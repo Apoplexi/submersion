@@ -241,10 +241,16 @@ void main() {
           ),
         );
 
-        final updatedDive = dive.copyWith(
+        // Fetch the dive to get the generated tank IDs
+        final fetchedDive = await repository.getDiveById(dive.id);
+        expect(fetchedDive, isNotNull);
+        expect(fetchedDive!.tanks.isNotEmpty, isTrue);
+        final tankId = fetchedDive.tanks[0].id;
+
+        final updatedDive = fetchedDive.copyWith(
           tanks: [
-            const DiveTank(
-              id: '',
+            DiveTank(
+              id: tankId,
               volume: 15.0,
               startPressure: 210,
               endPressure: 40,
