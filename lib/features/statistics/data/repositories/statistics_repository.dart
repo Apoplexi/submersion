@@ -236,7 +236,7 @@ class StatisticsRepository {
 
       RankingItem mapRow(dynamic row) {
         final dateMs = row.read<int>('dive_date_time');
-        final date = DateTime.fromMillisecondsSinceEpoch(dateMs);
+        final date = DateTime.fromMillisecondsSinceEpoch(dateMs, isUtc: true);
         final diveNum = row.read<int?>('dive_number');
         final siteName = row.read<String?>('site_name');
         return RankingItem(
@@ -288,7 +288,7 @@ class StatisticsRepository {
 
       RankingItem mapRow(dynamic row) {
         final dateMs = row.read<int>('dive_date_time');
-        final date = DateTime.fromMillisecondsSinceEpoch(dateMs);
+        final date = DateTime.fromMillisecondsSinceEpoch(dateMs, isUtc: true);
         final diveNum = row.read<int?>('dive_number');
         final siteName = row.read<String?>('site_name');
         return RankingItem(
