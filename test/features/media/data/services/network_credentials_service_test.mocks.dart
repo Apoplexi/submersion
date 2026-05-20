@@ -407,4 +407,13 @@ class MockNetworkCredentialsRepository extends _i1.Mock
             returnValueForMissingStub: _i4.Future<void>.value(),
           )
           as _i4.Future<void>);
+
+  @override
+  _i4.Future<void> updateDisplayName(String? id, String? displayName) =>
+      (super.noSuchMethod(
+            Invocation.method(#updateDisplayName, [id, displayName]),
+            returnValue: _i4.Future<void>.value(),
+            returnValueForMissingStub: _i4.Future<void>.value(),
+          )
+          as _i4.Future<void>);
 }

@@ -305,6 +305,15 @@ class MockNetworkCredentialsService extends _i1.Mock
             ),
           )
           as _i5.Future<List<_i8.NetworkCredentialHost>>);
+
+  @override
+  _i5.Future<void> updateDisplayName(String? id, String? displayName) =>
+      (super.noSuchMethod(
+            Invocation.method(#updateDisplayName, [id, displayName]),
+            returnValue: _i5.Future<void>.value(),
+            returnValueForMissingStub: _i5.Future<void>.value(),
+          )
+          as _i5.Future<void>);
 }
 
 /// A class which mocks [ManifestSubscriptionRepository].
@@ -445,6 +454,23 @@ class MockManifestSubscriptionRepository extends _i1.Mock
   _i5.Future<void> setActive(String? id, bool? isActive) =>
       (super.noSuchMethod(
             Invocation.method(#setActive, [id, isActive]),
+            returnValue: _i5.Future<void>.value(),
+            returnValueForMissingStub: _i5.Future<void>.value(),
+          )
+          as _i5.Future<void>);
+
+  @override
+  _i5.Future<void> updateUrlAndDisplayName(
+    String? id, {
+    required String? manifestUrl,
+    required String? displayName,
+  }) =>
+      (super.noSuchMethod(
+            Invocation.method(
+              #updateUrlAndDisplayName,
+              [id],
+              {#manifestUrl: manifestUrl, #displayName: displayName},
+            ),
             returnValue: _i5.Future<void>.value(),
             returnValueForMissingStub: _i5.Future<void>.value(),
           )
