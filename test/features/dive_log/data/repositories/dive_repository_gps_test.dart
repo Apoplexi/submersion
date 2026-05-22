@@ -29,11 +29,15 @@ void main() {
             diveDateTime: now,
             createdAt: now,
             updatedAt: now,
-            entryLatitude: withGps ? const Value(12.34567) : const Value.absent(),
+            entryLatitude: withGps
+                ? const Value(12.34567)
+                : const Value.absent(),
             entryLongitude: withGps
                 ? const Value(98.76543)
                 : const Value.absent(),
-            exitLatitude: withGps ? const Value(12.34612) : const Value.absent(),
+            exitLatitude: withGps
+                ? const Value(12.34612)
+                : const Value.absent(),
             exitLongitude: withGps
                 ? const Value(98.76489)
                 : const Value.absent(),

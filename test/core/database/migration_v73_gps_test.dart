@@ -9,9 +9,7 @@ void main() {
       final db = AppDatabase(NativeDatabase.memory());
       addTearDown(db.close);
 
-      final cols = await db
-          .customSelect("PRAGMA table_info('dives')")
-          .get();
+      final cols = await db.customSelect("PRAGMA table_info('dives')").get();
       final names = cols.map((c) => c.read<String>('name')).toSet();
 
       expect(
@@ -45,9 +43,9 @@ void main() {
             ),
           );
 
-      final row =
-          await (db.select(db.dives)..where((t) => t.id.equals('gps-1')))
-              .getSingle();
+      final row = await (db.select(
+        db.dives,
+      )..where((t) => t.id.equals('gps-1'))).getSingle();
       expect(row.entryLatitude, 12.34567);
       expect(row.exitLongitude, 98.76489);
     });
