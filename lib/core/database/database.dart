@@ -241,6 +241,12 @@ class Dives extends Table {
       text().nullable()(); // enum: WeatherSource.name
   IntColumn get weatherFetchedAt => integer().nullable()(); // unix timestamp
 
+  // GPS entry/exit fixes from dive computer (Shearwater Swift). Decimal degrees.
+  RealColumn get entryLatitude => real().nullable()();
+  RealColumn get entryLongitude => real().nullable()();
+  RealColumn get exitLatitude => real().nullable()();
+  RealColumn get exitLongitude => real().nullable()();
+
   // Import version: null = pre-fix, 1 = wall-clock-as-UTC convention
   IntColumn get importVersion => integer().nullable()();
 
@@ -1447,7 +1453,7 @@ class AppDatabase extends _$AppDatabase {
 
   /// The current schema version as a static constant so that pre-open checks
   /// (e.g. version-mismatch guard) can reference it without an instance.
-  static const int currentSchemaVersion = 72;
+  static const int currentSchemaVersion = 73;
 
   /// Every schema version that has a migration block in onUpgrade.
   /// Used to calculate progress step counts. When adding a new migration,
@@ -1523,6 +1529,7 @@ class AppDatabase extends _$AppDatabase {
     70,
     71,
     72,
+    73,
   ];
 
   /// Returns the number of migration steps that will execute when upgrading
@@ -3573,6 +3580,21 @@ class AppDatabase extends _$AppDatabase {
           ''');
         }
         if (from < 72) await reportProgress();
+        if (from < 73) {
+          await customStatement(
+            'ALTER TABLE dives ADD COLUMN entry_latitude REAL',
+          );
+          await customStatement(
+            'ALTER TABLE dives ADD COLUMN entry_longitude REAL',
+          );
+          await customStatement(
+            'ALTER TABLE dives ADD COLUMN exit_latitude REAL',
+          );
+          await customStatement(
+            'ALTER TABLE dives ADD COLUMN exit_longitude REAL',
+          );
+        }
+        if (from < 73) await reportProgress();
       },
       beforeOpen: (details) async {
         // Enable foreign keys
