@@ -9,6 +9,7 @@ import 'package:material_design_icons_flutter/material_design_icons_flutter.dart
 import 'package:submersion/core/providers/provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'package:submersion/core/constants/dive_detail_sections.dart';
 import 'package:submersion/core/constants/enums.dart';
@@ -22,6 +23,7 @@ import 'package:submersion/core/deco/altitude_calculator.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/o2_toxicity_card.dart';
 import 'package:submersion/core/services/export/export_service.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
+import 'package:submersion/core/utils/geo_math.dart';
 import 'package:submersion/features/buddies/domain/entities/buddy.dart';
 import 'package:submersion/features/buddies/presentation/providers/buddy_providers.dart';
 import 'package:submersion/features/marine_life/domain/entities/species.dart';
@@ -35,6 +37,7 @@ import 'package:submersion/features/dive_log/domain/entities/cylinder_sac.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive_data_source.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive_computer.dart';
+import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
 import 'package:submersion/features/dive_log/domain/entities/gas_switch.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_computer_providers.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_detail_ui_providers.dart';
@@ -317,6 +320,13 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
       DiveDetailSectionId.tide: () {
         // _buildTideSection includes its own internal spacing
         return [_buildTideSection(context, ref, dive)];
+      },
+      DiveDetailSectionId.surfaceGps: () {
+        if (dive.entryLocation == null && dive.exitLocation == null) return [];
+        return [
+          const SizedBox(height: 24),
+          _buildSurfaceGpsSection(context, ref, dive, units),
+        ];
       },
       DiveDetailSectionId.weights: () {
         if (!_hasWeights(dive)) return [];
@@ -1025,6 +1035,86 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
       ),
       child: Center(child: Icon(icon, size: 14, color: colorScheme.onPrimary)),
     );
+  }
+
+  Widget _buildSurfaceGpsSection(
+    BuildContext context,
+    WidgetRef ref,
+    Dive dive,
+    UnitFormatter units,
+  ) {
+    final isExpanded = ref.watch(surfaceGpsSectionExpandedProvider);
+    final entry = dive.entryLocation;
+    final exit = dive.exitLocation;
+
+    String? driftText;
+    if (entry != null && exit != null) {
+      final dist = distanceMeters(entry, exit);
+      final bearing = initialBearingDegrees(entry, exit);
+      driftText = '${units.formatDistance(dist)} · ${formatBearing(bearing)}';
+    }
+
+    final collapsedSubtitle = driftText != null
+        ? '${context.l10n.diveLog_detail_label_drift}: $driftText'
+        : (entry != null
+              ? context.l10n.diveLog_detail_surfaceGps_entryOnly
+              : context.l10n.diveLog_detail_surfaceGps_exitOnly);
+
+    return CollapsibleCardSection(
+      title: context.l10n.diveLog_detail_section_surfaceGps,
+      icon: Icons.my_location,
+      collapsedSubtitle: collapsedSubtitle,
+      isExpanded: isExpanded,
+      onToggle: (expanded) {
+        ref
+            .read(collapsibleSectionProvider.notifier)
+            .setSurfaceGpsExpanded(expanded);
+      },
+      contentBuilder: (context) => Padding(
+        padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Divider(),
+            if (entry != null)
+              _buildDetailRow(
+                context,
+                context.l10n.diveLog_detail_label_entry,
+                '${entry.latitude.toStringAsFixed(5)}, ${entry.longitude.toStringAsFixed(5)}',
+              ),
+            if (exit != null)
+              _buildDetailRow(
+                context,
+                context.l10n.diveLog_detail_label_exit,
+                '${exit.latitude.toStringAsFixed(5)}, ${exit.longitude.toStringAsFixed(5)}',
+              ),
+            if (driftText != null)
+              _buildDetailRow(
+                context,
+                context.l10n.diveLog_detail_label_drift,
+                driftText,
+              ),
+            const SizedBox(height: 8),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: TextButton.icon(
+                icon: const Icon(Icons.open_in_new, size: 16),
+                label: Text(context.l10n.diveLog_detail_openInMaps),
+                onPressed: () => _openInMaps(entry ?? exit!),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _openInMaps(GeoPoint point) async {
+    final uri = Uri.parse(
+      'https://www.openstreetmap.org/?mlat=${point.latitude}'
+      '&mlon=${point.longitude}#map=16/${point.latitude}/${point.longitude}',
+    );
+    await launchUrl(uri, mode: LaunchMode.externalApplication);
   }
 
   /// Format runtime: use stored value, or calculate from entry/exit times
