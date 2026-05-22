@@ -934,6 +934,10 @@ class DiveComputerRepository {
                 avgDepth: Value(effectiveAvgDepth),
                 duration: Value(durationSeconds),
                 waterTemp: Value(minWaterTemp),
+                entryLatitude: Value(entryLatitude),
+                entryLongitude: Value(entryLongitude),
+                exitLatitude: Value(exitLatitude),
+                exitLongitude: Value(exitLongitude),
                 entryTime: Value(profileStartTime),
                 exitTime: Value(
                   profileStartTime.add(Duration(seconds: durationSeconds)),

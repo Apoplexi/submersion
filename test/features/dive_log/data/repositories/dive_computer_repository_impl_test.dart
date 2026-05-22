@@ -528,6 +528,14 @@ void main() {
       expect(row.entryLongitude, 98.76543);
       expect(row.exitLatitude, 12.34612);
       expect(row.exitLongitude, 98.76489);
+
+      // The provenance (data source) row carries GPS too, for attribution.
+      final source =
+          await (db.select(db.diveDataSources)
+                ..where((t) => t.diveId.equals(diveId)))
+              .getSingle();
+      expect(source.entryLatitude, 12.34567);
+      expect(source.exitLongitude, 98.76489);
     });
   });
 }
