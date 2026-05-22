@@ -6,6 +6,8 @@ import 'package:submersion/features/dive_log/domain/entities/dive_data_source.da
 import 'package:submersion/features/dive_log/presentation/pages/dive_detail_page.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_detail_ui_providers.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_providers.dart';
+import 'package:submersion/features/dive_log/presentation/widgets/collapsible_section.dart';
+import 'package:submersion/features/dive_log/presentation/widgets/field_attribution_badge.dart';
 import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
 
@@ -24,6 +26,7 @@ Future<void> _pump(
   WidgetTester tester,
   Dive dive, {
   bool expanded = false,
+  List<DiveDataSource> sources = const [],
 }) async {
   final overrides = await getBaseOverrides();
   final originalOnError = FlutterError.onError;
@@ -37,9 +40,7 @@ Future<void> _pump(
         ...overrides,
         if (expanded) surfaceGpsSectionExpandedProvider.overrideWithValue(true),
         diveProvider(dive.id).overrideWith((ref) async => dive),
-        diveDataSourcesProvider(
-          dive.id,
-        ).overrideWith((ref) async => <DiveDataSource>[]),
+        diveDataSourcesProvider(dive.id).overrideWith((ref) async => sources),
       ],
       child: MaterialApp(
         localizationsDelegates: AppLocalizations.localizationsDelegates,
@@ -74,5 +75,49 @@ void main() {
     await _pump(tester, _gpsDive());
 
     expect(find.text('Surface GPS'), findsNothing);
+  });
+
+  testWidgets('shows source-attribution badge on GPS for a multi-computer '
+      'dive', (tester) async {
+    await _pump(
+      tester,
+      _gpsDive(
+        entry: const GeoPoint(12.34567, 98.76543),
+        exit: const GeoPoint(12.34612, 98.76489),
+      ),
+      expanded: true,
+      sources: [
+        DiveDataSource(
+          id: 's1',
+          diveId: 'sgps',
+          isPrimary: true,
+          computerModel: 'Perdix',
+          entryLatitude: 12.34567,
+          entryLongitude: 98.76543,
+          importedAt: DateTime(2026),
+          createdAt: DateTime(2026),
+        ),
+        DiveDataSource(
+          id: 's2',
+          diveId: 'sgps',
+          isPrimary: false,
+          computerModel: 'Teric',
+          importedAt: DateTime(2026),
+          createdAt: DateTime(2026),
+        ),
+      ],
+    );
+
+    final section = find.ancestor(
+      of: find.text('Surface GPS'),
+      matching: find.byType(CollapsibleCardSection),
+    );
+    expect(
+      find.descendant(
+        of: section,
+        matching: find.byType(FieldAttributionBadge),
+      ),
+      findsWidgets,
+    );
   });
 }

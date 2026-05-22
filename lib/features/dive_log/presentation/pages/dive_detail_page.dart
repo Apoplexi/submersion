@@ -325,7 +325,25 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
         if (dive.entryLocation == null && dive.exitLocation == null) return [];
         return [
           const SizedBox(height: 24),
-          _buildSurfaceGpsSection(context, ref, dive, units),
+          ValueListenableBuilder<String?>(
+            valueListenable: _viewedSourceIdNotifier,
+            builder: (context, viewedSourceId, _) {
+              final dataSources = computerReadingsAsync.valueOrNull ?? [];
+              final attribution = FieldAttributionService.computeAttribution(
+                dataSources,
+                viewedSourceId: viewedSourceId,
+              );
+              final showBadges =
+                  settings.showDataSourceBadges && attribution.isNotEmpty;
+              return _buildSurfaceGpsSection(
+                context,
+                ref,
+                dive,
+                units,
+                sourceName: showBadges ? attribution['gps'] : null,
+              );
+            },
+          ),
         ];
       },
       DiveDetailSectionId.weights: () {
@@ -1041,8 +1059,9 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
     BuildContext context,
     WidgetRef ref,
     Dive dive,
-    UnitFormatter units,
-  ) {
+    UnitFormatter units, {
+    String? sourceName,
+  }) {
     final isExpanded = ref.watch(surfaceGpsSectionExpandedProvider);
     final entry = dive.entryLocation;
     final exit = dive.exitLocation;
@@ -1081,12 +1100,14 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
                 context,
                 context.l10n.diveLog_detail_label_entry,
                 '${entry.latitude.toStringAsFixed(5)}, ${entry.longitude.toStringAsFixed(5)}',
+                sourceName: sourceName,
               ),
             if (exit != null)
               _buildDetailRow(
                 context,
                 context.l10n.diveLog_detail_label_exit,
                 '${exit.latitude.toStringAsFixed(5)}, ${exit.longitude.toStringAsFixed(5)}',
+                sourceName: sourceName,
               ),
             if (driftText != null)
               _buildDetailRow(
