@@ -2998,13 +2998,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get diveLog_detail_label_elevation => 'Elevation';
 
   @override
-  String get diveLog_detail_label_entry => 'Entry';
+  String get diveLog_detail_label_entry => 'Entry:';
 
   @override
   String get diveLog_detail_label_entryMethod => 'Entry Method';
 
   @override
-  String get diveLog_detail_label_exit => 'Exit';
+  String get diveLog_detail_label_exit => 'Exit:';
 
   @override
   String get diveLog_detail_label_exitMethod => 'Exit Method';
@@ -9603,6 +9603,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get diveLog_detail_section_surfaceGps => 'Surface GPS';
+
+  @override
+  String get diveLog_detail_surfaceGps_entry => 'Entry';
+
+  @override
+  String get diveLog_detail_surfaceGps_exit => 'Exit';
 
   @override
   String get diveLog_detail_label_drift => 'Drift';

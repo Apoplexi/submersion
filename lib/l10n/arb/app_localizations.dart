@@ -5143,7 +5143,7 @@ abstract class AppLocalizations {
   /// No description provided for @diveLog_detail_label_entry.
   ///
   /// In en, this message translates to:
-  /// **'Entry'**
+  /// **'Entry:'**
   String get diveLog_detail_label_entry;
 
   /// No description provided for @diveLog_detail_label_entryMethod.
@@ -5155,7 +5155,7 @@ abstract class AppLocalizations {
   /// No description provided for @diveLog_detail_label_exit.
   ///
   /// In en, this message translates to:
-  /// **'Exit'**
+  /// **'Exit:'**
   String get diveLog_detail_label_exit;
 
   /// No description provided for @diveLog_detail_label_exitMethod.
@@ -16737,6 +16737,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Surface GPS'**
   String get diveLog_detail_section_surfaceGps;
+
+  /// No description provided for @diveLog_detail_surfaceGps_entry.
+  ///
+  /// In en, this message translates to:
+  /// **'Entry'**
+  String get diveLog_detail_surfaceGps_entry;
+
+  /// No description provided for @diveLog_detail_surfaceGps_exit.
+  ///
+  /// In en, this message translates to:
+  /// **'Exit'**
+  String get diveLog_detail_surfaceGps_exit;
 
   /// No description provided for @diveLog_detail_label_drift.
   ///

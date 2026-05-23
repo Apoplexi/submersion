@@ -9800,6 +9800,12 @@ class AppLocalizationsFr extends AppLocalizations {
   String get diveLog_detail_section_surfaceGps => 'Surface GPS';
 
   @override
+  String get diveLog_detail_surfaceGps_entry => 'Entry';
+
+  @override
+  String get diveLog_detail_surfaceGps_exit => 'Exit';
+
+  @override
   String get diveLog_detail_label_drift => 'Drift';
 
   @override

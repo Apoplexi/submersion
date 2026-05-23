@@ -1098,14 +1098,14 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
             if (entry != null)
               _buildDetailRow(
                 context,
-                context.l10n.diveLog_detail_label_entry,
+                context.l10n.diveLog_detail_surfaceGps_entry,
                 '${entry.latitude.toStringAsFixed(5)}, ${entry.longitude.toStringAsFixed(5)}',
                 sourceName: sourceName,
               ),
             if (exit != null)
               _buildDetailRow(
                 context,
-                context.l10n.diveLog_detail_label_exit,
+                context.l10n.diveLog_detail_surfaceGps_exit,
                 '${exit.latitude.toStringAsFixed(5)}, ${exit.longitude.toStringAsFixed(5)}',
                 sourceName: sourceName,
               ),
