@@ -753,6 +753,21 @@ class DiveRepository {
   Future<void> updateDive(domain.Dive dive) async {
     try {
       _log.info('Updating dive: ${dive.id}');
+
+      // Validate that all tanks have non-empty IDs on update to prevent data loss
+      // (If a tank ID is empty, it would generate a new UUID and cause the old tank to be deleted)
+      final emptyTankIndices = dive.tanks
+          .asMap()
+          .entries
+          .where((e) => e.value.id.isEmpty)
+          .map((e) => e.key);
+      if (emptyTankIndices.isNotEmpty) {
+        throw ArgumentError(
+          'Cannot update dive: tank(s) at index(es) ${emptyTankIndices.join(', ')} '
+          'have empty IDs. All tanks must have valid IDs when updating a dive.',
+        );
+      }
+
       final now = DateTime.now().millisecondsSinceEpoch;
 
       await (_db.update(_db.dives)..where((t) => t.id.equals(dive.id))).write(
@@ -864,7 +879,8 @@ class DiveRepository {
 
       // Update or insert tanks
       for (final tank in dive.tanks) {
-        final tankId = tank.id.isNotEmpty ? tank.id : _uuid.v4();
+        // Tank ID is guaranteed to be non-empty by validation at start of method
+        final tankId = tank.id;
         updatedTankIds.add(tankId);
 
         if (existingTankIds.contains(tankId)) {
@@ -2491,9 +2507,9 @@ class DiveRepository {
           : null,
       tanks: tankRows.map((t) {
         // Derive start/end pressure from profile data when available.
-        // Profile time-series from AI transmitters is the authoritative
-        // source, preferred over stored values (which may be stale or
-        // defaulted from a tank preset's working pressure).
+        // Profile time-series from AI transmitters is the fallback
+        // source, if values entered by the user are not available in the
+        // dive tanks table.
         final profilePoints = tankPressuresByTankId[t.id];
         final profileStartPressure =
             profilePoints != null && profilePoints.isNotEmpty

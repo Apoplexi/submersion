@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 
 import 'package:submersion/core/constants/enums.dart';
+import 'package:submersion/core/deco/constants/buhlmann_coefficients.dart';
 import 'package:submersion/features/dive_centers/domain/entities/dive_center.dart';
 import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
 import 'package:submersion/features/dive_types/domain/entities/dive_type_entity.dart';
@@ -917,10 +918,12 @@ class GasMix extends Equatable {
   bool get isAir => o2 >= 20 && o2 <= 22 && he == 0;
   bool get isNitrox => o2 > 22 && he == 0;
   bool get isTrimix => he > 0;
+  bool get isOxygen => o2 >= 99 && he == 0;
 
   String get name {
     if (isAir) return 'Air';
     if (isTrimix) return 'Tx $roundedO2/$roundedHe';
+    if (isOxygen) return 'O2';
     if (isNitrox) return 'EAN$roundedO2';
     return '$roundedO2% O2';
   }
@@ -933,7 +936,7 @@ class GasMix extends Equatable {
   /// Equivalent Narcotic Depth at given depth.
   ///
   /// When [o2Narcotic] is true, all gases except He are narcotic.
-  /// When false, only N2 is narcotic (compared against air baseline 0.79).
+  /// When false, only N2 is narcotic (compared against the air N2 baseline).
   double end(double depth, {bool o2Narcotic = true}) {
     final ambientPressure = (depth / 10) + 1;
     if (o2Narcotic) {
@@ -941,7 +944,7 @@ class GasMix extends Equatable {
       return ((ambientPressure * narcoticFraction) - 1) * 10;
     } else {
       final n2Fraction = n2 / 100.0;
-      return ((ambientPressure * n2Fraction / 0.79) - 1) * 10;
+      return ((ambientPressure * n2Fraction / airN2Fraction) - 1) * 10;
     }
   }
 
@@ -959,7 +962,7 @@ class GasMix extends Equatable {
     } else {
       final n2Fraction = n2 / 100.0;
       if (n2Fraction <= 0) return double.infinity;
-      final maxPressure = targetPressure * 0.79 / n2Fraction;
+      final maxPressure = targetPressure * airN2Fraction / n2Fraction;
       return (maxPressure - 1) * 10;
     }
   }
@@ -978,7 +981,7 @@ class GasMix extends Equatable {
 
     final he = o2Narcotic
         ? (1 - targetPressure / maxPressure) * 100
-        : 100 - o2 - (targetPressure * 0.79 / maxPressure * 100);
+        : 100 - o2 - (targetPressure * airN2Fraction / maxPressure * 100);
 
     return he.clamp(0.0, 100 - o2);
   }

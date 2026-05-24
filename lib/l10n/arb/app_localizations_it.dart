@@ -4006,6 +4006,9 @@ class AppLocalizationsIt extends AppLocalizations {
   String get diveLog_legend_label_sacRate => 'Consumo SAC';
 
   @override
+  String get diveLog_legend_label_showGas => 'Gas';
+
+  @override
   String get diveLog_legend_label_surfaceGf => 'GF superficie';
 
   @override
@@ -9099,10 +9102,6 @@ class AppLocalizationsIt extends AppLocalizations {
   String get media_photoPicker_openSettingsButton => 'Apri Impostazioni';
 
   @override
-  String get media_photoPicker_openSettingsSnackbar =>
-      'Apri Impostazioni e abilita l\'accesso alle foto';
-
-  @override
   String get media_photoPicker_permissionDeniedMessage =>
       'L\'accesso alla libreria foto è stato negato. Abilitalo nelle Impostazioni per aggiungere foto delle immersioni.';
 
@@ -9290,8 +9289,26 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
+  String get media_unavailablePlaceholder_fileNotFound => 'File not found';
+
+  @override
+  String get media_unavailablePlaceholder_fromOtherDevice =>
+      'From another device';
+
+  @override
+  String media_unavailablePlaceholder_fromOtherDeviceLabel(String device) {
+    return 'From $device';
+  }
+
+  @override
+  String get media_unavailablePlaceholder_networkError => 'Couldn\'t connect';
+
+  @override
   String get media_unavailablePlaceholder_notOnDevice =>
       'Non su questo dispositivo';
+
+  @override
+  String get media_unavailablePlaceholder_signInRequired => 'Sign in to view';
 
   @override
   String get media_writeMetadata_cancelButton => 'Annulla';

@@ -25,6 +25,7 @@ class RankingItem {
   final int count;
   final double? value;
   final String? subtitle;
+  final DateTime? date;
 
   RankingItem({
     required this.id,
@@ -32,6 +33,7 @@ class RankingItem {
     required this.count,
     this.value,
     this.subtitle,
+    this.date,
   });
 }
 
@@ -234,7 +236,7 @@ class StatisticsRepository {
 
       RankingItem mapRow(dynamic row) {
         final dateMs = row.read<int>('dive_date_time');
-        final date = DateTime.fromMillisecondsSinceEpoch(dateMs);
+        final date = DateTime.fromMillisecondsSinceEpoch(dateMs, isUtc: true);
         final diveNum = row.read<int?>('dive_number');
         final siteName = row.read<String?>('site_name');
         return RankingItem(
@@ -242,7 +244,7 @@ class StatisticsRepository {
           name: siteName ?? 'Dive #${diveNum ?? "?"}',
           count: 0,
           value: row.read<double>('sac'),
-          subtitle: '${date.day}/${date.month}/${date.year}',
+          date: date,
         );
       }
 
@@ -286,7 +288,7 @@ class StatisticsRepository {
 
       RankingItem mapRow(dynamic row) {
         final dateMs = row.read<int>('dive_date_time');
-        final date = DateTime.fromMillisecondsSinceEpoch(dateMs);
+        final date = DateTime.fromMillisecondsSinceEpoch(dateMs, isUtc: true);
         final diveNum = row.read<int?>('dive_number');
         final siteName = row.read<String?>('site_name');
         return RankingItem(
@@ -294,7 +296,7 @@ class StatisticsRepository {
           name: siteName ?? 'Dive #${diveNum ?? "?"}',
           count: 0,
           value: row.read<double>('sac'),
-          subtitle: '${date.day}/${date.month}/${date.year}',
+          date: date,
         );
       }
 
@@ -309,10 +311,63 @@ class StatisticsRepository {
     }
   }
 
-  /// Get average SAC by tank role (back gas, stage, deco, etc.)
+  /// Get volume-based average SAC by tank role (back gas, stage, deco, etc.)
+  ///
+  /// Returns a map of tank role to average SAC in L/min.
+  /// Requires tank volume data.
+  Future<Map<String, double>> getSacVolumeByTankRole({String? diverId}) async {
+    try {
+      final diverFilter = diverId != null ? 'AND d.diver_id = ?' : '';
+      final params = diverId != null ? [diverId] : [];
+
+      final results = await _db.customSelect('''
+        SELECT
+          t.tank_role,
+          AVG(
+            CASE
+              WHEN COALESCE(d.runtime, d.bottom_time) > 0 AND d.avg_depth > 0 AND t.start_pressure > t.end_pressure THEN
+                ((t.start_pressure - t.end_pressure) * t.volume) / (COALESCE(d.runtime, d.bottom_time) / 60.0) / ((d.avg_depth / 10.0) + 1)
+              ELSE NULL
+            END
+          ) AS avg_sac
+        FROM dives d
+        INNER JOIN dive_tanks t ON t.dive_id = d.id
+        WHERE t.start_pressure IS NOT NULL
+          AND t.end_pressure IS NOT NULL
+          AND COALESCE(d.runtime, d.bottom_time) > 0
+          AND d.avg_depth > 0
+          AND t.volume > 0
+          $diverFilter
+        GROUP BY t.tank_role
+        HAVING avg_sac IS NOT NULL
+        ORDER BY avg_sac ASC
+        ''', variables: params.map((p) => Variable(p)).toList()).get();
+
+      final Map<String, double> sacByRole = {};
+      for (final row in results) {
+        final role = row.read<String>('tank_role');
+        final sac = row.read<double>('avg_sac');
+        sacByRole[role] = sac;
+      }
+
+      return sacByRole;
+    } catch (e, stackTrace) {
+      _log.error(
+        'Failed to get SAC in volume by tank role',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      return {};
+    }
+  }
+
+  /// Get pressure-based average SAC by tank role (back gas, stage, deco, etc.)
   ///
   /// Returns a map of tank role to average SAC in bar/min.
-  Future<Map<String, double>> getSacByTankRole({String? diverId}) async {
+  /// Does not require tank volume.
+  Future<Map<String, double>> getSacPressureByTankRole({
+    String? diverId,
+  }) async {
     try {
       final diverFilter = diverId != null ? 'AND d.diver_id = ?' : '';
       final params = diverId != null ? [diverId] : [];
@@ -349,7 +404,7 @@ class StatisticsRepository {
       return sacByRole;
     } catch (e, stackTrace) {
       _log.error(
-        'Failed to get SAC by tank role',
+        'Failed to get SAC in pressure by tank role',
         error: e,
         stackTrace: stackTrace,
       );

@@ -3887,6 +3887,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get diveLog_legend_label_sacRate => 'קצב SAC';
 
   @override
+  String get diveLog_legend_label_showGas => 'גזים';
+
+  @override
   String get diveLog_legend_label_surfaceGf => 'GF פני השטח';
 
   @override
@@ -8862,10 +8865,6 @@ class AppLocalizationsHe extends AppLocalizations {
   String get media_photoPicker_openSettingsButton => 'פתח הגדרות';
 
   @override
-  String get media_photoPicker_openSettingsSnackbar =>
-      'נא לפתוח הגדרות ולאפשר גישה לתמונות';
-
-  @override
   String get media_photoPicker_permissionDeniedMessage =>
       'הגישה לספריית התמונות נדחתה. נא לאפשר אותה בהגדרות כדי להוסיף תמונות צלילה.';
 
@@ -9044,7 +9043,25 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
+  String get media_unavailablePlaceholder_fileNotFound => 'File not found';
+
+  @override
+  String get media_unavailablePlaceholder_fromOtherDevice =>
+      'From another device';
+
+  @override
+  String media_unavailablePlaceholder_fromOtherDeviceLabel(String device) {
+    return 'From $device';
+  }
+
+  @override
+  String get media_unavailablePlaceholder_networkError => 'Couldn\'t connect';
+
+  @override
   String get media_unavailablePlaceholder_notOnDevice => 'לא במכשיר הזה';
+
+  @override
+  String get media_unavailablePlaceholder_signInRequired => 'Sign in to view';
 
   @override
   String get media_writeMetadata_cancelButton => 'ביטול';
