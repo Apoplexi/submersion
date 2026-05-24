@@ -67,9 +67,14 @@ DownloadedDive parsedDiveToDownloaded(pigeon.ParsedDive parsed) {
         )
         .toList(),
     tanks: parsed.tanks.map((t) {
+      // The tank's gas-mix link can be DC_GASMIX_UNKNOWN (e.g. Shearwater
+      // single-gas dives leave the tank unlinked). Fall back to the primary
+      // mix rather than assuming air, which would mislabel an EAN dive.
       final gasMix = parsed.gasMixes.firstWhere(
         (g) => g.index == t.gasMixIndex,
-        orElse: () => pigeon.GasMix(index: 0, o2Percent: 21.0, hePercent: 0.0),
+        orElse: () => parsed.gasMixes.isNotEmpty
+            ? parsed.gasMixes.first
+            : pigeon.GasMix(index: 0, o2Percent: 21.0, hePercent: 0.0),
       );
       return DownloadedTank(
         index: t.index,

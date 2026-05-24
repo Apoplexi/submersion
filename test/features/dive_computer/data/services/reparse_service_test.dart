@@ -2102,7 +2102,57 @@ void main() {
   });
 
   group('Coverage: _carryOverTanks gas mix fallback', () {
-    test('unmatched gasMixIndex falls back to 21% O2 and 0% He', () async {
+    test(
+      'unmatched gasMixIndex falls back to the primary (first) mix',
+      () async {
+        await insertDive('dive-1');
+        await insertComputer('comp-1');
+        await insertSource(
+          id: 'src-1',
+          diveId: 'dive-1',
+          computerId: 'comp-1',
+          isPrimary: true,
+        );
+
+        // Tank gas-mix link unmatched (e.g. DC_GASMIX_UNKNOWN on a Shearwater
+        // single-gas dive): must resolve to the dive's primary mix, not air.
+        final parsed = makeParsedDive(
+          tanks: [
+            pigeon.TankInfo(
+              index: 0,
+              gasMixIndex: 99,
+              volumeLiters: 12.0,
+              startPressureBar: 200.0,
+              endPressureBar: 50.0,
+            ),
+          ],
+          gasMixes: [
+            pigeon.GasMix(index: 0, o2Percent: 32.0, hePercent: 0.0),
+            pigeon.GasMix(index: 1, o2Percent: 21.0, hePercent: 0.0),
+          ],
+        );
+
+        await service.applyParsedUpdate(
+          diveId: 'dive-1',
+          sourceRowId: 'src-1',
+          parsed: parsed,
+          descriptorVendor: null,
+          descriptorProduct: null,
+          descriptorModel: null,
+          libdivecomputerVersion: null,
+        );
+
+        final tanks = await (db.select(
+          db.diveTanks,
+        )..where((t) => t.diveId.equals('dive-1'))).get();
+        expect(tanks.length, 1);
+        // Primary mix (index 0 = EAN32), NOT a hardcoded 21% air default.
+        expect(tanks.first.o2Percent, 32.0);
+        expect(tanks.first.hePercent, 0.0);
+      },
+    );
+
+    test('falls back to air only when there are no gas mixes at all', () async {
       await insertDive('dive-1');
       await insertComputer('comp-1');
       await insertSource(
@@ -2112,7 +2162,6 @@ void main() {
         isPrimary: true,
       );
 
-      // Tank with gasMixIndex 99, which does not match any gas mix
       final parsed = makeParsedDive(
         tanks: [
           pigeon.TankInfo(
@@ -2123,10 +2172,7 @@ void main() {
             endPressureBar: 50.0,
           ),
         ],
-        gasMixes: [
-          // Only gas mix at index 0 -- tank references index 99
-          pigeon.GasMix(index: 0, o2Percent: 36.0, hePercent: 10.0),
-        ],
+        gasMixes: [],
       );
 
       await service.applyParsedUpdate(
@@ -2143,7 +2189,6 @@ void main() {
         db.diveTanks,
       )..where((t) => t.diveId.equals('dive-1'))).get();
       expect(tanks.length, 1);
-      // Fallback: 21% O2, 0% He
       expect(tanks.first.o2Percent, 21.0);
       expect(tanks.first.hePercent, 0.0);
     });

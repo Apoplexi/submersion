@@ -223,9 +223,29 @@ void main() {
       expect(downloaded.tanks[1].gasName, 'EAN50');
     });
 
-    test('falls back to air when gas mix not found', () {
+    test('unmatched gasMixIndex falls back to the primary (first) mix', () {
+      // Tank gas-mix link unknown (DC_GASMIX_UNKNOWN, e.g. Shearwater
+      // single-gas dives): must resolve to the dive's primary mix, not a
+      // hardcoded air default that would mislabel an EAN dive.
       final parsed = makeParsedDive(
-        fingerprint: 'fallback',
+        fingerprint: 'fallback-primary',
+        tanks: [pigeon.TankInfo(index: 0, gasMixIndex: 99)],
+        gasMixes: [
+          pigeon.GasMix(index: 0, o2Percent: 32.0, hePercent: 0.0),
+          pigeon.GasMix(index: 1, o2Percent: 21.0, hePercent: 0.0),
+        ],
+      );
+
+      final downloaded = parsedDiveToDownloaded(parsed);
+
+      expect(downloaded.tanks, hasLength(1));
+      expect(downloaded.tanks[0].o2Percent, 32.0);
+      expect(downloaded.tanks[0].hePercent, 0.0);
+    });
+
+    test('falls back to air when there are no gas mixes at all', () {
+      final parsed = makeParsedDive(
+        fingerprint: 'fallback-air',
         tanks: [pigeon.TankInfo(index: 0, gasMixIndex: 99)],
       );
 

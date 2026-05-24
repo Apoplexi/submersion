@@ -480,10 +480,14 @@ class ReparseService {
     for (final tank in parsed.tanks) {
       newTankOrders.add(tank.index);
 
-      // Resolve gas mix
+      // Resolve gas mix. The tank's gas-mix link can be DC_GASMIX_UNKNOWN
+      // (e.g. Shearwater single-gas dives); fall back to the primary mix
+      // rather than assuming air, which would mislabel an EAN dive.
       final gasMix = parsed.gasMixes.firstWhere(
         (g) => g.index == tank.gasMixIndex,
-        orElse: () => pigeon.GasMix(index: 0, o2Percent: 21.0, hePercent: 0.0),
+        orElse: () => parsed.gasMixes.isNotEmpty
+            ? parsed.gasMixes.first
+            : pigeon.GasMix(index: 0, o2Percent: 21.0, hePercent: 0.0),
       );
 
       final existing = existingByOrder[tank.index];
