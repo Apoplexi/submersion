@@ -278,6 +278,135 @@ void main() {
     });
   });
 
+  group('combineMultiTankPressures', () {
+    test('returns the tank pressure series when the tank has no volume', () {
+      // Reproduces a Shearwater Teric import: per-sample tank pressure is
+      // present, but cylinder volume is unknown (dive computers log pressure,
+      // not tank size). SAC on the profile graph is shown in bar/min and does
+      // not require volume, so a pressure series must still be produced.
+      const tank = DiveTank(id: 'tank-1', gasMix: GasMix(o2: 21, he: 0));
+      final tankPressures = {
+        'tank-1': const [
+          TankPressurePoint(
+            id: 'p0',
+            tankId: 'tank-1',
+            timestamp: 0,
+            pressure: 200,
+          ),
+          TankPressurePoint(
+            id: 'p1',
+            tankId: 'tank-1',
+            timestamp: 60,
+            pressure: 190,
+          ),
+          TankPressurePoint(
+            id: 'p2',
+            tankId: 'tank-1',
+            timestamp: 120,
+            pressure: 180,
+          ),
+        ],
+      };
+
+      final result = combineMultiTankPressures(
+        timestamps: const [0, 60, 120],
+        tankPressures: tankPressures,
+        tanks: const [tank],
+      );
+
+      expect(result, isNotNull);
+      expect(result, hasLength(3));
+      expect(result![0], closeTo(200, 0.001));
+      expect(result[1], closeTo(190, 0.001));
+      expect(result[2], closeTo(180, 0.001));
+    });
+
+    test('weights tanks by volume when volumes are present', () {
+      // Tank A (10 L) drops 200 -> 100; tank B (20 L) holds at 200. The
+      // combined series must be volume-weighted, not a plain average:
+      //   t=60: (100*10 + 200*20) / 30 = 166.67  (plain average would be 150).
+      const tankA = DiveTank(id: 'a', volume: 10, gasMix: GasMix());
+      const tankB = DiveTank(id: 'b', volume: 20, gasMix: GasMix());
+      final tankPressures = {
+        'a': const [
+          TankPressurePoint(id: 'a0', tankId: 'a', timestamp: 0, pressure: 200),
+          TankPressurePoint(
+            id: 'a1',
+            tankId: 'a',
+            timestamp: 60,
+            pressure: 100,
+          ),
+        ],
+        'b': const [
+          TankPressurePoint(id: 'b0', tankId: 'b', timestamp: 0, pressure: 200),
+          TankPressurePoint(
+            id: 'b1',
+            tankId: 'b',
+            timestamp: 60,
+            pressure: 200,
+          ),
+        ],
+      };
+
+      final result = combineMultiTankPressures(
+        timestamps: const [0, 60],
+        tankPressures: tankPressures,
+        tanks: const [tankA, tankB],
+      );
+
+      expect(result, isNotNull);
+      expect(result![0], closeTo(200, 0.01));
+      expect(result[1], closeTo(166.667, 0.01));
+    });
+
+    test('weights tanks equally when none has a volume', () {
+      // Same pressures as the volume-weighted case but with no volumes: the
+      // fallback weights tanks equally, so t=60 is (100 + 200) / 2 = 150.
+      const tankA = DiveTank(id: 'a', gasMix: GasMix());
+      const tankB = DiveTank(id: 'b', gasMix: GasMix());
+      final tankPressures = {
+        'a': const [
+          TankPressurePoint(id: 'a0', tankId: 'a', timestamp: 0, pressure: 200),
+          TankPressurePoint(
+            id: 'a1',
+            tankId: 'a',
+            timestamp: 60,
+            pressure: 100,
+          ),
+        ],
+        'b': const [
+          TankPressurePoint(id: 'b0', tankId: 'b', timestamp: 0, pressure: 200),
+          TankPressurePoint(
+            id: 'b1',
+            tankId: 'b',
+            timestamp: 60,
+            pressure: 200,
+          ),
+        ],
+      };
+
+      final result = combineMultiTankPressures(
+        timestamps: const [0, 60],
+        tankPressures: tankPressures,
+        tanks: const [tankA, tankB],
+      );
+
+      expect(result, isNotNull);
+      expect(result![0], closeTo(200, 0.01));
+      expect(result[1], closeTo(150, 0.01));
+    });
+
+    test('returns null when no tank pressure data is available', () {
+      final result = combineMultiTankPressures(
+        timestamps: const [0, 60],
+        tankPressures: const {},
+        tanks: const [DiveTank(id: 'tank-1', gasMix: GasMix())],
+      );
+
+      expect(result, isNull);
+    });
+  });
+
   group('ProfileAnalysisService - Gradient Factor override', () {
     test('different GF values produce different NDL curves', () {
       // Conservative GF 30/70

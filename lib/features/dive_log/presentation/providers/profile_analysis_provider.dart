@@ -37,14 +37,21 @@ final diveComputerEventsProvider =
       return dbEvents.map(mapDiveProfileEventToProfileEvent).toList();
     });
 
-/// Combines pressure data from multiple tanks into a single pressure series.
+/// Combines pressure data from one or more tanks into a single pressure series.
 ///
-/// For multi-tank SAC calculation, we need to track total gas consumption across
-/// all tanks. This function sums up pressure drops at each timestamp.
+/// Aligns each tank's pressure readings to [timestamps] (interpolating between
+/// samples) to track total gas consumption across all tanks.
 ///
-/// Returns a list of combined pressures aligned with the given timestamps,
-/// or null if no multi-tank data is available.
-List<double>? _combineMultiTankPressures({
+/// Tank volume is used only to weight multiple tanks against each other. When
+/// no tank has a configured volume -- common for dives imported from a dive
+/// computer such as a Shearwater, which logs tank pressure but not cylinder
+/// size -- the tanks are weighted equally so a SAC curve (bar/min) can still be
+/// produced; for a single tank this yields its raw pressure series.
+///
+/// Returns a list of combined pressures aligned with [timestamps], or null if
+/// no tank pressure data is available.
+@visibleForTesting
+List<double>? combineMultiTankPressures({
   required List<int> timestamps,
   required Map<String, List<TankPressurePoint>> tankPressures,
   required List<DiveTank> tanks,
@@ -59,8 +66,16 @@ List<double>? _combineMultiTankPressures({
     }
   }
 
-  // If no tank has volume data, we can't properly calculate combined SAC
-  if (tankVolumes.isEmpty) return null;
+  // Volume is only needed to weight multiple tanks against each other. When no
+  // tank has a configured volume -- common for dives imported from a dive
+  // computer such as a Shearwater, which logs tank pressure but not cylinder
+  // size -- fall back to equal weighting so the SAC curve (bar/min) can still
+  // be produced. For a single tank this yields its raw pressure series.
+  if (tankVolumes.isEmpty) {
+    for (final tank in tanks) {
+      tankVolumes[tank.id] = 1.0;
+    }
+  }
 
   // For each timestamp, calculate total gas consumption (in liters at surface)
   // from all tanks with pressure data
@@ -477,7 +492,7 @@ final profileAnalysisProvider = FutureProvider.family<ProfileAnalysis?, String>(
         _log.debug(
           'Loading multi-tank pressure data: ${tankPressures.length} tanks',
         );
-        pressures = _combineMultiTankPressures(
+        pressures = combineMultiTankPressures(
           timestamps: timestamps,
           tankPressures: tankPressures,
           tanks: dive.tanks,
