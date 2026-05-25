@@ -283,9 +283,7 @@ class _DiveNumberingDialogState extends ConsumerState<DiveNumberingDialog> {
       final repository = ref.read(diveRepositoryProvider);
       final diverId = await ref.read(validatedCurrentDiverIdProvider.future);
       await repository.assignMissingDiveNumbers(diverId: diverId);
-      ref.invalidate(diveNumberingInfoProvider);
-      ref.invalidate(diveListNotifierProvider);
-      ref.invalidate(paginatedDiveListProvider);
+      invalidateDiveNumberingProviders(ref);
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -356,9 +354,7 @@ class _DiveNumberingDialogState extends ConsumerState<DiveNumberingDialog> {
       final repository = ref.read(diveRepositoryProvider);
       final diverId = await ref.read(validatedCurrentDiverIdProvider.future);
       await repository.renumberAllDives(startFrom: startFrom, diverId: diverId);
-      ref.invalidate(diveNumberingInfoProvider);
-      ref.invalidate(diveListNotifierProvider);
-      ref.invalidate(paginatedDiveListProvider);
+      invalidateDiveNumberingProviders(ref);
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -378,6 +374,18 @@ class _DiveNumberingDialogState extends ConsumerState<DiveNumberingDialog> {
       setState(() => _isRenumbering = false);
     }
   }
+}
+
+/// Invalidates all Riverpod providers that must refresh after any dive
+/// renumbering operation (renumber-all or assign-missing).
+///
+/// Includes [diveProvider] (the per-dive detail cache) so that open detail
+/// pages reflect the new numbers without requiring a save round-trip.
+void invalidateDiveNumberingProviders(WidgetRef ref) {
+  ref.invalidate(diveNumberingInfoProvider);
+  ref.invalidate(diveListNotifierProvider);
+  ref.invalidate(paginatedDiveListProvider);
+  ref.invalidate(diveProvider);
 }
 
 /// Shows the dive numbering dialog
