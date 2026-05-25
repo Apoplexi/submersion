@@ -33,6 +33,25 @@ void main() {
     });
   });
 
+  group('AppSettings defaultShowGasTimeline', () {
+    test('defaults to true', () {
+      const settings = AppSettings();
+      expect(settings.defaultShowGasTimeline, isTrue);
+    });
+
+    test('copyWith updates defaultShowGasTimeline', () {
+      const settings = AppSettings();
+      final updated = settings.copyWith(defaultShowGasTimeline: false);
+      expect(updated.defaultShowGasTimeline, isFalse);
+    });
+
+    test('copyWith preserves defaultShowGasTimeline when not specified', () {
+      const settings = AppSettings(defaultShowGasTimeline: false);
+      final updated = settings.copyWith(themePresetId: 'dark');
+      expect(updated.defaultShowGasTimeline, isFalse);
+    });
+  });
+
   group('AppSettings diveDetailSections', () {
     test('defaults to all 18 sections visible', () {
       const settings = AppSettings();

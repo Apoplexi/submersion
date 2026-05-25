@@ -244,6 +244,9 @@ class AppSettings {
   /// Default visibility for gas switch markers on dive profile
   final bool defaultShowGasSwitchMarkers;
 
+  /// Default visibility for the gas-usage timeline strip on the dive profile
+  final bool defaultShowGasTimeline;
+
   // Notification settings
   final bool notificationsEnabled;
   final List<int> serviceReminderDays;
@@ -342,6 +345,7 @@ class AppSettings {
     this.defaultShowCns = false,
     this.defaultShowOtu = false,
     this.defaultShowGasSwitchMarkers = true,
+    this.defaultShowGasTimeline = true,
     // Notification defaults
     this.notificationsEnabled = true,
     this.serviceReminderDays = const [7, 14, 30],
@@ -465,6 +469,7 @@ class AppSettings {
     bool? defaultShowCns,
     bool? defaultShowOtu,
     bool? defaultShowGasSwitchMarkers,
+    bool? defaultShowGasTimeline,
     bool? notificationsEnabled,
     List<int>? serviceReminderDays,
     TimeOfDay? reminderTime,
@@ -568,6 +573,8 @@ class AppSettings {
       defaultShowOtu: defaultShowOtu ?? this.defaultShowOtu,
       defaultShowGasSwitchMarkers:
           defaultShowGasSwitchMarkers ?? this.defaultShowGasSwitchMarkers,
+      defaultShowGasTimeline:
+          defaultShowGasTimeline ?? this.defaultShowGasTimeline,
       notificationsEnabled: notificationsEnabled ?? this.notificationsEnabled,
       serviceReminderDays: serviceReminderDays ?? this.serviceReminderDays,
       reminderTime: reminderTime ?? this.reminderTime,
