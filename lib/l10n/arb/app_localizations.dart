@@ -16780,6 +16780,24 @@ abstract class AppLocalizations {
   /// **'Exit point recorded'**
   String get diveLog_detail_surfaceGps_exitOnly;
 
+  /// No description provided for @diveLog_detail_surfaceGps_site.
+  ///
+  /// In en, this message translates to:
+  /// **'Site'**
+  String get diveLog_detail_surfaceGps_site;
+
+  /// No description provided for @diveLog_detail_locationsMap_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Dive Locations'**
+  String get diveLog_detail_locationsMap_title;
+
+  /// No description provided for @diveLog_detail_coordinatesCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'Coordinates copied to clipboard'**
+  String get diveLog_detail_coordinatesCopied;
+
   /// No description provided for @diveLog_detail_openInMaps.
   ///
   /// In en, this message translates to:

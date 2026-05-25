@@ -9822,6 +9822,16 @@ class AppLocalizationsFr extends AppLocalizations {
   String get diveLog_detail_surfaceGps_exitOnly => 'Exit point recorded';
 
   @override
+  String get diveLog_detail_surfaceGps_site => 'Site';
+
+  @override
+  String get diveLog_detail_locationsMap_title => 'Dive Locations';
+
+  @override
+  String get diveLog_detail_coordinatesCopied =>
+      'Coordinates copied to clipboard';
+
+  @override
   String get diveLog_detail_openInMaps => 'Open in Maps';
 
   @override
