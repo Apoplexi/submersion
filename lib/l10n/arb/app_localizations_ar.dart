@@ -3968,6 +3968,14 @@ class AppLocalizationsAr extends AppLocalizations {
   String get diveLog_listPage_menuDiveNumbering => 'ترقيم الغوصات';
 
   @override
+  String get diveLog_listPage_menuMatchSites => 'Match Dives to Sites';
+
+  @override
+  String importSummary_matchSitesButton(int count) {
+    return 'Match $count dives to sites';
+  }
+
+  @override
   String get diveLog_listPage_searchFieldLabel => 'البحث في الغوصات...';
 
   @override

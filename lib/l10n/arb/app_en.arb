@@ -2018,6 +2018,13 @@
   "diveLog_listPage_fab_logDive": "Log Dive",
   "diveLog_listPage_menuAdvancedSearch": "Advanced Search",
   "diveLog_listPage_menuDiveNumbering": "Dive Numbering",
+  "diveLog_listPage_menuMatchSites": "Match Dives to Sites",
+  "importSummary_matchSitesButton": "Match {count} dives to sites",
+  "@importSummary_matchSitesButton": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
   "diveLog_listPage_searchFieldLabel": "Search dives...",
   "diveLog_listPage_searchNoResults": "No dives found for \"{query}\"",
   "diveLog_listPage_searchSuggestion": "Search by site, buddy, or notes",

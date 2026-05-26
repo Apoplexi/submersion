@@ -117,3 +117,16 @@ final siteMatchReviewProvider = StateNotifierProvider.autoDispose
     .family<SiteMatchReviewNotifier, SiteMatchReviewState, List<String>?>(
       (ref, diveIds) => SiteMatchReviewNotifier(ref, diveIds),
     );
+
+/// Of the given imported dive ids, which are eligible for site matching
+/// (have GPS and no assigned site). Used to decide whether to surface the
+/// post-download "match" button and what count to show.
+final eligibleImportedDivesProvider = FutureProvider.autoDispose
+    .family<List<String>, List<String>>((ref, importedIds) async {
+      if (importedIds.isEmpty) return const [];
+      final diverId = await ref.read(validatedCurrentDiverIdProvider.future);
+      final dives = await ref
+          .read(diveRepositoryProvider)
+          .getDivesNeedingSiteMatch(diverId: diverId, limitToIds: importedIds);
+      return dives.map((d) => d.id).toList();
+    });

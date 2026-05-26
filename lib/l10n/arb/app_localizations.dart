@@ -6922,6 +6922,18 @@ abstract class AppLocalizations {
   /// **'Dive Numbering'**
   String get diveLog_listPage_menuDiveNumbering;
 
+  /// No description provided for @diveLog_listPage_menuMatchSites.
+  ///
+  /// In en, this message translates to:
+  /// **'Match Dives to Sites'**
+  String get diveLog_listPage_menuMatchSites;
+
+  /// No description provided for @importSummary_matchSitesButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Match {count} dives to sites'**
+  String importSummary_matchSitesButton(int count);
+
   /// No description provided for @diveLog_listPage_searchFieldLabel.
   ///
   /// In en, this message translates to:
