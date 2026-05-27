@@ -1330,6 +1330,7 @@
   "diveLog_listPage_menuDiveNumbering": "Numerotation des plongees",
   "diveLog_listPage_menuMatchSites": "Associer les plongées aux sites",
   "siteMatchReview_title": "Associer les sites",
+  "siteMatchReview_diveNumber": "Plongee n°{number}",
   "siteMatchReview_empty": "Rien à associer.",
   "siteMatchReview_summary": "{selected} sélectionnées · {review} à vérifier · {none} sans correspondance",
   "siteMatchReview_confirm": "Confirmer {count} associations",

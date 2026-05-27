@@ -3959,6 +3959,11 @@ class AppLocalizationsHe extends AppLocalizations {
   String get siteMatchReview_title => 'התאמת אתרים';
 
   @override
+  String siteMatchReview_diveNumber(Object number) {
+    return 'צלילה #$number';
+  }
+
+  @override
   String get siteMatchReview_empty => 'אין מה להתאים.';
 
   @override

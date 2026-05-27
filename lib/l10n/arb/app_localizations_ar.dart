@@ -3974,6 +3974,11 @@ class AppLocalizationsAr extends AppLocalizations {
   String get siteMatchReview_title => 'مطابقة المواقع';
 
   @override
+  String siteMatchReview_diveNumber(Object number) {
+    return 'الغوصة #$number';
+  }
+
+  @override
   String get siteMatchReview_empty => 'لا شيء للمطابقة.';
 
   @override

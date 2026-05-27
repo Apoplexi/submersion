@@ -1330,6 +1330,7 @@
   "diveLog_listPage_menuDiveNumbering": "Merules szamozas",
   "diveLog_listPage_menuMatchSites": "Merülések hozzárendelése helyekhez",
   "siteMatchReview_title": "Helyek hozzárendelése",
+  "siteMatchReview_diveNumber": "#{number}. merules",
   "siteMatchReview_empty": "Nincs mit hozzárendelni.",
   "siteMatchReview_summary": "{selected} kiválasztva · {review} ellenőrzendő · {none} nincs találat",
   "siteMatchReview_confirm": "{count} hozzárendelés megerősítése",

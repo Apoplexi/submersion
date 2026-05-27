@@ -4061,6 +4061,11 @@ class AppLocalizationsHu extends AppLocalizations {
   String get siteMatchReview_title => 'Helyek hozzárendelése';
 
   @override
+  String siteMatchReview_diveNumber(Object number) {
+    return '#$number. merules';
+  }
+
+  @override
   String get siteMatchReview_empty => 'Nincs mit hozzárendelni.';
 
   @override

@@ -135,6 +135,28 @@ void main() {
     verify(dives.setSite('d1', 'b')).called(1);
   });
 
+  test('confirm with no selection returns null without writing', () async {
+    final container = makeContainer([_dive('d1', const GeoPoint(0, 0))]);
+    when(sites.getAllSites(diverId: anyNamed('diverId'))).thenAnswer(
+      (_) async => const [
+        // Review-tier (not auto-selected), so nothing is chosen after init.
+        DiveSite(id: 'a', name: 'A', location: GeoPoint(0, 0.0003)),
+        DiveSite(id: 'b', name: 'B', location: GeoPoint(0, 0.0006)),
+      ],
+    );
+    await _settle();
+    expect(container.read(siteMatchReviewProvider(null)).selectedCount, 0);
+
+    final notifier = container.read(siteMatchReviewProvider(null).notifier);
+    final result = await notifier.confirm();
+
+    // Empty selection short-circuits: null result, no transaction, no writes,
+    // and isApplying is never left stuck on.
+    expect(result, isNull);
+    expect(container.read(siteMatchReviewProvider(null)).isApplying, false);
+    verifyNever(dives.setSite(any, any));
+  });
+
   test('confirm refreshes the dive list so linked sites appear', () async {
     final container = makeContainer([_dive('d1', _eastMeters(33))]);
     when(sites.getAllSites(diverId: anyNamed('diverId'))).thenAnswer(

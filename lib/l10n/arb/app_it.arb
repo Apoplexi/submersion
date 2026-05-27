@@ -1330,6 +1330,7 @@
   "diveLog_listPage_menuDiveNumbering": "Numerazione immersioni",
   "diveLog_listPage_menuMatchSites": "Associa le immersioni ai siti",
   "siteMatchReview_title": "Associa siti",
+  "siteMatchReview_diveNumber": "Immersione #{number}",
   "siteMatchReview_empty": "Niente da associare.",
   "siteMatchReview_summary": "{selected} selezionate · {review} da rivedere · {none} senza corrispondenza",
   "siteMatchReview_confirm": "Conferma {count} associazioni",

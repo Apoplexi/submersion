@@ -4097,6 +4097,11 @@ class AppLocalizationsFr extends AppLocalizations {
   String get siteMatchReview_title => 'Associer les sites';
 
   @override
+  String siteMatchReview_diveNumber(Object number) {
+    return 'Plongee n°$number';
+  }
+
+  @override
   String get siteMatchReview_empty => 'Rien à associer.';
 
   @override

@@ -3877,6 +3877,11 @@ class AppLocalizationsZh extends AppLocalizations {
   String get siteMatchReview_title => '匹配潜水点';
 
   @override
+  String siteMatchReview_diveNumber(Object number) {
+    return '潜水 #$number';
+  }
+
+  @override
   String get siteMatchReview_empty => '没有可匹配的内容。';
 
   @override

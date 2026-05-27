@@ -1364,6 +1364,7 @@
   "diveLog_listPage_menuDiveNumbering": "Numeracao de Mergulhos",
   "diveLog_listPage_menuMatchSites": "Associar mergulhos a pontos",
   "siteMatchReview_title": "Associar pontos",
+  "siteMatchReview_diveNumber": "Mergulho #{number}",
   "siteMatchReview_empty": "Nada para associar.",
   "siteMatchReview_summary": "{selected} selecionados · {review} para revisar · {none} sem correspondência",
   "siteMatchReview_confirm": "Confirmar {count} associações",

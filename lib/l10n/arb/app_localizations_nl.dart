@@ -4044,6 +4044,11 @@ class AppLocalizationsNl extends AppLocalizations {
   String get siteMatchReview_title => 'Stekken koppelen';
 
   @override
+  String siteMatchReview_diveNumber(Object number) {
+    return 'Duik #$number';
+  }
+
+  @override
   String get siteMatchReview_empty => 'Niets om te koppelen.';
 
   @override

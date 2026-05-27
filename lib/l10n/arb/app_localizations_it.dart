@@ -4079,6 +4079,11 @@ class AppLocalizationsIt extends AppLocalizations {
   String get siteMatchReview_title => 'Associa siti';
 
   @override
+  String siteMatchReview_diveNumber(Object number) {
+    return 'Immersione #$number';
+  }
+
+  @override
   String get siteMatchReview_empty => 'Niente da associare.';
 
   @override

@@ -1364,6 +1364,7 @@
   "diveLog_listPage_menuDiveNumbering": "Duiknummering",
   "diveLog_listPage_menuMatchSites": "Duiken aan stekken koppelen",
   "siteMatchReview_title": "Stekken koppelen",
+  "siteMatchReview_diveNumber": "Duik #{number}",
   "siteMatchReview_empty": "Niets om te koppelen.",
   "siteMatchReview_summary": "{selected} geselecteerd · {review} te beoordelen · {none} geen match",
   "siteMatchReview_confirm": "{count} koppelingen bevestigen",

@@ -4000,6 +4000,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get siteMatchReview_title => 'Match Sites';
 
   @override
+  String siteMatchReview_diveNumber(Object number) {
+    return 'Dive #$number';
+  }
+
+  @override
   String get siteMatchReview_empty => 'Nothing to match.';
 
   @override

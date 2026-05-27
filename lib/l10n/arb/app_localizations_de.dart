@@ -4074,6 +4074,11 @@ class AppLocalizationsDe extends AppLocalizations {
   String get siteMatchReview_title => 'Tauchplätze zuordnen';
 
   @override
+  String siteMatchReview_diveNumber(Object number) {
+    return 'Tauchgang #$number';
+  }
+
+  @override
   String get siteMatchReview_empty => 'Nichts zuzuordnen.';
 
   @override

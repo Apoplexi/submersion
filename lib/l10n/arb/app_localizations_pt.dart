@@ -4074,6 +4074,11 @@ class AppLocalizationsPt extends AppLocalizations {
   String get siteMatchReview_title => 'Associar pontos';
 
   @override
+  String siteMatchReview_diveNumber(Object number) {
+    return 'Mergulho #$number';
+  }
+
+  @override
   String get siteMatchReview_empty => 'Nada para associar.';
 
   @override

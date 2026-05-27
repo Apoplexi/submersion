@@ -213,7 +213,9 @@ class _DiveRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
-    final title = 'Dive #${proposal.dive.diveNumber ?? '?'}';
+    final title = l10n.siteMatchReview_diveNumber(
+      proposal.dive.diveNumber ?? '?',
+    );
 
     MatchCandidateView? selected;
     for (final c in proposal.candidates) {

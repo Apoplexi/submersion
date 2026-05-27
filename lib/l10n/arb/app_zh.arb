@@ -1493,6 +1493,7 @@
   "diveLog_listPage_menuDiveNumbering": "潜水编号",
   "diveLog_listPage_menuMatchSites": "将潜水匹配到潜水点",
   "siteMatchReview_title": "匹配潜水点",
+  "siteMatchReview_diveNumber": "潜水 #{number}",
   "siteMatchReview_empty": "没有可匹配的内容。",
   "siteMatchReview_summary": "已选择 {selected} · 待审核 {review} · 无匹配 {none}",
   "siteMatchReview_confirm": "确认 {count} 项匹配",

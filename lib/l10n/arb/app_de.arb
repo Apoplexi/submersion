@@ -1364,6 +1364,7 @@
   "diveLog_listPage_menuDiveNumbering": "Tauchgangnummerierung",
   "diveLog_listPage_menuMatchSites": "Tauchgänge Tauchplätzen zuordnen",
   "siteMatchReview_title": "Tauchplätze zuordnen",
+  "siteMatchReview_diveNumber": "Tauchgang #{number}",
   "siteMatchReview_empty": "Nichts zuzuordnen.",
   "siteMatchReview_summary": "{selected} ausgewählt · {review} zu prüfen · {none} ohne Treffer",
   "siteMatchReview_confirm": "{count} Zuordnungen bestätigen",

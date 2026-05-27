@@ -2020,6 +2020,10 @@
   "diveLog_listPage_menuDiveNumbering": "Dive Numbering",
   "diveLog_listPage_menuMatchSites": "Match Dives to Sites",
   "siteMatchReview_title": "Match Sites",
+  "siteMatchReview_diveNumber": "Dive #{number}",
+  "@siteMatchReview_diveNumber": {
+    "placeholders": { "number": { "type": "Object" } }
+  },
   "siteMatchReview_empty": "Nothing to match.",
   "siteMatchReview_summary": "{selected} selected · {review} to review · {none} no match",
   "@siteMatchReview_summary": {

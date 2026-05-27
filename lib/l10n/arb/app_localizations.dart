@@ -6934,6 +6934,12 @@ abstract class AppLocalizations {
   /// **'Match Sites'**
   String get siteMatchReview_title;
 
+  /// No description provided for @siteMatchReview_diveNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Dive #{number}'**
+  String siteMatchReview_diveNumber(Object number);
+
   /// No description provided for @siteMatchReview_empty.
   ///
   /// In en, this message translates to:

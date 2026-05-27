@@ -153,7 +153,10 @@ class SiteMatchReviewNotifier extends StateNotifier<SiteMatchReviewState> {
   /// null result with a snackbar, keeping the review screen up for retry.
   Future<ApplyResult?> confirm() async {
     final service = _service;
-    if (service == null) return null;
+    // Nothing to apply: not initialised yet, or no site chosen. The confirm
+    // button is disabled when nothing is selected, but guard here too so we
+    // never open an empty transaction (keeps the doc's contract honest).
+    if (service == null || state.selections.isEmpty) return null;
     state = state.copyWith(isApplying: true);
     try {
       final confirmed = [

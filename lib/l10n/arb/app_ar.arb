@@ -1364,6 +1364,7 @@
   "diveLog_listPage_menuDiveNumbering": "ترقيم الغوصات",
   "diveLog_listPage_menuMatchSites": "مطابقة الغوصات بالمواقع",
   "siteMatchReview_title": "مطابقة المواقع",
+  "siteMatchReview_diveNumber": "الغوصة #{number}",
   "siteMatchReview_empty": "لا شيء للمطابقة.",
   "siteMatchReview_summary": "{selected} محددة · {review} للمراجعة · {none} بدون تطابق",
   "siteMatchReview_confirm": "تأكيد {count} مطابقات",
