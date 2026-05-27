@@ -61,6 +61,10 @@ void main() {
       ),
     ).thenAnswer((_) async => eligible);
     when(dives.setSite(any, any)).thenAnswer((_) async {});
+    // DiveListNotifier.refresh() (triggered by confirm) reloads via getAllDives.
+    when(
+      dives.getAllDives(diverId: anyNamed('diverId')),
+    ).thenAnswer((_) async => <Dive>[]);
     when(
       sites.getAllSites(diverId: anyNamed('diverId')),
     ).thenAnswer((_) async => const []);
@@ -78,6 +82,11 @@ void main() {
         siteRepositoryProvider.overrideWithValue(sites),
         diveSiteApiServiceProvider.overrideWithValue(api),
         validatedCurrentDiverIdProvider.overrideWith((ref) => 'diver-1'),
+        // DiveListNotifier reads currentDiverIdProvider in its constructor;
+        // mock it so confirm()'s post-apply refresh can build the notifier.
+        currentDiverIdProvider.overrideWith(
+          (ref) => MockCurrentDiverIdNotifier(),
+        ),
         settingsProvider.overrideWith((ref) => MockSettingsNotifier()),
       ],
     );
@@ -125,6 +134,72 @@ void main() {
     expect(result?.divesLinked, 1);
     verify(dives.setSite('d1', 'b')).called(1);
   });
+
+  test('confirm refreshes the dive list so linked sites appear', () async {
+    final container = makeContainer([_dive('d1', _eastMeters(33))]);
+    when(sites.getAllSites(diverId: anyNamed('diverId'))).thenAnswer(
+      (_) async => const [
+        DiveSite(id: 's1', name: 'Blue Hole', location: GeoPoint(0, 0)),
+      ],
+    );
+    await _settle();
+
+    final notifier = container.read(siteMatchReviewProvider(null).notifier);
+    // Nothing has reloaded the dive list yet (init only reads dives needing
+    // matching, never the full list via getAllDives).
+    verifyNever(dives.getAllDives(diverId: anyNamed('diverId')));
+
+    await notifier.confirm();
+
+    // confirm() must refresh DiveListNotifier so the dives list drops the
+    // stale "unknown site" rows for the dives it just linked.
+    verify(
+      dives.getAllDives(diverId: anyNamed('diverId')),
+    ).called(greaterThanOrEqualTo(1));
+  });
+
+  test(
+    'confirm refreshes the sites list when a bundled site is created',
+    () async {
+      final container = makeContainer([_dive('d1', const GeoPoint(0, 0))]);
+      when(sites.createSite(any)).thenAnswer((inv) async {
+        final s = inv.positionalArguments.first as DiveSite;
+        return s.copyWith(id: 'new-${s.name}');
+      });
+      when(
+        api.searchNearby(
+          latitude: anyNamed('latitude'),
+          longitude: anyNamed('longitude'),
+          radiusKm: anyNamed('radiusKm'),
+        ),
+      ).thenAnswer(
+        (_) async => const DiveSiteSearchResult(
+          sites: [
+            ExternalDiveSite(
+              externalId: 'osm_1',
+              name: 'Wreck',
+              latitude: 0,
+              longitude: 0,
+              source: 'OpenStreetMap',
+            ),
+          ],
+        ),
+      );
+      await _settle();
+
+      final notifier = container.read(siteMatchReviewProvider(null).notifier);
+      final result = await notifier.confirm();
+      await _settle();
+
+      expect(result?.sitesCreated, 1);
+      // SiteListNotifier.refresh() reloads sites via getAllSites. computeProposals
+      // reads it once; >1 proves the post-apply sites-tab refresh also ran, so a
+      // newly materialised bundled site shows up on the Sites tab.
+      verify(
+        sites.getAllSites(diverId: anyNamed('diverId')),
+      ).called(greaterThan(1));
+    },
+  );
 
   test('select toggles off when tapping the same candidate', () async {
     final container = makeContainer([_dive('d1', _eastMeters(33))]);
