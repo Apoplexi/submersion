@@ -201,6 +201,41 @@ void main() {
     )..where((t) => t.id.equals(id))).getSingle();
   }
 
+  pigeon.ParsedDive makeParsedDiveWithGps({
+    double? entryLatitude,
+    double? entryLongitude,
+    double? exitLatitude,
+    double? exitLongitude,
+  }) {
+    final base = makeParsedDive();
+    return pigeon.ParsedDive(
+      fingerprint: base.fingerprint,
+      dateTimeYear: base.dateTimeYear,
+      dateTimeMonth: base.dateTimeMonth,
+      dateTimeDay: base.dateTimeDay,
+      dateTimeHour: base.dateTimeHour,
+      dateTimeMinute: base.dateTimeMinute,
+      dateTimeSecond: base.dateTimeSecond,
+      maxDepthMeters: base.maxDepthMeters,
+      avgDepthMeters: base.avgDepthMeters,
+      durationSeconds: base.durationSeconds,
+      minTemperatureCelsius: base.minTemperatureCelsius,
+      samples: base.samples,
+      tanks: base.tanks,
+      gasMixes: base.gasMixes,
+      events: base.events,
+      diveMode: base.diveMode,
+      decoAlgorithm: base.decoAlgorithm,
+      gfLow: base.gfLow,
+      gfHigh: base.gfHigh,
+      decoConservatism: base.decoConservatism,
+      entryLatitude: entryLatitude,
+      entryLongitude: entryLongitude,
+      exitLatitude: exitLatitude,
+      exitLongitude: exitLongitude,
+    );
+  }
+
   // ---------------------------------------------------------------------------
   // Tests
   // ---------------------------------------------------------------------------
@@ -264,6 +299,186 @@ void main() {
       expect(dive.gradientFactorLow, 30);
       expect(dive.gradientFactorHigh, 70);
     });
+
+    test(
+      'writes new entry/exit GPS to dives + source when source is primary',
+      () async {
+        // Reproduces the user-reported scenario: a dive previously downloaded
+        // with the pre-patch libdivecomputer had exit GPS == entry GPS. After
+        // updating to the patched libdivecomputer, re-parsing should write the
+        // new (correct) exit GPS to both dives and dive_data_sources.
+        await insertDive('dive-1');
+        await insertComputer('comp-1');
+        await insertSource(
+          id: 'src-1',
+          diveId: 'dive-1',
+          computerId: 'comp-1',
+          isPrimary: true,
+        );
+
+        // Seed both tables with the "wrong" pre-patch values: entry == exit.
+        await (db.update(db.dives)..where((t) => t.id.equals('dive-1'))).write(
+          const DivesCompanion(
+            entryLatitude: Value(21.0),
+            entryLongitude: Value(-157.0),
+            exitLatitude: Value(21.0),
+            exitLongitude: Value(-157.0),
+          ),
+        );
+        await (db.update(
+          db.diveDataSources,
+        )..where((t) => t.id.equals('src-1'))).write(
+          const DiveDataSourcesCompanion(
+            entryLatitude: Value(21.0),
+            entryLongitude: Value(-157.0),
+            exitLatitude: Value(21.0),
+            exitLongitude: Value(-157.0),
+          ),
+        );
+
+        // Re-parse returns a fresh ParsedDive where exit GPS now differs.
+        final parsed = makeParsedDiveWithGps(
+          entryLatitude: 21.0,
+          entryLongitude: -157.0,
+          exitLatitude: 21.0015,
+          exitLongitude: -157.0021,
+        );
+
+        await service.applyParsedUpdate(
+          diveId: 'dive-1',
+          sourceRowId: 'src-1',
+          parsed: parsed,
+          descriptorVendor: 'Shearwater',
+          descriptorProduct: 'Perdix',
+          descriptorModel: 5,
+          libdivecomputerVersion: '0.9.0',
+        );
+
+        final dive = await getDive('dive-1');
+        expect(dive.entryLatitude, 21.0);
+        expect(dive.entryLongitude, -157.0);
+        expect(dive.exitLatitude, 21.0015);
+        expect(dive.exitLongitude, -157.0021);
+
+        final src = await getSource('src-1');
+        expect(src.entryLatitude, 21.0);
+        expect(src.entryLongitude, -157.0);
+        expect(src.exitLatitude, 21.0015);
+        expect(src.exitLongitude, -157.0021);
+      },
+    );
+
+    test(
+      'reparseDive end-to-end: parses raw and writes new GPS to dives',
+      () async {
+        // Mirrors the user-facing "Re-parse raw data" path: a real source row
+        // with rawData + descriptor info, then reparseDive(parseFn) → DB write.
+        await insertDive('dive-1');
+        await insertComputer('comp-1');
+        final now = DateTime.fromMillisecondsSinceEpoch(nowMs);
+        await db
+            .into(db.diveDataSources)
+            .insert(
+              DiveDataSourcesCompanion(
+                id: const Value('src-1'),
+                diveId: const Value('dive-1'),
+                computerId: const Value('comp-1'),
+                isPrimary: const Value(true),
+                sourceFormat: const Value('dive_computer'),
+                rawData: Value(Uint8List.fromList(List.filled(64, 0xAB))),
+                descriptorVendor: const Value('Shearwater'),
+                descriptorProduct: const Value('Perdix'),
+                descriptorModel: const Value(5),
+                libdivecomputerVersion: const Value('0.9.0'),
+                entryLatitude: const Value(21.0),
+                entryLongitude: const Value(-157.0),
+                exitLatitude: const Value(21.0),
+                exitLongitude: const Value(-157.0),
+                importedAt: Value(now),
+                createdAt: Value(now),
+              ),
+            );
+        await (db.update(db.dives)..where((t) => t.id.equals('dive-1'))).write(
+          const DivesCompanion(
+            entryLatitude: Value(21.0),
+            entryLongitude: Value(-157.0),
+            exitLatitude: Value(21.0),
+            exitLongitude: Value(-157.0),
+          ),
+        );
+
+        // Fake parser: returns a ParsedDive with NEW exit GPS — the value the
+        // patched libdivecomputer would produce.
+        Future<pigeon.ParsedDive> fakeParse(
+          String vendor,
+          String product,
+          int model,
+          Uint8List raw,
+        ) async {
+          return makeParsedDiveWithGps(
+            entryLatitude: 21.0,
+            entryLongitude: -157.0,
+            exitLatitude: 21.0015,
+            exitLongitude: -157.0021,
+          );
+        }
+
+        final errors = await service.reparseDive('dive-1', parseFn: fakeParse);
+
+        expect(errors, isEmpty);
+        final dive = await getDive('dive-1');
+        expect(dive.exitLatitude, 21.0015);
+        expect(dive.exitLongitude, -157.0021);
+      },
+    );
+
+    test(
+      'reparseDive silently skips sources missing descriptor info',
+      () async {
+        // A source row with rawData but no descriptor vendor/product/model
+        // (e.g. older import). reparseDive returns no errors, but no actual
+        // re-parse happens. This is the silent-skip trap.
+        await insertDive('dive-1');
+        await insertComputer('comp-1');
+        final now = DateTime.fromMillisecondsSinceEpoch(nowMs);
+        await db
+            .into(db.diveDataSources)
+            .insert(
+              DiveDataSourcesCompanion(
+                id: const Value('src-1'),
+                diveId: const Value('dive-1'),
+                computerId: const Value('comp-1'),
+                isPrimary: const Value(true),
+                sourceFormat: const Value('dive_computer'),
+                rawData: Value(Uint8List.fromList(List.filled(64, 0xAB))),
+                // descriptor* deliberately left absent
+                entryLatitude: const Value(21.0),
+                entryLongitude: const Value(-157.0),
+                exitLatitude: const Value(21.0),
+                exitLongitude: const Value(-157.0),
+                importedAt: Value(now),
+                createdAt: Value(now),
+              ),
+            );
+
+        var parserCalls = 0;
+        Future<pigeon.ParsedDive> fakeParse(
+          String vendor,
+          String product,
+          int model,
+          Uint8List raw,
+        ) async {
+          parserCalls++;
+          return makeParsedDive();
+        }
+
+        final errors = await service.reparseDive('dive-1', parseFn: fakeParse);
+
+        // Documents current behavior: no errors reported, parser not invoked.
+        expect(errors, isEmpty);
+        expect(parserCalls, 0);
+      },
+    );
 
     test('preserves user-authored fields on primary source', () async {
       // Arrange: create dive with user-authored fields set
