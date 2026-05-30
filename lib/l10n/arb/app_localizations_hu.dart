@@ -5544,6 +5544,16 @@ class AppLocalizationsHu extends AppLocalizations {
       'Kerem adjon meg egy helyszinnevet';
 
   @override
+  String diveSites_similarSite_useHint(Object siteName) {
+    return 'Hasonló egy meglévő merülőhelyhez: „$siteName“. Koppintson a használathoz.';
+  }
+
+  @override
+  String diveSites_similarSite_warning(Object siteName) {
+    return 'Már létezik hasonló merülőhely: „$siteName“';
+  }
+
+  @override
   String get diveSites_edit_gps_gettingLocation => 'Lekeres...';
 
   @override

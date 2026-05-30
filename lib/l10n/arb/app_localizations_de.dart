@@ -5546,6 +5546,16 @@ class AppLocalizationsDe extends AppLocalizations {
       'Bitte geben Sie einen Tauchplatznamen ein';
 
   @override
+  String diveSites_similarSite_useHint(Object siteName) {
+    return 'Ähnelt vorhandenem Tauchplatz „$siteName“. Zum Verwenden tippen.';
+  }
+
+  @override
+  String diveSites_similarSite_warning(Object siteName) {
+    return 'Ein ähnlicher Tauchplatz existiert bereits: „$siteName“';
+  }
+
+  @override
   String get diveSites_edit_gps_gettingLocation => 'Wird ermittelt...';
 
   @override

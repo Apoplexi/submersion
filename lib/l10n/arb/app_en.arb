@@ -2982,6 +2982,26 @@
   "diveSites_edit_field_siteName_hint": "e.g., Blue Hole",
   "diveSites_edit_field_siteName_label": "Site Name *",
   "diveSites_edit_field_siteName_validation": "Please enter a site name",
+  "diveSites_similarSite_useHint": "Similar to existing site \"{siteName}\". Tap to use.",
+  "@diveSites_similarSite_useHint": {
+    "description": "Tappable hint in the dive-entry site picker when the typed query closely matches an existing site name that is not already in the list",
+    "placeholders": {
+      "siteName": {
+        "type": "Object",
+        "description": "The existing site name"
+      }
+    }
+  },
+  "diveSites_similarSite_warning": "A similar site already exists: \"{siteName}\"",
+  "@diveSites_similarSite_warning": {
+    "description": "Passive warning under the site name field when the typed name closely matches an existing site",
+    "placeholders": {
+      "siteName": {
+        "type": "Object",
+        "description": "The existing site name"
+      }
+    }
+  },
   "diveSites_edit_gps_gettingLocation": "Getting...",
   "diveSites_edit_gps_helperText": "Choose a location method - coordinates will auto-fill country and region",
   "diveSites_edit_gps_latitude_hint": "e.g., 21.4225",

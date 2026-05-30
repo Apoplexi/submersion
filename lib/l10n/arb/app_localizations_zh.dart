@@ -5303,6 +5303,16 @@ class AppLocalizationsZh extends AppLocalizations {
   String get diveSites_edit_field_siteName_validation => '请输入潜水点名称';
 
   @override
+  String diveSites_similarSite_useHint(Object siteName) {
+    return '与现有潜点\"$siteName\"相似。点按以使用。';
+  }
+
+  @override
+  String diveSites_similarSite_warning(Object siteName) {
+    return '已存在相似的潜点：\"$siteName\"';
+  }
+
+  @override
   String get diveSites_edit_gps_gettingLocation => '获取中...';
 
   @override

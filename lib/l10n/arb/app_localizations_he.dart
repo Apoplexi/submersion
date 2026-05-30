@@ -5404,6 +5404,16 @@ class AppLocalizationsHe extends AppLocalizations {
   String get diveSites_edit_field_siteName_validation => 'נא להזין שם אתר';
 
   @override
+  String diveSites_similarSite_useHint(Object siteName) {
+    return 'דומה לאתר צלילה קיים \"$siteName\". הקש כדי להשתמש.';
+  }
+
+  @override
+  String diveSites_similarSite_warning(Object siteName) {
+    return 'כבר קיים אתר דומה: \"$siteName\"';
+  }
+
+  @override
   String get diveSites_edit_gps_gettingLocation => 'מאתר...';
 
   @override

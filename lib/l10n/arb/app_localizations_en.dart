@@ -5460,6 +5460,16 @@ class AppLocalizationsEn extends AppLocalizations {
       'Please enter a site name';
 
   @override
+  String diveSites_similarSite_useHint(Object siteName) {
+    return 'Similar to existing site \"$siteName\". Tap to use.';
+  }
+
+  @override
+  String diveSites_similarSite_warning(Object siteName) {
+    return 'A similar site already exists: \"$siteName\"';
+  }
+
+  @override
   String get diveSites_edit_gps_gettingLocation => 'Getting...';
 
   @override

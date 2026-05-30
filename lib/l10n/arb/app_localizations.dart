@@ -9527,6 +9527,18 @@ abstract class AppLocalizations {
   /// **'Please enter a site name'**
   String get diveSites_edit_field_siteName_validation;
 
+  /// Tappable hint in the dive-entry site picker when the typed query closely matches an existing site name that is not already in the list
+  ///
+  /// In en, this message translates to:
+  /// **'Similar to existing site \"{siteName}\". Tap to use.'**
+  String diveSites_similarSite_useHint(Object siteName);
+
+  /// Passive warning under the site name field when the typed name closely matches an existing site
+  ///
+  /// In en, this message translates to:
+  /// **'A similar site already exists: \"{siteName}\"'**
+  String diveSites_similarSite_warning(Object siteName);
+
   /// No description provided for @diveSites_edit_gps_gettingLocation.
   ///
   /// In en, this message translates to:

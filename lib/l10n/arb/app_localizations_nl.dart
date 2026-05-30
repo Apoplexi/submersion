@@ -5508,6 +5508,16 @@ class AppLocalizationsNl extends AppLocalizations {
   String get diveSites_edit_field_siteName_validation => 'Voer een steknaam in';
 
   @override
+  String diveSites_similarSite_useHint(Object siteName) {
+    return 'Vergelijkbaar met bestaande duiklocatie \"$siteName\". Tik om te gebruiken.';
+  }
+
+  @override
+  String diveSites_similarSite_warning(Object siteName) {
+    return 'Er bestaat al een vergelijkbare locatie: \"$siteName\"';
+  }
+
+  @override
   String get diveSites_edit_gps_gettingLocation => 'Ophalen...';
 
   @override

@@ -5551,6 +5551,16 @@ class AppLocalizationsEs extends AppLocalizations {
       'Por favor ingresa un nombre de sitio';
 
   @override
+  String diveSites_similarSite_useHint(Object siteName) {
+    return 'Similar a un sitio de buceo existente \"$siteName\". Toca para usar.';
+  }
+
+  @override
+  String diveSites_similarSite_warning(Object siteName) {
+    return 'Ya existe un sitio similar: \"$siteName\"';
+  }
+
+  @override
   String get diveSites_edit_gps_gettingLocation => 'Obteniendo...';
 
   @override

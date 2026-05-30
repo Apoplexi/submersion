@@ -5560,6 +5560,16 @@ class AppLocalizationsIt extends AppLocalizations {
       'Inserisci un nome per il sito';
 
   @override
+  String diveSites_similarSite_useHint(Object siteName) {
+    return 'Simile a un sito di immersione esistente \"$siteName\". Tocca per usare.';
+  }
+
+  @override
+  String diveSites_similarSite_warning(Object siteName) {
+    return 'Esiste già un sito simile: \"$siteName\"';
+  }
+
+  @override
   String get diveSites_edit_gps_gettingLocation => 'Acquisizione...';
 
   @override

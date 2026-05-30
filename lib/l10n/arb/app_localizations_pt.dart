@@ -5551,6 +5551,16 @@ class AppLocalizationsPt extends AppLocalizations {
       'Por favor, insira o nome do ponto';
 
   @override
+  String diveSites_similarSite_useHint(Object siteName) {
+    return 'Semelhante a um local de mergulho existente \"$siteName\". Toque para usar.';
+  }
+
+  @override
+  String diveSites_similarSite_warning(Object siteName) {
+    return 'Já existe um local semelhante: \"$siteName\"';
+  }
+
+  @override
   String get diveSites_edit_gps_gettingLocation => 'Obtendo...';
 
   @override

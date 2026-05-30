@@ -5430,6 +5430,16 @@ class AppLocalizationsAr extends AppLocalizations {
       'يرجى إدخال اسم الموقع';
 
   @override
+  String diveSites_similarSite_useHint(Object siteName) {
+    return 'مشابه لموقع غوص موجود \"$siteName\". انقر للاستخدام.';
+  }
+
+  @override
+  String diveSites_similarSite_warning(Object siteName) {
+    return 'يوجد بالفعل موقع مشابه: \"$siteName\"';
+  }
+
+  @override
   String get diveSites_edit_gps_gettingLocation => 'جارٍ الحصول على الموقع...';
 
   @override
