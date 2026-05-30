@@ -537,15 +537,24 @@ class _SiteEditPageState extends ConsumerState<SiteEditPage> {
               ),
               const SizedBox(width: 16),
               Expanded(
-                child: TextFormField(
-                  controller: _regionController,
-                  decoration: _withMergeTextDecoration(
-                    key: 'region',
-                    decoration: InputDecoration(
-                      labelText: context.l10n.diveSites_edit_field_region_label,
-                      prefixIcon: const Icon(Icons.map),
-                    ),
-                  ),
+                child: ValueListenableBuilder<TextEditingValue>(
+                  valueListenable: _countryController,
+                  builder: (context, country, _) {
+                    return SuggestionField(
+                      controller: _regionController,
+                      suggestions: suggestedRegions(allSites, country.text),
+                      enableFuzzy: true,
+                      textCapitalization: TextCapitalization.words,
+                      decoration: _withMergeTextDecoration(
+                        key: 'region',
+                        decoration: InputDecoration(
+                          labelText:
+                              context.l10n.diveSites_edit_field_region_label,
+                          prefixIcon: const Icon(Icons.map),
+                        ),
+                      ),
+                    );
+                  },
                 ),
               ),
             ],
