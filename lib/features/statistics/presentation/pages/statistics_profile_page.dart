@@ -26,7 +26,7 @@ class StatisticsProfilePage extends ConsumerWidget {
         children: [
           _buildAscentDescentSection(context, ref, units),
           const SizedBox(height: 16),
-          _buildTimeAtDepthSection(context, ref),
+          _buildTimeAtDepthSection(context, ref, units),
           const SizedBox(height: 16),
           _buildDecoSection(context, ref),
         ],
@@ -140,7 +140,11 @@ class StatisticsProfilePage extends ConsumerWidget {
     );
   }
 
-  Widget _buildTimeAtDepthSection(BuildContext context, WidgetRef ref) {
+  Widget _buildTimeAtDepthSection(
+    BuildContext context,
+    WidgetRef ref,
+    UnitFormatter units,
+  ) {
     final depthRangesAsync = ref.watch(timeAtDepthRangesProvider);
 
     return StatSectionCard(
@@ -154,19 +158,21 @@ class StatisticsProfilePage extends ConsumerWidget {
               message: context.l10n.statistics_profile_timeAtDepth_empty,
             );
           }
+          // The repository emits numeric bucket edges in meters; convert to
+          // the user's unit and put just the numbers on each tick. The shared
+          // unit ("m" or "ft") shows once on the x-axis label.
           return CategoryBarChart(
-            // The repository returns ranges like "0-10m"; strip the trailing
-            // "m" so the chart can show the unit once on the x-axis label
-            // instead of on every tick. "40m+" becomes "40+".
-            data: data
-                .map(
-                  (d) => (label: d.range.replaceAll('m', ''), count: d.minutes),
-                )
-                .toList(),
+            data: data.map((d) {
+              final lo = units.convertDepth(d.lowerDepth.toDouble()).round();
+              final label = d.upperDepth == null
+                  ? '$lo+'
+                  : '$lo-${units.convertDepth(d.upperDepth!.toDouble()).round()}';
+              return (label: label, count: d.minutes);
+            }).toList(),
             barColor: Colors.indigo,
             valueFormatter: (value) =>
                 context.l10n.statistics_profile_timeAtDepth_valueFormat(value),
-            xAxisLabel: context.l10n.units_depth_meters,
+            xAxisLabel: units.depthSymbol,
             yAxisLabel: context.l10n.units_profileMetric_min,
           );
         },

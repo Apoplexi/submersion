@@ -1,7 +1,7 @@
 name: submersion
 description: An open-source dive logging application for scuba divers.
 publish_to: 'none'
-version: 1.4.6+92
+version: 1.4.9+95
 
 environment:
   sdk: ^3.10.0
@@ -150,3 +150,6 @@ flutter:
     - assets/data/
     - assets/data/tide/
     - assets/icon/
+
+  shaders:
+    - shaders/heatmap.frag

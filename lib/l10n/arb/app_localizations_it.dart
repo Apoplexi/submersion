@@ -4073,6 +4073,87 @@ class AppLocalizationsIt extends AppLocalizations {
   String get diveLog_listPage_menuDiveNumbering => 'Numerazione immersioni';
 
   @override
+  String get diveLog_listPage_menuMatchSites => 'Associa le immersioni ai siti';
+
+  @override
+  String get siteMatchReview_title => 'Associa siti';
+
+  @override
+  String siteMatchReview_diveNumber(Object number) {
+    return 'Immersione #$number';
+  }
+
+  @override
+  String get siteMatchReview_empty => 'Niente da associare.';
+
+  @override
+  String siteMatchReview_summary(int selected, int review, int none) {
+    return '$selected selezionate · $review da rivedere · $none senza corrispondenza';
+  }
+
+  @override
+  String siteMatchReview_confirm(int count) {
+    return 'Conferma $count associazioni';
+  }
+
+  @override
+  String get siteMatchReview_cancel => 'Annulla';
+
+  @override
+  String get siteMatchReview_tapToChoose => 'Tocca per scegliere un sito';
+
+  @override
+  String siteMatchReview_awayMeters(int meters) {
+    return 'a $meters m';
+  }
+
+  @override
+  String siteMatchReview_depthTo(int meters) {
+    return 'fino a $meters m';
+  }
+
+  @override
+  String siteMatchReview_depthRange(int min, int max) {
+    return '$min–$max m';
+  }
+
+  @override
+  String siteMatchReview_appliedSnack(int dives, int sites) {
+    return '$dives immersioni associate · $sites siti aggiunti';
+  }
+
+  @override
+  String get siteMatchReview_applyError =>
+      'Impossibile applicare le associazioni';
+
+  @override
+  String get siteMatchReview_discardTitle => 'Scartare le associazioni?';
+
+  @override
+  String get siteMatchReview_discardMessage =>
+      'La tua selezione non verrà salvata.';
+
+  @override
+  String get siteMatchReview_discardConfirm => 'Scarta';
+
+  @override
+  String get siteMatchReview_keepReviewing => 'Continua a rivedere';
+
+  @override
+  String get siteMatchReview_sourceExisting => 'il tuo sito';
+
+  @override
+  String get siteMatchReview_sourceBundled => 'importato';
+
+  @override
+  String get siteMatchReview_noNearbySite => 'Nessun sito nelle vicinanze';
+
+  @override
+  String importSummary_matchSitesButton(int count) {
+    return 'Associa $count immersioni ai siti';
+  }
+
+  @override
   String get diveLog_listPage_searchFieldLabel => 'Cerca immersioni...';
 
   @override
@@ -5477,6 +5558,16 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String get diveSites_edit_field_siteName_validation =>
       'Inserisci un nome per il sito';
+
+  @override
+  String diveSites_similarSite_useHint(Object siteName) {
+    return 'Simile a un sito di immersione esistente \"$siteName\". Tocca per usare.';
+  }
+
+  @override
+  String diveSites_similarSite_warning(Object siteName) {
+    return 'Esiste già un sito simile: \"$siteName\"';
+  }
 
   @override
   String get diveSites_edit_gps_gettingLocation => 'Acquisizione...';
@@ -9679,6 +9770,13 @@ class AppLocalizationsIt extends AppLocalizations {
       'Mostra i marcatori per i cambi gas';
 
   @override
+  String get settings_appearance_gasTimeline => 'Gas timeline';
+
+  @override
+  String get settings_appearance_gasTimeline_subtitle =>
+      'Show the gas-usage strip below the dive profile by default';
+
+  @override
   String get settings_appearance_header_diveDetails => 'Dettagli immersione';
 
   @override
@@ -9754,6 +9852,44 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String get diveDetailSection_tide_description =>
       'Grafico ciclo marea e tempi';
+
+  @override
+  String get diveDetailSection_surfaceGps_name => 'Surface GPS';
+
+  @override
+  String get diveDetailSection_surfaceGps_description =>
+      'GPS entry/exit points and surface drift';
+
+  @override
+  String get diveLog_detail_section_surfaceGps => 'Surface GPS';
+
+  @override
+  String get diveLog_detail_surfaceGps_entry => 'Entry';
+
+  @override
+  String get diveLog_detail_surfaceGps_exit => 'Exit';
+
+  @override
+  String get diveLog_detail_label_drift => 'Drift';
+
+  @override
+  String get diveLog_detail_surfaceGps_entryOnly => 'Entry point recorded';
+
+  @override
+  String get diveLog_detail_surfaceGps_exitOnly => 'Exit point recorded';
+
+  @override
+  String get diveLog_detail_surfaceGps_site => 'Site';
+
+  @override
+  String get diveLog_detail_locationsMap_title => 'Dive Locations';
+
+  @override
+  String get diveLog_detail_coordinatesCopied =>
+      'Coordinates copied to clipboard';
+
+  @override
+  String get diveLog_detail_openInMaps => 'Open in Maps';
 
   @override
   String get diveDetailSection_weights_name => 'Zavorra';
@@ -15965,6 +16101,22 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String get settings_section_dataSources_subtitle =>
       'Connected services & integrations';
+
+  @override
+  String get settings_siteMatch_title => 'Associazione automatica dei siti';
+
+  @override
+  String get settings_siteMatch_subtitle =>
+      'Con quanta intensità le immersioni scaricate vengono associate ai siti';
+
+  @override
+  String get settings_siteMatch_strict => 'Rigoroso';
+
+  @override
+  String get settings_siteMatch_balanced => 'Bilanciato';
+
+  @override
+  String get settings_siteMatch_relaxed => 'Rilassato';
 
   @override
   String get settings_dataSources_header => 'Data Sources';

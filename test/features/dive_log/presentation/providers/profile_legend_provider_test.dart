@@ -6,7 +6,8 @@ import 'package:submersion/features/settings/presentation/providers/settings_pro
 
 class _StubSettingsNotifier extends StateNotifier<AppSettings>
     implements SettingsNotifier {
-  _StubSettingsNotifier() : super(const AppSettings());
+  _StubSettingsNotifier([AppSettings? settings])
+    : super(settings ?? const AppSettings());
 
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
@@ -144,7 +145,11 @@ void main() {
   group('ProfileLegend.toggleGas', () {
     ProviderContainer makeContainer() => ProviderContainer(
       overrides: [
-        settingsProvider.overrideWith((ref) => _StubSettingsNotifier()),
+        settingsProvider.overrideWith(
+          (ref) => _StubSettingsNotifier(
+            const AppSettings(defaultShowGasTimeline: true),
+          ),
+        ),
       ],
     );
 
@@ -164,6 +169,36 @@ void main() {
       notifier.toggleGas();
       notifier.toggleGas();
       expect(container.read(profileLegendProvider).showGas, isTrue);
+    });
+  });
+
+  group('ProfileLegend.build gas timeline hydration', () {
+    test('showGas starts true when defaultShowGasTimeline is true', () {
+      final container = ProviderContainer(
+        overrides: [
+          settingsProvider.overrideWith(
+            (ref) => _StubSettingsNotifier(
+              const AppSettings(defaultShowGasTimeline: true),
+            ),
+          ),
+        ],
+      );
+      addTearDown(container.dispose);
+      expect(container.read(profileLegendProvider).showGas, isTrue);
+    });
+
+    test('showGas starts false when defaultShowGasTimeline is false', () {
+      final container = ProviderContainer(
+        overrides: [
+          settingsProvider.overrideWith(
+            (ref) => _StubSettingsNotifier(
+              const AppSettings(defaultShowGasTimeline: false),
+            ),
+          ),
+        ],
+      );
+      addTearDown(container.dispose);
+      expect(container.read(profileLegendProvider).showGas, isFalse);
     });
   });
 }

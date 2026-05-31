@@ -2018,6 +2018,57 @@
   "diveLog_listPage_fab_logDive": "Log Dive",
   "diveLog_listPage_menuAdvancedSearch": "Advanced Search",
   "diveLog_listPage_menuDiveNumbering": "Dive Numbering",
+  "diveLog_listPage_menuMatchSites": "Match Dives to Sites",
+  "siteMatchReview_title": "Match Sites",
+  "siteMatchReview_diveNumber": "Dive #{number}",
+  "@siteMatchReview_diveNumber": {
+    "placeholders": { "number": { "type": "Object" } }
+  },
+  "siteMatchReview_empty": "Nothing to match.",
+  "siteMatchReview_summary": "{selected} selected · {review} to review · {none} no match",
+  "@siteMatchReview_summary": {
+    "placeholders": {
+      "selected": { "type": "int" },
+      "review": { "type": "int" },
+      "none": { "type": "int" }
+    }
+  },
+  "siteMatchReview_confirm": "Confirm {count} matches",
+  "@siteMatchReview_confirm": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "siteMatchReview_cancel": "Cancel",
+  "siteMatchReview_tapToChoose": "Tap to choose a site",
+  "siteMatchReview_awayMeters": "{meters} m away",
+  "@siteMatchReview_awayMeters": {
+    "placeholders": { "meters": { "type": "int" } }
+  },
+  "siteMatchReview_depthTo": "to {meters} m",
+  "@siteMatchReview_depthTo": {
+    "placeholders": { "meters": { "type": "int" } }
+  },
+  "siteMatchReview_depthRange": "{min}–{max} m",
+  "@siteMatchReview_depthRange": {
+    "placeholders": { "min": { "type": "int" }, "max": { "type": "int" } }
+  },
+  "siteMatchReview_appliedSnack": "Linked {dives} dives · added {sites} sites",
+  "@siteMatchReview_appliedSnack": {
+    "placeholders": { "dives": { "type": "int" }, "sites": { "type": "int" } }
+  },
+  "siteMatchReview_applyError": "Couldn't apply matches",
+  "siteMatchReview_discardTitle": "Discard matches?",
+  "siteMatchReview_discardMessage": "Your selections won't be saved.",
+  "siteMatchReview_discardConfirm": "Discard",
+  "siteMatchReview_keepReviewing": "Keep reviewing",
+  "siteMatchReview_sourceExisting": "your site",
+  "siteMatchReview_sourceBundled": "import",
+  "siteMatchReview_noNearbySite": "No nearby site",
+  "importSummary_matchSitesButton": "Match {count} dives to sites",
+  "@importSummary_matchSitesButton": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
   "diveLog_listPage_searchFieldLabel": "Search dives...",
   "diveLog_listPage_searchNoResults": "No dives found for \"{query}\"",
   "diveLog_listPage_searchSuggestion": "Search by site, buddy, or notes",
@@ -2931,6 +2982,26 @@
   "diveSites_edit_field_siteName_hint": "e.g., Blue Hole",
   "diveSites_edit_field_siteName_label": "Site Name *",
   "diveSites_edit_field_siteName_validation": "Please enter a site name",
+  "diveSites_similarSite_useHint": "Similar to existing site \"{siteName}\". Tap to use.",
+  "@diveSites_similarSite_useHint": {
+    "description": "Tappable hint in the dive-entry site picker when the typed query closely matches an existing site name that is not already in the list",
+    "placeholders": {
+      "siteName": {
+        "type": "Object",
+        "description": "The existing site name"
+      }
+    }
+  },
+  "diveSites_similarSite_warning": "A similar site already exists: \"{siteName}\"",
+  "@diveSites_similarSite_warning": {
+    "description": "Passive warning under the site name field when the typed name closely matches an existing site",
+    "placeholders": {
+      "siteName": {
+        "type": "Object",
+        "description": "The existing site name"
+      }
+    }
+  },
   "diveSites_edit_gps_gettingLocation": "Getting...",
   "diveSites_edit_gps_helperText": "Choose a location method - coordinates will auto-fill country and region",
   "diveSites_edit_gps_latitude_hint": "e.g., 21.4225",
@@ -5293,6 +5364,8 @@
   "settings_appearance_colorGradient_custom": "Custom",
   "settings_appearance_gasSwitchMarkers": "Gas switch markers",
   "settings_appearance_gasSwitchMarkers_subtitle": "Show markers for gas switches",
+  "settings_appearance_gasTimeline": "Gas timeline",
+  "settings_appearance_gasTimeline_subtitle": "Show the gas-usage strip below the dive profile by default",
   "settings_appearance_header_diveDetails": "Dive Details",
   "settings_appearance_header_diveLog": "Dive Log",
   "settings_appearance_header_diveProfile": "Dive Profile",
@@ -5315,6 +5388,18 @@
   "diveDetailSection_altitude_description": "Altitude value, category, deco requirement",
   "diveDetailSection_tide_name": "Tide",
   "diveDetailSection_tide_description": "Tide cycle graph and timing",
+  "diveDetailSection_surfaceGps_name": "Surface GPS",
+  "diveDetailSection_surfaceGps_description": "GPS entry/exit points and surface drift",
+  "diveLog_detail_section_surfaceGps": "Surface GPS",
+  "diveLog_detail_surfaceGps_entry": "Entry",
+  "diveLog_detail_surfaceGps_exit": "Exit",
+  "diveLog_detail_label_drift": "Drift",
+  "diveLog_detail_surfaceGps_entryOnly": "Entry point recorded",
+  "diveLog_detail_surfaceGps_exitOnly": "Exit point recorded",
+  "diveLog_detail_surfaceGps_site": "Site",
+  "diveLog_detail_locationsMap_title": "Dive Locations",
+  "diveLog_detail_coordinatesCopied": "Coordinates copied to clipboard",
+  "diveLog_detail_openInMaps": "Open in Maps",
   "diveDetailSection_weights_name": "Weights",
   "diveDetailSection_weights_description": "Weight breakdown, total weight",
   "diveDetailSection_tanks_name": "Tanks",
@@ -9846,6 +9931,11 @@
   "tools_weight_yourWeight": "Your weight",
   "settings_section_dataSources_title": "Apple HealthKit",
   "settings_section_dataSources_subtitle": "Health data integration",
+  "settings_siteMatch_title": "Auto site matching",
+  "settings_siteMatch_subtitle": "How aggressively downloaded dives are matched to sites",
+  "settings_siteMatch_strict": "Strict",
+  "settings_siteMatch_balanced": "Balanced",
+  "settings_siteMatch_relaxed": "Relaxed",
   "settings_dataSources_header": "Apple HealthKit Integration",
   "settings_dataSources_appleHealth_title": "Apple HealthKit",
   "settings_dataSources_appleHealth_subtitle": "Underwater Diving Data",

@@ -3,7 +3,6 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_map/flutter_map.dart';
 import 'package:intl/intl.dart' show DateFormat;
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:submersion/core/providers/provider.dart';
@@ -12,12 +11,10 @@ import 'package:latlong2/latlong.dart';
 
 import 'package:submersion/core/constants/dive_detail_sections.dart';
 import 'package:submersion/core/constants/enums.dart';
+import 'package:submersion/features/marine_life/presentation/utils/species_category_icon.dart';
 import 'package:submersion/core/constants/list_view_mode.dart';
 import 'package:submersion/core/constants/tank_presets.dart';
 import 'package:submersion/core/constants/units.dart';
-import 'package:submersion/features/maps/data/services/tile_cache_service.dart';
-import 'package:submersion/features/maps/presentation/providers/map_tile_providers.dart';
-import 'package:submersion/features/maps/presentation/widgets/map_attribution.dart';
 import 'package:submersion/core/deco/altitude_calculator.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/o2_toxicity_card.dart';
 import 'package:submersion/core/services/export/export_service.dart';
@@ -47,6 +44,8 @@ import 'package:submersion/features/dive_log/presentation/providers/profile_play
 import 'package:submersion/features/dive_log/presentation/providers/profile_tracking_provider.dart';
 import 'package:submersion/features/dive_log/presentation/providers/profile_range_provider.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/collapsible_section.dart';
+import 'package:submersion/features/dive_log/presentation/widgets/dive_locations_map.dart';
+import 'package:submersion/features/dive_log/presentation/widgets/surface_gps_section.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/data_sources_section.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/field_attribution_badge.dart';
 import 'package:submersion/features/dive_log/domain/services/field_attribution_service.dart';
@@ -317,6 +316,28 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
       DiveDetailSectionId.tide: () {
         // _buildTideSection includes its own internal spacing
         return [_buildTideSection(context, ref, dive)];
+      },
+      DiveDetailSectionId.surfaceGps: () {
+        if (dive.entryLocation == null && dive.exitLocation == null) return [];
+        return [
+          const SizedBox(height: 24),
+          ValueListenableBuilder<String?>(
+            valueListenable: _viewedSourceIdNotifier,
+            builder: (context, viewedSourceId, _) {
+              final dataSources = computerReadingsAsync.valueOrNull ?? [];
+              final attribution = FieldAttributionService.computeAttribution(
+                dataSources,
+                viewedSourceId: viewedSourceId,
+              );
+              final showBadges =
+                  settings.showDataSourceBadges && attribution.isNotEmpty;
+              return SurfaceGpsSection(
+                dive: dive,
+                sourceName: showBadges ? attribution['gps'] : null,
+              );
+            },
+          ),
+        ];
       },
       DiveDetailSectionId.weights: () {
         if (!_hasWeights(dive)) return [];
@@ -743,7 +764,11 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
     UnitFormatter units, {
     Map<String, String>? attribution,
   }) {
-    final hasLocation = dive.site?.location != null;
+    final entryLoc = dive.entryLocation;
+    final exitLoc = dive.exitLocation;
+    final siteLoc = dive.site?.location;
+    final hasGps = entryLoc != null || exitLoc != null;
+    final hasLocation = siteLoc != null || hasGps;
     final colorScheme = Theme.of(context).colorScheme;
     final cardColor = Theme.of(context).cardColor;
 
@@ -861,68 +886,33 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
       return Card(clipBehavior: Clip.antiAlias, child: content);
     }
 
-    final site = dive.site!;
-    final siteLocation = LatLng(
-      site.location!.latitude,
-      site.location!.longitude,
-    );
+    final site = dive.site;
+    final LatLng mapCenter = entryLoc != null
+        ? LatLng(entryLoc.latitude, entryLoc.longitude)
+        : exitLoc != null
+        ? LatLng(exitLoc.latitude, exitLoc.longitude)
+        : LatLng(siteLoc!.latitude, siteLoc.longitude);
 
     return Card(
       clipBehavior: Clip.antiAlias,
       child: Semantics(
-        button: true,
-        label: '${context.l10n.diveLog_detail_viewSite} ${site.name}',
+        button: site != null,
+        label: site != null
+            ? '${context.l10n.diveLog_detail_viewSite} ${site.name}'
+            : '',
         child: InkWell(
-          onTap: () => context.push('/sites/${site.id}'),
+          onTap: site != null ? () => context.push('/sites/${site.id}') : null,
           child: Stack(
             children: [
-              // Map background
+              // Map background (decorative, non-interactive).
               Positioned.fill(
-                child: FlutterMap(
-                  options: MapOptions(
-                    initialCenter: siteLocation,
-                    initialZoom: 12.0,
-                    interactionOptions: const InteractionOptions(
-                      flags: InteractiveFlag.none,
-                    ),
-                  ),
-                  children: [
-                    TileLayer(
-                      urlTemplate: ref.watch(mapTileUrlProvider),
-                      userAgentPackageName: 'app.submersion',
-                      maxZoom: ref.watch(mapTileMaxZoomProvider),
-                      tileProvider: TileCacheService.instance.isInitialized
-                          ? TileCacheService.instance.getTileProvider()
-                          : null,
-                    ),
-                    MarkerLayer(
-                      markers: [
-                        Marker(
-                          point: siteLocation,
-                          width: 32,
-                          height: 32,
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: colorScheme.primary,
-                              shape: BoxShape.circle,
-                              border: Border.all(
-                                color: colorScheme.onPrimary,
-                                width: 2,
-                              ),
-                            ),
-                            child: Center(
-                              child: Icon(
-                                Icons.scuba_diving,
-                                size: 16,
-                                color: colorScheme.onPrimary,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const MapAttribution(),
-                  ],
+                child: DiveLocationsMap(
+                  entry: entryLoc,
+                  exit: exitLoc,
+                  site: hasGps ? null : siteLoc,
+                  interactive: false,
+                  initialCenter: mapCenter,
+                  initialZoom: 12.0,
                 ),
               ),
               // Gradient overlay from top to bottom
@@ -946,45 +936,47 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
               // Content
               content,
               // View Site button
-              Positioned(
-                right: 8,
-                top: 8,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 6,
-                  ),
-                  decoration: BoxDecoration(
-                    color: colorScheme.primaryContainer,
-                    borderRadius: BorderRadius.circular(16),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.2),
-                        blurRadius: 4,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        Icons.open_in_new,
-                        size: 14,
-                        color: colorScheme.onPrimaryContainer,
-                      ),
-                      const SizedBox(width: 6),
-                      Text(
-                        context.l10n.diveLog_detail_viewSite,
-                        style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                          color: colorScheme.onPrimaryContainer,
-                          fontWeight: FontWeight.w600,
+              if (site != null)
+                Positioned(
+                  right: 8,
+                  top: 8,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 6,
+                    ),
+                    decoration: BoxDecoration(
+                      color: colorScheme.primaryContainer,
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.2),
+                          blurRadius: 4,
+                          offset: const Offset(0, 2),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.open_in_new,
+                          size: 14,
+                          color: colorScheme.onPrimaryContainer,
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          context.l10n.diveLog_detail_viewSite,
+                          style: Theme.of(context).textTheme.labelSmall
+                              ?.copyWith(
+                                color: colorScheme.onPrimaryContainer,
+                                fontWeight: FontWeight.w600,
+                              ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              ),
             ],
           ),
         ),
@@ -4026,7 +4018,9 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
                 radius: 18,
                 backgroundColor: _getCategoryColor(sighting.speciesCategory),
                 child: Icon(
-                  _getCategoryIcon(sighting.speciesCategory),
+                  iconForSpeciesCategory(
+                    sighting.speciesCategory ?? SpeciesCategory.other,
+                  ),
                   color: Colors.white,
                   size: 18,
                 ),
@@ -4101,30 +4095,6 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
       case SpeciesCategory.other:
       case null:
         return Colors.grey;
-    }
-  }
-
-  IconData _getCategoryIcon(SpeciesCategory? category) {
-    switch (category) {
-      case SpeciesCategory.fish:
-        return Icons.set_meal;
-      case SpeciesCategory.shark:
-        return Icons.water;
-      case SpeciesCategory.ray:
-        return Icons.water;
-      case SpeciesCategory.mammal:
-        return Icons.pets;
-      case SpeciesCategory.turtle:
-        return Icons.water;
-      case SpeciesCategory.invertebrate:
-        return Icons.bug_report;
-      case SpeciesCategory.coral:
-        return Icons.nature;
-      case SpeciesCategory.plant:
-        return Icons.eco;
-      case SpeciesCategory.other:
-      case null:
-        return Icons.water;
     }
   }
 

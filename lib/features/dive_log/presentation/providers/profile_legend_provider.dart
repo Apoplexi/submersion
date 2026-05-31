@@ -302,6 +302,7 @@ class ProfileLegend extends _$ProfileLegend {
       showMaxDepthMarker: settings.showMaxDepthMarker,
       showPressureMarkers: settings.showPressureThresholdMarkers,
       showGasSwitchMarkers: settings.defaultShowGasSwitchMarkers,
+      showGas: settings.defaultShowGasTimeline,
       showNdl: settings.showNdlOnProfile,
       showPpO2: settings.defaultShowPpO2,
       showPpN2: settings.defaultShowPpN2,

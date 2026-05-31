@@ -3871,6 +3871,85 @@ class AppLocalizationsZh extends AppLocalizations {
   String get diveLog_listPage_menuDiveNumbering => '潜水编号';
 
   @override
+  String get diveLog_listPage_menuMatchSites => '将潜水匹配到潜水点';
+
+  @override
+  String get siteMatchReview_title => '匹配潜水点';
+
+  @override
+  String siteMatchReview_diveNumber(Object number) {
+    return '潜水 #$number';
+  }
+
+  @override
+  String get siteMatchReview_empty => '没有可匹配的内容。';
+
+  @override
+  String siteMatchReview_summary(int selected, int review, int none) {
+    return '已选择 $selected · 待审核 $review · 无匹配 $none';
+  }
+
+  @override
+  String siteMatchReview_confirm(int count) {
+    return '确认 $count 项匹配';
+  }
+
+  @override
+  String get siteMatchReview_cancel => '取消';
+
+  @override
+  String get siteMatchReview_tapToChoose => '点按以选择潜水点';
+
+  @override
+  String siteMatchReview_awayMeters(int meters) {
+    return '$meters 米外';
+  }
+
+  @override
+  String siteMatchReview_depthTo(int meters) {
+    return '至 $meters 米';
+  }
+
+  @override
+  String siteMatchReview_depthRange(int min, int max) {
+    return '$min–$max 米';
+  }
+
+  @override
+  String siteMatchReview_appliedSnack(int dives, int sites) {
+    return '已关联 $dives 次潜水 · 已添加 $sites 个潜水点';
+  }
+
+  @override
+  String get siteMatchReview_applyError => '无法应用匹配';
+
+  @override
+  String get siteMatchReview_discardTitle => '丢弃匹配？';
+
+  @override
+  String get siteMatchReview_discardMessage => '您的选择将不会被保存。';
+
+  @override
+  String get siteMatchReview_discardConfirm => '丢弃';
+
+  @override
+  String get siteMatchReview_keepReviewing => '继续审核';
+
+  @override
+  String get siteMatchReview_sourceExisting => '您的潜水点';
+
+  @override
+  String get siteMatchReview_sourceBundled => '导入';
+
+  @override
+  String get siteMatchReview_noNearbySite => '附近没有潜水点';
+
+  @override
+  String importSummary_matchSitesButton(int count) {
+    return '将 $count 次潜水匹配到潜水点';
+  }
+
+  @override
   String get diveLog_listPage_searchFieldLabel => '搜索潜水...';
 
   @override
@@ -5222,6 +5301,16 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get diveSites_edit_field_siteName_validation => '请输入潜水点名称';
+
+  @override
+  String diveSites_similarSite_useHint(Object siteName) {
+    return '与现有潜点\"$siteName\"相似。点按以使用。';
+  }
+
+  @override
+  String diveSites_similarSite_warning(Object siteName) {
+    return '已存在相似的潜点：\"$siteName\"';
+  }
 
   @override
   String get diveSites_edit_gps_gettingLocation => '获取中...';
@@ -9241,6 +9330,13 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settings_appearance_gasSwitchMarkers_subtitle => '显示气体切换标记';
 
   @override
+  String get settings_appearance_gasTimeline => 'Gas timeline';
+
+  @override
+  String get settings_appearance_gasTimeline_subtitle =>
+      'Show the gas-usage strip below the dive profile by default';
+
+  @override
   String get settings_appearance_header_diveDetails => '潜水详情';
 
   @override
@@ -9308,6 +9404,44 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get diveDetailSection_tide_description => '潮汐周期图和时间';
+
+  @override
+  String get diveDetailSection_surfaceGps_name => 'Surface GPS';
+
+  @override
+  String get diveDetailSection_surfaceGps_description =>
+      'GPS entry/exit points and surface drift';
+
+  @override
+  String get diveLog_detail_section_surfaceGps => 'Surface GPS';
+
+  @override
+  String get diveLog_detail_surfaceGps_entry => 'Entry';
+
+  @override
+  String get diveLog_detail_surfaceGps_exit => 'Exit';
+
+  @override
+  String get diveLog_detail_label_drift => 'Drift';
+
+  @override
+  String get diveLog_detail_surfaceGps_entryOnly => 'Entry point recorded';
+
+  @override
+  String get diveLog_detail_surfaceGps_exitOnly => 'Exit point recorded';
+
+  @override
+  String get diveLog_detail_surfaceGps_site => 'Site';
+
+  @override
+  String get diveLog_detail_locationsMap_title => 'Dive Locations';
+
+  @override
+  String get diveLog_detail_coordinatesCopied =>
+      'Coordinates copied to clipboard';
+
+  @override
+  String get diveLog_detail_openInMaps => 'Open in Maps';
 
   @override
   String get diveDetailSection_weights_name => '重量';
@@ -15193,6 +15327,21 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get settings_section_dataSources_subtitle => '健康数据集成';
+
+  @override
+  String get settings_siteMatch_title => '自动匹配潜水点';
+
+  @override
+  String get settings_siteMatch_subtitle => '下载的潜水与潜水点匹配的积极程度';
+
+  @override
+  String get settings_siteMatch_strict => '严格';
+
+  @override
+  String get settings_siteMatch_balanced => '平衡';
+
+  @override
+  String get settings_siteMatch_relaxed => '宽松';
 
   @override
   String get settings_dataSources_header => 'Apple HealthKit 集成';

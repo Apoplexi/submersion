@@ -201,6 +201,41 @@ void main() {
     )..where((t) => t.id.equals(id))).getSingle();
   }
 
+  pigeon.ParsedDive makeParsedDiveWithGps({
+    double? entryLatitude,
+    double? entryLongitude,
+    double? exitLatitude,
+    double? exitLongitude,
+  }) {
+    final base = makeParsedDive();
+    return pigeon.ParsedDive(
+      fingerprint: base.fingerprint,
+      dateTimeYear: base.dateTimeYear,
+      dateTimeMonth: base.dateTimeMonth,
+      dateTimeDay: base.dateTimeDay,
+      dateTimeHour: base.dateTimeHour,
+      dateTimeMinute: base.dateTimeMinute,
+      dateTimeSecond: base.dateTimeSecond,
+      maxDepthMeters: base.maxDepthMeters,
+      avgDepthMeters: base.avgDepthMeters,
+      durationSeconds: base.durationSeconds,
+      minTemperatureCelsius: base.minTemperatureCelsius,
+      samples: base.samples,
+      tanks: base.tanks,
+      gasMixes: base.gasMixes,
+      events: base.events,
+      diveMode: base.diveMode,
+      decoAlgorithm: base.decoAlgorithm,
+      gfLow: base.gfLow,
+      gfHigh: base.gfHigh,
+      decoConservatism: base.decoConservatism,
+      entryLatitude: entryLatitude,
+      entryLongitude: entryLongitude,
+      exitLatitude: exitLatitude,
+      exitLongitude: exitLongitude,
+    );
+  }
+
   // ---------------------------------------------------------------------------
   // Tests
   // ---------------------------------------------------------------------------
@@ -264,6 +299,186 @@ void main() {
       expect(dive.gradientFactorLow, 30);
       expect(dive.gradientFactorHigh, 70);
     });
+
+    test(
+      'writes new entry/exit GPS to dives + source when source is primary',
+      () async {
+        // Reproduces the user-reported scenario: a dive previously downloaded
+        // with the pre-patch libdivecomputer had exit GPS == entry GPS. After
+        // updating to the patched libdivecomputer, re-parsing should write the
+        // new (correct) exit GPS to both dives and dive_data_sources.
+        await insertDive('dive-1');
+        await insertComputer('comp-1');
+        await insertSource(
+          id: 'src-1',
+          diveId: 'dive-1',
+          computerId: 'comp-1',
+          isPrimary: true,
+        );
+
+        // Seed both tables with the "wrong" pre-patch values: entry == exit.
+        await (db.update(db.dives)..where((t) => t.id.equals('dive-1'))).write(
+          const DivesCompanion(
+            entryLatitude: Value(21.0),
+            entryLongitude: Value(-157.0),
+            exitLatitude: Value(21.0),
+            exitLongitude: Value(-157.0),
+          ),
+        );
+        await (db.update(
+          db.diveDataSources,
+        )..where((t) => t.id.equals('src-1'))).write(
+          const DiveDataSourcesCompanion(
+            entryLatitude: Value(21.0),
+            entryLongitude: Value(-157.0),
+            exitLatitude: Value(21.0),
+            exitLongitude: Value(-157.0),
+          ),
+        );
+
+        // Re-parse returns a fresh ParsedDive where exit GPS now differs.
+        final parsed = makeParsedDiveWithGps(
+          entryLatitude: 21.0,
+          entryLongitude: -157.0,
+          exitLatitude: 21.0015,
+          exitLongitude: -157.0021,
+        );
+
+        await service.applyParsedUpdate(
+          diveId: 'dive-1',
+          sourceRowId: 'src-1',
+          parsed: parsed,
+          descriptorVendor: 'Shearwater',
+          descriptorProduct: 'Perdix',
+          descriptorModel: 5,
+          libdivecomputerVersion: '0.9.0',
+        );
+
+        final dive = await getDive('dive-1');
+        expect(dive.entryLatitude, 21.0);
+        expect(dive.entryLongitude, -157.0);
+        expect(dive.exitLatitude, 21.0015);
+        expect(dive.exitLongitude, -157.0021);
+
+        final src = await getSource('src-1');
+        expect(src.entryLatitude, 21.0);
+        expect(src.entryLongitude, -157.0);
+        expect(src.exitLatitude, 21.0015);
+        expect(src.exitLongitude, -157.0021);
+      },
+    );
+
+    test(
+      'reparseDive end-to-end: parses raw and writes new GPS to dives',
+      () async {
+        // Mirrors the user-facing "Re-parse raw data" path: a real source row
+        // with rawData + descriptor info, then reparseDive(parseFn) → DB write.
+        await insertDive('dive-1');
+        await insertComputer('comp-1');
+        final now = DateTime.fromMillisecondsSinceEpoch(nowMs);
+        await db
+            .into(db.diveDataSources)
+            .insert(
+              DiveDataSourcesCompanion(
+                id: const Value('src-1'),
+                diveId: const Value('dive-1'),
+                computerId: const Value('comp-1'),
+                isPrimary: const Value(true),
+                sourceFormat: const Value('dive_computer'),
+                rawData: Value(Uint8List.fromList(List.filled(64, 0xAB))),
+                descriptorVendor: const Value('Shearwater'),
+                descriptorProduct: const Value('Perdix'),
+                descriptorModel: const Value(5),
+                libdivecomputerVersion: const Value('0.9.0'),
+                entryLatitude: const Value(21.0),
+                entryLongitude: const Value(-157.0),
+                exitLatitude: const Value(21.0),
+                exitLongitude: const Value(-157.0),
+                importedAt: Value(now),
+                createdAt: Value(now),
+              ),
+            );
+        await (db.update(db.dives)..where((t) => t.id.equals('dive-1'))).write(
+          const DivesCompanion(
+            entryLatitude: Value(21.0),
+            entryLongitude: Value(-157.0),
+            exitLatitude: Value(21.0),
+            exitLongitude: Value(-157.0),
+          ),
+        );
+
+        // Fake parser: returns a ParsedDive with NEW exit GPS — the value the
+        // patched libdivecomputer would produce.
+        Future<pigeon.ParsedDive> fakeParse(
+          String vendor,
+          String product,
+          int model,
+          Uint8List raw,
+        ) async {
+          return makeParsedDiveWithGps(
+            entryLatitude: 21.0,
+            entryLongitude: -157.0,
+            exitLatitude: 21.0015,
+            exitLongitude: -157.0021,
+          );
+        }
+
+        final errors = await service.reparseDive('dive-1', parseFn: fakeParse);
+
+        expect(errors, isEmpty);
+        final dive = await getDive('dive-1');
+        expect(dive.exitLatitude, 21.0015);
+        expect(dive.exitLongitude, -157.0021);
+      },
+    );
+
+    test(
+      'reparseDive silently skips sources missing descriptor info',
+      () async {
+        // A source row with rawData but no descriptor vendor/product/model
+        // (e.g. older import). reparseDive returns no errors, but no actual
+        // re-parse happens. This is the silent-skip trap.
+        await insertDive('dive-1');
+        await insertComputer('comp-1');
+        final now = DateTime.fromMillisecondsSinceEpoch(nowMs);
+        await db
+            .into(db.diveDataSources)
+            .insert(
+              DiveDataSourcesCompanion(
+                id: const Value('src-1'),
+                diveId: const Value('dive-1'),
+                computerId: const Value('comp-1'),
+                isPrimary: const Value(true),
+                sourceFormat: const Value('dive_computer'),
+                rawData: Value(Uint8List.fromList(List.filled(64, 0xAB))),
+                // descriptor* deliberately left absent
+                entryLatitude: const Value(21.0),
+                entryLongitude: const Value(-157.0),
+                exitLatitude: const Value(21.0),
+                exitLongitude: const Value(-157.0),
+                importedAt: Value(now),
+                createdAt: Value(now),
+              ),
+            );
+
+        var parserCalls = 0;
+        Future<pigeon.ParsedDive> fakeParse(
+          String vendor,
+          String product,
+          int model,
+          Uint8List raw,
+        ) async {
+          parserCalls++;
+          return makeParsedDive();
+        }
+
+        final errors = await service.reparseDive('dive-1', parseFn: fakeParse);
+
+        // Documents current behavior: no errors reported, parser not invoked.
+        expect(errors, isEmpty);
+        expect(parserCalls, 0);
+      },
+    );
 
     test('preserves user-authored fields on primary source', () async {
       // Arrange: create dive with user-authored fields set
@@ -805,6 +1020,102 @@ void main() {
       expect(t2.o2Percent, 100.0);
       expect(t2.startPressure, 200.0);
       expect(t2.endPressure, 100.0);
+    });
+
+    test('re-inserts tank pressure profiles and backfills start/end pressure '
+        'from samples when the tank summary has no pressure (AI)', () async {
+      await insertDive('dive-1');
+      await insertComputer('comp-1');
+      await insertSource(
+        id: 'src-1',
+        diveId: 'dive-1',
+        computerId: 'comp-1',
+        isPrimary: true,
+      );
+
+      // Existing tank with previously-derived pressures, plus a stale pressure
+      // profile row that the re-parse must replace.
+      await db
+          .into(db.diveTanks)
+          .insert(
+            const DiveTanksCompanion(
+              id: Value('tank-0'),
+              diveId: Value('dive-1'),
+              volume: Value(12.0),
+              startPressure: Value(225.9),
+              endPressure: Value(93.5),
+              o2Percent: Value(32.0),
+              hePercent: Value(0.0),
+              tankOrder: Value(0),
+              tankRole: Value('backGas'),
+            ),
+          );
+      await db
+          .into(db.tankPressureProfiles)
+          .insert(
+            TankPressureProfilesCompanion.insert(
+              id: 'stale-pp',
+              diveId: 'dive-1',
+              tankId: 'tank-0',
+              timestamp: 0,
+              pressure: 999.0,
+            ),
+          );
+
+      // Air-integrated tank: summary pressure is null, pressure lives in the
+      // sample stream.
+      final parsed = makeParsedDive(
+        tanks: [pigeon.TankInfo(index: 0, gasMixIndex: 0, volumeLiters: 12.0)],
+        gasMixes: [pigeon.GasMix(index: 0, o2Percent: 32.0, hePercent: 0.0)],
+        samples: [
+          pigeon.ProfileSample(
+            timeSeconds: 0,
+            depthMeters: 0.0,
+            pressureBar: 220.0,
+            tankIndex: 0,
+          ),
+          pigeon.ProfileSample(
+            timeSeconds: 60,
+            depthMeters: 18.0,
+            pressureBar: 150.0,
+            tankIndex: 0,
+          ),
+          pigeon.ProfileSample(
+            timeSeconds: 120,
+            depthMeters: 5.0,
+            pressureBar: 90.0,
+            tankIndex: 0,
+          ),
+        ],
+      );
+
+      await service.applyParsedUpdate(
+        diveId: 'dive-1',
+        sourceRowId: 'src-1',
+        parsed: parsed,
+        descriptorVendor: null,
+        descriptorProduct: null,
+        descriptorModel: null,
+        libdivecomputerVersion: null,
+      );
+
+      // Pressure profiles replaced with the parsed samples (stale row gone).
+      final profiles =
+          await (db.select(db.tankPressureProfiles)
+                ..where((t) => t.diveId.equals('dive-1'))
+                ..orderBy([(t) => OrderingTerm.asc(t.timestamp)]))
+              .get();
+      expect(profiles.length, 3);
+      expect(profiles.first.pressure, 220.0);
+      expect(profiles.last.pressure, 90.0);
+      expect(profiles.every((p) => p.tankId == 'tank-0'), isTrue);
+
+      // Tank start/end pressure backfilled from first/last sample.
+      final tank = await (db.select(
+        db.diveTanks,
+      )..where((t) => t.diveId.equals('dive-1'))).getSingle();
+      expect(tank.startPressure, 220.0);
+      expect(tank.endPressure, 90.0);
     });
 
     test('multi-source dive skips event/gasSwitch/tankPressure deletion '
@@ -2006,7 +2317,57 @@ void main() {
   });
 
   group('Coverage: _carryOverTanks gas mix fallback', () {
-    test('unmatched gasMixIndex falls back to 21% O2 and 0% He', () async {
+    test(
+      'unmatched gasMixIndex falls back to the primary (first) mix',
+      () async {
+        await insertDive('dive-1');
+        await insertComputer('comp-1');
+        await insertSource(
+          id: 'src-1',
+          diveId: 'dive-1',
+          computerId: 'comp-1',
+          isPrimary: true,
+        );
+
+        // Tank gas-mix link unmatched (e.g. DC_GASMIX_UNKNOWN on a Shearwater
+        // single-gas dive): must resolve to the dive's primary mix, not air.
+        final parsed = makeParsedDive(
+          tanks: [
+            pigeon.TankInfo(
+              index: 0,
+              gasMixIndex: 99,
+              volumeLiters: 12.0,
+              startPressureBar: 200.0,
+              endPressureBar: 50.0,
+            ),
+          ],
+          gasMixes: [
+            pigeon.GasMix(index: 0, o2Percent: 32.0, hePercent: 0.0),
+            pigeon.GasMix(index: 1, o2Percent: 21.0, hePercent: 0.0),
+          ],
+        );
+
+        await service.applyParsedUpdate(
+          diveId: 'dive-1',
+          sourceRowId: 'src-1',
+          parsed: parsed,
+          descriptorVendor: null,
+          descriptorProduct: null,
+          descriptorModel: null,
+          libdivecomputerVersion: null,
+        );
+
+        final tanks = await (db.select(
+          db.diveTanks,
+        )..where((t) => t.diveId.equals('dive-1'))).get();
+        expect(tanks.length, 1);
+        // Primary mix (index 0 = EAN32), NOT a hardcoded 21% air default.
+        expect(tanks.first.o2Percent, 32.0);
+        expect(tanks.first.hePercent, 0.0);
+      },
+    );
+
+    test('falls back to air only when there are no gas mixes at all', () async {
       await insertDive('dive-1');
       await insertComputer('comp-1');
       await insertSource(
@@ -2016,7 +2377,6 @@ void main() {
         isPrimary: true,
       );
 
-      // Tank with gasMixIndex 99, which does not match any gas mix
       final parsed = makeParsedDive(
         tanks: [
           pigeon.TankInfo(
@@ -2027,10 +2387,7 @@ void main() {
             endPressureBar: 50.0,
           ),
         ],
-        gasMixes: [
-          // Only gas mix at index 0 -- tank references index 99
-          pigeon.GasMix(index: 0, o2Percent: 36.0, hePercent: 10.0),
-        ],
+        gasMixes: [],
       );
 
       await service.applyParsedUpdate(
@@ -2047,7 +2404,6 @@ void main() {
         db.diveTanks,
       )..where((t) => t.diveId.equals('dive-1'))).get();
       expect(tanks.length, 1);
-      // Fallback: 21% O2, 0% He
       expect(tanks.first.o2Percent, 21.0);
       expect(tanks.first.hePercent, 0.0);
     });

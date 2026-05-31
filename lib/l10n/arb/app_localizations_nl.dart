@@ -4038,6 +4038,86 @@ class AppLocalizationsNl extends AppLocalizations {
   String get diveLog_listPage_menuDiveNumbering => 'Duiknummering';
 
   @override
+  String get diveLog_listPage_menuMatchSites => 'Duiken aan stekken koppelen';
+
+  @override
+  String get siteMatchReview_title => 'Stekken koppelen';
+
+  @override
+  String siteMatchReview_diveNumber(Object number) {
+    return 'Duik #$number';
+  }
+
+  @override
+  String get siteMatchReview_empty => 'Niets om te koppelen.';
+
+  @override
+  String siteMatchReview_summary(int selected, int review, int none) {
+    return '$selected geselecteerd · $review te beoordelen · $none geen match';
+  }
+
+  @override
+  String siteMatchReview_confirm(int count) {
+    return '$count koppelingen bevestigen';
+  }
+
+  @override
+  String get siteMatchReview_cancel => 'Annuleren';
+
+  @override
+  String get siteMatchReview_tapToChoose => 'Tik om een stek te kiezen';
+
+  @override
+  String siteMatchReview_awayMeters(int meters) {
+    return '$meters m verderop';
+  }
+
+  @override
+  String siteMatchReview_depthTo(int meters) {
+    return 'tot $meters m';
+  }
+
+  @override
+  String siteMatchReview_depthRange(int min, int max) {
+    return '$min–$max m';
+  }
+
+  @override
+  String siteMatchReview_appliedSnack(int dives, int sites) {
+    return '$dives duiken gekoppeld · $sites stekken toegevoegd';
+  }
+
+  @override
+  String get siteMatchReview_applyError => 'Kan koppelingen niet toepassen';
+
+  @override
+  String get siteMatchReview_discardTitle => 'Koppelingen verwerpen?';
+
+  @override
+  String get siteMatchReview_discardMessage =>
+      'Je selectie wordt niet opgeslagen.';
+
+  @override
+  String get siteMatchReview_discardConfirm => 'Verwerpen';
+
+  @override
+  String get siteMatchReview_keepReviewing => 'Doorgaan met beoordelen';
+
+  @override
+  String get siteMatchReview_sourceExisting => 'jouw stek';
+
+  @override
+  String get siteMatchReview_sourceBundled => 'import';
+
+  @override
+  String get siteMatchReview_noNearbySite => 'Geen stek in de buurt';
+
+  @override
+  String importSummary_matchSitesButton(int count) {
+    return '$count duiken aan stekken koppelen';
+  }
+
+  @override
   String get diveLog_listPage_searchFieldLabel => 'Duiken zoeken...';
 
   @override
@@ -5426,6 +5506,16 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get diveSites_edit_field_siteName_validation => 'Voer een steknaam in';
+
+  @override
+  String diveSites_similarSite_useHint(Object siteName) {
+    return 'Vergelijkbaar met bestaande duiklocatie \"$siteName\". Tik om te gebruiken.';
+  }
+
+  @override
+  String diveSites_similarSite_warning(Object siteName) {
+    return 'Er bestaat al een vergelijkbare locatie: \"$siteName\"';
+  }
 
   @override
   String get diveSites_edit_gps_gettingLocation => 'Ophalen...';
@@ -9603,6 +9693,13 @@ class AppLocalizationsNl extends AppLocalizations {
       'Toon markeringen voor gaswisselingen';
 
   @override
+  String get settings_appearance_gasTimeline => 'Gas timeline';
+
+  @override
+  String get settings_appearance_gasTimeline_subtitle =>
+      'Show the gas-usage strip below the dive profile by default';
+
+  @override
   String get settings_appearance_header_diveDetails => 'Duikdetails';
 
   @override
@@ -9679,6 +9776,44 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get diveDetailSection_tide_description =>
       'Getijdecyclusgrafiek en timing';
+
+  @override
+  String get diveDetailSection_surfaceGps_name => 'Surface GPS';
+
+  @override
+  String get diveDetailSection_surfaceGps_description =>
+      'GPS entry/exit points and surface drift';
+
+  @override
+  String get diveLog_detail_section_surfaceGps => 'Surface GPS';
+
+  @override
+  String get diveLog_detail_surfaceGps_entry => 'Entry';
+
+  @override
+  String get diveLog_detail_surfaceGps_exit => 'Exit';
+
+  @override
+  String get diveLog_detail_label_drift => 'Drift';
+
+  @override
+  String get diveLog_detail_surfaceGps_entryOnly => 'Entry point recorded';
+
+  @override
+  String get diveLog_detail_surfaceGps_exitOnly => 'Exit point recorded';
+
+  @override
+  String get diveLog_detail_surfaceGps_site => 'Site';
+
+  @override
+  String get diveLog_detail_locationsMap_title => 'Dive Locations';
+
+  @override
+  String get diveLog_detail_coordinatesCopied =>
+      'Coordinates copied to clipboard';
+
+  @override
+  String get diveLog_detail_openInMaps => 'Open in Maps';
 
   @override
   String get diveDetailSection_weights_name => 'Gewichten';
@@ -15836,6 +15971,22 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get settings_section_dataSources_subtitle =>
       'Connected services & integrations';
+
+  @override
+  String get settings_siteMatch_title => 'Automatisch stekken koppelen';
+
+  @override
+  String get settings_siteMatch_subtitle =>
+      'Hoe agressief gedownloade duiken aan stekken worden gekoppeld';
+
+  @override
+  String get settings_siteMatch_strict => 'Strikt';
+
+  @override
+  String get settings_siteMatch_balanced => 'Gebalanceerd';
+
+  @override
+  String get settings_siteMatch_relaxed => 'Soepel';
 
   @override
   String get settings_dataSources_header => 'Data Sources';

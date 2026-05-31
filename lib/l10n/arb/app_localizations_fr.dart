@@ -4090,6 +4090,88 @@ class AppLocalizationsFr extends AppLocalizations {
   String get diveLog_listPage_menuDiveNumbering => 'Numerotation des plongees';
 
   @override
+  String get diveLog_listPage_menuMatchSites =>
+      'Associer les plongées aux sites';
+
+  @override
+  String get siteMatchReview_title => 'Associer les sites';
+
+  @override
+  String siteMatchReview_diveNumber(Object number) {
+    return 'Plongee n°$number';
+  }
+
+  @override
+  String get siteMatchReview_empty => 'Rien à associer.';
+
+  @override
+  String siteMatchReview_summary(int selected, int review, int none) {
+    return '$selected sélectionnées · $review à vérifier · $none sans correspondance';
+  }
+
+  @override
+  String siteMatchReview_confirm(int count) {
+    return 'Confirmer $count associations';
+  }
+
+  @override
+  String get siteMatchReview_cancel => 'Annuler';
+
+  @override
+  String get siteMatchReview_tapToChoose => 'Appuyez pour choisir un site';
+
+  @override
+  String siteMatchReview_awayMeters(int meters) {
+    return 'à $meters m';
+  }
+
+  @override
+  String siteMatchReview_depthTo(int meters) {
+    return 'jusqu\'à $meters m';
+  }
+
+  @override
+  String siteMatchReview_depthRange(int min, int max) {
+    return '$min–$max m';
+  }
+
+  @override
+  String siteMatchReview_appliedSnack(int dives, int sites) {
+    return '$dives plongées associées · $sites sites ajoutés';
+  }
+
+  @override
+  String get siteMatchReview_applyError =>
+      'Impossible d\'appliquer les associations';
+
+  @override
+  String get siteMatchReview_discardTitle => 'Abandonner les associations ?';
+
+  @override
+  String get siteMatchReview_discardMessage =>
+      'Votre sélection ne sera pas enregistrée.';
+
+  @override
+  String get siteMatchReview_discardConfirm => 'Abandonner';
+
+  @override
+  String get siteMatchReview_keepReviewing => 'Continuer la vérification';
+
+  @override
+  String get siteMatchReview_sourceExisting => 'votre site';
+
+  @override
+  String get siteMatchReview_sourceBundled => 'import';
+
+  @override
+  String get siteMatchReview_noNearbySite => 'Aucun site à proximité';
+
+  @override
+  String importSummary_matchSitesButton(int count) {
+    return 'Associer $count plongées aux sites';
+  }
+
+  @override
   String get diveLog_listPage_searchFieldLabel => 'Rechercher des plongees...';
 
   @override
@@ -5498,6 +5580,16 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get diveSites_edit_field_siteName_validation =>
       'Veuillez entrer un nom de site';
+
+  @override
+  String diveSites_similarSite_useHint(Object siteName) {
+    return 'Similaire à un site de plongée existant « $siteName ». Appuyez pour l\'utiliser.';
+  }
+
+  @override
+  String diveSites_similarSite_warning(Object siteName) {
+    return 'Un site similaire existe déjà : « $siteName »';
+  }
 
   @override
   String get diveSites_edit_gps_gettingLocation => 'Obtention...';
@@ -9711,6 +9803,13 @@ class AppLocalizationsFr extends AppLocalizations {
       'Afficher les marqueurs de changement de gaz';
 
   @override
+  String get settings_appearance_gasTimeline => 'Gas timeline';
+
+  @override
+  String get settings_appearance_gasTimeline_subtitle =>
+      'Show the gas-usage strip below the dive profile by default';
+
+  @override
   String get settings_appearance_header_diveDetails => 'Details de la plongee';
 
   @override
@@ -9788,6 +9887,44 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get diveDetailSection_tide_description =>
       'Graphique du cycle de maree et horaires';
+
+  @override
+  String get diveDetailSection_surfaceGps_name => 'Surface GPS';
+
+  @override
+  String get diveDetailSection_surfaceGps_description =>
+      'GPS entry/exit points and surface drift';
+
+  @override
+  String get diveLog_detail_section_surfaceGps => 'Surface GPS';
+
+  @override
+  String get diveLog_detail_surfaceGps_entry => 'Entry';
+
+  @override
+  String get diveLog_detail_surfaceGps_exit => 'Exit';
+
+  @override
+  String get diveLog_detail_label_drift => 'Drift';
+
+  @override
+  String get diveLog_detail_surfaceGps_entryOnly => 'Entry point recorded';
+
+  @override
+  String get diveLog_detail_surfaceGps_exitOnly => 'Exit point recorded';
+
+  @override
+  String get diveLog_detail_surfaceGps_site => 'Site';
+
+  @override
+  String get diveLog_detail_locationsMap_title => 'Dive Locations';
+
+  @override
+  String get diveLog_detail_coordinatesCopied =>
+      'Coordinates copied to clipboard';
+
+  @override
+  String get diveLog_detail_openInMaps => 'Open in Maps';
 
   @override
   String get diveDetailSection_weights_name => 'Lestage';
@@ -16026,6 +16163,22 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get settings_section_dataSources_subtitle =>
       'Connected services & integrations';
+
+  @override
+  String get settings_siteMatch_title => 'Association automatique des sites';
+
+  @override
+  String get settings_siteMatch_subtitle =>
+      'À quel point les plongées téléchargées sont associées aux sites';
+
+  @override
+  String get settings_siteMatch_strict => 'Strict';
+
+  @override
+  String get settings_siteMatch_balanced => 'Équilibré';
+
+  @override
+  String get settings_siteMatch_relaxed => 'Souple';
 
   @override
   String get settings_dataSources_header => 'Data Sources';

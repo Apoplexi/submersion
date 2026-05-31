@@ -3968,6 +3968,85 @@ class AppLocalizationsAr extends AppLocalizations {
   String get diveLog_listPage_menuDiveNumbering => 'ترقيم الغوصات';
 
   @override
+  String get diveLog_listPage_menuMatchSites => 'مطابقة الغوصات بالمواقع';
+
+  @override
+  String get siteMatchReview_title => 'مطابقة المواقع';
+
+  @override
+  String siteMatchReview_diveNumber(Object number) {
+    return 'الغوصة #$number';
+  }
+
+  @override
+  String get siteMatchReview_empty => 'لا شيء للمطابقة.';
+
+  @override
+  String siteMatchReview_summary(int selected, int review, int none) {
+    return '$selected محددة · $review للمراجعة · $none بدون تطابق';
+  }
+
+  @override
+  String siteMatchReview_confirm(int count) {
+    return 'تأكيد $count مطابقات';
+  }
+
+  @override
+  String get siteMatchReview_cancel => 'إلغاء';
+
+  @override
+  String get siteMatchReview_tapToChoose => 'اضغط لاختيار موقع';
+
+  @override
+  String siteMatchReview_awayMeters(int meters) {
+    return 'على بعد $meters م';
+  }
+
+  @override
+  String siteMatchReview_depthTo(int meters) {
+    return 'حتى $meters م';
+  }
+
+  @override
+  String siteMatchReview_depthRange(int min, int max) {
+    return '$min–$max م';
+  }
+
+  @override
+  String siteMatchReview_appliedSnack(int dives, int sites) {
+    return 'تم ربط $dives غوصات · تمت إضافة $sites مواقع';
+  }
+
+  @override
+  String get siteMatchReview_applyError => 'تعذّر تطبيق المطابقات';
+
+  @override
+  String get siteMatchReview_discardTitle => 'تجاهل المطابقات؟';
+
+  @override
+  String get siteMatchReview_discardMessage => 'لن يتم حفظ اختياراتك.';
+
+  @override
+  String get siteMatchReview_discardConfirm => 'تجاهل';
+
+  @override
+  String get siteMatchReview_keepReviewing => 'متابعة المراجعة';
+
+  @override
+  String get siteMatchReview_sourceExisting => 'موقعك';
+
+  @override
+  String get siteMatchReview_sourceBundled => 'مستورد';
+
+  @override
+  String get siteMatchReview_noNearbySite => 'لا يوجد موقع قريب';
+
+  @override
+  String importSummary_matchSitesButton(int count) {
+    return 'مطابقة $count غوصات بالمواقع';
+  }
+
+  @override
   String get diveLog_listPage_searchFieldLabel => 'البحث في الغوصات...';
 
   @override
@@ -5349,6 +5428,16 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get diveSites_edit_field_siteName_validation =>
       'يرجى إدخال اسم الموقع';
+
+  @override
+  String diveSites_similarSite_useHint(Object siteName) {
+    return 'مشابه لموقع غوص موجود \"$siteName\". انقر للاستخدام.';
+  }
+
+  @override
+  String diveSites_similarSite_warning(Object siteName) {
+    return 'يوجد بالفعل موقع مشابه: \"$siteName\"';
+  }
 
   @override
   String get diveSites_edit_gps_gettingLocation => 'جارٍ الحصول على الموقع...';
@@ -9486,6 +9575,13 @@ class AppLocalizationsAr extends AppLocalizations {
       'عرض علامات لتبديل الغازات';
 
   @override
+  String get settings_appearance_gasTimeline => 'Gas timeline';
+
+  @override
+  String get settings_appearance_gasTimeline_subtitle =>
+      'Show the gas-usage strip below the dive profile by default';
+
+  @override
   String get settings_appearance_header_diveDetails => 'تفاصيل الغوصة';
 
   @override
@@ -9562,6 +9658,44 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get diveDetailSection_tide_description =>
       'رسم بياني لدورة المد والجزر والتوقيت';
+
+  @override
+  String get diveDetailSection_surfaceGps_name => 'Surface GPS';
+
+  @override
+  String get diveDetailSection_surfaceGps_description =>
+      'GPS entry/exit points and surface drift';
+
+  @override
+  String get diveLog_detail_section_surfaceGps => 'Surface GPS';
+
+  @override
+  String get diveLog_detail_surfaceGps_entry => 'Entry';
+
+  @override
+  String get diveLog_detail_surfaceGps_exit => 'Exit';
+
+  @override
+  String get diveLog_detail_label_drift => 'Drift';
+
+  @override
+  String get diveLog_detail_surfaceGps_entryOnly => 'Entry point recorded';
+
+  @override
+  String get diveLog_detail_surfaceGps_exitOnly => 'Exit point recorded';
+
+  @override
+  String get diveLog_detail_surfaceGps_site => 'Site';
+
+  @override
+  String get diveLog_detail_locationsMap_title => 'Dive Locations';
+
+  @override
+  String get diveLog_detail_coordinatesCopied =>
+      'Coordinates copied to clipboard';
+
+  @override
+  String get diveLog_detail_openInMaps => 'Open in Maps';
 
   @override
   String get diveDetailSection_weights_name => 'الأوزان';
@@ -15659,6 +15793,22 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get settings_section_dataSources_subtitle =>
       'Connected services & integrations';
+
+  @override
+  String get settings_siteMatch_title => 'مطابقة المواقع تلقائيًا';
+
+  @override
+  String get settings_siteMatch_subtitle =>
+      'مدى صرامة مطابقة الغوصات التي تم تنزيلها بالمواقع';
+
+  @override
+  String get settings_siteMatch_strict => 'صارم';
+
+  @override
+  String get settings_siteMatch_balanced => 'متوازن';
+
+  @override
+  String get settings_siteMatch_relaxed => 'متساهل';
 
   @override
   String get settings_dataSources_header => 'Data Sources';

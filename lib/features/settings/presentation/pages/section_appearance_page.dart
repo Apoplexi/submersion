@@ -478,6 +478,15 @@ class SectionAppearancePage extends ConsumerWidget {
               .setDefaultShowGasSwitchMarkers(value);
         },
       ),
+      SwitchListTile(
+        title: Text(context.l10n.settings_appearance_gasTimeline),
+        subtitle: Text(context.l10n.settings_appearance_gasTimeline_subtitle),
+        secondary: const Icon(Icons.timeline),
+        value: settings.defaultShowGasTimeline,
+        onChanged: (value) {
+          ref.read(settingsProvider.notifier).setDefaultShowGasTimeline(value);
+        },
+      ),
       ListTile(
         leading: const Icon(Icons.visibility),
         title: Text(

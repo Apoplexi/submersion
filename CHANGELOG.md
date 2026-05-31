@@ -3,6 +3,392 @@
 All notable changes to Submersion are documented in this file.
 
 
+## 1.4.9 (2026-05-29)
+
+### Bug Fixes
+
+- respect depth unit in Time at Depth Ranges chart
+- honor user date format + count duration inclusively
+- refresh paginated dive list after applying matches
+
+### Chores
+
+- bump version to 1.4.9+95
+
+### Other
+
+- vendor patches via fork submodule so CI builds include them
+- Update docs
+
+
+## 1.4.8 (2026-05-27)
+
+### Features
+
+- staged map + confirm review screen (responsive) + l10n
+- add MatchSitesMap (dive + candidate pins, tap to select)
+- add sensitivity setting UI and wire it through
+- persist configurable siteMatchSensitivity setting
+- wire route, dives-list action, and post-download match button
+- add SiteMatchReviewNotifier and review page
+- add SiteMatchingService with dedup, coincidence guard, and rollback
+- add DiveRepository.setSite and getDivesNeedingSiteMatch
+- add pure matcher, domain types, and sensitivity presets
+
+### Bug Fixes
+
+- localize dive-row title + short-circuit empty confirm
+- use the diver icon for the surface-GPS site marker
+- partition review summary + v76 migration step
+- make apply errors transient; preserve fatal error in copyWith
+- refresh dive list after applying site matches
+- show 'Match Dives to Sites' in default list view menu, not only table mode
+- address PR review (unlink guard, in-query id filter, l10n, Change action, settings tile)
+- prevent popup menu overflow with flexible match-sites label
+
+### Refactoring
+
+- address review — value-equality provider key + rank candidates once
+- staged notifier (proposals/selections/confirm)
+- split service into computeProposals + applyConfirmed
+
+### Documentation
+
+- add site-match review map + staged-confirm implementation plan
+- add site-match review map + staged-confirm design spec
+- add GPS site-matching implementation plan
+- add GPS site-matching design spec
+
+### Tests
+
+- cover notifier/page/map for staged review (patch >=90%); drop dead map didUpdateWidget
+- raise patch coverage above 90% (notifier, page, repo, import-summary, settings)
+- add setSiteMatchSensitivity override to remaining settings mocks
+
+### Chores
+
+- bump version to 1.4.8+94
+- regenerate mocks for new DiveRepository methods
+
+### Other
+
+- i18n: translate site-matching strings across 10 locales
+
+
+## 1.4.7 (2026-05-25)
+
+### Features
+
+- seed gas timeline strip visibility from defaultShowGasTimeline setting
+- default the gas timeline strip to hidden
+- wire interactive map into detail page, remove Open in Maps
+- add SurfaceGpsSection and fullscreen DiveLocationsMapPage
+- add shared DiveLocationsMap widget
+- add l10n strings for site row, map title, copy toast
+- expose gas timeline default visibility toggle
+- hydrate gas timeline visibility from setting
+- add setDefaultShowGasTimeline setter
+- persist defaultShowGasTimeline in DiverSettingsRepository
+- add default_show_gas_timeline column with v75 migration
+- add defaultShowGasTimeline to AppSettings model
+- show source-attribution badge on Surface GPS values
+- attribute GPS to the source that recorded it
+- record GPS on the dive data-source provenance
+- carry GPS on DiveDataSource provenance
+- add GPS columns to dive_data_sources (schema v74)
+- add Surface GPS collapsible section with drift and open-in-maps
+- show entry/exit pins and drift line on header map
+- register Surface GPS dive-detail section
+- add Surface GPS section expansion state
+- add formatDistance for drift readout
+- add geo distance/bearing helpers for dive drift
+- expose GPS entry/exit on Dive entity and hydrate from DB
+- persist Swift GPS entry/exit on downloaded dives
+- add GPS entry/exit columns to dives (schema v73)
+- carry GPS entry/exit on DownloadedDive
+- map GPS entry/exit through all platform converters
+- add GPS entry/exit to Pigeon ParsedDive
+- read Swift GPS entry/exit into parsed-dive struct
+- add GPS entry/exit fields to parsed-dive struct
+- expose Shearwater Swift exit GPS via DC_FIELD_LOCATION flags
+- add used gas to dive profile chart
+- add isOxygen classification to GasMix and GasSwitchWithTank
+- add date field to RankingItem class
+- close networkUrl resolver gap by parameterizing HttpUrlMediaResolver
+- route Network Sources from the Media Sources page
+- add NetworkSourcesPage hosting the three cards + scan
+- add NetworkScanDialog for live scan progress + summary
+- add NetworkCacheCard for size + clear UX
+- add ManifestSubscriptionCard for subscription management
+- add CredentialsHostCard for saved-hosts management
+- add network sources Riverpod providers
+- add CachedNetworkImageDiagnostics for size + clear
+- add NetworkScanService for user-triggered HTTP scan
+- add HostRateLimiter for per-host concurrency + spacing
+- add NetworkScanProgress and NetworkScanReport value objects
+- wire Subscribe toggle, poll-interval picker, and Import commit
+- add ManifestModePanel with fetch + preview UI
+- wire subscription poller scheduler with 30s warmup
+- add SubscriptionPoller single-pass diff cycle
+- extend network fetch pipeline for manifestEntry items
+- register ManifestEntryResolver in the resolver registry
+- add ManifestSubscriptionRepository for synced + per-device state
+- add ManifestFetchService (HTTP + sniff + parse)
+- add ManifestFormatSniffer for content-type and body detection
+- add CsvManifestParser
+- add AtomManifestParser for Atom/RSS feeds
+- add JsonManifestParser for Submersion v1 JSON manifests
+- add ManifestEntry, ManifestFormat, and ManifestParseResult value types
+- swap URL placeholder for new URL tab in picker
+- wire cached_network_image with auth + LRU caps
+- add URL tab UI, review pane, and sign-in sheet
+- add URL tab Riverpod providers (commit/undo, sign-in)
+- add network fetch pipeline (sync insert + background fill)
+- add UrlMetadataExtractor with range + full-GET fallback
+- add NetworkUrlResolver for HTTP-fetched media
+- add NetworkCredentialsService with secure storage
+- add NetworkCredentialsRepository
+- add URL validator for bulk import
+- add Local files diagnostics + Settings subsection
+- add right-click context menu for local-file items (desktop)
+- wire Files-tab commit flow with bookmark persistence + undo
+- wire FilesTab into photo picker tab shell
+- add FileReviewPane and FileReviewCard + wire into FilesTab
+- add folder picker + auto-match-by-date wiring
+- add FilesTab widget skeleton with file-picker action
+- add Files tab state notifier
+- promote LocalFileResolver from stub to full multi-platform
+- add readBookmarkBytes/readUriBytes native methods
+- add LocalBookmarkStorage for iOS/macOS bookmark persistence
+- add DivePhotoMatcher shared matching service
+- add ExtractedFile and MatchedSelection value objects
+- add ExifExtractor service for local file metadata
+- add Media Sources settings page under Data
+- auto-populate originDeviceId for device-local sources
+- add LocalMediaPlatform Dart wrapper
+- add LocalMediaHandler for persistable URI perms
+- add LocalMediaHandler for security-scoped bookmarks
+- add MediaItemView universal display widget
+- add UnavailableMediaPlaceholder widget
+- register media source resolver registry as a provider
+- add SignatureResolver
+- add PlatformGalleryResolver
+- add MediaSourceResolverRegistry
+- add MediaSourceResolver abstract interface
+- persist source-type fields in MediaRepository
+- add Drift tables for subscriptions/connectors/credentials
+- mirror new media columns in Drift Media table
+- add source-type fields to MediaItem entity
+- add MediaSourceData sealed class
+- add VerifyResult and MediaSourceMetadata value objects
+- add MediaSourceType enum
+- backfill source_type and add indexes
+- add subscription/connector/credential tables
+- add media table columns for source-type extension
+- bump schema to v72 for media source extension
+- decode ZRAWDATA profiles via libdivecomputer_plugin
+- MacDive SQLite import (Milestone 3 of 4)
+- wire MacDiveXmlParser into universal import pipeline
+- MacDive value mapper for water type / entry type / rating
+- MacDiveXmlParser produces unified ImportPayload
+- MacDiveXmlReader parses MacDive native XML into typed models
+- MacDive unit converter (imperial ↔ SI canonical)
+- MacDive XML typed value classes
+- detect MacDive native XML format
+- add ImportFormat.macdiveXml and source override
+- persist MacDive waypoint gas switches via existing gasSwitches pipe
+- persist MacDive dive/site metadata to DB
+- persist UDDF <dive id> as dive_data_sources.source_uuid
+- extract site waterType / bodyOfWater / difficulty / flag and source UUID
+- extract MacDive extended dive fields (weather, boat, operator, ...) and source UUID
+- add LinkRefIndex for ref-kind disambiguation
+- add source_uuid to dive_data_sources for cross-format import dedup
+
+### Bug Fixes
+
+- cap map fit zoom so tiles render for clustered GPS points
+- guard v75 diver_settings migration for partial-schema tests
+- show SAC on graph for imports without tank volume
+- use primary gas mix when tank gas link is unknown
+- restore tank pressure on reparse
+- persist entry/exit GPS on reparse
+- rebuild libdivecomputer when patched sources change
+- resolve duplicate diveLog_detail_label_entry/exit keys
+- guard v73 migration ALTER and update section/props counts
+- address PR review feedback
+- honor pinned Flutter version on Windows runners
+- exclude zero-volume tanks from SAC by tank role; report SAC in L/min
+- interpret dive_date_time as UTC when converting to DateTime
+- use separate functions for SAC by tank role
+- wire applyMediaCacheCaps at app boot to enforce 75 MB memory cap
+- reject TZ-abbreviation RFC 822 dates rather than silently treating as UTC
+- cancel warm-up timer on SubscriptionPollerScheduler dispose
+- repair malformed coverage:ignore-start marker that was hanging CI
+- format best/worst SAC dates according to user preference
+- tolerate corrupted credentials blobs in headersFor
+- set _lastReport before emitting finished event
+- store localPath alongside bookmarkRef on macOS for context-menu actions
+- filter video imports from Files tab pending Phase 3 video support
+- parse EXIF dates as wall-clock-UTC for matcher consistency
+- add context.mounted check after reverifyAll await
+- use readBookmarkBytes on iOS/macOS to avoid security-scope leak
+- sync state.match when removeFile drops a staged file
+- route files to Unmatched when auto-match is disabled
+- close Exif handle on attribute-read failure
+- tolerate per-item failures in reverifyAll + handle onTap errors
+- tighten _persistOne return type, fix Link button count + l10n TODO
+- use package:path for filename + add l10n TODO markers
+- clear isExtracting when picker skips files + extra render tests
+- apply picker buffer in UTC to match scanner exactly
+- apply wall-clock-UTC→local conversion in photo picker
+- wire up Open Settings button + remove dead l10n key
+- address 4 follow-up Copilot review comments on PR #268
+- register Phase 1 LocalFileResolver + harden MediaItemView
+- address PR #268 review comments
+- wire PlatformGalleryResolver through AssetResolutionService
+- preserve mini profile chart detail
+- emit sample tank pressure via allTankPressures key
+- dedupe source name in detection label; parse MacDive sample <time> as decimal seconds
+- SQLite gas-mix cast, remove broken ZRAWDATA decoder
+- propagate fatal FFI errors + add Perdix 2/NERD 2 models
+- dedup buddyRefs / tagRefs + use MacDiveValueMapper.rating
+- address PR #254 review round 2 — MacDive XML polish
+- address PR #254 review — MacDive XML consumer compatibility
+- use const for constants, remove unused import
+- route MacDive waterType/entryType through MacDiveValueMapper
+- trim mixRef + order-independent tank lookup in test
+- use Value.absent() for missing companion fields
+- extract equipment from standard <diver><owner><equipment> location
+- record gasMixRef on samples carrying <switchmix>
+- ensure equipmentused refs from both before/after sections are captured
+
+### Refactoring
+
+- centralize chart layout constants
+- consolidate wall-clock-UTC parsing into shared helper
+- delegate gallery match to DivePhotoMatcher
+- route trip photos through MediaItemView
+- route all dive media items through MediaItemView
+- wrap photo picker in tab shell
+- remove legacy UnavailablePhotoPlaceholder
+- use UnavailableMediaPlaceholder in trip photo widgets
+- use MediaItemView in trip photo viewer
+- use MediaItemView in photo viewer page
+- use MediaItemView in dive media section
+- drop dive_number_of_day column; it's derivable
+- drop low-value extractions and unused LinkRefIndex
+
+### Documentation
+
+- add gas timeline default visibility design spec and plan
+- add interactive map implementation plan
+- add interactive map redesign spec
+- spec + plan for Shearwater Swift GPS entry/exit points
+- correct scanAll cancellation behavior in NetworkScanService
+- correct clearCache() doc to acknowledge rethrow on failure
+- add JSON manifest v1 schema spec
+- add Phase 3a (URL bulk import) implementation plan
+- add Phase 3b (manifest import) implementation plan
+- add Phase 3c (settings + scan) implementation plan
+- refresh LocalBookmarkStorage class doc to readBookmarkBytes flow
+- add Phase 2 (Local Files) implementation plan
+- clarify LocalMediaHandler bookmark options vs macOS
+- add media source extension design + Phase 1 plan
+- preserve ZSAMPLES findings on main (closing PR #260)
+- retarget Phase 2 plan to concrete ZRAWDATA + parseRawDiveData
+- Phase 2 plan references main as target (PR #256 merged)
+- record Phase 1 NO-GO + Phase 2 pivot to ZRAWDATA via libdivecomputer
+- fix stale inspect.py reference in README content (renamed to blob_inspect.py)
+- MacDive ZSAMPLES Phase 1 spike implementation plan
+- MacDive SQLite ZSAMPLES profile decoding design
+- reflect dive_number_of_day removal in Milestone 1 plan
+- fix link to roadmap
+
+### Tests
+
+- add setDefaultShowGasTimeline to remaining SettingsNotifier mocks
+- cover Surface GPS UI, header map, and expand-state provider
+- assert provider returns NetworkScanService instance, not closure type
+- add failing widget tests for URL tab + sign-in sheet
+- add failing tests for network fetch pipeline
+- add failing tests for UrlMetadataExtractor
+- add failing tests for NetworkUrlResolver
+- add failing tests for NetworkCredentialsService
+- add failing tests for NetworkCredentialsRepository
+- add failing tests for URL validator
+- cover compute() isolate path + remaining matcher branches
+- cover Local files diagnostics card + Re-verify tile
+- cover FileReviewCard render + remove tap
+- cover androidUriUsageProvider + localFilesDiagnosticsProvider
+- cover scanGalleryForTrip / scanGalleryForDive helpers
+- mock native_exif channel to cover EXIF parse paths
+- cover BytesData round-trip + ignore Android branch
+- add readBookmarkBytes / readUriBytes platform-check tests
+- cover reverifyAll catch + Equatable + ignore Android URI usage
+- add coverage for getAllBySourceType
+- verify phase-1 local-only tables don't sync
+- seed v71 media table in older migration test fixtures
+- cover PlatformException + _defaultParse + optional sample fields
+- real-sample test covers ZRAWDATA decode path
+- MacDive XML real-sample regression (gated)
+- strengthen MacDive XML wizard test to exercise parser
+- imperial-unit fixture and tests for MacDive XML reader
+- make MacDive real-sample suite portable and skip-safe
+- MacDive real-sample regression (gated)
+- replace parser-only test with real integration test for source_uuid
+- lock down <infinity/> surface interval handling
+- rename and expand v70 migration test to match house convention
+
+### Chores
+
+- bump version to 1.4.7+93
+- ignore submodule working-tree dirtiness
+- refresh stale mocks for new MediaRepository methods
+- re-format exif_extractor_test after coverage additions
+- final coverage:ignore polish for unreachable branches
+- tighten coverage:ignore regions for picker / right-click
+- mark Android-only branches as coverage:ignore
+- mark FilesTab picker / commit callbacks as coverage:ignore
+- mark right-click context menu as coverage:ignore
+- @Deprecated matchPhotoToDive + align picker buffers
+- remove unused dart:typed_data import
+- CHANGELOG and plan update for M2 completion
+- regenerate mocks for applyImportedMetadata
+- changelog and plan update for M1 completion
+
+### Other
+
+- format v75 migration test
+- dart format generated Pigeon bindings (CI format gate)
+- apply dart format to GPS test files
+- i18n: use correct German umlauts Fixes #262
+- Fixed formatting.
+- Added new test to group 'updateDive' that verifies a tank validation error by attempting to update with an empty tank ID.
+- Fixed test still using empty tank ID.
+- Added validation that all tanks have non-empty IDs on update to prevent data loss. Added test to verify that an ArgumentError is thrown when updating a dive with a tank that has an empty id.
+- i18n(heatmap): reposition fast and slow labels
+- Address Claude code review comments
+- Clarify fallback behavior in MetricSourceInfo documentation
+- Rebase changes on current main
+- Update pp02 and CNS to be gas-aware, consistent with deco model
+- change 0.79 hard-coded constants to either airN2Fraction or inspiredSurfaceN2Bar
+- pull out DC or calculated feature and revert to merged view
+- code review fixes
+- revert unrelated changes
+- Add gas-aware imported profile deco analysis
+- Fixed formatting issues.
+- dart format coverage tests
+- promote empty-logbook fixture to const
+- fix analyzer info issues (unused import, missing const)
+- skip M1 Task 3 after finding non-existent bug
+- narrow M1 Task 1 source_uuid to dive_data_sources only
+- Added integration test that verifies that no data is deleted from either tank_pressure_profiles or gas_switches when a dive is updated.
+- Fixed inline comments to match changed behavior.
+- Replaced delete & re-insert approach for updating dives with a real update mechanism.
+- Fixed Dart style convention.
+- Changed prio of start/end pressure data source. Prio #1 is now tank metadata, prio #2 is now first/last value from tank_pressure_profiles
+
+
 ## Unreleased
 
 ### Added

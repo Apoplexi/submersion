@@ -339,6 +339,10 @@ class MockDiveComputerRepository extends _i1.Mock
     String? descriptorProduct,
     int? descriptorModel,
     String? libdivecomputerVersion,
+    double? entryLatitude,
+    double? entryLongitude,
+    double? exitLatitude,
+    double? exitLongitude,
   }) =>
       (super.noSuchMethod(
             Invocation.method(#importProfile, [], {
@@ -364,6 +368,10 @@ class MockDiveComputerRepository extends _i1.Mock
               #descriptorProduct: descriptorProduct,
               #descriptorModel: descriptorModel,
               #libdivecomputerVersion: libdivecomputerVersion,
+              #entryLatitude: entryLatitude,
+              #entryLongitude: entryLongitude,
+              #exitLatitude: exitLatitude,
+              #exitLongitude: exitLongitude,
             }),
             returnValue: _i7.Future<String>.value(
               _i10.dummyValue<String>(
@@ -391,6 +399,10 @@ class MockDiveComputerRepository extends _i1.Mock
                   #descriptorProduct: descriptorProduct,
                   #descriptorModel: descriptorModel,
                   #libdivecomputerVersion: libdivecomputerVersion,
+                  #entryLatitude: entryLatitude,
+                  #entryLongitude: entryLongitude,
+                  #exitLatitude: exitLatitude,
+                  #exitLongitude: exitLongitude,
                 }),
               ),
             ),
@@ -498,6 +510,29 @@ class MockDiveRepository extends _i1.Mock implements _i4.DiveRepository {
             returnValue: _i7.Future<_i3.Dive?>.value(),
           )
           as _i7.Future<_i3.Dive?>);
+
+  @override
+  _i7.Future<void> setSite(String? diveId, String? siteId) =>
+      (super.noSuchMethod(
+            Invocation.method(#setSite, [diveId, siteId]),
+            returnValue: _i7.Future<void>.value(),
+            returnValueForMissingStub: _i7.Future<void>.value(),
+          )
+          as _i7.Future<void>);
+
+  @override
+  _i7.Future<List<_i3.Dive>> getDivesNeedingSiteMatch({
+    String? diverId,
+    List<String>? limitToIds,
+  }) =>
+      (super.noSuchMethod(
+            Invocation.method(#getDivesNeedingSiteMatch, [], {
+              #diverId: diverId,
+              #limitToIds: limitToIds,
+            }),
+            returnValue: _i7.Future<List<_i3.Dive>>.value(<_i3.Dive>[]),
+          )
+          as _i7.Future<List<_i3.Dive>>);
 
   @override
   _i7.Future<List<_i3.DiveProfilePoint>> getDiveProfile(String? diveId) =>

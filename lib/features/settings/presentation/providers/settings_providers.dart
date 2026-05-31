@@ -4,6 +4,7 @@ import 'package:submersion/core/constants/card_color.dart';
 import 'package:submersion/core/constants/dive_detail_sections.dart';
 import 'package:submersion/core/constants/list_view_mode.dart';
 import 'package:submersion/core/constants/map_style.dart';
+import 'package:submersion/features/dive_sites/domain/matching/site_match_sensitivity.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/core/theme/app_theme_preset.dart';
 import 'package:submersion/core/theme/app_theme_registry.dart';
@@ -160,6 +161,9 @@ class AppSettings {
   /// Which map tile style to use
   final MapStyle mapStyle;
 
+  /// How aggressively downloaded dives are auto-matched to sites.
+  final SiteMatchSensitivity siteMatchSensitivity;
+
   /// Name of the selected gradient preset ('ocean', 'thermal', etc.)
   final String cardColorGradientPreset;
 
@@ -244,6 +248,9 @@ class AppSettings {
   /// Default visibility for gas switch markers on dive profile
   final bool defaultShowGasSwitchMarkers;
 
+  /// Default visibility for the gas-usage timeline strip on the dive profile
+  final bool defaultShowGasTimeline;
+
   // Notification settings
   final bool notificationsEnabled;
   final List<int> serviceReminderDays;
@@ -314,6 +321,7 @@ class AppSettings {
     this.buddyListViewMode = ListViewMode.detailed,
     this.diveCenterListViewMode = ListViewMode.detailed,
     this.mapStyle = MapStyle.openStreetMap,
+    this.siteMatchSensitivity = SiteMatchSensitivity.balanced,
     this.cardColorGradientPreset = 'ocean',
     this.cardColorGradientStart,
     this.cardColorGradientEnd,
@@ -342,6 +350,7 @@ class AppSettings {
     this.defaultShowCns = false,
     this.defaultShowOtu = false,
     this.defaultShowGasSwitchMarkers = true,
+    this.defaultShowGasTimeline = false,
     // Notification defaults
     this.notificationsEnabled = true,
     this.serviceReminderDays = const [7, 14, 30],
@@ -437,6 +446,7 @@ class AppSettings {
     ListViewMode? buddyListViewMode,
     ListViewMode? diveCenterListViewMode,
     MapStyle? mapStyle,
+    SiteMatchSensitivity? siteMatchSensitivity,
     String? cardColorGradientPreset,
     int? cardColorGradientStart,
     int? cardColorGradientEnd,
@@ -465,6 +475,7 @@ class AppSettings {
     bool? defaultShowCns,
     bool? defaultShowOtu,
     bool? defaultShowGasSwitchMarkers,
+    bool? defaultShowGasTimeline,
     bool? notificationsEnabled,
     List<int>? serviceReminderDays,
     TimeOfDay? reminderTime,
@@ -530,6 +541,7 @@ class AppSettings {
       diveCenterListViewMode:
           diveCenterListViewMode ?? this.diveCenterListViewMode,
       mapStyle: mapStyle ?? this.mapStyle,
+      siteMatchSensitivity: siteMatchSensitivity ?? this.siteMatchSensitivity,
       cardColorGradientPreset:
           cardColorGradientPreset ?? this.cardColorGradientPreset,
       cardColorGradientStart: clearCardColorGradientStart
@@ -568,6 +580,8 @@ class AppSettings {
       defaultShowOtu: defaultShowOtu ?? this.defaultShowOtu,
       defaultShowGasSwitchMarkers:
           defaultShowGasSwitchMarkers ?? this.defaultShowGasSwitchMarkers,
+      defaultShowGasTimeline:
+          defaultShowGasTimeline ?? this.defaultShowGasTimeline,
       notificationsEnabled: notificationsEnabled ?? this.notificationsEnabled,
       serviceReminderDays: serviceReminderDays ?? this.serviceReminderDays,
       reminderTime: reminderTime ?? this.reminderTime,
@@ -962,6 +976,11 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
     await _saveSettings();
   }
 
+  Future<void> setSiteMatchSensitivity(SiteMatchSensitivity value) async {
+    state = state.copyWith(siteMatchSensitivity: value);
+    await _saveSettings();
+  }
+
   Future<void> setCardColorGradientPreset(String preset) async {
     state = state.copyWith(
       cardColorGradientPreset: preset,
@@ -1094,6 +1113,11 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
 
   Future<void> setDefaultShowGasSwitchMarkers(bool value) async {
     state = state.copyWith(defaultShowGasSwitchMarkers: value);
+    await _saveSettings();
+  }
+
+  Future<void> setDefaultShowGasTimeline(bool value) async {
+    state = state.copyWith(defaultShowGasTimeline: value);
     await _saveSettings();
   }
 

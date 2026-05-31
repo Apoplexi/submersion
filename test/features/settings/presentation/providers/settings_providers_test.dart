@@ -33,10 +33,29 @@ void main() {
     });
   });
 
-  group('AppSettings diveDetailSections', () {
-    test('defaults to all 17 sections visible', () {
+  group('AppSettings defaultShowGasTimeline', () {
+    test('defaults to false', () {
       const settings = AppSettings();
-      expect(settings.diveDetailSections.length, 17);
+      expect(settings.defaultShowGasTimeline, isFalse);
+    });
+
+    test('copyWith updates defaultShowGasTimeline', () {
+      const settings = AppSettings();
+      final updated = settings.copyWith(defaultShowGasTimeline: true);
+      expect(updated.defaultShowGasTimeline, isTrue);
+    });
+
+    test('copyWith preserves defaultShowGasTimeline when not specified', () {
+      const settings = AppSettings(defaultShowGasTimeline: true);
+      final updated = settings.copyWith(themePresetId: 'dark');
+      expect(updated.defaultShowGasTimeline, isTrue);
+    });
+  });
+
+  group('AppSettings diveDetailSections', () {
+    test('defaults to all 18 sections visible', () {
+      const settings = AppSettings();
+      expect(settings.diveDetailSections.length, 18);
       expect(settings.diveDetailSections.every((s) => s.visible), true);
     });
 
@@ -67,7 +86,7 @@ void main() {
         ],
       );
       final updated = settings.copyWith(clearDiveDetailSections: true);
-      expect(updated.diveDetailSections.length, 17);
+      expect(updated.diveDetailSections.length, 18);
       expect(updated.diveDetailSections.every((s) => s.visible), true);
     });
 
@@ -118,7 +137,7 @@ void main() {
           clearDiveDetailSections: true,
         );
         // Clear flag wins — should be defaults, not the custom list
-        expect(updated.diveDetailSections.length, 17);
+        expect(updated.diveDetailSections.length, 18);
         expect(updated.diveDetailSections.every((s) => s.visible), true);
       },
     );

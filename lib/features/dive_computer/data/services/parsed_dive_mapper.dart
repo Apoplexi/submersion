@@ -35,6 +35,10 @@ DownloadedDive parsedDiveToDownloaded(pigeon.ParsedDive parsed) {
     avgDepth: parsed.avgDepthMeters != 0.0 ? parsed.avgDepthMeters : null,
     minTemperature: minTemp,
     maxTemperature: maxTemp,
+    entryLatitude: _validCoord(parsed.entryLatitude, parsed.entryLongitude),
+    entryLongitude: _validCoord(parsed.entryLongitude, parsed.entryLatitude),
+    exitLatitude: _validCoord(parsed.exitLatitude, parsed.exitLongitude),
+    exitLongitude: _validCoord(parsed.exitLongitude, parsed.exitLatitude),
     fingerprint: parsed.fingerprint,
     decoAlgorithm: parsed.decoAlgorithm,
     gfLow: parsed.gfLow,
@@ -63,9 +67,14 @@ DownloadedDive parsedDiveToDownloaded(pigeon.ParsedDive parsed) {
         )
         .toList(),
     tanks: parsed.tanks.map((t) {
+      // The tank's gas-mix link can be DC_GASMIX_UNKNOWN (e.g. Shearwater
+      // single-gas dives leave the tank unlinked). Fall back to the primary
+      // mix rather than assuming air, which would mislabel an EAN dive.
       final gasMix = parsed.gasMixes.firstWhere(
         (g) => g.index == t.gasMixIndex,
-        orElse: () => pigeon.GasMix(index: 0, o2Percent: 21.0, hePercent: 0.0),
+        orElse: () => parsed.gasMixes.isNotEmpty
+            ? parsed.gasMixes.first
+            : pigeon.GasMix(index: 0, o2Percent: 21.0, hePercent: 0.0),
       );
       return DownloadedTank(
         index: t.index,
@@ -89,4 +98,13 @@ DownloadedDive parsedDiveToDownloaded(pigeon.ParsedDive parsed) {
     rawData: parsed.rawData,
     rawFingerprint: parsed.rawFingerprint,
   );
+}
+
+/// Returns [value] unless it is null or part of a libdivecomputer sentinel
+/// invalid-fix pair: (0,0) or (-1,-1). [other] is the paired coordinate.
+double? _validCoord(double? value, double? other) {
+  if (value == null || other == null) return null;
+  if (value == 0.0 && other == 0.0) return null;
+  if (value == -1.0 && other == -1.0) return null;
+  return value;
 }

@@ -111,7 +111,15 @@ class ReparseService {
       //    multi-source dives to avoid overwriting data from other sources.
       // ------------------------------------------------------------------
       if (sourceRow.isPrimary && !isMultiSource) {
-        await _carryOverTanks(diveId: diveId, parsed: parsed);
+        final tankIdsByIndex = await _carryOverTanks(
+          diveId: diveId,
+          parsed: parsed,
+        );
+        await _replaceTankPressureProfiles(
+          diveId: diveId,
+          parsed: parsed,
+          tankIdsByIndex: tankIdsByIndex,
+        );
       }
     });
   }
@@ -302,6 +310,10 @@ class ReparseService {
         decoAlgorithm: Value(parsed.decoAlgorithm),
         gradientFactorLow: Value(parsed.gfLow),
         gradientFactorHigh: Value(parsed.gfHigh),
+        entryLatitude: Value(parsed.entryLatitude),
+        entryLongitude: Value(parsed.entryLongitude),
+        exitLatitude: Value(parsed.exitLatitude),
+        exitLongitude: Value(parsed.exitLongitude),
         descriptorVendor: Value(descriptorVendor),
         descriptorProduct: Value(descriptorProduct),
         descriptorModel: Value(descriptorModel),
@@ -354,6 +366,10 @@ class ReparseService {
         gradientFactorHigh: Value(parsed.gfHigh),
         decoAlgorithm: Value(parsed.decoAlgorithm),
         decoConservatism: Value(parsed.decoConservatism),
+        entryLatitude: Value(parsed.entryLatitude),
+        entryLongitude: Value(parsed.entryLongitude),
+        exitLatitude: Value(parsed.exitLatitude),
+        exitLongitude: Value(parsed.exitLongitude),
         updatedAt: Value(now.millisecondsSinceEpoch),
       ),
     );
@@ -441,10 +457,13 @@ class ReparseService {
     });
   }
 
-  Future<void> _carryOverTanks({
+  /// Re-creates/updates dive_tanks from parsed data and returns a map of
+  /// tank index -> tank row id, used to attach tank pressure profiles.
+  Future<Map<int, String>> _carryOverTanks({
     required String diveId,
     required pigeon.ParsedDive parsed,
   }) async {
+    final tankIdsByIndex = <int, String>{};
     // Get existing tanks
     final existingTanks =
         await (db.select(db.diveTanks)
@@ -461,14 +480,19 @@ class ReparseService {
     for (final tank in parsed.tanks) {
       newTankOrders.add(tank.index);
 
-      // Resolve gas mix
+      // Resolve gas mix. The tank's gas-mix link can be DC_GASMIX_UNKNOWN
+      // (e.g. Shearwater single-gas dives); fall back to the primary mix
+      // rather than assuming air, which would mislabel an EAN dive.
       final gasMix = parsed.gasMixes.firstWhere(
         (g) => g.index == tank.gasMixIndex,
-        orElse: () => pigeon.GasMix(index: 0, o2Percent: 21.0, hePercent: 0.0),
+        orElse: () => parsed.gasMixes.isNotEmpty
+            ? parsed.gasMixes.first
+            : pigeon.GasMix(index: 0, o2Percent: 21.0, hePercent: 0.0),
       );
 
       final existing = existingByOrder[tank.index];
       if (existing != null) {
+        tankIdsByIndex[tank.index] = existing.id;
         // Update existing tank: overwrite computer fields, preserve user fields
         await (db.update(
           db.diveTanks,
@@ -486,11 +510,13 @@ class ReparseService {
         );
       } else {
         // New tank: insert with defaults
+        final newTankId = _uuid.v4();
+        tankIdsByIndex[tank.index] = newTankId;
         await db
             .into(db.diveTanks)
             .insert(
               DiveTanksCompanion(
-                id: Value(_uuid.v4()),
+                id: Value(newTankId),
                 diveId: Value(diveId),
                 volume: Value(tank.volumeLiters),
                 startPressure: Value(tank.startPressureBar),
@@ -511,6 +537,87 @@ class ReparseService {
           db.diveTanks,
         )..where((t) => t.id.equals(existing.id))).go();
       }
+    }
+
+    return tankIdsByIndex;
+  }
+
+  /// Re-inserts per-tank pressure time-series from parsed samples, and backfills
+  /// each tank's start/end pressure from the profile when the parsed tank
+  /// summary lacks explicit values (air-integrated transmitters store pressure
+  /// in the sample stream, not the tank header). Mirrors the download path so
+  /// re-parsing does not drop tank pressure. tankPressureProfiles for this dive
+  /// were already cleared by the single-source replace step above.
+  Future<void> _replaceTankPressureProfiles({
+    required String diveId,
+    required pigeon.ParsedDive parsed,
+    required Map<int, String> tankIdsByIndex,
+  }) async {
+    if (tankIdsByIndex.isEmpty) return;
+
+    // Group sample pressures by tank index.
+    final pressuresByTank = <int, List<({int timestamp, double pressure})>>{};
+    for (final s in parsed.samples) {
+      final pressure = s.pressureBar;
+      if (pressure != null) {
+        final idx = s.tankIndex ?? 0;
+        pressuresByTank.putIfAbsent(idx, () => []).add((
+          timestamp: s.timeSeconds,
+          pressure: pressure,
+        ));
+      }
+    }
+    if (pressuresByTank.isEmpty) return;
+
+    // Insert the pressure time-series for each known tank.
+    await db.batch((batch) {
+      for (final entry in pressuresByTank.entries) {
+        final tankId = tankIdsByIndex[entry.key];
+        if (tankId == null) continue;
+        for (final point in entry.value) {
+          batch.insert(
+            db.tankPressureProfiles,
+            TankPressureProfilesCompanion.insert(
+              id: _uuid.v4(),
+              diveId: diveId,
+              tankId: tankId,
+              timestamp: point.timestamp,
+              pressure: point.pressure,
+            ),
+          );
+        }
+      }
+    });
+
+    // Backfill start/end pressure from the profile when the parsed tank summary
+    // didn't provide explicit values.
+    for (final entry in pressuresByTank.entries) {
+      final tankId = tankIdsByIndex[entry.key];
+      if (tankId == null) continue;
+
+      pigeon.TankInfo? parsedTank;
+      for (final t in parsed.tanks) {
+        if (t.index == entry.key) {
+          parsedTank = t;
+          break;
+        }
+      }
+      final needStart = parsedTank?.startPressureBar == null;
+      final needEnd = parsedTank?.endPressureBar == null;
+      if (!needStart && !needEnd) continue;
+
+      final sorted = [...entry.value]
+        ..sort((a, b) => a.timestamp.compareTo(b.timestamp));
+      await (db.update(db.diveTanks)..where((t) => t.id.equals(tankId))).write(
+        DiveTanksCompanion(
+          startPressure: needStart
+              ? Value(sorted.first.pressure)
+              : const Value.absent(),
+          endPressure: needEnd
+              ? Value(sorted.last.pressure)
+              : const Value.absent(),
+        ),
+      );
     }
   }
 

@@ -338,7 +338,9 @@ final ascentDescentRatesProvider =
     });
 
 final timeAtDepthRangesProvider =
-    FutureProvider<List<({String range, int minutes})>>((ref) async {
+    FutureProvider<List<({int lowerDepth, int? upperDepth, int minutes})>>((
+      ref,
+    ) async {
       _keepAliveWithExpiry(ref);
       final repository = ref.watch(statisticsRepositoryProvider);
       final currentDiverId = ref.watch(currentDiverIdProvider);

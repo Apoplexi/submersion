@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:submersion/l10n/l10n_extension.dart';
+import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/courses/domain/entities/course.dart';
+import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 
 /// Card widget for displaying a course in a list
-class CourseCard extends StatelessWidget {
+class CourseCard extends ConsumerWidget {
   final Course course;
   final VoidCallback? onTap;
   final bool isSelected;
@@ -18,9 +20,10 @@ class CourseCard extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
-    final dateFormat = DateFormat.yMMMd();
+    final formatter = UnitFormatter(ref.watch(settingsProvider));
+    final startDateStr = formatter.formatDate(course.startDate);
 
     final statusStr = course.isCompleted
         ? context.l10n.courses_status_completed
@@ -31,7 +34,7 @@ class CourseCard extends StatelessWidget {
 
     return Semantics(
       label:
-          '${course.name}, ${course.agency.displayName}, ${context.l10n.courses_card_started(dateFormat.format(course.startDate))}, $statusStr$instructorStr',
+          '${course.name}, ${course.agency.displayName}, ${context.l10n.courses_card_started(startDateStr)}, $statusStr$instructorStr',
       child: Card(
         elevation: isSelected ? 2 : 1,
         color: isSelected
@@ -103,7 +106,7 @@ class CourseCard extends StatelessWidget {
                           ),
                           const SizedBox(width: 4),
                           Text(
-                            dateFormat.format(course.startDate),
+                            startDateStr,
                             style: Theme.of(context).textTheme.bodySmall
                                 ?.copyWith(color: colorScheme.onSurfaceVariant),
                           ),

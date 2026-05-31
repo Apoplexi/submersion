@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 
 import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:submersion/core/services/export/export_service.dart';
+import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/shared/widgets/master_detail/responsive_breakpoints.dart';
 import 'package:submersion/features/certifications/presentation/providers/certification_providers.dart';
 import 'package:submersion/features/courses/domain/entities/course.dart';
 import 'package:submersion/features/courses/presentation/providers/course_providers.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
+import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 
 class CourseDetailPage extends ConsumerWidget {
   final String courseId;
@@ -47,7 +48,7 @@ class CourseDetailPage extends ConsumerWidget {
     AsyncValue<List<Dive>> divesAsync,
   ) {
     final colorScheme = Theme.of(context).colorScheme;
-    final dateFormat = DateFormat.yMMMd();
+    final formatter = UnitFormatter(ref.watch(settingsProvider));
 
     final body = SingleChildScrollView(
       padding: const EdgeInsets.all(16),
@@ -80,14 +81,14 @@ class CourseDetailPage extends ConsumerWidget {
                   _buildDetailRow(
                     context,
                     context.l10n.courses_label_startDate,
-                    dateFormat.format(course.startDate),
+                    formatter.formatDate(course.startDate),
                     Icons.calendar_today,
                   ),
                   if (course.completionDate != null)
                     _buildDetailRow(
                       context,
                       context.l10n.courses_label_completed,
-                      dateFormat.format(course.completionDate!),
+                      formatter.formatDate(course.completionDate!),
                       Icons.check_circle,
                     ),
                   if (course.location != null)
@@ -183,7 +184,7 @@ class CourseDetailPage extends ConsumerWidget {
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                             ),
-                            subtitle: Text(dateFormat.format(dive.dateTime)),
+                            subtitle: Text(formatter.formatDate(dive.dateTime)),
                             trailing: Icon(
                               Icons.chevron_right,
                               color: colorScheme.onSurfaceVariant,

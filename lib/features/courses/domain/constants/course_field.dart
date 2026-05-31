@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart' show DateFormat;
 
 import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
@@ -143,8 +142,6 @@ class CourseFieldAdapter extends EntityFieldAdapter<Course, CourseField> {
     return map;
   }();
 
-  static final DateFormat _dateFormat = DateFormat.yMMMd();
-
   @override
   List<CourseField> get allFields => _allFields;
 
@@ -172,8 +169,8 @@ class CourseFieldAdapter extends EntityFieldAdapter<Course, CourseField> {
     if (value == null) return '--';
     return switch (field) {
       CourseField.agency => (value as CertificationAgency).name,
-      CourseField.startDate => _dateFormat.format(value as DateTime),
-      CourseField.completionDate => _dateFormat.format(value as DateTime),
+      CourseField.startDate => units.formatDate(value as DateTime),
+      CourseField.completionDate => units.formatDate(value as DateTime),
       CourseField.durationDays => '${value as int} days',
       CourseField.isCompleted => (value as bool) ? 'Yes' : 'No',
       _ => value is String ? (value.isEmpty ? '--' : value) : value.toString(),

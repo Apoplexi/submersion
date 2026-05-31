@@ -1076,4 +1076,29 @@ void main() {
       expect(pushedPath, '/settings/dive-detail-sections');
     });
   });
+
+  group('SectionAppearancePage - Gas timeline toggle', () {
+    testWidgets('toggling gas timeline switch updates state', (tester) async {
+      await tester.binding.setSurfaceSize(const Size(400, 4000));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+
+      await tester.pumpWidget(_buildTestWidget('dives'));
+      await tester.pumpAndSettle();
+
+      final gasTimelineSwitch = find.widgetWithIcon(
+        SwitchListTile,
+        Icons.timeline,
+      );
+      expect(gasTimelineSwitch, findsOneWidget);
+
+      var switchWidget = tester.widget<SwitchListTile>(gasTimelineSwitch);
+      expect(switchWidget.value, isFalse);
+
+      await tester.tap(gasTimelineSwitch);
+      await tester.pumpAndSettle();
+
+      switchWidget = tester.widget<SwitchListTile>(gasTimelineSwitch);
+      expect(switchWidget.value, isTrue);
+    });
+  });
 }

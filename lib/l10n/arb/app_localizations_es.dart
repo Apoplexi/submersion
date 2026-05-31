@@ -4066,6 +4066,88 @@ class AppLocalizationsEs extends AppLocalizations {
   String get diveLog_listPage_menuDiveNumbering => 'Numeración de inmersiones';
 
   @override
+  String get diveLog_listPage_menuMatchSites =>
+      'Asociar inmersiones a puntos de buceo';
+
+  @override
+  String get siteMatchReview_title => 'Asociar puntos';
+
+  @override
+  String siteMatchReview_diveNumber(Object number) {
+    return 'Inmersion #$number';
+  }
+
+  @override
+  String get siteMatchReview_empty => 'Nada que asociar.';
+
+  @override
+  String siteMatchReview_summary(int selected, int review, int none) {
+    return '$selected seleccionadas · $review por revisar · $none sin coincidencia';
+  }
+
+  @override
+  String siteMatchReview_confirm(int count) {
+    return 'Confirmar $count asociaciones';
+  }
+
+  @override
+  String get siteMatchReview_cancel => 'Cancelar';
+
+  @override
+  String get siteMatchReview_tapToChoose =>
+      'Toca para elegir un punto de buceo';
+
+  @override
+  String siteMatchReview_awayMeters(int meters) {
+    return 'a $meters m';
+  }
+
+  @override
+  String siteMatchReview_depthTo(int meters) {
+    return 'hasta $meters m';
+  }
+
+  @override
+  String siteMatchReview_depthRange(int min, int max) {
+    return '$min–$max m';
+  }
+
+  @override
+  String siteMatchReview_appliedSnack(int dives, int sites) {
+    return '$dives inmersiones asociadas · $sites puntos añadidos';
+  }
+
+  @override
+  String get siteMatchReview_applyError =>
+      'No se pudieron aplicar las asociaciones';
+
+  @override
+  String get siteMatchReview_discardTitle => '¿Descartar asociaciones?';
+
+  @override
+  String get siteMatchReview_discardMessage => 'Tu selección no se guardará.';
+
+  @override
+  String get siteMatchReview_discardConfirm => 'Descartar';
+
+  @override
+  String get siteMatchReview_keepReviewing => 'Seguir revisando';
+
+  @override
+  String get siteMatchReview_sourceExisting => 'tu punto';
+
+  @override
+  String get siteMatchReview_sourceBundled => 'importado';
+
+  @override
+  String get siteMatchReview_noNearbySite => 'Ningún punto cercano';
+
+  @override
+  String importSummary_matchSitesButton(int count) {
+    return 'Asociar $count inmersiones a puntos';
+  }
+
+  @override
   String get diveLog_listPage_searchFieldLabel => 'Buscar inmersiones...';
 
   @override
@@ -5467,6 +5549,16 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get diveSites_edit_field_siteName_validation =>
       'Por favor ingresa un nombre de sitio';
+
+  @override
+  String diveSites_similarSite_useHint(Object siteName) {
+    return 'Similar a un sitio de buceo existente \"$siteName\". Toca para usar.';
+  }
+
+  @override
+  String diveSites_similarSite_warning(Object siteName) {
+    return 'Ya existe un sitio similar: \"$siteName\"';
+  }
 
   @override
   String get diveSites_edit_gps_gettingLocation => 'Obteniendo...';
@@ -9663,6 +9755,13 @@ class AppLocalizationsEs extends AppLocalizations {
       'Mostrar marcadores para cambios de gas';
 
   @override
+  String get settings_appearance_gasTimeline => 'Gas timeline';
+
+  @override
+  String get settings_appearance_gasTimeline_subtitle =>
+      'Show the gas-usage strip below the dive profile by default';
+
+  @override
   String get settings_appearance_header_diveDetails => 'Detalles de Inmersion';
 
   @override
@@ -9739,6 +9838,44 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get diveDetailSection_tide_description =>
       'Grafico del ciclo de mareas y temporalizacion';
+
+  @override
+  String get diveDetailSection_surfaceGps_name => 'Surface GPS';
+
+  @override
+  String get diveDetailSection_surfaceGps_description =>
+      'GPS entry/exit points and surface drift';
+
+  @override
+  String get diveLog_detail_section_surfaceGps => 'Surface GPS';
+
+  @override
+  String get diveLog_detail_surfaceGps_entry => 'Entry';
+
+  @override
+  String get diveLog_detail_surfaceGps_exit => 'Exit';
+
+  @override
+  String get diveLog_detail_label_drift => 'Drift';
+
+  @override
+  String get diveLog_detail_surfaceGps_entryOnly => 'Entry point recorded';
+
+  @override
+  String get diveLog_detail_surfaceGps_exitOnly => 'Exit point recorded';
+
+  @override
+  String get diveLog_detail_surfaceGps_site => 'Site';
+
+  @override
+  String get diveLog_detail_locationsMap_title => 'Dive Locations';
+
+  @override
+  String get diveLog_detail_coordinatesCopied =>
+      'Coordinates copied to clipboard';
+
+  @override
+  String get diveLog_detail_openInMaps => 'Open in Maps';
 
   @override
   String get diveDetailSection_weights_name => 'Lastres';
@@ -15970,6 +16107,22 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get settings_section_dataSources_subtitle =>
       'Connected services & integrations';
+
+  @override
+  String get settings_siteMatch_title => 'Asociación automática de puntos';
+
+  @override
+  String get settings_siteMatch_subtitle =>
+      'Con qué intensidad se asocian a puntos de buceo las inmersiones descargadas';
+
+  @override
+  String get settings_siteMatch_strict => 'Estricto';
+
+  @override
+  String get settings_siteMatch_balanced => 'Equilibrado';
+
+  @override
+  String get settings_siteMatch_relaxed => 'Relajado';
 
   @override
   String get settings_dataSources_header => 'Data Sources';

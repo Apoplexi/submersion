@@ -1500,10 +1500,14 @@ class StatisticsRepository {
     }
   }
 
-  /// Get time spent in depth ranges
-  Future<List<({String range, int minutes})>> getTimeAtDepthRanges({
-    String? diverId,
-  }) async {
+  /// Get time spent in depth ranges.
+  ///
+  /// Returns numeric bucket edges in meters (the canonical depth unit). The
+  /// display layer converts to the user's preferred depth unit so the chart's
+  /// axis label and bucket labels match the setting. The top bucket is
+  /// open-ended ([upperDepth] is null).
+  Future<List<({int lowerDepth, int? upperDepth, int minutes})>>
+  getTimeAtDepthRanges({String? diverId}) async {
     try {
       final diverFilter = diverId != null ? 'AND d.diver_id = ?' : '';
       final params = diverId != null ? [diverId] : <dynamic>[];
@@ -1511,34 +1515,29 @@ class StatisticsRepository {
       final results = await _db.customSelect('''
         SELECT
           CASE
-            WHEN p.depth < 10 THEN '0-10m'
-            WHEN p.depth < 20 THEN '10-20m'
-            WHEN p.depth < 30 THEN '20-30m'
-            WHEN p.depth < 40 THEN '30-40m'
-            ELSE '40m+'
-          END AS depth_range,
+            WHEN p.depth < 10 THEN 0
+            WHEN p.depth < 20 THEN 10
+            WHEN p.depth < 30 THEN 20
+            WHEN p.depth < 40 THEN 30
+            ELSE 40
+          END AS bucket_lo,
           COUNT(*) AS sample_count
         FROM dive_profiles p
         JOIN dives d ON d.id = p.dive_id
         WHERE 1=1 $diverFilter
-        GROUP BY depth_range
-        ORDER BY
-          CASE depth_range
-            WHEN '0-10m' THEN 1
-            WHEN '10-20m' THEN 2
-            WHEN '20-30m' THEN 3
-            WHEN '30-40m' THEN 4
-            ELSE 5
-          END
+        GROUP BY bucket_lo
+        ORDER BY bucket_lo
         ''', variables: params.map((p) => Variable(p)).toList()).get();
 
-      // Sample count approximates minutes (profiles are usually sampled every second or few seconds)
-      // This is a rough approximation
+      // Sample count approximates minutes (profiles are usually sampled every
+      // second or few seconds) — a rough estimate matching the original
+      // implementation.
       return results.map((row) {
+        final lo = row.read<int>('bucket_lo');
         return (
-          range: row.read<String>('depth_range'),
-          minutes: (row.read<int>('sample_count') / 60)
-              .round(), // Rough estimate
+          lowerDepth: lo,
+          upperDepth: lo >= 40 ? null : lo + 10,
+          minutes: (row.read<int>('sample_count') / 60).round(),
         );
       }).toList();
     } catch (e, stackTrace) {

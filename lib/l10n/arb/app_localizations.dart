@@ -6922,6 +6922,132 @@ abstract class AppLocalizations {
   /// **'Dive Numbering'**
   String get diveLog_listPage_menuDiveNumbering;
 
+  /// No description provided for @diveLog_listPage_menuMatchSites.
+  ///
+  /// In en, this message translates to:
+  /// **'Match Dives to Sites'**
+  String get diveLog_listPage_menuMatchSites;
+
+  /// No description provided for @siteMatchReview_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Match Sites'**
+  String get siteMatchReview_title;
+
+  /// No description provided for @siteMatchReview_diveNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Dive #{number}'**
+  String siteMatchReview_diveNumber(Object number);
+
+  /// No description provided for @siteMatchReview_empty.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing to match.'**
+  String get siteMatchReview_empty;
+
+  /// No description provided for @siteMatchReview_summary.
+  ///
+  /// In en, this message translates to:
+  /// **'{selected} selected · {review} to review · {none} no match'**
+  String siteMatchReview_summary(int selected, int review, int none);
+
+  /// No description provided for @siteMatchReview_confirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm {count} matches'**
+  String siteMatchReview_confirm(int count);
+
+  /// No description provided for @siteMatchReview_cancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get siteMatchReview_cancel;
+
+  /// No description provided for @siteMatchReview_tapToChoose.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to choose a site'**
+  String get siteMatchReview_tapToChoose;
+
+  /// No description provided for @siteMatchReview_awayMeters.
+  ///
+  /// In en, this message translates to:
+  /// **'{meters} m away'**
+  String siteMatchReview_awayMeters(int meters);
+
+  /// No description provided for @siteMatchReview_depthTo.
+  ///
+  /// In en, this message translates to:
+  /// **'to {meters} m'**
+  String siteMatchReview_depthTo(int meters);
+
+  /// No description provided for @siteMatchReview_depthRange.
+  ///
+  /// In en, this message translates to:
+  /// **'{min}–{max} m'**
+  String siteMatchReview_depthRange(int min, int max);
+
+  /// No description provided for @siteMatchReview_appliedSnack.
+  ///
+  /// In en, this message translates to:
+  /// **'Linked {dives} dives · added {sites} sites'**
+  String siteMatchReview_appliedSnack(int dives, int sites);
+
+  /// No description provided for @siteMatchReview_applyError.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t apply matches'**
+  String get siteMatchReview_applyError;
+
+  /// No description provided for @siteMatchReview_discardTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Discard matches?'**
+  String get siteMatchReview_discardTitle;
+
+  /// No description provided for @siteMatchReview_discardMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Your selections won\'t be saved.'**
+  String get siteMatchReview_discardMessage;
+
+  /// No description provided for @siteMatchReview_discardConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Discard'**
+  String get siteMatchReview_discardConfirm;
+
+  /// No description provided for @siteMatchReview_keepReviewing.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep reviewing'**
+  String get siteMatchReview_keepReviewing;
+
+  /// No description provided for @siteMatchReview_sourceExisting.
+  ///
+  /// In en, this message translates to:
+  /// **'your site'**
+  String get siteMatchReview_sourceExisting;
+
+  /// No description provided for @siteMatchReview_sourceBundled.
+  ///
+  /// In en, this message translates to:
+  /// **'import'**
+  String get siteMatchReview_sourceBundled;
+
+  /// No description provided for @siteMatchReview_noNearbySite.
+  ///
+  /// In en, this message translates to:
+  /// **'No nearby site'**
+  String get siteMatchReview_noNearbySite;
+
+  /// No description provided for @importSummary_matchSitesButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Match {count} dives to sites'**
+  String importSummary_matchSitesButton(int count);
+
   /// No description provided for @diveLog_listPage_searchFieldLabel.
   ///
   /// In en, this message translates to:
@@ -9400,6 +9526,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Please enter a site name'**
   String get diveSites_edit_field_siteName_validation;
+
+  /// Tappable hint in the dive-entry site picker when the typed query closely matches an existing site name that is not already in the list
+  ///
+  /// In en, this message translates to:
+  /// **'Similar to existing site \"{siteName}\". Tap to use.'**
+  String diveSites_similarSite_useHint(Object siteName);
+
+  /// Passive warning under the site name field when the typed name closely matches an existing site
+  ///
+  /// In en, this message translates to:
+  /// **'A similar site already exists: \"{siteName}\"'**
+  String diveSites_similarSite_warning(Object siteName);
 
   /// No description provided for @diveSites_edit_gps_gettingLocation.
   ///
@@ -16588,6 +16726,18 @@ abstract class AppLocalizations {
   /// **'Show markers for gas switches'**
   String get settings_appearance_gasSwitchMarkers_subtitle;
 
+  /// No description provided for @settings_appearance_gasTimeline.
+  ///
+  /// In en, this message translates to:
+  /// **'Gas timeline'**
+  String get settings_appearance_gasTimeline;
+
+  /// No description provided for @settings_appearance_gasTimeline_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Show the gas-usage strip below the dive profile by default'**
+  String get settings_appearance_gasTimeline_subtitle;
+
   /// No description provided for @settings_appearance_header_diveDetails.
   ///
   /// In en, this message translates to:
@@ -16719,6 +16869,78 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Tide cycle graph and timing'**
   String get diveDetailSection_tide_description;
+
+  /// No description provided for @diveDetailSection_surfaceGps_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Surface GPS'**
+  String get diveDetailSection_surfaceGps_name;
+
+  /// No description provided for @diveDetailSection_surfaceGps_description.
+  ///
+  /// In en, this message translates to:
+  /// **'GPS entry/exit points and surface drift'**
+  String get diveDetailSection_surfaceGps_description;
+
+  /// No description provided for @diveLog_detail_section_surfaceGps.
+  ///
+  /// In en, this message translates to:
+  /// **'Surface GPS'**
+  String get diveLog_detail_section_surfaceGps;
+
+  /// No description provided for @diveLog_detail_surfaceGps_entry.
+  ///
+  /// In en, this message translates to:
+  /// **'Entry'**
+  String get diveLog_detail_surfaceGps_entry;
+
+  /// No description provided for @diveLog_detail_surfaceGps_exit.
+  ///
+  /// In en, this message translates to:
+  /// **'Exit'**
+  String get diveLog_detail_surfaceGps_exit;
+
+  /// No description provided for @diveLog_detail_label_drift.
+  ///
+  /// In en, this message translates to:
+  /// **'Drift'**
+  String get diveLog_detail_label_drift;
+
+  /// No description provided for @diveLog_detail_surfaceGps_entryOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Entry point recorded'**
+  String get diveLog_detail_surfaceGps_entryOnly;
+
+  /// No description provided for @diveLog_detail_surfaceGps_exitOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Exit point recorded'**
+  String get diveLog_detail_surfaceGps_exitOnly;
+
+  /// No description provided for @diveLog_detail_surfaceGps_site.
+  ///
+  /// In en, this message translates to:
+  /// **'Site'**
+  String get diveLog_detail_surfaceGps_site;
+
+  /// No description provided for @diveLog_detail_locationsMap_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Dive Locations'**
+  String get diveLog_detail_locationsMap_title;
+
+  /// No description provided for @diveLog_detail_coordinatesCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'Coordinates copied to clipboard'**
+  String get diveLog_detail_coordinatesCopied;
+
+  /// No description provided for @diveLog_detail_openInMaps.
+  ///
+  /// In en, this message translates to:
+  /// **'Open in Maps'**
+  String get diveLog_detail_openInMaps;
 
   /// No description provided for @diveDetailSection_weights_name.
   ///
@@ -26921,6 +27143,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Health data integration'**
   String get settings_section_dataSources_subtitle;
+
+  /// No description provided for @settings_siteMatch_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Auto site matching'**
+  String get settings_siteMatch_title;
+
+  /// No description provided for @settings_siteMatch_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'How aggressively downloaded dives are matched to sites'**
+  String get settings_siteMatch_subtitle;
+
+  /// No description provided for @settings_siteMatch_strict.
+  ///
+  /// In en, this message translates to:
+  /// **'Strict'**
+  String get settings_siteMatch_strict;
+
+  /// No description provided for @settings_siteMatch_balanced.
+  ///
+  /// In en, this message translates to:
+  /// **'Balanced'**
+  String get settings_siteMatch_balanced;
+
+  /// No description provided for @settings_siteMatch_relaxed.
+  ///
+  /// In en, this message translates to:
+  /// **'Relaxed'**
+  String get settings_siteMatch_relaxed;
 
   /// No description provided for @settings_dataSources_header.
   ///

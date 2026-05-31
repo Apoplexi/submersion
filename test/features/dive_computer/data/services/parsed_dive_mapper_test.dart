@@ -26,6 +26,10 @@ void main() {
       int? gfLow,
       int? gfHigh,
       int? decoConservatism,
+      double? entryLatitude,
+      double? entryLongitude,
+      double? exitLatitude,
+      double? exitLongitude,
     }) {
       return pigeon.ParsedDive(
         fingerprint: fingerprint,
@@ -49,6 +53,10 @@ void main() {
         gfLow: gfLow,
         gfHigh: gfHigh,
         decoConservatism: decoConservatism,
+        entryLatitude: entryLatitude,
+        entryLongitude: entryLongitude,
+        exitLatitude: exitLatitude,
+        exitLongitude: exitLongitude,
       );
     }
 
@@ -215,9 +223,29 @@ void main() {
       expect(downloaded.tanks[1].gasName, 'EAN50');
     });
 
-    test('falls back to air when gas mix not found', () {
+    test('unmatched gasMixIndex falls back to the primary (first) mix', () {
+      // Tank gas-mix link unknown (DC_GASMIX_UNKNOWN, e.g. Shearwater
+      // single-gas dives): must resolve to the dive's primary mix, not a
+      // hardcoded air default that would mislabel an EAN dive.
       final parsed = makeParsedDive(
-        fingerprint: 'fallback',
+        fingerprint: 'fallback-primary',
+        tanks: [pigeon.TankInfo(index: 0, gasMixIndex: 99)],
+        gasMixes: [
+          pigeon.GasMix(index: 0, o2Percent: 32.0, hePercent: 0.0),
+          pigeon.GasMix(index: 1, o2Percent: 21.0, hePercent: 0.0),
+        ],
+      );
+
+      final downloaded = parsedDiveToDownloaded(parsed);
+
+      expect(downloaded.tanks, hasLength(1));
+      expect(downloaded.tanks[0].o2Percent, 32.0);
+      expect(downloaded.tanks[0].hePercent, 0.0);
+    });
+
+    test('falls back to air when there are no gas mixes at all', () {
+      final parsed = makeParsedDive(
+        fingerprint: 'fallback-air',
         tanks: [pigeon.TankInfo(index: 0, gasMixIndex: 99)],
       );
 
@@ -701,6 +729,42 @@ void main() {
       final downloaded = parsedDiveToDownloaded(parsed);
 
       expect(downloaded.events, isEmpty);
+    });
+
+    // --- GPS entry/exit (Shearwater Swift) ---
+
+    test('copies entry and exit coordinates', () {
+      final d = parsedDiveToDownloaded(
+        makeParsedDive(
+          entryLatitude: 12.34567,
+          entryLongitude: 98.76543,
+          exitLatitude: 12.34612,
+          exitLongitude: 98.76489,
+        ),
+      );
+      expect(d.entryLatitude, 12.34567);
+      expect(d.entryLongitude, 98.76543);
+      expect(d.exitLatitude, 12.34612);
+      expect(d.exitLongitude, 98.76489);
+    });
+
+    test('GPS null when absent', () {
+      final d = parsedDiveToDownloaded(makeParsedDive());
+      expect(d.entryLatitude, isNull);
+      expect(d.exitLatitude, isNull);
+    });
+
+    test('rejects sentinel (0,0) and (-1,-1) GPS coordinates', () {
+      final zero = parsedDiveToDownloaded(
+        makeParsedDive(entryLatitude: 0.0, entryLongitude: 0.0),
+      );
+      expect(zero.entryLatitude, isNull);
+      expect(zero.entryLongitude, isNull);
+      final neg = parsedDiveToDownloaded(
+        makeParsedDive(exitLatitude: -1.0, exitLongitude: -1.0),
+      );
+      expect(neg.exitLatitude, isNull);
+      expect(neg.exitLongitude, isNull);
     });
   });
 }

@@ -3953,6 +3953,85 @@ class AppLocalizationsHe extends AppLocalizations {
   String get diveLog_listPage_menuDiveNumbering => 'מספור צלילות';
 
   @override
+  String get diveLog_listPage_menuMatchSites => 'התאמת צלילות לאתרים';
+
+  @override
+  String get siteMatchReview_title => 'התאמת אתרים';
+
+  @override
+  String siteMatchReview_diveNumber(Object number) {
+    return 'צלילה #$number';
+  }
+
+  @override
+  String get siteMatchReview_empty => 'אין מה להתאים.';
+
+  @override
+  String siteMatchReview_summary(int selected, int review, int none) {
+    return '$selected נבחרו · $review לבדיקה · $none ללא התאמה';
+  }
+
+  @override
+  String siteMatchReview_confirm(int count) {
+    return 'אישור $count התאמות';
+  }
+
+  @override
+  String get siteMatchReview_cancel => 'ביטול';
+
+  @override
+  String get siteMatchReview_tapToChoose => 'הקש כדי לבחור אתר';
+
+  @override
+  String siteMatchReview_awayMeters(int meters) {
+    return 'במרחק $meters מ׳';
+  }
+
+  @override
+  String siteMatchReview_depthTo(int meters) {
+    return 'עד $meters מ׳';
+  }
+
+  @override
+  String siteMatchReview_depthRange(int min, int max) {
+    return '$min–$max מ׳';
+  }
+
+  @override
+  String siteMatchReview_appliedSnack(int dives, int sites) {
+    return '$dives צלילות שויכו · $sites אתרים נוספו';
+  }
+
+  @override
+  String get siteMatchReview_applyError => 'לא ניתן היה להחיל את ההתאמות';
+
+  @override
+  String get siteMatchReview_discardTitle => 'לבטל את ההתאמות?';
+
+  @override
+  String get siteMatchReview_discardMessage => 'הבחירות שלך לא יישמרו.';
+
+  @override
+  String get siteMatchReview_discardConfirm => 'בטל';
+
+  @override
+  String get siteMatchReview_keepReviewing => 'המשך בדיקה';
+
+  @override
+  String get siteMatchReview_sourceExisting => 'האתר שלך';
+
+  @override
+  String get siteMatchReview_sourceBundled => 'מיובא';
+
+  @override
+  String get siteMatchReview_noNearbySite => 'אין אתר בקרבת מקום';
+
+  @override
+  String importSummary_matchSitesButton(int count) {
+    return 'התאמת $count צלילות לאתרים';
+  }
+
+  @override
   String get diveLog_listPage_searchFieldLabel => 'חיפוש צלילות...';
 
   @override
@@ -5323,6 +5402,16 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get diveSites_edit_field_siteName_validation => 'נא להזין שם אתר';
+
+  @override
+  String diveSites_similarSite_useHint(Object siteName) {
+    return 'דומה לאתר צלילה קיים \"$siteName\". הקש כדי להשתמש.';
+  }
+
+  @override
+  String diveSites_similarSite_warning(Object siteName) {
+    return 'כבר קיים אתר דומה: \"$siteName\"';
+  }
 
   @override
   String get diveSites_edit_gps_gettingLocation => 'מאתר...';
@@ -9420,6 +9509,13 @@ class AppLocalizationsHe extends AppLocalizations {
       'הצג סמנים להחלפות גז';
 
   @override
+  String get settings_appearance_gasTimeline => 'Gas timeline';
+
+  @override
+  String get settings_appearance_gasTimeline_subtitle =>
+      'Show the gas-usage strip below the dive profile by default';
+
+  @override
   String get settings_appearance_header_diveDetails => 'פרטי צלילה';
 
   @override
@@ -9493,6 +9589,44 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get diveDetailSection_tide_description => 'גרף מחזור גאות ושפל וזמן';
+
+  @override
+  String get diveDetailSection_surfaceGps_name => 'Surface GPS';
+
+  @override
+  String get diveDetailSection_surfaceGps_description =>
+      'GPS entry/exit points and surface drift';
+
+  @override
+  String get diveLog_detail_section_surfaceGps => 'Surface GPS';
+
+  @override
+  String get diveLog_detail_surfaceGps_entry => 'Entry';
+
+  @override
+  String get diveLog_detail_surfaceGps_exit => 'Exit';
+
+  @override
+  String get diveLog_detail_label_drift => 'Drift';
+
+  @override
+  String get diveLog_detail_surfaceGps_entryOnly => 'Entry point recorded';
+
+  @override
+  String get diveLog_detail_surfaceGps_exitOnly => 'Exit point recorded';
+
+  @override
+  String get diveLog_detail_surfaceGps_site => 'Site';
+
+  @override
+  String get diveLog_detail_locationsMap_title => 'Dive Locations';
+
+  @override
+  String get diveLog_detail_coordinatesCopied =>
+      'Coordinates copied to clipboard';
+
+  @override
+  String get diveLog_detail_openInMaps => 'Open in Maps';
 
   @override
   String get diveDetailSection_weights_name => 'משקולות';
@@ -15547,6 +15681,22 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String get settings_section_dataSources_subtitle =>
       'Connected services & integrations';
+
+  @override
+  String get settings_siteMatch_title => 'התאמת אתרים אוטומטית';
+
+  @override
+  String get settings_siteMatch_subtitle =>
+      'באיזו מידה צלילות שהורדו מותאמות לאתרים';
+
+  @override
+  String get settings_siteMatch_strict => 'קפדני';
+
+  @override
+  String get settings_siteMatch_balanced => 'מאוזן';
+
+  @override
+  String get settings_siteMatch_relaxed => 'גמיש';
 
   @override
   String get settings_dataSources_header => 'Data Sources';

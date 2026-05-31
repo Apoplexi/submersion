@@ -241,6 +241,12 @@ class Dives extends Table {
       text().nullable()(); // enum: WeatherSource.name
   IntColumn get weatherFetchedAt => integer().nullable()(); // unix timestamp
 
+  // GPS entry/exit fixes from dive computer (Shearwater Swift). Decimal degrees.
+  RealColumn get entryLatitude => real().nullable()();
+  RealColumn get entryLongitude => real().nullable()();
+  RealColumn get exitLatitude => real().nullable()();
+  RealColumn get exitLongitude => real().nullable()();
+
   // Import version: null = pre-fix, 1 = wall-clock-as-UTC convention
   IntColumn get importVersion => integer().nullable()();
 
@@ -794,6 +800,9 @@ class DiverSettings extends Table {
   // Map style (v67)
   TextColumn get mapStyle =>
       text().withDefault(const Constant('openStreetMap'))();
+  // Auto site matching sensitivity (v76): strict | balanced | relaxed
+  TextColumn get siteMatchSensitivity =>
+      text().withDefault(const Constant('balanced'))();
   // Dive profile chart defaults
   TextColumn get defaultRightAxisMetric =>
       text().withDefault(const Constant('temperature'))();
@@ -829,6 +838,8 @@ class DiverSettings extends Table {
       boolean().withDefault(const Constant(false))();
   BoolColumn get defaultShowGasSwitchMarkers =>
       boolean().withDefault(const Constant(true))();
+  BoolColumn get defaultShowGasTimeline =>
+      boolean().withDefault(const Constant(false))();
   // Notification settings (v26)
   BoolColumn get notificationsEnabled =>
       boolean().withDefault(const Constant(true))();
@@ -1084,6 +1095,10 @@ class DiveDataSources extends Table {
   RealColumn get avgDepth => real().nullable()();
   IntColumn get duration => integer().nullable()();
   RealColumn get waterTemp => real().nullable()();
+  RealColumn get entryLatitude => real().nullable()();
+  RealColumn get entryLongitude => real().nullable()();
+  RealColumn get exitLatitude => real().nullable()();
+  RealColumn get exitLongitude => real().nullable()();
   DateTimeColumn get entryTime => dateTime().nullable()();
   DateTimeColumn get exitTime => dateTime().nullable()();
   RealColumn get maxAscentRate => real().nullable()();
@@ -1447,7 +1462,7 @@ class AppDatabase extends _$AppDatabase {
 
   /// The current schema version as a static constant so that pre-open checks
   /// (e.g. version-mismatch guard) can reference it without an instance.
-  static const int currentSchemaVersion = 72;
+  static const int currentSchemaVersion = 76;
 
   /// Every schema version that has a migration block in onUpgrade.
   /// Used to calculate progress step counts. When adding a new migration,
@@ -1523,6 +1538,10 @@ class AppDatabase extends _$AppDatabase {
     70,
     71,
     72,
+    73,
+    74,
+    75,
+    76,
   ];
 
   /// Returns the number of migration steps that will execute when upgrading
@@ -3573,6 +3592,83 @@ class AppDatabase extends _$AppDatabase {
           ''');
         }
         if (from < 72) await reportProgress();
+        if (from < 73) {
+          // Guard: dives may not exist in older migration-test contexts.
+          final divesCols = await customSelect(
+            "PRAGMA table_info('dives')",
+          ).get();
+          if (divesCols.isNotEmpty) {
+            final divesExisting = divesCols
+                .map((c) => c.read<String>('name'))
+                .toSet();
+            if (!divesExisting.contains('entry_latitude')) {
+              await customStatement(
+                'ALTER TABLE dives ADD COLUMN entry_latitude REAL',
+              );
+              await customStatement(
+                'ALTER TABLE dives ADD COLUMN entry_longitude REAL',
+              );
+              await customStatement(
+                'ALTER TABLE dives ADD COLUMN exit_latitude REAL',
+              );
+              await customStatement(
+                'ALTER TABLE dives ADD COLUMN exit_longitude REAL',
+              );
+            }
+          }
+        }
+        if (from < 73) await reportProgress();
+        if (from < 74) {
+          final cols = await customSelect(
+            "PRAGMA table_info('dive_data_sources')",
+          ).get();
+          if (cols.isNotEmpty) {
+            final existing = cols.map((c) => c.read<String>('name')).toSet();
+            if (!existing.contains('entry_latitude')) {
+              await customStatement(
+                'ALTER TABLE dive_data_sources ADD COLUMN entry_latitude REAL',
+              );
+              await customStatement(
+                'ALTER TABLE dive_data_sources ADD COLUMN entry_longitude REAL',
+              );
+              await customStatement(
+                'ALTER TABLE dive_data_sources ADD COLUMN exit_latitude REAL',
+              );
+              await customStatement(
+                'ALTER TABLE dive_data_sources ADD COLUMN exit_longitude REAL',
+              );
+            }
+          }
+        }
+        if (from < 74) await reportProgress();
+        if (from < 75) {
+          final cols = await customSelect(
+            "PRAGMA table_info('diver_settings')",
+          ).get();
+          if (cols.isNotEmpty) {
+            final existing = cols.map((c) => c.read<String>('name')).toSet();
+            if (!existing.contains('default_show_gas_timeline')) {
+              await customStatement(
+                'ALTER TABLE diver_settings ADD COLUMN default_show_gas_timeline INTEGER NOT NULL DEFAULT 0',
+              );
+            }
+          }
+        }
+        if (from < 75) await reportProgress();
+        if (from < 76) {
+          final cols = await customSelect(
+            "PRAGMA table_info('diver_settings')",
+          ).get();
+          if (cols.isNotEmpty) {
+            final existing = cols.map((c) => c.read<String>('name')).toSet();
+            if (!existing.contains('site_match_sensitivity')) {
+              await customStatement(
+                "ALTER TABLE diver_settings ADD COLUMN site_match_sensitivity TEXT NOT NULL DEFAULT 'balanced'",
+              );
+            }
+          }
+        }
+        if (from < 76) await reportProgress();
       },
       beforeOpen: (details) async {
         // Enable foreign keys
