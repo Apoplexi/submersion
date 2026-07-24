@@ -3013,6 +3013,14 @@ class AppLocalizationsHu extends AppLocalizations {
   String get dashboard_photos_title => 'Legutóbbi fotók';
 
   @override
+  String get dashboard_onThisDay_title => 'Ezen a napon';
+
+  @override
+  String dashboard_onThisDay_entry(String year, String site) {
+    return '$year - $site';
+  }
+
+  @override
   String get dashboard_milestones_title => 'Mérföldkövek';
 
   @override

@@ -5607,6 +5607,8 @@
   "dashboard_gauges_retry": "状态不可用 - 点按重试",
   "dashboard_urgent_title": "需要注意",
   "dashboard_photos_title": "最近照片",
+  "dashboard_onThisDay_title": "历史上的今天",
+  "dashboard_onThisDay_entry": "{year} - {site}",
   "dashboard_milestones_title": "里程碑",
   "dashboard_milestones_nextDive": "还有 {remaining} 次即达第 {milestone} 潜",
   "dashboard_milestones_certYears": "{name}:{month}满 {years} 年",

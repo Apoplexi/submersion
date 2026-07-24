@@ -5607,6 +5607,8 @@
   "dashboard_gauges_retry": "الحالة غير متاحة - انقر لإعادة المحاولة",
   "dashboard_urgent_title": "يتطلب الانتباه",
   "dashboard_photos_title": "أحدث الصور",
+  "dashboard_onThisDay_title": "في مثل هذا اليوم",
+  "dashboard_onThisDay_entry": "{year} - {site}",
   "dashboard_milestones_title": "الإنجازات",
   "dashboard_milestones_nextDive": "{remaining} غطسات حتى رقم {milestone}",
   "dashboard_milestones_certYears": "{name}: {years} سنوات في {month}",

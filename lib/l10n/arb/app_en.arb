@@ -1780,6 +1780,18 @@
   "dashboard_gauges_retry": "Status unavailable - tap to retry",
   "dashboard_urgent_title": "Needs attention",
   "dashboard_photos_title": "Recent photos",
+  "dashboard_onThisDay_title": "On this day",
+  "dashboard_onThisDay_entry": "{year} - {site}",
+  "@dashboard_onThisDay_entry": {
+    "placeholders": {
+      "year": {
+        "type": "String"
+      },
+      "site": {
+        "type": "String"
+      }
+    }
+  },
   "dashboard_milestones_title": "Milestones",
   "dashboard_milestones_nextDive": "{remaining} dives to #{milestone}",
   "@dashboard_milestones_nextDive": {

@@ -3003,6 +3003,14 @@ class AppLocalizationsNl extends AppLocalizations {
   String get dashboard_photos_title => 'Recente foto\'s';
 
   @override
+  String get dashboard_onThisDay_title => 'Op deze dag';
+
+  @override
+  String dashboard_onThisDay_entry(String year, String site) {
+    return '$year - $site';
+  }
+
+  @override
   String get dashboard_milestones_title => 'Mijlpalen';
 
   @override

@@ -2938,6 +2938,14 @@ class AppLocalizationsHe extends AppLocalizations {
   String get dashboard_photos_title => 'תמונות אחרונות';
 
   @override
+  String get dashboard_onThisDay_title => 'ביום הזה';
+
+  @override
+  String dashboard_onThisDay_entry(String year, String site) {
+    return '$year - $site';
+  }
+
+  @override
   String get dashboard_milestones_title => 'אבני דרך';
 
   @override

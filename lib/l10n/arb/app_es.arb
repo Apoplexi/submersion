@@ -5607,6 +5607,8 @@
   "dashboard_gauges_retry": "Estado no disponible - toca para reintentar",
   "dashboard_urgent_title": "Requiere atención",
   "dashboard_photos_title": "Fotos recientes",
+  "dashboard_onThisDay_title": "Tal día como hoy",
+  "dashboard_onThisDay_entry": "{year} - {site}",
   "dashboard_milestones_title": "Hitos",
   "dashboard_milestones_nextDive": "{remaining} inmersiones para la n.º {milestone}",
   "dashboard_milestones_certYears": "{name}: {years} años en {month}",

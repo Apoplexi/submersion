@@ -5607,6 +5607,8 @@
   "dashboard_gauges_retry": "הסטטוס אינו זמין - הקש לניסיון חוזר",
   "dashboard_urgent_title": "דורש תשומת לב",
   "dashboard_photos_title": "תמונות אחרונות",
+  "dashboard_onThisDay_title": "ביום הזה",
+  "dashboard_onThisDay_entry": "{year} - {site}",
   "dashboard_milestones_title": "אבני דרך",
   "dashboard_milestones_nextDive": "עוד {remaining} צלילות עד מספר {milestone}",
   "dashboard_milestones_certYears": "{name}: {years} שנים ב{month}",

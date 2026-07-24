@@ -5178,6 +5178,18 @@ abstract class AppLocalizations {
   /// **'Recent photos'**
   String get dashboard_photos_title;
 
+  /// No description provided for @dashboard_onThisDay_title.
+  ///
+  /// In en, this message translates to:
+  /// **'On this day'**
+  String get dashboard_onThisDay_title;
+
+  /// No description provided for @dashboard_onThisDay_entry.
+  ///
+  /// In en, this message translates to:
+  /// **'{year} - {site}'**
+  String dashboard_onThisDay_entry(String year, String site);
+
   /// No description provided for @dashboard_milestones_title.
   ///
   /// In en, this message translates to:

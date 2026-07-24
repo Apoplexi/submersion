@@ -5607,6 +5607,8 @@
   "dashboard_gauges_retry": "Status niet beschikbaar - tik om opnieuw te proberen",
   "dashboard_urgent_title": "Vereist aandacht",
   "dashboard_photos_title": "Recente foto's",
+  "dashboard_onThisDay_title": "Op deze dag",
+  "dashboard_onThisDay_entry": "{year} - {site}",
   "dashboard_milestones_title": "Mijlpalen",
   "dashboard_milestones_nextDive": "Nog {remaining} duiken tot nr. {milestone}",
   "dashboard_milestones_certYears": "{name}: {years} jaar in {month}",

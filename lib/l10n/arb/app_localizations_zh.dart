@@ -2860,6 +2860,14 @@ class AppLocalizationsZh extends AppLocalizations {
   String get dashboard_photos_title => '最近照片';
 
   @override
+  String get dashboard_onThisDay_title => '历史上的今天';
+
+  @override
+  String dashboard_onThisDay_entry(String year, String site) {
+    return '$year - $site';
+  }
+
+  @override
   String get dashboard_milestones_title => '里程碑';
 
   @override

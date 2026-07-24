@@ -5607,6 +5607,8 @@
   "dashboard_gauges_retry": "Statut indisponible - touchez pour réessayer",
   "dashboard_urgent_title": "Attention requise",
   "dashboard_photos_title": "Photos récentes",
+  "dashboard_onThisDay_title": "Ce jour-là",
+  "dashboard_onThisDay_entry": "{year} - {site}",
   "dashboard_milestones_title": "Étapes",
   "dashboard_milestones_nextDive": "{remaining} plongées avant la n°{milestone}",
   "dashboard_milestones_certYears": "{name} : {years} ans en {month}",

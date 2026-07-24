@@ -219,6 +219,26 @@ final personalRecordsProvider = FutureProvider<PersonalRecords>((ref) async {
   );
 });
 
+/// Dives from this month/day in prior years ("on this day").
+final onThisDayProvider = FutureProvider<List<Dive>>((ref) async {
+  final repository = ref.watch(diveRepositoryProvider);
+  ref.invalidateSelfWhen(repository.watchDivesChanges());
+  final currentDiverId = ref.watch(currentDiverIdProvider);
+  final now = DateTime.now();
+  final ids = await repository.getOnThisDayDiveIds(
+    month: now.month,
+    day: now.day,
+    excludeYear: now.year,
+    diverId: currentDiverId,
+  );
+  final dives = <Dive>[];
+  for (final id in ids) {
+    final dive = await repository.getDiveById(id);
+    if (dive != null) dives.add(dive);
+  }
+  return dives;
+});
+
 /// Quick stats data class for dashboard
 class DashboardQuickStats {
   final String? topBuddyName;

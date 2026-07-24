@@ -5607,6 +5607,8 @@
   "dashboard_gauges_retry": "Status nicht verfügbar - zum Wiederholen tippen",
   "dashboard_urgent_title": "Braucht Aufmerksamkeit",
   "dashboard_photos_title": "Aktuelle Fotos",
+  "dashboard_onThisDay_title": "An diesem Tag",
+  "dashboard_onThisDay_entry": "{year} - {site}",
   "dashboard_milestones_title": "Meilensteine",
   "dashboard_milestones_nextDive": "Noch {remaining} Tauchgänge bis Nr. {milestone}",
   "dashboard_milestones_certYears": "{name}: {years} Jahre im {month}",

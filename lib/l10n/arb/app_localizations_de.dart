@@ -3038,6 +3038,14 @@ class AppLocalizationsDe extends AppLocalizations {
   String get dashboard_photos_title => 'Aktuelle Fotos';
 
   @override
+  String get dashboard_onThisDay_title => 'An diesem Tag';
+
+  @override
+  String dashboard_onThisDay_entry(String year, String site) {
+    return '$year - $site';
+  }
+
+  @override
   String get dashboard_milestones_title => 'Meilensteine';
 
   @override
