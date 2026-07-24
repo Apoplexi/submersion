@@ -2954,6 +2954,21 @@ class AppLocalizationsDe extends AppLocalizations {
   String get dashboard_hero_diverFallbackName => 'Taucher';
 
   @override
+  String get dashboard_hero_statDives => 'Tauchgänge';
+
+  @override
+  String get dashboard_hero_statHours => 'Stunden';
+
+  @override
+  String get dashboard_hero_statDeepest => 'max. Tiefe';
+
+  @override
+  String get dashboard_hero_statSites => 'Tauchplätze';
+
+  @override
+  String get dashboard_hero_statCountries => 'Länder';
+
+  @override
   String dashboard_activityStats_divesInYear(String year) {
     return 'Tauchgänge in $year';
   }

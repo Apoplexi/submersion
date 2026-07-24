@@ -2855,6 +2855,21 @@ class AppLocalizationsHe extends AppLocalizations {
   String get dashboard_hero_diverFallbackName => 'צוללן';
 
   @override
+  String get dashboard_hero_statDives => 'צלילות';
+
+  @override
+  String get dashboard_hero_statHours => 'שעות';
+
+  @override
+  String get dashboard_hero_statDeepest => 'עומק מרבי';
+
+  @override
+  String get dashboard_hero_statSites => 'אתרים';
+
+  @override
+  String get dashboard_hero_statCountries => 'מדינות';
+
+  @override
   String dashboard_activityStats_divesInYear(String year) {
     return 'צלילות ב-$year';
   }

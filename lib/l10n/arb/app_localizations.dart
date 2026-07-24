@@ -5040,6 +5040,36 @@ abstract class AppLocalizations {
   /// **'Diver'**
   String get dashboard_hero_diverFallbackName;
 
+  /// No description provided for @dashboard_hero_statDives.
+  ///
+  /// In en, this message translates to:
+  /// **'dives'**
+  String get dashboard_hero_statDives;
+
+  /// No description provided for @dashboard_hero_statHours.
+  ///
+  /// In en, this message translates to:
+  /// **'hours'**
+  String get dashboard_hero_statHours;
+
+  /// No description provided for @dashboard_hero_statDeepest.
+  ///
+  /// In en, this message translates to:
+  /// **'deepest'**
+  String get dashboard_hero_statDeepest;
+
+  /// No description provided for @dashboard_hero_statSites.
+  ///
+  /// In en, this message translates to:
+  /// **'sites'**
+  String get dashboard_hero_statSites;
+
+  /// No description provided for @dashboard_hero_statCountries.
+  ///
+  /// In en, this message translates to:
+  /// **'countries'**
+  String get dashboard_hero_statCountries;
+
   /// No description provided for @dashboard_activityStats_divesInYear.
   ///
   /// In en, this message translates to:

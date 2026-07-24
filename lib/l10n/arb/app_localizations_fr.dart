@@ -2954,6 +2954,21 @@ class AppLocalizationsFr extends AppLocalizations {
   String get dashboard_hero_diverFallbackName => 'Plongeur';
 
   @override
+  String get dashboard_hero_statDives => 'plongées';
+
+  @override
+  String get dashboard_hero_statHours => 'heures';
+
+  @override
+  String get dashboard_hero_statDeepest => 'prof. max';
+
+  @override
+  String get dashboard_hero_statSites => 'sites';
+
+  @override
+  String get dashboard_hero_statCountries => 'pays';
+
+  @override
   String dashboard_activityStats_divesInYear(String year) {
     return 'plongées en $year';
   }

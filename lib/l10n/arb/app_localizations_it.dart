@@ -2940,6 +2940,21 @@ class AppLocalizationsIt extends AppLocalizations {
   String get dashboard_hero_diverFallbackName => 'Subacqueo';
 
   @override
+  String get dashboard_hero_statDives => 'immersioni';
+
+  @override
+  String get dashboard_hero_statHours => 'ore';
+
+  @override
+  String get dashboard_hero_statDeepest => 'prof. max';
+
+  @override
+  String get dashboard_hero_statSites => 'siti';
+
+  @override
+  String get dashboard_hero_statCountries => 'paesi';
+
+  @override
   String dashboard_activityStats_divesInYear(String year) {
     return 'immersioni nel $year';
   }

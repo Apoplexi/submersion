@@ -2945,6 +2945,21 @@ class AppLocalizationsEs extends AppLocalizations {
   String get dashboard_hero_diverFallbackName => 'Buzo';
 
   @override
+  String get dashboard_hero_statDives => 'inmersiones';
+
+  @override
+  String get dashboard_hero_statHours => 'horas';
+
+  @override
+  String get dashboard_hero_statDeepest => 'máx. prof.';
+
+  @override
+  String get dashboard_hero_statSites => 'sitios';
+
+  @override
+  String get dashboard_hero_statCountries => 'países';
+
+  @override
   String dashboard_activityStats_divesInYear(String year) {
     return 'inmersiones en $year';
   }

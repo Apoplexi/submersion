@@ -2886,6 +2886,21 @@ class AppLocalizationsEn extends AppLocalizations {
   String get dashboard_hero_diverFallbackName => 'Diver';
 
   @override
+  String get dashboard_hero_statDives => 'dives';
+
+  @override
+  String get dashboard_hero_statHours => 'hours';
+
+  @override
+  String get dashboard_hero_statDeepest => 'deepest';
+
+  @override
+  String get dashboard_hero_statSites => 'sites';
+
+  @override
+  String get dashboard_hero_statCountries => 'countries';
+
+  @override
   String dashboard_activityStats_divesInYear(String year) {
     return 'dives in $year';
   }

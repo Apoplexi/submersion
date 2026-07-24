@@ -2928,6 +2928,21 @@ class AppLocalizationsHu extends AppLocalizations {
   String get dashboard_hero_diverFallbackName => 'Búvár';
 
   @override
+  String get dashboard_hero_statDives => 'merülés';
+
+  @override
+  String get dashboard_hero_statHours => 'óra';
+
+  @override
+  String get dashboard_hero_statDeepest => 'max. mélység';
+
+  @override
+  String get dashboard_hero_statSites => 'helyszín';
+
+  @override
+  String get dashboard_hero_statCountries => 'ország';
+
+  @override
   String dashboard_activityStats_divesInYear(String year) {
     return 'merülések $year-ben';
   }

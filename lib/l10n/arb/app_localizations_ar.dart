@@ -2878,6 +2878,21 @@ class AppLocalizationsAr extends AppLocalizations {
   String get dashboard_hero_diverFallbackName => 'غواص';
 
   @override
+  String get dashboard_hero_statDives => 'غطسات';
+
+  @override
+  String get dashboard_hero_statHours => 'ساعات';
+
+  @override
+  String get dashboard_hero_statDeepest => 'أقصى عمق';
+
+  @override
+  String get dashboard_hero_statSites => 'مواقع';
+
+  @override
+  String get dashboard_hero_statCountries => 'دول';
+
+  @override
   String dashboard_activityStats_divesInYear(String year) {
     return 'غطسات في $year';
   }
