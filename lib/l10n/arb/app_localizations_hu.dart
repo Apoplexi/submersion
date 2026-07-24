@@ -3010,6 +3010,19 @@ class AppLocalizationsHu extends AppLocalizations {
   String get dashboard_urgent_title => 'Figyelmet igényel';
 
   @override
+  String get dashboard_milestones_title => 'Mérföldkövek';
+
+  @override
+  String dashboard_milestones_nextDive(int remaining, int milestone) {
+    return 'Még $remaining merülés a(z) $milestone. eléréséig';
+  }
+
+  @override
+  String dashboard_milestones_certYears(String name, int years, String month) {
+    return '$name: $years év $month hónapban';
+  }
+
+  @override
   String get dashboard_personalRecords_coldest => 'Leghidegebb';
 
   @override

@@ -1779,6 +1779,32 @@
   "dashboard_gauges_noDivesYet": "No dives yet",
   "dashboard_gauges_retry": "Status unavailable - tap to retry",
   "dashboard_urgent_title": "Needs attention",
+  "dashboard_milestones_title": "Milestones",
+  "dashboard_milestones_nextDive": "{remaining} dives to #{milestone}",
+  "@dashboard_milestones_nextDive": {
+    "placeholders": {
+      "remaining": {
+        "type": "int"
+      },
+      "milestone": {
+        "type": "int"
+      }
+    }
+  },
+  "dashboard_milestones_certYears": "{name}: {years} years in {month}",
+  "@dashboard_milestones_certYears": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "years": {
+        "type": "int"
+      },
+      "month": {
+        "type": "String"
+      }
+    }
+  },
   "dashboard_personalRecords_coldest": "Coldest",
   "dashboard_personalRecords_deepest": "Deepest",
   "dashboard_personalRecords_longest": "Longest",

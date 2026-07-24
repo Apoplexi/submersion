@@ -2935,6 +2935,19 @@ class AppLocalizationsHe extends AppLocalizations {
   String get dashboard_urgent_title => 'דורש תשומת לב';
 
   @override
+  String get dashboard_milestones_title => 'אבני דרך';
+
+  @override
+  String dashboard_milestones_nextDive(int remaining, int milestone) {
+    return 'עוד $remaining צלילות עד מספר $milestone';
+  }
+
+  @override
+  String dashboard_milestones_certYears(String name, int years, String month) {
+    return '$name: $years שנים ב$month';
+  }
+
+  @override
   String get dashboard_personalRecords_coldest => 'הקרה ביותר';
 
   @override

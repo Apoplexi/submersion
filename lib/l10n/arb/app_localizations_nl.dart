@@ -3000,6 +3000,19 @@ class AppLocalizationsNl extends AppLocalizations {
   String get dashboard_urgent_title => 'Vereist aandacht';
 
   @override
+  String get dashboard_milestones_title => 'Mijlpalen';
+
+  @override
+  String dashboard_milestones_nextDive(int remaining, int milestone) {
+    return 'Nog $remaining duiken tot nr. $milestone';
+  }
+
+  @override
+  String dashboard_milestones_certYears(String name, int years, String month) {
+    return '$name: $years jaar in $month';
+  }
+
+  @override
   String get dashboard_personalRecords_coldest => 'Koudste';
 
   @override

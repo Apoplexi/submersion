@@ -5172,6 +5172,24 @@ abstract class AppLocalizations {
   /// **'Needs attention'**
   String get dashboard_urgent_title;
 
+  /// No description provided for @dashboard_milestones_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Milestones'**
+  String get dashboard_milestones_title;
+
+  /// No description provided for @dashboard_milestones_nextDive.
+  ///
+  /// In en, this message translates to:
+  /// **'{remaining} dives to #{milestone}'**
+  String dashboard_milestones_nextDive(int remaining, int milestone);
+
+  /// No description provided for @dashboard_milestones_certYears.
+  ///
+  /// In en, this message translates to:
+  /// **'{name}: {years} years in {month}'**
+  String dashboard_milestones_certYears(String name, int years, String month);
+
   /// No description provided for @dashboard_personalRecords_coldest.
   ///
   /// In en, this message translates to:

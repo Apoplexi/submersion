@@ -2857,6 +2857,19 @@ class AppLocalizationsZh extends AppLocalizations {
   String get dashboard_urgent_title => '需要注意';
 
   @override
+  String get dashboard_milestones_title => '里程碑';
+
+  @override
+  String dashboard_milestones_nextDive(int remaining, int milestone) {
+    return '还有 $remaining 次即达第 $milestone 潜';
+  }
+
+  @override
+  String dashboard_milestones_certYears(String name, int years, String month) {
+    return '$name:$month满 $years 年';
+  }
+
+  @override
   String get dashboard_personalRecords_coldest => '最冷';
 
   @override
