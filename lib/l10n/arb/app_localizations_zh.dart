@@ -2860,6 +2860,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get dashboard_photos_title => '最近照片';
 
   @override
+  String get dashboard_recentSites_title => '最近潜点';
+
+  @override
   String get dashboard_yearInReview_title => '今年';
 
   @override

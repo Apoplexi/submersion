@@ -3024,6 +3024,9 @@ class AppLocalizationsIt extends AppLocalizations {
   String get dashboard_photos_title => 'Foto recenti';
 
   @override
+  String get dashboard_recentSites_title => 'Siti recenti';
+
+  @override
   String get dashboard_yearInReview_title => 'Quest\'anno';
 
   @override

@@ -5607,6 +5607,7 @@
   "dashboard_gauges_retry": "הסטטוס אינו זמין - הקש לניסיון חוזר",
   "dashboard_urgent_title": "דורש תשומת לב",
   "dashboard_photos_title": "תמונות אחרונות",
+  "dashboard_recentSites_title": "אתרים אחרונים",
   "dashboard_yearInReview_title": "השנה",
   "dashboard_yearInReview_divesVs": "{count} צלילות (לעומת {previous} בשנה שעברה)",
   "dashboard_yearInReview_hours": "{hours} שעות מתחת למים",

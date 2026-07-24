@@ -5607,6 +5607,7 @@
   "dashboard_gauges_retry": "Estado indisponível - toque para tentar novamente",
   "dashboard_urgent_title": "Requer atenção",
   "dashboard_photos_title": "Fotos recentes",
+  "dashboard_recentSites_title": "Locais recentes",
   "dashboard_yearInReview_title": "Este ano",
   "dashboard_yearInReview_divesVs": "{count} mergulhos (vs {previous} no ano passado)",
   "dashboard_yearInReview_hours": "{hours} horas debaixo de água",

@@ -5607,6 +5607,7 @@
   "dashboard_gauges_retry": "Status niet beschikbaar - tik om opnieuw te proberen",
   "dashboard_urgent_title": "Vereist aandacht",
   "dashboard_photos_title": "Recente foto's",
+  "dashboard_recentSites_title": "Recente stekken",
   "dashboard_yearInReview_title": "Dit jaar",
   "dashboard_yearInReview_divesVs": "{count} duiken (vs {previous} vorig jaar)",
   "dashboard_yearInReview_hours": "{hours} uur onder water",

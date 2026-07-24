@@ -2969,6 +2969,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get dashboard_photos_title => 'Recent photos';
 
   @override
+  String get dashboard_recentSites_title => 'Recent sites';
+
+  @override
   String get dashboard_yearInReview_title => 'This year';
 
   @override

@@ -220,6 +220,47 @@ final personalRecordsProvider = FutureProvider<PersonalRecords>((ref) async {
   );
 });
 
+/// A GPS pin for the recent-sites mini map.
+class RecentSitePin {
+  final String? siteName;
+  final double latitude;
+  final double longitude;
+
+  const RecentSitePin({
+    required this.siteName,
+    required this.latitude,
+    required this.longitude,
+  });
+}
+
+/// Distinct GPS-bearing sites among the last 10 dives.
+final recentSitesProvider = FutureProvider<List<RecentSitePin>>((ref) async {
+  final repository = ref.watch(diveRepositoryProvider);
+  ref.invalidateSelfWhen(repository.watchDivesChanges());
+  final currentDiverId = ref.watch(currentDiverIdProvider);
+  final summaries = await repository.getDiveSummaries(
+    diverId: currentDiverId,
+    limit: 10,
+  );
+  final seen = <String>{};
+  final pins = <RecentSitePin>[];
+  for (final summary in summaries) {
+    final lat = summary.siteLatitude;
+    final lng = summary.siteLongitude;
+    if (lat == null || lng == null) continue;
+    if (seen.add('$lat,$lng')) {
+      pins.add(
+        RecentSitePin(
+          siteName: summary.siteName,
+          latitude: lat,
+          longitude: lng,
+        ),
+      );
+    }
+  }
+  return pins;
+});
+
 /// This year vs last year, for the year-in-review card.
 class YearInReview {
   final int year;

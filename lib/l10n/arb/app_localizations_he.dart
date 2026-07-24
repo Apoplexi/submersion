@@ -2938,6 +2938,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get dashboard_photos_title => 'תמונות אחרונות';
 
   @override
+  String get dashboard_recentSites_title => 'אתרים אחרונים';
+
+  @override
   String get dashboard_yearInReview_title => 'השנה';
 
   @override

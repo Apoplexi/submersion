@@ -3038,6 +3038,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get dashboard_photos_title => 'Aktuelle Fotos';
 
   @override
+  String get dashboard_recentSites_title => 'Aktuelle Tauchplätze';
+
+  @override
   String get dashboard_yearInReview_title => 'Dieses Jahr';
 
   @override

@@ -5607,6 +5607,7 @@
   "dashboard_gauges_retry": "Status nicht verfügbar - zum Wiederholen tippen",
   "dashboard_urgent_title": "Braucht Aufmerksamkeit",
   "dashboard_photos_title": "Aktuelle Fotos",
+  "dashboard_recentSites_title": "Aktuelle Tauchplätze",
   "dashboard_yearInReview_title": "Dieses Jahr",
   "dashboard_yearInReview_divesVs": "{count} Tauchgänge (Vorjahr: {previous})",
   "dashboard_yearInReview_hours": "{hours} Stunden unter Wasser",

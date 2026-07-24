@@ -2962,6 +2962,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get dashboard_photos_title => 'أحدث الصور';
 
   @override
+  String get dashboard_recentSites_title => 'المواقع الأخيرة';
+
+  @override
   String get dashboard_yearInReview_title => 'هذا العام';
 
   @override

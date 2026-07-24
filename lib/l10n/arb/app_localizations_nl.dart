@@ -3003,6 +3003,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get dashboard_photos_title => 'Recente foto\'s';
 
   @override
+  String get dashboard_recentSites_title => 'Recente stekken';
+
+  @override
   String get dashboard_yearInReview_title => 'Dit jaar';
 
   @override

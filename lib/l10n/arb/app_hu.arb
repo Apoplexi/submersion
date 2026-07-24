@@ -5607,6 +5607,7 @@
   "dashboard_gauges_retry": "Az állapot nem érhető el - koppints az újrapróbáláshoz",
   "dashboard_urgent_title": "Figyelmet igényel",
   "dashboard_photos_title": "Legutóbbi fotók",
+  "dashboard_recentSites_title": "Legutóbbi helyszínek",
   "dashboard_yearInReview_title": "Idén",
   "dashboard_yearInReview_divesVs": "{count} merülés (tavaly: {previous})",
   "dashboard_yearInReview_hours": "{hours} óra a víz alatt",

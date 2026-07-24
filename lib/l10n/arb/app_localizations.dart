@@ -5178,6 +5178,12 @@ abstract class AppLocalizations {
   /// **'Recent photos'**
   String get dashboard_photos_title;
 
+  /// No description provided for @dashboard_recentSites_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Recent sites'**
+  String get dashboard_recentSites_title;
+
   /// No description provided for @dashboard_yearInReview_title.
   ///
   /// In en, this message translates to:
