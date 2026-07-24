@@ -1,7 +1,7 @@
 <h1>
 <img src="assets/icon/icon.png" alt="Submersion logo" width="72" align="left" hspace="14">
 Submersion<br>
-<sub><sub><em>Own your dive log. Free and open-source, forever.</em></sub></sub><br>&nbsp;
+<sub><sub><sup><em>Own your dive log. Free and open-source, forever.</em></sup></sub></sub><br>&nbsp;
 </h1>
 
 [![License: GPL-3.0](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE)
