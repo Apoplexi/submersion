@@ -220,6 +220,27 @@ void main() {
       expect(find.textContaining('Deepest:'), findsOneWidget);
     });
 
+    testWidgets('hours just under 10 render as whole hours, not "10.0"', (
+      tester,
+    ) async {
+      // 9.96h: fails a naive `< 10` test but rounds to 10.0 at one decimal.
+      await pumpCard(
+        tester,
+        const YearInReviewCard(),
+        overrides: [
+          yearInReviewProvider.overrideWith(
+            (ref) async => const YearInReview(
+              year: 2026,
+              current: YearStats(diveCount: 5, totalSeconds: 35856),
+              previous: YearStats(diveCount: 3, totalSeconds: 10800),
+            ),
+          ),
+        ],
+      );
+      expect(find.text('10 hours underwater'), findsOneWidget);
+      expect(find.text('10.0 hours underwater'), findsNothing);
+    });
+
     testWidgets('omits depth and hours rows when the year is empty', (
       tester,
     ) async {

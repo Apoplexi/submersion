@@ -838,6 +838,12 @@ class StatisticsRepository {
   /// with the hero header's lifetime hours.
   Future<YearStats> getYearStats(int year, {String? diverId}) async {
     try {
+      // Half-open millisecond range [Jan 1, next Jan 1) rather than
+      // strftime('%Y', ...): the range predicate lets SQLite use the
+      // (diver_id, dive_date_time) index instead of scanning every row.
+      // Local-midnight boundaries match countDivesSince's convention.
+      final startMs = DateTime(year).millisecondsSinceEpoch;
+      final endMs = DateTime(year + 1).millisecondsSinceEpoch;
       final diverFilter = diverId != null ? 'AND diver_id = ?' : '';
       final results = await _db
           .customSelect(
@@ -847,11 +853,12 @@ class StatisticsRepository {
           COALESCE(SUM(COALESCE(runtime, bottom_time)), 0) AS total_seconds,
           MAX(max_depth) AS max_depth
         FROM dives
-        WHERE strftime('%Y', dive_date_time / 1000, 'unixepoch') = ?
+        WHERE dive_date_time >= ? AND dive_date_time < ?
         $diverFilter
         ''',
             variables: [
-              Variable<String>(year.toString()),
+              Variable<int>(startMs),
+              Variable<int>(endMs),
               if (diverId != null) Variable<String>(diverId),
             ],
           )

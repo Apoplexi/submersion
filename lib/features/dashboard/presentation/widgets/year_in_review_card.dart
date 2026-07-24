@@ -20,10 +20,13 @@ class YearInReviewCard extends ConsumerWidget {
     final settings = ref.watch(settingsProvider);
     final fmt = UnitFormatter(settings);
     final seconds = review.current.totalSeconds;
-    final hours = seconds / 3600;
-    final hoursText = hours >= 10
-        ? hours.round().toString()
-        : hours.toStringAsFixed(1);
+    // Round to one decimal first, then pick the format from the rounded
+    // value: otherwise 9.96h would fail the `< 10` test yet render as
+    // "10.0" once the decimal is applied.
+    final hoursRounded = double.parse((seconds / 3600).toStringAsFixed(1));
+    final hoursText = hoursRounded >= 10
+        ? hoursRounded.round().toString()
+        : hoursRounded.toStringAsFixed(1);
 
     return Card(
       margin: EdgeInsets.zero,

@@ -39,12 +39,14 @@ void main() {
     double lastBottom = -1;
     for (final k in keys) {
       final rect = tester.getRect(find.byKey(Key(k)));
+      // Each block starts at or below the previous block's BOTTOM, so a
+      // vertical overlap would fail this (tracking .top would not).
       expect(
         rect.top,
-        greaterThan(lastBottom - 0.01),
-        reason: '$k should be below the previous block',
+        greaterThanOrEqualTo(lastBottom - 0.01),
+        reason: '$k should not overlap the previous block',
       );
-      lastBottom = rect.top;
+      lastBottom = rect.bottom;
       expect(rect.width, 500);
     }
   });
