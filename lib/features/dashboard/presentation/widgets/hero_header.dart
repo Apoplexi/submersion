@@ -30,7 +30,8 @@ class HeroHeader extends ConsumerWidget {
       child: OceanBackground(
         borderRadius: BorderRadius.circular(20),
         child: Padding(
-          padding: const EdgeInsets.all(24),
+          // Tighter on the right so the logo sits closer to the banner edge.
+          padding: const EdgeInsets.fromLTRB(24, 24, 14, 24),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
@@ -213,7 +214,7 @@ class _QuietStats extends ConsumerWidget {
             if (i > 0)
               Container(
                 width: 1,
-                height: 28,
+                height: 32,
                 margin: const EdgeInsets.symmetric(horizontal: 20),
                 color: Colors.white.withValues(alpha: 0.15),
               ),
@@ -222,7 +223,7 @@ class _QuietStats extends ConsumerWidget {
               children: [
                 Text(
                   items[i].$1,
-                  style: theme.textTheme.titleMedium?.copyWith(
+                  style: theme.textTheme.titleLarge?.copyWith(
                     color: Colors.white.withValues(alpha: 0.85),
                     fontWeight: FontWeight.w400,
                   ),
@@ -232,7 +233,7 @@ class _QuietStats extends ConsumerWidget {
                   style: theme.textTheme.labelSmall?.copyWith(
                     color: Colors.white.withValues(alpha: 0.55),
                     letterSpacing: 1.2,
-                    fontSize: 9,
+                    fontSize: 10,
                   ),
                 ),
               ],
