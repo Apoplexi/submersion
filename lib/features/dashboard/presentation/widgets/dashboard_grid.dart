@@ -59,17 +59,18 @@ class DashboardGrid extends StatelessWidget {
               ? pendingThirds.length
               : i + columns;
           final chunk = pendingThirds.sublist(i, end);
+          // No IntrinsicHeight: cards keep natural heights, top-aligned.
+          // Intrinsic measurement is unsafe over arbitrary card content
+          // (charts, internal flex) and caused layout failures.
           rows.add(
-            IntrinsicHeight(
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  for (var j = 0; j < chunk.length; j++) ...[
-                    if (j > 0) SizedBox(width: spacing),
-                    Expanded(child: chunk[j]),
-                  ],
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                for (var j = 0; j < chunk.length; j++) ...[
+                  if (j > 0) SizedBox(width: spacing),
+                  Expanded(child: chunk[j]),
                 ],
-              ),
+              ],
             ),
           );
         }
@@ -91,25 +92,24 @@ class DashboardGrid extends StatelessWidget {
             rows.addAll(side);
           } else {
             rows.add(
-              IntrinsicHeight(
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Expanded(flex: columns == 3 ? 2 : 1, child: lead),
-                    SizedBox(width: spacing),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          for (var i = 0; i < side.length; i++) ...[
-                            if (i > 0) SizedBox(height: spacing),
-                            Expanded(child: side[i]),
-                          ],
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(flex: columns == 3 ? 2 : 1, child: lead),
+                  SizedBox(width: spacing),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        for (var i = 0; i < side.length; i++) ...[
+                          if (i > 0) SizedBox(height: spacing),
+                          side[i],
                         ],
-                      ),
+                      ],
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             );
           }

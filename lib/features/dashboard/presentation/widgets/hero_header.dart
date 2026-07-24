@@ -208,40 +208,46 @@ class _QuietStats extends ConsumerWidget {
     ];
 
     final theme = Theme.of(context);
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        for (var i = 0; i < items.length; i++) ...[
-          if (i > 0)
-            Container(
-              width: 1,
-              height: 28,
-              margin: const EdgeInsets.symmetric(horizontal: 20),
-              color: Colors.white.withValues(alpha: 0.15),
+    // FittedBox: at mid desktop widths the five stat columns can exceed
+    // the space between greeting and banner edge; scale down rather than
+    // overflow the row.
+    return FittedBox(
+      fit: BoxFit.scaleDown,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          for (var i = 0; i < items.length; i++) ...[
+            if (i > 0)
+              Container(
+                width: 1,
+                height: 28,
+                margin: const EdgeInsets.symmetric(horizontal: 20),
+                color: Colors.white.withValues(alpha: 0.15),
+              ),
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  items[i].$1,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    color: Colors.white.withValues(alpha: 0.85),
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+                Text(
+                  items[i].$2.toUpperCase(),
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color: Colors.white.withValues(alpha: 0.55),
+                    letterSpacing: 1.2,
+                    fontSize: 9,
+                  ),
+                ),
+              ],
             ),
-          Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                items[i].$1,
-                style: theme.textTheme.titleMedium?.copyWith(
-                  color: Colors.white.withValues(alpha: 0.85),
-                  fontWeight: FontWeight.w400,
-                ),
-              ),
-              Text(
-                items[i].$2.toUpperCase(),
-                style: theme.textTheme.labelSmall?.copyWith(
-                  color: Colors.white.withValues(alpha: 0.55),
-                  letterSpacing: 1.2,
-                  fontSize: 9,
-                ),
-              ),
-            ],
-          ),
+          ],
         ],
-      ],
+      ),
     );
   }
 }

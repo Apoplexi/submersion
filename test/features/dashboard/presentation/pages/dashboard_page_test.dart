@@ -125,6 +125,28 @@ void main() {
     expect(find.byType(RecentSitesMapCard), findsNothing);
   });
 
+  testWidgets('renders without layout errors at phone width', (tester) async {
+    // Regression: QuickActionsCard once used an internal Expanded that
+    // threw in the unbounded 1-column scroll layout, collapsing the page.
+    tester.view.physicalSize = const Size(400, 900);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.reset);
+
+    await pumpDashboard(
+      tester,
+      milestones: const DashboardMilestones(
+        nextMilestone: 250,
+        divesRemaining: 3,
+        anniversaries: [],
+      ),
+    );
+
+    expect(tester.takeException(), isNull);
+    expect(find.byType(HeroHeader), findsOneWidget);
+    expect(find.byType(QuickActionsCard), findsOneWidget);
+    expect(find.byType(MilestonesCard), findsOneWidget);
+  });
+
   testWidgets('populated data shows the conditional cards', (tester) async {
     await pumpDashboard(
       tester,

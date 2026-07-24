@@ -62,8 +62,9 @@ void main() {
     final side1 = tester.getRect(find.byKey(const Key('side1')));
     expect(side1.top, lead.top);
     expect(lead.width, greaterThan(side1.width * 1.8));
+    // Side widgets stack below one another with natural heights.
     final side2 = tester.getRect(find.byKey(const Key('side2')));
-    expect(side2.bottom, closeTo(lead.bottom, 1.0));
+    expect(side2.top, greaterThan(side1.bottom - 0.01));
   });
 
   testWidgets('2 columns (800-1199): thirds flow 2-up, leftover shares row', (
