@@ -88,7 +88,9 @@ class OnThisDayCard extends ConsumerWidget {
     final maxDepth = dive.maxDepth;
     if (maxDepth != null) parts.add(fmt.formatDepth(maxDepth));
     final runtime = dive.effectiveRuntime;
-    if (runtime != null) parts.add('${runtime.inMinutes} min');
+    if (runtime != null) {
+      parts.add(context.l10n.diveLog_sources_minutes(runtime.inMinutes));
+    }
     return parts.join(' · ');
   }
 }

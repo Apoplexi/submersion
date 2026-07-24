@@ -138,15 +138,11 @@ void main() {
     test('carries upcoming certification anniversaries through', () async {
       final now = DateTime.now();
       totalDives = 0;
+      // Issue date exactly 10 years ago today: the next anniversary is today
+      // (0 days out, inside the window) and the year count is always 10,
+      // whatever calendar day the test runs on.
       certs = [
-        _cert(
-          DateTime(
-            now.year - 10,
-            now.month,
-            now.day,
-          ).add(const Duration(days: 3)),
-          name: 'Open Water',
-        ),
+        _cert(DateTime(now.year - 10, now.month, now.day), name: 'Open Water'),
       ];
       final milestones = await container.read(milestonesProvider.future);
 
