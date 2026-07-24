@@ -93,9 +93,17 @@ class _MediaItemViewState extends ConsumerState<MediaItemView> {
     // suffices, since thumbs upload before originals. Rows without any
     // confirmed upload skip the runtime entirely (no keychain read, no
     // store construction). Any store failure keeps the native placeholder.
+    //
+    // The compressed stamp counts as confirmation in its own right: an
+    // upload-quality setting other than "original" uploads a rendition and
+    // leaves remoteUploadedAt null permanently, so gating on the original
+    // alone made every such photo unviewable on other devices even though
+    // MediaStoreResolver.tryResolveRemote can serve the rendition. This
+    // mirrors what MediaRepository already treats as backed up.
     final storeConfirmed =
         widget.item.contentHash != null &&
         (widget.item.remoteUploadedAt != null ||
+            widget.item.remoteCompressedUploadedAt != null ||
             (widget.thumbnail && widget.item.remoteThumbUploadedAt != null));
     if (!storeConfirmed) {
       return native;
