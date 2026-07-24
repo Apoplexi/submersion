@@ -76,10 +76,12 @@ class LocalFileResolver implements MediaSourceResolver {
         // to the security-scoped bookmark — the design's source of truth
         // on macOS — when the direct read is denied.
         if (await f.exists()) {
-          if (await _isReadable(f)) return FileData(file: f);
+          final blocker = await _readBlocker(f);
+          if (blocker == null) return FileData(file: f);
           _log.debug(
-            'localPath exists but is not readable (sandbox?), falling '
+            'localPath exists but cannot be opened (sandbox?), falling '
             'back to bookmark: $localPath [item ${item.id}]',
+            error: blocker,
           );
         } else {
           _log.debug(
@@ -128,8 +130,12 @@ class LocalFileResolver implements MediaSourceResolver {
       try {
         final bytes = await _platform.readUriBytes(ref);
         return BytesData(bytes: bytes);
-      } catch (e) {
-        _log.warning('readUriBytes failed for item ${item.id}', error: e);
+      } catch (e, st) {
+        _log.warning(
+          'readUriBytes failed for item ${item.id}',
+          error: e,
+          stackTrace: st,
+        );
         return const UnavailableData(kind: UnavailableKind.notFound);
       }
       // coverage:ignore-end
@@ -152,8 +158,12 @@ class LocalFileResolver implements MediaSourceResolver {
         // security scope when callers forget to invoke releaseBookmark.
         final bytes = await _platform.readBookmarkBytes(blob);
         return BytesData(bytes: bytes);
-      } catch (e) {
-        _log.warning('readBookmarkBytes failed for item ${item.id}', error: e);
+      } catch (e, st) {
+        _log.warning(
+          'readBookmarkBytes failed for item ${item.id}',
+          error: e,
+          stackTrace: st,
+        );
         return const UnavailableData(kind: UnavailableKind.notFound);
       }
     }
@@ -161,18 +171,23 @@ class LocalFileResolver implements MediaSourceResolver {
     return const UnavailableData(kind: UnavailableKind.notFound);
   }
 
-  /// True when [f] can actually be opened for reading. Complements the
-  /// exists() check in [resolve]: a sandboxed build can stat a user file it
-  /// is not allowed to open, and handing such a file to Image.file produces
-  /// a broken tile with no diagnosable error. An open/close round-trip is
-  /// cheap relative to decoding and runs only on the localFile resolve path.
-  Future<bool> _isReadable(File f) async {
+  /// Returns null when [f] can actually be opened for reading, otherwise the
+  /// exception that blocked it. Complements the exists() check in [resolve]:
+  /// a sandboxed build can stat a user file it is not allowed to open, and
+  /// handing such a file to Image.file produces a broken tile with no
+  /// diagnosable error. An open/close round-trip is cheap relative to
+  /// decoding and runs only on the localFile resolve path.
+  ///
+  /// The exception is returned rather than collapsed to a bool so the caller
+  /// can log the concrete reason (EPERM vs. ENOENT vs. an I/O error) — the
+  /// whole point of this path is that the failure was previously invisible.
+  Future<FileSystemException?> _readBlocker(File f) async {
     try {
       final raf = await f.open();
       await raf.close();
-      return true;
-    } on FileSystemException {
-      return false;
+      return null;
+    } on FileSystemException catch (e) {
+      return e;
     }
   }
 

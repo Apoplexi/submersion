@@ -279,16 +279,45 @@ void main() {
   // taking the direct-file fast path; otherwise it returns FileData that
   // Image.file can never load and the working security-scoped bookmark is
   // never consulted. chmod 000 reproduces the same exists-but-unreadable
-  // split without a sandbox.
+  // split without a sandbox, on both macOS and Linux (CI runs the unit
+  // shards on ubuntu, so guarding these on macOS alone would mean the
+  // regression is never exercised in CI).
   group('exists-but-unreadable localPath (sandbox)', () {
+    /// Creates a file at [path] that exists but cannot be opened, or returns
+    /// null when this environment cannot produce that state — Windows has no
+    /// chmod semantics, and chmod cannot deny root, so a root test runner
+    /// (some CI containers) would silently get a readable file and fail for
+    /// the wrong reason. Callers skip in that case.
+    Future<File?> unreadableFile(String path) async {
+      if (Platform.isWindows) {
+        markTestSkipped('chmod permission semantics are POSIX-only');
+        return null;
+      }
+      final f = File(path)..writeAsBytesSync([1, 2, 3]);
+      final chmod = await Process.run('chmod', ['000', f.path]);
+      expect(chmod.exitCode, 0, reason: 'chmod 000 failed: ${chmod.stderr}');
+      addTearDown(() => Process.run('chmod', ['644', f.path]));
+      // Confirm the state we actually need, rather than assuming chmod
+      // implies it.
+      try {
+        await (await f.open()).close();
+        markTestSkipped('running as root: chmod cannot deny read access');
+        return null;
+      } on FileSystemException {
+        return f;
+      }
+    }
+
+    // Unlike its two siblings below, this one cannot run on Linux: the
+    // bookmark branch in resolve() is gated on Platform.isIOS/isMacOS, so a
+    // Linux host would fall straight through to notFound no matter how the
+    // storage is stubbed.
     test(
       'resolve falls back to the bookmark when localPath is unreadable',
       () async {
-        if (!Platform.isMacOS) return;
-        final f = File('${tempDir.path}/locked.jpg')
-          ..writeAsBytesSync([1, 2, 3]);
-        await Process.run('chmod', ['000', f.path]);
-        addTearDown(() => Process.run('chmod', ['644', f.path]));
+        if (!Platform.isIOS && !Platform.isMacOS) return;
+        final f = await unreadableFile('${tempDir.path}/locked.jpg');
+        if (f == null) return;
 
         final platform = _StubPlatform()
           ..onReadBookmarkBytes = ((blob) async =>
@@ -309,11 +338,8 @@ void main() {
     test(
       'resolve reads unreadable localPath as Unavailable when no bookmark',
       () async {
-        if (!Platform.isMacOS) return;
-        final f = File('${tempDir.path}/locked2.jpg')
-          ..writeAsBytesSync([1, 2, 3]);
-        await Process.run('chmod', ['000', f.path]);
-        addTearDown(() => Process.run('chmod', ['644', f.path]));
+        final f = await unreadableFile('${tempDir.path}/locked2.jpg');
+        if (f == null) return;
 
         final r = _resolver();
         final data = await r.resolve(_localFile(localPath: f.path));
@@ -327,11 +353,8 @@ void main() {
     // re-granted permission restores the file with no user action.
     test('verify reports transientError (not notFound) for a present but '
         'unreadable file', () async {
-      if (!Platform.isMacOS) return;
-      final f = File('${tempDir.path}/locked3.jpg')
-        ..writeAsBytesSync([1, 2, 3]);
-      await Process.run('chmod', ['000', f.path]);
-      addTearDown(() => Process.run('chmod', ['644', f.path]));
+      final f = await unreadableFile('${tempDir.path}/locked3.jpg');
+      if (f == null) return;
 
       final r = _resolver();
       expect(

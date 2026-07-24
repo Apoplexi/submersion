@@ -187,7 +187,7 @@ class _VideoThumbnailPlaceholder extends StatelessWidget {
   }
 }
 
-const _imageErrorLog = LoggerService('MediaItemView');
+final _imageErrorLog = LoggerService.forClass(MediaItemView);
 
 /// Graceful fallback when image bytes fail to decode (corrupt/unsupported), so
 /// the raw "Invalid image data" exception never reaches the UI. Shows a
