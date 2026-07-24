@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:ui' show Size;
 
+import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/features/media/data/services/exif_extractor.dart';
 import 'package:submersion/features/media/data/services/local_bookmark_storage.dart';
 import 'package:submersion/features/media/data/services/local_media_platform.dart';
@@ -50,6 +51,7 @@ class LocalFileResolver implements MediaSourceResolver {
 
   final VideoThumbnailService? _videoThumbnails;
   final VolumeStatus _volumeStatus;
+  final _log = LoggerService.forClass(LocalFileResolver);
 
   @override
   MediaSourceType get sourceType => MediaSourceType.localFile;
@@ -67,7 +69,24 @@ class LocalFileResolver implements MediaSourceResolver {
     if (localPath != null && localPath.isNotEmpty) {
       try {
         final f = File(localPath);
-        if (await f.exists()) return FileData(file: f);
+        // Existence alone is not enough: the macOS sandbox allows STAT on
+        // user files (~/Downloads etc.) while denying OPEN, so exists()
+        // returns true for a file Image.file can never actually read
+        // (PathAccessException, EPERM). Probe readability and fall through
+        // to the security-scoped bookmark — the design's source of truth
+        // on macOS — when the direct read is denied.
+        if (await f.exists()) {
+          if (await _isReadable(f)) return FileData(file: f);
+          _log.debug(
+            'localPath exists but is not readable (sandbox?), falling '
+            'back to bookmark: $localPath [item ${item.id}]',
+          );
+        } else {
+          _log.debug(
+            'localPath does not exist, falling back to bookmark: '
+            '$localPath [item ${item.id}]',
+          );
+        }
         // Missing file on an unmounted volume (network share, external
         // disk) is a temporary condition, not a dead pointer: report it
         // as such so nothing orphans the row while the share is offline.
@@ -94,6 +113,10 @@ class LocalFileResolver implements MediaSourceResolver {
 
     final ref = item.bookmarkRef;
     if (ref == null || ref.isEmpty) {
+      _log.warning(
+        'No usable localPath and no bookmarkRef; item ${item.id} '
+        'is unresolvable on this device',
+      );
       return const UnavailableData(kind: UnavailableKind.notFound);
     }
 
@@ -105,7 +128,8 @@ class LocalFileResolver implements MediaSourceResolver {
       try {
         final bytes = await _platform.readUriBytes(ref);
         return BytesData(bytes: bytes);
-      } catch (_) {
+      } catch (e) {
+        _log.warning('readUriBytes failed for item ${item.id}', error: e);
         return const UnavailableData(kind: UnavailableKind.notFound);
       }
       // coverage:ignore-end
@@ -114,6 +138,10 @@ class LocalFileResolver implements MediaSourceResolver {
     if (Platform.isIOS || Platform.isMacOS) {
       final blob = await _bookmarkStorage.read(ref);
       if (blob == null) {
+        _log.warning(
+          'Bookmark blob $ref missing from secure storage for '
+          'item ${item.id}',
+        );
         return const UnavailableData(kind: UnavailableKind.notFound);
       }
       try {
@@ -124,12 +152,28 @@ class LocalFileResolver implements MediaSourceResolver {
         // security scope when callers forget to invoke releaseBookmark.
         final bytes = await _platform.readBookmarkBytes(blob);
         return BytesData(bytes: bytes);
-      } catch (_) {
+      } catch (e) {
+        _log.warning('readBookmarkBytes failed for item ${item.id}', error: e);
         return const UnavailableData(kind: UnavailableKind.notFound);
       }
     }
 
     return const UnavailableData(kind: UnavailableKind.notFound);
+  }
+
+  /// True when [f] can actually be opened for reading. Complements the
+  /// exists() check in [resolve]: a sandboxed build can stat a user file it
+  /// is not allowed to open, and handing such a file to Image.file produces
+  /// a broken tile with no diagnosable error. An open/close round-trip is
+  /// cheap relative to decoding and runs only on the localFile resolve path.
+  Future<bool> _isReadable(File f) async {
+    try {
+      final raf = await f.open();
+      await raf.close();
+      return true;
+    } on FileSystemException {
+      return false;
+    }
   }
 
   @override

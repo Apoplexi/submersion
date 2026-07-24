@@ -273,6 +273,56 @@ void main() {
       expect(tmp.existsSync(), isFalse);
     },
   );
+  // Regression: a sandboxed macOS build can STAT a user file (~/Downloads)
+  // but not OPEN it — File.exists() returns true while any read throws
+  // EPERM. The resolver must probe readability, not existence, before
+  // taking the direct-file fast path; otherwise it returns FileData that
+  // Image.file can never load and the working security-scoped bookmark is
+  // never consulted. chmod 000 reproduces the same exists-but-unreadable
+  // split without a sandbox.
+  group('exists-but-unreadable localPath (sandbox)', () {
+    test(
+      'resolve falls back to the bookmark when localPath is unreadable',
+      () async {
+        if (!Platform.isMacOS) return;
+        final f = File('${tempDir.path}/locked.jpg')
+          ..writeAsBytesSync([1, 2, 3]);
+        await Process.run('chmod', ['000', f.path]);
+        addTearDown(() => Process.run('chmod', ['644', f.path]));
+
+        final platform = _StubPlatform()
+          ..onReadBookmarkBytes = ((blob) async =>
+              Uint8List.fromList([10, 20, 30]));
+        final r = LocalFileResolver(
+          bookmarkStorage: _StubBookmarkStorage(Uint8List.fromList([1, 2])),
+          platform: platform,
+          exifExtractor: ExifExtractor(),
+        );
+        final data = await r.resolve(
+          _localFile(localPath: f.path, bookmarkRef: 'ref-1'),
+        );
+        expect(data, isA<BytesData>());
+        expect((data as BytesData).bytes, [10, 20, 30]);
+      },
+    );
+
+    test(
+      'resolve reads unreadable localPath as Unavailable when no bookmark',
+      () async {
+        if (!Platform.isMacOS) return;
+        final f = File('${tempDir.path}/locked2.jpg')
+          ..writeAsBytesSync([1, 2, 3]);
+        await Process.run('chmod', ['000', f.path]);
+        addTearDown(() => Process.run('chmod', ['644', f.path]));
+
+        final r = _resolver();
+        final data = await r.resolve(_localFile(localPath: f.path));
+        expect(data, isA<UnavailableData>());
+        expect((data as UnavailableData).kind, UnavailableKind.notFound);
+      },
+    );
+  });
+
   group('volume awareness', () {
     LocalFileResolver volumeResolver({required bool volumeOnline}) =>
         LocalFileResolver(
