@@ -90,9 +90,35 @@ void main() {
     test('empty input yields empty output', () {
       expect(worstGaugePerType([]), isEmpty);
     });
+
+    test('a dated clock beats an undated one when tied on severity', () {
+      // The first-seen item is undated; the dated candidate must replace it,
+      // exercising the null-dueDate tie-break branch.
+      final result = worstGaugePerType([
+        _clocks(_item('Undated', EquipmentType.regulator), [
+          _status(ServiceClockSeverity.dueSoon),
+        ]),
+        _clocks(_item('Dated', EquipmentType.regulator), [
+          _status(ServiceClockSeverity.dueSoon, dueDate: DateTime(2026, 8, 1)),
+        ]),
+      ]);
+      expect(result.single.itemName, 'Dated');
+    });
   });
 
   group('dueGearGauges', () {
+    test('null due dates sort after dated clocks of equal severity', () {
+      final result = dueGearGauges([
+        _clocks(_item('Undated', EquipmentType.regulator), [
+          _status(ServiceClockSeverity.dueSoon),
+        ]),
+        _clocks(_item('Dated', EquipmentType.bcd), [
+          _status(ServiceClockSeverity.dueSoon, dueDate: DateTime(2026, 8, 1)),
+        ]),
+      ]);
+      expect(result.map((g) => g.itemName), ['Dated', 'Undated']);
+    });
+
     test('drops types whose worst clock is ok', () {
       final result = dueGearGauges([
         _clocks(_item('Reg', EquipmentType.regulator), [
