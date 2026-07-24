@@ -2951,9 +2951,6 @@ class AppLocalizationsPt extends AppLocalizations {
   String get dashboard_hero_statHours => 'horas';
 
   @override
-  String get dashboard_hero_statDeepest => 'prof. máx.';
-
-  @override
   String get dashboard_hero_statSites => 'locais';
 
   @override

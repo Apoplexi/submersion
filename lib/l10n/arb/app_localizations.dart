@@ -5052,12 +5052,6 @@ abstract class AppLocalizations {
   /// **'hours'**
   String get dashboard_hero_statHours;
 
-  /// No description provided for @dashboard_hero_statDeepest.
-  ///
-  /// In en, this message translates to:
-  /// **'deepest'**
-  String get dashboard_hero_statDeepest;
-
   /// No description provided for @dashboard_hero_statSites.
   ///
   /// In en, this message translates to:

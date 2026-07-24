@@ -2951,9 +2951,6 @@ class AppLocalizationsEs extends AppLocalizations {
   String get dashboard_hero_statHours => 'horas';
 
   @override
-  String get dashboard_hero_statDeepest => 'máx. prof.';
-
-  @override
   String get dashboard_hero_statSites => 'sitios';
 
   @override

@@ -2925,9 +2925,6 @@ class AppLocalizationsNl extends AppLocalizations {
   String get dashboard_hero_statHours => 'uur';
 
   @override
-  String get dashboard_hero_statDeepest => 'max. diepte';
-
-  @override
   String get dashboard_hero_statSites => 'stekken';
 
   @override

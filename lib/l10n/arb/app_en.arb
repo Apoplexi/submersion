@@ -1704,7 +1704,6 @@
   "dashboard_hero_diverFallbackName": "Diver",
   "dashboard_hero_statDives": "dives",
   "dashboard_hero_statHours": "hours",
-  "dashboard_hero_statDeepest": "deepest",
   "dashboard_hero_statSites": "sites",
   "dashboard_hero_statCountries": "countries",
   "dashboard_activityStats_divesInYear": "dives in {year}",

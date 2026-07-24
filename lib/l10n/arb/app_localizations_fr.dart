@@ -2960,9 +2960,6 @@ class AppLocalizationsFr extends AppLocalizations {
   String get dashboard_hero_statHours => 'heures';
 
   @override
-  String get dashboard_hero_statDeepest => 'prof. max';
-
-  @override
   String get dashboard_hero_statSites => 'sites';
 
   @override

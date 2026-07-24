@@ -2934,9 +2934,6 @@ class AppLocalizationsHu extends AppLocalizations {
   String get dashboard_hero_statHours => 'óra';
 
   @override
-  String get dashboard_hero_statDeepest => 'max. mélység';
-
-  @override
   String get dashboard_hero_statSites => 'helyszín';
 
   @override

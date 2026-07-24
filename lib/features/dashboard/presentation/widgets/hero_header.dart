@@ -2,12 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/core/presentation/widgets/ocean_background.dart';
-import 'package:submersion/core/utils/unit_formatter.dart';
 
 import 'package:submersion/features/dive_log/data/repositories/dive_repository_impl.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_providers.dart';
 import 'package:submersion/features/dashboard/presentation/providers/dashboard_providers.dart';
-import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:submersion/shared/widgets/master_detail/responsive_breakpoints.dart';
 
@@ -129,8 +127,8 @@ class HeroHeader extends ConsumerWidget {
               ExcludeSemantics(
                 child: Image.asset(
                   'assets/icon/icon.png',
-                  width: 80,
-                  height: 80,
+                  width: 56,
+                  height: 56,
                 ),
               ),
             ],
@@ -186,8 +184,6 @@ class _QuietStats extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final statsAsync = ref.watch(diveStatisticsProvider);
     final quickAsync = ref.watch(dashboardQuickStatsProvider);
-    final settings = ref.watch(settingsProvider);
-    final fmt = UnitFormatter(settings);
     final stats = statsAsync.valueOrNull;
     if (stats == null || stats.totalDives == 0) {
       return const SizedBox.shrink();
@@ -198,10 +194,6 @@ class _QuietStats extends ConsumerWidget {
     final items = <(String, String)>[
       ('${stats.totalDives}', context.l10n.dashboard_hero_statDives),
       ('$hours', context.l10n.dashboard_hero_statHours),
-      (
-        fmt.formatDepth(stats.maxDepth, decimals: 0),
-        context.l10n.dashboard_hero_statDeepest,
-      ),
       ('${stats.totalSites}', context.l10n.dashboard_hero_statSites),
       if (countries > 0)
         ('$countries', context.l10n.dashboard_hero_statCountries),

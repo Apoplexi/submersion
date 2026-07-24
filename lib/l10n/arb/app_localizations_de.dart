@@ -2960,9 +2960,6 @@ class AppLocalizationsDe extends AppLocalizations {
   String get dashboard_hero_statHours => 'Stunden';
 
   @override
-  String get dashboard_hero_statDeepest => 'max. Tiefe';
-
-  @override
   String get dashboard_hero_statSites => 'Tauchplätze';
 
   @override

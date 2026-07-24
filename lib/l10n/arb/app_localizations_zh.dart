@@ -2783,9 +2783,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get dashboard_hero_statHours => '小时';
 
   @override
-  String get dashboard_hero_statDeepest => '最大深度';
-
-  @override
   String get dashboard_hero_statSites => '潜点';
 
   @override

@@ -2884,9 +2884,6 @@ class AppLocalizationsAr extends AppLocalizations {
   String get dashboard_hero_statHours => 'ساعات';
 
   @override
-  String get dashboard_hero_statDeepest => 'أقصى عمق';
-
-  @override
   String get dashboard_hero_statSites => 'مواقع';
 
   @override
