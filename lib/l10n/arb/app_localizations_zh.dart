@@ -2857,6 +2857,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get dashboard_urgent_title => '需要注意';
 
   @override
+  String get dashboard_photos_title => '最近照片';
+
+  @override
   String get dashboard_milestones_title => '里程碑';
 
   @override

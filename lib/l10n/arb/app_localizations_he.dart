@@ -2935,6 +2935,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get dashboard_urgent_title => 'דורש תשומת לב';
 
   @override
+  String get dashboard_photos_title => 'תמונות אחרונות';
+
+  @override
   String get dashboard_milestones_title => 'אבני דרך';
 
   @override

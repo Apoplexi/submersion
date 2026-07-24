@@ -5606,6 +5606,7 @@
   "dashboard_gauges_noDivesYet": "Noch keine Tauchgänge",
   "dashboard_gauges_retry": "Status nicht verfügbar - zum Wiederholen tippen",
   "dashboard_urgent_title": "Braucht Aufmerksamkeit",
+  "dashboard_photos_title": "Aktuelle Fotos",
   "dashboard_milestones_title": "Meilensteine",
   "dashboard_milestones_nextDive": "Noch {remaining} Tauchgänge bis Nr. {milestone}",
   "dashboard_milestones_certYears": "{name}: {years} Jahre im {month}",

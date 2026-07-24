@@ -3035,6 +3035,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get dashboard_urgent_title => 'Braucht Aufmerksamkeit';
 
   @override
+  String get dashboard_photos_title => 'Aktuelle Fotos';
+
+  @override
   String get dashboard_milestones_title => 'Meilensteine';
 
   @override

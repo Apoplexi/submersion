@@ -5606,6 +5606,7 @@
   "dashboard_gauges_noDivesYet": "Ainda sem mergulhos",
   "dashboard_gauges_retry": "Estado indisponível - toque para tentar novamente",
   "dashboard_urgent_title": "Requer atenção",
+  "dashboard_photos_title": "Fotos recentes",
   "dashboard_milestones_title": "Marcos",
   "dashboard_milestones_nextDive": "{remaining} mergulhos para o n.º {milestone}",
   "dashboard_milestones_certYears": "{name}: {years} anos em {month}",

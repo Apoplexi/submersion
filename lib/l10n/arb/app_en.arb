@@ -1779,6 +1779,7 @@
   "dashboard_gauges_noDivesYet": "No dives yet",
   "dashboard_gauges_retry": "Status unavailable - tap to retry",
   "dashboard_urgent_title": "Needs attention",
+  "dashboard_photos_title": "Recent photos",
   "dashboard_milestones_title": "Milestones",
   "dashboard_milestones_nextDive": "{remaining} dives to #{milestone}",
   "@dashboard_milestones_nextDive": {

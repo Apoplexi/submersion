@@ -3010,6 +3010,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String get dashboard_urgent_title => 'Figyelmet igényel';
 
   @override
+  String get dashboard_photos_title => 'Legutóbbi fotók';
+
+  @override
   String get dashboard_milestones_title => 'Mérföldkövek';
 
   @override

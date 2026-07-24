@@ -3000,6 +3000,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get dashboard_urgent_title => 'Vereist aandacht';
 
   @override
+  String get dashboard_photos_title => 'Recente foto\'s';
+
+  @override
   String get dashboard_milestones_title => 'Mijlpalen';
 
   @override

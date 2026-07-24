@@ -5606,6 +5606,7 @@
   "dashboard_gauges_noDivesYet": "Nessuna immersione",
   "dashboard_gauges_retry": "Stato non disponibile - tocca per riprovare",
   "dashboard_urgent_title": "Richiede attenzione",
+  "dashboard_photos_title": "Foto recenti",
   "dashboard_milestones_title": "Traguardi",
   "dashboard_milestones_nextDive": "{remaining} immersioni alla n. {milestone}",
   "dashboard_milestones_certYears": "{name}: {years} anni a {month}",

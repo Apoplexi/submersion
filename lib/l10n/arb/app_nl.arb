@@ -5606,6 +5606,7 @@
   "dashboard_gauges_noDivesYet": "Nog geen duiken",
   "dashboard_gauges_retry": "Status niet beschikbaar - tik om opnieuw te proberen",
   "dashboard_urgent_title": "Vereist aandacht",
+  "dashboard_photos_title": "Recente foto's",
   "dashboard_milestones_title": "Mijlpalen",
   "dashboard_milestones_nextDive": "Nog {remaining} duiken tot nr. {milestone}",
   "dashboard_milestones_certYears": "{name}: {years} jaar in {month}",

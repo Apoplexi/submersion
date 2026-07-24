@@ -5606,6 +5606,7 @@
   "dashboard_gauges_noDivesYet": "Aucune plongée",
   "dashboard_gauges_retry": "Statut indisponible - touchez pour réessayer",
   "dashboard_urgent_title": "Attention requise",
+  "dashboard_photos_title": "Photos récentes",
   "dashboard_milestones_title": "Étapes",
   "dashboard_milestones_nextDive": "{remaining} plongées avant la n°{milestone}",
   "dashboard_milestones_certYears": "{name} : {years} ans en {month}",

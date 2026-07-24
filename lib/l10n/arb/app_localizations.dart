@@ -5172,6 +5172,12 @@ abstract class AppLocalizations {
   /// **'Needs attention'**
   String get dashboard_urgent_title;
 
+  /// No description provided for @dashboard_photos_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Recent photos'**
+  String get dashboard_photos_title;
+
   /// No description provided for @dashboard_milestones_title.
   ///
   /// In en, this message translates to:

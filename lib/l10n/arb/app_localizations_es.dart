@@ -3026,6 +3026,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get dashboard_urgent_title => 'Requiere atención';
 
   @override
+  String get dashboard_photos_title => 'Fotos recientes';
+
+  @override
   String get dashboard_milestones_title => 'Hitos';
 
   @override

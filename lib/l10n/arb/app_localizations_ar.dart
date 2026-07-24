@@ -2959,6 +2959,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get dashboard_urgent_title => 'يتطلب الانتباه';
 
   @override
+  String get dashboard_photos_title => 'أحدث الصور';
+
+  @override
   String get dashboard_milestones_title => 'الإنجازات';
 
   @override

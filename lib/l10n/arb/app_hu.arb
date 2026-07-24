@@ -5606,6 +5606,7 @@
   "dashboard_gauges_noDivesYet": "Még nincs merülés",
   "dashboard_gauges_retry": "Az állapot nem érhető el - koppints az újrapróbáláshoz",
   "dashboard_urgent_title": "Figyelmet igényel",
+  "dashboard_photos_title": "Legutóbbi fotók",
   "dashboard_milestones_title": "Mérföldkövek",
   "dashboard_milestones_nextDive": "Még {remaining} merülés a(z) {milestone}. eléréséig",
   "dashboard_milestones_certYears": "{name}: {years} év {month} hónapban",
