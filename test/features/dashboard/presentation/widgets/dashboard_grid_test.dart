@@ -8,11 +8,11 @@ void main() {
     tester.view.devicePixelRatio = 1.0;
     addTearDown(tester.view.reset);
     await tester.pumpWidget(
-      MaterialApp(
+      const MaterialApp(
         home: Scaffold(
           body: SingleChildScrollView(
             child: DashboardGrid(
-              entries: const [
+              entries: [
                 FullBlock(SizedBox(key: Key('hero'), height: 40)),
                 LeadSideGroup(
                   lead: SizedBox(key: Key('lead'), height: 120),
