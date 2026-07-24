@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/data/repositories/connected_accounts_repository.dart';
 import 'package:submersion/core/database/database.dart';
+import 'package:submersion/core/services/accounts/account_identity.dart';
 import 'package:submersion/core/services/accounts/account_kind.dart';
 
 import '../../../helpers/test_database.dart';
@@ -97,4 +98,64 @@ void main() {
       expect(tombstones, hasLength(1), reason: 'deletions sync via tombstones');
     },
   );
+
+  test('ensure is idempotent: two calls yield one row', () async {
+    final first = await repo.ensure(
+      kind: AccountKind.s3,
+      naturalKey: 'minio.local|dive-media|media/',
+      label: 'dive-media @ minio.local',
+    );
+    final second = await repo.ensure(
+      kind: AccountKind.s3,
+      naturalKey: 'minio.local|dive-media|media/',
+      label: 'dive-media @ minio.local',
+    );
+    expect(second.id, first.id);
+    expect((await repo.getAll()).length, 1);
+  });
+
+  test('ensure uses the deterministic id', () async {
+    final account = await repo.ensure(
+      kind: AccountKind.icloud,
+      naturalKey: 'icloud',
+      label: 'iCloud',
+    );
+    expect(
+      account.id,
+      accountIdFor(kind: AccountKind.icloud, naturalKey: 'icloud'),
+    );
+  });
+
+  test('ensure refreshes a drifted label in place', () async {
+    final first = await repo.ensure(
+      kind: AccountKind.s3,
+      naturalKey: 'minio.local|dive-media|media/',
+      label: 'old label',
+    );
+    final second = await repo.ensure(
+      kind: AccountKind.s3,
+      naturalKey: 'minio.local|dive-media|media/',
+      label: 'new label',
+    );
+    expect(second.id, first.id);
+    expect(second.label, 'new label');
+    final all = await repo.getAll();
+    expect(all.length, 1);
+    expect(all.single.label, 'new label');
+  });
+
+  test('ensure separates two prefixes in one bucket', () async {
+    final sync = await repo.ensure(
+      kind: AccountKind.s3,
+      naturalKey: 'minio.local|shared|submersion-sync/',
+      label: 'shared @ minio.local',
+    );
+    final media = await repo.ensure(
+      kind: AccountKind.s3,
+      naturalKey: 'minio.local|shared|media/',
+      label: 'shared @ minio.local',
+    );
+    expect(media.id, isNot(sync.id));
+    expect((await repo.getAll()).length, 2);
+  });
 }

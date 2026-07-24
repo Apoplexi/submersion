@@ -3,6 +3,7 @@ import 'package:uuid/uuid.dart';
 
 import 'package:submersion/core/data/repositories/sync_repository.dart';
 import 'package:submersion/core/database/database.dart';
+import 'package:submersion/core/services/accounts/account_identity.dart';
 import 'package:submersion/core/services/accounts/account_kind.dart';
 import 'package:submersion/core/services/accounts/connected_account.dart'
     as domain;
@@ -56,6 +57,30 @@ class ConnectedAccountsRepository {
       createdAt: DateTime.fromMillisecondsSinceEpoch(now, isUtc: true),
       updatedAt: DateTime.fromMillisecondsSinceEpoch(now, isUtc: true),
     );
+  }
+
+  /// Find-or-create by deterministic id.
+  ///
+  /// The id IS the dedup mechanism: it collides for the same endpoint on
+  /// every device, so sync's upsert-by-id merges rather than duplicating.
+  /// Callers on write paths must use this instead of [create]; [getByKind]
+  /// is a local-only query and cannot dedup a replicated table.
+  ///
+  /// A drifted [label] (renamed bucket, changed host spelling) is refreshed
+  /// in place rather than minting a row.
+  Future<domain.ConnectedAccount> ensure({
+    required AccountKind kind,
+    required String naturalKey,
+    required String label,
+  }) async {
+    final id = accountIdFor(kind: kind, naturalKey: naturalKey);
+    final existing = await getById(id);
+    if (existing == null) {
+      return create(kind: kind, label: label, id: id);
+    }
+    if (existing.label == label) return existing;
+    await updateLabels(id, label: label);
+    return existing.copyWith(label: label);
   }
 
   Future<List<domain.ConnectedAccount>> getAll() async {
