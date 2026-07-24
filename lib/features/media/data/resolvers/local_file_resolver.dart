@@ -43,14 +43,28 @@ class LocalFileResolver implements MediaSourceResolver {
     required ExifExtractor exifExtractor,
     VideoThumbnailService? videoThumbnails,
     VolumeStatus? volumeStatus,
+    bool Function()? usesSecurityScopedBookmarks,
   }) : _bookmarkStorage = bookmarkStorage,
        _platform = platform,
        _exifExtractor = exifExtractor,
        _videoThumbnails = videoThumbnails,
-       _volumeStatus = volumeStatus ?? VolumeStatus();
+       _volumeStatus = volumeStatus ?? VolumeStatus(),
+       _usesSecurityScopedBookmarks =
+           usesSecurityScopedBookmarks ??
+           (() => Platform.isIOS || Platform.isMacOS);
 
   final VideoThumbnailService? _videoThumbnails;
   final VolumeStatus _volumeStatus;
+
+  /// Whether this host resolves local files through security-scoped
+  /// bookmarks (iOS / macOS) rather than a plain path.
+  ///
+  /// Injectable for the same reason [VolumeStatus.directoryExists] is: the
+  /// unit shards run on Linux, so a hard `Platform.isMacOS` check would
+  /// leave the bookmark branch — the only path that can resolve a sandboxed
+  /// file, and the whole point of this resolver on Apple platforms —
+  /// unexecuted in CI. Production always gets the real check.
+  final bool Function() _usesSecurityScopedBookmarks;
   final _log = LoggerService.forClass(LocalFileResolver);
 
   @override
@@ -141,7 +155,7 @@ class LocalFileResolver implements MediaSourceResolver {
       // coverage:ignore-end
     }
 
-    if (Platform.isIOS || Platform.isMacOS) {
+    if (_usesSecurityScopedBookmarks()) {
       final blob = await _bookmarkStorage.read(ref);
       if (blob == null) {
         _log.warning(
