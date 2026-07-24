@@ -3013,6 +3013,24 @@ class AppLocalizationsHu extends AppLocalizations {
   String get dashboard_photos_title => 'Legutóbbi fotók';
 
   @override
+  String get dashboard_yearInReview_title => 'Idén';
+
+  @override
+  String dashboard_yearInReview_divesVs(int count, int previous) {
+    return '$count merülés (tavaly: $previous)';
+  }
+
+  @override
+  String dashboard_yearInReview_hours(String hours) {
+    return '$hours óra a víz alatt';
+  }
+
+  @override
+  String dashboard_yearInReview_maxDepth(String depth) {
+    return 'Legmélyebb: $depth';
+  }
+
+  @override
   String get dashboard_onThisDay_title => 'Ezen a napon';
 
   @override

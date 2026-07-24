@@ -1780,6 +1780,34 @@
   "dashboard_gauges_retry": "Status unavailable - tap to retry",
   "dashboard_urgent_title": "Needs attention",
   "dashboard_photos_title": "Recent photos",
+  "dashboard_yearInReview_title": "This year",
+  "dashboard_yearInReview_divesVs": "{count} dives (vs {previous} last year)",
+  "@dashboard_yearInReview_divesVs": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "previous": {
+        "type": "int"
+      }
+    }
+  },
+  "dashboard_yearInReview_hours": "{hours} hours underwater",
+  "@dashboard_yearInReview_hours": {
+    "placeholders": {
+      "hours": {
+        "type": "String"
+      }
+    }
+  },
+  "dashboard_yearInReview_maxDepth": "Deepest: {depth}",
+  "@dashboard_yearInReview_maxDepth": {
+    "placeholders": {
+      "depth": {
+        "type": "String"
+      }
+    }
+  },
   "dashboard_onThisDay_title": "On this day",
   "dashboard_onThisDay_entry": "{year} - {site}",
   "@dashboard_onThisDay_entry": {

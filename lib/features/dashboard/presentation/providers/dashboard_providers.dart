@@ -7,6 +7,7 @@ import 'package:submersion/features/divers/presentation/providers/diver_provider
 import 'package:submersion/features/equipment/presentation/providers/equipment_providers.dart';
 import 'package:submersion/features/safety/domain/services/no_fly_service.dart';
 import 'package:submersion/features/safety/presentation/providers/no_fly_providers.dart';
+import 'package:submersion/features/statistics/data/repositories/statistics_repository.dart';
 import 'package:submersion/features/statistics/presentation/providers/statistics_providers.dart';
 
 /// Dashboard alerts data class
@@ -217,6 +218,31 @@ final personalRecordsProvider = FutureProvider<PersonalRecords>((ref) async {
     mostVisitedSiteName: winners.mostVisitedSiteName,
     mostVisitedSiteCount: winners.mostVisitedSiteCount,
   );
+});
+
+/// This year vs last year, for the year-in-review card.
+class YearInReview {
+  final int year;
+  final YearStats current;
+  final YearStats previous;
+
+  const YearInReview({
+    required this.year,
+    required this.current,
+    required this.previous,
+  });
+}
+
+/// This year vs last year. Null when both years are empty.
+final yearInReviewProvider = FutureProvider<YearInReview?>((ref) async {
+  ref.watch(statisticsVersionProvider);
+  final repository = ref.watch(statisticsRepositoryProvider);
+  final diverId = ref.watch(currentDiverIdProvider);
+  final year = DateTime.now().year;
+  final current = await repository.getYearStats(year, diverId: diverId);
+  final previous = await repository.getYearStats(year - 1, diverId: diverId);
+  if (current.diveCount == 0 && previous.diveCount == 0) return null;
+  return YearInReview(year: year, current: current, previous: previous);
 });
 
 /// Dives from this month/day in prior years ("on this day").

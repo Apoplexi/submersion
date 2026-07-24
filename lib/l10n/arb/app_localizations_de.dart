@@ -3038,6 +3038,24 @@ class AppLocalizationsDe extends AppLocalizations {
   String get dashboard_photos_title => 'Aktuelle Fotos';
 
   @override
+  String get dashboard_yearInReview_title => 'Dieses Jahr';
+
+  @override
+  String dashboard_yearInReview_divesVs(int count, int previous) {
+    return '$count Tauchgänge (Vorjahr: $previous)';
+  }
+
+  @override
+  String dashboard_yearInReview_hours(String hours) {
+    return '$hours Stunden unter Wasser';
+  }
+
+  @override
+  String dashboard_yearInReview_maxDepth(String depth) {
+    return 'Tiefste: $depth';
+  }
+
+  @override
   String get dashboard_onThisDay_title => 'An diesem Tag';
 
   @override

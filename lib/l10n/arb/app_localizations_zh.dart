@@ -2860,6 +2860,24 @@ class AppLocalizationsZh extends AppLocalizations {
   String get dashboard_photos_title => '最近照片';
 
   @override
+  String get dashboard_yearInReview_title => '今年';
+
+  @override
+  String dashboard_yearInReview_divesVs(int count, int previous) {
+    return '$count 次潜水(去年 $previous 次)';
+  }
+
+  @override
+  String dashboard_yearInReview_hours(String hours) {
+    return '水下 $hours 小时';
+  }
+
+  @override
+  String dashboard_yearInReview_maxDepth(String depth) {
+    return '最深:$depth';
+  }
+
+  @override
   String get dashboard_onThisDay_title => '历史上的今天';
 
   @override

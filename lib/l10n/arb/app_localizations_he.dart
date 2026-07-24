@@ -2938,6 +2938,24 @@ class AppLocalizationsHe extends AppLocalizations {
   String get dashboard_photos_title => 'תמונות אחרונות';
 
   @override
+  String get dashboard_yearInReview_title => 'השנה';
+
+  @override
+  String dashboard_yearInReview_divesVs(int count, int previous) {
+    return '$count צלילות (לעומת $previous בשנה שעברה)';
+  }
+
+  @override
+  String dashboard_yearInReview_hours(String hours) {
+    return '$hours שעות מתחת למים';
+  }
+
+  @override
+  String dashboard_yearInReview_maxDepth(String depth) {
+    return 'העמוקה ביותר: $depth';
+  }
+
+  @override
   String get dashboard_onThisDay_title => 'ביום הזה';
 
   @override

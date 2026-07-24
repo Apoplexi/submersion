@@ -5178,6 +5178,30 @@ abstract class AppLocalizations {
   /// **'Recent photos'**
   String get dashboard_photos_title;
 
+  /// No description provided for @dashboard_yearInReview_title.
+  ///
+  /// In en, this message translates to:
+  /// **'This year'**
+  String get dashboard_yearInReview_title;
+
+  /// No description provided for @dashboard_yearInReview_divesVs.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} dives (vs {previous} last year)'**
+  String dashboard_yearInReview_divesVs(int count, int previous);
+
+  /// No description provided for @dashboard_yearInReview_hours.
+  ///
+  /// In en, this message translates to:
+  /// **'{hours} hours underwater'**
+  String dashboard_yearInReview_hours(String hours);
+
+  /// No description provided for @dashboard_yearInReview_maxDepth.
+  ///
+  /// In en, this message translates to:
+  /// **'Deepest: {depth}'**
+  String dashboard_yearInReview_maxDepth(String depth);
+
   /// No description provided for @dashboard_onThisDay_title.
   ///
   /// In en, this message translates to:
