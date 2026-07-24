@@ -1,7 +1,14 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/features/certifications/domain/entities/certification.dart';
+import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/features/dashboard/presentation/providers/milestone_providers.dart';
+import 'package:submersion/features/certifications/presentation/providers/certification_providers.dart';
+import 'package:submersion/features/dive_log/data/repositories/dive_repository_impl.dart';
+import 'package:submersion/features/dive_log/presentation/providers/dive_providers.dart';
+import 'package:submersion/features/divers/presentation/providers/diver_providers.dart';
+
+import '../../../../helpers/mock_providers.dart';
 
 Certification _cert(DateTime? issueDate, {String name = 'Open Water'}) =>
     Certification(
@@ -79,4 +86,85 @@ void main() {
       expect(result.first.certName, 'AOW');
     });
   });
+
+  group('milestonesProvider', () {
+    late ProviderContainer container;
+    var totalDives = 0;
+    var certs = <Certification>[];
+
+    setUp(() {
+      container = ProviderContainer(
+        overrides: [
+          currentDiverIdProvider.overrideWith(
+            (ref) => MockCurrentDiverIdNotifier(),
+          ),
+          certificationListNotifierProvider.overrideWith(
+            (ref) => _FakeCertificationListNotifier(AsyncValue.data(certs)),
+          ),
+          diveStatisticsProvider.overrideWith(
+            (ref) async => DiveStatistics(
+              totalDives: totalDives,
+              totalTimeSeconds: 0,
+              maxDepth: 0,
+              avgMaxDepth: 0,
+              totalSites: 0,
+            ),
+          ),
+        ],
+      );
+      addTearDown(container.dispose);
+    });
+
+    test('computes the next milestone and remaining dives', () async {
+      totalDives = 247;
+      final milestones = await container.read(milestonesProvider.future);
+
+      expect(milestones.nextMilestone, 250);
+      expect(milestones.divesRemaining, 3);
+      expect(milestones.isEmpty, isFalse);
+    });
+
+    test('is empty for a diver with no dives and no certifications', () async {
+      totalDives = 0;
+      certs = [];
+      final milestones = await container.read(milestonesProvider.future);
+
+      expect(milestones.nextMilestone, isNull);
+      expect(milestones.divesRemaining, isNull);
+      expect(milestones.anniversaries, isEmpty);
+      expect(milestones.isEmpty, isTrue);
+    });
+
+    test('carries upcoming certification anniversaries through', () async {
+      final now = DateTime.now();
+      totalDives = 0;
+      certs = [
+        _cert(
+          DateTime(
+            now.year - 10,
+            now.month,
+            now.day,
+          ).add(const Duration(days: 3)),
+          name: 'Open Water',
+        ),
+      ];
+      final milestones = await container.read(milestonesProvider.future);
+
+      expect(milestones.anniversaries.single.certName, 'Open Water');
+      expect(milestones.anniversaries.single.years, 10);
+      expect(milestones.isEmpty, isFalse);
+    });
+  });
+}
+
+/// Stands in for the real notifier, which loads from the database in its
+/// constructor. noSuchMethod forwarding satisfies the interface without
+/// implementing setters the provider under test never calls.
+class _FakeCertificationListNotifier
+    extends StateNotifier<AsyncValue<List<Certification>>>
+    implements CertificationListNotifier {
+  _FakeCertificationListNotifier(super.state);
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }

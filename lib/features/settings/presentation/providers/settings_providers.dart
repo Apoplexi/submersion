@@ -480,7 +480,7 @@ class AppSettings {
     this.diveDetailSections = DiveDetailSectionConfig.defaultSections,
     this.fullscreenTileOrder = const [],
     this.fullscreenHiddenTiles = const [],
-    this.hiddenHomeChips = const {},
+    this.hiddenHomeChips = const <String>{},
     this.fullscreenReadoutCardX,
     this.fullscreenReadoutCardY,
     this.perdixOverlayEnabled = false,

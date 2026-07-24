@@ -30,11 +30,16 @@ class UrgentBanner extends ConsumerWidget {
       if (alerts.insuranceExpired)
         context.l10n.dashboard_gauges_insuranceExpired,
     ];
+    // Send the tap where the listed problem is fixed: gear service when
+    // any clock is overdue, otherwise the insurance record.
+    final destination = overdue.isNotEmpty
+        ? '/gear'
+        : '/settings/diver-profile/insurance';
     return Card(
       margin: EdgeInsets.zero,
       color: scheme.errorContainer,
       child: InkWell(
-        onTap: () => context.go('/gear'),
+        onTap: () => context.go(destination),
         child: Padding(
           padding: const EdgeInsets.all(12),
           child: Row(

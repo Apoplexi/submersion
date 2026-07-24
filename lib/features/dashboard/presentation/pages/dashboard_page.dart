@@ -32,13 +32,13 @@ class DashboardPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // Conditional-block gating: include a block while loading (the card
-    // renders its own placeholder/shrink) or when it has content; exclude
-    // it once it has definitively resolved to empty, so the grid backfills
-    // without phantom spacing. Errors resolve to hidden for conditional
-    // blocks; always-on blocks contain their own error state.
+    // Conditional-block gating: a block is included only once its provider
+    // has resolved to content. Loading and error both resolve to excluded,
+    // because these cards render SizedBox.shrink() when they have nothing
+    // to show and a zero-height block would still consume a grid row gap
+    // (phantom spacing). Always-on blocks contain their own error state.
     bool show<T>(AsyncValue<T> value, bool Function(T data) hasContent) =>
-        value.maybeWhen(data: hasContent, orElse: () => value.isLoading);
+        value.maybeWhen(data: hasContent, orElse: () => false);
 
     final alerts = ref.watch(dashboardAlertsProvider);
     final milestones = ref.watch(milestonesProvider);

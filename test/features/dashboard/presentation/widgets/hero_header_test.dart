@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/providers/provider.dart';
@@ -227,6 +229,75 @@ void main() {
           find.textContaining('Good afternoon').evaluate().isNotEmpty ||
           find.textContaining('Good evening').evaluate().isNotEmpty;
       expect(hasGreeting, isTrue);
+    });
+
+    testWidgets('falls back to a plain greeting while the diver loads', (
+      tester,
+    ) async {
+      tester.view.physicalSize = const Size(500, 900);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.reset);
+      final overrides = await getBaseOverrides();
+      final diverCompleter = Completer<Diver?>();
+      addTearDown(() => diverCompleter.complete(null));
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            ...overrides,
+            divesProvider.overrideWith((ref) async => <Dive>[]),
+            diveStatisticsProvider.overrideWith(
+              (ref) => Completer<DiveStatistics>().future,
+            ),
+            currentDiverProvider.overrideWith((ref) => diverCompleter.future),
+          ].cast(),
+          child: const MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: Scaffold(body: SingleChildScrollView(child: HeroHeader())),
+          ),
+        ),
+      );
+      for (int i = 0; i < 5; i++) {
+        await tester.pump(const Duration(milliseconds: 100));
+      }
+
+      // Greeting renders without a name, and the stats line shows its
+      // loading copy.
+      expect(find.textContaining('Diver'), findsNothing);
+      expect(find.text('Loading your dive stats...'), findsOneWidget);
+    });
+
+    testWidgets('shows error copy when the providers fail', (tester) async {
+      tester.view.physicalSize = const Size(500, 900);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.reset);
+      final overrides = await getBaseOverrides();
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            ...overrides,
+            divesProvider.overrideWith((ref) async => <Dive>[]),
+            diveStatisticsProvider.overrideWith(
+              (ref) async => throw StateError('stats boom'),
+            ),
+            currentDiverProvider.overrideWith(
+              (ref) async => throw StateError('diver boom'),
+            ),
+          ].cast(),
+          child: const MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: Scaffold(body: SingleChildScrollView(child: HeroHeader())),
+          ),
+        ),
+      );
+      for (int i = 0; i < 5; i++) {
+        await tester.pump(const Duration(milliseconds: 100));
+      }
+
+      expect(find.text('Ready to explore the depths?'), findsOneWidget);
     });
   });
 }

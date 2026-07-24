@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
@@ -29,6 +31,9 @@ import 'package:submersion/l10n/arb/app_localizations.dart';
 
 import '../../../../helpers/mock_providers.dart';
 
+/// Counts how many times a refreshed provider was rebuilt.
+int refreshBuilds = 0;
+
 Future<void> pumpDashboard(
   WidgetTester tester, {
   DashboardMilestones? milestones,
@@ -37,6 +42,7 @@ Future<void> pumpDashboard(
   YearInReview? yearInReview,
   List<RecentSitePin> sites = const [],
 }) async {
+  refreshBuilds = 0;
   final overrides = await getBaseOverrides();
   final router = GoRouter(
     routes: [
@@ -50,7 +56,10 @@ Future<void> pumpDashboard(
       overrides: [
         ...overrides,
         currentDiverProvider.overrideWith((ref) async => null),
-        recentDivesProvider.overrideWith((ref) async => <Dive>[]),
+        recentDivesProvider.overrideWith((ref) async {
+          refreshBuilds++;
+          return <Dive>[];
+        }),
         diveStatisticsProvider.overrideWith(
           (ref) async => DiveStatistics(
             totalDives: 0,
@@ -123,6 +132,25 @@ void main() {
     expect(find.byType(OnThisDayCard), findsNothing);
     expect(find.byType(YearInReviewCard), findsNothing);
     expect(find.byType(RecentSitesMapCard), findsNothing);
+  });
+
+  testWidgets('pull-to-refresh refetches the dashboard providers', (
+    tester,
+  ) async {
+    await pumpDashboard(tester);
+
+    // Providers are counted through the shared build counter below; showing
+    // the indicator runs onRefresh directly, which is what a drag does.
+    final indicator = tester.state<RefreshIndicatorState>(
+      find.byType(RefreshIndicator),
+    );
+    unawaited(indicator.show());
+    for (var i = 0; i < 10; i++) {
+      await tester.pump(const Duration(milliseconds: 100));
+    }
+
+    expect(refreshBuilds, greaterThan(1));
+    expect(tester.takeException(), isNull);
   });
 
   testWidgets('renders without layout errors at phone width', (tester) async {

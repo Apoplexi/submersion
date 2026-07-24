@@ -75,7 +75,10 @@ class MediaRepository {
   }
 
   /// Newest photos across all dives, ordered by takenAt descending.
-  /// Videos and signatures are excluded. Backs the dashboard photo ribbon.
+  /// Videos and signatures are excluded, as are photos not attached to a
+  /// dive (the dashboard ribbon links each tile to its dive, so an
+  /// unattached photo would render as a dead tile). Backs the dashboard
+  /// photo ribbon.
   Future<List<domain.MediaItem>> getRecentPhotos({int limit = 12}) async {
     try {
       final query =
@@ -87,8 +90,9 @@ class MediaRepository {
             ])
             ..where(
               _db.media.fileType.equals(
-                _mediaTypeToString(domain.MediaType.photo),
-              ),
+                    _mediaTypeToString(domain.MediaType.photo),
+                  ) &
+                  _db.media.diveId.isNotNull(),
             )
             ..orderBy([OrderingTerm.desc(_db.media.takenAt)])
             ..limit(limit);
