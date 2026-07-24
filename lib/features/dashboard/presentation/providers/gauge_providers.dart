@@ -78,7 +78,28 @@ List<GearGauge> worstGaugePerType(List<EquipmentClocks> clocks) {
   return best.values.toList();
 }
 
-/// Always-on gauges: worst gear clock per type, insurance, no-fly,
+/// Gear chips actually shown on the strip: only types whose worst clock
+/// is due soon or overdue, worst first (overdue before due-soon, then
+/// earliest due date, undated last), capped at [cap].
+List<GearGauge> dueGearGauges(List<EquipmentClocks> clocks, {int cap = 6}) {
+  final due = worstGaugePerType(
+    clocks,
+  ).where((g) => g.status.severity != ServiceClockSeverity.ok).toList();
+  due.sort((a, b) {
+    final bySeverity =
+        _severityRank(b.status.severity) - _severityRank(a.status.severity);
+    if (bySeverity != 0) return bySeverity;
+    final ad = a.status.dueDate;
+    final bd = b.status.dueDate;
+    if (ad == null && bd == null) return 0;
+    if (ad == null) return 1;
+    if (bd == null) return -1;
+    return ad.compareTo(bd);
+  });
+  return due.take(cap).toList();
+}
+
+/// Always-on gauges: due/overdue gear clocks (capped), insurance, no-fly,
 /// days since last dive.
 final dashboardGaugesProvider = FutureProvider<DashboardGauges>((ref) async {
   final clocks = await ref.watch(activeEquipmentClocksProvider.future);
@@ -87,7 +108,7 @@ final dashboardGaugesProvider = FutureProvider<DashboardGauges>((ref) async {
   final daysSince = await ref.watch(daysSinceLastDiveProvider.future);
 
   return DashboardGauges(
-    gearGauges: worstGaugePerType(clocks),
+    gearGauges: dueGearGauges(clocks),
     hasGear: clocks.isNotEmpty,
     insurance: diver?.insurance,
     noFlyStatus: noFly,

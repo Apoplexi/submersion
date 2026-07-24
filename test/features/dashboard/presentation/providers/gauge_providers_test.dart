@@ -91,4 +91,70 @@ void main() {
       expect(worstGaugePerType([]), isEmpty);
     });
   });
+
+  group('dueGearGauges', () {
+    test('drops types whose worst clock is ok', () {
+      final result = dueGearGauges([
+        _clocks(_item('Reg', EquipmentType.regulator), [
+          _status(ServiceClockSeverity.ok),
+        ]),
+        _clocks(_item('BCD', EquipmentType.bcd), [
+          _status(ServiceClockSeverity.dueSoon, dueDate: DateTime(2026, 8, 1)),
+        ]),
+      ]);
+      expect(result.map((g) => g.itemName), ['BCD']);
+    });
+
+    test('sorts overdue before due-soon, then earliest due date', () {
+      final result = dueGearGauges([
+        _clocks(_item('Soon-late', EquipmentType.bcd), [
+          _status(ServiceClockSeverity.dueSoon, dueDate: DateTime(2026, 9, 1)),
+        ]),
+        _clocks(_item('Overdue', EquipmentType.regulator), [
+          _status(ServiceClockSeverity.overdue, dueDate: DateTime(2026, 6, 1)),
+        ]),
+        _clocks(_item('Soon-early', EquipmentType.computer), [
+          _status(ServiceClockSeverity.dueSoon, dueDate: DateTime(2026, 8, 1)),
+        ]),
+      ]);
+      expect(result.map((g) => g.itemName), [
+        'Overdue',
+        'Soon-early',
+        'Soon-late',
+      ]);
+    });
+
+    test('caps the list', () {
+      final types = [
+        EquipmentType.regulator,
+        EquipmentType.bcd,
+        EquipmentType.computer,
+        EquipmentType.transmitter,
+        EquipmentType.drysuit,
+        EquipmentType.wetsuit,
+        EquipmentType.light,
+        EquipmentType.camera,
+      ];
+      final result = dueGearGauges([
+        for (var i = 0; i < types.length; i++)
+          _clocks(_item('Item $i', types[i]), [
+            _status(
+              ServiceClockSeverity.dueSoon,
+              dueDate: DateTime(2026, 8, 1 + i),
+            ),
+          ]),
+      ]);
+      expect(result, hasLength(6));
+      expect(result.first.itemName, 'Item 0');
+    });
+
+    test('all-ok gear yields empty list', () {
+      final result = dueGearGauges([
+        _clocks(_item('Reg', EquipmentType.regulator), [
+          _status(ServiceClockSeverity.ok),
+        ]),
+      ]);
+      expect(result, isEmpty);
+    });
+  });
 }
