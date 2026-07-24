@@ -321,6 +321,32 @@ void main() {
         expect((data as UnavailableData).kind, UnavailableKind.notFound);
       },
     );
+
+    // The bytes are still on disk, so the re-verify sweep must not flag the
+    // row "missing from device" — that state is sticky and misleading, and a
+    // re-granted permission restores the file with no user action.
+    test('verify reports transientError (not notFound) for a present but '
+        'unreadable file', () async {
+      if (!Platform.isMacOS) return;
+      final f = File('${tempDir.path}/locked3.jpg')
+        ..writeAsBytesSync([1, 2, 3]);
+      await Process.run('chmod', ['000', f.path]);
+      addTearDown(() => Process.run('chmod', ['644', f.path]));
+
+      final r = _resolver();
+      expect(
+        await r.verify(_localFile(localPath: f.path)),
+        VerifyResult.transientError,
+      );
+    });
+
+    test('verify still reports notFound for a genuinely absent file', () async {
+      final r = _resolver();
+      expect(
+        await r.verify(_localFile(localPath: '${tempDir.path}/gone.jpg')),
+        VerifyResult.notFound,
+      );
+    });
   });
 
   group('volume awareness', () {

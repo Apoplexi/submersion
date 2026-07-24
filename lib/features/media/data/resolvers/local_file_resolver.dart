@@ -242,8 +242,29 @@ class LocalFileResolver implements MediaSourceResolver {
   Future<VerifyResult> verify(MediaItem item) async {
     final data = await resolve(item);
     if (data is! UnavailableData) return VerifyResult.available;
-    return data.kind == UnavailableKind.volumeOffline
-        ? VerifyResult.volumeOffline
-        : VerifyResult.notFound;
+    if (data.kind == UnavailableKind.volumeOffline) {
+      return VerifyResult.volumeOffline;
+    }
+    // A file that is present but unreadable (sandbox denial, revoked
+    // permission) is not a dead pointer: the bytes are still on disk and a
+    // re-grant restores access. Reporting notFound here would let the
+    // re-verify sweep flag the row "missing from device", which is both
+    // wrong and sticky. transientError updates lastVerifiedAt without
+    // touching the orphan flag.
+    final localPath = item.localPath ?? item.filePath;
+    if (localPath != null && localPath.isNotEmpty) {
+      try {
+        if (await File(localPath).exists()) return VerifyResult.transientError;
+      }
+      // coverage:ignore-start
+      // Only reachable when exists() itself throws (permission/FS error),
+      // which flutter_test's tmpdir fixtures do not produce. Falling through
+      // to notFound matches the pre-existing behaviour.
+      on FileSystemException {
+        // Fall through to notFound.
+      }
+      // coverage:ignore-end
+    }
+    return VerifyResult.notFound;
   }
 }
