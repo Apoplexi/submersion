@@ -5822,6 +5822,8 @@
   "settings_mediaStorage_transfers_state_deleting": "Suppression du cloud",
   "settings_mediaStorage_transfers_state_done": "Terminé",
   "settings_mediaStorage_transfers_state_failed": "Échec",
+  "settings_mediaStorage_transfers_queued": "{count} en file",
+  "settings_mediaStorage_transfers_waitingRetry": "{count} en attente de nouvelle tentative",
   "settings_mediaStorage_verify_action": "Vérifier la bibliothèque",
   "settings_mediaStorage_verify_running": "Vérification de la médiathèque...",
   "settings_mediaStorage_verify_summary": "{checked} objets vérifiés : {removed} orphelins supprimés, {repaired} réparations en file, {aborted} envois périmés annulés",

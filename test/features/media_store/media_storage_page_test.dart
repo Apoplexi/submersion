@@ -12,6 +12,7 @@ import 'package:submersion/features/media_store/data/media_store_service.dart';
 import 'package:submersion/features/media_store/data/media_verify_service.dart';
 import 'package:submersion/features/media_store/data/media_stores_repository.dart';
 import 'package:submersion/features/media_store/data/media_transfer_queue_repository.dart';
+import 'package:submersion/features/media_store/domain/media_transfer_summary.dart';
 import 'package:submersion/features/media_store/presentation/pages/media_storage_page.dart';
 import 'package:submersion/features/media_store/presentation/providers/media_store_providers.dart';
 import 'package:submersion/features/settings/presentation/providers/sync_providers.dart';
@@ -126,7 +127,7 @@ void main() {
   Widget app({
     bool apple = true,
     String? statusHint,
-    int activeCount = 0,
+    MediaTransferSummary summary = const MediaTransferSummary(),
     // Riverpod 3 does not export the Override type; mirror the
     // weight_planner_page_test precedent.
     List<dynamic> extraOverrides = const [],
@@ -139,9 +140,7 @@ void main() {
       mediaStoreServiceProvider.overrideWithValue(service),
       mediaBackfillServiceProvider.overrideWithValue(backfill),
       mediaStoreStatusHintProvider.overrideWith((ref) async => statusHint),
-      mediaTransferActiveCountProvider.overrideWith(
-        (ref) => Stream.value(activeCount),
-      ),
+      mediaTransferSummaryProvider.overrideWith((ref) => Stream.value(summary)),
       isApplePlatformProvider.overrideWithValue(apple),
       // Last, so callers can genuinely override any of the defaults above.
       // (Plain spread: dynamic elements implicitly cast, and Riverpod 3
@@ -405,7 +404,10 @@ void main() {
     addTearDown(tester.view.reset);
     await tester.runAsync(() async {
       await tester.pumpWidget(
-        app(statusHint: 'dive-media @ minio', activeCount: 3),
+        app(
+          statusHint: 'dive-media @ minio',
+          summary: const MediaTransferSummary(transferring: 3),
+        ),
       );
       // Pump until the active-count stream has propagated.
       for (var i = 0; i < 20; i++) {
@@ -974,8 +976,8 @@ void main() {
             mediaStoreStatusHintProvider.overrideWith(
               (ref) async => 'dive-media @ minio',
             ),
-            mediaTransferActiveCountProvider.overrideWith(
-              (ref) => Stream.value(0),
+            mediaTransferSummaryProvider.overrideWith(
+              (ref) => Stream.value(const MediaTransferSummary()),
             ),
             isApplePlatformProvider.overrideWithValue(false),
             isLinuxPlatformProvider.overrideWithValue(true),

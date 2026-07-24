@@ -20457,6 +20457,16 @@ class AppLocalizationsPt extends AppLocalizations {
   String get settings_mediaStorage_transfers_state_failed => 'Falhou';
 
   @override
+  String settings_mediaStorage_transfers_queued(int count) {
+    return '$count na fila';
+  }
+
+  @override
+  String settings_mediaStorage_transfers_waitingRetry(int count) {
+    return '$count aguardando nova tentativa';
+  }
+
+  @override
   String get settings_mediaStorage_verify_action => 'Verificar biblioteca';
 
   @override
