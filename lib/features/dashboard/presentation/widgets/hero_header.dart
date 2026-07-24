@@ -52,7 +52,7 @@ class HeroHeader extends ConsumerWidget {
                             greeting,
                             name,
                           ),
-                          style: theme.textTheme.headlineSmall?.copyWith(
+                          style: theme.textTheme.titleLarge?.copyWith(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
                           ),
@@ -62,7 +62,7 @@ class HeroHeader extends ConsumerWidget {
                         context.l10n.dashboard_greeting_withoutName(
                           _getGreeting(context),
                         ),
-                        style: theme.textTheme.headlineSmall?.copyWith(
+                        style: theme.textTheme.titleLarge?.copyWith(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
                         ),
@@ -71,7 +71,7 @@ class HeroHeader extends ConsumerWidget {
                         context.l10n.dashboard_greeting_withoutName(
                           _getGreeting(context),
                         ),
-                        style: theme.textTheme.headlineSmall?.copyWith(
+                        style: theme.textTheme.titleLarge?.copyWith(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
                         ),
@@ -128,8 +128,8 @@ class HeroHeader extends ConsumerWidget {
               ExcludeSemantics(
                 child: Image.asset(
                   'assets/icon/icon.png',
-                  width: 56,
-                  height: 56,
+                  width: 64,
+                  height: 64,
                 ),
               ),
             ],
