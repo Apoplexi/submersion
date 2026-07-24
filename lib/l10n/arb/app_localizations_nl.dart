@@ -2990,6 +2990,96 @@ class AppLocalizationsNl extends AppLocalizations {
   String get dashboard_gauges_noDivesYet => 'Nog geen duiken';
 
   @override
+  String get settings_homeChips_pageTitle => 'Statuschips van start';
+
+  @override
+  String get settings_homeChips_description =>
+      'Kies welke statuschips bovenaan het tabblad Start verschijnen.';
+
+  @override
+  String get settings_homeChips_gear => 'Uitrustingsonderhoud';
+
+  @override
+  String get settings_homeChips_insurance => 'Verzekering';
+
+  @override
+  String get settings_homeChips_noFly => 'Vliegverbod-timer';
+
+  @override
+  String get settings_homeChips_lastDive => 'Duikactualiteit';
+
+  @override
+  String get settings_homeChips_certifications => 'Verloop van certificeringen';
+
+  @override
+  String get settings_homeChips_trip => 'Aankomende reis';
+
+  @override
+  String get settings_homeChips_checklist => 'Actieve checklist';
+
+  @override
+  String get settings_homeChips_course => 'Cursusvoortgang';
+
+  @override
+  String get settings_homeChips_uploads => 'Media-uploads';
+
+  @override
+  String get settings_homeChips_backup => 'Back-upleeftijd';
+
+  @override
+  String get settings_homeChips_sync => 'Synchronisatiestatus';
+
+  @override
+  String get settings_homeChips_dataQuality => 'Datakwaliteit';
+
+  @override
+  String dashboard_gauges_certsExpiring(int count) {
+    return '$count certificeringen verlopen bijna';
+  }
+
+  @override
+  String dashboard_gauges_tripCountdown(String name, int days) {
+    return '$name over ${days}d';
+  }
+
+  @override
+  String get dashboard_gauges_checklistActive => 'Checklist actief';
+
+  @override
+  String dashboard_gauges_courseProgress(String name, int done, int total) {
+    return '$name: $done/$total';
+  }
+
+  @override
+  String dashboard_gauges_uploadsPending(int count) {
+    return '$count uploads in wachtrij';
+  }
+
+  @override
+  String get dashboard_gauges_backupNone => 'Nog geen back-up';
+
+  @override
+  String get dashboard_gauges_backupToday => 'Vandaag geback-upt';
+
+  @override
+  String dashboard_gauges_backupDays(int days) {
+    return 'Back-up ${days}d geleden';
+  }
+
+  @override
+  String dashboard_gauges_syncPending(int count) {
+    return '$count niet gesynchroniseerd';
+  }
+
+  @override
+  String get dashboard_gauges_synced => 'Gesynchroniseerd';
+
+  @override
+  String dashboard_gauges_dataIssues(int count) {
+    return '$count dataproblemen';
+  }
+
+  @override
   String get dashboard_gauges_retry =>
       'Status niet beschikbaar - tik om opnieuw te proberen';
 

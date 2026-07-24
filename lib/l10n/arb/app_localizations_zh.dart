@@ -2848,6 +2848,95 @@ class AppLocalizationsZh extends AppLocalizations {
   String get dashboard_gauges_noDivesYet => '暂无潜水记录';
 
   @override
+  String get settings_homeChips_pageTitle => '主页状态标签';
+
+  @override
+  String get settings_homeChips_description => '选择主页顶部显示哪些状态标签。';
+
+  @override
+  String get settings_homeChips_gear => '装备保养';
+
+  @override
+  String get settings_homeChips_insurance => '保险';
+
+  @override
+  String get settings_homeChips_noFly => '禁飞计时';
+
+  @override
+  String get settings_homeChips_lastDive => '潜水近期度';
+
+  @override
+  String get settings_homeChips_certifications => '证书到期';
+
+  @override
+  String get settings_homeChips_trip => '即将出行';
+
+  @override
+  String get settings_homeChips_checklist => '进行中的清单';
+
+  @override
+  String get settings_homeChips_course => '课程进度';
+
+  @override
+  String get settings_homeChips_uploads => '媒体上传';
+
+  @override
+  String get settings_homeChips_backup => '备份时间';
+
+  @override
+  String get settings_homeChips_sync => '同步状态';
+
+  @override
+  String get settings_homeChips_dataQuality => '数据质量';
+
+  @override
+  String dashboard_gauges_certsExpiring(int count) {
+    return '$count 个证书即将到期';
+  }
+
+  @override
+  String dashboard_gauges_tripCountdown(String name, int days) {
+    return '$name 还有 $days 天';
+  }
+
+  @override
+  String get dashboard_gauges_checklistActive => '检查清单进行中';
+
+  @override
+  String dashboard_gauges_courseProgress(String name, int done, int total) {
+    return '$name:$done/$total';
+  }
+
+  @override
+  String dashboard_gauges_uploadsPending(int count) {
+    return '$count 个上传待处理';
+  }
+
+  @override
+  String get dashboard_gauges_backupNone => '尚无备份';
+
+  @override
+  String get dashboard_gauges_backupToday => '今天已备份';
+
+  @override
+  String dashboard_gauges_backupDays(int days) {
+    return '$days 天前备份';
+  }
+
+  @override
+  String dashboard_gauges_syncPending(int count) {
+    return '$count 条未同步';
+  }
+
+  @override
+  String get dashboard_gauges_synced => '已同步';
+
+  @override
+  String dashboard_gauges_dataIssues(int count) {
+    return '$count 个数据问题';
+  }
+
+  @override
   String get dashboard_gauges_retry => '状态不可用 - 点按重试';
 
   @override

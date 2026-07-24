@@ -155,6 +155,17 @@ class _MockSettingsNotifier extends StateNotifier<AppSettings>
   Future<void> setNoFlyPreset(NoFlyPreset preset) async =>
       state = state.copyWith(noFlyPreset: preset);
   @override
+  Future<void> setHomeChipEnabled(String chipId, bool enabled) async {
+    final hidden = {...state.hiddenHomeChips};
+    if (enabled) {
+      hidden.remove(chipId);
+    } else {
+      hidden.add(chipId);
+    }
+    state = state.copyWith(hiddenHomeChips: hidden);
+  }
+
+  @override
   Future<void> setSafetyRuleEnabled(SafetyRuleId rule, bool enabled) async {
     final rules = {...state.safetyReviewDisabledRules};
     if (enabled) {
@@ -780,6 +791,8 @@ void main() {
       await tester.pumpAndSettle();
 
       // The hub view should show Sections with entries like "Dives"
+      // (scroll down first: the sections card sits below the fold).
+      await tester.scrollUntilVisible(find.text('Dives'), 100);
       expect(find.text('Dives'), findsOneWidget);
       expect(find.text('Sites'), findsOneWidget);
 
@@ -799,7 +812,8 @@ void main() {
       await tester.pumpWidget(buildAppearanceWidget(getOverrides()));
       await tester.pumpAndSettle();
 
-      // Navigate into Dives section
+      // Navigate into Dives section (scroll it into view first)
+      await tester.scrollUntilVisible(find.text('Dives'), 100);
       await tester.tap(find.text('Dives'));
       await tester.pumpAndSettle();
 

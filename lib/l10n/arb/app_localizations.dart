@@ -5154,6 +5154,156 @@ abstract class AppLocalizations {
   /// **'No dives yet'**
   String get dashboard_gauges_noDivesYet;
 
+  /// No description provided for @settings_homeChips_pageTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Home status chips'**
+  String get settings_homeChips_pageTitle;
+
+  /// No description provided for @settings_homeChips_description.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose which status chips appear at the top of the Home tab.'**
+  String get settings_homeChips_description;
+
+  /// No description provided for @settings_homeChips_gear.
+  ///
+  /// In en, this message translates to:
+  /// **'Gear service'**
+  String get settings_homeChips_gear;
+
+  /// No description provided for @settings_homeChips_insurance.
+  ///
+  /// In en, this message translates to:
+  /// **'Insurance'**
+  String get settings_homeChips_insurance;
+
+  /// No description provided for @settings_homeChips_noFly.
+  ///
+  /// In en, this message translates to:
+  /// **'No-fly timer'**
+  String get settings_homeChips_noFly;
+
+  /// No description provided for @settings_homeChips_lastDive.
+  ///
+  /// In en, this message translates to:
+  /// **'Dive currency'**
+  String get settings_homeChips_lastDive;
+
+  /// No description provided for @settings_homeChips_certifications.
+  ///
+  /// In en, this message translates to:
+  /// **'Certification expiry'**
+  String get settings_homeChips_certifications;
+
+  /// No description provided for @settings_homeChips_trip.
+  ///
+  /// In en, this message translates to:
+  /// **'Upcoming trip'**
+  String get settings_homeChips_trip;
+
+  /// No description provided for @settings_homeChips_checklist.
+  ///
+  /// In en, this message translates to:
+  /// **'Active checklist'**
+  String get settings_homeChips_checklist;
+
+  /// No description provided for @settings_homeChips_course.
+  ///
+  /// In en, this message translates to:
+  /// **'Course progress'**
+  String get settings_homeChips_course;
+
+  /// No description provided for @settings_homeChips_uploads.
+  ///
+  /// In en, this message translates to:
+  /// **'Media uploads'**
+  String get settings_homeChips_uploads;
+
+  /// No description provided for @settings_homeChips_backup.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup age'**
+  String get settings_homeChips_backup;
+
+  /// No description provided for @settings_homeChips_sync.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync status'**
+  String get settings_homeChips_sync;
+
+  /// No description provided for @settings_homeChips_dataQuality.
+  ///
+  /// In en, this message translates to:
+  /// **'Data quality'**
+  String get settings_homeChips_dataQuality;
+
+  /// No description provided for @dashboard_gauges_certsExpiring.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} certifications expiring'**
+  String dashboard_gauges_certsExpiring(int count);
+
+  /// No description provided for @dashboard_gauges_tripCountdown.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} in {days}d'**
+  String dashboard_gauges_tripCountdown(String name, int days);
+
+  /// No description provided for @dashboard_gauges_checklistActive.
+  ///
+  /// In en, this message translates to:
+  /// **'Checklist in progress'**
+  String get dashboard_gauges_checklistActive;
+
+  /// No description provided for @dashboard_gauges_courseProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'{name}: {done}/{total}'**
+  String dashboard_gauges_courseProgress(String name, int done, int total);
+
+  /// No description provided for @dashboard_gauges_uploadsPending.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} uploads pending'**
+  String dashboard_gauges_uploadsPending(int count);
+
+  /// No description provided for @dashboard_gauges_backupNone.
+  ///
+  /// In en, this message translates to:
+  /// **'No backup yet'**
+  String get dashboard_gauges_backupNone;
+
+  /// No description provided for @dashboard_gauges_backupToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Backed up today'**
+  String get dashboard_gauges_backupToday;
+
+  /// No description provided for @dashboard_gauges_backupDays.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup {days}d ago'**
+  String dashboard_gauges_backupDays(int days);
+
+  /// No description provided for @dashboard_gauges_syncPending.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} unsynced'**
+  String dashboard_gauges_syncPending(int count);
+
+  /// No description provided for @dashboard_gauges_synced.
+  ///
+  /// In en, this message translates to:
+  /// **'Synced'**
+  String get dashboard_gauges_synced;
+
+  /// No description provided for @dashboard_gauges_dataIssues.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} data issues'**
+  String dashboard_gauges_dataIssues(int count);
+
   /// No description provided for @dashboard_gauges_retry.
   ///
   /// In en, this message translates to:

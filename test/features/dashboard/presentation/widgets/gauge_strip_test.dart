@@ -12,8 +12,12 @@ import 'package:submersion/l10n/arb/app_localizations.dart';
 
 import '../../../../helpers/mock_providers.dart';
 
-Future<void> pumpStrip(WidgetTester tester, DashboardGauges gauges) async {
-  final overrides = await getBaseOverrides();
+Future<void> pumpStrip(
+  WidgetTester tester,
+  DashboardGauges gauges, {
+  MockSettingsNotifier? settingsNotifier,
+}) async {
+  final overrides = await getBaseOverrides(settingsNotifier: settingsNotifier);
   final router = GoRouter(
     routes: [
       GoRoute(
@@ -110,5 +114,51 @@ void main() {
     expect(find.text('Regulator overdue'), findsOneWidget);
     expect(find.text('No dives yet'), findsOneWidget);
     expect(find.text('Add gear'), findsNothing);
+  });
+
+  testWidgets('hidden chip types are not rendered', (tester) async {
+    final settingsNotifier = MockSettingsNotifier();
+    await settingsNotifier.setHomeChipEnabled('noFly', false);
+    await settingsNotifier.setHomeChipEnabled('gear', false);
+    await pumpStrip(
+      tester,
+      const DashboardGauges(
+        gearGauges: [],
+        hasGear: false,
+        insurance: null,
+        noFlyStatus: null,
+        daysSinceLastDive: 12,
+      ),
+      settingsNotifier: settingsNotifier,
+    );
+    expect(find.text('No-fly 0:00'), findsNothing);
+    expect(find.text('Add gear'), findsNothing);
+    expect(find.text('Last dive 12d ago'), findsOneWidget);
+  });
+
+  testWidgets('attention chips render when their data is present', (
+    tester,
+  ) async {
+    await pumpStrip(
+      tester,
+      const DashboardGauges(
+        gearGauges: [],
+        hasGear: true,
+        insurance: null,
+        noFlyStatus: null,
+        daysSinceLastDive: 200,
+        expiringCertCount: 2,
+        uploadsPending: 3,
+        syncEnabled: true,
+        syncPending: 5,
+        dataQualityFindings: 4,
+      ),
+    );
+    expect(find.text('2 certifications expiring'), findsOneWidget);
+    expect(find.text('3 uploads pending'), findsOneWidget);
+    expect(find.text('5 unsynced'), findsOneWidget);
+    expect(find.text('4 data issues'), findsOneWidget);
+    expect(find.text('No backup yet'), findsOneWidget);
+    expect(find.text('Last dive 200d ago'), findsOneWidget);
   });
 }

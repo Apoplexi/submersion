@@ -3000,6 +3000,96 @@ class AppLocalizationsHu extends AppLocalizations {
   String get dashboard_gauges_noDivesYet => 'Még nincs merülés';
 
   @override
+  String get settings_homeChips_pageTitle => 'Kezdőlap állapotjelzői';
+
+  @override
+  String get settings_homeChips_description =>
+      'Válaszd ki, mely állapotjelzők jelenjenek meg a Kezdőlap tetején.';
+
+  @override
+  String get settings_homeChips_gear => 'Felszerelés szervize';
+
+  @override
+  String get settings_homeChips_insurance => 'Biztosítás';
+
+  @override
+  String get settings_homeChips_noFly => 'Repülési tilalom időzítő';
+
+  @override
+  String get settings_homeChips_lastDive => 'Merülési naprakészség';
+
+  @override
+  String get settings_homeChips_certifications => 'Minősítések lejárata';
+
+  @override
+  String get settings_homeChips_trip => 'Közelgő utazás';
+
+  @override
+  String get settings_homeChips_checklist => 'Aktív ellenőrzőlista';
+
+  @override
+  String get settings_homeChips_course => 'Tanfolyam haladása';
+
+  @override
+  String get settings_homeChips_uploads => 'Médiafeltöltések';
+
+  @override
+  String get settings_homeChips_backup => 'Mentés kora';
+
+  @override
+  String get settings_homeChips_sync => 'Szinkronizálási állapot';
+
+  @override
+  String get settings_homeChips_dataQuality => 'Adatminőség';
+
+  @override
+  String dashboard_gauges_certsExpiring(int count) {
+    return '$count minősítés hamarosan lejár';
+  }
+
+  @override
+  String dashboard_gauges_tripCountdown(String name, int days) {
+    return '$name $days nap múlva';
+  }
+
+  @override
+  String get dashboard_gauges_checklistActive => 'Ellenőrzőlista folyamatban';
+
+  @override
+  String dashboard_gauges_courseProgress(String name, int done, int total) {
+    return '$name: $done/$total';
+  }
+
+  @override
+  String dashboard_gauges_uploadsPending(int count) {
+    return '$count feltöltés függőben';
+  }
+
+  @override
+  String get dashboard_gauges_backupNone => 'Még nincs biztonsági mentés';
+
+  @override
+  String get dashboard_gauges_backupToday => 'Ma mentve';
+
+  @override
+  String dashboard_gauges_backupDays(int days) {
+    return 'Mentés $days napja';
+  }
+
+  @override
+  String dashboard_gauges_syncPending(int count) {
+    return '$count nem szinkronizált';
+  }
+
+  @override
+  String get dashboard_gauges_synced => 'Szinkronizálva';
+
+  @override
+  String dashboard_gauges_dataIssues(int count) {
+    return '$count adatprobléma';
+  }
+
+  @override
   String get dashboard_gauges_retry =>
       'Az állapot nem érhető el - koppints az újrapróbáláshoz';
 

@@ -3026,6 +3026,97 @@ class AppLocalizationsFr extends AppLocalizations {
   String get dashboard_gauges_noDivesYet => 'Aucune plongée';
 
   @override
+  String get settings_homeChips_pageTitle => 'Pastilles d\'état de l\'accueil';
+
+  @override
+  String get settings_homeChips_description =>
+      'Choisissez les pastilles d\'état affichées en haut de l\'onglet Accueil.';
+
+  @override
+  String get settings_homeChips_gear => 'Entretien du matériel';
+
+  @override
+  String get settings_homeChips_insurance => 'Assurance';
+
+  @override
+  String get settings_homeChips_noFly => 'Délai avant vol';
+
+  @override
+  String get settings_homeChips_lastDive => 'Récence de plongée';
+
+  @override
+  String get settings_homeChips_certifications =>
+      'Expiration des certifications';
+
+  @override
+  String get settings_homeChips_trip => 'Voyage à venir';
+
+  @override
+  String get settings_homeChips_checklist => 'Liste de contrôle active';
+
+  @override
+  String get settings_homeChips_course => 'Progression du cours';
+
+  @override
+  String get settings_homeChips_uploads => 'Envois de médias';
+
+  @override
+  String get settings_homeChips_backup => 'Âge de la sauvegarde';
+
+  @override
+  String get settings_homeChips_sync => 'État de synchronisation';
+
+  @override
+  String get settings_homeChips_dataQuality => 'Qualité des données';
+
+  @override
+  String dashboard_gauges_certsExpiring(int count) {
+    return '$count certifications expirent bientôt';
+  }
+
+  @override
+  String dashboard_gauges_tripCountdown(String name, int days) {
+    return '$name dans ${days}j';
+  }
+
+  @override
+  String get dashboard_gauges_checklistActive => 'Liste de contrôle en cours';
+
+  @override
+  String dashboard_gauges_courseProgress(String name, int done, int total) {
+    return '$name : $done/$total';
+  }
+
+  @override
+  String dashboard_gauges_uploadsPending(int count) {
+    return '$count envois en attente';
+  }
+
+  @override
+  String get dashboard_gauges_backupNone => 'Aucune sauvegarde';
+
+  @override
+  String get dashboard_gauges_backupToday => 'Sauvegardé aujourd\'hui';
+
+  @override
+  String dashboard_gauges_backupDays(int days) {
+    return 'Sauvegarde il y a ${days}j';
+  }
+
+  @override
+  String dashboard_gauges_syncPending(int count) {
+    return '$count non synchronisés';
+  }
+
+  @override
+  String get dashboard_gauges_synced => 'Synchronisé';
+
+  @override
+  String dashboard_gauges_dataIssues(int count) {
+    return '$count problèmes de données';
+  }
+
+  @override
   String get dashboard_gauges_retry =>
       'Statut indisponible - touchez pour réessayer';
 

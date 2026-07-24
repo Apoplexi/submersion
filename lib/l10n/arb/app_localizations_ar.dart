@@ -2949,6 +2949,96 @@ class AppLocalizationsAr extends AppLocalizations {
   String get dashboard_gauges_noDivesYet => 'لا توجد غطسات بعد';
 
   @override
+  String get settings_homeChips_pageTitle => 'شرائح حالة الصفحة الرئيسية';
+
+  @override
+  String get settings_homeChips_description =>
+      'اختر شرائح الحالة التي تظهر أعلى تبويب الرئيسية.';
+
+  @override
+  String get settings_homeChips_gear => 'صيانة المعدات';
+
+  @override
+  String get settings_homeChips_insurance => 'التأمين';
+
+  @override
+  String get settings_homeChips_noFly => 'مؤقت حظر الطيران';
+
+  @override
+  String get settings_homeChips_lastDive => 'حداثة الغطس';
+
+  @override
+  String get settings_homeChips_certifications => 'انتهاء الشهادات';
+
+  @override
+  String get settings_homeChips_trip => 'الرحلة القادمة';
+
+  @override
+  String get settings_homeChips_checklist => 'قائمة التحقق النشطة';
+
+  @override
+  String get settings_homeChips_course => 'تقدم الدورة';
+
+  @override
+  String get settings_homeChips_uploads => 'رفع الوسائط';
+
+  @override
+  String get settings_homeChips_backup => 'عمر النسخ الاحتياطي';
+
+  @override
+  String get settings_homeChips_sync => 'حالة المزامنة';
+
+  @override
+  String get settings_homeChips_dataQuality => 'جودة البيانات';
+
+  @override
+  String dashboard_gauges_certsExpiring(int count) {
+    return '$count شهادات على وشك الانتهاء';
+  }
+
+  @override
+  String dashboard_gauges_tripCountdown(String name, int days) {
+    return '$name خلال $days يوم';
+  }
+
+  @override
+  String get dashboard_gauges_checklistActive => 'قائمة التحقق قيد التنفيذ';
+
+  @override
+  String dashboard_gauges_courseProgress(String name, int done, int total) {
+    return '$name: $done/$total';
+  }
+
+  @override
+  String dashboard_gauges_uploadsPending(int count) {
+    return '$count عمليات رفع معلقة';
+  }
+
+  @override
+  String get dashboard_gauges_backupNone => 'لا يوجد نسخ احتياطي';
+
+  @override
+  String get dashboard_gauges_backupToday => 'تم النسخ الاحتياطي اليوم';
+
+  @override
+  String dashboard_gauges_backupDays(int days) {
+    return 'نسخ احتياطي منذ $days يوم';
+  }
+
+  @override
+  String dashboard_gauges_syncPending(int count) {
+    return '$count غير متزامنة';
+  }
+
+  @override
+  String get dashboard_gauges_synced => 'متزامن';
+
+  @override
+  String dashboard_gauges_dataIssues(int count) {
+    return '$count مشاكل في البيانات';
+  }
+
+  @override
   String get dashboard_gauges_retry =>
       'الحالة غير متاحة - انقر لإعادة المحاولة';
 

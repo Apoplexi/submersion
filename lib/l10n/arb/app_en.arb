@@ -1776,6 +1776,89 @@
   },
   "dashboard_gauges_lastDiveToday": "Dove today",
   "dashboard_gauges_noDivesYet": "No dives yet",
+  "settings_homeChips_pageTitle": "Home status chips",
+  "settings_homeChips_description": "Choose which status chips appear at the top of the Home tab.",
+  "settings_homeChips_gear": "Gear service",
+  "settings_homeChips_insurance": "Insurance",
+  "settings_homeChips_noFly": "No-fly timer",
+  "settings_homeChips_lastDive": "Dive currency",
+  "settings_homeChips_certifications": "Certification expiry",
+  "settings_homeChips_trip": "Upcoming trip",
+  "settings_homeChips_checklist": "Active checklist",
+  "settings_homeChips_course": "Course progress",
+  "settings_homeChips_uploads": "Media uploads",
+  "settings_homeChips_backup": "Backup age",
+  "settings_homeChips_sync": "Sync status",
+  "settings_homeChips_dataQuality": "Data quality",
+  "dashboard_gauges_certsExpiring": "{count} certifications expiring",
+  "@dashboard_gauges_certsExpiring": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "dashboard_gauges_tripCountdown": "{name} in {days}d",
+  "@dashboard_gauges_tripCountdown": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "dashboard_gauges_checklistActive": "Checklist in progress",
+  "dashboard_gauges_courseProgress": "{name}: {done}/{total}",
+  "@dashboard_gauges_courseProgress": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "done": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "dashboard_gauges_uploadsPending": "{count} uploads pending",
+  "@dashboard_gauges_uploadsPending": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "dashboard_gauges_backupNone": "No backup yet",
+  "dashboard_gauges_backupToday": "Backed up today",
+  "dashboard_gauges_backupDays": "Backup {days}d ago",
+  "@dashboard_gauges_backupDays": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "dashboard_gauges_syncPending": "{count} unsynced",
+  "@dashboard_gauges_syncPending": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "dashboard_gauges_synced": "Synced",
+  "dashboard_gauges_dataIssues": "{count} data issues",
+  "@dashboard_gauges_dataIssues": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "dashboard_gauges_retry": "Status unavailable - tap to retry",
   "dashboard_urgent_title": "Needs attention",
   "dashboard_photos_title": "Recent photos",

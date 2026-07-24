@@ -2926,6 +2926,96 @@ class AppLocalizationsHe extends AppLocalizations {
   String get dashboard_gauges_noDivesYet => 'אין צלילות עדיין';
 
   @override
+  String get settings_homeChips_pageTitle => 'שבבי מצב של דף הבית';
+
+  @override
+  String get settings_homeChips_description =>
+      'בחר אילו שבבי מצב יופיעו בראש לשונית הבית.';
+
+  @override
+  String get settings_homeChips_gear => 'תחזוקת ציוד';
+
+  @override
+  String get settings_homeChips_insurance => 'ביטוח';
+
+  @override
+  String get settings_homeChips_noFly => 'טיימר איסור טיסה';
+
+  @override
+  String get settings_homeChips_lastDive => 'עדכניות צלילה';
+
+  @override
+  String get settings_homeChips_certifications => 'תפוגת הסמכות';
+
+  @override
+  String get settings_homeChips_trip => 'טיול קרוב';
+
+  @override
+  String get settings_homeChips_checklist => 'רשימת תיוג פעילה';
+
+  @override
+  String get settings_homeChips_course => 'התקדמות קורס';
+
+  @override
+  String get settings_homeChips_uploads => 'העלאות מדיה';
+
+  @override
+  String get settings_homeChips_backup => 'גיל הגיבוי';
+
+  @override
+  String get settings_homeChips_sync => 'מצב סנכרון';
+
+  @override
+  String get settings_homeChips_dataQuality => 'איכות נתונים';
+
+  @override
+  String dashboard_gauges_certsExpiring(int count) {
+    return '$count הסמכות עומדות לפוג';
+  }
+
+  @override
+  String dashboard_gauges_tripCountdown(String name, int days) {
+    return '$name בעוד $days ימים';
+  }
+
+  @override
+  String get dashboard_gauges_checklistActive => 'רשימת תיוג בתהליך';
+
+  @override
+  String dashboard_gauges_courseProgress(String name, int done, int total) {
+    return '$name: $done/$total';
+  }
+
+  @override
+  String dashboard_gauges_uploadsPending(int count) {
+    return '$count העלאות ממתינות';
+  }
+
+  @override
+  String get dashboard_gauges_backupNone => 'אין גיבוי עדיין';
+
+  @override
+  String get dashboard_gauges_backupToday => 'גובה היום';
+
+  @override
+  String dashboard_gauges_backupDays(int days) {
+    return 'גיבוי לפני $days ימים';
+  }
+
+  @override
+  String dashboard_gauges_syncPending(int count) {
+    return '$count לא מסונכרנים';
+  }
+
+  @override
+  String get dashboard_gauges_synced => 'מסונכרן';
+
+  @override
+  String dashboard_gauges_dataIssues(int count) {
+    return '$count בעיות נתונים';
+  }
+
+  @override
   String get dashboard_gauges_retry => 'הסטטוס אינו זמין - הקש לניסיון חוזר';
 
   @override

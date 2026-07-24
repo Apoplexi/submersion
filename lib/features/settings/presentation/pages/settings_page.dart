@@ -12,6 +12,7 @@ import 'package:submersion/features/settings/presentation/pages/column_config_pa
 import 'package:submersion/features/settings/presentation/pages/safety_settings_page.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/core/constants/profile_metrics.dart';
+import 'package:submersion/features/settings/presentation/pages/home_appearance_page.dart';
 import 'package:submersion/features/settings/presentation/pages/section_appearance_page.dart';
 import 'package:submersion/core/constants/units.dart';
 import 'package:submersion/core/services/notification_service.dart';
@@ -1417,6 +1418,7 @@ class _DecompressionSectionContent extends ConsumerWidget {
 
 /// Appearance section content
 const _sectionHubEntries = [
+  ('home', 'Home'),
   ('dives', 'Dives'),
   ('sites', 'Sites'),
   ('buddies', 'Buddies'),
@@ -1498,16 +1500,18 @@ class _AppearanceSectionContentState
             ),
           ),
           Expanded(
-            child: SectionAppearancePage(
-              sectionKey: _activeSectionKey!,
-              embedded: true,
-              onColumnConfigTap: () {
-                setState(() {
-                  _showColumnConfig = true;
-                  _columnConfigSection = _activeSectionKey;
-                });
-              },
-            ),
+            child: _activeSectionKey == 'home'
+                ? const HomeAppearancePage(embedded: true)
+                : SectionAppearancePage(
+                    sectionKey: _activeSectionKey!,
+                    embedded: true,
+                    onColumnConfigTap: () {
+                      setState(() {
+                        _showColumnConfig = true;
+                        _columnConfigSection = _activeSectionKey;
+                      });
+                    },
+                  ),
           ),
         ],
       );
