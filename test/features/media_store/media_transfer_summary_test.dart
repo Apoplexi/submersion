@@ -50,6 +50,35 @@ void main() {
     expect(summary.isBusy, isFalse);
   });
 
+  test(
+    'waitingReason is the newest failure among several parked rows',
+    () async {
+      final older = await repo.enqueueUpload(mediaId: 'older');
+      await repo.markFailed(
+        older,
+        'older failure',
+        retryAfter: const Duration(hours: 25),
+      );
+      // markFailed stamps updatedAt from the wall clock; two calls can land in
+      // the same millisecond, so force a distinct tick.
+      await Future<void>.delayed(const Duration(milliseconds: 5));
+      final newer = await repo.enqueueUpload(mediaId: 'newer');
+      await repo.markFailed(
+        newer,
+        'newer failure',
+        retryAfter: const Duration(hours: 25),
+      );
+      // Parked with no error at all: the newest row overall, and still not a
+      // reason. A policy deferral consumes no attempt and records nothing.
+      final quiet = await repo.enqueueUpload(mediaId: 'quiet');
+      await repo.defer(quiet, DateTime.now().add(const Duration(hours: 25)));
+
+      final summary = await repo.watchSummary().first;
+      expect(summary.waiting, 3);
+      expect(summary.waitingReason, 'newer failure');
+    },
+  );
+
   test('terminal and completed rows are excluded entirely', () async {
     final done = await repo.enqueueUpload(mediaId: 'done');
     await repo.markDone(done);

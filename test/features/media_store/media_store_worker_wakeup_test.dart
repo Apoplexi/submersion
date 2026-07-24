@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:drift/native.dart';
@@ -27,9 +28,15 @@ class _RecordingPipeline extends MediaUploadPipeline {
   final MediaTransferQueueRepository queueRef;
   final processed = <String>[];
 
+  /// When set, process() parks here until completed, holding the drain
+  /// open so a test can act while it is in flight.
+  Completer<void>? gate;
+
   @override
   Future<UploadOutcome> process(MediaTransferQueueEntry entry) async {
     processed.add(entry.mediaId);
+    final held = gate;
+    if (held != null) await held.future;
     await queueRef.markDone(entry.id);
     return UploadOutcome.uploaded;
   }
@@ -149,6 +156,45 @@ void main() {
     worker.dispose();
 
     await Future<void>.delayed(const Duration(milliseconds: 250));
+    expect(pipeline.processed, isEmpty);
+    expect(worker.wakeupDelayForTesting, isNull);
+  });
+
+  // A runtime rebuild disposes this worker without cancelling a drain it
+  // already started - that invariant predates the wakeup. So dispose can
+  // land mid-drain, and the drain's finally would then arm a fresh timer
+  // AFTER disposal, leaving a superseded worker re-draining forever behind
+  // the runtime that replaced it.
+  test('dispose during an in-flight drain does not re-arm a wakeup', () async {
+    await queue.enqueueUpload(mediaId: 'due');
+    final parked = await queue.enqueueUpload(mediaId: 'parked');
+    await queue.defer(parked, DateTime.now().add(const Duration(minutes: 10)));
+    pipeline.gate = Completer<void>();
+
+    final draining = worker.drain();
+    expect(
+      await _waitFor(() => pipeline.processed.isNotEmpty),
+      isTrue,
+      reason: 'the drain should be parked inside process()',
+    );
+
+    worker.dispose();
+    pipeline.gate!.complete();
+    await draining;
+
+    expect(
+      worker.wakeupDelayForTesting,
+      isNull,
+      reason: 'a disposed worker must not arm a wakeup on drain completion',
+    );
+  });
+
+  test('a disposed worker refuses to start a new drain', () async {
+    await queue.enqueueUpload(mediaId: 'm1');
+    worker.dispose();
+
+    await worker.drain();
+
     expect(pipeline.processed, isEmpty);
     expect(worker.wakeupDelayForTesting, isNull);
   });

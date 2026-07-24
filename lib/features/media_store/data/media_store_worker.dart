@@ -47,6 +47,7 @@ class MediaStoreWorker {
 
   final _log = LoggerService.forClass(MediaStoreWorker);
   bool _running = false;
+  bool _disposed = false;
   Future<void>? _activeDrain;
   Timer? _wakeup;
   Duration? _wakeupDelay;
@@ -63,7 +64,7 @@ class MediaStoreWorker {
   Future<void>? get activeDrain => _activeDrain;
 
   Future<void> drain() async {
-    if (_running) return;
+    if (_disposed || _running) return;
     _running = true;
     try {
       while (true) {
@@ -121,6 +122,11 @@ class MediaStoreWorker {
     _wakeup?.cancel();
     _wakeup = null;
     _wakeupDelay = null;
+    // A rebuild disposes this worker without cancelling a drain it already
+    // started, so dispose can land while one is in flight and this runs
+    // afterwards. Re-arming then would leave a superseded worker waking
+    // itself forever behind the runtime that replaced it.
+    if (_disposed) return;
     try {
       // One clock reading for both the query and the delay, so the timer
       // cannot be handed a negative duration by the query's own latency.
@@ -135,13 +141,18 @@ class MediaStoreWorker {
     }
   }
 
-  /// Cancels the retry wakeup. Called when the runtime that owns this
-  /// worker is disposed (disconnect, or a connect that rebuilds it).
+  /// Retires this worker. Called when the runtime that owns it is disposed
+  /// (disconnect, or a connect that rebuilds it). Cancels the retry wakeup
+  /// and blocks any further drain, including one a still-armed timer or a
+  /// late caller would otherwise start.
   ///
   /// Deliberately does not touch an in-flight drain: a rebuild does not
   /// cancel one, and a half-cancelled transfer is worse than one that runs
-  /// to completion against a store it already opened.
+  /// to completion against a store it already opened. That drain's finally
+  /// still calls _armWakeup, which is why the flag - not just the cancel -
+  /// is what makes disposal stick.
   void dispose() {
+    _disposed = true;
     _wakeup?.cancel();
     _wakeup = null;
     _wakeupDelay = null;

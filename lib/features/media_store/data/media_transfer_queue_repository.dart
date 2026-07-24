@@ -394,31 +394,32 @@ class MediaTransferQueueRepository {
     final nowMs = now.millisecondsSinceEpoch;
     var transferring = 0;
     var queued = 0;
-    final deferred = <MediaTransferQueueEntry>[];
+    var waiting = 0;
+    String? reason;
+    int? reasonAt;
+    // Single pass, no intermediate list: this re-runs on every queue write,
+    // and a backfill writes once per row transition over the whole library.
     for (final row in rows) {
       final until = row.nextAttemptAt;
       if (row.state == 'transferring') {
         transferring++;
       } else if (until != null && until > nowMs) {
-        deferred.add(row);
+        waiting++;
+        // Newest wins: of several parked rows, the freshest failure is the
+        // one someone opening this page is looking for.
+        final error = row.errorMessage;
+        if (error != null && (reasonAt == null || row.updatedAt > reasonAt)) {
+          reason = error;
+          reasonAt = row.updatedAt;
+        }
       } else {
         queued++;
-      }
-    }
-    // Newest first: of several parked rows, the freshest failure is the one
-    // someone opening this page is looking for.
-    deferred.sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
-    String? reason;
-    for (final row in deferred) {
-      if (row.errorMessage != null) {
-        reason = row.errorMessage;
-        break;
       }
     }
     return MediaTransferSummary(
       transferring: transferring,
       queued: queued,
-      waiting: deferred.length,
+      waiting: waiting,
       waitingReason: reason,
     );
   }
