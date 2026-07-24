@@ -5822,6 +5822,8 @@
   "settings_mediaStorage_transfers_state_deleting": "Rimozione dal cloud",
   "settings_mediaStorage_transfers_state_done": "Completato",
   "settings_mediaStorage_transfers_state_failed": "Non riuscito",
+  "settings_mediaStorage_transfers_queued": "{count} in coda",
+  "settings_mediaStorage_transfers_waitingRetry": "{count} in attesa di riprovare",
   "settings_mediaStorage_verify_action": "Verifica libreria",
   "settings_mediaStorage_verify_running": "Verifica della libreria multimediale...",
   "settings_mediaStorage_verify_summary": "Controllati {checked} oggetti: {removed} orfani rimossi, {repaired} riparazioni in coda, {aborted} caricamenti obsoleti annullati",

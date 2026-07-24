@@ -5822,6 +5822,8 @@
   "settings_mediaStorage_transfers_state_deleting": "מסיר מהענן",
   "settings_mediaStorage_transfers_state_done": "הושלם",
   "settings_mediaStorage_transfers_state_failed": "נכשל",
+  "settings_mediaStorage_transfers_queued": "{count} בתור",
+  "settings_mediaStorage_transfers_waitingRetry": "{count} ממתינים לניסיון חוזר",
   "settings_mediaStorage_verify_action": "אימות הספרייה",
   "settings_mediaStorage_verify_running": "מאמת את ספריית המדיה...",
   "settings_mediaStorage_verify_summary": "נבדקו {checked} אובייקטים: הוסרו {removed} יתומים, {repaired} תיקונים נוספו לתור, {aborted} העלאות ישנות בוטלו",

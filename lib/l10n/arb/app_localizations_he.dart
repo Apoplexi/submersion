@@ -19934,6 +19934,16 @@ class AppLocalizationsHe extends AppLocalizations {
   String get settings_mediaStorage_transfers_state_failed => 'נכשל';
 
   @override
+  String settings_mediaStorage_transfers_queued(int count) {
+    return '$count בתור';
+  }
+
+  @override
+  String settings_mediaStorage_transfers_waitingRetry(int count) {
+    return '$count ממתינים לניסיון חוזר';
+  }
+
+  @override
   String get settings_mediaStorage_verify_action => 'אימות הספרייה';
 
   @override

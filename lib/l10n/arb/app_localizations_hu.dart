@@ -20393,6 +20393,16 @@ class AppLocalizationsHu extends AppLocalizations {
   String get settings_mediaStorage_transfers_state_failed => 'Sikertelen';
 
   @override
+  String settings_mediaStorage_transfers_queued(int count) {
+    return '$count sorban áll';
+  }
+
+  @override
+  String settings_mediaStorage_transfers_waitingRetry(int count) {
+    return '$count újrapróbálkozásra vár';
+  }
+
+  @override
   String get settings_mediaStorage_verify_action => 'Könyvtár ellenőrzése';
 
   @override

@@ -34164,6 +34164,18 @@ abstract class AppLocalizations {
   /// **'Failed'**
   String get settings_mediaStorage_transfers_state_failed;
 
+  /// No description provided for @settings_mediaStorage_transfers_queued.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} queued'**
+  String settings_mediaStorage_transfers_queued(int count);
+
+  /// No description provided for @settings_mediaStorage_transfers_waitingRetry.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} waiting to retry'**
+  String settings_mediaStorage_transfers_waitingRetry(int count);
+
   /// No description provided for @settings_mediaStorage_verify_action.
   ///
   /// In en, this message translates to:

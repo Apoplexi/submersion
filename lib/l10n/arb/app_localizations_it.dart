@@ -20452,6 +20452,16 @@ class AppLocalizationsIt extends AppLocalizations {
   String get settings_mediaStorage_transfers_state_failed => 'Non riuscito';
 
   @override
+  String settings_mediaStorage_transfers_queued(int count) {
+    return '$count in coda';
+  }
+
+  @override
+  String settings_mediaStorage_transfers_waitingRetry(int count) {
+    return '$count in attesa di riprovare';
+  }
+
+  @override
   String get settings_mediaStorage_verify_action => 'Verifica libreria';
 
   @override

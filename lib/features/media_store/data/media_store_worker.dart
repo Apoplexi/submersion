@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
+
 import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/features/media_store/data/media_delete_processor.dart';
 import 'package:submersion/features/media_store/data/media_transfer_queue_repository.dart';
@@ -46,6 +48,13 @@ class MediaStoreWorker {
   final _log = LoggerService.forClass(MediaStoreWorker);
   bool _running = false;
   Future<void>? _activeDrain;
+  Timer? _wakeup;
+  Duration? _wakeupDelay;
+
+  /// The delay the currently armed retry wakeup will wait, or null when no
+  /// row is deferred. Lets a test assert scheduling without waiting it out.
+  @visibleForTesting
+  Duration? get wakeupDelayForTesting => _wakeupDelay;
 
   /// The drain kicked by [enqueueAndKick], if any. Completes only when the
   /// queue has been fully drained, including each entry's post-upload cleanup.
@@ -92,7 +101,50 @@ class MediaStoreWorker {
       }
     } finally {
       _running = false;
+      await _armWakeup();
     }
+  }
+
+  /// Arms a single timer for the soonest deferred row, so a retry that comes
+  /// due mid-session actually fires.
+  ///
+  /// Every other drain trigger is an external event: app start, a
+  /// connectivity change, an explicit user action. Without this, a row that
+  /// markFailed parked behind a long retryAfter - 25 hours for a
+  /// source-unavailable failure - sat untouched for the rest of the
+  /// session, and the settings page kept reporting it as outstanding work
+  /// the entire time.
+  ///
+  /// Runs in drain's finally and must never throw: an exception here would
+  /// replace whatever the drain itself was reporting.
+  Future<void> _armWakeup() async {
+    _wakeup?.cancel();
+    _wakeup = null;
+    _wakeupDelay = null;
+    try {
+      // One clock reading for both the query and the delay, so the timer
+      // cannot be handed a negative duration by the query's own latency.
+      final now = DateTime.now();
+      final due = await _queue.earliestPendingWakeup(now);
+      if (due == null) return;
+      final delay = due.difference(now);
+      _wakeupDelay = delay;
+      _wakeup = Timer(delay, () => unawaited(drain()));
+    } on Object catch (e) {
+      _log.warning('Could not schedule the next transfer retry: $e');
+    }
+  }
+
+  /// Cancels the retry wakeup. Called when the runtime that owns this
+  /// worker is disposed (disconnect, or a connect that rebuilds it).
+  ///
+  /// Deliberately does not touch an in-flight drain: a rebuild does not
+  /// cancel one, and a half-cancelled transfer is worse than one that runs
+  /// to completion against a store it already opened.
+  void dispose() {
+    _wakeup?.cancel();
+    _wakeup = null;
+    _wakeupDelay = null;
   }
 
   Future<void> enqueueAndKick(String mediaId) async {

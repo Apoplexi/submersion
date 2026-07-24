@@ -19405,6 +19405,16 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settings_mediaStorage_transfers_state_failed => '失败';
 
   @override
+  String settings_mediaStorage_transfers_queued(int count) {
+    return '$count 个排队中';
+  }
+
+  @override
+  String settings_mediaStorage_transfers_waitingRetry(int count) {
+    return '$count 个等待重试';
+  }
+
+  @override
   String get settings_mediaStorage_verify_action => '验证媒体库';
 
   @override

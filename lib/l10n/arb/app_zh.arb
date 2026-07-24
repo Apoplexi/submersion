@@ -5822,6 +5822,8 @@
   "settings_mediaStorage_transfers_state_deleting": "正在从云端移除",
   "settings_mediaStorage_transfers_state_done": "已完成",
   "settings_mediaStorage_transfers_state_failed": "失败",
+  "settings_mediaStorage_transfers_queued": "{count} 个排队中",
+  "settings_mediaStorage_transfers_waitingRetry": "{count} 个等待重试",
   "settings_mediaStorage_verify_action": "验证媒体库",
   "settings_mediaStorage_verify_running": "正在验证媒体库...",
   "settings_mediaStorage_verify_summary": "已检查 {checked} 个对象：移除 {removed} 个孤立文件，排队 {repaired} 个修复，中止 {aborted} 个过期上传",
