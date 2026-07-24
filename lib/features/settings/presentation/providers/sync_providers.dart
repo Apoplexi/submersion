@@ -322,6 +322,7 @@ final selectedSyncAccountProvider = FutureProvider<domain.ConnectedAccount?>((
       type,
       repo,
       syncRepository: ref.read(syncRepositoryProvider),
+      s3Credentials: ref.read(s3CredentialsStoreProvider),
     );
     await ref
         .read(syncRepositoryProvider)
