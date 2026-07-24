@@ -5052,6 +5052,96 @@ abstract class AppLocalizations {
   /// **'Dive statistics summary'**
   String get dashboard_semantics_statsBar;
 
+  /// No description provided for @dashboard_gauges_addGear.
+  ///
+  /// In en, this message translates to:
+  /// **'Add gear'**
+  String get dashboard_gauges_addGear;
+
+  /// No description provided for @dashboard_gauges_gearOk.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} OK'**
+  String dashboard_gauges_gearOk(String name);
+
+  /// No description provided for @dashboard_gauges_gearDueIn.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} due in {days}d'**
+  String dashboard_gauges_gearDueIn(String name, int days);
+
+  /// No description provided for @dashboard_gauges_gearOverdue.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} overdue'**
+  String dashboard_gauges_gearOverdue(String name);
+
+  /// No description provided for @dashboard_gauges_insuranceOk.
+  ///
+  /// In en, this message translates to:
+  /// **'Insurance OK'**
+  String get dashboard_gauges_insuranceOk;
+
+  /// No description provided for @dashboard_gauges_insuranceExpires.
+  ///
+  /// In en, this message translates to:
+  /// **'Insurance expires {date}'**
+  String dashboard_gauges_insuranceExpires(String date);
+
+  /// No description provided for @dashboard_gauges_insuranceExpired.
+  ///
+  /// In en, this message translates to:
+  /// **'Insurance expired'**
+  String get dashboard_gauges_insuranceExpired;
+
+  /// No description provided for @dashboard_gauges_noInsurance.
+  ///
+  /// In en, this message translates to:
+  /// **'No insurance on file'**
+  String get dashboard_gauges_noInsurance;
+
+  /// No description provided for @dashboard_gauges_noFlyClear.
+  ///
+  /// In en, this message translates to:
+  /// **'No-fly 0:00'**
+  String get dashboard_gauges_noFlyClear;
+
+  /// No description provided for @dashboard_gauges_noFlyRemaining.
+  ///
+  /// In en, this message translates to:
+  /// **'No-fly {hours}:{minutes}'**
+  String dashboard_gauges_noFlyRemaining(String hours, String minutes);
+
+  /// No description provided for @dashboard_gauges_lastDiveDays.
+  ///
+  /// In en, this message translates to:
+  /// **'Last dive {days}d ago'**
+  String dashboard_gauges_lastDiveDays(int days);
+
+  /// No description provided for @dashboard_gauges_lastDiveToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Dove today'**
+  String get dashboard_gauges_lastDiveToday;
+
+  /// No description provided for @dashboard_gauges_noDivesYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No dives yet'**
+  String get dashboard_gauges_noDivesYet;
+
+  /// No description provided for @dashboard_gauges_retry.
+  ///
+  /// In en, this message translates to:
+  /// **'Status unavailable - tap to retry'**
+  String get dashboard_gauges_retry;
+
+  /// No description provided for @dashboard_urgent_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Needs attention'**
+  String get dashboard_urgent_title;
+
   /// No description provided for @dashboard_personalRecords_coldest.
   ///
   /// In en, this message translates to:

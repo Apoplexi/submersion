@@ -2937,6 +2937,64 @@ class AppLocalizationsHu extends AppLocalizations {
       'Merülési statisztika összefoglaló';
 
   @override
+  String get dashboard_gauges_addGear => 'Felszerelés hozzáadása';
+
+  @override
+  String dashboard_gauges_gearOk(String name) {
+    return '$name rendben';
+  }
+
+  @override
+  String dashboard_gauges_gearDueIn(String name, int days) {
+    return '$name szervize $days nap múlva esedékes';
+  }
+
+  @override
+  String dashboard_gauges_gearOverdue(String name) {
+    return '$name szervize lejárt';
+  }
+
+  @override
+  String get dashboard_gauges_insuranceOk => 'Biztosítás rendben';
+
+  @override
+  String dashboard_gauges_insuranceExpires(String date) {
+    return 'A biztosítás lejár: $date';
+  }
+
+  @override
+  String get dashboard_gauges_insuranceExpired => 'A biztosítás lejárt';
+
+  @override
+  String get dashboard_gauges_noInsurance => 'Nincs rögzített biztosítás';
+
+  @override
+  String get dashboard_gauges_noFlyClear => 'Repülési tilalom 0:00';
+
+  @override
+  String dashboard_gauges_noFlyRemaining(String hours, String minutes) {
+    return 'Repülési tilalom $hours:$minutes';
+  }
+
+  @override
+  String dashboard_gauges_lastDiveDays(int days) {
+    return 'Utolsó merülés $days napja';
+  }
+
+  @override
+  String get dashboard_gauges_lastDiveToday => 'Ma merültél';
+
+  @override
+  String get dashboard_gauges_noDivesYet => 'Még nincs merülés';
+
+  @override
+  String get dashboard_gauges_retry =>
+      'Az állapot nem érhető el - koppints az újrapróbáláshoz';
+
+  @override
+  String get dashboard_urgent_title => 'Figyelmet igényel';
+
+  @override
   String get dashboard_personalRecords_coldest => 'Leghidegebb';
 
   @override

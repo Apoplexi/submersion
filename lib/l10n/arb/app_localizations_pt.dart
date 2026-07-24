@@ -2954,6 +2954,64 @@ class AppLocalizationsPt extends AppLocalizations {
       'Resumo das estatísticas de mergulho';
 
   @override
+  String get dashboard_gauges_addGear => 'Adicionar equipamento';
+
+  @override
+  String dashboard_gauges_gearOk(String name) {
+    return '$name OK';
+  }
+
+  @override
+  String dashboard_gauges_gearDueIn(String name, int days) {
+    return '$name vence em ${days}d';
+  }
+
+  @override
+  String dashboard_gauges_gearOverdue(String name) {
+    return '$name atrasado';
+  }
+
+  @override
+  String get dashboard_gauges_insuranceOk => 'Seguro OK';
+
+  @override
+  String dashboard_gauges_insuranceExpires(String date) {
+    return 'Seguro expira em $date';
+  }
+
+  @override
+  String get dashboard_gauges_insuranceExpired => 'Seguro expirado';
+
+  @override
+  String get dashboard_gauges_noInsurance => 'Sem seguro registado';
+
+  @override
+  String get dashboard_gauges_noFlyClear => 'Não voar 0:00';
+
+  @override
+  String dashboard_gauges_noFlyRemaining(String hours, String minutes) {
+    return 'Não voar $hours:$minutes';
+  }
+
+  @override
+  String dashboard_gauges_lastDiveDays(int days) {
+    return 'Último mergulho há ${days}d';
+  }
+
+  @override
+  String get dashboard_gauges_lastDiveToday => 'Mergulhou hoje';
+
+  @override
+  String get dashboard_gauges_noDivesYet => 'Ainda sem mergulhos';
+
+  @override
+  String get dashboard_gauges_retry =>
+      'Estado indisponível - toque para tentar novamente';
+
+  @override
+  String get dashboard_urgent_title => 'Requer atenção';
+
+  @override
   String get dashboard_personalRecords_coldest => 'Mais Frio';
 
   @override

@@ -2886,6 +2886,64 @@ class AppLocalizationsAr extends AppLocalizations {
   String get dashboard_semantics_statsBar => 'ملخص إحصائيات الغوص';
 
   @override
+  String get dashboard_gauges_addGear => 'إضافة معدات';
+
+  @override
+  String dashboard_gauges_gearOk(String name) {
+    return '$name سليم';
+  }
+
+  @override
+  String dashboard_gauges_gearDueIn(String name, int days) {
+    return '$name مستحق خلال $days يوم';
+  }
+
+  @override
+  String dashboard_gauges_gearOverdue(String name) {
+    return '$name متأخر عن الصيانة';
+  }
+
+  @override
+  String get dashboard_gauges_insuranceOk => 'التأمين سليم';
+
+  @override
+  String dashboard_gauges_insuranceExpires(String date) {
+    return 'ينتهي التأمين في $date';
+  }
+
+  @override
+  String get dashboard_gauges_insuranceExpired => 'انتهى التأمين';
+
+  @override
+  String get dashboard_gauges_noInsurance => 'لا يوجد تأمين مسجل';
+
+  @override
+  String get dashboard_gauges_noFlyClear => 'حظر الطيران 0:00';
+
+  @override
+  String dashboard_gauges_noFlyRemaining(String hours, String minutes) {
+    return 'حظر الطيران $hours:$minutes';
+  }
+
+  @override
+  String dashboard_gauges_lastDiveDays(int days) {
+    return 'آخر غطسة منذ $days يوم';
+  }
+
+  @override
+  String get dashboard_gauges_lastDiveToday => 'غطست اليوم';
+
+  @override
+  String get dashboard_gauges_noDivesYet => 'لا توجد غطسات بعد';
+
+  @override
+  String get dashboard_gauges_retry =>
+      'الحالة غير متاحة - انقر لإعادة المحاولة';
+
+  @override
+  String get dashboard_urgent_title => 'يتطلب الانتباه';
+
+  @override
   String get dashboard_personalRecords_coldest => 'الأبرد';
 
   @override

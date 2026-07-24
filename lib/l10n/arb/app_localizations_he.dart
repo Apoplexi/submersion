@@ -2863,6 +2863,63 @@ class AppLocalizationsHe extends AppLocalizations {
   String get dashboard_semantics_statsBar => 'סיכום סטטיסטיקות צלילה';
 
   @override
+  String get dashboard_gauges_addGear => 'הוסף ציוד';
+
+  @override
+  String dashboard_gauges_gearOk(String name) {
+    return '$name תקין';
+  }
+
+  @override
+  String dashboard_gauges_gearDueIn(String name, int days) {
+    return '$name דורש טיפול בעוד $days ימים';
+  }
+
+  @override
+  String dashboard_gauges_gearOverdue(String name) {
+    return '$name באיחור טיפול';
+  }
+
+  @override
+  String get dashboard_gauges_insuranceOk => 'ביטוח תקין';
+
+  @override
+  String dashboard_gauges_insuranceExpires(String date) {
+    return 'הביטוח פג ב-$date';
+  }
+
+  @override
+  String get dashboard_gauges_insuranceExpired => 'הביטוח פג תוקף';
+
+  @override
+  String get dashboard_gauges_noInsurance => 'אין ביטוח רשום';
+
+  @override
+  String get dashboard_gauges_noFlyClear => 'איסור טיסה 0:00';
+
+  @override
+  String dashboard_gauges_noFlyRemaining(String hours, String minutes) {
+    return 'איסור טיסה $hours:$minutes';
+  }
+
+  @override
+  String dashboard_gauges_lastDiveDays(int days) {
+    return 'צלילה אחרונה לפני $days ימים';
+  }
+
+  @override
+  String get dashboard_gauges_lastDiveToday => 'צללת היום';
+
+  @override
+  String get dashboard_gauges_noDivesYet => 'אין צלילות עדיין';
+
+  @override
+  String get dashboard_gauges_retry => 'הסטטוס אינו זמין - הקש לניסיון חוזר';
+
+  @override
+  String get dashboard_urgent_title => 'דורש תשומת לב';
+
+  @override
   String get dashboard_personalRecords_coldest => 'הקרה ביותר';
 
   @override

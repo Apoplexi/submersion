@@ -2948,6 +2948,64 @@ class AppLocalizationsIt extends AppLocalizations {
   String get dashboard_semantics_statsBar => 'Riepilogo statistiche immersioni';
 
   @override
+  String get dashboard_gauges_addGear => 'Aggiungi attrezzatura';
+
+  @override
+  String dashboard_gauges_gearOk(String name) {
+    return '$name OK';
+  }
+
+  @override
+  String dashboard_gauges_gearDueIn(String name, int days) {
+    return '$name in scadenza tra ${days}g';
+  }
+
+  @override
+  String dashboard_gauges_gearOverdue(String name) {
+    return '$name in ritardo';
+  }
+
+  @override
+  String get dashboard_gauges_insuranceOk => 'Assicurazione OK';
+
+  @override
+  String dashboard_gauges_insuranceExpires(String date) {
+    return 'Assicurazione scade il $date';
+  }
+
+  @override
+  String get dashboard_gauges_insuranceExpired => 'Assicurazione scaduta';
+
+  @override
+  String get dashboard_gauges_noInsurance => 'Nessuna assicurazione registrata';
+
+  @override
+  String get dashboard_gauges_noFlyClear => 'No-fly 0:00';
+
+  @override
+  String dashboard_gauges_noFlyRemaining(String hours, String minutes) {
+    return 'No-fly $hours:$minutes';
+  }
+
+  @override
+  String dashboard_gauges_lastDiveDays(int days) {
+    return 'Ultima immersione ${days}g fa';
+  }
+
+  @override
+  String get dashboard_gauges_lastDiveToday => 'Immersione oggi';
+
+  @override
+  String get dashboard_gauges_noDivesYet => 'Nessuna immersione';
+
+  @override
+  String get dashboard_gauges_retry =>
+      'Stato non disponibile - tocca per riprovare';
+
+  @override
+  String get dashboard_urgent_title => 'Richiede attenzione';
+
+  @override
   String get dashboard_personalRecords_coldest => 'Piu fredda';
 
   @override

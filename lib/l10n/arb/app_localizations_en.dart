@@ -2894,6 +2894,63 @@ class AppLocalizationsEn extends AppLocalizations {
   String get dashboard_semantics_statsBar => 'Dive statistics summary';
 
   @override
+  String get dashboard_gauges_addGear => 'Add gear';
+
+  @override
+  String dashboard_gauges_gearOk(String name) {
+    return '$name OK';
+  }
+
+  @override
+  String dashboard_gauges_gearDueIn(String name, int days) {
+    return '$name due in ${days}d';
+  }
+
+  @override
+  String dashboard_gauges_gearOverdue(String name) {
+    return '$name overdue';
+  }
+
+  @override
+  String get dashboard_gauges_insuranceOk => 'Insurance OK';
+
+  @override
+  String dashboard_gauges_insuranceExpires(String date) {
+    return 'Insurance expires $date';
+  }
+
+  @override
+  String get dashboard_gauges_insuranceExpired => 'Insurance expired';
+
+  @override
+  String get dashboard_gauges_noInsurance => 'No insurance on file';
+
+  @override
+  String get dashboard_gauges_noFlyClear => 'No-fly 0:00';
+
+  @override
+  String dashboard_gauges_noFlyRemaining(String hours, String minutes) {
+    return 'No-fly $hours:$minutes';
+  }
+
+  @override
+  String dashboard_gauges_lastDiveDays(int days) {
+    return 'Last dive ${days}d ago';
+  }
+
+  @override
+  String get dashboard_gauges_lastDiveToday => 'Dove today';
+
+  @override
+  String get dashboard_gauges_noDivesYet => 'No dives yet';
+
+  @override
+  String get dashboard_gauges_retry => 'Status unavailable - tap to retry';
+
+  @override
+  String get dashboard_urgent_title => 'Needs attention';
+
+  @override
   String get dashboard_personalRecords_coldest => 'Coldest';
 
   @override

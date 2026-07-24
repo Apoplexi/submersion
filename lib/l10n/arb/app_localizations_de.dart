@@ -2962,6 +2962,64 @@ class AppLocalizationsDe extends AppLocalizations {
   String get dashboard_semantics_statsBar => 'Tauchstatistik-Zusammenfassung';
 
   @override
+  String get dashboard_gauges_addGear => 'Ausrüstung hinzufügen';
+
+  @override
+  String dashboard_gauges_gearOk(String name) {
+    return '$name OK';
+  }
+
+  @override
+  String dashboard_gauges_gearDueIn(String name, int days) {
+    return '$name fällig in ${days}T';
+  }
+
+  @override
+  String dashboard_gauges_gearOverdue(String name) {
+    return '$name überfällig';
+  }
+
+  @override
+  String get dashboard_gauges_insuranceOk => 'Versicherung OK';
+
+  @override
+  String dashboard_gauges_insuranceExpires(String date) {
+    return 'Versicherung läuft am $date ab';
+  }
+
+  @override
+  String get dashboard_gauges_insuranceExpired => 'Versicherung abgelaufen';
+
+  @override
+  String get dashboard_gauges_noInsurance => 'Keine Versicherung hinterlegt';
+
+  @override
+  String get dashboard_gauges_noFlyClear => 'Flugverbot 0:00';
+
+  @override
+  String dashboard_gauges_noFlyRemaining(String hours, String minutes) {
+    return 'Flugverbot $hours:$minutes';
+  }
+
+  @override
+  String dashboard_gauges_lastDiveDays(int days) {
+    return 'Letzter Tauchgang vor ${days}T';
+  }
+
+  @override
+  String get dashboard_gauges_lastDiveToday => 'Heute getaucht';
+
+  @override
+  String get dashboard_gauges_noDivesYet => 'Noch keine Tauchgänge';
+
+  @override
+  String get dashboard_gauges_retry =>
+      'Status nicht verfügbar - zum Wiederholen tippen';
+
+  @override
+  String get dashboard_urgent_title => 'Braucht Aufmerksamkeit';
+
+  @override
   String get dashboard_personalRecords_coldest => 'Kältester';
 
   @override

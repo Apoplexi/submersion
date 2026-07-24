@@ -1711,6 +1711,69 @@
     }
   },
   "dashboard_semantics_statsBar": "Dive statistics summary",
+  "dashboard_gauges_addGear": "Add gear",
+  "dashboard_gauges_gearOk": "{name} OK",
+  "@dashboard_gauges_gearOk": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "dashboard_gauges_gearDueIn": "{name} due in {days}d",
+  "@dashboard_gauges_gearDueIn": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "dashboard_gauges_gearOverdue": "{name} overdue",
+  "@dashboard_gauges_gearOverdue": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "dashboard_gauges_insuranceOk": "Insurance OK",
+  "dashboard_gauges_insuranceExpires": "Insurance expires {date}",
+  "@dashboard_gauges_insuranceExpires": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "dashboard_gauges_insuranceExpired": "Insurance expired",
+  "dashboard_gauges_noInsurance": "No insurance on file",
+  "dashboard_gauges_noFlyClear": "No-fly 0:00",
+  "dashboard_gauges_noFlyRemaining": "No-fly {hours}:{minutes}",
+  "@dashboard_gauges_noFlyRemaining": {
+    "placeholders": {
+      "hours": {
+        "type": "String"
+      },
+      "minutes": {
+        "type": "String"
+      }
+    }
+  },
+  "dashboard_gauges_lastDiveDays": "Last dive {days}d ago",
+  "@dashboard_gauges_lastDiveDays": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "dashboard_gauges_lastDiveToday": "Dove today",
+  "dashboard_gauges_noDivesYet": "No dives yet",
+  "dashboard_gauges_retry": "Status unavailable - tap to retry",
+  "dashboard_urgent_title": "Needs attention",
   "dashboard_personalRecords_coldest": "Coldest",
   "dashboard_personalRecords_deepest": "Deepest",
   "dashboard_personalRecords_longest": "Longest",

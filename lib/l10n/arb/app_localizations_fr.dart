@@ -2963,6 +2963,64 @@ class AppLocalizationsFr extends AppLocalizations {
       'Résumé des statistiques de plongée';
 
   @override
+  String get dashboard_gauges_addGear => 'Ajouter du matériel';
+
+  @override
+  String dashboard_gauges_gearOk(String name) {
+    return '$name OK';
+  }
+
+  @override
+  String dashboard_gauges_gearDueIn(String name, int days) {
+    return '$name à réviser dans ${days}j';
+  }
+
+  @override
+  String dashboard_gauges_gearOverdue(String name) {
+    return '$name en retard de révision';
+  }
+
+  @override
+  String get dashboard_gauges_insuranceOk => 'Assurance OK';
+
+  @override
+  String dashboard_gauges_insuranceExpires(String date) {
+    return 'Assurance expire le $date';
+  }
+
+  @override
+  String get dashboard_gauges_insuranceExpired => 'Assurance expirée';
+
+  @override
+  String get dashboard_gauges_noInsurance => 'Aucune assurance enregistrée';
+
+  @override
+  String get dashboard_gauges_noFlyClear => 'Délai avant vol 0:00';
+
+  @override
+  String dashboard_gauges_noFlyRemaining(String hours, String minutes) {
+    return 'Délai avant vol $hours:$minutes';
+  }
+
+  @override
+  String dashboard_gauges_lastDiveDays(int days) {
+    return 'Dernière plongée il y a ${days}j';
+  }
+
+  @override
+  String get dashboard_gauges_lastDiveToday => 'Plongé aujourd\'hui';
+
+  @override
+  String get dashboard_gauges_noDivesYet => 'Aucune plongée';
+
+  @override
+  String get dashboard_gauges_retry =>
+      'Statut indisponible - touchez pour réessayer';
+
+  @override
+  String get dashboard_urgent_title => 'Attention requise';
+
+  @override
   String get dashboard_personalRecords_coldest => 'La plus froide';
 
   @override

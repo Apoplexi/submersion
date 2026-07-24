@@ -2927,6 +2927,64 @@ class AppLocalizationsNl extends AppLocalizations {
   String get dashboard_semantics_statsBar => 'Samenvatting duikstatistieken';
 
   @override
+  String get dashboard_gauges_addGear => 'Uitrusting toevoegen';
+
+  @override
+  String dashboard_gauges_gearOk(String name) {
+    return '$name OK';
+  }
+
+  @override
+  String dashboard_gauges_gearDueIn(String name, int days) {
+    return '$name over ${days}d aan onderhoud toe';
+  }
+
+  @override
+  String dashboard_gauges_gearOverdue(String name) {
+    return '$name over tijd';
+  }
+
+  @override
+  String get dashboard_gauges_insuranceOk => 'Verzekering OK';
+
+  @override
+  String dashboard_gauges_insuranceExpires(String date) {
+    return 'Verzekering verloopt $date';
+  }
+
+  @override
+  String get dashboard_gauges_insuranceExpired => 'Verzekering verlopen';
+
+  @override
+  String get dashboard_gauges_noInsurance => 'Geen verzekering geregistreerd';
+
+  @override
+  String get dashboard_gauges_noFlyClear => 'Vliegverbod 0:00';
+
+  @override
+  String dashboard_gauges_noFlyRemaining(String hours, String minutes) {
+    return 'Vliegverbod $hours:$minutes';
+  }
+
+  @override
+  String dashboard_gauges_lastDiveDays(int days) {
+    return 'Laatste duik ${days}d geleden';
+  }
+
+  @override
+  String get dashboard_gauges_lastDiveToday => 'Vandaag gedoken';
+
+  @override
+  String get dashboard_gauges_noDivesYet => 'Nog geen duiken';
+
+  @override
+  String get dashboard_gauges_retry =>
+      'Status niet beschikbaar - tik om opnieuw te proberen';
+
+  @override
+  String get dashboard_urgent_title => 'Vereist aandacht';
+
+  @override
   String get dashboard_personalRecords_coldest => 'Koudste';
 
   @override

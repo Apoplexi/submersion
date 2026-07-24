@@ -2785,6 +2785,63 @@ class AppLocalizationsZh extends AppLocalizations {
   String get dashboard_semantics_statsBar => '潜水统计摘要';
 
   @override
+  String get dashboard_gauges_addGear => '添加装备';
+
+  @override
+  String dashboard_gauges_gearOk(String name) {
+    return '$name 正常';
+  }
+
+  @override
+  String dashboard_gauges_gearDueIn(String name, int days) {
+    return '$name $days天后需保养';
+  }
+
+  @override
+  String dashboard_gauges_gearOverdue(String name) {
+    return '$name 保养逾期';
+  }
+
+  @override
+  String get dashboard_gauges_insuranceOk => '保险正常';
+
+  @override
+  String dashboard_gauges_insuranceExpires(String date) {
+    return '保险 $date 到期';
+  }
+
+  @override
+  String get dashboard_gauges_insuranceExpired => '保险已过期';
+
+  @override
+  String get dashboard_gauges_noInsurance => '未登记保险';
+
+  @override
+  String get dashboard_gauges_noFlyClear => '禁飞 0:00';
+
+  @override
+  String dashboard_gauges_noFlyRemaining(String hours, String minutes) {
+    return '禁飞 $hours:$minutes';
+  }
+
+  @override
+  String dashboard_gauges_lastDiveDays(int days) {
+    return '上次潜水 $days 天前';
+  }
+
+  @override
+  String get dashboard_gauges_lastDiveToday => '今天潜过水';
+
+  @override
+  String get dashboard_gauges_noDivesYet => '暂无潜水记录';
+
+  @override
+  String get dashboard_gauges_retry => '状态不可用 - 点按重试';
+
+  @override
+  String get dashboard_urgent_title => '需要注意';
+
+  @override
   String get dashboard_personalRecords_coldest => '最冷';
 
   @override
