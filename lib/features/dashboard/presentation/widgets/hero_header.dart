@@ -36,15 +36,7 @@ class HeroHeader extends ConsumerWidget {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              ExcludeSemantics(
-                child: Image.asset(
-                  'assets/icon/icon.png',
-                  width: 56,
-                  height: 56,
-                ),
-              ),
-              const SizedBox(width: 16),
-              Flexible(
+              Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
@@ -133,6 +125,14 @@ class HeroHeader extends ConsumerWidget {
                 const SizedBox(width: 24),
                 const Expanded(flex: 2, child: _QuietStats()),
               ],
+              const SizedBox(width: 16),
+              ExcludeSemantics(
+                child: Image.asset(
+                  'assets/icon/icon.png',
+                  width: 80,
+                  height: 80,
+                ),
+              ),
             ],
           ),
         ),
