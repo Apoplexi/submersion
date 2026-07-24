@@ -30,8 +30,9 @@ class HeroHeader extends ConsumerWidget {
       child: OceanBackground(
         borderRadius: BorderRadius.circular(20),
         child: Padding(
-          // Tighter on the right so the logo sits closer to the banner edge.
-          padding: const EdgeInsets.fromLTRB(24, 24, 14, 24),
+          // Compact insets; tightest on the right so the logo sits close
+          // to the banner edge.
+          padding: const EdgeInsets.fromLTRB(18, 16, 12, 16),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
