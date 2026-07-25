@@ -106,6 +106,12 @@ class _FakeAppSettingsRepository implements AppSettingsRepository {
 
   @override
   Future<void> setNavPrimaryIds(List<String> ids) async {}
+
+  @override
+  Future<String?> getRawSetting(String key) async => null;
+
+  @override
+  Future<void> setRawSetting(String key, String value) async {}
 }
 
 /// Mock SettingsNotifier that doesn't access the database.

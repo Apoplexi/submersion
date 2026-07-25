@@ -37210,6 +37210,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Install ffmpeg to enable video compression. Originals are uploaded until then.'**
   String get settings_mediaStorage_quality_linuxFfmpegHint;
+
+  /// No description provided for @settings_mediaStorage_quality_saveFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not save the upload quality. Try again.'**
+  String get settings_mediaStorage_quality_saveFailed;
+
+  /// No description provided for @settings_mediaStorage_quality_noTranscoderHint.
+  ///
+  /// In en, this message translates to:
+  /// **'This device cannot compress video. Originals are uploaded from it.'**
+  String get settings_mediaStorage_quality_noTranscoderHint;
 }
 
 class _AppLocalizationsDelegate

@@ -21851,4 +21851,12 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get settings_mediaStorage_quality_linuxFfmpegHint =>
       'ثبّت ffmpeg لتمكين ضغط الفيديو. حتى ذلك الحين يتم رفع النسخ الأصلية.';
+
+  @override
+  String get settings_mediaStorage_quality_saveFailed =>
+      'تعذّر حفظ جودة الرفع. حاول مرة أخرى.';
+
+  @override
+  String get settings_mediaStorage_quality_noTranscoderHint =>
+      'لا يمكن لهذا الجهاز ضغط الفيديو. يتم رفع الملفات الأصلية منه.';
 }

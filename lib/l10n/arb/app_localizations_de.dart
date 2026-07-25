@@ -22220,4 +22220,12 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get settings_mediaStorage_quality_linuxFfmpegHint =>
       'Installieren Sie ffmpeg, um Videokomprimierung zu aktivieren. Bis dahin werden Originale hochgeladen.';
+
+  @override
+  String get settings_mediaStorage_quality_saveFailed =>
+      'Die Upload-Qualität konnte nicht gespeichert werden. Bitte erneut versuchen.';
+
+  @override
+  String get settings_mediaStorage_quality_noTranscoderHint =>
+      'Dieses Gerät kann keine Videos komprimieren. Von ihm werden Originale hochgeladen.';
 }
