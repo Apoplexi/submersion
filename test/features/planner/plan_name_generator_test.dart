@@ -19,8 +19,10 @@ void main() {
     // this is a pure unit test, so it has to ask.
     late String? previousLocale;
 
-    setUp(() async {
-      await initializeDateFormatting('en');
+    // Symbol data does not depend on per-test state, so load it once.
+    setUpAll(() => initializeDateFormatting('en'));
+
+    setUp(() {
       previousLocale = Intl.defaultLocale;
       Intl.defaultLocale = 'en';
     });

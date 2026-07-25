@@ -4,6 +4,8 @@ import 'package:submersion/core/constants/map_style.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/core/services/database_service.dart';
 import 'package:submersion/features/dive_planner/presentation/providers/dive_planner_providers.dart';
+import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
+import 'package:submersion/features/dive_sites/presentation/providers/site_providers.dart';
 import 'package:submersion/features/planner/data/repositories/dive_plan_repository.dart';
 import 'package:submersion/features/planner/domain/entities/dive_plan.dart';
 import 'package:submersion/features/planner/presentation/pages/plan_canvas_page.dart';
@@ -134,6 +136,39 @@ void main() {
 
     final summaries = await repository.getAllPlanSummaries();
     expect(summaries.single.maxDepth, 45);
+  });
+
+  testWidgets('a site change during the lookup drops the stale site name', (
+    tester,
+  ) async {
+    await setSize(tester, const Size(420, 900));
+    await tester.pumpWidget(
+      testApp(
+        overrides: [
+          settingsProvider.overrideWith((ref) => _TestSettingsNotifier()),
+          // Switch the plan to a different site while the lookup for the
+          // original one is still in flight. No modal is up during that await,
+          // so this is something the diver can really do.
+          siteProvider.overrideWith((ref, id) async {
+            await Future<void>.delayed(Duration.zero);
+            ref.read(divePlanNotifierProvider.notifier).updateSite('elsewhere');
+            return const DiveSite(id: 'blue-hole', name: 'Blue Hole');
+          }),
+        ],
+        locale: const Locale('en'),
+        child: const PlanCanvasPage(),
+      ),
+    );
+    notifierOf(tester).addSimplePlan(maxDepth: 30, bottomTimeMinutes: 20);
+    notifierOf(tester).updateSite('blue-hole');
+    await tester.pumpAndSettle();
+    await tapSave(tester);
+
+    expect(find.text('Name your plan'), findsOneWidget);
+    // The fetched name describes a site the plan no longer uses, so it must
+    // not be paired with the plan's current depth and date.
+    expect(find.textContaining('Blue Hole'), findsNothing);
+    expect(find.textContaining('30.0m - '), findsOneWidget);
   });
 
   testWidgets('a second save does not re-open the dialog', (tester) async {

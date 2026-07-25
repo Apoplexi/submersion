@@ -571,11 +571,15 @@ class _PlanCanvasPageState extends ConsumerState<PlanCanvasPage> {
       // suggested name must describe what the plan is now.
       final planState = ref.read(divePlanNotifierProvider);
       final suggestedDepth = ref.read(planOutcomeProvider).maxDepth;
+      // The lookup was keyed on the pre-await id. If the diver switched sites
+      // while it resolved, the fetched name describes a site the plan no longer
+      // uses, so drop it rather than pair it with fresh depth and date.
+      final siteName = planState.siteId == siteId ? site?.name : null;
 
       final entered = await showPlanNameDialog(
         context,
         initialName: generateDefaultPlanName(
-          siteName: site?.name,
+          siteName: siteName,
           depthLabel: suggestedDepth > 0
               ? units.formatDepth(suggestedDepth)
               : null,
