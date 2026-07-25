@@ -14,7 +14,7 @@ import 'package:submersion/features/settings/presentation/providers/settings_pro
 class DisplayZoomNotifier extends StateNotifier<double> {
   DisplayZoomNotifier(this._prefs)
     : super(
-        DisplayZoom.clampValue(
+        DisplayZoom.normalize(
           _prefs.getDouble(SettingsKeys.displayZoom) ??
               DisplayZoom.defaultValue,
         ),
@@ -23,10 +23,10 @@ class DisplayZoomNotifier extends StateNotifier<double> {
   final SharedPreferences _prefs;
 
   Future<void> setZoom(double value) async {
-    final clamped = DisplayZoom.clampValue(value);
-    if (clamped == state) return;
-    state = clamped;
-    await _prefs.setDouble(SettingsKeys.displayZoom, clamped);
+    final normalized = DisplayZoom.normalize(value);
+    if (normalized == state) return;
+    state = normalized;
+    await _prefs.setDouble(SettingsKeys.displayZoom, normalized);
   }
 
   /// Moves one [DisplayZoom.step] in [direction] (+1 larger, -1 smaller).

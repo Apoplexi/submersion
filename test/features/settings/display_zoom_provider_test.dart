@@ -46,17 +46,48 @@ void main() {
     expect(prefs.getDouble('display_zoom'), DisplayZoom.max);
   });
 
+  // Exact equality, not moreOrLessEquals: normalize snaps every result onto
+  // the ladder, and a tolerant matcher here would hide the drift that makes
+  // `zoom == defaultValue` false at a displayed 100%.
   test('stepBy walks the ladder in both directions', () async {
     final container = await _container({'display_zoom': 1.0});
     final notifier = container.read(displayZoomNotifierProvider.notifier);
 
     await notifier.stepBy(1);
-    expect(container.read(displayZoomNotifierProvider), moreOrLessEquals(1.05));
+    expect(container.read(displayZoomNotifierProvider), 1.05);
 
     await notifier.stepBy(-1);
     await notifier.stepBy(-1);
-    expect(container.read(displayZoomNotifierProvider), moreOrLessEquals(0.95));
+    expect(container.read(displayZoomNotifierProvider), 0.95);
   });
+
+  test(
+    'returns exactly to the default after a clamp-floor round trip',
+    () async {
+      // Hold Cmd+- past the floor, then Cmd+= back to nominal 100%. Repeated
+      // 0.05 arithmetic would land on 1.0000000000000002 without snapping,
+      // which displays "100%" while failing `zoom == defaultValue`.
+      final container = await _container({});
+      final notifier = container.read(displayZoomNotifierProvider.notifier);
+
+      for (var i = 0; i < 8; i++) {
+        await notifier.stepBy(-1);
+      }
+      expect(container.read(displayZoomNotifierProvider), DisplayZoom.min);
+
+      for (var i = 0; i < 6; i++) {
+        await notifier.stepBy(1);
+      }
+
+      final zoom = container.read(displayZoomNotifierProvider);
+      expect(zoom, DisplayZoom.defaultValue);
+      expect(
+        zoom == DisplayZoom.defaultValue,
+        isTrue,
+        reason: 'must be exactly equal so the no-op fast path engages',
+      );
+    },
+  );
 
   test('stepBy saturates at the bounds', () async {
     final container = await _container({'display_zoom': DisplayZoom.max});

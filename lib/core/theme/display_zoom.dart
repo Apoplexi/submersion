@@ -22,13 +22,29 @@ class DisplayZoom {
   /// Slider divisions across [min]..[max] at [step] granularity.
   static const int divisions = 14;
 
-  /// Clamps any stored or computed value into the supported range.
+  static const int _minPercent = 70;
+  static const int _maxPercent = 140;
+  static const int _stepPercent = 5;
+
+  /// Clamps a stored or computed value into range and snaps it to the nearest
+  /// supported level.
   ///
-  /// Guards against a corrupt preference producing a zero or NaN scale, which
-  /// would divide by zero in the layout and blank the app.
-  static double clampValue(double value) {
+  /// Clamping guards against a corrupt preference producing a zero or NaN
+  /// scale, which would divide by zero in the layout and blank the app.
+  ///
+  /// Snapping matters just as much. Repeated `+/- 0.05` arithmetic drifts:
+  /// stepping down past the [min] floor and back up lands on
+  /// 1.0000000000000002, which renders as "100%" but is not `== 1.0`. That
+  /// would leave the Reset button visible and make DisplayZoomScope build a
+  /// transform layer at nominal 100%, defeating its no-op fast path. Snapping
+  /// happens in integer-percent space so it cannot itself accumulate error,
+  /// and it guarantees the stored value always equals the displayed
+  /// percentage divided by 100.
+  static double normalize(double value) {
     if (!value.isFinite) return defaultValue;
-    return value.clamp(min, max).toDouble();
+    final percent = (value * 100).round().clamp(_minPercent, _maxPercent);
+    final snapped = (percent / _stepPercent).round() * _stepPercent;
+    return snapped / 100;
   }
 }
 
