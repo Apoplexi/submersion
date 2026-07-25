@@ -1,6 +1,6 @@
-import 'dart:typed_data';
 import 'dart:ui';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
@@ -8,6 +8,7 @@ import 'package:submersion/core/providers/provider.dart';
 
 import 'package:submersion/core/theme/app_theme_registry.dart';
 import 'package:submersion/core/theme/display_zoom.dart';
+import 'package:submersion/core/theme/display_zoom_shortcuts.dart';
 import 'package:submersion/core/router/app_router.dart';
 import 'package:submersion/features/settings/presentation/providers/display_zoom_provider.dart';
 import 'package:submersion/features/auto_update/presentation/providers/update_menu_channel.dart';
@@ -338,7 +339,27 @@ class _SubmersionAppState extends ConsumerState<SubmersionApp>
               // Watched here rather than in build() so dragging the zoom
               // slider rebuilds only this subtree, not all of MaterialApp.
               final zoom = ref.watch(displayZoomNotifierProvider);
-              return DisplayZoomScope(zoom: zoom, child: child!);
+              final notifier = ref.read(displayZoomNotifierProvider.notifier);
+              final useMeta =
+                  defaultTargetPlatform == TargetPlatform.macOS ||
+                  defaultTargetPlatform == TargetPlatform.iOS;
+
+              return CallbackShortcuts(
+                bindings: displayZoomShortcuts(
+                  onZoomIn: () => notifier.stepBy(1),
+                  onZoomOut: () => notifier.stepBy(-1),
+                  onReset: notifier.reset,
+                  useMetaModifier: useMeta,
+                ),
+                // CallbackShortcuts only fires for keystrokes inside its
+                // focused subtree, and nothing has focus on desktop
+                // cold-start, so the shortcuts would otherwise be dead until
+                // the user clicks something.
+                child: Focus(
+                  autofocus: true,
+                  child: DisplayZoomScope(zoom: zoom, child: child!),
+                ),
+              );
             },
           ),
         );
