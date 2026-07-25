@@ -7,6 +7,7 @@ import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_repository_provider.dart';
 import 'package:submersion/features/dive_planner/presentation/providers/dive_planner_providers.dart';
+import 'package:submersion/features/dive_sites/presentation/providers/site_providers.dart';
 import 'package:submersion/features/dive_planner/presentation/widgets/plan_tank_list.dart';
 import 'package:submersion/features/dive_planner/presentation/widgets/segment_list.dart';
 import 'package:submersion/features/dive_planner/presentation/widgets/simple_plan_dialog.dart';
@@ -16,6 +17,7 @@ import 'package:submersion/features/planner/data/services/plan_slate_pdf_service
 import 'package:submersion/features/planner/domain/entities/dive_plan.dart'
     as domain;
 import 'package:submersion/features/planner/domain/services/dive_plan_state_mapper.dart';
+import 'package:submersion/features/planner/domain/services/plan_name_generator.dart';
 import 'package:submersion/features/planner/presentation/chart/plan_profile_chart.dart';
 import 'package:submersion/features/planner/presentation/panes/plan_editor_pane.dart';
 import 'package:submersion/features/planner/presentation/panes/plan_results_pane.dart';
@@ -549,16 +551,47 @@ class _PlanCanvasPageState extends ConsumerState<PlanCanvasPage> {
   }
 
   Future<void> _savePlan() async {
+    final notifier = ref.read(divePlanNotifierProvider.notifier);
     final outcome = ref.read(planOutcomeProvider);
-    await ref
-        .read(divePlanNotifierProvider.notifier)
-        .save(
-          summary: PlanSummaryData(
-            maxDepth: outcome.maxDepth,
-            runtimeSeconds: outcome.runtimeSeconds,
-            ttsSeconds: outcome.ttsAtBottom,
-          ),
-        );
+    final summary = PlanSummaryData(
+      maxDepth: outcome.maxDepth,
+      runtimeSeconds: outcome.runtimeSeconds,
+      ttsSeconds: outcome.ttsAtBottom,
+    );
+
+    // Prompt for a name the first time a plan is persisted, so the saved-plans
+    // list is not a wall of identically-named rows. Re-saves stay silent, and
+    // so does Convert to Dive: that flow is already multi-step and should not
+    // grow a modal.
+    if (!notifier.isPersisted) {
+      final l10n = context.l10n;
+      final planState = ref.read(divePlanNotifierProvider);
+      final units = UnitFormatter(ref.read(settingsProvider));
+      final siteId = planState.siteId;
+      final site = siteId == null
+          ? null
+          : await ref.read(siteProvider(siteId).future);
+      if (!mounted) return;
+
+      final entered = await showPlanNameDialog(
+        context,
+        initialName: generateDefaultPlanName(
+          siteName: site?.name,
+          depthLabel: outcome.maxDepth > 0
+              ? units.formatDepth(outcome.maxDepth)
+              : null,
+          date: planState.startDateTime ?? DateTime.now(),
+          fallbackLabel: l10n.plannerCanvas_name_defaultFallback,
+        ),
+        title: l10n.plannerCanvas_name_dialogTitle,
+      );
+      // Cancel aborts the save entirely: nothing is written and the plan stays
+      // dirty, so the diver is never surprised by a name they rejected.
+      if (entered == null) return;
+      notifier.updateName(entered);
+    }
+
+    await notifier.save(summary: summary);
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(context.l10n.divePlanner_message_planSaved)),
