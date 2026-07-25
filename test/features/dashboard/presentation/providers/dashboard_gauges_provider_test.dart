@@ -17,6 +17,7 @@ import 'package:submersion/features/equipment/domain/entities/service_clock_stat
 import 'package:submersion/features/equipment/domain/entities/service_kind.dart';
 import 'package:submersion/features/equipment/domain/entities/service_schedule.dart';
 import 'package:submersion/features/equipment/presentation/providers/equipment_providers.dart';
+import 'package:submersion/features/media_store/domain/media_transfer_summary.dart';
 import 'package:submersion/features/media_store/presentation/providers/media_store_providers.dart';
 import 'package:submersion/features/pre_dive/domain/entities/pre_dive_session.dart';
 import 'package:submersion/features/pre_dive/presentation/providers/pre_dive_providers.dart';
@@ -116,8 +117,8 @@ ProviderContainer makeContainer({
       allTripsProvider.overrideWith((ref) async => trips),
       preDiveActiveSessionProvider.overrideWith((ref) async => activeSession),
       activeCoursesProgressProvider.overrideWith((ref) async => courses),
-      mediaTransferActiveCountProvider.overrideWith(
-        (ref) => Stream.value(uploads),
+      mediaTransferSummaryProvider.overrideWith(
+        (ref) => Stream.value(MediaTransferSummary(queued: uploads)),
       ),
       lastBackupTimeProvider.overrideWithValue(lastBackup),
       isSyncEnabledProvider.overrideWithValue(syncEnabled),

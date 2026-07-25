@@ -186,7 +186,8 @@ final dashboardGaugesProvider = FutureProvider<DashboardGauges>((ref) async {
   final trips = await ref.watch(allTripsProvider.future);
   final activeSession = await ref.watch(preDiveActiveSessionProvider.future);
   final courses = await ref.watch(activeCoursesProgressProvider.future);
-  final uploads = ref.watch(mediaTransferActiveCountProvider).valueOrNull ?? 0;
+  final uploads =
+      ref.watch(mediaTransferSummaryProvider).valueOrNull?.total ?? 0;
   final lastBackup = ref.watch(lastBackupTimeProvider);
   final syncEnabled = ref.watch(isSyncEnabledProvider);
   final syncPending = ref.watch(pendingChangesCountProvider);

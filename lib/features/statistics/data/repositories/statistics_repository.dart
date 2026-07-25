@@ -841,9 +841,11 @@ class StatisticsRepository {
       // Half-open millisecond range [Jan 1, next Jan 1) rather than
       // strftime('%Y', ...): the range predicate lets SQLite use the
       // (diver_id, dive_date_time) index instead of scanning every row.
-      // Local-midnight boundaries match countDivesSince's convention.
-      final startMs = DateTime(year).millisecondsSinceEpoch;
-      final endMs = DateTime(year + 1).millisecondsSinceEpoch;
+      // UTC boundaries match the wall-clock-as-UTC epoch-ms convention that
+      // dive_date_time is stored in, so dives near the year edge aren't
+      // shifted across the boundary by the local timezone offset.
+      final startMs = DateTime.utc(year).millisecondsSinceEpoch;
+      final endMs = DateTime.utc(year + 1).millisecondsSinceEpoch;
       final diverFilter = diverId != null ? 'AND diver_id = ?' : '';
       final results = await _db
           .customSelect(
