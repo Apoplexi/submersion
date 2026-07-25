@@ -60,16 +60,31 @@ class AppDelegate: FlutterAppDelegate {
     updateChannel?.invokeMethod("checkForUpdateInteractively", arguments: nil)
   }
 
+  /// Invokes a display zoom method and logs anything the Dart side rejects.
+  /// Without the result handler a miswired selector or renamed method is a
+  /// menu item that silently does nothing.
+  private func invokeDisplayMethod(_ method: String) {
+    displayChannel?.invokeMethod(method, arguments: nil, result: { result in
+      if let error = result as? FlutterError {
+        NSLog(
+          "[AppDelegate] display channel '\(method)' failed: \(error.code) \(error.message ?? "")"
+        )
+      } else if (result as? NSObject) == FlutterMethodNotImplemented {
+        NSLog("[AppDelegate] display channel has no method '\(method)'")
+      }
+    })
+  }
+
   @IBAction func zoomIn(_ sender: Any) {
-    displayChannel?.invokeMethod("zoomIn", arguments: nil)
+    invokeDisplayMethod("zoomIn")
   }
 
   @IBAction func zoomOut(_ sender: Any) {
-    displayChannel?.invokeMethod("zoomOut", arguments: nil)
+    invokeDisplayMethod("zoomOut")
   }
 
   @IBAction func actualSize(_ sender: Any) {
-    displayChannel?.invokeMethod("actualSize", arguments: nil)
+    invokeDisplayMethod("actualSize")
   }
 
   override func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {

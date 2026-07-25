@@ -17,6 +17,16 @@ void registerDisplayZoomMenuChannel(WidgetRef ref) {
         await notifier.stepBy(-1);
       case 'actualSize':
         await notifier.reset();
+      default:
+        // Fail loudly rather than no-op. This channel is driven by native menu
+        // wiring, so an unknown method means a miswired selector or a renamed
+        // method -- otherwise a menu item that silently does nothing. Paired
+        // with the result handler in AppDelegate, which logs this back on the
+        // native side where the miswiring actually happened.
+        throw PlatformException(
+          code: 'unimplemented',
+          message: 'No display zoom method named "${call.method}"',
+        );
     }
   });
 }
