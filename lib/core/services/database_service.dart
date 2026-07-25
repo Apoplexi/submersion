@@ -134,11 +134,13 @@ class DatabaseService {
   ///    hot-journal recovery are proven there, and closing a background
   ///    executor MID-migration has historically hung. The close happens
   ///    strictly after the ladder finishes.
-  /// 2. Open with [NativeDatabase.createInBackground]: every statement
-  ///    executes on drift's worker isolate. Migration callbacks (onCreate
-  ///    for fresh files, the beforeOpen re-asserts) still run on the main
-  ///    isolate and issue their statements through the remote executor,
-  ///    so their semantics are unchanged.
+  /// 2. Open with [BackgroundDatabaseConnection.open] (a
+  ///    [NativeDatabase.createInBackground] equivalent that owns the worker
+  ///    isolate, so [close] can wait for SQLite to actually finish closing):
+  ///    every statement executes on drift's worker isolate. Migration
+  ///    callbacks (onCreate for fresh files, the beforeOpen re-asserts)
+  ///    still run on the main isolate and issue their statements through
+  ///    the remote executor, so their semantics are unchanged.
   ///
   /// A single synchronous `PRAGMA user_version` read (via
   /// [getStoredSchemaVersion]) drives BOTH the newer-than-app guard and
