@@ -87,9 +87,12 @@ class DisplayZoomScope extends StatelessWidget {
       child: Transform.scale(
         scale: zoom,
         alignment: Alignment.topLeft,
-        child: SizedBox(
-          width: logical.width,
-          height: logical.height,
+        child: OverflowBox(
+          alignment: Alignment.topLeft,
+          minWidth: logical.width,
+          maxWidth: logical.width,
+          minHeight: logical.height,
+          maxHeight: logical.height,
           child: child,
         ),
       ),
@@ -112,6 +115,15 @@ Notes on the field adjustments:
 - The `zoom == defaultValue` early return means users who never touch the
   setting get a byte-identical widget tree to today — no extra layer, no
   `MediaQuery` rebuild.
+- `OverflowBox`, not `SizedBox`. `MaterialApp.builder` passes its child TIGHT
+  constraints equal to the physical window, and a `SizedBox` is forced back to
+  those constraints. The child would then be laid out at the physical size and
+  scaled, painting only `zoom`x the window (a black band on the right and
+  bottom at zoom < 1) or overflowing and clipping at zoom > 1. `OverflowBox`
+  is what lets the child take the enlarged logical size. This was found by
+  manual smoke test, not by unit tests: assertions on `MediaQuery` values all
+  passed while the layout was wrong, so the regression test asserts the
+  child's rendered `Size` via `tester.getSize`.
 
 ### 2. `lib/features/settings/presentation/providers/display_zoom_provider.dart` (new)
 
