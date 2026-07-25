@@ -276,8 +276,14 @@ class DatabaseService {
       // closed. A caller about to reopen the same file must wait for the
       // real close, and a stuck worker throws rather than being killed:
       // killing it would strand an open handle holding the file locks.
+      //
+      // The budget here is deliberately much longer than the 5s ack wait:
+      // the worker's sqlite3_close_v2 is where a WAL checkpoint-on-close
+      // runs, which on a multi-hundred-MB database can take tens of
+      // seconds. Restore/move callers strongly prefer a slow success over
+      // a fast TimeoutException that aborts the whole operation.
       await _background?.awaitWorkerShutdown(
-        timeout: const Duration(seconds: 5),
+        timeout: const Duration(seconds: 60),
         killIfStuck: false,
       );
       _background = null;
