@@ -290,9 +290,12 @@ cheap.
    assertion to add to an existing settings sync test, not a parallel test to
    write.
 
-6. **Localization.** One new key for the non-Linux capability note, translated
-   across all 11 locales, then `flutter gen-l10n`. `app_localizations*.dart` is
-   tracked (unlike `*.g.dart`) and must be committed.
+6. **Localization.** Two new keys -- the non-Linux capability note
+   (`settings_mediaStorage_quality_noTranscoderHint`) and the write-failure
+   snackbar required by section 6 (`settings_mediaStorage_quality_saveFailed`)
+   -- translated across all 11 locales, then `flutter gen-l10n`.
+   `app_localizations*.dart` is tracked (unlike `*.g.dart`) and must be
+   committed.
 
 ## 9. Delivery
 
