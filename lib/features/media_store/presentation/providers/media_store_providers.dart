@@ -32,6 +32,7 @@ import 'package:submersion/features/media_store/data/media_verify_service.dart';
 import 'package:submersion/features/media_store/data/media_upload_pipeline.dart';
 import 'package:submersion/features/media_store/data/platform_video_transcoder.dart';
 import 'package:submersion/features/media_store/domain/media_backup_status.dart';
+import 'package:submersion/features/media_store/domain/media_transfer_summary.dart';
 import 'package:submersion/features/media_store/domain/media_upload_quality.dart';
 import 'package:submersion/features/media_store/presentation/widgets/media_store_badge.dart';
 
@@ -159,9 +160,10 @@ final mediaBackfillServiceProvider = Provider<MediaBackfillService>(
   ),
 );
 
-/// Pending + transferring count, for the backfill progress row.
-final mediaTransferActiveCountProvider = StreamProvider<int>(
-  (ref) => ref.watch(mediaTransferQueueRepositoryProvider).watchActiveCount(),
+/// Outstanding transfer work, split into moving / due / parked so the
+/// settings page can tell progress from a retry backoff.
+final mediaTransferSummaryProvider = StreamProvider<MediaTransferSummary>(
+  (ref) => ref.watch(mediaTransferQueueRepositoryProvider).watchSummary(),
 );
 
 /// Transfers view feed.
@@ -409,6 +411,10 @@ final FutureProvider<MediaStoreRuntime?> mediaStoreRuntimeProvider =
         if (kind != NetworkKind.offline) unawaited(worker.drain());
       });
       ref.onDispose(connectivitySub.cancel);
+      // Cancels only the retry wakeup, not an in-flight drain: a rebuild
+      // has never cancelled one, and a superseded worker's timer must not
+      // keep re-draining behind the runtime that replaced it.
+      ref.onDispose(worker.dispose);
       unawaited(worker.drain());
 
       // Opportunistic Verify Library sweep (orphan-prevention spec 6.4):

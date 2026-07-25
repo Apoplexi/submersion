@@ -137,6 +137,27 @@ void main() {
       expect(container.read(settingsProvider).hiddenChamberIds, isEmpty);
     });
 
+    test('setHomeChipEnabled toggles hidden home chips', () async {
+      container.read(settingsProvider.notifier);
+      await waitForInit();
+
+      // All home chips are visible by default.
+      expect(container.read(settingsProvider).hiddenHomeChips, isEmpty);
+
+      await container
+          .read(settingsProvider.notifier)
+          .setHomeChipEnabled('noFly', false);
+      expect(
+        container.read(settingsProvider).hiddenHomeChips,
+        contains('noFly'),
+      );
+
+      await container
+          .read(settingsProvider.notifier)
+          .setHomeChipEnabled('noFly', true);
+      expect(container.read(settingsProvider).hiddenHomeChips, isEmpty);
+    });
+
     test('setEmergencyRegion sets and clears the override', () async {
       container.read(settingsProvider.notifier);
       await waitForInit();

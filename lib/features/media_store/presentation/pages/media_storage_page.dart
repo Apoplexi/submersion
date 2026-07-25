@@ -13,6 +13,7 @@ import 'package:submersion/core/services/media_store/media_upload_quality_policy
 import 'package:submersion/features/media_store/data/media_store_service.dart';
 import 'package:submersion/features/media_store/domain/media_upload_quality.dart';
 import 'package:submersion/features/media_store/presentation/providers/media_store_providers.dart';
+import 'package:submersion/features/media_store/presentation/widgets/media_transfer_summary_row.dart';
 import 'package:submersion/features/settings/presentation/providers/sync_providers.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
@@ -759,23 +760,7 @@ class _MediaStoragePageState extends ConsumerState<MediaStoragePage> {
                   padding: EdgeInsets.only(top: 8),
                   child: LinearProgressIndicator(),
                 ),
-              Consumer(
-                builder: (context, ref, _) {
-                  final active =
-                      ref.watch(mediaTransferActiveCountProvider).value ?? 0;
-                  if (active == 0) return const SizedBox.shrink();
-                  return Padding(
-                    padding: const EdgeInsets.only(top: 8),
-                    child: Row(
-                      children: [
-                        const Expanded(child: LinearProgressIndicator()),
-                        const SizedBox(width: 12),
-                        Text('$active'),
-                      ],
-                    ),
-                  );
-                },
-              ),
+              const MediaTransferSummaryRow(),
               ListTile(
                 key: const Key('media-s3-transfers'),
                 leading: const Icon(Icons.swap_vert),
