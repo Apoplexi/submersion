@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider_platform_interface/path_provider_platform_interface.dart';
@@ -23,10 +22,6 @@ class _FakePathProvider extends PathProviderPlatform
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  const channel = MethodChannel('app.submersion/icloud_container');
-  final messenger =
-      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger;
-
   late Directory tempDir;
   late PathProviderPlatform originalPathProvider;
 
@@ -37,34 +32,38 @@ void main() {
   });
 
   tearDown(() {
-    messenger.setMockMethodCallHandler(channel, null);
     PathProviderPlatform.instance = originalPathProvider;
     if (tempDir.existsSync()) tempDir.deleteSync(recursive: true);
   });
+
+  // The container lookup is injected rather than mocked at the method channel:
+  // ICloudNativeService.getContainerPath carries its own platform guard and
+  // returns null without touching the channel on a non-Apple host, so a mocked
+  // channel would go unconsulted on the Linux CI runner.
+  ICloudStorageProvider providerWithContainer(
+    String? containerPath, {
+    ICloudHostPlatform platform = ICloudHostPlatform.ios,
+  }) {
+    return ICloudStorageProvider(
+      platform: platform,
+      containerPathLookup: () async => containerPath,
+    );
+  }
 
   group('ICloudStorageProvider with no reachable ubiquity container', () {
     // The native lookup returns null whenever iCloud cannot serve this app:
     // no iCloud account signed in, or a build without the ubiquity
     // entitlement. The iOS Simulator is permanently in this state.
-    setUp(() {
-      messenger.setMockMethodCallHandler(channel, (call) async => null);
-    });
 
     test(
       'reports unavailable on iOS instead of substituting local storage',
       () async {
-        final provider = ICloudStorageProvider(
-          platform: ICloudHostPlatform.ios,
-        );
-
-        expect(await provider.isAvailable(), isFalse);
+        expect(await providerWithContainer(null).isAvailable(), isFalse);
       },
     );
 
     test('leaves no local stand-in directory behind on iOS', () async {
-      final provider = ICloudStorageProvider(platform: ICloudHostPlatform.ios);
-
-      await provider.isAvailable();
+      await providerWithContainer(null).isAvailable();
 
       expect(
         Directory(p.join(tempDir.path, 'iCloud')).existsSync(),
@@ -76,27 +75,63 @@ void main() {
     });
 
     test('authenticate throws on iOS rather than reporting success', () async {
-      final provider = ICloudStorageProvider(platform: ICloudHostPlatform.ios);
-
       await expectLater(
-        provider.authenticate(),
+        providerWithContainer(null).authenticate(),
         throwsA(isA<CloudStorageException>()),
       );
     });
 
     test('reports unavailable on macOS', () async {
-      final provider = ICloudStorageProvider(
+      final provider = providerWithContainer(
+        null,
         platform: ICloudHostPlatform.macos,
+      );
+
+      expect(await provider.isAvailable(), isFalse);
+    });
+
+    test('reports unavailable on non-Apple platforms', () async {
+      final provider = providerWithContainer(
+        null,
+        platform: ICloudHostPlatform.other,
       );
 
       expect(await provider.isAvailable(), isFalse);
     });
   });
 
-  test('reports unavailable on non-Apple platforms', () async {
-    final provider = ICloudStorageProvider(platform: ICloudHostPlatform.other);
+  group('ICloudStorageProvider with a reachable ubiquity container', () {
+    // Control: proves the injected lookup is genuinely wired into
+    // _getICloudContainer. Without it, a provider that ignored the lookup and
+    // always returned null would satisfy every unavailability test above.
+    test('reports available when the container resolves', () async {
+      final container = Directory(p.join(tempDir.path, 'container'))
+        ..createSync();
 
-    expect(await provider.isAvailable(), isFalse);
+      final provider = providerWithContainer(container.path);
+
+      expect(await provider.isAvailable(), isTrue);
+    });
+
+    test('authenticate succeeds when the container resolves', () async {
+      final container = Directory(p.join(tempDir.path, 'container'))
+        ..createSync();
+
+      await expectLater(
+        providerWithContainer(container.path).authenticate(),
+        completes,
+      );
+    });
+
+    test(
+      'creates the container directory when it does not yet exist',
+      () async {
+        final container = p.join(tempDir.path, 'not-yet-there');
+
+        expect(await providerWithContainer(container).isAvailable(), isTrue);
+        expect(Directory(container).existsSync(), isTrue);
+      },
+    );
   });
 
   group('ICloudHostPlatform', () {
@@ -106,10 +141,16 @@ void main() {
       expect(ICloudHostPlatform.other.isApple, isFalse);
     });
 
-    test('current() resolves the host to a single consistent value', () {
-      final current = ICloudHostPlatform.current();
+    test(
+      'current() reports macos on a macOS host',
+      () => expect(ICloudHostPlatform.current(), ICloudHostPlatform.macos),
+      skip: !Platform.isMacOS,
+    );
 
-      expect(current.isApple, current != ICloudHostPlatform.other);
-    });
+    test(
+      'current() reports other on a non-Apple host',
+      () => expect(ICloudHostPlatform.current(), ICloudHostPlatform.other),
+      skip: Platform.isMacOS || Platform.isIOS,
+    );
   });
 }

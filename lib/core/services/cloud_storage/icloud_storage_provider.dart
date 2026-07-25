@@ -31,6 +31,10 @@ enum ICloudHostPlatform {
   bool get isApple => this != ICloudHostPlatform.other;
 }
 
+/// Resolves the iCloud container's Documents path, or null when iCloud cannot
+/// serve this app.
+typedef ICloudContainerPathLookup = Future<String?> Function();
+
 /// iCloud implementation of CloudStorageProvider
 ///
 /// Uses the app's iCloud container directory for storage.
@@ -46,12 +50,24 @@ class ICloudStorageProvider
   /// [platform] defaults to the real host platform. It is injectable because
   /// unit tests never run on a real iOS device, so the iOS-specific behaviour
   /// of this provider is otherwise unreachable from a test host.
-  ICloudStorageProvider({ICloudHostPlatform? platform})
-    : _platform = platform ?? ICloudHostPlatform.current();
+  ///
+  /// [containerPathLookup] defaults to the native channel call. It is
+  /// injectable because [ICloudNativeService.getContainerPath] carries its own
+  /// `Platform.isIOS || Platform.isMacOS` guard and returns null without
+  /// reaching the channel on other hosts — so on a Linux CI runner a mocked
+  /// channel is never consulted, and a test would reach its assertion via a
+  /// short circuit rather than via the branch it means to exercise.
+  ICloudStorageProvider({
+    ICloudHostPlatform? platform,
+    ICloudContainerPathLookup? containerPathLookup,
+  }) : _platform = platform ?? ICloudHostPlatform.current(),
+       _lookupContainerPath =
+           containerPathLookup ?? ICloudNativeService.getContainerPath;
 
   static final _log = LoggerService.forClass(ICloudStorageProvider);
 
   final ICloudHostPlatform _platform;
+  final ICloudContainerPathLookup _lookupContainerPath;
 
   Directory? _icloudContainer;
   Directory? _syncFolder;
@@ -126,7 +142,7 @@ class ICloudStorageProvider
     try {
       _log.info('Platform: ${_platform.name}');
 
-      final containerPath = await ICloudNativeService.getContainerPath();
+      final containerPath = await _lookupContainerPath();
       if (containerPath != null) {
         _log.info('iCloud container path: $containerPath');
         final container = Directory(containerPath);
