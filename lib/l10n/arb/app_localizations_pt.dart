@@ -12572,7 +12572,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get settings_appearance_appLanguage => 'Idioma do Aplicativo';
 
   @override
-  String get settings_appearance_displaySize => 'Display size';
+  String get settings_appearance_displaySize => 'Tamanho de exibição';
 
   @override
   String settings_appearance_displaySize_value(int percent) {
@@ -12580,13 +12580,13 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get settings_appearance_displaySize_reset => 'Reset';
+  String get settings_appearance_displaySize_reset => 'Redefinir';
 
   @override
-  String get settings_appearance_displaySize_smaller => 'Smaller';
+  String get settings_appearance_displaySize_smaller => 'Menor';
 
   @override
-  String get settings_appearance_displaySize_larger => 'Larger';
+  String get settings_appearance_displaySize_larger => 'Maior';
 
   @override
   String get settings_appearance_depthColoredCards =>

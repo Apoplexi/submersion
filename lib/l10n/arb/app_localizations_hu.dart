@@ -12530,7 +12530,7 @@ class AppLocalizationsHu extends AppLocalizations {
   String get settings_appearance_appLanguage => 'Alkalmazas nyelve';
 
   @override
-  String get settings_appearance_displaySize => 'Display size';
+  String get settings_appearance_displaySize => 'Megjelenítési méret';
 
   @override
   String settings_appearance_displaySize_value(int percent) {
@@ -12538,13 +12538,13 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
-  String get settings_appearance_displaySize_reset => 'Reset';
+  String get settings_appearance_displaySize_reset => 'Visszaállítás';
 
   @override
-  String get settings_appearance_displaySize_smaller => 'Smaller';
+  String get settings_appearance_displaySize_smaller => 'Kisebb';
 
   @override
-  String get settings_appearance_displaySize_larger => 'Larger';
+  String get settings_appearance_displaySize_larger => 'Nagyobb';
 
   @override
   String get settings_appearance_depthColoredCards =>

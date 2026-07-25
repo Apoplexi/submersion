@@ -12344,7 +12344,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get settings_appearance_appLanguage => 'لغة التطبيق';
 
   @override
-  String get settings_appearance_displaySize => 'Display size';
+  String get settings_appearance_displaySize => 'حجم العرض';
 
   @override
   String settings_appearance_displaySize_value(int percent) {
@@ -12352,13 +12352,13 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
-  String get settings_appearance_displaySize_reset => 'Reset';
+  String get settings_appearance_displaySize_reset => 'إعادة تعيين';
 
   @override
-  String get settings_appearance_displaySize_smaller => 'Smaller';
+  String get settings_appearance_displaySize_smaller => 'أصغر';
 
   @override
-  String get settings_appearance_displaySize_larger => 'Larger';
+  String get settings_appearance_displaySize_larger => 'أكبر';
 
   @override
   String get settings_appearance_depthColoredCards => 'بطاقات ملونة حسب العمق';
