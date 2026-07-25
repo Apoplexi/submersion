@@ -102,7 +102,6 @@ class BackgroundDatabaseConnection {
   final Isolate _worker;
   final ReceivePort _exitPort;
   final Future<void> _workerExited;
-  bool _shutdownStarted = false;
 
   /// Opens [file] on a dedicated worker isolate.
   ///
@@ -165,22 +164,21 @@ class BackgroundDatabaseConnection {
   ///   restore), a [TimeoutException] is thrown instead, because killing the
   ///   worker would strand an open SQLite handle — and its file locks — in a
   ///   process that is about to reopen the same file.
+  ///
+  /// Safe to call more than once: every call genuinely waits for the exit
+  /// event (awaiting the already-completed future is a no-op after the worker
+  /// has exited, and closing the port or killing the isolate again does
+  /// nothing).
   Future<bool> awaitWorkerShutdown({
     required Duration timeout,
     required bool killIfStuck,
   }) async {
-    if (_shutdownStarted) return true;
-    _shutdownStarted = true;
-
     try {
       await _workerExited.timeout(timeout);
       _exitPort.close();
       return true;
     } on TimeoutException {
-      if (!killIfStuck) {
-        _shutdownStarted = false;
-        rethrow;
-      }
+      if (!killIfStuck) rethrow;
       _worker.kill(priority: Isolate.immediate);
       try {
         await _workerExited.timeout(const Duration(seconds: 2));

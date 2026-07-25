@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -19,9 +21,13 @@ void main() {
     await db.customStatement('CREATE TABLE t (id INTEGER PRIMARY KEY)');
 
     final stream = db.customSelect('SELECT id FROM t').watch();
-    final subscription = stream.listen((_) {});
-    // Let the first snapshot arrive so the stream is fully live.
-    await Future<void>.delayed(const Duration(milliseconds: 100));
+    // Wait for the first snapshot so the stream is fully live before pausing;
+    // a fixed sleep here would be timing-dependent on contended CI.
+    final firstSnapshot = Completer<void>();
+    final subscription = stream.listen((_) {
+      if (!firstSnapshot.isCompleted) firstSnapshot.complete();
+    });
+    await firstSnapshot.future;
 
     // What Riverpod 3 does to the streams of providers nobody listens to.
     subscription.pause();

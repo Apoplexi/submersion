@@ -192,11 +192,15 @@ void main() {
     // A live watch() whose subscription is paused makes db.close() hang in
     // streamQueries.close() before the executor is ever asked to close —
     // exactly what Riverpod 3 does to unlistened providers' streams.
-    final subscription = db
-        .customSelect('SELECT id FROM t')
-        .watch()
-        .listen((_) {});
-    await Future<void>.delayed(const Duration(milliseconds: 100));
+    final firstSnapshot = Completer<void>();
+    final subscription = db.customSelect('SELECT id FROM t').watch().listen((
+      _,
+    ) {
+      if (!firstSnapshot.isCompleted) firstSnapshot.complete();
+    });
+    // Pause only once the stream is live; a fixed sleep would be flaky on
+    // contended CI.
+    await firstSnapshot.future;
     subscription.pause();
 
     final sw = Stopwatch()..start();
