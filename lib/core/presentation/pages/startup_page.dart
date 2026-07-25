@@ -14,6 +14,7 @@ import 'package:submersion/core/domain/entities/migration_progress.dart';
 import 'package:submersion/core/presentation/startup_brightness.dart';
 import 'package:submersion/core/presentation/widgets/backup_status_views.dart';
 import 'package:submersion/core/presentation/widgets/ocean_background.dart';
+import 'package:submersion/core/services/accounts/account_deduplicator.dart';
 import 'package:submersion/core/services/accounts/account_startup_migration.dart';
 import 'package:submersion/core/services/background_service.dart';
 import 'package:submersion/core/services/database_location_service.dart';
@@ -355,6 +356,10 @@ class _StartupWrapperState extends State<StartupWrapper>
     await timeStartupStep('accountMigration', () async {
       final prefs = await SharedPreferences.getInstance();
       await AccountStartupMigration(prefs: prefs).run();
+      // After the migration, so rows it seeds are already at their
+      // deterministic ids and the pass finds nothing to do on a fresh
+      // install. Both swallow their own errors: neither can block startup.
+      await AccountDeduplicator(prefs: prefs).run();
     });
     await timeStartupStep(
       'notifications',
