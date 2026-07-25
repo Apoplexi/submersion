@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:sqlite3/sqlite3.dart' show sqlite3;
 import 'package:submersion/core/database/background_database_connection.dart';
 
 /// Minimal drift database used only to drive the remote executor.
@@ -187,7 +188,11 @@ void main() {
       File('${dir.path}/app.db'),
     );
     final db = _TinyDb(connection.connection);
+    // Explicit WAL mode with a write through it, so the durability check
+    // after shutdown exercises a WAL checkpoint-on-close.
+    await db.customStatement('PRAGMA journal_mode = WAL');
     await db.customStatement('CREATE TABLE t (id INTEGER PRIMARY KEY)');
+    await db.customStatement('INSERT INTO t (id) VALUES (1)');
 
     // A live watch() whose subscription is paused makes db.close() hang in
     // streamQueries.close() before the executor is ever asked to close —
@@ -217,8 +222,17 @@ void main() {
       lessThan(const Duration(seconds: 4)),
       reason: 'shutdown must not sit out full timeouts',
     );
-    // The worker really closed SQLite: a completed close removes the WAL.
-    expect(File('${dir.path}/app.db-wal').existsSync(), isFalse);
+    // clean == true is the "SQLite really closed" signal: the worker isolate
+    // exits only after connection.close() has returned. (The -wal sidecar is
+    // NOT a usable signal here — Apple's system SQLite enables PERSIST_WAL,
+    // leaving the file behind even on a clean close.) Reopening and reading
+    // additionally proves the committed write survived the shutdown.
+    final reopened = sqlite3.open('${dir.path}/app.db');
+    try {
+      expect(reopened.select('SELECT id FROM t').single['id'], 1);
+    } finally {
+      reopened.dispose();
+    }
 
     subscription.resume();
     await subscription.cancel();
@@ -235,6 +249,9 @@ void main() {
       );
       final db = _TinyDb(connection.connection);
 
+      // Explicit WAL mode so the post-shutdown read exercises a WAL
+      // checkpoint-on-close.
+      await db.customStatement('PRAGMA journal_mode = WAL');
       await db.customStatement('CREATE TABLE t (id INTEGER PRIMARY KEY)');
       await db.customStatement('INSERT INTO t (id) VALUES (7)');
       final rows = await db.customSelect('SELECT id FROM t').get();
@@ -247,9 +264,16 @@ void main() {
       );
 
       expect(exitedCleanly, isTrue);
-      expect(File('${dir.path}/app.db').existsSync(), isTrue);
-      // A completed SQLite close removes the WAL sidecars.
-      expect(File('${dir.path}/app.db-wal').existsSync(), isFalse);
+      // The worker exits only after connection.close() returns, so a clean
+      // exit means SQLite closed. (WAL-sidecar absence is not assertable:
+      // Apple's system SQLite enables PERSIST_WAL and keeps the file on a
+      // clean close.) The committed write must survive a fresh open.
+      final reopened = sqlite3.open('${dir.path}/app.db');
+      try {
+        expect(reopened.select('SELECT id FROM t').single['id'], 7);
+      } finally {
+        reopened.dispose();
+      }
     },
     timeout: const Timeout(Duration(seconds: 60)),
   );

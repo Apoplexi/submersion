@@ -32,19 +32,22 @@ void main() {
     // What Riverpod 3 does to the streams of providers nobody listens to.
     subscription.pause();
 
-    final closed = db
-        .close()
+    final closeFuture = db.close();
+    final outcome = await closeFuture
         .then((_) => 'closed')
         .timeout(const Duration(seconds: 2), onTimeout: () => 'timed out');
 
     expect(
-      await closed,
+      outcome,
       'timed out',
       reason: 'a paused subscription blocks StreamQueryStore.close()',
     );
 
-    // Cleanup so the test process can exit.
+    // Releasing the subscription must unblock the stalled close. Awaiting it
+    // (bounded) both proves that and releases the native connection, so the
+    // abandoned close cannot leak sqlite state across the suite.
     subscription.resume();
     await subscription.cancel();
+    await closeFuture.timeout(const Duration(seconds: 5));
   }, timeout: const Timeout(Duration(seconds: 30)));
 }
