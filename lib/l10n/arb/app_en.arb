@@ -7113,6 +7113,8 @@
   "plannerCanvas_saved_duplicate": "Duplicate",
   "plannerCanvas_saved_empty": "No saved plans yet",
   "plannerCanvas_saved_title": "Saved plans",
+  "plannerCanvas_name_dialogTitle": "Name your plan",
+  "plannerCanvas_name_defaultFallback": "Dive Plan",
   "plannerCanvas_scrub_bailout": "BO {minutes}′",
   "@plannerCanvas_scrub_bailout": {
     "placeholders": {

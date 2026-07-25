@@ -3890,6 +3890,8 @@
   "plannerCanvas_saved_duplicate": "Duplicar",
   "plannerCanvas_saved_empty": "Aún no hay planes guardados",
   "plannerCanvas_saved_title": "Planes guardados",
+  "plannerCanvas_name_dialogTitle": "Nombra tu plan",
+  "plannerCanvas_name_defaultFallback": "Plan de buceo",
   "plannerCanvas_scrub_bailout": "BO {minutes}′",
   "plannerCanvas_scrub_readout": "RT {minutes}′ · {depth}",
   "plannerCanvas_share_import": "Importar",

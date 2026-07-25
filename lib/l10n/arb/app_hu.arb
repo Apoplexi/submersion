@@ -3820,6 +3820,8 @@
   "plannerCanvas_saved_duplicate": "Duplikálás",
   "plannerCanvas_saved_empty": "Még nincsenek mentett tervek",
   "plannerCanvas_saved_title": "Mentett tervek",
+  "plannerCanvas_name_dialogTitle": "Nevezze el a tervet",
+  "plannerCanvas_name_defaultFallback": "Merülési terv",
   "plannerCanvas_scrub_bailout": "BO {minutes}′",
   "plannerCanvas_scrub_readout": "RT {minutes}′ · {depth}",
   "plannerCanvas_share_import": "Importálás",

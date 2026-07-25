@@ -11780,6 +11780,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get plannerCanvas_saved_title => '已保存的计划';
 
   @override
+  String get plannerCanvas_name_dialogTitle => '为计划命名';
+
+  @override
+  String get plannerCanvas_name_defaultFallback => '潜水计划';
+
+  @override
   String plannerCanvas_scrub_bailout(String minutes) {
     return 'BO $minutes′';
   }

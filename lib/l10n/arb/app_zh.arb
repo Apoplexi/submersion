@@ -4041,6 +4041,8 @@
   "plannerCanvas_saved_duplicate": "复制",
   "plannerCanvas_saved_empty": "尚无已保存的计划",
   "plannerCanvas_saved_title": "已保存的计划",
+  "plannerCanvas_name_dialogTitle": "为计划命名",
+  "plannerCanvas_name_defaultFallback": "潜水计划",
   "plannerCanvas_scrub_bailout": "BO {minutes}′",
   "plannerCanvas_scrub_readout": "RT {minutes}′ · {depth}",
   "plannerCanvas_share_import": "导入",

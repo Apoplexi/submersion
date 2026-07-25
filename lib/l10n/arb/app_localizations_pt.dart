@@ -12347,6 +12347,12 @@ class AppLocalizationsPt extends AppLocalizations {
   String get plannerCanvas_saved_title => 'Planos salvos';
 
   @override
+  String get plannerCanvas_name_dialogTitle => 'Dê um nome ao seu plano';
+
+  @override
+  String get plannerCanvas_name_defaultFallback => 'Plano de mergulho';
+
+  @override
   String plannerCanvas_scrub_bailout(String minutes) {
     return 'BO $minutes′';
   }

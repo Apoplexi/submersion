@@ -12342,6 +12342,12 @@ class AppLocalizationsIt extends AppLocalizations {
   String get plannerCanvas_saved_title => 'Piani salvati';
 
   @override
+  String get plannerCanvas_name_dialogTitle => 'Dai un nome al piano';
+
+  @override
+  String get plannerCanvas_name_defaultFallback => 'Piano di immersione';
+
+  @override
   String plannerCanvas_scrub_bailout(String minutes) {
     return 'BO $minutes′';
   }

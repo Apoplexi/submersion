@@ -3890,6 +3890,8 @@
   "plannerCanvas_saved_duplicate": "Duplizieren",
   "plannerCanvas_saved_empty": "Noch keine gespeicherten Pläne",
   "plannerCanvas_saved_title": "Gespeicherte Pläne",
+  "plannerCanvas_name_dialogTitle": "Plan benennen",
+  "plannerCanvas_name_defaultFallback": "Tauchplan",
   "plannerCanvas_scrub_bailout": "BO {minutes}′",
   "plannerCanvas_scrub_readout": "RT {minutes}′ · {depth}",
   "plannerCanvas_share_import": "Importieren",

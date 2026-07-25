@@ -3890,6 +3890,8 @@
   "plannerCanvas_saved_duplicate": "Duplicar",
   "plannerCanvas_saved_empty": "Ainda não há planos salvos",
   "plannerCanvas_saved_title": "Planos salvos",
+  "plannerCanvas_name_dialogTitle": "Dê um nome ao seu plano",
+  "plannerCanvas_name_defaultFallback": "Plano de mergulho",
   "plannerCanvas_scrub_bailout": "BO {minutes}′",
   "plannerCanvas_scrub_readout": "RT {minutes}′ · {depth}",
   "plannerCanvas_share_import": "Importar",
