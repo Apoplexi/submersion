@@ -272,8 +272,10 @@ Windows and Linux have no menu bar; they rely on the Dart shortcuts.
 New ARB keys in `app_en.arb`:
 
 - `settings_appearance_displaySize`
+- `settings_appearance_displaySize_value` — takes an `int` placeholder
+  `percent`, so the percentage is formatted per locale rather than
+  concatenated in Dart
 - `settings_appearance_displaySize_reset`
-- `settings_appearance_displaySize_semanticLabel`
 - `settings_appearance_displaySize_smaller`
 - `settings_appearance_displaySize_larger`
 
