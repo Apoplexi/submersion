@@ -166,7 +166,8 @@ class MediaUploadPipeline {
       final hadOriginal = item.remoteUploadedAt != null;
       final hadCompressed = item.remoteCompressedUploadedAt != null;
       // A corrupt or future-enum override string must not fail the upload:
-      // fall back to the device's configured level so the item still uploads.
+      // fall back to the library-wide configured level (MediaUploadQualityPolicy,
+      // a synced setting -- not a per-device one) so the item still uploads.
       final level =
           (isOverride ? _tryParseQuality(entry.overrideLevel!) : null) ??
           await _quality.qualityFor(item.mediaType);

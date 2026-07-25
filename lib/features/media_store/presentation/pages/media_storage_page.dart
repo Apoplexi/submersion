@@ -83,15 +83,26 @@ class _MediaStoragePageState extends ConsumerState<MediaStoragePage> {
     Future<void> Function(MediaUploadQualityPolicy policy) write,
     FutureProvider<MediaUploadQuality> provider,
   ) async {
+    // Capture the app-level container before the first await. It outlives this
+    // page, so the write and invalidate below still run (and never throw) if
+    // the page is popped during the async gap -- `ref` throws once the
+    // ConsumerState is disposed. Guarding the invalidate with `mounted`
+    // instead would swap the crash for a stale cached level on the next visit,
+    // since these providers are not autoDispose. Mirrors S3ConfigPage's save.
+    final container = ProviderScope.containerOf(context, listen: false);
     try {
-      await write(ref.read(mediaUploadQualityPolicyProvider));
+      await write(container.read(mediaUploadQualityPolicyProvider));
     } catch (_) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.settings_mediaStorage_quality_saveFailed)),
-      );
+      // Only the snackbar needs a live widget; the invalidate does not.
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(l10n.settings_mediaStorage_quality_saveFailed),
+          ),
+        );
+      }
     }
-    ref.invalidate(provider);
+    container.invalidate(provider);
   }
 
   List<DropdownMenuItem<MediaUploadQuality>> _qualityItems(

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -551,6 +553,69 @@ void main() {
     });
 
     expect(settings.values[MediaUploadQualityPolicy.photoQualityKey], 'small');
+  });
+
+  // Popping the page mid-save must not crash: `ref` throws once the
+  // ConsumerState is disposed, so _saveQuality captures the app-level
+  // container before the first await. The write and the invalidate both still
+  // have to land, otherwise the next visit shows a stale level.
+  testWidgets('a save that outlives the page neither throws nor is lost', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(800, 2600);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.reset);
+    final settings = FakeAppSettingsRepository();
+    final policy = MediaUploadQualityPolicy(settings: settings);
+
+    await tester.runAsync(() async {
+      await tester.pumpWidget(
+        app(
+          statusHint: 'dive-media @ minio',
+          extraOverrides: [
+            mediaUploadQualityPolicyProvider.overrideWithValue(policy),
+          ],
+        ),
+      );
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+      await tester.pump();
+    });
+
+    // Hold the write open so the page can be disposed while it is in flight.
+    final gate = Completer<void>();
+    settings.gateWrite = gate;
+
+    final dropdown = find.byKey(const Key('media-quality-photos'));
+    await tester.ensureVisible(dropdown);
+    await tester.runAsync(() async {
+      await tester.tap(dropdown);
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+      await tester.pump();
+      await tester.pump(const Duration(seconds: 1));
+    });
+    await tester.runAsync(() async {
+      await tester.tap(find.text('Small').last);
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+      await tester.pump();
+    });
+
+    // Navigate away: the MediaStoragePage ConsumerState is disposed while the
+    // write is still awaiting the gate.
+    await tester.pumpWidget(const MaterialApp(home: SizedBox.shrink()));
+    expect(find.byType(MediaStoragePage), findsNothing);
+
+    await tester.runAsync(() async {
+      gate.complete();
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+    });
+    await tester.pump();
+
+    expect(tester.takeException(), isNull);
+    expect(
+      settings.values[MediaUploadQualityPolicy.photoQualityKey],
+      'small',
+      reason: 'the write must still land after the page is gone',
+    );
   });
 
   // Writes rethrow by design so a failed save is visible; the previous
