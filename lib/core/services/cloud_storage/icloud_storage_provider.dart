@@ -8,6 +8,29 @@ import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/core/services/cloud_storage/cloud_storage_provider.dart';
 import 'package:submersion/core/services/cloud_storage/icloud_native_service.dart';
 
+/// The host platform, as far as iCloud availability is concerned.
+///
+/// [ICloudStorageProvider] takes one of these rather than separate `isApple` /
+/// `isIOS` booleans, so that an impossible combination (iOS but not Apple)
+/// cannot be constructed at all. A provider built from mismatched booleans
+/// would fail the platform guard before ever consulting the container, making
+/// a test pass for the wrong reason.
+enum ICloudHostPlatform {
+  ios,
+  macos,
+  other;
+
+  /// The real host platform this process is running on.
+  static ICloudHostPlatform current() {
+    if (Platform.isIOS) return ICloudHostPlatform.ios;
+    if (Platform.isMacOS) return ICloudHostPlatform.macos;
+    return ICloudHostPlatform.other;
+  }
+
+  /// Whether iCloud can exist here at all.
+  bool get isApple => this != ICloudHostPlatform.other;
+}
+
 /// iCloud implementation of CloudStorageProvider
 ///
 /// Uses the app's iCloud container directory for storage.
@@ -20,19 +43,15 @@ import 'package:submersion/core/services/cloud_storage/icloud_native_service.dar
 class ICloudStorageProvider
     with CloudStorageProviderMixin
     implements CloudStorageProvider {
-  /// [isApplePlatform] and [isIOS] default to the real `dart:io` platform.
-  /// They are injectable because unit tests never run on a real iOS device, so
-  /// the iOS-specific behaviour of this provider is otherwise unreachable from
-  /// a test host.
-  ICloudStorageProvider({bool? isApplePlatform, bool? isIOS})
-    : _isApplePlatform =
-          isApplePlatform ?? (Platform.isIOS || Platform.isMacOS),
-      _isIOS = isIOS ?? Platform.isIOS;
+  /// [platform] defaults to the real host platform. It is injectable because
+  /// unit tests never run on a real iOS device, so the iOS-specific behaviour
+  /// of this provider is otherwise unreachable from a test host.
+  ICloudStorageProvider({ICloudHostPlatform? platform})
+    : _platform = platform ?? ICloudHostPlatform.current();
 
   static final _log = LoggerService.forClass(ICloudStorageProvider);
 
-  final bool _isApplePlatform;
-  final bool _isIOS;
+  final ICloudHostPlatform _platform;
 
   Directory? _icloudContainer;
   Directory? _syncFolder;
@@ -46,7 +65,7 @@ class ICloudStorageProvider
   @override
   Future<bool> isAvailable() async {
     // iCloud is only available on iOS and macOS
-    if (!_isApplePlatform) {
+    if (!_platform.isApple) {
       return false;
     }
 
@@ -105,7 +124,7 @@ class ICloudStorageProvider
     }
 
     try {
-      _log.info('Platform: apple=$_isApplePlatform, iOS=$_isIOS');
+      _log.info('Platform: ${_platform.name}');
 
       final containerPath = await ICloudNativeService.getContainerPath();
       if (containerPath != null) {

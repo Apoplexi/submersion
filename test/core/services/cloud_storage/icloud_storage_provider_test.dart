@@ -54,8 +54,7 @@ void main() {
       'reports unavailable on iOS instead of substituting local storage',
       () async {
         final provider = ICloudStorageProvider(
-          isApplePlatform: true,
-          isIOS: true,
+          platform: ICloudHostPlatform.ios,
         );
 
         expect(await provider.isAvailable(), isFalse);
@@ -63,10 +62,7 @@ void main() {
     );
 
     test('leaves no local stand-in directory behind on iOS', () async {
-      final provider = ICloudStorageProvider(
-        isApplePlatform: true,
-        isIOS: true,
-      );
+      final provider = ICloudStorageProvider(platform: ICloudHostPlatform.ios);
 
       await provider.isAvailable();
 
@@ -80,10 +76,7 @@ void main() {
     });
 
     test('authenticate throws on iOS rather than reporting success', () async {
-      final provider = ICloudStorageProvider(
-        isApplePlatform: true,
-        isIOS: true,
-      );
+      final provider = ICloudStorageProvider(platform: ICloudHostPlatform.ios);
 
       await expectLater(
         provider.authenticate(),
@@ -93,8 +86,7 @@ void main() {
 
     test('reports unavailable on macOS', () async {
       final provider = ICloudStorageProvider(
-        isApplePlatform: true,
-        isIOS: false,
+        platform: ICloudHostPlatform.macos,
       );
 
       expect(await provider.isAvailable(), isFalse);
@@ -102,11 +94,22 @@ void main() {
   });
 
   test('reports unavailable on non-Apple platforms', () async {
-    final provider = ICloudStorageProvider(
-      isApplePlatform: false,
-      isIOS: false,
-    );
+    final provider = ICloudStorageProvider(platform: ICloudHostPlatform.other);
 
     expect(await provider.isAvailable(), isFalse);
+  });
+
+  group('ICloudHostPlatform', () {
+    test('treats both Apple platforms as Apple', () {
+      expect(ICloudHostPlatform.ios.isApple, isTrue);
+      expect(ICloudHostPlatform.macos.isApple, isTrue);
+      expect(ICloudHostPlatform.other.isApple, isFalse);
+    });
+
+    test('current() resolves the host to a single consistent value', () {
+      final current = ICloudHostPlatform.current();
+
+      expect(current.isApple, current != ICloudHostPlatform.other);
+    });
   });
 }
