@@ -5877,6 +5877,8 @@
   "settings_mediaStorage_transfers_state_deleting": "Eliminando de la nube",
   "settings_mediaStorage_transfers_state_done": "Completado",
   "settings_mediaStorage_transfers_state_failed": "Fallido",
+  "settings_mediaStorage_transfers_queued": "{count} en cola",
+  "settings_mediaStorage_transfers_waitingRetry": "{count} esperando para reintentar",
   "settings_mediaStorage_verify_action": "Verificar biblioteca",
   "settings_mediaStorage_verify_running": "Verificando la biblioteca multimedia...",
   "settings_mediaStorage_verify_summary": "Se comprobaron {checked} objetos: {removed} huérfanos eliminados, {repaired} reparaciones en cola, {aborted} subidas obsoletas canceladas",

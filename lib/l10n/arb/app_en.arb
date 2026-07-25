@@ -13046,6 +13046,22 @@
   "settings_mediaStorage_transfers_state_deleting": "Removing from cloud",
   "settings_mediaStorage_transfers_state_done": "Done",
   "settings_mediaStorage_transfers_state_failed": "Failed",
+  "settings_mediaStorage_transfers_queued": "{count} queued",
+  "@settings_mediaStorage_transfers_queued": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "settings_mediaStorage_transfers_waitingRetry": "{count} waiting to retry",
+  "@settings_mediaStorage_transfers_waitingRetry": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "settings_mediaStorage_verify_action": "Verify library",
   "settings_mediaStorage_verify_running": "Verifying media library...",
   "settings_mediaStorage_verify_summary": "Checked {checked} objects: removed {removed} orphans, queued {repaired} repairs, aborted {aborted} stale uploads",

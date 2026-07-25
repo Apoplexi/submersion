@@ -20285,6 +20285,16 @@ class AppLocalizationsAr extends AppLocalizations {
   String get settings_mediaStorage_transfers_state_failed => 'فشل';
 
   @override
+  String settings_mediaStorage_transfers_queued(int count) {
+    return '$count في قائمة الانتظار';
+  }
+
+  @override
+  String settings_mediaStorage_transfers_waitingRetry(int count) {
+    return '$count في انتظار إعادة المحاولة';
+  }
+
+  @override
   String get settings_mediaStorage_verify_action => 'التحقق من المكتبة';
 
   @override

@@ -20623,6 +20623,16 @@ class AppLocalizationsDe extends AppLocalizations {
   String get settings_mediaStorage_transfers_state_failed => 'Fehlgeschlagen';
 
   @override
+  String settings_mediaStorage_transfers_queued(int count) {
+    return '$count in Warteschlange';
+  }
+
+  @override
+  String settings_mediaStorage_transfers_waitingRetry(int count) {
+    return '$count warten auf Wiederholung';
+  }
+
+  @override
   String get settings_mediaStorage_verify_action => 'Bibliothek überprüfen';
 
   @override

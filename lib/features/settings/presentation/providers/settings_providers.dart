@@ -15,6 +15,7 @@ import 'package:submersion/features/dive_log/domain/entities/safety_finding.dart
 import 'package:submersion/features/safety/domain/services/no_fly_service.dart';
 import 'package:submersion/core/constants/units.dart';
 import 'package:submersion/core/deco/entities/cns_calculation_method.dart';
+import 'package:submersion/core/presentation/startup_brightness.dart';
 import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/features/divers/presentation/providers/diver_providers.dart';
 import 'package:submersion/features/notifications/data/services/notification_scheduler.dart';
@@ -904,6 +905,7 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
           perdixOverlayX: perdixOverlayX,
           perdixOverlayY: perdixOverlayY,
         );
+        await _writeCachedThemeMode(prefs);
         return;
       }
 
@@ -920,6 +922,8 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
         perdixOverlayX: perdixOverlayX,
         perdixOverlayY: perdixOverlayY,
       );
+
+      await _writeCachedThemeMode(prefs);
 
       // Schedule notifications with the loaded settings
       _scheduleNotificationsIfNeeded();
@@ -988,9 +992,21 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
       await prefs.setDouble(SettingsKeys.perdixOverlayY, perdixY);
     }
 
+    await _writeCachedThemeMode(prefs);
+
     final diverId = _validatedDiverId;
     if (diverId == null) return;
     await _repository.updateSettingsForDiver(diverId, state);
+  }
+
+  /// Mirrors the effective theme mode into SharedPreferences so the startup
+  /// splash and setup wizard (which render before the database opens) can
+  /// resolve dark mode. See [resolveStartupBrightness].
+  Future<void> _writeCachedThemeMode(SharedPreferences prefs) async {
+    await prefs.setString(
+      cachedThemeModeKey,
+      cachedThemeModeValue(state.themeMode),
+    );
   }
 
   Future<void> setDepthUnit(DepthUnit unit) async {

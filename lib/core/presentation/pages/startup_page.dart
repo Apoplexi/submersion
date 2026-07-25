@@ -11,6 +11,7 @@ import 'package:sqlite3/sqlite3.dart' as sqlite3;
 import 'package:submersion/core/database/database.dart';
 import 'package:submersion/core/database/database_version_exception.dart';
 import 'package:submersion/core/domain/entities/migration_progress.dart';
+import 'package:submersion/core/presentation/startup_brightness.dart';
 import 'package:submersion/core/presentation/widgets/backup_status_views.dart';
 import 'package:submersion/core/presentation/widgets/ocean_background.dart';
 import 'package:submersion/core/services/accounts/account_startup_migration.dart';
@@ -538,7 +539,11 @@ class _StartupWrapperState extends State<StartupWrapper>
 
   @override
   Widget build(BuildContext context) {
-    final isDark = MediaQuery.platformBrightnessOf(context) == Brightness.dark;
+    final brightness = resolveStartupBrightness(
+      widget.prefs,
+      MediaQuery.platformBrightnessOf(context),
+    );
+    final isDark = brightness == Brightness.dark;
     final backgroundColor = isDark ? const Color(0xFF121212) : Colors.white;
     final textColor = isDark ? Colors.white : Colors.black87;
     final subtitleColor = isDark ? Colors.white70 : Colors.black54;
@@ -582,6 +587,7 @@ class _StartupWrapperState extends State<StartupWrapper>
                         // Scaffold crossfade.
                         key: const ValueKey('splash'),
                         body: OceanBackground(
+                          brightness: brightness,
                           child: SafeArea(
                             child: Center(child: _buildSplashContent(isDark)),
                           ),
