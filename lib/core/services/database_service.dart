@@ -6,6 +6,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
 import 'package:sqlite3/sqlite3.dart' as sqlite3;
 
+import 'package:submersion/core/database/background_database_connection.dart';
 import 'package:submersion/core/database/database.dart';
 import 'package:submersion/core/database/database_version_exception.dart';
 import 'package:submersion/core/services/database_location_service.dart';
@@ -26,6 +27,12 @@ class DatabaseService {
   static final DatabaseService instance = DatabaseService._();
 
   AppDatabase? _database;
+
+  /// The worker isolate behind [_database], when it was opened on one. Held so
+  /// [close] can wait for SQLite to actually finish closing rather than just
+  /// for drift's acknowledgement — see [BackgroundDatabaseConnection].
+  BackgroundDatabaseConnection? _background;
+
   DatabaseLocationService? _locationService;
   String? _currentDatabasePath;
   bool _isMigrating = false;
@@ -80,6 +87,7 @@ class DatabaseService {
   @visibleForTesting
   void resetForTesting() {
     _database = null;
+    _background = null;
     _locationService = null;
     _currentDatabasePath = null;
     lastOpenMode = null;
@@ -185,8 +193,10 @@ class DatabaseService {
       lastOpenMode = DatabaseOpenMode.background;
     }
 
+    final background = await BackgroundDatabaseConnection.open(file);
+    _background = background;
     return AppDatabase(
-      NativeDatabase.createInBackground(file),
+      background.connection,
       onMigrationProgress: onMigrationProgress,
     );
   }
@@ -259,20 +269,33 @@ class DatabaseService {
       // keep it so the connection (and its locks) is not leaked and a
       // retry can re-attempt the close before reopening.
       await _database!.close().timeout(const Duration(seconds: 5));
+      // Drift acknowledges the shutdown request before the worker isolate
+      // runs sqlite3_close_v2, so the await above does NOT mean the file is
+      // closed. A caller about to reopen the same file must wait for the
+      // real close, and a stuck worker throws rather than being killed:
+      // killing it would strand an open handle holding the file locks.
+      await _background?.awaitWorkerShutdown(
+        timeout: const Duration(seconds: 5),
+        killIfStuck: false,
+      );
+      _background = null;
       _database = null;
       return;
     }
 
+    // Shutdown/abandon path. Two traps make a plain close() unsafe here:
+    // paused watch() subscriptions (Riverpod 3 auto-pause) hang the graceful
+    // close before it ever reaches the executor, and the background worker
+    // acknowledges the executor close before SQLite is actually closed. If
+    // the app then terminates, the worker's sqlite3_close_v2 calls back into
+    // Dart (drift's SQL function destructors) after the VM tore down its FFI
+    // callback metadata, aborting with "GetFfiCallbackMetadata called after
+    // shutdown" and hanging the app in the Dock. See
+    // closeDatabaseForAppShutdown for how each is handled.
     try {
-      // Shutdown/abandon path: if close times out, drop the connection and
-      // let the OS reclaim the file handles when the app exits.
-      await _database!.close().timeout(
-        const Duration(seconds: 5),
-        onTimeout: () {},
-      );
-    } catch (e) {
-      // Ignore close errors - we're abandoning this connection anyway.
+      await closeDatabaseForAppShutdown(_database!, background: _background);
     } finally {
+      _background = null;
       _database = null;
     }
   }
