@@ -84,6 +84,7 @@ Future<NavSpy> pumpStrip(
         dashboardGaugesProvider.overrideWith((ref) async => gauges),
       ].cast(),
       child: MaterialApp.router(
+        locale: const Locale('en'),
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         routerConfig: router,
@@ -652,6 +653,7 @@ void main() {
             dashboardGaugesProvider.overrideWith((ref) => completer.future),
           ].cast(),
           child: const MaterialApp(
+            locale: Locale('en'),
             localizationsDelegates: AppLocalizations.localizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
             home: Scaffold(body: GaugeStrip()),
@@ -682,6 +684,7 @@ void main() {
             }),
           ].cast(),
           child: const MaterialApp(
+            locale: Locale('en'),
             localizationsDelegates: AppLocalizations.localizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
             home: Scaffold(body: GaugeStrip()),

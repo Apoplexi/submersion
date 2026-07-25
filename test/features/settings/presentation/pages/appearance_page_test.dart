@@ -26,6 +26,7 @@ Widget _buildTestWidget() {
       settingsProvider.overrideWith((ref) => _MockSettingsNotifier()),
     ],
     child: const MaterialApp(
+      locale: Locale('en'),
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       home: AppearancePage(),
@@ -139,6 +140,7 @@ void main() {
             settingsProvider.overrideWith((ref) => _MockSettingsNotifier()),
           ],
           child: MaterialApp.router(
+            locale: const Locale('en'),
             localizationsDelegates: AppLocalizations.localizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
             routerConfig: router,

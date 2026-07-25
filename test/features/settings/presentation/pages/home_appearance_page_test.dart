@@ -15,6 +15,7 @@ void main() {
       ProviderScope(
         overrides: overrides.cast(),
         child: const MaterialApp(
+          locale: Locale('en'),
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
           home: HomeAppearancePage(),

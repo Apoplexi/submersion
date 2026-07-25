@@ -73,6 +73,7 @@ Future<NavSpy> pumpBanner(WidgetTester tester, DashboardAlerts alerts) async {
         dashboardAlertsProvider.overrideWith((ref) async => alerts),
       ].cast(),
       child: MaterialApp.router(
+        locale: const Locale('en'),
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         routerConfig: router,

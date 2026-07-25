@@ -103,6 +103,7 @@ Future<void> pumpDashboard(
         recentSitesProvider.overrideWith((ref) async => sites),
       ].cast(),
       child: MaterialApp.router(
+        locale: const Locale('en'),
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         routerConfig: router,

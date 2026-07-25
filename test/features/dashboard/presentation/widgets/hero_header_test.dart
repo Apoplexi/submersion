@@ -60,6 +60,7 @@ void main() {
             ),
           ].cast(),
           child: const MaterialApp(
+            locale: Locale('en'),
             localizationsDelegates: AppLocalizations.localizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
             home: Scaffold(body: SingleChildScrollView(child: HeroHeader())),
@@ -98,6 +99,7 @@ void main() {
             currentDiverProvider.overrideWith((ref) async => null),
           ].cast(),
           child: const MaterialApp(
+            locale: Locale('en'),
             localizationsDelegates: AppLocalizations.localizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
             home: Scaffold(body: SingleChildScrollView(child: HeroHeader())),
@@ -137,6 +139,7 @@ void main() {
             currentDiverProvider.overrideWith((ref) async => null),
           ].cast(),
           child: const MaterialApp(
+            locale: Locale('en'),
             localizationsDelegates: AppLocalizations.localizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
             home: Scaffold(body: SingleChildScrollView(child: HeroHeader())),
@@ -179,6 +182,7 @@ void main() {
             currentDiverProvider.overrideWith((ref) async => null),
           ].cast(),
           child: const MaterialApp(
+            locale: Locale('en'),
             localizationsDelegates: AppLocalizations.localizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
             home: Scaffold(body: SingleChildScrollView(child: HeroHeader())),
@@ -213,6 +217,7 @@ void main() {
             currentDiverProvider.overrideWith((ref) async => null),
           ].cast(),
           child: const MaterialApp(
+            locale: Locale('en'),
             localizationsDelegates: AppLocalizations.localizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
             home: Scaffold(body: SingleChildScrollView(child: HeroHeader())),
@@ -252,6 +257,7 @@ void main() {
             currentDiverProvider.overrideWith((ref) => diverCompleter.future),
           ].cast(),
           child: const MaterialApp(
+            locale: Locale('en'),
             localizationsDelegates: AppLocalizations.localizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
             home: Scaffold(body: SingleChildScrollView(child: HeroHeader())),
@@ -287,6 +293,7 @@ void main() {
             ),
           ].cast(),
           child: const MaterialApp(
+            locale: Locale('en'),
             localizationsDelegates: AppLocalizations.localizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
             home: Scaffold(body: SingleChildScrollView(child: HeroHeader())),

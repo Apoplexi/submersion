@@ -778,6 +778,7 @@ void main() {
       return ProviderScope(
         overrides: overrides,
         child: MaterialApp.router(
+          locale: const Locale('en'),
           routerConfig: router,
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
@@ -936,6 +937,7 @@ void main() {
       return ProviderScope(
         overrides: overrides,
         child: MaterialApp.router(
+          locale: const Locale('en'),
           routerConfig: router,
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
