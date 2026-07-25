@@ -63,26 +63,33 @@ class DisplayZoomScope extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Normalize at the boundary rather than trusting the call site. The
+    // provider always supplies a normalized value, but this widget is public:
+    // a raw 0, NaN, or negative zoom would divide the logical size into
+    // infinity or NaN and blank the UI. Normalizing also means a float-drifted
+    // value that should be 100% still takes the no-op fast path below.
+    final scale = DisplayZoom.normalize(zoom);
+
     // Exact identity at the default so users who never touch the setting get
     // the same widget tree as before, with no extra transform layer.
-    if (zoom == DisplayZoom.defaultValue) return child;
+    if (scale == DisplayZoom.defaultValue) return child;
 
     final mq = MediaQuery.of(context);
-    final logical = mq.size / zoom;
+    final logical = mq.size / scale;
 
     return MediaQuery(
       data: mq.copyWith(
         size: logical,
         // Insets are expressed in the outer coordinate space. Without dividing
         // them, content creeps under the notch and behind the keyboard.
-        padding: mq.padding / zoom,
-        viewPadding: mq.viewPadding / zoom,
-        viewInsets: mq.viewInsets / zoom,
+        padding: mq.padding / scale,
+        viewPadding: mq.viewPadding / scale,
+        viewInsets: mq.viewInsets / scale,
         // ImageConfiguration consults this to select asset resolution.
-        devicePixelRatio: mq.devicePixelRatio * zoom,
+        devicePixelRatio: mq.devicePixelRatio * scale,
       ),
       child: Transform.scale(
-        scale: zoom,
+        scale: scale,
         alignment: Alignment.topLeft,
         // OverflowBox, not SizedBox: MaterialApp.builder passes TIGHT
         // constraints equal to the physical window, which would force a

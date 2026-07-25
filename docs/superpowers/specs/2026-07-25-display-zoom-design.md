@@ -71,10 +71,13 @@ class DisplayZoomScope extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (zoom == DisplayZoom.defaultValue) return child;
+    // Normalized at the boundary: this widget is public, and a raw 0 / NaN /
+    // negative zoom would divide the logical size into infinity or NaN.
+    final scale = DisplayZoom.normalize(zoom);
+    if (scale == DisplayZoom.defaultValue) return child;
 
     final mq = MediaQuery.of(context);
-    final logical = mq.size / zoom;
+    final logical = mq.size / scale;
 
     return MediaQuery(
       data: mq.copyWith(
