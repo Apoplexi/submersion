@@ -315,9 +315,16 @@ class DisplayZoomScope extends StatelessWidget {
       child: Transform.scale(
         scale: zoom,
         alignment: Alignment.topLeft,
-        child: SizedBox(
-          width: logical.width,
-          height: logical.height,
+        // OverflowBox, not SizedBox: MaterialApp.builder passes TIGHT
+        // constraints equal to the physical window, which would force a
+        // SizedBox back to the physical size and paint only zoom-times the
+        // window.
+        child: OverflowBox(
+          alignment: Alignment.topLeft,
+          minWidth: logical.width,
+          maxWidth: logical.width,
+          minHeight: logical.height,
+          maxHeight: logical.height,
           child: child,
         ),
       ),
