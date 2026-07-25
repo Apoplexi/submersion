@@ -63,12 +63,45 @@ class MediaCacheEntries extends Table {
   Set<Column> get primaryKey => {contentHash, kind};
 }
 
-@DriftDatabase(tables: [LocalAssetCache, MediaTransferQueue, MediaCacheEntries])
+/// Cached third-party reef data, keyed by quantized coordinate. Never synced
+/// and never backed up: any device can re-derive this from a site's
+/// coordinates, so a restored database re-fetches rather than carrying
+/// another device's stale results.
+class ReefDataCache extends Table {
+  /// A `ReefProviderId.name`.
+  TextColumn get provider => text()();
+
+  /// `ReefCoordinateKey.format` output, e.g. "12.160,-68.280".
+  TextColumn get coordKey => text()();
+
+  /// Dive date as `yyyy-MM-dd` for historical reef health; empty otherwise.
+  TextColumn get variant => text().withDefault(const Constant(''))();
+
+  /// Provider-specific JSON. Empty object when status is not `ok`.
+  TextColumn get payloadJson => text()();
+
+  /// A `ReefDataStatus.name`.
+  TextColumn get status => text()();
+
+  IntColumn get fetchedAt => integer()();
+
+  @override
+  Set<Column> get primaryKey => {provider, coordKey, variant};
+}
+
+@DriftDatabase(
+  tables: [
+    LocalAssetCache,
+    MediaTransferQueue,
+    MediaCacheEntries,
+    ReefDataCache,
+  ],
+)
 class LocalCacheDatabase extends _$LocalCacheDatabase {
   LocalCacheDatabase(super.e);
 
   @override
-  int get schemaVersion => 6;
+  int get schemaVersion => 7;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -96,6 +129,11 @@ class LocalCacheDatabase extends _$LocalCacheDatabase {
       // v1 create path above already includes the current schema.
       if (from >= 2 && from < 6) {
         await m.addColumn(mediaTransferQueue, mediaTransferQueue.payloadJson);
+      }
+      // v7: reef data cache. Every stored schema below 7 lacks this table,
+      // including v1, because the from<2 branch above predates it.
+      if (from < 7) {
+        await m.createTable(reefDataCache);
       }
     },
   );
