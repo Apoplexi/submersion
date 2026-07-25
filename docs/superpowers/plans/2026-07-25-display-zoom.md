@@ -30,15 +30,15 @@ The pure-logic foundation. Everything else depends on these constants, and the c
 
 **Files:**
 - Create: `lib/core/theme/display_zoom.dart`
-- Test: `test/core/theme/display_zoom_clamp_test.dart`
+- Test: `test/core/theme/display_zoom_normalize_test.dart`
 
 **Interfaces:**
 - Consumes: nothing.
-- Produces: `class DisplayZoom` with `static const double min = 0.70`, `max = 1.40`, `step = 0.05`, `defaultValue = 1.0`, `static const int divisions = 14`, and `static double clampValue(double value)`.
+- Produces: `class DisplayZoom` with `static const double min = 0.70`, `max = 1.40`, `step = 0.05`, `defaultValue = 1.0`, `static const int divisions = 14`, and `static double normalize(double value)`.
 
 - [ ] **Step 1: Write the failing test**
 
-Create `test/core/theme/display_zoom_clamp_test.dart`:
+Create `test/core/theme/display_zoom_normalize_test.dart`:
 
 ```dart
 import 'package:flutter_test/flutter_test.dart';
@@ -58,27 +58,27 @@ void main() {
     });
   });
 
-  group('DisplayZoom.clampValue', () {
+  group('DisplayZoom.normalize', () {
     test('returns in-range values unchanged', () {
-      expect(DisplayZoom.clampValue(0.85), 0.85);
-      expect(DisplayZoom.clampValue(DisplayZoom.min), DisplayZoom.min);
-      expect(DisplayZoom.clampValue(DisplayZoom.max), DisplayZoom.max);
+      expect(DisplayZoom.normalize(0.85), 0.85);
+      expect(DisplayZoom.normalize(DisplayZoom.min), DisplayZoom.min);
+      expect(DisplayZoom.normalize(DisplayZoom.max), DisplayZoom.max);
     });
 
     test('clamps values below the minimum', () {
-      expect(DisplayZoom.clampValue(0.0), DisplayZoom.min);
-      expect(DisplayZoom.clampValue(-1.0), DisplayZoom.min);
+      expect(DisplayZoom.normalize(0.0), DisplayZoom.min);
+      expect(DisplayZoom.normalize(-1.0), DisplayZoom.min);
     });
 
     test('clamps values above the maximum', () {
-      expect(DisplayZoom.clampValue(9.9), DisplayZoom.max);
+      expect(DisplayZoom.normalize(9.9), DisplayZoom.max);
     });
 
     test('falls back to the default for non-finite values', () {
-      expect(DisplayZoom.clampValue(double.nan), DisplayZoom.defaultValue);
-      expect(DisplayZoom.clampValue(double.infinity), DisplayZoom.defaultValue);
+      expect(DisplayZoom.normalize(double.nan), DisplayZoom.defaultValue);
+      expect(DisplayZoom.normalize(double.infinity), DisplayZoom.defaultValue);
       expect(
-        DisplayZoom.clampValue(double.negativeInfinity),
+        DisplayZoom.normalize(double.negativeInfinity),
         DisplayZoom.defaultValue,
       );
     });
@@ -88,7 +88,7 @@ void main() {
 
 - [ ] **Step 2: Run test to verify it fails**
 
-Run: `flutter test test/core/theme/display_zoom_clamp_test.dart`
+Run: `flutter test test/core/theme/display_zoom_normalize_test.dart`
 Expected: FAIL - `Error: Couldn't resolve the package 'submersion/core/theme/display_zoom.dart'` or "Undefined name 'DisplayZoom'".
 
 - [ ] **Step 3: Write minimal implementation**
@@ -118,22 +118,32 @@ class DisplayZoom {
   /// Slider divisions across [min]..[max] at [step] granularity.
   static const int divisions = 14;
 
-  /// Clamps any stored or computed value into the supported range.
+  static const int _minPercent = 70;
+  static const int _maxPercent = 140;
+  static const int _stepPercent = 5;
+
+  /// Clamps a stored or computed value into range and snaps it to the nearest
+  /// supported level.
   ///
-  /// Guards against a corrupt preference producing a zero or NaN scale, which
-  /// would divide by zero in the layout and blank the app.
-  static double clampValue(double value) {
+  /// Clamping guards against a corrupt preference producing a zero or NaN
+  /// scale, which would divide by zero in the layout and blank the app.
+  ///
+  /// Snapping prevents float drift: stepping down past [min] clamps to the
+  /// floor and discards the accumulated error, so stepping back up lands on
+  /// 1.0000000000000002 -- displayed as "100%" but not `== 1.0`. Snapping runs
+  /// in integer-percent space so it cannot itself accumulate error.
+  static double normalize(double value) {
     if (!value.isFinite) return defaultValue;
-    return value.clamp(min, max).toDouble();
+    final percent = (value * 100).round().clamp(_minPercent, _maxPercent);
+    final snapped = (percent / _stepPercent).round() * _stepPercent;
+    return snapped / 100;
   }
 }
 ```
 
-Note: `.toDouble()` is required. `num.clamp` returns `num`, not `double`, so omitting it is a compile error.
-
 - [ ] **Step 4: Run test to verify it passes**
 
-Run: `flutter test test/core/theme/display_zoom_clamp_test.dart`
+Run: `flutter test test/core/theme/display_zoom_normalize_test.dart`
 Expected: PASS, 5 tests.
 
 - [ ] **Step 5: Format, analyze, and commit**
@@ -141,7 +151,7 @@ Expected: PASS, 5 tests.
 ```bash
 dart format .
 flutter analyze
-git add lib/core/theme/display_zoom.dart test/core/theme/display_zoom_clamp_test.dart
+git add lib/core/theme/display_zoom.dart test/core/theme/display_zoom_normalize_test.dart
 git commit -m "feat(zoom): add display zoom constants and value clamping"
 ```
 
@@ -407,7 +417,7 @@ Zoom is device-local and never per-diver, so it does not live on `AppSettings`. 
 - Test: `test/features/settings/display_zoom_provider_test.dart`
 
 **Interfaces:**
-- Consumes: `DisplayZoom.clampValue`, `DisplayZoom.defaultValue`, `DisplayZoom.step` from Task 1; `sharedPreferencesProvider` from `settings_providers.dart`.
+- Consumes: `DisplayZoom.normalize`, `DisplayZoom.defaultValue`, `DisplayZoom.step` from Task 1; `sharedPreferencesProvider` from `settings_providers.dart`.
 - Produces:
   - `SettingsKeys.displayZoom` == `'display_zoom'`
   - `class DisplayZoomNotifier extends StateNotifier<double>` with `Future<void> setZoom(double value)`, `Future<void> stepBy(int direction)`, `Future<void> reset()`
@@ -541,7 +551,7 @@ import 'package:submersion/features/settings/presentation/providers/settings_pro
 class DisplayZoomNotifier extends StateNotifier<double> {
   DisplayZoomNotifier(this._prefs)
     : super(
-        DisplayZoom.clampValue(
+        DisplayZoom.normalize(
           _prefs.getDouble(SettingsKeys.displayZoom) ??
               DisplayZoom.defaultValue,
         ),
@@ -550,7 +560,7 @@ class DisplayZoomNotifier extends StateNotifier<double> {
   final SharedPreferences _prefs;
 
   Future<void> set(double value) async {
-    final clamped = DisplayZoom.clampValue(value);
+    final clamped = DisplayZoom.normalize(value);
     if (clamped == state) return;
     state = clamped;
     await _prefs.setDouble(SettingsKeys.displayZoom, clamped);
@@ -1512,7 +1522,7 @@ Run the app on any non-macOS target available (`flutter run -d <device>`), then:
 
 | Spec section | Task |
 | --- | --- |
-| `DisplayZoom` constants and `clampValue` | 1 |
+| `DisplayZoom` constants and `normalize` | 1 |
 | `DisplayZoomScope` with all five MediaQuery field adjustments | 2 |
 | `DisplayZoomNotifier` + `displayZoomNotifierProvider` + `SettingsKeys.displayZoom` | 3 |
 | `app.dart` wiring, `RestoreBarrier` ordering, `Consumer` placement | 4 |
@@ -1530,4 +1540,4 @@ One addition beyond the spec: `test/features/settings/presentation/display_zoom_
 
 **Placeholder scan:** No TBD, TODO, "handle edge cases", or "similar to Task N" entries. Every code step contains complete, compilable content.
 
-**Type consistency:** `DisplayZoom.clampValue`/`min`/`max`/`step`/`defaultValue`/`divisions`, `DisplayZoomScope({zoom, child})`, `DisplayZoomNotifier.setZoom`/`stepBy`/`reset`, `displayZoomNotifierProvider`, `displayZoomShortcuts({onZoomIn, onZoomOut, onReset, useMetaModifier})`, `registerDisplayZoomMenuChannel`, and `SettingsKeys.displayZoom` are each named identically everywhere they appear. Channel name `app.submersion/display` and its three methods match between Swift and Dart.
+**Type consistency:** `DisplayZoom.normalize`/`min`/`max`/`step`/`defaultValue`/`divisions`, `DisplayZoomScope({zoom, child})`, `DisplayZoomNotifier.setZoom`/`stepBy`/`reset`, `displayZoomNotifierProvider`, `displayZoomShortcuts({onZoomIn, onZoomOut, onReset, useMetaModifier})`, `registerDisplayZoomMenuChannel`, and `SettingsKeys.displayZoom` are each named identically everywhere they appear. Channel name `app.submersion/display` and its three methods match between Swift and Dart.

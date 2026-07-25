@@ -54,12 +54,29 @@ class DisplayZoom {
   static const double defaultValue = 1.0;
   static const int divisions = 14;
 
-  /// Clamps any stored or computed value into the supported range. Guards
-  /// against a corrupt preference producing a zero or NaN scale, which would
-  /// divide by zero and blank the app.
-  static double clampValue(double value) {
+  static const int _minPercent = 70;
+  static const int _maxPercent = 140;
+  static const int _stepPercent = 5;
+
+  /// Clamps a stored or computed value into range and snaps it to the nearest
+  /// supported level.
+  ///
+  /// Clamping guards against a corrupt preference producing a zero or NaN
+  /// scale, which would divide by zero and blank the app.
+  ///
+  /// Snapping matters just as much: repeated `+/- 0.05` arithmetic drifts.
+  /// Stepping down past [min] clamps to the floor, which discards the
+  /// accumulated error, so stepping back up lands on 1.0000000000000002 --
+  /// rendered as "100%" but not `== 1.0`, leaving the Reset button visible and
+  /// making DisplayZoomScope build a transform layer at nominal 100%. Snapping
+  /// runs in integer-percent space so it cannot itself accumulate error, and
+  /// it guarantees the stored value always equals the displayed percentage
+  /// divided by 100.
+  static double normalize(double value) {
     if (!value.isFinite) return defaultValue;
-    return value.clamp(min, max);
+    final percent = (value * 100).round().clamp(_minPercent, _maxPercent);
+    final snapped = (percent / _stepPercent).round() * _stepPercent;
+    return snapped / 100;
   }
 }
 
@@ -144,23 +161,23 @@ its initial state is the stored value on frame one.
 ```dart
 class DisplayZoomNotifier extends StateNotifier<double> {
   DisplayZoomNotifier(this._prefs)
-      : super(DisplayZoom.clampValue(
+      : super(DisplayZoom.normalize(
           _prefs.getDouble(SettingsKeys.displayZoom) ?? DisplayZoom.defaultValue,
         ));
 
   final SharedPreferences _prefs;
 
-  Future<void> set(double value) async {
-    final clamped = DisplayZoom.clampValue(value);
-    if (clamped == state) return;
-    state = clamped;
-    await _prefs.setDouble(SettingsKeys.displayZoom, clamped);
+  Future<void> setZoom(double value) async {
+    final normalized = DisplayZoom.normalize(value);
+    if (normalized == state) return;
+    state = normalized;
+    await _prefs.setDouble(SettingsKeys.displayZoom, normalized);
   }
 
   Future<void> stepBy(int direction) =>
-      set(state + direction * DisplayZoom.step);
+      setZoom(state + direction * DisplayZoom.step);
 
-  Future<void> reset() => set(DisplayZoom.defaultValue);
+  Future<void> reset() => setZoom(DisplayZoom.defaultValue);
 }
 
 final displayZoomNotifierProvider =
@@ -294,11 +311,13 @@ unrelated UI change.
 | File | Assertions |
 | --- | --- |
 | `test/core/theme/display_zoom_scope_test.dart` | At 1.0 the child is returned with no `Transform` in the tree. At 0.8 the inner `MediaQuery.sizeOf` equals outer size / 0.8. `padding`, `viewPadding`, `viewInsets` divide. `devicePixelRatio` multiplies. |
-| `test/core/theme/display_zoom_clamp_test.dart` | Stored `0.0`, `NaN`, `-1`, and `9.9` all clamp into range. Covers the divide-by-zero blank-screen guard. |
+| `test/core/theme/display_zoom_normalize_test.dart` | Stored `0.0`, `NaN`, `-1`, and `9.9` all clamp into range, covering the divide-by-zero blank-screen guard. A float-drifted `1.0000000000000002` snaps back to exactly `1.0`, and every result lands on an exact whole percent on the 5% ladder. |
 | `test/core/theme/display_zoom_hit_test.dart` | A button tapped at 0.8 and at 1.3 still fires its callback. |
 | `test/shared/widgets/display_zoom_breakpoints_test.dart` | A 1000pt-wide harness is not master-detail at 100% and is at 85%. Encodes the floating-breakpoint decision so it cannot be silently reverted. |
-| `test/features/settings/display_zoom_provider_test.dart` | Initial state reads synchronously from prefs. `set` clamps and persists. `stepBy` walks the ladder and saturates at the bounds. `reset` returns to 1.0. |
-| `test/app/display_zoom_shortcuts_test.dart` | Ctrl+`-`, Ctrl+`=`, Ctrl+`0` step and reset on the Linux/Windows path. |
+| `test/features/settings/display_zoom_provider_test.dart` | Initial state reads synchronously from prefs. `setZoom` normalizes and persists. `stepBy` walks the ladder and saturates at the bounds. `reset` returns to 1.0. A clamp-floor round trip returns to exactly `defaultValue`, asserted with exact equality rather than a tolerant matcher. |
+| `test/core/theme/display_zoom_shortcuts_test.dart` | Ctrl+`-`, Ctrl+`=`, Ctrl+`0` step and reset on the Linux/Windows path; numpad `+`/`-` are bound; the wrong modifier does not fire. |
+| `test/features/settings/display_zoom_menu_channel_test.dart` | `zoomIn`/`zoomOut`/`actualSize` dispatch through the `app.submersion/display` channel, and an unknown method returns an error envelope instead of looking like success. |
+| `test/features/settings/presentation/display_zoom_settings_tile_test.dart` | The tile shows the current percentage, hides Reset at 100%, resets on tap, and configures the slider for the supported range. |
 
 The hit test is the highest-value case here: a root `Transform` is exactly the
 kind of change where everything renders correctly and nothing responds, and a
