@@ -7,12 +7,22 @@ import 'package:submersion/core/services/accounts/account_credentials_store.dart
 import 'package:submersion/core/services/accounts/account_deduplicator.dart';
 import 'package:submersion/core/services/accounts/account_identity.dart';
 import 'package:submersion/core/services/accounts/account_kind.dart';
+import 'package:submersion/core/services/accounts/connected_account.dart'
+    as domain;
 import 'package:submersion/core/services/cloud_storage/s3/s3_config.dart';
 import 'package:submersion/core/services/cloud_storage/s3/s3_credentials_store.dart';
 import 'package:submersion/core/services/sync/established_provider_store.dart';
 
 import '../../../helpers/test_database.dart';
 import '../../../support/fake_keychain_storage.dart';
+
+/// Fails the very first read the pass makes, so run()'s guarantee that a
+/// dedup failure cannot block startup is exercised end to end.
+class _ThrowingAccounts extends ConnectedAccountsRepository {
+  @override
+  Future<List<domain.ConnectedAccount>> getAll() async =>
+      throw StateError('keychain unavailable');
+}
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -220,6 +230,50 @@ void main() {
     await (await dedup(prefs)).run();
 
     expect(established.contains(syncCanonicalId()), isTrue);
+  });
+
+  test('canonicalizes a managed-kind sync anchor', () async {
+    // The observed real-world roster had iCloud as the sync anchor, not S3:
+    // sync_metadata pointed at one of the two duplicate iCloud rows.
+    SharedPreferences.setMockInitialValues({});
+    final prefs = await SharedPreferences.getInstance();
+    final first = await accounts.create(
+      kind: AccountKind.icloud,
+      label: 'iCloud',
+    );
+    await accounts.create(kind: AccountKind.icloud, label: 'iCloud');
+    await SyncRepository().setSyncAccount(
+      accountId: first.id,
+      providerType: CloudProviderType.icloud,
+    );
+
+    await (await dedup(prefs)).run();
+
+    final canonical = accountIdFor(
+      kind: AccountKind.icloud,
+      naturalKey: 'icloud',
+    );
+    final remaining = await accounts.getAll();
+    expect(remaining.length, 1);
+    expect(remaining.single.id, canonical);
+    expect(await SyncRepository().getSyncAccountId(), canonical);
+  });
+
+  test('a failure never blocks startup', () async {
+    SharedPreferences.setMockInitialValues({});
+    final prefs = await SharedPreferences.getInstance();
+    final failing = AccountDeduplicator(
+      prefs: prefs,
+      accounts: _ThrowingAccounts(),
+      credentials: credentials,
+      syncRepository: SyncRepository(),
+      established: EstablishedProviderStore(prefs),
+      syncS3: syncS3,
+      mediaS3: mediaS3,
+    );
+
+    // Swallowed, not rethrown: startup must proceed.
+    await expectLater(failing.run(), completes);
   });
 
   test('does nothing when there is nothing to collapse', () async {
