@@ -157,7 +157,10 @@ final recentSitesProvider = FutureProvider<List<RecentSitePin>>((ref) async {
     final lat = summary.siteLatitude;
     final lng = summary.siteLongitude;
     if (lat == null || lng == null) continue;
-    if (seen.add('$lat,$lng')) {
+    // Dedupe on name + coordinates rather than coordinates alone, so two
+    // distinct sites that happen to share a GPS fix (nearby or renamed
+    // sites) both keep a pin. DiveSummary carries no site id to key on.
+    if (seen.add('${summary.siteName}|$lat,$lng')) {
       pins.add(
         RecentSitePin(
           siteName: summary.siteName,

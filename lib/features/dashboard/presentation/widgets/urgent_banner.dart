@@ -24,9 +24,16 @@ class UrgentBanner extends ConsumerWidget {
     if (!urgent) return const SizedBox.shrink();
 
     final scheme = Theme.of(context).colorScheme;
+    // Cap the overdue-gear lines so a diver with many lapsed clocks doesn't
+    // get a banner that dominates the dashboard; the overflow collapses to
+    // a localized "+N more" line and the tap still opens the gear list.
+    const maxGearLines = 3;
+    final shownOverdue = overdue.take(maxGearLines).toList();
+    final hiddenCount = overdue.length - shownOverdue.length;
     final lines = <String>[
-      for (final clock in overdue)
+      for (final clock in shownOverdue)
         context.l10n.dashboard_gauges_gearOverdue(clock.item.name),
+      if (hiddenCount > 0) context.l10n.dashboard_serviceDue_more(hiddenCount),
       if (alerts.insuranceExpired)
         context.l10n.dashboard_gauges_insuranceExpired,
     ];

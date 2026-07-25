@@ -132,6 +132,33 @@ void main() {
     expect(spy.location, '/gear');
   });
 
+  testWidgets('caps overdue lines and shows a "+N more" overflow', (
+    tester,
+  ) async {
+    final spy = await pumpBanner(
+      tester,
+      DashboardAlerts(
+        serviceClocksDue: [
+          for (var i = 0; i < 6; i++)
+            _dueClock('Gear $i', ServiceClockSeverity.overdue),
+        ],
+        insuranceExpiringSoon: false,
+        insuranceExpired: false,
+      ),
+    );
+
+    // First three overdue items are listed; the remaining three collapse.
+    expect(find.text('Gear 0 overdue'), findsOneWidget);
+    expect(find.text('Gear 2 overdue'), findsOneWidget);
+    expect(find.text('Gear 3 overdue'), findsNothing);
+    expect(find.text('+3 more'), findsOneWidget);
+
+    // Tap still opens the gear list.
+    await tester.tap(find.byType(InkWell));
+    await tester.pumpAndSettle();
+    expect(spy.location, '/gear');
+  });
+
   testWidgets('expired insurance alone navigates to the insurance record', (
     tester,
   ) async {

@@ -66,4 +66,25 @@ void main() {
     final pins = await container.read(recentSitesProvider.future);
     expect(pins, isEmpty);
   });
+
+  test('distinct sites sharing coordinates both keep a pin', () async {
+    final siteRepo = SiteRepository();
+    final wreck = await siteRepo.createSite(
+      const DiveSite(id: '', name: 'Wreck', location: GeoPoint(36.0, 25.0)),
+    );
+    // Same GPS fix, different site (e.g. a renamed or adjacent site).
+    final reef = await siteRepo.createSite(
+      const DiveSite(id: '', name: 'Reef', location: GeoPoint(36.0, 25.0)),
+    );
+
+    await repository.createDive(
+      domain.Dive(id: 'w1', dateTime: DateTime(2026, 7, 1), site: wreck),
+    );
+    await repository.createDive(
+      domain.Dive(id: 'r1', dateTime: DateTime(2026, 7, 2), site: reef),
+    );
+
+    final pins = await container.read(recentSitesProvider.future);
+    expect(pins.map((p) => p.siteName).toSet(), {'Wreck', 'Reef'});
+  });
 }
