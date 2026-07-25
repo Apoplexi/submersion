@@ -25,6 +25,7 @@ import 'package:submersion/features/planner/presentation/providers/plan_reposito
 import 'package:submersion/features/planner/presentation/providers/planner_layout_providers.dart';
 import 'package:submersion/features/planner/presentation/widgets/contingency_chips.dart';
 import 'package:submersion/features/planner/presentation/widgets/follow_dive_sheet.dart';
+import 'package:submersion/features/planner/presentation/widgets/plan_name_dialog.dart';
 import 'package:submersion/features/planner/presentation/widgets/plan_status_chips.dart';
 import 'package:submersion/features/planner/presentation/widgets/saved_plans_sheet.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
@@ -106,7 +107,25 @@ class _PlanCanvasPageState extends ConsumerState<PlanCanvasPage> {
             Flexible(
               child: InkWell(
                 onTap: () => _showRenameDialog(context),
-                child: Text(planState.name),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // The inner Flexible is what keeps a long plan name
+                    // ellipsizing once the pencil takes fixed width.
+                    Flexible(
+                      child: Text(
+                        planState.name,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    Icon(
+                      Icons.edit_outlined,
+                      size: 14,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
+                  ],
+                ),
               ),
             ),
             const SizedBox(width: 8),
@@ -714,37 +733,14 @@ class _PlanCanvasPageState extends ConsumerState<PlanCanvasPage> {
     );
   }
 
-  void _showRenameDialog(BuildContext context) {
-    final controller = TextEditingController(
-      text: ref.read(divePlanNotifierProvider).name,
+  Future<void> _showRenameDialog(BuildContext context) async {
+    final notifier = ref.read(divePlanNotifierProvider.notifier);
+    final entered = await showPlanNameDialog(
+      context,
+      initialName: ref.read(divePlanNotifierProvider).name,
+      title: context.l10n.divePlanner_action_renamePlan,
     );
-    showDialog<void>(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: Text(context.l10n.divePlanner_action_renamePlan),
-        content: TextField(
-          controller: controller,
-          decoration: InputDecoration(
-            labelText: context.l10n.divePlanner_field_planName,
-          ),
-          autofocus: true,
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext),
-            child: Text(context.l10n.common_action_cancel),
-          ),
-          FilledButton(
-            onPressed: () {
-              ref
-                  .read(divePlanNotifierProvider.notifier)
-                  .updateName(controller.text);
-              Navigator.pop(dialogContext);
-            },
-            child: Text(context.l10n.common_action_save),
-          ),
-        ],
-      ),
-    );
+    if (entered == null) return;
+    notifier.updateName(entered);
   }
 }
