@@ -12608,6 +12608,23 @@ class AppLocalizationsFr extends AppLocalizations {
   String get settings_appearance_appLanguage => 'Langue de l\'application';
 
   @override
+  String get settings_appearance_displaySize => 'Taille d\'affichage';
+
+  @override
+  String settings_appearance_displaySize_value(int percent) {
+    return '$percent%';
+  }
+
+  @override
+  String get settings_appearance_displaySize_reset => 'Réinitialiser';
+
+  @override
+  String get settings_appearance_displaySize_smaller => 'Plus petit';
+
+  @override
+  String get settings_appearance_displaySize_larger => 'Plus grand';
+
+  @override
   String get settings_appearance_depthColoredCards =>
       'Cartes de plongee colorees par profondeur';
 

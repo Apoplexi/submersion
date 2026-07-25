@@ -12344,6 +12344,23 @@ class AppLocalizationsAr extends AppLocalizations {
   String get settings_appearance_appLanguage => 'لغة التطبيق';
 
   @override
+  String get settings_appearance_displaySize => 'حجم العرض';
+
+  @override
+  String settings_appearance_displaySize_value(int percent) {
+    return '$percent%';
+  }
+
+  @override
+  String get settings_appearance_displaySize_reset => 'إعادة تعيين';
+
+  @override
+  String get settings_appearance_displaySize_smaller => 'أصغر';
+
+  @override
+  String get settings_appearance_displaySize_larger => 'أكبر';
+
+  @override
   String get settings_appearance_depthColoredCards => 'بطاقات ملونة حسب العمق';
 
   @override

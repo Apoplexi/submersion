@@ -12560,6 +12560,23 @@ class AppLocalizationsDe extends AppLocalizations {
   String get settings_appearance_appLanguage => 'App-Sprache';
 
   @override
+  String get settings_appearance_displaySize => 'Anzeigegröße';
+
+  @override
+  String settings_appearance_displaySize_value(int percent) {
+    return '$percent%';
+  }
+
+  @override
+  String get settings_appearance_displaySize_reset => 'Zurücksetzen';
+
+  @override
+  String get settings_appearance_displaySize_smaller => 'Kleiner';
+
+  @override
+  String get settings_appearance_displaySize_larger => 'Größer';
+
+  @override
   String get settings_appearance_depthColoredCards =>
       'Tiefengefärbte Tauchkarten';
 

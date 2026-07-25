@@ -12470,6 +12470,23 @@ class AppLocalizationsNl extends AppLocalizations {
   String get settings_appearance_appLanguage => 'App-taal';
 
   @override
+  String get settings_appearance_displaySize => 'Weergavegrootte';
+
+  @override
+  String settings_appearance_displaySize_value(int percent) {
+    return '$percent%';
+  }
+
+  @override
+  String get settings_appearance_displaySize_reset => 'Herstellen';
+
+  @override
+  String get settings_appearance_displaySize_smaller => 'Kleiner';
+
+  @override
+  String get settings_appearance_displaySize_larger => 'Groter';
+
+  @override
   String get settings_appearance_depthColoredCards =>
       'Dieptegekleurde duikkaarten';
 

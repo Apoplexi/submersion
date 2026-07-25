@@ -12530,6 +12530,23 @@ class AppLocalizationsHu extends AppLocalizations {
   String get settings_appearance_appLanguage => 'Alkalmazas nyelve';
 
   @override
+  String get settings_appearance_displaySize => 'Megjelenítési méret';
+
+  @override
+  String settings_appearance_displaySize_value(int percent) {
+    return '$percent%';
+  }
+
+  @override
+  String get settings_appearance_displaySize_reset => 'Visszaállítás';
+
+  @override
+  String get settings_appearance_displaySize_smaller => 'Kisebb';
+
+  @override
+  String get settings_appearance_displaySize_larger => 'Nagyobb';
+
+  @override
   String get settings_appearance_depthColoredCards =>
       'Melyseg szerint szinezett merülesi kartyak';
 

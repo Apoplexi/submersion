@@ -12258,6 +12258,23 @@ class AppLocalizationsHe extends AppLocalizations {
   String get settings_appearance_appLanguage => 'שפת האפליקציה';
 
   @override
+  String get settings_appearance_displaySize => 'גודל התצוגה';
+
+  @override
+  String settings_appearance_displaySize_value(int percent) {
+    return '$percent%';
+  }
+
+  @override
+  String get settings_appearance_displaySize_reset => 'איפוס';
+
+  @override
+  String get settings_appearance_displaySize_smaller => 'קטן יותר';
+
+  @override
+  String get settings_appearance_displaySize_larger => 'גדול יותר';
+
+  @override
   String get settings_appearance_depthColoredCards =>
       'כרטיסי צלילה צבועים לפי עומק';
 

@@ -11989,6 +11989,23 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settings_appearance_appLanguage => '应用语言';
 
   @override
+  String get settings_appearance_displaySize => '显示大小';
+
+  @override
+  String settings_appearance_displaySize_value(int percent) {
+    return '$percent%';
+  }
+
+  @override
+  String get settings_appearance_displaySize_reset => '重置';
+
+  @override
+  String get settings_appearance_displaySize_smaller => '更小';
+
+  @override
+  String get settings_appearance_displaySize_larger => '更大';
+
+  @override
   String get settings_appearance_depthColoredCards => '按深度着色的潜水卡片';
 
   @override
