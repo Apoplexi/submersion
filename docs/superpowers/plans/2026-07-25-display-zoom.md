@@ -403,7 +403,7 @@ Zoom is device-local and never per-diver, so it does not live on `AppSettings`. 
 - Consumes: `DisplayZoom.clampValue`, `DisplayZoom.defaultValue`, `DisplayZoom.step` from Task 1; `sharedPreferencesProvider` from `settings_providers.dart`.
 - Produces:
   - `SettingsKeys.displayZoom` == `'display_zoom'`
-  - `class DisplayZoomNotifier extends StateNotifier<double>` with `Future<void> set(double value)`, `Future<void> stepBy(int direction)`, `Future<void> reset()`
+  - `class DisplayZoomNotifier extends StateNotifier<double>` with `Future<void> setZoom(double value)`, `Future<void> stepBy(int direction)`, `Future<void> reset()`
   - `final displayZoomNotifierProvider = StateNotifierProvider<DisplayZoomNotifier, double>(...)`
 
 - [ ] **Step 1: Write the failing test**
@@ -507,10 +507,20 @@ In `lib/features/settings/presentation/providers/settings_providers.dart`, insid
 
 Create `lib/features/settings/presentation/providers/display_zoom_provider.dart`:
 
+Note: `StateNotifier` and `StateNotifierProvider` are NOT exported by
+`package:flutter_riverpod/flutter_riverpod.dart` under Riverpod 3.1 - they
+moved to `flutter_riverpod/legacy.dart`. Import the project barrel
+`package:submersion/core/providers/provider.dart`, which re-exports both, as
+every other provider file in this codebase does.
+
+Also note the method is `setZoom`, not `set`: `set` is a built-in identifier
+and shadows awkwardly, and `setZoom` matches the existing `setThemeMode` /
+`setLocale` naming on `SettingsNotifier`.
+
 ```dart
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/core/theme/display_zoom.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 
@@ -1110,7 +1120,7 @@ class DisplayZoomSettingsTile extends ConsumerWidget {
                   max: DisplayZoom.max,
                   divisions: DisplayZoom.divisions,
                   label: l10n.settings_appearance_displaySize_value(percent),
-                  onChanged: notifier.set,
+                  onChanged: notifier.setZoom,
                 ),
               ),
               Text(
@@ -1513,4 +1523,4 @@ One addition beyond the spec: `test/features/settings/presentation/display_zoom_
 
 **Placeholder scan:** No TBD, TODO, "handle edge cases", or "similar to Task N" entries. Every code step contains complete, compilable content.
 
-**Type consistency:** `DisplayZoom.clampValue`/`min`/`max`/`step`/`defaultValue`/`divisions`, `DisplayZoomScope({zoom, child})`, `DisplayZoomNotifier.set`/`stepBy`/`reset`, `displayZoomNotifierProvider`, `displayZoomShortcuts({onZoomIn, onZoomOut, onReset, useMetaModifier})`, `registerDisplayZoomMenuChannel`, and `SettingsKeys.displayZoom` are each named identically everywhere they appear. Channel name `app.submersion/display` and its three methods match between Swift and Dart.
+**Type consistency:** `DisplayZoom.clampValue`/`min`/`max`/`step`/`defaultValue`/`divisions`, `DisplayZoomScope({zoom, child})`, `DisplayZoomNotifier.setZoom`/`stepBy`/`reset`, `displayZoomNotifierProvider`, `displayZoomShortcuts({onZoomIn, onZoomOut, onReset, useMetaModifier})`, `registerDisplayZoomMenuChannel`, and `SettingsKeys.displayZoom` are each named identically everywhere they appear. Channel name `app.submersion/display` and its three methods match between Swift and Dart.
