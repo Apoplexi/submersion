@@ -550,7 +550,27 @@ class _PlanCanvasPageState extends ConsumerState<PlanCanvasPage> {
     );
   }
 
+  /// Guards [_savePlan] against re-entry.
+  ///
+  /// The save button stays enabled across the naming flow's async gaps - the
+  /// site lookup and the write itself both run with no modal up and isDirty
+  /// still true - so a second tap could start a concurrent save. Worse than
+  /// stacked dialogs: [DivePlanNotifier.save] only sets its loaded plan after
+  /// the write completes, so a concurrent call still reads isPersisted as false
+  /// and prompts for a name on a plan that is already being saved.
+  bool _saveInFlight = false;
+
   Future<void> _savePlan() async {
+    if (_saveInFlight) return;
+    _saveInFlight = true;
+    try {
+      await _runSavePlan();
+    } finally {
+      _saveInFlight = false;
+    }
+  }
+
+  Future<void> _runSavePlan() async {
     final notifier = ref.read(divePlanNotifierProvider.notifier);
 
     // Prompt for a name the first time a plan is persisted, so the saved-plans

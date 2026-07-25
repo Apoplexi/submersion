@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/constants/map_style.dart';
@@ -169,6 +171,42 @@ void main() {
     // not be paired with the plan's current depth and date.
     expect(find.textContaining('Blue Hole'), findsNothing);
     expect(find.textContaining('30.0m - '), findsOneWidget);
+  });
+
+  testWidgets('a second tap during the site lookup does not stack dialogs', (
+    tester,
+  ) async {
+    // Hold the site lookup open so both taps land inside the async gap. The
+    // save button stays enabled there because isDirty is still true and no
+    // modal is up yet.
+    final gate = Completer<void>();
+    await setSize(tester, const Size(420, 900));
+    await tester.pumpWidget(
+      testApp(
+        overrides: [
+          settingsProvider.overrideWith((ref) => _TestSettingsNotifier()),
+          siteProvider.overrideWith((ref, id) async {
+            await gate.future;
+            return const DiveSite(id: 'blue-hole', name: 'Blue Hole');
+          }),
+        ],
+        locale: const Locale('en'),
+        child: const PlanCanvasPage(),
+      ),
+    );
+    notifierOf(tester).addSimplePlan(maxDepth: 30, bottomTimeMinutes: 20);
+    notifierOf(tester).updateSite('blue-hole');
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byIcon(Icons.save));
+    await tester.pump();
+    await tester.tap(find.byIcon(Icons.save));
+    await tester.pump();
+
+    gate.complete();
+    await tester.pumpAndSettle();
+
+    expect(find.text('Name your plan'), findsOneWidget);
   });
 
   testWidgets('a second save does not re-open the dialog', (tester) async {
