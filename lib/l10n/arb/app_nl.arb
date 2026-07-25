@@ -3890,6 +3890,8 @@
   "plannerCanvas_saved_duplicate": "Dupliceren",
   "plannerCanvas_saved_empty": "Nog geen opgeslagen plannen",
   "plannerCanvas_saved_title": "Opgeslagen plannen",
+  "plannerCanvas_name_dialogTitle": "Geef je plan een naam",
+  "plannerCanvas_name_defaultFallback": "Duikplan",
   "plannerCanvas_scrub_bailout": "BO {minutes}′",
   "plannerCanvas_scrub_readout": "RT {minutes}′ · {depth}",
   "plannerCanvas_share_import": "Importeren",

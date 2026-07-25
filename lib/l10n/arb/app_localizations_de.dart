@@ -12335,6 +12335,12 @@ class AppLocalizationsDe extends AppLocalizations {
   String get plannerCanvas_saved_title => 'Gespeicherte Pläne';
 
   @override
+  String get plannerCanvas_name_dialogTitle => 'Plan benennen';
+
+  @override
+  String get plannerCanvas_name_defaultFallback => 'Tauchplan';
+
+  @override
   String plannerCanvas_scrub_bailout(String minutes) {
     return 'BO $minutes′';
   }

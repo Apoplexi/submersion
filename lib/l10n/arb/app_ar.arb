@@ -3890,6 +3890,8 @@
   "plannerCanvas_saved_duplicate": "تكرار",
   "plannerCanvas_saved_empty": "لا توجد خطط محفوظة بعد",
   "plannerCanvas_saved_title": "الخطط المحفوظة",
+  "plannerCanvas_name_dialogTitle": "سمِّ خطتك",
+  "plannerCanvas_name_defaultFallback": "خطة غوص",
   "plannerCanvas_scrub_bailout": "BO {minutes}′",
   "plannerCanvas_scrub_readout": "RT {minutes}′ · {depth}",
   "plannerCanvas_share_import": "استيراد",

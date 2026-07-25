@@ -3820,6 +3820,8 @@
   "plannerCanvas_saved_duplicate": "שכפול",
   "plannerCanvas_saved_empty": "אין עדיין תוכניות שמורות",
   "plannerCanvas_saved_title": "תוכניות שמורות",
+  "plannerCanvas_name_dialogTitle": "תן שם לתוכנית",
+  "plannerCanvas_name_defaultFallback": "תוכנית צלילה",
   "plannerCanvas_scrub_bailout": "BO {minutes}′",
   "plannerCanvas_scrub_readout": "RT {minutes}′ · {depth}",
   "plannerCanvas_share_import": "ייבוא",

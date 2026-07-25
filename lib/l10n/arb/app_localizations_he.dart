@@ -12038,6 +12038,12 @@ class AppLocalizationsHe extends AppLocalizations {
   String get plannerCanvas_saved_title => 'תוכניות שמורות';
 
   @override
+  String get plannerCanvas_name_dialogTitle => 'תן שם לתוכנית';
+
+  @override
+  String get plannerCanvas_name_defaultFallback => 'תוכנית צלילה';
+
+  @override
   String plannerCanvas_scrub_bailout(String minutes) {
     return 'BO $minutes′';
   }

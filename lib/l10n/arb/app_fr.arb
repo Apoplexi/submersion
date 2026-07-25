@@ -3820,6 +3820,8 @@
   "plannerCanvas_saved_duplicate": "Dupliquer",
   "plannerCanvas_saved_empty": "Aucun plan enregistré",
   "plannerCanvas_saved_title": "Plans enregistrés",
+  "plannerCanvas_name_dialogTitle": "Nommez votre plan",
+  "plannerCanvas_name_defaultFallback": "Plan de plongée",
   "plannerCanvas_scrub_bailout": "BO {minutes}′",
   "plannerCanvas_scrub_readout": "RT {minutes}′ · {depth}",
   "plannerCanvas_share_import": "Importer",

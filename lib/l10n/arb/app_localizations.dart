@@ -20960,6 +20960,18 @@ abstract class AppLocalizations {
   /// **'Saved plans'**
   String get plannerCanvas_saved_title;
 
+  /// No description provided for @plannerCanvas_name_dialogTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Name your plan'**
+  String get plannerCanvas_name_dialogTitle;
+
+  /// No description provided for @plannerCanvas_name_defaultFallback.
+  ///
+  /// In en, this message translates to:
+  /// **'Dive Plan'**
+  String get plannerCanvas_name_defaultFallback;
+
   /// No description provided for @plannerCanvas_scrub_bailout.
   ///
   /// In en, this message translates to:

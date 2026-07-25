@@ -3820,6 +3820,8 @@
   "plannerCanvas_saved_duplicate": "Duplica",
   "plannerCanvas_saved_empty": "Nessun piano salvato",
   "plannerCanvas_saved_title": "Piani salvati",
+  "plannerCanvas_name_dialogTitle": "Dai un nome al piano",
+  "plannerCanvas_name_defaultFallback": "Piano di immersione",
   "plannerCanvas_scrub_bailout": "BO {minutes}′",
   "plannerCanvas_scrub_readout": "RT {minutes}′ · {depth}",
   "plannerCanvas_share_import": "Importa",

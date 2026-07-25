@@ -12119,6 +12119,12 @@ class AppLocalizationsAr extends AppLocalizations {
   String get plannerCanvas_saved_title => 'الخطط المحفوظة';
 
   @override
+  String get plannerCanvas_name_dialogTitle => 'سمِّ خطتك';
+
+  @override
+  String get plannerCanvas_name_defaultFallback => 'خطة غوص';
+
+  @override
   String plannerCanvas_scrub_bailout(String minutes) {
     return 'BO $minutes′';
   }

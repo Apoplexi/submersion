@@ -12305,6 +12305,12 @@ class AppLocalizationsHu extends AppLocalizations {
   String get plannerCanvas_saved_title => 'Mentett tervek';
 
   @override
+  String get plannerCanvas_name_dialogTitle => 'Nevezze el a tervet';
+
+  @override
+  String get plannerCanvas_name_defaultFallback => 'Merülési terv';
+
+  @override
   String plannerCanvas_scrub_bailout(String minutes) {
     return 'BO $minutes′';
   }
