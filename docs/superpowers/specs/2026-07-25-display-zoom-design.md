@@ -235,8 +235,10 @@ displays Cmd++; AppKit does not treat them as equivalent. Safari and Chrome
 both ship the same hidden-duplicate workaround. Omitting it is the most likely
 way this ships feeling broken.
 
-The existing "Zoom" item at line 317 is AppKit's `performZoom:` (maximize
-window) and is left alone; the new titles are distinct.
+The View submenu currently contains only "Enter Full Screen". The existing
+"Zoom" item at line 317 is AppKit's `performZoom:` (maximize window) and lives
+in the *Window* menu, not View; it is left alone and the new titles are
+distinct from it.
 
 `AppDelegate.swift` gains three `@IBAction` methods that invoke a new
 `app.submersion/display` `MethodChannel`, mirroring the existing
