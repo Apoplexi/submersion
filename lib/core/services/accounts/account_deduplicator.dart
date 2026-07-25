@@ -172,14 +172,15 @@ class AccountDeduplicator {
   Future<void> _adopt(domain.ConnectedAccount row, String canonicalId) async {
     final blob = await _credentials.read(row.id);
     if (blob != null) await _credentials.write(canonicalId, blob);
-    if (await _accounts.getById(canonicalId) == null) {
-      await _accounts.create(
-        kind: row.kind,
-        label: row.label,
-        accountIdentifier: row.accountIdentifier,
-        id: canonicalId,
-      );
-    }
+    // ensureById rather than a read-then-create: another device may already
+    // have published this very id (that is the point of deterministic ids),
+    // so an inbound sync apply can land the row mid-pass.
+    await _accounts.ensureById(
+      id: canonicalId,
+      kind: row.kind,
+      label: row.label,
+      accountIdentifier: row.accountIdentifier,
+    );
     if (_established.contains(row.id)) {
       await _established.add(canonicalId);
     }

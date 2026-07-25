@@ -72,11 +72,59 @@ class ConnectedAccountsRepository {
     required AccountKind kind,
     required String naturalKey,
     required String label,
+  }) => ensureById(
+    id: accountIdFor(kind: kind, naturalKey: naturalKey),
+    kind: kind,
+    label: label,
+  );
+
+  /// [ensure] for a caller that already holds the id (the deduplicator
+  /// canonicalizing an anchor), preserving [accountIdentifier].
+  ///
+  /// The insert is `insertOrIgnore` rather than a read-then-insert because
+  /// the two are not atomic and deterministic ids make the collision an
+  /// EXPECTED event, not a freak one: provider re-derivation, a media store
+  /// connect and an inbound sync apply (which upserts this table) all
+  /// compute the same id. Without it the loser throws
+  /// SqliteException(1555). Same reasoning as
+  /// SyncRepository.getOrCreateMetadata's seed.
+  Future<domain.ConnectedAccount> ensureById({
+    required String id,
+    required AccountKind kind,
+    required String label,
+    String? accountIdentifier,
   }) async {
-    final id = accountIdFor(kind: kind, naturalKey: naturalKey);
+    final now = DateTime.now().millisecondsSinceEpoch;
+    final inserted = await _db
+        .into(_db.connectedAccounts)
+        .insertReturningOrNull(
+          ConnectedAccountsCompanion.insert(
+            id: id,
+            kind: kind.name,
+            label: label,
+            accountIdentifier: Value(accountIdentifier),
+            createdAt: now,
+            updatedAt: now,
+          ),
+          mode: InsertMode.insertOrIgnore,
+        );
+    if (inserted != null) {
+      // Only the writer that actually inserted marks pending, so a losing
+      // racer cannot stamp a second HLC on someone else's row.
+      await _markPending(id, now);
+      return _toDomain(inserted);
+    }
+
     final existing = await getById(id);
     if (existing == null) {
-      return create(kind: kind, label: label, id: id);
+      // The row was deleted between the ignored insert and this read (a
+      // tombstone apply landing mid-flight). Nothing holds the id now.
+      return create(
+        kind: kind,
+        label: label,
+        accountIdentifier: accountIdentifier,
+        id: id,
+      );
     }
     if (existing.label == label) return existing;
     await updateLabels(id, label: label);

@@ -144,6 +144,57 @@ void main() {
     expect(all.single.label, 'new label');
   });
 
+  test(
+    'concurrent ensure calls do not collide on the deterministic id',
+    () async {
+      // Deterministic ids mean independent writers compute the SAME id, and
+      // ensure's existence check is not atomic with its insert. Provider
+      // re-derivation, a media-store connect and an inbound sync apply can all
+      // be in flight at once; the loser of that race must not throw
+      // SqliteException(1555).
+      final results = await Future.wait([
+        for (var i = 0; i < 4; i++)
+          repo.ensure(
+            kind: AccountKind.s3,
+            naturalKey: 'minio.local|dive-media|media/',
+            label: 'dive-media @ minio.local',
+          ),
+      ]);
+
+      expect(results.map((a) => a.id).toSet(), hasLength(1));
+      expect((await repo.getAll()).length, 1);
+    },
+  );
+
+  test('ensure adopts a row an inbound sync apply already wrote', () async {
+    final id = accountIdFor(
+      kind: AccountKind.s3,
+      naturalKey: 'minio.local|dive-media|media/',
+    );
+    // Mirrors sync_data_serializer's insertOnConflictUpdate for this table.
+    await db
+        .into(db.connectedAccounts)
+        .insertOnConflictUpdate(
+          ConnectedAccountsCompanion.insert(
+            id: id,
+            kind: AccountKind.s3.name,
+            label: 'from peer',
+            createdAt: 1,
+            updatedAt: 1,
+          ),
+        );
+
+    final account = await repo.ensure(
+      kind: AccountKind.s3,
+      naturalKey: 'minio.local|dive-media|media/',
+      label: 'dive-media @ minio.local',
+    );
+
+    expect(account.id, id);
+    expect(account.label, 'dive-media @ minio.local');
+    expect((await repo.getAll()).length, 1);
+  });
+
   test('ensure separates two prefixes in one bucket', () async {
     final sync = await repo.ensure(
       kind: AccountKind.s3,
