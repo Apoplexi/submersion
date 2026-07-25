@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 /// App-wide display zoom constants and value clamping.
 ///
 /// Zoom is a pure scale factor: 1.0 is the design size, values below 1.0 fit
@@ -27,5 +29,51 @@ class DisplayZoom {
   static double clampValue(double value) {
     if (!value.isFinite) return defaultValue;
     return value.clamp(min, max).toDouble();
+  }
+}
+
+/// Applies an app-wide zoom factor to everything below it.
+///
+/// Lays the child out in a logical space divided by [zoom], then scales that
+/// space back up by [zoom] to fill the physical area. The result is true
+/// browser-style zoom: text, icons, spacing, and custom painters all change
+/// size together, and because [MediaQuery] is inherited, responsive
+/// breakpoints below this widget see the zoomed logical width.
+class DisplayZoomScope extends StatelessWidget {
+  const DisplayZoomScope({super.key, required this.zoom, required this.child});
+
+  final double zoom;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    // Exact identity at the default so users who never touch the setting get
+    // the same widget tree as before, with no extra transform layer.
+    if (zoom == DisplayZoom.defaultValue) return child;
+
+    final mq = MediaQuery.of(context);
+    final logical = mq.size / zoom;
+
+    return MediaQuery(
+      data: mq.copyWith(
+        size: logical,
+        // Insets are expressed in the outer coordinate space. Without dividing
+        // them, content creeps under the notch and behind the keyboard.
+        padding: mq.padding / zoom,
+        viewPadding: mq.viewPadding / zoom,
+        viewInsets: mq.viewInsets / zoom,
+        // ImageConfiguration consults this to select asset resolution.
+        devicePixelRatio: mq.devicePixelRatio * zoom,
+      ),
+      child: Transform.scale(
+        scale: zoom,
+        alignment: Alignment.topLeft,
+        child: SizedBox(
+          width: logical.width,
+          height: logical.height,
+          child: child,
+        ),
+      ),
+    );
   }
 }
