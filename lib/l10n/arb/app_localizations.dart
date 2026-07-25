@@ -21350,6 +21350,36 @@ abstract class AppLocalizations {
   /// **'App Language'**
   String get settings_appearance_appLanguage;
 
+  /// Title of the app-wide display zoom control in Appearance settings
+  ///
+  /// In en, this message translates to:
+  /// **'Display size'**
+  String get settings_appearance_displaySize;
+
+  /// Current display zoom level shown as a percentage
+  ///
+  /// In en, this message translates to:
+  /// **'{percent}%'**
+  String settings_appearance_displaySize_value(int percent);
+
+  /// Button that returns the display zoom to 100 percent
+  ///
+  /// In en, this message translates to:
+  /// **'Reset'**
+  String get settings_appearance_displaySize_reset;
+
+  /// Label at the low end of the display zoom slider
+  ///
+  /// In en, this message translates to:
+  /// **'Smaller'**
+  String get settings_appearance_displaySize_smaller;
+
+  /// Label at the high end of the display zoom slider
+  ///
+  /// In en, this message translates to:
+  /// **'Larger'**
+  String get settings_appearance_displaySize_larger;
+
   /// No description provided for @settings_appearance_depthColoredCards.
   ///
   /// In en, this message translates to:
