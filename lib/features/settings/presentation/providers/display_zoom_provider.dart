@@ -22,10 +22,23 @@ class DisplayZoomNotifier extends StateNotifier<double> {
 
   final SharedPreferences _prefs;
 
+  /// Updates the live zoom without touching storage.
+  ///
+  /// Used while a slider drag is in flight: the whole app rescales on every
+  /// notch, but only the commit at the end of the drag is persisted. Keeping
+  /// the write out of the drag avoids a burst of platform-channel writes whose
+  /// completion order would otherwise decide what ends up stored.
+  void previewZoom(double value) {
+    state = DisplayZoom.normalize(value);
+  }
+
+  /// Updates the live zoom and commits it to storage.
   Future<void> setZoom(double value) async {
     final normalized = DisplayZoom.normalize(value);
-    if (normalized == state) return;
     state = normalized;
+    // Compared against what is stored rather than against [state], so a commit
+    // that follows previewZoom to the same value still persists.
+    if (_prefs.getDouble(SettingsKeys.displayZoom) == normalized) return;
     await _prefs.setDouble(SettingsKeys.displayZoom, normalized);
   }
 

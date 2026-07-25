@@ -65,6 +65,28 @@ void main() {
     );
   });
 
+  testWidgets('drags rescale live but only persist on release', (tester) async {
+    final container = await _pumpTile(tester, {});
+    final prefs = await SharedPreferences.getInstance();
+    final slider = tester.widget<Slider>(find.byType(Slider));
+
+    // Mid-drag: state moves so the app rescales, storage stays untouched.
+    slider.onChanged!(0.8);
+    await tester.pump();
+    expect(container.read(displayZoomNotifierProvider), 0.8);
+    expect(prefs.getDouble('display_zoom'), isNull);
+
+    slider.onChanged!(0.75);
+    await tester.pump();
+    expect(container.read(displayZoomNotifierProvider), 0.75);
+    expect(prefs.getDouble('display_zoom'), isNull);
+
+    // Release commits once.
+    slider.onChangeEnd!(0.75);
+    await tester.pumpAndSettle();
+    expect(prefs.getDouble('display_zoom'), 0.75);
+  });
+
   testWidgets('the slider is configured for the supported range', (
     tester,
   ) async {

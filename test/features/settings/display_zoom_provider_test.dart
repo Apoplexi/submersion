@@ -89,6 +89,43 @@ void main() {
     },
   );
 
+  test('previewZoom updates state without persisting', () async {
+    final container = await _container({});
+    final notifier = container.read(displayZoomNotifierProvider.notifier);
+
+    notifier.previewZoom(1.2);
+
+    expect(container.read(displayZoomNotifierProvider), 1.2);
+    final prefs = await SharedPreferences.getInstance();
+    expect(
+      prefs.getDouble('display_zoom'),
+      isNull,
+      reason: 'a drag in progress must not hit SharedPreferences',
+    );
+  });
+
+  test('setZoom persists even when preview already moved state', () async {
+    // The commit at the end of a drag must not be skipped just because
+    // previewZoom already advanced state to the same value.
+    final container = await _container({});
+    final notifier = container.read(displayZoomNotifierProvider.notifier);
+
+    notifier.previewZoom(1.2);
+    await notifier.setZoom(1.2);
+
+    final prefs = await SharedPreferences.getInstance();
+    expect(prefs.getDouble('display_zoom'), 1.2);
+  });
+
+  test('setZoom skips a redundant write when storage already agrees', () async {
+    final container = await _container({'display_zoom': 0.9});
+    final notifier = container.read(displayZoomNotifierProvider.notifier);
+
+    await notifier.setZoom(0.9);
+
+    expect(container.read(displayZoomNotifierProvider), 0.9);
+  });
+
   test('stepBy saturates at the bounds', () async {
     final container = await _container({'display_zoom': DisplayZoom.max});
     final notifier = container.read(displayZoomNotifierProvider.notifier);

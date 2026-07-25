@@ -167,10 +167,17 @@ class DisplayZoomNotifier extends StateNotifier<double> {
 
   final SharedPreferences _prefs;
 
+  /// Live update with no write. Used while a slider drag is in flight.
+  void previewZoom(double value) {
+    state = DisplayZoom.normalize(value);
+  }
+
   Future<void> setZoom(double value) async {
     final normalized = DisplayZoom.normalize(value);
-    if (normalized == state) return;
     state = normalized;
+    // Compared against storage, not state, so a commit that follows
+    // previewZoom to the same value still persists.
+    if (_prefs.getDouble(SettingsKeys.displayZoom) == normalized) return;
     await _prefs.setDouble(SettingsKeys.displayZoom, normalized);
   }
 
@@ -248,6 +255,14 @@ current percentage and, when not at 100%, a Reset action.
 
 No preview widget: because zoom applies at the app root, the Appearance page
 itself scales as the slider moves. The settings screen is the live preview.
+
+The slider drives `previewZoom` from `onChanged` and `setZoom` from
+`onChangeEnd`. `divisions` already discretizes the drag, so `onChanged` fires
+per notch rather than per pixel, but the split keeps storage writes out of the
+drag entirely: one write per gesture instead of one per notch, and no reliance
+on the completion order of overlapping async writes to decide what ends up
+stored. The keyboard shortcuts and the macOS menu call `setZoom` directly,
+since those are discrete commits with no drag to defer.
 
 ### 5. macOS View menu
 

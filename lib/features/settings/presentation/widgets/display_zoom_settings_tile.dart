@@ -48,7 +48,10 @@ class DisplayZoomSettingsTile extends ConsumerWidget {
                   max: DisplayZoom.max,
                   divisions: DisplayZoom.divisions,
                   label: l10n.settings_appearance_displaySize_value(percent),
-                  onChanged: notifier.setZoom,
+                  // Rescale live on every notch, but only write to storage
+                  // once the drag ends.
+                  onChanged: notifier.previewZoom,
+                  onChangeEnd: notifier.setZoom,
                 ),
               ),
               Text(
