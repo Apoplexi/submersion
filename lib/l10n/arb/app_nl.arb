@@ -6574,5 +6574,6 @@
   "settings_mediaStorage_quality_small": "Klein",
   "settings_mediaStorage_quality_caveat": "Als er een compressieniveau is ingesteld, worden originelen op volledige resolutie niet geüpload; ze blijven alleen op dit apparaat.",
   "settings_mediaStorage_quality_reuploadQueued": "Opnieuw uploaden in wachtrij",
-  "settings_mediaStorage_quality_linuxFfmpegHint": "Installeer ffmpeg om videocompressie in te schakelen. Tot die tijd worden originelen geüpload."
+  "settings_mediaStorage_quality_linuxFfmpegHint": "Installeer ffmpeg om videocompressie in te schakelen. Tot die tijd worden originelen geüpload.",
+  "settings_mediaStorage_quality_saveFailed": "Kan de uploadkwaliteit niet opslaan. Probeer het opnieuw."
 }

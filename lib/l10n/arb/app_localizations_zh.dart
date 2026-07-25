@@ -20924,4 +20924,7 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String get settings_mediaStorage_quality_linuxFfmpegHint =>
       '安装 ffmpeg 以启用视频压缩。在此之前将上传原始文件。';
+
+  @override
+  String get settings_mediaStorage_quality_saveFailed => '无法保存上传质量。请重试。';
 }

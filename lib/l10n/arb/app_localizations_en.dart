@@ -21665,4 +21665,8 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get settings_mediaStorage_quality_linuxFfmpegHint =>
       'Install ffmpeg to enable video compression. Originals are uploaded until then.';
+
+  @override
+  String get settings_mediaStorage_quality_saveFailed =>
+      'Could not save the upload quality. Try again.';
 }

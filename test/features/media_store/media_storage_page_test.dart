@@ -6,6 +6,8 @@ import 'package:submersion/core/services/cloud_storage/s3/s3_config.dart';
 import 'package:submersion/core/services/media_store/media_object_store.dart';
 import 'package:submersion/core/services/media_store/media_store_attach_state.dart';
 import 'package:submersion/core/services/media_store/media_store_credentials_store.dart';
+import 'package:submersion/core/services/media_store/media_upload_quality_policy.dart';
+import 'package:submersion/features/media_store/domain/media_upload_quality.dart';
 import 'package:submersion/features/media/data/repositories/media_repository.dart';
 import 'package:submersion/features/media_store/data/media_backfill_service.dart';
 import 'package:submersion/features/media_store/data/media_store_service.dart';
@@ -18,6 +20,7 @@ import 'package:submersion/features/settings/presentation/providers/sync_provide
 import 'package:submersion/l10n/arb/app_localizations.dart';
 
 import '../../helpers/in_memory_media_object_store.dart';
+import '../../support/fake_app_settings_repository.dart';
 import '../../support/fake_keychain_storage.dart';
 
 class _RecordingService extends MediaStoreService {
@@ -473,29 +476,60 @@ void main() {
     );
   });
 
-  testWidgets('the quality section renders both dropdowns and the caveat', (
-    tester,
-  ) async {
+  testWidgets('the quality section renders the synced levels', (tester) async {
     tester.view.physicalSize = const Size(800, 2600);
     tester.view.devicePixelRatio = 1.0;
     addTearDown(tester.view.reset);
+    final policy = MediaUploadQualityPolicy(
+      settings: FakeAppSettingsRepository(),
+    );
+    await policy.setPhotoUploadQuality(MediaUploadQuality.small);
+    await policy.setVideoUploadQuality(MediaUploadQuality.high);
+
     await tester.runAsync(() async {
-      await tester.pumpWidget(app(statusHint: 'dive-media @ minio'));
+      await tester.pumpWidget(
+        app(
+          statusHint: 'dive-media @ minio',
+          extraOverrides: [
+            mediaUploadQualityPolicyProvider.overrideWithValue(policy),
+          ],
+        ),
+      );
       await Future<void>.delayed(const Duration(milliseconds: 50));
       await tester.pump();
     });
+
     expect(find.byKey(const Key('media-quality-photos')), findsOneWidget);
     expect(find.byKey(const Key('media-quality-video')), findsOneWidget);
+
+    final photo = tester.widget<DropdownButton<MediaUploadQuality>>(
+      find.byKey(const Key('media-quality-photos')),
+    );
+    final video = tester.widget<DropdownButton<MediaUploadQuality>>(
+      find.byKey(const Key('media-quality-video')),
+    );
+    expect(photo.value, MediaUploadQuality.small);
+    expect(video.value, MediaUploadQuality.high);
   });
 
-  testWidgets('changing the photo quality dropdown writes through', (
+  testWidgets('changing the photo quality writes to the synced setting', (
     tester,
   ) async {
     tester.view.physicalSize = const Size(800, 2600);
     tester.view.devicePixelRatio = 1.0;
     addTearDown(tester.view.reset);
+    final settings = FakeAppSettingsRepository();
+    final policy = MediaUploadQualityPolicy(settings: settings);
+
     await tester.runAsync(() async {
-      await tester.pumpWidget(app(statusHint: 'dive-media @ minio'));
+      await tester.pumpWidget(
+        app(
+          statusHint: 'dive-media @ minio',
+          extraOverrides: [
+            mediaUploadQualityPolicyProvider.overrideWithValue(policy),
+          ],
+        ),
+      );
       await Future<void>.delayed(const Duration(milliseconds: 50));
       await tester.pump();
     });
@@ -514,8 +548,57 @@ void main() {
       await tester.pump();
     });
 
-    final prefs = await SharedPreferences.getInstance();
-    expect(prefs.getString('media_store_photo_quality'), 'small');
+    expect(settings.values[MediaUploadQualityPolicy.photoQualityKey], 'small');
+  });
+
+  // Writes rethrow by design so a failed save is visible; the previous
+  // handlers awaited the write and swallowed the error entirely.
+  testWidgets('a failed quality write surfaces a snackbar', (tester) async {
+    tester.view.physicalSize = const Size(800, 2600);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.reset);
+    final settings = FakeAppSettingsRepository();
+    final policy = MediaUploadQualityPolicy(settings: settings);
+
+    await tester.runAsync(() async {
+      await tester.pumpWidget(
+        app(
+          statusHint: 'dive-media @ minio',
+          extraOverrides: [
+            mediaUploadQualityPolicyProvider.overrideWithValue(policy),
+          ],
+        ),
+      );
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+      await tester.pump();
+    });
+
+    settings.throwOnWrite = StateError('disk full');
+
+    final dropdown = find.byKey(const Key('media-quality-photos'));
+    await tester.ensureVisible(dropdown);
+    await tester.runAsync(() async {
+      await tester.tap(dropdown);
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+      await tester.pump();
+      await tester.pump(const Duration(seconds: 1));
+    });
+    await tester.runAsync(() async {
+      await tester.tap(find.text('Small').last);
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+      await tester.pump();
+    });
+    await tester.pump();
+
+    expect(
+      find.text('Could not save the upload quality. Try again.'),
+      findsOneWidget,
+    );
+    expect(
+      settings.values[MediaUploadQualityPolicy.photoQualityKey],
+      isNull,
+      reason: 'the failed write must not appear to have landed',
+    );
   });
 
   testWidgets('backfill enqueues and reports the count', (tester) async {
@@ -958,13 +1041,15 @@ void main() {
     tester.view.physicalSize = const Size(800, 2600);
     tester.view.devicePixelRatio = 1.0;
     addTearDown(tester.view.reset);
-    SharedPreferences.setMockInitialValues({
-      'media_store_video_quality': 'small',
-    });
+    final policy = MediaUploadQualityPolicy(
+      settings: FakeAppSettingsRepository(),
+    );
+    await policy.setVideoUploadQuality(MediaUploadQuality.small);
     await tester.runAsync(() async {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
+            mediaUploadQualityPolicyProvider.overrideWithValue(policy),
             mediaStoreRuntimeProvider.overrideWith((ref) async => null),
             mediaStoreCredentialsStoreProvider.overrideWithValue(
               MediaStoreCredentialsStore(storage: InMemoryKeychain()),

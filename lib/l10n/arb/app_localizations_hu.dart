@@ -21971,4 +21971,8 @@ class AppLocalizationsHu extends AppLocalizations {
   @override
   String get settings_mediaStorage_quality_linuxFfmpegHint =>
       'Telepítse az ffmpeg-et a videótömörítés engedélyezéséhez. Addig az eredetik kerülnek feltöltésre.';
+
+  @override
+  String get settings_mediaStorage_quality_saveFailed =>
+      'A feltöltési minőség mentése nem sikerült. Próbáld újra.';
 }

@@ -22112,4 +22112,8 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get settings_mediaStorage_quality_linuxFfmpegHint =>
       'Installez ffmpeg pour activer la compression vidéo. Les originaux sont téléversés d\'ici là.';
+
+  @override
+  String get settings_mediaStorage_quality_saveFailed =>
+      'Impossible d\'enregistrer la qualité de téléversement. Réessayez.';
 }

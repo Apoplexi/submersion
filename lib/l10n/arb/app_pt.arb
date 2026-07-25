@@ -6574,5 +6574,6 @@
   "settings_mediaStorage_quality_small": "Pequena",
   "settings_mediaStorage_quality_caveat": "Com um nível de compressão definido, os originais em resolução total não são enviados; permanecem apenas neste dispositivo.",
   "settings_mediaStorage_quality_reuploadQueued": "Novo envio na fila",
-  "settings_mediaStorage_quality_linuxFfmpegHint": "Instale o ffmpeg para ativar a compressão de vídeo. Até lá, os originais são enviados."
+  "settings_mediaStorage_quality_linuxFfmpegHint": "Instale o ffmpeg para ativar a compressão de vídeo. Até lá, os originais são enviados.",
+  "settings_mediaStorage_quality_saveFailed": "Não foi possível guardar a qualidade de envio. Tente novamente."
 }

@@ -52,8 +52,6 @@ class _MediaStoragePageState extends ConsumerState<MediaStoragePage> {
   // Null until loaded; the switches render only once values are known.
   bool? _autoUpload;
   bool? _photosOnCellular;
-  MediaUploadQuality? _photoQuality;
-  MediaUploadQuality? _videoQuality;
 
   @override
   void initState() {
@@ -69,16 +67,30 @@ class _MediaStoragePageState extends ConsumerState<MediaStoragePage> {
     final policies = ref.read(mediaStorePoliciesProvider);
     final autoUpload = await policies.autoUpload();
     final photosOnCellular = await policies.photosOnCellular();
-    final qualityPolicy = MediaUploadQualityPolicy();
-    final photoQuality = await qualityPolicy.photoUploadQuality();
-    final videoQuality = await qualityPolicy.videoUploadQuality();
     if (!mounted) return;
     setState(() {
       _autoUpload = autoUpload;
       _photosOnCellular = photosOnCellular;
-      _photoQuality = photoQuality;
-      _videoQuality = videoQuality;
     });
+  }
+
+  /// Persists a quality level, surfacing a failed write rather than letting it
+  /// pass silently. The invalidate runs either way: on success it re-reads the
+  /// new truth, on failure it discards the optimistic value for free.
+  Future<void> _saveQuality(
+    AppLocalizations l10n,
+    Future<void> Function(MediaUploadQualityPolicy policy) write,
+    FutureProvider<MediaUploadQuality> provider,
+  ) async {
+    try {
+      await write(ref.read(mediaUploadQualityPolicyProvider));
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.settings_mediaStorage_quality_saveFailed)),
+      );
+    }
+    ref.invalidate(provider);
   }
 
   List<DropdownMenuItem<MediaUploadQuality>> _qualityItems(
@@ -393,6 +405,10 @@ class _MediaStoragePageState extends ConsumerState<MediaStoragePage> {
     final l10n = context.l10n;
     final statusHint = ref.watch(mediaStoreStatusHintProvider).value;
     final connected = statusHint != null;
+    // AsyncValue.value, not .when: an in-flight refresh after a write keeps
+    // the previous level on screen instead of blanking the whole section.
+    final photoQuality = ref.watch(photoUploadQualityProvider).value;
+    final videoQuality = ref.watch(videoUploadQualityProvider).value;
     return Scaffold(
       appBar: AppBar(title: Text(l10n.settings_mediaStorage_entry_title)),
       body: Form(
@@ -651,7 +667,7 @@ class _MediaStoragePageState extends ConsumerState<MediaStoragePage> {
                         .setPhotosOnCellular(value);
                   },
                 ),
-              if (_photoQuality != null && _videoQuality != null) ...[
+              if (photoQuality != null && videoQuality != null) ...[
                 const Divider(),
                 Padding(
                   padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
@@ -664,13 +680,14 @@ class _MediaStoragePageState extends ConsumerState<MediaStoragePage> {
                   title: Text(l10n.settings_mediaStorage_quality_photos),
                   trailing: DropdownButton<MediaUploadQuality>(
                     key: const Key('media-quality-photos'),
-                    value: _photoQuality,
+                    value: photoQuality,
                     underline: const SizedBox(),
                     onChanged: (value) async {
                       if (value == null) return;
-                      setState(() => _photoQuality = value);
-                      await MediaUploadQualityPolicy().setPhotoUploadQuality(
-                        value,
+                      await _saveQuality(
+                        l10n,
+                        (policy) => policy.setPhotoUploadQuality(value),
+                        photoUploadQualityProvider,
                       );
                     },
                     items: _qualityItems(l10n),
@@ -680,21 +697,21 @@ class _MediaStoragePageState extends ConsumerState<MediaStoragePage> {
                   title: Text(l10n.settings_mediaStorage_quality_video),
                   trailing: DropdownButton<MediaUploadQuality>(
                     key: const Key('media-quality-video'),
-                    value: _videoQuality,
+                    value: videoQuality,
                     underline: const SizedBox(),
                     onChanged: (value) async {
                       if (value == null) return;
-                      setState(() => _videoQuality = value);
-                      await MediaUploadQualityPolicy().setVideoUploadQuality(
-                        value,
+                      await _saveQuality(
+                        l10n,
+                        (policy) => policy.setVideoUploadQuality(value),
+                        videoUploadQualityProvider,
                       );
                     },
                     items: _qualityItems(l10n),
                   ),
                 ),
                 if (ref.watch(isLinuxPlatformProvider) &&
-                    _videoQuality != null &&
-                    _videoQuality != MediaUploadQuality.original &&
+                    videoQuality != MediaUploadQuality.original &&
                     !(ref.watch(videoTranscodeAvailableProvider).value ?? true))
                   Padding(
                     padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
