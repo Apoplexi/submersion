@@ -9,6 +9,7 @@ import 'package:submersion/core/services/cloud_storage/s3/s3_config.dart';
 import 'package:submersion/core/services/cloud_storage/s3/s3_credentials_store.dart';
 import 'package:submersion/core/services/cloud_storage/s3/s3_region.dart';
 import 'package:submersion/core/services/media_store/media_object_store.dart';
+import 'package:submersion/core/services/media_store/media_upload_quality_policy.dart';
 import 'package:submersion/features/media_store/data/media_store_service.dart';
 import 'package:submersion/features/media_store/domain/media_upload_quality.dart';
 import 'package:submersion/features/media_store/presentation/providers/media_store_providers.dart';
@@ -68,8 +69,9 @@ class _MediaStoragePageState extends ConsumerState<MediaStoragePage> {
     final policies = ref.read(mediaStorePoliciesProvider);
     final autoUpload = await policies.autoUpload();
     final photosOnCellular = await policies.photosOnCellular();
-    final photoQuality = await policies.photoUploadQuality();
-    final videoQuality = await policies.videoUploadQuality();
+    final qualityPolicy = MediaUploadQualityPolicy();
+    final photoQuality = await qualityPolicy.photoUploadQuality();
+    final videoQuality = await qualityPolicy.videoUploadQuality();
     if (!mounted) return;
     setState(() {
       _autoUpload = autoUpload;
@@ -667,9 +669,9 @@ class _MediaStoragePageState extends ConsumerState<MediaStoragePage> {
                     onChanged: (value) async {
                       if (value == null) return;
                       setState(() => _photoQuality = value);
-                      await ref
-                          .read(mediaStorePoliciesProvider)
-                          .setPhotoUploadQuality(value);
+                      await MediaUploadQualityPolicy().setPhotoUploadQuality(
+                        value,
+                      );
                     },
                     items: _qualityItems(l10n),
                   ),
@@ -683,9 +685,9 @@ class _MediaStoragePageState extends ConsumerState<MediaStoragePage> {
                     onChanged: (value) async {
                       if (value == null) return;
                       setState(() => _videoQuality = value);
-                      await ref
-                          .read(mediaStorePoliciesProvider)
-                          .setVideoUploadQuality(value);
+                      await MediaUploadQualityPolicy().setVideoUploadQuality(
+                        value,
+                      );
                     },
                     items: _qualityItems(l10n),
                   ),
