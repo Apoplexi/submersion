@@ -1082,11 +1082,90 @@ void main() {
       await tester.pump();
     });
     await tester.ensureVisible(
-      find.byKey(const Key('media-quality-linux-ffmpeg-hint')),
+      find.byKey(const Key('media-quality-transcoder-hint')),
     );
     expect(
-      find.byKey(const Key('media-quality-linux-ffmpeg-hint')),
+      find.byKey(const Key('media-quality-transcoder-hint')),
       findsOneWidget,
+    );
+  });
+
+  // The Linux gate was only correct while quality was per-device: a user could
+  // then only pick a level their own machine could not honour. A library-wide
+  // setting lets a Mac choose a level for a Windows box with no engine.
+  testWidgets('a non-Linux device without an engine shows the generic hint', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(800, 2600);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.reset);
+    final policy = MediaUploadQualityPolicy(
+      settings: FakeAppSettingsRepository(),
+    );
+    await policy.setVideoUploadQuality(MediaUploadQuality.small);
+
+    await tester.runAsync(() async {
+      await tester.pumpWidget(
+        app(
+          statusHint: 'dive-media @ minio',
+          extraOverrides: [
+            mediaUploadQualityPolicyProvider.overrideWithValue(policy),
+            isLinuxPlatformProvider.overrideWithValue(false),
+            videoTranscodeAvailableProvider.overrideWith((ref) async => false),
+          ],
+        ),
+      );
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+      await tester.pump();
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+      await tester.pump();
+    });
+
+    await tester.ensureVisible(
+      find.byKey(const Key('media-quality-transcoder-hint')),
+    );
+    expect(
+      find.byKey(const Key('media-quality-transcoder-hint')),
+      findsOneWidget,
+    );
+    expect(
+      find.text(
+        'This device cannot compress video. Originals are uploaded '
+        'from it.',
+      ),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets('a device with a working engine shows no hint', (tester) async {
+    tester.view.physicalSize = const Size(800, 2600);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.reset);
+    final policy = MediaUploadQualityPolicy(
+      settings: FakeAppSettingsRepository(),
+    );
+    await policy.setVideoUploadQuality(MediaUploadQuality.small);
+
+    await tester.runAsync(() async {
+      await tester.pumpWidget(
+        app(
+          statusHint: 'dive-media @ minio',
+          extraOverrides: [
+            mediaUploadQualityPolicyProvider.overrideWithValue(policy),
+            isLinuxPlatformProvider.overrideWithValue(false),
+            videoTranscodeAvailableProvider.overrideWith((ref) async => true),
+          ],
+        ),
+      );
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+      await tester.pump();
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+      await tester.pump();
+    });
+
+    expect(
+      find.byKey(const Key('media-quality-transcoder-hint')),
+      findsNothing,
     );
   });
 }

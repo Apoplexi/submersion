@@ -710,14 +710,22 @@ class _MediaStoragePageState extends ConsumerState<MediaStoragePage> {
                     items: _qualityItems(l10n),
                   ),
                 ),
-                if (ref.watch(isLinuxPlatformProvider) &&
-                    videoQuality != MediaUploadQuality.original &&
+                // A library-wide level can be set from a device that cannot
+                // honour it, so this note is not Linux-specific: any device
+                // without a working engine uploads originals. Only the remedy
+                // differs, which is why the copy branches but the condition
+                // does not. The `?? true` keeps the note hidden while
+                // availability is still resolving, rather than flashing a
+                // warning that then disappears.
+                if (videoQuality != MediaUploadQuality.original &&
                     !(ref.watch(videoTranscodeAvailableProvider).value ?? true))
                   Padding(
                     padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
                     child: Text(
-                      l10n.settings_mediaStorage_quality_linuxFfmpegHint,
-                      key: const Key('media-quality-linux-ffmpeg-hint'),
+                      ref.watch(isLinuxPlatformProvider)
+                          ? l10n.settings_mediaStorage_quality_linuxFfmpegHint
+                          : l10n.settings_mediaStorage_quality_noTranscoderHint,
+                      key: const Key('media-quality-transcoder-hint'),
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
                         color: Theme.of(context).colorScheme.error,
                       ),

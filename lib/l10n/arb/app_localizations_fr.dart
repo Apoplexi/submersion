@@ -22116,4 +22116,8 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get settings_mediaStorage_quality_saveFailed =>
       'Impossible d\'enregistrer la qualité de téléversement. Réessayez.';
+
+  @override
+  String get settings_mediaStorage_quality_noTranscoderHint =>
+      'Cet appareil ne peut pas compresser la vidéo. Les originaux sont téléversés depuis celui-ci.';
 }

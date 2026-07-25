@@ -6575,5 +6575,6 @@
   "settings_mediaStorage_quality_caveat": "Con un livello di compressione impostato, gli originali a piena risoluzione non vengono caricati: rimangono solo su questo dispositivo.",
   "settings_mediaStorage_quality_reuploadQueued": "Ricaricamento in coda",
   "settings_mediaStorage_quality_linuxFfmpegHint": "Installa ffmpeg per abilitare la compressione video. Fino ad allora vengono caricati gli originali.",
-  "settings_mediaStorage_quality_saveFailed": "Impossibile salvare la qualità di caricamento. Riprova."
+  "settings_mediaStorage_quality_saveFailed": "Impossibile salvare la qualità di caricamento. Riprova.",
+  "settings_mediaStorage_quality_noTranscoderHint": "Questo dispositivo non può comprimere i video. Da esso vengono caricati gli originali."
 }

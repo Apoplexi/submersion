@@ -21484,4 +21484,8 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String get settings_mediaStorage_quality_saveFailed =>
       'לא ניתן היה לשמור את איכות ההעלאה. נסה שוב.';
+
+  @override
+  String get settings_mediaStorage_quality_noTranscoderHint =>
+      'מכשיר זה אינו יכול לדחוס וידאו. ממנו מועלים הקבצים המקוריים.';
 }
