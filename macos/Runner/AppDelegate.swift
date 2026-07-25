@@ -12,6 +12,7 @@ class AppDelegate: FlutterAppDelegate {
   private var localMediaHandler: LocalMediaHandler?
   private var backupBookmarkHandler: BackupBookmarkHandler?
   private var updateChannel: FlutterMethodChannel?
+  private var displayChannel: FlutterMethodChannel?
 
   /// Mac App Store and TestFlight builds contain a receipt file;
   /// direct-distribution (DMG / GitHub) builds do not.
@@ -45,6 +46,10 @@ class AppDelegate: FlutterAppDelegate {
         name: "app.submersion/updates",
         binaryMessenger: messenger
       )
+      displayChannel = FlutterMethodChannel(
+        name: "app.submersion/display",
+        binaryMessenger: messenger
+      )
       NSLog("[AppDelegate] All handlers initialized")
     } else {
       NSLog("[AppDelegate] ERROR: Could not get FlutterViewController!")
@@ -53,6 +58,18 @@ class AppDelegate: FlutterAppDelegate {
 
   @IBAction func checkForUpdates(_ sender: Any) {
     updateChannel?.invokeMethod("checkForUpdateInteractively", arguments: nil)
+  }
+
+  @IBAction func zoomIn(_ sender: Any) {
+    displayChannel?.invokeMethod("zoomIn", arguments: nil)
+  }
+
+  @IBAction func zoomOut(_ sender: Any) {
+    displayChannel?.invokeMethod("zoomOut", arguments: nil)
+  }
+
+  @IBAction func actualSize(_ sender: Any) {
+    displayChannel?.invokeMethod("actualSize", arguments: nil)
   }
 
   override func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
