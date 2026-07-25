@@ -114,6 +114,28 @@ void main() {
     expect(summaries.single.name, 'Zenobia');
   });
 
+  testWidgets('the stored summary reflects edits made during the naming flow', (
+    tester,
+  ) async {
+    await setSize(tester, const Size(420, 900));
+    await tester.pumpWidget(harness());
+    await seedAndSave(tester);
+
+    // Deepen the plan while the naming flow is still in flight. The dialog
+    // blocks the diver, but the site lookup that precedes it does not, so the
+    // summary must describe the plan as it is when save() actually runs.
+    notifierOf(tester).addSimplePlan(maxDepth: 45, bottomTimeMinutes: 10);
+    await tester.pump();
+
+    await tester.enterText(find.byType(TextField), 'Zenobia');
+    await tester.pump();
+    await tester.tap(find.widgetWithText(FilledButton, 'Save'));
+    await tester.pumpAndSettle();
+
+    final summaries = await repository.getAllPlanSummaries();
+    expect(summaries.single.maxDepth, 45);
+  });
+
   testWidgets('a second save does not re-open the dialog', (tester) async {
     await setSize(tester, const Size(420, 900));
     await tester.pumpWidget(harness());

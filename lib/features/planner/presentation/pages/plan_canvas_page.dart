@@ -552,12 +552,6 @@ class _PlanCanvasPageState extends ConsumerState<PlanCanvasPage> {
 
   Future<void> _savePlan() async {
     final notifier = ref.read(divePlanNotifierProvider.notifier);
-    final outcome = ref.read(planOutcomeProvider);
-    final summary = PlanSummaryData(
-      maxDepth: outcome.maxDepth,
-      runtimeSeconds: outcome.runtimeSeconds,
-      ttsSeconds: outcome.ttsAtBottom,
-    );
 
     // Prompt for a name the first time a plan is persisted, so the saved-plans
     // list is not a wall of identically-named rows. Re-saves stay silent, and
@@ -565,20 +559,25 @@ class _PlanCanvasPageState extends ConsumerState<PlanCanvasPage> {
     // grow a modal.
     if (!notifier.isPersisted) {
       final l10n = context.l10n;
-      final planState = ref.read(divePlanNotifierProvider);
       final units = UnitFormatter(ref.read(settingsProvider));
-      final siteId = planState.siteId;
+      final siteId = ref.read(divePlanNotifierProvider).siteId;
       final site = siteId == null
           ? null
           : await ref.read(siteProvider(siteId).future);
       if (!mounted) return;
 
+      // Re-read after the site lookup rather than before it. No modal is up
+      // while that read resolves, so the diver can still edit the plan and the
+      // suggested name must describe what the plan is now.
+      final planState = ref.read(divePlanNotifierProvider);
+      final suggestedDepth = ref.read(planOutcomeProvider).maxDepth;
+
       final entered = await showPlanNameDialog(
         context,
         initialName: generateDefaultPlanName(
           siteName: site?.name,
-          depthLabel: outcome.maxDepth > 0
-              ? units.formatDepth(outcome.maxDepth)
+          depthLabel: suggestedDepth > 0
+              ? units.formatDepth(suggestedDepth)
               : null,
           date: planState.startDateTime ?? DateTime.now(),
           fallbackLabel: l10n.plannerCanvas_name_defaultFallback,
@@ -591,7 +590,17 @@ class _PlanCanvasPageState extends ConsumerState<PlanCanvasPage> {
       notifier.updateName(entered);
     }
 
-    await notifier.save(summary: summary);
+    // Build the summary last so the denormalized depth/runtime always describe
+    // the plan actually being persisted, never whatever it looked like before
+    // the naming flow's async gaps.
+    final outcome = ref.read(planOutcomeProvider);
+    await notifier.save(
+      summary: PlanSummaryData(
+        maxDepth: outcome.maxDepth,
+        runtimeSeconds: outcome.runtimeSeconds,
+        ttsSeconds: outcome.ttsAtBottom,
+      ),
+    );
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(context.l10n.divePlanner_message_planSaved)),
