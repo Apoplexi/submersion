@@ -80,6 +80,7 @@ class SettingsKeys {
   // stored directly in SharedPreferences rather than per-diver in the DB).
   static const String fullscreenTileOrder = 'fullscreen_tile_order';
   static const String fullscreenHiddenTiles = 'fullscreen_hidden_tiles';
+  static const String hiddenHomeChips = 'hidden_home_chips';
   static const String fullscreenReadoutCardX = 'fullscreen_readout_card_x';
   static const String fullscreenReadoutCardY = 'fullscreen_readout_card_y';
 
@@ -355,6 +356,11 @@ class AppSettings {
   /// Instrument tiles the user has hidden in the fullscreen profile view.
   final List<String> fullscreenHiddenTiles;
 
+  /// Home dashboard gauge-strip chip types the user has hidden.
+  /// Ids are [HomeChipType.name] values; empty means all chips shown.
+  /// Device-local, not per-diver.
+  final Set<String> hiddenHomeChips;
+
   /// Fullscreen readout card position as fractions (0..1) of the movable
   /// range; null means the default corner. See DraggableReadoutCard.
   final double? fullscreenReadoutCardX;
@@ -475,6 +481,7 @@ class AppSettings {
     this.diveDetailSections = DiveDetailSectionConfig.defaultSections,
     this.fullscreenTileOrder = const [],
     this.fullscreenHiddenTiles = const [],
+    this.hiddenHomeChips = const <String>{},
     this.fullscreenReadoutCardX,
     this.fullscreenReadoutCardY,
     this.perdixOverlayEnabled = false,
@@ -621,6 +628,7 @@ class AppSettings {
     bool clearDiveDetailSections = false,
     List<String>? fullscreenTileOrder,
     List<String>? fullscreenHiddenTiles,
+    Set<String>? hiddenHomeChips,
     double? fullscreenReadoutCardX,
     double? fullscreenReadoutCardY,
     bool? perdixOverlayEnabled,
@@ -762,6 +770,7 @@ class AppSettings {
       fullscreenTileOrder: fullscreenTileOrder ?? this.fullscreenTileOrder,
       fullscreenHiddenTiles:
           fullscreenHiddenTiles ?? this.fullscreenHiddenTiles,
+      hiddenHomeChips: hiddenHomeChips ?? this.hiddenHomeChips,
       fullscreenReadoutCardX:
           fullscreenReadoutCardX ?? this.fullscreenReadoutCardX,
       fullscreenReadoutCardY:
@@ -864,6 +873,9 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
           prefs.getStringList(SettingsKeys.fullscreenTileOrder) ?? const [];
       final fullscreenHiddenTiles =
           prefs.getStringList(SettingsKeys.fullscreenHiddenTiles) ?? const [];
+      final hiddenHomeChips =
+          prefs.getStringList(SettingsKeys.hiddenHomeChips)?.toSet() ??
+          const <String>{};
       final fullscreenReadoutCardX = prefs.getDouble(
         SettingsKeys.fullscreenReadoutCardX,
       );
@@ -885,6 +897,7 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
         state = AppSettings(
           fullscreenTileOrder: fullscreenTileOrder,
           fullscreenHiddenTiles: fullscreenHiddenTiles,
+          hiddenHomeChips: hiddenHomeChips,
           fullscreenReadoutCardX: fullscreenReadoutCardX,
           fullscreenReadoutCardY: fullscreenReadoutCardY,
           pscrRatio: pscrRatio ?? 100.0,
@@ -901,6 +914,7 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
       state = settings.copyWith(
         fullscreenTileOrder: fullscreenTileOrder,
         fullscreenHiddenTiles: fullscreenHiddenTiles,
+        hiddenHomeChips: hiddenHomeChips,
         fullscreenReadoutCardX: fullscreenReadoutCardX,
         fullscreenReadoutCardY: fullscreenReadoutCardY,
         pscrRatio: pscrRatio,
@@ -951,6 +965,10 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
     await prefs.setStringList(
       SettingsKeys.fullscreenHiddenTiles,
       state.fullscreenHiddenTiles,
+    );
+    await prefs.setStringList(
+      SettingsKeys.hiddenHomeChips,
+      state.hiddenHomeChips.toList()..sort(),
     );
     final readoutCardX = state.fullscreenReadoutCardX;
     if (readoutCardX != null) {
@@ -1143,6 +1161,18 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
 
   Future<void> setSafetyReviewEnabled(bool value) async {
     state = state.copyWith(safetyReviewEnabled: value);
+    await _saveSettings();
+  }
+
+  /// Show or hide one home gauge-strip chip type (id = HomeChipType.name).
+  Future<void> setHomeChipEnabled(String chipId, bool enabled) async {
+    final hidden = {...state.hiddenHomeChips};
+    if (enabled) {
+      hidden.remove(chipId);
+    } else {
+      hidden.add(chipId);
+    }
+    state = state.copyWith(hiddenHomeChips: hidden);
     await _saveSettings();
   }
 

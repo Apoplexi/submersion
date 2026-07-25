@@ -2954,6 +2954,18 @@ class AppLocalizationsFr extends AppLocalizations {
   String get dashboard_hero_diverFallbackName => 'Plongeur';
 
   @override
+  String get dashboard_hero_statDives => 'plongées';
+
+  @override
+  String get dashboard_hero_statHours => 'heures';
+
+  @override
+  String get dashboard_hero_statSites => 'sites';
+
+  @override
+  String get dashboard_hero_statCountries => 'pays';
+
+  @override
   String dashboard_activityStats_divesInYear(String year) {
     return 'plongées en $year';
   }
@@ -2961,6 +2973,200 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get dashboard_semantics_statsBar =>
       'Résumé des statistiques de plongée';
+
+  @override
+  String get dashboard_gauges_addGear => 'Ajouter du matériel';
+
+  @override
+  String dashboard_gauges_gearOk(String name) {
+    return '$name OK';
+  }
+
+  @override
+  String dashboard_gauges_gearDueIn(String name, int days) {
+    return '$name à réviser dans ${days}j';
+  }
+
+  @override
+  String dashboard_gauges_gearOverdue(String name) {
+    return '$name en retard de révision';
+  }
+
+  @override
+  String get dashboard_gauges_insuranceOk => 'Assurance OK';
+
+  @override
+  String dashboard_gauges_insuranceExpires(String date) {
+    return 'Assurance expire le $date';
+  }
+
+  @override
+  String get dashboard_gauges_insuranceExpired => 'Assurance expirée';
+
+  @override
+  String get dashboard_gauges_noInsurance => 'Aucune assurance enregistrée';
+
+  @override
+  String get dashboard_gauges_noFlyClear => 'Délai avant vol 0:00';
+
+  @override
+  String dashboard_gauges_noFlyRemaining(String hours, String minutes) {
+    return 'Délai avant vol $hours:$minutes';
+  }
+
+  @override
+  String dashboard_gauges_lastDiveDays(int days) {
+    return 'Dernière plongée il y a ${days}j';
+  }
+
+  @override
+  String get dashboard_gauges_lastDiveToday => 'Plongé aujourd\'hui';
+
+  @override
+  String get dashboard_gauges_noDivesYet => 'Aucune plongée';
+
+  @override
+  String get settings_homeChips_pageTitle => 'Pastilles d\'état de l\'accueil';
+
+  @override
+  String get settings_homeChips_description =>
+      'Choisissez les pastilles d\'état affichées en haut de l\'onglet Accueil.';
+
+  @override
+  String get settings_homeChips_gear => 'Entretien du matériel';
+
+  @override
+  String get settings_homeChips_insurance => 'Assurance';
+
+  @override
+  String get settings_homeChips_noFly => 'Délai avant vol';
+
+  @override
+  String get settings_homeChips_lastDive => 'Récence de plongée';
+
+  @override
+  String get settings_homeChips_certifications =>
+      'Expiration des certifications';
+
+  @override
+  String get settings_homeChips_trip => 'Voyage à venir';
+
+  @override
+  String get settings_homeChips_checklist => 'Liste de contrôle active';
+
+  @override
+  String get settings_homeChips_course => 'Progression du cours';
+
+  @override
+  String get settings_homeChips_uploads => 'Envois de médias';
+
+  @override
+  String get settings_homeChips_backup => 'Âge de la sauvegarde';
+
+  @override
+  String get settings_homeChips_sync => 'État de synchronisation';
+
+  @override
+  String get settings_homeChips_dataQuality => 'Qualité des données';
+
+  @override
+  String dashboard_gauges_certsExpiring(int count) {
+    return '$count certifications expirent bientôt';
+  }
+
+  @override
+  String dashboard_gauges_tripCountdown(String name, int days) {
+    return '$name dans ${days}j';
+  }
+
+  @override
+  String get dashboard_gauges_checklistActive => 'Liste de contrôle en cours';
+
+  @override
+  String dashboard_gauges_courseProgress(String name, int done, int total) {
+    return '$name : $done/$total';
+  }
+
+  @override
+  String dashboard_gauges_uploadsPending(int count) {
+    return '$count envois en attente';
+  }
+
+  @override
+  String get dashboard_gauges_backupNone => 'Aucune sauvegarde';
+
+  @override
+  String get dashboard_gauges_backupToday => 'Sauvegardé aujourd\'hui';
+
+  @override
+  String dashboard_gauges_backupDays(int days) {
+    return 'Sauvegarde il y a ${days}j';
+  }
+
+  @override
+  String dashboard_gauges_syncPending(int count) {
+    return '$count non synchronisés';
+  }
+
+  @override
+  String get dashboard_gauges_synced => 'Synchronisé';
+
+  @override
+  String dashboard_gauges_dataIssues(int count) {
+    return '$count problèmes de données';
+  }
+
+  @override
+  String get dashboard_gauges_retry =>
+      'Statut indisponible - touchez pour réessayer';
+
+  @override
+  String get dashboard_urgent_title => 'Attention requise';
+
+  @override
+  String get dashboard_photos_title => 'Photos récentes';
+
+  @override
+  String get dashboard_recentSites_title => 'Sites récents';
+
+  @override
+  String get dashboard_yearInReview_title => 'Cette année';
+
+  @override
+  String dashboard_yearInReview_divesVs(int count, int previous) {
+    return '$count plongées (contre $previous l\'an dernier)';
+  }
+
+  @override
+  String dashboard_yearInReview_hours(String hours) {
+    return '$hours heures sous l\'eau';
+  }
+
+  @override
+  String dashboard_yearInReview_maxDepth(String depth) {
+    return 'Prof. max : $depth';
+  }
+
+  @override
+  String get dashboard_onThisDay_title => 'Ce jour-là';
+
+  @override
+  String dashboard_onThisDay_entry(String year, String site) {
+    return '$year - $site';
+  }
+
+  @override
+  String get dashboard_milestones_title => 'Étapes';
+
+  @override
+  String dashboard_milestones_nextDive(int remaining, int milestone) {
+    return '$remaining plongées avant la n°$milestone';
+  }
+
+  @override
+  String dashboard_milestones_certYears(String name, int years, String month) {
+    return '$name : $years ans en $month';
+  }
 
   @override
   String get dashboard_personalRecords_coldest => 'La plus froide';
