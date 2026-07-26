@@ -234,7 +234,8 @@ void main() {
     expect(p.extension((data! as FileData).file.path), '.mp4');
   });
 
-  test('a photo with no filename keeps the extensionless cache name', () async {
+  test('a photo with no filename keeps the store key unknown '
+      'extension', () async {
     final bytes = 'photo-no-filename'.codeUnits;
     final hash = await seed('pnofn', bytes);
     store.objects[StoreKeys.objectKey(hash, extension: 'bin')] = bytes;
