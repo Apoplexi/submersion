@@ -20,6 +20,7 @@ import 'package:submersion/features/maps/presentation/widgets/map_attribution.da
 import 'package:submersion/features/maps/presentation/widgets/trackpad_zoom_map.dart';
 import 'package:submersion/features/marine_life/presentation/widgets/site_marine_life_section.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
+import 'package:submersion/features/reef/presentation/widgets/reef_section.dart';
 import 'package:submersion/features/tides/presentation/widgets/tide_section.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:submersion/shared/widgets/master_detail/detail_scroll_retainer.dart';
@@ -193,6 +194,12 @@ class _SiteDetailContentState extends ConsumerState<_SiteDetailContent> {
           // Tide Section (only if site has coordinates)
           if (site.hasCoordinates) ...[
             TideSection(location: site.location!),
+            const SizedBox(height: 16),
+          ],
+
+          // Reef Section (only if site has coordinates)
+          if (site.hasCoordinates) ...[
+            ReefSection(location: site.location!),
             const SizedBox(height: 16),
           ],
 
