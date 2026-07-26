@@ -1312,6 +1312,8 @@
   "diveDetailSection_tanks_description": "Lista de cilindros, misturas de gas, pressoes, SAC por cilindro",
   "diveDetailSection_tanks_name": "Cilindros",
   "diveDetailSection_tide_description": "Grafico do ciclo de mare e horarios",
+  "diveDetailSection_reefHealth_name": "Saude do recife",
+  "diveDetailSection_reefHealth_description": "Estresse termico de branqueamento de corais na data do mergulho",
   "diveDetailSection_tide_name": "Mare",
   "diveDetailSection_weights_description": "Detalhamento de peso, peso total",
   "diveDetailSection_buoyancy_name": "Flutuabilidade",

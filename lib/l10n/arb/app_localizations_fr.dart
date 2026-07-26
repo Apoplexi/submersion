@@ -12885,6 +12885,13 @@ class AppLocalizationsFr extends AppLocalizations {
       'Graphique du cycle de maree et horaires';
 
   @override
+  String get diveDetailSection_reefHealth_name => 'Sante du recif';
+
+  @override
+  String get diveDetailSection_reefHealth_description =>
+      'Stress thermique de blanchissement corallien a la date de la plongee';
+
+  @override
   String get diveDetailSection_surfaceGps_name => 'GPS de surface';
 
   @override

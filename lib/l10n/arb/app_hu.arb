@@ -5498,6 +5498,8 @@
   "diveDetailSection_tanks_description": "Palack lista, gázkeverékek, nyomások, palackonkénti SAC",
   "diveDetailSection_tanks_name": "Palackok",
   "diveDetailSection_tide_description": "Árapály-ciklus grafikon és időzítés",
+  "diveDetailSection_reefHealth_name": "Zatony allapota",
+  "diveDetailSection_reefHealth_description": "Korallfeheredesi hostressz a merules napjan",
   "diveDetailSection_tide_name": "Árapály",
   "diveDetailSection_weights_description": "Súly lebontás, teljes súly",
   "diveDetailSection_buoyancy_name": "Felhajtóerő",

@@ -3944,6 +3944,8 @@
   "diveDetailSection_tanks_description": "רשימת בלונים, תערובות גז, לחצים, SAC לבלון",
   "diveDetailSection_tanks_name": "בלונים",
   "diveDetailSection_tide_description": "גרף מחזור גאות ושפל וזמן",
+  "diveDetailSection_reefHealth_name": "בריאות השונית",
+  "diveDetailSection_reefHealth_description": "עקת חום מהלבנת אלמוגים בתאריך הצלילה",
   "diveDetailSection_tide_name": "גאות ושפל",
   "diveDetailSection_weights_description": "פירוט משקולות, משקל כולל",
   "diveDetailSection_buoyancy_name": "ציפה",

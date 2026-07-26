@@ -1312,6 +1312,8 @@
   "diveDetailSection_tanks_description": "Lista de tanques, mezclas de gas, presiones, SAC por tanque",
   "diveDetailSection_tanks_name": "Tanques",
   "diveDetailSection_tide_description": "Grafico del ciclo de mareas y temporalizacion",
+  "diveDetailSection_reefHealth_name": "Salud del arrecife",
+  "diveDetailSection_reefHealth_description": "Estres termico por blanqueamiento de coral en la fecha del buceo",
   "diveDetailSection_tide_name": "Marea",
   "diveDetailSection_weights_description": "Desglose de pesos, peso total",
   "diveDetailSection_buoyancy_name": "Flotabilidad",

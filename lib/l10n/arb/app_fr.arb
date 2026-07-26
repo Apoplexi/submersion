@@ -5498,6 +5498,8 @@
   "diveDetailSection_tanks_description": "Liste des bouteilles, melanges gazeux, pressions, SAC par bouteille",
   "diveDetailSection_tanks_name": "Bouteilles",
   "diveDetailSection_tide_description": "Graphique du cycle de maree et horaires",
+  "diveDetailSection_reefHealth_name": "Sante du recif",
+  "diveDetailSection_reefHealth_description": "Stress thermique de blanchissement corallien a la date de la plongee",
   "diveDetailSection_tide_name": "Maree",
   "diveDetailSection_weights_description": "Repartition des lests, poids total",
   "diveDetailSection_buoyancy_name": "Flottabilité",

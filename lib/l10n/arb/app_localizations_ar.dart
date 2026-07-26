@@ -12614,6 +12614,13 @@ class AppLocalizationsAr extends AppLocalizations {
       'رسم بياني لدورة المد والجزر والتوقيت';
 
   @override
+  String get diveDetailSection_reefHealth_name => 'صحة الشعاب المرجانية';
+
+  @override
+  String get diveDetailSection_reefHealth_description =>
+      'الإجهاد الحراري لابيضاض المرجان في تاريخ الغوص';
+
+  @override
   String get diveDetailSection_surfaceGps_name => 'GPS السطح';
 
   @override

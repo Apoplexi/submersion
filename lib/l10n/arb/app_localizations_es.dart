@@ -12837,6 +12837,13 @@ class AppLocalizationsEs extends AppLocalizations {
       'Grafico del ciclo de mareas y temporalizacion';
 
   @override
+  String get diveDetailSection_reefHealth_name => 'Salud del arrecife';
+
+  @override
+  String get diveDetailSection_reefHealth_description =>
+      'Estres termico por blanqueamiento de coral en la fecha del buceo';
+
+  @override
   String get diveDetailSection_surfaceGps_name => 'GPS de superficie';
 
   @override

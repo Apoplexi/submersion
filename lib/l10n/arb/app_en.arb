@@ -7364,6 +7364,8 @@
   "diveDetailSection_altitude_description": "Altitude value, category, deco requirement",
   "diveDetailSection_tide_name": "Tide",
   "diveDetailSection_tide_description": "Tide cycle graph and timing",
+  "diveDetailSection_reefHealth_name": "Reef Health",
+  "diveDetailSection_reefHealth_description": "Coral bleaching heat stress on the dive date",
   "diveDetailSection_surfaceGps_name": "Surface GPS",
   "diveDetailSection_surfaceGps_description": "GPS entry/exit points and surface drift",
   "diveLog_detail_section_surfaceGps": "Surface GPS",

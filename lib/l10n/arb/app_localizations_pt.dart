@@ -12846,6 +12846,13 @@ class AppLocalizationsPt extends AppLocalizations {
       'Grafico do ciclo de mare e horarios';
 
   @override
+  String get diveDetailSection_reefHealth_name => 'Saude do recife';
+
+  @override
+  String get diveDetailSection_reefHealth_description =>
+      'Estresse termico de branqueamento de corais na data do mergulho';
+
+  @override
   String get diveDetailSection_surfaceGps_name => 'GPS de superfície';
 
   @override

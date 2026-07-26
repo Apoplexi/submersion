@@ -12635,6 +12635,13 @@ class AppLocalizationsEn extends AppLocalizations {
       'Tide cycle graph and timing';
 
   @override
+  String get diveDetailSection_reefHealth_name => 'Reef Health';
+
+  @override
+  String get diveDetailSection_reefHealth_description =>
+      'Coral bleaching heat stress on the dive date';
+
+  @override
   String get diveDetailSection_surfaceGps_name => 'Surface GPS';
 
   @override

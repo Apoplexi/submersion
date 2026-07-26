@@ -1196,6 +1196,8 @@
   "diveDetailSection_tanks_description": "قائمة الأسطوانات، خلطات الغاز، الضغوط، SAC لكل أسطوانة",
   "diveDetailSection_tanks_name": "الأسطوانات",
   "diveDetailSection_tide_description": "رسم بياني لدورة المد والجزر والتوقيت",
+  "diveDetailSection_reefHealth_name": "صحة الشعاب المرجانية",
+  "diveDetailSection_reefHealth_description": "الإجهاد الحراري لابيضاض المرجان في تاريخ الغوص",
   "diveDetailSection_tide_name": "المد والجزر",
   "diveDetailSection_weights_description": "تفصيل الأوزان، إجمالي الوزن",
   "diveDetailSection_buoyancy_name": "الطفو",

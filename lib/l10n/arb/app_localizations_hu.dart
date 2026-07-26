@@ -12805,6 +12805,13 @@ class AppLocalizationsHu extends AppLocalizations {
       'Árapály-ciklus grafikon és időzítés';
 
   @override
+  String get diveDetailSection_reefHealth_name => 'Zatony allapota';
+
+  @override
+  String get diveDetailSection_reefHealth_description =>
+      'Korallfeheredesi hostressz a merules napjan';
+
+  @override
   String get diveDetailSection_surfaceGps_name => 'Felszíni GPS';
 
   @override

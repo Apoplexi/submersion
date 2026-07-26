@@ -12744,6 +12744,13 @@ class AppLocalizationsNl extends AppLocalizations {
       'Getijdecyclusgrafiek en timing';
 
   @override
+  String get diveDetailSection_reefHealth_name => 'Rifgezondheid';
+
+  @override
+  String get diveDetailSection_reefHealth_description =>
+      'Hittestress door koraalverbleking op de duikdatum';
+
+  @override
   String get diveDetailSection_surfaceGps_name => 'Oppervlakte-GPS';
 
   @override

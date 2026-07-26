@@ -12843,6 +12843,13 @@ class AppLocalizationsIt extends AppLocalizations {
       'Grafico ciclo marea e tempi';
 
   @override
+  String get diveDetailSection_reefHealth_name => 'Salute della barriera';
+
+  @override
+  String get diveDetailSection_reefHealth_description =>
+      'Stress termico da sbiancamento dei coralli alla data dell\'immersione';
+
+  @override
   String get diveDetailSection_surfaceGps_name => 'GPS di superficie';
 
   @override

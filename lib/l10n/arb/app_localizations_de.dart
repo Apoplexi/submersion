@@ -12834,6 +12834,13 @@ class AppLocalizationsDe extends AppLocalizations {
       'Gezeitenzyklusdiagramm und Zeiten';
 
   @override
+  String get diveDetailSection_reefHealth_name => 'Riffgesundheit';
+
+  @override
+  String get diveDetailSection_reefHealth_description =>
+      'Korallenbleiche-Hitzestress am Tauchtag';
+
+  @override
   String get diveDetailSection_surfaceGps_name => 'Oberflächen-GPS';
 
   @override

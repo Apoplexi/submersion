@@ -97,6 +97,8 @@ import 'package:submersion/features/signatures/presentation/widgets/buddy_signat
 import 'package:submersion/features/signatures/presentation/widgets/signature_capture_widget.dart';
 import 'package:submersion/features/signatures/presentation/widgets/signature_display_widget.dart';
 import 'package:submersion/features/tides/domain/entities/tide_record.dart';
+import 'package:submersion/features/reef/presentation/providers/reef_providers.dart';
+import 'package:submersion/features/reef/presentation/widgets/reef_health_card.dart';
 import 'package:submersion/features/tides/presentation/providers/tide_providers.dart';
 import 'package:submersion/features/tides/presentation/widgets/tide_cycle_graph.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
@@ -362,6 +364,9 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
       DiveDetailSectionId.tide: () {
         // _buildTideSection includes its own internal spacing
         return [_buildTideSection(context, ref, dive)];
+      },
+      DiveDetailSectionId.reefHealth: () {
+        return [_buildReefHealthSection(context, ref, dive)];
       },
       DiveDetailSectionId.surfaceGps: () {
         if (dive.entryLocation == null && dive.exitLocation == null) return [];
@@ -3332,6 +3337,39 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
   /// Returns [SizedBox.shrink] when no tide data is available so the section
   /// takes up zero space.  The 24-px top spacer is included only when the
   /// section actually renders content.
+  /// Reef thermal stress on the date of this dive.
+  ///
+  /// Historical NOAA readings are immutable, so this is fetched once and
+  /// cached permanently. Hidden when the dive has no site coordinates.
+  Widget _buildReefHealthSection(
+    BuildContext context,
+    WidgetRef ref,
+    Dive dive,
+  ) {
+    if (dive.site?.hasCoordinates != true) return const SizedBox.shrink();
+
+    final healthAsync = ref.watch(
+      reefHealthForDiveProvider(
+        ReefHealthRequest(
+          location: dive.site!.location!,
+          date: dive.effectiveEntryTime,
+        ),
+      ),
+    );
+
+    return healthAsync.when(
+      data: (part) => Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const SizedBox(height: 24),
+          Card(child: ReefHealthCard(part: part)),
+        ],
+      ),
+      loading: () => const SizedBox.shrink(),
+      error: (_, _) => const SizedBox.shrink(),
+    );
+  }
+
   Widget _buildTideSection(BuildContext context, WidgetRef ref, Dive dive) {
     Widget withSpacing(Widget card) {
       return Column(

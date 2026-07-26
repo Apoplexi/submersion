@@ -1404,6 +1404,8 @@
   "diveDetailSection_tanks_description": "气瓶列表、气体混合、压力、单瓶耗气率",
   "diveDetailSection_tanks_name": "气瓶",
   "diveDetailSection_tide_description": "潮汐周期图和时间",
+  "diveDetailSection_reefHealth_name": "珊瑚礁健康",
+  "diveDetailSection_reefHealth_description": "潜水当天的珊瑚白化热压力",
   "diveDetailSection_tide_name": "潮汐",
   "diveDetailSection_weights_description": "配重明细、总重量",
   "diveDetailSection_buoyancy_name": "浮力",

@@ -1312,6 +1312,8 @@
   "diveDetailSection_tanks_description": "Flaschenliste, Gasmischungen, Drucke, Flaschen-AMV",
   "diveDetailSection_tanks_name": "Flaschen",
   "diveDetailSection_tide_description": "Gezeitenzyklusdiagramm und Zeiten",
+  "diveDetailSection_reefHealth_name": "Riffgesundheit",
+  "diveDetailSection_reefHealth_description": "Korallenbleiche-Hitzestress am Tauchtag",
   "diveDetailSection_tide_name": "Gezeiten",
   "diveDetailSection_weights_description": "Gewichtsaufteilung, Gesamtgewicht",
   "diveDetailSection_buoyancy_name": "Auftrieb",

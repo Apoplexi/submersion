@@ -12241,6 +12241,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get diveDetailSection_tide_description => '潮汐周期图和时间';
 
   @override
+  String get diveDetailSection_reefHealth_name => '珊瑚礁健康';
+
+  @override
+  String get diveDetailSection_reefHealth_description => '潜水当天的珊瑚白化热压力';
+
+  @override
   String get diveDetailSection_surfaceGps_name => '水面 GPS';
 
   @override
