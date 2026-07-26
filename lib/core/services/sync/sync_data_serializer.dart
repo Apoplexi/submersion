@@ -5207,6 +5207,8 @@ class SyncDataSerializer {
       'showDetailsPaneTrips': false,
       'showDetailsPaneEquipment': false,
       'showDetailsPaneDiveCenters': false,
+      'showDetailsPaneCertifications': false,
+      'showDetailsPaneCourses': false
       // Override with actual data (existing values take precedence)
       ...data,
     };
