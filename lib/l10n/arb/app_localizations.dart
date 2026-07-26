@@ -20960,6 +20960,18 @@ abstract class AppLocalizations {
   /// **'Saved plans'**
   String get plannerCanvas_saved_title;
 
+  /// No description provided for @plannerCanvas_name_dialogTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Name your plan'**
+  String get plannerCanvas_name_dialogTitle;
+
+  /// No description provided for @plannerCanvas_name_defaultFallback.
+  ///
+  /// In en, this message translates to:
+  /// **'Dive Plan'**
+  String get plannerCanvas_name_defaultFallback;
+
   /// No description provided for @plannerCanvas_scrub_bailout.
   ///
   /// In en, this message translates to:
@@ -21349,6 +21361,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'App Language'**
   String get settings_appearance_appLanguage;
+
+  /// Title of the app-wide display zoom control in Appearance settings
+  ///
+  /// In en, this message translates to:
+  /// **'Display size'**
+  String get settings_appearance_displaySize;
+
+  /// Current display zoom level shown as a percentage
+  ///
+  /// In en, this message translates to:
+  /// **'{percent}%'**
+  String settings_appearance_displaySize_value(int percent);
+
+  /// Button that returns the display zoom to 100 percent
+  ///
+  /// In en, this message translates to:
+  /// **'Reset'**
+  String get settings_appearance_displaySize_reset;
+
+  /// Label at the low end of the display zoom slider
+  ///
+  /// In en, this message translates to:
+  /// **'Smaller'**
+  String get settings_appearance_displaySize_smaller;
+
+  /// Label at the high end of the display zoom slider
+  ///
+  /// In en, this message translates to:
+  /// **'Larger'**
+  String get settings_appearance_displaySize_larger;
 
   /// No description provided for @settings_appearance_depthColoredCards.
   ///
@@ -37222,6 +37264,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Install ffmpeg to enable video compression. Originals are uploaded until then.'**
   String get settings_mediaStorage_quality_linuxFfmpegHint;
+
+  /// No description provided for @settings_mediaStorage_quality_saveFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not save the upload quality. Try again.'**
+  String get settings_mediaStorage_quality_saveFailed;
+
+  /// No description provided for @settings_mediaStorage_quality_noTranscoderHint.
+  ///
+  /// In en, this message translates to:
+  /// **'This device cannot compress video. Originals are uploaded from it.'**
+  String get settings_mediaStorage_quality_noTranscoderHint;
 
   /// No description provided for @reef_section_title.
   ///

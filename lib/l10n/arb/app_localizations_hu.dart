@@ -12305,6 +12305,12 @@ class AppLocalizationsHu extends AppLocalizations {
   String get plannerCanvas_saved_title => 'Mentett tervek';
 
   @override
+  String get plannerCanvas_name_dialogTitle => 'Nevezze el a tervet';
+
+  @override
+  String get plannerCanvas_name_defaultFallback => 'Merülési terv';
+
+  @override
   String plannerCanvas_scrub_bailout(String minutes) {
     return 'BO $minutes′';
   }
@@ -12528,6 +12534,23 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get settings_appearance_appLanguage => 'Alkalmazas nyelve';
+
+  @override
+  String get settings_appearance_displaySize => 'Megjelenítési méret';
+
+  @override
+  String settings_appearance_displaySize_value(int percent) {
+    return '$percent%';
+  }
+
+  @override
+  String get settings_appearance_displaySize_reset => 'Visszaállítás';
+
+  @override
+  String get settings_appearance_displaySize_smaller => 'Kisebb';
+
+  @override
+  String get settings_appearance_displaySize_larger => 'Nagyobb';
 
   @override
   String get settings_appearance_depthColoredCards =>
@@ -22193,6 +22216,14 @@ class AppLocalizationsHu extends AppLocalizations {
   @override
   String get settings_mediaStorage_quality_linuxFfmpegHint =>
       'Telepítse az ffmpeg-et a videótömörítés engedélyezéséhez. Addig az eredetik kerülnek feltöltésre.';
+
+  @override
+  String get settings_mediaStorage_quality_saveFailed =>
+      'A feltöltési minőség mentése nem sikerült. Próbáld újra.';
+
+  @override
+  String get settings_mediaStorage_quality_noTranscoderHint =>
+      'Ez az eszköz nem tud videót tömöríteni. Róla az eredetik töltődnek fel.';
 
   @override
   String get reef_section_title => 'Zátony';

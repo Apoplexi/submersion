@@ -12335,6 +12335,12 @@ class AppLocalizationsDe extends AppLocalizations {
   String get plannerCanvas_saved_title => 'Gespeicherte Pläne';
 
   @override
+  String get plannerCanvas_name_dialogTitle => 'Plan benennen';
+
+  @override
+  String get plannerCanvas_name_defaultFallback => 'Tauchplan';
+
+  @override
   String plannerCanvas_scrub_bailout(String minutes) {
     return 'BO $minutes′';
   }
@@ -12558,6 +12564,23 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get settings_appearance_appLanguage => 'App-Sprache';
+
+  @override
+  String get settings_appearance_displaySize => 'Anzeigegröße';
+
+  @override
+  String settings_appearance_displaySize_value(int percent) {
+    return '$percent%';
+  }
+
+  @override
+  String get settings_appearance_displaySize_reset => 'Zurücksetzen';
+
+  @override
+  String get settings_appearance_displaySize_smaller => 'Kleiner';
+
+  @override
+  String get settings_appearance_displaySize_larger => 'Größer';
 
   @override
   String get settings_appearance_depthColoredCards =>
@@ -22227,6 +22250,14 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get settings_mediaStorage_quality_linuxFfmpegHint =>
       'Installieren Sie ffmpeg, um Videokomprimierung zu aktivieren. Bis dahin werden Originale hochgeladen.';
+
+  @override
+  String get settings_mediaStorage_quality_saveFailed =>
+      'Die Upload-Qualität konnte nicht gespeichert werden. Bitte erneut versuchen.';
+
+  @override
+  String get settings_mediaStorage_quality_noTranscoderHint =>
+      'Dieses Gerät kann keine Videos komprimieren. Von ihm werden Originale hochgeladen.';
 
   @override
   String get reef_section_title => 'Riff';

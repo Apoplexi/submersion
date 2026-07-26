@@ -11780,6 +11780,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get plannerCanvas_saved_title => '已保存的计划';
 
   @override
+  String get plannerCanvas_name_dialogTitle => '为计划命名';
+
+  @override
+  String get plannerCanvas_name_defaultFallback => '潜水计划';
+
+  @override
   String plannerCanvas_scrub_bailout(String minutes) {
     return 'BO $minutes′';
   }
@@ -11987,6 +11993,23 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get settings_appearance_appLanguage => '应用语言';
+
+  @override
+  String get settings_appearance_displaySize => '显示大小';
+
+  @override
+  String settings_appearance_displaySize_value(int percent) {
+    return '$percent%';
+  }
+
+  @override
+  String get settings_appearance_displaySize_reset => '重置';
+
+  @override
+  String get settings_appearance_displaySize_smaller => '更小';
+
+  @override
+  String get settings_appearance_displaySize_larger => '更大';
 
   @override
   String get settings_appearance_depthColoredCards => '按深度着色的潜水卡片';
@@ -21143,6 +21166,13 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String get settings_mediaStorage_quality_linuxFfmpegHint =>
       '安装 ffmpeg 以启用视频压缩。在此之前将上传原始文件。';
+
+  @override
+  String get settings_mediaStorage_quality_saveFailed => '无法保存上传质量。请重试。';
+
+  @override
+  String get settings_mediaStorage_quality_noTranscoderHint =>
+      '此设备无法压缩视频。将从此设备上传原始文件。';
 
   @override
   String get reef_section_title => '珊瑚礁';

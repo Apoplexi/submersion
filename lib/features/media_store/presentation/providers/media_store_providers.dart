@@ -13,6 +13,7 @@ import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/core/services/media_store/media_store_attach_state.dart';
 import 'package:submersion/core/services/media_store/media_store_credentials_store.dart';
 import 'package:submersion/core/services/media_store/media_store_policies.dart';
+import 'package:submersion/core/services/media_store/media_upload_quality_policy.dart';
 import 'package:submersion/core/services/media_store/network_status_service.dart';
 import 'package:submersion/core/services/media_store/store_marker.dart';
 import 'package:submersion/features/media/data/resolvers/media_store_resolver.dart';
@@ -64,6 +65,20 @@ final mediaStoreAttachStateProvider = Provider<MediaStoreAttachState>(
 
 final mediaStorePoliciesProvider = Provider<MediaStorePolicies>(
   (ref) => MediaStorePolicies(),
+);
+
+final mediaUploadQualityPolicyProvider = Provider<MediaUploadQualityPolicy>(
+  (ref) => MediaUploadQualityPolicy(),
+);
+
+/// Library-wide photo upload level. Watched by the settings page and
+/// invalidated on write, mirroring `shareByDefaultProvider`.
+final photoUploadQualityProvider = FutureProvider<MediaUploadQuality>(
+  (ref) => ref.watch(mediaUploadQualityPolicyProvider).photoUploadQuality(),
+);
+
+final videoUploadQualityProvider = FutureProvider<MediaUploadQuality>(
+  (ref) => ref.watch(mediaUploadQualityPolicyProvider).videoUploadQuality(),
 );
 
 final mediaTransferQueueRepositoryProvider =
@@ -340,6 +355,7 @@ final FutureProvider<MediaStoreRuntime?> mediaStoreRuntimeProvider =
         store: store,
         registry: ref.watch(mediaSourceResolverRegistryProvider),
         cache: cache,
+        quality: ref.watch(mediaUploadQualityPolicyProvider),
         videoTranscoder: PlatformVideoTranscoder(),
       );
       final deleteProcessor = MediaDeleteProcessor(
