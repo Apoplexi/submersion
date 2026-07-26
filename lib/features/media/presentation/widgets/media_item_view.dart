@@ -46,8 +46,18 @@ class MediaItemView extends ConsumerStatefulWidget {
   ConsumerState<MediaItemView> createState() => _MediaItemViewState();
 }
 
+/// What [_MediaItemViewState._resolve] produced.
+///
+/// [videoPosterMissing] separates "this video has no poster frame here" from
+/// the missing-media reading [MediaSourceData] would otherwise force: the
+/// store holds the item, it simply has no still image to draw, and pulling
+/// the video down to discover that is exactly what the resolver declines to
+/// do. Carried alongside the data rather than folded into it so the resolver
+/// contract stays a plain "bytes or a reason".
+typedef _Resolution = ({MediaSourceData data, bool videoPosterMissing});
+
 class _MediaItemViewState extends ConsumerState<MediaItemView> {
-  late Future<MediaSourceData> _future;
+  late Future<_Resolution> _future;
 
   @override
   void initState() {
@@ -78,7 +88,7 @@ class _MediaItemViewState extends ConsumerState<MediaItemView> {
   // throwing UnsupportedError when a row's source_type has no registered
   // resolver — becomes a Future error caught by FutureBuilder's hasError
   // branch in [build] instead of escaping initState/didUpdateWidget.
-  Future<MediaSourceData> _resolve() async {
+  Future<_Resolution> _resolve() async {
     final registry = ref.read(mediaSourceResolverRegistryProvider);
     final resolver = registry.resolverFor(widget.item.sourceType);
     final native = widget.thumbnail && widget.targetSize != null
@@ -87,7 +97,9 @@ class _MediaItemViewState extends ConsumerState<MediaItemView> {
             target: widget.targetSize!,
           )
         : await resolver.resolve(widget.item);
-    if (native is! UnavailableData) return native;
+    if (native is! UnavailableData) {
+      return (data: native, videoPosterMissing: false);
+    }
     // Media store fallback (design spec section 10): only engages when the
     // native source cannot produce bytes on this device and the row is
     // confirmed uploaded - for thumbnail requests the thumb stamp alone
@@ -107,7 +119,7 @@ class _MediaItemViewState extends ConsumerState<MediaItemView> {
             widget.item.remoteCompressedUploadedAt != null ||
             (widget.thumbnail && widget.item.remoteThumbUploadedAt != null));
     if (!storeConfirmed) {
-      return native;
+      return (data: native, videoPosterMissing: false);
     }
     try {
       final runtime = await ref.read(mediaStoreRuntimeProvider.future);
@@ -115,15 +127,24 @@ class _MediaItemViewState extends ConsumerState<MediaItemView> {
         widget.item,
         thumbnail: widget.thumbnail,
       );
-      return remote ?? native;
+      if (remote != null) return (data: remote, videoPosterMissing: false);
+      // The store is confirmed to hold this item, so a video thumbnail that
+      // came back empty means no poster was uploaded -- not that the media
+      // is gone. Rendering the native "file not found" badge here would be
+      // wrong on both counts, and the resolver deliberately did not download
+      // the whole video to prove the point.
+      return (
+        data: native,
+        videoPosterMissing: widget.thumbnail && widget.item.isVideo,
+      );
     } catch (_) {
-      return native;
+      return (data: native, videoPosterMissing: false);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<MediaSourceData>(
+    return FutureBuilder<_Resolution>(
       future: _future,
       builder: (context, snapshot) {
         if (snapshot.hasError) {
@@ -134,13 +155,19 @@ class _MediaItemViewState extends ConsumerState<MediaItemView> {
         if (!snapshot.hasData) {
           return const _ShimmerThumbnail();
         }
-        final data = snapshot.data!;
+        final resolution = snapshot.data!;
+        if (resolution.videoPosterMissing) {
+          return const _VideoThumbnailPlaceholder();
+        }
+        final data = resolution.data;
         return switch (data) {
-          // A local video resolves to the raw video file, which Image.file
+          // A video normally resolves to the raw video file, which Image.file
           // cannot decode. Show a placeholder instead of surfacing an
-          // "Invalid image data" exception. (Connector video posters arrive as
-          // BytesData JPEGs below and render normally.)
-          FileData() when widget.item.isVideo =>
+          // "Invalid image data" exception. A poster frame is the exception:
+          // it is a JPEG derived from the video, and only its producer can
+          // tell the two apart. (Connector video posters arrive as BytesData
+          // JPEGs below and render normally.)
+          FileData(isPoster: false) when widget.item.isVideo =>
             const _VideoThumbnailPlaceholder(),
           FileData(file: final f) => Image.file(
             f,

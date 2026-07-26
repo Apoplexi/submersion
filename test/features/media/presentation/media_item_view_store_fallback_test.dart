@@ -259,6 +259,146 @@ void main() {
     expect(find.byType(UnavailableMediaPlaceholder), findsNothing);
   });
 
+  // A video linked on a laptop reaches a phone with only its poster frame in
+  // the store. The poster is a JPEG, but the row is a video, so the view's
+  // "videos are not decodable images" guard used to swallow it and draw the
+  // movie icon over a thumbnail that had already been downloaded.
+  testWidgets('renders a video poster from the store instead of the movie '
+      'placeholder', (tester) async {
+    await tester.runAsync(() async {
+      final bytes = base64Decode(_onePixelPngBase64);
+      final hash = 'e5${'5' * 62}';
+      store.objects[StoreKeys.thumbKey(hash)] = bytes;
+
+      final runtime = MediaStoreRuntime(
+        storeId: 'store-1',
+        store: store,
+        cache: cache,
+        resolver: MediaStoreResolver(store: store, cache: cache),
+      );
+
+      final videoRow = MediaItem(
+        id: 'v-remote',
+        mediaType: MediaType.video,
+        sourceType: MediaSourceType.platformGallery,
+        platformAssetId: 'asset-from-other-device',
+        originalFilename: 'DIVE_001.mp4',
+        takenAt: DateTime(2026),
+        createdAt: DateTime(2026),
+        updatedAt: DateTime(2026),
+        contentHash: hash,
+        remoteThumbUploadedAt: DateTime(2026, 7, 1),
+      );
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            mediaSourceResolverRegistryProvider.overrideWithValue(
+              MediaSourceResolverRegistry({
+                MediaSourceType.platformGallery:
+                    const _UnavailableGalleryResolver(),
+              }),
+            ),
+            mediaStoreRuntimeProvider.overrideWith((ref) async => runtime),
+          ],
+          child: MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: Scaffold(
+              body: SizedBox(
+                width: 100,
+                height: 100,
+                child: MediaItemView(
+                  item: videoRow,
+                  thumbnail: true,
+                  targetSize: const Size(100, 100),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+      for (var i = 0; i < 40; i++) {
+        await Future<void>.delayed(const Duration(milliseconds: 20));
+        await tester.pump();
+        if (find.byType(Image).evaluate().isNotEmpty) break;
+      }
+    });
+
+    expect(find.byType(Image), findsOneWidget);
+    expect(find.byIcon(Icons.movie_outlined), findsNothing);
+    expect(find.byType(UnavailableMediaPlaceholder), findsNothing);
+  });
+
+  // The complement: without a poster the tile must still read as a video,
+  // and must not have pulled the whole file down to get there.
+  testWidgets('keeps the movie placeholder when the store holds no '
+      'poster', (tester) async {
+    await tester.runAsync(() async {
+      final hash = 'a7${'3' * 62}';
+      store.objects[StoreKeys.objectKey(hash, extension: 'mp4')] =
+          'a-very-large-video'.codeUnits;
+
+      final runtime = MediaStoreRuntime(
+        storeId: 'store-1',
+        store: store,
+        cache: cache,
+        resolver: MediaStoreResolver(store: store, cache: cache),
+      );
+
+      final videoRow = MediaItem(
+        id: 'v-no-poster',
+        mediaType: MediaType.video,
+        sourceType: MediaSourceType.platformGallery,
+        platformAssetId: 'asset-from-other-device',
+        originalFilename: 'DIVE_002.mp4',
+        takenAt: DateTime(2026),
+        createdAt: DateTime(2026),
+        updatedAt: DateTime(2026),
+        contentHash: hash,
+        remoteUploadedAt: DateTime(2026, 7, 1),
+      );
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            mediaSourceResolverRegistryProvider.overrideWithValue(
+              MediaSourceResolverRegistry({
+                MediaSourceType.platformGallery:
+                    const _UnavailableGalleryResolver(),
+              }),
+            ),
+            mediaStoreRuntimeProvider.overrideWith((ref) async => runtime),
+          ],
+          child: MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: Scaffold(
+              body: SizedBox(
+                width: 100,
+                height: 100,
+                child: MediaItemView(
+                  item: videoRow,
+                  thumbnail: true,
+                  targetSize: const Size(100, 100),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+      for (var i = 0; i < 40; i++) {
+        await Future<void>.delayed(const Duration(milliseconds: 20));
+        await tester.pump();
+        if (find.byIcon(Icons.movie_outlined).evaluate().isNotEmpty) break;
+      }
+    });
+
+    expect(find.byIcon(Icons.movie_outlined), findsOneWidget);
+    expect(find.byType(UnavailableMediaPlaceholder), findsNothing);
+    expect(store.getFileKeys, isEmpty);
+  });
+
   testWidgets('keeps the native placeholder when no store runtime '
       'exists', (tester) async {
     await tester.runAsync(() async {
