@@ -22246,7 +22246,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String reef_habitat_onReefWithThreat(String threat) {
-    return 'Auf einem Korallenriff, Gefaehrdungsstufe $threat';
+    return 'Auf einem Korallenriff, Gefährdungsstufe $threat';
   }
 
   @override
@@ -22255,17 +22255,17 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get reef_habitat_unavailable =>
-      'Riff-Lebensraum konnte gerade nicht geprueft werden';
+      'Riff-Lebensraum konnte gerade nicht geprüft werden';
 
   @override
   String get reef_health_title => 'Riffgesundheit';
 
   @override
   String get reef_health_unavailable =>
-      'Riffgesundheit konnte gerade nicht geprueft werden';
+      'Riffgesundheit konnte gerade nicht geprüft werden';
 
   @override
-  String get reef_health_noData => 'Keine Riffgesundheitsdaten fuer diesen Ort';
+  String get reef_health_noData => 'Keine Riffgesundheitsdaten für diesen Ort';
 
   @override
   String reef_health_degreeHeatingWeeks(String value) {
@@ -22274,7 +22274,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String reef_health_seaSurface(String value) {
-    return 'Wasseroberflaeche $value';
+    return 'Wasseroberfläche $value';
   }
 
   @override
@@ -22314,7 +22314,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get reef_protection_unavailable =>
-      'Schutzstatus konnte gerade nicht geprueft werden';
+      'Schutzstatus konnte gerade nicht geprüft werden';
 
   @override
   String get reef_protection_viewRegulations => 'Vorschriften ansehen';
@@ -22325,21 +22325,21 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
-  String get reef_species_recordedNearby => 'In der Naehe erfasst';
+  String get reef_species_recordedNearby => 'In der Nähe erfasst';
 
   @override
-  String get reef_species_addToExpected => 'Zu erwarteten Arten hinzufuegen';
+  String get reef_species_addToExpected => 'Zu erwarteten Arten hinzufügen';
 
   @override
   String get reef_attribution_title => 'Riff-Datenquellen';
 
   @override
   String get reef_attribution_wri =>
-      'Riffvorkommen und Gefaehrdungsstufe. CC BY 3.0.';
+      'Riffvorkommen und Gefährdungsstufe. CC BY 3.0.';
 
   @override
   String get reef_attribution_noaa =>
-      'Wasseroberflaechentemperatur und Bleiche-Hitzestress. Gemeinfrei.';
+      'Wasseroberflächentemperatur und Bleiche-Hitzestress. Gemeinfrei.';
 
   @override
   String get reef_attribution_gbif =>

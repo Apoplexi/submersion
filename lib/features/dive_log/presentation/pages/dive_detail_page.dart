@@ -3328,15 +3328,6 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
     );
   }
 
-  /// Build the tide conditions section for a dive.
-  ///
-  /// Shows tide data from:
-  /// 1. Stored TideRecord (if saved when dive was logged)
-  /// 2. Calculated from tide model (if dive site has coordinates and tide data)
-  ///
-  /// Returns [SizedBox.shrink] when no tide data is available so the section
-  /// takes up zero space.  The 24-px top spacer is included only when the
-  /// section actually renders content.
   /// Reef thermal stress on the date of this dive.
   ///
   /// Historical NOAA readings are immutable, so this is fetched once and
@@ -3370,6 +3361,15 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
     );
   }
 
+  /// Build the tide conditions section for a dive.
+  ///
+  /// Shows tide data from:
+  /// 1. Stored TideRecord (if saved when dive was logged)
+  /// 2. Calculated from tide model (if dive site has coordinates and tide data)
+  ///
+  /// Returns [SizedBox.shrink] when no tide data is available so the section
+  /// takes up zero space.  The 24-px top spacer is included only when the
+  /// section actually renders content.
   Widget _buildTideSection(BuildContext context, WidgetRef ref, Dive dive) {
     Widget withSpacing(Widget card) {
       return Column(

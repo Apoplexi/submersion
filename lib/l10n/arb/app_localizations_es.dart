@@ -12841,7 +12841,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get diveDetailSection_reefHealth_description =>
-      'Estres termico por blanqueamiento de coral en la fecha del buceo';
+      'Estrés térmico por blanqueamiento de coral en la fecha del buceo';
 
   @override
   String get diveDetailSection_surfaceGps_name => 'GPS de superficie';
@@ -22286,7 +22286,7 @@ class AppLocalizationsEs extends AppLocalizations {
       'No se pudieron cargar los datos del arrecife ahora';
 
   @override
-  String get reef_habitat_title => 'Habitat del arrecife';
+  String get reef_habitat_title => 'Hábitat del arrecife';
 
   @override
   String get reef_habitat_onReef => 'En un arrecife de coral';
@@ -22298,11 +22298,11 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get reef_habitat_noReef =>
-      'No hay arrecife de coral cartografiado en esta ubicacion';
+      'No hay arrecife de coral cartografiado en esta ubicación';
 
   @override
   String get reef_habitat_unavailable =>
-      'No se pudo comprobar el habitat del arrecife ahora';
+      'No se pudo comprobar el hábitat del arrecife ahora';
 
   @override
   String get reef_health_title => 'Salud del arrecife';
@@ -22313,7 +22313,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get reef_health_noData =>
-      'No hay datos de salud del arrecife para esta ubicacion';
+      'No hay datos de salud del arrecife para esta ubicación';
 
   @override
   String reef_health_degreeHeatingWeeks(String value) {
@@ -22331,7 +22331,7 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String get reef_health_levelNoStress => 'Sin estres termico';
+  String get reef_health_levelNoStress => 'Sin estrés térmico';
 
   @override
   String get reef_health_levelWatch => 'Vigilancia de blanqueamiento';
@@ -22355,14 +22355,14 @@ class AppLocalizationsEs extends AppLocalizations {
   String get reef_health_levelAlert5 => 'Alerta de blanqueamiento nivel 5';
 
   @override
-  String get reef_protection_title => 'Area protegida';
+  String get reef_protection_title => 'Área protegida';
 
   @override
-  String get reef_protection_none => 'No esta en un area marina protegida';
+  String get reef_protection_none => 'No está en un área marina protegida';
 
   @override
   String get reef_protection_unavailable =>
-      'No se pudo comprobar el estado de proteccion ahora';
+      'No se pudo comprobar el estado de protección ahora';
 
   @override
   String get reef_protection_viewRegulations => 'Ver normativa';
@@ -22376,7 +22376,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get reef_species_recordedNearby => 'Registrado cerca';
 
   @override
-  String get reef_species_addToExpected => 'Anadir a especies esperadas';
+  String get reef_species_addToExpected => 'Añadir a especies esperadas';
 
   @override
   String get reef_attribution_title => 'Fuentes de datos del arrecife';
@@ -22387,7 +22387,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get reef_attribution_noaa =>
-      'Temperatura superficial del mar y estres termico. Dominio publico.';
+      'Temperatura superficial del mar y estrés térmico. Dominio público.';
 
   @override
   String get reef_attribution_gbif =>
@@ -22395,5 +22395,5 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get reef_attribution_protectedSeas =>
-      'Limites de areas marinas protegidas. CC BY 4.0.';
+      'Límites de áreas marinas protegidas. CC BY 4.0.';
 }

@@ -12805,11 +12805,11 @@ class AppLocalizationsHu extends AppLocalizations {
       'Árapály-ciklus grafikon és időzítés';
 
   @override
-  String get diveDetailSection_reefHealth_name => 'Zatony allapota';
+  String get diveDetailSection_reefHealth_name => 'Zátony állapota';
 
   @override
   String get diveDetailSection_reefHealth_description =>
-      'Korallfeheredesi hostressz a merules napjan';
+      'Korallfehéredési hőstressz a merülés napján';
 
   @override
   String get diveDetailSection_surfaceGps_name => 'Felszíni GPS';
@@ -22195,94 +22195,94 @@ class AppLocalizationsHu extends AppLocalizations {
       'Telepítse az ffmpeg-et a videótömörítés engedélyezéséhez. Addig az eredetik kerülnek feltöltésre.';
 
   @override
-  String get reef_section_title => 'Zatony';
+  String get reef_section_title => 'Zátony';
 
   @override
-  String get reef_section_sourcesTooltip => 'Adatforrasok';
+  String get reef_section_sourcesTooltip => 'Adatforrások';
 
   @override
-  String get reef_section_loadError => 'A zatonyadatok most nem toltehetok be';
+  String get reef_section_loadError => 'A zátonyadatok most nem tölthetők be';
 
   @override
-  String get reef_habitat_title => 'Zatony elohely';
+  String get reef_habitat_title => 'Zátony élőhely';
 
   @override
-  String get reef_habitat_onReef => 'Korallzatonyon';
+  String get reef_habitat_onReef => 'Korallzátonyon';
 
   @override
   String reef_habitat_onReefWithThreat(String threat) {
-    return 'Korallzatonyon, veszelyeztetettsegi szint: $threat';
+    return 'Korallzátonyon, veszélyeztetettségi szint: $threat';
   }
 
   @override
   String get reef_habitat_noReef =>
-      'Nincs terkepezett korallzatony ezen a helyen';
+      'Nincs térképezett korallzátony ezen a helyen';
 
   @override
   String get reef_habitat_unavailable =>
-      'A zatony elohelye most nem ellenorizheto';
+      'A zátony élőhelye most nem ellenőrizhető';
 
   @override
-  String get reef_health_title => 'Zatony allapota';
+  String get reef_health_title => 'Zátony állapota';
 
   @override
   String get reef_health_unavailable =>
-      'A zatony allapota most nem ellenorizheto';
+      'A zátony állapota most nem ellenőrizhető';
 
   @override
-  String get reef_health_noData => 'Nincs zatonyallapot-adat ehhez a helyhez';
+  String get reef_health_noData => 'Nincs zátonyállapot-adat ehhez a helyhez';
 
   @override
   String reef_health_degreeHeatingWeeks(String value) {
-    return 'Hoterhelesi hetek $value C-het';
+    return 'Hőterhelési hetek $value C-hét';
   }
 
   @override
   String reef_health_seaSurface(String value) {
-    return 'Tengerfelszin $value';
+    return 'Tengerfelszín $value';
   }
 
   @override
   String reef_health_asOf(String date) {
-    return 'Datum: $date';
+    return 'Dátum: $date';
   }
 
   @override
-  String get reef_health_levelNoStress => 'Nincs hostressz';
+  String get reef_health_levelNoStress => 'Nincs hőstressz';
 
   @override
-  String get reef_health_levelWatch => 'Feheredesi megfigyeles';
+  String get reef_health_levelWatch => 'Fehéredési megfigyelés';
 
   @override
-  String get reef_health_levelWarning => 'Feheredesi figyelmeztetes';
+  String get reef_health_levelWarning => 'Fehéredési figyelmeztetés';
 
   @override
-  String get reef_health_levelAlert1 => 'Feheredesi riasztas 1. szint';
+  String get reef_health_levelAlert1 => 'Fehéredési riasztás 1. szint';
 
   @override
-  String get reef_health_levelAlert2 => 'Feheredesi riasztas 2. szint';
+  String get reef_health_levelAlert2 => 'Fehéredési riasztás 2. szint';
 
   @override
-  String get reef_health_levelAlert3 => 'Feheredesi riasztas 3. szint';
+  String get reef_health_levelAlert3 => 'Fehéredési riasztás 3. szint';
 
   @override
-  String get reef_health_levelAlert4 => 'Feheredesi riasztas 4. szint';
+  String get reef_health_levelAlert4 => 'Fehéredési riasztás 4. szint';
 
   @override
-  String get reef_health_levelAlert5 => 'Feheredesi riasztas 5. szint';
+  String get reef_health_levelAlert5 => 'Fehéredési riasztás 5. szint';
 
   @override
-  String get reef_protection_title => 'Vedett terulet';
+  String get reef_protection_title => 'Védett terület';
 
   @override
-  String get reef_protection_none => 'Nem vedett tengeri teruleten';
+  String get reef_protection_none => 'Nem védett tengeri területen';
 
   @override
   String get reef_protection_unavailable =>
-      'A vedettsegi allapot most nem ellenorizheto';
+      'A védettségi állapot most nem ellenőrizhető';
 
   @override
-  String get reef_protection_viewRegulations => 'Szabalyok megtekintese';
+  String get reef_protection_viewRegulations => 'Szabályok megtekintése';
 
   @override
   String reef_protection_iucn(String category) {
@@ -22290,27 +22290,27 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
-  String get reef_species_recordedNearby => 'Kozelben rogzitve';
+  String get reef_species_recordedNearby => 'Közelben rögzítve';
 
   @override
-  String get reef_species_addToExpected => 'Hozzaadas a varhato fajokhoz';
+  String get reef_species_addToExpected => 'Hozzáadás a várható fajokhoz';
 
   @override
-  String get reef_attribution_title => 'Zatony adatforrasai';
+  String get reef_attribution_title => 'Zátony adatforrásai';
 
   @override
   String get reef_attribution_wri =>
-      'Zatony jelenlete es veszelyeztetettsege. CC BY 3.0.';
+      'Zátony jelenléte és veszélyeztetettsége. CC BY 3.0.';
 
   @override
   String get reef_attribution_noaa =>
-      'Tengerfelszini homerseklet es hostressz. Kozkincs.';
+      'Tengerfelszíni hőmérséklet és hőstressz. Közkincs.';
 
   @override
   String get reef_attribution_gbif =>
-      'Fajelofordulasi adatok, CC0 es CC BY 4.0 szurve.';
+      'Fajelőfordulási adatok, CC0 és CC BY 4.0 szűrve.';
 
   @override
   String get reef_attribution_protectedSeas =>
-      'Vedett tengeri teruletek hatarai. CC BY 4.0.';
+      'Védett tengeri területek határai. CC BY 4.0.';
 }
