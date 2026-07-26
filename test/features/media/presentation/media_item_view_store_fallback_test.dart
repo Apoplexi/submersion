@@ -260,9 +260,12 @@ void main() {
   });
 
   // A video linked on a laptop reaches a phone with only its poster frame in
-  // the store. The poster is a JPEG, but the row is a video, so the view's
-  // "videos are not decodable images" guard used to swallow it and draw the
-  // movie icon over a thumbnail that had already been downloaded.
+  // the store. The poster is a still image -- a JPEG in production, any
+  // decodable image as far as this test is concerned -- but the row is a
+  // video, so the view's "videos are not decodable images" guard used to
+  // swallow it and draw the movie icon over a thumbnail it had already
+  // downloaded. The seeded bytes stand in for the poster; what is under test
+  // is which branch the view takes, not the encoding.
   testWidgets('renders a video poster from the store instead of the movie '
       'placeholder', (tester) async {
     await tester.runAsync(() async {
