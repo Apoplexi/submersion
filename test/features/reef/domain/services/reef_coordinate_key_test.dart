@@ -36,6 +36,21 @@ void main() {
       );
     });
 
+    // Rounding a small negative coordinate produces -0.0, whose
+    // toStringAsFixed keeps the sign. Without normalization two points a few
+    // dozen metres apart on the equator or prime meridian would occupy
+    // separate cache rows.
+    test('negative values that quantize to zero share a key with positive', () {
+      expect(
+        ReefCoordinateKey.format(const GeoPoint(-0.0001, -0.0002)),
+        ReefCoordinateKey.format(const GeoPoint(0.0001, 0.0002)),
+      );
+      expect(
+        ReefCoordinateKey.format(const GeoPoint(-0.0001, -0.0002)),
+        '0.000,0.000',
+      );
+    });
+
     test('format handles the antimeridian without losing precision', () {
       expect(
         ReefCoordinateKey.format(const GeoPoint(-16.5, 179.9996)),

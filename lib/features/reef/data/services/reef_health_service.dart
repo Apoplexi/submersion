@@ -90,10 +90,13 @@ class ReefHealthService {
   }
 
   Uri _boxUri(GeoPoint point, String time) {
-    final latLo = (point.latitude - _fallbackSpan).toStringAsFixed(3);
-    final latHi = (point.latitude + _fallbackSpan).toStringAsFixed(3);
-    final lonLo = (point.longitude - _fallbackSpan).toStringAsFixed(3);
-    final lonHi = (point.longitude + _fallbackSpan).toStringAsFixed(3);
+    // ERDDAP answers out-of-range coordinates with HTTP 404, so a site near a
+    // pole or the antimeridian would lose its land-pixel fallback entirely.
+    // Clamp to the WGS84 range the grid actually covers.
+    final latLo = _clamp(point.latitude - _fallbackSpan, -90, 90);
+    final latHi = _clamp(point.latitude + _fallbackSpan, -90, 90);
+    final lonLo = _clamp(point.longitude - _fallbackSpan, -180, 180);
+    final lonHi = _clamp(point.longitude + _fallbackSpan, -180, 180);
     final query = _variables
         .map((v) => '$v[($time)][($latLo):1:($latHi)][($lonLo):1:($lonHi)]')
         .join(',');
@@ -165,6 +168,9 @@ class ReefHealthService {
     final dLon = point.longitude - s.longitude;
     return dLat * dLat + dLon * dLon;
   }
+
+  String _clamp(double value, double min, double max) =>
+      value.clamp(min, max).toStringAsFixed(3);
 
   String _formatDate(DateTime date) {
     final utc = date.toUtc();

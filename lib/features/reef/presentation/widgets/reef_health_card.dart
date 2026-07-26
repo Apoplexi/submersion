@@ -68,9 +68,13 @@ class ReefHealthCard extends ConsumerWidget {
         ),
       );
     }
+    // NOAA publishes one composite per UTC day, stamped at 12:00Z. Converting
+    // to local time would shift that stamp into the next or previous calendar
+    // day at the extremes of the timezone range, reporting an observation date
+    // the dataset never had.
     lines.add(
       context.l10n.reef_health_asOf(
-        DateFormat.yMMMd().format(health.observedAt.toLocal()),
+        DateFormat.yMMMd().format(health.observedAt.toUtc()),
       ),
     );
 

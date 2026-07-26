@@ -104,6 +104,76 @@ void main() {
     expect(find.textContaining('Could not check'), findsWidgets);
   });
 
+  // NOAA publishes one composite per UTC day at 12:00Z. Formatting in local
+  // time would report a date the dataset never had at the extremes of the
+  // timezone range.
+  testWidgets('reports the observation date in UTC, not local time', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      _harness(
+        _snapshot(
+          health: ReefPart.ok(
+            ReefHealth(
+              degreeHeatingWeeks: 1.2,
+              hotspot: 0.2,
+              alertLevel: BleachingAlertLevel.watch,
+              observedAt: DateTime.utc(2026, 7, 23, 12),
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('Jul 23, 2026'), findsOneWidget);
+    expect(find.textContaining('Jul 24, 2026'), findsNothing);
+    expect(find.textContaining('Jul 22, 2026'), findsNothing);
+  });
+
+  // navigatorLink is remote data; a malformed value must not produce a button
+  // that throws when tapped.
+  testWidgets('omits the regulations button for an unparseable link', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      _harness(
+        _snapshot(
+          protection: const ReefPart.ok([
+            ReefProtection(
+              siteName: 'Somewhere',
+              navigatorLink: ':::not a url',
+            ),
+          ]),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('Somewhere'), findsOneWidget);
+    expect(find.widgetWithText(TextButton, 'View regulations'), findsNothing);
+  });
+
+  testWidgets('renders the regulations button for a valid link', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      _harness(
+        _snapshot(
+          protection: const ReefPart.ok([
+            ReefProtection(
+              siteName: 'Somewhere',
+              navigatorLink: 'https://navigatormap.org/site/1',
+            ),
+          ]),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.widgetWithText(TextButton, 'View regulations'), findsOneWidget);
+  });
+
   testWidgets('does not render ProtectedSeas activity codes', (tester) async {
     await tester.pumpWidget(
       _harness(

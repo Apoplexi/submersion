@@ -27,6 +27,10 @@ class ReefCoordinateKey {
   }
 
   static double _round(double value) {
-    return (value * _factor).roundToDouble() / _factor;
+    final rounded = (value * _factor).roundToDouble() / _factor;
+    // Rounding a small negative coordinate yields -0.0, and toStringAsFixed
+    // keeps the sign, so "-0.000" and "0.000" would be separate cache rows for
+    // the same quantized point. Normalize the sign away.
+    return rounded == 0 ? 0.0 : rounded;
   }
 }

@@ -128,6 +128,39 @@ void main() {
       expect(nameLookups, 25);
     });
 
+    // Sequentially these would be 25 round trips before the tier can render.
+    test('resolves unmatched names concurrently', () async {
+      var inFlight = 0;
+      var peakInFlight = 0;
+      final counts = List.generate(
+        10,
+        (i) => <Object>['${900000 + i}', 10 - i],
+      );
+      final client = MockClient((request) async {
+        if (request.url.path.startsWith('/v1/species/')) {
+          inFlight++;
+          peakInFlight = inFlight > peakInFlight ? inFlight : peakInFlight;
+          await Future<void>.delayed(const Duration(milliseconds: 10));
+          inFlight--;
+          return http.Response(
+            jsonEncode({
+              'scientificName': 'Species ${request.url.pathSegments.last}',
+            }),
+            200,
+          );
+        }
+        return http.Response(_facetBody(counts), 200);
+      });
+
+      final result = await NearbySpeciesService(
+        client: client,
+        matcher: _matcher(),
+      ).fetch(const GeoPoint(1, 2));
+
+      expect(result.value!.unmatchedNames, hasLength(10));
+      expect(peakInFlight, greaterThan(1), reason: 'lookups ran sequentially');
+    });
+
     test('drops unmatched entries whose name lookup fails', () async {
       final client = MockClient((request) async {
         if (request.url.path.startsWith('/v1/species/')) {

@@ -66,12 +66,12 @@ class ReefHealth extends Equatable {
     sstAnomaly: (json['sstAnomaly'] as num?)?.toDouble(),
     hotspot: (json['hotspot'] as num?)?.toDouble(),
     degreeHeatingWeeks: (json['degreeHeatingWeeks'] as num?)?.toDouble(),
-    alertLevel: json['alertLevel'] == null
-        ? null
-        : BleachingAlertLevel.values.firstWhere(
-            (l) => l.name == json['alertLevel'],
-            orElse: () => BleachingAlertLevel.noStress,
-          ),
+    // An unrecognised value means the cached row is from a different build or
+    // is corrupt. Falling back to noStress would render the safest-looking
+    // badge over a reef whose real state is unknown, so treat it as absent.
+    alertLevel: BleachingAlertLevel.values
+        .cast<BleachingAlertLevel?>()
+        .firstWhere((l) => l!.name == json['alertLevel'], orElse: () => null),
     observedAt: DateTime.parse(json['observedAt'] as String).toUtc(),
   );
 

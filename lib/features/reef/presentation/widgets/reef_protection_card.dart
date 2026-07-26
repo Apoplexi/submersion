@@ -51,18 +51,25 @@ class ReefProtectionCard extends StatelessWidget {
             leading: Icon(Icons.shield_outlined, color: scheme.primary),
             title: Text(area.siteName, style: theme.textTheme.titleSmall),
             subtitle: Text(_subtitle(context, area)),
-            trailing: area.navigatorLink == null
-                ? null
-                : TextButton(
-                    onPressed: () => launchUrl(
-                      Uri.parse(area.navigatorLink!),
-                      mode: LaunchMode.externalApplication,
-                    ),
-                    child: Text(context.l10n.reef_protection_viewRegulations),
-                  ),
+            trailing: _regulationsButton(context, area),
             dense: true,
           ),
       ],
+    );
+  }
+
+  /// The link comes from a remote service, so a malformed value must not throw
+  /// out of the button callback. An unparseable link renders no button rather
+  /// than one that crashes on tap.
+  Widget? _regulationsButton(BuildContext context, ReefProtection area) {
+    final raw = area.navigatorLink;
+    if (raw == null || raw.isEmpty) return null;
+    final uri = Uri.tryParse(raw);
+    if (uri == null || !uri.hasScheme) return null;
+
+    return TextButton(
+      onPressed: () => launchUrl(uri, mode: LaunchMode.externalApplication),
+      child: Text(context.l10n.reef_protection_viewRegulations),
     );
   }
 

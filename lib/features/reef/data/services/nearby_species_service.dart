@@ -82,11 +82,11 @@ class NearbySpeciesService {
         }
       }
 
-      final unmatchedNames = <String>[];
-      for (final key in unmatchedKeys) {
-        final name = await _scientificName(key);
-        if (name != null) unmatchedNames.add(name);
-      }
+      // Resolved concurrently. Sequentially these are up to 25 round trips at
+      // roughly 0.4s each, which would stall the site view for ten seconds.
+      // The cap keeps the burst small enough to stay polite.
+      final resolved = await Future.wait(unmatchedKeys.map(_scientificName));
+      final unmatchedNames = resolved.whereType<String>().toList();
 
       final result = NearbySpecies(
         matched: matched,

@@ -6,6 +6,9 @@ import 'package:submersion/features/reef/domain/entities/nearby_species.dart';
 import 'package:submersion/features/reef/domain/entities/reef_data_status.dart';
 import 'package:submersion/features/reef/domain/entities/reef_snapshot.dart';
 import 'package:submersion/features/reef/presentation/providers/reef_providers.dart';
+import 'package:submersion/core/constants/enums.dart';
+import 'package:submersion/features/marine_life/domain/entities/species.dart';
+import 'package:submersion/features/marine_life/presentation/providers/species_providers.dart';
 import 'package:submersion/features/reef/presentation/widgets/nearby_species_tier.dart';
 
 import '../../../../helpers/l10n_test_helpers.dart';
@@ -17,9 +20,22 @@ ReefSnapshot _snapshot(ReefPart<NearbySpecies> species) => ReefSnapshot(
   species: species,
 );
 
-Widget _harness(GeoPoint location, ReefSnapshot snapshot) => ProviderScope(
+const _catalogSpecies = Species(
+  id: 'sp_whale_shark',
+  commonName: 'Whale Shark',
+  scientificName: 'Rhincodon typus',
+  category: SpeciesCategory.shark,
+  isBuiltIn: true,
+);
+
+Widget _harness(
+  GeoPoint location,
+  ReefSnapshot snapshot, {
+  List<Species> catalog = const [_catalogSpecies],
+}) => ProviderScope(
   overrides: [
     reefSnapshotProvider(location).overrideWith((ref) async => snapshot),
+    allSpeciesProvider.overrideWith((ref) async => catalog),
   ],
   child: localizedMaterialApp(
     locale: const Locale('en'),
@@ -52,6 +68,8 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.textContaining('Recorded nearby'), findsOneWidget);
+    // Catalog match renders with its common name, not a bare Latin binomial.
+    expect(find.text('Whale Shark'), findsOneWidget);
     expect(find.textContaining('Aplysina archeri'), findsOneWidget);
   });
 

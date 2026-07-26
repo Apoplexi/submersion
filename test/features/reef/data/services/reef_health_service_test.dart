@@ -215,6 +215,30 @@ void main() {
       expect(result.status, ReefDataStatus.empty);
     });
 
+    // ERDDAP answers out-of-range coordinates with HTTP 404, so an unclamped
+    // box near a pole or the antimeridian would lose the fallback entirely.
+    test('clamps the fallback box to valid WGS84 bounds', () async {
+      final captured = <Uri>[];
+      final client = MockClient((request) async {
+        captured.add(request.url);
+        return http.Response(
+          _erddapBody(time: '2026-07-23T12:00:00Z', mask: 1),
+          200,
+        );
+      });
+
+      await ReefHealthService(
+        client: client,
+      ).fetch(const GeoPoint(89.98, 179.95));
+
+      expect(captured, hasLength(2));
+      final box = captured.last.query;
+      expect(box, contains('(90.000)'));
+      expect(box, contains('(180.000)'));
+      expect(box, isNot(contains('90.055')));
+      expect(box, isNot(contains('180.025')));
+    });
+
     test('returns unavailable on the 404 non-JSON error body', () async {
       final client = MockClient(
         (_) async =>
