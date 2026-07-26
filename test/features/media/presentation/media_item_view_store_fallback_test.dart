@@ -402,6 +402,120 @@ void main() {
     expect(store.getFileKeys, isEmpty);
   });
 
+  // The movie tile asserts something specific: this video simply has no
+  // poster frame. Two other ways store resolution can return null must not be
+  // dressed up as that, or an unreachable video reads as an intact one.
+  MediaItem videoRow({
+    required String id,
+    required String hash,
+    DateTime? uploadedAt,
+    DateTime? thumbUploadedAt,
+  }) => MediaItem(
+    id: id,
+    mediaType: MediaType.video,
+    sourceType: MediaSourceType.platformGallery,
+    platformAssetId: 'asset-from-other-device',
+    originalFilename: 'DIVE_003.mp4',
+    takenAt: DateTime(2026),
+    createdAt: DateTime(2026),
+    updatedAt: DateTime(2026),
+    contentHash: hash,
+    remoteUploadedAt: uploadedAt,
+    remoteThumbUploadedAt: thumbUploadedAt,
+  );
+
+  Widget videoApp(MediaItem item, {MediaStoreRuntime? runtime}) =>
+      ProviderScope(
+        overrides: [
+          mediaSourceResolverRegistryProvider.overrideWithValue(
+            MediaSourceResolverRegistry({
+              MediaSourceType.platformGallery:
+                  const _UnavailableGalleryResolver(),
+            }),
+          ),
+          mediaStoreRuntimeProvider.overrideWith((ref) async => runtime),
+        ],
+        child: MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: Scaffold(
+            body: SizedBox(
+              width: 100,
+              height: 100,
+              child: MediaItemView(
+                item: item,
+                thumbnail: true,
+                targetSize: const Size(100, 100),
+              ),
+            ),
+          ),
+        ),
+      );
+
+  testWidgets('a video with no store attached keeps the native '
+      'placeholder', (tester) async {
+    await tester.runAsync(() async {
+      // The row says it is uploaded, but this device has no store to reach:
+      // the bytes are genuinely unavailable here, not merely poster-less.
+      await tester.pumpWidget(
+        videoApp(
+          videoRow(
+            id: 'v-no-runtime',
+            hash: 'b8${'1' * 62}',
+            uploadedAt: DateTime(2026, 7, 1),
+          ),
+        ),
+      );
+      for (var i = 0; i < 20; i++) {
+        await Future<void>.delayed(const Duration(milliseconds: 20));
+        await tester.pump();
+        if (find.byType(UnavailableMediaPlaceholder).evaluate().isNotEmpty) {
+          break;
+        }
+      }
+    });
+
+    expect(find.byType(UnavailableMediaPlaceholder), findsOneWidget);
+    expect(find.byIcon(Icons.movie_outlined), findsNothing);
+  });
+
+  testWidgets('a poster that fails to download keeps the native '
+      'placeholder', (tester) async {
+    await tester.runAsync(() async {
+      final hash = 'b9${'0' * 62}';
+      // Stamped as uploaded, but the object is absent from the store, so the
+      // fetch fails. That is an error, not an absence of poster.
+      final runtime = MediaStoreRuntime(
+        storeId: 'store-1',
+        store: store,
+        cache: cache,
+        resolver: MediaStoreResolver(store: store, cache: cache),
+      );
+
+      await tester.pumpWidget(
+        videoApp(
+          videoRow(
+            id: 'v-thumb-fails',
+            hash: hash,
+            uploadedAt: DateTime(2026, 7, 1),
+            thumbUploadedAt: DateTime(2026, 7, 1),
+          ),
+          runtime: runtime,
+        ),
+      );
+      for (var i = 0; i < 20; i++) {
+        await Future<void>.delayed(const Duration(milliseconds: 20));
+        await tester.pump();
+        if (find.byType(UnavailableMediaPlaceholder).evaluate().isNotEmpty) {
+          break;
+        }
+      }
+    });
+
+    expect(find.byType(UnavailableMediaPlaceholder), findsOneWidget);
+    expect(find.byIcon(Icons.movie_outlined), findsNothing);
+  });
+
   testWidgets('keeps the native placeholder when no store runtime '
       'exists', (tester) async {
     await tester.runAsync(() async {

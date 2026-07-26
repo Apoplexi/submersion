@@ -123,19 +123,28 @@ class _MediaItemViewState extends ConsumerState<MediaItemView> {
     }
     try {
       final runtime = await ref.read(mediaStoreRuntimeProvider.future);
-      final remote = await runtime?.resolver.tryResolveRemote(
+      // No store on this device: the row's stamps say the bytes exist
+      // somewhere, but nothing here can reach them, so the native
+      // placeholder is the honest answer.
+      if (runtime == null) return (data: native, videoPosterMissing: false);
+      final remote = await runtime.resolver.tryResolveRemote(
         widget.item,
         thumbnail: widget.thumbnail,
       );
       if (remote != null) return (data: remote, videoPosterMissing: false);
-      // The store is confirmed to hold this item, so a video thumbnail that
-      // came back empty means no poster was uploaded -- not that the media
-      // is gone. Rendering the native "file not found" badge here would be
-      // wrong on both counts, and the resolver deliberately did not download
-      // the whole video to prove the point.
+      // The movie tile claims something specific -- this video has no poster
+      // frame -- so it is shown only when that is what happened: the store
+      // holds the item, no thumb was ever stamped, and the resolver therefore
+      // declined to download the whole video just to draw an icon. A poster
+      // that IS stamped but failed to fetch is an error, not an absence, and
+      // keeps the native placeholder so a transient failure cannot read as a
+      // video that simply has no preview.
       return (
         data: native,
-        videoPosterMissing: widget.thumbnail && widget.item.isVideo,
+        videoPosterMissing:
+            widget.thumbnail &&
+            widget.item.isVideo &&
+            widget.item.remoteThumbUploadedAt == null,
       );
     } catch (_) {
       return (data: native, videoPosterMissing: false);
