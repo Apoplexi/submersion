@@ -13,6 +13,8 @@ import 'package:submersion/features/reef/presentation/providers/reef_providers.d
 import 'package:submersion/features/reef/presentation/widgets/reef_section.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 
+import '../../../../helpers/l10n_test_helpers.dart';
+
 const _location = GeoPoint(12.16, -68.28);
 
 ReefSnapshot _snapshot({
@@ -35,8 +37,9 @@ Widget _harness(ReefSnapshot snapshot) {
       // point severs that chain without mocking preferences.
       temperatureUnitProvider.overrideWithValue(TemperatureUnit.celsius),
     ],
-    child: const MaterialApp(
-      home: Scaffold(
+    child: localizedMaterialApp(
+      locale: const Locale('en'),
+      home: const Scaffold(
         body: SingleChildScrollView(child: ReefSection(location: _location)),
       ),
     ),

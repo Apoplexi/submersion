@@ -21143,4 +21143,116 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String get settings_mediaStorage_quality_linuxFfmpegHint =>
       '安装 ffmpeg 以启用视频压缩。在此之前将上传原始文件。';
+
+  @override
+  String get reef_section_title => '珊瑚礁';
+
+  @override
+  String get reef_section_sourcesTooltip => '数据来源';
+
+  @override
+  String get reef_section_loadError => '目前无法加载珊瑚礁数据';
+
+  @override
+  String get reef_habitat_title => '珊瑚礁生境';
+
+  @override
+  String get reef_habitat_onReef => '位于珊瑚礁上';
+
+  @override
+  String reef_habitat_onReefWithThreat(String threat) {
+    return '位于珊瑚礁上，威胁等级 $threat';
+  }
+
+  @override
+  String get reef_habitat_noReef => '此位置没有已制图的珊瑚礁';
+
+  @override
+  String get reef_habitat_unavailable => '目前无法查询珊瑚礁生境';
+
+  @override
+  String get reef_health_title => '珊瑚礁健康';
+
+  @override
+  String get reef_health_unavailable => '目前无法查询珊瑚礁健康状况';
+
+  @override
+  String get reef_health_noData => '此位置没有珊瑚礁健康数据';
+
+  @override
+  String reef_health_degreeHeatingWeeks(String value) {
+    return '热度周 $value 摄氏度周';
+  }
+
+  @override
+  String reef_health_seaSurface(String value) {
+    return '海表温度 $value';
+  }
+
+  @override
+  String reef_health_asOf(String date) {
+    return '数据日期 $date';
+  }
+
+  @override
+  String get reef_health_levelNoStress => '无热压力';
+
+  @override
+  String get reef_health_levelWatch => '白化观察';
+
+  @override
+  String get reef_health_levelWarning => '白化警告';
+
+  @override
+  String get reef_health_levelAlert1 => '白化警报 1 级';
+
+  @override
+  String get reef_health_levelAlert2 => '白化警报 2 级';
+
+  @override
+  String get reef_health_levelAlert3 => '白化警报 3 级';
+
+  @override
+  String get reef_health_levelAlert4 => '白化警报 4 级';
+
+  @override
+  String get reef_health_levelAlert5 => '白化警报 5 级';
+
+  @override
+  String get reef_protection_title => '保护区';
+
+  @override
+  String get reef_protection_none => '不在海洋保护区内';
+
+  @override
+  String get reef_protection_unavailable => '目前无法查询保护状态';
+
+  @override
+  String get reef_protection_viewRegulations => '查看规定';
+
+  @override
+  String reef_protection_iucn(String category) {
+    return 'IUCN $category';
+  }
+
+  @override
+  String get reef_species_recordedNearby => '附近记录';
+
+  @override
+  String get reef_species_addToExpected => '添加到预期物种';
+
+  @override
+  String get reef_attribution_title => '珊瑚礁数据来源';
+
+  @override
+  String get reef_attribution_wri => '珊瑚礁分布与威胁等级。CC BY 3.0。';
+
+  @override
+  String get reef_attribution_noaa => '海表温度与白化热压力。公共领域。';
+
+  @override
+  String get reef_attribution_gbif => '物种出现记录，已筛选为 CC0 和 CC BY 4.0。';
+
+  @override
+  String get reef_attribution_protectedSeas => '海洋保护区边界。CC BY 4.0。';
 }

@@ -22085,4 +22085,125 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get settings_mediaStorage_quality_linuxFfmpegHint =>
       'Installeer ffmpeg om videocompressie in te schakelen. Tot die tijd worden originelen geüpload.';
+
+  @override
+  String get reef_section_title => 'Rif';
+
+  @override
+  String get reef_section_sourcesTooltip => 'Gegevensbronnen';
+
+  @override
+  String get reef_section_loadError =>
+      'Rifgegevens konden nu niet worden geladen';
+
+  @override
+  String get reef_habitat_title => 'Rifhabitat';
+
+  @override
+  String get reef_habitat_onReef => 'Op een koraalrif';
+
+  @override
+  String reef_habitat_onReefWithThreat(String threat) {
+    return 'Op een koraalrif, dreigingsniveau $threat';
+  }
+
+  @override
+  String get reef_habitat_noReef => 'Geen gekarteerd koraalrif op deze locatie';
+
+  @override
+  String get reef_habitat_unavailable =>
+      'Rifhabitat kon nu niet worden gecontroleerd';
+
+  @override
+  String get reef_health_title => 'Rifgezondheid';
+
+  @override
+  String get reef_health_unavailable =>
+      'Rifgezondheid kon nu niet worden gecontroleerd';
+
+  @override
+  String get reef_health_noData =>
+      'Geen rifgezondheidsgegevens voor deze locatie';
+
+  @override
+  String reef_health_degreeHeatingWeeks(String value) {
+    return 'Degree Heating Weeks $value C-weken';
+  }
+
+  @override
+  String reef_health_seaSurface(String value) {
+    return 'Zeeoppervlak $value';
+  }
+
+  @override
+  String reef_health_asOf(String date) {
+    return 'Per $date';
+  }
+
+  @override
+  String get reef_health_levelNoStress => 'Geen hittestress';
+
+  @override
+  String get reef_health_levelWatch => 'Verbleking waakzaamheid';
+
+  @override
+  String get reef_health_levelWarning => 'Verbleking waarschuwing';
+
+  @override
+  String get reef_health_levelAlert1 => 'Verblekingsalarm niveau 1';
+
+  @override
+  String get reef_health_levelAlert2 => 'Verblekingsalarm niveau 2';
+
+  @override
+  String get reef_health_levelAlert3 => 'Verblekingsalarm niveau 3';
+
+  @override
+  String get reef_health_levelAlert4 => 'Verblekingsalarm niveau 4';
+
+  @override
+  String get reef_health_levelAlert5 => 'Verblekingsalarm niveau 5';
+
+  @override
+  String get reef_protection_title => 'Beschermd gebied';
+
+  @override
+  String get reef_protection_none => 'Niet in een beschermd zeegebied';
+
+  @override
+  String get reef_protection_unavailable =>
+      'Beschermingsstatus kon nu niet worden gecontroleerd';
+
+  @override
+  String get reef_protection_viewRegulations => 'Regels bekijken';
+
+  @override
+  String reef_protection_iucn(String category) {
+    return 'IUCN $category';
+  }
+
+  @override
+  String get reef_species_recordedNearby => 'In de buurt geregistreerd';
+
+  @override
+  String get reef_species_addToExpected => 'Toevoegen aan verwachte soorten';
+
+  @override
+  String get reef_attribution_title => 'Rifgegevensbronnen';
+
+  @override
+  String get reef_attribution_wri =>
+      'Rifaanwezigheid en dreigingsniveau. CC BY 3.0.';
+
+  @override
+  String get reef_attribution_noaa =>
+      'Zeeoppervlaktetemperatuur en hittestress. Publiek domein.';
+
+  @override
+  String get reef_attribution_gbif =>
+      'Waarnemingen van soorten, gefilterd op CC0 en CC BY 4.0.';
+
+  @override
+  String get reef_attribution_protectedSeas =>
+      'Grenzen van beschermde zeegebieden. CC BY 4.0.';
 }

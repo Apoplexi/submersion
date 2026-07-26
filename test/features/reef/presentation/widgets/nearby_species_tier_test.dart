@@ -8,6 +8,8 @@ import 'package:submersion/features/reef/domain/entities/reef_snapshot.dart';
 import 'package:submersion/features/reef/presentation/providers/reef_providers.dart';
 import 'package:submersion/features/reef/presentation/widgets/nearby_species_tier.dart';
 
+import '../../../../helpers/l10n_test_helpers.dart';
+
 ReefSnapshot _snapshot(ReefPart<NearbySpecies> species) => ReefSnapshot(
   habitat: const ReefPart.empty(),
   health: const ReefPart.empty(),
@@ -19,7 +21,8 @@ Widget _harness(GeoPoint location, ReefSnapshot snapshot) => ProviderScope(
   overrides: [
     reefSnapshotProvider(location).overrideWith((ref) async => snapshot),
   ],
-  child: MaterialApp(
+  child: localizedMaterialApp(
+    locale: const Locale('en'),
     home: Scaffold(
       body: NearbySpeciesTier(siteId: 'site-1', location: location),
     ),

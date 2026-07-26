@@ -7,6 +7,7 @@ import 'package:submersion/features/reef/domain/entities/reef_data_status.dart';
 import 'package:submersion/features/reef/domain/entities/reef_health.dart';
 import 'package:submersion/features/reef/domain/services/bleaching_alert_level.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
+import 'package:submersion/l10n/l10n_extension.dart';
 
 /// One row of the reef section: thermal stress and bleaching risk.
 ///
@@ -26,16 +27,22 @@ class ReefHealthCard extends ConsumerWidget {
     if (part.status == ReefDataStatus.unavailable) {
       return ListTile(
         leading: Icon(Icons.thermostat, color: scheme.primary),
-        title: Text('Reef health', style: theme.textTheme.titleSmall),
-        subtitle: const Text('Could not check reef health right now'),
+        title: Text(
+          context.l10n.reef_health_title,
+          style: theme.textTheme.titleSmall,
+        ),
+        subtitle: Text(context.l10n.reef_health_unavailable),
         dense: true,
       );
     }
     if (part.status == ReefDataStatus.empty) {
       return ListTile(
         leading: Icon(Icons.thermostat, color: scheme.primary),
-        title: Text('Reef health', style: theme.textTheme.titleSmall),
-        subtitle: const Text('No reef health data for this location'),
+        title: Text(
+          context.l10n.reef_health_title,
+          style: theme.textTheme.titleSmall,
+        ),
+        subtitle: Text(context.l10n.reef_health_noData),
         dense: true,
       );
     }
@@ -45,38 +52,49 @@ class ReefHealthCard extends ConsumerWidget {
 
     final lines = <String>[];
     final level = health.alertLevel;
-    if (level != null) lines.add(_levelLabel(level));
+    if (level != null) lines.add(_levelLabel(context, level));
     if (health.degreeHeatingWeeks != null) {
       lines.add(
-        'Degree Heating Weeks '
-        '${health.degreeHeatingWeeks!.toStringAsFixed(1)} C-weeks',
+        context.l10n.reef_health_degreeHeatingWeeks(
+          health.degreeHeatingWeeks!.toStringAsFixed(1),
+        ),
       );
     }
     if (health.sst != null) {
       final value = TemperatureUnit.celsius.convert(health.sst!, tempUnit);
-      lines.add('Sea surface ${value.toStringAsFixed(1)}${tempUnit.symbol}');
+      lines.add(
+        context.l10n.reef_health_seaSurface(
+          '${value.toStringAsFixed(1)}${tempUnit.symbol}',
+        ),
+      );
     }
     lines.add(
-      'As of ${DateFormat.yMMMd().format(health.observedAt.toLocal())}',
+      context.l10n.reef_health_asOf(
+        DateFormat.yMMMd().format(health.observedAt.toLocal()),
+      ),
     );
 
     return ListTile(
       leading: Icon(Icons.thermostat, color: scheme.primary),
-      title: Text('Reef health', style: theme.textTheme.titleSmall),
+      title: Text(
+        context.l10n.reef_health_title,
+        style: theme.textTheme.titleSmall,
+      ),
       subtitle: Text(lines.join('\n')),
       isThreeLine: true,
       dense: true,
     );
   }
 
-  String _levelLabel(BleachingAlertLevel level) => switch (level) {
-    BleachingAlertLevel.noStress => 'No thermal stress',
-    BleachingAlertLevel.watch => 'Bleaching watch',
-    BleachingAlertLevel.warning => 'Bleaching warning',
-    BleachingAlertLevel.alertLevel1 => 'Bleaching alert level 1',
-    BleachingAlertLevel.alertLevel2 => 'Bleaching alert level 2',
-    BleachingAlertLevel.alertLevel3 => 'Bleaching alert level 3',
-    BleachingAlertLevel.alertLevel4 => 'Bleaching alert level 4',
-    BleachingAlertLevel.alertLevel5 => 'Bleaching alert level 5',
-  };
+  String _levelLabel(BuildContext context, BleachingAlertLevel level) =>
+      switch (level) {
+        BleachingAlertLevel.noStress => context.l10n.reef_health_levelNoStress,
+        BleachingAlertLevel.watch => context.l10n.reef_health_levelWatch,
+        BleachingAlertLevel.warning => context.l10n.reef_health_levelWarning,
+        BleachingAlertLevel.alertLevel1 => context.l10n.reef_health_levelAlert1,
+        BleachingAlertLevel.alertLevel2 => context.l10n.reef_health_levelAlert2,
+        BleachingAlertLevel.alertLevel3 => context.l10n.reef_health_levelAlert3,
+        BleachingAlertLevel.alertLevel4 => context.l10n.reef_health_levelAlert4,
+        BleachingAlertLevel.alertLevel5 => context.l10n.reef_health_levelAlert5,
+      };
 }

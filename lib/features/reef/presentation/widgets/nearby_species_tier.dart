@@ -9,6 +9,7 @@ import 'package:submersion/features/marine_life/presentation/utils/species_categ
 import 'package:submersion/features/marine_life/presentation/utils/species_category_icon.dart';
 import 'package:submersion/features/reef/domain/entities/reef_data_status.dart';
 import 'package:submersion/features/reef/presentation/providers/reef_providers.dart';
+import 'package:submersion/l10n/l10n_extension.dart';
 
 /// Species recorded near a dive site, shown beneath Spotted and Expected.
 ///
@@ -47,7 +48,10 @@ class NearbySpeciesTier extends ConsumerWidget {
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Recorded nearby', style: theme.textTheme.labelLarge),
+                Text(
+                  context.l10n.reef_species_recordedNearby,
+                  style: theme.textTheme.labelLarge,
+                ),
                 const SizedBox(height: 8),
                 for (final match in species.matched)
                   if (byId[match.speciesId] case final Species s)
@@ -66,7 +70,7 @@ class NearbySpeciesTier extends ConsumerWidget {
                           : Text(s.scientificName!),
                       trailing: IconButton(
                         icon: const Icon(Icons.add_circle_outline),
-                        tooltip: 'Add to expected species',
+                        tooltip: context.l10n.reef_species_addToExpected,
                         onPressed: () => ref
                             .read(
                               siteExpectedSpeciesNotifierProvider(

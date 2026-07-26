@@ -2,10 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/features/reef/presentation/widgets/reef_attribution_sheet.dart';
 
+import '../../../../helpers/l10n_test_helpers.dart';
+
 void main() {
   testWidgets('names every data source the feature uses', (tester) async {
     await tester.pumpWidget(
-      const MaterialApp(home: Scaffold(body: ReefAttributionSheet())),
+      localizedMaterialApp(
+        locale: const Locale('en'),
+        home: const Scaffold(body: ReefAttributionSheet()),
+      ),
     );
     await tester.pumpAndSettle();
 
@@ -17,7 +22,10 @@ void main() {
 
   testWidgets('states the licence for each attributed source', (tester) async {
     await tester.pumpWidget(
-      const MaterialApp(home: Scaffold(body: ReefAttributionSheet())),
+      localizedMaterialApp(
+        locale: const Locale('en'),
+        home: const Scaffold(body: ReefAttributionSheet()),
+      ),
     );
     await tester.pumpAndSettle();
 

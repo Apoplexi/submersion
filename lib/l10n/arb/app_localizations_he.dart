@@ -21701,4 +21701,118 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String get settings_mediaStorage_quality_linuxFfmpegHint =>
       'התקן ffmpeg כדי לאפשר דחיסת וידאו. עד אז מועלים קבצי המקור.';
+
+  @override
+  String get reef_section_title => 'שונית';
+
+  @override
+  String get reef_section_sourcesTooltip => 'מקורות נתונים';
+
+  @override
+  String get reef_section_loadError => 'לא ניתן לטעון כעת את נתוני השונית';
+
+  @override
+  String get reef_habitat_title => 'בית גידול השונית';
+
+  @override
+  String get reef_habitat_onReef => 'על שונית אלמוגים';
+
+  @override
+  String reef_habitat_onReefWithThreat(String threat) {
+    return 'על שונית אלמוגים, רמת איום $threat';
+  }
+
+  @override
+  String get reef_habitat_noReef => 'אין שונית אלמוגים ממופה במיקום זה';
+
+  @override
+  String get reef_habitat_unavailable => 'לא ניתן לבדוק כעת את בית הגידול';
+
+  @override
+  String get reef_health_title => 'בריאות השונית';
+
+  @override
+  String get reef_health_unavailable => 'לא ניתן לבדוק כעת את בריאות השונית';
+
+  @override
+  String get reef_health_noData => 'אין נתוני בריאות שונית למיקום זה';
+
+  @override
+  String reef_health_degreeHeatingWeeks(String value) {
+    return 'שבועות חום מצטברים $value מעלות-שבוע';
+  }
+
+  @override
+  String reef_health_seaSurface(String value) {
+    return 'פני הים $value';
+  }
+
+  @override
+  String reef_health_asOf(String date) {
+    return 'נכון ל-$date';
+  }
+
+  @override
+  String get reef_health_levelNoStress => 'אין עקת חום';
+
+  @override
+  String get reef_health_levelWatch => 'תצפית הלבנה';
+
+  @override
+  String get reef_health_levelWarning => 'אזהרת הלבנה';
+
+  @override
+  String get reef_health_levelAlert1 => 'התראת הלבנה רמה 1';
+
+  @override
+  String get reef_health_levelAlert2 => 'התראת הלבנה רמה 2';
+
+  @override
+  String get reef_health_levelAlert3 => 'התראת הלבנה רמה 3';
+
+  @override
+  String get reef_health_levelAlert4 => 'התראת הלבנה רמה 4';
+
+  @override
+  String get reef_health_levelAlert5 => 'התראת הלבנה רמה 5';
+
+  @override
+  String get reef_protection_title => 'אזור מוגן';
+
+  @override
+  String get reef_protection_none => 'לא נמצא באזור ימי מוגן';
+
+  @override
+  String get reef_protection_unavailable => 'לא ניתן לבדוק כעת את מצב ההגנה';
+
+  @override
+  String get reef_protection_viewRegulations => 'הצגת תקנות';
+
+  @override
+  String reef_protection_iucn(String category) {
+    return 'IUCN $category';
+  }
+
+  @override
+  String get reef_species_recordedNearby => 'תועד בסביבה';
+
+  @override
+  String get reef_species_addToExpected => 'הוספה למינים צפויים';
+
+  @override
+  String get reef_attribution_title => 'מקורות נתוני השונית';
+
+  @override
+  String get reef_attribution_wri => 'נוכחות שונית ורמת איום. CC BY 3.0.';
+
+  @override
+  String get reef_attribution_noaa => 'טמפרטורת פני הים ועקת חום. נחלת הכלל.';
+
+  @override
+  String get reef_attribution_gbif =>
+      'רשומות תצפית מינים, מסוננות ל-CC0 ו-CC BY 4.0.';
+
+  @override
+  String get reef_attribution_protectedSeas =>
+      'גבולות אזורים ימיים מוגנים. CC BY 4.0.';
 }

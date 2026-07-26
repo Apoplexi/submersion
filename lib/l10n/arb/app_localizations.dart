@@ -37222,6 +37222,210 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Install ffmpeg to enable video compression. Originals are uploaded until then.'**
   String get settings_mediaStorage_quality_linuxFfmpegHint;
+
+  /// No description provided for @reef_section_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Reef'**
+  String get reef_section_title;
+
+  /// No description provided for @reef_section_sourcesTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Data sources'**
+  String get reef_section_sourcesTooltip;
+
+  /// No description provided for @reef_section_loadError.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load reef data right now'**
+  String get reef_section_loadError;
+
+  /// No description provided for @reef_habitat_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Reef habitat'**
+  String get reef_habitat_title;
+
+  /// No description provided for @reef_habitat_onReef.
+  ///
+  /// In en, this message translates to:
+  /// **'On a coral reef'**
+  String get reef_habitat_onReef;
+
+  /// No description provided for @reef_habitat_onReefWithThreat.
+  ///
+  /// In en, this message translates to:
+  /// **'On a coral reef, threat level {threat}'**
+  String reef_habitat_onReefWithThreat(String threat);
+
+  /// No description provided for @reef_habitat_noReef.
+  ///
+  /// In en, this message translates to:
+  /// **'No mapped coral reef at this location'**
+  String get reef_habitat_noReef;
+
+  /// No description provided for @reef_habitat_unavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not check reef habitat right now'**
+  String get reef_habitat_unavailable;
+
+  /// No description provided for @reef_health_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Reef health'**
+  String get reef_health_title;
+
+  /// No description provided for @reef_health_unavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not check reef health right now'**
+  String get reef_health_unavailable;
+
+  /// No description provided for @reef_health_noData.
+  ///
+  /// In en, this message translates to:
+  /// **'No reef health data for this location'**
+  String get reef_health_noData;
+
+  /// No description provided for @reef_health_degreeHeatingWeeks.
+  ///
+  /// In en, this message translates to:
+  /// **'Degree Heating Weeks {value} C-weeks'**
+  String reef_health_degreeHeatingWeeks(String value);
+
+  /// No description provided for @reef_health_seaSurface.
+  ///
+  /// In en, this message translates to:
+  /// **'Sea surface {value}'**
+  String reef_health_seaSurface(String value);
+
+  /// No description provided for @reef_health_asOf.
+  ///
+  /// In en, this message translates to:
+  /// **'As of {date}'**
+  String reef_health_asOf(String date);
+
+  /// No description provided for @reef_health_levelNoStress.
+  ///
+  /// In en, this message translates to:
+  /// **'No thermal stress'**
+  String get reef_health_levelNoStress;
+
+  /// No description provided for @reef_health_levelWatch.
+  ///
+  /// In en, this message translates to:
+  /// **'Bleaching watch'**
+  String get reef_health_levelWatch;
+
+  /// No description provided for @reef_health_levelWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'Bleaching warning'**
+  String get reef_health_levelWarning;
+
+  /// No description provided for @reef_health_levelAlert1.
+  ///
+  /// In en, this message translates to:
+  /// **'Bleaching alert level 1'**
+  String get reef_health_levelAlert1;
+
+  /// No description provided for @reef_health_levelAlert2.
+  ///
+  /// In en, this message translates to:
+  /// **'Bleaching alert level 2'**
+  String get reef_health_levelAlert2;
+
+  /// No description provided for @reef_health_levelAlert3.
+  ///
+  /// In en, this message translates to:
+  /// **'Bleaching alert level 3'**
+  String get reef_health_levelAlert3;
+
+  /// No description provided for @reef_health_levelAlert4.
+  ///
+  /// In en, this message translates to:
+  /// **'Bleaching alert level 4'**
+  String get reef_health_levelAlert4;
+
+  /// No description provided for @reef_health_levelAlert5.
+  ///
+  /// In en, this message translates to:
+  /// **'Bleaching alert level 5'**
+  String get reef_health_levelAlert5;
+
+  /// No description provided for @reef_protection_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Protected area'**
+  String get reef_protection_title;
+
+  /// No description provided for @reef_protection_none.
+  ///
+  /// In en, this message translates to:
+  /// **'Not in a marine protected area'**
+  String get reef_protection_none;
+
+  /// No description provided for @reef_protection_unavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not check protected status right now'**
+  String get reef_protection_unavailable;
+
+  /// No description provided for @reef_protection_viewRegulations.
+  ///
+  /// In en, this message translates to:
+  /// **'View regulations'**
+  String get reef_protection_viewRegulations;
+
+  /// No description provided for @reef_protection_iucn.
+  ///
+  /// In en, this message translates to:
+  /// **'IUCN {category}'**
+  String reef_protection_iucn(String category);
+
+  /// No description provided for @reef_species_recordedNearby.
+  ///
+  /// In en, this message translates to:
+  /// **'Recorded nearby'**
+  String get reef_species_recordedNearby;
+
+  /// No description provided for @reef_species_addToExpected.
+  ///
+  /// In en, this message translates to:
+  /// **'Add to expected species'**
+  String get reef_species_addToExpected;
+
+  /// No description provided for @reef_attribution_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Reef data sources'**
+  String get reef_attribution_title;
+
+  /// No description provided for @reef_attribution_wri.
+  ///
+  /// In en, this message translates to:
+  /// **'Reef presence and threat level. CC BY 3.0.'**
+  String get reef_attribution_wri;
+
+  /// No description provided for @reef_attribution_noaa.
+  ///
+  /// In en, this message translates to:
+  /// **'Sea surface temperature and bleaching heat stress. Public domain.'**
+  String get reef_attribution_noaa;
+
+  /// No description provided for @reef_attribution_gbif.
+  ///
+  /// In en, this message translates to:
+  /// **'Species occurrence records, filtered to CC0 and CC BY 4.0.'**
+  String get reef_attribution_gbif;
+
+  /// No description provided for @reef_attribution_protectedSeas.
+  ///
+  /// In en, this message translates to:
+  /// **'Marine protected area boundaries. CC BY 4.0.'**
+  String get reef_attribution_protectedSeas;
 }
 
 class _AppLocalizationsDelegate

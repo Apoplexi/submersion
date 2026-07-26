@@ -22259,4 +22259,126 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String get settings_mediaStorage_quality_linuxFfmpegHint =>
       'Installa ffmpeg per abilitare la compressione video. Fino ad allora vengono caricati gli originali.';
+
+  @override
+  String get reef_section_title => 'Barriera';
+
+  @override
+  String get reef_section_sourcesTooltip => 'Fonti dei dati';
+
+  @override
+  String get reef_section_loadError =>
+      'Impossibile caricare i dati della barriera in questo momento';
+
+  @override
+  String get reef_habitat_title => 'Habitat della barriera';
+
+  @override
+  String get reef_habitat_onReef => 'Su una barriera corallina';
+
+  @override
+  String reef_habitat_onReefWithThreat(String threat) {
+    return 'Su una barriera corallina, livello di minaccia $threat';
+  }
+
+  @override
+  String get reef_habitat_noReef =>
+      'Nessuna barriera corallina mappata in questa posizione';
+
+  @override
+  String get reef_habitat_unavailable =>
+      'Impossibile verificare l\'habitat della barriera in questo momento';
+
+  @override
+  String get reef_health_title => 'Salute della barriera';
+
+  @override
+  String get reef_health_unavailable =>
+      'Impossibile verificare la salute della barriera in questo momento';
+
+  @override
+  String get reef_health_noData =>
+      'Nessun dato sulla salute della barriera per questa posizione';
+
+  @override
+  String reef_health_degreeHeatingWeeks(String value) {
+    return 'Settimane di riscaldamento $value C-settimane';
+  }
+
+  @override
+  String reef_health_seaSurface(String value) {
+    return 'Superficie del mare $value';
+  }
+
+  @override
+  String reef_health_asOf(String date) {
+    return 'Al $date';
+  }
+
+  @override
+  String get reef_health_levelNoStress => 'Nessuno stress termico';
+
+  @override
+  String get reef_health_levelWatch => 'Sorveglianza sbiancamento';
+
+  @override
+  String get reef_health_levelWarning => 'Avviso di sbiancamento';
+
+  @override
+  String get reef_health_levelAlert1 => 'Allerta sbiancamento livello 1';
+
+  @override
+  String get reef_health_levelAlert2 => 'Allerta sbiancamento livello 2';
+
+  @override
+  String get reef_health_levelAlert3 => 'Allerta sbiancamento livello 3';
+
+  @override
+  String get reef_health_levelAlert4 => 'Allerta sbiancamento livello 4';
+
+  @override
+  String get reef_health_levelAlert5 => 'Allerta sbiancamento livello 5';
+
+  @override
+  String get reef_protection_title => 'Area protetta';
+
+  @override
+  String get reef_protection_none => 'Non in un\'area marina protetta';
+
+  @override
+  String get reef_protection_unavailable =>
+      'Impossibile verificare lo stato di protezione in questo momento';
+
+  @override
+  String get reef_protection_viewRegulations => 'Vedi normativa';
+
+  @override
+  String reef_protection_iucn(String category) {
+    return 'IUCN $category';
+  }
+
+  @override
+  String get reef_species_recordedNearby => 'Registrato nelle vicinanze';
+
+  @override
+  String get reef_species_addToExpected => 'Aggiungi alle specie attese';
+
+  @override
+  String get reef_attribution_title => 'Fonti dei dati sulla barriera';
+
+  @override
+  String get reef_attribution_wri =>
+      'Presenza della barriera e livello di minaccia. CC BY 3.0.';
+
+  @override
+  String get reef_attribution_noaa =>
+      'Temperatura superficiale del mare e stress termico. Dominio pubblico.';
+
+  @override
+  String get reef_attribution_gbif =>
+      'Dati di presenza delle specie, filtrati a CC0 e CC BY 4.0.';
+
+  @override
+  String get reef_attribution_protectedSeas =>
+      'Confini delle aree marine protette. CC BY 4.0.';
 }

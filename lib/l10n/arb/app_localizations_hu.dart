@@ -22193,4 +22193,124 @@ class AppLocalizationsHu extends AppLocalizations {
   @override
   String get settings_mediaStorage_quality_linuxFfmpegHint =>
       'Telepítse az ffmpeg-et a videótömörítés engedélyezéséhez. Addig az eredetik kerülnek feltöltésre.';
+
+  @override
+  String get reef_section_title => 'Zatony';
+
+  @override
+  String get reef_section_sourcesTooltip => 'Adatforrasok';
+
+  @override
+  String get reef_section_loadError => 'A zatonyadatok most nem toltehetok be';
+
+  @override
+  String get reef_habitat_title => 'Zatony elohely';
+
+  @override
+  String get reef_habitat_onReef => 'Korallzatonyon';
+
+  @override
+  String reef_habitat_onReefWithThreat(String threat) {
+    return 'Korallzatonyon, veszelyeztetettsegi szint: $threat';
+  }
+
+  @override
+  String get reef_habitat_noReef =>
+      'Nincs terkepezett korallzatony ezen a helyen';
+
+  @override
+  String get reef_habitat_unavailable =>
+      'A zatony elohelye most nem ellenorizheto';
+
+  @override
+  String get reef_health_title => 'Zatony allapota';
+
+  @override
+  String get reef_health_unavailable =>
+      'A zatony allapota most nem ellenorizheto';
+
+  @override
+  String get reef_health_noData => 'Nincs zatonyallapot-adat ehhez a helyhez';
+
+  @override
+  String reef_health_degreeHeatingWeeks(String value) {
+    return 'Hoterhelesi hetek $value C-het';
+  }
+
+  @override
+  String reef_health_seaSurface(String value) {
+    return 'Tengerfelszin $value';
+  }
+
+  @override
+  String reef_health_asOf(String date) {
+    return 'Datum: $date';
+  }
+
+  @override
+  String get reef_health_levelNoStress => 'Nincs hostressz';
+
+  @override
+  String get reef_health_levelWatch => 'Feheredesi megfigyeles';
+
+  @override
+  String get reef_health_levelWarning => 'Feheredesi figyelmeztetes';
+
+  @override
+  String get reef_health_levelAlert1 => 'Feheredesi riasztas 1. szint';
+
+  @override
+  String get reef_health_levelAlert2 => 'Feheredesi riasztas 2. szint';
+
+  @override
+  String get reef_health_levelAlert3 => 'Feheredesi riasztas 3. szint';
+
+  @override
+  String get reef_health_levelAlert4 => 'Feheredesi riasztas 4. szint';
+
+  @override
+  String get reef_health_levelAlert5 => 'Feheredesi riasztas 5. szint';
+
+  @override
+  String get reef_protection_title => 'Vedett terulet';
+
+  @override
+  String get reef_protection_none => 'Nem vedett tengeri teruleten';
+
+  @override
+  String get reef_protection_unavailable =>
+      'A vedettsegi allapot most nem ellenorizheto';
+
+  @override
+  String get reef_protection_viewRegulations => 'Szabalyok megtekintese';
+
+  @override
+  String reef_protection_iucn(String category) {
+    return 'IUCN $category';
+  }
+
+  @override
+  String get reef_species_recordedNearby => 'Kozelben rogzitve';
+
+  @override
+  String get reef_species_addToExpected => 'Hozzaadas a varhato fajokhoz';
+
+  @override
+  String get reef_attribution_title => 'Zatony adatforrasai';
+
+  @override
+  String get reef_attribution_wri =>
+      'Zatony jelenlete es veszelyeztetettsege. CC BY 3.0.';
+
+  @override
+  String get reef_attribution_noaa =>
+      'Tengerfelszini homerseklet es hostressz. Kozkincs.';
+
+  @override
+  String get reef_attribution_gbif =>
+      'Fajelofordulasi adatok, CC0 es CC BY 4.0 szurve.';
+
+  @override
+  String get reef_attribution_protectedSeas =>
+      'Vedett tengeri teruletek hatarai. CC BY 4.0.';
 }

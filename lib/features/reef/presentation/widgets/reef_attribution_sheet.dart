@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import 'package:submersion/l10n/l10n_extension.dart';
+
 /// Attribution for the reef data sources.
 ///
 /// Required: WRI Reefs at Risk is CC BY 3.0 and ProtectedSeas Navigator is
@@ -9,26 +11,27 @@ import 'package:url_launcher/url_launcher.dart';
 class ReefAttributionSheet extends StatelessWidget {
   const ReefAttributionSheet({super.key});
 
-  static const List<_Source> _sources = [
+  /// Source names are proper nouns and stay untranslated; only the
+  /// descriptions are localized.
+  List<_Source> _sources(BuildContext context) => [
     _Source(
       name: 'WRI Reefs at Risk Revisited',
-      detail: 'Reef presence and threat level. CC BY 3.0.',
+      detail: context.l10n.reef_attribution_wri,
       url: 'https://www.wri.org/research/reefs-risk-revisited',
     ),
     _Source(
       name: 'NOAA Coral Reef Watch',
-      detail:
-          'Sea surface temperature and bleaching heat stress. Public domain.',
+      detail: context.l10n.reef_attribution_noaa,
       url: 'https://coralreefwatch.noaa.gov',
     ),
     _Source(
       name: 'GBIF',
-      detail: 'Species occurrence records, filtered to CC0 and CC BY 4.0.',
+      detail: context.l10n.reef_attribution_gbif,
       url: 'https://www.gbif.org',
     ),
     _Source(
       name: 'ProtectedSeas Navigator',
-      detail: 'Marine protected area boundaries. CC BY 4.0.',
+      detail: context.l10n.reef_attribution_protectedSeas,
       url: 'https://navigatormap.org',
     ),
   ];
@@ -47,11 +50,11 @@ class ReefAttributionSheet extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
               child: Text(
-                'Reef data sources',
+                context.l10n.reef_attribution_title,
                 style: theme.textTheme.titleMedium,
               ),
             ),
-            for (final source in _sources)
+            for (final source in _sources(context))
               ListTile(
                 title: Text(source.name),
                 subtitle: Text(source.detail),

@@ -3,6 +3,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import 'package:submersion/features/reef/domain/entities/reef_data_status.dart';
 import 'package:submersion/features/reef/domain/entities/reef_protection.dart';
+import 'package:submersion/l10n/l10n_extension.dart';
 
 /// One row of the reef section: marine protected area identity.
 ///
@@ -22,16 +23,22 @@ class ReefProtectionCard extends StatelessWidget {
     if (part.status == ReefDataStatus.unavailable) {
       return ListTile(
         leading: Icon(Icons.shield_outlined, color: scheme.primary),
-        title: Text('Protected area', style: theme.textTheme.titleSmall),
-        subtitle: const Text('Could not check protected status right now'),
+        title: Text(
+          context.l10n.reef_protection_title,
+          style: theme.textTheme.titleSmall,
+        ),
+        subtitle: Text(context.l10n.reef_protection_unavailable),
         dense: true,
       );
     }
     if (part.status == ReefDataStatus.empty) {
       return ListTile(
         leading: Icon(Icons.shield_outlined, color: scheme.primary),
-        title: Text('Protected area', style: theme.textTheme.titleSmall),
-        subtitle: const Text('Not in a marine protected area'),
+        title: Text(
+          context.l10n.reef_protection_title,
+          style: theme.textTheme.titleSmall,
+        ),
+        subtitle: Text(context.l10n.reef_protection_none),
         dense: true,
       );
     }
@@ -43,7 +50,7 @@ class ReefProtectionCard extends StatelessWidget {
           ListTile(
             leading: Icon(Icons.shield_outlined, color: scheme.primary),
             title: Text(area.siteName, style: theme.textTheme.titleSmall),
-            subtitle: Text(_subtitle(area)),
+            subtitle: Text(_subtitle(context, area)),
             trailing: area.navigatorLink == null
                 ? null
                 : TextButton(
@@ -51,7 +58,7 @@ class ReefProtectionCard extends StatelessWidget {
                       Uri.parse(area.navigatorLink!),
                       mode: LaunchMode.externalApplication,
                     ),
-                    child: const Text('View regulations'),
+                    child: Text(context.l10n.reef_protection_viewRegulations),
                   ),
             dense: true,
           ),
@@ -59,13 +66,13 @@ class ReefProtectionCard extends StatelessWidget {
     );
   }
 
-  String _subtitle(ReefProtection area) {
+  String _subtitle(BuildContext context, ReefProtection area) {
     final parts = <String>[];
     if (area.country != null && area.country!.isNotEmpty) {
       parts.add(area.country!);
     }
     if (area.iucnCategory != null && area.iucnCategory!.isNotEmpty) {
-      parts.add('IUCN ${area.iucnCategory}');
+      parts.add(context.l10n.reef_protection_iucn(area.iucnCategory!));
     }
     return parts.join(' - ');
   }

@@ -7,6 +7,7 @@ import 'package:submersion/features/reef/presentation/widgets/reef_attribution_s
 import 'package:submersion/features/reef/presentation/widgets/reef_habitat_card.dart';
 import 'package:submersion/features/reef/presentation/widgets/reef_health_card.dart';
 import 'package:submersion/features/reef/presentation/widgets/reef_protection_card.dart';
+import 'package:submersion/l10n/l10n_extension.dart';
 
 /// Reef information for a dive site: habitat, health, and protected status.
 ///
@@ -38,11 +39,14 @@ class ReefSection extends ConsumerWidget {
                     color: theme.colorScheme.primary,
                   ),
                   const SizedBox(width: 8),
-                  Text('Reef', style: theme.textTheme.titleMedium),
+                  Text(
+                    context.l10n.reef_section_title,
+                    style: theme.textTheme.titleMedium,
+                  ),
                   const Spacer(),
                   IconButton(
                     icon: const Icon(Icons.info_outline, size: 18),
-                    tooltip: 'Data sources',
+                    tooltip: context.l10n.reef_section_sourcesTooltip,
                     onPressed: () => showModalBottomSheet<void>(
                       context: context,
                       builder: (_) => const ReefAttributionSheet(),
@@ -63,9 +67,9 @@ class ReefSection extends ConsumerWidget {
                 padding: EdgeInsets.all(24),
                 child: Center(child: CircularProgressIndicator()),
               ),
-              error: (_, _) => const Padding(
-                padding: EdgeInsets.fromLTRB(16, 8, 16, 16),
-                child: Text('Could not load reef data right now'),
+              error: (_, _) => Padding(
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+                child: Text(context.l10n.reef_section_loadError),
               ),
             ),
           ],

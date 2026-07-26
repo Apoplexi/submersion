@@ -22227,4 +22227,125 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get settings_mediaStorage_quality_linuxFfmpegHint =>
       'Installieren Sie ffmpeg, um Videokomprimierung zu aktivieren. Bis dahin werden Originale hochgeladen.';
+
+  @override
+  String get reef_section_title => 'Riff';
+
+  @override
+  String get reef_section_sourcesTooltip => 'Datenquellen';
+
+  @override
+  String get reef_section_loadError =>
+      'Riffdaten konnten gerade nicht geladen werden';
+
+  @override
+  String get reef_habitat_title => 'Riff-Lebensraum';
+
+  @override
+  String get reef_habitat_onReef => 'Auf einem Korallenriff';
+
+  @override
+  String reef_habitat_onReefWithThreat(String threat) {
+    return 'Auf einem Korallenriff, Gefaehrdungsstufe $threat';
+  }
+
+  @override
+  String get reef_habitat_noReef =>
+      'Kein kartiertes Korallenriff an diesem Ort';
+
+  @override
+  String get reef_habitat_unavailable =>
+      'Riff-Lebensraum konnte gerade nicht geprueft werden';
+
+  @override
+  String get reef_health_title => 'Riffgesundheit';
+
+  @override
+  String get reef_health_unavailable =>
+      'Riffgesundheit konnte gerade nicht geprueft werden';
+
+  @override
+  String get reef_health_noData => 'Keine Riffgesundheitsdaten fuer diesen Ort';
+
+  @override
+  String reef_health_degreeHeatingWeeks(String value) {
+    return 'Degree Heating Weeks $value C-Wochen';
+  }
+
+  @override
+  String reef_health_seaSurface(String value) {
+    return 'Wasseroberflaeche $value';
+  }
+
+  @override
+  String reef_health_asOf(String date) {
+    return 'Stand $date';
+  }
+
+  @override
+  String get reef_health_levelNoStress => 'Kein Hitzestress';
+
+  @override
+  String get reef_health_levelWatch => 'Bleiche-Beobachtung';
+
+  @override
+  String get reef_health_levelWarning => 'Bleiche-Warnung';
+
+  @override
+  String get reef_health_levelAlert1 => 'Bleiche-Alarmstufe 1';
+
+  @override
+  String get reef_health_levelAlert2 => 'Bleiche-Alarmstufe 2';
+
+  @override
+  String get reef_health_levelAlert3 => 'Bleiche-Alarmstufe 3';
+
+  @override
+  String get reef_health_levelAlert4 => 'Bleiche-Alarmstufe 4';
+
+  @override
+  String get reef_health_levelAlert5 => 'Bleiche-Alarmstufe 5';
+
+  @override
+  String get reef_protection_title => 'Schutzgebiet';
+
+  @override
+  String get reef_protection_none => 'Nicht in einem Meeresschutzgebiet';
+
+  @override
+  String get reef_protection_unavailable =>
+      'Schutzstatus konnte gerade nicht geprueft werden';
+
+  @override
+  String get reef_protection_viewRegulations => 'Vorschriften ansehen';
+
+  @override
+  String reef_protection_iucn(String category) {
+    return 'IUCN $category';
+  }
+
+  @override
+  String get reef_species_recordedNearby => 'In der Naehe erfasst';
+
+  @override
+  String get reef_species_addToExpected => 'Zu erwarteten Arten hinzufuegen';
+
+  @override
+  String get reef_attribution_title => 'Riff-Datenquellen';
+
+  @override
+  String get reef_attribution_wri =>
+      'Riffvorkommen und Gefaehrdungsstufe. CC BY 3.0.';
+
+  @override
+  String get reef_attribution_noaa =>
+      'Wasseroberflaechentemperatur und Bleiche-Hitzestress. Gemeinfrei.';
+
+  @override
+  String get reef_attribution_gbif =>
+      'Artnachweise, gefiltert auf CC0 und CC BY 4.0.';
+
+  @override
+  String get reef_attribution_protectedSeas =>
+      'Grenzen von Meeresschutzgebieten. CC BY 4.0.';
 }
