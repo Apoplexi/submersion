@@ -172,6 +172,94 @@ void main() {
     expect((data! as FileData).isPoster, isFalse);
   });
 
+  // Rows created by the Files tab before it recorded a filename have
+  // originalFilename == null, so StoreKeys.extensionFor yields 'bin' and the
+  // object was UPLOADED under `<hash>.bin`. That key must not change -- it is
+  // where the bytes actually live -- but `.bin` is not a container extension,
+  // so caching under it leaves AVFoundation exactly as stuck as before
+  // (verified: identical bytes open as .mp4/.mov and fail as .bin). The
+  // cached name is local, so it can carry a playable extension from the
+  // local path even when the store key cannot.
+  test('a video with no filename still caches under a playable '
+      'extension', () async {
+    final bytes = 'no-filename-video'.codeUnits;
+    final hash = await seed('nofn', bytes);
+    // Uploaded under the 'bin' key, which is what extensionFor produced.
+    store.objects[StoreKeys.objectKey(hash, extension: 'bin')] = bytes;
+
+    final row = MediaItem(
+      id: 'v-nofn',
+      mediaType: MediaType.video,
+      sourceType: MediaSourceType.localFile,
+      localPath: '/Users/somebody/Downloads/dive media/GX015932-2.MP4',
+      takenAt: DateTime(2026),
+      createdAt: DateTime(2026),
+      updatedAt: DateTime(2026),
+      contentHash: hash,
+      remoteUploadedAt: DateTime(2026),
+    );
+    expect(row.originalFilename, isNull);
+
+    final data = await resolver.tryResolveRemote(row, thumbnail: false);
+
+    expect(data, isA<FileData>());
+    expect(p.extension((data! as FileData).file.path), '.mp4');
+    // The object was fetched from the key it was uploaded under.
+    expect(store.getFileKeys, [StoreKeys.objectKey(hash, extension: 'bin')]);
+  });
+
+  test('a video with neither filename nor local path falls back to '
+      'mp4', () async {
+    final bytes = 'bookmark-only-video'.codeUnits;
+    final hash = await seed('bmonly', bytes);
+    store.objects[StoreKeys.objectKey(hash, extension: 'bin')] = bytes;
+
+    final row = MediaItem(
+      id: 'v-bm',
+      mediaType: MediaType.video,
+      sourceType: MediaSourceType.localFile,
+      bookmarkRef: 'bm-1',
+      takenAt: DateTime(2026),
+      createdAt: DateTime(2026),
+      updatedAt: DateTime(2026),
+      contentHash: hash,
+      remoteUploadedAt: DateTime(2026),
+    );
+
+    final data = await resolver.tryResolveRemote(row, thumbnail: false);
+
+    expect(data, isA<FileData>());
+    // AVFoundation treats .mp4 and .mov interchangeably, so defaulting by
+    // media type is safe even when the bytes are QuickTime.
+    expect(p.extension((data! as FileData).file.path), '.mp4');
+  });
+
+  test('a photo with no filename keeps the extensionless cache name', () async {
+    final bytes = 'photo-no-filename'.codeUnits;
+    final hash = await seed('pnofn', bytes);
+    store.objects[StoreKeys.objectKey(hash, extension: 'bin')] = bytes;
+
+    final data = await resolver.tryResolveRemote(
+      MediaItem(
+        id: 'p-nofn',
+        mediaType: MediaType.photo,
+        sourceType: MediaSourceType.localFile,
+        takenAt: DateTime(2026),
+        createdAt: DateTime(2026),
+        updatedAt: DateTime(2026),
+        contentHash: hash,
+        remoteUploadedAt: DateTime(2026),
+      ),
+      thumbnail: false,
+    );
+
+    // Image.file sniffs the bytes, so a photo needs no rescue: the cache
+    // name mirrors the store key rather than fabricating an image extension
+    // that the bytes might not match.
+    expect(data, isA<FileData>());
+    expect(p.extension((data! as FileData).file.path), '.bin');
+  });
+
   // A video original can only ever render as the movie placeholder, so
   // reaching for it to satisfy a grid tile downloads megabytes (potentially
   // over cellular) to draw an icon.

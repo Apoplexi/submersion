@@ -140,7 +140,7 @@ class MediaStoreResolver {
         hash,
         MediaCacheKind.original,
         staging,
-        extension: extension,
+        extension: _cacheExtensionFor(item, extension),
       );
       return FileData(file: file);
     } on Exception catch (e) {
@@ -150,6 +150,39 @@ class MediaStoreResolver {
       await _discardStaging(staging);
     }
   }
+
+  /// Extension for the CACHED copy, which is a different question from the
+  /// store key's.
+  ///
+  /// The key records how the object was addressed when it was uploaded and
+  /// can never be recomputed differently — that is where the bytes live. The
+  /// cache name is local and disposable, and its only job is to let the OS
+  /// identify the file. Those come apart when a row has no usable filename:
+  /// [StoreKeys.extensionFor] yields [StoreKeys.unknownExtension], which is a
+  /// fine address and a useless container hint, so a video cached under it
+  /// stays unplayable (`AVURLAsset` infers the container from the path
+  /// extension alone).
+  ///
+  /// Only videos are rescued. A photo's bytes are identified by sniffing, so
+  /// giving it a guessed image extension would risk contradicting them for no
+  /// gain. Videos fall back to the local path's extension — still recorded on
+  /// the row even after the file itself is gone — and then to the media
+  /// type's container. That last guess is safe: AVFoundation opens QuickTime
+  /// and MP4 bytes under either extension, and rejects only names it does not
+  /// recognise at all.
+  String _cacheExtensionFor(MediaItem item, String storeExtension) {
+    if (storeExtension != StoreKeys.unknownExtension) return storeExtension;
+    if (item.mediaType != MediaType.video) return storeExtension;
+    final localPath = item.localPath ?? '';
+    final dot = localPath.lastIndexOf('.');
+    if (dot >= 0 && dot < localPath.length - 1) {
+      final ext = localPath.substring(dot + 1).toLowerCase();
+      if (_extPattern.hasMatch(ext)) return ext;
+    }
+    return 'mp4';
+  }
+
+  static final RegExp _extPattern = RegExp(r'^[a-z0-9]{1,8}$');
 
   /// cache.put moves the staging file into the pool, so anything still at
   /// the staging path after a fetch is the debris of a failed one
