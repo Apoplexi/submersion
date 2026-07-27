@@ -11,6 +11,7 @@ import 'package:submersion/features/divers/presentation/providers/diver_provider
 import 'package:submersion/features/planner/presentation/pages/plan_canvas_page.dart';
 import 'package:submersion/features/safety/presentation/pages/incident_edit_page.dart';
 import 'package:submersion/features/safety/presentation/pages/incidents_list_page.dart';
+import 'package:submersion/features/safety/presentation/pages/no_fly_page.dart';
 import 'package:submersion/features/settings/presentation/pages/section_appearance_page.dart';
 import 'package:submersion/features/settings/presentation/pages/column_config_page.dart';
 
@@ -625,8 +626,26 @@ void main() {
         router.configuration.routes,
         'divePlanner',
       );
+      expect(divePlanner, isNotNull);
       final nestedNames = _collectRouteNames(divePlanner!.routes);
       expect(nestedNames, isNot(contains('noFly')));
+    });
+
+    testWidgets('noFly route builds the NoFlyPage', (tester) async {
+      await tester.pumpWidget(const MaterialApp(home: SizedBox()));
+      final context = tester.element(find.byType(SizedBox));
+
+      final noFly = _findRouteByName(router.configuration.routes, 'noFly');
+      expect(noFly, isNotNull);
+      final state = GoRouterState(
+        router.configuration,
+        uri: Uri.parse('/planning/no-fly'),
+        matchedLocation: '/planning/no-fly',
+        fullPath: '/planning/no-fly',
+        pathParameters: const {},
+        pageKey: const ValueKey('/planning/no-fly'),
+      );
+      expect(noFly!.builder!(context, state), isA<NoFlyPage>());
     });
 
     testWidgets(
