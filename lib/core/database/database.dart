@@ -704,6 +704,12 @@ class Dives extends Table {
       text().nullable()(); // enum: WeatherSource.name
   IntColumn get weatherFetchedAt => integer().nullable()(); // unix timestamp
 
+  /// Raw WMO weather code from the forecast provider.
+  ///
+  /// Retained so the description can be rendered in the diver's locale and
+  /// units at display time rather than frozen as English prose at fetch time.
+  IntColumn get weatherCode => integer().nullable()();
+
   // GPS entry/exit fixes from dive computer (Shearwater Swift). Decimal degrees.
   RealColumn get entryLatitude => real().nullable()();
   RealColumn get entryLongitude => real().nullable()();
@@ -2846,7 +2852,7 @@ class AppDatabase extends _$AppDatabase {
 
   /// The current schema version as a static constant so that pre-open checks
   /// (e.g. version-mismatch guard) can reference it without an instance.
-  static const int currentSchemaVersion = 136;
+  static const int currentSchemaVersion = 137;
 
   /// Every schema version that has a migration block in onUpgrade.
   /// Used to calculate progress step counts. When adding a new migration,
@@ -3010,6 +3016,9 @@ class AppDatabase extends _$AppDatabase {
     // Phase A). Renumbered from v130 as main advanced past it at merge time.
     134,
     136,
+    // v137: dives.weather_code, plus a one-time clear of the English weather
+    // prose this app generated itself so it can be re-rendered localized.
+    137,
   ];
 
   /// Idempotent DDL for the v106 connector-suggestion columns (Lightroom
@@ -3882,6 +3891,48 @@ class AppDatabase extends _$AppDatabase {
       );
     }
   }
+
+  /// Idempotent DDL for the v137 weather code column. Called from the v137
+  /// onUpgrade step and the beforeOpen backstop, matching the
+  /// _assertMediaStoreSchema pattern so a schema-version collision cannot
+  /// strand a database without it. Self-guarding when the table is absent
+  /// (minimal migration-test fixtures).
+  Future<void> _assertWeatherCodeColumn() async {
+    final cols = await customSelect("PRAGMA table_info('dives')").get();
+    if (cols.isEmpty) return;
+    final names = cols.map((c) => c.read<String>('name')).toSet();
+    if (!names.contains('weather_code')) {
+      await customStatement(
+        'ALTER TABLE dives ADD COLUMN weather_code INTEGER',
+      );
+    }
+  }
+
+  /// One-time clear of weather descriptions this app generated itself.
+  ///
+  /// Only rows whose weather_source is 'openMeteo' are touched -- those are
+  /// the English, metric strings the old WeatherMapper built and persisted.
+  /// They are now rendered at display time from the structured fields, so the
+  /// frozen copy would override the localized one. Manually entered and
+  /// imported descriptions are user data and are left verbatim.
+  Future<void> _clearGeneratedWeatherDescriptions() async {
+    final cols = await customSelect("PRAGMA table_info('dives')").get();
+    if (cols.isEmpty) return;
+    final names = cols.map((c) => c.read<String>('name')).toSet();
+    if (!names.contains('weather_source') ||
+        !names.contains('weather_description')) {
+      return;
+    }
+    await customStatement(
+      "UPDATE dives SET weather_description = NULL "
+      "WHERE weather_source = 'openMeteo'",
+    );
+  }
+
+  /// Test-only wrapper. The column assert is exercised through beforeOpen, but
+  /// the one-time clear only runs on upgrade, so it needs a direct handle.
+  Future<void> clearGeneratedWeatherDescriptionsForTesting() =>
+      _clearGeneratedWeatherDescriptions();
 
   /// Idempotent DDL for the v133 compressed-rendition columns. Called from the
   /// v133 onUpgrade step and the beforeOpen backstop, matching the
@@ -7063,6 +7114,13 @@ class AppDatabase extends _$AppDatabase {
           await _assertMediaStoresLastSweepColumn();
         }
         if (from < 136) await reportProgress();
+        // v137: dives.weather_code + clear the English weather prose we
+        // generated ourselves, so it re-renders in the diver's locale.
+        if (from < 137) {
+          await _assertWeatherCodeColumn();
+          await _clearGeneratedWeatherDescriptions();
+        }
+        if (from < 137) await reportProgress();
       },
       beforeOpen: (details) async {
         // Enable foreign keys
@@ -7080,6 +7138,9 @@ class AppDatabase extends _$AppDatabase {
 
         // v136 backstop: re-assert media_stores.last_sweep_at.
         await _assertMediaStoresLastSweepColumn();
+
+        // v137 backstop: re-assert dives.weather_code.
+        await _assertWeatherCodeColumn();
 
         // v106 backstop: re-assert connector-suggestion columns (the helper
         // is self-guarding when the suggestions table is absent).
