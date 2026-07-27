@@ -27,12 +27,20 @@ class PhotoPickerPage extends ConsumerStatefulWidget {
   /// Called when user confirms selection with the selected assets.
   final void Function(List<AssetInfo> selectedAssets)? onSelectionConfirmed;
 
+  /// The dive this picker was opened from, when there is one.
+  ///
+  /// Passed to the Files tab so photos the date matcher rejects can still be
+  /// linked to the dive the user was looking at. Null when the picker is
+  /// opened outside a dive context.
+  final String? diveId;
+
   const PhotoPickerPage({
     super.key,
     required this.startTime,
     required this.endTime,
     this.alreadyLinkedIds = const {},
     this.onSelectionConfirmed,
+    this.diveId,
   });
 
   @override
@@ -118,37 +126,56 @@ class _PhotoPickerPageState extends ConsumerState<PhotoPickerPage> {
       tooltip: context.l10n.media_photoPicker_closeTooltip,
       onPressed: () => Navigator.of(context).pop(),
     );
-    final appBarActions = [
-      TextButton(
-        onPressed: state.selectionCount > 0 ? _handleDone : null,
-        child: Text(
-          state.selectionCount > 0
-              ? context.l10n.media_photoPicker_doneCountButton(
-                  state.selectionCount,
-                )
-              : context.l10n.media_photoPicker_doneButton,
-        ),
+    final doneAction = TextButton(
+      onPressed: state.selectionCount > 0 ? _handleDone : null,
+      child: Text(
+        state.selectionCount > 0
+            ? context.l10n.media_photoPicker_doneCountButton(
+                state.selectionCount,
+              )
+            : context.l10n.media_photoPicker_doneButton,
       ),
-    ];
+    );
 
     return DefaultTabController(
       length: 3,
-      child: Scaffold(
-        appBar: AppBar(
-          leading: appBarLeading,
-          title: Text(context.l10n.media_photoPicker_appBarTitle),
-          actions: appBarActions,
-          bottom: TabBar(
-            tabs: [
-              Tab(text: context.l10n.media_photoPicker_tab_gallery),
-              Tab(text: context.l10n.media_photoPicker_tab_files),
-              Tab(text: context.l10n.media_photoPicker_tab_url),
-            ],
-          ),
-        ),
-        body: TabBarView(
-          children: [_galleryTab(context), const FilesTab(), const UrlTab()],
-        ),
+      child: Builder(
+        builder: (context) {
+          final tabController = DefaultTabController.of(context);
+          return Scaffold(
+            appBar: AppBar(
+              leading: appBarLeading,
+              title: Text(context.l10n.media_photoPicker_appBarTitle),
+              actions: [
+                // Done commits the GALLERY tab's selection; the Files and URL
+                // tabs carry their own commit buttons. Showing a
+                // permanently-greyed Done over those tabs read as "the app
+                // rejected my photos" to users who had staged files there,
+                // so the action tracks the active tab.
+                ListenableBuilder(
+                  listenable: tabController,
+                  builder: (context, _) => tabController.index == 0
+                      ? doneAction
+                      : const SizedBox.shrink(),
+                ),
+              ],
+              bottom: TabBar(
+                tabs: [
+                  Tab(text: context.l10n.media_photoPicker_tab_gallery),
+                  Tab(text: context.l10n.media_photoPicker_tab_files),
+                  Tab(text: context.l10n.media_photoPicker_tab_url),
+                ],
+              ),
+            ),
+            body: TabBarView(
+              children: [
+                _galleryTab(context),
+                FilesTab(diveId: widget.diveId),
+                const UrlTab(),
+              ],
+            ),
+          );
+        },
       ),
     );
   }
@@ -671,6 +698,7 @@ Future<List<AssetInfo>?> showPhotoPicker({
   required DateTime diveEndTime,
   Set<String> alreadyLinkedIds = const {},
   Duration buffer = const Duration(minutes: 30),
+  String? diveId,
 }) {
   final startTime = diveStartTime.subtract(buffer);
   final endTime = diveEndTime.add(buffer);
@@ -682,6 +710,7 @@ Future<List<AssetInfo>?> showPhotoPicker({
         startTime: startTime,
         endTime: endTime,
         alreadyLinkedIds: alreadyLinkedIds,
+        diveId: diveId,
       ),
     ),
   );

@@ -40,7 +40,18 @@ import 'package:submersion/features/media/presentation/widgets/file_review_pane.
 /// then an iOS-imported video matches and stores but shows the viewer's
 /// video-unavailable state rather than playing.
 class FilesTab extends ConsumerWidget {
-  const FilesTab({super.key});
+  const FilesTab({super.key, this.diveId});
+
+  /// The dive the picker was opened from, when there is one.
+  ///
+  /// [FilesTabNotifier.commit] only persists files sitting in
+  /// [MatchedSelection.matched], and the Link button is gated on that map
+  /// being non-empty, so a photo the date matcher rejected had no route into
+  /// the database. When the picker came from a dive, that dive is the obvious
+  /// manual target: it backs the review pane's "add all to this dive" action
+  /// and makes turning auto-match off produce a usable selection instead of
+  /// an inert one. Null when the picker was opened outside a dive context.
+  final String? diveId;
 
   // coverage:ignore-start
   // FilePicker.pickFiles is a static method on package:file_picker; not
@@ -130,9 +141,19 @@ class FilesTab extends ConsumerWidget {
     final notifier = ref.read(filesTabNotifierProvider.notifier);
     final state = ref.read(filesTabNotifierProvider);
     if (!state.autoMatchByDate) {
+      // Opened from a dive, auto-match declined: the user asked for exactly
+      // these files on exactly this dive, so stage them as matched. Parking
+      // them in `unmatched` (as this used to) hid the Link button and made
+      // the unchecked checkbox a dead end.
+      final target = diveId;
       notifier.setFiles(
         extracted,
-        match: MatchedSelection(matched: const {}, unmatched: extracted),
+        match: target == null
+            ? MatchedSelection(matched: const {}, unmatched: extracted)
+            : MatchedSelection(
+                matched: {target: extracted},
+                unmatched: const [],
+              ),
       );
       return;
     }
@@ -219,7 +240,7 @@ class FilesTab extends ConsumerWidget {
                       style: Theme.of(context).textTheme.bodyMedium,
                     ),
                   )
-                : FileReviewPane(state: state),
+                : FileReviewPane(state: state, assignableDiveId: diveId),
           ),
           // TODO(media): l10n, pluralization
           if (state.match.matched.isNotEmpty)
