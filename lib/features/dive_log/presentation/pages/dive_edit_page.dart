@@ -1343,6 +1343,7 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
           FormRow.text(
             label: context.l10n.diveLog_edit_label_swellHeight,
             controller: _swellHeightController,
+            suffixText: units.depthSymbol,
             keyboardType: TextInputType.number,
             alwaysEditing: true,
           ),
