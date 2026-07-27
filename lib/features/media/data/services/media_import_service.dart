@@ -116,11 +116,19 @@ class MediaImportService {
     final existingAssetIds = await _mediaRepository.getLinkedAssetIdsForDive(
       dive.id,
     );
+    // Desktop picks are persisted as localFile rows with a null
+    // platform_asset_id (see [_createMediaItemFromAsset]), so the asset-id set
+    // above cannot see them; dedupe those on the path instead.
+    final existingPaths = await _mediaRepository.getLinkedLocalPathsForDive(
+      dive.id,
+    );
 
     // Filter out duplicates before processing
-    final newAssets = selectedAssets
-        .where((a) => !existingAssetIds.contains(a.id))
-        .toList();
+    final newAssets = selectedAssets.where((a) {
+      final path = a.filePath;
+      if (path != null && path.isNotEmpty) return !existingPaths.contains(path);
+      return !existingAssetIds.contains(a.id);
+    }).toList();
     final skippedCount = selectedAssets.length - newAssets.length;
 
     if (skippedCount > 0) {
@@ -189,7 +197,14 @@ class MediaImportService {
     return MediaItem(
       id: '',
       diveId: diveId,
-      platformAssetId: asset.id,
+      // Deliberately null for a localFile row. The desktop picker's asset id
+      // is a synthetic in-memory key, and several features gate purely on
+      // `platformAssetId != null` -- MediaItem.isGalleryPhoto,
+      // PhotoViewerPage's write-metadata action, resolvedFilePathProvider's
+      // gallery fast path -- so carrying it would route a Windows file
+      // through photo_manager, which has no backend there. Duplicate
+      // detection for these rows keys on localPath instead.
+      platformAssetId: isLocalFile ? null : asset.id,
       originalFilename: asset.filename,
       mediaType: asset.isVideo ? MediaType.video : MediaType.photo,
       sourceType: isLocalFile

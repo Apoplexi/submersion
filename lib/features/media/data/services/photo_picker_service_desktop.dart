@@ -169,6 +169,11 @@ AssetInfo? _assetInfoForPath(String path) {
           capturedUtc.minute,
           capturedUtc.second,
           capturedUtc.millisecond,
+          // Today's readers are all second-granularity (EXIF
+          // DateTimeOriginal, mvhd creation_time), so this is defensive --
+          // but dropping sub-second components on a reinterpretation that
+          // exists only to swap the isUtc flag would be a silent lossy step.
+          capturedUtc.microsecond,
         );
 
   final size = _dimensionsOf(ioFile, mime);
@@ -191,7 +196,13 @@ AssetInfo? _assetInfoForPath(String path) {
   );
 }
 
-/// Reads pixel dimensions from an image header without decoding pixels.
+/// Reads pixel dimensions from an image's header.
+///
+/// Only the header is parsed -- `startDecode` stops before any pixel decode --
+/// but the decoder API takes bytes, so the file is read in full first. That
+/// read is why the batch runs on a [compute] isolate; on the main thread a
+/// pick of large images would visibly jank the UI.
+///
 /// Returns null for videos and for anything the decoder cannot read.
 ({int width, int height})? _dimensionsOf(File file, String mime) {
   if (!mime.startsWith('image/')) return null;

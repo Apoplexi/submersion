@@ -55,6 +55,11 @@ void main() {
       enrichmentService: mockEnrichmentService,
     );
     testDive = _testDive();
+    // Default: no desktop rows linked. Tests exercising path-based dedupe
+    // re-stub this for their specific dive id.
+    when(
+      mockMediaRepository.getLinkedLocalPathsForDive(any),
+    ).thenAnswer((_) async => <String>{});
   });
 
   group('ImportResult', () {
@@ -348,6 +353,60 @@ void main() {
         expect(persisted, isNotNull);
         expect(persisted!.sourceType, MediaSourceType.localFile);
         expect(persisted!.localPath, path);
+        // A localFile row must NOT carry a gallery asset id: several features
+        // gate purely on `platformAssetId != null` (MediaItem.isGalleryPhoto,
+        // PhotoViewerPage's write-metadata action, resolvedFilePathProvider's
+        // gallery fast path) and would route a desktop file through
+        // photo_manager, which has no Windows backend.
+        expect(persisted!.platformAssetId, isNull);
+      });
+
+      test('skips a file already linked to the dive by path', () async {
+        const path = r'C:\Users\stiebs\Pictures\DIVE_0042.JPG';
+        final assets = [_testAsset('42_998877', filePath: path)];
+
+        when(
+          mockMediaRepository.getLinkedAssetIdsForDive('dive-1'),
+        ).thenAnswer((_) async => <String>{});
+        // Nulling platformAssetId means the asset-id filter can no longer see
+        // desktop rows, so dedupe has to run off the path instead. Keying on
+        // the path is also strictly better than the old synthetic id, which
+        // embedded the mtime and silently changed when a file was touched.
+        when(
+          mockMediaRepository.getLinkedLocalPathsForDive('dive-1'),
+        ).thenAnswer((_) async => {path});
+
+        final result = await service.importPhotosForDive(
+          selectedAssets: assets,
+          dive: testDive,
+        );
+
+        expect(result.imported, isEmpty);
+        expect(result.skippedDuplicates, 1);
+        verifyNever(mockMediaRepository.createMedia(any));
+      });
+
+      test('imports a file whose path is not yet linked', () async {
+        final assets = [_testAsset('1_2', filePath: '/photos/a.jpg')];
+
+        when(
+          mockMediaRepository.getLinkedAssetIdsForDive('dive-1'),
+        ).thenAnswer((_) async => <String>{});
+        when(
+          mockMediaRepository.getLinkedLocalPathsForDive('dive-1'),
+        ).thenAnswer((_) async => {'/photos/other.jpg'});
+        when(mockMediaRepository.createMedia(any)).thenAnswer(
+          (_) async =>
+              _savedMediaItem(id: 'm1', diveId: 'dive-1', platformAssetId: ''),
+        );
+
+        final result = await service.importPhotosForDive(
+          selectedAssets: assets,
+          dive: testDive,
+        );
+
+        expect(result.imported.length, 1);
+        expect(result.skippedDuplicates, 0);
       });
 
       test('leaves a gallery asset without a path as platformGallery', () {
