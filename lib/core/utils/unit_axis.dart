@@ -62,11 +62,26 @@ class UnitAxis {
       (value / grid).ceil() * grid;
 
   /// Maximum depth, canonical 10-50 m.
-  factory UnitAxis.depth(UnitFormatter units) {
+  factory UnitAxis.depth(UnitFormatter units) =>
+      UnitAxis.depthRange(units, minMeters: 10, maxMeters: 50);
+
+  /// Target depth for gas planning, canonical 6-60 m.
+  ///
+  /// Wider than [UnitAxis.depth] because a best-mix or MOD question is asked
+  /// about deco stops as well as bottom depths.
+  factory UnitAxis.targetDepth(UnitFormatter units) =>
+      UnitAxis.depthRange(units, minMeters: 6, maxMeters: 60);
+
+  /// A depth axis over an explicit canonical range.
+  factory UnitAxis.depthRange(
+    UnitFormatter units, {
+    required double minMeters,
+    required double maxMeters,
+  }) {
     final metric = units.settings.depthUnit == DepthUnit.meters;
     return UnitAxis(
-      min: metric ? 10 : _ceilTo(units.convertDepth(10), 5),
-      max: metric ? 50 : _floorTo(units.convertDepth(50), 5),
+      min: metric ? minMeters : _ceilTo(units.convertDepth(minMeters), 5),
+      max: metric ? maxMeters : _floorTo(units.convertDepth(maxMeters), 5),
       step: metric ? 1 : 5,
       decimals: 0,
       symbol: units.depthSymbol,
