@@ -55,7 +55,13 @@ Future<NavSpy> pumpStrip(
         path: '/',
         builder: (_, _) => const Scaffold(body: GaugeStrip()),
       ),
-      GoRoute(path: '/gear', builder: (_, _) => stub('/gear')),
+      GoRoute(
+        path: '/equipment',
+        builder: (_, _) => stub('/equipment'),
+        routes: [
+          GoRoute(path: 'new', builder: (_, _) => stub('/equipment/new')),
+        ],
+      ),
       GoRoute(
         path: '/certifications',
         builder: (_, _) => stub('/certifications'),
@@ -191,7 +197,7 @@ void main() {
       );
       expect(find.text('Add gear'), findsOneWidget);
       await tapChip(tester, 'Add gear');
-      expect(spy.location, '/gear');
+      expect(spy.location, '/equipment/new');
     });
 
     testWidgets('overdue, due-soon and ok gear render their own labels', (
@@ -232,7 +238,7 @@ void main() {
       expect(find.text('Add gear'), findsNothing);
 
       await tapChip(tester, 'Regulator overdue');
-      expect(spy.location, '/gear');
+      expect(spy.location, '/equipment');
     });
 
     testWidgets('due-soon clock without a due date falls back to 0 days', (

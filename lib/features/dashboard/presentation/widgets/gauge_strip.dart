@@ -65,7 +65,7 @@ class GaugeStrip extends ConsumerWidget {
             icon: Icons.add,
             label: l10n.dashboard_gauges_addGear,
             tone: _Tone.neutral,
-            onTap: () => context.go('/gear'),
+            onTap: () => context.push('/equipment/new'),
           ),
         );
       } else {
@@ -93,7 +93,7 @@ class GaugeStrip extends ConsumerWidget {
               icon: Icons.build_outlined,
               label: label,
               tone: tone,
-              onTap: () => context.go('/gear'),
+              onTap: () => context.go('/equipment'),
             ),
           );
         }
