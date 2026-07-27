@@ -386,6 +386,83 @@ void main() {
         verifyNever(mockMediaRepository.createMedia(any));
       });
 
+      // Each lookup only feeds one branch of the dedupe filter, so querying
+      // both on every import does dead work: a mobile selection never has a
+      // path to compare, and a desktop selection never has a gallery id.
+      test('skips the path lookup when no asset carries a path', () async {
+        when(
+          mockMediaRepository.getLinkedAssetIdsForDive('dive-1'),
+        ).thenAnswer((_) async => <String>{});
+        when(mockMediaRepository.createMedia(any)).thenAnswer(
+          (_) async =>
+              _savedMediaItem(id: 'm1', diveId: 'dive-1', platformAssetId: 'a'),
+        );
+
+        await service.importPhotosForDive(
+          selectedAssets: [_testAsset('asset-1')],
+          dive: testDive,
+        );
+
+        verifyNever(mockMediaRepository.getLinkedLocalPathsForDive(any));
+        verify(
+          mockMediaRepository.getLinkedAssetIdsForDive('dive-1'),
+        ).called(1);
+      });
+
+      test(
+        'skips the asset-id lookup when every asset carries a path',
+        () async {
+          when(
+            mockMediaRepository.getLinkedLocalPathsForDive('dive-1'),
+          ).thenAnswer((_) async => <String>{});
+          when(mockMediaRepository.createMedia(any)).thenAnswer(
+            (_) async => _savedMediaItem(
+              id: 'm1',
+              diveId: 'dive-1',
+              platformAssetId: '',
+            ),
+          );
+
+          await service.importPhotosForDive(
+            selectedAssets: [_testAsset('1_2', filePath: '/photos/a.jpg')],
+            dive: testDive,
+          );
+
+          verifyNever(mockMediaRepository.getLinkedAssetIdsForDive(any));
+          verify(
+            mockMediaRepository.getLinkedLocalPathsForDive('dive-1'),
+          ).called(1);
+        },
+      );
+
+      test('queries both lookups for a mixed selection', () async {
+        when(
+          mockMediaRepository.getLinkedAssetIdsForDive('dive-1'),
+        ).thenAnswer((_) async => <String>{});
+        when(
+          mockMediaRepository.getLinkedLocalPathsForDive('dive-1'),
+        ).thenAnswer((_) async => <String>{});
+        when(mockMediaRepository.createMedia(any)).thenAnswer(
+          (_) async =>
+              _savedMediaItem(id: 'm1', diveId: 'dive-1', platformAssetId: ''),
+        );
+
+        await service.importPhotosForDive(
+          selectedAssets: [
+            _testAsset('asset-1'),
+            _testAsset('1_2', filePath: '/photos/a.jpg'),
+          ],
+          dive: testDive,
+        );
+
+        verify(
+          mockMediaRepository.getLinkedAssetIdsForDive('dive-1'),
+        ).called(1);
+        verify(
+          mockMediaRepository.getLinkedLocalPathsForDive('dive-1'),
+        ).called(1);
+      });
+
       test('imports a file whose path is not yet linked', () async {
         final assets = [_testAsset('1_2', filePath: '/photos/a.jpg')];
 

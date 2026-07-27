@@ -112,21 +112,29 @@ class MediaImportService {
       'Starting import of ${selectedAssets.length} assets for dive ${dive.id}',
     );
 
-    // Fetch already-linked asset IDs for this dive
-    final existingAssetIds = await _mediaRepository.getLinkedAssetIdsForDive(
-      dive.id,
-    );
-    // Desktop picks are persisted as localFile rows with a null
-    // platform_asset_id (see [_createMediaItemFromAsset]), so the asset-id set
-    // above cannot see them; dedupe those on the path instead.
-    final existingPaths = await _mediaRepository.getLinkedLocalPathsForDive(
-      dive.id,
-    );
+    // Two dedupe keys, one per origin. Gallery picks are matched on their
+    // platform asset id; desktop picks are localFile rows with a null
+    // platform_asset_id (see [_createMediaItemFromAsset]), invisible to that
+    // query, so they are matched on the path instead.
+    //
+    // Each lookup only feeds one branch of the filter below, so query a
+    // lookup only when the selection actually contains that kind of asset:
+    // a mobile pick has no paths to compare and a desktop pick has no
+    // gallery ids, and either way the unused set would be dead work.
+    bool hasPath(AssetInfo a) => a.filePath != null && a.filePath!.isNotEmpty;
+    final anyPaths = selectedAssets.any(hasPath);
+    final anyGallery = selectedAssets.any((a) => !hasPath(a));
+
+    final existingAssetIds = anyGallery
+        ? await _mediaRepository.getLinkedAssetIdsForDive(dive.id)
+        : const <String>{};
+    final existingPaths = anyPaths
+        ? await _mediaRepository.getLinkedLocalPathsForDive(dive.id)
+        : const <String>{};
 
     // Filter out duplicates before processing
     final newAssets = selectedAssets.where((a) {
-      final path = a.filePath;
-      if (path != null && path.isNotEmpty) return !existingPaths.contains(path);
+      if (hasPath(a)) return !existingPaths.contains(a.filePath);
       return !existingAssetIds.contains(a.id);
     }).toList();
     final skippedCount = selectedAssets.length - newAssets.length;
