@@ -51,6 +51,68 @@
   },
   "equipment_setDetail_geofencesTitle": "Geofences",
   "equipment_setDetail_noGeofences": "No geofences",
+  "gasCalculators_bestMix_densityCritical": "Above the {limit} g/L hard density ceiling.",
+  "@gasCalculators_bestMix_densityCritical": {
+    "placeholders": {
+      "limit": {
+        "type": "Object"
+      }
+    }
+  },
+  "gasCalculators_bestMix_densityLabel": "Gas density at depth",
+  "gasCalculators_bestMix_densityWarn": "Above the recommended {limit} g/L density limit.",
+  "@gasCalculators_bestMix_densityWarn": {
+    "placeholders": {
+      "limit": {
+        "type": "Object"
+      }
+    }
+  },
+  "gasCalculators_bestMix_endExceeded": "END exceeds your {limit} limit.",
+  "@gasCalculators_bestMix_endExceeded": {
+    "placeholders": {
+      "limit": {
+        "type": "Object"
+      }
+    }
+  },
+  "gasCalculators_bestMix_endLabel": "END at depth",
+  "gasCalculators_bestMix_endLimitLabel": "END limit",
+  "gasCalculators_bestMix_heliumAdded": "Helium added to keep END within your {limit} limit.",
+  "@gasCalculators_bestMix_heliumAdded": {
+    "placeholders": {
+      "limit": {
+        "type": "Object"
+      }
+    }
+  },
+  "gasCalculators_bestMix_idealLabel": "Ideal fraction",
+  "gasCalculators_bestMix_marginLabel": "Margin below MOD",
+  "gasCalculators_bestMix_modLabel": "MOD at ppO2 {ppO2}",
+  "@gasCalculators_bestMix_modLabel": {
+    "placeholders": {
+      "ppO2": {
+        "type": "Object"
+      }
+    }
+  },
+  "gasCalculators_bestMix_nearestStandard": "Nearest standard mix covering this depth",
+  "gasCalculators_bestMix_recommendedMix": "Recommended mix",
+  "gasCalculators_bestMix_withoutHelium": "Without helium",
+  "gasCalculators_planningCaveat": "Planning estimate. Assumes a direct ascent. Verify against your training and add margin for conditions.",
+  "gasCalculators_rockBottom_solveGas": "Problem-solving gas at {depth}{unit}",
+  "@gasCalculators_rockBottom_solveGas": {
+    "placeholders": {
+      "depth": {
+        "type": "Object"
+      },
+      "unit": {
+        "type": "Object"
+      }
+    }
+  },
+  "gasCalculators_rockBottom_solveTime": "Problem-solving time",
+  "gasCalculators_rockBottom_solveTimeHint": "Time spent at depth resolving the emergency before starting the ascent.",
   "trips_story_dayLabel": "Day {number}",
   "@trips_story_dayLabel": {
     "placeholders": {

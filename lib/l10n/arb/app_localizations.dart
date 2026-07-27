@@ -260,6 +260,108 @@ abstract class AppLocalizations {
   /// **'No geofences'**
   String get equipment_setDetail_noGeofences;
 
+  /// No description provided for @gasCalculators_bestMix_densityCritical.
+  ///
+  /// In en, this message translates to:
+  /// **'Above the {limit} g/L hard density ceiling.'**
+  String gasCalculators_bestMix_densityCritical(Object limit);
+
+  /// No description provided for @gasCalculators_bestMix_densityLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Gas density at depth'**
+  String get gasCalculators_bestMix_densityLabel;
+
+  /// No description provided for @gasCalculators_bestMix_densityWarn.
+  ///
+  /// In en, this message translates to:
+  /// **'Above the recommended {limit} g/L density limit.'**
+  String gasCalculators_bestMix_densityWarn(Object limit);
+
+  /// No description provided for @gasCalculators_bestMix_endExceeded.
+  ///
+  /// In en, this message translates to:
+  /// **'END exceeds your {limit} limit.'**
+  String gasCalculators_bestMix_endExceeded(Object limit);
+
+  /// No description provided for @gasCalculators_bestMix_endLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'END at depth'**
+  String get gasCalculators_bestMix_endLabel;
+
+  /// No description provided for @gasCalculators_bestMix_endLimitLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'END limit'**
+  String get gasCalculators_bestMix_endLimitLabel;
+
+  /// No description provided for @gasCalculators_bestMix_heliumAdded.
+  ///
+  /// In en, this message translates to:
+  /// **'Helium added to keep END within your {limit} limit.'**
+  String gasCalculators_bestMix_heliumAdded(Object limit);
+
+  /// No description provided for @gasCalculators_bestMix_idealLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Ideal fraction'**
+  String get gasCalculators_bestMix_idealLabel;
+
+  /// No description provided for @gasCalculators_bestMix_marginLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Margin below MOD'**
+  String get gasCalculators_bestMix_marginLabel;
+
+  /// No description provided for @gasCalculators_bestMix_modLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'MOD at ppO2 {ppO2}'**
+  String gasCalculators_bestMix_modLabel(Object ppO2);
+
+  /// No description provided for @gasCalculators_bestMix_nearestStandard.
+  ///
+  /// In en, this message translates to:
+  /// **'Nearest standard mix covering this depth'**
+  String get gasCalculators_bestMix_nearestStandard;
+
+  /// No description provided for @gasCalculators_bestMix_recommendedMix.
+  ///
+  /// In en, this message translates to:
+  /// **'Recommended mix'**
+  String get gasCalculators_bestMix_recommendedMix;
+
+  /// No description provided for @gasCalculators_bestMix_withoutHelium.
+  ///
+  /// In en, this message translates to:
+  /// **'Without helium'**
+  String get gasCalculators_bestMix_withoutHelium;
+
+  /// No description provided for @gasCalculators_planningCaveat.
+  ///
+  /// In en, this message translates to:
+  /// **'Planning estimate. Assumes a direct ascent. Verify against your training and add margin for conditions.'**
+  String get gasCalculators_planningCaveat;
+
+  /// No description provided for @gasCalculators_rockBottom_solveGas.
+  ///
+  /// In en, this message translates to:
+  /// **'Problem-solving gas at {depth}{unit}'**
+  String gasCalculators_rockBottom_solveGas(Object depth, Object unit);
+
+  /// No description provided for @gasCalculators_rockBottom_solveTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Problem-solving time'**
+  String get gasCalculators_rockBottom_solveTime;
+
+  /// No description provided for @gasCalculators_rockBottom_solveTimeHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Time spent at depth resolving the emergency before starting the ascent.'**
+  String get gasCalculators_rockBottom_solveTimeHint;
+
   /// No description provided for @trips_story_dayLabel.
   ///
   /// In en, this message translates to:

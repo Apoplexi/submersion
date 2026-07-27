@@ -91,6 +91,72 @@ class AppLocalizationsPt extends AppLocalizations {
   String get equipment_setDetail_noGeofences => 'Sem geocercas';
 
   @override
+  String gasCalculators_bestMix_densityCritical(Object limit) {
+    return 'Above the $limit g/L hard density ceiling.';
+  }
+
+  @override
+  String get gasCalculators_bestMix_densityLabel => 'Gas density at depth';
+
+  @override
+  String gasCalculators_bestMix_densityWarn(Object limit) {
+    return 'Above the recommended $limit g/L density limit.';
+  }
+
+  @override
+  String gasCalculators_bestMix_endExceeded(Object limit) {
+    return 'END exceeds your $limit limit.';
+  }
+
+  @override
+  String get gasCalculators_bestMix_endLabel => 'END at depth';
+
+  @override
+  String get gasCalculators_bestMix_endLimitLabel => 'END limit';
+
+  @override
+  String gasCalculators_bestMix_heliumAdded(Object limit) {
+    return 'Helium added to keep END within your $limit limit.';
+  }
+
+  @override
+  String get gasCalculators_bestMix_idealLabel => 'Ideal fraction';
+
+  @override
+  String get gasCalculators_bestMix_marginLabel => 'Margin below MOD';
+
+  @override
+  String gasCalculators_bestMix_modLabel(Object ppO2) {
+    return 'MOD at ppO2 $ppO2';
+  }
+
+  @override
+  String get gasCalculators_bestMix_nearestStandard =>
+      'Nearest standard mix covering this depth';
+
+  @override
+  String get gasCalculators_bestMix_recommendedMix => 'Recommended mix';
+
+  @override
+  String get gasCalculators_bestMix_withoutHelium => 'Without helium';
+
+  @override
+  String get gasCalculators_planningCaveat =>
+      'Planning estimate. Assumes a direct ascent. Verify against your training and add margin for conditions.';
+
+  @override
+  String gasCalculators_rockBottom_solveGas(Object depth, Object unit) {
+    return 'Problem-solving gas at $depth$unit';
+  }
+
+  @override
+  String get gasCalculators_rockBottom_solveTime => 'Problem-solving time';
+
+  @override
+  String get gasCalculators_rockBottom_solveTimeHint =>
+      'Time spent at depth resolving the emergency before starting the ascent.';
+
+  @override
   String trips_story_dayLabel(int number) {
     return 'Dia $number';
   }
