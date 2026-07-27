@@ -91,6 +91,21 @@ class AppLocalizationsNl extends AppLocalizations {
   String get equipment_setDetail_noGeofences => 'Geen geofences';
 
   @override
+  String formatter_duration_minutes(Object minutes) {
+    return '${minutes}m';
+  }
+
+  @override
+  String formatter_duration_minutesSeconds(Object minutes, Object seconds) {
+    return '${minutes}m ${seconds}s';
+  }
+
+  @override
+  String formatter_duration_seconds(Object seconds) {
+    return '${seconds}s';
+  }
+
+  @override
   String gasCalculators_bestMix_densityCritical(Object limit) {
     return 'Above the $limit g/L hard density ceiling.';
   }
@@ -155,6 +170,50 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get gasCalculators_rockBottom_solveTimeHint =>
       'Time spent at depth resolving the emergency before starting the ascent.';
+
+  @override
+  String o2Toxicity_addedThisDive(Object value) {
+    return '+$value this dive';
+  }
+
+  @override
+  String o2Toxicity_cnsProgressSemantics(Object percent) {
+    return 'CNS progress $percent percent';
+  }
+
+  @override
+  String get o2Toxicity_daily => 'Daily';
+
+  @override
+  String o2Toxicity_otuSemantics(
+    Object label,
+    Object value,
+    Object limit,
+    Object percent,
+  ) {
+    return '$label: $value of $limit OTU, $percent percent';
+  }
+
+  @override
+  String o2Toxicity_otuValueSemantics(Object label, Object value) {
+    return '$label: $value OTU';
+  }
+
+  @override
+  String o2Toxicity_prior(Object value) {
+    return 'Prior: $value OTU';
+  }
+
+  @override
+  String o2Toxicity_start(Object value) {
+    return 'Start: $value OTU';
+  }
+
+  @override
+  String get o2Toxicity_thisDive => 'This Dive';
+
+  @override
+  String get o2Toxicity_weekly => 'Weekly';
 
   @override
   String trips_story_dayLabel(int number) {

@@ -51,6 +51,33 @@
   },
   "equipment_setDetail_geofencesTitle": "Geofences",
   "equipment_setDetail_noGeofences": "No geofences",
+  "formatter_duration_minutes": "{minutes}m",
+  "@formatter_duration_minutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "Object"
+      }
+    }
+  },
+  "formatter_duration_minutesSeconds": "{minutes}m {seconds}s",
+  "@formatter_duration_minutesSeconds": {
+    "placeholders": {
+      "minutes": {
+        "type": "Object"
+      },
+      "seconds": {
+        "type": "Object"
+      }
+    }
+  },
+  "formatter_duration_seconds": "{seconds}s",
+  "@formatter_duration_seconds": {
+    "placeholders": {
+      "seconds": {
+        "type": "Object"
+      }
+    }
+  },
   "gasCalculators_bestMix_densityCritical": "Above the {limit} g/L hard density ceiling.",
   "@gasCalculators_bestMix_densityCritical": {
     "placeholders": {
@@ -113,6 +140,69 @@
   },
   "gasCalculators_rockBottom_solveTime": "Problem-solving time",
   "gasCalculators_rockBottom_solveTimeHint": "Time spent at depth resolving the emergency before starting the ascent.",
+  "o2Toxicity_addedThisDive": "+{value} this dive",
+  "@o2Toxicity_addedThisDive": {
+    "placeholders": {
+      "value": {
+        "type": "Object"
+      }
+    }
+  },
+  "o2Toxicity_cnsProgressSemantics": "CNS progress {percent} percent",
+  "@o2Toxicity_cnsProgressSemantics": {
+    "placeholders": {
+      "percent": {
+        "type": "Object"
+      }
+    }
+  },
+  "o2Toxicity_daily": "Daily",
+  "o2Toxicity_otuSemantics": "{label}: {value} of {limit} OTU, {percent} percent",
+  "@o2Toxicity_otuSemantics": {
+    "placeholders": {
+      "label": {
+        "type": "Object"
+      },
+      "value": {
+        "type": "Object"
+      },
+      "limit": {
+        "type": "Object"
+      },
+      "percent": {
+        "type": "Object"
+      }
+    }
+  },
+  "o2Toxicity_otuValueSemantics": "{label}: {value} OTU",
+  "@o2Toxicity_otuValueSemantics": {
+    "placeholders": {
+      "label": {
+        "type": "Object"
+      },
+      "value": {
+        "type": "Object"
+      }
+    }
+  },
+  "o2Toxicity_prior": "Prior: {value} OTU",
+  "@o2Toxicity_prior": {
+    "placeholders": {
+      "value": {
+        "type": "Object"
+      }
+    }
+  },
+  "o2Toxicity_start": "Start: {value} OTU",
+  "@o2Toxicity_start": {
+    "placeholders": {
+      "value": {
+        "type": "Object"
+      }
+    }
+  },
+  "o2Toxicity_thisDive": "This Dive",
+  "o2Toxicity_weekly": "Weekly",
   "trips_story_dayLabel": "Day {number}",
   "@trips_story_dayLabel": {
     "placeholders": {

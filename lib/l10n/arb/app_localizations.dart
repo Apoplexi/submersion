@@ -260,6 +260,24 @@ abstract class AppLocalizations {
   /// **'No geofences'**
   String get equipment_setDetail_noGeofences;
 
+  /// No description provided for @formatter_duration_minutes.
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes}m'**
+  String formatter_duration_minutes(Object minutes);
+
+  /// No description provided for @formatter_duration_minutesSeconds.
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes}m {seconds}s'**
+  String formatter_duration_minutesSeconds(Object minutes, Object seconds);
+
+  /// No description provided for @formatter_duration_seconds.
+  ///
+  /// In en, this message translates to:
+  /// **'{seconds}s'**
+  String formatter_duration_seconds(Object seconds);
+
   /// No description provided for @gasCalculators_bestMix_densityCritical.
   ///
   /// In en, this message translates to:
@@ -361,6 +379,65 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Time spent at depth resolving the emergency before starting the ascent.'**
   String get gasCalculators_rockBottom_solveTimeHint;
+
+  /// No description provided for @o2Toxicity_addedThisDive.
+  ///
+  /// In en, this message translates to:
+  /// **'+{value} this dive'**
+  String o2Toxicity_addedThisDive(Object value);
+
+  /// No description provided for @o2Toxicity_cnsProgressSemantics.
+  ///
+  /// In en, this message translates to:
+  /// **'CNS progress {percent} percent'**
+  String o2Toxicity_cnsProgressSemantics(Object percent);
+
+  /// No description provided for @o2Toxicity_daily.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily'**
+  String get o2Toxicity_daily;
+
+  /// No description provided for @o2Toxicity_otuSemantics.
+  ///
+  /// In en, this message translates to:
+  /// **'{label}: {value} of {limit} OTU, {percent} percent'**
+  String o2Toxicity_otuSemantics(
+    Object label,
+    Object value,
+    Object limit,
+    Object percent,
+  );
+
+  /// No description provided for @o2Toxicity_otuValueSemantics.
+  ///
+  /// In en, this message translates to:
+  /// **'{label}: {value} OTU'**
+  String o2Toxicity_otuValueSemantics(Object label, Object value);
+
+  /// No description provided for @o2Toxicity_prior.
+  ///
+  /// In en, this message translates to:
+  /// **'Prior: {value} OTU'**
+  String o2Toxicity_prior(Object value);
+
+  /// No description provided for @o2Toxicity_start.
+  ///
+  /// In en, this message translates to:
+  /// **'Start: {value} OTU'**
+  String o2Toxicity_start(Object value);
+
+  /// No description provided for @o2Toxicity_thisDive.
+  ///
+  /// In en, this message translates to:
+  /// **'This Dive'**
+  String get o2Toxicity_thisDive;
+
+  /// No description provided for @o2Toxicity_weekly.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekly'**
+  String get o2Toxicity_weekly;
 
   /// No description provided for @trips_story_dayLabel.
   ///
