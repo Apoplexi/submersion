@@ -1006,6 +1006,7 @@ class DiveRepository {
               precipitation: Value(dive.precipitation?.name),
               humidity: Value(dive.humidity),
               weatherDescription: Value(dive.weatherDescription),
+              weatherCode: Value(dive.weatherCode),
               weatherSource: Value(dive.weatherSource?.name),
               weatherFetchedAt: Value(
                 dive.weatherFetchedAt != null
@@ -1247,6 +1248,7 @@ class DiveRepository {
           precipitation: Value(dive.precipitation?.name),
           humidity: Value(dive.humidity),
           weatherDescription: Value(dive.weatherDescription),
+          weatherCode: Value(dive.weatherCode),
           weatherSource: Value(dive.weatherSource?.name),
           weatherFetchedAt: Value(
             dive.weatherFetchedAt != null
@@ -2996,6 +2998,7 @@ class DiveRepository {
           : null,
       humidity: row.humidity,
       weatherDescription: row.weatherDescription,
+      weatherCode: row.weatherCode,
       weatherSource: row.weatherSource != null
           ? WeatherSource.values.firstWhere(
               (w) => w.name == row.weatherSource,
@@ -3367,6 +3370,7 @@ class DiveRepository {
           : null,
       humidity: row.humidity,
       weatherDescription: row.weatherDescription,
+      weatherCode: row.weatherCode,
       weatherSource: row.weatherSource != null
           ? WeatherSource.values.firstWhere(
               (w) => w.name == row.weatherSource,
