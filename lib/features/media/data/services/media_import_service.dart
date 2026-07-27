@@ -174,12 +174,28 @@ class MediaImportService {
   MediaItem _createMediaItemFromAsset(AssetInfo asset, String diveId) {
     final now = DateTime.now();
 
+    // Windows / Linux have no platform photo library: the picker opens a file
+    // dialog and the asset's id is a synthetic key into an in-memory map on
+    // the picker service. Persisting such a row with the default
+    // platformGallery sourceType left every path column blank and sent
+    // display through PlatformGalleryResolver -> photo_manager, which has no
+    // desktop-Windows backend, so the photo rendered "File not found" and the
+    // pointer died with the process. When the picker hands us a real path,
+    // store a localFile row instead: LocalFileResolver reads localPath
+    // straight off disk on every desktop platform and survives a restart.
+    final path = asset.filePath;
+    final isLocalFile = path != null && path.isNotEmpty;
+
     return MediaItem(
       id: '',
       diveId: diveId,
       platformAssetId: asset.id,
       originalFilename: asset.filename,
       mediaType: asset.isVideo ? MediaType.video : MediaType.photo,
+      sourceType: isLocalFile
+          ? MediaSourceType.localFile
+          : MediaSourceType.platformGallery,
+      localPath: isLocalFile ? path : null,
       latitude: asset.latitude,
       longitude: asset.longitude,
       takenAt: asset.createDateTime,
