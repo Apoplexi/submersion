@@ -12,9 +12,12 @@ import 'package:submersion/features/media/presentation/widgets/file_review_card.
 /// matched-dive group and an "Unmatched" group at the bottom (only when
 /// non-empty). Each group's children are [FileReviewCard]s.
 ///
-/// Stateless because all mutation flows through
-/// [filesTabNotifierProvider]; the pane just renders the current
-/// [FilesTabState] passed in by the parent.
+/// Holds no state of its own: the current [FilesTabState] is passed in by the
+/// parent, and the pane's own actions -- the Unmatched group's bulk
+/// "add all to this dive", plus each [FileReviewCard]'s assign and remove --
+/// are dispatched to [filesTabNotifierProvider], which owns every mutation.
+/// It is a [ConsumerWidget] rather than a [StatelessWidget] only to reach
+/// that notifier.
 class FileReviewPane extends ConsumerWidget {
   final FilesTabState state;
 
