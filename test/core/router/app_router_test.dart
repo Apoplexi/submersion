@@ -593,8 +593,8 @@ void main() {
     });
 
     test('static sub-routes still win over the :planId sibling', () {
-      // Precedence guard: 'compare' / 'chart' / 'no-fly' remain children of
-      // divePlanner and must resolve before the dynamic sibling.
+      // Precedence guard: 'compare' / 'chart' remain children of divePlanner
+      // and must resolve before the dynamic sibling.
       expect(
         router.configuration
             .findMatch(Uri.parse('/planning/dive-planner/compare?ids=a,b'))
@@ -607,6 +607,26 @@ void main() {
             .fullPath,
         '/planning/dive-planner/chart',
       );
+    });
+
+    test('no-fly is a direct child of /planning (matches the hub tile)', () {
+      // Regression: the "Flying after diving" hub tile navigates to
+      // '/planning/no-fly'. The route used to live under 'dive-planner'
+      // (so its real path was '/planning/dive-planner/no-fly'), leaving the
+      // tile's target unmatched and throwing "no routes for location".
+      expect(
+        router.configuration.findMatch(Uri.parse('/planning/no-fly')).fullPath,
+        '/planning/no-fly',
+      );
+
+      final noFly = _findRouteByName(router.configuration.routes, 'noFly');
+      expect(noFly, isNotNull);
+      final divePlanner = _findRouteByName(
+        router.configuration.routes,
+        'divePlanner',
+      );
+      final nestedNames = _collectRouteNames(divePlanner!.routes);
+      expect(nestedNames, isNot(contains('noFly')));
     });
 
     testWidgets(

@@ -245,11 +245,6 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                     builder: (context, state) =>
                         const PlanChartFullscreenPage(),
                   ),
-                  GoRoute(
-                    path: 'no-fly',
-                    name: 'noFly',
-                    builder: (context, state) => const NoFlyPage(),
-                  ),
                 ],
               ),
               // Editing a saved plan is a SIBLING of the new-plan canvas, not a
@@ -258,7 +253,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
               // both read the same shared divePlanNotifierProvider, the first
               // Back press only revealed the identical parent canvas, forcing a
               // second press. Declared after the divePlanner subtree so its
-              // static children (compare/chart/no-fly) still win route matching.
+              // static children (compare/chart) still win route matching.
               GoRoute(
                 path: 'dive-planner/:planId',
                 name: 'editPlan',
@@ -284,6 +279,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                 path: 'surface-interval',
                 name: 'surfaceInterval',
                 builder: (context, state) => const SurfaceIntervalToolPage(),
+              ),
+              GoRoute(
+                path: 'no-fly',
+                name: 'noFly',
+                builder: (context, state) => const NoFlyPage(),
               ),
               // GPS Logger moved to top-level /gps-log; keep old deep
               // links working.
