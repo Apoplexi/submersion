@@ -23,7 +23,7 @@ BestMixResult _at(
 
 void main() {
   group('computeBestMix at 111 ft (the reported regression)', () {
-    final depth = 111 / _feetPerMeter;
+    const depth = 111 / _feetPerMeter;
     final r = _at(depth);
 
     test('ideal fraction is 31.94 percent', () {
