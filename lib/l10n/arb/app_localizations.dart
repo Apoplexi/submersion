@@ -14059,6 +14059,12 @@ abstract class AppLocalizations {
   /// **'Import'**
   String get diveSites_list_menu_import;
 
+  /// No description provided for @diveSites_list_menu_select.
+  ///
+  /// In en, this message translates to:
+  /// **'Select sites'**
+  String get diveSites_list_menu_select;
+
   /// No description provided for @diveSites_list_search_backTooltip.
   ///
   /// In en, this message translates to:

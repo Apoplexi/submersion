@@ -8100,6 +8100,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get diveSites_list_menu_import => 'ייבא';
 
   @override
+  String get diveSites_list_menu_select => 'Select sites';
+
+  @override
   String get diveSites_list_search_backTooltip => 'חזרה';
 
   @override

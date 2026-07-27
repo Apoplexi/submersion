@@ -8341,6 +8341,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get diveSites_list_menu_import => 'Importer';
 
   @override
+  String get diveSites_list_menu_select => 'Select sites';
+
+  @override
   String get diveSites_list_search_backTooltip => 'Retour';
 
   @override

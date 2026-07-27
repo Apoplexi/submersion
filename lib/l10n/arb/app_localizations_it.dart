@@ -8308,6 +8308,9 @@ class AppLocalizationsIt extends AppLocalizations {
   String get diveSites_list_menu_import => 'Importa';
 
   @override
+  String get diveSites_list_menu_select => 'Select sites';
+
+  @override
   String get diveSites_list_search_backTooltip => 'Indietro';
 
   @override

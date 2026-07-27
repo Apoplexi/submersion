@@ -7910,6 +7910,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get diveSites_list_menu_import => '导入';
 
   @override
+  String get diveSites_list_menu_select => 'Select sites';
+
+  @override
   String get diveSites_list_search_backTooltip => '返回';
 
   @override

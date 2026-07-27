@@ -4553,6 +4553,7 @@
   "diveSites_list_error_loadingSites": "Error loading sites: {error}",
   "diveSites_list_error_retry": "Retry",
   "diveSites_list_menu_import": "Import",
+  "diveSites_list_menu_select": "Select sites",
   "diveSites_list_search_backTooltip": "Back",
   "diveSites_list_search_clearTooltip": "Clear Search",
   "diveSites_list_search_emptyHint": "Search by site name, country, or region",
