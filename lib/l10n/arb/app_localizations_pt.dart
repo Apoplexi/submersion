@@ -18148,6 +18148,71 @@ class AppLocalizationsPt extends AppLocalizations {
       'Fechar assistente de importação';
 
   @override
+  String weather_windFromDirection(Object wind, Object direction) {
+    return '$wind from $direction';
+  }
+
+  @override
+  String get weather_wind_calm => 'calm';
+
+  @override
+  String get weather_wind_highWind => 'high wind';
+
+  @override
+  String get weather_wind_lightBreeze => 'light breeze';
+
+  @override
+  String get weather_wind_moderateBreeze => 'moderate breeze';
+
+  @override
+  String get weather_wind_strongBreeze => 'strong breeze';
+
+  @override
+  String get weather_wmo_clear => 'Clear sky';
+
+  @override
+  String get weather_wmo_drizzle => 'Drizzle';
+
+  @override
+  String get weather_wmo_fog => 'Fog';
+
+  @override
+  String get weather_wmo_freezingDrizzle => 'Freezing drizzle';
+
+  @override
+  String get weather_wmo_freezingRain => 'Freezing rain';
+
+  @override
+  String get weather_wmo_mainlyClear => 'Mainly clear';
+
+  @override
+  String get weather_wmo_overcast => 'Overcast';
+
+  @override
+  String get weather_wmo_partlyCloudy => 'Partly cloudy';
+
+  @override
+  String get weather_wmo_rain => 'Rain';
+
+  @override
+  String get weather_wmo_rainShowers => 'Rain showers';
+
+  @override
+  String get weather_wmo_snow => 'Snow';
+
+  @override
+  String get weather_wmo_snowGrains => 'Snow grains';
+
+  @override
+  String get weather_wmo_snowShowers => 'Snow showers';
+
+  @override
+  String get weather_wmo_thunderstorm => 'Thunderstorm';
+
+  @override
+  String get weather_wmo_thunderstormHail => 'Thunderstorm with hail';
+
+  @override
   String weightCalc_baseLine(Object suitType, Object weight) {
     return 'Base ($suitType): $weight kg';
   }

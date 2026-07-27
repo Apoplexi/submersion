@@ -30477,6 +30477,132 @@ abstract class AppLocalizations {
   /// **'Close import wizard'**
   String get universalImport_tooltip_closeWizard;
 
+  /// No description provided for @weather_windFromDirection.
+  ///
+  /// In en, this message translates to:
+  /// **'{wind} from {direction}'**
+  String weather_windFromDirection(Object wind, Object direction);
+
+  /// No description provided for @weather_wind_calm.
+  ///
+  /// In en, this message translates to:
+  /// **'calm'**
+  String get weather_wind_calm;
+
+  /// No description provided for @weather_wind_highWind.
+  ///
+  /// In en, this message translates to:
+  /// **'high wind'**
+  String get weather_wind_highWind;
+
+  /// No description provided for @weather_wind_lightBreeze.
+  ///
+  /// In en, this message translates to:
+  /// **'light breeze'**
+  String get weather_wind_lightBreeze;
+
+  /// No description provided for @weather_wind_moderateBreeze.
+  ///
+  /// In en, this message translates to:
+  /// **'moderate breeze'**
+  String get weather_wind_moderateBreeze;
+
+  /// No description provided for @weather_wind_strongBreeze.
+  ///
+  /// In en, this message translates to:
+  /// **'strong breeze'**
+  String get weather_wind_strongBreeze;
+
+  /// No description provided for @weather_wmo_clear.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear sky'**
+  String get weather_wmo_clear;
+
+  /// No description provided for @weather_wmo_drizzle.
+  ///
+  /// In en, this message translates to:
+  /// **'Drizzle'**
+  String get weather_wmo_drizzle;
+
+  /// No description provided for @weather_wmo_fog.
+  ///
+  /// In en, this message translates to:
+  /// **'Fog'**
+  String get weather_wmo_fog;
+
+  /// No description provided for @weather_wmo_freezingDrizzle.
+  ///
+  /// In en, this message translates to:
+  /// **'Freezing drizzle'**
+  String get weather_wmo_freezingDrizzle;
+
+  /// No description provided for @weather_wmo_freezingRain.
+  ///
+  /// In en, this message translates to:
+  /// **'Freezing rain'**
+  String get weather_wmo_freezingRain;
+
+  /// No description provided for @weather_wmo_mainlyClear.
+  ///
+  /// In en, this message translates to:
+  /// **'Mainly clear'**
+  String get weather_wmo_mainlyClear;
+
+  /// No description provided for @weather_wmo_overcast.
+  ///
+  /// In en, this message translates to:
+  /// **'Overcast'**
+  String get weather_wmo_overcast;
+
+  /// No description provided for @weather_wmo_partlyCloudy.
+  ///
+  /// In en, this message translates to:
+  /// **'Partly cloudy'**
+  String get weather_wmo_partlyCloudy;
+
+  /// No description provided for @weather_wmo_rain.
+  ///
+  /// In en, this message translates to:
+  /// **'Rain'**
+  String get weather_wmo_rain;
+
+  /// No description provided for @weather_wmo_rainShowers.
+  ///
+  /// In en, this message translates to:
+  /// **'Rain showers'**
+  String get weather_wmo_rainShowers;
+
+  /// No description provided for @weather_wmo_snow.
+  ///
+  /// In en, this message translates to:
+  /// **'Snow'**
+  String get weather_wmo_snow;
+
+  /// No description provided for @weather_wmo_snowGrains.
+  ///
+  /// In en, this message translates to:
+  /// **'Snow grains'**
+  String get weather_wmo_snowGrains;
+
+  /// No description provided for @weather_wmo_snowShowers.
+  ///
+  /// In en, this message translates to:
+  /// **'Snow showers'**
+  String get weather_wmo_snowShowers;
+
+  /// No description provided for @weather_wmo_thunderstorm.
+  ///
+  /// In en, this message translates to:
+  /// **'Thunderstorm'**
+  String get weather_wmo_thunderstorm;
+
+  /// No description provided for @weather_wmo_thunderstormHail.
+  ///
+  /// In en, this message translates to:
+  /// **'Thunderstorm with hail'**
+  String get weather_wmo_thunderstormHail;
+
   /// Base weight line in calculation breakdown
   ///
   /// In en, this message translates to:

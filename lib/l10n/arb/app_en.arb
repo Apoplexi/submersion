@@ -10903,6 +10903,37 @@
   "@universalImport_tooltip_closeWizard": {
     "description": "Tooltip for the close button on the import wizard app bar"
   },
+  "weather_windFromDirection": "{wind} from {direction}",
+  "@weather_windFromDirection": {
+    "placeholders": {
+      "wind": {
+        "type": "Object"
+      },
+      "direction": {
+        "type": "Object"
+      }
+    }
+  },
+  "weather_wind_calm": "calm",
+  "weather_wind_highWind": "high wind",
+  "weather_wind_lightBreeze": "light breeze",
+  "weather_wind_moderateBreeze": "moderate breeze",
+  "weather_wind_strongBreeze": "strong breeze",
+  "weather_wmo_clear": "Clear sky",
+  "weather_wmo_drizzle": "Drizzle",
+  "weather_wmo_fog": "Fog",
+  "weather_wmo_freezingDrizzle": "Freezing drizzle",
+  "weather_wmo_freezingRain": "Freezing rain",
+  "weather_wmo_mainlyClear": "Mainly clear",
+  "weather_wmo_overcast": "Overcast",
+  "weather_wmo_partlyCloudy": "Partly cloudy",
+  "weather_wmo_rain": "Rain",
+  "weather_wmo_rainShowers": "Rain showers",
+  "weather_wmo_snow": "Snow",
+  "weather_wmo_snowGrains": "Snow grains",
+  "weather_wmo_snowShowers": "Snow showers",
+  "weather_wmo_thunderstorm": "Thunderstorm",
+  "weather_wmo_thunderstormHail": "Thunderstorm with hail",
   "weightCalc_baseLine": "Base ({suitType}): {weight} kg",
   "weightCalc_bodyWeightAdjustment": "Body weight adjustment: +{adjustment} kg",
   "weightCalc_suit_drysuit": "Drysuit",
