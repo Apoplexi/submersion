@@ -1,0 +1,200 @@
+name: Beta
+
+# Per-merge beta pipeline (release-channels spec, Phase 2). Runs after CI/CD
+# succeeds on main, builds the exact validated SHA via build-all.yml, and
+# publishes the artifact set as a release in submersion-app/beta-builds.
+# Store lanes (TestFlight / Play beta track) are Phase 4 and not wired here.
+on:
+  workflow_run:
+    workflows: ["CI/CD"]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      skip-publish:
+        description: 'Build only; do not publish to beta-builds'
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: beta-pipeline
+  cancel-in-progress: true
+
+jobs:
+  precheck:
+    name: Compute version and gate
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    outputs:
+      proceed: ${{ steps.gate.outputs.proceed }}
+      tag: ${{ steps.version.outputs.tag }}
+      build-number: ${{ steps.version.outputs.build-number }}
+      sha: ${{ steps.version.outputs.sha }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+          fetch-depth: 0
+
+      - name: Compute beta version
+        id: version
+        run: |
+          set -euo pipefail
+          SEMVER=$(grep '^version:' pubspec.yaml | sed 's/version: *//; s/+.*//')
+          BUILD=$(git rev-list --count HEAD)
+          # Train-closed guard: a stable tag for this marketing version means
+          # it has shipped; the bump PR from promotion has not landed yet.
+          if [ -n "$(git tag -l "v${SEMVER}.[0-9]*")" ]; then
+            echo "::error::Marketing version ${SEMVER} already has a stable release." \
+              " Land the version bump (scripts/release/bump_version.sh) before the next beta."
+            exit 1
+          fi
+          echo "tag=v${SEMVER}.${BUILD}" >> "$GITHUB_OUTPUT"
+          echo "build-number=${BUILD}" >> "$GITHUB_OUTPUT"
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
+      - name: Skip if nothing shippable changed since the last beta
+        id: gate
+        env:
+          GH_TOKEN: ${{ secrets.BETA_BUILDS_TOKEN }}
+        run: |
+          set -euo pipefail
+          PREV_SHA=""
+          if gh release download --repo submersion-app/beta-builds \
+               --pattern metadata.json --dir /tmp/prev-beta 2>/dev/null; then
+            PREV_SHA=$(python3 -c "import json;print(json.load(open('/tmp/prev-beta/metadata.json'))['sourceSha'])")
+          fi
+          if [ -z "$PREV_SHA" ] || ! git rev-parse --verify --quiet "${PREV_SHA}^{commit}" >/dev/null; then
+            echo "No previous beta baseline; proceeding."
+            echo "proceed=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          if [ "$PREV_SHA" = "$(git rev-parse HEAD)" ]; then
+            echo "HEAD already published as a beta; skipping."
+            echo "proceed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          # Same inert-path filter as ci.yaml's changes job: skip when every
+          # file changed since the last beta is docs/CI/image-only.
+          code=false
+          while IFS= read -r f; do
+            [ -n "$f" ] || continue
+            case "$f" in
+              .github/flutter-version.txt) code=true ;;
+              .github/*) ;;
+              *.md|docs/*|LICENSE*|.gitignore|.gitattributes|.editorconfig|codecov.yml|hooks/*) ;;
+              *.png|*.jpg|*.jpeg|*.gif|*.svg|*.webp|*.ico) ;;
+              *) code=true ;;
+            esac
+          done <<< "$(git diff --name-only "${PREV_SHA}..HEAD")"
+          echo "proceed=$code" >> "$GITHUB_OUTPUT"
+
+  build:
+    name: Build
+    needs: precheck
+    if: needs.precheck.outputs.proceed == 'true'
+    uses: ./.github/workflows/build-all.yml
+    with:
+      version-tag: ${{ needs.precheck.outputs.tag }}
+      build-number: ${{ needs.precheck.outputs.build-number }}
+      ref: ${{ needs.precheck.outputs.sha }}
+    secrets: inherit
+
+  publish-beta:
+    name: Publish to beta-builds
+    needs: [precheck, build]
+    if: needs.precheck.outputs.proceed == 'true' && inputs.skip-publish != true
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ needs.precheck.outputs.sha }}
+          fetch-depth: 0
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v8
+        with:
+          path: artifacts
+          merge-multiple: true
+
+      - name: Generate release notes
+        run: |
+          set -euo pipefail
+          ./scripts/release/generate_changelog.sh --notes-only > release-notes.md
+          ./scripts/generate_release_notes_html.sh < release-notes.md > release-notes.html
+
+      - name: Generate checksums and metadata
+        env:
+          TAG_NAME: ${{ needs.precheck.outputs.tag }}
+          BUILD_NUMBER: ${{ needs.precheck.outputs.build-number }}
+          SOURCE_SHA: ${{ needs.precheck.outputs.sha }}
+          EDDSA_SIGNATURE: ${{ needs.build.outputs.eddsa-signature }}
+          DMG_LENGTH: ${{ needs.build.outputs.dmg-length }}
+        run: |
+          set -euo pipefail
+          cd artifacts
+          sha256sum Submersion-* > ../checksums-sha256.txt
+          cd ..
+          python3 - <<'PYEOF'
+          import json, os
+          tag = os.environ['TAG_NAME']
+          build = os.environ['BUILD_NUMBER']
+          semver = tag[1:]
+          if semver.endswith('.' + build):
+              semver = semver[: -(len(build) + 1)]
+          json.dump({
+              'sourceSha': os.environ['SOURCE_SHA'],
+              'semver': semver,
+              'buildNumber': int(build),
+              'eddsaSignature': os.environ['EDDSA_SIGNATURE'],
+              'dmgLength': int(os.environ['DMG_LENGTH']),
+          }, open('metadata.json', 'w'), indent=2)
+          PYEOF
+
+      - name: Generate beta appcast
+        env:
+          TAG_NAME: ${{ needs.precheck.outputs.tag }}
+          BUILD_NUMBER: ${{ needs.precheck.outputs.build-number }}
+          SPARKLE_EDDSA_SIGNATURE: ${{ needs.build.outputs.eddsa-signature }}
+          SPARKLE_DMG_LENGTH: ${{ needs.build.outputs.dmg-length }}
+        run: |
+          set -euo pipefail
+          VERSION="${TAG_NAME#v}"
+          DATE=$(date -R)
+          BASE="https://github.com/submersion-app/beta-builds/releases/download/${TAG_NAME}"
+          curl -fsSL -o stable-appcast.xml \
+            "https://github.com/${{ github.repository }}/releases/latest/download/appcast.xml" \
+            || : > stable-appcast.xml
+          ./scripts/generate_appcast_beta.sh "$VERSION" "$BUILD_NUMBER" "$DATE" \
+            "${BASE}/Submersion-${TAG_NAME}-macOS.dmg" \
+            "${BASE}/Submersion-${TAG_NAME}-Windows-Setup.exe" \
+            release-notes.html stable-appcast.xml > appcast-beta.xml
+
+      - name: Create beta release
+        env:
+          GH_TOKEN: ${{ secrets.BETA_BUILDS_TOKEN }}
+          TAG_NAME: ${{ needs.precheck.outputs.tag }}
+          SOURCE_SHA: ${{ needs.precheck.outputs.sha }}
+        run: |
+          set -euo pipefail
+          gh release create "$TAG_NAME" --repo submersion-app/beta-builds \
+            --title "Beta $TAG_NAME" \
+            --notes-file release-notes.md \
+            artifacts/Submersion-* checksums-sha256.txt metadata.json appcast-beta.xml
+          echo "Published beta $TAG_NAME from $SOURCE_SHA"
+
+      - name: Prune old betas
+        env:
+          GH_TOKEN: ${{ secrets.BETA_BUILDS_TOKEN }}
+        run: |
+          set -euo pipefail
+          gh release list --repo submersion-app/beta-builds \
+            --json tagName --limit 100 -q '.[15:][].tagName' | while read -r tag; do
+            echo "Pruning $tag"
+            gh release delete "$tag" --repo submersion-app/beta-builds --yes --cleanup-tag
+          done
