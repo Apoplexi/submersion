@@ -61,7 +61,8 @@ class _SpatialSitePageState extends ConsumerState<SpatialSitePage>
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (_, _) =>
             Center(child: Text(context.l10n.dive3d_spatial_noPath)),
-        data: (scene) {
+        data: (result) {
+          final scene = result?.scene;
           if (scene == null || scene.layers.isEmpty) {
             return Center(child: Text(context.l10n.dive3d_spatial_noPath));
           }
