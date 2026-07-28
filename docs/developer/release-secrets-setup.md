@@ -83,6 +83,22 @@ The alias of the key within the keystore (e.g., `submersion`).
 
 The password for the key (often the same as the keystore password).
 
+### Beta Pipeline (beta-builds publishing)
+
+**BETA_BUILDS_TOKEN**
+
+Fine-grained personal access token used by the Beta workflow (`beta.yml`) to
+publish per-merge beta releases into `submersion-app/beta-builds`:
+
+1. Create at https://github.com/settings/personal-access-tokens/new
+2. Resource owner: `submersion-app`
+3. Repository access: Only select repositories > `submersion-app/beta-builds`
+4. Permissions: Contents - Read and write (nothing else)
+5. Set with: `gh secret set BETA_BUILDS_TOKEN --repo submersion-app/submersion`
+
+Rotation: regenerate the token and re-run the same command. The workflow
+fails loudly on the next merge to main if the token has expired.
+
 ## Verification
 
 After configuring all secrets, trigger a test release:
