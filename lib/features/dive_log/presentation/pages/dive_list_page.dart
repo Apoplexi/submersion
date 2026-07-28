@@ -839,12 +839,21 @@ class DiveListTile extends ConsumerWidget {
                             )
                           : CircleAvatar(
                               backgroundColor: colorScheme.primaryContainer,
-                              child: Text(
-                                '#$diveNumber',
-                                style: TextStyle(
-                                  color: colorScheme.onPrimaryContainer,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 12,
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 4,
+                                ),
+                                child: FittedBox(
+                                  fit: BoxFit.scaleDown,
+                                  child: Text(
+                                    '#$diveNumber',
+                                    maxLines: 1,
+                                    style: TextStyle(
+                                      color: colorScheme.onPrimaryContainer,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 12,
+                                    ),
+                                  ),
                                 ),
                               ),
                             ),
