@@ -48,7 +48,11 @@ Future<void> pumpDashboard(
     routes: [
       GoRoute(path: '/', builder: (_, _) => const DashboardPage()),
       GoRoute(path: '/dives', builder: (_, _) => const Scaffold()),
-      GoRoute(path: '/gear', builder: (_, _) => const Scaffold()),
+      GoRoute(
+        path: '/equipment',
+        builder: (_, _) => const Scaffold(),
+        routes: [GoRoute(path: 'new', builder: (_, _) => const Scaffold())],
+      ),
     ],
   );
   await tester.pumpWidget(

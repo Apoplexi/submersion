@@ -40,7 +40,7 @@ class UrgentBanner extends ConsumerWidget {
     // Send the tap where the listed problem is fixed: gear service when
     // any clock is overdue, otherwise the insurance record.
     final destination = overdue.isNotEmpty
-        ? '/gear'
+        ? '/equipment'
         : '/settings/diver-profile/insurance';
     return Card(
       margin: EdgeInsets.zero,
