@@ -1,0 +1,120 @@
+import 'package:flutter/foundation.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import 'package:submersion/core/utils/geo_math.dart';
+import 'package:submersion/features/bathymetry/application/bathymetry_providers.dart';
+import 'package:submersion/features/bathymetry/data/bathymetry_repository.dart';
+import 'package:submersion/features/dive_3d/application/spatial_providers.dart';
+import 'package:submersion/features/dive_3d/domain/scene_3d.dart';
+import 'package:submersion/features/dive_3d/domain/spatial/bathymetry_terrain_builder.dart';
+import 'package:submersion/features/dive_3d/domain/spatial/site_seascape_geometry_service.dart';
+import 'package:submersion/features/dive_log/presentation/providers/dive_providers.dart';
+import 'package:submersion/features/dive_sites/presentation/providers/site_providers.dart';
+
+/// Terminal states for the site seascape. The provider ALWAYS resolves to
+/// one of these — a null/silent-spinner path does not exist (PR #659).
+sealed class SiteSeascapeState {
+  const SiteSeascapeState();
+}
+
+class SiteSeascapeReady extends SiteSeascapeState {
+  final Scene3d scene;
+  final String sourceId;
+  final double resolutionMeters;
+
+  const SiteSeascapeReady({
+    required this.scene,
+    required this.sourceId,
+    required this.resolutionMeters,
+  });
+}
+
+class SiteSeascapeNoCoordinates extends SiteSeascapeState {
+  const SiteSeascapeNoCoordinates();
+}
+
+class SiteSeascapeNoData extends SiteSeascapeState {
+  const SiteSeascapeNoData();
+}
+
+/// Heaviest sites stay readable: newest dives first, capped.
+const int _maxDivePaths = 30;
+
+/// Below this cell count the scene builds synchronously (widget-test
+/// FakeAsync deadlock rule); above it, in a compute() isolate.
+const int _isolateCellThreshold = 4000;
+
+final siteSeascapeProvider = FutureProvider.family<SiteSeascapeState, String>((
+  ref,
+  siteId,
+) async {
+  final site = await ref.watch(siteProvider(siteId).future);
+  final center = site?.location;
+  if (site == null || center == null) {
+    return const SiteSeascapeNoCoordinates();
+  }
+
+  final grid = await ref.watch(
+    bathymetryGridProvider(BathymetryRepository.quantize(center)).future,
+  );
+  if (grid == null) return const SiteSeascapeNoData();
+
+  final allDives = await ref.watch(divesProvider.future);
+  final atSite = allDives.where((d) => d.site?.id == siteId).toList()
+    ..sort(
+      (a, b) =>
+          (b.entryTime ?? b.dateTime).compareTo(a.entryTime ?? a.dateTime),
+    );
+  final divePaths = <SiteDivePathInput>[];
+  for (final dive in atSite.take(_maxDivePaths)) {
+    final path = await ref.watch(spatialReckonedPathProvider(dive.id).future);
+    if (path == null || path.points.length < 2) continue;
+    final entry = dive.entryLocation;
+    divePaths.add(
+      SiteDivePathInput(
+        diveId: dive.id,
+        path: path,
+        anchor: entry == null
+            ? (east: 0.0, north: 0.0)
+            : enuOffsetMeters(center, entry),
+      ),
+    );
+  }
+
+  final box = BathymetryTerrainBuilder.enuBounds(grid, center);
+  final sites = await ref.watch(sitesProvider.future);
+  final nearby = <NearbySiteInput>[];
+  for (final s in sites) {
+    final sLoc = s.location;
+    if (s.id == siteId || sLoc == null) continue;
+    final off = enuOffsetMeters(center, sLoc);
+    final inside =
+        off.east >= box.minEast &&
+        off.east <= box.maxEast &&
+        off.north >= box.minNorth &&
+        off.north <= box.maxNorth;
+    if (inside) {
+      nearby.add(NearbySiteInput(siteId: s.id, name: s.name, offset: off));
+    }
+  }
+
+  final input = SiteSeascapeInput(
+    grid: grid,
+    center: center,
+    siteName: site.name,
+    siteMaxDepth: site.maxDepth,
+    divePaths: divePaths,
+    nearbySites: nearby,
+  );
+  final scene = grid.rows * grid.cols > _isolateCellThreshold
+      ? await compute(_buildScene, input)
+      : const SiteSeascapeGeometryService().build(input);
+  return SiteSeascapeReady(
+    scene: scene,
+    sourceId: grid.sourceId,
+    resolutionMeters: grid.resolutionMeters,
+  );
+});
+
+Scene3d _buildScene(SiteSeascapeInput input) =>
+    const SiteSeascapeGeometryService().build(input);

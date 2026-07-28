@@ -32,6 +32,16 @@ double initialBearingDegrees(GeoPoint a, GeoPoint b) {
   return (bearing + 360.0) % 360.0;
 }
 
+/// Offset of [to] relative to [from] in local east-north meters
+/// (distance + bearing decomposition — the same math the spatial scene
+/// uses for exit fixes).
+({double east, double north}) enuOffsetMeters(GeoPoint from, GeoPoint to) {
+  final d = distanceMeters(from, to);
+  if (d == 0) return (east: 0, north: 0);
+  final brg = initialBearingDegrees(from, to) * math.pi / 180.0;
+  return (east: d * math.sin(brg), north: d * math.cos(brg));
+}
+
 const List<String> _cardinals = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
 
 /// Formats a bearing as zero-padded degrees + 8-point cardinal, e.g. "042° NE".
