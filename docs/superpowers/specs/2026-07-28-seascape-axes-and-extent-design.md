@@ -95,6 +95,31 @@ All 10 non-English locales + regen, per convention.
 - Widget tests: both pages pass chrome to the viewport; existing terminal-
   state tests stay green.
 
+## Addendum: hover inspection (approved 2026-07-28)
+
+Hovering the terrain shows latitude/longitude (5 decimals) and seafloor
+depth (diver's units) at that vertex, mirroring the tissue view's hover.
+
+- **Data**: results carry the downsampled `BathymetryGrid` — required on
+  `SiteSeascapeReady`, nullable on `SpatialSceneResult`. Hover exists only
+  over real bathymetry; the synthesized seafloor is invented data, so no
+  hover there.
+- **Pick lattice**: reuse the viewport's existing machinery by building
+  its pick grid with `columns = grid.rows`, `compartments = grid.cols`,
+  `positions = scene.layers.first.mesh.positions` (the terrain mesh's own
+  vertex array; index layouts match `row*cols + col` exactly, so picking
+  aligns pixel-for-pixel with the rendered surface). Tissue-specific
+  fields stay empty; the hover path never reads them.
+- **Viewport**: hover MouseRegion gates on `surfaceGrid != null &&
+  hoverPick != null` (not the full tissue-chrome bundle);
+  `AxisChromePainter` gains optional pick inputs and draws the hover ring,
+  repainting on the pick listenable.
+- **Tooltip**: `SeascapeHoverTooltip` positioned by the existing clamping
+  layout delegate; land/nodata cells show coordinates with an em-dash for
+  depth. Mouse-driven, matching tissue; no tap-to-inspect.
+- **Tests**: lattice index alignment, cell -> lat/lon/depth mapping,
+  tooltip rendering per cell kind, no hover wiring without a grid.
+
 ## Out of scope
 
 - Grid walls/floors, axis toggles, scrub-position readouts (the readout
