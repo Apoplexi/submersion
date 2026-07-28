@@ -104,4 +104,60 @@ void main() {
 
     expect(manifest.schemaVersion, AppDatabase.currentSchemaVersion);
   });
+
+  test('holds a peer publishing from a newer schema', () async {
+    await DiveRepository().createDive(
+      createTestDiveWithBottomTime(id: 'd1', diveNumber: 1),
+    );
+    await publishPeer(
+      'peer-1',
+      epochId: 'epoch-A',
+      schemaVersionOverride: AppDatabase.currentSchemaVersion + 1,
+    );
+
+    final result = await pull(currentEpochId: 'epoch-A');
+
+    expect(result.peersProcessed, 0);
+    expect(result.newerSchemaPeerDeviceIds, {'peer-1'});
+    expect(applied, isEmpty);
+  });
+
+  test('a held peer is fully applied after this device updates', () async {
+    await DiveRepository().createDive(
+      createTestDiveWithBottomTime(id: 'd1', diveNumber: 1),
+    );
+    await publishPeer(
+      'peer-1',
+      epochId: 'epoch-A',
+      schemaVersionOverride: AppDatabase.currentSchemaVersion + 1,
+    );
+    await pull(currentEpochId: 'epoch-A'); // held: cursor must not advance
+
+    final result = await reader.pull(
+      provider: provider,
+      selfDeviceId: 'reader-x',
+      folderId: folder,
+      apply: spyApply,
+      applyBaseFile: spyApplyBaseFile(applied),
+      currentEpochId: 'epoch-A',
+      localSchemaVersion: AppDatabase.currentSchemaVersion + 1,
+    );
+
+    expect(result.peersProcessed, 1);
+    expect(result.newerSchemaPeerDeviceIds, isEmpty);
+    expect(applied, isNotEmpty);
+  });
+
+  test('same-schema and legacy (unstamped) peers apply normally', () async {
+    await DiveRepository().createDive(
+      createTestDiveWithBottomTime(id: 'd1', diveNumber: 1),
+    );
+    // publishPeer without override stamps the current schema version.
+    await publishPeer('peer-same', epochId: 'epoch-A');
+
+    final result = await pull(currentEpochId: 'epoch-A');
+
+    expect(result.peersProcessed, 1);
+    expect(result.newerSchemaPeerDeviceIds, isEmpty);
+  });
 }
