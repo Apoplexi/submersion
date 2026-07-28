@@ -1,0 +1,101 @@
+import 'dart:convert';
+
+import 'package:drift/drift.dart';
+
+import 'package:submersion/core/database/local_cache_database.dart';
+import 'package:submersion/features/bathymetry/data/bathymetry_resolver.dart';
+import 'package:submersion/features/bathymetry/domain/bathymetry_grid.dart';
+import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
+
+/// Cache-first bathymetry access. Grids cache per quantized 0.02 degree
+/// coordinate cell (nearby sites, re-pinned sites, and site-less GPS dives
+/// share one fetch). Definitive negatives cache as 'empty'; transient
+/// failures write NO row so the next visit retries. Never throws: null
+/// simply means "no real terrain available right now".
+class BathymetryRepository {
+  static const int maxGridDim = 120;
+  static const double quantumDeg = 0.02;
+
+  final LocalCacheDatabase _db;
+  final BathymetryResolver _resolver;
+  final Map<String, Future<BathymetryGrid?>> _inFlight = {};
+
+  BathymetryRepository({
+    required LocalCacheDatabase db,
+    required BathymetryResolver resolver,
+  }) : _db = db,
+       _resolver = resolver;
+
+  static ({double lat, double lon}) quantize(GeoPoint c) {
+    double q(double v) => (v / quantumDeg).floorToDouble() * quantumDeg;
+    return (lat: q(c.latitude), lon: q(c.longitude));
+  }
+
+  static String keyFor(GeoPoint c) {
+    final q = quantize(c);
+    return '${q.lat.toStringAsFixed(2)},${q.lon.toStringAsFixed(2)}';
+  }
+
+  Future<BathymetryGrid?> getGrid(GeoPoint center) {
+    final key = keyFor(center);
+    return _inFlight[key] ??= _load(key, center)
+      ..whenComplete(() => _inFlight.remove(key));
+  }
+
+  Future<BathymetryGrid?> _load(String key, GeoPoint center) async {
+    final row = await (_db.select(
+      _db.bathymetryCache,
+    )..where((t) => t.cacheKey.equals(key))).getSingleOrNull();
+    if (row != null) {
+      final json = row.gridJson;
+      if (row.status == 'ok' && json != null) {
+        return BathymetryGrid.fromJson(
+          jsonDecode(json) as Map<String, dynamic>,
+        );
+      }
+      return null; // 'empty' / 'unavailable': definitive, no refetch
+    }
+
+    // Fetch centered on the quantized CELL CENTER so every coordinate in
+    // the cell gets the same, fully covering grid.
+    final q = quantize(center);
+    final fetchCenter = GeoPoint(
+      q.lat + quantumDeg / 2,
+      q.lon + quantumDeg / 2,
+    );
+    final res = await _resolver.resolve(fetchCenter);
+    final resolved = res.grid;
+    if (resolved != null) {
+      final grid = resolved.downsampleTo(maxGridDim);
+      await _db
+          .into(_db.bathymetryCache)
+          .insertOnConflictUpdate(
+            BathymetryCacheCompanion.insert(
+              cacheKey: key,
+              centerLat: fetchCenter.latitude,
+              centerLon: fetchCenter.longitude,
+              status: 'ok',
+              sourceId: Value(grid.sourceId),
+              resolutionMeters: Value(grid.resolutionMeters),
+              gridJson: Value(jsonEncode(grid.toJson())),
+              fetchedAt: DateTime.now().millisecondsSinceEpoch,
+            ),
+          );
+      return grid;
+    }
+    if (res.definitive) {
+      await _db
+          .into(_db.bathymetryCache)
+          .insertOnConflictUpdate(
+            BathymetryCacheCompanion.insert(
+              cacheKey: key,
+              centerLat: fetchCenter.latitude,
+              centerLon: fetchCenter.longitude,
+              status: 'empty',
+              fetchedAt: DateTime.now().millisecondsSinceEpoch,
+            ),
+          );
+    }
+    return null; // transient: no row, next call retries
+  }
+}
