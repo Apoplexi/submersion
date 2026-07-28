@@ -63,12 +63,38 @@ class MediaCacheEntries extends Table {
   Set<Column> get primaryKey => {contentHash, kind};
 }
 
-@DriftDatabase(tables: [LocalAssetCache, MediaTransferQueue, MediaCacheEntries])
+/// Cached bathymetry grids keyed by quantized coordinate (0.02 degree
+/// cells). Re-derivable third-party data: never synced, never backed up.
+/// status semantics: 'ok' = usable grid in gridJson; 'empty' = fetched
+/// fine, definitively no water here; 'unavailable' = reserved for future
+/// definitive negatives. Transient failures write NO row.
+class BathymetryCache extends Table {
+  TextColumn get cacheKey => text()();
+  RealColumn get centerLat => real()();
+  RealColumn get centerLon => real()();
+  TextColumn get status => text()();
+  TextColumn get sourceId => text().nullable()();
+  RealColumn get resolutionMeters => real().nullable()();
+  TextColumn get gridJson => text().nullable()();
+  IntColumn get fetchedAt => integer()();
+
+  @override
+  Set<Column> get primaryKey => {cacheKey};
+}
+
+@DriftDatabase(
+  tables: [
+    LocalAssetCache,
+    MediaTransferQueue,
+    MediaCacheEntries,
+    BathymetryCache,
+  ],
+)
 class LocalCacheDatabase extends _$LocalCacheDatabase {
   LocalCacheDatabase(super.e);
 
   @override
-  int get schemaVersion => 6;
+  int get schemaVersion => 7;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -96,6 +122,12 @@ class LocalCacheDatabase extends _$LocalCacheDatabase {
       // v1 create path above already includes the current schema.
       if (from >= 2 && from < 6) {
         await m.addColumn(mediaTransferQueue, mediaTransferQueue.payloadJson);
+      }
+      // v7: bathymetry grid cache. NOTE: the reef-data branch (PR #728)
+      // also claims v7 on its own branch — whichever merges second
+      // renumbers. from < 7 covers both the v1 path and v2..v6 upgrades.
+      if (from < 7) {
+        await m.createTable(bathymetryCache);
       }
     },
   );
