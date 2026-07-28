@@ -5,6 +5,16 @@ import 'package:submersion/features/dive_3d/domain/geometry/scene_bounds.dart';
 import 'package:submersion/features/dive_3d/domain/spatial/spatial_projection.dart';
 import 'package:submersion/features/dive_3d/presentation/renderer/axis_labels.dart';
 
+/// The scene-frame numbers the axes are built from, captured where the
+/// scene's projection is built (plain record: crosses compute() cheaply).
+typedef SeascapeAxisInputs = ({
+  double minEast,
+  double maxEast,
+  double minNorth,
+  double maxNorth,
+  double maxDepth,
+});
+
 /// The seascape's measurement chrome: a map-frame at the waterline (two
 /// distance axes along the south and west edges) plus a depth axis
 /// descending at the origin corner. No reference grids — axes, ticks, and

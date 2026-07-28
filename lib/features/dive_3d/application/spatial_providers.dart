@@ -10,6 +10,7 @@ import 'package:submersion/features/bathymetry/domain/bathymetry_grid.dart';
 import 'package:submersion/features/dive_3d/domain/scene_3d.dart';
 import 'package:submersion/features/dive_3d/domain/spatial/dead_reckoning_service.dart';
 import 'package:submersion/features/dive_3d/domain/spatial/reckoned_path.dart';
+import 'package:submersion/features/dive_3d/domain/spatial/seascape_axes.dart';
 import 'package:submersion/features/dive_3d/domain/spatial/spatial_geometry_service.dart';
 import 'package:submersion/features/dive_log/presentation/providers/active_source_provider.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_providers.dart';
@@ -59,10 +60,15 @@ class SpatialSceneResult {
   final String? bathymetrySourceId;
   final double? bathymetryResolutionMeters;
 
+  /// The scene-frame numbers for the distance/depth axes; null only for
+  /// results constructed without them (older tests, degenerate scenes).
+  final SeascapeAxisInputs? axisInputs;
+
   const SpatialSceneResult({
     required this.scene,
     this.bathymetrySourceId,
     this.bathymetryResolutionMeters,
+    this.axisInputs,
   });
 }
 
@@ -104,21 +110,23 @@ final spatialGeometryProvider =
         pathAnchor: anchor,
       );
       final cells = grid == null ? 0 : grid.rows * grid.cols;
-      final scene = (path.points.length < 4000 && cells < 4000)
+      final built = (path.points.length < 4000 && cells < 4000)
           ? _buildSpatial(input)
           : await compute(_buildSpatial, input);
       return SpatialSceneResult(
-        scene: scene,
+        scene: built.scene,
         bathymetrySourceId: grid?.sourceId,
         bathymetryResolutionMeters: grid?.resolutionMeters,
+        axisInputs: built.frame,
       );
     });
 
-Scene3d _buildSpatial(_SpatialBuildInput input) =>
-    const SpatialGeometryService().build(
-      input.path,
-      siteMaxDepth: input.siteMaxDepth,
-      grid: input.grid,
-      gridCenter: input.gridCenter,
-      pathAnchor: input.pathAnchor,
-    );
+({Scene3d scene, SeascapeAxisInputs frame}) _buildSpatial(
+  _SpatialBuildInput input,
+) => const SpatialGeometryService().buildWithFrame(
+  input.path,
+  siteMaxDepth: input.siteMaxDepth,
+  grid: input.grid,
+  gridCenter: input.gridCenter,
+  pathAnchor: input.pathAnchor,
+);

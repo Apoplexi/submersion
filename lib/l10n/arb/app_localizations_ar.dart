@@ -20592,6 +20592,11 @@ class AppLocalizationsAr extends AppLocalizations {
       'لا توجد بيانات قياس أعماق متاحة لهذا الموقع';
 
   @override
+  String dive3d_seascape_axis_distance(String unitSymbol) {
+    return 'المسافة ($unitSymbol)';
+  }
+
+  @override
   String get settings_about_bathymetryCredit =>
       'بيانات قياس الأعماق: GMRT (CC BY 4.0) · EMODnet Bathymetry (CC BY 4.0) · NOAA ETOPO 2022';
 

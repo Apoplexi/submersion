@@ -1,11 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/features/dive_3d/application/spatial_providers.dart';
 import 'package:submersion/features/dive_3d/domain/spatial/reckoned_path.dart';
 import 'package:submersion/features/dive_3d/domain/spatial/spatial_geometry_service.dart';
 import 'package:submersion/features/dive_3d/presentation/pages/spatial_site_page.dart';
+import 'package:submersion/features/dive_3d/presentation/widgets/dive_3d_interactive_viewport.dart';
+import 'package:submersion/core/providers/provider.dart';
+import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
+
+class _TestSettingsNotifier extends StateNotifier<AppSettings>
+    implements SettingsNotifier {
+  _TestSettingsNotifier() : super(const AppSettings());
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
 
 ReckonedPath _path() => const ReckonedPath(
   points: [
@@ -22,7 +32,10 @@ ReckonedPath _path() => const ReckonedPath(
 );
 
 Widget page(SpatialSceneResult? result) => ProviderScope(
-  overrides: [spatialGeometryProvider.overrideWith((ref, id) async => result)],
+  overrides: [
+    settingsProvider.overrideWith((ref) => _TestSettingsNotifier()),
+    spatialGeometryProvider.overrideWith((ref, id) async => result),
+  ],
   child: const MaterialApp(
     localizationsDelegates: AppLocalizations.localizationsDelegates,
     supportedLocales: AppLocalizations.supportedLocales,
@@ -38,6 +51,13 @@ void main() {
     scene: const SpatialGeometryService().build(_path(), siteMaxDepth: 30),
     bathymetrySourceId: 'gmrt',
     bathymetryResolutionMeters: 61,
+    axisInputs: (
+      minEast: -100.0,
+      maxEast: 200.0,
+      minNorth: -100.0,
+      maxNorth: 200.0,
+      maxDepth: 30.0,
+    ),
   );
 
   testWidgets('real terrain shows the provenance chip, not synthesized', (
@@ -49,6 +69,12 @@ void main() {
     expect(find.textContaining('GMRT'), findsOneWidget);
     expect(find.text('Synthesized seafloor'), findsNothing);
     expect(find.text('Estimated path (dead reckoning)'), findsOneWidget);
+    // Distance/depth axes render whenever the scene carries axis inputs.
+    final viewport = tester.widget<Dive3dInteractiveViewport>(
+      find.byType(Dive3dInteractiveViewport),
+    );
+    expect(viewport.axisFrame, isNotNull);
+    expect(viewport.chromeStyle, isNotNull);
   });
 
   testWidgets('fallback shows the synthesized chip', (tester) async {

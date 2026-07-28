@@ -5981,6 +5981,8 @@
   "@dive3d_seascape_noCoordinates": {},
   "dive3d_seascape_noData": "该位置没有可用的水深数据",
   "@dive3d_seascape_noData": {},
+  "dive3d_seascape_axis_distance": "距离（{unitSymbol}）",
+  "@dive3d_seascape_axis_distance": {},
   "settings_about_bathymetryCredit": "水深数据：GMRT（CC BY 4.0）· EMODnet Bathymetry（CC BY 4.0）· NOAA ETOPO 2022",
   "@settings_about_bathymetryCredit": {},
   "dive3d_metric_depth": "深度",

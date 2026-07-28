@@ -1,13 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/features/bathymetry/domain/bathymetry_grid.dart';
+import 'package:submersion/features/dive_3d/domain/spatial/bathymetry_terrain_builder.dart';
 import 'package:submersion/features/dive_3d/application/site_seascape_providers.dart';
 import 'package:submersion/features/dive_3d/domain/spatial/site_seascape_geometry_service.dart';
 import 'package:submersion/features/dive_3d/presentation/pages/site_seascape_page.dart';
 import 'package:submersion/features/dive_3d/presentation/widgets/dive_3d_interactive_viewport.dart';
+import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
+import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
+
+class _TestSettingsNotifier extends StateNotifier<AppSettings>
+    implements SettingsNotifier {
+  _TestSettingsNotifier() : super(const AppSettings());
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
 
 SiteSeascapeReady readyState() {
   final grid = BathymetryGrid(
@@ -32,15 +42,29 @@ SiteSeascapeReady readyState() {
       nearbySites: const [],
     ),
   );
+  final box = BathymetryTerrainBuilder.enuBounds(
+    grid,
+    const GeoPoint(12.151, -68.299),
+  );
   return SiteSeascapeReady(
     scene: scene,
     sourceId: 'gmrt',
     resolutionMeters: 61,
+    axisInputs: (
+      minEast: box.minEast,
+      maxEast: box.maxEast,
+      minNorth: box.minNorth,
+      maxNorth: box.maxNorth,
+      maxDepth: 35,
+    ),
   );
 }
 
 Widget page(SiteSeascapeState state) => ProviderScope(
-  overrides: [siteSeascapeProvider.overrideWith((ref, id) async => state)],
+  overrides: [
+    settingsProvider.overrideWith((ref) => _TestSettingsNotifier()),
+    siteSeascapeProvider.overrideWith((ref, id) async => state),
+  ],
   child: const MaterialApp(
     localizationsDelegates: AppLocalizations.localizationsDelegates,
     supportedLocales: AppLocalizations.supportedLocales,
@@ -58,6 +82,13 @@ void main() {
     expect(find.byType(Dive3dInteractiveViewport), findsOneWidget);
     expect(find.textContaining('GMRT'), findsOneWidget);
     expect(find.byType(CircularProgressIndicator), findsNothing);
+    // Distance/depth axes are always-on chrome.
+    final viewport = tester.widget<Dive3dInteractiveViewport>(
+      find.byType(Dive3dInteractiveViewport),
+    );
+    expect(viewport.axisFrame, isNotNull);
+    expect(viewport.axisLabels, isNotNull);
+    expect(viewport.chromeStyle, isNotNull);
   });
 
   testWidgets('no-coordinates state shows the message, not a spinner', (

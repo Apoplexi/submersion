@@ -5,6 +5,7 @@ import 'package:submersion/features/dive_3d/domain/geometry/scene_bounds.dart';
 import 'package:submersion/features/dive_3d/domain/scene_3d.dart';
 import 'package:submersion/features/dive_3d/domain/spatial/bathymetry_terrain_builder.dart';
 import 'package:submersion/features/dive_3d/domain/spatial/reckoned_path.dart';
+import 'package:submersion/features/dive_3d/domain/spatial/seascape_axes.dart';
 import 'package:submersion/features/dive_3d/domain/spatial/spatial_path_builder.dart';
 import 'package:submersion/features/dive_3d/domain/spatial/spatial_projection.dart';
 import 'package:submersion/features/dive_3d/domain/spatial/terrain_builder.dart';
@@ -28,12 +29,38 @@ class SpatialGeometryService {
     BathymetryGrid? grid,
     GeoPoint? gridCenter,
     ({double east, double north}) pathAnchor = (east: 0.0, north: 0.0),
+  }) => buildWithFrame(
+    path,
+    siteMaxDepth: siteMaxDepth,
+    grid: grid,
+    gridCenter: gridCenter,
+    pathAnchor: pathAnchor,
+  ).scene;
+
+  /// [build], plus the scene-frame numbers ([SeascapeAxisInputs]) the axes
+  /// are derived from — captured here because only this method knows the
+  /// union box of terrain and path.
+  ({Scene3d scene, SeascapeAxisInputs frame}) buildWithFrame(
+    ReckonedPath path, {
+    double? siteMaxDepth,
+    BathymetryGrid? grid,
+    GeoPoint? gridCenter,
+    ({double east, double north}) pathAnchor = (east: 0.0, north: 0.0),
   }) {
     if (path.points.length < 2) {
-      return const Scene3d(
-        layers: [],
-        markers: [],
-        bounds: SceneBounds(durationSeconds: 1, maxDepthMeters: 1),
+      return (
+        scene: const Scene3d(
+          layers: [],
+          markers: [],
+          bounds: SceneBounds(durationSeconds: 1, maxDepthMeters: 1),
+        ),
+        frame: (
+          minEast: 0.0,
+          maxEast: 0.0,
+          minNorth: 0.0,
+          maxNorth: 0.0,
+          maxDepth: 1.0,
+        ),
       );
     }
 
@@ -115,7 +142,7 @@ class SpatialGeometryService {
       zs: [for (final p in placed.points) proj.zOf(p.north)],
     );
 
-    return Scene3d(
+    final scene = Scene3d(
       // Back-to-front: seafloor, path, pins, translucent water on top.
       layers: [
         SceneLayer(terrain.terrain),
@@ -127,6 +154,16 @@ class SpatialGeometryService {
       markers: const [],
       bounds: bounds,
       scrubPath: scrub,
+    );
+    return (
+      scene: scene,
+      frame: (
+        minEast: minE,
+        maxEast: maxE,
+        minNorth: minN,
+        maxNorth: maxN,
+        maxDepth: maxDepth,
+      ),
     );
   }
 }

@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -7,6 +9,7 @@ import 'package:submersion/features/bathymetry/data/bathymetry_repository.dart';
 import 'package:submersion/features/dive_3d/application/spatial_providers.dart';
 import 'package:submersion/features/dive_3d/domain/scene_3d.dart';
 import 'package:submersion/features/dive_3d/domain/spatial/bathymetry_terrain_builder.dart';
+import 'package:submersion/features/dive_3d/domain/spatial/seascape_axes.dart';
 import 'package:submersion/features/dive_3d/domain/spatial/site_seascape_geometry_service.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_providers.dart';
 import 'package:submersion/features/dive_sites/presentation/providers/site_providers.dart';
@@ -21,11 +24,13 @@ class SiteSeascapeReady extends SiteSeascapeState {
   final Scene3d scene;
   final String sourceId;
   final double resolutionMeters;
+  final SeascapeAxisInputs axisInputs;
 
   const SiteSeascapeReady({
     required this.scene,
     required this.sourceId,
     required this.resolutionMeters,
+    required this.axisInputs,
   });
 }
 
@@ -109,10 +114,23 @@ final siteSeascapeProvider = FutureProvider.family<SiteSeascapeState, String>((
   final scene = grid.rows * grid.cols > _isolateCellThreshold
       ? await compute(_buildScene, input)
       : const SiteSeascapeGeometryService().build(input);
+  // Mirrors SiteSeascapeGeometryService's depth budget so the axes and the
+  // terrain agree on the scene frame.
+  final maxDepth = math.max(
+    math.max(grid.maxDepthMeters, site.maxDepth ?? 0),
+    1.0,
+  );
   return SiteSeascapeReady(
     scene: scene,
     sourceId: grid.sourceId,
     resolutionMeters: grid.resolutionMeters,
+    axisInputs: (
+      minEast: box.minEast,
+      maxEast: box.maxEast,
+      minNorth: box.minNorth,
+      maxNorth: box.maxNorth,
+      maxDepth: maxDepth,
+    ),
   );
 });
 

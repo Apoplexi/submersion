@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/bathymetry/presentation/bathymetry_labels.dart';
 import 'package:submersion/features/dive_3d/application/spatial_providers.dart';
+import 'package:submersion/features/dive_3d/domain/spatial/seascape_axes.dart';
+import 'package:submersion/features/dive_3d/domain/spatial/spatial_projection.dart';
+import 'package:submersion/features/dive_3d/presentation/seascape_chrome.dart';
+import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/features/dive_3d/presentation/scene_overlay.dart';
 import 'package:submersion/features/dive_3d/presentation/widgets/dive_3d_interactive_viewport.dart';
 import 'package:submersion/features/dive_3d/presentation/widgets/time_scrub_bar.dart';
@@ -80,10 +85,20 @@ class _SpatialSitePageState extends ConsumerState<SpatialSitePage>
                 child: Stack(
                   children: [
                     Positioned.fill(
-                      child: Dive3dInteractiveViewport(
-                        scene: scene,
-                        scrubPosition: _position,
-                        visibleOverlays: const {SceneOverlay.markers},
+                      child: Builder(
+                        builder: (context) {
+                          final axes = _buildAxes(result!.axisInputs);
+                          return Dive3dInteractiveViewport(
+                            scene: scene,
+                            scrubPosition: _position,
+                            visibleOverlays: const {SceneOverlay.markers},
+                            axisFrame: axes?.frame,
+                            axisLabels: axes?.labels,
+                            chromeStyle: axes == null
+                                ? null
+                                : seascapeChromeStyle(context),
+                          );
+                        },
                       ),
                     ),
                     Positioned(
@@ -110,6 +125,30 @@ class _SpatialSitePageState extends ConsumerState<SpatialSitePage>
           );
         },
       ),
+    );
+  }
+
+  SeascapeAxes? _buildAxes(SeascapeAxisInputs? inputs) {
+    if (inputs == null) return null;
+    final units = UnitFormatter(ref.watch(settingsProvider));
+    return buildSeascapeAxes(
+      projection: SpatialProjection(
+        minEast: inputs.minEast,
+        maxEast: inputs.maxEast,
+        minNorth: inputs.minNorth,
+        maxNorth: inputs.maxNorth,
+        maxDepth: inputs.maxDepth,
+      ),
+      minEast: inputs.minEast,
+      maxEast: inputs.maxEast,
+      minNorth: inputs.minNorth,
+      maxNorth: inputs.maxNorth,
+      maxDepthMeters: inputs.maxDepth,
+      displayUnitInMeters: units.depthToMeters(1.0),
+      distanceTitle: context.l10n.dive3d_seascape_axis_distance(
+        units.depthSymbol,
+      ),
+      depthTitle: context.l10n.divePlanner_label_depthAxis(units.depthSymbol),
     );
   }
 

@@ -20909,6 +20909,11 @@ class AppLocalizationsHu extends AppLocalizations {
       'Ehhez a helyhez nem érhető el batimetria';
 
   @override
+  String dive3d_seascape_axis_distance(String unitSymbol) {
+    return 'Távolság ($unitSymbol)';
+  }
+
+  @override
   String get settings_about_bathymetryCredit =>
       'Batimetriai adatok: GMRT (CC BY 4.0) · EMODnet Bathymetry (CC BY 4.0) · NOAA ETOPO 2022';
 

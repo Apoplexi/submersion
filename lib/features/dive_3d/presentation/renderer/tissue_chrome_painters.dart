@@ -96,6 +96,122 @@ class TissueFramePainter extends CustomPainter {
       old.style != style;
 }
 
+/// Draws [frame]'s axis lines and tick marks in the axis colors. Grid
+/// segments are skipped — they belong to the background frame painter.
+/// Shared by the tissue chrome and the seascape's [AxisChromePainter].
+void paintAxisSegments(
+  Canvas canvas,
+  SceneProjector p,
+  AxisFrame frame,
+  TissueChromeStyle style,
+) {
+  Paint stroke(Color c, double w) => Paint()
+    ..color = c
+    ..strokeWidth = w
+    ..style = PaintingStyle.stroke;
+  for (final s in frame.segments) {
+    final a = p.project(s.x1, s.y1, s.z1);
+    final b = p.project(s.x2, s.y2, s.z2);
+    switch (s.role) {
+      case AxisRole.axisX:
+        canvas.drawLine(a, b, stroke(style.axisX, 2));
+      case AxisRole.axisY:
+        canvas.drawLine(a, b, stroke(style.axisY, 2));
+      case AxisRole.axisZ:
+        canvas.drawLine(a, b, stroke(style.axisZ, 2));
+      case AxisRole.tickX:
+        canvas.drawLine(a, b, stroke(style.axisX.withValues(alpha: 0.9), 1.5));
+      case AxisRole.tickY:
+        canvas.drawLine(a, b, stroke(style.axisY.withValues(alpha: 0.9), 1.5));
+      case AxisRole.tickZ:
+        canvas.drawLine(a, b, stroke(style.axisZ.withValues(alpha: 0.9), 1.5));
+      case AxisRole.frameGrid:
+        break; // background layer's concern
+    }
+  }
+}
+
+/// Draws world-anchored axis titles and tick values so labels track the
+/// rotating camera. Shared by the tissue chrome and [AxisChromePainter].
+void paintAxisLabels(
+  Canvas canvas,
+  SceneProjector p,
+  AxisLabelSet? labels,
+  TissueChromeStyle style,
+  TextDirection textDirection,
+) {
+  if (labels == null) return;
+  for (final l in labels.labels) {
+    final at = p.project(l.x, l.y, l.z);
+    final isTitle = l.kind == AxisLabelKind.title;
+    final tp = TextPainter(
+      text: TextSpan(
+        text: l.text,
+        style: TextStyle(
+          color: style.label,
+          fontSize: isTitle ? 11 : 9.5,
+          fontWeight: isTitle ? FontWeight.w600 : FontWeight.w400,
+        ),
+      ),
+      textDirection: textDirection,
+    )..layout();
+    // Titles sit above-right of the axis end; tick values below-left of the
+    // tick, so neither overlaps the axis line.
+    final offset = isTitle
+        ? Offset(4, -tp.height - 2)
+        : Offset(-tp.width - 4, -tp.height / 2);
+    tp.paint(canvas, at + offset);
+  }
+}
+
+/// Foreground axis + label chrome with no tissue surface — the seascape
+/// views' measurement frame. Static layer: repaints only on camera, frame,
+/// label, or style changes; the scrub cursor stays on the scene's own
+/// foreground painter, unaffected.
+class AxisChromePainter extends CustomPainter {
+  final SceneBounds bounds;
+  final AxisFrame frame;
+  final AxisLabelSet? labels;
+  final TissueChromeStyle style;
+  final double yawDegrees, pitchDegrees, zoom;
+  final TextDirection textDirection;
+
+  AxisChromePainter({
+    required this.bounds,
+    required this.frame,
+    required this.style,
+    required this.yawDegrees,
+    required this.pitchDegrees,
+    required this.zoom,
+    this.labels,
+    this.textDirection = TextDirection.ltr,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final p = SceneProjector(
+      size: size,
+      bounds: bounds,
+      yawDegrees: yawDegrees,
+      pitchDegrees: pitchDegrees,
+      zoom: zoom,
+    );
+    paintAxisSegments(canvas, p, frame, style);
+    paintAxisLabels(canvas, p, labels, style, textDirection);
+  }
+
+  @override
+  bool shouldRepaint(covariant AxisChromePainter old) =>
+      old.yawDegrees != yawDegrees ||
+      old.pitchDegrees != pitchDegrees ||
+      old.zoom != zoom ||
+      !identical(old.frame, frame) ||
+      !identical(old.labels, labels) ||
+      !identical(old.bounds, bounds) ||
+      old.style != style ||
+      old.textDirection != textDirection;
+}
+
 /// Static chrome layer: the draped wireframe on the surface, then the axis
 /// lines + ticks + labels. Deliberately has NO scrub/hover listenable, so it
 /// repaints only when the camera, grid, frame, labels, or style change -- it
@@ -143,34 +259,8 @@ class TissueChromePainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final p = _projector(size);
     if (!grid.isEmpty) _paintWireframe(canvas, p);
-    _paintAxes(canvas, p);
-    _paintLabels(canvas, p);
-  }
-
-  void _paintLabels(Canvas canvas, SceneProjector p) {
-    final set = labels;
-    if (set == null) return;
-    for (final l in set.labels) {
-      final at = p.project(l.x, l.y, l.z);
-      final isTitle = l.kind == AxisLabelKind.title;
-      final tp = TextPainter(
-        text: TextSpan(
-          text: l.text,
-          style: TextStyle(
-            color: style.label,
-            fontSize: isTitle ? 11 : 9.5,
-            fontWeight: isTitle ? FontWeight.w600 : FontWeight.w400,
-          ),
-        ),
-        textDirection: textDirection,
-      )..layout();
-      // Titles sit above-right of the axis end; tick values below-left of the
-      // tick, so neither overlaps the axis line.
-      final offset = isTitle
-          ? Offset(4, -tp.height - 2)
-          : Offset(-tp.width - 4, -tp.height / 2);
-      tp.paint(canvas, at + offset);
-    }
+    paintAxisSegments(canvas, p, frame, style);
+    paintAxisLabels(canvas, p, labels, style, textDirection);
   }
 
   void _paintWireframe(Canvas canvas, SceneProjector p) {
@@ -201,45 +291,6 @@ class TissueChromePainter extends CustomPainter {
         comp == 0 ? path.moveTo(o.dx, o.dy) : path.lineTo(o.dx, o.dy);
       }
       canvas.drawPath(path, paint);
-    }
-  }
-
-  void _paintAxes(Canvas canvas, SceneProjector p) {
-    Paint stroke(Color c, double w) => Paint()
-      ..color = c
-      ..strokeWidth = w
-      ..style = PaintingStyle.stroke;
-    for (final s in frame.segments) {
-      final a = p.project(s.x1, s.y1, s.z1);
-      final b = p.project(s.x2, s.y2, s.z2);
-      switch (s.role) {
-        case AxisRole.axisX:
-          canvas.drawLine(a, b, stroke(style.axisX, 2));
-        case AxisRole.axisY:
-          canvas.drawLine(a, b, stroke(style.axisY, 2));
-        case AxisRole.axisZ:
-          canvas.drawLine(a, b, stroke(style.axisZ, 2));
-        case AxisRole.tickX:
-          canvas.drawLine(
-            a,
-            b,
-            stroke(style.axisX.withValues(alpha: 0.9), 1.5),
-          );
-        case AxisRole.tickY:
-          canvas.drawLine(
-            a,
-            b,
-            stroke(style.axisY.withValues(alpha: 0.9), 1.5),
-          );
-        case AxisRole.tickZ:
-          canvas.drawLine(
-            a,
-            b,
-            stroke(style.axisZ.withValues(alpha: 0.9), 1.5),
-          );
-        case AxisRole.frameGrid:
-          break; // drawn by TissueFramePainter
-      }
     }
   }
 

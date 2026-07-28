@@ -20984,6 +20984,11 @@ class AppLocalizationsEs extends AppLocalizations {
       'No hay batimetría disponible para esta ubicación';
 
   @override
+  String dive3d_seascape_axis_distance(String unitSymbol) {
+    return 'Distancia ($unitSymbol)';
+  }
+
+  @override
   String get settings_about_bathymetryCredit =>
       'Datos de batimetría: GMRT (CC BY 4.0) · EMODnet Bathymetry (CC BY 4.0) · NOAA ETOPO 2022';
 

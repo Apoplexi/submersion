@@ -35021,6 +35021,12 @@ abstract class AppLocalizations {
   /// **'No bathymetry available for this location'**
   String get dive3d_seascape_noData;
 
+  /// No description provided for @dive3d_seascape_axis_distance.
+  ///
+  /// In en, this message translates to:
+  /// **'Distance ({unitSymbol})'**
+  String dive3d_seascape_axis_distance(String unitSymbol);
+
   /// No description provided for @settings_about_bathymetryCredit.
   ///
   /// In en, this message translates to:

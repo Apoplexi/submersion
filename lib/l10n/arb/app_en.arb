@@ -13274,6 +13274,10 @@
   "@dive3d_seascape_noCoordinates": {},
   "dive3d_seascape_noData": "No bathymetry available for this location",
   "@dive3d_seascape_noData": {},
+  "dive3d_seascape_axis_distance": "Distance ({unitSymbol})",
+  "@dive3d_seascape_axis_distance": {
+    "placeholders": {"unitSymbol": {"type": "String"}}
+  },
   "settings_about_bathymetryCredit": "Bathymetry data: GMRT (CC BY 4.0) · EMODnet Bathymetry (CC BY 4.0) · NOAA ETOPO 2022",
   "@settings_about_bathymetryCredit": {},
   "dive3d_metric_depth": "Depth",

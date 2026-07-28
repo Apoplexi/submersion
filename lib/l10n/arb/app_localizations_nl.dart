@@ -20801,6 +20801,11 @@ class AppLocalizationsNl extends AppLocalizations {
       'Geen bathymetrie beschikbaar voor deze locatie';
 
   @override
+  String dive3d_seascape_axis_distance(String unitSymbol) {
+    return 'Afstand ($unitSymbol)';
+  }
+
+  @override
   String get settings_about_bathymetryCredit =>
       'Bathymetriegegevens: GMRT (CC BY 4.0) · EMODnet Bathymetry (CC BY 4.0) · NOAA ETOPO 2022';
 

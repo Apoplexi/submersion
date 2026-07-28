@@ -259,6 +259,12 @@ class _Dive3dInteractiveViewportState extends State<Dive3dInteractiveViewport> {
             widget.axisFrame != null &&
             widget.chromeStyle != null &&
             widget.hoverPick != null;
+        // Axis-only chrome (seascape views): frame + labels without the
+        // tissue surface/hover machinery, scrub cursor untouched.
+        final hasAxisChrome =
+            !hasChrome &&
+            widget.axisFrame != null &&
+            widget.chromeStyle != null;
 
         final scenePaint = CustomPaint(
           painter: Dive3dScenePainter(
@@ -312,6 +318,20 @@ class _Dive3dInteractiveViewportState extends State<Dive3dInteractiveViewport> {
                   zoom: _zoom,
                   scrubPosition: widget.scrubPosition,
                   hoverPick: widget.hoverPick!,
+                ),
+                child: scenePaint,
+              )
+            : hasAxisChrome
+            ? CustomPaint(
+                foregroundPainter: AxisChromePainter(
+                  bounds: widget.scene.bounds,
+                  frame: widget.axisFrame!,
+                  labels: widget.axisLabels,
+                  style: widget.chromeStyle!,
+                  yawDegrees: _yaw,
+                  pitchDegrees: _pitch,
+                  zoom: _zoom,
+                  textDirection: Directionality.of(context),
                 ),
                 child: scenePaint,
               )
