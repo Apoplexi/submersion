@@ -12,6 +12,7 @@ import 'package:submersion/core/domain/entities/migration_progress.dart';
 import 'package:submersion/core/presentation/pages/startup_page.dart';
 import 'package:submersion/core/presentation/startup_brightness.dart';
 import 'package:submersion/core/presentation/widgets/ocean_background.dart';
+import 'package:submersion/core/presentation/widgets/version_mismatch_view.dart';
 import 'package:submersion/core/services/database_location_service.dart';
 import 'package:submersion/core/services/log_file_service.dart';
 import 'package:submersion/features/backup/data/repositories/backup_preferences.dart';
@@ -186,52 +187,22 @@ Widget _buildVersionMismatchError({
   required int dbVersion,
   required int appVersion,
   VoidCallback? onClose,
+  VoidCallback? onDownloadLatest,
 }) {
-  const textColor = Colors.black87;
-  const subtitleColor = Colors.black54;
-
+  // Renders the real production widget so these tests cannot drift from the
+  // screen users actually see (the previous inline replica did exactly that).
   return MaterialApp(
     home: Scaffold(
       key: const ValueKey('error'),
       body: SafeArea(
         child: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(Icons.update, size: 64, color: Colors.orange),
-                const SizedBox(height: 24),
-                const Text(
-                  'Update Required',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: textColor,
-                  ),
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  'Your dive data was saved by a newer version of '
-                  'Submersion (schema v$dbVersion). This version '
-                  'only supports up to schema v$appVersion.',
-                  style: const TextStyle(fontSize: 14, color: subtitleColor),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 16),
-                const Text(
-                  'Please update Submersion to the latest version. '
-                  'Your data is safe and has not been modified.',
-                  style: TextStyle(fontSize: 14, color: subtitleColor),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 24),
-                FilledButton(
-                  onPressed: onClose ?? () {},
-                  child: const Text('Close'),
-                ),
-              ],
-            ),
+          child: VersionMismatchView(
+            databaseVersion: dbVersion,
+            appVersion: appVersion,
+            textColor: Colors.black87,
+            subtitleColor: Colors.black54,
+            onDownloadLatest: onDownloadLatest ?? () {},
+            onClose: onClose ?? () {},
           ),
         ),
       ),
@@ -417,6 +388,29 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.byKey(const ValueKey('error')), findsOneWidget);
+    });
+
+    testWidgets('offers a download link for the latest version', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        _buildVersionMismatchError(dbVersion: 137, appVersion: 136),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Download Latest Version'), findsOneWidget);
+    });
+
+    testWidgets('mentions the pre-upgrade backup', (tester) async {
+      await tester.pumpWidget(
+        _buildVersionMismatchError(dbVersion: 137, appVersion: 136),
+      );
+      await tester.pumpAndSettle();
+
+      expect(
+        find.textContaining('backup taken before the upgrade'),
+        findsOneWidget,
+      );
     });
   });
 
