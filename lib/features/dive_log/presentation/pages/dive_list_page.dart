@@ -17,6 +17,7 @@ import 'package:submersion/features/dive_log/presentation/formatters/dive_type_l
 import 'package:submersion/features/data_quality/presentation/providers/data_quality_providers.dart';
 import 'package:submersion/features/dive_log/presentation/pages/dive_detail_page.dart';
 import 'package:submersion/features/dive_log/presentation/pages/dive_edit_page.dart';
+import 'package:submersion/features/dive_sites/presentation/pages/site_edit_page.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_providers.dart';
 import 'package:submersion/features/dive_log/presentation/providers/highlight_providers.dart';
 import 'package:submersion/features/dive_log/presentation/providers/view_config_providers.dart';
@@ -393,12 +394,47 @@ class _DiveListPageState extends ConsumerState<DiveListPage> {
             context.go('$currentPath?selected=$diveId');
           },
         ),
-        editBuilder: (context, diveId, onSaved, onCancel) => DiveEditPage(
-          diveId: diveId,
-          embedded: true,
-          onSaved: onSaved,
-          onCancel: onCancel,
-        ),
+        editBuilder: (context, id, onSaved, onCancel) {
+          final state = GoRouterState.of(context);
+          final siteId = state.uri.queryParameters['site'];
+          if (siteId != null && siteId.isNotEmpty) {
+            return SiteEditPage(
+              siteId: siteId,
+              embedded: true,
+              onSaved: (savedId) {
+                // When a site is saved through the dive details navigation, we want to return to the site detail view.
+                // We must preserve the original dive 'selected' parameter and keep the 'site' parameter,
+                // while removing the 'mode=edit' parameter.
+                final params = Map<String, String>.from(
+                  state.uri.queryParameters,
+                );
+                params.remove('mode');
+                // Ensure the site ID is updated if it changed (though unlikely for edit)
+                params['site'] = savedId;
+                // 'selected' remains the original diveId (passed as 'id' here)
+                context.replace(
+                  Uri(path: state.uri.path, queryParameters: params).toString(),
+                );
+              },
+              onCancel: () {
+                // Same for cancel - return to site detail view without 'mode=edit'
+                final params = Map<String, String>.from(
+                  state.uri.queryParameters,
+                );
+                params.remove('mode');
+                context.replace(
+                  Uri(path: state.uri.path, queryParameters: params).toString(),
+                );
+              },
+            );
+          }
+          return DiveEditPage(
+            diveId: id,
+            embedded: true,
+            onSaved: onSaved,
+            onCancel: onCancel,
+          );
+        },
         createBuilder: (context, onSaved, onCancel) =>
             DiveEditPage(embedded: true, onSaved: onSaved, onCancel: onCancel),
         floatingActionButton: fab,
