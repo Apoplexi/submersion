@@ -75,6 +75,10 @@ Future<NavSpy> pumpStrip(
         path: '/settings/data-quality',
         builder: (_, _) => stub('/settings/data-quality'),
       ),
+      GoRoute(
+        path: '/settings/diver-profile/insurance',
+        builder: (_, _) => stub('/settings/diver-profile/insurance'),
+      ),
     ],
   );
   await tester.pumpWidget(
@@ -255,9 +259,13 @@ void main() {
   });
 
   group('insurance chip', () {
-    testWidgets('missing insurance', (tester) async {
-      await pumpStrip(tester, _emptyGauges);
+    testWidgets('missing insurance chip navigates to the insurance record', (
+      tester,
+    ) async {
+      final spy = await pumpStrip(tester, _emptyGauges);
       expect(find.text('No insurance on file'), findsOneWidget);
+      await tapChip(tester, 'No insurance on file');
+      expect(spy.location, '/settings/diver-profile/insurance');
     });
 
     testWidgets('insurance without an expiry date reads as missing', (
@@ -276,8 +284,10 @@ void main() {
       expect(find.text('No insurance on file'), findsOneWidget);
     });
 
-    testWidgets('expired insurance', (tester) async {
-      await pumpStrip(
+    testWidgets('expired insurance chip navigates to the insurance record', (
+      tester,
+    ) async {
+      final spy = await pumpStrip(
         tester,
         DashboardGauges(
           gearGauges: const [],
@@ -291,10 +301,14 @@ void main() {
         ),
       );
       expect(find.text('Insurance expired'), findsOneWidget);
+      await tapChip(tester, 'Insurance expired');
+      expect(spy.location, '/settings/diver-profile/insurance');
     });
 
-    testWidgets('insurance expiring soon shows the date', (tester) async {
-      await pumpStrip(
+    testWidgets('expiring-soon insurance chip navigates to the record', (
+      tester,
+    ) async {
+      final spy = await pumpStrip(
         tester,
         DashboardGauges(
           gearGauges: const [],
@@ -307,11 +321,18 @@ void main() {
           daysSinceLastDive: null,
         ),
       );
-      expect(find.textContaining('Insurance expires'), findsOneWidget);
+      // The label carries a formatted date, so match on its prefix.
+      final chip = find.textContaining('Insurance expires');
+      expect(chip, findsOneWidget);
+      await tester.tap(find.ancestor(of: chip, matching: find.byType(InkWell)));
+      await tester.pumpAndSettle();
+      expect(spy.location, '/settings/diver-profile/insurance');
     });
 
-    testWidgets('valid insurance', (tester) async {
-      await pumpStrip(
+    testWidgets('valid insurance chip navigates to the insurance record', (
+      tester,
+    ) async {
+      final spy = await pumpStrip(
         tester,
         DashboardGauges(
           gearGauges: const [],
@@ -325,6 +346,8 @@ void main() {
         ),
       );
       expect(find.text('Insurance OK'), findsOneWidget);
+      await tapChip(tester, 'Insurance OK');
+      expect(spy.location, '/settings/diver-profile/insurance');
     });
   });
 
