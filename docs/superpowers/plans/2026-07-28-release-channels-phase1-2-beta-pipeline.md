@@ -650,3 +650,4 @@ dart format . && flutter analyze && python3 -c "import yaml; [yaml.safe_load(ope
 - `workflow_run` only fires from the default branch: the trigger goes live when this branch merges; until then `workflow_dispatch` is the test path.
 - `secrets: inherit` exposes all repo secrets to `build-all.yml` — same trust boundary as today (same repo, same jobs).
 - The train-closed guard depends on stable tags being 4-segment `vX.Y.Z.N`; the legacy prerelease tags (`vX.Y.Z-beta.N`) do not match `v${SEMVER}.[0-9]*` and correctly do not close the train.
+- Windows `VersionInfoVersion` parts are 16-bit: build numbers must stay <= 65535 (discovered when the first smoke used 999999 and Inno Setup rejected it). Commit count is ~4,750 today, so decades of headroom — but if the counter scheme ever changes (e.g. to a date-based number), the Windows installer is the binding constraint.
