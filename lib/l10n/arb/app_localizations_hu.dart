@@ -92,6 +92,131 @@ class AppLocalizationsHu extends AppLocalizations {
   String get equipment_setDetail_noGeofences => 'Nincsenek geokerítések';
 
   @override
+  String formatter_duration_minutes(Object minutes) {
+    return '$minutes perc';
+  }
+
+  @override
+  String formatter_duration_minutesSeconds(Object minutes, Object seconds) {
+    return '$minutes perc $seconds mp';
+  }
+
+  @override
+  String formatter_duration_seconds(Object seconds) {
+    return '$seconds mp';
+  }
+
+  @override
+  String gasCalculators_bestMix_densityCritical(Object limit) {
+    return 'A $limit g/L abszolut suruseghatar felett.';
+  }
+
+  @override
+  String get gasCalculators_bestMix_densityLabel => 'Gazsuruseg a melysegben';
+
+  @override
+  String gasCalculators_bestMix_densityWarn(Object limit) {
+    return 'Az ajanlott $limit g/L suruseghatar felett.';
+  }
+
+  @override
+  String gasCalculators_bestMix_endExceeded(Object limit) {
+    return 'Az END meghaladja a $limit korlatodat.';
+  }
+
+  @override
+  String get gasCalculators_bestMix_endLabel => 'END a melysegben';
+
+  @override
+  String get gasCalculators_bestMix_endLimitLabel => 'END-korlat';
+
+  @override
+  String gasCalculators_bestMix_heliumAdded(Object limit) {
+    return 'Helium hozzaadva, hogy az END a $limit korlaton belul maradjon.';
+  }
+
+  @override
+  String get gasCalculators_bestMix_idealLabel => 'Idealis arany';
+
+  @override
+  String get gasCalculators_bestMix_marginLabel => 'Tartalek a MOD alatt';
+
+  @override
+  String gasCalculators_bestMix_modLabel(Object ppO2) {
+    return 'MOD ppO2 $ppO2 mellett';
+  }
+
+  @override
+  String get gasCalculators_bestMix_nearestStandard =>
+      'A legkozelebbi szabvanykeverek erre a melysegre';
+
+  @override
+  String get gasCalculators_bestMix_recommendedMix => 'Ajanlott keverek';
+
+  @override
+  String get gasCalculators_bestMix_withoutHelium => 'Helium nelkul';
+
+  @override
+  String get gasCalculators_planningCaveat =>
+      'Tervezesi becsles. Kozvetlen felmerulest feltetelez. Vesd ossze a kepzeseddel, es szamolj tartalekkal a korulmenyekre.';
+
+  @override
+  String gasCalculators_rockBottom_solveGas(Object depth, Object unit) {
+    return 'Problemamegoldo gaz $depth$unit melysegben';
+  }
+
+  @override
+  String get gasCalculators_rockBottom_solveTime => 'Problemamegoldasi ido';
+
+  @override
+  String get gasCalculators_rockBottom_solveTimeHint =>
+      'A melysegben toltott ido a veszhelyzet megoldasara, mielott a felmerules elkezdodik.';
+
+  @override
+  String o2Toxicity_addedThisDive(Object value) {
+    return '+$value ezen a merulesen';
+  }
+
+  @override
+  String o2Toxicity_cnsProgressSemantics(Object percent) {
+    return 'CNS elorehalads $percent szazalek';
+  }
+
+  @override
+  String get o2Toxicity_daily => 'Napi';
+
+  @override
+  String o2Toxicity_otuSemantics(
+    Object label,
+    Object value,
+    Object limit,
+    Object percent,
+  ) {
+    return '$label: $value / $limit OTU, $percent szazalek';
+  }
+
+  @override
+  String o2Toxicity_otuValueSemantics(Object label, Object value) {
+    return '$label: $value OTU';
+  }
+
+  @override
+  String o2Toxicity_prior(Object value) {
+    return 'Korabbi: $value OTU';
+  }
+
+  @override
+  String o2Toxicity_start(Object value) {
+    return 'Kezdet: $value OTU';
+  }
+
+  @override
+  String get o2Toxicity_thisDive => 'Ez a merules';
+
+  @override
+  String get o2Toxicity_weekly => 'Heti';
+
+  @override
   String trips_story_dayLabel(int number) {
     return '$number. nap';
   }
@@ -18024,6 +18149,71 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get universalImport_tooltip_closeWizard => 'Import varázsló bezárása';
+
+  @override
+  String weather_windFromDirection(Object wind, Object direction) {
+    return '$wind $direction felol';
+  }
+
+  @override
+  String get weather_wind_calm => 'szelcsend';
+
+  @override
+  String get weather_wind_highWind => 'eros szel';
+
+  @override
+  String get weather_wind_lightBreeze => 'gyenge szello';
+
+  @override
+  String get weather_wind_moderateBreeze => 'mersekelt szello';
+
+  @override
+  String get weather_wind_strongBreeze => 'elenk szello';
+
+  @override
+  String get weather_wmo_clear => 'Derult eg';
+
+  @override
+  String get weather_wmo_drizzle => 'Szitalo eso';
+
+  @override
+  String get weather_wmo_fog => 'Kod';
+
+  @override
+  String get weather_wmo_freezingDrizzle => 'Onodo szitalo eso';
+
+  @override
+  String get weather_wmo_freezingRain => 'Onodo eso';
+
+  @override
+  String get weather_wmo_mainlyClear => 'Tulnyomoan derult';
+
+  @override
+  String get weather_wmo_overcast => 'Borult';
+
+  @override
+  String get weather_wmo_partlyCloudy => 'Reszben felhos';
+
+  @override
+  String get weather_wmo_rain => 'Eso';
+
+  @override
+  String get weather_wmo_rainShowers => 'Zaporeso';
+
+  @override
+  String get weather_wmo_snow => 'Ho';
+
+  @override
+  String get weather_wmo_snowGrains => 'Hodara';
+
+  @override
+  String get weather_wmo_snowShowers => 'Hozapor';
+
+  @override
+  String get weather_wmo_thunderstorm => 'Zivatar';
+
+  @override
+  String get weather_wmo_thunderstormHail => 'Zivatar jegesovel';
 
   @override
   String weightCalc_baseLine(Object suitType, Object weight) {

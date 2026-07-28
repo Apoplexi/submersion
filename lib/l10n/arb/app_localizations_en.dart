@@ -91,6 +91,131 @@ class AppLocalizationsEn extends AppLocalizations {
   String get equipment_setDetail_noGeofences => 'No geofences';
 
   @override
+  String formatter_duration_minutes(Object minutes) {
+    return '${minutes}m';
+  }
+
+  @override
+  String formatter_duration_minutesSeconds(Object minutes, Object seconds) {
+    return '${minutes}m ${seconds}s';
+  }
+
+  @override
+  String formatter_duration_seconds(Object seconds) {
+    return '${seconds}s';
+  }
+
+  @override
+  String gasCalculators_bestMix_densityCritical(Object limit) {
+    return 'Above the $limit g/L hard density ceiling.';
+  }
+
+  @override
+  String get gasCalculators_bestMix_densityLabel => 'Gas density at depth';
+
+  @override
+  String gasCalculators_bestMix_densityWarn(Object limit) {
+    return 'Above the recommended $limit g/L density limit.';
+  }
+
+  @override
+  String gasCalculators_bestMix_endExceeded(Object limit) {
+    return 'END exceeds your $limit limit.';
+  }
+
+  @override
+  String get gasCalculators_bestMix_endLabel => 'END at depth';
+
+  @override
+  String get gasCalculators_bestMix_endLimitLabel => 'END limit';
+
+  @override
+  String gasCalculators_bestMix_heliumAdded(Object limit) {
+    return 'Helium added to keep END within your $limit limit.';
+  }
+
+  @override
+  String get gasCalculators_bestMix_idealLabel => 'Ideal fraction';
+
+  @override
+  String get gasCalculators_bestMix_marginLabel => 'Margin below MOD';
+
+  @override
+  String gasCalculators_bestMix_modLabel(Object ppO2) {
+    return 'MOD at ppO2 $ppO2';
+  }
+
+  @override
+  String get gasCalculators_bestMix_nearestStandard =>
+      'Nearest standard mix covering this depth';
+
+  @override
+  String get gasCalculators_bestMix_recommendedMix => 'Recommended mix';
+
+  @override
+  String get gasCalculators_bestMix_withoutHelium => 'Without helium';
+
+  @override
+  String get gasCalculators_planningCaveat =>
+      'Planning estimate. Assumes a direct ascent. Verify against your training and add margin for conditions.';
+
+  @override
+  String gasCalculators_rockBottom_solveGas(Object depth, Object unit) {
+    return 'Problem-solving gas at $depth$unit';
+  }
+
+  @override
+  String get gasCalculators_rockBottom_solveTime => 'Problem-solving time';
+
+  @override
+  String get gasCalculators_rockBottom_solveTimeHint =>
+      'Time spent at depth resolving the emergency before starting the ascent.';
+
+  @override
+  String o2Toxicity_addedThisDive(Object value) {
+    return '+$value this dive';
+  }
+
+  @override
+  String o2Toxicity_cnsProgressSemantics(Object percent) {
+    return 'CNS progress $percent percent';
+  }
+
+  @override
+  String get o2Toxicity_daily => 'Daily';
+
+  @override
+  String o2Toxicity_otuSemantics(
+    Object label,
+    Object value,
+    Object limit,
+    Object percent,
+  ) {
+    return '$label: $value of $limit OTU, $percent percent';
+  }
+
+  @override
+  String o2Toxicity_otuValueSemantics(Object label, Object value) {
+    return '$label: $value OTU';
+  }
+
+  @override
+  String o2Toxicity_prior(Object value) {
+    return 'Prior: $value OTU';
+  }
+
+  @override
+  String o2Toxicity_start(Object value) {
+    return 'Start: $value OTU';
+  }
+
+  @override
+  String get o2Toxicity_thisDive => 'This Dive';
+
+  @override
+  String get o2Toxicity_weekly => 'Weekly';
+
+  @override
   String trips_story_dayLabel(int number) {
     return 'Day $number';
   }
@@ -17767,6 +17892,71 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get universalImport_tooltip_closeWizard => 'Close import wizard';
+
+  @override
+  String weather_windFromDirection(Object wind, Object direction) {
+    return '$wind from $direction';
+  }
+
+  @override
+  String get weather_wind_calm => 'calm';
+
+  @override
+  String get weather_wind_highWind => 'high wind';
+
+  @override
+  String get weather_wind_lightBreeze => 'light breeze';
+
+  @override
+  String get weather_wind_moderateBreeze => 'moderate breeze';
+
+  @override
+  String get weather_wind_strongBreeze => 'strong breeze';
+
+  @override
+  String get weather_wmo_clear => 'Clear sky';
+
+  @override
+  String get weather_wmo_drizzle => 'Drizzle';
+
+  @override
+  String get weather_wmo_fog => 'Fog';
+
+  @override
+  String get weather_wmo_freezingDrizzle => 'Freezing drizzle';
+
+  @override
+  String get weather_wmo_freezingRain => 'Freezing rain';
+
+  @override
+  String get weather_wmo_mainlyClear => 'Mainly clear';
+
+  @override
+  String get weather_wmo_overcast => 'Overcast';
+
+  @override
+  String get weather_wmo_partlyCloudy => 'Partly cloudy';
+
+  @override
+  String get weather_wmo_rain => 'Rain';
+
+  @override
+  String get weather_wmo_rainShowers => 'Rain showers';
+
+  @override
+  String get weather_wmo_snow => 'Snow';
+
+  @override
+  String get weather_wmo_snowGrains => 'Snow grains';
+
+  @override
+  String get weather_wmo_snowShowers => 'Snow showers';
+
+  @override
+  String get weather_wmo_thunderstorm => 'Thunderstorm';
+
+  @override
+  String get weather_wmo_thunderstormHail => 'Thunderstorm with hail';
 
   @override
   String weightCalc_baseLine(Object suitType, Object weight) {
