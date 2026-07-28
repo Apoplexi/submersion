@@ -1,0 +1,24 @@
+name: Smoke Build All
+
+# TEMPORARY: pre-merge smoke test for build-all.yml. workflow_dispatch cannot
+# target a workflow that is not on the default branch yet, so this wrapper
+# runs the reusable workflow on branch pushes instead. Delete before merging
+# release-channels-phase1-2.
+on:
+  push:
+    branches: [release-channels-phase1-2]
+    paths:
+      - '.github/workflows/build-all.yml'
+      - '.github/workflows/smoke-build-all.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    name: Smoke build
+    uses: ./.github/workflows/build-all.yml
+    with:
+      version-tag: v0.0.0-smoke.1
+      build-number: '999999'
+    secrets: inherit
