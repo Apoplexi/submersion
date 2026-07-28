@@ -144,6 +144,11 @@ class Dive extends Equatable {
   final Precipitation? precipitation;
   final double? humidity; // 0-100
   final String? weatherDescription;
+
+  /// Raw WMO weather code from the forecast provider, when available.
+  /// Drives the localized weather description at display time.
+  final int? weatherCode;
+
   final WeatherSource? weatherSource;
   final DateTime? weatherFetchedAt;
 
@@ -236,6 +241,7 @@ class Dive extends Equatable {
     this.precipitation,
     this.humidity,
     this.weatherDescription,
+    this.weatherCode,
     this.weatherSource,
     this.weatherFetchedAt,
   });
@@ -610,6 +616,7 @@ class Dive extends Equatable {
     Precipitation? precipitation,
     double? humidity,
     String? weatherDescription,
+    int? weatherCode,
     WeatherSource? weatherSource,
     DateTime? weatherFetchedAt,
   }) {
@@ -702,6 +709,7 @@ class Dive extends Equatable {
       precipitation: precipitation ?? this.precipitation,
       humidity: humidity ?? this.humidity,
       weatherDescription: weatherDescription ?? this.weatherDescription,
+      weatherCode: weatherCode ?? this.weatherCode,
       weatherSource: weatherSource ?? this.weatherSource,
       weatherFetchedAt: weatherFetchedAt ?? this.weatherFetchedAt,
     );
@@ -797,6 +805,7 @@ class Dive extends Equatable {
     precipitation,
     humidity,
     weatherDescription,
+    weatherCode,
     weatherSource,
     weatherFetchedAt,
   ];

@@ -91,6 +91,131 @@ class AppLocalizationsHe extends AppLocalizations {
   String get equipment_setDetail_noGeofences => 'אין גדרות גאוגרפיות';
 
   @override
+  String formatter_duration_minutes(Object minutes) {
+    return '$minutes דק\'';
+  }
+
+  @override
+  String formatter_duration_minutesSeconds(Object minutes, Object seconds) {
+    return '$minutes דק\' $seconds שנ\'';
+  }
+
+  @override
+  String formatter_duration_seconds(Object seconds) {
+    return '$seconds שנ\'';
+  }
+
+  @override
+  String gasCalculators_bestMix_densityCritical(Object limit) {
+    return 'מעל תקרת הצפיפות המוחלטת של $limit g/L.';
+  }
+
+  @override
+  String get gasCalculators_bestMix_densityLabel => 'צפיפות הגז בעומק';
+
+  @override
+  String gasCalculators_bestMix_densityWarn(Object limit) {
+    return 'מעל מגבלת הצפיפות המומלצת של $limit g/L.';
+  }
+
+  @override
+  String gasCalculators_bestMix_endExceeded(Object limit) {
+    return 'ה-END חורג מהמגבלה שלך $limit.';
+  }
+
+  @override
+  String get gasCalculators_bestMix_endLabel => 'END בעומק';
+
+  @override
+  String get gasCalculators_bestMix_endLimitLabel => 'מגבלת END';
+
+  @override
+  String gasCalculators_bestMix_heliumAdded(Object limit) {
+    return 'נוסף הליום כדי לשמור על ה-END בתוך המגבלה שלך $limit.';
+  }
+
+  @override
+  String get gasCalculators_bestMix_idealLabel => 'שיעור אידאלי';
+
+  @override
+  String get gasCalculators_bestMix_marginLabel => 'מרווח מתחת ל-MOD';
+
+  @override
+  String gasCalculators_bestMix_modLabel(Object ppO2) {
+    return 'MOD ב-ppO2 $ppO2';
+  }
+
+  @override
+  String get gasCalculators_bestMix_nearestStandard =>
+      'התערובת התקנית הקרובה ביותר המכסה עומק זה';
+
+  @override
+  String get gasCalculators_bestMix_recommendedMix => 'תערובת מומלצת';
+
+  @override
+  String get gasCalculators_bestMix_withoutHelium => 'ללא הליום';
+
+  @override
+  String get gasCalculators_planningCaveat =>
+      'הערכת תכנון. מניחה עלייה ישירה. ודא מול ההכשרה שלך והוסף מרווח לתנאים.';
+
+  @override
+  String gasCalculators_rockBottom_solveGas(Object depth, Object unit) {
+    return 'גז לפתרון תקלה בעומק $depth$unit';
+  }
+
+  @override
+  String get gasCalculators_rockBottom_solveTime => 'זמן לפתרון תקלה';
+
+  @override
+  String get gasCalculators_rockBottom_solveTimeHint =>
+      'הזמן בעומק לפתרון החירום לפני תחילת העלייה.';
+
+  @override
+  String o2Toxicity_addedThisDive(Object value) {
+    return '+$value בצלילה זו';
+  }
+
+  @override
+  String o2Toxicity_cnsProgressSemantics(Object percent) {
+    return 'התקדמות CNS $percent אחוזים';
+  }
+
+  @override
+  String get o2Toxicity_daily => 'יומי';
+
+  @override
+  String o2Toxicity_otuSemantics(
+    Object label,
+    Object value,
+    Object limit,
+    Object percent,
+  ) {
+    return '$label: $value מתוך $limit OTU, $percent אחוזים';
+  }
+
+  @override
+  String o2Toxicity_otuValueSemantics(Object label, Object value) {
+    return '$label: $value OTU';
+  }
+
+  @override
+  String o2Toxicity_prior(Object value) {
+    return 'קודם: $value OTU';
+  }
+
+  @override
+  String o2Toxicity_start(Object value) {
+    return 'התחלה: $value OTU';
+  }
+
+  @override
+  String get o2Toxicity_thisDive => 'צלילה זו';
+
+  @override
+  String get o2Toxicity_weekly => 'שבועי';
+
+  @override
   String trips_story_dayLabel(int number) {
     return 'יום $number';
   }
@@ -17618,6 +17743,71 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get universalImport_tooltip_closeWizard => 'סגור אשף ייבוא';
+
+  @override
+  String weather_windFromDirection(Object wind, Object direction) {
+    return '$wind מכיוון $direction';
+  }
+
+  @override
+  String get weather_wind_calm => 'רגוע';
+
+  @override
+  String get weather_wind_highWind => 'רוח עזה';
+
+  @override
+  String get weather_wind_lightBreeze => 'רוח קלה';
+
+  @override
+  String get weather_wind_moderateBreeze => 'רוח מתונה';
+
+  @override
+  String get weather_wind_strongBreeze => 'רוח חזקה';
+
+  @override
+  String get weather_wmo_clear => 'שמים בהירים';
+
+  @override
+  String get weather_wmo_drizzle => 'טפטוף';
+
+  @override
+  String get weather_wmo_fog => 'ערפל';
+
+  @override
+  String get weather_wmo_freezingDrizzle => 'טפטוף קופא';
+
+  @override
+  String get weather_wmo_freezingRain => 'גשם קופא';
+
+  @override
+  String get weather_wmo_mainlyClear => 'בהיר ברובו';
+
+  @override
+  String get weather_wmo_overcast => 'מעונן';
+
+  @override
+  String get weather_wmo_partlyCloudy => 'מעונן חלקית';
+
+  @override
+  String get weather_wmo_rain => 'גשם';
+
+  @override
+  String get weather_wmo_rainShowers => 'ממטרי גשם';
+
+  @override
+  String get weather_wmo_snow => 'שלג';
+
+  @override
+  String get weather_wmo_snowGrains => 'גרגרי שלג';
+
+  @override
+  String get weather_wmo_snowShowers => 'ממטרי שלג';
+
+  @override
+  String get weather_wmo_thunderstorm => 'סופת רעמים';
+
+  @override
+  String get weather_wmo_thunderstormHail => 'סופת רעמים עם ברד';
 
   @override
   String weightCalc_baseLine(Object suitType, Object weight) {

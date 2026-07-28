@@ -91,6 +91,131 @@ class AppLocalizationsAr extends AppLocalizations {
   String get equipment_setDetail_noGeofences => 'لا توجد أسوار جغرافية';
 
   @override
+  String formatter_duration_minutes(Object minutes) {
+    return '$minutes د';
+  }
+
+  @override
+  String formatter_duration_minutesSeconds(Object minutes, Object seconds) {
+    return '$minutes د $seconds ث';
+  }
+
+  @override
+  String formatter_duration_seconds(Object seconds) {
+    return '$seconds ث';
+  }
+
+  @override
+  String gasCalculators_bestMix_densityCritical(Object limit) {
+    return 'أعلى من الحد الأقصى للكثافة $limit g/L.';
+  }
+
+  @override
+  String get gasCalculators_bestMix_densityLabel => 'كثافة الغاز عند العمق';
+
+  @override
+  String gasCalculators_bestMix_densityWarn(Object limit) {
+    return 'أعلى من حد الكثافة الموصى به $limit g/L.';
+  }
+
+  @override
+  String gasCalculators_bestMix_endExceeded(Object limit) {
+    return 'قيمة END تتجاوز حدك $limit.';
+  }
+
+  @override
+  String get gasCalculators_bestMix_endLabel => 'END عند العمق';
+
+  @override
+  String get gasCalculators_bestMix_endLimitLabel => 'حد END';
+
+  @override
+  String gasCalculators_bestMix_heliumAdded(Object limit) {
+    return 'تمت إضافة الهيليوم لإبقاء END ضمن حدك $limit.';
+  }
+
+  @override
+  String get gasCalculators_bestMix_idealLabel => 'النسبة المثالية';
+
+  @override
+  String get gasCalculators_bestMix_marginLabel => 'الهامش تحت MOD';
+
+  @override
+  String gasCalculators_bestMix_modLabel(Object ppO2) {
+    return 'MOD عند ppO2 $ppO2';
+  }
+
+  @override
+  String get gasCalculators_bestMix_nearestStandard =>
+      'أقرب خليط قياسي يغطي هذا العمق';
+
+  @override
+  String get gasCalculators_bestMix_recommendedMix => 'الخليط الموصى به';
+
+  @override
+  String get gasCalculators_bestMix_withoutHelium => 'بدون هيليوم';
+
+  @override
+  String get gasCalculators_planningCaveat =>
+      'تقدير تخطيطي. يفترض صعودًا مباشرًا. تحقق منه وفق تدريبك وأضف هامشًا للظروف.';
+
+  @override
+  String gasCalculators_rockBottom_solveGas(Object depth, Object unit) {
+    return 'غاز حل المشكلة عند $depth$unit';
+  }
+
+  @override
+  String get gasCalculators_rockBottom_solveTime => 'زمن حل المشكلة';
+
+  @override
+  String get gasCalculators_rockBottom_solveTimeHint =>
+      'الوقت المستغرق في العمق لحل الطارئ قبل بدء الصعود.';
+
+  @override
+  String o2Toxicity_addedThisDive(Object value) {
+    return '+$value في هذه الغطسة';
+  }
+
+  @override
+  String o2Toxicity_cnsProgressSemantics(Object percent) {
+    return 'تقدم CNS $percent بالمئة';
+  }
+
+  @override
+  String get o2Toxicity_daily => 'يومي';
+
+  @override
+  String o2Toxicity_otuSemantics(
+    Object label,
+    Object value,
+    Object limit,
+    Object percent,
+  ) {
+    return '$label: $value من $limit OTU، $percent بالمئة';
+  }
+
+  @override
+  String o2Toxicity_otuValueSemantics(Object label, Object value) {
+    return '$label: $value OTU';
+  }
+
+  @override
+  String o2Toxicity_prior(Object value) {
+    return 'سابق: $value OTU';
+  }
+
+  @override
+  String o2Toxicity_start(Object value) {
+    return 'البداية: $value OTU';
+  }
+
+  @override
+  String get o2Toxicity_thisDive => 'هذه الغطسة';
+
+  @override
+  String get o2Toxicity_weekly => 'أسبوعي';
+
+  @override
   String trips_story_dayLabel(int number) {
     return 'اليوم $number';
   }
@@ -17744,6 +17869,71 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get universalImport_tooltip_closeWizard => 'إغلاق معالج الاستيراد';
+
+  @override
+  String weather_windFromDirection(Object wind, Object direction) {
+    return '$wind من $direction';
+  }
+
+  @override
+  String get weather_wind_calm => 'هدوء';
+
+  @override
+  String get weather_wind_highWind => 'رياح قوية';
+
+  @override
+  String get weather_wind_lightBreeze => 'نسيم خفيف';
+
+  @override
+  String get weather_wind_moderateBreeze => 'نسيم معتدل';
+
+  @override
+  String get weather_wind_strongBreeze => 'نسيم شديد';
+
+  @override
+  String get weather_wmo_clear => 'سماء صافية';
+
+  @override
+  String get weather_wmo_drizzle => 'رذاذ';
+
+  @override
+  String get weather_wmo_fog => 'ضباب';
+
+  @override
+  String get weather_wmo_freezingDrizzle => 'رذاذ متجمد';
+
+  @override
+  String get weather_wmo_freezingRain => 'مطر متجمد';
+
+  @override
+  String get weather_wmo_mainlyClear => 'صافية غالبًا';
+
+  @override
+  String get weather_wmo_overcast => 'غائم كليًا';
+
+  @override
+  String get weather_wmo_partlyCloudy => 'غائم جزئيًا';
+
+  @override
+  String get weather_wmo_rain => 'مطر';
+
+  @override
+  String get weather_wmo_rainShowers => 'زخات مطر';
+
+  @override
+  String get weather_wmo_snow => 'ثلج';
+
+  @override
+  String get weather_wmo_snowGrains => 'حبيبات ثلج';
+
+  @override
+  String get weather_wmo_snowShowers => 'زخات ثلج';
+
+  @override
+  String get weather_wmo_thunderstorm => 'عاصفة رعدية';
+
+  @override
+  String get weather_wmo_thunderstormHail => 'عاصفة رعدية مع برد';
 
   @override
   String weightCalc_baseLine(Object suitType, Object weight) {

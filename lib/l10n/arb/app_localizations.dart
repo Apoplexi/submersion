@@ -260,6 +260,185 @@ abstract class AppLocalizations {
   /// **'No geofences'**
   String get equipment_setDetail_noGeofences;
 
+  /// No description provided for @formatter_duration_minutes.
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes}m'**
+  String formatter_duration_minutes(Object minutes);
+
+  /// No description provided for @formatter_duration_minutesSeconds.
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes}m {seconds}s'**
+  String formatter_duration_minutesSeconds(Object minutes, Object seconds);
+
+  /// No description provided for @formatter_duration_seconds.
+  ///
+  /// In en, this message translates to:
+  /// **'{seconds}s'**
+  String formatter_duration_seconds(Object seconds);
+
+  /// No description provided for @gasCalculators_bestMix_densityCritical.
+  ///
+  /// In en, this message translates to:
+  /// **'Above the {limit} g/L hard density ceiling.'**
+  String gasCalculators_bestMix_densityCritical(Object limit);
+
+  /// No description provided for @gasCalculators_bestMix_densityLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Gas density at depth'**
+  String get gasCalculators_bestMix_densityLabel;
+
+  /// No description provided for @gasCalculators_bestMix_densityWarn.
+  ///
+  /// In en, this message translates to:
+  /// **'Above the recommended {limit} g/L density limit.'**
+  String gasCalculators_bestMix_densityWarn(Object limit);
+
+  /// No description provided for @gasCalculators_bestMix_endExceeded.
+  ///
+  /// In en, this message translates to:
+  /// **'END exceeds your {limit} limit.'**
+  String gasCalculators_bestMix_endExceeded(Object limit);
+
+  /// No description provided for @gasCalculators_bestMix_endLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'END at depth'**
+  String get gasCalculators_bestMix_endLabel;
+
+  /// No description provided for @gasCalculators_bestMix_endLimitLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'END limit'**
+  String get gasCalculators_bestMix_endLimitLabel;
+
+  /// No description provided for @gasCalculators_bestMix_heliumAdded.
+  ///
+  /// In en, this message translates to:
+  /// **'Helium added to keep END within your {limit} limit.'**
+  String gasCalculators_bestMix_heliumAdded(Object limit);
+
+  /// No description provided for @gasCalculators_bestMix_idealLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Ideal fraction'**
+  String get gasCalculators_bestMix_idealLabel;
+
+  /// No description provided for @gasCalculators_bestMix_marginLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Margin below MOD'**
+  String get gasCalculators_bestMix_marginLabel;
+
+  /// No description provided for @gasCalculators_bestMix_modLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'MOD at ppO2 {ppO2}'**
+  String gasCalculators_bestMix_modLabel(Object ppO2);
+
+  /// No description provided for @gasCalculators_bestMix_nearestStandard.
+  ///
+  /// In en, this message translates to:
+  /// **'Nearest standard mix covering this depth'**
+  String get gasCalculators_bestMix_nearestStandard;
+
+  /// No description provided for @gasCalculators_bestMix_recommendedMix.
+  ///
+  /// In en, this message translates to:
+  /// **'Recommended mix'**
+  String get gasCalculators_bestMix_recommendedMix;
+
+  /// No description provided for @gasCalculators_bestMix_withoutHelium.
+  ///
+  /// In en, this message translates to:
+  /// **'Without helium'**
+  String get gasCalculators_bestMix_withoutHelium;
+
+  /// No description provided for @gasCalculators_planningCaveat.
+  ///
+  /// In en, this message translates to:
+  /// **'Planning estimate. Assumes a direct ascent. Verify against your training and add margin for conditions.'**
+  String get gasCalculators_planningCaveat;
+
+  /// No description provided for @gasCalculators_rockBottom_solveGas.
+  ///
+  /// In en, this message translates to:
+  /// **'Problem-solving gas at {depth}{unit}'**
+  String gasCalculators_rockBottom_solveGas(Object depth, Object unit);
+
+  /// No description provided for @gasCalculators_rockBottom_solveTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Problem-solving time'**
+  String get gasCalculators_rockBottom_solveTime;
+
+  /// No description provided for @gasCalculators_rockBottom_solveTimeHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Time spent at depth resolving the emergency before starting the ascent.'**
+  String get gasCalculators_rockBottom_solveTimeHint;
+
+  /// No description provided for @o2Toxicity_addedThisDive.
+  ///
+  /// In en, this message translates to:
+  /// **'+{value} this dive'**
+  String o2Toxicity_addedThisDive(Object value);
+
+  /// No description provided for @o2Toxicity_cnsProgressSemantics.
+  ///
+  /// In en, this message translates to:
+  /// **'CNS progress {percent} percent'**
+  String o2Toxicity_cnsProgressSemantics(Object percent);
+
+  /// No description provided for @o2Toxicity_daily.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily'**
+  String get o2Toxicity_daily;
+
+  /// No description provided for @o2Toxicity_otuSemantics.
+  ///
+  /// In en, this message translates to:
+  /// **'{label}: {value} of {limit} OTU, {percent} percent'**
+  String o2Toxicity_otuSemantics(
+    Object label,
+    Object value,
+    Object limit,
+    Object percent,
+  );
+
+  /// No description provided for @o2Toxicity_otuValueSemantics.
+  ///
+  /// In en, this message translates to:
+  /// **'{label}: {value} OTU'**
+  String o2Toxicity_otuValueSemantics(Object label, Object value);
+
+  /// No description provided for @o2Toxicity_prior.
+  ///
+  /// In en, this message translates to:
+  /// **'Prior: {value} OTU'**
+  String o2Toxicity_prior(Object value);
+
+  /// No description provided for @o2Toxicity_start.
+  ///
+  /// In en, this message translates to:
+  /// **'Start: {value} OTU'**
+  String o2Toxicity_start(Object value);
+
+  /// No description provided for @o2Toxicity_thisDive.
+  ///
+  /// In en, this message translates to:
+  /// **'This Dive'**
+  String get o2Toxicity_thisDive;
+
+  /// No description provided for @o2Toxicity_weekly.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekly'**
+  String get o2Toxicity_weekly;
+
   /// No description provided for @trips_story_dayLabel.
   ///
   /// In en, this message translates to:
@@ -30374,6 +30553,132 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Close import wizard'**
   String get universalImport_tooltip_closeWizard;
+
+  /// No description provided for @weather_windFromDirection.
+  ///
+  /// In en, this message translates to:
+  /// **'{wind} from {direction}'**
+  String weather_windFromDirection(Object wind, Object direction);
+
+  /// No description provided for @weather_wind_calm.
+  ///
+  /// In en, this message translates to:
+  /// **'calm'**
+  String get weather_wind_calm;
+
+  /// No description provided for @weather_wind_highWind.
+  ///
+  /// In en, this message translates to:
+  /// **'high wind'**
+  String get weather_wind_highWind;
+
+  /// No description provided for @weather_wind_lightBreeze.
+  ///
+  /// In en, this message translates to:
+  /// **'light breeze'**
+  String get weather_wind_lightBreeze;
+
+  /// No description provided for @weather_wind_moderateBreeze.
+  ///
+  /// In en, this message translates to:
+  /// **'moderate breeze'**
+  String get weather_wind_moderateBreeze;
+
+  /// No description provided for @weather_wind_strongBreeze.
+  ///
+  /// In en, this message translates to:
+  /// **'strong breeze'**
+  String get weather_wind_strongBreeze;
+
+  /// No description provided for @weather_wmo_clear.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear sky'**
+  String get weather_wmo_clear;
+
+  /// No description provided for @weather_wmo_drizzle.
+  ///
+  /// In en, this message translates to:
+  /// **'Drizzle'**
+  String get weather_wmo_drizzle;
+
+  /// No description provided for @weather_wmo_fog.
+  ///
+  /// In en, this message translates to:
+  /// **'Fog'**
+  String get weather_wmo_fog;
+
+  /// No description provided for @weather_wmo_freezingDrizzle.
+  ///
+  /// In en, this message translates to:
+  /// **'Freezing drizzle'**
+  String get weather_wmo_freezingDrizzle;
+
+  /// No description provided for @weather_wmo_freezingRain.
+  ///
+  /// In en, this message translates to:
+  /// **'Freezing rain'**
+  String get weather_wmo_freezingRain;
+
+  /// No description provided for @weather_wmo_mainlyClear.
+  ///
+  /// In en, this message translates to:
+  /// **'Mainly clear'**
+  String get weather_wmo_mainlyClear;
+
+  /// No description provided for @weather_wmo_overcast.
+  ///
+  /// In en, this message translates to:
+  /// **'Overcast'**
+  String get weather_wmo_overcast;
+
+  /// No description provided for @weather_wmo_partlyCloudy.
+  ///
+  /// In en, this message translates to:
+  /// **'Partly cloudy'**
+  String get weather_wmo_partlyCloudy;
+
+  /// No description provided for @weather_wmo_rain.
+  ///
+  /// In en, this message translates to:
+  /// **'Rain'**
+  String get weather_wmo_rain;
+
+  /// No description provided for @weather_wmo_rainShowers.
+  ///
+  /// In en, this message translates to:
+  /// **'Rain showers'**
+  String get weather_wmo_rainShowers;
+
+  /// No description provided for @weather_wmo_snow.
+  ///
+  /// In en, this message translates to:
+  /// **'Snow'**
+  String get weather_wmo_snow;
+
+  /// No description provided for @weather_wmo_snowGrains.
+  ///
+  /// In en, this message translates to:
+  /// **'Snow grains'**
+  String get weather_wmo_snowGrains;
+
+  /// No description provided for @weather_wmo_snowShowers.
+  ///
+  /// In en, this message translates to:
+  /// **'Snow showers'**
+  String get weather_wmo_snowShowers;
+
+  /// No description provided for @weather_wmo_thunderstorm.
+  ///
+  /// In en, this message translates to:
+  /// **'Thunderstorm'**
+  String get weather_wmo_thunderstorm;
+
+  /// No description provided for @weather_wmo_thunderstormHail.
+  ///
+  /// In en, this message translates to:
+  /// **'Thunderstorm with hail'**
+  String get weather_wmo_thunderstormHail;
 
   /// Base weight line in calculation breakdown
   ///

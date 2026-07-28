@@ -92,6 +92,7 @@ import 'package:submersion/features/media/presentation/providers/photo_picker_pr
 import 'package:submersion/features/media/presentation/widgets/dive_media_section.dart';
 import 'package:submersion/features/settings/presentation/providers/export_providers.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
+import 'package:submersion/features/weather/presentation/widgets/weather_description_builder.dart';
 import 'package:submersion/features/signatures/presentation/providers/signature_providers.dart';
 import 'package:submersion/features/signatures/presentation/widgets/buddy_signatures_section.dart';
 import 'package:submersion/features/signatures/presentation/widgets/signature_capture_widget.dart';
@@ -3025,7 +3026,7 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
                 _buildDetailRow(
                   context,
                   context.l10n.diveLog_detail_label_surfacePressure,
-                  '${(dive.surfacePressure! * 1000).toStringAsFixed(0)} mbar',
+                  units.formatSurfacePressure(dive.surfacePressure),
                 ),
               if (dive.windSpeed != null)
                 _buildDetailRow(
@@ -3057,13 +3058,34 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
                   context.l10n.diveLog_detail_label_humidity,
                   '${dive.humidity!.toStringAsFixed(0)}%',
                 ),
-              if (dive.weatherDescription != null &&
-                  dive.weatherDescription!.isNotEmpty)
-                _buildDetailRow(
-                  context,
-                  context.l10n.diveLog_detail_label_weatherDescription,
-                  dive.weatherDescription!,
-                ),
+              // Rendered at display time so it follows the diver's locale and
+              // units. Text the diver typed or that arrived with an import is
+              // user data and is shown verbatim; the prose we used to generate
+              // for fetched weather is rebuilt from the structured fields.
+              Builder(
+                builder: (context) {
+                  final description = buildLocalizedWeatherDescription(
+                    l10n: context.l10n,
+                    units: units,
+                    weatherCode: dive.weatherCode,
+                    cloudCover: dive.cloudCover,
+                    airTempCelsius: dive.airTemp,
+                    windSpeedMs: dive.windSpeed,
+                    windDirection: dive.windDirection,
+                    precipitation: dive.precipitation,
+                    storedDescription:
+                        dive.weatherSource == WeatherSource.openMeteo
+                        ? null
+                        : dive.weatherDescription,
+                  );
+                  if (description == null) return const SizedBox.shrink();
+                  return _buildDetailRow(
+                    context,
+                    context.l10n.diveLog_detail_label_weatherDescription,
+                    description,
+                  );
+                },
+              ),
               if (dive.weatherSource == WeatherSource.openMeteo)
                 Padding(
                   padding: const EdgeInsets.only(top: 4),
@@ -3106,7 +3128,7 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
                 _buildDetailRow(
                   context,
                   context.l10n.diveLog_detail_label_swellHeight,
-                  '${dive.swellHeight!.toStringAsFixed(1)}m',
+                  units.formatDepth(dive.swellHeight, decimals: 1),
                 ),
               if (dive.entryMethod != null)
                 _buildDetailRow(

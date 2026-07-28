@@ -5127,6 +5127,8 @@ class SyncDataSerializer {
       // Theme
       'themeMode': 'system',
       'themePreset': 'submersion',
+      // Locale (language preference: 'system', 'en', 'es', 'fr', etc.)
+      'locale': 'system',
       // Defaults
       'defaultDiveType': 'recreational',
       'defaultTankVolume': 12.0,
@@ -5147,17 +5149,57 @@ class SyncDataSerializer {
       'lastStopDepth': 3.0,
       'decoStopIncrement': 3.0,
       'ascentGasSet': 0,
+      'o2Narcotic': true,
+      'endLimit': 30.0,
+      'useDiveComputerCnsData': false,
+      'defaultNdlSource': 1,
+      'defaultCeilingSource': 1,
+      'defaultTtsSource': 1,
+      'defaultCnsSource': 1,
       // Appearance settings
       'showDepthColoredDiveCards': false,
       'cardColorAttribute': 'none',
       'cardColorGradientPreset': 'ocean',
       'cardColorGradientStart': null,
       'cardColorGradientEnd': null,
+      // Tissue visualization settings
+      'tissueColorScheme': 'classic',
+      'tissueVizMode': 'heatMap',
       'showMapBackgroundOnDiveCards': false,
       'showMapBackgroundOnSiteCards': false,
       // Dive profile markers
       'showMaxDepthMarker': true,
       'showPressureThresholdMarkers': false,
+      // List view modes
+      'diveListViewMode': 'detailed',
+      'siteListViewMode': 'detailed',
+      'tripListViewMode': 'detailed',
+      'equipmentListViewMode': 'detailed',
+      'buddyListViewMode': 'detailed',
+      'diveCenterListViewMode': 'detailed',
+      // Map style
+      'mapStyle': 'openStreetMap',
+      // Auto site matching sensitivity
+      'siteMatchSensitivity': 'balanced',
+      // Dive profile chart defaults
+      'defaultRightAxisMetric': 'temperature',
+      'defaultShowTemperature': true,
+      'defaultShowPressure': true,
+      'defaultShowHeartRate': false,
+      'defaultShowSac': false,
+      'defaultShowEvents': true,
+      'defaultShowPpO2': false,
+      'defaultShowPpN2': false,
+      'defaultShowPpHe': false,
+      'defaultShowGasDensity': false,
+      'defaultShowGf': false,
+      'defaultShowSurfaceGf': false,
+      'defaultShowMeanDepth': false,
+      'defaultShowTts': false,
+      'defaultShowCns': false,
+      'defaultShowOtu': false,
+      'defaultShowGasSwitchMarkers': true,
+      'defaultShowGasTimeline': false,
       // Dive profile default-visible metrics. Non-nullable bool added in v91;
       // seed it so payloads predating the column hydrate instead of throwing in
       // DiverSetting.fromJson.
@@ -5171,6 +5213,23 @@ class SyncDataSerializer {
       // columns hydrate instead of throwing in DiverSetting.fromJson.
       'showDecoStopsOnProfile': true,
       'defaultDecoStopSource': 1,
+      // additional non-nullable
+      'safetyReviewEnabled': true,
+      'noFlyPreset': 'standard',
+      'notificationsEnabled': true,
+      'serviceReminderDays': '[7, 14, 30]',
+      'reminderTime': '09:00',
+      'tripServiceLeadDays': 14,
+      'showDataSourceBadges': true,
+      'showProfilePanelInTableView': true,
+      'showDetailsPaneDives': false,
+      'showDetailsPaneSites': false,
+      'showDetailsPaneBuddies': false,
+      'showDetailsPaneTrips': false,
+      'showDetailsPaneEquipment': false,
+      'showDetailsPaneDiveCenters': false,
+      'showDetailsPaneCertifications': false,
+      'showDetailsPaneCourses': false,
       // Override with actual data (existing values take precedence)
       ...data,
     };

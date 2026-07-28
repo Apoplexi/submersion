@@ -307,12 +307,17 @@ class DenseDiveListTile extends ConsumerWidget {
                         ),
                       ),
                       if (!isSelectionMode)
-                        Text(
-                          '#$diveNumber',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 12,
-                            color: accentColor,
+                        FittedBox(
+                          fit: BoxFit.scaleDown,
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            '#$diveNumber',
+                            maxLines: 1,
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 12,
+                              color: accentColor,
+                            ),
                           ),
                         ),
                     ],
