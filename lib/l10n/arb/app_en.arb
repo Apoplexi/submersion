@@ -13259,6 +13259,8 @@
   "@dive3d_overlay_curtain": {},
   "dive3d_overlay_markers": "Markers",
   "@dive3d_overlay_markers": {},
+  "dive3d_seascape_overlay_paths": "Dive paths",
+  "@dive3d_seascape_overlay_paths": {},
   "dive3d_metric_depth": "Depth",
   "@dive3d_metric_depth": {},
   "dive3d_metric_temperature": "Temp",

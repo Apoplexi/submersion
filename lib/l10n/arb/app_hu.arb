@@ -5971,6 +5971,8 @@
   "@dive3d_overlay_curtain": {},
   "dive3d_overlay_markers": "Jelölők",
   "@dive3d_overlay_markers": {},
+  "dive3d_seascape_overlay_paths": "Merülési útvonalak",
+  "@dive3d_seascape_overlay_paths": {},
   "dive3d_metric_depth": "Mélység",
   "@dive3d_metric_depth": {},
   "dive3d_metric_temperature": "Hőm",

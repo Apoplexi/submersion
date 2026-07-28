@@ -19892,6 +19892,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get dive3d_overlay_markers => '标记';
 
   @override
+  String get dive3d_seascape_overlay_paths => '潜水路径';
+
+  @override
   String get dive3d_metric_depth => '深度';
 
   @override

@@ -238,7 +238,8 @@ class _Dive3dInteractiveViewportState extends State<Dive3dInteractiveViewport> {
     SceneMarker? best;
     var bestDistance = 24.0;
     for (final marker in widget.scene.markers) {
-      final d = (projector.project(marker.x, marker.y, 0) - cursor).distance;
+      final d =
+          (projector.project(marker.x, marker.y, marker.z) - cursor).distance;
       if (d < bestDistance) {
         bestDistance = d;
         best = marker;

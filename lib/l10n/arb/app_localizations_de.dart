@@ -20917,6 +20917,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get dive3d_overlay_markers => 'Markierungen';
 
   @override
+  String get dive3d_seascape_overlay_paths => 'Tauchgangspfade';
+
+  @override
   String get dive3d_metric_depth => 'Tiefe';
 
   @override

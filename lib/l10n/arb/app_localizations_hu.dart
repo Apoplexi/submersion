@@ -20890,6 +20890,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String get dive3d_overlay_markers => 'Jelölők';
 
   @override
+  String get dive3d_seascape_overlay_paths => 'Merülési útvonalak';
+
+  @override
   String get dive3d_metric_depth => 'Mélység';
 
   @override

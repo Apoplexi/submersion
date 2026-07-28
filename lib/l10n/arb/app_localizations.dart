@@ -34991,6 +34991,12 @@ abstract class AppLocalizations {
   /// **'Markers'**
   String get dive3d_overlay_markers;
 
+  /// No description provided for @dive3d_seascape_overlay_paths.
+  ///
+  /// In en, this message translates to:
+  /// **'Dive paths'**
+  String get dive3d_seascape_overlay_paths;
+
   /// No description provided for @dive3d_metric_depth.
   ///
   /// In en, this message translates to:

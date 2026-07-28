@@ -5971,6 +5971,8 @@
   "@dive3d_overlay_curtain": {},
   "dive3d_overlay_markers": "Marcadores",
   "@dive3d_overlay_markers": {},
+  "dive3d_seascape_overlay_paths": "Trayectos de buceo",
+  "@dive3d_seascape_overlay_paths": {},
   "dive3d_metric_depth": "Profundidad",
   "@dive3d_metric_depth": {},
   "dive3d_metric_temperature": "Temp",
