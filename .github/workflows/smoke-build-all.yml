@@ -19,6 +19,8 @@ jobs:
     name: Smoke build
     uses: ./.github/workflows/build-all.yml
     with:
-      version-tag: v0.0.0-smoke.1
-      build-number: '999999'
+      # Production-shaped values: 4-segment numeric tag, build number within
+      # the Windows VersionInfo 16-bit part limit (65535).
+      version-tag: v0.0.0.12345
+      build-number: '12345'
     secrets: inherit
