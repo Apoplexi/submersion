@@ -10,6 +10,7 @@ import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/dive_3d/application/career_providers.dart';
 import 'package:submersion/features/dive_3d/presentation/pages/career_terrain_page.dart';
+import 'package:submersion/features/dive_3d/presentation/pages/site_seascape_page.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_providers.dart';
 import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
 import 'package:submersion/features/dive_sites/presentation/providers/site_providers.dart';
@@ -242,6 +243,16 @@ class _SiteDetailContentState extends ConsumerState<_SiteDetailContent> {
       appBar: AppBar(
         title: Text(site.name),
         actions: [
+          if (site.hasCoordinates)
+            IconButton(
+              icon: const Icon(Icons.water),
+              tooltip: context.l10n.dive3d_seascape_siteTitle,
+              onPressed: () => Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (_) => SiteSeascapePage(siteId: siteId),
+                ),
+              ),
+            ),
           IconButton(
             icon: const Icon(Icons.view_in_ar),
             tooltip: context.l10n.dive3d_career_title,

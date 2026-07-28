@@ -34997,6 +34997,30 @@ abstract class AppLocalizations {
   /// **'Dive paths'**
   String get dive3d_seascape_overlay_paths;
 
+  /// No description provided for @dive3d_seascape_siteTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Site Seascape'**
+  String get dive3d_seascape_siteTitle;
+
+  /// No description provided for @dive3d_seascape_seafloorSource.
+  ///
+  /// In en, this message translates to:
+  /// **'Seafloor: {source} (~{resolution} m)'**
+  String dive3d_seascape_seafloorSource(String source, String resolution);
+
+  /// No description provided for @dive3d_seascape_noCoordinates.
+  ///
+  /// In en, this message translates to:
+  /// **'This site has no GPS coordinates'**
+  String get dive3d_seascape_noCoordinates;
+
+  /// No description provided for @dive3d_seascape_noData.
+  ///
+  /// In en, this message translates to:
+  /// **'No bathymetry available for this location'**
+  String get dive3d_seascape_noData;
+
   /// No description provided for @dive3d_metric_depth.
   ///
   /// In en, this message translates to:

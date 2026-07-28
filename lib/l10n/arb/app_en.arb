@@ -13261,6 +13261,19 @@
   "@dive3d_overlay_markers": {},
   "dive3d_seascape_overlay_paths": "Dive paths",
   "@dive3d_seascape_overlay_paths": {},
+  "dive3d_seascape_siteTitle": "Site Seascape",
+  "@dive3d_seascape_siteTitle": {},
+  "dive3d_seascape_seafloorSource": "Seafloor: {source} (~{resolution} m)",
+  "@dive3d_seascape_seafloorSource": {
+    "placeholders": {
+      "source": {"type": "String"},
+      "resolution": {"type": "String"}
+    }
+  },
+  "dive3d_seascape_noCoordinates": "This site has no GPS coordinates",
+  "@dive3d_seascape_noCoordinates": {},
+  "dive3d_seascape_noData": "No bathymetry available for this location",
+  "@dive3d_seascape_noData": {},
   "dive3d_metric_depth": "Depth",
   "@dive3d_metric_depth": {},
   "dive3d_metric_temperature": "Temp",

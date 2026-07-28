@@ -20893,6 +20893,22 @@ class AppLocalizationsHu extends AppLocalizations {
   String get dive3d_seascape_overlay_paths => 'Merülési útvonalak';
 
   @override
+  String get dive3d_seascape_siteTitle => 'Helyszíni tengertáj';
+
+  @override
+  String dive3d_seascape_seafloorSource(String source, String resolution) {
+    return 'Tengerfenék: $source (~$resolution m)';
+  }
+
+  @override
+  String get dive3d_seascape_noCoordinates =>
+      'Ennek a helyszínnek nincsenek GPS-koordinátái';
+
+  @override
+  String get dive3d_seascape_noData =>
+      'Ehhez a helyhez nem érhető el batimetria';
+
+  @override
   String get dive3d_metric_depth => 'Mélység';
 
   @override

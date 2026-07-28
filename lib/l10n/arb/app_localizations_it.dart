@@ -20954,6 +20954,22 @@ class AppLocalizationsIt extends AppLocalizations {
   String get dive3d_seascape_overlay_paths => 'Percorsi delle immersioni';
 
   @override
+  String get dive3d_seascape_siteTitle => 'Paesaggio marino del sito';
+
+  @override
+  String dive3d_seascape_seafloorSource(String source, String resolution) {
+    return 'Fondale: $source (~$resolution m)';
+  }
+
+  @override
+  String get dive3d_seascape_noCoordinates =>
+      'Questo sito non ha coordinate GPS';
+
+  @override
+  String get dive3d_seascape_noData =>
+      'Nessuna batimetria disponibile per questa posizione';
+
+  @override
   String get dive3d_metric_depth => 'Profondità';
 
   @override

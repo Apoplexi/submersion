@@ -20920,6 +20920,22 @@ class AppLocalizationsDe extends AppLocalizations {
   String get dive3d_seascape_overlay_paths => 'Tauchgangspfade';
 
   @override
+  String get dive3d_seascape_siteTitle => 'Standort-Seelandschaft';
+
+  @override
+  String dive3d_seascape_seafloorSource(String source, String resolution) {
+    return 'Meeresboden: $source (~$resolution m)';
+  }
+
+  @override
+  String get dive3d_seascape_noCoordinates =>
+      'Dieser Tauchplatz hat keine GPS-Koordinaten';
+
+  @override
+  String get dive3d_seascape_noData =>
+      'Keine Bathymetrie für diesen Ort verfügbar';
+
+  @override
   String get dive3d_metric_depth => 'Tiefe';
 
   @override

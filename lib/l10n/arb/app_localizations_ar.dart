@@ -20576,6 +20576,22 @@ class AppLocalizationsAr extends AppLocalizations {
   String get dive3d_seascape_overlay_paths => 'مسارات الغوص';
 
   @override
+  String get dive3d_seascape_siteTitle => 'المشهد البحري للموقع';
+
+  @override
+  String dive3d_seascape_seafloorSource(String source, String resolution) {
+    return 'قاع البحر: $source (~$resolution م)';
+  }
+
+  @override
+  String get dive3d_seascape_noCoordinates =>
+      'لا توجد إحداثيات GPS لهذا الموقع';
+
+  @override
+  String get dive3d_seascape_noData =>
+      'لا توجد بيانات قياس أعماق متاحة لهذا الموقع';
+
+  @override
   String get dive3d_metric_depth => 'العمق';
 
   @override

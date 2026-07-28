@@ -20429,6 +20429,20 @@ class AppLocalizationsHe extends AppLocalizations {
   String get dive3d_seascape_overlay_paths => 'מסלולי צלילה';
 
   @override
+  String get dive3d_seascape_siteTitle => 'נוף ימי של האתר';
+
+  @override
+  String dive3d_seascape_seafloorSource(String source, String resolution) {
+    return 'קרקעית הים: $source (~$resolution מ\')';
+  }
+
+  @override
+  String get dive3d_seascape_noCoordinates => 'לאתר זה אין נקודות ציון GPS';
+
+  @override
+  String get dive3d_seascape_noData => 'אין נתוני עומק זמינים למיקום זה';
+
+  @override
   String get dive3d_metric_depth => 'עומק';
 
   @override

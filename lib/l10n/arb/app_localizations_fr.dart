@@ -21028,6 +21028,22 @@ class AppLocalizationsFr extends AppLocalizations {
   String get dive3d_seascape_overlay_paths => 'Trajets de plongée';
 
   @override
+  String get dive3d_seascape_siteTitle => 'Paysage marin du site';
+
+  @override
+  String dive3d_seascape_seafloorSource(String source, String resolution) {
+    return 'Fond marin : $source (~$resolution m)';
+  }
+
+  @override
+  String get dive3d_seascape_noCoordinates =>
+      'Ce site n\'a pas de coordonnées GPS';
+
+  @override
+  String get dive3d_seascape_noData =>
+      'Aucune bathymétrie disponible pour cet endroit';
+
+  @override
   String get dive3d_metric_depth => 'Profondeur';
 
   @override
