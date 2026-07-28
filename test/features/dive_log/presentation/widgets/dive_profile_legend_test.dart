@@ -221,8 +221,26 @@ void main() {
 
     testWidgets('source-capable metrics have SegmentedButtons', (tester) async {
       await openDialog(tester);
-      // 4 metrics with source selectors: Ceiling, NDL, TTS, CNS%
-      expect(find.byType(SegmentedButton<MetricDataSource>), findsNWidgets(4));
+      // 3 metrics with source selectors: NDL, TTS, CNS%. The ceiling line has
+      // no source toggle (issue #755) -- it always shows the calculated curve.
+      expect(find.byType(SegmentedButton<MetricDataSource>), findsNWidgets(3));
+    });
+
+    testWidgets('Ceiling row has no source SegmentedButton', (tester) async {
+      await openDialog(tester);
+      // The ceiling line always renders the exact calculated curve, so its
+      // legend row is a plain visibility toggle with no Computer/Calculated
+      // selector (issue #755).
+      final ceilingRow = find
+          .ancestor(of: find.text('Ceiling'), matching: find.byType(Row))
+          .first;
+      expect(
+        find.descendant(
+          of: ceilingRow,
+          matching: find.byType(SegmentedButton<MetricDataSource>),
+        ),
+        findsNothing,
+      );
     });
 
     testWidgets('tapping SegmentedButton changes source state', (tester) async {

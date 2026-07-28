@@ -642,14 +642,17 @@ class _ChartOptionsDialog extends StatelessWidget {
           isAreaSwatch: true,
         ),
       if (config.hasCeilingCurve)
-        _buildToggleWithSource(
+        // No source toggle: the ceiling line always shows the exact, continuous
+        // calculated curve. Every import stores only the computer's stepped stop
+        // depth, so a "computer" ceiling would duplicate the deco-stop band
+        // (issue #755). The Computer/Calculated comparison lives on the deco
+        // stops above.
+        _buildToggleItem(
           context,
           label: context.l10n.diveLog_legend_label_ceiling,
           color: const Color(0xFFD32F2F),
           isEnabled: legendState.showCeiling,
           onTap: legendNotifier.toggleCeiling,
-          currentSource: legendState.ceilingSource,
-          onSourceChanged: legendNotifier.setCeilingSource,
         ),
       if (config.hasNdlData)
         _buildToggleWithSource(
