@@ -40,6 +40,20 @@ class BathymetryRepository {
     return '${q.lat.toStringAsFixed(2)},${q.lon.toStringAsFixed(2)}@$span';
   }
 
+  /// Whether the cache holds a DEFINITIVE answer (grid or empty) for this
+  /// coordinate's cell. False means a null from [getGrid] was transient
+  /// (network failure, broken cache) and worth retrying later.
+  Future<bool> hasCachedAnswer(GeoPoint center) async {
+    try {
+      final row = await (_db.select(
+        _db.bathymetryCache,
+      )..where((t) => t.cacheKey.equals(keyFor(center)))).getSingleOrNull();
+      return row != null;
+    } catch (_) {
+      return false;
+    }
+  }
+
   Future<BathymetryGrid?> getGrid(GeoPoint center) {
     final key = keyFor(center);
     return _inFlight[key] ??= _guardedLoad(key, center)
