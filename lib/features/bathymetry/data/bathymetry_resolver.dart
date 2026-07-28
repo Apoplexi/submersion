@@ -24,7 +24,12 @@ class BathymetryResolution {
 /// datums (EMODnet is LAT, GMRT/ETOPO MSL) and stitching them seams.
 class BathymetryResolver {
   static const double minWetFraction = 0.10;
-  static const double defaultSpanMeters = 4000;
+
+  /// Request-box width. 8 km shows the surrounding seascape, not just the
+  /// site itself; the repository's downsample cap bounds the render cost.
+  /// This value is part of the cache key — see
+  /// [BathymetryRepository.keyFor] — so changing it refetches.
+  static const double defaultSpanMeters = 8000;
 
   final List<BathymetrySource> sources;
 

@@ -73,11 +73,13 @@ void main() {
     final q = BathymetryRepository.quantize(bonaire);
     expect(q.lat, closeTo(12.16, 1e-9));
     expect(q.lon, closeTo(-68.30, 1e-9)); // -68.29 floors DOWN to -68.30
-    expect(BathymetryRepository.keyFor(bonaire), '12.16,-68.30');
+    // The key carries the request span so a span change refetches instead
+    // of serving a smaller cached area forever.
+    expect(BathymetryRepository.keyFor(bonaire), '12.16,-68.30@8000');
     // Nearby coordinates share the key.
     expect(
       BathymetryRepository.keyFor(const GeoPoint(12.171, -68.281)),
-      '12.16,-68.30',
+      '12.16,-68.30@8000',
     );
   });
 

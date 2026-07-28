@@ -33,7 +33,11 @@ class BathymetryRepository {
 
   static String keyFor(GeoPoint c) {
     final q = quantize(c);
-    return '${q.lat.toStringAsFixed(2)},${q.lon.toStringAsFixed(2)}';
+    // The span is part of the key: cached rows never expire, so a span
+    // change must miss the old rows and refetch the larger area. Stale
+    // rows are inert leftovers in this local-only cache.
+    final span = BathymetryResolver.defaultSpanMeters.round();
+    return '${q.lat.toStringAsFixed(2)},${q.lon.toStringAsFixed(2)}@$span';
   }
 
   Future<BathymetryGrid?> getGrid(GeoPoint center) {

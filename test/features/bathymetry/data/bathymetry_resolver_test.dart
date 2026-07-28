@@ -26,6 +26,7 @@ class FakeSource implements BathymetrySource {
   final bool coversIt;
   final BathymetryGrid? result; // null => throw transient
   int fetchCount = 0;
+  double? lastSpanMeters;
 
   FakeSource(this.id, {this.global = true, this.coversIt = true, this.result});
 
@@ -35,6 +36,7 @@ class FakeSource implements BathymetrySource {
   @override
   Future<BathymetryGrid> fetch(GeoPoint c, {required double spanMeters}) async {
     fetchCount++;
+    lastSpanMeters = spanMeters;
     final r = result;
     if (r == null) throw const BathymetryFetchException('down');
     return r;
@@ -68,6 +70,8 @@ void main() {
       expect(res.grid!.sourceId, 'a');
       expect(res.definitive, isTrue);
       expect(b.fetchCount, 0);
+      // The 8 km extended-extent span reaches the source.
+      expect(a.lastSpanMeters, 8000);
     },
   );
 
