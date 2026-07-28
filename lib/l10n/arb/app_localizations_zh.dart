@@ -19909,6 +19909,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get dive3d_seascape_noData => '该位置没有可用的水深数据';
 
   @override
+  String get settings_about_bathymetryCredit =>
+      '水深数据：GMRT（CC BY 4.0）· EMODnet Bathymetry（CC BY 4.0）· NOAA ETOPO 2022';
+
+  @override
   String get dive3d_metric_depth => '深度';
 
   @override

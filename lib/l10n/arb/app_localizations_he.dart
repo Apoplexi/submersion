@@ -20443,6 +20443,10 @@ class AppLocalizationsHe extends AppLocalizations {
   String get dive3d_seascape_noData => 'אין נתוני עומק זמינים למיקום זה';
 
   @override
+  String get settings_about_bathymetryCredit =>
+      'נתוני עומק: GMRT (CC BY 4.0) · EMODnet Bathymetry (CC BY 4.0) · NOAA ETOPO 2022';
+
+  @override
   String get dive3d_metric_depth => 'עומק';
 
   @override

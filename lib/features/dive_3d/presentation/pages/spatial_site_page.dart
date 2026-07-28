@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:submersion/features/bathymetry/presentation/bathymetry_labels.dart';
 import 'package:submersion/features/dive_3d/application/spatial_providers.dart';
 import 'package:submersion/features/dive_3d/presentation/scene_overlay.dart';
 import 'package:submersion/features/dive_3d/presentation/widgets/dive_3d_interactive_viewport.dart';
@@ -78,7 +79,12 @@ class _SpatialSitePageState extends ConsumerState<SpatialSitePage>
                         visibleOverlays: const {SceneOverlay.markers},
                       ),
                     ),
-                    Positioned(top: 8, left: 8, right: 8, child: _captions()),
+                    Positioned(
+                      top: 8,
+                      left: 8,
+                      right: 8,
+                      child: _captions(result!),
+                    ),
                   ],
                 ),
               ),
@@ -100,7 +106,7 @@ class _SpatialSitePageState extends ConsumerState<SpatialSitePage>
     );
   }
 
-  Widget _captions() {
+  Widget _captions(SpatialSceneResult result) {
     Widget chip(String text) => Container(
       margin: const EdgeInsets.only(right: 6, bottom: 6),
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -117,13 +123,24 @@ class _SpatialSitePageState extends ConsumerState<SpatialSitePage>
         ],
       ),
     );
+    // The path caption is an always-true honesty label: the swim path is
+    // always an estimate (dead reckoning or straight-line fallback). The
+    // seafloor chip states provenance: real bathymetry when a grid won,
+    // otherwise the honest synthesized label.
+    final sourceId = result.bathymetrySourceId;
+    final resolution = result.bathymetryResolutionMeters;
     return Wrap(
       children: [
-        // Both captions are always-true honesty labels: the swim path is
-        // always an estimate (dead reckoning or straight-line fallback) and
-        // the seafloor is always synthesized.
         chip(context.l10n.dive3d_spatial_estimatedPath),
-        chip(context.l10n.dive3d_spatial_synthesizedSeafloor),
+        if (sourceId != null && resolution != null)
+          chip(
+            context.l10n.dive3d_seascape_seafloorSource(
+              bathymetrySourceDisplayName(sourceId),
+              resolution.round().toString(),
+            ),
+          )
+        else
+          chip(context.l10n.dive3d_spatial_synthesizedSeafloor),
       ],
     );
   }

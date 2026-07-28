@@ -20970,6 +20970,10 @@ class AppLocalizationsIt extends AppLocalizations {
       'Nessuna batimetria disponibile per questa posizione';
 
   @override
+  String get settings_about_bathymetryCredit =>
+      'Dati batimetrici: GMRT (CC BY 4.0) · EMODnet Bathymetry (CC BY 4.0) · NOAA ETOPO 2022';
+
+  @override
   String get dive3d_metric_depth => 'Profondità';
 
   @override

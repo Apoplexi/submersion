@@ -5981,6 +5981,8 @@
   "@dive3d_seascape_noCoordinates": {},
   "dive3d_seascape_noData": "Ehhez a helyhez nem érhető el batimetria",
   "@dive3d_seascape_noData": {},
+  "settings_about_bathymetryCredit": "Batimetriai adatok: GMRT (CC BY 4.0) · EMODnet Bathymetry (CC BY 4.0) · NOAA ETOPO 2022",
+  "@settings_about_bathymetryCredit": {},
   "dive3d_metric_depth": "Mélység",
   "@dive3d_metric_depth": {},
   "dive3d_metric_temperature": "Hőm",

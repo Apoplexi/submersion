@@ -20592,6 +20592,10 @@ class AppLocalizationsAr extends AppLocalizations {
       'لا توجد بيانات قياس أعماق متاحة لهذا الموقع';
 
   @override
+  String get settings_about_bathymetryCredit =>
+      'بيانات قياس الأعماق: GMRT (CC BY 4.0) · EMODnet Bathymetry (CC BY 4.0) · NOAA ETOPO 2022';
+
+  @override
   String get dive3d_metric_depth => 'العمق';
 
   @override

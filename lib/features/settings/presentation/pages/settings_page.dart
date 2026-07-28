@@ -2730,6 +2730,16 @@ class _AboutSectionContentState extends ConsumerState<_AboutSectionContent> {
                   title: Text(context.l10n.settings_about_reportIssue),
                   onTap: () => launchReportIssue(context),
                 ),
+                const Divider(height: 1),
+                // CC-BY attribution for the seascape's bathymetry sources.
+                ListTile(
+                  leading: const Icon(Icons.water),
+                  title: Text(
+                    context.l10n.settings_about_bathymetryCredit,
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                  dense: true,
+                ),
               ],
             ),
           ),

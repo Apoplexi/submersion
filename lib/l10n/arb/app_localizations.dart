@@ -35021,6 +35021,12 @@ abstract class AppLocalizations {
   /// **'No bathymetry available for this location'**
   String get dive3d_seascape_noData;
 
+  /// No description provided for @settings_about_bathymetryCredit.
+  ///
+  /// In en, this message translates to:
+  /// **'Bathymetry data: GMRT (CC BY 4.0) · EMODnet Bathymetry (CC BY 4.0) · NOAA ETOPO 2022'**
+  String get settings_about_bathymetryCredit;
+
   /// No description provided for @dive3d_metric_depth.
   ///
   /// In en, this message translates to:
