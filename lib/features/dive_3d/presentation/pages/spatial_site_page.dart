@@ -60,8 +60,15 @@ class _SpatialSitePageState extends ConsumerState<SpatialSitePage>
       appBar: AppBar(title: Text(context.l10n.dive3d_spatial_title)),
       body: sceneAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (_, _) =>
-            Center(child: Text(context.l10n.dive3d_spatial_noPath)),
+        error: (e, _) {
+          // The fallback text blames missing data; surface the real error
+          // in debug builds so a provider failure is never mistaken for it.
+          assert(() {
+            debugPrint('spatialGeometryProvider failed: $e');
+            return true;
+          }());
+          return Center(child: Text(context.l10n.dive3d_spatial_noPath));
+        },
         data: (result) {
           final scene = result?.scene;
           if (scene == null || scene.layers.isEmpty) {

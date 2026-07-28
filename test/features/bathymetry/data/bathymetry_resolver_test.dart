@@ -41,6 +41,19 @@ class FakeSource implements BathymetrySource {
   }
 }
 
+class _ErrorSource implements BathymetrySource {
+  @override
+  String get id => 'boom';
+  @override
+  bool get global => true;
+  @override
+  bool covers(GeoPoint center) => true;
+  @override
+  Future<BathymetryGrid> fetch(GeoPoint c, {required double spanMeters}) async {
+    throw ArgumentError('unexpected parser blow-up');
+  }
+}
+
 void main() {
   const p = GeoPoint(12.16, -68.29);
   final wet = [for (var i = 0; i < 10; i++) 50.0];
@@ -97,6 +110,18 @@ void main() {
     expect(res.grid, isNull);
     expect(res.definitive, isFalse);
   });
+
+  test(
+    'a source throwing a non-Exception Error is treated as transient',
+    () async {
+      // e.g. a TypeError/ArgumentError escaping a parser: must not kill the
+      // scene — fall through like any transient failure.
+      final blowsUp = _ErrorSource();
+      final b = FakeSource('b', result: gridWith(wet, 'b'));
+      final res = await BathymetryResolver(sources: [blowsUp, b]).resolve(p);
+      expect(res.grid!.sourceId, 'b');
+    },
+  );
 
   test('a barely-wet grid below 10% is treated as dry', () async {
     // 1 wet cell of 11 known => ~9%.

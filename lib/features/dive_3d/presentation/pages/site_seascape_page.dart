@@ -37,8 +37,15 @@ class _SiteSeascapePageState extends ConsumerState<SiteSeascapePage> {
       appBar: AppBar(title: Text(context.l10n.dive3d_seascape_siteTitle)),
       body: stateAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (_, _) =>
-            Center(child: Text(context.l10n.dive3d_seascape_noData)),
+        error: (e, _) {
+          // The fallback text blames missing data; surface the real error
+          // in debug builds so a provider failure is never mistaken for it.
+          assert(() {
+            debugPrint('siteSeascapeProvider failed: $e');
+            return true;
+          }());
+          return Center(child: Text(context.l10n.dive3d_seascape_noData));
+        },
         data: (state) => switch (state) {
           SiteSeascapeNoCoordinates() => Center(
             child: Text(context.l10n.dive3d_seascape_noCoordinates),

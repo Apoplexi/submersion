@@ -125,6 +125,17 @@ void main() {
     expect(source.calls, 1);
   });
 
+  test('a broken cache table degrades to null, never a throw', () async {
+    final source = ScriptedSource(() => BathymetryResolution.ok(wetGrid()));
+    final r = repo(source);
+    // Force the DB open (beforeOpen self-heal runs), then break the table
+    // out from under the repository.
+    await db.select(db.bathymetryCache).get();
+    await db.customStatement('DROP TABLE bathymetry_cache');
+    final grid = await r.getGrid(bonaire);
+    expect(grid, isNull); // degraded, not thrown
+  });
+
   test('oversized grids are downsampled before caching', () async {
     final big = BathymetryGrid(
       originLat: 12.14,

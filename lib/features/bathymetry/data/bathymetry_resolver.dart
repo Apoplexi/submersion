@@ -44,6 +44,10 @@ class BathymetryResolver {
         if (source.global) globalSourceSaidDry = true;
       } on BathymetryFetchException {
         // Transient: fall through to the next tier.
+      } catch (_) {
+        // A source blowing up with anything else (a TypeError from an
+        // unexpected response shape, an ArgumentError) must not kill the
+        // whole scene — treat it exactly like a transient failure.
       }
     }
     return globalSourceSaidDry

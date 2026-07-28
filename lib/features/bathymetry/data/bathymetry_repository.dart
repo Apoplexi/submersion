@@ -38,8 +38,24 @@ class BathymetryRepository {
 
   Future<BathymetryGrid?> getGrid(GeoPoint center) {
     final key = keyFor(center);
-    return _inFlight[key] ??= _load(key, center)
+    return _inFlight[key] ??= _guardedLoad(key, center)
       ..whenComplete(() => _inFlight.remove(key));
+  }
+
+  /// The scene must survive ANY cache/fetch failure (a broken table, an
+  /// unexpected parser error) by degrading to synthesized terrain — so
+  /// every failure becomes a null grid, treated as transient (no caching).
+  Future<BathymetryGrid?> _guardedLoad(String key, GeoPoint center) async {
+    try {
+      return await _load(key, center);
+    } catch (e) {
+      assert(() {
+        // ignore: avoid_print
+        print('BathymetryRepository.getGrid($key) degraded to null: $e');
+        return true;
+      }());
+      return null;
+    }
   }
 
   Future<BathymetryGrid?> _load(String key, GeoPoint center) async {

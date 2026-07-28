@@ -130,5 +130,25 @@ class LocalCacheDatabase extends _$LocalCacheDatabase {
         await m.createTable(bathymetryCache);
       }
     },
+    beforeOpen: (details) async {
+      // Ladder-collision self-heal: a parallel branch that also claims v7
+      // (e.g. reef data) may have stamped user_version first on a shared
+      // dev machine, so onUpgrade never runs here and this table would be
+      // missing. Idempotent re-assert, mirroring the main DB's pattern.
+      // Keep the column shape in sync with the BathymetryCache table.
+      await customStatement('''
+        CREATE TABLE IF NOT EXISTS bathymetry_cache (
+          cache_key TEXT NOT NULL,
+          center_lat REAL NOT NULL,
+          center_lon REAL NOT NULL,
+          status TEXT NOT NULL,
+          source_id TEXT NULL,
+          resolution_meters REAL NULL,
+          grid_json TEXT NULL,
+          fetched_at INTEGER NOT NULL,
+          PRIMARY KEY (cache_key)
+        )
+      ''');
+    },
   );
 }
