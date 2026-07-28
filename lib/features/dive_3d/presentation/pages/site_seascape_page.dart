@@ -2,13 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:submersion/core/utils/unit_formatter.dart';
+import 'package:submersion/features/bathymetry/domain/bathymetry_grid.dart';
 import 'package:submersion/features/bathymetry/presentation/bathymetry_labels.dart';
 import 'package:submersion/features/dive_3d/application/site_seascape_providers.dart';
 import 'package:submersion/features/dive_3d/domain/spatial/seascape_axes.dart';
+import 'package:submersion/features/dive_3d/domain/spatial/seascape_surface.dart';
 import 'package:submersion/features/dive_3d/domain/spatial/spatial_projection.dart';
+import 'package:submersion/features/dive_3d/domain/tissue/tissue_surface_picker.dart';
 import 'package:submersion/features/dive_3d/presentation/scene_overlay.dart';
 import 'package:submersion/features/dive_3d/presentation/seascape_chrome.dart';
 import 'package:submersion/features/dive_3d/presentation/widgets/dive_3d_interactive_viewport.dart';
+import 'package:submersion/features/dive_3d/presentation/widgets/seascape_hover_tooltip.dart';
+import 'package:submersion/features/dive_3d/presentation/widgets/tissue_tooltip_layout.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 
@@ -27,11 +32,13 @@ class SiteSeascapePage extends ConsumerStatefulWidget {
 class _SiteSeascapePageState extends ConsumerState<SiteSeascapePage> {
   // No timeline at site level: the scrub cursor stays parked.
   final ValueNotifier<double> _scrub = ValueNotifier(0);
+  final ValueNotifier<TissuePick?> _hoverPick = ValueNotifier(null);
   final Set<SceneOverlay> _visible = {SceneOverlay.markers, SceneOverlay.paths};
 
   @override
   void dispose() {
     _scrub.dispose();
+    _hoverPick.dispose();
     super.dispose();
   }
 
@@ -63,6 +70,7 @@ class _SiteSeascapePageState extends ConsumerState<SiteSeascapePage> {
             :final sourceId,
             :final resolutionMeters,
             :final axisInputs,
+            :final grid,
           ) =>
             Column(
               children: [
@@ -80,6 +88,12 @@ class _SiteSeascapePageState extends ConsumerState<SiteSeascapePage> {
                               axisFrame: axes.frame,
                               axisLabels: axes.labels,
                               chromeStyle: seascapeChromeStyle(context),
+                              axisChromeOnly: true,
+                              surfaceGrid: seascapePickGrid(
+                                grid,
+                                scene.layers.first.mesh,
+                              ),
+                              hoverPick: _hoverPick,
                             );
                           },
                         ),
@@ -90,6 +104,7 @@ class _SiteSeascapePageState extends ConsumerState<SiteSeascapePage> {
                         right: 8,
                         child: _sourceChip(sourceId, resolutionMeters),
                       ),
+                      _hoverTooltip(grid),
                     ],
                   ),
                 ),
@@ -97,6 +112,25 @@ class _SiteSeascapePageState extends ConsumerState<SiteSeascapePage> {
               ],
             ),
         },
+      ),
+    );
+  }
+
+  /// The hover readout, clamped inside the viewport by the shared layout
+  /// delegate and transparent to pointer events so it never steals hover.
+  Widget _hoverTooltip(BathymetryGrid grid) {
+    return Positioned.fill(
+      child: IgnorePointer(
+        child: ValueListenableBuilder<TissuePick?>(
+          valueListenable: _hoverPick,
+          builder: (context, pick, _) {
+            if (pick == null) return const SizedBox.shrink();
+            return CustomSingleChildLayout(
+              delegate: TissueTooltipLayoutDelegate(pick.screenPos),
+              child: SeascapeHoverTooltip(pick: pick, grid: grid),
+            );
+          },
+        ),
       ),
     );
   }

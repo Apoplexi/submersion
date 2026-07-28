@@ -165,9 +165,11 @@ void paintAxisLabels(
 }
 
 /// Foreground axis + label chrome with no tissue surface — the seascape
-/// views' measurement frame. Static layer: repaints only on camera, frame,
-/// label, or style changes; the scrub cursor stays on the scene's own
-/// foreground painter, unaffected.
+/// views' measurement frame, plus (when hover inputs are provided) the
+/// hover marker ring on the picked terrain vertex. The scrub cursor stays
+/// on the scene's own foreground painter, unaffected. The seascape frame
+/// is small (~10 segments, ~15 labels), so folding the ring's per-hover
+/// repaint into this layer costs little.
 class AxisChromePainter extends CustomPainter {
   final SceneBounds bounds;
   final AxisFrame frame;
@@ -175,6 +177,8 @@ class AxisChromePainter extends CustomPainter {
   final TissueChromeStyle style;
   final double yawDegrees, pitchDegrees, zoom;
   final TextDirection textDirection;
+  final TissueSurfaceGrid? surfaceGrid;
+  final ValueListenable<TissuePick?>? hoverPick;
 
   AxisChromePainter({
     required this.bounds,
@@ -185,7 +189,9 @@ class AxisChromePainter extends CustomPainter {
     required this.zoom,
     this.labels,
     this.textDirection = TextDirection.ltr,
-  });
+    this.surfaceGrid,
+    this.hoverPick,
+  }) : super(repaint: hoverPick);
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -198,6 +204,32 @@ class AxisChromePainter extends CustomPainter {
     );
     paintAxisSegments(canvas, p, frame, style);
     paintAxisLabels(canvas, p, labels, style, textDirection);
+    _paintHoverRing(canvas, p);
+  }
+
+  void _paintHoverRing(Canvas canvas, SceneProjector p) {
+    final grid = surfaceGrid;
+    final pick = hoverPick?.value;
+    if (grid == null || grid.isEmpty || pick == null) return;
+    if (pick.col >= grid.columns || pick.comp >= grid.compartments) return;
+    final (x, y, z) = grid.positionAt(pick.col, pick.comp);
+    final center = p.project(x, y, z);
+    canvas.drawCircle(
+      center,
+      6,
+      Paint()
+        ..color = style.markerOutline.withValues(alpha: 0.5)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 3.5,
+    );
+    canvas.drawCircle(
+      center,
+      6,
+      Paint()
+        ..color = style.marker.withValues(alpha: 0.9)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 2,
+    );
   }
 
   @override
@@ -208,6 +240,7 @@ class AxisChromePainter extends CustomPainter {
       !identical(old.frame, frame) ||
       !identical(old.labels, labels) ||
       !identical(old.bounds, bounds) ||
+      !identical(old.surfaceGrid, surfaceGrid) ||
       old.style != style ||
       old.textDirection != textDirection;
 }

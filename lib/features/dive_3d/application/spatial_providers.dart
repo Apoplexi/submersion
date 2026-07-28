@@ -64,11 +64,17 @@ class SpatialSceneResult {
   /// results constructed without them (older tests, degenerate scenes).
   final SeascapeAxisInputs? axisInputs;
 
+  /// The terrain's source grid when the seafloor is real bathymetry; null
+  /// for the synthesized fallback, whose invented surface offers no honest
+  /// per-point readout (so hover inspection is disabled there).
+  final BathymetryGrid? grid;
+
   const SpatialSceneResult({
     required this.scene,
     this.bathymetrySourceId,
     this.bathymetryResolutionMeters,
     this.axisInputs,
+    this.grid,
   });
 }
 
@@ -118,6 +124,7 @@ final spatialGeometryProvider =
         bathymetrySourceId: grid?.sourceId,
         bathymetryResolutionMeters: grid?.resolutionMeters,
         axisInputs: built.frame,
+        grid: grid,
       );
     });
 

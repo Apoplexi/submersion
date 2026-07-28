@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:submersion/features/bathymetry/domain/bathymetry_grid.dart';
 import 'package:submersion/features/dive_3d/application/spatial_providers.dart';
 import 'package:submersion/features/dive_3d/domain/spatial/reckoned_path.dart';
 import 'package:submersion/features/dive_3d/domain/spatial/spatial_geometry_service.dart';
 import 'package:submersion/features/dive_3d/presentation/pages/spatial_site_page.dart';
 import 'package:submersion/features/dive_3d/presentation/widgets/dive_3d_interactive_viewport.dart';
 import 'package:submersion/core/providers/provider.dart';
+import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
 
@@ -47,10 +49,30 @@ void main() {
   final synthesized = SpatialSceneResult(
     scene: const SpatialGeometryService().build(_path(), siteMaxDepth: 30),
   );
+  // The pick lattice requires the terrain mesh to match the grid's cell
+  // count, so build the real-terrain scene FROM the grid.
+  final grid = BathymetryGrid(
+    originLat: 12.15,
+    originLon: -68.30,
+    cellSizeLatDeg: 0.001,
+    cellSizeLonDeg: 0.001,
+    rows: 2,
+    cols: 2,
+    depthsMeters: const [20, 30, 25, 35],
+    sourceId: 'gmrt',
+    resolutionMeters: 61,
+    fetchedAt: DateTime.utc(2026, 7, 28),
+  );
   final real = SpatialSceneResult(
-    scene: const SpatialGeometryService().build(_path(), siteMaxDepth: 30),
+    scene: const SpatialGeometryService().build(
+      _path(),
+      siteMaxDepth: 30,
+      grid: grid,
+      gridCenter: const GeoPoint(12.151, -68.299),
+    ),
     bathymetrySourceId: 'gmrt',
     bathymetryResolutionMeters: 61,
+    grid: grid,
     axisInputs: (
       minEast: -100.0,
       maxEast: 200.0,
@@ -75,6 +97,21 @@ void main() {
     );
     expect(viewport.axisFrame, isNotNull);
     expect(viewport.chromeStyle, isNotNull);
+    // Real terrain also gets hover inspection.
+    expect(viewport.surfaceGrid, isNotNull);
+    expect(viewport.surfaceGrid!.isEmpty, isFalse);
+    expect(viewport.hoverPick, isNotNull);
+  });
+
+  testWidgets('synthesized fallback has no hover inspection', (tester) async {
+    await tester.pumpWidget(page(synthesized));
+    await tester.pump();
+    await tester.pump();
+    final viewport = tester.widget<Dive3dInteractiveViewport>(
+      find.byType(Dive3dInteractiveViewport),
+    );
+    expect(viewport.surfaceGrid, isNull);
+    expect(viewport.hoverPick, isNull);
   });
 
   testWidgets('fallback shows the synthesized chip', (tester) async {

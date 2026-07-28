@@ -50,6 +50,7 @@ SiteSeascapeReady readyState() {
     scene: scene,
     sourceId: 'gmrt',
     resolutionMeters: 61,
+    grid: grid,
     axisInputs: (
       minEast: box.minEast,
       maxEast: box.maxEast,
@@ -89,6 +90,11 @@ void main() {
     expect(viewport.axisFrame, isNotNull);
     expect(viewport.axisLabels, isNotNull);
     expect(viewport.chromeStyle, isNotNull);
+    // Hover inspection: pick lattice + notifier wired, tissue chrome not.
+    expect(viewport.surfaceGrid, isNotNull);
+    expect(viewport.surfaceGrid!.isEmpty, isFalse);
+    expect(viewport.hoverPick, isNotNull);
+    expect(viewport.axisChromeOnly, isTrue);
   });
 
   testWidgets('no-coordinates state shows the message, not a spinner', (

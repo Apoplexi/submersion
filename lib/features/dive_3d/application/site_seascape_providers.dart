@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:submersion/core/utils/geo_math.dart';
 import 'package:submersion/features/bathymetry/application/bathymetry_providers.dart';
 import 'package:submersion/features/bathymetry/data/bathymetry_repository.dart';
+import 'package:submersion/features/bathymetry/domain/bathymetry_grid.dart';
 import 'package:submersion/features/dive_3d/application/spatial_providers.dart';
 import 'package:submersion/features/dive_3d/domain/scene_3d.dart';
 import 'package:submersion/features/dive_3d/domain/spatial/bathymetry_terrain_builder.dart';
@@ -26,11 +27,16 @@ class SiteSeascapeReady extends SiteSeascapeState {
   final double resolutionMeters;
   final SeascapeAxisInputs axisInputs;
 
+  /// The (downsampled) grid the terrain was built from — hover inspection
+  /// reads per-cell coordinates and depth from it.
+  final BathymetryGrid grid;
+
   const SiteSeascapeReady({
     required this.scene,
     required this.sourceId,
     required this.resolutionMeters,
     required this.axisInputs,
+    required this.grid,
   });
 }
 
@@ -124,6 +130,7 @@ final siteSeascapeProvider = FutureProvider.family<SiteSeascapeState, String>((
     scene: scene,
     sourceId: grid.sourceId,
     resolutionMeters: grid.resolutionMeters,
+    grid: grid,
     axisInputs: (
       minEast: box.minEast,
       maxEast: box.maxEast,
