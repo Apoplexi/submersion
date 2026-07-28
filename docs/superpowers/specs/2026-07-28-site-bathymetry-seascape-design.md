@@ -6,7 +6,9 @@
 `2026-07-11-spatial-site-3d-design.md` (that scene remains as the fallback).
 **Depends on:** the dive 3D view foundation (`Scene3d`, `Dive3dInteractiveViewport`,
 CustomPainter renderer), `DeadReckoningService`, `geo_math`,
-`local_cache_database.dart` (local ladder at v7 after reef data; this takes v8).
+`local_cache_database.dart` (local ladder at v6 on main; this takes v7 —
+PR #728 reef data, unmerged, also claims v7 on its branch; whichever merges
+second renumbers).
 
 ## Problem
 
@@ -46,8 +48,10 @@ Open-Meteo elevation (no bathymetry - returns 0.0 over ocean).
 Source quirks to pin in parsers:
 - GMRT: `nodata_value -2147483648` appears literally; rows run north to
   south; `cellsize` may be scientific notation; land cells carry positive
-  elevations. Metadata endpoint (`/services/GridServer/metadata`) returns
-  width/height/meters_per_node to size requests before download.
+  elevations. (Planning decision: the `/services/GridServer/metadata`
+  pre-flight is deferred — a fixed ~4 km box at `resolution=high` plus the
+  repository's 120-cell downsample cap makes it an extra round-trip and
+  failure mode for no change in outcome.)
 - ERDDAP JSON (both servers): depth column mixes int and float - parse as
   `num`; land cells are `null` (EMODnet); grid is cell-centered on the fixed
   grid, not the requested bounds.
@@ -93,7 +97,11 @@ Default request box ~4 km square; ETOPO requests ~10 km (coarse cells need
 the wider box for enough samples). Grid capped at ~120x120 cells with
 downsampling above that.
 
-### Cache (`local_cache_database.dart`, v7 -> v8)
+### Cache (`local_cache_database.dart`, v6 -> v7)
+
+(Ladder note, corrected at planning time: main's local cache DB is at v6 —
+reef's v7 claim lives on the unmerged PR #728 branch. This feature takes
+v6 -> v7 here; second-to-merge renumbers.)
 
 New table `BathymetryCache`, keyed by **quantized coordinate** (not site id)
 so nearby sites, re-pinned sites, and site-less GPS-fixed dives share a
