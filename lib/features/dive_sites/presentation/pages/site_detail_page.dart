@@ -327,7 +327,25 @@ class _SiteDetailContentState extends ConsumerState<_SiteDetailContent> {
             onPressed: () {
               final state = GoRouterState.of(context);
               final currentPath = state.uri.path;
-              context.go('$currentPath?selected=${widget.siteId}&mode=edit');
+              if (currentPath.startsWith('/dives')) {
+                // If we're on the /dives path, keep it and just add mode=edit and site parameter.
+                // The MasterDetailScaffold in DiveListPage will handle showing the site edit panel
+                // because we'll have both ?site=... and &mode=edit in the query params.
+                final params = Map<String, String>.from(
+                  state.uri.queryParameters,
+                );
+                params['mode'] = 'edit';
+                // We do NOT change 'selected' here, because 'selected' is used by DiveListPage's
+                // MasterDetailScaffold to identify the DIVE. If we change it to the siteId,
+                // the scaffold will try to find a dive with that siteId and fail.
+                params['site'] = widget.siteId;
+                context.push(
+                  Uri(path: currentPath, queryParameters: params).toString(),
+                );
+              } else {
+                // Default to /sites path for site-related navigation if not on /dives.
+                context.go('/sites?selected=${widget.siteId}&mode=edit');
+              }
             },
           ),
           PopupMenuButton<String>(
