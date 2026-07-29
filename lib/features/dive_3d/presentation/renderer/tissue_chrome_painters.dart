@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -164,6 +166,18 @@ void paintAxisLabels(
   }
 }
 
+/// Screen angle (radians, canvas convention: y grows downward) of the
+/// scene's +Z axis — geographic NORTH in the seascape's east-north-up
+/// frame — under the projector's current camera. Position-independent
+/// under the orthographic projection, so any base point works. Returns
+/// null when the view runs straight along north and the projected
+/// direction collapses (the compass should hide, not point a lie).
+double? compassNeedleAngle(SceneProjector p) {
+  final delta = p.project(0, 0, 1) - p.project(0, 0, 0);
+  if (delta.distance < 1e-3) return null;
+  return math.atan2(delta.dy, delta.dx);
+}
+
 /// Foreground axis + label chrome with no tissue surface — the seascape
 /// views' measurement frame, plus (when hover inputs are provided) the
 /// hover marker ring on the picked terrain vertex. The scrub cursor stays
@@ -193,6 +207,9 @@ class AxisChromePainter extends CustomPainter {
     this.hoverPick,
   }) : super(repaint: hoverPick);
 
+  static const double _compassRadius = 18;
+  static const Offset _compassInset = Offset(36, 36);
+
   @override
   void paint(Canvas canvas, Size size) {
     final p = SceneProjector(
@@ -204,7 +221,57 @@ class AxisChromePainter extends CustomPainter {
     );
     paintAxisSegments(canvas, p, frame, style);
     paintAxisLabels(canvas, p, labels, style, textDirection);
+    _paintCompass(canvas, size, p);
     _paintHoverRing(canvas, p);
+  }
+
+  /// A small rose in the bottom-left corner whose needle points along the
+  /// screen-projected direction of scene-north — so it tracks yaw and
+  /// pitch honestly. Hidden when the projection degenerates (viewing
+  /// straight along north).
+  void _paintCompass(Canvas canvas, Size size, SceneProjector p) {
+    final angle = compassNeedleAngle(p);
+    if (angle == null) return;
+    final center = Offset(_compassInset.dx, size.height - _compassInset.dy);
+    canvas.drawCircle(
+      center,
+      _compassRadius,
+      Paint()
+        ..color = style.label.withValues(alpha: 0.25)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 1.2,
+    );
+    final needle = Offset(math.cos(angle), math.sin(angle));
+    final tip = center + needle * (_compassRadius - 4);
+    // South tail, fainter, so the rose reads as a needle not a spoke.
+    canvas.drawLine(
+      center,
+      center - needle * (_compassRadius - 8),
+      Paint()
+        ..color = style.label.withValues(alpha: 0.35)
+        ..strokeWidth = 1.5,
+    );
+    canvas.drawLine(
+      center,
+      tip,
+      Paint()
+        ..color = style.label
+        ..strokeWidth = 2,
+    );
+    final tp = TextPainter(
+      text: TextSpan(
+        text: 'N',
+        style: TextStyle(
+          color: style.label,
+          fontSize: 9.5,
+          fontWeight: FontWeight.w700,
+        ),
+      ),
+      textDirection: textDirection,
+    )..layout();
+    // The label rides just beyond the tip, kept clear of the needle.
+    final labelCenter = center + needle * (_compassRadius + 7);
+    tp.paint(canvas, labelCenter - Offset(tp.width / 2, tp.height / 2));
   }
 
   void _paintHoverRing(Canvas canvas, SceneProjector p) {

@@ -120,6 +120,18 @@ depth (diver's units) at that vertex, mirroring the tissue view's hover.
 - **Tests**: lattice index alignment, cell -> lat/lon/depth mapping,
   tooltip rendering per cell kind, no hover wiring without a grid.
 
+## Addendum: compass (approved 2026-07-29)
+
+A small compass rose fixed in the viewport's bottom-left corner of both
+seascape views: circle, needle, "N" at the needle tip. The needle points
+along the screen-projected direction of scene-north (+Z), computed by
+projecting two world points through the existing SceneProjector and taking
+the screen delta — so it tracks yaw AND pitch honestly. Drawn by
+AxisChromePainter (seascape-only, repaints on camera change, no new
+plumbing); hidden when the projection degenerates (viewing straight along
+north). Pure helper `compassNeedleAngle(SceneProjector)` carries the math
+and its unit tests (yaw rotation tracks, degenerate null).
+
 ## Out of scope
 
 - Grid walls/floors, axis toggles, scrub-position readouts (the readout
