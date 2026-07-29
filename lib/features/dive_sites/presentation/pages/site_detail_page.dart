@@ -245,7 +245,7 @@ class _SiteDetailContentState extends ConsumerState<_SiteDetailContent> {
         actions: [
           if (site.hasCoordinates)
             IconButton(
-              icon: const Icon(Icons.water),
+              icon: const Icon(Icons.terrain),
               tooltip: context.l10n.dive3d_seascape_siteTitle,
               onPressed: () => Navigator.of(context).push(
                 MaterialPageRoute<void>(
@@ -334,7 +334,7 @@ class _SiteDetailContentState extends ConsumerState<_SiteDetailContent> {
           ),
           if (site.hasCoordinates)
             IconButton(
-              icon: const Icon(Icons.water, size: 20),
+              icon: const Icon(Icons.terrain, size: 20),
               tooltip: context.l10n.dive3d_seascape_siteTitle,
               onPressed: () => Navigator.of(context).push(
                 MaterialPageRoute<void>(
