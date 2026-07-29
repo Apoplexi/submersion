@@ -1742,16 +1742,35 @@ class UddfFullImportService {
         final decoStop = waypoint.findElements('decostop').firstOrNull;
         if (decoStop != null) {
           final kind = decoStop.getAttribute('kind')?.trim().toLowerCase();
+          // UDDF 3.2.x specifies `safety` / `mandatory`; some exporters emit
+          // `safetystop` / `decostop`. Accept both spellings and only warn for
+          // a genuinely unknown kind (otherwise a spec-valid `mandatory` file
+          // logs a warning on every in-deco waypoint).
+          const safetyKinds = {'safety', 'safetystop'};
+          const decoKinds = {'mandatory', 'decostop'};
           if (kind != null &&
               kind.isNotEmpty &&
-              kind != 'safetystop' &&
-              kind != 'decostop') {
+              !safetyKinds.contains(kind) &&
+              !decoKinds.contains(kind)) {
             _logger.warning(
               'UDDF import: unsupported decostop kind "$kind"; '
               'mapping to decoType=2 because the sample still indicates a deco stop.',
             );
           }
-          point['decoType'] = kind == 'safetystop' ? 1 : 2;
+          point['decoType'] = safetyKinds.contains(kind) ? 1 : 2;
+
+          // Map the computer's stop depth to the sample ceiling. UDDF is SI, so
+          // `decodepth` is metres and needs no conversion. Unlike Subsurface's
+          // delta-encoded stopdepth, `<decostop>` is present on every in-stop
+          // waypoint, so there is nothing to carry forward: a waypoint with no
+          // decostop is simply no obligation (null ceiling). A non-positive
+          // depth is treated as no stop.
+          final decoDepth = double.tryParse(
+            decoStop.getAttribute('decodepth') ?? '',
+          );
+          if (decoDepth != null && decoDepth > 0) {
+            point['ceiling'] = decoDepth;
+          }
         }
 
         // UDDF exposes both remainingbottomtime and remainingo2time.

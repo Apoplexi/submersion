@@ -430,5 +430,95 @@ void main() {
         expect(profile[3]['decoType'], 2);
       },
     );
+
+    test('maps decostop decodepth to the sample ceiling (meters) and leaves it '
+        'null when there is no decostop', () async {
+      const uddfContent = '''
+<uddf version="3.2.3">
+  <profiledata>
+    <repetitiongroup>
+      <dive id="dive-1">
+        <informationbeforedive>
+          <datetime>2025-09-01T14:18:24Z</datetime>
+          <divenumber>235</divenumber>
+        </informationbeforedive>
+        <samples>
+          <waypoint>
+            <depth>30</depth>
+            <divetime>0</divetime>
+          </waypoint>
+          <waypoint>
+            <depth>12</depth>
+            <divetime>600</divetime>
+            <decostop kind="mandatory" decodepth="12" duration="60" />
+          </waypoint>
+          <waypoint>
+            <depth>9</depth>
+            <divetime>720</divetime>
+            <decostop kind="mandatory" decodepth="9" duration="120" />
+          </waypoint>
+          <waypoint>
+            <depth>6</depth>
+            <divetime>900</divetime>
+            <decostop kind="safetystop" decodepth="6" duration="180" />
+          </waypoint>
+        </samples>
+      </dive>
+    </repetitiongroup>
+  </profiledata>
+</uddf>
+''';
+
+      final result = await service.importAllDataFromUddf(uddfContent);
+      final dive = result.dives.first;
+      final profile = dive['profile'] as List<Map<String, dynamic>>;
+
+      // A waypoint with no decostop carries no ceiling.
+      expect(profile[0]['ceiling'], isNull);
+      // decodepth (UDDF is SI: metres) maps straight to the ceiling.
+      expect(profile[1]['ceiling'], 12.0);
+      expect(profile[2]['ceiling'], 9.0);
+      // A safety stop still records its stop depth as the ceiling.
+      expect(profile[3]['ceiling'], 6.0);
+    });
+
+    test('recognizes UDDF spec decostop kinds: mandatory -> deco, safety -> '
+        'safety', () async {
+      const uddfContent = '''
+<uddf version="3.2.3">
+  <profiledata>
+    <repetitiongroup>
+      <dive id="dive-1">
+        <informationbeforedive>
+          <datetime>2025-09-01T14:18:24Z</datetime>
+          <divenumber>235</divenumber>
+        </informationbeforedive>
+        <samples>
+          <waypoint>
+            <depth>12</depth>
+            <divetime>60</divetime>
+            <decostop kind="mandatory" decodepth="12" duration="60" />
+          </waypoint>
+          <waypoint>
+            <depth>6</depth>
+            <divetime>120</divetime>
+            <decostop kind="safety" decodepth="6" duration="180" />
+          </waypoint>
+        </samples>
+      </dive>
+    </repetitiongroup>
+  </profiledata>
+</uddf>
+''';
+
+      final result = await service.importAllDataFromUddf(uddfContent);
+      final dive = result.dives.first;
+      final profile = dive['profile'] as List<Map<String, dynamic>>;
+
+      // UDDF 3.2.x spec kinds are `mandatory` and `safety`; both must be
+      // recognized (no "unsupported kind" warning spam) and mapped correctly.
+      expect(profile[0]['decoType'], 2);
+      expect(profile[1]['decoType'], 1);
+    });
   });
 }
