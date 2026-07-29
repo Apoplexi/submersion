@@ -961,15 +961,9 @@ class _DecompressionSectionContent extends ConsumerWidget {
                       .setDefaultNdlSource(source),
                 ),
                 const Divider(height: 1),
-                _buildSourceDropdownTile(
-                  context,
-                  title: 'Ceiling Source',
-                  value: settings.defaultCeilingSource,
-                  onChanged: (source) => ref
-                      .read(settingsProvider.notifier)
-                      .setDefaultCeilingSource(source),
-                ),
-                const Divider(height: 1),
+                // No Ceiling Source tile: the ceiling line always renders the
+                // exact calculated curve (issue #755). The Computer/Calculated
+                // choice remains meaningful for the deco stop schedule below.
                 _buildSourceDropdownTile(
                   context,
                   title: 'Deco Stop Source',
