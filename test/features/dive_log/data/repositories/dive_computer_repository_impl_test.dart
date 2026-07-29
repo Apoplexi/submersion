@@ -356,6 +356,25 @@ void main() {
       );
       expect(result, isNull);
     });
+
+    test(
+      'matches a stored serialNumber that itself has stray whitespace',
+      () async {
+        await insertComputer(
+          id: 'comp-a',
+          manufacturer: 'Shearwater',
+          model: 'Perdix',
+          serialNumber: '  SN-12345  ',
+        );
+
+        final result = await repository.findByHardwareIdentity(
+          manufacturer: 'Shearwater',
+          model: 'Perdix',
+          serialNumber: 'SN-12345',
+        );
+        expect(result?.id, equals('comp-a'));
+      },
+    );
   });
 
   // ---------------------------------------------------------------------------

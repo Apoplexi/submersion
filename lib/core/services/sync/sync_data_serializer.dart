@@ -4799,6 +4799,7 @@ class SyncDataSerializer {
     String? entityType,
   }) {
     if (entityType != null && entityType != 'diveComputers') return data;
+    if (!data.containsKey('bluetoothAddress')) return data;
     final copy = Map<String, dynamic>.from(data);
     copy.remove('bluetoothAddress');
     return copy;

@@ -157,18 +157,22 @@ class DiveComputerRepository {
   }) async {
     try {
       final query = _db.select(_db.diveComputers)
-        ..where((t) => t.serialNumber.equals(serialNumber.trim()))
         ..orderBy([(t) => OrderingTerm.desc(t.updatedAt)]);
       final normalizedDiverId = diverId?.trim();
       if (normalizedDiverId != null && normalizedDiverId.isNotEmpty) {
         query.where((t) => t.diverId.equals(normalizedDiverId));
       }
 
+      // Matched in Dart (rather than pushed into the SQL filter) because a
+      // stored serialNumber/manufacturer/model may itself carry whitespace
+      // from an older import; trimming only the input would miss that row.
       final rows = await query.get();
+      final normalizedSerial = serialNumber.trim();
       final normalizedManufacturer = manufacturer.trim().toLowerCase();
       final normalizedModel = model.trim().toLowerCase();
       for (final row in rows) {
-        if (row.manufacturer?.trim().toLowerCase() == normalizedManufacturer &&
+        if (row.serialNumber?.trim() == normalizedSerial &&
+            row.manufacturer?.trim().toLowerCase() == normalizedManufacturer &&
             row.model?.trim().toLowerCase() == normalizedModel) {
           return _mapRowToComputer(row);
         }
