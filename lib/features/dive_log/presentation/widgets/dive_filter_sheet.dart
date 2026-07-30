@@ -574,18 +574,18 @@ class _DiveFilterSheetState extends ConsumerState<DiveFilterSheet> {
               const SizedBox(height: 8),
               LayoutBuilder(
                 builder: (context, constraints) {
+                  final buddiesAsync = ref.watch(allBuddiesProvider);
+                  final allBuddyNames =
+                      buddiesAsync.valueOrNull
+                          ?.map((b) => b.name)
+                          .toSet()
+                          .toList() ??
+                      const <String>[];
+
                   return RawAutocomplete<String>(
                     textEditingController: _buddyNameController,
                     focusNode: _buddyFocusNode,
                     optionsBuilder: (TextEditingValue textEditingValue) {
-                      final buddiesAsync = ref.watch(allBuddiesProvider);
-                      final allBuddyNames =
-                          buddiesAsync.valueOrNull
-                              ?.map((b) => b.name)
-                              .toSet()
-                              .toList() ??
-                          const <String>[];
-
                       final text = textEditingValue.text;
                       final parts = text
                           .split(',')
@@ -669,8 +669,8 @@ class _DiveFilterSheetState extends ConsumerState<DiveFilterSheet> {
                         alignment: Alignment.topLeft,
                         child: Material(
                           elevation: 4.0,
-                          child: SizedBox(
-                            width: constraints.maxWidth,
+                          child: ConstrainedBox(
+                            constraints: const BoxConstraints(maxHeight: 200),
                             child: ListView.builder(
                               padding: EdgeInsets.zero,
                               shrinkWrap: true,

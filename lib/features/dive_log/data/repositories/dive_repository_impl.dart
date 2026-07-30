@@ -4756,6 +4756,7 @@ class DiveRepository {
   Future<Map<String, List<String>>> _buddyNamesForDives(
     List<String> diveIds,
   ) async {
+    if (diveIds.isEmpty) return {};
     final placeholders = List.filled(diveIds.length, '?').join(', ');
     final rows = await (_db.customSelect(
       'SELECT db.dive_id, b.name FROM dive_buddies db '
