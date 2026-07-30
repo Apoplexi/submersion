@@ -598,6 +598,13 @@ void main() {
         expect(result.first.id, 's1');
       });
 
+      test('throws ArgumentError if applied to unsupported type', () {
+        const filter = DiveFilterState();
+        final invalidItems = ['not a dive', 'another non-dive'];
+
+        expect(() => filter.apply(invalidItems), throwsArgumentError);
+      });
+
       group('equipmentAttr axis', () {
         EquipmentAttribute curated(String key, {String? text, double? num}) =>
             EquipmentAttribute.curated(

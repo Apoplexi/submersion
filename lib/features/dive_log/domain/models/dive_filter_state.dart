@@ -213,7 +213,18 @@ class DiveFilterState {
   /// the SQL-backed list. It relies on dive.equipment being hydrated with its
   /// curated attributes (getAllDives does this).
   List<T> apply<T>(List<T> dives) {
+    if (T != Dive && T != DiveSummary && T != dynamic) {
+      throw ArgumentError(
+        'DiveFilterState.apply can only be used with Dive or DiveSummary. '
+        'Received: $T',
+      );
+    }
     return dives.where((d) {
+      if (d is! Dive && d is! DiveSummary) {
+        throw ArgumentError(
+          'DiveFilterState.apply received an element that is neither Dive nor DiveSummary: ${d.runtimeType}',
+        );
+      }
       // Both Dive and DiveSummary are used here. We cast to dynamic to access
       // shared field names, while buddyNameFilter uses explicit type checks.
       final dive = d as dynamic;

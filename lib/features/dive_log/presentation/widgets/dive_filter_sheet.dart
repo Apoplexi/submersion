@@ -591,10 +591,12 @@ class _DiveFilterSheetState extends ConsumerState<DiveFilterSheet> {
                           .split(',')
                           .map((e) => e.trim())
                           .toList();
-                      final currentBuddies = parts
-                          .sublist(0, parts.length - 1)
-                          .map((e) => e.toLowerCase())
-                          .toSet();
+                      final currentBuddies = parts.length > 1
+                          ? parts
+                                .sublist(0, parts.length - 1)
+                                .map((e) => e.toLowerCase())
+                                .toSet()
+                          : <String>{};
 
                       final buddyNames = allBuddyNames
                           .where(
@@ -660,7 +662,9 @@ class _DiveFilterSheetState extends ConsumerState<DiveFilterSheet> {
                               prefixIcon: const Icon(Icons.person),
                             ),
                             onChanged: (value) {
-                              _buddyNameFilter = value.isEmpty ? null : value;
+                              setState(() {
+                                _buddyNameFilter = value.isEmpty ? null : value;
+                              });
                             },
                           );
                         },
