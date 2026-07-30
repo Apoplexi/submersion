@@ -1,6 +1,5 @@
 import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
-import 'package:submersion/features/dive_log/domain/entities/dive_summary.dart';
 import 'package:submersion/features/equipment/domain/constants/equipment_attribute_catalog.dart';
 
 /// Filter state for dive list.
@@ -213,19 +212,19 @@ class DiveFilterState {
   /// the SQL-backed list. It relies on dive.equipment being hydrated with its
   /// curated attributes (getAllDives does this).
   List<T> apply<T>(List<T> dives) {
-    if (T != Dive && T != DiveSummary && T != dynamic) {
+    if (T != Dive && T != dynamic) {
       throw ArgumentError(
-        'DiveFilterState.apply can only be used with Dive or DiveSummary. '
+        'DiveFilterState.apply can only be used with Dive. '
         'Received: $T',
       );
     }
     return dives.where((d) {
-      if (d is! Dive && d is! DiveSummary) {
+      if (d is! Dive) {
         throw ArgumentError(
-          'DiveFilterState.apply received an element that is neither Dive nor DiveSummary: ${d.runtimeType}',
+          'DiveFilterState.apply received an element that is not a Dive: ${d.runtimeType}',
         );
       }
-      // Both Dive and DiveSummary are used here. We cast to dynamic to access
+      // We cast to dynamic to access
       // shared field names, while buddyNameFilter uses explicit type checks.
       final dive = d as dynamic;
       if (startDate != null && dive.dateTime.isBefore(startDate!)) {
@@ -282,14 +281,7 @@ class DiveFilterState {
             .toList();
 
         for (final filterLower in filters) {
-          if (dive is DiveSummary) {
-            final summary = dive;
-            if (!summary.buddyNames.any(
-              (b) => b.toLowerCase().contains(filterLower),
-            )) {
-              return false;
-            }
-          } else if (dive is Dive) {
+          if (dive is Dive) {
             final fullDive = dive;
             final buddyLower = fullDive.buddy?.toLowerCase() ?? '';
             final hasLegacyMatch = buddyLower.contains(filterLower);

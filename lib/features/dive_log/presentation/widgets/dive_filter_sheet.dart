@@ -573,7 +573,7 @@ class _DiveFilterSheetState extends ConsumerState<DiveFilterSheet> {
               ),
               const SizedBox(height: 8),
               LayoutBuilder(
-                builder: (context, constraints) {
+                builder: (context, _) {
                   final buddiesAsync = ref.watch(allBuddiesProvider);
                   final allBuddyNames =
                       buddiesAsync.valueOrNull
