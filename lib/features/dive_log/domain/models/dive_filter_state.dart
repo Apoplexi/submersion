@@ -1,5 +1,6 @@
 import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
+import 'package:submersion/features/dive_log/domain/entities/dive_summary.dart';
 import 'package:submersion/features/equipment/domain/constants/equipment_attribute_catalog.dart';
 
 /// Filter state for dive list.
@@ -211,8 +212,11 @@ class DiveFilterState {
   /// buildFilteredDiveIdSubquery), so non-paginated views stay consistent with
   /// the SQL-backed list. It relies on dive.equipment being hydrated with its
   /// curated attributes (getAllDives does this).
-  List<Dive> apply(List<Dive> dives) {
-    return dives.where((dive) {
+  List<T> apply<T>(List<T> dives) {
+    return dives.where((d) {
+      // Both Dive and DiveSummary are used here. We cast to dynamic to access
+      // shared field names, while buddyNameFilter uses explicit type checks.
+      final dive = d as dynamic;
       if (startDate != null && dive.dateTime.isBefore(startDate!)) {
         return false;
       }
@@ -233,7 +237,9 @@ class DiveFilterState {
         return false;
       }
       if (equipmentIds.isNotEmpty) {
-        final diveEquipmentIds = dive.equipment.map((e) => e.id).toSet();
+        final diveEquipmentIds = (dive.equipment as List<dynamic>)
+            .map((e) => e.id)
+            .toSet();
         if (!equipmentIds.any((eqId) => diveEquipmentIds.contains(eqId))) {
           return false;
         }
@@ -250,23 +256,41 @@ class DiveFilterState {
         return false;
       }
       if (tagIds.isNotEmpty) {
-        final diveTagIds = dive.tags.map((t) => t.id).toSet();
+        final diveTagIds = (dive.tags as List<dynamic>)
+            .map((t) => t.id)
+            .toSet();
         if (!tagIds.any((tagId) => diveTagIds.contains(tagId))) {
           return false;
         }
       }
       if (buddyNameFilter != null && buddyNameFilter!.isNotEmpty) {
-        final buddyLower = dive.buddy?.toLowerCase() ?? '';
-        if (!buddyLower.contains(buddyNameFilter!.toLowerCase())) {
-          return false;
+        final filterLower = buddyNameFilter!.toLowerCase();
+        if (dive is DiveSummary) {
+          final summary = dive;
+          if (!summary.buddyNames.any(
+            (b) => b.toLowerCase().contains(filterLower),
+          )) {
+            return false;
+          }
+        } else if (dive is Dive) {
+          final fullDive = dive;
+          final buddyLower = fullDive.buddy?.toLowerCase() ?? '';
+          final hasLegacyMatch = buddyLower.contains(filterLower);
+          final hasJointMatch = fullDive.buddies.any(
+            (b) => b.buddy.name.toLowerCase().contains(filterLower),
+          );
+          if (!hasLegacyMatch && !hasJointMatch) {
+            return false;
+          }
         }
       }
       if (diveIds.isNotEmpty && !diveIds.contains(dive.id)) {
         return false;
       }
       if (minO2Percent != null || maxO2Percent != null) {
-        if (dive.tanks.isEmpty) return false;
-        final hasMatchingTank = dive.tanks.any((tank) {
+        final tanks = dive.tanks as List<dynamic>;
+        if (tanks.isEmpty) return false;
+        final hasMatchingTank = tanks.any((tank) {
           final o2 = tank.gasMix.o2;
           if (minO2Percent != null && o2 < minO2Percent!) return false;
           if (maxO2Percent != null && o2 > maxO2Percent!) return false;
@@ -278,7 +302,7 @@ class DiveFilterState {
         if (dive.rating == null || dive.rating! < minRating!) return false;
       }
       if (minBottomTimeMinutes != null || maxBottomTimeMinutes != null) {
-        final durationMinutes = dive.bottomTime?.inMinutes;
+        final durationMinutes = (dive.bottomTime as Duration?)?.inMinutes;
         if (durationMinutes == null) return false;
         if (minBottomTimeMinutes != null &&
             durationMinutes < minBottomTimeMinutes!) {
@@ -293,7 +317,7 @@ class DiveFilterState {
         if (dive.diveComputerSerial != computerSerial) return false;
       }
       if (customFieldKey != null && customFieldKey!.isNotEmpty) {
-        final hasMatch = dive.customFields.any((cf) {
+        final hasMatch = (dive.customFields as List<dynamic>).any((cf) {
           if (cf.key != customFieldKey) return false;
           if (customFieldValue != null && customFieldValue!.isNotEmpty) {
             return cf.value.toLowerCase().contains(
@@ -311,13 +335,13 @@ class DiveFilterState {
         // getDivesBySuitThickness() and the SQL axis; hoods/gloves/boots also
         // carry thickness_mm but are not suits.
         final suitOnly = equipmentAttrKey == EquipmentAttrKeys.thicknessMm;
-        final matches = dive.equipment.any((item) {
+        final matches = (dive.equipment as List<dynamic>).any((item) {
           if (suitOnly &&
               item.type != EquipmentType.wetsuit &&
               item.type != EquipmentType.drysuit) {
             return false;
           }
-          return item.attributes.any((attr) {
+          return (item.attributes as List<dynamic>).any((attr) {
             if (attr.isCustom || attr.key != equipmentAttrKey) return false;
             if (equipmentAttrChoice != null &&
                 attr.valueText != equipmentAttrChoice) {

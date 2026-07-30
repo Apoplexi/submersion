@@ -1565,6 +1565,16 @@ class _DiveListContentState extends ConsumerState<DiveListContent> {
       );
     }
 
+    if (filter.buddyNameFilter != null && filter.buddyNameFilter!.isNotEmpty) {
+      chips.add(
+        _buildFilterChip(context, filter.buddyNameFilter!, () {
+          ref.read(diveFilterProvider.notifier).state = filter.copyWith(
+            clearBuddyNameFilter: true,
+          );
+        }),
+      );
+    }
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Row(

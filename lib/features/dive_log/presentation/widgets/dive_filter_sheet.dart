@@ -10,6 +10,7 @@ import 'package:submersion/features/dive_types/presentation/dive_type_display.da
 import 'package:submersion/features/dive_types/presentation/providers/dive_type_providers.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/features/tags/presentation/providers/tag_providers.dart';
+import 'package:submersion/features/buddies/presentation/providers/buddy_providers.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_providers.dart';
 
 /// Filter sheet for dive list
@@ -36,6 +37,7 @@ class DiveFilterSheet extends ConsumerStatefulWidget {
 }
 
 class _DiveFilterSheetState extends ConsumerState<DiveFilterSheet> {
+  late final FocusNode _buddyFocusNode;
   late DateTime? _startDate;
   late DateTime? _endDate;
   late String? _diveTypeId;
@@ -65,6 +67,7 @@ class _DiveFilterSheetState extends ConsumerState<DiveFilterSheet> {
   @override
   void initState() {
     super.initState();
+    _buddyFocusNode = FocusNode();
     final filter = widget.ref.read(widget.filterProvider);
     _startDate = filter.startDate;
     _endDate = filter.endDate;
@@ -96,6 +99,7 @@ class _DiveFilterSheetState extends ConsumerState<DiveFilterSheet> {
 
   @override
   void dispose() {
+    _buddyFocusNode.dispose();
     _minDepthController.dispose();
     _maxDepthController.dispose();
     _buddyNameController.dispose();
@@ -568,15 +572,78 @@ class _DiveFilterSheetState extends ConsumerState<DiveFilterSheet> {
                 style: Theme.of(context).textTheme.titleMedium,
               ),
               const SizedBox(height: 8),
-              TextField(
-                controller: _buddyNameController,
-                decoration: InputDecoration(
-                  labelText: context.l10n.diveLog_filter_buddyName,
-                  hintText: context.l10n.diveLog_filter_buddyHint,
-                  prefixIcon: const Icon(Icons.person),
-                ),
-                onChanged: (value) {
-                  _buddyNameFilter = value.isEmpty ? null : value;
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  return RawAutocomplete<String>(
+                    textEditingController: _buddyNameController,
+                    focusNode: _buddyFocusNode,
+                    optionsBuilder: (TextEditingValue textEditingValue) {
+                      final buddiesAsync = ref.watch(allBuddiesProvider);
+                      final buddyNames =
+                          buddiesAsync.valueOrNull
+                              ?.map((b) => b.name)
+                              .toSet()
+                              .toList() ??
+                          const <String>[];
+
+                      if (textEditingValue.text.isEmpty) {
+                        return buddyNames;
+                      }
+                      return buddyNames.where((String option) {
+                        return option.toLowerCase().contains(
+                          textEditingValue.text.toLowerCase(),
+                        );
+                      });
+                    },
+                    onSelected: (String selection) {
+                      setState(() {
+                        _buddyNameFilter = selection;
+                      });
+                    },
+                    fieldViewBuilder:
+                        (
+                          context,
+                          textEditingController,
+                          focusNode,
+                          onFieldSubmitted,
+                        ) {
+                          return TextField(
+                            controller: textEditingController,
+                            focusNode: focusNode,
+                            decoration: InputDecoration(
+                              labelText: context.l10n.diveLog_filter_buddyName,
+                              hintText: context.l10n.diveLog_filter_buddyHint,
+                              prefixIcon: const Icon(Icons.person),
+                            ),
+                            onChanged: (value) {
+                              _buddyNameFilter = value.isEmpty ? null : value;
+                            },
+                          );
+                        },
+                    optionsViewBuilder: (context, onSelected, options) {
+                      return Align(
+                        alignment: Alignment.topLeft,
+                        child: Material(
+                          elevation: 4.0,
+                          child: SizedBox(
+                            width: constraints.maxWidth,
+                            child: ListView.builder(
+                              padding: EdgeInsets.zero,
+                              shrinkWrap: true,
+                              itemCount: options.length,
+                              itemBuilder: (BuildContext context, int index) {
+                                final String option = options.elementAt(index);
+                                return ListTile(
+                                  title: Text(option),
+                                  onTap: () => onSelected(option),
+                                );
+                              },
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  );
                 },
               ),
               const SizedBox(height: 24),

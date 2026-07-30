@@ -1,8 +1,11 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/constants/enums.dart';
+import 'package:submersion/features/buddies/domain/entities/buddy.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive_custom_field.dart';
+import 'package:submersion/features/dive_log/domain/entities/dive_summary.dart';
 import 'package:submersion/features/dive_log/domain/models/dive_filter_state.dart';
+import 'package:submersion/features/dive_roles/domain/entities/dive_role.dart';
 import 'package:submersion/features/equipment/domain/entities/equipment_attribute.dart';
 import 'package:submersion/features/equipment/domain/entities/equipment_item.dart';
 
@@ -39,6 +42,20 @@ Dive _makeDive({
     weights: const [],
     tags: const [],
     customFields: customFields,
+  );
+}
+
+/// Helper to create a minimal DiveSummary for filter testing.
+DiveSummary _makeSummary({
+  String id = 'dive-1',
+  DateTime? dateTime,
+  List<String> buddyNames = const [],
+}) {
+  return DiveSummary(
+    id: id,
+    dateTime: dateTime ?? DateTime(2026, 3, 19),
+    sortTimestamp: (dateTime ?? DateTime(2026, 3, 19)).millisecondsSinceEpoch,
+    buddyNames: buddyNames,
   );
 }
 
@@ -484,6 +501,72 @@ void main() {
 
         expect(result, hasLength(1));
         expect(result.first.id, 'd1');
+      });
+
+      test('filters by buddyNameFilter (case-insensitive legacy)', () {
+        const filter = DiveFilterState(buddyNameFilter: 'JOHN');
+        final dives = [
+          Dive(
+            id: 'd1',
+            dateTime: DateTime.now(),
+            buddy: 'John Doe',
+            notes: '',
+          ),
+          Dive(
+            id: 'd2',
+            dateTime: DateTime.now(),
+            buddy: 'Jane Smith',
+            notes: '',
+          ),
+        ];
+
+        final result = filter.apply(dives);
+
+        expect(result, hasLength(1));
+        expect(result.first.id, 'd1');
+      });
+
+      test('filters by buddyNameFilter (case-insensitive structured)', () {
+        const filter = DiveFilterState(buddyNameFilter: 'doe');
+        final buddyJohn = Buddy(
+          id: 'b1',
+          name: 'John Doe',
+          createdAt: DateTime.now(),
+          updatedAt: DateTime.now(),
+        );
+        final dives = [
+          Dive(
+            id: 'd1',
+            dateTime: DateTime.now(),
+            notes: '',
+            buddies: [
+              BuddyWithRole(buddy: buddyJohn, role: DiveRole.builtInBuddy()),
+            ],
+          ),
+          Dive(
+            id: 'd2',
+            dateTime: DateTime.now(),
+            buddy: 'Jane Doe',
+            notes: '',
+          ),
+        ];
+
+        final result = filter.apply(dives);
+
+        expect(result, hasLength(2));
+      });
+
+      test('filters DiveSummary by buddyNameFilter', () {
+        const filter = DiveFilterState(buddyNameFilter: 'smith');
+        final summaries = [
+          _makeSummary(id: 's1', buddyNames: ['John Doe']),
+          _makeSummary(id: 's2', buddyNames: ['Jane Smith', 'Bob']),
+        ];
+
+        final result = filter.apply(summaries);
+
+        expect(result, hasLength(1));
+        expect(result.first.id, 's2');
       });
 
       group('equipmentAttr axis', () {
