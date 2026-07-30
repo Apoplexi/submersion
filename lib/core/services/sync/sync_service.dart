@@ -531,7 +531,7 @@ class SyncService {
           provider.providerId,
         );
         try {
-          await _changesetWriter.publish(
+          final write = await _changesetWriter.publish(
             provider: provider,
             deviceId: deviceId,
             folderId: folderId,
@@ -540,6 +540,20 @@ class SyncService {
             uploadNonce: uploadNonce,
             appliedPeerHlc: appliedPeerHlc,
           );
+          // A publish that did not stamp this nonce into the manifest -- a
+          // noop (nothing to say) or a heartbeat (which deliberately keeps
+          // the previous nonce) -- must give its speculative ring slot back.
+          // Otherwise every idle sync consumes a slot until the manifest's
+          // live nonce is evicted, and the device reads its own manifest as
+          // a foreign twin: a fresh identity plus a full base re-upload
+          // every ring-length idle syncs (#733).
+          if (write.kind == ChangesetWriteKind.noop ||
+              write.kind == ChangesetWriteKind.heartbeat) {
+            await _syncInitializer?.removeUploadNonce(
+              uploadNonce,
+              provider.providerId,
+            );
+          }
         } catch (e) {
           // Keep the speculative nonce on a timeout (the publish may have
           // landed); remove it only on definite failures, so repeated hard
