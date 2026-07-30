@@ -264,23 +264,30 @@ class DiveFilterState {
         }
       }
       if (buddyNameFilter != null && buddyNameFilter!.isNotEmpty) {
-        final filterLower = buddyNameFilter!.toLowerCase();
-        if (dive is DiveSummary) {
-          final summary = dive;
-          if (!summary.buddyNames.any(
-            (b) => b.toLowerCase().contains(filterLower),
-          )) {
-            return false;
-          }
-        } else if (dive is Dive) {
-          final fullDive = dive;
-          final buddyLower = fullDive.buddy?.toLowerCase() ?? '';
-          final hasLegacyMatch = buddyLower.contains(filterLower);
-          final hasJointMatch = fullDive.buddies.any(
-            (b) => b.buddy.name.toLowerCase().contains(filterLower),
-          );
-          if (!hasLegacyMatch && !hasJointMatch) {
-            return false;
+        final filters = buddyNameFilter!
+            .split(',')
+            .map((s) => s.trim().toLowerCase())
+            .where((s) => s.isNotEmpty)
+            .toList();
+
+        for (final filterLower in filters) {
+          if (dive is DiveSummary) {
+            final summary = dive;
+            if (!summary.buddyNames.any(
+              (b) => b.toLowerCase().contains(filterLower),
+            )) {
+              return false;
+            }
+          } else if (dive is Dive) {
+            final fullDive = dive;
+            final buddyLower = fullDive.buddy?.toLowerCase() ?? '';
+            final hasLegacyMatch = buddyLower.contains(filterLower);
+            final hasJointMatch = fullDive.buddies.any(
+              (b) => b.buddy.name.toLowerCase().contains(filterLower),
+            );
+            if (!hasLegacyMatch && !hasJointMatch) {
+              return false;
+            }
           }
         }
       }

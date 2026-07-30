@@ -569,6 +569,35 @@ void main() {
         expect(result.first.id, 's2');
       });
 
+      test(
+        'filters by multiple buddy names (comma-separated, ALL must match)',
+        () {
+          const filter = DiveFilterState(buddyNameFilter: 'John, Bob');
+          final summaries = [
+            _makeSummary(id: 's1', buddyNames: ['John Doe', 'Bob']),
+            _makeSummary(id: 's2', buddyNames: ['John Doe', 'Alice']),
+            _makeSummary(id: 's3', buddyNames: ['Charlie', 'Bob']),
+          ];
+
+          final result = filter.apply(summaries);
+
+          expect(result, hasLength(1));
+          expect(result.first.id, 's1');
+        },
+      );
+
+      test('filters by multiple buddy names (case-insensitive, trimmed)', () {
+        const filter = DiveFilterState(buddyNameFilter: ' john , BOB ');
+        final summaries = [
+          _makeSummary(id: 's1', buddyNames: ['John Doe', 'Bob']),
+        ];
+
+        final result = filter.apply(summaries);
+
+        expect(result, hasLength(1));
+        expect(result.first.id, 's1');
+      });
+
       group('equipmentAttr axis', () {
         EquipmentAttribute curated(String key, {String? text, double? num}) =>
             EquipmentAttribute.curated(

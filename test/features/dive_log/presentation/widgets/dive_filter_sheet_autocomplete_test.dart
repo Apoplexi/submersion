@@ -156,4 +156,57 @@ void main() {
     expect(find.text('Bob Brown'), findsNothing);
     expect(find.text('Charlie Chaplin'), findsNothing);
   });
+
+  testWidgets('buddy autocomplete supports multiple selections with commas', (
+    tester,
+  ) async {
+    await openSheet(tester);
+
+    final buddyField = find.byWidgetPredicate(
+      (w) => w is TextField && w.decoration?.labelText == 'Buddy Name',
+    );
+
+    await tester.scrollUntilVisible(
+      buddyField,
+      100.0,
+      scrollable: scrollable(),
+    );
+    await tester.pumpAndSettle();
+
+    // Select first buddy
+    await tester.enterText(buddyField, 'Ali');
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Alice Anderson').last);
+    await tester.pumpAndSettle();
+
+    expect(find.widgetWithText(TextField, 'Alice Anderson'), findsOneWidget);
+
+    // Add comma and start typing second buddy
+    await tester.enterText(buddyField, 'Alice Anderson, Bo');
+    await tester.pumpAndSettle();
+
+    // Should suggest Bob
+    expect(find.text('Bob Brown'), findsOneWidget);
+
+    // Select Bob
+    await tester.tap(find.text('Bob Brown').last);
+    await tester.pumpAndSettle();
+
+    // Apply and check state
+    final applyButton = find.text('Apply Filters');
+    await tester.scrollUntilVisible(
+      applyButton,
+      100.0,
+      scrollable: scrollable(),
+    );
+    await tester.tap(applyButton);
+    await tester.pumpAndSettle();
+
+    final element = tester.element(find.byType(MaterialApp));
+    final container = ProviderScope.containerOf(element);
+    expect(
+      container.read(filterProvider).buddyNameFilter,
+      'Alice Anderson, Bob Brown',
+    );
+  });
 }

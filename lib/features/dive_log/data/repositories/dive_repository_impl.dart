@@ -1946,14 +1946,22 @@ class DiveRepository {
       }
     }
     if (filter.buddyNameFilter != null && filter.buddyNameFilter!.isNotEmpty) {
-      clauses.add(
-        '(LOWER(d.buddy) LIKE LOWER(?) OR '
-        'EXISTS (SELECT 1 FROM dive_buddies db '
-        'JOIN buddies b ON db.buddy_id = b.id '
-        'WHERE db.dive_id = d.id AND LOWER(b.name) LIKE LOWER(?)))',
-      );
-      args.add(Variable('%${filter.buddyNameFilter}%'));
-      args.add(Variable('%${filter.buddyNameFilter}%'));
+      final names = filter.buddyNameFilter!
+          .split(',')
+          .map((s) => s.trim())
+          .where((s) => s.isNotEmpty)
+          .toList();
+
+      for (final name in names) {
+        clauses.add(
+          '(LOWER(d.buddy) LIKE LOWER(?) OR '
+          'EXISTS (SELECT 1 FROM dive_buddies db '
+          'JOIN buddies b ON db.buddy_id = b.id '
+          'WHERE db.dive_id = d.id AND LOWER(b.name) LIKE LOWER(?)))',
+        );
+        args.add(Variable('%$name%'));
+        args.add(Variable('%$name%'));
+      }
     }
     if (filter.buddyId != null) {
       clauses.add(

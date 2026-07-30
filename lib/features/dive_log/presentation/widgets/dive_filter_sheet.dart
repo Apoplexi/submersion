@@ -579,25 +579,69 @@ class _DiveFilterSheetState extends ConsumerState<DiveFilterSheet> {
                     focusNode: _buddyFocusNode,
                     optionsBuilder: (TextEditingValue textEditingValue) {
                       final buddiesAsync = ref.watch(allBuddiesProvider);
-                      final buddyNames =
+                      final allBuddyNames =
                           buddiesAsync.valueOrNull
                               ?.map((b) => b.name)
                               .toSet()
                               .toList() ??
                           const <String>[];
 
-                      if (textEditingValue.text.isEmpty) {
+                      final text = textEditingValue.text;
+                      final parts = text
+                          .split(',')
+                          .map((e) => e.trim())
+                          .toList();
+                      final currentBuddies = parts
+                          .sublist(0, parts.length - 1)
+                          .map((e) => e.toLowerCase())
+                          .toSet();
+
+                      final buddyNames = allBuddyNames
+                          .where(
+                            (name) =>
+                                !currentBuddies.contains(name.toLowerCase()),
+                          )
+                          .toList();
+
+                      if (text.isEmpty) {
                         return buddyNames;
                       }
+
+                      final lastPart = text
+                          .split(',')
+                          .last
+                          .trim()
+                          .toLowerCase();
+
+                      if (lastPart.isEmpty) {
+                        return buddyNames;
+                      }
+
                       return buddyNames.where((String option) {
-                        return option.toLowerCase().contains(
-                          textEditingValue.text.toLowerCase(),
-                        );
+                        return option.toLowerCase().contains(lastPart);
                       });
                     },
                     onSelected: (String selection) {
+                      final text = _buddyNameFilter ?? '';
+                      final parts = text.split(',');
+                      String newText;
+                      if (parts.length > 1 || text.contains(',')) {
+                        parts.removeLast();
+                        final prefix = parts.join(',');
+                        newText = prefix.trim().isEmpty
+                            ? selection
+                            : '${prefix.trim()}, $selection';
+                      } else {
+                        newText = selection;
+                      }
+
+                      _buddyNameController.text = newText;
+                      _buddyNameController.selection = TextSelection.collapsed(
+                        offset: newText.length,
+                      );
+
                       setState(() {
-                        _buddyNameFilter = selection;
+                        _buddyNameFilter = newText;
                       });
                     },
                     fieldViewBuilder:
