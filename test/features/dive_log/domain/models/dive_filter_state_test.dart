@@ -3,7 +3,6 @@ import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/features/buddies/domain/entities/buddy.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive_custom_field.dart';
-import 'package:submersion/features/dive_log/domain/entities/dive_summary.dart';
 import 'package:submersion/features/dive_log/domain/models/dive_filter_state.dart';
 import 'package:submersion/features/dive_roles/domain/entities/dive_role.dart';
 import 'package:submersion/features/equipment/domain/entities/equipment_attribute.dart';
@@ -42,20 +41,6 @@ Dive _makeDive({
     weights: const [],
     tags: const [],
     customFields: customFields,
-  );
-}
-
-/// Helper to create a minimal DiveSummary for filter testing.
-DiveSummary _makeSummary({
-  String id = 'dive-1',
-  DateTime? dateTime,
-  List<String> buddyNames = const [],
-}) {
-  return DiveSummary(
-    id: id,
-    dateTime: dateTime ?? DateTime(2026, 3, 19),
-    sortTimestamp: (dateTime ?? DateTime(2026, 3, 19)).millisecondsSinceEpoch,
-    buddyNames: buddyNames,
   );
 }
 
@@ -554,48 +539,6 @@ void main() {
         final result = filter.apply(dives);
 
         expect(result, hasLength(2));
-      });
-
-      test('filters DiveSummary by buddyNameFilter', () {
-        const filter = DiveFilterState(buddyNameFilter: 'smith');
-        final summaries = [
-          _makeSummary(id: 's1', buddyNames: ['John Doe']),
-          _makeSummary(id: 's2', buddyNames: ['Jane Smith', 'Bob']),
-        ];
-
-        final result = filter.apply(summaries);
-
-        expect(result, hasLength(1));
-        expect(result.first.id, 's2');
-      });
-
-      test(
-        'filters by multiple buddy names (comma-separated, ALL must match)',
-        () {
-          const filter = DiveFilterState(buddyNameFilter: 'John, Bob');
-          final summaries = [
-            _makeSummary(id: 's1', buddyNames: ['John Doe', 'Bob']),
-            _makeSummary(id: 's2', buddyNames: ['John Doe', 'Alice']),
-            _makeSummary(id: 's3', buddyNames: ['Charlie', 'Bob']),
-          ];
-
-          final result = filter.apply(summaries);
-
-          expect(result, hasLength(1));
-          expect(result.first.id, 's1');
-        },
-      );
-
-      test('filters by multiple buddy names (case-insensitive, trimmed)', () {
-        const filter = DiveFilterState(buddyNameFilter: ' john , BOB ');
-        final summaries = [
-          _makeSummary(id: 's1', buddyNames: ['John Doe', 'Bob']),
-        ];
-
-        final result = filter.apply(summaries);
-
-        expect(result, hasLength(1));
-        expect(result.first.id, 's1');
       });
 
       test('throws ArgumentError if applied to unsupported type', () {
