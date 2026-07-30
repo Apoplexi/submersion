@@ -4748,12 +4748,13 @@ class DiveRepository {
   Future<Map<String, List<String>>> _buddyNamesForDives(
     List<String> diveIds,
   ) async {
-    if (diveIds.isEmpty) return {};
+    final placeholders = List.filled(diveIds.length, '?').join(', ');
     final rows = await (_db.customSelect(
       'SELECT db.dive_id, b.name FROM dive_buddies db '
       'JOIN buddies b ON db.buddy_id = b.id '
-      'WHERE db.dive_id IN (${diveIds.map((id) => "'$id'").join(',')}) '
+      'WHERE db.dive_id IN ($placeholders) '
       'ORDER BY db.created_at',
+      variables: diveIds.map(Variable.new).toList(),
     )).get();
 
     final map = <String, List<String>>{};
