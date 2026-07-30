@@ -31,6 +31,7 @@ BathymetryGrid grid() => BathymetryGrid(
 Widget host(TissuePick pick) => ProviderScope(
   overrides: [settingsProvider.overrideWith((ref) => _TestSettingsNotifier())],
   child: MaterialApp(
+    locale: const Locale('en'),
     localizationsDelegates: AppLocalizations.localizationsDelegates,
     supportedLocales: AppLocalizations.supportedLocales,
     home: Scaffold(

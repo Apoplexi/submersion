@@ -2,6 +2,7 @@ import 'dart:math' as math;
 import 'dart:typed_data';
 import 'dart:ui';
 
+import 'package:submersion/core/utils/geo_math.dart';
 import 'package:submersion/features/bathymetry/domain/bathymetry_grid.dart';
 import 'package:submersion/features/dive_3d/domain/entities/mesh_data.dart';
 import 'package:submersion/features/dive_3d/domain/spatial/spatial_projection.dart';
@@ -22,13 +23,11 @@ class BathymetryTerrainBuilder {
   static const double _landHeightCapFraction = 0.15;
 
   static const double _metersPerDegLat = 110540.0;
-  static const double _metersPerDegLonAtEquator = 111320.0;
 
   /// The grid's extent in local east-north meters relative to [center].
   static ({double minEast, double maxEast, double minNorth, double maxNorth})
   enuBounds(BathymetryGrid grid, GeoPoint center) {
-    final mLon =
-        _metersPerDegLonAtEquator * math.cos(center.latitude * math.pi / 180.0);
+    final mLon = metersPerDegreeLongitude(center.latitude);
     final minEast = (grid.originLon - center.longitude) * mLon;
     final maxEast =
         (grid.originLon +
@@ -55,8 +54,7 @@ class BathymetryTerrainBuilder {
     required SpatialProjection projection,
   }) {
     final rows = grid.rows, cols = grid.cols;
-    final mLon =
-        _metersPerDegLonAtEquator * math.cos(center.latitude * math.pi / 180.0);
+    final mLon = metersPerDegreeLongitude(center.latitude);
     final maxDepth = math.max(projection.maxDepth, 1.0);
     final landCap = _landHeightCapFraction * maxDepth;
 

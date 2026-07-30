@@ -1,7 +1,6 @@
-import 'dart:math' as math;
-
 import 'package:http/http.dart' as http;
 
+import 'package:submersion/core/utils/geo_math.dart';
 import 'package:submersion/features/bathymetry/data/sources/esri_ascii_parser.dart';
 import 'package:submersion/features/bathymetry/domain/bathymetry_grid.dart';
 import 'package:submersion/features/bathymetry/domain/bathymetry_source.dart';
@@ -35,10 +34,7 @@ class GmrtSource implements BathymetrySource {
     required double spanMeters,
   }) async {
     final dLat = spanMeters / 2 / 110540.0;
-    final dLon =
-        spanMeters /
-        2 /
-        (111320.0 * math.cos(center.latitude * math.pi / 180.0));
+    final dLon = spanMeters / 2 / metersPerDegreeLongitude(center.latitude);
     final url = Uri.parse('$baseUrl/services/GridServer').replace(
       queryParameters: {
         'north': '${center.latitude + dLat}',

@@ -13,6 +13,13 @@ void main() {
     expect(east.north.abs(), lessThan(5));
   });
 
+  test('metersPerDegreeLongitude tracks latitude and floors at the poles', () {
+    expect(metersPerDegreeLongitude(0), closeTo(111320, 1));
+    expect(metersPerDegreeLongitude(60), closeTo(55660, 5));
+    // cos(90) == 0: the floor keeps the scale strictly positive.
+    expect(metersPerDegreeLongitude(90), greaterThan(1000));
+  });
+
   test('enuOffsetMeters is zero for identical points', () {
     const a = GeoPoint(12.16, -68.29);
     final o = enuOffsetMeters(a, a);

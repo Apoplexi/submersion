@@ -67,6 +67,7 @@ Widget page(SiteSeascapeState state) => ProviderScope(
     siteSeascapeProvider.overrideWith((ref, id) async => state),
   ],
   child: const MaterialApp(
+    locale: Locale('en'),
     localizationsDelegates: AppLocalizations.localizationsDelegates,
     supportedLocales: AppLocalizations.supportedLocales,
     home: SiteSeascapePage(siteId: 'site-1'),

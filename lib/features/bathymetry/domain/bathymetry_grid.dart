@@ -71,7 +71,9 @@ class BathymetryGrid {
       cols: newCols,
       depthsMeters: out,
       sourceId: sourceId,
-      resolutionMeters: resolutionMeters * stepC,
+      // The coarser stride sets the effective spacing: never claim more
+      // detail than the downsampled grid actually has.
+      resolutionMeters: resolutionMeters * (stepR > stepC ? stepR : stepC),
       fetchedAt: fetchedAt,
     );
   }

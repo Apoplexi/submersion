@@ -1,3 +1,4 @@
+import 'package:drift/drift.dart' show Value;
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/database/local_cache_database.dart';
@@ -125,6 +126,28 @@ void main() {
     expect(results[0], isNotNull);
     expect(results[1], isNotNull);
     expect(source.calls, 1);
+  });
+
+  test('a corrupt ok row is dropped and refetched, not wedged', () async {
+    final source = ScriptedSource(() => BathymetryResolution.ok(wetGrid()));
+    final r = repo(source);
+    await db
+        .into(db.bathymetryCache)
+        .insert(
+          BathymetryCacheCompanion.insert(
+            cacheKey: BathymetryRepository.keyFor(bonaire),
+            centerLat: 12.17,
+            centerLon: -68.29,
+            status: 'ok',
+            gridJson: const Value('{not json'),
+            fetchedAt: 1753600000000,
+          ),
+        );
+    final grid = await r.getGrid(bonaire);
+    expect(grid, isNotNull); // fell through to a fresh resolve
+    expect(source.calls, 1);
+    final row = await db.select(db.bathymetryCache).getSingle();
+    expect(row.gridJson, isNot('{not json')); // corrupt row replaced
   });
 
   test('a broken cache table degrades to null, never a throw', () async {

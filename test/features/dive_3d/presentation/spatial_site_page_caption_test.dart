@@ -39,6 +39,7 @@ Widget page(SpatialSceneResult? result) => ProviderScope(
     spatialGeometryProvider.overrideWith((ref, id) async => result),
   ],
   child: const MaterialApp(
+    locale: Locale('en'),
     localizationsDelegates: AppLocalizations.localizationsDelegates,
     supportedLocales: AppLocalizations.supportedLocales,
     home: SpatialSitePage(diveId: 'd1'),

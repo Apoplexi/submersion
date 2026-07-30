@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:http/http.dart' as http;
 
+import 'package:submersion/core/utils/geo_math.dart';
 import 'package:submersion/features/bathymetry/data/sources/erddap_grid_parser.dart';
 import 'package:submersion/features/bathymetry/domain/bathymetry_grid.dart';
 import 'package:submersion/features/bathymetry/domain/bathymetry_source.dart';
@@ -43,8 +44,7 @@ class EtopoErddapSource implements BathymetrySource {
     // ~450 m cells need a wide box for enough samples.
     final span = math.max(spanMeters, 10000.0);
     final dLat = span / 2 / 110540.0;
-    final dLon =
-        span / 2 / (111320.0 * math.cos(center.latitude * math.pi / 180.0));
+    final dLon = span / 2 / metersPerDegreeLongitude(center.latitude);
     Object? lastError;
     for (final host in hosts) {
       final url = Uri.parse(

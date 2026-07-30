@@ -76,14 +76,20 @@ final siteSeascapeProvider = FutureProvider.family<SiteSeascapeState, String>((
       (a, b) =>
           (b.entryTime ?? b.dateTime).compareTo(a.entryTime ?? a.dateTime),
     );
+  // Reconstruct all paths concurrently: each resolution touches the DB and
+  // does dead-reckoning work, so N sequential awaits would stack latency.
+  final kept = atSite.take(_maxDivePaths).toList();
+  final paths = await Future.wait(
+    kept.map((d) => ref.watch(spatialReckonedPathProvider(d.id).future)),
+  );
   final divePaths = <SiteDivePathInput>[];
-  for (final dive in atSite.take(_maxDivePaths)) {
-    final path = await ref.watch(spatialReckonedPathProvider(dive.id).future);
+  for (var i = 0; i < kept.length; i++) {
+    final path = paths[i];
     if (path == null || path.points.length < 2) continue;
-    final entry = dive.entryLocation;
+    final entry = kept[i].entryLocation;
     divePaths.add(
       SiteDivePathInput(
-        diveId: dive.id,
+        diveId: kept[i].id,
         path: path,
         anchor: entry == null
             ? (east: 0.0, north: 0.0)

@@ -210,6 +210,7 @@ void main() {
             siteDiveCountProvider(gpsSite.id).overrideWith((ref) async => 0),
           ],
           child: MaterialApp(
+            locale: const Locale('en'),
             localizationsDelegates: AppLocalizations.localizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
             home: SiteDetailPage(siteId: gpsSite.id, embedded: true),
@@ -235,6 +236,7 @@ void main() {
             siteDiveCountProvider(bareSite.id).overrideWith((ref) async => 0),
           ],
           child: MaterialApp(
+            locale: const Locale('en'),
             localizationsDelegates: AppLocalizations.localizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
             home: SiteDetailPage(siteId: bareSite.id, embedded: true),

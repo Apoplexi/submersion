@@ -1,7 +1,6 @@
-import 'dart:math' as math;
-
 import 'package:http/http.dart' as http;
 
+import 'package:submersion/core/utils/geo_math.dart';
 import 'package:submersion/features/bathymetry/data/sources/erddap_grid_parser.dart';
 import 'package:submersion/features/bathymetry/domain/bathymetry_grid.dart';
 import 'package:submersion/features/bathymetry/domain/bathymetry_source.dart';
@@ -70,10 +69,7 @@ class EmodnetSource implements BathymetrySource {
   }) async {
     final box = _inBox(center, _carib) ? _carib : _europe;
     final dLat = spanMeters / 2 / 110540.0;
-    final dLon =
-        spanMeters /
-        2 /
-        (111320.0 * math.cos(center.latitude * math.pi / 180.0));
+    final dLon = spanMeters / 2 / metersPerDegreeLongitude(center.latitude);
     final url = Uri.parse(
       '$baseUrl/erddap/griddap/${box.dataset}.json'
       '?elevation[(${center.latitude - dLat}):(${center.latitude + dLat})]'

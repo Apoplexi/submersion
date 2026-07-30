@@ -32,6 +32,15 @@ double initialBearingDegrees(GeoPoint a, GeoPoint b) {
   return (bearing + 360.0) % 360.0;
 }
 
+/// Meters per degree of longitude at [latitudeDeg], floored near the poles
+/// so callers never divide by — or scale a mesh with — a zero at
+/// extreme-but-valid coordinates (cos(90°) == 0). The floor only engages
+/// above ~89.4° latitude.
+double metersPerDegreeLongitude(double latitudeDeg) {
+  final cosLat = math.cos(latitudeDeg * math.pi / 180.0);
+  return 111320.0 * math.max(cosLat, 0.01);
+}
+
 /// Offset of [to] relative to [from] in local east-north meters
 /// (distance + bearing decomposition — the same math the spatial scene
 /// uses for exit fixes).
