@@ -658,6 +658,24 @@ Branch: `fix/143-usbhid-transport-honesty`
 - [ ] **Step 4:** implement across all four platforms. Search for any UI copy that special-cases USB for Suunto and adjust if it exists (grep "EON" in `lib/`).
 - [ ] **Steps 5-6:** commit `fix(dc): stop advertising USB for USB-HID-only dive computers`; PR body `Fixes #143` + issue comment: "The EON Steel's USB mode is USB-HID, which Submersion's transport layer doesn't implement — the app was wrongly advertising USB and then failing to find a serial port. As of this fix the app offers BLE (which works) and no longer dead-ends you on USB. Leaving a note here: if there's demand for true USB-HID cable support, that's a feature we can track separately."
 
+### Task 28: Fix #759 — Shearwater oldest-first download aborts with zero dives (promoted from Task 7)
+
+Branch: `fix/759-shearwater-partial-download`
+
+**Root cause (Task 7 investigation, fork HEAD 1a47a01):** the oldest-first patch (`shearwater_petrel.c:329-348` in the fork submodule) kept abort-on-first-failure; with the order reversed, one lost BLE notification aborts the pass at the OLDEST dive — zero dives delivered, no partial-import offer, "Download Failed" right after the manifest. `shearwater_common_download` has no retry; the fork already carries an OSTC3 retry wrapper (commit 4ac9867) for the identical failure mode. The existing native test `check_stop_on_failure` encodes the broken behavior as intended.
+
+**Files:**
+- Modify (SUBMODULE `packages/libdivecomputer_plugin/third_party/libdivecomputer`, fork repo): `src/shearwater_petrel.c:329-348` — (a) wrap the per-dive `shearwater_common_download` in a 2-3 attempt retry with `dc_iostream_purge` + short backoff, mirroring the hw_ostc3 wrapper; (b) on persistent failure `break` instead of `return rc`, and return `DC_STATUS_SUCCESS` when at least one dive was delivered (preserves the contiguous-oldest-prefix contract from #480; the newest delivered fingerprint stays a valid high-water mark).
+- Modify: `packages/libdivecomputer_plugin/test/native/test_shearwater_petrel_foreach.c` — update `check_stop_on_failure` to the new contract; add (a) oldest-dive-fails -> newer dives still delivered, pass succeeds; (b) transient failure -> retry succeeds -> full delivery.
+
+**Submodule workflow:** commit on a branch in the fork, push the fork FIRST, then bump the superproject pointer in the campaign branch (the plugin's five platform source lists only break when files are added/removed — this change adds none).
+
+**Interfaces:** none new; behavior change is partial-success semantics.
+
+- [ ] **Steps 1-3:** update/add the native tests, build and run them (same cmake/ctest flow as Task 26); expect the new cases to fail against the current abort behavior.
+- [ ] **Step 4:** implement retry + partial-success in `shearwater_petrel.c`.
+- [ ] **Steps 5-6:** native tests green; `flutter analyze` + full `flutter test` still green (Dart side untouched); commit submodule, push fork branch, bump pointer; PR body `Fixes #759` with the honest caveat that the trigger on the reporter's units (transient BLE loss vs unreadable oldest record) needs their logs, but the zero-dives regression is fixed either way.
+
 ---
 
 ## Delivery
