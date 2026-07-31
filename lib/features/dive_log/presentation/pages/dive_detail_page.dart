@@ -2048,21 +2048,34 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
         .map((t) => t.volume!)
         .firstOrNull;
 
-    // Determine if we can show L/min (need tank volume)
-    final showLitersPerMin =
-        sacUnit == SacUnit.litersPerMin && tankVolume != null;
-
     // Use the top-level normalization function
     final normalizationFactor = calculateSacNormalizationFactor(dive, analysis);
 
-    // Format SAC value based on unit setting, applying normalization
-    String formatSacValue(double sacBarPerMin) {
+    // Format SAC value based on unit setting, applying normalization.
+    // [segmentTankId] selects that segment's own cylinder volume for the
+    // L/min conversion -- sidemount tanks can differ in size, so one shared
+    // volume misconverts half the segments (#110). Falls back to the first
+    // tank with a volume when the segment carries no attribution.
+    String formatSacValue(double sacBarPerMin, {String? segmentTankId}) {
       // Apply normalization to align with overall dive SAC
       final normalizedSac = sacBarPerMin * normalizationFactor;
 
-      if (showLitersPerMin) {
+      final segmentVolume = segmentTankId == null
+          ? null
+          : dive.tanks
+                .where(
+                  (t) =>
+                      t.id == segmentTankId &&
+                      t.volume != null &&
+                      t.volume! > 0,
+                )
+                .map((t) => t.volume!)
+                .firstOrNull;
+      final effectiveVolume = segmentVolume ?? tankVolume;
+
+      if (sacUnit == SacUnit.litersPerMin && effectiveVolume != null) {
         // Convert bar/min to L/min: sacLPerMin = sacBarPerMin * tankVolume
-        final sacLPerMin = normalizedSac * tankVolume;
+        final sacLPerMin = normalizedSac * effectiveVolume;
         return '${units.convertVolume(sacLPerMin).toStringAsFixed(1)} ${units.volumeSymbol}/min';
       } else {
         // Convert to user's pressure unit (bar or psi)
@@ -2208,7 +2221,10 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
                         SizedBox(
                           width: 90,
                           child: Text(
-                            formatSacValue(segment.sacRate),
+                            formatSacValue(
+                              segment.sacRate,
+                              segmentTankId: segment.tankId,
+                            ),
                             style: Theme.of(context).textTheme.bodySmall
                                 ?.copyWith(fontWeight: FontWeight.bold),
                             textAlign: TextAlign.end,

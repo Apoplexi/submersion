@@ -42,6 +42,55 @@ void main() {
   }
 
   group('calculateGasSwitchSegments', () {
+    test('fallback prorates against the whole dive, not the segment '
+        '(#110)', () {
+      // No per-sample pressure series (common on sidemount, where the
+      // attributed tank's series is flat while the diver breathes the
+      // other cylinder): the start/end-pressure fallback applies.
+      const tank = DiveTank(
+        id: 't1',
+        name: 'Sidemount L',
+        startPressure: 200,
+        endPressure: 100,
+        gasMix: GasMix(o2: 21, he: 0),
+      );
+      final profile = flatProfile(30 * 60, 20.0);
+      GasSwitchWithTank sw(String id, int ts) => GasSwitchWithTank(
+        gasSwitch: GasSwitch(
+          id: id,
+          diveId: 'dive-1',
+          timestamp: ts,
+          tankId: 't1',
+          createdAt: DateTime(2026),
+        ),
+        tankName: 'Sidemount L',
+        gasMix: 'Air',
+        o2Fraction: 0.21,
+      );
+
+      final segments = service.calculateGasSwitchSegments(
+        profile: profile,
+        tanks: [tank],
+        gasSwitches: [sw('gs1', 0), sw('gs2', 600), sw('gs3', 1200)],
+        tankPressures: const {},
+      );
+
+      expect(segments, isNotNull);
+      expect(segments!.length, 3);
+      // Each 10-minute third gets one third of the 100 bar drop:
+      // 33.33 bar / 10 min / 3.0 atm. The old fallback divided the segment
+      // by ITS OWN duration, charging every segment the whole cylinder and
+      // inflating segment SAC by the number of segments.
+      for (final s in segments) {
+        expect(s.sacRate, closeTo(100 / 3 / 10 / 3.0, 0.02));
+      }
+      final totalConsumed = segments.fold<double>(
+        0,
+        (sum, s) => sum + s.gasConsumed,
+      );
+      expect(totalConsumed, closeTo(100, 1.0));
+    });
+
     test('computes SAC with Z-factor for segments with tank volume', () {
       const tank = DiveTank(
         id: 't1',

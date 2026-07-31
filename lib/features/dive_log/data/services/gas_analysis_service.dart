@@ -81,6 +81,8 @@ class GasAnalysisService {
         tankPressures: resolvedPressures[tank.id],
         startTime: startTime,
         endTime: endTime,
+        diveStartTimestamp: profile.first.timestamp,
+        diveEndTimestamp: profile.last.timestamp,
       );
 
       if (sacRate == null) continue;
@@ -196,6 +198,8 @@ class GasAnalysisService {
         tankPressures: resolvedPressures[tank.id],
         startTime: seg.start,
         endTime: seg.end,
+        diveStartTimestamp: profile.first.timestamp,
+        diveEndTimestamp: profile.last.timestamp,
       );
 
       if (sacRate == null) continue;
@@ -656,6 +660,8 @@ class GasAnalysisService {
     List<TankPressurePoint>? tankPressures,
     required int startTime,
     required int endTime,
+    required int diveStartTimestamp,
+    required int diveEndTimestamp,
   }) {
     if (profile.isEmpty) return null;
 
@@ -683,8 +689,10 @@ class GasAnalysisService {
     // Fallback: estimate from tank start/end (less accurate for segments)
     if (pressureUsed == null || pressureUsed <= 0) {
       if (tank.startPressure != null && tank.endPressure != null) {
-        // Estimate proportionally based on segment duration
-        final totalDuration = profile.last.timestamp - profile.first.timestamp;
+        // Prorate against the WHOLE DIVE: the profile passed in is the
+        // SEGMENT's own slice, so dividing by its span made proportion ~1.0
+        // and charged every segment the entire cylinder (#110).
+        final totalDuration = diveEndTimestamp - diveStartTimestamp;
         if (totalDuration > 0) {
           final tankPressureUsed = tank.startPressure! - tank.endPressure!;
           final proportion = durationSec / totalDuration;
@@ -693,7 +701,7 @@ class GasAnalysisService {
           startPressure =
               tank.startPressure! -
               (tankPressureUsed *
-                  (startTime - profile.first.timestamp) /
+                  (startTime - diveStartTimestamp) /
                   totalDuration);
           endPressure = startPressure - pressureUsed;
         }
