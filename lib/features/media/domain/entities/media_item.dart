@@ -152,6 +152,20 @@ class MediaItem extends Equatable {
   /// Returns true if this is a video
   bool get isVideo => mediaType == MediaType.video;
 
+  /// Filename to use when writing this item's bytes to a temp file for
+  /// sharing. Falls back to a media-type-appropriate default when
+  /// [originalFilename] is missing or blank -- some import sources (e.g.
+  /// the desktop file picker) report an empty string rather than null,
+  /// which a plain `??` fallback misses and produces an empty path.
+  String get shareFilename {
+    final name = originalFilename;
+    if (name != null && name.isNotEmpty) return name;
+    return isVideo ? 'dive_video.mp4' : 'dive_photo.jpg';
+  }
+
+  /// MIME type to advertise when sharing this item, matching [shareFilename].
+  String get shareMimeType => isVideo ? 'video/mp4' : 'image/jpeg';
+
   /// Returns formatted duration string (e.g., "1:30" for 90 seconds)
   String? get durationString {
     if (durationSeconds == null) return null;

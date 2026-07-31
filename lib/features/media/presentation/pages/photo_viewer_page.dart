@@ -394,8 +394,7 @@ class _PhotoViewerPageState extends ConsumerState<PhotoViewerPage> {
 
       // Save to temp file
       final tempDir = await getTemporaryDirectory();
-      final filename = item.originalFilename ?? 'dive_photo.jpg';
-      final file = File('${tempDir.path}/$filename');
+      final file = File('${tempDir.path}/${item.shareFilename}');
       await file.writeAsBytes(bytes);
 
       // Dismiss loading - use rootNavigator to match where showDialog placed the dialog
@@ -403,7 +402,7 @@ class _PhotoViewerPageState extends ConsumerState<PhotoViewerPage> {
 
       // Share
       await SharePlus.instance.share(
-        ShareParams(files: [XFile(file.path, mimeType: 'image/jpeg')]),
+        ShareParams(files: [XFile(file.path, mimeType: item.shareMimeType)]),
       );
     } catch (e) {
       if (mounted) Navigator.of(context, rootNavigator: true).pop();

@@ -220,6 +220,40 @@ void main() {
       expect(baseItem.isVideo, false);
     });
 
+    test('shareFilename returns originalFilename when present', () {
+      final item = baseItem.copyWith(originalFilename: 'IMG_1234.jpg');
+      expect(item.shareFilename, 'IMG_1234.jpg');
+    });
+
+    test('shareFilename falls back for a null filename', () {
+      expect(baseItem.originalFilename, isNull);
+      expect(baseItem.shareFilename, 'dive_photo.jpg');
+    });
+
+    test('shareFilename falls back for an empty-string filename', () {
+      // Some import sources (e.g. the desktop file picker) report an
+      // empty string rather than null, which a plain `??` fallback misses.
+      final item = baseItem.copyWith(originalFilename: '');
+      expect(item.shareFilename, 'dive_photo.jpg');
+    });
+
+    test('shareFilename fallback uses a video extension for videos', () {
+      final item = baseItem.copyWith(
+        mediaType: MediaType.video,
+        originalFilename: '',
+      );
+      expect(item.shareFilename, 'dive_video.mp4');
+    });
+
+    test('shareMimeType returns image/jpeg for photos', () {
+      expect(baseItem.shareMimeType, 'image/jpeg');
+    });
+
+    test('shareMimeType returns video/mp4 for videos', () {
+      final item = baseItem.copyWith(mediaType: MediaType.video);
+      expect(item.shareMimeType, 'video/mp4');
+    });
+
     test('durationString formats seconds correctly', () {
       final video30s = baseItem.copyWith(durationSeconds: 30);
       expect(video30s.durationString, '0:30');
