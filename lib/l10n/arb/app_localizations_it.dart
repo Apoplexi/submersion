@@ -21143,6 +21143,34 @@ class AppLocalizationsIt extends AppLocalizations {
   String get dive3d_overlay_markers => 'Indicatori';
 
   @override
+  String get dive3d_seascape_overlay_paths => 'Percorsi delle immersioni';
+
+  @override
+  String get dive3d_seascape_siteTitle => 'Paesaggio marino del sito';
+
+  @override
+  String dive3d_seascape_seafloorSource(String source, String resolution) {
+    return 'Fondale: $source (~$resolution m)';
+  }
+
+  @override
+  String get dive3d_seascape_noCoordinates =>
+      'Questo sito non ha coordinate GPS';
+
+  @override
+  String get dive3d_seascape_noData =>
+      'Nessuna batimetria disponibile per questa posizione';
+
+  @override
+  String dive3d_seascape_axis_distance(String unitSymbol) {
+    return 'Distanza ($unitSymbol)';
+  }
+
+  @override
+  String get settings_about_bathymetryCredit =>
+      'Dati batimetrici: GMRT (CC BY 4.0) · EMODnet Bathymetry (CC BY 4.0) · NOAA ETOPO 2022';
+
+  @override
   String get dive3d_metric_depth => 'Profondità';
 
   @override

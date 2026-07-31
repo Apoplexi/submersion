@@ -35296,6 +35296,48 @@ abstract class AppLocalizations {
   /// **'Markers'**
   String get dive3d_overlay_markers;
 
+  /// No description provided for @dive3d_seascape_overlay_paths.
+  ///
+  /// In en, this message translates to:
+  /// **'Dive paths'**
+  String get dive3d_seascape_overlay_paths;
+
+  /// No description provided for @dive3d_seascape_siteTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Site Seascape'**
+  String get dive3d_seascape_siteTitle;
+
+  /// No description provided for @dive3d_seascape_seafloorSource.
+  ///
+  /// In en, this message translates to:
+  /// **'Seafloor: {source} (~{resolution} m)'**
+  String dive3d_seascape_seafloorSource(String source, String resolution);
+
+  /// No description provided for @dive3d_seascape_noCoordinates.
+  ///
+  /// In en, this message translates to:
+  /// **'This site has no GPS coordinates'**
+  String get dive3d_seascape_noCoordinates;
+
+  /// No description provided for @dive3d_seascape_noData.
+  ///
+  /// In en, this message translates to:
+  /// **'No bathymetry available for this location'**
+  String get dive3d_seascape_noData;
+
+  /// No description provided for @dive3d_seascape_axis_distance.
+  ///
+  /// In en, this message translates to:
+  /// **'Distance ({unitSymbol})'**
+  String dive3d_seascape_axis_distance(String unitSymbol);
+
+  /// No description provided for @settings_about_bathymetryCredit.
+  ///
+  /// In en, this message translates to:
+  /// **'Bathymetry data: GMRT (CC BY 4.0) · EMODnet Bathymetry (CC BY 4.0) · NOAA ETOPO 2022'**
+  String get settings_about_bathymetryCredit;
+
   /// No description provided for @dive3d_metric_depth.
   ///
   /// In en, this message translates to:

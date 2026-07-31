@@ -20973,6 +20973,34 @@ class AppLocalizationsNl extends AppLocalizations {
   String get dive3d_overlay_markers => 'Markeringen';
 
   @override
+  String get dive3d_seascape_overlay_paths => 'Duikroutes';
+
+  @override
+  String get dive3d_seascape_siteTitle => 'Zeelandschap van de duikstek';
+
+  @override
+  String dive3d_seascape_seafloorSource(String source, String resolution) {
+    return 'Zeebodem: $source (~$resolution m)';
+  }
+
+  @override
+  String get dive3d_seascape_noCoordinates =>
+      'Deze duikstek heeft geen gps-coördinaten';
+
+  @override
+  String get dive3d_seascape_noData =>
+      'Geen bathymetrie beschikbaar voor deze locatie';
+
+  @override
+  String dive3d_seascape_axis_distance(String unitSymbol) {
+    return 'Afstand ($unitSymbol)';
+  }
+
+  @override
+  String get settings_about_bathymetryCredit =>
+      'Bathymetriegegevens: GMRT (CC BY 4.0) · EMODnet Bathymetry (CC BY 4.0) · NOAA ETOPO 2022';
+
+  @override
   String get dive3d_metric_depth => 'Diepte';
 
   @override

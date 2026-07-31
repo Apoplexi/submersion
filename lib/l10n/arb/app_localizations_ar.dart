@@ -20763,6 +20763,34 @@ class AppLocalizationsAr extends AppLocalizations {
   String get dive3d_overlay_markers => 'علامات';
 
   @override
+  String get dive3d_seascape_overlay_paths => 'مسارات الغوص';
+
+  @override
+  String get dive3d_seascape_siteTitle => 'المشهد البحري للموقع';
+
+  @override
+  String dive3d_seascape_seafloorSource(String source, String resolution) {
+    return 'قاع البحر: $source (~$resolution م)';
+  }
+
+  @override
+  String get dive3d_seascape_noCoordinates =>
+      'لا توجد إحداثيات GPS لهذا الموقع';
+
+  @override
+  String get dive3d_seascape_noData =>
+      'لا توجد بيانات قياس أعماق متاحة لهذا الموقع';
+
+  @override
+  String dive3d_seascape_axis_distance(String unitSymbol) {
+    return 'المسافة ($unitSymbol)';
+  }
+
+  @override
+  String get settings_about_bathymetryCredit =>
+      'بيانات قياس الأعماق: GMRT (CC BY 4.0) · EMODnet Bathymetry (CC BY 4.0) · NOAA ETOPO 2022';
+
+  @override
   String get dive3d_metric_depth => 'العمق';
 
   @override

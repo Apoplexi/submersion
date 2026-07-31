@@ -20080,6 +20080,32 @@ class AppLocalizationsZh extends AppLocalizations {
   String get dive3d_overlay_markers => '标记';
 
   @override
+  String get dive3d_seascape_overlay_paths => '潜水路径';
+
+  @override
+  String get dive3d_seascape_siteTitle => '潜点海景';
+
+  @override
+  String dive3d_seascape_seafloorSource(String source, String resolution) {
+    return '海底：$source（约$resolution米）';
+  }
+
+  @override
+  String get dive3d_seascape_noCoordinates => '该潜点没有GPS坐标';
+
+  @override
+  String get dive3d_seascape_noData => '该位置没有可用的水深数据';
+
+  @override
+  String dive3d_seascape_axis_distance(String unitSymbol) {
+    return '距离（$unitSymbol）';
+  }
+
+  @override
+  String get settings_about_bathymetryCredit =>
+      '水深数据：GMRT（CC BY 4.0）· EMODnet Bathymetry（CC BY 4.0）· NOAA ETOPO 2022';
+
+  @override
   String get dive3d_metric_depth => '深度';
 
   @override

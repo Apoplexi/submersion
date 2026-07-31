@@ -20616,6 +20616,32 @@ class AppLocalizationsHe extends AppLocalizations {
   String get dive3d_overlay_markers => 'סמנים';
 
   @override
+  String get dive3d_seascape_overlay_paths => 'מסלולי צלילה';
+
+  @override
+  String get dive3d_seascape_siteTitle => 'נוף ימי של האתר';
+
+  @override
+  String dive3d_seascape_seafloorSource(String source, String resolution) {
+    return 'קרקעית הים: $source (~$resolution מ\')';
+  }
+
+  @override
+  String get dive3d_seascape_noCoordinates => 'לאתר זה אין נקודות ציון GPS';
+
+  @override
+  String get dive3d_seascape_noData => 'אין נתוני עומק זמינים למיקום זה';
+
+  @override
+  String dive3d_seascape_axis_distance(String unitSymbol) {
+    return 'מרחק ($unitSymbol)';
+  }
+
+  @override
+  String get settings_about_bathymetryCredit =>
+      'נתוני עומק: GMRT (CC BY 4.0) · EMODnet Bathymetry (CC BY 4.0) · NOAA ETOPO 2022';
+
+  @override
   String get dive3d_metric_depth => 'עומק';
 
   @override

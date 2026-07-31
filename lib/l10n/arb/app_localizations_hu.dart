@@ -21080,6 +21080,34 @@ class AppLocalizationsHu extends AppLocalizations {
   String get dive3d_overlay_markers => 'Jelölők';
 
   @override
+  String get dive3d_seascape_overlay_paths => 'Merülési útvonalak';
+
+  @override
+  String get dive3d_seascape_siteTitle => 'Helyszíni tengertáj';
+
+  @override
+  String dive3d_seascape_seafloorSource(String source, String resolution) {
+    return 'Tengerfenék: $source (~$resolution m)';
+  }
+
+  @override
+  String get dive3d_seascape_noCoordinates =>
+      'Ennek a helyszínnek nincsenek GPS-koordinátái';
+
+  @override
+  String get dive3d_seascape_noData =>
+      'Ehhez a helyhez nem érhető el batimetria';
+
+  @override
+  String dive3d_seascape_axis_distance(String unitSymbol) {
+    return 'Távolság ($unitSymbol)';
+  }
+
+  @override
+  String get settings_about_bathymetryCredit =>
+      'Batimetriai adatok: GMRT (CC BY 4.0) · EMODnet Bathymetry (CC BY 4.0) · NOAA ETOPO 2022';
+
+  @override
   String get dive3d_metric_depth => 'Mélység';
 
   @override

@@ -13442,6 +13442,27 @@
   "@dive3d_overlay_curtain": {},
   "dive3d_overlay_markers": "Markers",
   "@dive3d_overlay_markers": {},
+  "dive3d_seascape_overlay_paths": "Dive paths",
+  "@dive3d_seascape_overlay_paths": {},
+  "dive3d_seascape_siteTitle": "Site Seascape",
+  "@dive3d_seascape_siteTitle": {},
+  "dive3d_seascape_seafloorSource": "Seafloor: {source} (~{resolution} m)",
+  "@dive3d_seascape_seafloorSource": {
+    "placeholders": {
+      "source": {"type": "String"},
+      "resolution": {"type": "String"}
+    }
+  },
+  "dive3d_seascape_noCoordinates": "This site has no GPS coordinates",
+  "@dive3d_seascape_noCoordinates": {},
+  "dive3d_seascape_noData": "No bathymetry available for this location",
+  "@dive3d_seascape_noData": {},
+  "dive3d_seascape_axis_distance": "Distance ({unitSymbol})",
+  "@dive3d_seascape_axis_distance": {
+    "placeholders": {"unitSymbol": {"type": "String"}}
+  },
+  "settings_about_bathymetryCredit": "Bathymetry data: GMRT (CC BY 4.0) · EMODnet Bathymetry (CC BY 4.0) · NOAA ETOPO 2022",
+  "@settings_about_bathymetryCredit": {},
   "dive3d_metric_depth": "Depth",
   "@dive3d_metric_depth": {},
   "dive3d_metric_temperature": "Temp",

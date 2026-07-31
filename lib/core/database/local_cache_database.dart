@@ -63,12 +63,38 @@ class MediaCacheEntries extends Table {
   Set<Column> get primaryKey => {contentHash, kind};
 }
 
-@DriftDatabase(tables: [LocalAssetCache, MediaTransferQueue, MediaCacheEntries])
+/// Cached bathymetry grids keyed by quantized coordinate (0.02 degree
+/// cells). Re-derivable third-party data: never synced, never backed up.
+/// status semantics: 'ok' = usable grid in gridJson; 'empty' = fetched
+/// fine, definitively no water here; 'unavailable' = reserved for future
+/// definitive negatives. Transient failures write NO row.
+class BathymetryCache extends Table {
+  TextColumn get cacheKey => text()();
+  RealColumn get centerLat => real()();
+  RealColumn get centerLon => real()();
+  TextColumn get status => text()();
+  TextColumn get sourceId => text().nullable()();
+  RealColumn get resolutionMeters => real().nullable()();
+  TextColumn get gridJson => text().nullable()();
+  IntColumn get fetchedAt => integer()();
+
+  @override
+  Set<Column> get primaryKey => {cacheKey};
+}
+
+@DriftDatabase(
+  tables: [
+    LocalAssetCache,
+    MediaTransferQueue,
+    MediaCacheEntries,
+    BathymetryCache,
+  ],
+)
 class LocalCacheDatabase extends _$LocalCacheDatabase {
   LocalCacheDatabase(super.e);
 
   @override
-  int get schemaVersion => 6;
+  int get schemaVersion => 7;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -97,6 +123,32 @@ class LocalCacheDatabase extends _$LocalCacheDatabase {
       if (from >= 2 && from < 6) {
         await m.addColumn(mediaTransferQueue, mediaTransferQueue.payloadJson);
       }
+      // v7: bathymetry grid cache. NOTE: the reef-data branch (PR #728)
+      // also claims v7 on its own branch — whichever merges second
+      // renumbers. from < 7 covers both the v1 path and v2..v6 upgrades.
+      if (from < 7) {
+        await m.createTable(bathymetryCache);
+      }
+    },
+    beforeOpen: (details) async {
+      // Ladder-collision self-heal: a parallel branch that also claims v7
+      // (e.g. reef data) may have stamped user_version first on a shared
+      // dev machine, so onUpgrade never runs here and this table would be
+      // missing. Idempotent re-assert, mirroring the main DB's pattern.
+      // Keep the column shape in sync with the BathymetryCache table.
+      await customStatement('''
+        CREATE TABLE IF NOT EXISTS bathymetry_cache (
+          cache_key TEXT NOT NULL,
+          center_lat REAL NOT NULL,
+          center_lon REAL NOT NULL,
+          status TEXT NOT NULL,
+          source_id TEXT NULL,
+          resolution_meters REAL NULL,
+          grid_json TEXT NULL,
+          fetched_at INTEGER NOT NULL,
+          PRIMARY KEY (cache_key)
+        )
+      ''');
     },
   );
 }

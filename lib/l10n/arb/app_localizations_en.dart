@@ -20787,6 +20787,34 @@ class AppLocalizationsEn extends AppLocalizations {
   String get dive3d_overlay_markers => 'Markers';
 
   @override
+  String get dive3d_seascape_overlay_paths => 'Dive paths';
+
+  @override
+  String get dive3d_seascape_siteTitle => 'Site Seascape';
+
+  @override
+  String dive3d_seascape_seafloorSource(String source, String resolution) {
+    return 'Seafloor: $source (~$resolution m)';
+  }
+
+  @override
+  String get dive3d_seascape_noCoordinates =>
+      'This site has no GPS coordinates';
+
+  @override
+  String get dive3d_seascape_noData =>
+      'No bathymetry available for this location';
+
+  @override
+  String dive3d_seascape_axis_distance(String unitSymbol) {
+    return 'Distance ($unitSymbol)';
+  }
+
+  @override
+  String get settings_about_bathymetryCredit =>
+      'Bathymetry data: GMRT (CC BY 4.0) · EMODnet Bathymetry (CC BY 4.0) · NOAA ETOPO 2022';
+
+  @override
   String get dive3d_metric_depth => 'Depth';
 
   @override
