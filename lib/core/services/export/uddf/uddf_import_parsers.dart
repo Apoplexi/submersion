@@ -3,6 +3,22 @@ import 'package:xml/xml.dart';
 import 'package:submersion/core/constants/enums.dart' as enums;
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
 
+/// Normalizes a raw UDDF `<tankvolume>` value to liters (#158).
+///
+/// UDDF 3.2.3 defines tankvolume in CUBIC METERS, but exporters disagree:
+/// spec-conformant tools write 0.0111 for an 11.1 L tank, Diving Log 6.x
+/// writes 0.111 (10x off), and legacy Submersion exports wrote plain liters.
+/// A plausibility ladder keyed to real tank sizes (roughly 1-45 L water
+/// capacity) disambiguates the three conventions; implausible values are
+/// stored unchanged rather than guessed at.
+double normalizeUddfTankVolumeToLiters(double raw) {
+  if (raw <= 0) return raw;
+  if (raw <= 0.045) return raw * 1000; // spec cubic meters
+  if (raw <= 0.45) return raw * 100; // Diving Log 10x-off quirk
+  if (raw <= 45) return raw; // legacy liter exports
+  return raw;
+}
+
 /// Static parser methods for UDDF entity elements.
 ///
 /// Used by [UddfFullImportService] to parse individual entity types

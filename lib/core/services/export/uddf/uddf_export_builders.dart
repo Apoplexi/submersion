@@ -428,9 +428,14 @@ class UddfExportBuilders {
                 if (tank.name != null && tank.name!.isNotEmpty) {
                   builder.element('tankname', nest: tank.name);
                 }
-                // Volume in liters
+                // Volume: UDDF tankvolume is CUBIC METERS per spec (#158).
+                // Stored volume is liters, so divide by 1000 on the way out;
+                // the import side's normalizer restores liters symmetrically.
                 if (tank.volume != null) {
-                  builder.element('tankvolume', nest: tank.volume.toString());
+                  builder.element(
+                    'tankvolume',
+                    nest: (tank.volume! / 1000).toString(),
+                  );
                 }
                 // Working pressure in Pascal (UDDF standard)
                 if (tank.workingPressure != null) {
