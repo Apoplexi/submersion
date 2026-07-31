@@ -35,6 +35,32 @@ class LocationResult {
 
 /// Service for handling device GPS location and geocoding
 class LocationService {
+  /// Nominatim reverse-geocode URI. accept-language pins results to English
+  /// so country/region strings group consistently in statistics (#214).
+  static Uri buildReverseGeocodeUri(double latitude, double longitude) =>
+      Uri.parse(
+        'https://nominatim.openstreetmap.org/reverse?format=json'
+        '&lat=$latitude&lon=$longitude&zoom=10&accept-language=en',
+      );
+
+  /// Nominatim forward-geocode URI, English-pinned like the reverse path.
+  static Uri buildForwardGeocodeUri(String address) => Uri.parse(
+    'https://nominatim.openstreetmap.org/search?format=json'
+    '&q=${Uri.encodeComponent(address)}&limit=1&addressdetails=1'
+    '&accept-language=en',
+  );
+
+  /// The platform geocoder answers in the DEVICE locale unless pinned,
+  /// which stored 'Spanien' on German phones and 'España' on Spanish ones
+  /// for the same country (#214). Pin once per process.
+  static bool _geocoderLocalePinned = false;
+
+  static Future<void> _pinGeocoderLocale() async {
+    if (_geocoderLocalePinned) return;
+    await setLocaleIdentifier('en');
+    _geocoderLocalePinned = true;
+  }
+
   static final _log = LoggerService.forClass(LocationService);
   static LocationService? _instance;
 
@@ -195,6 +221,7 @@ class LocationService {
       // Try native geocoding first (works on iOS/Android)
       if (_isMobile) {
         try {
+          await _pinGeocoderLocale();
           final placemarks = await placemarkFromCoordinates(
             latitude,
             longitude,
@@ -227,14 +254,13 @@ class LocationService {
   Future<({String? country, String? region, String? locality})>
   _reverseGeocodeWeb(double latitude, double longitude) async {
     try {
-      final url = Uri.parse(
-        'https://nominatim.openstreetmap.org/reverse?format=json&lat=$latitude&lon=$longitude&zoom=10',
-      );
+      final url = buildReverseGeocodeUri(latitude, longitude);
 
       final client = HttpClient();
       client.userAgent = 'Submersion Dive Log App';
 
       final request = await client.getUrl(url);
+      request.headers.set('Accept-Language', 'en');
       final response = await request.close();
 
       if (response.statusCode == 200) {
@@ -275,14 +301,13 @@ class LocationService {
     try {
       _log.info('Forward geocoding address: $address');
 
-      final url = Uri.parse(
-        'https://nominatim.openstreetmap.org/search?format=json&q=${Uri.encodeComponent(address)}&limit=1&addressdetails=1',
-      );
+      final url = buildForwardGeocodeUri(address);
 
       final client = HttpClient();
       client.userAgent = 'Submersion Dive Log App';
 
       final request = await client.getUrl(url);
+      request.headers.set('Accept-Language', 'en');
       final response = await request.close();
 
       if (response.statusCode == 200) {
