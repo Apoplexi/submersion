@@ -34,6 +34,11 @@ enum StartupLocationCheck {
   /// Custom database exists and is readable.
   accessible,
 
+  /// The folder is configured but holds no database yet -- the normal
+  /// first launch after choosing a location. The configuration is KEPT on
+  /// every platform; the database is created at the chosen path.
+  keptDatabaseMissing,
+
   /// Custom database is not accessible, but the configuration is KEPT
   /// (non-sandbox platforms; the open will create the file or surface a
   /// real error instead of silently discarding the user's choice, #218).
@@ -201,11 +206,12 @@ class DatabaseLocationService {
 
       if (result == null) return null;
       return FolderPickResultWithBookmark(path: result);
-    } catch (e) {
+    } catch (e, stackTrace) {
       // A thrown picker (e.g. a missing/broken XDG desktop portal on
       // Linux) must be distinguishable from a user cancel, or the setting
-      // silently appears to do nothing (#218).
-      throw FolderPickException('$e');
+      // silently appears to do nothing (#218). Rethrow on the original
+      // stack so logs point at the failing portal/DBus call.
+      Error.throwWithStackTrace(FolderPickException('$e'), stackTrace);
     }
   }
 
@@ -283,17 +289,29 @@ class DatabaseLocationService {
     }
 
     final dbPath = await getDatabasePath();
+    final file = File(dbPath);
+
+    // Nothing at the path is NOT an access failure: it is the first launch
+    // after choosing a folder. Resetting here would wipe a freshly-chosen
+    // location before the database was ever created (#218). Anything that
+    // DOES occupy the path (including a directory) has to be opened to
+    // decide, so test the entity type rather than File.exists().
+    if (await FileSystemEntity.type(dbPath) == FileSystemEntityType.notFound) {
+      return StartupLocationCheck.keptDatabaseMissing;
+    }
+
     var canAccess = false;
+    RandomAccessFile? handle;
     try {
-      final file = File(dbPath);
-      if (await file.exists()) {
-        final raf = await file.open(mode: FileMode.read);
-        await raf.read(16);
-        await raf.close();
-        canAccess = true;
-      }
+      handle = await file.open(mode: FileMode.read);
+      await handle.read(16);
+      canAccess = true;
     } catch (_) {
       canAccess = false;
+    } finally {
+      // Close even when the read throws, or the handle leaks on every
+      // launch that hits a revoked-permission folder.
+      await handle?.close();
     }
 
     if (canAccess) return StartupLocationCheck.accessible;
