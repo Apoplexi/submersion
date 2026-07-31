@@ -97,6 +97,16 @@ static void test_non_uwatec_device_unaffected(void) {
 // numbering (Petrel 3 = 10, Perdix 2 = 11, Tern = 12, Peregrine TX = 13).
 static void test_perdix_3_resolves(void) {
     expect_ble_match("Perdix 3", "Perdix 3", 14);
+
+    // Issue #590: HW OSTC BLE names can carry a serial suffix; the prefix
+    // tiebreaker must resolve them to their own descriptor instead of the
+    // first hw_ostc3 family row ("OSTC 2").
+    expect_ble_match("OSTC4", "OSTC 4", 0x43);
+    expect_ble_match("OSTC4 12345", "OSTC 4", 0x43);
+    expect_ble_match("OSTC 4 12345", "OSTC 4", 0x43);
+    expect_ble_match("OSTC5-9876", "OSTC 5", 0x44);
+    expect_ble_match("OSTC 2", "OSTC 2", 0);
+    expect_ble_match("OSTC Plus 321", "OSTC Plus", 0);
     expect_ble_match("perdix 3", "Perdix 3", 14);
     printf("PASS: test_perdix_3_resolves\n");
 }
