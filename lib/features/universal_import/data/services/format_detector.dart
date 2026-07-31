@@ -257,10 +257,19 @@ class FormatDetector {
   // ======================== CSV Detection ========================
 
   DetectionResult? _detectCsv(String content, Uint8List bytes) {
-    // Try to parse first line as CSV headers
+    // Normalize line endings and strip the UTF-8 BOM before parsing: the
+    // csv package's default eol is '\r\n' matched literally, so an LF-only
+    // file (e.g. the MySSI web export) would otherwise parse as ONE giant
+    // row and every cell would be reported as a header (#190).
+    var normalized = content;
+    if (normalized.startsWith('﻿')) {
+      normalized = normalized.substring(1);
+    }
+    normalized = normalized.replaceAll('\r\n', '\n').replaceAll('\r', '\n');
+
     List<List<dynamic>> rows;
     try {
-      rows = const CsvToListConverter().convert(content);
+      rows = const CsvToListConverter(eol: '\n').convert(normalized);
     } catch (_) {
       return null;
     }
@@ -369,6 +378,15 @@ class FormatDetector {
   double _scoreSsi(List<String> headers) {
     final joined = headers.join(' ');
     if (joined.contains('ssi') || joined.contains('mydiveguide')) return 0.85;
+    // The MySSI website CSV export carries no 'ssi' branding anywhere; match
+    // its distinctive column set instead (#190).
+    const myssiSignature = [
+      'dive activity',
+      'specialty dive',
+      'dive buddy / instructor / center',
+    ];
+    final hits = myssiSignature.where(headers.contains).length;
+    if (hits >= 2) return 0.8;
     return 0.0;
   }
 
