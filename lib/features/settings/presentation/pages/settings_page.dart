@@ -228,7 +228,15 @@ class _SettingsSectionDetailPage extends ConsumerWidget {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           tooltip: context.l10n.settings_backToSettings_tooltip,
-          onPressed: () => context.go('/settings'),
+          // Pop the pushed section route; fall back to go() for deep links
+          // where the detail page is the root of the stack.
+          onPressed: () {
+            if (context.canPop()) {
+              context.pop();
+            } else {
+              context.go('/settings');
+            }
+          },
         ),
       ),
       body: _buildContent(context, ref),
@@ -365,11 +373,13 @@ class _MobileSettingsTile extends StatelessWidget {
         context.push('/settings/appearance');
         break;
       default:
-        // For sections that don't have dedicated pages,
-        // show them in a detail page using query params
+        // For sections that don't have dedicated pages, show them in a
+        // detail page using query params. PUSH (not go): go() replaces the
+        // location in place, leaving nothing on the stack for the system
+        // back gesture to pop, so Android closed the whole app (#647).
         final state = GoRouterState.of(context);
         final currentPath = state.uri.path;
-        context.go('$currentPath?selected=$sectionId');
+        context.push('$currentPath?selected=$sectionId');
     }
   }
 }

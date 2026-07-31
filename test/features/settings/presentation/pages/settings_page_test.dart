@@ -1027,4 +1027,77 @@ void main() {
       expect(find.byType(DropdownButton<int>), findsOneWidget);
     });
   });
+
+  group('Section navigation stack (#647)', () {
+    Future<GoRouter> pumpSettingsList(WidgetTester tester) async {
+      await tester.binding.setSurfaceSize(const Size(400, 800));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+
+      final router = GoRouter(
+        initialLocation: '/settings',
+        routes: [
+          GoRoute(
+            path: '/settings',
+            builder: (context, state) => const SettingsPage(),
+          ),
+        ],
+      );
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: getOverrides(),
+          child: MaterialApp.router(
+            locale: const Locale('en'),
+            routerConfig: router,
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      return router;
+    }
+
+    testWidgets('opening a query-param section pushes a poppable route so the '
+        'system back gesture returns to Settings instead of closing the app', (
+      tester,
+    ) async {
+      final router = await pumpSettingsList(tester);
+
+      await tester.scrollUntilVisible(find.text('Data'), 100);
+      await tester.tap(find.text('Data'));
+      await tester.pumpAndSettle();
+
+      expect(
+        router.canPop(),
+        isTrue,
+        reason:
+            'the section detail must be a pushed route; with nothing to '
+            'pop, the Android back gesture closes the whole app (#647)',
+      );
+
+      router.pop();
+      await tester.pumpAndSettle();
+
+      // Back on the section list.
+      expect(find.text('Units'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('detail app-bar back returns to the settings list', (
+      tester,
+    ) async {
+      await pumpSettingsList(tester);
+
+      await tester.scrollUntilVisible(find.text('Data'), 100);
+      await tester.tap(find.text('Data'));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byIcon(Icons.arrow_back));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Units'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+  });
 }
