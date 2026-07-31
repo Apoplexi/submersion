@@ -131,8 +131,12 @@ class _EquipmentListContentState extends ConsumerState<EquipmentListContent> {
     final AsyncValue<List<EquipmentItem>> equipmentAsync;
     if (_selectedFilter == _serviceDueFilter) {
       equipmentAsync = ref.watch(serviceDueEquipmentProvider);
+    } else if (_selectedFilter == null) {
+      // The default view hides retired gear; the Retired status filter is
+      // the way to see it (#636).
+      equipmentAsync = ref.watch(activeEquipmentProvider);
     } else {
-      final status = _selectedFilter as EquipmentStatus?;
+      final status = _selectedFilter as EquipmentStatus;
       equipmentAsync = ref.watch(equipmentByStatusProvider(status));
     }
 

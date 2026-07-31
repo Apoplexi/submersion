@@ -186,6 +186,26 @@ void main() {
         expect(result.length, equals(1));
         expect(result[0].name, equals('Active Reg'));
       });
+
+      test('excludes status-retired gear even when isActive was never flipped '
+          '(#636)', () async {
+        await repository.createEquipment(
+          createTestEquipment(name: 'Active Reg'),
+        );
+        // Legacy inconsistency: the edit page used to set status=retired
+        // while leaving isActive=true, so existing rows can carry both.
+        await repository.createEquipment(
+          createTestEquipment(
+            name: 'Status-Retired Reg',
+            status: EquipmentStatus.retired,
+            isActive: true,
+          ),
+        );
+
+        final result = await repository.getActiveEquipment();
+
+        expect(result.map((e) => e.name).toList(), ['Active Reg']);
+      });
     });
 
     group('getRetiredEquipment', () {

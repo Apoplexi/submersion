@@ -781,7 +781,9 @@ class _EquipmentEditPageState extends ConsumerState<EquipmentEditPage> {
         lastServiceDate: existingEquipment?.lastServiceDate,
         serviceIntervalDays: existingEquipment?.serviceIntervalDays,
         notes: _notesController.text.trim(),
-        isActive: existingEquipment?.isActive ?? true,
+        // Retiring via the status dropdown must deactivate the item, or it
+        // keeps appearing in active-gear pickers (#636).
+        isActive: _selectedStatus != EquipmentStatus.retired,
         // Only attributes in the SELECTED type's catalog are kept: switching
         // type drops out-of-catalog values at save time (form = source of
         // truth), plus non-empty custom fields with re-packed sort order.

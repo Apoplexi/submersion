@@ -72,6 +72,7 @@ Future<List<Override>> _buildOverrides({
     // The equipment list content watches equipmentByStatusProvider(null) for
     // all equipment when no filter is selected, so we override that.
     equipmentByStatusProvider.overrideWith((ref, status) => equipment),
+    activeEquipmentProvider.overrideWith((ref) async => equipment),
     equipmentListViewModeProvider.overrideWith((ref) => ListViewMode.table),
     equipmentTableConfigProvider.overrideWith(
       (ref) => _TestEquipTableConfigNotifier(_testConfig),
@@ -92,6 +93,7 @@ Future<List<Override>> _buildPhoneOverrides({
     settingsProvider.overrideWith((ref) => MockSettingsNotifier()),
     currentDiverIdProvider.overrideWith((ref) => MockCurrentDiverIdNotifier()),
     equipmentByStatusProvider.overrideWith((ref, status) => items),
+    activeEquipmentProvider.overrideWith((ref) async => items),
     equipmentListViewModeProvider.overrideWith((ref) => viewMode),
     equipmentTableConfigProvider.overrideWith(
       (ref) => _TestEquipTableConfigNotifier(_testConfig),

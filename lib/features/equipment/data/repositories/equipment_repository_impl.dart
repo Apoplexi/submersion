@@ -24,7 +24,13 @@ class EquipmentRepository {
   Future<List<EquipmentItem>> getActiveEquipment({String? diverId}) async {
     try {
       final query = _db.select(_db.equipment)
-        ..where((t) => t.isActive.equals(true))
+        // status is the user-visible retirement flag; legacy rows can carry
+        // status=retired with isActive still true, so filter on both (#636).
+        ..where(
+          (t) =>
+              t.isActive.equals(true) &
+              t.status.isNotValue(EquipmentStatus.retired.name),
+        )
         ..orderBy([
           (t) => OrderingTerm.asc(t.type),
           (t) => OrderingTerm.asc(t.name),
