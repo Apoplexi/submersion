@@ -38,6 +38,7 @@ memory or assumption alone.
 | #358 iCloud sync crash on iOS | OOM/adopt fixes (adf2fee, 98b54b6, 5b7ed90); reporter silent since confirm request |
 | #141 dive planner broken in Imperial | Planner redesign (#485-491) + unit fixes (#739); verify imperial path end to end |
 | #154 Android "no such column: d.min_temperature" | April-era schema report; verify migration ladder covers the column, close as resolved-by-migration |
+| #680 sync PathNotFoundException | Reconnaissance traced it to the #554 sync-temp-dir fix (commit 3fe1b3a), shipped in 1.7.0.117; reporter was on 1.6.0.114 |
 
 ### 0b. Close as duplicate or stale (comment pointing at canonical issue)
 
@@ -91,9 +92,11 @@ findings comment and moves to needs-info.
 ## Phase 1: Fix campaign (one large batch)
 
 Fix list (own worktree + own PR each): #765, #764, #757, #756, #736,
-#647, #644, #636, #680, #222, #218, #214, #190, #158, #152, #110, #71,
-plus #623 if the Reddit repro pans out, plus any provable DC fixes from
-0d (#590 is the most likely).
+#647, #644, #636, #222, #218, #214, #190, #158, #152, #110, #71, plus
+the DC fixes reconnaissance proved provable (#590 recognition matcher,
+#143 transport mislabel), plus #623 if the Reddit repro pans out.
+(#680 moved to close-as-fixed and #732 to needs-info after
+reconnaissance; see the implementation plan.)
 
 Execution model:
 
