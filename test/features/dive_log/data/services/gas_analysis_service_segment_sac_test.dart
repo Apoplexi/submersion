@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/core/utils/gas_compressibility.dart';
 import 'package:submersion/features/dive_log/data/services/gas_analysis_service.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
@@ -42,6 +43,65 @@ void main() {
   }
 
   group('calculateGasSwitchSegments', () {
+    test('a stage tank prorates over its own stint, not the whole dive '
+        '(#110)', () {
+      // 60-minute dive: back gas for 50 minutes, then a deco tank for the
+      // last 10. Neither has a pressure series, so both fall back to
+      // start/end pressures. The deco tank's whole 50 bar drop belongs to
+      // its 10-minute stint -- spreading it across the full dive would
+      // understate its SAC six-fold, and would disagree with
+      // calculateCylinderSac, which prorates over the usage range.
+      const backGas = DiveTank(
+        id: 't1',
+        name: 'Back gas',
+        role: TankRole.backGas,
+        startPressure: 200,
+        endPressure: 100,
+        gasMix: GasMix(o2: 21, he: 0),
+      );
+      const decoTank = DiveTank(
+        id: 't2',
+        name: 'Deco 50',
+        role: TankRole.deco,
+        startPressure: 200,
+        endPressure: 150,
+        gasMix: GasMix(o2: 50, he: 0),
+      );
+      final profile = flatProfile(60 * 60, 20.0);
+      GasSwitchWithTank sw(String id, int ts, String tankId) =>
+          GasSwitchWithTank(
+            gasSwitch: GasSwitch(
+              id: id,
+              diveId: 'dive-1',
+              timestamp: ts,
+              tankId: tankId,
+              createdAt: DateTime(2026),
+            ),
+            tankName: tankId,
+            gasMix: 'mix',
+            o2Fraction: 0.21,
+          );
+
+      final segments = service.calculateGasSwitchSegments(
+        profile: profile,
+        tanks: [backGas, decoTank],
+        gasSwitches: [sw('gs1', 0, 't1'), sw('gs2', 50 * 60, 't2')],
+        tankPressures: const {},
+      );
+
+      expect(segments, isNotNull);
+      expect(segments!.length, 2);
+
+      final deco = segments.last;
+      expect(deco.tankId, 't2');
+      // Full 50 bar over the 10-minute stint at 3.0 ata.
+      expect(
+        deco.sacRate,
+        closeTo(50 / 10 / 3.0, 0.02),
+        reason: 'whole-dive proration would charge only 50 * (10/60) bar here',
+      );
+    });
+
     test('fallback prorates against the whole dive, not the segment '
         '(#110)', () {
       // No per-sample pressure series (common on sidemount, where the
