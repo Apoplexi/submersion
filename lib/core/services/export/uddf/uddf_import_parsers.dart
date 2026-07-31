@@ -11,8 +11,22 @@ import 'package:submersion/features/dive_log/domain/entities/dive.dart';
 /// A plausibility ladder keyed to real tank sizes (roughly 1-45 L water
 /// capacity) disambiguates the three conventions; implausible values are
 /// stored unchanged rather than guessed at.
-double normalizeUddfTankVolumeToLiters(double raw) {
+///
+/// The ladder cannot be exact for every input: 0.045 < raw <= 0.45 is
+/// genuinely ambiguous between a Diving Log 4.5-45 L tank and a
+/// spec-conformant 45-450 L one, and it resolves toward Diving Log because
+/// small cylinders are far more common than 45 L+ single-tank records.
+/// Submersion's own exports never hit that ambiguity: they are recognized
+/// by [strictCubicMeters] and converted exactly.
+double normalizeUddfTankVolumeToLiters(
+  double raw, {
+  bool strictCubicMeters = false,
+}) {
   if (raw <= 0) return raw;
+  // A file that identifies itself as a Submersion export is known to be
+  // spec-conformant, so no guessing is needed and any volume round-trips
+  // exactly -- including tanks above the plausibility ladder's range.
+  if (strictCubicMeters) return raw * 1000;
   if (raw <= 0.045) return raw * 1000; // spec cubic meters
   if (raw <= 0.45) return raw * 100; // Diving Log 10x-off quirk
   if (raw <= 45) return raw; // legacy liter exports

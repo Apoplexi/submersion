@@ -429,8 +429,11 @@ class UddfExportBuilders {
                   builder.element('tankname', nest: tank.name);
                 }
                 // Volume: UDDF tankvolume is CUBIC METERS per spec (#158).
-                // Stored volume is liters, so divide by 1000 on the way out;
-                // the import side's normalizer restores liters symmetrically.
+                // Stored volume is liters, so divide by 1000 on the way out.
+                // Re-importing is exact at any volume because the file
+                // carries the <applicationdata><submersion> marker, which
+                // switches the importer to strict m3 instead of the
+                // exporter-quirk plausibility ladder.
                 if (tank.volume != null) {
                   builder.element(
                     'tankvolume',

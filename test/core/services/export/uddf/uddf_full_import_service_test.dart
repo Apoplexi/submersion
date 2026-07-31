@@ -521,4 +521,69 @@ void main() {
       expect(profile[1]['decoType'], 1);
     });
   });
+
+  group('tankvolume normalization (#158)', () {
+    // Liter-valued fixtures pass through the normalizer unchanged, so only
+    // non-literal inputs prove the parse site still calls it.
+    String docWith(String tankVolume, {bool submersionExport = false}) =>
+        '''<uddf version="3.2.1">
+  <profiledata>
+    <repetitiongroup id="rg">
+      <dive id="d1">
+        <informationbeforedive>
+          <divenumber>1</divenumber>
+          <datetime>2026-01-15T09:00:00</datetime>
+        </informationbeforedive>
+        <tankdata>
+          <tankvolume>$tankVolume</tankvolume>
+          <tankpressurebegin>20000000</tankpressurebegin>
+          <tankpressureend>5000000</tankpressureend>
+        </tankdata>
+        <samples>
+          <waypoint><depth>5</depth><divetime>0</divetime></waypoint>
+          <waypoint><depth>5</depth><divetime>60</divetime></waypoint>
+        </samples>
+      </dive>
+    </repetitiongroup>
+  </profiledata>
+${submersionExport ? '<applicationdata><submersion/></applicationdata>' : ''}
+</uddf>''';
+
+    Future<double?> volumeFor(
+      String tankVolume, {
+      bool submersionExport = false,
+    }) async {
+      final result = await UddfFullImportService().importAllDataFromUddf(
+        docWith(tankVolume, submersionExport: submersionExport),
+      );
+      final tanks = result.dives.first['tanks'] as List<Map<String, dynamic>>;
+      return tanks.first['volume'] as double?;
+    }
+
+    test('converts spec cubic meters to liters', () async {
+      expect(await volumeFor('0.0111'), closeTo(11.1, 0.001));
+    });
+
+    test('converts the Diving Log 10x-off quirk to liters', () async {
+      expect(await volumeFor('0.111'), closeTo(11.1, 0.001));
+    });
+
+    test('leaves legacy liter-valued volumes unchanged', () async {
+      expect(await volumeFor('24.0'), closeTo(24.0, 0.001));
+    });
+
+    test('a Submersion export converts strictly, so large tanks round-trip '
+        'exactly instead of hitting the quirk rung', () async {
+      // 0.06 m3 = 60 L. Without the strict path this lands on the
+      // Diving Log rung and comes back as 6 L.
+      expect(
+        await volumeFor('0.06', submersionExport: true),
+        closeTo(60.0, 0.001),
+      );
+      expect(
+        await volumeFor('0.0111', submersionExport: true),
+        closeTo(11.1, 0.001),
+      );
+    });
+  });
 }

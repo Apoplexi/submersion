@@ -16,6 +16,11 @@ import 'package:submersion/features/dive_log/domain/entities/dive.dart';
 class UddfFullImportService {
   static final _logger = LoggerService.forClass(UddfFullImportService);
 
+  /// True when the document being parsed identifies itself as a Submersion
+  /// export, which guarantees spec-conformant cubic-meter tank volumes and
+  /// lets the importer skip the exporter-quirk plausibility ladder (#158).
+  bool _strictTankVolumes = false;
+
   /// Import ALL application data from UDDF file.
   /// Returns [UddfImportResult] with all parsed data.
   Future<UddfImportResult> importAllDataFromUddf(String uddfContent) async {
@@ -28,6 +33,17 @@ class UddfFullImportService {
         'Invalid UDDF file: missing uddf root element',
       );
     }
+
+    // Our own exports carry the <applicationdata><submersion> extension and
+    // write spec cubic meters, so their tank volumes convert exactly rather
+    // than going through the exporter-quirk ladder (#158).
+    _strictTankVolumes =
+        uddfElement
+            .findElements('applicationdata')
+            .firstOrNull
+            ?.findElements('submersion')
+            .firstOrNull !=
+        null;
 
     // Parse full buddy records and owner from diver section
     final buddies = <Map<String, dynamic>>[];
@@ -1402,7 +1418,10 @@ class UddfFullImportService {
         final rawVolume = double.tryParse(volumeText);
         tankInfo['volume'] = rawVolume == null
             ? null
-            : normalizeUddfTankVolumeToLiters(rawVolume);
+            : normalizeUddfTankVolumeToLiters(
+                rawVolume,
+                strictCubicMeters: _strictTankVolumes,
+              );
       }
 
       // Get linked gas mix
