@@ -1,10 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:intl/intl.dart';
 import 'package:submersion/core/tide/entities/tide_extremes.dart';
 import 'package:submersion/features/tides/presentation/widgets/tide_times_table.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
 
 void main() {
+  // The widget formats via DateFormat(pattern) with no explicit locale, so it
+  // resolves against intl's process-global default. Pin it so the expected
+  // digits do not depend on the locale the test host happens to run under.
+  String? previousDefaultLocale;
+
+  setUp(() {
+    previousDefaultLocale = Intl.defaultLocale;
+    Intl.defaultLocale = 'en_US';
+  });
+
+  tearDown(() {
+    Intl.defaultLocale = previousDefaultLocale;
+  });
+
   testWidgets(
     'renders wall-clock-as-UTC tide times without a device-local shift (#222)',
     (tester) async {

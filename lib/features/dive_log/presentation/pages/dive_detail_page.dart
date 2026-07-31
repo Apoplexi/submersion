@@ -3466,19 +3466,19 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
     final dateStr = dateRef != null
         ? DateFormat('EEE, MMM d').format(dateRef)
         : '';
+    // Cycle bounds are stored wall-clock instants, not device-local times:
+    // format them verbatim without any timezone conversion.
     final timeRangeStr = cycleStart != null && cycleEnd != null
         ? () {
-            final startLocal = cycleStart;
-            final endLocal = cycleEnd;
             final timeFmt = DateFormat(settings.timeFormat.pattern);
-            final startStr = timeFmt.format(startLocal);
-            final endStr = timeFmt.format(endLocal);
+            final startStr = timeFmt.format(cycleStart);
+            final endStr = timeFmt.format(cycleEnd);
             final spansNewDay =
-                startLocal.year != endLocal.year ||
-                startLocal.month != endLocal.month ||
-                startLocal.day != endLocal.day;
+                cycleStart.year != cycleEnd.year ||
+                cycleStart.month != cycleEnd.month ||
+                cycleStart.day != cycleEnd.day;
             if (spansNewDay) {
-              final endDateStr = DateFormat('MMM d').format(endLocal);
+              final endDateStr = DateFormat('MMM d').format(cycleEnd);
               return '$startStr - $endStr ($endDateStr)';
             }
             return '$startStr - $endStr';
