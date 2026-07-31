@@ -108,7 +108,12 @@ class _EquipmentEditPageState extends ConsumerState<EquipmentEditPage> {
     _purchaseCurrencyController.text = equipment.purchaseCurrency;
     _notesController.text = equipment.notes;
     _selectedType = equipment.type;
-    _selectedStatus = equipment.status;
+    // A legacy row can carry isActive=false with a non-retired status.
+    // Show it as Retired so the form states the item's real condition --
+    // otherwise saving would silently reactivate it (#636).
+    _selectedStatus = !equipment.isActive
+        ? EquipmentStatus.retired
+        : equipment.status;
     _purchaseDate = equipment.purchaseDate;
     _customReminderEnabled = equipment.customReminderEnabled;
     _customReminderDays = equipment.customReminderDays ?? const [7, 14, 30];
