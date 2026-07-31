@@ -30406,6 +30406,24 @@ abstract class AppLocalizations {
   /// **'{selected} of {total} selected'**
   String universalImport_label_xOfYSelected(Object selected, Object total);
 
+  /// Collapsed-header badge on a duplicate row whose action is link-to-existing
+  ///
+  /// In en, this message translates to:
+  /// **'LINK'**
+  String get universalImport_entityAction_linkBadge;
+
+  /// Action button on a duplicate buddy/tag row: link the import to the matched existing record instead of skipping or creating a twin
+  ///
+  /// In en, this message translates to:
+  /// **'Link to existing'**
+  String get universalImport_entityAction_linkExisting;
+
+  /// Subtitle under the link-to-existing action button
+  ///
+  /// In en, this message translates to:
+  /// **'Use the matched record'**
+  String get universalImport_entityAction_linkExistingSubtitle;
+
   /// Prompt shown above the action buttons on an expanded pending duplicate row, telling the user to pick an action
   ///
   /// In en, this message translates to:

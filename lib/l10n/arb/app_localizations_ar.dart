@@ -17772,6 +17772,16 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String get universalImport_entityAction_linkBadge => 'ربط';
+
+  @override
+  String get universalImport_entityAction_linkExisting => 'الربط بالموجود';
+
+  @override
+  String get universalImport_entityAction_linkExistingSubtitle =>
+      'استخدام السجل المطابق';
+
+  @override
   String get universalImport_pending_chooseAction => 'اختر إجراء';
 
   @override

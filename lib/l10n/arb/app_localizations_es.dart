@@ -18114,6 +18114,17 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
+  String get universalImport_entityAction_linkBadge => 'VINCULAR';
+
+  @override
+  String get universalImport_entityAction_linkExisting =>
+      'Vincular al existente';
+
+  @override
+  String get universalImport_entityAction_linkExistingSubtitle =>
+      'Usar el registro coincidente';
+
+  @override
   String get universalImport_pending_chooseAction => 'Elegir una accion';
 
   @override

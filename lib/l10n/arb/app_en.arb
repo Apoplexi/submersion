@@ -10544,6 +10544,9 @@
   "universalImport_label_unnamed": "Unnamed",
   "universalImport_label_xOfY": "{current} of {total}",
   "universalImport_label_xOfYSelected": "{selected} of {total} selected",
+  "universalImport_entityAction_linkBadge": "LINK",
+  "universalImport_entityAction_linkExisting": "Link to existing",
+  "universalImport_entityAction_linkExistingSubtitle": "Use the matched record",
   "universalImport_pending_chooseAction": "Choose an action",
   "universalImport_pending_gateHint": "{count} duplicate(s) need a decision",
   "universalImport_pending_needsDecision": "Needs decision",
@@ -10850,6 +10853,15 @@
         "example": "5"
       }
     }
+  },
+  "@universalImport_entityAction_linkBadge": {
+    "description": "Collapsed-header badge on a duplicate row whose action is link-to-existing"
+  },
+  "@universalImport_entityAction_linkExisting": {
+    "description": "Action button on a duplicate buddy/tag row: link the import to the matched existing record instead of skipping or creating a twin"
+  },
+  "@universalImport_entityAction_linkExistingSubtitle": {
+    "description": "Subtitle under the link-to-existing action button"
   },
   "@universalImport_pending_chooseAction": {
     "description": "Prompt shown above the action buttons on an expanded pending duplicate row, telling the user to pick an action"

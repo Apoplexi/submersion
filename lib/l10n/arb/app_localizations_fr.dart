@@ -18171,6 +18171,16 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String get universalImport_entityAction_linkBadge => 'LIER';
+
+  @override
+  String get universalImport_entityAction_linkExisting => 'Lier à l\'existant';
+
+  @override
+  String get universalImport_entityAction_linkExistingSubtitle =>
+      'Utiliser la fiche correspondante';
+
+  @override
   String get universalImport_pending_chooseAction => 'Choisir une action';
 
   @override

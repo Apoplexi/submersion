@@ -430,6 +430,34 @@ class UniversalAdapter implements ImportSourceAdapter {
         _resolveSelections(type, selections, duplicateActions);
 
     final uddfData = _payloadToUddfResult(payload);
+
+    // #756: flagged duplicates whose action is skip (or explicit link via
+    // consolidate) must LINK the dive to the matched existing record rather
+    // than dropping the association or creating a twin. Build source-ref ->
+    // existing-id seeds for the importer's id mappings.
+    Map<String, String> preResolvedIdsFor(
+      wizard.ImportEntityType type,
+      List<Map<String, dynamic>> items,
+    ) {
+      final matches = bundle.groups[type]?.entityMatches;
+      if (matches == null || matches.isEmpty) return const {};
+      final actions = duplicateActions[type] ?? const {};
+      final map = <String, String>{};
+      for (final entry in matches.entries) {
+        final action = actions[entry.key];
+        final links =
+            action == null ||
+            action == DuplicateAction.skip ||
+            action == DuplicateAction.consolidate;
+        if (!links) continue;
+        if (entry.key < 0 || entry.key >= items.length) continue;
+        final item = items[entry.key];
+        final ref = (item['uddfId'] as String?) ?? (item['name'] as String?);
+        if (ref != null) map[ref] = entry.value.existingId;
+      }
+      return map;
+    }
+
     final uddfSelections = UddfImportSelections(
       dives: resolve(wizard.ImportEntityType.dives),
       sites: resolve(wizard.ImportEntityType.sites),
@@ -479,6 +507,14 @@ class UniversalAdapter implements ImportSourceAdapter {
       repositories: repos,
       diverId: currentDiver.id,
       retainSourceDiveNumbers: retainSourceDiveNumbers,
+      preResolvedBuddyIds: preResolvedIdsFor(
+        wizard.ImportEntityType.buddies,
+        uddfData.buddies,
+      ),
+      preResolvedTagIds: preResolvedIdsFor(
+        wizard.ImportEntityType.tags,
+        uddfData.tags,
+      ),
       onProgress: onProgress,
       cancelToken: cancelToken,
     );
@@ -915,10 +951,14 @@ class UniversalAdapter implements ImportSourceAdapter {
     }
 
     for (final entry in actions.entries) {
-      // Consolidate-flagged items are imported as standalone dives first (like
-      // importAsNew); performImport folds them into their match afterwards.
+      // Consolidate-flagged DIVES are imported as standalone dives first
+      // (like importAsNew); performImport folds them into their match
+      // afterwards. For non-dive entities, consolidate means "link to the
+      // existing record" (#756): nothing is imported, the association is
+      // resolved through the pre-seeded id mappings instead.
       if (entry.value == DuplicateAction.importAsNew ||
-          entry.value == DuplicateAction.consolidate) {
+          (type == wizard.ImportEntityType.dives &&
+              entry.value == DuplicateAction.consolidate)) {
         resolved.add(entry.key);
       }
     }
