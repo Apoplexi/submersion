@@ -47,10 +47,14 @@ Future<DateTime?> showAppDatePicker({
 /// here would drag in SharedPreferences/database dependencies that
 /// widget-test harnesses of picker call sites do not provide; harnesses
 /// without a ProviderScope at all get the app default (pre-#765 behavior).
+///
+/// Uses `listen: false` because the pickers are opened from event handlers
+/// (onTap/onPressed), where the listening variant would trip Flutter's
+/// "dependOnInheritedWidgetOfExactType() called outside of build" assertion.
 DateFormatPreference _resolveFormat(BuildContext context) {
   final ProviderContainer container;
   try {
-    container = ProviderScope.containerOf(context);
+    container = ProviderScope.containerOf(context, listen: false);
   } on StateError {
     return DateFormatPreference.mmmDYYYY;
   }
