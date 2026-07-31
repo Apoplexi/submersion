@@ -97,18 +97,21 @@ static void test_non_uwatec_device_unaffected(void) {
 // numbering (Petrel 3 = 10, Perdix 2 = 11, Tern = 12, Peregrine TX = 13).
 static void test_perdix_3_resolves(void) {
     expect_ble_match("Perdix 3", "Perdix 3", 14);
+    expect_ble_match("perdix 3", "Perdix 3", 14);
+    printf("PASS: test_perdix_3_resolves\n");
+}
 
-    // Issue #590: HW OSTC BLE names can carry a serial suffix; the prefix
-    // tiebreaker must resolve them to their own descriptor instead of the
-    // first hw_ostc3 family row ("OSTC 2").
+// Issue #590: HW OSTC BLE names can carry a serial suffix; the prefix
+// tiebreaker must resolve them to their own descriptor instead of the first
+// hw_ostc3 family row ("OSTC 2"). Unsuffixed names must stay put.
+static void test_hw_ostc_suffixed_names_resolve(void) {
     expect_ble_match("OSTC4", "OSTC 4", 0x43);
     expect_ble_match("OSTC4 12345", "OSTC 4", 0x43);
     expect_ble_match("OSTC 4 12345", "OSTC 4", 0x43);
     expect_ble_match("OSTC5-9876", "OSTC 5", 0x44);
     expect_ble_match("OSTC 2", "OSTC 2", 0);
     expect_ble_match("OSTC Plus 321", "OSTC Plus", 0);
-    expect_ble_match("perdix 3", "Perdix 3", 14);
-    printf("PASS: test_perdix_3_resolves\n");
+    printf("PASS: test_hw_ostc_suffixed_names_resolve\n");
 }
 
 // Issue #483 regression guard: dc_filter_shearwater passes a whitelisted name
@@ -145,6 +148,7 @@ int main(void) {
     test_exact_product_names_unchanged();
     test_non_uwatec_device_unaffected();
     test_perdix_3_resolves();
+    test_hw_ostc_suffixed_names_resolve();
     test_other_perdix_models_unchanged();
     test_symbios_handset_resolves_to_handset();
     test_symbios_hud_resolves_to_hud();

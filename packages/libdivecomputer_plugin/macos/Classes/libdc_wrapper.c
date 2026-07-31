@@ -107,9 +107,12 @@ static int strcasecmp_nospace(const char *a, const char *b) {
     return 0;
 }
 
-// Number of characters of `product` matched as a space/case-insensitive
-// PREFIX of `name`, or 0 when `name` does not start with the whole product
-// (or the match ends mid-word in `name`). Some vendors append a serial to
+// Number of NON-SPACE characters of `product` matched as a space/case-
+// insensitive PREFIX of `name`, or 0 when `name` does not start with the
+// whole product (or the match ends mid-word in `name`). Spaces are skipped
+// in both strings and do not count, so the score compares like for like
+// across spacing variants ("OSTC 4" and "OSTC4" both score 5) and stays
+// usable as a longest-match tiebreaker. Some vendors append a serial to
 // the advertised BLE name (e.g. an OSTC4 advertising "OSTC4 12345"):
 // dc_filter_hw accepts any "OSTC*" name for EVERY hw_ostc3-family
 // descriptor and the exact-name tiebreaker cannot bridge the suffix, so
