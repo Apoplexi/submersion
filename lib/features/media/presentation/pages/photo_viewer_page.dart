@@ -392,9 +392,12 @@ class _PhotoViewerPageState extends ConsumerState<PhotoViewerPage> {
 
       final bytes = resolvedResult.bytes!;
 
-      // Save to temp file
+      // Save to temp file. tempDir.path may not exist yet on a fresh
+      // install -- getTemporaryDirectory() only returns where the OS
+      // expects it, it doesn't create it.
       final tempDir = await getTemporaryDirectory();
       final file = File('${tempDir.path}/${item.shareFilename}');
+      await file.parent.create(recursive: true);
       await file.writeAsBytes(bytes);
 
       // Dismiss loading - use rootNavigator to match where showDialog placed the dialog
