@@ -13,6 +13,7 @@ import 'package:submersion/features/equipment/domain/entities/equipment_item.dar
 import 'package:submersion/features/equipment/presentation/providers/equipment_providers.dart';
 import 'package:submersion/features/equipment/presentation/widgets/equipment_attribute_form_section.dart';
 import 'package:submersion/features/equipment/presentation/widgets/equipment_custom_fields_section.dart';
+import 'package:submersion/shared/widgets/app_date_picker.dart';
 
 class EquipmentEditPage extends ConsumerStatefulWidget {
   final String? equipmentId;
@@ -714,7 +715,7 @@ class _EquipmentEditPageState extends ConsumerState<EquipmentEditPage> {
   }
 
   Future<void> _selectPurchaseDate() async {
-    final date = await showDatePicker(
+    final date = await showAppDatePicker(
       context: context,
       initialDate: _purchaseDate ?? DateTime.now(),
       firstDate: DateTime(1950),
