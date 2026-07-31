@@ -16467,6 +16467,45 @@ class AppLocalizationsAr extends AppLocalizations {
   String get transfer_computers_noComputersSaved => 'لا توجد حواسيب محفوظة';
 
   @override
+  String transfer_computers_diveCount(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count غوصات',
+      one: 'غوصة واحدة',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get transfer_computers_downloadTooltip => 'تنزيل الغوصات';
+
+  @override
+  String get transfer_computers_knownComputersHeader =>
+      'أجهزة الكمبيوتر المعروفة';
+
+  @override
+  String transfer_computers_lastDownloadDaysAgo(int days) {
+    return 'قبل $days أيام';
+  }
+
+  @override
+  String transfer_computers_lastDownloadHoursAgo(int hours) {
+    return 'قبل $hours ساعات';
+  }
+
+  @override
+  String transfer_computers_lastDownloadMinutesAgo(int minutes) {
+    return 'قبل $minutes دقيقة';
+  }
+
+  @override
+  String get transfer_computers_lastDownloadNever => 'أبدًا';
+
+  @override
+  String get transfer_computers_lastDownloadYesterday => 'أمس';
+
+  @override
   String transfer_computers_savedCount(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

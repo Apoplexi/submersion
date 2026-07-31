@@ -16633,6 +16633,44 @@ class AppLocalizationsNl extends AppLocalizations {
   String get transfer_computers_noComputersSaved => 'Geen computers opgeslagen';
 
   @override
+  String transfer_computers_diveCount(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count duiken',
+      one: '1 duik',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get transfer_computers_downloadTooltip => 'Duiken downloaden';
+
+  @override
+  String get transfer_computers_knownComputersHeader => 'Bekende computers';
+
+  @override
+  String transfer_computers_lastDownloadDaysAgo(int days) {
+    return '$days dagen geleden';
+  }
+
+  @override
+  String transfer_computers_lastDownloadHoursAgo(int hours) {
+    return '$hours uur geleden';
+  }
+
+  @override
+  String transfer_computers_lastDownloadMinutesAgo(int minutes) {
+    return '$minutes min geleden';
+  }
+
+  @override
+  String get transfer_computers_lastDownloadNever => 'Nooit';
+
+  @override
+  String get transfer_computers_lastDownloadYesterday => 'Gisteren';
+
+  @override
   String transfer_computers_savedCount(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

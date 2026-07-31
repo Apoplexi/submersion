@@ -15922,6 +15922,43 @@ class AppLocalizationsZh extends AppLocalizations {
   String get transfer_computers_noComputersSaved => '没有已保存的潜水电脑';
 
   @override
+  String transfer_computers_diveCount(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 次潜水',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get transfer_computers_downloadTooltip => '下载潜水记录';
+
+  @override
+  String get transfer_computers_knownComputersHeader => '已知潜水电脑';
+
+  @override
+  String transfer_computers_lastDownloadDaysAgo(int days) {
+    return '$days 天前';
+  }
+
+  @override
+  String transfer_computers_lastDownloadHoursAgo(int hours) {
+    return '$hours 小时前';
+  }
+
+  @override
+  String transfer_computers_lastDownloadMinutesAgo(int minutes) {
+    return '$minutes 分钟前';
+  }
+
+  @override
+  String get transfer_computers_lastDownloadNever => '从未';
+
+  @override
+  String get transfer_computers_lastDownloadYesterday => '昨天';
+
+  @override
   String transfer_computers_savedCount(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

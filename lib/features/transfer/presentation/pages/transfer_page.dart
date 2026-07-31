@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:submersion/features/dive_computer/presentation/utils/last_download_formatter.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:submersion/shared/widgets/master_detail/master_detail_scaffold.dart';
 import 'package:submersion/shared/widgets/master_detail/responsive_breakpoints.dart';
@@ -645,7 +646,10 @@ class _ComputersSectionContent extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const SizedBox(height: 16),
-                  _buildSectionHeader(context, 'Known Computers'),
+                  _buildSectionHeader(
+                    context,
+                    context.l10n.transfer_computers_knownComputersHeader,
+                  ),
                   const SizedBox(height: 8),
                   ...computers.map(
                     (computer) => _buildComputerCard(
@@ -759,7 +763,9 @@ class _ComputersSectionContent extends ConsumerWidget {
                         ),
                         const SizedBox(width: 4),
                         Text(
-                          '${computer.diveCount} dives',
+                          context.l10n.transfer_computers_diveCount(
+                            computer.diveCount,
+                          ),
                           style: theme.textTheme.bodySmall?.copyWith(
                             color: colorScheme.onSurfaceVariant,
                             fontSize: 11,
@@ -773,7 +779,7 @@ class _ComputersSectionContent extends ConsumerWidget {
                         ),
                         const SizedBox(width: 4),
                         Text(
-                          computer.lastDownloadFormatted,
+                          formatLastDownload(context, computer.lastDownload),
                           style: theme.textTheme.bodySmall?.copyWith(
                             color: colorScheme.onSurfaceVariant,
                             fontSize: 11,
@@ -788,7 +794,7 @@ class _ComputersSectionContent extends ConsumerWidget {
                 onPressed: () =>
                     context.push('/dive-computers/${computer.id}/download'),
                 icon: const Icon(Icons.download, size: 20),
-                tooltip: 'Download dives',
+                tooltip: context.l10n.transfer_computers_downloadTooltip,
                 visualDensity: VisualDensity.compact,
               ),
             ],

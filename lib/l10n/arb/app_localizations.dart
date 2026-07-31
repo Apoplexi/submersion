@@ -28174,6 +28174,54 @@ abstract class AppLocalizations {
   /// **'No computers saved'**
   String get transfer_computers_noComputersSaved;
 
+  /// Dive count on a known-computer card
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 dive} other{{count} dives}}'**
+  String transfer_computers_diveCount(num count);
+
+  /// Tooltip on the per-computer download button
+  ///
+  /// In en, this message translates to:
+  /// **'Download dives'**
+  String get transfer_computers_downloadTooltip;
+
+  /// Section header above previously used dive computers
+  ///
+  /// In en, this message translates to:
+  /// **'Known Computers'**
+  String get transfer_computers_knownComputersHeader;
+
+  /// Relative last-download label, days
+  ///
+  /// In en, this message translates to:
+  /// **'{days} days ago'**
+  String transfer_computers_lastDownloadDaysAgo(int days);
+
+  /// Relative last-download label, hours
+  ///
+  /// In en, this message translates to:
+  /// **'{hours} hours ago'**
+  String transfer_computers_lastDownloadHoursAgo(int hours);
+
+  /// Relative last-download label, minutes
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes} min ago'**
+  String transfer_computers_lastDownloadMinutesAgo(int minutes);
+
+  /// Shown when a computer has never been downloaded from
+  ///
+  /// In en, this message translates to:
+  /// **'Never'**
+  String get transfer_computers_lastDownloadNever;
+
+  /// Relative last-download label, yesterday
+  ///
+  /// In en, this message translates to:
+  /// **'Yesterday'**
+  String get transfer_computers_lastDownloadYesterday;
+
   /// No description provided for @transfer_computers_savedCount.
   ///
   /// In en, this message translates to:

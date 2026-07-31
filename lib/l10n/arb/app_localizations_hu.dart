@@ -16730,6 +16730,44 @@ class AppLocalizationsHu extends AppLocalizations {
       'Nincsenek mentett szamitogepek';
 
   @override
+  String transfer_computers_diveCount(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count merülés',
+      one: '1 merülés',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get transfer_computers_downloadTooltip => 'Merülések letöltése';
+
+  @override
+  String get transfer_computers_knownComputersHeader => 'Ismert számítógépek';
+
+  @override
+  String transfer_computers_lastDownloadDaysAgo(int days) {
+    return '$days napja';
+  }
+
+  @override
+  String transfer_computers_lastDownloadHoursAgo(int hours) {
+    return '$hours órája';
+  }
+
+  @override
+  String transfer_computers_lastDownloadMinutesAgo(int minutes) {
+    return '$minutes perce';
+  }
+
+  @override
+  String get transfer_computers_lastDownloadNever => 'Soha';
+
+  @override
+  String get transfer_computers_lastDownloadYesterday => 'Tegnap';
+
+  @override
   String transfer_computers_savedCount(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

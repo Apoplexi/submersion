@@ -9809,6 +9809,14 @@
   "transfer_computers_loading": "Loading...",
   "transfer_computers_manageTitle": "Manage Computers",
   "transfer_computers_noComputersSaved": "No computers saved",
+  "transfer_computers_diveCount": "{count, plural, =1{1 dive} other{{count} dives}}",
+  "transfer_computers_downloadTooltip": "Download dives",
+  "transfer_computers_knownComputersHeader": "Known Computers",
+  "transfer_computers_lastDownloadDaysAgo": "{days} days ago",
+  "transfer_computers_lastDownloadHoursAgo": "{hours} hours ago",
+  "transfer_computers_lastDownloadMinutesAgo": "{minutes} min ago",
+  "transfer_computers_lastDownloadNever": "Never",
+  "transfer_computers_lastDownloadYesterday": "Yesterday",
   "transfer_computers_savedCount": "{count} saved {count, plural, =1{computer} other{computers}}",
   "transfer_computers_sectionHeader": "Dive Computers",
   "transfer_csvExport_cancelButton": "Cancel",
@@ -10851,6 +10859,14 @@
       }
     }
   },
+  "@transfer_computers_diveCount": {"description": "Dive count on a known-computer card", "placeholders": {"count": {"type": "num"}}},
+  "@transfer_computers_downloadTooltip": {"description": "Tooltip on the per-computer download button"},
+  "@transfer_computers_knownComputersHeader": {"description": "Section header above previously used dive computers"},
+  "@transfer_computers_lastDownloadDaysAgo": {"description": "Relative last-download label, days", "placeholders": {"days": {"type": "int"}}},
+  "@transfer_computers_lastDownloadHoursAgo": {"description": "Relative last-download label, hours", "placeholders": {"hours": {"type": "int"}}},
+  "@transfer_computers_lastDownloadMinutesAgo": {"description": "Relative last-download label, minutes", "placeholders": {"minutes": {"type": "int"}}},
+  "@transfer_computers_lastDownloadNever": {"description": "Shown when a computer has never been downloaded from"},
+  "@transfer_computers_lastDownloadYesterday": {"description": "Relative last-download label, yesterday"},
   "@universalImport_pending_chooseAction": {
     "description": "Prompt shown above the action buttons on an expanded pending duplicate row, telling the user to pick an action"
   },
