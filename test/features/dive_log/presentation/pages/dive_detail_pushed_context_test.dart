@@ -58,6 +58,9 @@ void main() {
       if (d.toString().contains('overflowed')) return;
       originalOnError?.call(d);
     };
+    // Restore via tearDown so a throw from pumpWidget/pump below cannot leak
+    // the override into subsequent tests.
+    addTearDown(() => FlutterError.onError = originalOnError);
 
     await tester.pumpWidget(
       ProviderScope(
@@ -81,7 +84,6 @@ void main() {
     );
     await tester.pump();
     await tester.pump(const Duration(seconds: 1));
-    FlutterError.onError = originalOnError;
     return router;
   }
 
@@ -96,7 +98,9 @@ void main() {
       locations: locations,
     );
 
-    router.push('/dives/b');
+    // push() completes only when the pushed route is popped; hold the future
+    // and await it after the pop so it is never left dangling.
+    final pushed = router.push('/dives/b');
     await tester.pump();
     await tester.pump(const Duration(seconds: 1));
 
@@ -112,6 +116,7 @@ void main() {
     router.pop();
     await tester.pump();
     await tester.pump(const Duration(seconds: 1));
+    await pushed;
     expect(find.text('TRIP PAGE'), findsOneWidget);
   });
 
