@@ -445,6 +445,13 @@ class UniversalAdapter implements ImportSourceAdapter {
       final map = <String, String>{};
       for (final entry in matches.entries) {
         final action = actions[entry.key];
+        // Seed for skip and consolidate (both mean "do not create a new
+        // row"), and for an undecided duplicate as a safety net -- the
+        // wizard gates advancement on pending decisions, so that state is
+        // not reachable today, but dropping the association silently is the
+        // exact defect this fix exists to prevent. A seed is harmless when
+        // the entity IS imported: _importBuddies/_importTags overwrite the
+        // mapping with the newly created id.
         final links =
             action == null ||
             action == DuplicateAction.skip ||
@@ -945,9 +952,16 @@ class UniversalAdapter implements ImportSourceAdapter {
 
     for (final index in baseSelections) {
       final action = actions[index];
-      if (action != DuplicateAction.skip) {
-        resolved.add(index);
+      if (action == DuplicateAction.skip) continue;
+      // For non-dive entities consolidate means "link to the existing
+      // record": nothing is imported. It has to be excluded here too, or a
+      // duplicate that is ALSO in the base selection set gets imported as a
+      // new row anyway -- the twin the action exists to avoid (#756).
+      if (action == DuplicateAction.consolidate &&
+          type != wizard.ImportEntityType.dives) {
+        continue;
       }
+      resolved.add(index);
     }
 
     for (final entry in actions.entries) {
