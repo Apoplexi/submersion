@@ -150,6 +150,30 @@ void main() {
     expect(row.gridJson, isNot('{not json')); // corrupt row replaced
   });
 
+  test('an ok row with NULL gridJson is dropped and refetched too', () async {
+    // Same corruption class as unparseable JSON: an 'ok' row without a
+    // usable grid must not read as a definitive answer (which would also
+    // suppress the provider's transient retry).
+    final source = ScriptedSource(() => BathymetryResolution.ok(wetGrid()));
+    final r = repo(source);
+    await db
+        .into(db.bathymetryCache)
+        .insert(
+          BathymetryCacheCompanion.insert(
+            cacheKey: BathymetryRepository.keyFor(bonaire),
+            centerLat: 12.17,
+            centerLon: -68.29,
+            status: 'ok',
+            fetchedAt: 1753600000000,
+          ),
+        );
+    final grid = await r.getGrid(bonaire);
+    expect(grid, isNotNull);
+    expect(source.calls, 1);
+    final row = await db.select(db.bathymetryCache).getSingle();
+    expect(row.gridJson, isNotNull);
+  });
+
   test('a broken cache table degrades to null, never a throw', () async {
     final source = ScriptedSource(() => BathymetryResolution.ok(wetGrid()));
     final r = repo(source);

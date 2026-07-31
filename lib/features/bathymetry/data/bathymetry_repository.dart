@@ -81,22 +81,26 @@ class BathymetryRepository {
       _db.bathymetryCache,
     )..where((t) => t.cacheKey.equals(key))).getSingleOrNull();
     if (row != null) {
-      final json = row.gridJson;
-      if (row.status != 'ok' || json == null) {
+      if (row.status != 'ok') {
         return null; // 'empty' / 'unavailable': definitive, no refetch
       }
-      try {
-        return BathymetryGrid.fromJson(
-          jsonDecode(json) as Map<String, dynamic>,
-        );
-      } catch (_) {
-        // Corrupt cache row: left in place it would wedge this cell on
-        // synthesized terrain forever (and read as a definitive answer).
-        // Drop it and fall through to a fresh resolve.
-        await (_db.delete(
-          _db.bathymetryCache,
-        )..where((t) => t.cacheKey.equals(key))).go();
+      final json = row.gridJson;
+      if (json != null) {
+        try {
+          return BathymetryGrid.fromJson(
+            jsonDecode(json) as Map<String, dynamic>,
+          );
+        } catch (_) {
+          // Fall through to the corruption handling below.
+        }
       }
+      // An 'ok' row without a decodable grid is corruption: left in place
+      // it would wedge this cell on synthesized terrain forever AND read
+      // as a definitive answer to the retry logic. Drop it and fall
+      // through to a fresh resolve.
+      await (_db.delete(
+        _db.bathymetryCache,
+      )..where((t) => t.cacheKey.equals(key))).go();
     }
 
     // Fetch centered on the quantized CELL CENTER so every coordinate in
