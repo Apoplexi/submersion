@@ -366,8 +366,8 @@ class _TideSectionContent extends ConsumerWidget {
       windowEnd = now.add(const Duration(hours: 12));
     }
 
-    final startLocal = windowStart.toLocal();
-    final endLocal = windowEnd.toLocal();
+    final startLocal = windowStart;
+    final endLocal = windowEnd;
     final dateStr = DateFormat('EEE, MMM d').format(startLocal);
     final startTimeStr = DateFormat(timeFormat.pattern).format(startLocal);
     final endTimeStr = DateFormat(timeFormat.pattern).format(endLocal);

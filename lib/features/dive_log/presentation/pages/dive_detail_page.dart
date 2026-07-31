@@ -3464,12 +3464,12 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
     );
     final dateRef = entryTime ?? record.highTideTime ?? record.lowTideTime;
     final dateStr = dateRef != null
-        ? DateFormat('EEE, MMM d').format(dateRef.toLocal())
+        ? DateFormat('EEE, MMM d').format(dateRef)
         : '';
     final timeRangeStr = cycleStart != null && cycleEnd != null
         ? () {
-            final startLocal = cycleStart.toLocal();
-            final endLocal = cycleEnd.toLocal();
+            final startLocal = cycleStart;
+            final endLocal = cycleEnd;
             final timeFmt = DateFormat(settings.timeFormat.pattern);
             final startStr = timeFmt.format(startLocal);
             final endStr = timeFmt.format(endLocal);
@@ -3595,7 +3595,7 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
 
   /// Format a DateTime as a time string using the given time format.
   String _formatTime(DateTime time, TimeFormat timeFormat) {
-    return DateFormat(timeFormat.pattern).format(time.toLocal());
+    return DateFormat(timeFormat.pattern).format(time);
   }
 
   Widget _buildWeightSection(
