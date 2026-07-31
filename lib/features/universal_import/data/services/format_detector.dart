@@ -20,6 +20,10 @@ class FormatDetector {
   /// Maximum bytes to read for detection purposes.
   static const _peekSize = 8192;
 
+  /// The UTF-8 byte order mark as decoded text (U+FEFF). Written as an escape
+  /// because the literal character is invisible in source.
+  static const _bom = '\u{FEFF}';
+
   /// Detect the format and source app of the given file bytes.
   DetectionResult detect(Uint8List bytes) {
     if (bytes.isEmpty) {
@@ -242,7 +246,7 @@ class FormatDetector {
   /// remove (it is not Unicode White_Space), so it is stripped explicitly.
   DetectionResult? _detectDl7(String content) {
     var trimmed = content.trimLeft();
-    if (trimmed.startsWith('﻿')) {
+    if (trimmed.startsWith(_bom)) {
       trimmed = trimmed.substring(1).trimLeft();
     }
     if (!trimmed.startsWith('FSH|')) return null;
@@ -262,7 +266,7 @@ class FormatDetector {
     // file (e.g. the MySSI web export) would otherwise parse as ONE giant
     // row and every cell would be reported as a header (#190).
     var normalized = content;
-    if (normalized.startsWith('﻿')) {
+    if (normalized.startsWith(_bom)) {
       normalized = normalized.substring(1);
     }
     normalized = normalized.replaceAll('\r\n', '\n').replaceAll('\r', '\n');

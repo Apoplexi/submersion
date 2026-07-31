@@ -260,7 +260,7 @@ void main() {
 
     test('strips the UTF-8 BOM from the first CSV header (#190)', () {
       const csv =
-          '﻿dive #,Dive Site,Country,Date / Time,Dive Activity,'
+          '\u{FEFF}dive #,Dive Site,Country,Date / Time,Dive Activity,'
           'Specialty Dive,Dive type,Duration,Depth,'
           'Dive Buddy / Instructor / Center\n'
           '1,Reef,Egypt,2026-01-15 09:00,Fun Dive,,Open Water,45,18,Bob\n';
@@ -324,7 +324,7 @@ void main() {
 
     test('a BOM before FSH still detects', () {
       final result = detector.detect(
-        _toBytes('﻿FSH|^~<>{}|X^^|ZXU|20240101120000|\n'),
+        _toBytes('\u{FEFF}FSH|^~<>{}|X^^|ZXU|20240101120000|\n'),
       );
       expect(result.format, ImportFormat.danDl7);
     });
