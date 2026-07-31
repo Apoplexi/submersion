@@ -1943,7 +1943,7 @@ class DiveRepository {
       // The dive editor writes buddies only to the dive_buddies junction;
       // d.buddy is a legacy text column kept for old data (#757).
       clauses.add(
-        '(d.buddy LIKE ? OR EXISTS (SELECT 1 FROM dive_buddies db '
+        '(LOWER(d.buddy) LIKE LOWER(?) OR EXISTS (SELECT 1 FROM dive_buddies db '
         'JOIN buddies b ON b.id = db.buddy_id '
         'WHERE db.dive_id = d.id AND LOWER(b.name) LIKE LOWER(?)))',
       );
