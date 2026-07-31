@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:submersion/shared/widgets/app_bar_text_action.dart';
 import 'package:uuid/uuid.dart';
 
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/features/divers/domain/entities/diver.dart';
 import 'package:submersion/features/divers/presentation/providers/diver_providers.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
+import 'package:submersion/shared/widgets/app_bar_text_action.dart';
 
 class PersonalInfoEditPage extends ConsumerStatefulWidget {
   final bool isNewDiver;

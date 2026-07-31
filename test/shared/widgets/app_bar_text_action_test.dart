@@ -18,7 +18,19 @@ void main() {
 
   Color renderedColor(WidgetTester tester, String label) {
     final paragraph = tester.renderObject<RenderParagraph>(find.text(label));
-    return paragraph.text.style!.color!;
+    final style = paragraph.text.style;
+    expect(
+      style,
+      isNotNull,
+      reason: 'the rendered span for "$label" carries no TextStyle',
+    );
+    final color = style!.color;
+    expect(
+      color,
+      isNotNull,
+      reason: 'the TextStyle for "$label" resolved to a null color',
+    );
+    return color!;
   }
 
   testWidgets('bare TextButton is invisible on the tropical app bar '
