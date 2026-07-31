@@ -45,8 +45,37 @@ Bug campaign 2026-07-31 — one line per Bug-type issue (43 total).
 
 ## Fix list (19) — Phase 1, one worktree + PR each
 
-- #757: IN PROGRESS (fix/757-buddy-filter: junction join fix committed, full suite running)
-- #736: IN PROGRESS (fix/736-profile-save-visibility: AppBarTextAction + 6 pages patched)
-- #764: IN PROGRESS (fix/764-preserve-browse-context: test written, awaiting worktree init)
-- #647, #756, #158, #71, #190, #644, #765, #636, #222, #214, #218, #152, #110,
-  #590, #143, #759: pending Phase 1
+All 19 fix PRs open (each with a pre-fix-failing test unless noted):
+
+- #757 buddy filter -> PR #773
+- #736 save visibility -> PR #774
+- #764 browse context -> PR #775 (amended to GoRouter.maybeOf)
+- #647 settings back gesture -> PR #776
+- #71 Shearwater UDDF gas mix -> PR #777 (already fixed by #404; test-only lock)
+- #756 import duplicate linking -> PR #778
+- #158 UDDF tank volume -> PR #779
+- #190 MySSI CSV -> PR #780
+- #644 PDF options + runtime -> PR #781
+- #765 date entry format -> PR #782
+- #222 tide time display -> PR #783 (+ follow-up comment re site timezone)
+- #214 geocode locale pin -> PR #784 (+ comment re stored-rows backfill)
+- #636 retired equipment -> PR #785
+- #590 OSTC4 recognition -> PR #786 (native matcher; pre-fix failure proven)
+- #218 Linux DB location -> PR #787
+- #143 USBHID transport honesty -> PR #788 (4 platform impls; CI validates)
+- #152 Transfer l10n -> PR #789 (8 keys x 11 locales)
+- #110 segment SAC -> PR #790
+- #759 Shearwater partial download -> PR #791 (fork branch
+  fix/759-partial-download pushed to submersion-app/libdivecomputer first,
+  pointer bumped; 3 new mock-transport cases verified failing pre-fix)
+
+Known full-suite contention flakes seen during the campaign (each passes
+standalone): media store fallback, sync backend switch/restore, backup
+encryption, OCR scan page.
+
+## Process note
+
+flutter test piped to tail masks the exit code (pipe returns tail's status) —
+verify by grepping "All tests passed" in output, or run with
+`flutter test > log 2>&1; echo EXIT:$?`. Caught on #764 where 25
+dive_detail_page tests failed silently.
