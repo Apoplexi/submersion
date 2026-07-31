@@ -5057,7 +5057,7 @@
   "transfer_computers_downloadTooltip": "Tauchgänge herunterladen",
   "transfer_computers_knownComputersHeader": "Bekannte Computer",
   "transfer_computers_lastDownloadDaysAgo": "vor {days} Tagen",
-  "transfer_computers_lastDownloadHoursAgo": "vor {hours} Stunden",
+  "transfer_computers_lastDownloadHoursAgo": "{hours, plural, =1{vor 1 Stunde} other{vor {hours} Stunden}}",
   "transfer_computers_lastDownloadMinutesAgo": "vor {minutes} Min.",
   "transfer_computers_lastDownloadNever": "Nie",
   "transfer_computers_lastDownloadYesterday": "Gestern",

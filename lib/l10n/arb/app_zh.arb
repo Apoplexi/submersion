@@ -5223,7 +5223,7 @@
   "transfer_computers_downloadTooltip": "下载潜水记录",
   "transfer_computers_knownComputersHeader": "已知潜水电脑",
   "transfer_computers_lastDownloadDaysAgo": "{days} 天前",
-  "transfer_computers_lastDownloadHoursAgo": "{hours} 小时前",
+  "transfer_computers_lastDownloadHoursAgo": "{hours, plural, other{{hours} 小时前}}",
   "transfer_computers_lastDownloadMinutesAgo": "{minutes} 分钟前",
   "transfer_computers_lastDownloadNever": "从未",
   "transfer_computers_lastDownloadYesterday": "昨天",

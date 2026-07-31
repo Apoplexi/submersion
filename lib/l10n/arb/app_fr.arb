@@ -4987,7 +4987,7 @@
   "transfer_computers_downloadTooltip": "Télécharger les plongées",
   "transfer_computers_knownComputersHeader": "Ordinateurs connus",
   "transfer_computers_lastDownloadDaysAgo": "il y a {days} jours",
-  "transfer_computers_lastDownloadHoursAgo": "il y a {hours} heures",
+  "transfer_computers_lastDownloadHoursAgo": "{hours, plural, =1{il y a 1 heure} other{il y a {hours} heures}}",
   "transfer_computers_lastDownloadMinutesAgo": "il y a {minutes} min",
   "transfer_computers_lastDownloadNever": "Jamais",
   "transfer_computers_lastDownloadYesterday": "Hier",

@@ -15944,7 +15944,12 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String transfer_computers_lastDownloadHoursAgo(int hours) {
-    return '$hours 小时前';
+    String _temp0 = intl.Intl.pluralLogic(
+      hours,
+      locale: localeName,
+      other: '$hours 小时前',
+    );
+    return '$_temp0';
   }
 
   @override

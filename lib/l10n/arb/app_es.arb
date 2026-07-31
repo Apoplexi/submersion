@@ -5057,7 +5057,7 @@
   "transfer_computers_downloadTooltip": "Descargar inmersiones",
   "transfer_computers_knownComputersHeader": "Ordenadores conocidos",
   "transfer_computers_lastDownloadDaysAgo": "hace {days} días",
-  "transfer_computers_lastDownloadHoursAgo": "hace {hours} horas",
+  "transfer_computers_lastDownloadHoursAgo": "{hours, plural, =1{hace 1 hora} other{hace {hours} horas}}",
   "transfer_computers_lastDownloadMinutesAgo": "hace {minutes} min",
   "transfer_computers_lastDownloadNever": "Nunca",
   "transfer_computers_lastDownloadYesterday": "Ayer",

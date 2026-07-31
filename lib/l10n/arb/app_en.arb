@@ -9813,7 +9813,7 @@
   "transfer_computers_downloadTooltip": "Download dives",
   "transfer_computers_knownComputersHeader": "Known Computers",
   "transfer_computers_lastDownloadDaysAgo": "{days} days ago",
-  "transfer_computers_lastDownloadHoursAgo": "{hours} hours ago",
+  "transfer_computers_lastDownloadHoursAgo": "{hours, plural, =1{1 hour ago} other{{hours} hours ago}}",
   "transfer_computers_lastDownloadMinutesAgo": "{minutes} min ago",
   "transfer_computers_lastDownloadNever": "Never",
   "transfer_computers_lastDownloadYesterday": "Yesterday",

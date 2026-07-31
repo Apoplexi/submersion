@@ -16753,7 +16753,12 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String transfer_computers_lastDownloadHoursAgo(int hours) {
-    return '$hours órája';
+    String _temp0 = intl.Intl.pluralLogic(
+      hours,
+      locale: localeName,
+      other: '$hours órája',
+    );
+    return '$_temp0';
   }
 
   @override

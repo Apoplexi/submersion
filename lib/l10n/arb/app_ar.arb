@@ -5057,7 +5057,7 @@
   "transfer_computers_downloadTooltip": "تنزيل الغوصات",
   "transfer_computers_knownComputersHeader": "أجهزة الكمبيوتر المعروفة",
   "transfer_computers_lastDownloadDaysAgo": "قبل {days} أيام",
-  "transfer_computers_lastDownloadHoursAgo": "قبل {hours} ساعات",
+  "transfer_computers_lastDownloadHoursAgo": "{hours, plural, =1{قبل ساعة} other{قبل {hours} ساعات}}",
   "transfer_computers_lastDownloadMinutesAgo": "قبل {minutes} دقيقة",
   "transfer_computers_lastDownloadNever": "أبدًا",
   "transfer_computers_lastDownloadYesterday": "أمس",

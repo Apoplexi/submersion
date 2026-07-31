@@ -12,7 +12,12 @@ String formatLastDownload(BuildContext context, DateTime? lastDownload) {
   final l10n = context.l10n;
   if (lastDownload == null) return l10n.transfer_computers_lastDownloadNever;
 
-  final diff = DateTime.now().difference(lastDownload);
+  // Clamp a future timestamp (dive-computer or host clock skew) to zero:
+  // a negative Duration would render as "-1 hours ago".
+  final now = DateTime.now();
+  final diff = lastDownload.isAfter(now)
+      ? Duration.zero
+      : now.difference(lastDownload);
   if (diff.inDays == 0) {
     if (diff.inHours == 0) {
       return l10n.transfer_computers_lastDownloadMinutesAgo(diff.inMinutes);

@@ -5057,7 +5057,7 @@
   "transfer_computers_downloadTooltip": "הורדת צלילות",
   "transfer_computers_knownComputersHeader": "מחשבים מוכרים",
   "transfer_computers_lastDownloadDaysAgo": "לפני {days} ימים",
-  "transfer_computers_lastDownloadHoursAgo": "לפני {hours} שעות",
+  "transfer_computers_lastDownloadHoursAgo": "{hours, plural, =1{לפני שעה} other{לפני {hours} שעות}}",
   "transfer_computers_lastDownloadMinutesAgo": "לפני {minutes} דק'",
   "transfer_computers_lastDownloadNever": "אף פעם",
   "transfer_computers_lastDownloadYesterday": "אתמול",

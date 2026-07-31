@@ -5057,7 +5057,7 @@
   "transfer_computers_downloadTooltip": "Baixar mergulhos",
   "transfer_computers_knownComputersHeader": "Computadores conhecidos",
   "transfer_computers_lastDownloadDaysAgo": "há {days} dias",
-  "transfer_computers_lastDownloadHoursAgo": "há {hours} horas",
+  "transfer_computers_lastDownloadHoursAgo": "{hours, plural, =1{há 1 hora} other{há {hours} horas}}",
   "transfer_computers_lastDownloadMinutesAgo": "há {minutes} min",
   "transfer_computers_lastDownloadNever": "Nunca",
   "transfer_computers_lastDownloadYesterday": "Ontem",

@@ -28201,7 +28201,7 @@ abstract class AppLocalizations {
   /// Relative last-download label, hours
   ///
   /// In en, this message translates to:
-  /// **'{hours} hours ago'**
+  /// **'{hours, plural, =1{1 hour ago} other{{hours} hours ago}}'**
   String transfer_computers_lastDownloadHoursAgo(int hours);
 
   /// Relative last-download label, minutes

@@ -4987,7 +4987,7 @@
   "transfer_computers_downloadTooltip": "Merülések letöltése",
   "transfer_computers_knownComputersHeader": "Ismert számítógépek",
   "transfer_computers_lastDownloadDaysAgo": "{days} napja",
-  "transfer_computers_lastDownloadHoursAgo": "{hours} órája",
+  "transfer_computers_lastDownloadHoursAgo": "{hours, plural, other{{hours} órája}}",
   "transfer_computers_lastDownloadMinutesAgo": "{minutes} perce",
   "transfer_computers_lastDownloadNever": "Soha",
   "transfer_computers_lastDownloadYesterday": "Tegnap",

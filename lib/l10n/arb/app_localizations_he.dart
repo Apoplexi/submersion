@@ -16365,7 +16365,13 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String transfer_computers_lastDownloadHoursAgo(int hours) {
-    return 'לפני $hours שעות';
+    String _temp0 = intl.Intl.pluralLogic(
+      hours,
+      locale: localeName,
+      other: 'לפני $hours שעות',
+      one: 'לפני שעה',
+    );
+    return '$_temp0';
   }
 
   @override

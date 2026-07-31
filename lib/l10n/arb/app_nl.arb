@@ -5057,7 +5057,7 @@
   "transfer_computers_downloadTooltip": "Duiken downloaden",
   "transfer_computers_knownComputersHeader": "Bekende computers",
   "transfer_computers_lastDownloadDaysAgo": "{days} dagen geleden",
-  "transfer_computers_lastDownloadHoursAgo": "{hours} uur geleden",
+  "transfer_computers_lastDownloadHoursAgo": "{hours, plural, =1{1 uur geleden} other{{hours} uur geleden}}",
   "transfer_computers_lastDownloadMinutesAgo": "{minutes} min geleden",
   "transfer_computers_lastDownloadNever": "Nooit",
   "transfer_computers_lastDownloadYesterday": "Gisteren",

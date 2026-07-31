@@ -31,4 +31,15 @@ void main() {
     expect(de.transfer_computers_lastDownloadNever, 'Nie');
     expect(de.transfer_computers_lastDownloadYesterday, 'Gestern');
   });
+
+  test('the hours-ago label is pluralized, not "1 hours ago"', () {
+    // inHours reaches this label at 1..23, so the singular case is real.
+    final en = lookupAppLocalizations(const Locale('en'));
+    expect(en.transfer_computers_lastDownloadHoursAgo(1), '1 hour ago');
+    expect(en.transfer_computers_lastDownloadHoursAgo(3), '3 hours ago');
+
+    final de = lookupAppLocalizations(const Locale('de'));
+    expect(de.transfer_computers_lastDownloadHoursAgo(1), 'vor 1 Stunde');
+    expect(de.transfer_computers_lastDownloadHoursAgo(3), 'vor 3 Stunden');
+  });
 }

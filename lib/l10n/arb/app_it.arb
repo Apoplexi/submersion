@@ -4983,7 +4983,7 @@
   "transfer_computers_downloadTooltip": "Scarica immersioni",
   "transfer_computers_knownComputersHeader": "Computer conosciuti",
   "transfer_computers_lastDownloadDaysAgo": "{days} giorni fa",
-  "transfer_computers_lastDownloadHoursAgo": "{hours} ore fa",
+  "transfer_computers_lastDownloadHoursAgo": "{hours, plural, =1{1 ora fa} other{{hours} ore fa}}",
   "transfer_computers_lastDownloadMinutesAgo": "{minutes} min fa",
   "transfer_computers_lastDownloadNever": "Mai",
   "transfer_computers_lastDownloadYesterday": "Ieri",
