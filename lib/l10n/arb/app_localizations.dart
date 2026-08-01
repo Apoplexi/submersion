@@ -11983,6 +11983,36 @@ abstract class AppLocalizations {
   /// **'Select Preset...'**
   String get diveLog_tank_selectPreset;
 
+  /// No description provided for @diveLog_tank_saveAsPreset.
+  ///
+  /// In en, this message translates to:
+  /// **'Save as preset'**
+  String get diveLog_tank_saveAsPreset;
+
+  /// No description provided for @diveLog_tank_saveAsPreset_needSpecs.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a volume and working pressure first'**
+  String get diveLog_tank_saveAsPreset_needSpecs;
+
+  /// No description provided for @diveLog_tank_saveAsPreset_nameTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Save tank preset'**
+  String get diveLog_tank_saveAsPreset_nameTitle;
+
+  /// No description provided for @diveLog_tank_saveAsPreset_nameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. My AL80'**
+  String get diveLog_tank_saveAsPreset_nameHint;
+
+  /// No description provided for @diveLog_tank_saveAsPreset_saved.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved preset \"{name}\"'**
+  String diveLog_tank_saveAsPreset_saved(String name);
+
   /// No description provided for @diveLog_tank_title.
   ///
   /// In en, this message translates to:

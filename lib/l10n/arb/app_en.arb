@@ -3754,6 +3754,18 @@
   "diveLog_tank_modMndInfo": "MOD: {mod} (ppO₂ 1.4) | MND: {mnd}",
   "diveLog_tank_section_gasMix": "Gas Mix",
   "diveLog_tank_selectPreset": "Select Preset...",
+  "diveLog_tank_saveAsPreset": "Save as preset",
+  "diveLog_tank_saveAsPreset_needSpecs": "Enter a volume and working pressure first",
+  "diveLog_tank_saveAsPreset_nameTitle": "Save tank preset",
+  "diveLog_tank_saveAsPreset_nameHint": "e.g. My AL80",
+  "diveLog_tank_saveAsPreset_saved": "Saved preset \"{name}\"",
+  "@diveLog_tank_saveAsPreset_saved": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "diveLog_tank_title": "Tank {number}",
   "diveLog_tank_tooltip_remove": "Remove tank",
   "diveLog_tissue_label_ceiling": "Ceiling",
