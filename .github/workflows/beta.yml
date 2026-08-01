@@ -14,7 +14,7 @@ on:
   # release-channels-phase1-2.
   push:
     branches: [release-channels-phase1-2]
-    paths: ['.github/workflows/beta.yml']
+    paths: ['.github/workflows/beta.yml', 'pubspec.yaml']
   workflow_dispatch:
     inputs:
       skip-publish:
