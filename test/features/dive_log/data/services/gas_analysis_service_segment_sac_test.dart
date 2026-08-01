@@ -151,6 +151,56 @@ void main() {
       expect(totalConsumed, closeTo(100, 1.0));
     });
 
+    test('falls back to whole-dive proration when the gas switches name no '
+        'known cylinder (#110)', () {
+      // Every gas switch points at a tank id absent from the dive's tank list
+      // (stale ids survive a re-import), so each segment resolves to the first
+      // cylinder through the orElse fallback and no switch identifies that
+      // cylinder's usage window. Proration must then widen to the whole dive
+      // instead of collapsing onto the segment.
+      const tank = DiveTank(
+        id: 't1',
+        name: 'Back gas',
+        startPressure: 200,
+        endPressure: 100,
+        gasMix: GasMix(o2: 21, he: 0),
+      );
+      final profile = flatProfile(30 * 60, 20.0);
+      GasSwitchWithTank sw(String id, int ts, String tankId) =>
+          GasSwitchWithTank(
+            gasSwitch: GasSwitch(
+              id: id,
+              diveId: 'dive-1',
+              timestamp: ts,
+              tankId: tankId,
+              createdAt: DateTime(2026),
+            ),
+            tankName: tankId,
+            gasMix: 'Air',
+            o2Fraction: 0.21,
+          );
+
+      final segments = service.calculateGasSwitchSegments(
+        profile: profile,
+        tanks: [tank],
+        gasSwitches: [sw('gs1', 0, 'orphan-a'), sw('gs2', 15 * 60, 'orphan-b')],
+        tankPressures: const {},
+      );
+
+      expect(segments, isNotNull);
+      expect(segments!.length, 2);
+      // Whole-dive window: each 15-minute half carries half of the 100 bar
+      // drop, i.e. 50 bar / 15 min / 3.0 ata.
+      for (final s in segments) {
+        expect(s.sacRate, closeTo(50 / 15 / 3.0, 0.02));
+      }
+      // The cylinder is charged exactly once across the dive.
+      expect(
+        segments.fold<double>(0, (sum, s) => sum + s.gasConsumed),
+        closeTo(100, 1.0),
+      );
+    });
+
     test('computes SAC with Z-factor for segments with tank volume', () {
       const tank = DiveTank(
         id: 't1',
@@ -310,6 +360,64 @@ void main() {
       // All segment SAC rates should be positive
       for (final seg in segments) {
         expect(seg.sacRate, greaterThan(0));
+      }
+    });
+
+    test('falls back to whole-dive proration when no gas switches identify '
+        'the active cylinder (#110)', () {
+      // A sidemount pair with no gas switches logged: neither cylinder is back
+      // gas, so the usage window is indeterminate and every segment must
+      // prorate against the whole dive.
+      const left = DiveTank(
+        id: 't1',
+        name: 'Sidemount L',
+        role: TankRole.sidemountLeft,
+        startPressure: 200,
+        endPressure: 80,
+        gasMix: GasMix(o2: 21, he: 0),
+      );
+      const right = DiveTank(
+        id: 't2',
+        name: 'Sidemount R',
+        role: TankRole.sidemountRight,
+        startPressure: 200,
+        endPressure: 90,
+        gasMix: GasMix(o2: 21, he: 0),
+      );
+      final profile = <DiveProfilePoint>[];
+      for (int t = 0; t <= 120; t += 10) {
+        profile.add(DiveProfilePoint(timestamp: t, depth: t / 120 * 25));
+      }
+      for (int t = 130; t <= 2220; t += 10) {
+        profile.add(DiveProfilePoint(timestamp: t, depth: 25.0));
+      }
+      for (int t = 2230; t <= 2520; t += 10) {
+        profile.add(
+          DiveProfilePoint(timestamp: t, depth: 25.0 * (1 - (t - 2220) / 300)),
+        );
+      }
+
+      // No gasSwitches: the active-tank lookup falls through to the first
+      // cylinder, which is not back gas, so the usage range is unknowable.
+      final segments = service.calculatePhaseSegments(
+        profile: profile,
+        tanks: [left, right],
+      );
+
+      expect(segments, isNotNull);
+      expect(segments!, isNotEmpty);
+      const diveDurationSec = 2520;
+      for (final seg in segments) {
+        expect(seg.tankId, 't1');
+        expect(seg.sacRate, greaterThan(0));
+        // The 120 bar drop is spread across the whole dive, not the segment,
+        // so each segment's share is strictly proportional to its length.
+        final durationSec = seg.endTimestamp - seg.startTimestamp;
+        expect(
+          seg.gasConsumed,
+          closeTo(120 * durationSec / diveDurationSec, 0.01),
+          reason: 'segment must carry only its whole-dive share of the drop',
+        );
       }
     });
 
