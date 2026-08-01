@@ -34,7 +34,7 @@ jobs:
   precheck:
     name: Compute version and gate
     runs-on: ubuntu-latest
-    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
     outputs:
       proceed: ${{ steps.gate.outputs.proceed }}
       tag: ${{ steps.version.outputs.tag }}
