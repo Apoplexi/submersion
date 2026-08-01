@@ -6962,21 +6962,22 @@ class AppLocalizationsAr extends AppLocalizations {
   String get diveLog_tank_selectPreset => 'اختر إعداداً مسبقاً...';
 
   @override
-  String get diveLog_tank_saveAsPreset => 'Save as preset';
+  String get diveLog_tank_saveAsPreset => 'حفظ كإعداد مسبق';
 
   @override
   String get diveLog_tank_saveAsPreset_needSpecs =>
-      'Enter a volume and working pressure first';
+      'أدخل الحجم وضغط العمل أولاً';
 
   @override
-  String get diveLog_tank_saveAsPreset_nameTitle => 'Save tank preset';
+  String get diveLog_tank_saveAsPreset_nameTitle =>
+      'حفظ إعداد الأسطوانة المسبق';
 
   @override
-  String get diveLog_tank_saveAsPreset_nameHint => 'e.g. My AL80';
+  String get diveLog_tank_saveAsPreset_nameHint => 'مثال: AL80 خاصتي';
 
   @override
   String diveLog_tank_saveAsPreset_saved(String name) {
-    return 'Saved preset \"$name\"';
+    return 'تم حفظ الإعداد المسبق \"$name\"';
   }
 
   @override

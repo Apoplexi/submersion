@@ -7111,21 +7111,22 @@ class AppLocalizationsEs extends AppLocalizations {
   String get diveLog_tank_selectPreset => 'Seleccionar preajuste...';
 
   @override
-  String get diveLog_tank_saveAsPreset => 'Save as preset';
+  String get diveLog_tank_saveAsPreset => 'Guardar como preajuste';
 
   @override
   String get diveLog_tank_saveAsPreset_needSpecs =>
-      'Enter a volume and working pressure first';
+      'Introduce primero un volumen y una presión de trabajo';
 
   @override
-  String get diveLog_tank_saveAsPreset_nameTitle => 'Save tank preset';
+  String get diveLog_tank_saveAsPreset_nameTitle =>
+      'Guardar preajuste de tanque';
 
   @override
-  String get diveLog_tank_saveAsPreset_nameHint => 'e.g. My AL80';
+  String get diveLog_tank_saveAsPreset_nameHint => 'p. ej. Mi AL80';
 
   @override
   String diveLog_tank_saveAsPreset_saved(String name) {
-    return 'Saved preset \"$name\"';
+    return 'Preajuste \"$name\" guardado';
   }
 
   @override

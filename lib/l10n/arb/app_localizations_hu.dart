@@ -7085,21 +7085,22 @@ class AppLocalizationsHu extends AppLocalizations {
   String get diveLog_tank_selectPreset => 'Valasszon elore beallitast...';
 
   @override
-  String get diveLog_tank_saveAsPreset => 'Save as preset';
+  String get diveLog_tank_saveAsPreset => 'Mentés előre beállításként';
 
   @override
   String get diveLog_tank_saveAsPreset_needSpecs =>
-      'Enter a volume and working pressure first';
+      'Először adjon meg térfogatot és üzemi nyomást';
 
   @override
-  String get diveLog_tank_saveAsPreset_nameTitle => 'Save tank preset';
+  String get diveLog_tank_saveAsPreset_nameTitle =>
+      'Palack előre beállítás mentése';
 
   @override
-  String get diveLog_tank_saveAsPreset_nameHint => 'e.g. My AL80';
+  String get diveLog_tank_saveAsPreset_nameHint => 'pl. Az én AL80-am';
 
   @override
   String diveLog_tank_saveAsPreset_saved(String name) {
-    return 'Saved preset \"$name\"';
+    return '\"$name\" előre beállítás mentve';
   }
 
   @override

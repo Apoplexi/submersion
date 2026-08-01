@@ -1,4 +1,9 @@
 {
+  "diveLog_tank_saveAsPreset": "Salva come preset",
+  "diveLog_tank_saveAsPreset_needSpecs": "Inserisci prima volume e pressione di esercizio",
+  "diveLog_tank_saveAsPreset_nameTitle": "Salva preset bombola",
+  "diveLog_tank_saveAsPreset_nameHint": "es. La mia AL80",
+  "diveLog_tank_saveAsPreset_saved": "Preset \"{name}\" salvato",
   "diveLog_edit_geofenceSuggestion_near": "Vicino a {location}",
   "diveLog_edit_geofenceSuggestion_title": "Suggerimento attrezzatura",
   "diveLog_edit_geofenceSuggestion_body": "Applicare il set \"{setName}\"?",

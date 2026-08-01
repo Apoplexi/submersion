@@ -1,4 +1,9 @@
 {
+  "diveLog_tank_saveAsPreset": "שמור כתבנית",
+  "diveLog_tank_saveAsPreset_needSpecs": "הזן תחילה נפח ולחץ עבודה",
+  "diveLog_tank_saveAsPreset_nameTitle": "שמור תבנית בלון",
+  "diveLog_tank_saveAsPreset_nameHint": "לדוגמה AL80 שלי",
+  "diveLog_tank_saveAsPreset_saved": "התבנית \"{name}\" נשמרה",
   "diveLog_edit_geofenceSuggestion_near": "ליד {location}",
   "diveLog_edit_geofenceSuggestion_title": "הצעת ציוד",
   "diveLog_edit_geofenceSuggestion_body": "להחיל את ערכת \"{setName}\"?",

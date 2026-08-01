@@ -1,4 +1,9 @@
 {
+  "diveLog_tank_saveAsPreset": "Als voorinstelling opslaan",
+  "diveLog_tank_saveAsPreset_needSpecs": "Voer eerst een volume en werkdruk in",
+  "diveLog_tank_saveAsPreset_nameTitle": "Flesvoorinstelling opslaan",
+  "diveLog_tank_saveAsPreset_nameHint": "bijv. Mijn AL80",
+  "diveLog_tank_saveAsPreset_saved": "Voorinstelling \"{name}\" opgeslagen",
   "diveLog_edit_geofenceSuggestion_near": "Bij {location}",
   "diveLog_edit_geofenceSuggestion_title": "Uitrustingssuggestie",
   "diveLog_edit_geofenceSuggestion_body": "Set \"{setName}\" toepassen?",

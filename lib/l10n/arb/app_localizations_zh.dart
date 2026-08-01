@@ -6758,21 +6758,20 @@ class AppLocalizationsZh extends AppLocalizations {
   String get diveLog_tank_selectPreset => '选择预设...';
 
   @override
-  String get diveLog_tank_saveAsPreset => 'Save as preset';
+  String get diveLog_tank_saveAsPreset => '另存为预设';
 
   @override
-  String get diveLog_tank_saveAsPreset_needSpecs =>
-      'Enter a volume and working pressure first';
+  String get diveLog_tank_saveAsPreset_needSpecs => '请先输入容积和工作压力';
 
   @override
-  String get diveLog_tank_saveAsPreset_nameTitle => 'Save tank preset';
+  String get diveLog_tank_saveAsPreset_nameTitle => '保存气瓶预设';
 
   @override
-  String get diveLog_tank_saveAsPreset_nameHint => 'e.g. My AL80';
+  String get diveLog_tank_saveAsPreset_nameHint => '例如 我的 AL80';
 
   @override
   String diveLog_tank_saveAsPreset_saved(String name) {
-    return 'Saved preset \"$name\"';
+    return '已保存预设 \"$name\"';
   }
 
   @override

@@ -7051,21 +7051,22 @@ class AppLocalizationsNl extends AppLocalizations {
   String get diveLog_tank_selectPreset => 'Selecteer voorinstelling...';
 
   @override
-  String get diveLog_tank_saveAsPreset => 'Save as preset';
+  String get diveLog_tank_saveAsPreset => 'Als voorinstelling opslaan';
 
   @override
   String get diveLog_tank_saveAsPreset_needSpecs =>
-      'Enter a volume and working pressure first';
+      'Voer eerst een volume en werkdruk in';
 
   @override
-  String get diveLog_tank_saveAsPreset_nameTitle => 'Save tank preset';
+  String get diveLog_tank_saveAsPreset_nameTitle =>
+      'Flesvoorinstelling opslaan';
 
   @override
-  String get diveLog_tank_saveAsPreset_nameHint => 'e.g. My AL80';
+  String get diveLog_tank_saveAsPreset_nameHint => 'bijv. Mijn AL80';
 
   @override
   String diveLog_tank_saveAsPreset_saved(String name) {
-    return 'Saved preset \"$name\"';
+    return 'Voorinstelling \"$name\" opgeslagen';
   }
 
   @override

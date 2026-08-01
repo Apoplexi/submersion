@@ -1,4 +1,9 @@
 {
+  "diveLog_tank_saveAsPreset": "Guardar como preajuste",
+  "diveLog_tank_saveAsPreset_needSpecs": "Introduce primero un volumen y una presión de trabajo",
+  "diveLog_tank_saveAsPreset_nameTitle": "Guardar preajuste de tanque",
+  "diveLog_tank_saveAsPreset_nameHint": "p. ej. Mi AL80",
+  "diveLog_tank_saveAsPreset_saved": "Preajuste \"{name}\" guardado",
   "diveLog_edit_geofenceSuggestion_near": "Cerca de {location}",
   "diveLog_edit_geofenceSuggestion_title": "Sugerencia de equipo",
   "diveLog_edit_geofenceSuggestion_body": "¿Aplicar tu conjunto \"{setName}\"?",
