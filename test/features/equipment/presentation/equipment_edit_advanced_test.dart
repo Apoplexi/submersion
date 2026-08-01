@@ -183,5 +183,33 @@ void main() {
       final saved = await repository.getEquipmentById(created.id);
       expect(saved!.buoyancyKg, isNull);
     });
+
+    testWidgets('shows the stored currency and its symbol on the price field', (
+      tester,
+    ) async {
+      final created = await repository.createEquipment(
+        EquipmentItem(
+          id: '',
+          name: 'Regulator',
+          type: EquipmentType.regulator,
+          purchasePrice: 150,
+          purchaseCurrency: 'EUR',
+        ),
+      );
+      await pumpEditor(tester, created.id);
+
+      // Bring the purchase section into view.
+      final currencyField = find.byType(DropdownMenu<String>);
+      await tester.scrollUntilVisible(
+        currencyField,
+        300,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.pumpAndSettle();
+
+      // Currency field shows the stored code; the price prefix shows its symbol.
+      expect(find.text('EUR'), findsWidgets);
+      expect(find.textContaining('€'), findsWidgets);
+    });
   });
 }

@@ -45,6 +45,10 @@ class MockSettingsNotifier extends StateNotifier<AppSettings>
   @override
   Future<void> setSacUnit(SacUnit unit) async =>
       state = state.copyWith(sacUnit: unit);
+
+  @override
+  Future<void> setDefaultCurrency(String currencyCode) async =>
+      state = state.copyWith(defaultCurrency: currencyCode);
   @override
   Future<void> setAltitudeUnit(AltitudeUnit unit) async =>
       state = state.copyWith(altitudeUnit: unit);

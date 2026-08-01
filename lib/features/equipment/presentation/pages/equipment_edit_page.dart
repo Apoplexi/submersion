@@ -3,6 +3,7 @@ import 'package:submersion/core/providers/provider.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:submersion/core/constants/enums.dart';
+import 'package:submersion/core/utils/currency.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
@@ -56,6 +57,11 @@ class _EquipmentEditPageState extends ConsumerState<EquipmentEditPage> {
   @override
   void initState() {
     super.initState();
+    // New items start in the diver's default currency; existing items get
+    // their stored currency from _loadEquipment.
+    if (widget.equipmentId == null) {
+      _purchaseCurrencyController.text = ref.read(defaultCurrencyProvider);
+    }
     _nameController.addListener(_onFieldChanged);
     _brandController.addListener(_onFieldChanged);
     _modelController.addListener(_onFieldChanged);
@@ -557,27 +563,51 @@ class _EquipmentEditPageState extends ConsumerState<EquipmentEditPage> {
               ),
             const SizedBox(height: 16),
             Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Expanded(
                   flex: 2,
-                  child: TextFormField(
-                    controller: _purchasePriceController,
-                    decoration: InputDecoration(
-                      labelText: context.l10n.equipment_edit_purchasePriceLabel,
-                      prefixIcon: const Icon(Icons.attach_money),
-                    ),
-                    keyboardType: const TextInputType.numberWithOptions(
-                      decimal: true,
-                    ),
+                  // Rebuild the price field when the currency changes so its
+                  // prefix shows the right symbol (€, $, £ ...).
+                  child: ValueListenableBuilder<TextEditingValue>(
+                    valueListenable: _purchaseCurrencyController,
+                    builder: (context, value, _) {
+                      final symbol = currencySymbol(value.text);
+                      return TextFormField(
+                        controller: _purchasePriceController,
+                        decoration: InputDecoration(
+                          labelText:
+                              context.l10n.equipment_edit_purchasePriceLabel,
+                          prefixText: symbol.isEmpty ? null : '$symbol ',
+                        ),
+                        keyboardType: const TextInputType.numberWithOptions(
+                          decimal: true,
+                        ),
+                      );
+                    },
                   ),
                 ),
                 const SizedBox(width: 16),
                 Expanded(
-                  child: TextFormField(
+                  // Editable dropdown: common currencies as presets, but any
+                  // ISO code can still be typed.
+                  child: DropdownMenu<String>(
                     controller: _purchaseCurrencyController,
-                    decoration: InputDecoration(
-                      labelText: context.l10n.equipment_edit_currencyLabel,
-                    ),
+                    expandedInsets: EdgeInsets.zero,
+                    requestFocusOnTap: true,
+                    enableFilter: true,
+                    label: Text(context.l10n.equipment_edit_currencyLabel),
+                    dropdownMenuEntries: [
+                      for (final code in kCommonCurrencyCodes)
+                        DropdownMenuEntry(
+                          value: code,
+                          label: code,
+                          leadingIcon: SizedBox(
+                            width: 28,
+                            child: Center(child: Text(currencySymbol(code))),
+                          ),
+                        ),
+                    ],
                   ),
                 ),
               ],

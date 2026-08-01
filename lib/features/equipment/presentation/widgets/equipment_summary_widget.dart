@@ -3,7 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:submersion/core/accessibility/semantic_helpers.dart';
+import 'package:submersion/core/utils/currency.dart';
 import 'package:submersion/features/equipment/presentation/providers/equipment_providers.dart';
+import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 
 /// Summary widget shown when no equipment is selected.
@@ -133,7 +135,8 @@ class EquipmentSummaryWidget extends ConsumerWidget {
               _buildStatCard(
                 context,
                 icon: Icons.attach_money,
-                value: '\$${totalValue.toStringAsFixed(0)}',
+                value:
+                    '${currencySymbol(ref.watch(defaultCurrencyProvider))}${totalValue.toStringAsFixed(0)}',
                 label: context.l10n.equipment_summary_totalValue,
                 color: Colors.orange,
               ),

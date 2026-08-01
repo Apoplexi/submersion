@@ -14695,6 +14695,12 @@ class AppLocalizationsHe extends AppLocalizations {
   String get settings_units_sacRate => 'קצב SAC';
 
   @override
+  String get settings_units_defaultCurrency => 'Default Currency';
+
+  @override
+  String get settings_units_dialog_defaultCurrency => 'Default Currency';
+
+  @override
   String get settings_units_sac_pressurePerMinute => 'לחץ לדקה';
 
   @override

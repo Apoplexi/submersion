@@ -25436,6 +25436,18 @@ abstract class AppLocalizations {
   /// **'SAC Rate'**
   String get settings_units_sacRate;
 
+  /// No description provided for @settings_units_defaultCurrency.
+  ///
+  /// In en, this message translates to:
+  /// **'Default Currency'**
+  String get settings_units_defaultCurrency;
+
+  /// No description provided for @settings_units_dialog_defaultCurrency.
+  ///
+  /// In en, this message translates to:
+  /// **'Default Currency'**
+  String get settings_units_dialog_defaultCurrency;
+
   /// No description provided for @settings_units_sac_pressurePerMinute.
   ///
   /// In en, this message translates to:

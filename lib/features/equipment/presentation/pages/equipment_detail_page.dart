@@ -4,6 +4,7 @@ import 'package:submersion/core/providers/provider.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:submersion/core/constants/list_view_mode.dart';
+import 'package:submersion/core/utils/currency.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:submersion/shared/widgets/master_detail/detail_scroll_retainer.dart';
@@ -604,7 +605,10 @@ class _EquipmentDetailContent extends ConsumerWidget {
               _buildDetailRow(
                 context,
                 context.l10n.equipment_detail_purchasePriceLabel,
-                '${equipment.purchasePrice!.toStringAsFixed(2)} ${equipment.purchaseCurrency}',
+                formatMoney(
+                  equipment.purchasePrice!,
+                  equipment.purchaseCurrency,
+                ),
               ),
             if (equipment.ownershipDuration != null)
               _buildDetailRow(

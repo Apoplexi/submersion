@@ -8329,6 +8329,8 @@
   "settings_units_pressure_psi": "PSI",
   "settings_units_quickSelect": "Quick Select",
   "settings_units_sacRate": "SAC Rate",
+  "settings_units_defaultCurrency": "Default Currency",
+  "settings_units_dialog_defaultCurrency": "Default Currency",
   "settings_units_sac_pressurePerMinute": "Pressure per minute",
   "settings_units_sac_pressurePerMinute_subtitle": "No tank volume needed (bar/min or psi/min)",
   "settings_units_sac_volumePerMinute": "Volume per minute",
