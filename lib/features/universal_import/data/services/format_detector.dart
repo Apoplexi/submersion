@@ -261,15 +261,14 @@ class FormatDetector {
   // ======================== CSV Detection ========================
 
   DetectionResult? _detectCsv(String content, Uint8List bytes) {
-    // Normalize line endings and strip the UTF-8 BOM before parsing: the
-    // csv package's default eol is '\r\n' matched literally, so an LF-only
-    // file (e.g. the MySSI web export) would otherwise parse as ONE giant
-    // row and every cell would be reported as a header (#190).
-    var normalized = content;
-    if (normalized.startsWith(_bom)) {
-      normalized = normalized.substring(1);
-    }
-    normalized = normalized.replaceAll('\r\n', '\n').replaceAll('\r', '\n');
+    // Normalize line endings before parsing: the csv package's default eol
+    // is '\r\n' matched literally, so an LF-only file (e.g. the MySSI web
+    // export) would otherwise parse as ONE giant row and every cell would
+    // be reported as a header (#190).
+    //
+    // A UTF-8 BOM needs no handling here: utf8.decode in [detect] already
+    // consumes it, so `content` never starts with U+FEFF.
+    final normalized = content.replaceAll('\r\n', '\n').replaceAll('\r', '\n');
 
     List<List<dynamic>> rows;
     try {
