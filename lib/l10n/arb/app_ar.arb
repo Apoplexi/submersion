@@ -1,4 +1,6 @@
 {
+  "settings_units_defaultCurrency": "العملة الافتراضية",
+  "settings_units_dialog_defaultCurrency": "العملة الافتراضية",
   "diveLog_edit_geofenceSuggestion_near": "بالقرب من {location}",
   "diveLog_edit_geofenceSuggestion_title": "اقتراح المعدات",
   "diveLog_edit_geofenceSuggestion_body": "تطبيق مجموعة \"{setName}\"؟",

@@ -1,4 +1,6 @@
 {
+  "settings_units_defaultCurrency": "מטבע ברירת מחדל",
+  "settings_units_dialog_defaultCurrency": "מטבע ברירת מחדל",
   "diveLog_edit_geofenceSuggestion_near": "ליד {location}",
   "diveLog_edit_geofenceSuggestion_title": "הצעת ציוד",
   "diveLog_edit_geofenceSuggestion_body": "להחיל את ערכת \"{setName}\"?",

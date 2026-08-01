@@ -188,7 +188,7 @@ void main() {
       tester,
     ) async {
       final created = await repository.createEquipment(
-        EquipmentItem(
+        const EquipmentItem(
           id: '',
           name: 'Regulator',
           type: EquipmentType.regulator,

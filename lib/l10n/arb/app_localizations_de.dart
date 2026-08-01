@@ -15057,10 +15057,10 @@ class AppLocalizationsDe extends AppLocalizations {
   String get settings_units_sacRate => 'AMV';
 
   @override
-  String get settings_units_defaultCurrency => 'Default Currency';
+  String get settings_units_defaultCurrency => 'Standardwährung';
 
   @override
-  String get settings_units_dialog_defaultCurrency => 'Default Currency';
+  String get settings_units_dialog_defaultCurrency => 'Standardwährung';
 
   @override
   String get settings_units_sac_pressurePerMinute => 'Druck pro Minute';

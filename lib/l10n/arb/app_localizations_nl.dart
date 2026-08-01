@@ -14949,10 +14949,10 @@ class AppLocalizationsNl extends AppLocalizations {
   String get settings_units_sacRate => 'SAC-snelheid';
 
   @override
-  String get settings_units_defaultCurrency => 'Default Currency';
+  String get settings_units_defaultCurrency => 'Standaardvaluta';
 
   @override
-  String get settings_units_dialog_defaultCurrency => 'Default Currency';
+  String get settings_units_dialog_defaultCurrency => 'Standaardvaluta';
 
   @override
   String get settings_units_sac_pressurePerMinute => 'Druk per minuut';

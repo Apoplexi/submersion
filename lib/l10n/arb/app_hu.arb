@@ -1,4 +1,6 @@
 {
+  "settings_units_defaultCurrency": "Alapértelmezett pénznem",
+  "settings_units_dialog_defaultCurrency": "Alapértelmezett pénznem",
   "diveLog_edit_geofenceSuggestion_near": "{location} közelében",
   "diveLog_edit_geofenceSuggestion_title": "Felszerelési javaslat",
   "diveLog_edit_geofenceSuggestion_body": "Alkalmazza a(z) \"{setName}\" készletet?",

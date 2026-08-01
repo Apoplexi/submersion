@@ -1,4 +1,6 @@
 {
+  "settings_units_defaultCurrency": "Moeda padrão",
+  "settings_units_dialog_defaultCurrency": "Moeda padrão",
   "diveLog_edit_geofenceSuggestion_near": "Perto de {location}",
   "diveLog_edit_geofenceSuggestion_title": "Sugestão de equipamento",
   "diveLog_edit_geofenceSuggestion_body": "Aplicar o conjunto \"{setName}\"?",

@@ -15131,10 +15131,10 @@ class AppLocalizationsFr extends AppLocalizations {
   String get settings_units_sacRate => 'SAC Rate';
 
   @override
-  String get settings_units_defaultCurrency => 'Default Currency';
+  String get settings_units_defaultCurrency => 'Devise par défaut';
 
   @override
-  String get settings_units_dialog_defaultCurrency => 'Default Currency';
+  String get settings_units_dialog_defaultCurrency => 'Devise par défaut';
 
   @override
   String get settings_units_sac_pressurePerMinute => 'Pression par minute';

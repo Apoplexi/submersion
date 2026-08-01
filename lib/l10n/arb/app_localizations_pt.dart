@@ -15083,10 +15083,10 @@ class AppLocalizationsPt extends AppLocalizations {
   String get settings_units_sacRate => 'Taxa SAC';
 
   @override
-  String get settings_units_defaultCurrency => 'Default Currency';
+  String get settings_units_defaultCurrency => 'Moeda padrão';
 
   @override
-  String get settings_units_dialog_defaultCurrency => 'Default Currency';
+  String get settings_units_dialog_defaultCurrency => 'Moeda padrão';
 
   @override
   String get settings_units_sac_pressurePerMinute => 'Pressao por minuto';

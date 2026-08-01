@@ -15072,10 +15072,10 @@ class AppLocalizationsIt extends AppLocalizations {
   String get settings_units_sacRate => 'SAC Rate';
 
   @override
-  String get settings_units_defaultCurrency => 'Default Currency';
+  String get settings_units_defaultCurrency => 'Valuta predefinita';
 
   @override
-  String get settings_units_dialog_defaultCurrency => 'Default Currency';
+  String get settings_units_dialog_defaultCurrency => 'Valuta predefinita';
 
   @override
   String get settings_units_sac_pressurePerMinute => 'Pressione al minuto';

@@ -1,4 +1,6 @@
 {
+  "settings_units_defaultCurrency": "Valuta predefinita",
+  "settings_units_dialog_defaultCurrency": "Valuta predefinita",
   "diveLog_edit_geofenceSuggestion_near": "Vicino a {location}",
   "diveLog_edit_geofenceSuggestion_title": "Suggerimento attrezzatura",
   "diveLog_edit_geofenceSuggestion_body": "Applicare il set \"{setName}\"?",

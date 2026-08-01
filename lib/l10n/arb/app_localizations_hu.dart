@@ -15032,10 +15032,10 @@ class AppLocalizationsHu extends AppLocalizations {
   String get settings_units_sacRate => 'SAC ertek';
 
   @override
-  String get settings_units_defaultCurrency => 'Default Currency';
+  String get settings_units_defaultCurrency => 'Alapértelmezett pénznem';
 
   @override
-  String get settings_units_dialog_defaultCurrency => 'Default Currency';
+  String get settings_units_dialog_defaultCurrency => 'Alapértelmezett pénznem';
 
   @override
   String get settings_units_sac_pressurePerMinute => 'Nyomas percenként';

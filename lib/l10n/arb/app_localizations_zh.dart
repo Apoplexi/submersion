@@ -14334,10 +14334,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settings_units_sacRate => '气体消耗率';
 
   @override
-  String get settings_units_defaultCurrency => 'Default Currency';
+  String get settings_units_defaultCurrency => '默认货币';
 
   @override
-  String get settings_units_dialog_defaultCurrency => 'Default Currency';
+  String get settings_units_dialog_defaultCurrency => '默认货币';
 
   @override
   String get settings_units_sac_pressurePerMinute => '压力/分钟';

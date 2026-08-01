@@ -1,4 +1,6 @@
 {
+  "settings_units_defaultCurrency": "Standardwährung",
+  "settings_units_dialog_defaultCurrency": "Standardwährung",
   "diveLog_edit_geofenceSuggestion_near": "In der Nähe von {location}",
   "diveLog_edit_geofenceSuggestion_title": "Ausrüstungsvorschlag",
   "diveLog_edit_geofenceSuggestion_body": "Set \"{setName}\" übernehmen?",
