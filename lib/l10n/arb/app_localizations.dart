@@ -5480,7 +5480,7 @@ abstract class AppLocalizations {
   /// No description provided for @dashboard_gauges_dataIssues.
   ///
   /// In en, this message translates to:
-  /// **'{count} data issues'**
+  /// **'{count, plural, =1{1 data issue} other{{count} data issues}}'**
   String dashboard_gauges_dataIssues(int count);
 
   /// No description provided for @dashboard_gauges_retry.

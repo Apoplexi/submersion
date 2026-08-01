@@ -5684,7 +5684,7 @@
   "dashboard_gauges_backupDays": "Copia hace {days}d",
   "dashboard_gauges_syncPending": "{count} sin sincronizar",
   "dashboard_gauges_synced": "Sincronizado",
-  "dashboard_gauges_dataIssues": "{count} problemas de datos",
+  "dashboard_gauges_dataIssues": "{count, plural, =1{1 problema de datos} other{{count} problemas de datos}}",
   "dashboard_gauges_retry": "Estado no disponible - toca para reintentar",
   "dashboard_urgent_title": "Requiere atención",
   "dashboard_photos_title": "Fotos recientes",

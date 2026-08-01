@@ -2003,7 +2003,7 @@
     }
   },
   "dashboard_gauges_synced": "Synced",
-  "dashboard_gauges_dataIssues": "{count} data issues",
+  "dashboard_gauges_dataIssues": "{count, plural, =1{1 data issue} other{{count} data issues}}",
   "@dashboard_gauges_dataIssues": {
     "placeholders": {
       "count": {

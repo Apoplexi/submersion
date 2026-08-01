@@ -5684,7 +5684,7 @@
   "dashboard_gauges_backupDays": "{days} 天前备份",
   "dashboard_gauges_syncPending": "{count} 条未同步",
   "dashboard_gauges_synced": "已同步",
-  "dashboard_gauges_dataIssues": "{count} 个数据问题",
+  "dashboard_gauges_dataIssues": "{count, plural, =1{1 个数据问题} other{{count} 个数据问题}}",
   "dashboard_gauges_retry": "状态不可用 - 点按重试",
   "dashboard_urgent_title": "需要注意",
   "dashboard_photos_title": "最近照片",

@@ -5684,7 +5684,7 @@
   "dashboard_gauges_backupDays": "גיבוי לפני {days} ימים",
   "dashboard_gauges_syncPending": "{count} לא מסונכרנים",
   "dashboard_gauges_synced": "מסונכרן",
-  "dashboard_gauges_dataIssues": "{count} בעיות נתונים",
+  "dashboard_gauges_dataIssues": "{count, plural, =1{בעיית נתונים אחת} other{{count} בעיות נתונים}}",
   "dashboard_gauges_retry": "הסטטוס אינו זמין - הקש לניסיון חוזר",
   "dashboard_urgent_title": "דורש תשומת לב",
   "dashboard_photos_title": "תמונות אחרונות",
