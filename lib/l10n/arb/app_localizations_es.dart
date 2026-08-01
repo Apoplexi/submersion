@@ -8310,7 +8310,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get diveSites_list_menu_import => 'Importar';
 
   @override
-  String get diveSites_list_menu_select => 'Select sites';
+  String get diveSites_list_menu_select => 'Seleccionar puntos';
 
   @override
   String get diveSites_list_search_backTooltip => 'Atras';

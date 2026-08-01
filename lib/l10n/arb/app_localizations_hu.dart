@@ -8289,7 +8289,7 @@ class AppLocalizationsHu extends AppLocalizations {
   String get diveSites_list_menu_import => 'Importalas';
 
   @override
-  String get diveSites_list_menu_select => 'Select sites';
+  String get diveSites_list_menu_select => 'Merülőhelyek kiválasztása';
 
   @override
   String get diveSites_list_search_backTooltip => 'Vissza';

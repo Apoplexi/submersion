@@ -7910,7 +7910,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get diveSites_list_menu_import => '导入';
 
   @override
-  String get diveSites_list_menu_select => 'Select sites';
+  String get diveSites_list_menu_select => '选择潜水点';
 
   @override
   String get diveSites_list_search_backTooltip => '返回';

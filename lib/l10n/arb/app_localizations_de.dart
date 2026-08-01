@@ -8306,7 +8306,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get diveSites_list_menu_import => 'Importieren';
 
   @override
-  String get diveSites_list_menu_select => 'Select sites';
+  String get diveSites_list_menu_select => 'Tauchplätze auswählen';
 
   @override
   String get diveSites_list_search_backTooltip => 'Zurück';

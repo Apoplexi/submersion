@@ -1,4 +1,5 @@
 {
+  "diveSites_list_menu_select": "Duikstekken selecteren",
   "diveLog_edit_geofenceSuggestion_near": "Bij {location}",
   "diveLog_edit_geofenceSuggestion_title": "Uitrustingssuggestie",
   "diveLog_edit_geofenceSuggestion_body": "Set \"{setName}\" toepassen?",
