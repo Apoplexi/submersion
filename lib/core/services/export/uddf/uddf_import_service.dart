@@ -372,13 +372,21 @@ class UddfImportService {
       }
 
       // Get tank volume. UDDF stores cubic meters; normalize to liters
-      // with tolerance for non-conforming exporters (#158).
-      final volumeText = _getElementText(tankDataElement, 'tankvolume');
-      if (volumeText != null) {
+      // with tolerance for non-conforming exporters (#158). An element that
+      // declares its unit is converted exactly instead of being guessed at.
+      final volumeElement = tankDataElement
+          .findElements('tankvolume')
+          .firstOrNull;
+      final volumeText = volumeElement?.innerText.trim();
+      if (volumeText != null && volumeText.isNotEmpty) {
         final rawVolume = double.tryParse(volumeText);
         tankInfo['volume'] = rawVolume == null
             ? null
-            : normalizeUddfTankVolumeToLiters(rawVolume);
+            : normalizeUddfTankVolumeToLiters(
+                rawVolume,
+                strictCubicMeters:
+                    volumeElement?.getAttribute('unit')?.toLowerCase() == 'm3',
+              );
       }
 
       // Get linked gas mix

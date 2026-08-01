@@ -525,8 +525,16 @@ void main() {
   group('tankvolume normalization (#158)', () {
     // Liter-valued fixtures pass through the normalizer unchanged, so only
     // non-literal inputs prove the parse site still calls it.
-    String docWith(String tankVolume, {bool submersionExport = false}) =>
-        '''<uddf version="3.2.1">
+    String docWith(
+      String tankVolume, {
+      String? unit,
+      bool submersionMarker = false,
+    }) {
+      final unitAttr = unit == null ? '' : ' unit="$unit"';
+      final appData = submersionMarker
+          ? '<applicationdata><submersion version="1.0"/></applicationdata>'
+          : '';
+      return '''<uddf version="3.2.1">
   <profiledata>
     <repetitiongroup id="rg">
       <dive id="d1">
@@ -535,7 +543,7 @@ void main() {
           <datetime>2026-01-15T09:00:00</datetime>
         </informationbeforedive>
         <tankdata>
-          <tankvolume>$tankVolume</tankvolume>
+          <tankvolume$unitAttr>$tankVolume</tankvolume>
           <tankpressurebegin>20000000</tankpressurebegin>
           <tankpressureend>5000000</tankpressureend>
         </tankdata>
@@ -546,15 +554,17 @@ void main() {
       </dive>
     </repetitiongroup>
   </profiledata>
-${submersionExport ? '<applicationdata><submersion/></applicationdata>' : ''}
+$appData
 </uddf>''';
+    }
 
     Future<double?> volumeFor(
       String tankVolume, {
-      bool submersionExport = false,
+      String? unit,
+      bool submersionMarker = false,
     }) async {
       final result = await UddfFullImportService().importAllDataFromUddf(
-        docWith(tankVolume, submersionExport: submersionExport),
+        docWith(tankVolume, unit: unit, submersionMarker: submersionMarker),
       );
       final tanks = result.dives.first['tanks'] as List<Map<String, dynamic>>;
       return tanks.first['volume'] as double?;
@@ -572,18 +582,32 @@ ${submersionExport ? '<applicationdata><submersion/></applicationdata>' : ''}
       expect(await volumeFor('24.0'), closeTo(24.0, 0.001));
     });
 
-    test('a Submersion export converts strictly, so large tanks round-trip '
-        'exactly instead of hitting the quirk rung', () async {
-      // 0.06 m3 = 60 L. Without the strict path this lands on the
+    test('a declared m3 unit converts exactly, so large tanks round-trip '
+        'instead of hitting the quirk rung', () async {
+      // 0.06 m3 = 60 L. Without the declared unit this lands on the
       // Diving Log rung and comes back as 6 L.
+      expect(await volumeFor('0.06', unit: 'm3'), closeTo(60.0, 0.001));
+      expect(await volumeFor('0.0111', unit: 'm3'), closeTo(11.1, 0.001));
+    });
+
+    test('a pre-fix Submersion export (marker present, LITERS, no declared '
+        'unit) is not scaled by 1000', () async {
+      // Exports before the unit attribute wrote liters into tankvolume and
+      // carry the same <submersion version="1.0"> marker, so the marker
+      // cannot be used to infer the convention.
       expect(
-        await volumeFor('0.06', submersionExport: true),
-        closeTo(60.0, 0.001),
-      );
-      expect(
-        await volumeFor('0.0111', submersionExport: true),
+        await volumeFor('11.1', submersionMarker: true),
         closeTo(11.1, 0.001),
       );
+      expect(
+        await volumeFor('24.0', submersionMarker: true),
+        closeTo(24.0, 0.001),
+      );
+    });
+
+    test('a mislabelled unit still refuses an impossible volume', () async {
+      // 11.1 m3 would be 11,100 L. Whatever the label says, that is liters.
+      expect(await volumeFor('11.1', unit: 'm3'), closeTo(11.1, 0.001));
     });
   });
 }

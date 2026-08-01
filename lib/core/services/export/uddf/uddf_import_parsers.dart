@@ -16,17 +16,20 @@ import 'package:submersion/features/dive_log/domain/entities/dive.dart';
 /// genuinely ambiguous between a Diving Log 4.5-45 L tank and a
 /// spec-conformant 45-450 L one, and it resolves toward Diving Log because
 /// small cylinders are far more common than 45 L+ single-tank records.
-/// Submersion's own exports never hit that ambiguity: they are recognized
-/// by [strictCubicMeters] and converted exactly.
+/// Exports that declare their unit never hit that ambiguity: they set
+/// [strictCubicMeters] and are converted exactly. Submersion exports made
+/// BEFORE the unit was declared wrote liters, carry no declaration, and so
+/// fall through to the ladder, which reads them correctly.
 double normalizeUddfTankVolumeToLiters(
   double raw, {
   bool strictCubicMeters = false,
 }) {
   if (raw <= 0) return raw;
-  // A file that identifies itself as a Submersion export is known to be
-  // spec-conformant, so no guessing is needed and any volume round-trips
-  // exactly -- including tanks above the plausibility ladder's range.
-  if (strictCubicMeters) return raw * 1000;
+  // A file that DECLARES its unit needs no guessing, so any volume
+  // round-trips exactly -- including tanks above the ladder's range. The
+  // >= 1 guard is a backstop against a mislabelled file: 1 m3 is 1000 L,
+  // which is not a tank, so such a value is liters whatever the label says.
+  if (strictCubicMeters && raw < 1.0) return raw * 1000;
   if (raw <= 0.045) return raw * 1000; // spec cubic meters
   if (raw <= 0.45) return raw * 100; // Diving Log 10x-off quirk
   if (raw <= 45) return raw; // legacy liter exports

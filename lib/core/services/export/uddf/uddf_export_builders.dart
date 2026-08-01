@@ -435,8 +435,15 @@ class UddfExportBuilders {
                 // switches the importer to strict m3 instead of the
                 // exporter-quirk plausibility ladder.
                 if (tank.volume != null) {
+                  // The unit attribute is what makes re-import exact. It is
+                  // not UDDF-standard (other readers ignore it), but our own
+                  // exports before this change wrote LITERS into the same
+                  // element, and nothing else in the file distinguishes the
+                  // two conventions -- inferring from the Submersion marker
+                  // would silently scale those old files by 1000.
                   builder.element(
                     'tankvolume',
+                    attributes: {'unit': 'm3'},
                     nest: (tank.volume! / 1000).toString(),
                   );
                 }
