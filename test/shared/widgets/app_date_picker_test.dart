@@ -73,4 +73,61 @@ void main() {
 
     expect(find.text('dd.mm.yyyy'), findsOneWidget);
   });
+
+  testWidgets('manual entry accepts a day-first text-month preference', (
+    tester,
+  ) async {
+    final picked = await pumpPickerButton(
+      tester,
+      DateFormatPreference.dMMMYYYY,
+    );
+
+    await tester.tap(find.text('pick'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byIcon(Icons.edit_outlined));
+    await tester.pumpAndSettle();
+
+    // D MMM YYYY has no compact input analogue, so the picker falls back to
+    // the day-first numeric locale (en-GB): 31/01 parses, 31 is not a month.
+    await tester.enterText(find.byType(TextField), '31/01/2026');
+    await tester.tap(find.text('OK'));
+    await tester.pumpAndSettle();
+
+    expect(picked(), DateTime(2026, 1, 31));
+  });
+
+  // Every preference must map to a picker locale and a hint; a missing switch
+  // arm would throw when the dialog builds.
+  for (final format in DateFormatPreference.values) {
+    testWidgets('opens the picker for ${format.name}', (tester) async {
+      await pumpPickerButton(tester, format);
+
+      await tester.tap(find.text('pick'));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(DatePickerDialog), findsOneWidget);
+
+      await tester.tap(find.byIcon(Icons.edit_outlined));
+      await tester.pumpAndSettle();
+
+      // Numeric preferences advertise their own pattern as the hint; the
+      // text-month ones defer to Material's default.
+      final usesOwnHint =
+          format != DateFormatPreference.mmmDYYYY &&
+          format != DateFormatPreference.dMMMYYYY;
+      expect(
+        find.text(format.displayName.toLowerCase()),
+        usesOwnHint ? findsOneWidget : findsNothing,
+      );
+
+      // The picker locale also localizes the dialog chrome, so the cancel
+      // label is not always English (de for the dotted preference).
+      final cancelLabel = MaterialLocalizations.of(
+        tester.element(find.byType(DatePickerDialog)),
+      ).cancelButtonLabel;
+      await tester.tap(find.text(cancelLabel));
+      await tester.pumpAndSettle();
+      expect(find.byType(DatePickerDialog), findsNothing);
+    });
+  }
 }
