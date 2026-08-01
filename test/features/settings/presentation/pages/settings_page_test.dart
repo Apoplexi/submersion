@@ -1029,12 +1029,15 @@ void main() {
   });
 
   group('Section navigation stack (#647)', () {
-    Future<GoRouter> pumpSettingsList(WidgetTester tester) async {
+    Future<GoRouter> pumpSettingsList(
+      WidgetTester tester, {
+      String initialLocation = '/settings',
+    }) async {
       await tester.binding.setSurfaceSize(const Size(400, 800));
       addTearDown(() => tester.binding.setSurfaceSize(null));
 
       final router = GoRouter(
-        initialLocation: '/settings',
+        initialLocation: initialLocation,
         routes: [
           GoRoute(
             path: '/settings',
@@ -1080,6 +1083,30 @@ void main() {
       await tester.pumpAndSettle();
 
       // Back on the section list.
+      expect(find.text('Units'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('deep-linked section detail falls back to go() because there '
+        'is nothing on the stack to pop', (tester) async {
+      // Opening ?selected= directly (a deep link or a restored location)
+      // makes the detail page the stack root, so the app-bar back button
+      // cannot pop and must navigate to the section list instead.
+      final router = await pumpSettingsList(
+        tester,
+        initialLocation: '/settings?selected=data',
+      );
+
+      expect(router.canPop(), isFalse);
+
+      await tester.tap(find.byIcon(Icons.arrow_back));
+      await tester.pumpAndSettle();
+
+      expect(
+        router.state.uri.toString(),
+        '/settings',
+        reason: 'the fallback clears the selected-section query parameter',
+      );
       expect(find.text('Units'), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
