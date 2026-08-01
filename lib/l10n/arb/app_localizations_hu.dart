@@ -2491,17 +2491,6 @@ class AppLocalizationsHu extends AppLocalizations {
   String get preDive_dashboard_start => 'Merülés előtti ellenőrzés indítása';
 
   @override
-  String get tools_preDive_title => 'Merülés előtti ellenőrzőlisták';
-
-  @override
-  String get tools_preDive_subtitle =>
-      'Ellenőrzőlista-munkamenetek futtatása és áttekintése';
-
-  @override
-  String get tools_preDive_description =>
-      'Társellenőrzések, CCR összeszerelési listák és felszereléscsomagolás naplózott előzményekkel';
-
-  @override
   String get trips_detail_preDive_action => 'Merülés előtti ellenőrzőlista';
 
   @override
@@ -19935,32 +19924,6 @@ class AppLocalizationsHu extends AppLocalizations {
   String get tankPresets_title => 'Palacksablonok';
 
   @override
-  String get tools_deco_description =>
-      'Szamitsa ki a dekompresszio nelküli limiteket, szukseges deko megalokat es a CNS/OTU terhelest többszintu merülesi profilokhoz.';
-
-  @override
-  String get tools_deco_subtitle =>
-      'Merulesek tervezese dekompressziós megalokkal';
-
-  @override
-  String get tools_deco_title => 'Deko szamologep';
-
-  @override
-  String get tools_disclaimer =>
-      'Ezek a szamologepek csak tervezesi celokat szolgalnak. Mindig ellenorizze a szamitasokat es kovesse a merulesi kepzeset.';
-
-  @override
-  String get tools_gas_description =>
-      'Negy specialis gaz szamologep:\n- MOD - Maximalis üzemi melyseg egy gazkeverekhez\n- Legjobb keverek - Idealis O₂% egy cel melyseghez\n- Fogyasztas - Gaz felhasznalasi becsles\n- Rock Bottom - Veszhelyzeti tartalek szamitas';
-
-  @override
-  String get tools_gas_subtitle =>
-      'MOD, Legjobb keverek, Fogyasztas, Rock Bottom';
-
-  @override
-  String get tools_gas_title => 'Gaz szamologepek';
-
-  @override
   String get tools_gpsLogger_description =>
       'Rögzítsd a pozíciódat a merülőnap során, és párosítsd automatikusan az importált merüléseket GPS-helyekhez.';
 
@@ -19969,9 +19932,6 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get tools_gpsLogger_title => 'GPS-naplózó';
-
-  @override
-  String get tools_title => 'Eszkozok';
 
   @override
   String get tools_weight_aluminumImperial => 'Uresbben pozitivabb (+4 lbs)';
@@ -19987,10 +19947,6 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get tools_weight_carbonFiberMetric => 'Nagyon pozitiv (+3 kg)';
-
-  @override
-  String get tools_weight_description =>
-      'Becsülje meg a szükseges sülyt az expoziciós ruha, palackanyag, viztipus es testtomeg alapjan.';
 
   @override
   String get tools_weight_disclaimer =>
@@ -20028,9 +19984,6 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get tools_weight_steelMetric => 'Negativ felhajtoeroe (-2 kg)';
-
-  @override
-  String get tools_weight_subtitle => 'Ajanlott suly az összeallitasahoz';
 
   @override
   String get tools_weight_tankMaterial => 'Palack anyag';

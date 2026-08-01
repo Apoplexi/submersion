@@ -2509,17 +2509,6 @@ class AppLocalizationsDe extends AppLocalizations {
   String get preDive_dashboard_start => 'Check vor dem Tauchgang starten';
 
   @override
-  String get tools_preDive_title => 'Checklisten vor dem Tauchgang';
-
-  @override
-  String get tools_preDive_subtitle =>
-      'Checklisten-Durchläufe starten und einsehen';
-
-  @override
-  String get tools_preDive_description =>
-      'Buddy-Checks, CCR-Aufbaulisten und Ausrüstungspacken mit Prüfprotokoll';
-
-  @override
   String get trips_detail_preDive_action => 'Checkliste vor dem Tauchgang';
 
   @override
@@ -19958,30 +19947,6 @@ class AppLocalizationsDe extends AppLocalizations {
   String get tankPresets_title => 'Flaschenvorlagen';
 
   @override
-  String get tools_deco_description =>
-      'Berechnen Sie Nullzeitgrenzen, erforderliche Dekostopps und CNS/OTU-Belastung für mehrstufige Tauchprofile.';
-
-  @override
-  String get tools_deco_subtitle => 'Tauchgänge mit Dekostopps planen';
-
-  @override
-  String get tools_deco_title => 'Deko-Rechner';
-
-  @override
-  String get tools_disclaimer =>
-      'Diese Rechner dienen nur der Planung. Überprüfen Sie die Berechnungen immer und folgen Sie Ihrer Tauchausbildung.';
-
-  @override
-  String get tools_gas_description =>
-      'Vier spezialisierte Gasrechner:\n- MOD - Maximale Einsatztiefe für ein Gasgemisch\n- Best Mix - Idealer O2-Anteil für eine Zieltiefe\n- Verbrauch - Gasverbrauchsschätzung\n- Rock Bottom - Notreserve-Berechnung';
-
-  @override
-  String get tools_gas_subtitle => 'MOD, Best Mix, Verbrauch, Rock Bottom';
-
-  @override
-  String get tools_gas_title => 'Gasrechner';
-
-  @override
   String get tools_gpsLogger_description =>
       'Zeichne deine Position während eines Tauchtags auf und ordne importierte Tauchgänge automatisch GPS-Positionen zu.';
 
@@ -19990,9 +19955,6 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get tools_gpsLogger_title => 'GPS-Logger';
-
-  @override
-  String get tools_title => 'Werkzeuge';
 
   @override
   String get tools_weight_aluminumImperial =>
@@ -20011,10 +19973,6 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get tools_weight_carbonFiberMetric => 'Sehr auftriebspositiv (+3 kg)';
-
-  @override
-  String get tools_weight_description =>
-      'Schätzen Sie das benötigte Blei basierend auf Tauchanzug, Flaschenmaterial, Wassertyp und Körpergewicht.';
 
   @override
   String get tools_weight_disclaimer =>
@@ -20052,10 +20010,6 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get tools_weight_steelMetric => 'Auftriebsnegativ (-2 kg)';
-
-  @override
-  String get tools_weight_subtitle =>
-      'Empfohlenes Gewicht für Ihre Konfiguration';
 
   @override
   String get tools_weight_tankMaterial => 'Flaschenmaterial';

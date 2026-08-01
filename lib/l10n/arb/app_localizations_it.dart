@@ -2501,17 +2501,6 @@ class AppLocalizationsIt extends AppLocalizations {
   String get preDive_dashboard_start => 'Avvia controllo pre-immersione';
 
   @override
-  String get tools_preDive_title => 'Checklist pre-immersione';
-
-  @override
-  String get tools_preDive_subtitle =>
-      'Esegui e rivedi le sessioni di checklist';
-
-  @override
-  String get tools_preDive_description =>
-      'Buddy check, liste di montaggio CCR e preparazione dell\'attrezzatura con registro delle verifiche';
-
-  @override
   String get trips_detail_preDive_action => 'Checklist pre-immersione';
 
   @override
@@ -19991,30 +19980,6 @@ class AppLocalizationsIt extends AppLocalizations {
   String get tankPresets_title => 'Preset bombole';
 
   @override
-  String get tools_deco_description =>
-      'Calcola i limiti di non decompressione, le tappe deco richieste e l\'esposizione CNS/OTU per profili multilivello.';
-
-  @override
-  String get tools_deco_subtitle => 'Pianifica immersioni con tappe deco';
-
-  @override
-  String get tools_deco_title => 'Calcolatore deco';
-
-  @override
-  String get tools_disclaimer =>
-      'Questi calcolatori sono solo a scopo di pianificazione. Verifica sempre i calcoli e segui la tua formazione subacquea.';
-
-  @override
-  String get tools_gas_description =>
-      'Quattro calcolatori gas specializzati:\n• MOD - Profondità massima operativa per una miscela\n• Best Mix - O₂% ideale per una profondità target\n• Consumo - Stima del consumo di gas\n• Rock Bottom - Calcolo della riserva di emergenza';
-
-  @override
-  String get tools_gas_subtitle => 'MOD, Best Mix, Consumo, Rock Bottom';
-
-  @override
-  String get tools_gas_title => 'Calcolatori gas';
-
-  @override
   String get tools_gpsLogger_description =>
       'Registra la tua posizione durante una giornata di immersioni e abbina automaticamente le immersioni importate alle posizioni GPS.';
 
@@ -20023,9 +19988,6 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get tools_gpsLogger_title => 'Registratore GPS';
-
-  @override
-  String get tools_title => 'Strumenti';
 
   @override
   String get tools_weight_aluminumImperial =>
@@ -20042,10 +20004,6 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get tools_weight_carbonFiberMetric => 'Molto galleggiante (+3 kg)';
-
-  @override
-  String get tools_weight_description =>
-      'Stima la zavorra necessaria in base a muta, materiale della bombola, tipo di acqua e peso corporeo.';
 
   @override
   String get tools_weight_disclaimer =>
@@ -20083,10 +20041,6 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get tools_weight_steelMetric => 'Galleggiabilità negativa (-2 kg)';
-
-  @override
-  String get tools_weight_subtitle =>
-      'Zavorra consigliata per la tua configurazione';
 
   @override
   String get tools_weight_tankMaterial => 'Materiale bombola';

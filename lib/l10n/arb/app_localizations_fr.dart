@@ -2512,17 +2512,6 @@ class AppLocalizationsFr extends AppLocalizations {
   String get preDive_dashboard_start => 'Démarrer la vérification pré-plongée';
 
   @override
-  String get tools_preDive_title => 'Checklists pré-plongée';
-
-  @override
-  String get tools_preDive_subtitle =>
-      'Lancez et consultez les sessions de checklist';
-
-  @override
-  String get tools_preDive_description =>
-      'Vérifications entre binômes, listes de montage CCR et préparation du matériel avec traçabilité';
-
-  @override
   String get trips_detail_preDive_action => 'Checklist pré-plongée';
 
   @override
@@ -20065,31 +20054,6 @@ class AppLocalizationsFr extends AppLocalizations {
   String get tankPresets_title => 'Presets de blocs';
 
   @override
-  String get tools_deco_description =>
-      'Calculez les limites de non-decompression, les paliers de deco requis et l\'exposition CNS/OTU pour les profils de plongee multi-niveaux.';
-
-  @override
-  String get tools_deco_subtitle =>
-      'Planifiez vos plongees avec paliers de deco';
-
-  @override
-  String get tools_deco_title => 'Calculateur de deco';
-
-  @override
-  String get tools_disclaimer =>
-      'Ces calculateurs sont fournis a titre indicatif uniquement. Verifiez toujours les calculs et suivez votre formation de plongee.';
-
-  @override
-  String get tools_gas_description =>
-      'Quatre calculateurs de gaz specialises :\n- MOD - Profondeur maximale d\'utilisation d\'un melange\n- Best Mix - O2% ideal pour une profondeur cible\n- Consommation - Estimation de la consommation de gaz\n- Rock Bottom - Calcul de la reserve d\'urgence';
-
-  @override
-  String get tools_gas_subtitle => 'MOD, Best Mix, Consommation, Rock Bottom';
-
-  @override
-  String get tools_gas_title => 'Calculateurs de gaz';
-
-  @override
   String get tools_gpsLogger_description =>
       'Enregistrez votre position pendant une journée de plongée et associez automatiquement les plongées importées à des positions GPS.';
 
@@ -20098,9 +20062,6 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get tools_gpsLogger_title => 'Enregistreur GPS';
-
-  @override
-  String get tools_title => 'Outils';
 
   @override
   String get tools_weight_aluminumImperial => 'Plus flottant a vide (+4 lbs)';
@@ -20116,10 +20077,6 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get tools_weight_carbonFiberMetric => 'Tres flottant (+3 kg)';
-
-  @override
-  String get tools_weight_description =>
-      'Estimez le lestage necessaire en fonction de votre combinaison, du materiau du bloc, du type d\'eau et de votre poids.';
 
   @override
   String get tools_weight_disclaimer =>
@@ -20157,10 +20114,6 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get tools_weight_steelMetric => 'Flottabilite negative (-2 kg)';
-
-  @override
-  String get tools_weight_subtitle =>
-      'Lestage recommande pour votre configuration';
 
   @override
   String get tools_weight_tankMaterial => 'Materiau du bloc';

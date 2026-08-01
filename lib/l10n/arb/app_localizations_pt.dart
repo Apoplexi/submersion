@@ -2506,17 +2506,6 @@ class AppLocalizationsPt extends AppLocalizations {
   String get preDive_dashboard_start => 'Iniciar verificação pré-mergulho';
 
   @override
-  String get tools_preDive_title => 'Listas de Verificação Pré-Mergulho';
-
-  @override
-  String get tools_preDive_subtitle =>
-      'Executar e revisar sessões de lista de verificação';
-
-  @override
-  String get tools_preDive_description =>
-      'Verificações de dupla, listas de montagem de CCR e preparação de equipamento com trilha de auditoria';
-
-  @override
   String get trips_detail_preDive_action => 'Lista de verificação pré-mergulho';
 
   @override
@@ -19996,31 +19985,6 @@ class AppLocalizationsPt extends AppLocalizations {
   String get tankPresets_title => 'Presets de Cilindro';
 
   @override
-  String get tools_deco_description =>
-      'Calcule limites de nao descompressao, paradas deco necessarias e exposicao CNS/OTU para perfis de mergulho multinivel.';
-
-  @override
-  String get tools_deco_subtitle =>
-      'Planeje mergulhos com paradas de descompressao';
-
-  @override
-  String get tools_deco_title => 'Calculadora Deco';
-
-  @override
-  String get tools_disclaimer =>
-      'Estas calculadoras sao apenas para fins de planeamento. Sempre verifique os calculos e siga o seu treinamento de mergulho.';
-
-  @override
-  String get tools_gas_description =>
-      'Quatro calculadoras de gas especializadas:\n- MOD - Profundidade maxima operacional para uma mistura\n- Best Mix - O2% ideal para uma profundidade alvo\n- Consumo - Estimativa de uso de gas\n- Rock Bottom - Calculo de reserva de emergencia';
-
-  @override
-  String get tools_gas_subtitle => 'MOD, Best Mix, Consumo, Rock Bottom';
-
-  @override
-  String get tools_gas_title => 'Calculadoras de Gas';
-
-  @override
   String get tools_gpsLogger_description =>
       'Grave sua posição durante um dia de mergulho e associe automaticamente os mergulhos importados a localizações GPS.';
 
@@ -20029,9 +19993,6 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get tools_gpsLogger_title => 'Registrador GPS';
-
-  @override
-  String get tools_title => 'Ferramentas';
 
   @override
   String get tools_weight_aluminumImperial =>
@@ -20049,10 +20010,6 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get tools_weight_carbonFiberMetric => 'Muito flutuante (+3 kg)';
-
-  @override
-  String get tools_weight_description =>
-      'Estime o lastro necessario com base na sua roupa, material do cilindro, tipo de agua e peso corporal.';
 
   @override
   String get tools_weight_disclaimer =>
@@ -20090,10 +20047,6 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get tools_weight_steelMetric => 'Flutuabilidade negativa (-2 kg)';
-
-  @override
-  String get tools_weight_subtitle =>
-      'Lastro recomendado para o seu equipamento';
 
   @override
   String get tools_weight_tankMaterial => 'Material do Cilindro';

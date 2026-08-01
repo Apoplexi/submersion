@@ -2430,16 +2430,6 @@ class AppLocalizationsHe extends AppLocalizations {
   String get preDive_dashboard_start => 'התחל בדיקה לפני צלילה';
 
   @override
-  String get tools_preDive_title => 'רשימות בדיקה לפני צלילה';
-
-  @override
-  String get tools_preDive_subtitle => 'הרץ וסקור הרצות של רשימות בדיקה';
-
-  @override
-  String get tools_preDive_description =>
-      'בדיקות באדי, רשימות הרכבת CCR ואריזת ציוד עם תיעוד ביקורת';
-
-  @override
   String get trips_detail_preDive_action => 'רשימת בדיקה לפני צלילה';
 
   @override
@@ -19494,30 +19484,6 @@ class AppLocalizationsHe extends AppLocalizations {
   String get tankPresets_title => 'תבניות מיכל';
 
   @override
-  String get tools_deco_description =>
-      'חשב מגבלות ללא-דקומפרסיה, עצירות דקו נדרשות, וחשיפת CNS/OTU לפרופילי צלילה מרובי-שכבות.';
-
-  @override
-  String get tools_deco_subtitle => 'תכנן צלילות עם עצירות דקומפרסיה';
-
-  @override
-  String get tools_deco_title => 'מחשבון דקו';
-
-  @override
-  String get tools_disclaimer =>
-      'מחשבונים אלו מיועדים לתכנון בלבד. תמיד אמת חישובים ופעל לפי הכשרת הצלילה שלך.';
-
-  @override
-  String get tools_gas_description =>
-      'ארבעה מחשבוני גז מתמחים:\n• MOD - עומק פעולה מרבי לתערובת גז\n• Best Mix - אחוז O₂ אידיאלי לעומק יעד\n• Consumption - הערכת צריכת גז\n• Rock Bottom - חישוב עתודה לחירום';
-
-  @override
-  String get tools_gas_subtitle => 'MOD, Best Mix, צריכה, Rock Bottom';
-
-  @override
-  String get tools_gas_title => 'מחשבוני גז';
-
-  @override
   String get tools_gpsLogger_description =>
       'הקלט את מיקומך במהלך יום צלילה והתאם אוטומטית צלילות מיובאות למיקומי GPS.';
 
@@ -19526,9 +19492,6 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get tools_gpsLogger_title => 'מקליט GPS';
-
-  @override
-  String get tools_title => 'כלים';
 
   @override
   String get tools_weight_aluminumImperial => 'ציפה יותר כשריק (+4 lbs)';
@@ -19544,10 +19507,6 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get tools_weight_carbonFiberMetric => 'ציפה מאוד (+3 kg)';
-
-  @override
-  String get tools_weight_description =>
-      'הערך את המשקל הנדרש על סמך חליפת החשיפה, חומר המיכל, סוג המים ומשקל הגוף.';
 
   @override
   String get tools_weight_disclaimer =>
@@ -19584,9 +19543,6 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get tools_weight_steelMetric => 'שלילי ציפה (-2 kg)';
-
-  @override
-  String get tools_weight_subtitle => 'משקל מומלץ להתקנה שלך';
 
   @override
   String get tools_weight_tankMaterial => 'חומר מיכל';

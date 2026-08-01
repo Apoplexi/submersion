@@ -2451,16 +2451,6 @@ class AppLocalizationsAr extends AppLocalizations {
   String get preDive_dashboard_start => 'بدء فحص ما قبل الغوص';
 
   @override
-  String get tools_preDive_title => 'قوائم تحقق ما قبل الغوص';
-
-  @override
-  String get tools_preDive_subtitle => 'تشغيل جلسات قوائم التحقق ومراجعتها';
-
-  @override
-  String get tools_preDive_description =>
-      'فحوصات رفيق الغوص، وقوائم تجهيز CCR، وتوضيب المعدات مع سجل تدقيق';
-
-  @override
   String get trips_detail_preDive_action => 'قائمة تحقق ما قبل الغوص';
 
   @override
@@ -19636,30 +19626,6 @@ class AppLocalizationsAr extends AppLocalizations {
   String get tankPresets_title => 'إعدادات الأسطوانات';
 
   @override
-  String get tools_deco_description =>
-      'احسب حدود عدم تخفيف الضغط، ووقفات التخفيف المطلوبة، والتعرض لـ CNS/OTU لملفات الغطسات متعددة المستويات.';
-
-  @override
-  String get tools_deco_subtitle => 'خطط للغطسات مع وقفات تخفيف الضغط';
-
-  @override
-  String get tools_deco_title => 'حاسبة تخفيف الضغط';
-
-  @override
-  String get tools_disclaimer =>
-      'هذه الحاسبات للتخطيط فقط. تحقق دائمًا من الحسابات واتبع تدريبك على الغوص.';
-
-  @override
-  String get tools_gas_description =>
-      'أربع حاسبات غاز متخصصة:\n- MOD - أقصى عمق تشغيلي لخليط غاز\n- Best Mix - نسبة O₂ المثالية لعمق مستهدف\n- الاستهلاك - تقدير استخدام الغاز\n- الحد الأدنى - حساب احتياطي الطوارئ';
-
-  @override
-  String get tools_gas_subtitle => 'MOD، Best Mix، الاستهلاك، الحد الأدنى';
-
-  @override
-  String get tools_gas_title => 'حاسبات الغاز';
-
-  @override
   String get tools_gpsLogger_description =>
       'سجّل موقعك خلال يوم الغطس وتتم مطابقة الغطسات المستوردة مع مواقع GPS تلقائيًا.';
 
@@ -19668,9 +19634,6 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get tools_gpsLogger_title => 'مسجّل GPS';
-
-  @override
-  String get tools_title => 'الأدوات';
 
   @override
   String get tools_weight_aluminumImperial => 'أكثر طفوًا عند الفراغ (+4 lbs)';
@@ -19686,10 +19649,6 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get tools_weight_carbonFiberMetric => 'طفو عالٍ جدًا (+3 kg)';
-
-  @override
-  String get tools_weight_description =>
-      'قدّر الوزن المطلوب بناءً على بدلة الغوص ومادة الأسطوانة ونوع الماء ووزن الجسم.';
 
   @override
   String get tools_weight_disclaimer =>
@@ -19726,9 +19685,6 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get tools_weight_steelMetric => 'طفو سلبي (-2 kg)';
-
-  @override
-  String get tools_weight_subtitle => 'الوزن الموصى به لإعدادك';
 
   @override
   String get tools_weight_tankMaterial => 'مادة الأسطوانة';

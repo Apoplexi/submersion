@@ -2485,16 +2485,6 @@ class AppLocalizationsNl extends AppLocalizations {
   String get preDive_dashboard_start => 'Pre-dive check starten';
 
   @override
-  String get tools_preDive_title => 'Pre-dive checklists';
-
-  @override
-  String get tools_preDive_subtitle => 'Checklistsessies uitvoeren en bekijken';
-
-  @override
-  String get tools_preDive_description =>
-      'Buddychecks, CCR-opbouwlijsten en het inpakken van uitrusting, met een audittrail';
-
-  @override
   String get trips_detail_preDive_action => 'Pre-dive checklist';
 
   @override
@@ -19829,30 +19819,6 @@ class AppLocalizationsNl extends AppLocalizations {
   String get tankPresets_title => 'Flesinstellingen';
 
   @override
-  String get tools_deco_description =>
-      'Bereken no-decompressielimieten, vereiste decostops en CNS/OTU-blootstelling voor duikprofielen op meerdere niveaus.';
-
-  @override
-  String get tools_deco_subtitle => 'Plan duiken met decostops';
-
-  @override
-  String get tools_deco_title => 'Decocalculator';
-
-  @override
-  String get tools_disclaimer =>
-      'Deze calculators zijn alleen bedoeld voor planningsdoeleinden. Controleer berekeningen altijd en volg je duikopleiding.';
-
-  @override
-  String get tools_gas_description =>
-      'Vier gespecialiseerde gascalculators:\n• MOD - Maximale werkdiepte voor een gasmengsel\n• Beste mix - Ideaal O2% voor een doeldiepte\n• Verbruik - Schatting gasverbruik\n• Rock Bottom - Berekening noodreserve';
-
-  @override
-  String get tools_gas_subtitle => 'MOD, Beste mix, Verbruik, Rock Bottom';
-
-  @override
-  String get tools_gas_title => 'Gascalculators';
-
-  @override
   String get tools_gpsLogger_description =>
       'Registreer je positie tijdens een duikdag en koppel geïmporteerde duiken automatisch aan GPS-locaties.';
 
@@ -19861,9 +19827,6 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get tools_gpsLogger_title => 'GPS-logger';
-
-  @override
-  String get tools_title => 'Gereedschap';
 
   @override
   String get tools_weight_aluminumImperial =>
@@ -19881,10 +19844,6 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get tools_weight_carbonFiberMetric => 'Zeer drijvend (+3 kg)';
-
-  @override
-  String get tools_weight_description =>
-      'Schat het gewicht dat je nodig hebt op basis van je duikpak, flesmateriaal, watertype en lichaamsgewicht.';
 
   @override
   String get tools_weight_disclaimer =>
@@ -19922,9 +19881,6 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get tools_weight_steelMetric => 'Negatief drijvend (-2 kg)';
-
-  @override
-  String get tools_weight_subtitle => 'Aanbevolen gewicht voor je opstelling';
 
   @override
   String get tools_weight_tankMaterial => 'Flesmateriaal';
