@@ -214,10 +214,14 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
     }
 
     // On desktop, redirect standalone detail pages to master-detail view.
-    // Skip in table mode -- table view has no master-detail split to redirect into.
+    // Skip in table mode -- table view has no master-detail split to redirect
+    // into. Also skip when the page was explicitly opened full-page
+    // (?fullpage=1), so "Open Full Page" isn't bounced straight back into the
+    // pane it was opened from.
     if (!widget.embedded &&
         !_hasRedirected &&
-        ResponsiveBreakpoints.isMasterDetail(context)) {
+        ResponsiveBreakpoints.isMasterDetail(context) &&
+        GoRouterState.of(context).uri.queryParameters['fullpage'] != '1') {
       final viewMode = ref.read(diveListViewModeProvider);
       if (viewMode != ListViewMode.table) {
         _hasRedirected = true;
@@ -928,8 +932,10 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
                   _showDeleteConfirmation(context, ref);
                   break;
                 case 'open':
-                  // Open in full page mode
-                  context.go('/dives/$diveId');
+                  // Open in full-page mode. push (not go) so there's a back
+                  // button, and ?fullpage=1 so the page doesn't redirect
+                  // itself straight back into the master-detail pane.
+                  context.push('/dives/$diveId?fullpage=1');
                   break;
               }
             },

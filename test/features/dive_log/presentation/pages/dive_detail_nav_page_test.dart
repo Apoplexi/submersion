@@ -15,13 +15,14 @@ Future<List<String>> _pumpNav(
   WidgetTester tester, {
   required bool embedded,
   required Size size,
+  String initialLocation = '/dives',
 }) async {
   final dive = createTestDiveWithBottomTime(id: 'b');
   final overrides = await getBaseOverrides();
   final locations = <String>[];
 
   final router = GoRouter(
-    initialLocation: '/dives',
+    initialLocation: initialLocation,
     routes: [
       GoRoute(
         path: '/dives',
@@ -110,5 +111,36 @@ void main() {
     await tester.tap(find.byIcon(Icons.chevron_right));
     await tester.pump();
     expect(locations.last, '/dives/c');
+  });
+
+  testWidgets('standalone wide: a plain detail path redirects into the pane', (
+    tester,
+  ) async {
+    // Baseline for the fullpage case below: at master-detail width a
+    // standalone /dives/:id bounces into /dives?selected=:id.
+    final locations = await _pumpNav(
+      tester,
+      embedded: false,
+      size: const Size(1200, 800),
+      initialLocation: '/dives/b',
+    );
+
+    expect(locations.last, '/dives?selected=b');
+  });
+
+  testWidgets('standalone wide: ?fullpage=1 opens full page without redirect', (
+    tester,
+  ) async {
+    // "Open Full Page" navigates with ?fullpage=1; the page must not redirect
+    // itself straight back into the master-detail pane.
+    final locations = await _pumpNav(
+      tester,
+      embedded: false,
+      size: const Size(1200, 800),
+      initialLocation: '/dives/b?fullpage=1',
+    );
+
+    expect(locations.where((l) => l.contains('selected=')), isEmpty);
+    expect(locations.last, '/dives/b?fullpage=1');
   });
 }
