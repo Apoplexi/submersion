@@ -9,6 +9,12 @@ on:
     workflows: ["CI/CD"]
     types: [completed]
     branches: [main]
+  # TEMPORARY pre-merge smoke trigger: workflow_dispatch cannot target a
+  # workflow absent from the default branch. Delete before merging
+  # release-channels-phase1-2.
+  push:
+    branches: [release-channels-phase1-2]
+    paths: ['.github/workflows/beta.yml']
   workflow_dispatch:
     inputs:
       skip-publish:
