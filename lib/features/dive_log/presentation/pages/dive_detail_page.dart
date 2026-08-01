@@ -836,12 +836,19 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
           CircleAvatar(
             radius: 16,
             backgroundColor: colorScheme.primaryContainer,
-            child: Text(
-              '#${dive.diveNumber ?? '-'}',
-              style: TextStyle(
-                color: colorScheme.onPrimaryContainer,
-                fontWeight: FontWeight.bold,
-                fontSize: 11,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 3),
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(
+                  '#${dive.diveNumber ?? '-'}',
+                  maxLines: 1,
+                  style: TextStyle(
+                    color: colorScheme.onPrimaryContainer,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 11,
+                  ),
+                ),
               ),
             ),
           ),
@@ -1009,18 +1016,30 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
         children: [
           Row(
             children: [
-              CircleAvatar(
-                radius: 24,
-                backgroundColor: colorScheme.primaryContainer,
-                child: Text(
-                  '#${dive.diveNumber ?? '-'}',
-                  style: TextStyle(
-                    color: colorScheme.onPrimaryContainer,
-                    fontWeight: FontWeight.bold,
+              // In the embedded master-detail pane the pinned header already
+              // shows the dive number, so skip it here to avoid repeating it.
+              // On the standalone full page there is no such header, so keep it.
+              if (!widget.embedded) ...[
+                CircleAvatar(
+                  radius: 24,
+                  backgroundColor: colorScheme.primaryContainer,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 4),
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text(
+                        '#${dive.diveNumber ?? '-'}',
+                        maxLines: 1,
+                        style: TextStyle(
+                          color: colorScheme.onPrimaryContainer,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(width: 16),
+                const SizedBox(width: 16),
+              ],
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
