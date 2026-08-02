@@ -7,6 +7,8 @@ import 'package:submersion/features/safety/domain/services/no_fly_service.dart';
 import 'package:go_router/go_router.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:submersion/features/auto_update/domain/entities/update_status.dart';
+import 'package:submersion/features/auto_update/presentation/providers/update_providers.dart';
 // ignore: implementation_imports
 import 'package:riverpod/src/framework.dart' as riverpod show Override;
 import 'package:submersion/core/providers/provider.dart';
@@ -778,10 +780,15 @@ void main() {
 
     /// Seeds prefs so the UpdateStatusNotifier's delayed startup check
     /// short-circuits; tests still pump 6s to drain the timer itself.
-    Future<List<Override>> aboutOverrides({String? channel}) async {
+    Future<List<Override>> aboutOverrides({
+      String? channel,
+      Map<String, Object> extraPrefs = const {},
+      UpdateStatus? status,
+    }) async {
       SharedPreferences.setMockInitialValues({
         'auto_update_enabled': false,
         'update_release_channel': ?channel,
+        ...extraPrefs,
       });
       final aboutPrefs = await SharedPreferences.getInstance();
       // Mirrors getOverrides() but with these prefs; a provider must not be
@@ -797,6 +804,13 @@ void main() {
         diverListNotifierProvider.overrideWith(
           (ref) => _MockDiverListNotifier(),
         ),
+        // No real update service: channel-switch tests exercise the settings
+        // flow, not Sparkle/GitHub polling.
+        updateServiceProvider.overrideWith((ref) async => null),
+        if (status != null)
+          updateStatusProvider.overrideWith(
+            (ref) => UpdateStatusNotifier(ref)..state = status,
+          ),
       ];
     }
 
@@ -824,6 +838,149 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Receive beta updates?'), findsOneWidget);
+    });
+
+    testWidgets('confirming the beta dialog switches the channel', (
+      tester,
+    ) async {
+      await tester.pumpWidget(buildAboutWidget(await aboutOverrides()));
+      await tester.pumpAndSettle();
+      await tester.pump(const Duration(seconds: 6));
+
+      await tester.scrollUntilVisible(find.text('Update channel'), 100);
+      await tester.tap(find.text('Update channel'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Beta'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Switch to Beta'));
+      await tester.pumpAndSettle();
+
+      final prefs = await SharedPreferences.getInstance();
+      expect(prefs.getString('update_release_channel'), 'beta');
+      expect(find.text('Beta'), findsOneWidget); // channel row subtitle
+    });
+
+    testWidgets('cancelling the beta dialog keeps the stable channel', (
+      tester,
+    ) async {
+      await tester.pumpWidget(buildAboutWidget(await aboutOverrides()));
+      await tester.pumpAndSettle();
+      await tester.pump(const Duration(seconds: 6));
+
+      await tester.scrollUntilVisible(find.text('Update channel'), 100);
+      await tester.tap(find.text('Update channel'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Beta'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Cancel'));
+      await tester.pumpAndSettle();
+
+      final prefs = await SharedPreferences.getInstance();
+      expect(prefs.getString('update_release_channel'), isNull);
+    });
+
+    testWidgets('re-selecting the current channel is a no-op', (tester) async {
+      await tester.pumpWidget(buildAboutWidget(await aboutOverrides()));
+      await tester.pumpAndSettle();
+      await tester.pump(const Duration(seconds: 6));
+
+      await tester.scrollUntilVisible(find.text('Update channel'), 100);
+      await tester.tap(find.text('Update channel'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Tested releases only'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Receive beta updates?'), findsNothing);
+      final prefs = await SharedPreferences.getInstance();
+      expect(prefs.getString('update_release_channel'), isNull);
+    });
+
+    testWidgets('switching back to stable shows the ride-forward notice', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        buildAboutWidget(await aboutOverrides(channel: 'beta')),
+      );
+      await tester.pumpAndSettle();
+      await tester.pump(const Duration(seconds: 6));
+
+      await tester.scrollUntilVisible(find.text('Update channel'), 100);
+      await tester.tap(find.text('Update channel'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Tested releases only'));
+      await tester.pumpAndSettle();
+
+      final prefs = await SharedPreferences.getInstance();
+      expect(prefs.getString('update_release_channel'), 'stable');
+      expect(
+        find.textContaining('until the next stable release'),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('status text renders the downloading and ready states', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        buildAboutWidget(
+          await aboutOverrides(status: const Downloading(progress: 0.42)),
+        ),
+      );
+      await tester.pumpAndSettle();
+      await tester.pump(const Duration(seconds: 6));
+      await tester.scrollUntilVisible(find.text('Downloading... 42%'), 100);
+      expect(find.text('Downloading... 42%'), findsOneWidget);
+    });
+
+    testWidgets('status text renders ready-to-install and error states', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        buildAboutWidget(
+          await aboutOverrides(
+            status: const ReadyToInstall(version: '9.9.9', localPath: '/tmp/x'),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      await tester.pump(const Duration(seconds: 6));
+      await tester.scrollUntilVisible(
+        find.text('Version 9.9.9 ready to install'),
+        100,
+      );
+      expect(find.text('Version 9.9.9 ready to install'), findsOneWidget);
+    });
+
+    testWidgets('status text renders the error state', (tester) async {
+      await tester.pumpWidget(
+        buildAboutWidget(
+          await aboutOverrides(status: const UpdateError(message: 'offline')),
+        ),
+      );
+      await tester.pumpAndSettle();
+      await tester.pump(const Duration(seconds: 6));
+      await tester.scrollUntilVisible(find.text('Error: offline'), 100);
+      expect(find.text('Error: offline'), findsOneWidget);
+    });
+
+    testWidgets('a recorded last-check time is formatted, not Never', (
+      tester,
+    ) async {
+      final lastCheck = DateTime(2026, 7, 4, 9, 5);
+      await tester.pumpWidget(
+        buildAboutWidget(
+          await aboutOverrides(
+            extraPrefs: {
+              'auto_update_last_check': lastCheck.millisecondsSinceEpoch,
+            },
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      await tester.pump(const Duration(seconds: 6));
+      await tester.scrollUntilVisible(find.text('Last checked'), 100);
+      expect(find.text('7/4/2026 09:05'), findsOneWidget);
+      expect(find.text('Never'), findsNothing);
     });
 
     testWidgets('version row shows a beta badge on the beta channel', (
