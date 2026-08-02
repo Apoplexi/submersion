@@ -357,7 +357,12 @@ jobs:
       - name: Setup Google Play service account key
         env:
           GOOGLE_PLAY_SERVICE_ACCOUNT_KEY: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_KEY }}
-        run: echo "$GOOGLE_PLAY_SERVICE_ACCOUNT_KEY" > android/fastlane/play-store-key.json
+        # The secret is stored base64-encoded; release.yml decodes it the same
+        # way and has authenticated against Play in production. Writing it raw
+        # yields base64 text in a .json file and fastlane fails to parse it.
+        run: |
+          echo "$GOOGLE_PLAY_SERVICE_ACCOUNT_KEY" | base64 --decode > android/fastlane/play-store-key.json
+          chmod 600 android/fastlane/play-store-key.json
 
       - name: Download Android AAB artifact
         uses: actions/download-artifact@v8
