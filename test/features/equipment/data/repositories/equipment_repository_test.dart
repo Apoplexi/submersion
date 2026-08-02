@@ -261,6 +261,31 @@ void main() {
         );
       });
 
+      test('a non-retired status filter matches only that status', () async {
+        await repository.createEquipment(
+          createTestEquipment(name: 'Active Reg'),
+        );
+        await repository.createEquipment(
+          createTestEquipment(
+            name: 'Loaned Reg',
+            status: EquipmentStatus.loaned,
+          ),
+        );
+        await repository.createEquipment(
+          createTestEquipment(name: 'Retired Reg', isActive: false),
+        );
+
+        expect(
+          (await repository.getEquipmentByStatus(
+            EquipmentStatus.loaned,
+          )).map((e) => e.name),
+          ['Loaned Reg'],
+          reason:
+              'only the Retired filter widens to the legacy isActive flag; '
+              'other statuses match on status alone',
+        );
+      });
+
       test('legacy isActive-only retirements still list as retired', () async {
         // Written by the pre-fix retire path: isActive false, status active.
         await repository.createEquipment(

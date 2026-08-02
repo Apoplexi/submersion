@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -497,5 +498,176 @@ void main() {
         expect(bravo.isSelected, isTrue);
       },
     );
+  });
+
+  group('filter selection and refresh target the right provider (#636)', () {
+    Future<void> pumpPhoneList(
+      WidgetTester tester,
+      List<EquipmentItem> items,
+    ) async {
+      final overrides = await _buildPhoneOverrides(
+        items: items,
+        viewMode: ListViewMode.detailed,
+      );
+      await tester.pumpWidget(
+        testApp(
+          overrides: overrides,
+          child: const EquipmentListContent(showAppBar: false),
+        ),
+      );
+      await tester.pumpAndSettle();
+    }
+
+    testWidgets('selecting a status filter switches to the status provider', (
+      tester,
+    ) async {
+      await pumpPhoneList(tester, [
+        _makeEquipment(id: 'e1', name: 'Alpha Reg'),
+        _makeEquipment(
+          id: 'e2',
+          name: 'Old BCD',
+          status: EquipmentStatus.retired,
+        ),
+      ]);
+
+      await tester.tap(find.byType(DropdownButton<Object?>));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text(EquipmentStatus.retired.displayName).last);
+      await tester.pumpAndSettle();
+
+      // The status branch of build() is now live; both fixtures come back
+      // because the status provider is overridden to return the full list.
+      expect(find.byType(EquipmentListTile), findsNWidgets(2));
+      expect(tester.takeException(), isNull);
+    });
+
+    /// Drives the RefreshIndicator directly: the list is short, so its
+    /// default physics do not permit the overscroll a drag would need.
+    Future<void> pullToRefresh(WidgetTester tester) async {
+      final state = tester.state<RefreshIndicatorState>(
+        find.byType(RefreshIndicator),
+      );
+      unawaited(state.show());
+      await tester.pumpAndSettle();
+    }
+
+    testWidgets('refreshing the default view rebuilds the active provider', (
+      tester,
+    ) async {
+      var activeBuilds = 0;
+      var statusBuilds = 0;
+      final items = [_makeEquipment(id: 'e1', name: 'Alpha Reg')];
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+
+      await tester.pumpWidget(
+        testApp(
+          overrides: [
+            sharedPreferencesProvider.overrideWithValue(prefs),
+            settingsProvider.overrideWith((ref) => MockSettingsNotifier()),
+            currentDiverIdProvider.overrideWith(
+              (ref) => MockCurrentDiverIdNotifier(),
+            ),
+            activeEquipmentProvider.overrideWith((ref) async {
+              activeBuilds++;
+              return items;
+            }),
+            equipmentByStatusProvider.overrideWith((ref, status) {
+              statusBuilds++;
+              return items;
+            }),
+            equipmentListViewModeProvider.overrideWith(
+              (ref) => ListViewMode.detailed,
+            ),
+            equipmentTableConfigProvider.overrideWith(
+              (ref) => _TestEquipTableConfigNotifier(_testConfig),
+            ),
+          ],
+          child: const EquipmentListContent(showAppBar: false),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final activeBefore = activeBuilds;
+      final statusBefore = statusBuilds;
+
+      await pullToRefresh(tester);
+
+      expect(
+        activeBuilds,
+        greaterThan(activeBefore),
+        reason:
+            'the default view reads activeEquipmentProvider, so refresh must '
+            'invalidate that one or the list stays stale (#636)',
+      );
+      expect(
+        statusBuilds,
+        statusBefore,
+        reason: 'the status family is not what the default view is showing',
+      );
+    });
+
+    testWidgets('refreshing under a status filter rebuilds that status', (
+      tester,
+    ) async {
+      var activeBuilds = 0;
+      var statusBuilds = 0;
+      final items = [
+        _makeEquipment(
+          id: 'e2',
+          name: 'Old BCD',
+          status: EquipmentStatus.retired,
+        ),
+      ];
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+
+      await tester.pumpWidget(
+        testApp(
+          overrides: [
+            sharedPreferencesProvider.overrideWithValue(prefs),
+            settingsProvider.overrideWith((ref) => MockSettingsNotifier()),
+            currentDiverIdProvider.overrideWith(
+              (ref) => MockCurrentDiverIdNotifier(),
+            ),
+            activeEquipmentProvider.overrideWith((ref) async {
+              activeBuilds++;
+              return items;
+            }),
+            equipmentByStatusProvider.overrideWith((ref, status) {
+              statusBuilds++;
+              return items;
+            }),
+            equipmentListViewModeProvider.overrideWith(
+              (ref) => ListViewMode.detailed,
+            ),
+            equipmentTableConfigProvider.overrideWith(
+              (ref) => _TestEquipTableConfigNotifier(_testConfig),
+            ),
+          ],
+          child: const EquipmentListContent(showAppBar: false),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byType(DropdownButton<Object?>));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text(EquipmentStatus.retired.displayName).last);
+      await tester.pumpAndSettle();
+
+      final activeBefore = activeBuilds;
+      final statusBefore = statusBuilds;
+
+      await pullToRefresh(tester);
+
+      expect(
+        statusBuilds,
+        greaterThan(statusBefore),
+        reason:
+            'the filtered view reads the status family, so refresh must '
+            'invalidate that family',
+      );
+      expect(activeBuilds, activeBefore);
+    });
   });
 }
