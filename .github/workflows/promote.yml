@@ -1,0 +1,296 @@
+name: Promote Beta
+
+# Phase 5 of the release-channels spec: promotes an already-published beta
+# to the stable channel everywhere, without rebuilding anything. GitHub gets
+# the copied artifacts + a stable appcast entry (signature was computed at
+# beta build time); Play promotes the identical AAB from the beta track;
+# the App Store gets the existing TestFlight build submitted for review;
+# and the marketing-version bump PR opens immediately so the next merge
+# starts the next beta train (App Store trains close on release).
+on:
+  workflow_dispatch:
+    inputs:
+      build-number:
+        description: 'Beta build number to promote (e.g. 4951)'
+        required: true
+        type: string
+      play-rollout:
+        description: 'Play production rollout fraction (0.0-1.0)'
+        required: false
+        type: string
+        default: '1.0'
+      next-bump:
+        description: 'Version bump to open the next beta train'
+        required: false
+        type: choice
+        options: [patch, minor, major]
+        default: patch
+
+permissions:
+  contents: read
+
+concurrency:
+  group: promote
+  cancel-in-progress: false
+
+jobs:
+  promote:
+    name: Publish stable release from beta
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: write
+      issues: read
+    outputs:
+      tag: ${{ steps.resolve.outputs.tag }}
+      semver: ${{ steps.resolve.outputs.semver }}
+      build-number: ${{ steps.resolve.outputs.build-number }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Resolve and verify the beta release
+        id: resolve
+        env:
+          GH_TOKEN: ${{ secrets.BETA_BUILDS_TOKEN }}
+          BUILD: ${{ inputs.build-number }}
+        run: |
+          set -euo pipefail
+          TAG=$(gh release list --repo submersion-app/beta-builds \
+            --json tagName -q ".[].tagName" | grep -E "\.${BUILD}$" | head -1)
+          if [ -z "$TAG" ]; then
+            echo "::error::No beta release ending in .${BUILD} found (pruned or never built)."
+            exit 1
+          fi
+          mkdir -p promoted && cd promoted
+          gh release download "$TAG" --repo submersion-app/beta-builds
+          sha256sum -c checksums-sha256.txt
+          SEMVER=$(python3 -c "import json;print(json.load(open('metadata.json'))['semver'])")
+          SHA=$(python3 -c "import json;print(json.load(open('metadata.json'))['sourceSha'])")
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "semver=$SEMVER" >> "$GITHUB_OUTPUT"
+          echo "build-number=$BUILD" >> "$GITHUB_OUTPUT"
+          echo "sha=$SHA" >> "$GITHUB_OUTPUT"
+
+      - name: Check for beta blockers
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          OPEN=$(gh issue list --repo ${{ github.repository }} \
+            --label beta-blocker --state open --json number -q 'length')
+          if [ "$OPEN" != "0" ]; then
+            echo "::error::$OPEN open beta-blocker issue(s); resolve them before promoting."
+            exit 1
+          fi
+
+      - name: Verify the source commit is on main
+        run: |
+          set -euo pipefail
+          git merge-base --is-ancestor "${{ steps.resolve.outputs.sha }}" origin/main || {
+            echo "::error::Beta source commit is not on main."; exit 1; }
+
+      - name: Create the stable tag
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag "${{ steps.resolve.outputs.tag }}" "${{ steps.resolve.outputs.sha }}"
+          git push origin "refs/tags/${{ steps.resolve.outputs.tag }}"
+
+      - name: Generate release notes and stable appcast
+        env:
+          TAG_NAME: ${{ steps.resolve.outputs.tag }}
+        run: |
+          set -euo pipefail
+          git checkout "${{ steps.resolve.outputs.sha }}"
+          ./scripts/release/generate_changelog.sh --notes-only > release-notes.md
+          ./scripts/generate_release_notes_html.sh < release-notes.md > release-notes.html
+          VERSION="${TAG_NAME#v}"
+          export SPARKLE_EDDSA_SIGNATURE=$(python3 -c "import json;print(json.load(open('promoted/metadata.json'))['eddsaSignature'])")
+          export SPARKLE_DMG_LENGTH=$(python3 -c "import json;print(json.load(open('promoted/metadata.json'))['dmgLength'])")
+          BASE="https://github.com/${{ github.repository }}/releases/download/${TAG_NAME}"
+          ./scripts/generate_appcast.sh "$VERSION" "${{ steps.resolve.outputs.build-number }}" \
+            "$(date -R)" \
+            "${BASE}/Submersion-${TAG_NAME}-macOS.dmg" \
+            "${BASE}/Submersion-${TAG_NAME}-Windows-Setup.exe" \
+            release-notes.html > appcast.xml
+          python3 -c "import xml.dom.minidom;xml.dom.minidom.parse('appcast.xml')"
+
+      - name: Create the stable GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG_NAME: ${{ steps.resolve.outputs.tag }}
+        run: |
+          set -euo pipefail
+          # Submersion-* (with hyphen) deliberately excludes the store-only
+          # Submersion.pkg, matching the historical stable asset list.
+          gh release create "$TAG_NAME" --repo ${{ github.repository }} \
+            --title "$TAG_NAME" --notes-file release-notes.md --latest \
+            promoted/Submersion-* promoted/checksums-sha256.txt \
+            appcast.xml release-notes.html
+
+      - name: Validate the published release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG_NAME: ${{ steps.resolve.outputs.tag }}
+        run: |
+          set -euo pipefail
+          mkdir -p check && cd check
+          gh release download "$TAG_NAME" --repo ${{ github.repository }}
+          # --ignore-missing: the beta checksums include Submersion.pkg (a
+          # store-only artifact deliberately not re-hosted on the stable
+          # release, matching the historical stable asset list).
+          sha256sum -c --ignore-missing checksums-sha256.txt
+          for suffix in macOS.dmg Windows-Setup.exe Linux.tar.gz Android.apk Android.aab iOS.ipa; do
+            ls Submersion-*-$suffix >/dev/null || { echo "::error::Missing $suffix"; exit 1; }
+          done
+          test -s appcast.xml
+
+  promote-play:
+    name: Promote Play build to production
+    runs-on: ubuntu-latest
+    needs: promote
+    timeout-minutes: 15
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2'
+          bundler-cache: true
+          working-directory: android
+
+      - name: Setup Google Play service account key
+        env:
+          GOOGLE_PLAY_SERVICE_ACCOUNT_KEY: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_KEY }}
+        run: echo "$GOOGLE_PLAY_SERVICE_ACCOUNT_KEY" > android/fastlane/play-store-key.json
+
+      - name: Promote beta track to production
+        working-directory: android
+        env:
+          GOOGLE_PLAY_JSON_KEY_PATH: fastlane/play-store-key.json
+        run: |
+          bundle exec fastlane promote_to_production \
+            version_code:"${{ needs.promote.outputs.build-number }}" \
+            rollout:"${{ inputs.play-rollout }}"
+
+      - name: Cleanup sensitive files
+        if: always()
+        run: rm -f android/fastlane/play-store-key.json
+
+  submit-appstore:
+    name: Submit existing builds for App Review
+    runs-on: macos-15
+    needs: promote
+    timeout-minutes: 30
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Setup Ruby (iOS)
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2'
+          bundler-cache: true
+          working-directory: ios
+
+      - name: Setup App Store Connect API Key
+        env:
+          APP_STORE_CONNECT_API_KEY_KEY: ${{ secrets.APP_STORE_CONNECT_API_KEY_KEY }}
+        run: |
+          mkdir -p ios/fastlane macos/fastlane
+          echo "$APP_STORE_CONNECT_API_KEY_KEY" | base64 --decode > ios/fastlane/AuthKey.p8
+          echo "$APP_STORE_CONNECT_API_KEY_KEY" | base64 --decode > macos/fastlane/AuthKey.p8
+
+      - name: Submit iOS build
+        working-directory: ios
+        env:
+          APP_STORE_CONNECT_API_KEY_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_KEY_ID }}
+          APP_STORE_CONNECT_API_KEY_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ISSUER_ID }}
+          APP_STORE_CONNECT_API_KEY_KEY_FILEPATH: fastlane/AuthKey.p8
+        run: |
+          bundle exec fastlane submit_existing \
+            app_version:"${{ needs.promote.outputs.semver }}" \
+            build_number:"${{ needs.promote.outputs.build-number }}"
+
+      - name: Setup Ruby (macOS)
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2'
+          bundler-cache: true
+          working-directory: macos
+
+      - name: Submit macOS build
+        working-directory: macos
+        env:
+          APP_STORE_CONNECT_API_KEY_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_KEY_ID }}
+          APP_STORE_CONNECT_API_KEY_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ISSUER_ID }}
+          APP_STORE_CONNECT_API_KEY_KEY_FILEPATH: fastlane/AuthKey.p8
+        run: |
+          bundle exec fastlane submit_existing \
+            app_version:"${{ needs.promote.outputs.semver }}" \
+            build_number:"${{ needs.promote.outputs.build-number }}"
+
+      - name: Cleanup sensitive files
+        if: always()
+        run: rm -f ios/fastlane/AuthKey.p8 macos/fastlane/AuthKey.p8
+
+  bump-pr:
+    name: Open the version bump PR
+    runs-on: ubuntu-latest
+    needs: promote
+    timeout-minutes: 10
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v7
+        with:
+          ref: main
+
+      - name: Bump and open PR
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          ./scripts/release/bump_version.sh --${{ inputs.next-bump }}
+          NEWVER=$(grep '^version:' pubspec.yaml | sed 's/version: *//')
+          BRANCH="chore/bump-${NEWVER//+/-}"
+          git checkout -b "$BRANCH"
+          git add pubspec.yaml
+          git commit -m "chore: bump version to ${NEWVER}
+
+          Opens the next beta train after promoting ${{ needs.promote.outputs.tag }};
+          the App Store closes a version train on release, so betas cannot
+          continue on the promoted marketing version."
+          git push origin "$BRANCH"
+          gh pr create --base main --head "$BRANCH" \
+            --title "chore: bump version to ${NEWVER}" \
+            --body "Opens the next beta train after promoting ${{ needs.promote.outputs.tag }}. Merge promptly: the beta pipeline's train-closed guard fails every merge until this lands. Note: CI does not auto-run on bot-pushed branches; close/reopen the PR or push an empty commit to trigger it."
+          gh pr merge --auto --merge "$BRANCH" || \
+            echo "::warning::Auto-merge unavailable; merge the bump PR manually."
+
+  notify-failures:
+    name: Open issue on promotion failure
+    runs-on: ubuntu-latest
+    needs: [promote, promote-play, submit-appstore, bump-pr]
+    if: always() && contains(needs.*.result, 'failure')
+    permissions:
+      issues: write
+    steps:
+      - name: Open tracking issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh issue create --repo ${{ github.repository }} \
+            --title "Promotion of build ${{ inputs.build-number }} partially failed" \
+            --label ci \
+            --body "One or more promotion jobs failed: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}. The GitHub release, Play promotion, App Store submission, and bump PR are independent - check which succeeded before re-running."
