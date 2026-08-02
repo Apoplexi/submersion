@@ -1016,6 +1016,33 @@ void main() {
       expect(find.textContaining('First sync is waiting'), findsOneWidget);
     });
 
+    testWidgets('shows the update banner when peers run a newer version', (
+      tester,
+    ) async {
+      await pumpPage(
+        tester,
+        selectedProvider: CloudProviderType.icloud,
+        syncState: const SyncState(newerSchemaPeerCount: 2),
+      );
+
+      expect(
+        find.textContaining('newer version of Submersion'),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('no update banner when no newer-schema peers were held', (
+      tester,
+    ) async {
+      await pumpPage(
+        tester,
+        selectedProvider: CloudProviderType.icloud,
+        syncState: const SyncState(),
+      );
+
+      expect(find.textContaining('newer version of Submersion'), findsNothing);
+    });
+
     testWidgets('shows the replace banner while adoption is pending', (
       tester,
     ) async {

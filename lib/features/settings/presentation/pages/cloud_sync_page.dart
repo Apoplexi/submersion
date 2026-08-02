@@ -993,6 +993,36 @@ class CloudSyncPage extends ConsumerWidget {
                 ),
               ),
             ),
+          if (syncState.newerSchemaPeerCount > 0)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: Card(
+                color: Theme.of(context).colorScheme.secondaryContainer,
+                child: Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.system_update_alt,
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.onSecondaryContainer,
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          context.l10n
+                              .settings_cloudSync_peerRequiresUpdate_banner(
+                                syncState.newerSchemaPeerCount,
+                              ),
+                          style: Theme.of(context).textTheme.bodyMedium,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
           if (syncState.movedMarker != null)
             _buildMovedBanner(context, ref, syncState.movedMarker!),
           if (syncState.cleanupOldBackendProviderId != null)
