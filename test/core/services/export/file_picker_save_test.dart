@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/services/export/csv/csv_export_service.dart';
 import 'package:submersion/core/services/export/excel/excel_export_service.dart';
@@ -101,6 +103,49 @@ void main() {
     test('savePdfToFile returns null when cancelled', () async {
       mockPicker.saveFileResult = null;
       expect(await savePdfToFile([1, 2, 3], 'test.pdf'), isNull);
+    });
+  });
+
+  // Unit tests run on a desktop host, so saveAndShareFile takes the
+  // save-dialog branch (rather than the mobile share sheet).
+  group('saveAndShareFile on desktop saves to the chosen path', () {
+    late Directory dir;
+    setUp(() async {
+      dir = await Directory.systemTemp.createTemp('export_save_test');
+    });
+    tearDown(() async => dir.delete(recursive: true));
+
+    test('writes string content to the picker-chosen path', () async {
+      final target = '${dir.path}/dives_export.csv';
+      mockPicker.saveFileResult = target;
+
+      final path = await saveAndShareFile(
+        'a,b,c',
+        'dives_export.csv',
+        'text/csv',
+      );
+
+      expect(path, target);
+      expect(await File(target).readAsString(), 'a,b,c');
+    });
+
+    test('writes bytes to the picker-chosen path', () async {
+      final target = '${dir.path}/out.bin';
+      mockPicker.saveFileResult = target;
+
+      final path = await saveAndShareFileBytes(
+        [1, 2, 3],
+        'out.bin',
+        'application/octet-stream',
+      );
+
+      expect(path, target);
+      expect(await File(target).readAsBytes(), [1, 2, 3]);
+    });
+
+    test('returns an empty path when the save dialog is cancelled', () async {
+      mockPicker.saveFileResult = null;
+      expect(await saveAndShareFile('x', 'x.csv', 'text/csv'), isEmpty);
     });
   });
 }
