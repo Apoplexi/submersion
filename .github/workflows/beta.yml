@@ -149,7 +149,11 @@ jobs:
         run: |
           set -euo pipefail
           cd artifacts
-          sha256sum Submersion-* > ../checksums-sha256.txt
+          # Glob without the hyphen: six artifacts are Submersion-<tag>-<os>.<ext>
+          # but the Mac App Store package is plain Submersion.pkg (release.yml's
+          # upload-macos job consumes it by that fixed name), so Submersion-*
+          # silently omitted it from the checksums.
+          sha256sum Submersion* > ../checksums-sha256.txt
           cd ..
           python3 - <<'PYEOF'
           import json, os
@@ -196,7 +200,7 @@ jobs:
           gh release create "$TAG_NAME" --repo submersion-app/beta-builds \
             --title "Beta $TAG_NAME" \
             --notes-file release-notes.md \
-            artifacts/Submersion-* checksums-sha256.txt metadata.json appcast-beta.xml
+            artifacts/Submersion* checksums-sha256.txt metadata.json appcast-beta.xml
           echo "Published beta $TAG_NAME from $SOURCE_SHA"
 
       - name: Prune old betas
