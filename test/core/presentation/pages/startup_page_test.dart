@@ -401,16 +401,37 @@ void main() {
       expect(find.text('Download Latest Version'), findsOneWidget);
     });
 
-    testWidgets('mentions the pre-upgrade backup', (tester) async {
+    testWidgets('mentions the pre-upgrade backup conditionally', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         _buildVersionMismatchError(dbVersion: 137, appVersion: 136),
       );
       await tester.pumpAndSettle();
 
+      // A newer-on-disk database means no pre-migration backup ran on this
+      // launch (PreMigrationBackupService returns early when stored >= target),
+      // and the database may have arrived from another device entirely. The
+      // copy must not promise a backup this device might never have taken.
       expect(
-        find.textContaining('backup taken before the upgrade'),
+        find.textContaining('If a backup was taken before the upgrade'),
         findsOneWidget,
       );
+    });
+
+    testWidgets('shows the release URL as a manual fallback', (tester) async {
+      await tester.pumpWidget(
+        _buildVersionMismatchError(dbVersion: 137, appVersion: 136),
+      );
+      await tester.pumpAndSettle();
+
+      // launchUrl can fail (headless Linux, sandboxed or kiosk builds); the
+      // visible URL is what keeps the button's failure path recoverable.
+      expect(
+        find.textContaining(VersionMismatchView.latestReleaseUrl),
+        findsOneWidget,
+      );
+      expect(find.textContaining('does not open a browser'), findsOneWidget);
     });
   });
 

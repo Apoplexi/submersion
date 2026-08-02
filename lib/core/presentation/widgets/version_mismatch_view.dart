@@ -16,6 +16,14 @@ class VersionMismatchView extends StatelessWidget {
     required this.onClose,
   });
 
+  /// Canonical download location, shown on screen and opened by the button.
+  ///
+  /// Deliberately owned here rather than passed in: the view renders this exact
+  /// string as the manual fallback, and the caller launches the same constant,
+  /// so the displayed address and the opened address cannot drift apart.
+  static const String latestReleaseUrl =
+      'https://github.com/submersion-app/submersion/releases/latest';
+
   final int databaseVersion;
   final int appVersion;
   final Color textColor;
@@ -52,9 +60,9 @@ class VersionMismatchView extends StatelessWidget {
           const SizedBox(height: 16),
           Text(
             'Please update Submersion to the latest version. '
-            'Your data is safe and has not been modified. A backup taken '
-            'before the upgrade is also in your Backups folder and can be '
-            'restored after updating.',
+            'Your data is safe and has not been modified. If a backup was '
+            'taken before the upgrade, it is in your Backups folder and can '
+            'be restored after updating.',
             style: TextStyle(fontSize: 14, color: subtitleColor),
             textAlign: TextAlign.center,
           ),
@@ -62,6 +70,18 @@ class VersionMismatchView extends StatelessWidget {
           FilledButton(
             onPressed: onDownloadLatest,
             child: const Text('Download Latest Version'),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            'If that does not open a browser, visit:',
+            style: TextStyle(fontSize: 12, color: subtitleColor),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 4),
+          SelectableText(
+            latestReleaseUrl,
+            style: TextStyle(fontSize: 12, color: subtitleColor),
+            textAlign: TextAlign.center,
           ),
           const SizedBox(height: 8),
           TextButton(onPressed: onClose, child: const Text('Close')),

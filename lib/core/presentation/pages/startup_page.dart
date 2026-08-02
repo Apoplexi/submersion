@@ -511,15 +511,17 @@ class _StartupWrapperState extends State<StartupWrapper>
   }
 
   static final Uri _latestReleaseUri = Uri.parse(
-    'https://github.com/submersion-app/submersion/releases/latest',
+    VersionMismatchView.latestReleaseUrl,
   );
 
   Future<void> _openLatestRelease() async {
     try {
       await launchUrl(_latestReleaseUri, mode: LaunchMode.externalApplication);
     } catch (_) {
-      // Leaving the user on this screen is the only safe fallback; the URL
-      // is also shown in the surrounding text.
+      // Leaving the user on this screen is the only safe fallback: the
+      // database is untouched and must stay that way. VersionMismatchView
+      // renders this same URL beneath the button, so a launch failure still
+      // leaves the user an address they can type in manually.
     }
   }
 
