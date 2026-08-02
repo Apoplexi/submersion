@@ -42,7 +42,13 @@ final updateServiceProvider = FutureProvider<UpdateService?>((ref) async {
   if (!UpdateChannelConfig.isAutoUpdateEnabled) return null;
 
   final packageInfo = await PackageInfo.fromPlatform();
-  final currentVersion = packageInfo.version;
+  // Release tags are 4-segment (vX.Y.Z.N) while packageInfo.version is the
+  // 3-segment marketing version; without the build number appended, a
+  // current install always compares as older than its own release tag.
+  final currentVersion =
+      packageInfo.version.endsWith('.${packageInfo.buildNumber}')
+      ? packageInfo.version
+      : '${packageInfo.version}.${packageInfo.buildNumber}';
 
   if (_useSparkleEngine) {
     return SparkleUpdateService(feedUrl: _appcastUrl);
