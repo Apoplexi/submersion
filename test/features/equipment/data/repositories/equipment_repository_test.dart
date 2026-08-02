@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/constants/enums.dart';
+import 'package:submersion/core/services/database_service.dart';
 import 'package:submersion/features/equipment/data/repositories/equipment_repository_impl.dart';
 import 'package:submersion/features/equipment/domain/entities/equipment_attribute.dart';
 import 'package:submersion/features/equipment/domain/entities/equipment_item.dart';
@@ -284,6 +285,40 @@ void main() {
               'only the Retired filter widens to the legacy isActive flag; '
               'other statuses match on status alone',
         );
+      });
+
+      test('retiring and reactivating stage the row for sync', () async {
+        final item = await repository.createEquipment(
+          createTestEquipment(name: 'Synced Reg'),
+        );
+        final db = DatabaseService.instance.database;
+
+        Future<int> pendingCount() async {
+          final rows = await db.select(db.syncRecords).get();
+          return rows
+              .where(
+                (r) => r.entityType == 'equipment' && r.recordId == item.id,
+              )
+              .length;
+        }
+
+        // createEquipment already staged it; clear so the assertion is about
+        // retire/reactivate rather than the create.
+        await db.delete(db.syncRecords).go();
+        expect(await pendingCount(), 0);
+
+        await repository.retireEquipment(item.id);
+        expect(
+          await pendingCount(),
+          1,
+          reason:
+              'an unsynced retirement leaves the item active on every other '
+              'device, which now also keeps it in the active-gear queries',
+        );
+
+        await db.delete(db.syncRecords).go();
+        await repository.reactivateEquipment(item.id);
+        expect(await pendingCount(), 1);
       });
 
       test('legacy isActive-only retirements still list as retired', () async {

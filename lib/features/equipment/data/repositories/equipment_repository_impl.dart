@@ -404,6 +404,15 @@ class EquipmentRepository {
           updatedAt: Value(now),
         ),
       );
+      // Retiring is a real edit to the row, so it has to be staged for sync
+      // like create/update -- otherwise the item stays active on every other
+      // device, which now also hides it from the active-gear queries.
+      await _syncRepository.markRecordPending(
+        entityType: 'equipment',
+        recordId: id,
+        localUpdatedAt: now,
+      );
+      SyncEventBus.notifyLocalChange();
     } catch (e, stackTrace) {
       _log.error(
         'Failed to retire equipment: $id',
@@ -435,6 +444,12 @@ class EquipmentRepository {
           updatedAt: Value(now),
         ),
       );
+      await _syncRepository.markRecordPending(
+        entityType: 'equipment',
+        recordId: id,
+        localUpdatedAt: now,
+      );
+      SyncEventBus.notifyLocalChange();
     } catch (e, stackTrace) {
       _log.error(
         'Failed to reactivate equipment: $id',
