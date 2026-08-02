@@ -1031,6 +1031,27 @@ void main() {
       );
     });
 
+    testWidgets('update banner text is paired with its container colour', (
+      tester,
+    ) async {
+      await pumpPage(
+        tester,
+        selectedProvider: CloudProviderType.icloud,
+        syncState: const SyncState(newerSchemaPeerCount: 2),
+      );
+
+      // Material does not re-derive text colour from the Card background, so
+      // without an explicit colour this text falls back to onSurface while the
+      // icon beside it uses onSecondaryContainer.
+      final banner = tester.widget<Text>(
+        find.textContaining('newer version of Submersion'),
+      );
+      final scheme = Theme.of(
+        tester.element(find.textContaining('newer version of Submersion')),
+      ).colorScheme;
+      expect(banner.style?.color, scheme.onSecondaryContainer);
+    });
+
     testWidgets('no update banner when no newer-schema peers were held', (
       tester,
     ) async {

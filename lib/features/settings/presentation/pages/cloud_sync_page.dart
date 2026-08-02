@@ -1015,7 +1015,16 @@ class CloudSyncPage extends ConsumerWidget {
                               .settings_cloudSync_peerRequiresUpdate_banner(
                                 syncState.newerSchemaPeerCount,
                               ),
-                          style: Theme.of(context).textTheme.bodyMedium,
+                          // Card is secondaryContainer, and Material does not
+                          // re-derive text colour from its background, so
+                          // bodyMedium would keep onSurface. Pair it with the
+                          // container explicitly, as the icon already is.
+                          style: Theme.of(context).textTheme.bodyMedium
+                              ?.copyWith(
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.onSecondaryContainer,
+                              ),
                         ),
                       ),
                     ],
@@ -1095,7 +1104,11 @@ class CloudSyncPage extends ConsumerWidget {
                         marker.displayName,
                         marker.toProviderDisplay,
                       ),
-                      style: theme.textTheme.bodyMedium,
+                      // Same secondaryContainer pairing as the peer-update
+                      // banner above; kept in step so the two read alike.
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: theme.colorScheme.onSecondaryContainer,
+                      ),
                     ),
                   ),
                 ],
