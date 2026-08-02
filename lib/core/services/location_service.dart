@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:io' show Platform, HttpClient;
 
-import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/foundation.dart' show kIsWeb, visibleForTesting;
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
 
@@ -58,6 +58,22 @@ class LocationService {
   /// share one `setLocaleIdentifier` call instead of racing past a flag that
   /// is only set after the await.
   static Future<void>? _geocoderLocalePin;
+
+  /// Routes reverse geocoding through the platform geocoder.
+  ///
+  /// True on mobile in production. `Platform.isIOS`/`isAndroid` are
+  /// natively-resolved statics with no override hook, so the mobile branch
+  /// is otherwise unreachable on a desktop test host -- including the
+  /// locale pin below, whose single-call and retry-after-failure contracts
+  /// are the part of #214 most worth asserting.
+  @visibleForTesting
+  static bool debugForceNativeGeocoder = false;
+
+  static bool get _useNativeGeocoder => debugForceNativeGeocoder || _isMobile;
+
+  /// Resets the memoized locale pin. Tests only.
+  @visibleForTesting
+  static void debugResetGeocoderLocalePin() => _geocoderLocalePin = null;
 
   /// Pin the platform geocoder to English, at most once per process.
   ///
@@ -229,7 +245,7 @@ class LocationService {
       _log.info('Reverse geocoding: $latitude, $longitude');
 
       // Try native geocoding first (works on iOS/Android)
-      if (_isMobile) {
+      if (_useNativeGeocoder) {
         try {
           await _pinGeocoderLocale();
           final placemarks = await placemarkFromCoordinates(

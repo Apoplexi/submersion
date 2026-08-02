@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 import 'package:submersion/core/services/location_service.dart';
 
 /// One canned HTTP exchange plus a record of what the service actually sent.
@@ -455,4 +457,116 @@ void main() {
       },
     );
   });
+
+  group('native geocoder locale pin (#214)', () {
+    setUp(() {
+      LocationService.debugForceNativeGeocoder = true;
+      LocationService.debugResetGeocoderLocalePin();
+    });
+
+    tearDown(() {
+      LocationService.debugForceNativeGeocoder = false;
+      LocationService.debugResetGeocoderLocalePin();
+    });
+
+    test('pins the geocoder to English before the first lookup', () async {
+      final platform = _FakeGeocodingPlatform(
+        placemarks: const [
+          Placemark(
+            country: 'Spain',
+            administrativeArea: 'Andalusia',
+            locality: 'Tarifa',
+          ),
+        ],
+      );
+      GeocodingPlatform.instance = platform;
+
+      final result = await service.reverseGeocode(36.0143, -5.6044);
+
+      expect(platform.localeIdentifiers, ['en']);
+      expect(result.country, 'Spain');
+      expect(result.region, 'Andalusia');
+      expect(result.locality, 'Tarifa');
+    });
+
+    test('concurrent lookups share a single pin call', () async {
+      final platform = _FakeGeocodingPlatform(
+        placemarks: const [Placemark(country: 'Spain')],
+        localeDelay: const Duration(milliseconds: 20),
+      );
+      GeocodingPlatform.instance = platform;
+
+      await Future.wait([
+        service.reverseGeocode(36.0, -5.6),
+        service.reverseGeocode(37.0, -5.7),
+        service.reverseGeocode(38.0, -5.8),
+      ]);
+
+      expect(
+        platform.localeIdentifiers,
+        ['en'],
+        reason:
+            'the memo holds the in-flight future, so callers that arrive '
+            'before it completes must not each issue their own pin',
+      );
+    });
+
+    test('a failed pin is retried by the next lookup', () async {
+      final platform = _FakeGeocodingPlatform(
+        placemarks: const [Placemark(country: 'Spain')],
+        failLocaleOnce: true,
+      );
+      GeocodingPlatform.instance = platform;
+
+      // The first attempt throws inside the native branch; the service falls
+      // through to the web fallback rather than surfacing the failure.
+      final server = _FakeNominatim(
+        body: '{"address": {"country": "Fallback"}}',
+      );
+      final first = await server.run(() => service.reverseGeocode(36.0, -5.6));
+      expect(first.country, 'Fallback', reason: 'a failed pin is non-fatal');
+
+      final second = await service.reverseGeocode(36.0, -5.6);
+
+      expect(
+        platform.localeIdentifiers,
+        ['en', 'en'],
+        reason: 'clearing the memo on failure lets a later call retry',
+      );
+      expect(second.country, 'Spain');
+    });
+  });
+}
+
+/// Minimal [GeocodingPlatform] that records the locales it was pinned to.
+class _FakeGeocodingPlatform extends GeocodingPlatform
+    with MockPlatformInterfaceMixin {
+  _FakeGeocodingPlatform({
+    required this.placemarks,
+    this.localeDelay = Duration.zero,
+    this.failLocaleOnce = false,
+  });
+
+  final List<Placemark> placemarks;
+  final Duration localeDelay;
+  bool failLocaleOnce;
+
+  final List<String> localeIdentifiers = <String>[];
+
+  @override
+  Future<void> setLocaleIdentifier(String localeIdentifier) async {
+    localeIdentifiers.add(localeIdentifier);
+    if (localeDelay > Duration.zero) await Future<void>.delayed(localeDelay);
+    if (failLocaleOnce) {
+      failLocaleOnce = false;
+      throw StateError('geocoder unavailable');
+    }
+  }
+
+  @override
+  Future<List<Placemark>> placemarkFromCoordinates(
+    double latitude,
+    double longitude, {
+    String? localeIdentifier,
+  }) async => placemarks;
 }
