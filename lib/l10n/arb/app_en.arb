@@ -7861,6 +7861,7 @@
   "settings_cloudSync_header_syncBehavior": "Sync Behavior",
   "settings_cloudSync_lastSynced": "Last synced: {time}",
   "settings_cloudSync_pendingChanges": "{count, plural, =1{1 pending change} other{{count} pending changes}}",
+  "settings_cloudSync_peerRequiresUpdate_banner": "{count, plural, =1{1 device syncs from a newer version of Submersion. Update this device to receive its latest changes.} other{{count} devices sync from a newer version of Submersion. Update this device to receive their latest changes.}}",
   "settings_cloudSync_provider_connected": "Connected",
   "settings_cloudSync_provider_connectedTo": "Connected to {providerName}",
   "settings_cloudSync_provider_connectionFailed": "{providerName} connection failed: {error}",
@@ -8343,6 +8344,65 @@
   "settings_units_weight": "Weight",
   "settings_units_weight_kilograms": "Kilograms (kg)",
   "settings_units_weight_pounds": "Pounds (lbs)",
+  "settings_updates_automaticUpdates": "Automatic updates",
+  "settings_updates_automaticUpdatesSubtitle": "Check for updates periodically",
+  "settings_updates_betaDialogBody": "Beta builds are published from every change and may upgrade your dive log's database before the stable release does. Switching back to stable later will not downgrade the app, and all devices that sync together should use the same channel. A backup is taken automatically before any database upgrade.",
+  "settings_updates_betaDialogConfirm": "Switch to Beta",
+  "settings_updates_betaDialogTitle": "Receive beta updates?",
+  "settings_updates_channel": "Update channel",
+  "settings_updates_channelBadgeBeta": "{version} (Beta)",
+  "@settings_updates_channelBadgeBeta": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "settings_updates_channelBeta": "Beta",
+  "settings_updates_channelBetaSubtitle": "New builds from every change, ahead of stable",
+  "settings_updates_channelStable": "Stable",
+  "settings_updates_channelStableSubtitle": "Tested releases only",
+  "settings_updates_checkForUpdates": "Check for Updates",
+  "settings_updates_checking": "Checking...",
+  "settings_updates_downloading": "Downloading... {progress}%",
+  "@settings_updates_downloading": {
+    "placeholders": {
+      "progress": {
+        "type": "String"
+      }
+    }
+  },
+  "settings_updates_error": "Error: {message}",
+  "@settings_updates_error": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "settings_updates_header": "Updates",
+  "settings_updates_joinBeta": "Join the Beta",
+  "settings_updates_joinBetaSubtitle": "Get new features early through the beta program",
+  "settings_updates_lastChecked": "Last checked",
+  "settings_updates_never": "Never",
+  "settings_updates_readyToInstall": "Version {version} ready to install",
+  "@settings_updates_readyToInstall": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "settings_updates_stableSwitchNotice": "You will stay on this beta until the next stable release is newer than it.",
+  "settings_updates_upToDate": "Up to date",
+  "settings_updates_versionAvailable": "Version {version} available",
+  "@settings_updates_versionAvailable": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
   "@settings_cloudSync_conflictItems": {
     "placeholders": {
       "count": {

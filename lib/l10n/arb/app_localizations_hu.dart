@@ -13559,6 +13559,19 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String settings_cloudSync_peerRequiresUpdate_banner(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count eszköz a Submersion újabb verziójából szinkronizál. Frissítsd ezt az eszközt, hogy megkapd a legújabb változtatásaikat.',
+      one:
+          '1 eszköz a Submersion újabb verziójából szinkronizál. Frissítsd ezt az eszközt, hogy megkapd a legújabb változtatásait.',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get settings_cloudSync_provider_connected => 'Csatlakoztatva';
 
   @override
@@ -15074,6 +15087,94 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get settings_units_weight_pounds => 'Font (lbs)';
+
+  @override
+  String get settings_updates_automaticUpdates => 'Automatikus frissítések';
+
+  @override
+  String get settings_updates_automaticUpdatesSubtitle =>
+      'Frissítések rendszeres keresése';
+
+  @override
+  String get settings_updates_betaDialogBody =>
+      'A béta buildek minden változtatásból megjelennek, és a merülési napló adatbázisát a stabil kiadás előtt frissíthetik. Ha később visszaváltasz a stabil csatornára, az alkalmazás nem áll vissza korábbi verzióra, és az együtt szinkronizáló eszközöknek ugyanazt a csatornát érdemes használniuk. Minden adatbázis-frissítés előtt automatikusan biztonsági mentés készül.';
+
+  @override
+  String get settings_updates_betaDialogConfirm => 'Váltás bétára';
+
+  @override
+  String get settings_updates_betaDialogTitle =>
+      'Szeretnél béta frissítéseket kapni?';
+
+  @override
+  String get settings_updates_channel => 'Frissítési csatorna';
+
+  @override
+  String settings_updates_channelBadgeBeta(String version) {
+    return '$version (Béta)';
+  }
+
+  @override
+  String get settings_updates_channelBeta => 'Béta';
+
+  @override
+  String get settings_updates_channelBetaSubtitle =>
+      'Új buildek minden változtatásból, a stabil előtt';
+
+  @override
+  String get settings_updates_channelStable => 'Stabil';
+
+  @override
+  String get settings_updates_channelStableSubtitle => 'Csak tesztelt kiadások';
+
+  @override
+  String get settings_updates_checkForUpdates => 'Frissítések keresése';
+
+  @override
+  String get settings_updates_checking => 'Keresés...';
+
+  @override
+  String settings_updates_downloading(String progress) {
+    return 'Letöltés... $progress%';
+  }
+
+  @override
+  String settings_updates_error(String message) {
+    return 'Hiba: $message';
+  }
+
+  @override
+  String get settings_updates_header => 'Frissítések';
+
+  @override
+  String get settings_updates_joinBeta => 'Csatlakozz a bétához';
+
+  @override
+  String get settings_updates_joinBetaSubtitle =>
+      'Kapd meg korábban az új funkciókat a bétaprogramon keresztül';
+
+  @override
+  String get settings_updates_lastChecked => 'Utolsó ellenőrzés';
+
+  @override
+  String get settings_updates_never => 'Soha';
+
+  @override
+  String settings_updates_readyToInstall(String version) {
+    return 'A(z) $version verzió telepítésre kész';
+  }
+
+  @override
+  String get settings_updates_stableSwitchNotice =>
+      'Ezen a bétán maradsz, amíg a következő stabil kiadás nem lesz nála újabb.';
+
+  @override
+  String get settings_updates_upToDate => 'Naprakész';
+
+  @override
+  String settings_updates_versionAvailable(String version) {
+    return 'A(z) $version verzió elérhető';
+  }
 
   @override
   String get signatures_action_clear => 'Törlés';

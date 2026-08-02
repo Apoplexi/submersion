@@ -4029,6 +4029,7 @@
   "settings_cloudSync_header_syncBehavior": "Comportement de synchronisation",
   "settings_cloudSync_lastSynced": "Derniere synchronisation : {time}",
   "settings_cloudSync_pendingChanges": "{count, plural, =1{1 modification en attente} other{{count} modifications en attente}}",
+  "settings_cloudSync_peerRequiresUpdate_banner": "{count, plural, =1{1 appareil se synchronise depuis une version plus récente de Submersion. Mettez à jour cet appareil pour recevoir ses derniers changements.} other{{count} appareils se synchronisent depuis une version plus récente de Submersion. Mettez à jour cet appareil pour recevoir leurs derniers changements.}}",
   "settings_cloudSync_provider_connected": "Connecte",
   "settings_cloudSync_provider_connectedTo": "Connecte a {providerName}",
   "settings_cloudSync_provider_connectionFailed": "Echec de la connexion a {providerName} : {error}",
@@ -4456,6 +4457,65 @@
   "settings_units_weight": "Poids",
   "settings_units_weight_kilograms": "Kilogrammes (kg)",
   "settings_units_weight_pounds": "Livres (lbs)",
+  "settings_updates_automaticUpdates": "Mises à jour automatiques",
+  "settings_updates_automaticUpdatesSubtitle": "Rechercher les mises à jour périodiquement",
+  "settings_updates_betaDialogBody": "Les versions bêta sont publiées à chaque modification et peuvent mettre à niveau la base de données de votre carnet de plongée avant la version stable. Revenir ensuite au canal stable ne rétrogradera pas l'application, et tous les appareils qui se synchronisent ensemble devraient utiliser le même canal. Une sauvegarde est effectuée automatiquement avant toute mise à niveau de la base de données.",
+  "settings_updates_betaDialogConfirm": "Passer à la bêta",
+  "settings_updates_betaDialogTitle": "Recevoir les mises à jour bêta ?",
+  "settings_updates_channel": "Canal de mise à jour",
+  "settings_updates_channelBadgeBeta": "{version} (Bêta)",
+  "@settings_updates_channelBadgeBeta": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "settings_updates_channelBeta": "Bêta",
+  "settings_updates_channelBetaSubtitle": "Nouvelles versions à chaque modification, en avance sur la stable",
+  "settings_updates_channelStable": "Stable",
+  "settings_updates_channelStableSubtitle": "Versions testées uniquement",
+  "settings_updates_checkForUpdates": "Rechercher les mises à jour",
+  "settings_updates_checking": "Vérification...",
+  "settings_updates_downloading": "Téléchargement... {progress}%",
+  "@settings_updates_downloading": {
+    "placeholders": {
+      "progress": {
+        "type": "String"
+      }
+    }
+  },
+  "settings_updates_error": "Erreur : {message}",
+  "@settings_updates_error": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "settings_updates_header": "Mises à jour",
+  "settings_updates_joinBeta": "Rejoindre la bêta",
+  "settings_updates_joinBetaSubtitle": "Recevez les nouvelles fonctionnalités en avant-première grâce au programme bêta",
+  "settings_updates_lastChecked": "Dernière vérification",
+  "settings_updates_never": "Jamais",
+  "settings_updates_readyToInstall": "Version {version} prête à installer",
+  "@settings_updates_readyToInstall": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "settings_updates_stableSwitchNotice": "Vous resterez sur cette bêta jusqu'à ce que la prochaine version stable soit plus récente qu'elle.",
+  "settings_updates_upToDate": "À jour",
+  "settings_updates_versionAvailable": "Version {version} disponible",
+  "@settings_updates_versionAvailable": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
   "signatures_action_clear": "Effacer",
   "signatures_action_closeSignatureView": "Fermer la vue signature",
   "signatures_action_deleteSignature": "Supprimer la signature",

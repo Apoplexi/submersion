@@ -5,6 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/features/dive_log/domain/entities/safety_finding.dart';
 import 'package:submersion/features/safety/domain/services/no_fly_service.dart';
 import 'package:go_router/go_router.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 // ignore: implementation_imports
 import 'package:riverpod/src/framework.dart' as riverpod show Override;
@@ -748,6 +749,101 @@ void main() {
 
       expect(tapPrefs.getBool('debug_mode_enabled'), isTrue);
       expect(container.read(debugModeNotifierProvider), isTrue);
+    });
+  });
+
+  group('About section updates card', () {
+    /// Renders the About detail page (which hosts the Updates card) via the
+    /// same GoRouter ?selected= mechanism the appearance tests use.
+    Widget buildAboutWidget(List<Override> overrides) {
+      final router = GoRouter(
+        initialLocation: '/settings?selected=about',
+        routes: [
+          GoRoute(
+            path: '/settings',
+            builder: (context, state) => const SettingsPage(),
+          ),
+        ],
+      );
+      return ProviderScope(
+        overrides: overrides,
+        child: MaterialApp.router(
+          locale: const Locale('en'),
+          routerConfig: router,
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+        ),
+      );
+    }
+
+    /// Seeds prefs so the UpdateStatusNotifier's delayed startup check
+    /// short-circuits; tests still pump 6s to drain the timer itself.
+    Future<List<Override>> aboutOverrides({String? channel}) async {
+      SharedPreferences.setMockInitialValues({
+        'auto_update_enabled': false,
+        'update_release_channel': ?channel,
+      });
+      final aboutPrefs = await SharedPreferences.getInstance();
+      // Mirrors getOverrides() but with these prefs; a provider must not be
+      // overridden twice in one container, so the list is built explicitly.
+      return [
+        sharedPreferencesProvider.overrideWithValue(aboutPrefs),
+        logFileServiceProvider.overrideWithValue(logFileService),
+        settingsProvider.overrideWith((ref) => _MockSettingsNotifier()),
+        currentDiverIdProvider.overrideWith(
+          (ref) => _MockCurrentDiverIdNotifier(),
+        ),
+        currentDiverProvider.overrideWith((ref) async => null),
+        diverListNotifierProvider.overrideWith(
+          (ref) => _MockDiverListNotifier(),
+        ),
+      ];
+    }
+
+    testWidgets('shows the channel selector on stable', (tester) async {
+      await tester.pumpWidget(buildAboutWidget(await aboutOverrides()));
+      await tester.pumpAndSettle();
+      await tester.pump(const Duration(seconds: 6));
+
+      await tester.scrollUntilVisible(find.text('Update channel'), 100);
+      expect(find.text('Update channel'), findsOneWidget);
+      expect(find.text('Stable'), findsOneWidget);
+    });
+
+    testWidgets('switching to beta asks for confirmation first', (
+      tester,
+    ) async {
+      await tester.pumpWidget(buildAboutWidget(await aboutOverrides()));
+      await tester.pumpAndSettle();
+      await tester.pump(const Duration(seconds: 6));
+
+      await tester.scrollUntilVisible(find.text('Update channel'), 100);
+      await tester.tap(find.text('Update channel'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Beta'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Receive beta updates?'), findsOneWidget);
+    });
+
+    testWidgets('version row shows a beta badge on the beta channel', (
+      tester,
+    ) async {
+      PackageInfo.setMockInitialValues(
+        appName: 'Submersion',
+        packageName: 'app.submersion',
+        version: '1.7.2',
+        buildNumber: '119',
+        buildSignature: '',
+        installerStore: null,
+      );
+      await tester.pumpWidget(
+        buildAboutWidget(await aboutOverrides(channel: 'beta')),
+      );
+      await tester.pumpAndSettle();
+      await tester.pump(const Duration(seconds: 6));
+
+      expect(find.textContaining('(Beta)'), findsOneWidget);
     });
   });
 

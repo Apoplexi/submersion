@@ -13266,6 +13266,19 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
+  String settings_cloudSync_peerRequiresUpdate_banner(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count מכשירים מסתנכרנים מגרסה חדשה יותר של Submersion. עדכן מכשיר זה כדי לקבל את השינויים האחרונים שלהם.',
+      one:
+          'מכשיר אחד מסתנכרן מגרסה חדשה יותר של Submersion. עדכן מכשיר זה כדי לקבל את השינויים האחרונים שלו.',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get settings_cloudSync_provider_connected => 'מחובר';
 
   @override
@@ -14737,6 +14750,93 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get settings_units_weight_pounds => 'ליברות (lbs)';
+
+  @override
+  String get settings_updates_automaticUpdates => 'עדכונים אוטומטיים';
+
+  @override
+  String get settings_updates_automaticUpdatesSubtitle =>
+      'בדיקת עדכונים מעת לעת';
+
+  @override
+  String get settings_updates_betaDialogBody =>
+      'גרסאות בטא מתפרסמות מכל שינוי ועשויות לשדרג את מסד הנתונים של יומן הצלילה שלך לפני הגרסה היציבה. חזרה מאוחר יותר לערוץ היציב לא תחזיר את האפליקציה לגרסה קודמת, וכל המכשירים שמסתנכרנים יחד צריכים להשתמש באותו ערוץ. גיבוי נוצר אוטומטית לפני כל שדרוג של מסד הנתונים.';
+
+  @override
+  String get settings_updates_betaDialogConfirm => 'מעבר לבטא';
+
+  @override
+  String get settings_updates_betaDialogTitle => 'לקבל עדכוני בטא?';
+
+  @override
+  String get settings_updates_channel => 'ערוץ עדכונים';
+
+  @override
+  String settings_updates_channelBadgeBeta(String version) {
+    return '$version (בטא)';
+  }
+
+  @override
+  String get settings_updates_channelBeta => 'בטא';
+
+  @override
+  String get settings_updates_channelBetaSubtitle =>
+      'גרסאות חדשות מכל שינוי, לפני היציבה';
+
+  @override
+  String get settings_updates_channelStable => 'יציב';
+
+  @override
+  String get settings_updates_channelStableSubtitle => 'גרסאות שנבדקו בלבד';
+
+  @override
+  String get settings_updates_checkForUpdates => 'בדוק אם יש עדכונים';
+
+  @override
+  String get settings_updates_checking => 'בודק...';
+
+  @override
+  String settings_updates_downloading(String progress) {
+    return 'מוריד... $progress%';
+  }
+
+  @override
+  String settings_updates_error(String message) {
+    return 'שגיאה: $message';
+  }
+
+  @override
+  String get settings_updates_header => 'עדכונים';
+
+  @override
+  String get settings_updates_joinBeta => 'הצטרפות לבטא';
+
+  @override
+  String get settings_updates_joinBetaSubtitle =>
+      'קבל תכונות חדשות מוקדם דרך תוכנית הבטא';
+
+  @override
+  String get settings_updates_lastChecked => 'בדיקה אחרונה';
+
+  @override
+  String get settings_updates_never => 'אף פעם';
+
+  @override
+  String settings_updates_readyToInstall(String version) {
+    return 'גרסה $version מוכנה להתקנה';
+  }
+
+  @override
+  String get settings_updates_stableSwitchNotice =>
+      'תישאר בגרסת הבטא הזו עד שהגרסה היציבה הבאה תהיה חדשה ממנה.';
+
+  @override
+  String get settings_updates_upToDate => 'מעודכן';
+
+  @override
+  String settings_updates_versionAvailable(String version) {
+    return 'גרסה $version זמינה';
+  }
 
   @override
   String get signatures_action_clear => 'נקה';
