@@ -46,6 +46,17 @@ jobs:
           set -euo pipefail
           SEMVER=$(grep '^version:' pubspec.yaml | sed 's/version: *//; s/+.*//')
           BUILD=$(git rev-list --count HEAD)
+          # Range guard: Inno Setup's VersionInfoVersion parts are 16-bit, so
+          # the Windows installer rejects a build number above 65535 (found
+          # when an early smoke run passed 999999). Fail here, in a job that
+          # takes seconds, rather than deep in the Windows build after the
+          # whole matrix has compiled and with an opaque iscc error.
+          if [ "$BUILD" -gt 65535 ]; then
+            echo "::error::Beta build number ${BUILD} exceeds 65535, the maximum the Windows" \
+              " installer (Inno Setup VersionInfoVersion) accepts. The commit-count scheme has" \
+              " outgrown it; switch to a numbering scheme that stays within 16 bits."
+            exit 1
+          fi
           # Train-closed guard: a stable tag for this marketing version means
           # it has shipped; the bump PR from promotion has not landed yet.
           if [ -n "$(git tag -l "v${SEMVER}.[0-9]*")" ]; then
