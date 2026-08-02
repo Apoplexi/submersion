@@ -15,7 +15,7 @@ void main() {
   /// the platform-appropriate update service out of it.
   Future<Object?> serviceFor(String? channel) async {
     SharedPreferences.setMockInitialValues({
-      if (channel != null) 'update_release_channel': channel,
+      'update_release_channel': ?channel,
     });
     PackageInfo.setMockInitialValues(
       appName: 'Submersion',
