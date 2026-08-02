@@ -22,7 +22,7 @@ const _appcastUrl =
 /// Platform-specific asset suffix for GitHub Releases downloads.
 String get _platformSuffix {
   if (Platform.isMacOS) return 'macOS.dmg';
-  if (Platform.isWindows) return 'Windows.zip';
+  if (Platform.isWindows) return 'Windows-Setup.exe';
   if (Platform.isLinux) return 'Linux.tar.gz';
   if (Platform.isAndroid) return 'Android.apk';
   return '';

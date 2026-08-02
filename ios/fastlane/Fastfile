@@ -168,7 +168,7 @@ platform :ios do
 
     # Build the Flutter app (version comes from pubspec.yaml -> Generated.xcconfig -> Info.plist)
     UI.message("Building Flutter app...")
-    sh("cd ../.. && flutter build ios --release --no-codesign")
+    sh("cd ../.. && flutter build ios --release --no-codesign --dart-define=UPDATE_CHANNEL=appstore")
 
     # Build and sign the IPA
     UI.message("Building and signing IPA...")

@@ -526,7 +526,7 @@ jobs:
         run: flutter build apk --release --dart-define=UPDATE_CHANNEL=github
 
       - name: Build Android App Bundle
-        run: flutter build appbundle --release --dart-define=HEALTH_CONNECT_ENABLED=false
+        run: flutter build appbundle --release --dart-define=HEALTH_CONNECT_ENABLED=false --dart-define=UPDATE_CHANNEL=playstore
 
       # Guards against issue #318: a 4 KB-aligned native lib (liblibdc_jni.so)
       # silently shipped in v1.5.5.107 and crashed the app on Android 15+
