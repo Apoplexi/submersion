@@ -119,7 +119,7 @@ before any database upgrade.
   [beta-builds](https://github.com/submersion-app/beta-builds/releases)
 - **Android** — [join the open test](https://play.google.com/apps/testing/app.submersion),
   then Play delivers beta updates automatically
-- **iOS / Mac App Store** — TestFlight public link (coming soon)
+- **iOS / Mac App Store** — [join via TestFlight](https://testflight.apple.com/join/aMD393sB)
 
 ## Data Philosophy
 
