@@ -196,7 +196,7 @@ git commit -m "feat(release): add beta store lanes alongside the legacy upload l
         run: rm -f ios/fastlane/AuthKey.p8
 ```
 
-`upload-testflight-macos`: identical shape with `working-directory: macos`, artifact `macos-pkg`, glob `Submersion-*-macOS.pkg` — verify the actual pkg artifact filename first (`gh release view` on a recent beta or the build-all upload step; the MAS pkg was added to beta publishing in commit `edcb5173677`, use whatever name that step produces) — and lane call `bundle exec fastlane upload_testflight_beta pkg:"$PKG_PATH"`.
+`upload-testflight-macos`: identical shape with `working-directory: macos`, artifact `macos-pkg`. Verified: the MAS package keeps its fixed name `Submersion.pkg` (no tag prefix — release.yml's upload job consumes it by that name, and commit `edcb5173677` widened the beta checksum/upload globs to `Submersion*` to include it), so the lane call is `bundle exec fastlane upload_testflight_beta pkg:"$GITHUB_WORKSPACE/Submersion.pkg"` with an existence check instead of a glob.
 
 `upload-play` (ubuntu-latest, `timeout-minutes: 15`): model on `release.yml`'s `upload-android` job (checkout ref like above, Setup Ruby wd `android`, write `android/fastlane/play-store-key.json` from `GOOGLE_PLAY_SERVICE_ACCOUNT_KEY`, download `android-aab` artifact, retry loop around `bundle exec fastlane upload_beta`, `if: always()` cleanup of the key file).
 
@@ -376,7 +376,10 @@ jobs:
           set -euo pipefail
           mkdir -p check && cd check
           gh release download "$TAG_NAME" --repo ${{ github.repository }}
-          sha256sum -c checksums-sha256.txt
+          # --ignore-missing: the beta checksums include Submersion.pkg (a
+          # store-only artifact deliberately not re-hosted on the stable
+          # release, matching the historical stable asset list).
+          sha256sum -c --ignore-missing checksums-sha256.txt
           for suffix in macOS.dmg Windows-Setup.exe Linux.tar.gz Android.apk Android.aab iOS.ipa; do
             ls Submersion-*-$suffix >/dev/null || { echo "::error::Missing $suffix"; exit 1; }
           done
