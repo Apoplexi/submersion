@@ -57,7 +57,9 @@ jobs:
           # release-create call and its tag-push event reaching this workflow.
           for attempt in 1 2; do
             set +e
-            RESPONSE=$(gh api "repos/${{ github.repository }}/releases/tags/${TAG_NAME}" 2>&1)
+            # -i prepends the HTTP status line, a protocol-stable format,
+            # rather than grepping gh's free-form error prose.
+            RESPONSE=$(gh api -i "repos/${{ github.repository }}/releases/tags/${TAG_NAME}" 2>&1)
             STATUS=$?
             set -e
             if [ "$STATUS" -eq 0 ]; then
@@ -65,7 +67,7 @@ jobs:
               echo "proceed=false" >> "$GITHUB_OUTPUT"
               exit 0
             fi
-            if ! echo "$RESPONSE" | grep -q "HTTP 404"; then
+            if ! echo "$RESPONSE" | head -1 | grep -qE '^HTTP/[0-9.]+ 404'; then
               echo "::error::Could not determine whether $TAG_NAME already has a" \
                 " release (non-404 failure); refusing to run the legacy rebuild." \
                 " Response: $RESPONSE"
