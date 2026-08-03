@@ -298,7 +298,11 @@ platform :ios do
       build_number: build_number.to_s,
       skip_binary_upload: true,
       skip_screenshots: true,
-      skip_metadata: true,
+      # skip_metadata false so deliver uploads metadata/en-US/release_notes.txt
+      # (written by promote.yml from the GitHub release notes) - Apple requires
+      # whatsNew on a new version. Only files present are uploaded, and that is
+      # the only metadata file provided.
+      skip_metadata: false,
       submit_for_review: true,
       automatic_release: false,
       precheck_include_in_app_purchases: false,
