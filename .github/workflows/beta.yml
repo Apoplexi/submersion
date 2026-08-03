@@ -209,7 +209,7 @@ jobs:
         run: |
           set -euo pipefail
           gh release list --repo submersion-app/beta-builds \
-            --json tagName --limit 100 -q '.[15:][].tagName' | while read -r tag; do
+            --json tagName --limit 100 -q '.[30:][].tagName' | while read -r tag; do
             echo "Pruning $tag"
             gh release delete "$tag" --repo submersion-app/beta-builds --yes --cleanup-tag
           done
