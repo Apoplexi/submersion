@@ -109,7 +109,10 @@ never trigger workflows, so CI would not run on the bump branch:
 1. Create at https://github.com/settings/personal-access-tokens/new
 2. Resource owner: `submersion-app`
 3. Repository access: only `submersion-app/submersion`
-4. Permissions: Contents - Read and write; Pull requests - Read and write
+4. Permissions: Contents - Read and write; Pull requests - Read and write;
+   Workflows - Read and write (required to push the stable tag: it points at
+   commits whose history touches `.github/workflows`, and GitHub rejects the
+   push without this permission)
 5. Set with: `gh secret set RELEASE_BOT_TOKEN --repo submersion-app/submersion`
 
 Also requires repository auto-merge to be enabled (Settings > General >

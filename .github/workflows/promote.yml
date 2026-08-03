@@ -47,11 +47,13 @@ jobs:
       build-number: ${{ steps.resolve.outputs.build-number }}
     steps:
       # RELEASE_BOT_TOKEN, not github.token: the stable tag points at a commit
-      # whose history touches .github/workflows, and GitHub categorically
-      # rejects App tokens (which GITHUB_TOKEN is) pushing any ref that makes
-      # workflow-file changes reachable - there is no grantable `workflows`
-      # permission for it. A user PAT pushing a tag to an existing commit is
-      # allowed. First live promotion failed exactly here (#835).
+      # whose history touches .github/workflows, and GitHub rejects ANY token
+      # pushing a ref that makes workflow-file changes reachable unless the
+      # token carries the workflow-editing capability. Exact names by token
+      # type: not grantable to GITHUB_TOKEN at all; classic PAT `workflow`
+      # scope; fine-grained PAT "Workflows: Read and write" (what
+      # RELEASE_BOT_TOKEN uses). Both rejection variants were hit live:
+      # #835, run 30785339668.
       - name: Require RELEASE_BOT_TOKEN
         env:
           RELEASE_BOT_TOKEN: ${{ secrets.RELEASE_BOT_TOKEN }}
