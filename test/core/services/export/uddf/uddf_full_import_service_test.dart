@@ -1,5 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/core/services/export/uddf/uddf_full_import_service.dart';
+import 'package:submersion/core/services/export/uddf/uddf_import_parsers.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
 
 const _uddfEan29 = '''<uddf version="3.2.1">
@@ -676,6 +678,48 @@ void main() {
         final point = profile.single;
         expect(point['setpoint'], closeTo(1.3, 0.001));
         expect(point['ppO2'], closeTo(1.21, 0.001));
+      });
+
+      test('reads the dive mode from waypoint divemode types', () async {
+        // Shearwater marks the circuit on the samples, as a `type` attribute
+        // using UDDF's spelling. Without it the dive imports as open circuit,
+        // and the analysis discards every loop ppO2 reading it just imported
+        // in favour of a depth x FO2 curve off the diluent.
+        const uddfContent = '''
+<uddf version="3.2.3">
+  <profiledata>
+    <repetitiongroup>
+      <dive id="dive-1">
+        <informationbeforedive>
+          <datetime>2026-08-01T09:08:48Z</datetime>
+        </informationbeforedive>
+        <samples>
+          <waypoint>
+            <depth>30</depth>
+            <divetime>120</divetime>
+            <divemode type="closedcircuit" />
+            <calculatedpo2>1.2</calculatedpo2>
+          </waypoint>
+        </samples>
+      </dive>
+    </repetitiongroup>
+  </profiledata>
+</uddf>
+''';
+        final result = await service.importAllDataFromUddf(uddfContent);
+
+        expect(result.dives.first['diveMode'], DiveMode.ccr);
+      });
+
+      test('maps UDDF circuit spellings to dive modes', () async {
+        expect(
+          UddfImportParsers.parseUddfDiveMode('semiclosedcircuit'),
+          DiveMode.scr,
+        );
+        expect(UddfImportParsers.parseUddfDiveMode('opencircuit'), DiveMode.oc);
+        // Our own exporter writes the enum name rather than UDDF's spelling.
+        expect(UddfImportParsers.parseUddfDiveMode('ccr'), DiveMode.ccr);
+        expect(UddfImportParsers.parseUddfDiveMode('apnoe'), isNull);
       });
 
       test('keeps oxygen data on the waypoint it came from', () async {

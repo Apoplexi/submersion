@@ -569,11 +569,9 @@ class UddfFullImportService {
         beforeElement,
         'divemode',
       );
-      if (diveModeStr != null) {
-        diveData['diveMode'] = UddfImportParsers.parseEnumValue(
-          diveModeStr,
-          enums.DiveMode.values,
-        );
+      final diveMode = UddfImportParsers.parseUddfDiveMode(diveModeStr);
+      if (diveMode != null) {
+        diveData['diveMode'] = diveMode;
       }
 
       // Parse planned dive flag
@@ -1557,6 +1555,7 @@ class UddfFullImportService {
       GasMix? pendingSwitchMix;
       double? lastWaypointCns;
       double? lastWaypointOtu;
+      enums.DiveMode? waypointDiveMode;
 
       // Cell readings reference sensors declared once per document, so the
       // order is resolved before walking the samples.
@@ -1761,6 +1760,17 @@ class UddfFullImportService {
           point['o2Sensor${index + 1}'] = value;
         });
 
+        // Shearwater and other computers mark the circuit per sample rather
+        // than on the dive. A dive that runs closed circuit for any part of
+        // it is a rebreather dive; bailout segments switch the samples to
+        // open circuit without changing that.
+        final waypointMode = UddfImportParsers.parseUddfDiveMode(
+          waypoint.findElements('divemode').firstOrNull?.getAttribute('type'),
+        );
+        if (waypointMode != null && waypointMode != enums.DiveMode.oc) {
+          waypointDiveMode = waypointMode;
+        }
+
         final ndlText = UddfImportParsers.getElementText(
           waypoint,
           'nodecotime',
@@ -1833,6 +1843,10 @@ class UddfFullImportService {
 
       if (profile.isNotEmpty) {
         diveData['profile'] = profile;
+      }
+      // Only fills the gap: an explicit dive-level mode always wins.
+      if (waypointDiveMode != null && diveData['diveMode'] == null) {
+        diveData['diveMode'] = waypointDiveMode;
       }
       if (lastWaypointCns != null) {
         diveData['cnsEnd'] = lastWaypointCns;

@@ -42,6 +42,23 @@ class UddfImportParsers {
   /// Maximum O2 cells the profile schema can hold (o2Sensor1..o2Sensor6).
   static const int maxO2Sensors = 6;
 
+  /// Resolves a UDDF circuit name to a dive mode.
+  ///
+  /// UDDF spells the circuit out (`closedcircuit`), while our own exporter
+  /// writes the enum name (`ccr`), so both are accepted. Apnea has no
+  /// equivalent mode and stays unresolved rather than being forced to gauge.
+  static enums.DiveMode? parseUddfDiveMode(String? value) {
+    final normalized = value?.trim().toLowerCase();
+    if (normalized == null || normalized.isEmpty) return null;
+
+    return switch (normalized) {
+      'closedcircuit' => enums.DiveMode.ccr,
+      'semiclosedcircuit' => enums.DiveMode.scr,
+      'opencircuit' => enums.DiveMode.oc,
+      _ => parseEnumValue(normalized, enums.DiveMode.values),
+    };
+  }
+
   /// Parses a UDDF partial pressure into bar.
   ///
   /// The spec mandates Pascal (`1.27e5` for 1.27 bar), but exporters are
