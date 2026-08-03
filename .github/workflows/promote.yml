@@ -46,10 +46,28 @@ jobs:
       semver: ${{ steps.resolve.outputs.semver }}
       build-number: ${{ steps.resolve.outputs.build-number }}
     steps:
+      # RELEASE_BOT_TOKEN, not github.token: the stable tag points at a commit
+      # whose history touches .github/workflows, and GitHub categorically
+      # rejects App tokens (which GITHUB_TOKEN is) pushing any ref that makes
+      # workflow-file changes reachable - there is no grantable `workflows`
+      # permission for it. A user PAT pushing a tag to an existing commit is
+      # allowed. First live promotion failed exactly here (#835).
+      - name: Require RELEASE_BOT_TOKEN
+        env:
+          RELEASE_BOT_TOKEN: ${{ secrets.RELEASE_BOT_TOKEN }}
+        run: |
+          if [ -z "$RELEASE_BOT_TOKEN" ]; then
+            echo "::error::RELEASE_BOT_TOKEN secret is not configured; the" \
+              " stable tag cannot be pushed with the built-in token. See" \
+              " docs/developer/release-secrets-setup.md."
+            exit 1
+          fi
+
       - name: Checkout repository
         uses: actions/checkout@v7
         with:
           fetch-depth: 0
+          token: ${{ secrets.RELEASE_BOT_TOKEN }}
 
       - name: Resolve and verify the beta release
         id: resolve
