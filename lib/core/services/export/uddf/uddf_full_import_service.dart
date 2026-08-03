@@ -1124,29 +1124,10 @@ class UddfFullImportService {
       }
     }
 
-    // Parse setpoint and ppO2 from waypoints (sensor readings)
-    final samplesElement = diveElement.findElements('samples').firstOrNull;
-    if (samplesElement != null) {
-      final existingProfile =
-          diveData['profile'] as List<Map<String, dynamic>>?;
-      if (existingProfile != null) {
-        // Enrich existing profile points with setpoint/ppO2
-        int idx = 0;
-        for (final waypoint in samplesElement.findElements('waypoint')) {
-          final sp = UddfImportParsers.getElementText(waypoint, 'setpoint');
-          final ppo2 = UddfImportParsers.getElementText(waypoint, 'ppo2');
-          if ((sp != null || ppo2 != null) && idx < existingProfile.length) {
-            if (sp != null) {
-              existingProfile[idx]['setpoint'] = double.tryParse(sp);
-            }
-            if (ppo2 != null) {
-              existingProfile[idx]['ppO2'] = double.tryParse(ppo2);
-            }
-          }
-          idx++;
-        }
-      }
-    }
+    // Oxygen sample data (setpoint, ppO2, per-cell readings) is parsed with
+    // the rest of the waypoint in _parseUddfDive. Enriching the profile in a
+    // second pass here would index waypoints against profile points, which
+    // drift apart as soon as a waypoint is dropped for lacking a depth.
 
     return diveData;
   }
@@ -1577,6 +1558,13 @@ class UddfFullImportService {
       double? lastWaypointCns;
       double? lastWaypointOtu;
 
+      // Cell readings reference sensors declared once per document, so the
+      // order is resolved before walking the samples.
+      final document = diveElement.document;
+      final o2SensorOrder = document == null
+          ? const <String>[]
+          : UddfImportParsers.parseO2SensorOrder(document);
+
       for (final waypoint in samplesElement.findElements('waypoint')) {
         final point = <String, dynamic>{};
 
@@ -1730,6 +1718,48 @@ class UddfFullImportService {
             lastWaypointOtu = otu;
           }
         }
+
+        // Oxygen data. The spec elements are <setpo2> (setpoint),
+        // <calculatedpo2> (a single aggregate ppO2) and <measuredpo2 ref>
+        // (one per cell). <setpoint> and bare <ppo2> are the non-standard
+        // names our own exporter writes, kept so our files round-trip.
+        final setpoint =
+            UddfImportParsers.parsePartialPressureBar(
+              UddfImportParsers.getElementText(waypoint, 'setpo2'),
+            ) ??
+            UddfImportParsers.parsePartialPressureBar(
+              UddfImportParsers.getElementText(waypoint, 'setpoint'),
+            );
+        if (setpoint != null) {
+          point['setpoint'] = setpoint;
+        }
+
+        // A <measuredpo2> or <ppo2> without a ref names no cell, so it is an
+        // aggregate loop value rather than a per-cell reading.
+        final bareLoopPpO2 =
+            [
+              ...waypoint.findElements('measuredpo2'),
+              ...waypoint.findElements('ppo2'),
+            ].where((element) {
+              final ref = element.getAttribute('ref')?.trim();
+              return ref == null || ref.isEmpty;
+            }).firstOrNull;
+        final ppO2 =
+            UddfImportParsers.parsePartialPressureBar(
+              UddfImportParsers.getElementText(waypoint, 'calculatedpo2'),
+            ) ??
+            UddfImportParsers.parsePartialPressureBar(bareLoopPpO2?.innerText);
+        if (ppO2 != null) {
+          point['ppO2'] = ppO2;
+        }
+
+        final sensorReadings = UddfImportParsers.parseO2SensorReadings(
+          waypoint,
+          o2SensorOrder,
+        );
+        sensorReadings.forEach((index, value) {
+          point['o2Sensor${index + 1}'] = value;
+        });
 
         final ndlText = UddfImportParsers.getElementText(
           waypoint,

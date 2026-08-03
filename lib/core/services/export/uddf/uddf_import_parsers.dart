@@ -39,6 +39,86 @@ class UddfImportParsers {
         : element?.innerText.trim();
   }
 
+  /// Maximum O2 cells the profile schema can hold (o2Sensor1..o2Sensor6).
+  static const int maxO2Sensors = 6;
+
+  /// Parses a UDDF partial pressure into bar.
+  ///
+  /// The spec mandates Pascal (`1.27e5` for 1.27 bar), but exporters are
+  /// inconsistent: Shearwater Cloud writes plain bar (`0.849999964`), and our
+  /// own exporter has always written bar. The two differ by 10^5, so the
+  /// magnitude decides the unit. No breathable partial pressure reaches 100
+  /// bar, and 100 Pa (0.001 bar) is not a plausible reading either, so
+  /// anything above the threshold is Pascal.
+  static double? parsePartialPressureBar(String? text) {
+    if (text == null) return null;
+    final value = double.tryParse(text.trim());
+    if (value == null || value <= 0) return null;
+    return value > 100 ? value / 100000 : value;
+  }
+
+  /// Ordered O2 cell ids declared in the document.
+  ///
+  /// AP Diving declares them under `diver/owner/equipment/rebreather`, but the
+  /// lookup is document-wide so an exporter that puts them elsewhere still
+  /// resolves. Per-waypoint cell readings reference these ids, so declaration
+  /// order — not the order the readings appear in a waypoint — determines
+  /// which cell a reading belongs to.
+  static List<String> parseO2SensorOrder(XmlDocument document) {
+    return document
+        .findAllElements('o2sensor')
+        .map((sensor) => sensor.getAttribute('id')?.trim())
+        .whereType<String>()
+        .where((id) => id.isNotEmpty)
+        .toList();
+  }
+
+  /// Reads per-cell O2 readings from a waypoint, in bar, indexed by cell.
+  ///
+  /// Handles both the published `<measuredpo2 ref="...">` form and the
+  /// unpublished 3.3.0 draft `<ppo2 ref="...">` rename that AP Diving's
+  /// DiveSight emits. Readings whose `ref` matches no declared sensor fall
+  /// back to the order they appear in the waypoint, so an export that omits
+  /// the `<rebreather>` block still yields usable curves.
+  static Map<int, double> parseO2SensorReadings(
+    XmlElement waypoint,
+    List<String> sensorOrder,
+  ) {
+    final readings = <int, double>{};
+    final unresolved = <double>[];
+
+    for (final element in [
+      ...waypoint.findElements('measuredpo2'),
+      ...waypoint.findElements('ppo2'),
+    ]) {
+      final ref = element.getAttribute('ref')?.trim();
+      // A bare <ppo2> with no ref is our own exporter's aggregate value,
+      // not a cell reading.
+      if (ref == null || ref.isEmpty) continue;
+
+      final value = parsePartialPressureBar(element.innerText);
+      if (value == null) continue;
+
+      final index = sensorOrder.indexOf(ref);
+      if (index >= 0) {
+        if (index < maxO2Sensors) readings[index] = value;
+      } else {
+        unresolved.add(value);
+      }
+    }
+
+    for (final value in unresolved) {
+      var slot = 0;
+      while (readings.containsKey(slot)) {
+        slot++;
+      }
+      if (slot >= maxO2Sensors) break;
+      readings[slot] = value;
+    }
+
+    return readings;
+  }
+
   static GasMix parseGasMix(XmlElement mixElement) {
     final o2Text = getElementText(mixElement, 'o2');
     final heText = getElementText(mixElement, 'he');

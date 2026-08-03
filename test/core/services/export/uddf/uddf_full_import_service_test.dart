@@ -520,5 +520,182 @@ void main() {
       expect(profile[0]['decoType'], 2);
       expect(profile[1]['decoType'], 1);
     });
+
+    group('oxygen sample data', () {
+      Future<List<Map<String, dynamic>>> profileFrom(
+        String samples, {
+        String equipment = '',
+      }) async {
+        final uddfContent =
+            '''
+<uddf version="3.2.3">
+  <diver>
+    <owner>
+      <equipment>$equipment</equipment>
+    </owner>
+  </diver>
+  <profiledata>
+    <repetitiongroup>
+      <dive id="dive-1">
+        <informationbeforedive>
+          <datetime>2026-08-01T09:08:48Z</datetime>
+        </informationbeforedive>
+        <samples>$samples</samples>
+      </dive>
+    </repetitiongroup>
+  </profiledata>
+</uddf>
+''';
+        final result = await service.importAllDataFromUddf(uddfContent);
+        return result.dives.first['profile'] as List<Map<String, dynamic>>;
+      }
+
+      const rebreather = '''
+        <rebreather id="rb-1">
+          <o2sensor id="o2sensor_1"><name>Cell 1</name></o2sensor>
+          <o2sensor id="o2sensor_2"><name>Cell 2</name></o2sensor>
+          <o2sensor id="o2sensor_3"><name>Cell 3</name></o2sensor>
+        </rebreather>''';
+
+      test('imports calculatedpo2 as the sample ppO2', () async {
+        // Shearwater Cloud exports the aggregated loop ppO2 as
+        // <calculatedpo2>, in bar rather than the spec's Pascal.
+        final profile = await profileFrom('''
+          <waypoint>
+            <depth>12.4</depth>
+            <divetime>60</divetime>
+            <calculatedpo2>0.849999964</calculatedpo2>
+          </waypoint>''');
+
+        expect(profile.single['ppO2'], closeTo(0.85, 0.001));
+      });
+
+      test('converts a Pascal calculatedpo2 to bar', () async {
+        // UDDF 3.2.3 mandates Pascal: 1.27e5 Pa is 1.27 bar.
+        final profile = await profileFrom('''
+          <waypoint>
+            <depth>12.4</depth>
+            <divetime>60</divetime>
+            <calculatedpo2>1.27e5</calculatedpo2>
+          </waypoint>''');
+
+        expect(profile.single['ppO2'], closeTo(1.27, 0.001));
+      });
+
+      test('imports setpo2 as the sample setpoint', () async {
+        final profile = await profileFrom('''
+          <waypoint>
+            <depth>30</depth>
+            <divetime>120</divetime>
+            <setpo2>1.3e5</setpo2>
+          </waypoint>''');
+
+        expect(profile.single['setpoint'], closeTo(1.3, 0.001));
+      });
+
+      test('imports repeated measuredpo2 into per-cell readings', () async {
+        // The spec form: one <measuredpo2> per cell, each referencing a
+        // declared <o2sensor>. Cell order follows the declaration order,
+        // not the order the readings appear in the waypoint.
+        final profile = await profileFrom('''
+          <waypoint>
+            <depth>30</depth>
+            <divetime>120</divetime>
+            <measuredpo2 ref="o2sensor_2">1.23e5</measuredpo2>
+            <measuredpo2 ref="o2sensor_1">1.22e5</measuredpo2>
+            <measuredpo2 ref="o2sensor_3">1.21e5</measuredpo2>
+          </waypoint>''', equipment: rebreather);
+
+        final point = profile.single;
+        expect(point['o2Sensor1'], closeTo(1.22, 0.001));
+        expect(point['o2Sensor2'], closeTo(1.23, 0.001));
+        expect(point['o2Sensor3'], closeTo(1.21, 0.001));
+      });
+
+      test('imports the draft 3.3.0 ppo2 cell form', () async {
+        // AP Diving DiveSight emits the unpublished 3.3.0 <ppo2 ref=...>
+        // rename of <measuredpo2>.
+        final profile = await profileFrom('''
+          <waypoint>
+            <depth>30</depth>
+            <divetime>120</divetime>
+            <ppo2 ref="o2sensor_1">1.22e5</ppo2>
+            <ppo2 ref="o2sensor_2">1.23e5</ppo2>
+            <ppo2 ref="o2sensor_3">1.21e5</ppo2>
+          </waypoint>''', equipment: rebreather);
+
+        final point = profile.single;
+        expect(point['o2Sensor1'], closeTo(1.22, 0.001));
+        expect(point['o2Sensor2'], closeTo(1.23, 0.001));
+        expect(point['o2Sensor3'], closeTo(1.21, 0.001));
+      });
+
+      test('falls back to waypoint order for unresolvable cell refs', () async {
+        // No <o2sensor> declarations to resolve against: keep the readings
+        // rather than dropping them, in document order.
+        final profile = await profileFrom('''
+          <waypoint>
+            <depth>30</depth>
+            <divetime>120</divetime>
+            <measuredpo2 ref="cell_a">1.22e5</measuredpo2>
+            <measuredpo2 ref="cell_b">1.23e5</measuredpo2>
+          </waypoint>''');
+
+        final point = profile.single;
+        expect(point['o2Sensor1'], closeTo(1.22, 0.001));
+        expect(point['o2Sensor2'], closeTo(1.23, 0.001));
+      });
+
+      test('treats a bare measuredpo2 as the aggregate ppO2', () async {
+        // The spec makes `ref` mandatory, but an exporter that omits it is
+        // reporting one loop value rather than a cell, so it belongs on ppO2
+        // instead of being dropped.
+        final profile = await profileFrom('''
+          <waypoint>
+            <depth>30</depth>
+            <divetime>120</divetime>
+            <measuredpo2>1.22e5</measuredpo2>
+          </waypoint>''');
+
+        final point = profile.single;
+        expect(point['ppO2'], closeTo(1.22, 0.001));
+        expect(point['o2Sensor1'], isNull);
+      });
+
+      test('still reads the names our own exporter writes', () async {
+        // Submersion exports bare <setpoint>/<ppo2> in bar; re-importing our
+        // own file has to keep working.
+        final profile = await profileFrom('''
+          <waypoint>
+            <depth>30</depth>
+            <divetime>120</divetime>
+            <setpoint>1.3</setpoint>
+            <ppo2>1.21</ppo2>
+          </waypoint>''');
+
+        final point = profile.single;
+        expect(point['setpoint'], closeTo(1.3, 0.001));
+        expect(point['ppO2'], closeTo(1.21, 0.001));
+      });
+
+      test('keeps oxygen data on the waypoint it came from', () async {
+        // A waypoint without a depth is dropped from the profile, so a
+        // second pass that indexes waypoints against profile points shifts
+        // every later reading onto the wrong sample.
+        final profile = await profileFrom('''
+          <waypoint>
+            <divetime>0</divetime>
+            <setpoint>0.7</setpoint>
+          </waypoint>
+          <waypoint>
+            <depth>30</depth>
+            <divetime>120</divetime>
+            <setpoint>1.3</setpoint>
+          </waypoint>''');
+
+        expect(profile, hasLength(1));
+        expect(profile.single['setpoint'], closeTo(1.3, 0.001));
+      });
+    });
   });
 }
