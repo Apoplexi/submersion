@@ -58,6 +58,12 @@ jobs:
           BUILD: ${{ inputs.build-number }}
         run: |
           set -euo pipefail
+          # Digits only: BUILD lands in a grep pattern, where e.g. "49.7"
+          # (dot matches anything) could resolve the wrong release.
+          if ! [[ "$BUILD" =~ ^[0-9]+$ ]]; then
+            echo "::error::build-number must be digits only (got: ${BUILD})."
+            exit 1
+          fi
           TAG=$(gh release list --repo submersion-app/beta-builds \
             --json tagName -q ".[].tagName" | grep -E "\.${BUILD}$" | head -1)
           if [ -z "$TAG" ]; then

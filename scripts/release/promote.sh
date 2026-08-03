@@ -57,6 +57,16 @@ case "$BUMP" in patch|minor|major) ;; *)
   echo "Error: --bump must be patch, minor, or major (got: $BUMP)" >&2; exit 1 ;;
 esac
 
+# The build number is interpolated into a grep pattern and shipped to the
+# promote workflow; anything but digits (e.g. "49.7", where the dot matches
+# any character) could silently resolve the wrong release.
+require_numeric_build() {
+  if ! [[ "$1" =~ ^[0-9]+$ ]]; then
+    echo "Error: build number must be digits only (got: $1)" >&2
+    exit 1
+  fi
+}
+
 if $LATEST; then
   if [ -n "$BUILD" ]; then
     echo "Error: give either a build number or --latest, not both." >&2
@@ -64,7 +74,9 @@ if $LATEST; then
   fi
   TAG=$(gh release view --repo submersion-app/beta-builds --json tagName -q .tagName)
   BUILD="${TAG##*.}"
+  require_numeric_build "$BUILD"
 elif [ -n "$BUILD" ]; then
+  require_numeric_build "$BUILD"
   TAG=$(gh release list --repo submersion-app/beta-builds --json tagName \
     -q ".[].tagName" | grep -E "\.${BUILD}$" | head -1)
   if [ -z "$TAG" ]; then
