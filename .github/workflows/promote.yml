@@ -150,8 +150,10 @@ jobs:
           # store leg after the release already published. If the release
           # exists AND its checksums match this beta's, leave it untouched;
           # a checksum mismatch or an ambiguous API failure aborts.
+          # -i prepends the HTTP status line, a protocol-stable format,
+          # rather than grepping gh's free-form error prose.
           set +e
-          RESPONSE=$(gh api "repos/${{ github.repository }}/releases/tags/${TAG_NAME}" 2>&1)
+          RESPONSE=$(gh api -i "repos/${{ github.repository }}/releases/tags/${TAG_NAME}" 2>&1)
           STATUS=$?
           set -e
           if [ "$STATUS" -eq 0 ]; then
@@ -167,7 +169,7 @@ jobs:
               " skipping creation (re-entrant run)."
             exit 0
           fi
-          if ! echo "$RESPONSE" | grep -q "HTTP 404"; then
+          if ! echo "$RESPONSE" | head -1 | grep -qE '^HTTP/[0-9.]+ 404'; then
             echo "::error::Could not determine whether $TAG_NAME already" \
               " exists: $RESPONSE"
             exit 1
@@ -354,10 +356,17 @@ jobs:
           # merged (pubspec moved past the promoted version) or already be an
           # open PR from the previous attempt - both mean nothing to do here.
           CURRENT_SEMVER=$(grep '^version:' pubspec.yaml | sed 's/version: *//; s/+.*//')
-          if [ "$CURRENT_SEMVER" != "${{ needs.promote.outputs.semver }}" ]; then
-            echo "pubspec is at ${CURRENT_SEMVER}, already past promoted" \
-              " ${{ needs.promote.outputs.semver }}; skipping the bump."
-            exit 0
+          PROMOTED_SEMVER="${{ needs.promote.outputs.semver }}"
+          if [ "$CURRENT_SEMVER" != "$PROMOTED_SEMVER" ]; then
+            HIGHEST=$(printf '%s\n%s\n' "$CURRENT_SEMVER" "$PROMOTED_SEMVER" | sort -V | tail -1)
+            if [ "$HIGHEST" = "$CURRENT_SEMVER" ]; then
+              echo "pubspec is at ${CURRENT_SEMVER}, already past promoted" \
+                " ${PROMOTED_SEMVER}; the bump has landed - skipping."
+              exit 0
+            fi
+            echo "::error::pubspec is at ${CURRENT_SEMVER}, BEHIND the promoted" \
+              " ${PROMOTED_SEMVER} - unexpected state, refusing to bump."
+            exit 1
           fi
           OPEN_BUMP=$(gh pr list --repo ${{ github.repository }} --state open \
             --json headRefName -q '.[] | select(.headRefName | startswith("chore/bump-")) | .headRefName' | head -1)
