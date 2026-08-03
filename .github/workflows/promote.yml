@@ -250,18 +250,20 @@ jobs:
     runs-on: ubuntu-latest
     needs: promote
     timeout-minutes: 10
-    permissions:
-      contents: write
-      pull-requests: write
     steps:
+      # RELEASE_BOT_TOKEN (fine-grained PAT) instead of github.token: pushes
+      # made with the built-in token never trigger workflows, so CI would not
+      # run on the bump branch and auto-merge would wait forever. A PAT push
+      # fires CI normally and the PR lands itself when checks pass.
       - name: Checkout main
         uses: actions/checkout@v7
         with:
           ref: main
+          token: ${{ secrets.RELEASE_BOT_TOKEN }}
 
-      - name: Bump and open PR
+      - name: Bump and open auto-merging PR
         env:
-          GH_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ secrets.RELEASE_BOT_TOKEN }}
         run: |
           set -euo pipefail
           git config user.name "github-actions[bot]"
@@ -279,7 +281,7 @@ jobs:
           git push origin "$BRANCH"
           gh pr create --base main --head "$BRANCH" \
             --title "chore: bump version to ${NEWVER}" \
-            --body "Opens the next beta train after promoting ${{ needs.promote.outputs.tag }}. Merge promptly: the beta pipeline's train-closed guard fails every merge until this lands. Note: CI does not auto-run on bot-pushed branches; close/reopen the PR or push an empty commit to trigger it."
+            --body "Opens the next beta train after promoting ${{ needs.promote.outputs.tag }}. Auto-merges when checks pass; until it lands, the beta pipeline's train-closed guard fails every merge."
           gh pr merge --auto --merge "$BRANCH" || \
             echo "::warning::Auto-merge unavailable; merge the bump PR manually."
 

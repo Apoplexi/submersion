@@ -99,6 +99,23 @@ publish per-merge beta releases into `submersion-app/beta-builds`:
 Rotation: regenerate the token and re-run the same command. The workflow
 fails loudly on the next merge to main if the token has expired.
 
+**RELEASE_BOT_TOKEN**
+
+Fine-grained personal access token used by the Promote Beta workflow
+(`promote.yml`) to push the version-bump branch and open its auto-merging
+PR. A PAT is required because pushes made with the built-in `GITHUB_TOKEN`
+never trigger workflows, so CI would not run on the bump branch:
+
+1. Create at https://github.com/settings/personal-access-tokens/new
+2. Resource owner: `submersion-app`
+3. Repository access: only `submersion-app/submersion`
+4. Permissions: Contents - Read and write; Pull requests - Read and write
+5. Set with: `gh secret set RELEASE_BOT_TOKEN --repo submersion-app/submersion`
+
+Also requires repository auto-merge to be enabled (Settings > General >
+"Allow auto-merge"). Rotation: same as BETA_BUILDS_TOKEN; an expired token
+fails the bump-pr job of the next promotion.
+
 ## Verification
 
 After configuring all secrets, trigger a test release:
