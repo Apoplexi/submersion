@@ -108,7 +108,7 @@ a build number above the current commit count. Expected to be rare.
 | TestFlight upload slow (~10+ min) | External distribution waits for Apple build processing | Normal; 45-minute job timeout absorbs it |
 | Testers not seeing a new TestFlight build | First build of a new version train awaits Beta App Review | Normal; once per train, internal testers unaffected |
 | Promotion: "pruned or never built" | The build aged out of the newest-30 window | Promote a retained build instead |
-| Store upload leg failed after release published | Legs are independent | Fix the cause and re-run just that leg via workflow re-run |
+| Store upload leg failed after release published | Legs are independent | Fix the cause, then dispatch the SAME promotion again - it is re-entrant (existing release is verified by checksum and left untouched; a merged or already-open bump PR is skipped). Avoid GitHub's "re-run failed jobs": it replays the workflow definition pinned at the original run, without any fixes merged since |
 
 ## Pointers
 
