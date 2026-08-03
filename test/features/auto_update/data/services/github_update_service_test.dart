@@ -91,6 +91,28 @@ void main() {
       expect(available.downloadUrl, contains('Linux.tar.gz'));
     });
 
+    test(
+      '4-segment current version equal to the release tag is up to date',
+      () async {
+        final client = MockClient((request) async {
+          return http.Response(
+            jsonEncode(makeRelease(tagName: 'v1.7.1.118')),
+            200,
+          );
+        });
+
+        final service = GithubUpdateService(
+          owner: owner,
+          repo: repo,
+          currentVersion: '1.7.1.118',
+          platformSuffix: 'Linux.tar.gz',
+          httpClient: client,
+        );
+
+        expect(await service.checkForUpdate(), isA<UpToDate>());
+      },
+    );
+
     test('finds the Windows installer asset by its real suffix', () async {
       final client = MockClient((request) async {
         return http.Response(

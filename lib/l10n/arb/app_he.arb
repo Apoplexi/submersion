@@ -4103,6 +4103,7 @@
   "settings_cloudSync_header_syncBehavior": "התנהגות סנכרון",
   "settings_cloudSync_lastSynced": "סנכרון אחרון: {time}",
   "settings_cloudSync_pendingChanges": "{count, plural, =1{שינוי ממתין אחד} other{{count} שינויים ממתינים}}",
+  "settings_cloudSync_peerRequiresUpdate_banner": "{count, plural, =1{מכשיר אחד מסתנכרן מגרסה חדשה יותר של Submersion. עדכן מכשיר זה כדי לקבל את השינויים האחרונים שלו.} other{{count} מכשירים מסתנכרנים מגרסה חדשה יותר של Submersion. עדכן מכשיר זה כדי לקבל את השינויים האחרונים שלהם.}}",
   "settings_cloudSync_provider_connected": "מחובר",
   "settings_cloudSync_provider_connectedTo": "מחובר אל {providerName}",
   "settings_cloudSync_provider_connectionFailed": "החיבור אל {providerName} נכשל: {error}",
@@ -4526,6 +4527,65 @@
   "settings_units_weight": "משקל",
   "settings_units_weight_kilograms": "קילוגרם (kg)",
   "settings_units_weight_pounds": "ליברות (lbs)",
+  "settings_updates_automaticUpdates": "עדכונים אוטומטיים",
+  "settings_updates_automaticUpdatesSubtitle": "בדיקת עדכונים מעת לעת",
+  "settings_updates_betaDialogBody": "גרסאות בטא מתפרסמות מכל שינוי ועשויות לשדרג את מסד הנתונים של יומן הצלילה שלך לפני הגרסה היציבה. חזרה מאוחר יותר לערוץ היציב לא תחזיר את האפליקציה לגרסה קודמת, וכל המכשירים שמסתנכרנים יחד צריכים להשתמש באותו ערוץ. גיבוי נוצר אוטומטית לפני כל שדרוג של מסד הנתונים.",
+  "settings_updates_betaDialogConfirm": "מעבר לבטא",
+  "settings_updates_betaDialogTitle": "לקבל עדכוני בטא?",
+  "settings_updates_channel": "ערוץ עדכונים",
+  "settings_updates_channelBadgeBeta": "{version} (בטא)",
+  "@settings_updates_channelBadgeBeta": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "settings_updates_channelBeta": "בטא",
+  "settings_updates_channelBetaSubtitle": "גרסאות חדשות מכל שינוי, לפני היציבה",
+  "settings_updates_channelStable": "יציב",
+  "settings_updates_channelStableSubtitle": "גרסאות שנבדקו בלבד",
+  "settings_updates_checkForUpdates": "בדוק אם יש עדכונים",
+  "settings_updates_checking": "בודק...",
+  "settings_updates_downloading": "מוריד... {progress}%",
+  "@settings_updates_downloading": {
+    "placeholders": {
+      "progress": {
+        "type": "String"
+      }
+    }
+  },
+  "settings_updates_error": "שגיאה: {message}",
+  "@settings_updates_error": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "settings_updates_header": "עדכונים",
+  "settings_updates_joinBeta": "הצטרפות לבטא",
+  "settings_updates_joinBetaSubtitle": "קבל תכונות חדשות מוקדם דרך תוכנית הבטא",
+  "settings_updates_lastChecked": "בדיקה אחרונה",
+  "settings_updates_never": "אף פעם",
+  "settings_updates_readyToInstall": "גרסה {version} מוכנה להתקנה",
+  "@settings_updates_readyToInstall": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "settings_updates_stableSwitchNotice": "תישאר בגרסת הבטא הזו עד שהגרסה היציבה הבאה תהיה חדשה ממנה.",
+  "settings_updates_upToDate": "מעודכן",
+  "settings_updates_versionAvailable": "גרסה {version} זמינה",
+  "@settings_updates_versionAvailable": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
   "signatures_action_clear": "נקה",
   "signatures_action_closeSignatureView": "סגור תצוגת חתימה",
   "signatures_action_deleteSignature": "מחק חתימה",

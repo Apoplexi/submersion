@@ -3,7 +3,7 @@ name: Beta
 # Per-merge beta pipeline (release-channels spec, Phase 2). Runs after CI/CD
 # succeeds on main, builds the exact validated SHA via build-all.yml, and
 # publishes the artifact set as a release in submersion-app/beta-builds.
-# Store lanes (TestFlight / Play beta track) are Phase 4 and not wired here.
+# Store lanes: TestFlight (Public Beta group) and Play open testing (Phase 4).
 on:
   workflow_run:
     workflows: ["CI/CD"]
@@ -213,3 +213,179 @@ jobs:
             echo "Pruning $tag"
             gh release delete "$tag" --repo submersion-app/beta-builds --yes --cleanup-tag
           done
+
+  upload-testflight-ios:
+    name: Upload iOS beta to TestFlight
+    runs-on: macos-15
+    needs: [precheck, build]
+    if: needs.precheck.outputs.proceed == 'true' && inputs.skip-publish != true
+    timeout-minutes: 45
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ needs.precheck.outputs.sha }}
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2'
+          bundler-cache: true
+          working-directory: ios
+
+      - name: Setup App Store Connect API Key
+        env:
+          APP_STORE_CONNECT_API_KEY_KEY: ${{ secrets.APP_STORE_CONNECT_API_KEY_KEY }}
+        run: |
+          mkdir -p ios/fastlane
+          echo "$APP_STORE_CONNECT_API_KEY_KEY" | base64 --decode > ios/fastlane/AuthKey.p8
+
+      - name: Download iOS IPA artifact
+        uses: actions/download-artifact@v8
+        with:
+          name: ios-ipa
+
+      - name: Upload to TestFlight (Public Beta)
+        working-directory: ios
+        env:
+          APP_STORE_CONNECT_API_KEY_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_KEY_ID }}
+          APP_STORE_CONNECT_API_KEY_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ISSUER_ID }}
+          APP_STORE_CONNECT_API_KEY_KEY_FILEPATH: fastlane/AuthKey.p8
+          BETA_CHANGELOG: "Beta ${{ needs.precheck.outputs.tag }} - automated per-merge build."
+        run: |
+          IPA_PATH=$(ls $GITHUB_WORKSPACE/Submersion-*-iOS.ipa 2>/dev/null | head -1)
+          if [ -z "$IPA_PATH" ]; then
+            echo "Error: No IPA artifact found"
+            exit 1
+          fi
+          for attempt in 1 2; do
+            if bundle exec fastlane upload_testflight_beta ipa:"$IPA_PATH"; then
+              break
+            fi
+            if [ "$attempt" -eq 2 ]; then
+              echo "Fastlane upload failed after 2 attempts"
+              exit 1
+            fi
+            echo "Fastlane attempt $attempt failed, retrying in 30s..."
+            sleep 30
+          done
+
+      - name: Cleanup sensitive files
+        if: always()
+        run: rm -f ios/fastlane/AuthKey.p8
+
+  upload-testflight-macos:
+    name: Upload macOS beta to TestFlight
+    runs-on: macos-15
+    needs: [precheck, build]
+    if: needs.precheck.outputs.proceed == 'true' && inputs.skip-publish != true
+    timeout-minutes: 45
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ needs.precheck.outputs.sha }}
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2'
+          bundler-cache: true
+          working-directory: macos
+
+      - name: Setup App Store Connect API Key
+        env:
+          APP_STORE_CONNECT_API_KEY_KEY: ${{ secrets.APP_STORE_CONNECT_API_KEY_KEY }}
+        run: |
+          mkdir -p macos/fastlane
+          echo "$APP_STORE_CONNECT_API_KEY_KEY" | base64 --decode > macos/fastlane/AuthKey.p8
+
+      - name: Download Mac App Store pkg artifact
+        uses: actions/download-artifact@v8
+        with:
+          name: macos-pkg
+
+      - name: Upload to TestFlight (Public Beta)
+        working-directory: macos
+        env:
+          APP_STORE_CONNECT_API_KEY_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_KEY_ID }}
+          APP_STORE_CONNECT_API_KEY_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ISSUER_ID }}
+          APP_STORE_CONNECT_API_KEY_KEY_FILEPATH: fastlane/AuthKey.p8
+          BETA_CHANGELOG: "Beta ${{ needs.precheck.outputs.tag }} - automated per-merge build."
+        run: |
+          # The Mac App Store package keeps its fixed name (no tag prefix).
+          PKG_PATH="$GITHUB_WORKSPACE/Submersion.pkg"
+          if [ ! -f "$PKG_PATH" ]; then
+            echo "Error: No pkg artifact found at $PKG_PATH"
+            exit 1
+          fi
+          for attempt in 1 2; do
+            if bundle exec fastlane upload_testflight_beta pkg:"$PKG_PATH"; then
+              break
+            fi
+            if [ "$attempt" -eq 2 ]; then
+              echo "Fastlane upload failed after 2 attempts"
+              exit 1
+            fi
+            echo "Fastlane attempt $attempt failed, retrying in 30s..."
+            sleep 30
+          done
+
+      - name: Cleanup sensitive files
+        if: always()
+        run: rm -f macos/fastlane/AuthKey.p8
+
+  upload-play:
+    name: Upload Android beta to Play open testing
+    runs-on: ubuntu-latest
+    needs: [precheck, build]
+    if: needs.precheck.outputs.proceed == 'true' && inputs.skip-publish != true
+    timeout-minutes: 15
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ needs.precheck.outputs.sha }}
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2'
+          bundler-cache: true
+          working-directory: android
+
+      - name: Setup Google Play service account key
+        env:
+          GOOGLE_PLAY_SERVICE_ACCOUNT_KEY: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_KEY }}
+        # The secret is stored base64-encoded; release.yml decodes it the same
+        # way and has authenticated against Play in production. Writing it raw
+        # yields base64 text in a .json file and fastlane fails to parse it.
+        run: |
+          echo "$GOOGLE_PLAY_SERVICE_ACCOUNT_KEY" | base64 --decode > android/fastlane/play-store-key.json
+          chmod 600 android/fastlane/play-store-key.json
+
+      - name: Download Android AAB artifact
+        uses: actions/download-artifact@v8
+        with:
+          name: android-aab
+
+      - name: Upload to Play open testing
+        working-directory: android
+        env:
+          GOOGLE_PLAY_JSON_KEY_PATH: fastlane/play-store-key.json
+        run: |
+          for attempt in 1 2; do
+            if bundle exec fastlane upload_beta; then
+              break
+            fi
+            if [ "$attempt" -eq 2 ]; then
+              echo "Fastlane upload failed after 2 attempts"
+              exit 1
+            fi
+            echo "Fastlane attempt $attempt failed, retrying in 30s..."
+            sleep 30
+          done
+
+      - name: Cleanup sensitive files
+        if: always()
+        run: rm -f android/fastlane/play-store-key.json

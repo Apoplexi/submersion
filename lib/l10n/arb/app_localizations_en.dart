@@ -13377,6 +13377,19 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String settings_cloudSync_peerRequiresUpdate_banner(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count devices sync from a newer version of Submersion. Update this device to receive their latest changes.',
+      one:
+          '1 device syncs from a newer version of Submersion. Update this device to receive its latest changes.',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get settings_cloudSync_provider_connected => 'Connected';
 
   @override
@@ -14863,6 +14876,93 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settings_units_weight_pounds => 'Pounds (lbs)';
+
+  @override
+  String get settings_updates_automaticUpdates => 'Automatic updates';
+
+  @override
+  String get settings_updates_automaticUpdatesSubtitle =>
+      'Check for updates periodically';
+
+  @override
+  String get settings_updates_betaDialogBody =>
+      'Beta builds are published from every change and may upgrade your dive log\'s database before the stable release does. Switching back to stable later will not downgrade the app, and all devices that sync together should use the same channel. A backup is taken automatically before any database upgrade.';
+
+  @override
+  String get settings_updates_betaDialogConfirm => 'Switch to Beta';
+
+  @override
+  String get settings_updates_betaDialogTitle => 'Receive beta updates?';
+
+  @override
+  String get settings_updates_channel => 'Update channel';
+
+  @override
+  String settings_updates_channelBadgeBeta(String version) {
+    return '$version (Beta)';
+  }
+
+  @override
+  String get settings_updates_channelBeta => 'Beta';
+
+  @override
+  String get settings_updates_channelBetaSubtitle =>
+      'New builds from every change, ahead of stable';
+
+  @override
+  String get settings_updates_channelStable => 'Stable';
+
+  @override
+  String get settings_updates_channelStableSubtitle => 'Tested releases only';
+
+  @override
+  String get settings_updates_checkForUpdates => 'Check for Updates';
+
+  @override
+  String get settings_updates_checking => 'Checking...';
+
+  @override
+  String settings_updates_downloading(String progress) {
+    return 'Downloading... $progress%';
+  }
+
+  @override
+  String settings_updates_error(String message) {
+    return 'Error: $message';
+  }
+
+  @override
+  String get settings_updates_header => 'Updates';
+
+  @override
+  String get settings_updates_joinBeta => 'Join the Beta';
+
+  @override
+  String get settings_updates_joinBetaSubtitle =>
+      'Get new features early through the beta program';
+
+  @override
+  String get settings_updates_lastChecked => 'Last checked';
+
+  @override
+  String get settings_updates_never => 'Never';
+
+  @override
+  String settings_updates_readyToInstall(String version) {
+    return 'Version $version ready to install';
+  }
+
+  @override
+  String get settings_updates_stableSwitchNotice =>
+      'You will stay on this beta until the next stable release is newer than it.';
+
+  @override
+  String get settings_updates_upToDate => 'Up to date';
+
+  @override
+  String settings_updates_versionAvailable(String version) {
+    return 'Version $version available';
+  }
 
   @override
   String get signatures_action_clear => 'Clear';

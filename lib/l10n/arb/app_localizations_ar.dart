@@ -13360,6 +13360,19 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String settings_cloudSync_peerRequiresUpdate_banner(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count أجهزة تتزامن من إصدار أحدث من Submersion. حدّث هذا الجهاز لتلقي أحدث تغييراتها.',
+      one:
+          'جهاز واحد يتزامن من إصدار أحدث من Submersion. حدّث هذا الجهاز لتلقي أحدث تغييراته.',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get settings_cloudSync_provider_connected => 'متصل';
 
   @override
@@ -14845,6 +14858,93 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get settings_units_weight_pounds => 'أرطال (lbs)';
+
+  @override
+  String get settings_updates_automaticUpdates => 'التحديثات التلقائية';
+
+  @override
+  String get settings_updates_automaticUpdatesSubtitle =>
+      'التحقق من التحديثات بشكل دوري';
+
+  @override
+  String get settings_updates_betaDialogBody =>
+      'تُنشر إصدارات البيتا مع كل تغيير وقد تقوم بترقية قاعدة بيانات سجل الغوص قبل الإصدار المستقر. العودة لاحقًا إلى القناة المستقرة لن تعيد التطبيق إلى إصدار أقدم، وينبغي أن تستخدم جميع الأجهزة التي تتزامن معًا القناة نفسها. يتم إنشاء نسخة احتياطية تلقائيًا قبل أي ترقية لقاعدة البيانات.';
+
+  @override
+  String get settings_updates_betaDialogConfirm => 'التبديل إلى البيتا';
+
+  @override
+  String get settings_updates_betaDialogTitle => 'هل تريد تلقي تحديثات البيتا؟';
+
+  @override
+  String get settings_updates_channel => 'قناة التحديث';
+
+  @override
+  String settings_updates_channelBadgeBeta(String version) {
+    return '$version (بيتا)';
+  }
+
+  @override
+  String get settings_updates_channelBeta => 'بيتا';
+
+  @override
+  String get settings_updates_channelBetaSubtitle =>
+      'إصدارات جديدة مع كل تغيير، قبل الإصدار المستقر';
+
+  @override
+  String get settings_updates_channelStable => 'مستقر';
+
+  @override
+  String get settings_updates_channelStableSubtitle => 'الإصدارات المختبرة فقط';
+
+  @override
+  String get settings_updates_checkForUpdates => 'التحقق من التحديثات';
+
+  @override
+  String get settings_updates_checking => 'جارٍ التحقق...';
+
+  @override
+  String settings_updates_downloading(String progress) {
+    return 'جارٍ التنزيل... $progress%';
+  }
+
+  @override
+  String settings_updates_error(String message) {
+    return 'خطأ: $message';
+  }
+
+  @override
+  String get settings_updates_header => 'التحديثات';
+
+  @override
+  String get settings_updates_joinBeta => 'الانضمام إلى البيتا';
+
+  @override
+  String get settings_updates_joinBetaSubtitle =>
+      'احصل على الميزات الجديدة مبكرًا من خلال برنامج البيتا';
+
+  @override
+  String get settings_updates_lastChecked => 'آخر تحقق';
+
+  @override
+  String get settings_updates_never => 'أبدًا';
+
+  @override
+  String settings_updates_readyToInstall(String version) {
+    return 'الإصدار $version جاهز للتثبيت';
+  }
+
+  @override
+  String get settings_updates_stableSwitchNotice =>
+      'ستبقى على إصدار البيتا هذا حتى يصبح الإصدار المستقر التالي أحدث منه.';
+
+  @override
+  String get settings_updates_upToDate => 'محدّث';
+
+  @override
+  String settings_updates_versionAvailable(String version) {
+    return 'الإصدار $version متاح';
+  }
 
   @override
   String get signatures_action_clear => 'مسح';

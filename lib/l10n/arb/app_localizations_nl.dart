@@ -13495,6 +13495,19 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String settings_cloudSync_peerRequiresUpdate_banner(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count apparaten synchroniseren vanaf een nieuwere versie van Submersion. Werk dit apparaat bij om hun nieuwste wijzigingen te ontvangen.',
+      one:
+          '1 apparaat synchroniseert vanaf een nieuwere versie van Submersion. Werk dit apparaat bij om de nieuwste wijzigingen ervan te ontvangen.',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get settings_cloudSync_provider_connected => 'Verbonden';
 
   @override
@@ -14991,6 +15004,94 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get settings_units_weight_pounds => 'Pond (lbs)';
+
+  @override
+  String get settings_updates_automaticUpdates => 'Automatische updates';
+
+  @override
+  String get settings_updates_automaticUpdatesSubtitle =>
+      'Periodiek controleren op updates';
+
+  @override
+  String get settings_updates_betaDialogBody =>
+      'Bètabuilds worden bij elke wijziging gepubliceerd en kunnen de database van je duiklogboek upgraden vóór de stabiele versie. Later terugschakelen naar stabiel zet de app niet terug naar een oudere versie, en alle apparaten die met elkaar synchroniseren moeten hetzelfde kanaal gebruiken. Vóór elke database-upgrade wordt automatisch een back-up gemaakt.';
+
+  @override
+  String get settings_updates_betaDialogConfirm => 'Overschakelen naar bèta';
+
+  @override
+  String get settings_updates_betaDialogTitle => 'Bèta-updates ontvangen?';
+
+  @override
+  String get settings_updates_channel => 'Updatekanaal';
+
+  @override
+  String settings_updates_channelBadgeBeta(String version) {
+    return '$version (Bèta)';
+  }
+
+  @override
+  String get settings_updates_channelBeta => 'Bèta';
+
+  @override
+  String get settings_updates_channelBetaSubtitle =>
+      'Nieuwe builds bij elke wijziging, vóór de stabiele versie';
+
+  @override
+  String get settings_updates_channelStable => 'Stabiel';
+
+  @override
+  String get settings_updates_channelStableSubtitle =>
+      'Alleen geteste releases';
+
+  @override
+  String get settings_updates_checkForUpdates => 'Controleren op updates';
+
+  @override
+  String get settings_updates_checking => 'Controleren...';
+
+  @override
+  String settings_updates_downloading(String progress) {
+    return 'Downloaden... $progress%';
+  }
+
+  @override
+  String settings_updates_error(String message) {
+    return 'Fout: $message';
+  }
+
+  @override
+  String get settings_updates_header => 'Updates';
+
+  @override
+  String get settings_updates_joinBeta => 'Doe mee aan de bèta';
+
+  @override
+  String get settings_updates_joinBetaSubtitle =>
+      'Krijg nieuwe functies eerder via het bètaprogramma';
+
+  @override
+  String get settings_updates_lastChecked => 'Laatst gecontroleerd';
+
+  @override
+  String get settings_updates_never => 'Nooit';
+
+  @override
+  String settings_updates_readyToInstall(String version) {
+    return 'Versie $version klaar om te installeren';
+  }
+
+  @override
+  String get settings_updates_stableSwitchNotice =>
+      'Je blijft op deze bèta totdat de volgende stabiele versie nieuwer is.';
+
+  @override
+  String get settings_updates_upToDate => 'Up-to-date';
+
+  @override
+  String settings_updates_versionAvailable(String version) {
+    return 'Versie $version beschikbaar';
+  }
 
   @override
   String get signatures_action_clear => 'Wissen';

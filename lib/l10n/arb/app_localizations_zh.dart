@@ -12954,6 +12954,17 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String settings_cloudSync_peerRequiresUpdate_banner(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 台设备正在从更新版本的 Submersion 同步。请更新此设备以接收它们的最新更改。',
+      one: '1 台设备正在从更新版本的 Submersion 同步。请更新此设备以接收其最新更改。',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get settings_cloudSync_provider_connected => '已连接';
 
   @override
@@ -14376,6 +14387,90 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get settings_units_weight_pounds => '磅 (lbs)';
+
+  @override
+  String get settings_updates_automaticUpdates => '自动更新';
+
+  @override
+  String get settings_updates_automaticUpdatesSubtitle => '定期检查更新';
+
+  @override
+  String get settings_updates_betaDialogBody =>
+      'Beta 版本会随每次更改发布，可能会先于稳定版升级您的潜水日志数据库。之后切换回稳定版不会降级应用，并且所有相互同步的设备应使用相同的更新渠道。每次数据库升级前都会自动创建备份。';
+
+  @override
+  String get settings_updates_betaDialogConfirm => '切换到 Beta';
+
+  @override
+  String get settings_updates_betaDialogTitle => '接收 Beta 更新？';
+
+  @override
+  String get settings_updates_channel => '更新渠道';
+
+  @override
+  String settings_updates_channelBadgeBeta(String version) {
+    return '$version (Beta)';
+  }
+
+  @override
+  String get settings_updates_channelBeta => 'Beta';
+
+  @override
+  String get settings_updates_channelBetaSubtitle => '每次更改都会发布新版本，先于稳定版';
+
+  @override
+  String get settings_updates_channelStable => '稳定版';
+
+  @override
+  String get settings_updates_channelStableSubtitle => '仅提供经过测试的版本';
+
+  @override
+  String get settings_updates_checkForUpdates => '检查更新';
+
+  @override
+  String get settings_updates_checking => '正在检查...';
+
+  @override
+  String settings_updates_downloading(String progress) {
+    return '正在下载... $progress%';
+  }
+
+  @override
+  String settings_updates_error(String message) {
+    return '错误：$message';
+  }
+
+  @override
+  String get settings_updates_header => '更新';
+
+  @override
+  String get settings_updates_joinBeta => '加入 Beta 计划';
+
+  @override
+  String get settings_updates_joinBetaSubtitle => '通过 Beta 计划抢先体验新功能';
+
+  @override
+  String get settings_updates_lastChecked => '上次检查';
+
+  @override
+  String get settings_updates_never => '从未';
+
+  @override
+  String settings_updates_readyToInstall(String version) {
+    return '版本 $version 已准备好安装';
+  }
+
+  @override
+  String get settings_updates_stableSwitchNotice =>
+      '在下一个稳定版比当前 Beta 版更新之前，将保持在此 Beta 版上。';
+
+  @override
+  String get settings_updates_upToDate => '已是最新版本';
+
+  @override
+  String settings_updates_versionAvailable(String version) {
+    return '版本 $version 可用';
+  }
 
   @override
   String get signatures_action_clear => '清除';

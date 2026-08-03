@@ -4029,6 +4029,7 @@
   "settings_cloudSync_header_syncBehavior": "Comportamento sincronizzazione",
   "settings_cloudSync_lastSynced": "Ultima sincronizzazione: {time}",
   "settings_cloudSync_pendingChanges": "{count, plural, =1{1 modifica in sospeso} other{{count} modifiche in sospeso}}",
+  "settings_cloudSync_peerRequiresUpdate_banner": "{count, plural, =1{1 dispositivo si sincronizza da una versione più recente di Submersion. Aggiorna questo dispositivo per ricevere le sue ultime modifiche.} other{{count} dispositivi si sincronizzano da una versione più recente di Submersion. Aggiorna questo dispositivo per ricevere le loro ultime modifiche.}}",
   "settings_cloudSync_provider_connected": "Connesso",
   "settings_cloudSync_provider_connectedTo": "Connesso a {providerName}",
   "settings_cloudSync_provider_connectionFailed": "Connessione a {providerName} non riuscita: {error}",
@@ -4452,6 +4453,65 @@
   "settings_units_weight": "Peso",
   "settings_units_weight_kilograms": "Chilogrammi (kg)",
   "settings_units_weight_pounds": "Libbre (lbs)",
+  "settings_updates_automaticUpdates": "Aggiornamenti automatici",
+  "settings_updates_automaticUpdatesSubtitle": "Controlla periodicamente gli aggiornamenti",
+  "settings_updates_betaDialogBody": "Le build beta vengono pubblicate a ogni modifica e possono aggiornare il database del tuo diario immersioni prima della versione stabile. Tornare in seguito al canale stabile non riporterà l'app a una versione precedente, e tutti i dispositivi che si sincronizzano tra loro dovrebbero usare lo stesso canale. Prima di ogni aggiornamento del database viene eseguito automaticamente un backup.",
+  "settings_updates_betaDialogConfirm": "Passa alla Beta",
+  "settings_updates_betaDialogTitle": "Ricevere aggiornamenti beta?",
+  "settings_updates_channel": "Canale di aggiornamento",
+  "settings_updates_channelBadgeBeta": "{version} (Beta)",
+  "@settings_updates_channelBadgeBeta": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "settings_updates_channelBeta": "Beta",
+  "settings_updates_channelBetaSubtitle": "Nuove build a ogni modifica, in anticipo sulla stabile",
+  "settings_updates_channelStable": "Stabile",
+  "settings_updates_channelStableSubtitle": "Solo versioni testate",
+  "settings_updates_checkForUpdates": "Controlla aggiornamenti",
+  "settings_updates_checking": "Controllo in corso...",
+  "settings_updates_downloading": "Download in corso... {progress}%",
+  "@settings_updates_downloading": {
+    "placeholders": {
+      "progress": {
+        "type": "String"
+      }
+    }
+  },
+  "settings_updates_error": "Errore: {message}",
+  "@settings_updates_error": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "settings_updates_header": "Aggiornamenti",
+  "settings_updates_joinBeta": "Partecipa alla Beta",
+  "settings_updates_joinBetaSubtitle": "Ricevi in anteprima le nuove funzionalità tramite il programma beta",
+  "settings_updates_lastChecked": "Ultimo controllo",
+  "settings_updates_never": "Mai",
+  "settings_updates_readyToInstall": "Versione {version} pronta per l'installazione",
+  "@settings_updates_readyToInstall": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "settings_updates_stableSwitchNotice": "Rimarrai su questa beta finché la prossima versione stabile non sarà più recente di essa.",
+  "settings_updates_upToDate": "Aggiornato",
+  "settings_updates_versionAvailable": "Versione {version} disponibile",
+  "@settings_updates_versionAvailable": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
   "signatures_action_clear": "Cancella",
   "signatures_action_closeSignatureView": "Chiudi vista firma",
   "signatures_action_deleteSignature": "Elimina firma",

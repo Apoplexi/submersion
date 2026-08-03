@@ -13606,6 +13606,19 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
+  String settings_cloudSync_peerRequiresUpdate_banner(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count dispositivos sincronizam a partir de uma versão mais recente do Submersion. Atualize este dispositivo para receber as alterações mais recentes deles.',
+      one:
+          '1 dispositivo sincroniza a partir de uma versão mais recente do Submersion. Atualize este dispositivo para receber as alterações mais recentes dele.',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get settings_cloudSync_provider_connected => 'Conectado';
 
   @override
@@ -15125,6 +15138,94 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_units_weight_pounds => 'Libras (lbs)';
+
+  @override
+  String get settings_updates_automaticUpdates => 'Atualizações automáticas';
+
+  @override
+  String get settings_updates_automaticUpdatesSubtitle =>
+      'Verificar atualizações periodicamente';
+
+  @override
+  String get settings_updates_betaDialogBody =>
+      'As versões beta são publicadas a cada alteração e podem atualizar o banco de dados do seu registro de mergulhos antes da versão estável. Voltar depois para o canal estável não fará downgrade do app, e todos os dispositivos que sincronizam entre si devem usar o mesmo canal. Um backup é feito automaticamente antes de qualquer atualização do banco de dados.';
+
+  @override
+  String get settings_updates_betaDialogConfirm => 'Mudar para Beta';
+
+  @override
+  String get settings_updates_betaDialogTitle => 'Receber atualizações beta?';
+
+  @override
+  String get settings_updates_channel => 'Canal de atualização';
+
+  @override
+  String settings_updates_channelBadgeBeta(String version) {
+    return '$version (Beta)';
+  }
+
+  @override
+  String get settings_updates_channelBeta => 'Beta';
+
+  @override
+  String get settings_updates_channelBetaSubtitle =>
+      'Novas versões a cada alteração, antes da estável';
+
+  @override
+  String get settings_updates_channelStable => 'Estável';
+
+  @override
+  String get settings_updates_channelStableSubtitle =>
+      'Apenas versões testadas';
+
+  @override
+  String get settings_updates_checkForUpdates => 'Verificar atualizações';
+
+  @override
+  String get settings_updates_checking => 'Verificando...';
+
+  @override
+  String settings_updates_downloading(String progress) {
+    return 'Baixando... $progress%';
+  }
+
+  @override
+  String settings_updates_error(String message) {
+    return 'Erro: $message';
+  }
+
+  @override
+  String get settings_updates_header => 'Atualizações';
+
+  @override
+  String get settings_updates_joinBeta => 'Participar do Beta';
+
+  @override
+  String get settings_updates_joinBetaSubtitle =>
+      'Receba novos recursos antes através do programa beta';
+
+  @override
+  String get settings_updates_lastChecked => 'Última verificação';
+
+  @override
+  String get settings_updates_never => 'Nunca';
+
+  @override
+  String settings_updates_readyToInstall(String version) {
+    return 'Versão $version pronta para instalar';
+  }
+
+  @override
+  String get settings_updates_stableSwitchNotice =>
+      'Você permanecerá nesta beta até que a próxima versão estável seja mais recente que ela.';
+
+  @override
+  String get settings_updates_upToDate => 'Atualizado';
+
+  @override
+  String settings_updates_versionAvailable(String version) {
+    return 'Versão $version disponível';
+  }
 
   @override
   String get signatures_action_clear => 'Limpar';

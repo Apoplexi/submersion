@@ -50,6 +50,46 @@ platform :android do
     UI.success("AAB validation passed!")
   end
 
+  desc "Upload AAB to the open-testing (beta) track, released"
+  lane :upload_beta do
+    aab_path = find_aab
+
+    UI.message("Uploading to the open testing (beta) track...")
+    upload_to_play_store(
+      aab: aab_path,
+      track: "beta",
+      release_status: "completed",
+      skip_upload_metadata: true,
+      skip_upload_changelogs: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true,
+    )
+
+    UI.success("AAB released to the open testing track!")
+  end
+
+  desc "Promote an existing beta-track build to production (no upload)"
+  lane :promote_to_production do |options|
+    version_code = options[:version_code] || UI.user_error!("version_code is required")
+    rollout = options[:rollout] || "1.0"
+
+    UI.message("Promoting build #{version_code} from beta to production (rollout #{rollout})...")
+    upload_to_play_store(
+      track: "beta",
+      track_promote_to: "production",
+      version_code: version_code,
+      rollout: rollout,
+      skip_upload_aab: true,
+      skip_upload_apk: true,
+      skip_upload_metadata: true,
+      skip_upload_changelogs: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true,
+    )
+
+    UI.success("Build #{version_code} promoted to production!")
+  end
+
   # ============================================================================
   # Helper Methods
   # ============================================================================

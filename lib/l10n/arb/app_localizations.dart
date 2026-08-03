@@ -22979,6 +22979,12 @@ abstract class AppLocalizations {
   /// **'{count, plural, =1{1 pending change} other{{count} pending changes}}'**
   String settings_cloudSync_pendingChanges(int count);
 
+  /// No description provided for @settings_cloudSync_peerRequiresUpdate_banner.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 device syncs from a newer version of Submersion. Update this device to receive its latest changes.} other{{count} devices sync from a newer version of Submersion. Update this device to receive their latest changes.}}'**
+  String settings_cloudSync_peerRequiresUpdate_banner(num count);
+
   /// No description provided for @settings_cloudSync_provider_connected.
   ///
   /// In en, this message translates to:
@@ -25519,6 +25525,150 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Pounds (lbs)'**
   String get settings_units_weight_pounds;
+
+  /// No description provided for @settings_updates_automaticUpdates.
+  ///
+  /// In en, this message translates to:
+  /// **'Automatic updates'**
+  String get settings_updates_automaticUpdates;
+
+  /// No description provided for @settings_updates_automaticUpdatesSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Check for updates periodically'**
+  String get settings_updates_automaticUpdatesSubtitle;
+
+  /// No description provided for @settings_updates_betaDialogBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Beta builds are published from every change and may upgrade your dive log\'s database before the stable release does. Switching back to stable later will not downgrade the app, and all devices that sync together should use the same channel. A backup is taken automatically before any database upgrade.'**
+  String get settings_updates_betaDialogBody;
+
+  /// No description provided for @settings_updates_betaDialogConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Switch to Beta'**
+  String get settings_updates_betaDialogConfirm;
+
+  /// No description provided for @settings_updates_betaDialogTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Receive beta updates?'**
+  String get settings_updates_betaDialogTitle;
+
+  /// No description provided for @settings_updates_channel.
+  ///
+  /// In en, this message translates to:
+  /// **'Update channel'**
+  String get settings_updates_channel;
+
+  /// No description provided for @settings_updates_channelBadgeBeta.
+  ///
+  /// In en, this message translates to:
+  /// **'{version} (Beta)'**
+  String settings_updates_channelBadgeBeta(String version);
+
+  /// No description provided for @settings_updates_channelBeta.
+  ///
+  /// In en, this message translates to:
+  /// **'Beta'**
+  String get settings_updates_channelBeta;
+
+  /// No description provided for @settings_updates_channelBetaSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'New builds from every change, ahead of stable'**
+  String get settings_updates_channelBetaSubtitle;
+
+  /// No description provided for @settings_updates_channelStable.
+  ///
+  /// In en, this message translates to:
+  /// **'Stable'**
+  String get settings_updates_channelStable;
+
+  /// No description provided for @settings_updates_channelStableSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Tested releases only'**
+  String get settings_updates_channelStableSubtitle;
+
+  /// No description provided for @settings_updates_checkForUpdates.
+  ///
+  /// In en, this message translates to:
+  /// **'Check for Updates'**
+  String get settings_updates_checkForUpdates;
+
+  /// No description provided for @settings_updates_checking.
+  ///
+  /// In en, this message translates to:
+  /// **'Checking...'**
+  String get settings_updates_checking;
+
+  /// No description provided for @settings_updates_downloading.
+  ///
+  /// In en, this message translates to:
+  /// **'Downloading... {progress}%'**
+  String settings_updates_downloading(String progress);
+
+  /// No description provided for @settings_updates_error.
+  ///
+  /// In en, this message translates to:
+  /// **'Error: {message}'**
+  String settings_updates_error(String message);
+
+  /// No description provided for @settings_updates_header.
+  ///
+  /// In en, this message translates to:
+  /// **'Updates'**
+  String get settings_updates_header;
+
+  /// No description provided for @settings_updates_joinBeta.
+  ///
+  /// In en, this message translates to:
+  /// **'Join the Beta'**
+  String get settings_updates_joinBeta;
+
+  /// No description provided for @settings_updates_joinBetaSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Get new features early through the beta program'**
+  String get settings_updates_joinBetaSubtitle;
+
+  /// No description provided for @settings_updates_lastChecked.
+  ///
+  /// In en, this message translates to:
+  /// **'Last checked'**
+  String get settings_updates_lastChecked;
+
+  /// No description provided for @settings_updates_never.
+  ///
+  /// In en, this message translates to:
+  /// **'Never'**
+  String get settings_updates_never;
+
+  /// No description provided for @settings_updates_readyToInstall.
+  ///
+  /// In en, this message translates to:
+  /// **'Version {version} ready to install'**
+  String settings_updates_readyToInstall(String version);
+
+  /// No description provided for @settings_updates_stableSwitchNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'You will stay on this beta until the next stable release is newer than it.'**
+  String get settings_updates_stableSwitchNotice;
+
+  /// No description provided for @settings_updates_upToDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Up to date'**
+  String get settings_updates_upToDate;
+
+  /// No description provided for @settings_updates_versionAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Version {version} available'**
+  String settings_updates_versionAvailable(String version);
 
   /// Button label to clear the signature canvas
   ///
