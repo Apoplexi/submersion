@@ -4,7 +4,7 @@ import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/features/divers/data/repositories/diver_repository.dart';
 import 'package:submersion/features/divers/domain/entities/diver.dart';
 import 'package:submersion/features/divers/presentation/providers/diver_providers.dart';
-import 'package:submersion/features/settings/presentation/pages/prior_experience_edit_page.dart';
+import 'package:submersion/features/settings/presentation/pages/notes_edit_page.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
 
 import '../../../../helpers/mock_providers.dart';
@@ -35,19 +35,13 @@ class _CapturingNotifier extends StateNotifier<AsyncValue<List<Diver>>>
 void main() {
   final now = DateTime.now();
 
-  Diver makeDiver({
-    int? priorDiveCount,
-    int? priorDiveTimeSeconds,
-    DateTime? divingSince,
-  }) {
+  Diver makeDiver({String notes = ''}) {
     return Diver(
       id: 'diver-1',
       name: 'Alice Alpha',
       createdAt: now,
       updatedAt: now,
-      priorDiveCount: priorDiveCount,
-      priorDiveTimeSeconds: priorDiveTimeSeconds,
-      divingSince: divingSince,
+      notes: notes,
     );
   }
 
@@ -70,7 +64,7 @@ void main() {
           locale: Locale('en'),
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
-          home: PriorExperienceEditPage(),
+          home: NotesEditPage(),
         ),
       ),
     );
@@ -78,83 +72,47 @@ void main() {
     return notifier;
   }
 
-  testWidgets('populates fields from the existing diver', (tester) async {
+  testWidgets('populates the notes field from the existing diver', (
+    tester,
+  ) async {
     final notifier = await pump(
       tester,
-      makeDiver(
-        priorDiveCount: 42,
-        priorDiveTimeSeconds: 2 * 3600 + 30 * 60,
-        divingSince: DateTime(2008),
-      ),
+      makeDiver(notes: 'Prefers early morning boat dives'),
     );
 
-    expect(find.widgetWithText(TextFormField, '42'), findsOneWidget);
-    expect(find.widgetWithText(TextFormField, '2'), findsOneWidget); // hours
-    expect(find.widgetWithText(TextFormField, '30'), findsOneWidget); // minutes
-    expect(find.textContaining('2008'), findsWidgets);
+    expect(find.widgetWithText(AppBar, 'Notes'), findsOneWidget);
+    expect(find.text('Save'), findsOneWidget);
+    expect(find.text('Prefers early morning boat dives'), findsOneWidget);
     expect(notifier.updated, isNull);
   });
 
-  testWidgets('entering prior experience saves it onto the diver', (
+  testWidgets('saving persists the trimmed notes onto the diver', (
     tester,
   ) async {
     final notifier = await pump(tester, makeDiver());
 
     await tester.enterText(
-      find.widgetWithText(TextFormField, 'Prior dives'),
-      '150',
+      find.byType(TextField),
+      '  Nitrox refresher due in spring  ',
     );
-    await tester.enterText(
-      find.widgetWithText(TextFormField, 'Prior hours'),
-      '75',
-    );
-    await tester.enterText(find.widgetWithText(TextFormField, 'Minutes'), '45');
-
     await tester.tap(find.text('Save'));
     await tester.pumpAndSettle();
 
     expect(notifier.updated, isNotNull);
-    expect(notifier.updated!.priorDiveCount, 150);
-    expect(notifier.updated!.priorDiveTimeSeconds, 75 * 3600 + 45 * 60);
+    expect(notifier.updated!.notes, 'Nitrox refresher due in spring');
+    expect(notifier.updated!.id, 'diver-1');
   });
 
-  testWidgets('rejects negative dive counts and does not save', (tester) async {
-    final notifier = await pump(tester, makeDiver());
-
-    await tester.enterText(
-      find.widgetWithText(TextFormField, 'Prior dives'),
-      '-5',
-    );
-    await tester.tap(find.text('Save'));
-    await tester.pumpAndSettle();
-
-    expect(notifier.updated, isNull);
-    expect(find.text('Enter a valid number'), findsOneWidget);
-  });
-
-  testWidgets('rejects minutes greater than 59', (tester) async {
-    final notifier = await pump(tester, makeDiver());
-
-    await tester.enterText(find.widgetWithText(TextFormField, 'Minutes'), '90');
-    await tester.tap(find.text('Save'));
-    await tester.pumpAndSettle();
-
-    expect(notifier.updated, isNull);
-  });
-
-  testWidgets('clearing a previously-set dive count persists null', (
+  testWidgets('clearing existing notes persists an empty string', (
     tester,
   ) async {
-    final notifier = await pump(tester, makeDiver(priorDiveCount: 80));
+    final notifier = await pump(tester, makeDiver(notes: 'Old note'));
 
-    await tester.enterText(
-      find.widgetWithText(TextFormField, 'Prior dives'),
-      '',
-    );
+    await tester.enterText(find.byType(TextField), '');
     await tester.tap(find.text('Save'));
     await tester.pumpAndSettle();
 
     expect(notifier.updated, isNotNull);
-    expect(notifier.updated!.priorDiveCount, isNull);
+    expect(notifier.updated!.notes, isEmpty);
   });
 }
