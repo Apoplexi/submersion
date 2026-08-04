@@ -174,6 +174,13 @@ void main() {
     'BuddyEditPage on top, and the dialog/sheet reappear intact once it is '
     'saved and popped',
     (tester) async {
+      // BuddyEditPage's form is taller than the default 800x600 test
+      // surface, so its Save button sits below the fold; widen the surface
+      // rather than fight scroll offsets to reach it.
+      addTearDown(tester.view.resetPhysicalSize);
+      tester.view.physicalSize = const Size(800, 2000);
+      tester.view.devicePixelRatio = 1.0;
+
       await tester.pumpWidget(buildApp(const _BulkAddBuddiesHost()));
       await tester.pumpAndSettle();
 
@@ -202,7 +209,7 @@ void main() {
       // their original state intact -- proving nothing was lost while
       // covered.
       await tester.enterText(find.byType(TextFormField).first, 'New Diver');
-      await tester.tap(find.text('Save'));
+      await tester.tap(find.byType(FilledButton));
       await tester.pumpAndSettle();
 
       expect(find.byType(BuddyEditPage), findsNothing);
@@ -218,6 +225,10 @@ void main() {
     'still shows the real BuddyEditPage on top -- the root-navigator fix '
     'does not regress this flow',
     (tester) async {
+      addTearDown(tester.view.resetPhysicalSize);
+      tester.view.physicalSize = const Size(800, 2000);
+      tester.view.devicePixelRatio = 1.0;
+
       await tester.pumpWidget(buildApp(const _EmbeddedPickerHost()));
       await tester.pumpAndSettle();
 
@@ -231,7 +242,7 @@ void main() {
       expect(find.byType(BuddyEditPage), findsOneWidget);
 
       await tester.enterText(find.byType(TextFormField).first, 'Another One');
-      await tester.tap(find.text('Save'));
+      await tester.tap(find.byType(FilledButton));
       await tester.pumpAndSettle();
 
       expect(find.byType(BuddyEditPage), findsNothing);
