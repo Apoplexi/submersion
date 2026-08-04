@@ -29,6 +29,12 @@ on:
       dmg-length:
         description: 'Byte length of the macOS DMG'
         value: ${{ jobs.build-macos.outputs.dmg-length }}
+      windows-eddsa-signature:
+        description: 'Sparkle EdDSA signature of the Windows installer'
+        value: ${{ jobs.build-windows.outputs.windows-eddsa-signature }}
+      windows-exe-length:
+        description: 'Byte length of the Windows installer'
+        value: ${{ jobs.build-windows.outputs.windows-exe-length }}
   workflow_dispatch:
     inputs:
       version-tag:
@@ -350,6 +356,9 @@ jobs:
     name: Build Windows
     runs-on: windows-latest
     timeout-minutes: 30
+    outputs:
+      windows-eddsa-signature: ${{ steps.sparkle-sign-windows.outputs.windows-eddsa-signature }}
+      windows-exe-length: ${{ steps.sparkle-sign-windows.outputs.windows-exe-length }}
 
     steps:
       - name: Checkout repository
@@ -415,6 +424,59 @@ jobs:
           $buildNumber = (Select-String -Path pubspec.yaml -Pattern '^\s*version:.*\+(\d+)' | ForEach-Object { $_.Matches.Groups[1].Value })
           iscc /DAPP_VERSION="$version" /DAPP_VERSION_CODE="$buildNumber" windows\installer\submersion.iss
           Move-Item "build\windows\installer\Submersion-*-Windows-Setup.exe" .
+
+      - name: Sign installer with Sparkle EdDSA
+        id: sparkle-sign-windows
+        env:
+          SPARKLE_EDDSA_PRIVATE_KEY: ${{ secrets.SPARKLE_EDDSA_PRIVATE_KEY }}
+          # Must match the EdDSAPub resource in windows/runner/Runner.rc and
+          # SUPublicEDKey in macos/Runner/Info.plist (one key pair signs both
+          # platforms). Verified below so a key-format or secret mixup fails
+          # the build instead of publishing signatures clients would reject.
+          EXPECTED_PUBLIC_KEY: 'XHQ9oigpC8fdjMcsVJQn5gfgYoWocVOb2G4M6IvexJk='
+        run: |
+          if (-not $env:SPARKLE_EDDSA_PRIVATE_KEY) {
+            Write-Error "SPARKLE_EDDSA_PRIVATE_KEY secret is not configured"
+            exit 1
+          }
+
+          # winsparkle-tool understands Sparkle's private key formats and
+          # produces the same edSignature the macOS sign_update tool would.
+          $tool = "packages\auto_updater_windows\windows\WinSparkle-0.9.4\bin\winsparkle-tool.exe"
+          $exe = Get-Item "Submersion-*-Windows-Setup.exe"
+          $keyFile = Join-Path $env:RUNNER_TEMP "sparkle-eddsa.key"
+          [IO.File]::WriteAllText($keyFile, $env:SPARKLE_EDDSA_PRIVATE_KEY)
+
+          try {
+            $pubOut = (& $tool public-key -f $keyFile) -join "`n"
+            if ($LASTEXITCODE -ne 0) {
+              Write-Error "winsparkle-tool public-key failed: $pubOut"
+              exit 1
+            }
+            if (-not $pubOut.Contains($env:EXPECTED_PUBLIC_KEY)) {
+              Write-Error "Private key does not match the public key embedded in Runner.rc"
+              exit 1
+            }
+
+            $sigOut = (& $tool sign -f $keyFile -v $exe.FullName) -join "`n"
+            if ($LASTEXITCODE -ne 0) {
+              Write-Error "winsparkle-tool sign failed: $sigOut"
+              exit 1
+            }
+          } finally {
+            Remove-Item $keyFile -Force
+          }
+
+          if ($sigOut -notmatch 'sparkle:edSignature="([^"]+)" length="(\d+)"') {
+            Write-Error "Failed to parse winsparkle-tool output: $sigOut"
+            exit 1
+          }
+          $signature = $Matches[1]
+          $length = $Matches[2]
+
+          Write-Output "Installer length: $length bytes"
+          "windows-eddsa-signature=$signature" >> $env:GITHUB_OUTPUT
+          "windows-exe-length=$length" >> $env:GITHUB_OUTPUT
 
       - name: Upload Windows artifact
         uses: actions/upload-artifact@v7

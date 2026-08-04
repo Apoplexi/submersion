@@ -146,6 +146,8 @@ jobs:
           SOURCE_SHA: ${{ needs.precheck.outputs.sha }}
           EDDSA_SIGNATURE: ${{ needs.build.outputs.eddsa-signature }}
           DMG_LENGTH: ${{ needs.build.outputs.dmg-length }}
+          WINDOWS_EDDSA_SIGNATURE: ${{ needs.build.outputs.windows-eddsa-signature }}
+          WINDOWS_EXE_LENGTH: ${{ needs.build.outputs.windows-exe-length }}
         run: |
           set -euo pipefail
           cd artifacts
@@ -168,6 +170,8 @@ jobs:
               'buildNumber': int(build),
               'eddsaSignature': os.environ['EDDSA_SIGNATURE'],
               'dmgLength': int(os.environ['DMG_LENGTH']),
+              'windowsEddsaSignature': os.environ['WINDOWS_EDDSA_SIGNATURE'],
+              'windowsExeLength': int(os.environ['WINDOWS_EXE_LENGTH']),
           }, open('metadata.json', 'w'), indent=2)
           PYEOF
 
@@ -177,6 +181,8 @@ jobs:
           BUILD_NUMBER: ${{ needs.precheck.outputs.build-number }}
           SPARKLE_EDDSA_SIGNATURE: ${{ needs.build.outputs.eddsa-signature }}
           SPARKLE_DMG_LENGTH: ${{ needs.build.outputs.dmg-length }}
+          SPARKLE_WINDOWS_EDDSA_SIGNATURE: ${{ needs.build.outputs.windows-eddsa-signature }}
+          SPARKLE_WINDOWS_EXE_LENGTH: ${{ needs.build.outputs.windows-exe-length }}
         run: |
           set -euo pipefail
           VERSION="${TAG_NAME#v}"

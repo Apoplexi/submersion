@@ -14,6 +14,14 @@
 # Requires:
 #   SPARKLE_EDDSA_SIGNATURE env var (EdDSA signature of macOS DMG)
 #   SPARKLE_DMG_LENGTH env var (byte length of macOS DMG)
+#   SPARKLE_WINDOWS_EDDSA_SIGNATURE env var (EdDSA signature of Windows installer)
+#   SPARKLE_WINDOWS_EXE_LENGTH env var (byte length of Windows installer)
+#
+# The Windows signature vars are mandatory: WinSparkle clients with an
+# embedded EdDSA public key reject unsigned enclosures, so silently emitting
+# one would break updates for every up-to-date install. Set
+# SPARKLE_ALLOW_UNSIGNED_WINDOWS=1 to emit the legacy unsigned enclosure
+# (only for promoting betas built before Windows signing existed).
 
 set -euo pipefail
 
@@ -28,7 +36,27 @@ MACOS_URL="${4}"
 WINDOWS_URL="${5}"
 RELEASE_NOTES_FILE="${6:?Missing release_notes_html_file argument}"
 EDDSA_SIG="${SPARKLE_EDDSA_SIGNATURE:-}"
-DMG_LENGTH="${SPARKLE_DMG_LENGTH:-0}"
+DMG_LENGTH="${SPARKLE_DMG_LENGTH:-}"
+WINDOWS_EDDSA_SIG="${SPARKLE_WINDOWS_EDDSA_SIGNATURE:-}"
+WINDOWS_EXE_LENGTH="${SPARKLE_WINDOWS_EXE_LENGTH:-}"
+
+if [ -z "$EDDSA_SIG" ] || [ -z "$DMG_LENGTH" ] || [ "$DMG_LENGTH" = "0" ]; then
+  echo "Error: SPARKLE_EDDSA_SIGNATURE and SPARKLE_DMG_LENGTH are required" >&2
+  exit 1
+fi
+
+if [ -z "$WINDOWS_EDDSA_SIG" ] || [ -z "$WINDOWS_EXE_LENGTH" ]; then
+  if [ "${SPARKLE_ALLOW_UNSIGNED_WINDOWS:-}" != "1" ]; then
+    echo "Error: SPARKLE_WINDOWS_EDDSA_SIGNATURE and SPARKLE_WINDOWS_EXE_LENGTH are required" >&2
+    echo "(set SPARKLE_ALLOW_UNSIGNED_WINDOWS=1 only to promote a pre-signing beta)" >&2
+    exit 1
+  fi
+  WINDOWS_SIG_ATTRS=""
+else
+  WINDOWS_SIG_ATTRS="
+        sparkle:edSignature=\"${WINDOWS_EDDSA_SIG}\"
+        length=\"${WINDOWS_EXE_LENGTH}\""
+fi
 
 if [ ! -f "$RELEASE_NOTES_FILE" ]; then
   echo "Error: release notes file not found: $RELEASE_NOTES_FILE" >&2
@@ -63,7 +91,7 @@ cat <<APPCAST
       <description><![CDATA[${RELEASE_NOTES_HTML}]]></description>
       <pubDate>${DATE}</pubDate>
       <enclosure
-        url="${WINDOWS_URL}"
+        url="${WINDOWS_URL}"${WINDOWS_SIG_ATTRS}
         type="application/octet-stream"
         sparkle:os="windows"
       />
