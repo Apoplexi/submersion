@@ -45,10 +45,17 @@ if [ -z "$EDDSA_SIG" ] || [ -z "$DMG_LENGTH" ] || [ "$DMG_LENGTH" = "0" ]; then
   exit 1
 fi
 
-if [ -z "$WINDOWS_EDDSA_SIG" ] || [ -z "$WINDOWS_EXE_LENGTH" ]; then
+if [ -z "$WINDOWS_EDDSA_SIG" ] || [ -z "$WINDOWS_EXE_LENGTH" ] || [ "$WINDOWS_EXE_LENGTH" = "0" ]; then
   if [ "${SPARKLE_ALLOW_UNSIGNED_WINDOWS:-}" != "1" ]; then
     echo "Error: SPARKLE_WINDOWS_EDDSA_SIGNATURE and SPARKLE_WINDOWS_EXE_LENGTH are required" >&2
     echo "(set SPARKLE_ALLOW_UNSIGNED_WINDOWS=1 only to promote a pre-signing beta)" >&2
+    exit 1
+  fi
+  # The escape hatch covers builds with no Windows signing at all. If either
+  # var is present the CI wiring is broken, and silently emitting an unsigned
+  # enclosure would strand every keyed WinSparkle client.
+  if [ -n "$WINDOWS_EDDSA_SIG" ] || [ -n "$WINDOWS_EXE_LENGTH" ]; then
+    echo "Error: partial Windows signing vars; refusing the unsigned fallback" >&2
     exit 1
   fi
   WINDOWS_SIG_ATTRS=""

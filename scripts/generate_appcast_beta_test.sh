@@ -61,6 +61,24 @@ if OUT=$(env -u SPARKLE_EDDSA_SIGNATURE -u SPARKLE_DMG_LENGTH \
   fail "expected failure when macOS signature env vars are missing"
 fi
 
+# Case 3c: a zero-byte Windows length is as fatal as a missing one; keyed
+# WinSparkle clients reject an enclosure whose length does not match the
+# installer, so length="0" can only be a CI wiring mistake.
+if OUT=$(SPARKLE_WINDOWS_EXE_LENGTH=0 \
+    "$SCRIPT_DIR/generate_appcast.sh" 1.8.0 5601 "Mon, 28 Jul 2026 00:00:00 +0000" \
+    https://example.com/beta.dmg https://example.com/beta.exe "$TMP/notes.html" 2>/dev/null); then
+  fail "expected failure when Windows length is 0"
+fi
+
+# Case 3d: the unsigned escape hatch only covers builds with no Windows
+# signing at all; if one of the two vars is present the wiring is broken,
+# and silently emitting an unsigned enclosure would strand keyed clients.
+if OUT=$(env -u SPARKLE_WINDOWS_EXE_LENGTH SPARKLE_ALLOW_UNSIGNED_WINDOWS=1 \
+    "$SCRIPT_DIR/generate_appcast.sh" 1.8.0 5601 "Mon, 28 Jul 2026 00:00:00 +0000" \
+    https://example.com/beta.dmg https://example.com/beta.exe "$TMP/notes.html" 2>/dev/null); then
+  fail "expected failure when only one Windows signing var is set despite allow-unsigned"
+fi
+
 # Case 4: SPARKLE_ALLOW_UNSIGNED_WINDOWS=1 restores the legacy unsigned
 # enclosure (needed to promote betas built before Windows signing existed).
 OUT=$(env -u SPARKLE_WINDOWS_EDDSA_SIGNATURE -u SPARKLE_WINDOWS_EXE_LENGTH \
