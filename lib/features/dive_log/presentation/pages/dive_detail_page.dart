@@ -215,8 +215,13 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
 
     // On desktop, redirect standalone detail pages to master-detail view.
     // Skip in table mode -- table view has no master-detail split to redirect into.
+    // Skip when this page was PUSHED (trip/buddy/site drill-through): the
+    // redirect uses go(), which would wipe the stack and lose the browse
+    // context and back button (#764). Only redirect root-level details
+    // (deep links, tab navigation).
     if (!widget.embedded &&
         !_hasRedirected &&
+        !(GoRouter.maybeOf(context)?.canPop() ?? false) &&
         ResponsiveBreakpoints.isMasterDetail(context)) {
       final viewMode = ref.read(diveListViewModeProvider);
       if (viewMode != ListViewMode.table) {
