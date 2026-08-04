@@ -1,5 +1,4 @@
-import 'dart:typed_data';
-
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
@@ -237,6 +236,41 @@ void main() {
 
         expect(result.status, equals(ResolutionStatus.resolved));
         expect(result.localAssetId, equals('matched-id'));
+      },
+    );
+
+    // checkPermission() ultimately hits platform code (see
+    // PhotoPickerServiceMobile.checkPermission()); a platform-channel
+    // exception must not bubble out of resolveAssetId() and break a
+    // Riverpod provider watching it. It should be treated like any other
+    // gallery failure: log and report unavailable without caching.
+    test(
+      'returns unavailable without caching when checkPermission throws',
+      () async {
+        when(mockPicker.supportsGalleryBrowsing).thenReturn(true);
+        when(
+          mockCache.getCachedAssetId('media-1'),
+        ).thenAnswer((_) async => null);
+        when(mockCache.getCacheEntry('media-1')).thenAnswer((_) async => null);
+        when(
+          mockPicker.getThumbnail('original-asset-id', size: 50),
+        ).thenAnswer((_) async => null);
+        when(
+          mockPicker.checkPermission(),
+        ).thenThrow(PlatformException(code: 'permission_check_failed'));
+
+        final result = await service.resolveAssetId(createTestItem());
+
+        expect(result.status, equals(ResolutionStatus.unavailable));
+        expect(result.localAssetId, isNull);
+        verifyNever(mockPicker.getAssetsInDateRange(any, any));
+        verifyNever(
+          mockCache.cacheResolution(
+            mediaId: anyNamed('mediaId'),
+            localAssetId: anyNamed('localAssetId'),
+            method: anyNamed('method'),
+          ),
+        );
       },
     );
   });

@@ -137,7 +137,17 @@ class AssetResolutionService {
     // in place: caching would apply the 24h+ backoff to a transient,
     // user-recoverable condition, leaving the item stuck as unavailable
     // long after permission is granted.
-    final permission = await _photoPickerService.checkPermission();
+    final PhotoPermissionStatus permission;
+    try {
+      permission = await _photoPickerService.checkPermission();
+    } catch (e) {
+      // checkPermission() ultimately hits platform code; treat a
+      // platform-channel failure like any other gallery failure rather than
+      // letting it bubble out of resolveAssetId() and break a Riverpod
+      // provider watching it.
+      _log.error('Permission check failed for media ${item.id}', error: e);
+      return const ResolutionResult(status: ResolutionStatus.unavailable);
+    }
     if (permission != PhotoPermissionStatus.authorized &&
         permission != PhotoPermissionStatus.limited) {
       _log.info(
