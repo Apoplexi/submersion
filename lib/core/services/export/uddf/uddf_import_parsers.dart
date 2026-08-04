@@ -3,6 +3,39 @@ import 'package:xml/xml.dart';
 import 'package:submersion/core/constants/enums.dart' as enums;
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
 
+/// Normalizes a raw UDDF `<tankvolume>` value to liters (#158).
+///
+/// UDDF 3.2.3 defines tankvolume in CUBIC METERS, but exporters disagree:
+/// spec-conformant tools write 0.0111 for an 11.1 L tank, Diving Log 6.x
+/// writes 0.111 (10x off), and legacy Submersion exports wrote plain liters.
+/// A plausibility ladder keyed to real tank sizes (roughly 1-45 L water
+/// capacity) disambiguates the three conventions; implausible values are
+/// stored unchanged rather than guessed at.
+///
+/// The ladder cannot be exact for every input: 0.045 < raw <= 0.45 is
+/// genuinely ambiguous between a Diving Log 4.5-45 L tank and a
+/// spec-conformant 45-450 L one, and it resolves toward Diving Log because
+/// small cylinders are far more common than 45 L+ single-tank records.
+/// Exports that declare their unit never hit that ambiguity: they set
+/// [strictCubicMeters] and are converted exactly. Submersion exports made
+/// BEFORE the unit was declared wrote liters, carry no declaration, and so
+/// fall through to the ladder, which reads them correctly.
+double normalizeUddfTankVolumeToLiters(
+  double raw, {
+  bool strictCubicMeters = false,
+}) {
+  if (raw <= 0) return raw;
+  // A file that DECLARES its unit needs no guessing, so any volume
+  // round-trips exactly -- including tanks above the ladder's range. The
+  // >= 1 guard is a backstop against a mislabelled file: 1 m3 is 1000 L,
+  // which is not a tank, so such a value is liters whatever the label says.
+  if (strictCubicMeters && raw < 1.0) return raw * 1000;
+  if (raw <= 0.045) return raw * 1000; // spec cubic meters
+  if (raw <= 0.45) return raw * 100; // Diving Log 10x-off quirk
+  if (raw <= 45) return raw; // legacy liter exports
+  return raw;
+}
+
 /// Static parser methods for UDDF entity elements.
 ///
 /// Used by [UddfFullImportService] to parse individual entity types
