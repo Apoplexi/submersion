@@ -3464,21 +3464,21 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
     );
     final dateRef = entryTime ?? record.highTideTime ?? record.lowTideTime;
     final dateStr = dateRef != null
-        ? DateFormat('EEE, MMM d').format(dateRef.toLocal())
+        ? DateFormat('EEE, MMM d').format(dateRef)
         : '';
+    // Cycle bounds are stored wall-clock instants, not device-local times:
+    // format them verbatim without any timezone conversion.
     final timeRangeStr = cycleStart != null && cycleEnd != null
         ? () {
-            final startLocal = cycleStart.toLocal();
-            final endLocal = cycleEnd.toLocal();
             final timeFmt = DateFormat(settings.timeFormat.pattern);
-            final startStr = timeFmt.format(startLocal);
-            final endStr = timeFmt.format(endLocal);
+            final startStr = timeFmt.format(cycleStart);
+            final endStr = timeFmt.format(cycleEnd);
             final spansNewDay =
-                startLocal.year != endLocal.year ||
-                startLocal.month != endLocal.month ||
-                startLocal.day != endLocal.day;
+                cycleStart.year != cycleEnd.year ||
+                cycleStart.month != cycleEnd.month ||
+                cycleStart.day != cycleEnd.day;
             if (spansNewDay) {
-              final endDateStr = DateFormat('MMM d').format(endLocal);
+              final endDateStr = DateFormat('MMM d').format(cycleEnd);
               return '$startStr - $endStr ($endDateStr)';
             }
             return '$startStr - $endStr';
@@ -3595,7 +3595,7 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
 
   /// Format a DateTime as a time string using the given time format.
   String _formatTime(DateTime time, TimeFormat timeFormat) {
-    return DateFormat(timeFormat.pattern).format(time.toLocal());
+    return DateFormat(timeFormat.pattern).format(time);
   }
 
   Widget _buildWeightSection(
