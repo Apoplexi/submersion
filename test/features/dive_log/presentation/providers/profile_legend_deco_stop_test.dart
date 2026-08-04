@@ -17,12 +17,14 @@ void main() {
     expect(updated.showCeiling, state.showCeiling);
   });
 
-  test('deco stop source is independent of the ceiling source', () {
+  test('deco stop source is independent of other metric sources', () {
     const state = ProfileLegendState();
     final updated = state.copyWith(decoStopSource: MetricDataSource.computer);
 
     expect(updated.decoStopSource, MetricDataSource.computer);
-    expect(updated.ceilingSource, MetricDataSource.calculated);
+    // The ceiling line has no source toggle (issue #755); other metric sources
+    // are untouched when only the deco stop source changes.
+    expect(updated.ndlSource, MetricDataSource.calculated);
   });
 
   test('equality accounts for the deco stop fields', () {

@@ -11,6 +11,7 @@ import 'package:submersion/features/divers/presentation/providers/diver_provider
 import 'package:submersion/features/planner/presentation/pages/plan_canvas_page.dart';
 import 'package:submersion/features/safety/presentation/pages/incident_edit_page.dart';
 import 'package:submersion/features/safety/presentation/pages/incidents_list_page.dart';
+import 'package:submersion/features/safety/presentation/pages/no_fly_page.dart';
 import 'package:submersion/features/settings/presentation/pages/section_appearance_page.dart';
 import 'package:submersion/features/settings/presentation/pages/column_config_page.dart';
 
@@ -593,8 +594,8 @@ void main() {
     });
 
     test('static sub-routes still win over the :planId sibling', () {
-      // Precedence guard: 'compare' / 'chart' / 'no-fly' remain children of
-      // divePlanner and must resolve before the dynamic sibling.
+      // Precedence guard: 'compare' / 'chart' remain children of divePlanner
+      // and must resolve before the dynamic sibling.
       expect(
         router.configuration
             .findMatch(Uri.parse('/planning/dive-planner/compare?ids=a,b'))
@@ -607,6 +608,44 @@ void main() {
             .fullPath,
         '/planning/dive-planner/chart',
       );
+    });
+
+    test('no-fly is a direct child of /planning (matches the hub tile)', () {
+      // Regression: the "Flying after diving" hub tile navigates to
+      // '/planning/no-fly'. The route used to live under 'dive-planner'
+      // (so its real path was '/planning/dive-planner/no-fly'), leaving the
+      // tile's target unmatched and throwing "no routes for location".
+      expect(
+        router.configuration.findMatch(Uri.parse('/planning/no-fly')).fullPath,
+        '/planning/no-fly',
+      );
+
+      final noFly = _findRouteByName(router.configuration.routes, 'noFly');
+      expect(noFly, isNotNull);
+      final divePlanner = _findRouteByName(
+        router.configuration.routes,
+        'divePlanner',
+      );
+      expect(divePlanner, isNotNull);
+      final nestedNames = _collectRouteNames(divePlanner!.routes);
+      expect(nestedNames, isNot(contains('noFly')));
+    });
+
+    testWidgets('noFly route builds the NoFlyPage', (tester) async {
+      await tester.pumpWidget(const MaterialApp(home: SizedBox()));
+      final context = tester.element(find.byType(SizedBox));
+
+      final noFly = _findRouteByName(router.configuration.routes, 'noFly');
+      expect(noFly, isNotNull);
+      final state = GoRouterState(
+        router.configuration,
+        uri: Uri.parse('/planning/no-fly'),
+        matchedLocation: '/planning/no-fly',
+        fullPath: '/planning/no-fly',
+        pathParameters: const {},
+        pageKey: const ValueKey('/planning/no-fly'),
+      );
+      expect(noFly!.builder!(context, state), isA<NoFlyPage>());
     });
 
     testWidgets(

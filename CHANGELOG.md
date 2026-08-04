@@ -3,6 +3,81 @@
 All notable changes to Submersion are documented in this file.
 
 
+## 1.7.1 (2026-07-30)
+
+### Features
+
+- add DD.MM.YYYY dot-separated date format
+- translate gas calculator, weather, and CNS keys
+- render descriptions from the WMO code at display time
+- keep the WMO code and stop generating English prose
+- v137 adds dives.weather_code and clears generated prose
+- add English keys for gas calculator results
+- pure consumption math using the tank working pressure
+- pure rock-bottom math with problem-solving time at depth
+- add TankSpec separating water capacity from free gas
+- add UnitSlider bound to a canonical-unit axis
+- add UnitAxis to declare slider ranges in canonical units
+
+### Bug Fixes
+
+- stop idle syncs rotting the upload-nonce ring into a false twin (#733)
+- pin pure-Dart HKDF for data key derivation (#737)
+- address Copilot review feedback on PR #682
+- drop Computer source toggle from the ceiling line (#755)
+- map UDDF decostop depth to the sample ceiling
+- map Subsurface stopdepth to the sample ceiling
+- include state/province in location display
+- let users draw by disabling sheet drag-to-dismiss
+- keep large dive numbers inside the list-tile badge
+- fix imported-center View action (route + lingering snackbar)
+- make the insurance gauge chip tappable
+- register no-fly as a direct child of /planning
+- route gear chips to /equipment instead of /gear
+- localize the CNS/O2 card and convert max ppO2 depth
+- surface pressure and swell height follow diver units
+- rewire all four calculators onto unit-safe inputs
+- best mix rounds O2 down and reports its own MOD
+- keep desktop imports off gallery-only code paths
+- scope the picker's Done action to the Gallery tab
+- let the Files tab link photos the date matcher rejected
+- persist real file paths for desktop photo imports
+
+### Refactoring
+
+- remove unused duplicate addressSummary getter
+
+### Performance
+
+- query only the dedupe lookup the selection needs
+
+### Documentation
+
+- implementation plan for gas calculator, weather, and CNS unit fixes
+- spec for gas calculator, weather, and CNS unit correctness
+- correct FileReviewPane's stale "Stateless" doc
+
+### Tests
+
+- cover findByHardwareIdentity in DiveComputerRepository
+- assert navigation for all insurance chip states
+- cover noFly builder and harden the regression assertion
+
+### Chores
+
+- bump version to 1.7.1+118
+
+### Other
+
+- Fixed embedded dive to site navigation
+- use const for the fixed test depth
+- Add missing comma in `sync_data_serializer.dart` default settings from AI mistake
+- Potential fix for pull request finding
+- Add missing default settings in `sync_data_serializer.dart`
+- Keep dive computer BLE identities device-local
+- Added auto-generation and improved naming logic and unit tests for certification name
+
+
 ## 1.7.0 (2026-07-25)
 
 ### Features

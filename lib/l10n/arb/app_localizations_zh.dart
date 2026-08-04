@@ -89,6 +89,129 @@ class AppLocalizationsZh extends AppLocalizations {
   String get equipment_setDetail_noGeofences => '无地理围栏';
 
   @override
+  String formatter_duration_minutes(Object minutes) {
+    return '$minutes 分';
+  }
+
+  @override
+  String formatter_duration_minutesSeconds(Object minutes, Object seconds) {
+    return '$minutes 分 $seconds 秒';
+  }
+
+  @override
+  String formatter_duration_seconds(Object seconds) {
+    return '$seconds 秒';
+  }
+
+  @override
+  String gasCalculators_bestMix_densityCritical(Object limit) {
+    return '超过 $limit g/L 的密度上限。';
+  }
+
+  @override
+  String get gasCalculators_bestMix_densityLabel => '深度处气体密度';
+
+  @override
+  String gasCalculators_bestMix_densityWarn(Object limit) {
+    return '超过建议的 $limit g/L 密度限值。';
+  }
+
+  @override
+  String gasCalculators_bestMix_endExceeded(Object limit) {
+    return 'END 超过你设定的 $limit 限值。';
+  }
+
+  @override
+  String get gasCalculators_bestMix_endLabel => '深度处 END';
+
+  @override
+  String get gasCalculators_bestMix_endLimitLabel => 'END 限值';
+
+  @override
+  String gasCalculators_bestMix_heliumAdded(Object limit) {
+    return '已加入氦气，使 END 保持在你设定的 $limit 限值内。';
+  }
+
+  @override
+  String get gasCalculators_bestMix_idealLabel => '理想比例';
+
+  @override
+  String get gasCalculators_bestMix_marginLabel => 'MOD 余量';
+
+  @override
+  String gasCalculators_bestMix_modLabel(Object ppO2) {
+    return 'ppO2 $ppO2 时的 MOD';
+  }
+
+  @override
+  String get gasCalculators_bestMix_nearestStandard => '可覆盖此深度的最接近标准混合气';
+
+  @override
+  String get gasCalculators_bestMix_recommendedMix => '推荐混合气';
+
+  @override
+  String get gasCalculators_bestMix_withoutHelium => '不含氦气';
+
+  @override
+  String get gasCalculators_planningCaveat =>
+      '规划估算值。假设直接上升。请结合你的训练核实，并为实际条件预留余量。';
+
+  @override
+  String gasCalculators_rockBottom_solveGas(Object depth, Object unit) {
+    return '在 $depth$unit 处解决问题所需气量';
+  }
+
+  @override
+  String get gasCalculators_rockBottom_solveTime => '问题处理时间';
+
+  @override
+  String get gasCalculators_rockBottom_solveTimeHint => '开始上升前在该深度处理紧急情况所花的时间。';
+
+  @override
+  String o2Toxicity_addedThisDive(Object value) {
+    return '本次潜水 +$value';
+  }
+
+  @override
+  String o2Toxicity_cnsProgressSemantics(Object percent) {
+    return 'CNS 进度 $percent 百分比';
+  }
+
+  @override
+  String get o2Toxicity_daily => '每日';
+
+  @override
+  String o2Toxicity_otuSemantics(
+    Object label,
+    Object value,
+    Object limit,
+    Object percent,
+  ) {
+    return '$label：$limit OTU 中的 $value，$percent 百分比';
+  }
+
+  @override
+  String o2Toxicity_otuValueSemantics(Object label, Object value) {
+    return '$label：$value OTU';
+  }
+
+  @override
+  String o2Toxicity_prior(Object value) {
+    return '此前：$value OTU';
+  }
+
+  @override
+  String o2Toxicity_start(Object value) {
+    return '起始：$value OTU';
+  }
+
+  @override
+  String get o2Toxicity_thisDive => '本次潜水';
+
+  @override
+  String get o2Toxicity_weekly => '每周';
+
+  @override
   String trips_story_dayLabel(int number) {
     return '第 $number 天';
   }
@@ -2233,15 +2356,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get preDive_dashboard_start => '开始潜前检查';
 
   @override
-  String get tools_preDive_title => '潜前检查清单';
-
-  @override
-  String get tools_preDive_subtitle => '执行并查看检查清单记录';
-
-  @override
-  String get tools_preDive_description => '潜伴检查、CCR 组装清单和装备打包，并保留审核记录';
-
-  @override
   String get trips_detail_preDive_action => '潜前检查清单';
 
   @override
@@ -2933,7 +3047,13 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String dashboard_gauges_dataIssues(int count) {
-    return '$count 个数据问题';
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 个数据问题',
+      one: '1 个数据问题',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -12831,6 +12951,17 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String settings_cloudSync_peerRequiresUpdate_banner(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 台设备正在从更新版本的 Submersion 同步。请更新此设备以接收它们的最新更改。',
+      one: '1 台设备正在从更新版本的 Submersion 同步。请更新此设备以接收其最新更改。',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get settings_cloudSync_provider_connected => '已连接';
 
   @override
@@ -14253,6 +14384,90 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get settings_units_weight_pounds => '磅 (lbs)';
+
+  @override
+  String get settings_updates_automaticUpdates => '自动更新';
+
+  @override
+  String get settings_updates_automaticUpdatesSubtitle => '定期检查更新';
+
+  @override
+  String get settings_updates_betaDialogBody =>
+      'Beta 版本会随每次更改发布，可能会先于稳定版升级您的潜水日志数据库。之后切换回稳定版不会降级应用，并且所有相互同步的设备应使用相同的更新渠道。每次数据库升级前都会自动创建备份。';
+
+  @override
+  String get settings_updates_betaDialogConfirm => '切换到 Beta';
+
+  @override
+  String get settings_updates_betaDialogTitle => '接收 Beta 更新？';
+
+  @override
+  String get settings_updates_channel => '更新渠道';
+
+  @override
+  String settings_updates_channelBadgeBeta(String version) {
+    return '$version (Beta)';
+  }
+
+  @override
+  String get settings_updates_channelBeta => 'Beta';
+
+  @override
+  String get settings_updates_channelBetaSubtitle => '每次更改都会发布新版本，先于稳定版';
+
+  @override
+  String get settings_updates_channelStable => '稳定版';
+
+  @override
+  String get settings_updates_channelStableSubtitle => '仅提供经过测试的版本';
+
+  @override
+  String get settings_updates_checkForUpdates => '检查更新';
+
+  @override
+  String get settings_updates_checking => '正在检查...';
+
+  @override
+  String settings_updates_downloading(String progress) {
+    return '正在下载... $progress%';
+  }
+
+  @override
+  String settings_updates_error(String message) {
+    return '错误：$message';
+  }
+
+  @override
+  String get settings_updates_header => '更新';
+
+  @override
+  String get settings_updates_joinBeta => '加入 Beta 计划';
+
+  @override
+  String get settings_updates_joinBetaSubtitle => '通过 Beta 计划抢先体验新功能';
+
+  @override
+  String get settings_updates_lastChecked => '上次检查';
+
+  @override
+  String get settings_updates_never => '从未';
+
+  @override
+  String settings_updates_readyToInstall(String version) {
+    return '版本 $version 已准备好安装';
+  }
+
+  @override
+  String get settings_updates_stableSwitchNotice =>
+      '在下一个稳定版比当前 Beta 版更新之前，将保持在此 Beta 版上。';
+
+  @override
+  String get settings_updates_upToDate => '已是最新版本';
+
+  @override
+  String settings_updates_versionAvailable(String version) {
+    return '版本 $version 可用';
+  }
 
   @override
   String get signatures_action_clear => '清除';
@@ -17058,6 +17273,15 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get universalImport_entityAction_linkBadge => '关联';
+
+  @override
+  String get universalImport_entityAction_linkExisting => '关联现有记录';
+
+  @override
+  String get universalImport_entityAction_linkExistingSubtitle => '使用匹配的记录';
+
+  @override
   String get universalImport_pending_chooseAction => '选择操作';
 
   @override
@@ -17152,6 +17376,71 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get universalImport_tooltip_closeWizard => '关闭导入向导';
+
+  @override
+  String weather_windFromDirection(Object wind, Object direction) {
+    return '$direction 向$wind';
+  }
+
+  @override
+  String get weather_wind_calm => '无风';
+
+  @override
+  String get weather_wind_highWind => '大风';
+
+  @override
+  String get weather_wind_lightBreeze => '轻风';
+
+  @override
+  String get weather_wind_moderateBreeze => '和风';
+
+  @override
+  String get weather_wind_strongBreeze => '强风';
+
+  @override
+  String get weather_wmo_clear => '晴朗';
+
+  @override
+  String get weather_wmo_drizzle => '毛毛雨';
+
+  @override
+  String get weather_wmo_fog => '雾';
+
+  @override
+  String get weather_wmo_freezingDrizzle => '冻毛毛雨';
+
+  @override
+  String get weather_wmo_freezingRain => '冻雨';
+
+  @override
+  String get weather_wmo_mainlyClear => '大致晴朗';
+
+  @override
+  String get weather_wmo_overcast => '阴天';
+
+  @override
+  String get weather_wmo_partlyCloudy => '局部多云';
+
+  @override
+  String get weather_wmo_rain => '雨';
+
+  @override
+  String get weather_wmo_rainShowers => '阵雨';
+
+  @override
+  String get weather_wmo_snow => '雪';
+
+  @override
+  String get weather_wmo_snowGrains => '米雪';
+
+  @override
+  String get weather_wmo_snowShowers => '阵雪';
+
+  @override
+  String get weather_wmo_thunderstorm => '雷暴';
+
+  @override
+  String get weather_wmo_thunderstormHail => '雷暴伴冰雹';
 
   @override
   String weightCalc_baseLine(Object suitType, Object weight) {
@@ -18799,29 +19088,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get tankPresets_title => '气瓶预设';
 
   @override
-  String get tools_deco_description =>
-      '计算免减压极限、所需减压停留以及多层潜水轮廓的中枢神经系统毒性/氧毒性单位暴露量。';
-
-  @override
-  String get tools_deco_subtitle => '规划需要减压停留的潜水';
-
-  @override
-  String get tools_deco_title => '减压计算器';
-
-  @override
-  String get tools_disclaimer => '这些计算器仅供计划参考。请务必验证计算结果并遵循您的潜水训练。';
-
-  @override
-  String get tools_gas_description =>
-      '四种专用气体计算器：\n• 最大作业深度 - 气体混合物的最大作业深度\n• 最佳混合气 - 目标深度的理想氧气百分比\n• 耗气量 - 气体使用量估算\n• 底限储备 - 紧急储备计算';
-
-  @override
-  String get tools_gas_subtitle => '最大作业深度、最佳混合气、耗气量、底限储备';
-
-  @override
-  String get tools_gas_title => '气体计算器';
-
-  @override
   String get tools_gpsLogger_description => '在潜水日记录你的位置，自动将导入的潜水与 GPS 位置匹配。';
 
   @override
@@ -18829,9 +19095,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get tools_gpsLogger_title => 'GPS 记录器';
-
-  @override
-  String get tools_title => '工具';
 
   @override
   String get tools_weight_aluminumImperial => '空瓶时浮力较大（+4 lbs）';
@@ -18847,9 +19110,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get tools_weight_carbonFiberMetric => '浮力很大（+3 kg）';
-
-  @override
-  String get tools_weight_description => '根据您的防寒服、气瓶材质、水型和体重估算所需配重。';
 
   @override
   String get tools_weight_disclaimer =>
@@ -18886,9 +19146,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get tools_weight_steelMetric => '负浮力（-2 kg）';
-
-  @override
-  String get tools_weight_subtitle => '适合您装备配置的推荐配重';
 
   @override
   String get tools_weight_tankMaterial => '气瓶材质';
@@ -19890,6 +20147,32 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get dive3d_overlay_markers => '标记';
+
+  @override
+  String get dive3d_seascape_overlay_paths => '潜水路径';
+
+  @override
+  String get dive3d_seascape_siteTitle => '潜点海景';
+
+  @override
+  String dive3d_seascape_seafloorSource(String source, String resolution) {
+    return '海底：$source（约$resolution米）';
+  }
+
+  @override
+  String get dive3d_seascape_noCoordinates => '该潜点没有GPS坐标';
+
+  @override
+  String get dive3d_seascape_noData => '该位置没有可用的水深数据';
+
+  @override
+  String dive3d_seascape_axis_distance(String unitSymbol) {
+    return '距离（$unitSymbol）';
+  }
+
+  @override
+  String get settings_about_bathymetryCredit =>
+      '水深数据：GMRT（CC BY 4.0）· EMODnet Bathymetry（CC BY 4.0）· NOAA ETOPO 2022';
 
   @override
   String get dive3d_metric_depth => '深度';

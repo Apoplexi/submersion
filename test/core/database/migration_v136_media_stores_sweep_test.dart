@@ -55,7 +55,9 @@ void main() {
     // add a fresh exact test when a later migration lands on top of v136.
     // (v135 is reserved by the in-flight color-accents branch; this claim
     // deliberately skips it, mirroring the v132-over-v131 precedent.)
-    expect(AppDatabase.currentSchemaVersion, 136);
+    // Relaxed from an exact 136 when v137 landed: an exact-latest tripwire
+    // becomes a false failure the moment a higher version merges.
+    expect(AppDatabase.currentSchemaVersion, greaterThanOrEqualTo(136));
     expect(AppDatabase.migrationVersions, contains(136));
   });
 }

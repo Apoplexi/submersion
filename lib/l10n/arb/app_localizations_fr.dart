@@ -92,6 +92,133 @@ class AppLocalizationsFr extends AppLocalizations {
   String get equipment_setDetail_noGeofences => 'Aucun géorepère';
 
   @override
+  String formatter_duration_minutes(Object minutes) {
+    return '$minutes min';
+  }
+
+  @override
+  String formatter_duration_minutesSeconds(Object minutes, Object seconds) {
+    return '$minutes min $seconds s';
+  }
+
+  @override
+  String formatter_duration_seconds(Object seconds) {
+    return '$seconds s';
+  }
+
+  @override
+  String gasCalculators_bestMix_densityCritical(Object limit) {
+    return 'Au-dessus du plafond de densite de $limit g/L.';
+  }
+
+  @override
+  String get gasCalculators_bestMix_densityLabel =>
+      'Densite du gaz a la profondeur';
+
+  @override
+  String gasCalculators_bestMix_densityWarn(Object limit) {
+    return 'Au-dessus de la limite de densite recommandee de $limit g/L.';
+  }
+
+  @override
+  String gasCalculators_bestMix_endExceeded(Object limit) {
+    return 'L\'END depasse votre limite de $limit.';
+  }
+
+  @override
+  String get gasCalculators_bestMix_endLabel => 'END a la profondeur';
+
+  @override
+  String get gasCalculators_bestMix_endLimitLabel => 'Limite END';
+
+  @override
+  String gasCalculators_bestMix_heliumAdded(Object limit) {
+    return 'Helium ajoute pour maintenir l\'END dans votre limite de $limit.';
+  }
+
+  @override
+  String get gasCalculators_bestMix_idealLabel => 'Fraction ideale';
+
+  @override
+  String get gasCalculators_bestMix_marginLabel => 'Marge sous la MOD';
+
+  @override
+  String gasCalculators_bestMix_modLabel(Object ppO2) {
+    return 'MOD a ppO2 $ppO2';
+  }
+
+  @override
+  String get gasCalculators_bestMix_nearestStandard =>
+      'Melange standard le plus proche couvrant cette profondeur';
+
+  @override
+  String get gasCalculators_bestMix_recommendedMix => 'Melange recommande';
+
+  @override
+  String get gasCalculators_bestMix_withoutHelium => 'Sans helium';
+
+  @override
+  String get gasCalculators_planningCaveat =>
+      'Estimation de planification. Suppose une remontee directe. Verifiez selon votre formation et ajoutez une marge pour les conditions.';
+
+  @override
+  String gasCalculators_rockBottom_solveGas(Object depth, Object unit) {
+    return 'Gaz de resolution du probleme a $depth$unit';
+  }
+
+  @override
+  String get gasCalculators_rockBottom_solveTime =>
+      'Temps de resolution du probleme';
+
+  @override
+  String get gasCalculators_rockBottom_solveTimeHint =>
+      'Temps passe au fond a resoudre l\'urgence avant d\'entamer la remontee.';
+
+  @override
+  String o2Toxicity_addedThisDive(Object value) {
+    return '+$value cette plongee';
+  }
+
+  @override
+  String o2Toxicity_cnsProgressSemantics(Object percent) {
+    return 'Progression SNC $percent pour cent';
+  }
+
+  @override
+  String get o2Toxicity_daily => 'Quotidien';
+
+  @override
+  String o2Toxicity_otuSemantics(
+    Object label,
+    Object value,
+    Object limit,
+    Object percent,
+  ) {
+    return '$label : $value sur $limit OTU, $percent pour cent';
+  }
+
+  @override
+  String o2Toxicity_otuValueSemantics(Object label, Object value) {
+    return '$label : $value OTU';
+  }
+
+  @override
+  String o2Toxicity_prior(Object value) {
+    return 'Anterieur : $value OTU';
+  }
+
+  @override
+  String o2Toxicity_start(Object value) {
+    return 'Debut : $value OTU';
+  }
+
+  @override
+  String get o2Toxicity_thisDive => 'Cette plongee';
+
+  @override
+  String get o2Toxicity_weekly => 'Hebdomadaire';
+
+  @override
   String trips_story_dayLabel(int number) {
     return 'Jour $number';
   }
@@ -2385,17 +2512,6 @@ class AppLocalizationsFr extends AppLocalizations {
   String get preDive_dashboard_start => 'Démarrer la vérification pré-plongée';
 
   @override
-  String get tools_preDive_title => 'Checklists pré-plongée';
-
-  @override
-  String get tools_preDive_subtitle =>
-      'Lancez et consultez les sessions de checklist';
-
-  @override
-  String get tools_preDive_description =>
-      'Vérifications entre binômes, listes de montage CCR et préparation du matériel avec traçabilité';
-
-  @override
   String get trips_detail_preDive_action => 'Checklist pré-plongée';
 
   @override
@@ -3113,7 +3229,13 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String dashboard_gauges_dataIssues(int count) {
-    return '$count problèmes de données';
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count problèmes de données',
+      one: '1 problème de données',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -13519,6 +13641,19 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String settings_cloudSync_peerRequiresUpdate_banner(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count appareils se synchronisent depuis une version plus récente de Submersion. Mettez à jour cet appareil pour recevoir leurs derniers changements.',
+      one:
+          '1 appareil se synchronise depuis une version plus récente de Submersion. Mettez à jour cet appareil pour recevoir ses derniers changements.',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get settings_cloudSync_provider_connected => 'Connecte';
 
   @override
@@ -15046,6 +15181,95 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get settings_units_weight_pounds => 'Livres (lbs)';
+
+  @override
+  String get settings_updates_automaticUpdates => 'Mises à jour automatiques';
+
+  @override
+  String get settings_updates_automaticUpdatesSubtitle =>
+      'Rechercher les mises à jour périodiquement';
+
+  @override
+  String get settings_updates_betaDialogBody =>
+      'Les versions bêta sont publiées à chaque modification et peuvent mettre à niveau la base de données de votre carnet de plongée avant la version stable. Revenir ensuite au canal stable ne rétrogradera pas l\'application, et tous les appareils qui se synchronisent ensemble devraient utiliser le même canal. Une sauvegarde est effectuée automatiquement avant toute mise à niveau de la base de données.';
+
+  @override
+  String get settings_updates_betaDialogConfirm => 'Passer à la bêta';
+
+  @override
+  String get settings_updates_betaDialogTitle =>
+      'Recevoir les mises à jour bêta ?';
+
+  @override
+  String get settings_updates_channel => 'Canal de mise à jour';
+
+  @override
+  String settings_updates_channelBadgeBeta(String version) {
+    return '$version (Bêta)';
+  }
+
+  @override
+  String get settings_updates_channelBeta => 'Bêta';
+
+  @override
+  String get settings_updates_channelBetaSubtitle =>
+      'Nouvelles versions à chaque modification, en avance sur la stable';
+
+  @override
+  String get settings_updates_channelStable => 'Stable';
+
+  @override
+  String get settings_updates_channelStableSubtitle =>
+      'Versions testées uniquement';
+
+  @override
+  String get settings_updates_checkForUpdates => 'Rechercher les mises à jour';
+
+  @override
+  String get settings_updates_checking => 'Vérification...';
+
+  @override
+  String settings_updates_downloading(String progress) {
+    return 'Téléchargement... $progress%';
+  }
+
+  @override
+  String settings_updates_error(String message) {
+    return 'Erreur : $message';
+  }
+
+  @override
+  String get settings_updates_header => 'Mises à jour';
+
+  @override
+  String get settings_updates_joinBeta => 'Rejoindre la bêta';
+
+  @override
+  String get settings_updates_joinBetaSubtitle =>
+      'Recevez les nouvelles fonctionnalités en avant-première grâce au programme bêta';
+
+  @override
+  String get settings_updates_lastChecked => 'Dernière vérification';
+
+  @override
+  String get settings_updates_never => 'Jamais';
+
+  @override
+  String settings_updates_readyToInstall(String version) {
+    return 'Version $version prête à installer';
+  }
+
+  @override
+  String get settings_updates_stableSwitchNotice =>
+      'Vous resterez sur cette bêta jusqu\'à ce que la prochaine version stable soit plus récente qu\'elle.';
+
+  @override
+  String get settings_updates_upToDate => 'À jour';
+
+  @override
+  String settings_updates_versionAvailable(String version) {
+    return 'Version $version disponible';
+  }
 
   @override
   String get signatures_action_clear => 'Effacer';
@@ -18044,6 +18268,16 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String get universalImport_entityAction_linkBadge => 'LIER';
+
+  @override
+  String get universalImport_entityAction_linkExisting => 'Lier à l\'existant';
+
+  @override
+  String get universalImport_entityAction_linkExistingSubtitle =>
+      'Utiliser la fiche correspondante';
+
+  @override
   String get universalImport_pending_chooseAction => 'Choisir une action';
 
   @override
@@ -18142,6 +18376,71 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get universalImport_tooltip_closeWizard =>
       'Fermer l\'assistant d\'import';
+
+  @override
+  String weather_windFromDirection(Object wind, Object direction) {
+    return '$wind de $direction';
+  }
+
+  @override
+  String get weather_wind_calm => 'calme';
+
+  @override
+  String get weather_wind_highWind => 'vent fort';
+
+  @override
+  String get weather_wind_lightBreeze => 'brise legere';
+
+  @override
+  String get weather_wind_moderateBreeze => 'brise moderee';
+
+  @override
+  String get weather_wind_strongBreeze => 'brise forte';
+
+  @override
+  String get weather_wmo_clear => 'Ciel degage';
+
+  @override
+  String get weather_wmo_drizzle => 'Bruine';
+
+  @override
+  String get weather_wmo_fog => 'Brouillard';
+
+  @override
+  String get weather_wmo_freezingDrizzle => 'Bruine verglacante';
+
+  @override
+  String get weather_wmo_freezingRain => 'Pluie verglacante';
+
+  @override
+  String get weather_wmo_mainlyClear => 'Principalement degage';
+
+  @override
+  String get weather_wmo_overcast => 'Couvert';
+
+  @override
+  String get weather_wmo_partlyCloudy => 'Partiellement nuageux';
+
+  @override
+  String get weather_wmo_rain => 'Pluie';
+
+  @override
+  String get weather_wmo_rainShowers => 'Averses de pluie';
+
+  @override
+  String get weather_wmo_snow => 'Neige';
+
+  @override
+  String get weather_wmo_snowGrains => 'Neige en grains';
+
+  @override
+  String get weather_wmo_snowShowers => 'Averses de neige';
+
+  @override
+  String get weather_wmo_thunderstorm => 'Orage';
+
+  @override
+  String get weather_wmo_thunderstormHail => 'Orage avec grele';
 
   @override
   String weightCalc_baseLine(Object suitType, Object weight) {
@@ -19873,31 +20172,6 @@ class AppLocalizationsFr extends AppLocalizations {
   String get tankPresets_title => 'Presets de blocs';
 
   @override
-  String get tools_deco_description =>
-      'Calculez les limites de non-decompression, les paliers de deco requis et l\'exposition CNS/OTU pour les profils de plongee multi-niveaux.';
-
-  @override
-  String get tools_deco_subtitle =>
-      'Planifiez vos plongees avec paliers de deco';
-
-  @override
-  String get tools_deco_title => 'Calculateur de deco';
-
-  @override
-  String get tools_disclaimer =>
-      'Ces calculateurs sont fournis a titre indicatif uniquement. Verifiez toujours les calculs et suivez votre formation de plongee.';
-
-  @override
-  String get tools_gas_description =>
-      'Quatre calculateurs de gaz specialises :\n- MOD - Profondeur maximale d\'utilisation d\'un melange\n- Best Mix - O2% ideal pour une profondeur cible\n- Consommation - Estimation de la consommation de gaz\n- Rock Bottom - Calcul de la reserve d\'urgence';
-
-  @override
-  String get tools_gas_subtitle => 'MOD, Best Mix, Consommation, Rock Bottom';
-
-  @override
-  String get tools_gas_title => 'Calculateurs de gaz';
-
-  @override
   String get tools_gpsLogger_description =>
       'Enregistrez votre position pendant une journée de plongée et associez automatiquement les plongées importées à des positions GPS.';
 
@@ -19906,9 +20180,6 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get tools_gpsLogger_title => 'Enregistreur GPS';
-
-  @override
-  String get tools_title => 'Outils';
 
   @override
   String get tools_weight_aluminumImperial => 'Plus flottant a vide (+4 lbs)';
@@ -19924,10 +20195,6 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get tools_weight_carbonFiberMetric => 'Tres flottant (+3 kg)';
-
-  @override
-  String get tools_weight_description =>
-      'Estimez le lestage necessaire en fonction de votre combinaison, du materiau du bloc, du type d\'eau et de votre poids.';
 
   @override
   String get tools_weight_disclaimer =>
@@ -19965,10 +20232,6 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get tools_weight_steelMetric => 'Flottabilite negative (-2 kg)';
-
-  @override
-  String get tools_weight_subtitle =>
-      'Lestage recommande pour votre configuration';
 
   @override
   String get tools_weight_tankMaterial => 'Materiau du bloc';
@@ -21023,6 +21286,34 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get dive3d_overlay_markers => 'Marqueurs';
+
+  @override
+  String get dive3d_seascape_overlay_paths => 'Trajets de plongée';
+
+  @override
+  String get dive3d_seascape_siteTitle => 'Paysage marin du site';
+
+  @override
+  String dive3d_seascape_seafloorSource(String source, String resolution) {
+    return 'Fond marin : $source (~$resolution m)';
+  }
+
+  @override
+  String get dive3d_seascape_noCoordinates =>
+      'Ce site n\'a pas de coordonnées GPS';
+
+  @override
+  String get dive3d_seascape_noData =>
+      'Aucune bathymétrie disponible pour cet endroit';
+
+  @override
+  String dive3d_seascape_axis_distance(String unitSymbol) {
+    return 'Distance ($unitSymbol)';
+  }
+
+  @override
+  String get settings_about_bathymetryCredit =>
+      'Données bathymétriques : GMRT (CC BY 4.0) · EMODnet Bathymetry (CC BY 4.0) · NOAA ETOPO 2022';
 
   @override
   String get dive3d_metric_depth => 'Profondeur';

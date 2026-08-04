@@ -10,6 +10,7 @@ import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/dive_3d/application/career_providers.dart';
 import 'package:submersion/features/dive_3d/presentation/pages/career_terrain_page.dart';
+import 'package:submersion/features/dive_3d/presentation/pages/site_seascape_page.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_providers.dart';
 import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
 import 'package:submersion/features/dive_sites/presentation/providers/site_providers.dart';
@@ -242,6 +243,16 @@ class _SiteDetailContentState extends ConsumerState<_SiteDetailContent> {
       appBar: AppBar(
         title: Text(site.name),
         actions: [
+          if (site.hasCoordinates)
+            IconButton(
+              icon: const Icon(Icons.terrain),
+              tooltip: context.l10n.dive3d_seascape_siteTitle,
+              onPressed: () => Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (_) => SiteSeascapePage(siteId: siteId),
+                ),
+              ),
+            ),
           IconButton(
             icon: const Icon(Icons.view_in_ar),
             tooltip: context.l10n.dive3d_career_title,
@@ -321,13 +332,41 @@ class _SiteDetailContentState extends ConsumerState<_SiteDetailContent> {
               ],
             ),
           ),
+          if (site.hasCoordinates)
+            IconButton(
+              icon: const Icon(Icons.terrain, size: 20),
+              tooltip: context.l10n.dive3d_seascape_siteTitle,
+              onPressed: () => Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (_) => SiteSeascapePage(siteId: widget.siteId),
+                ),
+              ),
+            ),
           IconButton(
             icon: const Icon(Icons.edit, size: 20),
             tooltip: context.l10n.diveSites_detail_editTooltipShort,
             onPressed: () {
               final state = GoRouterState.of(context);
               final currentPath = state.uri.path;
-              context.go('$currentPath?selected=${widget.siteId}&mode=edit');
+              if (currentPath.startsWith('/dives')) {
+                // If we're on the /dives path, keep it and just add mode=edit and site parameter.
+                // The MasterDetailScaffold in DiveListPage will handle showing the site edit panel
+                // because we'll have both ?site=... and &mode=edit in the query params.
+                final params = Map<String, String>.from(
+                  state.uri.queryParameters,
+                );
+                params['mode'] = 'edit';
+                // We do NOT change 'selected' here, because 'selected' is used by DiveListPage's
+                // MasterDetailScaffold to identify the DIVE. If we change it to the siteId,
+                // the scaffold will try to find a dive with that siteId and fail.
+                params['site'] = widget.siteId;
+                context.push(
+                  Uri(path: currentPath, queryParameters: params).toString(),
+                );
+              } else {
+                // Default to /sites path for site-related navigation if not on /dives.
+                context.go('/sites?selected=${widget.siteId}&mode=edit');
+              }
             },
           ),
           PopupMenuButton<String>(
