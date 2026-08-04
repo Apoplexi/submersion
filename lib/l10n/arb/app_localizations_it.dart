@@ -18190,6 +18190,17 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
+  String get universalImport_entityAction_linkBadge => 'COLLEGA';
+
+  @override
+  String get universalImport_entityAction_linkExisting =>
+      'Collega all\'esistente';
+
+  @override
+  String get universalImport_entityAction_linkExistingSubtitle =>
+      'Usa il record corrispondente';
+
+  @override
   String get universalImport_pending_chooseAction => 'Scegli un\'azione';
 
   @override
