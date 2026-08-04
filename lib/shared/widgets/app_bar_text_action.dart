@@ -19,8 +19,18 @@ class AppBarTextAction extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    // AppBar wraps its whole toolbar, actions included, in a DefaultTextStyle
+    // whose color resolves AppBar.foregroundColor, AppBarTheme.foregroundColor
+    // and the Material default in that order, so it is the one channel that
+    // tracks a per-app-bar override. The surrounding IconTheme is not usable
+    // here: it carries the actions icon color, which Material 3 defaults to the
+    // de-emphasized onSurfaceVariant rather than the toolbar foreground. The
+    // theme fallbacks below only apply when this widget is used outside an
+    // app bar, or under a toolbar text style that leaves the color unset.
     final foreground =
-        theme.appBarTheme.foregroundColor ?? theme.colorScheme.onSurface;
+        DefaultTextStyle.of(context).style.color ??
+        theme.appBarTheme.foregroundColor ??
+        theme.colorScheme.onSurface;
     return TextButton(
       onPressed: onPressed,
       style: TextButton.styleFrom(foregroundColor: foreground),

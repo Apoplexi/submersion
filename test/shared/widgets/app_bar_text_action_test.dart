@@ -5,12 +5,21 @@ import 'package:submersion/core/theme/full_themes/tropical_theme.dart';
 import 'package:submersion/shared/widgets/app_bar_text_action.dart';
 
 void main() {
-  Future<void> pump(WidgetTester tester, ThemeData theme, Widget action) {
+  Future<void> pump(
+    WidgetTester tester,
+    ThemeData theme,
+    Widget action, {
+    Color? appBarForeground,
+  }) {
     return tester.pumpWidget(
       MaterialApp(
         theme: theme,
         home: Scaffold(
-          appBar: AppBar(title: const Text('Title'), actions: [action]),
+          appBar: AppBar(
+            foregroundColor: appBarForeground,
+            title: const Text('Title'),
+            actions: [action],
+          ),
         ),
       ),
     );
@@ -61,6 +70,49 @@ void main() {
     expect(color, tropicalLight.appBarTheme.foregroundColor);
     expect(color, isNot(tropicalLight.appBarTheme.backgroundColor));
   });
+
+  testWidgets(
+    'AppBarTextAction honors a per-app-bar foregroundColor override',
+    (tester) async {
+      const override = Color(0xFFAA0000);
+      await pump(
+        tester,
+        tropicalLight,
+        AppBarTextAction(label: 'Save', onPressed: () {}),
+        appBarForeground: override,
+      );
+      expect(
+        renderedColor(tester, 'Save'),
+        override,
+        reason:
+            'an AppBar.foregroundColor override sits ahead of '
+            'AppBarTheme.foregroundColor in the app bar resolution chain',
+      );
+    },
+  );
+
+  testWidgets(
+    'AppBarTextAction uses the emphasized foreground when a theme sets no '
+    'app bar foreground color',
+    (tester) async {
+      final theme = ThemeData(useMaterial3: true);
+      await pump(
+        tester,
+        theme,
+        AppBarTextAction(label: 'Save', onPressed: () {}),
+      );
+      expect(theme.appBarTheme.foregroundColor, isNull);
+      expect(renderedColor(tester, 'Save'), theme.colorScheme.onSurface);
+      expect(
+        renderedColor(tester, 'Save'),
+        isNot(theme.colorScheme.onSurfaceVariant),
+        reason:
+            'the actions IconTheme resolves to the de-emphasized '
+            'onSurfaceVariant under Material 3, which is wrong for a text '
+            'action and must not be used as the color source',
+      );
+    },
+  );
 
   testWidgets('AppBarTextAction invokes onPressed', (tester) async {
     var tapped = false;

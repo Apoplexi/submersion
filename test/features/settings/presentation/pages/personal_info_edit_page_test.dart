@@ -70,6 +70,7 @@ void main() {
           diverListNotifierProvider.overrideWith((_) => notifier),
         ],
         child: MaterialApp(
+          locale: const Locale('en'),
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
           home: PersonalInfoEditPage(isNewDiver: isNewDiver),
