@@ -325,11 +325,20 @@ jobs:
     runs-on: ubuntu-latest
     needs: promote
     timeout-minutes: 10
+    permissions:
+      contents: read
+      pull-requests: write
     steps:
-      # RELEASE_BOT_TOKEN (fine-grained PAT) instead of github.token: pushes
-      # made with the built-in token never trigger workflows, so CI would not
-      # run on the bump branch and auto-merge would wait forever. A PAT push
-      # fires CI normally and the PR lands itself when checks pass.
+      # Two tokens, deliberately split. RELEASE_BOT_TOKEN (fine-grained PAT)
+      # pushes the branch: pushes made with the built-in token never trigger
+      # workflows, so CI would not run on the bump branch and auto-merge
+      # would wait forever. github.token creates the PR: main requires one
+      # approving review and GitHub forbids approving your own PR, so a
+      # PAT-authored PR can never satisfy the rule and auto-merge waits
+      # forever (#842). With github-actions[bot] as author, the PAT account
+      # approves, arms auto-merge, and the PR lands itself when checks pass.
+      # Needs "Allow GitHub Actions to create and approve pull requests"
+      # enabled under Settings > Actions > General.
       - name: Require RELEASE_BOT_TOKEN
         env:
           RELEASE_BOT_TOKEN: ${{ secrets.RELEASE_BOT_TOKEN }}
@@ -350,11 +359,32 @@ jobs:
       - name: Bump and open auto-merging PR
         env:
           GH_TOKEN: ${{ secrets.RELEASE_BOT_TOKEN }}
+          BOT_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
+          # Approve with the PAT and arm auto-merge. On a re-dispatch where
+          # checks are already green the auto-merge API rejects a PR that is
+          # already clean, so fall back to merging it outright. Fatal, not a
+          # warning: a bump PR left unapproved or unarmed silently
+          # reintroduces the manual step and leaves the beta train closed.
+          # Failing here makes notify-failures open a tracking issue.
+          arm_automerge() {
+            gh pr review --approve "$1" \
+              --body "Automated release-train approval (promote workflow)." || {
+              echo "::error::Could not approve bump PR ${1}; approve and" \
+                " merge it manually to reopen the beta train."
+              return 1
+            }
+            gh pr merge --auto --merge "$1" || gh pr merge --merge "$1" || {
+              echo "::error::Could not enable auto-merge on bump PR ${1};" \
+                " merge it manually to reopen the beta train."
+              return 1
+            }
+          }
           # Re-entrancy: on a re-dispatched promotion the bump may already be
-          # merged (pubspec moved past the promoted version) or already be an
-          # open PR from the previous attempt - both mean nothing to do here.
+          # merged (pubspec moved past the promoted version - nothing to do)
+          # or already be an open PR from the previous attempt (re-arm it
+          # instead of opening a duplicate).
           CURRENT_SEMVER=$(grep '^version:' pubspec.yaml | sed 's/version: *//; s/+.*//')
           PROMOTED_SEMVER="${{ needs.promote.outputs.semver }}"
           if [ "$CURRENT_SEMVER" != "$PROMOTED_SEMVER" ]; then
@@ -368,10 +398,16 @@ jobs:
               " ${PROMOTED_SEMVER} - unexpected state, refusing to bump."
             exit 1
           fi
+          # first() inside the query, not `| head -1`: under pipefail, head
+          # closing the pipe early can kill the producer with SIGPIPE and
+          # abort the job before it re-arms an existing bump PR.
           OPEN_BUMP=$(gh pr list --repo ${{ github.repository }} --state open \
-            --json headRefName -q '.[] | select(.headRefName | startswith("chore/bump-")) | .headRefName' | head -1)
+            --json headRefName \
+            -q 'first(.[] | select(.headRefName | startswith("chore/bump-")) | .headRefName)')
           if [ -n "$OPEN_BUMP" ]; then
-            echo "Bump PR from branch ${OPEN_BUMP} is already open; skipping."
+            echo "Bump PR from branch ${OPEN_BUMP} is already open;" \
+              " ensuring it is approved and armed to auto-merge."
+            arm_automerge "$OPEN_BUMP"
             exit 0
           fi
           git config user.name "github-actions[bot]"
@@ -387,17 +423,12 @@ jobs:
           the App Store closes a version train on release, so betas cannot
           continue on the promoted marketing version."
           git push origin "$BRANCH"
-          gh pr create --base main --head "$BRANCH" \
+          # Created with the built-in token so the author is
+          # github-actions[bot], leaving the PAT account free to approve.
+          GH_TOKEN="$BOT_TOKEN" gh pr create --base main --head "$BRANCH" \
             --title "chore: bump version to ${NEWVER}" \
             --body "Opens the next beta train after promoting ${{ needs.promote.outputs.tag }}. Auto-merges when checks pass; until it lands, the beta pipeline's train-closed guard fails every merge."
-          # Fatal, not a warning: a bump PR without auto-merge silently
-          # reintroduces the manual step and leaves the beta train closed.
-          # Failing here makes notify-failures open a tracking issue.
-          gh pr merge --auto --merge "$BRANCH" || {
-            echo "::error::Could not enable auto-merge on the bump PR;" \
-              " merge it manually to reopen the beta train."
-            exit 1
-          }
+          arm_automerge "$BRANCH"
 
   notify-failures:
     name: Open issue on promotion failure
