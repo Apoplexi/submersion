@@ -129,6 +129,15 @@ jobs:
           VERSION="${TAG_NAME#v}"
           export SPARKLE_EDDSA_SIGNATURE=$(python3 -c "import json;print(json.load(open('promoted/metadata.json'))['eddsaSignature'])")
           export SPARKLE_DMG_LENGTH=$(python3 -c "import json;print(json.load(open('promoted/metadata.json'))['dmgLength'])")
+          # Betas built before Windows signing existed have no
+          # windowsEddsaSignature in metadata.json; allow promoting those with
+          # the legacy unsigned enclosure instead of failing the pipeline.
+          export SPARKLE_WINDOWS_EDDSA_SIGNATURE=$(python3 -c "import json;print(json.load(open('promoted/metadata.json')).get('windowsEddsaSignature',''))")
+          export SPARKLE_WINDOWS_EXE_LENGTH=$(python3 -c "import json;print(json.load(open('promoted/metadata.json')).get('windowsExeLength',''))")
+          if [ -z "$SPARKLE_WINDOWS_EDDSA_SIGNATURE" ]; then
+            echo "::warning::Promoting a beta without a Windows EdDSA signature (pre-signing build)"
+            export SPARKLE_ALLOW_UNSIGNED_WINDOWS=1
+          fi
           BASE="https://github.com/${{ github.repository }}/releases/download/${TAG_NAME}"
           ./scripts/generate_appcast.sh "$VERSION" "${{ steps.resolve.outputs.build-number }}" \
             "$(date -R)" \

@@ -318,6 +318,8 @@ jobs:
           TAG_NAME: ${{ github.ref_name }}
           SPARKLE_EDDSA_SIGNATURE: ${{ needs.build.outputs.eddsa-signature }}
           SPARKLE_DMG_LENGTH: ${{ needs.build.outputs.dmg-length }}
+          SPARKLE_WINDOWS_EDDSA_SIGNATURE: ${{ needs.build.outputs.windows-eddsa-signature }}
+          SPARKLE_WINDOWS_EXE_LENGTH: ${{ needs.build.outputs.windows-exe-length }}
         run: |
           VERSION="${TAG_NAME#v}"
           BUILD_NUMBER=$(grep '^version:' pubspec.yaml | sed 's/.*+//')
