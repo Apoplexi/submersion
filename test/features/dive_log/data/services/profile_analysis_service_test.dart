@@ -687,8 +687,9 @@ void main() {
 
       test('in-band drift (7m / 2m) keeps a single stop', () {
         // Small drifts just outside the 3-6m band are buoyancy wobble, not a
-        // new stop: hysteresis keeps them within one continuous stop, even
-        // when they last longer than the consolidation window.
+        // new stop: hysteresis keeps the segment open through them, so the
+        // stop never splits. (Under the previous 30s consolidation window,
+        // these 31s/45s excursions each broke the stop in two.)
         final profile = buildDiveWithGaps(
           gaps: [
             (durationSeconds: 31, depth: 7.0),

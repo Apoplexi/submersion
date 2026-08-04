@@ -1040,8 +1040,11 @@ class ProfileAnalysisService {
   ///
   /// Three-layer detection:
   /// 1. Max depth gate: skip dives shallower than 10m
-  /// 2. Ascent-phase restriction: only scan after max depth point
-  /// 3. Consolidation: merge stops separated by gaps <= 30s
+  /// 2. Ascent-phase scan with hysteresis: only samples after the max depth
+  ///    point are considered; a stop opens when depth enters the 3-6m band
+  ///    and closes only on a clear departure (shallower than 1.5m or deeper
+  ///    than 8m), so small drifts across the band edges do not split it
+  /// 3. Consolidation: merge stops separated by gaps <= 120s
   void _detectSafetyStops(
     String diveId,
     List<double> depths,
@@ -1099,7 +1102,8 @@ class ProfileAnalysisService {
           stopStartTimestamp = timestamps[i];
         }
       } else if (depth < stopExitShallow || depth > stopExitDeep) {
-        // Clear departure: close at the previous in-range sample.
+        // Clear departure: close at the previous sample (which may sit
+        // between the band edge and the hysteresis threshold, e.g. 7m).
         addRawStop(stopStartIndex, stopStartTimestamp!, i - 1);
         stopStartIndex = null;
         stopStartTimestamp = null;
