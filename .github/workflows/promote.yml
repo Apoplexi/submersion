@@ -398,8 +398,12 @@ jobs:
               " ${PROMOTED_SEMVER} - unexpected state, refusing to bump."
             exit 1
           fi
+          # first() inside the query, not `| head -1`: under pipefail, head
+          # closing the pipe early can kill the producer with SIGPIPE and
+          # abort the job before it re-arms an existing bump PR.
           OPEN_BUMP=$(gh pr list --repo ${{ github.repository }} --state open \
-            --json headRefName -q '.[] | select(.headRefName | startswith("chore/bump-")) | .headRefName' | head -1)
+            --json headRefName \
+            -q 'first(.[] | select(.headRefName | startswith("chore/bump-")) | .headRefName)')
           if [ -n "$OPEN_BUMP" ]; then
             echo "Bump PR from branch ${OPEN_BUMP} is already open;" \
               " ensuring it is approved and armed to auto-merge."
