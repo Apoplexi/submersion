@@ -5731,7 +5731,7 @@
   "dashboard_gauges_backupDays": "Back-up {days}d geleden",
   "dashboard_gauges_syncPending": "{count} niet gesynchroniseerd",
   "dashboard_gauges_synced": "Gesynchroniseerd",
-  "dashboard_gauges_dataIssues": "{count} dataproblemen",
+  "dashboard_gauges_dataIssues": "{count, plural, =1{1 dataprobleem} other{{count} dataproblemen}}",
   "dashboard_gauges_retry": "Status niet beschikbaar - tik om opnieuw te proberen",
   "dashboard_urgent_title": "Vereist aandacht",
   "dashboard_photos_title": "Recente foto's",

@@ -5731,7 +5731,7 @@
   "dashboard_gauges_backupDays": "نسخ احتياطي منذ {days} يوم",
   "dashboard_gauges_syncPending": "{count} غير متزامنة",
   "dashboard_gauges_synced": "متزامن",
-  "dashboard_gauges_dataIssues": "{count} مشاكل في البيانات",
+  "dashboard_gauges_dataIssues": "{count, plural, =1{مشكلة واحدة في البيانات} other{{count} مشاكل في البيانات}}",
   "dashboard_gauges_retry": "الحالة غير متاحة - انقر لإعادة المحاولة",
   "dashboard_urgent_title": "يتطلب الانتباه",
   "dashboard_photos_title": "أحدث الصور",

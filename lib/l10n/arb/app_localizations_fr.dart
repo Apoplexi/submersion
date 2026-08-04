@@ -3229,7 +3229,13 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String dashboard_gauges_dataIssues(int count) {
-    return '$count problèmes de données';
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count problèmes de données',
+      one: '1 problème de données',
+    );
+    return '$_temp0';
   }
 
   @override

@@ -5731,7 +5731,7 @@
   "dashboard_gauges_backupDays": "Mentés {days} napja",
   "dashboard_gauges_syncPending": "{count} nem szinkronizált",
   "dashboard_gauges_synced": "Szinkronizálva",
-  "dashboard_gauges_dataIssues": "{count} adatprobléma",
+  "dashboard_gauges_dataIssues": "{count, plural, =1{1 adatprobléma} other{{count} adatprobléma}}",
   "dashboard_gauges_retry": "Az állapot nem érhető el - koppints az újrapróbáláshoz",
   "dashboard_urgent_title": "Figyelmet igényel",
   "dashboard_photos_title": "Legutóbbi fotók",
