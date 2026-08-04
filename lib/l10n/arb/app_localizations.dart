@@ -4235,24 +4235,6 @@ abstract class AppLocalizations {
   /// **'Start pre-dive check'**
   String get preDive_dashboard_start;
 
-  /// No description provided for @tools_preDive_title.
-  ///
-  /// In en, this message translates to:
-  /// **'Pre-Dive Checklists'**
-  String get tools_preDive_title;
-
-  /// No description provided for @tools_preDive_subtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Run and review checklist sessions'**
-  String get tools_preDive_subtitle;
-
-  /// No description provided for @tools_preDive_description.
-  ///
-  /// In en, this message translates to:
-  /// **'Buddy checks, CCR build lists, and gear packing with an audit trail'**
-  String get tools_preDive_description;
-
   /// No description provided for @trips_detail_preDive_action.
   ///
   /// In en, this message translates to:
@@ -33535,48 +33517,6 @@ abstract class AppLocalizations {
   /// **'Tank Presets'**
   String get tankPresets_title;
 
-  /// No description provided for @tools_deco_description.
-  ///
-  /// In en, this message translates to:
-  /// **'Calculate no-decompression limits, required deco stops, and CNS/OTU exposure for multi-level dive profiles.'**
-  String get tools_deco_description;
-
-  /// No description provided for @tools_deco_subtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Plan dives with decompression stops'**
-  String get tools_deco_subtitle;
-
-  /// No description provided for @tools_deco_title.
-  ///
-  /// In en, this message translates to:
-  /// **'Deco Calculator'**
-  String get tools_deco_title;
-
-  /// No description provided for @tools_disclaimer.
-  ///
-  /// In en, this message translates to:
-  /// **'These calculators are for planning purposes only. Always verify calculations and follow your dive training.'**
-  String get tools_disclaimer;
-
-  /// No description provided for @tools_gas_description.
-  ///
-  /// In en, this message translates to:
-  /// **'Four specialized gas calculators:\n• MOD - Maximum operating depth for a gas mix\n• Best Mix - Ideal O₂% for a target depth\n• Consumption - Gas usage estimation\n• Rock Bottom - Emergency reserve calculation'**
-  String get tools_gas_description;
-
-  /// No description provided for @tools_gas_subtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'MOD, Best Mix, Consumption, Rock Bottom'**
-  String get tools_gas_subtitle;
-
-  /// No description provided for @tools_gas_title.
-  ///
-  /// In en, this message translates to:
-  /// **'Gas Calculators'**
-  String get tools_gas_title;
-
   /// No description provided for @tools_gpsLogger_description.
   ///
   /// In en, this message translates to:
@@ -33594,12 +33534,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'GPS Logger'**
   String get tools_gpsLogger_title;
-
-  /// No description provided for @tools_title.
-  ///
-  /// In en, this message translates to:
-  /// **'Tools'**
-  String get tools_title;
 
   /// No description provided for @tools_weight_aluminumImperial.
   ///
@@ -33630,12 +33564,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Very buoyant (+3 kg)'**
   String get tools_weight_carbonFiberMetric;
-
-  /// No description provided for @tools_weight_description.
-  ///
-  /// In en, this message translates to:
-  /// **'Estimate the weight you need based on your exposure suit, tank material, water type, and body weight.'**
-  String get tools_weight_description;
 
   /// No description provided for @tools_weight_disclaimer.
   ///
@@ -33696,12 +33624,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Negatively buoyant (-2 kg)'**
   String get tools_weight_steelMetric;
-
-  /// No description provided for @tools_weight_subtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Recommended weight for your setup'**
-  String get tools_weight_subtitle;
 
   /// No description provided for @tools_weight_tankMaterial.
   ///

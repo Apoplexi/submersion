@@ -2456,16 +2456,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get preDive_dashboard_start => 'Start pre-dive check';
 
   @override
-  String get tools_preDive_title => 'Pre-Dive Checklists';
-
-  @override
-  String get tools_preDive_subtitle => 'Run and review checklist sessions';
-
-  @override
-  String get tools_preDive_description =>
-      'Buddy checks, CCR build lists, and gear packing with an audit trail';
-
-  @override
   String get trips_detail_preDive_action => 'Pre-dive checklist';
 
   @override
@@ -19756,30 +19746,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tankPresets_title => 'Tank Presets';
 
   @override
-  String get tools_deco_description =>
-      'Calculate no-decompression limits, required deco stops, and CNS/OTU exposure for multi-level dive profiles.';
-
-  @override
-  String get tools_deco_subtitle => 'Plan dives with decompression stops';
-
-  @override
-  String get tools_deco_title => 'Deco Calculator';
-
-  @override
-  String get tools_disclaimer =>
-      'These calculators are for planning purposes only. Always verify calculations and follow your dive training.';
-
-  @override
-  String get tools_gas_description =>
-      'Four specialized gas calculators:\n• MOD - Maximum operating depth for a gas mix\n• Best Mix - Ideal O₂% for a target depth\n• Consumption - Gas usage estimation\n• Rock Bottom - Emergency reserve calculation';
-
-  @override
-  String get tools_gas_subtitle => 'MOD, Best Mix, Consumption, Rock Bottom';
-
-  @override
-  String get tools_gas_title => 'Gas Calculators';
-
-  @override
   String get tools_gpsLogger_description =>
       'Record your position during a dive day and match imported dives to GPS locations automatically.';
 
@@ -19788,9 +19754,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get tools_gpsLogger_title => 'GPS Logger';
-
-  @override
-  String get tools_title => 'Tools';
 
   @override
   String get tools_weight_aluminumImperial =>
@@ -19807,10 +19770,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get tools_weight_carbonFiberMetric => 'Very buoyant (+3 kg)';
-
-  @override
-  String get tools_weight_description =>
-      'Estimate the weight you need based on your exposure suit, tank material, water type, and body weight.';
 
   @override
   String get tools_weight_disclaimer =>
@@ -19847,9 +19806,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get tools_weight_steelMetric => 'Negatively buoyant (-2 kg)';
-
-  @override
-  String get tools_weight_subtitle => 'Recommended weight for your setup';
 
   @override
   String get tools_weight_tankMaterial => 'Tank Material';

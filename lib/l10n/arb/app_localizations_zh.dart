@@ -2356,15 +2356,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get preDive_dashboard_start => '开始潜前检查';
 
   @override
-  String get tools_preDive_title => '潜前检查清单';
-
-  @override
-  String get tools_preDive_subtitle => '执行并查看检查清单记录';
-
-  @override
-  String get tools_preDive_description => '潜伴检查、CCR 组装清单和装备打包，并保留审核记录';
-
-  @override
   String get trips_detail_preDive_action => '潜前检查清单';
 
   @override
@@ -19082,29 +19073,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get tankPresets_title => '气瓶预设';
 
   @override
-  String get tools_deco_description =>
-      '计算免减压极限、所需减压停留以及多层潜水轮廓的中枢神经系统毒性/氧毒性单位暴露量。';
-
-  @override
-  String get tools_deco_subtitle => '规划需要减压停留的潜水';
-
-  @override
-  String get tools_deco_title => '减压计算器';
-
-  @override
-  String get tools_disclaimer => '这些计算器仅供计划参考。请务必验证计算结果并遵循您的潜水训练。';
-
-  @override
-  String get tools_gas_description =>
-      '四种专用气体计算器：\n• 最大作业深度 - 气体混合物的最大作业深度\n• 最佳混合气 - 目标深度的理想氧气百分比\n• 耗气量 - 气体使用量估算\n• 底限储备 - 紧急储备计算';
-
-  @override
-  String get tools_gas_subtitle => '最大作业深度、最佳混合气、耗气量、底限储备';
-
-  @override
-  String get tools_gas_title => '气体计算器';
-
-  @override
   String get tools_gpsLogger_description => '在潜水日记录你的位置，自动将导入的潜水与 GPS 位置匹配。';
 
   @override
@@ -19112,9 +19080,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get tools_gpsLogger_title => 'GPS 记录器';
-
-  @override
-  String get tools_title => '工具';
 
   @override
   String get tools_weight_aluminumImperial => '空瓶时浮力较大（+4 lbs）';
@@ -19130,9 +19095,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get tools_weight_carbonFiberMetric => '浮力很大（+3 kg）';
-
-  @override
-  String get tools_weight_description => '根据您的防寒服、气瓶材质、水型和体重估算所需配重。';
 
   @override
   String get tools_weight_disclaimer =>
@@ -19169,9 +19131,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get tools_weight_steelMetric => '负浮力（-2 kg）';
-
-  @override
-  String get tools_weight_subtitle => '适合您装备配置的推荐配重';
 
   @override
   String get tools_weight_tankMaterial => '气瓶材质';

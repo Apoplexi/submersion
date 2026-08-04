@@ -2510,17 +2510,6 @@ class AppLocalizationsEs extends AppLocalizations {
       'Iniciar comprobación previa a la inmersión';
 
   @override
-  String get tools_preDive_title => 'Listas previas a la inmersión';
-
-  @override
-  String get tools_preDive_subtitle =>
-      'Ejecuta y revisa sesiones de listas de verificación';
-
-  @override
-  String get tools_preDive_description =>
-      'Comprobaciones de seguridad en pareja, listas de montaje CCR y preparación del equipo con registro de auditoría';
-
-  @override
   String get trips_detail_preDive_action => 'Lista previa a la inmersión';
 
   @override
@@ -20111,31 +20100,6 @@ class AppLocalizationsEs extends AppLocalizations {
   String get tankPresets_title => 'Presets de tanque';
 
   @override
-  String get tools_deco_description =>
-      'Calcula limites de no descompresion, paradas deco requeridas y exposicion CNS/OTU para perfiles de inmersion multinivel.';
-
-  @override
-  String get tools_deco_subtitle =>
-      'Planifica inmersiones con paradas de descompresion';
-
-  @override
-  String get tools_deco_title => 'Calculadora deco';
-
-  @override
-  String get tools_disclaimer =>
-      'Estas calculadoras son solo para planificacion. Siempre verifica los calculos y sigue tu formacion de buceo.';
-
-  @override
-  String get tools_gas_description =>
-      'Cuatro calculadoras de gas especializadas:\n- MOD - Profundidad maxima operativa para una mezcla\n- Mejor mezcla - % de O2 ideal para una profundidad objetivo\n- Consumo - Estimacion de uso de gas\n- Reserva minima - Calculo de reserva de emergencia';
-
-  @override
-  String get tools_gas_subtitle => 'MOD, Mejor mezcla, Consumo, Reserva minima';
-
-  @override
-  String get tools_gas_title => 'Calculadoras de gas';
-
-  @override
   String get tools_gpsLogger_description =>
       'Graba tu posición durante un día de buceo y empareja automáticamente las inmersiones importadas con ubicaciones GPS.';
 
@@ -20144,9 +20108,6 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get tools_gpsLogger_title => 'Registrador GPS';
-
-  @override
-  String get tools_title => 'Herramientas';
 
   @override
   String get tools_weight_aluminumImperial => 'Mas flotabilidad vacio (+4 lbs)';
@@ -20162,10 +20123,6 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get tools_weight_carbonFiberMetric => 'Muy flotante (+3 kg)';
-
-  @override
-  String get tools_weight_description =>
-      'Estima el peso que necesitas segun tu traje, material del tanque, tipo de agua y peso corporal.';
 
   @override
   String get tools_weight_disclaimer =>
@@ -20203,9 +20160,6 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get tools_weight_steelMetric => 'Flotabilidad negativa (-2 kg)';
-
-  @override
-  String get tools_weight_subtitle => 'Peso recomendado para tu configuracion';
 
   @override
   String get tools_weight_tankMaterial => 'Material del tanque';
