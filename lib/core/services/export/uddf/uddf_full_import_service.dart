@@ -565,11 +565,7 @@ class UddfFullImportService {
       }
 
       // Parse dive mode
-      final diveModeStr = UddfImportParsers.getElementText(
-        beforeElement,
-        'divemode',
-      );
-      final diveMode = UddfImportParsers.parseUddfDiveMode(diveModeStr);
+      final diveMode = UddfImportParsers.parseDiveModeIn(beforeElement);
       if (diveMode != null) {
         diveData['diveMode'] = diveMode;
       }
@@ -1009,15 +1005,9 @@ class UddfFullImportService {
         .findElements('rebreather')
         .firstOrNull;
     if (rebreatherElement != null) {
-      final diveMode = UddfImportParsers.getElementText(
-        rebreatherElement,
-        'divemode',
-      );
+      final diveMode = UddfImportParsers.parseDiveModeIn(rebreatherElement);
       if (diveMode != null) {
-        diveData['diveMode'] = UddfImportParsers.parseEnumValue(
-          diveMode,
-          enums.DiveMode.values,
-        );
+        diveData['diveMode'] = diveMode;
       }
       // CCR setpoints
       final spLow = UddfImportParsers.getElementText(
@@ -1764,9 +1754,7 @@ class UddfFullImportService {
         // than on the dive. A dive that runs closed circuit for any part of
         // it is a rebreather dive; bailout segments switch the samples to
         // open circuit without changing that.
-        final waypointMode = UddfImportParsers.parseUddfDiveMode(
-          waypoint.findElements('divemode').firstOrNull?.getAttribute('type'),
-        );
+        final waypointMode = UddfImportParsers.parseDiveModeIn(waypoint);
         if (waypointMode != null && waypointMode != enums.DiveMode.oc) {
           waypointDiveMode = waypointMode;
         }

@@ -42,6 +42,21 @@ class UddfImportParsers {
   /// Maximum O2 cells the profile schema can hold (o2Sensor1..o2Sensor6).
   static const int maxO2Sensors = 6;
 
+  /// Reads the dive mode from a `<divemode>` child of [parent].
+  ///
+  /// UDDF's own form is an empty element carrying the circuit in a `type`
+  /// attribute (`<divemode type="closedcircuit" />`), while our exporter
+  /// writes the enum name as inner text. Both appear at dive level, on
+  /// `<rebreather>` and on waypoints, so both are read wherever the element
+  /// occurs.
+  static enums.DiveMode? parseDiveModeIn(XmlElement parent) {
+    final element = parent.findElements('divemode').firstOrNull;
+    if (element == null) return null;
+
+    return parseUddfDiveMode(element.innerText) ??
+        parseUddfDiveMode(element.getAttribute('type'));
+  }
+
   /// Resolves a UDDF circuit name to a dive mode.
   ///
   /// UDDF spells the circuit out (`closedcircuit`), while our own exporter

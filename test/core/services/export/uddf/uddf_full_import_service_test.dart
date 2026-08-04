@@ -711,6 +711,62 @@ void main() {
         expect(result.dives.first['diveMode'], DiveMode.ccr);
       });
 
+      test('reads a dive-level divemode from its type attribute', () async {
+        // UDDF's own form is an empty element carrying `type`, so a file can
+        // state the circuit at dive level with no inner text at all.
+        const uddfContent = '''
+<uddf version="3.2.3">
+  <profiledata>
+    <repetitiongroup>
+      <dive id="dive-1">
+        <informationbeforedive>
+          <datetime>2026-08-01T09:08:48Z</datetime>
+          <divemode type="closedcircuit" />
+        </informationbeforedive>
+        <samples>
+          <waypoint>
+            <depth>30</depth>
+            <divetime>120</divetime>
+          </waypoint>
+        </samples>
+      </dive>
+    </repetitiongroup>
+  </profiledata>
+</uddf>
+''';
+        final result = await service.importAllDataFromUddf(uddfContent);
+
+        expect(result.dives.first['diveMode'], DiveMode.ccr);
+      });
+
+      test('reads a rebreather divemode from its type attribute', () async {
+        const uddfContent = '''
+<uddf version="3.2.3">
+  <profiledata>
+    <repetitiongroup>
+      <dive id="dive-1">
+        <informationbeforedive>
+          <datetime>2026-08-01T09:08:48Z</datetime>
+        </informationbeforedive>
+        <rebreather>
+          <divemode type="semiclosedcircuit" />
+        </rebreather>
+        <samples>
+          <waypoint>
+            <depth>30</depth>
+            <divetime>120</divetime>
+          </waypoint>
+        </samples>
+      </dive>
+    </repetitiongroup>
+  </profiledata>
+</uddf>
+''';
+        final result = await service.importAllDataFromUddf(uddfContent);
+
+        expect(result.dives.first['diveMode'], DiveMode.scr);
+      });
+
       test('maps UDDF circuit spellings to dive modes', () async {
         expect(
           UddfImportParsers.parseUddfDiveMode('semiclosedcircuit'),
