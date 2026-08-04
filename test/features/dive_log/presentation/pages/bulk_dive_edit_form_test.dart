@@ -137,6 +137,7 @@ void main() {
           ProviderScope(
             overrides: buildOverrides(overrides).cast(),
             child: MaterialApp(
+              locale: const Locale('en'),
               localizationsDelegates: AppLocalizations.localizationsDelegates,
               supportedLocales: AppLocalizations.supportedLocales,
               home: Scaffold(
