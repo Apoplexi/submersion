@@ -104,12 +104,19 @@ class _EquipmentListContentState extends ConsumerState<EquipmentListContent> {
     }
   }
 
+  /// Invalidate whatever provider the visible list is actually reading.
+  /// Must mirror the selection in [build]: the default (no filter) view
+  /// reads activeEquipmentProvider, so invalidating only the status family
+  /// would leave pull-to-refresh and error-retry showing stale rows.
   void _invalidateCurrentProvider(WidgetRef ref) {
     if (_selectedFilter == _serviceDueFilter) {
       ref.invalidate(serviceDueEquipmentProvider);
+    } else if (_selectedFilter == null) {
+      ref.invalidate(activeEquipmentProvider);
     } else {
-      final status = _selectedFilter as EquipmentStatus?;
-      ref.invalidate(equipmentByStatusProvider(status));
+      ref.invalidate(
+        equipmentByStatusProvider(_selectedFilter as EquipmentStatus),
+      );
     }
   }
 
@@ -131,8 +138,12 @@ class _EquipmentListContentState extends ConsumerState<EquipmentListContent> {
     final AsyncValue<List<EquipmentItem>> equipmentAsync;
     if (_selectedFilter == _serviceDueFilter) {
       equipmentAsync = ref.watch(serviceDueEquipmentProvider);
+    } else if (_selectedFilter == null) {
+      // The default view hides retired gear; the Retired status filter is
+      // the way to see it (#636).
+      equipmentAsync = ref.watch(activeEquipmentProvider);
     } else {
-      final status = _selectedFilter as EquipmentStatus?;
+      final status = _selectedFilter as EquipmentStatus;
       equipmentAsync = ref.watch(equipmentByStatusProvider(status));
     }
 

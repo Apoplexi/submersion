@@ -167,6 +167,63 @@ class FilesTabNotifier extends StateNotifier<FilesTabState> {
     );
   }
 
+  /// Routes the staged file at [sourcePath] to [diveId], removing it from
+  /// whichever bucket currently holds it (unmatched, or another dive).
+  ///
+  /// [commit] only persists files sitting in [MatchedSelection.matched], so
+  /// without this a file the date matcher rejected had no route into the
+  /// database at all. Unknown paths are ignored.
+  void assignToDive(String sourcePath, String diveId) {
+    final file = state.files
+        .where((f) => f.sourcePath == sourcePath)
+        .firstOrNull;
+    if (file == null) return;
+
+    final newMatched = <String, List<ExtractedFile>>{};
+    for (final entry in state.match.matched.entries) {
+      final kept = entry.value
+          .where((f) => f.sourcePath != sourcePath)
+          .toList();
+      // Drop emptied groups, mirroring [removeFile].
+      if (kept.isNotEmpty) newMatched[entry.key] = kept;
+    }
+    newMatched.update(
+      diveId,
+      (existing) => [...existing, file],
+      ifAbsent: () => [file],
+    );
+
+    state = state.copyWith(
+      match: MatchedSelection(
+        matched: newMatched,
+        unmatched: state.match.unmatched
+            .where((f) => f.sourcePath != sourcePath)
+            .toList(),
+      ),
+    );
+  }
+
+  /// Routes every currently-unmatched file to [diveId]. Backs the review
+  /// pane's bulk "add all to this dive" action.
+  void assignAllUnmatched(String diveId) {
+    final unmatched = state.match.unmatched;
+    if (unmatched.isEmpty) return;
+
+    final newMatched = {
+      for (final entry in state.match.matched.entries)
+        entry.key: [...entry.value],
+    };
+    newMatched.update(
+      diveId,
+      (existing) => [...existing, ...unmatched],
+      ifAbsent: () => [...unmatched],
+    );
+
+    state = state.copyWith(
+      match: MatchedSelection(matched: newMatched, unmatched: const []),
+    );
+  }
+
   /// Persists the matcher's per-dive assignment as [MediaItem] rows and
   /// returns the list of created IDs. Pass the list back to [undoCommit]
   /// to roll back. State is reset via [clear] before returning.

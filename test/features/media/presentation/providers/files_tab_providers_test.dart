@@ -167,6 +167,127 @@ void main() {
     });
   });
 
+  // commit() only ever persists files sitting in match.matched, so a file the
+  // date matcher rejected had no route into the database at all: the Link
+  // button is gated on matched being non-empty, and turning the auto-match
+  // checkbox off put EVERY file in unmatched, making the whole tab a no-op.
+  // These mutators are what let a user link photos the matcher didn't claim.
+  group('manual dive assignment', () {
+    test('assignToDive moves an unmatched file into the dive bucket', () {
+      final notifier = container.read(filesTabNotifierProvider.notifier);
+      final a = _ef('/a.jpg');
+      final b = _ef('/b.jpg');
+      notifier.setFiles([
+        a,
+        b,
+      ], match: MatchedSelection(matched: const {}, unmatched: [a, b]));
+
+      notifier.assignToDive('/a.jpg', 'd1');
+
+      final state = container.read(filesTabNotifierProvider);
+      expect(state.match.matched['d1'], [a]);
+      expect(state.match.unmatched, [b]);
+    });
+
+    test('assignToDive appends to an existing dive bucket', () {
+      final notifier = container.read(filesTabNotifierProvider.notifier);
+      final a = _ef('/a.jpg');
+      final b = _ef('/b.jpg');
+      notifier.setFiles(
+        [a, b],
+        match: MatchedSelection(
+          matched: {
+            'd1': [a],
+          },
+          unmatched: [b],
+        ),
+      );
+
+      notifier.assignToDive('/b.jpg', 'd1');
+
+      final state = container.read(filesTabNotifierProvider);
+      expect(state.match.matched['d1'], [a, b]);
+      expect(state.match.unmatched, isEmpty);
+    });
+
+    test('assignToDive re-homes a file without duplicating it', () {
+      final notifier = container.read(filesTabNotifierProvider.notifier);
+      final a = _ef('/a.jpg');
+      notifier.setFiles(
+        [a],
+        match: MatchedSelection(
+          matched: {
+            'd1': [a],
+          },
+          unmatched: const [],
+        ),
+      );
+
+      notifier.assignToDive('/a.jpg', 'd2');
+
+      final state = container.read(filesTabNotifierProvider);
+      // Emptied groups are dropped, mirroring removeFile.
+      expect(state.match.matched.containsKey('d1'), isFalse);
+      expect(state.match.matched['d2'], [a]);
+      expect(state.match.totalFiles, 1);
+    });
+
+    test('assignToDive ignores a path that is not staged', () {
+      final notifier = container.read(filesTabNotifierProvider.notifier);
+      final a = _ef('/a.jpg');
+      notifier.setFiles([
+        a,
+      ], match: MatchedSelection(matched: const {}, unmatched: [a]));
+
+      notifier.assignToDive('/nope.jpg', 'd1');
+
+      final state = container.read(filesTabNotifierProvider);
+      expect(state.match.matched, isEmpty);
+      expect(state.match.unmatched, [a]);
+    });
+
+    test('assignAllUnmatched empties the unmatched bucket', () {
+      final notifier = container.read(filesTabNotifierProvider.notifier);
+      final a = _ef('/a.jpg');
+      final b = _ef('/b.jpg');
+      final c = _ef('/c.jpg');
+      notifier.setFiles(
+        [a, b, c],
+        match: MatchedSelection(
+          matched: {
+            'd1': [a],
+          },
+          unmatched: [b, c],
+        ),
+      );
+
+      notifier.assignAllUnmatched('d1');
+
+      final state = container.read(filesTabNotifierProvider);
+      expect(state.match.matched['d1'], [a, b, c]);
+      expect(state.match.unmatched, isEmpty);
+    });
+
+    test('assignAllUnmatched on an empty bucket is a no-op', () {
+      final notifier = container.read(filesTabNotifierProvider.notifier);
+      final a = _ef('/a.jpg');
+      notifier.setFiles(
+        [a],
+        match: MatchedSelection(
+          matched: {
+            'd1': [a],
+          },
+          unmatched: const [],
+        ),
+      );
+      final before = container.read(filesTabNotifierProvider);
+
+      notifier.assignAllUnmatched('d1');
+
+      expect(container.read(filesTabNotifierProvider), before);
+    });
+  });
+
   // The platform-conditional branches in _persistOne are exercised on the
   // host platform (macOS in CI / dev box) — the iOS / macOS branch. Coverage
   // for the Android / desktop branches is left to integration testing,

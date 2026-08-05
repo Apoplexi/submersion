@@ -92,6 +92,7 @@ import 'package:submersion/features/media/presentation/providers/photo_picker_pr
 import 'package:submersion/features/media/presentation/widgets/dive_media_section.dart';
 import 'package:submersion/features/settings/presentation/providers/export_providers.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
+import 'package:submersion/features/weather/presentation/widgets/weather_description_builder.dart';
 import 'package:submersion/features/signatures/presentation/providers/signature_providers.dart';
 import 'package:submersion/features/signatures/presentation/widgets/buddy_signatures_section.dart';
 import 'package:submersion/features/signatures/presentation/widgets/signature_capture_widget.dart';
@@ -216,8 +217,13 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
 
     // On desktop, redirect standalone detail pages to master-detail view.
     // Skip in table mode -- table view has no master-detail split to redirect into.
+    // Skip when this page was PUSHED (trip/buddy/site drill-through): the
+    // redirect uses go(), which would wipe the stack and lose the browse
+    // context and back button (#764). Only redirect root-level details
+    // (deep links, tab navigation).
     if (!widget.embedded &&
         !_hasRedirected &&
+        !(GoRouter.maybeOf(context)?.canPop() ?? false) &&
         ResponsiveBreakpoints.isMasterDetail(context)) {
       final viewMode = ref.read(diveListViewModeProvider);
       if (viewMode != ListViewMode.table) {
@@ -2052,21 +2058,34 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
         .map((t) => t.volume!)
         .firstOrNull;
 
-    // Determine if we can show L/min (need tank volume)
-    final showLitersPerMin =
-        sacUnit == SacUnit.litersPerMin && tankVolume != null;
-
     // Use the top-level normalization function
     final normalizationFactor = calculateSacNormalizationFactor(dive, analysis);
 
-    // Format SAC value based on unit setting, applying normalization
-    String formatSacValue(double sacBarPerMin) {
+    // Format SAC value based on unit setting, applying normalization.
+    // [segmentTankId] selects that segment's own cylinder volume for the
+    // L/min conversion -- sidemount tanks can differ in size, so one shared
+    // volume misconverts half the segments (#110). Falls back to the first
+    // tank with a volume when the segment carries no attribution.
+    String formatSacValue(double sacBarPerMin, {String? segmentTankId}) {
       // Apply normalization to align with overall dive SAC
       final normalizedSac = sacBarPerMin * normalizationFactor;
 
-      if (showLitersPerMin) {
+      final segmentVolume = segmentTankId == null
+          ? null
+          : dive.tanks
+                .where(
+                  (t) =>
+                      t.id == segmentTankId &&
+                      t.volume != null &&
+                      t.volume! > 0,
+                )
+                .map((t) => t.volume!)
+                .firstOrNull;
+      final effectiveVolume = segmentVolume ?? tankVolume;
+
+      if (sacUnit == SacUnit.litersPerMin && effectiveVolume != null) {
         // Convert bar/min to L/min: sacLPerMin = sacBarPerMin * tankVolume
-        final sacLPerMin = normalizedSac * tankVolume;
+        final sacLPerMin = normalizedSac * effectiveVolume;
         return '${units.convertVolume(sacLPerMin).toStringAsFixed(1)} ${units.volumeSymbol}/min';
       } else {
         // Convert to user's pressure unit (bar or psi)
@@ -2212,7 +2231,10 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
                         SizedBox(
                           width: 90,
                           child: Text(
-                            formatSacValue(segment.sacRate),
+                            formatSacValue(
+                              segment.sacRate,
+                              segmentTankId: segment.tankId,
+                            ),
                             style: Theme.of(context).textTheme.bodySmall
                                 ?.copyWith(fontWeight: FontWeight.bold),
                             textAlign: TextAlign.end,
@@ -3030,7 +3052,7 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
                 _buildDetailRow(
                   context,
                   context.l10n.diveLog_detail_label_surfacePressure,
-                  '${(dive.surfacePressure! * 1000).toStringAsFixed(0)} mbar',
+                  units.formatSurfacePressure(dive.surfacePressure),
                 ),
               if (dive.windSpeed != null)
                 _buildDetailRow(
@@ -3062,13 +3084,34 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
                   context.l10n.diveLog_detail_label_humidity,
                   '${dive.humidity!.toStringAsFixed(0)}%',
                 ),
-              if (dive.weatherDescription != null &&
-                  dive.weatherDescription!.isNotEmpty)
-                _buildDetailRow(
-                  context,
-                  context.l10n.diveLog_detail_label_weatherDescription,
-                  dive.weatherDescription!,
-                ),
+              // Rendered at display time so it follows the diver's locale and
+              // units. Text the diver typed or that arrived with an import is
+              // user data and is shown verbatim; the prose we used to generate
+              // for fetched weather is rebuilt from the structured fields.
+              Builder(
+                builder: (context) {
+                  final description = buildLocalizedWeatherDescription(
+                    l10n: context.l10n,
+                    units: units,
+                    weatherCode: dive.weatherCode,
+                    cloudCover: dive.cloudCover,
+                    airTempCelsius: dive.airTemp,
+                    windSpeedMs: dive.windSpeed,
+                    windDirection: dive.windDirection,
+                    precipitation: dive.precipitation,
+                    storedDescription:
+                        dive.weatherSource == WeatherSource.openMeteo
+                        ? null
+                        : dive.weatherDescription,
+                  );
+                  if (description == null) return const SizedBox.shrink();
+                  return _buildDetailRow(
+                    context,
+                    context.l10n.diveLog_detail_label_weatherDescription,
+                    description,
+                  );
+                },
+              ),
               if (dive.weatherSource == WeatherSource.openMeteo)
                 Padding(
                   padding: const EdgeInsets.only(top: 4),
@@ -3111,7 +3154,7 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
                 _buildDetailRow(
                   context,
                   context.l10n.diveLog_detail_label_swellHeight,
-                  '${dive.swellHeight!.toStringAsFixed(1)}m',
+                  units.formatDepth(dive.swellHeight, decimals: 1),
                 ),
               if (dive.entryMethod != null)
                 _buildDetailRow(
@@ -3480,21 +3523,21 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
     );
     final dateRef = entryTime ?? record.highTideTime ?? record.lowTideTime;
     final dateStr = dateRef != null
-        ? DateFormat('EEE, MMM d').format(dateRef.toLocal())
+        ? DateFormat('EEE, MMM d').format(dateRef)
         : '';
+    // Cycle bounds are stored wall-clock instants, not device-local times:
+    // format them verbatim without any timezone conversion.
     final timeRangeStr = cycleStart != null && cycleEnd != null
         ? () {
-            final startLocal = cycleStart.toLocal();
-            final endLocal = cycleEnd.toLocal();
             final timeFmt = DateFormat(settings.timeFormat.pattern);
-            final startStr = timeFmt.format(startLocal);
-            final endStr = timeFmt.format(endLocal);
+            final startStr = timeFmt.format(cycleStart);
+            final endStr = timeFmt.format(cycleEnd);
             final spansNewDay =
-                startLocal.year != endLocal.year ||
-                startLocal.month != endLocal.month ||
-                startLocal.day != endLocal.day;
+                cycleStart.year != cycleEnd.year ||
+                cycleStart.month != cycleEnd.month ||
+                cycleStart.day != cycleEnd.day;
             if (spansNewDay) {
-              final endDateStr = DateFormat('MMM d').format(endLocal);
+              final endDateStr = DateFormat('MMM d').format(cycleEnd);
               return '$startStr - $endStr ($endDateStr)';
             }
             return '$startStr - $endStr';
@@ -3611,7 +3654,7 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
 
   /// Format a DateTime as a time string using the given time format.
   String _formatTime(DateTime time, TimeFormat timeFormat) {
-    return DateFormat(timeFormat.pattern).format(time.toLocal());
+    return DateFormat(timeFormat.pattern).format(time);
   }
 
   Widget _buildWeightSection(

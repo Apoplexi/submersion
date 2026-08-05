@@ -382,6 +382,9 @@ jobs:
           python3 -m coverage xml --include="$guards" \
             -o coverage/scripts.xml
 
+      - name: Run appcast beta feed test
+        run: ./scripts/generate_appcast_beta_test.sh
+
       - name: Upload coverage
         uses: codecov/codecov-action@v7
         if: always()

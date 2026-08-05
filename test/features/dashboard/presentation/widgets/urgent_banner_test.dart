@@ -59,7 +59,7 @@ Future<NavSpy> pumpBanner(WidgetTester tester, DashboardAlerts alerts) async {
         path: '/',
         builder: (_, _) => const Scaffold(body: UrgentBanner()),
       ),
-      GoRoute(path: '/gear', builder: (_, _) => stub('/gear')),
+      GoRoute(path: '/equipment', builder: (_, _) => stub('/equipment')),
       GoRoute(
         path: '/settings/diver-profile/insurance',
         builder: (_, _) => stub('/settings/diver-profile/insurance'),
@@ -130,7 +130,7 @@ void main() {
 
     await tester.tap(find.byType(InkWell));
     await tester.pumpAndSettle();
-    expect(spy.location, '/gear');
+    expect(spy.location, '/equipment');
   });
 
   testWidgets('caps overdue lines and shows a "+N more" overflow', (
@@ -157,7 +157,7 @@ void main() {
     // Tap still opens the gear list.
     await tester.tap(find.byType(InkWell));
     await tester.pumpAndSettle();
-    expect(spy.location, '/gear');
+    expect(spy.location, '/equipment');
   });
 
   testWidgets('expired insurance alone navigates to the insurance record', (
@@ -197,6 +197,6 @@ void main() {
 
     await tester.tap(find.byType(InkWell));
     await tester.pumpAndSettle();
-    expect(spy.location, '/gear');
+    expect(spy.location, '/equipment');
   });
 }

@@ -1006,6 +1006,7 @@ class DiveRepository {
               precipitation: Value(dive.precipitation?.name),
               humidity: Value(dive.humidity),
               weatherDescription: Value(dive.weatherDescription),
+              weatherCode: Value(dive.weatherCode),
               weatherSource: Value(dive.weatherSource?.name),
               weatherFetchedAt: Value(
                 dive.weatherFetchedAt != null
@@ -1247,6 +1248,7 @@ class DiveRepository {
           precipitation: Value(dive.precipitation?.name),
           humidity: Value(dive.humidity),
           weatherDescription: Value(dive.weatherDescription),
+          weatherCode: Value(dive.weatherCode),
           weatherSource: Value(dive.weatherSource?.name),
           weatherFetchedAt: Value(
             dive.weatherFetchedAt != null
@@ -1938,7 +1940,14 @@ class DiveRepository {
       }
     }
     if (filter.buddyNameFilter != null && filter.buddyNameFilter!.isNotEmpty) {
-      clauses.add('d.buddy LIKE ?');
+      // The dive editor writes buddies only to the dive_buddies junction;
+      // d.buddy is a legacy text column kept for old data (#757).
+      clauses.add(
+        '(LOWER(d.buddy) LIKE LOWER(?) OR EXISTS (SELECT 1 FROM dive_buddies db '
+        'JOIN buddies b ON b.id = db.buddy_id '
+        'WHERE db.dive_id = d.id AND LOWER(b.name) LIKE LOWER(?)))',
+      );
+      args.add(Variable('%${filter.buddyNameFilter}%'));
       args.add(Variable('%${filter.buddyNameFilter}%'));
     }
     if (filter.buddyId != null) {
@@ -2996,6 +3005,7 @@ class DiveRepository {
           : null,
       humidity: row.humidity,
       weatherDescription: row.weatherDescription,
+      weatherCode: row.weatherCode,
       weatherSource: row.weatherSource != null
           ? WeatherSource.values.firstWhere(
               (w) => w.name == row.weatherSource,
@@ -3367,6 +3377,7 @@ class DiveRepository {
           : null,
       humidity: row.humidity,
       weatherDescription: row.weatherDescription,
+      weatherCode: row.weatherCode,
       weatherSource: row.weatherSource != null
           ? WeatherSource.values.firstWhere(
               (w) => w.name == row.weatherSource,

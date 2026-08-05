@@ -54,9 +54,12 @@ class ProfileLegendState {
   final bool showCns;
   final bool showOtu;
 
-  // Per-metric data source preferences (session overrides)
+  // Per-metric data source preferences (session overrides).
+  // The ceiling line has no source toggle: every import path stores only the
+  // computer's stepped stop depth in `ceiling`, so a "computer" ceiling line
+  // would duplicate the deco-stop band. The ceiling line therefore always
+  // renders the exact, continuous calculated curve (see issue #755).
   final MetricDataSource ndlSource;
-  final MetricDataSource ceilingSource;
   final MetricDataSource ttsSource;
   final MetricDataSource cnsSource;
   final MetricDataSource decoStopSource;
@@ -99,7 +102,6 @@ class ProfileLegendState {
     this.showCns = false,
     this.showOtu = false,
     this.ndlSource = MetricDataSource.calculated,
-    this.ceilingSource = MetricDataSource.calculated,
     this.ttsSource = MetricDataSource.calculated,
     this.cnsSource = MetricDataSource.calculated,
     this.decoStopSource = MetricDataSource.calculated,
@@ -178,7 +180,6 @@ class ProfileLegendState {
     bool? showCns,
     bool? showOtu,
     MetricDataSource? ndlSource,
-    MetricDataSource? ceilingSource,
     MetricDataSource? ttsSource,
     MetricDataSource? cnsSource,
     MetricDataSource? decoStopSource,
@@ -217,7 +218,6 @@ class ProfileLegendState {
       showCns: showCns ?? this.showCns,
       showOtu: showOtu ?? this.showOtu,
       ndlSource: ndlSource ?? this.ndlSource,
-      ceilingSource: ceilingSource ?? this.ceilingSource,
       ttsSource: ttsSource ?? this.ttsSource,
       cnsSource: cnsSource ?? this.cnsSource,
       decoStopSource: decoStopSource ?? this.decoStopSource,
@@ -260,7 +260,6 @@ class ProfileLegendState {
           showCns == other.showCns &&
           showOtu == other.showOtu &&
           ndlSource == other.ndlSource &&
-          ceilingSource == other.ceilingSource &&
           ttsSource == other.ttsSource &&
           cnsSource == other.cnsSource &&
           decoStopSource == other.decoStopSource &&
@@ -298,7 +297,6 @@ class ProfileLegendState {
     showCns,
     showOtu,
     ndlSource,
-    ceilingSource,
     ttsSource,
     cnsSource,
     decoStopSource,
@@ -354,7 +352,6 @@ class ProfileLegend extends _$ProfileLegend {
           defaultShowCns: s.defaultShowCns,
           defaultShowOtu: s.defaultShowOtu,
           defaultNdlSource: s.defaultNdlSource,
-          defaultCeilingSource: s.defaultCeilingSource,
           defaultTtsSource: s.defaultTtsSource,
           defaultCnsSource: s.defaultCnsSource,
           defaultDecoStopSource: s.defaultDecoStopSource,
@@ -390,7 +387,6 @@ class ProfileLegend extends _$ProfileLegend {
       showCns: settings.defaultShowCns,
       showOtu: settings.defaultShowOtu,
       ndlSource: settings.defaultNdlSource,
-      ceilingSource: settings.defaultCeilingSource,
       ttsSource: settings.defaultTtsSource,
       cnsSource: settings.defaultCnsSource,
       decoStopSource: settings.defaultDecoStopSource,
@@ -523,10 +519,6 @@ class ProfileLegend extends _$ProfileLegend {
   }
 
   // Data source set methods (for SegmentedButton)
-  void setCeilingSource(MetricDataSource source) {
-    state = state.copyWith(ceilingSource: source);
-  }
-
   void setDecoStopSource(MetricDataSource source) {
     state = state.copyWith(decoStopSource: source);
   }

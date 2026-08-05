@@ -144,6 +144,50 @@ class DiveComputerRepository {
     }
   }
 
+  /// Find a computer by its stable hardware identity.
+  ///
+  /// BLE identifiers are host-specific and are therefore only useful for a
+  /// local connection. The serial number, together with manufacturer/model,
+  /// identifies the physical computer across devices.
+  Future<domain.DiveComputer?> findByHardwareIdentity({
+    required String manufacturer,
+    required String model,
+    required String serialNumber,
+    String? diverId,
+  }) async {
+    try {
+      final query = _db.select(_db.diveComputers)
+        ..orderBy([(t) => OrderingTerm.desc(t.updatedAt)]);
+      final normalizedDiverId = diverId?.trim();
+      if (normalizedDiverId != null && normalizedDiverId.isNotEmpty) {
+        query.where((t) => t.diverId.equals(normalizedDiverId));
+      }
+
+      // Matched in Dart (rather than pushed into the SQL filter) because a
+      // stored serialNumber/manufacturer/model may itself carry whitespace
+      // from an older import; trimming only the input would miss that row.
+      final rows = await query.get();
+      final normalizedSerial = serialNumber.trim();
+      final normalizedManufacturer = manufacturer.trim().toLowerCase();
+      final normalizedModel = model.trim().toLowerCase();
+      for (final row in rows) {
+        if (row.serialNumber?.trim() == normalizedSerial &&
+            row.manufacturer?.trim().toLowerCase() == normalizedManufacturer &&
+            row.model?.trim().toLowerCase() == normalizedModel) {
+          return _mapRowToComputer(row);
+        }
+      }
+      return null;
+    } catch (e, stackTrace) {
+      _log.error(
+        'Failed to find dive computer by hardware identity',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      rethrow;
+    }
+  }
+
   /// Create a new dive computer
   Future<domain.DiveComputer> createComputer(
     domain.DiveComputer computer,
