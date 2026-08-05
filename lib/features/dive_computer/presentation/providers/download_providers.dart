@@ -346,7 +346,21 @@ final computerDiveIdsProvider = FutureProvider.family<List<String>, String>((
 ///
 /// Null when there is no active diver or the log is empty (no cutoff
 /// prompt is shown then).
-final firstSyncCutoffDefaultProvider = FutureProvider<DateTime?>((ref) async {
+///
+/// `autoDispose`: this is only ever watched by `DcAdapterDownloadStep` while
+/// the cutoff prompt could apply, and only for as long as that step widget
+/// stays mounted. Without `autoDispose` a plain `FutureProvider` caches its
+/// first resolved value (e.g. `null` from an empty log) for the app's
+/// lifetime, so a later cutoff-eligible reconnect (after an intervening file
+/// import populates the log) would never re-fetch and the prompt would stay
+/// stuck showing stale data until app restart. `autoDispose` tears the
+/// provider down once its last listener unmounts, so the next watch always
+/// re-fetches. The download step watches it continuously while it's on
+/// screen, so there's no risk of a mid-session refetch under an active
+/// listener.
+final firstSyncCutoffDefaultProvider = FutureProvider.autoDispose<DateTime?>((
+  ref,
+) async {
   final diverId = ref.watch(currentDiverIdProvider);
   if (diverId == null || diverId.isEmpty) return null;
   final repository = ref.watch(diveRepositoryProvider);

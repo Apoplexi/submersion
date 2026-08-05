@@ -273,5 +273,33 @@ void main() {
         );
       },
     );
+
+    testWidgets(
+      'tapping the date row does not crash when the cutoff default is '
+      'ahead of the local calendar day (timezone skew)',
+      (tester) async {
+        // The default cutoff comes from the newest dive's stored timestamp,
+        // which can land after `DateTime.now()` on this device when the
+        // dive was logged in a timezone ahead of it. showDatePicker asserts
+        // `initialDate <= lastDate`; a naive `lastDate: DateTime.now()`
+        // would fail that assertion here.
+        final futureCutoff = DateTime.now().add(const Duration(days: 2));
+        await _pump(
+          tester,
+          container,
+          computer: _computerWithoutFingerprint,
+          firstSyncCutoffDefault: futureCutoff,
+        );
+        await tester.pump();
+
+        await tester.tap(find.byKey(const Key('cutoff-date-row')));
+        await tester.pumpAndSettle();
+
+        // No assertion/exception surfaced (tester would have thrown by
+        // now) and the picker actually opened.
+        expect(tester.takeException(), isNull);
+        expect(find.byType(DatePickerDialog), findsOneWidget);
+      },
+    );
   });
 }

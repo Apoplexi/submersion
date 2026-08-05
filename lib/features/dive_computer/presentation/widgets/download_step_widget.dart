@@ -119,11 +119,22 @@ class _DownloadStepWidgetState extends ConsumerState<DownloadStepWidget> {
 
   Future<void> _pickCutoffDate(BuildContext context) async {
     final now = DateTime.now();
+    // The default cutoff is the diver's newest logged dive, which can carry
+    // a timestamp in a different timezone than the device's local calendar
+    // day. If that dive's local-time timestamp lands after `now` (e.g. a
+    // dive logged in a timezone ahead of the device's), a `lastDate: now`
+    // with `initialDate: _cutoff` violates showDatePicker's
+    // `initialDate <= lastDate` assertion. Extend `lastDate` to cover
+    // `_cutoff` in that case rather than clamping `initialDate` down --
+    // clamping down would silently move the picker's starting point away
+    // from the diver's actual cutoff.
+    final cutoff = _cutoff;
+    final lastDate = (cutoff != null && cutoff.isAfter(now)) ? cutoff : now;
     final picked = await showDatePicker(
       context: context,
       initialDate: _cutoff,
       firstDate: DateTime(2000),
-      lastDate: now,
+      lastDate: lastDate,
     );
     if (picked != null && mounted) {
       setState(() {

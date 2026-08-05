@@ -87,11 +87,12 @@ void main() {
           knownComputer: computer,
         ),
       );
-      // Two async gates settle in sequence before DownloadStepWidget is
-      // constructed: deviceDescriptorsProvider (synthesizing a device from
-      // the known computer), then firstSyncCutoffDefaultProvider (only
-      // watched when this computer has no stored fingerprint). Each
-      // resolution triggers a rebuild on its own frame.
+      // Only one async gate applies here: deviceDescriptorsProvider
+      // (synthesizing a device from the known computer). With
+      // forceFullDownload=true, `promptCouldApply` in DcAdapterDownloadStep
+      // is false, so firstSyncCutoffDefaultProvider is never watched and
+      // has no gate to settle. The extra pump is harmless -- it just covers
+      // a frame with nothing left to resolve.
       await tester.pump();
       await tester.pump();
 
