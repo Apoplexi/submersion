@@ -1548,9 +1548,6 @@
     }
   },
   "preDive_dashboard_start": "Start pre-dive check",
-  "tools_preDive_title": "Pre-Dive Checklists",
-  "tools_preDive_subtitle": "Run and review checklist sessions",
-  "tools_preDive_description": "Buddy checks, CCR build lists, and gear packing with an audit trail",
   "trips_detail_preDive_action": "Pre-dive checklist",
   "settings_manage_preDiveChecklists": "Pre-Dive Checklists",
   "settings_manage_preDiveChecklists_subtitle": "Buddy checks, CCR build lists, gear packing",
@@ -2003,7 +2000,7 @@
     }
   },
   "dashboard_gauges_synced": "Synced",
-  "dashboard_gauges_dataIssues": "{count} data issues",
+  "dashboard_gauges_dataIssues": "{count, plural, =1{1 data issue} other{{count} data issues}}",
   "@dashboard_gauges_dataIssues": {
     "placeholders": {
       "count": {
@@ -7861,6 +7858,7 @@
   "settings_cloudSync_header_syncBehavior": "Sync Behavior",
   "settings_cloudSync_lastSynced": "Last synced: {time}",
   "settings_cloudSync_pendingChanges": "{count, plural, =1{1 pending change} other{{count} pending changes}}",
+  "settings_cloudSync_peerRequiresUpdate_banner": "{count, plural, =1{1 device syncs from a newer version of Submersion. Update this device to receive its latest changes.} other{{count} devices sync from a newer version of Submersion. Update this device to receive their latest changes.}}",
   "settings_cloudSync_provider_connected": "Connected",
   "settings_cloudSync_provider_connectedTo": "Connected to {providerName}",
   "settings_cloudSync_provider_connectionFailed": "{providerName} connection failed: {error}",
@@ -8343,6 +8341,65 @@
   "settings_units_weight": "Weight",
   "settings_units_weight_kilograms": "Kilograms (kg)",
   "settings_units_weight_pounds": "Pounds (lbs)",
+  "settings_updates_automaticUpdates": "Automatic updates",
+  "settings_updates_automaticUpdatesSubtitle": "Check for updates periodically",
+  "settings_updates_betaDialogBody": "Beta builds are published from every change and may upgrade your dive log's database before the stable release does. Switching back to stable later will not downgrade the app, and all devices that sync together should use the same channel. A backup is taken automatically before any database upgrade.",
+  "settings_updates_betaDialogConfirm": "Switch to Beta",
+  "settings_updates_betaDialogTitle": "Receive beta updates?",
+  "settings_updates_channel": "Update channel",
+  "settings_updates_channelBadgeBeta": "{version} (Beta)",
+  "@settings_updates_channelBadgeBeta": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "settings_updates_channelBeta": "Beta",
+  "settings_updates_channelBetaSubtitle": "New builds from every change, ahead of stable",
+  "settings_updates_channelStable": "Stable",
+  "settings_updates_channelStableSubtitle": "Tested releases only",
+  "settings_updates_checkForUpdates": "Check for Updates",
+  "settings_updates_checking": "Checking...",
+  "settings_updates_downloading": "Downloading... {progress}%",
+  "@settings_updates_downloading": {
+    "placeholders": {
+      "progress": {
+        "type": "String"
+      }
+    }
+  },
+  "settings_updates_error": "Error: {message}",
+  "@settings_updates_error": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "settings_updates_header": "Updates",
+  "settings_updates_joinBeta": "Join the Beta",
+  "settings_updates_joinBetaSubtitle": "Get new features early through the beta program",
+  "settings_updates_lastChecked": "Last checked",
+  "settings_updates_never": "Never",
+  "settings_updates_readyToInstall": "Version {version} ready to install",
+  "@settings_updates_readyToInstall": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "settings_updates_stableSwitchNotice": "You will stay on this beta until the next stable release is newer than it.",
+  "settings_updates_upToDate": "Up to date",
+  "settings_updates_versionAvailable": "Version {version} available",
+  "@settings_updates_versionAvailable": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
   "@settings_cloudSync_conflictItems": {
     "placeholders": {
       "count": {
@@ -10552,6 +10609,9 @@
   "universalImport_label_unnamed": "Unnamed",
   "universalImport_label_xOfY": "{current} of {total}",
   "universalImport_label_xOfYSelected": "{selected} of {total} selected",
+  "universalImport_entityAction_linkBadge": "LINK",
+  "universalImport_entityAction_linkExisting": "Link to existing",
+  "universalImport_entityAction_linkExistingSubtitle": "Use the matched record",
   "universalImport_pending_chooseAction": "Choose an action",
   "universalImport_pending_gateHint": "{count} duplicate(s) need a decision",
   "universalImport_pending_needsDecision": "Needs decision",
@@ -10867,6 +10927,15 @@
   "@transfer_computers_lastDownloadMinutesAgo": {"description": "Relative last-download label, minutes", "placeholders": {"minutes": {"type": "int"}}},
   "@transfer_computers_lastDownloadNever": {"description": "Shown when a computer has never been downloaded from"},
   "@transfer_computers_lastDownloadYesterday": {"description": "Relative last-download label, yesterday"},
+  "@universalImport_entityAction_linkBadge": {
+    "description": "Collapsed-header badge on a duplicate row whose action is link-to-existing"
+  },
+  "@universalImport_entityAction_linkExisting": {
+    "description": "Action button on a duplicate buddy/tag row: link the import to the matched existing record instead of skipping or creating a twin"
+  },
+  "@universalImport_entityAction_linkExistingSubtitle": {
+    "description": "Subtitle under the link-to-existing action button"
+  },
   "@universalImport_pending_chooseAction": {
     "description": "Prompt shown above the action buttons on an expanded pending duplicate row, telling the user to pick an action"
   },
@@ -12635,23 +12704,14 @@
   "tankPresets_noPresets": "No tank presets available",
   "tankPresets_setAsDefault": "Set as default",
   "tankPresets_title": "Tank Presets",
-  "tools_deco_description": "Calculate no-decompression limits, required deco stops, and CNS/OTU exposure for multi-level dive profiles.",
-  "tools_deco_subtitle": "Plan dives with decompression stops",
-  "tools_deco_title": "Deco Calculator",
-  "tools_disclaimer": "These calculators are for planning purposes only. Always verify calculations and follow your dive training.",
-  "tools_gas_description": "Four specialized gas calculators:\n• MOD - Maximum operating depth for a gas mix\n• Best Mix - Ideal O₂% for a target depth\n• Consumption - Gas usage estimation\n• Rock Bottom - Emergency reserve calculation",
-  "tools_gas_subtitle": "MOD, Best Mix, Consumption, Rock Bottom",
-  "tools_gas_title": "Gas Calculators",
   "tools_gpsLogger_description": "Record your position during a dive day and match imported dives to GPS locations automatically.",
   "tools_gpsLogger_subtitle": "Record a surface track",
   "tools_gpsLogger_title": "GPS Logger",
-  "tools_title": "Tools",
   "tools_weight_aluminumImperial": "More buoyant when empty (+4 lbs)",
   "tools_weight_aluminumMetric": "More buoyant when empty (+2 kg)",
   "tools_weight_bodyWeightOptional": "Body Weight (optional)",
   "tools_weight_carbonFiberImperial": "Very buoyant (+7 lbs)",
   "tools_weight_carbonFiberMetric": "Very buoyant (+3 kg)",
-  "tools_weight_description": "Estimate the weight you need based on your exposure suit, tank material, water type, and body weight.",
   "tools_weight_disclaimer": "This is an estimate only. Always perform a buoyancy check at the start of your dive and adjust as needed. Factors like BCD, personal buoyancy, and breathing patterns will affect your actual weight requirements.",
   "tools_weight_exposureSuit": "Exposure Suit",
   "tools_weight_gasCapacity": "• Gas capacity: {capacity} cuft",
@@ -12679,7 +12739,6 @@
   },
   "tools_weight_steelImperial": "Negatively buoyant (-4 lbs)",
   "tools_weight_steelMetric": "Negatively buoyant (-2 kg)",
-  "tools_weight_subtitle": "Recommended weight for your setup",
   "tools_weight_tankMaterial": "Tank Material",
   "tools_weight_tankSpecifications": "Tank Specifications",
   "tools_weight_title": "Weight Calculator",
@@ -13458,6 +13517,27 @@
   "@dive3d_overlay_curtain": {},
   "dive3d_overlay_markers": "Markers",
   "@dive3d_overlay_markers": {},
+  "dive3d_seascape_overlay_paths": "Dive paths",
+  "@dive3d_seascape_overlay_paths": {},
+  "dive3d_seascape_siteTitle": "Site Seascape",
+  "@dive3d_seascape_siteTitle": {},
+  "dive3d_seascape_seafloorSource": "Seafloor: {source} (~{resolution} m)",
+  "@dive3d_seascape_seafloorSource": {
+    "placeholders": {
+      "source": {"type": "String"},
+      "resolution": {"type": "String"}
+    }
+  },
+  "dive3d_seascape_noCoordinates": "This site has no GPS coordinates",
+  "@dive3d_seascape_noCoordinates": {},
+  "dive3d_seascape_noData": "No bathymetry available for this location",
+  "@dive3d_seascape_noData": {},
+  "dive3d_seascape_axis_distance": "Distance ({unitSymbol})",
+  "@dive3d_seascape_axis_distance": {
+    "placeholders": {"unitSymbol": {"type": "String"}}
+  },
+  "settings_about_bathymetryCredit": "Bathymetry data: GMRT (CC BY 4.0) · EMODnet Bathymetry (CC BY 4.0) · NOAA ETOPO 2022",
+  "@settings_about_bathymetryCredit": {},
   "dive3d_metric_depth": "Depth",
   "@dive3d_metric_depth": {},
   "dive3d_metric_temperature": "Temp",

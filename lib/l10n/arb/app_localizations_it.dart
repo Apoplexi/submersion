@@ -2501,17 +2501,6 @@ class AppLocalizationsIt extends AppLocalizations {
   String get preDive_dashboard_start => 'Avvia controllo pre-immersione';
 
   @override
-  String get tools_preDive_title => 'Checklist pre-immersione';
-
-  @override
-  String get tools_preDive_subtitle =>
-      'Esegui e rivedi le sessioni di checklist';
-
-  @override
-  String get tools_preDive_description =>
-      'Buddy check, liste di montaggio CCR e preparazione dell\'attrezzatura con registro delle verifiche';
-
-  @override
   String get trips_detail_preDive_action => 'Checklist pre-immersione';
 
   @override
@@ -3224,7 +3213,13 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String dashboard_gauges_dataIssues(int count) {
-    return '$count problemi nei dati';
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count problemi nei dati',
+      one: '1 problema nei dati',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -13600,6 +13595,19 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
+  String settings_cloudSync_peerRequiresUpdate_banner(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count dispositivi si sincronizzano da una versione più recente di Submersion. Aggiorna questo dispositivo per ricevere le loro ultime modifiche.',
+      one:
+          '1 dispositivo si sincronizza da una versione più recente di Submersion. Aggiorna questo dispositivo per ricevere le sue ultime modifiche.',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get settings_cloudSync_provider_connected => 'Connesso';
 
   @override
@@ -15114,6 +15122,93 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get settings_units_weight_pounds => 'Libbre (lbs)';
+
+  @override
+  String get settings_updates_automaticUpdates => 'Aggiornamenti automatici';
+
+  @override
+  String get settings_updates_automaticUpdatesSubtitle =>
+      'Controlla periodicamente gli aggiornamenti';
+
+  @override
+  String get settings_updates_betaDialogBody =>
+      'Le build beta vengono pubblicate a ogni modifica e possono aggiornare il database del tuo diario immersioni prima della versione stabile. Tornare in seguito al canale stabile non riporterà l\'app a una versione precedente, e tutti i dispositivi che si sincronizzano tra loro dovrebbero usare lo stesso canale. Prima di ogni aggiornamento del database viene eseguito automaticamente un backup.';
+
+  @override
+  String get settings_updates_betaDialogConfirm => 'Passa alla Beta';
+
+  @override
+  String get settings_updates_betaDialogTitle => 'Ricevere aggiornamenti beta?';
+
+  @override
+  String get settings_updates_channel => 'Canale di aggiornamento';
+
+  @override
+  String settings_updates_channelBadgeBeta(String version) {
+    return '$version (Beta)';
+  }
+
+  @override
+  String get settings_updates_channelBeta => 'Beta';
+
+  @override
+  String get settings_updates_channelBetaSubtitle =>
+      'Nuove build a ogni modifica, in anticipo sulla stabile';
+
+  @override
+  String get settings_updates_channelStable => 'Stabile';
+
+  @override
+  String get settings_updates_channelStableSubtitle => 'Solo versioni testate';
+
+  @override
+  String get settings_updates_checkForUpdates => 'Controlla aggiornamenti';
+
+  @override
+  String get settings_updates_checking => 'Controllo in corso...';
+
+  @override
+  String settings_updates_downloading(String progress) {
+    return 'Download in corso... $progress%';
+  }
+
+  @override
+  String settings_updates_error(String message) {
+    return 'Errore: $message';
+  }
+
+  @override
+  String get settings_updates_header => 'Aggiornamenti';
+
+  @override
+  String get settings_updates_joinBeta => 'Partecipa alla Beta';
+
+  @override
+  String get settings_updates_joinBetaSubtitle =>
+      'Ricevi in anteprima le nuove funzionalità tramite il programma beta';
+
+  @override
+  String get settings_updates_lastChecked => 'Ultimo controllo';
+
+  @override
+  String get settings_updates_never => 'Mai';
+
+  @override
+  String settings_updates_readyToInstall(String version) {
+    return 'Versione $version pronta per l\'installazione';
+  }
+
+  @override
+  String get settings_updates_stableSwitchNotice =>
+      'Rimarrai su questa beta finché la prossima versione stabile non sarà più recente di essa.';
+
+  @override
+  String get settings_updates_upToDate => 'Aggiornato';
+
+  @override
+  String settings_updates_versionAvailable(String version) {
+    return 'Versione $version disponibile';
+  }
 
   @override
   String get signatures_action_clear => 'Cancella';
@@ -18145,6 +18240,17 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
+  String get universalImport_entityAction_linkBadge => 'COLLEGA';
+
+  @override
+  String get universalImport_entityAction_linkExisting =>
+      'Collega all\'esistente';
+
+  @override
+  String get universalImport_entityAction_linkExistingSubtitle =>
+      'Usa il record corrispondente';
+
+  @override
   String get universalImport_pending_chooseAction => 'Scegli un\'azione';
 
   @override
@@ -20035,30 +20141,6 @@ class AppLocalizationsIt extends AppLocalizations {
   String get tankPresets_title => 'Preset bombole';
 
   @override
-  String get tools_deco_description =>
-      'Calcola i limiti di non decompressione, le tappe deco richieste e l\'esposizione CNS/OTU per profili multilivello.';
-
-  @override
-  String get tools_deco_subtitle => 'Pianifica immersioni con tappe deco';
-
-  @override
-  String get tools_deco_title => 'Calcolatore deco';
-
-  @override
-  String get tools_disclaimer =>
-      'Questi calcolatori sono solo a scopo di pianificazione. Verifica sempre i calcoli e segui la tua formazione subacquea.';
-
-  @override
-  String get tools_gas_description =>
-      'Quattro calcolatori gas specializzati:\n• MOD - Profondità massima operativa per una miscela\n• Best Mix - O₂% ideale per una profondità target\n• Consumo - Stima del consumo di gas\n• Rock Bottom - Calcolo della riserva di emergenza';
-
-  @override
-  String get tools_gas_subtitle => 'MOD, Best Mix, Consumo, Rock Bottom';
-
-  @override
-  String get tools_gas_title => 'Calcolatori gas';
-
-  @override
   String get tools_gpsLogger_description =>
       'Registra la tua posizione durante una giornata di immersioni e abbina automaticamente le immersioni importate alle posizioni GPS.';
 
@@ -20067,9 +20149,6 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get tools_gpsLogger_title => 'Registratore GPS';
-
-  @override
-  String get tools_title => 'Strumenti';
 
   @override
   String get tools_weight_aluminumImperial =>
@@ -20086,10 +20165,6 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get tools_weight_carbonFiberMetric => 'Molto galleggiante (+3 kg)';
-
-  @override
-  String get tools_weight_description =>
-      'Stima la zavorra necessaria in base a muta, materiale della bombola, tipo di acqua e peso corporeo.';
 
   @override
   String get tools_weight_disclaimer =>
@@ -20127,10 +20202,6 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get tools_weight_steelMetric => 'Galleggiabilità negativa (-2 kg)';
-
-  @override
-  String get tools_weight_subtitle =>
-      'Zavorra consigliata per la tua configurazione';
 
   @override
   String get tools_weight_tankMaterial => 'Materiale bombola';
@@ -21185,6 +21256,34 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get dive3d_overlay_markers => 'Indicatori';
+
+  @override
+  String get dive3d_seascape_overlay_paths => 'Percorsi delle immersioni';
+
+  @override
+  String get dive3d_seascape_siteTitle => 'Paesaggio marino del sito';
+
+  @override
+  String dive3d_seascape_seafloorSource(String source, String resolution) {
+    return 'Fondale: $source (~$resolution m)';
+  }
+
+  @override
+  String get dive3d_seascape_noCoordinates =>
+      'Questo sito non ha coordinate GPS';
+
+  @override
+  String get dive3d_seascape_noData =>
+      'Nessuna batimetria disponibile per questa posizione';
+
+  @override
+  String dive3d_seascape_axis_distance(String unitSymbol) {
+    return 'Distanza ($unitSymbol)';
+  }
+
+  @override
+  String get settings_about_bathymetryCredit =>
+      'Dati batimetrici: GMRT (CC BY 4.0) · EMODnet Bathymetry (CC BY 4.0) · NOAA ETOPO 2022';
 
   @override
   String get dive3d_metric_depth => 'Profondità';

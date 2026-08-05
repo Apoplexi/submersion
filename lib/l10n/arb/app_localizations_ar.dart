@@ -2451,16 +2451,6 @@ class AppLocalizationsAr extends AppLocalizations {
   String get preDive_dashboard_start => 'بدء فحص ما قبل الغوص';
 
   @override
-  String get tools_preDive_title => 'قوائم تحقق ما قبل الغوص';
-
-  @override
-  String get tools_preDive_subtitle => 'تشغيل جلسات قوائم التحقق ومراجعتها';
-
-  @override
-  String get tools_preDive_description =>
-      'فحوصات رفيق الغوص، وقوائم تجهيز CCR، وتوضيب المعدات مع سجل تدقيق';
-
-  @override
   String get trips_detail_preDive_action => 'قائمة تحقق ما قبل الغوص';
 
   @override
@@ -3160,7 +3150,13 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String dashboard_gauges_dataIssues(int count) {
-    return '$count مشاكل في البيانات';
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count مشاكل في البيانات',
+      one: 'مشكلة واحدة في البيانات',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -13360,6 +13356,19 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String settings_cloudSync_peerRequiresUpdate_banner(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count أجهزة تتزامن من إصدار أحدث من Submersion. حدّث هذا الجهاز لتلقي أحدث تغييراتها.',
+      one:
+          'جهاز واحد يتزامن من إصدار أحدث من Submersion. حدّث هذا الجهاز لتلقي أحدث تغييراته.',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get settings_cloudSync_provider_connected => 'متصل';
 
   @override
@@ -14845,6 +14854,93 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get settings_units_weight_pounds => 'أرطال (lbs)';
+
+  @override
+  String get settings_updates_automaticUpdates => 'التحديثات التلقائية';
+
+  @override
+  String get settings_updates_automaticUpdatesSubtitle =>
+      'التحقق من التحديثات بشكل دوري';
+
+  @override
+  String get settings_updates_betaDialogBody =>
+      'تُنشر إصدارات البيتا مع كل تغيير وقد تقوم بترقية قاعدة بيانات سجل الغوص قبل الإصدار المستقر. العودة لاحقًا إلى القناة المستقرة لن تعيد التطبيق إلى إصدار أقدم، وينبغي أن تستخدم جميع الأجهزة التي تتزامن معًا القناة نفسها. يتم إنشاء نسخة احتياطية تلقائيًا قبل أي ترقية لقاعدة البيانات.';
+
+  @override
+  String get settings_updates_betaDialogConfirm => 'التبديل إلى البيتا';
+
+  @override
+  String get settings_updates_betaDialogTitle => 'هل تريد تلقي تحديثات البيتا؟';
+
+  @override
+  String get settings_updates_channel => 'قناة التحديث';
+
+  @override
+  String settings_updates_channelBadgeBeta(String version) {
+    return '$version (بيتا)';
+  }
+
+  @override
+  String get settings_updates_channelBeta => 'بيتا';
+
+  @override
+  String get settings_updates_channelBetaSubtitle =>
+      'إصدارات جديدة مع كل تغيير، قبل الإصدار المستقر';
+
+  @override
+  String get settings_updates_channelStable => 'مستقر';
+
+  @override
+  String get settings_updates_channelStableSubtitle => 'الإصدارات المختبرة فقط';
+
+  @override
+  String get settings_updates_checkForUpdates => 'التحقق من التحديثات';
+
+  @override
+  String get settings_updates_checking => 'جارٍ التحقق...';
+
+  @override
+  String settings_updates_downloading(String progress) {
+    return 'جارٍ التنزيل... $progress%';
+  }
+
+  @override
+  String settings_updates_error(String message) {
+    return 'خطأ: $message';
+  }
+
+  @override
+  String get settings_updates_header => 'التحديثات';
+
+  @override
+  String get settings_updates_joinBeta => 'الانضمام إلى البيتا';
+
+  @override
+  String get settings_updates_joinBetaSubtitle =>
+      'احصل على الميزات الجديدة مبكرًا من خلال برنامج البيتا';
+
+  @override
+  String get settings_updates_lastChecked => 'آخر تحقق';
+
+  @override
+  String get settings_updates_never => 'أبدًا';
+
+  @override
+  String settings_updates_readyToInstall(String version) {
+    return 'الإصدار $version جاهز للتثبيت';
+  }
+
+  @override
+  String get settings_updates_stableSwitchNotice =>
+      'ستبقى على إصدار البيتا هذا حتى يصبح الإصدار المستقر التالي أحدث منه.';
+
+  @override
+  String get settings_updates_upToDate => 'محدّث';
+
+  @override
+  String settings_updates_versionAvailable(String version) {
+    return 'الإصدار $version متاح';
+  }
 
   @override
   String get signatures_action_clear => 'مسح';
@@ -17817,6 +17913,16 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String get universalImport_entityAction_linkBadge => 'ربط';
+
+  @override
+  String get universalImport_entityAction_linkExisting => 'الربط بالموجود';
+
+  @override
+  String get universalImport_entityAction_linkExistingSubtitle =>
+      'استخدام السجل المطابق';
+
+  @override
   String get universalImport_pending_chooseAction => 'اختر إجراء';
 
   @override
@@ -19681,30 +19787,6 @@ class AppLocalizationsAr extends AppLocalizations {
   String get tankPresets_title => 'إعدادات الأسطوانات';
 
   @override
-  String get tools_deco_description =>
-      'احسب حدود عدم تخفيف الضغط، ووقفات التخفيف المطلوبة، والتعرض لـ CNS/OTU لملفات الغطسات متعددة المستويات.';
-
-  @override
-  String get tools_deco_subtitle => 'خطط للغطسات مع وقفات تخفيف الضغط';
-
-  @override
-  String get tools_deco_title => 'حاسبة تخفيف الضغط';
-
-  @override
-  String get tools_disclaimer =>
-      'هذه الحاسبات للتخطيط فقط. تحقق دائمًا من الحسابات واتبع تدريبك على الغوص.';
-
-  @override
-  String get tools_gas_description =>
-      'أربع حاسبات غاز متخصصة:\n- MOD - أقصى عمق تشغيلي لخليط غاز\n- Best Mix - نسبة O₂ المثالية لعمق مستهدف\n- الاستهلاك - تقدير استخدام الغاز\n- الحد الأدنى - حساب احتياطي الطوارئ';
-
-  @override
-  String get tools_gas_subtitle => 'MOD، Best Mix، الاستهلاك، الحد الأدنى';
-
-  @override
-  String get tools_gas_title => 'حاسبات الغاز';
-
-  @override
   String get tools_gpsLogger_description =>
       'سجّل موقعك خلال يوم الغطس وتتم مطابقة الغطسات المستوردة مع مواقع GPS تلقائيًا.';
 
@@ -19713,9 +19795,6 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get tools_gpsLogger_title => 'مسجّل GPS';
-
-  @override
-  String get tools_title => 'الأدوات';
 
   @override
   String get tools_weight_aluminumImperial => 'أكثر طفوًا عند الفراغ (+4 lbs)';
@@ -19731,10 +19810,6 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get tools_weight_carbonFiberMetric => 'طفو عالٍ جدًا (+3 kg)';
-
-  @override
-  String get tools_weight_description =>
-      'قدّر الوزن المطلوب بناءً على بدلة الغوص ومادة الأسطوانة ونوع الماء ووزن الجسم.';
 
   @override
   String get tools_weight_disclaimer =>
@@ -19771,9 +19846,6 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get tools_weight_steelMetric => 'طفو سلبي (-2 kg)';
-
-  @override
-  String get tools_weight_subtitle => 'الوزن الموصى به لإعدادك';
 
   @override
   String get tools_weight_tankMaterial => 'مادة الأسطوانة';
@@ -20806,6 +20878,34 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get dive3d_overlay_markers => 'علامات';
+
+  @override
+  String get dive3d_seascape_overlay_paths => 'مسارات الغوص';
+
+  @override
+  String get dive3d_seascape_siteTitle => 'المشهد البحري للموقع';
+
+  @override
+  String dive3d_seascape_seafloorSource(String source, String resolution) {
+    return 'قاع البحر: $source (~$resolution م)';
+  }
+
+  @override
+  String get dive3d_seascape_noCoordinates =>
+      'لا توجد إحداثيات GPS لهذا الموقع';
+
+  @override
+  String get dive3d_seascape_noData =>
+      'لا توجد بيانات قياس أعماق متاحة لهذا الموقع';
+
+  @override
+  String dive3d_seascape_axis_distance(String unitSymbol) {
+    return 'المسافة ($unitSymbol)';
+  }
+
+  @override
+  String get settings_about_bathymetryCredit =>
+      'بيانات قياس الأعماق: GMRT (CC BY 4.0) · EMODnet Bathymetry (CC BY 4.0) · NOAA ETOPO 2022';
 
   @override
   String get dive3d_metric_depth => 'العمق';

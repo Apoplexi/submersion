@@ -847,9 +847,6 @@
     }
   },
   "preDive_dashboard_start": "Iniciar verificação pré-mergulho",
-  "tools_preDive_title": "Listas de Verificação Pré-Mergulho",
-  "tools_preDive_subtitle": "Executar e revisar sessões de lista de verificação",
-  "tools_preDive_description": "Verificações de dupla, listas de montagem de CCR e preparação de equipamento com trilha de auditoria",
   "trips_detail_preDive_action": "Lista de verificação pré-mergulho",
   "settings_manage_preDiveChecklists": "Listas de Verificação Pré-Mergulho",
   "settings_manage_preDiveChecklists_subtitle": "Verificações de dupla, listas de montagem de CCR, preparação de equipamento",
@@ -4099,6 +4096,7 @@
   "settings_cloudSync_header_syncBehavior": "Comportamento de Sincronizacao",
   "settings_cloudSync_lastSynced": "Ultima sincronizacao: {time}",
   "settings_cloudSync_pendingChanges": "{count, plural, =1{1 alteracao pendente} other{{count} alteracoes pendentes}}",
+  "settings_cloudSync_peerRequiresUpdate_banner": "{count, plural, =1{1 dispositivo sincroniza a partir de uma versão mais recente do Submersion. Atualize este dispositivo para receber as alterações mais recentes dele.} other{{count} dispositivos sincronizam a partir de uma versão mais recente do Submersion. Atualize este dispositivo para receber as alterações mais recentes deles.}}",
   "settings_cloudSync_provider_connected": "Conectado",
   "settings_cloudSync_provider_connectedTo": "Conectado a {providerName}",
   "settings_cloudSync_provider_connectionFailed": "Falha na conexao com {providerName}: {error}",
@@ -4526,6 +4524,65 @@
   "settings_units_weight": "Peso",
   "settings_units_weight_kilograms": "Quilogramas (kg)",
   "settings_units_weight_pounds": "Libras (lbs)",
+  "settings_updates_automaticUpdates": "Atualizações automáticas",
+  "settings_updates_automaticUpdatesSubtitle": "Verificar atualizações periodicamente",
+  "settings_updates_betaDialogBody": "As versões beta são publicadas a cada alteração e podem atualizar o banco de dados do seu registro de mergulhos antes da versão estável. Voltar depois para o canal estável não fará downgrade do app, e todos os dispositivos que sincronizam entre si devem usar o mesmo canal. Um backup é feito automaticamente antes de qualquer atualização do banco de dados.",
+  "settings_updates_betaDialogConfirm": "Mudar para Beta",
+  "settings_updates_betaDialogTitle": "Receber atualizações beta?",
+  "settings_updates_channel": "Canal de atualização",
+  "settings_updates_channelBadgeBeta": "{version} (Beta)",
+  "@settings_updates_channelBadgeBeta": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "settings_updates_channelBeta": "Beta",
+  "settings_updates_channelBetaSubtitle": "Novas versões a cada alteração, antes da estável",
+  "settings_updates_channelStable": "Estável",
+  "settings_updates_channelStableSubtitle": "Apenas versões testadas",
+  "settings_updates_checkForUpdates": "Verificar atualizações",
+  "settings_updates_checking": "Verificando...",
+  "settings_updates_downloading": "Baixando... {progress}%",
+  "@settings_updates_downloading": {
+    "placeholders": {
+      "progress": {
+        "type": "String"
+      }
+    }
+  },
+  "settings_updates_error": "Erro: {message}",
+  "@settings_updates_error": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "settings_updates_header": "Atualizações",
+  "settings_updates_joinBeta": "Participar do Beta",
+  "settings_updates_joinBetaSubtitle": "Receba novos recursos antes através do programa beta",
+  "settings_updates_lastChecked": "Última verificação",
+  "settings_updates_never": "Nunca",
+  "settings_updates_readyToInstall": "Versão {version} pronta para instalar",
+  "@settings_updates_readyToInstall": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "settings_updates_stableSwitchNotice": "Você permanecerá nesta beta até que a próxima versão estável seja mais recente que ela.",
+  "settings_updates_upToDate": "Atualizado",
+  "settings_updates_versionAvailable": "Versão {version} disponível",
+  "@settings_updates_versionAvailable": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
   "signatures_action_clear": "Limpar",
   "signatures_action_closeSignatureView": "Fechar visualização de assinatura",
   "signatures_action_deleteSignature": "Excluir assinatura",
@@ -5006,23 +5063,14 @@
   "tides_semantic_tideCycle": "Ciclo de maré, estado: {state}, altura: {height}",
   "tides_semantic_tideState": "Estado da maré: {state}",
   "tides_title": "Marés",
-  "tools_deco_description": "Calcule limites de nao descompressao, paradas deco necessarias e exposicao CNS/OTU para perfis de mergulho multinivel.",
-  "tools_deco_subtitle": "Planeje mergulhos com paradas de descompressao",
-  "tools_deco_title": "Calculadora Deco",
-  "tools_disclaimer": "Estas calculadoras sao apenas para fins de planeamento. Sempre verifique os calculos e siga o seu treinamento de mergulho.",
-  "tools_gas_description": "Quatro calculadoras de gas especializadas:\n- MOD - Profundidade maxima operacional para uma mistura\n- Best Mix - O2% ideal para uma profundidade alvo\n- Consumo - Estimativa de uso de gas\n- Rock Bottom - Calculo de reserva de emergencia",
-  "tools_gas_subtitle": "MOD, Best Mix, Consumo, Rock Bottom",
-  "tools_gas_title": "Calculadoras de Gas",
   "tools_gpsLogger_description": "Grave sua posição durante um dia de mergulho e associe automaticamente os mergulhos importados a localizações GPS.",
   "tools_gpsLogger_subtitle": "Grave uma trilha de superfície",
   "tools_gpsLogger_title": "Registrador GPS",
-  "tools_title": "Ferramentas",
   "tools_weight_aluminumImperial": "Mais flutuante quando vazio (+4 lbs)",
   "tools_weight_aluminumMetric": "Mais flutuante quando vazio (+2 kg)",
   "tools_weight_bodyWeightOptional": "Peso Corporal (opcional)",
   "tools_weight_carbonFiberImperial": "Muito flutuante (+7 lbs)",
   "tools_weight_carbonFiberMetric": "Muito flutuante (+3 kg)",
-  "tools_weight_description": "Estime o lastro necessario com base na sua roupa, material do cilindro, tipo de agua e peso corporal.",
   "tools_weight_disclaimer": "Isto e apenas uma estimativa. Sempre faca uma verificacao de flutuabilidade no inicio do mergulho e ajuste conforme necessario. Fatores como colete, flutuabilidade pessoal e padroes respiratorios afetarao os seus requisitos reais de lastro.",
   "tools_weight_exposureSuit": "Roupa de Mergulho",
   "tools_weight_gasCapacity": "- Capacidade de gas: {capacity} cuft",
@@ -5033,7 +5081,6 @@
   "tools_weight_resultAccessibility": "Lastro recomendado: {weight} {unit}",
   "tools_weight_steelImperial": "Flutuabilidade negativa (-4 lbs)",
   "tools_weight_steelMetric": "Flutuabilidade negativa (-2 kg)",
-  "tools_weight_subtitle": "Lastro recomendado para o seu equipamento",
   "tools_weight_tankMaterial": "Material do Cilindro",
   "tools_weight_tankSpecifications": "Especificacoes do Cilindro",
   "tools_weight_title": "Calculadora de Lastro",
@@ -5692,7 +5739,7 @@
   "dashboard_gauges_backupDays": "Cópia há {days}d",
   "dashboard_gauges_syncPending": "{count} por sincronizar",
   "dashboard_gauges_synced": "Sincronizado",
-  "dashboard_gauges_dataIssues": "{count} problemas de dados",
+  "dashboard_gauges_dataIssues": "{count, plural, =1{1 problema de dados} other{{count} problemas de dados}}",
   "dashboard_gauges_retry": "Estado indisponível - toque para tentar novamente",
   "dashboard_urgent_title": "Requer atenção",
   "dashboard_photos_title": "Fotos recentes",
@@ -5756,6 +5803,9 @@
   "universalImport_dive_decideAction": "Decidir",
   "universalImport_label_consolidate": "Consolidar",
   "universalImport_label_importAsNew": "Importar como novo",
+  "universalImport_entityAction_linkBadge": "VINCULAR",
+  "universalImport_entityAction_linkExisting": "Vincular ao existente",
+  "universalImport_entityAction_linkExistingSubtitle": "Usar o registro correspondente",
   "universalImport_pending_chooseAction": "Escolher uma acao",
   "universalImport_pending_gateHint": "{count} duplicado(s) precisam de uma decisao",
   "universalImport_pending_needsDecision": "Decisao necessaria",
@@ -6029,6 +6079,20 @@
   "@dive3d_overlay_curtain": {},
   "dive3d_overlay_markers": "Marcadores",
   "@dive3d_overlay_markers": {},
+  "dive3d_seascape_overlay_paths": "Trajetos de mergulho",
+  "@dive3d_seascape_overlay_paths": {},
+  "dive3d_seascape_siteTitle": "Paisagem marinha do local",
+  "@dive3d_seascape_siteTitle": {},
+  "dive3d_seascape_seafloorSource": "Fundo do mar: {source} (~{resolution} m)",
+  "@dive3d_seascape_seafloorSource": {},
+  "dive3d_seascape_noCoordinates": "Este local não tem coordenadas GPS",
+  "@dive3d_seascape_noCoordinates": {},
+  "dive3d_seascape_noData": "Nenhuma batimetria disponível para este local",
+  "@dive3d_seascape_noData": {},
+  "dive3d_seascape_axis_distance": "Distância ({unitSymbol})",
+  "@dive3d_seascape_axis_distance": {},
+  "settings_about_bathymetryCredit": "Dados de batimetria: GMRT (CC BY 4.0) · EMODnet Bathymetry (CC BY 4.0) · NOAA ETOPO 2022",
+  "@settings_about_bathymetryCredit": {},
   "dive3d_metric_depth": "Profundidade",
   "@dive3d_metric_depth": {},
   "dive3d_metric_temperature": "Temp",

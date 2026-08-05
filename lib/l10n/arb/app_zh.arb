@@ -941,9 +941,6 @@
     }
   },
   "preDive_dashboard_start": "开始潜前检查",
-  "tools_preDive_title": "潜前检查清单",
-  "tools_preDive_subtitle": "执行并查看检查清单记录",
-  "tools_preDive_description": "潜伴检查、CCR 组装清单和装备打包，并保留审核记录",
   "trips_detail_preDive_action": "潜前检查清单",
   "settings_manage_preDiveChecklists": "潜前检查清单",
   "settings_manage_preDiveChecklists_subtitle": "潜伴检查、CCR 组装清单、装备打包",
@@ -4252,6 +4249,7 @@
   "settings_cloudSync_header_syncBehavior": "同步行为",
   "settings_cloudSync_lastSynced": "上次同步：{time}",
   "settings_cloudSync_pendingChanges": "{count, plural, =1{1 个待同步更改} other{{count} 个待同步更改}}",
+  "settings_cloudSync_peerRequiresUpdate_banner": "{count, plural, =1{1 台设备正在从更新版本的 Submersion 同步。请更新此设备以接收其最新更改。} other{{count} 台设备正在从更新版本的 Submersion 同步。请更新此设备以接收它们的最新更改。}}",
   "settings_cloudSync_provider_connected": "已连接",
   "settings_cloudSync_provider_connectedTo": "已连接到 {providerName}",
   "settings_cloudSync_provider_connectionFailed": "{providerName} 连接失败：{error}",
@@ -4700,6 +4698,65 @@
   "settings_units_weight": "重量",
   "settings_units_weight_kilograms": "千克 (kg)",
   "settings_units_weight_pounds": "磅 (lbs)",
+  "settings_updates_automaticUpdates": "自动更新",
+  "settings_updates_automaticUpdatesSubtitle": "定期检查更新",
+  "settings_updates_betaDialogBody": "Beta 版本会随每次更改发布，可能会先于稳定版升级您的潜水日志数据库。之后切换回稳定版不会降级应用，并且所有相互同步的设备应使用相同的更新渠道。每次数据库升级前都会自动创建备份。",
+  "settings_updates_betaDialogConfirm": "切换到 Beta",
+  "settings_updates_betaDialogTitle": "接收 Beta 更新？",
+  "settings_updates_channel": "更新渠道",
+  "settings_updates_channelBadgeBeta": "{version} (Beta)",
+  "@settings_updates_channelBadgeBeta": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "settings_updates_channelBeta": "Beta",
+  "settings_updates_channelBetaSubtitle": "每次更改都会发布新版本，先于稳定版",
+  "settings_updates_channelStable": "稳定版",
+  "settings_updates_channelStableSubtitle": "仅提供经过测试的版本",
+  "settings_updates_checkForUpdates": "检查更新",
+  "settings_updates_checking": "正在检查...",
+  "settings_updates_downloading": "正在下载... {progress}%",
+  "@settings_updates_downloading": {
+    "placeholders": {
+      "progress": {
+        "type": "String"
+      }
+    }
+  },
+  "settings_updates_error": "错误：{message}",
+  "@settings_updates_error": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "settings_updates_header": "更新",
+  "settings_updates_joinBeta": "加入 Beta 计划",
+  "settings_updates_joinBetaSubtitle": "通过 Beta 计划抢先体验新功能",
+  "settings_updates_lastChecked": "上次检查",
+  "settings_updates_never": "从未",
+  "settings_updates_readyToInstall": "版本 {version} 已准备好安装",
+  "@settings_updates_readyToInstall": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "settings_updates_stableSwitchNotice": "在下一个稳定版比当前 Beta 版更新之前，将保持在此 Beta 版上。",
+  "settings_updates_upToDate": "已是最新版本",
+  "settings_updates_versionAvailable": "版本 {version} 可用",
+  "@settings_updates_versionAvailable": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
   "signatures_action_clear": "清除",
   "signatures_action_closeSignatureView": "关闭签名视图",
   "signatures_action_deleteSignature": "删除签名",
@@ -5172,23 +5229,14 @@
   "tides_semantic_tideCycle": "潮汐周期，状态：{state}，高度：{height}",
   "tides_semantic_tideState": "潮汐状态：{state}",
   "tides_title": "潮汐",
-  "tools_deco_description": "计算免减压极限、所需减压停留以及多层潜水轮廓的中枢神经系统毒性/氧毒性单位暴露量。",
-  "tools_deco_subtitle": "规划需要减压停留的潜水",
-  "tools_deco_title": "减压计算器",
-  "tools_disclaimer": "这些计算器仅供计划参考。请务必验证计算结果并遵循您的潜水训练。",
-  "tools_gas_description": "四种专用气体计算器：\n• 最大作业深度 - 气体混合物的最大作业深度\n• 最佳混合气 - 目标深度的理想氧气百分比\n• 耗气量 - 气体使用量估算\n• 底限储备 - 紧急储备计算",
-  "tools_gas_subtitle": "最大作业深度、最佳混合气、耗气量、底限储备",
-  "tools_gas_title": "气体计算器",
   "tools_gpsLogger_description": "在潜水日记录你的位置，自动将导入的潜水与 GPS 位置匹配。",
   "tools_gpsLogger_subtitle": "记录水面轨迹",
   "tools_gpsLogger_title": "GPS 记录器",
-  "tools_title": "工具",
   "tools_weight_aluminumImperial": "空瓶时浮力较大（+4 lbs）",
   "tools_weight_aluminumMetric": "空瓶时浮力较大（+2 kg）",
   "tools_weight_bodyWeightOptional": "体重（可选）",
   "tools_weight_carbonFiberImperial": "浮力很大（+7 lbs）",
   "tools_weight_carbonFiberMetric": "浮力很大（+3 kg）",
-  "tools_weight_description": "根据您的防寒服、气瓶材质、水型和体重估算所需配重。",
   "tools_weight_disclaimer": "这仅为估算值。请务必在潜水开始时进行浮力检查并根据需要调整。浮力控制装置、个人浮力和呼吸模式等因素都会影响您的实际配重需求。",
   "tools_weight_exposureSuit": "防寒服",
   "tools_weight_gasCapacity": "• 气体容量：{capacity} cuft",
@@ -5199,7 +5247,6 @@
   "tools_weight_resultAccessibility": "推荐配重: {weight} {unit}",
   "tools_weight_steelImperial": "负浮力（-4 lbs）",
   "tools_weight_steelMetric": "负浮力（-2 kg）",
-  "tools_weight_subtitle": "适合您装备配置的推荐配重",
   "tools_weight_tankMaterial": "气瓶材质",
   "tools_weight_tankSpecifications": "气瓶规格",
   "tools_weight_title": "配重计算器",
@@ -5692,7 +5739,7 @@
   "dashboard_gauges_backupDays": "{days} 天前备份",
   "dashboard_gauges_syncPending": "{count} 条未同步",
   "dashboard_gauges_synced": "已同步",
-  "dashboard_gauges_dataIssues": "{count} 个数据问题",
+  "dashboard_gauges_dataIssues": "{count, plural, =1{1 个数据问题} other{{count} 个数据问题}}",
   "dashboard_gauges_retry": "状态不可用 - 点按重试",
   "dashboard_urgent_title": "需要注意",
   "dashboard_photos_title": "最近照片",
@@ -5756,6 +5803,9 @@
   "universalImport_dive_decideAction": "决定",
   "universalImport_label_consolidate": "合并",
   "universalImport_label_importAsNew": "作为新导入",
+  "universalImport_entityAction_linkBadge": "关联",
+  "universalImport_entityAction_linkExisting": "关联现有记录",
+  "universalImport_entityAction_linkExistingSubtitle": "使用匹配的记录",
   "universalImport_pending_chooseAction": "选择操作",
   "universalImport_pending_gateHint": "{count} 个重复项需要决定",
   "universalImport_pending_needsDecision": "需要决定",
@@ -6029,6 +6079,20 @@
   "@dive3d_overlay_curtain": {},
   "dive3d_overlay_markers": "标记",
   "@dive3d_overlay_markers": {},
+  "dive3d_seascape_overlay_paths": "潜水路径",
+  "@dive3d_seascape_overlay_paths": {},
+  "dive3d_seascape_siteTitle": "潜点海景",
+  "@dive3d_seascape_siteTitle": {},
+  "dive3d_seascape_seafloorSource": "海底：{source}（约{resolution}米）",
+  "@dive3d_seascape_seafloorSource": {},
+  "dive3d_seascape_noCoordinates": "该潜点没有GPS坐标",
+  "@dive3d_seascape_noCoordinates": {},
+  "dive3d_seascape_noData": "该位置没有可用的水深数据",
+  "@dive3d_seascape_noData": {},
+  "dive3d_seascape_axis_distance": "距离（{unitSymbol}）",
+  "@dive3d_seascape_axis_distance": {},
+  "settings_about_bathymetryCredit": "水深数据：GMRT（CC BY 4.0）· EMODnet Bathymetry（CC BY 4.0）· NOAA ETOPO 2022",
+  "@settings_about_bathymetryCredit": {},
   "dive3d_metric_depth": "深度",
   "@dive3d_metric_depth": {},
   "dive3d_metric_temperature": "温度",
