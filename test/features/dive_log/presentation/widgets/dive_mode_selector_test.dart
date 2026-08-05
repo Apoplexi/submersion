@@ -35,12 +35,12 @@ void main() {
     );
 
     // The segments no longer carry icons (they were what overflowed the row).
+    final segmentedButton = tester.widget<SegmentedButton<DiveMode>>(
+      find.byType(SegmentedButton<DiveMode>),
+    );
     expect(
-      find.descendant(
-        of: find.byType(SegmentedButton<DiveMode>),
-        matching: find.byType(Icon),
-      ),
-      findsNothing,
+      segmentedButton.segments.map((segment) => segment.icon),
+      everyElement(isNull),
     );
   });
 }
