@@ -25,6 +25,43 @@ void main() {
     expect(reg.defaultIntervalDives, 100);
   });
 
+  test('pre-existing built-in kinds keep null hour intervals', () async {
+    // Characterization: pins the current seed so adding an hours column to
+    // kSeedBuiltInServiceKindsSql cannot silently shift a positional value.
+    final kinds = await db.select(db.serviceKinds).get();
+    final byId = {for (final k in kinds) k.id: k};
+
+    expect(
+      byId.keys,
+      containsAll(<String>[
+        'hydro',
+        'vip',
+        'o2-clean',
+        'regulator-service',
+        'computer-battery',
+        'transmitter-battery',
+        'bcd-inspection',
+        'drysuit-seals',
+        'general-service',
+      ]),
+    );
+
+    for (final id in byId.keys) {
+      expect(
+        byId[id]!.defaultIntervalHours,
+        isNull,
+        reason: '$id must not gain an hours interval',
+      );
+    }
+
+    expect(byId['vip']!.defaultIntervalDays, 365);
+    expect(byId['o2-clean']!.autoAttach, isFalse);
+    expect(byId['drysuit-seals']!.defaultIntervalDays, 730);
+    expect(byId['general-service']!.defaultIntervalDays, isNull);
+    expect(byId['general-service']!.defaultIntervalDives, isNull);
+    expect(byId['general-service']!.applicableTypes, '[]');
+  });
+
   test(
     'service_schedules round-trips and cascades on equipment delete',
     () async {

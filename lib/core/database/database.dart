@@ -2116,26 +2116,26 @@ const String kSeedBuiltInServiceKindsSql = '''
     (id, diver_id, name, applicable_types, default_interval_days,
      default_interval_dives, default_interval_hours, auto_attach,
      is_built_in, created_at, updated_at)
-  SELECT t.id, NULL, t.name, t.types, t.days, t.dives, NULL, t.auto, 1,
+  SELECT t.id, NULL, t.name, t.types, t.days, t.dives, t.hours, t.auto, 1,
          n.now_ms, n.now_ms
   FROM (
     SELECT 'hydro' AS id, 'Hydrostatic test' AS name, '["tank"]' AS types,
-           1825 AS days, NULL AS dives, 1 AS auto
+           1825 AS days, NULL AS dives, NULL AS hours, 1 AS auto
     UNION ALL SELECT 'vip', 'Visual inspection (VIP)', '["tank"]',
-           365, NULL, 1
-    UNION ALL SELECT 'o2-clean', 'O2 clean', '["tank"]', 365, NULL, 0
+           365, NULL, NULL, 1
+    UNION ALL SELECT 'o2-clean', 'O2 clean', '["tank"]', 365, NULL, NULL, 0
     UNION ALL SELECT 'regulator-service', 'Regulator service',
-           '["regulator"]', 365, 100, 1
+           '["regulator"]', 365, 100, NULL, 1
     UNION ALL SELECT 'computer-battery', 'Computer battery', '["computer"]',
-           730, NULL, 1
+           730, NULL, NULL, 1
     UNION ALL SELECT 'transmitter-battery', 'Transmitter battery',
-           '["transmitter"]', 365, NULL, 1
+           '["transmitter"]', 365, NULL, NULL, 1
     UNION ALL SELECT 'bcd-inspection', 'BCD/wing inspection', '["bcd"]',
-           365, NULL, 1
+           365, NULL, NULL, 1
     UNION ALL SELECT 'drysuit-seals', 'Drysuit seals', '["drysuit"]',
-           730, NULL, 0
+           730, NULL, NULL, 0
     UNION ALL SELECT 'general-service', 'General service', '[]',
-           NULL, NULL, 0
+           NULL, NULL, NULL, 0
   ) t
   CROSS JOIN (SELECT CAST(strftime('%s','now') AS INTEGER) * 1000 AS now_ms) n
 ''';
