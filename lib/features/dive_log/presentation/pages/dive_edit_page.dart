@@ -3817,19 +3817,38 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
               SegmentedButton<WeightingFeedback>(
                 emptySelectionAllowed: true,
                 segments: [
+                  // Labels like "Overweighted" are wider than a third of the
+                  // row on a phone; scale them down to stay on one line rather
+                  // than wrapping mid-word.
                   ButtonSegment(
                     value: WeightingFeedback.correct,
-                    label: Text(
-                      context.l10n.diveLog_edit_weightFeedback_correct,
+                    label: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text(
+                        context.l10n.diveLog_edit_weightFeedback_correct,
+                        maxLines: 1,
+                      ),
                     ),
                   ),
                   ButtonSegment(
                     value: WeightingFeedback.overweighted,
-                    label: Text(context.l10n.diveLog_edit_weightFeedback_over),
+                    label: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text(
+                        context.l10n.diveLog_edit_weightFeedback_over,
+                        maxLines: 1,
+                      ),
+                    ),
                   ),
                   ButtonSegment(
                     value: WeightingFeedback.underweighted,
-                    label: Text(context.l10n.diveLog_edit_weightFeedback_under),
+                    label: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text(
+                        context.l10n.diveLog_edit_weightFeedback_under,
+                        maxLines: 1,
+                      ),
+                    ),
                   ),
                 ],
                 selected: {?_weightingFeedback},
