@@ -8290,6 +8290,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get diveSites_list_menu_import => 'Import';
 
   @override
+  String get diveSites_list_menu_select => 'Select sites';
+
+  @override
   String get diveSites_list_search_backTooltip => 'Back';
 
   @override

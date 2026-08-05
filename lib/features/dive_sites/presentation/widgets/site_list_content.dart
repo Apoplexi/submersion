@@ -445,7 +445,9 @@ class _SiteListContentState extends ConsumerState<SiteListContent> {
                 PopupMenuButton<String>(
                   icon: const Icon(Icons.more_vert),
                   onSelected: (value) {
-                    if (value == 'import') {
+                    if (value == 'select') {
+                      _enterSelectionMode(null);
+                    } else if (value == 'import') {
                       context.push('/sites/import');
                     } else if (value.startsWith('view_')) {
                       final mode = ListViewMode.fromName(
@@ -467,6 +469,14 @@ class _SiteListContentState extends ConsumerState<SiteListContent> {
                         ],
                       ),
                       const PopupMenuDivider(),
+                      PopupMenuItem(
+                        value: 'select',
+                        child: ListTile(
+                          leading: const Icon(Icons.checklist),
+                          title: Text(context.l10n.diveSites_list_menu_select),
+                          contentPadding: EdgeInsets.zero,
+                        ),
+                      ),
                       PopupMenuItem(
                         value: 'import',
                         child: ListTile(
@@ -642,7 +652,9 @@ class _SiteListContentState extends ConsumerState<SiteListContent> {
           PopupMenuButton<String>(
             icon: const Icon(Icons.more_vert, size: 20),
             onSelected: (value) {
-              if (value == 'import') {
+              if (value == 'select') {
+                _enterSelectionMode(null);
+              } else if (value == 'import') {
                 context.push('/sites/import');
               } else if (value.startsWith('view_')) {
                 final mode = ListViewMode.fromName(
@@ -664,6 +676,10 @@ class _SiteListContentState extends ConsumerState<SiteListContent> {
                   ],
                 ),
                 const PopupMenuDivider(),
+                PopupMenuItem(
+                  value: 'select',
+                  child: Text(context.l10n.diveSites_list_menu_select),
+                ),
                 PopupMenuItem(
                   value: 'import',
                   child: Text(context.l10n.diveSites_list_menu_import),
