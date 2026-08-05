@@ -16,7 +16,7 @@ void main() {
 
   test('built-in kinds are seeded on fresh install', () async {
     final kinds = await db.select(db.serviceKinds).get();
-    expect(kinds.length, 9);
+    expect(kinds.length, 12);
     expect(kinds.every((k) => k.isBuiltIn), isTrue);
     final hydro = kinds.firstWhere((k) => k.id == 'hydro');
     expect(hydro.defaultIntervalDays, 1825);
@@ -28,25 +28,24 @@ void main() {
   test('pre-existing built-in kinds keep null hour intervals', () async {
     // Characterization: pins the current seed so adding an hours column to
     // kSeedBuiltInServiceKindsSql cannot silently shift a positional value.
+    const preExisting = <String>[
+      'hydro',
+      'vip',
+      'o2-clean',
+      'regulator-service',
+      'computer-battery',
+      'transmitter-battery',
+      'bcd-inspection',
+      'drysuit-seals',
+      'general-service',
+    ];
+
     final kinds = await db.select(db.serviceKinds).get();
     final byId = {for (final k in kinds) k.id: k};
 
-    expect(
-      byId.keys,
-      containsAll(<String>[
-        'hydro',
-        'vip',
-        'o2-clean',
-        'regulator-service',
-        'computer-battery',
-        'transmitter-battery',
-        'bcd-inspection',
-        'drysuit-seals',
-        'general-service',
-      ]),
-    );
+    expect(byId.keys, containsAll(preExisting));
 
-    for (final id in byId.keys) {
+    for (final id in preExisting) {
       expect(
         byId[id]!.defaultIntervalHours,
         isNull,
@@ -61,6 +60,65 @@ void main() {
     expect(byId['general-service']!.defaultIntervalDives, isNull);
     expect(byId['general-service']!.applicableTypes, '[]');
   });
+
+  test('rebreather built-in kinds seed with the expected clocks', () async {
+    final kinds = await db.select(db.serviceKinds).get();
+    final byId = {
+      for (final k in kinds)
+        if (const [
+          'scrubber-repack',
+          'o2-cell-replacement',
+          'rebreather-annual',
+        ].contains(k.id))
+          k.id: k,
+    };
+
+    expect(byId.length, 3);
+
+    final scrubber = byId['scrubber-repack']!;
+    expect(scrubber.defaultIntervalHours, 3.0);
+    expect(scrubber.defaultIntervalDays, isNull);
+    expect(scrubber.defaultIntervalDives, isNull);
+    expect(scrubber.autoAttach, isTrue);
+
+    final cells = byId['o2-cell-replacement']!;
+    expect(cells.defaultIntervalDays, 365);
+    expect(cells.defaultIntervalHours, isNull);
+
+    expect(byId['rebreather-annual']!.defaultIntervalDays, 365);
+
+    for (final kind in byId.values) {
+      expect(kind.applicableTypes, '["rebreather"]', reason: kind.id);
+      expect(kind.isBuiltIn, isTrue, reason: kind.id);
+    }
+  });
+
+  test('re-running the built-in seed is a no-op', () async {
+    await db.customStatement(kSeedBuiltInServiceKindsSql);
+    await db.customStatement(kSeedBuiltInServiceKindsSql);
+
+    final kinds = await db.select(db.serviceKinds).get();
+    final scrubbers = kinds.where((k) => k.id == 'scrubber-repack');
+    expect(scrubbers.length, 1);
+  });
+
+  test(
+    'a database missing a rebreather kind regains it from the seed',
+    () async {
+      // The seed already runs from onCreate and the v122 beforeOpen backstop,
+      // so an upgraded database picks the new kinds up without a migration.
+      await db.customStatement(
+        "DELETE FROM service_kinds WHERE id = 'scrubber-repack'",
+      );
+      var kinds = await db.select(db.serviceKinds).get();
+      expect(kinds.where((k) => k.id == 'scrubber-repack'), isEmpty);
+
+      await db.customStatement(kSeedBuiltInServiceKindsSql);
+
+      kinds = await db.select(db.serviceKinds).get();
+      expect(kinds.where((k) => k.id == 'scrubber-repack'), hasLength(1));
+    },
+  );
 
   test(
     'service_schedules round-trips and cascades on equipment delete',

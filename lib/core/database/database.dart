@@ -2134,6 +2134,16 @@ const String kSeedBuiltInServiceKindsSql = '''
            365, NULL, NULL, 1
     UNION ALL SELECT 'drysuit-seals', 'Drysuit seals', '["drysuit"]',
            730, NULL, NULL, 0
+    -- A scrubber is consumed by loop time, not by the calendar, so this is
+    -- the only built-in with an hours-only clock. 3.0 h is conservative
+    -- across the 2-6 h range real units are rated for; the diver overrides
+    -- it per unit via ServiceSchedule.intervalHours.
+    UNION ALL SELECT 'scrubber-repack', 'Scrubber repack', '["rebreather"]',
+           NULL, NULL, 3.0, 1
+    UNION ALL SELECT 'o2-cell-replacement', 'O2 cell replacement',
+           '["rebreather"]', 365, NULL, NULL, 1
+    UNION ALL SELECT 'rebreather-annual', 'Rebreather annual service',
+           '["rebreather"]', 365, NULL, NULL, 1
     UNION ALL SELECT 'general-service', 'General service', '[]',
            NULL, NULL, NULL, 0
   ) t
