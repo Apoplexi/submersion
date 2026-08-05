@@ -12384,6 +12384,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get diveDetailSection_tide_description => '潮汐周期图和时间';
 
   @override
+  String get diveDetailSection_reefHealth_name => '珊瑚礁健康';
+
+  @override
+  String get diveDetailSection_reefHealth_description => '潜水当天的珊瑚白化热压力';
+
+  @override
   String get diveDetailSection_surfaceGps_name => '水面 GPS';
 
   @override
@@ -15668,6 +15674,16 @@ class AppLocalizationsZh extends AppLocalizations {
   String get importWizard_tagsLabel => '标签';
 
   @override
+  String importWizard_review_olderDivesSkipped(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '已跳过 $count 次较早的潜水 — 已在您的日志中',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get tags_hint_addTags => '添加标签...';
 
   @override
@@ -16012,6 +16028,48 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get transfer_computers_noComputersSaved => '没有已保存的潜水电脑';
+
+  @override
+  String transfer_computers_diveCount(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 次潜水',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get transfer_computers_downloadTooltip => '下载潜水记录';
+
+  @override
+  String get transfer_computers_knownComputersHeader => '已知潜水电脑';
+
+  @override
+  String transfer_computers_lastDownloadDaysAgo(int days) {
+    return '$days 天前';
+  }
+
+  @override
+  String transfer_computers_lastDownloadHoursAgo(int hours) {
+    String _temp0 = intl.Intl.pluralLogic(
+      hours,
+      locale: localeName,
+      other: '$hours 小时前',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String transfer_computers_lastDownloadMinutesAgo(int minutes) {
+    return '$minutes 分钟前';
+  }
+
+  @override
+  String get transfer_computers_lastDownloadNever => '从未';
+
+  @override
+  String get transfer_computers_lastDownloadYesterday => '昨天';
 
   @override
   String transfer_computers_savedCount(int count) {
@@ -17742,7 +17800,13 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get diveComputer_downloadStep_downloadAll => '下载所有潜水记录';
+
+  @override
   String get diveComputer_downloadStep_downloadFailed => '下载失败';
+
+  @override
+  String get diveComputer_downloadStep_downloadNew => '下载新的潜水记录';
 
   @override
   String get diveComputer_downloadStep_downloadedDives => '已下载的潜水';
@@ -17758,6 +17822,18 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String diveComputer_downloadStep_errorSemanticLabel(Object error) {
     return '下载错误：$error';
+  }
+
+  @override
+  String get diveComputer_downloadStep_firstSyncBody =>
+      '您的潜水日志中已有潜水记录。您可以跳过下载已有的潜水记录。';
+
+  @override
+  String get diveComputer_downloadStep_firstSyncTitle => '首次从此潜水电脑下载';
+
+  @override
+  String diveComputer_downloadStep_onlyAfterDate(String date) {
+    return '仅下载$date之后的潜水记录';
   }
 
   @override
@@ -19481,6 +19557,28 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get settings_appearance_sections => '部分';
+
+  @override
+  String get settings_appearance_colorAccents => '彩色强调';
+
+  @override
+  String get settings_appearance_accentNavIcons => '彩色导航图标';
+
+  @override
+  String get settings_appearance_accentNavIcons_subtitle => '使用各功能区的颜色为主菜单图标着色';
+
+  @override
+  String get settings_appearance_accentSectionHeaders => '彩色分区标题';
+
+  @override
+  String get settings_appearance_accentSectionHeaders_subtitle =>
+      '在页面标题旁显示彩色功能图标';
+
+  @override
+  String get settings_appearance_accentListIcons => '彩色列表图标';
+
+  @override
+  String get settings_appearance_accentListIcons_subtitle => '为列表和设置页面中的图标着色';
 
   @override
   String get settings_appearance_showDetailsPane => '显示详情面板';
@@ -21450,4 +21548,116 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String get settings_mediaStorage_quality_noTranscoderHint =>
       '此设备无法压缩视频。将从此设备上传原始文件。';
+
+  @override
+  String get reef_section_title => '珊瑚礁';
+
+  @override
+  String get reef_section_sourcesTooltip => '数据来源';
+
+  @override
+  String get reef_section_loadError => '目前无法加载珊瑚礁数据';
+
+  @override
+  String get reef_habitat_title => '珊瑚礁生境';
+
+  @override
+  String get reef_habitat_onReef => '位于珊瑚礁上';
+
+  @override
+  String reef_habitat_onReefWithThreat(String threat) {
+    return '位于珊瑚礁上，威胁等级 $threat';
+  }
+
+  @override
+  String get reef_habitat_noReef => '此位置没有已制图的珊瑚礁';
+
+  @override
+  String get reef_habitat_unavailable => '目前无法查询珊瑚礁生境';
+
+  @override
+  String get reef_health_title => '珊瑚礁健康';
+
+  @override
+  String get reef_health_unavailable => '目前无法查询珊瑚礁健康状况';
+
+  @override
+  String get reef_health_noData => '此位置没有珊瑚礁健康数据';
+
+  @override
+  String reef_health_degreeHeatingWeeks(String value) {
+    return '热度周 $value 摄氏度周';
+  }
+
+  @override
+  String reef_health_seaSurface(String value) {
+    return '海表温度 $value';
+  }
+
+  @override
+  String reef_health_asOf(String date) {
+    return '数据日期 $date';
+  }
+
+  @override
+  String get reef_health_levelNoStress => '无热压力';
+
+  @override
+  String get reef_health_levelWatch => '白化观察';
+
+  @override
+  String get reef_health_levelWarning => '白化警告';
+
+  @override
+  String get reef_health_levelAlert1 => '白化警报 1 级';
+
+  @override
+  String get reef_health_levelAlert2 => '白化警报 2 级';
+
+  @override
+  String get reef_health_levelAlert3 => '白化警报 3 级';
+
+  @override
+  String get reef_health_levelAlert4 => '白化警报 4 级';
+
+  @override
+  String get reef_health_levelAlert5 => '白化警报 5 级';
+
+  @override
+  String get reef_protection_title => '保护区';
+
+  @override
+  String get reef_protection_none => '不在海洋保护区内';
+
+  @override
+  String get reef_protection_unavailable => '目前无法查询保护状态';
+
+  @override
+  String get reef_protection_viewRegulations => '查看规定';
+
+  @override
+  String reef_protection_iucn(String category) {
+    return 'IUCN $category';
+  }
+
+  @override
+  String get reef_species_recordedNearby => '附近记录';
+
+  @override
+  String get reef_species_addToExpected => '添加到预期物种';
+
+  @override
+  String get reef_attribution_title => '珊瑚礁数据来源';
+
+  @override
+  String get reef_attribution_wri => '珊瑚礁分布与威胁等级。CC BY 3.0。';
+
+  @override
+  String get reef_attribution_noaa => '海表温度与白化热压力。公共领域。';
+
+  @override
+  String get reef_attribution_gbif => '物种出现记录，已筛选为 CC0 和 CC BY 4.0。';
+
+  @override
+  String get reef_attribution_protectedSeas => '海洋保护区边界。CC BY 4.0。';
 }

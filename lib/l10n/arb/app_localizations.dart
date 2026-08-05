@@ -21973,6 +21973,18 @@ abstract class AppLocalizations {
   /// **'Tide cycle graph and timing'**
   String get diveDetailSection_tide_description;
 
+  /// No description provided for @diveDetailSection_reefHealth_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Reef Health'**
+  String get diveDetailSection_reefHealth_name;
+
+  /// No description provided for @diveDetailSection_reefHealth_description.
+  ///
+  /// In en, this message translates to:
+  /// **'Coral bleaching heat stress on the dive date'**
+  String get diveDetailSection_reefHealth_description;
+
   /// No description provided for @diveDetailSection_surfaceGps_name.
   ///
   /// In en, this message translates to:
@@ -27750,6 +27762,12 @@ abstract class AppLocalizations {
   /// **'Tags'**
   String get importWizard_tagsLabel;
 
+  /// Title for the collapsed ExpansionTile summarizing auto-skipped dives that fall at or before the diver's first-sync cutoff
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{1 older dive skipped — already in your log} other{{count} older dives skipped — already in your log}}'**
+  String importWizard_review_olderDivesSkipped(int count);
+
   /// No description provided for @tags_hint_addTags.
   ///
   /// In en, this message translates to:
@@ -28305,6 +28323,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No computers saved'**
   String get transfer_computers_noComputersSaved;
+
+  /// Dive count on a known-computer card
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 dive} other{{count} dives}}'**
+  String transfer_computers_diveCount(num count);
+
+  /// Tooltip on the per-computer download button
+  ///
+  /// In en, this message translates to:
+  /// **'Download dives'**
+  String get transfer_computers_downloadTooltip;
+
+  /// Section header above previously used dive computers
+  ///
+  /// In en, this message translates to:
+  /// **'Known Computers'**
+  String get transfer_computers_knownComputersHeader;
+
+  /// Relative last-download label, days
+  ///
+  /// In en, this message translates to:
+  /// **'{days} days ago'**
+  String transfer_computers_lastDownloadDaysAgo(int days);
+
+  /// Relative last-download label, hours
+  ///
+  /// In en, this message translates to:
+  /// **'{hours, plural, =1{1 hour ago} other{{hours} hours ago}}'**
+  String transfer_computers_lastDownloadHoursAgo(int hours);
+
+  /// Relative last-download label, minutes
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes} min ago'**
+  String transfer_computers_lastDownloadMinutesAgo(int minutes);
+
+  /// Shown when a computer has never been downloaded from
+  ///
+  /// In en, this message translates to:
+  /// **'Never'**
+  String get transfer_computers_lastDownloadNever;
+
+  /// Relative last-download label, yesterday
+  ///
+  /// In en, this message translates to:
+  /// **'Yesterday'**
+  String get transfer_computers_lastDownloadYesterday;
 
   /// No description provided for @transfer_computers_savedCount.
   ///
@@ -31358,11 +31424,23 @@ abstract class AppLocalizations {
   /// **'{depth}m'**
   String diveComputer_downloadStep_depthMeters(Object depth);
 
+  /// No description provided for @diveComputer_downloadStep_downloadAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Download all dives'**
+  String get diveComputer_downloadStep_downloadAll;
+
   /// No description provided for @diveComputer_downloadStep_downloadFailed.
   ///
   /// In en, this message translates to:
   /// **'Download failed'**
   String get diveComputer_downloadStep_downloadFailed;
+
+  /// No description provided for @diveComputer_downloadStep_downloadNew.
+  ///
+  /// In en, this message translates to:
+  /// **'Download new dives'**
+  String get diveComputer_downloadStep_downloadNew;
 
   /// No description provided for @diveComputer_downloadStep_downloadedDives.
   ///
@@ -31387,6 +31465,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Download error: {error}'**
   String diveComputer_downloadStep_errorSemanticLabel(Object error);
+
+  /// No description provided for @diveComputer_downloadStep_firstSyncBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your logbook already has dives. You can skip downloading dives you already have.'**
+  String get diveComputer_downloadStep_firstSyncBody;
+
+  /// No description provided for @diveComputer_downloadStep_firstSyncTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'First download from this computer'**
+  String get diveComputer_downloadStep_firstSyncTitle;
+
+  /// No description provided for @diveComputer_downloadStep_onlyAfterDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Only download dives after {date}'**
+  String diveComputer_downloadStep_onlyAfterDate(String date);
 
   /// No description provided for @diveComputer_downloadStep_percentAccessibility.
   ///
@@ -34284,6 +34380,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Sections'**
   String get settings_appearance_sections;
+
+  /// No description provided for @settings_appearance_colorAccents.
+  ///
+  /// In en, this message translates to:
+  /// **'Color accents'**
+  String get settings_appearance_colorAccents;
+
+  /// No description provided for @settings_appearance_accentNavIcons.
+  ///
+  /// In en, this message translates to:
+  /// **'Colored navigation icons'**
+  String get settings_appearance_accentNavIcons;
+
+  /// No description provided for @settings_appearance_accentNavIcons_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Tint main menu icons with each feature\'s color'**
+  String get settings_appearance_accentNavIcons_subtitle;
+
+  /// No description provided for @settings_appearance_accentSectionHeaders.
+  ///
+  /// In en, this message translates to:
+  /// **'Colored section headers'**
+  String get settings_appearance_accentSectionHeaders;
+
+  /// No description provided for @settings_appearance_accentSectionHeaders_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Show a colored feature icon next to page titles'**
+  String get settings_appearance_accentSectionHeaders_subtitle;
+
+  /// No description provided for @settings_appearance_accentListIcons.
+  ///
+  /// In en, this message translates to:
+  /// **'Colored list icons'**
+  String get settings_appearance_accentListIcons;
+
+  /// No description provided for @settings_appearance_accentListIcons_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Tint icons in lists and settings pages'**
+  String get settings_appearance_accentListIcons_subtitle;
 
   /// No description provided for @settings_appearance_showDetailsPane.
   ///
@@ -37701,6 +37839,210 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'This device cannot compress video. Originals are uploaded from it.'**
   String get settings_mediaStorage_quality_noTranscoderHint;
+
+  /// No description provided for @reef_section_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Reef'**
+  String get reef_section_title;
+
+  /// No description provided for @reef_section_sourcesTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Data sources'**
+  String get reef_section_sourcesTooltip;
+
+  /// No description provided for @reef_section_loadError.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load reef data right now'**
+  String get reef_section_loadError;
+
+  /// No description provided for @reef_habitat_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Reef habitat'**
+  String get reef_habitat_title;
+
+  /// No description provided for @reef_habitat_onReef.
+  ///
+  /// In en, this message translates to:
+  /// **'On a coral reef'**
+  String get reef_habitat_onReef;
+
+  /// No description provided for @reef_habitat_onReefWithThreat.
+  ///
+  /// In en, this message translates to:
+  /// **'On a coral reef, threat level {threat}'**
+  String reef_habitat_onReefWithThreat(String threat);
+
+  /// No description provided for @reef_habitat_noReef.
+  ///
+  /// In en, this message translates to:
+  /// **'No mapped coral reef at this location'**
+  String get reef_habitat_noReef;
+
+  /// No description provided for @reef_habitat_unavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not check reef habitat right now'**
+  String get reef_habitat_unavailable;
+
+  /// No description provided for @reef_health_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Reef health'**
+  String get reef_health_title;
+
+  /// No description provided for @reef_health_unavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not check reef health right now'**
+  String get reef_health_unavailable;
+
+  /// No description provided for @reef_health_noData.
+  ///
+  /// In en, this message translates to:
+  /// **'No reef health data for this location'**
+  String get reef_health_noData;
+
+  /// No description provided for @reef_health_degreeHeatingWeeks.
+  ///
+  /// In en, this message translates to:
+  /// **'Degree Heating Weeks {value} C-weeks'**
+  String reef_health_degreeHeatingWeeks(String value);
+
+  /// No description provided for @reef_health_seaSurface.
+  ///
+  /// In en, this message translates to:
+  /// **'Sea surface {value}'**
+  String reef_health_seaSurface(String value);
+
+  /// No description provided for @reef_health_asOf.
+  ///
+  /// In en, this message translates to:
+  /// **'As of {date}'**
+  String reef_health_asOf(String date);
+
+  /// No description provided for @reef_health_levelNoStress.
+  ///
+  /// In en, this message translates to:
+  /// **'No thermal stress'**
+  String get reef_health_levelNoStress;
+
+  /// No description provided for @reef_health_levelWatch.
+  ///
+  /// In en, this message translates to:
+  /// **'Bleaching watch'**
+  String get reef_health_levelWatch;
+
+  /// No description provided for @reef_health_levelWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'Bleaching warning'**
+  String get reef_health_levelWarning;
+
+  /// No description provided for @reef_health_levelAlert1.
+  ///
+  /// In en, this message translates to:
+  /// **'Bleaching alert level 1'**
+  String get reef_health_levelAlert1;
+
+  /// No description provided for @reef_health_levelAlert2.
+  ///
+  /// In en, this message translates to:
+  /// **'Bleaching alert level 2'**
+  String get reef_health_levelAlert2;
+
+  /// No description provided for @reef_health_levelAlert3.
+  ///
+  /// In en, this message translates to:
+  /// **'Bleaching alert level 3'**
+  String get reef_health_levelAlert3;
+
+  /// No description provided for @reef_health_levelAlert4.
+  ///
+  /// In en, this message translates to:
+  /// **'Bleaching alert level 4'**
+  String get reef_health_levelAlert4;
+
+  /// No description provided for @reef_health_levelAlert5.
+  ///
+  /// In en, this message translates to:
+  /// **'Bleaching alert level 5'**
+  String get reef_health_levelAlert5;
+
+  /// No description provided for @reef_protection_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Protected area'**
+  String get reef_protection_title;
+
+  /// No description provided for @reef_protection_none.
+  ///
+  /// In en, this message translates to:
+  /// **'Not in a marine protected area'**
+  String get reef_protection_none;
+
+  /// No description provided for @reef_protection_unavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not check protected status right now'**
+  String get reef_protection_unavailable;
+
+  /// No description provided for @reef_protection_viewRegulations.
+  ///
+  /// In en, this message translates to:
+  /// **'View regulations'**
+  String get reef_protection_viewRegulations;
+
+  /// No description provided for @reef_protection_iucn.
+  ///
+  /// In en, this message translates to:
+  /// **'IUCN {category}'**
+  String reef_protection_iucn(String category);
+
+  /// No description provided for @reef_species_recordedNearby.
+  ///
+  /// In en, this message translates to:
+  /// **'Recorded nearby'**
+  String get reef_species_recordedNearby;
+
+  /// No description provided for @reef_species_addToExpected.
+  ///
+  /// In en, this message translates to:
+  /// **'Add to expected species'**
+  String get reef_species_addToExpected;
+
+  /// No description provided for @reef_attribution_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Reef data sources'**
+  String get reef_attribution_title;
+
+  /// No description provided for @reef_attribution_wri.
+  ///
+  /// In en, this message translates to:
+  /// **'Reef presence and threat level. CC BY 3.0.'**
+  String get reef_attribution_wri;
+
+  /// No description provided for @reef_attribution_noaa.
+  ///
+  /// In en, this message translates to:
+  /// **'Sea surface temperature and bleaching heat stress. Public domain.'**
+  String get reef_attribution_noaa;
+
+  /// No description provided for @reef_attribution_gbif.
+  ///
+  /// In en, this message translates to:
+  /// **'Species occurrence records, filtered to CC0 and CC BY 4.0.'**
+  String get reef_attribution_gbif;
+
+  /// No description provided for @reef_attribution_protectedSeas.
+  ///
+  /// In en, this message translates to:
+  /// **'Marine protected area boundaries. CC BY 4.0.'**
+  String get reef_attribution_protectedSeas;
 }
 
 class _AppLocalizationsDelegate

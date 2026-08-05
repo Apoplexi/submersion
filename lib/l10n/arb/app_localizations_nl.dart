@@ -12889,6 +12889,13 @@ class AppLocalizationsNl extends AppLocalizations {
       'Getijdecyclusgrafiek en timing';
 
   @override
+  String get diveDetailSection_reefHealth_name => 'Rifgezondheid';
+
+  @override
+  String get diveDetailSection_reefHealth_description =>
+      'Hittestress door koraalverbleking op de duikdatum';
+
+  @override
   String get diveDetailSection_surfaceGps_name => 'Oppervlakte-GPS';
 
   @override
@@ -16379,6 +16386,17 @@ class AppLocalizationsNl extends AppLocalizations {
   String get importWizard_tagsLabel => 'Tags';
 
   @override
+  String importWizard_review_olderDivesSkipped(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count oudere duiken overgeslagen — al in je logboek',
+      one: '1 oudere duik overgeslagen — al in je logboek',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get tags_hint_addTags => 'Tags toevoegen...';
 
   @override
@@ -16728,6 +16746,50 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get transfer_computers_noComputersSaved => 'Geen computers opgeslagen';
+
+  @override
+  String transfer_computers_diveCount(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count duiken',
+      one: '1 duik',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get transfer_computers_downloadTooltip => 'Duiken downloaden';
+
+  @override
+  String get transfer_computers_knownComputersHeader => 'Bekende computers';
+
+  @override
+  String transfer_computers_lastDownloadDaysAgo(int days) {
+    return '$days dagen geleden';
+  }
+
+  @override
+  String transfer_computers_lastDownloadHoursAgo(int hours) {
+    String _temp0 = intl.Intl.pluralLogic(
+      hours,
+      locale: localeName,
+      other: '$hours uur geleden',
+      one: '1 uur geleden',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String transfer_computers_lastDownloadMinutesAgo(int minutes) {
+    return '$minutes min geleden';
+  }
+
+  @override
+  String get transfer_computers_lastDownloadNever => 'Nooit';
+
+  @override
+  String get transfer_computers_lastDownloadYesterday => 'Gisteren';
 
   @override
   String transfer_computers_savedCount(int count) {
@@ -18538,7 +18600,14 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String get diveComputer_downloadStep_downloadAll => 'Alle duiken downloaden';
+
+  @override
   String get diveComputer_downloadStep_downloadFailed => 'Download mislukt';
+
+  @override
+  String get diveComputer_downloadStep_downloadNew =>
+      'Nieuwe duiken downloaden';
 
   @override
   String get diveComputer_downloadStep_downloadedDives => 'Gedownloade duiken';
@@ -18555,6 +18624,19 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String diveComputer_downloadStep_errorSemanticLabel(Object error) {
     return 'Downloadfout: $error';
+  }
+
+  @override
+  String get diveComputer_downloadStep_firstSyncBody =>
+      'Je logboek bevat al duiken. Je kunt het downloaden van duiken die je al hebt overslaan.';
+
+  @override
+  String get diveComputer_downloadStep_firstSyncTitle =>
+      'Eerste download van deze duikcomputer';
+
+  @override
+  String diveComputer_downloadStep_onlyAfterDate(String date) {
+    return 'Alleen duiken na $date downloaden';
   }
 
   @override
@@ -20344,6 +20426,33 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get settings_appearance_sections => 'Secties';
+
+  @override
+  String get settings_appearance_colorAccents => 'Kleuraccenten';
+
+  @override
+  String get settings_appearance_accentNavIcons =>
+      'Gekleurde navigatiepictogrammen';
+
+  @override
+  String get settings_appearance_accentNavIcons_subtitle =>
+      'Pictogrammen in het hoofdmenu kleuren met de kleur van elk onderdeel';
+
+  @override
+  String get settings_appearance_accentSectionHeaders =>
+      'Gekleurde sectiekoppen';
+
+  @override
+  String get settings_appearance_accentSectionHeaders_subtitle =>
+      'Een gekleurd sectiepictogram naast paginatitels tonen';
+
+  @override
+  String get settings_appearance_accentListIcons =>
+      'Gekleurde lijstpictogrammen';
+
+  @override
+  String get settings_appearance_accentListIcons_subtitle =>
+      'Pictogrammen in lijsten en instellingenpagina\'s kleuren';
 
   @override
   String get settings_appearance_showDetailsPane => 'Detailvenster tonen';
@@ -22402,4 +22511,125 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get settings_mediaStorage_quality_noTranscoderHint =>
       'Dit apparaat kan geen video comprimeren. Vanaf dit apparaat worden originelen geüpload.';
+
+  @override
+  String get reef_section_title => 'Rif';
+
+  @override
+  String get reef_section_sourcesTooltip => 'Gegevensbronnen';
+
+  @override
+  String get reef_section_loadError =>
+      'Rifgegevens konden nu niet worden geladen';
+
+  @override
+  String get reef_habitat_title => 'Rifhabitat';
+
+  @override
+  String get reef_habitat_onReef => 'Op een koraalrif';
+
+  @override
+  String reef_habitat_onReefWithThreat(String threat) {
+    return 'Op een koraalrif, dreigingsniveau $threat';
+  }
+
+  @override
+  String get reef_habitat_noReef => 'Geen gekarteerd koraalrif op deze locatie';
+
+  @override
+  String get reef_habitat_unavailable =>
+      'Rifhabitat kon nu niet worden gecontroleerd';
+
+  @override
+  String get reef_health_title => 'Rifgezondheid';
+
+  @override
+  String get reef_health_unavailable =>
+      'Rifgezondheid kon nu niet worden gecontroleerd';
+
+  @override
+  String get reef_health_noData =>
+      'Geen rifgezondheidsgegevens voor deze locatie';
+
+  @override
+  String reef_health_degreeHeatingWeeks(String value) {
+    return 'Degree Heating Weeks $value C-weken';
+  }
+
+  @override
+  String reef_health_seaSurface(String value) {
+    return 'Zeeoppervlak $value';
+  }
+
+  @override
+  String reef_health_asOf(String date) {
+    return 'Per $date';
+  }
+
+  @override
+  String get reef_health_levelNoStress => 'Geen hittestress';
+
+  @override
+  String get reef_health_levelWatch => 'Verbleking waakzaamheid';
+
+  @override
+  String get reef_health_levelWarning => 'Verbleking waarschuwing';
+
+  @override
+  String get reef_health_levelAlert1 => 'Verblekingsalarm niveau 1';
+
+  @override
+  String get reef_health_levelAlert2 => 'Verblekingsalarm niveau 2';
+
+  @override
+  String get reef_health_levelAlert3 => 'Verblekingsalarm niveau 3';
+
+  @override
+  String get reef_health_levelAlert4 => 'Verblekingsalarm niveau 4';
+
+  @override
+  String get reef_health_levelAlert5 => 'Verblekingsalarm niveau 5';
+
+  @override
+  String get reef_protection_title => 'Beschermd gebied';
+
+  @override
+  String get reef_protection_none => 'Niet in een beschermd zeegebied';
+
+  @override
+  String get reef_protection_unavailable =>
+      'Beschermingsstatus kon nu niet worden gecontroleerd';
+
+  @override
+  String get reef_protection_viewRegulations => 'Regels bekijken';
+
+  @override
+  String reef_protection_iucn(String category) {
+    return 'IUCN $category';
+  }
+
+  @override
+  String get reef_species_recordedNearby => 'In de buurt geregistreerd';
+
+  @override
+  String get reef_species_addToExpected => 'Toevoegen aan verwachte soorten';
+
+  @override
+  String get reef_attribution_title => 'Rifgegevensbronnen';
+
+  @override
+  String get reef_attribution_wri =>
+      'Rifaanwezigheid en dreigingsniveau. CC BY 3.0.';
+
+  @override
+  String get reef_attribution_noaa =>
+      'Zeeoppervlaktetemperatuur en hittestress. Publiek domein.';
+
+  @override
+  String get reef_attribution_gbif =>
+      'Waarnemingen van soorten, gefilterd op CC0 en CC BY 4.0.';
+
+  @override
+  String get reef_attribution_protectedSeas =>
+      'Grenzen van beschermde zeegebieden. CC BY 4.0.';
 }

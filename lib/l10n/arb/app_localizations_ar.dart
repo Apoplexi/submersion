@@ -12758,6 +12758,13 @@ class AppLocalizationsAr extends AppLocalizations {
       'رسم بياني لدورة المد والجزر والتوقيت';
 
   @override
+  String get diveDetailSection_reefHealth_name => 'صحة الشعاب المرجانية';
+
+  @override
+  String get diveDetailSection_reefHealth_description =>
+      'الإجهاد الحراري لابيضاض المرجان في تاريخ الغوص';
+
+  @override
   String get diveDetailSection_surfaceGps_name => 'GPS السطح';
 
   @override
@@ -16212,6 +16219,17 @@ class AppLocalizationsAr extends AppLocalizations {
   String get importWizard_tagsLabel => 'Tags';
 
   @override
+  String importWizard_review_olderDivesSkipped(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'تم تخطي $count غطسات أقدم — موجودة بالفعل في سجلك',
+      one: 'تم تخطي غطسة واحدة أقدم — موجودة بالفعل في سجلك',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get tags_hint_addTags => 'إضافة وسوم...';
 
   @override
@@ -16561,6 +16579,51 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get transfer_computers_noComputersSaved => 'لا توجد حواسيب محفوظة';
+
+  @override
+  String transfer_computers_diveCount(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count غوصات',
+      one: 'غوصة واحدة',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get transfer_computers_downloadTooltip => 'تنزيل الغوصات';
+
+  @override
+  String get transfer_computers_knownComputersHeader =>
+      'أجهزة الكمبيوتر المعروفة';
+
+  @override
+  String transfer_computers_lastDownloadDaysAgo(int days) {
+    return 'قبل $days أيام';
+  }
+
+  @override
+  String transfer_computers_lastDownloadHoursAgo(int hours) {
+    String _temp0 = intl.Intl.pluralLogic(
+      hours,
+      locale: localeName,
+      other: 'قبل $hours ساعات',
+      one: 'قبل ساعة',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String transfer_computers_lastDownloadMinutesAgo(int minutes) {
+    return 'قبل $minutes دقيقة';
+  }
+
+  @override
+  String get transfer_computers_lastDownloadNever => 'أبدًا';
+
+  @override
+  String get transfer_computers_lastDownloadYesterday => 'أمس';
 
   @override
   String transfer_computers_savedCount(int count) {
@@ -18351,7 +18414,13 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String get diveComputer_downloadStep_downloadAll => 'تنزيل جميع الغطسات';
+
+  @override
   String get diveComputer_downloadStep_downloadFailed => 'فشل التنزيل';
+
+  @override
+  String get diveComputer_downloadStep_downloadNew => 'تنزيل الغطسات الجديدة';
 
   @override
   String get diveComputer_downloadStep_downloadedDives => 'الغطسات المنزّلة';
@@ -18367,6 +18436,19 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String diveComputer_downloadStep_errorSemanticLabel(Object error) {
     return 'خطأ في التنزيل: $error';
+  }
+
+  @override
+  String get diveComputer_downloadStep_firstSyncBody =>
+      'يحتوي سجل الغطسات الخاص بك بالفعل على غطسات. يمكنك تخطي تنزيل الغطسات التي لديك بالفعل.';
+
+  @override
+  String get diveComputer_downloadStep_firstSyncTitle =>
+      'أول تنزيل من كمبيوتر الغوص هذا';
+
+  @override
+  String diveComputer_downloadStep_onlyAfterDate(String date) {
+    return 'تنزيل الغطسات بعد $date فقط';
   }
 
   @override
@@ -20145,6 +20227,30 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get settings_appearance_sections => 'الأقسام';
+
+  @override
+  String get settings_appearance_colorAccents => 'التمييز اللوني';
+
+  @override
+  String get settings_appearance_accentNavIcons => 'أيقونات تنقل ملونة';
+
+  @override
+  String get settings_appearance_accentNavIcons_subtitle =>
+      'تلوين أيقونات القائمة الرئيسية بلون كل قسم';
+
+  @override
+  String get settings_appearance_accentSectionHeaders => 'عناوين أقسام ملونة';
+
+  @override
+  String get settings_appearance_accentSectionHeaders_subtitle =>
+      'إظهار أيقونة قسم ملونة بجانب عناوين الصفحات';
+
+  @override
+  String get settings_appearance_accentListIcons => 'أيقونات قوائم ملونة';
+
+  @override
+  String get settings_appearance_accentListIcons_subtitle =>
+      'تلوين الأيقونات في القوائم وصفحات الإعدادات';
 
   @override
   String get settings_appearance_showDetailsPane => 'إظهار لوحة التفاصيل';
@@ -22172,4 +22278,119 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get settings_mediaStorage_quality_noTranscoderHint =>
       'لا يمكن لهذا الجهاز ضغط الفيديو. يتم رفع الملفات الأصلية منه.';
+
+  @override
+  String get reef_section_title => 'الشعاب المرجانية';
+
+  @override
+  String get reef_section_sourcesTooltip => 'مصادر البيانات';
+
+  @override
+  String get reef_section_loadError => 'تعذر تحميل بيانات الشعاب الآن';
+
+  @override
+  String get reef_habitat_title => 'موئل الشعاب';
+
+  @override
+  String get reef_habitat_onReef => 'على شعاب مرجانية';
+
+  @override
+  String reef_habitat_onReefWithThreat(String threat) {
+    return 'على شعاب مرجانية، مستوى التهديد $threat';
+  }
+
+  @override
+  String get reef_habitat_noReef => 'لا توجد شعاب مرجانية مرسومة في هذا الموقع';
+
+  @override
+  String get reef_habitat_unavailable => 'تعذر التحقق من موئل الشعاب الآن';
+
+  @override
+  String get reef_health_title => 'صحة الشعاب المرجانية';
+
+  @override
+  String get reef_health_unavailable => 'تعذر التحقق من صحة الشعاب الآن';
+
+  @override
+  String get reef_health_noData => 'لا توجد بيانات عن صحة الشعاب لهذا الموقع';
+
+  @override
+  String reef_health_degreeHeatingWeeks(String value) {
+    return 'أسابيع الحرارة المتراكمة $value درجة-أسبوع';
+  }
+
+  @override
+  String reef_health_seaSurface(String value) {
+    return 'سطح البحر $value';
+  }
+
+  @override
+  String reef_health_asOf(String date) {
+    return 'حتى $date';
+  }
+
+  @override
+  String get reef_health_levelNoStress => 'لا يوجد إجهاد حراري';
+
+  @override
+  String get reef_health_levelWatch => 'مراقبة الابيضاض';
+
+  @override
+  String get reef_health_levelWarning => 'تحذير من الابيضاض';
+
+  @override
+  String get reef_health_levelAlert1 => 'إنذار ابيضاض المستوى 1';
+
+  @override
+  String get reef_health_levelAlert2 => 'إنذار ابيضاض المستوى 2';
+
+  @override
+  String get reef_health_levelAlert3 => 'إنذار ابيضاض المستوى 3';
+
+  @override
+  String get reef_health_levelAlert4 => 'إنذار ابيضاض المستوى 4';
+
+  @override
+  String get reef_health_levelAlert5 => 'إنذار ابيضاض المستوى 5';
+
+  @override
+  String get reef_protection_title => 'منطقة محمية';
+
+  @override
+  String get reef_protection_none => 'ليست ضمن منطقة بحرية محمية';
+
+  @override
+  String get reef_protection_unavailable => 'تعذر التحقق من حالة الحماية الآن';
+
+  @override
+  String get reef_protection_viewRegulations => 'عرض اللوائح';
+
+  @override
+  String reef_protection_iucn(String category) {
+    return 'IUCN $category';
+  }
+
+  @override
+  String get reef_species_recordedNearby => 'مسجل في الجوار';
+
+  @override
+  String get reef_species_addToExpected => 'إضافة إلى الأنواع المتوقعة';
+
+  @override
+  String get reef_attribution_title => 'مصادر بيانات الشعاب';
+
+  @override
+  String get reef_attribution_wri => 'وجود الشعاب ومستوى التهديد. CC BY 3.0.';
+
+  @override
+  String get reef_attribution_noaa =>
+      'درجة حرارة سطح البحر والإجهاد الحراري. ملكية عامة.';
+
+  @override
+  String get reef_attribution_gbif =>
+      'سجلات تواجد الأنواع، مصفاة على CC0 و CC BY 4.0.';
+
+  @override
+  String get reef_attribution_protectedSeas =>
+      'حدود المناطق البحرية المحمية. CC BY 4.0.';
 }

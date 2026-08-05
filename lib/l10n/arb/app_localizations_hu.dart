@@ -12948,6 +12948,13 @@ class AppLocalizationsHu extends AppLocalizations {
       'Árapály-ciklus grafikon és időzítés';
 
   @override
+  String get diveDetailSection_reefHealth_name => 'Zátony állapota';
+
+  @override
+  String get diveDetailSection_reefHealth_description =>
+      'Korallfehéredési hőstressz a merülés napján';
+
+  @override
   String get diveDetailSection_surfaceGps_name => 'Felszíni GPS';
 
   @override
@@ -16472,6 +16479,17 @@ class AppLocalizationsHu extends AppLocalizations {
   String get importWizard_tagsLabel => 'Tags';
 
   @override
+  String importWizard_review_olderDivesSkipped(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count régebbi merülés kihagyva — már szerepel a naplódban',
+      one: '1 régebbi merülés kihagyva — már szerepel a naplódban',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get tags_hint_addTags => 'Címkék hozzáadása...';
 
   @override
@@ -16824,6 +16842,49 @@ class AppLocalizationsHu extends AppLocalizations {
   @override
   String get transfer_computers_noComputersSaved =>
       'Nincsenek mentett szamitogepek';
+
+  @override
+  String transfer_computers_diveCount(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count merülés',
+      one: '1 merülés',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get transfer_computers_downloadTooltip => 'Merülések letöltése';
+
+  @override
+  String get transfer_computers_knownComputersHeader => 'Ismert számítógépek';
+
+  @override
+  String transfer_computers_lastDownloadDaysAgo(int days) {
+    return '$days napja';
+  }
+
+  @override
+  String transfer_computers_lastDownloadHoursAgo(int hours) {
+    String _temp0 = intl.Intl.pluralLogic(
+      hours,
+      locale: localeName,
+      other: '$hours órája',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String transfer_computers_lastDownloadMinutesAgo(int minutes) {
+    return '$minutes perce';
+  }
+
+  @override
+  String get transfer_computers_lastDownloadNever => 'Soha';
+
+  @override
+  String get transfer_computers_lastDownloadYesterday => 'Tegnap';
 
   @override
   String transfer_computers_savedCount(int count) {
@@ -18638,8 +18699,15 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String get diveComputer_downloadStep_downloadAll =>
+      'Összes merülés letöltése';
+
+  @override
   String get diveComputer_downloadStep_downloadFailed =>
       'A letoltes sikertelen';
+
+  @override
+  String get diveComputer_downloadStep_downloadNew => 'Új merülések letöltése';
 
   @override
   String get diveComputer_downloadStep_downloadedDives => 'Letoltott merulesek';
@@ -18655,6 +18723,19 @@ class AppLocalizationsHu extends AppLocalizations {
   @override
   String diveComputer_downloadStep_errorSemanticLabel(Object error) {
     return 'Letoltesi hiba: $error';
+  }
+
+  @override
+  String get diveComputer_downloadStep_firstSyncBody =>
+      'A naplód már tartalmaz merüléseket. Kihagyhatod a már meglévő merülések letöltését.';
+
+  @override
+  String get diveComputer_downloadStep_firstSyncTitle =>
+      'Első letöltés erről a merülésszámítógépről';
+
+  @override
+  String diveComputer_downloadStep_onlyAfterDate(String date) {
+    return 'Csak a $date utáni merülések letöltése';
   }
 
   @override
@@ -20448,6 +20529,31 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get settings_appearance_sections => 'Szekciók';
+
+  @override
+  String get settings_appearance_colorAccents => 'Színes kiemelések';
+
+  @override
+  String get settings_appearance_accentNavIcons => 'Színes navigációs ikonok';
+
+  @override
+  String get settings_appearance_accentNavIcons_subtitle =>
+      'A főmenü ikonjainak színezése az egyes területek színével';
+
+  @override
+  String get settings_appearance_accentSectionHeaders =>
+      'Színes szekciófejlécek';
+
+  @override
+  String get settings_appearance_accentSectionHeaders_subtitle =>
+      'Színes szekcióikon megjelenítése az oldalcímek mellett';
+
+  @override
+  String get settings_appearance_accentListIcons => 'Színes listaikonok';
+
+  @override
+  String get settings_appearance_accentListIcons_subtitle =>
+      'Ikonok színezése a listákban és a beállítási oldalakon';
 
   @override
   String get settings_appearance_showDetailsPane =>
@@ -22506,4 +22612,124 @@ class AppLocalizationsHu extends AppLocalizations {
   @override
   String get settings_mediaStorage_quality_noTranscoderHint =>
       'Ez az eszköz nem tud videót tömöríteni. Róla az eredetik töltődnek fel.';
+
+  @override
+  String get reef_section_title => 'Zátony';
+
+  @override
+  String get reef_section_sourcesTooltip => 'Adatforrások';
+
+  @override
+  String get reef_section_loadError => 'A zátonyadatok most nem tölthetők be';
+
+  @override
+  String get reef_habitat_title => 'Zátony élőhely';
+
+  @override
+  String get reef_habitat_onReef => 'Korallzátonyon';
+
+  @override
+  String reef_habitat_onReefWithThreat(String threat) {
+    return 'Korallzátonyon, veszélyeztetettségi szint: $threat';
+  }
+
+  @override
+  String get reef_habitat_noReef =>
+      'Nincs térképezett korallzátony ezen a helyen';
+
+  @override
+  String get reef_habitat_unavailable =>
+      'A zátony élőhelye most nem ellenőrizhető';
+
+  @override
+  String get reef_health_title => 'Zátony állapota';
+
+  @override
+  String get reef_health_unavailable =>
+      'A zátony állapota most nem ellenőrizhető';
+
+  @override
+  String get reef_health_noData => 'Nincs zátonyállapot-adat ehhez a helyhez';
+
+  @override
+  String reef_health_degreeHeatingWeeks(String value) {
+    return 'Hőterhelési hetek $value C-hét';
+  }
+
+  @override
+  String reef_health_seaSurface(String value) {
+    return 'Tengerfelszín $value';
+  }
+
+  @override
+  String reef_health_asOf(String date) {
+    return 'Dátum: $date';
+  }
+
+  @override
+  String get reef_health_levelNoStress => 'Nincs hőstressz';
+
+  @override
+  String get reef_health_levelWatch => 'Fehéredési megfigyelés';
+
+  @override
+  String get reef_health_levelWarning => 'Fehéredési figyelmeztetés';
+
+  @override
+  String get reef_health_levelAlert1 => 'Fehéredési riasztás 1. szint';
+
+  @override
+  String get reef_health_levelAlert2 => 'Fehéredési riasztás 2. szint';
+
+  @override
+  String get reef_health_levelAlert3 => 'Fehéredési riasztás 3. szint';
+
+  @override
+  String get reef_health_levelAlert4 => 'Fehéredési riasztás 4. szint';
+
+  @override
+  String get reef_health_levelAlert5 => 'Fehéredési riasztás 5. szint';
+
+  @override
+  String get reef_protection_title => 'Védett terület';
+
+  @override
+  String get reef_protection_none => 'Nem védett tengeri területen';
+
+  @override
+  String get reef_protection_unavailable =>
+      'A védettségi állapot most nem ellenőrizhető';
+
+  @override
+  String get reef_protection_viewRegulations => 'Szabályok megtekintése';
+
+  @override
+  String reef_protection_iucn(String category) {
+    return 'IUCN $category';
+  }
+
+  @override
+  String get reef_species_recordedNearby => 'Közelben rögzítve';
+
+  @override
+  String get reef_species_addToExpected => 'Hozzáadás a várható fajokhoz';
+
+  @override
+  String get reef_attribution_title => 'Zátony adatforrásai';
+
+  @override
+  String get reef_attribution_wri =>
+      'Zátony jelenléte és veszélyeztetettsége. CC BY 3.0.';
+
+  @override
+  String get reef_attribution_noaa =>
+      'Tengerfelszíni hőmérséklet és hőstressz. Közkincs.';
+
+  @override
+  String get reef_attribution_gbif =>
+      'Fajelőfordulási adatok, CC0 és CC BY 4.0 szűrve.';
+
+  @override
+  String get reef_attribution_protectedSeas =>
+      'Védett tengeri területek határai. CC BY 4.0.';
 }

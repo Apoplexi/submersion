@@ -12779,6 +12779,13 @@ class AppLocalizationsEn extends AppLocalizations {
       'Tide cycle graph and timing';
 
   @override
+  String get diveDetailSection_reefHealth_name => 'Reef Health';
+
+  @override
+  String get diveDetailSection_reefHealth_description =>
+      'Coral bleaching heat stress on the dive date';
+
+  @override
   String get diveDetailSection_surfaceGps_name => 'Surface GPS';
 
   @override
@@ -16232,6 +16239,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String get importWizard_tagsLabel => 'Tags';
 
   @override
+  String importWizard_review_olderDivesSkipped(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count older dives skipped — already in your log',
+      one: '1 older dive skipped — already in your log',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get tags_hint_addTags => 'Add tags...';
 
   @override
@@ -16580,6 +16598,50 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get transfer_computers_noComputersSaved => 'No computers saved';
+
+  @override
+  String transfer_computers_diveCount(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count dives',
+      one: '1 dive',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get transfer_computers_downloadTooltip => 'Download dives';
+
+  @override
+  String get transfer_computers_knownComputersHeader => 'Known Computers';
+
+  @override
+  String transfer_computers_lastDownloadDaysAgo(int days) {
+    return '$days days ago';
+  }
+
+  @override
+  String transfer_computers_lastDownloadHoursAgo(int hours) {
+    String _temp0 = intl.Intl.pluralLogic(
+      hours,
+      locale: localeName,
+      other: '$hours hours ago',
+      one: '1 hour ago',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String transfer_computers_lastDownloadMinutesAgo(int minutes) {
+    return '$minutes min ago';
+  }
+
+  @override
+  String get transfer_computers_lastDownloadNever => 'Never';
+
+  @override
+  String get transfer_computers_lastDownloadYesterday => 'Yesterday';
 
   @override
   String transfer_computers_savedCount(int count) {
@@ -18374,7 +18436,13 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get diveComputer_downloadStep_downloadAll => 'Download all dives';
+
+  @override
   String get diveComputer_downloadStep_downloadFailed => 'Download failed';
+
+  @override
+  String get diveComputer_downloadStep_downloadNew => 'Download new dives';
 
   @override
   String get diveComputer_downloadStep_downloadedDives => 'Downloaded Dives';
@@ -18390,6 +18458,19 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String diveComputer_downloadStep_errorSemanticLabel(Object error) {
     return 'Download error: $error';
+  }
+
+  @override
+  String get diveComputer_downloadStep_firstSyncBody =>
+      'Your logbook already has dives. You can skip downloading dives you already have.';
+
+  @override
+  String get diveComputer_downloadStep_firstSyncTitle =>
+      'First download from this computer';
+
+  @override
+  String diveComputer_downloadStep_onlyAfterDate(String date) {
+    return 'Only download dives after $date';
   }
 
   @override
@@ -20165,6 +20246,31 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settings_appearance_sections => 'Sections';
+
+  @override
+  String get settings_appearance_colorAccents => 'Color accents';
+
+  @override
+  String get settings_appearance_accentNavIcons => 'Colored navigation icons';
+
+  @override
+  String get settings_appearance_accentNavIcons_subtitle =>
+      'Tint main menu icons with each feature\'s color';
+
+  @override
+  String get settings_appearance_accentSectionHeaders =>
+      'Colored section headers';
+
+  @override
+  String get settings_appearance_accentSectionHeaders_subtitle =>
+      'Show a colored feature icon next to page titles';
+
+  @override
+  String get settings_appearance_accentListIcons => 'Colored list icons';
+
+  @override
+  String get settings_appearance_accentListIcons_subtitle =>
+      'Tint icons in lists and settings pages';
 
   @override
   String get settings_appearance_showDetailsPane => 'Show Details Pane';
@@ -22200,4 +22306,122 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get settings_mediaStorage_quality_noTranscoderHint =>
       'This device cannot compress video. Originals are uploaded from it.';
+
+  @override
+  String get reef_section_title => 'Reef';
+
+  @override
+  String get reef_section_sourcesTooltip => 'Data sources';
+
+  @override
+  String get reef_section_loadError => 'Could not load reef data right now';
+
+  @override
+  String get reef_habitat_title => 'Reef habitat';
+
+  @override
+  String get reef_habitat_onReef => 'On a coral reef';
+
+  @override
+  String reef_habitat_onReefWithThreat(String threat) {
+    return 'On a coral reef, threat level $threat';
+  }
+
+  @override
+  String get reef_habitat_noReef => 'No mapped coral reef at this location';
+
+  @override
+  String get reef_habitat_unavailable =>
+      'Could not check reef habitat right now';
+
+  @override
+  String get reef_health_title => 'Reef health';
+
+  @override
+  String get reef_health_unavailable => 'Could not check reef health right now';
+
+  @override
+  String get reef_health_noData => 'No reef health data for this location';
+
+  @override
+  String reef_health_degreeHeatingWeeks(String value) {
+    return 'Degree Heating Weeks $value C-weeks';
+  }
+
+  @override
+  String reef_health_seaSurface(String value) {
+    return 'Sea surface $value';
+  }
+
+  @override
+  String reef_health_asOf(String date) {
+    return 'As of $date';
+  }
+
+  @override
+  String get reef_health_levelNoStress => 'No thermal stress';
+
+  @override
+  String get reef_health_levelWatch => 'Bleaching watch';
+
+  @override
+  String get reef_health_levelWarning => 'Bleaching warning';
+
+  @override
+  String get reef_health_levelAlert1 => 'Bleaching alert level 1';
+
+  @override
+  String get reef_health_levelAlert2 => 'Bleaching alert level 2';
+
+  @override
+  String get reef_health_levelAlert3 => 'Bleaching alert level 3';
+
+  @override
+  String get reef_health_levelAlert4 => 'Bleaching alert level 4';
+
+  @override
+  String get reef_health_levelAlert5 => 'Bleaching alert level 5';
+
+  @override
+  String get reef_protection_title => 'Protected area';
+
+  @override
+  String get reef_protection_none => 'Not in a marine protected area';
+
+  @override
+  String get reef_protection_unavailable =>
+      'Could not check protected status right now';
+
+  @override
+  String get reef_protection_viewRegulations => 'View regulations';
+
+  @override
+  String reef_protection_iucn(String category) {
+    return 'IUCN $category';
+  }
+
+  @override
+  String get reef_species_recordedNearby => 'Recorded nearby';
+
+  @override
+  String get reef_species_addToExpected => 'Add to expected species';
+
+  @override
+  String get reef_attribution_title => 'Reef data sources';
+
+  @override
+  String get reef_attribution_wri =>
+      'Reef presence and threat level. CC BY 3.0.';
+
+  @override
+  String get reef_attribution_noaa =>
+      'Sea surface temperature and bleaching heat stress. Public domain.';
+
+  @override
+  String get reef_attribution_gbif =>
+      'Species occurrence records, filtered to CC0 and CC BY 4.0.';
+
+  @override
+  String get reef_attribution_protectedSeas =>
+      'Marine protected area boundaries. CC BY 4.0.';
 }
