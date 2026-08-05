@@ -1033,6 +1033,10 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
                         style: TextStyle(
                           color: colorScheme.onPrimaryContainer,
                           fontWeight: FontWeight.bold,
+                          // Pin the pre-scale size (CircleAvatar's implicit
+                          // titleMedium default) so FittedBox scales from a
+                          // theme-independent baseline.
+                          fontSize: 16,
                         ),
                       ),
                     ),
