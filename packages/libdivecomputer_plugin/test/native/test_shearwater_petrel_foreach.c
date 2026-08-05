@@ -147,6 +147,45 @@ static void set_record(int page, int slot, int deleted, unsigned char id) {
   r[23] = address & 0xFF;
 }
 
+// Writes one manifest record with an explicit big-endian ticks value at
+// offset +4, instead of the {0xF0, 0, 0, id} pattern set_record() uses. The
+// real Petrel fingerprint IS the dive start time (big-endian ticks) mirrored
+// at this offset, so the timestamp-floor tests need to control that value
+// directly rather than deriving it from the dive id. The storage address
+// (offset +20) is still keyed off id, matching the mock's download lookup.
+static void set_record_ticks(int page, int slot, int deleted,
+                             unsigned int ticks, unsigned char id) {
+  assert(page >= 0 && page < MAX_PAGES);
+  assert(slot >= 0 && slot < (int)RECORD_COUNT);
+  unsigned char *r = g_script.pages[page] + slot * RECORD_SIZE;
+  memset(r, 0, RECORD_SIZE);
+  if (deleted) {
+    r[0] = 0x5A;
+    r[1] = 0x23;
+    return;
+  }
+  r[0] = 0xA5;
+  r[1] = 0xC4;
+  r[4] = (ticks >> 24) & 0xFF;
+  r[5] = (ticks >> 16) & 0xFF;
+  r[6] = (ticks >> 8) & 0xFF;
+  r[7] = ticks & 0xFF;
+  unsigned int address = (unsigned int)id * 0x1000;
+  r[20] = (address >> 24) & 0xFF;
+  r[21] = (address >> 16) & 0xFF;
+  r[22] = (address >> 8) & 0xFF;
+  r[23] = address & 0xFF;
+}
+
+// Encodes a ticks value as the big-endian 4-byte fingerprint device->fingerprint
+// expects, so a test can set the resume/floor fingerprint directly from ticks.
+static void ticks_to_fingerprint(unsigned int ticks, unsigned char fp[4]) {
+  fp[0] = (ticks >> 24) & 0xFF;
+  fp[1] = (ticks >> 16) & 0xFF;
+  fp[2] = (ticks >> 8) & 0xFF;
+  fp[3] = ticks & 0xFF;
+}
+
 dc_status_t shearwater_common_setup(shearwater_common_device_t *device,
                                     dc_context_t *context,
                                     dc_iostream_t *iostream,
@@ -504,6 +543,135 @@ static void check_multi_page(void) {
   if (s.n != 49 || memcmp(s.order, want, 49) != 0) print_order(&s);
 }
 
+// ---------------------------------------------------------------------------
+// Fingerprint timestamp floor: a resume fingerprint that matches NO manifest
+// record (because the local logbook was seeded by an import rather than a
+// prior device download) is treated as a timestamp floor instead of being
+// ignored. Records at or before the floor are skipped without a download
+// request; the floor logic must stay inert whenever the fingerprint matches
+// a record exactly, and whenever the fingerprint is all zeros.
+// ---------------------------------------------------------------------------
+
+// Manifest listed newest first: ticks 4000, 3000, 2000, 1000. A floor of
+// 2500 matches no record, so only the two dives newer than the floor
+// (3000, 4000) should be delivered, oldest first, and the two at-or-below
+// the floor (1000, 2000) must never be requested: they are deliberately left
+// out of the download script below, so a request for either one turns into
+// an unscripted-address DC_STATUS_IO and fails the test.
+static void test_floor_skips_older_dives(void) {
+  script_reset();
+  g_script.npages = 1;
+  set_record_ticks(0, 0, 0, 4000, 4);  // newest
+  set_record_ticks(0, 1, 0, 3000, 3);
+  set_record_ticks(0, 2, 0, 2000, 2);  // at/below floor: must not be requested
+  set_record_ticks(0, 3, 0, 1000, 1);  // at/below floor: must not be requested
+  script_add_dive(3, 0);
+  script_add_dive(4, 0);
+
+  unsigned char fp[4];
+  ticks_to_fingerprint(2500, fp);  // matches no record
+
+  cb_state_t s;
+  dc_status_t rc = run_foreach(fp, &s);
+  const unsigned char want[] = {3, 4};
+  expect(rc == DC_STATUS_SUCCESS,
+         "an unmatched fingerprint floor download succeeds");
+  expect(order_is(&s, want, 2),
+         "only dives newer than the floor are delivered, oldest first");
+  if (s.n != 2 || memcmp(s.order, want, 2) != 0) print_order(&s);
+  expect(g_last_progress.maximum != 0, "a final progress event was emitted");
+  expect(g_last_progress.current == g_last_progress.maximum,
+         "final progress reaches 100% with the floor active");
+}
+
+// Same manifest, but the fingerprint is an EXACT match for the ticks-2000
+// record. The manifest walk truncates at the match (found = 1), so only
+// records newer than the match (3000, 4000) are ever walked/appended, and
+// the floor logic must stay inert -- delivery and download requests are
+// identical to the pre-patch driver's plain fingerprint-resume behavior.
+static void test_exact_match_behavior_unchanged(void) {
+  script_reset();
+  g_script.npages = 1;
+  set_record_ticks(0, 0, 0, 4000, 4);  // newest
+  set_record_ticks(0, 1, 0, 3000, 3);
+  set_record_ticks(0, 2, 0, 2000, 2);  // exact match: walk stops here
+  set_record_ticks(0, 3, 0, 1000, 1);
+  script_add_dive(3, 0);
+  script_add_dive(4, 0);
+
+  unsigned char fp[4];
+  ticks_to_fingerprint(2000, fp);  // exact match
+
+  cb_state_t s;
+  dc_status_t rc = run_foreach(fp, &s);
+  const unsigned char want[] = {3, 4};
+  expect(rc == DC_STATUS_SUCCESS, "an exact-match resume download succeeds");
+  expect(order_is(&s, want, 2),
+         "exact match delivers only the newer dives, oldest first, "
+         "unchanged from pre-floor behavior");
+  if (s.n != 2 || memcmp(s.order, want, 2) != 0) print_order(&s);
+}
+
+// Same manifest, fingerprint unset (all zeros): the floor must be inert and
+// every dive downloaded, oldest first.
+static void test_zero_fingerprint_downloads_all(void) {
+  script_reset();
+  g_script.npages = 1;
+  set_record_ticks(0, 0, 0, 4000, 4);  // newest
+  set_record_ticks(0, 1, 0, 3000, 3);
+  set_record_ticks(0, 2, 0, 2000, 2);
+  set_record_ticks(0, 3, 0, 1000, 1);  // oldest
+  script_add_dive(1, 0);
+  script_add_dive(2, 0);
+  script_add_dive(3, 0);
+  script_add_dive(4, 0);
+
+  cb_state_t s;
+  dc_status_t rc = run_foreach(NULL, &s);  // NULL -> device->fingerprint stays zero
+  const unsigned char want[] = {1, 2, 3, 4};
+  expect(rc == DC_STATUS_SUCCESS, "a zero-fingerprint download succeeds");
+  expect(order_is(&s, want, 4),
+         "a zero fingerprint downloads every dive, oldest first");
+  if (s.n != 4 || memcmp(s.order, want, 4) != 0) print_order(&s);
+}
+
+// A deleted record (0x5A23) interspersed among records at/below the floor
+// must not disturb the floor accounting: it contributes nothing to the
+// progress maximum (deleted records never did) and is skipped by its own
+// deleted-record check before the floor comparison ever runs on it.
+static void test_floor_deleted_record_below_floor_unaffected(void) {
+  script_reset();
+  g_script.npages = 1;
+  set_record_ticks(0, 0, 0, 4000, 4);  // newest
+  set_record_ticks(0, 1, 0, 3000, 3);
+  set_record_ticks(0, 2, 0, 2000, 2);  // at/below floor
+  set_record(0, 3, 1, 0);              // deleted, interspersed below the floor
+  set_record_ticks(0, 4, 0, 1000, 1);  // at/below floor, oldest
+  script_add_dive(3, 0);
+  script_add_dive(4, 0);
+
+  unsigned char fp[4];
+  ticks_to_fingerprint(2500, fp);  // matches no record
+
+  cb_state_t s;
+  dc_status_t rc = run_foreach(fp, &s);
+  const unsigned char want[] = {3, 4};
+  expect(rc == DC_STATUS_SUCCESS,
+         "a floor download with a deleted record below the floor succeeds");
+  expect(order_is(&s, want, 2),
+         "the deleted record does not change which dives are delivered");
+  if (s.n != 2 || memcmp(s.order, want, 2) != 0) print_order(&s);
+  expect(g_last_progress.current == g_last_progress.maximum,
+         "final progress still reaches 100%");
+  // 1 manifest page + 2 delivered dives; the two below-floor records and the
+  // deleted record all contribute nothing to the maximum.
+  expect(g_last_progress.maximum == 3 * NSTEPS,
+         "the deleted record is not double-counted against the floor");
+  if (g_last_progress.maximum != 3 * NSTEPS)
+    printf("  final progress %u / %u\n", g_last_progress.current,
+           g_last_progress.maximum);
+}
+
 int main(void) {
   check_oldest_first();
   check_deleted_records_preserved();
@@ -513,6 +681,10 @@ int main(void) {
   check_fingerprint_resume();
   check_progress_accounting();
   check_multi_page();
+  test_floor_skips_older_dives();
+  test_exact_match_behavior_unchanged();
+  test_zero_fingerprint_downloads_all();
+  test_floor_deleted_record_below_floor_unaffected();
 
   if (failures == 0) {
     printf("All shearwater_petrel_foreach tests passed.\n");
