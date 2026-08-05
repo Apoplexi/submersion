@@ -4765,7 +4765,7 @@ class DiveRepository {
       'JOIN buddies b ON db.buddy_id = b.id '
       'WHERE db.dive_id IN ($placeholders) '
       'ORDER BY db.created_at',
-      variables: diveIds.map(Variable.new).toList(),
+      variables: diveIds.map((id) => Variable<Object>(id)).toList(),
     )).get();
 
     final map = <String, List<String>>{};

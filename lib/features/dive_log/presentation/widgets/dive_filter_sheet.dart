@@ -621,7 +621,7 @@ class _DiveFilterSheetState extends ConsumerState<DiveFilterSheet> {
 
                       return buddyNames.where((String option) {
                         return option.toLowerCase().contains(lastPart);
-                      });
+                      }).toList();
                     },
                     onSelected: (String selection) {
                       final text = _buddyNameFilter ?? '';
