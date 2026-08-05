@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:intl/intl.dart' show Intl;
 import 'package:submersion/core/constants/units.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
@@ -47,6 +48,20 @@ Widget _harness(ReefSnapshot snapshot) {
 }
 
 void main() {
+  // ReefHealthCard formats the observation date with DateFormat.yMMMd(),
+  // which resolves against intl's process-global default locale. Pin it so
+  // the expected month names do not depend on the test host's locale.
+  String? previousDefaultLocale;
+
+  setUp(() {
+    previousDefaultLocale = Intl.defaultLocale;
+    Intl.defaultLocale = 'en_US';
+  });
+
+  tearDown(() {
+    Intl.defaultLocale = previousDefaultLocale;
+  });
+
   testWidgets('shows habitat threat level when on a reef', (tester) async {
     await tester.pumpWidget(
       _harness(

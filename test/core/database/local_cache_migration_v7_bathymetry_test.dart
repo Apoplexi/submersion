@@ -111,49 +111,47 @@ void main() {
     },
   );
 
-  test(
-    'self-heals a database stamped past v8 without reef_data_cache',
-    () async {
-      // Mirror of the bathymetry self-heal: a parallel branch stamps a
-      // higher user_version first, so the from<8 reef block never runs and
-      // reef_data_cache would be missing without the beforeOpen re-assert.
-      final db = LocalCacheDatabase(
-        NativeDatabase.memory(
-          setup: (raw) {
-            raw
-              ..execute(
-                'CREATE TABLE local_asset_cache '
-                '(media_id TEXT PRIMARY KEY, local_asset_id TEXT, '
-                'resolved_at INTEGER, resolution_method TEXT, '
-                'attempt_count INTEGER)',
-              )
-              ..execute(
-                'CREATE TABLE media_transfer_queue '
-                '(id INTEGER PRIMARY KEY AUTOINCREMENT, media_id TEXT)',
-              )
-              ..execute(
-                'CREATE TABLE media_cache_entries '
-                '(content_hash TEXT, kind TEXT, '
-                'PRIMARY KEY (content_hash, kind))',
-              )
-              ..execute('PRAGMA user_version = 8');
-          },
-        ),
-      );
-      addTearDown(db.close);
-      await db
-          .into(db.reefDataCache)
-          .insert(
-            ReefDataCacheCompanion.insert(
-              provider: 'noaaCoralReefWatch',
-              coordKey: '12.160,-68.280',
-              payloadJson: '{}',
-              status: 'ok',
-              fetchedAt: 1753600000000,
-            ),
-          );
-      final rows = await db.select(db.reefDataCache).get();
-      expect(rows.single.status, 'ok');
-    },
-  );
+  test('self-heals a v8-stamped database missing reef_data_cache', () async {
+    // Mirror of the bathymetry self-heal: a parallel branch that also
+    // claims v8 stamps user_version first, so the from<8 reef block never
+    // runs and reef_data_cache would be missing without the beforeOpen
+    // re-assert.
+    final db = LocalCacheDatabase(
+      NativeDatabase.memory(
+        setup: (raw) {
+          raw
+            ..execute(
+              'CREATE TABLE local_asset_cache '
+              '(media_id TEXT PRIMARY KEY, local_asset_id TEXT, '
+              'resolved_at INTEGER, resolution_method TEXT, '
+              'attempt_count INTEGER)',
+            )
+            ..execute(
+              'CREATE TABLE media_transfer_queue '
+              '(id INTEGER PRIMARY KEY AUTOINCREMENT, media_id TEXT)',
+            )
+            ..execute(
+              'CREATE TABLE media_cache_entries '
+              '(content_hash TEXT, kind TEXT, '
+              'PRIMARY KEY (content_hash, kind))',
+            )
+            ..execute('PRAGMA user_version = 8');
+        },
+      ),
+    );
+    addTearDown(db.close);
+    await db
+        .into(db.reefDataCache)
+        .insert(
+          ReefDataCacheCompanion.insert(
+            provider: 'noaaCoralReefWatch',
+            coordKey: '12.160,-68.280',
+            payloadJson: '{}',
+            status: 'ok',
+            fetchedAt: 1753600000000,
+          ),
+        );
+    final rows = await db.select(db.reefDataCache).get();
+    expect(rows.single.status, 'ok');
+  });
 }
