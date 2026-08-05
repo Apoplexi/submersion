@@ -5,7 +5,10 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/features/dive_log/domain/entities/safety_finding.dart';
 import 'package:submersion/features/safety/domain/services/no_fly_service.dart';
 import 'package:go_router/go_router.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:submersion/features/auto_update/domain/entities/update_status.dart';
+import 'package:submersion/features/auto_update/presentation/providers/update_providers.dart';
 // ignore: implementation_imports
 import 'package:riverpod/src/framework.dart' as riverpod show Override;
 import 'package:submersion/core/providers/provider.dart';
@@ -751,6 +754,256 @@ void main() {
     });
   });
 
+  group('About section updates card', () {
+    /// Renders the About detail page (which hosts the Updates card) via the
+    /// same GoRouter ?selected= mechanism the appearance tests use.
+    Widget buildAboutWidget(List<Override> overrides) {
+      final router = GoRouter(
+        initialLocation: '/settings?selected=about',
+        routes: [
+          GoRoute(
+            path: '/settings',
+            builder: (context, state) => const SettingsPage(),
+          ),
+        ],
+      );
+      return ProviderScope(
+        overrides: overrides,
+        child: MaterialApp.router(
+          locale: const Locale('en'),
+          routerConfig: router,
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+        ),
+      );
+    }
+
+    /// Seeds prefs so the UpdateStatusNotifier's delayed startup check
+    /// short-circuits; tests still pump 6s to drain the timer itself.
+    Future<List<Override>> aboutOverrides({
+      String? channel,
+      Map<String, Object> extraPrefs = const {},
+      UpdateStatus? status,
+    }) async {
+      SharedPreferences.setMockInitialValues({
+        'auto_update_enabled': false,
+        'update_release_channel': ?channel,
+        ...extraPrefs,
+      });
+      final aboutPrefs = await SharedPreferences.getInstance();
+      // Mirrors getOverrides() but with these prefs; a provider must not be
+      // overridden twice in one container, so the list is built explicitly.
+      return [
+        sharedPreferencesProvider.overrideWithValue(aboutPrefs),
+        logFileServiceProvider.overrideWithValue(logFileService),
+        settingsProvider.overrideWith((ref) => _MockSettingsNotifier()),
+        currentDiverIdProvider.overrideWith(
+          (ref) => _MockCurrentDiverIdNotifier(),
+        ),
+        currentDiverProvider.overrideWith((ref) async => null),
+        diverListNotifierProvider.overrideWith(
+          (ref) => _MockDiverListNotifier(),
+        ),
+        // No real update service: channel-switch tests exercise the settings
+        // flow, not Sparkle/GitHub polling.
+        updateServiceProvider.overrideWith((ref) async => null),
+        if (status != null)
+          updateStatusProvider.overrideWith(
+            (ref) => UpdateStatusNotifier(ref)..state = status,
+          ),
+      ];
+    }
+
+    testWidgets('shows the channel selector on stable', (tester) async {
+      await tester.pumpWidget(buildAboutWidget(await aboutOverrides()));
+      await tester.pumpAndSettle();
+      await tester.pump(const Duration(seconds: 6));
+
+      await tester.scrollUntilVisible(find.text('Update channel'), 100);
+      expect(find.text('Update channel'), findsOneWidget);
+      expect(find.text('Stable'), findsOneWidget);
+    });
+
+    testWidgets('switching to beta asks for confirmation first', (
+      tester,
+    ) async {
+      await tester.pumpWidget(buildAboutWidget(await aboutOverrides()));
+      await tester.pumpAndSettle();
+      await tester.pump(const Duration(seconds: 6));
+
+      await tester.scrollUntilVisible(find.text('Update channel'), 100);
+      await tester.tap(find.text('Update channel'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Beta'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Receive beta updates?'), findsOneWidget);
+    });
+
+    testWidgets('confirming the beta dialog switches the channel', (
+      tester,
+    ) async {
+      await tester.pumpWidget(buildAboutWidget(await aboutOverrides()));
+      await tester.pumpAndSettle();
+      await tester.pump(const Duration(seconds: 6));
+
+      await tester.scrollUntilVisible(find.text('Update channel'), 100);
+      await tester.tap(find.text('Update channel'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Beta'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Switch to Beta'));
+      await tester.pumpAndSettle();
+
+      final prefs = await SharedPreferences.getInstance();
+      expect(prefs.getString('update_release_channel'), 'beta');
+      expect(find.text('Beta'), findsOneWidget); // channel row subtitle
+    });
+
+    testWidgets('cancelling the beta dialog keeps the stable channel', (
+      tester,
+    ) async {
+      await tester.pumpWidget(buildAboutWidget(await aboutOverrides()));
+      await tester.pumpAndSettle();
+      await tester.pump(const Duration(seconds: 6));
+
+      await tester.scrollUntilVisible(find.text('Update channel'), 100);
+      await tester.tap(find.text('Update channel'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Beta'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Cancel'));
+      await tester.pumpAndSettle();
+
+      final prefs = await SharedPreferences.getInstance();
+      expect(prefs.getString('update_release_channel'), isNull);
+    });
+
+    testWidgets('re-selecting the current channel is a no-op', (tester) async {
+      await tester.pumpWidget(buildAboutWidget(await aboutOverrides()));
+      await tester.pumpAndSettle();
+      await tester.pump(const Duration(seconds: 6));
+
+      await tester.scrollUntilVisible(find.text('Update channel'), 100);
+      await tester.tap(find.text('Update channel'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Tested releases only'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Receive beta updates?'), findsNothing);
+      final prefs = await SharedPreferences.getInstance();
+      expect(prefs.getString('update_release_channel'), isNull);
+    });
+
+    testWidgets('switching back to stable shows the ride-forward notice', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        buildAboutWidget(await aboutOverrides(channel: 'beta')),
+      );
+      await tester.pumpAndSettle();
+      await tester.pump(const Duration(seconds: 6));
+
+      await tester.scrollUntilVisible(find.text('Update channel'), 100);
+      await tester.tap(find.text('Update channel'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Tested releases only'));
+      await tester.pumpAndSettle();
+
+      final prefs = await SharedPreferences.getInstance();
+      expect(prefs.getString('update_release_channel'), 'stable');
+      expect(
+        find.textContaining('until the next stable release'),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('status text renders the downloading and ready states', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        buildAboutWidget(
+          await aboutOverrides(status: const Downloading(progress: 0.42)),
+        ),
+      );
+      await tester.pumpAndSettle();
+      await tester.pump(const Duration(seconds: 6));
+      await tester.scrollUntilVisible(find.text('Downloading... 42%'), 100);
+      expect(find.text('Downloading... 42%'), findsOneWidget);
+    });
+
+    testWidgets('status text renders ready-to-install and error states', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        buildAboutWidget(
+          await aboutOverrides(
+            status: const ReadyToInstall(version: '9.9.9', localPath: '/tmp/x'),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      await tester.pump(const Duration(seconds: 6));
+      await tester.scrollUntilVisible(
+        find.text('Version 9.9.9 ready to install'),
+        100,
+      );
+      expect(find.text('Version 9.9.9 ready to install'), findsOneWidget);
+    });
+
+    testWidgets('status text renders the error state', (tester) async {
+      await tester.pumpWidget(
+        buildAboutWidget(
+          await aboutOverrides(status: const UpdateError(message: 'offline')),
+        ),
+      );
+      await tester.pumpAndSettle();
+      await tester.pump(const Duration(seconds: 6));
+      await tester.scrollUntilVisible(find.text('Error: offline'), 100);
+      expect(find.text('Error: offline'), findsOneWidget);
+    });
+
+    testWidgets('a recorded last-check time is formatted, not Never', (
+      tester,
+    ) async {
+      final lastCheck = DateTime(2026, 7, 4, 9, 5);
+      await tester.pumpWidget(
+        buildAboutWidget(
+          await aboutOverrides(
+            extraPrefs: {
+              'auto_update_last_check': lastCheck.millisecondsSinceEpoch,
+            },
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      await tester.pump(const Duration(seconds: 6));
+      await tester.scrollUntilVisible(find.text('Last checked'), 100);
+      expect(find.text('7/4/2026 09:05'), findsOneWidget);
+      expect(find.text('Never'), findsNothing);
+    });
+
+    testWidgets('version row shows a beta badge on the beta channel', (
+      tester,
+    ) async {
+      PackageInfo.setMockInitialValues(
+        appName: 'Submersion',
+        packageName: 'app.submersion',
+        version: '1.7.2',
+        buildNumber: '119',
+        buildSignature: '',
+        installerStore: null,
+      );
+      await tester.pumpWidget(
+        buildAboutWidget(await aboutOverrides(channel: 'beta')),
+      );
+      await tester.pumpAndSettle();
+      await tester.pump(const Duration(seconds: 6));
+
+      expect(find.textContaining('(Beta)'), findsOneWidget);
+    });
+  });
+
   group('AppearanceSectionContent navigation', () {
     /// Build a widget that renders the SettingsPage via GoRouter with
     /// ?selected=appearance, which renders the _SettingsSectionDetailPage
@@ -1025,6 +1278,106 @@ void main() {
       expect(find.text('10 days before a trip'), findsOneWidget);
       // The persisted value appears in the dropdown's options.
       expect(find.byType(DropdownButton<int>), findsOneWidget);
+    });
+  });
+
+  group('Section navigation stack (#647)', () {
+    Future<GoRouter> pumpSettingsList(
+      WidgetTester tester, {
+      String initialLocation = '/settings',
+    }) async {
+      await tester.binding.setSurfaceSize(const Size(400, 800));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+
+      final router = GoRouter(
+        initialLocation: initialLocation,
+        routes: [
+          GoRoute(
+            path: '/settings',
+            builder: (context, state) => const SettingsPage(),
+          ),
+        ],
+      );
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: getOverrides(),
+          child: MaterialApp.router(
+            locale: const Locale('en'),
+            routerConfig: router,
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      return router;
+    }
+
+    testWidgets('opening a query-param section pushes a poppable route so the '
+        'system back gesture returns to Settings instead of closing the app', (
+      tester,
+    ) async {
+      final router = await pumpSettingsList(tester);
+
+      await tester.scrollUntilVisible(find.text('Data'), 100);
+      await tester.tap(find.text('Data'));
+      await tester.pumpAndSettle();
+
+      expect(
+        router.canPop(),
+        isTrue,
+        reason:
+            'the section detail must be a pushed route; with nothing to '
+            'pop, the Android back gesture closes the whole app (#647)',
+      );
+
+      router.pop();
+      await tester.pumpAndSettle();
+
+      // Back on the section list.
+      expect(find.text('Units'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('deep-linked section detail falls back to go() because there '
+        'is nothing on the stack to pop', (tester) async {
+      // Opening ?selected= directly (a deep link or a restored location)
+      // makes the detail page the stack root, so the app-bar back button
+      // cannot pop and must navigate to the section list instead.
+      final router = await pumpSettingsList(
+        tester,
+        initialLocation: '/settings?selected=data',
+      );
+
+      expect(router.canPop(), isFalse);
+
+      await tester.tap(find.byIcon(Icons.arrow_back));
+      await tester.pumpAndSettle();
+
+      expect(
+        router.state.uri.toString(),
+        '/settings',
+        reason: 'the fallback clears the selected-section query parameter',
+      );
+      expect(find.text('Units'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('detail app-bar back returns to the settings list', (
+      tester,
+    ) async {
+      await pumpSettingsList(tester);
+
+      await tester.scrollUntilVisible(find.text('Data'), 100);
+      await tester.tap(find.text('Data'));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byIcon(Icons.arrow_back));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Units'), findsOneWidget);
+      expect(tester.takeException(), isNull);
     });
   });
 }

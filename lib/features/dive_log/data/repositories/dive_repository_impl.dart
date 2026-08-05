@@ -1946,6 +1946,8 @@ class DiveRepository {
       }
     }
     if (filter.buddyNameFilter != null && filter.buddyNameFilter!.isNotEmpty) {
+      // The dive editor writes buddies only to the dive_buddies junction;
+      // d.buddy is a legacy text column kept for old data (#757).
       final names = filter.buddyNameFilter!
           .split(',')
           .map((s) => s.trim())

@@ -847,9 +847,6 @@
     }
   },
   "preDive_dashboard_start": "Démarrer la vérification pré-plongée",
-  "tools_preDive_title": "Checklists pré-plongée",
-  "tools_preDive_subtitle": "Lancez et consultez les sessions de checklist",
-  "tools_preDive_description": "Vérifications entre binômes, listes de montage CCR et préparation du matériel avec traçabilité",
   "trips_detail_preDive_action": "Checklist pré-plongée",
   "settings_manage_preDiveChecklists": "Checklists pré-plongée",
   "settings_manage_preDiveChecklists_subtitle": "Vérifications entre binômes, listes de montage CCR, préparation du matériel",
@@ -4029,6 +4026,7 @@
   "settings_cloudSync_header_syncBehavior": "Comportement de synchronisation",
   "settings_cloudSync_lastSynced": "Derniere synchronisation : {time}",
   "settings_cloudSync_pendingChanges": "{count, plural, =1{1 modification en attente} other{{count} modifications en attente}}",
+  "settings_cloudSync_peerRequiresUpdate_banner": "{count, plural, =1{1 appareil se synchronise depuis une version plus récente de Submersion. Mettez à jour cet appareil pour recevoir ses derniers changements.} other{{count} appareils se synchronisent depuis une version plus récente de Submersion. Mettez à jour cet appareil pour recevoir leurs derniers changements.}}",
   "settings_cloudSync_provider_connected": "Connecte",
   "settings_cloudSync_provider_connectedTo": "Connecte a {providerName}",
   "settings_cloudSync_provider_connectionFailed": "Echec de la connexion a {providerName} : {error}",
@@ -4456,6 +4454,65 @@
   "settings_units_weight": "Poids",
   "settings_units_weight_kilograms": "Kilogrammes (kg)",
   "settings_units_weight_pounds": "Livres (lbs)",
+  "settings_updates_automaticUpdates": "Mises à jour automatiques",
+  "settings_updates_automaticUpdatesSubtitle": "Rechercher les mises à jour périodiquement",
+  "settings_updates_betaDialogBody": "Les versions bêta sont publiées à chaque modification et peuvent mettre à niveau la base de données de votre carnet de plongée avant la version stable. Revenir ensuite au canal stable ne rétrogradera pas l'application, et tous les appareils qui se synchronisent ensemble devraient utiliser le même canal. Une sauvegarde est effectuée automatiquement avant toute mise à niveau de la base de données.",
+  "settings_updates_betaDialogConfirm": "Passer à la bêta",
+  "settings_updates_betaDialogTitle": "Recevoir les mises à jour bêta ?",
+  "settings_updates_channel": "Canal de mise à jour",
+  "settings_updates_channelBadgeBeta": "{version} (Bêta)",
+  "@settings_updates_channelBadgeBeta": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "settings_updates_channelBeta": "Bêta",
+  "settings_updates_channelBetaSubtitle": "Nouvelles versions à chaque modification, en avance sur la stable",
+  "settings_updates_channelStable": "Stable",
+  "settings_updates_channelStableSubtitle": "Versions testées uniquement",
+  "settings_updates_checkForUpdates": "Rechercher les mises à jour",
+  "settings_updates_checking": "Vérification...",
+  "settings_updates_downloading": "Téléchargement... {progress}%",
+  "@settings_updates_downloading": {
+    "placeholders": {
+      "progress": {
+        "type": "String"
+      }
+    }
+  },
+  "settings_updates_error": "Erreur : {message}",
+  "@settings_updates_error": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "settings_updates_header": "Mises à jour",
+  "settings_updates_joinBeta": "Rejoindre la bêta",
+  "settings_updates_joinBetaSubtitle": "Recevez les nouvelles fonctionnalités en avant-première grâce au programme bêta",
+  "settings_updates_lastChecked": "Dernière vérification",
+  "settings_updates_never": "Jamais",
+  "settings_updates_readyToInstall": "Version {version} prête à installer",
+  "@settings_updates_readyToInstall": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "settings_updates_stableSwitchNotice": "Vous resterez sur cette bêta jusqu'à ce que la prochaine version stable soit plus récente qu'elle.",
+  "settings_updates_upToDate": "À jour",
+  "settings_updates_versionAvailable": "Version {version} disponible",
+  "@settings_updates_versionAvailable": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
   "signatures_action_clear": "Effacer",
   "signatures_action_closeSignatureView": "Fermer la vue signature",
   "signatures_action_deleteSignature": "Supprimer la signature",
@@ -4936,23 +4993,14 @@
   "tides_semantic_tideCycle": "Cycle de marée, état : {state}, hauteur : {height}",
   "tides_semantic_tideState": "État de la marée : {state}",
   "tides_title": "Marées",
-  "tools_deco_description": "Calculez les limites de non-decompression, les paliers de deco requis et l'exposition CNS/OTU pour les profils de plongee multi-niveaux.",
-  "tools_deco_subtitle": "Planifiez vos plongees avec paliers de deco",
-  "tools_deco_title": "Calculateur de deco",
-  "tools_disclaimer": "Ces calculateurs sont fournis a titre indicatif uniquement. Verifiez toujours les calculs et suivez votre formation de plongee.",
-  "tools_gas_description": "Quatre calculateurs de gaz specialises :\n- MOD - Profondeur maximale d'utilisation d'un melange\n- Best Mix - O2% ideal pour une profondeur cible\n- Consommation - Estimation de la consommation de gaz\n- Rock Bottom - Calcul de la reserve d'urgence",
-  "tools_gas_subtitle": "MOD, Best Mix, Consommation, Rock Bottom",
-  "tools_gas_title": "Calculateurs de gaz",
   "tools_gpsLogger_description": "Enregistrez votre position pendant une journée de plongée et associez automatiquement les plongées importées à des positions GPS.",
   "tools_gpsLogger_subtitle": "Enregistrer une trace de surface",
   "tools_gpsLogger_title": "Enregistreur GPS",
-  "tools_title": "Outils",
   "tools_weight_aluminumImperial": "Plus flottant a vide (+4 lbs)",
   "tools_weight_aluminumMetric": "Plus flottant a vide (+2 kg)",
   "tools_weight_bodyWeightOptional": "Poids corporel (facultatif)",
   "tools_weight_carbonFiberImperial": "Tres flottant (+7 lbs)",
   "tools_weight_carbonFiberMetric": "Tres flottant (+3 kg)",
-  "tools_weight_description": "Estimez le lestage necessaire en fonction de votre combinaison, du materiau du bloc, du type d'eau et de votre poids.",
   "tools_weight_disclaimer": "Ceci est une estimation uniquement. Effectuez toujours un controle de flottabilite au debut de votre plongee et ajustez si necessaire. Le gilet, la flottabilite personnelle et les habitudes respiratoires influencent vos besoins reels en lestage.",
   "tools_weight_exposureSuit": "Combinaison",
   "tools_weight_gasCapacity": "- Capacite de gaz : {capacity} cuft",
@@ -4963,7 +5011,6 @@
   "tools_weight_resultAccessibility": "Lestage recommande : {weight} {unit}",
   "tools_weight_steelImperial": "Flottabilite negative (-4 lbs)",
   "tools_weight_steelMetric": "Flottabilite negative (-2 kg)",
-  "tools_weight_subtitle": "Lestage recommande pour votre configuration",
   "tools_weight_tankMaterial": "Materiau du bloc",
   "tools_weight_tankSpecifications": "Specifications du bloc",
   "tools_weight_title": "Calculateur de lestage",
@@ -5555,6 +5602,8 @@
   "diveDetailSection_tanks_description": "Liste des bouteilles, melanges gazeux, pressions, SAC par bouteille",
   "diveDetailSection_tanks_name": "Bouteilles",
   "diveDetailSection_tide_description": "Graphique du cycle de maree et horaires",
+  "diveDetailSection_reefHealth_name": "Santé du récif",
+  "diveDetailSection_reefHealth_description": "Stress thermique de blanchissement corallien à la date de la plongée",
   "diveDetailSection_tide_name": "Maree",
   "diveDetailSection_weights_description": "Repartition des lests, poids total",
   "diveDetailSection_buoyancy_name": "Flottabilité",
@@ -5684,7 +5733,7 @@
   "dashboard_gauges_backupDays": "Sauvegarde il y a {days}j",
   "dashboard_gauges_syncPending": "{count} non synchronisés",
   "dashboard_gauges_synced": "Synchronisé",
-  "dashboard_gauges_dataIssues": "{count} problèmes de données",
+  "dashboard_gauges_dataIssues": "{count, plural, =1{1 problème de données} other{{count} problèmes de données}}",
   "dashboard_gauges_retry": "Statut indisponible - touchez pour réessayer",
   "dashboard_urgent_title": "Attention requise",
   "dashboard_photos_title": "Photos récentes",
@@ -5748,6 +5797,9 @@
   "universalImport_dive_decideAction": "Decider",
   "universalImport_label_consolidate": "Consolider",
   "universalImport_label_importAsNew": "Importer comme nouveau",
+  "universalImport_entityAction_linkBadge": "LIER",
+  "universalImport_entityAction_linkExisting": "Lier à l'existant",
+  "universalImport_entityAction_linkExistingSubtitle": "Utiliser la fiche correspondante",
   "universalImport_pending_chooseAction": "Choisir une action",
   "universalImport_pending_gateHint": "{count} doublon(s) necessitent une decision",
   "universalImport_pending_needsDecision": "Decision requise",
@@ -6021,6 +6073,20 @@
   "@dive3d_overlay_curtain": {},
   "dive3d_overlay_markers": "Marqueurs",
   "@dive3d_overlay_markers": {},
+  "dive3d_seascape_overlay_paths": "Trajets de plongée",
+  "@dive3d_seascape_overlay_paths": {},
+  "dive3d_seascape_siteTitle": "Paysage marin du site",
+  "@dive3d_seascape_siteTitle": {},
+  "dive3d_seascape_seafloorSource": "Fond marin : {source} (~{resolution} m)",
+  "@dive3d_seascape_seafloorSource": {},
+  "dive3d_seascape_noCoordinates": "Ce site n'a pas de coordonnées GPS",
+  "@dive3d_seascape_noCoordinates": {},
+  "dive3d_seascape_noData": "Aucune bathymétrie disponible pour cet endroit",
+  "@dive3d_seascape_noData": {},
+  "dive3d_seascape_axis_distance": "Distance ({unitSymbol})",
+  "@dive3d_seascape_axis_distance": {},
+  "settings_about_bathymetryCredit": "Données bathymétriques : GMRT (CC BY 4.0) · EMODnet Bathymetry (CC BY 4.0) · NOAA ETOPO 2022",
+  "@settings_about_bathymetryCredit": {},
   "dive3d_metric_depth": "Profondeur",
   "@dive3d_metric_depth": {},
   "dive3d_metric_temperature": "Temp",
@@ -6690,5 +6756,39 @@
   "settings_mediaStorage_quality_reuploadQueued": "Nouveau téléversement en file d'attente",
   "settings_mediaStorage_quality_linuxFfmpegHint": "Installez ffmpeg pour activer la compression vidéo. Les originaux sont téléversés d'ici là.",
   "settings_mediaStorage_quality_saveFailed": "Impossible d'enregistrer la qualité de téléversement. Réessayez.",
-  "settings_mediaStorage_quality_noTranscoderHint": "Cet appareil ne peut pas compresser la vidéo. Les originaux sont téléversés depuis celui-ci."
+  "settings_mediaStorage_quality_noTranscoderHint": "Cet appareil ne peut pas compresser la vidéo. Les originaux sont téléversés depuis celui-ci.",
+  "reef_section_title": "Récif",
+  "reef_section_sourcesTooltip": "Sources de données",
+  "reef_section_loadError": "Impossible de charger les données du récif pour le moment",
+  "reef_habitat_title": "Habitat du récif",
+  "reef_habitat_onReef": "Sur un récif corallien",
+  "reef_habitat_onReefWithThreat": "Sur un récif corallien, niveau de menace {threat}",
+  "reef_habitat_noReef": "Aucun récif corallien cartographié à cet endroit",
+  "reef_habitat_unavailable": "Impossible de vérifier l'habitat du récif pour le moment",
+  "reef_health_title": "Santé du récif",
+  "reef_health_unavailable": "Impossible de vérifier la santé du récif pour le moment",
+  "reef_health_noData": "Aucune donnée de santé du récif pour cet endroit",
+  "reef_health_degreeHeatingWeeks": "Degrés-semaines de chaleur {value} C-semaines",
+  "reef_health_seaSurface": "Surface de la mer {value}",
+  "reef_health_asOf": "Au {date}",
+  "reef_health_levelNoStress": "Aucun stress thermique",
+  "reef_health_levelWatch": "Veille de blanchissement",
+  "reef_health_levelWarning": "Alerte de blanchissement",
+  "reef_health_levelAlert1": "Alerte de blanchissement niveau 1",
+  "reef_health_levelAlert2": "Alerte de blanchissement niveau 2",
+  "reef_health_levelAlert3": "Alerte de blanchissement niveau 3",
+  "reef_health_levelAlert4": "Alerte de blanchissement niveau 4",
+  "reef_health_levelAlert5": "Alerte de blanchissement niveau 5",
+  "reef_protection_title": "Aire protégée",
+  "reef_protection_none": "Hors aire marine protégée",
+  "reef_protection_unavailable": "Impossible de vérifier le statut de protection pour le moment",
+  "reef_protection_viewRegulations": "Voir la réglementation",
+  "reef_protection_iucn": "IUCN {category}",
+  "reef_species_recordedNearby": "Observé à proximité",
+  "reef_species_addToExpected": "Ajouter aux espèces attendues",
+  "reef_attribution_title": "Sources de données du récif",
+  "reef_attribution_wri": "Présence de récif et niveau de menace. CC BY 3.0.",
+  "reef_attribution_noaa": "Température de surface et stress thermique. Domaine public.",
+  "reef_attribution_gbif": "Données d'occurrence d'espèces, filtrées en CC0 et CC BY 4.0.",
+  "reef_attribution_protectedSeas": "Limites des aires marines protégées. CC BY 4.0."
 }

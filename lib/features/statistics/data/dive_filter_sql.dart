@@ -116,12 +116,26 @@ import 'package:submersion/features/equipment/domain/constants/equipment_attribu
     conditions.add('is_favorite = 1');
   }
 
-  // Buddy free-text: case-insensitive substring.
+  // Buddy free-text: case-insensitive substring against the legacy scalar
+  // column OR any junction-linked buddy's name. The dive editor writes only
+  // the dive_buddies junction; the scalar covers old data (#757).
+  // Comma-separated names must each match (AND semantics), mirroring
+  // DiveRepositoryImpl and DiveFilterState.apply.
   if (filter.buddyNameFilter != null && filter.buddyNameFilter!.isNotEmpty) {
-    conditions.add(
-      "buddy IS NOT NULL AND LOWER(buddy) LIKE '%' || LOWER(?) || '%'",
-    );
-    params.add(filter.buddyNameFilter);
+    final names = filter.buddyNameFilter!
+        .split(',')
+        .map((s) => s.trim())
+        .where((s) => s.isNotEmpty);
+    for (final name in names) {
+      conditions.add(
+        "((buddy IS NOT NULL AND LOWER(buddy) LIKE '%' || LOWER(?) || '%') "
+        'OR id IN (SELECT db.dive_id FROM dive_buddies db '
+        'JOIN buddies b ON b.id = db.buddy_id '
+        "WHERE LOWER(b.name) LIKE '%' || LOWER(?) || '%'))",
+      );
+      params.add(name);
+      params.add(name);
+    }
   }
 
   if (filter.diveIds.isNotEmpty) {

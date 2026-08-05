@@ -4235,24 +4235,6 @@ abstract class AppLocalizations {
   /// **'Start pre-dive check'**
   String get preDive_dashboard_start;
 
-  /// No description provided for @tools_preDive_title.
-  ///
-  /// In en, this message translates to:
-  /// **'Pre-Dive Checklists'**
-  String get tools_preDive_title;
-
-  /// No description provided for @tools_preDive_subtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Run and review checklist sessions'**
-  String get tools_preDive_subtitle;
-
-  /// No description provided for @tools_preDive_description.
-  ///
-  /// In en, this message translates to:
-  /// **'Buddy checks, CCR build lists, and gear packing with an audit trail'**
-  String get tools_preDive_description;
-
   /// No description provided for @trips_detail_preDive_action.
   ///
   /// In en, this message translates to:
@@ -5480,7 +5462,7 @@ abstract class AppLocalizations {
   /// No description provided for @dashboard_gauges_dataIssues.
   ///
   /// In en, this message translates to:
-  /// **'{count} data issues'**
+  /// **'{count, plural, =1{1 data issue} other{{count} data issues}}'**
   String dashboard_gauges_dataIssues(int count);
 
   /// No description provided for @dashboard_gauges_retry.
@@ -21991,6 +21973,18 @@ abstract class AppLocalizations {
   /// **'Tide cycle graph and timing'**
   String get diveDetailSection_tide_description;
 
+  /// No description provided for @diveDetailSection_reefHealth_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Reef Health'**
+  String get diveDetailSection_reefHealth_name;
+
+  /// No description provided for @diveDetailSection_reefHealth_description.
+  ///
+  /// In en, this message translates to:
+  /// **'Coral bleaching heat stress on the dive date'**
+  String get diveDetailSection_reefHealth_description;
+
   /// No description provided for @diveDetailSection_surfaceGps_name.
   ///
   /// In en, this message translates to:
@@ -22978,6 +22972,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{count, plural, =1{1 pending change} other{{count} pending changes}}'**
   String settings_cloudSync_pendingChanges(int count);
+
+  /// No description provided for @settings_cloudSync_peerRequiresUpdate_banner.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 device syncs from a newer version of Submersion. Update this device to receive its latest changes.} other{{count} devices sync from a newer version of Submersion. Update this device to receive their latest changes.}}'**
+  String settings_cloudSync_peerRequiresUpdate_banner(num count);
 
   /// No description provided for @settings_cloudSync_provider_connected.
   ///
@@ -25519,6 +25519,150 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Pounds (lbs)'**
   String get settings_units_weight_pounds;
+
+  /// No description provided for @settings_updates_automaticUpdates.
+  ///
+  /// In en, this message translates to:
+  /// **'Automatic updates'**
+  String get settings_updates_automaticUpdates;
+
+  /// No description provided for @settings_updates_automaticUpdatesSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Check for updates periodically'**
+  String get settings_updates_automaticUpdatesSubtitle;
+
+  /// No description provided for @settings_updates_betaDialogBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Beta builds are published from every change and may upgrade your dive log\'s database before the stable release does. Switching back to stable later will not downgrade the app, and all devices that sync together should use the same channel. A backup is taken automatically before any database upgrade.'**
+  String get settings_updates_betaDialogBody;
+
+  /// No description provided for @settings_updates_betaDialogConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Switch to Beta'**
+  String get settings_updates_betaDialogConfirm;
+
+  /// No description provided for @settings_updates_betaDialogTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Receive beta updates?'**
+  String get settings_updates_betaDialogTitle;
+
+  /// No description provided for @settings_updates_channel.
+  ///
+  /// In en, this message translates to:
+  /// **'Update channel'**
+  String get settings_updates_channel;
+
+  /// No description provided for @settings_updates_channelBadgeBeta.
+  ///
+  /// In en, this message translates to:
+  /// **'{version} (Beta)'**
+  String settings_updates_channelBadgeBeta(String version);
+
+  /// No description provided for @settings_updates_channelBeta.
+  ///
+  /// In en, this message translates to:
+  /// **'Beta'**
+  String get settings_updates_channelBeta;
+
+  /// No description provided for @settings_updates_channelBetaSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'New builds from every change, ahead of stable'**
+  String get settings_updates_channelBetaSubtitle;
+
+  /// No description provided for @settings_updates_channelStable.
+  ///
+  /// In en, this message translates to:
+  /// **'Stable'**
+  String get settings_updates_channelStable;
+
+  /// No description provided for @settings_updates_channelStableSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Tested releases only'**
+  String get settings_updates_channelStableSubtitle;
+
+  /// No description provided for @settings_updates_checkForUpdates.
+  ///
+  /// In en, this message translates to:
+  /// **'Check for Updates'**
+  String get settings_updates_checkForUpdates;
+
+  /// No description provided for @settings_updates_checking.
+  ///
+  /// In en, this message translates to:
+  /// **'Checking...'**
+  String get settings_updates_checking;
+
+  /// No description provided for @settings_updates_downloading.
+  ///
+  /// In en, this message translates to:
+  /// **'Downloading... {progress}%'**
+  String settings_updates_downloading(String progress);
+
+  /// No description provided for @settings_updates_error.
+  ///
+  /// In en, this message translates to:
+  /// **'Error: {message}'**
+  String settings_updates_error(String message);
+
+  /// No description provided for @settings_updates_header.
+  ///
+  /// In en, this message translates to:
+  /// **'Updates'**
+  String get settings_updates_header;
+
+  /// No description provided for @settings_updates_joinBeta.
+  ///
+  /// In en, this message translates to:
+  /// **'Join the Beta'**
+  String get settings_updates_joinBeta;
+
+  /// No description provided for @settings_updates_joinBetaSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Get new features early through the beta program'**
+  String get settings_updates_joinBetaSubtitle;
+
+  /// No description provided for @settings_updates_lastChecked.
+  ///
+  /// In en, this message translates to:
+  /// **'Last checked'**
+  String get settings_updates_lastChecked;
+
+  /// No description provided for @settings_updates_never.
+  ///
+  /// In en, this message translates to:
+  /// **'Never'**
+  String get settings_updates_never;
+
+  /// No description provided for @settings_updates_readyToInstall.
+  ///
+  /// In en, this message translates to:
+  /// **'Version {version} ready to install'**
+  String settings_updates_readyToInstall(String version);
+
+  /// No description provided for @settings_updates_stableSwitchNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'You will stay on this beta until the next stable release is newer than it.'**
+  String get settings_updates_stableSwitchNotice;
+
+  /// No description provided for @settings_updates_upToDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Up to date'**
+  String get settings_updates_upToDate;
+
+  /// No description provided for @settings_updates_versionAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Version {version} available'**
+  String settings_updates_versionAvailable(String version);
 
   /// Button label to clear the signature canvas
   ///
@@ -30406,6 +30550,24 @@ abstract class AppLocalizations {
   /// **'{selected} of {total} selected'**
   String universalImport_label_xOfYSelected(Object selected, Object total);
 
+  /// Collapsed-header badge on a duplicate row whose action is link-to-existing
+  ///
+  /// In en, this message translates to:
+  /// **'LINK'**
+  String get universalImport_entityAction_linkBadge;
+
+  /// Action button on a duplicate buddy/tag row: link the import to the matched existing record instead of skipping or creating a twin
+  ///
+  /// In en, this message translates to:
+  /// **'Link to existing'**
+  String get universalImport_entityAction_linkExisting;
+
+  /// Subtitle under the link-to-existing action button
+  ///
+  /// In en, this message translates to:
+  /// **'Use the matched record'**
+  String get universalImport_entityAction_linkExistingSubtitle;
+
   /// Prompt shown above the action buttons on an expanded pending duplicate row, telling the user to pick an action
   ///
   /// In en, this message translates to:
@@ -33385,48 +33547,6 @@ abstract class AppLocalizations {
   /// **'Tank Presets'**
   String get tankPresets_title;
 
-  /// No description provided for @tools_deco_description.
-  ///
-  /// In en, this message translates to:
-  /// **'Calculate no-decompression limits, required deco stops, and CNS/OTU exposure for multi-level dive profiles.'**
-  String get tools_deco_description;
-
-  /// No description provided for @tools_deco_subtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Plan dives with decompression stops'**
-  String get tools_deco_subtitle;
-
-  /// No description provided for @tools_deco_title.
-  ///
-  /// In en, this message translates to:
-  /// **'Deco Calculator'**
-  String get tools_deco_title;
-
-  /// No description provided for @tools_disclaimer.
-  ///
-  /// In en, this message translates to:
-  /// **'These calculators are for planning purposes only. Always verify calculations and follow your dive training.'**
-  String get tools_disclaimer;
-
-  /// No description provided for @tools_gas_description.
-  ///
-  /// In en, this message translates to:
-  /// **'Four specialized gas calculators:\n• MOD - Maximum operating depth for a gas mix\n• Best Mix - Ideal O₂% for a target depth\n• Consumption - Gas usage estimation\n• Rock Bottom - Emergency reserve calculation'**
-  String get tools_gas_description;
-
-  /// No description provided for @tools_gas_subtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'MOD, Best Mix, Consumption, Rock Bottom'**
-  String get tools_gas_subtitle;
-
-  /// No description provided for @tools_gas_title.
-  ///
-  /// In en, this message translates to:
-  /// **'Gas Calculators'**
-  String get tools_gas_title;
-
   /// No description provided for @tools_gpsLogger_description.
   ///
   /// In en, this message translates to:
@@ -33444,12 +33564,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'GPS Logger'**
   String get tools_gpsLogger_title;
-
-  /// No description provided for @tools_title.
-  ///
-  /// In en, this message translates to:
-  /// **'Tools'**
-  String get tools_title;
 
   /// No description provided for @tools_weight_aluminumImperial.
   ///
@@ -33480,12 +33594,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Very buoyant (+3 kg)'**
   String get tools_weight_carbonFiberMetric;
-
-  /// No description provided for @tools_weight_description.
-  ///
-  /// In en, this message translates to:
-  /// **'Estimate the weight you need based on your exposure suit, tank material, water type, and body weight.'**
-  String get tools_weight_description;
 
   /// No description provided for @tools_weight_disclaimer.
   ///
@@ -33546,12 +33654,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Negatively buoyant (-2 kg)'**
   String get tools_weight_steelMetric;
-
-  /// No description provided for @tools_weight_subtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Recommended weight for your setup'**
-  String get tools_weight_subtitle;
 
   /// No description provided for @tools_weight_tankMaterial.
   ///
@@ -35295,6 +35397,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Markers'**
   String get dive3d_overlay_markers;
+
+  /// No description provided for @dive3d_seascape_overlay_paths.
+  ///
+  /// In en, this message translates to:
+  /// **'Dive paths'**
+  String get dive3d_seascape_overlay_paths;
+
+  /// No description provided for @dive3d_seascape_siteTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Site Seascape'**
+  String get dive3d_seascape_siteTitle;
+
+  /// No description provided for @dive3d_seascape_seafloorSource.
+  ///
+  /// In en, this message translates to:
+  /// **'Seafloor: {source} (~{resolution} m)'**
+  String dive3d_seascape_seafloorSource(String source, String resolution);
+
+  /// No description provided for @dive3d_seascape_noCoordinates.
+  ///
+  /// In en, this message translates to:
+  /// **'This site has no GPS coordinates'**
+  String get dive3d_seascape_noCoordinates;
+
+  /// No description provided for @dive3d_seascape_noData.
+  ///
+  /// In en, this message translates to:
+  /// **'No bathymetry available for this location'**
+  String get dive3d_seascape_noData;
+
+  /// No description provided for @dive3d_seascape_axis_distance.
+  ///
+  /// In en, this message translates to:
+  /// **'Distance ({unitSymbol})'**
+  String dive3d_seascape_axis_distance(String unitSymbol);
+
+  /// No description provided for @settings_about_bathymetryCredit.
+  ///
+  /// In en, this message translates to:
+  /// **'Bathymetry data: GMRT (CC BY 4.0) · EMODnet Bathymetry (CC BY 4.0) · NOAA ETOPO 2022'**
+  String get settings_about_bathymetryCredit;
 
   /// No description provided for @dive3d_metric_depth.
   ///
@@ -37569,6 +37713,210 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'This device cannot compress video. Originals are uploaded from it.'**
   String get settings_mediaStorage_quality_noTranscoderHint;
+
+  /// No description provided for @reef_section_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Reef'**
+  String get reef_section_title;
+
+  /// No description provided for @reef_section_sourcesTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Data sources'**
+  String get reef_section_sourcesTooltip;
+
+  /// No description provided for @reef_section_loadError.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load reef data right now'**
+  String get reef_section_loadError;
+
+  /// No description provided for @reef_habitat_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Reef habitat'**
+  String get reef_habitat_title;
+
+  /// No description provided for @reef_habitat_onReef.
+  ///
+  /// In en, this message translates to:
+  /// **'On a coral reef'**
+  String get reef_habitat_onReef;
+
+  /// No description provided for @reef_habitat_onReefWithThreat.
+  ///
+  /// In en, this message translates to:
+  /// **'On a coral reef, threat level {threat}'**
+  String reef_habitat_onReefWithThreat(String threat);
+
+  /// No description provided for @reef_habitat_noReef.
+  ///
+  /// In en, this message translates to:
+  /// **'No mapped coral reef at this location'**
+  String get reef_habitat_noReef;
+
+  /// No description provided for @reef_habitat_unavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not check reef habitat right now'**
+  String get reef_habitat_unavailable;
+
+  /// No description provided for @reef_health_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Reef health'**
+  String get reef_health_title;
+
+  /// No description provided for @reef_health_unavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not check reef health right now'**
+  String get reef_health_unavailable;
+
+  /// No description provided for @reef_health_noData.
+  ///
+  /// In en, this message translates to:
+  /// **'No reef health data for this location'**
+  String get reef_health_noData;
+
+  /// No description provided for @reef_health_degreeHeatingWeeks.
+  ///
+  /// In en, this message translates to:
+  /// **'Degree Heating Weeks {value} C-weeks'**
+  String reef_health_degreeHeatingWeeks(String value);
+
+  /// No description provided for @reef_health_seaSurface.
+  ///
+  /// In en, this message translates to:
+  /// **'Sea surface {value}'**
+  String reef_health_seaSurface(String value);
+
+  /// No description provided for @reef_health_asOf.
+  ///
+  /// In en, this message translates to:
+  /// **'As of {date}'**
+  String reef_health_asOf(String date);
+
+  /// No description provided for @reef_health_levelNoStress.
+  ///
+  /// In en, this message translates to:
+  /// **'No thermal stress'**
+  String get reef_health_levelNoStress;
+
+  /// No description provided for @reef_health_levelWatch.
+  ///
+  /// In en, this message translates to:
+  /// **'Bleaching watch'**
+  String get reef_health_levelWatch;
+
+  /// No description provided for @reef_health_levelWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'Bleaching warning'**
+  String get reef_health_levelWarning;
+
+  /// No description provided for @reef_health_levelAlert1.
+  ///
+  /// In en, this message translates to:
+  /// **'Bleaching alert level 1'**
+  String get reef_health_levelAlert1;
+
+  /// No description provided for @reef_health_levelAlert2.
+  ///
+  /// In en, this message translates to:
+  /// **'Bleaching alert level 2'**
+  String get reef_health_levelAlert2;
+
+  /// No description provided for @reef_health_levelAlert3.
+  ///
+  /// In en, this message translates to:
+  /// **'Bleaching alert level 3'**
+  String get reef_health_levelAlert3;
+
+  /// No description provided for @reef_health_levelAlert4.
+  ///
+  /// In en, this message translates to:
+  /// **'Bleaching alert level 4'**
+  String get reef_health_levelAlert4;
+
+  /// No description provided for @reef_health_levelAlert5.
+  ///
+  /// In en, this message translates to:
+  /// **'Bleaching alert level 5'**
+  String get reef_health_levelAlert5;
+
+  /// No description provided for @reef_protection_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Protected area'**
+  String get reef_protection_title;
+
+  /// No description provided for @reef_protection_none.
+  ///
+  /// In en, this message translates to:
+  /// **'Not in a marine protected area'**
+  String get reef_protection_none;
+
+  /// No description provided for @reef_protection_unavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not check protected status right now'**
+  String get reef_protection_unavailable;
+
+  /// No description provided for @reef_protection_viewRegulations.
+  ///
+  /// In en, this message translates to:
+  /// **'View regulations'**
+  String get reef_protection_viewRegulations;
+
+  /// No description provided for @reef_protection_iucn.
+  ///
+  /// In en, this message translates to:
+  /// **'IUCN {category}'**
+  String reef_protection_iucn(String category);
+
+  /// No description provided for @reef_species_recordedNearby.
+  ///
+  /// In en, this message translates to:
+  /// **'Recorded nearby'**
+  String get reef_species_recordedNearby;
+
+  /// No description provided for @reef_species_addToExpected.
+  ///
+  /// In en, this message translates to:
+  /// **'Add to expected species'**
+  String get reef_species_addToExpected;
+
+  /// No description provided for @reef_attribution_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Reef data sources'**
+  String get reef_attribution_title;
+
+  /// No description provided for @reef_attribution_wri.
+  ///
+  /// In en, this message translates to:
+  /// **'Reef presence and threat level. CC BY 3.0.'**
+  String get reef_attribution_wri;
+
+  /// No description provided for @reef_attribution_noaa.
+  ///
+  /// In en, this message translates to:
+  /// **'Sea surface temperature and bleaching heat stress. Public domain.'**
+  String get reef_attribution_noaa;
+
+  /// No description provided for @reef_attribution_gbif.
+  ///
+  /// In en, this message translates to:
+  /// **'Species occurrence records, filtered to CC0 and CC BY 4.0.'**
+  String get reef_attribution_gbif;
+
+  /// No description provided for @reef_attribution_protectedSeas.
+  ///
+  /// In en, this message translates to:
+  /// **'Marine protected area boundaries. CC BY 4.0.'**
+  String get reef_attribution_protectedSeas;
 }
 
 class _AppLocalizationsDelegate

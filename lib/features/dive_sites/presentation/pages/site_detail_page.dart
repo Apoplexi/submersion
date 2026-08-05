@@ -10,6 +10,7 @@ import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/dive_3d/application/career_providers.dart';
 import 'package:submersion/features/dive_3d/presentation/pages/career_terrain_page.dart';
+import 'package:submersion/features/dive_3d/presentation/pages/site_seascape_page.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_providers.dart';
 import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
 import 'package:submersion/features/dive_sites/presentation/providers/site_providers.dart';
@@ -20,6 +21,7 @@ import 'package:submersion/features/maps/presentation/widgets/map_attribution.da
 import 'package:submersion/features/maps/presentation/widgets/trackpad_zoom_map.dart';
 import 'package:submersion/features/marine_life/presentation/widgets/site_marine_life_section.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
+import 'package:submersion/features/reef/presentation/widgets/reef_section.dart';
 import 'package:submersion/features/tides/presentation/widgets/tide_section.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:submersion/shared/widgets/master_detail/detail_scroll_retainer.dart';
@@ -196,8 +198,14 @@ class _SiteDetailContentState extends ConsumerState<_SiteDetailContent> {
             const SizedBox(height: 16),
           ],
 
+          // Reef Section (only if site has coordinates)
+          if (site.hasCoordinates) ...[
+            ReefSection(location: site.location!),
+            const SizedBox(height: 16),
+          ],
+
           // Marine Life Section
-          SiteMarineLifeSection(siteId: site.id),
+          SiteMarineLifeSection(siteId: site.id, location: site.location),
           const SizedBox(height: 16),
 
           // Difficulty Section
@@ -242,6 +250,16 @@ class _SiteDetailContentState extends ConsumerState<_SiteDetailContent> {
       appBar: AppBar(
         title: Text(site.name),
         actions: [
+          if (site.hasCoordinates)
+            IconButton(
+              icon: const Icon(Icons.terrain),
+              tooltip: context.l10n.dive3d_seascape_siteTitle,
+              onPressed: () => Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (_) => SiteSeascapePage(siteId: siteId),
+                ),
+              ),
+            ),
           IconButton(
             icon: const Icon(Icons.view_in_ar),
             tooltip: context.l10n.dive3d_career_title,
@@ -321,6 +339,16 @@ class _SiteDetailContentState extends ConsumerState<_SiteDetailContent> {
               ],
             ),
           ),
+          if (site.hasCoordinates)
+            IconButton(
+              icon: const Icon(Icons.terrain, size: 20),
+              tooltip: context.l10n.dive3d_seascape_siteTitle,
+              onPressed: () => Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (_) => SiteSeascapePage(siteId: widget.siteId),
+                ),
+              ),
+            ),
           IconButton(
             icon: const Icon(Icons.edit, size: 20),
             tooltip: context.l10n.diveSites_detail_editTooltipShort,
