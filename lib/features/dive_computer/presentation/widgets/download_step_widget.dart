@@ -144,7 +144,15 @@ class _DownloadStepWidgetState extends ConsumerState<DownloadStepWidget> {
 
   @override
   Widget build(BuildContext context) {
-    if (_promptApplies && !_promptResolved) {
+    // The `_cutoff != null` check is a defensive belt-and-suspenders: the
+    // caller (DcAdapterDownloadStep) is expected to only ever construct
+    // this widget with a settled firstSyncCutoffDefault (see the comment
+    // there), so _promptApplies implies _cutoff != null in practice. But
+    // should a future caller pass a changing firstSyncCutoffDefault across
+    // rebuilds, this keeps `_cutoff!` in _buildCutoffPrompt from ever
+    // null-check-crashing instead of silently falling through to the
+    // normal (auto-starting) UI for that frame.
+    if (_promptApplies && !_promptResolved && _cutoff != null) {
       return _buildCutoffPrompt(context);
     }
 

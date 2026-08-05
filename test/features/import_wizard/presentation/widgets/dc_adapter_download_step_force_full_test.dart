@@ -35,6 +35,13 @@ Widget _buildDownloadStep({
       // Return an empty descriptor list so DcAdapterDownloadStep synthesizes
       // a DiscoveredDevice from the known computer's bluetoothAddress.
       deviceDescriptorsProvider.overrideWith((ref) async => []),
+      // These tests exercise a computer with no stored fingerprint, so
+      // DcAdapterDownloadStep waits on this provider before constructing
+      // DownloadStepWidget (see the comment at its call site). Override it
+      // rather than hitting the real Drift-backed provider, which has no
+      // database in this test and would leave the widget on its loading
+      // spinner forever.
+      firstSyncCutoffDefaultProvider.overrideWith((ref) async => null),
     ],
     child: MaterialApp(
       localizationsDelegates: AppLocalizations.localizationsDelegates,
@@ -80,6 +87,12 @@ void main() {
           knownComputer: computer,
         ),
       );
+      // Two async gates settle in sequence before DownloadStepWidget is
+      // constructed: deviceDescriptorsProvider (synthesizing a device from
+      // the known computer), then firstSyncCutoffDefaultProvider (only
+      // watched when this computer has no stored fingerprint). Each
+      // resolution triggers a rebuild on its own frame.
+      await tester.pump();
       await tester.pump();
 
       final step = tester.widget<DownloadStepWidget>(
@@ -109,6 +122,12 @@ void main() {
           knownComputer: computer,
         ),
       );
+      // Two async gates settle in sequence before DownloadStepWidget is
+      // constructed: deviceDescriptorsProvider (synthesizing a device from
+      // the known computer), then firstSyncCutoffDefaultProvider (only
+      // watched when this computer has no stored fingerprint). Each
+      // resolution triggers a rebuild on its own frame.
+      await tester.pump();
       await tester.pump();
 
       final step = tester.widget<DownloadStepWidget>(
