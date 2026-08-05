@@ -5128,6 +5128,11 @@ class SyncDataSerializer {
       // Theme
       'themeMode': 'system',
       'themePreset': 'submersion',
+      // Color accents. Non-nullable bools added in v135; seed payloads
+      // predating the columns so fromJson hydrates instead of throwing.
+      'accentNavIcons': false,
+      'accentSectionHeaders': false,
+      'accentListIcons': false,
       // Locale (language preference: 'system', 'en', 'es', 'fr', etc.)
       'locale': 'system',
       // Defaults
