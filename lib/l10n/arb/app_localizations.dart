@@ -17427,6 +17427,12 @@ abstract class AppLocalizations {
   /// **'{remaining} of {total} dives left'**
   String equipment_serviceClocks_divesLeft(int remaining, int total);
 
+  /// No description provided for @equipment_serviceClocks_hoursSource.
+  ///
+  /// In en, this message translates to:
+  /// **'Counted from logged dive time'**
+  String get equipment_serviceClocks_hoursSource;
+
   /// No description provided for @equipment_serviceClocks_hoursLeft.
   ///
   /// In en, this message translates to:

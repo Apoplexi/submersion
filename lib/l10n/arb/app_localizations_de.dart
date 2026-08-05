@@ -10189,6 +10189,10 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get equipment_serviceClocks_hoursSource =>
+      'Aus der protokollierten Tauchzeit berechnet';
+
+  @override
   String equipment_serviceClocks_hoursLeft(String remaining, String total) {
     return '$remaining von $total Stunden übrig';
   }

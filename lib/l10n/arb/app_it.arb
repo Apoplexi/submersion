@@ -3146,6 +3146,7 @@
   "equipment_serviceClocks_overdueSince": "In ritardo dal {date}",
   "equipment_serviceClocks_overdue": "In ritardo",
   "equipment_serviceClocks_divesLeft": "{remaining} immersioni rimanenti su {total}",
+  "equipment_serviceClocks_hoursSource": "Calcolato dal tempo di immersione registrato",
   "equipment_serviceClocks_hoursLeft": "{remaining} ore rimanenti su {total}",
   "equipment_serviceClocks_manageKinds": "Gestisci tipi di manutenzione",
   "equipment_serviceClocks_appliesToClock": "Si applica alla scadenza",

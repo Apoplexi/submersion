@@ -10036,6 +10036,10 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get equipment_serviceClocks_hoursSource =>
+      'Counted from logged dive time';
+
+  @override
   String equipment_serviceClocks_hoursLeft(String remaining, String total) {
     return '$remaining of $total hours left';
   }

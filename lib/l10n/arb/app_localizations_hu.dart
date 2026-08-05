@@ -10168,6 +10168,10 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String get equipment_serviceClocks_hoursSource =>
+      'A naplózott merülési idő alapján számolva';
+
+  @override
   String equipment_serviceClocks_hoursLeft(String remaining, String total) {
     return '$remaining / $total óra van hátra';
   }

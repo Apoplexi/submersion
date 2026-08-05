@@ -3360,6 +3360,7 @@
   "equipment_serviceClocks_overdueSince": "自 {date} 起逾期",
   "equipment_serviceClocks_overdue": "已逾期",
   "equipment_serviceClocks_divesLeft": "剩余 {remaining}/{total} 次潜水",
+  "equipment_serviceClocks_hoursSource": "根据已记录的潜水时间计算",
   "equipment_serviceClocks_hoursLeft": "剩余 {remaining}/{total} 小时",
   "equipment_serviceClocks_manageKinds": "管理维护类型",
   "equipment_serviceClocks_appliesToClock": "适用的倒计时",

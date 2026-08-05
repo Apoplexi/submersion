@@ -3146,6 +3146,7 @@
   "equipment_serviceClocks_overdueSince": "En retard depuis le {date}",
   "equipment_serviceClocks_overdue": "En retard",
   "equipment_serviceClocks_divesLeft": "{remaining} plongées restantes sur {total}",
+  "equipment_serviceClocks_hoursSource": "Calculé à partir du temps de plongée enregistré",
   "equipment_serviceClocks_hoursLeft": "{remaining} heures restantes sur {total}",
   "equipment_serviceClocks_manageKinds": "Gérer les types d'entretien",
   "equipment_serviceClocks_appliesToClock": "S'applique au compteur",

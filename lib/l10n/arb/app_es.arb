@@ -3218,6 +3218,7 @@
   "equipment_serviceClocks_overdueSince": "Vencido desde el {date}",
   "equipment_serviceClocks_overdue": "Vencido",
   "equipment_serviceClocks_divesLeft": "Quedan {remaining} de {total} inmersiones",
+  "equipment_serviceClocks_hoursSource": "Calculado a partir del tiempo de buceo registrado",
   "equipment_serviceClocks_hoursLeft": "Quedan {remaining} de {total} horas",
   "equipment_serviceClocks_manageKinds": "Gestionar tipos de mantenimiento",
   "equipment_serviceClocks_appliesToClock": "Se aplica al intervalo",

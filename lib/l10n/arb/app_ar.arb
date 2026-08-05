@@ -3218,6 +3218,7 @@
   "equipment_serviceClocks_overdueSince": "متأخر منذ {date}",
   "equipment_serviceClocks_overdue": "متأخر",
   "equipment_serviceClocks_divesLeft": "متبقٍ {remaining} من {total} غوصة",
+  "equipment_serviceClocks_hoursSource": "محسوب من زمن الغوص المسجل",
   "equipment_serviceClocks_hoursLeft": "متبقٍ {remaining} من {total} ساعة",
   "equipment_serviceClocks_manageKinds": "إدارة أنواع الصيانة",
   "equipment_serviceClocks_appliesToClock": "ينطبق على العداد",

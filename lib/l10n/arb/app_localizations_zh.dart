@@ -9748,6 +9748,9 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get equipment_serviceClocks_hoursSource => '根据已记录的潜水时间计算';
+
+  @override
   String equipment_serviceClocks_hoursLeft(String remaining, String total) {
     return '剩余 $remaining/$total 小时';
   }

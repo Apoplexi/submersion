@@ -3218,6 +3218,7 @@
   "equipment_serviceClocks_overdueSince": "Atrasado desde {date}",
   "equipment_serviceClocks_overdue": "Atrasado",
   "equipment_serviceClocks_divesLeft": "Restam {remaining} de {total} mergulhos",
+  "equipment_serviceClocks_hoursSource": "Calculado a partir do tempo de mergulho registado",
   "equipment_serviceClocks_hoursLeft": "Restam {remaining} de {total} horas",
   "equipment_serviceClocks_manageKinds": "Gerenciar tipos de manutenção",
   "equipment_serviceClocks_appliesToClock": "Aplica-se ao prazo",

@@ -9957,6 +9957,9 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
+  String get equipment_serviceClocks_hoursSource => 'מחושב מזמן הצלילה המתועד';
+
+  @override
   String equipment_serviceClocks_hoursLeft(String remaining, String total) {
     return 'נותרו $remaining מתוך $total שעות';
   }

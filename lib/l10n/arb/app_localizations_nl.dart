@@ -10115,6 +10115,10 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String get equipment_serviceClocks_hoursSource =>
+      'Berekend op basis van geregistreerde duiktijd';
+
+  @override
   String equipment_serviceClocks_hoursLeft(String remaining, String total) {
     return '$remaining van $total uur resterend';
   }

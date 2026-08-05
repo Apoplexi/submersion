@@ -3146,6 +3146,7 @@
   "equipment_serviceClocks_overdueSince": "{date} óta esedékes",
   "equipment_serviceClocks_overdue": "Lejárt",
   "equipment_serviceClocks_divesLeft": "{remaining} / {total} merülés van hátra",
+  "equipment_serviceClocks_hoursSource": "A naplózott merülési idő alapján számolva",
   "equipment_serviceClocks_hoursLeft": "{remaining} / {total} óra van hátra",
   "equipment_serviceClocks_manageKinds": "Szerviztípusok kezelése",
   "equipment_serviceClocks_appliesToClock": "Kapcsolódó intervallum",

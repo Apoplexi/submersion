@@ -10015,6 +10015,9 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String get equipment_serviceClocks_hoursSource => 'محسوب من زمن الغوص المسجل';
+
+  @override
   String equipment_serviceClocks_hoursLeft(String remaining, String total) {
     return 'متبقٍ $remaining من $total ساعة';
   }
