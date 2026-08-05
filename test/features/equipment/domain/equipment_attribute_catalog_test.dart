@@ -122,4 +122,10 @@ void main() {
     expect(isValidThicknessDesignation('thin'), isFalse);
     expect(isValidThicknessDesignation('abc'), isFalse);
   });
+
+  test('rebreather is a distinct equipment type with a stable name', () {
+    expect(EquipmentType.values, contains(EquipmentType.rebreather));
+    expect(EquipmentType.rebreather.name, 'rebreather');
+    expect(EquipmentType.rebreather.displayName, 'Rebreather');
+  });
 }

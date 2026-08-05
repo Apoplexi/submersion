@@ -2959,6 +2959,11 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
         return Icons.face;
       case EquipmentType.tank:
         return MdiIcons.divingScubaTank;
+      // A closed circuit recycles the breathing loop; the vendored MdiIcons
+      // subset has no rebreather glyph, and the tank glyph already means
+      // "tank".
+      case EquipmentType.rebreather:
+        return Icons.recycling;
       case EquipmentType.transmitter:
         return Icons.sensors;
       case EquipmentType.weights:

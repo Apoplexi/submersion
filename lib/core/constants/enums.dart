@@ -11,6 +11,7 @@ enum EquipmentType {
   computer('Dive Computer'),
   transmitter('Transmitter'),
   tank('Tank'),
+  rebreather('Rebreather'),
   weights('Weights'),
   light('Light'),
   camera('Camera'),
