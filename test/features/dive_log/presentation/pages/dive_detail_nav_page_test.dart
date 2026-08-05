@@ -35,9 +35,11 @@ Future<List<String>> _pumpNav(
         path: '/dives/:id',
         builder: (context, state) {
           locations.add(state.uri.toString());
+          // A detail path is always a standalone page, so pushing one from
+          // the embedded pane exercises the master-detail redirect guard.
           return DiveDetailPage(
             diveId: state.pathParameters['id']!,
-            embedded: embedded,
+            embedded: false,
           );
         },
       ),
@@ -63,6 +65,7 @@ Future<List<String>> _pumpNav(
       child: MediaQuery(
         data: MediaQueryData(size: size),
         child: MaterialApp.router(
+          locale: const Locale('en'),
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
           routerConfig: router,
@@ -116,7 +119,7 @@ void main() {
   testWidgets('standalone wide: a plain detail path redirects into the pane', (
     tester,
   ) async {
-    // Baseline for the fullpage case below: at master-detail width a
+    // Baseline for the menu case below: at master-detail width a root-level
     // standalone /dives/:id bounces into /dives?selected=:id.
     final locations = await _pumpNav(
       tester,
@@ -128,19 +131,31 @@ void main() {
     expect(locations.last, '/dives?selected=b');
   });
 
-  testWidgets('standalone wide: ?fullpage=1 opens full page without redirect', (
+  testWidgets('embedded wide: Open Full Page pushes a standalone page', (
     tester,
   ) async {
-    // "Open Full Page" navigates with ?fullpage=1; the page must not redirect
-    // itself straight back into the master-detail pane.
+    // "Open Full Page" must push (not go) so the pushed page can pop back
+    // and skips the master-detail redirect instead of bouncing straight
+    // back into the pane it was opened from (PR #802).
     final locations = await _pumpNav(
       tester,
-      embedded: false,
+      embedded: true,
       size: const Size(1200, 800),
-      initialLocation: '/dives/b?fullpage=1',
     );
 
-    expect(locations.where((l) => l.contains('selected=')), isEmpty);
-    expect(locations.last, '/dives/b?fullpage=1');
+    await tester.tap(find.byIcon(Icons.more_vert));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Open Full Page'));
+    await tester.pump();
+    await tester.pump(const Duration(seconds: 1));
+
+    // The pane route below rebuilds when the menu closes, so assert on
+    // membership rather than ordering.
+    expect(locations, contains('/dives/b'));
+    expect(
+      locations.where((l) => l.contains('selected=')),
+      isEmpty,
+      reason: 'the full page must not redirect back into the pane',
+    );
   });
 }
