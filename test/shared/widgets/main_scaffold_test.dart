@@ -82,6 +82,9 @@ Future<Widget> _buildTestApp({
     child: MaterialApp.router(
       routerConfig: router,
       theme: theme,
+      // Pin the locale: these tests find widgets by English label, and
+      // flutter_test forwards the host platform locales.
+      locale: const Locale('en'),
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
     ),
@@ -351,6 +354,7 @@ void main() {
         ],
         child: MaterialApp.router(
           routerConfig: router,
+          locale: const Locale('en'),
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
         ),

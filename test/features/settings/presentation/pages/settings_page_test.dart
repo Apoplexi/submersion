@@ -515,7 +515,9 @@ void main() {
       child: ProviderScope(
         overrides: getOverrides(),
         child: MaterialApp(
-          locale: locale,
+          // Default to English: tests find widgets by label, and flutter_test
+          // forwards the host platform locales when locale is null.
+          locale: locale ?? const Locale('en'),
           theme: theme,
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
@@ -713,6 +715,7 @@ void main() {
           child: ProviderScope(
             overrides: overrides,
             child: const MaterialApp(
+              locale: Locale('en'),
               localizationsDelegates: AppLocalizations.localizationsDelegates,
               supportedLocales: AppLocalizations.supportedLocales,
               home: SettingsPage(),
@@ -782,6 +785,7 @@ void main() {
           child: ProviderScope(
             overrides: overrides,
             child: const MaterialApp(
+              locale: Locale('en'),
               localizationsDelegates: AppLocalizations.localizationsDelegates,
               supportedLocales: AppLocalizations.supportedLocales,
               home: SettingsPage(),
