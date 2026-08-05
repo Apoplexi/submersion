@@ -128,4 +128,55 @@ void main() {
     expect(EquipmentType.rebreather.name, 'rebreather');
     expect(EquipmentType.rebreather.displayName, 'Rebreather');
   });
+
+  group('rebreather attributes', () {
+    test('exposes the curated rebreather keys plus the universal ones', () {
+      final keys = EquipmentAttributeCatalog.attributesFor(
+        EquipmentType.rebreather,
+      ).map((d) => d.key).toList();
+
+      expect(keys, [
+        'unit_type',
+        'mount_configuration',
+        'scrubber_type',
+        'scrubber_duration_h',
+        'o2_cell_count',
+        'diluent_cylinder_l',
+        'o2_cylinder_l',
+        'depth_rating_m',
+        'buoyancy_kg',
+        'dry_weight_kg',
+      ]);
+    });
+
+    test('unit_type covers both CCR and SCR variants', () {
+      final def = EquipmentAttributeCatalog.defFor('unit_type');
+      expect(def, isNotNull);
+      expect(def!.kind, AttributeKind.choice);
+      expect(def.choiceKeys, [
+        'eccr',
+        'mccr',
+        'hccr',
+        'scr_cmf',
+        'scr_pascr',
+        'scr_escr',
+      ]);
+    });
+
+    test('onboard cylinder attributes carry the volume dimension', () {
+      for (final key in ['diluent_cylinder_l', 'o2_cylinder_l']) {
+        final def = EquipmentAttributeCatalog.defFor(key);
+        expect(def, isNotNull, reason: key);
+        expect(def!.kind, AttributeKind.number, reason: key);
+        expect(def.dimension, AttributeDimension.volumeL, reason: key);
+      }
+    });
+
+    test('scrubber duration is dimensionless hours, not a unit-converted '
+        'quantity', () {
+      final def = EquipmentAttributeCatalog.defFor('scrubber_duration_h');
+      expect(def!.kind, AttributeKind.number);
+      expect(def.dimension, AttributeDimension.none);
+    });
+  });
 }
