@@ -8290,6 +8290,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get diveSites_list_menu_import => 'Import';
 
   @override
+  String get diveSites_list_menu_select => 'Select sites';
+
+  @override
   String get diveSites_list_search_backTooltip => 'Back';
 
   @override
@@ -16239,6 +16242,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String get importWizard_tagsLabel => 'Tags';
 
   @override
+  String importWizard_review_olderDivesSkipped(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count older dives skipped — already in your log',
+      one: '1 older dive skipped — already in your log',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get tags_hint_addTags => 'Add tags...';
 
   @override
@@ -16587,6 +16601,50 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get transfer_computers_noComputersSaved => 'No computers saved';
+
+  @override
+  String transfer_computers_diveCount(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count dives',
+      one: '1 dive',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get transfer_computers_downloadTooltip => 'Download dives';
+
+  @override
+  String get transfer_computers_knownComputersHeader => 'Known Computers';
+
+  @override
+  String transfer_computers_lastDownloadDaysAgo(int days) {
+    return '$days days ago';
+  }
+
+  @override
+  String transfer_computers_lastDownloadHoursAgo(int hours) {
+    String _temp0 = intl.Intl.pluralLogic(
+      hours,
+      locale: localeName,
+      other: '$hours hours ago',
+      one: '1 hour ago',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String transfer_computers_lastDownloadMinutesAgo(int minutes) {
+    return '$minutes min ago';
+  }
+
+  @override
+  String get transfer_computers_lastDownloadNever => 'Never';
+
+  @override
+  String get transfer_computers_lastDownloadYesterday => 'Yesterday';
 
   @override
   String transfer_computers_savedCount(int count) {
@@ -18381,7 +18439,13 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get diveComputer_downloadStep_downloadAll => 'Download all dives';
+
+  @override
   String get diveComputer_downloadStep_downloadFailed => 'Download failed';
+
+  @override
+  String get diveComputer_downloadStep_downloadNew => 'Download new dives';
 
   @override
   String get diveComputer_downloadStep_downloadedDives => 'Downloaded Dives';
@@ -18397,6 +18461,19 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String diveComputer_downloadStep_errorSemanticLabel(Object error) {
     return 'Download error: $error';
+  }
+
+  @override
+  String get diveComputer_downloadStep_firstSyncBody =>
+      'Your logbook already has dives. You can skip downloading dives you already have.';
+
+  @override
+  String get diveComputer_downloadStep_firstSyncTitle =>
+      'First download from this computer';
+
+  @override
+  String diveComputer_downloadStep_onlyAfterDate(String date) {
+    return 'Only download dives after $date';
   }
 
   @override
@@ -20172,6 +20249,31 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settings_appearance_sections => 'Sections';
+
+  @override
+  String get settings_appearance_colorAccents => 'Color accents';
+
+  @override
+  String get settings_appearance_accentNavIcons => 'Colored navigation icons';
+
+  @override
+  String get settings_appearance_accentNavIcons_subtitle =>
+      'Tint main menu icons with each feature\'s color';
+
+  @override
+  String get settings_appearance_accentSectionHeaders =>
+      'Colored section headers';
+
+  @override
+  String get settings_appearance_accentSectionHeaders_subtitle =>
+      'Show a colored feature icon next to page titles';
+
+  @override
+  String get settings_appearance_accentListIcons => 'Colored list icons';
+
+  @override
+  String get settings_appearance_accentListIcons_subtitle =>
+      'Tint icons in lists and settings pages';
 
   @override
   String get settings_appearance_showDetailsPane => 'Show Details Pane';

@@ -84,12 +84,21 @@ class EntityReviewList extends StatelessWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
-    final nonDuplicateIndices = _nonDuplicateIndices();
-    final likelyDuplicateIndices = _sortedDuplicateIndices(minScore: 0.7);
+    final autoSkipIndices = group.autoSkipIndices ?? const <int>{};
+
+    final nonDuplicateIndices = _nonDuplicateIndices()
+        .where((i) => !autoSkipIndices.contains(i))
+        .toList();
+    final likelyDuplicateIndices = _sortedDuplicateIndices(
+      minScore: 0.7,
+    ).where((i) => !autoSkipIndices.contains(i)).toList();
     final possibleDuplicateIndices = _sortedDuplicateIndices(
       minScore: 0.5,
       maxScore: 0.7,
-    );
+    ).where((i) => !autoSkipIndices.contains(i)).toList();
+    final unscoredDuplicateIndices = _unscoredDuplicateIndices()
+        .where((i) => !autoSkipIndices.contains(i))
+        .toList();
 
     final totalItems = group.items.length;
     final duplicateCount = group.duplicateIndices.length;
@@ -168,12 +177,12 @@ class EntityReviewList extends StatelessWidget {
         ],
 
         // Unscored duplicates (non-dive entities without matchResults)
-        if (_unscoredDuplicateIndices().isNotEmpty) ...[
+        if (unscoredDuplicateIndices.isNotEmpty) ...[
           _SectionLabel(
             label: 'Potential Duplicates',
             color: colorScheme.error,
           ),
-          for (final index in _unscoredDuplicateIndices())
+          for (final index in unscoredDuplicateIndices)
             _buildEntityDuplicateCard(index),
         ],
 
@@ -189,7 +198,62 @@ class EntityReviewList extends StatelessWidget {
               projectedDiveNumber: projectedDiveNumbers?[index],
             ),
         ],
+
+        // Auto-skipped items (e.g. dives at or before the diver's first-sync
+        // cutoff): collapsed by default behind a single summary row so a
+        // long tail of already-logged dives doesn't bury the rows that need
+        // attention. Expanding reveals each item via the same row widget
+        // used above, so action changes keep working unchanged.
+        if (autoSkipIndices.isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+            child: Card(
+              margin: EdgeInsets.zero,
+              clipBehavior: Clip.antiAlias,
+              child: ExpansionTile(
+                leading: const Icon(Icons.history),
+                title: Text(
+                  context.l10n.importWizard_review_olderDivesSkipped(
+                    autoSkipIndices.length,
+                  ),
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                  ),
+                ),
+                children: [
+                  for (final index in autoSkipIndices.toList()..sort())
+                    _buildRowForIndex(index),
+                ],
+              ),
+            ),
+          ),
       ],
+    );
+  }
+
+  /// Builds the appropriate row widget for a single item [index], reusing
+  /// the exact same per-item widgets the main list sections use above.
+  ///
+  /// Dispatches by data shape rather than by list membership so it works
+  /// identically whether called from the main sections or from inside the
+  /// auto-skipped summary's [ExpansionTile]: scored dive duplicates render
+  /// as a [DuplicateActionCard], unscored entity duplicates render as an
+  /// [_EntityDuplicateCard], and everything else renders as a
+  /// [_NonDuplicateRow].
+  Widget _buildRowForIndex(int index) {
+    if (group.duplicateIndices.contains(index)) {
+      final matchResults = group.matchResults;
+      if (matchResults != null && matchResults[index] != null) {
+        return _buildDuplicateCard(index);
+      }
+      return _buildEntityDuplicateCard(index);
+    }
+    return _NonDuplicateRow(
+      item: group.items[index],
+      index: index,
+      isSelected: selectedIndices.contains(index),
+      onToggle: () => onToggleSelection(index),
+      projectedDiveNumber: projectedDiveNumbers?[index],
     );
   }
 

@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:submersion/core/theme/feature_accent_colors.dart';
 import 'package:submersion/features/dive_log/domain/entities/safety_finding.dart';
 import 'package:submersion/features/safety/domain/services/no_fly_service.dart';
 import 'package:go_router/go_router.dart';
@@ -41,6 +42,18 @@ class _MockSettingsNotifier extends StateNotifier<AppSettings>
     implements SettingsNotifier {
   _MockSettingsNotifier([AppSettings? initial])
     : super(initial ?? const AppSettings());
+
+  @override
+  Future<void> setAccentNavIcons(bool value) async =>
+      state = state.copyWith(accentNavIcons: value);
+
+  @override
+  Future<void> setAccentSectionHeaders(bool value) async =>
+      state = state.copyWith(accentSectionHeaders: value);
+
+  @override
+  Future<void> setAccentListIcons(bool value) async =>
+      state = state.copyWith(accentListIcons: value);
 
   @override
   Future<void> setChamberHidden(String chamberId, bool hidden) async {
@@ -496,13 +509,16 @@ void main() {
   /// Builds a test widget with mobile screen size to avoid MasterDetailScaffold
   /// which requires GoRouter. The SettingsPage uses MasterDetailScaffold on
   /// desktop (>=800px) which calls GoRouterState.of(context).
-  Widget buildTestWidget(Widget child, {Locale? locale}) {
+  Widget buildTestWidget(Widget child, {Locale? locale, ThemeData? theme}) {
     return MediaQuery(
       data: const MediaQueryData(size: Size(400, 800)),
       child: ProviderScope(
         overrides: getOverrides(),
         child: MaterialApp(
-          locale: locale,
+          // Default to English: tests find widgets by label, and flutter_test
+          // forwards the host platform locales when locale is null.
+          locale: locale ?? const Locale('en'),
+          theme: theme,
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
           home: child,
@@ -510,6 +526,44 @@ void main() {
       ),
     );
   }
+
+  group('SettingsPage section accent colors', () {
+    ThemeData accentTheme() => ThemeData(
+      brightness: Brightness.light,
+      extensions: const <ThemeExtension<dynamic>>[FeatureAccentColors.light],
+    );
+
+    testWidgets('section icons resolve from the accent palette', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        buildTestWidget(const SettingsPage(), theme: accentTheme()),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.scrollUntilVisible(find.text('Appearance'), 50.0);
+      await tester.pumpAndSettle();
+
+      final icon = tester.widget<Icon>(find.byIcon(Icons.palette));
+      expect(icon.color, FeatureAccentColors.light.of('settings-appearance'));
+    });
+
+    testWidgets('section icons fall back to primary without the extension', (
+      tester,
+    ) async {
+      final theme = ThemeData(brightness: Brightness.light);
+      await tester.pumpWidget(
+        buildTestWidget(const SettingsPage(), theme: theme),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.scrollUntilVisible(find.text('Appearance'), 50.0);
+      await tester.pumpAndSettle();
+
+      final icon = tester.widget<Icon>(find.byIcon(Icons.palette));
+      expect(icon.color, theme.colorScheme.primary);
+    });
+  });
 
   group('SettingsPage', () {
     testWidgets('should display Settings title in app bar', (tester) async {
@@ -661,6 +715,7 @@ void main() {
           child: ProviderScope(
             overrides: overrides,
             child: const MaterialApp(
+              locale: Locale('en'),
               localizationsDelegates: AppLocalizations.localizationsDelegates,
               supportedLocales: AppLocalizations.supportedLocales,
               home: SettingsPage(),
@@ -730,6 +785,7 @@ void main() {
           child: ProviderScope(
             overrides: overrides,
             child: const MaterialApp(
+              locale: Locale('en'),
               localizationsDelegates: AppLocalizations.localizationsDelegates,
               supportedLocales: AppLocalizations.supportedLocales,
               home: SettingsPage(),
@@ -1039,6 +1095,50 @@ void main() {
       );
     }
 
+    // The desktop master-detail pane renders _AppearanceSectionContent, a
+    // separate widget from AppearancePage. The color-accent toggles have to
+    // exist in both or they vanish on wide screens.
+    testWidgets('hub shows the three color accent toggles', (tester) async {
+      await tester.binding.setSurfaceSize(const Size(500, 4000));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+
+      await tester.pumpWidget(buildAppearanceWidget(getOverrides()));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Color accents'), findsOneWidget);
+      expect(find.text('Colored navigation icons'), findsOneWidget);
+      expect(find.text('Colored section headers'), findsOneWidget);
+      expect(find.text('Colored list icons'), findsOneWidget);
+
+      final switches = tester
+          .widgetList<SwitchListTile>(find.byType(SwitchListTile))
+          .toList();
+      expect(switches, hasLength(3));
+      expect(switches.every((s) => s.value == false), isTrue);
+    });
+
+    testWidgets('hub accent toggle flips only its own surface', (tester) async {
+      await tester.binding.setSurfaceSize(const Size(500, 4000));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+
+      await tester.pumpWidget(buildAppearanceWidget(getOverrides()));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Colored list icons'));
+      await tester.pumpAndSettle();
+
+      SwitchListTile tileFor(String title) => tester.widget<SwitchListTile>(
+        find.ancestor(
+          of: find.text(title),
+          matching: find.byType(SwitchListTile),
+        ),
+      );
+
+      expect(tileFor('Colored list icons').value, isTrue);
+      expect(tileFor('Colored navigation icons').value, isFalse);
+      expect(tileFor('Colored section headers').value, isFalse);
+    });
+
     testWidgets('tapping Home shows the home chip settings', (tester) async {
       await tester.pumpWidget(buildAppearanceWidget(getOverrides()));
       await tester.pumpAndSettle();
@@ -1058,6 +1158,11 @@ void main() {
     testWidgets('tapping a section entry shows section appearance sub-page', (
       tester,
     ) async {
+      // Tall surface so the Sections card is on-screen and tappable: the hub
+      // scrolls, and the color-accent card sits above it.
+      await tester.binding.setSurfaceSize(const Size(400, 4000));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+
       await tester.pumpWidget(buildAppearanceWidget(getOverrides()));
       await tester.pumpAndSettle();
 
@@ -1080,6 +1185,9 @@ void main() {
     testWidgets('navigating back from section appearance returns to hub', (
       tester,
     ) async {
+      await tester.binding.setSurfaceSize(const Size(400, 4000));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+
       await tester.pumpWidget(buildAppearanceWidget(getOverrides()));
       await tester.pumpAndSettle();
 

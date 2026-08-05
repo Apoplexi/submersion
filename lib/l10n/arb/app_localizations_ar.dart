@@ -8271,6 +8271,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get diveSites_list_menu_import => 'استيراد';
 
   @override
+  String get diveSites_list_menu_select => 'تحديد المواقع';
+
+  @override
   String get diveSites_list_search_backTooltip => 'رجوع';
 
   @override
@@ -16219,6 +16222,17 @@ class AppLocalizationsAr extends AppLocalizations {
   String get importWizard_tagsLabel => 'Tags';
 
   @override
+  String importWizard_review_olderDivesSkipped(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'تم تخطي $count غطسات أقدم — موجودة بالفعل في سجلك',
+      one: 'تم تخطي غطسة واحدة أقدم — موجودة بالفعل في سجلك',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get tags_hint_addTags => 'إضافة وسوم...';
 
   @override
@@ -16568,6 +16582,51 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get transfer_computers_noComputersSaved => 'لا توجد حواسيب محفوظة';
+
+  @override
+  String transfer_computers_diveCount(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count غوصات',
+      one: 'غوصة واحدة',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get transfer_computers_downloadTooltip => 'تنزيل الغوصات';
+
+  @override
+  String get transfer_computers_knownComputersHeader =>
+      'أجهزة الكمبيوتر المعروفة';
+
+  @override
+  String transfer_computers_lastDownloadDaysAgo(int days) {
+    return 'قبل $days أيام';
+  }
+
+  @override
+  String transfer_computers_lastDownloadHoursAgo(int hours) {
+    String _temp0 = intl.Intl.pluralLogic(
+      hours,
+      locale: localeName,
+      other: 'قبل $hours ساعات',
+      one: 'قبل ساعة',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String transfer_computers_lastDownloadMinutesAgo(int minutes) {
+    return 'قبل $minutes دقيقة';
+  }
+
+  @override
+  String get transfer_computers_lastDownloadNever => 'أبدًا';
+
+  @override
+  String get transfer_computers_lastDownloadYesterday => 'أمس';
 
   @override
   String transfer_computers_savedCount(int count) {
@@ -18358,7 +18417,13 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String get diveComputer_downloadStep_downloadAll => 'تنزيل جميع الغطسات';
+
+  @override
   String get diveComputer_downloadStep_downloadFailed => 'فشل التنزيل';
+
+  @override
+  String get diveComputer_downloadStep_downloadNew => 'تنزيل الغطسات الجديدة';
 
   @override
   String get diveComputer_downloadStep_downloadedDives => 'الغطسات المنزّلة';
@@ -18374,6 +18439,19 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String diveComputer_downloadStep_errorSemanticLabel(Object error) {
     return 'خطأ في التنزيل: $error';
+  }
+
+  @override
+  String get diveComputer_downloadStep_firstSyncBody =>
+      'يحتوي سجل الغطسات الخاص بك بالفعل على غطسات. يمكنك تخطي تنزيل الغطسات التي لديك بالفعل.';
+
+  @override
+  String get diveComputer_downloadStep_firstSyncTitle =>
+      'أول تنزيل من كمبيوتر الغوص هذا';
+
+  @override
+  String diveComputer_downloadStep_onlyAfterDate(String date) {
+    return 'تنزيل الغطسات بعد $date فقط';
   }
 
   @override
@@ -20152,6 +20230,30 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get settings_appearance_sections => 'الأقسام';
+
+  @override
+  String get settings_appearance_colorAccents => 'التمييز اللوني';
+
+  @override
+  String get settings_appearance_accentNavIcons => 'أيقونات تنقل ملونة';
+
+  @override
+  String get settings_appearance_accentNavIcons_subtitle =>
+      'تلوين أيقونات القائمة الرئيسية بلون كل قسم';
+
+  @override
+  String get settings_appearance_accentSectionHeaders => 'عناوين أقسام ملونة';
+
+  @override
+  String get settings_appearance_accentSectionHeaders_subtitle =>
+      'إظهار أيقونة قسم ملونة بجانب عناوين الصفحات';
+
+  @override
+  String get settings_appearance_accentListIcons => 'أيقونات قوائم ملونة';
+
+  @override
+  String get settings_appearance_accentListIcons_subtitle =>
+      'تلوين الأيقونات في القوائم وصفحات الإعدادات';
 
   @override
   String get settings_appearance_showDetailsPane => 'إظهار لوحة التفاصيل';

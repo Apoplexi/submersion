@@ -8409,6 +8409,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String get diveSites_list_menu_import => 'Importalas';
 
   @override
+  String get diveSites_list_menu_select => 'Merülőhelyek kiválasztása';
+
+  @override
   String get diveSites_list_search_backTooltip => 'Vissza';
 
   @override
@@ -16479,6 +16482,17 @@ class AppLocalizationsHu extends AppLocalizations {
   String get importWizard_tagsLabel => 'Tags';
 
   @override
+  String importWizard_review_olderDivesSkipped(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count régebbi merülés kihagyva — már szerepel a naplódban',
+      one: '1 régebbi merülés kihagyva — már szerepel a naplódban',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get tags_hint_addTags => 'Címkék hozzáadása...';
 
   @override
@@ -16831,6 +16845,49 @@ class AppLocalizationsHu extends AppLocalizations {
   @override
   String get transfer_computers_noComputersSaved =>
       'Nincsenek mentett szamitogepek';
+
+  @override
+  String transfer_computers_diveCount(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count merülés',
+      one: '1 merülés',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get transfer_computers_downloadTooltip => 'Merülések letöltése';
+
+  @override
+  String get transfer_computers_knownComputersHeader => 'Ismert számítógépek';
+
+  @override
+  String transfer_computers_lastDownloadDaysAgo(int days) {
+    return '$days napja';
+  }
+
+  @override
+  String transfer_computers_lastDownloadHoursAgo(int hours) {
+    String _temp0 = intl.Intl.pluralLogic(
+      hours,
+      locale: localeName,
+      other: '$hours órája',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String transfer_computers_lastDownloadMinutesAgo(int minutes) {
+    return '$minutes perce';
+  }
+
+  @override
+  String get transfer_computers_lastDownloadNever => 'Soha';
+
+  @override
+  String get transfer_computers_lastDownloadYesterday => 'Tegnap';
 
   @override
   String transfer_computers_savedCount(int count) {
@@ -18645,8 +18702,15 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String get diveComputer_downloadStep_downloadAll =>
+      'Összes merülés letöltése';
+
+  @override
   String get diveComputer_downloadStep_downloadFailed =>
       'A letoltes sikertelen';
+
+  @override
+  String get diveComputer_downloadStep_downloadNew => 'Új merülések letöltése';
 
   @override
   String get diveComputer_downloadStep_downloadedDives => 'Letoltott merulesek';
@@ -18662,6 +18726,19 @@ class AppLocalizationsHu extends AppLocalizations {
   @override
   String diveComputer_downloadStep_errorSemanticLabel(Object error) {
     return 'Letoltesi hiba: $error';
+  }
+
+  @override
+  String get diveComputer_downloadStep_firstSyncBody =>
+      'A naplód már tartalmaz merüléseket. Kihagyhatod a már meglévő merülések letöltését.';
+
+  @override
+  String get diveComputer_downloadStep_firstSyncTitle =>
+      'Első letöltés erről a merülésszámítógépről';
+
+  @override
+  String diveComputer_downloadStep_onlyAfterDate(String date) {
+    return 'Csak a $date utáni merülések letöltése';
   }
 
   @override
@@ -20455,6 +20532,31 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get settings_appearance_sections => 'Szekciók';
+
+  @override
+  String get settings_appearance_colorAccents => 'Színes kiemelések';
+
+  @override
+  String get settings_appearance_accentNavIcons => 'Színes navigációs ikonok';
+
+  @override
+  String get settings_appearance_accentNavIcons_subtitle =>
+      'A főmenü ikonjainak színezése az egyes területek színével';
+
+  @override
+  String get settings_appearance_accentSectionHeaders =>
+      'Színes szekciófejlécek';
+
+  @override
+  String get settings_appearance_accentSectionHeaders_subtitle =>
+      'Színes szekcióikon megjelenítése az oldalcímek mellett';
+
+  @override
+  String get settings_appearance_accentListIcons => 'Színes listaikonok';
+
+  @override
+  String get settings_appearance_accentListIcons_subtitle =>
+      'Ikonok színezése a listákban és a beállítási oldalakon';
 
   @override
   String get settings_appearance_showDetailsPane =>

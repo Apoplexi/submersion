@@ -8221,6 +8221,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get diveSites_list_menu_import => 'ייבא';
 
   @override
+  String get diveSites_list_menu_select => 'בחירת אתרים';
+
+  @override
   String get diveSites_list_search_backTooltip => 'חזרה';
 
   @override
@@ -16098,6 +16101,17 @@ class AppLocalizationsHe extends AppLocalizations {
   String get importWizard_tagsLabel => 'Tags';
 
   @override
+  String importWizard_review_olderDivesSkipped(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count צלילות ישנות דולגו — כבר ביומן שלך',
+      one: 'צלילה ישנה אחת דולגה — כבר ביומן שלך',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get tags_hint_addTags => 'הוסף תגיות...';
 
   @override
@@ -16443,6 +16457,50 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get transfer_computers_noComputersSaved => 'לא נשמרו מחשבים';
+
+  @override
+  String transfer_computers_diveCount(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count צלילות',
+      one: 'צלילה אחת',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get transfer_computers_downloadTooltip => 'הורדת צלילות';
+
+  @override
+  String get transfer_computers_knownComputersHeader => 'מחשבים מוכרים';
+
+  @override
+  String transfer_computers_lastDownloadDaysAgo(int days) {
+    return 'לפני $days ימים';
+  }
+
+  @override
+  String transfer_computers_lastDownloadHoursAgo(int hours) {
+    String _temp0 = intl.Intl.pluralLogic(
+      hours,
+      locale: localeName,
+      other: 'לפני $hours שעות',
+      one: 'לפני שעה',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String transfer_computers_lastDownloadMinutesAgo(int minutes) {
+    return 'לפני $minutes דק\'';
+  }
+
+  @override
+  String get transfer_computers_lastDownloadNever => 'אף פעם';
+
+  @override
+  String get transfer_computers_lastDownloadYesterday => 'אתמול';
 
   @override
   String transfer_computers_savedCount(int count) {
@@ -18228,7 +18286,13 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
+  String get diveComputer_downloadStep_downloadAll => 'הורדת כל הצלילות';
+
+  @override
   String get diveComputer_downloadStep_downloadFailed => 'ההורדה נכשלה';
+
+  @override
+  String get diveComputer_downloadStep_downloadNew => 'הורדת צלילות חדשות';
 
   @override
   String get diveComputer_downloadStep_downloadedDives => 'צלילות שהורדו';
@@ -18244,6 +18308,19 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String diveComputer_downloadStep_errorSemanticLabel(Object error) {
     return 'שגיאת הורדה: $error';
+  }
+
+  @override
+  String get diveComputer_downloadStep_firstSyncBody =>
+      'ביומן הצלילות שלך כבר יש צלילות. אפשר לדלג על הורדת הצלילות שכבר יש לך.';
+
+  @override
+  String get diveComputer_downloadStep_firstSyncTitle =>
+      'הורדה ראשונה ממחשב הצלילה הזה';
+
+  @override
+  String diveComputer_downloadStep_onlyAfterDate(String date) {
+    return 'הורדת צלילות אחרי $date בלבד';
   }
 
   @override
@@ -20009,6 +20086,31 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get settings_appearance_sections => 'חלקים';
+
+  @override
+  String get settings_appearance_colorAccents => 'הדגשות צבע';
+
+  @override
+  String get settings_appearance_accentNavIcons => 'סמלי ניווט צבעוניים';
+
+  @override
+  String get settings_appearance_accentNavIcons_subtitle =>
+      'צביעת סמלי התפריט הראשי בצבע של כל מדור';
+
+  @override
+  String get settings_appearance_accentSectionHeaders =>
+      'כותרות מדורים צבעוניות';
+
+  @override
+  String get settings_appearance_accentSectionHeaders_subtitle =>
+      'הצגת סמל מדור צבעוני לצד כותרות הדפים';
+
+  @override
+  String get settings_appearance_accentListIcons => 'סמלי רשימה צבעוניים';
+
+  @override
+  String get settings_appearance_accentListIcons_subtitle =>
+      'צביעת סמלים ברשימות ובדפי ההגדרות';
 
   @override
   String get settings_appearance_showDetailsPane => 'הצג חלונית פרטים';

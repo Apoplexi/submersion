@@ -8030,6 +8030,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get diveSites_list_menu_import => '导入';
 
   @override
+  String get diveSites_list_menu_select => '选择潜水点';
+
+  @override
   String get diveSites_list_search_backTooltip => '返回';
 
   @override
@@ -15674,6 +15677,16 @@ class AppLocalizationsZh extends AppLocalizations {
   String get importWizard_tagsLabel => '标签';
 
   @override
+  String importWizard_review_olderDivesSkipped(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '已跳过 $count 次较早的潜水 — 已在您的日志中',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get tags_hint_addTags => '添加标签...';
 
   @override
@@ -16018,6 +16031,48 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get transfer_computers_noComputersSaved => '没有已保存的潜水电脑';
+
+  @override
+  String transfer_computers_diveCount(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 次潜水',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get transfer_computers_downloadTooltip => '下载潜水记录';
+
+  @override
+  String get transfer_computers_knownComputersHeader => '已知潜水电脑';
+
+  @override
+  String transfer_computers_lastDownloadDaysAgo(int days) {
+    return '$days 天前';
+  }
+
+  @override
+  String transfer_computers_lastDownloadHoursAgo(int hours) {
+    String _temp0 = intl.Intl.pluralLogic(
+      hours,
+      locale: localeName,
+      other: '$hours 小时前',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String transfer_computers_lastDownloadMinutesAgo(int minutes) {
+    return '$minutes 分钟前';
+  }
+
+  @override
+  String get transfer_computers_lastDownloadNever => '从未';
+
+  @override
+  String get transfer_computers_lastDownloadYesterday => '昨天';
 
   @override
   String transfer_computers_savedCount(int count) {
@@ -17748,7 +17803,13 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get diveComputer_downloadStep_downloadAll => '下载所有潜水记录';
+
+  @override
   String get diveComputer_downloadStep_downloadFailed => '下载失败';
+
+  @override
+  String get diveComputer_downloadStep_downloadNew => '下载新的潜水记录';
 
   @override
   String get diveComputer_downloadStep_downloadedDives => '已下载的潜水';
@@ -17764,6 +17825,18 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String diveComputer_downloadStep_errorSemanticLabel(Object error) {
     return '下载错误：$error';
+  }
+
+  @override
+  String get diveComputer_downloadStep_firstSyncBody =>
+      '您的潜水日志中已有潜水记录。您可以跳过下载已有的潜水记录。';
+
+  @override
+  String get diveComputer_downloadStep_firstSyncTitle => '首次从此潜水电脑下载';
+
+  @override
+  String diveComputer_downloadStep_onlyAfterDate(String date) {
+    return '仅下载$date之后的潜水记录';
   }
 
   @override
@@ -19487,6 +19560,28 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get settings_appearance_sections => '部分';
+
+  @override
+  String get settings_appearance_colorAccents => '彩色强调';
+
+  @override
+  String get settings_appearance_accentNavIcons => '彩色导航图标';
+
+  @override
+  String get settings_appearance_accentNavIcons_subtitle => '使用各功能区的颜色为主菜单图标着色';
+
+  @override
+  String get settings_appearance_accentSectionHeaders => '彩色分区标题';
+
+  @override
+  String get settings_appearance_accentSectionHeaders_subtitle =>
+      '在页面标题旁显示彩色功能图标';
+
+  @override
+  String get settings_appearance_accentListIcons => '彩色列表图标';
+
+  @override
+  String get settings_appearance_accentListIcons_subtitle => '为列表和设置页面中的图标着色';
 
   @override
   String get settings_appearance_showDetailsPane => '显示详情面板';

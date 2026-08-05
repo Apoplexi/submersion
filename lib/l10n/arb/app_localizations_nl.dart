@@ -8364,6 +8364,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get diveSites_list_menu_import => 'Importeren';
 
   @override
+  String get diveSites_list_menu_select => 'Duikstekken selecteren';
+
+  @override
   String get diveSites_list_search_backTooltip => 'Terug';
 
   @override
@@ -16386,6 +16389,17 @@ class AppLocalizationsNl extends AppLocalizations {
   String get importWizard_tagsLabel => 'Tags';
 
   @override
+  String importWizard_review_olderDivesSkipped(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count oudere duiken overgeslagen — al in je logboek',
+      one: '1 oudere duik overgeslagen — al in je logboek',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get tags_hint_addTags => 'Tags toevoegen...';
 
   @override
@@ -16735,6 +16749,50 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get transfer_computers_noComputersSaved => 'Geen computers opgeslagen';
+
+  @override
+  String transfer_computers_diveCount(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count duiken',
+      one: '1 duik',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get transfer_computers_downloadTooltip => 'Duiken downloaden';
+
+  @override
+  String get transfer_computers_knownComputersHeader => 'Bekende computers';
+
+  @override
+  String transfer_computers_lastDownloadDaysAgo(int days) {
+    return '$days dagen geleden';
+  }
+
+  @override
+  String transfer_computers_lastDownloadHoursAgo(int hours) {
+    String _temp0 = intl.Intl.pluralLogic(
+      hours,
+      locale: localeName,
+      other: '$hours uur geleden',
+      one: '1 uur geleden',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String transfer_computers_lastDownloadMinutesAgo(int minutes) {
+    return '$minutes min geleden';
+  }
+
+  @override
+  String get transfer_computers_lastDownloadNever => 'Nooit';
+
+  @override
+  String get transfer_computers_lastDownloadYesterday => 'Gisteren';
 
   @override
   String transfer_computers_savedCount(int count) {
@@ -18545,7 +18603,14 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String get diveComputer_downloadStep_downloadAll => 'Alle duiken downloaden';
+
+  @override
   String get diveComputer_downloadStep_downloadFailed => 'Download mislukt';
+
+  @override
+  String get diveComputer_downloadStep_downloadNew =>
+      'Nieuwe duiken downloaden';
 
   @override
   String get diveComputer_downloadStep_downloadedDives => 'Gedownloade duiken';
@@ -18562,6 +18627,19 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String diveComputer_downloadStep_errorSemanticLabel(Object error) {
     return 'Downloadfout: $error';
+  }
+
+  @override
+  String get diveComputer_downloadStep_firstSyncBody =>
+      'Je logboek bevat al duiken. Je kunt het downloaden van duiken die je al hebt overslaan.';
+
+  @override
+  String get diveComputer_downloadStep_firstSyncTitle =>
+      'Eerste download van deze duikcomputer';
+
+  @override
+  String diveComputer_downloadStep_onlyAfterDate(String date) {
+    return 'Alleen duiken na $date downloaden';
   }
 
   @override
@@ -20351,6 +20429,33 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get settings_appearance_sections => 'Secties';
+
+  @override
+  String get settings_appearance_colorAccents => 'Kleuraccenten';
+
+  @override
+  String get settings_appearance_accentNavIcons =>
+      'Gekleurde navigatiepictogrammen';
+
+  @override
+  String get settings_appearance_accentNavIcons_subtitle =>
+      'Pictogrammen in het hoofdmenu kleuren met de kleur van elk onderdeel';
+
+  @override
+  String get settings_appearance_accentSectionHeaders =>
+      'Gekleurde sectiekoppen';
+
+  @override
+  String get settings_appearance_accentSectionHeaders_subtitle =>
+      'Een gekleurd sectiepictogram naast paginatitels tonen';
+
+  @override
+  String get settings_appearance_accentListIcons =>
+      'Gekleurde lijstpictogrammen';
+
+  @override
+  String get settings_appearance_accentListIcons_subtitle =>
+      'Pictogrammen in lijsten en instellingenpagina\'s kleuren';
 
   @override
   String get settings_appearance_showDetailsPane => 'Detailvenster tonen';

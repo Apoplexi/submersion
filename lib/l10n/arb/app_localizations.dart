@@ -14220,6 +14220,12 @@ abstract class AppLocalizations {
   /// **'Import'**
   String get diveSites_list_menu_import;
 
+  /// No description provided for @diveSites_list_menu_select.
+  ///
+  /// In en, this message translates to:
+  /// **'Select sites'**
+  String get diveSites_list_menu_select;
+
   /// No description provided for @diveSites_list_search_backTooltip.
   ///
   /// In en, this message translates to:
@@ -27762,6 +27768,12 @@ abstract class AppLocalizations {
   /// **'Tags'**
   String get importWizard_tagsLabel;
 
+  /// Title for the collapsed ExpansionTile summarizing auto-skipped dives that fall at or before the diver's first-sync cutoff
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{1 older dive skipped — already in your log} other{{count} older dives skipped — already in your log}}'**
+  String importWizard_review_olderDivesSkipped(int count);
+
   /// No description provided for @tags_hint_addTags.
   ///
   /// In en, this message translates to:
@@ -28317,6 +28329,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No computers saved'**
   String get transfer_computers_noComputersSaved;
+
+  /// Dive count on a known-computer card
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 dive} other{{count} dives}}'**
+  String transfer_computers_diveCount(num count);
+
+  /// Tooltip on the per-computer download button
+  ///
+  /// In en, this message translates to:
+  /// **'Download dives'**
+  String get transfer_computers_downloadTooltip;
+
+  /// Section header above previously used dive computers
+  ///
+  /// In en, this message translates to:
+  /// **'Known Computers'**
+  String get transfer_computers_knownComputersHeader;
+
+  /// Relative last-download label, days
+  ///
+  /// In en, this message translates to:
+  /// **'{days} days ago'**
+  String transfer_computers_lastDownloadDaysAgo(int days);
+
+  /// Relative last-download label, hours
+  ///
+  /// In en, this message translates to:
+  /// **'{hours, plural, =1{1 hour ago} other{{hours} hours ago}}'**
+  String transfer_computers_lastDownloadHoursAgo(int hours);
+
+  /// Relative last-download label, minutes
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes} min ago'**
+  String transfer_computers_lastDownloadMinutesAgo(int minutes);
+
+  /// Shown when a computer has never been downloaded from
+  ///
+  /// In en, this message translates to:
+  /// **'Never'**
+  String get transfer_computers_lastDownloadNever;
+
+  /// Relative last-download label, yesterday
+  ///
+  /// In en, this message translates to:
+  /// **'Yesterday'**
+  String get transfer_computers_lastDownloadYesterday;
 
   /// No description provided for @transfer_computers_savedCount.
   ///
@@ -31370,11 +31430,23 @@ abstract class AppLocalizations {
   /// **'{depth}m'**
   String diveComputer_downloadStep_depthMeters(Object depth);
 
+  /// No description provided for @diveComputer_downloadStep_downloadAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Download all dives'**
+  String get diveComputer_downloadStep_downloadAll;
+
   /// No description provided for @diveComputer_downloadStep_downloadFailed.
   ///
   /// In en, this message translates to:
   /// **'Download failed'**
   String get diveComputer_downloadStep_downloadFailed;
+
+  /// No description provided for @diveComputer_downloadStep_downloadNew.
+  ///
+  /// In en, this message translates to:
+  /// **'Download new dives'**
+  String get diveComputer_downloadStep_downloadNew;
 
   /// No description provided for @diveComputer_downloadStep_downloadedDives.
   ///
@@ -31399,6 +31471,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Download error: {error}'**
   String diveComputer_downloadStep_errorSemanticLabel(Object error);
+
+  /// No description provided for @diveComputer_downloadStep_firstSyncBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your logbook already has dives. You can skip downloading dives you already have.'**
+  String get diveComputer_downloadStep_firstSyncBody;
+
+  /// No description provided for @diveComputer_downloadStep_firstSyncTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'First download from this computer'**
+  String get diveComputer_downloadStep_firstSyncTitle;
+
+  /// No description provided for @diveComputer_downloadStep_onlyAfterDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Only download dives after {date}'**
+  String diveComputer_downloadStep_onlyAfterDate(String date);
 
   /// No description provided for @diveComputer_downloadStep_percentAccessibility.
   ///
@@ -34296,6 +34386,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Sections'**
   String get settings_appearance_sections;
+
+  /// No description provided for @settings_appearance_colorAccents.
+  ///
+  /// In en, this message translates to:
+  /// **'Color accents'**
+  String get settings_appearance_colorAccents;
+
+  /// No description provided for @settings_appearance_accentNavIcons.
+  ///
+  /// In en, this message translates to:
+  /// **'Colored navigation icons'**
+  String get settings_appearance_accentNavIcons;
+
+  /// No description provided for @settings_appearance_accentNavIcons_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Tint main menu icons with each feature\'s color'**
+  String get settings_appearance_accentNavIcons_subtitle;
+
+  /// No description provided for @settings_appearance_accentSectionHeaders.
+  ///
+  /// In en, this message translates to:
+  /// **'Colored section headers'**
+  String get settings_appearance_accentSectionHeaders;
+
+  /// No description provided for @settings_appearance_accentSectionHeaders_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Show a colored feature icon next to page titles'**
+  String get settings_appearance_accentSectionHeaders_subtitle;
+
+  /// No description provided for @settings_appearance_accentListIcons.
+  ///
+  /// In en, this message translates to:
+  /// **'Colored list icons'**
+  String get settings_appearance_accentListIcons;
+
+  /// No description provided for @settings_appearance_accentListIcons_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Tint icons in lists and settings pages'**
+  String get settings_appearance_accentListIcons_subtitle;
 
   /// No description provided for @settings_appearance_showDetailsPane.
   ///

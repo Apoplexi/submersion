@@ -8463,6 +8463,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get diveSites_list_menu_import => 'Importer';
 
   @override
+  String get diveSites_list_menu_select => 'Sélectionner des sites';
+
+  @override
   String get diveSites_list_search_backTooltip => 'Retour';
 
   @override
@@ -16592,6 +16595,17 @@ class AppLocalizationsFr extends AppLocalizations {
   String get importWizard_tagsLabel => 'Tags';
 
   @override
+  String importWizard_review_olderDivesSkipped(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count plongées plus anciennes ignorées — déjà dans votre carnet',
+      one: '1 plongée plus ancienne ignorée — déjà dans votre carnet',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get tags_hint_addTags => 'Ajouter des étiquettes...';
 
   @override
@@ -16948,6 +16962,50 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get transfer_computers_noComputersSaved =>
       'Aucun ordinateur enregistre';
+
+  @override
+  String transfer_computers_diveCount(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count plongées',
+      one: '1 plongée',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get transfer_computers_downloadTooltip => 'Télécharger les plongées';
+
+  @override
+  String get transfer_computers_knownComputersHeader => 'Ordinateurs connus';
+
+  @override
+  String transfer_computers_lastDownloadDaysAgo(int days) {
+    return 'il y a $days jours';
+  }
+
+  @override
+  String transfer_computers_lastDownloadHoursAgo(int hours) {
+    String _temp0 = intl.Intl.pluralLogic(
+      hours,
+      locale: localeName,
+      other: 'il y a $hours heures',
+      one: 'il y a 1 heure',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String transfer_computers_lastDownloadMinutesAgo(int minutes) {
+    return 'il y a $minutes min';
+  }
+
+  @override
+  String get transfer_computers_lastDownloadNever => 'Jamais';
+
+  @override
+  String get transfer_computers_lastDownloadYesterday => 'Hier';
 
   @override
   String transfer_computers_savedCount(int count) {
@@ -18767,8 +18825,16 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String get diveComputer_downloadStep_downloadAll =>
+      'Télécharger toutes les plongées';
+
+  @override
   String get diveComputer_downloadStep_downloadFailed =>
       'Echec du telechargement';
+
+  @override
+  String get diveComputer_downloadStep_downloadNew =>
+      'Télécharger les nouvelles plongées';
 
   @override
   String get diveComputer_downloadStep_downloadedDives =>
@@ -18786,6 +18852,19 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String diveComputer_downloadStep_errorSemanticLabel(Object error) {
     return 'Erreur de telechargement : $error';
+  }
+
+  @override
+  String get diveComputer_downloadStep_firstSyncBody =>
+      'Votre carnet de plongée contient déjà des plongées. Vous pouvez éviter de télécharger les plongées que vous avez déjà.';
+
+  @override
+  String get diveComputer_downloadStep_firstSyncTitle =>
+      'Premier téléchargement depuis cet ordinateur de plongée';
+
+  @override
+  String diveComputer_downloadStep_onlyAfterDate(String date) {
+    return 'Télécharger uniquement les plongées après le $date';
   }
 
   @override
@@ -20588,6 +20667,32 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get settings_appearance_sections => 'Sections';
+
+  @override
+  String get settings_appearance_colorAccents => 'Accents de couleur';
+
+  @override
+  String get settings_appearance_accentNavIcons =>
+      'Icônes de navigation colorées';
+
+  @override
+  String get settings_appearance_accentNavIcons_subtitle =>
+      'Colorer les icônes du menu principal avec la couleur de chaque section';
+
+  @override
+  String get settings_appearance_accentSectionHeaders =>
+      'En-têtes de section colorés';
+
+  @override
+  String get settings_appearance_accentSectionHeaders_subtitle =>
+      'Afficher une icône de section colorée à côté des titres de page';
+
+  @override
+  String get settings_appearance_accentListIcons => 'Icônes de liste colorées';
+
+  @override
+  String get settings_appearance_accentListIcons_subtitle =>
+      'Colorer les icônes des listes et des pages de réglages';
 
   @override
   String get settings_appearance_showDetailsPane =>
