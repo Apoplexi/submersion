@@ -13030,6 +13030,13 @@ class AppLocalizationsFr extends AppLocalizations {
       'Graphique du cycle de maree et horaires';
 
   @override
+  String get diveDetailSection_reefHealth_name => 'Santé du récif';
+
+  @override
+  String get diveDetailSection_reefHealth_description =>
+      'Stress thermique de blanchissement corallien à la date de la plongée';
+
+  @override
   String get diveDetailSection_surfaceGps_name => 'GPS de surface';
 
   @override
@@ -22650,4 +22657,126 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get settings_mediaStorage_quality_noTranscoderHint =>
       'Cet appareil ne peut pas compresser la vidéo. Les originaux sont téléversés depuis celui-ci.';
+
+  @override
+  String get reef_section_title => 'Récif';
+
+  @override
+  String get reef_section_sourcesTooltip => 'Sources de données';
+
+  @override
+  String get reef_section_loadError =>
+      'Impossible de charger les données du récif pour le moment';
+
+  @override
+  String get reef_habitat_title => 'Habitat du récif';
+
+  @override
+  String get reef_habitat_onReef => 'Sur un récif corallien';
+
+  @override
+  String reef_habitat_onReefWithThreat(String threat) {
+    return 'Sur un récif corallien, niveau de menace $threat';
+  }
+
+  @override
+  String get reef_habitat_noReef =>
+      'Aucun récif corallien cartographié à cet endroit';
+
+  @override
+  String get reef_habitat_unavailable =>
+      'Impossible de vérifier l\'habitat du récif pour le moment';
+
+  @override
+  String get reef_health_title => 'Santé du récif';
+
+  @override
+  String get reef_health_unavailable =>
+      'Impossible de vérifier la santé du récif pour le moment';
+
+  @override
+  String get reef_health_noData =>
+      'Aucune donnée de santé du récif pour cet endroit';
+
+  @override
+  String reef_health_degreeHeatingWeeks(String value) {
+    return 'Degrés-semaines de chaleur $value C-semaines';
+  }
+
+  @override
+  String reef_health_seaSurface(String value) {
+    return 'Surface de la mer $value';
+  }
+
+  @override
+  String reef_health_asOf(String date) {
+    return 'Au $date';
+  }
+
+  @override
+  String get reef_health_levelNoStress => 'Aucun stress thermique';
+
+  @override
+  String get reef_health_levelWatch => 'Veille de blanchissement';
+
+  @override
+  String get reef_health_levelWarning => 'Alerte de blanchissement';
+
+  @override
+  String get reef_health_levelAlert1 => 'Alerte de blanchissement niveau 1';
+
+  @override
+  String get reef_health_levelAlert2 => 'Alerte de blanchissement niveau 2';
+
+  @override
+  String get reef_health_levelAlert3 => 'Alerte de blanchissement niveau 3';
+
+  @override
+  String get reef_health_levelAlert4 => 'Alerte de blanchissement niveau 4';
+
+  @override
+  String get reef_health_levelAlert5 => 'Alerte de blanchissement niveau 5';
+
+  @override
+  String get reef_protection_title => 'Aire protégée';
+
+  @override
+  String get reef_protection_none => 'Hors aire marine protégée';
+
+  @override
+  String get reef_protection_unavailable =>
+      'Impossible de vérifier le statut de protection pour le moment';
+
+  @override
+  String get reef_protection_viewRegulations => 'Voir la réglementation';
+
+  @override
+  String reef_protection_iucn(String category) {
+    return 'IUCN $category';
+  }
+
+  @override
+  String get reef_species_recordedNearby => 'Observé à proximité';
+
+  @override
+  String get reef_species_addToExpected => 'Ajouter aux espèces attendues';
+
+  @override
+  String get reef_attribution_title => 'Sources de données du récif';
+
+  @override
+  String get reef_attribution_wri =>
+      'Présence de récif et niveau de menace. CC BY 3.0.';
+
+  @override
+  String get reef_attribution_noaa =>
+      'Température de surface et stress thermique. Domaine public.';
+
+  @override
+  String get reef_attribution_gbif =>
+      'Données d\'occurrence d\'espèces, filtrées en CC0 et CC BY 4.0.';
+
+  @override
+  String get reef_attribution_protectedSeas =>
+      'Limites des aires marines protégées. CC BY 4.0.';
 }
