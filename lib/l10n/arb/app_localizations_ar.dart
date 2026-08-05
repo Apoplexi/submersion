@@ -16219,6 +16219,17 @@ class AppLocalizationsAr extends AppLocalizations {
   String get importWizard_tagsLabel => 'Tags';
 
   @override
+  String importWizard_review_olderDivesSkipped(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'تم تخطي $count غطسات أقدم — موجودة بالفعل في سجلك',
+      one: 'تم تخطي غطسة واحدة أقدم — موجودة بالفعل في سجلك',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get tags_hint_addTags => 'إضافة وسوم...';
 
   @override
@@ -18358,7 +18369,13 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String get diveComputer_downloadStep_downloadAll => 'تنزيل جميع الغطسات';
+
+  @override
   String get diveComputer_downloadStep_downloadFailed => 'فشل التنزيل';
+
+  @override
+  String get diveComputer_downloadStep_downloadNew => 'تنزيل الغطسات الجديدة';
 
   @override
   String get diveComputer_downloadStep_downloadedDives => 'الغطسات المنزّلة';
@@ -18374,6 +18391,19 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String diveComputer_downloadStep_errorSemanticLabel(Object error) {
     return 'خطأ في التنزيل: $error';
+  }
+
+  @override
+  String get diveComputer_downloadStep_firstSyncBody =>
+      'يحتوي سجل الغطسات الخاص بك بالفعل على غطسات. يمكنك تخطي تنزيل الغطسات التي لديك بالفعل.';
+
+  @override
+  String get diveComputer_downloadStep_firstSyncTitle =>
+      'أول تنزيل من كمبيوتر الغوص هذا';
+
+  @override
+  String diveComputer_downloadStep_onlyAfterDate(String date) {
+    return 'تنزيل الغطسات بعد $date فقط';
   }
 
   @override

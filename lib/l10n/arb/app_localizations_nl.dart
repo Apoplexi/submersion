@@ -16386,6 +16386,17 @@ class AppLocalizationsNl extends AppLocalizations {
   String get importWizard_tagsLabel => 'Tags';
 
   @override
+  String importWizard_review_olderDivesSkipped(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count oudere duiken overgeslagen — al in je logboek',
+      one: '1 oudere duik overgeslagen — al in je logboek',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get tags_hint_addTags => 'Tags toevoegen...';
 
   @override
@@ -18545,7 +18556,14 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String get diveComputer_downloadStep_downloadAll => 'Alle duiken downloaden';
+
+  @override
   String get diveComputer_downloadStep_downloadFailed => 'Download mislukt';
+
+  @override
+  String get diveComputer_downloadStep_downloadNew =>
+      'Nieuwe duiken downloaden';
 
   @override
   String get diveComputer_downloadStep_downloadedDives => 'Gedownloade duiken';
@@ -18562,6 +18580,19 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String diveComputer_downloadStep_errorSemanticLabel(Object error) {
     return 'Downloadfout: $error';
+  }
+
+  @override
+  String get diveComputer_downloadStep_firstSyncBody =>
+      'Je logboek bevat al duiken. Je kunt het downloaden van duiken die je al hebt overslaan.';
+
+  @override
+  String get diveComputer_downloadStep_firstSyncTitle =>
+      'Eerste download van deze duikcomputer';
+
+  @override
+  String diveComputer_downloadStep_onlyAfterDate(String date) {
+    return 'Alleen duiken na $date downloaden';
   }
 
   @override

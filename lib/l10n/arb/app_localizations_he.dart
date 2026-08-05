@@ -16098,6 +16098,17 @@ class AppLocalizationsHe extends AppLocalizations {
   String get importWizard_tagsLabel => 'Tags';
 
   @override
+  String importWizard_review_olderDivesSkipped(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count צלילות ישנות דולגו — כבר ביומן שלך',
+      one: 'צלילה ישנה אחת דולגה — כבר ביומן שלך',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get tags_hint_addTags => 'הוסף תגיות...';
 
   @override
@@ -18228,7 +18239,13 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
+  String get diveComputer_downloadStep_downloadAll => 'הורדת כל הצלילות';
+
+  @override
   String get diveComputer_downloadStep_downloadFailed => 'ההורדה נכשלה';
+
+  @override
+  String get diveComputer_downloadStep_downloadNew => 'הורדת צלילות חדשות';
 
   @override
   String get diveComputer_downloadStep_downloadedDives => 'צלילות שהורדו';
@@ -18244,6 +18261,19 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String diveComputer_downloadStep_errorSemanticLabel(Object error) {
     return 'שגיאת הורדה: $error';
+  }
+
+  @override
+  String get diveComputer_downloadStep_firstSyncBody =>
+      'ביומן הצלילות שלך כבר יש צלילות. אפשר לדלג על הורדת הצלילות שכבר יש לך.';
+
+  @override
+  String get diveComputer_downloadStep_firstSyncTitle =>
+      'הורדה ראשונה ממחשב הצלילה הזה';
+
+  @override
+  String diveComputer_downloadStep_onlyAfterDate(String date) {
+    return 'הורדת צלילות אחרי $date בלבד';
   }
 
   @override

@@ -9725,6 +9725,15 @@
   "tags_empty": "No tags yet. Create tags when editing dives.",
   "tags_hint_addMoreTags": "Add more tags...",
   "importWizard_tagsLabel": "Tags",
+  "importWizard_review_olderDivesSkipped": "{count, plural, one{1 older dive skipped — already in your log} other{{count} older dives skipped — already in your log}}",
+  "@importWizard_review_olderDivesSkipped": {
+    "description": "Title for the collapsed ExpansionTile summarizing auto-skipped dives that fall at or before the diver's first-sync cutoff",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "tags_hint_addTags": "Add tags...",
   "tags_manage_title": "Tags",
   "tags_manage_searchHint": "Search tags...",
@@ -11680,7 +11689,9 @@
       }
     }
   },
+  "diveComputer_downloadStep_downloadAll": "Download all dives",
   "diveComputer_downloadStep_downloadFailed": "Download failed",
+  "diveComputer_downloadStep_downloadNew": "Download new dives",
   "diveComputer_downloadStep_downloadedDives": "Downloaded Dives",
   "diveComputer_downloadStep_durationMin": "{duration} min",
   "@diveComputer_downloadStep_durationMin": {
@@ -11696,6 +11707,16 @@
     "placeholders": {
       "error": {
         "type": "Object"
+      }
+    }
+  },
+  "diveComputer_downloadStep_firstSyncBody": "Your logbook already has dives. You can skip downloading dives you already have.",
+  "diveComputer_downloadStep_firstSyncTitle": "First download from this computer",
+  "diveComputer_downloadStep_onlyAfterDate": "Only download dives after {date}",
+  "@diveComputer_downloadStep_onlyAfterDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
       }
     }
   },

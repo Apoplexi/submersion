@@ -16497,6 +16497,18 @@ class AppLocalizationsDe extends AppLocalizations {
   String get importWizard_tagsLabel => 'Tags';
 
   @override
+  String importWizard_review_olderDivesSkipped(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count ältere Tauchgänge übersprungen — bereits in deinem Logbuch',
+      one: '1 älterer Tauchgang übersprungen — bereits in deinem Logbuch',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get tags_hint_addTags => 'Tags hinzufügen...';
 
   @override
@@ -18665,8 +18677,16 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get diveComputer_downloadStep_downloadAll =>
+      'Alle Tauchgänge herunterladen';
+
+  @override
   String get diveComputer_downloadStep_downloadFailed =>
       'Download fehlgeschlagen';
+
+  @override
+  String get diveComputer_downloadStep_downloadNew =>
+      'Neue Tauchgänge herunterladen';
 
   @override
   String get diveComputer_downloadStep_downloadedDives =>
@@ -18684,6 +18704,19 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String diveComputer_downloadStep_errorSemanticLabel(Object error) {
     return 'Download-Fehler: $error';
+  }
+
+  @override
+  String get diveComputer_downloadStep_firstSyncBody =>
+      'Dein Logbuch enthält bereits Tauchgänge. Du kannst das Herunterladen von Tauchgängen überspringen, die du bereits hast.';
+
+  @override
+  String get diveComputer_downloadStep_firstSyncTitle =>
+      'Erster Download von diesem Tauchcomputer';
+
+  @override
+  String diveComputer_downloadStep_onlyAfterDate(String date) {
+    return 'Nur Tauchgänge nach dem $date herunterladen';
   }
 
   @override

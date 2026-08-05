@@ -27762,6 +27762,12 @@ abstract class AppLocalizations {
   /// **'Tags'**
   String get importWizard_tagsLabel;
 
+  /// Title for the collapsed ExpansionTile summarizing auto-skipped dives that fall at or before the diver's first-sync cutoff
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{1 older dive skipped — already in your log} other{{count} older dives skipped — already in your log}}'**
+  String importWizard_review_olderDivesSkipped(int count);
+
   /// No description provided for @tags_hint_addTags.
   ///
   /// In en, this message translates to:
@@ -31370,11 +31376,23 @@ abstract class AppLocalizations {
   /// **'{depth}m'**
   String diveComputer_downloadStep_depthMeters(Object depth);
 
+  /// No description provided for @diveComputer_downloadStep_downloadAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Download all dives'**
+  String get diveComputer_downloadStep_downloadAll;
+
   /// No description provided for @diveComputer_downloadStep_downloadFailed.
   ///
   /// In en, this message translates to:
   /// **'Download failed'**
   String get diveComputer_downloadStep_downloadFailed;
+
+  /// No description provided for @diveComputer_downloadStep_downloadNew.
+  ///
+  /// In en, this message translates to:
+  /// **'Download new dives'**
+  String get diveComputer_downloadStep_downloadNew;
 
   /// No description provided for @diveComputer_downloadStep_downloadedDives.
   ///
@@ -31399,6 +31417,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Download error: {error}'**
   String diveComputer_downloadStep_errorSemanticLabel(Object error);
+
+  /// No description provided for @diveComputer_downloadStep_firstSyncBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your logbook already has dives. You can skip downloading dives you already have.'**
+  String get diveComputer_downloadStep_firstSyncBody;
+
+  /// No description provided for @diveComputer_downloadStep_firstSyncTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'First download from this computer'**
+  String get diveComputer_downloadStep_firstSyncTitle;
+
+  /// No description provided for @diveComputer_downloadStep_onlyAfterDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Only download dives after {date}'**
+  String diveComputer_downloadStep_onlyAfterDate(String date);
 
   /// No description provided for @diveComputer_downloadStep_percentAccessibility.
   ///

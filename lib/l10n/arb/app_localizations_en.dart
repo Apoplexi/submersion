@@ -16239,6 +16239,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String get importWizard_tagsLabel => 'Tags';
 
   @override
+  String importWizard_review_olderDivesSkipped(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count older dives skipped — already in your log',
+      one: '1 older dive skipped — already in your log',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get tags_hint_addTags => 'Add tags...';
 
   @override
@@ -18381,7 +18392,13 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get diveComputer_downloadStep_downloadAll => 'Download all dives';
+
+  @override
   String get diveComputer_downloadStep_downloadFailed => 'Download failed';
+
+  @override
+  String get diveComputer_downloadStep_downloadNew => 'Download new dives';
 
   @override
   String get diveComputer_downloadStep_downloadedDives => 'Downloaded Dives';
@@ -18397,6 +18414,19 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String diveComputer_downloadStep_errorSemanticLabel(Object error) {
     return 'Download error: $error';
+  }
+
+  @override
+  String get diveComputer_downloadStep_firstSyncBody =>
+      'Your logbook already has dives. You can skip downloading dives you already have.';
+
+  @override
+  String get diveComputer_downloadStep_firstSyncTitle =>
+      'First download from this computer';
+
+  @override
+  String diveComputer_downloadStep_onlyAfterDate(String date) {
+    return 'Only download dives after $date';
   }
 
   @override

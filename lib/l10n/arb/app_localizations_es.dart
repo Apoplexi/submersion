@@ -16534,6 +16534,17 @@ class AppLocalizationsEs extends AppLocalizations {
   String get importWizard_tagsLabel => 'Tags';
 
   @override
+  String importWizard_review_olderDivesSkipped(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count inmersiones antiguas omitidas — ya están en tu registro',
+      one: '1 inmersión antigua omitida — ya está en tu registro',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get tags_hint_addTags => 'Agregar etiquetas...';
 
   @override
@@ -18711,7 +18722,15 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
+  String get diveComputer_downloadStep_downloadAll =>
+      'Descargar todas las inmersiones';
+
+  @override
   String get diveComputer_downloadStep_downloadFailed => 'La descarga fallo';
+
+  @override
+  String get diveComputer_downloadStep_downloadNew =>
+      'Descargar inmersiones nuevas';
 
   @override
   String get diveComputer_downloadStep_downloadedDives =>
@@ -18728,6 +18747,19 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String diveComputer_downloadStep_errorSemanticLabel(Object error) {
     return 'Error de descarga: $error';
+  }
+
+  @override
+  String get diveComputer_downloadStep_firstSyncBody =>
+      'Tu bitácora ya tiene inmersiones. Puedes omitir la descarga de las inmersiones que ya tienes.';
+
+  @override
+  String get diveComputer_downloadStep_firstSyncTitle =>
+      'Primera descarga desde este ordenador de buceo';
+
+  @override
+  String diveComputer_downloadStep_onlyAfterDate(String date) {
+    return 'Descargar solo inmersiones después de $date';
   }
 
   @override

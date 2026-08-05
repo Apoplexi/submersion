@@ -16527,6 +16527,17 @@ class AppLocalizationsIt extends AppLocalizations {
   String get importWizard_tagsLabel => 'Tags';
 
   @override
+  String importWizard_review_olderDivesSkipped(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count immersioni precedenti ignorate — già nel tuo libro',
+      one: '1 immersione precedente ignorata — già nel tuo libro',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get tags_hint_addTags => 'Aggiungi tag...';
 
   @override
@@ -18696,7 +18707,15 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
+  String get diveComputer_downloadStep_downloadAll =>
+      'Scarica tutte le immersioni';
+
+  @override
   String get diveComputer_downloadStep_downloadFailed => 'Download fallito';
+
+  @override
+  String get diveComputer_downloadStep_downloadNew =>
+      'Scarica le nuove immersioni';
 
   @override
   String get diveComputer_downloadStep_downloadedDives =>
@@ -18714,6 +18733,19 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String diveComputer_downloadStep_errorSemanticLabel(Object error) {
     return 'Errore di download: $error';
+  }
+
+  @override
+  String get diveComputer_downloadStep_firstSyncBody =>
+      'Il tuo diario ha già delle immersioni. Puoi saltare il download delle immersioni che hai già.';
+
+  @override
+  String get diveComputer_downloadStep_firstSyncTitle =>
+      'Primo download da questo computer subacqueo';
+
+  @override
+  String diveComputer_downloadStep_onlyAfterDate(String date) {
+    return 'Scarica solo le immersioni dopo il $date';
   }
 
   @override

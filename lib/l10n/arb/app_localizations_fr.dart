@@ -16592,6 +16592,17 @@ class AppLocalizationsFr extends AppLocalizations {
   String get importWizard_tagsLabel => 'Tags';
 
   @override
+  String importWizard_review_olderDivesSkipped(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count plongées plus anciennes ignorées — déjà dans votre carnet',
+      one: '1 plongée plus ancienne ignorée — déjà dans votre carnet',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get tags_hint_addTags => 'Ajouter des étiquettes...';
 
   @override
@@ -18767,8 +18778,16 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String get diveComputer_downloadStep_downloadAll =>
+      'Télécharger toutes les plongées';
+
+  @override
   String get diveComputer_downloadStep_downloadFailed =>
       'Echec du telechargement';
+
+  @override
+  String get diveComputer_downloadStep_downloadNew =>
+      'Télécharger les nouvelles plongées';
 
   @override
   String get diveComputer_downloadStep_downloadedDives =>
@@ -18786,6 +18805,19 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String diveComputer_downloadStep_errorSemanticLabel(Object error) {
     return 'Erreur de telechargement : $error';
+  }
+
+  @override
+  String get diveComputer_downloadStep_firstSyncBody =>
+      'Votre carnet de plongée contient déjà des plongées. Vous pouvez éviter de télécharger les plongées que vous avez déjà.';
+
+  @override
+  String get diveComputer_downloadStep_firstSyncTitle =>
+      'Premier téléchargement depuis cet ordinateur de plongée';
+
+  @override
+  String diveComputer_downloadStep_onlyAfterDate(String date) {
+    return 'Télécharger uniquement les plongées après le $date';
   }
 
   @override
