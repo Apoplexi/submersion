@@ -211,22 +211,8 @@ class DiveFilterState {
   /// buildFilteredDiveIdSubquery), so non-paginated views stay consistent with
   /// the SQL-backed list. It relies on dive.equipment being hydrated with its
   /// curated attributes (getAllDives does this).
-  List<T> apply<T>(List<T> dives) {
-    if (T != Dive && T != dynamic) {
-      throw ArgumentError(
-        'DiveFilterState.apply can only be used with Dive. '
-        'Received: $T',
-      );
-    }
-    return dives.where((d) {
-      if (d is! Dive) {
-        throw ArgumentError(
-          'DiveFilterState.apply received an element that is not a Dive: ${d.runtimeType}',
-        );
-      }
-      // We cast to dynamic to access
-      // shared field names, while buddyNameFilter uses explicit type checks.
-      final dive = d as dynamic;
+  List<Dive> apply(List<Dive> dives) {
+    return dives.where((dive) {
       if (startDate != null && dive.dateTime.isBefore(startDate!)) {
         return false;
       }
@@ -247,9 +233,7 @@ class DiveFilterState {
         return false;
       }
       if (equipmentIds.isNotEmpty) {
-        final diveEquipmentIds = (dive.equipment as List<dynamic>)
-            .map((e) => e.id)
-            .toSet();
+        final diveEquipmentIds = dive.equipment.map((e) => e.id).toSet();
         if (!equipmentIds.any((eqId) => diveEquipmentIds.contains(eqId))) {
           return false;
         }
@@ -266,9 +250,7 @@ class DiveFilterState {
         return false;
       }
       if (tagIds.isNotEmpty) {
-        final diveTagIds = (dive.tags as List<dynamic>)
-            .map((t) => t.id)
-            .toSet();
+        final diveTagIds = dive.tags.map((t) => t.id).toSet();
         if (!tagIds.any((tagId) => diveTagIds.contains(tagId))) {
           return false;
         }
@@ -281,16 +263,14 @@ class DiveFilterState {
             .toList();
 
         for (final filterLower in filters) {
-          if (dive is Dive) {
-            final fullDive = dive;
-            final buddyLower = fullDive.buddy?.toLowerCase() ?? '';
-            final hasLegacyMatch = buddyLower.contains(filterLower);
-            final hasJointMatch = fullDive.buddies.any(
-              (b) => b.buddy.name.toLowerCase().contains(filterLower),
-            );
-            if (!hasLegacyMatch && !hasJointMatch) {
-              return false;
-            }
+          final fullDive = dive;
+          final buddyLower = fullDive.buddy?.toLowerCase() ?? '';
+          final hasLegacyMatch = buddyLower.contains(filterLower);
+          final hasJointMatch = fullDive.buddies.any(
+            (b) => b.buddy.name.toLowerCase().contains(filterLower),
+          );
+          if (!hasLegacyMatch && !hasJointMatch) {
+            return false;
           }
         }
       }
@@ -298,9 +278,8 @@ class DiveFilterState {
         return false;
       }
       if (minO2Percent != null || maxO2Percent != null) {
-        final tanks = dive.tanks as List<dynamic>;
-        if (tanks.isEmpty) return false;
-        final hasMatchingTank = tanks.any((tank) {
+        if (dive.tanks.isEmpty) return false;
+        final hasMatchingTank = dive.tanks.any((tank) {
           final o2 = tank.gasMix.o2;
           if (minO2Percent != null && o2 < minO2Percent!) return false;
           if (maxO2Percent != null && o2 > maxO2Percent!) return false;
@@ -312,7 +291,7 @@ class DiveFilterState {
         if (dive.rating == null || dive.rating! < minRating!) return false;
       }
       if (minBottomTimeMinutes != null || maxBottomTimeMinutes != null) {
-        final durationMinutes = (dive.bottomTime as Duration?)?.inMinutes;
+        final durationMinutes = (dive.bottomTime)?.inMinutes;
         if (durationMinutes == null) return false;
         if (minBottomTimeMinutes != null &&
             durationMinutes < minBottomTimeMinutes!) {

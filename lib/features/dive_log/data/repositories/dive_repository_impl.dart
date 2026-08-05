@@ -1730,14 +1730,8 @@ class DiveRepository {
         final diveIds = rows.map((r) => r.read<String>('id')).toList();
         final tagsByDive = await _tagRepository.getTagsForDives(diveIds);
         final diveTypesByDive = await _diveTypesForDives(diveIds);
-        final buddyNamesByDive = await _buddyNamesForDives(diveIds);
 
-        return _mapSummaryRows(
-          rows,
-          tagsByDive,
-          diveTypesByDive,
-          buddyNamesByDive,
-        );
+        return _mapSummaryRows(rows, tagsByDive, diveTypesByDive);
       });
     } catch (e, stackTrace) {
       _log.error(
@@ -2323,8 +2317,7 @@ class DiveRepository {
     final diveIds = rows.map((r) => r.read<String>('id')).toList();
     final tagsByDive = await _tagRepository.getTagsForDives(diveIds);
     final diveTypesByDive = await _diveTypesForDives(diveIds);
-    final buddyNamesByDive = await _buddyNamesForDives(diveIds);
-    return _mapSummaryRows(rows, tagsByDive, diveTypesByDive, buddyNamesByDive);
+    return _mapSummaryRows(rows, tagsByDive, diveTypesByDive);
   }
 
   /// Shared row mapper for the summary SELECT column list (used by
@@ -2333,7 +2326,6 @@ class DiveRepository {
     List<QueryRow> rows,
     Map<String, List<domain.Tag>> tagsByDive,
     Map<String, List<String>> diveTypesByDive,
-    Map<String, List<String>> buddyNamesByDive,
   ) {
     return rows.map((row) {
       final id = row.read<String>('id');
@@ -2364,7 +2356,6 @@ class DiveRepository {
           if (row.readNullable<String>('buddy') != null &&
               row.readNullable<String>('buddy')!.isNotEmpty)
             row.readNullable<String>('buddy')!,
-          ...buddyNamesByDive[id] ?? [],
         ],
         siteName: row.readNullable<String>('site_name'),
         siteCountry: row.readNullable<String>('site_country'),
@@ -4771,29 +4762,6 @@ class DiveRepository {
     final map = <String, List<String>>{};
     for (final r in rows) {
       (map[r.diveId] ??= <String>[]).add(r.diveTypeId);
-    }
-    return map;
-  }
-
-  /// Load each dive's structured buddy names from the junction, keyed by dive id.
-  Future<Map<String, List<String>>> _buddyNamesForDives(
-    List<String> diveIds,
-  ) async {
-    if (diveIds.isEmpty) return {};
-    final placeholders = List.filled(diveIds.length, '?').join(', ');
-    final rows = await (_db.customSelect(
-      'SELECT db.dive_id, b.name FROM dive_buddies db '
-      'JOIN buddies b ON db.buddy_id = b.id '
-      'WHERE db.dive_id IN ($placeholders) '
-      'ORDER BY db.created_at',
-      variables: diveIds.map((id) => Variable<Object>(id)).toList(),
-    )).get();
-
-    final map = <String, List<String>>{};
-    for (final r in rows) {
-      final diveId = r.read<String>('dive_id');
-      final name = r.read<String>('name');
-      (map[diveId] ??= <String>[]).add(name);
     }
     return map;
   }
