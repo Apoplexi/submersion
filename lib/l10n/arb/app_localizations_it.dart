@@ -16520,6 +16520,17 @@ class AppLocalizationsIt extends AppLocalizations {
   String get importWizard_tagsLabel => 'Tags';
 
   @override
+  String importWizard_review_olderDivesSkipped(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count immersioni precedenti ignorate — già nel tuo libro',
+      one: '1 immersione precedente ignorata — già nel tuo libro',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get tags_hint_addTags => 'Aggiungi tag...';
 
   @override

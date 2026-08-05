@@ -16091,6 +16091,17 @@ class AppLocalizationsHe extends AppLocalizations {
   String get importWizard_tagsLabel => 'Tags';
 
   @override
+  String importWizard_review_olderDivesSkipped(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count צלילות ישנות דולגו — כבר ביומן שלך',
+      one: 'צלילה ישנה אחת דולגה — כבר ביומן שלך',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get tags_hint_addTags => 'הוסף תגיות...';
 
   @override

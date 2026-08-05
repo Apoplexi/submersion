@@ -27750,6 +27750,12 @@ abstract class AppLocalizations {
   /// **'Tags'**
   String get importWizard_tagsLabel;
 
+  /// Title for the collapsed ExpansionTile summarizing auto-skipped dives that fall at or before the diver's first-sync cutoff
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{1 older dive skipped — already in your log} other{{count} older dives skipped — already in your log}}'**
+  String importWizard_review_olderDivesSkipped(int count);
+
   /// No description provided for @tags_hint_addTags.
   ///
   /// In en, this message translates to:

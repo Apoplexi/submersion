@@ -15668,6 +15668,16 @@ class AppLocalizationsZh extends AppLocalizations {
   String get importWizard_tagsLabel => '标签';
 
   @override
+  String importWizard_review_olderDivesSkipped(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '已跳过 $count 次较早的潜水 — 已在您的日志中',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get tags_hint_addTags => '添加标签...';
 
   @override

@@ -4860,6 +4860,7 @@
   "tags_empty": "Aucune étiquette pour le moment. Créez des étiquettes lors de la modification des plongées.",
   "tags_hint_addMoreTags": "Ajouter plus d'étiquettes...",
   "importWizard_tagsLabel": "Tags",
+  "importWizard_review_olderDivesSkipped": "{count, plural, one{1 plongée plus ancienne ignorée — déjà dans votre carnet} other{{count} plongées plus anciennes ignorées — déjà dans votre carnet}}",
   "tags_hint_addTags": "Ajouter des étiquettes...",
   "tags_manage_bulkDeleteMessage": "Ces etiquettes seront retirees de {diveCount, plural, =0{0 plongees} =1{1 plongee} other{{diveCount} plongees}} au total. Cette action est irreversible.",
   "tags_manage_bulkDeleteTitle": "Supprimer {count} etiquettes ?",

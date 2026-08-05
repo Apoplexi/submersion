@@ -3732,6 +3732,7 @@
   "gas_tmx2135_description": "常氧三混气 21/35",
   "gas_tmx2135_displayName": "Tx 21/35",
   "importWizard_tagsLabel": "标签",
+  "importWizard_review_olderDivesSkipped": "{count, plural, other{已跳过 {count} 次较早的潜水 — 已在您的日志中}}",
   "maps_compass_resetLabel": "将地图方向重置为正北",
   "maps_compass_resetTooltip": "正北朝上",
   "maps_heatMap_hide": "隐藏热力图",

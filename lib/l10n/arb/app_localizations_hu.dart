@@ -16472,6 +16472,17 @@ class AppLocalizationsHu extends AppLocalizations {
   String get importWizard_tagsLabel => 'Tags';
 
   @override
+  String importWizard_review_olderDivesSkipped(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count régebbi merülés kihagyva — már szerepel a naplódban',
+      one: '1 régebbi merülés kihagyva — már szerepel a naplódban',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get tags_hint_addTags => 'Címkék hozzáadása...';
 
   @override

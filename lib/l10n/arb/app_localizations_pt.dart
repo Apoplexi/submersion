@@ -16530,6 +16530,18 @@ class AppLocalizationsPt extends AppLocalizations {
   String get importWizard_tagsLabel => 'Tags';
 
   @override
+  String importWizard_review_olderDivesSkipped(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count mergulhos mais antigos ignorados — já estão no seu registo',
+      one: '1 mergulho mais antigo ignorado — já está no seu registo',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get tags_hint_addTags => 'Adicionar tags...';
 
   @override

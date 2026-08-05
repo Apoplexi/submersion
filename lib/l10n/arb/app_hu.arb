@@ -4860,6 +4860,7 @@
   "tags_empty": "Még nincsenek címkék. Hozz létre címkéket a merülések szerkesztésekor.",
   "tags_hint_addMoreTags": "További címkék hozzáadása...",
   "importWizard_tagsLabel": "Tags",
+  "importWizard_review_olderDivesSkipped": "{count, plural, one{1 régebbi merülés kihagyva — már szerepel a naplódban} other{{count} régebbi merülés kihagyva — már szerepel a naplódban}}",
   "tags_hint_addTags": "Címkék hozzáadása...",
   "tags_manage_bulkDeleteMessage": "Ezek a címkék eltávolításra kerülnek összesen {diveCount, plural, =0{0 merülésből} =1{1 merülésből} other{{diveCount} merülésből}}. Ez nem vonható vissza.",
   "tags_manage_bulkDeleteTitle": "{count} címke törlése?",

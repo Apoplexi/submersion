@@ -4930,6 +4930,7 @@
   "tags_empty": "Noch keine Tags. Erstellen Sie Tags beim Bearbeiten von Tauchgängen.",
   "tags_hint_addMoreTags": "Weitere Tags hinzufügen...",
   "importWizard_tagsLabel": "Tags",
+  "importWizard_review_olderDivesSkipped": "{count, plural, one{1 älterer Tauchgang übersprungen — bereits in deinem Logbuch} other{{count} ältere Tauchgänge übersprungen — bereits in deinem Logbuch}}",
   "tags_hint_addTags": "Tags hinzufügen...",
   "tags_manage_bulkDeleteMessage": "Diese Tags werden von insgesamt {diveCount, plural, =0{0 Tauchgängen} =1{1 Tauchgang} other{{diveCount} Tauchgängen}} entfernt. Dies kann nicht rückgängig gemacht werden.",
   "tags_manage_bulkDeleteTitle": "{count} Tags löschen?",
