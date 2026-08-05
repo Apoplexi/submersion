@@ -393,11 +393,19 @@ class _CourseEditPageState extends ConsumerState<CourseEditPage> {
     BuildContext context, {
     required bool isStart,
   }) async {
-    final initialDate = isStart
-        ? _startDate
-        : (_completionDate ?? DateTime.now());
     final firstDate = isStart ? DateTime(1950) : _startDate;
     final lastDate = DateTime(2100);
+    // Clamp into [firstDate, lastDate]: a completion date defaults to today,
+    // which precedes a future start date and would trip showDatePicker's
+    // initialDate assertion.
+    var initialDate = isStart
+        ? _startDate
+        : (_completionDate ?? DateTime.now());
+    if (initialDate.isBefore(firstDate)) {
+      initialDate = firstDate;
+    } else if (initialDate.isAfter(lastDate)) {
+      initialDate = lastDate;
+    }
 
     final picked = await showDatePicker(
       context: context,
