@@ -16902,6 +16902,50 @@ class AppLocalizationsEs extends AppLocalizations {
       'No hay computadoras guardadas';
 
   @override
+  String transfer_computers_diveCount(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count inmersiones',
+      one: '1 inmersión',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get transfer_computers_downloadTooltip => 'Descargar inmersiones';
+
+  @override
+  String get transfer_computers_knownComputersHeader => 'Ordenadores conocidos';
+
+  @override
+  String transfer_computers_lastDownloadDaysAgo(int days) {
+    return 'hace $days días';
+  }
+
+  @override
+  String transfer_computers_lastDownloadHoursAgo(int hours) {
+    String _temp0 = intl.Intl.pluralLogic(
+      hours,
+      locale: localeName,
+      other: 'hace $hours horas',
+      one: 'hace 1 hora',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String transfer_computers_lastDownloadMinutesAgo(int minutes) {
+    return 'hace $minutes min';
+  }
+
+  @override
+  String get transfer_computers_lastDownloadNever => 'Nunca';
+
+  @override
+  String get transfer_computers_lastDownloadYesterday => 'Ayer';
+
+  @override
   String transfer_computers_savedCount(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
