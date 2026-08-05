@@ -2150,6 +2150,60 @@ const String kSeedBuiltInServiceKindsSql = '''
   CROSS JOIN (SELECT CAST(strftime('%s','now') AS INTEGER) * 1000 AS now_ms) n
 ''';
 
+/// A named, reusable set of cylinders. equipment_id set means "a config for
+/// this rebreather"; null means a generic gas plan usable on any dive.
+/// ON DELETE SET NULL demotes a config when its unit is deleted rather than
+/// destroying a painstakingly entered bailout plan.
+class CylinderConfigs extends Table {
+  TextColumn get id => text()();
+  TextColumn get diverId => text().nullable().references(Divers, #id)();
+  TextColumn get equipmentId => text().nullable().references(
+    Equipment,
+    #id,
+    onDelete: KeyAction.setNull,
+  )();
+  TextColumn get name => text()();
+  TextColumn get description => text().withDefault(const Constant(''))();
+  IntColumn get sortOrder => integer().withDefault(const Constant(0))();
+  IntColumn get createdAt => integer()();
+  IntColumn get updatedAt => integer()();
+
+  /// Hybrid Logical Clock for cross-device conflict resolution
+  /// (nullable: rows written before HLC rollout fall back to updatedAt).
+  TextColumn get hlc => text().nullable()();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
+/// One cylinder in a configuration. The spec columns are a SNAPSHOT: a tank
+/// preset may populate them at edit time, but there is deliberately no FK to
+/// tank_presets. A config records what the diver actually dives, so a later
+/// edit to a preset must not rewrite the meaning of a saved config.
+class CylinderConfigItems extends Table {
+  TextColumn get id => text()();
+  TextColumn get configId =>
+      text().references(CylinderConfigs, #id, onDelete: KeyAction.cascade)();
+  IntColumn get sortOrder => integer().withDefault(const Constant(0))();
+  TextColumn get label => text().nullable()();
+  TextColumn get tankRole => text()(); // TankRole.name
+  RealColumn get volumeL => real().nullable()();
+  RealColumn get workingPressureBar => real().nullable()();
+  TextColumn get tankMaterial => text().nullable()(); // TankMaterial.name
+  RealColumn get o2Percent => real().withDefault(const Constant(21.0))();
+  RealColumn get hePercent => real().withDefault(const Constant(0.0))();
+  RealColumn get defaultStartPressureBar => real().nullable()();
+  IntColumn get createdAt => integer()();
+  IntColumn get updatedAt => integer()();
+
+  /// Hybrid Logical Clock for cross-device conflict resolution
+  /// (nullable: rows written before HLC rollout fall back to updatedAt).
+  TextColumn get hlc => text().nullable()();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
 /// Custom tank presets (user-defined tank configurations)
 class TankPresets extends Table {
   TextColumn get id => text()();
@@ -2862,6 +2916,8 @@ String legacyDataSourceId(String diveId) => '$kLegacyDataSourceIdPrefix$diveId';
     ConnectedAccounts,
     ServiceKinds,
     ServiceSchedules,
+    CylinderConfigs,
+    CylinderConfigItems,
   ],
 )
 class AppDatabase extends _$AppDatabase {
@@ -2871,7 +2927,7 @@ class AppDatabase extends _$AppDatabase {
 
   /// The current schema version as a static constant so that pre-open checks
   /// (e.g. version-mismatch guard) can reference it without an instance.
-  static const int currentSchemaVersion = 137;
+  static const int currentSchemaVersion = 139;
 
   /// Every schema version that has a migration block in onUpgrade.
   /// Used to calculate progress step counts. When adding a new migration,
@@ -3040,6 +3096,10 @@ class AppDatabase extends _$AppDatabase {
     // v137: dives.weather_code, plus a one-time clear of the English weather
     // prose this app generated itself so it can be re-rendered localized.
     137,
+    // v138 is reserved by the divelogs.de branch (connected_accounts.diver_id).
+    // v139: cylinder_configs + cylinder_config_items (reusable diluent and
+    // bailout setups).
+    139,
   ];
 
   /// Idempotent DDL for the v106 connector-suggestion columns (Lightroom
@@ -3403,6 +3463,60 @@ class AppDatabase extends _$AppDatabase {
       'ON quality_findings (status)',
     );
   }
+
+  /// v139: cylinder configuration tables. CREATE TABLE IF NOT EXISTS, so this
+  /// is safe to call from both onUpgrade and the beforeOpen backstop
+  /// (parallel-branch version-collision self-heal).
+  ///
+  /// o2_percent / he_percent carry the same non-null defaults as dive_tanks
+  /// so a configuration cylinder is never in an "unset gas" state.
+  Future<void> _assertCylinderConfigSchema() async {
+    await customStatement('''
+      CREATE TABLE IF NOT EXISTS cylinder_configs (
+        id TEXT NOT NULL PRIMARY KEY,
+        diver_id TEXT REFERENCES divers (id),
+        equipment_id TEXT REFERENCES equipment (id) ON DELETE SET NULL,
+        name TEXT NOT NULL,
+        description TEXT NOT NULL DEFAULT '',
+        sort_order INTEGER NOT NULL DEFAULT 0,
+        created_at INTEGER NOT NULL,
+        updated_at INTEGER NOT NULL,
+        hlc TEXT
+      )
+    ''');
+    await customStatement('''
+      CREATE TABLE IF NOT EXISTS cylinder_config_items (
+        id TEXT NOT NULL PRIMARY KEY,
+        config_id TEXT NOT NULL
+          REFERENCES cylinder_configs (id) ON DELETE CASCADE,
+        sort_order INTEGER NOT NULL DEFAULT 0,
+        label TEXT,
+        tank_role TEXT NOT NULL,
+        volume_l REAL,
+        working_pressure_bar REAL,
+        tank_material TEXT,
+        o2_percent REAL NOT NULL DEFAULT 21.0,
+        he_percent REAL NOT NULL DEFAULT 0.0,
+        default_start_pressure_bar REAL,
+        created_at INTEGER NOT NULL,
+        updated_at INTEGER NOT NULL,
+        hlc TEXT
+      )
+    ''');
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_cylinder_configs_equipment '
+      'ON cylinder_configs (equipment_id)',
+    );
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_cylinder_config_items_config '
+      'ON cylinder_config_items (config_id)',
+    );
+  }
+
+  /// Test hook: re-assert the v139 tables on demand so tests can prove the
+  /// stranded-database self-heal path is idempotent.
+  Future<void> assertCylinderConfigSchemaForTest() =>
+      _assertCylinderConfigSchema();
 
   /// v127: pre-dive checklist tables. Migrator.createTable is IF NOT EXISTS,
   /// so this is safe to call from both onUpgrade and the beforeOpen backstop
@@ -7171,6 +7285,10 @@ class AppDatabase extends _$AppDatabase {
           await _clearGeneratedWeatherDescriptions();
         }
         if (from < 137) await reportProgress();
+        if (from < 139) {
+          await _assertCylinderConfigSchema();
+          await reportProgress();
+        }
       },
       beforeOpen: (details) async {
         // Enable foreign keys
@@ -7278,6 +7396,11 @@ class AppDatabase extends _$AppDatabase {
 
         // v135 backstop: re-assert color accent toggle columns.
         await _assertAccentColorSettingsColumns();
+
+        // v139 backstop: re-assert the cylinder configuration tables. A
+        // database stranded at any lower version by a parallel-branch
+        // version collision self-heals here.
+        await _assertCylinderConfigSchema();
 
         // Built-in dive types are reference data: identical on every device and
         // undeletable through DiveTypeRepository. Nothing else restores them --
