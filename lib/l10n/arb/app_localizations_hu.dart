@@ -21611,6 +21611,60 @@ class AppLocalizationsHu extends AppLocalizations {
   String get attrLabel_dry_weight_kg => 'Száraz tömeg';
 
   @override
+  String get attrLabel_unit_type => 'Készülék típusa';
+
+  @override
+  String get attrLabel_mount_configuration => 'Rögzítés';
+
+  @override
+  String get attrLabel_scrubber_type => 'Abszorber típusa';
+
+  @override
+  String get attrLabel_scrubber_duration_h => 'Abszorber élettartama (ó)';
+
+  @override
+  String get attrLabel_o2_cell_count => 'O2-cellák';
+
+  @override
+  String get attrLabel_diluent_cylinder_l => 'Diluent palack';
+
+  @override
+  String get attrLabel_o2_cylinder_l => 'O2 palack';
+
+  @override
+  String get attrChoice_unit_type_eccr => 'Elektronikus CCR (eCCR)';
+
+  @override
+  String get attrChoice_unit_type_mccr => 'Manuális CCR (mCCR)';
+
+  @override
+  String get attrChoice_unit_type_hccr => 'Hibrid CCR (hCCR)';
+
+  @override
+  String get attrChoice_unit_type_scr_cmf => 'SCR - állandó tömegáram';
+
+  @override
+  String get attrChoice_unit_type_scr_pascr => 'SCR - passzív adagolás';
+
+  @override
+  String get attrChoice_unit_type_scr_escr => 'SCR - elektronikus szabályozás';
+
+  @override
+  String get attrChoice_mount_configuration_back => 'Háti rögzítés';
+
+  @override
+  String get attrChoice_mount_configuration_chest => 'Mellkasi rögzítés';
+
+  @override
+  String get attrChoice_mount_configuration_sidemount => 'Oldalra szerelt';
+
+  @override
+  String get attrChoice_scrubber_type_axial => 'Axiális';
+
+  @override
+  String get attrChoice_scrubber_type_radial => 'Radiális';
+
+  @override
   String get attrChoice_suit_style_full => 'Egész ruha';
 
   @override

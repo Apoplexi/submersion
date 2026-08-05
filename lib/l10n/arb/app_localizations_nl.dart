@@ -21511,6 +21511,60 @@ class AppLocalizationsNl extends AppLocalizations {
   String get attrLabel_dry_weight_kg => 'Drooggewicht';
 
   @override
+  String get attrLabel_unit_type => 'Type unit';
+
+  @override
+  String get attrLabel_mount_configuration => 'Montage';
+
+  @override
+  String get attrLabel_scrubber_type => 'Type scrubber';
+
+  @override
+  String get attrLabel_scrubber_duration_h => 'Scrubberduur (u)';
+
+  @override
+  String get attrLabel_o2_cell_count => 'O2-cellen';
+
+  @override
+  String get attrLabel_diluent_cylinder_l => 'Diluentfles';
+
+  @override
+  String get attrLabel_o2_cylinder_l => 'O2-fles';
+
+  @override
+  String get attrChoice_unit_type_eccr => 'Elektronische CCR (eCCR)';
+
+  @override
+  String get attrChoice_unit_type_mccr => 'Handmatige CCR (mCCR)';
+
+  @override
+  String get attrChoice_unit_type_hccr => 'Hybride CCR (hCCR)';
+
+  @override
+  String get attrChoice_unit_type_scr_cmf => 'SCR - constante massastroom';
+
+  @override
+  String get attrChoice_unit_type_scr_pascr => 'SCR - passieve toevoeging';
+
+  @override
+  String get attrChoice_unit_type_scr_escr => 'SCR - elektronisch geregeld';
+
+  @override
+  String get attrChoice_mount_configuration_back => 'Rugmontage';
+
+  @override
+  String get attrChoice_mount_configuration_chest => 'Borstmontage';
+
+  @override
+  String get attrChoice_mount_configuration_sidemount => 'Sidemount';
+
+  @override
+  String get attrChoice_scrubber_type_axial => 'Axiaal';
+
+  @override
+  String get attrChoice_scrubber_type_radial => 'Radiaal';
+
+  @override
   String get attrChoice_suit_style_full => 'Volledig pak';
 
   @override

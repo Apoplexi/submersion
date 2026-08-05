@@ -21137,6 +21137,60 @@ class AppLocalizationsHe extends AppLocalizations {
   String get attrLabel_dry_weight_kg => 'משקל יבש';
 
   @override
+  String get attrLabel_unit_type => 'סוג היחידה';
+
+  @override
+  String get attrLabel_mount_configuration => 'אופן ההרכבה';
+
+  @override
+  String get attrLabel_scrubber_type => 'סוג הסופח';
+
+  @override
+  String get attrLabel_scrubber_duration_h => 'משך הסופח (שעות)';
+
+  @override
+  String get attrLabel_o2_cell_count => 'תאי O2';
+
+  @override
+  String get attrLabel_diluent_cylinder_l => 'בלון מדלל';
+
+  @override
+  String get attrLabel_o2_cylinder_l => 'בלון O2';
+
+  @override
+  String get attrChoice_unit_type_eccr => 'CCR אלקטרוני (eCCR)';
+
+  @override
+  String get attrChoice_unit_type_mccr => 'CCR ידני (mCCR)';
+
+  @override
+  String get attrChoice_unit_type_hccr => 'CCR היברידי (hCCR)';
+
+  @override
+  String get attrChoice_unit_type_scr_cmf => 'SCR - ספיקת מסה קבועה';
+
+  @override
+  String get attrChoice_unit_type_scr_pascr => 'SCR - הוספה פסיבית';
+
+  @override
+  String get attrChoice_unit_type_scr_escr => 'SCR - בקרה אלקטרונית';
+
+  @override
+  String get attrChoice_mount_configuration_back => 'הרכבה על הגב';
+
+  @override
+  String get attrChoice_mount_configuration_chest => 'הרכבה על החזה';
+
+  @override
+  String get attrChoice_mount_configuration_sidemount => 'הרכבה בצד';
+
+  @override
+  String get attrChoice_scrubber_type_axial => 'צירי';
+
+  @override
+  String get attrChoice_scrubber_type_radial => 'רדיאלי';
+
+  @override
   String get attrChoice_suit_style_full => 'חליפה מלאה';
 
   @override

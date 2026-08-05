@@ -21752,6 +21752,60 @@ class AppLocalizationsFr extends AppLocalizations {
   String get attrLabel_dry_weight_kg => 'Poids à sec';
 
   @override
+  String get attrLabel_unit_type => 'Type d\'appareil';
+
+  @override
+  String get attrLabel_mount_configuration => 'Montage';
+
+  @override
+  String get attrLabel_scrubber_type => 'Type de cartouche';
+
+  @override
+  String get attrLabel_scrubber_duration_h => 'Autonomie cartouche (h)';
+
+  @override
+  String get attrLabel_o2_cell_count => 'Cellules O2';
+
+  @override
+  String get attrLabel_diluent_cylinder_l => 'Bouteille de diluant';
+
+  @override
+  String get attrLabel_o2_cylinder_l => 'Bouteille d\'O2';
+
+  @override
+  String get attrChoice_unit_type_eccr => 'CCR électronique (eCCR)';
+
+  @override
+  String get attrChoice_unit_type_mccr => 'CCR manuel (mCCR)';
+
+  @override
+  String get attrChoice_unit_type_hccr => 'CCR hybride (hCCR)';
+
+  @override
+  String get attrChoice_unit_type_scr_cmf => 'SCR - débit massique constant';
+
+  @override
+  String get attrChoice_unit_type_scr_pascr => 'SCR - addition passive';
+
+  @override
+  String get attrChoice_unit_type_scr_escr => 'SCR - régulé électroniquement';
+
+  @override
+  String get attrChoice_mount_configuration_back => 'Montage dorsal';
+
+  @override
+  String get attrChoice_mount_configuration_chest => 'Montage ventral';
+
+  @override
+  String get attrChoice_mount_configuration_sidemount => 'Sidemount';
+
+  @override
+  String get attrChoice_scrubber_type_axial => 'Axiale';
+
+  @override
+  String get attrChoice_scrubber_type_radial => 'Radiale';
+
+  @override
   String get attrChoice_suit_style_full => 'Combinaison intégrale';
 
   @override

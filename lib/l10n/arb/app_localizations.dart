@@ -36214,6 +36214,114 @@ abstract class AppLocalizations {
   /// **'Dry weight'**
   String get attrLabel_dry_weight_kg;
 
+  /// No description provided for @attrLabel_unit_type.
+  ///
+  /// In en, this message translates to:
+  /// **'Unit type'**
+  String get attrLabel_unit_type;
+
+  /// No description provided for @attrLabel_mount_configuration.
+  ///
+  /// In en, this message translates to:
+  /// **'Mount'**
+  String get attrLabel_mount_configuration;
+
+  /// No description provided for @attrLabel_scrubber_type.
+  ///
+  /// In en, this message translates to:
+  /// **'Scrubber type'**
+  String get attrLabel_scrubber_type;
+
+  /// No description provided for @attrLabel_scrubber_duration_h.
+  ///
+  /// In en, this message translates to:
+  /// **'Scrubber duration (h)'**
+  String get attrLabel_scrubber_duration_h;
+
+  /// No description provided for @attrLabel_o2_cell_count.
+  ///
+  /// In en, this message translates to:
+  /// **'O2 cells'**
+  String get attrLabel_o2_cell_count;
+
+  /// No description provided for @attrLabel_diluent_cylinder_l.
+  ///
+  /// In en, this message translates to:
+  /// **'Diluent cylinder'**
+  String get attrLabel_diluent_cylinder_l;
+
+  /// No description provided for @attrLabel_o2_cylinder_l.
+  ///
+  /// In en, this message translates to:
+  /// **'O2 cylinder'**
+  String get attrLabel_o2_cylinder_l;
+
+  /// No description provided for @attrChoice_unit_type_eccr.
+  ///
+  /// In en, this message translates to:
+  /// **'Electronic CCR (eCCR)'**
+  String get attrChoice_unit_type_eccr;
+
+  /// No description provided for @attrChoice_unit_type_mccr.
+  ///
+  /// In en, this message translates to:
+  /// **'Manual CCR (mCCR)'**
+  String get attrChoice_unit_type_mccr;
+
+  /// No description provided for @attrChoice_unit_type_hccr.
+  ///
+  /// In en, this message translates to:
+  /// **'Hybrid CCR (hCCR)'**
+  String get attrChoice_unit_type_hccr;
+
+  /// No description provided for @attrChoice_unit_type_scr_cmf.
+  ///
+  /// In en, this message translates to:
+  /// **'SCR - constant mass flow'**
+  String get attrChoice_unit_type_scr_cmf;
+
+  /// No description provided for @attrChoice_unit_type_scr_pascr.
+  ///
+  /// In en, this message translates to:
+  /// **'SCR - passive addition'**
+  String get attrChoice_unit_type_scr_pascr;
+
+  /// No description provided for @attrChoice_unit_type_scr_escr.
+  ///
+  /// In en, this message translates to:
+  /// **'SCR - electronically controlled'**
+  String get attrChoice_unit_type_scr_escr;
+
+  /// No description provided for @attrChoice_mount_configuration_back.
+  ///
+  /// In en, this message translates to:
+  /// **'Back mount'**
+  String get attrChoice_mount_configuration_back;
+
+  /// No description provided for @attrChoice_mount_configuration_chest.
+  ///
+  /// In en, this message translates to:
+  /// **'Chest mount'**
+  String get attrChoice_mount_configuration_chest;
+
+  /// No description provided for @attrChoice_mount_configuration_sidemount.
+  ///
+  /// In en, this message translates to:
+  /// **'Sidemount'**
+  String get attrChoice_mount_configuration_sidemount;
+
+  /// No description provided for @attrChoice_scrubber_type_axial.
+  ///
+  /// In en, this message translates to:
+  /// **'Axial'**
+  String get attrChoice_scrubber_type_axial;
+
+  /// No description provided for @attrChoice_scrubber_type_radial.
+  ///
+  /// In en, this message translates to:
+  /// **'Radial'**
+  String get attrChoice_scrubber_type_radial;
+
   /// No description provided for @attrChoice_suit_style_full.
   ///
   /// In en, this message translates to:

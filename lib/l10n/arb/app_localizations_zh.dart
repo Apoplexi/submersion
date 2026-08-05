@@ -20586,6 +20586,60 @@ class AppLocalizationsZh extends AppLocalizations {
   String get attrLabel_dry_weight_kg => '干重';
 
   @override
+  String get attrLabel_unit_type => '设备类型';
+
+  @override
+  String get attrLabel_mount_configuration => '安装方式';
+
+  @override
+  String get attrLabel_scrubber_type => '药罐类型';
+
+  @override
+  String get attrLabel_scrubber_duration_h => '药罐时长（小时）';
+
+  @override
+  String get attrLabel_o2_cell_count => '氧电池';
+
+  @override
+  String get attrLabel_diluent_cylinder_l => '稀释气瓶';
+
+  @override
+  String get attrLabel_o2_cylinder_l => 'O2 气瓶';
+
+  @override
+  String get attrChoice_unit_type_eccr => '电子式 CCR (eCCR)';
+
+  @override
+  String get attrChoice_unit_type_mccr => '手动式 CCR (mCCR)';
+
+  @override
+  String get attrChoice_unit_type_hccr => '混合式 CCR (hCCR)';
+
+  @override
+  String get attrChoice_unit_type_scr_cmf => 'SCR - 恒定质量流量';
+
+  @override
+  String get attrChoice_unit_type_scr_pascr => 'SCR - 被动补气';
+
+  @override
+  String get attrChoice_unit_type_scr_escr => 'SCR - 电子控制';
+
+  @override
+  String get attrChoice_mount_configuration_back => '背挂式';
+
+  @override
+  String get attrChoice_mount_configuration_chest => '胸挂式';
+
+  @override
+  String get attrChoice_mount_configuration_sidemount => '侧挂式';
+
+  @override
+  String get attrChoice_scrubber_type_axial => '轴向';
+
+  @override
+  String get attrChoice_scrubber_type_radial => '径向';
+
+  @override
   String get attrChoice_suit_style_full => '全身湿衣';
 
   @override

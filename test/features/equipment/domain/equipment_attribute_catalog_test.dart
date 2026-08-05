@@ -1,6 +1,9 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/features/equipment/domain/constants/equipment_attribute_catalog.dart';
+import 'package:submersion/features/equipment/presentation/utils/equipment_attribute_l10n.dart';
+import 'package:submersion/l10n/arb/app_localizations.dart';
 
 void main() {
   test('every equipment type resolves to a definition list', () {
@@ -177,6 +180,43 @@ void main() {
       final def = EquipmentAttributeCatalog.defFor('scrubber_duration_h');
       expect(def!.kind, AttributeKind.number);
       expect(def.dimension, AttributeDimension.none);
+    });
+
+    testWidgets('every rebreather attribute and choice resolves to a label', (
+      tester,
+    ) async {
+      late AppLocalizations l10n;
+      await tester.pumpWidget(
+        MaterialApp(
+          locale: const Locale('en'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: Builder(
+            builder: (context) {
+              l10n = AppLocalizations.of(context);
+              return const SizedBox.shrink();
+            },
+          ),
+        ),
+      );
+
+      final defs = EquipmentAttributeCatalog.attributesFor(
+        EquipmentType.rebreather,
+      );
+      for (final def in defs) {
+        expect(
+          attributeLabel(l10n, def.key),
+          isNot(def.key),
+          reason: 'missing attrLabel_${def.key}',
+        );
+        for (final option in def.choiceKeys) {
+          expect(
+            attributeChoiceLabel(l10n, def.key, option),
+            isNot(option),
+            reason: 'missing attrChoice_${def.key}_$option',
+          );
+        }
+      }
     });
   });
 }

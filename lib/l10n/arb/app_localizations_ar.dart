@@ -21288,6 +21288,60 @@ class AppLocalizationsAr extends AppLocalizations {
   String get attrLabel_dry_weight_kg => 'الوزن الجاف';
 
   @override
+  String get attrLabel_unit_type => 'نوع الجهاز';
+
+  @override
+  String get attrLabel_mount_configuration => 'طريقة التثبيت';
+
+  @override
+  String get attrLabel_scrubber_type => 'نوع الماص';
+
+  @override
+  String get attrLabel_scrubber_duration_h => 'مدة الماص (ساعة)';
+
+  @override
+  String get attrLabel_o2_cell_count => 'خلايا O2';
+
+  @override
+  String get attrLabel_diluent_cylinder_l => 'أسطوانة المخفف';
+
+  @override
+  String get attrLabel_o2_cylinder_l => 'أسطوانة O2';
+
+  @override
+  String get attrChoice_unit_type_eccr => 'CCR إلكتروني (eCCR)';
+
+  @override
+  String get attrChoice_unit_type_mccr => 'CCR يدوي (mCCR)';
+
+  @override
+  String get attrChoice_unit_type_hccr => 'CCR هجين (hCCR)';
+
+  @override
+  String get attrChoice_unit_type_scr_cmf => 'SCR - تدفق كتلي ثابت';
+
+  @override
+  String get attrChoice_unit_type_scr_pascr => 'SCR - إضافة سلبية';
+
+  @override
+  String get attrChoice_unit_type_scr_escr => 'SCR - تحكم إلكتروني';
+
+  @override
+  String get attrChoice_mount_configuration_back => 'تثبيت خلفي';
+
+  @override
+  String get attrChoice_mount_configuration_chest => 'تثبيت أمامي';
+
+  @override
+  String get attrChoice_mount_configuration_sidemount => 'تثبيت جانبي';
+
+  @override
+  String get attrChoice_scrubber_type_axial => 'محوري';
+
+  @override
+  String get attrChoice_scrubber_type_radial => 'شعاعي';
+
+  @override
   String get attrChoice_suit_style_full => 'بدلة كاملة';
 
   @override
