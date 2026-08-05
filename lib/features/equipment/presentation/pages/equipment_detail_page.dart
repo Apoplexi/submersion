@@ -21,6 +21,7 @@ import 'package:submersion/features/equipment/domain/entities/service_record.dar
 import 'package:submersion/features/equipment/presentation/providers/equipment_providers.dart';
 import 'package:submersion/features/equipment/presentation/utils/equipment_attribute_l10n.dart';
 import 'package:submersion/features/equipment/presentation/utils/equipment_attribute_units.dart';
+import 'package:submersion/features/cylinder_configs/presentation/widgets/unit_configurations_card.dart';
 import 'package:submersion/features/equipment/presentation/widgets/service_clocks_card.dart';
 
 class EquipmentDetailPage extends ConsumerStatefulWidget {
@@ -160,6 +161,12 @@ class _EquipmentDetailContent extends ConsumerWidget {
               serviceKindId: status.kind.id,
             ),
           ),
+          // Only rebreathers own configurations; every other type would show
+          // a card that can never be anything but empty.
+          if (equipment.type == EquipmentType.rebreather) ...[
+            const SizedBox(height: 24),
+            UnitConfigurationsCard(equipmentId: equipmentId),
+          ],
           const SizedBox(height: 24),
           _ServiceHistorySection(equipmentId: equipmentId),
           if (equipment.notes.isNotEmpty) ...[
