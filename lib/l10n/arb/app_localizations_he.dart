@@ -2430,16 +2430,6 @@ class AppLocalizationsHe extends AppLocalizations {
   String get preDive_dashboard_start => 'התחל בדיקה לפני צלילה';
 
   @override
-  String get tools_preDive_title => 'רשימות בדיקה לפני צלילה';
-
-  @override
-  String get tools_preDive_subtitle => 'הרץ וסקור הרצות של רשימות בדיקה';
-
-  @override
-  String get tools_preDive_description =>
-      'בדיקות באדי, רשימות הרכבת CCR ואריזת ציוד עם תיעוד ביקורת';
-
-  @override
   String get trips_detail_preDive_action => 'רשימת בדיקה לפני צלילה';
 
   @override
@@ -3137,7 +3127,13 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String dashboard_gauges_dataIssues(int count) {
-    return '$count בעיות נתונים';
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count בעיות נתונים',
+      one: 'בעיית נתונים אחת',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -12674,6 +12670,13 @@ class AppLocalizationsHe extends AppLocalizations {
   String get diveDetailSection_tide_description => 'גרף מחזור גאות ושפל וזמן';
 
   @override
+  String get diveDetailSection_reefHealth_name => 'בריאות השונית';
+
+  @override
+  String get diveDetailSection_reefHealth_description =>
+      'עקת חום מהלבנת אלמוגים בתאריך הצלילה';
+
+  @override
   String get diveDetailSection_surfaceGps_name => 'GPS פני המים';
 
   @override
@@ -13261,6 +13264,19 @@ class AppLocalizationsHe extends AppLocalizations {
       locale: localeName,
       other: '$count שינויים ממתינים',
       one: 'שינוי ממתין אחד',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String settings_cloudSync_peerRequiresUpdate_banner(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count מכשירים מסתנכרנים מגרסה חדשה יותר של Submersion. עדכן מכשיר זה כדי לקבל את השינויים האחרונים שלהם.',
+      one:
+          'מכשיר אחד מסתנכרן מגרסה חדשה יותר של Submersion. עדכן מכשיר זה כדי לקבל את השינויים האחרונים שלו.',
     );
     return '$_temp0';
   }
@@ -14739,6 +14755,93 @@ class AppLocalizationsHe extends AppLocalizations {
   String get settings_units_weight_pounds => 'ליברות (lbs)';
 
   @override
+  String get settings_updates_automaticUpdates => 'עדכונים אוטומטיים';
+
+  @override
+  String get settings_updates_automaticUpdatesSubtitle =>
+      'בדיקת עדכונים מעת לעת';
+
+  @override
+  String get settings_updates_betaDialogBody =>
+      'גרסאות בטא מתפרסמות מכל שינוי ועשויות לשדרג את מסד הנתונים של יומן הצלילה שלך לפני הגרסה היציבה. חזרה מאוחר יותר לערוץ היציב לא תחזיר את האפליקציה לגרסה קודמת, וכל המכשירים שמסתנכרנים יחד צריכים להשתמש באותו ערוץ. גיבוי נוצר אוטומטית לפני כל שדרוג של מסד הנתונים.';
+
+  @override
+  String get settings_updates_betaDialogConfirm => 'מעבר לבטא';
+
+  @override
+  String get settings_updates_betaDialogTitle => 'לקבל עדכוני בטא?';
+
+  @override
+  String get settings_updates_channel => 'ערוץ עדכונים';
+
+  @override
+  String settings_updates_channelBadgeBeta(String version) {
+    return '$version (בטא)';
+  }
+
+  @override
+  String get settings_updates_channelBeta => 'בטא';
+
+  @override
+  String get settings_updates_channelBetaSubtitle =>
+      'גרסאות חדשות מכל שינוי, לפני היציבה';
+
+  @override
+  String get settings_updates_channelStable => 'יציב';
+
+  @override
+  String get settings_updates_channelStableSubtitle => 'גרסאות שנבדקו בלבד';
+
+  @override
+  String get settings_updates_checkForUpdates => 'בדוק אם יש עדכונים';
+
+  @override
+  String get settings_updates_checking => 'בודק...';
+
+  @override
+  String settings_updates_downloading(String progress) {
+    return 'מוריד... $progress%';
+  }
+
+  @override
+  String settings_updates_error(String message) {
+    return 'שגיאה: $message';
+  }
+
+  @override
+  String get settings_updates_header => 'עדכונים';
+
+  @override
+  String get settings_updates_joinBeta => 'הצטרפות לבטא';
+
+  @override
+  String get settings_updates_joinBetaSubtitle =>
+      'קבל תכונות חדשות מוקדם דרך תוכנית הבטא';
+
+  @override
+  String get settings_updates_lastChecked => 'בדיקה אחרונה';
+
+  @override
+  String get settings_updates_never => 'אף פעם';
+
+  @override
+  String settings_updates_readyToInstall(String version) {
+    return 'גרסה $version מוכנה להתקנה';
+  }
+
+  @override
+  String get settings_updates_stableSwitchNotice =>
+      'תישאר בגרסת הבטא הזו עד שהגרסה היציבה הבאה תהיה חדשה ממנה.';
+
+  @override
+  String get settings_updates_upToDate => 'מעודכן';
+
+  @override
+  String settings_updates_versionAvailable(String version) {
+    return 'גרסה $version זמינה';
+  }
+
+  @override
   String get signatures_action_clear => 'נקה';
 
   @override
@@ -15993,6 +16096,17 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get importWizard_tagsLabel => 'Tags';
+
+  @override
+  String importWizard_review_olderDivesSkipped(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count צלילות ישנות דולגו — כבר ביומן שלך',
+      one: 'צלילה ישנה אחת דולגה — כבר ביומן שלך',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get tags_hint_addTags => 'הוסף תגיות...';
@@ -17646,6 +17760,16 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
+  String get universalImport_entityAction_linkBadge => 'קישור';
+
+  @override
+  String get universalImport_entityAction_linkExisting => 'קישור לקיים';
+
+  @override
+  String get universalImport_entityAction_linkExistingSubtitle =>
+      'שימוש ברשומה התואמת';
+
+  @override
   String get universalImport_pending_chooseAction => 'בחר פעולה';
 
   @override
@@ -18115,7 +18239,13 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
+  String get diveComputer_downloadStep_downloadAll => 'הורדת כל הצלילות';
+
+  @override
   String get diveComputer_downloadStep_downloadFailed => 'ההורדה נכשלה';
+
+  @override
+  String get diveComputer_downloadStep_downloadNew => 'הורדת צלילות חדשות';
 
   @override
   String get diveComputer_downloadStep_downloadedDives => 'צלילות שהורדו';
@@ -18131,6 +18261,19 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String diveComputer_downloadStep_errorSemanticLabel(Object error) {
     return 'שגיאת הורדה: $error';
+  }
+
+  @override
+  String get diveComputer_downloadStep_firstSyncBody =>
+      'ביומן הצלילות שלך כבר יש צלילות. אפשר לדלג על הורדת הצלילות שכבר יש לך.';
+
+  @override
+  String get diveComputer_downloadStep_firstSyncTitle =>
+      'הורדה ראשונה ממחשב הצלילה הזה';
+
+  @override
+  String diveComputer_downloadStep_onlyAfterDate(String date) {
+    return 'הורדת צלילות אחרי $date בלבד';
   }
 
   @override
@@ -19494,30 +19637,6 @@ class AppLocalizationsHe extends AppLocalizations {
   String get tankPresets_title => 'תבניות מיכל';
 
   @override
-  String get tools_deco_description =>
-      'חשב מגבלות ללא-דקומפרסיה, עצירות דקו נדרשות, וחשיפת CNS/OTU לפרופילי צלילה מרובי-שכבות.';
-
-  @override
-  String get tools_deco_subtitle => 'תכנן צלילות עם עצירות דקומפרסיה';
-
-  @override
-  String get tools_deco_title => 'מחשבון דקו';
-
-  @override
-  String get tools_disclaimer =>
-      'מחשבונים אלו מיועדים לתכנון בלבד. תמיד אמת חישובים ופעל לפי הכשרת הצלילה שלך.';
-
-  @override
-  String get tools_gas_description =>
-      'ארבעה מחשבוני גז מתמחים:\n• MOD - עומק פעולה מרבי לתערובת גז\n• Best Mix - אחוז O₂ אידיאלי לעומק יעד\n• Consumption - הערכת צריכת גז\n• Rock Bottom - חישוב עתודה לחירום';
-
-  @override
-  String get tools_gas_subtitle => 'MOD, Best Mix, צריכה, Rock Bottom';
-
-  @override
-  String get tools_gas_title => 'מחשבוני גז';
-
-  @override
   String get tools_gpsLogger_description =>
       'הקלט את מיקומך במהלך יום צלילה והתאם אוטומטית צלילות מיובאות למיקומי GPS.';
 
@@ -19526,9 +19645,6 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get tools_gpsLogger_title => 'מקליט GPS';
-
-  @override
-  String get tools_title => 'כלים';
 
   @override
   String get tools_weight_aluminumImperial => 'ציפה יותר כשריק (+4 lbs)';
@@ -19544,10 +19660,6 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get tools_weight_carbonFiberMetric => 'ציפה מאוד (+3 kg)';
-
-  @override
-  String get tools_weight_description =>
-      'הערך את המשקל הנדרש על סמך חליפת החשיפה, חומר המיכל, סוג המים ומשקל הגוף.';
 
   @override
   String get tools_weight_disclaimer =>
@@ -19584,9 +19696,6 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get tools_weight_steelMetric => 'שלילי ציפה (-2 kg)';
-
-  @override
-  String get tools_weight_subtitle => 'משקל מומלץ להתקנה שלך';
 
   @override
   String get tools_weight_tankMaterial => 'חומר מיכל';
@@ -19930,6 +20039,31 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get settings_appearance_sections => 'חלקים';
+
+  @override
+  String get settings_appearance_colorAccents => 'הדגשות צבע';
+
+  @override
+  String get settings_appearance_accentNavIcons => 'סמלי ניווט צבעוניים';
+
+  @override
+  String get settings_appearance_accentNavIcons_subtitle =>
+      'צביעת סמלי התפריט הראשי בצבע של כל מדור';
+
+  @override
+  String get settings_appearance_accentSectionHeaders =>
+      'כותרות מדורים צבעוניות';
+
+  @override
+  String get settings_appearance_accentSectionHeaders_subtitle =>
+      'הצגת סמל מדור צבעוני לצד כותרות הדפים';
+
+  @override
+  String get settings_appearance_accentListIcons => 'סמלי רשימה צבעוניים';
+
+  @override
+  String get settings_appearance_accentListIcons_subtitle =>
+      'צביעת סמלים ברשימות ובדפי ההגדרות';
 
   @override
   String get settings_appearance_showDetailsPane => 'הצג חלונית פרטים';
@@ -20614,6 +20748,32 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get dive3d_overlay_markers => 'סמנים';
+
+  @override
+  String get dive3d_seascape_overlay_paths => 'מסלולי צלילה';
+
+  @override
+  String get dive3d_seascape_siteTitle => 'נוף ימי של האתר';
+
+  @override
+  String dive3d_seascape_seafloorSource(String source, String resolution) {
+    return 'קרקעית הים: $source (~$resolution מ\')';
+  }
+
+  @override
+  String get dive3d_seascape_noCoordinates => 'לאתר זה אין נקודות ציון GPS';
+
+  @override
+  String get dive3d_seascape_noData => 'אין נתוני עומק זמינים למיקום זה';
+
+  @override
+  String dive3d_seascape_axis_distance(String unitSymbol) {
+    return 'מרחק ($unitSymbol)';
+  }
+
+  @override
+  String get settings_about_bathymetryCredit =>
+      'נתוני עומק: GMRT (CC BY 4.0) · EMODnet Bathymetry (CC BY 4.0) · NOAA ETOPO 2022';
 
   @override
   String get dive3d_metric_depth => 'עומק';
@@ -21915,4 +22075,118 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String get settings_mediaStorage_quality_noTranscoderHint =>
       'מכשיר זה אינו יכול לדחוס וידאו. ממנו מועלים הקבצים המקוריים.';
+
+  @override
+  String get reef_section_title => 'שונית';
+
+  @override
+  String get reef_section_sourcesTooltip => 'מקורות נתונים';
+
+  @override
+  String get reef_section_loadError => 'לא ניתן לטעון כעת את נתוני השונית';
+
+  @override
+  String get reef_habitat_title => 'בית גידול השונית';
+
+  @override
+  String get reef_habitat_onReef => 'על שונית אלמוגים';
+
+  @override
+  String reef_habitat_onReefWithThreat(String threat) {
+    return 'על שונית אלמוגים, רמת איום $threat';
+  }
+
+  @override
+  String get reef_habitat_noReef => 'אין שונית אלמוגים ממופה במיקום זה';
+
+  @override
+  String get reef_habitat_unavailable => 'לא ניתן לבדוק כעת את בית הגידול';
+
+  @override
+  String get reef_health_title => 'בריאות השונית';
+
+  @override
+  String get reef_health_unavailable => 'לא ניתן לבדוק כעת את בריאות השונית';
+
+  @override
+  String get reef_health_noData => 'אין נתוני בריאות שונית למיקום זה';
+
+  @override
+  String reef_health_degreeHeatingWeeks(String value) {
+    return 'שבועות חום מצטברים $value מעלות-שבוע';
+  }
+
+  @override
+  String reef_health_seaSurface(String value) {
+    return 'פני הים $value';
+  }
+
+  @override
+  String reef_health_asOf(String date) {
+    return 'נכון ל-$date';
+  }
+
+  @override
+  String get reef_health_levelNoStress => 'אין עקת חום';
+
+  @override
+  String get reef_health_levelWatch => 'תצפית הלבנה';
+
+  @override
+  String get reef_health_levelWarning => 'אזהרת הלבנה';
+
+  @override
+  String get reef_health_levelAlert1 => 'התראת הלבנה רמה 1';
+
+  @override
+  String get reef_health_levelAlert2 => 'התראת הלבנה רמה 2';
+
+  @override
+  String get reef_health_levelAlert3 => 'התראת הלבנה רמה 3';
+
+  @override
+  String get reef_health_levelAlert4 => 'התראת הלבנה רמה 4';
+
+  @override
+  String get reef_health_levelAlert5 => 'התראת הלבנה רמה 5';
+
+  @override
+  String get reef_protection_title => 'אזור מוגן';
+
+  @override
+  String get reef_protection_none => 'לא נמצא באזור ימי מוגן';
+
+  @override
+  String get reef_protection_unavailable => 'לא ניתן לבדוק כעת את מצב ההגנה';
+
+  @override
+  String get reef_protection_viewRegulations => 'הצגת תקנות';
+
+  @override
+  String reef_protection_iucn(String category) {
+    return 'IUCN $category';
+  }
+
+  @override
+  String get reef_species_recordedNearby => 'תועד בסביבה';
+
+  @override
+  String get reef_species_addToExpected => 'הוספה למינים צפויים';
+
+  @override
+  String get reef_attribution_title => 'מקורות נתוני השונית';
+
+  @override
+  String get reef_attribution_wri => 'נוכחות שונית ורמת איום. CC BY 3.0.';
+
+  @override
+  String get reef_attribution_noaa => 'טמפרטורת פני הים ועקת חום. נחלת הכלל.';
+
+  @override
+  String get reef_attribution_gbif =>
+      'רשומות תצפית מינים, מסוננות ל-CC0 ו-CC BY 4.0.';
+
+  @override
+  String get reef_attribution_protectedSeas =>
+      'גבולות אזורים ימיים מוגנים. CC BY 4.0.';
 }
