@@ -10115,6 +10115,88 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String get cylinderConfigs_title => 'Flesconfiguraties';
+
+  @override
+  String get cylinderConfigs_empty => 'Nog geen configuraties';
+
+  @override
+  String get cylinderConfigs_emptyBody =>
+      'Sla een diluent- en bailout-opstelling één keer op en pas hem toe op elke duik.';
+
+  @override
+  String get cylinderConfigs_new => 'Nieuwe configuratie';
+
+  @override
+  String get cylinderConfigs_name => 'Naam';
+
+  @override
+  String get cylinderConfigs_nameRequired => 'Voer een naam in';
+
+  @override
+  String get cylinderConfigs_forUnit => 'Voor unit';
+
+  @override
+  String get cylinderConfigs_noUnit => 'Algemeen gasplan';
+
+  @override
+  String get cylinderConfigs_gasPlans => 'Gasplannen';
+
+  @override
+  String get cylinderConfigs_addCylinder => 'Fles toevoegen';
+
+  @override
+  String get cylinderConfigs_role => 'Rol';
+
+  @override
+  String get cylinderConfigs_startPressure => 'Begindruk';
+
+  @override
+  String get cylinderConfigs_label => 'Label';
+
+  @override
+  String get cylinderConfigs_fromPreset => 'Uit voorinstelling';
+
+  @override
+  String get cylinderConfigs_deleteTitle => 'Configuratie verwijderen?';
+
+  @override
+  String get cylinderConfigs_deleteBody =>
+      'Duiken waarop hij al is toegepast veranderen niet.';
+
+  @override
+  String get cylinderConfigs_applyAction => 'Configuratie toepassen';
+
+  @override
+  String cylinderConfigs_applyAdded(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count flessen toegevoegd',
+      one: '1 fles toegevoegd',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String cylinderConfigs_applyKept(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count behouden',
+      one: '1 behouden',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get cylinderConfigs_applyNothingToDo =>
+      'Deze duik komt al overeen met de configuratie';
+
+  @override
+  String get cylinderConfigs_sectionTitle => 'Configuraties';
+
+  @override
   String get equipment_serviceClocks_hoursSource =>
       'Berekend op basis van geregistreerde duiktijd';
 

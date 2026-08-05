@@ -3218,6 +3218,41 @@
   "equipment_serviceClocks_overdueSince": "متأخر منذ {date}",
   "equipment_serviceClocks_overdue": "متأخر",
   "equipment_serviceClocks_divesLeft": "متبقٍ {remaining} من {total} غوصة",
+  "cylinderConfigs_title": "إعدادات الأسطوانات",
+  "cylinderConfigs_empty": "لا توجد إعدادات بعد",
+  "cylinderConfigs_emptyBody": "احفظ إعداد المخفف والبديل مرة واحدة ثم طبّقه على أي غوصة.",
+  "cylinderConfigs_new": "إعداد جديد",
+  "cylinderConfigs_name": "الاسم",
+  "cylinderConfigs_nameRequired": "أدخل اسمًا",
+  "cylinderConfigs_forUnit": "للجهاز",
+  "cylinderConfigs_noUnit": "خطة غاز عامة",
+  "cylinderConfigs_gasPlans": "خطط الغاز",
+  "cylinderConfigs_addCylinder": "إضافة أسطوانة",
+  "cylinderConfigs_role": "الدور",
+  "cylinderConfigs_startPressure": "ضغط البداية",
+  "cylinderConfigs_label": "التسمية",
+  "cylinderConfigs_fromPreset": "من قالب",
+  "cylinderConfigs_deleteTitle": "حذف الإعداد؟",
+  "cylinderConfigs_deleteBody": "لن تتغير الغوصات التي طُبّق عليها بالفعل.",
+  "cylinderConfigs_applyAction": "تطبيق إعداد",
+  "cylinderConfigs_applyAdded": "{count, plural, =1{تمت إضافة أسطوانة واحدة} other{تمت إضافة {count} أسطوانات}}",
+  "@cylinderConfigs_applyAdded": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "cylinderConfigs_applyKept": "{count, plural, =1{مع الإبقاء على واحدة} other{مع الإبقاء على {count}}}",
+  "@cylinderConfigs_applyKept": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "cylinderConfigs_applyNothingToDo": "هذه الغوصة تطابق الإعداد بالفعل",
+  "cylinderConfigs_sectionTitle": "الإعدادات",
   "equipment_serviceClocks_hoursSource": "محسوب من زمن الغوص المسجل",
   "equipment_serviceClocks_hoursLeft": "متبقٍ {remaining} من {total} ساعة",
   "equipment_serviceClocks_manageKinds": "إدارة أنواع الصيانة",

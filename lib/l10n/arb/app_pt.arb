@@ -3218,6 +3218,41 @@
   "equipment_serviceClocks_overdueSince": "Atrasado desde {date}",
   "equipment_serviceClocks_overdue": "Atrasado",
   "equipment_serviceClocks_divesLeft": "Restam {remaining} de {total} mergulhos",
+  "cylinderConfigs_title": "Configurações de garrafas",
+  "cylinderConfigs_empty": "Ainda sem configurações",
+  "cylinderConfigs_emptyBody": "Guarde uma montagem de diluente e bailout uma vez e aplique-a a qualquer mergulho.",
+  "cylinderConfigs_new": "Nova configuração",
+  "cylinderConfigs_name": "Nome",
+  "cylinderConfigs_nameRequired": "Introduza um nome",
+  "cylinderConfigs_forUnit": "Para a unidade",
+  "cylinderConfigs_noUnit": "Plano de gás genérico",
+  "cylinderConfigs_gasPlans": "Planos de gás",
+  "cylinderConfigs_addCylinder": "Adicionar garrafa",
+  "cylinderConfigs_role": "Função",
+  "cylinderConfigs_startPressure": "Pressão inicial",
+  "cylinderConfigs_label": "Etiqueta",
+  "cylinderConfigs_fromPreset": "A partir de predefinição",
+  "cylinderConfigs_deleteTitle": "Eliminar a configuração?",
+  "cylinderConfigs_deleteBody": "Os mergulhos onde já foi aplicada não são alterados.",
+  "cylinderConfigs_applyAction": "Aplicar configuração",
+  "cylinderConfigs_applyAdded": "{count, plural, =1{1 garrafa adicionada} other{{count} garrafas adicionadas}}",
+  "@cylinderConfigs_applyAdded": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "cylinderConfigs_applyKept": "{count, plural, =1{1 mantida} other{{count} mantidas}}",
+  "@cylinderConfigs_applyKept": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "cylinderConfigs_applyNothingToDo": "Este mergulho já corresponde à configuração",
+  "cylinderConfigs_sectionTitle": "Configurações",
   "equipment_serviceClocks_hoursSource": "Calculado a partir do tempo de mergulho registado",
   "equipment_serviceClocks_hoursLeft": "Restam {remaining} de {total} horas",
   "equipment_serviceClocks_manageKinds": "Gerenciar tipos de manutenção",

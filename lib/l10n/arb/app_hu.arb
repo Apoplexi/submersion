@@ -3146,6 +3146,41 @@
   "equipment_serviceClocks_overdueSince": "{date} óta esedékes",
   "equipment_serviceClocks_overdue": "Lejárt",
   "equipment_serviceClocks_divesLeft": "{remaining} / {total} merülés van hátra",
+  "cylinderConfigs_title": "Palackkonfigurációk",
+  "cylinderConfigs_empty": "Még nincs konfiguráció",
+  "cylinderConfigs_emptyBody": "Mentsd el egyszer a diluent- és bailout-összeállítást, majd alkalmazd bármelyik merülésre.",
+  "cylinderConfigs_new": "Új konfiguráció",
+  "cylinderConfigs_name": "Név",
+  "cylinderConfigs_nameRequired": "Adj meg egy nevet",
+  "cylinderConfigs_forUnit": "Készülékhez",
+  "cylinderConfigs_noUnit": "Általános gázterv",
+  "cylinderConfigs_gasPlans": "Gáztervek",
+  "cylinderConfigs_addCylinder": "Palack hozzáadása",
+  "cylinderConfigs_role": "Szerep",
+  "cylinderConfigs_startPressure": "Kezdőnyomás",
+  "cylinderConfigs_label": "Címke",
+  "cylinderConfigs_fromPreset": "Sablonból",
+  "cylinderConfigs_deleteTitle": "Törlöd a konfigurációt?",
+  "cylinderConfigs_deleteBody": "A már alkalmazott merülések nem változnak.",
+  "cylinderConfigs_applyAction": "Konfiguráció alkalmazása",
+  "cylinderConfigs_applyAdded": "{count, plural, other{{count} palack hozzáadva}}",
+  "@cylinderConfigs_applyAdded": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "cylinderConfigs_applyKept": "{count, plural, other{{count} megtartva}}",
+  "@cylinderConfigs_applyKept": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "cylinderConfigs_applyNothingToDo": "Ez a merülés már megegyezik a konfigurációval",
+  "cylinderConfigs_sectionTitle": "Konfigurációk",
   "equipment_serviceClocks_hoursSource": "A naplózott merülési idő alapján számolva",
   "equipment_serviceClocks_hoursLeft": "{remaining} / {total} óra van hátra",
   "equipment_serviceClocks_manageKinds": "Szerviztípusok kezelése",

@@ -3146,6 +3146,41 @@
   "equipment_serviceClocks_overdueSince": "En retard depuis le {date}",
   "equipment_serviceClocks_overdue": "En retard",
   "equipment_serviceClocks_divesLeft": "{remaining} plongées restantes sur {total}",
+  "cylinderConfigs_title": "Configurations de bouteilles",
+  "cylinderConfigs_empty": "Aucune configuration",
+  "cylinderConfigs_emptyBody": "Enregistrez un montage diluant et bailout une fois, puis appliquez-le à n'importe quelle plongée.",
+  "cylinderConfigs_new": "Nouvelle configuration",
+  "cylinderConfigs_name": "Nom",
+  "cylinderConfigs_nameRequired": "Saisissez un nom",
+  "cylinderConfigs_forUnit": "Pour l'appareil",
+  "cylinderConfigs_noUnit": "Plan de gaz générique",
+  "cylinderConfigs_gasPlans": "Plans de gaz",
+  "cylinderConfigs_addCylinder": "Ajouter une bouteille",
+  "cylinderConfigs_role": "Rôle",
+  "cylinderConfigs_startPressure": "Pression de départ",
+  "cylinderConfigs_label": "Libellé",
+  "cylinderConfigs_fromPreset": "Depuis un préréglage",
+  "cylinderConfigs_deleteTitle": "Supprimer la configuration ?",
+  "cylinderConfigs_deleteBody": "Les plongées déjà concernées ne sont pas modifiées.",
+  "cylinderConfigs_applyAction": "Appliquer une configuration",
+  "cylinderConfigs_applyAdded": "{count, plural, =1{1 bouteille ajoutée} other{{count} bouteilles ajoutées}}",
+  "@cylinderConfigs_applyAdded": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "cylinderConfigs_applyKept": "{count, plural, =1{1 conservée} other{{count} conservées}}",
+  "@cylinderConfigs_applyKept": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "cylinderConfigs_applyNothingToDo": "Cette plongée correspond déjà à la configuration",
+  "cylinderConfigs_sectionTitle": "Configurations",
   "equipment_serviceClocks_hoursSource": "Calculé à partir du temps de plongée enregistré",
   "equipment_serviceClocks_hoursLeft": "{remaining} heures restantes sur {total}",
   "equipment_serviceClocks_manageKinds": "Gérer les types d'entretien",

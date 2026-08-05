@@ -10015,6 +10015,88 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String get cylinderConfigs_title => 'إعدادات الأسطوانات';
+
+  @override
+  String get cylinderConfigs_empty => 'لا توجد إعدادات بعد';
+
+  @override
+  String get cylinderConfigs_emptyBody =>
+      'احفظ إعداد المخفف والبديل مرة واحدة ثم طبّقه على أي غوصة.';
+
+  @override
+  String get cylinderConfigs_new => 'إعداد جديد';
+
+  @override
+  String get cylinderConfigs_name => 'الاسم';
+
+  @override
+  String get cylinderConfigs_nameRequired => 'أدخل اسمًا';
+
+  @override
+  String get cylinderConfigs_forUnit => 'للجهاز';
+
+  @override
+  String get cylinderConfigs_noUnit => 'خطة غاز عامة';
+
+  @override
+  String get cylinderConfigs_gasPlans => 'خطط الغاز';
+
+  @override
+  String get cylinderConfigs_addCylinder => 'إضافة أسطوانة';
+
+  @override
+  String get cylinderConfigs_role => 'الدور';
+
+  @override
+  String get cylinderConfigs_startPressure => 'ضغط البداية';
+
+  @override
+  String get cylinderConfigs_label => 'التسمية';
+
+  @override
+  String get cylinderConfigs_fromPreset => 'من قالب';
+
+  @override
+  String get cylinderConfigs_deleteTitle => 'حذف الإعداد؟';
+
+  @override
+  String get cylinderConfigs_deleteBody =>
+      'لن تتغير الغوصات التي طُبّق عليها بالفعل.';
+
+  @override
+  String get cylinderConfigs_applyAction => 'تطبيق إعداد';
+
+  @override
+  String cylinderConfigs_applyAdded(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'تمت إضافة $count أسطوانات',
+      one: 'تمت إضافة أسطوانة واحدة',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String cylinderConfigs_applyKept(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'مع الإبقاء على $count',
+      one: 'مع الإبقاء على واحدة',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get cylinderConfigs_applyNothingToDo =>
+      'هذه الغوصة تطابق الإعداد بالفعل';
+
+  @override
+  String get cylinderConfigs_sectionTitle => 'الإعدادات';
+
+  @override
   String get equipment_serviceClocks_hoursSource => 'محسوب من زمن الغوص المسجل';
 
   @override

@@ -9748,6 +9748,83 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get cylinderConfigs_title => '气瓶配置';
+
+  @override
+  String get cylinderConfigs_empty => '尚无配置';
+
+  @override
+  String get cylinderConfigs_emptyBody => '保存一次稀释气与备用气配置，即可应用到任何一次潜水。';
+
+  @override
+  String get cylinderConfigs_new => '新建配置';
+
+  @override
+  String get cylinderConfigs_name => '名称';
+
+  @override
+  String get cylinderConfigs_nameRequired => '请输入名称';
+
+  @override
+  String get cylinderConfigs_forUnit => '所属设备';
+
+  @override
+  String get cylinderConfigs_noUnit => '通用气体方案';
+
+  @override
+  String get cylinderConfigs_gasPlans => '气体方案';
+
+  @override
+  String get cylinderConfigs_addCylinder => '添加气瓶';
+
+  @override
+  String get cylinderConfigs_role => '用途';
+
+  @override
+  String get cylinderConfigs_startPressure => '起始压力';
+
+  @override
+  String get cylinderConfigs_label => '标签';
+
+  @override
+  String get cylinderConfigs_fromPreset => '从预设填入';
+
+  @override
+  String get cylinderConfigs_deleteTitle => '删除此配置？';
+
+  @override
+  String get cylinderConfigs_deleteBody => '已应用过的潜水不会改变。';
+
+  @override
+  String get cylinderConfigs_applyAction => '应用配置';
+
+  @override
+  String cylinderConfigs_applyAdded(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '已添加 $count 个气瓶',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String cylinderConfigs_applyKept(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '保留 $count 个',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get cylinderConfigs_applyNothingToDo => '该潜水已与配置一致';
+
+  @override
+  String get cylinderConfigs_sectionTitle => '配置';
+
+  @override
   String get equipment_serviceClocks_hoursSource => '根据已记录的潜水时间计算';
 
   @override

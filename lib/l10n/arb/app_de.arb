@@ -3218,6 +3218,41 @@
   "equipment_serviceClocks_overdueSince": "Überfällig seit {date}",
   "equipment_serviceClocks_overdue": "Überfällig",
   "equipment_serviceClocks_divesLeft": "{remaining} von {total} Tauchgängen übrig",
+  "cylinderConfigs_title": "Flaschenkonfigurationen",
+  "cylinderConfigs_empty": "Noch keine Konfigurationen",
+  "cylinderConfigs_emptyBody": "Diluent- und Bailout-Aufbau einmal speichern und auf jeden Tauchgang anwenden.",
+  "cylinderConfigs_new": "Neue Konfiguration",
+  "cylinderConfigs_name": "Name",
+  "cylinderConfigs_nameRequired": "Namen eingeben",
+  "cylinderConfigs_forUnit": "Für Gerät",
+  "cylinderConfigs_noUnit": "Allgemeiner Gasplan",
+  "cylinderConfigs_gasPlans": "Gaspläne",
+  "cylinderConfigs_addCylinder": "Flasche hinzufügen",
+  "cylinderConfigs_role": "Rolle",
+  "cylinderConfigs_startPressure": "Anfangsdruck",
+  "cylinderConfigs_label": "Bezeichnung",
+  "cylinderConfigs_fromPreset": "Aus Vorlage",
+  "cylinderConfigs_deleteTitle": "Konfiguration löschen?",
+  "cylinderConfigs_deleteBody": "Bereits angewendete Tauchgänge bleiben unverändert.",
+  "cylinderConfigs_applyAction": "Konfiguration anwenden",
+  "cylinderConfigs_applyAdded": "{count, plural, =1{1 Flasche hinzugefügt} other{{count} Flaschen hinzugefügt}}",
+  "@cylinderConfigs_applyAdded": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "cylinderConfigs_applyKept": "{count, plural, =1{1 beibehalten} other{{count} beibehalten}}",
+  "@cylinderConfigs_applyKept": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "cylinderConfigs_applyNothingToDo": "Dieser Tauchgang entspricht bereits der Konfiguration",
+  "cylinderConfigs_sectionTitle": "Konfigurationen",
   "equipment_serviceClocks_hoursSource": "Aus der protokollierten Tauchzeit berechnet",
   "equipment_serviceClocks_hoursLeft": "{remaining} von {total} Stunden übrig",
   "equipment_serviceClocks_manageKinds": "Wartungsarten verwalten",

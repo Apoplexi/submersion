@@ -10168,6 +10168,86 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String get cylinderConfigs_title => 'Palackkonfigurációk';
+
+  @override
+  String get cylinderConfigs_empty => 'Még nincs konfiguráció';
+
+  @override
+  String get cylinderConfigs_emptyBody =>
+      'Mentsd el egyszer a diluent- és bailout-összeállítást, majd alkalmazd bármelyik merülésre.';
+
+  @override
+  String get cylinderConfigs_new => 'Új konfiguráció';
+
+  @override
+  String get cylinderConfigs_name => 'Név';
+
+  @override
+  String get cylinderConfigs_nameRequired => 'Adj meg egy nevet';
+
+  @override
+  String get cylinderConfigs_forUnit => 'Készülékhez';
+
+  @override
+  String get cylinderConfigs_noUnit => 'Általános gázterv';
+
+  @override
+  String get cylinderConfigs_gasPlans => 'Gáztervek';
+
+  @override
+  String get cylinderConfigs_addCylinder => 'Palack hozzáadása';
+
+  @override
+  String get cylinderConfigs_role => 'Szerep';
+
+  @override
+  String get cylinderConfigs_startPressure => 'Kezdőnyomás';
+
+  @override
+  String get cylinderConfigs_label => 'Címke';
+
+  @override
+  String get cylinderConfigs_fromPreset => 'Sablonból';
+
+  @override
+  String get cylinderConfigs_deleteTitle => 'Törlöd a konfigurációt?';
+
+  @override
+  String get cylinderConfigs_deleteBody =>
+      'A már alkalmazott merülések nem változnak.';
+
+  @override
+  String get cylinderConfigs_applyAction => 'Konfiguráció alkalmazása';
+
+  @override
+  String cylinderConfigs_applyAdded(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count palack hozzáadva',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String cylinderConfigs_applyKept(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count megtartva',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get cylinderConfigs_applyNothingToDo =>
+      'Ez a merülés már megegyezik a konfigurációval';
+
+  @override
+  String get cylinderConfigs_sectionTitle => 'Konfigurációk';
+
+  @override
   String get equipment_serviceClocks_hoursSource =>
       'A naplózott merülési idő alapján számolva';
 

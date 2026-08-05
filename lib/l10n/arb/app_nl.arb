@@ -3218,6 +3218,41 @@
   "equipment_serviceClocks_overdueSince": "Achterstallig sinds {date}",
   "equipment_serviceClocks_overdue": "Te laat",
   "equipment_serviceClocks_divesLeft": "{remaining} van {total} duiken resterend",
+  "cylinderConfigs_title": "Flesconfiguraties",
+  "cylinderConfigs_empty": "Nog geen configuraties",
+  "cylinderConfigs_emptyBody": "Sla een diluent- en bailout-opstelling één keer op en pas hem toe op elke duik.",
+  "cylinderConfigs_new": "Nieuwe configuratie",
+  "cylinderConfigs_name": "Naam",
+  "cylinderConfigs_nameRequired": "Voer een naam in",
+  "cylinderConfigs_forUnit": "Voor unit",
+  "cylinderConfigs_noUnit": "Algemeen gasplan",
+  "cylinderConfigs_gasPlans": "Gasplannen",
+  "cylinderConfigs_addCylinder": "Fles toevoegen",
+  "cylinderConfigs_role": "Rol",
+  "cylinderConfigs_startPressure": "Begindruk",
+  "cylinderConfigs_label": "Label",
+  "cylinderConfigs_fromPreset": "Uit voorinstelling",
+  "cylinderConfigs_deleteTitle": "Configuratie verwijderen?",
+  "cylinderConfigs_deleteBody": "Duiken waarop hij al is toegepast veranderen niet.",
+  "cylinderConfigs_applyAction": "Configuratie toepassen",
+  "cylinderConfigs_applyAdded": "{count, plural, =1{1 fles toegevoegd} other{{count} flessen toegevoegd}}",
+  "@cylinderConfigs_applyAdded": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "cylinderConfigs_applyKept": "{count, plural, =1{1 behouden} other{{count} behouden}}",
+  "@cylinderConfigs_applyKept": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "cylinderConfigs_applyNothingToDo": "Deze duik komt al overeen met de configuratie",
+  "cylinderConfigs_sectionTitle": "Configuraties",
   "equipment_serviceClocks_hoursSource": "Berekend op basis van geregistreerde duiktijd",
   "equipment_serviceClocks_hoursLeft": "{remaining} van {total} uur resterend",
   "equipment_serviceClocks_manageKinds": "Servicetypen beheren",

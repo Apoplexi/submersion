@@ -9957,6 +9957,87 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
+  String get cylinderConfigs_title => 'תצורות בלונים';
+
+  @override
+  String get cylinderConfigs_empty => 'אין עדיין תצורות';
+
+  @override
+  String get cylinderConfigs_emptyBody =>
+      'שמור פעם אחת מערך מדלל וביילאאוט, ואז החל אותו על כל צלילה.';
+
+  @override
+  String get cylinderConfigs_new => 'תצורה חדשה';
+
+  @override
+  String get cylinderConfigs_name => 'שם';
+
+  @override
+  String get cylinderConfigs_nameRequired => 'הזן שם';
+
+  @override
+  String get cylinderConfigs_forUnit => 'עבור היחידה';
+
+  @override
+  String get cylinderConfigs_noUnit => 'תוכנית גז כללית';
+
+  @override
+  String get cylinderConfigs_gasPlans => 'תוכניות גז';
+
+  @override
+  String get cylinderConfigs_addCylinder => 'הוסף בלון';
+
+  @override
+  String get cylinderConfigs_role => 'תפקיד';
+
+  @override
+  String get cylinderConfigs_startPressure => 'לחץ התחלתי';
+
+  @override
+  String get cylinderConfigs_label => 'תווית';
+
+  @override
+  String get cylinderConfigs_fromPreset => 'מתבנית';
+
+  @override
+  String get cylinderConfigs_deleteTitle => 'למחוק את התצורה?';
+
+  @override
+  String get cylinderConfigs_deleteBody =>
+      'צלילות שהתצורה כבר הוחלה עליהן לא ישתנו.';
+
+  @override
+  String get cylinderConfigs_applyAction => 'החל תצורה';
+
+  @override
+  String cylinderConfigs_applyAdded(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count בלונים נוספו',
+      one: 'בלון אחד נוסף',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String cylinderConfigs_applyKept(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count נשמרו',
+      one: 'אחד נשמר',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get cylinderConfigs_applyNothingToDo => 'הצלילה כבר תואמת לתצורה';
+
+  @override
+  String get cylinderConfigs_sectionTitle => 'תצורות';
+
+  @override
   String get equipment_serviceClocks_hoursSource => 'מחושב מזמן הצלילה המתועד';
 
   @override

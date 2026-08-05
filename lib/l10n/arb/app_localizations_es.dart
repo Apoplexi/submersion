@@ -10187,6 +10187,88 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
+  String get cylinderConfigs_title => 'Configuraciones de botellas';
+
+  @override
+  String get cylinderConfigs_empty => 'Aún no hay configuraciones';
+
+  @override
+  String get cylinderConfigs_emptyBody =>
+      'Guarda un montaje de diluyente y bailout una vez y aplícalo a cualquier inmersión.';
+
+  @override
+  String get cylinderConfigs_new => 'Nueva configuración';
+
+  @override
+  String get cylinderConfigs_name => 'Nombre';
+
+  @override
+  String get cylinderConfigs_nameRequired => 'Introduce un nombre';
+
+  @override
+  String get cylinderConfigs_forUnit => 'Para el equipo';
+
+  @override
+  String get cylinderConfigs_noUnit => 'Plan de gas genérico';
+
+  @override
+  String get cylinderConfigs_gasPlans => 'Planes de gas';
+
+  @override
+  String get cylinderConfigs_addCylinder => 'Añadir botella';
+
+  @override
+  String get cylinderConfigs_role => 'Función';
+
+  @override
+  String get cylinderConfigs_startPressure => 'Presión inicial';
+
+  @override
+  String get cylinderConfigs_label => 'Etiqueta';
+
+  @override
+  String get cylinderConfigs_fromPreset => 'Desde preajuste';
+
+  @override
+  String get cylinderConfigs_deleteTitle => '¿Eliminar la configuración?';
+
+  @override
+  String get cylinderConfigs_deleteBody =>
+      'Las inmersiones ya aplicadas no cambian.';
+
+  @override
+  String get cylinderConfigs_applyAction => 'Aplicar configuración';
+
+  @override
+  String cylinderConfigs_applyAdded(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count botellas añadidas',
+      one: '1 botella añadida',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String cylinderConfigs_applyKept(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count conservadas',
+      one: '1 conservada',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get cylinderConfigs_applyNothingToDo =>
+      'Esta inmersión ya coincide con la configuración';
+
+  @override
+  String get cylinderConfigs_sectionTitle => 'Configuraciones';
+
+  @override
   String get equipment_serviceClocks_hoursSource =>
       'Calculado a partir del tiempo de buceo registrado';
 

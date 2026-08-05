@@ -10189,6 +10189,88 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get cylinderConfigs_title => 'Flaschenkonfigurationen';
+
+  @override
+  String get cylinderConfigs_empty => 'Noch keine Konfigurationen';
+
+  @override
+  String get cylinderConfigs_emptyBody =>
+      'Diluent- und Bailout-Aufbau einmal speichern und auf jeden Tauchgang anwenden.';
+
+  @override
+  String get cylinderConfigs_new => 'Neue Konfiguration';
+
+  @override
+  String get cylinderConfigs_name => 'Name';
+
+  @override
+  String get cylinderConfigs_nameRequired => 'Namen eingeben';
+
+  @override
+  String get cylinderConfigs_forUnit => 'Für Gerät';
+
+  @override
+  String get cylinderConfigs_noUnit => 'Allgemeiner Gasplan';
+
+  @override
+  String get cylinderConfigs_gasPlans => 'Gaspläne';
+
+  @override
+  String get cylinderConfigs_addCylinder => 'Flasche hinzufügen';
+
+  @override
+  String get cylinderConfigs_role => 'Rolle';
+
+  @override
+  String get cylinderConfigs_startPressure => 'Anfangsdruck';
+
+  @override
+  String get cylinderConfigs_label => 'Bezeichnung';
+
+  @override
+  String get cylinderConfigs_fromPreset => 'Aus Vorlage';
+
+  @override
+  String get cylinderConfigs_deleteTitle => 'Konfiguration löschen?';
+
+  @override
+  String get cylinderConfigs_deleteBody =>
+      'Bereits angewendete Tauchgänge bleiben unverändert.';
+
+  @override
+  String get cylinderConfigs_applyAction => 'Konfiguration anwenden';
+
+  @override
+  String cylinderConfigs_applyAdded(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Flaschen hinzugefügt',
+      one: '1 Flasche hinzugefügt',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String cylinderConfigs_applyKept(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count beibehalten',
+      one: '1 beibehalten',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get cylinderConfigs_applyNothingToDo =>
+      'Dieser Tauchgang entspricht bereits der Konfiguration';
+
+  @override
+  String get cylinderConfigs_sectionTitle => 'Konfigurationen';
+
+  @override
   String get equipment_serviceClocks_hoursSource =>
       'Aus der protokollierten Tauchzeit berechnet';
 

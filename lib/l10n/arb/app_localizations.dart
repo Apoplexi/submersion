@@ -17427,6 +17427,132 @@ abstract class AppLocalizations {
   /// **'{remaining} of {total} dives left'**
   String equipment_serviceClocks_divesLeft(int remaining, int total);
 
+  /// No description provided for @cylinderConfigs_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Cylinder configurations'**
+  String get cylinderConfigs_title;
+
+  /// No description provided for @cylinderConfigs_empty.
+  ///
+  /// In en, this message translates to:
+  /// **'No configurations yet'**
+  String get cylinderConfigs_empty;
+
+  /// No description provided for @cylinderConfigs_emptyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Save a diluent and bailout setup once, then apply it to any dive.'**
+  String get cylinderConfigs_emptyBody;
+
+  /// No description provided for @cylinderConfigs_new.
+  ///
+  /// In en, this message translates to:
+  /// **'New configuration'**
+  String get cylinderConfigs_new;
+
+  /// No description provided for @cylinderConfigs_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get cylinderConfigs_name;
+
+  /// No description provided for @cylinderConfigs_nameRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a name'**
+  String get cylinderConfigs_nameRequired;
+
+  /// No description provided for @cylinderConfigs_forUnit.
+  ///
+  /// In en, this message translates to:
+  /// **'For unit'**
+  String get cylinderConfigs_forUnit;
+
+  /// No description provided for @cylinderConfigs_noUnit.
+  ///
+  /// In en, this message translates to:
+  /// **'Generic gas plan'**
+  String get cylinderConfigs_noUnit;
+
+  /// No description provided for @cylinderConfigs_gasPlans.
+  ///
+  /// In en, this message translates to:
+  /// **'Gas plans'**
+  String get cylinderConfigs_gasPlans;
+
+  /// No description provided for @cylinderConfigs_addCylinder.
+  ///
+  /// In en, this message translates to:
+  /// **'Add cylinder'**
+  String get cylinderConfigs_addCylinder;
+
+  /// No description provided for @cylinderConfigs_role.
+  ///
+  /// In en, this message translates to:
+  /// **'Role'**
+  String get cylinderConfigs_role;
+
+  /// No description provided for @cylinderConfigs_startPressure.
+  ///
+  /// In en, this message translates to:
+  /// **'Start pressure'**
+  String get cylinderConfigs_startPressure;
+
+  /// No description provided for @cylinderConfigs_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Label'**
+  String get cylinderConfigs_label;
+
+  /// No description provided for @cylinderConfigs_fromPreset.
+  ///
+  /// In en, this message translates to:
+  /// **'From preset'**
+  String get cylinderConfigs_fromPreset;
+
+  /// No description provided for @cylinderConfigs_deleteTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete configuration?'**
+  String get cylinderConfigs_deleteTitle;
+
+  /// No description provided for @cylinderConfigs_deleteBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This does not change any dive it was already applied to.'**
+  String get cylinderConfigs_deleteBody;
+
+  /// No description provided for @cylinderConfigs_applyAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Apply configuration'**
+  String get cylinderConfigs_applyAction;
+
+  /// No description provided for @cylinderConfigs_applyAdded.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Added 1 cylinder} other{Added {count} cylinders}}'**
+  String cylinderConfigs_applyAdded(int count);
+
+  /// No description provided for @cylinderConfigs_applyKept.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{kept 1} other{kept {count}}}'**
+  String cylinderConfigs_applyKept(int count);
+
+  /// No description provided for @cylinderConfigs_applyNothingToDo.
+  ///
+  /// In en, this message translates to:
+  /// **'This dive already matches the configuration'**
+  String get cylinderConfigs_applyNothingToDo;
+
+  /// No description provided for @cylinderConfigs_sectionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Configurations'**
+  String get cylinderConfigs_sectionTitle;
+
   /// No description provided for @equipment_serviceClocks_hoursSource.
   ///
   /// In en, this message translates to:

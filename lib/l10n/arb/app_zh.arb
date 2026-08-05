@@ -3360,6 +3360,41 @@
   "equipment_serviceClocks_overdueSince": "自 {date} 起逾期",
   "equipment_serviceClocks_overdue": "已逾期",
   "equipment_serviceClocks_divesLeft": "剩余 {remaining}/{total} 次潜水",
+  "cylinderConfigs_title": "气瓶配置",
+  "cylinderConfigs_empty": "尚无配置",
+  "cylinderConfigs_emptyBody": "保存一次稀释气与备用气配置，即可应用到任何一次潜水。",
+  "cylinderConfigs_new": "新建配置",
+  "cylinderConfigs_name": "名称",
+  "cylinderConfigs_nameRequired": "请输入名称",
+  "cylinderConfigs_forUnit": "所属设备",
+  "cylinderConfigs_noUnit": "通用气体方案",
+  "cylinderConfigs_gasPlans": "气体方案",
+  "cylinderConfigs_addCylinder": "添加气瓶",
+  "cylinderConfigs_role": "用途",
+  "cylinderConfigs_startPressure": "起始压力",
+  "cylinderConfigs_label": "标签",
+  "cylinderConfigs_fromPreset": "从预设填入",
+  "cylinderConfigs_deleteTitle": "删除此配置？",
+  "cylinderConfigs_deleteBody": "已应用过的潜水不会改变。",
+  "cylinderConfigs_applyAction": "应用配置",
+  "cylinderConfigs_applyAdded": "{count, plural, other{已添加 {count} 个气瓶}}",
+  "@cylinderConfigs_applyAdded": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "cylinderConfigs_applyKept": "{count, plural, other{保留 {count} 个}}",
+  "@cylinderConfigs_applyKept": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "cylinderConfigs_applyNothingToDo": "该潜水已与配置一致",
+  "cylinderConfigs_sectionTitle": "配置",
   "equipment_serviceClocks_hoursSource": "根据已记录的潜水时间计算",
   "equipment_serviceClocks_hoursLeft": "剩余 {remaining}/{total} 小时",
   "equipment_serviceClocks_manageKinds": "管理维护类型",

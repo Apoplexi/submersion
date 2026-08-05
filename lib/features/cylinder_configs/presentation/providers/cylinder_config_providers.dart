@@ -51,7 +51,7 @@ final cylinderConfigProvider = FutureProvider.family<CylinderConfig?, String>((
 /// Invalidates every configuration view. Call after a create, update, delete,
 /// or item save so the list, the owning unit's card, and any open detail all
 /// refetch together.
-void invalidateCylinderConfigs(Ref ref, {String? configId}) {
+void invalidateCylinderConfigs(WidgetRef ref, {String? configId}) {
   ref.invalidate(cylinderConfigsProvider);
   ref.invalidate(cylinderConfigsForEquipmentProvider);
   if (configId != null) {
