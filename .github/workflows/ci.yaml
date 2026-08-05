@@ -385,6 +385,9 @@ jobs:
       - name: Run appcast beta feed test
         run: ./scripts/generate_appcast_beta_test.sh
 
+      - name: Run release notes HTML test
+        run: ./scripts/generate_release_notes_html_test.sh
+
       - name: Upload coverage
         uses: codecov/codecov-action@v7
         if: always()
