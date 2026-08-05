@@ -297,6 +297,23 @@ class ImportWizardNotifier extends StateNotifier<ImportWizardState> {
             }
           }
         }
+
+        // First-sync cutoff default (tier-1 filter): a downloaded dive at or
+        // before the diver's cutoff is pre-selected to skip and never left
+        // for review, using the exact same mechanism as the
+        // matchedExistingSource default above. An index that is both
+        // matched and auto-skipped is idempotent here -- setting the same
+        // map entry and removing from the same sets twice has no additional
+        // effect -- so it ends up skipped once, not double-handled.
+        final autoSkipIndices = group.autoSkipIndices;
+        if (autoSkipIndices != null) {
+          for (final index in autoSkipIndices) {
+            duplicateActions.putIfAbsent(type, () => {})[index] =
+                DuplicateAction.skip;
+            selections[type] = selections[type]!.difference({index});
+            pendingForType = pendingForType.difference({index});
+          }
+        }
       }
 
       if (pendingForType.isNotEmpty) {

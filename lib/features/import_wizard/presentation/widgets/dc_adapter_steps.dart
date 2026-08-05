@@ -428,6 +428,7 @@ class _DcAdapterDownloadStepState extends ConsumerState<DcAdapterDownloadStep> {
   void _captureAndAdvance(DownloadState state) {
     if (_captured) return;
     _captured = true;
+    widget.adapter.setSinceCutoff(state.sinceCutoff);
     widget.adapter.setDownloadedDives(state.downloadedDives);
 
     // No dives — show an informational message instead of advancing to an

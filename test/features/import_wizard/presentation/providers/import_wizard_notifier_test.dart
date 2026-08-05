@@ -152,6 +152,7 @@ void main() {
       List<EntityItem>? diveItems,
       Set<int> diveDuplicateIndices = const {},
       Map<int, DiveMatchResult>? diveMatchResults,
+      Set<int>? diveAutoSkipIndices,
       List<EntityItem>? siteItems,
       Set<int> siteDuplicateIndices = const {},
       String? currentComputerId,
@@ -163,6 +164,7 @@ void main() {
           items: diveItems,
           duplicateIndices: diveDuplicateIndices,
           matchResults: diveMatchResults,
+          autoSkipIndices: diveAutoSkipIndices,
         );
       }
 
@@ -415,6 +417,71 @@ void main() {
             ),
           },
           currentComputerId: 'computer-current',
+        );
+
+        notifier.setBundle(bundle);
+
+        expect(
+          notifier.state.duplicateActions[ImportEntityType.dives]?[0],
+          DuplicateAction.skip,
+        );
+        expect(
+          notifier.state.pendingFor(ImportEntityType.dives),
+          isNot(contains(0)),
+        );
+        expect(
+          notifier.state.selections[ImportEntityType.dives],
+          isNot(contains(0)),
+        );
+      });
+
+      // -----------------------------------------------------------------
+      // Tier-1 first-sync cutoff auto-skip (Task 6)
+      // -----------------------------------------------------------------
+
+      test('an index in autoSkipIndices is seeded with DuplicateAction.skip '
+          'and drained from pending', () {
+        final bundle = buildBundle(
+          diveItems: [makeItem('Dive 1'), makeItem('Dive 2')],
+          diveAutoSkipIndices: {0},
+        );
+
+        notifier.setBundle(bundle);
+
+        expect(
+          notifier.state.duplicateActions[ImportEntityType.dives]?[0],
+          DuplicateAction.skip,
+        );
+        expect(
+          notifier.state.pendingFor(ImportEntityType.dives),
+          isNot(contains(0)),
+        );
+        expect(
+          notifier.state.selections[ImportEntityType.dives],
+          isNot(contains(0)),
+        );
+        // The unaffected index is untouched: selected, no action, not pending.
+        expect(notifier.state.selections[ImportEntityType.dives], contains(1));
+        expect(
+          notifier.state.duplicateActions[ImportEntityType.dives]?[1],
+          isNull,
+        );
+      });
+
+      test('an index that is both matchedExistingSource AND in autoSkipIndices '
+          'ends up skipped once, not double-handled', () {
+        final bundle = buildBundle(
+          diveItems: [makeItem('Dive 1')],
+          diveDuplicateIndices: {0},
+          diveMatchResults: {
+            0: const DiveMatchResult(
+              diveId: 'existing-dive',
+              score: 1.0,
+              timeDifferenceMs: 0,
+              matchedExistingSource: true,
+            ),
+          },
+          diveAutoSkipIndices: {0},
         );
 
         notifier.setBundle(bundle);
