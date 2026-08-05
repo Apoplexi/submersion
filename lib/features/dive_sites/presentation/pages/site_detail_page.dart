@@ -349,6 +349,20 @@ class _SiteDetailContentState extends ConsumerState<_SiteDetailContent> {
                 ),
               ),
             ),
+          // Unconditional, matching the standalone AppBar: career terrain is
+          // built from dive profiles, not from the site's coordinates.
+          IconButton(
+            icon: const Icon(Icons.view_in_ar, size: 20),
+            tooltip: context.l10n.dive3d_career_title,
+            onPressed: () => Navigator.of(context).push(
+              MaterialPageRoute<void>(
+                builder: (_) => CareerTerrainPage(
+                  query: careerSiteQuery(widget.siteId),
+                  title: site.name,
+                ),
+              ),
+            ),
+          ),
           IconButton(
             icon: const Icon(Icons.edit, size: 20),
             tooltip: context.l10n.diveSites_detail_editTooltipShort,
