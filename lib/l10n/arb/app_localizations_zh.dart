@@ -17742,7 +17742,13 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get diveComputer_downloadStep_downloadAll => '下载所有潜水记录';
+
+  @override
   String get diveComputer_downloadStep_downloadFailed => '下载失败';
+
+  @override
+  String get diveComputer_downloadStep_downloadNew => '下载新的潜水记录';
 
   @override
   String get diveComputer_downloadStep_downloadedDives => '已下载的潜水';
@@ -17758,6 +17764,18 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String diveComputer_downloadStep_errorSemanticLabel(Object error) {
     return '下载错误：$error';
+  }
+
+  @override
+  String get diveComputer_downloadStep_firstSyncBody =>
+      '您的潜水日志中已有潜水记录。您可以跳过下载已有的潜水记录。';
+
+  @override
+  String get diveComputer_downloadStep_firstSyncTitle => '首次从此潜水电脑下载';
+
+  @override
+  String diveComputer_downloadStep_onlyAfterDate(String date) {
+    return '仅下载$date之后的潜水记录';
   }
 
   @override

@@ -18695,7 +18695,14 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
+  String get diveComputer_downloadStep_downloadAll =>
+      'Baixar todos os mergulhos';
+
+  @override
   String get diveComputer_downloadStep_downloadFailed => 'Falha no download';
+
+  @override
+  String get diveComputer_downloadStep_downloadNew => 'Baixar novos mergulhos';
 
   @override
   String get diveComputer_downloadStep_downloadedDives => 'Mergulhos Baixados';
@@ -18711,6 +18718,19 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String diveComputer_downloadStep_errorSemanticLabel(Object error) {
     return 'Erro no download: $error';
+  }
+
+  @override
+  String get diveComputer_downloadStep_firstSyncBody =>
+      'Seu diário já tem mergulhos. Você pode pular o download de mergulhos que já possui.';
+
+  @override
+  String get diveComputer_downloadStep_firstSyncTitle =>
+      'Primeiro download deste computador de mergulho';
+
+  @override
+  String diveComputer_downloadStep_onlyAfterDate(String date) {
+    return 'Baixar apenas mergulhos após $date';
   }
 
   @override

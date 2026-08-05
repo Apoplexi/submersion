@@ -370,10 +370,13 @@ class _DcAdapterDownloadStepState extends ConsumerState<DcAdapterDownloadStep> {
       );
     }
 
+    final cutoffDefault = ref.watch(firstSyncCutoffDefaultProvider).valueOrNull;
+
     return DownloadStepWidget(
       device: device,
       computer: computer,
       forceFullDownload: widget.adapter.forceFullDownload,
+      firstSyncCutoffDefault: cutoffDefault,
       onComplete: () {
         // Handled by the state watcher above.
       },

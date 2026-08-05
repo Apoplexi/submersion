@@ -18638,8 +18638,15 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String get diveComputer_downloadStep_downloadAll =>
+      'Összes merülés letöltése';
+
+  @override
   String get diveComputer_downloadStep_downloadFailed =>
       'A letoltes sikertelen';
+
+  @override
+  String get diveComputer_downloadStep_downloadNew => 'Új merülések letöltése';
 
   @override
   String get diveComputer_downloadStep_downloadedDives => 'Letoltott merulesek';
@@ -18655,6 +18662,19 @@ class AppLocalizationsHu extends AppLocalizations {
   @override
   String diveComputer_downloadStep_errorSemanticLabel(Object error) {
     return 'Letoltesi hiba: $error';
+  }
+
+  @override
+  String get diveComputer_downloadStep_firstSyncBody =>
+      'A naplód már tartalmaz merüléseket. Kihagyhatod a már meglévő merülések letöltését.';
+
+  @override
+  String get diveComputer_downloadStep_firstSyncTitle =>
+      'Első letöltés erről a merülésszámítógépről';
+
+  @override
+  String diveComputer_downloadStep_onlyAfterDate(String date) {
+    return 'Csak a $date utáni merülések letöltése';
   }
 
   @override

@@ -11678,7 +11678,9 @@
       }
     }
   },
+  "diveComputer_downloadStep_downloadAll": "Download all dives",
   "diveComputer_downloadStep_downloadFailed": "Download failed",
+  "diveComputer_downloadStep_downloadNew": "Download new dives",
   "diveComputer_downloadStep_downloadedDives": "Downloaded Dives",
   "diveComputer_downloadStep_durationMin": "{duration} min",
   "@diveComputer_downloadStep_durationMin": {
@@ -11694,6 +11696,16 @@
     "placeholders": {
       "error": {
         "type": "Object"
+      }
+    }
+  },
+  "diveComputer_downloadStep_firstSyncBody": "Your logbook already has dives. You can skip downloading dives you already have.",
+  "diveComputer_downloadStep_firstSyncTitle": "First download from this computer",
+  "diveComputer_downloadStep_onlyAfterDate": "Only download dives after {date}",
+  "@diveComputer_downloadStep_onlyAfterDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
       }
     }
   },

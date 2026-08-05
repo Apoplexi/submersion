@@ -18689,7 +18689,15 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
+  String get diveComputer_downloadStep_downloadAll =>
+      'Scarica tutte le immersioni';
+
+  @override
   String get diveComputer_downloadStep_downloadFailed => 'Download fallito';
+
+  @override
+  String get diveComputer_downloadStep_downloadNew =>
+      'Scarica le nuove immersioni';
 
   @override
   String get diveComputer_downloadStep_downloadedDives =>
@@ -18707,6 +18715,19 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String diveComputer_downloadStep_errorSemanticLabel(Object error) {
     return 'Errore di download: $error';
+  }
+
+  @override
+  String get diveComputer_downloadStep_firstSyncBody =>
+      'Il tuo diario ha già delle immersioni. Puoi saltare il download delle immersioni che hai già.';
+
+  @override
+  String get diveComputer_downloadStep_firstSyncTitle =>
+      'Primo download da questo computer subacqueo';
+
+  @override
+  String diveComputer_downloadStep_onlyAfterDate(String date) {
+    return 'Scarica solo le immersioni dopo il $date';
   }
 
   @override
