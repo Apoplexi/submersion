@@ -147,4 +147,53 @@ void main() {
 
     expect(find.byType(UrlTab), findsOneWidget);
   });
+
+  // The AppBar's Done action commits the GALLERY tab's selection only; the
+  // Files and URL tabs carry their own commit buttons. Rendering a
+  // permanently-greyed Done over those tabs read as "the app rejected my
+  // photos" to users who had staged files in the Files tab.
+  group('Done action is scoped to the Gallery tab', () {
+    testWidgets('is shown on the Gallery tab', (tester) async {
+      await tester.pumpWidget(_wrap());
+      await tester.pump();
+
+      expect(find.text('Done'), findsOneWidget);
+    });
+
+    testWidgets('is hidden on the Files tab', (tester) async {
+      await tester.pumpWidget(_wrap());
+      await tester.pump();
+
+      await tester.tap(find.text('Files'));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 350));
+
+      expect(find.text('Done'), findsNothing);
+    });
+
+    testWidgets('is hidden on the URL tab', (tester) async {
+      await tester.pumpWidget(_wrap());
+      await tester.pump();
+
+      await tester.tap(find.text('URL'));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 350));
+
+      expect(find.text('Done'), findsNothing);
+    });
+
+    testWidgets('returns when switching back to Gallery', (tester) async {
+      await tester.pumpWidget(_wrap());
+      await tester.pump();
+
+      await tester.tap(find.text('Files'));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 350));
+      await tester.tap(find.text('Gallery'));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 350));
+
+      expect(find.text('Done'), findsOneWidget);
+    });
+  });
 }

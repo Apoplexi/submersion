@@ -3,12 +3,11 @@ import 'dart:io';
 
 import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/core/services/media_store/media_object_store.dart';
-import 'package:submersion/core/services/media_store/media_store_policies.dart';
+import 'package:submersion/core/services/media_store/media_upload_quality_policy.dart';
 import 'package:submersion/core/services/media_store/store_keys.dart';
 import 'package:submersion/features/media/data/repositories/media_repository.dart';
 import 'package:submersion/features/media/data/services/media_source_resolver_registry.dart';
 import 'package:submersion/features/media/domain/entities/media_item.dart';
-import 'package:submersion/features/media/domain/entities/media_source_type.dart';
 import 'package:submersion/features/media/domain/value_objects/media_source_data.dart';
 import 'package:submersion/features/media_store/data/media_cache_store.dart';
 import 'package:submersion/features/media_store/data/media_transfer_queue_repository.dart';
@@ -16,9 +15,15 @@ import 'package:submersion/features/media_store/data/image_compressor.dart';
 import 'package:submersion/features/media_store/data/media_compressor.dart';
 import 'package:submersion/features/media_store/data/thumbnail_generator.dart';
 import 'package:submersion/features/media_store/data/video_transcoder.dart';
+import 'package:submersion/features/media_store/domain/media_backup_status.dart';
 import 'package:submersion/features/media_store/domain/media_upload_quality.dart';
 
 enum UploadOutcome { uploaded, deduplicated, skippedIneligible, failed }
+
+/// Retry delay for an item whose bytes could not be materialized. Chosen to
+/// outlast the shortest asset-resolution lockout (24h) so each queue attempt
+/// gets a genuine re-resolution rather than a cached refusal.
+const Duration _sourceUnavailableRetryAfter = Duration(hours: 25);
 
 /// The six-step upload pipeline (design spec section 9), photos and
 /// single-shot transfers in Phase 1. Every step is idempotent: a crash
@@ -32,7 +37,7 @@ class MediaUploadPipeline {
     required MediaSourceResolverRegistry registry,
     required MediaCacheStore cache,
     ThumbnailGenerator? thumbnails,
-    MediaStorePolicies? policies,
+    MediaUploadQualityPolicy? quality,
     MediaCompressor? imageCompressor,
     VideoTranscoder? videoTranscoder,
     DateTime Function()? now,
@@ -43,7 +48,7 @@ class MediaUploadPipeline {
        _cache = cache,
        _thumbnails =
            thumbnails ?? ThumbnailGenerator(registry: registry, cache: cache),
-       _policies = policies ?? MediaStorePolicies(),
+       _quality = quality ?? MediaUploadQualityPolicy(),
        _imageCompressor =
            imageCompressor ?? ImageCompressor(registry: registry, cache: cache),
        _videoTranscoder = videoTranscoder,
@@ -55,26 +60,18 @@ class MediaUploadPipeline {
   final MediaSourceResolverRegistry _registry;
   final MediaCacheStore _cache;
   final ThumbnailGenerator _thumbnails;
-  final MediaStorePolicies _policies;
+  final MediaUploadQualityPolicy _quality;
   final MediaCompressor _imageCompressor;
   final VideoTranscoder? _videoTranscoder;
   final DateTime Function() _now;
   final _log = LoggerService.forClass(MediaUploadPipeline);
-
-  static const Set<MediaSourceType> _eligibleSources = {
-    MediaSourceType.platformGallery,
-    MediaSourceType.localFile,
-    MediaSourceType.serviceConnector,
-  };
 
   /// Connector videos never download their original in v1 (Lightroom spec:
   /// match + thumbnail only). The store carries just the thumb, derived
   /// from the poster rendition the resolver materializes, and
   /// remoteUploadedAt stays null so a future playback phase can tell a
   /// poster frame from a playable original.
-  bool _isThumbOnly(MediaItem item) =>
-      item.sourceType == MediaSourceType.serviceConnector &&
-      item.mediaType == MediaType.video;
+  bool _isThumbOnly(MediaItem item) => isThumbOnlyMedia(item);
 
   Future<UploadOutcome> process(MediaTransferQueueEntry entry) async {
     await _queue.markTransferring(entry.id);
@@ -98,10 +95,22 @@ class MediaUploadPipeline {
 
     File? staged;
     CompressionResult? rendition;
+    // Freshest resume state and its key, for terminal-failure session
+    // abandonment (orphan-prevention spec 5.5): the queue row's copy can
+    // lag when this very attempt created the session.
+    var latestResumeJson = entry.resumeStateJson;
+    String? resumableUploadKey;
     try {
       staged = await _materialize(item);
       if (staged == null) {
-        await _queue.markFailed(entry.id, 'source unavailable on this device');
+        // Resolution failure is rate-limited on a 24h/3d/7d clock of its own,
+        // so retrying on the queue's minute-scale ladder would consume the
+        // attempt budget without ever re-reaching the gallery.
+        await _queue.markFailed(
+          entry.id,
+          'source unavailable on this device',
+          retryAfter: _sourceUnavailableRetryAfter,
+        );
         return UploadOutcome.failed;
       }
 
@@ -157,10 +166,11 @@ class MediaUploadPipeline {
       final hadOriginal = item.remoteUploadedAt != null;
       final hadCompressed = item.remoteCompressedUploadedAt != null;
       // A corrupt or future-enum override string must not fail the upload:
-      // fall back to the device's configured level so the item still uploads.
+      // fall back to the library-wide configured level (MediaUploadQualityPolicy,
+      // a synced setting -- not a per-device one) so the item still uploads.
       final level =
           (isOverride ? _tryParseQuality(entry.overrideLevel!) : null) ??
-          await _policies.qualityFor(item.mediaType);
+          await _quality.qualityFor(item.mediaType);
       rendition = await _renditionFor(item, staged, level, digest.hash);
       if (rendition != null) {
         final renditionKey = StoreKeys.renditionKey(
@@ -229,13 +239,16 @@ class MediaUploadPipeline {
         // Resume state survives failures on the queue row; content
         // addressing makes replaying it against a re-materialized staging
         // copy safe (identical bytes, identical part boundaries).
+        resumableUploadKey = key;
         await _store.putFile(
           key,
           staged,
           contentType: StoreKeys.contentTypeFor(extension),
           resumeStateJson: entry.resumeStateJson,
-          onResumeStateChanged: (json) =>
-              unawaited(_queue.updateResumeState(entry.id, json)),
+          onResumeStateChanged: (json) {
+            latestResumeJson = json;
+            unawaited(_queue.updateResumeState(entry.id, json));
+          },
           onProgress: (sent, total) => unawaited(
             _queue.updateProgress(
               entry.id,
@@ -279,7 +292,23 @@ class MediaUploadPipeline {
         error: e,
         stackTrace: stackTrace,
       );
-      await _queue.markFailed(entry.id, e.toString());
+      final terminal = await _queue.markFailed(entry.id, e.toString());
+      // Terminal failure means the resume state will never be replayed:
+      // abandon any provider-side session so its parts cannot strand
+      // (orphan-prevention spec 5.5). retry() re-arms with the preserved
+      // resume state; _validateResume then finds the session gone and
+      // starts fresh - graceful either way.
+      final abandonKey = resumableUploadKey;
+      if (terminal && abandonKey != null && latestResumeJson != null) {
+        try {
+          await _store.abandonResume(abandonKey, latestResumeJson);
+        } on Exception catch (abortError) {
+          _log.warning(
+            'Abandoning upload session failed for $abandonKey',
+            error: abortError,
+          );
+        }
+      }
       // Photos re-compress cheaply, so their rendition staging file is
       // discarded on failure (Phase A leaked it). Video renditions are
       // deterministic and PRESERVED for the retry (spec section 8).
@@ -305,7 +334,7 @@ class MediaUploadPipeline {
   }
 
   bool _isEligible(MediaItem item) {
-    if (!_eligibleSources.contains(item.sourceType)) return false;
+    if (!kUploadableSources.contains(item.sourceType)) return false;
     if (item.mediaType == MediaType.instructorSignature) return false;
     final resolver = _registry.resolverFor(item.sourceType);
     return resolver.canResolveOnThisDevice(item);

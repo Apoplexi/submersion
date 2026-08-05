@@ -928,9 +928,8 @@ Future<ProfileAnalysis?> computeAnalysisForProfile(
     final ndlSource = ref.watch(
       profileLegendProvider.select((s) => s.ndlSource),
     );
-    final ceilingSource = ref.watch(
-      profileLegendProvider.select((s) => s.ceilingSource),
-    );
+    // The ceiling line has no source toggle; it always uses the calculated
+    // (exact, continuous) curve, so no ceilingSource is read here (issue #755).
     final ttsSource = ref.watch(
       profileLegendProvider.select((s) => s.ttsSource),
     );
@@ -1035,7 +1034,8 @@ Future<ProfileAnalysis?> computeAnalysisForProfile(
       analysis,
       profile,
       ndlSource: ndlSource,
-      ceilingSource: ceilingSource,
+      // ceilingSource omitted: defaults to calculated so the ceiling line is
+      // always the exact continuous curve (issue #755).
       ttsSource: ttsSource,
       cnsSource: cnsSource,
       decoStopSource: decoStopSource,

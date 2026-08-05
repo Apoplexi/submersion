@@ -65,6 +65,10 @@ class SyncResult {
   /// can be safely merged.
   final Set<String> skippedPeerDeviceIds;
 
+  /// Peers held because they publish from a newer database schema than this
+  /// build understands. Their data applies after this device updates.
+  final Set<String> newerSchemaPeerDeviceIds;
+
   /// Set with [SyncResultStatus.awaitingAdoption]: the cloud library was
   /// replaced under this marker's epoch and the user must adopt (or defer)
   /// before any sync can proceed.
@@ -78,6 +82,7 @@ class SyncResult {
     this.lastSyncTime,
     this.adoptedFreshIdentity = false,
     this.skippedPeerDeviceIds = const {},
+    this.newerSchemaPeerDeviceIds = const {},
     this.replaceMarker,
   });
 
@@ -370,6 +375,49 @@ class SyncService {
   /// pull peers (epoch-filtered) -> publish our delta (epoch-stamped) ->
   /// advance state. Re-pulls are idempotent (upsert + HLC), so a partial apply
   /// leaves state unadvanced and retries next sync rather than losing records.
+  /// Builds the user-facing result messages for a completed pull. Extracted
+  /// so the phrasing and precedence (failures suppress peer notices) are
+  /// unit-testable without a full sync.
+  @visibleForTesting
+  static List<String> pullResultMessages({
+    required int recordsFailed,
+    required Set<String> skippedPeerDeviceIds,
+    required Set<String> newerSchemaPeerDeviceIds,
+    required bool adoptedFreshIdentity,
+  }) {
+    final resultMessages = <String>[];
+    if (recordsFailed > 0) {
+      final recordWord = recordsFailed == 1 ? 'record' : 'records';
+      resultMessages.add('$recordsFailed $recordWord failed to apply');
+      return resultMessages;
+    }
+    final skippedCount = skippedPeerDeviceIds.length;
+    if (skippedCount > 0) {
+      final deviceWord = skippedCount == 1 ? 'device' : 'devices';
+      final verb = skippedCount == 1 ? 'has' : 'have';
+      resultMessages.add(
+        '$skippedCount $deviceWord still $verb an older or unknown '
+        'library version and were not merged. Those devices must adopt '
+        'the current library.',
+      );
+    }
+    final newerCount = newerSchemaPeerDeviceIds.length;
+    if (newerCount > 0) {
+      final phrase = newerCount == 1 ? 'device runs' : 'devices run';
+      resultMessages.add(
+        '$newerCount $phrase a newer version of Submersion; their latest '
+        'changes were not merged. Update this device to receive them.',
+      );
+    }
+    if (adoptedFreshIdentity) {
+      resultMessages.add(
+        'Another device was syncing with this device\'s identity. '
+        'This device adopted a new identity and merged the cloud data.',
+      );
+    }
+    return resultMessages;
+  }
+
   Future<SyncResult> performSync() async {
     final provider = _cloudProvider;
     if (provider == null) {
@@ -531,7 +579,7 @@ class SyncService {
           provider.providerId,
         );
         try {
-          await _changesetWriter.publish(
+          final write = await _changesetWriter.publish(
             provider: provider,
             deviceId: deviceId,
             folderId: folderId,
@@ -540,6 +588,20 @@ class SyncService {
             uploadNonce: uploadNonce,
             appliedPeerHlc: appliedPeerHlc,
           );
+          // A publish that did not stamp this nonce into the manifest -- a
+          // noop (nothing to say) or a heartbeat (which deliberately keeps
+          // the previous nonce) -- must give its speculative ring slot back.
+          // Otherwise every idle sync consumes a slot until the manifest's
+          // live nonce is evicted, and the device reads its own manifest as
+          // a foreign twin: a fresh identity plus a full base re-upload
+          // every ring-length idle syncs (#733).
+          if (write.kind == ChangesetWriteKind.noop ||
+              write.kind == ChangesetWriteKind.heartbeat) {
+            await _syncInitializer?.removeUploadNonce(
+              uploadNonce,
+              provider.providerId,
+            );
+          }
         } catch (e) {
           // Keep the speculative nonce on a timeout (the publish may have
           // landed); remove it only on definite failures, so repeated hard
@@ -604,28 +666,12 @@ class SyncService {
       }
 
       _reportProgress(SyncPhase.complete, 1.0, 'Sync complete');
-      final resultMessages = <String>[];
-      if (recordsFailed > 0) {
-        final recordWord = recordsFailed == 1 ? 'record' : 'records';
-        resultMessages.add('$recordsFailed $recordWord failed to apply');
-      } else {
-        final skippedCount = pullResult.skippedPeerDeviceIds.length;
-        if (skippedCount > 0) {
-          final deviceWord = skippedCount == 1 ? 'device' : 'devices';
-          final verb = skippedCount == 1 ? 'has' : 'have';
-          resultMessages.add(
-            '$skippedCount $deviceWord still $verb an older or unknown '
-            'library version and were not merged. Those devices must adopt '
-            'the current library.',
-          );
-        }
-        if (adoptedFreshIdentity) {
-          resultMessages.add(
-            'Another device was syncing with this device\'s identity. '
-            'This device adopted a new identity and merged the cloud data.',
-          );
-        }
-      }
+      final resultMessages = pullResultMessages(
+        recordsFailed: recordsFailed,
+        skippedPeerDeviceIds: pullResult.skippedPeerDeviceIds,
+        newerSchemaPeerDeviceIds: pullResult.newerSchemaPeerDeviceIds,
+        adoptedFreshIdentity: adoptedFreshIdentity,
+      );
       final resultMessage = resultMessages.isEmpty
           ? null
           : resultMessages.join(' ');
@@ -641,6 +687,7 @@ class SyncService {
         lastSyncTime: recordsFailed == 0 ? now : null,
         adoptedFreshIdentity: adoptedFreshIdentity,
         skippedPeerDeviceIds: pullResult.skippedPeerDeviceIds,
+        newerSchemaPeerDeviceIds: pullResult.newerSchemaPeerDeviceIds,
       );
     } on TimeoutException {
       _log.warning('Sync timed out');
@@ -703,12 +750,26 @@ class SyncService {
         // On an epoch but the marker vanished: self-heal it from the mirror
         // and continue as current.
         final stored = epochStore.lastAcceptedMarker;
-        if (stored != null) {
-          try {
-            await writeLibraryEpochMarker(provider, stored);
-          } catch (e) {
-            _log.warning('Could not self-heal epoch marker: $e');
-          }
+        if (stored == null) {
+          // No marker in the cloud AND no mirror to rebuild one from: this
+          // epoch can never be proven to a peer or republished, yet the reader
+          // fences off every peer stamped differently -- which, with the marker
+          // gone, is all of them. Peers meanwhile see no marker, stay in the
+          // pre-epoch world, and merge us happily: sync silently goes one-way
+          // behind a green "Sync complete". A missing marker means the fence
+          // is already gone fleet-wide, so holding an unprovable epoch buys no
+          // safety and only isolates this device. Rejoin the pre-epoch world.
+          _log.warning(
+            'Accepted epoch $accepted has neither a cloud marker nor a local '
+            'mirror; dropping to the pre-epoch world so peers merge again',
+          );
+          await _syncRepository.setLastAcceptedEpochId(null);
+          return const _EpochGate.proceed(null);
+        }
+        try {
+          await writeLibraryEpochMarker(provider, stored);
+        } catch (e) {
+          _log.warning('Could not self-heal epoch marker: $e');
         }
         return _EpochGate.proceed(accepted);
       }
@@ -2022,7 +2083,7 @@ class SyncService {
         // or resurrect an orphan. A NOT NULL (cascade) child is skipped; a
         // nullable (set-null) reference is cleared so the row survives detached
         // (e.g. a photo whose dive was deleted keeps the photo, sans dive link).
-        var recordToApply = record;
+        var recordToApply = _withoutDeviceLocalFields(entityType, record);
         var droppedByParent = false;
         for (final ref in entityParentRefs) {
           final parentId = record[ref.field];
@@ -2117,7 +2178,7 @@ class SyncService {
           await _syncRepository.markRecordConflict(
             entityType: entityType,
             recordId: recordId,
-            conflictDataJson: jsonEncode(record),
+            conflictDataJson: jsonEncode(recordToApply),
             localUpdatedAt: localUpdatedAt,
           );
           continue;
@@ -2179,6 +2240,20 @@ class SyncService {
     Map<String, dynamic> remote,
     Map<String, dynamic>? local,
   ) => local == null ? remote : {...local, ...remote};
+
+  /// BLE identifiers are host-specific and must never cross the sync boundary.
+  static Map<String, dynamic> _withoutDeviceLocalFields(
+    String entityType,
+    Map<String, dynamic> data,
+  ) {
+    if (entityType != 'diveComputers' ||
+        !data.containsKey('bluetoothAddress')) {
+      return data;
+    }
+    final copy = Map<String, dynamic>.from(data);
+    copy.remove('bluetoothAddress');
+    return copy;
+  }
 
   Future<Map<String, Set<String>>> _pendingRecordMap() async {
     final records = await _syncRepository.getPendingRecords();
@@ -2281,7 +2356,10 @@ class SyncService {
       return;
     }
 
-    final remoteData = _parseConflictData(match.conflictData!);
+    final remoteData = _withoutDeviceLocalFields(
+      entityType,
+      _parseConflictData(match.conflictData!),
+    );
     final isDeletion = remoteData['_deleted'] == true;
     final deletedAt = remoteData['deletedAt'] is int
         ? remoteData['deletedAt'] as int
@@ -2380,12 +2458,19 @@ class SyncService {
   }
 
   /// Comprehensive local sync reset: everything [resetSyncState] clears, PLUS
-  /// the SharedPreferences epoch markers (the one local sync state a DB reset
-  /// misses -- see [LibraryEpochStore.clear]) and any leftover base temp files.
+  /// both library-epoch anchors (the SharedPreferences markers -- see
+  /// [LibraryEpochStore.clear] -- and the DB's accepted epoch, which
+  /// [resetSyncState] leaves alone) and any leftover base temp files.
   /// A true reinstall-equivalent for sync state that never touches dive data.
   /// The notifier-level caller still runs the identity/cloud-file cleanup.
+  ///
+  /// Both anchors must go together. Clearing only the mirror strands this
+  /// device on a DB epoch it can no longer republish a marker for, and the
+  /// reader then skips every peer stamped differently -- turning the repair
+  /// into a worse wedge than the one it was invoked to escape.
   Future<void> repairLocalSyncState() async {
     await resetSyncState();
+    await _syncRepository.setLastAcceptedEpochId(null);
     await _epochStore?.clear();
     await deleteLeftoverBaseTempFiles();
     _log.info('Local sync state repaired');

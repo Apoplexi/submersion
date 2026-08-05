@@ -1764,7 +1764,7 @@ class SyncDataSerializer {
         final row = await (_db.select(
           _db.diveComputers,
         )..where((t) => t.id.equals(recordId))).getSingleOrNull();
-        return row?.toJson();
+        return row == null ? null : _withoutDeviceLocalFields(row.toJson());
       case 'tankPressureProfiles':
         final row = await (_db.select(
           _db.tankPressureProfiles,
@@ -2049,7 +2049,9 @@ class SyncDataSerializer {
         final rows = await (_db.select(
           _db.diveComputers,
         )..where((t) => t.id.isIn(idList))).get();
-        return {for (final r in rows) r.id: r.toJson()};
+        return {
+          for (final r in rows) r.id: _withoutDeviceLocalFields(r.toJson()),
+        };
       case 'tags':
         final rows = await (_db.select(
           _db.tags,
@@ -2141,6 +2143,7 @@ class SyncDataSerializer {
     String entityType,
     Map<String, dynamic> data,
   ) async {
+    data = _withoutDeviceLocalFields(data, entityType: entityType);
     switch (entityType) {
       case 'divers':
         await _db
@@ -2615,6 +2618,11 @@ class SyncDataSerializer {
     List<Map<String, dynamic>> records,
   ) async {
     if (records.isEmpty) return;
+    records = records
+        .map(
+          (record) => _withoutDeviceLocalFields(record, entityType: entityType),
+        )
+        .toList();
     switch (entityType) {
       case 'divers':
         await _db.batch(
@@ -4780,7 +4788,21 @@ class SyncDataSerializer {
       query.where((t) => t.hlc.isBiggerThanValue(hlcSince));
     }
     final rows = await query.get();
-    return rows.map((r) => r.toJson()).toList();
+    return rows.map((r) => _withoutDeviceLocalFields(r.toJson())).toList();
+  }
+
+  /// Removes fields that describe this host's connection to a device rather
+  /// than the device's synced identity. A remote BLE identifier must never
+  /// overwrite the identifier stored locally on another host.
+  static Map<String, dynamic> _withoutDeviceLocalFields(
+    Map<String, dynamic> data, {
+    String? entityType,
+  }) {
+    if (entityType != null && entityType != 'diveComputers') return data;
+    if (!data.containsKey('bluetoothAddress')) return data;
+    final copy = Map<String, dynamic>.from(data);
+    copy.remove('bluetoothAddress');
+    return copy;
   }
 
   Future<List<Map<String, dynamic>>> _exportTankPressureProfiles(
@@ -5111,6 +5133,8 @@ class SyncDataSerializer {
       'accentNavIcons': false,
       'accentSectionHeaders': false,
       'accentListIcons': false,
+      // Locale (language preference: 'system', 'en', 'es', 'fr', etc.)
+      'locale': 'system',
       // Defaults
       'defaultDiveType': 'recreational',
       'defaultTankVolume': 12.0,
@@ -5131,17 +5155,57 @@ class SyncDataSerializer {
       'lastStopDepth': 3.0,
       'decoStopIncrement': 3.0,
       'ascentGasSet': 0,
+      'o2Narcotic': true,
+      'endLimit': 30.0,
+      'useDiveComputerCnsData': false,
+      'defaultNdlSource': 1,
+      'defaultCeilingSource': 1,
+      'defaultTtsSource': 1,
+      'defaultCnsSource': 1,
       // Appearance settings
       'showDepthColoredDiveCards': false,
       'cardColorAttribute': 'none',
       'cardColorGradientPreset': 'ocean',
       'cardColorGradientStart': null,
       'cardColorGradientEnd': null,
+      // Tissue visualization settings
+      'tissueColorScheme': 'classic',
+      'tissueVizMode': 'heatMap',
       'showMapBackgroundOnDiveCards': false,
       'showMapBackgroundOnSiteCards': false,
       // Dive profile markers
       'showMaxDepthMarker': true,
       'showPressureThresholdMarkers': false,
+      // List view modes
+      'diveListViewMode': 'detailed',
+      'siteListViewMode': 'detailed',
+      'tripListViewMode': 'detailed',
+      'equipmentListViewMode': 'detailed',
+      'buddyListViewMode': 'detailed',
+      'diveCenterListViewMode': 'detailed',
+      // Map style
+      'mapStyle': 'openStreetMap',
+      // Auto site matching sensitivity
+      'siteMatchSensitivity': 'balanced',
+      // Dive profile chart defaults
+      'defaultRightAxisMetric': 'temperature',
+      'defaultShowTemperature': true,
+      'defaultShowPressure': true,
+      'defaultShowHeartRate': false,
+      'defaultShowSac': false,
+      'defaultShowEvents': true,
+      'defaultShowPpO2': false,
+      'defaultShowPpN2': false,
+      'defaultShowPpHe': false,
+      'defaultShowGasDensity': false,
+      'defaultShowGf': false,
+      'defaultShowSurfaceGf': false,
+      'defaultShowMeanDepth': false,
+      'defaultShowTts': false,
+      'defaultShowCns': false,
+      'defaultShowOtu': false,
+      'defaultShowGasSwitchMarkers': true,
+      'defaultShowGasTimeline': false,
       // Dive profile default-visible metrics. Non-nullable bool added in v91;
       // seed it so payloads predating the column hydrate instead of throwing in
       // DiverSetting.fromJson.
@@ -5155,6 +5219,23 @@ class SyncDataSerializer {
       // columns hydrate instead of throwing in DiverSetting.fromJson.
       'showDecoStopsOnProfile': true,
       'defaultDecoStopSource': 1,
+      // additional non-nullable
+      'safetyReviewEnabled': true,
+      'noFlyPreset': 'standard',
+      'notificationsEnabled': true,
+      'serviceReminderDays': '[7, 14, 30]',
+      'reminderTime': '09:00',
+      'tripServiceLeadDays': 14,
+      'showDataSourceBadges': true,
+      'showProfilePanelInTableView': true,
+      'showDetailsPaneDives': false,
+      'showDetailsPaneSites': false,
+      'showDetailsPaneBuddies': false,
+      'showDetailsPaneTrips': false,
+      'showDetailsPaneEquipment': false,
+      'showDetailsPaneDiveCenters': false,
+      'showDetailsPaneCertifications': false,
+      'showDetailsPaneCourses': false,
       // Override with actual data (existing values take precedence)
       ...data,
     };

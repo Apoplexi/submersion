@@ -27,6 +27,11 @@ class InMemoryMediaObjectStore implements MediaObjectStore {
   /// The resumeStateJson the last putFile call received.
   String? lastResumeStateJsonIn;
 
+  /// Every key getFile was asked for, in order. Lets a test assert that an
+  /// expensive object (a whole video) was never downloaded, which a null
+  /// return value alone cannot distinguish from a download-then-discard.
+  final getFileKeys = <String>[];
+
   void _maybeFail() {
     final e = failNextWith;
     if (e != null) {
@@ -72,6 +77,7 @@ class InMemoryMediaObjectStore implements MediaObjectStore {
     File destination, {
     TransferProgressCallback? onProgress,
   }) async {
+    getFileKeys.add(key);
     _maybeFail();
     final partial = partialGetThenFail;
     if (partial != null) {
@@ -105,10 +111,31 @@ class InMemoryMediaObjectStore implements MediaObjectStore {
     modified.remove(key);
   }
 
+  /// (key, resumeStateJson) pairs abandonResume was called with.
+  final abandonResumeCalls = <(String, String?)>[];
+
+  /// Returned (then zeroed) by the next reapStaleUploadSessions call.
+  int staleSessionCount = 0;
+
+  @override
+  Future<int> reapStaleUploadSessions({required DateTime olderThan}) async {
+    _maybeFail();
+    final n = staleSessionCount;
+    staleSessionCount = 0;
+    return n;
+  }
+
+  @override
+  Future<void> abandonResume(String key, String? resumeStateJson) async {
+    abandonResumeCalls.add((key, resumeStateJson));
+  }
+
   @override
   Stream<StoreObjectInfo> list(String keyPrefix) async* {
     _maybeFail();
-    for (final entry in objects.entries) {
+    // Snapshot: real adapters list server-side pages, so a caller deleting
+    // objects mid-stream (the verify sweep) must not perturb the listing.
+    for (final entry in objects.entries.toList()) {
       if (entry.key.startsWith(keyPrefix)) {
         yield StoreObjectInfo(
           key: entry.key,

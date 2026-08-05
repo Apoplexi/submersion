@@ -260,6 +260,185 @@ abstract class AppLocalizations {
   /// **'No geofences'**
   String get equipment_setDetail_noGeofences;
 
+  /// No description provided for @formatter_duration_minutes.
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes}m'**
+  String formatter_duration_minutes(Object minutes);
+
+  /// No description provided for @formatter_duration_minutesSeconds.
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes}m {seconds}s'**
+  String formatter_duration_minutesSeconds(Object minutes, Object seconds);
+
+  /// No description provided for @formatter_duration_seconds.
+  ///
+  /// In en, this message translates to:
+  /// **'{seconds}s'**
+  String formatter_duration_seconds(Object seconds);
+
+  /// No description provided for @gasCalculators_bestMix_densityCritical.
+  ///
+  /// In en, this message translates to:
+  /// **'Above the {limit} g/L hard density ceiling.'**
+  String gasCalculators_bestMix_densityCritical(Object limit);
+
+  /// No description provided for @gasCalculators_bestMix_densityLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Gas density at depth'**
+  String get gasCalculators_bestMix_densityLabel;
+
+  /// No description provided for @gasCalculators_bestMix_densityWarn.
+  ///
+  /// In en, this message translates to:
+  /// **'Above the recommended {limit} g/L density limit.'**
+  String gasCalculators_bestMix_densityWarn(Object limit);
+
+  /// No description provided for @gasCalculators_bestMix_endExceeded.
+  ///
+  /// In en, this message translates to:
+  /// **'END exceeds your {limit} limit.'**
+  String gasCalculators_bestMix_endExceeded(Object limit);
+
+  /// No description provided for @gasCalculators_bestMix_endLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'END at depth'**
+  String get gasCalculators_bestMix_endLabel;
+
+  /// No description provided for @gasCalculators_bestMix_endLimitLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'END limit'**
+  String get gasCalculators_bestMix_endLimitLabel;
+
+  /// No description provided for @gasCalculators_bestMix_heliumAdded.
+  ///
+  /// In en, this message translates to:
+  /// **'Helium added to keep END within your {limit} limit.'**
+  String gasCalculators_bestMix_heliumAdded(Object limit);
+
+  /// No description provided for @gasCalculators_bestMix_idealLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Ideal fraction'**
+  String get gasCalculators_bestMix_idealLabel;
+
+  /// No description provided for @gasCalculators_bestMix_marginLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Margin below MOD'**
+  String get gasCalculators_bestMix_marginLabel;
+
+  /// No description provided for @gasCalculators_bestMix_modLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'MOD at ppO2 {ppO2}'**
+  String gasCalculators_bestMix_modLabel(Object ppO2);
+
+  /// No description provided for @gasCalculators_bestMix_nearestStandard.
+  ///
+  /// In en, this message translates to:
+  /// **'Nearest standard mix covering this depth'**
+  String get gasCalculators_bestMix_nearestStandard;
+
+  /// No description provided for @gasCalculators_bestMix_recommendedMix.
+  ///
+  /// In en, this message translates to:
+  /// **'Recommended mix'**
+  String get gasCalculators_bestMix_recommendedMix;
+
+  /// No description provided for @gasCalculators_bestMix_withoutHelium.
+  ///
+  /// In en, this message translates to:
+  /// **'Without helium'**
+  String get gasCalculators_bestMix_withoutHelium;
+
+  /// No description provided for @gasCalculators_planningCaveat.
+  ///
+  /// In en, this message translates to:
+  /// **'Planning estimate. Assumes a direct ascent. Verify against your training and add margin for conditions.'**
+  String get gasCalculators_planningCaveat;
+
+  /// No description provided for @gasCalculators_rockBottom_solveGas.
+  ///
+  /// In en, this message translates to:
+  /// **'Problem-solving gas at {depth}{unit}'**
+  String gasCalculators_rockBottom_solveGas(Object depth, Object unit);
+
+  /// No description provided for @gasCalculators_rockBottom_solveTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Problem-solving time'**
+  String get gasCalculators_rockBottom_solveTime;
+
+  /// No description provided for @gasCalculators_rockBottom_solveTimeHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Time spent at depth resolving the emergency before starting the ascent.'**
+  String get gasCalculators_rockBottom_solveTimeHint;
+
+  /// No description provided for @o2Toxicity_addedThisDive.
+  ///
+  /// In en, this message translates to:
+  /// **'+{value} this dive'**
+  String o2Toxicity_addedThisDive(Object value);
+
+  /// No description provided for @o2Toxicity_cnsProgressSemantics.
+  ///
+  /// In en, this message translates to:
+  /// **'CNS progress {percent} percent'**
+  String o2Toxicity_cnsProgressSemantics(Object percent);
+
+  /// No description provided for @o2Toxicity_daily.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily'**
+  String get o2Toxicity_daily;
+
+  /// No description provided for @o2Toxicity_otuSemantics.
+  ///
+  /// In en, this message translates to:
+  /// **'{label}: {value} of {limit} OTU, {percent} percent'**
+  String o2Toxicity_otuSemantics(
+    Object label,
+    Object value,
+    Object limit,
+    Object percent,
+  );
+
+  /// No description provided for @o2Toxicity_otuValueSemantics.
+  ///
+  /// In en, this message translates to:
+  /// **'{label}: {value} OTU'**
+  String o2Toxicity_otuValueSemantics(Object label, Object value);
+
+  /// No description provided for @o2Toxicity_prior.
+  ///
+  /// In en, this message translates to:
+  /// **'Prior: {value} OTU'**
+  String o2Toxicity_prior(Object value);
+
+  /// No description provided for @o2Toxicity_start.
+  ///
+  /// In en, this message translates to:
+  /// **'Start: {value} OTU'**
+  String o2Toxicity_start(Object value);
+
+  /// No description provided for @o2Toxicity_thisDive.
+  ///
+  /// In en, this message translates to:
+  /// **'This Dive'**
+  String get o2Toxicity_thisDive;
+
+  /// No description provided for @o2Toxicity_weekly.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekly'**
+  String get o2Toxicity_weekly;
+
   /// No description provided for @trips_story_dayLabel.
   ///
   /// In en, this message translates to:
@@ -4056,24 +4235,6 @@ abstract class AppLocalizations {
   /// **'Start pre-dive check'**
   String get preDive_dashboard_start;
 
-  /// No description provided for @tools_preDive_title.
-  ///
-  /// In en, this message translates to:
-  /// **'Pre-Dive Checklists'**
-  String get tools_preDive_title;
-
-  /// No description provided for @tools_preDive_subtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Run and review checklist sessions'**
-  String get tools_preDive_subtitle;
-
-  /// No description provided for @tools_preDive_description.
-  ///
-  /// In en, this message translates to:
-  /// **'Buddy checks, CCR build lists, and gear packing with an audit trail'**
-  String get tools_preDive_description;
-
   /// No description provided for @trips_detail_preDive_action.
   ///
   /// In en, this message translates to:
@@ -5040,6 +5201,30 @@ abstract class AppLocalizations {
   /// **'Diver'**
   String get dashboard_hero_diverFallbackName;
 
+  /// No description provided for @dashboard_hero_statDives.
+  ///
+  /// In en, this message translates to:
+  /// **'dives'**
+  String get dashboard_hero_statDives;
+
+  /// No description provided for @dashboard_hero_statHours.
+  ///
+  /// In en, this message translates to:
+  /// **'hours'**
+  String get dashboard_hero_statHours;
+
+  /// No description provided for @dashboard_hero_statSites.
+  ///
+  /// In en, this message translates to:
+  /// **'sites'**
+  String get dashboard_hero_statSites;
+
+  /// No description provided for @dashboard_hero_statCountries.
+  ///
+  /// In en, this message translates to:
+  /// **'countries'**
+  String get dashboard_hero_statCountries;
+
   /// No description provided for @dashboard_activityStats_divesInYear.
   ///
   /// In en, this message translates to:
@@ -5051,6 +5236,312 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Dive statistics summary'**
   String get dashboard_semantics_statsBar;
+
+  /// No description provided for @dashboard_gauges_addGear.
+  ///
+  /// In en, this message translates to:
+  /// **'Add gear'**
+  String get dashboard_gauges_addGear;
+
+  /// No description provided for @dashboard_gauges_gearOk.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} OK'**
+  String dashboard_gauges_gearOk(String name);
+
+  /// No description provided for @dashboard_gauges_gearDueIn.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} due in {days}d'**
+  String dashboard_gauges_gearDueIn(String name, int days);
+
+  /// No description provided for @dashboard_gauges_gearOverdue.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} overdue'**
+  String dashboard_gauges_gearOverdue(String name);
+
+  /// No description provided for @dashboard_gauges_insuranceOk.
+  ///
+  /// In en, this message translates to:
+  /// **'Insurance OK'**
+  String get dashboard_gauges_insuranceOk;
+
+  /// No description provided for @dashboard_gauges_insuranceExpires.
+  ///
+  /// In en, this message translates to:
+  /// **'Insurance expires {date}'**
+  String dashboard_gauges_insuranceExpires(String date);
+
+  /// No description provided for @dashboard_gauges_insuranceExpired.
+  ///
+  /// In en, this message translates to:
+  /// **'Insurance expired'**
+  String get dashboard_gauges_insuranceExpired;
+
+  /// No description provided for @dashboard_gauges_noInsurance.
+  ///
+  /// In en, this message translates to:
+  /// **'No insurance on file'**
+  String get dashboard_gauges_noInsurance;
+
+  /// No description provided for @dashboard_gauges_noFlyClear.
+  ///
+  /// In en, this message translates to:
+  /// **'No-fly 0:00'**
+  String get dashboard_gauges_noFlyClear;
+
+  /// No description provided for @dashboard_gauges_noFlyRemaining.
+  ///
+  /// In en, this message translates to:
+  /// **'No-fly {hours}:{minutes}'**
+  String dashboard_gauges_noFlyRemaining(String hours, String minutes);
+
+  /// No description provided for @dashboard_gauges_lastDiveDays.
+  ///
+  /// In en, this message translates to:
+  /// **'Last dive {days}d ago'**
+  String dashboard_gauges_lastDiveDays(int days);
+
+  /// No description provided for @dashboard_gauges_lastDiveToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Dove today'**
+  String get dashboard_gauges_lastDiveToday;
+
+  /// No description provided for @dashboard_gauges_noDivesYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No dives yet'**
+  String get dashboard_gauges_noDivesYet;
+
+  /// No description provided for @settings_homeChips_pageTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Home status chips'**
+  String get settings_homeChips_pageTitle;
+
+  /// No description provided for @settings_homeChips_description.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose which status chips appear at the top of the Home tab.'**
+  String get settings_homeChips_description;
+
+  /// No description provided for @settings_homeChips_gear.
+  ///
+  /// In en, this message translates to:
+  /// **'Gear service'**
+  String get settings_homeChips_gear;
+
+  /// No description provided for @settings_homeChips_insurance.
+  ///
+  /// In en, this message translates to:
+  /// **'Insurance'**
+  String get settings_homeChips_insurance;
+
+  /// No description provided for @settings_homeChips_noFly.
+  ///
+  /// In en, this message translates to:
+  /// **'No-fly timer'**
+  String get settings_homeChips_noFly;
+
+  /// No description provided for @settings_homeChips_lastDive.
+  ///
+  /// In en, this message translates to:
+  /// **'Dive currency'**
+  String get settings_homeChips_lastDive;
+
+  /// No description provided for @settings_homeChips_certifications.
+  ///
+  /// In en, this message translates to:
+  /// **'Certification expiry'**
+  String get settings_homeChips_certifications;
+
+  /// No description provided for @settings_homeChips_trip.
+  ///
+  /// In en, this message translates to:
+  /// **'Upcoming trip'**
+  String get settings_homeChips_trip;
+
+  /// No description provided for @settings_homeChips_checklist.
+  ///
+  /// In en, this message translates to:
+  /// **'Active checklist'**
+  String get settings_homeChips_checklist;
+
+  /// No description provided for @settings_homeChips_course.
+  ///
+  /// In en, this message translates to:
+  /// **'Course progress'**
+  String get settings_homeChips_course;
+
+  /// No description provided for @settings_homeChips_uploads.
+  ///
+  /// In en, this message translates to:
+  /// **'Media uploads'**
+  String get settings_homeChips_uploads;
+
+  /// No description provided for @settings_homeChips_backup.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup age'**
+  String get settings_homeChips_backup;
+
+  /// No description provided for @settings_homeChips_sync.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync status'**
+  String get settings_homeChips_sync;
+
+  /// No description provided for @settings_homeChips_dataQuality.
+  ///
+  /// In en, this message translates to:
+  /// **'Data quality'**
+  String get settings_homeChips_dataQuality;
+
+  /// No description provided for @dashboard_gauges_certsExpiring.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} certifications expiring'**
+  String dashboard_gauges_certsExpiring(int count);
+
+  /// No description provided for @dashboard_gauges_tripCountdown.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} in {days}d'**
+  String dashboard_gauges_tripCountdown(String name, int days);
+
+  /// No description provided for @dashboard_gauges_checklistActive.
+  ///
+  /// In en, this message translates to:
+  /// **'Checklist in progress'**
+  String get dashboard_gauges_checklistActive;
+
+  /// No description provided for @dashboard_gauges_courseProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'{name}: {done}/{total}'**
+  String dashboard_gauges_courseProgress(String name, int done, int total);
+
+  /// No description provided for @dashboard_gauges_uploadsPending.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} uploads pending'**
+  String dashboard_gauges_uploadsPending(int count);
+
+  /// No description provided for @dashboard_gauges_backupNone.
+  ///
+  /// In en, this message translates to:
+  /// **'No backup yet'**
+  String get dashboard_gauges_backupNone;
+
+  /// No description provided for @dashboard_gauges_backupToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Backed up today'**
+  String get dashboard_gauges_backupToday;
+
+  /// No description provided for @dashboard_gauges_backupDays.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup {days}d ago'**
+  String dashboard_gauges_backupDays(int days);
+
+  /// No description provided for @dashboard_gauges_syncPending.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} unsynced'**
+  String dashboard_gauges_syncPending(int count);
+
+  /// No description provided for @dashboard_gauges_synced.
+  ///
+  /// In en, this message translates to:
+  /// **'Synced'**
+  String get dashboard_gauges_synced;
+
+  /// No description provided for @dashboard_gauges_dataIssues.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 data issue} other{{count} data issues}}'**
+  String dashboard_gauges_dataIssues(int count);
+
+  /// No description provided for @dashboard_gauges_retry.
+  ///
+  /// In en, this message translates to:
+  /// **'Status unavailable - tap to retry'**
+  String get dashboard_gauges_retry;
+
+  /// No description provided for @dashboard_urgent_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Needs attention'**
+  String get dashboard_urgent_title;
+
+  /// No description provided for @dashboard_photos_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Recent photos'**
+  String get dashboard_photos_title;
+
+  /// No description provided for @dashboard_recentSites_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Recent sites'**
+  String get dashboard_recentSites_title;
+
+  /// No description provided for @dashboard_yearInReview_title.
+  ///
+  /// In en, this message translates to:
+  /// **'This year'**
+  String get dashboard_yearInReview_title;
+
+  /// No description provided for @dashboard_yearInReview_divesVs.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} dives (vs {previous} last year)'**
+  String dashboard_yearInReview_divesVs(int count, int previous);
+
+  /// No description provided for @dashboard_yearInReview_hours.
+  ///
+  /// In en, this message translates to:
+  /// **'{hours} hours underwater'**
+  String dashboard_yearInReview_hours(String hours);
+
+  /// No description provided for @dashboard_yearInReview_maxDepth.
+  ///
+  /// In en, this message translates to:
+  /// **'Deepest: {depth}'**
+  String dashboard_yearInReview_maxDepth(String depth);
+
+  /// No description provided for @dashboard_onThisDay_title.
+  ///
+  /// In en, this message translates to:
+  /// **'On this day'**
+  String get dashboard_onThisDay_title;
+
+  /// No description provided for @dashboard_onThisDay_entry.
+  ///
+  /// In en, this message translates to:
+  /// **'{year} - {site}'**
+  String dashboard_onThisDay_entry(String year, String site);
+
+  /// No description provided for @dashboard_milestones_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Milestones'**
+  String get dashboard_milestones_title;
+
+  /// No description provided for @dashboard_milestones_nextDive.
+  ///
+  /// In en, this message translates to:
+  /// **'{remaining} dives to #{milestone}'**
+  String dashboard_milestones_nextDive(int remaining, int milestone);
+
+  /// No description provided for @dashboard_milestones_certYears.
+  ///
+  /// In en, this message translates to:
+  /// **'{name}: {years} years in {month}'**
+  String dashboard_milestones_certYears(String name, int years, String month);
 
   /// No description provided for @dashboard_personalRecords_coldest.
   ///
@@ -20630,6 +21121,18 @@ abstract class AppLocalizations {
   /// **'Saved plans'**
   String get plannerCanvas_saved_title;
 
+  /// No description provided for @plannerCanvas_name_dialogTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Name your plan'**
+  String get plannerCanvas_name_dialogTitle;
+
+  /// No description provided for @plannerCanvas_name_defaultFallback.
+  ///
+  /// In en, this message translates to:
+  /// **'Dive Plan'**
+  String get plannerCanvas_name_defaultFallback;
+
   /// No description provided for @plannerCanvas_scrub_bailout.
   ///
   /// In en, this message translates to:
@@ -21019,6 +21522,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'App Language'**
   String get settings_appearance_appLanguage;
+
+  /// Title of the app-wide display zoom control in Appearance settings
+  ///
+  /// In en, this message translates to:
+  /// **'Display size'**
+  String get settings_appearance_displaySize;
+
+  /// Current display zoom level shown as a percentage
+  ///
+  /// In en, this message translates to:
+  /// **'{percent}%'**
+  String settings_appearance_displaySize_value(int percent);
+
+  /// Button that returns the display zoom to 100 percent
+  ///
+  /// In en, this message translates to:
+  /// **'Reset'**
+  String get settings_appearance_displaySize_reset;
+
+  /// Label at the low end of the display zoom slider
+  ///
+  /// In en, this message translates to:
+  /// **'Smaller'**
+  String get settings_appearance_displaySize_smaller;
+
+  /// Label at the high end of the display zoom slider
+  ///
+  /// In en, this message translates to:
+  /// **'Larger'**
+  String get settings_appearance_displaySize_larger;
 
   /// No description provided for @settings_appearance_depthColoredCards.
   ///
@@ -22427,6 +22960,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{count, plural, =1{1 pending change} other{{count} pending changes}}'**
   String settings_cloudSync_pendingChanges(int count);
+
+  /// No description provided for @settings_cloudSync_peerRequiresUpdate_banner.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 device syncs from a newer version of Submersion. Update this device to receive its latest changes.} other{{count} devices sync from a newer version of Submersion. Update this device to receive their latest changes.}}'**
+  String settings_cloudSync_peerRequiresUpdate_banner(num count);
 
   /// No description provided for @settings_cloudSync_provider_connected.
   ///
@@ -24968,6 +25507,150 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Pounds (lbs)'**
   String get settings_units_weight_pounds;
+
+  /// No description provided for @settings_updates_automaticUpdates.
+  ///
+  /// In en, this message translates to:
+  /// **'Automatic updates'**
+  String get settings_updates_automaticUpdates;
+
+  /// No description provided for @settings_updates_automaticUpdatesSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Check for updates periodically'**
+  String get settings_updates_automaticUpdatesSubtitle;
+
+  /// No description provided for @settings_updates_betaDialogBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Beta builds are published from every change and may upgrade your dive log\'s database before the stable release does. Switching back to stable later will not downgrade the app, and all devices that sync together should use the same channel. A backup is taken automatically before any database upgrade.'**
+  String get settings_updates_betaDialogBody;
+
+  /// No description provided for @settings_updates_betaDialogConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Switch to Beta'**
+  String get settings_updates_betaDialogConfirm;
+
+  /// No description provided for @settings_updates_betaDialogTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Receive beta updates?'**
+  String get settings_updates_betaDialogTitle;
+
+  /// No description provided for @settings_updates_channel.
+  ///
+  /// In en, this message translates to:
+  /// **'Update channel'**
+  String get settings_updates_channel;
+
+  /// No description provided for @settings_updates_channelBadgeBeta.
+  ///
+  /// In en, this message translates to:
+  /// **'{version} (Beta)'**
+  String settings_updates_channelBadgeBeta(String version);
+
+  /// No description provided for @settings_updates_channelBeta.
+  ///
+  /// In en, this message translates to:
+  /// **'Beta'**
+  String get settings_updates_channelBeta;
+
+  /// No description provided for @settings_updates_channelBetaSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'New builds from every change, ahead of stable'**
+  String get settings_updates_channelBetaSubtitle;
+
+  /// No description provided for @settings_updates_channelStable.
+  ///
+  /// In en, this message translates to:
+  /// **'Stable'**
+  String get settings_updates_channelStable;
+
+  /// No description provided for @settings_updates_channelStableSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Tested releases only'**
+  String get settings_updates_channelStableSubtitle;
+
+  /// No description provided for @settings_updates_checkForUpdates.
+  ///
+  /// In en, this message translates to:
+  /// **'Check for Updates'**
+  String get settings_updates_checkForUpdates;
+
+  /// No description provided for @settings_updates_checking.
+  ///
+  /// In en, this message translates to:
+  /// **'Checking...'**
+  String get settings_updates_checking;
+
+  /// No description provided for @settings_updates_downloading.
+  ///
+  /// In en, this message translates to:
+  /// **'Downloading... {progress}%'**
+  String settings_updates_downloading(String progress);
+
+  /// No description provided for @settings_updates_error.
+  ///
+  /// In en, this message translates to:
+  /// **'Error: {message}'**
+  String settings_updates_error(String message);
+
+  /// No description provided for @settings_updates_header.
+  ///
+  /// In en, this message translates to:
+  /// **'Updates'**
+  String get settings_updates_header;
+
+  /// No description provided for @settings_updates_joinBeta.
+  ///
+  /// In en, this message translates to:
+  /// **'Join the Beta'**
+  String get settings_updates_joinBeta;
+
+  /// No description provided for @settings_updates_joinBetaSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Get new features early through the beta program'**
+  String get settings_updates_joinBetaSubtitle;
+
+  /// No description provided for @settings_updates_lastChecked.
+  ///
+  /// In en, this message translates to:
+  /// **'Last checked'**
+  String get settings_updates_lastChecked;
+
+  /// No description provided for @settings_updates_never.
+  ///
+  /// In en, this message translates to:
+  /// **'Never'**
+  String get settings_updates_never;
+
+  /// No description provided for @settings_updates_readyToInstall.
+  ///
+  /// In en, this message translates to:
+  /// **'Version {version} ready to install'**
+  String settings_updates_readyToInstall(String version);
+
+  /// No description provided for @settings_updates_stableSwitchNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'You will stay on this beta until the next stable release is newer than it.'**
+  String get settings_updates_stableSwitchNotice;
+
+  /// No description provided for @settings_updates_upToDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Up to date'**
+  String get settings_updates_upToDate;
+
+  /// No description provided for @settings_updates_versionAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Version {version} available'**
+  String settings_updates_versionAvailable(String version);
 
   /// Button label to clear the signature canvas
   ///
@@ -29855,6 +30538,24 @@ abstract class AppLocalizations {
   /// **'{selected} of {total} selected'**
   String universalImport_label_xOfYSelected(Object selected, Object total);
 
+  /// Collapsed-header badge on a duplicate row whose action is link-to-existing
+  ///
+  /// In en, this message translates to:
+  /// **'LINK'**
+  String get universalImport_entityAction_linkBadge;
+
+  /// Action button on a duplicate buddy/tag row: link the import to the matched existing record instead of skipping or creating a twin
+  ///
+  /// In en, this message translates to:
+  /// **'Link to existing'**
+  String get universalImport_entityAction_linkExisting;
+
+  /// Subtitle under the link-to-existing action button
+  ///
+  /// In en, this message translates to:
+  /// **'Use the matched record'**
+  String get universalImport_entityAction_linkExistingSubtitle;
+
   /// Prompt shown above the action buttons on an expanded pending duplicate row, telling the user to pick an action
   ///
   /// In en, this message translates to:
@@ -30002,6 +30703,132 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Close import wizard'**
   String get universalImport_tooltip_closeWizard;
+
+  /// No description provided for @weather_windFromDirection.
+  ///
+  /// In en, this message translates to:
+  /// **'{wind} from {direction}'**
+  String weather_windFromDirection(Object wind, Object direction);
+
+  /// No description provided for @weather_wind_calm.
+  ///
+  /// In en, this message translates to:
+  /// **'calm'**
+  String get weather_wind_calm;
+
+  /// No description provided for @weather_wind_highWind.
+  ///
+  /// In en, this message translates to:
+  /// **'high wind'**
+  String get weather_wind_highWind;
+
+  /// No description provided for @weather_wind_lightBreeze.
+  ///
+  /// In en, this message translates to:
+  /// **'light breeze'**
+  String get weather_wind_lightBreeze;
+
+  /// No description provided for @weather_wind_moderateBreeze.
+  ///
+  /// In en, this message translates to:
+  /// **'moderate breeze'**
+  String get weather_wind_moderateBreeze;
+
+  /// No description provided for @weather_wind_strongBreeze.
+  ///
+  /// In en, this message translates to:
+  /// **'strong breeze'**
+  String get weather_wind_strongBreeze;
+
+  /// No description provided for @weather_wmo_clear.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear sky'**
+  String get weather_wmo_clear;
+
+  /// No description provided for @weather_wmo_drizzle.
+  ///
+  /// In en, this message translates to:
+  /// **'Drizzle'**
+  String get weather_wmo_drizzle;
+
+  /// No description provided for @weather_wmo_fog.
+  ///
+  /// In en, this message translates to:
+  /// **'Fog'**
+  String get weather_wmo_fog;
+
+  /// No description provided for @weather_wmo_freezingDrizzle.
+  ///
+  /// In en, this message translates to:
+  /// **'Freezing drizzle'**
+  String get weather_wmo_freezingDrizzle;
+
+  /// No description provided for @weather_wmo_freezingRain.
+  ///
+  /// In en, this message translates to:
+  /// **'Freezing rain'**
+  String get weather_wmo_freezingRain;
+
+  /// No description provided for @weather_wmo_mainlyClear.
+  ///
+  /// In en, this message translates to:
+  /// **'Mainly clear'**
+  String get weather_wmo_mainlyClear;
+
+  /// No description provided for @weather_wmo_overcast.
+  ///
+  /// In en, this message translates to:
+  /// **'Overcast'**
+  String get weather_wmo_overcast;
+
+  /// No description provided for @weather_wmo_partlyCloudy.
+  ///
+  /// In en, this message translates to:
+  /// **'Partly cloudy'**
+  String get weather_wmo_partlyCloudy;
+
+  /// No description provided for @weather_wmo_rain.
+  ///
+  /// In en, this message translates to:
+  /// **'Rain'**
+  String get weather_wmo_rain;
+
+  /// No description provided for @weather_wmo_rainShowers.
+  ///
+  /// In en, this message translates to:
+  /// **'Rain showers'**
+  String get weather_wmo_rainShowers;
+
+  /// No description provided for @weather_wmo_snow.
+  ///
+  /// In en, this message translates to:
+  /// **'Snow'**
+  String get weather_wmo_snow;
+
+  /// No description provided for @weather_wmo_snowGrains.
+  ///
+  /// In en, this message translates to:
+  /// **'Snow grains'**
+  String get weather_wmo_snowGrains;
+
+  /// No description provided for @weather_wmo_snowShowers.
+  ///
+  /// In en, this message translates to:
+  /// **'Snow showers'**
+  String get weather_wmo_snowShowers;
+
+  /// No description provided for @weather_wmo_thunderstorm.
+  ///
+  /// In en, this message translates to:
+  /// **'Thunderstorm'**
+  String get weather_wmo_thunderstorm;
+
+  /// No description provided for @weather_wmo_thunderstormHail.
+  ///
+  /// In en, this message translates to:
+  /// **'Thunderstorm with hail'**
+  String get weather_wmo_thunderstormHail;
 
   /// Base weight line in calculation breakdown
   ///
@@ -32708,48 +33535,6 @@ abstract class AppLocalizations {
   /// **'Tank Presets'**
   String get tankPresets_title;
 
-  /// No description provided for @tools_deco_description.
-  ///
-  /// In en, this message translates to:
-  /// **'Calculate no-decompression limits, required deco stops, and CNS/OTU exposure for multi-level dive profiles.'**
-  String get tools_deco_description;
-
-  /// No description provided for @tools_deco_subtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Plan dives with decompression stops'**
-  String get tools_deco_subtitle;
-
-  /// No description provided for @tools_deco_title.
-  ///
-  /// In en, this message translates to:
-  /// **'Deco Calculator'**
-  String get tools_deco_title;
-
-  /// No description provided for @tools_disclaimer.
-  ///
-  /// In en, this message translates to:
-  /// **'These calculators are for planning purposes only. Always verify calculations and follow your dive training.'**
-  String get tools_disclaimer;
-
-  /// No description provided for @tools_gas_description.
-  ///
-  /// In en, this message translates to:
-  /// **'Four specialized gas calculators:\n• MOD - Maximum operating depth for a gas mix\n• Best Mix - Ideal O₂% for a target depth\n• Consumption - Gas usage estimation\n• Rock Bottom - Emergency reserve calculation'**
-  String get tools_gas_description;
-
-  /// No description provided for @tools_gas_subtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'MOD, Best Mix, Consumption, Rock Bottom'**
-  String get tools_gas_subtitle;
-
-  /// No description provided for @tools_gas_title.
-  ///
-  /// In en, this message translates to:
-  /// **'Gas Calculators'**
-  String get tools_gas_title;
-
   /// No description provided for @tools_gpsLogger_description.
   ///
   /// In en, this message translates to:
@@ -32767,12 +33552,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'GPS Logger'**
   String get tools_gpsLogger_title;
-
-  /// No description provided for @tools_title.
-  ///
-  /// In en, this message translates to:
-  /// **'Tools'**
-  String get tools_title;
 
   /// No description provided for @tools_weight_aluminumImperial.
   ///
@@ -32803,12 +33582,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Very buoyant (+3 kg)'**
   String get tools_weight_carbonFiberMetric;
-
-  /// No description provided for @tools_weight_description.
-  ///
-  /// In en, this message translates to:
-  /// **'Estimate the weight you need based on your exposure suit, tank material, water type, and body weight.'**
-  String get tools_weight_description;
 
   /// No description provided for @tools_weight_disclaimer.
   ///
@@ -32869,12 +33642,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Negatively buoyant (-2 kg)'**
   String get tools_weight_steelMetric;
-
-  /// No description provided for @tools_weight_subtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Recommended weight for your setup'**
-  String get tools_weight_subtitle;
 
   /// No description provided for @tools_weight_tankMaterial.
   ///
@@ -34188,6 +34955,12 @@ abstract class AppLocalizations {
   /// **'Uploading'**
   String get settings_mediaStorage_transfers_state_transferring;
 
+  /// No description provided for @settings_mediaStorage_transfers_state_deleting.
+  ///
+  /// In en, this message translates to:
+  /// **'Removing from cloud'**
+  String get settings_mediaStorage_transfers_state_deleting;
+
   /// No description provided for @settings_mediaStorage_transfers_state_done.
   ///
   /// In en, this message translates to:
@@ -34199,6 +34972,41 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Failed'**
   String get settings_mediaStorage_transfers_state_failed;
+
+  /// No description provided for @settings_mediaStorage_transfers_queued.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} queued'**
+  String settings_mediaStorage_transfers_queued(int count);
+
+  /// No description provided for @settings_mediaStorage_transfers_waitingRetry.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} waiting to retry'**
+  String settings_mediaStorage_transfers_waitingRetry(int count);
+
+  /// No description provided for @settings_mediaStorage_verify_action.
+  ///
+  /// In en, this message translates to:
+  /// **'Verify library'**
+  String get settings_mediaStorage_verify_action;
+
+  /// No description provided for @settings_mediaStorage_verify_running.
+  ///
+  /// In en, this message translates to:
+  /// **'Verifying media library...'**
+  String get settings_mediaStorage_verify_running;
+
+  /// No description provided for @settings_mediaStorage_verify_summary.
+  ///
+  /// In en, this message translates to:
+  /// **'Checked {checked} objects: removed {removed} orphans, queued {repaired} repairs, aborted {aborted} stale uploads'**
+  String settings_mediaStorage_verify_summary(
+    int checked,
+    int removed,
+    int repaired,
+    int aborted,
+  );
 
   /// No description provided for @settings_mediaStorage_backfill_action.
   ///
@@ -34619,6 +35427,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Markers'**
   String get dive3d_overlay_markers;
+
+  /// No description provided for @dive3d_seascape_overlay_paths.
+  ///
+  /// In en, this message translates to:
+  /// **'Dive paths'**
+  String get dive3d_seascape_overlay_paths;
+
+  /// No description provided for @dive3d_seascape_siteTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Site Seascape'**
+  String get dive3d_seascape_siteTitle;
+
+  /// No description provided for @dive3d_seascape_seafloorSource.
+  ///
+  /// In en, this message translates to:
+  /// **'Seafloor: {source} (~{resolution} m)'**
+  String dive3d_seascape_seafloorSource(String source, String resolution);
+
+  /// No description provided for @dive3d_seascape_noCoordinates.
+  ///
+  /// In en, this message translates to:
+  /// **'This site has no GPS coordinates'**
+  String get dive3d_seascape_noCoordinates;
+
+  /// No description provided for @dive3d_seascape_noData.
+  ///
+  /// In en, this message translates to:
+  /// **'No bathymetry available for this location'**
+  String get dive3d_seascape_noData;
+
+  /// No description provided for @dive3d_seascape_axis_distance.
+  ///
+  /// In en, this message translates to:
+  /// **'Distance ({unitSymbol})'**
+  String dive3d_seascape_axis_distance(String unitSymbol);
+
+  /// No description provided for @settings_about_bathymetryCredit.
+  ///
+  /// In en, this message translates to:
+  /// **'Bathymetry data: GMRT (CC BY 4.0) · EMODnet Bathymetry (CC BY 4.0) · NOAA ETOPO 2022'**
+  String get settings_about_bathymetryCredit;
 
   /// No description provided for @dive3d_metric_depth.
   ///
@@ -36881,6 +37731,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Install ffmpeg to enable video compression. Originals are uploaded until then.'**
   String get settings_mediaStorage_quality_linuxFfmpegHint;
+
+  /// No description provided for @settings_mediaStorage_quality_saveFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not save the upload quality. Try again.'**
+  String get settings_mediaStorage_quality_saveFailed;
+
+  /// No description provided for @settings_mediaStorage_quality_noTranscoderHint.
+  ///
+  /// In en, this message translates to:
+  /// **'This device cannot compress video. Originals are uploaded from it.'**
+  String get settings_mediaStorage_quality_noTranscoderHint;
 }
 
 class _AppLocalizationsDelegate

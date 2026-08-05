@@ -91,6 +91,133 @@ class AppLocalizationsPt extends AppLocalizations {
   String get equipment_setDetail_noGeofences => 'Sem geocercas';
 
   @override
+  String formatter_duration_minutes(Object minutes) {
+    return '$minutes min';
+  }
+
+  @override
+  String formatter_duration_minutesSeconds(Object minutes, Object seconds) {
+    return '$minutes min $seconds s';
+  }
+
+  @override
+  String formatter_duration_seconds(Object seconds) {
+    return '$seconds s';
+  }
+
+  @override
+  String gasCalculators_bestMix_densityCritical(Object limit) {
+    return 'Acima do limite maximo de densidade de $limit g/L.';
+  }
+
+  @override
+  String get gasCalculators_bestMix_densityLabel =>
+      'Densidade do gas na profundidade';
+
+  @override
+  String gasCalculators_bestMix_densityWarn(Object limit) {
+    return 'Acima do limite de densidade recomendado de $limit g/L.';
+  }
+
+  @override
+  String gasCalculators_bestMix_endExceeded(Object limit) {
+    return 'A END excede o teu limite de $limit.';
+  }
+
+  @override
+  String get gasCalculators_bestMix_endLabel => 'END na profundidade';
+
+  @override
+  String get gasCalculators_bestMix_endLimitLabel => 'Limite END';
+
+  @override
+  String gasCalculators_bestMix_heliumAdded(Object limit) {
+    return 'Helio adicionado para manter a END dentro do teu limite de $limit.';
+  }
+
+  @override
+  String get gasCalculators_bestMix_idealLabel => 'Fracao ideal';
+
+  @override
+  String get gasCalculators_bestMix_marginLabel => 'Margem abaixo da MOD';
+
+  @override
+  String gasCalculators_bestMix_modLabel(Object ppO2) {
+    return 'MOD a ppO2 $ppO2';
+  }
+
+  @override
+  String get gasCalculators_bestMix_nearestStandard =>
+      'Mistura padrao mais proxima que cobre esta profundidade';
+
+  @override
+  String get gasCalculators_bestMix_recommendedMix => 'Mistura recomendada';
+
+  @override
+  String get gasCalculators_bestMix_withoutHelium => 'Sem helio';
+
+  @override
+  String get gasCalculators_planningCaveat =>
+      'Estimativa de planeamento. Assume uma subida direta. Verifica de acordo com a tua formacao e acrescenta margem para as condicoes.';
+
+  @override
+  String gasCalculators_rockBottom_solveGas(Object depth, Object unit) {
+    return 'Gas para resolver o problema a $depth$unit';
+  }
+
+  @override
+  String get gasCalculators_rockBottom_solveTime =>
+      'Tempo de resolucao do problema';
+
+  @override
+  String get gasCalculators_rockBottom_solveTimeHint =>
+      'Tempo passado na profundidade a resolver a emergencia antes de iniciar a subida.';
+
+  @override
+  String o2Toxicity_addedThisDive(Object value) {
+    return '+$value este mergulho';
+  }
+
+  @override
+  String o2Toxicity_cnsProgressSemantics(Object percent) {
+    return 'Progresso SNC $percent por cento';
+  }
+
+  @override
+  String get o2Toxicity_daily => 'Diario';
+
+  @override
+  String o2Toxicity_otuSemantics(
+    Object label,
+    Object value,
+    Object limit,
+    Object percent,
+  ) {
+    return '$label: $value de $limit OTU, $percent por cento';
+  }
+
+  @override
+  String o2Toxicity_otuValueSemantics(Object label, Object value) {
+    return '$label: $value OTU';
+  }
+
+  @override
+  String o2Toxicity_prior(Object value) {
+    return 'Anterior: $value OTU';
+  }
+
+  @override
+  String o2Toxicity_start(Object value) {
+    return 'Inicio: $value OTU';
+  }
+
+  @override
+  String get o2Toxicity_thisDive => 'Este mergulho';
+
+  @override
+  String get o2Toxicity_weekly => 'Semanal';
+
+  @override
   String trips_story_dayLabel(int number) {
     return 'Dia $number';
   }
@@ -2379,17 +2506,6 @@ class AppLocalizationsPt extends AppLocalizations {
   String get preDive_dashboard_start => 'Iniciar verificação pré-mergulho';
 
   @override
-  String get tools_preDive_title => 'Listas de Verificação Pré-Mergulho';
-
-  @override
-  String get tools_preDive_subtitle =>
-      'Executar e revisar sessões de lista de verificação';
-
-  @override
-  String get tools_preDive_description =>
-      'Verificações de dupla, listas de montagem de CCR e preparação de equipamento com trilha de auditoria';
-
-  @override
   String get trips_detail_preDive_action => 'Lista de verificação pré-mergulho';
 
   @override
@@ -2945,6 +3061,18 @@ class AppLocalizationsPt extends AppLocalizations {
   String get dashboard_hero_diverFallbackName => 'Mergulhador';
 
   @override
+  String get dashboard_hero_statDives => 'mergulhos';
+
+  @override
+  String get dashboard_hero_statHours => 'horas';
+
+  @override
+  String get dashboard_hero_statSites => 'locais';
+
+  @override
+  String get dashboard_hero_statCountries => 'países';
+
+  @override
   String dashboard_activityStats_divesInYear(String year) {
     return 'mergulhos em $year';
   }
@@ -2952,6 +3080,206 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get dashboard_semantics_statsBar =>
       'Resumo das estatísticas de mergulho';
+
+  @override
+  String get dashboard_gauges_addGear => 'Adicionar equipamento';
+
+  @override
+  String dashboard_gauges_gearOk(String name) {
+    return '$name OK';
+  }
+
+  @override
+  String dashboard_gauges_gearDueIn(String name, int days) {
+    return '$name vence em ${days}d';
+  }
+
+  @override
+  String dashboard_gauges_gearOverdue(String name) {
+    return '$name atrasado';
+  }
+
+  @override
+  String get dashboard_gauges_insuranceOk => 'Seguro OK';
+
+  @override
+  String dashboard_gauges_insuranceExpires(String date) {
+    return 'Seguro expira em $date';
+  }
+
+  @override
+  String get dashboard_gauges_insuranceExpired => 'Seguro expirado';
+
+  @override
+  String get dashboard_gauges_noInsurance => 'Sem seguro registado';
+
+  @override
+  String get dashboard_gauges_noFlyClear => 'Não voar 0:00';
+
+  @override
+  String dashboard_gauges_noFlyRemaining(String hours, String minutes) {
+    return 'Não voar $hours:$minutes';
+  }
+
+  @override
+  String dashboard_gauges_lastDiveDays(int days) {
+    return 'Último mergulho há ${days}d';
+  }
+
+  @override
+  String get dashboard_gauges_lastDiveToday => 'Mergulhou hoje';
+
+  @override
+  String get dashboard_gauges_noDivesYet => 'Ainda sem mergulhos';
+
+  @override
+  String get settings_homeChips_pageTitle => 'Chips de estado do Início';
+
+  @override
+  String get settings_homeChips_description =>
+      'Escolha que chips de estado aparecem no topo do separador Início.';
+
+  @override
+  String get settings_homeChips_gear => 'Manutenção do equipamento';
+
+  @override
+  String get settings_homeChips_insurance => 'Seguro';
+
+  @override
+  String get settings_homeChips_noFly => 'Temporizador de não voar';
+
+  @override
+  String get settings_homeChips_lastDive => 'Atualidade de mergulho';
+
+  @override
+  String get settings_homeChips_certifications => 'Expiração de certificações';
+
+  @override
+  String get settings_homeChips_trip => 'Próxima viagem';
+
+  @override
+  String get settings_homeChips_checklist => 'Lista de verificação ativa';
+
+  @override
+  String get settings_homeChips_course => 'Progresso do curso';
+
+  @override
+  String get settings_homeChips_uploads => 'Envios de média';
+
+  @override
+  String get settings_homeChips_backup => 'Idade da cópia';
+
+  @override
+  String get settings_homeChips_sync => 'Estado de sincronização';
+
+  @override
+  String get settings_homeChips_dataQuality => 'Qualidade dos dados';
+
+  @override
+  String dashboard_gauges_certsExpiring(int count) {
+    return '$count certificações a expirar';
+  }
+
+  @override
+  String dashboard_gauges_tripCountdown(String name, int days) {
+    return '$name em ${days}d';
+  }
+
+  @override
+  String get dashboard_gauges_checklistActive =>
+      'Lista de verificação em curso';
+
+  @override
+  String dashboard_gauges_courseProgress(String name, int done, int total) {
+    return '$name: $done/$total';
+  }
+
+  @override
+  String dashboard_gauges_uploadsPending(int count) {
+    return '$count envios pendentes';
+  }
+
+  @override
+  String get dashboard_gauges_backupNone => 'Sem cópia de segurança';
+
+  @override
+  String get dashboard_gauges_backupToday => 'Cópia feita hoje';
+
+  @override
+  String dashboard_gauges_backupDays(int days) {
+    return 'Cópia há ${days}d';
+  }
+
+  @override
+  String dashboard_gauges_syncPending(int count) {
+    return '$count por sincronizar';
+  }
+
+  @override
+  String get dashboard_gauges_synced => 'Sincronizado';
+
+  @override
+  String dashboard_gauges_dataIssues(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count problemas de dados',
+      one: '1 problema de dados',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get dashboard_gauges_retry =>
+      'Estado indisponível - toque para tentar novamente';
+
+  @override
+  String get dashboard_urgent_title => 'Requer atenção';
+
+  @override
+  String get dashboard_photos_title => 'Fotos recentes';
+
+  @override
+  String get dashboard_recentSites_title => 'Locais recentes';
+
+  @override
+  String get dashboard_yearInReview_title => 'Este ano';
+
+  @override
+  String dashboard_yearInReview_divesVs(int count, int previous) {
+    return '$count mergulhos (vs $previous no ano passado)';
+  }
+
+  @override
+  String dashboard_yearInReview_hours(String hours) {
+    return '$hours horas debaixo de água';
+  }
+
+  @override
+  String dashboard_yearInReview_maxDepth(String depth) {
+    return 'Máxima: $depth';
+  }
+
+  @override
+  String get dashboard_onThisDay_title => 'Neste dia';
+
+  @override
+  String dashboard_onThisDay_entry(String year, String site) {
+    return '$year - $site';
+  }
+
+  @override
+  String get dashboard_milestones_title => 'Marcos';
+
+  @override
+  String dashboard_milestones_nextDive(int remaining, int milestone) {
+    return '$remaining mergulhos para o n.º $milestone';
+  }
+
+  @override
+  String dashboard_milestones_certYears(String name, int years, String month) {
+    return '$name: $years anos em $month';
+  }
 
   @override
   String get dashboard_personalRecords_coldest => 'Mais Frio';
@@ -12141,6 +12469,12 @@ class AppLocalizationsPt extends AppLocalizations {
   String get plannerCanvas_saved_title => 'Planos salvos';
 
   @override
+  String get plannerCanvas_name_dialogTitle => 'Dê um nome ao seu plano';
+
+  @override
+  String get plannerCanvas_name_defaultFallback => 'Plano de mergulho';
+
+  @override
   String plannerCanvas_scrub_bailout(String minutes) {
     return 'BO $minutes′';
   }
@@ -12364,6 +12698,23 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_appearance_appLanguage => 'Idioma do Aplicativo';
+
+  @override
+  String get settings_appearance_displaySize => 'Tamanho de exibição';
+
+  @override
+  String settings_appearance_displaySize_value(int percent) {
+    return '$percent%';
+  }
+
+  @override
+  String get settings_appearance_displaySize_reset => 'Redefinir';
+
+  @override
+  String get settings_appearance_displaySize_smaller => 'Menor';
+
+  @override
+  String get settings_appearance_displaySize_larger => 'Maior';
 
   @override
   String get settings_appearance_depthColoredCards =>
@@ -13245,6 +13596,19 @@ class AppLocalizationsPt extends AppLocalizations {
       locale: localeName,
       other: '$count alteracoes pendentes',
       one: '1 alteracao pendente',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String settings_cloudSync_peerRequiresUpdate_banner(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count dispositivos sincronizam a partir de uma versão mais recente do Submersion. Atualize este dispositivo para receber as alterações mais recentes deles.',
+      one:
+          '1 dispositivo sincroniza a partir de uma versão mais recente do Submersion. Atualize este dispositivo para receber as alterações mais recentes dele.',
     );
     return '$_temp0';
   }
@@ -14769,6 +15133,94 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_units_weight_pounds => 'Libras (lbs)';
+
+  @override
+  String get settings_updates_automaticUpdates => 'Atualizações automáticas';
+
+  @override
+  String get settings_updates_automaticUpdatesSubtitle =>
+      'Verificar atualizações periodicamente';
+
+  @override
+  String get settings_updates_betaDialogBody =>
+      'As versões beta são publicadas a cada alteração e podem atualizar o banco de dados do seu registro de mergulhos antes da versão estável. Voltar depois para o canal estável não fará downgrade do app, e todos os dispositivos que sincronizam entre si devem usar o mesmo canal. Um backup é feito automaticamente antes de qualquer atualização do banco de dados.';
+
+  @override
+  String get settings_updates_betaDialogConfirm => 'Mudar para Beta';
+
+  @override
+  String get settings_updates_betaDialogTitle => 'Receber atualizações beta?';
+
+  @override
+  String get settings_updates_channel => 'Canal de atualização';
+
+  @override
+  String settings_updates_channelBadgeBeta(String version) {
+    return '$version (Beta)';
+  }
+
+  @override
+  String get settings_updates_channelBeta => 'Beta';
+
+  @override
+  String get settings_updates_channelBetaSubtitle =>
+      'Novas versões a cada alteração, antes da estável';
+
+  @override
+  String get settings_updates_channelStable => 'Estável';
+
+  @override
+  String get settings_updates_channelStableSubtitle =>
+      'Apenas versões testadas';
+
+  @override
+  String get settings_updates_checkForUpdates => 'Verificar atualizações';
+
+  @override
+  String get settings_updates_checking => 'Verificando...';
+
+  @override
+  String settings_updates_downloading(String progress) {
+    return 'Baixando... $progress%';
+  }
+
+  @override
+  String settings_updates_error(String message) {
+    return 'Erro: $message';
+  }
+
+  @override
+  String get settings_updates_header => 'Atualizações';
+
+  @override
+  String get settings_updates_joinBeta => 'Participar do Beta';
+
+  @override
+  String get settings_updates_joinBetaSubtitle =>
+      'Receba novos recursos antes através do programa beta';
+
+  @override
+  String get settings_updates_lastChecked => 'Última verificação';
+
+  @override
+  String get settings_updates_never => 'Nunca';
+
+  @override
+  String settings_updates_readyToInstall(String version) {
+    return 'Versão $version pronta para instalar';
+  }
+
+  @override
+  String get settings_updates_stableSwitchNotice =>
+      'Você permanecerá nesta beta até que a próxima versão estável seja mais recente que ela.';
+
+  @override
+  String get settings_updates_upToDate => 'Atualizado';
+
+  @override
+  String settings_updates_versionAvailable(String version) {
+    return 'Versão $version disponível';
+  }
 
   @override
   String get signatures_action_clear => 'Limpar';
@@ -17751,6 +18203,17 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
+  String get universalImport_entityAction_linkBadge => 'VINCULAR';
+
+  @override
+  String get universalImport_entityAction_linkExisting =>
+      'Vincular ao existente';
+
+  @override
+  String get universalImport_entityAction_linkExistingSubtitle =>
+      'Usar o registro correspondente';
+
+  @override
   String get universalImport_pending_chooseAction => 'Escolher uma acao';
 
   @override
@@ -17851,6 +18314,71 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get universalImport_tooltip_closeWizard =>
       'Fechar assistente de importação';
+
+  @override
+  String weather_windFromDirection(Object wind, Object direction) {
+    return '$wind de $direction';
+  }
+
+  @override
+  String get weather_wind_calm => 'calmo';
+
+  @override
+  String get weather_wind_highWind => 'vento forte';
+
+  @override
+  String get weather_wind_lightBreeze => 'brisa leve';
+
+  @override
+  String get weather_wind_moderateBreeze => 'brisa moderada';
+
+  @override
+  String get weather_wind_strongBreeze => 'brisa forte';
+
+  @override
+  String get weather_wmo_clear => 'Ceu limpo';
+
+  @override
+  String get weather_wmo_drizzle => 'Chuvisco';
+
+  @override
+  String get weather_wmo_fog => 'Nevoeiro';
+
+  @override
+  String get weather_wmo_freezingDrizzle => 'Chuvisco gelado';
+
+  @override
+  String get weather_wmo_freezingRain => 'Chuva gelada';
+
+  @override
+  String get weather_wmo_mainlyClear => 'Maioritariamente limpo';
+
+  @override
+  String get weather_wmo_overcast => 'Encoberto';
+
+  @override
+  String get weather_wmo_partlyCloudy => 'Parcialmente nublado';
+
+  @override
+  String get weather_wmo_rain => 'Chuva';
+
+  @override
+  String get weather_wmo_rainShowers => 'Aguaceiros';
+
+  @override
+  String get weather_wmo_snow => 'Neve';
+
+  @override
+  String get weather_wmo_snowGrains => 'Graos de neve';
+
+  @override
+  String get weather_wmo_snowShowers => 'Aguaceiros de neve';
+
+  @override
+  String get weather_wmo_thunderstorm => 'Trovoada';
+
+  @override
+  String get weather_wmo_thunderstormHail => 'Trovoada com granizo';
 
   @override
   String weightCalc_baseLine(Object suitType, Object weight) {
@@ -19575,31 +20103,6 @@ class AppLocalizationsPt extends AppLocalizations {
   String get tankPresets_title => 'Presets de Cilindro';
 
   @override
-  String get tools_deco_description =>
-      'Calcule limites de nao descompressao, paradas deco necessarias e exposicao CNS/OTU para perfis de mergulho multinivel.';
-
-  @override
-  String get tools_deco_subtitle =>
-      'Planeje mergulhos com paradas de descompressao';
-
-  @override
-  String get tools_deco_title => 'Calculadora Deco';
-
-  @override
-  String get tools_disclaimer =>
-      'Estas calculadoras sao apenas para fins de planeamento. Sempre verifique os calculos e siga o seu treinamento de mergulho.';
-
-  @override
-  String get tools_gas_description =>
-      'Quatro calculadoras de gas especializadas:\n- MOD - Profundidade maxima operacional para uma mistura\n- Best Mix - O2% ideal para uma profundidade alvo\n- Consumo - Estimativa de uso de gas\n- Rock Bottom - Calculo de reserva de emergencia';
-
-  @override
-  String get tools_gas_subtitle => 'MOD, Best Mix, Consumo, Rock Bottom';
-
-  @override
-  String get tools_gas_title => 'Calculadoras de Gas';
-
-  @override
   String get tools_gpsLogger_description =>
       'Grave sua posição durante um dia de mergulho e associe automaticamente os mergulhos importados a localizações GPS.';
 
@@ -19608,9 +20111,6 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get tools_gpsLogger_title => 'Registrador GPS';
-
-  @override
-  String get tools_title => 'Ferramentas';
 
   @override
   String get tools_weight_aluminumImperial =>
@@ -19628,10 +20128,6 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get tools_weight_carbonFiberMetric => 'Muito flutuante (+3 kg)';
-
-  @override
-  String get tools_weight_description =>
-      'Estime o lastro necessario com base na sua roupa, material do cilindro, tipo de agua e peso corporal.';
 
   @override
   String get tools_weight_disclaimer =>
@@ -19669,10 +20165,6 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get tools_weight_steelMetric => 'Flutuabilidade negativa (-2 kg)';
-
-  @override
-  String get tools_weight_subtitle =>
-      'Lastro recomendado para o seu equipamento';
 
   @override
   String get tools_weight_tankMaterial => 'Material do Cilindro';
@@ -20473,10 +20965,41 @@ class AppLocalizationsPt extends AppLocalizations {
   String get settings_mediaStorage_transfers_state_transferring => 'Enviando';
 
   @override
+  String get settings_mediaStorage_transfers_state_deleting =>
+      'Removendo da nuvem';
+
+  @override
   String get settings_mediaStorage_transfers_state_done => 'Concluído';
 
   @override
   String get settings_mediaStorage_transfers_state_failed => 'Falhou';
+
+  @override
+  String settings_mediaStorage_transfers_queued(int count) {
+    return '$count na fila';
+  }
+
+  @override
+  String settings_mediaStorage_transfers_waitingRetry(int count) {
+    return '$count aguardando nova tentativa';
+  }
+
+  @override
+  String get settings_mediaStorage_verify_action => 'Verificar biblioteca';
+
+  @override
+  String get settings_mediaStorage_verify_running =>
+      'Verificando a biblioteca de mídia...';
+
+  @override
+  String settings_mediaStorage_verify_summary(
+    int checked,
+    int removed,
+    int repaired,
+    int aborted,
+  ) {
+    return '$checked objetos verificados: $removed órfãos removidos, $repaired reparos na fila, $aborted envios obsoletos cancelados';
+  }
 
   @override
   String get settings_mediaStorage_backfill_action =>
@@ -20720,6 +21243,34 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get dive3d_overlay_markers => 'Marcadores';
+
+  @override
+  String get dive3d_seascape_overlay_paths => 'Trajetos de mergulho';
+
+  @override
+  String get dive3d_seascape_siteTitle => 'Paisagem marinha do local';
+
+  @override
+  String dive3d_seascape_seafloorSource(String source, String resolution) {
+    return 'Fundo do mar: $source (~$resolution m)';
+  }
+
+  @override
+  String get dive3d_seascape_noCoordinates =>
+      'Este local não tem coordenadas GPS';
+
+  @override
+  String get dive3d_seascape_noData =>
+      'Nenhuma batimetria disponível para este local';
+
+  @override
+  String dive3d_seascape_axis_distance(String unitSymbol) {
+    return 'Distância ($unitSymbol)';
+  }
+
+  @override
+  String get settings_about_bathymetryCredit =>
+      'Dados de batimetria: GMRT (CC BY 4.0) · EMODnet Bathymetry (CC BY 4.0) · NOAA ETOPO 2022';
 
   @override
   String get dive3d_metric_depth => 'Profundidade';
@@ -22043,4 +22594,12 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get settings_mediaStorage_quality_linuxFfmpegHint =>
       'Instale o ffmpeg para ativar a compressão de vídeo. Até lá, os originais são enviados.';
+
+  @override
+  String get settings_mediaStorage_quality_saveFailed =>
+      'Não foi possível guardar a qualidade de envio. Tente novamente.';
+
+  @override
+  String get settings_mediaStorage_quality_noTranscoderHint =>
+      'Este dispositivo não consegue comprimir vídeo. A partir dele são enviados os originais.';
 }

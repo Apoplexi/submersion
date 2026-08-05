@@ -33,6 +33,9 @@ import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart'
     as domain;
 import 'package:submersion/features/equipment/domain/entities/equipment_attribute.dart';
 import 'package:submersion/features/equipment/domain/entities/equipment_item.dart';
+import 'package:submersion/features/media/data/repositories/media_repository.dart';
+import 'package:submersion/features/media_store/data/media_deletion_coordinator.dart';
+import 'package:submersion/features/media_store/data/media_transfer_queue_repository.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive_custom_field.dart'
     as domain;
 import 'package:submersion/features/dive_log/data/repositories/dive_custom_field_repository.dart';
@@ -46,6 +49,39 @@ import 'package:submersion/features/buddies/domain/entities/buddy.dart'
 import 'package:submersion/features/buddies/data/repositories/buddy_repository.dart';
 
 class DiveRepository {
+  /// The media dependencies drive the dive-deletion cascade
+  /// (orphan-prevention spec 4.2); injectable for tests, self-constructed
+  /// otherwise so every existing zero-arg construction site cascades too.
+  ///
+  /// A factory rather than a generative constructor so the default
+  /// [MediaRepository] is built ONCE and shared with the coordinator: an
+  /// initializer list cannot bind a local, so the obvious
+  /// `mediaRepository ?? MediaRepository()` written twice would hand the
+  /// cascade a different instance than the one this repository partitions
+  /// with.
+  factory DiveRepository({
+    MediaRepository? mediaRepository,
+    MediaDeletionCoordinator? mediaDeletionCoordinator,
+  }) {
+    final media = mediaRepository ?? MediaRepository();
+    return DiveRepository._(
+      media,
+      mediaDeletionCoordinator ??
+          MediaDeletionCoordinator(
+            mediaRepository: media,
+            queue: () => MediaTransferQueueRepository(),
+            // No worker kick from the data layer (provider cycles):
+            // queued intents drain on the next connectivity event, app
+            // start, or any other kick; the Verify Library sweep is the
+            // backstop.
+          ),
+    );
+  }
+
+  DiveRepository._(this._mediaRepository, this._mediaDeletionCoordinator);
+
+  final MediaRepository _mediaRepository;
+  final MediaDeletionCoordinator _mediaDeletionCoordinator;
   AppDatabase get _db => DatabaseService.instance.database;
   final SyncRepository _syncRepository = SyncRepository();
   final _uuid = const Uuid();
@@ -970,6 +1006,7 @@ class DiveRepository {
               precipitation: Value(dive.precipitation?.name),
               humidity: Value(dive.humidity),
               weatherDescription: Value(dive.weatherDescription),
+              weatherCode: Value(dive.weatherCode),
               weatherSource: Value(dive.weatherSource?.name),
               weatherFetchedAt: Value(
                 dive.weatherFetchedAt != null
@@ -1211,6 +1248,7 @@ class DiveRepository {
           precipitation: Value(dive.precipitation?.name),
           humidity: Value(dive.humidity),
           weatherDescription: Value(dive.weatherDescription),
+          weatherCode: Value(dive.weatherCode),
           weatherSource: Value(dive.weatherSource?.name),
           weatherFetchedAt: Value(
             dive.weatherFetchedAt != null
@@ -1469,10 +1507,39 @@ class DiveRepository {
     }
   }
 
-  /// Delete a dive
-  Future<void> deleteDive(String id) async {
+  /// Cascade a dying dive's media (orphan-prevention spec 4.2): dive-only
+  /// non-library rows die with the dive (rows + tombstones + blob-delete
+  /// intents via the coordinator's enqueue-before-delete path); site-linked
+  /// and library-level rows survive with diveId nulled and HLC-stamped.
+  ///
+  /// Deliberately NOT wrapped in a transaction with the dive delete: the
+  /// coordinator's queue writes live in another database, and every step is
+  /// individually idempotent/tombstoned - a crash between cascade and dive
+  /// delete leaves a re-deletable dive, never an orphan. Merge and
+  /// consolidation services reassign media to the surviving dive BEFORE
+  /// deleting sources, so this sees no doomed media for merged-away dives.
+  Future<void> _cascadeMediaForDiveDeletion(List<String> ids) async {
+    final split = await _mediaRepository.partitionMediaForDiveDeletion(ids);
+    if (split.doomed.isNotEmpty) {
+      // Items, not ids: the partition already read these rows, and the
+      // blob-delete intent needs exactly the fields it carries.
+      await _mediaDeletionCoordinator.deleteMediaItems(split.doomed);
+    }
+    if (split.unlinkIds.isNotEmpty) {
+      await _mediaRepository.unlinkMediaFromDeletedDives(split.unlinkIds);
+    }
+  }
+
+  /// Delete a dive.
+  ///
+  /// [cascadeMedia] is true for user-intent deletions (the dive's media
+  /// goes with the dive). Restore/undo flows that re-point media
+  /// afterwards (e.g. merge undo) pass false so the cascade cannot eat
+  /// rows they are about to restore.
+  Future<void> deleteDive(String id, {bool cascadeMedia = true}) async {
     try {
       _log.info('Deleting dive: $id');
+      if (cascadeMedia) await _cascadeMediaForDiveDeletion([id]);
       await (_db.delete(_db.dives)..where((t) => t.id.equals(id))).go();
       await _syncRepository.logDeletion(entityType: 'dives', recordId: id);
       SyncEventBus.notifyLocalChange();
@@ -1489,11 +1556,15 @@ class DiveRepository {
 
   /// Bulk delete multiple dives
   /// Returns the list of deleted dive IDs for potential undo
-  Future<List<String>> bulkDeleteDives(List<String> ids) async {
+  Future<List<String>> bulkDeleteDives(
+    List<String> ids, {
+    bool cascadeMedia = true,
+  }) async {
     if (ids.isEmpty) return [];
 
     try {
       _log.info('Bulk deleting ${ids.length} dives');
+      if (cascadeMedia) await _cascadeMediaForDiveDeletion(ids);
       await (_db.delete(_db.dives)..where((t) => t.id.isIn(ids))).go();
       for (final id in ids) {
         await _syncRepository.logDeletion(entityType: 'dives', recordId: id);
@@ -1869,7 +1940,14 @@ class DiveRepository {
       }
     }
     if (filter.buddyNameFilter != null && filter.buddyNameFilter!.isNotEmpty) {
-      clauses.add('d.buddy LIKE ?');
+      // The dive editor writes buddies only to the dive_buddies junction;
+      // d.buddy is a legacy text column kept for old data (#757).
+      clauses.add(
+        '(LOWER(d.buddy) LIKE LOWER(?) OR EXISTS (SELECT 1 FROM dive_buddies db '
+        'JOIN buddies b ON b.id = db.buddy_id '
+        'WHERE db.dive_id = d.id AND LOWER(b.name) LIKE LOWER(?)))',
+      );
+      args.add(Variable('%${filter.buddyNameFilter}%'));
       args.add(Variable('%${filter.buddyNameFilter}%'));
     }
     if (filter.buddyId != null) {
@@ -2571,6 +2649,38 @@ class DiveRepository {
     return row.read<int>('c');
   }
 
+  /// Dive ids from prior years sharing the given month/day ("on this
+  /// day" dashboard card). Newest first, capped at [limit].
+  Future<List<String>> getOnThisDayDiveIds({
+    required int month,
+    required int day,
+    required int excludeYear,
+    String? diverId,
+    int limit = 5,
+  }) async {
+    final monthDay =
+        "${month.toString().padLeft(2, '0')}-${day.toString().padLeft(2, '0')}";
+    final diverFilter = diverId != null ? 'AND diver_id = ? ' : '';
+    final rows = await _db
+        .customSelect(
+          "SELECT id FROM dives "
+          "WHERE strftime('%m-%d', dive_date_time / 1000, 'unixepoch') = ? "
+          "AND CAST(strftime('%Y', dive_date_time / 1000, 'unixepoch') "
+          "AS INTEGER) != ? "
+          "$diverFilter"
+          "ORDER BY dive_date_time DESC LIMIT ?",
+          variables: [
+            Variable<String>(monthDay),
+            Variable<int>(excludeYear),
+            if (diverId != null) Variable<String>(diverId),
+            Variable<int>(limit),
+          ],
+          readsFrom: {_db.dives},
+        )
+        .get();
+    return rows.map((r) => r.read<String>('id')).toList();
+  }
+
   /// SQL expression mirroring [domain.Dive.effectiveRuntime]'s resolution
   /// order in seconds: runtime, exit - entry (when positive), profile span,
   /// bottom time.
@@ -2895,6 +3005,7 @@ class DiveRepository {
           : null,
       humidity: row.humidity,
       weatherDescription: row.weatherDescription,
+      weatherCode: row.weatherCode,
       weatherSource: row.weatherSource != null
           ? WeatherSource.values.firstWhere(
               (w) => w.name == row.weatherSource,
@@ -3266,6 +3377,7 @@ class DiveRepository {
           : null,
       humidity: row.humidity,
       weatherDescription: row.weatherDescription,
+      weatherCode: row.weatherCode,
       weatherSource: row.weatherSource != null
           ? WeatherSource.values.firstWhere(
               (w) => w.name == row.weatherSource,

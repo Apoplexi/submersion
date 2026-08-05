@@ -15,6 +15,7 @@ import 'package:submersion/features/dive_log/domain/entities/safety_finding.dart
 import 'package:submersion/features/safety/domain/services/no_fly_service.dart';
 import 'package:submersion/core/constants/units.dart';
 import 'package:submersion/core/deco/entities/cns_calculation_method.dart';
+import 'package:submersion/core/presentation/startup_brightness.dart';
 import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/features/divers/presentation/providers/diver_providers.dart';
 import 'package:submersion/features/notifications/data/services/notification_scheduler.dart';
@@ -51,6 +52,7 @@ class SettingsKeys {
   static const String sacUnit = 'sac_unit';
   static const String unitPreset = 'unit_preset';
   static const String themeMode = 'theme_mode';
+  static const String displayZoom = 'display_zoom';
   static const String defaultDiveType = 'default_dive_type';
   static const String defaultTankVolume = 'default_tank_volume';
   static const String defaultStartPressure = 'default_start_pressure';
@@ -79,6 +81,7 @@ class SettingsKeys {
   // stored directly in SharedPreferences rather than per-diver in the DB).
   static const String fullscreenTileOrder = 'fullscreen_tile_order';
   static const String fullscreenHiddenTiles = 'fullscreen_hidden_tiles';
+  static const String hiddenHomeChips = 'hidden_home_chips';
   static const String fullscreenReadoutCardX = 'fullscreen_readout_card_x';
   static const String fullscreenReadoutCardY = 'fullscreen_readout_card_y';
 
@@ -363,6 +366,11 @@ class AppSettings {
   /// Instrument tiles the user has hidden in the fullscreen profile view.
   final List<String> fullscreenHiddenTiles;
 
+  /// Home dashboard gauge-strip chip types the user has hidden.
+  /// Ids are [HomeChipType.name] values; empty means all chips shown.
+  /// Device-local, not per-diver.
+  final Set<String> hiddenHomeChips;
+
   /// Fullscreen readout card position as fractions (0..1) of the movable
   /// range; null means the default corner. See DraggableReadoutCard.
   final double? fullscreenReadoutCardX;
@@ -486,6 +494,7 @@ class AppSettings {
     this.diveDetailSections = DiveDetailSectionConfig.defaultSections,
     this.fullscreenTileOrder = const [],
     this.fullscreenHiddenTiles = const [],
+    this.hiddenHomeChips = const <String>{},
     this.fullscreenReadoutCardX,
     this.fullscreenReadoutCardY,
     this.perdixOverlayEnabled = false,
@@ -635,6 +644,7 @@ class AppSettings {
     bool clearDiveDetailSections = false,
     List<String>? fullscreenTileOrder,
     List<String>? fullscreenHiddenTiles,
+    Set<String>? hiddenHomeChips,
     double? fullscreenReadoutCardX,
     double? fullscreenReadoutCardY,
     bool? perdixOverlayEnabled,
@@ -779,6 +789,7 @@ class AppSettings {
       fullscreenTileOrder: fullscreenTileOrder ?? this.fullscreenTileOrder,
       fullscreenHiddenTiles:
           fullscreenHiddenTiles ?? this.fullscreenHiddenTiles,
+      hiddenHomeChips: hiddenHomeChips ?? this.hiddenHomeChips,
       fullscreenReadoutCardX:
           fullscreenReadoutCardX ?? this.fullscreenReadoutCardX,
       fullscreenReadoutCardY:
@@ -881,6 +892,9 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
           prefs.getStringList(SettingsKeys.fullscreenTileOrder) ?? const [];
       final fullscreenHiddenTiles =
           prefs.getStringList(SettingsKeys.fullscreenHiddenTiles) ?? const [];
+      final hiddenHomeChips =
+          prefs.getStringList(SettingsKeys.hiddenHomeChips)?.toSet() ??
+          const <String>{};
       final fullscreenReadoutCardX = prefs.getDouble(
         SettingsKeys.fullscreenReadoutCardX,
       );
@@ -902,6 +916,7 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
         state = AppSettings(
           fullscreenTileOrder: fullscreenTileOrder,
           fullscreenHiddenTiles: fullscreenHiddenTiles,
+          hiddenHomeChips: hiddenHomeChips,
           fullscreenReadoutCardX: fullscreenReadoutCardX,
           fullscreenReadoutCardY: fullscreenReadoutCardY,
           pscrRatio: pscrRatio ?? 100.0,
@@ -909,6 +924,7 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
           perdixOverlayX: perdixOverlayX,
           perdixOverlayY: perdixOverlayY,
         );
+        await _writeCachedThemeMode(prefs);
         return;
       }
 
@@ -917,6 +933,7 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
       state = settings.copyWith(
         fullscreenTileOrder: fullscreenTileOrder,
         fullscreenHiddenTiles: fullscreenHiddenTiles,
+        hiddenHomeChips: hiddenHomeChips,
         fullscreenReadoutCardX: fullscreenReadoutCardX,
         fullscreenReadoutCardY: fullscreenReadoutCardY,
         pscrRatio: pscrRatio,
@@ -924,6 +941,8 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
         perdixOverlayX: perdixOverlayX,
         perdixOverlayY: perdixOverlayY,
       );
+
+      await _writeCachedThemeMode(prefs);
 
       // Schedule notifications with the loaded settings
       _scheduleNotificationsIfNeeded();
@@ -966,6 +985,10 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
       SettingsKeys.fullscreenHiddenTiles,
       state.fullscreenHiddenTiles,
     );
+    await prefs.setStringList(
+      SettingsKeys.hiddenHomeChips,
+      state.hiddenHomeChips.toList()..sort(),
+    );
     final readoutCardX = state.fullscreenReadoutCardX;
     if (readoutCardX != null) {
       await prefs.setDouble(SettingsKeys.fullscreenReadoutCardX, readoutCardX);
@@ -988,9 +1011,21 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
       await prefs.setDouble(SettingsKeys.perdixOverlayY, perdixY);
     }
 
+    await _writeCachedThemeMode(prefs);
+
     final diverId = _validatedDiverId;
     if (diverId == null) return;
     await _repository.updateSettingsForDiver(diverId, state);
+  }
+
+  /// Mirrors the effective theme mode into SharedPreferences so the startup
+  /// splash and setup wizard (which render before the database opens) can
+  /// resolve dark mode. See [resolveStartupBrightness].
+  Future<void> _writeCachedThemeMode(SharedPreferences prefs) async {
+    await prefs.setString(
+      cachedThemeModeKey,
+      cachedThemeModeValue(state.themeMode),
+    );
   }
 
   Future<void> setDepthUnit(DepthUnit unit) async {
@@ -1160,6 +1195,18 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
 
   Future<void> setSafetyReviewEnabled(bool value) async {
     state = state.copyWith(safetyReviewEnabled: value);
+    await _saveSettings();
+  }
+
+  /// Show or hide one home gauge-strip chip type (id = HomeChipType.name).
+  Future<void> setHomeChipEnabled(String chipId, bool enabled) async {
+    final hidden = {...state.hiddenHomeChips};
+    if (enabled) {
+      hidden.remove(chipId);
+    } else {
+      hidden.add(chipId);
+    }
+    state = state.copyWith(hiddenHomeChips: hidden);
     await _saveSettings();
   }
 

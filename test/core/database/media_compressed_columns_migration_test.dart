@@ -18,10 +18,9 @@ void main() {
     );
   });
 
-  test('v134 is present in the migration ladder', () {
-    // Relaxed from the exact-latest tripwire when v135 (color accents) landed
-    // on top; migration_v135_accent_columns_test.dart now owns the exact
-    // assertion. (Renumbered from v130 as main advanced past it at merge time.)
+  test('v134 migration is present', () {
+    // Relaxed from an exact-latest tripwire: newer migrations (v135 accents,
+    // v136 media_stores sweep, v137 weather code) sit above it now.
     expect(AppDatabase.currentSchemaVersion, greaterThanOrEqualTo(134));
     expect(AppDatabase.migrationVersions, contains(134));
   });
