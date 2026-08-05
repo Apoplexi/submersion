@@ -163,8 +163,41 @@ class MediaItem extends Equatable {
     return isVideo ? 'dive_video.mp4' : 'dive_photo.jpg';
   }
 
-  /// MIME type to advertise when sharing this item, matching [shareFilename].
-  String get shareMimeType => isVideo ? 'video/mp4' : 'image/jpeg';
+  /// MIME type to advertise when sharing this item, derived from
+  /// [shareFilename]'s extension so the advertised type never disagrees with
+  /// the filename (and likely the bytes) some share targets inspect. Falls
+  /// back to a media-type-appropriate default for a missing or unrecognized
+  /// extension.
+  String get shareMimeType {
+    final name = shareFilename;
+    final dot = name.lastIndexOf('.');
+    final ext = dot >= 0 && dot < name.length - 1
+        ? name.substring(dot + 1).toLowerCase()
+        : '';
+    switch (ext) {
+      case 'jpg':
+      case 'jpeg':
+        return 'image/jpeg';
+      case 'png':
+        return 'image/png';
+      case 'gif':
+        return 'image/gif';
+      case 'webp':
+        return 'image/webp';
+      case 'heic':
+        return 'image/heic';
+      case 'heif':
+        return 'image/heif';
+      case 'mp4':
+        return 'video/mp4';
+      case 'mov':
+        return 'video/quicktime';
+      case 'm4v':
+        return 'video/x-m4v';
+      default:
+        return isVideo ? 'video/mp4' : 'image/jpeg';
+    }
+  }
 
   /// Returns formatted duration string (e.g., "1:30" for 90 seconds)
   String? get durationString {

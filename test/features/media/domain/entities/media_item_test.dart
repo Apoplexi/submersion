@@ -254,6 +254,35 @@ void main() {
       expect(item.shareMimeType, 'video/mp4');
     });
 
+    // shareFilename preserves the original extension (e.g. HEIC photos,
+    // MOV videos); shareMimeType must agree with it rather than assuming
+    // every photo is a JPEG and every video is an MP4.
+    test('shareMimeType matches a HEIC photo filename', () {
+      final item = baseItem.copyWith(originalFilename: 'IMG_1234.HEIC');
+      expect(item.shareMimeType, 'image/heic');
+    });
+
+    test('shareMimeType matches a PNG photo filename', () {
+      final item = baseItem.copyWith(originalFilename: 'screenshot.png');
+      expect(item.shareMimeType, 'image/png');
+    });
+
+    test('shareMimeType matches a MOV video filename', () {
+      final item = baseItem.copyWith(
+        mediaType: MediaType.video,
+        originalFilename: 'clip.mov',
+      );
+      expect(item.shareMimeType, 'video/quicktime');
+    });
+
+    test(
+      'shareMimeType falls back to the media-type default for an unrecognized extension',
+      () {
+        final item = baseItem.copyWith(originalFilename: 'export.xyz');
+        expect(item.shareMimeType, 'image/jpeg');
+      },
+    );
+
     test('durationString formats seconds correctly', () {
       final video30s = baseItem.copyWith(durationSeconds: 30);
       expect(video30s.durationString, '0:30');
