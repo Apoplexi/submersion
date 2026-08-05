@@ -2352,11 +2352,6 @@ class DiveRepository {
         isFavorite: row.read<int>('is_favorite') == 1,
         diveTypeIds: diveTypesByDive[id] ?? [row.read<String>('dive_type')],
         tags: tagsByDive[id] ?? [],
-        buddyNames: [
-          if (row.readNullable<String>('buddy') != null &&
-              row.readNullable<String>('buddy')!.isNotEmpty)
-            row.readNullable<String>('buddy')!,
-        ],
         siteName: row.readNullable<String>('site_name'),
         siteCountry: row.readNullable<String>('site_country'),
         siteRegion: row.readNullable<String>('site_region'),
