@@ -14,6 +14,7 @@ import 'package:submersion/features/dive_computer/data/services/parsed_dive_mapp
 import 'package:submersion/features/dive_computer/domain/entities/device_model.dart';
 import 'package:submersion/features/dive_computer/domain/entities/downloaded_dive.dart';
 import 'package:submersion/features/dive_computer/presentation/providers/discovery_providers.dart';
+import 'package:submersion/features/divers/presentation/providers/diver_providers.dart';
 import 'package:submersion/features/gps_log/presentation/providers/gps_log_providers.dart';
 
 /// Provider for the dive computer repository.
@@ -311,4 +312,15 @@ final computerDiveIdsProvider = FutureProvider.family<List<String>, String>((
 ) async {
   final repository = ref.watch(diveComputerRepositoryProvider);
   return repository.getDiveIdsForComputer(computerId);
+});
+
+/// Default first-sync cutoff: the newest dive in the active diver's log.
+///
+/// Null when there is no active diver or the log is empty (no cutoff
+/// prompt is shown then).
+final firstSyncCutoffDefaultProvider = FutureProvider<DateTime?>((ref) async {
+  final diverId = ref.watch(currentDiverIdProvider);
+  if (diverId == null || diverId.isEmpty) return null;
+  final repository = ref.watch(diveRepositoryProvider);
+  return repository.getNewestDiveDateTime(diverId: diverId);
 });
