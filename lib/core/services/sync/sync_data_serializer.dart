@@ -5108,9 +5108,9 @@ class SyncDataSerializer {
 
   /// Cached (jsonKey, fill) pairs per entity type: one entry for every
   /// non-nullable column of the entity's table whose schema-level default can
-  /// be reconstructed at replay time (a primitive [Constant] or a
-  /// `clientDefault`). Built lazily from the live table metadata so new
-  /// columns are covered without touching this file.
+  /// be reconstructed at replay time (a primitive [Constant]). Built lazily
+  /// from the live table metadata so new columns are covered without touching
+  /// this file.
   final Map<String, List<MapEntry<String, Object? Function()>>>
   _schemaDefaultFills = {};
 
@@ -5156,22 +5156,17 @@ class SyncDataSerializer {
     final fills = <MapEntry<String, Object? Function()>>[];
     for (final column in table.$columns) {
       if (column.$nullable) continue;
-      final jsonKey = _jsonKeyForSqlColumn(column.name);
       final defaultValue = column.defaultValue;
-      final clientDefault = column.clientDefault;
-      if (defaultValue is Constant<Object>) {
-        final value = defaultValue.value;
-        // Primitives only: they match the wire format for plain and enum
-        // columns, and cover every NOT NULL DEFAULT a migration can add.
-        // Non-constant SQL defaults (e.g. currentDateAndTime) can't be
-        // evaluated here and keep today's behavior.
-        if (value is bool || value is num || value is String) {
-          fills.add(MapEntry(jsonKey, () => value));
-        }
-      } else if (clientDefault != null) {
-        fills.add(
-          MapEntry(jsonKey, () => _syncBlobSerializer.toJson(clientDefault())),
-        );
+      if (defaultValue is! Constant<Object>) continue;
+      final value = defaultValue.value;
+      // Primitive constants only: they match the wire format for plain and
+      // enum columns, and cover every replay-relevant column -- SQLite
+      // requires a constant DEFAULT to add a NOT NULL column, so a column
+      // that old records can be missing always has one. Non-constant SQL
+      // defaults (e.g. currentDateAndTime) can't be evaluated here and keep
+      // today's behavior.
+      if (value is bool || value is num || value is String) {
+        fills.add(MapEntry(_jsonKeyForSqlColumn(column.name), () => value));
       }
     }
     return fills;

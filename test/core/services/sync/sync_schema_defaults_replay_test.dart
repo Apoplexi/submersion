@@ -144,6 +144,16 @@ void main() {
     expect(row.isFavorite, isTrue);
   });
 
+  test('unknown entity types stay a silent no-op', () async {
+    // A payload from a newer app version can carry entity types this build
+    // has never heard of; upsertRecord ignores them, and the schema-default
+    // hydration must not turn that into a throw.
+    await serializer.upsertRecord('entityFromTheFuture', {
+      'id': 'x1',
+      'someKey': true,
+    });
+  });
+
   test(
     'single-record replay hydrates missing non-nullable bools too',
     () async {
