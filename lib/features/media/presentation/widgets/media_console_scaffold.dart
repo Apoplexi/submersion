@@ -6,7 +6,7 @@ import 'package:submersion/l10n/l10n_extension.dart';
 /// The Media section's internal destinations. Later phases append values
 /// (missing, importMedia); both layouts render whatever the enum contains,
 /// so growth is enum-plus-registry only.
-enum MediaConsoleSection { library, unlinked, missing, transfers }
+enum MediaConsoleSection { library, unlinked, missing, transfers, importMedia }
 
 /// Internal navigation for the Media section: a left sidebar on wide
 /// layouts, top tabs on narrow ones. Mirrors MainScaffold's rail/bar split
@@ -36,6 +36,7 @@ class MediaConsoleScaffold extends StatelessWidget {
       MediaConsoleSection.unlinked => l10n.media_console_unlinked,
       MediaConsoleSection.missing => l10n.media_console_missing,
       MediaConsoleSection.transfers => l10n.media_console_transfers,
+      MediaConsoleSection.importMedia => l10n.media_console_import,
     };
   }
 
@@ -45,6 +46,7 @@ class MediaConsoleScaffold extends StatelessWidget {
       MediaConsoleSection.unlinked => Icons.link_off,
       MediaConsoleSection.missing => Icons.warning_amber_outlined,
       MediaConsoleSection.transfers => Icons.swap_vert,
+      MediaConsoleSection.importMedia => Icons.add_photo_alternate_outlined,
     };
   }
 

@@ -20911,6 +20911,24 @@ abstract class AppLocalizations {
   /// **'Transfers'**
   String get media_console_transfers;
 
+  /// Media console sidebar/tab label for the import section
+  ///
+  /// In en, this message translates to:
+  /// **'Import'**
+  String get media_console_import;
+
+  /// Import section: open the picker
+  ///
+  /// In en, this message translates to:
+  /// **'Import media...'**
+  String get media_import_launch;
+
+  /// Import section intro text
+  ///
+  /// In en, this message translates to:
+  /// **'Imported media is kept in your library and can be linked to dives automatically.'**
+  String get media_import_intro;
+
   /// Media console sidebar/tab label for the missing-files view
   ///
   /// In en, this message translates to:

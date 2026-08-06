@@ -12298,6 +12298,16 @@ class AppLocalizationsHu extends AppLocalizations {
   String get media_console_transfers => 'Átvitelek';
 
   @override
+  String get media_console_import => 'Importálás';
+
+  @override
+  String get media_import_launch => 'Média importálása...';
+
+  @override
+  String get media_import_intro =>
+      'Az importált média a könyvtáradban marad, és automatikusan csatolható a merülésekhez.';
+
+  @override
   String get media_console_missing => 'Hiányzó';
 
   @override

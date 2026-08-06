@@ -12114,6 +12114,16 @@ class AppLocalizationsAr extends AppLocalizations {
   String get media_console_transfers => 'عمليات النقل';
 
   @override
+  String get media_console_import => 'استيراد';
+
+  @override
+  String get media_import_launch => 'استيراد الوسائط...';
+
+  @override
+  String get media_import_intro =>
+      'يتم الاحتفاظ بالوسائط المستوردة في مكتبتك ويمكن ربطها بالغطسات تلقائيًا.';
+
+  @override
   String get media_console_missing => 'مفقودة';
 
   @override

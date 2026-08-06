@@ -12243,6 +12243,16 @@ class AppLocalizationsNl extends AppLocalizations {
   String get media_console_transfers => 'Overdrachten';
 
   @override
+  String get media_console_import => 'Importeren';
+
+  @override
+  String get media_import_launch => 'Media importeren...';
+
+  @override
+  String get media_import_intro =>
+      'Geïmporteerde media blijft in je bibliotheek en kan automatisch aan duiken worden gekoppeld.';
+
+  @override
   String get media_console_missing => 'Ontbrekend';
 
   @override

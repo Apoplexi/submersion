@@ -12376,6 +12376,16 @@ class AppLocalizationsFr extends AppLocalizations {
   String get media_console_transfers => 'Transferts';
 
   @override
+  String get media_console_import => 'Importer';
+
+  @override
+  String get media_import_launch => 'Importer des médias...';
+
+  @override
+  String get media_import_intro =>
+      'Les médias importés sont conservés dans votre bibliothèque et peuvent être liés automatiquement aux plongées.';
+
+  @override
   String get media_console_missing => 'Manquants';
 
   @override

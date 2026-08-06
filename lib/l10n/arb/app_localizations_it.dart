@@ -12337,6 +12337,16 @@ class AppLocalizationsIt extends AppLocalizations {
   String get media_console_transfers => 'Trasferimenti';
 
   @override
+  String get media_console_import => 'Importa';
+
+  @override
+  String get media_import_launch => 'Importa contenuti...';
+
+  @override
+  String get media_import_intro =>
+      'I contenuti importati restano nella tua libreria e possono essere collegati automaticamente alle immersioni.';
+
+  @override
   String get media_console_missing => 'Mancanti';
 
   @override

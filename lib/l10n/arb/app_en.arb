@@ -7094,6 +7094,18 @@
   "@media_console_transfers": {
     "description": "Media console sidebar/tab label for the transfers view"
   },
+  "media_console_import": "Import",
+  "@media_console_import": {
+    "description": "Media console sidebar/tab label for the import section"
+  },
+  "media_import_launch": "Import media...",
+  "@media_import_launch": {
+    "description": "Import section: open the picker"
+  },
+  "media_import_intro": "Imported media is kept in your library and can be linked to dives automatically.",
+  "@media_import_intro": {
+    "description": "Import section intro text"
+  },
   "media_console_missing": "Missing",
   "@media_console_missing": {
     "description": "Media console sidebar/tab label for the missing-files view"

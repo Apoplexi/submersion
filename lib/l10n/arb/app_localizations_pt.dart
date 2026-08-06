@@ -12341,6 +12341,16 @@ class AppLocalizationsPt extends AppLocalizations {
   String get media_console_transfers => 'Transferências';
 
   @override
+  String get media_console_import => 'Importar';
+
+  @override
+  String get media_import_launch => 'Importar mídia...';
+
+  @override
+  String get media_import_intro =>
+      'A mídia importada fica na sua biblioteca e pode ser vinculada aos mergulhos automaticamente.';
+
+  @override
   String get media_console_missing => 'Ausentes';
 
   @override

@@ -12032,6 +12032,16 @@ class AppLocalizationsHe extends AppLocalizations {
   String get media_console_transfers => 'העברות';
 
   @override
+  String get media_console_import => 'ייבוא';
+
+  @override
+  String get media_import_launch => 'ייבוא מדיה...';
+
+  @override
+  String get media_import_intro =>
+      'מדיה מיובאת נשמרת בספרייה שלך וניתן לקשר אותה לצלילות באופן אוטומטי.';
+
+  @override
   String get media_console_missing => 'חסרים';
 
   @override

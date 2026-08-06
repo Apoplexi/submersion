@@ -11776,6 +11776,15 @@ class AppLocalizationsZh extends AppLocalizations {
   String get media_console_transfers => '传输';
 
   @override
+  String get media_console_import => '导入';
+
+  @override
+  String get media_import_launch => '导入媒体...';
+
+  @override
+  String get media_import_intro => '导入的媒体会保留在您的媒体库中，并可自动关联到潜水。';
+
+  @override
   String get media_console_missing => '缺失';
 
   @override
