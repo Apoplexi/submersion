@@ -16,7 +16,7 @@ list(APPEND FLUTTER_PLUGIN_LIST
   permission_handler_windows
   printing
   share_plus
-  sqlite3_flutter_libs
+  sqlcipher_flutter_libs
   submersion_ocr
   submersion_transcoder
   url_launcher_windows

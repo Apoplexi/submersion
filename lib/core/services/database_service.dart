@@ -118,6 +118,26 @@ class DatabaseService {
       dbPath,
       onMigrationProgress: onMigrationProgress,
     );
+
+    await _assertCipherAvailable(_database!);
+  }
+
+  /// Fails loudly at startup if the native library is NOT SQLCipher — e.g.
+  /// the dynamic linker resolved sqlite3 symbols to a system/plugin copy on
+  /// iOS/macOS. Encrypted databases would be unopenable and enabling
+  /// encryption would corrupt silently, so this must be caught on day one.
+  ///
+  /// Skipped under `flutter test`: the host test runner loads the system
+  /// SQLite, which legitimately has no cipher.
+  Future<void> _assertCipherAvailable(AppDatabase db) async {
+    if (Platform.environment.containsKey('FLUTTER_TEST')) return;
+    final rows = await db.customSelect('PRAGMA cipher_version').get();
+    if (rows.isEmpty) {
+      throw StateError(
+        'SQLCipher is not linked: PRAGMA cipher_version returned nothing. '
+        'The app was built against a non-SQLCipher sqlite3 library.',
+      );
+    }
   }
 
   /// Which executor path [_openDatabase] took on the most recent open.
