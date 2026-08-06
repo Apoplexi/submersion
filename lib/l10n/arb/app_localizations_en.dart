@@ -12021,6 +12021,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get nav_home => 'Home';
 
   @override
+  String get nav_media => 'Media';
+
+  @override
   String get nav_more => 'More';
 
   @override

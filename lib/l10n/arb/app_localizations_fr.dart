@@ -12259,6 +12259,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get nav_home => 'Accueil';
 
   @override
+  String get nav_media => 'Médias';
+
+  @override
   String get nav_more => 'Plus';
 
   @override

@@ -12224,6 +12224,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String get nav_home => 'Inicio';
 
   @override
+  String get nav_media => 'Mídia';
+
+  @override
   String get nav_more => 'Mais';
 
   @override

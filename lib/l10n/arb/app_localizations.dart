@@ -20731,6 +20731,12 @@ abstract class AppLocalizations {
   /// **'Home'**
   String get nav_home;
 
+  /// Navigation label for the media section
+  ///
+  /// In en, this message translates to:
+  /// **'Media'**
+  String get nav_media;
+
   /// Navigation label for the 'more' menu on mobile
   ///
   /// In en, this message translates to:

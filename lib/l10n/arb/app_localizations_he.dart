@@ -11918,6 +11918,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get nav_home => 'בית';
 
   @override
+  String get nav_media => 'מדיה';
+
+  @override
   String get nav_more => 'עוד';
 
   @override

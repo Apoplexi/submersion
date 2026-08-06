@@ -12183,6 +12183,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String get nav_home => 'Fooldal';
 
   @override
+  String get nav_media => 'Média';
+
+  @override
   String get nav_more => 'Tovabb';
 
   @override

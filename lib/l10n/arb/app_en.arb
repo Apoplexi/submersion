@@ -7015,6 +7015,7 @@
   "nav_equipment": "Equipment",
   "nav_gpsLog": "GPS Log",
   "nav_home": "Home",
+  "nav_media": "Media",
   "nav_more": "More",
   "nav_planning": "Planning",
   "nav_planningSubtitle": "Dive Planner, Calculators",
@@ -7049,6 +7050,9 @@
   },
   "@nav_home": {
     "description": "Navigation label for home/dashboard"
+  },
+  "@nav_media": {
+    "description": "Navigation label for the media section"
   },
   "@nav_more": {
     "description": "Navigation label for the 'more' menu on mobile"

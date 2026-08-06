@@ -12213,6 +12213,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get nav_home => 'Startseite';
 
   @override
+  String get nav_media => 'Medien';
+
+  @override
   String get nav_more => 'Mehr';
 
   @override
