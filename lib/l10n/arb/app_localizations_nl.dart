@@ -12123,6 +12123,12 @@ class AppLocalizationsNl extends AppLocalizations {
   String get nav_gpsLog => 'GPS-log';
 
   @override
+  String get media_console_library => 'Bibliotheek';
+
+  @override
+  String get media_console_transfers => 'Overdrachten';
+
+  @override
   String get nav_home => 'Home';
 
   @override

@@ -7014,6 +7014,14 @@
   "nav_dives": "Dives",
   "nav_equipment": "Equipment",
   "nav_gpsLog": "GPS Log",
+  "media_console_library": "Library",
+  "@media_console_library": {
+    "description": "Media console sidebar/tab label for the library view"
+  },
+  "media_console_transfers": "Transfers",
+  "@media_console_transfers": {
+    "description": "Media console sidebar/tab label for the transfers view"
+  },
   "nav_home": "Home",
   "nav_media": "Media",
   "nav_more": "More",

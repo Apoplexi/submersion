@@ -12180,6 +12180,12 @@ class AppLocalizationsHu extends AppLocalizations {
   String get nav_gpsLog => 'GPS-napló';
 
   @override
+  String get media_console_library => 'Könyvtár';
+
+  @override
+  String get media_console_transfers => 'Átvitelek';
+
+  @override
   String get nav_home => 'Fooldal';
 
   @override

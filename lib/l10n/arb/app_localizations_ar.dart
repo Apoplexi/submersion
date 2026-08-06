@@ -11996,6 +11996,12 @@ class AppLocalizationsAr extends AppLocalizations {
   String get nav_gpsLog => 'سجل GPS';
 
   @override
+  String get media_console_library => 'المكتبة';
+
+  @override
+  String get media_console_transfers => 'عمليات النقل';
+
+  @override
   String get nav_home => 'الرئيسية';
 
   @override

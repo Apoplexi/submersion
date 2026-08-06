@@ -20725,6 +20725,18 @@ abstract class AppLocalizations {
   /// **'GPS Log'**
   String get nav_gpsLog;
 
+  /// Media console sidebar/tab label for the library view
+  ///
+  /// In en, this message translates to:
+  /// **'Library'**
+  String get media_console_library;
+
+  /// Media console sidebar/tab label for the transfers view
+  ///
+  /// In en, this message translates to:
+  /// **'Transfers'**
+  String get media_console_transfers;
+
   /// Navigation label for home/dashboard
   ///
   /// In en, this message translates to:

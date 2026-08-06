@@ -12210,6 +12210,12 @@ class AppLocalizationsDe extends AppLocalizations {
   String get nav_gpsLog => 'GPS-Log';
 
   @override
+  String get media_console_library => 'Bibliothek';
+
+  @override
+  String get media_console_transfers => 'Übertragungen';
+
+  @override
   String get nav_home => 'Startseite';
 
   @override

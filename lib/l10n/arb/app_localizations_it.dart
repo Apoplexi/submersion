@@ -12217,6 +12217,12 @@ class AppLocalizationsIt extends AppLocalizations {
   String get nav_gpsLog => 'Registro GPS';
 
   @override
+  String get media_console_library => 'Libreria';
+
+  @override
+  String get media_console_transfers => 'Trasferimenti';
+
+  @override
   String get nav_home => 'Home';
 
   @override

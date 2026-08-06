@@ -12018,6 +12018,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get nav_gpsLog => 'GPS Log';
 
   @override
+  String get media_console_library => 'Library';
+
+  @override
+  String get media_console_transfers => 'Transfers';
+
+  @override
   String get nav_home => 'Home';
 
   @override

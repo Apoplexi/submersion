@@ -12256,6 +12256,12 @@ class AppLocalizationsFr extends AppLocalizations {
   String get nav_gpsLog => 'Journal GPS';
 
   @override
+  String get media_console_library => 'Bibliothèque';
+
+  @override
+  String get media_console_transfers => 'Transferts';
+
+  @override
   String get nav_home => 'Accueil';
 
   @override

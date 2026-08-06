@@ -11915,6 +11915,12 @@ class AppLocalizationsHe extends AppLocalizations {
   String get nav_gpsLog => 'יומן GPS';
 
   @override
+  String get media_console_library => 'ספרייה';
+
+  @override
+  String get media_console_transfers => 'העברות';
+
+  @override
   String get nav_home => 'בית';
 
   @override

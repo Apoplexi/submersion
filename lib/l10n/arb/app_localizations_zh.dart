@@ -11663,6 +11663,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get nav_gpsLog => 'GPS 记录';
 
   @override
+  String get media_console_library => '媒体库';
+
+  @override
+  String get media_console_transfers => '传输';
+
+  @override
   String get nav_home => '首页';
 
   @override
