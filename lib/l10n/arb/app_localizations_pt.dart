@@ -12330,6 +12330,29 @@ class AppLocalizationsPt extends AppLocalizations {
   String get media_console_transfers => 'Transferências';
 
   @override
+  String get media_console_unlinked => 'Sem vínculo';
+
+  @override
+  String get media_inbox_chooseDive => 'Escolher mergulho';
+
+  @override
+  String get media_inbox_empty => 'Nenhuma mídia sem vínculo';
+
+  @override
+  String get media_inbox_keep => 'Manter';
+
+  @override
+  String media_inbox_linkChip(int number) {
+    return 'Vincular a #$number';
+  }
+
+  @override
+  String get media_inbox_linkToDive => 'Vincular a um mergulho';
+
+  @override
+  String get media_inbox_linkToSite => 'Vincular a um ponto';
+
+  @override
   String get media_library_empty => 'Nenhuma mídia ainda';
 
   @override

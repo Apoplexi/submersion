@@ -12326,6 +12326,29 @@ class AppLocalizationsIt extends AppLocalizations {
   String get media_console_transfers => 'Trasferimenti';
 
   @override
+  String get media_console_unlinked => 'Non collegati';
+
+  @override
+  String get media_inbox_chooseDive => 'Scegli immersione';
+
+  @override
+  String get media_inbox_empty => 'Nessun contenuto multimediale non collegato';
+
+  @override
+  String get media_inbox_keep => 'Mantieni';
+
+  @override
+  String media_inbox_linkChip(int number) {
+    return 'Collega a #$number';
+  }
+
+  @override
+  String get media_inbox_linkToDive => 'Collega a un\'immersione';
+
+  @override
+  String get media_inbox_linkToSite => 'Collega a un sito';
+
+  @override
   String get media_library_empty => 'Ancora nessun contenuto multimediale';
 
   @override

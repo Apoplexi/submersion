@@ -12287,6 +12287,29 @@ class AppLocalizationsHu extends AppLocalizations {
   String get media_console_transfers => 'Átvitelek';
 
   @override
+  String get media_console_unlinked => 'Nem csatolt';
+
+  @override
+  String get media_inbox_chooseDive => 'Merülés kiválasztása';
+
+  @override
+  String get media_inbox_empty => 'Nincs nem csatolt média';
+
+  @override
+  String get media_inbox_keep => 'Megtartás';
+
+  @override
+  String media_inbox_linkChip(int number) {
+    return 'Csatolás: #$number';
+  }
+
+  @override
+  String get media_inbox_linkToDive => 'Csatolás merüléshez';
+
+  @override
+  String get media_inbox_linkToSite => 'Csatolás merülőhelyhez';
+
+  @override
   String get media_library_empty => 'Még nincs média';
 
   @override

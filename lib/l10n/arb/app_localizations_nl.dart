@@ -12232,6 +12232,29 @@ class AppLocalizationsNl extends AppLocalizations {
   String get media_console_transfers => 'Overdrachten';
 
   @override
+  String get media_console_unlinked => 'Niet gekoppeld';
+
+  @override
+  String get media_inbox_chooseDive => 'Duik kiezen';
+
+  @override
+  String get media_inbox_empty => 'Geen niet-gekoppelde media';
+
+  @override
+  String get media_inbox_keep => 'Behouden';
+
+  @override
+  String media_inbox_linkChip(int number) {
+    return 'Koppelen aan #$number';
+  }
+
+  @override
+  String get media_inbox_linkToDive => 'Aan duik koppelen';
+
+  @override
+  String get media_inbox_linkToSite => 'Aan duikstek koppelen';
+
+  @override
   String get media_library_empty => 'Nog geen media';
 
   @override

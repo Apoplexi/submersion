@@ -11766,6 +11766,29 @@ class AppLocalizationsZh extends AppLocalizations {
   String get media_console_transfers => '传输';
 
   @override
+  String get media_console_unlinked => '未关联';
+
+  @override
+  String get media_inbox_chooseDive => '选择潜水';
+
+  @override
+  String get media_inbox_empty => '没有未关联的媒体';
+
+  @override
+  String get media_inbox_keep => '保留';
+
+  @override
+  String media_inbox_linkChip(int number) {
+    return '关联到 #$number';
+  }
+
+  @override
+  String get media_inbox_linkToDive => '关联到潜水';
+
+  @override
+  String get media_inbox_linkToSite => '关联到潜点';
+
+  @override
   String get media_library_empty => '暂无媒体';
 
   @override

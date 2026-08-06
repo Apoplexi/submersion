@@ -12319,6 +12319,29 @@ class AppLocalizationsDe extends AppLocalizations {
   String get media_console_transfers => 'Übertragungen';
 
   @override
+  String get media_console_unlinked => 'Nicht verknüpft';
+
+  @override
+  String get media_inbox_chooseDive => 'Tauchgang wählen';
+
+  @override
+  String get media_inbox_empty => 'Keine nicht verknüpften Medien';
+
+  @override
+  String get media_inbox_keep => 'Behalten';
+
+  @override
+  String media_inbox_linkChip(int number) {
+    return 'Mit #$number verknüpfen';
+  }
+
+  @override
+  String get media_inbox_linkToDive => 'Mit Tauchgang verknüpfen';
+
+  @override
+  String get media_inbox_linkToSite => 'Mit Tauchplatz verknüpfen';
+
+  @override
   String get media_library_empty => 'Noch keine Medien';
 
   @override

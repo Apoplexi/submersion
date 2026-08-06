@@ -12104,6 +12104,29 @@ class AppLocalizationsAr extends AppLocalizations {
   String get media_console_transfers => 'عمليات النقل';
 
   @override
+  String get media_console_unlinked => 'غير مرتبطة';
+
+  @override
+  String get media_inbox_chooseDive => 'اختيار الغطسة';
+
+  @override
+  String get media_inbox_empty => 'لا توجد وسائط غير مرتبطة';
+
+  @override
+  String get media_inbox_keep => 'احتفاظ';
+
+  @override
+  String media_inbox_linkChip(int number) {
+    return 'ربط بالغطسة رقم $number';
+  }
+
+  @override
+  String get media_inbox_linkToDive => 'ربط بغطسة';
+
+  @override
+  String get media_inbox_linkToSite => 'ربط بموقع';
+
+  @override
   String get media_library_empty => 'لا توجد وسائط بعد';
 
   @override

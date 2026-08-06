@@ -12365,6 +12365,29 @@ class AppLocalizationsFr extends AppLocalizations {
   String get media_console_transfers => 'Transferts';
 
   @override
+  String get media_console_unlinked => 'Non liés';
+
+  @override
+  String get media_inbox_chooseDive => 'Choisir la plongée';
+
+  @override
+  String get media_inbox_empty => 'Aucun média non lié';
+
+  @override
+  String get media_inbox_keep => 'Conserver';
+
+  @override
+  String media_inbox_linkChip(int number) {
+    return 'Lier à #$number';
+  }
+
+  @override
+  String get media_inbox_linkToDive => 'Lier à une plongée';
+
+  @override
+  String get media_inbox_linkToSite => 'Lier à un site';
+
+  @override
   String get media_library_empty => 'Aucun média pour le moment';
 
   @override

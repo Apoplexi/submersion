@@ -7082,6 +7082,39 @@
   "@media_console_transfers": {
     "description": "Media console sidebar/tab label for the transfers view"
   },
+  "media_console_unlinked": "Unlinked",
+  "@media_console_unlinked": {
+    "description": "Media console sidebar/tab label for the unlinked inbox"
+  },
+  "media_inbox_chooseDive": "Choose dive",
+  "@media_inbox_chooseDive": {
+    "description": "Inbox chip for an ambiguous auto-match"
+  },
+  "media_inbox_empty": "No unlinked media",
+  "@media_inbox_empty": {
+    "description": "Empty state for the unlinked inbox"
+  },
+  "media_inbox_keep": "Keep",
+  "@media_inbox_keep": {
+    "description": "Inbox action: keep the item in the library unlinked"
+  },
+  "media_inbox_linkChip": "Link to #{number}",
+  "@media_inbox_linkChip": {
+    "description": "Inbox chip for a confident auto-match",
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "media_inbox_linkToDive": "Link to dive",
+  "@media_inbox_linkToDive": {
+    "description": "Inbox menu action: pick a dive manually"
+  },
+  "media_inbox_linkToSite": "Link to site",
+  "@media_inbox_linkToSite": {
+    "description": "Inbox menu action: pick a site manually"
+  },
   "media_library_empty": "No media yet",
   "@media_library_empty": {
     "description": "Empty state for the media library"

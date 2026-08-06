@@ -12022,6 +12022,29 @@ class AppLocalizationsHe extends AppLocalizations {
   String get media_console_transfers => 'העברות';
 
   @override
+  String get media_console_unlinked => 'לא מקושרים';
+
+  @override
+  String get media_inbox_chooseDive => 'בחירת צלילה';
+
+  @override
+  String get media_inbox_empty => 'אין מדיה לא מקושרת';
+
+  @override
+  String get media_inbox_keep => 'שמירה';
+
+  @override
+  String media_inbox_linkChip(int number) {
+    return 'קישור אל #$number';
+  }
+
+  @override
+  String get media_inbox_linkToDive => 'קישור לצלילה';
+
+  @override
+  String get media_inbox_linkToSite => 'קישור לאתר';
+
+  @override
   String get media_library_empty => 'אין מדיה עדיין';
 
   @override

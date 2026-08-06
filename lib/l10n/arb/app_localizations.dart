@@ -20893,6 +20893,48 @@ abstract class AppLocalizations {
   /// **'Transfers'**
   String get media_console_transfers;
 
+  /// Media console sidebar/tab label for the unlinked inbox
+  ///
+  /// In en, this message translates to:
+  /// **'Unlinked'**
+  String get media_console_unlinked;
+
+  /// Inbox chip for an ambiguous auto-match
+  ///
+  /// In en, this message translates to:
+  /// **'Choose dive'**
+  String get media_inbox_chooseDive;
+
+  /// Empty state for the unlinked inbox
+  ///
+  /// In en, this message translates to:
+  /// **'No unlinked media'**
+  String get media_inbox_empty;
+
+  /// Inbox action: keep the item in the library unlinked
+  ///
+  /// In en, this message translates to:
+  /// **'Keep'**
+  String get media_inbox_keep;
+
+  /// Inbox chip for a confident auto-match
+  ///
+  /// In en, this message translates to:
+  /// **'Link to #{number}'**
+  String media_inbox_linkChip(int number);
+
+  /// Inbox menu action: pick a dive manually
+  ///
+  /// In en, this message translates to:
+  /// **'Link to dive'**
+  String get media_inbox_linkToDive;
+
+  /// Inbox menu action: pick a site manually
+  ///
+  /// In en, this message translates to:
+  /// **'Link to site'**
+  String get media_inbox_linkToSite;
+
   /// Empty state for the media library
   ///
   /// In en, this message translates to:
