@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:uuid/uuid.dart';
 
 import 'package:submersion/core/services/logger_service.dart';
+import 'package:submersion/features/media/data/repositories/media_repair_log_repository.dart';
 import 'package:submersion/features/media/data/repositories/media_repository.dart';
 import 'package:submersion/features/media/data/services/repair/folder_candidate_source.dart';
 import 'package:submersion/features/media/domain/services/media_repair_types.dart';
@@ -59,6 +60,7 @@ class MediaRepairService {
     required this.queue,
     required this.createBookmark,
     required this.writeBookmark,
+    this.log,
   });
 
   final MediaRepository repository;
@@ -68,10 +70,17 @@ class MediaRepairService {
   final Future<Uint8List> Function(String path)? createBookmark;
   final Future<void> Function(String ref, Uint8List blob)? writeBookmark;
 
+  /// Audit trail (Media section Phase 5). Optional so the engine stays
+  /// constructible in tests that do not care about history.
+  final MediaRepairLogRepository? log;
+
   static const _log = LoggerService('MediaRepairService');
   static const _uuid = Uuid();
 
-  Future<RepairApplyReport> apply(List<RepairProposal> accepted) async {
+  Future<RepairApplyReport> apply(
+    List<RepairProposal> accepted, {
+    RepairLogSource source = RepairLogSource.manual,
+  }) async {
     var failed = 0;
     var skipped = 0;
     var reuploadsQueued = 0;
@@ -80,15 +89,32 @@ class MediaRepairService {
     final writes = <RepairWrite>[];
     final editedStamps = <({String mediaId, String hash, int sizeBytes})>[];
     final storeIds = <String>[];
+    // One batch id per apply pass, so the history can group a wizard run.
+    final batchId = _uuid.v4();
+    final auditEntries = <RepairLogEntry>[];
+    final now = DateTime.now();
 
     // Stage A: per-row I/O.
     for (final proposal in accepted) {
       final candidate = proposal.candidate;
       if (candidate == null) continue;
 
+      final oldPointer = proposal.item.localPath ?? proposal.item.filePath;
+
       try {
         if (candidate.isStore) {
           storeIds.add(proposal.item.id);
+          auditEntries.add(
+            RepairLogEntry(
+              id: _uuid.v4(),
+              mediaId: proposal.item.id,
+              batchId: batchId,
+              occurredAt: now,
+              action: RepairLogAction.cloudBacked,
+              oldValue: oldPointer,
+              source: source,
+            ),
+          );
           continue;
         }
 
@@ -98,6 +124,18 @@ class MediaRepairService {
               mediaId: proposal.item.id,
               newPlatformAssetId: candidate.assetId,
               toGallery: true,
+            ),
+          );
+          auditEntries.add(
+            RepairLogEntry(
+              id: _uuid.v4(),
+              mediaId: proposal.item.id,
+              batchId: batchId,
+              occurredAt: now,
+              action: _actionFor(source),
+              oldValue: oldPointer,
+              newValue: candidate.assetId,
+              source: source,
             ),
           );
           continue;
@@ -131,6 +169,18 @@ class MediaRepairService {
             mediaId: proposal.item.id,
             newLocalPath: candidate.path,
             newBookmarkRef: newRef,
+          ),
+        );
+        auditEntries.add(
+          RepairLogEntry(
+            id: _uuid.v4(),
+            mediaId: proposal.item.id,
+            batchId: batchId,
+            occurredAt: now,
+            action: _actionFor(source),
+            oldValue: oldPointer,
+            newValue: candidate.path,
+            source: source,
           ),
         );
         if (!matches) {
@@ -167,6 +217,10 @@ class MediaRepairService {
       cloudBacked = storeIds.length;
     }
 
+    // Audit last: history records what actually happened, so it is written
+    // only after the DB and store effects have gone through.
+    await log?.record(auditEntries);
+
     return RepairApplyReport(
       relinked: writes.length,
       cloudBacked: cloudBacked,
@@ -175,4 +229,11 @@ class MediaRepairService {
       skipped: skipped,
     );
   }
+
+  /// The watcher applies without a human in the loop, which is worth
+  /// distinguishing in the history from a repair the user confirmed.
+  static RepairLogAction _actionFor(RepairLogSource source) =>
+      source == RepairLogSource.watcher
+      ? RepairLogAction.autoRelink
+      : RepairLogAction.relink;
 }

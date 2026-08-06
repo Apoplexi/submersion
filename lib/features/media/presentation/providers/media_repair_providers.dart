@@ -1,5 +1,6 @@
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/features/divers/presentation/providers/diver_providers.dart';
+import 'package:submersion/features/media/data/repositories/media_repair_log_repository.dart';
 import 'package:submersion/features/media/data/services/repair/folder_candidate_source.dart';
 import 'package:submersion/features/media/data/services/repair/media_repair_service.dart';
 import 'package:submersion/features/media/data/services/repair/photo_library_candidate_source.dart';
@@ -176,8 +177,19 @@ final mediaRepairServiceProvider = Provider<MediaRepairService>((ref) {
     queue: ref.watch(mediaTransferQueueRepositoryProvider),
     createBookmark: platform.createBookmark,
     writeBookmark: storage.write,
+    log: ref.watch(mediaRepairLogRepositoryProvider),
   );
 });
+
+/// Per-device repair history (Media section Phase 5).
+final mediaRepairLogRepositoryProvider = Provider<MediaRepairLogRepository>(
+  (ref) => MediaRepairLogRepository(),
+);
+
+/// Newest repair history entries for the history view.
+final repairHistoryProvider = FutureProvider<List<RepairLogEntry>>(
+  (ref) => ref.watch(mediaRepairLogRepositoryProvider).recent(),
+);
 
 final repairWizardProvider =
     StateNotifierProvider.autoDispose<RepairWizardNotifier, RepairWizardState>((
