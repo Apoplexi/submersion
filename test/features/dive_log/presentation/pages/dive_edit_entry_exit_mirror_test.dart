@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/constants/enums.dart';
-import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/features/dive_log/data/repositories/dive_repository_impl.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
 import 'package:submersion/features/dive_log/presentation/pages/dive_edit_page.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_providers.dart';
 import 'package:submersion/features/tank_presets/presentation/providers/tank_preset_providers.dart';
-import 'package:submersion/l10n/arb/app_localizations.dart';
 
 import '../../../../helpers/mock_providers.dart';
+import '../../../../helpers/test_app.dart';
 import '../../../../helpers/test_database.dart';
 
 /// New-dive pages host a continuous animation, so pumpAndSettle never
@@ -84,13 +83,10 @@ void main() {
       addTearDown(tester.view.reset);
       final overrides = await getBaseOverrides();
       await tester.pumpWidget(
-        ProviderScope(
-          overrides: buildOverrides(overrides).cast(),
-          child: const MaterialApp(
-            localizationsDelegates: AppLocalizations.localizationsDelegates,
-            supportedLocales: AppLocalizations.supportedLocales,
-            home: Scaffold(body: DiveEditPage(embedded: true)),
-          ),
+        testApp(
+          overrides: buildOverrides(overrides),
+          locale: const Locale('en'),
+          child: const DiveEditPage(embedded: true),
         ),
       );
       await pumpFrames(tester);
@@ -196,13 +192,10 @@ void main() {
       addTearDown(tester.view.reset);
       final overrides = await getBaseOverrides();
       await tester.pumpWidget(
-        ProviderScope(
-          overrides: buildOverrides(overrides).cast(),
-          child: MaterialApp(
-            localizationsDelegates: AppLocalizations.localizationsDelegates,
-            supportedLocales: AppLocalizations.supportedLocales,
-            home: Scaffold(body: DiveEditPage(diveId: diveId, embedded: true)),
-          ),
+        testApp(
+          overrides: buildOverrides(overrides),
+          locale: const Locale('en'),
+          child: DiveEditPage(diveId: diveId, embedded: true),
         ),
       );
       // Existing-dive pages settle normally (no perpetual animation).
