@@ -58,7 +58,7 @@ class _MediaImportLinkPageState extends ConsumerState<MediaImportLinkPage> {
   Widget build(BuildContext context) {
     final suggestions = <String, InboxSuggestion>{
       for (final id in widget.mediaIds)
-        if (ref.watch(inboxSuggestionProvider(id)).value case final s?) id: s,
+        id: ?ref.watch(inboxSuggestionProvider(id)).value,
     };
     final checkedCount = widget.mediaIds
         .where((id) => _isChecked(id, suggestions[id]))

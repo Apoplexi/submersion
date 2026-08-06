@@ -28,7 +28,7 @@ void main() {
     repo = MediaRepository();
     service = MediaImportService(
       mediaRepository: repo,
-      enrichmentService: EnrichmentService(),
+      enrichmentService: const EnrichmentService(),
     );
     expect(db, isNotNull);
   });
