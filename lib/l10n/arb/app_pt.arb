@@ -5710,6 +5710,7 @@
   "diveComputer_download_newDivesOnlyTitle": "Baixar apenas novos mergulhos",
   "diveComputer_download_upToDate": "Nenhum mergulho novo encontrado -- seu registro está atualizado",
   "diveLog_edit_section_environment": "Ambiente",
+  "diveLog_edit_subsection_autofill": "Preenchimento automático",
   "diveLog_edit_subsection_weather": "Clima",
   "diveLog_edit_subsection_diveConditions": "Condições de mergulho",
   "diveLog_edit_label_windSpeed": "Velocidade do vento",

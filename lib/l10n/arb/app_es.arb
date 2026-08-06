@@ -5710,6 +5710,7 @@
   "diveComputer_download_newDivesOnlyTitle": "Descargar solo inmersiones nuevas",
   "diveComputer_download_upToDate": "No se encontraron inmersiones nuevas -- tu registro está al día",
   "diveLog_edit_section_environment": "Entorno",
+  "diveLog_edit_subsection_autofill": "Autocompletar",
   "diveLog_edit_subsection_weather": "Clima",
   "diveLog_edit_subsection_diveConditions": "Condiciones de buceo",
   "diveLog_edit_label_windSpeed": "Velocidad del viento",

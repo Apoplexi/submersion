@@ -5710,6 +5710,7 @@
   "diveComputer_download_newDivesOnlyTitle": "Nur neue Tauchgänge herunterladen",
   "diveComputer_download_upToDate": "Keine neuen Tauchgänge gefunden -- Ihr Logbuch ist aktuell",
   "diveLog_edit_section_environment": "Umgebung",
+  "diveLog_edit_subsection_autofill": "Automatisch ausfüllen",
   "diveLog_edit_subsection_weather": "Wetter",
   "diveLog_edit_subsection_diveConditions": "Tauchbedingungen",
   "diveLog_edit_label_windSpeed": "Windgeschwindigkeit",

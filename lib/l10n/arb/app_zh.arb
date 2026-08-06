@@ -1938,6 +1938,7 @@
   "diveLog_edit_snackbar_unableToCalculateMaxDepth": "无法从轮廓计算最大深度",
   "diveLog_edit_snackbar_unableToCalculateRuntime": "无法从轮廓计算运行时间",
   "diveLog_edit_subsection_diveConditions": "潜水条件",
+  "diveLog_edit_subsection_autofill": "自动填充",
   "diveLog_edit_subsection_weather": "天气",
   "diveLog_edit_summary_items": "{count, plural, one{1 件装备} other{{count} 件装备}}",
   "diveLog_edit_summary_notes": "笔记",

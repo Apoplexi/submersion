@@ -5710,6 +5710,7 @@
   "diveComputer_download_newDivesOnlyTitle": "Alleen nieuwe duiken downloaden",
   "diveComputer_download_upToDate": "Geen nieuwe duiken gevonden -- je logboek is up-to-date",
   "diveLog_edit_section_environment": "Omgeving",
+  "diveLog_edit_subsection_autofill": "Automatisch invullen",
   "diveLog_edit_subsection_weather": "Weer",
   "diveLog_edit_subsection_diveConditions": "Duikomstandigheden",
   "diveLog_edit_label_windSpeed": "Windsnelheid",

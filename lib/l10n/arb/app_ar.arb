@@ -5710,6 +5710,7 @@
   "diveComputer_download_newDivesOnlyTitle": "تنزيل الغطسات الجديدة فقط",
   "diveComputer_download_upToDate": "لم يتم العثور على غطسات جديدة -- سجلك محدّث",
   "diveLog_edit_section_environment": "البيئة",
+  "diveLog_edit_subsection_autofill": "تعبئة تلقائية",
   "diveLog_edit_subsection_weather": "الطقس",
   "diveLog_edit_subsection_diveConditions": "ظروف الغوص",
   "diveLog_edit_label_windSpeed": "سرعة الرياح",

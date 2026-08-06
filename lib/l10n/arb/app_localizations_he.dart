@@ -19971,6 +19971,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get diveLog_edit_section_environment => 'סביבה';
 
   @override
+  String get diveLog_edit_subsection_autofill => 'מילוי אוטומטי';
+
+  @override
   String get diveLog_edit_subsection_weather => 'מזג אוויר';
 
   @override

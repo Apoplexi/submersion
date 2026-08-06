@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart' hide Visibility;
+import 'package:http/http.dart' as http;
+import 'package:http/testing.dart';
 // ignore: implementation_imports
 import 'package:riverpod/src/framework.dart' as riverpod show Override;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -19,6 +21,7 @@ import 'package:submersion/features/dive_log/domain/entities/dive.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/tissue_color_schemes.dart';
 import 'package:submersion/features/divers/presentation/providers/diver_providers.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
+import 'package:submersion/features/weather/presentation/providers/weather_providers.dart';
 
 typedef Override = riverpod.Override;
 
@@ -472,6 +475,7 @@ Dive createTestDiveWithBottomTime({
 /// Common provider overrides for widget tests
 Future<List<Override>> getBaseOverrides({
   MockSettingsNotifier? settingsNotifier,
+  http.Client? weatherHttpClient,
 }) async {
   SharedPreferences.setMockInitialValues({});
   final prefs = await SharedPreferences.getInstance();
@@ -490,6 +494,11 @@ Future<List<Override>> getBaseOverrides({
     // timer at teardown.
     diveOpenFindingsCountProvider.overrideWith(
       (ref, diveId) => Stream.value(0),
+    ),
+    // Weather/elevation lookups must never hit the network in widget tests;
+    // the default stub fails fast so altitude auto-fill resolves to null.
+    weatherHttpClientProvider.overrideWithValue(
+      weatherHttpClient ?? MockClient((_) async => http.Response('', 500)),
     ),
   ];
 }

@@ -20415,6 +20415,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String get diveLog_edit_section_environment => 'Környezet';
 
   @override
+  String get diveLog_edit_subsection_autofill => 'Automatikus kitöltés';
+
+  @override
   String get diveLog_edit_subsection_weather => 'Időjárás';
 
   @override

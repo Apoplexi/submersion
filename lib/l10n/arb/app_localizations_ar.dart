@@ -20116,6 +20116,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get diveLog_edit_section_environment => 'البيئة';
 
   @override
+  String get diveLog_edit_subsection_autofill => 'تعبئة تلقائية';
+
+  @override
   String get diveLog_edit_subsection_weather => 'الطقس';
 
   @override

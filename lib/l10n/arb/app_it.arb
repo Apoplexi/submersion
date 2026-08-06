@@ -5634,6 +5634,7 @@
   "diveComputer_download_newDivesOnlyTitle": "Scarica solo le nuove immersioni",
   "diveComputer_download_upToDate": "Nessuna nuova immersione trovata -- il tuo registro è aggiornato",
   "diveLog_edit_section_environment": "Ambiente",
+  "diveLog_edit_subsection_autofill": "Compilazione automatica",
   "diveLog_edit_subsection_weather": "Meteo",
   "diveLog_edit_subsection_diveConditions": "Condizioni di immersione",
   "diveLog_edit_label_windSpeed": "Velocità del vento",
