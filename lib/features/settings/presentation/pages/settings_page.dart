@@ -838,11 +838,7 @@ class _UnitsSectionContent extends ConsumerWidget {
     String currentCode,
   ) {
     final current = currentCode.trim().toUpperCase();
-    final codes = [
-      if (current.isNotEmpty && !kCommonCurrencyCodes.contains(current))
-        current,
-      ...kCommonCurrencyCodes,
-    ];
+    final codes = currencyCodesWith(current);
     showDialog<void>(
       context: context,
       builder: (dialogContext) => AlertDialog(

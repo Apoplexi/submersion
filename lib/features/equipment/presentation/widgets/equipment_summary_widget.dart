@@ -84,16 +84,20 @@ class EquipmentSummaryWidget extends ConsumerWidget {
   ) {
     // Calculate stats
     int activeCount = 0;
-    double totalValue = 0;
-
     for (final item in equipment) {
       if (item.isActive) {
         activeCount++;
       }
-      if (item.purchasePrice != null) {
-        totalValue += item.purchasePrice;
-      }
     }
+
+    // Equipment can be priced in different currencies, so totals are kept
+    // per currency rather than added into one figure under a single symbol.
+    final totalsByCurrency = sumByCurrency<dynamic>(
+      equipment,
+      amountOf: (item) => item.purchasePrice as double?,
+      currencyOf: (item) => item.purchaseCurrency as String,
+      fallbackCode: ref.watch(defaultCurrencyProvider),
+    );
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -131,15 +135,16 @@ class EquipmentSummaryWidget extends ConsumerWidget {
                 label: context.l10n.equipment_summary_serviceDue,
                 color: Colors.red,
               ),
-            if (totalValue > 0)
-              _buildStatCard(
-                context,
-                icon: Icons.attach_money,
-                value:
-                    '${currencySymbol(ref.watch(defaultCurrencyProvider))}${totalValue.toStringAsFixed(0)}',
-                label: context.l10n.equipment_summary_totalValue,
-                color: Colors.orange,
-              ),
+            for (final entry in totalsByCurrency)
+              if (entry.value > 0)
+                _buildStatCard(
+                  context,
+                  icon: Icons.attach_money,
+                  value:
+                      '${currencySymbol(entry.key)}${entry.value.toStringAsFixed(0)}',
+                  label: context.l10n.equipment_summary_totalValue,
+                  color: Colors.orange,
+                ),
           ],
         ),
         if (serviceDue.isNotEmpty) ...[
