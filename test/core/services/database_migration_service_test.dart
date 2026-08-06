@@ -8,6 +8,7 @@ import 'package:submersion/core/domain/entities/storage_config.dart';
 import 'package:submersion/core/services/database_location_service.dart';
 import 'package:submersion/core/services/database_migration_service.dart';
 import 'package:submersion/core/services/database_service.dart';
+import 'package:submersion/core/services/security/database_security_sidecar.dart';
 
 /// Minimal location-service fake: the migration methods drive real temp
 /// files for everything except configuration/bookmark bookkeeping, which we
@@ -108,6 +109,24 @@ void main() {
         .customSelect('SELECT 1 AS v')
         .getSingle();
     expect(one.read<int>('v'), 1);
+  });
+
+  test('migrateToCustomFolder carries the security keyslot sidecar', () async {
+    final service = await initServiceAt(p.join(root.path, 'default'));
+    final targetDir = p.join(root.path, 'target');
+    await Directory(targetDir).create(recursive: true);
+    // A sidecar next to the live DB (as enableSecurity would write it).
+    final sidecarPath = DatabaseSecuritySidecar.pathFor(currentPath);
+    File(sidecarPath).writeAsStringSync('{"version":1}');
+
+    final result = await service.migrateToCustomFolder(targetDir);
+
+    expect(result.success, isTrue, reason: result.errorMessage);
+    expect(
+      File(p.join(targetDir, DatabaseSecuritySidecar.fileName)).existsSync(),
+      isTrue,
+      reason: 'sidecar must travel with the database on a storage move',
+    );
   });
 
   test('migrateToDefault closes strictly and reopens at the default '

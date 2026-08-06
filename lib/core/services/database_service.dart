@@ -13,6 +13,7 @@ import 'package:submersion/core/database/database_version_exception.dart';
 import 'package:submersion/core/database/sqlcipher_setup.dart'
     as sqlcipher_setup;
 import 'package:submersion/core/services/database_location_service.dart';
+import 'package:submersion/core/services/security/database_encryption_migrator.dart';
 import 'package:submersion/core/services/security/database_locked_exception.dart';
 import 'package:submersion/core/services/security/database_security_sidecar.dart'
     show isEncryptedDatabaseFile;
@@ -101,6 +102,15 @@ class DatabaseService {
     _database = db;
   }
 
+  /// Test seam for the sqlcipher export used by portable backup/restore.
+  @visibleForTesting
+  SqlcipherExporter? debugExporterOverride;
+
+  @visibleForTesting
+  void setCurrentPathForTesting(String path) {
+    _currentDatabasePath = path;
+  }
+
   /// For testing only: resets the database instance
   @visibleForTesting
   void resetForTesting() {
@@ -109,6 +119,7 @@ class DatabaseService {
     _locationService = null;
     _currentDatabasePath = null;
     databaseKeyHex = null;
+    debugExporterOverride = null;
     lastOpenMode = null;
     // The service is a singleton, so a restore seam set by one test would
     // otherwise leak into the next and fire unexpectedly.
@@ -485,18 +496,46 @@ class DatabaseService {
     return _resolveDatabasePath();
   }
 
+  /// Copies the live database to [destinationPath] as a PLAINTEXT SQLite
+  /// file — always. Backups are portable by design: they must restore on a
+  /// device where the DB password is unknown, and the existing SBE1 backup
+  /// encryption remains the (orthogonal) way to protect backup artifacts.
+  ///
+  /// Plaintext live DB: plain file copy, as before. Encrypted live DB:
+  /// decrypt-export through a staging file, then rename into place.
   Future<void> backup(String destinationPath) async {
     final sourcePath = await databasePath;
     final sourceFile = File(sourcePath);
+    if (!await sourceFile.exists()) return;
 
-    if (await sourceFile.exists()) {
-      // Ensure the destination directory exists
-      final destDir = Directory(p.dirname(destinationPath));
-      if (!await destDir.exists()) {
-        await destDir.create(recursive: true);
-      }
-      await sourceFile.copy(destinationPath);
+    // Ensure the destination directory exists
+    final destDir = Directory(p.dirname(destinationPath));
+    if (!await destDir.exists()) {
+      await destDir.create(recursive: true);
     }
+
+    final keyHex = databaseKeyHex;
+    if (keyHex != null && isEncryptedDatabaseFile(sourcePath)) {
+      final exporter = debugExporterOverride ?? sqlcipherExport;
+      final staging = '$destinationPath.export-staging';
+      await _deleteIfExists(staging);
+      try {
+        await exporter(
+          sourcePath: sourcePath,
+          targetPath: staging,
+          sourceKeyHex: keyHex,
+          targetKeyHex: null,
+        );
+        await _deleteIfExists(destinationPath);
+        await File(staging).rename(destinationPath);
+      } catch (_) {
+        await _bestEffortDelete(staging);
+        rethrow;
+      }
+      return;
+    }
+
+    await sourceFile.copy(destinationPath);
   }
 
   /// Test seam: invoked synchronously the instant the live database has been
@@ -594,6 +633,16 @@ class DatabaseService {
       await _deleteIfExists(stagingPath);
       await initialize();
       rethrow;
+    }
+
+    // A restored backup is plaintext (portable-backup hard rule). When the
+    // live database is protected, re-encrypt the swapped-in file before the
+    // reopen so protection survives a restore without user action.
+    final keyHex = databaseKeyHex;
+    if (keyHex != null && !isEncryptedDatabaseFile(destinationPath)) {
+      await DatabaseEncryptionMigrator(
+        exporter: debugExporterOverride ?? sqlcipherExport,
+      ).encryptInPlace(dbPath: destinationPath, keyHex: keyHex);
     }
 
     // Reopen on the swapped-in file BEFORE dropping the pre-restore copy, so a

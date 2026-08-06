@@ -8,6 +8,7 @@ import 'package:sqlite3/sqlite3.dart' as sqlite3;
 import 'package:submersion/core/domain/entities/storage_config.dart';
 import 'package:submersion/core/services/database_location_service.dart';
 import 'package:submersion/core/services/database_service.dart';
+import 'package:submersion/core/services/security/database_security_sidecar.dart';
 
 /// Result of a database migration operation
 class MigrationResult {
@@ -629,6 +630,14 @@ class DatabaseMigrationService {
     final walSource = File('$sourcePath-wal');
     if (await walSource.exists()) {
       await walSource.copy('$destPath-wal');
+    }
+
+    // The security keyslot sidecar must travel with the database: without it
+    // a keychain wipe at the new location would leave the encrypted file
+    // permanently unopenable (the sidecar is the durable wrapped key copy).
+    final sidecarSource = File(DatabaseSecuritySidecar.pathFor(sourcePath));
+    if (await sidecarSource.exists()) {
+      await sidecarSource.copy(DatabaseSecuritySidecar.pathFor(destPath));
     }
   }
 
