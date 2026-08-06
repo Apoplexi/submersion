@@ -144,4 +144,158 @@ void main() {
     expect(payload.data.cylinderConfigs, isEmpty);
     expect(payload.data.cylinderConfigItems, isEmpty);
   });
+
+  test('a single config and item are fetchable by id', () async {
+    // The per-record fetch is what the conflict resolver reads to compare a
+    // local row against an incoming one, so a missing case here silently
+    // resolves every conflict in the remote's favour.
+    await seedUnit('rb-1');
+    await seedConfig('c1', equipmentId: 'rb-1');
+    await seedItem('i1', 'c1');
+
+    final config = await serializer.fetchRecord('cylinderConfigs', 'c1');
+    expect(config, isNotNull);
+    expect(config!['name'], 'JJ trimix');
+    expect(config['equipmentId'], 'rb-1');
+
+    final item = await serializer.fetchRecord('cylinderConfigItems', 'i1');
+    expect(item, isNotNull);
+    expect(item!['configId'], 'c1');
+    expect(item['tankRole'], 'diluent');
+
+    expect(await serializer.fetchRecord('cylinderConfigs', 'missing'), isNull);
+  });
+
+  test('configs and items round-trip through the batch paths', () async {
+    // The streaming/base sync paths use the batch variants (fetchRecords /
+    // upsertRecords), distinct from the single-record CRUD above.
+    await serializer.upsertRecords('cylinderConfigs', [
+      {
+        'id': 'c1',
+        'name': 'JJ trimix',
+        'description': '',
+        'sortOrder': 0,
+        'createdAt': 1000,
+        'updatedAt': 1000,
+      },
+      {
+        'id': 'c2',
+        'name': 'Doubles + 50',
+        'description': '',
+        'sortOrder': 1,
+        'createdAt': 1000,
+        'updatedAt': 1000,
+      },
+    ]);
+
+    await serializer.upsertRecords('cylinderConfigItems', [
+      {
+        'id': 'i1',
+        'configId': 'c1',
+        'sortOrder': 0,
+        'tankRole': 'diluent',
+        'o2Percent': 18.0,
+        'hePercent': 45.0,
+        'createdAt': 1000,
+        'updatedAt': 1000,
+      },
+      {
+        'id': 'i2',
+        'configId': 'c1',
+        'sortOrder': 1,
+        'tankRole': 'bailout',
+        'o2Percent': 21.0,
+        'hePercent': 0.0,
+        'createdAt': 1000,
+        'updatedAt': 1000,
+      },
+    ]);
+
+    final configs = await serializer.fetchRecords('cylinderConfigs', [
+      'c1',
+      'c2',
+    ]);
+    expect(configs.keys, containsAll(['c1', 'c2']));
+    expect(configs['c2']!['name'], 'Doubles + 50');
+
+    final items = await serializer.fetchRecords('cylinderConfigItems', [
+      'i1',
+      'i2',
+    ]);
+    expect(items.keys, containsAll(['i1', 'i2']));
+    expect(items['i2']!['tankRole'], 'bailout');
+  });
+
+  test(
+    'an incremental changeset carries only rows past the watermark',
+    () async {
+      // Rows arriving from a peer carry an hlc; the watermark filter is what
+      // keeps an incremental changeset from re-sending the whole table.
+      const oldHlc = '2026-07-01T00:00:00.000Z-0000-peer';
+      const newHlc = '2026-08-01T00:00:00.000Z-0000-peer';
+
+      await serializer.upsertRecord('cylinderConfigs', {
+        'id': 'old',
+        'name': 'Unchanged',
+        'description': '',
+        'sortOrder': 0,
+        'createdAt': 1000,
+        'updatedAt': 1000,
+        'hlc': oldHlc,
+      });
+      await serializer.upsertRecord('cylinderConfigs', {
+        'id': 'new',
+        'name': 'Edited',
+        'description': '',
+        'sortOrder': 0,
+        'createdAt': 1000,
+        'updatedAt': 2000,
+        'hlc': newHlc,
+      });
+      await serializer.upsertRecord('cylinderConfigItems', {
+        'id': 'i-old',
+        'configId': 'old',
+        'sortOrder': 0,
+        'tankRole': 'diluent',
+        'o2Percent': 18.0,
+        'hePercent': 45.0,
+        'createdAt': 1000,
+        'updatedAt': 1000,
+        'hlc': oldHlc,
+      });
+      await serializer.upsertRecord('cylinderConfigItems', {
+        'id': 'i-new',
+        'configId': 'new',
+        'sortOrder': 0,
+        'tankRole': 'bailout',
+        'o2Percent': 21.0,
+        'hePercent': 0.0,
+        'createdAt': 1000,
+        'updatedAt': 2000,
+        'hlc': newHlc,
+      });
+
+      final changeset = await serializer.exportChangeset(
+        deviceId: 'test-device',
+        hlcWatermark: oldHlc,
+        deletions: const [],
+      );
+
+      final configIds = changeset.data.cylinderConfigs
+          .map((c) => c['id'])
+          .toSet();
+      expect(configIds, contains('new'));
+      expect(
+        configIds,
+        isNot(contains('old')),
+        reason: 'a config at the watermark must not be re-sent',
+      );
+
+      final itemIds = changeset.data.cylinderConfigItems
+          .map((i) => i['id'])
+          .toSet();
+      expect(itemIds, contains('i-new'));
+      expect(itemIds, isNot(contains('i-old')));
+    },
+  );
 }

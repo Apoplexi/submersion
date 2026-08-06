@@ -167,6 +167,117 @@ void main() {
     expect(saved.single.cylinderCount, 1);
   });
 
+  testWidgets('editing an existing configuration updates it in place', (
+    tester,
+  ) async {
+    final id = await repo.createConfig(
+      diverId: 'd1',
+      equipmentId: 'rb-1',
+      name: 'JJ trimix',
+    );
+
+    await tester.pumpWidget(host(configId: id));
+    await tester.pumpAndSettle();
+
+    await tester.enterText(find.byType(TextFormField).first, 'JJ air dil');
+    await tester.tap(find.text('Save'));
+    await tester.pumpAndSettle();
+
+    final saved = await repo.getAllConfigs(diverId: 'd1');
+    expect(saved, hasLength(1), reason: 'must not fork into a second config');
+    expect(saved.single.id, id);
+    expect(saved.single.name, 'JJ air dil');
+    expect(saved.single.equipmentId, 'rb-1');
+  });
+
+  testWidgets('clearing the owning unit demotes a config to a gas plan', (
+    tester,
+  ) async {
+    // The generic option is a real value, not "leave unchanged": picking it
+    // must null equipment_id rather than silently keep the old unit.
+    final id = await repo.createConfig(
+      diverId: 'd1',
+      equipmentId: 'rb-1',
+      name: 'JJ trimix',
+    );
+
+    await tester.pumpWidget(host(configId: id));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('JJ-CCR'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Generic gas plan').last);
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Save'));
+    await tester.pumpAndSettle();
+
+    final saved = await repo.getConfigById(id);
+    expect(saved!.equipmentId, isNull);
+    expect(saved.isOwnedByUnit, isFalse);
+  });
+
+  testWidgets('removing a cylinder drops it from the saved set', (
+    tester,
+  ) async {
+    final id = await repo.createConfig(diverId: 'd1', name: 'JJ trimix');
+    await repo.saveItems(id, [
+      CylinderConfigItem(
+        id: 'i1',
+        configId: id,
+        tankRole: TankRole.diluent,
+        createdAt: now,
+        updatedAt: now,
+      ),
+      CylinderConfigItem(
+        id: 'i2',
+        configId: id,
+        tankRole: TankRole.bailout,
+        createdAt: now,
+        updatedAt: now,
+      ),
+    ]);
+
+    await tester.pumpWidget(host(configId: id));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byIcon(Icons.delete_outline).first);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Save'));
+    await tester.pumpAndSettle();
+
+    final saved = await repo.getConfigById(id);
+    expect(saved!.cylinderCount, 1);
+    expect(saved.items.single.tankRole, TankRole.bailout);
+  });
+
+  testWidgets('an edited gas mix reaches the database on save', (tester) async {
+    final id = await repo.createConfig(diverId: 'd1', name: 'JJ trimix');
+    await repo.saveItems(id, [
+      CylinderConfigItem(
+        id: 'i1',
+        configId: id,
+        tankRole: TankRole.diluent,
+        o2Percent: 21,
+        createdAt: now,
+        updatedAt: now,
+      ),
+    ]);
+
+    await tester.pumpWidget(host(configId: id));
+    await tester.pumpAndSettle();
+
+    await tester.enterText(find.widgetWithText(TextField, 'O2 %'), '18');
+    await tester.enterText(find.widgetWithText(TextField, 'He %'), '45');
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Save'));
+    await tester.pumpAndSettle();
+
+    final saved = await repo.getConfigById(id);
+    expect(saved!.items.single.o2Percent, 18);
+    expect(saved.items.single.hePercent, 45);
+  });
+
   testWidgets('the first configuration a diver saves is diver-scoped', (
     tester,
   ) async {

@@ -34,6 +34,84 @@ void main() {
     expect(generic.name, 'JJ trimix');
   });
 
+  CylinderConfig config({
+    String id = 'c1',
+    String name = 'JJ trimix',
+    String? diverId = 'd1',
+    String? equipmentId = 'rb-1',
+    String description = '',
+    int sortOrder = 0,
+    List<CylinderConfigItem> items = const [],
+  }) => CylinderConfig(
+    id: id,
+    diverId: diverId,
+    equipmentId: equipmentId,
+    name: name,
+    description: description,
+    sortOrder: sortOrder,
+    items: items,
+    createdAt: now,
+    updatedAt: now,
+  );
+
+  test('config equality is by value, so provider rebuilds are stable', () {
+    expect(config(), equals(config()));
+    expect(config().hashCode, equals(config().hashCode));
+  });
+
+  test('every meaningful field participates in config equality', () {
+    // A field missing from props means an edit to it does not rebuild the
+    // list, the owning unit's card, or an open detail pane.
+    expect(config(id: 'c2'), isNot(equals(config())));
+    expect(config(name: 'Other'), isNot(equals(config())));
+    expect(config(diverId: 'd2'), isNot(equals(config())));
+    expect(config(equipmentId: 'rb-2'), isNot(equals(config())));
+    expect(config(description: 'Deep'), isNot(equals(config())));
+    expect(config(sortOrder: 3), isNot(equals(config())));
+    expect(config(items: [item()]), isNot(equals(config())));
+  });
+
+  test('config timestamps are excluded from equality', () {
+    final a = config();
+    expect(a, equals(a.copyWith(updatedAt: now.add(const Duration(days: 1)))));
+  });
+
+  test('cylinderCount reflects the item list', () {
+    expect(config().cylinderCount, 0);
+    expect(
+      config(
+        items: [
+          item(id: 'a'),
+          item(id: 'b'),
+        ],
+      ).cylinderCount,
+      2,
+    );
+  });
+
+  test('clearing the diver detaches a config without touching its unit', () {
+    final orphaned = config().copyWith(clearDiverId: true);
+    expect(orphaned.diverId, isNull);
+    expect(orphaned.equipmentId, 'rb-1');
+  });
+
+  test('copyWith replaces every scalar field', () {
+    final updated = config().copyWith(
+      id: 'c9',
+      diverId: 'd9',
+      equipmentId: 'rb-9',
+      name: 'Renamed',
+      description: 'Trimix bailout',
+      sortOrder: 7,
+    );
+    expect(updated.id, 'c9');
+    expect(updated.diverId, 'd9');
+    expect(updated.equipmentId, 'rb-9');
+    expect(updated.name, 'Renamed');
+    expect(updated.description, 'Trimix bailout');
+    expect(updated.sortOrder, 7);
+  });
+
   test('items default to air and back gas is not assumed', () {
     final i = item();
     expect(i.o2Percent, 21);
