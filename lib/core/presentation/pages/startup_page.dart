@@ -1,4 +1,4 @@
-import 'dart:async' show unawaited;
+import 'dart:async' show Completer, unawaited;
 import 'dart:io';
 
 import 'package:flutter/foundation.dart' show kReleaseMode;
@@ -12,6 +12,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:submersion/core/database/database.dart';
 import 'package:submersion/core/database/database_version_exception.dart';
 import 'package:submersion/core/domain/entities/migration_progress.dart';
+import 'package:submersion/core/presentation/pages/lock_screen_view.dart';
 import 'package:submersion/core/presentation/startup_brightness.dart';
 import 'package:submersion/core/presentation/widgets/backup_status_views.dart';
 import 'package:submersion/core/presentation/widgets/ocean_background.dart';
@@ -22,6 +23,10 @@ import 'package:submersion/core/services/background_service.dart';
 import 'package:submersion/core/services/database_location_service.dart';
 import 'package:submersion/core/services/database_service.dart';
 import 'package:submersion/core/services/local_cache_database_service.dart';
+import 'package:submersion/core/services/security/biometric_service.dart';
+import 'package:submersion/core/services/security/database_locked_exception.dart';
+import 'package:submersion/core/services/security/database_security_service.dart';
+import 'package:submersion/core/services/security/database_security_sidecar.dart';
 import 'package:submersion/core/services/log_file_service.dart';
 import 'package:submersion/core/services/notification_service.dart';
 import 'package:submersion/features/backup/data/repositories/backup_preferences.dart';
@@ -73,6 +78,7 @@ Future<void> timeStartupStep(
 
 enum _StartupState {
   initializing,
+  locked,
   backingUp,
   migrating,
   backupFailed,
@@ -137,6 +143,16 @@ class _StartupWrapperState extends State<StartupWrapper>
   BackupFailedException? _backupError;
   sqlite3.SqliteException? _readonlyError;
 
+  /// Completed by the unlock handlers to resume [_runInitialization] past
+  /// the lock gate.
+  Completer<void>? _unlockCompleter;
+  bool _biometricAvailable = false;
+
+  /// Navigator key for the splash MaterialApp, so the escape-hatch dialogs
+  /// (Task: recovery code / start fresh) have a dialog-capable context.
+  final GlobalKey<NavigatorState> _splashNavigatorKey =
+      GlobalKey<NavigatorState>();
+
   /// Drives the dissolve of the splash layer over the mounted app beneath.
   /// Forward-only; starts when _state first reaches ready.
   late final AnimationController _splashFadeController = AnimationController(
@@ -174,6 +190,10 @@ class _StartupWrapperState extends State<StartupWrapper>
     try {
       // Determine if migration is needed before opening the database
       final dbPath = await widget.locationService.getDatabasePath();
+
+      // App Security gate: must resolve BEFORE the schema probe below, which
+      // needs the cipher key to read an encrypted file.
+      await _resolveSecurityGate(dbPath);
 
       final int? storedVersion;
       final bool needsMigration;
@@ -256,6 +276,18 @@ class _StartupWrapperState extends State<StartupWrapper>
           _appVersion = e.appVersion;
         });
       }
+    } on DatabaseLockedException {
+      // The cached/typed key did not open the file (e.g. a keychain restored
+      // from another device). Fall back to the password prompt — the sidecar
+      // is authoritative and unlockWithSecret re-derives from it — then
+      // retry initialization from the top.
+      _unlockCompleter = Completer<void>();
+      if (mounted) setState(() => _state = _StartupState.locked);
+      await _unlockCompleter!.future;
+      if (mounted) {
+        setState(() => _state = _StartupState.initializing);
+        await _runInitialization();
+      }
     } on sqlite3.SqliteException catch (e) {
       if (DatabaseService.isRecoverableReadonlyError(e)) {
         debugPrint(
@@ -286,6 +318,76 @@ class _StartupWrapperState extends State<StartupWrapper>
         });
       }
     }
+  }
+
+  /// Resolves the App Security gate before any database access.
+  ///
+  /// - App Lock on: show the lock screen and wait for a successful unlock.
+  /// - Encryption on, App Lock off: load the cached key silently; only a
+  ///   missing cached key (new device, keychain wipe) shows the prompt —
+  ///   the database is physically unopenable without it.
+  /// - Both off: no-op.
+  ///
+  /// Also self-heals a flag/file mismatch: the file header is the truth
+  /// (an interrupted enable/disable or restored prefs can disagree).
+  Future<void> _resolveSecurityGate(String dbPath) async {
+    final security = DatabaseSecurityService.instance;
+    await security.configure(prefs: widget.prefs);
+
+    final fileEncrypted = isEncryptedDatabaseFile(dbPath);
+    if (!fileEncrypted && security.encryptionEnabled) {
+      // Interrupted disable-encryption run: the file is plaintext, the flag
+      // is stale. The file wins.
+      await security.preferences.setDbEncryptionEnabled(false);
+      await security.refreshDerivedKey();
+    } else if (fileEncrypted && !security.encryptionEnabled) {
+      // Encrypted-LOOKING file with the flag off. A corrupt plaintext
+      // database has the same non-SQLite header, so only conclude
+      // "interrupted enable-encryption" when the keyslot sidecar is present
+      // to corroborate it (enableSecurity always writes one and it travels
+      // with the database); otherwise leave the file to the existing
+      // corruption-recovery flow.
+      final hasSidecar = File(
+        DatabaseSecuritySidecar.pathFor(dbPath),
+      ).existsSync();
+      if (hasSidecar) {
+        await security.preferences.setDbEncryptionEnabled(true);
+        await security.refreshDerivedKey();
+      }
+    }
+
+    if (security.appLockEnabled || security.encryptionEnabled) {
+      final cached = await security.tryLoadCachedKey();
+      final mustPrompt =
+          security.appLockEnabled || (security.encryptionEnabled && !cached);
+      if (mustPrompt) {
+        _biometricAvailable =
+            cached &&
+            security.preferences.appLockBiometricsEnabled &&
+            await BiometricService().isAvailable();
+        _unlockCompleter = Completer<void>();
+        if (mounted) setState(() => _state = _StartupState.locked);
+        await _unlockCompleter!.future;
+        if (mounted) setState(() => _state = _StartupState.initializing);
+      }
+    }
+    DatabaseService.instance.databaseKeyHex = security.databaseKeyHex;
+  }
+
+  Future<bool> _unlockWithPassword(String secret) async {
+    final security = DatabaseSecurityService.instance;
+    final dbPath = await widget.locationService.getDatabasePath();
+    final ok = await security.unlockWithSecret(secret, dbPath: dbPath);
+    if (ok) _unlockCompleter?.complete();
+    return ok;
+  }
+
+  Future<bool> _unlockWithBiometric() async {
+    final ok = await BiometricService().authenticate(
+      reason: 'Unlock your dive log',
+    );
+    if (ok) _unlockCompleter?.complete();
+    return ok;
   }
 
   /// Attempt to recover the database from a hot-journal-readonly error by
@@ -598,6 +700,7 @@ class _StartupWrapperState extends State<StartupWrapper>
               ),
               child: MaterialApp(
                 debugShowCheckedModeBanner: false,
+                navigatorKey: _splashNavigatorKey,
                 home:
                     (_state == _StartupState.error ||
                         _state == _StartupState.backupFailed ||
@@ -612,6 +715,19 @@ class _StartupWrapperState extends State<StartupWrapper>
                             child: _buildErrorContent(textColor, subtitleColor),
                           ),
                         ),
+                      )
+                    : _state == _StartupState.locked
+                    ? LockScreenView(
+                        key: const ValueKey('locked'),
+                        brightness: brightness,
+                        onSubmitSecret: _unlockWithPassword,
+                        onBiometric: _biometricAvailable
+                            ? _unlockWithBiometric
+                            : null,
+                        // Escape-hatch callbacks are wired in the
+                        // escape-hatch task; hidden until then.
+                        onUseRecoveryCode: null,
+                        onStartFresh: null,
                       )
                     : Scaffold(
                         // Use 'splash' key for both initializing and migrating
