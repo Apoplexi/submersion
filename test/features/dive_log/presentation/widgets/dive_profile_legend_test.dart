@@ -29,6 +29,13 @@ const _testTanks = [
   DiveTank(id: 'tank-2', name: 'AL80', gasMix: GasMix(o2: 50), order: 1),
 ];
 
+/// Scopes a finder to the chart options dialog. Every dialog row lives inside
+/// an ExpansionTile section; inline legend toggles never do. This keeps
+/// assertions unambiguous once toggles can appear both inline and in the
+/// dialog (adaptive legend row).
+Finder _inDialog(Finder matching) =>
+    find.descendant(of: find.byType(ExpansionTile), matching: matching);
+
 void main() {
   group('DiveProfileLegend - estimated tank pressure', () {
     testWidgets('estimated tank row shows the (est.) suffix', (tester) async {
@@ -622,6 +629,79 @@ void main() {
         4,
         reason: 'stroked metrics keep the thin line swatch',
       );
+    });
+  });
+
+  group('dialog catalog completeness', () {
+    testWidgets('Overlays section lists Temperature, Pressure, and Events', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        testApp(
+          overrides: [
+            settingsProvider.overrideWith((ref) => _TestSettingsNotifier()),
+          ],
+          child: DiveProfileLegend(
+            config: const ProfileLegendConfig(
+              hasTemperatureData: true,
+              hasPressureData: true,
+              hasEvents: true,
+              hasHeartRateData: true,
+            ),
+            zoomLevel: 1.0,
+            onZoomIn: () {},
+            onZoomOut: () {},
+            onResetZoom: () {},
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.byIcon(Icons.tune), warnIfMissed: false);
+      await tester.pumpAndSettle();
+
+      expect(_inDialog(find.text('Temp')), findsOneWidget);
+      expect(_inDialog(find.text('Pressure')), findsOneWidget);
+      expect(_inDialog(find.text('Events')), findsOneWidget);
+    });
+
+    testWidgets('single-tank Pressure entry is absent for multi-tank dives', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        testApp(
+          overrides: [
+            settingsProvider.overrideWith((ref) => _TestSettingsNotifier()),
+          ],
+          child: DiveProfileLegend(
+            config: const ProfileLegendConfig(
+              hasPressureData: true,
+              hasMultiTankPressure: true,
+              tanks: _testTanks,
+              tankPressures: {
+                'tank-1': [
+                  TankPressurePoint(
+                    id: 'tp-1',
+                    tankId: 'tank-1',
+                    timestamp: 0,
+                    pressure: 200,
+                  ),
+                ],
+              },
+            ),
+            zoomLevel: 1.0,
+            onZoomIn: () {},
+            onZoomOut: () {},
+            onResetZoom: () {},
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.byIcon(Icons.tune), warnIfMissed: false);
+      await tester.pumpAndSettle();
+
+      // Multi-tank dives use per-tank rows in Tank Pressures instead of the
+      // single "Pressure" toggle.
+      expect(_inDialog(find.text('Pressure')), findsNothing);
     });
   });
 }

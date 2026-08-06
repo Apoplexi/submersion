@@ -92,6 +92,30 @@ class ChartOptionsDialog extends StatelessWidget {
 
     // Overlays section
     final overlayItems = <Widget>[
+      if (config.hasTemperatureData)
+        _buildToggleItem(
+          context,
+          label: context.l10n.diveLog_legend_label_temp,
+          color: Theme.of(context).colorScheme.tertiary,
+          isEnabled: legendState.showTemperature,
+          onTap: legendNotifier.toggleTemperature,
+        ),
+      if (config.hasPressureData && !config.hasMultiTankPressure)
+        _buildToggleItem(
+          context,
+          label: context.l10n.diveLog_legend_label_pressure,
+          color: Colors.orange,
+          isEnabled: legendState.showPressure,
+          onTap: legendNotifier.togglePressure,
+        ),
+      if (config.hasEvents)
+        _buildToggleItem(
+          context,
+          label: context.l10n.diveLog_legend_label_events,
+          color: Colors.amber,
+          isEnabled: legendState.showEvents,
+          onTap: legendNotifier.toggleEvents,
+        ),
       if (config.hasHeartRateData)
         _buildToggleItem(
           context,
