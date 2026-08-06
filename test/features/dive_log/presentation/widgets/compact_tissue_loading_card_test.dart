@@ -110,6 +110,25 @@ void main() {
       expect(opened, 1);
     });
 
+    testWidgets('3D button keeps a minimum touch target on mobile', (
+      tester,
+    ) async {
+      await tester.pumpWidget(buildCard(onOpen3dView: () {}));
+      await tester.pumpAndSettle();
+
+      // The default test platform (android) uses MaterialTapTargetSize.padded,
+      // which must inflate the compact 16px icon to an accessible hit area
+      // (48 minus the compact visual density adjustment).
+      final size = tester.getSize(
+        find.ancestor(
+          of: find.byIcon(Icons.view_in_ar),
+          matching: find.byType(IconButton),
+        ),
+      );
+      expect(size.width, greaterThanOrEqualTo(40));
+      expect(size.height, greaterThanOrEqualTo(40));
+    });
+
     testWidgets('hides the 3D button when no callback is provided', (
       tester,
     ) async {

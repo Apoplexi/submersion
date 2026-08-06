@@ -584,6 +584,10 @@ class _CompactTissueLoadingCardState
   }
 
   Widget _build3dViewButton(ColorScheme colorScheme) {
+    // padding/constraints keep the layout box as tight as the other header
+    // controls; the tap target size is left at the platform default, so
+    // touch platforms get the full 48x48 hit region (padded expands the hit
+    // test area without growing the layout) while desktop stays compact.
     return IconButton(
       icon: Icon(
         Icons.view_in_ar,
@@ -593,10 +597,7 @@ class _CompactTissueLoadingCardState
       tooltip: context.l10n.dive3d_previewTitle,
       padding: EdgeInsets.zero,
       constraints: const BoxConstraints(),
-      style: const ButtonStyle(
-        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-        visualDensity: VisualDensity.compact,
-      ),
+      style: const ButtonStyle(visualDensity: VisualDensity.compact),
       onPressed: widget.onOpen3dView,
     );
   }
