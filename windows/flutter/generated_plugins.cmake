@@ -12,6 +12,7 @@ list(APPEND FLUTTER_PLUGIN_LIST
   gal
   geolocator_windows
   libdivecomputer_plugin
+  local_auth_windows
   objectbox_flutter_libs
   permission_handler_windows
   printing

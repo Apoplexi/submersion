@@ -1,4 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Biometric unlock for App Lock (local_auth) -->
+    <uses-permission android:name="android.permission.USE_BIOMETRIC" />
     <!-- Photo library access for attaching dive photos -->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />

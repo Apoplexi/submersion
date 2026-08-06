@@ -1,10 +1,12 @@
 package app.submersion
 
-import io.flutter.embedding.android.FlutterActivity
+import io.flutter.embedding.android.FlutterFragmentActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
 
-class MainActivity : FlutterActivity() {
+// FlutterFragmentActivity (not FlutterActivity): local_auth's biometric
+// prompt requires a FragmentActivity host.
+class MainActivity : FlutterFragmentActivity() {
     private var metadataHandler: MetadataWriteHandler? = null
     private var localMediaHandler: LocalMediaHandler? = null
 
