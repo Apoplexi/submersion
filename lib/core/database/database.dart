@@ -1306,6 +1306,56 @@ class MediaSpecies extends Table {
   Set<Column> get primaryKey => {id};
 }
 
+/// Repair history (Media section Phase 5, v143).
+///
+/// Deliberately NOT synced and NOT registered in [SyncRepository]: every
+/// row records a device-specific path change, so replaying one device's
+/// history onto another would describe files that never existed there.
+/// Same per-device reasoning as [PendingPhotoSuggestions]. Pruned to the
+/// newest 500 rows by MediaRepairLogRepository.
+class MediaRepairLog extends Table {
+  TextColumn get id => text()();
+  TextColumn get mediaId => text()();
+
+  /// Groups every row written by one apply pass.
+  TextColumn get batchId => text()();
+  IntColumn get occurredAt => integer()();
+
+  /// A `RepairLogAction.name`: relink | cloudBacked | autoRelink.
+  TextColumn get action => text()();
+
+  /// The pointer before and after the repair (path, asset id, or null for
+  /// a cloud-backed conversion's new value).
+  TextColumn get oldValue => text().nullable()();
+  TextColumn get newValue => text().nullable()();
+
+  /// A `RepairLogSource.name`: folder | photoLibrary | store | watcher |
+  /// manual.
+  TextColumn get source => text()();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
+/// A named saved library filter (Media section Phase 5, v143).
+///
+/// Synced like any other user data: the filter is expressed in ids and
+/// enum names that mean the same thing on every device.
+class MediaSmartAlbums extends Table {
+  TextColumn get id => text()();
+  TextColumn get name => text()();
+
+  /// A serialized `MediaLibraryFilter`.
+  TextColumn get filterJson => text()();
+  IntColumn get sortOrder => integer().withDefault(const Constant(0))();
+  IntColumn get createdAt => integer()();
+  IntColumn get updatedAt => integer()();
+  TextColumn get hlc => text().nullable()();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
 /// Pending photo suggestions for background scan feature.
 ///
 /// v106: connector suggestions (Lightroom) reuse this table. For those
@@ -2848,6 +2898,8 @@ String legacyDataSourceId(String diveId) => '$kLegacyDataSourceIdPrefix$diveId';
     MediaEnrichment,
     MediaSpecies,
     PendingPhotoSuggestions,
+    MediaRepairLog,
+    MediaSmartAlbums,
     Settings,
     Buddies,
     DiveBuddies,
@@ -2932,7 +2984,7 @@ class AppDatabase extends _$AppDatabase {
 
   /// The current schema version as a static constant so that pre-open checks
   /// (e.g. version-mismatch guard) can reference it without an instance.
-  static const int currentSchemaVersion = 140;
+  static const int currentSchemaVersion = 143;
 
   /// Every schema version that has a migration block in onUpgrade.
   /// Used to calculate progress step counts. When adding a new migration,
@@ -3107,6 +3159,10 @@ class AppDatabase extends _$AppDatabase {
     139,
     // v140: media.retain_in_library (Media section Phase 1).
     140,
+    // v143: media_repair_log (per-device) + media_smart_albums (synced),
+    // Media section Phase 5. 141 (equipment currency) and 142 (trip return
+    // flight) live on main and arrive with the merge.
+    143,
   ];
 
   /// Idempotent DDL for the v106 connector-suggestion columns (Lightroom
@@ -3718,6 +3774,14 @@ class AppDatabase extends _$AppDatabase {
         );
       }
     }
+  }
+
+  /// v143: Media section Phase 5 tables. createTable is CREATE TABLE IF NOT
+  /// EXISTS, so this is safe to call from both onUpgrade and the beforeOpen
+  /// backstop (parallel-branch collision self-heal).
+  Future<void> _assertMediaPhase5Schema() async {
+    await createMigrator().createTable(mediaRepairLog);
+    await createMigrator().createTable(mediaSmartAlbums);
   }
 
   /// v140: media.retain_in_library (Media section Phase 1). Idempotent; safe
@@ -7318,6 +7382,11 @@ class AppDatabase extends _$AppDatabase {
           await _assertMediaRetainInLibraryColumn();
         }
         if (from < 140) await reportProgress();
+        // v143: repair history + smart albums (Media section Phase 5).
+        if (from < 143) {
+          await _assertMediaPhase5Schema();
+        }
+        if (from < 143) await reportProgress();
       },
       beforeOpen: (details) async {
         // Enable foreign keys
@@ -7341,6 +7410,9 @@ class AppDatabase extends _$AppDatabase {
 
         // v140 backstop: re-assert media.retain_in_library.
         await _assertMediaRetainInLibraryColumn();
+
+        // v143 backstop: re-assert the Phase 5 tables.
+        await _assertMediaPhase5Schema();
 
         // v106 backstop: re-assert connector-suggestion columns (the helper
         // is self-guarding when the suggestions table is absent).
