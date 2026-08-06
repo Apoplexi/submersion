@@ -757,5 +757,95 @@ void main() {
         isNull,
       );
     });
+
+    // Rows written by the pre-normalisation import path hold the INSTANT of a
+    // local DateTime, which MediaRepository then hydrates as UTC -- so their
+    // calendar fields are the capture time plus the host offset, and it is the
+    // raw value, not the restated one, that lines up with a gallery candidate.
+    // Nothing in the schema distinguishes them from correctly-written rows, so
+    // both readings have to be tried or every already-linked photo becomes
+    // unresolvable the moment its platformAssetId goes stale.
+    DateTime legacyStored(DateTime captureLocal) =>
+        DateTime.fromMillisecondsSinceEpoch(
+          captureLocal.millisecondsSinceEpoch,
+          isUtc: true,
+        );
+
+    test('tier 1 still matches a legacy row written as a local instant', () {
+      final capture = DateTime(2025, 6, 15, 10, 30, 0);
+      final item = createTestItem(
+        originalFilename: 'IMG_001.jpg',
+        takenAt: legacyStored(capture),
+      );
+
+      expect(
+        AssetResolutionService.matchByFilenameAndTimestamp(
+          item,
+          candidatesAt(capture),
+        ),
+        equals('local-match'),
+      );
+    });
+
+    test('tier 2 still matches a legacy row written as a local instant', () {
+      final capture = DateTime(2025, 6, 15, 10, 30, 0);
+      final item = createTestItem(
+        originalFilename: '',
+        takenAt: legacyStored(capture),
+      );
+
+      expect(
+        AssetResolutionService.matchByTimestampAndDimensions(
+          item,
+          candidatesAt(capture),
+          tolerance: Duration.zero,
+        ),
+        equals('local-match'),
+      );
+    });
+
+    test('offering both readings still refuses an ambiguous pair', () {
+      // One candidate sits on each reading of the same stored value, so the
+      // row cannot be attributed to either without guessing.
+      final capture = DateTime(2025, 6, 15, 10, 30, 0);
+      final stored = legacyStored(capture);
+      final item = createTestItem(
+        originalFilename: 'IMG_001.jpg',
+        takenAt: stored,
+      );
+
+      final ambiguous = [
+        AssetInfo(
+          id: 'on-legacy-reading',
+          type: AssetType.image,
+          createDateTime: capture,
+          width: 4032,
+          height: 3024,
+          filename: 'IMG_001.jpg',
+        ),
+        AssetInfo(
+          id: 'on-restated-reading',
+          type: AssetType.image,
+          createDateTime: DateTime(
+            stored.year,
+            stored.month,
+            stored.day,
+            stored.hour,
+            stored.minute,
+            stored.second,
+          ),
+          width: 4032,
+          height: 3024,
+          filename: 'IMG_001.jpg',
+        ),
+      ];
+
+      // Vacuous on a UTC host, where the two readings collapse to one and the
+      // list above holds two candidates at the same instant -- still ambiguous.
+      expect(
+        AssetResolutionService.matchByFilenameAndTimestamp(item, ambiguous),
+        isNull,
+      );
+    });
   });
 }

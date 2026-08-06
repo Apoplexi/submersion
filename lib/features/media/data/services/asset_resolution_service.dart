@@ -158,20 +158,27 @@ class AssetResolutionService {
     }
 
     // Step 3: Search gallery by metadata (with query coalescing). The gallery
-    // API takes LOCAL bounds, so the window is built from the same restated
-    // timestamp the matchers below compare against -- see [_asGalleryLocal].
+    // API takes LOCAL bounds, so one narrow window is queried per reading the
+    // matchers below will compare against -- see [_galleryReadings]. Two
+    // +-5s windows keep each query cheap; spanning a single window across both
+    // would cover the whole UTC offset and pull in hours of unrelated assets.
     const timeWindow = Duration(seconds: 5);
-    final galleryTakenAt = _asGalleryLocal(item.takenAt);
-    final start = galleryTakenAt.subtract(timeWindow);
-    final end = galleryTakenAt.add(timeWindow);
-
-    List<AssetInfo> candidates;
-    try {
-      candidates = await _getAssetsCoalesced(start, end);
-    } catch (e) {
-      _log.error('Gallery query failed for media ${item.id}', error: e);
-      return const ResolutionResult(status: ResolutionStatus.unavailable);
+    final byId = <String, AssetInfo>{};
+    for (final reading in _galleryReadings(item.takenAt)) {
+      try {
+        final found = await _getAssetsCoalesced(
+          reading.subtract(timeWindow),
+          reading.add(timeWindow),
+        );
+        for (final asset in found) {
+          byId[asset.id] = asset;
+        }
+      } catch (e) {
+        _log.error('Gallery query failed for media ${item.id}', error: e);
+        return const ResolutionResult(status: ResolutionStatus.unavailable);
+      }
     }
+    final candidates = byId.values.toList();
 
     if (candidates.isEmpty) {
       await _cacheUnresolved(item.id);
@@ -335,13 +342,15 @@ class AssetResolutionService {
     final filename = item.originalFilename;
     if (filename == null || filename.isEmpty) return null;
 
-    final takenAt = _asGalleryLocal(item.takenAt);
+    final readings = _galleryReadings(item.takenAt);
     final matches = candidates.where((c) {
       final candidateName = c.filename;
       if (candidateName == null || candidateName.isEmpty) return false;
       if (candidateName != filename) return false;
-      final diff = c.createDateTime.difference(takenAt).abs();
-      return diff <= const Duration(seconds: 5);
+      return readings.any(
+        (r) =>
+            c.createDateTime.difference(r).abs() <= const Duration(seconds: 5),
+      );
     }).toList();
 
     return matches.length == 1 ? matches.first.id : null;
@@ -363,31 +372,47 @@ class AssetResolutionService {
   }) {
     if (item.width == null || item.height == null) return null;
 
-    final itemSecond = _truncateToSecond(_asGalleryLocal(item.takenAt));
+    final itemSeconds = _galleryReadings(
+      item.takenAt,
+    ).map(_truncateToSecond).toList();
     final matches = candidates.where((c) {
       if (c.width != item.width || c.height != item.height) return false;
-      final diff = _truncateToSecond(
-        c.createDateTime,
-      ).difference(itemSecond).abs();
-      return diff <= tolerance;
+      final candidateSecond = _truncateToSecond(c.createDateTime);
+      return itemSeconds.any(
+        (s) => candidateSecond.difference(s).abs() <= tolerance,
+      );
     }).toList();
 
     return matches.length == 1 ? matches.first.id : null;
   }
 
-  /// Restate a stored [MediaItem.takenAt] in the gallery's own convention.
+  /// The readings of a stored [MediaItem.takenAt] that could line up with a
+  /// gallery candidate's LOCAL [AssetInfo.createDateTime].
   ///
-  /// `taken_at` is persisted wall-clock-as-UTC (the same convention as dive
-  /// entry times), whereas photo_manager reports [AssetInfo.createDateTime] as
-  /// a LOCAL [DateTime]. Comparing the two as instants makes every candidate
-  /// look like it is off by the host's UTC offset, so each tier below matches
-  /// only on a host that happens to run at UTC. Reinterpreting the calendar
-  /// fields as local first means the remaining difference is real clock drift.
+  /// `taken_at` is meant to hold wall-clock-as-UTC (the same convention as dive
+  /// entry times), so restating its calendar fields as local is the correct
+  /// reading and is listed first.
   ///
-  /// A value that is already local is returned unchanged, so rows written
-  /// before the convention was enforced still compare the way they always did.
-  static DateTime _asGalleryLocal(DateTime takenAt) =>
-      TripMediaScanner.wallClockUtcToLocal(takenAt);
+  /// Rows written by the import path before it normalised, however, hold the
+  /// INSTANT of a local [DateTime]; [MediaRepository] hydrates every row as UTC
+  /// regardless, so those rows arrive with their fields shifted by the offset
+  /// that was in force at import and it is the RAW value that already lines up
+  /// with a candidate's instant. Nothing in the schema distinguishes the two
+  /// populations, so both readings are offered rather than guessing: comparing
+  /// only the restated one would make every photo linked before the fix
+  /// unresolvable the moment its `platformAssetId` went stale.
+  ///
+  /// Callers accept a candidate matching EITHER reading, and the tiers keep
+  /// refusing whenever more than one candidate qualifies -- so a library that
+  /// happens to hold a second plausible asset exactly one UTC offset away is
+  /// declined rather than mis-bound.
+  ///
+  /// On a host running at UTC the two coincide and the list collapses to one.
+  static List<DateTime> _galleryReadings(DateTime takenAt) {
+    final restated = TripMediaScanner.wallClockUtcToLocal(takenAt);
+    if (restated.isAtSameMomentAs(takenAt)) return [restated];
+    return [restated, takenAt];
+  }
 
   /// Both sides are compared at second granularity so [Duration.zero] means
   /// "the same capture second" rather than "the same instant".
