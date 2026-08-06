@@ -10810,6 +10810,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String get equipment_serviceDialog_costLabel => 'Koltseg';
 
   @override
+  String get equipment_serviceDialog_currencyLabel => 'Penznem';
+
+  @override
   String get equipment_serviceDialog_costValidation =>
       'Adjon meg ervenyes osszeget';
 
@@ -15149,6 +15152,12 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get settings_units_sacRate => 'SAC ertek';
+
+  @override
+  String get settings_units_defaultCurrency => 'Alapértelmezett pénznem';
+
+  @override
+  String get settings_units_dialog_defaultCurrency => 'Alapértelmezett pénznem';
 
   @override
   String get settings_units_sac_pressurePerMinute => 'Nyomas percenként';

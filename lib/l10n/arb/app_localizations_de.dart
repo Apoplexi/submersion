@@ -10833,6 +10833,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get equipment_serviceDialog_costLabel => 'Kosten';
 
   @override
+  String get equipment_serviceDialog_currencyLabel => 'Währung';
+
+  @override
   String get equipment_serviceDialog_costValidation =>
       'Geben Sie einen gültigen Betrag ein';
 
@@ -15176,6 +15179,12 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get settings_units_sacRate => 'AMV';
+
+  @override
+  String get settings_units_defaultCurrency => 'Standardwährung';
+
+  @override
+  String get settings_units_dialog_defaultCurrency => 'Standardwährung';
 
   @override
   String get settings_units_sac_pressurePerMinute => 'Druck pro Minute';

@@ -14,6 +14,7 @@ import 'package:submersion/features/auto_update/presentation/providers/update_pr
 import 'package:riverpod/src/framework.dart' as riverpod show Override;
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/core/constants/units.dart';
+import 'package:submersion/core/utils/currency.dart';
 import 'package:submersion/core/deco/entities/cns_calculation_method.dart';
 import 'package:submersion/features/divers/data/repositories/diver_repository.dart'
     show DeleteDiverResult;
@@ -99,6 +100,10 @@ class _MockSettingsNotifier extends StateNotifier<AppSettings>
   @override
   Future<void> setSacUnit(SacUnit unit) async =>
       state = state.copyWith(sacUnit: unit);
+
+  @override
+  Future<void> setDefaultCurrency(String currencyCode) async =>
+      state = state.copyWith(defaultCurrency: currencyCode);
   @override
   Future<void> setAltitudeUnit(AltitudeUnit unit) async =>
       state = state.copyWith(altitudeUnit: unit);
@@ -1486,6 +1491,124 @@ void main() {
 
       expect(find.text('Units'), findsOneWidget);
       expect(tester.takeException(), isNull);
+    });
+  });
+
+  group('UnitsSectionContent default currency', () {
+    Widget buildUnitsWidget(List<Override> overrides) {
+      final router = GoRouter(
+        initialLocation: '/settings?selected=units',
+        routes: [
+          GoRoute(
+            path: '/settings',
+            builder: (context, state) => const SettingsPage(),
+          ),
+        ],
+      );
+      return ProviderScope(
+        overrides: overrides,
+        child: MaterialApp.router(
+          routerConfig: router,
+          // Pin the locale so the English string-based finders below are
+          // deterministic regardless of the host environment locale.
+          locale: const Locale('en'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+        ),
+      );
+    }
+
+    Future<void> openPicker(WidgetTester tester) async {
+      await tester.scrollUntilVisible(find.text('Default Currency'), 200);
+      await tester.ensureVisible(find.text('Default Currency'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Default Currency'));
+      await tester.pumpAndSettle();
+    }
+
+    testWidgets('the tile shows the persisted currency code', (tester) async {
+      await tester.pumpWidget(
+        buildUnitsWidget(
+          getOverrides(const AppSettings(defaultCurrency: 'EUR')),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.scrollUntilVisible(find.text('Default Currency'), 200);
+      await tester.pumpAndSettle();
+
+      expect(find.text('EUR'), findsOneWidget);
+    });
+
+    testWidgets('the picker lists the preset codes with their symbols', (
+      tester,
+    ) async {
+      await tester.pumpWidget(buildUnitsWidget(getOverrides()));
+      await tester.pumpAndSettle();
+      await openPicker(tester);
+
+      expect(find.byType(AlertDialog), findsOneWidget);
+      expect(find.text('EUR  €'), findsOneWidget);
+      expect(find.text('GBP  £'), findsOneWidget);
+      // The current selection is ticked (scoped to the dialog - the page
+      // behind it has check icons of its own).
+      expect(
+        find.descendant(
+          of: find.byType(AlertDialog),
+          matching: find.byIcon(Icons.check),
+        ),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('picking a currency persists it and closes the dialog', (
+      tester,
+    ) async {
+      await tester.pumpWidget(buildUnitsWidget(getOverrides()));
+      await tester.pumpAndSettle();
+      await openPicker(tester);
+
+      await tester.tap(find.text('EUR  €'));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(AlertDialog), findsNothing);
+      expect(find.text('EUR'), findsOneWidget);
+    });
+
+    testWidgets('cancelling leaves the currency unchanged', (tester) async {
+      await tester.pumpWidget(buildUnitsWidget(getOverrides()));
+      await tester.pumpAndSettle();
+      await openPicker(tester);
+
+      await tester.tap(find.text('Cancel'));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(AlertDialog), findsNothing);
+      expect(find.text('USD'), findsOneWidget);
+    });
+
+    testWidgets('a stored code outside the presets stays selectable', (
+      tester,
+    ) async {
+      // Currency is free text elsewhere in the app, so the picker must offer
+      // the persisted value even when it is not one of the presets.
+      await tester.pumpWidget(
+        buildUnitsWidget(
+          getOverrides(const AppSettings(defaultCurrency: 'ISK')),
+        ),
+      );
+      await tester.pumpAndSettle();
+      await openPicker(tester);
+
+      // Listed with its symbol in the dialog, and ticked as the current value.
+      expect(find.text('ISK  ${currencySymbol('ISK')}'), findsOneWidget);
+      expect(
+        find.descendant(
+          of: find.byType(AlertDialog),
+          matching: find.byIcon(Icons.check),
+        ),
+        findsOneWidget,
+      );
     });
   });
 }

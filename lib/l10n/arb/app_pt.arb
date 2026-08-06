@@ -1,4 +1,6 @@
 {
+  "settings_units_defaultCurrency": "Moeda padrão",
+  "settings_units_dialog_defaultCurrency": "Moeda padrão",
   "diveSites_list_menu_select": "Selecionar pontos",
   "diveLog_edit_flightWindowWarning": "Este mergulho termina depois do último horário seguro para emergir antes do seu voo ({time})",
   "@diveLog_edit_flightWindowWarning": {
@@ -3417,6 +3419,7 @@
   "equipment_serviceDialog_clearNextServiceDateTooltip": "Limpar Data da Proxima Manutencao",
   "equipment_serviceDialog_costHint": "0,00",
   "equipment_serviceDialog_costLabel": "Custo",
+  "equipment_serviceDialog_currencyLabel": "Moeda",
   "equipment_serviceDialog_costValidation": "Insira um valor valido",
   "equipment_serviceDialog_editTitle": "Editar Registro de Manutencao",
   "equipment_serviceDialog_nextServiceDueLabel": "Proxima Manutencao",

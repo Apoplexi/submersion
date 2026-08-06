@@ -195,20 +195,32 @@ class ServiceRecordRepository {
     return results.map(_mapCustomRowToServiceRecord).toList();
   }
 
-  /// Get total cost of services for an equipment item
-  Future<double> getTotalServiceCost(String equipmentId) async {
-    final result = await _db
+  /// Total service cost for an equipment item, keyed by the currency each
+  /// record was priced in.
+  ///
+  /// Grouped rather than summed into one figure: records can carry different
+  /// currencies, and adding them together would produce a number that is not
+  /// a real amount in any of them.
+  Future<Map<String, double>> getTotalServiceCostByCurrency(
+    String equipmentId,
+  ) async {
+    final results = await _db
         .customSelect(
           '''
-      SELECT COALESCE(SUM(cost), 0) as total
+      SELECT currency, COALESCE(SUM(cost), 0) as total
       FROM service_records
-      WHERE equipment_id = ?
+      WHERE equipment_id = ? AND cost IS NOT NULL
+      GROUP BY currency
     ''',
           variables: [Variable.withString(equipmentId)],
         )
-        .getSingle();
+        .get();
 
-    return (result.data['total'] as num?)?.toDouble() ?? 0.0;
+    return {
+      for (final row in results)
+        (row.data['currency'] as String?) ?? '':
+            (row.data['total'] as num?)?.toDouble() ?? 0.0,
+    };
   }
 
   /// Get service record count for an equipment item

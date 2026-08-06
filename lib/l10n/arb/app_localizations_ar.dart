@@ -10653,6 +10653,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get equipment_serviceDialog_costLabel => 'التكلفة';
 
   @override
+  String get equipment_serviceDialog_currencyLabel => 'العملة';
+
+  @override
   String get equipment_serviceDialog_costValidation => 'أدخل مبلغاً صالحاً';
 
   @override
@@ -14922,6 +14925,12 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get settings_units_sacRate => 'معدل SAC';
+
+  @override
+  String get settings_units_defaultCurrency => 'العملة الافتراضية';
+
+  @override
+  String get settings_units_dialog_defaultCurrency => 'العملة الافتراضية';
 
   @override
   String get settings_units_sac_pressurePerMinute => 'الضغط في الدقيقة';

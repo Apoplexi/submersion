@@ -10837,6 +10837,9 @@ class AppLocalizationsIt extends AppLocalizations {
   String get equipment_serviceDialog_costLabel => 'Costo';
 
   @override
+  String get equipment_serviceDialog_currencyLabel => 'Valuta';
+
+  @override
   String get equipment_serviceDialog_costValidation =>
       'Inserisci un importo valido';
 
@@ -15192,6 +15195,12 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get settings_units_sacRate => 'SAC Rate';
+
+  @override
+  String get settings_units_defaultCurrency => 'Valuta predefinita';
+
+  @override
+  String get settings_units_dialog_defaultCurrency => 'Valuta predefinita';
 
   @override
   String get settings_units_sac_pressurePerMinute => 'Pressione al minuto';

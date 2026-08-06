@@ -1,4 +1,6 @@
 {
+  "settings_units_defaultCurrency": "Alapértelmezett pénznem",
+  "settings_units_dialog_defaultCurrency": "Alapértelmezett pénznem",
   "diveSites_list_menu_select": "Merülőhelyek kiválasztása",
   "diveLog_edit_flightWindowWarning": "Ez a merülés a járatod előtti utolsó biztonságos felszínre érési idő után ér véget ({time})",
   "@diveLog_edit_flightWindowWarning": {
@@ -3345,6 +3347,7 @@
   "equipment_serviceDialog_clearNextServiceDateTooltip": "Kovetkezo szerviz datum torlese",
   "equipment_serviceDialog_costHint": "0.00",
   "equipment_serviceDialog_costLabel": "Koltseg",
+  "equipment_serviceDialog_currencyLabel": "Penznem",
   "equipment_serviceDialog_costValidation": "Adjon meg ervenyes osszeget",
   "equipment_serviceDialog_editTitle": "Szervizrekord szerkesztese",
   "equipment_serviceDialog_nextServiceDueLabel": "Kovetkezo szerviz esedekesseg",

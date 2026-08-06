@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:drift/native.dart';
@@ -266,11 +267,30 @@ class DatabaseService {
     if (_database == null) return;
 
     if (strict) {
-      // No onTimeout swallow: a timeout throws TimeoutException. Clear the
-      // reference only after the close actually completed — on failure we
-      // keep it so the connection (and its locks) is not leaked and a
-      // retry can re-attempt the close before reopening.
-      await _database!.close().timeout(const Duration(seconds: 5));
+      // Graceful close first, but only briefly: GeneratedDatabase.close()
+      // awaits streamQueries.close(), which hangs for as long as ANY watch()
+      // subscription is paused — and Riverpod 3 auto-pauses the streams of
+      // providers nobody is currently listening to, so a mid-session restore
+      // almost always has one. Trusting the graceful close with a throwing
+      // timeout here made large-DB restores fail with TimeoutException until
+      // retried. On a hang, fall through and close the executor directly:
+      // idempotent when the graceful close got that far, and it sends the
+      // shutdown request the hung close never reached. Skipping the
+      // stream-store cleanup is safe on this path — the connection is being
+      // replaced, and the old stream subscriptions die with it.
+      final graceful = _database!.close();
+      try {
+        await graceful.timeout(const Duration(seconds: 2));
+      } on TimeoutException {
+        graceful.ignore();
+        // No onTimeout swallow: if even the direct executor close cannot get
+        // an acknowledgment, the connection is genuinely stuck and the caller
+        // must not race the file swap. Clear the reference only after the
+        // close actually completed — on failure we keep it so the connection
+        // (and its locks) is not leaked and a retry can re-attempt the close
+        // before reopening.
+        await _database!.executor.close().timeout(const Duration(seconds: 5));
+      }
       // Drift acknowledges the shutdown request before the worker isolate
       // runs sqlite3_close_v2, so the await above does NOT mean the file is
       // closed. A caller about to reopen the same file must wait for the
@@ -409,7 +429,15 @@ class DatabaseService {
   @visibleForTesting
   void Function(String stagingPath)? debugOnRestoreWindowOpen;
 
-  Future<void> restore(String backupPath) async {
+  /// Swap the live database for [backupPath].
+  ///
+  /// [onMigrationProgress] is forwarded to the post-swap [initialize]: when
+  /// the restored file carries an older schema, the reopen runs the upgrade
+  /// ladder, and this callback is the only feedback the user gets during it.
+  Future<void> restore(
+    String backupPath, {
+    void Function(int currentStep, int totalSteps)? onMigrationProgress,
+  }) async {
     final backupFile = File(backupPath);
     final destinationPath = await databasePath;
 
@@ -488,8 +516,9 @@ class DatabaseService {
     }
 
     // Reopen on the swapped-in file BEFORE dropping the pre-restore copy, so a
-    // cleanup hiccup can never prevent the reopen.
-    await initialize();
+    // cleanup hiccup can never prevent the reopen. An older-schema backup runs
+    // its migration ladder here; surface its progress to the caller.
+    await initialize(onMigrationProgress: onMigrationProgress);
 
     // The database is open again on the restored file; the pre-restore copy is
     // no longer needed. Its deletion is best-effort — a transient failure (e.g.

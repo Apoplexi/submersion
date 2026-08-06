@@ -603,8 +603,10 @@ class _FakeBackupDatabaseAdapter implements BackupDatabaseAdapter {
       throw UnimplementedError('not used');
 
   @override
-  Future<void> restore(String backupPath) async =>
-      throw UnimplementedError('not used');
+  Future<void> restore(
+    String backupPath, {
+    void Function(int, int)? onMigrationProgress,
+  }) async => throw UnimplementedError('not used');
 
   @override
   Future<String> get databasePath async => '/fake/db/path';
@@ -634,6 +636,7 @@ class _RecordingRestoreService extends BackupService {
     BackupRecord record, {
     RestoreMode mode = RestoreMode.merge,
     String? encryptionSecret,
+    void Function(int currentStep, int totalSteps)? onMigrationProgress,
   }) async {
     calls.add('restoreFromBackup');
     lastMode = mode;
@@ -644,6 +647,7 @@ class _RecordingRestoreService extends BackupService {
     String filePath, {
     RestoreMode mode = RestoreMode.merge,
     String? encryptionSecret,
+    void Function(int currentStep, int totalSteps)? onMigrationProgress,
   }) async {
     calls.add('restoreFromFile');
     lastMode = mode;
