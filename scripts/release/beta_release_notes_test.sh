@@ -1,0 +1,247 @@
+#!/usr/bin/env bash
+# Tests for beta_release_notes.sh: the per-beta "what to test" text handed to
+# TestFlight and Play open testing. Before this script existed the store lanes
+# shipped a fixed "automated per-merge build" string, so testers had no way to
+# tell what a beta actually changed.
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+GEN="$SCRIPT_DIR/beta_release_notes.sh"
+
+fail() { echo "FAIL: $1"; exit 1; }
+
+# --- Grouping and prefix stripping -----------------------------------------
+
+SUBJECTS=$(printf '%s\n' \
+  'feat(sync): add incremental changesets' \
+  'fix: stop the profile chart flickering' \
+  'perf: cache the tissue grid' \
+  'chore: bump deps' \
+  'ci: retain 30 betas' \
+  'docs: update the readme' \
+  'test: cover the gauge provider' \
+  'refactor: extract a helper')
+
+OUT=$(printf '%s\n' "$SUBJECTS" | "$GEN" --stdin --format store)
+
+echo "$OUT" | grep -q "New in this build" || fail "store output missing the new-work heading"
+echo "$OUT" | grep -q "add incremental changesets" || fail "feat subject missing"
+echo "$OUT" | grep -q "stop the profile chart flickering" || fail "fix subject missing"
+echo "$OUT" | grep -q "cache the tissue grid" || fail "perf subject missing"
+echo "$OUT" | grep -q "feat(sync):" && fail "conventional-commit prefix was not stripped"
+echo "$OUT" | grep -q "bump deps" && fail "chore leaked into tester-facing notes"
+echo "$OUT" | grep -q "retain 30 betas" && fail "ci leaked into tester-facing notes"
+echo "$OUT" | grep -q "update the readme" && fail "docs leaked into tester-facing notes"
+echo "$OUT" | grep -q "cover the gauge provider" && fail "test leaked into tester-facing notes"
+echo "$OUT" | grep -q "extract a helper" && fail "refactor leaked into tester-facing notes"
+
+# Fixes must be separated from new work so testers can target their testing.
+echo "$OUT" | grep -q "Fixed" || fail "store output missing the fixes heading"
+
+# --- Breaking-change and scope variants ------------------------------------
+
+OUT=$(printf '%s\n' 'feat!: drop the legacy importer' 'fix(ios)!: correct the BLE handshake' \
+  | "$GEN" --stdin --format store)
+echo "$OUT" | grep -q "drop the legacy importer" || fail "breaking feat subject missing"
+echo "$OUT" | grep -q "correct the BLE handshake" || fail "scoped breaking fix subject missing"
+echo "$OUT" | grep -qE '(feat|fix)[(!]' && fail "breaking-change prefix was not stripped"
+
+# --- Duplicate subjects collapse -------------------------------------------
+
+OUT=$(printf '%s\n' 'fix: same thing' 'fix: same thing' 'fix: same thing' \
+  | "$GEN" --stdin --format store)
+[ "$(echo "$OUT" | grep -c "same thing")" -eq 1 ] || fail "duplicate subjects were not collapsed"
+
+# --- Play's 500-character limit --------------------------------------------
+# Google rejects a release-notes body over 500 chars per locale, so the play
+# format must cap itself rather than fail the upload.
+
+LONG=$(for i in $(seq 1 60); do
+  echo "feat: add a fairly wordy feature number $i that eats up characters"
+done)
+
+OUT=$(printf '%s\n' "$LONG" | "$GEN" --stdin --format play)
+LEN=${#OUT}
+[ "$LEN" -le 500 ] || fail "play format emitted $LEN chars, over Google's 500 limit"
+[ "$LEN" -gt 0 ] || fail "play format emitted nothing"
+echo "$OUT" | grep -q "more" || fail "play format truncated without telling the reader more was cut"
+
+# --- TestFlight's 4000-character limit --------------------------------------
+
+HUGE=$(for i in $(seq 1 400); do
+  echo "feat: add a fairly wordy feature number $i that eats up characters"
+done)
+
+OUT=$(printf '%s\n' "$HUGE" | "$GEN" --stdin --format store)
+LEN=${#OUT}
+[ "$LEN" -le 4000 ] || fail "store format emitted $LEN chars, over Apple's 4000 limit"
+[ "$LEN" -gt 0 ] || fail "store format emitted nothing"
+
+# Truncation must land on an item boundary, never mid-word.
+echo "$OUT" | grep -q "characters$" || echo "$OUT" | grep -q "more" \
+  || fail "store truncation did not end cleanly"
+
+# --- Empty and no-user-facing-work cases ------------------------------------
+# whatsNew must never be blank: Apple shows the field verbatim, and an empty
+# string reads to a tester as "the previous build's notes still apply".
+
+OUT=$(printf '' | "$GEN" --stdin --format store)
+[ -n "$OUT" ] || fail "empty range produced empty store notes"
+
+OUT=$(printf '%s\n' 'chore: bump deps' 'ci: tweak a workflow' | "$GEN" --stdin --format store)
+[ -n "$OUT" ] || fail "internal-only range produced empty store notes"
+echo "$OUT" | grep -qi "internal" || fail "internal-only range should say so explicitly"
+
+# --- The placeholder this script replaces must never reappear ---------------
+
+OUT=$(printf '%s\n' 'feat: something real' | "$GEN" --stdin --format store)
+echo "$OUT" | grep -q "automated per-merge build" \
+  && fail "output still contains the placeholder string it was written to replace"
+
+# --- Markdown format for the GitHub beta release ----------------------------
+
+OUT=$(printf '%s\n' 'feat: a new thing' 'fix: an old thing' 'chore: noise' \
+  | "$GEN" --stdin --format markdown)
+echo "$OUT" | grep -q "^### " || fail "markdown format missing section headings"
+echo "$OUT" | grep -q "^- a new thing" || fail "markdown format missing bullet for feat"
+echo "$OUT" | grep -q "^- an old thing" || fail "markdown format missing bullet for fix"
+
+# The markdown format is the GitHub release body, where the full engineering
+# history is useful, so it keeps internal work under its own heading.
+echo "$OUT" | grep -q "noise" || fail "markdown format dropped internal work entirely"
+
+# --- Progress output must not contaminate stdout ----------------------------
+# generate_changelog.sh wrote its progress lines to stdout, which embedded
+# "Found N commit(s)" at the top of every published beta release body.
+
+OUT=$(printf '%s\n' 'feat: a new thing' | "$GEN" --stdin --format markdown 2>/dev/null)
+echo "$OUT" | grep -qiE "^(found|changelog:|generating)" \
+  && fail "progress output leaked onto stdout"
+
+# --- Argument validation ----------------------------------------------------
+
+if printf '' | "$GEN" --stdin --format bogus >/dev/null 2>&1; then
+  fail "an unknown --format was accepted"
+fi
+
+if "$GEN" --format store >/dev/null 2>&1; then
+  fail "missing --range/--stdin was accepted"
+fi
+
+# --- --since against a real repository --------------------------------------
+# The beta pipeline knows the previous beta's commit but not a git range, and
+# on the very first beta it knows nothing at all. Both must work.
+
+TMPREPO=$(mktemp -d)
+trap 'rm -rf "$TMPREPO"' EXIT
+(
+  cd "$TMPREPO"
+  git init -q .
+  git config user.email t@example.com
+  git config user.name Test
+  git commit -q --allow-empty -m 'feat: the baseline feature'
+  git tag v0.0.1.1
+  BASE=$(git rev-parse HEAD)
+  git commit -q --allow-empty -m 'feat: the new feature'
+  # The repository carries Flutter's own upstream tags alongside the app's.
+  # Those are 3-segment, and an unfiltered `git describe` picks them up.
+  git tag v3.13.0
+  git commit -q --allow-empty -m 'chore: internal noise'
+  echo "$BASE" > .base
+)
+BASE=$(cat "$TMPREPO/.base")
+
+OUT=$(cd "$TMPREPO" && "$GEN" --since "$BASE" --format store 2>/dev/null)
+echo "$OUT" | grep -q "the new feature" || fail "--since did not include commits after the baseline"
+echo "$OUT" | grep -q "the baseline feature" \
+  && fail "--since included the baseline commit itself"
+
+# An empty --since is the first-beta case: fall back to the last tag rather
+# than failing, so the very first beta still gets real notes.
+# The fallback must land on the app's 4-segment tag, not the Flutter tag that
+# sits closer to HEAD; picking the wrong one silently drops real changes.
+OUT=$(cd "$TMPREPO" && "$GEN" --since "" --format store 2>/dev/null)
+echo "$OUT" | grep -q "the new feature" \
+  || fail "empty --since fell back to a Flutter tag instead of the app's 4-segment tag"
+echo "$OUT" | grep -q "the baseline feature" \
+  && fail "empty --since should start from the last tag, not the beginning"
+
+# --- Cumulative section for the GitHub beta release body --------------------
+# A tester coming straight from the public release needs the whole picture, not
+# just this beta's delta. The GitHub body is uncapped, so it carries both.
+
+TMPREPO2=$(mktemp -d)
+trap 'rm -rf "$TMPREPO" "$TMPREPO2"' EXIT
+(
+  cd "$TMPREPO2"
+  git init -q .
+  git config user.email t@example.com
+  git config user.name Test
+  git commit -q --allow-empty -m 'feat: the shipped feature'
+  git tag v0.0.1.1                       # last production release
+  git commit -q --allow-empty -m 'feat: an earlier beta feature'
+  git tag v3.13.0                        # a Flutter upstream tag, must be ignored
+  git commit -q --allow-empty -m 'chore: internal noise'
+  PREV_BETA=$(git rev-parse HEAD)
+  git commit -q --allow-empty -m 'fix: a fix only in this beta'
+  echo "$PREV_BETA" > .prev
+)
+PREV_BETA=$(cat "$TMPREPO2/.prev")
+
+OUT=$(cd "$TMPREPO2" && "$GEN" --since "$PREV_BETA" --format markdown --cumulative 2>/dev/null)
+
+echo "$OUT" | grep -q "^## New in this beta" || fail "cumulative mode missing the per-beta heading"
+echo "$OUT" | grep -q "^## Everything since v0.0.1.1" \
+  || fail "cumulative heading missing or naming the wrong baseline tag"
+
+# The baseline must be the last production tag, not the Flutter tag nearer HEAD.
+echo "$OUT" | grep -q "^## Everything since v3.13.0" \
+  && fail "cumulative section anchored to a Flutter upstream tag"
+
+# Split at the cumulative heading and check what landed on each side.
+INCREMENTAL=$(echo "$OUT" | sed -n '1,/^## Everything since/p')
+CUMULATIVE=$(echo "$OUT" | sed -n '/^## Everything since/,$p')
+
+echo "$INCREMENTAL" | grep -q "a fix only in this beta" \
+  || fail "per-beta section missing this beta's own change"
+echo "$INCREMENTAL" | grep -q "an earlier beta feature" \
+  && fail "per-beta section leaked a change from an earlier beta"
+
+echo "$CUMULATIVE" | grep -q "an earlier beta feature" \
+  || fail "cumulative section missing an earlier beta's change"
+echo "$CUMULATIVE" | grep -q "a fix only in this beta" \
+  || fail "cumulative section missing this beta's change"
+
+# Work already in production must not be replayed in either section.
+echo "$OUT" | grep -q "the shipped feature" \
+  && fail "already-released work appeared in the beta notes"
+
+# Without the flag the output stays exactly as it was.
+OUT=$(cd "$TMPREPO2" && "$GEN" --since "$PREV_BETA" --format markdown 2>/dev/null)
+echo "$OUT" | grep -q "^## " && fail "non-cumulative markdown gained a section heading"
+echo "$OUT" | grep -q "an earlier beta feature" \
+  && fail "non-cumulative markdown included earlier betas"
+
+# With no production tag at all there is nothing to be cumulative against, and
+# the body must still be valid rather than carrying an empty section.
+TMPREPO3=$(mktemp -d)
+trap 'rm -rf "$TMPREPO" "$TMPREPO2" "$TMPREPO3"' EXIT
+(
+  cd "$TMPREPO3"
+  git init -q .
+  git config user.email t@example.com
+  git config user.name Test
+  git commit -q --allow-empty -m 'feat: the very first feature'
+)
+OUT=$(cd "$TMPREPO3" && "$GEN" --since "" --format markdown --cumulative 2>/dev/null)
+[ -n "$OUT" ] || fail "cumulative mode with no tags produced nothing"
+echo "$OUT" | grep -q "^## Everything since" \
+  && fail "cumulative section emitted with no production tag to anchor it"
+echo "$OUT" | grep -q "the very first feature" || fail "first-ever build lost its notes"
+
+# The cumulative section is meaningless for the length-capped store formats.
+if (cd "$TMPREPO2" && "$GEN" --since "$PREV_BETA" --format store --cumulative) >/dev/null 2>&1; then
+  fail "--cumulative was accepted for the store format"
+fi
+
+echo "PASS: all beta_release_notes tests passed"

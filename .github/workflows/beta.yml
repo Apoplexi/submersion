@@ -34,6 +34,10 @@ jobs:
       tag: ${{ steps.version.outputs.tag }}
       build-number: ${{ steps.version.outputs.build-number }}
       sha: ${{ steps.version.outputs.sha }}
+      # The previous beta's source commit. Every downstream job derives its
+      # release notes from prev-sha..sha, so testers see what changed in this
+      # beta rather than everything since the last stable release.
+      prev-sha: ${{ steps.gate.outputs.prev-sha }}
     steps:
       - uses: actions/checkout@v7
         with:
@@ -81,9 +85,14 @@ jobs:
           fi
           if [ -z "$PREV_SHA" ] || ! git rev-parse --verify --quiet "${PREV_SHA}^{commit}" >/dev/null; then
             echo "No previous beta baseline; proceeding."
+            # Leave prev-sha empty: the notes generator falls back to the last
+            # tag, which is the best available baseline when there is no prior
+            # beta to diff against.
+            echo "prev-sha=" >> "$GITHUB_OUTPUT"
             echo "proceed=true" >> "$GITHUB_OUTPUT"
             exit 0
           fi
+          echo "prev-sha=${PREV_SHA}" >> "$GITHUB_OUTPUT"
           if [ "$PREV_SHA" = "$(git rev-parse HEAD)" ]; then
             echo "HEAD already published as a beta; skipping."
             echo "proceed=false" >> "$GITHUB_OUTPUT"
@@ -103,6 +112,38 @@ jobs:
             esac
           done <<< "$(git diff --name-only "${PREV_SHA}..HEAD")"
           echo "proceed=$code" >> "$GITHUB_OUTPUT"
+
+      # Generated once, here, because this is the only job with full history
+      # (fetch-depth: 0). Sharing one artifact also keeps TestFlight, Play and
+      # the GitHub beta release describing the build identically, which they
+      # did not when each lane supplied its own text.
+      - name: Generate beta release notes
+        if: steps.gate.outputs.proceed == 'true'
+        env:
+          PREV_SHA: ${{ steps.gate.outputs.prev-sha }}
+        run: |
+          set -euo pipefail
+          ./scripts/release/beta_release_notes.sh --since "$PREV_SHA" --format store \
+            > beta-notes-store.txt
+          ./scripts/release/beta_release_notes.sh --since "$PREV_SHA" --format play \
+            > beta-notes-play.txt
+          # The GitHub body is uncapped, so it carries this beta's delta plus a
+          # cumulative section for testers arriving from the public release.
+          ./scripts/release/beta_release_notes.sh --since "$PREV_SHA" --format markdown \
+            --cumulative > beta-notes.md
+          echo "--- TestFlight whatsNew ---"
+          cat beta-notes-store.txt
+
+      - name: Upload beta release notes
+        if: steps.gate.outputs.proceed == 'true'
+        uses: actions/upload-artifact@v7
+        with:
+          name: beta-notes
+          path: |
+            beta-notes-store.txt
+            beta-notes-play.txt
+            beta-notes.md
+          retention-days: 5
 
   build:
     name: Build
@@ -133,10 +174,14 @@ jobs:
           path: artifacts
           merge-multiple: true
 
-      - name: Generate release notes
+      # Uses the notes precheck generated, so the GitHub release, TestFlight and
+      # Play all describe the same build the same way. generate_changelog.sh is
+      # scoped to the last stable tag, which on a mid-release beta meant a body
+      # covering hundreds of commits already shipped in earlier betas.
+      - name: Prepare release notes
         run: |
           set -euo pipefail
-          ./scripts/release/generate_changelog.sh --notes-only > release-notes.md
+          cp artifacts/beta-notes.md release-notes.md
           ./scripts/generate_release_notes_html.sh < release-notes.md > release-notes.html
 
       - name: Generate checksums and metadata
@@ -251,13 +296,29 @@ jobs:
         with:
           name: ios-ipa
 
+      - name: Download beta release notes
+        uses: actions/download-artifact@v8
+        with:
+          name: beta-notes
+
+      # "What to Test" is the only place a TestFlight tester learns what a build
+      # changed. It used to be a fixed string, so every beta looked identical
+      # and testers had nothing to aim at.
+      - name: Load release notes into the environment
+        run: |
+          set -euo pipefail
+          {
+            echo 'BETA_CHANGELOG<<BETA_NOTES_EOF'
+            cat "$GITHUB_WORKSPACE/beta-notes-store.txt"
+            echo 'BETA_NOTES_EOF'
+          } >> "$GITHUB_ENV"
+
       - name: Upload to TestFlight (Public Beta)
         working-directory: ios
         env:
           APP_STORE_CONNECT_API_KEY_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_KEY_ID }}
           APP_STORE_CONNECT_API_KEY_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ISSUER_ID }}
           APP_STORE_CONNECT_API_KEY_KEY_FILEPATH: fastlane/AuthKey.p8
-          BETA_CHANGELOG: "Beta ${{ needs.precheck.outputs.tag }} - automated per-merge build."
         run: |
           IPA_PATH=$(ls $GITHUB_WORKSPACE/Submersion-*-iOS.ipa 2>/dev/null | head -1)
           if [ -z "$IPA_PATH" ]; then
@@ -311,13 +372,26 @@ jobs:
         with:
           name: macos-pkg
 
+      - name: Download beta release notes
+        uses: actions/download-artifact@v8
+        with:
+          name: beta-notes
+
+      - name: Load release notes into the environment
+        run: |
+          set -euo pipefail
+          {
+            echo 'BETA_CHANGELOG<<BETA_NOTES_EOF'
+            cat "$GITHUB_WORKSPACE/beta-notes-store.txt"
+            echo 'BETA_NOTES_EOF'
+          } >> "$GITHUB_ENV"
+
       - name: Upload to TestFlight (Public Beta)
         working-directory: macos
         env:
           APP_STORE_CONNECT_API_KEY_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_KEY_ID }}
           APP_STORE_CONNECT_API_KEY_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ISSUER_ID }}
           APP_STORE_CONNECT_API_KEY_KEY_FILEPATH: fastlane/AuthKey.p8
-          BETA_CHANGELOG: "Beta ${{ needs.precheck.outputs.tag }} - automated per-merge build."
         run: |
           # The Mac App Store package keeps its fixed name (no tag prefix).
           PKG_PATH="$GITHUB_WORKSPACE/Submersion.pkg"
@@ -375,11 +449,19 @@ jobs:
         with:
           name: android-aab
 
+      - name: Download beta release notes
+        uses: actions/download-artifact@v8
+        with:
+          name: beta-notes
+
       - name: Upload to Play open testing
         working-directory: android
         env:
           GOOGLE_PLAY_JSON_KEY_PATH: fastlane/play-store-key.json
+          PLAY_VERSION_CODE: ${{ needs.precheck.outputs.build-number }}
         run: |
+          PLAY_BETA_CHANGELOG=$(cat "$GITHUB_WORKSPACE/beta-notes-play.txt")
+          export PLAY_BETA_CHANGELOG
           for attempt in 1 2; do
             if bundle exec fastlane upload_beta; then
               break

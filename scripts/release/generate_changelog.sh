@@ -63,14 +63,16 @@ else
   PREV_TAG=$(git describe --tags --abbrev=0 HEAD 2>/dev/null || echo "")
 fi
 
+# Progress goes to stderr: --notes-only is redirected into a release body, and
+# these lines were being published as part of it.
 if [ -n "$PREV_TAG" ]; then
   COMMIT_RANGE="${PREV_TAG}..HEAD"
-  echo "Changelog: $SEMVER (commits since $PREV_TAG)"
+  echo "Changelog: $SEMVER (commits since $PREV_TAG)" >&2
 else
   COMMIT_RANGE="HEAD"
-  echo "Changelog: $SEMVER (all commits, no previous tag found)"
+  echo "Changelog: $SEMVER (all commits, no previous tag found)" >&2
 fi
-echo ""
+echo "" >&2
 
 # --- Map commit type to section header ---
 section_header() {
@@ -133,8 +135,8 @@ $(git log --format='%s' --no-merges $COMMIT_RANGE 2>/dev/null)
 EOF
 
 if [ "$COMMIT_COUNT" -eq 0 ]; then
-  echo "No commits found since ${PREV_TAG:-the beginning}."
-  echo "Nothing to generate."
+  echo "No commits found since ${PREV_TAG:-the beginning}." >&2
+  echo "Nothing to generate." >&2
   exit 0
 fi
 
@@ -158,8 +160,8 @@ $(cat "$TMPDIR_CL/$t")
   fi
 done
 
-echo "Found $COMMIT_COUNT commit(s) in $SECTION_COUNT section(s)."
-echo ""
+echo "Found $COMMIT_COUNT commit(s) in $SECTION_COUNT section(s)." >&2
+echo "" >&2
 
 # --- Output ---
 if [ "$NOTES_ONLY" = true ]; then

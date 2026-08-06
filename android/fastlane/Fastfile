@@ -12,6 +12,9 @@
 
 default_platform(:android)
 
+# Google Play rejects a release-notes body over 500 characters per locale.
+PLAY_CHANGELOG_LIMIT = 500
+
 platform :android do
   desc "Upload AAB to internal testing track"
   lane :upload do
@@ -54,6 +57,7 @@ platform :android do
   lane :upload_beta do
     aab_path = find_aab
     track = beta_track
+    has_changelog = write_beta_changelog
 
     UI.message("Uploading to the '#{track}' testing track...")
     upload_to_play_store(
@@ -61,7 +65,9 @@ platform :android do
       track: track,
       release_status: "completed",
       skip_upload_metadata: true,
-      skip_upload_changelogs: true,
+      # Beta testers need to know what a build changed; the other lanes stay
+      # silent because their notes are managed in the Play Console.
+      skip_upload_changelogs: !has_changelog,
       skip_upload_images: true,
       skip_upload_screenshots: true,
     )
@@ -110,6 +116,43 @@ platform :android do
       )
     end
     track
+  end
+
+  # Writes the beta release notes where supply expects them:
+  # fastlane/metadata/android/<locale>/changelogs/<versionCode>.txt. The file is
+  # generated per build rather than committed, so the notes always match the AAB
+  # being uploaded. Returns false when there is nothing to write, which leaves
+  # the existing Play notes untouched instead of blanking them.
+  def write_beta_changelog
+    notes = ENV["PLAY_BETA_CHANGELOG"].to_s.strip
+    version_code = ENV["PLAY_VERSION_CODE"].to_s.strip
+
+    if notes.empty? || version_code.empty?
+      UI.important(
+        "PLAY_BETA_CHANGELOG or PLAY_VERSION_CODE is unset; uploading without " \
+        "release notes."
+      )
+      return false
+    end
+
+    unless version_code.match?(/\A\d+\z/)
+      UI.user_error!("PLAY_VERSION_CODE must be digits only; got '#{version_code}'.")
+    end
+
+    # Google rejects a release-notes body over 500 characters per locale, and
+    # rejects the whole upload rather than truncating it.
+    if notes.length > PLAY_CHANGELOG_LIMIT
+      UI.important(
+        "Release notes are #{notes.length} characters; truncating to " \
+        "#{PLAY_CHANGELOG_LIMIT} for Play."
+      )
+    end
+
+    dir = File.join("fastlane", "metadata", "android", "en-US", "changelogs")
+    FileUtils.mkdir_p(dir)
+    File.write(File.join(dir, "#{version_code}.txt"), notes[0, PLAY_CHANGELOG_LIMIT])
+    UI.message("Wrote Play release notes for version code #{version_code}.")
+    true
   end
 
   # Finds the AAB file. Checks for the renamed artifact first (CI),

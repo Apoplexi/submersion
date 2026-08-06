@@ -388,6 +388,12 @@ jobs:
       - name: Run release notes HTML test
         run: ./scripts/generate_release_notes_html_test.sh
 
+      - name: Run beta release notes test
+        run: ./scripts/release/beta_release_notes_test.sh
+
+      - name: Run fastlane beta changelog test
+        run: ruby scripts/release/fastlane_beta_changelog_test.rb
+
       - name: Upload coverage
         uses: codecov/codecov-action@v7
         if: always()

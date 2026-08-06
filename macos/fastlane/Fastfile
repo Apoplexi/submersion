@@ -17,10 +17,36 @@
 
 default_platform(:mac)
 
+# Apple rejects an upload whose whatsNew exceeds 4000 characters.
+TESTFLIGHT_CHANGELOG_LIMIT = 4000
+
 platform :mac do
   # ============================================================================
   # Helper Methods
   # ============================================================================
+
+  # The TestFlight "What to Test" text, supplied by the beta pipeline.
+  #
+  # Blank is treated as unset: Ruby's `||` only falls back on nil, so an empty
+  # BETA_CHANGELOG would publish empty notes, which a tester reads as "the
+  # previous build's notes still apply" - the exact confusion this replaced.
+  def beta_changelog
+    notes = ENV["BETA_CHANGELOG"].to_s.strip
+
+    if notes.empty?
+      UI.important("BETA_CHANGELOG is unset; falling back to a generic note.")
+      return "Beta build. See the beta-builds release for the change list."
+    end
+
+    if notes.length > TESTFLIGHT_CHANGELOG_LIMIT
+      UI.important(
+        "Release notes are #{notes.length} characters; truncating to " \
+        "#{TESTFLIGHT_CHANGELOG_LIMIT} for TestFlight."
+      )
+    end
+
+    notes[0, TESTFLIGHT_CHANGELOG_LIMIT]
+  end
 
   def load_api_key
     if ENV["APP_STORE_CONNECT_API_KEY_KEY_ID"] &&
@@ -362,7 +388,7 @@ platform :mac do
       pkg: pkg_path,
       distribute_external: true,
       groups: ["Public Beta"],
-      changelog: ENV["BETA_CHANGELOG"] || "Automated beta build.",
+      changelog: beta_changelog,
     )
     UI.success("macOS beta distributed to the Public Beta group!")
   end
