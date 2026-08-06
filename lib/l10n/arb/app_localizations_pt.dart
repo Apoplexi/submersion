@@ -12435,6 +12435,22 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
+  String get media_repairHistory_sourceFolder => 'verificação de pastas';
+
+  @override
+  String get media_repairHistory_sourcePhotoLibrary => 'biblioteca de fotos';
+
+  @override
+  String get media_repairHistory_sourceStore =>
+      'armazenamento de mídia na nuvem';
+
+  @override
+  String get media_repairHistory_sourceWatcher => 'pastas monitoradas';
+
+  @override
+  String get media_repairHistory_sourceManual => 'revinculação manual';
+
+  @override
   String media_repairHistory_source(String source) {
     return 'via $source';
   }

@@ -11867,6 +11867,21 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get media_repairHistory_sourceFolder => '文件夹扫描';
+
+  @override
+  String get media_repairHistory_sourcePhotoLibrary => '照片图库';
+
+  @override
+  String get media_repairHistory_sourceStore => '云媒体存储';
+
+  @override
+  String get media_repairHistory_sourceWatcher => '监视的文件夹';
+
+  @override
+  String get media_repairHistory_sourceManual => '手动重新关联';
+
+  @override
   String media_repairHistory_source(String source) {
     return '通过 $source';
   }

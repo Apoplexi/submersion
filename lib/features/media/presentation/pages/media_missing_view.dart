@@ -4,6 +4,7 @@ import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/features/divers/presentation/providers/diver_providers.dart';
 import 'package:submersion/features/media/data/services/volume_status.dart';
 import 'package:submersion/features/media/domain/entities/media_library_filter.dart';
+import 'package:submersion/features/media/presentation/pages/media_repair_history_view.dart';
 import 'package:submersion/features/media/presentation/pages/media_repair_wizard_page.dart';
 import 'package:submersion/features/media/presentation/providers/media_library_providers.dart';
 import 'package:submersion/features/media/presentation/widgets/media_library_grid.dart';
@@ -50,9 +51,7 @@ class MediaMissingView extends ConsumerWidget {
     if (state.isLoading && state.entries.isEmpty) {
       return const Center(child: CircularProgressIndicator());
     }
-    if (state.entries.isEmpty) {
-      return Center(child: Text(context.l10n.media_missing_empty));
-    }
+    final isEmpty = state.entries.isEmpty;
 
     return Column(
       children: [
@@ -69,25 +68,41 @@ class MediaMissingView extends ConsumerWidget {
                 )
               else
                 const Spacer(),
-              FilledButton.tonalIcon(
-                icon: const Icon(Icons.build_outlined),
-                label: Text(context.l10n.media_missing_repair),
+              IconButton(
+                icon: const Icon(Icons.history),
+                tooltip: context.l10n.media_repairHistory_title,
                 onPressed: () => Navigator.of(context).push(
                   MaterialPageRoute<void>(
-                    builder: (_) => const MediaRepairWizardPage(),
+                    builder: (_) => const MediaRepairHistoryView(),
                   ),
                 ),
               ),
+              // An empty missing list means nothing to repair, but the
+              // history behind it is exactly what the user wants to check
+              // then -- so only the wizard entry point disappears.
+              if (!isEmpty)
+                FilledButton.tonalIcon(
+                  icon: const Icon(Icons.build_outlined),
+                  label: Text(context.l10n.media_missing_repair),
+                  onPressed: () => Navigator.of(context).push(
+                    MaterialPageRoute<void>(
+                      builder: (_) => const MediaRepairWizardPage(),
+                    ),
+                  ),
+                ),
             ],
           ),
         ),
         Expanded(
-          child: MediaLibraryGrid(
-            entries: state.entries,
-            hasMore: state.hasMore,
-            onLoadMore: () => ref.read(missingViewProvider.notifier).loadMore(),
-            onTileTap: (entry, index) {},
-          ),
+          child: isEmpty
+              ? Center(child: Text(context.l10n.media_missing_empty))
+              : MediaLibraryGrid(
+                  entries: state.entries,
+                  hasMore: state.hasMore,
+                  onLoadMore: () =>
+                      ref.read(missingViewProvider.notifier).loadMore(),
+                  onTileTap: (entry, index) {},
+                ),
         ),
       ],
     );

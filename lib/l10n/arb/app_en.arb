@@ -7215,6 +7215,26 @@
       "repaired": { "type": "int" }
     }
   },
+  "media_repairHistory_sourceFolder": "folder scan",
+  "@media_repairHistory_sourceFolder": {
+    "description": "Repair history: candidate came from a folder scan"
+  },
+  "media_repairHistory_sourcePhotoLibrary": "photo library",
+  "@media_repairHistory_sourcePhotoLibrary": {
+    "description": "Repair history: candidate came from the gallery"
+  },
+  "media_repairHistory_sourceStore": "cloud media store",
+  "@media_repairHistory_sourceStore": {
+    "description": "Repair history: row was made cloud-backed from the store"
+  },
+  "media_repairHistory_sourceWatcher": "watched folders",
+  "@media_repairHistory_sourceWatcher": {
+    "description": "Repair history: applied automatically by the folder watcher"
+  },
+  "media_repairHistory_sourceManual": "manual re-link",
+  "@media_repairHistory_sourceManual": {
+    "description": "Repair history: the user picked the file by hand"
+  },
   "media_repairHistory_source": "via {source}",
   "@media_repairHistory_source": {
     "placeholders": {

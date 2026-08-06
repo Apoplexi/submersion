@@ -12469,6 +12469,21 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String get media_repairHistory_sourceFolder => 'analyse de dossier';
+
+  @override
+  String get media_repairHistory_sourcePhotoLibrary => 'photothèque';
+
+  @override
+  String get media_repairHistory_sourceStore => 'stockage multimédia cloud';
+
+  @override
+  String get media_repairHistory_sourceWatcher => 'dossiers surveillés';
+
+  @override
+  String get media_repairHistory_sourceManual => 'reliaison manuelle';
+
+  @override
   String media_repairHistory_source(String source) {
     return 'via $source';
   }

@@ -12337,6 +12337,21 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String get media_repairHistory_sourceFolder => 'mapscan';
+
+  @override
+  String get media_repairHistory_sourcePhotoLibrary => 'fotobibliotheek';
+
+  @override
+  String get media_repairHistory_sourceStore => 'cloudmediaopslag';
+
+  @override
+  String get media_repairHistory_sourceWatcher => 'bewaakte mappen';
+
+  @override
+  String get media_repairHistory_sourceManual => 'handmatig opnieuw koppelen';
+
+  @override
   String media_repairHistory_source(String source) {
     return 'via $source';
   }

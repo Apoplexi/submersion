@@ -93,6 +93,14 @@ void main() {
     expect(find.text('Repair...'), findsNothing);
   });
 
+  testWidgets('repair history stays reachable with nothing missing', (
+    tester,
+  ) async {
+    await tester.pumpWidget(host(const []));
+    await tester.pumpAndSettle();
+    expect(find.byIcon(Icons.history), findsOneWidget);
+  });
+
   testWidgets('missing rows render with the Repair entry point', (
     tester,
   ) async {

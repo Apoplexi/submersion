@@ -12206,6 +12206,21 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String get media_repairHistory_sourceFolder => 'فحص المجلدات';
+
+  @override
+  String get media_repairHistory_sourcePhotoLibrary => 'مكتبة الصور';
+
+  @override
+  String get media_repairHistory_sourceStore => 'مخزن الوسائط السحابي';
+
+  @override
+  String get media_repairHistory_sourceWatcher => 'المجلدات المراقَبة';
+
+  @override
+  String get media_repairHistory_sourceManual => 'إعادة ربط يدوية';
+
+  @override
   String media_repairHistory_source(String source) {
     return 'عبر $source';
   }

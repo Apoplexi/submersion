@@ -12419,6 +12419,21 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
+  String get media_repairHistory_sourceFolder => 'análisis de carpetas';
+
+  @override
+  String get media_repairHistory_sourcePhotoLibrary => 'fototeca';
+
+  @override
+  String get media_repairHistory_sourceStore => 'almacén multimedia en la nube';
+
+  @override
+  String get media_repairHistory_sourceWatcher => 'carpetas vigiladas';
+
+  @override
+  String get media_repairHistory_sourceManual => 'revinculación manual';
+
+  @override
   String media_repairHistory_source(String source) {
     return 'vía $source';
   }

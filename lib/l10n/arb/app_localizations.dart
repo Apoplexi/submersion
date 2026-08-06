@@ -21085,6 +21085,36 @@ abstract class AppLocalizations {
   /// **'{indexed} files indexed, {repaired} re-linked'**
   String media_sources_scanResult(int indexed, int repaired);
 
+  /// Repair history: candidate came from a folder scan
+  ///
+  /// In en, this message translates to:
+  /// **'folder scan'**
+  String get media_repairHistory_sourceFolder;
+
+  /// Repair history: candidate came from the gallery
+  ///
+  /// In en, this message translates to:
+  /// **'photo library'**
+  String get media_repairHistory_sourcePhotoLibrary;
+
+  /// Repair history: row was made cloud-backed from the store
+  ///
+  /// In en, this message translates to:
+  /// **'cloud media store'**
+  String get media_repairHistory_sourceStore;
+
+  /// Repair history: applied automatically by the folder watcher
+  ///
+  /// In en, this message translates to:
+  /// **'watched folders'**
+  String get media_repairHistory_sourceWatcher;
+
+  /// Repair history: the user picked the file by hand
+  ///
+  /// In en, this message translates to:
+  /// **'manual re-link'**
+  String get media_repairHistory_sourceManual;
+
   /// No description provided for @media_repairHistory_source.
   ///
   /// In en, this message translates to:

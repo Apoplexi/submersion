@@ -12124,6 +12124,21 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
+  String get media_repairHistory_sourceFolder => 'סריקת תיקיות';
+
+  @override
+  String get media_repairHistory_sourcePhotoLibrary => 'ספריית התמונות';
+
+  @override
+  String get media_repairHistory_sourceStore => 'אחסון מדיה בענן';
+
+  @override
+  String get media_repairHistory_sourceWatcher => 'תיקיות במעקב';
+
+  @override
+  String get media_repairHistory_sourceManual => 'קישור ידני';
+
+  @override
   String media_repairHistory_source(String source) {
     return 'דרך $source';
   }

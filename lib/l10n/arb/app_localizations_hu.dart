@@ -12392,6 +12392,21 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String get media_repairHistory_sourceFolder => 'mappavizsgálat';
+
+  @override
+  String get media_repairHistory_sourcePhotoLibrary => 'fotókönyvtár';
+
+  @override
+  String get media_repairHistory_sourceStore => 'felhőalapú médiatár';
+
+  @override
+  String get media_repairHistory_sourceWatcher => 'figyelt mappák';
+
+  @override
+  String get media_repairHistory_sourceManual => 'kézi újracsatolás';
+
+  @override
   String media_repairHistory_source(String source) {
     return 'forrás: $source';
   }
