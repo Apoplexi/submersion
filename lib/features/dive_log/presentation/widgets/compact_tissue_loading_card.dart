@@ -42,6 +42,10 @@ class CompactTissueLoadingCard extends ConsumerStatefulWidget {
   /// (e.g. in the wide two-column layout).
   final bool expandVisualization;
 
+  /// Opens the 3D tissue saturation view. The button is hidden when null,
+  /// keeping this widget free of any dive_3d navigation dependency.
+  final VoidCallback? onOpen3dView;
+
   const CompactTissueLoadingCard({
     super.key,
     required this.status,
@@ -50,6 +54,7 @@ class CompactTissueLoadingCard extends ConsumerStatefulWidget {
     this.subtitle,
     this.onHeatMapHover,
     this.expandVisualization = false,
+    this.onOpen3dView,
   });
 
   @override
@@ -122,6 +127,10 @@ class _CompactTissueLoadingCardState
                 _buildVizModeToggle(colorScheme, vizMode),
                 const SizedBox(width: 4),
                 _buildColorSchemeSelector(colorScheme),
+                if (widget.onOpen3dView != null) ...[
+                  const SizedBox(width: 4),
+                  _build3dViewButton(colorScheme),
+                ],
               ],
             ),
             const SizedBox(height: 14),
@@ -571,6 +580,24 @@ class _CompactTissueLoadingCardState
               : colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
         ),
       ),
+    );
+  }
+
+  Widget _build3dViewButton(ColorScheme colorScheme) {
+    return IconButton(
+      icon: Icon(
+        Icons.view_in_ar,
+        size: 16,
+        color: colorScheme.onSurfaceVariant,
+      ),
+      tooltip: context.l10n.dive3d_previewTitle,
+      padding: EdgeInsets.zero,
+      constraints: const BoxConstraints(),
+      style: const ButtonStyle(
+        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        visualDensity: VisualDensity.compact,
+      ),
+      onPressed: widget.onOpen3dView,
     );
   }
 

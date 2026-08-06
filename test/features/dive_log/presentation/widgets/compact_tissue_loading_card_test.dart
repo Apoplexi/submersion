@@ -63,6 +63,7 @@ Widget buildCard({
   DecoStatus status = _status,
   List<DecoStatus>? decoStatuses,
   bool expandVisualization = false,
+  VoidCallback? onOpen3dView,
 }) {
   return ProviderScope(
     overrides: [settingsProvider.overrideWith((ref) => MockSettingsNotifier())],
@@ -74,6 +75,7 @@ Widget buildCard({
           status: status,
           decoStatuses: decoStatuses,
           expandVisualization: expandVisualization,
+          onOpen3dView: onOpen3dView,
         ),
       ),
     ),
@@ -93,6 +95,30 @@ void main() {
       expect(tester.takeException(), isNull);
     },
   );
+
+  group('CompactTissueLoadingCard 3D view button', () {
+    testWidgets('shows the 3D button and fires the callback on tap', (
+      tester,
+    ) async {
+      var opened = 0;
+      await tester.pumpWidget(buildCard(onOpen3dView: () => opened++));
+      await tester.pumpAndSettle();
+
+      final button = find.byIcon(Icons.view_in_ar);
+      expect(button, findsOneWidget);
+      await tester.tap(button);
+      expect(opened, 1);
+    });
+
+    testWidgets('hides the 3D button when no callback is provided', (
+      tester,
+    ) async {
+      await tester.pumpWidget(buildCard());
+      await tester.pumpAndSettle();
+
+      expect(find.byIcon(Icons.view_in_ar), findsNothing);
+    });
+  });
 
   group('CompactTissueLoadingCard heatmap labels', () {
     testWidgets('shows Fast and Slow labels when heatmap data is provided', (
