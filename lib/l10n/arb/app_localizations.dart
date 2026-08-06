@@ -18459,6 +18459,12 @@ abstract class AppLocalizations {
   /// **'Cost'**
   String get equipment_serviceDialog_costLabel;
 
+  /// No description provided for @equipment_serviceDialog_currencyLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Currency'**
+  String get equipment_serviceDialog_currencyLabel;
+
   /// No description provided for @equipment_serviceDialog_costValidation.
   ///
   /// In en, this message translates to:

@@ -10817,6 +10817,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String get equipment_serviceDialog_costLabel => 'Custo';
 
   @override
+  String get equipment_serviceDialog_currencyLabel => 'Moeda';
+
+  @override
   String get equipment_serviceDialog_costValidation => 'Insira um valor valido';
 
   @override

@@ -10850,6 +10850,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get equipment_serviceDialog_costLabel => 'Cout';
 
   @override
+  String get equipment_serviceDialog_currencyLabel => 'Devise';
+
+  @override
   String get equipment_serviceDialog_costValidation =>
       'Entrez un montant valide';
 

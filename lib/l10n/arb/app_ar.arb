@@ -3411,6 +3411,7 @@
   "equipment_serviceDialog_clearNextServiceDateTooltip": "مسح تاريخ الصيانة القادمة",
   "equipment_serviceDialog_costHint": "0.00",
   "equipment_serviceDialog_costLabel": "التكلفة",
+  "equipment_serviceDialog_currencyLabel": "العملة",
   "equipment_serviceDialog_costValidation": "أدخل مبلغاً صالحاً",
   "equipment_serviceDialog_editTitle": "تعديل سجل الصيانة",
   "equipment_serviceDialog_nextServiceDueLabel": "موعد الصيانة القادمة",

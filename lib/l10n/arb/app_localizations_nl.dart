@@ -10742,6 +10742,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get equipment_serviceDialog_costLabel => 'Kosten';
 
   @override
+  String get equipment_serviceDialog_currencyLabel => 'Valuta';
+
+  @override
   String get equipment_serviceDialog_costValidation =>
       'Voer een geldig bedrag in';
 

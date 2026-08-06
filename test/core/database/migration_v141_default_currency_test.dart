@@ -2,7 +2,7 @@ import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/database/database.dart';
 
-/// Minimal pre-v140 shape: a diver_settings table with just a primary key,
+/// Minimal pre-v141 shape: a diver_settings table with just a primary key,
 /// stamped at v137 so only the default_currency migration runs.
 NativeDatabase _dbAt137() {
   return NativeDatabase.memory(
@@ -39,7 +39,7 @@ NativeDatabase _strandedAtCurrent() {
 
 void main() {
   test(
-    'v140 adds default_currency to diver_settings, defaulting to USD',
+    'v141 adds default_currency to diver_settings, defaulting to USD',
     () async {
       final db = AppDatabase(_dbAt137());
       addTearDown(db.close);
@@ -57,9 +57,9 @@ void main() {
     },
   );
 
-  test('v140 default_currency migration is present', () {
-    expect(AppDatabase.currentSchemaVersion, greaterThanOrEqualTo(140));
-    expect(AppDatabase.migrationVersions, contains(140));
+  test('v141 default_currency migration is present', () {
+    expect(AppDatabase.currentSchemaVersion, greaterThanOrEqualTo(141));
+    expect(AppDatabase.migrationVersions, contains(141));
   });
 
   test('a fresh database gets default_currency via onCreate', () async {

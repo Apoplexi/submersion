@@ -10339,6 +10339,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get equipment_serviceDialog_costLabel => '费用';
 
   @override
+  String get equipment_serviceDialog_currencyLabel => '货币';
+
+  @override
   String get equipment_serviceDialog_costValidation => '请输入有效金额';
 
   @override

@@ -10656,6 +10656,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get equipment_serviceDialog_costLabel => 'Cost';
 
   @override
+  String get equipment_serviceDialog_currencyLabel => 'Currency';
+
+  @override
   String get equipment_serviceDialog_costValidation => 'Enter a valid amount';
 
   @override

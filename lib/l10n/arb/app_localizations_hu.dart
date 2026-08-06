@@ -10793,6 +10793,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String get equipment_serviceDialog_costLabel => 'Koltseg';
 
   @override
+  String get equipment_serviceDialog_currencyLabel => 'Penznem';
+
+  @override
   String get equipment_serviceDialog_costValidation =>
       'Adjon meg ervenyes osszeget';
 

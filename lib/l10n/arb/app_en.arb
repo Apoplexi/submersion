@@ -5997,6 +5997,7 @@
   "equipment_serviceDialog_clearNextServiceDateTooltip": "Clear Next Service Date",
   "equipment_serviceDialog_costHint": "0.00",
   "equipment_serviceDialog_costLabel": "Cost",
+  "equipment_serviceDialog_currencyLabel": "Currency",
   "equipment_serviceDialog_costValidation": "Enter a valid amount",
   "equipment_serviceDialog_editTitle": "Edit Service Record",
   "equipment_serviceDialog_nextServiceDueLabel": "Next Service Due",

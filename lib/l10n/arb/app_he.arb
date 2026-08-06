@@ -3339,6 +3339,7 @@
   "equipment_serviceDialog_clearNextServiceDateTooltip": "נקה תאריך טיפול הבא",
   "equipment_serviceDialog_costHint": "0.00",
   "equipment_serviceDialog_costLabel": "עלות",
+  "equipment_serviceDialog_currencyLabel": "מטבע",
   "equipment_serviceDialog_costValidation": "הזן סכום חוקי",
   "equipment_serviceDialog_editTitle": "ערוך רשומת טיפול",
   "equipment_serviceDialog_nextServiceDueLabel": "הטיפול הבא",

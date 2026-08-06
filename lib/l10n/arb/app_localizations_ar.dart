@@ -10636,6 +10636,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get equipment_serviceDialog_costLabel => 'التكلفة';
 
   @override
+  String get equipment_serviceDialog_currencyLabel => 'العملة';
+
+  @override
   String get equipment_serviceDialog_costValidation => 'أدخل مبلغاً صالحاً';
 
   @override

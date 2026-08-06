@@ -72,7 +72,7 @@ void main() {
               ).overrideWith((ref) => _MockServiceRecordNotifier()),
               serviceRecordTotalCostProvider(
                 equipment.id,
-              ).overrideWith((ref) async => 0.0),
+              ).overrideWith((ref) async => <String, double>{}),
             ].cast(),
             child: MaterialApp.router(
               routerConfig: router,
@@ -135,7 +135,7 @@ void main() {
             ).overrideWith((ref) => _MockServiceRecordNotifier()),
             serviceRecordTotalCostProvider(
               equipment.id,
-            ).overrideWith((ref) async => 0.0),
+            ).overrideWith((ref) async => <String, double>{}),
           ].cast(),
           child: MaterialApp.router(
             routerConfig: router,
@@ -205,7 +205,7 @@ void main() {
             ).overrideWith((ref) => _MockServiceRecordNotifier()),
             serviceRecordTotalCostProvider(
               equipment.id,
-            ).overrideWith((ref) async => 0.0),
+            ).overrideWith((ref) async => <String, double>{}),
           ].cast(),
           child: MaterialApp(
             locale: const Locale('en'),
@@ -260,7 +260,7 @@ void main() {
             ).overrideWith((ref) => _MockServiceRecordNotifier()),
             serviceRecordTotalCostProvider(
               equipment.id,
-            ).overrideWith((ref) async => 0.0),
+            ).overrideWith((ref) async => <String, double>{}),
           ].cast(),
           child: MaterialApp(
             locale: const Locale('en'),

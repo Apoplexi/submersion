@@ -10572,6 +10572,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get equipment_serviceDialog_costLabel => 'עלות';
 
   @override
+  String get equipment_serviceDialog_currencyLabel => 'מטבע';
+
+  @override
   String get equipment_serviceDialog_costValidation => 'הזן סכום חוקי';
 
   @override

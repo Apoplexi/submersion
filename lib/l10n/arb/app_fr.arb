@@ -3339,6 +3339,7 @@
   "equipment_serviceDialog_clearNextServiceDateTooltip": "Effacer la date de prochaine revision",
   "equipment_serviceDialog_costHint": "0.00",
   "equipment_serviceDialog_costLabel": "Cout",
+  "equipment_serviceDialog_currencyLabel": "Devise",
   "equipment_serviceDialog_costValidation": "Entrez un montant valide",
   "equipment_serviceDialog_editTitle": "Modifier l'enregistrement de revision",
   "equipment_serviceDialog_nextServiceDueLabel": "Prochaine revision",

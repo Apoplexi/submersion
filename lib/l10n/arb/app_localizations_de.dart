@@ -10816,6 +10816,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get equipment_serviceDialog_costLabel => 'Kosten';
 
   @override
+  String get equipment_serviceDialog_currencyLabel => 'Währung';
+
+  @override
   String get equipment_serviceDialog_costValidation =>
       'Geben Sie einen gültigen Betrag ein';
 
