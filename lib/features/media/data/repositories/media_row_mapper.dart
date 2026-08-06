@@ -72,6 +72,7 @@ domain.MediaItem mediaItemFromRow(
     remoteCompressedUploadedAt: row.remoteCompressedUploadedAt != null
         ? DateTime.fromMillisecondsSinceEpoch(row.remoteCompressedUploadedAt!)
         : null,
+    retainInLibrary: row.retainInLibrary,
     createdAt: DateTime.fromMillisecondsSinceEpoch(row.createdAt),
     updatedAt: DateTime.fromMillisecondsSinceEpoch(row.updatedAt),
     enrichment: enrichmentRow != null

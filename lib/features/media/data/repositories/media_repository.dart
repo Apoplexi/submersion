@@ -191,6 +191,7 @@ class MediaRepository {
               remoteCompressedUploadedAt: Value(
                 item.remoteCompressedUploadedAt?.millisecondsSinceEpoch,
               ),
+              retainInLibrary: Value(item.retainInLibrary),
               createdAt: Value(now.millisecondsSinceEpoch),
               updatedAt: Value(now.millisecondsSinceEpoch),
             ),
@@ -272,6 +273,7 @@ class MediaRepository {
           remoteCompressedUploadedAt: Value(
             item.remoteCompressedUploadedAt?.millisecondsSinceEpoch,
           ),
+          retainInLibrary: Value(item.retainInLibrary),
           updatedAt: Value(now),
         ),
       );
