@@ -8,6 +8,7 @@ import 'package:submersion/features/dive_log/presentation/providers/profile_lege
 import 'package:submersion/features/dive_log/presentation/widgets/deco_stop_band.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/dive_profile_legend.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/gas_colors.dart';
+import 'package:submersion/features/dive_log/presentation/widgets/legend_candidates.dart';
 
 /// Persistent dialog for chart toggle options.
 ///
@@ -226,7 +227,7 @@ class ChartOptionsDialog extends StatelessWidget {
       for (var i = 0; i < sortedTanks.length; i++) {
         final tank = sortedTanks[i];
         final color = GasColors.forGasMix(tank.gasMix);
-        final label = _buildTankLabel(context, tank, fallbackIndex: i + 1);
+        final label = tankLegendLabel(context, tank, fallbackIndex: i + 1);
 
         tankItems.add(_buildStaticItem(context, label: label, color: color));
       }
@@ -247,16 +248,19 @@ class ChartOptionsDialog extends StatelessWidget {
 
     // Tank Pressures section
     if (config.hasMultiTankPressure && config.tankPressures != null) {
-      final sortedTankIds = _sortedTankIds(config.tankPressures!.keys);
+      final sortedTankIds = sortTankIdsByOrder(
+        config.tankPressures!.keys,
+        config.tanks,
+      );
       final tankItems = <Widget>[];
       for (var i = 0; i < sortedTankIds.length; i++) {
         final tankId = sortedTankIds[i];
         final tank = _getTankById(tankId);
         final color = tank != null
             ? GasColors.forGasMix(tank.gasMix)
-            : _getTankColor(i);
+            : tankFallbackColor(i);
         final baseLabel = tank != null
-            ? _buildTankLabel(context, tank, fallbackIndex: i + 1)
+            ? tankLegendLabel(context, tank, fallbackIndex: i + 1)
             : context.l10n.diveLog_tank_title(i + 1);
         final label = config.estimatedTankIds.contains(tankId)
             ? '$baseLabel ${context.l10n.diveLog_pressure_estimatedSuffix}'
@@ -680,17 +684,6 @@ class ChartOptionsDialog extends StatelessWidget {
     );
   }
 
-  String _buildTankLabel(
-    BuildContext context,
-    DiveTank tank, {
-    required int fallbackIndex,
-  }) {
-    final tankTitle = tank.name?.trim().isNotEmpty == true
-        ? tank.name!.trim()
-        : context.l10n.diveLog_tank_title(fallbackIndex);
-    return '$tankTitle (${tank.gasMix.name})';
-  }
-
   Widget _buildStaticItem(
     BuildContext context, {
     required String label,
@@ -717,17 +710,6 @@ class ChartOptionsDialog extends StatelessWidget {
     );
   }
 
-  /// Sort tank IDs by tank order
-  List<String> _sortedTankIds(Iterable<String> tankIds) {
-    final ids = tankIds.toList();
-    ids.sort((a, b) {
-      final orderA = _getTankById(a)?.order ?? 999;
-      final orderB = _getTankById(b)?.order ?? 999;
-      return orderA.compareTo(orderB);
-    });
-    return ids;
-  }
-
   /// Get tank by ID
   DiveTank? _getTankById(String tankId) {
     final tanks = config.tanks;
@@ -736,18 +718,5 @@ class ChartOptionsDialog extends StatelessWidget {
       if (tank.id == tankId) return tank;
     }
     return null;
-  }
-
-  /// Get color for tank by index (fallback when no gas mix info)
-  Color _getTankColor(int index) {
-    const colors = [
-      Colors.orange,
-      Colors.amber,
-      Colors.green,
-      Colors.cyan,
-      Colors.purple,
-      Colors.pink,
-    ];
-    return colors[index % colors.length];
   }
 }
