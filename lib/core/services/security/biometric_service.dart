@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart' show visibleForTesting;
 import 'package:flutter/services.dart';
 import 'package:local_auth/local_auth.dart';
 
@@ -8,12 +9,19 @@ import 'package:local_auth/local_auth.dart';
 /// backend — password-only there, and [isAvailable] says so.
 class BiometricService {
   final LocalAuthentication _auth;
+  final bool _platformSupported;
 
-  BiometricService({LocalAuthentication? auth})
-    : _auth = auth ?? LocalAuthentication();
+  /// [platformSupported] exists so tests do not depend on the host they run
+  /// on: the Linux gate below would otherwise make every capability test
+  /// pass on macOS and fail on CI's Linux runners.
+  BiometricService({
+    LocalAuthentication? auth,
+    @visibleForTesting bool? platformSupported,
+  }) : _auth = auth ?? LocalAuthentication(),
+       _platformSupported = platformSupported ?? !Platform.isLinux;
 
   Future<bool> isAvailable() async {
-    if (Platform.isLinux) return false;
+    if (!_platformSupported) return false;
     try {
       return await _auth.isDeviceSupported() && await _auth.canCheckBiometrics;
     } on PlatformException {

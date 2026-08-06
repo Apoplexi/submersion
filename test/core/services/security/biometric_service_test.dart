@@ -43,7 +43,9 @@ void main() {
     final mock = MockLocalAuthentication();
     when(mock.isDeviceSupported()).thenAnswer((_) async => false);
     when(mock.canCheckBiometrics).thenAnswer((_) async => true);
-    final svc = BiometricService(auth: mock);
+    // platformSupported pinned: without it this test's result depends on the
+    // host OS (passes on macOS, fails on CI's Linux runners).
+    final svc = BiometricService(auth: mock, platformSupported: true);
     expect(await svc.isAvailable(), false);
   });
 
@@ -51,7 +53,17 @@ void main() {
     final mock = MockLocalAuthentication();
     when(mock.isDeviceSupported()).thenAnswer((_) async => true);
     when(mock.canCheckBiometrics).thenAnswer((_) async => true);
-    final svc = BiometricService(auth: mock);
+    final svc = BiometricService(auth: mock, platformSupported: true);
     expect(await svc.isAvailable(), true);
+  });
+
+  test('isAvailable false on an unsupported platform without asking the '
+      'plugin (Linux has no local_auth backend)', () async {
+    final mock = MockLocalAuthentication();
+    when(mock.isDeviceSupported()).thenAnswer((_) async => true);
+    when(mock.canCheckBiometrics).thenAnswer((_) async => true);
+    final svc = BiometricService(auth: mock, platformSupported: false);
+    expect(await svc.isAvailable(), false);
+    verifyNever(mock.isDeviceSupported());
   });
 }
