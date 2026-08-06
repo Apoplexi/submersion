@@ -21,6 +21,8 @@ import 'package:submersion/core/services/sync/post_restore_sync_store.dart';
 import 'package:submersion/core/services/sync/sync_preferences.dart';
 import 'package:submersion/features/backup/data/services/backup_crypto.dart';
 import 'package:submersion/features/backup/data/services/backup_encryption_key_store.dart';
+import 'package:submersion/core/services/database_service.dart'
+    show DatabaseService;
 import 'package:submersion/features/backup/domain/exceptions/backup_encrypted_exception.dart';
 import 'package:submersion/features/backup/data/repositories/backup_preferences.dart';
 import 'package:submersion/features/backup/data/services/backup_database_adapter.dart';
@@ -582,8 +584,10 @@ class BackupService {
     // Use sqlite3 directly in read-only mode to avoid Drift's migration
     // system triggering ALTER TABLE on older-schema backups. The backup file
     // may also be in a read-only sandboxed directory (iOS/macOS file picker).
+    // Deliberately keyless: backup artifacts are portable plaintext by
+    // design, and an encrypted-looking file should fail validation loudly.
     try {
-      final testDb = sqlite3.sqlite3.open(
+      final testDb = DatabaseService.openRaw(
         filePath,
         mode: sqlite3.OpenMode.readOnly,
       );

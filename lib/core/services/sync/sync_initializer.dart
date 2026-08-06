@@ -7,6 +7,8 @@ import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/core/services/sync/changeset_log/changeset_log_layout.dart';
 import 'package:submersion/core/services/sync/library_epoch_store.dart';
 import 'package:submersion/core/services/sync/sync_clock.dart';
+import 'package:submersion/core/services/sync/sync_preferences.dart'
+    show syncLastProviderPrefsKey;
 
 /// Handles sync initialization and checks on app launch
 class SyncInitializer {
@@ -14,7 +16,9 @@ class SyncInitializer {
 
   final _uuid = const Uuid();
 
-  static const _lastProviderKey = 'sync_last_provider';
+  // Single definition lives in sync_preferences.dart so the pre-provider
+  // escape-hatch path clears the same key.
+  static const _lastProviderKey = syncLastProviderPrefsKey;
 
   /// Mirrors the in-DB sync device id outside the database (which a restore
   /// would otherwise rewind silently). A mismatch on launch is one signal that

@@ -21,6 +21,7 @@ import gal
 import geolocator_apple
 import google_sign_in_ios
 import libdivecomputer_plugin
+import local_auth_darwin
 import objectbox_flutter_libs
 import package_info_plus
 import photo_manager
@@ -28,7 +29,7 @@ import printing
 import share_plus
 import shared_preferences_foundation
 import sqflite_darwin
-import sqlite3_flutter_libs
+import sqlcipher_flutter_libs
 import submersion_ocr
 import submersion_transcoder
 import url_launcher_macos
@@ -52,6 +53,7 @@ func RegisterGeneratedPlugins(registry: FlutterPluginRegistry) {
   GeolocatorPlugin.register(with: registry.registrar(forPlugin: "GeolocatorPlugin"))
   FLTGoogleSignInPlugin.register(with: registry.registrar(forPlugin: "FLTGoogleSignInPlugin"))
   LibdivecomputerPlugin.register(with: registry.registrar(forPlugin: "LibdivecomputerPlugin"))
+  LocalAuthPlugin.register(with: registry.registrar(forPlugin: "LocalAuthPlugin"))
   ObjectboxFlutterLibsPlugin.register(with: registry.registrar(forPlugin: "ObjectboxFlutterLibsPlugin"))
   FPPPackageInfoPlusPlugin.register(with: registry.registrar(forPlugin: "FPPPackageInfoPlusPlugin"))
   PhotoManagerPlugin.register(with: registry.registrar(forPlugin: "PhotoManagerPlugin"))
