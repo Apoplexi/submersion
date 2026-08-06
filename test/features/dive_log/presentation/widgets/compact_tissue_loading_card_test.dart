@@ -32,6 +32,31 @@ const _status = DecoStatus(
   ambientPressureBar: 2.0,
 );
 
+const _comp2 = TissueCompartment(
+  compartmentNumber: 2,
+  halfTimeN2: 8.0,
+  halfTimeHe: 3.02,
+  mValueAN2: 1.0000,
+  mValueBN2: 0.6514,
+  mValueAHe: 1.3830,
+  mValueBHe: 0.5747,
+);
+
+// The area chart spreads hue across `compartments.length - 1`, so a
+// single-compartment status divides by zero. Real deco models always emit all
+// 16 compartments; use at least two here to stay on a realistic code path.
+const _multiCompStatus = DecoStatus(
+  compartments: [_comp, _comp2],
+  ndlSeconds: 600,
+  ceilingMeters: 0.0,
+  ttsSeconds: 0,
+  gfLow: 0.4,
+  gfHigh: 0.85,
+  decoStops: [],
+  currentDepthMeters: 10.0,
+  ambientPressureBar: 2.0,
+);
+
 // A compartment loaded well past its M-value. surfaceMValue for these
 // coefficients is ~3.24 bar, so currentPN2 4.5 is ~139% loading, which clamps
 // the bar to full chart height -- the case where the highlight outline used to
@@ -136,6 +161,79 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.byIcon(Icons.view_in_ar), findsNothing);
+    });
+  });
+
+  group('CompactTissueLoadingCard header icons', () {
+    // Header controls in left-to-right render order.
+    const headerIcons = [
+      Icons.grid_on,
+      Icons.area_chart,
+      Icons.palette_outlined,
+      Icons.view_in_ar,
+    ];
+
+    testWidgets('are spaced evenly across the header row', (tester) async {
+      await tester.pumpWidget(buildCard(onOpen3dView: () {}));
+      await tester.pumpAndSettle();
+
+      final rects = headerIcons
+          .map((icon) => tester.getRect(find.byIcon(icon)))
+          .toList();
+
+      // Guard the assumed render order before measuring the gaps.
+      for (var i = 1; i < rects.length; i++) {
+        expect(rects[i].left, greaterThan(rects[i - 1].left));
+      }
+
+      final gaps = [
+        for (var i = 1; i < rects.length; i++)
+          rects[i].left - rects[i - 1].right,
+      ];
+      for (final gap in gaps) {
+        expect(gap, closeTo(gaps.first, 0.5), reason: 'gaps were $gaps');
+      }
+    });
+
+    testWidgets('share one layout box so the gaps cannot drift', (
+      tester,
+    ) async {
+      await tester.pumpWidget(buildCard(onOpen3dView: () {}));
+      await tester.pumpAndSettle();
+
+      final sizes = headerIcons
+          .map(
+            (icon) => tester.getSize(
+              find.ancestor(
+                of: find.byIcon(icon),
+                matching: find.byType(IconButton),
+              ),
+            ),
+          )
+          .toList();
+
+      for (final size in sizes) {
+        // Every control carries the same accessible touch target as the 3D
+        // button (48 minus the compact visual density adjustment).
+        expect(size.width, greaterThanOrEqualTo(40));
+        expect(size.height, greaterThanOrEqualTo(40));
+        expect(size, sizes.first, reason: 'sizes were $sizes');
+      }
+    });
+
+    testWidgets('switch the visualization mode when tapped', (tester) async {
+      await tester.pumpWidget(
+        buildCard(status: _multiCompStatus, decoStatuses: [_multiCompStatus]),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byIcon(Icons.area_chart));
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+
+      await tester.tap(find.byIcon(Icons.grid_on));
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
     });
   });
 
