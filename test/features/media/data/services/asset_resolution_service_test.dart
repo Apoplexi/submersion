@@ -689,4 +689,73 @@ void main() {
       );
     });
   });
+
+  // MediaItem.takenAt is stored wall-clock-as-UTC, while photo_manager reports
+  // AssetInfo.createDateTime as LOCAL. Both matchers used to compare the two
+  // as instants, so on any host west or east of UTC the difference was the
+  // host's offset rather than real clock drift, and every tier missed. The
+  // picker write path masked this by persisting an unnormalised local
+  // timestamp; once that was corrected these comparisons had to convert.
+  //
+  // NOTE: these cases can only fail on a host whose local time is not UTC --
+  // where the two conventions coincide there is nothing to convert. CI runners
+  // default to UTC, so treat them as a guard for developer machines.
+  group('wall-clock-UTC takenAt against a local gallery candidate', () {
+    List<AssetInfo> candidatesAt(DateTime local) => [
+      AssetInfo(
+        id: 'local-match',
+        type: AssetType.image,
+        createDateTime: local,
+        width: 4032,
+        height: 3024,
+        filename: 'IMG_001.jpg',
+      ),
+    ];
+
+    test('tier 1 matches on filename plus the same wall-clock second', () {
+      final item = createTestItem(
+        originalFilename: 'IMG_001.jpg',
+        takenAt: DateTime.utc(2025, 6, 15, 10, 30, 0),
+      );
+
+      expect(
+        AssetResolutionService.matchByFilenameAndTimestamp(
+          item,
+          candidatesAt(DateTime(2025, 6, 15, 10, 30, 1)),
+        ),
+        equals('local-match'),
+      );
+    });
+
+    test('tier 2 matches on the exact wall-clock capture second', () {
+      final item = createTestItem(
+        originalFilename: '',
+        takenAt: DateTime.utc(2025, 6, 15, 10, 30, 0),
+      );
+
+      expect(
+        AssetResolutionService.matchByTimestampAndDimensions(
+          item,
+          candidatesAt(DateTime(2025, 6, 15, 10, 30, 0)),
+          tolerance: Duration.zero,
+        ),
+        equals('local-match'),
+      );
+    });
+
+    test('a genuinely distant candidate is still rejected', () {
+      final item = createTestItem(
+        originalFilename: 'IMG_001.jpg',
+        takenAt: DateTime.utc(2025, 6, 15, 10, 30, 0),
+      );
+
+      expect(
+        AssetResolutionService.matchByFilenameAndTimestamp(
+          item,
+          candidatesAt(DateTime(2025, 6, 15, 10, 31, 0)),
+        ),
+        isNull,
+      );
+    });
+  });
 }

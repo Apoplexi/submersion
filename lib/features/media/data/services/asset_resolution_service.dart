@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/features/media/data/repositories/local_asset_cache_repository.dart';
 import 'package:submersion/features/media/data/services/photo_picker_service.dart';
+import 'package:submersion/features/media/data/services/trip_media_scanner.dart';
 import 'package:submersion/features/media/domain/entities/media_item.dart';
 
 /// Status of an asset resolution attempt.
@@ -156,10 +157,13 @@ class AssetResolutionService {
       return const ResolutionResult(status: ResolutionStatus.unavailable);
     }
 
-    // Step 3: Search gallery by metadata (with query coalescing)
+    // Step 3: Search gallery by metadata (with query coalescing). The gallery
+    // API takes LOCAL bounds, so the window is built from the same restated
+    // timestamp the matchers below compare against -- see [_asGalleryLocal].
     const timeWindow = Duration(seconds: 5);
-    final start = item.takenAt.subtract(timeWindow);
-    final end = item.takenAt.add(timeWindow);
+    final galleryTakenAt = _asGalleryLocal(item.takenAt);
+    final start = galleryTakenAt.subtract(timeWindow);
+    final end = galleryTakenAt.add(timeWindow);
 
     List<AssetInfo> candidates;
     try {
@@ -331,11 +335,12 @@ class AssetResolutionService {
     final filename = item.originalFilename;
     if (filename == null || filename.isEmpty) return null;
 
+    final takenAt = _asGalleryLocal(item.takenAt);
     final matches = candidates.where((c) {
       final candidateName = c.filename;
       if (candidateName == null || candidateName.isEmpty) return false;
       if (candidateName != filename) return false;
-      final diff = c.createDateTime.difference(item.takenAt).abs();
+      final diff = c.createDateTime.difference(takenAt).abs();
       return diff <= const Duration(seconds: 5);
     }).toList();
 
@@ -358,7 +363,7 @@ class AssetResolutionService {
   }) {
     if (item.width == null || item.height == null) return null;
 
-    final itemSecond = _truncateToSecond(item.takenAt);
+    final itemSecond = _truncateToSecond(_asGalleryLocal(item.takenAt));
     final matches = candidates.where((c) {
       if (c.width != item.width || c.height != item.height) return false;
       final diff = _truncateToSecond(
@@ -369,6 +374,20 @@ class AssetResolutionService {
 
     return matches.length == 1 ? matches.first.id : null;
   }
+
+  /// Restate a stored [MediaItem.takenAt] in the gallery's own convention.
+  ///
+  /// `taken_at` is persisted wall-clock-as-UTC (the same convention as dive
+  /// entry times), whereas photo_manager reports [AssetInfo.createDateTime] as
+  /// a LOCAL [DateTime]. Comparing the two as instants makes every candidate
+  /// look like it is off by the host's UTC offset, so each tier below matches
+  /// only on a host that happens to run at UTC. Reinterpreting the calendar
+  /// fields as local first means the remaining difference is real clock drift.
+  ///
+  /// A value that is already local is returned unchanged, so rows written
+  /// before the convention was enforced still compare the way they always did.
+  static DateTime _asGalleryLocal(DateTime takenAt) =>
+      TripMediaScanner.wallClockUtcToLocal(takenAt);
 
   /// Both sides are compared at second granularity so [Duration.zero] means
   /// "the same capture second" rather than "the same instant".
