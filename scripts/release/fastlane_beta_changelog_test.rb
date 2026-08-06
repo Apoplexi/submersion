@@ -82,6 +82,46 @@ with_env('BETA_CHANGELOG' => 'x' * 4000) do
   check(beta_changelog.length == 4000, 'notes exactly at the limit were altered')
 end
 
+# --- File-based notes -------------------------------------------------------
+# The pipeline passes a path rather than the text itself, so nothing derived
+# from commit subjects is ever written to GITHUB_ENV (CodeQL: environment
+# variable built from user-controlled sources).
+
+Dir.mktmpdir do |tmp|
+  notes_file = File.join(tmp, 'beta-notes-store.txt')
+  File.write(notes_file, "New in this build\n- a change from a file\n")
+
+  with_env('BETA_CHANGELOG_FILE' => notes_file, 'BETA_CHANGELOG' => nil) do
+    check(beta_changelog.include?('a change from a file'), 'notes were not read from the file')
+    check(beta_changelog.include?("\n"), 'file notes were flattened')
+  end
+
+  # The file wins when both are present: the env var is the legacy path.
+  with_env('BETA_CHANGELOG_FILE' => notes_file, 'BETA_CHANGELOG' => 'from the env var') do
+    check(beta_changelog.include?('a change from a file'), 'the file did not take precedence')
+    check(!beta_changelog.include?('from the env var'), 'the env var overrode the file')
+  end
+
+  # A missing file must not blank the notes; it degrades to the generic line
+  # rather than failing a 45-minute upload job.
+  with_env('BETA_CHANGELOG_FILE' => File.join(tmp, 'nope.txt'), 'BETA_CHANGELOG' => nil) do
+    check(!beta_changelog.to_s.strip.empty?, 'a missing notes file produced blank notes')
+  end
+
+  # A file that exists but is empty is the same failure mode as a blank env var.
+  empty_file = File.join(tmp, 'empty.txt')
+  File.write(empty_file, "\n  \n")
+  with_env('BETA_CHANGELOG_FILE' => empty_file, 'BETA_CHANGELOG' => nil) do
+    check(!beta_changelog.to_s.strip.empty?, 'an empty notes file produced blank notes')
+  end
+
+  over_limit = File.join(tmp, 'huge.txt')
+  File.write(over_limit, 'x' * 5000)
+  with_env('BETA_CHANGELOG_FILE' => over_limit, 'BETA_CHANGELOG' => nil) do
+    check(beta_changelog.length <= 4000, 'file notes were not truncated to Apple\'s limit')
+  end
+end
+
 # --- Play changelog (Android Fastfile) --------------------------------------
 
 load File.join(ROOT, 'android', 'fastlane', 'Fastfile')
@@ -124,6 +164,26 @@ Dir.mktmpdir do |tmp|
       check(write_beta_changelog == true, 'valid inputs did not enable changelog upload')
       written = File.read(changelog_path.call(5163))
       check(written.include?('a real change'), 'notes were not written to the changelog file')
+    end
+
+    # Same file-based contract as the TestFlight lanes, so the workflow never
+    # interpolates commit-derived text into a shell or environment assignment.
+    Dir.mktmpdir do |notes_dir|
+      notes_file = File.join(notes_dir, 'beta-notes-play.txt')
+      File.write(notes_file, "New in this build\n- a change from a file\n")
+
+      with_env('PLAY_BETA_CHANGELOG_FILE' => notes_file, 'PLAY_BETA_CHANGELOG' => nil,
+               'PLAY_VERSION_CODE' => '5165') do
+        check(write_beta_changelog == true, 'file-based notes did not enable changelog upload')
+        check(File.read(changelog_path.call(5165)).include?('a change from a file'),
+              'file-based notes were not written to the changelog file')
+      end
+
+      with_env('PLAY_BETA_CHANGELOG_FILE' => File.join(notes_dir, 'nope.txt'),
+               'PLAY_BETA_CHANGELOG' => nil, 'PLAY_VERSION_CODE' => '5166') do
+        check(write_beta_changelog == false, 'a missing notes file did not disable changelog upload')
+        check(!File.exist?(changelog_path.call(5166)), 'a missing notes file still wrote a changelog')
+      end
     end
 
     with_env('PLAY_BETA_CHANGELOG' => 'y' * 900, 'PLAY_VERSION_CODE' => '5164') do

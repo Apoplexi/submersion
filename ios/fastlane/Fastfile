@@ -70,16 +70,35 @@ platform :ios do
   # Helper Methods
   # ============================================================================
 
+  # Reads the notes the beta pipeline generated.
+  #
+  # BETA_CHANGELOG_FILE (a path) is the pipeline's contract; BETA_CHANGELOG
+  # (the text) remains for local runs. Passing a path keeps commit-derived text
+  # out of GITHUB_ENV, where a line matching the heredoc delimiter would be a
+  # environment-variable injection vector in a workflow holding signing
+  # credentials.
+  def read_beta_notes
+    path = ENV["BETA_CHANGELOG_FILE"].to_s.strip
+    return ENV["BETA_CHANGELOG"].to_s if path.empty?
+
+    unless File.exist?(path)
+      UI.important("BETA_CHANGELOG_FILE points at #{path}, which does not exist.")
+      return ENV["BETA_CHANGELOG"].to_s
+    end
+
+    File.read(path)
+  end
+
   # The TestFlight "What to Test" text, supplied by the beta pipeline.
   #
   # Blank is treated as unset: Ruby's `||` only falls back on nil, so an empty
   # BETA_CHANGELOG would publish empty notes, which a tester reads as "the
   # previous build's notes still apply" - the exact confusion this replaced.
   def beta_changelog
-    notes = ENV["BETA_CHANGELOG"].to_s.strip
+    notes = read_beta_notes.strip
 
     if notes.empty?
-      UI.important("BETA_CHANGELOG is unset; falling back to a generic note.")
+      UI.important("No beta release notes supplied; falling back to a generic note.")
       return "Beta build. See the beta-builds release for the change list."
     end
 

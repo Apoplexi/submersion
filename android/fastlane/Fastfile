@@ -118,13 +118,31 @@ platform :android do
     track
   end
 
+  # Reads the notes the beta pipeline generated.
+  #
+  # PLAY_BETA_CHANGELOG_FILE (a path) is the pipeline's contract;
+  # PLAY_BETA_CHANGELOG (the text) remains for local runs. Passing a path keeps
+  # commit-derived text out of shell and environment assignments in a workflow
+  # that holds the Play service account key.
+  def read_beta_notes
+    path = ENV["PLAY_BETA_CHANGELOG_FILE"].to_s.strip
+    return ENV["PLAY_BETA_CHANGELOG"].to_s if path.empty?
+
+    unless File.exist?(path)
+      UI.important("PLAY_BETA_CHANGELOG_FILE points at #{path}, which does not exist.")
+      return ENV["PLAY_BETA_CHANGELOG"].to_s
+    end
+
+    File.read(path)
+  end
+
   # Writes the beta release notes where supply expects them:
   # fastlane/metadata/android/<locale>/changelogs/<versionCode>.txt. The file is
   # generated per build rather than committed, so the notes always match the AAB
   # being uploaded. Returns false when there is nothing to write, which leaves
   # the existing Play notes untouched instead of blanking them.
   def write_beta_changelog
-    notes = ENV["PLAY_BETA_CHANGELOG"].to_s.strip
+    notes = read_beta_notes.strip
     version_code = ENV["PLAY_VERSION_CODE"].to_s.strip
 
     if notes.empty? || version_code.empty?

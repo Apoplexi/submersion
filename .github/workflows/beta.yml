@@ -304,21 +304,18 @@ jobs:
       # "What to Test" is the only place a TestFlight tester learns what a build
       # changed. It used to be a fixed string, so every beta looked identical
       # and testers had nothing to aim at.
-      - name: Load release notes into the environment
-        run: |
-          set -euo pipefail
-          {
-            echo 'BETA_CHANGELOG<<BETA_NOTES_EOF'
-            cat "$GITHUB_WORKSPACE/beta-notes-store.txt"
-            echo 'BETA_NOTES_EOF'
-          } >> "$GITHUB_ENV"
-
+      #
+      # The lane is handed the notes as a path, not as text: writing
+      # commit-derived content into GITHUB_ENV makes a commit subject that
+      # matches the heredoc delimiter an environment-variable injection vector,
+      # and this job holds the App Store Connect signing key.
       - name: Upload to TestFlight (Public Beta)
         working-directory: ios
         env:
           APP_STORE_CONNECT_API_KEY_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_KEY_ID }}
           APP_STORE_CONNECT_API_KEY_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ISSUER_ID }}
           APP_STORE_CONNECT_API_KEY_KEY_FILEPATH: fastlane/AuthKey.p8
+          BETA_CHANGELOG_FILE: ${{ github.workspace }}/beta-notes-store.txt
         run: |
           IPA_PATH=$(ls $GITHUB_WORKSPACE/Submersion-*-iOS.ipa 2>/dev/null | head -1)
           if [ -z "$IPA_PATH" ]; then
@@ -377,21 +374,14 @@ jobs:
         with:
           name: beta-notes
 
-      - name: Load release notes into the environment
-        run: |
-          set -euo pipefail
-          {
-            echo 'BETA_CHANGELOG<<BETA_NOTES_EOF'
-            cat "$GITHUB_WORKSPACE/beta-notes-store.txt"
-            echo 'BETA_NOTES_EOF'
-          } >> "$GITHUB_ENV"
-
+      # Handed as a path, not as text - see the iOS job for why.
       - name: Upload to TestFlight (Public Beta)
         working-directory: macos
         env:
           APP_STORE_CONNECT_API_KEY_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_KEY_ID }}
           APP_STORE_CONNECT_API_KEY_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ISSUER_ID }}
           APP_STORE_CONNECT_API_KEY_KEY_FILEPATH: fastlane/AuthKey.p8
+          BETA_CHANGELOG_FILE: ${{ github.workspace }}/beta-notes-store.txt
         run: |
           # The Mac App Store package keeps its fixed name (no tag prefix).
           PKG_PATH="$GITHUB_WORKSPACE/Submersion.pkg"
@@ -459,9 +449,9 @@ jobs:
         env:
           GOOGLE_PLAY_JSON_KEY_PATH: fastlane/play-store-key.json
           PLAY_VERSION_CODE: ${{ needs.precheck.outputs.build-number }}
+          # Handed as a path, not as text - see the iOS job for why.
+          PLAY_BETA_CHANGELOG_FILE: ${{ github.workspace }}/beta-notes-play.txt
         run: |
-          PLAY_BETA_CHANGELOG=$(cat "$GITHUB_WORKSPACE/beta-notes-play.txt")
-          export PLAY_BETA_CHANGELOG
           for attempt in 1 2; do
             if bundle exec fastlane upload_beta; then
               break
