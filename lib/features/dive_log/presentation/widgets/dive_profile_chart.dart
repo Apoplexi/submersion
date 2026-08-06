@@ -1604,10 +1604,13 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
     // an analysis-curve re-emission (e.g. a ceiling-source toggle) rebuilds
     // only the analysis group over decimated points.
     final vpBucket = _viewportDecimationBucket();
+    // The one depth scan for this build; handed to _buildChart below so the
+    // chart body does not repeat it (see _totalMaxDepth).
+    final totalMaxDepth = _totalMaxDepth(units);
     // Every band-mapped bar's Y position moves with the visible depth window,
     // so the band belongs in each signature that covers one — otherwise a zoom
     // or vertical pan is served stale bars from the cache.
-    final metricBandSig = _metricBand(units).hashCode;
+    final metricBandSig = _metricBand(totalMaxDepth).hashCode;
     final commonSig = _sigOf([
       identityHashCode(widget.profile),
       identityHashCode(legendState),
@@ -1729,6 +1732,7 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
             hasTemperatureData: hasTemperatureData,
             hasPressureData: hasPressureData,
             hasHeartRateData: hasHeartRateData,
+            totalMaxDepth: totalMaxDepth,
           ),
         );
 
@@ -1788,6 +1792,7 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
     required bool hasTemperatureData,
     required bool hasPressureData,
     required bool hasHeartRateData,
+    required double totalMaxDepth,
   }) {
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -1993,6 +1998,7 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
                     hasTemperatureData: hasTemperatureData,
                     hasPressureData: hasPressureData,
                     hasHeartRateData: hasHeartRateData,
+                    totalMaxDepth: totalMaxDepth,
                   ),
                 ),
               ),
@@ -2055,9 +2061,10 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
   /// Full extent of the depth axis in display units, including the 10% padding.
   /// Overlaid sources widen it so a deeper overlay trace is never clipped.
   ///
-  /// Callable outside [_buildChart] because the bar-cache signatures are
-  /// computed in [build], before the chart body runs, and must see the same
-  /// value the chart body will use.
+  /// Scans the profile and every overlay, so call it ONCE per build: [build]
+  /// computes it for the bar-cache signatures and hands the same value to
+  /// [_buildChart], which must not recompute it. The chart rebuilds on every
+  /// hover and pan frame, where a repeated O(samples) scan is not free.
   double _totalMaxDepth(UnitFormatter units) {
     final maxDepthValueMeters = [
       widget.profile.map((p) => p.depth).reduce(math.max),
@@ -2074,8 +2081,9 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
   /// axis, so metrics magnify and scroll with the depth trace and can leave the
   /// viewport when zoomed. When on, it is the currently visible depth window,
   /// so metrics stay on screen at any zoom. See [MetricBand].
-  MetricBand _metricBand(UnitFormatter units) {
-    final totalMaxDepth = _totalMaxDepth(units);
+  /// Takes [totalMaxDepth] rather than recomputing it, so one build shares a
+  /// single depth scan between the cache signatures and the chart body.
+  MetricBand _metricBand(double totalMaxDepth) {
     if (!_metricsFollowViewport) return MetricBand.full(totalMaxDepth);
     return MetricBand(
       top: _viewport.offsetY * totalMaxDepth,
@@ -2090,6 +2098,7 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
     required bool hasTemperatureData,
     required bool hasPressureData,
     required bool hasHeartRateData,
+    required double totalMaxDepth,
   }) {
     final colorScheme = Theme.of(context).colorScheme;
     final sacUnit = ref.read(sacUnitProvider);
@@ -2104,7 +2113,6 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
       widget.profile.map((p) => p.timestamp).reduce(math.max),
       ...overlayPoints.map((p) => p.timestamp),
     ].reduce(math.max).toDouble();
-    final totalMaxDepth = _totalMaxDepth(units);
 
     // Apply zoom and pan to calculate visible bounds (see ProfileChartViewport).
     final visibleRangeX = totalMaxTime * _viewport.visibleWidth;
@@ -2116,9 +2124,10 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
     final visibleMinDepth = _viewport.offsetY * totalMaxDepth;
     final visibleMaxDepth = visibleMinDepth + visibleRangeY;
 
-    // Same helper build() feeds into the bar-cache signatures, so the band the
-    // bars are drawn with can never diverge from the band they are keyed on.
-    final metricBand = _metricBand(units);
+    // Same helper and same totalMaxDepth build() fed into the bar-cache
+    // signatures, so the band the bars are drawn with can never diverge from
+    // the band they are keyed on.
+    final metricBand = _metricBand(totalMaxDepth);
 
     // Temperature bounds (if showing) - convert to user's preferred unit.
     // Pool the active source's and every overlaid source's readings so both

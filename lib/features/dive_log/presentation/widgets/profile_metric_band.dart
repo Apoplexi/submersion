@@ -22,7 +22,12 @@ class MetricBand {
   /// Depth (positive, in display units) of the band's top edge.
   final double top;
 
-  /// Height of the band in display depth units. Always > 0.
+  /// Height of the band in display depth units.
+  ///
+  /// Normally > 0, but a profile that never leaves the surface gives a depth
+  /// axis of zero height, so treat 0 as reachable: [map] then collapses every
+  /// value onto [top] and [unmap] reports the range minimum. Both stay finite,
+  /// which is what matters - a NaN here reaches fl_chart's painter.
   final double span;
 
   const MetricBand({required this.top, required this.span});

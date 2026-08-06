@@ -51,6 +51,33 @@ void main() {
       }
     });
 
+    test('a zero-height band stays finite', () {
+      // A profile that never leaves the surface gives a depth axis of zero
+      // height. A NaN escaping here would reach fl_chart's painter.
+      final band = MetricBand.full(0);
+
+      expect(band.span, 0);
+      expect(band.map(1.5, 0, 2), 0);
+      expect(band.map(1.5, 0, 2).isNaN, isFalse);
+      expect(band.mapNormalized(0.5).isNaN, isFalse);
+      expect(band.unmap(0, 0, 2), 0);
+      expect(band.unmap(0, 0, 2).isNaN, isFalse);
+    });
+
+    test('equal bands share a hash code', () {
+      // The chart folds band.hashCode into its bar-cache signatures, so two
+      // equal bands must agree or the cache would rebuild every frame - and
+      // two different bands must not collide, or it would serve stale bars.
+      const a = MetricBand(top: 4, span: 16);
+      const b = MetricBand(top: 4, span: 16);
+      const different = MetricBand(top: 4, span: 8);
+
+      expect(a, b);
+      expect(a.hashCode, b.hashCode);
+      expect(a, isNot(different));
+      expect(a.hashCode, isNot(different.hashCode));
+    });
+
     test('MetricBand.full starts at the surface', () {
       final band = MetricBand.full(40);
 
