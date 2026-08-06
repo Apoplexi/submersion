@@ -4,7 +4,7 @@
 
 **Goal:** Store a return-flight departure time on a trip and show, on four surfaces, how much diving time remains before the diver's no-fly interval would collide with that flight.
 
-**Architecture:** The trips feature stores one new nullable timestamp (`trips.return_flight_at`, schema v140). The safety feature owns all math: `NoFlyService` gains a pure `flightWindow()` method reusing the existing preset interval table, and a new provider family computes a `FlightWindowStatus` per trip. Four consumers render it: trip story card, No-Fly page section, dashboard gauge chip, dive-edit warning banner.
+**Architecture:** The trips feature stores one new nullable timestamp (`trips.return_flight_at`, schema v142). The safety feature owns all math: `NoFlyService` gains a pure `flightWindow()` method reusing the existing preset interval table, and a new provider family computes a `FlightWindowStatus` per trip. Four consumers render it: trip story card, No-Fly page section, dashboard gauge chip, dive-edit warning banner.
 
 **Tech Stack:** Flutter 3 / Material 3, Drift ORM (SQLite), Riverpod, go_router, flutter gen-l10n.
 
@@ -13,7 +13,7 @@
 ## Global Constraints
 
 - Worktree: all work happens in `/Users/ericgriffin/repos/submersion-app/submersion/.claude/worktrees/trip-flight-no-fly` on branch `worktree-trip-flight-no-fly`. Run `pwd` before trusting any shell result.
-- Schema version: this feature claims **v140**. v138 (divelogs #603) and v139 (equipment currency #805) are reserved by parallel branches; the ladder deliberately skips them. Before starting Task 1, run `git fetch origin && git show origin/main:lib/core/database/database.dart | grep "currentSchemaVersion = "` — if main has advanced past 137, renumber every "140" in this plan to the next free number above both main and open-PR claims.
+- Schema version: this feature claims **v142**. v138 (divelogs #603) and v139 (equipment currency #805) are reserved by parallel branches; the ladder deliberately skips them. Before starting Task 1, run `git fetch origin && git show origin/main:lib/core/database/database.dart | grep "currentSchemaVersion = "` — if main has advanced past 137, renumber every "142" in this plan to the next free number above both main and open-PR claims.
 - Time frame: dive times in this app are **wall-clock-as-UTC** (`DateTime.utc(local components)`, displayed without `toLocal()`). Every new timestamp, comparison, and display in this feature uses that same frame. "Now" is obtained via the new `NoFlyService.wallClockNowUtc()`, never `DateTime.now().toUtc()`.
 - Localization: every new user-facing string gets a key in `lib/l10n/arb/app_en.arb` AND translated values in all 10 other catalogs (`app_ar.arb, app_de.arb, app_es.arb, app_fr.arb, app_he.arb, app_hu.arb, app_it.arb, app_nl.arb, app_pt.arb, app_zh.arb`), then `flutter gen-l10n`. Real translations, not English copies.
 - No emojis anywhere. `dart format .` (whole project) before every commit. `flutter analyze` on the whole project with NO output piping/truncation — infos are fatal in CI.
@@ -23,11 +23,11 @@
 
 ---
 
-### Task 1: Schema v140 — `trips.return_flight_at`
+### Task 1: Schema v142 — `trips.return_flight_at`
 
 **Files:**
 - Modify: `lib/core/database/database.dart` (Trips table ~line 62-83; `currentSchemaVersion` line 2864; `migrationVersions` list starting line 2869; onUpgrade v137 block ~line 7159-7163; beforeOpen backstop ~line 7182; helper section near `_assertWeatherCodeColumn` ~line 3933)
-- Create: `test/core/database/migration_v140_trip_return_flight_test.dart`
+- Create: `test/core/database/migration_v142_trip_return_flight_test.dart`
 
 **Interfaces:**
 - Consumes: existing `_assertWeatherCodeColumn()` pattern.
@@ -35,7 +35,7 @@
 
 - [ ] **Step 1: Write the failing migration test**
 
-Create `test/core/database/migration_v140_trip_return_flight_test.dart` (modeled exactly on `migration_v137_weather_code_test.dart`):
+Create `test/core/database/migration_v142_trip_return_flight_test.dart` (modeled exactly on `migration_v137_weather_code_test.dart`):
 
 ```dart
 import 'package:drift/native.dart';
@@ -44,9 +44,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/database/database.dart';
 
 void main() {
-  test('v140 is in the migration ladder', () {
-    expect(AppDatabase.currentSchemaVersion, greaterThanOrEqualTo(140));
-    expect(AppDatabase.migrationVersions, contains(140));
+  test('v142 is in the migration ladder', () {
+    expect(AppDatabase.currentSchemaVersion, greaterThanOrEqualTo(142));
+    expect(AppDatabase.migrationVersions, contains(142));
   });
 
   test('a fresh database has trips.return_flight_at', () async {
@@ -59,7 +59,7 @@ void main() {
   });
 
   test(
-    'a database stranded before v140 gains return_flight_at via beforeOpen',
+    'a database stranded before v142 gains return_flight_at via beforeOpen',
     () async {
       // Only the columns this migration touches are modelled. The beforeOpen
       // backstop must add return_flight_at even when onUpgrade never ran
@@ -105,8 +105,8 @@ void main() {
 
 - [ ] **Step 2: Run the test to verify it fails**
 
-Run: `flutter test test/core/database/migration_v140_trip_return_flight_test.dart`
-Expected: FAIL — ladder test (137 < 140) and column tests (no `return_flight_at`).
+Run: `flutter test test/core/database/migration_v142_trip_return_flight_test.dart`
+Expected: FAIL — ladder test (137 < 142) and column tests (no `return_flight_at`).
 
 - [ ] **Step 3: Implement the migration**
 
@@ -115,19 +115,19 @@ In `lib/core/database/database.dart`:
 3a. In `class Trips extends Table`, after the `isShared` column:
 
 ```dart
-  /// Return flight departure, wall-clock-as-UTC epoch ms (v140). Drives the
+  /// Return flight departure, wall-clock-as-UTC epoch ms (v142). Drives the
   /// remaining-dive-window countdown; null when the trip has no flight set.
   IntColumn get returnFlightAt => integer().nullable()();
 ```
 
-3b. Bump `static const int currentSchemaVersion = 137;` to `140`.
+3b. Bump `static const int currentSchemaVersion = 137;` to `142`.
 
-3c. Append `140` to the `migrationVersions` list (after `137`).
+3c. Append `142` to the `migrationVersions` list (after `137`).
 
 3d. Add the idempotent helper next to `_assertWeatherCodeColumn()` (~line 3942):
 
 ```dart
-  /// Idempotent DDL for the v140 return-flight column. Called from the v140
+  /// Idempotent DDL for the v142 return-flight column. Called from the v142
   /// onUpgrade step and the beforeOpen backstop, matching the
   /// _assertWeatherCodeColumn pattern so a schema-version collision cannot
   /// strand a database without it. Self-guarding when the table is absent
@@ -147,19 +147,19 @@ In `lib/core/database/database.dart`:
 3e. In `onUpgrade`, after the `if (from < 137)` block:
 
 ```dart
-        // v140: trips.return_flight_at (return-flight dive-window countdown).
+        // v142: trips.return_flight_at (return-flight dive-window countdown).
         // v138/v139 are reserved by parallel branches (#603, #805); the
         // beforeOpen backstop heals any DB stranded between.
-        if (from < 140) {
+        if (from < 142) {
           await _assertTripReturnFlightColumn();
         }
-        if (from < 140) await reportProgress();
+        if (from < 142) await reportProgress();
 ```
 
 3f. In `beforeOpen`, after the v137 backstop line:
 
 ```dart
-        // v140 backstop: re-assert trips.return_flight_at.
+        // v142 backstop: re-assert trips.return_flight_at.
         await _assertTripReturnFlightColumn();
 ```
 
@@ -170,8 +170,8 @@ Expected: exits 0; `database.g.dart` gains `returnFlightAt` on the trips row cla
 
 - [ ] **Step 5: Run the migration test and the neighboring ladder tests**
 
-Run: `flutter test test/core/database/migration_v140_trip_return_flight_test.dart test/core/database/migration_v137_weather_code_test.dart test/core/database/migration_v125_no_fly_preset_test.dart`
-Expected: PASS (v137/v125 tests use greaterThanOrEqualTo, so the bump to 140 is safe).
+Run: `flutter test test/core/database/migration_v142_trip_return_flight_test.dart test/core/database/migration_v137_weather_code_test.dart test/core/database/migration_v125_no_fly_preset_test.dart`
+Expected: PASS (v137/v125 tests use greaterThanOrEqualTo, so the bump to 142 is safe).
 
 - [ ] **Step 6: Verify sync needs no per-column work**
 
@@ -183,7 +183,7 @@ Expected: no explicit trips column list (export serializes whole rows via genera
 ```bash
 dart format .
 git add -A
-git commit -m "Add trips.return_flight_at column (schema v140)"
+git commit -m "Add trips.return_flight_at column (schema v142)"
 ```
 
 ---

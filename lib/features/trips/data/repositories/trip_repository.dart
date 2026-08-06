@@ -632,8 +632,13 @@ class TripRepository {
       notes: row.notes,
       tripType: TripType.fromName(row.tripType),
       isShared: row.isShared,
+      // Wall-clock-as-UTC: decode with isUtc so the stored components are
+      // preserved rather than shifted into the device's timezone.
       returnFlightAt: row.returnFlightAt != null
-          ? DateTime.fromMillisecondsSinceEpoch(row.returnFlightAt!)
+          ? DateTime.fromMillisecondsSinceEpoch(
+              row.returnFlightAt!,
+              isUtc: true,
+            )
           : null,
       createdAt: DateTime.fromMillisecondsSinceEpoch(row.createdAt),
       updatedAt: DateTime.fromMillisecondsSinceEpoch(row.updatedAt),
@@ -656,8 +661,13 @@ class TripRepository {
       notes: (data['notes'] as String?) ?? '',
       tripType: TripType.fromName((data['trip_type'] as String?) ?? 'shore'),
       isShared: (data['is_shared'] as int? ?? 0) != 0,
+      // Wall-clock-as-UTC: decode with isUtc so the stored components are
+      // preserved rather than shifted into the device's timezone.
       returnFlightAt: data['return_flight_at'] != null
-          ? DateTime.fromMillisecondsSinceEpoch(data['return_flight_at'] as int)
+          ? DateTime.fromMillisecondsSinceEpoch(
+              data['return_flight_at'] as int,
+              isUtc: true,
+            )
           : null,
       createdAt: DateTime.fromMillisecondsSinceEpoch(data['created_at'] as int),
       updatedAt: DateTime.fromMillisecondsSinceEpoch(data['updated_at'] as int),

@@ -31,7 +31,7 @@ before departure.
 - Architecture: Approach A - the safety feature owns all computation; the
   trips feature only stores the flight time.
 
-## Data Model and Migration (schema v140)
+## Data Model and Migration (schema v142)
 
 New nullable column on `Trips` in `lib/core/database/database.dart`:
 
@@ -46,13 +46,13 @@ New nullable column on `Trips` in `lib/core/database/database.dart`:
 Migration mechanics (mirrors v135/v139 column-add pattern):
 
 - Idempotent `_assertTripReturnFlightColumn()` called from both the
-  `if (from < 140)` onUpgrade block and the beforeOpen backstop.
-- Version number: v140 per the schema ladder (v138 = divelogs #603,
+  `if (from < 142)` onUpgrade block and the beforeOpen backstop.
+- Version number: v142 per the schema ladder (v138 = divelogs #603,
   v139 = equipment currency #805). Re-grep `currentSchemaVersion = ` on
   current origin/main immediately before implementation; renumber upward if
   main has advanced.
-- Migration test `migration_v140_trip_return_flight_test.dart` using
-  `greaterThanOrEqualTo(140)` + `contains(140)`, plus a fresh-DB (onCreate)
+- Migration test `migration_v142_trip_return_flight_test.dart` using
+  `greaterThanOrEqualTo(142)` + `contains(142)`, plus a fresh-DB (onCreate)
   case and a stranded-at-currentSchemaVersion (backstop) case.
 
 Entity and repository:
@@ -174,7 +174,7 @@ All new strings localized in en + 10 non-English locales with l10n regen.
 - Unit tests for `flightWindow()` with fixed clocks: every state, both
   presets, category escalation, exact-boundary at the deadline, conflict
   precedence over open/closed.
-- Migration test for v140: upgrade path, fresh DB, backstop.
+- Migration test for v142: upgrade path, fresh DB, backstop.
 - Widget tests for the trip story card states (open/closed/conflict).
 - Provider tests for `tripFlightWindowProvider` null and populated paths.
 - Known trap: adding a provider dependency to the dive edit page and

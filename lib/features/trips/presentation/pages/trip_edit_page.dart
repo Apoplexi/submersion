@@ -749,7 +749,7 @@ class _TripEditPageState extends ConsumerState<TripEditPage> {
       context: context,
       initialTime: TimeOfDay.fromDateTime(initial),
     );
-    if (pickedTime == null) return;
+    if (pickedTime == null || !mounted) return;
     setState(() {
       // Wall-clock-as-UTC, the same frame as dive times, so the no-fly
       // math can compare this directly against dive end times.

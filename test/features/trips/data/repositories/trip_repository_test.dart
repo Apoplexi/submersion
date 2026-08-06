@@ -623,6 +623,11 @@ void main() {
           loaded!.returnFlightAt!.millisecondsSinceEpoch,
           DateTime.utc(2026, 8, 10, 14, 30).millisecondsSinceEpoch,
         );
+        // Wall-clock-as-UTC round-trip: components must survive on any
+        // device timezone, so the decode has to be isUtc.
+        expect(loaded.returnFlightAt!.isUtc, isTrue);
+        expect(loaded.returnFlightAt!.hour, 14);
+        expect(loaded.returnFlightAt!.minute, 30);
       });
 
       test(

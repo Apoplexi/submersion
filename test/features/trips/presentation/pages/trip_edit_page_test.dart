@@ -1219,6 +1219,8 @@ void main() {
             }),
           ],
           child: const MaterialApp(
+            // Pinned: these tests assert English strings.
+            locale: Locale('en'),
             localizationsDelegates: AppLocalizations.localizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
             home: TripEditPage(),
