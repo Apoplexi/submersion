@@ -7135,6 +7135,18 @@
       }
     }
   },
+  "media_library_moveToDive": "Move to dive",
+  "@media_library_moveToDive": {
+    "description": "Library selection action: reassign media to a dive"
+  },
+  "media_library_unlinkFromSite": "Unlink from site",
+  "@media_library_unlinkFromSite": {
+    "description": "Library selection action: clear the site link"
+  },
+  "media_library_unlinkSelected": "Unlink",
+  "@media_library_unlinkSelected": {
+    "description": "Library selection action: clear the dive link"
+  },
   "media_library_selectedCount": "{count} selected",
   "@media_library_selectedCount": {
     "description": "Selection bar count label",

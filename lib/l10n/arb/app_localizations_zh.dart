@@ -11804,6 +11804,15 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get media_library_moveToDive => '移至潜水';
+
+  @override
+  String get media_library_unlinkFromSite => '取消关联潜点';
+
+  @override
+  String get media_library_unlinkSelected => '取消关联';
+
+  @override
   String media_library_selectedCount(int count) {
     return '已选择 $count 项';
   }

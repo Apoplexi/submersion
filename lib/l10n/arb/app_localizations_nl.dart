@@ -12271,6 +12271,15 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String get media_library_moveToDive => 'Naar duik verplaatsen';
+
+  @override
+  String get media_library_unlinkFromSite => 'Loskoppelen van duikstek';
+
+  @override
+  String get media_library_unlinkSelected => 'Loskoppelen';
+
+  @override
   String media_library_selectedCount(int count) {
     return '$count geselecteerd';
   }

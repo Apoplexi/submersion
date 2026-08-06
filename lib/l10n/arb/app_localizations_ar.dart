@@ -12143,6 +12143,15 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String get media_library_moveToDive => 'نقل إلى غطسة';
+
+  @override
+  String get media_library_unlinkFromSite => 'إلغاء الربط بالموقع';
+
+  @override
+  String get media_library_unlinkSelected => 'إلغاء الربط';
+
+  @override
   String media_library_selectedCount(int count) {
     return 'تم تحديد $count';
   }

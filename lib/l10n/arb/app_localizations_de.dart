@@ -12358,6 +12358,15 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get media_library_moveToDive => 'Zu Tauchgang verschieben';
+
+  @override
+  String get media_library_unlinkFromSite => 'Vom Tauchplatz lösen';
+
+  @override
+  String get media_library_unlinkSelected => 'Lösen';
+
+  @override
   String media_library_selectedCount(int count) {
     return '$count ausgewählt';
   }

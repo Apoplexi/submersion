@@ -12061,6 +12061,15 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
+  String get media_library_moveToDive => 'העברה לצלילה';
+
+  @override
+  String get media_library_unlinkFromSite => 'ניתוק מהאתר';
+
+  @override
+  String get media_library_unlinkSelected => 'ניתוק';
+
+  @override
   String media_library_selectedCount(int count) {
     return '$count נבחרו';
   }

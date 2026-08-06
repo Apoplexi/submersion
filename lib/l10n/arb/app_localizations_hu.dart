@@ -12326,6 +12326,15 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String get media_library_moveToDive => 'Áthelyezés merüléshez';
+
+  @override
+  String get media_library_unlinkFromSite => 'Leválasztás a merülőhelyről';
+
+  @override
+  String get media_library_unlinkSelected => 'Leválasztás';
+
+  @override
   String media_library_selectedCount(int count) {
     return '$count kiválasztva';
   }

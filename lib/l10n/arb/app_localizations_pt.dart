@@ -12369,6 +12369,15 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
+  String get media_library_moveToDive => 'Mover para um mergulho';
+
+  @override
+  String get media_library_unlinkFromSite => 'Desvincular do ponto';
+
+  @override
+  String get media_library_unlinkSelected => 'Desvincular';
+
+  @override
   String media_library_selectedCount(int count) {
     return '$count selecionados';
   }

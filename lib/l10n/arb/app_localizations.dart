@@ -20965,6 +20965,24 @@ abstract class AppLocalizations {
   /// **'Delete {count} items?'**
   String media_library_deleteConfirmTitle(int count);
 
+  /// Library selection action: reassign media to a dive
+  ///
+  /// In en, this message translates to:
+  /// **'Move to dive'**
+  String get media_library_moveToDive;
+
+  /// Library selection action: clear the site link
+  ///
+  /// In en, this message translates to:
+  /// **'Unlink from site'**
+  String get media_library_unlinkFromSite;
+
+  /// Library selection action: clear the dive link
+  ///
+  /// In en, this message translates to:
+  /// **'Unlink'**
+  String get media_library_unlinkSelected;
+
   /// Selection bar count label
   ///
   /// In en, this message translates to:

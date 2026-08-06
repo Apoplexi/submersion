@@ -12166,6 +12166,15 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get media_library_moveToDive => 'Move to dive';
+
+  @override
+  String get media_library_unlinkFromSite => 'Unlink from site';
+
+  @override
+  String get media_library_unlinkSelected => 'Unlink';
+
+  @override
   String media_library_selectedCount(int count) {
     return '$count selected';
   }

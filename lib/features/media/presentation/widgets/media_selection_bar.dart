@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/features/media/domain/entities/media_item.dart';
 import 'package:submersion/features/media/presentation/helpers/media_share_helper.dart';
+import 'package:submersion/features/media/presentation/providers/media_providers.dart';
 import 'package:submersion/features/media/presentation/providers/media_selection_provider.dart';
+import 'package:submersion/features/media/presentation/widgets/dive_picker_sheet.dart';
 import 'package:submersion/features/media_store/presentation/providers/media_store_providers.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 
@@ -46,8 +48,20 @@ class MediaSelectionBar extends ConsumerWidget {
     ref.read(mediaSelectionProvider.notifier).clear();
   }
 
+  List<String> get _ids => selectedItems.map((m) => m.id).toList();
+
+  Future<void> _moveToDive(BuildContext context, WidgetRef ref) async {
+    final diveId = await showDivePickerSheet(context);
+    if (diveId == null) return;
+    await ref.read(mediaRepositoryProvider).reassignMediaToDive(_ids, diveId);
+    ref.read(mediaSelectionProvider.notifier).clear();
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final anyDiveLinked = selectedItems.any((m) => m.diveId != null);
+    final anySiteLinked = selectedItems.any((m) => m.siteId != null);
+
     return Material(
       color: Theme.of(context).colorScheme.surfaceContainerHighest,
       child: Padding(
@@ -64,20 +78,60 @@ class MediaSelectionBar extends ConsumerWidget {
               context.l10n.media_library_selectedCount(selectedItems.length),
               style: Theme.of(context).textTheme.titleSmall,
             ),
-            const Spacer(),
-            TextButton.icon(
-              icon: const Icon(Icons.share),
-              label: Text(context.l10n.common_action_share),
-              onPressed: selectedItems.isEmpty
-                  ? null
-                  : () => shareMediaItems(context, ref, selectedItems),
-            ),
-            TextButton.icon(
-              icon: const Icon(Icons.delete_outline),
-              label: Text(context.l10n.common_action_delete),
-              onPressed: selectedItems.isEmpty
-                  ? null
-                  : () => _deleteSelected(context, ref),
+            const SizedBox(width: 8),
+            // The action set grows with selection context; scroll instead of
+            // overflowing on narrow layouts.
+            Expanded(
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
+                    if (anyDiveLinked)
+                      TextButton.icon(
+                        icon: const Icon(Icons.link_off),
+                        label: Text(context.l10n.media_library_unlinkSelected),
+                        onPressed: () async {
+                          await ref
+                              .read(mediaRepositoryProvider)
+                              .unlinkFromDive(_ids);
+                          ref.read(mediaSelectionProvider.notifier).clear();
+                        },
+                      ),
+                    if (anySiteLinked)
+                      TextButton.icon(
+                        icon: const Icon(Icons.location_off),
+                        label: Text(context.l10n.media_library_unlinkFromSite),
+                        onPressed: () async {
+                          await ref
+                              .read(mediaRepositoryProvider)
+                              .unlinkFromSite(_ids);
+                          ref.read(mediaSelectionProvider.notifier).clear();
+                        },
+                      ),
+                    TextButton.icon(
+                      icon: const Icon(Icons.drive_file_move_outline),
+                      label: Text(context.l10n.media_library_moveToDive),
+                      onPressed: selectedItems.isEmpty
+                          ? null
+                          : () => _moveToDive(context, ref),
+                    ),
+                    TextButton.icon(
+                      icon: const Icon(Icons.share),
+                      label: Text(context.l10n.common_action_share),
+                      onPressed: selectedItems.isEmpty
+                          ? null
+                          : () => shareMediaItems(context, ref, selectedItems),
+                    ),
+                    TextButton.icon(
+                      icon: const Icon(Icons.delete_outline),
+                      label: Text(context.l10n.common_action_delete),
+                      onPressed: selectedItems.isEmpty
+                          ? null
+                          : () => _deleteSelected(context, ref),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ],
         ),

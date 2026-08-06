@@ -12365,6 +12365,15 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
+  String get media_library_moveToDive => 'Sposta in un\'immersione';
+
+  @override
+  String get media_library_unlinkFromSite => 'Scollega dal sito';
+
+  @override
+  String get media_library_unlinkSelected => 'Scollega';
+
+  @override
   String media_library_selectedCount(int count) {
     return '$count selezionati';
   }
