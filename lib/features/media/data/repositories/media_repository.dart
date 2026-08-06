@@ -1047,10 +1047,57 @@ class MediaRepository {
     SyncEventBus.notifyLocalChange();
   }
 
+  /// User-initiated unlink (Media section Phase 2): clears the dive link,
+  /// keeps the row, and sets retain_in_library so the orphan sweep never
+  /// GCs the blobs of media the user deliberately kept. Same sync-safe
+  /// shape as [unlinkMediaFromDeletedDives], which deliberately does NOT
+  /// set the flag (dive-deletion leftovers stay sweepable).
+  Future<void> unlinkFromDive(List<String> mediaIds) => _unlinkColumns(
+    mediaIds,
+    const MediaCompanion(diveId: Value(null), retainInLibrary: Value(true)),
+  );
+
+  /// Same mechanic for the site link.
+  Future<void> unlinkFromSite(List<String> mediaIds) => _unlinkColumns(
+    mediaIds,
+    const MediaCompanion(siteId: Value(null), retainInLibrary: Value(true)),
+  );
+
+  /// Inbox "keep": marks rows retained without touching links.
+  Future<void> markRetainedInLibrary(List<String> mediaIds) => _unlinkColumns(
+    mediaIds,
+    const MediaCompanion(retainInLibrary: Value(true)),
+  );
+
+  /// Inbox "link to site": attaches the site link, same sync-safe shape.
+  Future<void> linkMediaToSite(List<String> mediaIds, String siteId) =>
+      _unlinkColumns(mediaIds, MediaCompanion(siteId: Value(siteId)));
+
+  Future<void> _unlinkColumns(
+    List<String> mediaIds,
+    MediaCompanion changes,
+  ) async {
+    if (mediaIds.isEmpty) return;
+    final now = DateTime.now().millisecondsSinceEpoch;
+    await _db.transaction(() async {
+      await (_db.update(_db.media)..where((t) => t.id.isIn(mediaIds))).write(
+        changes.copyWith(updatedAt: Value(now)),
+      );
+      for (final id in mediaIds) {
+        await _syncRepository.markRecordPending(
+          entityType: 'media',
+          recordId: id,
+          localUpdatedAt: now,
+        );
+      }
+    });
+    SyncEventBus.notifyLocalChange();
+  }
+
   /// Backlog-sweep candidates (orphan-prevention spec 4.3): unlinked,
-  /// non-library, and created before [olderThan] (the 24h age guard
-  /// protects any future add-then-link creator the gate audit could not
-  /// foresee).
+  /// non-library, NOT explicitly retained in the library, and created
+  /// before [olderThan] (the 24h age guard protects any future
+  /// add-then-link creator the gate audit could not foresee).
   Future<List<String>> getSweepableOrphanIds({
     required DateTime olderThan,
   }) async {
@@ -1059,6 +1106,7 @@ class MediaRepository {
       ..addColumns([id])
       ..where(
         isLinkedToDiveOrSite(_db.media).not() &
+            _db.media.retainInLibrary.equals(false) &
             _db.media.sourceType.isNotIn(libraryLevelSourceTypes) &
             _db.media.createdAt.isSmallerThanValue(
               olderThan.millisecondsSinceEpoch,
