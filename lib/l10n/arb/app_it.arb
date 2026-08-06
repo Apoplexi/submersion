@@ -3152,6 +3152,42 @@
   "equipment_serviceClocks_overdueSince": "In ritardo dal {date}",
   "equipment_serviceClocks_overdue": "In ritardo",
   "equipment_serviceClocks_divesLeft": "{remaining} immersioni rimanenti su {total}",
+  "cylinderConfigs_title": "Configurazioni bombole",
+  "cylinderConfigs_empty": "Nessuna configurazione",
+  "cylinderConfigs_emptyBody": "Salva una volta un assetto diluente e bailout, poi applicalo a qualsiasi immersione.",
+  "cylinderConfigs_new": "Nuova configurazione",
+  "cylinderConfigs_name": "Nome",
+  "cylinderConfigs_nameRequired": "Inserisci un nome",
+  "cylinderConfigs_forUnit": "Per unità",
+  "cylinderConfigs_noUnit": "Piano gas generico",
+  "cylinderConfigs_gasPlans": "Piani gas",
+  "cylinderConfigs_addCylinder": "Aggiungi bombola",
+  "cylinderConfigs_role": "Ruolo",
+  "cylinderConfigs_startPressure": "Pressione iniziale",
+  "cylinderConfigs_label": "Etichetta",
+  "cylinderConfigs_fromPreset": "Da preimpostazione",
+  "cylinderConfigs_deleteTitle": "Eliminare la configurazione?",
+  "cylinderConfigs_deleteBody": "Le immersioni a cui è già stata applicata non cambiano.",
+  "cylinderConfigs_applyAction": "Applica configurazione",
+  "cylinderConfigs_applyAdded": "{count, plural, =1{1 bombola aggiunta} other{{count} bombole aggiunte}}",
+  "@cylinderConfigs_applyAdded": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "cylinderConfigs_applyKept": "{count, plural, =1{1 mantenuta} other{{count} mantenute}}",
+  "@cylinderConfigs_applyKept": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "cylinderConfigs_applyNothingToDo": "Questa immersione corrisponde già alla configurazione",
+  "cylinderConfigs_sectionTitle": "Configurazioni",
+  "equipment_serviceClocks_hoursSource": "Calcolato dal tempo di immersione registrato",
   "equipment_serviceClocks_hoursLeft": "{remaining} ore rimanenti su {total}",
   "equipment_serviceClocks_manageKinds": "Gestisci tipi di manutenzione",
   "equipment_serviceClocks_appliesToClock": "Si applica alla scadenza",
@@ -6304,6 +6340,24 @@
   "attrLabel_sole_type": "Suola",
   "attrLabel_buoyancy_kg": "Galleggiabilità",
   "attrLabel_dry_weight_kg": "Peso a secco",
+  "attrLabel_unit_type": "Tipo di unità",
+  "attrLabel_mount_configuration": "Montaggio",
+  "attrLabel_scrubber_type": "Tipo di calce",
+  "attrLabel_scrubber_duration_h": "Durata calce (h)",
+  "attrLabel_o2_cell_count": "Celle O2",
+  "attrLabel_diluent_cylinder_l": "Bombola diluente",
+  "attrLabel_o2_cylinder_l": "Bombola O2",
+  "attrChoice_unit_type_eccr": "CCR elettronico (eCCR)",
+  "attrChoice_unit_type_mccr": "CCR manuale (mCCR)",
+  "attrChoice_unit_type_hccr": "CCR ibrido (hCCR)",
+  "attrChoice_unit_type_scr_cmf": "SCR - flusso di massa costante",
+  "attrChoice_unit_type_scr_pascr": "SCR - addizione passiva",
+  "attrChoice_unit_type_scr_escr": "SCR - controllo elettronico",
+  "attrChoice_mount_configuration_back": "Montaggio dorsale",
+  "attrChoice_mount_configuration_chest": "Montaggio frontale",
+  "attrChoice_mount_configuration_sidemount": "Sidemount",
+  "attrChoice_scrubber_type_axial": "Assiale",
+  "attrChoice_scrubber_type_radial": "Radiale",
   "attrChoice_suit_style_full": "Muta intera",
   "attrChoice_suit_style_shorty": "Shorty",
   "attrChoice_suit_style_two_piece": "Due pezzi",

@@ -1143,6 +1143,19 @@ class SyncService {
             records: data.equipmentSetGeofences,
             hasUpdatedAt: true,
           ),
+          // References equipment (nullably); must apply after it.
+          (
+            type: 'cylinderConfigs',
+            records: data.cylinderConfigs,
+            hasUpdatedAt: true,
+          ),
+          // Child of cylinderConfigs; must apply after its parent so the
+          // deferred-FK commit sees the config row.
+          (
+            type: 'cylinderConfigItems',
+            records: data.cylinderConfigItems,
+            hasUpdatedAt: true,
+          ),
           // Child of equipment; must apply after its parent so the
           // deferred-FK commit sees the equipment row.
           (
@@ -1815,6 +1828,8 @@ class SyncService {
     'equipmentSets': true,
     'equipmentSetItems': false,
     'equipmentSetGeofences': true,
+    'cylinderConfigs': true,
+    'cylinderConfigItems': true,
     'qualityFindings': true,
     'equipmentAttributes': true,
     'divePlanEquipment': false,
@@ -2010,6 +2025,17 @@ class SyncService {
     ],
     'equipmentSetGeofences': [
       (field: 'setId', parent: 'equipmentSets', nullable: false),
+    ],
+    // equipmentId is nullable by design: deleting a rebreather demotes its
+    // configurations to generic gas plans (ON DELETE SET NULL) rather than
+    // destroying them, so a peer's config referencing a locally-deleted unit
+    // must have the reference cleared, not be skipped.
+    'cylinderConfigs': [
+      (field: 'diverId', parent: 'divers', nullable: true),
+      (field: 'equipmentId', parent: 'equipment', nullable: true),
+    ],
+    'cylinderConfigItems': [
+      (field: 'configId', parent: 'cylinderConfigs', nullable: false),
     ],
     'divePlanEquipment': [
       (field: 'planId', parent: 'divePlans', nullable: false),

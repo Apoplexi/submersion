@@ -223,6 +223,8 @@ class SyncData {
   final List<Map<String, dynamic>> equipmentSets;
   final List<Map<String, dynamic>> equipmentSetItems;
   final List<Map<String, dynamic>> equipmentSetGeofences;
+  final List<Map<String, dynamic>> cylinderConfigs;
+  final List<Map<String, dynamic>> cylinderConfigItems;
   final List<Map<String, dynamic>> qualityFindings;
   final List<Map<String, dynamic>> equipmentAttributes;
   final List<Map<String, dynamic>> media;
@@ -295,6 +297,8 @@ class SyncData {
     this.equipmentSets = const [],
     this.equipmentSetItems = const [],
     this.equipmentSetGeofences = const [],
+    this.cylinderConfigs = const [],
+    this.cylinderConfigItems = const [],
     this.qualityFindings = const [],
     this.equipmentAttributes = const [],
     this.media = const [],
@@ -368,6 +372,8 @@ class SyncData {
     'equipmentSets': equipmentSets,
     'equipmentSetItems': equipmentSetItems,
     'equipmentSetGeofences': equipmentSetGeofences,
+    'cylinderConfigs': cylinderConfigs,
+    'cylinderConfigItems': cylinderConfigItems,
     'qualityFindings': qualityFindings,
     'equipmentAttributes': equipmentAttributes,
     'media': media,
@@ -442,6 +448,8 @@ class SyncData {
       equipmentSets: _parseList(json['equipmentSets']),
       equipmentSetItems: _parseList(json['equipmentSetItems']),
       equipmentSetGeofences: _parseList(json['equipmentSetGeofences']),
+      cylinderConfigs: _parseList(json['cylinderConfigs']),
+      cylinderConfigItems: _parseList(json['cylinderConfigItems']),
       qualityFindings: _parseList(json['qualityFindings']),
       equipmentAttributes: _parseList(json['equipmentAttributes']),
       media: _parseList(json['media']),
@@ -652,6 +660,18 @@ class SyncDataSerializer {
     (
       key: 'equipmentSetGeofences',
       table: _db.equipmentSetGeofences,
+      blob: false,
+      full: null,
+    ),
+    (
+      key: 'cylinderConfigs',
+      table: _db.cylinderConfigs,
+      blob: false,
+      full: null,
+    ),
+    (
+      key: 'cylinderConfigItems',
+      table: _db.cylinderConfigItems,
       blob: false,
       full: null,
     ),
@@ -1157,6 +1177,14 @@ class SyncDataSerializer {
         'equipmentSetGeofences',
         () => _exportEquipmentSetGeofences(hlcSince),
       ),
+      cylinderConfigs: await _safeExport(
+        'cylinderConfigs',
+        () => _exportCylinderConfigs(hlcSince),
+      ),
+      cylinderConfigItems: await _safeExport(
+        'cylinderConfigItems',
+        () => _exportCylinderConfigItems(hlcSince),
+      ),
       qualityFindings: await _safeExport(
         'qualityFindings',
         () => _exportQualityFindings(hlcSince),
@@ -1543,6 +1571,16 @@ class SyncDataSerializer {
           _db.equipmentSetGeofences,
         )..where((t) => t.id.equals(recordId))).getSingleOrNull();
         return row?.toJson();
+      case 'cylinderConfigs':
+        final row = await (_db.select(
+          _db.cylinderConfigs,
+        )..where((t) => t.id.equals(recordId))).getSingleOrNull();
+        return row?.toJson();
+      case 'cylinderConfigItems':
+        final row = await (_db.select(
+          _db.cylinderConfigItems,
+        )..where((t) => t.id.equals(recordId))).getSingleOrNull();
+        return row?.toJson();
       case 'qualityFindings':
         final row = await (_db.select(
           _db.qualityFindings,
@@ -1915,6 +1953,16 @@ class SyncDataSerializer {
           _db.equipmentSetGeofences,
         )..where((t) => t.id.isIn(idList))).get();
         return {for (final r in rows) r.id: r.toJson()};
+      case 'cylinderConfigs':
+        final rows = await (_db.select(
+          _db.cylinderConfigs,
+        )..where((t) => t.id.isIn(idList))).get();
+        return {for (final r in rows) r.id: r.toJson()};
+      case 'cylinderConfigItems':
+        final rows = await (_db.select(
+          _db.cylinderConfigItems,
+        )..where((t) => t.id.isIn(idList))).get();
+        return {for (final r in rows) r.id: r.toJson()};
       case 'qualityFindings':
         final rows = await (_db.select(
           _db.qualityFindings,
@@ -2211,6 +2259,20 @@ class SyncDataSerializer {
             .into(_db.equipmentSetGeofences)
             .insertOnConflictUpdate(
               EquipmentSetGeofence.fromJson(data).toCompanion(false),
+            );
+        return;
+      case 'cylinderConfigs':
+        await _db
+            .into(_db.cylinderConfigs)
+            .insertOnConflictUpdate(
+              CylinderConfig.fromJson(data).toCompanion(false),
+            );
+        return;
+      case 'cylinderConfigItems':
+        await _db
+            .into(_db.cylinderConfigItems)
+            .insertOnConflictUpdate(
+              CylinderConfigItem.fromJson(data).toCompanion(false),
             );
         return;
       case 'qualityFindings':
@@ -2728,6 +2790,26 @@ class SyncDataSerializer {
             _db.equipmentSetGeofences,
             records
                 .map((r) => EquipmentSetGeofence.fromJson(r).toCompanion(false))
+                .toList(),
+          ),
+        );
+        return;
+      case 'cylinderConfigs':
+        await _db.batch(
+          (b) => b.insertAllOnConflictUpdate(
+            _db.cylinderConfigs,
+            records
+                .map((r) => CylinderConfig.fromJson(r).toCompanion(false))
+                .toList(),
+          ),
+        );
+        return;
+      case 'cylinderConfigItems':
+        await _db.batch(
+          (b) => b.insertAllOnConflictUpdate(
+            _db.cylinderConfigItems,
+            records
+                .map((r) => CylinderConfigItem.fromJson(r).toCompanion(false))
                 .toList(),
           ),
         );
@@ -3452,6 +3534,10 @@ class SyncDataSerializer {
         return plain(_db.equipmentSets, _db.equipmentSets.id);
       case 'equipmentSetGeofences':
         return plain(_db.equipmentSetGeofences, _db.equipmentSetGeofences.id);
+      case 'cylinderConfigs':
+        return plain(_db.cylinderConfigs, _db.cylinderConfigs.id);
+      case 'cylinderConfigItems':
+        return plain(_db.cylinderConfigItems, _db.cylinderConfigItems.id);
       case 'qualityFindings':
         return plain(_db.qualityFindings, _db.qualityFindings.id);
       case 'equipmentAttributes':
@@ -3673,6 +3759,10 @@ class SyncDataSerializer {
         return _db.equipmentSets;
       case 'equipmentSetGeofences':
         return _db.equipmentSetGeofences;
+      case 'cylinderConfigs':
+        return _db.cylinderConfigs;
+      case 'cylinderConfigItems':
+        return _db.cylinderConfigItems;
       case 'qualityFindings':
         return _db.qualityFindings;
       case 'equipmentAttributes':
@@ -3831,6 +3921,16 @@ class SyncDataSerializer {
       case 'equipmentSetGeofences':
         await (_db.delete(
           _db.equipmentSetGeofences,
+        )..where((t) => t.id.equals(recordId))).go();
+        return;
+      case 'cylinderConfigs':
+        await (_db.delete(
+          _db.cylinderConfigs,
+        )..where((t) => t.id.equals(recordId))).go();
+        return;
+      case 'cylinderConfigItems':
+        await (_db.delete(
+          _db.cylinderConfigItems,
         )..where((t) => t.id.equals(recordId))).go();
         return;
       case 'qualityFindings':
@@ -4300,6 +4400,28 @@ class SyncDataSerializer {
     String? hlcSince,
   ) async {
     final query = _db.select(_db.equipmentSetGeofences);
+    if (hlcSince != null) {
+      query.where((t) => t.hlc.isBiggerThanValue(hlcSince));
+    }
+    final rows = await query.get();
+    return rows.map((r) => r.toJson()).toList();
+  }
+
+  Future<List<Map<String, dynamic>>> _exportCylinderConfigs(
+    String? hlcSince,
+  ) async {
+    final query = _db.select(_db.cylinderConfigs);
+    if (hlcSince != null) {
+      query.where((t) => t.hlc.isBiggerThanValue(hlcSince));
+    }
+    final rows = await query.get();
+    return rows.map((r) => r.toJson()).toList();
+  }
+
+  Future<List<Map<String, dynamic>>> _exportCylinderConfigItems(
+    String? hlcSince,
+  ) async {
+    final query = _db.select(_db.cylinderConfigItems);
     if (hlcSince != null) {
       query.where((t) => t.hlc.isBiggerThanValue(hlcSince));
     }

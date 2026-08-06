@@ -39,6 +39,13 @@ String attributeLabel(AppLocalizations l10n, String key) => switch (key) {
   'sole_type' => l10n.attrLabel_sole_type,
   'buoyancy_kg' => l10n.attrLabel_buoyancy_kg,
   'dry_weight_kg' => l10n.attrLabel_dry_weight_kg,
+  'unit_type' => l10n.attrLabel_unit_type,
+  'mount_configuration' => l10n.attrLabel_mount_configuration,
+  'scrubber_type' => l10n.attrLabel_scrubber_type,
+  'scrubber_duration_h' => l10n.attrLabel_scrubber_duration_h,
+  'o2_cell_count' => l10n.attrLabel_o2_cell_count,
+  'diluent_cylinder_l' => l10n.attrLabel_diluent_cylinder_l,
+  'o2_cylinder_l' => l10n.attrLabel_o2_cylinder_l,
   _ => key,
 };
 
@@ -109,5 +116,17 @@ String attributeChoiceLabel(AppLocalizations l10n, String key, String option) =>
       'glove_type_dry' => l10n.attrChoice_glove_type_dry,
       'sole_type_hard' => l10n.attrChoice_sole_type_hard,
       'sole_type_soft' => l10n.attrChoice_sole_type_soft,
+      'unit_type_eccr' => l10n.attrChoice_unit_type_eccr,
+      'unit_type_mccr' => l10n.attrChoice_unit_type_mccr,
+      'unit_type_hccr' => l10n.attrChoice_unit_type_hccr,
+      'unit_type_scr_cmf' => l10n.attrChoice_unit_type_scr_cmf,
+      'unit_type_scr_pascr' => l10n.attrChoice_unit_type_scr_pascr,
+      'unit_type_scr_escr' => l10n.attrChoice_unit_type_scr_escr,
+      'mount_configuration_back' => l10n.attrChoice_mount_configuration_back,
+      'mount_configuration_chest' => l10n.attrChoice_mount_configuration_chest,
+      'mount_configuration_sidemount' =>
+        l10n.attrChoice_mount_configuration_sidemount,
+      'scrubber_type_axial' => l10n.attrChoice_scrubber_type_axial,
+      'scrubber_type_radial' => l10n.attrChoice_scrubber_type_radial,
       _ => option,
     };

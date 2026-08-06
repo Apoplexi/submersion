@@ -10171,6 +10171,90 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String get cylinderConfigs_title => 'Palackkonfigurációk';
+
+  @override
+  String get cylinderConfigs_empty => 'Még nincs konfiguráció';
+
+  @override
+  String get cylinderConfigs_emptyBody =>
+      'Mentsd el egyszer a diluent- és bailout-összeállítást, majd alkalmazd bármelyik merülésre.';
+
+  @override
+  String get cylinderConfigs_new => 'Új konfiguráció';
+
+  @override
+  String get cylinderConfigs_name => 'Név';
+
+  @override
+  String get cylinderConfigs_nameRequired => 'Adj meg egy nevet';
+
+  @override
+  String get cylinderConfigs_forUnit => 'Készülékhez';
+
+  @override
+  String get cylinderConfigs_noUnit => 'Általános gázterv';
+
+  @override
+  String get cylinderConfigs_gasPlans => 'Gáztervek';
+
+  @override
+  String get cylinderConfigs_addCylinder => 'Palack hozzáadása';
+
+  @override
+  String get cylinderConfigs_role => 'Szerep';
+
+  @override
+  String get cylinderConfigs_startPressure => 'Kezdőnyomás';
+
+  @override
+  String get cylinderConfigs_label => 'Címke';
+
+  @override
+  String get cylinderConfigs_fromPreset => 'Sablonból';
+
+  @override
+  String get cylinderConfigs_deleteTitle => 'Törlöd a konfigurációt?';
+
+  @override
+  String get cylinderConfigs_deleteBody =>
+      'A már alkalmazott merülések nem változnak.';
+
+  @override
+  String get cylinderConfigs_applyAction => 'Konfiguráció alkalmazása';
+
+  @override
+  String cylinderConfigs_applyAdded(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count palack hozzáadva',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String cylinderConfigs_applyKept(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count megtartva',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get cylinderConfigs_applyNothingToDo =>
+      'Ez a merülés már megegyezik a konfigurációval';
+
+  @override
+  String get cylinderConfigs_sectionTitle => 'Konfigurációk';
+
+  @override
+  String get equipment_serviceClocks_hoursSource =>
+      'A naplózott merülési idő alapján számolva';
+
+  @override
   String equipment_serviceClocks_hoursLeft(String remaining, String total) {
     return '$remaining / $total óra van hátra';
   }
@@ -21686,6 +21770,60 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get attrLabel_dry_weight_kg => 'Száraz tömeg';
+
+  @override
+  String get attrLabel_unit_type => 'Készülék típusa';
+
+  @override
+  String get attrLabel_mount_configuration => 'Rögzítés';
+
+  @override
+  String get attrLabel_scrubber_type => 'Abszorber típusa';
+
+  @override
+  String get attrLabel_scrubber_duration_h => 'Abszorber élettartama (ó)';
+
+  @override
+  String get attrLabel_o2_cell_count => 'O2-cellák';
+
+  @override
+  String get attrLabel_diluent_cylinder_l => 'Diluent palack';
+
+  @override
+  String get attrLabel_o2_cylinder_l => 'O2 palack';
+
+  @override
+  String get attrChoice_unit_type_eccr => 'Elektronikus CCR (eCCR)';
+
+  @override
+  String get attrChoice_unit_type_mccr => 'Manuális CCR (mCCR)';
+
+  @override
+  String get attrChoice_unit_type_hccr => 'Hibrid CCR (hCCR)';
+
+  @override
+  String get attrChoice_unit_type_scr_cmf => 'SCR - állandó tömegáram';
+
+  @override
+  String get attrChoice_unit_type_scr_pascr => 'SCR - passzív adagolás';
+
+  @override
+  String get attrChoice_unit_type_scr_escr => 'SCR - elektronikus szabályozás';
+
+  @override
+  String get attrChoice_mount_configuration_back => 'Háti rögzítés';
+
+  @override
+  String get attrChoice_mount_configuration_chest => 'Mellkasi rögzítés';
+
+  @override
+  String get attrChoice_mount_configuration_sidemount => 'Oldalra szerelt';
+
+  @override
+  String get attrChoice_scrubber_type_axial => 'Axiális';
+
+  @override
+  String get attrChoice_scrubber_type_radial => 'Radiális';
 
   @override
   String get attrChoice_suit_style_full => 'Egész ruha';

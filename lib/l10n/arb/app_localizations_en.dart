@@ -10039,6 +10039,92 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get cylinderConfigs_title => 'Cylinder configurations';
+
+  @override
+  String get cylinderConfigs_empty => 'No configurations yet';
+
+  @override
+  String get cylinderConfigs_emptyBody =>
+      'Save a diluent and bailout setup once, then apply it to any dive.';
+
+  @override
+  String get cylinderConfigs_new => 'New configuration';
+
+  @override
+  String get cylinderConfigs_name => 'Name';
+
+  @override
+  String get cylinderConfigs_nameRequired => 'Enter a name';
+
+  @override
+  String get cylinderConfigs_forUnit => 'For unit';
+
+  @override
+  String get cylinderConfigs_noUnit => 'Generic gas plan';
+
+  @override
+  String get cylinderConfigs_gasPlans => 'Gas plans';
+
+  @override
+  String get cylinderConfigs_addCylinder => 'Add cylinder';
+
+  @override
+  String get cylinderConfigs_role => 'Role';
+
+  @override
+  String get cylinderConfigs_startPressure => 'Start pressure';
+
+  @override
+  String get cylinderConfigs_label => 'Label';
+
+  @override
+  String get cylinderConfigs_fromPreset => 'From preset';
+
+  @override
+  String get cylinderConfigs_deleteTitle => 'Delete configuration?';
+
+  @override
+  String get cylinderConfigs_deleteBody =>
+      'This does not change any dive it was already applied to.';
+
+  @override
+  String get cylinderConfigs_applyAction => 'Apply configuration';
+
+  @override
+  String cylinderConfigs_applyAdded(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Added $count cylinders',
+      one: 'Added 1 cylinder',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String cylinderConfigs_applyKept(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'kept $count',
+      one: 'kept 1',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get cylinderConfigs_applyNothingToDo =>
+      'This dive already matches the configuration';
+
+  @override
+  String get cylinderConfigs_sectionTitle => 'Configurations';
+
+  @override
+  String get equipment_serviceClocks_hoursSource =>
+      'Counted from logged dive time';
+
+  @override
   String equipment_serviceClocks_hoursLeft(String remaining, String total) {
     return '$remaining of $total hours left';
   }
@@ -21390,6 +21476,60 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get attrLabel_dry_weight_kg => 'Dry weight';
+
+  @override
+  String get attrLabel_unit_type => 'Unit type';
+
+  @override
+  String get attrLabel_mount_configuration => 'Mount';
+
+  @override
+  String get attrLabel_scrubber_type => 'Scrubber type';
+
+  @override
+  String get attrLabel_scrubber_duration_h => 'Scrubber duration (h)';
+
+  @override
+  String get attrLabel_o2_cell_count => 'O2 cells';
+
+  @override
+  String get attrLabel_diluent_cylinder_l => 'Diluent cylinder';
+
+  @override
+  String get attrLabel_o2_cylinder_l => 'O2 cylinder';
+
+  @override
+  String get attrChoice_unit_type_eccr => 'Electronic CCR (eCCR)';
+
+  @override
+  String get attrChoice_unit_type_mccr => 'Manual CCR (mCCR)';
+
+  @override
+  String get attrChoice_unit_type_hccr => 'Hybrid CCR (hCCR)';
+
+  @override
+  String get attrChoice_unit_type_scr_cmf => 'SCR - constant mass flow';
+
+  @override
+  String get attrChoice_unit_type_scr_pascr => 'SCR - passive addition';
+
+  @override
+  String get attrChoice_unit_type_scr_escr => 'SCR - electronically controlled';
+
+  @override
+  String get attrChoice_mount_configuration_back => 'Back mount';
+
+  @override
+  String get attrChoice_mount_configuration_chest => 'Chest mount';
+
+  @override
+  String get attrChoice_mount_configuration_sidemount => 'Sidemount';
+
+  @override
+  String get attrChoice_scrubber_type_axial => 'Axial';
+
+  @override
+  String get attrChoice_scrubber_type_radial => 'Radial';
 
   @override
   String get attrChoice_suit_style_full => 'Full suit';
