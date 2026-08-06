@@ -57,6 +57,10 @@ class DatabaseSecurityService {
   bool get encryptionEnabled => _p.dbEncryptionEnabled;
   bool get isUnlocked => _mlk != null;
 
+  /// The key id minted at enableSecurity, once unlocked. Stable across
+  /// password changes (rewrap only); used to label rebuilt sidecars.
+  String? get libraryKeyId => _libraryKeyId;
+
   /// Non-null only after a successful unlock/cached-key load AND while
   /// encryption is enabled. App-lock-only mode never exposes a DB key.
   String? get databaseKeyHex => _databaseKeyHex;

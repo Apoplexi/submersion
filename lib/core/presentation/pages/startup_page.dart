@@ -186,7 +186,10 @@ class _StartupWrapperState extends State<StartupWrapper>
         storedVersion =
             null; // probe path doesn't expose storedVersion; backup uses 0 default
       } else {
-        storedVersion = DatabaseService.getStoredSchemaVersion(dbPath);
+        storedVersion = DatabaseService.getStoredSchemaVersion(
+          dbPath,
+          keyHex: DatabaseService.instance.databaseKeyHex,
+        );
         final sv = storedVersion;
         needsMigration =
             sv != null && sv > 0 && sv < AppDatabase.currentSchemaVersion;
@@ -298,7 +301,10 @@ class _StartupWrapperState extends State<StartupWrapper>
     });
     try {
       final dbPath = await widget.locationService.getDatabasePath();
-      final recovered = DatabaseService.recoverHotJournal(dbPath);
+      final recovered = DatabaseService.recoverHotJournal(
+        dbPath,
+        keyHex: DatabaseService.instance.databaseKeyHex,
+      );
       if (!recovered) {
         if (mounted) {
           setState(() {
@@ -481,7 +487,12 @@ class _StartupWrapperState extends State<StartupWrapper>
     });
     try {
       final dbPath = await widget.locationService.getDatabasePath();
-      final stored = DatabaseService.getStoredSchemaVersion(dbPath) ?? 0;
+      final stored =
+          DatabaseService.getStoredSchemaVersion(
+            dbPath,
+            keyHex: DatabaseService.instance.databaseKeyHex,
+          ) ??
+          0;
       await _runPreMigrationBackup(dbPath: dbPath, stored: stored);
       if (!mounted) return;
       final totalSteps = AppDatabase.migrationStepCount(stored);

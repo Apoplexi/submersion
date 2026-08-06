@@ -17,3 +17,12 @@ void setupSqlcipher() {
     open.overrideFor(OperatingSystem.android, openCipherOnAndroid);
   }
 }
+
+/// The PRAGMA that keys a SQLCipher connection with a raw (already
+/// KDF-stretched) 32-byte key, given as 64 hex chars. Must be the first
+/// statement executed on the connection.
+///
+/// Top-level here (not on DatabaseService) so the drift worker isolate and
+/// the encryption migrator can build it without importing
+/// database_service.dart — that file imports both of them.
+String cipherKeyPragma(String keyHex) => 'PRAGMA key = "x\'$keyHex\'"';

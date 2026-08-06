@@ -7,14 +7,29 @@ import 'package:drift/isolate.dart';
 import 'package:drift/native.dart';
 import 'package:flutter/foundation.dart' show visibleForTesting;
 
+import 'package:submersion/core/database/sqlcipher_setup.dart';
+
 /// Builds the worker's database opener in its own scope.
 ///
 /// Dart closures capture the whole enclosing scope rather than just the
 /// variables they reference, so a closure created next to an unsendable local
 /// (a [ReceivePort], for instance) cannot be sent to an isolate. Minting it
-/// here keeps the capture context down to [path].
-DatabaseConnection Function() _openerFor(String path) {
-  return () => DatabaseConnection(NativeDatabase(File(path)));
+/// here keeps the capture context down to [path] and [keyHex] — both plain
+/// Strings, so they cross the isolate boundary.
+DatabaseConnection Function() _openerFor(String path, String? keyHex) {
+  return () {
+    // Fresh isolate: the sqlite3 loader override is per-isolate state and
+    // must be re-applied here or Android loads the non-cipher system lib.
+    setupSqlcipher();
+    return DatabaseConnection(
+      NativeDatabase(
+        File(path),
+        setup: keyHex == null
+            ? null
+            : (db) => db.execute(cipherKeyPragma(keyHex)),
+      ),
+    );
+  };
 }
 
 /// Closes [db] for process shutdown, tolerating the two ways a plain
@@ -105,11 +120,15 @@ class BackgroundDatabaseConnection {
 
   /// Opens [file] on a dedicated worker isolate.
   ///
+  /// [keyHex] is the SQLCipher raw key for an encrypted database; the worker
+  /// applies it as the first statement on its connection.
+  ///
   /// [debugOpener] replaces what the worker opens. It exists so tests can give
   /// the worker a deliberately slow-closing executor; it must be a closure
   /// that can be sent to an isolate (see [_openerFor]).
   static Future<BackgroundDatabaseConnection> open(
     File file, {
+    String? keyHex,
     @visibleForTesting DatabaseConnection Function()? debugOpener,
   }) async {
     final exitPort = ReceivePort('submersion drift worker exit');
@@ -121,7 +140,7 @@ class BackgroundDatabaseConnection {
     Isolate? worker;
     try {
       final driftIsolate = await DriftIsolate.spawn(
-        debugOpener ?? _openerFor(file.absolute.path),
+        debugOpener ?? _openerFor(file.absolute.path, keyHex),
         isolateSpawn: <T>(entrypoint, message) async {
           final isolate = await Isolate.spawn(
             entrypoint,

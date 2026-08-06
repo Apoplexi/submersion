@@ -546,8 +546,12 @@ class DatabaseMigrationService {
       debugInfo?.writeln('DEBUG: File exists, size: $fileSize bytes');
 
       // Use sqlite3 directly to avoid Drift's migration system triggering
-      // when opening a database with a different schema version
-      final db = sqlite3.sqlite3.open(dbPath);
+      // when opening a database with a different schema version. openRaw
+      // applies the cipher key when the live database is encrypted.
+      final db = DatabaseService.openRaw(
+        dbPath,
+        keyHex: DatabaseService.instance.databaseKeyHex,
+      );
       try {
         // Run integrity check (quick_check is faster and avoids long stalls)
         final result = db.select('PRAGMA quick_check');
@@ -689,8 +693,12 @@ class DatabaseMigrationService {
 
   Future<_DatabaseCounts> _fetchDatabaseCounts(String dbPath) async {
     // Use sqlite3 directly to avoid Drift's migration system triggering
-    // when opening a database with a different schema version
-    final db = sqlite3.sqlite3.open(dbPath);
+    // when opening a database with a different schema version. openRaw
+    // applies the cipher key when the live database is encrypted.
+    final db = DatabaseService.openRaw(
+      dbPath,
+      keyHex: DatabaseService.instance.databaseKeyHex,
+    );
     try {
       // Query each table individually to handle missing tables gracefully
       // (older database versions may not have all tables)

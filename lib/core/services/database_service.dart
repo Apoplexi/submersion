@@ -10,7 +10,12 @@ import 'package:sqlite3/sqlite3.dart' as sqlite3;
 import 'package:submersion/core/database/background_database_connection.dart';
 import 'package:submersion/core/database/database.dart';
 import 'package:submersion/core/database/database_version_exception.dart';
+import 'package:submersion/core/database/sqlcipher_setup.dart'
+    as sqlcipher_setup;
 import 'package:submersion/core/services/database_location_service.dart';
+import 'package:submersion/core/services/security/database_locked_exception.dart';
+import 'package:submersion/core/services/security/database_security_sidecar.dart'
+    show isEncryptedDatabaseFile;
 
 /// Which executor path [DatabaseService] used for the most recent open.
 enum DatabaseOpenMode {
@@ -20,6 +25,13 @@ enum DatabaseOpenMode {
   /// A pending upgrade ladder ran on the synchronous main-isolate executor
   /// first, then the database reopened on the background executor.
   migrationThenBackground,
+}
+
+/// drift setup callback that keys a SQLCipher connection before any other
+/// statement. Null when no key — plaintext open, zero overhead.
+void Function(sqlite3.Database)? _cipherSetup(String? keyHex) {
+  if (keyHex == null) return null;
+  return (db) => db.execute(DatabaseService.cipherKeyPragma(keyHex));
 }
 
 class DatabaseService {
@@ -37,6 +49,11 @@ class DatabaseService {
   DatabaseLocationService? _locationService;
   String? _currentDatabasePath;
   bool _isMigrating = false;
+
+  /// SQLCipher raw key (64 lowercase hex chars) for the main database, set by
+  /// DatabaseSecurityService BEFORE initialize()/reinitializeAtPath() when
+  /// encryption is enabled. Null = open without a key (plaintext database).
+  String? databaseKeyHex;
 
   /// Whether a database migration is currently in progress
   /// During migration, database access should be avoided
@@ -91,6 +108,7 @@ class DatabaseService {
     _background = null;
     _locationService = null;
     _currentDatabasePath = null;
+    databaseKeyHex = null;
     lastOpenMode = null;
     // The service is a singleton, so a restore seam set by one test would
     // otherwise leak into the next and fire unexpectedly.
@@ -172,7 +190,8 @@ class DatabaseService {
     void Function(int currentStep, int totalSteps)? onMigrationProgress,
   }) async {
     final file = File(dbPath);
-    final stored = getStoredSchemaVersion(dbPath);
+    final keyHex = databaseKeyHex;
+    final stored = getStoredSchemaVersion(dbPath, keyHex: keyHex);
 
     // Guard: reject databases created by a newer version of the app.
     if (stored != null && stored > AppDatabase.currentSchemaVersion) {
@@ -189,7 +208,7 @@ class DatabaseService {
 
     if (migrationPending) {
       final migrator = AppDatabase(
-        NativeDatabase(file),
+        NativeDatabase(file, setup: _cipherSetup(keyHex)),
         onMigrationProgress: onMigrationProgress,
       );
       try {
@@ -216,7 +235,10 @@ class DatabaseService {
       lastOpenMode = DatabaseOpenMode.background;
     }
 
-    final background = await BackgroundDatabaseConnection.open(file);
+    final background = await BackgroundDatabaseConnection.open(
+      file,
+      keyHex: keyHex,
+    );
     _background = background;
     return AppDatabase(
       background.connection,
@@ -356,19 +378,58 @@ class DatabaseService {
   /// roll back any hot journal left behind by a previous crash. A read-only
   /// open on a db with a pending rollback throws SQLITE_READONLY_ROLLBACK
   /// (extended code 776) before even the first PRAGMA can execute.
-  static int? getStoredSchemaVersion(String dbPath) {
+  static int? getStoredSchemaVersion(String dbPath, {String? keyHex}) {
     final file = File(dbPath);
     if (!file.existsSync()) return null;
 
-    final db = sqlite3.sqlite3.open(dbPath, mode: sqlite3.OpenMode.readWrite);
+    final db = openRaw(dbPath, keyHex: keyHex);
     try {
       final result = db.select('PRAGMA user_version');
       if (result.isEmpty) return null;
       return result.first.values.first as int;
+    } on sqlite3.SqliteException catch (e) {
+      // An encrypted file read without (or with the wrong) key surfaces as
+      // NOTADB on the first real page read. Route it to the unlock flow
+      // instead of the generic startup error. The header probe distinguishes
+      // a genuinely corrupt plaintext file from an encrypted one.
+      if (_isNotADatabaseError(e) && isEncryptedDatabaseFile(dbPath)) {
+        throw DatabaseLockedException(dbPath, wrongKey: keyHex != null);
+      }
+      rethrow;
     } finally {
       db.dispose();
     }
   }
+
+  /// The PRAGMA that keys a SQLCipher connection with a raw key. Delegate to
+  /// the single definition in sqlcipher_setup.dart.
+  static String cipherKeyPragma(String keyHex) =>
+      sqlcipher_setup.cipherKeyPragma(keyHex);
+
+  /// Single choke point for raw (non-drift) opens of the main database.
+  /// Applies the cipher key when given, and disposes the handle on failure.
+  static sqlite3.Database openRaw(
+    String path, {
+    sqlite3.OpenMode mode = sqlite3.OpenMode.readWrite,
+    String? keyHex,
+  }) {
+    final db = sqlite3.sqlite3.open(path, mode: mode);
+    if (keyHex != null) {
+      try {
+        db.execute(cipherKeyPragma(keyHex));
+      } catch (_) {
+        db.dispose();
+        rethrow;
+      }
+    }
+    return db;
+  }
+
+  /// True when [error] is SQLite's NOTADB ("file is not a database", primary
+  /// result code 26) — what SQLCipher raises when reading an encrypted file
+  /// with a missing or wrong key.
+  static bool _isNotADatabaseError(Object error) =>
+      error is sqlite3.SqliteException && error.resultCode == 26;
 
   /// Force SQLite to complete any pending hot-journal rollback on [dbPath].
   ///
@@ -379,11 +440,11 @@ class DatabaseService {
   /// read-only volume, etc.).
   ///
   /// Safe to call on a file without a hot journal: it simply no-ops.
-  static bool recoverHotJournal(String dbPath) {
+  static bool recoverHotJournal(String dbPath, {String? keyHex}) {
     final file = File(dbPath);
     if (!file.existsSync()) return true;
     try {
-      final db = sqlite3.sqlite3.open(dbPath, mode: sqlite3.OpenMode.readWrite);
+      final db = openRaw(dbPath, keyHex: keyHex);
       try {
         db.select('PRAGMA user_version');
       } finally {
