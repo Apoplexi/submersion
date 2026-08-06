@@ -21,34 +21,45 @@ class LockBarrier extends ConsumerWidget {
         child,
         if (locked)
           Positioned.fill(
-            child: Material(
-              color: Theme.of(context).colorScheme.surface,
-              child: SafeArea(
-                child: Center(
-                  child: SingleChildScrollView(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(Icons.lock_outline, size: 48),
-                        const SizedBox(height: 16),
-                        Text(
-                          'Submersion is locked',
-                          style: Theme.of(context).textTheme.titleLarge,
+            child: Stack(
+              children: [
+                // Load-bearing for BOTH concerns, which is why the opaque
+                // Material below is not enough on its own: ModalBarrier
+                // absorbs every pointer event, and it blocks the semantics of
+                // everything painted earlier. Without the semantics block a
+                // screen reader can still read out the dive log the lock is
+                // supposed to be hiding. Same pattern as RestoreBarrier.
+                const ModalBarrier(dismissible: false),
+                Material(
+                  color: Theme.of(context).colorScheme.surface,
+                  child: SafeArea(
+                    child: Center(
+                      child: SingleChildScrollView(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(Icons.lock_outline, size: 48),
+                            const SizedBox(height: 16),
+                            Text(
+                              'Submersion is locked',
+                              style: Theme.of(context).textTheme.titleLarge,
+                            ),
+                            const SizedBox(height: 24),
+                            UnlockForm(
+                              onSubmitSecret: (s) => ref
+                                  .read(appLockNotifierProvider.notifier)
+                                  .unlockWithSecret(s),
+                              onBiometric: () => ref
+                                  .read(appLockNotifierProvider.notifier)
+                                  .unlockWithBiometric(),
+                            ),
+                          ],
                         ),
-                        const SizedBox(height: 24),
-                        UnlockForm(
-                          onSubmitSecret: (s) => ref
-                              .read(appLockNotifierProvider.notifier)
-                              .unlockWithSecret(s),
-                          onBiometric: () => ref
-                              .read(appLockNotifierProvider.notifier)
-                              .unlockWithBiometric(),
-                        ),
-                      ],
+                      ),
                     ),
                   ),
                 ),
-              ),
+              ],
             ),
           ),
       ],

@@ -39,6 +39,15 @@ abstract final class DatabaseSecuritySidecar {
 
   static String pathFor(String dbPath) => p.join(p.dirname(dbPath), fileName);
 
+  /// Whether this install has security material for [dbPath].
+  ///
+  /// This is the corroboration signal for an unreadable database file: a
+  /// corrupt plaintext database and an encrypted one are indistinguishable at
+  /// the header, so [isEncryptedDatabaseFile] alone must never decide. Both
+  /// the startup gate and the schema probe consult this before concluding
+  /// "encrypted" rather than "corrupt".
+  static bool existsFor(String dbPath) => File(pathFor(dbPath)).existsSync();
+
   static Future<KeyslotFile?> read(String dbPath) async {
     final file = File(pathFor(dbPath));
     if (!await file.exists()) return null;

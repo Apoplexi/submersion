@@ -349,10 +349,7 @@ class _StartupWrapperState extends State<StartupWrapper>
       // to corroborate it (enableSecurity always writes one and it travels
       // with the database); otherwise leave the file to the existing
       // corruption-recovery flow.
-      final hasSidecar = File(
-        DatabaseSecuritySidecar.pathFor(dbPath),
-      ).existsSync();
-      if (hasSidecar) {
+      if (DatabaseSecuritySidecar.existsFor(dbPath)) {
         await security.preferences.setDbEncryptionEnabled(true);
         await security.refreshDerivedKey();
       }
@@ -380,7 +377,7 @@ class _StartupWrapperState extends State<StartupWrapper>
     // strand the database permanently. Declining just reoffers next launch.
     if ((security.appLockEnabled || security.encryptionEnabled) &&
         security.isUnlocked &&
-        !File(DatabaseSecuritySidecar.pathFor(dbPath)).existsSync()) {
+        !DatabaseSecuritySidecar.existsFor(dbPath)) {
       final ctx = _splashNavigatorKey.currentContext;
       if (ctx != null && ctx.mounted) {
         String? newCode;

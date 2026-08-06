@@ -15,8 +15,7 @@ import 'package:submersion/core/database/sqlcipher_setup.dart'
 import 'package:submersion/core/services/database_location_service.dart';
 import 'package:submersion/core/services/security/database_encryption_migrator.dart';
 import 'package:submersion/core/services/security/database_locked_exception.dart';
-import 'package:submersion/core/services/security/database_security_sidecar.dart'
-    show isEncryptedDatabaseFile;
+import 'package:submersion/core/services/security/database_security_sidecar.dart';
 
 /// Which executor path [DatabaseService] used for the most recent open.
 enum DatabaseOpenMode {
@@ -400,10 +399,20 @@ class DatabaseService {
       return result.first.values.first as int;
     } on sqlite3.SqliteException catch (e) {
       // An encrypted file read without (or with the wrong) key surfaces as
-      // NOTADB on the first real page read. Route it to the unlock flow
-      // instead of the generic startup error. The header probe distinguishes
-      // a genuinely corrupt plaintext file from an encrypted one.
-      if (_isNotADatabaseError(e) && isEncryptedDatabaseFile(dbPath)) {
+      // NOTADB on the first real page read — but so does a CORRUPT plaintext
+      // database, since the header probe alone cannot tell the two apart
+      // (both simply fail to start with the SQLite magic).
+      //
+      // So require corroboration before routing to the unlock flow, the same
+      // rule the startup gate applies: either a key was supplied (we already
+      // believed the file was encrypted and it was rejected) or the keyslot
+      // sidecar exists (this install has security material). With neither,
+      // let the SqliteException through to the corruption-recovery flow —
+      // sending corruption to the lock screen would strand the user there,
+      // because no password can unwrap a sidecar that does not exist.
+      if (_isNotADatabaseError(e) &&
+          isEncryptedDatabaseFile(dbPath) &&
+          (keyHex != null || DatabaseSecuritySidecar.existsFor(dbPath))) {
         throw DatabaseLockedException(dbPath, wrongKey: keyHex != null);
       }
       rethrow;
