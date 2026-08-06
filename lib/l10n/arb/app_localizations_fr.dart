@@ -12262,6 +12262,18 @@ class AppLocalizationsFr extends AppLocalizations {
   String get media_console_transfers => 'Transferts';
 
   @override
+  String get media_library_empty => 'Aucun média pour le moment';
+
+  @override
+  String get media_library_filter_all => 'Tous';
+
+  @override
+  String get media_library_filter_photos => 'Photos';
+
+  @override
+  String get media_library_filter_videos => 'Vidéos';
+
+  @override
   String get nav_home => 'Accueil';
 
   @override

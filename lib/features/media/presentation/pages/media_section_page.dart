@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'package:submersion/features/media/presentation/pages/media_library_view.dart';
 import 'package:submersion/features/media/presentation/widgets/media_console_scaffold.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 
@@ -24,7 +25,7 @@ class _MediaSectionPageState extends State<MediaSectionPage> {
         selected: _section,
         onSelect: (section) => setState(() => _section = section),
         child: switch (_section) {
-          MediaConsoleSection.library => const SizedBox.shrink(),
+          MediaConsoleSection.library => const MediaLibraryView(),
           MediaConsoleSection.transfers => const SizedBox.shrink(),
         },
       ),

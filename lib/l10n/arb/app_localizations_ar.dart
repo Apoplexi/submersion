@@ -12002,6 +12002,18 @@ class AppLocalizationsAr extends AppLocalizations {
   String get media_console_transfers => 'عمليات النقل';
 
   @override
+  String get media_library_empty => 'لا توجد وسائط بعد';
+
+  @override
+  String get media_library_filter_all => 'الكل';
+
+  @override
+  String get media_library_filter_photos => 'الصور';
+
+  @override
+  String get media_library_filter_videos => 'مقاطع الفيديو';
+
+  @override
   String get nav_home => 'الرئيسية';
 
   @override

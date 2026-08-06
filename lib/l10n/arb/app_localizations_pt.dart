@@ -12227,6 +12227,18 @@ class AppLocalizationsPt extends AppLocalizations {
   String get media_console_transfers => 'Transferências';
 
   @override
+  String get media_library_empty => 'Nenhuma mídia ainda';
+
+  @override
+  String get media_library_filter_all => 'Tudo';
+
+  @override
+  String get media_library_filter_photos => 'Fotos';
+
+  @override
+  String get media_library_filter_videos => 'Vídeos';
+
+  @override
   String get nav_home => 'Inicio';
 
   @override

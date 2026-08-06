@@ -12216,6 +12216,18 @@ class AppLocalizationsDe extends AppLocalizations {
   String get media_console_transfers => 'Übertragungen';
 
   @override
+  String get media_library_empty => 'Noch keine Medien';
+
+  @override
+  String get media_library_filter_all => 'Alle';
+
+  @override
+  String get media_library_filter_photos => 'Fotos';
+
+  @override
+  String get media_library_filter_videos => 'Videos';
+
+  @override
   String get nav_home => 'Startseite';
 
   @override

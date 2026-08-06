@@ -11921,6 +11921,18 @@ class AppLocalizationsHe extends AppLocalizations {
   String get media_console_transfers => 'העברות';
 
   @override
+  String get media_library_empty => 'אין מדיה עדיין';
+
+  @override
+  String get media_library_filter_all => 'הכול';
+
+  @override
+  String get media_library_filter_photos => 'תמונות';
+
+  @override
+  String get media_library_filter_videos => 'סרטונים';
+
+  @override
   String get nav_home => 'בית';
 
   @override

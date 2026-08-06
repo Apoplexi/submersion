@@ -20737,6 +20737,30 @@ abstract class AppLocalizations {
   /// **'Transfers'**
   String get media_console_transfers;
 
+  /// Empty state for the media library
+  ///
+  /// In en, this message translates to:
+  /// **'No media yet'**
+  String get media_library_empty;
+
+  /// Library filter chip: no type filter
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get media_library_filter_all;
+
+  /// Library filter chip: photos only
+  ///
+  /// In en, this message translates to:
+  /// **'Photos'**
+  String get media_library_filter_photos;
+
+  /// Library filter chip: videos only
+  ///
+  /// In en, this message translates to:
+  /// **'Videos'**
+  String get media_library_filter_videos;
+
   /// Navigation label for home/dashboard
   ///
   /// In en, this message translates to:

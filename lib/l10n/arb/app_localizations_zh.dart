@@ -11669,6 +11669,18 @@ class AppLocalizationsZh extends AppLocalizations {
   String get media_console_transfers => '传输';
 
   @override
+  String get media_library_empty => '暂无媒体';
+
+  @override
+  String get media_library_filter_all => '全部';
+
+  @override
+  String get media_library_filter_photos => '照片';
+
+  @override
+  String get media_library_filter_videos => '视频';
+
+  @override
   String get nav_home => '首页';
 
   @override

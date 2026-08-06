@@ -12129,6 +12129,18 @@ class AppLocalizationsNl extends AppLocalizations {
   String get media_console_transfers => 'Overdrachten';
 
   @override
+  String get media_library_empty => 'Nog geen media';
+
+  @override
+  String get media_library_filter_all => 'Alles';
+
+  @override
+  String get media_library_filter_photos => 'Foto\'s';
+
+  @override
+  String get media_library_filter_videos => 'Video\'s';
+
+  @override
   String get nav_home => 'Home';
 
   @override

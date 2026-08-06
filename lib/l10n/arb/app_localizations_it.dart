@@ -12223,6 +12223,18 @@ class AppLocalizationsIt extends AppLocalizations {
   String get media_console_transfers => 'Trasferimenti';
 
   @override
+  String get media_library_empty => 'Ancora nessun contenuto multimediale';
+
+  @override
+  String get media_library_filter_all => 'Tutti';
+
+  @override
+  String get media_library_filter_photos => 'Foto';
+
+  @override
+  String get media_library_filter_videos => 'Video';
+
+  @override
   String get nav_home => 'Home';
 
   @override

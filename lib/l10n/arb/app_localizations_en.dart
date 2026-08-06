@@ -12024,6 +12024,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get media_console_transfers => 'Transfers';
 
   @override
+  String get media_library_empty => 'No media yet';
+
+  @override
+  String get media_library_filter_all => 'All';
+
+  @override
+  String get media_library_filter_photos => 'Photos';
+
+  @override
+  String get media_library_filter_videos => 'Videos';
+
+  @override
   String get nav_home => 'Home';
 
   @override

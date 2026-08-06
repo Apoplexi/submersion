@@ -12186,6 +12186,18 @@ class AppLocalizationsHu extends AppLocalizations {
   String get media_console_transfers => 'Átvitelek';
 
   @override
+  String get media_library_empty => 'Még nincs média';
+
+  @override
+  String get media_library_filter_all => 'Összes';
+
+  @override
+  String get media_library_filter_photos => 'Fotók';
+
+  @override
+  String get media_library_filter_videos => 'Videók';
+
+  @override
   String get nav_home => 'Fooldal';
 
   @override

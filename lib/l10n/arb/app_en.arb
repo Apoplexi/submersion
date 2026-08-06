@@ -7022,6 +7022,22 @@
   "@media_console_transfers": {
     "description": "Media console sidebar/tab label for the transfers view"
   },
+  "media_library_empty": "No media yet",
+  "@media_library_empty": {
+    "description": "Empty state for the media library"
+  },
+  "media_library_filter_all": "All",
+  "@media_library_filter_all": {
+    "description": "Library filter chip: no type filter"
+  },
+  "media_library_filter_photos": "Photos",
+  "@media_library_filter_photos": {
+    "description": "Library filter chip: photos only"
+  },
+  "media_library_filter_videos": "Videos",
+  "@media_library_filter_videos": {
+    "description": "Library filter chip: videos only"
+  },
   "nav_home": "Home",
   "nav_media": "Media",
   "nav_more": "More",
