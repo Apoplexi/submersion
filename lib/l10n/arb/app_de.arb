@@ -3224,6 +3224,42 @@
   "equipment_serviceClocks_overdueSince": "Überfällig seit {date}",
   "equipment_serviceClocks_overdue": "Überfällig",
   "equipment_serviceClocks_divesLeft": "{remaining} von {total} Tauchgängen übrig",
+  "cylinderConfigs_title": "Flaschenkonfigurationen",
+  "cylinderConfigs_empty": "Noch keine Konfigurationen",
+  "cylinderConfigs_emptyBody": "Diluent- und Bailout-Aufbau einmal speichern und auf jeden Tauchgang anwenden.",
+  "cylinderConfigs_new": "Neue Konfiguration",
+  "cylinderConfigs_name": "Name",
+  "cylinderConfigs_nameRequired": "Namen eingeben",
+  "cylinderConfigs_forUnit": "Für Gerät",
+  "cylinderConfigs_noUnit": "Allgemeiner Gasplan",
+  "cylinderConfigs_gasPlans": "Gaspläne",
+  "cylinderConfigs_addCylinder": "Flasche hinzufügen",
+  "cylinderConfigs_role": "Rolle",
+  "cylinderConfigs_startPressure": "Anfangsdruck",
+  "cylinderConfigs_label": "Bezeichnung",
+  "cylinderConfigs_fromPreset": "Aus Vorlage",
+  "cylinderConfigs_deleteTitle": "Konfiguration löschen?",
+  "cylinderConfigs_deleteBody": "Bereits angewendete Tauchgänge bleiben unverändert.",
+  "cylinderConfigs_applyAction": "Konfiguration anwenden",
+  "cylinderConfigs_applyAdded": "{count, plural, =1{1 Flasche hinzugefügt} other{{count} Flaschen hinzugefügt}}",
+  "@cylinderConfigs_applyAdded": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "cylinderConfigs_applyKept": "{count, plural, =1{1 beibehalten} other{{count} beibehalten}}",
+  "@cylinderConfigs_applyKept": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "cylinderConfigs_applyNothingToDo": "Dieser Tauchgang entspricht bereits der Konfiguration",
+  "cylinderConfigs_sectionTitle": "Konfigurationen",
+  "equipment_serviceClocks_hoursSource": "Aus der protokollierten Tauchzeit berechnet",
   "equipment_serviceClocks_hoursLeft": "{remaining} von {total} Stunden übrig",
   "equipment_serviceClocks_manageKinds": "Wartungsarten verwalten",
   "equipment_serviceClocks_appliesToClock": "Zugehöriges Intervall",
@@ -6323,6 +6359,24 @@
   "attrLabel_sole_type": "Sohle",
   "attrLabel_buoyancy_kg": "Auftrieb",
   "attrLabel_dry_weight_kg": "Trockengewicht",
+  "attrLabel_unit_type": "Gerätetyp",
+  "attrLabel_mount_configuration": "Montage",
+  "attrLabel_scrubber_type": "Absorbertyp",
+  "attrLabel_scrubber_duration_h": "Absorberstandzeit (h)",
+  "attrLabel_o2_cell_count": "O2-Zellen",
+  "attrLabel_diluent_cylinder_l": "Diluent-Flasche",
+  "attrLabel_o2_cylinder_l": "O2-Flasche",
+  "attrChoice_unit_type_eccr": "Elektronischer CCR (eCCR)",
+  "attrChoice_unit_type_mccr": "Manueller CCR (mCCR)",
+  "attrChoice_unit_type_hccr": "Hybrid-CCR (hCCR)",
+  "attrChoice_unit_type_scr_cmf": "SCR - konstanter Massenstrom",
+  "attrChoice_unit_type_scr_pascr": "SCR - passive Zugabe",
+  "attrChoice_unit_type_scr_escr": "SCR - elektronisch geregelt",
+  "attrChoice_mount_configuration_back": "Rückenmontage",
+  "attrChoice_mount_configuration_chest": "Brustmontage",
+  "attrChoice_mount_configuration_sidemount": "Seitenmontage",
+  "attrChoice_scrubber_type_axial": "Axial",
+  "attrChoice_scrubber_type_radial": "Radial",
   "attrChoice_suit_style_full": "Vollanzug",
   "attrChoice_suit_style_shorty": "Shorty",
   "attrChoice_suit_style_two_piece": "Zweiteiler",

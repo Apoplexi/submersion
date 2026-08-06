@@ -10192,6 +10192,92 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get cylinderConfigs_title => 'Flaschenkonfigurationen';
+
+  @override
+  String get cylinderConfigs_empty => 'Noch keine Konfigurationen';
+
+  @override
+  String get cylinderConfigs_emptyBody =>
+      'Diluent- und Bailout-Aufbau einmal speichern und auf jeden Tauchgang anwenden.';
+
+  @override
+  String get cylinderConfigs_new => 'Neue Konfiguration';
+
+  @override
+  String get cylinderConfigs_name => 'Name';
+
+  @override
+  String get cylinderConfigs_nameRequired => 'Namen eingeben';
+
+  @override
+  String get cylinderConfigs_forUnit => 'Für Gerät';
+
+  @override
+  String get cylinderConfigs_noUnit => 'Allgemeiner Gasplan';
+
+  @override
+  String get cylinderConfigs_gasPlans => 'Gaspläne';
+
+  @override
+  String get cylinderConfigs_addCylinder => 'Flasche hinzufügen';
+
+  @override
+  String get cylinderConfigs_role => 'Rolle';
+
+  @override
+  String get cylinderConfigs_startPressure => 'Anfangsdruck';
+
+  @override
+  String get cylinderConfigs_label => 'Bezeichnung';
+
+  @override
+  String get cylinderConfigs_fromPreset => 'Aus Vorlage';
+
+  @override
+  String get cylinderConfigs_deleteTitle => 'Konfiguration löschen?';
+
+  @override
+  String get cylinderConfigs_deleteBody =>
+      'Bereits angewendete Tauchgänge bleiben unverändert.';
+
+  @override
+  String get cylinderConfigs_applyAction => 'Konfiguration anwenden';
+
+  @override
+  String cylinderConfigs_applyAdded(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Flaschen hinzugefügt',
+      one: '1 Flasche hinzugefügt',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String cylinderConfigs_applyKept(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count beibehalten',
+      one: '1 beibehalten',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get cylinderConfigs_applyNothingToDo =>
+      'Dieser Tauchgang entspricht bereits der Konfiguration';
+
+  @override
+  String get cylinderConfigs_sectionTitle => 'Konfigurationen';
+
+  @override
+  String get equipment_serviceClocks_hoursSource =>
+      'Aus der protokollierten Tauchzeit berechnet';
+
+  @override
   String equipment_serviceClocks_hoursLeft(String remaining, String total) {
     return '$remaining von $total Stunden übrig';
   }
@@ -21782,6 +21868,60 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get attrLabel_dry_weight_kg => 'Trockengewicht';
+
+  @override
+  String get attrLabel_unit_type => 'Gerätetyp';
+
+  @override
+  String get attrLabel_mount_configuration => 'Montage';
+
+  @override
+  String get attrLabel_scrubber_type => 'Absorbertyp';
+
+  @override
+  String get attrLabel_scrubber_duration_h => 'Absorberstandzeit (h)';
+
+  @override
+  String get attrLabel_o2_cell_count => 'O2-Zellen';
+
+  @override
+  String get attrLabel_diluent_cylinder_l => 'Diluent-Flasche';
+
+  @override
+  String get attrLabel_o2_cylinder_l => 'O2-Flasche';
+
+  @override
+  String get attrChoice_unit_type_eccr => 'Elektronischer CCR (eCCR)';
+
+  @override
+  String get attrChoice_unit_type_mccr => 'Manueller CCR (mCCR)';
+
+  @override
+  String get attrChoice_unit_type_hccr => 'Hybrid-CCR (hCCR)';
+
+  @override
+  String get attrChoice_unit_type_scr_cmf => 'SCR - konstanter Massenstrom';
+
+  @override
+  String get attrChoice_unit_type_scr_pascr => 'SCR - passive Zugabe';
+
+  @override
+  String get attrChoice_unit_type_scr_escr => 'SCR - elektronisch geregelt';
+
+  @override
+  String get attrChoice_mount_configuration_back => 'Rückenmontage';
+
+  @override
+  String get attrChoice_mount_configuration_chest => 'Brustmontage';
+
+  @override
+  String get attrChoice_mount_configuration_sidemount => 'Seitenmontage';
+
+  @override
+  String get attrChoice_scrubber_type_axial => 'Axial';
+
+  @override
+  String get attrChoice_scrubber_type_radial => 'Radial';
 
   @override
   String get attrChoice_suit_style_full => 'Vollanzug';

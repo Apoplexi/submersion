@@ -55,6 +55,9 @@ import 'package:submersion/features/dive_log/presentation/widgets/edit_sections/
 import 'package:submersion/features/dive_log/presentation/widgets/edit_sections/experience_section.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/edit_sections/gas_gear_section.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/edit_sections/rare_sections.dart';
+import 'package:submersion/features/cylinder_configs/domain/entities/cylinder_config.dart';
+import 'package:submersion/features/cylinder_configs/domain/services/dive_tank_config_adapter.dart';
+import 'package:submersion/features/cylinder_configs/presentation/widgets/apply_configuration_menu.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/edit_sections/tank_row.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/edit_sections/the_dive_section.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/edit_sections/trip_section.dart';
@@ -2453,6 +2456,9 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
       ],
       onAddTank: _addTank,
       addTankLabel: context.l10n.diveLog_edit_addTank,
+      applyConfigChild: ApplyConfigurationMenu(
+        onSelected: _applyCylinderConfig,
+      ),
       equipmentChild: _equipmentChild(),
       weightChild: _weightChild(units),
       showTankControls: _diveMode != DiveMode.gauge,
@@ -2721,6 +2727,51 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
     );
   }
 
+  /// Merges a saved cylinder configuration into the in-memory tank list.
+  ///
+  /// Deliberately does not touch dive_tanks: these cylinders are unsaved form
+  /// state until the diver taps Save, so writing through would bypass dirty
+  /// tracking and persist changes even if they then cancelled. All merge
+  /// rules live in CylinderConfigApplier via DiveTankConfigAdapter, which
+  /// never overwrites a gas mix already on the dive.
+  void _applyCylinderConfig(CylinderConfig config) {
+    final messenger = ScaffoldMessenger.of(context);
+    final l10n = context.l10n;
+
+    final result = const DiveTankConfigAdapter().apply(
+      tanks: _tanks,
+      items: config.items,
+      newId: (_) => _uuid.v4(),
+    );
+
+    // A repeat apply matches every role and so reports a non-zero kept while
+    // doing no work. Rebuilding then would mark the form dirty and raise an
+    // unsaved-changes prompt for a merge that altered nothing.
+    if (!result.changed) {
+      messenger.showSnackBar(
+        SnackBar(content: Text(l10n.cylinderConfigs_applyNothingToDo)),
+      );
+      return;
+    }
+
+    setState(() {
+      _markDirty();
+      _tanksDirty = true;
+      _tanks
+        ..clear()
+        ..addAll(result.tanks);
+    });
+
+    messenger.showSnackBar(
+      SnackBar(
+        content: Text(
+          '${l10n.cylinderConfigs_applyAdded(result.added)}, '
+          '${l10n.cylinderConfigs_applyKept(result.kept)}',
+        ),
+      ),
+    );
+  }
+
   void _addTank() {
     final settings = ref.read(settingsProvider);
     setState(() {
@@ -2961,6 +3012,11 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
         return Icons.face;
       case EquipmentType.tank:
         return MdiIcons.divingScubaTank;
+      // A closed circuit recycles the breathing loop; the vendored MdiIcons
+      // subset has no rebreather glyph, and the tank glyph already means
+      // "tank".
+      case EquipmentType.rebreather:
+        return Icons.recycling;
       case EquipmentType.transmitter:
         return Icons.sensors;
       case EquipmentType.weights:

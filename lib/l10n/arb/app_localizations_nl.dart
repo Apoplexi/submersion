@@ -10118,6 +10118,92 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String get cylinderConfigs_title => 'Flesconfiguraties';
+
+  @override
+  String get cylinderConfigs_empty => 'Nog geen configuraties';
+
+  @override
+  String get cylinderConfigs_emptyBody =>
+      'Sla een diluent- en bailout-opstelling één keer op en pas hem toe op elke duik.';
+
+  @override
+  String get cylinderConfigs_new => 'Nieuwe configuratie';
+
+  @override
+  String get cylinderConfigs_name => 'Naam';
+
+  @override
+  String get cylinderConfigs_nameRequired => 'Voer een naam in';
+
+  @override
+  String get cylinderConfigs_forUnit => 'Voor unit';
+
+  @override
+  String get cylinderConfigs_noUnit => 'Algemeen gasplan';
+
+  @override
+  String get cylinderConfigs_gasPlans => 'Gasplannen';
+
+  @override
+  String get cylinderConfigs_addCylinder => 'Fles toevoegen';
+
+  @override
+  String get cylinderConfigs_role => 'Rol';
+
+  @override
+  String get cylinderConfigs_startPressure => 'Begindruk';
+
+  @override
+  String get cylinderConfigs_label => 'Label';
+
+  @override
+  String get cylinderConfigs_fromPreset => 'Uit voorinstelling';
+
+  @override
+  String get cylinderConfigs_deleteTitle => 'Configuratie verwijderen?';
+
+  @override
+  String get cylinderConfigs_deleteBody =>
+      'Duiken waarop hij al is toegepast veranderen niet.';
+
+  @override
+  String get cylinderConfigs_applyAction => 'Configuratie toepassen';
+
+  @override
+  String cylinderConfigs_applyAdded(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count flessen toegevoegd',
+      one: '1 fles toegevoegd',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String cylinderConfigs_applyKept(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count behouden',
+      one: '1 behouden',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get cylinderConfigs_applyNothingToDo =>
+      'Deze duik komt al overeen met de configuratie';
+
+  @override
+  String get cylinderConfigs_sectionTitle => 'Configuraties';
+
+  @override
+  String get equipment_serviceClocks_hoursSource =>
+      'Berekend op basis van geregistreerde duiktijd';
+
+  @override
   String equipment_serviceClocks_hoursLeft(String remaining, String total) {
     return '$remaining van $total uur resterend';
   }
@@ -21649,6 +21735,60 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get attrLabel_dry_weight_kg => 'Drooggewicht';
+
+  @override
+  String get attrLabel_unit_type => 'Type unit';
+
+  @override
+  String get attrLabel_mount_configuration => 'Montage';
+
+  @override
+  String get attrLabel_scrubber_type => 'Type scrubber';
+
+  @override
+  String get attrLabel_scrubber_duration_h => 'Scrubberduur (u)';
+
+  @override
+  String get attrLabel_o2_cell_count => 'O2-cellen';
+
+  @override
+  String get attrLabel_diluent_cylinder_l => 'Diluentfles';
+
+  @override
+  String get attrLabel_o2_cylinder_l => 'O2-fles';
+
+  @override
+  String get attrChoice_unit_type_eccr => 'Elektronische CCR (eCCR)';
+
+  @override
+  String get attrChoice_unit_type_mccr => 'Handmatige CCR (mCCR)';
+
+  @override
+  String get attrChoice_unit_type_hccr => 'Hybride CCR (hCCR)';
+
+  @override
+  String get attrChoice_unit_type_scr_cmf => 'SCR - constante massastroom';
+
+  @override
+  String get attrChoice_unit_type_scr_pascr => 'SCR - passieve toevoeging';
+
+  @override
+  String get attrChoice_unit_type_scr_escr => 'SCR - elektronisch geregeld';
+
+  @override
+  String get attrChoice_mount_configuration_back => 'Rugmontage';
+
+  @override
+  String get attrChoice_mount_configuration_chest => 'Borstmontage';
+
+  @override
+  String get attrChoice_mount_configuration_sidemount => 'Sidemount';
+
+  @override
+  String get attrChoice_scrubber_type_axial => 'Axiaal';
+
+  @override
+  String get attrChoice_scrubber_type_radial => 'Radiaal';
 
   @override
   String get attrChoice_suit_style_full => 'Volledig pak';

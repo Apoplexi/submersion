@@ -3152,6 +3152,42 @@
   "equipment_serviceClocks_overdueSince": "באיחור מאז {date}",
   "equipment_serviceClocks_overdue": "באיחור",
   "equipment_serviceClocks_divesLeft": "נותרו {remaining} מתוך {total} צלילות",
+  "cylinderConfigs_title": "תצורות בלונים",
+  "cylinderConfigs_empty": "אין עדיין תצורות",
+  "cylinderConfigs_emptyBody": "שמור פעם אחת מערך מדלל וביילאאוט, ואז החל אותו על כל צלילה.",
+  "cylinderConfigs_new": "תצורה חדשה",
+  "cylinderConfigs_name": "שם",
+  "cylinderConfigs_nameRequired": "הזן שם",
+  "cylinderConfigs_forUnit": "עבור היחידה",
+  "cylinderConfigs_noUnit": "תוכנית גז כללית",
+  "cylinderConfigs_gasPlans": "תוכניות גז",
+  "cylinderConfigs_addCylinder": "הוסף בלון",
+  "cylinderConfigs_role": "תפקיד",
+  "cylinderConfigs_startPressure": "לחץ התחלתי",
+  "cylinderConfigs_label": "תווית",
+  "cylinderConfigs_fromPreset": "מתבנית",
+  "cylinderConfigs_deleteTitle": "למחוק את התצורה?",
+  "cylinderConfigs_deleteBody": "צלילות שהתצורה כבר הוחלה עליהן לא ישתנו.",
+  "cylinderConfigs_applyAction": "החל תצורה",
+  "cylinderConfigs_applyAdded": "{count, plural, =1{בלון אחד נוסף} other{{count} בלונים נוספו}}",
+  "@cylinderConfigs_applyAdded": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "cylinderConfigs_applyKept": "{count, plural, =1{אחד נשמר} other{{count} נשמרו}}",
+  "@cylinderConfigs_applyKept": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "cylinderConfigs_applyNothingToDo": "הצלילה כבר תואמת לתצורה",
+  "cylinderConfigs_sectionTitle": "תצורות",
+  "equipment_serviceClocks_hoursSource": "מחושב מזמן הצלילה המתועד",
   "equipment_serviceClocks_hoursLeft": "נותרו {remaining} מתוך {total} שעות",
   "equipment_serviceClocks_manageKinds": "ניהול סוגי טיפול",
   "equipment_serviceClocks_appliesToClock": "חל על שעון",
@@ -6323,6 +6359,24 @@
   "attrLabel_sole_type": "סוליה",
   "attrLabel_buoyancy_kg": "ציפה",
   "attrLabel_dry_weight_kg": "משקל יבש",
+  "attrLabel_unit_type": "סוג היחידה",
+  "attrLabel_mount_configuration": "אופן ההרכבה",
+  "attrLabel_scrubber_type": "סוג הסופח",
+  "attrLabel_scrubber_duration_h": "משך הסופח (שעות)",
+  "attrLabel_o2_cell_count": "תאי O2",
+  "attrLabel_diluent_cylinder_l": "בלון מדלל",
+  "attrLabel_o2_cylinder_l": "בלון O2",
+  "attrChoice_unit_type_eccr": "CCR אלקטרוני (eCCR)",
+  "attrChoice_unit_type_mccr": "CCR ידני (mCCR)",
+  "attrChoice_unit_type_hccr": "CCR היברידי (hCCR)",
+  "attrChoice_unit_type_scr_cmf": "SCR - ספיקת מסה קבועה",
+  "attrChoice_unit_type_scr_pascr": "SCR - הוספה פסיבית",
+  "attrChoice_unit_type_scr_escr": "SCR - בקרה אלקטרונית",
+  "attrChoice_mount_configuration_back": "הרכבה על הגב",
+  "attrChoice_mount_configuration_chest": "הרכבה על החזה",
+  "attrChoice_mount_configuration_sidemount": "הרכבה בצד",
+  "attrChoice_scrubber_type_axial": "צירי",
+  "attrChoice_scrubber_type_radial": "רדיאלי",
   "attrChoice_suit_style_full": "חליפה מלאה",
   "attrChoice_suit_style_shorty": "שורטי",
   "attrChoice_suit_style_two_piece": "שני חלקים",

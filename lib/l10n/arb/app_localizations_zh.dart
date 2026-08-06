@@ -9751,6 +9751,86 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get cylinderConfigs_title => '气瓶配置';
+
+  @override
+  String get cylinderConfigs_empty => '尚无配置';
+
+  @override
+  String get cylinderConfigs_emptyBody => '保存一次稀释气与备用气配置，即可应用到任何一次潜水。';
+
+  @override
+  String get cylinderConfigs_new => '新建配置';
+
+  @override
+  String get cylinderConfigs_name => '名称';
+
+  @override
+  String get cylinderConfigs_nameRequired => '请输入名称';
+
+  @override
+  String get cylinderConfigs_forUnit => '所属设备';
+
+  @override
+  String get cylinderConfigs_noUnit => '通用气体方案';
+
+  @override
+  String get cylinderConfigs_gasPlans => '气体方案';
+
+  @override
+  String get cylinderConfigs_addCylinder => '添加气瓶';
+
+  @override
+  String get cylinderConfigs_role => '用途';
+
+  @override
+  String get cylinderConfigs_startPressure => '起始压力';
+
+  @override
+  String get cylinderConfigs_label => '标签';
+
+  @override
+  String get cylinderConfigs_fromPreset => '从预设填入';
+
+  @override
+  String get cylinderConfigs_deleteTitle => '删除此配置？';
+
+  @override
+  String get cylinderConfigs_deleteBody => '已应用过的潜水不会改变。';
+
+  @override
+  String get cylinderConfigs_applyAction => '应用配置';
+
+  @override
+  String cylinderConfigs_applyAdded(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '已添加 $count 个气瓶',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String cylinderConfigs_applyKept(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '保留 $count 个',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get cylinderConfigs_applyNothingToDo => '该潜水已与配置一致';
+
+  @override
+  String get cylinderConfigs_sectionTitle => '配置';
+
+  @override
+  String get equipment_serviceClocks_hoursSource => '根据已记录的潜水时间计算';
+
+  @override
   String equipment_serviceClocks_hoursLeft(String remaining, String total) {
     return '剩余 $remaining/$total 小时';
   }
@@ -20718,6 +20798,60 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get attrLabel_dry_weight_kg => '干重';
+
+  @override
+  String get attrLabel_unit_type => '设备类型';
+
+  @override
+  String get attrLabel_mount_configuration => '安装方式';
+
+  @override
+  String get attrLabel_scrubber_type => '药罐类型';
+
+  @override
+  String get attrLabel_scrubber_duration_h => '药罐时长（小时）';
+
+  @override
+  String get attrLabel_o2_cell_count => '氧电池';
+
+  @override
+  String get attrLabel_diluent_cylinder_l => '稀释气瓶';
+
+  @override
+  String get attrLabel_o2_cylinder_l => 'O2 气瓶';
+
+  @override
+  String get attrChoice_unit_type_eccr => '电子式 CCR (eCCR)';
+
+  @override
+  String get attrChoice_unit_type_mccr => '手动式 CCR (mCCR)';
+
+  @override
+  String get attrChoice_unit_type_hccr => '混合式 CCR (hCCR)';
+
+  @override
+  String get attrChoice_unit_type_scr_cmf => 'SCR - 恒定质量流量';
+
+  @override
+  String get attrChoice_unit_type_scr_pascr => 'SCR - 被动补气';
+
+  @override
+  String get attrChoice_unit_type_scr_escr => 'SCR - 电子控制';
+
+  @override
+  String get attrChoice_mount_configuration_back => '背挂式';
+
+  @override
+  String get attrChoice_mount_configuration_chest => '胸挂式';
+
+  @override
+  String get attrChoice_mount_configuration_sidemount => '侧挂式';
+
+  @override
+  String get attrChoice_scrubber_type_axial => '轴向';
+
+  @override
+  String get attrChoice_scrubber_type_radial => '径向';
 
   @override
   String get attrChoice_suit_style_full => '全身湿衣';
