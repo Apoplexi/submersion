@@ -12186,6 +12186,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settings_about_reportIssue => '报告问题';
 
   @override
+  String get settings_about_reportIssue_copy => '复制链接';
+
+  @override
   String get settings_about_reportIssue_snackbar =>
       '请访问 github.com/submersion-app/submersion/issues';
 
