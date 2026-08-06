@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart' hide Visibility;
@@ -74,6 +75,7 @@ import 'package:submersion/features/dive_log/presentation/widgets/ccr_settings_p
 import 'package:submersion/features/dive_log/presentation/widgets/dive_mode_selector.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/scr_settings_panel.dart';
 import 'package:submersion/features/tides/presentation/providers/tide_providers.dart';
+import 'package:submersion/features/weather/domain/services/altitude_resolver.dart';
 import 'package:submersion/features/weather/presentation/providers/weather_providers.dart';
 import 'package:submersion/features/courses/domain/entities/course.dart';
 import 'package:submersion/features/courses/presentation/providers/course_providers.dart';
@@ -731,6 +733,7 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
       if (mounted) {
         setState(() => _isLoading = false);
         _suppressDirty = false;
+        unawaited(_maybeAutoFillAltitude());
       }
     }
   }
@@ -1996,7 +1999,18 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
   Future<void> _updateSiteWithPhotoGps(GeoPoint gps) async {
     if (_selectedSite == null) return;
 
-    final updatedSite = _selectedSite!.copyWith(location: gps);
+    var updatedSite = _selectedSite!.copyWith(location: gps);
+    // A site gaining coordinates should also gain its altitude, so later dives
+    // there resolve locally without a lookup.
+    if (updatedSite.altitude == null) {
+      final meters = await ref
+          .read(elevationServiceProvider)
+          .fetchElevation(latitude: gps.latitude, longitude: gps.longitude);
+      if (!mounted) return;
+      if (meters != null) {
+        updatedSite = updatedSite.copyWith(altitude: meters);
+      }
+    }
 
     // Update the site via the notifier
     final siteNotifier = ref.read(siteListNotifierProvider.notifier);
@@ -2024,6 +2038,7 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
   void _assignSite(DiveSite? site) {
     _selectedSite = site;
     _waterType = waterTypeAfterSiteAssign(_waterType, site);
+    unawaited(_maybeAutoFillAltitude());
   }
 
   Future<void> _showSitePicker() async {
@@ -3558,6 +3573,7 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
       temperatureSymbol: units.temperatureSymbol,
       waterTempController: _waterTempController,
       airTempController: _airTempController,
+      topRows: [_autofillOverline(units)],
       environmentRows: _environmentRows(units),
       weatherRows: _weatherRows(units),
     );
@@ -3685,22 +3701,30 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
     ];
   }
 
-  List<Widget> _weatherRows(UnitFormatter units) {
+  /// The section-leading auto-fill row: its action fills fields both above
+  /// (air temperature) and below it, so it cannot live at the weather
+  /// subsection overline.
+  Widget _autofillOverline(UnitFormatter units) {
     final l10n = context.l10n;
     final canFetchWeather =
         _selectedSite != null && _selectedSite!.hasCoordinates;
+    return FormOverline(
+      label: l10n.diveLog_edit_subsection_autofill,
+      actions: [
+        FormOverlineAction(
+          label: l10n.diveLog_edit_button_fetchWeather,
+          icon: Icons.cloud_download,
+          busy: _isFetchingWeather,
+          onPressed: canFetchWeather ? () => _fetchWeather(units) : null,
+        ),
+      ],
+    );
+  }
+
+  List<Widget> _weatherRows(UnitFormatter units) {
+    final l10n = context.l10n;
     return [
-      FormOverline(
-        label: l10n.diveLog_edit_subsection_weather,
-        actions: [
-          FormOverlineAction(
-            label: l10n.diveLog_edit_button_fetchWeather,
-            icon: Icons.cloud_download,
-            busy: _isFetchingWeather,
-            onPressed: canFetchWeather ? () => _fetchWeather(units) : null,
-          ),
-        ],
-      ),
+      FormOverline(label: l10n.diveLog_edit_subsection_weather),
       FormRow.text(
         label: l10n.diveLog_edit_label_humidity,
         controller: _humidityController,
@@ -3747,6 +3771,43 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
         maxLines: 2,
       ),
     ];
+  }
+
+  /// Fill an empty altitude field from the dive's logged GPS or the selected
+  /// site (spec: 2026-08-06 conditions design). Never overwrites a value and
+  /// never marks the form dirty on its own.
+  Future<void> _maybeAutoFillAltitude() async {
+    if (_altitudeController.text.isNotEmpty) return;
+
+    final resolver = AltitudeResolver(
+      elevationService: ref.read(elevationServiceProvider),
+    );
+    final resolution = await resolver.resolve(
+      entryLocation: _existingDive?.entryLocation,
+      exitLocation: _existingDive?.exitLocation,
+      site: _selectedSite,
+    );
+    if (!mounted) return;
+
+    final writeBack = resolution.siteWriteBack;
+    if (writeBack != null) {
+      await ref.read(siteListNotifierProvider.notifier).updateSite(writeBack);
+      if (!mounted) return;
+      if (_selectedSite?.id == writeBack.id) {
+        _selectedSite = writeBack;
+      }
+    }
+
+    final meters = resolution.altitudeMeters;
+    if (meters == null || _altitudeController.text.isNotEmpty) return;
+    final units = UnitFormatter(ref.read(settingsProvider));
+    setState(() {
+      _silently(() {
+        _altitudeController.text = units
+            .convertAltitude(meters)
+            .toStringAsFixed(0);
+      });
+    });
   }
 
   /// Fetch weather data from Open-Meteo for the selected site and dive date.
@@ -3851,6 +3912,10 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
         _weatherSource = WeatherSource.openMeteo;
         _weatherFetchedAt = DateTime.now();
       });
+
+      // Retry the altitude lookup: the on-load attempt may have failed while
+      // offline, and the user has just asked for a network fill.
+      unawaited(_maybeAutoFillAltitude());
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(

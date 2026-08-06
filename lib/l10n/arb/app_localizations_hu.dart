@@ -20430,6 +20430,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String get diveLog_edit_section_environment => 'Környezet';
 
   @override
+  String get diveLog_edit_subsection_autofill => 'Automatikus kitöltés';
+
+  @override
   String get diveLog_edit_subsection_weather => 'Időjárás';
 
   @override
@@ -22431,6 +22434,156 @@ class AppLocalizationsHu extends AppLocalizations {
   @override
   String get settings_section_safety_subtitle =>
       'Áttekintési szabályok és repülés merülés után';
+
+  @override
+  String get settings_section_security_title => 'Alkalmazásbiztonság';
+
+  @override
+  String get settings_section_security_subtitle =>
+      'Alkalmazászár és adatbázis-titkosítás';
+
+  @override
+  String get settings_security_appLock => 'Alkalmazászár';
+
+  @override
+  String get settings_security_appLock_subtitle =>
+      'Jelszó vagy biometria szükséges az alkalmazás megnyitásához';
+
+  @override
+  String get settings_security_biometrics => 'Feloldás biometriával';
+
+  @override
+  String get settings_security_autoLock => 'Automatikus zárolás';
+
+  @override
+  String get settings_security_autoLock_immediately => 'Azonnal';
+
+  @override
+  String settings_security_autoLock_minutes(int minutes) {
+    String _temp0 = intl.Intl.pluralLogic(
+      minutes,
+      locale: localeName,
+      other: '$minutes perc után',
+      one: '1 perc után',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get settings_security_autoLock_never => 'Soha';
+
+  @override
+  String get settings_security_encryption => 'Adatbázis titkosítása';
+
+  @override
+  String get settings_security_encryption_subtitle =>
+      'Védje merülési naplófájlját nyugalmi titkosítással';
+
+  @override
+  String get settings_security_encryption_progress_backup =>
+      'Biztonsági mentés készítése...';
+
+  @override
+  String get settings_security_encryption_progress_encrypt =>
+      'Adatbázis titkosítása...';
+
+  @override
+  String get settings_security_encryption_progress_decrypt =>
+      'Adatbázis visszafejtése...';
+
+  @override
+  String get settings_security_encryption_progress_reopen =>
+      'Adatbázis újranyitása...';
+
+  @override
+  String get settings_security_changePassword => 'Jelszó módosítása';
+
+  @override
+  String get settings_security_regenerateRecovery => 'Új helyreállítási kód';
+
+  @override
+  String get settings_security_setPassword => 'Alkalmazásjelszó beállítása';
+
+  @override
+  String get settings_security_password => 'Jelszó';
+
+  @override
+  String get settings_security_confirmPassword => 'Jelszó megerősítése';
+
+  @override
+  String get settings_security_currentPassword => 'Jelenlegi jelszó';
+
+  @override
+  String get settings_security_newPassword => 'Új jelszó';
+
+  @override
+  String get settings_security_passwordTooShort =>
+      'A jelszónak legalább 4 karakterből kell állnia.';
+
+  @override
+  String get settings_security_passwordMismatch => 'A jelszavak nem egyeznek.';
+
+  @override
+  String get settings_security_wrongPassword => 'Hibás jelszó.';
+
+  @override
+  String get settings_security_recoveryCode_title =>
+      'Az Ön helyreállítási kódja';
+
+  @override
+  String get settings_security_recoveryCode_explain =>
+      'Írja fel és őrizze biztonságos helyen. Ez az egyetlen módja az alkalmazás feloldásának, ha elfelejti a jelszavát, és minden korábbi helyreállítási kódot érvénytelenít.';
+
+  @override
+  String get settings_security_recoveryCode_savedConfirm =>
+      'Elmentettem a helyreállítási kódomat';
+
+  @override
+  String get settings_security_disableBlockedByEncryption_title =>
+      'A titkosítás be van kapcsolva';
+
+  @override
+  String get settings_security_disableBlockedByEncryption_body =>
+      'Először kapcsolja ki az adatbázis-titkosítást, mielőtt kikapcsolná az alkalmazászárat. A titkosított adatbázishoz hitelesítő adat szükséges.';
+
+  @override
+  String get settings_security_enableEncryption_title =>
+      'Titkosítja az adatbázist?';
+
+  @override
+  String get settings_security_enableEncryption_body =>
+      'Először biztonsági mentés készül, majd az adatbázisfájl helyben újratitkosítódik. Nagy naplóknál ez eltarthat egy ideig.';
+
+  @override
+  String get settings_security_disableEncryption_title =>
+      'Kikapcsolja a titkosítást?';
+
+  @override
+  String get settings_security_disableEncryption_body =>
+      'Az adatbázisfájl ismét titkosítás nélkül tárolódik a lemezen.';
+
+  @override
+  String get settings_security_turnOffAppLock_title =>
+      'Kikapcsolja az alkalmazászárat?';
+
+  @override
+  String get settings_security_turnOffAppLock_body =>
+      'Az alkalmazás jelszókérés nélkül nyílik meg.';
+
+  @override
+  String get settings_security_unlock_title => 'Adja meg a jelszavát';
+
+  @override
+  String get settings_security_cancel => 'Mégse';
+
+  @override
+  String get settings_security_continue => 'Folytatás';
+
+  @override
+  String get settings_security_done => 'Kész';
+
+  @override
+  String get settings_security_turnOff => 'Kikapcsolás';
 
   @override
   String get dataQuality_inbox_title => 'Adatminőség';

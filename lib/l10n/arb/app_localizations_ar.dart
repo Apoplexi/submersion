@@ -20131,6 +20131,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get diveLog_edit_section_environment => 'البيئة';
 
   @override
+  String get diveLog_edit_subsection_autofill => 'تعبئة تلقائية';
+
+  @override
   String get diveLog_edit_subsection_weather => 'الطقس';
 
   @override
@@ -22106,6 +22109,156 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get settings_section_safety_subtitle =>
       'قواعد المراجعة والطيران بعد الغوص';
+
+  @override
+  String get settings_section_security_title => 'أمان التطبيق';
+
+  @override
+  String get settings_section_security_subtitle =>
+      'قفل التطبيق وتشفير قاعدة البيانات';
+
+  @override
+  String get settings_security_appLock => 'قفل التطبيق';
+
+  @override
+  String get settings_security_appLock_subtitle =>
+      'طلب كلمة المرور أو القياسات الحيوية لفتح التطبيق';
+
+  @override
+  String get settings_security_biometrics => 'فتح القفل بالقياسات الحيوية';
+
+  @override
+  String get settings_security_autoLock => 'القفل التلقائي';
+
+  @override
+  String get settings_security_autoLock_immediately => 'فورًا';
+
+  @override
+  String settings_security_autoLock_minutes(int minutes) {
+    String _temp0 = intl.Intl.pluralLogic(
+      minutes,
+      locale: localeName,
+      other: 'بعد $minutes دقائق',
+      one: 'بعد دقيقة واحدة',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get settings_security_autoLock_never => 'أبدًا';
+
+  @override
+  String get settings_security_encryption => 'تشفير قاعدة البيانات';
+
+  @override
+  String get settings_security_encryption_subtitle =>
+      'احمِ ملف سجل الغوص الخاص بك بالتشفير أثناء التخزين';
+
+  @override
+  String get settings_security_encryption_progress_backup =>
+      'جارٍ إنشاء نسخة احتياطية...';
+
+  @override
+  String get settings_security_encryption_progress_encrypt =>
+      'جارٍ تشفير قاعدة البيانات...';
+
+  @override
+  String get settings_security_encryption_progress_decrypt =>
+      'جارٍ فك تشفير قاعدة البيانات...';
+
+  @override
+  String get settings_security_encryption_progress_reopen =>
+      'جارٍ إعادة فتح قاعدة البيانات...';
+
+  @override
+  String get settings_security_changePassword => 'تغيير كلمة المرور';
+
+  @override
+  String get settings_security_regenerateRecovery => 'رمز استرداد جديد';
+
+  @override
+  String get settings_security_setPassword => 'تعيين كلمة مرور التطبيق';
+
+  @override
+  String get settings_security_password => 'كلمة المرور';
+
+  @override
+  String get settings_security_confirmPassword => 'تأكيد كلمة المرور';
+
+  @override
+  String get settings_security_currentPassword => 'كلمة المرور الحالية';
+
+  @override
+  String get settings_security_newPassword => 'كلمة المرور الجديدة';
+
+  @override
+  String get settings_security_passwordTooShort =>
+      'يجب أن تتكون كلمة المرور من 4 أحرف على الأقل.';
+
+  @override
+  String get settings_security_passwordMismatch =>
+      'كلمتا المرور غير متطابقتين.';
+
+  @override
+  String get settings_security_wrongPassword => 'كلمة المرور غير صحيحة.';
+
+  @override
+  String get settings_security_recoveryCode_title => 'رمز الاسترداد الخاص بك';
+
+  @override
+  String get settings_security_recoveryCode_explain =>
+      'دوّنه واحفظه في مكان آمن. إنه الطريقة الوحيدة لفتح التطبيق إذا نسيت كلمة المرور، وهو يحل محل أي رمز استرداد سابق.';
+
+  @override
+  String get settings_security_recoveryCode_savedConfirm =>
+      'لقد حفظت رمز الاسترداد الخاص بي';
+
+  @override
+  String get settings_security_disableBlockedByEncryption_title =>
+      'التشفير مفعّل';
+
+  @override
+  String get settings_security_disableBlockedByEncryption_body =>
+      'أوقف تشفير قاعدة البيانات أولاً قبل إيقاف قفل التطبيق. تحتاج قاعدة البيانات المشفرة إلى بيانات اعتماد.';
+
+  @override
+  String get settings_security_enableEncryption_title =>
+      'هل تريد تشفير قاعدة البيانات؟';
+
+  @override
+  String get settings_security_enableEncryption_body =>
+      'يتم أولاً إنشاء نسخة احتياطية، ثم يُعاد تشفير ملف قاعدة البيانات في مكانه. قد يستغرق ذلك وقتًا مع السجلات الكبيرة.';
+
+  @override
+  String get settings_security_disableEncryption_title =>
+      'هل تريد إيقاف التشفير؟';
+
+  @override
+  String get settings_security_disableEncryption_body =>
+      'سيُخزَّن ملف قاعدة البيانات على القرص من دون تشفير مرة أخرى.';
+
+  @override
+  String get settings_security_turnOffAppLock_title =>
+      'هل تريد إيقاف قفل التطبيق؟';
+
+  @override
+  String get settings_security_turnOffAppLock_body =>
+      'سيُفتح التطبيق من دون طلب كلمة المرور.';
+
+  @override
+  String get settings_security_unlock_title => 'أدخل كلمة المرور';
+
+  @override
+  String get settings_security_cancel => 'إلغاء';
+
+  @override
+  String get settings_security_continue => 'متابعة';
+
+  @override
+  String get settings_security_done => 'تم';
+
+  @override
+  String get settings_security_turnOff => 'إيقاف';
 
   @override
   String get dataQuality_inbox_title => 'جودة البيانات';
