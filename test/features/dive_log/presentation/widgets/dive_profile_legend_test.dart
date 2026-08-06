@@ -46,6 +46,7 @@ Future<void> _pumpLegendAt(
 }) async {
   await tester.pumpWidget(
     testApp(
+      locale: const Locale('en'),
       overrides: [
         settingsProvider.overrideWith((ref) => _TestSettingsNotifier()),
       ],
@@ -72,6 +73,7 @@ void main() {
     testWidgets('estimated tank row shows the (est.) suffix', (tester) async {
       await tester.pumpWidget(
         testApp(
+          locale: const Locale('en'),
           overrides: [
             settingsProvider.overrideWith((ref) => _TestSettingsNotifier()),
           ],
@@ -112,6 +114,7 @@ void main() {
     testWidgets('shows Events toggle when hasEvents is true', (tester) async {
       await tester.pumpWidget(
         testApp(
+          locale: const Locale('en'),
           overrides: [
             settingsProvider.overrideWith((ref) => _TestSettingsNotifier()),
           ],
@@ -137,6 +140,7 @@ void main() {
     testWidgets('shows Ceiling inline when space allows', (tester) async {
       await tester.pumpWidget(
         testApp(
+          locale: const Locale('en'),
           overrides: [
             settingsProvider.overrideWith((ref) => _TestSettingsNotifier()),
           ],
@@ -165,6 +169,7 @@ void main() {
     Future<void> openDialog(WidgetTester tester) async {
       await tester.pumpWidget(
         testApp(
+          locale: const Locale('en'),
           overrides: [
             settingsProvider.overrideWith((ref) => _TestSettingsNotifier()),
           ],
@@ -303,6 +308,7 @@ void main() {
       (tester) async {
         await tester.pumpWidget(
           testApp(
+            locale: const Locale('en'),
             overrides: [
               settingsProvider.overrideWith((ref) => _TestSettingsNotifier()),
             ],
@@ -335,6 +341,7 @@ void main() {
     ) async {
       await tester.pumpWidget(
         testApp(
+          locale: const Locale('en'),
           overrides: [
             settingsProvider.overrideWith((ref) => _TestSettingsNotifier()),
           ],
@@ -442,6 +449,7 @@ void main() {
       (tester) async {
         await tester.pumpWidget(
           testApp(
+            locale: const Locale('en'),
             overrides: [
               settingsProvider.overrideWith((ref) => _TestSettingsNotifier()),
             ],
@@ -466,6 +474,7 @@ void main() {
     ) async {
       await tester.pumpWidget(
         testApp(
+          locale: const Locale('en'),
           overrides: [
             settingsProvider.overrideWith((ref) => _TestSettingsNotifier()),
           ],
@@ -489,6 +498,7 @@ void main() {
       (tester) async {
         await tester.pumpWidget(
           testApp(
+            locale: const Locale('en'),
             overrides: [
               settingsProvider.overrideWith((ref) => _TestSettingsNotifier()),
             ],
@@ -516,6 +526,7 @@ void main() {
     ) async {
       await tester.pumpWidget(
         testApp(
+          locale: const Locale('en'),
           overrides: [
             settingsProvider.overrideWith((ref) => _TestSettingsNotifier()),
           ],
@@ -540,6 +551,7 @@ void main() {
     ) async {
       await tester.pumpWidget(
         testApp(
+          locale: const Locale('en'),
           overrides: [
             settingsProvider.overrideWith((ref) => _TestSettingsNotifier()),
           ],
@@ -661,6 +673,7 @@ void main() {
     ) async {
       await tester.pumpWidget(
         testApp(
+          locale: const Locale('en'),
           overrides: [
             settingsProvider.overrideWith((ref) => _TestSettingsNotifier()),
           ],
@@ -692,6 +705,7 @@ void main() {
     ) async {
       await tester.pumpWidget(
         testApp(
+          locale: const Locale('en'),
           overrides: [
             settingsProvider.overrideWith((ref) => _TestSettingsNotifier()),
           ],
