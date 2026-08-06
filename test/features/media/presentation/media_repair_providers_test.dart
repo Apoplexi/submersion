@@ -1,8 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/features/media/data/services/repair/media_repair_service.dart';
 import 'package:submersion/features/media/domain/entities/media_item.dart';
-import 'package:submersion/features/media/domain/entities/media_library_filter.dart';
 import 'package:submersion/features/media/domain/entities/media_source_type.dart';
 import 'package:submersion/features/media/domain/services/media_repair_types.dart';
 import 'package:submersion/features/media/presentation/providers/media_repair_providers.dart';
@@ -60,16 +58,12 @@ void main() {
   test('harvest produces review with exact and probable pre-checked', () async {
     final n = notifier(
       missingRows: [broken('a'), broken('b'), broken('c')],
-      harvest: CandidateHarvest(
+      harvest: const CandidateHarvest(
         byFilename: {
           'a.jpg': [
-            const RepairCandidate.file(
-              path: '/nas/a.jpg',
-              sizeBytes: 4,
-              hash: null,
-            ),
+            RepairCandidate.file(path: '/nas/a.jpg', sizeBytes: 4, hash: null),
           ],
-          'b.jpg': [const RepairCandidate.store(verified: true)],
+          'b.jpg': [RepairCandidate.store(verified: true)],
         },
       ),
     );
@@ -104,11 +98,9 @@ void main() {
     () async {
       final n = notifier(
         missingRows: [broken('a'), broken('c')],
-        harvest: CandidateHarvest(
+        harvest: const CandidateHarvest(
           byFilename: {
-            'a.jpg': [
-              const RepairCandidate.file(path: '/nas/a.jpg', sizeBytes: 4),
-            ],
+            'a.jpg': [RepairCandidate.file(path: '/nas/a.jpg', sizeBytes: 4)],
           },
         ),
         report: const RepairApplyReport(
@@ -132,11 +124,9 @@ void main() {
   test('toggleProposal flips membership', () async {
     final n = notifier(
       missingRows: [broken('a')],
-      harvest: CandidateHarvest(
+      harvest: const CandidateHarvest(
         byFilename: {
-          'a.jpg': [
-            const RepairCandidate.file(path: '/nas/a.jpg', sizeBytes: 4),
-          ],
+          'a.jpg': [RepairCandidate.file(path: '/nas/a.jpg', sizeBytes: 4)],
         },
       ),
     );

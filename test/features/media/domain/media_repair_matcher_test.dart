@@ -121,7 +121,7 @@ void main() {
     });
 
     test('prefix-move hits rank first and are marked viaPrefixMove', () {
-      final move = const PrefixMove(
+      const move = PrefixMove(
         fromPrefix: '/old',
         toPrefix: '/nas',
         coveredCount: 2,
@@ -130,10 +130,7 @@ void main() {
         brokenRows: [broken('a', localPath: '/old/a.jpg')],
         candidatesByFilename: {
           'a.jpg': [
-            const RepairCandidate.file(
-              path: '/elsewhere/a.jpg',
-              sizeBytes: 10,
-            ),
+            const RepairCandidate.file(path: '/elsewhere/a.jpg', sizeBytes: 10),
           ],
         },
         prefixMove: move,
@@ -145,8 +142,7 @@ void main() {
       expect(p.confidence, RepairConfidence.probable);
     });
 
-    test('store candidates propose cloud-backed regardless of filename',
-        () {
+    test('store candidates propose cloud-backed regardless of filename', () {
       final proposals = buildRepairProposals(
         brokenRows: [broken('a', contentHash: 'H1')],
         candidatesByFilename: {
