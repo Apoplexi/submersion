@@ -617,6 +617,8 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
           _currentStrength = dive.currentStrength;
           _entryMethod = dive.entryMethod;
           _exitMethod = dive.exitMethod;
+          _exitMethodLinked =
+              _exitMethod == null || _exitMethod == _entryMethod;
           _waterType = dive.waterType;
           _swellHeightController.text = dive.swellHeight != null
               ? units.convertDepth(dive.swellHeight!).toStringAsFixed(1)

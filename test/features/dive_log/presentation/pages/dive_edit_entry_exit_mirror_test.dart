@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/features/dive_log/data/repositories/dive_repository_impl.dart';
+import 'package:submersion/features/dive_log/domain/entities/dive.dart';
 import 'package:submersion/features/dive_log/presentation/pages/dive_edit_page.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_providers.dart';
 import 'package:submersion/features/tank_presets/presentation/providers/tank_preset_providers.dart';
@@ -140,6 +142,102 @@ void main() {
       await pickMethod(tester, 'Entry Method', 'Not specified');
 
       expect(find.text('Shore Entry'), findsNothing);
+    });
+  });
+
+  group('DiveEditPage entry/exit mirroring (existing dive)', () {
+    late DiveRepository repository;
+
+    setUp(() async {
+      await setUpTestDatabase();
+      repository = DiveRepository();
+    });
+
+    tearDown(() async {
+      await tearDownTestDatabase();
+    });
+
+    List<dynamic> buildOverrides(List<dynamic> base) {
+      return [
+        ...base,
+        diveRepositoryProvider.overrideWithValue(repository),
+        diveListNotifierProvider.overrideWith((ref) {
+          return DiveListNotifier(repository, ref);
+        }),
+        customTankPresetsProvider.overrideWith((ref) async => []),
+      ];
+    }
+
+    Dive buildDive({EntryMethod? entry, EntryMethod? exit}) => Dive(
+      id: 'dive-entry-exit',
+      diveNumber: 1,
+      dateTime: DateTime(2026, 3, 28, 10, 0),
+      entryTime: DateTime(2026, 3, 28, 10, 5),
+      bottomTime: const Duration(minutes: 40),
+      maxDepth: 20.0,
+      entryMethod: entry,
+      exitMethod: exit,
+      tanks: const [],
+      profile: const [],
+      equipment: const [],
+      notes: '',
+      photoIds: const [],
+      sightings: const [],
+      weights: const [],
+      tags: const [],
+    );
+
+    Future<void> pumpExistingDivePage(
+      WidgetTester tester,
+      String diveId,
+    ) async {
+      tester.view.physicalSize = const Size(1200, 4000);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.reset);
+      final overrides = await getBaseOverrides();
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: buildOverrides(overrides).cast(),
+          child: MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: Scaffold(body: DiveEditPage(diveId: diveId, embedded: true)),
+          ),
+        ),
+      );
+      // Existing-dive pages settle normally (no perpetual animation).
+      await tester.pumpAndSettle();
+    }
+
+    testWidgets('equal saved values open linked: entry change updates both', (
+      tester,
+    ) async {
+      final created = await repository.createDive(
+        buildDive(entry: EntryMethod.shore, exit: EntryMethod.shore),
+      );
+      await pumpExistingDivePage(tester, created.id);
+      await expandConditions(tester);
+
+      await pickMethod(tester, 'Entry Method', 'Boat Entry');
+
+      expect(find.text('Boat Entry'), findsNWidgets(2));
+      expect(find.text('Shore Entry'), findsNothing);
+    });
+
+    testWidgets('differing saved values open unlinked: exit stays put', (
+      tester,
+    ) async {
+      final created = await repository.createDive(
+        buildDive(entry: EntryMethod.giantStride, exit: EntryMethod.ladder),
+      );
+      await pumpExistingDivePage(tester, created.id);
+      await expandConditions(tester);
+
+      await pickMethod(tester, 'Entry Method', 'Boat Entry');
+
+      expect(find.text('Boat Entry'), findsOneWidget);
+      expect(find.text('Ladder'), findsOneWidget);
+      expect(find.text('Giant Stride'), findsNothing);
     });
   });
 }
