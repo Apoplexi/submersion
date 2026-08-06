@@ -1949,7 +1949,18 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
   Future<void> _updateSiteWithPhotoGps(GeoPoint gps) async {
     if (_selectedSite == null) return;
 
-    final updatedSite = _selectedSite!.copyWith(location: gps);
+    var updatedSite = _selectedSite!.copyWith(location: gps);
+    // A site gaining coordinates should also gain its altitude, so later dives
+    // there resolve locally without a lookup.
+    if (updatedSite.altitude == null) {
+      final meters = await ref
+          .read(elevationServiceProvider)
+          .fetchElevation(latitude: gps.latitude, longitude: gps.longitude);
+      if (!mounted) return;
+      if (meters != null) {
+        updatedSite = updatedSite.copyWith(altitude: meters);
+      }
+    }
 
     // Update the site via the notifier
     final siteNotifier = ref.read(siteListNotifierProvider.notifier);
