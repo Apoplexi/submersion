@@ -33919,6 +33919,12 @@ abstract class AppLocalizations {
   /// **'Environment'**
   String get diveLog_edit_section_environment;
 
+  /// No description provided for @diveLog_edit_subsection_autofill.
+  ///
+  /// In en, this message translates to:
+  /// **'Auto-fill'**
+  String get diveLog_edit_subsection_autofill;
+
   /// No description provided for @diveLog_edit_subsection_weather.
   ///
   /// In en, this message translates to:

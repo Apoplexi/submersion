@@ -5659,6 +5659,7 @@
   "buoyancy_whatIfDelta": "{delta} a ténylegeshez",
   "diveDetailSection_weights_name": "Súlyok",
   "diveLog_edit_section_environment": "Környezet",
+  "diveLog_edit_subsection_autofill": "Automatikus kitöltés",
   "diveLog_edit_subsection_weather": "Időjárás",
   "diveLog_edit_subsection_diveConditions": "Merülési körülmények",
   "diveLog_edit_label_windSpeed": "Szélsebesség",

@@ -5,9 +5,10 @@ import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:submersion/shared/widgets/forms/form_row.dart';
 import 'package:submersion/shared/widgets/forms/form_section.dart';
 
-/// Group 3 of the dive form. Water/air temperature lead as ordinary rows
-/// (the hero strip is retired); the environment and weather row lists are
-/// page-provided and spread into the section so dividers separate rows.
+/// Group 3 of the dive form. An auto-fill action row leads, then water/air
+/// temperature as ordinary rows (the hero strip is retired); the top,
+/// environment and weather row lists are page-provided and spread into the
+/// section so dividers separate rows.
 class ConditionsSection extends StatelessWidget {
   const ConditionsSection({
     super.key,
@@ -20,6 +21,7 @@ class ConditionsSection extends StatelessWidget {
     required this.airTempController,
     required this.environmentRows,
     required this.weatherRows,
+    this.topRows = const [],
     this.errorCount = 0,
   });
 
@@ -32,6 +34,9 @@ class ConditionsSection extends StatelessWidget {
   final TextEditingController airTempController;
   final List<Widget> environmentRows;
   final List<Widget> weatherRows;
+
+  /// Rows pinned above the temperature fields (the auto-fill action overline).
+  final List<Widget> topRows;
   final int errorCount;
 
   @override
@@ -47,6 +52,7 @@ class ConditionsSection extends StatelessWidget {
       emptyInvitation: l10n.diveLog_edit_invite_conditions,
       errorCount: errorCount,
       children: [
+        ...topRows,
         FormRow.text(
           label: l10n.diveLog_edit_label_waterTemp,
           controller: waterTempController,

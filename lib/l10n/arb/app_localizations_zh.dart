@@ -19328,6 +19328,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get diveLog_edit_section_environment => '环境';
 
   @override
+  String get diveLog_edit_subsection_autofill => '自动填充';
+
+  @override
   String get diveLog_edit_subsection_weather => '天气';
 
   @override

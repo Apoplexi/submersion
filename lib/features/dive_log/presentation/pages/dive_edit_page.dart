@@ -3455,6 +3455,7 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
       temperatureSymbol: units.temperatureSymbol,
       waterTempController: _waterTempController,
       airTempController: _airTempController,
+      topRows: [_autofillOverline(units)],
       environmentRows: _environmentRows(units),
       weatherRows: _weatherRows(units),
     );
@@ -3576,22 +3577,30 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
     ];
   }
 
-  List<Widget> _weatherRows(UnitFormatter units) {
+  /// The section-leading auto-fill row: its action fills fields both above
+  /// (air temperature) and below it, so it cannot live at the weather
+  /// subsection overline.
+  Widget _autofillOverline(UnitFormatter units) {
     final l10n = context.l10n;
     final canFetchWeather =
         _selectedSite != null && _selectedSite!.hasCoordinates;
+    return FormOverline(
+      label: l10n.diveLog_edit_subsection_autofill,
+      actions: [
+        FormOverlineAction(
+          label: l10n.diveLog_edit_button_fetchWeather,
+          icon: Icons.cloud_download,
+          busy: _isFetchingWeather,
+          onPressed: canFetchWeather ? () => _fetchWeather(units) : null,
+        ),
+      ],
+    );
+  }
+
+  List<Widget> _weatherRows(UnitFormatter units) {
+    final l10n = context.l10n;
     return [
-      FormOverline(
-        label: l10n.diveLog_edit_subsection_weather,
-        actions: [
-          FormOverlineAction(
-            label: l10n.diveLog_edit_button_fetchWeather,
-            icon: Icons.cloud_download,
-            busy: _isFetchingWeather,
-            onPressed: canFetchWeather ? () => _fetchWeather(units) : null,
-          ),
-        ],
-      ),
+      FormOverline(label: l10n.diveLog_edit_subsection_weather),
       FormRow.text(
         label: l10n.diveLog_edit_label_humidity,
         controller: _humidityController,

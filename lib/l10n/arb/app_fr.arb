@@ -5659,6 +5659,7 @@
   "buoyancy_whatIfDelta": "{delta} vs réel",
   "diveDetailSection_weights_name": "Lestage",
   "diveLog_edit_section_environment": "Environnement",
+  "diveLog_edit_subsection_autofill": "Remplissage automatique",
   "diveLog_edit_subsection_weather": "Météo",
   "diveLog_edit_subsection_diveConditions": "Conditions de plongée",
   "diveLog_edit_label_windSpeed": "Vitesse du vent",

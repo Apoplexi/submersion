@@ -12806,6 +12806,7 @@
   "settings_dataSources_appleHealth_poweredBy": "Powered by Apple HealthKit",
   "settings_dataSources_noSources": "No data source integrations are available on this platform.",
   "diveLog_edit_section_environment": "Environment",
+  "diveLog_edit_subsection_autofill": "Auto-fill",
   "diveLog_edit_subsection_weather": "Weather",
   "diveLog_edit_subsection_diveConditions": "Dive Conditions",
   "diveLog_edit_label_windSpeed": "Wind Speed",

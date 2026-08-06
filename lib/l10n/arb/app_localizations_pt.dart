@@ -20359,6 +20359,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String get diveLog_edit_section_environment => 'Ambiente';
 
   @override
+  String get diveLog_edit_subsection_autofill => 'Preenchimento automático';
+
+  @override
   String get diveLog_edit_subsection_weather => 'Clima';
 
   @override

@@ -5659,6 +5659,7 @@
   "diveComputer_download_newDivesOnlyTitle": "הורד צלילות חדשות בלבד",
   "diveComputer_download_upToDate": "לא נמצאו צלילות חדשות -- היומן שלך מעודכן",
   "diveLog_edit_section_environment": "סביבה",
+  "diveLog_edit_subsection_autofill": "מילוי אוטומטי",
   "diveLog_edit_subsection_weather": "מזג אוויר",
   "diveLog_edit_subsection_diveConditions": "תנאי צלילה",
   "diveLog_edit_label_windSpeed": "מהירות רוח",

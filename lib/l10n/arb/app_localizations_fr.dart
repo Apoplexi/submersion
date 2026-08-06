@@ -20425,6 +20425,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get diveLog_edit_section_environment => 'Environnement';
 
   @override
+  String get diveLog_edit_subsection_autofill => 'Remplissage automatique';
+
+  @override
   String get diveLog_edit_subsection_weather => 'Météo';
 
   @override
