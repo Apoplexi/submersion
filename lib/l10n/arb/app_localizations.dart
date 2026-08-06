@@ -21025,6 +21025,30 @@ abstract class AppLocalizations {
   /// **'Unlinked'**
   String get media_console_unlinked;
 
+  /// Title of the post-import batch link screen
+  ///
+  /// In en, this message translates to:
+  /// **'Link imported media'**
+  String get media_import_linkTitle;
+
+  /// Confirm button on the post-import batch link screen
+  ///
+  /// In en, this message translates to:
+  /// **'Link {count} items'**
+  String media_import_linkConfirm(int count);
+
+  /// Row subtitle for imports without a confident dive match
+  ///
+  /// In en, this message translates to:
+  /// **'Stays in Unlinked'**
+  String get media_import_staysUnlinked;
+
+  /// Snackbar after the batch link applies
+  ///
+  /// In en, this message translates to:
+  /// **'{count} items linked'**
+  String media_import_linkedResult(int count);
+
   /// Inbox chip for an ambiguous auto-match
   ///
   /// In en, this message translates to:

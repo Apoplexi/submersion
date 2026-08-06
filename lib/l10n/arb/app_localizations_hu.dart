@@ -12366,6 +12366,22 @@ class AppLocalizationsHu extends AppLocalizations {
   String get media_console_unlinked => 'Nem csatolt';
 
   @override
+  String get media_import_linkTitle => 'Importált média csatolása';
+
+  @override
+  String media_import_linkConfirm(int count) {
+    return '$count elem csatolása';
+  }
+
+  @override
+  String get media_import_staysUnlinked => 'A Nem csatolt között marad';
+
+  @override
+  String media_import_linkedResult(int count) {
+    return '$count elem csatolva';
+  }
+
+  @override
   String get media_inbox_chooseDive => 'Merülés kiválasztása';
 
   @override

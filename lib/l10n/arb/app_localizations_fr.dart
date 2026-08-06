@@ -12444,6 +12444,22 @@ class AppLocalizationsFr extends AppLocalizations {
   String get media_console_unlinked => 'Non liés';
 
   @override
+  String get media_import_linkTitle => 'Lier les médias importés';
+
+  @override
+  String media_import_linkConfirm(int count) {
+    return 'Lier $count éléments';
+  }
+
+  @override
+  String get media_import_staysUnlinked => 'Reste dans Non liés';
+
+  @override
+  String media_import_linkedResult(int count) {
+    return '$count éléments liés';
+  }
+
+  @override
   String get media_inbox_chooseDive => 'Choisir la plongée';
 
   @override

@@ -7204,6 +7204,32 @@
   "@media_console_unlinked": {
     "description": "Media console sidebar/tab label for the unlinked inbox"
   },
+  "media_import_linkTitle": "Link imported media",
+  "@media_import_linkTitle": {
+    "description": "Title of the post-import batch link screen"
+  },
+  "media_import_linkConfirm": "Link {count} items",
+  "@media_import_linkConfirm": {
+    "description": "Confirm button on the post-import batch link screen",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "media_import_staysUnlinked": "Stays in Unlinked",
+  "@media_import_staysUnlinked": {
+    "description": "Row subtitle for imports without a confident dive match"
+  },
+  "media_import_linkedResult": "{count} items linked",
+  "@media_import_linkedResult": {
+    "description": "Snackbar after the batch link applies",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "media_inbox_chooseDive": "Choose dive",
   "@media_inbox_chooseDive": {
     "description": "Inbox chip for an ambiguous auto-match"

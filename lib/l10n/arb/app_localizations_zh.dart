@@ -11844,6 +11844,22 @@ class AppLocalizationsZh extends AppLocalizations {
   String get media_console_unlinked => '未关联';
 
   @override
+  String get media_import_linkTitle => '关联导入的媒体';
+
+  @override
+  String media_import_linkConfirm(int count) {
+    return '关联 $count 个项目';
+  }
+
+  @override
+  String get media_import_staysUnlinked => '保留在未关联中';
+
+  @override
+  String media_import_linkedResult(int count) {
+    return '已关联 $count 个项目';
+  }
+
+  @override
   String get media_inbox_chooseDive => '选择潜水';
 
   @override

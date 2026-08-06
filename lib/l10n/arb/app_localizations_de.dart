@@ -12398,6 +12398,22 @@ class AppLocalizationsDe extends AppLocalizations {
   String get media_console_unlinked => 'Nicht verknüpft';
 
   @override
+  String get media_import_linkTitle => 'Importierte Medien verknüpfen';
+
+  @override
+  String media_import_linkConfirm(int count) {
+    return '$count Elemente verknüpfen';
+  }
+
+  @override
+  String get media_import_staysUnlinked => 'Bleibt unter Nicht verknüpft';
+
+  @override
+  String media_import_linkedResult(int count) {
+    return '$count Elemente verknüpft';
+  }
+
+  @override
   String get media_inbox_chooseDive => 'Tauchgang wählen';
 
   @override

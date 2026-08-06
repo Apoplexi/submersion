@@ -12206,6 +12206,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get media_console_unlinked => 'Unlinked';
 
   @override
+  String get media_import_linkTitle => 'Link imported media';
+
+  @override
+  String media_import_linkConfirm(int count) {
+    return 'Link $count items';
+  }
+
+  @override
+  String get media_import_staysUnlinked => 'Stays in Unlinked';
+
+  @override
+  String media_import_linkedResult(int count) {
+    return '$count items linked';
+  }
+
+  @override
   String get media_inbox_chooseDive => 'Choose dive';
 
   @override

@@ -12393,6 +12393,22 @@ class AppLocalizationsEs extends AppLocalizations {
   String get media_console_unlinked => 'Sin vincular';
 
   @override
+  String get media_import_linkTitle => 'Vincular contenido importado';
+
+  @override
+  String media_import_linkConfirm(int count) {
+    return 'Vincular $count elementos';
+  }
+
+  @override
+  String get media_import_staysUnlinked => 'Permanece sin vincular';
+
+  @override
+  String media_import_linkedResult(int count) {
+    return '$count elementos vinculados';
+  }
+
+  @override
   String get media_inbox_chooseDive => 'Elegir inmersión';
 
   @override

@@ -12182,6 +12182,22 @@ class AppLocalizationsAr extends AppLocalizations {
   String get media_console_unlinked => 'غير مرتبطة';
 
   @override
+  String get media_import_linkTitle => 'ربط الوسائط المستوردة';
+
+  @override
+  String media_import_linkConfirm(int count) {
+    return 'ربط $count عناصر';
+  }
+
+  @override
+  String get media_import_staysUnlinked => 'تبقى غير مرتبطة';
+
+  @override
+  String media_import_linkedResult(int count) {
+    return 'تم ربط $count عناصر';
+  }
+
+  @override
   String get media_inbox_chooseDive => 'اختيار الغطسة';
 
   @override
