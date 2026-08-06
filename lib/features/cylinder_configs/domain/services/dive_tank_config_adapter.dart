@@ -41,11 +41,17 @@ class DiveTankConfigAdapter {
     order: order,
   );
 
-  /// Returns the merged tank list plus the counts to report to the diver.
+  /// Returns the merged tank list, the counts to report to the diver, and
+  /// whether anything actually changed.
+  ///
+  /// [changed] is derived from the plan's ops, not from the counts: a repeat
+  /// apply matches every role and so reports a non-zero [kept] while doing no
+  /// work at all. Callers use it to avoid marking a form dirty for a merge
+  /// that altered nothing.
   ///
   /// [newId] mints an id for each inserted tank; the caller supplies it so
   /// this stays pure and testable (no Uuid, no DateTime.now()).
-  ({List<DiveTank> tanks, int added, int kept}) apply({
+  ({List<DiveTank> tanks, int added, int kept, bool changed}) apply({
     required List<DiveTank> tanks,
     required List<CylinderConfigItem> items,
     required String Function(int insertIndex) newId,
@@ -80,6 +86,11 @@ class DiveTankConfigAdapter {
     final merged = byId.values.toList()
       ..sort((a, b) => a.order.compareTo(b.order));
 
-    return (tanks: merged, added: plan.insertedCount, kept: plan.keptCount);
+    return (
+      tanks: merged,
+      added: plan.insertedCount,
+      kept: plan.keptCount,
+      changed: plan.ops.isNotEmpty,
+    );
   }
 }

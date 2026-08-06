@@ -156,10 +156,33 @@ void main() {
     await tester.tap(find.text('Save'));
     await tester.pumpAndSettle();
 
-    final saved = await repo.getAllConfigs(includeItems: true);
+    // Scoped to the active diver, not unfiltered: a config saved with a null
+    // diver_id persists but is invisible to every diver-scoped provider, so
+    // an unfiltered read would pass while the feature is broken.
+    final saved = await repo.getAllConfigs(diverId: 'd1', includeItems: true);
     expect(saved, hasLength(1));
     expect(saved.single.name, 'Bailout plan');
     expect(saved.single.equipmentId, 'rb-1');
+    expect(saved.single.diverId, 'd1');
     expect(saved.single.cylinderCount, 1);
+  });
+
+  testWidgets('the first configuration a diver saves is diver-scoped', (
+    tester,
+  ) async {
+    // Regression: diverId used to be inferred from an existing config, so the
+    // very first one saved got a null diver_id and vanished from the list.
+    expect(await repo.getAllConfigs(diverId: 'd1'), isEmpty);
+
+    await tester.pumpWidget(host());
+    await tester.pumpAndSettle();
+
+    await tester.enterText(find.byType(TextFormField).first, 'First ever');
+    await tester.tap(find.text('Save'));
+    await tester.pumpAndSettle();
+
+    final saved = await repo.getAllConfigs(diverId: 'd1');
+    expect(saved, hasLength(1), reason: 'must be visible to its own diver');
+    expect(saved.single.diverId, 'd1');
   });
 }

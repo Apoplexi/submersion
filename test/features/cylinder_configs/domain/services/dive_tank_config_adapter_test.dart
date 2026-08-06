@@ -117,13 +117,15 @@ void main() {
     expect(tank.startPressure, 200);
   });
 
-  test('applying twice is idempotent', () {
+  test('applying twice is idempotent and reports no change', () {
     final items = [
       cfg(id: 'a', role: TankRole.diluent, order: 0, o2: 18, he: 45),
       cfg(id: 'b', role: TankRole.bailout, order: 1),
     ];
 
     final first = adapter.apply(tanks: const [], items: items, newId: newId);
+    expect(first.changed, isTrue);
+
     final second = adapter.apply(
       tanks: first.tanks,
       items: items,
@@ -133,6 +135,21 @@ void main() {
     expect(second.added, 0);
     expect(second.kept, 2);
     expect(second.tanks, hasLength(2));
+    // kept is non-zero here, so counts alone cannot distinguish "matched
+    // everything, changed nothing" from real work.
+    expect(second.changed, isFalse);
+  });
+
+  test('a claim that fills a null field counts as a change', () {
+    final result = adapter.apply(
+      tanks: [const DiveTank(id: 't1', role: TankRole.diluent)],
+      items: [cfg(id: 'a', role: TankRole.diluent, pressure: 232)],
+      newId: newId,
+    );
+
+    expect(result.added, 0);
+    expect(result.kept, 1);
+    expect(result.changed, isTrue);
   });
 
   test('existing tanks the config does not mention are preserved', () {

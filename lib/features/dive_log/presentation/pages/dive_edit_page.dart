@@ -2742,6 +2742,16 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
       newId: (_) => _uuid.v4(),
     );
 
+    // A repeat apply matches every role and so reports a non-zero kept while
+    // doing no work. Rebuilding then would mark the form dirty and raise an
+    // unsaved-changes prompt for a merge that altered nothing.
+    if (!result.changed) {
+      messenger.showSnackBar(
+        SnackBar(content: Text(l10n.cylinderConfigs_applyNothingToDo)),
+      );
+      return;
+    }
+
     setState(() {
       _markDirty();
       _tanksDirty = true;
@@ -2753,10 +2763,8 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
     messenger.showSnackBar(
       SnackBar(
         content: Text(
-          result.added == 0 && result.kept == 0
-              ? l10n.cylinderConfigs_applyNothingToDo
-              : '${l10n.cylinderConfigs_applyAdded(result.added)}, '
-                    '${l10n.cylinderConfigs_applyKept(result.kept)}',
+          '${l10n.cylinderConfigs_applyAdded(result.added)}, '
+          '${l10n.cylinderConfigs_applyKept(result.kept)}',
         ),
       ),
     );

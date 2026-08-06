@@ -150,7 +150,9 @@ class _CylinderConfigItemEditorState
                   keyboardType: const TextInputType.numberWithOptions(
                     decimal: true,
                   ),
-                  decoration: const InputDecoration(labelText: 'O2 %'),
+                  decoration: InputDecoration(
+                    labelText: l10n.gasCalculators_mnd_o2Percent,
+                  ),
                   // Only a parseable value updates the model: transient states
                   // like a lone "." must not clobber the stored mix.
                   onChanged: (text) {
@@ -168,7 +170,9 @@ class _CylinderConfigItemEditorState
                   keyboardType: const TextInputType.numberWithOptions(
                     decimal: true,
                   ),
-                  decoration: const InputDecoration(labelText: 'He %'),
+                  decoration: InputDecoration(
+                    labelText: l10n.gasCalculators_mnd_hePercent,
+                  ),
                   onChanged: (text) {
                     final parsed = _parse(text);
                     if (parsed != null) {

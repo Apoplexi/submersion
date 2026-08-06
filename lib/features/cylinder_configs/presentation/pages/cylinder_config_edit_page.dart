@@ -7,6 +7,7 @@ import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/cylinder_configs/domain/entities/cylinder_config_item.dart';
 import 'package:submersion/features/cylinder_configs/presentation/providers/cylinder_config_providers.dart';
 import 'package:submersion/features/cylinder_configs/presentation/widgets/cylinder_config_item_editor.dart';
+import 'package:submersion/features/divers/presentation/providers/diver_providers.dart';
 import 'package:submersion/features/equipment/domain/entities/equipment_item.dart';
 import 'package:submersion/features/equipment/presentation/providers/equipment_providers.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
@@ -91,9 +92,11 @@ class _CylinderConfigEditPageState
     setState(() => _saving = true);
 
     final repository = ref.read(cylinderConfigRepositoryProvider);
-    final diverId = await ref
-        .read(cylinderConfigsProvider.future)
-        .then((configs) => configs.isNotEmpty ? configs.first.diverId : null);
+    // Read the active diver directly. Bootstrapping this from an existing
+    // config made the first write depend on a prior one: with no configs yet
+    // the id was null, and a null diver_id is invisible to every
+    // diver-scoped query, so the first configuration ever saved vanished.
+    final diverId = await ref.read(validatedCurrentDiverIdProvider.future);
 
     var id = widget.configId;
     if (id == null) {
