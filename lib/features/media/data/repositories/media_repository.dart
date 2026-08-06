@@ -1049,6 +1049,45 @@ class MediaRepository {
     SyncEventBus.notifyLocalChange();
   }
 
+  /// Converts rows to cloud-backed [MediaSourceType.mediaStore] (Media
+  /// section Phase 3): the store becomes the source of truth, the local
+  /// pointers clear, and the orphan flag lifts. Refused per row without the
+  /// contentHash + remoteUploadedAt stamp pair -- converting an unconfirmed
+  /// row would render nothing anywhere. Sync-safe like [_unlinkColumns].
+  Future<void> convertToCloudBacked(List<String> mediaIds) async {
+    if (mediaIds.isEmpty) return;
+    final rows = await (_db.select(
+      _db.media,
+    )..where((t) => t.id.isIn(mediaIds))).get();
+    final qualified = [
+      for (final row in rows)
+        if (row.contentHash != null && row.remoteUploadedAt != null) row.id,
+    ];
+    if (qualified.isEmpty) return;
+    final now = DateTime.now().millisecondsSinceEpoch;
+    await _db.transaction(() async {
+      await (_db.update(_db.media)..where((t) => t.id.isIn(qualified))).write(
+        MediaCompanion(
+          sourceType: Value(MediaSourceType.mediaStore.name),
+          localPath: const Value(null),
+          bookmarkRef: const Value(null),
+          platformAssetId: const Value(null),
+          isOrphaned: const Value(false),
+          lastVerifiedAt: Value(now),
+          updatedAt: Value(now),
+        ),
+      );
+      for (final id in qualified) {
+        await _syncRepository.markRecordPending(
+          entityType: 'media',
+          recordId: id,
+          localUpdatedAt: now,
+        );
+      }
+    });
+    SyncEventBus.notifyLocalChange();
+  }
+
   /// Moves media to [newDiveId] (also the link path for unlinked rows).
   /// Enrichment rows are join products of media x the OLD dive's profile:
   /// stale after the move, so they are deleted with tombstones (enrichment
