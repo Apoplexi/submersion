@@ -3,9 +3,12 @@ import 'dart:typed_data';
 
 import 'package:cryptography/cryptography.dart';
 import 'package:flutter/foundation.dart' show visibleForTesting;
+import 'package:path/path.dart' as p;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 
+import 'package:submersion/core/services/database_service.dart';
+import 'package:submersion/core/services/security/database_encryption_migrator.dart';
 import 'package:submersion/core/services/security/database_security_key_store.dart';
 import 'package:submersion/core/services/security/database_security_sidecar.dart';
 import 'package:submersion/core/services/security/security_preferences.dart';
@@ -189,6 +192,97 @@ class DatabaseSecurityService {
     _mlk = null;
     _libraryKeyId = null;
     _databaseKeyHex = null;
+  }
+
+  /// Encrypts the live database in place. Sequence:
+  /// 1. safety backup (`pre_encrypt_<stamp>.db`, plaintext — DB still plain)
+  /// 2. strict close
+  /// 3. sqlcipher_export to encrypted staging + atomic swap
+  /// 4. flag on, derive key, hand it to DatabaseService, reopen
+  ///
+  /// The flag flips only AFTER the file swap succeeded, so a crash mid-way
+  /// leaves flag=off + plaintext file (consistent), or flag=off + encrypted
+  /// file (header-probe self-heal at next startup flips the flag).
+  Future<void> enableEncryption({
+    DatabaseEncryptionMigrator? migrator,
+    void Function(String phase)? onPhase,
+    @visibleForTesting String? dbPathOverride,
+    @visibleForTesting bool skipReopenForTesting = false,
+  }) async {
+    final mlk = _mlk;
+    if (mlk == null) {
+      throw StateError('Cannot enable encryption while locked');
+    }
+    if (encryptionEnabled) return;
+    final m = migrator ?? DatabaseEncryptionMigrator();
+    final dbPath =
+        dbPathOverride ?? await DatabaseService.instance.databasePath;
+
+    onPhase?.call('backup');
+    if (!skipReopenForTesting) {
+      final backupPath = p.join(
+        p.dirname(dbPath),
+        'Backups',
+        'pre_encrypt_${_timestamp()}.db',
+      );
+      await DatabaseService.instance.backup(backupPath);
+      await DatabaseService.instance.close(strict: true);
+    }
+
+    onPhase?.call('encrypt');
+    final keyHex = await deriveDbKeyHex(mlk);
+    await m.encryptInPlace(dbPath: dbPath, keyHex: keyHex);
+
+    await _p.setDbEncryptionEnabled(true);
+    await refreshDerivedKey();
+
+    if (!skipReopenForTesting) {
+      onPhase?.call('reopen');
+      DatabaseService.instance.databaseKeyHex = _databaseKeyHex;
+      await DatabaseService.instance.reinitializeAtPath(dbPath);
+    }
+  }
+
+  /// Decrypts in place; mirror image of [enableEncryption]. App Lock stays
+  /// on — only the at-rest tier is removed.
+  Future<void> disableEncryption({
+    DatabaseEncryptionMigrator? migrator,
+    void Function(String phase)? onPhase,
+    @visibleForTesting String? dbPathOverride,
+    @visibleForTesting bool skipReopenForTesting = false,
+  }) async {
+    final mlk = _mlk;
+    if (mlk == null) {
+      throw StateError('Cannot disable encryption while locked');
+    }
+    if (!encryptionEnabled) return;
+    final m = migrator ?? DatabaseEncryptionMigrator();
+    final dbPath =
+        dbPathOverride ?? await DatabaseService.instance.databasePath;
+
+    if (!skipReopenForTesting) {
+      await DatabaseService.instance.close(strict: true);
+    }
+
+    onPhase?.call('decrypt');
+    final keyHex = await deriveDbKeyHex(mlk);
+    await m.decryptInPlace(dbPath: dbPath, keyHex: keyHex);
+
+    await _p.setDbEncryptionEnabled(false);
+    await refreshDerivedKey();
+
+    if (!skipReopenForTesting) {
+      onPhase?.call('reopen');
+      DatabaseService.instance.databaseKeyHex = null;
+      await DatabaseService.instance.reinitializeAtPath(dbPath);
+    }
+  }
+
+  static String _timestamp() {
+    final ts = DateTime.now();
+    String two(int v) => v.toString().padLeft(2, '0');
+    return '${ts.year.toString().padLeft(4, '0')}-${two(ts.month)}-'
+        '${two(ts.day)}_${two(ts.hour)}${two(ts.minute)}${two(ts.second)}';
   }
 
   /// Re-derives [databaseKeyHex] after the encryption flag changes

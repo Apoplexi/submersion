@@ -4,6 +4,7 @@ import 'package:cryptography/cryptography.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:submersion/core/services/security/database_encryption_migrator.dart';
 import 'package:submersion/core/services/security/database_security_key_store.dart';
 import 'package:submersion/core/services/security/database_security_service.dart';
 
@@ -155,5 +156,82 @@ void main() {
     await svc.enableSecurity(password: 'pw', dbPath: dbPath, kdf: testKdf);
     await svc.preferences.setDbEncryptionEnabled(true);
     expect(() => svc.disableSecurity(dbPath: dbPath), throwsStateError);
+  });
+
+  group('encryption orchestration', () {
+    DatabaseEncryptionMigrator fakeMigrator(List<String> calls) {
+      return DatabaseEncryptionMigrator(
+        exporter:
+            ({
+              required String sourcePath,
+              required String targetPath,
+              String? sourceKeyHex,
+              String? targetKeyHex,
+            }) async {
+              calls.add('export:${targetKeyHex != null}');
+              File(targetPath).writeAsStringSync('ENC');
+            },
+      );
+    }
+
+    test('enableEncryption: migrates, flips flag, derives key', () async {
+      await svc.enableSecurity(password: 'pw', dbPath: dbPath, kdf: testKdf);
+      File(dbPath).writeAsStringSync('PLAIN');
+      final calls = <String>[];
+      final phases = <String>[];
+      await svc.enableEncryption(
+        migrator: fakeMigrator(calls),
+        onPhase: phases.add,
+        dbPathOverride: dbPath,
+        skipReopenForTesting: true,
+      );
+      expect(calls, ['export:true']);
+      expect(svc.encryptionEnabled, true);
+      expect(svc.databaseKeyHex, hasLength(64));
+      expect(phases, containsAllInOrder(['backup', 'encrypt']));
+      expect(File(dbPath).readAsStringSync(), 'ENC');
+    });
+
+    test('enableEncryption is a no-op when already enabled', () async {
+      await svc.enableSecurity(password: 'pw', dbPath: dbPath, kdf: testKdf);
+      await svc.preferences.setDbEncryptionEnabled(true);
+      final calls = <String>[];
+      await svc.enableEncryption(
+        migrator: fakeMigrator(calls),
+        dbPathOverride: dbPath,
+        skipReopenForTesting: true,
+      );
+      expect(calls, isEmpty);
+    });
+
+    test('disableEncryption reverses and clears the derived key', () async {
+      await svc.enableSecurity(password: 'pw', dbPath: dbPath, kdf: testKdf);
+      File(dbPath).writeAsStringSync('PLAIN');
+      final calls = <String>[];
+      await svc.enableEncryption(
+        migrator: fakeMigrator(calls),
+        dbPathOverride: dbPath,
+        skipReopenForTesting: true,
+      );
+      calls.clear();
+      await svc.disableEncryption(
+        migrator: fakeMigrator(calls),
+        dbPathOverride: dbPath,
+        skipReopenForTesting: true,
+      );
+      expect(calls, ['export:false']);
+      expect(svc.encryptionEnabled, false);
+      expect(svc.databaseKeyHex, isNull);
+    });
+
+    test('enableEncryption throws when locked', () async {
+      expect(
+        () => svc.enableEncryption(
+          dbPathOverride: dbPath,
+          skipReopenForTesting: true,
+        ),
+        throwsStateError,
+      );
+    });
   });
 }
