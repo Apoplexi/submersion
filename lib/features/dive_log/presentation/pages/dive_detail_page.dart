@@ -1016,34 +1016,29 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
         children: [
           Row(
             children: [
-              // In the embedded master-detail pane the pinned header already
-              // shows the dive number, so skip it here to avoid repeating it.
-              // On the standalone full page there is no such header, so keep it.
-              if (!widget.embedded) ...[
-                CircleAvatar(
-                  radius: 24,
-                  backgroundColor: colorScheme.primaryContainer,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 4),
-                    child: FittedBox(
-                      fit: BoxFit.scaleDown,
-                      child: Text(
-                        '#${dive.diveNumber ?? '-'}',
-                        maxLines: 1,
-                        style: TextStyle(
-                          color: colorScheme.onPrimaryContainer,
-                          fontWeight: FontWeight.bold,
-                          // Pin the pre-scale size (CircleAvatar's implicit
-                          // titleMedium default) so FittedBox scales from a
-                          // theme-independent baseline.
-                          fontSize: 16,
-                        ),
+              CircleAvatar(
+                radius: 24,
+                backgroundColor: colorScheme.primaryContainer,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(
+                      '#${dive.diveNumber ?? '-'}',
+                      maxLines: 1,
+                      style: TextStyle(
+                        color: colorScheme.onPrimaryContainer,
+                        fontWeight: FontWeight.bold,
+                        // Pin the pre-scale size (CircleAvatar's implicit
+                        // titleMedium default) so FittedBox scales from a
+                        // theme-independent baseline.
+                        fontSize: 16,
                       ),
                     ),
                   ),
                 ),
-                const SizedBox(width: 16),
-              ],
+              ),
+              const SizedBox(width: 16),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,

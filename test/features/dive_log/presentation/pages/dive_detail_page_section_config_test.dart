@@ -683,17 +683,18 @@ void main() {
       orderedDiveIdsProvider.overrideWith((ref) async => <String>[]),
     ];
 
-    /// Number of distinct rendered lines for the badge [text].
-    int lineCountOf(WidgetTester tester, String text) {
-      final paragraph = tester.renderObject<RenderParagraph>(find.text(text));
+    /// Number of distinct rendered lines for the badge [text] rendered by
+    /// the paragraph matched by [finder].
+    int lineCountOf(WidgetTester tester, Finder finder, String text) {
+      final paragraph = tester.renderObject<RenderParagraph>(finder);
       final boxes = paragraph.getBoxesForSelection(
         TextSelection(baseOffset: 0, extentOffset: text.length),
       );
       return boxes.map((box) => box.top).toSet().length;
     }
 
-    testWidgets('embedded mode shows the dive number exactly once, '
-        'on a single line', (tester) async {
+    testWidgets('embedded mode shows the dive number in the pinned header '
+        'and the hero card, each on a single line', (tester) async {
       final settings = _settingsWithVisibleSections([]);
 
       await tester.pumpWidget(
@@ -706,9 +707,11 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      // Embedded header badge only — the hero card badge is omitted.
-      expect(find.text('#28466'), findsOneWidget);
-      expect(lineCountOf(tester, '#28466'), 1);
+      // Embedded header badge plus the hero card badge.
+      final badges = find.text('#28466');
+      expect(badges, findsNWidgets(2));
+      expect(lineCountOf(tester, badges.at(0), '#28466'), 1);
+      expect(lineCountOf(tester, badges.at(1), '#28466'), 1);
     });
 
     testWidgets('standalone page shows the dive number exactly once, '
@@ -721,8 +724,9 @@ void main() {
       await tester.pumpAndSettle();
 
       // Hero card badge only — there is no embedded header here.
-      expect(find.text('#28466'), findsOneWidget);
-      expect(lineCountOf(tester, '#28466'), 1);
+      final badge = find.text('#28466');
+      expect(badge, findsOneWidget);
+      expect(lineCountOf(tester, badge, '#28466'), 1);
     });
   });
 }
