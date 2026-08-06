@@ -12232,6 +12232,71 @@ class AppLocalizationsNl extends AppLocalizations {
   String get media_console_transfers => 'Overdrachten';
 
   @override
+  String get media_console_missing => 'Ontbrekend';
+
+  @override
+  String get media_missing_empty => 'Geen ontbrekende bestanden';
+
+  @override
+  String media_missing_offlineVolumes(int count) {
+    return '$count op offline volumes';
+  }
+
+  @override
+  String get media_missing_repair => 'Herstellen...';
+
+  @override
+  String get media_repair_title => 'Ontbrekende bestanden herstellen';
+
+  @override
+  String get media_repair_addFolder => 'Map toevoegen...';
+
+  @override
+  String get media_repair_usePhotoLibrary => 'Fotobibliotheek doorzoeken';
+
+  @override
+  String get media_repair_useStore => 'Cloudmediaopslag gebruiken';
+
+  @override
+  String get media_repair_scan => 'Scannen';
+
+  @override
+  String media_repair_prefixMove(String from, String to, int count) {
+    return 'Mapverplaatsing gedetecteerd: $from naar $to dekt $count bestanden';
+  }
+
+  @override
+  String get media_repair_confidence_exact => 'Exact';
+
+  @override
+  String get media_repair_confidence_probable => 'Naam en grootte';
+
+  @override
+  String get media_repair_confidence_edited => 'Bewerkt bestand';
+
+  @override
+  String get media_repair_confidence_unmatched => 'Geen kandidaat';
+
+  @override
+  String get media_repair_unverified => 'Niet geverifieerd tegen de opslag';
+
+  @override
+  String media_repair_apply(int count) {
+    return '$count bestanden opnieuw koppelen';
+  }
+
+  @override
+  String media_repair_summary(
+    int relinked,
+    int cloudBacked,
+    int reuploads,
+    int failed,
+    int skipped,
+  ) {
+    return '$relinked opnieuw gekoppeld, $cloudBacked cloudgebaseerd, $reuploads heruploads in wachtrij, $failed mislukt, $skipped overgeslagen';
+  }
+
+  @override
   String get media_console_unlinked => 'Niet gekoppeld';
 
   @override

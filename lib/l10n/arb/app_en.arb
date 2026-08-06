@@ -7082,6 +7082,112 @@
   "@media_console_transfers": {
     "description": "Media console sidebar/tab label for the transfers view"
   },
+  "media_console_missing": "Missing",
+  "@media_console_missing": {
+    "description": "Media console sidebar/tab label for the missing-files view"
+  },
+  "media_missing_empty": "No missing files",
+  "@media_missing_empty": {
+    "description": "Empty state for the missing-files view"
+  },
+  "media_missing_offlineVolumes": "{count} on offline volumes",
+  "@media_missing_offlineVolumes": {
+    "description": "Informational banner: rows whose volume is unmounted",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "media_missing_repair": "Repair...",
+  "@media_missing_repair": {
+    "description": "Button opening the repair wizard"
+  },
+  "media_repair_title": "Repair missing files",
+  "@media_repair_title": {
+    "description": "Repair wizard page title"
+  },
+  "media_repair_addFolder": "Add folder...",
+  "@media_repair_addFolder": {
+    "description": "Wizard scope step: pick a folder to scan"
+  },
+  "media_repair_usePhotoLibrary": "Search photo library",
+  "@media_repair_usePhotoLibrary": {
+    "description": "Wizard scope step: photo library source toggle"
+  },
+  "media_repair_useStore": "Use cloud media store",
+  "@media_repair_useStore": {
+    "description": "Wizard scope step: cloud store source toggle"
+  },
+  "media_repair_scan": "Scan",
+  "@media_repair_scan": {
+    "description": "Wizard scope step: start the candidate scan"
+  },
+  "media_repair_prefixMove": "Folder move detected: {from} to {to} covers {count} files",
+  "@media_repair_prefixMove": {
+    "description": "Review step callout for a detected whole-tree move",
+    "placeholders": {
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "media_repair_confidence_exact": "Exact",
+  "@media_repair_confidence_exact": {
+    "description": "Review group: content hash matches"
+  },
+  "media_repair_confidence_probable": "Name and size",
+  "@media_repair_confidence_probable": {
+    "description": "Review group: filename and size agree"
+  },
+  "media_repair_confidence_edited": "Edited file",
+  "@media_repair_confidence_edited": {
+    "description": "Review group: bytes differ; accepting re-uploads"
+  },
+  "media_repair_confidence_unmatched": "No candidate",
+  "@media_repair_confidence_unmatched": {
+    "description": "Review group: nothing found"
+  },
+  "media_repair_unverified": "Not verified against the store",
+  "@media_repair_unverified": {
+    "description": "Subtitle for a store candidate the HEAD check could not confirm"
+  },
+  "media_repair_apply": "Re-link {count} files",
+  "@media_repair_apply": {
+    "description": "Review step apply button",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "media_repair_summary": "{relinked} re-linked, {cloudBacked} cloud-backed, {reuploads} re-uploads queued, {failed} failed, {skipped} skipped",
+  "@media_repair_summary": {
+    "description": "Apply step summary line",
+    "placeholders": {
+      "relinked": {
+        "type": "int"
+      },
+      "cloudBacked": {
+        "type": "int"
+      },
+      "reuploads": {
+        "type": "int"
+      },
+      "failed": {
+        "type": "int"
+      },
+      "skipped": {
+        "type": "int"
+      }
+    }
+  },
   "media_console_unlinked": "Unlinked",
   "@media_console_unlinked": {
     "description": "Media console sidebar/tab label for the unlinked inbox"

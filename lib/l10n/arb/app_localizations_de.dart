@@ -12319,6 +12319,71 @@ class AppLocalizationsDe extends AppLocalizations {
   String get media_console_transfers => 'Übertragungen';
 
   @override
+  String get media_console_missing => 'Fehlend';
+
+  @override
+  String get media_missing_empty => 'Keine fehlenden Dateien';
+
+  @override
+  String media_missing_offlineVolumes(int count) {
+    return '$count auf Offline-Laufwerken';
+  }
+
+  @override
+  String get media_missing_repair => 'Reparieren...';
+
+  @override
+  String get media_repair_title => 'Fehlende Dateien reparieren';
+
+  @override
+  String get media_repair_addFolder => 'Ordner hinzufügen...';
+
+  @override
+  String get media_repair_usePhotoLibrary => 'Fotomediathek durchsuchen';
+
+  @override
+  String get media_repair_useStore => 'Cloud-Medienspeicher verwenden';
+
+  @override
+  String get media_repair_scan => 'Scannen';
+
+  @override
+  String media_repair_prefixMove(String from, String to, int count) {
+    return 'Ordnerverschiebung erkannt: $from nach $to deckt $count Dateien ab';
+  }
+
+  @override
+  String get media_repair_confidence_exact => 'Exakt';
+
+  @override
+  String get media_repair_confidence_probable => 'Name und Größe';
+
+  @override
+  String get media_repair_confidence_edited => 'Bearbeitete Datei';
+
+  @override
+  String get media_repair_confidence_unmatched => 'Kein Kandidat';
+
+  @override
+  String get media_repair_unverified => 'Nicht gegen den Speicher verifiziert';
+
+  @override
+  String media_repair_apply(int count) {
+    return '$count Dateien neu verknüpfen';
+  }
+
+  @override
+  String media_repair_summary(
+    int relinked,
+    int cloudBacked,
+    int reuploads,
+    int failed,
+    int skipped,
+  ) {
+    return '$relinked neu verknüpft, $cloudBacked cloudgestützt, $reuploads erneute Uploads eingereiht, $failed fehlgeschlagen, $skipped übersprungen';
+  }
+
+  @override
   String get media_console_unlinked => 'Nicht verknüpft';
 
   @override

@@ -12326,6 +12326,71 @@ class AppLocalizationsIt extends AppLocalizations {
   String get media_console_transfers => 'Trasferimenti';
 
   @override
+  String get media_console_missing => 'Mancanti';
+
+  @override
+  String get media_missing_empty => 'Nessun file mancante';
+
+  @override
+  String media_missing_offlineVolumes(int count) {
+    return '$count su volumi non in linea';
+  }
+
+  @override
+  String get media_missing_repair => 'Ripara...';
+
+  @override
+  String get media_repair_title => 'Ripara i file mancanti';
+
+  @override
+  String get media_repair_addFolder => 'Aggiungi cartella...';
+
+  @override
+  String get media_repair_usePhotoLibrary => 'Cerca nella libreria foto';
+
+  @override
+  String get media_repair_useStore => 'Usa l\'archivio multimediale cloud';
+
+  @override
+  String get media_repair_scan => 'Scansiona';
+
+  @override
+  String media_repair_prefixMove(String from, String to, int count) {
+    return 'Spostamento cartella rilevato: $from a $to copre $count file';
+  }
+
+  @override
+  String get media_repair_confidence_exact => 'Esatto';
+
+  @override
+  String get media_repair_confidence_probable => 'Nome e dimensione';
+
+  @override
+  String get media_repair_confidence_edited => 'File modificato';
+
+  @override
+  String get media_repair_confidence_unmatched => 'Nessun candidato';
+
+  @override
+  String get media_repair_unverified => 'Non verificato con l\'archivio';
+
+  @override
+  String media_repair_apply(int count) {
+    return 'Ricollega $count file';
+  }
+
+  @override
+  String media_repair_summary(
+    int relinked,
+    int cloudBacked,
+    int reuploads,
+    int failed,
+    int skipped,
+  ) {
+    return '$relinked ricollegati, $cloudBacked su cloud, $reuploads ricaricamenti in coda, $failed falliti, $skipped saltati';
+  }
+
+  @override
   String get media_console_unlinked => 'Non collegati';
 
   @override

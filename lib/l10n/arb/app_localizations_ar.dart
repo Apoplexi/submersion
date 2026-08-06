@@ -12104,6 +12104,71 @@ class AppLocalizationsAr extends AppLocalizations {
   String get media_console_transfers => 'عمليات النقل';
 
   @override
+  String get media_console_missing => 'مفقودة';
+
+  @override
+  String get media_missing_empty => 'لا توجد ملفات مفقودة';
+
+  @override
+  String media_missing_offlineVolumes(int count) {
+    return '$count على وحدات تخزين غير متصلة';
+  }
+
+  @override
+  String get media_missing_repair => 'إصلاح...';
+
+  @override
+  String get media_repair_title => 'إصلاح الملفات المفقودة';
+
+  @override
+  String get media_repair_addFolder => 'إضافة مجلد...';
+
+  @override
+  String get media_repair_usePhotoLibrary => 'البحث في مكتبة الصور';
+
+  @override
+  String get media_repair_useStore => 'استخدام مخزن الوسائط السحابي';
+
+  @override
+  String get media_repair_scan => 'فحص';
+
+  @override
+  String media_repair_prefixMove(String from, String to, int count) {
+    return 'تم اكتشاف نقل مجلد: $from إلى $to يغطي $count ملفات';
+  }
+
+  @override
+  String get media_repair_confidence_exact => 'مطابقة تامة';
+
+  @override
+  String get media_repair_confidence_probable => 'الاسم والحجم';
+
+  @override
+  String get media_repair_confidence_edited => 'ملف معدل';
+
+  @override
+  String get media_repair_confidence_unmatched => 'لا يوجد مرشح';
+
+  @override
+  String get media_repair_unverified => 'لم يتم التحقق منه مقابل المخزن';
+
+  @override
+  String media_repair_apply(int count) {
+    return 'إعادة ربط $count ملفات';
+  }
+
+  @override
+  String media_repair_summary(
+    int relinked,
+    int cloudBacked,
+    int reuploads,
+    int failed,
+    int skipped,
+  ) {
+    return '$relinked أعيد ربطها، $cloudBacked مدعومة سحابيًا، $reuploads في قائمة إعادة الرفع، $failed فشلت، $skipped تم تخطيها';
+  }
+
+  @override
   String get media_console_unlinked => 'غير مرتبطة';
 
   @override

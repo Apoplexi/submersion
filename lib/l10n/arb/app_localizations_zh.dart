@@ -11766,6 +11766,71 @@ class AppLocalizationsZh extends AppLocalizations {
   String get media_console_transfers => '传输';
 
   @override
+  String get media_console_missing => '缺失';
+
+  @override
+  String get media_missing_empty => '没有缺失的文件';
+
+  @override
+  String media_missing_offlineVolumes(int count) {
+    return '$count 个位于离线卷上';
+  }
+
+  @override
+  String get media_missing_repair => '修复...';
+
+  @override
+  String get media_repair_title => '修复缺失的文件';
+
+  @override
+  String get media_repair_addFolder => '添加文件夹...';
+
+  @override
+  String get media_repair_usePhotoLibrary => '搜索照片图库';
+
+  @override
+  String get media_repair_useStore => '使用云媒体存储';
+
+  @override
+  String get media_repair_scan => '扫描';
+
+  @override
+  String media_repair_prefixMove(String from, String to, int count) {
+    return '检测到文件夹移动：$from 至 $to，涵盖 $count 个文件';
+  }
+
+  @override
+  String get media_repair_confidence_exact => '完全匹配';
+
+  @override
+  String get media_repair_confidence_probable => '名称和大小';
+
+  @override
+  String get media_repair_confidence_edited => '已编辑的文件';
+
+  @override
+  String get media_repair_confidence_unmatched => '无候选项';
+
+  @override
+  String get media_repair_unverified => '未通过存储验证';
+
+  @override
+  String media_repair_apply(int count) {
+    return '重新关联 $count 个文件';
+  }
+
+  @override
+  String media_repair_summary(
+    int relinked,
+    int cloudBacked,
+    int reuploads,
+    int failed,
+    int skipped,
+  ) {
+    return '$relinked 个已重新关联，$cloudBacked 个云端备份,$reuploads 个重新上传已排队，$failed 个失败，$skipped 个已跳过';
+  }
+
+  @override
   String get media_console_unlinked => '未关联';
 
   @override

@@ -20893,6 +20893,114 @@ abstract class AppLocalizations {
   /// **'Transfers'**
   String get media_console_transfers;
 
+  /// Media console sidebar/tab label for the missing-files view
+  ///
+  /// In en, this message translates to:
+  /// **'Missing'**
+  String get media_console_missing;
+
+  /// Empty state for the missing-files view
+  ///
+  /// In en, this message translates to:
+  /// **'No missing files'**
+  String get media_missing_empty;
+
+  /// Informational banner: rows whose volume is unmounted
+  ///
+  /// In en, this message translates to:
+  /// **'{count} on offline volumes'**
+  String media_missing_offlineVolumes(int count);
+
+  /// Button opening the repair wizard
+  ///
+  /// In en, this message translates to:
+  /// **'Repair...'**
+  String get media_missing_repair;
+
+  /// Repair wizard page title
+  ///
+  /// In en, this message translates to:
+  /// **'Repair missing files'**
+  String get media_repair_title;
+
+  /// Wizard scope step: pick a folder to scan
+  ///
+  /// In en, this message translates to:
+  /// **'Add folder...'**
+  String get media_repair_addFolder;
+
+  /// Wizard scope step: photo library source toggle
+  ///
+  /// In en, this message translates to:
+  /// **'Search photo library'**
+  String get media_repair_usePhotoLibrary;
+
+  /// Wizard scope step: cloud store source toggle
+  ///
+  /// In en, this message translates to:
+  /// **'Use cloud media store'**
+  String get media_repair_useStore;
+
+  /// Wizard scope step: start the candidate scan
+  ///
+  /// In en, this message translates to:
+  /// **'Scan'**
+  String get media_repair_scan;
+
+  /// Review step callout for a detected whole-tree move
+  ///
+  /// In en, this message translates to:
+  /// **'Folder move detected: {from} to {to} covers {count} files'**
+  String media_repair_prefixMove(String from, String to, int count);
+
+  /// Review group: content hash matches
+  ///
+  /// In en, this message translates to:
+  /// **'Exact'**
+  String get media_repair_confidence_exact;
+
+  /// Review group: filename and size agree
+  ///
+  /// In en, this message translates to:
+  /// **'Name and size'**
+  String get media_repair_confidence_probable;
+
+  /// Review group: bytes differ; accepting re-uploads
+  ///
+  /// In en, this message translates to:
+  /// **'Edited file'**
+  String get media_repair_confidence_edited;
+
+  /// Review group: nothing found
+  ///
+  /// In en, this message translates to:
+  /// **'No candidate'**
+  String get media_repair_confidence_unmatched;
+
+  /// Subtitle for a store candidate the HEAD check could not confirm
+  ///
+  /// In en, this message translates to:
+  /// **'Not verified against the store'**
+  String get media_repair_unverified;
+
+  /// Review step apply button
+  ///
+  /// In en, this message translates to:
+  /// **'Re-link {count} files'**
+  String media_repair_apply(int count);
+
+  /// Apply step summary line
+  ///
+  /// In en, this message translates to:
+  /// **'{relinked} re-linked, {cloudBacked} cloud-backed, {reuploads} re-uploads queued, {failed} failed, {skipped} skipped'**
+  String media_repair_summary(
+    int relinked,
+    int cloudBacked,
+    int reuploads,
+    int failed,
+    int skipped,
+  );
+
   /// Media console sidebar/tab label for the unlinked inbox
   ///
   /// In en, this message translates to:

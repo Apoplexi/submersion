@@ -12022,6 +12022,71 @@ class AppLocalizationsHe extends AppLocalizations {
   String get media_console_transfers => 'העברות';
 
   @override
+  String get media_console_missing => 'חסרים';
+
+  @override
+  String get media_missing_empty => 'אין קבצים חסרים';
+
+  @override
+  String media_missing_offlineVolumes(int count) {
+    return '$count בכוננים לא מחוברים';
+  }
+
+  @override
+  String get media_missing_repair => 'תיקון...';
+
+  @override
+  String get media_repair_title => 'תיקון קבצים חסרים';
+
+  @override
+  String get media_repair_addFolder => 'הוספת תיקייה...';
+
+  @override
+  String get media_repair_usePhotoLibrary => 'חיפוש בספריית התמונות';
+
+  @override
+  String get media_repair_useStore => 'שימוש במאגר המדיה בענן';
+
+  @override
+  String get media_repair_scan => 'סריקה';
+
+  @override
+  String media_repair_prefixMove(String from, String to, int count) {
+    return 'זוהתה העברת תיקייה: $from אל $to מכסה $count קבצים';
+  }
+
+  @override
+  String get media_repair_confidence_exact => 'מדויק';
+
+  @override
+  String get media_repair_confidence_probable => 'שם וגודל';
+
+  @override
+  String get media_repair_confidence_edited => 'קובץ ערוך';
+
+  @override
+  String get media_repair_confidence_unmatched => 'אין מועמד';
+
+  @override
+  String get media_repair_unverified => 'לא אומת מול המאגר';
+
+  @override
+  String media_repair_apply(int count) {
+    return 'קישור מחדש של $count קבצים';
+  }
+
+  @override
+  String media_repair_summary(
+    int relinked,
+    int cloudBacked,
+    int reuploads,
+    int failed,
+    int skipped,
+  ) {
+    return '$relinked קושרו מחדש, $cloudBacked מגובים בענן, $reuploads העלאות חוזרות בתור, $failed נכשלו, $skipped דולגו';
+  }
+
+  @override
   String get media_console_unlinked => 'לא מקושרים';
 
   @override
