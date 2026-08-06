@@ -380,30 +380,47 @@ void main() {
     });
   });
 
-  group('Badge count (rewritten in badge-semantics task)', () {
-    testWidgets('badge reflects active secondary count including Ceiling', (
+  group('Badge count', () {
+    testWidgets('badge counts active toggles hidden from the inline row', (
       tester,
     ) async {
+      // At 250px nothing fits inline; Ceiling is active by default, so
+      // exactly one active toggle is hidden behind the More button.
       await _pumpLegendAt(
         tester,
-        width: 800,
-        config: const ProfileLegendConfig(
-          hasCeilingCurve: true,
-          hasAscentRates: true,
-        ),
+        width: 250,
+        config: const ProfileLegendConfig(hasCeilingCurve: true),
       );
-      expect(find.byIcon(Icons.tune), findsOneWidget);
+
+      expect(find.text('Ceiling'), findsNothing);
+      expect(find.text('1'), findsOneWidget);
     });
 
-    testWidgets('badge includes gas strip when hasGasData is true', (
+    testWidgets('badge is hidden when every active toggle is inline', (
       tester,
     ) async {
       await _pumpLegendAt(
         tester,
-        width: 800,
+        width: 1200,
+        config: const ProfileLegendConfig(hasCeilingCurve: true),
+      );
+
+      expect(find.text('Ceiling'), findsOneWidget);
+      expect(find.text('1'), findsNothing);
+    });
+
+    testWidgets('hidden gas strip toggle counts toward the badge', (
+      tester,
+    ) async {
+      // showGas defaults to true; at 250px it cannot render inline.
+      await _pumpLegendAt(
+        tester,
+        width: 250,
         config: const ProfileLegendConfig(hasGasData: true),
       );
-      expect(find.byIcon(Icons.tune), findsOneWidget);
+
+      expect(find.text('Gases'), findsNothing);
+      expect(find.text('1'), findsOneWidget);
     });
   });
 

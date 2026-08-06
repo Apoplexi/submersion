@@ -175,6 +175,9 @@ class DiveProfileLegend extends ConsumerWidget {
                       _labelWidth(context, c.label) +
                       _itemSpacing,
                 );
+                final hiddenActiveCount =
+                    candidates.where((c) => c.isActive).length -
+                    admitted.where((c) => c.isActive).length;
                 // The admitted set is measured to fit, so this scroll view
                 // never actually scrolls; it exists to clip gracefully in
                 // degenerate over-constrained layouts instead of throwing
@@ -203,7 +206,7 @@ class DiveProfileLegend extends ConsumerWidget {
                         const SizedBox(width: _itemSpacing),
                         _MoreOptionsButton(
                           config: config,
-                          legendState: legendState,
+                          hiddenActiveCount: hiddenActiveCount,
                         ),
                       ],
                     ],
@@ -601,62 +604,27 @@ class DiveProfileLegend extends ConsumerWidget {
   }
 }
 
-/// Button that shows badge with active secondary toggle count and opens popover
+/// Button that shows a badge counting active toggles hidden from the inline
+/// row, and opens the chart options dialog.
 class _MoreOptionsButton extends ConsumerWidget {
   final ProfileLegendConfig config;
-  final ProfileLegendState legendState;
+  final int hiddenActiveCount;
 
-  const _MoreOptionsButton({required this.config, required this.legendState});
-
-  int get _activeSecondaryCount {
-    var count = 0;
-    if (config.hasHeartRateData && legendState.showHeartRate) count++;
-    if (config.hasSacCurve && legendState.showSac) count++;
-    if (config.hasAscentRates && legendState.showAscentRateColors) count++;
-    if (config.hasAscentRates && legendState.showAscentRateLine) count++;
-    if (config.hasMaxDepthMarker && legendState.showMaxDepthMarker) count++;
-    if (config.hasPressureMarkers && legendState.showPressureMarkers) count++;
-    if (config.hasGasSwitches && legendState.showGasSwitchMarkers) count++;
-    if (config.hasPhotoMarkers && legendState.showPhotoMarkers) count++;
-
-    // Advanced deco/gas toggles
-    if (config.hasCeilingCurve && legendState.showCeiling) count++;
-    if (config.hasDecoStopCurve && legendState.showDecoStops) count++;
-    if (config.hasNdlData && legendState.showNdl) count++;
-    if (config.hasPpO2Data && legendState.showPpO2) count++;
-    if (config.hasPpN2Data && legendState.showPpN2) count++;
-    if (config.hasPpHeData && legendState.showPpHe) count++;
-    if (config.hasModData && legendState.showMod) count++;
-    if (config.hasDensityData && legendState.showDensity) count++;
-    if (config.hasGfData && legendState.showGf) count++;
-    if (config.hasSurfaceGfData && legendState.showSurfaceGf) count++;
-    if (config.hasMeanDepthData && legendState.showMeanDepth) count++;
-    if (config.hasTtsData && legendState.showTts) count++;
-    if (config.hasCnsData && legendState.showCns) count++;
-    if (config.hasOtuData && legendState.showOtu) count++;
-    if (config.hasGasData && legendState.showGas) count++;
-
-    // Count active tank pressure toggles
-    if (config.hasMultiTankPressure && config.tankPressures != null) {
-      for (final tankId in config.tankPressures!.keys) {
-        if (legendState.showTankPressure[tankId] ?? true) count++;
-      }
-    }
-
-    return count;
-  }
+  const _MoreOptionsButton({
+    required this.config,
+    required this.hiddenActiveCount,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
-    final activeCount = _activeSecondaryCount;
 
     return IconButton(
       onPressed: () => _showMoreOptions(context),
       icon: Badge(
-        isLabelVisible: activeCount > 0,
+        isLabelVisible: hiddenActiveCount > 0,
         label: Text(
-          activeCount.toString(),
+          hiddenActiveCount.toString(),
           style: const TextStyle(fontSize: 10),
         ),
         child: const Icon(Icons.tune, size: 18),
@@ -665,7 +633,7 @@ class _MoreOptionsButton extends ConsumerWidget {
       padding: EdgeInsets.zero,
       constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
       style: IconButton.styleFrom(
-        foregroundColor: activeCount > 0
+        foregroundColor: hiddenActiveCount > 0
             ? colorScheme.primary
             : colorScheme.onSurfaceVariant,
       ),
