@@ -9,6 +9,11 @@ class AppLocalizationsZh extends AppLocalizations {
   AppLocalizationsZh([String locale = 'zh']) : super(locale);
 
   @override
+  String diveLog_edit_flightWindowWarning(String time) {
+    return '此次潜水的结束时间晚于您航班的最后安全出水时间($time)';
+  }
+
+  @override
   String diveLog_edit_geofenceSuggestion_near(String location) {
     return '靠近 $location';
   }
@@ -2946,6 +2951,14 @@ class AppLocalizationsZh extends AppLocalizations {
   String get dashboard_gauges_noFlyClear => '禁飞 0:00';
 
   @override
+  String dashboard_gauges_flightWindow(String hours, String minutes) {
+    return '潜水窗口 $hours:$minutes';
+  }
+
+  @override
+  String get dashboard_gauges_flightWindowClosed => '航班前请勿再潜水';
+
+  @override
   String dashboard_gauges_noFlyRemaining(String hours, String minutes) {
     return '禁飞 $hours:$minutes';
   }
@@ -2966,6 +2979,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get settings_homeChips_description => '选择主页顶部显示哪些状态标签。';
+
+  @override
+  String get settings_homeChips_flightWindow => '航班前潜水窗口';
 
   @override
   String get settings_homeChips_gear => '装备保养';
@@ -16681,6 +16697,15 @@ class AppLocalizationsZh extends AppLocalizations {
   String get trips_edit_label_resortName => '度假村名称';
 
   @override
+  String get trips_edit_label_returnFlight => '返程航班';
+
+  @override
+  String get trips_edit_returnFlightClear => '清除返程航班';
+
+  @override
+  String get trips_edit_returnFlightNotSet => '未设置';
+
+  @override
   String get trips_edit_label_startDate => '开始日期';
 
   @override
@@ -21030,6 +21055,27 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get safetySettings_noFlyPreset_subtitle => '单次免减压潜水、重复潜水和减压潜水后的指导间隔';
+
+  @override
+  String get flightWindow_closed => '航班前请勿再潜水';
+
+  @override
+  String get flightWindow_conflict => '您的禁飞时间超过了航班起飞时间';
+
+  @override
+  String flightWindow_departs(String time) {
+    return '航班 $time 起飞';
+  }
+
+  @override
+  String flightWindow_openTitle(String remaining) {
+    return '剩余潜水时间:$remaining';
+  }
+
+  @override
+  String flightWindow_surfaceBy(String time) {
+    return '请在 $time 前出水';
+  }
 
   @override
   String safetyHub_noFly_active_title(String remaining) {

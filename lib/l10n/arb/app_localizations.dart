@@ -116,6 +116,12 @@ abstract class AppLocalizations {
     Locale('zh'),
   ];
 
+  /// No description provided for @diveLog_edit_flightWindowWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'This dive ends after the latest safe surfacing time for your flight ({time})'**
+  String diveLog_edit_flightWindowWarning(String time);
+
   /// No description provided for @diveLog_edit_geofenceSuggestion_near.
   ///
   /// In en, this message translates to:
@@ -5291,6 +5297,18 @@ abstract class AppLocalizations {
   /// **'No-fly 0:00'**
   String get dashboard_gauges_noFlyClear;
 
+  /// No description provided for @dashboard_gauges_flightWindow.
+  ///
+  /// In en, this message translates to:
+  /// **'Dive window {hours}:{minutes}'**
+  String dashboard_gauges_flightWindow(String hours, String minutes);
+
+  /// No description provided for @dashboard_gauges_flightWindowClosed.
+  ///
+  /// In en, this message translates to:
+  /// **'No more diving before flight'**
+  String get dashboard_gauges_flightWindowClosed;
+
   /// No description provided for @dashboard_gauges_noFlyRemaining.
   ///
   /// In en, this message translates to:
@@ -5326,6 +5344,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Choose which status chips appear at the top of the Home tab.'**
   String get settings_homeChips_description;
+
+  /// No description provided for @settings_homeChips_flightWindow.
+  ///
+  /// In en, this message translates to:
+  /// **'Flight dive window'**
+  String get settings_homeChips_flightWindow;
 
   /// No description provided for @settings_homeChips_gear.
   ///
@@ -29470,6 +29494,24 @@ abstract class AppLocalizations {
   /// **'Resort Name'**
   String get trips_edit_label_resortName;
 
+  /// No description provided for @trips_edit_label_returnFlight.
+  ///
+  /// In en, this message translates to:
+  /// **'Return Flight'**
+  String get trips_edit_label_returnFlight;
+
+  /// No description provided for @trips_edit_returnFlightClear.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear return flight'**
+  String get trips_edit_returnFlightClear;
+
+  /// No description provided for @trips_edit_returnFlightNotSet.
+  ///
+  /// In en, this message translates to:
+  /// **'Not set'**
+  String get trips_edit_returnFlightNotSet;
+
   /// No description provided for @trips_edit_label_startDate.
   ///
   /// In en, this message translates to:
@@ -37017,6 +37059,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Guideline intervals after a single no-deco dive, repetitive dives, and deco dives'**
   String get safetySettings_noFlyPreset_subtitle;
+
+  /// No description provided for @flightWindow_closed.
+  ///
+  /// In en, this message translates to:
+  /// **'No more diving before your flight'**
+  String get flightWindow_closed;
+
+  /// No description provided for @flightWindow_conflict.
+  ///
+  /// In en, this message translates to:
+  /// **'Your no-fly time extends past your flight departure'**
+  String get flightWindow_conflict;
+
+  /// No description provided for @flightWindow_departs.
+  ///
+  /// In en, this message translates to:
+  /// **'Flight departs {time}'**
+  String flightWindow_departs(String time);
+
+  /// No description provided for @flightWindow_openTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Time left to dive: {remaining}'**
+  String flightWindow_openTitle(String remaining);
+
+  /// No description provided for @flightWindow_surfaceBy.
+  ///
+  /// In en, this message translates to:
+  /// **'Surface by {time}'**
+  String flightWindow_surfaceBy(String time);
 
   /// No description provided for @safetyHub_noFly_active_title.
   ///

@@ -9,6 +9,11 @@ class AppLocalizationsEs extends AppLocalizations {
   AppLocalizationsEs([String locale = 'es']) : super(locale);
 
   @override
+  String diveLog_edit_flightWindowWarning(String time) {
+    return 'Esta inmersión termina después de la última hora segura para emerger antes de tu vuelo ($time)';
+  }
+
+  @override
   String diveLog_edit_geofenceSuggestion_near(String location) {
     return 'Cerca de $location';
   }
@@ -3116,6 +3121,15 @@ class AppLocalizationsEs extends AppLocalizations {
   String get dashboard_gauges_noFlyClear => 'No volar 0:00';
 
   @override
+  String dashboard_gauges_flightWindow(String hours, String minutes) {
+    return 'Ventana de buceo $hours:$minutes';
+  }
+
+  @override
+  String get dashboard_gauges_flightWindowClosed =>
+      'No más buceo antes del vuelo';
+
+  @override
   String dashboard_gauges_noFlyRemaining(String hours, String minutes) {
     return 'No volar $hours:$minutes';
   }
@@ -3137,6 +3151,10 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get settings_homeChips_description =>
       'Elige qué chips de estado aparecen en la parte superior de la pestaña Inicio.';
+
+  @override
+  String get settings_homeChips_flightWindow =>
+      'Ventana de buceo antes del vuelo';
 
   @override
   String get settings_homeChips_gear => 'Mantenimiento del equipo';
@@ -17594,6 +17612,15 @@ class AppLocalizationsEs extends AppLocalizations {
   String get trips_edit_label_resortName => 'Nombre del resort';
 
   @override
+  String get trips_edit_label_returnFlight => 'Vuelo de regreso';
+
+  @override
+  String get trips_edit_returnFlightClear => 'Borrar vuelo de regreso';
+
+  @override
+  String get trips_edit_returnFlightNotSet => 'Sin definir';
+
+  @override
   String get trips_edit_label_startDate => 'Fecha de inicio';
 
   @override
@@ -22157,6 +22184,28 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get safetySettings_noFlyPreset_subtitle =>
       'Intervalos orientativos tras una única inmersión sin deco, inmersiones sucesivas e inmersiones con deco';
+
+  @override
+  String get flightWindow_closed => 'No bucees más antes de tu vuelo';
+
+  @override
+  String get flightWindow_conflict =>
+      'Tu tiempo de no volar se extiende más allá de la salida del vuelo';
+
+  @override
+  String flightWindow_departs(String time) {
+    return 'El vuelo sale $time';
+  }
+
+  @override
+  String flightWindow_openTitle(String remaining) {
+    return 'Tiempo restante para bucear: $remaining';
+  }
+
+  @override
+  String flightWindow_surfaceBy(String time) {
+    return 'Emerger antes de $time';
+  }
 
   @override
   String safetyHub_noFly_active_title(String remaining) {

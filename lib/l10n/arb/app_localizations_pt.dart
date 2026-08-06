@@ -9,6 +9,11 @@ class AppLocalizationsPt extends AppLocalizations {
   AppLocalizationsPt([String locale = 'pt']) : super(locale);
 
   @override
+  String diveLog_edit_flightWindowWarning(String time) {
+    return 'Este mergulho termina depois do último horário seguro para emergir antes do seu voo ($time)';
+  }
+
+  @override
   String diveLog_edit_geofenceSuggestion_near(String location) {
     return 'Perto de $location';
   }
@@ -3117,6 +3122,15 @@ class AppLocalizationsPt extends AppLocalizations {
   String get dashboard_gauges_noFlyClear => 'Não voar 0:00';
 
   @override
+  String dashboard_gauges_flightWindow(String hours, String minutes) {
+    return 'Janela de mergulho $hours:$minutes';
+  }
+
+  @override
+  String get dashboard_gauges_flightWindowClosed =>
+      'Não mergulhe mais antes do voo';
+
+  @override
   String dashboard_gauges_noFlyRemaining(String hours, String minutes) {
     return 'Não voar $hours:$minutes';
   }
@@ -3138,6 +3152,10 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get settings_homeChips_description =>
       'Escolha que chips de estado aparecem no topo do separador Início.';
+
+  @override
+  String get settings_homeChips_flightWindow =>
+      'Janela de mergulho antes do voo';
 
   @override
   String get settings_homeChips_gear => 'Manutenção do equipamento';
@@ -17588,6 +17606,15 @@ class AppLocalizationsPt extends AppLocalizations {
   String get trips_edit_label_resortName => 'Nome do Resort';
 
   @override
+  String get trips_edit_label_returnFlight => 'Voo de volta';
+
+  @override
+  String get trips_edit_returnFlightClear => 'Limpar voo de volta';
+
+  @override
+  String get trips_edit_returnFlightNotSet => 'Não definido';
+
+  @override
   String get trips_edit_label_startDate => 'Data de Inicio';
 
   @override
@@ -22144,6 +22171,28 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get safetySettings_noFlyPreset_subtitle =>
       'Intervalos orientativos após um único mergulho sem deco, mergulhos repetitivos e mergulhos com deco';
+
+  @override
+  String get flightWindow_closed => 'Não mergulhe mais antes do seu voo';
+
+  @override
+  String get flightWindow_conflict =>
+      'Seu tempo de não voar ultrapassa a partida do voo';
+
+  @override
+  String flightWindow_departs(String time) {
+    return 'O voo parte $time';
+  }
+
+  @override
+  String flightWindow_openTitle(String remaining) {
+    return 'Tempo restante para mergulhar: $remaining';
+  }
+
+  @override
+  String flightWindow_surfaceBy(String time) {
+    return 'Emergir até $time';
+  }
 
   @override
   String safetyHub_noFly_active_title(String remaining) {

@@ -2,6 +2,14 @@
   "settings_units_defaultCurrency": "Devise par défaut",
   "settings_units_dialog_defaultCurrency": "Devise par défaut",
   "diveSites_list_menu_select": "Sélectionner des sites",
+  "diveLog_edit_flightWindowWarning": "Cette plongée se termine après l'heure limite de remontée pour votre vol ({time})",
+  "@diveLog_edit_flightWindowWarning": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
   "diveLog_edit_geofenceSuggestion_near": "Près de {location}",
   "diveLog_edit_geofenceSuggestion_title": "Suggestion d'équipement",
   "diveLog_edit_geofenceSuggestion_body": "Appliquer l'ensemble \"{setName}\" ?",
@@ -5259,6 +5267,9 @@
   "trips_edit_label_notes": "Notes",
   "trips_edit_label_operatorName": "Operator / Charter",
   "trips_edit_label_resortName": "Nom du resort",
+  "trips_edit_label_returnFlight": "Vol retour",
+  "trips_edit_returnFlightClear": "Effacer le vol retour",
+  "trips_edit_returnFlightNotSet": "Non défini",
   "trips_edit_label_startDate": "Date de debut",
   "trips_edit_label_tripName": "Nom du voyage *",
   "trips_edit_label_tripType": "Trip Type",
@@ -5760,12 +5771,25 @@
   "dashboard_gauges_insuranceExpired": "Assurance expirée",
   "dashboard_gauges_noInsurance": "Aucune assurance enregistrée",
   "dashboard_gauges_noFlyClear": "Délai avant vol 0:00",
+  "dashboard_gauges_flightWindow": "Fenêtre de plongée {hours}:{minutes}",
+  "@dashboard_gauges_flightWindow": {
+    "placeholders": {
+      "hours": {
+        "type": "String"
+      },
+      "minutes": {
+        "type": "String"
+      }
+    }
+  },
+  "dashboard_gauges_flightWindowClosed": "Plus de plongée avant le vol",
   "dashboard_gauges_noFlyRemaining": "Délai avant vol {hours}:{minutes}",
   "dashboard_gauges_lastDiveDays": "Dernière plongée il y a {days}j",
   "dashboard_gauges_lastDiveToday": "Plongé aujourd'hui",
   "dashboard_gauges_noDivesYet": "Aucune plongée",
   "settings_homeChips_pageTitle": "Pastilles d'état de l'accueil",
   "settings_homeChips_description": "Choisissez les pastilles d'état affichées en haut de l'onglet Accueil.",
+  "settings_homeChips_flightWindow": "Fenêtre de plongée avant vol",
   "settings_homeChips_gear": "Entretien du matériel",
   "settings_homeChips_insurance": "Assurance",
   "settings_homeChips_noFly": "Délai avant vol",
@@ -6550,6 +6574,32 @@
   "safetySettings_noFlyPreset_standard": "Standard (12/18/24 h)",
   "safetySettings_noFlyPreset_strict": "Strict (18/24/48 h)",
   "safetySettings_noFlyPreset_subtitle": "Intervalles indicatifs après une plongée unique sans déco, des plongées successives et des plongées avec déco",
+  "flightWindow_closed": "Plus de plongée avant votre vol",
+  "flightWindow_conflict": "Votre délai avant vol dépasse le départ de votre vol",
+  "flightWindow_departs": "Le vol part {time}",
+  "@flightWindow_departs": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "flightWindow_openTitle": "Temps de plongée restant : {remaining}",
+  "@flightWindow_openTitle": {
+    "placeholders": {
+      "remaining": {
+        "type": "String"
+      }
+    }
+  },
+  "flightWindow_surfaceBy": "Remonter avant {time}",
+  "@flightWindow_surfaceBy": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
   "safetyHub_noFly_active_title": "Interdiction de vol : {remaining} restant",
   "@safetyHub_noFly_active_title": {
     "placeholders": {

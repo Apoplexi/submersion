@@ -9,6 +9,11 @@ class AppLocalizationsAr extends AppLocalizations {
   AppLocalizationsAr([String locale = 'ar']) : super(locale);
 
   @override
+  String diveLog_edit_flightWindowWarning(String time) {
+    return 'ينتهي هذا الغوص بعد آخر وقت آمن للصعود إلى السطح قبل رحلتك ($time)';
+  }
+
+  @override
   String diveLog_edit_geofenceSuggestion_near(String location) {
     return 'بالقرب من $location';
   }
@@ -3048,6 +3053,15 @@ class AppLocalizationsAr extends AppLocalizations {
   String get dashboard_gauges_noFlyClear => 'حظر الطيران 0:00';
 
   @override
+  String dashboard_gauges_flightWindow(String hours, String minutes) {
+    return 'نافذة الغوص $hours:$minutes';
+  }
+
+  @override
+  String get dashboard_gauges_flightWindowClosed =>
+      'لا مزيد من الغوص قبل الرحلة';
+
+  @override
   String dashboard_gauges_noFlyRemaining(String hours, String minutes) {
     return 'حظر الطيران $hours:$minutes';
   }
@@ -3069,6 +3083,9 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get settings_homeChips_description =>
       'اختر شرائح الحالة التي تظهر أعلى تبويب الرئيسية.';
+
+  @override
+  String get settings_homeChips_flightWindow => 'نافذة الغوص قبل الرحلة';
 
   @override
   String get settings_homeChips_gear => 'صيانة المعدات';
@@ -17258,6 +17275,15 @@ class AppLocalizationsAr extends AppLocalizations {
   String get trips_edit_label_resortName => 'اسم المنتجع';
 
   @override
+  String get trips_edit_label_returnFlight => 'رحلة العودة';
+
+  @override
+  String get trips_edit_returnFlightClear => 'مسح رحلة العودة';
+
+  @override
+  String get trips_edit_returnFlightNotSet => 'غير محدد';
+
+  @override
   String get trips_edit_label_startDate => 'تاريخ البدء';
 
   @override
@@ -21745,6 +21771,28 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get safetySettings_noFlyPreset_subtitle =>
       'فترات إرشادية بعد غطسة واحدة بلا توقفات، وغطسات متكررة، وغطسات بتخفيف الضغط';
+
+  @override
+  String get flightWindow_closed => 'لا مزيد من الغوص قبل رحلتك';
+
+  @override
+  String get flightWindow_conflict =>
+      'تمتد فترة حظر الطيران إلى ما بعد إقلاع رحلتك';
+
+  @override
+  String flightWindow_departs(String time) {
+    return 'تقلع الرحلة $time';
+  }
+
+  @override
+  String flightWindow_openTitle(String remaining) {
+    return 'الوقت المتبقي للغوص: $remaining';
+  }
+
+  @override
+  String flightWindow_surfaceBy(String time) {
+    return 'اصعد إلى السطح قبل $time';
+  }
 
   @override
   String safetyHub_noFly_active_title(String remaining) {

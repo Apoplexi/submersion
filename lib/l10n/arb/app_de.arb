@@ -2,6 +2,14 @@
   "settings_units_defaultCurrency": "Standardwährung",
   "settings_units_dialog_defaultCurrency": "Standardwährung",
   "diveSites_list_menu_select": "Tauchplätze auswählen",
+  "diveLog_edit_flightWindowWarning": "Dieser Tauchgang endet nach der letzten sicheren Auftauchzeit für deinen Flug ({time})",
+  "@diveLog_edit_flightWindowWarning": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
   "diveLog_edit_geofenceSuggestion_near": "In der Nähe von {location}",
   "diveLog_edit_geofenceSuggestion_title": "Ausrüstungsvorschlag",
   "diveLog_edit_geofenceSuggestion_body": "Set \"{setName}\" übernehmen?",
@@ -5331,6 +5339,9 @@
   "trips_edit_label_notes": "Notizen",
   "trips_edit_label_operatorName": "Operator / Charter",
   "trips_edit_label_resortName": "Resortname",
+  "trips_edit_label_returnFlight": "Rückflug",
+  "trips_edit_returnFlightClear": "Rückflug entfernen",
+  "trips_edit_returnFlightNotSet": "Nicht festgelegt",
   "trips_edit_label_startDate": "Startdatum",
   "trips_edit_label_tripName": "Reisename *",
   "trips_edit_label_tripType": "Trip Type",
@@ -5760,12 +5771,25 @@
   "dashboard_gauges_insuranceExpired": "Versicherung abgelaufen",
   "dashboard_gauges_noInsurance": "Keine Versicherung hinterlegt",
   "dashboard_gauges_noFlyClear": "Flugverbot 0:00",
+  "dashboard_gauges_flightWindow": "Tauchfenster {hours}:{minutes}",
+  "@dashboard_gauges_flightWindow": {
+    "placeholders": {
+      "hours": {
+        "type": "String"
+      },
+      "minutes": {
+        "type": "String"
+      }
+    }
+  },
+  "dashboard_gauges_flightWindowClosed": "Kein Tauchen mehr vor dem Flug",
   "dashboard_gauges_noFlyRemaining": "Flugverbot {hours}:{minutes}",
   "dashboard_gauges_lastDiveDays": "Letzter Tauchgang vor {days}T",
   "dashboard_gauges_lastDiveToday": "Heute getaucht",
   "dashboard_gauges_noDivesYet": "Noch keine Tauchgänge",
   "settings_homeChips_pageTitle": "Status-Chips der Startseite",
   "settings_homeChips_description": "Wähle, welche Status-Chips oben im Start-Tab erscheinen.",
+  "settings_homeChips_flightWindow": "Tauchfenster vor dem Flug",
   "settings_homeChips_gear": "Ausrüstungswartung",
   "settings_homeChips_insurance": "Versicherung",
   "settings_homeChips_noFly": "Flugverbots-Timer",
@@ -6550,6 +6574,32 @@
   "safetySettings_noFlyPreset_standard": "Standard (12/18/24 h)",
   "safetySettings_noFlyPreset_strict": "Streng (18/24/48 h)",
   "safetySettings_noFlyPreset_subtitle": "Richtwerte nach einem einzelnen Nullzeit-Tauchgang, Wiederholungstauchgängen und Deko-Tauchgängen",
+  "flightWindow_closed": "Kein Tauchen mehr vor deinem Flug",
+  "flightWindow_conflict": "Deine Flugverbotszeit reicht über deinen Abflug hinaus",
+  "flightWindow_departs": "Abflug {time}",
+  "@flightWindow_departs": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "flightWindow_openTitle": "Verbleibende Tauchzeit: {remaining}",
+  "@flightWindow_openTitle": {
+    "placeholders": {
+      "remaining": {
+        "type": "String"
+      }
+    }
+  },
+  "flightWindow_surfaceBy": "Auftauchen bis {time}",
+  "@flightWindow_surfaceBy": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
   "safetyHub_noFly_active_title": "Flugverbot: noch {remaining}",
   "@safetyHub_noFly_active_title": {
     "placeholders": {

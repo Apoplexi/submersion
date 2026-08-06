@@ -71,6 +71,10 @@ class Trips extends Table {
   TextColumn get tripType => text().withDefault(const Constant('shore'))();
   TextColumn get notes => text().withDefault(const Constant(''))();
   BoolColumn get isShared => boolean().withDefault(const Constant(false))();
+
+  /// Return flight departure, wall-clock-as-UTC epoch ms (v142). Drives the
+  /// remaining-dive-window countdown; null when the trip has no flight set.
+  IntColumn get returnFlightAt => integer().nullable()();
   IntColumn get createdAt => integer()();
   IntColumn get updatedAt => integer()();
 
@@ -2928,7 +2932,7 @@ class AppDatabase extends _$AppDatabase {
 
   /// The current schema version as a static constant so that pre-open checks
   /// (e.g. version-mismatch guard) can reference it without an instance.
-  static const int currentSchemaVersion = 141;
+  static const int currentSchemaVersion = 142;
 
   /// Every schema version that has a migration block in onUpgrade.
   /// Used to calculate progress step counts. When adding a new migration,
@@ -3106,6 +3110,8 @@ class AppDatabase extends _$AppDatabase {
     // items). Renumbered from v138 and then v139 as those went to the
     // divelogs.de branch and the cylinder configs respectively.
     141,
+    // v142: trips.return_flight_at (return-flight dive-window countdown).
+    142,
   ];
 
   /// Idempotent DDL for the v106 connector-suggestion columns (Lightroom
@@ -4093,6 +4099,22 @@ class AppDatabase extends _$AppDatabase {
     if (!names.contains('default_currency')) {
       await customStatement(
         "ALTER TABLE diver_settings ADD COLUMN default_currency TEXT NOT NULL DEFAULT 'USD'",
+      );
+    }
+  }
+
+  /// Idempotent DDL for the v142 return-flight column. Called from the v142
+  /// onUpgrade step and the beforeOpen backstop, matching the
+  /// _assertWeatherCodeColumn pattern so a schema-version collision cannot
+  /// strand a database without it. Self-guarding when the table is absent
+  /// (minimal migration-test fixtures).
+  Future<void> _assertTripReturnFlightColumn() async {
+    final cols = await customSelect("PRAGMA table_info('trips')").get();
+    if (cols.isEmpty) return;
+    final names = cols.map((c) => c.read<String>('name')).toSet();
+    if (!names.contains('return_flight_at')) {
+      await customStatement(
+        'ALTER TABLE trips ADD COLUMN return_flight_at INTEGER',
       );
     }
   }
@@ -7328,6 +7350,13 @@ class AppDatabase extends _$AppDatabase {
           await _assertDefaultCurrencyColumn();
         }
         if (from < 141) await reportProgress();
+        // v142: trips.return_flight_at (return-flight dive-window countdown).
+        // v138 (#603) and v140 (media section) are reserved by parallel
+        // branches; the beforeOpen backstop heals any DB stranded between.
+        if (from < 142) {
+          await _assertTripReturnFlightColumn();
+        }
+        if (from < 142) await reportProgress();
       },
       beforeOpen: (details) async {
         // Enable foreign keys
@@ -7443,6 +7472,9 @@ class AppDatabase extends _$AppDatabase {
         // database stranded at any lower version by a parallel-branch
         // version collision self-heals here.
         await _assertCylinderConfigSchema();
+
+        // v142 backstop: re-assert trips.return_flight_at.
+        await _assertTripReturnFlightColumn();
 
         // Built-in dive types are reference data: identical on every device and
         // undeletable through DiveTypeRepository. Nothing else restores them --

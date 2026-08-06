@@ -2,6 +2,14 @@
   "settings_units_defaultCurrency": "Moeda padrão",
   "settings_units_dialog_defaultCurrency": "Moeda padrão",
   "diveSites_list_menu_select": "Selecionar pontos",
+  "diveLog_edit_flightWindowWarning": "Este mergulho termina depois do último horário seguro para emergir antes do seu voo ({time})",
+  "@diveLog_edit_flightWindowWarning": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
   "diveLog_edit_geofenceSuggestion_near": "Perto de {location}",
   "diveLog_edit_geofenceSuggestion_title": "Sugestão de equipamento",
   "diveLog_edit_geofenceSuggestion_body": "Aplicar o conjunto \"{setName}\"?",
@@ -5331,6 +5339,9 @@
   "trips_edit_label_notes": "Notas",
   "trips_edit_label_operatorName": "Operator / Charter",
   "trips_edit_label_resortName": "Nome do Resort",
+  "trips_edit_label_returnFlight": "Voo de volta",
+  "trips_edit_returnFlightClear": "Limpar voo de volta",
+  "trips_edit_returnFlightNotSet": "Não definido",
   "trips_edit_label_startDate": "Data de Inicio",
   "trips_edit_label_tripName": "Nome da Viagem *",
   "trips_edit_label_tripType": "Trip Type",
@@ -5760,12 +5771,25 @@
   "dashboard_gauges_insuranceExpired": "Seguro expirado",
   "dashboard_gauges_noInsurance": "Sem seguro registado",
   "dashboard_gauges_noFlyClear": "Não voar 0:00",
+  "dashboard_gauges_flightWindow": "Janela de mergulho {hours}:{minutes}",
+  "@dashboard_gauges_flightWindow": {
+    "placeholders": {
+      "hours": {
+        "type": "String"
+      },
+      "minutes": {
+        "type": "String"
+      }
+    }
+  },
+  "dashboard_gauges_flightWindowClosed": "Não mergulhe mais antes do voo",
   "dashboard_gauges_noFlyRemaining": "Não voar {hours}:{minutes}",
   "dashboard_gauges_lastDiveDays": "Último mergulho há {days}d",
   "dashboard_gauges_lastDiveToday": "Mergulhou hoje",
   "dashboard_gauges_noDivesYet": "Ainda sem mergulhos",
   "settings_homeChips_pageTitle": "Chips de estado do Início",
   "settings_homeChips_description": "Escolha que chips de estado aparecem no topo do separador Início.",
+  "settings_homeChips_flightWindow": "Janela de mergulho antes do voo",
   "settings_homeChips_gear": "Manutenção do equipamento",
   "settings_homeChips_insurance": "Seguro",
   "settings_homeChips_noFly": "Temporizador de não voar",
@@ -6550,6 +6574,32 @@
   "safetySettings_noFlyPreset_standard": "Padrão (12/18/24 h)",
   "safetySettings_noFlyPreset_strict": "Rigoroso (18/24/48 h)",
   "safetySettings_noFlyPreset_subtitle": "Intervalos orientativos após um único mergulho sem deco, mergulhos repetitivos e mergulhos com deco",
+  "flightWindow_closed": "Não mergulhe mais antes do seu voo",
+  "flightWindow_conflict": "Seu tempo de não voar ultrapassa a partida do voo",
+  "flightWindow_departs": "O voo parte {time}",
+  "@flightWindow_departs": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "flightWindow_openTitle": "Tempo restante para mergulhar: {remaining}",
+  "@flightWindow_openTitle": {
+    "placeholders": {
+      "remaining": {
+        "type": "String"
+      }
+    }
+  },
+  "flightWindow_surfaceBy": "Emergir até {time}",
+  "@flightWindow_surfaceBy": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
   "safetyHub_noFly_active_title": "Não voar: faltam {remaining}",
   "@safetyHub_noFly_active_title": {
     "placeholders": {

@@ -2,6 +2,14 @@
   "settings_units_defaultCurrency": "מטבע ברירת מחדל",
   "settings_units_dialog_defaultCurrency": "מטבע ברירת מחדל",
   "diveSites_list_menu_select": "בחירת אתרים",
+  "diveLog_edit_flightWindowWarning": "הצלילה הזו מסתיימת אחרי הזמן הבטוח האחרון לעלייה לפני הטיסה שלך ({time})",
+  "@diveLog_edit_flightWindowWarning": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
   "diveLog_edit_geofenceSuggestion_near": "ליד {location}",
   "diveLog_edit_geofenceSuggestion_title": "הצעת ציוד",
   "diveLog_edit_geofenceSuggestion_body": "להחיל את ערכת \"{setName}\"?",
@@ -5331,6 +5339,9 @@
   "trips_edit_label_notes": "הערות",
   "trips_edit_label_operatorName": "Operator / Charter",
   "trips_edit_label_resortName": "שם אתר הנופש",
+  "trips_edit_label_returnFlight": "טיסת חזרה",
+  "trips_edit_returnFlightClear": "נקה טיסת חזרה",
+  "trips_edit_returnFlightNotSet": "לא הוגדר",
   "trips_edit_label_startDate": "תאריך התחלה",
   "trips_edit_label_tripName": "שם הטיול *",
   "trips_edit_label_tripType": "Trip Type",
@@ -5760,12 +5771,25 @@
   "dashboard_gauges_insuranceExpired": "הביטוח פג תוקף",
   "dashboard_gauges_noInsurance": "אין ביטוח רשום",
   "dashboard_gauges_noFlyClear": "איסור טיסה 0:00",
+  "dashboard_gauges_flightWindow": "חלון צלילה {hours}:{minutes}",
+  "@dashboard_gauges_flightWindow": {
+    "placeholders": {
+      "hours": {
+        "type": "String"
+      },
+      "minutes": {
+        "type": "String"
+      }
+    }
+  },
+  "dashboard_gauges_flightWindowClosed": "אין יותר צלילות לפני הטיסה",
   "dashboard_gauges_noFlyRemaining": "איסור טיסה {hours}:{minutes}",
   "dashboard_gauges_lastDiveDays": "צלילה אחרונה לפני {days} ימים",
   "dashboard_gauges_lastDiveToday": "צללת היום",
   "dashboard_gauges_noDivesYet": "אין צלילות עדיין",
   "settings_homeChips_pageTitle": "שבבי מצב של דף הבית",
   "settings_homeChips_description": "בחר אילו שבבי מצב יופיעו בראש לשונית הבית.",
+  "settings_homeChips_flightWindow": "חלון צלילה לפני טיסה",
   "settings_homeChips_gear": "תחזוקת ציוד",
   "settings_homeChips_insurance": "ביטוח",
   "settings_homeChips_noFly": "טיימר איסור טיסה",
@@ -6550,6 +6574,32 @@
   "safetySettings_noFlyPreset_standard": "רגיל (12/18/24 ש')",
   "safetySettings_noFlyPreset_strict": "מחמיר (18/24/48 ש')",
   "safetySettings_noFlyPreset_subtitle": "מרווחים מנחים אחרי צלילה בודדת ללא דקו, צלילות חוזרות וצלילות דקומפרסיה",
+  "flightWindow_closed": "אין יותר צלילות לפני הטיסה",
+  "flightWindow_conflict": "זמן איסור הטיסה שלך נמשך מעבר להמראה",
+  "flightWindow_departs": "הטיסה ממריאה {time}",
+  "@flightWindow_departs": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "flightWindow_openTitle": "זמן צלילה שנותר: {remaining}",
+  "@flightWindow_openTitle": {
+    "placeholders": {
+      "remaining": {
+        "type": "String"
+      }
+    }
+  },
+  "flightWindow_surfaceBy": "לעלות אל פני השטח עד {time}",
+  "@flightWindow_surfaceBy": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
   "safetyHub_noFly_active_title": "איסור טיסה: נותרו {remaining}",
   "@safetyHub_noFly_active_title": {
     "placeholders": {

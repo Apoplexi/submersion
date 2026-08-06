@@ -2,6 +2,14 @@
   "settings_units_defaultCurrency": "Alapértelmezett pénznem",
   "settings_units_dialog_defaultCurrency": "Alapértelmezett pénznem",
   "diveSites_list_menu_select": "Merülőhelyek kiválasztása",
+  "diveLog_edit_flightWindowWarning": "Ez a merülés a járatod előtti utolsó biztonságos felszínre érési idő után ér véget ({time})",
+  "@diveLog_edit_flightWindowWarning": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
   "diveLog_edit_geofenceSuggestion_near": "{location} közelében",
   "diveLog_edit_geofenceSuggestion_title": "Felszerelési javaslat",
   "diveLog_edit_geofenceSuggestion_body": "Alkalmazza a(z) \"{setName}\" készletet?",
@@ -5259,6 +5267,9 @@
   "trips_edit_label_notes": "Jegyzetek",
   "trips_edit_label_operatorName": "Operator / Charter",
   "trips_edit_label_resortName": "Udulohely neve",
+  "trips_edit_label_returnFlight": "Visszaúti járat",
+  "trips_edit_returnFlightClear": "Visszaúti járat törlése",
+  "trips_edit_returnFlightNotSet": "Nincs megadva",
   "trips_edit_label_startDate": "Kezdes datuma",
   "trips_edit_label_tripName": "Ut neve *",
   "trips_edit_label_tripType": "Trip Type",
@@ -5760,12 +5771,25 @@
   "dashboard_gauges_insuranceExpired": "A biztosítás lejárt",
   "dashboard_gauges_noInsurance": "Nincs rögzített biztosítás",
   "dashboard_gauges_noFlyClear": "Repülési tilalom 0:00",
+  "dashboard_gauges_flightWindow": "Merülési ablak {hours}:{minutes}",
+  "@dashboard_gauges_flightWindow": {
+    "placeholders": {
+      "hours": {
+        "type": "String"
+      },
+      "minutes": {
+        "type": "String"
+      }
+    }
+  },
+  "dashboard_gauges_flightWindowClosed": "A repülés előtt már nincs merülés",
   "dashboard_gauges_noFlyRemaining": "Repülési tilalom {hours}:{minutes}",
   "dashboard_gauges_lastDiveDays": "Utolsó merülés {days} napja",
   "dashboard_gauges_lastDiveToday": "Ma merültél",
   "dashboard_gauges_noDivesYet": "Még nincs merülés",
   "settings_homeChips_pageTitle": "Kezdőlap állapotjelzői",
   "settings_homeChips_description": "Válaszd ki, mely állapotjelzők jelenjenek meg a Kezdőlap tetején.",
+  "settings_homeChips_flightWindow": "Merülési ablak repülés előtt",
   "settings_homeChips_gear": "Felszerelés szervize",
   "settings_homeChips_insurance": "Biztosítás",
   "settings_homeChips_noFly": "Repülési tilalom időzítő",
@@ -6550,6 +6574,32 @@
   "safetySettings_noFlyPreset_standard": "Normál (12/18/24 ó)",
   "safetySettings_noFlyPreset_strict": "Szigorú (18/24/48 ó)",
   "safetySettings_noFlyPreset_subtitle": "Irányadó időközök egyetlen nullidős merülés, ismétlő merülések és dekós merülések után",
+  "flightWindow_closed": "A repülés előtt már ne merülj",
+  "flightWindow_conflict": "A repülési tilalmad túlnyúlik a járat indulásán",
+  "flightWindow_departs": "A járat indul: {time}",
+  "@flightWindow_departs": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "flightWindow_openTitle": "Hátralévő merülési idő: {remaining}",
+  "@flightWindow_openTitle": {
+    "placeholders": {
+      "remaining": {
+        "type": "String"
+      }
+    }
+  },
+  "flightWindow_surfaceBy": "Felszínre érés eddig: {time}",
+  "@flightWindow_surfaceBy": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
   "safetyHub_noFly_active_title": "Repülési tilalom: {remaining} van hátra",
   "@safetyHub_noFly_active_title": {
     "placeholders": {
