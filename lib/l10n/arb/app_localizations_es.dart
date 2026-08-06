@@ -10190,6 +10190,92 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
+  String get cylinderConfigs_title => 'Configuraciones de botellas';
+
+  @override
+  String get cylinderConfigs_empty => 'Aún no hay configuraciones';
+
+  @override
+  String get cylinderConfigs_emptyBody =>
+      'Guarda un montaje de diluyente y bailout una vez y aplícalo a cualquier inmersión.';
+
+  @override
+  String get cylinderConfigs_new => 'Nueva configuración';
+
+  @override
+  String get cylinderConfigs_name => 'Nombre';
+
+  @override
+  String get cylinderConfigs_nameRequired => 'Introduce un nombre';
+
+  @override
+  String get cylinderConfigs_forUnit => 'Para el equipo';
+
+  @override
+  String get cylinderConfigs_noUnit => 'Plan de gas genérico';
+
+  @override
+  String get cylinderConfigs_gasPlans => 'Planes de gas';
+
+  @override
+  String get cylinderConfigs_addCylinder => 'Añadir botella';
+
+  @override
+  String get cylinderConfigs_role => 'Función';
+
+  @override
+  String get cylinderConfigs_startPressure => 'Presión inicial';
+
+  @override
+  String get cylinderConfigs_label => 'Etiqueta';
+
+  @override
+  String get cylinderConfigs_fromPreset => 'Desde preajuste';
+
+  @override
+  String get cylinderConfigs_deleteTitle => '¿Eliminar la configuración?';
+
+  @override
+  String get cylinderConfigs_deleteBody =>
+      'Las inmersiones ya aplicadas no cambian.';
+
+  @override
+  String get cylinderConfigs_applyAction => 'Aplicar configuración';
+
+  @override
+  String cylinderConfigs_applyAdded(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count botellas añadidas',
+      one: '1 botella añadida',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String cylinderConfigs_applyKept(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count conservadas',
+      one: '1 conservada',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get cylinderConfigs_applyNothingToDo =>
+      'Esta inmersión ya coincide con la configuración';
+
+  @override
+  String get cylinderConfigs_sectionTitle => 'Configuraciones';
+
+  @override
+  String get equipment_serviceClocks_hoursSource =>
+      'Calculado a partir del tiempo de buceo registrado';
+
+  @override
   String equipment_serviceClocks_hoursLeft(String remaining, String total) {
     return 'Quedan $remaining de $total horas';
   }
@@ -21778,6 +21864,60 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get attrLabel_dry_weight_kg => 'Peso en seco';
+
+  @override
+  String get attrLabel_unit_type => 'Tipo de equipo';
+
+  @override
+  String get attrLabel_mount_configuration => 'Montaje';
+
+  @override
+  String get attrLabel_scrubber_type => 'Tipo de filtro';
+
+  @override
+  String get attrLabel_scrubber_duration_h => 'Duración del filtro (h)';
+
+  @override
+  String get attrLabel_o2_cell_count => 'Células de O2';
+
+  @override
+  String get attrLabel_diluent_cylinder_l => 'Botella de diluyente';
+
+  @override
+  String get attrLabel_o2_cylinder_l => 'Botella de O2';
+
+  @override
+  String get attrChoice_unit_type_eccr => 'CCR electrónico (eCCR)';
+
+  @override
+  String get attrChoice_unit_type_mccr => 'CCR manual (mCCR)';
+
+  @override
+  String get attrChoice_unit_type_hccr => 'CCR híbrido (hCCR)';
+
+  @override
+  String get attrChoice_unit_type_scr_cmf => 'SCR - flujo másico constante';
+
+  @override
+  String get attrChoice_unit_type_scr_pascr => 'SCR - adición pasiva';
+
+  @override
+  String get attrChoice_unit_type_scr_escr => 'SCR - control electrónico';
+
+  @override
+  String get attrChoice_mount_configuration_back => 'Montaje dorsal';
+
+  @override
+  String get attrChoice_mount_configuration_chest => 'Montaje frontal';
+
+  @override
+  String get attrChoice_mount_configuration_sidemount => 'Sidemount';
+
+  @override
+  String get attrChoice_scrubber_type_axial => 'Axial';
+
+  @override
+  String get attrChoice_scrubber_type_radial => 'Radial';
 
   @override
   String get attrChoice_suit_style_full => 'Traje completo';

@@ -134,6 +134,54 @@ abstract final class EquipmentAttributeCatalog {
       ),
       EquipmentAttributeDef(key: 'last_hydro_test', kind: AttributeKind.date),
     ],
+    EquipmentType.rebreather: [
+      EquipmentAttributeDef(
+        key: 'unit_type',
+        kind: AttributeKind.choice,
+        choiceKeys: [
+          'eccr',
+          'mccr',
+          'hccr',
+          'scr_cmf',
+          'scr_pascr',
+          'scr_escr',
+        ],
+      ),
+      EquipmentAttributeDef(
+        key: 'mount_configuration',
+        kind: AttributeKind.choice,
+        choiceKeys: ['back', 'chest', 'sidemount'],
+      ),
+      EquipmentAttributeDef(
+        key: 'scrubber_type',
+        kind: AttributeKind.choice,
+        choiceKeys: ['axial', 'radial'],
+      ),
+      // Rated scrubber duration in hours. Dimensionless: hours are hours in
+      // every market, so there is nothing for UnitFormatter to convert.
+      EquipmentAttributeDef(
+        key: 'scrubber_duration_h',
+        kind: AttributeKind.number,
+      ),
+      EquipmentAttributeDef(key: 'o2_cell_count', kind: AttributeKind.number),
+      EquipmentAttributeDef(
+        key: 'diluent_cylinder_l',
+        kind: AttributeKind.number,
+        dimension: AttributeDimension.volumeL,
+      ),
+      EquipmentAttributeDef(
+        key: 'o2_cylinder_l',
+        kind: AttributeKind.number,
+        dimension: AttributeDimension.volumeL,
+      ),
+      // Shared verbatim with the camera entry: same concept, same dimension,
+      // one label key.
+      EquipmentAttributeDef(
+        key: 'depth_rating_m',
+        kind: AttributeKind.number,
+        dimension: AttributeDimension.depthM,
+      ),
+    ],
     EquipmentType.regulator: [
       EquipmentAttributeDef(
         key: 'connection',

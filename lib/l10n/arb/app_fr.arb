@@ -3154,6 +3154,42 @@
   "equipment_serviceClocks_overdueSince": "En retard depuis le {date}",
   "equipment_serviceClocks_overdue": "En retard",
   "equipment_serviceClocks_divesLeft": "{remaining} plongées restantes sur {total}",
+  "cylinderConfigs_title": "Configurations de bouteilles",
+  "cylinderConfigs_empty": "Aucune configuration",
+  "cylinderConfigs_emptyBody": "Enregistrez un montage diluant et bailout une fois, puis appliquez-le à n'importe quelle plongée.",
+  "cylinderConfigs_new": "Nouvelle configuration",
+  "cylinderConfigs_name": "Nom",
+  "cylinderConfigs_nameRequired": "Saisissez un nom",
+  "cylinderConfigs_forUnit": "Pour l'appareil",
+  "cylinderConfigs_noUnit": "Plan de gaz générique",
+  "cylinderConfigs_gasPlans": "Plans de gaz",
+  "cylinderConfigs_addCylinder": "Ajouter une bouteille",
+  "cylinderConfigs_role": "Rôle",
+  "cylinderConfigs_startPressure": "Pression de départ",
+  "cylinderConfigs_label": "Libellé",
+  "cylinderConfigs_fromPreset": "Depuis un préréglage",
+  "cylinderConfigs_deleteTitle": "Supprimer la configuration ?",
+  "cylinderConfigs_deleteBody": "Les plongées déjà concernées ne sont pas modifiées.",
+  "cylinderConfigs_applyAction": "Appliquer une configuration",
+  "cylinderConfigs_applyAdded": "{count, plural, =1{1 bouteille ajoutée} other{{count} bouteilles ajoutées}}",
+  "@cylinderConfigs_applyAdded": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "cylinderConfigs_applyKept": "{count, plural, =1{1 conservée} other{{count} conservées}}",
+  "@cylinderConfigs_applyKept": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "cylinderConfigs_applyNothingToDo": "Cette plongée correspond déjà à la configuration",
+  "cylinderConfigs_sectionTitle": "Configurations",
+  "equipment_serviceClocks_hoursSource": "Calculé à partir du temps de plongée enregistré",
   "equipment_serviceClocks_hoursLeft": "{remaining} heures restantes sur {total}",
   "equipment_serviceClocks_manageKinds": "Gérer les types d'entretien",
   "equipment_serviceClocks_appliesToClock": "S'applique au compteur",
@@ -6306,6 +6342,24 @@
   "attrLabel_sole_type": "Semelle",
   "attrLabel_buoyancy_kg": "Flottabilité",
   "attrLabel_dry_weight_kg": "Poids à sec",
+  "attrLabel_unit_type": "Type d'appareil",
+  "attrLabel_mount_configuration": "Montage",
+  "attrLabel_scrubber_type": "Type de cartouche",
+  "attrLabel_scrubber_duration_h": "Autonomie cartouche (h)",
+  "attrLabel_o2_cell_count": "Cellules O2",
+  "attrLabel_diluent_cylinder_l": "Bouteille de diluant",
+  "attrLabel_o2_cylinder_l": "Bouteille d'O2",
+  "attrChoice_unit_type_eccr": "CCR électronique (eCCR)",
+  "attrChoice_unit_type_mccr": "CCR manuel (mCCR)",
+  "attrChoice_unit_type_hccr": "CCR hybride (hCCR)",
+  "attrChoice_unit_type_scr_cmf": "SCR - débit massique constant",
+  "attrChoice_unit_type_scr_pascr": "SCR - addition passive",
+  "attrChoice_unit_type_scr_escr": "SCR - régulé électroniquement",
+  "attrChoice_mount_configuration_back": "Montage dorsal",
+  "attrChoice_mount_configuration_chest": "Montage ventral",
+  "attrChoice_mount_configuration_sidemount": "Sidemount",
+  "attrChoice_scrubber_type_axial": "Axiale",
+  "attrChoice_scrubber_type_radial": "Radiale",
   "attrChoice_suit_style_full": "Combinaison intégrale",
   "attrChoice_suit_style_shorty": "Shorty",
   "attrChoice_suit_style_two_piece": "Deux pièces",

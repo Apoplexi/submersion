@@ -9960,6 +9960,90 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
+  String get cylinderConfigs_title => 'תצורות בלונים';
+
+  @override
+  String get cylinderConfigs_empty => 'אין עדיין תצורות';
+
+  @override
+  String get cylinderConfigs_emptyBody =>
+      'שמור פעם אחת מערך מדלל וביילאאוט, ואז החל אותו על כל צלילה.';
+
+  @override
+  String get cylinderConfigs_new => 'תצורה חדשה';
+
+  @override
+  String get cylinderConfigs_name => 'שם';
+
+  @override
+  String get cylinderConfigs_nameRequired => 'הזן שם';
+
+  @override
+  String get cylinderConfigs_forUnit => 'עבור היחידה';
+
+  @override
+  String get cylinderConfigs_noUnit => 'תוכנית גז כללית';
+
+  @override
+  String get cylinderConfigs_gasPlans => 'תוכניות גז';
+
+  @override
+  String get cylinderConfigs_addCylinder => 'הוסף בלון';
+
+  @override
+  String get cylinderConfigs_role => 'תפקיד';
+
+  @override
+  String get cylinderConfigs_startPressure => 'לחץ התחלתי';
+
+  @override
+  String get cylinderConfigs_label => 'תווית';
+
+  @override
+  String get cylinderConfigs_fromPreset => 'מתבנית';
+
+  @override
+  String get cylinderConfigs_deleteTitle => 'למחוק את התצורה?';
+
+  @override
+  String get cylinderConfigs_deleteBody =>
+      'צלילות שהתצורה כבר הוחלה עליהן לא ישתנו.';
+
+  @override
+  String get cylinderConfigs_applyAction => 'החל תצורה';
+
+  @override
+  String cylinderConfigs_applyAdded(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count בלונים נוספו',
+      one: 'בלון אחד נוסף',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String cylinderConfigs_applyKept(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count נשמרו',
+      one: 'אחד נשמר',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get cylinderConfigs_applyNothingToDo => 'הצלילה כבר תואמת לתצורה';
+
+  @override
+  String get cylinderConfigs_sectionTitle => 'תצורות';
+
+  @override
+  String get equipment_serviceClocks_hoursSource => 'מחושב מזמן הצלילה המתועד';
+
+  @override
   String equipment_serviceClocks_hoursLeft(String remaining, String total) {
     return 'נותרו $remaining מתוך $total שעות';
   }
@@ -21218,6 +21302,60 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get attrLabel_dry_weight_kg => 'משקל יבש';
+
+  @override
+  String get attrLabel_unit_type => 'סוג היחידה';
+
+  @override
+  String get attrLabel_mount_configuration => 'אופן ההרכבה';
+
+  @override
+  String get attrLabel_scrubber_type => 'סוג הסופח';
+
+  @override
+  String get attrLabel_scrubber_duration_h => 'משך הסופח (שעות)';
+
+  @override
+  String get attrLabel_o2_cell_count => 'תאי O2';
+
+  @override
+  String get attrLabel_diluent_cylinder_l => 'בלון מדלל';
+
+  @override
+  String get attrLabel_o2_cylinder_l => 'בלון O2';
+
+  @override
+  String get attrChoice_unit_type_eccr => 'CCR אלקטרוני (eCCR)';
+
+  @override
+  String get attrChoice_unit_type_mccr => 'CCR ידני (mCCR)';
+
+  @override
+  String get attrChoice_unit_type_hccr => 'CCR היברידי (hCCR)';
+
+  @override
+  String get attrChoice_unit_type_scr_cmf => 'SCR - ספיקת מסה קבועה';
+
+  @override
+  String get attrChoice_unit_type_scr_pascr => 'SCR - הוספה פסיבית';
+
+  @override
+  String get attrChoice_unit_type_scr_escr => 'SCR - בקרה אלקטרונית';
+
+  @override
+  String get attrChoice_mount_configuration_back => 'הרכבה על הגב';
+
+  @override
+  String get attrChoice_mount_configuration_chest => 'הרכבה על החזה';
+
+  @override
+  String get attrChoice_mount_configuration_sidemount => 'הרכבה בצד';
+
+  @override
+  String get attrChoice_scrubber_type_axial => 'צירי';
+
+  @override
+  String get attrChoice_scrubber_type_radial => 'רדיאלי';
 
   @override
   String get attrChoice_suit_style_full => 'חליפה מלאה';

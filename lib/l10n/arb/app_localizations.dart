@@ -17433,6 +17433,138 @@ abstract class AppLocalizations {
   /// **'{remaining} of {total} dives left'**
   String equipment_serviceClocks_divesLeft(int remaining, int total);
 
+  /// No description provided for @cylinderConfigs_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Cylinder configurations'**
+  String get cylinderConfigs_title;
+
+  /// No description provided for @cylinderConfigs_empty.
+  ///
+  /// In en, this message translates to:
+  /// **'No configurations yet'**
+  String get cylinderConfigs_empty;
+
+  /// No description provided for @cylinderConfigs_emptyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Save a diluent and bailout setup once, then apply it to any dive.'**
+  String get cylinderConfigs_emptyBody;
+
+  /// No description provided for @cylinderConfigs_new.
+  ///
+  /// In en, this message translates to:
+  /// **'New configuration'**
+  String get cylinderConfigs_new;
+
+  /// No description provided for @cylinderConfigs_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get cylinderConfigs_name;
+
+  /// No description provided for @cylinderConfigs_nameRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a name'**
+  String get cylinderConfigs_nameRequired;
+
+  /// No description provided for @cylinderConfigs_forUnit.
+  ///
+  /// In en, this message translates to:
+  /// **'For unit'**
+  String get cylinderConfigs_forUnit;
+
+  /// No description provided for @cylinderConfigs_noUnit.
+  ///
+  /// In en, this message translates to:
+  /// **'Generic gas plan'**
+  String get cylinderConfigs_noUnit;
+
+  /// No description provided for @cylinderConfigs_gasPlans.
+  ///
+  /// In en, this message translates to:
+  /// **'Gas plans'**
+  String get cylinderConfigs_gasPlans;
+
+  /// No description provided for @cylinderConfigs_addCylinder.
+  ///
+  /// In en, this message translates to:
+  /// **'Add cylinder'**
+  String get cylinderConfigs_addCylinder;
+
+  /// No description provided for @cylinderConfigs_role.
+  ///
+  /// In en, this message translates to:
+  /// **'Role'**
+  String get cylinderConfigs_role;
+
+  /// No description provided for @cylinderConfigs_startPressure.
+  ///
+  /// In en, this message translates to:
+  /// **'Start pressure'**
+  String get cylinderConfigs_startPressure;
+
+  /// No description provided for @cylinderConfigs_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Label'**
+  String get cylinderConfigs_label;
+
+  /// No description provided for @cylinderConfigs_fromPreset.
+  ///
+  /// In en, this message translates to:
+  /// **'From preset'**
+  String get cylinderConfigs_fromPreset;
+
+  /// No description provided for @cylinderConfigs_deleteTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete configuration?'**
+  String get cylinderConfigs_deleteTitle;
+
+  /// No description provided for @cylinderConfigs_deleteBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This does not change any dive it was already applied to.'**
+  String get cylinderConfigs_deleteBody;
+
+  /// No description provided for @cylinderConfigs_applyAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Apply configuration'**
+  String get cylinderConfigs_applyAction;
+
+  /// No description provided for @cylinderConfigs_applyAdded.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Added 1 cylinder} other{Added {count} cylinders}}'**
+  String cylinderConfigs_applyAdded(int count);
+
+  /// No description provided for @cylinderConfigs_applyKept.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{kept 1} other{kept {count}}}'**
+  String cylinderConfigs_applyKept(int count);
+
+  /// No description provided for @cylinderConfigs_applyNothingToDo.
+  ///
+  /// In en, this message translates to:
+  /// **'This dive already matches the configuration'**
+  String get cylinderConfigs_applyNothingToDo;
+
+  /// No description provided for @cylinderConfigs_sectionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Configurations'**
+  String get cylinderConfigs_sectionTitle;
+
+  /// No description provided for @equipment_serviceClocks_hoursSource.
+  ///
+  /// In en, this message translates to:
+  /// **'Counted from logged dive time'**
+  String get equipment_serviceClocks_hoursSource;
+
   /// No description provided for @equipment_serviceClocks_hoursLeft.
   ///
   /// In en, this message translates to:
@@ -36315,6 +36447,114 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Dry weight'**
   String get attrLabel_dry_weight_kg;
+
+  /// No description provided for @attrLabel_unit_type.
+  ///
+  /// In en, this message translates to:
+  /// **'Unit type'**
+  String get attrLabel_unit_type;
+
+  /// No description provided for @attrLabel_mount_configuration.
+  ///
+  /// In en, this message translates to:
+  /// **'Mount'**
+  String get attrLabel_mount_configuration;
+
+  /// No description provided for @attrLabel_scrubber_type.
+  ///
+  /// In en, this message translates to:
+  /// **'Scrubber type'**
+  String get attrLabel_scrubber_type;
+
+  /// No description provided for @attrLabel_scrubber_duration_h.
+  ///
+  /// In en, this message translates to:
+  /// **'Scrubber duration (h)'**
+  String get attrLabel_scrubber_duration_h;
+
+  /// No description provided for @attrLabel_o2_cell_count.
+  ///
+  /// In en, this message translates to:
+  /// **'O2 cells'**
+  String get attrLabel_o2_cell_count;
+
+  /// No description provided for @attrLabel_diluent_cylinder_l.
+  ///
+  /// In en, this message translates to:
+  /// **'Diluent cylinder'**
+  String get attrLabel_diluent_cylinder_l;
+
+  /// No description provided for @attrLabel_o2_cylinder_l.
+  ///
+  /// In en, this message translates to:
+  /// **'O2 cylinder'**
+  String get attrLabel_o2_cylinder_l;
+
+  /// No description provided for @attrChoice_unit_type_eccr.
+  ///
+  /// In en, this message translates to:
+  /// **'Electronic CCR (eCCR)'**
+  String get attrChoice_unit_type_eccr;
+
+  /// No description provided for @attrChoice_unit_type_mccr.
+  ///
+  /// In en, this message translates to:
+  /// **'Manual CCR (mCCR)'**
+  String get attrChoice_unit_type_mccr;
+
+  /// No description provided for @attrChoice_unit_type_hccr.
+  ///
+  /// In en, this message translates to:
+  /// **'Hybrid CCR (hCCR)'**
+  String get attrChoice_unit_type_hccr;
+
+  /// No description provided for @attrChoice_unit_type_scr_cmf.
+  ///
+  /// In en, this message translates to:
+  /// **'SCR - constant mass flow'**
+  String get attrChoice_unit_type_scr_cmf;
+
+  /// No description provided for @attrChoice_unit_type_scr_pascr.
+  ///
+  /// In en, this message translates to:
+  /// **'SCR - passive addition'**
+  String get attrChoice_unit_type_scr_pascr;
+
+  /// No description provided for @attrChoice_unit_type_scr_escr.
+  ///
+  /// In en, this message translates to:
+  /// **'SCR - electronically controlled'**
+  String get attrChoice_unit_type_scr_escr;
+
+  /// No description provided for @attrChoice_mount_configuration_back.
+  ///
+  /// In en, this message translates to:
+  /// **'Back mount'**
+  String get attrChoice_mount_configuration_back;
+
+  /// No description provided for @attrChoice_mount_configuration_chest.
+  ///
+  /// In en, this message translates to:
+  /// **'Chest mount'**
+  String get attrChoice_mount_configuration_chest;
+
+  /// No description provided for @attrChoice_mount_configuration_sidemount.
+  ///
+  /// In en, this message translates to:
+  /// **'Sidemount'**
+  String get attrChoice_mount_configuration_sidemount;
+
+  /// No description provided for @attrChoice_scrubber_type_axial.
+  ///
+  /// In en, this message translates to:
+  /// **'Axial'**
+  String get attrChoice_scrubber_type_axial;
+
+  /// No description provided for @attrChoice_scrubber_type_radial.
+  ///
+  /// In en, this message translates to:
+  /// **'Radial'**
+  String get attrChoice_scrubber_type_radial;
 
   /// No description provided for @attrChoice_suit_style_full.
   ///

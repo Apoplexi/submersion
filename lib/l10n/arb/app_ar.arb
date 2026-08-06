@@ -3226,6 +3226,42 @@
   "equipment_serviceClocks_overdueSince": "متأخر منذ {date}",
   "equipment_serviceClocks_overdue": "متأخر",
   "equipment_serviceClocks_divesLeft": "متبقٍ {remaining} من {total} غوصة",
+  "cylinderConfigs_title": "إعدادات الأسطوانات",
+  "cylinderConfigs_empty": "لا توجد إعدادات بعد",
+  "cylinderConfigs_emptyBody": "احفظ إعداد المخفف والبديل مرة واحدة ثم طبّقه على أي غوصة.",
+  "cylinderConfigs_new": "إعداد جديد",
+  "cylinderConfigs_name": "الاسم",
+  "cylinderConfigs_nameRequired": "أدخل اسمًا",
+  "cylinderConfigs_forUnit": "للجهاز",
+  "cylinderConfigs_noUnit": "خطة غاز عامة",
+  "cylinderConfigs_gasPlans": "خطط الغاز",
+  "cylinderConfigs_addCylinder": "إضافة أسطوانة",
+  "cylinderConfigs_role": "الدور",
+  "cylinderConfigs_startPressure": "ضغط البداية",
+  "cylinderConfigs_label": "التسمية",
+  "cylinderConfigs_fromPreset": "من قالب",
+  "cylinderConfigs_deleteTitle": "حذف الإعداد؟",
+  "cylinderConfigs_deleteBody": "لن تتغير الغوصات التي طُبّق عليها بالفعل.",
+  "cylinderConfigs_applyAction": "تطبيق إعداد",
+  "cylinderConfigs_applyAdded": "{count, plural, =1{تمت إضافة أسطوانة واحدة} other{تمت إضافة {count} أسطوانات}}",
+  "@cylinderConfigs_applyAdded": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "cylinderConfigs_applyKept": "{count, plural, =1{مع الإبقاء على واحدة} other{مع الإبقاء على {count}}}",
+  "@cylinderConfigs_applyKept": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "cylinderConfigs_applyNothingToDo": "هذه الغوصة تطابق الإعداد بالفعل",
+  "cylinderConfigs_sectionTitle": "الإعدادات",
+  "equipment_serviceClocks_hoursSource": "محسوب من زمن الغوص المسجل",
   "equipment_serviceClocks_hoursLeft": "متبقٍ {remaining} من {total} ساعة",
   "equipment_serviceClocks_manageKinds": "إدارة أنواع الصيانة",
   "equipment_serviceClocks_appliesToClock": "ينطبق على العداد",
@@ -6306,6 +6342,24 @@
   "attrLabel_sole_type": "النعل",
   "attrLabel_buoyancy_kg": "الطفو",
   "attrLabel_dry_weight_kg": "الوزن الجاف",
+  "attrLabel_unit_type": "نوع الجهاز",
+  "attrLabel_mount_configuration": "طريقة التثبيت",
+  "attrLabel_scrubber_type": "نوع الماص",
+  "attrLabel_scrubber_duration_h": "مدة الماص (ساعة)",
+  "attrLabel_o2_cell_count": "خلايا O2",
+  "attrLabel_diluent_cylinder_l": "أسطوانة المخفف",
+  "attrLabel_o2_cylinder_l": "أسطوانة O2",
+  "attrChoice_unit_type_eccr": "CCR إلكتروني (eCCR)",
+  "attrChoice_unit_type_mccr": "CCR يدوي (mCCR)",
+  "attrChoice_unit_type_hccr": "CCR هجين (hCCR)",
+  "attrChoice_unit_type_scr_cmf": "SCR - تدفق كتلي ثابت",
+  "attrChoice_unit_type_scr_pascr": "SCR - إضافة سلبية",
+  "attrChoice_unit_type_scr_escr": "SCR - تحكم إلكتروني",
+  "attrChoice_mount_configuration_back": "تثبيت خلفي",
+  "attrChoice_mount_configuration_chest": "تثبيت أمامي",
+  "attrChoice_mount_configuration_sidemount": "تثبيت جانبي",
+  "attrChoice_scrubber_type_axial": "محوري",
+  "attrChoice_scrubber_type_radial": "شعاعي",
   "attrChoice_suit_style_full": "بدلة كاملة",
   "attrChoice_suit_style_shorty": "شورتي",
   "attrChoice_suit_style_two_piece": "قطعتان",
