@@ -86,10 +86,10 @@ void main() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: buildOverrides(overrides).cast(),
-          child: MaterialApp(
+          child: const MaterialApp(
             localizationsDelegates: AppLocalizations.localizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
-            home: const Scaffold(body: DiveEditPage(embedded: true)),
+            home: Scaffold(body: DiveEditPage(embedded: true)),
           ),
         ),
       );
@@ -238,6 +238,26 @@ void main() {
       expect(find.text('Boat Entry'), findsOneWidget);
       expect(find.text('Ladder'), findsOneWidget);
       expect(find.text('Giant Stride'), findsNothing);
+    });
+
+    testWidgets('untouched open-and-save never backfills an empty exit', (
+      tester,
+    ) async {
+      final created = await repository.createDive(
+        buildDive(entry: EntryMethod.shore, exit: null),
+      );
+      await pumpExistingDivePage(tester, created.id);
+      await expandConditions(tester);
+
+      // Exit row shows no value on load — only the entry row has one.
+      expect(find.text('Shore Entry'), findsOneWidget);
+
+      await tester.tap(find.text('Save'));
+      await tester.pumpAndSettle();
+
+      final saved = await repository.getDiveById(created.id);
+      expect(saved!.entryMethod, EntryMethod.shore);
+      expect(saved.exitMethod, isNull);
     });
   });
 }
