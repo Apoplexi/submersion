@@ -12198,6 +12198,18 @@ class AppLocalizationsHu extends AppLocalizations {
   String get media_library_filter_videos => 'Videók';
 
   @override
+  String get media_library_unlinkedHeader => 'Nem csatolt';
+
+  @override
+  String get media_library_viewMode_byDive => 'Merülés szerint';
+
+  @override
+  String get media_library_viewMode_grid => 'Rács';
+
+  @override
+  String get media_library_viewMode_timeline => 'Idővonal';
+
+  @override
   String get nav_home => 'Fooldal';
 
   @override

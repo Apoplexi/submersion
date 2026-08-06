@@ -5,6 +5,8 @@ import 'package:submersion/features/media/domain/entities/media_item.dart';
 import 'package:submersion/features/media/domain/entities/media_library_filter.dart';
 import 'package:submersion/features/media/presentation/providers/media_library_providers.dart';
 import 'package:submersion/features/media/presentation/widgets/media_library_grid.dart';
+import 'package:submersion/features/media/presentation/widgets/media_library_grouped_list.dart';
+import 'package:submersion/features/media/presentation/widgets/media_library_groupers.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 
 /// The Library section content: type filter chips over the active view mode.
@@ -55,6 +57,31 @@ class MediaLibraryView extends ConsumerWidget {
                   ),
                 ),
               ),
+              const SizedBox(width: 8),
+              SegmentedButton<MediaLibraryViewMode>(
+                showSelectedIcon: false,
+                segments: [
+                  ButtonSegment(
+                    value: MediaLibraryViewMode.grid,
+                    icon: const Icon(Icons.grid_view),
+                    tooltip: context.l10n.media_library_viewMode_grid,
+                  ),
+                  ButtonSegment(
+                    value: MediaLibraryViewMode.byDive,
+                    icon: const Icon(Icons.scuba_diving),
+                    tooltip: context.l10n.media_library_viewMode_byDive,
+                  ),
+                  ButtonSegment(
+                    value: MediaLibraryViewMode.timeline,
+                    icon: const Icon(Icons.calendar_month),
+                    tooltip: context.l10n.media_library_viewMode_timeline,
+                  ),
+                ],
+                selected: {mode},
+                onSelectionChanged: (selection) => ref
+                    .read(mediaLibraryViewModeProvider.notifier)
+                    .setMode(selection.single),
+              ),
             ],
           ),
         ),
@@ -75,14 +102,28 @@ class MediaLibraryView extends ConsumerWidget {
     if (state.entries.isEmpty) {
       return Center(child: Text(context.l10n.media_library_empty));
     }
-    // The by-dive and timeline groupers land with the view-mode switcher;
-    // until then every mode renders the flat grid.
-    return MediaLibraryGrid(
-      entries: state.entries,
-      hasMore: state.hasMore,
-      onLoadMore: () =>
-          ref.read(mediaLibraryNotifierProvider.notifier).loadMore(),
-      onTileTap: (entry, index) {},
-    );
+    void loadMore() =>
+        ref.read(mediaLibraryNotifierProvider.notifier).loadMore();
+
+    return switch (mode) {
+      MediaLibraryViewMode.grid => MediaLibraryGrid(
+        entries: state.entries,
+        hasMore: state.hasMore,
+        onLoadMore: loadMore,
+        onTileTap: (entry, index) {},
+      ),
+      MediaLibraryViewMode.byDive => MediaLibraryGroupedList(
+        groups: groupByDive(state.entries),
+        hasMore: state.hasMore,
+        onLoadMore: loadMore,
+        onTileTap: (entry) {},
+      ),
+      MediaLibraryViewMode.timeline => MediaLibraryGroupedList(
+        groups: groupByTimeline(state.entries),
+        hasMore: state.hasMore,
+        onLoadMore: loadMore,
+        onTileTap: (entry) {},
+      ),
+    };
   }
 }

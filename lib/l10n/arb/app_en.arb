@@ -7038,6 +7038,22 @@
   "@media_library_filter_videos": {
     "description": "Library filter chip: videos only"
   },
+  "media_library_unlinkedHeader": "Unlinked",
+  "@media_library_unlinkedHeader": {
+    "description": "By-dive view header for media attached to no dive"
+  },
+  "media_library_viewMode_byDive": "By dive",
+  "@media_library_viewMode_byDive": {
+    "description": "Library view mode: grouped by dive"
+  },
+  "media_library_viewMode_grid": "Grid",
+  "@media_library_viewMode_grid": {
+    "description": "Library view mode: flat grid"
+  },
+  "media_library_viewMode_timeline": "Timeline",
+  "@media_library_viewMode_timeline": {
+    "description": "Library view mode: date-grouped timeline"
+  },
   "nav_home": "Home",
   "nav_media": "Media",
   "nav_more": "More",

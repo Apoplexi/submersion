@@ -12239,6 +12239,18 @@ class AppLocalizationsPt extends AppLocalizations {
   String get media_library_filter_videos => 'Vídeos';
 
   @override
+  String get media_library_unlinkedHeader => 'Sem vínculo';
+
+  @override
+  String get media_library_viewMode_byDive => 'Por mergulho';
+
+  @override
+  String get media_library_viewMode_grid => 'Grade';
+
+  @override
+  String get media_library_viewMode_timeline => 'Linha do tempo';
+
+  @override
   String get nav_home => 'Inicio';
 
   @override

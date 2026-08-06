@@ -12235,6 +12235,18 @@ class AppLocalizationsIt extends AppLocalizations {
   String get media_library_filter_videos => 'Video';
 
   @override
+  String get media_library_unlinkedHeader => 'Non collegati';
+
+  @override
+  String get media_library_viewMode_byDive => 'Per immersione';
+
+  @override
+  String get media_library_viewMode_grid => 'Griglia';
+
+  @override
+  String get media_library_viewMode_timeline => 'Cronologia';
+
+  @override
   String get nav_home => 'Home';
 
   @override

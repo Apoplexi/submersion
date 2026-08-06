@@ -13,6 +13,7 @@ import 'package:submersion/features/media/presentation/pages/media_library_view.
 import 'package:submersion/features/media/presentation/providers/media_library_providers.dart';
 import 'package:submersion/features/media/presentation/providers/media_resolver_providers.dart';
 import 'package:submersion/features/media/presentation/widgets/media_library_grid.dart';
+import 'package:submersion/features/media/presentation/widgets/media_library_grouped_list.dart';
 import 'package:submersion/features/settings/data/repositories/app_settings_repository.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
@@ -131,6 +132,26 @@ void main() {
     await tester.drag(find.byType(GridView), const Offset(0, -6000));
     await tester.pumpAndSettle();
     expect(notifier.loadMoreCalls, greaterThan(0));
+  });
+
+  testWidgets('view mode switcher swaps to the grouped presentation', (
+    tester,
+  ) async {
+    final notifier = _SeededLibraryNotifier(
+      MediaLibraryState(entries: [entry('a'), entry('b')]),
+    );
+    await tester.pumpWidget(host(notifier));
+    await tester.pumpAndSettle();
+    expect(find.byType(MediaLibraryGrid), findsOneWidget);
+
+    await tester.tap(find.byIcon(Icons.scuba_diving));
+    await tester.pumpAndSettle();
+    expect(find.byType(MediaLibraryGroupedList), findsOneWidget);
+    expect(find.byType(MediaLibraryGrid), findsNothing);
+
+    await tester.tap(find.byIcon(Icons.calendar_month));
+    await tester.pumpAndSettle();
+    expect(find.byType(MediaLibraryGroupedList), findsOneWidget);
   });
 
   testWidgets('type filter chips update mediaLibraryFilterProvider', (

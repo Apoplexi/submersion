@@ -12036,6 +12036,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get media_library_filter_videos => 'Videos';
 
   @override
+  String get media_library_unlinkedHeader => 'Unlinked';
+
+  @override
+  String get media_library_viewMode_byDive => 'By dive';
+
+  @override
+  String get media_library_viewMode_grid => 'Grid';
+
+  @override
+  String get media_library_viewMode_timeline => 'Timeline';
+
+  @override
   String get nav_home => 'Home';
 
   @override

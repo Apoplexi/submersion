@@ -20761,6 +20761,30 @@ abstract class AppLocalizations {
   /// **'Videos'**
   String get media_library_filter_videos;
 
+  /// By-dive view header for media attached to no dive
+  ///
+  /// In en, this message translates to:
+  /// **'Unlinked'**
+  String get media_library_unlinkedHeader;
+
+  /// Library view mode: grouped by dive
+  ///
+  /// In en, this message translates to:
+  /// **'By dive'**
+  String get media_library_viewMode_byDive;
+
+  /// Library view mode: flat grid
+  ///
+  /// In en, this message translates to:
+  /// **'Grid'**
+  String get media_library_viewMode_grid;
+
+  /// Library view mode: date-grouped timeline
+  ///
+  /// In en, this message translates to:
+  /// **'Timeline'**
+  String get media_library_viewMode_timeline;
+
   /// Navigation label for home/dashboard
   ///
   /// In en, this message translates to:

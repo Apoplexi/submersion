@@ -11933,6 +11933,18 @@ class AppLocalizationsHe extends AppLocalizations {
   String get media_library_filter_videos => 'סרטונים';
 
   @override
+  String get media_library_unlinkedHeader => 'לא מקושרים';
+
+  @override
+  String get media_library_viewMode_byDive => 'לפי צלילה';
+
+  @override
+  String get media_library_viewMode_grid => 'רשת';
+
+  @override
+  String get media_library_viewMode_timeline => 'ציר זמן';
+
+  @override
   String get nav_home => 'בית';
 
   @override

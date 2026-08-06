@@ -11681,6 +11681,18 @@ class AppLocalizationsZh extends AppLocalizations {
   String get media_library_filter_videos => '视频';
 
   @override
+  String get media_library_unlinkedHeader => '未关联';
+
+  @override
+  String get media_library_viewMode_byDive => '按潜水';
+
+  @override
+  String get media_library_viewMode_grid => '网格';
+
+  @override
+  String get media_library_viewMode_timeline => '时间线';
+
+  @override
   String get nav_home => '首页';
 
   @override

@@ -12014,6 +12014,18 @@ class AppLocalizationsAr extends AppLocalizations {
   String get media_library_filter_videos => 'مقاطع الفيديو';
 
   @override
+  String get media_library_unlinkedHeader => 'غير مرتبطة';
+
+  @override
+  String get media_library_viewMode_byDive => 'حسب الغطسة';
+
+  @override
+  String get media_library_viewMode_grid => 'شبكة';
+
+  @override
+  String get media_library_viewMode_timeline => 'الخط الزمني';
+
+  @override
   String get nav_home => 'الرئيسية';
 
   @override

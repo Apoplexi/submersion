@@ -12141,6 +12141,18 @@ class AppLocalizationsNl extends AppLocalizations {
   String get media_library_filter_videos => 'Video\'s';
 
   @override
+  String get media_library_unlinkedHeader => 'Niet gekoppeld';
+
+  @override
+  String get media_library_viewMode_byDive => 'Per duik';
+
+  @override
+  String get media_library_viewMode_grid => 'Raster';
+
+  @override
+  String get media_library_viewMode_timeline => 'Tijdlijn';
+
+  @override
   String get nav_home => 'Home';
 
   @override
