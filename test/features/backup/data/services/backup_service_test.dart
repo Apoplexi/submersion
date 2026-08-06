@@ -43,7 +43,10 @@ class FakeBackupDatabaseAdapter implements BackupDatabaseAdapter {
   }
 
   @override
-  Future<void> restore(String backupPath) async {
+  Future<void> restore(
+    String backupPath, {
+    void Function(int, int)? onMigrationProgress,
+  }) async {
     restoreCallCount++;
     lastRestorePath = backupPath;
   }
@@ -152,6 +155,22 @@ class FakeCloudStorageProvider implements CloudStorageProvider {
       throw const CloudStorageException('Download failed');
     }
     return storedFiles[fileId] ?? Uint8List(0);
+  }
+
+  @override
+  Future<UploadResult> uploadFileFromPath(
+    String sourcePath,
+    String filename, {
+    String? folderId,
+  }) async {
+    final data = await File(sourcePath).readAsBytes();
+    return uploadFile(data, filename, folderId: folderId);
+  }
+
+  @override
+  Future<void> downloadToFile(String fileId, String destinationPath) async {
+    final bytes = await downloadFile(fileId);
+    await File(destinationPath).writeAsBytes(bytes, flush: true);
   }
 
   @override

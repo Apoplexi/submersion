@@ -266,6 +266,7 @@ class BackupOperationNotifier extends StateNotifier<BackupOperationState> {
         record,
         mode: mode,
         encryptionSecret: encryptionSecret,
+        onMigrationProgress: _onRestoreMigrationProgress,
       );
       await _syncActiveDiverAfterRestore();
       state = const BackupOperationState(
@@ -400,6 +401,7 @@ class BackupOperationNotifier extends StateNotifier<BackupOperationState> {
         filePath,
         mode: mode,
         encryptionSecret: encryptionSecret,
+        onMigrationProgress: _onRestoreMigrationProgress,
       );
       await _syncActiveDiverAfterRestore();
       state = const BackupOperationState(
@@ -422,6 +424,17 @@ class BackupOperationNotifier extends StateNotifier<BackupOperationState> {
         message: 'Restore failed: $e',
       );
     }
+  }
+
+  /// Surface migration-ladder progress while a restored older-schema backup
+  /// upgrades to the current schema — the only long phase of the swap, and
+  /// otherwise a silent stall behind the restore barrier.
+  void _onRestoreMigrationProgress(int currentStep, int totalSteps) {
+    state = BackupOperationState(
+      status: BackupOperationStatus.inProgress,
+      message: 'Upgrading database (step $currentStep of $totalSteps)...',
+      isRestoring: true,
+    );
   }
 
   /// Reset status back to idle

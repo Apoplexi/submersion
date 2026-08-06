@@ -25,7 +25,10 @@ class _FakeBackupDatabaseAdapter implements BackupDatabaseAdapter {
   }
 
   @override
-  Future<void> restore(String backupPath) async {}
+  Future<void> restore(
+    String backupPath, {
+    void Function(int, int)? onMigrationProgress,
+  }) async {}
 
   @override
   Future<String> get databasePath async => '/fake/db/path';
@@ -169,6 +172,44 @@ void main() {
         throwsA(isA<BackupException>()),
       );
     });
+
+    test(
+      'a rejected restore leaves no safety backup or history entry',
+      () async {
+        // The pre-restore safety backup must run only after the source has been
+        // materialized (decrypted) and validated: a corrupt file or wrong
+        // passphrase aborts the flow without side effects. Running it first left
+        // a stray backup + history record behind every failed restore attempt.
+        final corrupt = File('${tempDir.path}/corrupt2.db');
+        await corrupt.writeAsString('not a database');
+        final record = BackupRecord(
+          id: 'r4',
+          filename: 'corrupt2.db',
+          timestamp: DateTime(2026),
+          sizeBytes: 10,
+          location: BackupLocation.local,
+          localPath: corrupt.path,
+        );
+
+        final service = BackupService(
+          dbAdapter: fakeDb,
+          preferences: preferences,
+          syncRepository: _EpochSpySyncRepository(),
+          epochStore: epochStore,
+        );
+
+        await expectLater(
+          () => service.restoreFromBackup(record),
+          throwsA(isA<BackupException>()),
+        );
+
+        expect(
+          preferences.getHistory(),
+          isEmpty,
+          reason: 'a failed restore must not mint a safety backup',
+        );
+      },
+    );
 
     test('history restore in replace mode mints a pending replace', () async {
       final dbFile = File('${tempDir.path}/valid_replace.db');
