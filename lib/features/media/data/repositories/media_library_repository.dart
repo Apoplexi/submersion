@@ -5,6 +5,7 @@ import 'package:submersion/core/services/database_service.dart';
 import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/features/media/data/repositories/media_row_mapper.dart';
 import 'package:submersion/features/media/domain/entities/media_library_filter.dart';
+import 'package:submersion/features/media/domain/entities/media_source_type.dart';
 
 /// Source types that live at library level by design (subscription feeds and
 /// URL media): they are never "unlinked" problems and never orphan-swept.
@@ -164,6 +165,26 @@ class MediaLibraryRepository {
     );
     final row = await (_db.selectOnly(m)..addColumns([count])).getSingle();
     return row.read(count) ?? 0;
+  }
+
+  /// How many library rows each source type holds (Media section Phase 5's
+  /// browse-by-source list). Signatures are excluded, as everywhere else in
+  /// the library.
+  Future<Map<MediaSourceType, int>> countBySourceType() async {
+    final m = _db.media;
+    final count = countAll();
+    final query = _db.selectOnly(m)
+      ..addColumns([m.sourceType, count])
+      ..where(m.fileType.equals('instructor_signature').not())
+      ..groupBy([m.sourceType]);
+    final rows = await query.get();
+    final result = <MediaSourceType, int>{};
+    for (final row in rows) {
+      final type = MediaSourceType.fromString(row.read(m.sourceType));
+      if (type == null) continue;
+      result[type] = row.read(count) ?? 0;
+    }
+    return result;
   }
 
   /// Rows whose persisted orphan flag is set. Backs the Missing sidebar

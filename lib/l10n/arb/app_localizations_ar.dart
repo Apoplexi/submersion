@@ -12124,6 +12124,93 @@ class AppLocalizationsAr extends AppLocalizations {
       'يتم الاحتفاظ بالوسائط المستوردة في مكتبتك ويمكن ربطها بالغطسات تلقائيًا.';
 
   @override
+  String get media_console_sources => 'المصادر';
+
+  @override
+  String get media_sources_browseHeader => 'التصفح حسب المصدر';
+
+  @override
+  String get media_sources_watchedHeader => 'المجلدات المراقَبة';
+
+  @override
+  String get media_sources_addWatched => 'إضافة مجلد...';
+
+  @override
+  String get media_sources_scanNow => 'فحص الآن';
+
+  @override
+  String get media_sources_autoApply => 'إعادة ربط المطابقات التامة تلقائيًا';
+
+  @override
+  String get media_sources_neverScanned => 'لم يتم الفحص مطلقًا';
+
+  @override
+  String get media_source_gallery => 'مكتبة الصور';
+
+  @override
+  String get media_source_localFile => 'الملفات المحلية';
+
+  @override
+  String get media_source_networkUrl => 'روابط الويب';
+
+  @override
+  String get media_source_manifest => 'الاشتراكات';
+
+  @override
+  String get media_source_connector => 'الخدمات المتصلة';
+
+  @override
+  String get media_source_mediaStore => 'مخزن الوسائط السحابي';
+
+  @override
+  String get media_source_signature => 'التوقيعات';
+
+  @override
+  String get media_repairHistory_title => 'سجل الإصلاحات';
+
+  @override
+  String get media_repairHistory_empty => 'لا توجد إصلاحات بعد';
+
+  @override
+  String get media_repairHistory_action_relink => 'أعيد ربطه';
+
+  @override
+  String get media_repairHistory_action_cloudBacked => 'مدعوم سحابيًا';
+
+  @override
+  String get media_repairHistory_action_autoRelink => 'أعيد ربطه تلقائيًا';
+
+  @override
+  String get media_smartAlbum_save => 'حفظ كألبوم';
+
+  @override
+  String get media_smartAlbum_saveTitle => 'تسمية هذا الألبوم';
+
+  @override
+  String get media_smartAlbum_albums => 'الألبومات';
+
+  @override
+  String get media_smartAlbum_delete => 'حذف الألبوم';
+
+  @override
+  String get media_smartAlbum_saved => 'تم حفظ الألبوم';
+
+  @override
+  String media_sources_lastScanned(String date) {
+    return 'آخر فحص $date';
+  }
+
+  @override
+  String media_sources_scanResult(int indexed, int repaired) {
+    return 'تمت فهرسة $indexed ملفات، وأعيد ربط $repaired';
+  }
+
+  @override
+  String media_repairHistory_source(String source) {
+    return 'عبر $source';
+  }
+
+  @override
   String get media_console_missing => 'مفقودة';
 
   @override

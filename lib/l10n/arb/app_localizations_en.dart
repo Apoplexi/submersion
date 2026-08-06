@@ -12148,6 +12148,93 @@ class AppLocalizationsEn extends AppLocalizations {
       'Imported media is kept in your library and can be linked to dives automatically.';
 
   @override
+  String get media_console_sources => 'Sources';
+
+  @override
+  String get media_sources_browseHeader => 'Browse by source';
+
+  @override
+  String get media_sources_watchedHeader => 'Watched folders';
+
+  @override
+  String get media_sources_addWatched => 'Add folder...';
+
+  @override
+  String get media_sources_scanNow => 'Scan now';
+
+  @override
+  String get media_sources_autoApply => 'Automatically re-link exact matches';
+
+  @override
+  String get media_sources_neverScanned => 'Never scanned';
+
+  @override
+  String get media_source_gallery => 'Photo library';
+
+  @override
+  String get media_source_localFile => 'Local files';
+
+  @override
+  String get media_source_networkUrl => 'Web links';
+
+  @override
+  String get media_source_manifest => 'Subscriptions';
+
+  @override
+  String get media_source_connector => 'Connected services';
+
+  @override
+  String get media_source_mediaStore => 'Cloud media store';
+
+  @override
+  String get media_source_signature => 'Signatures';
+
+  @override
+  String get media_repairHistory_title => 'Repair history';
+
+  @override
+  String get media_repairHistory_empty => 'No repairs yet';
+
+  @override
+  String get media_repairHistory_action_relink => 'Re-linked';
+
+  @override
+  String get media_repairHistory_action_cloudBacked => 'Cloud-backed';
+
+  @override
+  String get media_repairHistory_action_autoRelink => 'Auto re-linked';
+
+  @override
+  String get media_smartAlbum_save => 'Save as album';
+
+  @override
+  String get media_smartAlbum_saveTitle => 'Name this album';
+
+  @override
+  String get media_smartAlbum_albums => 'Albums';
+
+  @override
+  String get media_smartAlbum_delete => 'Delete album';
+
+  @override
+  String get media_smartAlbum_saved => 'Album saved';
+
+  @override
+  String media_sources_lastScanned(String date) {
+    return 'Last scanned $date';
+  }
+
+  @override
+  String media_sources_scanResult(int indexed, int repaired) {
+    return '$indexed files indexed, $repaired re-linked';
+  }
+
+  @override
+  String media_repairHistory_source(String source) {
+    return 'via $source';
+  }
+
+  @override
   String get media_console_missing => 'Missing';
 
   @override

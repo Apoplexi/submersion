@@ -12253,6 +12253,95 @@ class AppLocalizationsNl extends AppLocalizations {
       'Geïmporteerde media blijft in je bibliotheek en kan automatisch aan duiken worden gekoppeld.';
 
   @override
+  String get media_console_sources => 'Bronnen';
+
+  @override
+  String get media_sources_browseHeader => 'Bladeren op bron';
+
+  @override
+  String get media_sources_watchedHeader => 'Bewaakte mappen';
+
+  @override
+  String get media_sources_addWatched => 'Map toevoegen...';
+
+  @override
+  String get media_sources_scanNow => 'Nu scannen';
+
+  @override
+  String get media_sources_autoApply =>
+      'Exacte overeenkomsten automatisch opnieuw koppelen';
+
+  @override
+  String get media_sources_neverScanned => 'Nooit gescand';
+
+  @override
+  String get media_source_gallery => 'Fotobibliotheek';
+
+  @override
+  String get media_source_localFile => 'Lokale bestanden';
+
+  @override
+  String get media_source_networkUrl => 'Weblinks';
+
+  @override
+  String get media_source_manifest => 'Abonnementen';
+
+  @override
+  String get media_source_connector => 'Verbonden services';
+
+  @override
+  String get media_source_mediaStore => 'Cloudmediaopslag';
+
+  @override
+  String get media_source_signature => 'Handtekeningen';
+
+  @override
+  String get media_repairHistory_title => 'Herstelgeschiedenis';
+
+  @override
+  String get media_repairHistory_empty => 'Nog geen herstelacties';
+
+  @override
+  String get media_repairHistory_action_relink => 'Opnieuw gekoppeld';
+
+  @override
+  String get media_repairHistory_action_cloudBacked => 'Cloudgebaseerd';
+
+  @override
+  String get media_repairHistory_action_autoRelink =>
+      'Automatisch opnieuw gekoppeld';
+
+  @override
+  String get media_smartAlbum_save => 'Opslaan als album';
+
+  @override
+  String get media_smartAlbum_saveTitle => 'Naam dit album';
+
+  @override
+  String get media_smartAlbum_albums => 'Albums';
+
+  @override
+  String get media_smartAlbum_delete => 'Album verwijderen';
+
+  @override
+  String get media_smartAlbum_saved => 'Album opgeslagen';
+
+  @override
+  String media_sources_lastScanned(String date) {
+    return 'Laatst gescand $date';
+  }
+
+  @override
+  String media_sources_scanResult(int indexed, int repaired) {
+    return '$indexed bestanden geïndexeerd, $repaired opnieuw gekoppeld';
+  }
+
+  @override
+  String media_repairHistory_source(String source) {
+    return 'via $source';
+  }
+
+  @override
   String get media_console_missing => 'Ontbrekend';
 
   @override

@@ -12386,6 +12386,94 @@ class AppLocalizationsFr extends AppLocalizations {
       'Les médias importés sont conservés dans votre bibliothèque et peuvent être liés automatiquement aux plongées.';
 
   @override
+  String get media_console_sources => 'Sources';
+
+  @override
+  String get media_sources_browseHeader => 'Parcourir par source';
+
+  @override
+  String get media_sources_watchedHeader => 'Dossiers surveillés';
+
+  @override
+  String get media_sources_addWatched => 'Ajouter un dossier...';
+
+  @override
+  String get media_sources_scanNow => 'Analyser maintenant';
+
+  @override
+  String get media_sources_autoApply =>
+      'Relier automatiquement les correspondances exactes';
+
+  @override
+  String get media_sources_neverScanned => 'Jamais analysé';
+
+  @override
+  String get media_source_gallery => 'Photothèque';
+
+  @override
+  String get media_source_localFile => 'Fichiers locaux';
+
+  @override
+  String get media_source_networkUrl => 'Liens web';
+
+  @override
+  String get media_source_manifest => 'Abonnements';
+
+  @override
+  String get media_source_connector => 'Services connectés';
+
+  @override
+  String get media_source_mediaStore => 'Stockage multimédia cloud';
+
+  @override
+  String get media_source_signature => 'Signatures';
+
+  @override
+  String get media_repairHistory_title => 'Historique des réparations';
+
+  @override
+  String get media_repairHistory_empty => 'Aucune réparation';
+
+  @override
+  String get media_repairHistory_action_relink => 'Relié';
+
+  @override
+  String get media_repairHistory_action_cloudBacked => 'Sur le cloud';
+
+  @override
+  String get media_repairHistory_action_autoRelink => 'Relié automatiquement';
+
+  @override
+  String get media_smartAlbum_save => 'Enregistrer comme album';
+
+  @override
+  String get media_smartAlbum_saveTitle => 'Nommer cet album';
+
+  @override
+  String get media_smartAlbum_albums => 'Albums';
+
+  @override
+  String get media_smartAlbum_delete => 'Supprimer l\'album';
+
+  @override
+  String get media_smartAlbum_saved => 'Album enregistré';
+
+  @override
+  String media_sources_lastScanned(String date) {
+    return 'Dernière analyse $date';
+  }
+
+  @override
+  String media_sources_scanResult(int indexed, int repaired) {
+    return '$indexed fichiers indexés, $repaired reliés';
+  }
+
+  @override
+  String media_repairHistory_source(String source) {
+    return 'via $source';
+  }
+
+  @override
   String get media_console_missing => 'Manquants';
 
   @override

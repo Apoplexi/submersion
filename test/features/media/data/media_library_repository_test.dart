@@ -291,5 +291,23 @@ void main() {
     test('countMissing counts is_orphaned rows', () async {
       expect(await repo.countMissing(), 1);
     });
+
+    test('countBySourceType buckets every non-signature row', () async {
+      final counts = await repo.countBySourceType();
+      expect(counts[MediaSourceType.localFile], 7);
+      expect(counts[MediaSourceType.networkUrl], 1);
+      expect(counts.containsKey(MediaSourceType.signature), isFalse);
+    });
+
+    test('countBySourceType omits source types with no rows', () async {
+      final counts = await repo.countBySourceType();
+      expect(
+        counts.keys,
+        unorderedEquals(<MediaSourceType>[
+          MediaSourceType.localFile,
+          MediaSourceType.networkUrl,
+        ]),
+      );
+    });
   });
 }
