@@ -1,4 +1,6 @@
 {
+  "settings_units_defaultCurrency": "Moneda predeterminada",
+  "settings_units_dialog_defaultCurrency": "Moneda predeterminada",
   "diveSites_list_menu_select": "Seleccionar puntos",
   "diveLog_edit_geofenceSuggestion_near": "Cerca de {location}",
   "diveLog_edit_geofenceSuggestion_title": "Sugerencia de equipo",
@@ -3409,6 +3411,7 @@
   "equipment_serviceDialog_clearNextServiceDateTooltip": "Borrar fecha del proximo servicio",
   "equipment_serviceDialog_costHint": "0.00",
   "equipment_serviceDialog_costLabel": "Costo",
+  "equipment_serviceDialog_currencyLabel": "Moneda",
   "equipment_serviceDialog_costValidation": "Ingresa un monto valido",
   "equipment_serviceDialog_editTitle": "Editar registro de servicio",
   "equipment_serviceDialog_nextServiceDueLabel": "Proximo servicio",

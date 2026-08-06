@@ -1,4 +1,6 @@
 {
+  "settings_units_defaultCurrency": "Standardwährung",
+  "settings_units_dialog_defaultCurrency": "Standardwährung",
   "diveSites_list_menu_select": "Tauchplätze auswählen",
   "diveLog_edit_geofenceSuggestion_near": "In der Nähe von {location}",
   "diveLog_edit_geofenceSuggestion_title": "Ausrüstungsvorschlag",
@@ -3409,6 +3411,7 @@
   "equipment_serviceDialog_clearNextServiceDateTooltip": "Nächstes Wartungsdatum löschen",
   "equipment_serviceDialog_costHint": "0,00",
   "equipment_serviceDialog_costLabel": "Kosten",
+  "equipment_serviceDialog_currencyLabel": "Währung",
   "equipment_serviceDialog_costValidation": "Geben Sie einen gültigen Betrag ein",
   "equipment_serviceDialog_editTitle": "Wartungseintrag bearbeiten",
   "equipment_serviceDialog_nextServiceDueLabel": "Nächste Wartung fällig",

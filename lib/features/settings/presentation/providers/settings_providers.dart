@@ -50,6 +50,7 @@ class SettingsKeys {
   static const String volumeUnit = 'volume_unit';
   static const String weightUnit = 'weight_unit';
   static const String sacUnit = 'sac_unit';
+  static const String defaultCurrency = 'default_currency';
   static const String unitPreset = 'unit_preset';
   static const String themeMode = 'theme_mode';
   static const String displayZoom = 'display_zoom';
@@ -101,6 +102,10 @@ class AppSettings {
   final WeightUnit weightUnit;
   final AltitudeUnit altitudeUnit;
   final SacUnit sacUnit;
+
+  /// ISO 4217 code used as the default currency for new priced items
+  /// (e.g. equipment purchase price).
+  final String defaultCurrency;
   final TimeFormat timeFormat;
   final DateFormatPreference dateFormat;
   final ThemeMode themeMode;
@@ -393,6 +398,7 @@ class AppSettings {
     this.weightUnit = WeightUnit.kilograms,
     this.altitudeUnit = AltitudeUnit.meters,
     this.sacUnit = SacUnit.pressurePerMin,
+    this.defaultCurrency = 'USD',
     this.timeFormat = TimeFormat.twelveHour,
     this.dateFormat = DateFormatPreference.mmmDYYYY,
     this.themeMode = ThemeMode.system,
@@ -543,6 +549,7 @@ class AppSettings {
     WeightUnit? weightUnit,
     AltitudeUnit? altitudeUnit,
     SacUnit? sacUnit,
+    String? defaultCurrency,
     TimeFormat? timeFormat,
     DateFormatPreference? dateFormat,
     ThemeMode? themeMode,
@@ -659,6 +666,7 @@ class AppSettings {
       weightUnit: weightUnit ?? this.weightUnit,
       altitudeUnit: altitudeUnit ?? this.altitudeUnit,
       sacUnit: sacUnit ?? this.sacUnit,
+      defaultCurrency: defaultCurrency ?? this.defaultCurrency,
       timeFormat: timeFormat ?? this.timeFormat,
       dateFormat: dateFormat ?? this.dateFormat,
       themeMode: themeMode ?? this.themeMode,
@@ -1055,6 +1063,11 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
 
   Future<void> setSacUnit(SacUnit unit) async {
     state = state.copyWith(sacUnit: unit);
+    await _saveSettings();
+  }
+
+  Future<void> setDefaultCurrency(String currencyCode) async {
+    state = state.copyWith(defaultCurrency: currencyCode.trim().toUpperCase());
     await _saveSettings();
   }
 
@@ -1683,6 +1696,10 @@ final pressureUnitProvider = Provider<PressureUnit>((ref) {
 
 final sacUnitProvider = Provider<SacUnit>((ref) {
   return ref.watch(settingsProvider.select((s) => s.sacUnit));
+});
+
+final defaultCurrencyProvider = Provider<String>((ref) {
+  return ref.watch(settingsProvider.select((s) => s.defaultCurrency));
 });
 
 final altitudeUnitProvider = Provider<AltitudeUnit>((ref) {

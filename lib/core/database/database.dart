@@ -1465,6 +1465,7 @@ class DiverSettings extends Table {
   TextColumn get altitudeUnit => text().withDefault(const Constant('meters'))();
   TextColumn get sacUnit =>
       text().withDefault(const Constant('litersPerMin'))();
+  TextColumn get defaultCurrency => text().withDefault(const Constant('USD'))();
   // Time/Date format settings
   TextColumn get timeFormat =>
       text().withDefault(const Constant('twelveHour'))();
@@ -2927,7 +2928,7 @@ class AppDatabase extends _$AppDatabase {
 
   /// The current schema version as a static constant so that pre-open checks
   /// (e.g. version-mismatch guard) can reference it without an instance.
-  static const int currentSchemaVersion = 139;
+  static const int currentSchemaVersion = 141;
 
   /// Every schema version that has a migration block in onUpgrade.
   /// Used to calculate progress step counts. When adding a new migration,
@@ -3100,6 +3101,11 @@ class AppDatabase extends _$AppDatabase {
     // v139: cylinder_configs + cylinder_config_items (reusable diluent and
     // bailout setups).
     139,
+    // v140 is reserved by the media-section branch (media.retain_in_library).
+    // v141: diver_settings.default_currency (default currency for priced
+    // items). Renumbered from v138 and then v139 as those went to the
+    // divelogs.de branch and the cylinder configs respectively.
+    141,
   ];
 
   /// Idempotent DDL for the v106 connector-suggestion columns (Lightroom
@@ -4071,6 +4077,22 @@ class AppDatabase extends _$AppDatabase {
     if (!names.contains('weather_code')) {
       await customStatement(
         'ALTER TABLE dives ADD COLUMN weather_code INTEGER',
+      );
+    }
+  }
+
+  /// Idempotent DDL for the v141 diver_settings.default_currency column.
+  /// Called from the v141 onUpgrade step and the beforeOpen backstop, and
+  /// self-guarding when the table is absent (minimal migration-test fixtures).
+  Future<void> _assertDefaultCurrencyColumn() async {
+    final cols = await customSelect(
+      "PRAGMA table_info('diver_settings')",
+    ).get();
+    if (cols.isEmpty) return;
+    final names = cols.map((c) => c.read<String>('name')).toSet();
+    if (!names.contains('default_currency')) {
+      await customStatement(
+        "ALTER TABLE diver_settings ADD COLUMN default_currency TEXT NOT NULL DEFAULT 'USD'",
       );
     }
   }
@@ -7299,6 +7321,13 @@ class AppDatabase extends _$AppDatabase {
           await _assertCylinderConfigSchema();
           await reportProgress();
         }
+        // v141: default currency for priced items (e.g. equipment). A DB
+        // that upgraded past 141 on a parallel branch never enters this block;
+        // the beforeOpen backstop below is its only path to the column.
+        if (from < 141) {
+          await _assertDefaultCurrencyColumn();
+        }
+        if (from < 141) await reportProgress();
       },
       beforeOpen: (details) async {
         // Enable foreign keys
@@ -7319,6 +7348,9 @@ class AppDatabase extends _$AppDatabase {
 
         // v137 backstop: re-assert dives.weather_code.
         await _assertWeatherCodeColumn();
+
+        // v141 backstop: re-assert diver_settings.default_currency.
+        await _assertDefaultCurrencyColumn();
 
         // v106 backstop: re-assert connector-suggestion columns (the helper
         // is self-guarding when the suggestions table is absent).

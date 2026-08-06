@@ -1,4 +1,6 @@
 {
+  "settings_units_defaultCurrency": "מטבע ברירת מחדל",
+  "settings_units_dialog_defaultCurrency": "מטבע ברירת מחדל",
   "diveSites_list_menu_select": "בחירת אתרים",
   "diveLog_edit_geofenceSuggestion_near": "ליד {location}",
   "diveLog_edit_geofenceSuggestion_title": "הצעת ציוד",
@@ -3337,6 +3339,7 @@
   "equipment_serviceDialog_clearNextServiceDateTooltip": "נקה תאריך טיפול הבא",
   "equipment_serviceDialog_costHint": "0.00",
   "equipment_serviceDialog_costLabel": "עלות",
+  "equipment_serviceDialog_currencyLabel": "מטבע",
   "equipment_serviceDialog_costValidation": "הזן סכום חוקי",
   "equipment_serviceDialog_editTitle": "ערוך רשומת טיפול",
   "equipment_serviceDialog_nextServiceDueLabel": "הטיפול הבא",

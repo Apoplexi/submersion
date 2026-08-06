@@ -10742,6 +10742,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get equipment_serviceDialog_costLabel => 'Kosten';
 
   @override
+  String get equipment_serviceDialog_currencyLabel => 'Valuta';
+
+  @override
   String get equipment_serviceDialog_costValidation =>
       'Voer een geldig bedrag in';
 
@@ -15052,6 +15055,12 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get settings_units_sacRate => 'SAC-snelheid';
+
+  @override
+  String get settings_units_defaultCurrency => 'Standaardvaluta';
+
+  @override
+  String get settings_units_dialog_defaultCurrency => 'Standaardvaluta';
 
   @override
   String get settings_units_sac_pressurePerMinute => 'Druk per minuut';

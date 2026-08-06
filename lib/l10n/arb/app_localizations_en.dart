@@ -10656,6 +10656,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get equipment_serviceDialog_costLabel => 'Cost';
 
   @override
+  String get equipment_serviceDialog_currencyLabel => 'Currency';
+
+  @override
   String get equipment_serviceDialog_costValidation => 'Enter a valid amount';
 
   @override
@@ -14924,6 +14927,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settings_units_sacRate => 'SAC Rate';
+
+  @override
+  String get settings_units_defaultCurrency => 'Default Currency';
+
+  @override
+  String get settings_units_dialog_defaultCurrency => 'Default Currency';
 
   @override
   String get settings_units_sac_pressurePerMinute => 'Pressure per minute';

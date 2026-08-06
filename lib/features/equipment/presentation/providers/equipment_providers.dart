@@ -359,14 +359,16 @@ final mostRecentServiceRecordProvider =
       return repository.getMostRecentRecord(equipmentId);
     });
 
-/// Total service cost for equipment
-final serviceRecordTotalCostProvider = FutureProvider.family<double, String>((
-  ref,
-  equipmentId,
-) async {
-  final repository = ref.watch(serviceRecordRepositoryProvider);
-  return repository.getTotalServiceCost(equipmentId);
-});
+/// Total service cost for equipment, keyed by the currency of each record.
+/// Kept per currency so mixed-currency histories are never added together.
+final serviceRecordTotalCostProvider =
+    FutureProvider.family<Map<String, double>, String>((
+      ref,
+      equipmentId,
+    ) async {
+      final repository = ref.watch(serviceRecordRepositoryProvider);
+      return repository.getTotalServiceCostByCurrency(equipmentId);
+    });
 
 /// Service record count for equipment
 final serviceRecordCountProvider = FutureProvider.family<int, String>((

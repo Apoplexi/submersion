@@ -1,4 +1,6 @@
 {
+  "settings_units_defaultCurrency": "Valuta predefinita",
+  "settings_units_dialog_defaultCurrency": "Valuta predefinita",
   "diveSites_list_menu_select": "Seleziona siti",
   "diveLog_edit_geofenceSuggestion_near": "Vicino a {location}",
   "diveLog_edit_geofenceSuggestion_title": "Suggerimento attrezzatura",
@@ -3337,6 +3339,7 @@
   "equipment_serviceDialog_clearNextServiceDateTooltip": "Cancella data prossima manutenzione",
   "equipment_serviceDialog_costHint": "0.00",
   "equipment_serviceDialog_costLabel": "Costo",
+  "equipment_serviceDialog_currencyLabel": "Valuta",
   "equipment_serviceDialog_costValidation": "Inserisci un importo valido",
   "equipment_serviceDialog_editTitle": "Modifica registro manutenzione",
   "equipment_serviceDialog_nextServiceDueLabel": "Prossima manutenzione prevista",
