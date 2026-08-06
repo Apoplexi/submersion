@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:submersion/core/services/database_service.dart';
 import 'package:submersion/core/services/security/biometric_service.dart';
 import 'package:submersion/core/services/security/database_security_service.dart';
+import 'package:submersion/core/services/sync/crypto/keyslots.dart';
 import 'package:submersion/core/services/sync/crypto/sync_encryption_service.dart'
     show WrongPassphraseException;
 import 'package:submersion/features/settings/presentation/widgets/enable_encryption_dialog.dart'
@@ -16,7 +17,14 @@ import 'package:submersion/l10n/l10n_extension.dart';
 /// service is a pre-provider singleton, so this page is stateful rather
 /// than provider-driven, mirroring how the service itself works.
 class SecuritySettingsPage extends StatefulWidget {
-  const SecuritySettingsPage({super.key});
+  /// Argon2id cost for slots this page mints. Overridable only so widget
+  /// tests can exercise the credential flows: the production parameters are
+  /// 64 MiB / 3 passes, which is pure-Dart (and unusably slow) under
+  /// `flutter test`. Same seam the service itself exposes.
+  @visibleForTesting
+  final KdfParams kdf;
+
+  const SecuritySettingsPage({super.key, this.kdf = const KdfParams()});
 
   @override
   State<SecuritySettingsPage> createState() => _SecuritySettingsPageState();
@@ -129,8 +137,11 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
       context: context,
       barrierDismissible: false,
       builder: (_) => SecuritySetupDialog(
-        onSetPassword: (password) =>
-            _security.enableSecurity(password: password, dbPath: dbPath),
+        onSetPassword: (password) => _security.enableSecurity(
+          password: password,
+          dbPath: dbPath,
+          kdf: widget.kdf,
+        ),
       ),
     );
     if (mounted) setState(() {});
@@ -331,6 +342,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
           currentSecret: current,
           newPassword: next,
           dbPath: dbPath,
+          kdf: widget.kdf,
         ),
       ),
     );
@@ -345,6 +357,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
       newCode = await _security.regenerateRecoveryCode(
         currentSecret: secret,
         dbPath: await _dbPath(),
+        kdf: widget.kdf,
       );
     } on WrongPassphraseException {
       if (!mounted) return;
