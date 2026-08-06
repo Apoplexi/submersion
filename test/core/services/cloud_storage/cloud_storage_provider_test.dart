@@ -49,6 +49,21 @@ void main() {
       );
       expect(await dest.exists(), isFalse);
     });
+
+    test(
+      'downloadToFile surfaces a write failure and attempts cleanup',
+      () async {
+        provider.stored['id-1'] = Uint8List.fromList([1]);
+        // A destination inside a directory that does not exist makes the write
+        // itself fail after a successful download.
+        final dest = File('${tempDir.path}/no-such-dir/dest.bin');
+        await expectLater(
+          provider.downloadToFile('id-1', dest.path),
+          throwsA(isA<FileSystemException>()),
+        );
+        expect(await dest.exists(), isFalse);
+      },
+    );
   });
 
   group('CloudStorageException.displayMessage', () {

@@ -1,6 +1,8 @@
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:flutter/foundation.dart' show visibleForTesting;
+
 import 'package:extension_google_sign_in_as_googleapis_auth/extension_google_sign_in_as_googleapis_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart' as http;
@@ -151,6 +153,12 @@ class GoogleDriveStorageProvider
     }
     return api;
   }
+
+  /// Test seam: injects a [drive.DriveApi] (backed by a mock HTTP client) so
+  /// the transfer paths are exercisable without a Google sign-in — the real
+  /// api is only ever minted from an authenticated session.
+  @visibleForTesting
+  void debugSetDriveApi(drive.DriveApi api) => _driveApi = api;
 
   /// Authenticated HTTP client for the media store's raw REST calls.
   /// Enables silent auth (the media attach itself is the opt-in) and

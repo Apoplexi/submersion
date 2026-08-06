@@ -134,6 +134,117 @@ void main() {
     );
   });
 
+  group('path-based transfers', () {
+    late String containerPath;
+
+    setUp(() {
+      containerPath = p.join(tempDir.path, 'container');
+      Directory(containerPath).createSync(recursive: true);
+    });
+
+    ICloudStorageProvider transferProvider({
+      Future<bool> Function(String source, String destination)? move,
+      Future<bool> Function(String path)? download,
+    }) {
+      return ICloudStorageProvider(
+        platform: ICloudHostPlatform.ios,
+        containerPathLookup: () async => containerPath,
+        containerFileMove:
+            move ??
+            (source, destination) async {
+              File(source).renameSync(destination);
+              return true;
+            },
+        ensureDownloaded: download ?? (path) async => true,
+      );
+    }
+
+    test('uploadFileFromPath copies, moves into the container, and cleans '
+        'the staging file', () async {
+      final src = File(p.join(tempDir.path, 'backup.db'));
+      src.writeAsStringSync('payload');
+
+      final result = await transferProvider().uploadFileFromPath(
+        src.path,
+        'submersion_backup_x.db',
+      );
+
+      expect(File(result.fileId).readAsStringSync(), 'payload');
+      expect(
+        File('${result.fileId}.uploading').existsSync(),
+        isFalse,
+        reason: 'staging sibling must not be left behind',
+      );
+      // The source file is untouched (copied, not moved).
+      expect(src.existsSync(), isTrue);
+    });
+
+    test('uploadFileFromPath cleans the staging file when the coordinated '
+        'move fails', () async {
+      final src = File(p.join(tempDir.path, 'backup.db'));
+      src.writeAsStringSync('payload');
+      final provider = transferProvider(move: (_, _) async => false);
+
+      await expectLater(
+        provider.uploadFileFromPath(src.path, 'submersion_backup_x.db'),
+        throwsA(isA<CloudStorageException>()),
+      );
+
+      final syncDir = Directory(containerPath).listSync(recursive: true);
+      expect(
+        syncDir.whereType<File>().where((f) => f.path.endsWith('.uploading')),
+        isEmpty,
+        reason: 'a failed move must not strand its staging copy',
+      );
+    });
+
+    test('downloadToFile materializes and copies the container file', () async {
+      final containerFile = File(p.join(containerPath, 'b.db'))
+        ..writeAsStringSync('bytes');
+      final dest = p.join(tempDir.path, 'restored.db');
+      final downloadedPaths = <String>[];
+      final provider = transferProvider(
+        download: (path) async {
+          downloadedPaths.add(path);
+          return true;
+        },
+      );
+
+      await provider.downloadToFile(containerFile.path, dest);
+
+      expect(File(dest).readAsStringSync(), 'bytes');
+      expect(downloadedPaths, [containerFile.path]);
+    });
+
+    test('downloadToFile throws when the container file is missing', () async {
+      final dest = p.join(tempDir.path, 'restored.db');
+      await expectLater(
+        transferProvider().downloadToFile(
+          p.join(containerPath, 'missing.db'),
+          dest,
+        ),
+        throwsA(isA<CloudStorageException>()),
+      );
+      expect(File(dest).existsSync(), isFalse);
+    });
+
+    test(
+      'downloadToFile throws when iCloud cannot materialize the file',
+      () async {
+        final containerFile = File(p.join(containerPath, 'b.db'))
+          ..writeAsStringSync('bytes');
+        final dest = p.join(tempDir.path, 'restored.db');
+        final provider = transferProvider(download: (_) async => false);
+
+        await expectLater(
+          provider.downloadToFile(containerFile.path, dest),
+          throwsA(isA<CloudStorageException>()),
+        );
+        expect(File(dest).existsSync(), isFalse);
+      },
+    );
+  });
+
   group('ICloudHostPlatform', () {
     test('treats both Apple platforms as Apple', () {
       expect(ICloudHostPlatform.ios.isApple, isTrue);

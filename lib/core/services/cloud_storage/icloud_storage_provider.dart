@@ -35,6 +35,15 @@ enum ICloudHostPlatform {
 /// serve this app.
 typedef ICloudContainerPathLookup = Future<String?> Function();
 
+/// Moves a staged file into the container with file coordination; false when
+/// the move could not be performed.
+typedef ICloudContainerFileMove =
+    Future<bool> Function(String sourcePath, String destinationPath);
+
+/// Materializes an iCloud container file locally before it is read; false
+/// when the file could not be downloaded.
+typedef ICloudFileDownload = Future<bool> Function(String path);
+
 /// iCloud implementation of CloudStorageProvider
 ///
 /// Uses the app's iCloud container directory for storage.
@@ -57,17 +66,29 @@ class ICloudStorageProvider
   /// reaching the channel on other hosts — so on a Linux CI runner a mocked
   /// channel is never consulted, and a test would reach its assertion via a
   /// short circuit rather than via the branch it means to exercise.
+  /// [containerFileMove] and [ensureDownloaded] default to the native channel
+  /// calls and are injectable for the same reason as [containerPathLookup]:
+  /// both carry their own Apple-platform guard and short-circuit without
+  /// reaching the channel on other hosts, so a mocked channel would go
+  /// unconsulted on the Linux CI runner.
   ICloudStorageProvider({
     ICloudHostPlatform? platform,
     ICloudContainerPathLookup? containerPathLookup,
+    ICloudContainerFileMove? containerFileMove,
+    ICloudFileDownload? ensureDownloaded,
   }) : _platform = platform ?? ICloudHostPlatform.current(),
        _lookupContainerPath =
-           containerPathLookup ?? ICloudNativeService.getContainerPath;
+           containerPathLookup ?? ICloudNativeService.getContainerPath,
+       _moveIntoContainer = containerFileMove ?? ICloudNativeService.moveFile,
+       _ensureDownloaded =
+           ensureDownloaded ?? ICloudNativeService.downloadIfNeeded;
 
   static final _log = LoggerService.forClass(ICloudStorageProvider);
 
   final ICloudHostPlatform _platform;
   final ICloudContainerPathLookup _lookupContainerPath;
+  final ICloudContainerFileMove _moveIntoContainer;
+  final ICloudFileDownload _ensureDownloaded;
 
   Directory? _icloudContainer;
   Directory? _syncFolder;
@@ -268,7 +289,7 @@ class ICloudStorageProvider
       final staging = '$filePath.uploading';
       await File(sourcePath).copy(staging);
       try {
-        final moved = await ICloudNativeService.moveFile(staging, filePath);
+        final moved = await _moveIntoContainer(staging, filePath);
         if (!moved) {
           throw CloudStorageException('iCloud move failed for $filename');
         }
@@ -301,7 +322,7 @@ class ICloudStorageProvider
       if (!await file.exists()) {
         throw CloudStorageException('File not found: $fileId');
       }
-      final downloaded = await ICloudNativeService.downloadIfNeeded(fileId);
+      final downloaded = await _ensureDownloaded(fileId);
       if (!downloaded) {
         throw CloudStorageException('iCloud file not downloaded: $fileId');
       }
