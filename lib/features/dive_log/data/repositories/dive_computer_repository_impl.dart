@@ -21,6 +21,7 @@ import 'package:submersion/core/matching/match_scorer.dart';
 import 'package:submersion/features/dive_log/data/repositories/safety_findings_repository.dart';
 import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart'
     show GeoPoint;
+import 'package:submersion/features/dive_log/domain/services/dive_altitude_enricher.dart';
 import 'package:submersion/features/equipment/data/services/dive_equipment_defaulter.dart';
 import 'package:submersion/features/pre_dive/data/services/checklist_dive_linker.dart';
 import 'package:submersion/core/services/database_service.dart';
@@ -988,6 +989,12 @@ class DiveComputerRepository {
           diveId: diveId,
           diverId: diverId,
           diveStart: DateTime.fromMillisecondsSinceEpoch(entryTimeMs),
+        );
+
+        // Fill altitude from the entry/exit GPS fixes (best-effort).
+        await DiveAltitudeEnricher().applyForDownloadedDive(
+          diveId: diveId,
+          points: defaultPoints,
         );
 
         // Create a data source record for provenance tracking.
