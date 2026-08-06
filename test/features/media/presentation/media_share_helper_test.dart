@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:path_provider_platform_interface/path_provider_platform_interface.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
-import 'package:share_plus/share_plus.dart';
 import 'package:share_plus_platform_interface/share_plus_platform_interface.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/features/media/domain/entities/media_item.dart';
@@ -209,8 +208,9 @@ void main() {
     // exactly as the write did.
     List<int>? written;
     await tester.runAsync(() async {
-      written = await File(platform.calls.single.files!.single.path)
-          .readAsBytes();
+      written = await File(
+        platform.calls.single.files!.single.path,
+      ).readAsBytes();
     });
     expect(written, [1, 2, 3, 4]);
   });
