@@ -12235,6 +12235,18 @@ class AppLocalizationsIt extends AppLocalizations {
   String get media_library_filter_videos => 'Video';
 
   @override
+  String get media_library_filter_site => 'Sito';
+
+  @override
+  String get media_library_filter_trip => 'Viaggio';
+
+  @override
+  String get media_library_filter_dates => 'Date';
+
+  @override
+  String get media_library_filter_clear => 'Cancella filtri';
+
+  @override
   String get media_library_deleteConfirmBody =>
       'Questo li rimuove dall\'app e da qualsiasi archivio multimediale. Non può essere annullato.';
 

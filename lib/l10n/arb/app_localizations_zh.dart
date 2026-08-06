@@ -11681,6 +11681,18 @@ class AppLocalizationsZh extends AppLocalizations {
   String get media_library_filter_videos => '视频';
 
   @override
+  String get media_library_filter_site => '潜点';
+
+  @override
+  String get media_library_filter_trip => '行程';
+
+  @override
+  String get media_library_filter_dates => '日期';
+
+  @override
+  String get media_library_filter_clear => '清除筛选';
+
+  @override
   String get media_library_deleteConfirmBody => '这会将它们从应用和任何媒体存储中移除。此操作无法撤销。';
 
   @override

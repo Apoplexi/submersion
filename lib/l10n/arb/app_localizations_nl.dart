@@ -12141,6 +12141,18 @@ class AppLocalizationsNl extends AppLocalizations {
   String get media_library_filter_videos => 'Video\'s';
 
   @override
+  String get media_library_filter_site => 'Duikstek';
+
+  @override
+  String get media_library_filter_trip => 'Reis';
+
+  @override
+  String get media_library_filter_dates => 'Datums';
+
+  @override
+  String get media_library_filter_clear => 'Filters wissen';
+
+  @override
   String get media_library_deleteConfirmBody =>
       'Dit verwijdert ze uit de app en elke mediaopslag. Dit kan niet ongedaan worden gemaakt.';
 

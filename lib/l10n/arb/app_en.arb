@@ -7038,6 +7038,22 @@
   "@media_library_filter_videos": {
     "description": "Library filter chip: videos only"
   },
+  "media_library_filter_site": "Site",
+  "@media_library_filter_site": {
+    "description": "Library filter chip: pick a dive site"
+  },
+  "media_library_filter_trip": "Trip",
+  "@media_library_filter_trip": {
+    "description": "Library filter chip: pick a trip"
+  },
+  "media_library_filter_dates": "Dates",
+  "@media_library_filter_dates": {
+    "description": "Library filter chip: pick a date range"
+  },
+  "media_library_filter_clear": "Clear filters",
+  "@media_library_filter_clear": {
+    "description": "Library filter chip: reset every filter"
+  },
   "media_library_deleteConfirmBody": "This removes them from the app and any media store. This cannot be undone.",
   "@media_library_deleteConfirmBody": {
     "description": "Body of the bulk delete confirmation dialog"

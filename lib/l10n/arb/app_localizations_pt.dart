@@ -12239,6 +12239,18 @@ class AppLocalizationsPt extends AppLocalizations {
   String get media_library_filter_videos => 'Vídeos';
 
   @override
+  String get media_library_filter_site => 'Ponto';
+
+  @override
+  String get media_library_filter_trip => 'Viagem';
+
+  @override
+  String get media_library_filter_dates => 'Datas';
+
+  @override
+  String get media_library_filter_clear => 'Limpar filtros';
+
+  @override
   String get media_library_deleteConfirmBody =>
       'Isso os remove do aplicativo e de qualquer armazenamento de mídia. Não pode ser desfeito.';
 

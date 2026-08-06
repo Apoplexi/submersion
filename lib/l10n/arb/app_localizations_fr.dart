@@ -12274,6 +12274,18 @@ class AppLocalizationsFr extends AppLocalizations {
   String get media_library_filter_videos => 'Vidéos';
 
   @override
+  String get media_library_filter_site => 'Site';
+
+  @override
+  String get media_library_filter_trip => 'Voyage';
+
+  @override
+  String get media_library_filter_dates => 'Dates';
+
+  @override
+  String get media_library_filter_clear => 'Effacer les filtres';
+
+  @override
   String get media_library_deleteConfirmBody =>
       'Cela les supprime de l\'application et de tout stockage multimédia. Cette action est irréversible.';
 

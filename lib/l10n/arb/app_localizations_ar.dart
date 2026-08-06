@@ -12014,6 +12014,18 @@ class AppLocalizationsAr extends AppLocalizations {
   String get media_library_filter_videos => 'مقاطع الفيديو';
 
   @override
+  String get media_library_filter_site => 'الموقع';
+
+  @override
+  String get media_library_filter_trip => 'الرحلة';
+
+  @override
+  String get media_library_filter_dates => 'التواريخ';
+
+  @override
+  String get media_library_filter_clear => 'مسح عوامل التصفية';
+
+  @override
   String get media_library_deleteConfirmBody =>
       'ستتم إزالتها من التطبيق ومن أي مخزن وسائط. لا يمكن التراجع عن هذا.';
 

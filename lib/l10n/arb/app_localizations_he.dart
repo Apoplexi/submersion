@@ -11933,6 +11933,18 @@ class AppLocalizationsHe extends AppLocalizations {
   String get media_library_filter_videos => 'סרטונים';
 
   @override
+  String get media_library_filter_site => 'אתר';
+
+  @override
+  String get media_library_filter_trip => 'טיול';
+
+  @override
+  String get media_library_filter_dates => 'תאריכים';
+
+  @override
+  String get media_library_filter_clear => 'ניקוי מסננים';
+
+  @override
   String get media_library_deleteConfirmBody =>
       'פעולה זו מסירה אותם מהאפליקציה ומכל מאגר מדיה. לא ניתן לבטל זאת.';
 

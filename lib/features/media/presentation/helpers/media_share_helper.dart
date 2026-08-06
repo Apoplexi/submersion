@@ -41,15 +41,17 @@ Future<void> shareMediaItems(
       Navigator.of(context, rootNavigator: true).pop();
     }
     if (files.isEmpty) {
-      _showError(context, l10n.media_photoViewer_cannotShare);
+      if (context.mounted) {
+        _showError(context, l10n.media_photoViewer_cannotShare);
+      }
       return;
     }
     await SharePlus.instance.share(ShareParams(files: files));
   } catch (e) {
     if (context.mounted) {
       Navigator.of(context, rootNavigator: true).pop();
+      _showError(context, l10n.media_photoViewer_failedToShare(e.toString()));
     }
-    _showError(context, l10n.media_photoViewer_failedToShare(e.toString()));
   }
 }
 

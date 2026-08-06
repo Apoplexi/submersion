@@ -20761,6 +20761,30 @@ abstract class AppLocalizations {
   /// **'Videos'**
   String get media_library_filter_videos;
 
+  /// Library filter chip: pick a dive site
+  ///
+  /// In en, this message translates to:
+  /// **'Site'**
+  String get media_library_filter_site;
+
+  /// Library filter chip: pick a trip
+  ///
+  /// In en, this message translates to:
+  /// **'Trip'**
+  String get media_library_filter_trip;
+
+  /// Library filter chip: pick a date range
+  ///
+  /// In en, this message translates to:
+  /// **'Dates'**
+  String get media_library_filter_dates;
+
+  /// Library filter chip: reset every filter
+  ///
+  /// In en, this message translates to:
+  /// **'Clear filters'**
+  String get media_library_filter_clear;
+
   /// Body of the bulk delete confirmation dialog
   ///
   /// In en, this message translates to:

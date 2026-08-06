@@ -3036,8 +3036,8 @@ class AppDatabase extends _$AppDatabase {
     // prose this app generated itself so it can be re-rendered localized.
     137,
     // v140: media.retain_in_library (Media section Phase 1). 138 (divelogs
-    // #603) and 139 (equipment currency #805) are reserved by parallel
-    // branches; no blocks here.
+    // #603) is reserved by a parallel branch and 139 (cylinder configs #804)
+    // lives on main; the main merge brings the v139 block.
     140,
   ];
 
@@ -7185,8 +7185,8 @@ class AppDatabase extends _$AppDatabase {
         }
         if (from < 137) await reportProgress();
         // v140: media.retain_in_library (Media section Phase 1). v138
-        // (divelogs) and v139 (equipment currency) live on parallel branches;
-        // a DB arriving here from 137 skips straight to 140 and the
+        // (divelogs) is on a parallel branch and v139 (cylinder configs) is
+        // on main; a DB arriving here from 137 skips straight to 140 and the
         // beforeOpen backstop self-heals any DB a parallel branch strands in
         // between.
         if (from < 140) {

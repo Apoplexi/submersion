@@ -4,9 +4,10 @@ import 'package:submersion/core/database/database.dart';
 
 /// Minimal pre-v140 shape: a media table without retain_in_library, stamped
 /// at v137 so the 137->140 upgrade runs the retain-in-library block. The
-/// ladder deliberately skips 138 (divelogs) and 139 (equipment currency),
-/// which live on parallel branches; the beforeOpen backstop self-heals any
-/// database a parallel-branch version collision strands in between.
+/// ladder deliberately skips 138 (divelogs, parallel branch) and 139
+/// (cylinder configs, on main until the merge); the beforeOpen backstop
+/// self-heals any database a parallel-branch version collision strands in
+/// between.
 NativeDatabase _dbAt137() {
   return NativeDatabase.memory(
     setup: (rawDb) {

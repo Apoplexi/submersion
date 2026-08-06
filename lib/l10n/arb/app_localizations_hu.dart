@@ -12198,6 +12198,18 @@ class AppLocalizationsHu extends AppLocalizations {
   String get media_library_filter_videos => 'Videók';
 
   @override
+  String get media_library_filter_site => 'Merülőhely';
+
+  @override
+  String get media_library_filter_trip => 'Utazás';
+
+  @override
+  String get media_library_filter_dates => 'Dátumok';
+
+  @override
+  String get media_library_filter_clear => 'Szűrők törlése';
+
+  @override
   String get media_library_deleteConfirmBody =>
       'Ez eltávolítja őket az alkalmazásból és minden médiatárból. Nem vonható vissza.';
 
