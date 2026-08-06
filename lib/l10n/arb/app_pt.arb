@@ -3907,6 +3907,7 @@
   "media_sources_browseHeader": "Navegar por origem",
   "media_sources_watchedHeader": "Pastas monitoradas",
   "media_sources_addWatched": "Adicionar pasta...",
+  "media_sources_scanFailed": "Falha na verificação",
   "media_sources_scanNow": "Verificar agora",
   "media_sources_autoApply": "Revincular automaticamente correspondências exatas",
   "media_sources_neverScanned": "Nunca verificada",

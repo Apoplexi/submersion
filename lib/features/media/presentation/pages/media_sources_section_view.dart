@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import 'package:submersion/core/providers/provider.dart';
+import 'package:submersion/features/media/data/services/repair/watched_folder_scanner.dart';
 import 'package:submersion/features/media/domain/entities/media_library_filter.dart';
 import 'package:submersion/features/media/domain/entities/media_source_type.dart';
 import 'package:submersion/features/media/presentation/providers/media_library_providers.dart';
@@ -56,9 +57,19 @@ class MediaSourcesSectionView extends ConsumerWidget {
   }
 
   Future<void> _scanNow(BuildContext context, WidgetRef ref) async {
-    final report = await ref
-        .read(watcherScannerProvider)
-        .scan(now: DateTime.now());
+    // The automatic pass swallows failures by design; this one was asked
+    // for, so silence would read as "nothing happened".
+    WatcherScanReport report;
+    try {
+      report = await ref.read(watcherScannerProvider).scan(now: DateTime.now());
+    } catch (e) {
+      ref.invalidate(watchedRootsProvider);
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(context.l10n.media_sources_scanFailed)),
+      );
+      return;
+    }
     ref.invalidate(watchedRootsProvider);
     if (!context.mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(

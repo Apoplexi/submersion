@@ -12265,6 +12265,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get media_sources_addWatched => 'Map toevoegen...';
 
   @override
+  String get media_sources_scanFailed => 'Scannen mislukt';
+
+  @override
   String get media_sources_scanNow => 'Nu scannen';
 
   @override

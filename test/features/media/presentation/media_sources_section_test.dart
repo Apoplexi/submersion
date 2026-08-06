@@ -1,4 +1,6 @@
 import 'package:drift/native.dart';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/database/local_cache_database.dart';
@@ -15,11 +17,15 @@ import 'package:submersion/l10n/arb/app_localizations.dart';
 import '../../../support/fake_app_settings_repository.dart';
 
 class _FakeScanner implements WatchedFolderScanner {
+  _FakeScanner({this.throws = false});
+
+  final bool throws;
   int calls = 0;
 
   @override
   Future<WatcherScanReport> scan({required DateTime now}) async {
     calls++;
+    if (throws) throw const FileSystemException('volume went away');
     return const WatcherScanReport(
       filesIndexed: 12,
       rehashed: 3,
@@ -166,6 +172,49 @@ void main() {
 
     expect(scanner.calls, 1);
     expect(find.text('12 files indexed, 2 re-linked'), findsOneWidget);
+  });
+
+  testWidgets('a failed scan says so instead of going quiet', (tester) async {
+    scanner = _FakeScanner(throws: true);
+    await watched.addRoot('/nas/Dives');
+    await tester.pumpWidget(host());
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Scan now'));
+    await tester.pumpAndSettle();
+
+    expect(scanner.calls, 1);
+    expect(find.text('Scan failed'), findsOneWidget);
+    expect(find.textContaining('files indexed'), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+
+  group('readWatcherAutoApply', () {
+    test('defaults to on when nothing is stored', () async {
+      expect(await readWatcherAutoApply(FakeAppSettingsRepository()), isTrue);
+    });
+
+    test('honours a stored false', () async {
+      final settings = FakeAppSettingsRepository();
+      settings.values[kWatcherAutoApplySettingKey] = 'false';
+      expect(await readWatcherAutoApply(settings), isFalse);
+    });
+
+    test('honours a stored true', () async {
+      final settings = FakeAppSettingsRepository();
+      settings.values[kWatcherAutoApplySettingKey] = 'true';
+      expect(await readWatcherAutoApply(settings), isTrue);
+    });
+
+    test('the scanner gate reads storage, not a primed default', () async {
+      // The wiring watcherScannerProvider uses. A gate that read the
+      // StateNotifier's synchronous `true` default instead would auto-repair
+      // for someone who had turned auto-apply off.
+      final settings = FakeAppSettingsRepository();
+      settings.values[kWatcherAutoApplySettingKey] = 'false';
+      Future<bool> gate() => readWatcherAutoApply(settings);
+      expect(await gate(), isFalse);
+    });
   });
 
   testWidgets('toggling auto-apply persists the setting', (tester) async {

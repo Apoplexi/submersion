@@ -218,8 +218,19 @@ class MediaRepairService {
     }
 
     // Audit last: history records what actually happened, so it is written
-    // only after the DB and store effects have gone through.
-    await log?.record(auditEntries);
+    // only after the DB and store effects have gone through. That ordering
+    // also means the repair is already committed here -- letting a history
+    // failure escape would report a successful repair as failed and invite
+    // a retry against rows that are no longer missing.
+    try {
+      await log?.record(auditEntries);
+    } catch (e, stackTrace) {
+      _log.warning(
+        'Repair applied but the audit log write failed',
+        error: e,
+        stackTrace: stackTrace,
+      );
+    }
 
     return RepairApplyReport(
       relinked: writes.length,

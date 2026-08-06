@@ -20953,6 +20953,12 @@ abstract class AppLocalizations {
   /// **'Add folder...'**
   String get media_sources_addWatched;
 
+  /// Sources section: the watcher scan threw
+  ///
+  /// In en, this message translates to:
+  /// **'Scan failed'**
+  String get media_sources_scanFailed;
+
   /// Sources section: run the watcher immediately
   ///
   /// In en, this message translates to:

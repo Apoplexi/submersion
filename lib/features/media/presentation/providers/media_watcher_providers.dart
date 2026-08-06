@@ -29,23 +29,34 @@ final watcherAutoApplyProvider =
           WatcherAutoApplyNotifier(ref.watch(appSettingsRepositoryProvider)),
     );
 
+/// Reads the persisted auto-apply setting. Default on; only an explicit
+/// "false" turns it off.
+Future<bool> readWatcherAutoApply(AppSettingsRepository settings) async {
+  final raw = await settings.getRawSetting(kWatcherAutoApplySettingKey);
+  return raw == null || raw == 'true';
+}
+
+const String kWatcherAutoApplySettingKey = 'media_watcher_auto_apply';
+
 class WatcherAutoApplyNotifier extends StateNotifier<bool> {
   WatcherAutoApplyNotifier(this._settings) : super(true) {
     _prime();
   }
 
-  static const String _settingKey = 'media_watcher_auto_apply';
   final AppSettingsRepository _settings;
 
   Future<void> _prime() async {
-    final raw = await _settings.getRawSetting(_settingKey);
-    if (!mounted || raw == null) return;
-    state = raw == 'true';
+    final value = await readWatcherAutoApply(_settings);
+    if (!mounted) return;
+    state = value;
   }
 
   Future<void> setEnabled(bool value) async {
     state = value;
-    await _settings.setRawSetting(_settingKey, value ? 'true' : 'false');
+    await _settings.setRawSetting(
+      kWatcherAutoApplySettingKey,
+      value ? 'true' : 'false',
+    );
   }
 }
 
@@ -74,7 +85,12 @@ final watcherScannerProvider = Provider<WatchedFolderScanner>((ref) {
     watched: ref.watch(watchedFolderRepositoryProvider),
     repair: ref.watch(mediaRepairServiceProvider),
     loadMissingRows: () => loadAllMissingRows(ref),
-    autoApply: ref.watch(watcherAutoApplyProvider),
+    // Read from the database at scan time, NOT from watcherAutoApplyProvider:
+    // that notifier starts at its `true` default and loads the stored value
+    // asynchronously, so a scanner built from it would auto-repair for
+    // someone who had turned auto-apply off.
+    isAutoApplyEnabled: () =>
+        readWatcherAutoApply(ref.read(appSettingsRepositoryProvider)),
   );
 });
 

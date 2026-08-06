@@ -188,4 +188,44 @@ void main() {
     expect(entries.map((e) => e.id), isNot(contains('e0')));
     expect(entries.first.id, 'e504');
   });
+
+  test('a failing audit write does not fail the applied repair', () async {
+    final (file, hash) = await tempFile('a.jpg', 'aaaa');
+    await seed('a', contentHash: hash);
+    final item = (await repo.getMediaById('a'))!;
+
+    final failing = MediaRepairService(
+      repository: repo,
+      queue: MediaTransferQueueRepository(database: cacheDb),
+      createBookmark: null,
+      writeBookmark: null,
+      log: _ThrowingLogRepository(),
+    );
+
+    // The repair is already committed by the time history is written, so
+    // letting a log failure escape would report success as failure and
+    // invite a retry against rows that are no longer missing.
+    final report = await failing.apply([
+      RepairProposal(
+        item: item,
+        confidence: RepairConfidence.exact,
+        candidate: RepairCandidate.file(path: file.path, sizeBytes: 4),
+      ),
+    ], source: RepairLogSource.watcher);
+
+    expect(report.relinked, 1);
+    expect(report.failed, 0);
+    final repaired = (await repo.getMediaById('a'))!;
+    expect(repaired.localPath, file.path);
+    expect(repaired.isOrphaned, isFalse);
+  });
+}
+
+class _ThrowingLogRepository implements MediaRepairLogRepository {
+  @override
+  Future<void> record(List<RepairLogEntry> entries) async =>
+      throw StateError('no such table: media_repair_log');
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }

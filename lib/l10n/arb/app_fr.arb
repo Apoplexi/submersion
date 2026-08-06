@@ -3835,6 +3835,7 @@
   "media_sources_browseHeader": "Parcourir par source",
   "media_sources_watchedHeader": "Dossiers surveillés",
   "media_sources_addWatched": "Ajouter un dossier...",
+  "media_sources_scanFailed": "Échec de l'analyse",
   "media_sources_scanNow": "Analyser maintenant",
   "media_sources_autoApply": "Relier automatiquement les correspondances exactes",
   "media_sources_neverScanned": "Jamais analysé",

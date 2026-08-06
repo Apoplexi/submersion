@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:path/path.dart' as p;
 import 'package:submersion/core/database/database.dart';
 import 'package:submersion/core/database/local_cache_database.dart';
 import 'package:submersion/core/services/media_store/store_keys.dart';
@@ -118,7 +119,7 @@ void main() {
       watched: watched,
       repair: repair,
       loadMissingRows: () async => missing?.call() ?? const [],
-      autoApply: autoApply,
+      isAutoApplyEnabled: () async => autoApply,
     );
 
     test('first scan indexes every file and hashes each once', () async {
@@ -204,6 +205,107 @@ void main() {
       await writeFile('a.jpg', 'aaaa');
       await scanner().scan(now: DateTime(2026, 6, 12));
       expect(await watched.lastScanAt(root.path), DateTime(2026, 6, 12));
+    });
+
+    test('nested files index under a separator-relative path', () async {
+      await Directory('${root.path}/2026/june').create(recursive: true);
+      await writeFile('2026/june/a.jpg', 'aaaa');
+
+      await scanner().scan(now: DateTime(2026, 6, 12));
+
+      final index = await watched.indexForRoot(root.path);
+      // The relative path must be relative -- a hand-rolled prefix strip
+      // yields the whole absolute path on Windows, which then gets written
+      // into media.local_path as a healthy pointer to nothing.
+      expect(index.keys.single, p.join('2026', 'june', 'a.jpg'));
+      expect(p.isRelative(index.keys.single), isTrue);
+    });
+
+    test('a root written with a trailing separator still indexes '
+        'relatively', () async {
+      final trailing = '${root.path}${p.separator}';
+      await watched.removeRoot(root.path);
+      await watched.addRoot(trailing);
+      await writeFile('a.jpg', 'aaaa');
+
+      await scanner().scan(now: DateTime(2026, 6, 12));
+
+      expect((await watched.indexForRoot(trailing)).keys, ['a.jpg']);
+    });
+
+    test('an auto-applied repair points at the real file', () async {
+      await Directory('${root.path}/2026').create(recursive: true);
+      final hash = await writeFile('2026/a.jpg', 'aaaa');
+      await seedMissing('m1', hash);
+      final missing = (await repo.getMediaById('m1'))!;
+
+      final report = await scanner(
+        missing: () => [missing],
+      ).scan(now: DateTime(2026, 6, 12));
+
+      expect(report.autoRepaired, 1);
+      final repaired = (await repo.getMediaById('m1'))!;
+      expect(await File(repaired.localPath!).exists(), isTrue);
+    });
+
+    test('a file that vanishes between index and repair is skipped', () async {
+      final hash = await writeFile('a.jpg', 'aaaa');
+      await seedMissing('m1', hash);
+      final missing = (await repo.getMediaById('m1'))!;
+      // Index it, then delete the file WITHOUT re-scanning: the index still
+      // claims the bytes are there.
+      await scanner().scan(now: DateTime(2026, 6, 12));
+      await File('${root.path}/a.jpg').delete();
+
+      final report = await scanner(
+        missing: () => [missing],
+      ).scan(now: DateTime(2026, 6, 13));
+
+      expect(report.autoRepaired, 0);
+      // Still missing, and still pointing at its original path.
+      final row = (await repo.getMediaById('m1'))!;
+      expect(row.isOrphaned, isTrue);
+      expect(row.localPath, '/gone/m1.jpg');
+    });
+
+    test('auto-apply is resolved when the scan runs, not at build', () async {
+      final hash = await writeFile('a.jpg', 'aaaa');
+      await seedMissing('m1', hash);
+      final missing = (await repo.getMediaById('m1'))!;
+
+      // A gate that only resolves after an await: a scanner that captured a
+      // synchronous default would ignore it and repair anyway.
+      var enabled = true;
+      final built = WatchedFolderScanner(
+        watched: watched,
+        repair: repair,
+        loadMissingRows: () async => [missing],
+        isAutoApplyEnabled: () async {
+          await Future<void>.delayed(Duration.zero);
+          return enabled;
+        },
+      );
+      enabled = false;
+
+      final report = await built.scan(now: DateTime(2026, 6, 12));
+
+      expect(report.autoRepaired, 0);
+      expect((await repo.getMediaById('m1'))!.isOrphaned, isTrue);
+    });
+
+    test('an unreadable root does not prune the index it could not '
+        'list', () async {
+      await writeFile('a.jpg', 'aaaa');
+      await scanner().scan(now: DateTime(2026, 6, 12));
+      expect((await watched.indexForRoot(root.path)).keys, ['a.jpg']);
+
+      // A root that has gone away entirely is skipped before pruning, so
+      // yesterday's index survives for when the volume comes back.
+      await root.delete(recursive: true);
+      await scanner().scan(now: DateTime(2026, 6, 13));
+
+      expect((await watched.indexForRoot(root.path)).keys, ['a.jpg']);
+      await root.create(recursive: true);
     });
   });
 }

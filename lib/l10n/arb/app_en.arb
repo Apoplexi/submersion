@@ -7122,6 +7122,10 @@
   "@media_sources_addWatched": {
     "description": "Sources section: register a watched folder"
   },
+  "media_sources_scanFailed": "Scan failed",
+  "@media_sources_scanFailed": {
+    "description": "Sources section: the watcher scan threw"
+  },
   "media_sources_scanNow": "Scan now",
   "@media_sources_scanNow": {
     "description": "Sources section: run the watcher immediately"

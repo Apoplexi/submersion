@@ -12363,6 +12363,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String get media_sources_addWatched => 'Adicionar pasta...';
 
   @override
+  String get media_sources_scanFailed => 'Falha na verificação';
+
+  @override
   String get media_sources_scanNow => 'Verificar agora';
 
   @override

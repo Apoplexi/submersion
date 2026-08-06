@@ -3835,6 +3835,7 @@
   "media_sources_browseHeader": "Sfoglia per origine",
   "media_sources_watchedHeader": "Cartelle monitorate",
   "media_sources_addWatched": "Aggiungi cartella...",
+  "media_sources_scanFailed": "Scansione non riuscita",
   "media_sources_scanNow": "Scansiona ora",
   "media_sources_autoApply": "Ricollega automaticamente le corrispondenze esatte",
   "media_sources_neverScanned": "Mai scansionata",

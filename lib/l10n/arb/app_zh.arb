@@ -4059,6 +4059,7 @@
   "media_sources_browseHeader": "按来源浏览",
   "media_sources_watchedHeader": "监视的文件夹",
   "media_sources_addWatched": "添加文件夹...",
+  "media_sources_scanFailed": "扫描失败",
   "media_sources_scanNow": "立即扫描",
   "media_sources_autoApply": "自动重新关联完全匹配项",
   "media_sources_neverScanned": "从未扫描",

@@ -12320,6 +12320,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String get media_sources_addWatched => 'Mappa hozzáadása...';
 
   @override
+  String get media_sources_scanFailed => 'A keresés sikertelen';
+
+  @override
   String get media_sources_scanNow => 'Keresés most';
 
   @override

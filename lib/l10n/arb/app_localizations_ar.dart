@@ -12136,6 +12136,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get media_sources_addWatched => 'إضافة مجلد...';
 
   @override
+  String get media_sources_scanFailed => 'فشل الفحص';
+
+  @override
   String get media_sources_scanNow => 'فحص الآن';
 
   @override

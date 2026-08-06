@@ -32,7 +32,7 @@ void main() {
     expect(await repo.indexForRoot('/nas/Dives'), isEmpty);
   });
 
-  test('upsert replaces by (root, relativePath) and hashToPath maps '
+  test('upsert replaces by (root, relativePath) and pathsForHashes maps '
       'absolutes', () async {
     await repo.upsertIndexed(
       const IndexedFile(
@@ -56,10 +56,74 @@ void main() {
     final index = await repo.indexForRoot('/r');
     expect(index, hasLength(1));
     expect(index['a.jpg']!.sizeBytes, 9);
-    expect(await repo.hashToPath(), {'NEW': '/r/a.jpg'});
+    expect(await repo.pathsForHashes({'NEW'}), {'NEW': '/r/a.jpg'});
   });
 
-  test('pruneMissing drops rows whose file vanished', () async {
+  test('pathsForHashes returns only the hashes asked for', () async {
+    await repo.upsertIndexed(
+      const IndexedFile(
+        rootPath: '/r',
+        relativePath: 'a.jpg',
+        sizeBytes: 4,
+        mtimeMillis: 1,
+        contentHash: 'WANTED',
+      ),
+    );
+    await repo.upsertIndexed(
+      const IndexedFile(
+        rootPath: '/r',
+        relativePath: 'b.jpg',
+        sizeBytes: 4,
+        mtimeMillis: 1,
+        contentHash: 'IGNORED',
+      ),
+    );
+
+    expect(await repo.pathsForHashes({'WANTED'}), {'WANTED': '/r/a.jpg'});
+    expect(await repo.pathsForHashes(const <String>[]), isEmpty);
+  });
+
+  test('pathsForHashes chunks past SQLite bound-variable limits', () async {
+    // One IN(...) per 900 values; 2,500 forces three statements.
+    await repo.upsertIndexed(
+      const IndexedFile(
+        rootPath: '/r',
+        relativePath: 'found.jpg',
+        sizeBytes: 4,
+        mtimeMillis: 1,
+        contentHash: 'H-2400',
+      ),
+    );
+
+    final hashes = [for (var i = 0; i < 2500; i++) 'H-$i'];
+    expect(await repo.pathsForHashes(hashes), {'H-2400': '/r/found.jpg'});
+  });
+
+  test('deleteIndexed chunks past SQLite bound-variable limits', () async {
+    for (var i = 0; i < 2500; i++) {
+      await repo.upsertIndexed(
+        IndexedFile(
+          rootPath: '/r',
+          relativePath: 'f$i.jpg',
+          sizeBytes: 1,
+          mtimeMillis: 1,
+        ),
+      );
+    }
+    await repo.upsertIndexed(
+      const IndexedFile(
+        rootPath: '/r',
+        relativePath: 'keep.jpg',
+        sizeBytes: 1,
+        mtimeMillis: 1,
+      ),
+    );
+
+    await repo.deleteIndexed('/r', [for (var i = 0; i < 2500; i++) 'f$i.jpg']);
+    expect((await repo.indexForRoot('/r')).keys, ['keep.jpg']);
+  });
+
+  test('deleteIndexed drops rows whose file vanished', () async {
     await repo.upsertIndexed(
       const IndexedFile(
         rootPath: '/r',
@@ -77,7 +141,7 @@ void main() {
       ),
     );
 
-    await repo.pruneMissing('/r', {'keep.jpg'});
+    await repo.deleteIndexed('/r', {'gone.jpg'});
     expect((await repo.indexForRoot('/r')).keys, ['keep.jpg']);
   });
 

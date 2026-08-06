@@ -1,7 +1,13 @@
 import 'package:drift/drift.dart';
+import 'package:path/path.dart' as p;
 
 import 'package:submersion/core/database/local_cache_database.dart';
 import 'package:submersion/core/services/local_cache_database_service.dart';
+
+/// How many values may ride in one `IN (...)`. SQLite's bound-variable
+/// ceiling is ~999 on the most restrictive builds; the sync serializer uses
+/// the same margin.
+const int _sqlVariableChunk = 900;
 
 /// One indexed file under a watched root.
 class IndexedFile {
@@ -116,28 +122,46 @@ class WatchedFolderRepository {
         );
   }
 
-  /// Drops index rows under [rootPath] whose file was not seen this scan.
-  Future<void> pruneMissing(
+  /// Drops the named index rows under [rootPath] -- the files the scanner
+  /// did not see this pass.
+  ///
+  /// Chunked because every value becomes a bound SQL variable and a watched
+  /// photo archive routinely holds more paths than SQLite will accept in one
+  /// statement.
+  Future<void> deleteIndexed(
     String rootPath,
-    Set<String> keepRelativePaths,
+    Iterable<String> relativePaths,
   ) async {
-    await (_db.delete(_db.watchedFolderIndex)..where(
-          (t) =>
-              t.rootPath.equals(rootPath) &
-              t.relativePath.isNotIn(keepRelativePaths),
-        ))
-        .go();
+    final all = relativePaths.toList();
+    for (var start = 0; start < all.length; start += _sqlVariableChunk) {
+      final end = start + _sqlVariableChunk;
+      final chunk = all.sublist(start, end > all.length ? all.length : end);
+      await (_db.delete(_db.watchedFolderIndex)..where(
+            (t) => t.rootPath.equals(rootPath) & t.relativePath.isIn(chunk),
+          ))
+          .go();
+    }
   }
 
-  /// Content hash to absolute path across every watched root -- the lookup
-  /// the auto-repair pass runs against missing rows.
-  Future<Map<String, String>> hashToPath() async {
-    final rows = await (_db.select(
-      _db.watchedFolderIndex,
-    )..where((t) => t.contentHash.isNotNull())).get();
-    return {
-      for (final row in rows)
-        row.contentHash!: '${row.rootPath}/${row.relativePath}',
-    };
+  /// Absolute path for each of [hashes] found under any watched root -- the
+  /// lookup the auto-repair pass runs against missing rows.
+  ///
+  /// Takes the hashes it wants rather than returning the whole index, so the
+  /// result is bounded by the number of missing rows rather than by the size
+  /// of the watched archive.
+  Future<Map<String, String>> pathsForHashes(Iterable<String> hashes) async {
+    final all = hashes.toList();
+    final result = <String, String>{};
+    for (var start = 0; start < all.length; start += _sqlVariableChunk) {
+      final end = start + _sqlVariableChunk;
+      final chunk = all.sublist(start, end > all.length ? all.length : end);
+      final rows = await (_db.select(
+        _db.watchedFolderIndex,
+      )..where((t) => t.contentHash.isIn(chunk))).get();
+      for (final row in rows) {
+        result[row.contentHash!] = p.join(row.rootPath, row.relativePath);
+      }
+    }
+    return result;
   }
 }

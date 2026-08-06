@@ -12359,6 +12359,9 @@ class AppLocalizationsIt extends AppLocalizations {
   String get media_sources_addWatched => 'Aggiungi cartella...';
 
   @override
+  String get media_sources_scanFailed => 'Scansione non riuscita';
+
+  @override
   String get media_sources_scanNow => 'Scansiona ora';
 
   @override

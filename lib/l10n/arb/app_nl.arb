@@ -3907,6 +3907,7 @@
   "media_sources_browseHeader": "Bladeren op bron",
   "media_sources_watchedHeader": "Bewaakte mappen",
   "media_sources_addWatched": "Map toevoegen...",
+  "media_sources_scanFailed": "Scannen mislukt",
   "media_sources_scanNow": "Nu scannen",
   "media_sources_autoApply": "Exacte overeenkomsten automatisch opnieuw koppelen",
   "media_sources_neverScanned": "Nooit gescand",

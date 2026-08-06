@@ -3907,6 +3907,7 @@
   "media_sources_browseHeader": "Explorar por origen",
   "media_sources_watchedHeader": "Carpetas vigiladas",
   "media_sources_addWatched": "Agregar carpeta...",
+  "media_sources_scanFailed": "Error al analizar",
   "media_sources_scanNow": "Buscar ahora",
   "media_sources_autoApply": "Volver a vincular automáticamente las coincidencias exactas",
   "media_sources_neverScanned": "Nunca analizada",

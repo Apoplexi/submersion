@@ -3835,6 +3835,7 @@
   "media_sources_browseHeader": "Böngészés forrás szerint",
   "media_sources_watchedHeader": "Figyelt mappák",
   "media_sources_addWatched": "Mappa hozzáadása...",
+  "media_sources_scanFailed": "A keresés sikertelen",
   "media_sources_scanNow": "Keresés most",
   "media_sources_autoApply": "Pontos egyezések automatikus újracsatolása",
   "media_sources_neverScanned": "Még nem vizsgált",

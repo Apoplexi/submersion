@@ -3835,6 +3835,7 @@
   "media_sources_browseHeader": "עיון לפי מקור",
   "media_sources_watchedHeader": "תיקיות במעקב",
   "media_sources_addWatched": "הוספת תיקייה...",
+  "media_sources_scanFailed": "הסריקה נכשלה",
   "media_sources_scanNow": "סריקה עכשיו",
   "media_sources_autoApply": "קישור אוטומטי של התאמות מדויקות",
   "media_sources_neverScanned": "לא נסרק מעולם",

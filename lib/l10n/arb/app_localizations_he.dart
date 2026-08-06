@@ -12054,6 +12054,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get media_sources_addWatched => 'הוספת תיקייה...';
 
   @override
+  String get media_sources_scanFailed => 'הסריקה נכשלה';
+
+  @override
   String get media_sources_scanNow => 'סריקה עכשיו';
 
   @override

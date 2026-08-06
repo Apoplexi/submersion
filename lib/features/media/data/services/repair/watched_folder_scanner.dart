@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:path/path.dart' as p;
+
 import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/core/services/media_store/store_keys.dart';
 import 'package:submersion/features/media/data/repositories/media_repair_log_repository.dart';
@@ -43,16 +45,21 @@ class WatchedFolderScanner {
     required this.watched,
     required this.repair,
     required this.loadMissingRows,
-    this.autoApply = true,
+    required this.isAutoApplyEnabled,
   });
 
   final WatchedFolderRepository watched;
   final MediaRepairService repair;
   final Future<List<MediaItem>> Function() loadMissingRows;
 
-  /// When false the index still updates, but nothing is repaired -- the
-  /// suggest-only mode from the design spec.
-  final bool autoApply;
+  /// Whether exact-hash matches may be applied without asking, resolved when
+  /// the scan runs rather than when the scanner is built.
+  ///
+  /// This is deliberately a callback: the setting lives in the database, and
+  /// a scanner constructed from a not-yet-loaded default would silently
+  /// auto-repair for someone who had opted out. When false the index still
+  /// updates but nothing is repaired -- the spec's suggest-only mode.
+  final Future<bool> Function() isAutoApplyEnabled;
 
   static const _log = LoggerService('WatchedFolderScanner');
 
@@ -69,6 +76,7 @@ class WatchedFolderScanner {
 
       final stored = await watched.indexForRoot(root);
       final seen = <String>{};
+      var listingComplete = true;
 
       try {
         await for (final entity in dir.list(
@@ -76,10 +84,11 @@ class WatchedFolderScanner {
           followLinks: false,
         )) {
           if (entity is! File) continue;
-          final path = entity.path;
-          final relative = path.startsWith('$root/')
-              ? path.substring(root.length + 1)
-              : path;
+          // p.relative handles the platform separator and a root written
+          // with a trailing one. Hand-rolled prefix stripping produced the
+          // whole absolute path on Windows, which then got written into
+          // media.local_path as a healthy pointer to nothing.
+          final relative = p.relative(entity.path, from: root);
           seen.add(relative);
           filesIndexed++;
 
@@ -109,15 +118,19 @@ class WatchedFolderScanner {
         }
       } on FileSystemException catch (e) {
         // Partial coverage is fine: an unreadable subtree just contributes
-        // nothing this pass.
+        // nothing this pass. But `seen` is now incomplete, so pruning
+        // against it would delete index rows for files that still exist.
+        listingComplete = false;
         _log.warning('Watched scan failed under $root: $e');
       }
 
-      await watched.pruneMissing(root, seen);
+      if (listingComplete) {
+        await watched.deleteIndexed(root, stored.keys.toSet().difference(seen));
+      }
       await watched.stampScanned(root, now);
     }
 
-    if (!autoApply) {
+    if (!await isAutoApplyEnabled()) {
       return WatcherScanReport(
         filesIndexed: filesIndexed,
         rehashed: rehashed,
@@ -125,13 +138,26 @@ class WatchedFolderScanner {
       );
     }
 
-    final byHash = await watched.hashToPath();
+    final missingRows = await loadMissingRows();
+    final wanted = {
+      for (final row in missingRows)
+        if (row.contentHash != null) row.contentHash!,
+    };
+    // Looked up by the hashes actually needed rather than loading the whole
+    // index: memory stays bounded by the missing rows, not the archive.
+    final byHash = await watched.pathsForHashes(wanted);
     final proposals = <RepairProposal>[];
-    for (final row in await loadMissingRows()) {
+    for (final row in missingRows) {
       final hash = row.contentHash;
       if (hash == null) continue;
       final found = byHash[hash];
       if (found == null) continue;
+      // The index says these bytes are here; confirm the file before
+      // rewriting a pointer that will be marked healthy.
+      if (!await File(found).exists()) {
+        _log.warning('Indexed path vanished before repair: $found');
+        continue;
+      }
       proposals.add(
         RepairProposal(
           item: row,

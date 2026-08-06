@@ -12160,6 +12160,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get media_sources_addWatched => 'Add folder...';
 
   @override
+  String get media_sources_scanFailed => 'Scan failed';
+
+  @override
   String get media_sources_scanNow => 'Scan now';
 
   @override

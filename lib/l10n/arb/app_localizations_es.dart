@@ -12347,6 +12347,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get media_sources_addWatched => 'Agregar carpeta...';
 
   @override
+  String get media_sources_scanFailed => 'Error al analizar';
+
+  @override
   String get media_sources_scanNow => 'Buscar ahora';
 
   @override

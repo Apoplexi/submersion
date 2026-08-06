@@ -11797,6 +11797,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get media_sources_addWatched => '添加文件夹...';
 
   @override
+  String get media_sources_scanFailed => '扫描失败';
+
+  @override
   String get media_sources_scanNow => '立即扫描';
 
   @override
