@@ -72,7 +72,7 @@ class Trips extends Table {
   TextColumn get notes => text().withDefault(const Constant(''))();
   BoolColumn get isShared => boolean().withDefault(const Constant(false))();
 
-  /// Return flight departure, wall-clock-as-UTC epoch ms (v140). Drives the
+  /// Return flight departure, wall-clock-as-UTC epoch ms (v142). Drives the
   /// remaining-dive-window countdown; null when the trip has no flight set.
   IntColumn get returnFlightAt => integer().nullable()();
   IntColumn get createdAt => integer()();
@@ -2931,7 +2931,7 @@ class AppDatabase extends _$AppDatabase {
 
   /// The current schema version as a static constant so that pre-open checks
   /// (e.g. version-mismatch guard) can reference it without an instance.
-  static const int currentSchemaVersion = 140;
+  static const int currentSchemaVersion = 142;
 
   /// Every schema version that has a migration block in onUpgrade.
   /// Used to calculate progress step counts. When adding a new migration,
@@ -3104,8 +3104,10 @@ class AppDatabase extends _$AppDatabase {
     // v139: cylinder_configs + cylinder_config_items (reusable diluent and
     // bailout setups).
     139,
-    // v140: trips.return_flight_at (return-flight dive-window countdown).
-    140,
+    // v140 is reserved by the media-section branch (media.retain_in_library);
+    // v141 is reserved by equipment default currency (#805).
+    // v142: trips.return_flight_at (return-flight dive-window countdown).
+    142,
   ];
 
   /// Idempotent DDL for the v106 connector-suggestion columns (Lightroom
@@ -4071,7 +4073,7 @@ class AppDatabase extends _$AppDatabase {
     }
   }
 
-  /// Idempotent DDL for the v140 return-flight column. Called from the v140
+  /// Idempotent DDL for the v142 return-flight column. Called from the v142
   /// onUpgrade step and the beforeOpen backstop, matching the
   /// _assertWeatherCodeColumn pattern so a schema-version collision cannot
   /// strand a database without it. Self-guarding when the table is absent
@@ -7311,13 +7313,14 @@ class AppDatabase extends _$AppDatabase {
           await _assertCylinderConfigSchema();
           await reportProgress();
         }
-        // v140: trips.return_flight_at (return-flight dive-window countdown).
-        // v138 is reserved by a parallel branch (#603); the beforeOpen
-        // backstop heals any DB stranded between.
-        if (from < 140) {
+        // v142: trips.return_flight_at (return-flight dive-window countdown).
+        // v138 (#603), v140 (media section), and v141 (#805) are reserved by
+        // parallel branches; the beforeOpen backstop heals any DB stranded
+        // between.
+        if (from < 142) {
           await _assertTripReturnFlightColumn();
         }
-        if (from < 140) await reportProgress();
+        if (from < 142) await reportProgress();
       },
       beforeOpen: (details) async {
         // Enable foreign keys
@@ -7431,7 +7434,7 @@ class AppDatabase extends _$AppDatabase {
         // version collision self-heals here.
         await _assertCylinderConfigSchema();
 
-        // v140 backstop: re-assert trips.return_flight_at.
+        // v142 backstop: re-assert trips.return_flight_at.
         await _assertTripReturnFlightColumn();
 
         // Built-in dive types are reference data: identical on every device and

@@ -4,9 +4,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/database/database.dart';
 
 void main() {
-  test('v140 is in the migration ladder', () {
-    expect(AppDatabase.currentSchemaVersion, greaterThanOrEqualTo(140));
-    expect(AppDatabase.migrationVersions, contains(140));
+  test('v142 is in the migration ladder', () {
+    expect(AppDatabase.currentSchemaVersion, greaterThanOrEqualTo(142));
+    expect(AppDatabase.migrationVersions, contains(142));
   });
 
   test('a fresh database has trips.return_flight_at', () async {
@@ -19,12 +19,12 @@ void main() {
   });
 
   test(
-    'a database stranded before v140 gains return_flight_at via beforeOpen',
+    'a database stranded before v142 gains return_flight_at via beforeOpen',
     () async {
       // Only the columns this migration touches are modelled. The beforeOpen
       // backstop must add return_flight_at even when onUpgrade never ran
-      // (v138 is reserved by a parallel branch, so a DB can arrive at an
-      // intermediate version without this column).
+      // (v138/v140/v141 are reserved by parallel branches, so a DB can
+      // arrive at an intermediate version without this column).
       final nativeDb = NativeDatabase.memory(
         setup: (rawDb) {
           rawDb.execute('''
