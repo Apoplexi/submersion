@@ -464,6 +464,26 @@ class ChartOptionsDialog extends StatelessWidget {
       );
     }
 
+    // Display section: rendering behaviour rather than series visibility, so
+    // it is always present and its items carry no series colour.
+    sections.add(
+      _buildSection(
+        context,
+        key: 'display',
+        title: context.l10n.diveLog_chartSection_display,
+        legendState: legendState,
+        legendNotifier: legendNotifier,
+        children: [
+          _buildBehaviorItem(
+            context,
+            label: context.l10n.diveLog_chartOption_metricsFollowViewport,
+            isEnabled: legendState.metricsFollowViewport,
+            onTap: legendNotifier.toggleMetricsFollowViewport,
+          ),
+        ],
+      ),
+    );
+
     return sections;
   }
 
@@ -675,6 +695,37 @@ class ChartOptionsDialog extends StatelessWidget {
                 color: isEnabled ? color : color.withValues(alpha: 0.3),
                 borderRadius: BorderRadius.circular(2),
               ),
+            ),
+            const SizedBox(width: 8),
+            Expanded(child: Text(label)),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// A checkbox row for a rendering-behaviour option. Unlike
+  /// [_buildToggleItem] it carries no series colour swatch, because it does not
+  /// correspond to a line on the chart.
+  Widget _buildBehaviorItem(
+    BuildContext context, {
+    required String label,
+    required bool isEnabled,
+    required VoidCallback onTap,
+  }) {
+    final colorScheme = Theme.of(context).colorScheme;
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        child: Row(
+          children: [
+            Icon(
+              isEnabled ? Icons.check_box : Icons.check_box_outline_blank,
+              size: 20,
+              color: isEnabled
+                  ? colorScheme.primary
+                  : colorScheme.onSurfaceVariant,
             ),
             const SizedBox(width: 8),
             Expanded(child: Text(label)),

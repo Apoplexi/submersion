@@ -549,6 +549,11 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
 
   // Advanced decompression/gas toggles
   bool _showNdl = false;
+
+  /// Whether secondary-axis metrics are anchored to the visible depth window
+  /// instead of the full depth axis. Mirrors the legend session state; read by
+  /// [_metricBand] from both build() and _buildChart().
+  bool _metricsFollowViewport = false;
   bool _showPpO2 = false;
   bool _showPpN2 = false;
   bool _showPpHe = false;
@@ -1573,6 +1578,9 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
     _showPressureMarkersLocal = legendState.showPressureMarkers;
     _showGasSwitchMarkers = legendState.showGasSwitchMarkers;
     _showPhotoMarkers = legendState.showPhotoMarkers;
+    // Must be synced before _metricBand() is read for the cache signatures
+    // below, or a mode flip would key bars on the outgoing band.
+    _metricsFollowViewport = legendState.metricsFollowViewport;
     // Sync advanced deco/gas toggles
     _showNdl = legendState.showNdl;
     _showPpO2 = legendState.showPpO2;
@@ -2060,10 +2068,15 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
     return units.convertDepth(widget.maxDepth ?? maxDepthValueMeters) * 1.1;
   }
 
-  /// The depth slice that secondary-axis metrics are stretched across: the
-  /// currently visible depth window, so zoom never clips them off-screen.
+  /// The depth slice that secondary-axis metrics are stretched across.
+  ///
+  /// When [_metricsFollowViewport] is off (the default) this is the whole depth
+  /// axis, so metrics magnify and scroll with the depth trace and can leave the
+  /// viewport when zoomed. When on, it is the currently visible depth window,
+  /// so metrics stay on screen at any zoom. See [MetricBand].
   MetricBand _metricBand(UnitFormatter units) {
     final totalMaxDepth = _totalMaxDepth(units);
+    if (!_metricsFollowViewport) return MetricBand.full(totalMaxDepth);
     return MetricBand(
       top: _viewport.offsetY * totalMaxDepth,
       span: totalMaxDepth * _viewport.visibleHeight,
@@ -2103,11 +2116,9 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
     final visibleMinDepth = _viewport.offsetY * totalMaxDepth;
     final visibleMaxDepth = visibleMinDepth + visibleRangeY;
 
-    // Secondary-axis metrics follow the visible depth window rather than the
-    // full dive, so zooming never clips them off-screen (see MetricBand).
-    // Identical by construction to _metricBand(units), which build() feeds into
-    // the bar-cache signatures.
-    final metricBand = MetricBand(top: visibleMinDepth, span: visibleRangeY);
+    // Same helper build() feeds into the bar-cache signatures, so the band the
+    // bars are drawn with can never diverge from the band they are keyed on.
+    final metricBand = _metricBand(units);
 
     // Temperature bounds (if showing) - convert to user's preferred unit.
     // Pool the active source's and every overlaid source's readings so both

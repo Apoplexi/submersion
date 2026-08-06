@@ -86,6 +86,12 @@ class SettingsKeys {
   static const String fullscreenReadoutCardX = 'fullscreen_readout_card_x';
   static const String fullscreenReadoutCardY = 'fullscreen_readout_card_y';
 
+  // Whether profile-chart metric overlays follow the visible depth window when
+  // zoomed (device-local, stored directly in SharedPreferences rather than
+  // per-diver in the DB).
+  static const String profileMetricsFollowViewport =
+      'profile_metrics_follow_viewport';
+
   // Perdix-style media overlay preferences (device-local, stored directly in
   // SharedPreferences rather than per-diver in the DB).
   static const String perdixOverlayEnabled = 'perdix_overlay_enabled';
@@ -381,6 +387,12 @@ class AppSettings {
   final double? fullscreenReadoutCardX;
   final double? fullscreenReadoutCardY;
 
+  /// Whether the dive profile chart's secondary-axis metric overlays (NDL,
+  /// ppO2, GF, ...) follow the visible depth window when zoomed instead of
+  /// magnifying with the depth axis and scrolling out of view. Device-local,
+  /// not per-diver. See MetricBand.
+  final bool profileMetricsFollowViewport;
+
   /// Perdix-style media overlay: shown over photos/videos when enabled.
   /// Device-local, not per-diver.
   final bool perdixOverlayEnabled;
@@ -503,6 +515,7 @@ class AppSettings {
     this.hiddenHomeChips = const <String>{},
     this.fullscreenReadoutCardX,
     this.fullscreenReadoutCardY,
+    this.profileMetricsFollowViewport = false,
     this.perdixOverlayEnabled = false,
     this.perdixOverlayX,
     this.perdixOverlayY,
@@ -654,6 +667,7 @@ class AppSettings {
     Set<String>? hiddenHomeChips,
     double? fullscreenReadoutCardX,
     double? fullscreenReadoutCardY,
+    bool? profileMetricsFollowViewport,
     bool? perdixOverlayEnabled,
     double? perdixOverlayX,
     double? perdixOverlayY,
@@ -802,6 +816,8 @@ class AppSettings {
           fullscreenReadoutCardX ?? this.fullscreenReadoutCardX,
       fullscreenReadoutCardY:
           fullscreenReadoutCardY ?? this.fullscreenReadoutCardY,
+      profileMetricsFollowViewport:
+          profileMetricsFollowViewport ?? this.profileMetricsFollowViewport,
       perdixOverlayEnabled: perdixOverlayEnabled ?? this.perdixOverlayEnabled,
       perdixOverlayX: perdixOverlayX ?? this.perdixOverlayX,
       perdixOverlayY: perdixOverlayY ?? this.perdixOverlayY,
@@ -913,6 +929,10 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
       // per-diver settings table), so it is read straight from SharedPreferences
       // like the fullscreen tile prefs above.
       final pscrRatio = prefs.getDouble(SettingsKeys.pscrRatio);
+      // Profile-chart overlay scaling is a device-local viewing preference,
+      // kept out of the per-diver settings table like the prefs above.
+      final profileMetricsFollowViewport =
+          prefs.getBool(SettingsKeys.profileMetricsFollowViewport) ?? false;
       final perdixOverlayEnabled =
           prefs.getBool(SettingsKeys.perdixOverlayEnabled) ?? false;
       final perdixOverlayX = prefs.getDouble(SettingsKeys.perdixOverlayX);
@@ -928,6 +948,7 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
           fullscreenReadoutCardX: fullscreenReadoutCardX,
           fullscreenReadoutCardY: fullscreenReadoutCardY,
           pscrRatio: pscrRatio ?? 100.0,
+          profileMetricsFollowViewport: profileMetricsFollowViewport,
           perdixOverlayEnabled: perdixOverlayEnabled,
           perdixOverlayX: perdixOverlayX,
           perdixOverlayY: perdixOverlayY,
@@ -945,6 +966,7 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
         fullscreenReadoutCardX: fullscreenReadoutCardX,
         fullscreenReadoutCardY: fullscreenReadoutCardY,
         pscrRatio: pscrRatio,
+        profileMetricsFollowViewport: profileMetricsFollowViewport,
         perdixOverlayEnabled: perdixOverlayEnabled,
         perdixOverlayX: perdixOverlayX,
         perdixOverlayY: perdixOverlayY,
@@ -1006,6 +1028,10 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
       await prefs.setDouble(SettingsKeys.fullscreenReadoutCardY, readoutCardY);
     }
     await prefs.setDouble(SettingsKeys.pscrRatio, state.pscrRatio);
+    await prefs.setBool(
+      SettingsKeys.profileMetricsFollowViewport,
+      state.profileMetricsFollowViewport,
+    );
     await prefs.setBool(
       SettingsKeys.perdixOverlayEnabled,
       state.perdixOverlayEnabled,
@@ -1597,6 +1623,11 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
       fullscreenReadoutCardX: x.isFinite ? x.clamp(0.0, 1.0) : 1.0,
       fullscreenReadoutCardY: y.isFinite ? y.clamp(0.0, 1.0) : 0.0,
     );
+    await _saveSettings();
+  }
+
+  Future<void> setProfileMetricsFollowViewport(bool value) async {
+    state = state.copyWith(profileMetricsFollowViewport: value);
     await _saveSettings();
   }
 

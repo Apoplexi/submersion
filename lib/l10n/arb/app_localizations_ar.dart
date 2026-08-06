@@ -5658,10 +5658,17 @@ class AppLocalizationsAr extends AppLocalizations {
   String get diveLog_chartSection_gasAnalysis => 'تحليل الغاز';
 
   @override
+  String get diveLog_chartSection_display => 'العرض';
+
+  @override
   String get diveLog_chartSection_other => 'أخرى';
 
   @override
   String get diveLog_chartSection_tankPressures => 'ضغوط الأسطوانات';
+
+  @override
+  String get diveLog_chartOption_metricsFollowViewport =>
+      'إبقاء الطبقات الإضافية ضمن العرض';
 
   @override
   String get diveLog_pressure_estimatedSuffix => '(تقديري)';
@@ -13248,6 +13255,14 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get settings_appearance_pressureThresholdMarkers_subtitleFull =>
       'عرض علامات عندما يتجاوز ضغط الأسطوانة عتبات 2/3 و 1/2 و 1/3';
+
+  @override
+  String get settings_appearance_metricsFollowViewport =>
+      'إبقاء الطبقات الإضافية ضمن العرض عند التكبير';
+
+  @override
+  String get settings_appearance_metricsFollowViewport_subtitle =>
+      'ملاءمة الطبقات الإضافية مثل NDL وppO2 مع المنطقة المرئية بدلاً من تكبيرها مع محور العمق';
 
   @override
   String get settings_appearance_rightYAxisMetric => 'مقياس المحور الأيمن';

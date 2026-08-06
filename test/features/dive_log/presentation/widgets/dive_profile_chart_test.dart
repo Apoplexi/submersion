@@ -45,9 +45,10 @@ class _TestSettingsNotifier extends StateNotifier<AppSettings>
 /// _emitExternalTooltip coverage.
 class _AllMetricsSettingsNotifier extends StateNotifier<AppSettings>
     implements SettingsNotifier {
-  _AllMetricsSettingsNotifier()
+  _AllMetricsSettingsNotifier({bool metricsFollowViewport = false})
     : super(
-        const AppSettings(
+        AppSettings(
+          profileMetricsFollowViewport: metricsFollowViewport,
           defaultShowHeartRate: true,
           defaultShowSac: true,
           defaultShowPpO2: true,
@@ -215,10 +216,15 @@ Widget _buildChartAllMetrics({
   bool tooltipBelow = false,
   void Function(List<TooltipRow>? rows)? onTooltipData,
   void Function(int? index)? onPointSelected,
+  bool metricsFollowViewport = false,
 }) {
   return ProviderScope(
     overrides: [
-      settingsProvider.overrideWith((ref) => _AllMetricsSettingsNotifier()),
+      settingsProvider.overrideWith(
+        (ref) => _AllMetricsSettingsNotifier(
+          metricsFollowViewport: metricsFollowViewport,
+        ),
+      ),
     ],
     child: MaterialApp(
       localizationsDelegates: AppLocalizations.localizationsDelegates,
@@ -3080,6 +3086,7 @@ void main() {
         _buildChartAllMetrics(
           profile: _makeProfile(points: 20),
           ndlCurve: List.filled(20, 3600),
+          metricsFollowViewport: true,
         ),
       );
       await tester.pumpAndSettle();
@@ -3124,6 +3131,7 @@ void main() {
         _buildChartAllMetrics(
           profile: _makeProfile(points: 20),
           ndlCurve: List.filled(20, 3600),
+          metricsFollowViewport: true,
         ),
       );
       await tester.pumpAndSettle();
@@ -3159,6 +3167,46 @@ void main() {
         bars.first.spots.any((s) => s.y >= panned.minY && s.y <= panned.maxY),
         isTrue,
         reason: 'NDL must be rebuilt against the panned band, not cached',
+      );
+    });
+
+    testWidgets('off by default: NDL still zooms with the depth axis', (
+      tester,
+    ) async {
+      // The option is opt-in. With it off, the original behaviour stands:
+      // metrics are painted onto the full depth axis, so they magnify and
+      // scroll with it and a max-NDL line pinned to the top leaves the window
+      // as soon as the viewport's top edge drops below the surface.
+      await tester.pumpWidget(
+        _buildChartAllMetrics(
+          profile: _makeProfile(points: 20),
+          ndlCurve: List.filled(20, 3600),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(ndlBars(tester), isNotEmpty);
+
+      final chart = find.byType(LineChart).first;
+      final size = tester.getSize(chart);
+      await tester.sendEventToBinding(
+        PointerScrollEvent(
+          position:
+              tester.getTopLeft(chart) +
+              Offset(size.width * 0.5, size.height * 0.5),
+          scrollDelta: const Offset(0, -100),
+        ),
+      );
+      await tester.pump();
+
+      final data = chartData(tester);
+      final bars = ndlBars(tester);
+      expect(bars, isNotEmpty);
+      expect(
+        bars.first.spots.any((s) => s.y >= data.minY && s.y <= data.maxY),
+        isFalse,
+        reason:
+            'with the option off the NDL line keeps the original full-depth '
+            'anchoring, so zooming carries it out of the visible window',
       );
     });
 

@@ -9643,6 +9643,12 @@ abstract class AppLocalizations {
   /// **'Gas Analysis'**
   String get diveLog_chartSection_gasAnalysis;
 
+  /// No description provided for @diveLog_chartSection_display.
+  ///
+  /// In en, this message translates to:
+  /// **'Display'**
+  String get diveLog_chartSection_display;
+
   /// No description provided for @diveLog_chartSection_other.
   ///
   /// In en, this message translates to:
@@ -9654,6 +9660,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Tank Pressures'**
   String get diveLog_chartSection_tankPressures;
+
+  /// No description provided for @diveLog_chartOption_metricsFollowViewport.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep overlays in view'**
+  String get diveLog_chartOption_metricsFollowViewport;
 
   /// Short suffix appended to a tank label when its pressure line is a linear start-to-end estimate rather than measured air-integrated data. Abbreviation of 'estimated'.
   ///
@@ -22830,6 +22842,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Show markers when tank pressure crosses 2/3, 1/2, and 1/3 thresholds'**
   String get settings_appearance_pressureThresholdMarkers_subtitleFull;
+
+  /// No description provided for @settings_appearance_metricsFollowViewport.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep overlays in view when zooming'**
+  String get settings_appearance_metricsFollowViewport;
+
+  /// No description provided for @settings_appearance_metricsFollowViewport_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Fit overlays such as NDL and ppO2 to the visible area instead of magnifying them with the depth axis'**
+  String get settings_appearance_metricsFollowViewport_subtitle;
 
   /// No description provided for @settings_appearance_rightYAxisMetric.
   ///

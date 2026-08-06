@@ -5775,10 +5775,17 @@ class AppLocalizationsDe extends AppLocalizations {
   String get diveLog_chartSection_gasAnalysis => 'Gasanalyse';
 
   @override
+  String get diveLog_chartSection_display => 'Anzeige';
+
+  @override
   String get diveLog_chartSection_other => 'Sonstiges';
 
   @override
   String get diveLog_chartSection_tankPressures => 'Flaschendrucke';
+
+  @override
+  String get diveLog_chartOption_metricsFollowViewport =>
+      'Einblendungen im Sichtbereich halten';
 
   @override
   String get diveLog_pressure_estimatedSuffix => '(gesch.)';
@@ -13470,6 +13477,14 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get settings_appearance_pressureThresholdMarkers_subtitleFull =>
       'Markierungen anzeigen, wenn der Flaschendruck die Schwellenwerte 2/3, 1/2 und 1/3 überschreitet';
+
+  @override
+  String get settings_appearance_metricsFollowViewport =>
+      'Einblendungen beim Zoomen im Sichtbereich halten';
+
+  @override
+  String get settings_appearance_metricsFollowViewport_subtitle =>
+      'Einblendungen wie NDL und ppO2 an den sichtbaren Bereich anpassen, statt sie mit der Tiefenachse zu vergrößern';
 
   @override
   String get settings_appearance_rightYAxisMetric => 'Rechte Y-Achsen-Metrik';
