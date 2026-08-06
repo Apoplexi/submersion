@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:extension_google_sign_in_as_googleapis_auth/extension_google_sign_in_as_googleapis_auth.dart';
@@ -225,6 +226,85 @@ class GoogleDriveStorageProvider
       _log.info('Downloaded file: $fileId (${allBytes.length} bytes)');
       return Uint8List.fromList(allBytes);
     } catch (e, stackTrace) {
+      _log.error(
+        'Failed to download file: $fileId',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      throw CloudStorageException('Download failed: $e', e, stackTrace);
+    }
+  }
+
+  /// Streams the local file into the Drive SDK ([drive.Media] takes a byte
+  /// stream), so the artifact is never resident in memory.
+  @override
+  Future<UploadResult> uploadFileFromPath(
+    String sourcePath,
+    String filename, {
+    String? folderId,
+  }) async {
+    try {
+      final targetFolder = folderId ?? await getOrCreateSyncFolder();
+      final existingFile = await _findFile(filename, targetFolder);
+
+      final source = File(sourcePath);
+      final media = drive.Media(source.openRead(), await source.length());
+
+      drive.File result;
+      if (existingFile != null) {
+        result = await _api.files.update(
+          drive.File(),
+          existingFile.id!,
+          uploadMedia: media,
+        );
+        _log.info('Updated file: $filename (${result.id})');
+      } else {
+        final fileMetadata = drive.File()
+          ..name = filename
+          ..parents = [targetFolder];
+        result = await _api.files.create(fileMetadata, uploadMedia: media);
+        _log.info('Created file: $filename (${result.id})');
+      }
+
+      return UploadResult(fileId: result.id!, uploadTime: DateTime.now());
+    } catch (e, stackTrace) {
+      _log.error(
+        'Failed to upload file: $filename',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      throw CloudStorageException('Upload failed: $e', e, stackTrace);
+    }
+  }
+
+  /// Pipes the download stream straight to disk. The buffering downloadFile
+  /// holds three concurrent copies of the payload at peak (chunk list,
+  /// expanded list, Uint8List); this holds one chunk.
+  @override
+  Future<void> downloadToFile(String fileId, String destinationPath) async {
+    try {
+      final response = await _api.files.get(
+        fileId,
+        downloadOptions: drive.DownloadOptions.fullMedia,
+      );
+      if (response is! drive.Media) {
+        throw const CloudStorageException('Invalid download response');
+      }
+      final sink = File(destinationPath).openWrite();
+      try {
+        await response.stream.pipe(sink);
+      } finally {
+        await sink.close();
+      }
+    } catch (e, stackTrace) {
+      final partial = File(destinationPath);
+      if (await partial.exists()) {
+        try {
+          await partial.delete();
+        } catch (_) {
+          // Best-effort cleanup of a partial download.
+        }
+      }
       _log.error(
         'Failed to download file: $fileId',
         error: e,

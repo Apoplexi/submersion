@@ -242,6 +242,88 @@ class ICloudStorageProvider
     }
   }
 
+  /// The fileId IS a container path, so a streaming upload is a same-volume
+  /// copy plus a coordinated move — the payload never crosses the method
+  /// channel (uploadFile ships the whole file as one Uint8List through the
+  /// platform codec, a second full copy in RAM).
+  @override
+  Future<UploadResult> uploadFileFromPath(
+    String sourcePath,
+    String filename, {
+    String? folderId,
+  }) async {
+    try {
+      final syncFolder = await getOrCreateSyncFolder().timeout(
+        const Duration(seconds: 15),
+        onTimeout: () {
+          throw const CloudStorageException(
+            'Timeout getting sync folder (15s)',
+          );
+        },
+      );
+      final filePath = path.join(syncFolder, filename);
+
+      // Copy next to the destination so the coordinated move is same-volume,
+      // mirroring ICloudMediaObjectStore.putFile.
+      final staging = '$filePath.uploading';
+      await File(sourcePath).copy(staging);
+      try {
+        final moved = await ICloudNativeService.moveFile(staging, filePath);
+        if (!moved) {
+          throw CloudStorageException('iCloud move failed for $filename');
+        }
+      } catch (_) {
+        final stray = File(staging);
+        if (await stray.exists()) {
+          try {
+            await stray.delete();
+          } catch (_) {
+            // Best-effort staging cleanup.
+          }
+        }
+        rethrow;
+      }
+      return UploadResult(fileId: filePath, uploadTime: DateTime.now());
+    } catch (e, stackTrace) {
+      _log.error(
+        'uploadFileFromPath: FAILED - $e',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      throw CloudStorageException('Upload failed: $e', e, stackTrace);
+    }
+  }
+
+  @override
+  Future<void> downloadToFile(String fileId, String destinationPath) async {
+    try {
+      final file = File(fileId);
+      if (!await file.exists()) {
+        throw CloudStorageException('File not found: $fileId');
+      }
+      final downloaded = await ICloudNativeService.downloadIfNeeded(fileId);
+      if (!downloaded) {
+        throw CloudStorageException('iCloud file not downloaded: $fileId');
+      }
+      await file.copy(destinationPath);
+    } catch (e, stackTrace) {
+      final partial = File(destinationPath);
+      if (await partial.exists()) {
+        try {
+          await partial.delete();
+        } catch (_) {
+          // Best-effort cleanup of a partial copy.
+        }
+      }
+      _log.error(
+        'Failed to download file from iCloud: $fileId',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      throw CloudStorageException('Download failed: $e', e, stackTrace);
+    }
+  }
+
   @override
   Future<CloudFileInfo?> getFileInfo(String fileId) async {
     try {
