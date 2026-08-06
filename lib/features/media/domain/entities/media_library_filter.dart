@@ -74,6 +74,46 @@ class MediaLibraryFilter {
 
   static const Object _undefined = Object();
 
+  /// Serialized form stored by smart albums. Ids and enum names mean the
+  /// same thing on every device, which is why an album can sync.
+  Map<String, dynamic> toJson() => {
+    'mediaType': mediaType?.name,
+    'siteId': siteId,
+    'tripId': tripId,
+    'diveId': diveId,
+    'fromDate': fromDate?.millisecondsSinceEpoch,
+    'toDate': toDate?.millisecondsSinceEpoch,
+    'sourceType': sourceType?.name,
+    'health': health?.name,
+  };
+
+  /// Decodes leniently: an album written by a newer version (or a value
+  /// this build no longer knows) degrades to "no constraint" rather than
+  /// throwing and taking the library view down with it.
+  static MediaLibraryFilter fromJson(Map<String, dynamic> json) {
+    return MediaLibraryFilter(
+      mediaType: _enumByName(MediaType.values, json['mediaType']),
+      siteId: json['siteId'] as String?,
+      tripId: json['tripId'] as String?,
+      diveId: json['diveId'] as String?,
+      fromDate: _dateFromMillis(json['fromDate']),
+      toDate: _dateFromMillis(json['toDate']),
+      sourceType: _enumByName(MediaSourceType.values, json['sourceType']),
+      health: _enumByName(MediaHealthFilter.values, json['health']),
+    );
+  }
+
+  static T? _enumByName<T extends Enum>(List<T> values, Object? raw) {
+    if (raw is! String) return null;
+    for (final value in values) {
+      if (value.name == raw) return value;
+    }
+    return null;
+  }
+
+  static DateTime? _dateFromMillis(Object? raw) =>
+      raw is int ? DateTime.fromMillisecondsSinceEpoch(raw) : null;
+
   @override
   bool operator ==(Object other) {
     return other is MediaLibraryFilter &&
