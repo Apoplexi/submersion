@@ -1242,6 +1242,11 @@ class Media extends Table {
   TextColumn get compressedLevel => text().nullable()();
   IntColumn get compressedSizeBytes => integer().nullable()();
   IntColumn get remoteCompressedUploadedAt => integer().nullable()();
+  // Media section Phase 1 (v140): kept-in-library marker. Dormant until the
+  // Phase 2 link-management UI sets it; the orphan sweep will exclude rows
+  // where it is true. Synced with the row like every other media column.
+  BoolColumn get retainInLibrary =>
+      boolean().withDefault(const Constant(false))();
   // coverage:ignore-end
   IntColumn get createdAt => integer()();
   IntColumn get updatedAt => integer()();
@@ -2861,7 +2866,7 @@ class AppDatabase extends _$AppDatabase {
 
   /// The current schema version as a static constant so that pre-open checks
   /// (e.g. version-mismatch guard) can reference it without an instance.
-  static const int currentSchemaVersion = 137;
+  static const int currentSchemaVersion = 140;
 
   /// Every schema version that has a migration block in onUpgrade.
   /// Used to calculate progress step counts. When adding a new migration,
@@ -3030,6 +3035,10 @@ class AppDatabase extends _$AppDatabase {
     // v137: dives.weather_code, plus a one-time clear of the English weather
     // prose this app generated itself so it can be re-rendered localized.
     137,
+    // v140: media.retain_in_library (Media section Phase 1). 138 (divelogs
+    // #603) and 139 (equipment currency #805) are reserved by parallel
+    // branches; no blocks here.
+    140,
   ];
 
   /// Idempotent DDL for the v106 connector-suggestion columns (Lightroom
@@ -3586,6 +3595,20 @@ class AppDatabase extends _$AppDatabase {
           'INTEGER NOT NULL DEFAULT 0 CHECK ($column IN (0, 1))',
         );
       }
+    }
+  }
+
+  /// v140: media.retain_in_library (Media section Phase 1). Idempotent; safe
+  /// to call from both onUpgrade and the beforeOpen backstop.
+  Future<void> _assertMediaRetainInLibraryColumn() async {
+    final cols = await customSelect("PRAGMA table_info('media')").get();
+    if (cols.isEmpty) return;
+    final names = cols.map((c) => c.read<String>('name')).toSet();
+    if (!names.contains('retain_in_library')) {
+      await customStatement(
+        'ALTER TABLE media ADD COLUMN retain_in_library '
+        'INTEGER NOT NULL DEFAULT 0 CHECK (retain_in_library IN (0, 1))',
+      );
     }
   }
 
@@ -7161,6 +7184,15 @@ class AppDatabase extends _$AppDatabase {
           await _clearGeneratedWeatherDescriptions();
         }
         if (from < 137) await reportProgress();
+        // v140: media.retain_in_library (Media section Phase 1). v138
+        // (divelogs) and v139 (equipment currency) live on parallel branches;
+        // a DB arriving here from 137 skips straight to 140 and the
+        // beforeOpen backstop self-heals any DB a parallel branch strands in
+        // between.
+        if (from < 140) {
+          await _assertMediaRetainInLibraryColumn();
+        }
+        if (from < 140) await reportProgress();
       },
       beforeOpen: (details) async {
         // Enable foreign keys
@@ -7181,6 +7213,9 @@ class AppDatabase extends _$AppDatabase {
 
         // v137 backstop: re-assert dives.weather_code.
         await _assertWeatherCodeColumn();
+
+        // v140 backstop: re-assert media.retain_in_library.
+        await _assertMediaRetainInLibraryColumn();
 
         // v106 backstop: re-assert connector-suggestion columns (the helper
         // is self-guarding when the suggestions table is absent).
