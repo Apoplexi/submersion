@@ -9,6 +9,11 @@ class AppLocalizationsHu extends AppLocalizations {
   AppLocalizationsHu([String locale = 'hu']) : super(locale);
 
   @override
+  String diveLog_edit_flightWindowWarning(String time) {
+    return 'Ez a merülés a járatod előtti utolsó biztonságos felszínre érési idő után ér véget ($time)';
+  }
+
+  @override
   String diveLog_edit_geofenceSuggestion_near(String location) {
     return '$location közelében';
   }

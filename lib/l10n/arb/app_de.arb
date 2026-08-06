@@ -1,5 +1,13 @@
 {
   "diveSites_list_menu_select": "Tauchplätze auswählen",
+  "diveLog_edit_flightWindowWarning": "Dieser Tauchgang endet nach der letzten sicheren Auftauchzeit für deinen Flug ({time})",
+  "@diveLog_edit_flightWindowWarning": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
   "diveLog_edit_geofenceSuggestion_near": "In der Nähe von {location}",
   "diveLog_edit_geofenceSuggestion_title": "Ausrüstungsvorschlag",
   "diveLog_edit_geofenceSuggestion_body": "Set \"{setName}\" übernehmen?",

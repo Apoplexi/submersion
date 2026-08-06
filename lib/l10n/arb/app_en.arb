@@ -1,4 +1,12 @@
 {
+  "diveLog_edit_flightWindowWarning": "This dive ends after the latest safe surfacing time for your flight ({time})",
+  "@diveLog_edit_flightWindowWarning": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
   "diveLog_edit_geofenceSuggestion_near": "Near {location}",
   "@diveLog_edit_geofenceSuggestion_near": {
     "placeholders": {

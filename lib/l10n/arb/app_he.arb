@@ -1,5 +1,13 @@
 {
   "diveSites_list_menu_select": "בחירת אתרים",
+  "diveLog_edit_flightWindowWarning": "הצלילה הזו מסתיימת אחרי הזמן הבטוח האחרון לעלייה לפני הטיסה שלך ({time})",
+  "@diveLog_edit_flightWindowWarning": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
   "diveLog_edit_geofenceSuggestion_near": "ליד {location}",
   "diveLog_edit_geofenceSuggestion_title": "הצעת ציוד",
   "diveLog_edit_geofenceSuggestion_body": "להחיל את ערכת \"{setName}\"?",

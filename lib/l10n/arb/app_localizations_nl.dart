@@ -9,6 +9,11 @@ class AppLocalizationsNl extends AppLocalizations {
   AppLocalizationsNl([String locale = 'nl']) : super(locale);
 
   @override
+  String diveLog_edit_flightWindowWarning(String time) {
+    return 'Deze duik eindigt na het laatste veilige opstijgmoment voor je vlucht ($time)';
+  }
+
+  @override
   String diveLog_edit_geofenceSuggestion_near(String location) {
     return 'Bij $location';
   }

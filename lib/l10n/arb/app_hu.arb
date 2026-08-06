@@ -1,5 +1,13 @@
 {
   "diveSites_list_menu_select": "Merülőhelyek kiválasztása",
+  "diveLog_edit_flightWindowWarning": "Ez a merülés a járatod előtti utolsó biztonságos felszínre érési idő után ér véget ({time})",
+  "@diveLog_edit_flightWindowWarning": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
   "diveLog_edit_geofenceSuggestion_near": "{location} közelében",
   "diveLog_edit_geofenceSuggestion_title": "Felszerelési javaslat",
   "diveLog_edit_geofenceSuggestion_body": "Alkalmazza a(z) \"{setName}\" készletet?",

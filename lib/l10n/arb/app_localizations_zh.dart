@@ -9,6 +9,11 @@ class AppLocalizationsZh extends AppLocalizations {
   AppLocalizationsZh([String locale = 'zh']) : super(locale);
 
   @override
+  String diveLog_edit_flightWindowWarning(String time) {
+    return '此次潜水的结束时间晚于您航班的最后安全出水时间($time)';
+  }
+
+  @override
   String diveLog_edit_geofenceSuggestion_near(String location) {
     return '靠近 $location';
   }

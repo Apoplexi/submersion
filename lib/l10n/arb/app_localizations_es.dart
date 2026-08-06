@@ -9,6 +9,11 @@ class AppLocalizationsEs extends AppLocalizations {
   AppLocalizationsEs([String locale = 'es']) : super(locale);
 
   @override
+  String diveLog_edit_flightWindowWarning(String time) {
+    return 'Esta inmersión termina después de la última hora segura para emerger antes de tu vuelo ($time)';
+  }
+
+  @override
   String diveLog_edit_geofenceSuggestion_near(String location) {
     return 'Cerca de $location';
   }

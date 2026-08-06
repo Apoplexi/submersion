@@ -116,6 +116,12 @@ abstract class AppLocalizations {
     Locale('zh'),
   ];
 
+  /// No description provided for @diveLog_edit_flightWindowWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'This dive ends after the latest safe surfacing time for your flight ({time})'**
+  String diveLog_edit_flightWindowWarning(String time);
+
   /// No description provided for @diveLog_edit_geofenceSuggestion_near.
   ///
   /// In en, this message translates to:

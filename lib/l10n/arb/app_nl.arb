@@ -1,5 +1,13 @@
 {
   "diveSites_list_menu_select": "Duikstekken selecteren",
+  "diveLog_edit_flightWindowWarning": "Deze duik eindigt na het laatste veilige opstijgmoment voor je vlucht ({time})",
+  "@diveLog_edit_flightWindowWarning": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
   "diveLog_edit_geofenceSuggestion_near": "Bij {location}",
   "diveLog_edit_geofenceSuggestion_title": "Uitrustingssuggestie",
   "diveLog_edit_geofenceSuggestion_body": "Set \"{setName}\" toepassen?",

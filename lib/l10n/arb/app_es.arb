@@ -1,5 +1,13 @@
 {
   "diveSites_list_menu_select": "Seleccionar puntos",
+  "diveLog_edit_flightWindowWarning": "Esta inmersión termina después de la última hora segura para emerger antes de tu vuelo ({time})",
+  "@diveLog_edit_flightWindowWarning": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
   "diveLog_edit_geofenceSuggestion_near": "Cerca de {location}",
   "diveLog_edit_geofenceSuggestion_title": "Sugerencia de equipo",
   "diveLog_edit_geofenceSuggestion_body": "¿Aplicar tu conjunto \"{setName}\"?",
