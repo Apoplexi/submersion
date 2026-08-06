@@ -11759,6 +11759,17 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get media_diveMediaSection_replaceButton => 'Neu verknüpfen';
+
+  @override
+  String get media_diveMediaSection_replaceEditedContent =>
+      'Der Inhalt dieser Datei unterscheidet sich vom Original. Beim Neuverknüpfen wird sie erneut in Ihren Medienspeicher hochgeladen.';
+
+  @override
+  String get media_diveMediaSection_replaceEditedTitle =>
+      'Dateiinhalt unterscheidet sich';
+
+  @override
   String get media_diveMediaSection_unlinkButton => 'Trennen';
 
   @override

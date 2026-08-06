@@ -11578,6 +11578,17 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get media_diveMediaSection_replaceButton => 'Re-link';
+
+  @override
+  String get media_diveMediaSection_replaceEditedContent =>
+      'This file\'s contents differ from the original. Re-linking will re-upload it to your media store.';
+
+  @override
+  String get media_diveMediaSection_replaceEditedTitle =>
+      'File contents differ';
+
+  @override
   String get media_diveMediaSection_unlinkButton => 'Unlink';
 
   @override

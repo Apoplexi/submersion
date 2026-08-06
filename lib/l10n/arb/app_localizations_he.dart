@@ -11480,6 +11480,16 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
+  String get media_diveMediaSection_replaceButton => 'קישור מחדש';
+
+  @override
+  String get media_diveMediaSection_replaceEditedContent =>
+      'תוכן הקובץ שונה מהמקור. קישור מחדש יעלה אותו שוב למאגר המדיה שלך.';
+
+  @override
+  String get media_diveMediaSection_replaceEditedTitle => 'תוכן הקובץ שונה';
+
+  @override
   String get media_diveMediaSection_unlinkButton => 'בטל קישור';
 
   @override

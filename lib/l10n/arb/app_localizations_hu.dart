@@ -11733,6 +11733,17 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String get media_diveMediaSection_replaceButton => 'Újracsatolás';
+
+  @override
+  String get media_diveMediaSection_replaceEditedContent =>
+      'A fájl tartalma eltér az eredetitől. Az újracsatolás újra feltölti a médiatárba.';
+
+  @override
+  String get media_diveMediaSection_replaceEditedTitle =>
+      'A fájl tartalma eltér';
+
+  @override
   String get media_diveMediaSection_unlinkButton => 'Levalasztas';
 
   @override

@@ -11232,6 +11232,16 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get media_diveMediaSection_replaceButton => '重新关联';
+
+  @override
+  String get media_diveMediaSection_replaceEditedContent =>
+      '此文件的内容与原始文件不同。重新关联会将其重新上传到您的媒体存储。';
+
+  @override
+  String get media_diveMediaSection_replaceEditedTitle => '文件内容不同';
+
+  @override
   String get media_diveMediaSection_unlinkButton => '取消关联';
 
   @override

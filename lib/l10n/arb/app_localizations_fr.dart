@@ -11806,6 +11806,17 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String get media_diveMediaSection_replaceButton => 'Relier';
+
+  @override
+  String get media_diveMediaSection_replaceEditedContent =>
+      'Le contenu de ce fichier diffère de l\'original. Le relier entraînera son renvoi vers votre stockage multimédia.';
+
+  @override
+  String get media_diveMediaSection_replaceEditedTitle =>
+      'Le contenu du fichier diffère';
+
+  @override
   String get media_diveMediaSection_unlinkButton => 'Dissocier';
 
   @override

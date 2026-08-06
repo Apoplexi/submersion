@@ -11758,6 +11758,17 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
+  String get media_diveMediaSection_replaceButton => 'Volver a vincular';
+
+  @override
+  String get media_diveMediaSection_replaceEditedContent =>
+      'El contenido de este archivo difiere del original. Volver a vincularlo lo resubirá a su almacén multimedia.';
+
+  @override
+  String get media_diveMediaSection_replaceEditedTitle =>
+      'El contenido del archivo difiere';
+
+  @override
   String get media_diveMediaSection_unlinkButton => 'Desvincular';
 
   @override

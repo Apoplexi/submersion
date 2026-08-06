@@ -20060,6 +20060,24 @@ abstract class AppLocalizations {
   /// **'Delete {count} items?'**
   String media_diveMediaSection_deleteSelectedTitle(int count);
 
+  /// Replace-link confirm action for a changed file
+  ///
+  /// In en, this message translates to:
+  /// **'Re-link'**
+  String get media_diveMediaSection_replaceButton;
+
+  /// Body of the changed-bytes replace-link confirmation
+  ///
+  /// In en, this message translates to:
+  /// **'This file\'s contents differ from the original. Re-linking will re-upload it to your media store.'**
+  String get media_diveMediaSection_replaceEditedContent;
+
+  /// Title of the changed-bytes replace-link confirmation
+  ///
+  /// In en, this message translates to:
+  /// **'File contents differ'**
+  String get media_diveMediaSection_replaceEditedTitle;
+
   /// No description provided for @media_diveMediaSection_unlinkButton.
   ///
   /// In en, this message translates to:

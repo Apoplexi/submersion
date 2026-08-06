@@ -11682,6 +11682,17 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String get media_diveMediaSection_replaceButton => 'Opnieuw koppelen';
+
+  @override
+  String get media_diveMediaSection_replaceEditedContent =>
+      'De inhoud van dit bestand verschilt van het origineel. Opnieuw koppelen uploadt het opnieuw naar je mediaopslag.';
+
+  @override
+  String get media_diveMediaSection_replaceEditedTitle =>
+      'Bestandsinhoud verschilt';
+
+  @override
   String get media_diveMediaSection_unlinkButton => 'Ontkoppelen';
 
   @override

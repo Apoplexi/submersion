@@ -6693,6 +6693,18 @@
       }
     }
   },
+  "media_diveMediaSection_replaceButton": "Re-link",
+  "@media_diveMediaSection_replaceButton": {
+    "description": "Replace-link confirm action for a changed file"
+  },
+  "media_diveMediaSection_replaceEditedContent": "This file's contents differ from the original. Re-linking will re-upload it to your media store.",
+  "@media_diveMediaSection_replaceEditedContent": {
+    "description": "Body of the changed-bytes replace-link confirmation"
+  },
+  "media_diveMediaSection_replaceEditedTitle": "File contents differ",
+  "@media_diveMediaSection_replaceEditedTitle": {
+    "description": "Title of the changed-bytes replace-link confirmation"
+  },
   "media_diveMediaSection_unlinkButton": "Unlink",
   "media_diveMediaSection_unlinkDialogContent": "Remove this photo from the dive? The photo will remain in your gallery.",
   "media_diveMediaSection_unlinkDialogTitle": "Unlink Photo",

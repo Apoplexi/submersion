@@ -11559,6 +11559,16 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String get media_diveMediaSection_replaceButton => 'إعادة الربط';
+
+  @override
+  String get media_diveMediaSection_replaceEditedContent =>
+      'محتوى هذا الملف يختلف عن الأصل. إعادة الربط ستعيد رفعه إلى مخزن الوسائط الخاص بك.';
+
+  @override
+  String get media_diveMediaSection_replaceEditedTitle => 'محتوى الملف مختلف';
+
+  @override
   String get media_diveMediaSection_unlinkButton => 'إلغاء الربط';
 
   @override

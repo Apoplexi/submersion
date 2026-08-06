@@ -11774,6 +11774,17 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
+  String get media_diveMediaSection_replaceButton => 'Revincular';
+
+  @override
+  String get media_diveMediaSection_replaceEditedContent =>
+      'O conteúdo deste arquivo difere do original. Revincular fará um novo envio para seu armazenamento de mídia.';
+
+  @override
+  String get media_diveMediaSection_replaceEditedTitle =>
+      'O conteúdo do arquivo difere';
+
+  @override
   String get media_diveMediaSection_unlinkButton => 'Desvincular';
 
   @override
