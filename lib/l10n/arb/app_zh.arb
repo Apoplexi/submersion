@@ -3366,6 +3366,42 @@
   "equipment_serviceClocks_overdueSince": "自 {date} 起逾期",
   "equipment_serviceClocks_overdue": "已逾期",
   "equipment_serviceClocks_divesLeft": "剩余 {remaining}/{total} 次潜水",
+  "cylinderConfigs_title": "气瓶配置",
+  "cylinderConfigs_empty": "尚无配置",
+  "cylinderConfigs_emptyBody": "保存一次稀释气与备用气配置，即可应用到任何一次潜水。",
+  "cylinderConfigs_new": "新建配置",
+  "cylinderConfigs_name": "名称",
+  "cylinderConfigs_nameRequired": "请输入名称",
+  "cylinderConfigs_forUnit": "所属设备",
+  "cylinderConfigs_noUnit": "通用气体方案",
+  "cylinderConfigs_gasPlans": "气体方案",
+  "cylinderConfigs_addCylinder": "添加气瓶",
+  "cylinderConfigs_role": "用途",
+  "cylinderConfigs_startPressure": "起始压力",
+  "cylinderConfigs_label": "标签",
+  "cylinderConfigs_fromPreset": "从预设填入",
+  "cylinderConfigs_deleteTitle": "删除此配置？",
+  "cylinderConfigs_deleteBody": "已应用过的潜水不会改变。",
+  "cylinderConfigs_applyAction": "应用配置",
+  "cylinderConfigs_applyAdded": "{count, plural, other{已添加 {count} 个气瓶}}",
+  "@cylinderConfigs_applyAdded": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "cylinderConfigs_applyKept": "{count, plural, other{保留 {count} 个}}",
+  "@cylinderConfigs_applyKept": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "cylinderConfigs_applyNothingToDo": "该潜水已与配置一致",
+  "cylinderConfigs_sectionTitle": "配置",
+  "equipment_serviceClocks_hoursSource": "根据已记录的潜水时间计算",
   "equipment_serviceClocks_hoursLeft": "剩余 {remaining}/{total} 小时",
   "equipment_serviceClocks_manageKinds": "管理维护类型",
   "equipment_serviceClocks_appliesToClock": "适用的倒计时",
@@ -6304,6 +6340,24 @@
   "attrLabel_sole_type": "鞋底",
   "attrLabel_buoyancy_kg": "浮力",
   "attrLabel_dry_weight_kg": "干重",
+  "attrLabel_unit_type": "设备类型",
+  "attrLabel_mount_configuration": "安装方式",
+  "attrLabel_scrubber_type": "药罐类型",
+  "attrLabel_scrubber_duration_h": "药罐时长（小时）",
+  "attrLabel_o2_cell_count": "氧电池",
+  "attrLabel_diluent_cylinder_l": "稀释气瓶",
+  "attrLabel_o2_cylinder_l": "O2 气瓶",
+  "attrChoice_unit_type_eccr": "电子式 CCR (eCCR)",
+  "attrChoice_unit_type_mccr": "手动式 CCR (mCCR)",
+  "attrChoice_unit_type_hccr": "混合式 CCR (hCCR)",
+  "attrChoice_unit_type_scr_cmf": "SCR - 恒定质量流量",
+  "attrChoice_unit_type_scr_pascr": "SCR - 被动补气",
+  "attrChoice_unit_type_scr_escr": "SCR - 电子控制",
+  "attrChoice_mount_configuration_back": "背挂式",
+  "attrChoice_mount_configuration_chest": "胸挂式",
+  "attrChoice_mount_configuration_sidemount": "侧挂式",
+  "attrChoice_scrubber_type_axial": "轴向",
+  "attrChoice_scrubber_type_radial": "径向",
   "attrChoice_suit_style_full": "全身湿衣",
   "attrChoice_suit_style_shorty": "短款湿衣",
   "attrChoice_suit_style_two_piece": "两件式",

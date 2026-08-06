@@ -10222,6 +10222,92 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String get cylinderConfigs_title => 'Configurations de bouteilles';
+
+  @override
+  String get cylinderConfigs_empty => 'Aucune configuration';
+
+  @override
+  String get cylinderConfigs_emptyBody =>
+      'Enregistrez un montage diluant et bailout une fois, puis appliquez-le à n\'importe quelle plongée.';
+
+  @override
+  String get cylinderConfigs_new => 'Nouvelle configuration';
+
+  @override
+  String get cylinderConfigs_name => 'Nom';
+
+  @override
+  String get cylinderConfigs_nameRequired => 'Saisissez un nom';
+
+  @override
+  String get cylinderConfigs_forUnit => 'Pour l\'appareil';
+
+  @override
+  String get cylinderConfigs_noUnit => 'Plan de gaz générique';
+
+  @override
+  String get cylinderConfigs_gasPlans => 'Plans de gaz';
+
+  @override
+  String get cylinderConfigs_addCylinder => 'Ajouter une bouteille';
+
+  @override
+  String get cylinderConfigs_role => 'Rôle';
+
+  @override
+  String get cylinderConfigs_startPressure => 'Pression de départ';
+
+  @override
+  String get cylinderConfigs_label => 'Libellé';
+
+  @override
+  String get cylinderConfigs_fromPreset => 'Depuis un préréglage';
+
+  @override
+  String get cylinderConfigs_deleteTitle => 'Supprimer la configuration ?';
+
+  @override
+  String get cylinderConfigs_deleteBody =>
+      'Les plongées déjà concernées ne sont pas modifiées.';
+
+  @override
+  String get cylinderConfigs_applyAction => 'Appliquer une configuration';
+
+  @override
+  String cylinderConfigs_applyAdded(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count bouteilles ajoutées',
+      one: '1 bouteille ajoutée',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String cylinderConfigs_applyKept(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count conservées',
+      one: '1 conservée',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get cylinderConfigs_applyNothingToDo =>
+      'Cette plongée correspond déjà à la configuration';
+
+  @override
+  String get cylinderConfigs_sectionTitle => 'Configurations';
+
+  @override
+  String get equipment_serviceClocks_hoursSource =>
+      'Calculé à partir du temps de plongée enregistré';
+
+  @override
   String equipment_serviceClocks_hoursLeft(String remaining, String total) {
     return '$remaining heures restantes sur $total';
   }
@@ -21829,6 +21915,60 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get attrLabel_dry_weight_kg => 'Poids à sec';
+
+  @override
+  String get attrLabel_unit_type => 'Type d\'appareil';
+
+  @override
+  String get attrLabel_mount_configuration => 'Montage';
+
+  @override
+  String get attrLabel_scrubber_type => 'Type de cartouche';
+
+  @override
+  String get attrLabel_scrubber_duration_h => 'Autonomie cartouche (h)';
+
+  @override
+  String get attrLabel_o2_cell_count => 'Cellules O2';
+
+  @override
+  String get attrLabel_diluent_cylinder_l => 'Bouteille de diluant';
+
+  @override
+  String get attrLabel_o2_cylinder_l => 'Bouteille d\'O2';
+
+  @override
+  String get attrChoice_unit_type_eccr => 'CCR électronique (eCCR)';
+
+  @override
+  String get attrChoice_unit_type_mccr => 'CCR manuel (mCCR)';
+
+  @override
+  String get attrChoice_unit_type_hccr => 'CCR hybride (hCCR)';
+
+  @override
+  String get attrChoice_unit_type_scr_cmf => 'SCR - débit massique constant';
+
+  @override
+  String get attrChoice_unit_type_scr_pascr => 'SCR - addition passive';
+
+  @override
+  String get attrChoice_unit_type_scr_escr => 'SCR - régulé électroniquement';
+
+  @override
+  String get attrChoice_mount_configuration_back => 'Montage dorsal';
+
+  @override
+  String get attrChoice_mount_configuration_chest => 'Montage ventral';
+
+  @override
+  String get attrChoice_mount_configuration_sidemount => 'Sidemount';
+
+  @override
+  String get attrChoice_scrubber_type_axial => 'Axiale';
+
+  @override
+  String get attrChoice_scrubber_type_radial => 'Radiale';
 
   @override
   String get attrChoice_suit_style_full => 'Combinaison intégrale';

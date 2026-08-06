@@ -1,6 +1,9 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/features/equipment/domain/constants/equipment_attribute_catalog.dart';
+import 'package:submersion/features/equipment/presentation/utils/equipment_attribute_l10n.dart';
+import 'package:submersion/l10n/arb/app_localizations.dart';
 
 void main() {
   test('every equipment type resolves to a definition list', () {
@@ -121,5 +124,99 @@ void main() {
     // Non-numeric garbage is still rejected.
     expect(isValidThicknessDesignation('thin'), isFalse);
     expect(isValidThicknessDesignation('abc'), isFalse);
+  });
+
+  test('rebreather is a distinct equipment type with a stable name', () {
+    expect(EquipmentType.values, contains(EquipmentType.rebreather));
+    expect(EquipmentType.rebreather.name, 'rebreather');
+    expect(EquipmentType.rebreather.displayName, 'Rebreather');
+  });
+
+  group('rebreather attributes', () {
+    test('exposes the curated rebreather keys plus the universal ones', () {
+      final keys = EquipmentAttributeCatalog.attributesFor(
+        EquipmentType.rebreather,
+      ).map((d) => d.key).toList();
+
+      expect(keys, [
+        'unit_type',
+        'mount_configuration',
+        'scrubber_type',
+        'scrubber_duration_h',
+        'o2_cell_count',
+        'diluent_cylinder_l',
+        'o2_cylinder_l',
+        'depth_rating_m',
+        'buoyancy_kg',
+        'dry_weight_kg',
+      ]);
+    });
+
+    test('unit_type covers both CCR and SCR variants', () {
+      final def = EquipmentAttributeCatalog.defFor('unit_type');
+      expect(def, isNotNull);
+      expect(def!.kind, AttributeKind.choice);
+      expect(def.choiceKeys, [
+        'eccr',
+        'mccr',
+        'hccr',
+        'scr_cmf',
+        'scr_pascr',
+        'scr_escr',
+      ]);
+    });
+
+    test('onboard cylinder attributes carry the volume dimension', () {
+      for (final key in ['diluent_cylinder_l', 'o2_cylinder_l']) {
+        final def = EquipmentAttributeCatalog.defFor(key);
+        expect(def, isNotNull, reason: key);
+        expect(def!.kind, AttributeKind.number, reason: key);
+        expect(def.dimension, AttributeDimension.volumeL, reason: key);
+      }
+    });
+
+    test('scrubber duration is dimensionless hours, not a unit-converted '
+        'quantity', () {
+      final def = EquipmentAttributeCatalog.defFor('scrubber_duration_h');
+      expect(def!.kind, AttributeKind.number);
+      expect(def.dimension, AttributeDimension.none);
+    });
+
+    testWidgets('every rebreather attribute and choice resolves to a label', (
+      tester,
+    ) async {
+      late AppLocalizations l10n;
+      await tester.pumpWidget(
+        MaterialApp(
+          locale: const Locale('en'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: Builder(
+            builder: (context) {
+              l10n = AppLocalizations.of(context);
+              return const SizedBox.shrink();
+            },
+          ),
+        ),
+      );
+
+      final defs = EquipmentAttributeCatalog.attributesFor(
+        EquipmentType.rebreather,
+      );
+      for (final def in defs) {
+        expect(
+          attributeLabel(l10n, def.key),
+          isNot(def.key),
+          reason: 'missing attrLabel_${def.key}',
+        );
+        for (final option in def.choiceKeys) {
+          expect(
+            attributeChoiceLabel(l10n, def.key, option),
+            isNot(option),
+            reason: 'missing attrChoice_${def.key}_$option',
+          );
+        }
+      }
+    });
   });
 }
