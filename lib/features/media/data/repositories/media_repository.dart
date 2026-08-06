@@ -6,6 +6,7 @@ import 'package:submersion/core/database/database.dart';
 import 'package:submersion/core/services/database_service.dart';
 import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/core/services/sync/sync_event_bus.dart';
+import 'package:submersion/features/media/data/repositories/media_row_mapper.dart';
 import 'package:submersion/features/media/domain/entities/media_item.dart'
     as domain;
 import 'package:submersion/features/media/domain/entities/media_source_type.dart';
@@ -35,7 +36,7 @@ class MediaRepository {
       return rows.map((row) {
         final mediaRow = row.readTable(_db.media);
         final enrichmentRow = row.readTableOrNull(_db.mediaEnrichment);
-        return _mapRowToMediaItem(mediaRow, enrichmentRow);
+        return mediaItemFromRow(mediaRow, enrichmentRow);
       }).toList();
     } catch (e, stackTrace) {
       _log.error(
@@ -63,7 +64,7 @@ class MediaRepository {
 
       final mediaRow = row.readTable(_db.media);
       final enrichmentRow = row.readTableOrNull(_db.mediaEnrichment);
-      return _mapRowToMediaItem(mediaRow, enrichmentRow);
+      return mediaItemFromRow(mediaRow, enrichmentRow);
     } catch (e, stackTrace) {
       _log.error(
         'Failed to get media by id: $id',
@@ -90,7 +91,7 @@ class MediaRepository {
             ])
             ..where(
               _db.media.fileType.equals(
-                    _mediaTypeToString(domain.MediaType.photo),
+                    mediaTypeToDbString(domain.MediaType.photo),
                   ) &
                   _db.media.diveId.isNotNull(),
             )
@@ -101,7 +102,7 @@ class MediaRepository {
       return rows.map((row) {
         final mediaRow = row.readTable(_db.media);
         final enrichmentRow = row.readTableOrNull(_db.mediaEnrichment);
-        return _mapRowToMediaItem(mediaRow, enrichmentRow);
+        return mediaItemFromRow(mediaRow, enrichmentRow);
       }).toList();
     } catch (e, stackTrace) {
       _log.error(
@@ -147,7 +148,7 @@ class MediaRepository {
               diveId: Value(item.diveId),
               siteId: Value(item.siteId),
               filePath: Value(item.filePath ?? ''),
-              fileType: Value(_mediaTypeToString(item.mediaType)),
+              fileType: Value(mediaTypeToDbString(item.mediaType)),
               platformAssetId: Value(item.platformAssetId),
               originalFilename: Value(item.originalFilename),
               latitude: Value(item.latitude),
@@ -230,7 +231,7 @@ class MediaRepository {
           diveId: Value(item.diveId),
           siteId: Value(item.siteId),
           filePath: Value(item.filePath ?? ''),
-          fileType: Value(_mediaTypeToString(item.mediaType)),
+          fileType: Value(mediaTypeToDbString(item.mediaType)),
           platformAssetId: Value(item.platformAssetId),
           originalFilename: Value(item.originalFilename),
           latitude: Value(item.latitude),
@@ -425,7 +426,7 @@ class MediaRepository {
       return rows.map((row) {
         final mediaRow = row.readTable(_db.media);
         final enrichmentRow = row.readTableOrNull(_db.mediaEnrichment);
-        return _mapRowToMediaItem(mediaRow, enrichmentRow);
+        return mediaItemFromRow(mediaRow, enrichmentRow);
       }).toList();
     } catch (e, stackTrace) {
       _log.error(
@@ -458,7 +459,7 @@ class MediaRepository {
       return rows.map((row) {
         final mediaRow = row.readTable(_db.media);
         final enrichmentRow = row.readTableOrNull(_db.mediaEnrichment);
-        return _mapRowToMediaItem(mediaRow, enrichmentRow);
+        return mediaItemFromRow(mediaRow, enrichmentRow);
       }).toList();
     } catch (e, stackTrace) {
       _log.error(
@@ -516,7 +517,7 @@ class MediaRepository {
       return rows.map((row) {
         final mediaRow = row.readTable(_db.media);
         final enrichmentRow = row.readTableOrNull(_db.mediaEnrichment);
-        return _mapRowToMediaItem(mediaRow, enrichmentRow);
+        return mediaItemFromRow(mediaRow, enrichmentRow);
       }).toList();
     } catch (e, stackTrace) {
       _log.error(
@@ -576,7 +577,7 @@ class MediaRepository {
         ..where((t) => t.mediaId.equals(mediaId));
 
       final row = await query.getSingleOrNull();
-      return row != null ? _mapRowToEnrichment(row) : null;
+      return row != null ? mediaEnrichmentFromRow(row) : null;
     } catch (e, stackTrace) {
       _log.error(
         'Failed to get enrichment for media: $mediaId',
@@ -1017,7 +1018,7 @@ class MediaRepository {
       if (keep) {
         unlinkIds.add(row.id);
       } else {
-        doomed.add(_mapRowToMediaItem(row));
+        doomed.add(mediaItemFromRow(row));
       }
     }
     return (doomed: doomed, unlinkIds: unlinkIds);
@@ -1301,123 +1302,5 @@ class MediaRepository {
       ..addColumns([count])
       ..where(_db.media.contentHash.equals(contentHash));
     return (await query.getSingle()).read(count) ?? 0;
-  }
-
-  domain.MediaItem _mapRowToMediaItem(
-    MediaData row, [
-    MediaEnrichmentData? enrichmentRow,
-  ]) {
-    return domain.MediaItem(
-      id: row.id,
-      diveId: row.diveId,
-      siteId: row.siteId,
-      platformAssetId: row.platformAssetId,
-      filePath: row.filePath,
-      originalFilename: row.originalFilename,
-      mediaType: _parseMediaType(row.fileType),
-      latitude: row.latitude,
-      longitude: row.longitude,
-      // taken_at is stored as wall-clock-UTC millis (see the write path and the
-      // dive side, which reads entry_time with isUtc: true). Hydrate it as UTC
-      // so downstream normalisation (TripMediaScanner.toWallClockUtc, invoked by
-      // EnrichmentService.calculateEnrichment) is a no-op instead of shifting the
-      // photo time by the host's UTC offset.
-      takenAt: row.takenAt != null
-          ? DateTime.fromMillisecondsSinceEpoch(row.takenAt!, isUtc: true)
-          : _defaultTakenAt(row.id),
-      width: row.width,
-      height: row.height,
-      durationSeconds: row.durationSeconds,
-      caption: row.caption,
-      isFavorite: row.isFavorite,
-      thumbnailPath: null, // Not stored in database
-      thumbnailGeneratedAt: row.thumbnailGeneratedAt != null
-          ? DateTime.fromMillisecondsSinceEpoch(row.thumbnailGeneratedAt!)
-          : null,
-      lastVerifiedAt: row.lastVerifiedAt != null
-          ? DateTime.fromMillisecondsSinceEpoch(row.lastVerifiedAt!)
-          : null,
-      isOrphaned: row.isOrphaned,
-      signerId: row.signerId,
-      signerName: row.signerName,
-      imageData: row.imageData,
-      sourceType:
-          MediaSourceType.fromString(row.sourceType) ??
-          MediaSourceType.platformGallery,
-      localPath: row.localPath,
-      bookmarkRef: row.bookmarkRef,
-      url: row.url,
-      subscriptionId: row.subscriptionId,
-      entryKey: row.entryKey,
-      connectorAccountId: row.connectorAccountId,
-      remoteAssetId: row.remoteAssetId,
-      originDeviceId: row.originDeviceId,
-      contentHash: row.contentHash,
-      contentSizeBytes: row.contentSizeBytes,
-      remoteUploadedAt: row.remoteUploadedAt != null
-          ? DateTime.fromMillisecondsSinceEpoch(row.remoteUploadedAt!)
-          : null,
-      remoteThumbUploadedAt: row.remoteThumbUploadedAt != null
-          ? DateTime.fromMillisecondsSinceEpoch(row.remoteThumbUploadedAt!)
-          : null,
-      compressedLevel: row.compressedLevel,
-      compressedSizeBytes: row.compressedSizeBytes,
-      remoteCompressedUploadedAt: row.remoteCompressedUploadedAt != null
-          ? DateTime.fromMillisecondsSinceEpoch(row.remoteCompressedUploadedAt!)
-          : null,
-      createdAt: DateTime.fromMillisecondsSinceEpoch(row.createdAt),
-      updatedAt: DateTime.fromMillisecondsSinceEpoch(row.updatedAt),
-      enrichment: enrichmentRow != null
-          ? _mapRowToEnrichment(enrichmentRow)
-          : null,
-    );
-  }
-
-  domain.MediaEnrichment _mapRowToEnrichment(MediaEnrichmentData row) {
-    return domain.MediaEnrichment(
-      id: row.id,
-      mediaId: row.mediaId,
-      diveId: row.diveId,
-      depthMeters: row.depthMeters,
-      temperatureCelsius: row.temperatureCelsius,
-      elapsedSeconds: row.elapsedSeconds,
-      matchConfidence:
-          domain.MatchConfidence.fromString(row.matchConfidence) ??
-          domain.MatchConfidence.noProfile,
-      timestampOffsetSeconds: row.timestampOffsetSeconds,
-      createdAt: DateTime.fromMillisecondsSinceEpoch(row.createdAt),
-    );
-  }
-
-  /// Parses database file_type string to MediaType enum.
-  /// Handles both snake_case (database format) and camelCase (legacy) for compatibility.
-  domain.MediaType _parseMediaType(String value) {
-    switch (value) {
-      case 'video':
-        return domain.MediaType.video;
-      case 'instructor_signature':
-      case 'instructorSignature':
-        return domain.MediaType.instructorSignature;
-      default:
-        return domain.MediaType.photo;
-    }
-  }
-
-  String _mediaTypeToString(domain.MediaType type) {
-    switch (type) {
-      case domain.MediaType.video:
-        return 'video';
-      case domain.MediaType.instructorSignature:
-        return 'instructor_signature';
-      case domain.MediaType.photo:
-        return 'photo';
-    }
-  }
-
-  /// Returns a default DateTime when takenAt is null in database.
-  /// Logs a warning since this indicates data integrity issues.
-  DateTime _defaultTakenAt(String mediaId) {
-    _log.warning('Media $mediaId has null takenAt, defaulting to now');
-    return DateTime.now();
   }
 }
