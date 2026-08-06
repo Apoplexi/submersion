@@ -11752,6 +11752,23 @@ class AppLocalizationsIt extends AppLocalizations {
   String get media_diveMediaSection_title => 'Foto e video';
 
   @override
+  String get media_diveMediaSection_deleteButton => 'Elimina';
+
+  @override
+  String get media_diveMediaSection_deleteSelectedContent =>
+      'Questo li rimuove dall\'app e da qualsiasi archivio multimediale. Non può essere annullato.';
+
+  @override
+  String media_diveMediaSection_deleteSelectedSuccess(int count) {
+    return '$count elementi eliminati';
+  }
+
+  @override
+  String media_diveMediaSection_deleteSelectedTitle(int count) {
+    return 'Eliminare $count elementi?';
+  }
+
+  @override
   String get media_diveMediaSection_unlinkButton => 'Scollega';
 
   @override

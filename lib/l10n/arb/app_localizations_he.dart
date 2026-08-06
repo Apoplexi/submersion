@@ -11463,6 +11463,23 @@ class AppLocalizationsHe extends AppLocalizations {
   String get media_diveMediaSection_title => 'תמונות וסרטונים';
 
   @override
+  String get media_diveMediaSection_deleteButton => 'מחיקה';
+
+  @override
+  String get media_diveMediaSection_deleteSelectedContent =>
+      'פעולה זו מסירה אותם מהאפליקציה ומכל מאגר מדיה. לא ניתן לבטל זאת.';
+
+  @override
+  String media_diveMediaSection_deleteSelectedSuccess(int count) {
+    return '$count פריטים נמחקו';
+  }
+
+  @override
+  String media_diveMediaSection_deleteSelectedTitle(int count) {
+    return 'למחוק $count פריטים?';
+  }
+
+  @override
   String get media_diveMediaSection_unlinkButton => 'בטל קישור';
 
   @override

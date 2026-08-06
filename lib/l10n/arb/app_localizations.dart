@@ -20036,6 +20036,30 @@ abstract class AppLocalizations {
   /// **'Photos & Video'**
   String get media_diveMediaSection_title;
 
+  /// Dive media selection: destructive delete action
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get media_diveMediaSection_deleteButton;
+
+  /// Body of the dive media bulk delete confirmation
+  ///
+  /// In en, this message translates to:
+  /// **'This removes them from the app and any media store. This cannot be undone.'**
+  String get media_diveMediaSection_deleteSelectedContent;
+
+  /// No description provided for @media_diveMediaSection_deleteSelectedSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Deleted {count} items'**
+  String media_diveMediaSection_deleteSelectedSuccess(int count);
+
+  /// No description provided for @media_diveMediaSection_deleteSelectedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete {count} items?'**
+  String media_diveMediaSection_deleteSelectedTitle(int count);
+
   /// No description provided for @media_diveMediaSection_unlinkButton.
   ///
   /// In en, this message translates to:

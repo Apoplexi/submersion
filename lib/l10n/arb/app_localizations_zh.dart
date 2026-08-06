@@ -11215,6 +11215,23 @@ class AppLocalizationsZh extends AppLocalizations {
   String get media_diveMediaSection_title => '照片 & 视频';
 
   @override
+  String get media_diveMediaSection_deleteButton => '删除';
+
+  @override
+  String get media_diveMediaSection_deleteSelectedContent =>
+      '这会将它们从应用和任何媒体存储中移除。此操作无法撤销。';
+
+  @override
+  String media_diveMediaSection_deleteSelectedSuccess(int count) {
+    return '已删除 $count 个项目';
+  }
+
+  @override
+  String media_diveMediaSection_deleteSelectedTitle(int count) {
+    return '删除 $count 个项目？';
+  }
+
+  @override
   String get media_diveMediaSection_unlinkButton => '取消关联';
 
   @override

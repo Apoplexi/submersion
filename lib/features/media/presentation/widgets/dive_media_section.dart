@@ -170,6 +170,77 @@ class _DiveMediaSectionState extends ConsumerState<DiveMediaSection> {
 
     if (confirmed == true && context.mounted) {
       try {
+        // True unlink: the FK clears but the rows stay in the library,
+        // exactly what this dialog's copy has always promised.
+        await ref
+            .read(mediaListNotifierProvider(widget.diveId).notifier)
+            .unlinkMultipleMedia(selectedIds);
+
+        _exitSelectionMode();
+
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                context.l10n.media_diveMediaSection_unlinkSelectedSuccess(
+                  selectedIds.length,
+                ),
+              ),
+            ),
+          );
+        }
+      } catch (e) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                context.l10n.media_diveMediaSection_unlinkError(e.toString()),
+              ),
+              backgroundColor: Theme.of(context).colorScheme.error,
+            ),
+          );
+        }
+      }
+    }
+  }
+
+  Future<void> _deleteSelected(
+    BuildContext context,
+    List<MediaItem> media,
+  ) async {
+    final selectedIds = _selectedIndices
+        .where((i) => i < media.length)
+        .map((i) => media[i].id)
+        .toList();
+
+    if (selectedIds.isEmpty) return;
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(
+          ctx.l10n.media_diveMediaSection_deleteSelectedTitle(
+            selectedIds.length,
+          ),
+        ),
+        content: Text(ctx.l10n.media_diveMediaSection_deleteSelectedContent),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: Text(ctx.l10n.media_diveMediaSection_cancelButton),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: Text(ctx.l10n.media_diveMediaSection_deleteButton),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true && context.mounted) {
+      try {
+        // Destructive path: coordinator-routed so remote-blob delete
+        // intents are enqueued before the rows die.
         await ref
             .read(mediaListNotifierProvider(widget.diveId).notifier)
             .deleteMultipleMedia(selectedIds);
@@ -180,7 +251,7 @@ class _DiveMediaSectionState extends ConsumerState<DiveMediaSection> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                context.l10n.media_diveMediaSection_unlinkSelectedSuccess(
+                context.l10n.media_diveMediaSection_deleteSelectedSuccess(
                   selectedIds.length,
                 ),
               ),
@@ -324,6 +395,7 @@ class _DiveMediaSectionState extends ConsumerState<DiveMediaSection> {
                       onSelectAll: () => _selectAll(media.length),
                       onCancel: _exitSelectionMode,
                       onUnlinkSelected: () => _unlinkSelected(context, media),
+                      onDeleteSelected: () => _deleteSelected(context, media),
                     ),
                   ) ??
                   const SizedBox.shrink()
@@ -463,13 +535,15 @@ class _DiveMediaSectionState extends ConsumerState<DiveMediaSection> {
   }
 }
 
-/// Header shown during multi-select mode with count, select all, and unlink.
+/// Header shown during multi-select mode with count, select all, unlink,
+/// and delete.
 class _SelectionHeader extends StatelessWidget {
   final int selectedCount;
   final int totalCount;
   final VoidCallback onSelectAll;
   final VoidCallback onCancel;
   final VoidCallback onUnlinkSelected;
+  final VoidCallback onDeleteSelected;
 
   const _SelectionHeader({
     required this.selectedCount,
@@ -477,6 +551,7 @@ class _SelectionHeader extends StatelessWidget {
     required this.onSelectAll,
     required this.onCancel,
     required this.onUnlinkSelected,
+    required this.onDeleteSelected,
   });
 
   @override
@@ -502,11 +577,16 @@ class _SelectionHeader extends StatelessWidget {
             child: Text(context.l10n.media_diveMediaSection_selectAllButton),
           ),
         IconButton(
-          icon: Icon(Icons.delete_outline, color: colorScheme.error),
+          icon: const Icon(Icons.link_off),
           tooltip: context.l10n.media_diveMediaSection_unlinkSelectedButton(
             selectedCount,
           ),
           onPressed: selectedCount > 0 ? onUnlinkSelected : null,
+        ),
+        IconButton(
+          icon: Icon(Icons.delete_outline, color: colorScheme.error),
+          tooltip: context.l10n.media_diveMediaSection_deleteButton,
+          onPressed: selectedCount > 0 ? onDeleteSelected : null,
         ),
       ],
     );

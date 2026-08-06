@@ -11716,6 +11716,23 @@ class AppLocalizationsHu extends AppLocalizations {
   String get media_diveMediaSection_title => 'Fotok es videok';
 
   @override
+  String get media_diveMediaSection_deleteButton => 'Törlés';
+
+  @override
+  String get media_diveMediaSection_deleteSelectedContent =>
+      'Ez eltávolítja őket az alkalmazásból és minden médiatárból. Nem vonható vissza.';
+
+  @override
+  String media_diveMediaSection_deleteSelectedSuccess(int count) {
+    return '$count elem törölve';
+  }
+
+  @override
+  String media_diveMediaSection_deleteSelectedTitle(int count) {
+    return '$count elem törlése?';
+  }
+
+  @override
   String get media_diveMediaSection_unlinkButton => 'Levalasztas';
 
   @override

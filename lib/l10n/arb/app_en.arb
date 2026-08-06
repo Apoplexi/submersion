@@ -6669,6 +6669,30 @@
   "media_diveMediaSection_selectedCount": "{count} selected",
   "media_diveMediaSection_thumbnailLabel": "View photo. Long press to select",
   "media_diveMediaSection_title": "Photos & Video",
+  "media_diveMediaSection_deleteButton": "Delete",
+  "@media_diveMediaSection_deleteButton": {
+    "description": "Dive media selection: destructive delete action"
+  },
+  "media_diveMediaSection_deleteSelectedContent": "This removes them from the app and any media store. This cannot be undone.",
+  "@media_diveMediaSection_deleteSelectedContent": {
+    "description": "Body of the dive media bulk delete confirmation"
+  },
+  "media_diveMediaSection_deleteSelectedSuccess": "Deleted {count} items",
+  "@media_diveMediaSection_deleteSelectedSuccess": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "media_diveMediaSection_deleteSelectedTitle": "Delete {count} items?",
+  "@media_diveMediaSection_deleteSelectedTitle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "media_diveMediaSection_unlinkButton": "Unlink",
   "media_diveMediaSection_unlinkDialogContent": "Remove this photo from the dive? The photo will remain in your gallery.",
   "media_diveMediaSection_unlinkDialogTitle": "Unlink Photo",

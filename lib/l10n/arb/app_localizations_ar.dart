@@ -11542,6 +11542,23 @@ class AppLocalizationsAr extends AppLocalizations {
   String get media_diveMediaSection_title => 'الصور والفيديو';
 
   @override
+  String get media_diveMediaSection_deleteButton => 'حذف';
+
+  @override
+  String get media_diveMediaSection_deleteSelectedContent =>
+      'ستتم إزالتها من التطبيق ومن أي مخزن وسائط. لا يمكن التراجع عن هذا.';
+
+  @override
+  String media_diveMediaSection_deleteSelectedSuccess(int count) {
+    return 'تم حذف $count عناصر';
+  }
+
+  @override
+  String media_diveMediaSection_deleteSelectedTitle(int count) {
+    return 'حذف $count عناصر؟';
+  }
+
+  @override
   String get media_diveMediaSection_unlinkButton => 'إلغاء الربط';
 
   @override
