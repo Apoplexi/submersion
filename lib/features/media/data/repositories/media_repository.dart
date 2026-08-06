@@ -128,6 +128,8 @@ class MediaRepository {
       case MediaSourceType.networkUrl:
       case MediaSourceType.manifestEntry:
       case MediaSourceType.signature:
+      // Cloud-backed rows resolve through the store on every device.
+      case MediaSourceType.mediaStore:
         return null;
     }
   }
