@@ -625,12 +625,9 @@ class BackupService {
     BackupRecord record, {
     RestoreMode mode = RestoreMode.merge,
     String? encryptionSecret,
+    void Function(int currentStep, int totalSteps)? onMigrationProgress,
   }) async {
     _log.info('Starting restore from: ${record.filename} (mode: $mode)');
-
-    // Create a proper backup before restoring so the user can find it
-    // in their configured backup location and in the history list.
-    await performBackup();
 
     // Determine backup source path. A SAF (content://) ref is streamed to a
     // temp file first; SQLite open + validation need a real filesystem path.
@@ -674,10 +671,20 @@ class BackupService {
         );
       }
 
+      // Create a proper backup before restoring so the user can find it
+      // in their configured backup location and in the history list. Runs
+      // only after decryption + validation succeeded, so a wrong passphrase
+      // or corrupt artifact aborts the flow without side effects (parity
+      // with restoreFromFile).
+      await performBackup();
+
       // Restore using DatabaseService (handles close/copy/reinitialize), then
       // re-baseline sync so the restored data syncs cleanly instead of
       // replaying the backup's stale sync position.
-      await _replaceDatabaseAndRebaselineSync(materialized.path);
+      await _replaceDatabaseAndRebaselineSync(
+        materialized.path,
+        onMigrationProgress: onMigrationProgress,
+      );
     } finally {
       await materialized.cleanUp();
     }
@@ -703,6 +710,7 @@ class BackupService {
     String filePath, {
     RestoreMode mode = RestoreMode.merge,
     String? encryptionSecret,
+    void Function(int currentStep, int totalSteps)? onMigrationProgress,
   }) async {
     _log.info('Starting restore from file: $filePath (mode: $mode)');
 
@@ -724,7 +732,10 @@ class BackupService {
 
       // Restore using DatabaseService, then re-baseline sync (see
       // _replaceDatabaseAndRebaselineSync).
-      await _replaceDatabaseAndRebaselineSync(materialized.path);
+      await _replaceDatabaseAndRebaselineSync(
+        materialized.path,
+        onMigrationProgress: onMigrationProgress,
+      );
     } finally {
       await materialized.cleanUp();
     }
@@ -748,7 +759,10 @@ class BackupService {
   /// resurrect from a peer's still-live copy. This preserves the live device
   /// identity (captured before the swap) and clears the sync position so the
   /// next sync cleanly reconciles the restored data.
-  Future<void> _replaceDatabaseAndRebaselineSync(String sourcePath) async {
+  Future<void> _replaceDatabaseAndRebaselineSync(
+    String sourcePath, {
+    void Function(int currentStep, int totalSteps)? onMigrationProgress,
+  }) async {
     String liveDeviceId;
     try {
       liveDeviceId = await _syncRepository.getDeviceId();
@@ -780,7 +794,10 @@ class BackupService {
       liveEpochId = _epochStore?.lastAcceptedEpochId;
     }
 
-    await _dbAdapter.restore(sourcePath);
+    await _dbAdapter.restore(
+      sourcePath,
+      onMigrationProgress: onMigrationProgress,
+    );
 
     try {
       await _syncRepository.rebaselineAfterRestore(
@@ -1227,9 +1244,10 @@ class BackupService {
     }
 
     try {
-      final bytes = await File(uploadPath).readAsBytes();
-      final result = await _cloudProvider.uploadFile(
-        Uint8List.fromList(bytes),
+      // Path-based upload: providers stream from disk, so a multi-hundred-MB
+      // backup is never resident in memory.
+      final result = await _cloudProvider.uploadFileFromPath(
+        uploadPath,
         uploadName,
         folderId: folderId,
       );
@@ -1331,10 +1349,11 @@ class BackupService {
       throw const BackupException('No cloud provider available for download');
     }
 
-    final bytes = await _cloudProvider.downloadFile(cloudFileId);
     final tempDir = await resolveSyncTempDir();
     final tempPath = p.join(tempDir.path, filename);
-    await File(tempPath).writeAsBytes(bytes);
+    // Path-based download: providers stream to disk and delete a partial
+    // file on failure, so the backup is never resident in memory.
+    await _cloudProvider.downloadToFile(cloudFileId, tempPath);
     return tempPath;
   }
 

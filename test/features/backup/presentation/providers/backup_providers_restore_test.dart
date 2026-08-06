@@ -25,7 +25,10 @@ class _NoopAdapter implements BackupDatabaseAdapter {
   Future<void> backup(String destinationPath) async {}
 
   @override
-  Future<void> restore(String backupPath) async {}
+  Future<void> restore(
+    String backupPath, {
+    void Function(int, int)? onMigrationProgress,
+  }) async {}
 
   @override
   Future<String> get databasePath async => '/noop';
@@ -53,6 +56,11 @@ class _RecordingBackupService extends BackupService {
   /// in-flight (mid-restore) state.
   Completer<void>? restoreGate;
 
+  /// When set, restore fires the caller's onMigrationProgress with these
+  /// (currentStep, totalSteps) values, modelling an older-schema backup whose
+  /// post-swap reopen runs the migration ladder.
+  (int, int)? migrationProgressToEmit;
+
   _RecordingBackupService(BackupPreferences prefs)
     : super(dbAdapter: _NoopAdapter(), preferences: prefs);
 
@@ -74,11 +82,14 @@ class _RecordingBackupService extends BackupService {
     BackupRecord record, {
     RestoreMode mode = RestoreMode.merge,
     String? encryptionSecret,
+    void Function(int currentStep, int totalSteps)? onMigrationProgress,
   }) async {
     calls.add('restoreFromBackup');
     lastMode = mode;
     lastSecret = encryptionSecret;
     _gate(encryptionSecret);
+    final progress = migrationProgressToEmit;
+    if (progress != null) onMigrationProgress?.call(progress.$1, progress.$2);
     if (restoreGate != null) await restoreGate!.future;
   }
 
@@ -87,11 +98,14 @@ class _RecordingBackupService extends BackupService {
     String filePath, {
     RestoreMode mode = RestoreMode.merge,
     String? encryptionSecret,
+    void Function(int currentStep, int totalSteps)? onMigrationProgress,
   }) async {
     calls.add('restoreFromFile');
     lastMode = mode;
     lastSecret = encryptionSecret;
     _gate(encryptionSecret);
+    final progress = migrationProgressToEmit;
+    if (progress != null) onMigrationProgress?.call(progress.$1, progress.$2);
   }
 }
 
@@ -141,6 +155,38 @@ void main() {
 
     expect(service.calls, ['restoreFromFile']);
     expect(service.lastMode, RestoreMode.replace);
+    expect(
+      container.read(backupOperationProvider).status,
+      BackupOperationStatus.restoreComplete,
+    );
+  });
+
+  test('migration progress surfaces in the operation state message', () async {
+    // An older-schema backup runs the migration ladder during the post-swap
+    // reopen. The barrier renders the operation message, so each ladder step
+    // must land there — otherwise a long upgrade is a silent stall.
+    final container = makeContainer();
+    service.migrationProgressToEmit = (3, 7);
+    final messages = <String?>[];
+    container.listen(
+      backupOperationProvider,
+      (_, next) => messages.add(next.message),
+    );
+    final tmp = File(
+      '${Directory.systemTemp.path}/notifier_restore_migration_'
+      '${DateTime.now().microsecondsSinceEpoch}.db',
+    );
+    await tmp.writeAsString('db');
+    addTearDown(() async {
+      if (await tmp.exists()) await tmp.delete();
+    });
+
+    await container
+        .read(backupOperationProvider.notifier)
+        .restoreFromFilePath(tmp.path);
+
+    expect(messages, contains('Upgrading database (step 3 of 7)...'));
+    // The restore still finishes normally after progress updates.
     expect(
       container.read(backupOperationProvider).status,
       BackupOperationStatus.restoreComplete,

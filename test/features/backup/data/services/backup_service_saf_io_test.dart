@@ -27,7 +27,10 @@ class _FileWritingAdapter implements BackupDatabaseAdapter {
   }
 
   @override
-  Future<void> restore(String backupPath) async => restoreCalls++;
+  Future<void> restore(
+    String backupPath, {
+    void Function(int, int)? onMigrationProgress,
+  }) async => restoreCalls++;
 
   @override
   Future<String> get databasePath async => dbPath;
