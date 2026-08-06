@@ -341,6 +341,42 @@ void main() {
     });
   });
 
+  group('Trip.returnFlightAt', () {
+    final base = Trip(
+      id: 't1',
+      name: 'Red Sea',
+      startDate: DateTime.utc(2026, 8, 1),
+      endDate: DateTime.utc(2026, 8, 10),
+      createdAt: DateTime.utc(2026, 7, 1),
+      updatedAt: DateTime.utc(2026, 7, 1),
+    );
+
+    test('defaults to null and is preserved by unrelated copyWith', () {
+      expect(base.returnFlightAt, isNull);
+      final withFlight = base.copyWith(
+        returnFlightAt: DateTime.utc(2026, 8, 10, 14, 30),
+      );
+      expect(
+        withFlight.copyWith(name: 'Renamed').returnFlightAt,
+        DateTime.utc(2026, 8, 10, 14, 30),
+      );
+    });
+
+    test('copyWith clears returnFlightAt with an explicit null', () {
+      final withFlight = base.copyWith(
+        returnFlightAt: DateTime.utc(2026, 8, 10, 14, 30),
+      );
+      expect(withFlight.copyWith(returnFlightAt: null).returnFlightAt, isNull);
+    });
+
+    test('participates in equality', () {
+      expect(
+        base.copyWith(returnFlightAt: DateTime.utc(2026, 8, 10, 14, 30)),
+        isNot(equals(base)),
+      );
+    });
+  });
+
   group('TripWithStats.formattedBottomTime', () {
     Trip makeTrip() => Trip(
       id: 't1',
