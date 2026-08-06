@@ -18,6 +18,10 @@ class BiometricService {
       return await _auth.isDeviceSupported() && await _auth.canCheckBiometrics;
     } on PlatformException {
       return false;
+    } on MissingPluginException {
+      // MissingPluginException is NOT a PlatformException: platforms with no
+      // local_auth backend (and the flutter test host) land here.
+      return false;
     }
   }
 
@@ -30,6 +34,8 @@ class BiometricService {
         persistAcrossBackgrounding: true,
       );
     } on PlatformException {
+      return false;
+    } on MissingPluginException {
       return false;
     }
   }
