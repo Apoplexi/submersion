@@ -1474,6 +1474,13 @@ class DiverSettings extends Table {
   TextColumn get themeMode => text().withDefault(const Constant('system'))();
   TextColumn get themePreset =>
       text().withDefault(const Constant('submersion'))();
+  // Color accents (optional per-surface icon tinting; all default off)
+  BoolColumn get accentNavIcons =>
+      boolean().withDefault(const Constant(false))();
+  BoolColumn get accentSectionHeaders =>
+      boolean().withDefault(const Constant(false))();
+  BoolColumn get accentListIcons =>
+      boolean().withDefault(const Constant(false))();
   // Locale (language preference: 'system', 'en', 'es', 'fr', etc.)
   TextColumn get locale => text().withDefault(const Constant('system'))();
   // Defaults
@@ -2855,7 +2862,7 @@ class AppDatabase extends _$AppDatabase {
 
   /// The current schema version as a static constant so that pre-open checks
   /// (e.g. version-mismatch guard) can reference it without an instance.
-  static const int currentSchemaVersion = 138;
+  static const int currentSchemaVersion = 139;
 
   /// Every schema version that has a migration block in onUpgrade.
   /// Used to calculate progress step counts. When adding a new migration,
@@ -3018,12 +3025,16 @@ class AppDatabase extends _$AppDatabase {
     // v134: media compressed-rendition columns (adjustable upload quality
     // Phase A). Renumbered from v130 as main advanced past it at merge time.
     134,
+    // v135: color accent toggle columns on diver_settings.
+    135,
     136,
     // v137: dives.weather_code, plus a one-time clear of the English weather
     // prose this app generated itself so it can be re-rendered localized.
     137,
-    // v138: diver_settings.default_currency (default currency for priced items).
-    138,
+    // v139: diver_settings.default_currency (default currency for priced
+    // items). Renumbered from v138, which is claimed by the divelogs.de
+    // branch; v138 is deliberately absent from this ladder.
+    139,
   ];
 
   /// Idempotent DDL for the v106 connector-suggestion columns (Lightroom
@@ -3561,6 +3572,28 @@ class AppDatabase extends _$AppDatabase {
     }
   }
 
+  /// v135: color accent toggle columns on diver_settings. Idempotent; safe
+  /// to call from both onUpgrade and the beforeOpen backstop.
+  Future<void> _assertAccentColorSettingsColumns() async {
+    final cols = await customSelect(
+      "PRAGMA table_info('diver_settings')",
+    ).get();
+    if (cols.isEmpty) return;
+    final names = cols.map((c) => c.read<String>('name')).toSet();
+    for (final column in const [
+      'accent_nav_icons',
+      'accent_section_headers',
+      'accent_list_icons',
+    ]) {
+      if (!names.contains(column)) {
+        await customStatement(
+          'ALTER TABLE diver_settings ADD COLUMN $column '
+          'INTEGER NOT NULL DEFAULT 0 CHECK ($column IN (0, 1))',
+        );
+      }
+    }
+  }
+
   /// v111: equipment_sets.is_default column + equipment_set_geofences table.
   /// Idempotent (createTable is IF NOT EXISTS; the ALTER is PRAGMA-guarded) so
   /// it is safe to call from both onUpgrade and the beforeOpen backstop.
@@ -3913,8 +3946,8 @@ class AppDatabase extends _$AppDatabase {
     }
   }
 
-  /// Idempotent DDL for the v138 diver_settings.default_currency column.
-  /// Called from the v138 onUpgrade step and the beforeOpen backstop, and
+  /// Idempotent DDL for the v139 diver_settings.default_currency column.
+  /// Called from the v139 onUpgrade step and the beforeOpen backstop, and
   /// self-guarding when the table is absent (minimal migration-test fixtures).
   Future<void> _assertDefaultCurrencyColumn() async {
     final cols = await customSelect(
@@ -7128,9 +7161,16 @@ class AppDatabase extends _$AppDatabase {
           await _assertMediaCompressedRenditionColumns();
         }
         if (from < 134) await reportProgress();
+        // v135: color accent toggle columns on diver_settings. Devices that
+        // upgraded through main's v136/v137 before this merge skipped 135;
+        // the beforeOpen backstop re-asserts the columns for them.
+        if (from < 135) {
+          await _assertAccentColorSettingsColumns();
+        }
+        if (from < 135) await reportProgress();
         // v136: media_stores.last_sweep_at (Verify Library fleet cadence).
-        // v135 is reserved by a parallel branch; deliberately skipped here,
-        // mirroring the v132-over-v131 precedent.
+        // v136 shipped while v135 was still on its branch, so a DB can be at
+        // 136+ without the accent columns; see the v135 note above.
         if (from < 136) {
           await _assertMediaStoresLastSweepColumn();
         }
@@ -7142,11 +7182,11 @@ class AppDatabase extends _$AppDatabase {
           await _clearGeneratedWeatherDescriptions();
         }
         if (from < 137) await reportProgress();
-        // v138: default currency for priced items (e.g. equipment).
-        if (from < 138) {
+        // v139: default currency for priced items (e.g. equipment).
+        if (from < 139) {
           await _assertDefaultCurrencyColumn();
         }
-        if (from < 138) await reportProgress();
+        if (from < 139) await reportProgress();
       },
       beforeOpen: (details) async {
         // Enable foreign keys
@@ -7168,7 +7208,7 @@ class AppDatabase extends _$AppDatabase {
         // v137 backstop: re-assert dives.weather_code.
         await _assertWeatherCodeColumn();
 
-        // v138 backstop: re-assert diver_settings.default_currency.
+        // v139 backstop: re-assert diver_settings.default_currency.
         await _assertDefaultCurrencyColumn();
 
         // v106 backstop: re-assert connector-suggestion columns (the helper
@@ -7254,6 +7294,9 @@ class AppDatabase extends _$AppDatabase {
 
         // v133 backstop: re-assert the deco stop band settings columns.
         await _assertDecoStopSettingsColumns();
+
+        // v135 backstop: re-assert color accent toggle columns.
+        await _assertAccentColorSettingsColumns();
 
         // Built-in dive types are reference data: identical on every device and
         // undeletable through DiveTypeRepository. Nothing else restores them --
