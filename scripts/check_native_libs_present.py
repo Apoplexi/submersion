@@ -18,6 +18,10 @@ startup with::
     Failed to load dynamic library '/data/data/app.submersion/lib/libsqlite3.so':
     dlopen failed: library "..." not found
 
+The engine is now SQLCipher (``libsqlcipher.so``), and ``sqlcipher_flutter_libs``
+has the identical tombstone hazard one minor version up (``0.7.0+eol``), so the
+same guard applies unchanged to the new library name.
+
 The existing ``check_16kb_alignment`` guard did not catch this: a *missing*
 library is not a *misaligned* library, so the alignment pass was clean. This is
 the complementary check -- it asserts that each required library is present in
@@ -37,13 +41,20 @@ Usage:
 import sys
 import zipfile
 
-# Native libraries that MUST be bundled for every ABI. ``libsqlite3.so`` is the
-# SQLite engine behind Drift; without it the database cannot open and the app is
-# unusable from the first launch (issue #433). It is supplied by the Maven
-# artifact ``eu.simonbinder:sqlite3-native-library`` that sqlite3_flutter_libs
-# 0.5.x depends on -- and only while we remain on sqlite3 2.x. Keep this list in
-# sync with pubspec.yaml's note pinning sqlite3_flutter_libs to 0.5.x.
-REQUIRED_LIBS = ("libsqlite3.so",)
+# Native libraries that MUST be bundled for every ABI. ``libsqlcipher.so`` is
+# the SQLite engine behind Drift; without it the database cannot open and the
+# app is unusable from the first launch (issue #433). It is supplied by the
+# Maven artifact ``net.zetetic:sqlcipher-android`` that sqlcipher_flutter_libs
+# 0.6.x depends on -- and only while we remain on sqlite3 2.x. Keep this list
+# in sync with pubspec.yaml's note pinning sqlcipher_flutter_libs to 0.6.x.
+#
+# The name changed from ``libsqlite3.so`` when App Security replaced
+# sqlite3_flutter_libs with sqlcipher_flutter_libs: SQLCipher is ABI-compatible
+# with SQLite but ships under its own name, and ``openCipherOnAndroid`` (the
+# per-isolate loader override the app installs) dlopens ``libsqlcipher.so``
+# specifically. A build that shipped libsqlite3.so instead would fail exactly
+# the way #433 did.
+REQUIRED_LIBS = ("libsqlcipher.so",)
 
 
 def abi_to_libs(zf):

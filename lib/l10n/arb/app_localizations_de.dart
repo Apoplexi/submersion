@@ -22461,6 +22461,158 @@ class AppLocalizationsDe extends AppLocalizations {
       'Überprüfungsregeln & Fliegen nach dem Tauchen';
 
   @override
+  String get settings_section_security_title => 'App-Sicherheit';
+
+  @override
+  String get settings_section_security_subtitle =>
+      'App-Sperre & Datenbankverschlüsselung';
+
+  @override
+  String get settings_security_appLock => 'App-Sperre';
+
+  @override
+  String get settings_security_appLock_subtitle =>
+      'Passwort oder Biometrie zum Öffnen der App erforderlich';
+
+  @override
+  String get settings_security_biometrics => 'Mit Biometrie entsperren';
+
+  @override
+  String get settings_security_autoLock => 'Automatisch sperren';
+
+  @override
+  String get settings_security_autoLock_immediately => 'Sofort';
+
+  @override
+  String settings_security_autoLock_minutes(int minutes) {
+    String _temp0 = intl.Intl.pluralLogic(
+      minutes,
+      locale: localeName,
+      other: 'Nach $minutes Minuten',
+      one: 'Nach 1 Minute',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get settings_security_autoLock_never => 'Nie';
+
+  @override
+  String get settings_security_encryption => 'Datenbank verschlüsseln';
+
+  @override
+  String get settings_security_encryption_subtitle =>
+      'Schützen Sie Ihre Tauchlog-Datei mit Verschlüsselung im Ruhezustand';
+
+  @override
+  String get settings_security_encryption_progress_backup =>
+      'Sicherheitskopie wird erstellt...';
+
+  @override
+  String get settings_security_encryption_progress_encrypt =>
+      'Datenbank wird verschlüsselt...';
+
+  @override
+  String get settings_security_encryption_progress_decrypt =>
+      'Datenbank wird entschlüsselt...';
+
+  @override
+  String get settings_security_encryption_progress_reopen =>
+      'Datenbank wird neu geöffnet...';
+
+  @override
+  String get settings_security_changePassword => 'Passwort ändern';
+
+  @override
+  String get settings_security_regenerateRecovery =>
+      'Neuer Wiederherstellungscode';
+
+  @override
+  String get settings_security_setPassword => 'App-Passwort festlegen';
+
+  @override
+  String get settings_security_password => 'Passwort';
+
+  @override
+  String get settings_security_confirmPassword => 'Passwort bestätigen';
+
+  @override
+  String get settings_security_currentPassword => 'Aktuelles Passwort';
+
+  @override
+  String get settings_security_newPassword => 'Neues Passwort';
+
+  @override
+  String get settings_security_passwordTooShort =>
+      'Das Passwort muss mindestens 4 Zeichen lang sein.';
+
+  @override
+  String get settings_security_passwordMismatch =>
+      'Die Passwörter stimmen nicht überein.';
+
+  @override
+  String get settings_security_wrongPassword => 'Falsches Passwort.';
+
+  @override
+  String get settings_security_recoveryCode_title =>
+      'Ihr Wiederherstellungscode';
+
+  @override
+  String get settings_security_recoveryCode_explain =>
+      'Notieren Sie diesen Code und bewahren Sie ihn sicher auf. Er ist die einzige Möglichkeit, die App zu entsperren, falls Sie Ihr Passwort vergessen, und ersetzt jeden früheren Wiederherstellungscode.';
+
+  @override
+  String get settings_security_recoveryCode_savedConfirm =>
+      'Ich habe meinen Wiederherstellungscode gespeichert';
+
+  @override
+  String get settings_security_disableBlockedByEncryption_title =>
+      'Verschlüsselung ist aktiv';
+
+  @override
+  String get settings_security_disableBlockedByEncryption_body =>
+      'Deaktivieren Sie zuerst die Datenbankverschlüsselung, bevor Sie die App-Sperre ausschalten. Die verschlüsselte Datenbank benötigt Zugangsdaten.';
+
+  @override
+  String get settings_security_enableEncryption_title =>
+      'Datenbank verschlüsseln?';
+
+  @override
+  String get settings_security_enableEncryption_body =>
+      'Zuerst wird eine Sicherheitskopie erstellt, dann wird die Datenbankdatei direkt neu verschlüsselt. Bei großen Tauchlogs kann das eine Weile dauern.';
+
+  @override
+  String get settings_security_disableEncryption_title =>
+      'Verschlüsselung ausschalten?';
+
+  @override
+  String get settings_security_disableEncryption_body =>
+      'Die Datenbankdatei wird wieder unverschlüsselt auf der Festplatte gespeichert.';
+
+  @override
+  String get settings_security_turnOffAppLock_title =>
+      'App-Sperre ausschalten?';
+
+  @override
+  String get settings_security_turnOffAppLock_body =>
+      'Die App öffnet sich künftig ohne Passwortabfrage.';
+
+  @override
+  String get settings_security_unlock_title => 'Passwort eingeben';
+
+  @override
+  String get settings_security_cancel => 'Abbrechen';
+
+  @override
+  String get settings_security_continue => 'Weiter';
+
+  @override
+  String get settings_security_done => 'Fertig';
+
+  @override
+  String get settings_security_turnOff => 'Ausschalten';
+
+  @override
   String get dataQuality_inbox_title => 'Datenqualität';
 
   @override

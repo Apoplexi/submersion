@@ -12,6 +12,7 @@ import 'package:submersion/core/providers/provider.dart';
 
 import 'package:submersion/features/settings/presentation/pages/column_config_page.dart';
 import 'package:submersion/features/settings/presentation/pages/safety_settings_page.dart';
+import 'package:submersion/features/settings/presentation/pages/security_settings_page.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/core/constants/profile_metrics.dart';
 import 'package:submersion/features/settings/presentation/pages/home_appearance_page.dart';
@@ -143,6 +144,8 @@ class SettingsPage extends ConsumerWidget {
         return const DiverProfileHubPage();
       case 'safety':
         return const SafetySettingsPage();
+      case 'security':
+        return const SecuritySettingsPage();
       case 'units':
         return _UnitsSectionContent(ref: ref);
       case 'decompression':
@@ -277,6 +280,8 @@ class _SettingsSectionDetailPage extends ConsumerWidget {
         return const DiverProfileHubPage();
       case 'safety':
         return const SafetySettingsPage();
+      case 'security':
+        return const SecuritySettingsPage();
       case 'units':
         return _UnitsSectionContent(ref: ref);
       case 'decompression':
@@ -354,6 +359,7 @@ class _MobileSettingsTile extends StatelessWidget {
       'dataSources' => context.l10n.settings_section_dataSources_title,
       'sharedData' => context.l10n.settings_sharedData_sectionTitle,
       'safety' => context.l10n.settings_section_safety_title,
+      'security' => context.l10n.settings_section_security_title,
       _ => section.title,
     };
   }
@@ -370,6 +376,7 @@ class _MobileSettingsTile extends StatelessWidget {
       'about' => context.l10n.settings_section_about_subtitle,
       'dataSources' => context.l10n.settings_section_dataSources_subtitle,
       'safety' => context.l10n.settings_section_safety_subtitle,
+      'security' => context.l10n.settings_section_security_subtitle,
       _ => section.subtitle,
     };
   }

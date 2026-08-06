@@ -21369,6 +21369,141 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settings_section_safety_subtitle => '回顾规则与潜水后飞行';
 
   @override
+  String get settings_section_security_title => '应用安全';
+
+  @override
+  String get settings_section_security_subtitle => '应用锁定与数据库加密';
+
+  @override
+  String get settings_security_appLock => '应用锁定';
+
+  @override
+  String get settings_security_appLock_subtitle => '打开应用时需要密码或生物识别';
+
+  @override
+  String get settings_security_biometrics => '使用生物识别解锁';
+
+  @override
+  String get settings_security_autoLock => '自动锁定';
+
+  @override
+  String get settings_security_autoLock_immediately => '立即';
+
+  @override
+  String settings_security_autoLock_minutes(int minutes) {
+    String _temp0 = intl.Intl.pluralLogic(
+      minutes,
+      locale: localeName,
+      other: '$minutes 分钟后',
+      one: '1 分钟后',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get settings_security_autoLock_never => '从不';
+
+  @override
+  String get settings_security_encryption => '加密数据库';
+
+  @override
+  String get settings_security_encryption_subtitle => '使用静态加密保护您的潜水日志文件';
+
+  @override
+  String get settings_security_encryption_progress_backup => '正在创建安全备份...';
+
+  @override
+  String get settings_security_encryption_progress_encrypt => '正在加密数据库...';
+
+  @override
+  String get settings_security_encryption_progress_decrypt => '正在解密数据库...';
+
+  @override
+  String get settings_security_encryption_progress_reopen => '正在重新打开数据库...';
+
+  @override
+  String get settings_security_changePassword => '更改密码';
+
+  @override
+  String get settings_security_regenerateRecovery => '新恢复代码';
+
+  @override
+  String get settings_security_setPassword => '设置应用密码';
+
+  @override
+  String get settings_security_password => '密码';
+
+  @override
+  String get settings_security_confirmPassword => '确认密码';
+
+  @override
+  String get settings_security_currentPassword => '当前密码';
+
+  @override
+  String get settings_security_newPassword => '新密码';
+
+  @override
+  String get settings_security_passwordTooShort => '密码至少需要 4 个字符。';
+
+  @override
+  String get settings_security_passwordMismatch => '两次输入的密码不一致。';
+
+  @override
+  String get settings_security_wrongPassword => '密码错误。';
+
+  @override
+  String get settings_security_recoveryCode_title => '您的恢复代码';
+
+  @override
+  String get settings_security_recoveryCode_explain =>
+      '请抄写并妥善保管。如果忘记密码，它是解锁应用的唯一方式，并会替换之前的任何恢复代码。';
+
+  @override
+  String get settings_security_recoveryCode_savedConfirm => '我已保存恢复代码';
+
+  @override
+  String get settings_security_disableBlockedByEncryption_title => '加密已启用';
+
+  @override
+  String get settings_security_disableBlockedByEncryption_body =>
+      '请先关闭数据库加密，再关闭应用锁定。加密的数据库需要凭据。';
+
+  @override
+  String get settings_security_enableEncryption_title => '要加密数据库吗？';
+
+  @override
+  String get settings_security_enableEncryption_body =>
+      '首先会创建安全备份，然后就地重新加密数据库文件。日志较大时可能需要一些时间。';
+
+  @override
+  String get settings_security_disableEncryption_title => '要关闭加密吗？';
+
+  @override
+  String get settings_security_disableEncryption_body =>
+      '数据库文件将重新以未加密形式存储在磁盘上。';
+
+  @override
+  String get settings_security_turnOffAppLock_title => '要关闭应用锁定吗？';
+
+  @override
+  String get settings_security_turnOffAppLock_body => '应用打开时将不再要求输入密码。';
+
+  @override
+  String get settings_security_unlock_title => '输入您的密码';
+
+  @override
+  String get settings_security_cancel => '取消';
+
+  @override
+  String get settings_security_continue => '继续';
+
+  @override
+  String get settings_security_done => '完成';
+
+  @override
+  String get settings_security_turnOff => '关闭';
+
+  @override
   String get dataQuality_inbox_title => '数据质量';
 
   @override
