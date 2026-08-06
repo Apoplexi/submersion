@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Ship the new top-level Media section: nav entry, adaptive console scaffold, paginated cross-dive library with three view modes, shared full-screen viewer, multi-select with Delete/Share, a Transfers view, and the v139 `retain_in_library` migration.
+**Goal:** Ship the new top-level Media section: nav entry, adaptive console scaffold, paginated cross-dive library with three view modes, shared full-screen viewer, multi-select with Delete/Share, a Transfers view, and the v140 `retain_in_library` migration.
 
 **Architecture:** A new `/media` shell route hosts `MediaSectionPage`, which wraps content in `MediaConsoleScaffold` (desktop sidebar, phone top tabs). A new `MediaLibraryRepository` provides keyset-paginated, filtered, cross-dive reads (Drift join of media + dives + dive_sites), consumed by a paged `StateNotifier`. Tiles reuse `MediaItemView`; the full-screen viewer is `PhotoViewerPage` generalized to take a media list instead of a dive id. Spec: `docs/superpowers/specs/2026-08-05-media-section-design.md`.
 
@@ -25,32 +25,32 @@
 
 ---
 
-### Task 1: v139 migration — `media.retain_in_library`
+### Task 1: v140 migration — `media.retain_in_library`
 
-The dormant column that Phase 2's link management consumes. Schema ladder: main is at v137, v138 is reserved by divelogs PR #603 (not on this branch), so this claims **v139** and our branch has NO v138 block. Before starting, re-verify: `git fetch origin && git show origin/main:lib/core/database/database.dart | grep "currentSchemaVersion = "` — if it prints anything other than 137, renumber this task's claim to (that number + 2 if 138 is still reserved, else + 1) and adjust every "139" below.
+The dormant column that Phase 2's link management consumes. Schema ladder: main is at v137; v138 is reserved by divelogs PR #603 and v139 is claimed by equipment currency PR #805 (neither on this branch), so this claims **v140** and our branch has NO v138 or v139 blocks. Before starting, re-verify against the ladder memory AND `git fetch origin && git show origin/main:lib/core/database/database.dart | grep "currentSchemaVersion = "` — if either shows v140 taken, renumber this task's claim to the next free number and adjust every "140" below.
 
 **Files:**
 - Modify: `lib/core/database/database.dart` (table def ~line 1245, `currentSchemaVersion` line 2864, `migrationVersions` list ~line 3032, onUpgrade tail ~line 7163, beforeOpen ~line 7183)
-- Create: `test/core/database/migration_v139_retain_in_library_test.dart`
+- Create: `test/core/database/migration_v140_retain_in_library_test.dart`
 - Modify (generated): `lib/core/database/database.g.dart` via build_runner
 
 **Interfaces:**
 - Consumes: existing migration helper conventions (`_assertAccentColorSettingsColumns` at database.dart:3572 is the exact template).
-- Produces: `Media.retainInLibrary` (Drift `BoolColumn`, default false) available as `MediaData.retainInLibrary`; `AppDatabase.currentSchemaVersion == 139`. No repository or entity exposes it yet (dormant until Phase 2).
+- Produces: `Media.retainInLibrary` (Drift `BoolColumn`, default false) available as `MediaData.retainInLibrary`; `AppDatabase.currentSchemaVersion == 140`. No repository or entity exposes it yet (dormant until Phase 2).
 
 - [ ] **Step 1: Write the failing migration test**
 
-Copy `test/core/database/migration_v135_accent_columns_test.dart` to `test/core/database/migration_v139_retain_in_library_test.dart` and adapt it — keep that file's database-construction boilerplate verbatim and change the assertions to:
+Copy `test/core/database/migration_v135_accent_columns_test.dart` to `test/core/database/migration_v140_retain_in_library_test.dart` and adapt it — keep that file's database-construction boilerplate verbatim and change the assertions to:
 
 ```dart
 // Test bodies (keep the copied file's setup/teardown and DB construction):
 
-test('currentSchemaVersion includes v139', () {
+test('currentSchemaVersion includes v140', () {
   expect(
     AppDatabase.currentSchemaVersion,
-    greaterThanOrEqualTo(139),
+    greaterThanOrEqualTo(140),
   );
-  expect(AppDatabase.migrationVersions, contains(139));
+  expect(AppDatabase.migrationVersions, contains(140));
 });
 
 test('fresh database has media.retain_in_library', () async {
@@ -78,8 +78,8 @@ Where the v135 template exercises the upgrade path with an old-version fixture, 
 
 - [ ] **Step 2: Run the test to verify it fails**
 
-Run: `flutter test test/core/database/migration_v139_retain_in_library_test.dart --timeout 120s`
-Expected: FAIL — `migrationVersions` does not contain 139 and PRAGMA lacks the column.
+Run: `flutter test test/core/database/migration_v140_retain_in_library_test.dart --timeout 120s`
+Expected: FAIL — `migrationVersions` does not contain 140 and PRAGMA lacks the column.
 
 - [ ] **Step 3: Implement the migration**
 
@@ -88,7 +88,7 @@ In `lib/core/database/database.dart`:
 (a) Add the column to the `Media` table class, immediately before `IntColumn get createdAt` (line ~1246):
 
 ```dart
-  // Media section Phase 1 (v139): kept-in-library marker. Dormant until the
+  // Media section Phase 1 (v140): kept-in-library marker. Dormant until the
   // Phase 2 link-management UI sets it; the orphan sweep will exclude rows
   // where it is true. Synced with the row like every other media column.
   BoolColumn get retainInLibrary =>
@@ -98,21 +98,22 @@ In `lib/core/database/database.dart`:
 (b) Bump the version constant (line 2864):
 
 ```dart
-  static const int currentSchemaVersion = 139;
+  static const int currentSchemaVersion = 140;
 ```
 
 (c) Append to `migrationVersions` after `137,`:
 
 ```dart
-    // 138 is reserved by the divelogs.de branch (PR #603); no block here.
-    139,
+    // 138 (divelogs #603) and 139 (equipment currency #805) are reserved by
+    // parallel branches; no blocks here.
+    140,
   ];
 ```
 
 (d) Add the idempotent assert helper next to `_assertAccentColorSettingsColumns` (after line 3590):
 
 ```dart
-  /// v139: media.retain_in_library (Media section Phase 1). Idempotent; safe
+  /// v140: media.retain_in_library (Media section Phase 1). Idempotent; safe
   /// to call from both onUpgrade and the beforeOpen backstop.
   Future<void> _assertMediaRetainInLibraryColumn() async {
     final cols = await customSelect("PRAGMA table_info('media')").get();
@@ -130,20 +131,21 @@ In `lib/core/database/database.dart`:
 (e) Add the onUpgrade block after the `if (from < 137) await reportProgress();` line (~7163):
 
 ```dart
-        // v139: media.retain_in_library (Media section Phase 1). v138 is
-        // reserved by the divelogs branch; a DB arriving here from 137 skips
-        // straight to 139 and the beforeOpen backstop self-heals any DB a
-        // parallel branch strands in between.
-        if (from < 139) {
+        // v140: media.retain_in_library (Media section Phase 1). v138
+        // (divelogs) and v139 (equipment currency) live on parallel branches;
+        // a DB arriving here from 137 skips straight to 140 and the
+        // beforeOpen backstop self-heals any DB a parallel branch strands in
+        // between.
+        if (from < 140) {
           await _assertMediaRetainInLibraryColumn();
         }
-        if (from < 139) await reportProgress();
+        if (from < 140) await reportProgress();
 ```
 
 (f) Add the beforeOpen backstop after the v137 backstop (`await _assertWeatherCodeColumn();`, line ~7183):
 
 ```dart
-        // v139 backstop: re-assert media.retain_in_library.
+        // v140 backstop: re-assert media.retain_in_library.
         await _assertMediaRetainInLibraryColumn();
 ```
 
@@ -155,15 +157,15 @@ Expected: completes without errors; `database.g.dart` gains `retainInLibrary`.
 - [ ] **Step 5: Run the migration test and the neighboring migration tests**
 
 Run: `flutter test test/core/database/ --timeout 120s`
-Expected: ALL PASS. If an older migration test asserts `currentSchemaVersion == 137` exactly (exact-latest tripwire), relax that assertion to `greaterThanOrEqualTo(137)` per repo convention — the newest migration owns exact-latest, and our new test deliberately uses `greaterThanOrEqualTo(139)` from the start.
+Expected: ALL PASS. If an older migration test asserts `currentSchemaVersion == 137` exactly (exact-latest tripwire), relax that assertion to `greaterThanOrEqualTo(137)` per repo convention — the newest migration owns exact-latest, and our new test deliberately uses `greaterThanOrEqualTo(140)` from the start.
 
 - [ ] **Step 6: Format and commit**
 
 ```bash
 dart format .
-git add -u lib/core/database/ test/core/database/migration_v139_retain_in_library_test.dart
-git add test/core/database/migration_v139_retain_in_library_test.dart
-git commit -m "Add v139 migration: media.retain_in_library column"
+git add -u lib/core/database/ test/core/database/migration_v140_retain_in_library_test.dart
+git add test/core/database/migration_v140_retain_in_library_test.dart
+git commit -m "Add v140 migration: media.retain_in_library column"
 ```
 
 ---
@@ -1693,6 +1695,6 @@ git commit -m "Add library filter bar for site, trip, and date range"
 
 ## Plan self-review notes (already applied)
 
-- Spec coverage for Phase 1: nav (Task 5), console (Task 6), query layer (Task 4), three view modes (Tasks 8-9), shared viewer (Task 10), selection Delete/Share (Task 11), Transfers (Task 12), filter UI for type/site/trip/date (Tasks 8 and 13), v139 + indexes (Tasks 1-2). Badges ship with the providers (Task 7) and light up when Phase 2 adds the Unlinked/Missing sections.
+- Spec coverage for Phase 1: nav (Task 5), console (Task 6), query layer (Task 4), three view modes (Tasks 8-9), shared viewer (Task 10), selection Delete/Share (Task 11), Transfers (Task 12), filter UI for type/site/trip/date (Tasks 8 and 13), v140 + indexes (Tasks 1-2). Badges ship with the providers (Task 7) and light up when Phase 2 adds the Unlinked/Missing sections.
 - The spec's "indexes wired into both onCreate and onUpgrade" is implemented via `kPerformanceIndexes` (asserted every open from beforeOpen), which supersedes both — recorded here so the spec deviation is deliberate, not drift.
 - Type-consistency: `MediaLibraryEntry`/`MediaLibraryFilter`/`MediaLibraryCursor`/`MediaLibraryPageResult` names match across Tasks 4, 7, 8, 9, 11; `mediaItemFromRow` defined in Task 3, consumed in Task 4; `MediaConsoleSection` defined in Task 6, consumed in Task 12.

@@ -90,15 +90,18 @@ count queries.
 
 ## 4. Data model
 
-### Main database: schema v139
+### Main database: schema v140
 
 v137 is current on main; v138 is reserved for the divelogs.de sync work
-(issue 603). This design claims **v139** for a single migration containing the
-indexes (item 3) and the `retain_in_library` column (item 2), landing in
-Phase 1 (the column stays dormant until Phase 2 consumes it). The `mediaStore`
-source type (item 1) requires no schema change. The Phase 5 tables (items 4
-and 5) claim whatever number is next free when Phase 5 starts. All claims are
-re-verified against the schema version ladder at implementation time.
+(issue 603) and v139 is claimed by the equipment default-currency work
+(PR 805). This design claims **v140** for a single migration containing the
+`retain_in_library` column (item 2), landing in Phase 1 (the column stays
+dormant until Phase 2 consumes it). The indexes (item 3) ride the
+`kPerformanceIndexes` list, which is asserted on every open from beforeOpen
+and therefore needs no version bump. The `mediaStore` source type (item 1)
+requires no schema change. The Phase 5 tables (items 4 and 5) claim whatever
+number is next free when Phase 5 starts. All claims are re-verified against
+the schema version ladder at implementation time.
 
 1. **New source type `mediaStore`** -- a new value of `MediaSourceType`
    (`lib/features/media/domain/entities/media_source_type.dart`). No column
@@ -391,8 +394,8 @@ TDD throughout; 80 percent minimum coverage per project rules.
   is faked. `FolderCandidateSource` additionally gets integration tests
   against real temp directory trees with real hashing.
 - **Repository tests** on in-memory Drift: keyset pagination, filter-to-SQL
-  compilation, unlink/reassign HLC marking, migration tests for v138 to v139
-  and cache v8 to v9.
+  compilation, unlink/reassign HLC marking, migration tests for the v140
+  column and cache v8 to v9.
 - **Widget tests:** console adaptivity (sidebar versus tabs), the three view
   modes over fake pages, wizard steps over a mocked engine, inbox suggestion
   chips. Known repo traps respected: pinned `MaterialApp` locale, no Drift
@@ -415,11 +418,11 @@ TDD throughout; 80 percent minimum coverage per project rules.
 | 5 | Watcher with auto-apply, `media_repair_log` audit view, smart albums, per-source browsing | DAM extras |
 
 Phases ship independently with no feature flag; each is additive and the
-sidebar simply grows. Schema timing (details in section 4): the v139 migration
-(indexes plus dormant `retain_in_library`) lands in Phase 1; the `mediaStore`
-source type needs no migration and arrives with Phase 3; the audit and
-smart-album tables and cache v9 arrive with Phase 5 under whatever version
-numbers are then free.
+sidebar simply grows. Schema timing (details in section 4): the v140 migration
+(dormant `retain_in_library`) and the beforeOpen-asserted indexes land in
+Phase 1; the `mediaStore` source type needs no migration and arrives with
+Phase 3; the audit and smart-album tables and cache v9 arrive with Phase 5
+under whatever version numbers are then free.
 
 ## 14. Out of scope
 
