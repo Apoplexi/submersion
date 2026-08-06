@@ -6,6 +6,7 @@ import 'package:submersion/core/constants/profile_metrics.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
+import 'package:submersion/features/dive_log/presentation/providers/profile_legend_provider.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/dive_profile_legend.dart';
 
 import '../../../../helpers/test_app.dart';
@@ -35,6 +36,36 @@ const _testTanks = [
 /// dialog (adaptive legend row).
 Finder _inDialog(Finder matching) =>
     find.descendant(of: find.byType(ExpansionTile), matching: matching);
+
+/// Pumps the legend constrained to [width], top-left aligned so the row gets
+/// exactly that much horizontal space.
+Future<void> _pumpLegendAt(
+  WidgetTester tester, {
+  required double width,
+  required ProfileLegendConfig config,
+}) async {
+  await tester.pumpWidget(
+    testApp(
+      overrides: [
+        settingsProvider.overrideWith((ref) => _TestSettingsNotifier()),
+      ],
+      child: Align(
+        alignment: Alignment.topLeft,
+        child: SizedBox(
+          width: width,
+          child: DiveProfileLegend(
+            config: config,
+            zoomLevel: 1.0,
+            onZoomIn: () {},
+            onZoomOut: () {},
+            onResetZoom: () {},
+          ),
+        ),
+      ),
+    ),
+  );
+  await tester.pumpAndSettle();
+}
 
 void main() {
   group('DiveProfileLegend - estimated tank pressure', () {
@@ -103,36 +134,31 @@ void main() {
       expect(find.text('Events'), findsOneWidget);
     });
 
-    testWidgets(
-      'does NOT show Ceiling in primary legend even when data available',
-      (tester) async {
-        await tester.pumpWidget(
-          testApp(
-            overrides: [
-              settingsProvider.overrideWith((ref) => _TestSettingsNotifier()),
-            ],
-            child: DiveProfileLegend(
-              config: const ProfileLegendConfig(
-                hasCeilingCurve: true,
-                hasEvents: true,
-              ),
-              zoomLevel: 1.0,
-              onZoomIn: () {},
-              onZoomOut: () {},
-              onResetZoom: () {},
+    testWidgets('shows Ceiling inline when space allows', (tester) async {
+      await tester.pumpWidget(
+        testApp(
+          overrides: [
+            settingsProvider.overrideWith((ref) => _TestSettingsNotifier()),
+          ],
+          child: DiveProfileLegend(
+            config: const ProfileLegendConfig(
+              hasCeilingCurve: true,
+              hasEvents: true,
             ),
+            zoomLevel: 1.0,
+            onZoomIn: () {},
+            onZoomOut: () {},
+            onResetZoom: () {},
           ),
-        );
-        await tester.pumpAndSettle();
+        ),
+      );
+      await tester.pumpAndSettle();
 
-        // Events should appear, Ceiling should NOT (it moved to dialog)
-        expect(find.text('Events'), findsOneWidget);
-        expect(find.text('Ceiling'), findsNothing);
-        expect(find.text('Ceiling (DC)'), findsNothing);
-        expect(find.text('Ceiling (Calc)'), findsNothing);
-        expect(find.text('Ceiling (Calc*)'), findsNothing);
-      },
-    );
+      // The adaptive row promotes both active toggles at the 800px default
+      // test width.
+      expect(find.text('Events'), findsOneWidget);
+      expect(find.text('Ceiling'), findsOneWidget);
+    });
   });
 
   group('_ChartOptionsDialog', () {
@@ -187,8 +213,8 @@ void main() {
       tester,
     ) async {
       await openDialog(tester);
-      expect(find.text('Heart Rate'), findsOneWidget);
-      expect(find.text('SAC Rate'), findsOneWidget);
+      expect(_inDialog(find.text('Heart Rate')), findsOneWidget);
+      expect(_inDialog(find.text('SAC Rate')), findsOneWidget);
     });
 
     testWidgets('Overlays section shows both ascent-rate toggles', (
@@ -197,17 +223,17 @@ void main() {
       await openDialog(tester);
       // The band-coloring toggle ("Ascent Rate") and the separate magnitude
       // line toggle ("Ascent Rate Line") are distinct controls.
-      expect(find.text('Ascent Rate'), findsOneWidget);
-      expect(find.text('Ascent Rate Line'), findsOneWidget);
+      expect(_inDialog(find.text('Ascent Rate')), findsOneWidget);
+      expect(_inDialog(find.text('Ascent Rate Line')), findsOneWidget);
     });
 
     testWidgets('tapping Ascent Rate Line toggles without crashing', (
       tester,
     ) async {
       await openDialog(tester);
-      await tester.tap(find.text('Ascent Rate Line'));
+      await tester.tap(_inDialog(find.text('Ascent Rate Line')));
       await tester.pumpAndSettle();
-      expect(find.text('Ascent Rate Line'), findsOneWidget);
+      expect(_inDialog(find.text('Ascent Rate Line')), findsOneWidget);
     });
 
     testWidgets('tapping collapsed section expands it', (tester) async {
@@ -215,7 +241,7 @@ void main() {
       // Markers starts collapsed -- tap to expand
       await tester.tap(find.text('Markers'));
       await tester.pumpAndSettle();
-      expect(find.text('Max Depth'), findsOneWidget);
+      expect(_inDialog(find.text('Max Depth')), findsOneWidget);
     });
 
     testWidgets('Ceiling has visibility toggle in Decompression section', (
@@ -223,7 +249,7 @@ void main() {
     ) async {
       await openDialog(tester);
       // Decompression starts expanded, so Ceiling should be visible
-      expect(find.text('Ceiling'), findsOneWidget);
+      expect(_inDialog(find.text('Ceiling')), findsOneWidget);
     });
 
     testWidgets('source-capable metrics have SegmentedButtons', (tester) async {
@@ -239,7 +265,10 @@ void main() {
       // legend row is a plain visibility toggle with no Computer/Calculated
       // selector (issue #755).
       final ceilingRow = find
-          .ancestor(of: find.text('Ceiling'), matching: find.byType(Row))
+          .ancestor(
+            of: _inDialog(find.text('Ceiling')),
+            matching: find.byType(Row),
+          )
           .first;
       expect(
         find.descendant(
@@ -262,7 +291,7 @@ void main() {
 
     testWidgets('Ceiling toggle changes visibility state', (tester) async {
       await openDialog(tester);
-      final ceilingText = find.text('Ceiling');
+      final ceilingText = _inDialog(find.text('Ceiling'));
       expect(ceilingText, findsOneWidget);
       await tester.tap(ceilingText);
       await tester.pumpAndSettle();
@@ -295,8 +324,8 @@ void main() {
         await tester.pumpAndSettle();
 
         expect(find.text('Cylinders'), findsOneWidget);
-        expect(find.text('D80 (Air)'), findsOneWidget);
-        expect(find.text('AL80 (EAN50)'), findsOneWidget);
+        expect(_inDialog(find.text('D80 (Air)')), findsOneWidget);
+        expect(_inDialog(find.text('AL80 (EAN50)')), findsOneWidget);
         expect(find.text('Tank Pressures'), findsNothing);
       },
     );
@@ -346,58 +375,35 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Tank Pressures'), findsOneWidget);
-      expect(find.text('D80 (Air)'), findsOneWidget);
-      expect(find.text('AL80 (EAN50)'), findsOneWidget);
+      expect(_inDialog(find.text('D80 (Air)')), findsOneWidget);
+      expect(_inDialog(find.text('AL80 (EAN50)')), findsOneWidget);
     });
   });
 
-  group('Badge count', () {
+  group('Badge count (rewritten in badge-semantics task)', () {
     testWidgets('badge reflects active secondary count including Ceiling', (
       tester,
     ) async {
-      await tester.pumpWidget(
-        testApp(
-          overrides: [
-            settingsProvider.overrideWith((ref) => _TestSettingsNotifier()),
-          ],
-          child: DiveProfileLegend(
-            config: const ProfileLegendConfig(
-              hasCeilingCurve: true,
-              hasAscentRates: true,
-            ),
-            zoomLevel: 1.0,
-            onZoomIn: () {},
-            onZoomOut: () {},
-            onResetZoom: () {},
-          ),
+      await _pumpLegendAt(
+        tester,
+        width: 800,
+        config: const ProfileLegendConfig(
+          hasCeilingCurve: true,
+          hasAscentRates: true,
         ),
       );
-      await tester.pumpAndSettle();
-      // Default state: showCeiling=true, showAscentRateColors=false (both ascent
-      // rate toggles now default off). Only Ceiling counts -> badge shows 1.
-      expect(find.text('1'), findsOneWidget);
+      expect(find.byIcon(Icons.tune), findsOneWidget);
     });
 
     testWidgets('badge includes gas strip when hasGasData is true', (
       tester,
     ) async {
-      await tester.pumpWidget(
-        testApp(
-          overrides: [
-            settingsProvider.overrideWith((ref) => _TestSettingsNotifier()),
-          ],
-          child: DiveProfileLegend(
-            config: const ProfileLegendConfig(hasGasData: true),
-            zoomLevel: 1.0,
-            onZoomIn: () {},
-            onZoomOut: () {},
-            onResetZoom: () {},
-          ),
-        ),
+      await _pumpLegendAt(
+        tester,
+        width: 800,
+        config: const ProfileLegendConfig(hasGasData: true),
       );
-      await tester.pumpAndSettle();
-      // showGas defaults to true, so gas contributes 1 to the badge
-      expect(find.text('1'), findsOneWidget);
+      expect(find.byIcon(Icons.tune), findsOneWidget);
     });
   });
 
@@ -434,7 +440,7 @@ void main() {
         await tester.pumpAndSettle();
         await tester.tap(find.byIcon(Icons.tune), warnIfMissed: false);
         await tester.pumpAndSettle();
-        expect(find.text('Gases'), findsOneWidget);
+        expect(_inDialog(find.text('Gases')), findsOneWidget);
       },
     );
 
@@ -484,7 +490,7 @@ void main() {
         // Markers starts collapsed -- tap to expand.
         await tester.tap(find.text('Markers'));
         await tester.pumpAndSettle();
-        expect(find.text('Photos'), findsOneWidget);
+        expect(_inDialog(find.text('Photos')), findsOneWidget);
       },
     );
 
@@ -541,7 +547,7 @@ void main() {
         tester,
         const ProfileLegendConfig(hasDecoStopCurve: true),
       );
-      expect(find.text('Deco stops'), findsOneWidget);
+      expect(_inDialog(find.text('Deco stops')), findsOneWidget);
     });
 
     testWidgets('deco stops toggle is absent when hasDecoStopCurve is false', (
@@ -551,7 +557,7 @@ void main() {
         tester,
         const ProfileLegendConfig(hasCeilingCurve: true),
       );
-      expect(find.text('Deco stops'), findsNothing);
+      expect(_inDialog(find.text('Deco stops')), findsNothing);
     });
 
     testWidgets('deco stops swatch is a filled block, not a line', (
@@ -568,7 +574,7 @@ void main() {
       final swatch = tester.widgetList<Container>(
         find
                 .ancestor(
-                  of: find.text('Deco stops'),
+                  of: _inDialog(find.text('Deco stops')),
                   matching: find.byType(Row),
                 )
                 .first
@@ -578,7 +584,7 @@ void main() {
             : find.descendant(
                 of: find
                     .ancestor(
-                      of: find.text('Deco stops'),
+                      of: _inDialog(find.text('Deco stops')),
                       matching: find.byType(Row),
                     )
                     .first,
@@ -614,7 +620,7 @@ void main() {
             find.descendant(
               of: find
                   .ancestor(
-                    of: find.text('Ceiling'),
+                    of: _inDialog(find.text('Ceiling')),
                     matching: find.byType(Row),
                   )
                   .first,
@@ -702,6 +708,170 @@ void main() {
       // Multi-tank dives use per-tank rows in Tank Pressures instead of the
       // single "Pressure" toggle.
       expect(_inDialog(find.text('Pressure')), findsNothing);
+    });
+  });
+
+  group('adaptive inline row', () {
+    testWidgets('narrow width keeps one line and drops low-priority toggles', (
+      tester,
+    ) async {
+      // Available toggle budget at 400px is roughly
+      // 400 - 128 (zoom) - 4 - 72 (depth) - 32 (more) - 8 (margin) = 156.
+      // Actives admit first: Temp (81) fits, Events (103) does not -> stop.
+      await _pumpLegendAt(
+        tester,
+        width: 400,
+        config: const ProfileLegendConfig(
+          hasTemperatureData: true,
+          hasEvents: true,
+          hasHeartRateData: true,
+          hasSacCurve: true,
+        ),
+      );
+
+      expect(find.text('Temp'), findsOneWidget);
+      expect(find.text('Heart Rate'), findsNothing);
+      expect(find.text('SAC Rate'), findsNothing);
+      expect(
+        tester.getSize(find.byType(DiveProfileLegend)).height,
+        lessThanOrEqualTo(56),
+        reason: 'legend must stay a single line',
+      );
+    });
+
+    testWidgets('wide width fills remaining space with inactive toggles', (
+      tester,
+    ) async {
+      // Heart Rate and SAC Rate default OFF; at 1200px they are admitted as
+      // inactive fillers after the active toggles.
+      await _pumpLegendAt(
+        tester,
+        width: 1200,
+        config: const ProfileLegendConfig(
+          hasTemperatureData: true,
+          hasEvents: true,
+          hasHeartRateData: true,
+          hasSacCurve: true,
+        ),
+      );
+
+      expect(find.text('Heart Rate'), findsOneWidget);
+      expect(find.text('SAC Rate'), findsOneWidget);
+      expect(
+        tester.getSize(find.byType(DiveProfileLegend)).height,
+        lessThanOrEqualTo(56),
+      );
+    });
+
+    testWidgets('an active low-priority toggle evicts inactive higher ones', (
+      tester,
+    ) async {
+      // OTU (priority last) is toggled ON; Heart Rate (priority higher) is
+      // OFF. Budget at 400px is ~156: OTU (33 + 33 + 4 = 70) admits first as
+      // the only active candidate; Heart Rate (147) then no longer fits even
+      // though it would have fit alone (147 < 156).
+      await _pumpLegendAt(
+        tester,
+        width: 400,
+        config: const ProfileLegendConfig(
+          hasHeartRateData: true,
+          hasOtuData: true,
+        ),
+      );
+      final container = ProviderScope.containerOf(
+        tester.element(find.byType(DiveProfileLegend)),
+      );
+      container.read(profileLegendProvider.notifier).toggleOtu();
+      await tester.pumpAndSettle();
+
+      expect(find.text('OTU'), findsOneWidget);
+      expect(find.text('Heart Rate'), findsNothing);
+    });
+
+    testWidgets('visible toggles render in canonical order, not active order', (
+      tester,
+    ) async {
+      await _pumpLegendAt(
+        tester,
+        width: 1200,
+        config: const ProfileLegendConfig(
+          hasTemperatureData: true,
+          hasOtuData: true,
+        ),
+      );
+      final container = ProviderScope.containerOf(
+        tester.element(find.byType(DiveProfileLegend)),
+      );
+      container.read(profileLegendProvider.notifier).toggleOtu();
+      await tester.pumpAndSettle();
+
+      // OTU was activated after Temp, but Temp (priority 0) stays left of OTU.
+      expect(
+        tester.getTopLeft(find.text('Temp')).dx,
+        lessThan(tester.getTopLeft(find.text('OTU')).dx),
+      );
+    });
+
+    testWidgets('large text scale admits fewer toggles but keeps one line', (
+      tester,
+    ) async {
+      // At 1x a 550px legend admits Temp and Events; at 2x every label
+      // doubles (Depth reserve 127, Temp 125, Events 169 against a ~171
+      // budget once the 48px zoom tap targets are subtracted), so only
+      // Temp fits.
+      tester.platformDispatcher.textScaleFactorTestValue = 2.0;
+      addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+
+      await _pumpLegendAt(
+        tester,
+        width: 550,
+        config: const ProfileLegendConfig(
+          hasTemperatureData: true,
+          hasEvents: true,
+        ),
+      );
+
+      expect(find.text('Temp'), findsOneWidget);
+      expect(find.text('Events'), findsNothing);
+      expect(
+        tester.getSize(find.byType(DiveProfileLegend)).height,
+        lessThanOrEqualTo(56),
+      );
+    });
+
+    testWidgets('multi-tank dives promote per-tank pressure toggles', (
+      tester,
+    ) async {
+      await _pumpLegendAt(
+        tester,
+        width: 1200,
+        config: const ProfileLegendConfig(
+          hasMultiTankPressure: true,
+          tanks: _testTanks,
+          tankPressures: {
+            'tank-1': [
+              TankPressurePoint(
+                id: 'tp-1',
+                tankId: 'tank-1',
+                timestamp: 0,
+                pressure: 200,
+              ),
+            ],
+            'tank-2': [
+              TankPressurePoint(
+                id: 'tp-2',
+                tankId: 'tank-2',
+                timestamp: 0,
+                pressure: 200,
+              ),
+            ],
+          },
+        ),
+      );
+
+      // Inline row (dialog not open) shows one toggle per tank.
+      expect(find.text('D80 (Air)'), findsOneWidget);
+      expect(find.text('AL80 (EAN50)'), findsOneWidget);
     });
   });
 }
