@@ -5,6 +5,8 @@ import 'package:submersion/features/dive_sites/presentation/providers/site_provi
 import 'package:submersion/features/media/domain/entities/media_item.dart';
 import 'package:submersion/features/media/domain/entities/media_library_filter.dart';
 import 'package:submersion/features/media/presentation/providers/media_library_providers.dart';
+import 'package:submersion/features/media/presentation/providers/media_smart_album_providers.dart';
+import 'package:submersion/features/media/presentation/widgets/media_smart_album_name_dialog.dart';
 import 'package:submersion/features/trips/presentation/providers/trip_providers.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 
@@ -73,11 +75,24 @@ class MediaLibraryFilterBar extends ConsumerWidget {
     );
   }
 
+  Future<void> _saveAlbum(BuildContext context, WidgetRef ref) async {
+    final name = await showMediaSmartAlbumNameDialog(context);
+    if (name == null) return;
+    await ref
+        .read(mediaSmartAlbumRepositoryProvider)
+        .create(name: name, filter: ref.read(mediaLibraryFilterProvider));
+    if (!context.mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(context.l10n.media_smartAlbum_saved)),
+    );
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final filter = ref.watch(mediaLibraryFilterProvider);
     final sites = ref.watch(sitesProvider).value ?? const [];
     final trips = ref.watch(allTripsProvider).value ?? const [];
+    final albums = ref.watch(mediaSmartAlbumsProvider).value ?? const [];
 
     final siteName = filter.siteId == null
         ? null
@@ -162,6 +177,51 @@ class MediaLibraryFilterBar extends ConsumerWidget {
               onPressed: () =>
                   ref.read(mediaLibraryFilterProvider.notifier).state =
                       MediaLibraryFilter.none,
+            ),
+            const SizedBox(width: 6),
+            // Saving "everything" as an album would name nothing, so this
+            // only appears once the filter says something.
+            ActionChip(
+              avatar: const Icon(Icons.bookmark_add_outlined, size: 18),
+              label: Text(context.l10n.media_smartAlbum_save),
+              onPressed: () => _saveAlbum(context, ref),
+            ),
+          ],
+          if (albums.isNotEmpty) ...[
+            const SizedBox(width: 6),
+            PopupMenuButton<String>(
+              tooltip: context.l10n.media_smartAlbum_albums,
+              onSelected: (id) {
+                final album = albums.where((a) => a.id == id).firstOrNull;
+                if (album == null) return;
+                ref.read(mediaLibraryFilterProvider.notifier).state =
+                    album.filter;
+              },
+              itemBuilder: (menuContext) => [
+                for (final album in albums)
+                  PopupMenuItem<String>(
+                    value: album.id,
+                    child: Row(
+                      children: [
+                        Expanded(child: Text(album.name)),
+                        IconButton(
+                          icon: const Icon(Icons.delete_outline, size: 18),
+                          tooltip: context.l10n.media_smartAlbum_delete,
+                          onPressed: () {
+                            Navigator.of(menuContext).pop();
+                            ref
+                                .read(mediaSmartAlbumRepositoryProvider)
+                                .delete(album.id);
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+              ],
+              child: Chip(
+                avatar: const Icon(Icons.bookmarks_outlined, size: 18),
+                label: Text(context.l10n.media_smartAlbum_albums),
+              ),
             ),
           ],
         ],
