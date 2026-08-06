@@ -2946,6 +2946,14 @@ class AppLocalizationsZh extends AppLocalizations {
   String get dashboard_gauges_noFlyClear => '禁飞 0:00';
 
   @override
+  String dashboard_gauges_flightWindow(String hours, String minutes) {
+    return '潜水窗口 $hours:$minutes';
+  }
+
+  @override
+  String get dashboard_gauges_flightWindowClosed => '航班前请勿再潜水';
+
+  @override
   String dashboard_gauges_noFlyRemaining(String hours, String minutes) {
     return '禁飞 $hours:$minutes';
   }
@@ -2966,6 +2974,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get settings_homeChips_description => '选择主页顶部显示哪些状态标签。';
+
+  @override
+  String get settings_homeChips_flightWindow => '航班前潜水窗口';
 
   @override
   String get settings_homeChips_gear => '装备保养';

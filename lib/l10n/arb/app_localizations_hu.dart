@@ -3098,6 +3098,15 @@ class AppLocalizationsHu extends AppLocalizations {
   String get dashboard_gauges_noFlyClear => 'Repülési tilalom 0:00';
 
   @override
+  String dashboard_gauges_flightWindow(String hours, String minutes) {
+    return 'Merülési ablak $hours:$minutes';
+  }
+
+  @override
+  String get dashboard_gauges_flightWindowClosed =>
+      'A repülés előtt már nincs merülés';
+
+  @override
   String dashboard_gauges_noFlyRemaining(String hours, String minutes) {
     return 'Repülési tilalom $hours:$minutes';
   }
@@ -3119,6 +3128,9 @@ class AppLocalizationsHu extends AppLocalizations {
   @override
   String get settings_homeChips_description =>
       'Válaszd ki, mely állapotjelzők jelenjenek meg a Kezdőlap tetején.';
+
+  @override
+  String get settings_homeChips_flightWindow => 'Merülési ablak repülés előtt';
 
   @override
   String get settings_homeChips_gear => 'Felszerelés szervize';

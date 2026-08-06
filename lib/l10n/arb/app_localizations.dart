@@ -5291,6 +5291,18 @@ abstract class AppLocalizations {
   /// **'No-fly 0:00'**
   String get dashboard_gauges_noFlyClear;
 
+  /// No description provided for @dashboard_gauges_flightWindow.
+  ///
+  /// In en, this message translates to:
+  /// **'Dive window {hours}:{minutes}'**
+  String dashboard_gauges_flightWindow(String hours, String minutes);
+
+  /// No description provided for @dashboard_gauges_flightWindowClosed.
+  ///
+  /// In en, this message translates to:
+  /// **'No more diving before flight'**
+  String get dashboard_gauges_flightWindowClosed;
+
   /// No description provided for @dashboard_gauges_noFlyRemaining.
   ///
   /// In en, this message translates to:
@@ -5326,6 +5338,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Choose which status chips appear at the top of the Home tab.'**
   String get settings_homeChips_description;
+
+  /// No description provided for @settings_homeChips_flightWindow.
+  ///
+  /// In en, this message translates to:
+  /// **'Flight dive window'**
+  String get settings_homeChips_flightWindow;
 
   /// No description provided for @settings_homeChips_gear.
   ///

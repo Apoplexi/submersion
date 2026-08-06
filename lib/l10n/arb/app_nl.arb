@@ -5759,12 +5759,25 @@
   "dashboard_gauges_insuranceExpired": "Verzekering verlopen",
   "dashboard_gauges_noInsurance": "Geen verzekering geregistreerd",
   "dashboard_gauges_noFlyClear": "Vliegverbod 0:00",
+  "dashboard_gauges_flightWindow": "Duikvenster {hours}:{minutes}",
+  "@dashboard_gauges_flightWindow": {
+    "placeholders": {
+      "hours": {
+        "type": "String"
+      },
+      "minutes": {
+        "type": "String"
+      }
+    }
+  },
+  "dashboard_gauges_flightWindowClosed": "Niet meer duiken vóór de vlucht",
   "dashboard_gauges_noFlyRemaining": "Vliegverbod {hours}:{minutes}",
   "dashboard_gauges_lastDiveDays": "Laatste duik {days}d geleden",
   "dashboard_gauges_lastDiveToday": "Vandaag gedoken",
   "dashboard_gauges_noDivesYet": "Nog geen duiken",
   "settings_homeChips_pageTitle": "Statuschips van start",
   "settings_homeChips_description": "Kies welke statuschips bovenaan het tabblad Start verschijnen.",
+  "settings_homeChips_flightWindow": "Duikvenster voor vlucht",
   "settings_homeChips_gear": "Uitrustingsonderhoud",
   "settings_homeChips_insurance": "Verzekering",
   "settings_homeChips_noFly": "Vliegverbod-timer",

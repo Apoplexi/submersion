@@ -5759,12 +5759,25 @@
   "dashboard_gauges_insuranceExpired": "הביטוח פג תוקף",
   "dashboard_gauges_noInsurance": "אין ביטוח רשום",
   "dashboard_gauges_noFlyClear": "איסור טיסה 0:00",
+  "dashboard_gauges_flightWindow": "חלון צלילה {hours}:{minutes}",
+  "@dashboard_gauges_flightWindow": {
+    "placeholders": {
+      "hours": {
+        "type": "String"
+      },
+      "minutes": {
+        "type": "String"
+      }
+    }
+  },
+  "dashboard_gauges_flightWindowClosed": "אין יותר צלילות לפני הטיסה",
   "dashboard_gauges_noFlyRemaining": "איסור טיסה {hours}:{minutes}",
   "dashboard_gauges_lastDiveDays": "צלילה אחרונה לפני {days} ימים",
   "dashboard_gauges_lastDiveToday": "צללת היום",
   "dashboard_gauges_noDivesYet": "אין צלילות עדיין",
   "settings_homeChips_pageTitle": "שבבי מצב של דף הבית",
   "settings_homeChips_description": "בחר אילו שבבי מצב יופיעו בראש לשונית הבית.",
+  "settings_homeChips_flightWindow": "חלון צלילה לפני טיסה",
   "settings_homeChips_gear": "תחזוקת ציוד",
   "settings_homeChips_insurance": "ביטוח",
   "settings_homeChips_noFly": "טיימר איסור טיסה",

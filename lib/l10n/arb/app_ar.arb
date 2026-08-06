@@ -5759,12 +5759,25 @@
   "dashboard_gauges_insuranceExpired": "انتهى التأمين",
   "dashboard_gauges_noInsurance": "لا يوجد تأمين مسجل",
   "dashboard_gauges_noFlyClear": "حظر الطيران 0:00",
+  "dashboard_gauges_flightWindow": "نافذة الغوص {hours}:{minutes}",
+  "@dashboard_gauges_flightWindow": {
+    "placeholders": {
+      "hours": {
+        "type": "String"
+      },
+      "minutes": {
+        "type": "String"
+      }
+    }
+  },
+  "dashboard_gauges_flightWindowClosed": "لا مزيد من الغوص قبل الرحلة",
   "dashboard_gauges_noFlyRemaining": "حظر الطيران {hours}:{minutes}",
   "dashboard_gauges_lastDiveDays": "آخر غطسة منذ {days} يوم",
   "dashboard_gauges_lastDiveToday": "غطست اليوم",
   "dashboard_gauges_noDivesYet": "لا توجد غطسات بعد",
   "settings_homeChips_pageTitle": "شرائح حالة الصفحة الرئيسية",
   "settings_homeChips_description": "اختر شرائح الحالة التي تظهر أعلى تبويب الرئيسية.",
+  "settings_homeChips_flightWindow": "نافذة الغوص قبل الرحلة",
   "settings_homeChips_gear": "صيانة المعدات",
   "settings_homeChips_insurance": "التأمين",
   "settings_homeChips_noFly": "مؤقت حظر الطيران",

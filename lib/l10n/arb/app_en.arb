@@ -1904,6 +1904,18 @@
   "dashboard_gauges_insuranceExpired": "Insurance expired",
   "dashboard_gauges_noInsurance": "No insurance on file",
   "dashboard_gauges_noFlyClear": "No-fly 0:00",
+  "dashboard_gauges_flightWindow": "Dive window {hours}:{minutes}",
+  "@dashboard_gauges_flightWindow": {
+    "placeholders": {
+      "hours": {
+        "type": "String"
+      },
+      "minutes": {
+        "type": "String"
+      }
+    }
+  },
+  "dashboard_gauges_flightWindowClosed": "No more diving before flight",
   "dashboard_gauges_noFlyRemaining": "No-fly {hours}:{minutes}",
   "@dashboard_gauges_noFlyRemaining": {
     "placeholders": {
@@ -1927,6 +1939,7 @@
   "dashboard_gauges_noDivesYet": "No dives yet",
   "settings_homeChips_pageTitle": "Home status chips",
   "settings_homeChips_description": "Choose which status chips appear at the top of the Home tab.",
+  "settings_homeChips_flightWindow": "Flight dive window",
   "settings_homeChips_gear": "Gear service",
   "settings_homeChips_insurance": "Insurance",
   "settings_homeChips_noFly": "No-fly timer",

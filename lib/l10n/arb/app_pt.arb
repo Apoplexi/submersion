@@ -5759,12 +5759,25 @@
   "dashboard_gauges_insuranceExpired": "Seguro expirado",
   "dashboard_gauges_noInsurance": "Sem seguro registado",
   "dashboard_gauges_noFlyClear": "Não voar 0:00",
+  "dashboard_gauges_flightWindow": "Janela de mergulho {hours}:{minutes}",
+  "@dashboard_gauges_flightWindow": {
+    "placeholders": {
+      "hours": {
+        "type": "String"
+      },
+      "minutes": {
+        "type": "String"
+      }
+    }
+  },
+  "dashboard_gauges_flightWindowClosed": "Não mergulhe mais antes do voo",
   "dashboard_gauges_noFlyRemaining": "Não voar {hours}:{minutes}",
   "dashboard_gauges_lastDiveDays": "Último mergulho há {days}d",
   "dashboard_gauges_lastDiveToday": "Mergulhou hoje",
   "dashboard_gauges_noDivesYet": "Ainda sem mergulhos",
   "settings_homeChips_pageTitle": "Chips de estado do Início",
   "settings_homeChips_description": "Escolha que chips de estado aparecem no topo do separador Início.",
+  "settings_homeChips_flightWindow": "Janela de mergulho antes do voo",
   "settings_homeChips_gear": "Manutenção do equipamento",
   "settings_homeChips_insurance": "Seguro",
   "settings_homeChips_noFly": "Temporizador de não voar",

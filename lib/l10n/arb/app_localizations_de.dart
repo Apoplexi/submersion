@@ -3123,6 +3123,15 @@ class AppLocalizationsDe extends AppLocalizations {
   String get dashboard_gauges_noFlyClear => 'Flugverbot 0:00';
 
   @override
+  String dashboard_gauges_flightWindow(String hours, String minutes) {
+    return 'Tauchfenster $hours:$minutes';
+  }
+
+  @override
+  String get dashboard_gauges_flightWindowClosed =>
+      'Kein Tauchen mehr vor dem Flug';
+
+  @override
   String dashboard_gauges_noFlyRemaining(String hours, String minutes) {
     return 'Flugverbot $hours:$minutes';
   }
@@ -3144,6 +3153,9 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get settings_homeChips_description =>
       'Wähle, welche Status-Chips oben im Start-Tab erscheinen.';
+
+  @override
+  String get settings_homeChips_flightWindow => 'Tauchfenster vor dem Flug';
 
   @override
   String get settings_homeChips_gear => 'Ausrüstungswartung';

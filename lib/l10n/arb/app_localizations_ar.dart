@@ -3048,6 +3048,15 @@ class AppLocalizationsAr extends AppLocalizations {
   String get dashboard_gauges_noFlyClear => 'حظر الطيران 0:00';
 
   @override
+  String dashboard_gauges_flightWindow(String hours, String minutes) {
+    return 'نافذة الغوص $hours:$minutes';
+  }
+
+  @override
+  String get dashboard_gauges_flightWindowClosed =>
+      'لا مزيد من الغوص قبل الرحلة';
+
+  @override
   String dashboard_gauges_noFlyRemaining(String hours, String minutes) {
     return 'حظر الطيران $hours:$minutes';
   }
@@ -3069,6 +3078,9 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get settings_homeChips_description =>
       'اختر شرائح الحالة التي تظهر أعلى تبويب الرئيسية.';
+
+  @override
+  String get settings_homeChips_flightWindow => 'نافذة الغوص قبل الرحلة';
 
   @override
   String get settings_homeChips_gear => 'صيانة المعدات';

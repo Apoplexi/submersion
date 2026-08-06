@@ -3116,6 +3116,15 @@ class AppLocalizationsEs extends AppLocalizations {
   String get dashboard_gauges_noFlyClear => 'No volar 0:00';
 
   @override
+  String dashboard_gauges_flightWindow(String hours, String minutes) {
+    return 'Ventana de buceo $hours:$minutes';
+  }
+
+  @override
+  String get dashboard_gauges_flightWindowClosed =>
+      'No más buceo antes del vuelo';
+
+  @override
   String dashboard_gauges_noFlyRemaining(String hours, String minutes) {
     return 'No volar $hours:$minutes';
   }
@@ -3137,6 +3146,10 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get settings_homeChips_description =>
       'Elige qué chips de estado aparecen en la parte superior de la pestaña Inicio.';
+
+  @override
+  String get settings_homeChips_flightWindow =>
+      'Ventana de buceo antes del vuelo';
 
   @override
   String get settings_homeChips_gear => 'Mantenimiento del equipo';

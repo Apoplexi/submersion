@@ -5759,12 +5759,25 @@
   "dashboard_gauges_insuranceExpired": "Assurance expirée",
   "dashboard_gauges_noInsurance": "Aucune assurance enregistrée",
   "dashboard_gauges_noFlyClear": "Délai avant vol 0:00",
+  "dashboard_gauges_flightWindow": "Fenêtre de plongée {hours}:{minutes}",
+  "@dashboard_gauges_flightWindow": {
+    "placeholders": {
+      "hours": {
+        "type": "String"
+      },
+      "minutes": {
+        "type": "String"
+      }
+    }
+  },
+  "dashboard_gauges_flightWindowClosed": "Plus de plongée avant le vol",
   "dashboard_gauges_noFlyRemaining": "Délai avant vol {hours}:{minutes}",
   "dashboard_gauges_lastDiveDays": "Dernière plongée il y a {days}j",
   "dashboard_gauges_lastDiveToday": "Plongé aujourd'hui",
   "dashboard_gauges_noDivesYet": "Aucune plongée",
   "settings_homeChips_pageTitle": "Pastilles d'état de l'accueil",
   "settings_homeChips_description": "Choisissez les pastilles d'état affichées en haut de l'onglet Accueil.",
+  "settings_homeChips_flightWindow": "Fenêtre de plongée avant vol",
   "settings_homeChips_gear": "Entretien du matériel",
   "settings_homeChips_insurance": "Assurance",
   "settings_homeChips_noFly": "Délai avant vol",

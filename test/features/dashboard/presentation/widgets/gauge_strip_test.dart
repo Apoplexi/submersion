@@ -402,6 +402,44 @@ void main() {
     });
   });
 
+  group('flight window chip', () {
+    DashboardGauges gaugesWith(FlightWindowState state) => DashboardGauges(
+      gearGauges: const [],
+      hasGear: true,
+      insurance: null,
+      noFlyStatus: null,
+      daysSinceLastDive: null,
+      flightWindow: FlightWindowStatus(
+        state: state,
+        flightAt: DateTime.utc(2126, 8, 10, 9),
+        deadline: DateTime.utc(2126, 8, 9, 15),
+        category: NoFlyCategory.repetitive,
+        interval: const Duration(hours: 18),
+      ),
+    );
+
+    testWidgets('shows the dive window countdown while open', (tester) async {
+      await pumpStrip(tester, gaugesWith(FlightWindowState.open));
+      expect(find.textContaining('Dive window'), findsOneWidget);
+    });
+
+    testWidgets('shows the closed message past the deadline', (tester) async {
+      await pumpStrip(tester, gaugesWith(FlightWindowState.closed));
+      expect(find.text('No more diving before flight'), findsOneWidget);
+    });
+
+    testWidgets('shows the closed message on conflict', (tester) async {
+      await pumpStrip(tester, gaugesWith(FlightWindowState.conflict));
+      expect(find.text('No more diving before flight'), findsOneWidget);
+    });
+
+    testWidgets('absent when no flight window exists', (tester) async {
+      await pumpStrip(tester, _emptyGauges);
+      expect(find.textContaining('Dive window'), findsNothing);
+      expect(find.text('No more diving before flight'), findsNothing);
+    });
+  });
+
   group('dive currency chip', () {
     Future<void> pumpDays(WidgetTester tester, int? days) => pumpStrip(
       tester,

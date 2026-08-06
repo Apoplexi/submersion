@@ -3090,6 +3090,15 @@ class AppLocalizationsNl extends AppLocalizations {
   String get dashboard_gauges_noFlyClear => 'Vliegverbod 0:00';
 
   @override
+  String dashboard_gauges_flightWindow(String hours, String minutes) {
+    return 'Duikvenster $hours:$minutes';
+  }
+
+  @override
+  String get dashboard_gauges_flightWindowClosed =>
+      'Niet meer duiken vóór de vlucht';
+
+  @override
   String dashboard_gauges_noFlyRemaining(String hours, String minutes) {
     return 'Vliegverbod $hours:$minutes';
   }
@@ -3111,6 +3120,9 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get settings_homeChips_description =>
       'Kies welke statuschips bovenaan het tabblad Start verschijnen.';
+
+  @override
+  String get settings_homeChips_flightWindow => 'Duikvenster voor vlucht';
 
   @override
   String get settings_homeChips_gear => 'Uitrustingsonderhoud';

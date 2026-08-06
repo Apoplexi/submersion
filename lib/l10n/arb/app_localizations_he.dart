@@ -3025,6 +3025,15 @@ class AppLocalizationsHe extends AppLocalizations {
   String get dashboard_gauges_noFlyClear => 'איסור טיסה 0:00';
 
   @override
+  String dashboard_gauges_flightWindow(String hours, String minutes) {
+    return 'חלון צלילה $hours:$minutes';
+  }
+
+  @override
+  String get dashboard_gauges_flightWindowClosed =>
+      'אין יותר צלילות לפני הטיסה';
+
+  @override
   String dashboard_gauges_noFlyRemaining(String hours, String minutes) {
     return 'איסור טיסה $hours:$minutes';
   }
@@ -3046,6 +3055,9 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String get settings_homeChips_description =>
       'בחר אילו שבבי מצב יופיעו בראש לשונית הבית.';
+
+  @override
+  String get settings_homeChips_flightWindow => 'חלון צלילה לפני טיסה';
 
   @override
   String get settings_homeChips_gear => 'תחזוקת ציוד';

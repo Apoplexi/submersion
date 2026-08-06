@@ -5759,12 +5759,25 @@
   "dashboard_gauges_insuranceExpired": "Seguro vencido",
   "dashboard_gauges_noInsurance": "Sin seguro registrado",
   "dashboard_gauges_noFlyClear": "No volar 0:00",
+  "dashboard_gauges_flightWindow": "Ventana de buceo {hours}:{minutes}",
+  "@dashboard_gauges_flightWindow": {
+    "placeholders": {
+      "hours": {
+        "type": "String"
+      },
+      "minutes": {
+        "type": "String"
+      }
+    }
+  },
+  "dashboard_gauges_flightWindowClosed": "No más buceo antes del vuelo",
   "dashboard_gauges_noFlyRemaining": "No volar {hours}:{minutes}",
   "dashboard_gauges_lastDiveDays": "Última inmersión hace {days}d",
   "dashboard_gauges_lastDiveToday": "Buceaste hoy",
   "dashboard_gauges_noDivesYet": "Aún sin inmersiones",
   "settings_homeChips_pageTitle": "Chips de estado de Inicio",
   "settings_homeChips_description": "Elige qué chips de estado aparecen en la parte superior de la pestaña Inicio.",
+  "settings_homeChips_flightWindow": "Ventana de buceo antes del vuelo",
   "settings_homeChips_gear": "Mantenimiento del equipo",
   "settings_homeChips_insurance": "Seguro",
   "settings_homeChips_noFly": "Temporizador de no volar",

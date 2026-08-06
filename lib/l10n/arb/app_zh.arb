@@ -5759,12 +5759,25 @@
   "dashboard_gauges_insuranceExpired": "保险已过期",
   "dashboard_gauges_noInsurance": "未登记保险",
   "dashboard_gauges_noFlyClear": "禁飞 0:00",
+  "dashboard_gauges_flightWindow": "潜水窗口 {hours}:{minutes}",
+  "@dashboard_gauges_flightWindow": {
+    "placeholders": {
+      "hours": {
+        "type": "String"
+      },
+      "minutes": {
+        "type": "String"
+      }
+    }
+  },
+  "dashboard_gauges_flightWindowClosed": "航班前请勿再潜水",
   "dashboard_gauges_noFlyRemaining": "禁飞 {hours}:{minutes}",
   "dashboard_gauges_lastDiveDays": "上次潜水 {days} 天前",
   "dashboard_gauges_lastDiveToday": "今天潜过水",
   "dashboard_gauges_noDivesYet": "暂无潜水记录",
   "settings_homeChips_pageTitle": "主页状态标签",
   "settings_homeChips_description": "选择主页顶部显示哪些状态标签。",
+  "settings_homeChips_flightWindow": "航班前潜水窗口",
   "settings_homeChips_gear": "装备保养",
   "settings_homeChips_insurance": "保险",
   "settings_homeChips_noFly": "禁飞计时",

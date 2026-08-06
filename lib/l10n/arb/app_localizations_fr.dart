@@ -3126,6 +3126,15 @@ class AppLocalizationsFr extends AppLocalizations {
   String get dashboard_gauges_noFlyClear => 'Délai avant vol 0:00';
 
   @override
+  String dashboard_gauges_flightWindow(String hours, String minutes) {
+    return 'Fenêtre de plongée $hours:$minutes';
+  }
+
+  @override
+  String get dashboard_gauges_flightWindowClosed =>
+      'Plus de plongée avant le vol';
+
+  @override
   String dashboard_gauges_noFlyRemaining(String hours, String minutes) {
     return 'Délai avant vol $hours:$minutes';
   }
@@ -3147,6 +3156,9 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get settings_homeChips_description =>
       'Choisissez les pastilles d\'état affichées en haut de l\'onglet Accueil.';
+
+  @override
+  String get settings_homeChips_flightWindow => 'Fenêtre de plongée avant vol';
 
   @override
   String get settings_homeChips_gear => 'Entretien du matériel';
