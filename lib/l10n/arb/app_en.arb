@@ -7054,6 +7054,10 @@
   "@media_library_viewMode_timeline": {
     "description": "Library view mode: date-grouped timeline"
   },
+  "media_viewer_goToDive": "Go to dive",
+  "@media_viewer_goToDive": {
+    "description": "Viewer action: navigate to the dive owning this media"
+  },
   "nav_home": "Home",
   "nav_media": "Media",
   "nav_more": "More",

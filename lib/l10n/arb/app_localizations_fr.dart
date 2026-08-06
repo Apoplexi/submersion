@@ -12286,6 +12286,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get media_library_viewMode_timeline => 'Chronologie';
 
   @override
+  String get media_viewer_goToDive => 'Aller à la plongée';
+
+  @override
   String get nav_home => 'Accueil';
 
   @override

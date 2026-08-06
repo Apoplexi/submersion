@@ -11693,6 +11693,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get media_library_viewMode_timeline => '时间线';
 
   @override
+  String get media_viewer_goToDive => '前往潜水';
+
+  @override
   String get nav_home => '首页';
 
   @override

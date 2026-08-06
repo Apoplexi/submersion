@@ -12240,6 +12240,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get media_library_viewMode_timeline => 'Zeitleiste';
 
   @override
+  String get media_viewer_goToDive => 'Zum Tauchgang';
+
+  @override
   String get nav_home => 'Startseite';
 
   @override

@@ -12048,6 +12048,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get media_library_viewMode_timeline => 'Timeline';
 
   @override
+  String get media_viewer_goToDive => 'Go to dive';
+
+  @override
   String get nav_home => 'Home';
 
   @override

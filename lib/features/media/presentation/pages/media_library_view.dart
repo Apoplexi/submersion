@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/features/media/domain/entities/media_item.dart';
 import 'package:submersion/features/media/domain/entities/media_library_filter.dart';
+import 'package:submersion/features/media/presentation/pages/media_viewer_page.dart';
 import 'package:submersion/features/media/presentation/providers/media_library_providers.dart';
 import 'package:submersion/features/media/presentation/widgets/media_library_grid.dart';
 import 'package:submersion/features/media/presentation/widgets/media_library_grouped_list.dart';
@@ -17,6 +18,23 @@ class MediaLibraryView extends ConsumerWidget {
   void _setTypeFilter(WidgetRef ref, MediaType? type) {
     final notifier = ref.read(mediaLibraryFilterProvider.notifier);
     notifier.state = notifier.state.copyWith(mediaType: type);
+  }
+
+  void _openViewer(
+    BuildContext context,
+    List<MediaLibraryEntry> entries,
+    MediaLibraryEntry entry,
+  ) {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        fullscreenDialog: true,
+        builder: (_) => MediaViewerPage(
+          mediaList: entries.map((e) => e.item).toList(),
+          initialMediaId: entry.item.id,
+          showGoToDive: true,
+        ),
+      ),
+    );
   }
 
   @override
@@ -110,19 +128,19 @@ class MediaLibraryView extends ConsumerWidget {
         entries: state.entries,
         hasMore: state.hasMore,
         onLoadMore: loadMore,
-        onTileTap: (entry, index) {},
+        onTileTap: (entry, index) => _openViewer(context, state.entries, entry),
       ),
       MediaLibraryViewMode.byDive => MediaLibraryGroupedList(
         groups: groupByDive(state.entries),
         hasMore: state.hasMore,
         onLoadMore: loadMore,
-        onTileTap: (entry) {},
+        onTileTap: (entry) => _openViewer(context, state.entries, entry),
       ),
       MediaLibraryViewMode.timeline => MediaLibraryGroupedList(
         groups: groupByTimeline(state.entries),
         hasMore: state.hasMore,
         onLoadMore: loadMore,
-        onTileTap: (entry) {},
+        onTileTap: (entry) => _openViewer(context, state.entries, entry),
       ),
     };
   }

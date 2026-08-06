@@ -12026,6 +12026,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get media_library_viewMode_timeline => 'الخط الزمني';
 
   @override
+  String get media_viewer_goToDive => 'الانتقال إلى الغطسة';
+
+  @override
   String get nav_home => 'الرئيسية';
 
   @override

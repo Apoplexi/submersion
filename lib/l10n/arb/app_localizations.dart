@@ -20785,6 +20785,12 @@ abstract class AppLocalizations {
   /// **'Timeline'**
   String get media_library_viewMode_timeline;
 
+  /// Viewer action: navigate to the dive owning this media
+  ///
+  /// In en, this message translates to:
+  /// **'Go to dive'**
+  String get media_viewer_goToDive;
+
   /// Navigation label for home/dashboard
   ///
   /// In en, this message translates to:

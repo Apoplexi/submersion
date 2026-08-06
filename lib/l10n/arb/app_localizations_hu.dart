@@ -12210,6 +12210,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String get media_library_viewMode_timeline => 'Idővonal';
 
   @override
+  String get media_viewer_goToDive => 'Ugrás a merüléshez';
+
+  @override
   String get nav_home => 'Fooldal';
 
   @override

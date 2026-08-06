@@ -12251,6 +12251,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String get media_library_viewMode_timeline => 'Linha do tempo';
 
   @override
+  String get media_viewer_goToDive => 'Ir para o mergulho';
+
+  @override
   String get nav_home => 'Inicio';
 
   @override

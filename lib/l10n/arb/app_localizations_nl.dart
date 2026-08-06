@@ -12153,6 +12153,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get media_library_viewMode_timeline => 'Tijdlijn';
 
   @override
+  String get media_viewer_goToDive => 'Naar duik';
+
+  @override
   String get nav_home => 'Home';
 
   @override
