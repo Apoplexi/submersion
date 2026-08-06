@@ -22261,6 +22261,156 @@ class AppLocalizationsNl extends AppLocalizations {
       'Controleregels & vliegen na het duiken';
 
   @override
+  String get settings_section_security_title => 'App-beveiliging';
+
+  @override
+  String get settings_section_security_subtitle =>
+      'App-vergrendeling & databaseversleuteling';
+
+  @override
+  String get settings_security_appLock => 'App-vergrendeling';
+
+  @override
+  String get settings_security_appLock_subtitle =>
+      'Vereis je wachtwoord of biometrie om de app te openen';
+
+  @override
+  String get settings_security_biometrics => 'Ontgrendelen met biometrie';
+
+  @override
+  String get settings_security_autoLock => 'Automatisch vergrendelen';
+
+  @override
+  String get settings_security_autoLock_immediately => 'Onmiddellijk';
+
+  @override
+  String settings_security_autoLock_minutes(int minutes) {
+    String _temp0 = intl.Intl.pluralLogic(
+      minutes,
+      locale: localeName,
+      other: 'Na $minutes minuten',
+      one: 'Na 1 minuut',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get settings_security_autoLock_never => 'Nooit';
+
+  @override
+  String get settings_security_encryption => 'Database versleutelen';
+
+  @override
+  String get settings_security_encryption_subtitle =>
+      'Bescherm je duiklogbestand met versleuteling in rust';
+
+  @override
+  String get settings_security_encryption_progress_backup =>
+      'Veiligheidsback-up maken...';
+
+  @override
+  String get settings_security_encryption_progress_encrypt =>
+      'Database versleutelen...';
+
+  @override
+  String get settings_security_encryption_progress_decrypt =>
+      'Database ontsleutelen...';
+
+  @override
+  String get settings_security_encryption_progress_reopen =>
+      'Database opnieuw openen...';
+
+  @override
+  String get settings_security_changePassword => 'Wachtwoord wijzigen';
+
+  @override
+  String get settings_security_regenerateRecovery => 'Nieuwe herstelcode';
+
+  @override
+  String get settings_security_setPassword => 'App-wachtwoord instellen';
+
+  @override
+  String get settings_security_password => 'Wachtwoord';
+
+  @override
+  String get settings_security_confirmPassword => 'Bevestig wachtwoord';
+
+  @override
+  String get settings_security_currentPassword => 'Huidig wachtwoord';
+
+  @override
+  String get settings_security_newPassword => 'Nieuw wachtwoord';
+
+  @override
+  String get settings_security_passwordTooShort =>
+      'Het wachtwoord moet minimaal 4 tekens bevatten.';
+
+  @override
+  String get settings_security_passwordMismatch =>
+      'De wachtwoorden komen niet overeen.';
+
+  @override
+  String get settings_security_wrongPassword => 'Onjuist wachtwoord.';
+
+  @override
+  String get settings_security_recoveryCode_title => 'Je herstelcode';
+
+  @override
+  String get settings_security_recoveryCode_explain =>
+      'Schrijf deze op en bewaar hem veilig. Het is de enige manier om de app te ontgrendelen als je je wachtwoord vergeet, en hij vervangt elke eerdere herstelcode.';
+
+  @override
+  String get settings_security_recoveryCode_savedConfirm =>
+      'Ik heb mijn herstelcode opgeslagen';
+
+  @override
+  String get settings_security_disableBlockedByEncryption_title =>
+      'Versleuteling is ingeschakeld';
+
+  @override
+  String get settings_security_disableBlockedByEncryption_body =>
+      'Schakel eerst de databaseversleuteling uit voordat je de app-vergrendeling uitschakelt. De versleutelde database heeft een toegangscode nodig.';
+
+  @override
+  String get settings_security_enableEncryption_title =>
+      'Database versleutelen?';
+
+  @override
+  String get settings_security_enableEncryption_body =>
+      'Er wordt eerst een veiligheidsback-up gemaakt, daarna wordt het databasebestand ter plekke opnieuw versleuteld. Dit kan even duren bij grote logboeken.';
+
+  @override
+  String get settings_security_disableEncryption_title =>
+      'Versleuteling uitschakelen?';
+
+  @override
+  String get settings_security_disableEncryption_body =>
+      'Het databasebestand wordt weer onversleuteld op schijf opgeslagen.';
+
+  @override
+  String get settings_security_turnOffAppLock_title =>
+      'App-vergrendeling uitschakelen?';
+
+  @override
+  String get settings_security_turnOffAppLock_body =>
+      'De app opent voortaan zonder om je wachtwoord te vragen.';
+
+  @override
+  String get settings_security_unlock_title => 'Voer je wachtwoord in';
+
+  @override
+  String get settings_security_cancel => 'Annuleren';
+
+  @override
+  String get settings_security_continue => 'Doorgaan';
+
+  @override
+  String get settings_security_done => 'Klaar';
+
+  @override
+  String get settings_security_turnOff => 'Uitschakelen';
+
+  @override
   String get dataQuality_inbox_title => 'Datakwaliteit';
 
   @override

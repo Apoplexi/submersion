@@ -22435,6 +22435,157 @@ class AppLocalizationsPt extends AppLocalizations {
       'Regras de revisão e voar após mergulhar';
 
   @override
+  String get settings_section_security_title => 'Segurança do app';
+
+  @override
+  String get settings_section_security_subtitle =>
+      'Bloqueio do app e criptografia do banco de dados';
+
+  @override
+  String get settings_security_appLock => 'Bloqueio do app';
+
+  @override
+  String get settings_security_appLock_subtitle =>
+      'Exigir sua senha ou biometria para abrir o app';
+
+  @override
+  String get settings_security_biometrics => 'Desbloquear com biometria';
+
+  @override
+  String get settings_security_autoLock => 'Bloqueio automático';
+
+  @override
+  String get settings_security_autoLock_immediately => 'Imediatamente';
+
+  @override
+  String settings_security_autoLock_minutes(int minutes) {
+    String _temp0 = intl.Intl.pluralLogic(
+      minutes,
+      locale: localeName,
+      other: 'Após $minutes minutos',
+      one: 'Após 1 minuto',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get settings_security_autoLock_never => 'Nunca';
+
+  @override
+  String get settings_security_encryption => 'Criptografar banco de dados';
+
+  @override
+  String get settings_security_encryption_subtitle =>
+      'Proteja o arquivo do seu registro de mergulhos com criptografia em repouso';
+
+  @override
+  String get settings_security_encryption_progress_backup =>
+      'Criando backup de segurança...';
+
+  @override
+  String get settings_security_encryption_progress_encrypt =>
+      'Criptografando banco de dados...';
+
+  @override
+  String get settings_security_encryption_progress_decrypt =>
+      'Descriptografando banco de dados...';
+
+  @override
+  String get settings_security_encryption_progress_reopen =>
+      'Reabrindo banco de dados...';
+
+  @override
+  String get settings_security_changePassword => 'Alterar senha';
+
+  @override
+  String get settings_security_regenerateRecovery =>
+      'Novo código de recuperação';
+
+  @override
+  String get settings_security_setPassword => 'Definir senha do app';
+
+  @override
+  String get settings_security_password => 'Senha';
+
+  @override
+  String get settings_security_confirmPassword => 'Confirmar senha';
+
+  @override
+  String get settings_security_currentPassword => 'Senha atual';
+
+  @override
+  String get settings_security_newPassword => 'Nova senha';
+
+  @override
+  String get settings_security_passwordTooShort =>
+      'A senha deve ter pelo menos 4 caracteres.';
+
+  @override
+  String get settings_security_passwordMismatch => 'As senhas não coincidem.';
+
+  @override
+  String get settings_security_wrongPassword => 'Senha incorreta.';
+
+  @override
+  String get settings_security_recoveryCode_title =>
+      'Seu código de recuperação';
+
+  @override
+  String get settings_security_recoveryCode_explain =>
+      'Anote-o e guarde-o em local seguro. É a única forma de desbloquear o app se você esquecer sua senha, e ele substitui qualquer código de recuperação anterior.';
+
+  @override
+  String get settings_security_recoveryCode_savedConfirm =>
+      'Salvei meu código de recuperação';
+
+  @override
+  String get settings_security_disableBlockedByEncryption_title =>
+      'A criptografia está ativada';
+
+  @override
+  String get settings_security_disableBlockedByEncryption_body =>
+      'Desative a criptografia do banco de dados antes de desativar o bloqueio do app. O banco criptografado precisa de uma credencial.';
+
+  @override
+  String get settings_security_enableEncryption_title =>
+      'Criptografar o banco de dados?';
+
+  @override
+  String get settings_security_enableEncryption_body =>
+      'Primeiro é criado um backup de segurança e depois o arquivo do banco é recriptografado no local. Pode demorar com registros grandes.';
+
+  @override
+  String get settings_security_disableEncryption_title =>
+      'Desativar a criptografia?';
+
+  @override
+  String get settings_security_disableEncryption_body =>
+      'O arquivo do banco de dados voltará a ser armazenado sem criptografia no disco.';
+
+  @override
+  String get settings_security_turnOffAppLock_title =>
+      'Desativar o bloqueio do app?';
+
+  @override
+  String get settings_security_turnOffAppLock_body =>
+      'O app abrirá sem pedir sua senha.';
+
+  @override
+  String get settings_security_unlock_title => 'Digite sua senha';
+
+  @override
+  String get settings_security_cancel => 'Cancelar';
+
+  @override
+  String get settings_security_continue => 'Continuar';
+
+  @override
+  String get settings_security_done => 'Concluído';
+
+  @override
+  String get settings_security_turnOff => 'Desativar';
+
+  @override
   String get dataQuality_inbox_title => 'Qualidade dos dados';
 
   @override

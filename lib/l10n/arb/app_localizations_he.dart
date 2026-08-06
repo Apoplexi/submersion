@@ -21879,6 +21879,154 @@ class AppLocalizationsHe extends AppLocalizations {
   String get settings_section_safety_subtitle => 'כללי סקירה וטיסה אחרי צלילה';
 
   @override
+  String get settings_section_security_title => 'אבטחת האפליקציה';
+
+  @override
+  String get settings_section_security_subtitle =>
+      'נעילת אפליקציה והצפנת מסד הנתונים';
+
+  @override
+  String get settings_security_appLock => 'נעילת אפליקציה';
+
+  @override
+  String get settings_security_appLock_subtitle =>
+      'דרישת סיסמה או ביומטריה לפתיחת האפליקציה';
+
+  @override
+  String get settings_security_biometrics => 'ביטול נעילה באמצעות ביומטריה';
+
+  @override
+  String get settings_security_autoLock => 'נעילה אוטומטית';
+
+  @override
+  String get settings_security_autoLock_immediately => 'מיד';
+
+  @override
+  String settings_security_autoLock_minutes(int minutes) {
+    String _temp0 = intl.Intl.pluralLogic(
+      minutes,
+      locale: localeName,
+      other: 'אחרי $minutes דקות',
+      one: 'אחרי דקה אחת',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get settings_security_autoLock_never => 'אף פעם';
+
+  @override
+  String get settings_security_encryption => 'הצפנת מסד הנתונים';
+
+  @override
+  String get settings_security_encryption_subtitle =>
+      'הגנו על קובץ יומן הצלילות שלכם באמצעות הצפנה במנוחה';
+
+  @override
+  String get settings_security_encryption_progress_backup =>
+      'יוצר גיבוי בטיחות...';
+
+  @override
+  String get settings_security_encryption_progress_encrypt =>
+      'מצפין את מסד הנתונים...';
+
+  @override
+  String get settings_security_encryption_progress_decrypt =>
+      'מפענח את מסד הנתונים...';
+
+  @override
+  String get settings_security_encryption_progress_reopen =>
+      'פותח מחדש את מסד הנתונים...';
+
+  @override
+  String get settings_security_changePassword => 'שינוי סיסמה';
+
+  @override
+  String get settings_security_regenerateRecovery => 'קוד שחזור חדש';
+
+  @override
+  String get settings_security_setPassword => 'הגדרת סיסמת אפליקציה';
+
+  @override
+  String get settings_security_password => 'סיסמה';
+
+  @override
+  String get settings_security_confirmPassword => 'אישור סיסמה';
+
+  @override
+  String get settings_security_currentPassword => 'סיסמה נוכחית';
+
+  @override
+  String get settings_security_newPassword => 'סיסמה חדשה';
+
+  @override
+  String get settings_security_passwordTooShort =>
+      'הסיסמה חייבת להכיל לפחות 4 תווים.';
+
+  @override
+  String get settings_security_passwordMismatch => 'הסיסמאות אינן תואמות.';
+
+  @override
+  String get settings_security_wrongPassword => 'סיסמה שגויה.';
+
+  @override
+  String get settings_security_recoveryCode_title => 'קוד השחזור שלכם';
+
+  @override
+  String get settings_security_recoveryCode_explain =>
+      'רשמו אותו ושמרו אותו במקום בטוח. זו הדרך היחידה לפתוח את האפליקציה אם תשכחו את הסיסמה, והוא מחליף כל קוד שחזור קודם.';
+
+  @override
+  String get settings_security_recoveryCode_savedConfirm =>
+      'שמרתי את קוד השחזור שלי';
+
+  @override
+  String get settings_security_disableBlockedByEncryption_title =>
+      'ההצפנה פעילה';
+
+  @override
+  String get settings_security_disableBlockedByEncryption_body =>
+      'כבו תחילה את הצפנת מסד הנתונים לפני כיבוי נעילת האפליקציה. מסד הנתונים המוצפן דורש אמצעי אימות.';
+
+  @override
+  String get settings_security_enableEncryption_title =>
+      'להצפין את מסד הנתונים?';
+
+  @override
+  String get settings_security_enableEncryption_body =>
+      'תחילה נוצר גיבוי בטיחות ואז קובץ מסד הנתונים מוצפן מחדש במקומו. זה עשוי להימשך זמן מה ביומנים גדולים.';
+
+  @override
+  String get settings_security_disableEncryption_title => 'לכבות את ההצפנה?';
+
+  @override
+  String get settings_security_disableEncryption_body =>
+      'קובץ מסד הנתונים יישמר שוב ללא הצפנה בדיסק.';
+
+  @override
+  String get settings_security_turnOffAppLock_title =>
+      'לכבות את נעילת האפליקציה?';
+
+  @override
+  String get settings_security_turnOffAppLock_body =>
+      'האפליקציה תיפתח מבלי לבקש את הסיסמה.';
+
+  @override
+  String get settings_security_unlock_title => 'הזינו את הסיסמה';
+
+  @override
+  String get settings_security_cancel => 'ביטול';
+
+  @override
+  String get settings_security_continue => 'המשך';
+
+  @override
+  String get settings_security_done => 'סיום';
+
+  @override
+  String get settings_security_turnOff => 'כיבוי';
+
+  @override
   String get dataQuality_inbox_title => 'איכות הנתונים';
 
   @override

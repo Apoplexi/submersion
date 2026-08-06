@@ -22061,6 +22061,153 @@ class AppLocalizationsEn extends AppLocalizations {
       'Review rules & flying after diving';
 
   @override
+  String get settings_section_security_title => 'App Security';
+
+  @override
+  String get settings_section_security_subtitle =>
+      'App lock & database encryption';
+
+  @override
+  String get settings_security_appLock => 'App Lock';
+
+  @override
+  String get settings_security_appLock_subtitle =>
+      'Require your password or biometrics to open the app';
+
+  @override
+  String get settings_security_biometrics => 'Unlock with biometrics';
+
+  @override
+  String get settings_security_autoLock => 'Auto-lock';
+
+  @override
+  String get settings_security_autoLock_immediately => 'Immediately';
+
+  @override
+  String settings_security_autoLock_minutes(int minutes) {
+    String _temp0 = intl.Intl.pluralLogic(
+      minutes,
+      locale: localeName,
+      other: 'After $minutes minutes',
+      one: 'After 1 minute',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get settings_security_autoLock_never => 'Never';
+
+  @override
+  String get settings_security_encryption => 'Encrypt database';
+
+  @override
+  String get settings_security_encryption_subtitle =>
+      'Protect your dive log file with at-rest encryption';
+
+  @override
+  String get settings_security_encryption_progress_backup =>
+      'Creating safety backup...';
+
+  @override
+  String get settings_security_encryption_progress_encrypt =>
+      'Encrypting database...';
+
+  @override
+  String get settings_security_encryption_progress_decrypt =>
+      'Decrypting database...';
+
+  @override
+  String get settings_security_encryption_progress_reopen =>
+      'Reopening database...';
+
+  @override
+  String get settings_security_changePassword => 'Change password';
+
+  @override
+  String get settings_security_regenerateRecovery => 'New recovery code';
+
+  @override
+  String get settings_security_setPassword => 'Set app password';
+
+  @override
+  String get settings_security_password => 'Password';
+
+  @override
+  String get settings_security_confirmPassword => 'Confirm password';
+
+  @override
+  String get settings_security_currentPassword => 'Current password';
+
+  @override
+  String get settings_security_newPassword => 'New password';
+
+  @override
+  String get settings_security_passwordTooShort =>
+      'Password must be at least 4 characters.';
+
+  @override
+  String get settings_security_passwordMismatch => 'Passwords do not match.';
+
+  @override
+  String get settings_security_wrongPassword => 'Incorrect password.';
+
+  @override
+  String get settings_security_recoveryCode_title => 'Your recovery code';
+
+  @override
+  String get settings_security_recoveryCode_explain =>
+      'Write this down and keep it safe. It is the only way to unlock the app if you forget your password, and it replaces any previous recovery code.';
+
+  @override
+  String get settings_security_recoveryCode_savedConfirm =>
+      'I saved my recovery code';
+
+  @override
+  String get settings_security_disableBlockedByEncryption_title =>
+      'Encryption is on';
+
+  @override
+  String get settings_security_disableBlockedByEncryption_body =>
+      'Turn off database encryption before turning off App Lock. The encrypted database needs a credential.';
+
+  @override
+  String get settings_security_enableEncryption_title => 'Encrypt database?';
+
+  @override
+  String get settings_security_enableEncryption_body =>
+      'A safety backup is created first, then the database file is re-encrypted in place. This can take a while for large dive logs.';
+
+  @override
+  String get settings_security_disableEncryption_title =>
+      'Turn off encryption?';
+
+  @override
+  String get settings_security_disableEncryption_body =>
+      'The database file will be stored unencrypted on disk again.';
+
+  @override
+  String get settings_security_turnOffAppLock_title => 'Turn off App Lock?';
+
+  @override
+  String get settings_security_turnOffAppLock_body =>
+      'The app will open without asking for your password.';
+
+  @override
+  String get settings_security_unlock_title => 'Enter your password';
+
+  @override
+  String get settings_security_cancel => 'Cancel';
+
+  @override
+  String get settings_security_continue => 'Continue';
+
+  @override
+  String get settings_security_done => 'Done';
+
+  @override
+  String get settings_security_turnOff => 'Turn off';
+
+  @override
   String get dataQuality_inbox_title => 'Data quality';
 
   @override

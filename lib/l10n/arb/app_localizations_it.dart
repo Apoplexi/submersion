@@ -22432,6 +22432,157 @@ class AppLocalizationsIt extends AppLocalizations {
       'Regole di revisione e volo dopo l\'immersione';
 
   @override
+  String get settings_section_security_title => 'Sicurezza dell\'app';
+
+  @override
+  String get settings_section_security_subtitle =>
+      'Blocco app e crittografia del database';
+
+  @override
+  String get settings_security_appLock => 'Blocco app';
+
+  @override
+  String get settings_security_appLock_subtitle =>
+      'Richiedi la password o la biometria per aprire l\'app';
+
+  @override
+  String get settings_security_biometrics => 'Sblocca con la biometria';
+
+  @override
+  String get settings_security_autoLock => 'Blocco automatico';
+
+  @override
+  String get settings_security_autoLock_immediately => 'Immediatamente';
+
+  @override
+  String settings_security_autoLock_minutes(int minutes) {
+    String _temp0 = intl.Intl.pluralLogic(
+      minutes,
+      locale: localeName,
+      other: 'Dopo $minutes minuti',
+      one: 'Dopo 1 minuto',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get settings_security_autoLock_never => 'Mai';
+
+  @override
+  String get settings_security_encryption => 'Crittografa database';
+
+  @override
+  String get settings_security_encryption_subtitle =>
+      'Proteggi il file del tuo diario di immersioni con la crittografia a riposo';
+
+  @override
+  String get settings_security_encryption_progress_backup =>
+      'Creazione del backup di sicurezza...';
+
+  @override
+  String get settings_security_encryption_progress_encrypt =>
+      'Crittografia del database...';
+
+  @override
+  String get settings_security_encryption_progress_decrypt =>
+      'Decrittografia del database...';
+
+  @override
+  String get settings_security_encryption_progress_reopen =>
+      'Riapertura del database...';
+
+  @override
+  String get settings_security_changePassword => 'Cambia password';
+
+  @override
+  String get settings_security_regenerateRecovery => 'Nuovo codice di recupero';
+
+  @override
+  String get settings_security_setPassword => 'Imposta la password dell\'app';
+
+  @override
+  String get settings_security_password => 'Password';
+
+  @override
+  String get settings_security_confirmPassword => 'Conferma password';
+
+  @override
+  String get settings_security_currentPassword => 'Password attuale';
+
+  @override
+  String get settings_security_newPassword => 'Nuova password';
+
+  @override
+  String get settings_security_passwordTooShort =>
+      'La password deve contenere almeno 4 caratteri.';
+
+  @override
+  String get settings_security_passwordMismatch =>
+      'Le password non coincidono.';
+
+  @override
+  String get settings_security_wrongPassword => 'Password errata.';
+
+  @override
+  String get settings_security_recoveryCode_title =>
+      'Il tuo codice di recupero';
+
+  @override
+  String get settings_security_recoveryCode_explain =>
+      'Annotalo e conservalo in un luogo sicuro. È l\'unico modo per sbloccare l\'app se dimentichi la password e sostituisce qualsiasi codice di recupero precedente.';
+
+  @override
+  String get settings_security_recoveryCode_savedConfirm =>
+      'Ho salvato il mio codice di recupero';
+
+  @override
+  String get settings_security_disableBlockedByEncryption_title =>
+      'La crittografia è attiva';
+
+  @override
+  String get settings_security_disableBlockedByEncryption_body =>
+      'Disattiva prima la crittografia del database, poi il blocco app. Il database crittografato richiede una credenziale.';
+
+  @override
+  String get settings_security_enableEncryption_title =>
+      'Crittografare il database?';
+
+  @override
+  String get settings_security_enableEncryption_body =>
+      'Prima viene creato un backup di sicurezza, poi il file del database viene ricrittografato sul posto. Con diari grandi può richiedere tempo.';
+
+  @override
+  String get settings_security_disableEncryption_title =>
+      'Disattivare la crittografia?';
+
+  @override
+  String get settings_security_disableEncryption_body =>
+      'Il file del database tornerà a essere salvato non crittografato su disco.';
+
+  @override
+  String get settings_security_turnOffAppLock_title =>
+      'Disattivare il blocco app?';
+
+  @override
+  String get settings_security_turnOffAppLock_body =>
+      'L\'app si aprirà senza chiedere la password.';
+
+  @override
+  String get settings_security_unlock_title => 'Inserisci la password';
+
+  @override
+  String get settings_security_cancel => 'Annulla';
+
+  @override
+  String get settings_security_continue => 'Continua';
+
+  @override
+  String get settings_security_done => 'Fatto';
+
+  @override
+  String get settings_security_turnOff => 'Disattiva';
+
+  @override
   String get dataQuality_inbox_title => 'Qualità dei dati';
 
   @override
