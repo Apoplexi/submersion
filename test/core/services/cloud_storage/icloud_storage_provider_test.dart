@@ -198,6 +198,30 @@ void main() {
       );
     });
 
+    test('uploadFileFromPath cleans the staging file when the copy itself '
+        'fails', () async {
+      // A missing source makes the staging copy throw before the move ever
+      // runs; the cleanup guard must cover this leg too (a real-world failed
+      // copy — disk full — can leave a partial staging file).
+      final provider = transferProvider(
+        move: (_, _) async => fail('move must not run when the copy fails'),
+      );
+
+      await expectLater(
+        provider.uploadFileFromPath(
+          p.join(tempDir.path, 'does-not-exist.db'),
+          'submersion_backup_x.db',
+        ),
+        throwsA(isA<CloudStorageException>()),
+      );
+
+      final syncDir = Directory(containerPath).listSync(recursive: true);
+      expect(
+        syncDir.whereType<File>().where((f) => f.path.endsWith('.uploading')),
+        isEmpty,
+      );
+    });
+
     test('downloadToFile materializes and copies the container file', () async {
       final containerFile = File(p.join(containerPath, 'b.db'))
         ..writeAsStringSync('bytes');

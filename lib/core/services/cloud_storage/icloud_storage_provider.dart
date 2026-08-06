@@ -285,10 +285,12 @@ class ICloudStorageProvider
       final filePath = path.join(syncFolder, filename);
 
       // Copy next to the destination so the coordinated move is same-volume,
-      // mirroring ICloudMediaObjectStore.putFile.
+      // mirroring ICloudMediaObjectStore.putFile. The copy itself sits inside
+      // the cleanup guard: a failed copy (disk full, permissions) can leave a
+      // partial staging file behind just like a failed move.
       final staging = '$filePath.uploading';
-      await File(sourcePath).copy(staging);
       try {
+        await File(sourcePath).copy(staging);
         final moved = await _moveIntoContainer(staging, filePath);
         if (!moved) {
           throw CloudStorageException('iCloud move failed for $filename');
