@@ -12337,6 +12337,12 @@ class AppLocalizationsPt extends AppLocalizations {
   String get media_library_filter_clear => 'Limpar filtros';
 
   @override
+  String get media_divePicker_title => 'Mover para um mergulho';
+
+  @override
+  String get media_divePicker_search => 'Pesquisar mergulhos';
+
+  @override
   String get media_library_deleteConfirmBody =>
       'Isso os remove do aplicativo e de qualquer armazenamento de mídia. Não pode ser desfeito.';
 

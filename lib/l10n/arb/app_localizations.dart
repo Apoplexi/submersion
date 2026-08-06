@@ -20917,6 +20917,18 @@ abstract class AppLocalizations {
   /// **'Clear filters'**
   String get media_library_filter_clear;
 
+  /// Title of the dive picker sheet
+  ///
+  /// In en, this message translates to:
+  /// **'Move to dive'**
+  String get media_divePicker_title;
+
+  /// Search hint in the dive picker sheet
+  ///
+  /// In en, this message translates to:
+  /// **'Search dives'**
+  String get media_divePicker_search;
+
   /// Body of the bulk delete confirmation dialog
   ///
   /// In en, this message translates to:

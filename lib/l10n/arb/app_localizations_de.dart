@@ -12326,6 +12326,12 @@ class AppLocalizationsDe extends AppLocalizations {
   String get media_library_filter_clear => 'Filter zurücksetzen';
 
   @override
+  String get media_divePicker_title => 'Zu Tauchgang verschieben';
+
+  @override
+  String get media_divePicker_search => 'Tauchgänge durchsuchen';
+
+  @override
   String get media_library_deleteConfirmBody =>
       'Dies entfernt sie aus der App und aus jedem Medienspeicher. Dies kann nicht rückgängig gemacht werden.';
 

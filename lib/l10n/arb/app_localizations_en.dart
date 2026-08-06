@@ -12134,6 +12134,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get media_library_filter_clear => 'Clear filters';
 
   @override
+  String get media_divePicker_title => 'Move to dive';
+
+  @override
+  String get media_divePicker_search => 'Search dives';
+
+  @override
   String get media_library_deleteConfirmBody =>
       'This removes them from the app and any media store. This cannot be undone.';
 

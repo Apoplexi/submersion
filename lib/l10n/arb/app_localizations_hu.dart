@@ -12294,6 +12294,12 @@ class AppLocalizationsHu extends AppLocalizations {
   String get media_library_filter_clear => 'Szűrők törlése';
 
   @override
+  String get media_divePicker_title => 'Áthelyezés merüléshez';
+
+  @override
+  String get media_divePicker_search => 'Merülések keresése';
+
+  @override
   String get media_library_deleteConfirmBody =>
       'Ez eltávolítja őket az alkalmazásból és minden médiatárból. Nem vonható vissza.';
 

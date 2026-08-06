@@ -12111,6 +12111,12 @@ class AppLocalizationsAr extends AppLocalizations {
   String get media_library_filter_clear => 'مسح عوامل التصفية';
 
   @override
+  String get media_divePicker_title => 'نقل إلى غطسة';
+
+  @override
+  String get media_divePicker_search => 'البحث في الغطسات';
+
+  @override
   String get media_library_deleteConfirmBody =>
       'ستتم إزالتها من التطبيق ومن أي مخزن وسائط. لا يمكن التراجع عن هذا.';
 

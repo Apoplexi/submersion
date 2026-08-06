@@ -12333,6 +12333,12 @@ class AppLocalizationsIt extends AppLocalizations {
   String get media_library_filter_clear => 'Cancella filtri';
 
   @override
+  String get media_divePicker_title => 'Sposta in un\'immersione';
+
+  @override
+  String get media_divePicker_search => 'Cerca immersioni';
+
+  @override
   String get media_library_deleteConfirmBody =>
       'Questo li rimuove dall\'app e da qualsiasi archivio multimediale. Non può essere annullato.';
 

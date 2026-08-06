@@ -12321,6 +12321,12 @@ class AppLocalizationsEs extends AppLocalizations {
   String get media_library_filter_clear => 'Borrar filtros';
 
   @override
+  String get media_divePicker_title => 'Mover a una inmersión';
+
+  @override
+  String get media_divePicker_search => 'Buscar inmersiones';
+
+  @override
   String get media_library_deleteConfirmBody =>
       'Esto los elimina de la aplicación y de cualquier almacén multimedia. No se puede deshacer.';
 

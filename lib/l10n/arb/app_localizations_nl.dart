@@ -12239,6 +12239,12 @@ class AppLocalizationsNl extends AppLocalizations {
   String get media_library_filter_clear => 'Filters wissen';
 
   @override
+  String get media_divePicker_title => 'Naar duik verplaatsen';
+
+  @override
+  String get media_divePicker_search => 'Duiken zoeken';
+
+  @override
   String get media_library_deleteConfirmBody =>
       'Dit verwijdert ze uit de app en elke mediaopslag. Dit kan niet ongedaan worden gemaakt.';
 

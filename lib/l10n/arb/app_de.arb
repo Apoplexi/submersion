@@ -3893,6 +3893,8 @@
   "media_library_filter_all": "Alle",
   "media_library_filter_photos": "Fotos",
   "media_library_filter_videos": "Videos",
+  "media_divePicker_title": "Zu Tauchgang verschieben",
+  "media_divePicker_search": "Tauchgänge durchsuchen",
   "media_library_deleteConfirmBody": "Dies entfernt sie aus der App und aus jedem Medienspeicher. Dies kann nicht rückgängig gemacht werden.",
   "media_library_deleteConfirmTitle": "{count} Elemente löschen?",
   "media_library_selectedCount": "{count} ausgewählt",

@@ -11773,6 +11773,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get media_library_filter_clear => '清除筛选';
 
   @override
+  String get media_divePicker_title => '移至潜水';
+
+  @override
+  String get media_divePicker_search => '搜索潜水';
+
+  @override
   String get media_library_deleteConfirmBody => '这会将它们从应用和任何媒体存储中移除。此操作无法撤销。';
 
   @override

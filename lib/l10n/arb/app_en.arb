@@ -7090,6 +7090,14 @@
   "@media_library_filter_clear": {
     "description": "Library filter chip: reset every filter"
   },
+  "media_divePicker_title": "Move to dive",
+  "@media_divePicker_title": {
+    "description": "Title of the dive picker sheet"
+  },
+  "media_divePicker_search": "Search dives",
+  "@media_divePicker_search": {
+    "description": "Search hint in the dive picker sheet"
+  },
   "media_library_deleteConfirmBody": "This removes them from the app and any media store. This cannot be undone.",
   "@media_library_deleteConfirmBody": {
     "description": "Body of the bulk delete confirmation dialog"

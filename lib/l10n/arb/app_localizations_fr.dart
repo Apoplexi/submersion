@@ -12372,6 +12372,12 @@ class AppLocalizationsFr extends AppLocalizations {
   String get media_library_filter_clear => 'Effacer les filtres';
 
   @override
+  String get media_divePicker_title => 'Déplacer vers une plongée';
+
+  @override
+  String get media_divePicker_search => 'Rechercher des plongées';
+
+  @override
   String get media_library_deleteConfirmBody =>
       'Cela les supprime de l\'application et de tout stockage multimédia. Cette action est irréversible.';
 

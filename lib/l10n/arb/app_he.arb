@@ -3821,6 +3821,8 @@
   "media_library_filter_all": "הכול",
   "media_library_filter_photos": "תמונות",
   "media_library_filter_videos": "סרטונים",
+  "media_divePicker_title": "העברה לצלילה",
+  "media_divePicker_search": "חיפוש צלילות",
   "media_library_deleteConfirmBody": "פעולה זו מסירה אותם מהאפליקציה ומכל מאגר מדיה. לא ניתן לבטל זאת.",
   "media_library_deleteConfirmTitle": "למחוק {count} פריטים?",
   "media_library_selectedCount": "{count} נבחרו",

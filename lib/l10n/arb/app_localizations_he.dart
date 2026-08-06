@@ -12029,6 +12029,12 @@ class AppLocalizationsHe extends AppLocalizations {
   String get media_library_filter_clear => 'ניקוי מסננים';
 
   @override
+  String get media_divePicker_title => 'העברה לצלילה';
+
+  @override
+  String get media_divePicker_search => 'חיפוש צלילות';
+
+  @override
   String get media_library_deleteConfirmBody =>
       'פעולה זו מסירה אותם מהאפליקציה ומכל מאגר מדיה. לא ניתן לבטל זאת.';
 

@@ -3893,6 +3893,8 @@
   "media_library_filter_all": "Tudo",
   "media_library_filter_photos": "Fotos",
   "media_library_filter_videos": "Vídeos",
+  "media_divePicker_title": "Mover para um mergulho",
+  "media_divePicker_search": "Pesquisar mergulhos",
   "media_library_deleteConfirmBody": "Isso os remove do aplicativo e de qualquer armazenamento de mídia. Não pode ser desfeito.",
   "media_library_deleteConfirmTitle": "Excluir {count} itens?",
   "media_library_selectedCount": "{count} selecionados",
