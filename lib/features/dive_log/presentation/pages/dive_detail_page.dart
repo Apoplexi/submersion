@@ -846,12 +846,19 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
           CircleAvatar(
             radius: 16,
             backgroundColor: colorScheme.primaryContainer,
-            child: Text(
-              '#${dive.diveNumber ?? '-'}',
-              style: TextStyle(
-                color: colorScheme.onPrimaryContainer,
-                fontWeight: FontWeight.bold,
-                fontSize: 11,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 3),
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(
+                  '#${dive.diveNumber ?? '-'}',
+                  maxLines: 1,
+                  style: TextStyle(
+                    color: colorScheme.onPrimaryContainer,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 11,
+                  ),
+                ),
               ),
             ),
           ),
@@ -1025,11 +1032,22 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
               CircleAvatar(
                 radius: 24,
                 backgroundColor: colorScheme.primaryContainer,
-                child: Text(
-                  '#${dive.diveNumber ?? '-'}',
-                  style: TextStyle(
-                    color: colorScheme.onPrimaryContainer,
-                    fontWeight: FontWeight.bold,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(
+                      '#${dive.diveNumber ?? '-'}',
+                      maxLines: 1,
+                      style: TextStyle(
+                        color: colorScheme.onPrimaryContainer,
+                        fontWeight: FontWeight.bold,
+                        // Pin the pre-scale size (CircleAvatar's implicit
+                        // titleMedium default) so FittedBox scales from a
+                        // theme-independent baseline.
+                        fontSize: 16,
+                      ),
+                    ),
                   ),
                 ),
               ),
