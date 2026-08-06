@@ -1047,6 +1047,44 @@ class MediaRepository {
     SyncEventBus.notifyLocalChange();
   }
 
+  /// Moves media to [newDiveId] (also the link path for unlinked rows).
+  /// Enrichment rows are join products of media x the OLD dive's profile:
+  /// stale after the move, so they are deleted with tombstones (enrichment
+  /// is an HLC-synced entity) and recomputed lazily by DiveMediaEnricher
+  /// the next time the new dive's media renders.
+  Future<void> reassignMediaToDive(
+    List<String> mediaIds,
+    String newDiveId,
+  ) async {
+    if (mediaIds.isEmpty) return;
+    final now = DateTime.now().millisecondsSinceEpoch;
+    await _db.transaction(() async {
+      final stale = await (_db.select(
+        _db.mediaEnrichment,
+      )..where((t) => t.mediaId.isIn(mediaIds))).get();
+      for (final row in stale) {
+        await (_db.delete(
+          _db.mediaEnrichment,
+        )..where((t) => t.id.equals(row.id))).go();
+        await _syncRepository.logDeletion(
+          entityType: 'mediaEnrichment',
+          recordId: row.id,
+        );
+      }
+      await (_db.update(_db.media)..where((t) => t.id.isIn(mediaIds))).write(
+        MediaCompanion(diveId: Value(newDiveId), updatedAt: Value(now)),
+      );
+      for (final id in mediaIds) {
+        await _syncRepository.markRecordPending(
+          entityType: 'media',
+          recordId: id,
+          localUpdatedAt: now,
+        );
+      }
+    });
+    SyncEventBus.notifyLocalChange();
+  }
+
   /// User-initiated unlink (Media section Phase 2): clears the dive link,
   /// keeps the row, and sets retain_in_library so the orphan sweep never
   /// GCs the blobs of media the user deliberately kept. Same sync-safe
