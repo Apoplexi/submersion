@@ -17513,6 +17513,15 @@ class AppLocalizationsHu extends AppLocalizations {
   String get trips_edit_label_resortName => 'Udulohely neve';
 
   @override
+  String get trips_edit_label_returnFlight => 'Visszaúti járat';
+
+  @override
+  String get trips_edit_returnFlightClear => 'Visszaúti járat törlése';
+
+  @override
+  String get trips_edit_returnFlightNotSet => 'Nincs megadva';
+
+  @override
   String get trips_edit_label_startDate => 'Kezdes datuma';
 
   @override

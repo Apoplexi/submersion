@@ -17582,6 +17582,15 @@ class AppLocalizationsEs extends AppLocalizations {
   String get trips_edit_label_resortName => 'Nombre del resort';
 
   @override
+  String get trips_edit_label_returnFlight => 'Vuelo de regreso';
+
+  @override
+  String get trips_edit_returnFlightClear => 'Borrar vuelo de regreso';
+
+  @override
+  String get trips_edit_returnFlightNotSet => 'Sin definir';
+
+  @override
   String get trips_edit_label_startDate => 'Fecha de inicio';
 
   @override

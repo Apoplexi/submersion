@@ -17266,6 +17266,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get trips_edit_label_resortName => 'Resort Name';
 
   @override
+  String get trips_edit_label_returnFlight => 'Return Flight';
+
+  @override
+  String get trips_edit_returnFlightClear => 'Clear return flight';
+
+  @override
+  String get trips_edit_returnFlightNotSet => 'Not set';
+
+  @override
   String get trips_edit_label_startDate => 'Start Date';
 
   @override

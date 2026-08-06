@@ -17246,6 +17246,15 @@ class AppLocalizationsAr extends AppLocalizations {
   String get trips_edit_label_resortName => 'اسم المنتجع';
 
   @override
+  String get trips_edit_label_returnFlight => 'رحلة العودة';
+
+  @override
+  String get trips_edit_returnFlightClear => 'مسح رحلة العودة';
+
+  @override
+  String get trips_edit_returnFlightNotSet => 'غير محدد';
+
+  @override
   String get trips_edit_label_startDate => 'تاريخ البدء';
 
   @override

@@ -16669,6 +16669,15 @@ class AppLocalizationsZh extends AppLocalizations {
   String get trips_edit_label_resortName => '度假村名称';
 
   @override
+  String get trips_edit_label_returnFlight => '返程航班';
+
+  @override
+  String get trips_edit_returnFlightClear => '清除返程航班';
+
+  @override
+  String get trips_edit_returnFlightNotSet => '未设置';
+
+  @override
   String get trips_edit_label_startDate => '开始日期';
 
   @override

@@ -29446,6 +29446,24 @@ abstract class AppLocalizations {
   /// **'Resort Name'**
   String get trips_edit_label_resortName;
 
+  /// No description provided for @trips_edit_label_returnFlight.
+  ///
+  /// In en, this message translates to:
+  /// **'Return Flight'**
+  String get trips_edit_label_returnFlight;
+
+  /// No description provided for @trips_edit_returnFlightClear.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear return flight'**
+  String get trips_edit_returnFlightClear;
+
+  /// No description provided for @trips_edit_returnFlightNotSet.
+  ///
+  /// In en, this message translates to:
+  /// **'Not set'**
+  String get trips_edit_returnFlightNotSet;
+
   /// No description provided for @trips_edit_label_startDate.
   ///
   /// In en, this message translates to:

@@ -1208,6 +1208,75 @@ void main() {
     });
   });
 
+  group('TripEditPage - return flight', () {
+    Future<void> pumpNewTrip(WidgetTester tester) async {
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            tripRepositoryProvider.overrideWithValue(_MockTripRepository()),
+            tripListNotifierProvider.overrideWith((ref) {
+              return _MockTripListNotifier([]);
+            }),
+          ],
+          child: const MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: TripEditPage(),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+    }
+
+    testWidgets('shows Not set and sets a flight via date + time pickers', (
+      tester,
+    ) async {
+      await pumpNewTrip(tester);
+
+      await tester.scrollUntilVisible(
+        find.text('Return Flight'),
+        50.0,
+        scrollable: find.byType(Scrollable).first,
+      );
+      expect(find.text('Return Flight'), findsOneWidget);
+      expect(find.text('Not set'), findsOneWidget);
+
+      await tester.tap(find.text('Return Flight'));
+      await tester.pumpAndSettle();
+      expect(find.byType(DatePickerDialog), findsOneWidget);
+      await tester.tap(find.text('OK'));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(TimePickerDialog), findsOneWidget);
+      await tester.tap(find.text('OK'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Not set'), findsNothing);
+      expect(find.byIcon(Icons.clear), findsOneWidget);
+    });
+
+    testWidgets('clear icon reverts the flight to Not set', (tester) async {
+      await pumpNewTrip(tester);
+
+      await tester.scrollUntilVisible(
+        find.text('Return Flight'),
+        50.0,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.tap(find.text('Return Flight'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('OK'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('OK'));
+      await tester.pumpAndSettle();
+      expect(find.text('Not set'), findsNothing);
+
+      await tester.tap(find.byIcon(Icons.clear));
+      await tester.pumpAndSettle();
+      expect(find.text('Not set'), findsOneWidget);
+    });
+  });
+
   group('TripEditPage - duration display', () {
     testWidgets('updates duration text when start date moves past end date', (
       tester,

@@ -17117,6 +17117,15 @@ class AppLocalizationsHe extends AppLocalizations {
   String get trips_edit_label_resortName => 'שם אתר הנופש';
 
   @override
+  String get trips_edit_label_returnFlight => 'טיסת חזרה';
+
+  @override
+  String get trips_edit_returnFlightClear => 'נקה טיסת חזרה';
+
+  @override
+  String get trips_edit_returnFlightNotSet => 'לא הוגדר';
+
+  @override
   String get trips_edit_label_startDate => 'תאריך התחלה';
 
   @override

@@ -17638,6 +17638,15 @@ class AppLocalizationsFr extends AppLocalizations {
   String get trips_edit_label_resortName => 'Nom du resort';
 
   @override
+  String get trips_edit_label_returnFlight => 'Vol retour';
+
+  @override
+  String get trips_edit_returnFlightClear => 'Effacer le vol retour';
+
+  @override
+  String get trips_edit_returnFlightNotSet => 'Non défini';
+
+  @override
   String get trips_edit_label_startDate => 'Date de debut';
 
   @override

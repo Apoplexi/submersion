@@ -17420,6 +17420,15 @@ class AppLocalizationsNl extends AppLocalizations {
   String get trips_edit_label_resortName => 'Resortnaam';
 
   @override
+  String get trips_edit_label_returnFlight => 'Terugvlucht';
+
+  @override
+  String get trips_edit_returnFlightClear => 'Terugvlucht wissen';
+
+  @override
+  String get trips_edit_returnFlightNotSet => 'Niet ingesteld';
+
+  @override
   String get trips_edit_label_startDate => 'Startdatum';
 
   @override
