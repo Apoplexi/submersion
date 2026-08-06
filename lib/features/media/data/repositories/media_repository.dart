@@ -7,6 +7,7 @@ import 'package:submersion/core/services/database_service.dart';
 import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/core/services/sync/sync_event_bus.dart';
 import 'package:submersion/features/media/data/repositories/media_row_mapper.dart';
+import 'package:submersion/features/media/data/services/repair/media_repair_service.dart';
 import 'package:submersion/features/media/domain/entities/media_item.dart'
     as domain;
 import 'package:submersion/features/media/domain/entities/media_source_type.dart';
@@ -1042,6 +1043,46 @@ class MediaRepository {
         await _syncRepository.markRecordPending(
           entityType: 'media',
           recordId: id,
+          localUpdatedAt: now,
+        );
+      }
+    });
+    SyncEventBus.notifyLocalChange();
+  }
+
+  /// Stage B of the repair apply (Media section Phase 3): commits every
+  /// prepared write in one transaction with per-row HLC marking. Stage A
+  /// (hashing, bookmarks) happened per row before this; Stage C (queue
+  /// enqueues, cloud-backed conversion) follows after.
+  Future<void> applyRepairWrites(List<RepairWrite> writes) async {
+    if (writes.isEmpty) return;
+    final now = DateTime.now().millisecondsSinceEpoch;
+    await _db.transaction(() async {
+      for (final write in writes) {
+        await (_db.update(
+          _db.media,
+        )..where((t) => t.id.equals(write.mediaId))).write(
+          MediaCompanion(
+            localPath: write.toGallery
+                ? const Value(null)
+                : Value(write.newLocalPath),
+            bookmarkRef: write.newBookmarkRef == null && !write.toGallery
+                ? const Value.absent()
+                : Value(write.newBookmarkRef),
+            platformAssetId: write.toGallery
+                ? Value(write.newPlatformAssetId)
+                : const Value.absent(),
+            sourceType: write.toGallery
+                ? Value(MediaSourceType.platformGallery.name)
+                : const Value.absent(),
+            isOrphaned: const Value(false),
+            lastVerifiedAt: Value(now),
+            updatedAt: Value(now),
+          ),
+        );
+        await _syncRepository.markRecordPending(
+          entityType: 'media',
+          recordId: write.mediaId,
           localUpdatedAt: now,
         );
       }

@@ -57,11 +57,7 @@ class RepairCandidate {
         hash: hash,
       );
     }
-    return RepairCandidate.file(
-      path: path!,
-      sizeBytes: sizeBytes,
-      hash: hash,
-    );
+    return RepairCandidate.file(path: path!, sizeBytes: sizeBytes, hash: hash);
   }
 }
 
@@ -101,7 +97,10 @@ class PrefixMove {
 /// Candidates harvested by one source: an index by lowercase filename plus
 /// the full found-path set (folder sources only) for prefix-move detection.
 class CandidateHarvest {
-  const CandidateHarvest({required this.byFilename, this.foundPaths = const {}});
+  const CandidateHarvest({
+    required this.byFilename,
+    this.foundPaths = const {},
+  });
 
   final Map<String, List<RepairCandidate>> byFilename;
   final Set<String> foundPaths;
