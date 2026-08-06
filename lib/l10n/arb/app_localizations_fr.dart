@@ -9,6 +9,11 @@ class AppLocalizationsFr extends AppLocalizations {
   AppLocalizationsFr([String locale = 'fr']) : super(locale);
 
   @override
+  String diveLog_edit_flightWindowWarning(String time) {
+    return 'Cette plongée se termine après l\'heure limite de remontée pour votre vol ($time)';
+  }
+
+  @override
   String diveLog_edit_geofenceSuggestion_near(String location) {
     return 'Près de $location';
   }
@@ -3126,6 +3131,15 @@ class AppLocalizationsFr extends AppLocalizations {
   String get dashboard_gauges_noFlyClear => 'Délai avant vol 0:00';
 
   @override
+  String dashboard_gauges_flightWindow(String hours, String minutes) {
+    return 'Fenêtre de plongée $hours:$minutes';
+  }
+
+  @override
+  String get dashboard_gauges_flightWindowClosed =>
+      'Plus de plongée avant le vol';
+
+  @override
   String dashboard_gauges_noFlyRemaining(String hours, String minutes) {
     return 'Délai avant vol $hours:$minutes';
   }
@@ -3147,6 +3161,9 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get settings_homeChips_description =>
       'Choisissez les pastilles d\'état affichées en haut de l\'onglet Accueil.';
+
+  @override
+  String get settings_homeChips_flightWindow => 'Fenêtre de plongée avant vol';
 
   @override
   String get settings_homeChips_gear => 'Entretien du matériel';
@@ -10850,6 +10867,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get equipment_serviceDialog_costLabel => 'Cout';
 
   @override
+  String get equipment_serviceDialog_currencyLabel => 'Devise';
+
+  @override
   String get equipment_serviceDialog_costValidation =>
       'Entrez un montant valide';
 
@@ -12808,6 +12828,9 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get settings_about_reportIssue => 'Signaler un probleme';
+
+  @override
+  String get settings_about_reportIssue_copy => 'Copier le lien';
 
   @override
   String get settings_about_reportIssue_snackbar =>
@@ -15235,6 +15258,12 @@ class AppLocalizationsFr extends AppLocalizations {
   String get settings_units_sacRate => 'SAC Rate';
 
   @override
+  String get settings_units_defaultCurrency => 'Devise par défaut';
+
+  @override
+  String get settings_units_dialog_defaultCurrency => 'Devise par défaut';
+
+  @override
   String get settings_units_sac_pressurePerMinute => 'Pression par minute';
 
   @override
@@ -17636,6 +17665,15 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get trips_edit_label_resortName => 'Nom du resort';
+
+  @override
+  String get trips_edit_label_returnFlight => 'Vol retour';
+
+  @override
+  String get trips_edit_returnFlightClear => 'Effacer le vol retour';
+
+  @override
+  String get trips_edit_returnFlightNotSet => 'Non défini';
 
   @override
   String get trips_edit_label_startDate => 'Date de debut';
@@ -22201,6 +22239,28 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get safetySettings_noFlyPreset_subtitle =>
       'Intervalles indicatifs après une plongée unique sans déco, des plongées successives et des plongées avec déco';
+
+  @override
+  String get flightWindow_closed => 'Plus de plongée avant votre vol';
+
+  @override
+  String get flightWindow_conflict =>
+      'Votre délai avant vol dépasse le départ de votre vol';
+
+  @override
+  String flightWindow_departs(String time) {
+    return 'Le vol part $time';
+  }
+
+  @override
+  String flightWindow_openTitle(String remaining) {
+    return 'Temps de plongée restant : $remaining';
+  }
+
+  @override
+  String flightWindow_surfaceBy(String time) {
+    return 'Remonter avant $time';
+  }
 
   @override
   String safetyHub_noFly_active_title(String remaining) {

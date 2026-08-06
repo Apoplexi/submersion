@@ -9,6 +9,11 @@ class AppLocalizationsDe extends AppLocalizations {
   AppLocalizationsDe([String locale = 'de']) : super(locale);
 
   @override
+  String diveLog_edit_flightWindowWarning(String time) {
+    return 'Dieser Tauchgang endet nach der letzten sicheren Auftauchzeit für deinen Flug ($time)';
+  }
+
+  @override
   String diveLog_edit_geofenceSuggestion_near(String location) {
     return 'In der Nähe von $location';
   }
@@ -3123,6 +3128,15 @@ class AppLocalizationsDe extends AppLocalizations {
   String get dashboard_gauges_noFlyClear => 'Flugverbot 0:00';
 
   @override
+  String dashboard_gauges_flightWindow(String hours, String minutes) {
+    return 'Tauchfenster $hours:$minutes';
+  }
+
+  @override
+  String get dashboard_gauges_flightWindowClosed =>
+      'Kein Tauchen mehr vor dem Flug';
+
+  @override
   String dashboard_gauges_noFlyRemaining(String hours, String minutes) {
     return 'Flugverbot $hours:$minutes';
   }
@@ -3144,6 +3158,9 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get settings_homeChips_description =>
       'Wähle, welche Status-Chips oben im Start-Tab erscheinen.';
+
+  @override
+  String get settings_homeChips_flightWindow => 'Tauchfenster vor dem Flug';
 
   @override
   String get settings_homeChips_gear => 'Ausrüstungswartung';
@@ -10816,6 +10833,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get equipment_serviceDialog_costLabel => 'Kosten';
 
   @override
+  String get equipment_serviceDialog_currencyLabel => 'Währung';
+
+  @override
   String get equipment_serviceDialog_costValidation =>
       'Geben Sie einen gültigen Betrag ein';
 
@@ -12758,6 +12778,9 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get settings_about_reportIssue => 'Problem melden';
+
+  @override
+  String get settings_about_reportIssue_copy => 'Link kopieren';
 
   @override
   String get settings_about_reportIssue_snackbar =>
@@ -15161,6 +15184,12 @@ class AppLocalizationsDe extends AppLocalizations {
   String get settings_units_sacRate => 'AMV';
 
   @override
+  String get settings_units_defaultCurrency => 'Standardwährung';
+
+  @override
+  String get settings_units_dialog_defaultCurrency => 'Standardwährung';
+
+  @override
   String get settings_units_sac_pressurePerMinute => 'Druck pro Minute';
 
   @override
@@ -17534,6 +17563,15 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get trips_edit_label_resortName => 'Resortname';
+
+  @override
+  String get trips_edit_label_returnFlight => 'Rückflug';
+
+  @override
+  String get trips_edit_returnFlightClear => 'Rückflug entfernen';
+
+  @override
+  String get trips_edit_returnFlightNotSet => 'Nicht festgelegt';
 
   @override
   String get trips_edit_label_startDate => 'Startdatum';
@@ -22093,6 +22131,28 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get safetySettings_noFlyPreset_subtitle =>
       'Richtwerte nach einem einzelnen Nullzeit-Tauchgang, Wiederholungstauchgängen und Deko-Tauchgängen';
+
+  @override
+  String get flightWindow_closed => 'Kein Tauchen mehr vor deinem Flug';
+
+  @override
+  String get flightWindow_conflict =>
+      'Deine Flugverbotszeit reicht über deinen Abflug hinaus';
+
+  @override
+  String flightWindow_departs(String time) {
+    return 'Abflug $time';
+  }
+
+  @override
+  String flightWindow_openTitle(String remaining) {
+    return 'Verbleibende Tauchzeit: $remaining';
+  }
+
+  @override
+  String flightWindow_surfaceBy(String time) {
+    return 'Auftauchen bis $time';
+  }
 
   @override
   String safetyHub_noFly_active_title(String remaining) {

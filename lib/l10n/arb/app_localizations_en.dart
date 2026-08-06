@@ -9,6 +9,11 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
+  String diveLog_edit_flightWindowWarning(String time) {
+    return 'This dive ends after the latest safe surfacing time for your flight ($time)';
+  }
+
+  @override
   String diveLog_edit_geofenceSuggestion_near(String location) {
     return 'Near $location';
   }
@@ -3056,6 +3061,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get dashboard_gauges_noFlyClear => 'No-fly 0:00';
 
   @override
+  String dashboard_gauges_flightWindow(String hours, String minutes) {
+    return 'Dive window $hours:$minutes';
+  }
+
+  @override
+  String get dashboard_gauges_flightWindowClosed =>
+      'No more diving before flight';
+
+  @override
   String dashboard_gauges_noFlyRemaining(String hours, String minutes) {
     return 'No-fly $hours:$minutes';
   }
@@ -3077,6 +3091,9 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get settings_homeChips_description =>
       'Choose which status chips appear at the top of the Home tab.';
+
+  @override
+  String get settings_homeChips_flightWindow => 'Flight dive window';
 
   @override
   String get settings_homeChips_gear => 'Gear service';
@@ -10656,6 +10673,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get equipment_serviceDialog_costLabel => 'Cost';
 
   @override
+  String get equipment_serviceDialog_currencyLabel => 'Currency';
+
+  @override
   String get equipment_serviceDialog_costValidation => 'Enter a valid amount';
 
   @override
@@ -12563,6 +12583,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settings_about_reportIssue => 'Report an Issue';
+
+  @override
+  String get settings_about_reportIssue_copy => 'Copy link';
 
   @override
   String get settings_about_reportIssue_snackbar =>
@@ -14926,6 +14949,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settings_units_sacRate => 'SAC Rate';
 
   @override
+  String get settings_units_defaultCurrency => 'Default Currency';
+
+  @override
+  String get settings_units_dialog_defaultCurrency => 'Default Currency';
+
+  @override
   String get settings_units_sac_pressurePerMinute => 'Pressure per minute';
 
   @override
@@ -17264,6 +17293,15 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get trips_edit_label_resortName => 'Resort Name';
+
+  @override
+  String get trips_edit_label_returnFlight => 'Return Flight';
+
+  @override
+  String get trips_edit_returnFlightClear => 'Clear return flight';
+
+  @override
+  String get trips_edit_returnFlightNotSet => 'Not set';
 
   @override
   String get trips_edit_label_startDate => 'Start Date';
@@ -21760,6 +21798,28 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get safetySettings_noFlyPreset_subtitle =>
       'Guideline intervals after a single no-deco dive, repetitive dives, and deco dives';
+
+  @override
+  String get flightWindow_closed => 'No more diving before your flight';
+
+  @override
+  String get flightWindow_conflict =>
+      'Your no-fly time extends past your flight departure';
+
+  @override
+  String flightWindow_departs(String time) {
+    return 'Flight departs $time';
+  }
+
+  @override
+  String flightWindow_openTitle(String remaining) {
+    return 'Time left to dive: $remaining';
+  }
+
+  @override
+  String flightWindow_surfaceBy(String time) {
+    return 'Surface by $time';
+  }
 
   @override
   String safetyHub_noFly_active_title(String remaining) {

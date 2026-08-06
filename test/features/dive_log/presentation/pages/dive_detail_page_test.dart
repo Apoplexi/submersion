@@ -6,6 +6,8 @@ import 'package:submersion/core/deco/constants/buhlmann_coefficients.dart';
 import 'package:submersion/core/deco/entities/deco_status.dart';
 import 'package:submersion/core/deco/entities/tissue_compartment.dart';
 import 'package:submersion/core/providers/provider.dart';
+import 'package:submersion/features/dive_3d/application/tissue_providers.dart';
+import 'package:submersion/features/dive_3d/presentation/pages/dive_3d_page.dart';
 import 'package:submersion/features/dive_log/data/services/profile_analysis_service.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive_data_source.dart';
@@ -990,6 +992,69 @@ void main() {
       );
       expect(find.byType(CompactTissueLoadingCard), findsOneWidget);
       expect(find.byType(CompactO2ToxicityPanel), findsOneWidget);
+    });
+
+    testWidgets('tissue card 3D button opens the 3D view in tissue mode', (
+      tester,
+    ) async {
+      final dive = diveWithProfile();
+      final base = await getBaseOverrides();
+      final originalOnError = FlutterError.onError;
+      addTearDown(() => FlutterError.onError = originalOnError);
+      FlutterError.onError = (d) {
+        if (d.toString().contains('overflowed')) return;
+        originalOnError?.call(d);
+      };
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            ...base,
+            ...panelOverrides(
+              dive,
+              profileAnalysisProvider(
+                dive.id,
+              ).overrideWith((ref) async => analysisWithDeco()),
+            ),
+            // The pushed page only has to build, not render a surface: a null
+            // surface parks it on its loading indicator, so this test stays
+            // about the navigation wiring.
+            tissueSurfaceProvider(dive.id).overrideWith((ref) async => null),
+            tissueDecoStatusesProvider(
+              dive.id,
+            ).overrideWith((ref) async => <DecoStatus>[]),
+          ],
+          child: MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: DiveDetailPage(diveId: dive.id, embedded: true),
+          ),
+        ),
+      );
+      await tester.pump();
+      await tester.pump(const Duration(seconds: 1));
+
+      // Scoped to the tissue card: the profile section has a 3D button of its
+      // own, and that one must still open the dive scene.
+      final button = find.descendant(
+        of: find.byType(CompactTissueLoadingCard),
+        matching: find.byIcon(Icons.view_in_ar),
+      );
+      expect(button, findsOneWidget);
+
+      // The card sits below the fold on the 800x600 test surface.
+      await tester.ensureVisible(button);
+      await tester.pump();
+      await tester.tap(button);
+      await tester.pump();
+      await tester.pump(const Duration(seconds: 1));
+
+      final page = tester.widget<Dive3dPage>(find.byType(Dive3dPage));
+      expect(page.diveId, dive.id);
+      expect(page.initialMode, SceneKind.tissue);
+
+      await tester.pumpWidget(const SizedBox.shrink());
+      await tester.pump(const Duration(seconds: 1));
     });
   });
 

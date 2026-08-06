@@ -1,5 +1,15 @@
 {
+  "settings_units_defaultCurrency": "默认货币",
+  "settings_units_dialog_defaultCurrency": "默认货币",
   "diveSites_list_menu_select": "选择潜水点",
+  "diveLog_edit_flightWindowWarning": "此次潜水的结束时间晚于您航班的最后安全出水时间({time})",
+  "@diveLog_edit_flightWindowWarning": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
   "diveLog_edit_geofenceSuggestion_near": "靠近 {location}",
   "diveLog_edit_geofenceSuggestion_title": "装备建议",
   "diveLog_edit_geofenceSuggestion_body": "应用\"{setName}\"套装？",
@@ -3551,6 +3561,7 @@
   "equipment_serviceDialog_clearNextServiceDateTooltip": "清除下次维护日期",
   "equipment_serviceDialog_costHint": "0.00",
   "equipment_serviceDialog_costLabel": "费用",
+  "equipment_serviceDialog_currencyLabel": "货币",
   "equipment_serviceDialog_costValidation": "请输入有效金额",
   "equipment_serviceDialog_editTitle": "编辑维护记录",
   "equipment_serviceDialog_nextServiceDueLabel": "下次维护日期",
@@ -4175,6 +4186,7 @@
   "settings_about_header": "关于",
   "settings_about_openSourceLicenses": "开源许可证",
   "settings_about_reportIssue": "报告问题",
+  "settings_about_reportIssue_copy": "复制链接",
   "settings_about_reportIssue_snackbar": "请访问 github.com/submersion-app/submersion/issues",
   "settings_about_version": "版本 {version}",
   "settings_appBar_title": "设置",
@@ -5508,6 +5520,9 @@
   "trips_edit_label_notes": "备注",
   "trips_edit_label_operatorName": "运营商/包船",
   "trips_edit_label_resortName": "度假村名称",
+  "trips_edit_label_returnFlight": "返程航班",
+  "trips_edit_returnFlightClear": "清除返程航班",
+  "trips_edit_returnFlightNotSet": "未设置",
   "trips_edit_label_startDate": "开始日期",
   "trips_edit_label_tripName": "旅行名称 *",
   "trips_edit_label_tripType": "旅行类型",
@@ -5756,12 +5771,25 @@
   "dashboard_gauges_insuranceExpired": "保险已过期",
   "dashboard_gauges_noInsurance": "未登记保险",
   "dashboard_gauges_noFlyClear": "禁飞 0:00",
+  "dashboard_gauges_flightWindow": "潜水窗口 {hours}:{minutes}",
+  "@dashboard_gauges_flightWindow": {
+    "placeholders": {
+      "hours": {
+        "type": "String"
+      },
+      "minutes": {
+        "type": "String"
+      }
+    }
+  },
+  "dashboard_gauges_flightWindowClosed": "航班前请勿再潜水",
   "dashboard_gauges_noFlyRemaining": "禁飞 {hours}:{minutes}",
   "dashboard_gauges_lastDiveDays": "上次潜水 {days} 天前",
   "dashboard_gauges_lastDiveToday": "今天潜过水",
   "dashboard_gauges_noDivesYet": "暂无潜水记录",
   "settings_homeChips_pageTitle": "主页状态标签",
   "settings_homeChips_description": "选择主页顶部显示哪些状态标签。",
+  "settings_homeChips_flightWindow": "航班前潜水窗口",
   "settings_homeChips_gear": "装备保养",
   "settings_homeChips_insurance": "保险",
   "settings_homeChips_noFly": "禁飞计时",
@@ -6546,6 +6574,32 @@
   "safetySettings_noFlyPreset_standard": "标准(12/18/24 小时)",
   "safetySettings_noFlyPreset_strict": "严格(18/24/48 小时)",
   "safetySettings_noFlyPreset_subtitle": "单次免减压潜水、重复潜水和减压潜水后的指导间隔",
+  "flightWindow_closed": "航班前请勿再潜水",
+  "flightWindow_conflict": "您的禁飞时间超过了航班起飞时间",
+  "flightWindow_departs": "航班 {time} 起飞",
+  "@flightWindow_departs": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "flightWindow_openTitle": "剩余潜水时间:{remaining}",
+  "@flightWindow_openTitle": {
+    "placeholders": {
+      "remaining": {
+        "type": "String"
+      }
+    }
+  },
+  "flightWindow_surfaceBy": "请在 {time} 前出水",
+  "@flightWindow_surfaceBy": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
   "safetyHub_noFly_active_title": "禁飞:剩余 {remaining}",
   "@safetyHub_noFly_active_title": {
     "placeholders": {

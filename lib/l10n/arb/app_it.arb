@@ -1,5 +1,15 @@
 {
+  "settings_units_defaultCurrency": "Valuta predefinita",
+  "settings_units_dialog_defaultCurrency": "Valuta predefinita",
   "diveSites_list_menu_select": "Seleziona siti",
+  "diveLog_edit_flightWindowWarning": "Questa immersione termina dopo l'ultimo orario sicuro di riemersione per il tuo volo ({time})",
+  "@diveLog_edit_flightWindowWarning": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
   "diveLog_edit_geofenceSuggestion_near": "Vicino a {location}",
   "diveLog_edit_geofenceSuggestion_title": "Suggerimento attrezzatura",
   "diveLog_edit_geofenceSuggestion_body": "Applicare il set \"{setName}\"?",
@@ -3337,6 +3347,7 @@
   "equipment_serviceDialog_clearNextServiceDateTooltip": "Cancella data prossima manutenzione",
   "equipment_serviceDialog_costHint": "0.00",
   "equipment_serviceDialog_costLabel": "Costo",
+  "equipment_serviceDialog_currencyLabel": "Valuta",
   "equipment_serviceDialog_costValidation": "Inserisci un importo valido",
   "equipment_serviceDialog_editTitle": "Modifica registro manutenzione",
   "equipment_serviceDialog_nextServiceDueLabel": "Prossima manutenzione prevista",
@@ -3951,6 +3962,7 @@
   "settings_about_header": "Informazioni",
   "settings_about_openSourceLicenses": "Licenze open source",
   "settings_about_reportIssue": "Segnala un problema",
+  "settings_about_reportIssue_copy": "Copia link",
   "settings_about_reportIssue_snackbar": "Visita github.com/submersion-app/submersion/issues",
   "settings_about_version": "Versione {version}",
   "settings_appBar_title": "Impostazioni",
@@ -5251,6 +5263,9 @@
   "trips_edit_label_notes": "Note",
   "trips_edit_label_operatorName": "Operator / Charter",
   "trips_edit_label_resortName": "Nome resort",
+  "trips_edit_label_returnFlight": "Volo di ritorno",
+  "trips_edit_returnFlightClear": "Rimuovi volo di ritorno",
+  "trips_edit_returnFlightNotSet": "Non impostato",
   "trips_edit_label_startDate": "Data di inizio",
   "trips_edit_label_tripName": "Nome viaggio *",
   "trips_edit_label_tripType": "Trip Type",
@@ -5756,12 +5771,25 @@
   "dashboard_gauges_insuranceExpired": "Assicurazione scaduta",
   "dashboard_gauges_noInsurance": "Nessuna assicurazione registrata",
   "dashboard_gauges_noFlyClear": "No-fly 0:00",
+  "dashboard_gauges_flightWindow": "Finestra di immersione {hours}:{minutes}",
+  "@dashboard_gauges_flightWindow": {
+    "placeholders": {
+      "hours": {
+        "type": "String"
+      },
+      "minutes": {
+        "type": "String"
+      }
+    }
+  },
+  "dashboard_gauges_flightWindowClosed": "Niente più immersioni prima del volo",
   "dashboard_gauges_noFlyRemaining": "No-fly {hours}:{minutes}",
   "dashboard_gauges_lastDiveDays": "Ultima immersione {days}g fa",
   "dashboard_gauges_lastDiveToday": "Immersione oggi",
   "dashboard_gauges_noDivesYet": "Nessuna immersione",
   "settings_homeChips_pageTitle": "Chip di stato della Home",
   "settings_homeChips_description": "Scegli quali chip di stato compaiono in cima alla scheda Home.",
+  "settings_homeChips_flightWindow": "Finestra di immersione pre-volo",
   "settings_homeChips_gear": "Manutenzione attrezzatura",
   "settings_homeChips_insurance": "Assicurazione",
   "settings_homeChips_noFly": "Timer no-fly",
@@ -6546,6 +6574,32 @@
   "safetySettings_noFlyPreset_standard": "Standard (12/18/24 h)",
   "safetySettings_noFlyPreset_strict": "Rigoroso (18/24/48 h)",
   "safetySettings_noFlyPreset_subtitle": "Intervalli indicativi dopo una singola immersione senza deco, immersioni ripetitive e immersioni con deco",
+  "flightWindow_closed": "Niente più immersioni prima del volo",
+  "flightWindow_conflict": "Il tuo tempo di no-fly si estende oltre la partenza del volo",
+  "flightWindow_departs": "Il volo parte {time}",
+  "@flightWindow_departs": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "flightWindow_openTitle": "Tempo di immersione rimanente: {remaining}",
+  "@flightWindow_openTitle": {
+    "placeholders": {
+      "remaining": {
+        "type": "String"
+      }
+    }
+  },
+  "flightWindow_surfaceBy": "Riemergere entro {time}",
+  "@flightWindow_surfaceBy": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
   "safetyHub_noFly_active_title": "No-fly: mancano {remaining}",
   "@safetyHub_noFly_active_title": {
     "placeholders": {

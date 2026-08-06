@@ -9,6 +9,11 @@ class AppLocalizationsHe extends AppLocalizations {
   AppLocalizationsHe([String locale = 'he']) : super(locale);
 
   @override
+  String diveLog_edit_flightWindowWarning(String time) {
+    return 'הצלילה הזו מסתיימת אחרי הזמן הבטוח האחרון לעלייה לפני הטיסה שלך ($time)';
+  }
+
+  @override
   String diveLog_edit_geofenceSuggestion_near(String location) {
     return 'ליד $location';
   }
@@ -3025,6 +3030,15 @@ class AppLocalizationsHe extends AppLocalizations {
   String get dashboard_gauges_noFlyClear => 'איסור טיסה 0:00';
 
   @override
+  String dashboard_gauges_flightWindow(String hours, String minutes) {
+    return 'חלון צלילה $hours:$minutes';
+  }
+
+  @override
+  String get dashboard_gauges_flightWindowClosed =>
+      'אין יותר צלילות לפני הטיסה';
+
+  @override
   String dashboard_gauges_noFlyRemaining(String hours, String minutes) {
     return 'איסור טיסה $hours:$minutes';
   }
@@ -3046,6 +3060,9 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String get settings_homeChips_description =>
       'בחר אילו שבבי מצב יופיעו בראש לשונית הבית.';
+
+  @override
+  String get settings_homeChips_flightWindow => 'חלון צלילה לפני טיסה';
 
   @override
   String get settings_homeChips_gear => 'תחזוקת ציוד';
@@ -10572,6 +10589,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get equipment_serviceDialog_costLabel => 'עלות';
 
   @override
+  String get equipment_serviceDialog_currencyLabel => 'מטבע';
+
+  @override
   String get equipment_serviceDialog_costValidation => 'הזן סכום חוקי';
 
   @override
@@ -12455,6 +12475,9 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get settings_about_reportIssue => 'דווח על בעיה';
+
+  @override
+  String get settings_about_reportIssue_copy => 'העתקת קישור';
 
   @override
   String get settings_about_reportIssue_snackbar =>
@@ -14798,6 +14821,12 @@ class AppLocalizationsHe extends AppLocalizations {
   String get settings_units_sacRate => 'קצב SAC';
 
   @override
+  String get settings_units_defaultCurrency => 'מטבע ברירת מחדל';
+
+  @override
+  String get settings_units_dialog_defaultCurrency => 'מטבע ברירת מחדל';
+
+  @override
   String get settings_units_sac_pressurePerMinute => 'לחץ לדקה';
 
   @override
@@ -17115,6 +17144,15 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get trips_edit_label_resortName => 'שם אתר הנופש';
+
+  @override
+  String get trips_edit_label_returnFlight => 'טיסת חזרה';
+
+  @override
+  String get trips_edit_returnFlightClear => 'נקה טיסת חזרה';
+
+  @override
+  String get trips_edit_returnFlightNotSet => 'לא הוגדר';
 
   @override
   String get trips_edit_label_startDate => 'תאריך התחלה';
@@ -21580,6 +21618,27 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String get safetySettings_noFlyPreset_subtitle =>
       'מרווחים מנחים אחרי צלילה בודדת ללא דקו, צלילות חוזרות וצלילות דקומפרסיה';
+
+  @override
+  String get flightWindow_closed => 'אין יותר צלילות לפני הטיסה';
+
+  @override
+  String get flightWindow_conflict => 'זמן איסור הטיסה שלך נמשך מעבר להמראה';
+
+  @override
+  String flightWindow_departs(String time) {
+    return 'הטיסה ממריאה $time';
+  }
+
+  @override
+  String flightWindow_openTitle(String remaining) {
+    return 'זמן צלילה שנותר: $remaining';
+  }
+
+  @override
+  String flightWindow_surfaceBy(String time) {
+    return 'לעלות אל פני השטח עד $time';
+  }
 
   @override
   String safetyHub_noFly_active_title(String remaining) {

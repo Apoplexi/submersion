@@ -1,5 +1,15 @@
 {
+  "settings_units_defaultCurrency": "Moneda predeterminada",
+  "settings_units_dialog_defaultCurrency": "Moneda predeterminada",
   "diveSites_list_menu_select": "Seleccionar puntos",
+  "diveLog_edit_flightWindowWarning": "Esta inmersión termina después de la última hora segura para emerger antes de tu vuelo ({time})",
+  "@diveLog_edit_flightWindowWarning": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
   "diveLog_edit_geofenceSuggestion_near": "Cerca de {location}",
   "diveLog_edit_geofenceSuggestion_title": "Sugerencia de equipo",
   "diveLog_edit_geofenceSuggestion_body": "¿Aplicar tu conjunto \"{setName}\"?",
@@ -3409,6 +3419,7 @@
   "equipment_serviceDialog_clearNextServiceDateTooltip": "Borrar fecha del proximo servicio",
   "equipment_serviceDialog_costHint": "0.00",
   "equipment_serviceDialog_costLabel": "Costo",
+  "equipment_serviceDialog_currencyLabel": "Moneda",
   "equipment_serviceDialog_costValidation": "Ingresa un monto valido",
   "equipment_serviceDialog_editTitle": "Editar registro de servicio",
   "equipment_serviceDialog_nextServiceDueLabel": "Proximo servicio",
@@ -4023,6 +4034,7 @@
   "settings_about_header": "Acerca de",
   "settings_about_openSourceLicenses": "Licencias de codigo abierto",
   "settings_about_reportIssue": "Reportar un problema",
+  "settings_about_reportIssue_copy": "Copiar enlace",
   "settings_about_reportIssue_snackbar": "Visita github.com/submersion-app/submersion/issues",
   "settings_about_version": "Version {version}",
   "settings_appBar_title": "Ajustes",
@@ -5327,6 +5339,9 @@
   "trips_edit_label_notes": "Notas",
   "trips_edit_label_operatorName": "Operator / Charter",
   "trips_edit_label_resortName": "Nombre del resort",
+  "trips_edit_label_returnFlight": "Vuelo de regreso",
+  "trips_edit_returnFlightClear": "Borrar vuelo de regreso",
+  "trips_edit_returnFlightNotSet": "Sin definir",
   "trips_edit_label_startDate": "Fecha de inicio",
   "trips_edit_label_tripName": "Nombre del viaje *",
   "trips_edit_label_tripType": "Trip Type",
@@ -5756,12 +5771,25 @@
   "dashboard_gauges_insuranceExpired": "Seguro vencido",
   "dashboard_gauges_noInsurance": "Sin seguro registrado",
   "dashboard_gauges_noFlyClear": "No volar 0:00",
+  "dashboard_gauges_flightWindow": "Ventana de buceo {hours}:{minutes}",
+  "@dashboard_gauges_flightWindow": {
+    "placeholders": {
+      "hours": {
+        "type": "String"
+      },
+      "minutes": {
+        "type": "String"
+      }
+    }
+  },
+  "dashboard_gauges_flightWindowClosed": "No más buceo antes del vuelo",
   "dashboard_gauges_noFlyRemaining": "No volar {hours}:{minutes}",
   "dashboard_gauges_lastDiveDays": "Última inmersión hace {days}d",
   "dashboard_gauges_lastDiveToday": "Buceaste hoy",
   "dashboard_gauges_noDivesYet": "Aún sin inmersiones",
   "settings_homeChips_pageTitle": "Chips de estado de Inicio",
   "settings_homeChips_description": "Elige qué chips de estado aparecen en la parte superior de la pestaña Inicio.",
+  "settings_homeChips_flightWindow": "Ventana de buceo antes del vuelo",
   "settings_homeChips_gear": "Mantenimiento del equipo",
   "settings_homeChips_insurance": "Seguro",
   "settings_homeChips_noFly": "Temporizador de no volar",
@@ -6546,6 +6574,32 @@
   "safetySettings_noFlyPreset_standard": "Estándar (12/18/24 h)",
   "safetySettings_noFlyPreset_strict": "Estricto (18/24/48 h)",
   "safetySettings_noFlyPreset_subtitle": "Intervalos orientativos tras una única inmersión sin deco, inmersiones sucesivas e inmersiones con deco",
+  "flightWindow_closed": "No bucees más antes de tu vuelo",
+  "flightWindow_conflict": "Tu tiempo de no volar se extiende más allá de la salida del vuelo",
+  "flightWindow_departs": "El vuelo sale {time}",
+  "@flightWindow_departs": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "flightWindow_openTitle": "Tiempo restante para bucear: {remaining}",
+  "@flightWindow_openTitle": {
+    "placeholders": {
+      "remaining": {
+        "type": "String"
+      }
+    }
+  },
+  "flightWindow_surfaceBy": "Emerger antes de {time}",
+  "@flightWindow_surfaceBy": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
   "safetyHub_noFly_active_title": "No volar: quedan {remaining}",
   "@safetyHub_noFly_active_title": {
     "placeholders": {

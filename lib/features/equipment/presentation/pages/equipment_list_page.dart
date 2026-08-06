@@ -6,6 +6,7 @@ import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/core/constants/list_view_mode.dart';
 import 'package:submersion/core/constants/sort_options.dart';
 import 'package:submersion/core/models/sort_state.dart';
+import 'package:submersion/core/utils/currency.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:submersion/shared/widgets/app_date_picker.dart';
 import 'package:submersion/shared/widgets/entity_table/entity_table_column_picker.dart';
@@ -460,13 +461,27 @@ class _AddEquipmentSheetState extends ConsumerState<AddEquipmentSheet> {
   final _serialController = TextEditingController();
   final _sizeController = TextEditingController();
   final _purchasePriceController = TextEditingController();
-  final _purchaseCurrencyController = TextEditingController(text: 'USD');
+  final _purchaseCurrencyController = TextEditingController();
   final _serviceIntervalController = TextEditingController();
   final _notesController = TextEditingController();
 
   EquipmentType _selectedType = EquipmentType.regulator;
   DateTime? _purchaseDate;
   bool _isSaving = false;
+
+  /// The diver's default currency, captured once so the dropdown can offer it
+  /// even when it is outside the presets, and so save can fall back to it.
+  String _defaultCurrencyCode = '';
+
+  @override
+  void initState() {
+    super.initState();
+    // New items are priced in the diver's default currency, matching the
+    // full edit page rather than hardcoding USD.
+    final code = ref.read(defaultCurrencyProvider).trim().toUpperCase();
+    _defaultCurrencyCode = code.isEmpty ? 'USD' : code;
+    _purchaseCurrencyController.text = _defaultCurrencyCode;
+  }
 
   @override
   void dispose() {
@@ -624,25 +639,57 @@ class _AddEquipmentSheetState extends ConsumerState<AddEquipmentSheet> {
                     ),
                     const SizedBox(width: 12),
                     Expanded(
-                      child: TextFormField(
-                        controller: _purchasePriceController,
-                        decoration: InputDecoration(
-                          labelText: context.l10n.equipment_addSheet_priceLabel,
-                        ),
-                        keyboardType: const TextInputType.numberWithOptions(
-                          decimal: true,
-                        ),
+                      flex: 2,
+                      // Rebuild the price field when the currency changes so
+                      // its prefix shows the right symbol (EUR -> €, ...).
+                      child: ValueListenableBuilder<TextEditingValue>(
+                        valueListenable: _purchaseCurrencyController,
+                        builder: (context, value, _) {
+                          final symbol = currencySymbol(value.text);
+                          return TextFormField(
+                            controller: _purchasePriceController,
+                            decoration: InputDecoration(
+                              labelText:
+                                  context.l10n.equipment_addSheet_priceLabel,
+                              prefixText: symbol.isEmpty ? null : '$symbol ',
+                            ),
+                            keyboardType: const TextInputType.numberWithOptions(
+                              decimal: true,
+                            ),
+                          );
+                        },
                       ),
                     ),
                     const SizedBox(width: 12),
-                    SizedBox(
-                      width: 90,
-                      child: TextFormField(
+                    // Flexible rather than a fixed width: this row already
+                    // carries a 250dp date button, so a fixed currency box
+                    // would overflow on a narrow phone.
+                    Expanded(
+                      // Editable dropdown: common currencies as presets, but
+                      // any ISO code can still be typed.
+                      child: DropdownMenu<String>(
                         controller: _purchaseCurrencyController,
-                        decoration: InputDecoration(
-                          labelText:
-                              context.l10n.equipment_addSheet_currencyLabel,
+                        expandedInsets: EdgeInsets.zero,
+                        requestFocusOnTap: true,
+                        enableFilter: true,
+                        label: Text(
+                          context.l10n.equipment_addSheet_currencyLabel,
                         ),
+                        dropdownMenuEntries: [
+                          for (final code in currencyCodesWith(
+                            _defaultCurrencyCode,
+                          ))
+                            DropdownMenuEntry(
+                              value: code,
+                              label: code,
+                              leadingIcon: SizedBox(
+                                width: 28,
+                                child: Center(
+                                  child: Text(currencySymbol(code)),
+                                ),
+                              ),
+                            ),
+                        ],
                       ),
                     ),
                   ],
@@ -738,7 +785,7 @@ class _AddEquipmentSheetState extends ConsumerState<AddEquipmentSheet> {
             ? double.tryParse(_purchasePriceController.text)
             : null,
         purchaseCurrency: _purchaseCurrencyController.text.trim().isEmpty
-            ? 'USD'
+            ? _defaultCurrencyCode
             : _purchaseCurrencyController.text.trim(),
         serviceIntervalDays: _serviceIntervalController.text.isNotEmpty
             ? int.tryParse(_serviceIntervalController.text)

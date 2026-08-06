@@ -1,5 +1,15 @@
 {
+  "settings_units_defaultCurrency": "Standaardvaluta",
+  "settings_units_dialog_defaultCurrency": "Standaardvaluta",
   "diveSites_list_menu_select": "Duikstekken selecteren",
+  "diveLog_edit_flightWindowWarning": "Deze duik eindigt na het laatste veilige opstijgmoment voor je vlucht ({time})",
+  "@diveLog_edit_flightWindowWarning": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
   "diveLog_edit_geofenceSuggestion_near": "Bij {location}",
   "diveLog_edit_geofenceSuggestion_title": "Uitrustingssuggestie",
   "diveLog_edit_geofenceSuggestion_body": "Set \"{setName}\" toepassen?",
@@ -3409,6 +3419,7 @@
   "equipment_serviceDialog_clearNextServiceDateTooltip": "Volgende servicedatum wissen",
   "equipment_serviceDialog_costHint": "0,00",
   "equipment_serviceDialog_costLabel": "Kosten",
+  "equipment_serviceDialog_currencyLabel": "Valuta",
   "equipment_serviceDialog_costValidation": "Voer een geldig bedrag in",
   "equipment_serviceDialog_editTitle": "Servicerecord bewerken",
   "equipment_serviceDialog_nextServiceDueLabel": "Volgende service gepland",
@@ -4023,6 +4034,7 @@
   "settings_about_header": "Over",
   "settings_about_openSourceLicenses": "Open source-licenties",
   "settings_about_reportIssue": "Probleem melden",
+  "settings_about_reportIssue_copy": "Link kopiëren",
   "settings_about_reportIssue_snackbar": "Ga naar github.com/submersion-app/submersion/issues",
   "settings_about_version": "Versie {version}",
   "settings_appBar_title": "Instellingen",
@@ -5327,6 +5339,9 @@
   "trips_edit_label_notes": "Notities",
   "trips_edit_label_operatorName": "Operator / Charter",
   "trips_edit_label_resortName": "Resortnaam",
+  "trips_edit_label_returnFlight": "Terugvlucht",
+  "trips_edit_returnFlightClear": "Terugvlucht wissen",
+  "trips_edit_returnFlightNotSet": "Niet ingesteld",
   "trips_edit_label_startDate": "Startdatum",
   "trips_edit_label_tripName": "Reisnaam *",
   "trips_edit_label_tripType": "Trip Type",
@@ -5756,12 +5771,25 @@
   "dashboard_gauges_insuranceExpired": "Verzekering verlopen",
   "dashboard_gauges_noInsurance": "Geen verzekering geregistreerd",
   "dashboard_gauges_noFlyClear": "Vliegverbod 0:00",
+  "dashboard_gauges_flightWindow": "Duikvenster {hours}:{minutes}",
+  "@dashboard_gauges_flightWindow": {
+    "placeholders": {
+      "hours": {
+        "type": "String"
+      },
+      "minutes": {
+        "type": "String"
+      }
+    }
+  },
+  "dashboard_gauges_flightWindowClosed": "Niet meer duiken vóór de vlucht",
   "dashboard_gauges_noFlyRemaining": "Vliegverbod {hours}:{minutes}",
   "dashboard_gauges_lastDiveDays": "Laatste duik {days}d geleden",
   "dashboard_gauges_lastDiveToday": "Vandaag gedoken",
   "dashboard_gauges_noDivesYet": "Nog geen duiken",
   "settings_homeChips_pageTitle": "Statuschips van start",
   "settings_homeChips_description": "Kies welke statuschips bovenaan het tabblad Start verschijnen.",
+  "settings_homeChips_flightWindow": "Duikvenster voor vlucht",
   "settings_homeChips_gear": "Uitrustingsonderhoud",
   "settings_homeChips_insurance": "Verzekering",
   "settings_homeChips_noFly": "Vliegverbod-timer",
@@ -6546,6 +6574,32 @@
   "safetySettings_noFlyPreset_standard": "Standaard (12/18/24 u)",
   "safetySettings_noFlyPreset_strict": "Strikt (18/24/48 u)",
   "safetySettings_noFlyPreset_subtitle": "Richttijden na een enkele duik zonder deco, herhalingsduiken en decoduiken",
+  "flightWindow_closed": "Niet meer duiken vóór je vlucht",
+  "flightWindow_conflict": "Je no-flytijd loopt door tot na je vertrek",
+  "flightWindow_departs": "Vlucht vertrekt {time}",
+  "@flightWindow_departs": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "flightWindow_openTitle": "Resterende duiktijd: {remaining}",
+  "@flightWindow_openTitle": {
+    "placeholders": {
+      "remaining": {
+        "type": "String"
+      }
+    }
+  },
+  "flightWindow_surfaceBy": "Boven water vóór {time}",
+  "@flightWindow_surfaceBy": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
   "safetyHub_noFly_active_title": "Vliegverbod: nog {remaining}",
   "@safetyHub_noFly_active_title": {
     "placeholders": {

@@ -1,4 +1,12 @@
 {
+  "diveLog_edit_flightWindowWarning": "This dive ends after the latest safe surfacing time for your flight ({time})",
+  "@diveLog_edit_flightWindowWarning": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
   "diveLog_edit_geofenceSuggestion_near": "Near {location}",
   "@diveLog_edit_geofenceSuggestion_near": {
     "placeholders": {
@@ -1904,6 +1912,18 @@
   "dashboard_gauges_insuranceExpired": "Insurance expired",
   "dashboard_gauges_noInsurance": "No insurance on file",
   "dashboard_gauges_noFlyClear": "No-fly 0:00",
+  "dashboard_gauges_flightWindow": "Dive window {hours}:{minutes}",
+  "@dashboard_gauges_flightWindow": {
+    "placeholders": {
+      "hours": {
+        "type": "String"
+      },
+      "minutes": {
+        "type": "String"
+      }
+    }
+  },
+  "dashboard_gauges_flightWindowClosed": "No more diving before flight",
   "dashboard_gauges_noFlyRemaining": "No-fly {hours}:{minutes}",
   "@dashboard_gauges_noFlyRemaining": {
     "placeholders": {
@@ -1927,6 +1947,7 @@
   "dashboard_gauges_noDivesYet": "No dives yet",
   "settings_homeChips_pageTitle": "Home status chips",
   "settings_homeChips_description": "Choose which status chips appear at the top of the Home tab.",
+  "settings_homeChips_flightWindow": "Flight dive window",
   "settings_homeChips_gear": "Gear service",
   "settings_homeChips_insurance": "Insurance",
   "settings_homeChips_noFly": "No-fly timer",
@@ -5997,6 +6018,7 @@
   "equipment_serviceDialog_clearNextServiceDateTooltip": "Clear Next Service Date",
   "equipment_serviceDialog_costHint": "0.00",
   "equipment_serviceDialog_costLabel": "Cost",
+  "equipment_serviceDialog_currencyLabel": "Currency",
   "equipment_serviceDialog_costValidation": "Enter a valid amount",
   "equipment_serviceDialog_editTitle": "Edit Service Record",
   "equipment_serviceDialog_nextServiceDueLabel": "Next Service Due",
@@ -7386,6 +7408,7 @@
   "settings_about_header": "About",
   "settings_about_openSourceLicenses": "Open Source Licenses",
   "settings_about_reportIssue": "Report an Issue",
+  "settings_about_reportIssue_copy": "Copy link",
   "settings_about_reportIssue_snackbar": "Visit github.com/submersion-app/submersion/issues",
   "settings_about_version": "Version {version}",
   "@settings_about_version": {
@@ -8366,6 +8389,8 @@
   "settings_units_pressure_psi": "PSI",
   "settings_units_quickSelect": "Quick Select",
   "settings_units_sacRate": "SAC Rate",
+  "settings_units_defaultCurrency": "Default Currency",
+  "settings_units_dialog_defaultCurrency": "Default Currency",
   "settings_units_sac_pressurePerMinute": "Pressure per minute",
   "settings_units_sac_pressurePerMinute_subtitle": "No tank volume needed (bar/min or psi/min)",
   "settings_units_sac_volumePerMinute": "Volume per minute",
@@ -10162,6 +10187,9 @@
   "trips_edit_label_location": "Location",
   "trips_edit_label_notes": "Notes",
   "trips_edit_label_resortName": "Resort Name",
+  "trips_edit_label_returnFlight": "Return Flight",
+  "trips_edit_returnFlightClear": "Clear return flight",
+  "trips_edit_returnFlightNotSet": "Not set",
   "trips_edit_label_startDate": "Start Date",
   "trips_edit_label_tripName": "Trip Name *",
   "trips_edit_sectionTitle_dates": "Trip Dates",
@@ -13912,6 +13940,32 @@
   "safetySettings_noFlyPreset_standard": "Standard (12/18/24 h)",
   "safetySettings_noFlyPreset_strict": "Strict (18/24/48 h)",
   "safetySettings_noFlyPreset_subtitle": "Guideline intervals after a single no-deco dive, repetitive dives, and deco dives",
+  "flightWindow_closed": "No more diving before your flight",
+  "flightWindow_conflict": "Your no-fly time extends past your flight departure",
+  "flightWindow_departs": "Flight departs {time}",
+  "@flightWindow_departs": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "flightWindow_openTitle": "Time left to dive: {remaining}",
+  "@flightWindow_openTitle": {
+    "placeholders": {
+      "remaining": {
+        "type": "String"
+      }
+    }
+  },
+  "flightWindow_surfaceBy": "Surface by {time}",
+  "@flightWindow_surfaceBy": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
   "safetyHub_noFly_active_title": "No-fly: {remaining} remaining",
   "@safetyHub_noFly_active_title": {
     "placeholders": {

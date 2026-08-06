@@ -9,6 +9,11 @@ class AppLocalizationsNl extends AppLocalizations {
   AppLocalizationsNl([String locale = 'nl']) : super(locale);
 
   @override
+  String diveLog_edit_flightWindowWarning(String time) {
+    return 'Deze duik eindigt na het laatste veilige opstijgmoment voor je vlucht ($time)';
+  }
+
+  @override
   String diveLog_edit_geofenceSuggestion_near(String location) {
     return 'Bij $location';
   }
@@ -3090,6 +3095,15 @@ class AppLocalizationsNl extends AppLocalizations {
   String get dashboard_gauges_noFlyClear => 'Vliegverbod 0:00';
 
   @override
+  String dashboard_gauges_flightWindow(String hours, String minutes) {
+    return 'Duikvenster $hours:$minutes';
+  }
+
+  @override
+  String get dashboard_gauges_flightWindowClosed =>
+      'Niet meer duiken vóór de vlucht';
+
+  @override
   String dashboard_gauges_noFlyRemaining(String hours, String minutes) {
     return 'Vliegverbod $hours:$minutes';
   }
@@ -3111,6 +3125,9 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get settings_homeChips_description =>
       'Kies welke statuschips bovenaan het tabblad Start verschijnen.';
+
+  @override
+  String get settings_homeChips_flightWindow => 'Duikvenster voor vlucht';
 
   @override
   String get settings_homeChips_gear => 'Uitrustingsonderhoud';
@@ -10742,6 +10759,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get equipment_serviceDialog_costLabel => 'Kosten';
 
   @override
+  String get equipment_serviceDialog_currencyLabel => 'Valuta';
+
+  @override
   String get equipment_serviceDialog_costValidation =>
       'Voer een geldig bedrag in';
 
@@ -12670,6 +12690,9 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get settings_about_reportIssue => 'Probleem melden';
+
+  @override
+  String get settings_about_reportIssue_copy => 'Link kopiëren';
 
   @override
   String get settings_about_reportIssue_snackbar =>
@@ -15054,6 +15077,12 @@ class AppLocalizationsNl extends AppLocalizations {
   String get settings_units_sacRate => 'SAC-snelheid';
 
   @override
+  String get settings_units_defaultCurrency => 'Standaardvaluta';
+
+  @override
+  String get settings_units_dialog_defaultCurrency => 'Standaardvaluta';
+
+  @override
   String get settings_units_sac_pressurePerMinute => 'Druk per minuut';
 
   @override
@@ -17418,6 +17447,15 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get trips_edit_label_resortName => 'Resortnaam';
+
+  @override
+  String get trips_edit_label_returnFlight => 'Terugvlucht';
+
+  @override
+  String get trips_edit_returnFlightClear => 'Terugvlucht wissen';
+
+  @override
+  String get trips_edit_returnFlightNotSet => 'Niet ingesteld';
 
   @override
   String get trips_edit_label_startDate => 'Startdatum';
@@ -21958,6 +21996,28 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get safetySettings_noFlyPreset_subtitle =>
       'Richttijden na een enkele duik zonder deco, herhalingsduiken en decoduiken';
+
+  @override
+  String get flightWindow_closed => 'Niet meer duiken vóór je vlucht';
+
+  @override
+  String get flightWindow_conflict =>
+      'Je no-flytijd loopt door tot na je vertrek';
+
+  @override
+  String flightWindow_departs(String time) {
+    return 'Vlucht vertrekt $time';
+  }
+
+  @override
+  String flightWindow_openTitle(String remaining) {
+    return 'Resterende duiktijd: $remaining';
+  }
+
+  @override
+  String flightWindow_surfaceBy(String time) {
+    return 'Boven water vóór $time';
+  }
 
   @override
   String safetyHub_noFly_active_title(String remaining) {

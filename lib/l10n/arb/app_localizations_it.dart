@@ -9,6 +9,11 @@ class AppLocalizationsIt extends AppLocalizations {
   AppLocalizationsIt([String locale = 'it']) : super(locale);
 
   @override
+  String diveLog_edit_flightWindowWarning(String time) {
+    return 'Questa immersione termina dopo l\'ultimo orario sicuro di riemersione per il tuo volo ($time)';
+  }
+
+  @override
   String diveLog_edit_geofenceSuggestion_near(String location) {
     return 'Vicino a $location';
   }
@@ -3111,6 +3116,15 @@ class AppLocalizationsIt extends AppLocalizations {
   String get dashboard_gauges_noFlyClear => 'No-fly 0:00';
 
   @override
+  String dashboard_gauges_flightWindow(String hours, String minutes) {
+    return 'Finestra di immersione $hours:$minutes';
+  }
+
+  @override
+  String get dashboard_gauges_flightWindowClosed =>
+      'Niente più immersioni prima del volo';
+
+  @override
   String dashboard_gauges_noFlyRemaining(String hours, String minutes) {
     return 'No-fly $hours:$minutes';
   }
@@ -3132,6 +3146,10 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String get settings_homeChips_description =>
       'Scegli quali chip di stato compaiono in cima alla scheda Home.';
+
+  @override
+  String get settings_homeChips_flightWindow =>
+      'Finestra di immersione pre-volo';
 
   @override
   String get settings_homeChips_gear => 'Manutenzione attrezzatura';
@@ -10819,6 +10837,9 @@ class AppLocalizationsIt extends AppLocalizations {
   String get equipment_serviceDialog_costLabel => 'Costo';
 
   @override
+  String get equipment_serviceDialog_currencyLabel => 'Valuta';
+
+  @override
   String get equipment_serviceDialog_costValidation =>
       'Inserisci un importo valido';
 
@@ -12769,6 +12790,9 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get settings_about_reportIssue => 'Segnala un problema';
+
+  @override
+  String get settings_about_reportIssue_copy => 'Copia link';
 
   @override
   String get settings_about_reportIssue_snackbar =>
@@ -15176,6 +15200,12 @@ class AppLocalizationsIt extends AppLocalizations {
   String get settings_units_sacRate => 'SAC Rate';
 
   @override
+  String get settings_units_defaultCurrency => 'Valuta predefinita';
+
+  @override
+  String get settings_units_dialog_defaultCurrency => 'Valuta predefinita';
+
+  @override
   String get settings_units_sac_pressurePerMinute => 'Pressione al minuto';
 
   @override
@@ -17565,6 +17595,15 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get trips_edit_label_resortName => 'Nome resort';
+
+  @override
+  String get trips_edit_label_returnFlight => 'Volo di ritorno';
+
+  @override
+  String get trips_edit_returnFlightClear => 'Rimuovi volo di ritorno';
+
+  @override
+  String get trips_edit_returnFlightNotSet => 'Non impostato';
 
   @override
   String get trips_edit_label_startDate => 'Data di inizio';
@@ -22127,6 +22166,28 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String get safetySettings_noFlyPreset_subtitle =>
       'Intervalli indicativi dopo una singola immersione senza deco, immersioni ripetitive e immersioni con deco';
+
+  @override
+  String get flightWindow_closed => 'Niente più immersioni prima del volo';
+
+  @override
+  String get flightWindow_conflict =>
+      'Il tuo tempo di no-fly si estende oltre la partenza del volo';
+
+  @override
+  String flightWindow_departs(String time) {
+    return 'Il volo parte $time';
+  }
+
+  @override
+  String flightWindow_openTitle(String remaining) {
+    return 'Tempo di immersione rimanente: $remaining';
+  }
+
+  @override
+  String flightWindow_surfaceBy(String time) {
+    return 'Riemergere entro $time';
+  }
 
   @override
   String safetyHub_noFly_active_title(String remaining) {

@@ -9,6 +9,11 @@ class AppLocalizationsHu extends AppLocalizations {
   AppLocalizationsHu([String locale = 'hu']) : super(locale);
 
   @override
+  String diveLog_edit_flightWindowWarning(String time) {
+    return 'Ez a merülés a járatod előtti utolsó biztonságos felszínre érési idő után ér véget ($time)';
+  }
+
+  @override
   String diveLog_edit_geofenceSuggestion_near(String location) {
     return '$location közelében';
   }
@@ -3098,6 +3103,15 @@ class AppLocalizationsHu extends AppLocalizations {
   String get dashboard_gauges_noFlyClear => 'Repülési tilalom 0:00';
 
   @override
+  String dashboard_gauges_flightWindow(String hours, String minutes) {
+    return 'Merülési ablak $hours:$minutes';
+  }
+
+  @override
+  String get dashboard_gauges_flightWindowClosed =>
+      'A repülés előtt már nincs merülés';
+
+  @override
   String dashboard_gauges_noFlyRemaining(String hours, String minutes) {
     return 'Repülési tilalom $hours:$minutes';
   }
@@ -3119,6 +3133,9 @@ class AppLocalizationsHu extends AppLocalizations {
   @override
   String get settings_homeChips_description =>
       'Válaszd ki, mely állapotjelzők jelenjenek meg a Kezdőlap tetején.';
+
+  @override
+  String get settings_homeChips_flightWindow => 'Merülési ablak repülés előtt';
 
   @override
   String get settings_homeChips_gear => 'Felszerelés szervize';
@@ -10793,6 +10810,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String get equipment_serviceDialog_costLabel => 'Koltseg';
 
   @override
+  String get equipment_serviceDialog_currencyLabel => 'Penznem';
+
+  @override
   String get equipment_serviceDialog_costValidation =>
       'Adjon meg ervenyes osszeget';
 
@@ -12726,6 +12746,9 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get settings_about_reportIssue => 'Hiba bejelentese';
+
+  @override
+  String get settings_about_reportIssue_copy => 'Link másolása';
 
   @override
   String get settings_about_reportIssue_snackbar =>
@@ -15134,6 +15157,12 @@ class AppLocalizationsHu extends AppLocalizations {
   String get settings_units_sacRate => 'SAC ertek';
 
   @override
+  String get settings_units_defaultCurrency => 'Alapértelmezett pénznem';
+
+  @override
+  String get settings_units_dialog_defaultCurrency => 'Alapértelmezett pénznem';
+
+  @override
   String get settings_units_sac_pressurePerMinute => 'Nyomas percenként';
 
   @override
@@ -17511,6 +17540,15 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get trips_edit_label_resortName => 'Udulohely neve';
+
+  @override
+  String get trips_edit_label_returnFlight => 'Visszaúti járat';
+
+  @override
+  String get trips_edit_returnFlightClear => 'Visszaúti járat törlése';
+
+  @override
+  String get trips_edit_returnFlightNotSet => 'Nincs megadva';
 
   @override
   String get trips_edit_label_startDate => 'Kezdes datuma';
@@ -22054,6 +22092,28 @@ class AppLocalizationsHu extends AppLocalizations {
   @override
   String get safetySettings_noFlyPreset_subtitle =>
       'Irányadó időközök egyetlen nullidős merülés, ismétlő merülések és dekós merülések után';
+
+  @override
+  String get flightWindow_closed => 'A repülés előtt már ne merülj';
+
+  @override
+  String get flightWindow_conflict =>
+      'A repülési tilalmad túlnyúlik a járat indulásán';
+
+  @override
+  String flightWindow_departs(String time) {
+    return 'A járat indul: $time';
+  }
+
+  @override
+  String flightWindow_openTitle(String remaining) {
+    return 'Hátralévő merülési idő: $remaining';
+  }
+
+  @override
+  String flightWindow_surfaceBy(String time) {
+    return 'Felszínre érés eddig: $time';
+  }
 
   @override
   String safetyHub_noFly_active_title(String remaining) {
