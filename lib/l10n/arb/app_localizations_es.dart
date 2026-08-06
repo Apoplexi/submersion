@@ -22156,6 +22156,28 @@ class AppLocalizationsEs extends AppLocalizations {
       'Intervalos orientativos tras una única inmersión sin deco, inmersiones sucesivas e inmersiones con deco';
 
   @override
+  String get flightWindow_closed => 'No bucees más antes de tu vuelo';
+
+  @override
+  String get flightWindow_conflict =>
+      'Tu tiempo de no volar se extiende más allá de la salida del vuelo';
+
+  @override
+  String flightWindow_departs(String time) {
+    return 'El vuelo sale $time';
+  }
+
+  @override
+  String flightWindow_openTitle(String remaining) {
+    return 'Tiempo restante para bucear: $remaining';
+  }
+
+  @override
+  String flightWindow_surfaceBy(String time) {
+    return 'Emerger antes de $time';
+  }
+
+  @override
   String safetyHub_noFly_active_title(String remaining) {
     return 'No volar: quedan $remaining';
   }

@@ -37012,6 +37012,36 @@ abstract class AppLocalizations {
   /// **'Guideline intervals after a single no-deco dive, repetitive dives, and deco dives'**
   String get safetySettings_noFlyPreset_subtitle;
 
+  /// No description provided for @flightWindow_closed.
+  ///
+  /// In en, this message translates to:
+  /// **'No more diving before your flight'**
+  String get flightWindow_closed;
+
+  /// No description provided for @flightWindow_conflict.
+  ///
+  /// In en, this message translates to:
+  /// **'Your no-fly time extends past your flight departure'**
+  String get flightWindow_conflict;
+
+  /// No description provided for @flightWindow_departs.
+  ///
+  /// In en, this message translates to:
+  /// **'Flight departs {time}'**
+  String flightWindow_departs(String time);
+
+  /// No description provided for @flightWindow_openTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Time left to dive: {remaining}'**
+  String flightWindow_openTitle(String remaining);
+
+  /// No description provided for @flightWindow_surfaceBy.
+  ///
+  /// In en, this message translates to:
+  /// **'Surface by {time}'**
+  String flightWindow_surfaceBy(String time);
+
   /// No description provided for @safetyHub_noFly_active_title.
   ///
   /// In en, this message translates to:

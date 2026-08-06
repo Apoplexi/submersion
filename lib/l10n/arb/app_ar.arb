@@ -6549,6 +6549,32 @@
   "safetySettings_noFlyPreset_standard": "قياسي (12/18/24 س)",
   "safetySettings_noFlyPreset_strict": "صارم (18/24/48 س)",
   "safetySettings_noFlyPreset_subtitle": "فترات إرشادية بعد غطسة واحدة بلا توقفات، وغطسات متكررة، وغطسات بتخفيف الضغط",
+  "flightWindow_closed": "لا مزيد من الغوص قبل رحلتك",
+  "flightWindow_conflict": "تمتد فترة حظر الطيران إلى ما بعد إقلاع رحلتك",
+  "flightWindow_departs": "تقلع الرحلة {time}",
+  "@flightWindow_departs": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "flightWindow_openTitle": "الوقت المتبقي للغوص: {remaining}",
+  "@flightWindow_openTitle": {
+    "placeholders": {
+      "remaining": {
+        "type": "String"
+      }
+    }
+  },
+  "flightWindow_surfaceBy": "اصعد إلى السطح قبل {time}",
+  "@flightWindow_surfaceBy": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
   "safetyHub_noFly_active_title": "حظر الطيران: متبقٍ {remaining}",
   "@safetyHub_noFly_active_title": {
     "placeholders": {

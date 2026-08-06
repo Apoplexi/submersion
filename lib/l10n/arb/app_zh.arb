@@ -6549,6 +6549,32 @@
   "safetySettings_noFlyPreset_standard": "标准(12/18/24 小时)",
   "safetySettings_noFlyPreset_strict": "严格(18/24/48 小时)",
   "safetySettings_noFlyPreset_subtitle": "单次免减压潜水、重复潜水和减压潜水后的指导间隔",
+  "flightWindow_closed": "航班前请勿再潜水",
+  "flightWindow_conflict": "您的禁飞时间超过了航班起飞时间",
+  "flightWindow_departs": "航班 {time} 起飞",
+  "@flightWindow_departs": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "flightWindow_openTitle": "剩余潜水时间:{remaining}",
+  "@flightWindow_openTitle": {
+    "placeholders": {
+      "remaining": {
+        "type": "String"
+      }
+    }
+  },
+  "flightWindow_surfaceBy": "请在 {time} 前出水",
+  "@flightWindow_surfaceBy": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
   "safetyHub_noFly_active_title": "禁飞:剩余 {remaining}",
   "@safetyHub_noFly_active_title": {
     "placeholders": {

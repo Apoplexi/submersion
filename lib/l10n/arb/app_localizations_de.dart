@@ -22104,6 +22104,28 @@ class AppLocalizationsDe extends AppLocalizations {
       'Richtwerte nach einem einzelnen Nullzeit-Tauchgang, Wiederholungstauchgängen und Deko-Tauchgängen';
 
   @override
+  String get flightWindow_closed => 'Kein Tauchen mehr vor deinem Flug';
+
+  @override
+  String get flightWindow_conflict =>
+      'Deine Flugverbotszeit reicht über deinen Abflug hinaus';
+
+  @override
+  String flightWindow_departs(String time) {
+    return 'Abflug $time';
+  }
+
+  @override
+  String flightWindow_openTitle(String remaining) {
+    return 'Verbleibende Tauchzeit: $remaining';
+  }
+
+  @override
+  String flightWindow_surfaceBy(String time) {
+    return 'Auftauchen bis $time';
+  }
+
+  @override
   String safetyHub_noFly_active_title(String remaining) {
     return 'Flugverbot: noch $remaining';
   }

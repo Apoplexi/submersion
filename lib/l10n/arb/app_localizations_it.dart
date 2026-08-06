@@ -22138,6 +22138,28 @@ class AppLocalizationsIt extends AppLocalizations {
       'Intervalli indicativi dopo una singola immersione senza deco, immersioni ripetitive e immersioni con deco';
 
   @override
+  String get flightWindow_closed => 'Niente più immersioni prima del volo';
+
+  @override
+  String get flightWindow_conflict =>
+      'Il tuo tempo di no-fly si estende oltre la partenza del volo';
+
+  @override
+  String flightWindow_departs(String time) {
+    return 'Il volo parte $time';
+  }
+
+  @override
+  String flightWindow_openTitle(String remaining) {
+    return 'Tempo di immersione rimanente: $remaining';
+  }
+
+  @override
+  String flightWindow_surfaceBy(String time) {
+    return 'Riemergere entro $time';
+  }
+
+  @override
   String safetyHub_noFly_active_title(String remaining) {
     return 'No-fly: mancano $remaining';
   }

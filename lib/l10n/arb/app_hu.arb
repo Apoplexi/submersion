@@ -6549,6 +6549,32 @@
   "safetySettings_noFlyPreset_standard": "Normál (12/18/24 ó)",
   "safetySettings_noFlyPreset_strict": "Szigorú (18/24/48 ó)",
   "safetySettings_noFlyPreset_subtitle": "Irányadó időközök egyetlen nullidős merülés, ismétlő merülések és dekós merülések után",
+  "flightWindow_closed": "A repülés előtt már ne merülj",
+  "flightWindow_conflict": "A repülési tilalmad túlnyúlik a járat indulásán",
+  "flightWindow_departs": "A járat indul: {time}",
+  "@flightWindow_departs": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "flightWindow_openTitle": "Hátralévő merülési idő: {remaining}",
+  "@flightWindow_openTitle": {
+    "placeholders": {
+      "remaining": {
+        "type": "String"
+      }
+    }
+  },
+  "flightWindow_surfaceBy": "Felszínre érés eddig: {time}",
+  "@flightWindow_surfaceBy": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
   "safetyHub_noFly_active_title": "Repülési tilalom: {remaining} van hátra",
   "@safetyHub_noFly_active_title": {
     "placeholders": {

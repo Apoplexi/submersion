@@ -22065,6 +22065,28 @@ class AppLocalizationsHu extends AppLocalizations {
       'Irányadó időközök egyetlen nullidős merülés, ismétlő merülések és dekós merülések után';
 
   @override
+  String get flightWindow_closed => 'A repülés előtt már ne merülj';
+
+  @override
+  String get flightWindow_conflict =>
+      'A repülési tilalmad túlnyúlik a járat indulásán';
+
+  @override
+  String flightWindow_departs(String time) {
+    return 'A járat indul: $time';
+  }
+
+  @override
+  String flightWindow_openTitle(String remaining) {
+    return 'Hátralévő merülési idő: $remaining';
+  }
+
+  @override
+  String flightWindow_surfaceBy(String time) {
+    return 'Felszínre érés eddig: $time';
+  }
+
+  @override
   String safetyHub_noFly_active_title(String remaining) {
     return 'Repülési tilalom: $remaining van hátra';
   }

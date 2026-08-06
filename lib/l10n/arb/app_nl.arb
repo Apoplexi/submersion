@@ -6549,6 +6549,32 @@
   "safetySettings_noFlyPreset_standard": "Standaard (12/18/24 u)",
   "safetySettings_noFlyPreset_strict": "Strikt (18/24/48 u)",
   "safetySettings_noFlyPreset_subtitle": "Richttijden na een enkele duik zonder deco, herhalingsduiken en decoduiken",
+  "flightWindow_closed": "Niet meer duiken vóór je vlucht",
+  "flightWindow_conflict": "Je no-flytijd loopt door tot na je vertrek",
+  "flightWindow_departs": "Vlucht vertrekt {time}",
+  "@flightWindow_departs": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "flightWindow_openTitle": "Resterende duiktijd: {remaining}",
+  "@flightWindow_openTitle": {
+    "placeholders": {
+      "remaining": {
+        "type": "String"
+      }
+    }
+  },
+  "flightWindow_surfaceBy": "Boven water vóór {time}",
+  "@flightWindow_surfaceBy": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
   "safetyHub_noFly_active_title": "Vliegverbod: nog {remaining}",
   "@safetyHub_noFly_active_title": {
     "placeholders": {

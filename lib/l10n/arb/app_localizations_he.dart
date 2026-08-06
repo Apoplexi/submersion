@@ -21591,6 +21591,27 @@ class AppLocalizationsHe extends AppLocalizations {
       'מרווחים מנחים אחרי צלילה בודדת ללא דקו, צלילות חוזרות וצלילות דקומפרסיה';
 
   @override
+  String get flightWindow_closed => 'אין יותר צלילות לפני הטיסה';
+
+  @override
+  String get flightWindow_conflict => 'זמן איסור הטיסה שלך נמשך מעבר להמראה';
+
+  @override
+  String flightWindow_departs(String time) {
+    return 'הטיסה ממריאה $time';
+  }
+
+  @override
+  String flightWindow_openTitle(String remaining) {
+    return 'זמן צלילה שנותר: $remaining';
+  }
+
+  @override
+  String flightWindow_surfaceBy(String time) {
+    return 'לעלות אל פני השטח עד $time';
+  }
+
+  @override
   String safetyHub_noFly_active_title(String remaining) {
     return 'איסור טיסה: נותרו $remaining';
   }

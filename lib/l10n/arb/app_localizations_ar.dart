@@ -21744,6 +21744,28 @@ class AppLocalizationsAr extends AppLocalizations {
       'فترات إرشادية بعد غطسة واحدة بلا توقفات، وغطسات متكررة، وغطسات بتخفيف الضغط';
 
   @override
+  String get flightWindow_closed => 'لا مزيد من الغوص قبل رحلتك';
+
+  @override
+  String get flightWindow_conflict =>
+      'تمتد فترة حظر الطيران إلى ما بعد إقلاع رحلتك';
+
+  @override
+  String flightWindow_departs(String time) {
+    return 'تقلع الرحلة $time';
+  }
+
+  @override
+  String flightWindow_openTitle(String remaining) {
+    return 'الوقت المتبقي للغوص: $remaining';
+  }
+
+  @override
+  String flightWindow_surfaceBy(String time) {
+    return 'اصعد إلى السطح قبل $time';
+  }
+
+  @override
   String safetyHub_noFly_active_title(String remaining) {
     return 'حظر الطيران: متبقٍ $remaining';
   }

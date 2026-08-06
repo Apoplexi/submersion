@@ -21771,6 +21771,28 @@ class AppLocalizationsEn extends AppLocalizations {
       'Guideline intervals after a single no-deco dive, repetitive dives, and deco dives';
 
   @override
+  String get flightWindow_closed => 'No more diving before your flight';
+
+  @override
+  String get flightWindow_conflict =>
+      'Your no-fly time extends past your flight departure';
+
+  @override
+  String flightWindow_departs(String time) {
+    return 'Flight departs $time';
+  }
+
+  @override
+  String flightWindow_openTitle(String remaining) {
+    return 'Time left to dive: $remaining';
+  }
+
+  @override
+  String flightWindow_surfaceBy(String time) {
+    return 'Surface by $time';
+  }
+
+  @override
   String safetyHub_noFly_active_title(String remaining) {
     return 'No-fly: $remaining remaining';
   }

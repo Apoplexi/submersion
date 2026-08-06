@@ -6549,6 +6549,32 @@
   "safetySettings_noFlyPreset_standard": "רגיל (12/18/24 ש')",
   "safetySettings_noFlyPreset_strict": "מחמיר (18/24/48 ש')",
   "safetySettings_noFlyPreset_subtitle": "מרווחים מנחים אחרי צלילה בודדת ללא דקו, צלילות חוזרות וצלילות דקומפרסיה",
+  "flightWindow_closed": "אין יותר צלילות לפני הטיסה",
+  "flightWindow_conflict": "זמן איסור הטיסה שלך נמשך מעבר להמראה",
+  "flightWindow_departs": "הטיסה ממריאה {time}",
+  "@flightWindow_departs": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "flightWindow_openTitle": "זמן צלילה שנותר: {remaining}",
+  "@flightWindow_openTitle": {
+    "placeholders": {
+      "remaining": {
+        "type": "String"
+      }
+    }
+  },
+  "flightWindow_surfaceBy": "לעלות אל פני השטח עד {time}",
+  "@flightWindow_surfaceBy": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
   "safetyHub_noFly_active_title": "איסור טיסה: נותרו {remaining}",
   "@safetyHub_noFly_active_title": {
     "placeholders": {

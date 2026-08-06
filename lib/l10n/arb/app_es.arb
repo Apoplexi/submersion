@@ -6549,6 +6549,32 @@
   "safetySettings_noFlyPreset_standard": "Estándar (12/18/24 h)",
   "safetySettings_noFlyPreset_strict": "Estricto (18/24/48 h)",
   "safetySettings_noFlyPreset_subtitle": "Intervalos orientativos tras una única inmersión sin deco, inmersiones sucesivas e inmersiones con deco",
+  "flightWindow_closed": "No bucees más antes de tu vuelo",
+  "flightWindow_conflict": "Tu tiempo de no volar se extiende más allá de la salida del vuelo",
+  "flightWindow_departs": "El vuelo sale {time}",
+  "@flightWindow_departs": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "flightWindow_openTitle": "Tiempo restante para bucear: {remaining}",
+  "@flightWindow_openTitle": {
+    "placeholders": {
+      "remaining": {
+        "type": "String"
+      }
+    }
+  },
+  "flightWindow_surfaceBy": "Emerger antes de {time}",
+  "@flightWindow_surfaceBy": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
   "safetyHub_noFly_active_title": "No volar: quedan {remaining}",
   "@safetyHub_noFly_active_title": {
     "placeholders": {

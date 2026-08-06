@@ -22143,6 +22143,28 @@ class AppLocalizationsPt extends AppLocalizations {
       'Intervalos orientativos após um único mergulho sem deco, mergulhos repetitivos e mergulhos com deco';
 
   @override
+  String get flightWindow_closed => 'Não mergulhe mais antes do seu voo';
+
+  @override
+  String get flightWindow_conflict =>
+      'Seu tempo de não voar ultrapassa a partida do voo';
+
+  @override
+  String flightWindow_departs(String time) {
+    return 'O voo parte $time';
+  }
+
+  @override
+  String flightWindow_openTitle(String remaining) {
+    return 'Tempo restante para mergulhar: $remaining';
+  }
+
+  @override
+  String flightWindow_surfaceBy(String time) {
+    return 'Emergir até $time';
+  }
+
+  @override
   String safetyHub_noFly_active_title(String remaining) {
     return 'Não voar: faltam $remaining';
   }
