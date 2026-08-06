@@ -12014,6 +12014,20 @@ class AppLocalizationsAr extends AppLocalizations {
   String get media_library_filter_videos => 'مقاطع الفيديو';
 
   @override
+  String get media_library_deleteConfirmBody =>
+      'ستتم إزالتها من التطبيق ومن أي مخزن وسائط. لا يمكن التراجع عن هذا.';
+
+  @override
+  String media_library_deleteConfirmTitle(int count) {
+    return 'حذف $count عناصر؟';
+  }
+
+  @override
+  String media_library_selectedCount(int count) {
+    return 'تم تحديد $count';
+  }
+
+  @override
   String get media_library_unlinkedHeader => 'غير مرتبطة';
 
   @override

@@ -12141,6 +12141,20 @@ class AppLocalizationsNl extends AppLocalizations {
   String get media_library_filter_videos => 'Video\'s';
 
   @override
+  String get media_library_deleteConfirmBody =>
+      'Dit verwijdert ze uit de app en elke mediaopslag. Dit kan niet ongedaan worden gemaakt.';
+
+  @override
+  String media_library_deleteConfirmTitle(int count) {
+    return '$count items verwijderen?';
+  }
+
+  @override
+  String media_library_selectedCount(int count) {
+    return '$count geselecteerd';
+  }
+
+  @override
   String get media_library_unlinkedHeader => 'Niet gekoppeld';
 
   @override

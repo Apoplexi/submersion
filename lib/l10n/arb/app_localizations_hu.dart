@@ -12198,6 +12198,20 @@ class AppLocalizationsHu extends AppLocalizations {
   String get media_library_filter_videos => 'Videók';
 
   @override
+  String get media_library_deleteConfirmBody =>
+      'Ez eltávolítja őket az alkalmazásból és minden médiatárból. Nem vonható vissza.';
+
+  @override
+  String media_library_deleteConfirmTitle(int count) {
+    return '$count elem törlése?';
+  }
+
+  @override
+  String media_library_selectedCount(int count) {
+    return '$count kiválasztva';
+  }
+
+  @override
   String get media_library_unlinkedHeader => 'Nem csatolt';
 
   @override

@@ -12239,6 +12239,20 @@ class AppLocalizationsPt extends AppLocalizations {
   String get media_library_filter_videos => 'Vídeos';
 
   @override
+  String get media_library_deleteConfirmBody =>
+      'Isso os remove do aplicativo e de qualquer armazenamento de mídia. Não pode ser desfeito.';
+
+  @override
+  String media_library_deleteConfirmTitle(int count) {
+    return 'Excluir $count itens?';
+  }
+
+  @override
+  String media_library_selectedCount(int count) {
+    return '$count selecionados';
+  }
+
+  @override
   String get media_library_unlinkedHeader => 'Sem vínculo';
 
   @override

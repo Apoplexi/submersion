@@ -11681,6 +11681,19 @@ class AppLocalizationsZh extends AppLocalizations {
   String get media_library_filter_videos => '视频';
 
   @override
+  String get media_library_deleteConfirmBody => '这会将它们从应用和任何媒体存储中移除。此操作无法撤销。';
+
+  @override
+  String media_library_deleteConfirmTitle(int count) {
+    return '删除 $count 个项目？';
+  }
+
+  @override
+  String media_library_selectedCount(int count) {
+    return '已选择 $count 项';
+  }
+
+  @override
   String get media_library_unlinkedHeader => '未关联';
 
   @override

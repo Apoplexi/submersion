@@ -5,7 +5,9 @@ import 'package:submersion/features/media/domain/entities/media_item.dart';
 import 'package:submersion/features/media/domain/entities/media_library_filter.dart';
 import 'package:submersion/features/media/presentation/pages/media_viewer_page.dart';
 import 'package:submersion/features/media/presentation/providers/media_library_providers.dart';
+import 'package:submersion/features/media/presentation/providers/media_selection_provider.dart';
 import 'package:submersion/features/media/presentation/widgets/media_library_grid.dart';
+import 'package:submersion/features/media/presentation/widgets/media_selection_bar.dart';
 import 'package:submersion/features/media/presentation/widgets/media_library_grouped_list.dart';
 import 'package:submersion/features/media/presentation/widgets/media_library_groupers.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
@@ -42,9 +44,17 @@ class MediaLibraryView extends ConsumerWidget {
     final state = ref.watch(mediaLibraryNotifierProvider);
     final filter = ref.watch(mediaLibraryFilterProvider);
     final mode = ref.watch(mediaLibraryViewModeProvider);
+    final selection = ref.watch(mediaSelectionProvider);
 
     return Column(
       children: [
+        if (selection.isNotEmpty)
+          MediaSelectionBar(
+            selectedItems: state.entries
+                .where((e) => selection.contains(e.item.id))
+                .map((e) => e.item)
+                .toList(),
+          ),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
           child: Row(
@@ -123,24 +133,43 @@ class MediaLibraryView extends ConsumerWidget {
     void loadMore() =>
         ref.read(mediaLibraryNotifierProvider.notifier).loadMore();
 
+    final selection = ref.watch(mediaSelectionProvider);
+    void handleTap(MediaLibraryEntry entry) {
+      if (selection.isNotEmpty) {
+        ref.read(mediaSelectionProvider.notifier).toggle(entry.item.id);
+      } else {
+        _openViewer(context, state.entries, entry);
+      }
+    }
+
+    void handleLongPress(MediaLibraryEntry entry) {
+      ref.read(mediaSelectionProvider.notifier).toggle(entry.item.id);
+    }
+
     return switch (mode) {
       MediaLibraryViewMode.grid => MediaLibraryGrid(
         entries: state.entries,
         hasMore: state.hasMore,
         onLoadMore: loadMore,
-        onTileTap: (entry, index) => _openViewer(context, state.entries, entry),
+        onTileTap: (entry, index) => handleTap(entry),
+        selectedIds: selection,
+        onTileLongPress: handleLongPress,
       ),
       MediaLibraryViewMode.byDive => MediaLibraryGroupedList(
         groups: groupByDive(state.entries),
         hasMore: state.hasMore,
         onLoadMore: loadMore,
-        onTileTap: (entry) => _openViewer(context, state.entries, entry),
+        onTileTap: handleTap,
+        selectedIds: selection,
+        onTileLongPress: handleLongPress,
       ),
       MediaLibraryViewMode.timeline => MediaLibraryGroupedList(
         groups: groupByTimeline(state.entries),
         hasMore: state.hasMore,
         onLoadMore: loadMore,
-        onTileTap: (entry) => _openViewer(context, state.entries, entry),
+        onTileTap: handleTap,
+        selectedIds: selection,
+        onTileLongPress: handleLongPress,
       ),
     };
   }

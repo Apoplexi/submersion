@@ -20,10 +20,10 @@ import 'package:submersion/features/dive_log/presentation/providers/active_sourc
 import 'package:submersion/features/dive_log/presentation/providers/dive_providers.dart';
 import 'package:submersion/features/dive_log/presentation/providers/gas_switch_providers.dart';
 import 'package:submersion/features/dive_log/presentation/providers/profile_analysis_provider.dart';
-import 'package:submersion/features/media/data/services/media_share_temp_file.dart';
 import 'package:submersion/features/media/data/services/metadata_write_service.dart';
 import 'package:submersion/features/media/domain/entities/media_item.dart';
 import 'package:submersion/features/media/domain/entities/media_source_type.dart';
+import 'package:submersion/features/media/presentation/helpers/media_share_helper.dart';
 import 'package:submersion/features/media/presentation/providers/lightroom_providers.dart';
 import 'package:submersion/features/media/presentation/providers/resolved_asset_providers.dart';
 import 'package:submersion/features/media/presentation/widgets/media_item_view.dart';
@@ -393,40 +393,8 @@ class _MediaViewerPageState extends ConsumerState<MediaViewerPage> {
   }
 
   Future<void> _shareCurrentPhoto(MediaItem item) async {
-    final l10n = context.l10n;
-
-    // Show loading indicator
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (_) =>
-          const Center(child: CircularProgressIndicator(color: Colors.white)),
-    );
-
-    try {
-      final resolvedResult = await ref.read(
-        resolvedFullResolutionProvider(item).future,
-      );
-
-      if (resolvedResult.isUnavailable || resolvedResult.bytes == null) {
-        if (mounted) Navigator.of(context, rootNavigator: true).pop();
-        _showError(l10n.media_photoViewer_cannotShare);
-        return;
-      }
-
-      final file = await writeShareTempFile(item, resolvedResult.bytes!);
-
-      // Dismiss loading - use rootNavigator to match where showDialog placed the dialog
-      if (mounted) Navigator.of(context, rootNavigator: true).pop();
-
-      // Share
-      await SharePlus.instance.share(
-        ShareParams(files: [XFile(file.path, mimeType: item.shareMimeType)]),
-      );
-    } catch (e) {
-      if (mounted) Navigator.of(context, rootNavigator: true).pop();
-      _showError(l10n.media_photoViewer_failedToShare(e.toString()));
-    }
+    // Shared resolve-and-share flow (also used by the library selection bar).
+    await shareMediaItems(context, ref, [item]);
   }
 
   void _showError(String message) {

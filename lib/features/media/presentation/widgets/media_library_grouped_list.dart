@@ -3,7 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import 'package:submersion/features/media/domain/entities/media_library_filter.dart';
-import 'package:submersion/features/media/presentation/widgets/media_item_view.dart';
+import 'package:submersion/features/media/presentation/widgets/media_library_grid.dart';
 import 'package:submersion/features/media/presentation/widgets/media_library_groupers.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 
@@ -17,12 +17,20 @@ class MediaLibraryGroupedList extends StatelessWidget {
     required this.hasMore,
     required this.onLoadMore,
     required this.onTileTap,
+    this.selectedIds = const {},
+    this.onTileLongPress,
   });
 
   final List<MediaLibraryGroup> groups;
   final bool hasMore;
   final VoidCallback onLoadMore;
   final void Function(MediaLibraryEntry entry) onTileTap;
+
+  /// Ids rendered with the selection overlay.
+  final Set<String> selectedIds;
+
+  /// Long-press hook for entering selection mode.
+  final void Function(MediaLibraryEntry entry)? onTileLongPress;
 
   static const double _loadMoreThreshold = 400;
 
@@ -106,14 +114,13 @@ class MediaLibraryGroupedList extends StatelessWidget {
           itemCount: group.entries.length,
           itemBuilder: (context, index) {
             final entry = group.entries[index];
-            return GestureDetector(
+            return MediaLibraryTile(
+              entry: entry,
+              selected: selectedIds.contains(entry.item.id),
               onTap: () => onTileTap(entry),
-              child: MediaItemView(
-                item: entry.item,
-                thumbnail: true,
-                targetSize: const Size(200, 200),
-                fit: BoxFit.cover,
-              ),
+              onLongPress: onTileLongPress == null
+                  ? null
+                  : () => onTileLongPress!(entry),
             );
           },
         ),

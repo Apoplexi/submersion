@@ -20761,6 +20761,24 @@ abstract class AppLocalizations {
   /// **'Videos'**
   String get media_library_filter_videos;
 
+  /// Body of the bulk delete confirmation dialog
+  ///
+  /// In en, this message translates to:
+  /// **'This removes them from the app and any media store. This cannot be undone.'**
+  String get media_library_deleteConfirmBody;
+
+  /// Title of the bulk delete confirmation dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Delete {count} items?'**
+  String media_library_deleteConfirmTitle(int count);
+
+  /// Selection bar count label
+  ///
+  /// In en, this message translates to:
+  /// **'{count} selected'**
+  String media_library_selectedCount(int count);
+
   /// By-dive view header for media attached to no dive
   ///
   /// In en, this message translates to:

@@ -11933,6 +11933,20 @@ class AppLocalizationsHe extends AppLocalizations {
   String get media_library_filter_videos => 'סרטונים';
 
   @override
+  String get media_library_deleteConfirmBody =>
+      'פעולה זו מסירה אותם מהאפליקציה ומכל מאגר מדיה. לא ניתן לבטל זאת.';
+
+  @override
+  String media_library_deleteConfirmTitle(int count) {
+    return 'למחוק $count פריטים?';
+  }
+
+  @override
+  String media_library_selectedCount(int count) {
+    return '$count נבחרו';
+  }
+
+  @override
   String get media_library_unlinkedHeader => 'לא מקושרים';
 
   @override
