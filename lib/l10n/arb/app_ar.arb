@@ -1,4 +1,6 @@
 {
+  "settings_units_defaultCurrency": "العملة الافتراضية",
+  "settings_units_dialog_defaultCurrency": "العملة الافتراضية",
   "diveSites_list_menu_select": "تحديد المواقع",
   "diveLog_edit_geofenceSuggestion_near": "بالقرب من {location}",
   "diveLog_edit_geofenceSuggestion_title": "اقتراح المعدات",
@@ -3409,6 +3411,7 @@
   "equipment_serviceDialog_clearNextServiceDateTooltip": "مسح تاريخ الصيانة القادمة",
   "equipment_serviceDialog_costHint": "0.00",
   "equipment_serviceDialog_costLabel": "التكلفة",
+  "equipment_serviceDialog_currencyLabel": "العملة",
   "equipment_serviceDialog_costValidation": "أدخل مبلغاً صالحاً",
   "equipment_serviceDialog_editTitle": "تعديل سجل الصيانة",
   "equipment_serviceDialog_nextServiceDueLabel": "موعد الصيانة القادمة",

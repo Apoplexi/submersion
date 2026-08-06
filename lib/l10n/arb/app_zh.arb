@@ -1,4 +1,6 @@
 {
+  "settings_units_defaultCurrency": "默认货币",
+  "settings_units_dialog_defaultCurrency": "默认货币",
   "diveSites_list_menu_select": "选择潜水点",
   "diveLog_edit_geofenceSuggestion_near": "靠近 {location}",
   "diveLog_edit_geofenceSuggestion_title": "装备建议",
@@ -3551,6 +3553,7 @@
   "equipment_serviceDialog_clearNextServiceDateTooltip": "清除下次维护日期",
   "equipment_serviceDialog_costHint": "0.00",
   "equipment_serviceDialog_costLabel": "费用",
+  "equipment_serviceDialog_currencyLabel": "货币",
   "equipment_serviceDialog_costValidation": "请输入有效金额",
   "equipment_serviceDialog_editTitle": "编辑维护记录",
   "equipment_serviceDialog_nextServiceDueLabel": "下次维护日期",

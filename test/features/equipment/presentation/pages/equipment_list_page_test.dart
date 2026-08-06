@@ -637,4 +637,67 @@ void main() {
       expect(find.byType(DatePickerDialog), findsNothing);
     });
   });
+
+  group('AddEquipmentSheet currency', () {
+    Future<DropdownMenu<String>> pumpSheet(
+      WidgetTester tester, {
+      required String defaultCurrency,
+    }) async {
+      tester.view.devicePixelRatio = 1.0;
+      tester.view.physicalSize = const Size(800, 1600);
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      final settings = MockSettingsNotifier();
+      final overrides = await getBaseOverrides(settingsNotifier: settings);
+      await settings.setDefaultCurrency(defaultCurrency);
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: overrides,
+          child: MaterialApp(
+            locale: const Locale('en'),
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: Scaffold(
+              body: Consumer(
+                builder: (context, ref, _) => AddEquipmentSheet(ref: ref),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final menu = find.byType(DropdownMenu<String>);
+      await tester.scrollUntilVisible(
+        menu,
+        200,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.pumpAndSettle();
+      return tester.widget<DropdownMenu<String>>(menu);
+    }
+
+    testWidgets('opens in the diver default currency rather than USD', (
+      tester,
+    ) async {
+      final menu = await pumpSheet(tester, defaultCurrency: 'EUR');
+
+      expect(menu.controller?.text, 'EUR');
+      // The price field's prefix follows the selected currency.
+      expect(find.textContaining('€'), findsWidgets);
+    });
+
+    testWidgets('a non-preset default currency is still offered', (
+      tester,
+    ) async {
+      final menu = await pumpSheet(tester, defaultCurrency: 'ISK');
+
+      expect(menu.controller?.text, 'ISK');
+      expect(menu.dropdownMenuEntries.map((e) => e.value).first, 'ISK');
+    });
+  });
 }

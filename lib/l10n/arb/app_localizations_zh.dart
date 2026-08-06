@@ -10339,6 +10339,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get equipment_serviceDialog_costLabel => '费用';
 
   @override
+  String get equipment_serviceDialog_currencyLabel => '货币';
+
+  @override
   String get equipment_serviceDialog_costValidation => '请输入有效金额';
 
   @override
@@ -14429,6 +14432,12 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get settings_units_sacRate => '气体消耗率';
+
+  @override
+  String get settings_units_defaultCurrency => '默认货币';
+
+  @override
+  String get settings_units_dialog_defaultCurrency => '默认货币';
 
   @override
   String get settings_units_sac_pressurePerMinute => '压力/分钟';

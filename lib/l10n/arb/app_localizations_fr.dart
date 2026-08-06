@@ -10850,6 +10850,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get equipment_serviceDialog_costLabel => 'Cout';
 
   @override
+  String get equipment_serviceDialog_currencyLabel => 'Devise';
+
+  @override
   String get equipment_serviceDialog_costValidation =>
       'Entrez un montant valide';
 
@@ -15233,6 +15236,12 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get settings_units_sacRate => 'SAC Rate';
+
+  @override
+  String get settings_units_defaultCurrency => 'Devise par défaut';
+
+  @override
+  String get settings_units_dialog_defaultCurrency => 'Devise par défaut';
 
   @override
   String get settings_units_sac_pressurePerMinute => 'Pression par minute';

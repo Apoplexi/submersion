@@ -1,4 +1,6 @@
 {
+  "settings_units_defaultCurrency": "Standaardvaluta",
+  "settings_units_dialog_defaultCurrency": "Standaardvaluta",
   "diveSites_list_menu_select": "Duikstekken selecteren",
   "diveLog_edit_geofenceSuggestion_near": "Bij {location}",
   "diveLog_edit_geofenceSuggestion_title": "Uitrustingssuggestie",
@@ -3409,6 +3411,7 @@
   "equipment_serviceDialog_clearNextServiceDateTooltip": "Volgende servicedatum wissen",
   "equipment_serviceDialog_costHint": "0,00",
   "equipment_serviceDialog_costLabel": "Kosten",
+  "equipment_serviceDialog_currencyLabel": "Valuta",
   "equipment_serviceDialog_costValidation": "Voer een geldig bedrag in",
   "equipment_serviceDialog_editTitle": "Servicerecord bewerken",
   "equipment_serviceDialog_nextServiceDueLabel": "Volgende service gepland",

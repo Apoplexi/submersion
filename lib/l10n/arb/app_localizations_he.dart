@@ -10572,6 +10572,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get equipment_serviceDialog_costLabel => 'עלות';
 
   @override
+  String get equipment_serviceDialog_currencyLabel => 'מטבע';
+
+  @override
   String get equipment_serviceDialog_costValidation => 'הזן סכום חוקי';
 
   @override
@@ -14796,6 +14799,12 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get settings_units_sacRate => 'קצב SAC';
+
+  @override
+  String get settings_units_defaultCurrency => 'מטבע ברירת מחדל';
+
+  @override
+  String get settings_units_dialog_defaultCurrency => 'מטבע ברירת מחדל';
 
   @override
   String get settings_units_sac_pressurePerMinute => 'לחץ לדקה';

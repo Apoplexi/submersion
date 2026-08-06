@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:submersion/core/icons/mdi_icons.dart';
+import 'package:submersion/core/utils/currency.dart';
 import 'package:submersion/core/constants/map_style.dart';
 import 'package:submersion/core/deco/entities/cns_calculation_method.dart';
 import 'package:submersion/core/providers/provider.dart';
@@ -475,6 +476,17 @@ class _UnitsSectionContent extends ConsumerWidget {
                   onTap: () =>
                       _showSacUnitPicker(context, ref, settings.sacUnit),
                 ),
+                const Divider(height: 1),
+                _buildUnitTile(
+                  context,
+                  title: context.l10n.settings_units_defaultCurrency,
+                  value: settings.defaultCurrency,
+                  onTap: () => _showCurrencyPicker(
+                    context,
+                    ref,
+                    settings.defaultCurrency,
+                  ),
+                ),
               ],
             ),
           ),
@@ -816,6 +828,51 @@ class _UnitsSectionContent extends ConsumerWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  void _showCurrencyPicker(
+    BuildContext context,
+    WidgetRef ref,
+    String currentCode,
+  ) {
+    final current = currentCode.trim().toUpperCase();
+    final codes = currencyCodesWith(current);
+    showDialog<void>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(context.l10n.settings_units_dialog_defaultCurrency),
+        content: SizedBox(
+          width: double.maxFinite,
+          child: ListView(
+            shrinkWrap: true,
+            children: [
+              for (final code in codes)
+                ListTile(
+                  title: Text('$code  ${currencySymbol(code)}'),
+                  trailing: code == current
+                      ? Icon(
+                          Icons.check,
+                          color: Theme.of(context).colorScheme.primary,
+                        )
+                      : null,
+                  onTap: () {
+                    ref
+                        .read(settingsProvider.notifier)
+                        .setDefaultCurrency(code);
+                    Navigator.of(dialogContext).pop();
+                  },
+                ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(),
+            child: Text(context.l10n.common_action_cancel),
+          ),
+        ],
       ),
     );
   }
