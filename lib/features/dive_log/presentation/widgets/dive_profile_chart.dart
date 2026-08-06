@@ -24,6 +24,7 @@ import 'package:submersion/features/dive_log/presentation/widgets/chart_series_c
 import 'package:submersion/features/dive_log/presentation/widgets/deco_stop_band.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/dive_profile_legend.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/profile_decimator.dart';
+import 'package:submersion/features/dive_log/presentation/widgets/profile_metric_band.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/gas_colors.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/gas_timeline_strip.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/photo_marker_layout.dart';
@@ -1595,6 +1596,10 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
     // an analysis-curve re-emission (e.g. a ceiling-source toggle) rebuilds
     // only the analysis group over decimated points.
     final vpBucket = _viewportDecimationBucket();
+    // Every band-mapped bar's Y position moves with the visible depth window,
+    // so the band belongs in each signature that covers one — otherwise a zoom
+    // or vertical pan is served stale bars from the cache.
+    final metricBandSig = _metricBand(units).hashCode;
     final commonSig = _sigOf([
       identityHashCode(widget.profile),
       identityHashCode(legendState),
@@ -1603,6 +1608,7 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
       units.pressureSymbol,
       units.sacSymbol,
       colorScheme.hashCode,
+      metricBandSig,
     ]);
     _baseSig = _sigOf([
       commonSig,
@@ -2038,6 +2044,32 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
     ref.watch(profileLegendProvider.select((s) => s.showGas)),
   );
 
+  /// Full extent of the depth axis in display units, including the 10% padding.
+  /// Overlaid sources widen it so a deeper overlay trace is never clipped.
+  ///
+  /// Callable outside [_buildChart] because the bar-cache signatures are
+  /// computed in [build], before the chart body runs, and must see the same
+  /// value the chart body will use.
+  double _totalMaxDepth(UnitFormatter units) {
+    final maxDepthValueMeters = [
+      widget.profile.map((p) => p.depth).reduce(math.max),
+      ...(widget.overlays ?? const <ChartSourceOverlay>[]).expand(
+        (o) => o.points.map((p) => p.depth),
+      ),
+    ].reduce(math.max);
+    return units.convertDepth(widget.maxDepth ?? maxDepthValueMeters) * 1.1;
+  }
+
+  /// The depth slice that secondary-axis metrics are stretched across: the
+  /// currently visible depth window, so zoom never clips them off-screen.
+  MetricBand _metricBand(UnitFormatter units) {
+    final totalMaxDepth = _totalMaxDepth(units);
+    return MetricBand(
+      top: _viewport.offsetY * totalMaxDepth,
+      span: totalMaxDepth * _viewport.visibleHeight,
+    );
+  }
+
   Widget _buildChart(
     BuildContext context,
     UnitFormatter units, {
@@ -2059,15 +2091,7 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
       widget.profile.map((p) => p.timestamp).reduce(math.max),
       ...overlayPoints.map((p) => p.timestamp),
     ].reduce(math.max).toDouble();
-    final maxDepthValueMeters = [
-      widget.profile.map((p) => p.depth).reduce(math.max),
-      ...overlayPoints.map((p) => p.depth),
-    ].reduce(math.max);
-    // Convert to user's preferred depth unit for chart calculations
-    final maxDepthValueDisplay = units.convertDepth(
-      widget.maxDepth ?? maxDepthValueMeters,
-    );
-    final totalMaxDepth = maxDepthValueDisplay * 1.1; // Add 10% padding
+    final totalMaxDepth = _totalMaxDepth(units);
 
     // Apply zoom and pan to calculate visible bounds (see ProfileChartViewport).
     final visibleRangeX = totalMaxTime * _viewport.visibleWidth;
@@ -2078,6 +2102,12 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
 
     final visibleMinDepth = _viewport.offsetY * totalMaxDepth;
     final visibleMaxDepth = visibleMinDepth + visibleRangeY;
+
+    // Secondary-axis metrics follow the visible depth window rather than the
+    // full dive, so zooming never clips them off-screen (see MetricBand).
+    // Identical by construction to _metricBand(units), which build() feeds into
+    // the bar-cache signatures.
+    final metricBand = MetricBand(top: visibleMinDepth, span: visibleRangeY);
 
     // Temperature bounds (if showing) - convert to user's preferred unit.
     // Pool the active source's and every overlaid source's readings so both
@@ -2275,9 +2305,8 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
                       return const SizedBox.shrink();
                     }
                     // Map from inverted depth axis to the metric value
-                    final metricValue = _mapDepthToMetricValue(
+                    final metricValue = metricBand.unmap(
                       -value,
-                      totalMaxDepth,
                       rightAxisRange.min,
                       rightAxisRange.max,
                     );
@@ -2349,7 +2378,7 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
                         maxTemp != null)
                       ..._buildTemperatureLines(
                         colorScheme,
-                        totalMaxDepth,
+                        metricBand,
                         minTemp,
                         maxTemp,
                         units,
@@ -2358,7 +2387,7 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
                     // Multi-tank pressure lines (per-tank visibility controlled
                     // inside _buildMultiTankPressureLines via _showTankPressure)
                     if (_hasMultiTankPressure)
-                      ..._buildMultiTankPressureLines(totalMaxDepth),
+                      ..._buildMultiTankPressureLines(metricBand),
 
                     // Heart rate line (if showing)
                     if (_showHeartRate &&
@@ -2367,7 +2396,7 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
                         maxHR != null)
                       _buildHeartRateLine(
                         heartRateColor,
-                        totalMaxDepth,
+                        metricBand,
                         minHR,
                         maxHR,
                       ),
@@ -2382,7 +2411,7 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
                         hasSacData &&
                         minSac != null &&
                         maxSac != null)
-                      _buildSacLine(totalMaxDepth, minSac, maxSac),
+                      _buildSacLine(metricBand, minSac, maxSac),
                   ],
                 ),
                 ..._barsCache.series(
@@ -2392,7 +2421,7 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
                     // Ascent-rate magnitude line (separate overlay; signed
                     // m/min)
                     if (_showAscentRateLine && widget.ascentRates != null)
-                      _buildAscentRateLine(totalMaxDepth),
+                      _buildAscentRateLine(metricBand),
                   ],
                 ),
                 ..._barsCache.series(
@@ -2415,21 +2444,21 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
 
                     // NDL line (if showing)
                     if (_showNdl && widget.ndlCurve != null)
-                      _buildNdlLine(totalMaxDepth),
+                      _buildNdlLine(metricBand),
 
                     // ppO2 line (if showing)
                     if (_showPpO2 && widget.ppO2Curve != null)
-                      _buildPpO2Line(totalMaxDepth),
+                      _buildPpO2Line(metricBand),
 
                     // ppN2 line (if showing)
                     if (_showPpN2 && widget.ppN2Curve != null)
-                      _buildPpN2Line(totalMaxDepth),
+                      _buildPpN2Line(metricBand),
 
                     // ppHe line (if showing and has helium data)
                     if (_showPpHe &&
                         widget.ppHeCurve != null &&
                         widget.ppHeCurve!.any((v) => v > 0.001))
-                      _buildPpHeLine(totalMaxDepth),
+                      _buildPpHeLine(metricBand),
 
                     // MOD line (if showing)
                     if (_showMod && widget.modCurve != null)
@@ -2437,15 +2466,15 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
 
                     // Gas density line (if showing)
                     if (_showDensity && widget.densityCurve != null)
-                      _buildDensityLine(totalMaxDepth),
+                      _buildDensityLine(metricBand),
 
                     // GF% line (if showing)
                     if (_showGf && widget.gfCurve != null)
-                      _buildGfLine(totalMaxDepth),
+                      _buildGfLine(metricBand),
 
                     // Surface GF line (if showing)
                     if (_showSurfaceGf && widget.surfaceGfCurve != null)
-                      _buildSurfaceGfLine(totalMaxDepth),
+                      _buildSurfaceGfLine(metricBand),
 
                     // Mean depth line (if showing)
                     if (_showMeanDepth && widget.meanDepthCurve != null)
@@ -2453,15 +2482,15 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
 
                     // TTS line (if showing)
                     if (_showTts && widget.ttsCurve != null)
-                      _buildTtsLine(totalMaxDepth),
+                      _buildTtsLine(metricBand),
 
                     // CNS% curve (if showing)
                     if (_showCns && widget.cnsCurve != null)
-                      _buildCnsLine(totalMaxDepth),
+                      _buildCnsLine(metricBand),
 
                     // OTU curve (if showing)
                     if (_showOtu && widget.otuCurve != null)
-                      _buildOtuLine(totalMaxDepth),
+                      _buildOtuLine(metricBand),
                   ],
                 ),
                 ..._barsCache.series(
@@ -2471,7 +2500,7 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
                     // Profile markers (max depth, pressure thresholds)
                     ..._buildMarkerLines(
                       units,
-                      totalMaxDepth,
+                      metricBand,
                       minPressure: minPressure,
                       maxPressure: maxPressure,
                     ),
@@ -2483,12 +2512,7 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
                   () => [
                     // Overlaid comparison sources — LAST, so depth bars keep
                     // occupying the leading barIndex range (_depthBarCount).
-                    ..._buildOverlayLines(
-                      units,
-                      totalMaxDepth,
-                      minTemp,
-                      maxTemp,
-                    ),
+                    ..._buildOverlayLines(units, metricBand, minTemp, maxTemp),
                   ],
                 ),
               ],
@@ -3671,7 +3695,7 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
   /// valid for the tooltip's spot-to-sample mapping.
   List<LineChartBarData> _buildOverlayLines(
     UnitFormatter units,
-    double chartMaxDepth,
+    MetricBand band,
     double? minTemp,
     double? maxTemp,
   ) {
@@ -3737,9 +3761,8 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
                 for (final i in tempKeep)
                   FlSpot(
                     tempPoints[i].timestamp.toDouble(),
-                    -_mapTempToDepth(
+                    -band.map(
                       units.convertTemperature(tempPoints[i].temperature!),
-                      chartMaxDepth,
                       minTemp,
                       maxTemp,
                     ),
@@ -3802,12 +3825,10 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
             for (final i in ndlKeep)
               FlSpot(
                 ndlPoints[i].timestamp.toDouble(),
-                -(chartMaxDepth *
-                    (1 -
-                        ndlPoints[i].ndl!
-                                .clamp(0, maxNdlSeconds.toInt())
-                                .toDouble() /
-                            maxNdlSeconds)),
+                -band.mapNormalized(
+                  ndlPoints[i].ndl!.clamp(0, maxNdlSeconds.toInt()).toDouble() /
+                      maxNdlSeconds,
+                ),
               ),
           ];
           lines.add(
@@ -4048,25 +4069,17 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
   /// render through [_buildOverlayLines] on the same shared scale.
   List<LineChartBarData> _buildTemperatureLines(
     ColorScheme colorScheme,
-    double chartMaxDepth,
+    MetricBand band,
     double minTemp,
     double maxTemp,
     UnitFormatter units,
   ) {
-    return [
-      _buildTemperatureLine(
-        colorScheme,
-        chartMaxDepth,
-        minTemp,
-        maxTemp,
-        units,
-      ),
-    ];
+    return [_buildTemperatureLine(colorScheme, band, minTemp, maxTemp, units)];
   }
 
   LineChartBarData _buildTemperatureLine(
     ColorScheme colorScheme,
-    double chartMaxDepth,
+    MetricBand band,
     double minTemp,
     double maxTemp,
     UnitFormatter units,
@@ -4080,9 +4093,8 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
           (p) => FlSpot(
             p.timestamp.toDouble(),
             // Convert temp to user's unit, then map to depth axis
-            -_mapTempToDepth(
+            -band.map(
               units.convertTemperature(p.temperature!),
-              chartMaxDepth,
               minTemp,
               maxTemp,
             ),
@@ -4107,7 +4119,7 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
   }
 
   /// Build multiple pressure lines for multi-tank visualization
-  List<LineChartBarData> _buildMultiTankPressureLines(double chartMaxDepth) {
+  List<LineChartBarData> _buildMultiTankPressureLines(MetricBand band) {
     if (!_hasMultiTankPressure) return [];
 
     final tankPressures = widget.tankPressures!;
@@ -4175,12 +4187,7 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
           .map(
             (p) => FlSpot(
               p.timestamp.toDouble(),
-              -_mapValueToDepth(
-                p.pressure,
-                chartMaxDepth,
-                minPressure,
-                maxPressure,
-              ),
+              -band.map(p.pressure, minPressure, maxPressure),
             ),
           )
           .toList();
@@ -4211,7 +4218,7 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
 
   LineChartBarData _buildHeartRateLine(
     Color color,
-    double chartMaxDepth,
+    MetricBand band,
     double minHR,
     double maxHR,
   ) {
@@ -4221,12 +4228,7 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
           .map(
             (p) => FlSpot(
               p.timestamp.toDouble(),
-              -_mapValueToDepth(
-                p.heartRate!.toDouble(),
-                chartMaxDepth,
-                minHR,
-                maxHR,
-              ),
+              -band.map(p.heartRate!.toDouble(), minHR, maxHR),
             ),
           )
           .toList(),
@@ -4242,7 +4244,7 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
 
   /// Build SAC (Surface Air Consumption) curve line
   LineChartBarData _buildSacLine(
-    double chartMaxDepth,
+    MetricBand band,
     double minSac,
     double maxSac,
   ) {
@@ -4257,7 +4259,7 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
         spots.add(
           FlSpot(
             widget.profile[i].timestamp.toDouble(),
-            -_mapValueToDepth(sac, chartMaxDepth, minSac, maxSac),
+            -band.map(sac, minSac, maxSac),
           ),
         );
       }
@@ -4284,7 +4286,7 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
   /// into the depth plot area so ascents rise above and descents dip below the
   /// vertical mid-plot. Self-scaled via [DiveProfileChart.ascentRateAxisRange]
   /// so the line and the optional right-axis labels share one scale.
-  LineChartBarData _buildAscentRateLine(double chartMaxDepth) {
+  LineChartBarData _buildAscentRateLine(MetricBand band) {
     final ascentRates = widget.ascentRates!;
     final range = DiveProfileChart.ascentRateAxisRange(ascentRates)!;
     final spots = <FlSpot>[];
@@ -4294,12 +4296,7 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
       spots.add(
         FlSpot(
           widget.profile[i].timestamp.toDouble(),
-          -_mapValueToDepth(
-            ascentRates[i].rateMetersPerMin,
-            chartMaxDepth,
-            range.min,
-            range.max,
-          ),
+          -band.map(ascentRates[i].rateMetersPerMin, range.min, range.max),
         ),
       );
     }
@@ -4318,34 +4315,6 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
       dotData: const FlDotData(show: false),
       dashArray: const [5, 3],
     );
-  }
-
-  // Map temperature value to depth axis for overlay
-  double _mapTempToDepth(
-    double temp,
-    double maxDepth,
-    double minTemp,
-    double maxTemp,
-  ) {
-    final normalized = (temp - minTemp) / (maxTemp - minTemp);
-    return maxDepth * (1 - normalized); // Higher temp maps to shallower depth
-  }
-
-  // Generic value to depth axis mapping
-  double _mapValueToDepth(
-    double value,
-    double maxDepth,
-    double minValue,
-    double maxValue,
-  ) {
-    // Guard a zero-width range: (value - min) / 0 is NaN, which propagates into
-    // FlSpot coordinates and crashes fl_chart's touch/tooltip painter with
-    // "Offset argument contained a NaN value". Collapse to the axis midpoint so
-    // a constant series renders as a finite flat line instead.
-    final span = maxValue - minValue;
-    if (span == 0) return maxDepth * 0.5;
-    final normalized = (value - minValue) / span;
-    return maxDepth * (1 - normalized);
   }
 
   double _calculateDepthInterval(double maxDepth) {
@@ -4426,7 +4395,7 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
 
   /// Build NDL (No Decompression Limit) line
   /// NDL values are in seconds; shows time remaining before deco obligation
-  LineChartBarData _buildNdlLine(double chartMaxDepth) {
+  LineChartBarData _buildNdlLine(MetricBand band) {
     final ndlData = widget.ndlCurve!;
     final ndlColor = Colors.yellow.shade700;
 
@@ -4439,7 +4408,7 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
       // Negative values (in deco) clamp to 0; values > 60 min clamp to 60 min.
       final ndl = ndlData[i].clamp(0, maxNdlSeconds.toInt()).toDouble();
       final normalized = ndl / maxNdlSeconds;
-      final yValue = chartMaxDepth * (1 - normalized);
+      final yValue = band.mapNormalized(normalized);
       spots.add(FlSpot(widget.profile[i].timestamp.toDouble(), -yValue));
     }
 
@@ -4461,7 +4430,7 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
 
   /// Build ppO2 (partial pressure of oxygen) line
   /// Values typically range from 0.21 (surface air) to 1.6+ (critical)
-  LineChartBarData _buildPpO2Line(double chartMaxDepth) {
+  LineChartBarData _buildPpO2Line(MetricBand band) {
     final ppO2Data = widget.ppO2Curve!;
     const ppO2Color = Color(0xFF00ACC1); // Cyan 600 - distinct from depth blue
 
@@ -4472,7 +4441,7 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
     final spots = <FlSpot>[];
     for (final i in _decimatedCurveIndices(ppO2Data)) {
       final ppO2 = ppO2Data[i].clamp(minPpO2, maxPpO2);
-      final yValue = _mapValueToDepth(ppO2, chartMaxDepth, minPpO2, maxPpO2);
+      final yValue = band.map(ppO2, minPpO2, maxPpO2);
       spots.add(FlSpot(widget.profile[i].timestamp.toDouble(), -yValue));
     }
 
@@ -4481,9 +4450,8 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
       // not held flat: at 1 bar it is simply the oxygen fraction.
       spots: _withSurfaceLeadIn(
         spots,
-        -_mapValueToDepth(
+        -band.map(
           _surfaceValueOf(ppO2Data.first).clamp(minPpO2, maxPpO2),
-          chartMaxDepth,
           minPpO2,
           maxPpO2,
         ),
@@ -4504,7 +4472,7 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
   }
 
   /// Build ppN2 (partial pressure of nitrogen) line
-  LineChartBarData _buildPpN2Line(double chartMaxDepth) {
+  LineChartBarData _buildPpN2Line(MetricBand band) {
     final ppN2Data = widget.ppN2Curve!;
     const ppN2Color = Colors.indigo;
 
@@ -4515,7 +4483,7 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
     final spots = <FlSpot>[];
     for (final i in _decimatedCurveIndices(ppN2Data)) {
       final ppN2 = ppN2Data[i].clamp(minPpN2, maxPpN2);
-      final yValue = _mapValueToDepth(ppN2, chartMaxDepth, minPpN2, maxPpN2);
+      final yValue = band.map(ppN2, minPpN2, maxPpN2);
       spots.add(FlSpot(widget.profile[i].timestamp.toDouble(), -yValue));
     }
 
@@ -4523,9 +4491,8 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
       // Computed, not held flat: at 1 bar ppN2 is the nitrogen fraction.
       spots: _withSurfaceLeadIn(
         spots,
-        -_mapValueToDepth(
+        -band.map(
           _surfaceValueOf(ppN2Data.first).clamp(minPpN2, maxPpN2),
-          chartMaxDepth,
           minPpN2,
           maxPpN2,
         ),
@@ -4546,7 +4513,7 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
   }
 
   /// Build ppHe (partial pressure of helium) line for trimix dives
-  LineChartBarData _buildPpHeLine(double chartMaxDepth) {
+  LineChartBarData _buildPpHeLine(MetricBand band) {
     final ppHeData = widget.ppHeCurve!;
     final ppHeColor = Colors.pink.shade300;
 
@@ -4559,12 +4526,7 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
       final ppHe = ppHeData[i];
       if (ppHe > 0.001) {
         final clamped = ppHe.clamp(minPpHe, maxPpHe);
-        final yValue = _mapValueToDepth(
-          clamped,
-          chartMaxDepth,
-          minPpHe,
-          maxPpHe,
-        );
+        final yValue = band.map(clamped, minPpHe, maxPpHe);
         spots.add(FlSpot(widget.profile[i].timestamp.toDouble(), -yValue));
       }
     }
@@ -4575,9 +4537,8 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
       // and the lead-in is skipped with it.
       spots: _withSurfaceLeadIn(
         spots,
-        -_mapValueToDepth(
+        -band.map(
           _surfaceValueOf(ppHeData.first).clamp(minPpHe, maxPpHe),
-          chartMaxDepth,
           minPpHe,
           maxPpHe,
         ),
@@ -4633,7 +4594,7 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
 
   /// Build gas density line (g/L)
   /// High density (>5.7 g/L) increases work of breathing
-  LineChartBarData _buildDensityLine(double chartMaxDepth) {
+  LineChartBarData _buildDensityLine(MetricBand band) {
     final densityData = widget.densityCurve!;
     const densityColor = Colors.brown;
 
@@ -4644,12 +4605,7 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
     final spots = <FlSpot>[];
     for (final i in _decimatedCurveIndices(densityData)) {
       final density = densityData[i].clamp(minDensity, maxDensity);
-      final yValue = _mapValueToDepth(
-        density,
-        chartMaxDepth,
-        minDensity,
-        maxDensity,
-      );
+      final yValue = band.map(density, minDensity, maxDensity);
       spots.add(FlSpot(widget.profile[i].timestamp.toDouble(), -yValue));
     }
 
@@ -4658,9 +4614,8 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
       // computed rather than held flat.
       spots: _withSurfaceLeadIn(
         spots,
-        -_mapValueToDepth(
+        -band.map(
           _surfaceValueOf(densityData.first).clamp(minDensity, maxDensity),
-          chartMaxDepth,
           minDensity,
           maxDensity,
         ),
@@ -4682,7 +4637,7 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
 
   /// Build GF% (Gradient Factor percentage) line at current depth
   /// Shows how close tissues are to M-value limit
-  LineChartBarData _buildGfLine(double chartMaxDepth) {
+  LineChartBarData _buildGfLine(MetricBand band) {
     final gfData = widget.gfCurve!;
     const gfColor = Colors.deepPurple;
 
@@ -4693,7 +4648,7 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
     final spots = <FlSpot>[];
     for (final i in _decimatedCurveIndices(gfData)) {
       final gf = gfData[i].clamp(minGf, maxGf);
-      final yValue = _mapValueToDepth(gf, chartMaxDepth, minGf, maxGf);
+      final yValue = band.map(gf, minGf, maxGf);
       spots.add(FlSpot(widget.profile[i].timestamp.toDouble(), -yValue));
     }
 
@@ -4716,7 +4671,7 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
 
   /// Build Surface GF% line (what GF would be if surfaced now)
   /// Values >100% indicate deco obligation
-  LineChartBarData _buildSurfaceGfLine(double chartMaxDepth) {
+  LineChartBarData _buildSurfaceGfLine(MetricBand band) {
     final surfaceGfData = widget.surfaceGfCurve!;
     final surfaceGfColor = Colors.purple.shade300;
 
@@ -4727,7 +4682,7 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
     final spots = <FlSpot>[];
     for (final i in _decimatedCurveIndices(surfaceGfData)) {
       final gf = surfaceGfData[i].clamp(minGf, maxGf);
-      final yValue = _mapValueToDepth(gf, chartMaxDepth, minGf, maxGf);
+      final yValue = band.map(gf, minGf, maxGf);
       spots.add(FlSpot(widget.profile[i].timestamp.toDouble(), -yValue));
     }
 
@@ -4782,7 +4737,7 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
 
   /// Build TTS (Time To Surface) line
   /// Shows total time including deco stops to reach surface
-  LineChartBarData _buildTtsLine(double chartMaxDepth) {
+  LineChartBarData _buildTtsLine(MetricBand band) {
     final ttsData = widget.ttsCurve!;
     const ttsColor = Color(
       0xFFAD1457,
@@ -4795,7 +4750,7 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
     for (final i in _decimatedCurveIndices(ttsData)) {
       final tts = ttsData[i].toDouble().clamp(0, maxTtsSeconds);
       final normalized = tts / maxTtsSeconds;
-      final yValue = chartMaxDepth * (1 - normalized);
+      final yValue = band.mapNormalized(normalized);
       spots.add(FlSpot(widget.profile[i].timestamp.toDouble(), -yValue));
     }
 
@@ -4831,7 +4786,7 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
   }
 
   /// Build cumulative CNS% line
-  LineChartBarData _buildCnsLine(double chartMaxDepth) {
+  LineChartBarData _buildCnsLine(MetricBand band) {
     final cnsData = widget.cnsCurve!;
     const cnsColor = Color(0xFFE65100); // Orange 900
 
@@ -4841,7 +4796,7 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
     final spots = <FlSpot>[];
     for (final i in _decimatedCurveIndices(cnsData)) {
       final cns = cnsData[i].clamp(minCns, maxCns);
-      final yValue = _mapValueToDepth(cns, chartMaxDepth, minCns, maxCns);
+      final yValue = band.map(cns, minCns, maxCns);
       spots.add(FlSpot(widget.profile[i].timestamp.toDouble(), -yValue));
     }
 
@@ -4863,7 +4818,7 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
   }
 
   /// Build cumulative OTU line
-  LineChartBarData _buildOtuLine(double chartMaxDepth) {
+  LineChartBarData _buildOtuLine(MetricBand band) {
     final otuData = widget.otuCurve!;
     const otuColor = Color(0xFF6D4C41); // Brown 600
 
@@ -4873,7 +4828,7 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
     final spots = <FlSpot>[];
     for (final i in _decimatedCurveIndices(otuData)) {
       final otu = otuData[i].clamp(minOtu, maxOtu);
-      final yValue = _mapValueToDepth(otu, chartMaxDepth, minOtu, maxOtu);
+      final yValue = band.map(otu, minOtu, maxOtu);
       spots.add(FlSpot(widget.profile[i].timestamp.toDouble(), -yValue));
     }
 
@@ -5012,7 +4967,7 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
   /// Build marker lines for max depth and pressure thresholds
   List<LineChartBarData> _buildMarkerLines(
     UnitFormatter units,
-    double chartMaxDepth, {
+    MetricBand band, {
     double? minPressure,
     double? maxPressure,
   }) {
@@ -5037,7 +4992,7 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
         _buildSingleMarkerLine(
           marker,
           units,
-          chartMaxDepth,
+          band,
           minPressure: minPressure,
           maxPressure: maxPressure,
         ),
@@ -5051,7 +5006,7 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
   LineChartBarData _buildSingleMarkerLine(
     ProfileMarker marker,
     UnitFormatter units,
-    double chartMaxDepth, {
+    MetricBand band, {
     double? minPressure,
     double? maxPressure,
   }) {
@@ -5067,12 +5022,7 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
       // Pressure threshold marker: position on pressure line
       // Use the threshold pressure value (marker.value) mapped to the chart's Y axis
       if (minPressure != null && maxPressure != null && marker.value != null) {
-        yPosition = -_mapValueToDepth(
-          marker.value!,
-          chartMaxDepth,
-          minPressure,
-          maxPressure,
-        );
+        yPosition = -band.map(marker.value!, minPressure, maxPressure);
       } else {
         // Fallback to depth position if pressure range not available
         yPosition = -units.convertDepth(marker.depth);
@@ -5318,17 +5268,6 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
         if (suffix != null) return '$name ($suffix)';
         return name;
     }
-  }
-
-  /// Map a depth axis value back to the metric value for axis labels
-  double _mapDepthToMetricValue(
-    double depthAxisValue,
-    double maxDepth,
-    double minValue,
-    double maxValue,
-  ) {
-    final normalized = 1 - (depthAxisValue / maxDepth);
-    return minValue + (normalized * (maxValue - minValue));
   }
 }
 

@@ -3060,6 +3060,146 @@ void main() {
     });
   });
 
+  group('zoomed metric line visibility', () {
+    LineChartData chartData(WidgetTester tester) =>
+        tester.widget<LineChart>(find.byType(LineChart).first).data;
+
+    // The NDL line is the only yellow-700 bar (see _buildNdlLine).
+    List<LineChartBarData> ndlBars(WidgetTester tester) => chartData(
+      tester,
+    ).lineBarsData.where((b) => b.color == Colors.yellow.shade700).toList();
+
+    testWidgets('NDL line stays in the visible window when zoomed in', (
+      tester,
+    ) async {
+      // A recreational dive sits at max NDL for most of its length, which maps
+      // to the very top of the depth axis. Zoom zooms BOTH axes, so the visible
+      // depth window becomes a slice with its top edge below the surface, and a
+      // metric line anchored to the full depth span is clipped away entirely.
+      await tester.pumpWidget(
+        _buildChartAllMetrics(
+          profile: _makeProfile(points: 20),
+          ndlCurve: List.filled(20, 3600),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(
+        ndlBars(tester),
+        isNotEmpty,
+        reason: 'NDL line renders before zooming',
+      );
+
+      final chart = find.byType(LineChart).first;
+      final topLeft = tester.getTopLeft(chart);
+      final size = tester.getSize(chart);
+      await tester.sendEventToBinding(
+        PointerScrollEvent(
+          position: topLeft + Offset(size.width * 0.5, size.height * 0.5),
+          scrollDelta: const Offset(0, -100),
+        ),
+      );
+      await tester.pump();
+
+      final data = chartData(tester);
+      final bars = ndlBars(tester);
+      expect(bars, isNotEmpty);
+      expect(
+        bars.first.spots.any((s) => s.y >= data.minY && s.y <= data.maxY),
+        isTrue,
+        reason:
+            'the NDL line must stay on screen when the viewport zooms in, '
+            'not scroll off the top with the full-depth anchoring',
+      );
+    });
+
+    testWidgets('NDL line follows a vertical pan (bars cache is not stale)', (
+      tester,
+    ) async {
+      // Bars are memoized per viewport bucket. The metric band now depends on
+      // the viewport, so a signature that ignored it would serve spots built
+      // for the old band and the line would drift back off-screen while
+      // panning - the original bug, reintroduced through the cache.
+      await tester.pumpWidget(
+        _buildChartAllMetrics(
+          profile: _makeProfile(points: 20),
+          ndlCurve: List.filled(20, 3600),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final chart = find.byType(LineChart).first;
+      final center = tester.getCenter(chart);
+      await tester.sendEventToBinding(
+        PointerScrollEvent(
+          position: center,
+          scrollDelta: const Offset(0, -100),
+        ),
+      );
+      await tester.pump();
+      final zoomed = chartData(tester);
+
+      final gesture = await tester.startGesture(
+        center,
+        kind: PointerDeviceKind.mouse,
+      );
+      await gesture.moveBy(const Offset(0, -60));
+      await gesture.up();
+      await tester.pumpAndSettle();
+
+      final panned = chartData(tester);
+      expect(
+        (panned.minY - zoomed.minY).abs(),
+        greaterThan(1e-9),
+        reason: 'the drag must actually move the visible depth window',
+      );
+      final bars = ndlBars(tester);
+      expect(bars, isNotEmpty);
+      expect(
+        bars.first.spots.any((s) => s.y >= panned.minY && s.y <= panned.maxY),
+        isTrue,
+        reason: 'NDL must be rebuilt against the panned band, not cached',
+      );
+    });
+
+    testWidgets('the deco ceiling stays in real depth coordinates', (
+      tester,
+    ) async {
+      // The other half of the fix: ceiling, MOD and mean depth are REAL depths
+      // and must NOT be swept into the metric band, or a 6 m ceiling would slide
+      // away from the 6 m gridline as soon as you zoom.
+      await tester.pumpWidget(
+        _buildChartAllMetrics(
+          profile: _makeProfile(points: 20),
+          ceilingCurve: List.filled(20, 6.0),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      List<LineChartBarData> ceilingBars() => chartData(
+        tester,
+      ).lineBarsData.where((b) => b.color == const Color(0xFFD32F2F)).toList();
+
+      expect(ceilingBars(), isNotEmpty, reason: 'ceiling line renders');
+      expect(ceilingBars().first.spots.every((s) => s.y == -6.0), isTrue);
+
+      final chart = find.byType(LineChart).first;
+      await tester.sendEventToBinding(
+        PointerScrollEvent(
+          position: tester.getCenter(chart),
+          scrollDelta: const Offset(0, -100),
+        ),
+      );
+      await tester.pump();
+
+      expect(
+        ceilingBars().first.spots.every((s) => s.y == -6.0),
+        isTrue,
+        reason: 'a real depth must not move when the viewport zooms',
+      );
+    });
+  });
+
   group('trackpad interaction', () {
     testWidgets('trackpad pinch zooms in anchored off-center (not at 0)', (
       tester,
