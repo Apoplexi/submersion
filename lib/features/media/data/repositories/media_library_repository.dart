@@ -4,6 +4,7 @@ import 'package:submersion/core/database/database.dart';
 import 'package:submersion/core/services/database_service.dart';
 import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/features/media/data/repositories/media_row_mapper.dart';
+import 'package:submersion/features/media/data/services/trip_media_scanner.dart';
 import 'package:submersion/features/media/domain/entities/media_library_filter.dart';
 import 'package:submersion/features/media/domain/entities/media_source_type.dart';
 
@@ -29,11 +30,15 @@ class MediaLibraryRepository {
   Expression<int> get _sortKey =>
       coalesce<int>([_db.media.takenAt, _db.media.createdAt]);
 
+  /// Signatures never appear in the library, in any spelling.
+  Expression<bool> get _notSignature =>
+      _db.media.fileType.isNotIn(kSignatureFileTypes);
+
   Expression<bool> _baseWhere(String? diverId, MediaLibraryFilter filter) {
     final m = _db.media;
     final d = _db.dives;
 
-    Expression<bool> where = m.fileType.equals('instructor_signature').not();
+    Expression<bool> where = _notSignature;
     if (diverId != null) {
       where = where & (m.diveId.isNull() | d.diverId.equals(diverId));
     }
@@ -53,16 +58,25 @@ class MediaLibraryRepository {
     if (tripId != null) {
       where = where & d.tripId.equals(tripId);
     }
+    // taken_at is stored as wall-clock-as-UTC millis, so a bound picked in
+    // local time has to be normalised the same way before it can be
+    // compared -- otherwise the window slides by the host's UTC offset.
+    // TripMediaScanner does exactly this for its trip window bounds.
     final fromDate = filter.fromDate;
     if (fromDate != null) {
       where =
           where &
-          _sortKey.isBiggerOrEqualValue(fromDate.millisecondsSinceEpoch);
+          _sortKey.isBiggerOrEqualValue(
+            TripMediaScanner.toWallClockUtc(fromDate).millisecondsSinceEpoch,
+          );
     }
     final toDate = filter.toDate;
     if (toDate != null) {
       where =
-          where & _sortKey.isSmallerOrEqualValue(toDate.millisecondsSinceEpoch);
+          where &
+          _sortKey.isSmallerOrEqualValue(
+            TripMediaScanner.toWallClockUtc(toDate).millisecondsSinceEpoch,
+          );
     }
     final sourceType = filter.sourceType;
     if (sourceType != null) {
@@ -126,9 +140,15 @@ class MediaLibraryRepository {
         return MediaLibraryEntry(
           item: mediaItemFromRow(mediaRow),
           diveNumber: diveRow?.diveNumber,
+          // dive_date_time is wall-clock-as-UTC, exactly as
+          // DiveRepositoryImpl hydrates it. Reading it as a local instant
+          // shifts every group header by the host's UTC offset.
           diveDateTime: diveRow == null
               ? null
-              : DateTime.fromMillisecondsSinceEpoch(diveRow.diveDateTime),
+              : DateTime.fromMillisecondsSinceEpoch(
+                  diveRow.diveDateTime,
+                  isUtc: true,
+                ),
           siteName: siteRow?.name,
         );
       }).toList();
@@ -160,7 +180,7 @@ class MediaLibraryRepository {
       filter:
           m.diveId.isNull() &
           m.siteId.isNull() &
-          m.fileType.equals('instructor_signature').not() &
+          _notSignature &
           m.sourceType.isNotIn(kLibraryLevelSourceTypes),
     );
     final row = await (_db.selectOnly(m)..addColumns([count])).getSingle();
@@ -175,7 +195,7 @@ class MediaLibraryRepository {
     final count = countAll();
     final query = _db.selectOnly(m)
       ..addColumns([m.sourceType, count])
-      ..where(m.fileType.equals('instructor_signature').not())
+      ..where(_notSignature)
       ..groupBy([m.sourceType]);
     final rows = await query.get();
     final result = <MediaSourceType, int>{};
@@ -191,7 +211,7 @@ class MediaLibraryRepository {
   /// badge.
   Future<int> countMissing() async {
     final m = _db.media;
-    final count = countAll(filter: m.isOrphaned.equals(true));
+    final count = countAll(filter: m.isOrphaned.equals(true) & _notSignature);
     final row = await (_db.selectOnly(m)..addColumns([count])).getSingle();
     return row.read(count) ?? 0;
   }

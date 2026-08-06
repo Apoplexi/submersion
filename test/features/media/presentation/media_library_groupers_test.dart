@@ -85,15 +85,34 @@ void main() {
       expect(groups[2].entries, [e4]);
     });
 
-    test('day buckets use local time of the sort timestamp', () {
-      final utcEvening = entry(
+    test('day buckets read takenAt as wall-clock, not as an instant', () {
+      // takenAt is stored and hydrated as wall-clock-as-UTC: the components
+      // already say when the shutter fired, so the day must come straight
+      // from them. Converting to local first would move a photo across the
+      // date line by the host's UTC offset.
+      //
+      // Both ends of the day are asserted on purpose. On a host west of UTC
+      // the 00:30 case straddles backwards; east of UTC the 23:30 case
+      // straddles forwards. One of the two has teeth in any non-UTC zone.
+      final lateEvening = entry(
         'e1',
         takenAt: DateTime.utc(2026, 6, 12, 23, 30),
       );
-      final groups = groupByTimeline([utcEvening]);
-      final header = groups.single.header as DateGroupHeader;
-      final local = DateTime.utc(2026, 6, 12, 23, 30).toLocal();
-      expect(header.dayStart, DateTime(local.year, local.month, local.day));
+      expect(
+        (groupByTimeline([lateEvening]).single.header as DateGroupHeader)
+            .dayStart,
+        DateTime(2026, 6, 12),
+      );
+
+      final earlyMorning = entry(
+        'e2',
+        takenAt: DateTime.utc(2026, 6, 12, 0, 30),
+      );
+      expect(
+        (groupByTimeline([earlyMorning]).single.header as DateGroupHeader)
+            .dayStart,
+        DateTime(2026, 6, 12),
+      );
     });
   });
 }
