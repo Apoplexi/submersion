@@ -189,6 +189,10 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
   CurrentStrength? _currentStrength;
   EntryMethod? _entryMethod;
   EntryMethod? _exitMethod;
+  // Exit mirrors entry until the user edits the exit picker directly.
+  // Single-dive form only; the bulk layout's dropdowns share these value
+  // fields but must never trigger mirroring.
+  bool _exitMethodLinked = true;
   WaterType? _waterType;
   final _swellHeightController = TextEditingController();
   final _altitudeController = TextEditingController();
@@ -3620,14 +3624,20 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
         value: _entryMethod,
         values: EntryMethod.values,
         displayName: (v) => v.localizedName(l10n),
-        onChanged: (v) => setState(() => _entryMethod = v),
+        onChanged: (v) => setState(() {
+          _entryMethod = v;
+          if (_exitMethodLinked) _exitMethod = v;
+        }),
       ),
       EnumPickerRow<EntryMethod>(
         label: l10n.diveLog_edit_label_exitMethod,
         value: _exitMethod,
         values: EntryMethod.values,
         displayName: (v) => v.localizedName(l10n),
-        onChanged: (v) => setState(() => _exitMethod = v),
+        onChanged: (v) => setState(() {
+          _exitMethod = v;
+          _exitMethodLinked = false;
+        }),
       ),
     ];
   }
