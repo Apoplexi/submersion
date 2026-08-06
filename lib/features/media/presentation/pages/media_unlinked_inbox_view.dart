@@ -4,7 +4,6 @@ import 'package:intl/intl.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_providers.dart';
 import 'package:submersion/features/dive_sites/presentation/providers/site_providers.dart';
-import 'package:submersion/features/media/domain/entities/media_library_filter.dart';
 import 'package:submersion/features/media/domain/services/dive_photo_matcher.dart';
 import 'package:submersion/features/media/presentation/providers/media_inbox_providers.dart';
 import 'package:submersion/features/media/presentation/providers/media_providers.dart';
