@@ -285,6 +285,52 @@ class DatabaseSecurityService {
         '${two(ts.day)}_${two(ts.hour)}${two(ts.minute)}${two(ts.second)}';
   }
 
+  /// Nulls the in-memory MLK/key state WITHOUT touching prefs wiring
+  /// (unlike [resetForTesting]) — used by the start-fresh escape hatch,
+  /// which continues running in the same process.
+  Future<void> clearInMemoryState() async {
+    _mlk = null;
+    _libraryKeyId = null;
+    _databaseKeyHex = null;
+  }
+
+  /// Self-heal for a lost sidecar while the keychain still holds the MLK:
+  /// rewraps the cached MLK under the user-confirmed password and a fresh
+  /// recovery slot (the old recovery code died with the old sidecar).
+  /// Returns the new recovery code for display.
+  Future<String> rebuildSidecar({
+    required String password,
+    required String dbPath,
+    KdfParams kdf = const KdfParams(),
+  }) async {
+    final mlk = _mlk;
+    final keyId = _libraryKeyId;
+    if (mlk == null || keyId == null) {
+      throw StateError('Cannot rebuild sidecar while locked');
+    }
+    final recoveryCode = RecoveryCode.generate();
+    final file = KeyslotFile(
+      version: 1,
+      libraryKeyId: keyId,
+      slots: [
+        await Keyslots.createSlot(
+          type: 'passphrase',
+          secret: password,
+          mlk: mlk,
+          kdf: kdf,
+        ),
+        await Keyslots.createSlot(
+          type: 'recovery',
+          secret: recoveryCode,
+          mlk: mlk,
+          kdf: kdf,
+        ),
+      ],
+    );
+    await DatabaseSecuritySidecar.write(dbPath, file);
+    return recoveryCode;
+  }
+
   /// Re-derives [databaseKeyHex] after the encryption flag changes
   /// (enable/disable encryption flows flip the flag while unlocked).
   Future<void> refreshDerivedKey() async {

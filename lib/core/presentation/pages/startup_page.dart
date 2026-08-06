@@ -12,6 +12,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:submersion/core/database/database.dart';
 import 'package:submersion/core/database/database_version_exception.dart';
 import 'package:submersion/core/domain/entities/migration_progress.dart';
+import 'package:submersion/core/presentation/pages/lock_escape_dialogs.dart';
 import 'package:submersion/core/presentation/pages/lock_screen_view.dart';
 import 'package:submersion/core/presentation/startup_brightness.dart';
 import 'package:submersion/core/presentation/widgets/backup_status_views.dart';
@@ -27,6 +28,7 @@ import 'package:submersion/core/services/security/biometric_service.dart';
 import 'package:submersion/core/services/security/database_locked_exception.dart';
 import 'package:submersion/core/services/security/database_security_service.dart';
 import 'package:submersion/core/services/security/database_security_sidecar.dart';
+import 'package:submersion/core/services/security/locked_database_escape.dart';
 import 'package:submersion/core/services/log_file_service.dart';
 import 'package:submersion/core/services/notification_service.dart';
 import 'package:submersion/features/backup/data/repositories/backup_preferences.dart';
@@ -371,15 +373,106 @@ class _StartupWrapperState extends State<StartupWrapper>
         if (mounted) setState(() => _state = _StartupState.initializing);
       }
     }
+
+    // Sidecar self-heal: unlocked via the cached key but the durable wrapped
+    // copy is gone (deleted, excluded from a folder sync, ...). Rebuild it
+    // now — the cached key is the only unlock left, and losing it too would
+    // strand the database permanently. Declining just reoffers next launch.
+    if ((security.appLockEnabled || security.encryptionEnabled) &&
+        security.isUnlocked &&
+        !File(DatabaseSecuritySidecar.pathFor(dbPath)).existsSync()) {
+      final ctx = _splashNavigatorKey.currentContext;
+      if (ctx != null && ctx.mounted) {
+        String? newCode;
+        final repaired = await showSidecarRepairDialog(
+          ctx,
+          onSubmit: (password) async {
+            try {
+              newCode = await security.rebuildSidecar(
+                password: password,
+                dbPath: dbPath,
+              );
+              return true;
+            } catch (_) {
+              return false;
+            }
+          },
+        );
+        final codeCtx = _splashNavigatorKey.currentContext;
+        if (repaired == true &&
+            newCode != null &&
+            codeCtx != null &&
+            codeCtx.mounted) {
+          await showNewRecoveryCodeDialog(codeCtx, newCode!);
+        }
+      }
+    }
+
     DatabaseService.instance.databaseKeyHex = security.databaseKeyHex;
   }
 
-  Future<bool> _unlockWithPassword(String secret) async {
+  /// The last secret (password OR recovery code) that successfully unwrapped
+  /// the Master Key this session. Needed by the forced password reset after
+  /// a recovery-code unlock (changePassword requires the current secret).
+  String? _lastAcceptedSecret;
+
+  /// Unlocks without completing the gate — the recovery-code dialog uses
+  /// this so the forced password reset can finish BEFORE startup proceeds
+  /// (the splash layer, and any dialog on it, is torn down at ready).
+  Future<bool> _unlockSecretOnly(String secret) async {
     final security = DatabaseSecurityService.instance;
     final dbPath = await widget.locationService.getDatabasePath();
     final ok = await security.unlockWithSecret(secret, dbPath: dbPath);
+    if (ok) _lastAcceptedSecret = secret;
+    return ok;
+  }
+
+  Future<bool> _unlockWithPassword(String secret) async {
+    final ok = await _unlockSecretOnly(secret);
     if (ok) _unlockCompleter?.complete();
     return ok;
+  }
+
+  Future<void> _handleRecoveryUnlock() async {
+    final ctx = _splashNavigatorKey.currentContext;
+    if (ctx == null) return;
+    final ok = await showRecoveryCodeUnlockDialog(
+      ctx,
+      onSubmit: _unlockSecretOnly,
+    );
+    if (ok != true) return;
+    // Recovery implies the password is lost: force a new one before
+    // continuing (per spec), while the splash layer is still mounted.
+    final resetCtx = _splashNavigatorKey.currentContext;
+    final currentSecret = _lastAcceptedSecret;
+    if (resetCtx != null && resetCtx.mounted && currentSecret != null) {
+      await showForcedPasswordResetDialog(
+        resetCtx,
+        onSubmit: (newPassword) async {
+          final dbPath = await widget.locationService.getDatabasePath();
+          await DatabaseSecurityService.instance.changePassword(
+            currentSecret: currentSecret,
+            newPassword: newPassword,
+            dbPath: dbPath,
+          );
+        },
+      );
+    }
+    _unlockCompleter?.complete();
+  }
+
+  Future<void> _handleStartFresh() async {
+    final ctx = _splashNavigatorKey.currentContext;
+    if (ctx == null) return;
+    final confirmed = await showStartFreshConfirmDialog(ctx);
+    if (confirmed != true) return;
+    final dbPath = await widget.locationService.getDatabasePath();
+    await setAsideLockedDatabase(dbPath: dbPath, prefs: widget.prefs);
+    await DatabaseSecurityService.instance.clearInMemoryState();
+    DatabaseService.instance.databaseKeyHex = null;
+    // Resume initialization: the database file is gone, so a fresh empty
+    // database is created and the first-run wizard takes over.
+    _unlockCompleter?.complete();
   }
 
   Future<bool> _unlockWithBiometric() async {
@@ -724,10 +817,8 @@ class _StartupWrapperState extends State<StartupWrapper>
                         onBiometric: _biometricAvailable
                             ? _unlockWithBiometric
                             : null,
-                        // Escape-hatch callbacks are wired in the
-                        // escape-hatch task; hidden until then.
-                        onUseRecoveryCode: null,
-                        onStartFresh: null,
+                        onUseRecoveryCode: _handleRecoveryUnlock,
+                        onStartFresh: _handleStartFresh,
                       )
                     : Scaffold(
                         // Use 'splash' key for both initializing and migrating
