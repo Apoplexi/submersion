@@ -114,4 +114,74 @@ void main() {
       MediaLibraryFilter.none,
     );
   });
+
+  group('date range', () {
+    testWidgets('dismissing the range picker leaves the filter alone', (
+      tester,
+    ) async {
+      await tester.pumpWidget(host());
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Dates'));
+      await tester.pumpAndSettle();
+      // The picker is up.
+      expect(find.byType(DateRangePickerDialog), findsOneWidget);
+
+      await tester.tap(find.byIcon(Icons.close));
+      await tester.pumpAndSettle();
+
+      final filter = containerOf(tester).read(mediaLibraryFilterProvider);
+      expect(filter.fromDate, isNull);
+      expect(filter.toDate, isNull);
+    });
+
+    testWidgets('a chosen range extends the end bound to end-of-day', (
+      tester,
+    ) async {
+      await tester.pumpWidget(host());
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Dates'));
+      await tester.pumpAndSettle();
+
+      // Two day cells in the visible month, then confirm.
+      await tester.tap(find.text('10').first);
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('12').first);
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Save'));
+      await tester.pumpAndSettle();
+
+      final filter = containerOf(tester).read(mediaLibraryFilterProvider);
+      expect(filter.fromDate, isNotNull);
+      expect(filter.toDate, isNotNull);
+      // A single-day range would otherwise exclude everything shot after
+      // midnight, so the end bound is pushed to the last millisecond.
+      expect(filter.toDate!.hour, 23);
+      expect(filter.toDate!.minute, 59);
+      expect(filter.toDate!.second, 59);
+      expect(filter.toDate!.millisecond, 999);
+    });
+
+    testWidgets('clearing the dates chip drops both bounds', (tester) async {
+      await tester.pumpWidget(host());
+      await tester.pumpAndSettle();
+
+      final notifier = containerOf(
+        tester,
+      ).read(mediaLibraryFilterProvider.notifier);
+      notifier.state = MediaLibraryFilter(
+        fromDate: DateTime(2026, 6, 1),
+        toDate: DateTime(2026, 6, 30),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byIcon(Icons.clear).first);
+      await tester.pumpAndSettle();
+
+      final filter = containerOf(tester).read(mediaLibraryFilterProvider);
+      expect(filter.fromDate, isNull);
+      expect(filter.toDate, isNull);
+    });
+  });
 }
