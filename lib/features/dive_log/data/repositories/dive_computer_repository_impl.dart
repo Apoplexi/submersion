@@ -32,10 +32,18 @@ import 'package:submersion/features/dive_log/domain/entities/dive_computer.dart'
 
 /// Repository for managing dive computers and multi-profile support.
 class DiveComputerRepository {
+  DiveComputerRepository({DiveAltitudeEnricher? altitudeEnricher})
+    : _altitudeEnricher = altitudeEnricher ?? DiveAltitudeEnricher();
+
   AppDatabase get _db => DatabaseService.instance.database;
   final SyncRepository _syncRepository = SyncRepository();
   final _uuid = const Uuid();
   final _log = LoggerService.forClass(DiveComputerRepository);
+
+  /// Held for the repository's lifetime so a multi-dive download shares one
+  /// elevation-lookup cache: a trip's worth of dives at the same site costs a
+  /// single request (and a single failure) instead of one per dive.
+  final DiveAltitudeEnricher _altitudeEnricher;
 
   // ============================================================================
   // CRUD Operations for Dive Computers
@@ -991,8 +999,10 @@ class DiveComputerRepository {
           diveStart: DateTime.fromMillisecondsSinceEpoch(entryTimeMs),
         );
 
-        // Fill altitude from the entry/exit GPS fixes (best-effort).
-        await DiveAltitudeEnricher().applyForDownloadedDive(
+        // Fill altitude from the entry/exit GPS fixes (best-effort). Awaited
+        // rather than fire-and-forget so the write cannot outlive the download
+        // and race a database close; the shared cache keeps the cost bounded.
+        await _altitudeEnricher.applyForDownloadedDive(
           diveId: diveId,
           points: defaultPoints,
         );
