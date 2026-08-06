@@ -4026,6 +4026,7 @@
   "settings_about_header": "Sobre",
   "settings_about_openSourceLicenses": "Licencas de Codigo Aberto",
   "settings_about_reportIssue": "Relatar um Problema",
+  "settings_about_reportIssue_copy": "Copiar link",
   "settings_about_reportIssue_snackbar": "Acesse github.com/submersion-app/submersion/issues",
   "settings_about_version": "Versao {version}",
   "settings_appBar_title": "Configuracoes",

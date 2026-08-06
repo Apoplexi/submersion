@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:submersion/core/icons/mdi_icons.dart';
 import 'package:submersion/core/utils/currency.dart';
@@ -60,22 +61,29 @@ const _cnsSourceSubsurfaceUrl =
     'https://github.com/subsurface/subsurface/commit/a0912b38bd';
 
 /// Opens the GitHub issues page in an external browser. Falls back to a
-/// snackbar if the URL cannot be launched or an error occurs.
+/// snackbar with a copy-link action if the launch fails.
 Future<void> launchReportIssue(BuildContext context) async {
   final uri = Uri.parse(reportIssueUrl);
   var didLaunch = false;
 
-  if (await canLaunchUrl(uri)) {
-    try {
-      didLaunch = await launchUrl(uri, mode: LaunchMode.externalApplication);
-    } catch (_) {
-      didLaunch = false;
-    }
+  // No canLaunchUrl guard: it false-negatives for https on Android 11+
+  // unless the scheme is declared in the manifest <queries> block.
+  try {
+    didLaunch = await launchUrl(uri, mode: LaunchMode.externalApplication);
+  } catch (_) {
+    didLaunch = false;
   }
 
   if (!didLaunch && context.mounted) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(context.l10n.settings_about_reportIssue_snackbar)),
+      SnackBar(
+        content: Text(context.l10n.settings_about_reportIssue_snackbar),
+        action: SnackBarAction(
+          label: context.l10n.settings_about_reportIssue_copy,
+          onPressed: () =>
+              Clipboard.setData(const ClipboardData(text: reportIssueUrl)),
+        ),
+      ),
     );
   }
 }

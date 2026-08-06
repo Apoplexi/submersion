@@ -21643,6 +21643,12 @@ abstract class AppLocalizations {
   /// **'Report an Issue'**
   String get settings_about_reportIssue;
 
+  /// No description provided for @settings_about_reportIssue_copy.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy link'**
+  String get settings_about_reportIssue_copy;
+
   /// No description provided for @settings_about_reportIssue_snackbar.
   ///
   /// In en, this message translates to:
