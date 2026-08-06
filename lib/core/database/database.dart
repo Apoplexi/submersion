@@ -3246,7 +3246,17 @@ class AppDatabase extends _$AppDatabase {
       'AND bottom_time = runtime',
     ).get();
 
+    var processed = 0;
     for (final candidate in candidates) {
+      // On an imported library nearly every dive is a candidate, and during a
+      // migration the executor is a synchronous main-isolate NativeDatabase:
+      // drift's awaits complete in microtasks, so this loop would run as one
+      // unbroken microtask chain that never reaches the timer/vsync queue —
+      // freezing the migration spinner for the whole step. A real event-loop
+      // yield every few dives lets the UI animate while the backfill runs.
+      if (processed++ % 25 == 24) {
+        await Future<void>.delayed(Duration.zero);
+      }
       final diveId = candidate.read<String>('id');
       final runtimeSeconds = candidate.read<int>('runtime');
 
