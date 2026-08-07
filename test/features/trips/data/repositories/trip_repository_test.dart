@@ -28,6 +28,7 @@ void main() {
     String? resortName,
     String? liveaboardName,
     String notes = '',
+    DateTime? returnFlightAt,
   }) {
     final now = DateTime.now();
     final start = startDate ?? now;
@@ -41,6 +42,7 @@ void main() {
       resortName: resortName,
       liveaboardName: liveaboardName,
       notes: notes,
+      returnFlightAt: returnFlightAt,
       createdAt: now,
       updatedAt: now,
     );
@@ -602,6 +604,70 @@ void main() {
         final readBack = await repository.getTripById(created.id);
         expect(readBack!.isShared, isTrue);
       });
+    });
+
+    group('returnFlightAt persistence', () {
+      test('createTrip and getTripById round-trip the flight time', () async {
+        final created = await repository.createTrip(
+          createTestTrip(
+            name: 'Flight trip',
+            startDate: DateTime.utc(2026, 8, 1),
+            endDate: DateTime.utc(2026, 8, 10),
+            returnFlightAt: DateTime.utc(2026, 8, 10, 14, 30),
+          ),
+        );
+
+        final loaded = await repository.getTripById(created.id);
+
+        expect(
+          loaded!.returnFlightAt!.millisecondsSinceEpoch,
+          DateTime.utc(2026, 8, 10, 14, 30).millisecondsSinceEpoch,
+        );
+        // Wall-clock-as-UTC round-trip: components must survive on any
+        // device timezone, so the decode has to be isUtc.
+        expect(loaded.returnFlightAt!.isUtc, isTrue);
+        expect(loaded.returnFlightAt!.hour, 14);
+        expect(loaded.returnFlightAt!.minute, 30);
+      });
+
+      test(
+        'updateTrip with null clears a previously set flight time',
+        () async {
+          final created = await repository.createTrip(
+            createTestTrip(
+              name: 'Cleared trip',
+              startDate: DateTime.utc(2026, 8, 1),
+              endDate: DateTime.utc(2026, 8, 10),
+              returnFlightAt: DateTime.utc(2026, 8, 10, 14, 30),
+            ),
+          );
+
+          await repository.updateTrip(created.copyWith(returnFlightAt: null));
+
+          final loaded = await repository.getTripById(created.id);
+          expect(loaded!.returnFlightAt, isNull);
+        },
+      );
+
+      test(
+        'findTripForDate surfaces returnFlightAt (raw-SQL mapper)',
+        () async {
+          await repository.createTrip(
+            createTestTrip(
+              name: 'Raw mapper trip',
+              startDate: DateTime.utc(2026, 8, 1),
+              endDate: DateTime.utc(2026, 8, 10),
+              returnFlightAt: DateTime.utc(2026, 8, 10, 14, 30),
+            ),
+          );
+
+          final found = await repository.findTripForDate(
+            DateTime.utc(2026, 8, 5),
+          );
+
+          expect(found!.returnFlightAt, isNotNull);
+        },
+      );
     });
 
     group('sharing actions', () {

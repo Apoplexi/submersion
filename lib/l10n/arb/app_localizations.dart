@@ -116,6 +116,12 @@ abstract class AppLocalizations {
     Locale('zh'),
   ];
 
+  /// No description provided for @diveLog_edit_flightWindowWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'This dive ends after the latest safe surfacing time for your flight ({time})'**
+  String diveLog_edit_flightWindowWarning(String time);
+
   /// No description provided for @diveLog_edit_geofenceSuggestion_near.
   ///
   /// In en, this message translates to:
@@ -5291,6 +5297,18 @@ abstract class AppLocalizations {
   /// **'No-fly 0:00'**
   String get dashboard_gauges_noFlyClear;
 
+  /// No description provided for @dashboard_gauges_flightWindow.
+  ///
+  /// In en, this message translates to:
+  /// **'Dive window {hours}:{minutes}'**
+  String dashboard_gauges_flightWindow(String hours, String minutes);
+
+  /// No description provided for @dashboard_gauges_flightWindowClosed.
+  ///
+  /// In en, this message translates to:
+  /// **'No more diving before flight'**
+  String get dashboard_gauges_flightWindowClosed;
+
   /// No description provided for @dashboard_gauges_noFlyRemaining.
   ///
   /// In en, this message translates to:
@@ -5326,6 +5344,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Choose which status chips appear at the top of the Home tab.'**
   String get settings_homeChips_description;
+
+  /// No description provided for @settings_homeChips_flightWindow.
+  ///
+  /// In en, this message translates to:
+  /// **'Flight dive window'**
+  String get settings_homeChips_flightWindow;
 
   /// No description provided for @settings_homeChips_gear.
   ///
@@ -18459,6 +18483,12 @@ abstract class AppLocalizations {
   /// **'Cost'**
   String get equipment_serviceDialog_costLabel;
 
+  /// No description provided for @equipment_serviceDialog_currencyLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Currency'**
+  String get equipment_serviceDialog_currencyLabel;
+
   /// No description provided for @equipment_serviceDialog_costValidation.
   ///
   /// In en, this message translates to:
@@ -21750,6 +21780,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Report an Issue'**
   String get settings_about_reportIssue;
+
+  /// No description provided for @settings_about_reportIssue_copy.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy link'**
+  String get settings_about_reportIssue_copy;
 
   /// No description provided for @settings_about_reportIssue_snackbar.
   ///
@@ -25688,6 +25724,18 @@ abstract class AppLocalizations {
   /// **'SAC Rate'**
   String get settings_units_sacRate;
 
+  /// No description provided for @settings_units_defaultCurrency.
+  ///
+  /// In en, this message translates to:
+  /// **'Default Currency'**
+  String get settings_units_defaultCurrency;
+
+  /// No description provided for @settings_units_dialog_defaultCurrency.
+  ///
+  /// In en, this message translates to:
+  /// **'Default Currency'**
+  String get settings_units_dialog_defaultCurrency;
+
   /// No description provided for @settings_units_sac_pressurePerMinute.
   ///
   /// In en, this message translates to:
@@ -29559,6 +29607,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Resort Name'**
   String get trips_edit_label_resortName;
+
+  /// No description provided for @trips_edit_label_returnFlight.
+  ///
+  /// In en, this message translates to:
+  /// **'Return Flight'**
+  String get trips_edit_label_returnFlight;
+
+  /// No description provided for @trips_edit_returnFlightClear.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear return flight'**
+  String get trips_edit_returnFlightClear;
+
+  /// No description provided for @trips_edit_returnFlightNotSet.
+  ///
+  /// In en, this message translates to:
+  /// **'Not set'**
+  String get trips_edit_returnFlightNotSet;
 
   /// No description provided for @trips_edit_label_startDate.
   ///
@@ -34165,6 +34231,12 @@ abstract class AppLocalizations {
   /// **'Environment'**
   String get diveLog_edit_section_environment;
 
+  /// No description provided for @diveLog_edit_subsection_autofill.
+  ///
+  /// In en, this message translates to:
+  /// **'Auto-fill'**
+  String get diveLog_edit_subsection_autofill;
+
   /// No description provided for @diveLog_edit_subsection_weather.
   ///
   /// In en, this message translates to:
@@ -37108,6 +37180,36 @@ abstract class AppLocalizations {
   /// **'Guideline intervals after a single no-deco dive, repetitive dives, and deco dives'**
   String get safetySettings_noFlyPreset_subtitle;
 
+  /// No description provided for @flightWindow_closed.
+  ///
+  /// In en, this message translates to:
+  /// **'No more diving before your flight'**
+  String get flightWindow_closed;
+
+  /// No description provided for @flightWindow_conflict.
+  ///
+  /// In en, this message translates to:
+  /// **'Your no-fly time extends past your flight departure'**
+  String get flightWindow_conflict;
+
+  /// No description provided for @flightWindow_departs.
+  ///
+  /// In en, this message translates to:
+  /// **'Flight departs {time}'**
+  String flightWindow_departs(String time);
+
+  /// No description provided for @flightWindow_openTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Time left to dive: {remaining}'**
+  String flightWindow_openTitle(String remaining);
+
+  /// No description provided for @flightWindow_surfaceBy.
+  ///
+  /// In en, this message translates to:
+  /// **'Surface by {time}'**
+  String flightWindow_surfaceBy(String time);
+
   /// No description provided for @safetyHub_noFly_active_title.
   ///
   /// In en, this message translates to:
@@ -37605,6 +37707,252 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Review rules & flying after diving'**
   String get settings_section_safety_subtitle;
+
+  /// No description provided for @settings_section_security_title.
+  ///
+  /// In en, this message translates to:
+  /// **'App Security'**
+  String get settings_section_security_title;
+
+  /// No description provided for @settings_section_security_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'App lock & database encryption'**
+  String get settings_section_security_subtitle;
+
+  /// No description provided for @settings_security_appLock.
+  ///
+  /// In en, this message translates to:
+  /// **'App Lock'**
+  String get settings_security_appLock;
+
+  /// No description provided for @settings_security_appLock_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Require your password or biometrics to open the app'**
+  String get settings_security_appLock_subtitle;
+
+  /// No description provided for @settings_security_biometrics.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlock with biometrics'**
+  String get settings_security_biometrics;
+
+  /// No description provided for @settings_security_autoLock.
+  ///
+  /// In en, this message translates to:
+  /// **'Auto-lock'**
+  String get settings_security_autoLock;
+
+  /// No description provided for @settings_security_autoLock_immediately.
+  ///
+  /// In en, this message translates to:
+  /// **'Immediately'**
+  String get settings_security_autoLock_immediately;
+
+  /// No description provided for @settings_security_autoLock_minutes.
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes, plural, =1{After 1 minute} other{After {minutes} minutes}}'**
+  String settings_security_autoLock_minutes(int minutes);
+
+  /// No description provided for @settings_security_autoLock_never.
+  ///
+  /// In en, this message translates to:
+  /// **'Never'**
+  String get settings_security_autoLock_never;
+
+  /// No description provided for @settings_security_encryption.
+  ///
+  /// In en, this message translates to:
+  /// **'Encrypt database'**
+  String get settings_security_encryption;
+
+  /// No description provided for @settings_security_encryption_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Protect your dive log file with at-rest encryption'**
+  String get settings_security_encryption_subtitle;
+
+  /// No description provided for @settings_security_encryption_progress_backup.
+  ///
+  /// In en, this message translates to:
+  /// **'Creating safety backup...'**
+  String get settings_security_encryption_progress_backup;
+
+  /// No description provided for @settings_security_encryption_progress_encrypt.
+  ///
+  /// In en, this message translates to:
+  /// **'Encrypting database...'**
+  String get settings_security_encryption_progress_encrypt;
+
+  /// No description provided for @settings_security_encryption_progress_decrypt.
+  ///
+  /// In en, this message translates to:
+  /// **'Decrypting database...'**
+  String get settings_security_encryption_progress_decrypt;
+
+  /// No description provided for @settings_security_encryption_progress_reopen.
+  ///
+  /// In en, this message translates to:
+  /// **'Reopening database...'**
+  String get settings_security_encryption_progress_reopen;
+
+  /// No description provided for @settings_security_changePassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Change password'**
+  String get settings_security_changePassword;
+
+  /// No description provided for @settings_security_regenerateRecovery.
+  ///
+  /// In en, this message translates to:
+  /// **'New recovery code'**
+  String get settings_security_regenerateRecovery;
+
+  /// No description provided for @settings_security_setPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Set app password'**
+  String get settings_security_setPassword;
+
+  /// No description provided for @settings_security_password.
+  ///
+  /// In en, this message translates to:
+  /// **'Password'**
+  String get settings_security_password;
+
+  /// No description provided for @settings_security_confirmPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm password'**
+  String get settings_security_confirmPassword;
+
+  /// No description provided for @settings_security_currentPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Current password'**
+  String get settings_security_currentPassword;
+
+  /// No description provided for @settings_security_newPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'New password'**
+  String get settings_security_newPassword;
+
+  /// No description provided for @settings_security_passwordTooShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Password must be at least 4 characters.'**
+  String get settings_security_passwordTooShort;
+
+  /// No description provided for @settings_security_passwordMismatch.
+  ///
+  /// In en, this message translates to:
+  /// **'Passwords do not match.'**
+  String get settings_security_passwordMismatch;
+
+  /// No description provided for @settings_security_wrongPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Incorrect password.'**
+  String get settings_security_wrongPassword;
+
+  /// No description provided for @settings_security_recoveryCode_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Your recovery code'**
+  String get settings_security_recoveryCode_title;
+
+  /// No description provided for @settings_security_recoveryCode_explain.
+  ///
+  /// In en, this message translates to:
+  /// **'Write this down and keep it safe. It is the only way to unlock the app if you forget your password, and it replaces any previous recovery code.'**
+  String get settings_security_recoveryCode_explain;
+
+  /// No description provided for @settings_security_recoveryCode_savedConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'I saved my recovery code'**
+  String get settings_security_recoveryCode_savedConfirm;
+
+  /// No description provided for @settings_security_disableBlockedByEncryption_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Encryption is on'**
+  String get settings_security_disableBlockedByEncryption_title;
+
+  /// No description provided for @settings_security_disableBlockedByEncryption_body.
+  ///
+  /// In en, this message translates to:
+  /// **'Turn off database encryption before turning off App Lock. The encrypted database needs a credential.'**
+  String get settings_security_disableBlockedByEncryption_body;
+
+  /// No description provided for @settings_security_enableEncryption_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Encrypt database?'**
+  String get settings_security_enableEncryption_title;
+
+  /// No description provided for @settings_security_enableEncryption_body.
+  ///
+  /// In en, this message translates to:
+  /// **'A safety backup is created first, then the database file is re-encrypted in place. This can take a while for large dive logs.'**
+  String get settings_security_enableEncryption_body;
+
+  /// No description provided for @settings_security_disableEncryption_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Turn off encryption?'**
+  String get settings_security_disableEncryption_title;
+
+  /// No description provided for @settings_security_disableEncryption_body.
+  ///
+  /// In en, this message translates to:
+  /// **'The database file will be stored unencrypted on disk again.'**
+  String get settings_security_disableEncryption_body;
+
+  /// No description provided for @settings_security_turnOffAppLock_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Turn off App Lock?'**
+  String get settings_security_turnOffAppLock_title;
+
+  /// No description provided for @settings_security_turnOffAppLock_body.
+  ///
+  /// In en, this message translates to:
+  /// **'The app will open without asking for your password.'**
+  String get settings_security_turnOffAppLock_body;
+
+  /// No description provided for @settings_security_unlock_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your password'**
+  String get settings_security_unlock_title;
+
+  /// No description provided for @settings_security_cancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get settings_security_cancel;
+
+  /// No description provided for @settings_security_continue.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get settings_security_continue;
+
+  /// No description provided for @settings_security_done.
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get settings_security_done;
+
+  /// No description provided for @settings_security_turnOff.
+  ///
+  /// In en, this message translates to:
+  /// **'Turn off'**
+  String get settings_security_turnOff;
 
   /// No description provided for @dataQuality_inbox_title.
   ///

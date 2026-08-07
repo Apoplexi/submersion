@@ -1,5 +1,15 @@
 {
+  "settings_units_defaultCurrency": "Standardwährung",
+  "settings_units_dialog_defaultCurrency": "Standardwährung",
   "diveSites_list_menu_select": "Tauchplätze auswählen",
+  "diveLog_edit_flightWindowWarning": "Dieser Tauchgang endet nach der letzten sicheren Auftauchzeit für deinen Flug ({time})",
+  "@diveLog_edit_flightWindowWarning": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
   "diveLog_edit_geofenceSuggestion_near": "In der Nähe von {location}",
   "diveLog_edit_geofenceSuggestion_title": "Ausrüstungsvorschlag",
   "diveLog_edit_geofenceSuggestion_body": "Set \"{setName}\" übernehmen?",
@@ -3409,6 +3419,7 @@
   "equipment_serviceDialog_clearNextServiceDateTooltip": "Nächstes Wartungsdatum löschen",
   "equipment_serviceDialog_costHint": "0,00",
   "equipment_serviceDialog_costLabel": "Kosten",
+  "equipment_serviceDialog_currencyLabel": "Währung",
   "equipment_serviceDialog_costValidation": "Geben Sie einen gültigen Betrag ein",
   "equipment_serviceDialog_editTitle": "Wartungseintrag bearbeiten",
   "equipment_serviceDialog_nextServiceDueLabel": "Nächste Wartung fällig",
@@ -4042,6 +4053,7 @@
   "settings_about_header": "Über",
   "settings_about_openSourceLicenses": "Open-Source-Lizenzen",
   "settings_about_reportIssue": "Problem melden",
+  "settings_about_reportIssue_copy": "Link kopieren",
   "settings_about_reportIssue_snackbar": "Besuchen Sie github.com/submersion-app/submersion/issues",
   "settings_about_version": "Version {version}",
   "settings_appBar_title": "Einstellungen",
@@ -5346,6 +5358,9 @@
   "trips_edit_label_notes": "Notizen",
   "trips_edit_label_operatorName": "Operator / Charter",
   "trips_edit_label_resortName": "Resortname",
+  "trips_edit_label_returnFlight": "Rückflug",
+  "trips_edit_returnFlightClear": "Rückflug entfernen",
+  "trips_edit_returnFlightNotSet": "Nicht festgelegt",
   "trips_edit_label_startDate": "Startdatum",
   "trips_edit_label_tripName": "Reisename *",
   "trips_edit_label_tripType": "Trip Type",
@@ -5714,6 +5729,7 @@
   "diveComputer_download_newDivesOnlyTitle": "Nur neue Tauchgänge herunterladen",
   "diveComputer_download_upToDate": "Keine neuen Tauchgänge gefunden -- Ihr Logbuch ist aktuell",
   "diveLog_edit_section_environment": "Umgebung",
+  "diveLog_edit_subsection_autofill": "Automatisch ausfüllen",
   "diveLog_edit_subsection_weather": "Wetter",
   "diveLog_edit_subsection_diveConditions": "Tauchbedingungen",
   "diveLog_edit_label_windSpeed": "Windgeschwindigkeit",
@@ -5775,12 +5791,25 @@
   "dashboard_gauges_insuranceExpired": "Versicherung abgelaufen",
   "dashboard_gauges_noInsurance": "Keine Versicherung hinterlegt",
   "dashboard_gauges_noFlyClear": "Flugverbot 0:00",
+  "dashboard_gauges_flightWindow": "Tauchfenster {hours}:{minutes}",
+  "@dashboard_gauges_flightWindow": {
+    "placeholders": {
+      "hours": {
+        "type": "String"
+      },
+      "minutes": {
+        "type": "String"
+      }
+    }
+  },
+  "dashboard_gauges_flightWindowClosed": "Kein Tauchen mehr vor dem Flug",
   "dashboard_gauges_noFlyRemaining": "Flugverbot {hours}:{minutes}",
   "dashboard_gauges_lastDiveDays": "Letzter Tauchgang vor {days}T",
   "dashboard_gauges_lastDiveToday": "Heute getaucht",
   "dashboard_gauges_noDivesYet": "Noch keine Tauchgänge",
   "settings_homeChips_pageTitle": "Status-Chips der Startseite",
   "settings_homeChips_description": "Wähle, welche Status-Chips oben im Start-Tab erscheinen.",
+  "settings_homeChips_flightWindow": "Tauchfenster vor dem Flug",
   "settings_homeChips_gear": "Ausrüstungswartung",
   "settings_homeChips_insurance": "Versicherung",
   "settings_homeChips_noFly": "Flugverbots-Timer",
@@ -6565,6 +6594,32 @@
   "safetySettings_noFlyPreset_standard": "Standard (12/18/24 h)",
   "safetySettings_noFlyPreset_strict": "Streng (18/24/48 h)",
   "safetySettings_noFlyPreset_subtitle": "Richtwerte nach einem einzelnen Nullzeit-Tauchgang, Wiederholungstauchgängen und Deko-Tauchgängen",
+  "flightWindow_closed": "Kein Tauchen mehr vor deinem Flug",
+  "flightWindow_conflict": "Deine Flugverbotszeit reicht über deinen Abflug hinaus",
+  "flightWindow_departs": "Abflug {time}",
+  "@flightWindow_departs": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "flightWindow_openTitle": "Verbleibende Tauchzeit: {remaining}",
+  "@flightWindow_openTitle": {
+    "placeholders": {
+      "remaining": {
+        "type": "String"
+      }
+    }
+  },
+  "flightWindow_surfaceBy": "Auftauchen bis {time}",
+  "@flightWindow_surfaceBy": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
   "safetyHub_noFly_active_title": "Flugverbot: noch {remaining}",
   "@safetyHub_noFly_active_title": {
     "placeholders": {
@@ -6885,5 +6940,53 @@
   "reef_attribution_wri": "Riffvorkommen und Gefährdungsstufe. CC BY 3.0.",
   "reef_attribution_noaa": "Wasseroberflächentemperatur und Bleiche-Hitzestress. Gemeinfrei.",
   "reef_attribution_gbif": "Artnachweise, gefiltert auf CC0 und CC BY 4.0.",
-  "reef_attribution_protectedSeas": "Grenzen von Meeresschutzgebieten. CC BY 4.0."
+  "reef_attribution_protectedSeas": "Grenzen von Meeresschutzgebieten. CC BY 4.0.",
+  "settings_section_security_title": "App-Sicherheit",
+  "settings_section_security_subtitle": "App-Sperre & Datenbankverschlüsselung",
+  "settings_security_appLock": "App-Sperre",
+  "settings_security_appLock_subtitle": "Passwort oder Biometrie zum Öffnen der App erforderlich",
+  "settings_security_biometrics": "Mit Biometrie entsperren",
+  "settings_security_autoLock": "Automatisch sperren",
+  "settings_security_autoLock_immediately": "Sofort",
+  "settings_security_autoLock_minutes": "{minutes, plural, =1{Nach 1 Minute} other{Nach {minutes} Minuten}}",
+  "@settings_security_autoLock_minutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "settings_security_autoLock_never": "Nie",
+  "settings_security_encryption": "Datenbank verschlüsseln",
+  "settings_security_encryption_subtitle": "Schützen Sie Ihre Tauchlog-Datei mit Verschlüsselung im Ruhezustand",
+  "settings_security_encryption_progress_backup": "Sicherheitskopie wird erstellt...",
+  "settings_security_encryption_progress_encrypt": "Datenbank wird verschlüsselt...",
+  "settings_security_encryption_progress_decrypt": "Datenbank wird entschlüsselt...",
+  "settings_security_encryption_progress_reopen": "Datenbank wird neu geöffnet...",
+  "settings_security_changePassword": "Passwort ändern",
+  "settings_security_regenerateRecovery": "Neuer Wiederherstellungscode",
+  "settings_security_setPassword": "App-Passwort festlegen",
+  "settings_security_password": "Passwort",
+  "settings_security_confirmPassword": "Passwort bestätigen",
+  "settings_security_currentPassword": "Aktuelles Passwort",
+  "settings_security_newPassword": "Neues Passwort",
+  "settings_security_passwordTooShort": "Das Passwort muss mindestens 4 Zeichen lang sein.",
+  "settings_security_passwordMismatch": "Die Passwörter stimmen nicht überein.",
+  "settings_security_wrongPassword": "Falsches Passwort.",
+  "settings_security_recoveryCode_title": "Ihr Wiederherstellungscode",
+  "settings_security_recoveryCode_explain": "Notieren Sie diesen Code und bewahren Sie ihn sicher auf. Er ist die einzige Möglichkeit, die App zu entsperren, falls Sie Ihr Passwort vergessen, und ersetzt jeden früheren Wiederherstellungscode.",
+  "settings_security_recoveryCode_savedConfirm": "Ich habe meinen Wiederherstellungscode gespeichert",
+  "settings_security_disableBlockedByEncryption_title": "Verschlüsselung ist aktiv",
+  "settings_security_disableBlockedByEncryption_body": "Deaktivieren Sie zuerst die Datenbankverschlüsselung, bevor Sie die App-Sperre ausschalten. Die verschlüsselte Datenbank benötigt Zugangsdaten.",
+  "settings_security_enableEncryption_title": "Datenbank verschlüsseln?",
+  "settings_security_enableEncryption_body": "Zuerst wird eine Sicherheitskopie erstellt, dann wird die Datenbankdatei direkt neu verschlüsselt. Bei großen Tauchlogs kann das eine Weile dauern.",
+  "settings_security_disableEncryption_title": "Verschlüsselung ausschalten?",
+  "settings_security_disableEncryption_body": "Die Datenbankdatei wird wieder unverschlüsselt auf der Festplatte gespeichert.",
+  "settings_security_turnOffAppLock_title": "App-Sperre ausschalten?",
+  "settings_security_turnOffAppLock_body": "Die App öffnet sich künftig ohne Passwortabfrage.",
+  "settings_security_unlock_title": "Passwort eingeben",
+  "settings_security_cancel": "Abbrechen",
+  "settings_security_continue": "Weiter",
+  "settings_security_done": "Fertig",
+  "settings_security_turnOff": "Ausschalten"
 }

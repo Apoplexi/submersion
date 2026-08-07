@@ -4,6 +4,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
+import 'package:submersion/core/presentation/providers/app_lock_provider.dart';
+import 'package:submersion/core/presentation/widgets/lock_barrier.dart';
 import 'package:submersion/core/providers/provider.dart';
 
 import 'package:submersion/core/theme/app_theme_registry.dart';
@@ -132,7 +134,13 @@ class _SubmersionAppState extends ConsumerState<SubmersionApp>
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.inactive ||
+        state == AppLifecycleState.hidden) {
+      ref.read(appLockNotifierProvider.notifier).noteBackgrounded();
+    }
     if (state == AppLifecycleState.resumed) {
+      ref.read(appLockNotifierProvider.notifier).noteResumed();
       _maybeSyncOnResume();
     }
   }
@@ -336,35 +344,38 @@ class _SubmersionAppState extends ConsumerState<SubmersionApp>
         // Block all interaction while a database restore runs, so no data page
         // can rebuild against the transient null database mid-restore. Kept
         // outside the zoom scope so the barrier stays a full-screen, unscaled
-        // overlay.
-        return RestoreBarrier(
-          child: Consumer(
-            builder: (context, ref, _) {
-              // Watched here rather than in build() so dragging the zoom
-              // slider rebuilds only this subtree, not all of MaterialApp.
-              final zoom = ref.watch(displayZoomNotifierProvider);
-              final notifier = ref.read(displayZoomNotifierProvider.notifier);
-              final useMeta =
-                  defaultTargetPlatform == TargetPlatform.macOS ||
-                  defaultTargetPlatform == TargetPlatform.iOS;
+        // overlay. LockBarrier sits OUTSIDE RestoreBarrier so the App Lock
+        // re-lock overlay covers restore UI too.
+        return LockBarrier(
+          child: RestoreBarrier(
+            child: Consumer(
+              builder: (context, ref, _) {
+                // Watched here rather than in build() so dragging the zoom
+                // slider rebuilds only this subtree, not all of MaterialApp.
+                final zoom = ref.watch(displayZoomNotifierProvider);
+                final notifier = ref.read(displayZoomNotifierProvider.notifier);
+                final useMeta =
+                    defaultTargetPlatform == TargetPlatform.macOS ||
+                    defaultTargetPlatform == TargetPlatform.iOS;
 
-              return CallbackShortcuts(
-                bindings: displayZoomShortcuts(
-                  onZoomIn: () => notifier.stepBy(1),
-                  onZoomOut: () => notifier.stepBy(-1),
-                  onReset: notifier.reset,
-                  useMetaModifier: useMeta,
-                ),
-                // CallbackShortcuts only fires for keystrokes inside its
-                // focused subtree, and nothing has focus on desktop
-                // cold-start, so the shortcuts would otherwise be dead until
-                // the user clicks something.
-                child: Focus(
-                  autofocus: true,
-                  child: DisplayZoomScope(zoom: zoom, child: child!),
-                ),
-              );
-            },
+                return CallbackShortcuts(
+                  bindings: displayZoomShortcuts(
+                    onZoomIn: () => notifier.stepBy(1),
+                    onZoomOut: () => notifier.stepBy(-1),
+                    onReset: notifier.reset,
+                    useMetaModifier: useMeta,
+                  ),
+                  // CallbackShortcuts only fires for keystrokes inside its
+                  // focused subtree, and nothing has focus on desktop
+                  // cold-start, so the shortcuts would otherwise be dead until
+                  // the user clicks something.
+                  child: Focus(
+                    autofocus: true,
+                    child: DisplayZoomScope(zoom: zoom, child: child!),
+                  ),
+                );
+              },
+            ),
           ),
         );
       },

@@ -107,7 +107,10 @@ class _NoopBackupAdapter implements BackupDatabaseAdapter {
   Future<void> backup(String destinationPath) async {}
 
   @override
-  Future<void> restore(String backupPath) async {}
+  Future<void> restore(
+    String backupPath, {
+    void Function(int, int)? onMigrationProgress,
+  }) async {}
 
   @override
   Future<String> get databasePath async => '/noop';

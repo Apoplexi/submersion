@@ -1,5 +1,15 @@
 {
+  "settings_units_defaultCurrency": "Moeda padrão",
+  "settings_units_dialog_defaultCurrency": "Moeda padrão",
   "diveSites_list_menu_select": "Selecionar pontos",
+  "diveLog_edit_flightWindowWarning": "Este mergulho termina depois do último horário seguro para emergir antes do seu voo ({time})",
+  "@diveLog_edit_flightWindowWarning": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
   "diveLog_edit_geofenceSuggestion_near": "Perto de {location}",
   "diveLog_edit_geofenceSuggestion_title": "Sugestão de equipamento",
   "diveLog_edit_geofenceSuggestion_body": "Aplicar o conjunto \"{setName}\"?",
@@ -3409,6 +3419,7 @@
   "equipment_serviceDialog_clearNextServiceDateTooltip": "Limpar Data da Proxima Manutencao",
   "equipment_serviceDialog_costHint": "0,00",
   "equipment_serviceDialog_costLabel": "Custo",
+  "equipment_serviceDialog_currencyLabel": "Moeda",
   "equipment_serviceDialog_costValidation": "Insira um valor valido",
   "equipment_serviceDialog_editTitle": "Editar Registro de Manutencao",
   "equipment_serviceDialog_nextServiceDueLabel": "Proxima Manutencao",
@@ -4042,6 +4053,7 @@
   "settings_about_header": "Sobre",
   "settings_about_openSourceLicenses": "Licencas de Codigo Aberto",
   "settings_about_reportIssue": "Relatar um Problema",
+  "settings_about_reportIssue_copy": "Copiar link",
   "settings_about_reportIssue_snackbar": "Acesse github.com/submersion-app/submersion/issues",
   "settings_about_version": "Versao {version}",
   "settings_appBar_title": "Configuracoes",
@@ -5346,6 +5358,9 @@
   "trips_edit_label_notes": "Notas",
   "trips_edit_label_operatorName": "Operator / Charter",
   "trips_edit_label_resortName": "Nome do Resort",
+  "trips_edit_label_returnFlight": "Voo de volta",
+  "trips_edit_returnFlightClear": "Limpar voo de volta",
+  "trips_edit_returnFlightNotSet": "Não definido",
   "trips_edit_label_startDate": "Data de Inicio",
   "trips_edit_label_tripName": "Nome da Viagem *",
   "trips_edit_label_tripType": "Trip Type",
@@ -5714,6 +5729,7 @@
   "diveComputer_download_newDivesOnlyTitle": "Baixar apenas novos mergulhos",
   "diveComputer_download_upToDate": "Nenhum mergulho novo encontrado -- seu registro está atualizado",
   "diveLog_edit_section_environment": "Ambiente",
+  "diveLog_edit_subsection_autofill": "Preenchimento automático",
   "diveLog_edit_subsection_weather": "Clima",
   "diveLog_edit_subsection_diveConditions": "Condições de mergulho",
   "diveLog_edit_label_windSpeed": "Velocidade do vento",
@@ -5775,12 +5791,25 @@
   "dashboard_gauges_insuranceExpired": "Seguro expirado",
   "dashboard_gauges_noInsurance": "Sem seguro registado",
   "dashboard_gauges_noFlyClear": "Não voar 0:00",
+  "dashboard_gauges_flightWindow": "Janela de mergulho {hours}:{minutes}",
+  "@dashboard_gauges_flightWindow": {
+    "placeholders": {
+      "hours": {
+        "type": "String"
+      },
+      "minutes": {
+        "type": "String"
+      }
+    }
+  },
+  "dashboard_gauges_flightWindowClosed": "Não mergulhe mais antes do voo",
   "dashboard_gauges_noFlyRemaining": "Não voar {hours}:{minutes}",
   "dashboard_gauges_lastDiveDays": "Último mergulho há {days}d",
   "dashboard_gauges_lastDiveToday": "Mergulhou hoje",
   "dashboard_gauges_noDivesYet": "Ainda sem mergulhos",
   "settings_homeChips_pageTitle": "Chips de estado do Início",
   "settings_homeChips_description": "Escolha que chips de estado aparecem no topo do separador Início.",
+  "settings_homeChips_flightWindow": "Janela de mergulho antes do voo",
   "settings_homeChips_gear": "Manutenção do equipamento",
   "settings_homeChips_insurance": "Seguro",
   "settings_homeChips_noFly": "Temporizador de não voar",
@@ -6565,6 +6594,32 @@
   "safetySettings_noFlyPreset_standard": "Padrão (12/18/24 h)",
   "safetySettings_noFlyPreset_strict": "Rigoroso (18/24/48 h)",
   "safetySettings_noFlyPreset_subtitle": "Intervalos orientativos após um único mergulho sem deco, mergulhos repetitivos e mergulhos com deco",
+  "flightWindow_closed": "Não mergulhe mais antes do seu voo",
+  "flightWindow_conflict": "Seu tempo de não voar ultrapassa a partida do voo",
+  "flightWindow_departs": "O voo parte {time}",
+  "@flightWindow_departs": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "flightWindow_openTitle": "Tempo restante para mergulhar: {remaining}",
+  "@flightWindow_openTitle": {
+    "placeholders": {
+      "remaining": {
+        "type": "String"
+      }
+    }
+  },
+  "flightWindow_surfaceBy": "Emergir até {time}",
+  "@flightWindow_surfaceBy": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
   "safetyHub_noFly_active_title": "Não voar: faltam {remaining}",
   "@safetyHub_noFly_active_title": {
     "placeholders": {
@@ -6885,5 +6940,53 @@
   "reef_attribution_wri": "Presença de recife e nível de ameaça. CC BY 3.0.",
   "reef_attribution_noaa": "Temperatura da superfície do mar e estresse térmico. Domínio público.",
   "reef_attribution_gbif": "Registros de ocorrência de espécies, filtrados para CC0 e CC BY 4.0.",
-  "reef_attribution_protectedSeas": "Limites de áreas marinhas protegidas. CC BY 4.0."
+  "reef_attribution_protectedSeas": "Limites de áreas marinhas protegidas. CC BY 4.0.",
+  "settings_section_security_title": "Segurança do app",
+  "settings_section_security_subtitle": "Bloqueio do app e criptografia do banco de dados",
+  "settings_security_appLock": "Bloqueio do app",
+  "settings_security_appLock_subtitle": "Exigir sua senha ou biometria para abrir o app",
+  "settings_security_biometrics": "Desbloquear com biometria",
+  "settings_security_autoLock": "Bloqueio automático",
+  "settings_security_autoLock_immediately": "Imediatamente",
+  "settings_security_autoLock_minutes": "{minutes, plural, =1{Após 1 minuto} other{Após {minutes} minutos}}",
+  "@settings_security_autoLock_minutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "settings_security_autoLock_never": "Nunca",
+  "settings_security_encryption": "Criptografar banco de dados",
+  "settings_security_encryption_subtitle": "Proteja o arquivo do seu registro de mergulhos com criptografia em repouso",
+  "settings_security_encryption_progress_backup": "Criando backup de segurança...",
+  "settings_security_encryption_progress_encrypt": "Criptografando banco de dados...",
+  "settings_security_encryption_progress_decrypt": "Descriptografando banco de dados...",
+  "settings_security_encryption_progress_reopen": "Reabrindo banco de dados...",
+  "settings_security_changePassword": "Alterar senha",
+  "settings_security_regenerateRecovery": "Novo código de recuperação",
+  "settings_security_setPassword": "Definir senha do app",
+  "settings_security_password": "Senha",
+  "settings_security_confirmPassword": "Confirmar senha",
+  "settings_security_currentPassword": "Senha atual",
+  "settings_security_newPassword": "Nova senha",
+  "settings_security_passwordTooShort": "A senha deve ter pelo menos 4 caracteres.",
+  "settings_security_passwordMismatch": "As senhas não coincidem.",
+  "settings_security_wrongPassword": "Senha incorreta.",
+  "settings_security_recoveryCode_title": "Seu código de recuperação",
+  "settings_security_recoveryCode_explain": "Anote-o e guarde-o em local seguro. É a única forma de desbloquear o app se você esquecer sua senha, e ele substitui qualquer código de recuperação anterior.",
+  "settings_security_recoveryCode_savedConfirm": "Salvei meu código de recuperação",
+  "settings_security_disableBlockedByEncryption_title": "A criptografia está ativada",
+  "settings_security_disableBlockedByEncryption_body": "Desative a criptografia do banco de dados antes de desativar o bloqueio do app. O banco criptografado precisa de uma credencial.",
+  "settings_security_enableEncryption_title": "Criptografar o banco de dados?",
+  "settings_security_enableEncryption_body": "Primeiro é criado um backup de segurança e depois o arquivo do banco é recriptografado no local. Pode demorar com registros grandes.",
+  "settings_security_disableEncryption_title": "Desativar a criptografia?",
+  "settings_security_disableEncryption_body": "O arquivo do banco de dados voltará a ser armazenado sem criptografia no disco.",
+  "settings_security_turnOffAppLock_title": "Desativar o bloqueio do app?",
+  "settings_security_turnOffAppLock_body": "O app abrirá sem pedir sua senha.",
+  "settings_security_unlock_title": "Digite sua senha",
+  "settings_security_cancel": "Cancelar",
+  "settings_security_continue": "Continuar",
+  "settings_security_done": "Concluído",
+  "settings_security_turnOff": "Desativar"
 }

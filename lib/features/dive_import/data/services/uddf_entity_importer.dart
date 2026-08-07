@@ -3,6 +3,7 @@ import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/core/database/database.dart'
     show DiveDataSourcesCompanion, DiveSitesCompanion, DivesCompanion;
 import 'package:submersion/core/services/export/export_service.dart';
+import 'package:submersion/features/dive_log/domain/services/dive_altitude_enricher.dart';
 import 'package:submersion/features/equipment/data/services/dive_equipment_defaulter.dart';
 import 'package:submersion/features/pre_dive/data/services/checklist_dive_linker.dart';
 import 'package:submersion/core/services/location_service.dart';
@@ -1082,6 +1083,10 @@ class UddfEntityImporter {
         ? null
         : await repos.diveRepository.getNextDiveNumber(diverId: diverId);
 
+    // One instance for the run: its lookup cache collapses a batch of dives
+    // at the same location into a single elevation request.
+    final altitudeEnricher = DiveAltitudeEnricher();
+
     for (final i in sortedSelected) {
       if (cancelToken?.isCancelled ?? false) break;
 
@@ -1331,6 +1336,7 @@ class UddfEntityImporter {
       await repos.diveRepository.createDive(dive);
       await DiveEquipmentDefaulter().applyForImportedDive(dive);
       await ChecklistDiveLinker().applyForImportedDive(dive);
+      await altitudeEnricher.applyForImportedDive(dive);
       importedDiveIds.add(diveId);
       diveIdByIndex[i] = diveId;
 

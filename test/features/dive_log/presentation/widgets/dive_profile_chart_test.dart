@@ -412,6 +412,21 @@ void main() {
       // Empty profile should show empty state placeholder.
       expect(find.byType(DiveProfileChart), findsOneWidget);
     });
+
+    testWidgets('chart data changes are not implicitly animated', (
+      tester,
+    ) async {
+      await tester.pumpWidget(_buildChart());
+      await tester.pumpAndSettle();
+
+      // The chart rebuilds on every hover / pan / cursor move. fl_chart's
+      // default 150ms implicit animation lerps old data to new, which makes
+      // the highlight cursor lag the pointer, slides event markers when
+      // cursor lines shift verticalLines indices, and smears line bars while
+      // panning. Interaction-driven rebuilds must render immediately.
+      final chart = tester.widget<LineChart>(find.byType(LineChart));
+      expect(chart.duration, Duration.zero);
+    });
   });
 
   group('DiveProfileChart - overlay source rendering', () {

@@ -9,6 +9,11 @@ class AppLocalizationsPt extends AppLocalizations {
   AppLocalizationsPt([String locale = 'pt']) : super(locale);
 
   @override
+  String diveLog_edit_flightWindowWarning(String time) {
+    return 'Este mergulho termina depois do último horário seguro para emergir antes do seu voo ($time)';
+  }
+
+  @override
   String diveLog_edit_geofenceSuggestion_near(String location) {
     return 'Perto de $location';
   }
@@ -3117,6 +3122,15 @@ class AppLocalizationsPt extends AppLocalizations {
   String get dashboard_gauges_noFlyClear => 'Não voar 0:00';
 
   @override
+  String dashboard_gauges_flightWindow(String hours, String minutes) {
+    return 'Janela de mergulho $hours:$minutes';
+  }
+
+  @override
+  String get dashboard_gauges_flightWindowClosed =>
+      'Não mergulhe mais antes do voo';
+
+  @override
   String dashboard_gauges_noFlyRemaining(String hours, String minutes) {
     return 'Não voar $hours:$minutes';
   }
@@ -3138,6 +3152,10 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get settings_homeChips_description =>
       'Escolha que chips de estado aparecem no topo do separador Início.';
+
+  @override
+  String get settings_homeChips_flightWindow =>
+      'Janela de mergulho antes do voo';
 
   @override
   String get settings_homeChips_gear => 'Manutenção do equipamento';
@@ -10817,6 +10835,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String get equipment_serviceDialog_costLabel => 'Custo';
 
   @override
+  String get equipment_serviceDialog_currencyLabel => 'Moeda';
+
+  @override
   String get equipment_serviceDialog_costValidation => 'Insira um valor valido';
 
   @override
@@ -12834,6 +12855,9 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_about_reportIssue => 'Relatar um Problema';
+
+  @override
+  String get settings_about_reportIssue_copy => 'Copiar link';
 
   @override
   String get settings_about_reportIssue_snackbar =>
@@ -15249,6 +15273,12 @@ class AppLocalizationsPt extends AppLocalizations {
   String get settings_units_sacRate => 'Taxa SAC';
 
   @override
+  String get settings_units_defaultCurrency => 'Moeda padrão';
+
+  @override
+  String get settings_units_dialog_defaultCurrency => 'Moeda padrão';
+
+  @override
   String get settings_units_sac_pressurePerMinute => 'Pressao por minuto';
 
   @override
@@ -17636,6 +17666,15 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get trips_edit_label_resortName => 'Nome do Resort';
+
+  @override
+  String get trips_edit_label_returnFlight => 'Voo de volta';
+
+  @override
+  String get trips_edit_returnFlightClear => 'Limpar voo de volta';
+
+  @override
+  String get trips_edit_returnFlightNotSet => 'Não definido';
 
   @override
   String get trips_edit_label_startDate => 'Data de Inicio';
@@ -20507,6 +20546,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String get diveLog_edit_section_environment => 'Ambiente';
 
   @override
+  String get diveLog_edit_subsection_autofill => 'Preenchimento automático';
+
+  @override
   String get diveLog_edit_subsection_weather => 'Clima';
 
   @override
@@ -22196,6 +22238,28 @@ class AppLocalizationsPt extends AppLocalizations {
       'Intervalos orientativos após um único mergulho sem deco, mergulhos repetitivos e mergulhos com deco';
 
   @override
+  String get flightWindow_closed => 'Não mergulhe mais antes do seu voo';
+
+  @override
+  String get flightWindow_conflict =>
+      'Seu tempo de não voar ultrapassa a partida do voo';
+
+  @override
+  String flightWindow_departs(String time) {
+    return 'O voo parte $time';
+  }
+
+  @override
+  String flightWindow_openTitle(String remaining) {
+    return 'Tempo restante para mergulhar: $remaining';
+  }
+
+  @override
+  String flightWindow_surfaceBy(String time) {
+    return 'Emergir até $time';
+  }
+
+  @override
   String safetyHub_noFly_active_title(String remaining) {
     return 'Não voar: faltam $remaining';
   }
@@ -22495,6 +22559,157 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get settings_section_safety_subtitle =>
       'Regras de revisão e voar após mergulhar';
+
+  @override
+  String get settings_section_security_title => 'Segurança do app';
+
+  @override
+  String get settings_section_security_subtitle =>
+      'Bloqueio do app e criptografia do banco de dados';
+
+  @override
+  String get settings_security_appLock => 'Bloqueio do app';
+
+  @override
+  String get settings_security_appLock_subtitle =>
+      'Exigir sua senha ou biometria para abrir o app';
+
+  @override
+  String get settings_security_biometrics => 'Desbloquear com biometria';
+
+  @override
+  String get settings_security_autoLock => 'Bloqueio automático';
+
+  @override
+  String get settings_security_autoLock_immediately => 'Imediatamente';
+
+  @override
+  String settings_security_autoLock_minutes(int minutes) {
+    String _temp0 = intl.Intl.pluralLogic(
+      minutes,
+      locale: localeName,
+      other: 'Após $minutes minutos',
+      one: 'Após 1 minuto',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get settings_security_autoLock_never => 'Nunca';
+
+  @override
+  String get settings_security_encryption => 'Criptografar banco de dados';
+
+  @override
+  String get settings_security_encryption_subtitle =>
+      'Proteja o arquivo do seu registro de mergulhos com criptografia em repouso';
+
+  @override
+  String get settings_security_encryption_progress_backup =>
+      'Criando backup de segurança...';
+
+  @override
+  String get settings_security_encryption_progress_encrypt =>
+      'Criptografando banco de dados...';
+
+  @override
+  String get settings_security_encryption_progress_decrypt =>
+      'Descriptografando banco de dados...';
+
+  @override
+  String get settings_security_encryption_progress_reopen =>
+      'Reabrindo banco de dados...';
+
+  @override
+  String get settings_security_changePassword => 'Alterar senha';
+
+  @override
+  String get settings_security_regenerateRecovery =>
+      'Novo código de recuperação';
+
+  @override
+  String get settings_security_setPassword => 'Definir senha do app';
+
+  @override
+  String get settings_security_password => 'Senha';
+
+  @override
+  String get settings_security_confirmPassword => 'Confirmar senha';
+
+  @override
+  String get settings_security_currentPassword => 'Senha atual';
+
+  @override
+  String get settings_security_newPassword => 'Nova senha';
+
+  @override
+  String get settings_security_passwordTooShort =>
+      'A senha deve ter pelo menos 4 caracteres.';
+
+  @override
+  String get settings_security_passwordMismatch => 'As senhas não coincidem.';
+
+  @override
+  String get settings_security_wrongPassword => 'Senha incorreta.';
+
+  @override
+  String get settings_security_recoveryCode_title =>
+      'Seu código de recuperação';
+
+  @override
+  String get settings_security_recoveryCode_explain =>
+      'Anote-o e guarde-o em local seguro. É a única forma de desbloquear o app se você esquecer sua senha, e ele substitui qualquer código de recuperação anterior.';
+
+  @override
+  String get settings_security_recoveryCode_savedConfirm =>
+      'Salvei meu código de recuperação';
+
+  @override
+  String get settings_security_disableBlockedByEncryption_title =>
+      'A criptografia está ativada';
+
+  @override
+  String get settings_security_disableBlockedByEncryption_body =>
+      'Desative a criptografia do banco de dados antes de desativar o bloqueio do app. O banco criptografado precisa de uma credencial.';
+
+  @override
+  String get settings_security_enableEncryption_title =>
+      'Criptografar o banco de dados?';
+
+  @override
+  String get settings_security_enableEncryption_body =>
+      'Primeiro é criado um backup de segurança e depois o arquivo do banco é recriptografado no local. Pode demorar com registros grandes.';
+
+  @override
+  String get settings_security_disableEncryption_title =>
+      'Desativar a criptografia?';
+
+  @override
+  String get settings_security_disableEncryption_body =>
+      'O arquivo do banco de dados voltará a ser armazenado sem criptografia no disco.';
+
+  @override
+  String get settings_security_turnOffAppLock_title =>
+      'Desativar o bloqueio do app?';
+
+  @override
+  String get settings_security_turnOffAppLock_body =>
+      'O app abrirá sem pedir sua senha.';
+
+  @override
+  String get settings_security_unlock_title => 'Digite sua senha';
+
+  @override
+  String get settings_security_cancel => 'Cancelar';
+
+  @override
+  String get settings_security_continue => 'Continuar';
+
+  @override
+  String get settings_security_done => 'Concluído';
+
+  @override
+  String get settings_security_turnOff => 'Desativar';
 
   @override
   String get dataQuality_inbox_title => 'Qualidade dos dados';

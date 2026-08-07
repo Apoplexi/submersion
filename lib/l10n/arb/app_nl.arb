@@ -1,5 +1,15 @@
 {
+  "settings_units_defaultCurrency": "Standaardvaluta",
+  "settings_units_dialog_defaultCurrency": "Standaardvaluta",
   "diveSites_list_menu_select": "Duikstekken selecteren",
+  "diveLog_edit_flightWindowWarning": "Deze duik eindigt na het laatste veilige opstijgmoment voor je vlucht ({time})",
+  "@diveLog_edit_flightWindowWarning": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
   "diveLog_edit_geofenceSuggestion_near": "Bij {location}",
   "diveLog_edit_geofenceSuggestion_title": "Uitrustingssuggestie",
   "diveLog_edit_geofenceSuggestion_body": "Set \"{setName}\" toepassen?",
@@ -3409,6 +3419,7 @@
   "equipment_serviceDialog_clearNextServiceDateTooltip": "Volgende servicedatum wissen",
   "equipment_serviceDialog_costHint": "0,00",
   "equipment_serviceDialog_costLabel": "Kosten",
+  "equipment_serviceDialog_currencyLabel": "Valuta",
   "equipment_serviceDialog_costValidation": "Voer een geldig bedrag in",
   "equipment_serviceDialog_editTitle": "Servicerecord bewerken",
   "equipment_serviceDialog_nextServiceDueLabel": "Volgende service gepland",
@@ -4042,6 +4053,7 @@
   "settings_about_header": "Over",
   "settings_about_openSourceLicenses": "Open source-licenties",
   "settings_about_reportIssue": "Probleem melden",
+  "settings_about_reportIssue_copy": "Link kopiëren",
   "settings_about_reportIssue_snackbar": "Ga naar github.com/submersion-app/submersion/issues",
   "settings_about_version": "Versie {version}",
   "settings_appBar_title": "Instellingen",
@@ -5346,6 +5358,9 @@
   "trips_edit_label_notes": "Notities",
   "trips_edit_label_operatorName": "Operator / Charter",
   "trips_edit_label_resortName": "Resortnaam",
+  "trips_edit_label_returnFlight": "Terugvlucht",
+  "trips_edit_returnFlightClear": "Terugvlucht wissen",
+  "trips_edit_returnFlightNotSet": "Niet ingesteld",
   "trips_edit_label_startDate": "Startdatum",
   "trips_edit_label_tripName": "Reisnaam *",
   "trips_edit_label_tripType": "Trip Type",
@@ -5714,6 +5729,7 @@
   "diveComputer_download_newDivesOnlyTitle": "Alleen nieuwe duiken downloaden",
   "diveComputer_download_upToDate": "Geen nieuwe duiken gevonden -- je logboek is up-to-date",
   "diveLog_edit_section_environment": "Omgeving",
+  "diveLog_edit_subsection_autofill": "Automatisch invullen",
   "diveLog_edit_subsection_weather": "Weer",
   "diveLog_edit_subsection_diveConditions": "Duikomstandigheden",
   "diveLog_edit_label_windSpeed": "Windsnelheid",
@@ -5775,12 +5791,25 @@
   "dashboard_gauges_insuranceExpired": "Verzekering verlopen",
   "dashboard_gauges_noInsurance": "Geen verzekering geregistreerd",
   "dashboard_gauges_noFlyClear": "Vliegverbod 0:00",
+  "dashboard_gauges_flightWindow": "Duikvenster {hours}:{minutes}",
+  "@dashboard_gauges_flightWindow": {
+    "placeholders": {
+      "hours": {
+        "type": "String"
+      },
+      "minutes": {
+        "type": "String"
+      }
+    }
+  },
+  "dashboard_gauges_flightWindowClosed": "Niet meer duiken vóór de vlucht",
   "dashboard_gauges_noFlyRemaining": "Vliegverbod {hours}:{minutes}",
   "dashboard_gauges_lastDiveDays": "Laatste duik {days}d geleden",
   "dashboard_gauges_lastDiveToday": "Vandaag gedoken",
   "dashboard_gauges_noDivesYet": "Nog geen duiken",
   "settings_homeChips_pageTitle": "Statuschips van start",
   "settings_homeChips_description": "Kies welke statuschips bovenaan het tabblad Start verschijnen.",
+  "settings_homeChips_flightWindow": "Duikvenster voor vlucht",
   "settings_homeChips_gear": "Uitrustingsonderhoud",
   "settings_homeChips_insurance": "Verzekering",
   "settings_homeChips_noFly": "Vliegverbod-timer",
@@ -6565,6 +6594,32 @@
   "safetySettings_noFlyPreset_standard": "Standaard (12/18/24 u)",
   "safetySettings_noFlyPreset_strict": "Strikt (18/24/48 u)",
   "safetySettings_noFlyPreset_subtitle": "Richttijden na een enkele duik zonder deco, herhalingsduiken en decoduiken",
+  "flightWindow_closed": "Niet meer duiken vóór je vlucht",
+  "flightWindow_conflict": "Je no-flytijd loopt door tot na je vertrek",
+  "flightWindow_departs": "Vlucht vertrekt {time}",
+  "@flightWindow_departs": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "flightWindow_openTitle": "Resterende duiktijd: {remaining}",
+  "@flightWindow_openTitle": {
+    "placeholders": {
+      "remaining": {
+        "type": "String"
+      }
+    }
+  },
+  "flightWindow_surfaceBy": "Boven water vóór {time}",
+  "@flightWindow_surfaceBy": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
   "safetyHub_noFly_active_title": "Vliegverbod: nog {remaining}",
   "@safetyHub_noFly_active_title": {
     "placeholders": {
@@ -6885,5 +6940,53 @@
   "reef_attribution_wri": "Rifaanwezigheid en dreigingsniveau. CC BY 3.0.",
   "reef_attribution_noaa": "Zeeoppervlaktetemperatuur en hittestress. Publiek domein.",
   "reef_attribution_gbif": "Waarnemingen van soorten, gefilterd op CC0 en CC BY 4.0.",
-  "reef_attribution_protectedSeas": "Grenzen van beschermde zeegebieden. CC BY 4.0."
+  "reef_attribution_protectedSeas": "Grenzen van beschermde zeegebieden. CC BY 4.0.",
+  "settings_section_security_title": "App-beveiliging",
+  "settings_section_security_subtitle": "App-vergrendeling & databaseversleuteling",
+  "settings_security_appLock": "App-vergrendeling",
+  "settings_security_appLock_subtitle": "Vereis je wachtwoord of biometrie om de app te openen",
+  "settings_security_biometrics": "Ontgrendelen met biometrie",
+  "settings_security_autoLock": "Automatisch vergrendelen",
+  "settings_security_autoLock_immediately": "Onmiddellijk",
+  "settings_security_autoLock_minutes": "{minutes, plural, =1{Na 1 minuut} other{Na {minutes} minuten}}",
+  "@settings_security_autoLock_minutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "settings_security_autoLock_never": "Nooit",
+  "settings_security_encryption": "Database versleutelen",
+  "settings_security_encryption_subtitle": "Bescherm je duiklogbestand met versleuteling in rust",
+  "settings_security_encryption_progress_backup": "Veiligheidsback-up maken...",
+  "settings_security_encryption_progress_encrypt": "Database versleutelen...",
+  "settings_security_encryption_progress_decrypt": "Database ontsleutelen...",
+  "settings_security_encryption_progress_reopen": "Database opnieuw openen...",
+  "settings_security_changePassword": "Wachtwoord wijzigen",
+  "settings_security_regenerateRecovery": "Nieuwe herstelcode",
+  "settings_security_setPassword": "App-wachtwoord instellen",
+  "settings_security_password": "Wachtwoord",
+  "settings_security_confirmPassword": "Bevestig wachtwoord",
+  "settings_security_currentPassword": "Huidig wachtwoord",
+  "settings_security_newPassword": "Nieuw wachtwoord",
+  "settings_security_passwordTooShort": "Het wachtwoord moet minimaal 4 tekens bevatten.",
+  "settings_security_passwordMismatch": "De wachtwoorden komen niet overeen.",
+  "settings_security_wrongPassword": "Onjuist wachtwoord.",
+  "settings_security_recoveryCode_title": "Je herstelcode",
+  "settings_security_recoveryCode_explain": "Schrijf deze op en bewaar hem veilig. Het is de enige manier om de app te ontgrendelen als je je wachtwoord vergeet, en hij vervangt elke eerdere herstelcode.",
+  "settings_security_recoveryCode_savedConfirm": "Ik heb mijn herstelcode opgeslagen",
+  "settings_security_disableBlockedByEncryption_title": "Versleuteling is ingeschakeld",
+  "settings_security_disableBlockedByEncryption_body": "Schakel eerst de databaseversleuteling uit voordat je de app-vergrendeling uitschakelt. De versleutelde database heeft een toegangscode nodig.",
+  "settings_security_enableEncryption_title": "Database versleutelen?",
+  "settings_security_enableEncryption_body": "Er wordt eerst een veiligheidsback-up gemaakt, daarna wordt het databasebestand ter plekke opnieuw versleuteld. Dit kan even duren bij grote logboeken.",
+  "settings_security_disableEncryption_title": "Versleuteling uitschakelen?",
+  "settings_security_disableEncryption_body": "Het databasebestand wordt weer onversleuteld op schijf opgeslagen.",
+  "settings_security_turnOffAppLock_title": "App-vergrendeling uitschakelen?",
+  "settings_security_turnOffAppLock_body": "De app opent voortaan zonder om je wachtwoord te vragen.",
+  "settings_security_unlock_title": "Voer je wachtwoord in",
+  "settings_security_cancel": "Annuleren",
+  "settings_security_continue": "Doorgaan",
+  "settings_security_done": "Klaar",
+  "settings_security_turnOff": "Uitschakelen"
 }

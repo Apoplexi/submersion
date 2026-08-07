@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io' show Platform;
 
 import 'package:flutter/foundation.dart' show kIsWeb;
@@ -24,6 +25,7 @@ import 'package:submersion/features/dive_sites/presentation/widgets/location_pic
 import 'package:submersion/features/marine_life/domain/entities/species.dart';
 import 'package:submersion/features/marine_life/presentation/providers/species_providers.dart';
 import 'package:submersion/features/marine_life/presentation/widgets/species_picker_dialog.dart';
+import 'package:submersion/features/weather/presentation/providers/weather_providers.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:submersion/shared/widgets/forms/edit_form_scaffold.dart';
 import 'package:submersion/shared/widgets/forms/responsive_form_columns.dart';
@@ -88,6 +90,7 @@ class _SiteEditPageState extends ConsumerState<SiteEditPage> {
   bool _hasChanges = false;
   bool _isShared = false;
   bool _isApplyingInitialValues = false;
+  Timer? _altitudeLookupDebounce;
   DiveSite? _originalSite;
   List<Species> _expectedSpecies = [];
   Set<String> _originalExpectedSpeciesIds = {};
@@ -120,6 +123,8 @@ class _SiteEditPageState extends ConsumerState<SiteEditPage> {
     _mooringNumberController.addListener(_onFieldChanged);
     _parkingInfoController.addListener(_onFieldChanged);
     _altitudeController.addListener(_onFieldChanged);
+    _latitudeController.addListener(_scheduleAltitudeLookup);
+    _longitudeController.addListener(_scheduleAltitudeLookup);
     _mergeLoadFuture = widget.isMerging ? _loadMergeData() : null;
     if (!widget.isEditing && !widget.isMerging) {
       WidgetsBinding.instance.addPostFrameCallback((_) async {
@@ -135,6 +140,43 @@ class _SiteEditPageState extends ConsumerState<SiteEditPage> {
     if (!_hasChanges && _isInitialized) {
       setState(() => _hasChanges = true);
     }
+  }
+
+  /// Debounce typed coordinate edits; the locate action and map picker set both
+  /// controller texts at once and land here through the same listeners.
+  void _scheduleAltitudeLookup() {
+    _altitudeLookupDebounce?.cancel();
+    _altitudeLookupDebounce = Timer(const Duration(seconds: 1), () {
+      if (mounted) _maybeFetchAltitude();
+    });
+  }
+
+  /// Fill an empty altitude field from the site's coordinates so altitude
+  /// diving is flagged without manual entry. Never overwrites a value.
+  Future<void> _maybeFetchAltitude() async {
+    if (_altitudeController.text.isNotEmpty) return;
+    final lat = double.tryParse(_latitudeController.text.trim());
+    final lng = double.tryParse(_longitudeController.text.trim());
+    if (lat == null || lng == null) return;
+    if (lat < -90 || lat > 90 || lng < -180 || lng > 180) return;
+
+    final meters = await ref
+        .read(elevationServiceProvider)
+        .fetchElevation(latitude: lat, longitude: lng);
+    if (!mounted || meters == null) return;
+    if (_altitudeController.text.isNotEmpty) return;
+
+    final units = UnitFormatter(ref.read(settingsProvider));
+    setState(() {
+      // A programmatic fill must not dirty the form on its own: opening a site
+      // that predates this feature would otherwise prompt to discard changes.
+      final wasApplying = _isApplyingInitialValues;
+      _isApplyingInitialValues = true;
+      _altitudeController.text = units
+          .convertAltitude(meters)
+          .toStringAsFixed(0);
+      _isApplyingInitialValues = wasApplying;
+    });
   }
 
   /// Seed a brand-new site form from [SiteEditPage.initialLocation]: fill the
@@ -172,6 +214,7 @@ class _SiteEditPageState extends ConsumerState<SiteEditPage> {
 
   @override
   void dispose() {
+    _altitudeLookupDebounce?.cancel();
     _nameController.dispose();
     _descriptionController.dispose();
     _countryController.dispose();

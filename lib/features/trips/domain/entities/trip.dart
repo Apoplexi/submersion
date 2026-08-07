@@ -14,6 +14,9 @@ class Trip extends Equatable {
   final TripType tripType;
   final String notes;
   final bool isShared;
+
+  /// Return flight departure, wall-clock-as-UTC (the dive-time frame).
+  final DateTime? returnFlightAt;
   final DateTime createdAt;
   final DateTime updatedAt;
 
@@ -29,6 +32,7 @@ class Trip extends Equatable {
     this.tripType = TripType.shore,
     this.notes = '',
     this.isShared = false,
+    this.returnFlightAt,
     required this.createdAt,
     required this.updatedAt,
   });
@@ -102,6 +106,7 @@ class Trip extends Equatable {
     TripType? tripType,
     String? notes,
     bool? isShared,
+    Object? returnFlightAt = _undefined,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
@@ -121,6 +126,9 @@ class Trip extends Equatable {
       tripType: tripType ?? this.tripType,
       notes: notes ?? this.notes,
       isShared: isShared ?? this.isShared,
+      returnFlightAt: returnFlightAt == _undefined
+          ? this.returnFlightAt
+          : returnFlightAt as DateTime?,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );
@@ -139,6 +147,7 @@ class Trip extends Equatable {
     tripType,
     notes,
     isShared,
+    returnFlightAt,
     createdAt,
     updatedAt,
   ];

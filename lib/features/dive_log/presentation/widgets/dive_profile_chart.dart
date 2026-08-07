@@ -3281,6 +3281,12 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
               ),
             ),
           ),
+          // The chart rebuilds on every hover, pan, and cursor move. The
+          // default 150ms implicit animation lerps old data to new, lagging
+          // the highlight cursor behind the pointer, sliding event markers
+          // (verticalLines lerp by index, and cursor lines shift the
+          // indices), and smearing bars while panning. Render immediately.
+          duration: Duration.zero,
         ),
         // Right axis tap overlay for metric selection
         if (effectiveRightAxisMetric != null)

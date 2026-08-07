@@ -1,5 +1,15 @@
 {
+  "settings_units_defaultCurrency": "Devise par défaut",
+  "settings_units_dialog_defaultCurrency": "Devise par défaut",
   "diveSites_list_menu_select": "Sélectionner des sites",
+  "diveLog_edit_flightWindowWarning": "Cette plongée se termine après l'heure limite de remontée pour votre vol ({time})",
+  "@diveLog_edit_flightWindowWarning": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
   "diveLog_edit_geofenceSuggestion_near": "Près de {location}",
   "diveLog_edit_geofenceSuggestion_title": "Suggestion d'équipement",
   "diveLog_edit_geofenceSuggestion_body": "Appliquer l'ensemble \"{setName}\" ?",
@@ -3337,6 +3347,7 @@
   "equipment_serviceDialog_clearNextServiceDateTooltip": "Effacer la date de prochaine revision",
   "equipment_serviceDialog_costHint": "0.00",
   "equipment_serviceDialog_costLabel": "Cout",
+  "equipment_serviceDialog_currencyLabel": "Devise",
   "equipment_serviceDialog_costValidation": "Entrez un montant valide",
   "equipment_serviceDialog_editTitle": "Modifier l'enregistrement de revision",
   "equipment_serviceDialog_nextServiceDueLabel": "Prochaine revision",
@@ -3970,6 +3981,7 @@
   "settings_about_header": "A propos",
   "settings_about_openSourceLicenses": "Licences open source",
   "settings_about_reportIssue": "Signaler un probleme",
+  "settings_about_reportIssue_copy": "Copier le lien",
   "settings_about_reportIssue_snackbar": "Rendez-vous sur github.com/submersion-app/submersion/issues",
   "settings_about_version": "Version {version}",
   "settings_appBar_title": "Reglages",
@@ -5274,6 +5286,9 @@
   "trips_edit_label_notes": "Notes",
   "trips_edit_label_operatorName": "Operator / Charter",
   "trips_edit_label_resortName": "Nom du resort",
+  "trips_edit_label_returnFlight": "Vol retour",
+  "trips_edit_returnFlightClear": "Effacer le vol retour",
+  "trips_edit_returnFlightNotSet": "Non défini",
   "trips_edit_label_startDate": "Date de debut",
   "trips_edit_label_tripName": "Nom du voyage *",
   "trips_edit_label_tripType": "Trip Type",
@@ -5714,6 +5729,7 @@
   "buoyancy_whatIfDelta": "{delta} vs réel",
   "diveDetailSection_weights_name": "Lestage",
   "diveLog_edit_section_environment": "Environnement",
+  "diveLog_edit_subsection_autofill": "Remplissage automatique",
   "diveLog_edit_subsection_weather": "Météo",
   "diveLog_edit_subsection_diveConditions": "Conditions de plongée",
   "diveLog_edit_label_windSpeed": "Vitesse du vent",
@@ -5775,12 +5791,25 @@
   "dashboard_gauges_insuranceExpired": "Assurance expirée",
   "dashboard_gauges_noInsurance": "Aucune assurance enregistrée",
   "dashboard_gauges_noFlyClear": "Délai avant vol 0:00",
+  "dashboard_gauges_flightWindow": "Fenêtre de plongée {hours}:{minutes}",
+  "@dashboard_gauges_flightWindow": {
+    "placeholders": {
+      "hours": {
+        "type": "String"
+      },
+      "minutes": {
+        "type": "String"
+      }
+    }
+  },
+  "dashboard_gauges_flightWindowClosed": "Plus de plongée avant le vol",
   "dashboard_gauges_noFlyRemaining": "Délai avant vol {hours}:{minutes}",
   "dashboard_gauges_lastDiveDays": "Dernière plongée il y a {days}j",
   "dashboard_gauges_lastDiveToday": "Plongé aujourd'hui",
   "dashboard_gauges_noDivesYet": "Aucune plongée",
   "settings_homeChips_pageTitle": "Pastilles d'état de l'accueil",
   "settings_homeChips_description": "Choisissez les pastilles d'état affichées en haut de l'onglet Accueil.",
+  "settings_homeChips_flightWindow": "Fenêtre de plongée avant vol",
   "settings_homeChips_gear": "Entretien du matériel",
   "settings_homeChips_insurance": "Assurance",
   "settings_homeChips_noFly": "Délai avant vol",
@@ -6565,6 +6594,32 @@
   "safetySettings_noFlyPreset_standard": "Standard (12/18/24 h)",
   "safetySettings_noFlyPreset_strict": "Strict (18/24/48 h)",
   "safetySettings_noFlyPreset_subtitle": "Intervalles indicatifs après une plongée unique sans déco, des plongées successives et des plongées avec déco",
+  "flightWindow_closed": "Plus de plongée avant votre vol",
+  "flightWindow_conflict": "Votre délai avant vol dépasse le départ de votre vol",
+  "flightWindow_departs": "Le vol part {time}",
+  "@flightWindow_departs": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "flightWindow_openTitle": "Temps de plongée restant : {remaining}",
+  "@flightWindow_openTitle": {
+    "placeholders": {
+      "remaining": {
+        "type": "String"
+      }
+    }
+  },
+  "flightWindow_surfaceBy": "Remonter avant {time}",
+  "@flightWindow_surfaceBy": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
   "safetyHub_noFly_active_title": "Interdiction de vol : {remaining} restant",
   "@safetyHub_noFly_active_title": {
     "placeholders": {
@@ -6885,5 +6940,53 @@
   "reef_attribution_wri": "Présence de récif et niveau de menace. CC BY 3.0.",
   "reef_attribution_noaa": "Température de surface et stress thermique. Domaine public.",
   "reef_attribution_gbif": "Données d'occurrence d'espèces, filtrées en CC0 et CC BY 4.0.",
-  "reef_attribution_protectedSeas": "Limites des aires marines protégées. CC BY 4.0."
+  "reef_attribution_protectedSeas": "Limites des aires marines protégées. CC BY 4.0.",
+  "settings_section_security_title": "Sécurité de l'application",
+  "settings_section_security_subtitle": "Verrouillage de l'app et chiffrement de la base de données",
+  "settings_security_appLock": "Verrouillage de l'app",
+  "settings_security_appLock_subtitle": "Exiger votre mot de passe ou la biométrie pour ouvrir l'app",
+  "settings_security_biometrics": "Déverrouiller par biométrie",
+  "settings_security_autoLock": "Verrouillage automatique",
+  "settings_security_autoLock_immediately": "Immédiatement",
+  "settings_security_autoLock_minutes": "{minutes, plural, =1{Après 1 minute} other{Après {minutes} minutes}}",
+  "@settings_security_autoLock_minutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "settings_security_autoLock_never": "Jamais",
+  "settings_security_encryption": "Chiffrer la base de données",
+  "settings_security_encryption_subtitle": "Protégez votre carnet de plongée avec un chiffrement au repos",
+  "settings_security_encryption_progress_backup": "Création de la sauvegarde de sécurité...",
+  "settings_security_encryption_progress_encrypt": "Chiffrement de la base de données...",
+  "settings_security_encryption_progress_decrypt": "Déchiffrement de la base de données...",
+  "settings_security_encryption_progress_reopen": "Réouverture de la base de données...",
+  "settings_security_changePassword": "Changer le mot de passe",
+  "settings_security_regenerateRecovery": "Nouveau code de récupération",
+  "settings_security_setPassword": "Définir le mot de passe de l'app",
+  "settings_security_password": "Mot de passe",
+  "settings_security_confirmPassword": "Confirmer le mot de passe",
+  "settings_security_currentPassword": "Mot de passe actuel",
+  "settings_security_newPassword": "Nouveau mot de passe",
+  "settings_security_passwordTooShort": "Le mot de passe doit comporter au moins 4 caractères.",
+  "settings_security_passwordMismatch": "Les mots de passe ne correspondent pas.",
+  "settings_security_wrongPassword": "Mot de passe incorrect.",
+  "settings_security_recoveryCode_title": "Votre code de récupération",
+  "settings_security_recoveryCode_explain": "Notez-le et conservez-le en lieu sûr. C'est le seul moyen de déverrouiller l'app si vous oubliez votre mot de passe, et il remplace tout code de récupération précédent.",
+  "settings_security_recoveryCode_savedConfirm": "J'ai enregistré mon code de récupération",
+  "settings_security_disableBlockedByEncryption_title": "Le chiffrement est activé",
+  "settings_security_disableBlockedByEncryption_body": "Désactivez d'abord le chiffrement de la base de données avant de désactiver le verrouillage de l'app. La base chiffrée nécessite un identifiant.",
+  "settings_security_enableEncryption_title": "Chiffrer la base de données ?",
+  "settings_security_enableEncryption_body": "Une sauvegarde de sécurité est d'abord créée, puis le fichier de la base est rechiffré sur place. Cela peut prendre du temps pour les gros carnets.",
+  "settings_security_disableEncryption_title": "Désactiver le chiffrement ?",
+  "settings_security_disableEncryption_body": "Le fichier de la base de données sera de nouveau stocké non chiffré sur le disque.",
+  "settings_security_turnOffAppLock_title": "Désactiver le verrouillage de l'app ?",
+  "settings_security_turnOffAppLock_body": "L'app s'ouvrira sans demander votre mot de passe.",
+  "settings_security_unlock_title": "Saisissez votre mot de passe",
+  "settings_security_cancel": "Annuler",
+  "settings_security_continue": "Continuer",
+  "settings_security_done": "Terminé",
+  "settings_security_turnOff": "Désactiver"
 }

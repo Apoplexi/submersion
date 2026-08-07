@@ -9,6 +9,11 @@ class AppLocalizationsZh extends AppLocalizations {
   AppLocalizationsZh([String locale = 'zh']) : super(locale);
 
   @override
+  String diveLog_edit_flightWindowWarning(String time) {
+    return '此次潜水的结束时间晚于您航班的最后安全出水时间($time)';
+  }
+
+  @override
   String diveLog_edit_geofenceSuggestion_near(String location) {
     return '靠近 $location';
   }
@@ -2946,6 +2951,14 @@ class AppLocalizationsZh extends AppLocalizations {
   String get dashboard_gauges_noFlyClear => '禁飞 0:00';
 
   @override
+  String dashboard_gauges_flightWindow(String hours, String minutes) {
+    return '潜水窗口 $hours:$minutes';
+  }
+
+  @override
+  String get dashboard_gauges_flightWindowClosed => '航班前请勿再潜水';
+
+  @override
   String dashboard_gauges_noFlyRemaining(String hours, String minutes) {
     return '禁飞 $hours:$minutes';
   }
@@ -2966,6 +2979,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get settings_homeChips_description => '选择主页顶部显示哪些状态标签。';
+
+  @override
+  String get settings_homeChips_flightWindow => '航班前潜水窗口';
 
   @override
   String get settings_homeChips_gear => '装备保养';
@@ -10339,6 +10355,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get equipment_serviceDialog_costLabel => '费用';
 
   @override
+  String get equipment_serviceDialog_currencyLabel => '货币';
+
+  @override
   String get equipment_serviceDialog_costValidation => '请输入有效金额';
 
   @override
@@ -12242,6 +12261,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get settings_about_reportIssue => '报告问题';
+
+  @override
+  String get settings_about_reportIssue_copy => '复制链接';
 
   @override
   String get settings_about_reportIssue_snackbar =>
@@ -14492,6 +14514,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settings_units_sacRate => '气体消耗率';
 
   @override
+  String get settings_units_defaultCurrency => '默认货币';
+
+  @override
+  String get settings_units_dialog_defaultCurrency => '默认货币';
+
+  @override
   String get settings_units_sac_pressurePerMinute => '压力/分钟';
 
   @override
@@ -16728,6 +16756,15 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get trips_edit_label_resortName => '度假村名称';
+
+  @override
+  String get trips_edit_label_returnFlight => '返程航班';
+
+  @override
+  String get trips_edit_returnFlightClear => '清除返程航班';
+
+  @override
+  String get trips_edit_returnFlightNotSet => '未设置';
 
   @override
   String get trips_edit_label_startDate => '开始日期';
@@ -19469,6 +19506,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get diveLog_edit_section_environment => '环境';
 
   @override
+  String get diveLog_edit_subsection_autofill => '自动填充';
+
+  @override
   String get diveLog_edit_subsection_weather => '天气';
 
   @override
@@ -21081,6 +21121,27 @@ class AppLocalizationsZh extends AppLocalizations {
   String get safetySettings_noFlyPreset_subtitle => '单次免减压潜水、重复潜水和减压潜水后的指导间隔';
 
   @override
+  String get flightWindow_closed => '航班前请勿再潜水';
+
+  @override
+  String get flightWindow_conflict => '您的禁飞时间超过了航班起飞时间';
+
+  @override
+  String flightWindow_departs(String time) {
+    return '航班 $time 起飞';
+  }
+
+  @override
+  String flightWindow_openTitle(String remaining) {
+    return '剩余潜水时间:$remaining';
+  }
+
+  @override
+  String flightWindow_surfaceBy(String time) {
+    return '请在 $time 前出水';
+  }
+
+  @override
   String safetyHub_noFly_active_title(String remaining) {
     return '禁飞:剩余 $remaining';
   }
@@ -21367,6 +21428,141 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get settings_section_safety_subtitle => '回顾规则与潜水后飞行';
+
+  @override
+  String get settings_section_security_title => '应用安全';
+
+  @override
+  String get settings_section_security_subtitle => '应用锁定与数据库加密';
+
+  @override
+  String get settings_security_appLock => '应用锁定';
+
+  @override
+  String get settings_security_appLock_subtitle => '打开应用时需要密码或生物识别';
+
+  @override
+  String get settings_security_biometrics => '使用生物识别解锁';
+
+  @override
+  String get settings_security_autoLock => '自动锁定';
+
+  @override
+  String get settings_security_autoLock_immediately => '立即';
+
+  @override
+  String settings_security_autoLock_minutes(int minutes) {
+    String _temp0 = intl.Intl.pluralLogic(
+      minutes,
+      locale: localeName,
+      other: '$minutes 分钟后',
+      one: '1 分钟后',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get settings_security_autoLock_never => '从不';
+
+  @override
+  String get settings_security_encryption => '加密数据库';
+
+  @override
+  String get settings_security_encryption_subtitle => '使用静态加密保护您的潜水日志文件';
+
+  @override
+  String get settings_security_encryption_progress_backup => '正在创建安全备份...';
+
+  @override
+  String get settings_security_encryption_progress_encrypt => '正在加密数据库...';
+
+  @override
+  String get settings_security_encryption_progress_decrypt => '正在解密数据库...';
+
+  @override
+  String get settings_security_encryption_progress_reopen => '正在重新打开数据库...';
+
+  @override
+  String get settings_security_changePassword => '更改密码';
+
+  @override
+  String get settings_security_regenerateRecovery => '新恢复代码';
+
+  @override
+  String get settings_security_setPassword => '设置应用密码';
+
+  @override
+  String get settings_security_password => '密码';
+
+  @override
+  String get settings_security_confirmPassword => '确认密码';
+
+  @override
+  String get settings_security_currentPassword => '当前密码';
+
+  @override
+  String get settings_security_newPassword => '新密码';
+
+  @override
+  String get settings_security_passwordTooShort => '密码至少需要 4 个字符。';
+
+  @override
+  String get settings_security_passwordMismatch => '两次输入的密码不一致。';
+
+  @override
+  String get settings_security_wrongPassword => '密码错误。';
+
+  @override
+  String get settings_security_recoveryCode_title => '您的恢复代码';
+
+  @override
+  String get settings_security_recoveryCode_explain =>
+      '请抄写并妥善保管。如果忘记密码，它是解锁应用的唯一方式，并会替换之前的任何恢复代码。';
+
+  @override
+  String get settings_security_recoveryCode_savedConfirm => '我已保存恢复代码';
+
+  @override
+  String get settings_security_disableBlockedByEncryption_title => '加密已启用';
+
+  @override
+  String get settings_security_disableBlockedByEncryption_body =>
+      '请先关闭数据库加密，再关闭应用锁定。加密的数据库需要凭据。';
+
+  @override
+  String get settings_security_enableEncryption_title => '要加密数据库吗？';
+
+  @override
+  String get settings_security_enableEncryption_body =>
+      '首先会创建安全备份，然后就地重新加密数据库文件。日志较大时可能需要一些时间。';
+
+  @override
+  String get settings_security_disableEncryption_title => '要关闭加密吗？';
+
+  @override
+  String get settings_security_disableEncryption_body =>
+      '数据库文件将重新以未加密形式存储在磁盘上。';
+
+  @override
+  String get settings_security_turnOffAppLock_title => '要关闭应用锁定吗？';
+
+  @override
+  String get settings_security_turnOffAppLock_body => '应用打开时将不再要求输入密码。';
+
+  @override
+  String get settings_security_unlock_title => '输入您的密码';
+
+  @override
+  String get settings_security_cancel => '取消';
+
+  @override
+  String get settings_security_continue => '继续';
+
+  @override
+  String get settings_security_done => '完成';
+
+  @override
+  String get settings_security_turnOff => '关闭';
 
   @override
   String get dataQuality_inbox_title => '数据质量';

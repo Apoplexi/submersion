@@ -80,6 +80,12 @@ const settingsSections = [
     subtitle: 'Review rules & flying after diving',
   ),
   SettingsSection(
+    id: 'security',
+    icon: Icons.lock_outline,
+    title: 'App Security',
+    subtitle: 'App lock & database encryption',
+  ),
+  SettingsSection(
     id: 'manage',
     icon: Icons.folder_shared,
     title: 'Manage',
@@ -290,6 +296,8 @@ class _SettingsSectionTile extends StatelessWidget {
         return context.l10n.settings_sharedData_sectionTitle;
       case 'safety':
         return context.l10n.settings_section_safety_title;
+      case 'security':
+        return context.l10n.settings_section_security_title;
       case 'debug':
         return 'Debug';
       default:
@@ -321,6 +329,8 @@ class _SettingsSectionTile extends StatelessWidget {
         return context.l10n.settings_sharedData_sectionSubtitle;
       case 'safety':
         return context.l10n.settings_section_safety_subtitle;
+      case 'security':
+        return context.l10n.settings_section_security_subtitle;
       case 'debug':
         return 'Logs & diagnostics';
       default:

@@ -9,6 +9,11 @@ class AppLocalizationsHe extends AppLocalizations {
   AppLocalizationsHe([String locale = 'he']) : super(locale);
 
   @override
+  String diveLog_edit_flightWindowWarning(String time) {
+    return 'הצלילה הזו מסתיימת אחרי הזמן הבטוח האחרון לעלייה לפני הטיסה שלך ($time)';
+  }
+
+  @override
   String diveLog_edit_geofenceSuggestion_near(String location) {
     return 'ליד $location';
   }
@@ -3025,6 +3030,15 @@ class AppLocalizationsHe extends AppLocalizations {
   String get dashboard_gauges_noFlyClear => 'איסור טיסה 0:00';
 
   @override
+  String dashboard_gauges_flightWindow(String hours, String minutes) {
+    return 'חלון צלילה $hours:$minutes';
+  }
+
+  @override
+  String get dashboard_gauges_flightWindowClosed =>
+      'אין יותר צלילות לפני הטיסה';
+
+  @override
   String dashboard_gauges_noFlyRemaining(String hours, String minutes) {
     return 'איסור טיסה $hours:$minutes';
   }
@@ -3046,6 +3060,9 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String get settings_homeChips_description =>
       'בחר אילו שבבי מצב יופיעו בראש לשונית הבית.';
+
+  @override
+  String get settings_homeChips_flightWindow => 'חלון צלילה לפני טיסה';
 
   @override
   String get settings_homeChips_gear => 'תחזוקת ציוד';
@@ -10572,6 +10589,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get equipment_serviceDialog_costLabel => 'עלות';
 
   @override
+  String get equipment_serviceDialog_currencyLabel => 'מטבע';
+
+  @override
   String get equipment_serviceDialog_costValidation => 'הזן סכום חוקי';
 
   @override
@@ -12517,6 +12537,9 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get settings_about_reportIssue => 'דווח על בעיה';
+
+  @override
+  String get settings_about_reportIssue_copy => 'העתקת קישור';
 
   @override
   String get settings_about_reportIssue_snackbar =>
@@ -14860,6 +14883,12 @@ class AppLocalizationsHe extends AppLocalizations {
   String get settings_units_sacRate => 'קצב SAC';
 
   @override
+  String get settings_units_defaultCurrency => 'מטבע ברירת מחדל';
+
+  @override
+  String get settings_units_dialog_defaultCurrency => 'מטבע ברירת מחדל';
+
+  @override
   String get settings_units_sac_pressurePerMinute => 'לחץ לדקה';
 
   @override
@@ -17177,6 +17206,15 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get trips_edit_label_resortName => 'שם אתר הנופש';
+
+  @override
+  String get trips_edit_label_returnFlight => 'טיסת חזרה';
+
+  @override
+  String get trips_edit_returnFlightClear => 'נקה טיסת חזרה';
+
+  @override
+  String get trips_edit_returnFlightNotSet => 'לא הוגדר';
 
   @override
   String get trips_edit_label_startDate => 'תאריך התחלה';
@@ -19995,6 +20033,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get diveLog_edit_section_environment => 'סביבה';
 
   @override
+  String get diveLog_edit_subsection_autofill => 'מילוי אוטומטי';
+
+  @override
   String get diveLog_edit_subsection_weather => 'מזג אוויר';
 
   @override
@@ -21644,6 +21685,27 @@ class AppLocalizationsHe extends AppLocalizations {
       'מרווחים מנחים אחרי צלילה בודדת ללא דקו, צלילות חוזרות וצלילות דקומפרסיה';
 
   @override
+  String get flightWindow_closed => 'אין יותר צלילות לפני הטיסה';
+
+  @override
+  String get flightWindow_conflict => 'זמן איסור הטיסה שלך נמשך מעבר להמראה';
+
+  @override
+  String flightWindow_departs(String time) {
+    return 'הטיסה ממריאה $time';
+  }
+
+  @override
+  String flightWindow_openTitle(String remaining) {
+    return 'זמן צלילה שנותר: $remaining';
+  }
+
+  @override
+  String flightWindow_surfaceBy(String time) {
+    return 'לעלות אל פני השטח עד $time';
+  }
+
+  @override
   String safetyHub_noFly_active_title(String remaining) {
     return 'איסור טיסה: נותרו $remaining';
   }
@@ -21939,6 +22001,154 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get settings_section_safety_subtitle => 'כללי סקירה וטיסה אחרי צלילה';
+
+  @override
+  String get settings_section_security_title => 'אבטחת האפליקציה';
+
+  @override
+  String get settings_section_security_subtitle =>
+      'נעילת אפליקציה והצפנת מסד הנתונים';
+
+  @override
+  String get settings_security_appLock => 'נעילת אפליקציה';
+
+  @override
+  String get settings_security_appLock_subtitle =>
+      'דרישת סיסמה או ביומטריה לפתיחת האפליקציה';
+
+  @override
+  String get settings_security_biometrics => 'ביטול נעילה באמצעות ביומטריה';
+
+  @override
+  String get settings_security_autoLock => 'נעילה אוטומטית';
+
+  @override
+  String get settings_security_autoLock_immediately => 'מיד';
+
+  @override
+  String settings_security_autoLock_minutes(int minutes) {
+    String _temp0 = intl.Intl.pluralLogic(
+      minutes,
+      locale: localeName,
+      other: 'אחרי $minutes דקות',
+      one: 'אחרי דקה אחת',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get settings_security_autoLock_never => 'אף פעם';
+
+  @override
+  String get settings_security_encryption => 'הצפנת מסד הנתונים';
+
+  @override
+  String get settings_security_encryption_subtitle =>
+      'הגנו על קובץ יומן הצלילות שלכם באמצעות הצפנה במנוחה';
+
+  @override
+  String get settings_security_encryption_progress_backup =>
+      'יוצר גיבוי בטיחות...';
+
+  @override
+  String get settings_security_encryption_progress_encrypt =>
+      'מצפין את מסד הנתונים...';
+
+  @override
+  String get settings_security_encryption_progress_decrypt =>
+      'מפענח את מסד הנתונים...';
+
+  @override
+  String get settings_security_encryption_progress_reopen =>
+      'פותח מחדש את מסד הנתונים...';
+
+  @override
+  String get settings_security_changePassword => 'שינוי סיסמה';
+
+  @override
+  String get settings_security_regenerateRecovery => 'קוד שחזור חדש';
+
+  @override
+  String get settings_security_setPassword => 'הגדרת סיסמת אפליקציה';
+
+  @override
+  String get settings_security_password => 'סיסמה';
+
+  @override
+  String get settings_security_confirmPassword => 'אישור סיסמה';
+
+  @override
+  String get settings_security_currentPassword => 'סיסמה נוכחית';
+
+  @override
+  String get settings_security_newPassword => 'סיסמה חדשה';
+
+  @override
+  String get settings_security_passwordTooShort =>
+      'הסיסמה חייבת להכיל לפחות 4 תווים.';
+
+  @override
+  String get settings_security_passwordMismatch => 'הסיסמאות אינן תואמות.';
+
+  @override
+  String get settings_security_wrongPassword => 'סיסמה שגויה.';
+
+  @override
+  String get settings_security_recoveryCode_title => 'קוד השחזור שלכם';
+
+  @override
+  String get settings_security_recoveryCode_explain =>
+      'רשמו אותו ושמרו אותו במקום בטוח. זו הדרך היחידה לפתוח את האפליקציה אם תשכחו את הסיסמה, והוא מחליף כל קוד שחזור קודם.';
+
+  @override
+  String get settings_security_recoveryCode_savedConfirm =>
+      'שמרתי את קוד השחזור שלי';
+
+  @override
+  String get settings_security_disableBlockedByEncryption_title =>
+      'ההצפנה פעילה';
+
+  @override
+  String get settings_security_disableBlockedByEncryption_body =>
+      'כבו תחילה את הצפנת מסד הנתונים לפני כיבוי נעילת האפליקציה. מסד הנתונים המוצפן דורש אמצעי אימות.';
+
+  @override
+  String get settings_security_enableEncryption_title =>
+      'להצפין את מסד הנתונים?';
+
+  @override
+  String get settings_security_enableEncryption_body =>
+      'תחילה נוצר גיבוי בטיחות ואז קובץ מסד הנתונים מוצפן מחדש במקומו. זה עשוי להימשך זמן מה ביומנים גדולים.';
+
+  @override
+  String get settings_security_disableEncryption_title => 'לכבות את ההצפנה?';
+
+  @override
+  String get settings_security_disableEncryption_body =>
+      'קובץ מסד הנתונים יישמר שוב ללא הצפנה בדיסק.';
+
+  @override
+  String get settings_security_turnOffAppLock_title =>
+      'לכבות את נעילת האפליקציה?';
+
+  @override
+  String get settings_security_turnOffAppLock_body =>
+      'האפליקציה תיפתח מבלי לבקש את הסיסמה.';
+
+  @override
+  String get settings_security_unlock_title => 'הזינו את הסיסמה';
+
+  @override
+  String get settings_security_cancel => 'ביטול';
+
+  @override
+  String get settings_security_continue => 'המשך';
+
+  @override
+  String get settings_security_done => 'סיום';
+
+  @override
+  String get settings_security_turnOff => 'כיבוי';
 
   @override
   String get dataQuality_inbox_title => 'איכות הנתונים';

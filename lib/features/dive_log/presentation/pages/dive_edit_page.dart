@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart' hide Visibility;
@@ -74,6 +75,7 @@ import 'package:submersion/features/dive_log/presentation/widgets/ccr_settings_p
 import 'package:submersion/features/dive_log/presentation/widgets/dive_mode_selector.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/scr_settings_panel.dart';
 import 'package:submersion/features/tides/presentation/providers/tide_providers.dart';
+import 'package:submersion/features/weather/domain/services/altitude_resolver.dart';
 import 'package:submersion/features/weather/presentation/providers/weather_providers.dart';
 import 'package:submersion/features/courses/domain/entities/course.dart';
 import 'package:submersion/features/courses/presentation/providers/course_providers.dart';
@@ -96,6 +98,7 @@ import 'package:submersion/features/dive_log/domain/entities/bulk_edit_request.d
 import 'package:submersion/features/dive_log/presentation/pages/bulk_edit_field_set.dart';
 import 'package:submersion/features/dive_log/presentation/providers/bulk_dive_edit_provider.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/bulk_collection_mode_selector.dart';
+import 'package:submersion/features/dive_log/presentation/widgets/flight_window_warning_banner.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/bulk_field_gate.dart';
 import 'package:submersion/core/constants/tank_presets.dart';
 import 'package:submersion/features/tank_presets/domain/entities/tank_preset_entity.dart';
@@ -189,6 +192,10 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
   CurrentStrength? _currentStrength;
   EntryMethod? _entryMethod;
   EntryMethod? _exitMethod;
+  // Exit mirrors entry until the user edits the exit picker directly.
+  // Single-dive form only; the bulk layout's dropdowns share these value
+  // fields but must never trigger mirroring.
+  bool _exitMethodLinked = true;
   WaterType? _waterType;
   final _swellHeightController = TextEditingController();
   final _altitudeController = TextEditingController();
@@ -283,6 +290,31 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
   /// Suppressed while loading/populating so programmatic writes do not
   /// trip the discard guard.
   bool _suppressDirty = true;
+
+  /// In-edit dive end time, wall-clock-as-UTC: exit fields when both are
+  /// set, otherwise entry + runtime. Null when neither is derivable. Feeds
+  /// the flight-window warning banner; mirrors the save-path derivation.
+  DateTime? _currentDiveEndTime() {
+    if (_exitDate != null && _exitTime != null) {
+      return DateTime.utc(
+        _exitDate!.year,
+        _exitDate!.month,
+        _exitDate!.day,
+        _exitTime!.hour,
+        _exitTime!.minute,
+      );
+    }
+    final entry = DateTime.utc(
+      _entryDate.year,
+      _entryDate.month,
+      _entryDate.day,
+      _entryTime.hour,
+      _entryTime.minute,
+    );
+    final runtimeMinutes = int.tryParse(_runtimeController.text);
+    if (runtimeMinutes == null || runtimeMinutes <= 0) return null;
+    return entry.add(Duration(minutes: runtimeMinutes));
+  }
 
   void _markDirty() {
     if (_suppressDirty || _hasUnsavedChanges) return;
@@ -613,6 +645,8 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
           _currentStrength = dive.currentStrength;
           _entryMethod = dive.entryMethod;
           _exitMethod = dive.exitMethod;
+          _exitMethodLinked =
+              _exitMethod == null || _exitMethod == _entryMethod;
           _waterType = dive.waterType;
           _swellHeightController.text = dive.swellHeight != null
               ? units.convertDepth(dive.swellHeight!).toStringAsFixed(1)
@@ -699,6 +733,7 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
       if (mounted) {
         setState(() => _isLoading = false);
         _suppressDirty = false;
+        unawaited(_maybeAutoFillAltitude());
       }
     }
   }
@@ -797,32 +832,47 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
     final formBody = Form(
       key: _formKey,
       onChanged: _markDirty,
-      // Split after Gas & Gear so the two always-relevant groups lead the
-      // left column and the contextual ones fill the right on wide windows.
-      child: ResponsiveFormColumns(
-        splitIndex: 2,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          _buildTheDiveSection(units),
-          _buildGasGearSection(units),
-          _buildConditionsSection(units),
-          _buildTripGroupSection(units),
-          _buildBuddiesSection(),
-          _buildExperienceSection(),
-          if (_showCourseSection) _buildCourseGroupSection(),
-          if (_showCustomFieldsSection) _buildCustomFieldsGroupSection(),
-          AddSectionRow(
-            entries: [
-              if (!_showCourseSection)
-                AddSectionEntry(
-                  label: context.l10n.diveLog_edit_section_trainingCourse,
-                  onTap: () => setState(() => _expanded['course'] = true),
+          // Pinned above the scrolling form so the warning stays visible.
+          FlightWindowWarningBanner(
+            tripId: _selectedTrip?.id,
+            diveEndTime: _currentDiveEndTime(),
+          ),
+          // Split after Gas & Gear so the two always-relevant groups lead
+          // the left column and the contextual ones fill the right on wide
+          // windows. ResponsiveFormColumns owns the scroll view, so it
+          // needs the bounded height Expanded provides.
+          Expanded(
+            child: ResponsiveFormColumns(
+              splitIndex: 2,
+              children: [
+                _buildTheDiveSection(units),
+                _buildGasGearSection(units),
+                _buildConditionsSection(units),
+                _buildTripGroupSection(units),
+                _buildBuddiesSection(),
+                _buildExperienceSection(),
+                if (_showCourseSection) _buildCourseGroupSection(),
+                if (_showCustomFieldsSection) _buildCustomFieldsGroupSection(),
+                AddSectionRow(
+                  entries: [
+                    if (!_showCourseSection)
+                      AddSectionEntry(
+                        label: context.l10n.diveLog_edit_section_trainingCourse,
+                        onTap: () => setState(() => _expanded['course'] = true),
+                      ),
+                    if (!_showCustomFieldsSection)
+                      AddSectionEntry(
+                        label: context.l10n.diveLog_edit_section_customFields,
+                        onTap: () =>
+                            setState(() => _expanded['customFields'] = true),
+                      ),
+                  ],
                 ),
-              if (!_showCustomFieldsSection)
-                AddSectionEntry(
-                  label: context.l10n.diveLog_edit_section_customFields,
-                  onTap: () => setState(() => _expanded['customFields'] = true),
-                ),
-            ],
+              ],
+            ),
           ),
         ],
       ),
@@ -1949,7 +1999,18 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
   Future<void> _updateSiteWithPhotoGps(GeoPoint gps) async {
     if (_selectedSite == null) return;
 
-    final updatedSite = _selectedSite!.copyWith(location: gps);
+    var updatedSite = _selectedSite!.copyWith(location: gps);
+    // A site gaining coordinates should also gain its altitude, so later dives
+    // there resolve locally without a lookup.
+    if (updatedSite.altitude == null) {
+      final meters = await ref
+          .read(elevationServiceProvider)
+          .fetchElevation(latitude: gps.latitude, longitude: gps.longitude);
+      if (!mounted) return;
+      if (meters != null) {
+        updatedSite = updatedSite.copyWith(altitude: meters);
+      }
+    }
 
     // Update the site via the notifier
     final siteNotifier = ref.read(siteListNotifierProvider.notifier);
@@ -1977,6 +2038,7 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
   void _assignSite(DiveSite? site) {
     _selectedSite = site;
     _waterType = waterTypeAfterSiteAssign(_waterType, site);
+    unawaited(_maybeAutoFillAltitude());
   }
 
   Future<void> _showSitePicker() async {
@@ -3511,6 +3573,7 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
       temperatureSymbol: units.temperatureSymbol,
       waterTempController: _waterTempController,
       airTempController: _airTempController,
+      topRows: [_autofillOverline(units)],
       environmentRows: _environmentRows(units),
       weatherRows: _weatherRows(units),
     );
@@ -3620,34 +3683,48 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
         value: _entryMethod,
         values: EntryMethod.values,
         displayName: (v) => v.localizedName(l10n),
-        onChanged: (v) => setState(() => _entryMethod = v),
+        onChanged: (v) => setState(() {
+          _entryMethod = v;
+          if (_exitMethodLinked) _exitMethod = v;
+        }),
       ),
       EnumPickerRow<EntryMethod>(
         label: l10n.diveLog_edit_label_exitMethod,
         value: _exitMethod,
         values: EntryMethod.values,
         displayName: (v) => v.localizedName(l10n),
-        onChanged: (v) => setState(() => _exitMethod = v),
+        onChanged: (v) => setState(() {
+          _exitMethod = v;
+          _exitMethodLinked = false;
+        }),
       ),
     ];
   }
 
-  List<Widget> _weatherRows(UnitFormatter units) {
+  /// The section-leading auto-fill row: its action fills fields both above
+  /// (air temperature) and below it, so it cannot live at the weather
+  /// subsection overline.
+  Widget _autofillOverline(UnitFormatter units) {
     final l10n = context.l10n;
     final canFetchWeather =
         _selectedSite != null && _selectedSite!.hasCoordinates;
+    return FormOverline(
+      label: l10n.diveLog_edit_subsection_autofill,
+      actions: [
+        FormOverlineAction(
+          label: l10n.diveLog_edit_button_fetchWeather,
+          icon: Icons.cloud_download,
+          busy: _isFetchingWeather,
+          onPressed: canFetchWeather ? () => _fetchWeather(units) : null,
+        ),
+      ],
+    );
+  }
+
+  List<Widget> _weatherRows(UnitFormatter units) {
+    final l10n = context.l10n;
     return [
-      FormOverline(
-        label: l10n.diveLog_edit_subsection_weather,
-        actions: [
-          FormOverlineAction(
-            label: l10n.diveLog_edit_button_fetchWeather,
-            icon: Icons.cloud_download,
-            busy: _isFetchingWeather,
-            onPressed: canFetchWeather ? () => _fetchWeather(units) : null,
-          ),
-        ],
-      ),
+      FormOverline(label: l10n.diveLog_edit_subsection_weather),
       FormRow.text(
         label: l10n.diveLog_edit_label_humidity,
         controller: _humidityController,
@@ -3694,6 +3771,43 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
         maxLines: 2,
       ),
     ];
+  }
+
+  /// Fill an empty altitude field from the dive's logged GPS or the selected
+  /// site (spec: 2026-08-06 conditions design). Never overwrites a value and
+  /// never marks the form dirty on its own.
+  Future<void> _maybeAutoFillAltitude() async {
+    if (_altitudeController.text.isNotEmpty) return;
+
+    final resolver = AltitudeResolver(
+      elevationService: ref.read(elevationServiceProvider),
+    );
+    final resolution = await resolver.resolve(
+      entryLocation: _existingDive?.entryLocation,
+      exitLocation: _existingDive?.exitLocation,
+      site: _selectedSite,
+    );
+    if (!mounted) return;
+
+    final writeBack = resolution.siteWriteBack;
+    if (writeBack != null) {
+      await ref.read(siteListNotifierProvider.notifier).updateSite(writeBack);
+      if (!mounted) return;
+      if (_selectedSite?.id == writeBack.id) {
+        _selectedSite = writeBack;
+      }
+    }
+
+    final meters = resolution.altitudeMeters;
+    if (meters == null || _altitudeController.text.isNotEmpty) return;
+    final units = UnitFormatter(ref.read(settingsProvider));
+    setState(() {
+      _silently(() {
+        _altitudeController.text = units
+            .convertAltitude(meters)
+            .toStringAsFixed(0);
+      });
+    });
   }
 
   /// Fetch weather data from Open-Meteo for the selected site and dive date.
@@ -3798,6 +3912,10 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
         _weatherSource = WeatherSource.openMeteo;
         _weatherFetchedAt = DateTime.now();
       });
+
+      // Retry the altitude lookup: the on-load attempt may have failed while
+      // offline, and the user has just asked for a network fill.
+      unawaited(_maybeAutoFillAltitude());
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
