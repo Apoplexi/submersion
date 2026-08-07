@@ -18121,6 +18121,29 @@ class AppLocalizationsEn extends AppLocalizations {
       'Use the matched record';
 
   @override
+  String get universalImport_entityAction_replaceBadge => 'REPLACE';
+
+  @override
+  String get universalImport_entityAction_replaceExisting => 'Replace existing';
+
+  @override
+  String get universalImport_entityAction_replaceExistingSubtitle =>
+      'Overwrite with imported data';
+
+  @override
+  String get universalImport_entityAction_skip => 'Skip';
+
+  @override
+  String get universalImport_entityAction_skipSubtitle => 'Discard this import';
+
+  @override
+  String get universalImport_entityAction_importAsNew => 'Import as New';
+
+  @override
+  String get universalImport_entityAction_importAsNewSubtitle =>
+      'Create separate entry';
+
+  @override
   String get universalImport_pending_chooseAction => 'Choose an action';
 
   @override

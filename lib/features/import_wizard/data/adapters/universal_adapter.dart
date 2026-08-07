@@ -153,8 +153,24 @@ class UniversalAdapter implements ImportSourceAdapter {
     // File imports offer MANUAL consolidation only (no auto-consolidate: a
     // file has no single "current computer" to prove a cross-computer match).
     DuplicateAction.consolidate,
+    // Union across entity types. Overwrite-in-place is implemented for sites
+    // only -- see [duplicateActionsFor], which is what the review UI and the
+    // wizard notifier actually gate on.
     DuplicateAction.replaceSource,
   };
+
+  /// Overwrite-in-place ([DuplicateAction.replaceSource]) is only implemented
+  /// for sites: [UddfImportSelections.siteOverrides] is the sole override
+  /// channel the importer understands. Offering it on the buddies/equipment/
+  /// trips tabs would let the user mark a duplicate "decided" and then have it
+  /// silently dropped, so those tabs get the base set without it.
+  @override
+  Set<DuplicateAction> duplicateActionsFor(wizard.ImportEntityType type) {
+    if (type == wizard.ImportEntityType.sites) return supportedDuplicateActions;
+    return supportedDuplicateActions.difference(const {
+      DuplicateAction.replaceSource,
+    });
+  }
 
   @override
   List<WizardStepDef> get acquisitionSteps => [
@@ -981,6 +997,16 @@ class UniversalAdapter implements ImportSourceAdapter {
       // duplicate that is ALSO in the base selection set gets imported as a
       // new row anyway -- the twin the action exists to avoid (#756).
       if (action == DuplicateAction.consolidate &&
+          type != wizard.ImportEntityType.dives) {
+        continue;
+      }
+      // Same trap for replaceSource: it means "overwrite the matched record
+      // in place", which travels via UddfImportSelections.siteOverrides, not
+      // the create path. ImportWizardNotifier.setDuplicateAction adds every
+      // non-skip index to the base selection set, so without this guard the
+      // site would be overwritten AND re-created as a twin from the same
+      // payload.
+      if (action == DuplicateAction.replaceSource &&
           type != wizard.ImportEntityType.dives) {
         continue;
       }

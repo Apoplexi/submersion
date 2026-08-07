@@ -863,16 +863,38 @@ class UddfEntityImporter {
     var count = 0;
 
     // Handle overwrite (replaceSource): update existing sites in place.
+    //
+    // Unlike the create path below, this builds the row from the EXISTING
+    // entity via copyWith so fields absent from the import payload keep their
+    // current values. Constructing a fresh DiveSite here would reset every
+    // unmapped field to its constructor default -- notably isShared, city,
+    // island, photoIds and conditions -- because updateSite writes the whole
+    // column set, not just the fields the import happened to supply.
     for (final entry in overrides.entries) {
       final i = entry.key;
       final existingId = entry.value;
-      if (i >= items.length) continue;
+      if (i < 0 || i >= items.length) {
+        _log.warning(
+          'Site override index $i is out of range (${items.length} items); '
+          'skipping',
+        );
+        continue;
+      }
       final siteData = items[i];
       final name = siteData['name'] as String?;
-      if (name == null || name.isEmpty) continue;
+      if (name == null || name.isEmpty) {
+        _log.warning('Site override at index $i has no name; skipping');
+        continue;
+      }
 
       final existing = existingById[existingId];
-      if (existing == null) continue;
+      if (existing == null) {
+        _log.warning(
+          'Site override at index $i targets unknown site $existingId; '
+          'skipping',
+        );
+        continue;
+      }
 
       final uddfId = siteData['uddfId'] as String?;
       final lat = siteData['latitude'] as double?;
@@ -881,6 +903,7 @@ class UddfEntityImporter {
       String? country = siteData['country'] as String?;
       String? region = siteData['region'] as String?;
 
+      // Auto-lookup country/region if coordinates exist but fields are empty.
       if (lat != null && lon != null && (country == null || region == null)) {
         try {
           final geocodeResult = await LocationService.instance.reverseGeocode(
@@ -899,11 +922,11 @@ class UddfEntityImporter {
           ? SiteDifficulty.fromString(difficultyStr)
           : null;
 
-      final overwrittenSite = DiveSite(
-        id: existingId,
-        diverId: diverId,
+      // Every argument is nullable and copyWith treats null as "keep the
+      // existing value", so absent payload fields are preserved.
+      final overwrittenSite = existing.copyWith(
         name: name,
-        description: siteData['description'] as String? ?? '',
+        description: siteData['description'] as String?,
         location: (lat != null && lon != null) ? GeoPoint(lat, lon) : null,
         minDepth: siteData['minDepth'] as double?,
         maxDepth: siteData['maxDepth'] as double?,
@@ -911,7 +934,7 @@ class UddfEntityImporter {
         country: country,
         region: region,
         rating: siteData['rating'] as double?,
-        notes: siteData['notes'] as String? ?? '',
+        notes: siteData['notes'] as String?,
         hazards: siteData['hazards'] as String?,
         accessNotes: siteData['accessNotes'] as String?,
         mooringNumber: siteData['mooringNumber'] as String?,
@@ -919,23 +942,21 @@ class UddfEntityImporter {
         altitude: siteData['altitude'] as double?,
       );
 
-      await repository.updateSite(overwrittenSite);
-
+      // Core fields and the importer-only metadata columns go out as one
+      // UPDATE so a failure can't leave the row half-overwritten.
       final waterType = siteData['waterType'] as String?;
       final bodyOfWater = siteData['bodyOfWater'] as String?;
-      if (waterType != null || bodyOfWater != null) {
-        await repository.applyImportedMetadata(
-          existingId,
-          DiveSitesCompanion(
-            waterType: waterType != null
-                ? Value(waterType)
-                : const Value.absent(),
-            bodyOfWater: bodyOfWater != null
-                ? Value(bodyOfWater)
-                : const Value.absent(),
-          ),
-        );
-      }
+      await repository.updateSiteWithImportedMetadata(
+        overwrittenSite,
+        DiveSitesCompanion(
+          waterType: waterType != null
+              ? Value(waterType)
+              : const Value.absent(),
+          bodyOfWater: bodyOfWater != null
+              ? Value(bodyOfWater)
+              : const Value.absent(),
+        ),
+      );
 
       if (uddfId != null) idMapping[uddfId] = overwrittenSite;
       count++;

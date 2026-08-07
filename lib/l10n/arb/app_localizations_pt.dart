@@ -18440,6 +18440,31 @@ class AppLocalizationsPt extends AppLocalizations {
       'Usar o registro correspondente';
 
   @override
+  String get universalImport_entityAction_replaceBadge => 'SUBSTITUIR';
+
+  @override
+  String get universalImport_entityAction_replaceExisting =>
+      'Substituir existente';
+
+  @override
+  String get universalImport_entityAction_replaceExistingSubtitle =>
+      'Sobrescrever com os dados importados';
+
+  @override
+  String get universalImport_entityAction_skip => 'Pular';
+
+  @override
+  String get universalImport_entityAction_skipSubtitle =>
+      'Descartar esta importação';
+
+  @override
+  String get universalImport_entityAction_importAsNew => 'Importar como novo';
+
+  @override
+  String get universalImport_entityAction_importAsNewSubtitle =>
+      'Criar entrada separada';
+
+  @override
   String get universalImport_pending_chooseAction => 'Escolher uma acao';
 
   @override

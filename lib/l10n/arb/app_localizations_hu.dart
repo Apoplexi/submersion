@@ -18377,6 +18377,29 @@ class AppLocalizationsHu extends AppLocalizations {
       'A talált rekord használata';
 
   @override
+  String get universalImport_entityAction_replaceBadge => 'CSERE';
+
+  @override
+  String get universalImport_entityAction_replaceExisting => 'Meglévő cseréje';
+
+  @override
+  String get universalImport_entityAction_replaceExistingSubtitle =>
+      'Felülírás az importált adatokkal';
+
+  @override
+  String get universalImport_entityAction_skip => 'Kihagyás';
+
+  @override
+  String get universalImport_entityAction_skipSubtitle => 'Az import elvetése';
+
+  @override
+  String get universalImport_entityAction_importAsNew => 'Importálás újként';
+
+  @override
+  String get universalImport_entityAction_importAsNewSubtitle =>
+      'Külön bejegyzés létrehozása';
+
+  @override
   String get universalImport_pending_chooseAction => 'Valassz muveletet';
 
   @override

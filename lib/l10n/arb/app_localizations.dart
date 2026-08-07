@@ -30880,6 +30880,48 @@ abstract class AppLocalizations {
   /// **'Use the matched record'**
   String get universalImport_entityAction_linkExistingSubtitle;
 
+  /// Collapsed-header badge on a duplicate row whose action is replace-the-existing-record
+  ///
+  /// In en, this message translates to:
+  /// **'REPLACE'**
+  String get universalImport_entityAction_replaceBadge;
+
+  /// Action button on a duplicate site row: overwrite the matched existing record with the imported data
+  ///
+  /// In en, this message translates to:
+  /// **'Replace existing'**
+  String get universalImport_entityAction_replaceExisting;
+
+  /// Subtitle under the replace-existing action button
+  ///
+  /// In en, this message translates to:
+  /// **'Overwrite with imported data'**
+  String get universalImport_entityAction_replaceExistingSubtitle;
+
+  /// Action button on a duplicate entity row: do not import this item
+  ///
+  /// In en, this message translates to:
+  /// **'Skip'**
+  String get universalImport_entityAction_skip;
+
+  /// Subtitle under the skip action button
+  ///
+  /// In en, this message translates to:
+  /// **'Discard this import'**
+  String get universalImport_entityAction_skipSubtitle;
+
+  /// Action button on a duplicate entity row: create a separate new record instead of reusing the match
+  ///
+  /// In en, this message translates to:
+  /// **'Import as New'**
+  String get universalImport_entityAction_importAsNew;
+
+  /// Subtitle under the import-as-new action button
+  ///
+  /// In en, this message translates to:
+  /// **'Create separate entry'**
+  String get universalImport_entityAction_importAsNewSubtitle;
+
   /// Prompt shown above the action buttons on an expanded pending duplicate row, telling the user to pick an action
   ///
   /// In en, this message translates to:

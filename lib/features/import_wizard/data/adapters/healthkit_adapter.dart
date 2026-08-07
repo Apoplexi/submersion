@@ -109,6 +109,11 @@ class HealthKitAdapter implements ImportSourceAdapter {
     DuplicateAction.importAsNew,
   };
 
+  /// HealthKit only produces dives, so every tab gets the adapter-wide set.
+  @override
+  Set<DuplicateAction> duplicateActionsFor(ImportEntityType type) =>
+      supportedDuplicateActions;
+
   @override
   List<WizardStepDef> get acquisitionSteps => [
     WizardStepDef(

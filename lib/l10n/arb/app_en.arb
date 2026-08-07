@@ -10704,6 +10704,13 @@
   "universalImport_entityAction_linkBadge": "LINK",
   "universalImport_entityAction_linkExisting": "Link to existing",
   "universalImport_entityAction_linkExistingSubtitle": "Use the matched record",
+  "universalImport_entityAction_replaceBadge": "REPLACE",
+  "universalImport_entityAction_replaceExisting": "Replace existing",
+  "universalImport_entityAction_replaceExistingSubtitle": "Overwrite with imported data",
+  "universalImport_entityAction_skip": "Skip",
+  "universalImport_entityAction_skipSubtitle": "Discard this import",
+  "universalImport_entityAction_importAsNew": "Import as New",
+  "universalImport_entityAction_importAsNewSubtitle": "Create separate entry",
   "universalImport_pending_chooseAction": "Choose an action",
   "universalImport_pending_gateHint": "{count} duplicate(s) need a decision",
   "universalImport_pending_needsDecision": "Needs decision",
@@ -11027,6 +11034,27 @@
   },
   "@universalImport_entityAction_linkExistingSubtitle": {
     "description": "Subtitle under the link-to-existing action button"
+  },
+  "@universalImport_entityAction_replaceBadge": {
+    "description": "Collapsed-header badge on a duplicate row whose action is replace-the-existing-record"
+  },
+  "@universalImport_entityAction_replaceExisting": {
+    "description": "Action button on a duplicate site row: overwrite the matched existing record with the imported data"
+  },
+  "@universalImport_entityAction_replaceExistingSubtitle": {
+    "description": "Subtitle under the replace-existing action button"
+  },
+  "@universalImport_entityAction_skip": {
+    "description": "Action button on a duplicate entity row: do not import this item"
+  },
+  "@universalImport_entityAction_skipSubtitle": {
+    "description": "Subtitle under the skip action button"
+  },
+  "@universalImport_entityAction_importAsNew": {
+    "description": "Action button on a duplicate entity row: create a separate new record instead of reusing the match"
+  },
+  "@universalImport_entityAction_importAsNewSubtitle": {
+    "description": "Subtitle under the import-as-new action button"
   },
   "@universalImport_pending_chooseAction": {
     "description": "Prompt shown above the action buttons on an expanded pending duplicate row, telling the user to pick an action"

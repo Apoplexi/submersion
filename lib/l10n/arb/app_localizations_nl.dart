@@ -18282,6 +18282,31 @@ class AppLocalizationsNl extends AppLocalizations {
       'Gebruik het overeenkomende record';
 
   @override
+  String get universalImport_entityAction_replaceBadge => 'VERVANGEN';
+
+  @override
+  String get universalImport_entityAction_replaceExisting =>
+      'Bestaande vervangen';
+
+  @override
+  String get universalImport_entityAction_replaceExistingSubtitle =>
+      'Overschrijven met geïmporteerde gegevens';
+
+  @override
+  String get universalImport_entityAction_skip => 'Overslaan';
+
+  @override
+  String get universalImport_entityAction_skipSubtitle =>
+      'Deze import verwerpen';
+
+  @override
+  String get universalImport_entityAction_importAsNew => 'Als nieuw importeren';
+
+  @override
+  String get universalImport_entityAction_importAsNewSubtitle =>
+      'Aparte vermelding maken';
+
+  @override
   String get universalImport_pending_chooseAction => 'Kies een actie';
 
   @override
