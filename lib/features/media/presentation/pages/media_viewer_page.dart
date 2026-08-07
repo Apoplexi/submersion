@@ -320,8 +320,14 @@ class _MediaViewerPageState extends ConsumerState<MediaViewerPage> {
                     onWriteMetadata: () => _writeMetadataToPhoto(currentItem),
                     onGoToDive: widget.showGoToDive && currentDiveId != null
                         ? () {
+                            // push, not go: `/dives/:diveId` is a child route,
+                            // so a stack-replacing `go` would rebuild the stack
+                            // as [dive list, dive detail] and strand the user
+                            // on the dive list when they press back. Pushing
+                            // keeps the section they came from underneath.
+                            final router = GoRouter.of(context);
                             Navigator.of(context).pop();
-                            context.go('/dives/$currentDiveId');
+                            router.push('/dives/$currentDiveId');
                           }
                         : null,
                     hasEnrichment: enrichment?.depthMeters != null,

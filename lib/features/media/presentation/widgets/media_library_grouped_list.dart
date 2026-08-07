@@ -91,7 +91,11 @@ class MediaLibraryGroupedList extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(12, 12, 12, 4),
             child: header.diveId != null
                 ? InkWell(
-                    onTap: () => context.go('/dives/${header.diveId}'),
+                    // push, not go: `/dives/:diveId` is a child route, so a
+                    // stack-replacing `go` would strand the user on the dive
+                    // list when they press back instead of returning them to
+                    // the library.
+                    onTap: () => context.push('/dives/${header.diveId}'),
                     child: Text(
                       label,
                       style: Theme.of(context).textTheme.titleMedium,

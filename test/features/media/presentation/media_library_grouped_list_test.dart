@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
 import 'package:submersion/features/media/domain/entities/media_item.dart';
 import 'package:submersion/features/media/domain/entities/media_library_filter.dart';
 import 'package:submersion/features/media/domain/entities/media_source_type.dart';
@@ -111,6 +112,62 @@ void main() {
 
     // The linked header navigates; the unlinked one has nowhere to go.
     expect(find.byType(InkWell), findsOneWidget);
+  });
+
+  testWidgets('a dive header leaves the library beneath the dive detail', (
+    tester,
+  ) async {
+    // Mirrors the real router: :diveId is a CHILD of /dives, so a stack-
+    // replacing navigation would synthesize the dive list underneath.
+    final router = GoRouter(
+      initialLocation: '/media',
+      routes: [
+        GoRoute(
+          path: '/media',
+          builder: (context, state) => Scaffold(
+            body: MediaLibraryGroupedList(
+              groups: [diveGroup(diveId: 'd1', diveNumber: 9)],
+              hasMore: false,
+              onLoadMore: () {},
+              onTileTap: (_) {},
+              selectedIds: const {},
+            ),
+          ),
+        ),
+        GoRoute(
+          path: '/dives',
+          builder: (context, state) => const Scaffold(body: Text('Dive List')),
+          routes: [
+            GoRoute(
+              path: ':diveId',
+              builder: (context, state) =>
+                  Scaffold(appBar: AppBar(), body: const Text('Dive Detail')),
+            ),
+          ],
+        ),
+      ],
+    );
+    addTearDown(router.dispose);
+
+    await tester.pumpWidget(
+      MaterialApp.router(
+        routerConfig: router,
+        locale: const Locale('en'),
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('#9'));
+    await tester.pumpAndSettle();
+    expect(find.text('Dive Detail'), findsOneWidget);
+
+    await tester.tap(find.byType(BackButton));
+    await tester.pumpAndSettle();
+
+    expect(find.text('#9'), findsOneWidget);
+    expect(find.text('Dive List'), findsNothing);
   });
 
   testWidgets('tiles report taps with their entry', (tester) async {

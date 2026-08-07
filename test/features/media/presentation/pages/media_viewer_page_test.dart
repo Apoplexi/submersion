@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:submersion/features/media/data/services/media_source_resolver_registry.dart';
 import 'package:submersion/features/media/domain/entities/media_item.dart';
@@ -147,5 +148,84 @@ void main() {
       showGoToDive: true,
     );
     expect(find.byTooltip('Go to dive'), findsNothing);
+  });
+
+  testWidgets('Go to dive leaves the media section beneath the dive detail', (
+    tester,
+  ) async {
+    // Mirrors the real router: :diveId is a CHILD of /dives, so a stack-
+    // replacing navigation would synthesize the dive list underneath.
+    final router = GoRouter(
+      initialLocation: '/media',
+      routes: [
+        GoRoute(
+          path: '/media',
+          builder: (context, state) => Scaffold(
+            body: Builder(
+              builder: (inner) => TextButton(
+                onPressed: () => Navigator.of(inner).push(
+                  MaterialPageRoute<void>(
+                    fullscreenDialog: true,
+                    builder: (_) => MediaViewerPage(
+                      mediaList: [item('a', diveId: 'd1')],
+                      initialMediaId: 'a',
+                      showGoToDive: true,
+                    ),
+                  ),
+                ),
+                child: const Text('Media Section'),
+              ),
+            ),
+          ),
+        ),
+        GoRoute(
+          path: '/dives',
+          builder: (context, state) => const Scaffold(body: Text('Dive List')),
+          routes: [
+            GoRoute(
+              path: ':diveId',
+              builder: (context, state) =>
+                  Scaffold(appBar: AppBar(), body: const Text('Dive Detail')),
+            ),
+          ],
+        ),
+      ],
+    );
+    addTearDown(router.dispose);
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          sharedPreferencesProvider.overrideWithValue(prefs),
+          mediaSourceResolverRegistryProvider.overrideWithValue(
+            MediaSourceResolverRegistry({
+              MediaSourceType.platformGallery: _UnavailableResolver(
+                MediaSourceType.platformGallery,
+              ),
+            }),
+          ),
+        ],
+        child: MaterialApp.router(
+          routerConfig: router,
+          locale: const Locale('en'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Media Section'));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byTooltip('Go to dive'));
+    await tester.pumpAndSettle();
+    expect(find.text('Dive Detail'), findsOneWidget);
+
+    await tester.tap(find.byType(BackButton));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Media Section'), findsOneWidget);
+    expect(find.text('Dive List'), findsNothing);
   });
 }
