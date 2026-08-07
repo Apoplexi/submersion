@@ -22,7 +22,6 @@ class DiveSummary extends Equatable {
   final bool isFavorite;
   final List<String> diveTypeIds;
   final List<Tag> tags;
-  final List<String> buddyNames;
 
   // Site fields (from LEFT JOIN, avoids loading full DiveSite object)
   final String? siteName;
@@ -52,7 +51,6 @@ class DiveSummary extends Equatable {
     this.isFavorite = false,
     this.diveTypeIds = const ['recreational'],
     this.tags = const [],
-    this.buddyNames = const [],
     this.siteName,
     this.siteCountry,
     this.siteRegion,
@@ -83,10 +81,6 @@ class DiveSummary extends Equatable {
       isFavorite: dive.isFavorite,
       diveTypeIds: dive.diveTypeIds,
       tags: dive.tags,
-      buddyNames: [
-        if (dive.buddy != null && dive.buddy!.isNotEmpty) dive.buddy!,
-        ...dive.buddies.map((b) => b.buddy.name),
-      ],
       siteName: dive.site?.name,
       siteCountry: dive.site?.country,
       siteRegion: dive.site?.region,
@@ -137,7 +131,6 @@ class DiveSummary extends Equatable {
     bool? isFavorite,
     List<String>? diveTypeIds,
     List<Tag>? tags,
-    List<String>? buddyNames,
     String? siteName,
     String? siteCountry,
     String? siteRegion,
@@ -160,7 +153,6 @@ class DiveSummary extends Equatable {
       isFavorite: isFavorite ?? this.isFavorite,
       diveTypeIds: diveTypeIds ?? this.diveTypeIds,
       tags: tags ?? this.tags,
-      buddyNames: buddyNames ?? this.buddyNames,
       siteName: siteName ?? this.siteName,
       siteCountry: siteCountry ?? this.siteCountry,
       siteRegion: siteRegion ?? this.siteRegion,
@@ -186,7 +178,6 @@ class DiveSummary extends Equatable {
     isFavorite,
     diveTypeIds,
     tags,
-    buddyNames,
     siteName,
     siteCountry,
     siteRegion,
