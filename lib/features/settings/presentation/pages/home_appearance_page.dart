@@ -85,8 +85,9 @@ class HomeAppearancePage extends ConsumerWidget {
           itemCount: cards.length,
           proxyDecorator: (child, index, animation) =>
               Material(elevation: 4, child: child),
-          onReorder: (oldIndex, newIndex) {
-            if (newIndex > oldIndex) newIndex -= 1;
+          // onReorderItem pre-adjusts newIndex for the removed item, so no
+          // manual decrement is needed (unlike the deprecated onReorder).
+          onReorderItem: (oldIndex, newIndex) {
             final updated = List.of(cards);
             final moved = updated.removeAt(oldIndex);
             updated.insert(newIndex, moved);
