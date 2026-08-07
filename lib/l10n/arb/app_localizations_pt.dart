@@ -12328,7 +12328,69 @@ class AppLocalizationsPt extends AppLocalizations {
   String get nav_gpsLog => 'Registro GPS';
 
   @override
+  String get media_console_library => 'Biblioteca';
+
+  @override
+  String get media_console_transfers => 'Transferências';
+
+  @override
+  String get media_library_empty => 'Nenhuma mídia ainda';
+
+  @override
+  String get media_library_filter_all => 'Tudo';
+
+  @override
+  String get media_library_filter_photos => 'Fotos';
+
+  @override
+  String get media_library_filter_videos => 'Vídeos';
+
+  @override
+  String get media_library_filter_site => 'Ponto';
+
+  @override
+  String get media_library_filter_trip => 'Viagem';
+
+  @override
+  String get media_library_filter_dates => 'Datas';
+
+  @override
+  String get media_library_filter_clear => 'Limpar filtros';
+
+  @override
+  String get media_library_deleteConfirmBody =>
+      'Isso os remove do aplicativo e de qualquer armazenamento de mídia. Não pode ser desfeito.';
+
+  @override
+  String media_library_deleteConfirmTitle(int count) {
+    return 'Excluir $count itens?';
+  }
+
+  @override
+  String media_library_selectedCount(int count) {
+    return '$count selecionados';
+  }
+
+  @override
+  String get media_library_unlinkedHeader => 'Sem vínculo';
+
+  @override
+  String get media_library_viewMode_byDive => 'Por mergulho';
+
+  @override
+  String get media_library_viewMode_grid => 'Grade';
+
+  @override
+  String get media_library_viewMode_timeline => 'Linha do tempo';
+
+  @override
+  String get media_viewer_goToDive => 'Ir para o mergulho';
+
+  @override
   String get nav_home => 'Inicio';
+
+  @override
+  String get nav_media => 'Mídia';
 
   @override
   String get nav_more => 'Mais';

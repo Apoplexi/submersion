@@ -1246,6 +1246,11 @@ class Media extends Table {
   TextColumn get compressedLevel => text().nullable()();
   IntColumn get compressedSizeBytes => integer().nullable()();
   IntColumn get remoteCompressedUploadedAt => integer().nullable()();
+  // Media section Phase 1 (v140): kept-in-library marker. Dormant until the
+  // Phase 2 link-management UI sets it; the orphan sweep will exclude rows
+  // where it is true. Synced with the row like every other media column.
+  BoolColumn get retainInLibrary =>
+      boolean().withDefault(const Constant(false))();
   // coverage:ignore-end
   IntColumn get createdAt => integer()();
   IntColumn get updatedAt => integer()();
@@ -3105,7 +3110,8 @@ class AppDatabase extends _$AppDatabase {
     // v139: cylinder_configs + cylinder_config_items (reusable diluent and
     // bailout setups).
     139,
-    // v140 is reserved by the media-section branch (media.retain_in_library).
+    // v140: media.retain_in_library (Media section Phase 1).
+    140,
     // v141: diver_settings.default_currency (default currency for priced
     // items). Renumbered from v138 and then v139 as those went to the
     // divelogs.de branch and the cylinder configs respectively.
@@ -3732,6 +3738,20 @@ class AppDatabase extends _$AppDatabase {
           'INTEGER NOT NULL DEFAULT 0 CHECK ($column IN (0, 1))',
         );
       }
+    }
+  }
+
+  /// v140: media.retain_in_library (Media section Phase 1). Idempotent; safe
+  /// to call from both onUpgrade and the beforeOpen backstop.
+  Future<void> _assertMediaRetainInLibraryColumn() async {
+    final cols = await customSelect("PRAGMA table_info('media')").get();
+    if (cols.isEmpty) return;
+    final names = cols.map((c) => c.read<String>('name')).toSet();
+    if (!names.contains('retain_in_library')) {
+      await customStatement(
+        'ALTER TABLE media ADD COLUMN retain_in_library '
+        'INTEGER NOT NULL DEFAULT 0 CHECK (retain_in_library IN (0, 1))',
+      );
     }
   }
 
@@ -7343,6 +7363,14 @@ class AppDatabase extends _$AppDatabase {
           await _assertCylinderConfigSchema();
           await reportProgress();
         }
+        // v140: media.retain_in_library (Media section Phase 1). v138
+        // (divelogs) lives on a parallel branch; a DB arriving here from 137
+        // runs the v139 cylinder block then this one, and the beforeOpen
+        // backstop self-heals any DB a parallel branch strands in between.
+        if (from < 140) {
+          await _assertMediaRetainInLibraryColumn();
+        }
+        if (from < 140) await reportProgress();
         // v141: default currency for priced items (e.g. equipment). A DB
         // that upgraded past 141 on a parallel branch never enters this block;
         // the beforeOpen backstop below is its only path to the column.
@@ -7351,8 +7379,8 @@ class AppDatabase extends _$AppDatabase {
         }
         if (from < 141) await reportProgress();
         // v142: trips.return_flight_at (return-flight dive-window countdown).
-        // v138 (#603) and v140 (media section) are reserved by parallel
-        // branches; the beforeOpen backstop heals any DB stranded between.
+        // v138 (#603) is reserved by a parallel branch; the beforeOpen
+        // backstop heals any DB stranded between.
         if (from < 142) {
           await _assertTripReturnFlightColumn();
         }
@@ -7377,6 +7405,11 @@ class AppDatabase extends _$AppDatabase {
 
         // v137 backstop: re-assert dives.weather_code.
         await _assertWeatherCodeColumn();
+
+        // v140 backstop: re-assert media.retain_in_library. A device
+        // already at 141/142 never enters the `from < 140` block above, so
+        // this is the ONLY path that gives it the column.
+        await _assertMediaRetainInLibraryColumn();
 
         // v141 backstop: re-assert diver_settings.default_currency.
         await _assertDefaultCurrencyColumn();

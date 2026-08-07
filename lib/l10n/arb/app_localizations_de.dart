@@ -12316,7 +12316,69 @@ class AppLocalizationsDe extends AppLocalizations {
   String get nav_gpsLog => 'GPS-Log';
 
   @override
+  String get media_console_library => 'Bibliothek';
+
+  @override
+  String get media_console_transfers => 'Übertragungen';
+
+  @override
+  String get media_library_empty => 'Noch keine Medien';
+
+  @override
+  String get media_library_filter_all => 'Alle';
+
+  @override
+  String get media_library_filter_photos => 'Fotos';
+
+  @override
+  String get media_library_filter_videos => 'Videos';
+
+  @override
+  String get media_library_filter_site => 'Tauchplatz';
+
+  @override
+  String get media_library_filter_trip => 'Reise';
+
+  @override
+  String get media_library_filter_dates => 'Zeitraum';
+
+  @override
+  String get media_library_filter_clear => 'Filter zurücksetzen';
+
+  @override
+  String get media_library_deleteConfirmBody =>
+      'Dies entfernt sie aus der App und aus jedem Medienspeicher. Dies kann nicht rückgängig gemacht werden.';
+
+  @override
+  String media_library_deleteConfirmTitle(int count) {
+    return '$count Elemente löschen?';
+  }
+
+  @override
+  String media_library_selectedCount(int count) {
+    return '$count ausgewählt';
+  }
+
+  @override
+  String get media_library_unlinkedHeader => 'Nicht verknüpft';
+
+  @override
+  String get media_library_viewMode_byDive => 'Nach Tauchgang';
+
+  @override
+  String get media_library_viewMode_grid => 'Raster';
+
+  @override
+  String get media_library_viewMode_timeline => 'Zeitleiste';
+
+  @override
+  String get media_viewer_goToDive => 'Zum Tauchgang';
+
+  @override
   String get nav_home => 'Startseite';
+
+  @override
+  String get nav_media => 'Medien';
 
   @override
   String get nav_more => 'Mehr';

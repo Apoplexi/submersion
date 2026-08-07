@@ -12101,7 +12101,69 @@ class AppLocalizationsAr extends AppLocalizations {
   String get nav_gpsLog => 'سجل GPS';
 
   @override
+  String get media_console_library => 'المكتبة';
+
+  @override
+  String get media_console_transfers => 'عمليات النقل';
+
+  @override
+  String get media_library_empty => 'لا توجد وسائط بعد';
+
+  @override
+  String get media_library_filter_all => 'الكل';
+
+  @override
+  String get media_library_filter_photos => 'الصور';
+
+  @override
+  String get media_library_filter_videos => 'مقاطع الفيديو';
+
+  @override
+  String get media_library_filter_site => 'الموقع';
+
+  @override
+  String get media_library_filter_trip => 'الرحلة';
+
+  @override
+  String get media_library_filter_dates => 'التواريخ';
+
+  @override
+  String get media_library_filter_clear => 'مسح عوامل التصفية';
+
+  @override
+  String get media_library_deleteConfirmBody =>
+      'ستتم إزالتها من التطبيق ومن أي مخزن وسائط. لا يمكن التراجع عن هذا.';
+
+  @override
+  String media_library_deleteConfirmTitle(int count) {
+    return 'حذف $count عناصر؟';
+  }
+
+  @override
+  String media_library_selectedCount(int count) {
+    return 'تم تحديد $count';
+  }
+
+  @override
+  String get media_library_unlinkedHeader => 'غير مرتبطة';
+
+  @override
+  String get media_library_viewMode_byDive => 'حسب الغطسة';
+
+  @override
+  String get media_library_viewMode_grid => 'شبكة';
+
+  @override
+  String get media_library_viewMode_timeline => 'الخط الزمني';
+
+  @override
+  String get media_viewer_goToDive => 'الانتقال إلى الغطسة';
+
+  @override
   String get nav_home => 'الرئيسية';
+
+  @override
+  String get nav_media => 'الوسائط';
 
   @override
   String get nav_more => 'المزيد';

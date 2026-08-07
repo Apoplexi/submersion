@@ -7072,7 +7072,90 @@
   "nav_dives": "Dives",
   "nav_equipment": "Equipment",
   "nav_gpsLog": "GPS Log",
+  "media_console_library": "Library",
+  "@media_console_library": {
+    "description": "Media console sidebar/tab label for the library view"
+  },
+  "media_console_transfers": "Transfers",
+  "@media_console_transfers": {
+    "description": "Media console sidebar/tab label for the transfers view"
+  },
+  "media_library_empty": "No media yet",
+  "@media_library_empty": {
+    "description": "Empty state for the media library"
+  },
+  "media_library_filter_all": "All",
+  "@media_library_filter_all": {
+    "description": "Library filter chip: no type filter"
+  },
+  "media_library_filter_photos": "Photos",
+  "@media_library_filter_photos": {
+    "description": "Library filter chip: photos only"
+  },
+  "media_library_filter_videos": "Videos",
+  "@media_library_filter_videos": {
+    "description": "Library filter chip: videos only"
+  },
+  "media_library_filter_site": "Site",
+  "@media_library_filter_site": {
+    "description": "Library filter chip: pick a dive site"
+  },
+  "media_library_filter_trip": "Trip",
+  "@media_library_filter_trip": {
+    "description": "Library filter chip: pick a trip"
+  },
+  "media_library_filter_dates": "Dates",
+  "@media_library_filter_dates": {
+    "description": "Library filter chip: pick a date range"
+  },
+  "media_library_filter_clear": "Clear filters",
+  "@media_library_filter_clear": {
+    "description": "Library filter chip: reset every filter"
+  },
+  "media_library_deleteConfirmBody": "This removes them from the app and any media store. This cannot be undone.",
+  "@media_library_deleteConfirmBody": {
+    "description": "Body of the bulk delete confirmation dialog"
+  },
+  "media_library_deleteConfirmTitle": "Delete {count} items?",
+  "@media_library_deleteConfirmTitle": {
+    "description": "Title of the bulk delete confirmation dialog",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "media_library_selectedCount": "{count} selected",
+  "@media_library_selectedCount": {
+    "description": "Selection bar count label",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "media_library_unlinkedHeader": "Unlinked",
+  "@media_library_unlinkedHeader": {
+    "description": "By-dive view header for media attached to no dive"
+  },
+  "media_library_viewMode_byDive": "By dive",
+  "@media_library_viewMode_byDive": {
+    "description": "Library view mode: grouped by dive"
+  },
+  "media_library_viewMode_grid": "Grid",
+  "@media_library_viewMode_grid": {
+    "description": "Library view mode: flat grid"
+  },
+  "media_library_viewMode_timeline": "Timeline",
+  "@media_library_viewMode_timeline": {
+    "description": "Library view mode: date-grouped timeline"
+  },
+  "media_viewer_goToDive": "Go to dive",
+  "@media_viewer_goToDive": {
+    "description": "Viewer action: navigate to the dive owning this media"
+  },
   "nav_home": "Home",
+  "nav_media": "Media",
   "nav_more": "More",
   "nav_planning": "Planning",
   "nav_planningSubtitle": "Dive Planner, Calculators",
@@ -7107,6 +7190,9 @@
   },
   "@nav_home": {
     "description": "Navigation label for home/dashboard"
+  },
+  "@nav_media": {
+    "description": "Navigation label for the media section"
   },
   "@nav_more": {
     "description": "Navigation label for the 'more' menu on mobile"

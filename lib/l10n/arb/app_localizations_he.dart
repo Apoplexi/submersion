@@ -12019,7 +12019,69 @@ class AppLocalizationsHe extends AppLocalizations {
   String get nav_gpsLog => 'יומן GPS';
 
   @override
+  String get media_console_library => 'ספרייה';
+
+  @override
+  String get media_console_transfers => 'העברות';
+
+  @override
+  String get media_library_empty => 'אין מדיה עדיין';
+
+  @override
+  String get media_library_filter_all => 'הכול';
+
+  @override
+  String get media_library_filter_photos => 'תמונות';
+
+  @override
+  String get media_library_filter_videos => 'סרטונים';
+
+  @override
+  String get media_library_filter_site => 'אתר';
+
+  @override
+  String get media_library_filter_trip => 'טיול';
+
+  @override
+  String get media_library_filter_dates => 'תאריכים';
+
+  @override
+  String get media_library_filter_clear => 'ניקוי מסננים';
+
+  @override
+  String get media_library_deleteConfirmBody =>
+      'פעולה זו מסירה אותם מהאפליקציה ומכל מאגר מדיה. לא ניתן לבטל זאת.';
+
+  @override
+  String media_library_deleteConfirmTitle(int count) {
+    return 'למחוק $count פריטים?';
+  }
+
+  @override
+  String media_library_selectedCount(int count) {
+    return '$count נבחרו';
+  }
+
+  @override
+  String get media_library_unlinkedHeader => 'לא מקושרים';
+
+  @override
+  String get media_library_viewMode_byDive => 'לפי צלילה';
+
+  @override
+  String get media_library_viewMode_grid => 'רשת';
+
+  @override
+  String get media_library_viewMode_timeline => 'ציר זמן';
+
+  @override
+  String get media_viewer_goToDive => 'מעבר לצלילה';
+
+  @override
   String get nav_home => 'בית';
+
+  @override
+  String get nav_media => 'מדיה';
 
   @override
   String get nav_more => 'עוד';

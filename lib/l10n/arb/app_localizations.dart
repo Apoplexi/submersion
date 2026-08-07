@@ -20887,11 +20887,125 @@ abstract class AppLocalizations {
   /// **'GPS Log'**
   String get nav_gpsLog;
 
+  /// Media console sidebar/tab label for the library view
+  ///
+  /// In en, this message translates to:
+  /// **'Library'**
+  String get media_console_library;
+
+  /// Media console sidebar/tab label for the transfers view
+  ///
+  /// In en, this message translates to:
+  /// **'Transfers'**
+  String get media_console_transfers;
+
+  /// Empty state for the media library
+  ///
+  /// In en, this message translates to:
+  /// **'No media yet'**
+  String get media_library_empty;
+
+  /// Library filter chip: no type filter
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get media_library_filter_all;
+
+  /// Library filter chip: photos only
+  ///
+  /// In en, this message translates to:
+  /// **'Photos'**
+  String get media_library_filter_photos;
+
+  /// Library filter chip: videos only
+  ///
+  /// In en, this message translates to:
+  /// **'Videos'**
+  String get media_library_filter_videos;
+
+  /// Library filter chip: pick a dive site
+  ///
+  /// In en, this message translates to:
+  /// **'Site'**
+  String get media_library_filter_site;
+
+  /// Library filter chip: pick a trip
+  ///
+  /// In en, this message translates to:
+  /// **'Trip'**
+  String get media_library_filter_trip;
+
+  /// Library filter chip: pick a date range
+  ///
+  /// In en, this message translates to:
+  /// **'Dates'**
+  String get media_library_filter_dates;
+
+  /// Library filter chip: reset every filter
+  ///
+  /// In en, this message translates to:
+  /// **'Clear filters'**
+  String get media_library_filter_clear;
+
+  /// Body of the bulk delete confirmation dialog
+  ///
+  /// In en, this message translates to:
+  /// **'This removes them from the app and any media store. This cannot be undone.'**
+  String get media_library_deleteConfirmBody;
+
+  /// Title of the bulk delete confirmation dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Delete {count} items?'**
+  String media_library_deleteConfirmTitle(int count);
+
+  /// Selection bar count label
+  ///
+  /// In en, this message translates to:
+  /// **'{count} selected'**
+  String media_library_selectedCount(int count);
+
+  /// By-dive view header for media attached to no dive
+  ///
+  /// In en, this message translates to:
+  /// **'Unlinked'**
+  String get media_library_unlinkedHeader;
+
+  /// Library view mode: grouped by dive
+  ///
+  /// In en, this message translates to:
+  /// **'By dive'**
+  String get media_library_viewMode_byDive;
+
+  /// Library view mode: flat grid
+  ///
+  /// In en, this message translates to:
+  /// **'Grid'**
+  String get media_library_viewMode_grid;
+
+  /// Library view mode: date-grouped timeline
+  ///
+  /// In en, this message translates to:
+  /// **'Timeline'**
+  String get media_library_viewMode_timeline;
+
+  /// Viewer action: navigate to the dive owning this media
+  ///
+  /// In en, this message translates to:
+  /// **'Go to dive'**
+  String get media_viewer_goToDive;
+
   /// Navigation label for home/dashboard
   ///
   /// In en, this message translates to:
   /// **'Home'**
   String get nav_home;
+
+  /// Navigation label for the media section
+  ///
+  /// In en, this message translates to:
+  /// **'Media'**
+  String get nav_media;
 
   /// Navigation label for the 'more' menu on mobile
   ///

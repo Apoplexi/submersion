@@ -11762,7 +11762,68 @@ class AppLocalizationsZh extends AppLocalizations {
   String get nav_gpsLog => 'GPS 记录';
 
   @override
+  String get media_console_library => '媒体库';
+
+  @override
+  String get media_console_transfers => '传输';
+
+  @override
+  String get media_library_empty => '暂无媒体';
+
+  @override
+  String get media_library_filter_all => '全部';
+
+  @override
+  String get media_library_filter_photos => '照片';
+
+  @override
+  String get media_library_filter_videos => '视频';
+
+  @override
+  String get media_library_filter_site => '潜点';
+
+  @override
+  String get media_library_filter_trip => '行程';
+
+  @override
+  String get media_library_filter_dates => '日期';
+
+  @override
+  String get media_library_filter_clear => '清除筛选';
+
+  @override
+  String get media_library_deleteConfirmBody => '这会将它们从应用和任何媒体存储中移除。此操作无法撤销。';
+
+  @override
+  String media_library_deleteConfirmTitle(int count) {
+    return '删除 $count 个项目？';
+  }
+
+  @override
+  String media_library_selectedCount(int count) {
+    return '已选择 $count 项';
+  }
+
+  @override
+  String get media_library_unlinkedHeader => '未关联';
+
+  @override
+  String get media_library_viewMode_byDive => '按潜水';
+
+  @override
+  String get media_library_viewMode_grid => '网格';
+
+  @override
+  String get media_library_viewMode_timeline => '时间线';
+
+  @override
+  String get media_viewer_goToDive => '前往潜水';
+
+  @override
   String get nav_home => '首页';
+
+  @override
+  String get nav_media => '媒体';
 
   @override
   String get nav_more => '更多';

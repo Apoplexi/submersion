@@ -12229,7 +12229,69 @@ class AppLocalizationsNl extends AppLocalizations {
   String get nav_gpsLog => 'GPS-log';
 
   @override
+  String get media_console_library => 'Bibliotheek';
+
+  @override
+  String get media_console_transfers => 'Overdrachten';
+
+  @override
+  String get media_library_empty => 'Nog geen media';
+
+  @override
+  String get media_library_filter_all => 'Alles';
+
+  @override
+  String get media_library_filter_photos => 'Foto\'s';
+
+  @override
+  String get media_library_filter_videos => 'Video\'s';
+
+  @override
+  String get media_library_filter_site => 'Duikstek';
+
+  @override
+  String get media_library_filter_trip => 'Reis';
+
+  @override
+  String get media_library_filter_dates => 'Datums';
+
+  @override
+  String get media_library_filter_clear => 'Filters wissen';
+
+  @override
+  String get media_library_deleteConfirmBody =>
+      'Dit verwijdert ze uit de app en elke mediaopslag. Dit kan niet ongedaan worden gemaakt.';
+
+  @override
+  String media_library_deleteConfirmTitle(int count) {
+    return '$count items verwijderen?';
+  }
+
+  @override
+  String media_library_selectedCount(int count) {
+    return '$count geselecteerd';
+  }
+
+  @override
+  String get media_library_unlinkedHeader => 'Niet gekoppeld';
+
+  @override
+  String get media_library_viewMode_byDive => 'Per duik';
+
+  @override
+  String get media_library_viewMode_grid => 'Raster';
+
+  @override
+  String get media_library_viewMode_timeline => 'Tijdlijn';
+
+  @override
+  String get media_viewer_goToDive => 'Naar duik';
+
+  @override
   String get nav_home => 'Home';
+
+  @override
+  String get nav_media => 'Media';
 
   @override
   String get nav_more => 'Meer';

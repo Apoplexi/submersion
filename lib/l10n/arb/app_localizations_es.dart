@@ -12312,7 +12312,69 @@ class AppLocalizationsEs extends AppLocalizations {
   String get nav_gpsLog => 'Registro GPS';
 
   @override
+  String get media_console_library => 'Biblioteca';
+
+  @override
+  String get media_console_transfers => 'Transferencias';
+
+  @override
+  String get media_library_empty => 'Todavía no hay contenido multimedia';
+
+  @override
+  String get media_library_filter_all => 'Todo';
+
+  @override
+  String get media_library_filter_photos => 'Fotos';
+
+  @override
+  String get media_library_filter_videos => 'Vídeos';
+
+  @override
+  String get media_library_filter_site => 'Sitio';
+
+  @override
+  String get media_library_filter_trip => 'Viaje';
+
+  @override
+  String get media_library_filter_dates => 'Fechas';
+
+  @override
+  String get media_library_filter_clear => 'Borrar filtros';
+
+  @override
+  String get media_library_deleteConfirmBody =>
+      'Esto los elimina de la aplicación y de cualquier almacén multimedia. No se puede deshacer.';
+
+  @override
+  String media_library_deleteConfirmTitle(int count) {
+    return '¿Eliminar $count elementos?';
+  }
+
+  @override
+  String media_library_selectedCount(int count) {
+    return '$count seleccionados';
+  }
+
+  @override
+  String get media_library_unlinkedHeader => 'Sin vincular';
+
+  @override
+  String get media_library_viewMode_byDive => 'Por inmersión';
+
+  @override
+  String get media_library_viewMode_grid => 'Cuadrícula';
+
+  @override
+  String get media_library_viewMode_timeline => 'Cronología';
+
+  @override
+  String get media_viewer_goToDive => 'Ir a la inmersión';
+
+  @override
   String get nav_home => 'Inicio';
+
+  @override
+  String get nav_media => 'Multimedia';
 
   @override
   String get nav_more => 'Más';

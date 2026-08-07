@@ -12124,7 +12124,69 @@ class AppLocalizationsEn extends AppLocalizations {
   String get nav_gpsLog => 'GPS Log';
 
   @override
+  String get media_console_library => 'Library';
+
+  @override
+  String get media_console_transfers => 'Transfers';
+
+  @override
+  String get media_library_empty => 'No media yet';
+
+  @override
+  String get media_library_filter_all => 'All';
+
+  @override
+  String get media_library_filter_photos => 'Photos';
+
+  @override
+  String get media_library_filter_videos => 'Videos';
+
+  @override
+  String get media_library_filter_site => 'Site';
+
+  @override
+  String get media_library_filter_trip => 'Trip';
+
+  @override
+  String get media_library_filter_dates => 'Dates';
+
+  @override
+  String get media_library_filter_clear => 'Clear filters';
+
+  @override
+  String get media_library_deleteConfirmBody =>
+      'This removes them from the app and any media store. This cannot be undone.';
+
+  @override
+  String media_library_deleteConfirmTitle(int count) {
+    return 'Delete $count items?';
+  }
+
+  @override
+  String media_library_selectedCount(int count) {
+    return '$count selected';
+  }
+
+  @override
+  String get media_library_unlinkedHeader => 'Unlinked';
+
+  @override
+  String get media_library_viewMode_byDive => 'By dive';
+
+  @override
+  String get media_library_viewMode_grid => 'Grid';
+
+  @override
+  String get media_library_viewMode_timeline => 'Timeline';
+
+  @override
+  String get media_viewer_goToDive => 'Go to dive';
+
+  @override
   String get nav_home => 'Home';
+
+  @override
+  String get nav_media => 'Media';
 
   @override
   String get nav_more => 'More';

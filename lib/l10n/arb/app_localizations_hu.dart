@@ -12284,7 +12284,69 @@ class AppLocalizationsHu extends AppLocalizations {
   String get nav_gpsLog => 'GPS-napló';
 
   @override
+  String get media_console_library => 'Könyvtár';
+
+  @override
+  String get media_console_transfers => 'Átvitelek';
+
+  @override
+  String get media_library_empty => 'Még nincs média';
+
+  @override
+  String get media_library_filter_all => 'Összes';
+
+  @override
+  String get media_library_filter_photos => 'Fotók';
+
+  @override
+  String get media_library_filter_videos => 'Videók';
+
+  @override
+  String get media_library_filter_site => 'Merülőhely';
+
+  @override
+  String get media_library_filter_trip => 'Utazás';
+
+  @override
+  String get media_library_filter_dates => 'Dátumok';
+
+  @override
+  String get media_library_filter_clear => 'Szűrők törlése';
+
+  @override
+  String get media_library_deleteConfirmBody =>
+      'Ez eltávolítja őket az alkalmazásból és minden médiatárból. Nem vonható vissza.';
+
+  @override
+  String media_library_deleteConfirmTitle(int count) {
+    return '$count elem törlése?';
+  }
+
+  @override
+  String media_library_selectedCount(int count) {
+    return '$count kiválasztva';
+  }
+
+  @override
+  String get media_library_unlinkedHeader => 'Nem csatolt';
+
+  @override
+  String get media_library_viewMode_byDive => 'Merülés szerint';
+
+  @override
+  String get media_library_viewMode_grid => 'Rács';
+
+  @override
+  String get media_library_viewMode_timeline => 'Idővonal';
+
+  @override
+  String get media_viewer_goToDive => 'Ugrás a merüléshez';
+
+  @override
   String get nav_home => 'Fooldal';
+
+  @override
+  String get nav_media => 'Média';
 
   @override
   String get nav_more => 'Tovabb';
