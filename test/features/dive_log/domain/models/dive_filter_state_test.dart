@@ -541,6 +541,66 @@ void main() {
         expect(result, hasLength(2));
       });
 
+      test('filters by multiple comma-separated buddies (AND-semantics)', () {
+        const filter = DiveFilterState(buddyNameFilter: 'John, Jane');
+        final buddyJohn = Buddy(
+          id: 'b1',
+          name: 'John Smith',
+          createdAt: DateTime.now(),
+          updatedAt: DateTime.now(),
+        );
+        final buddyJane = Buddy(
+          id: 'b2',
+          name: 'Jane Smith',
+          createdAt: DateTime.now(),
+          updatedAt: DateTime.now(),
+        );
+
+        final dives = [
+          // D1: Matches both (John in structured, Jane in legacy)
+          Dive(
+            id: 'd1',
+            dateTime: DateTime.now(),
+            buddy: 'Jane Doe',
+            notes: '',
+            buddies: [
+              BuddyWithRole(buddy: buddyJohn, role: DiveRole.builtInBuddy()),
+            ],
+          ),
+          // D2: Matches both (Both in structured)
+          Dive(
+            id: 'd2',
+            dateTime: DateTime.now(),
+            notes: '',
+            buddies: [
+              BuddyWithRole(buddy: buddyJohn, role: DiveRole.builtInBuddy()),
+              BuddyWithRole(buddy: buddyJane, role: DiveRole.builtInBuddy()),
+            ],
+          ),
+          // D3: Matches only John
+          Dive(
+            id: 'd3',
+            dateTime: DateTime.now(),
+            buddy: 'John Doe',
+            notes: '',
+          ),
+          // D4: Matches only Jane
+          Dive(
+            id: 'd4',
+            dateTime: DateTime.now(),
+            notes: '',
+            buddies: [
+              BuddyWithRole(buddy: buddyJane, role: DiveRole.builtInBuddy()),
+            ],
+          ),
+        ];
+
+        final result = filter.apply(dives);
+
+        expect(result, hasLength(2));
+        expect(result.map((d) => d.id), containsAll(['d1', 'd2']));
+      });
+
       group('equipmentAttr axis', () {
         EquipmentAttribute curated(String key, {String? text, double? num}) =>
             EquipmentAttribute.curated(

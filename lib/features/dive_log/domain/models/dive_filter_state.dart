@@ -306,7 +306,7 @@ class DiveFilterState {
         if (dive.diveComputerSerial != computerSerial) return false;
       }
       if (customFieldKey != null && customFieldKey!.isNotEmpty) {
-        final hasMatch = (dive.customFields as List<dynamic>).any((cf) {
+        final hasMatch = dive.customFields.any((cf) {
           if (cf.key != customFieldKey) return false;
           if (customFieldValue != null && customFieldValue!.isNotEmpty) {
             return cf.value.toLowerCase().contains(
@@ -324,13 +324,13 @@ class DiveFilterState {
         // getDivesBySuitThickness() and the SQL axis; hoods/gloves/boots also
         // carry thickness_mm but are not suits.
         final suitOnly = equipmentAttrKey == EquipmentAttrKeys.thicknessMm;
-        final matches = (dive.equipment as List<dynamic>).any((item) {
+        final matches = dive.equipment.any((item) {
           if (suitOnly &&
               item.type != EquipmentType.wetsuit &&
               item.type != EquipmentType.drysuit) {
             return false;
           }
-          return (item.attributes as List<dynamic>).any((attr) {
+          return item.attributes.any((attr) {
             if (attr.isCustom || attr.key != equipmentAttrKey) return false;
             if (equipmentAttrChoice != null &&
                 attr.valueText != equipmentAttrChoice) {

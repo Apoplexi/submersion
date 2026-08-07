@@ -607,7 +607,7 @@ class _DiveFilterSheetState extends ConsumerState<DiveFilterSheet> {
                           .toList();
 
                       if (text.isEmpty) {
-                        return buddyNames;
+                        return [];
                       }
 
                       final lastPart = text
