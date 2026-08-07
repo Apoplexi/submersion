@@ -314,9 +314,9 @@ void main() {
             home: Scaffold(
               body: SingleChildScrollView(
                 controller: controller,
-                child: Column(
+                child: const Column(
                   children: [
-                    const SizedBox(height: 2000),
+                    SizedBox(height: 2000),
                     SafetyReviewSection(diveId: 'dive-1'),
                   ],
                 ),
