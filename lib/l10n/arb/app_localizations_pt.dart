@@ -11800,6 +11800,17 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
+  String get media_diveMediaSection_replaceButton => 'Revincular';
+
+  @override
+  String get media_diveMediaSection_replaceEditedContent =>
+      'O conteúdo deste arquivo difere do original. Revincular fará um novo envio para seu armazenamento de mídia.';
+
+  @override
+  String get media_diveMediaSection_replaceEditedTitle =>
+      'O conteúdo do arquivo difere';
+
+  @override
   String get media_diveMediaSection_unlinkButton => 'Desvincular';
 
   @override
@@ -12354,6 +12365,71 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get media_console_transfers => 'Transferências';
+
+  @override
+  String get media_console_missing => 'Ausentes';
+
+  @override
+  String get media_missing_empty => 'Nenhum arquivo ausente';
+
+  @override
+  String media_missing_offlineVolumes(int count) {
+    return '$count em volumes offline';
+  }
+
+  @override
+  String get media_missing_repair => 'Reparar...';
+
+  @override
+  String get media_repair_title => 'Reparar arquivos ausentes';
+
+  @override
+  String get media_repair_addFolder => 'Adicionar pasta...';
+
+  @override
+  String get media_repair_usePhotoLibrary => 'Pesquisar na fototeca';
+
+  @override
+  String get media_repair_useStore => 'Usar o armazenamento de mídia na nuvem';
+
+  @override
+  String get media_repair_scan => 'Verificar';
+
+  @override
+  String media_repair_prefixMove(String from, String to, int count) {
+    return 'Movimentação de pasta detectada: $from para $to cobre $count arquivos';
+  }
+
+  @override
+  String get media_repair_confidence_exact => 'Exato';
+
+  @override
+  String get media_repair_confidence_probable => 'Nome e tamanho';
+
+  @override
+  String get media_repair_confidence_edited => 'Arquivo editado';
+
+  @override
+  String get media_repair_confidence_unmatched => 'Nenhum candidato';
+
+  @override
+  String get media_repair_unverified => 'Não verificado no armazenamento';
+
+  @override
+  String media_repair_apply(int count) {
+    return 'Revincular $count arquivos';
+  }
+
+  @override
+  String media_repair_summary(
+    int relinked,
+    int cloudBacked,
+    int reuploads,
+    int failed,
+    int skipped,
+  ) {
+    return '$relinked revinculados, $cloudBacked na nuvem, $reuploads reenvios na fila, $failed falharam, $skipped ignorados';
+  }
 
   @override
   String get media_console_unlinked => 'Sem vínculo';

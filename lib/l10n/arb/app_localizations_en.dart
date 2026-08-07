@@ -11603,6 +11603,17 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get media_diveMediaSection_replaceButton => 'Re-link';
+
+  @override
+  String get media_diveMediaSection_replaceEditedContent =>
+      'This file\'s contents differ from the original. Re-linking will re-upload it to your media store.';
+
+  @override
+  String get media_diveMediaSection_replaceEditedTitle =>
+      'File contents differ';
+
+  @override
   String get media_diveMediaSection_unlinkButton => 'Unlink';
 
   @override
@@ -12150,6 +12161,71 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get media_console_transfers => 'Transfers';
+
+  @override
+  String get media_console_missing => 'Missing';
+
+  @override
+  String get media_missing_empty => 'No missing files';
+
+  @override
+  String media_missing_offlineVolumes(int count) {
+    return '$count on offline volumes';
+  }
+
+  @override
+  String get media_missing_repair => 'Repair...';
+
+  @override
+  String get media_repair_title => 'Repair missing files';
+
+  @override
+  String get media_repair_addFolder => 'Add folder...';
+
+  @override
+  String get media_repair_usePhotoLibrary => 'Search photo library';
+
+  @override
+  String get media_repair_useStore => 'Use cloud media store';
+
+  @override
+  String get media_repair_scan => 'Scan';
+
+  @override
+  String media_repair_prefixMove(String from, String to, int count) {
+    return 'Folder move detected: $from to $to covers $count files';
+  }
+
+  @override
+  String get media_repair_confidence_exact => 'Exact';
+
+  @override
+  String get media_repair_confidence_probable => 'Name and size';
+
+  @override
+  String get media_repair_confidence_edited => 'Edited file';
+
+  @override
+  String get media_repair_confidence_unmatched => 'No candidate';
+
+  @override
+  String get media_repair_unverified => 'Not verified against the store';
+
+  @override
+  String media_repair_apply(int count) {
+    return 'Re-link $count files';
+  }
+
+  @override
+  String media_repair_summary(
+    int relinked,
+    int cloudBacked,
+    int reuploads,
+    int failed,
+    int skipped,
+  ) {
+    return '$relinked re-linked, $cloudBacked cloud-backed, $reuploads re-uploads queued, $failed failed, $skipped skipped';
+  }
 
   @override
   String get media_console_unlinked => 'Unlinked';

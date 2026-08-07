@@ -11758,6 +11758,17 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String get media_diveMediaSection_replaceButton => 'Újracsatolás';
+
+  @override
+  String get media_diveMediaSection_replaceEditedContent =>
+      'A fájl tartalma eltér az eredetitől. Az újracsatolás újra feltölti a médiatárba.';
+
+  @override
+  String get media_diveMediaSection_replaceEditedTitle =>
+      'A fájl tartalma eltér';
+
+  @override
   String get media_diveMediaSection_unlinkButton => 'Levalasztas';
 
   @override
@@ -12310,6 +12321,71 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get media_console_transfers => 'Átvitelek';
+
+  @override
+  String get media_console_missing => 'Hiányzó';
+
+  @override
+  String get media_missing_empty => 'Nincs hiányzó fájl';
+
+  @override
+  String media_missing_offlineVolumes(int count) {
+    return '$count offline köteten';
+  }
+
+  @override
+  String get media_missing_repair => 'Javítás...';
+
+  @override
+  String get media_repair_title => 'Hiányzó fájlok javítása';
+
+  @override
+  String get media_repair_addFolder => 'Mappa hozzáadása...';
+
+  @override
+  String get media_repair_usePhotoLibrary => 'Keresés a fotókönyvtárban';
+
+  @override
+  String get media_repair_useStore => 'Felhő médiatár használata';
+
+  @override
+  String get media_repair_scan => 'Keresés';
+
+  @override
+  String media_repair_prefixMove(String from, String to, int count) {
+    return 'Mappaáthelyezés észlelve: $from -> $to, $count fájlt fed le';
+  }
+
+  @override
+  String get media_repair_confidence_exact => 'Pontos';
+
+  @override
+  String get media_repair_confidence_probable => 'Név és méret';
+
+  @override
+  String get media_repair_confidence_edited => 'Szerkesztett fájl';
+
+  @override
+  String get media_repair_confidence_unmatched => 'Nincs jelölt';
+
+  @override
+  String get media_repair_unverified => 'Nincs ellenőrizve a tár ellen';
+
+  @override
+  String media_repair_apply(int count) {
+    return '$count fájl újracsatolása';
+  }
+
+  @override
+  String media_repair_summary(
+    int relinked,
+    int cloudBacked,
+    int reuploads,
+    int failed,
+    int skipped,
+  ) {
+    return '$relinked újracsatolva, $cloudBacked felhőalapú, $reuploads újrafeltöltés sorban, $failed sikertelen, $skipped kihagyva';
+  }
 
   @override
   String get media_console_unlinked => 'Nem csatolt';

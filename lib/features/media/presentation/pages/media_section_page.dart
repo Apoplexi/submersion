@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/features/media/presentation/pages/media_library_view.dart';
+import 'package:submersion/features/media/presentation/pages/media_missing_view.dart';
 import 'package:submersion/features/media/presentation/pages/media_unlinked_inbox_view.dart';
 import 'package:submersion/features/media/presentation/providers/media_library_providers.dart';
 import 'package:submersion/features/media/presentation/widgets/media_console_scaffold.dart';
@@ -24,16 +25,21 @@ class _MediaSectionPageState extends ConsumerState<MediaSectionPage> {
   @override
   Widget build(BuildContext context) {
     final unlinkedCount = ref.watch(unlinkedCountProvider).value ?? 0;
+    final missingCount = ref.watch(missingCountProvider).value ?? 0;
 
     return Scaffold(
       appBar: AppBar(title: Text(context.l10n.nav_media)),
       body: MediaConsoleScaffold(
         selected: _section,
         onSelect: (section) => setState(() => _section = section),
-        badgeCounts: {MediaConsoleSection.unlinked: unlinkedCount},
+        badgeCounts: {
+          MediaConsoleSection.unlinked: unlinkedCount,
+          MediaConsoleSection.missing: missingCount,
+        },
         child: switch (_section) {
           MediaConsoleSection.library => const MediaLibraryView(),
           MediaConsoleSection.unlinked => const MediaUnlinkedInboxView(),
+          MediaConsoleSection.missing => const MediaMissingView(),
           MediaConsoleSection.transfers => const TransfersView(),
         },
       ),

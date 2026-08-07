@@ -7,6 +7,7 @@ import 'package:submersion/core/services/database_service.dart';
 import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/core/services/sync/sync_event_bus.dart';
 import 'package:submersion/features/media/data/repositories/media_row_mapper.dart';
+import 'package:submersion/features/media/data/services/repair/media_repair_service.dart';
 import 'package:submersion/features/media/domain/entities/media_item.dart'
     as domain;
 import 'package:submersion/features/media/domain/entities/media_source_type.dart';
@@ -128,6 +129,8 @@ class MediaRepository {
       case MediaSourceType.networkUrl:
       case MediaSourceType.manifestEntry:
       case MediaSourceType.signature:
+      // Cloud-backed rows resolve through the store on every device.
+      case MediaSourceType.mediaStore:
         return null;
     }
   }
@@ -1037,6 +1040,90 @@ class MediaRepository {
         MediaCompanion(diveId: const Value(null), updatedAt: Value(now)),
       );
       for (final id in mediaIds) {
+        await _syncRepository.markRecordPending(
+          entityType: 'media',
+          recordId: id,
+          localUpdatedAt: now,
+        );
+      }
+    });
+    SyncEventBus.notifyLocalChange();
+  }
+
+  /// Stage B of the repair apply (Media section Phase 3): commits every
+  /// prepared write in one transaction with per-row HLC marking. Stage A
+  /// (hashing, bookmarks) happened per row before this; Stage C (queue
+  /// enqueues, cloud-backed conversion) follows after.
+  Future<void> applyRepairWrites(List<RepairWrite> writes) async {
+    if (writes.isEmpty) return;
+    final now = DateTime.now().millisecondsSinceEpoch;
+    await _db.transaction(() async {
+      for (final write in writes) {
+        // sourceType is the resolver dispatch key, so a repair must always
+        // restate it: relinking a dead gallery row to a file on disk while
+        // leaving sourceType alone would keep routing the row through
+        // PlatformGalleryResolver, turning a visibly-missing item into a
+        // silently-missing one the moment the orphan flag lifts.
+        final toGallery =
+            write.newSourceType == MediaSourceType.platformGallery;
+        await (_db.update(
+          _db.media,
+        )..where((t) => t.id.equals(write.mediaId))).write(
+          MediaCompanion(
+            localPath: toGallery
+                ? const Value(null)
+                : Value(write.newLocalPath),
+            bookmarkRef: write.newBookmarkRef == null && !toGallery
+                ? const Value.absent()
+                : Value(write.newBookmarkRef),
+            // Null for a file repair: the old asset id addresses an asset
+            // that no longer exists on this device.
+            platformAssetId: Value(write.newPlatformAssetId),
+            sourceType: Value(write.newSourceType.name),
+            isOrphaned: const Value(false),
+            lastVerifiedAt: Value(now),
+            updatedAt: Value(now),
+          ),
+        );
+        await _syncRepository.markRecordPending(
+          entityType: 'media',
+          recordId: write.mediaId,
+          localUpdatedAt: now,
+        );
+      }
+    });
+    SyncEventBus.notifyLocalChange();
+  }
+
+  /// Converts rows to cloud-backed [MediaSourceType.mediaStore] (Media
+  /// section Phase 3): the store becomes the source of truth, the local
+  /// pointers clear, and the orphan flag lifts. Refused per row without the
+  /// contentHash + remoteUploadedAt stamp pair -- converting an unconfirmed
+  /// row would render nothing anywhere. Sync-safe like [_unlinkColumns].
+  Future<void> convertToCloudBacked(List<String> mediaIds) async {
+    if (mediaIds.isEmpty) return;
+    final rows = await (_db.select(
+      _db.media,
+    )..where((t) => t.id.isIn(mediaIds))).get();
+    final qualified = [
+      for (final row in rows)
+        if (row.contentHash != null && row.remoteUploadedAt != null) row.id,
+    ];
+    if (qualified.isEmpty) return;
+    final now = DateTime.now().millisecondsSinceEpoch;
+    await _db.transaction(() async {
+      await (_db.update(_db.media)..where((t) => t.id.isIn(qualified))).write(
+        MediaCompanion(
+          sourceType: Value(MediaSourceType.mediaStore.name),
+          localPath: const Value(null),
+          bookmarkRef: const Value(null),
+          platformAssetId: const Value(null),
+          isOrphaned: const Value(false),
+          lastVerifiedAt: Value(now),
+          updatedAt: Value(now),
+        ),
+      );
+      for (final id in qualified) {
         await _syncRepository.markRecordPending(
           entityType: 'media',
           recordId: id,

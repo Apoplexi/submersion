@@ -11784,6 +11784,17 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
+  String get media_diveMediaSection_replaceButton => 'Volver a vincular';
+
+  @override
+  String get media_diveMediaSection_replaceEditedContent =>
+      'El contenido de este archivo difiere del original. Volver a vincularlo lo resubirá a su almacén multimedia.';
+
+  @override
+  String get media_diveMediaSection_replaceEditedTitle =>
+      'El contenido del archivo difiere';
+
+  @override
   String get media_diveMediaSection_unlinkButton => 'Desvincular';
 
   @override
@@ -12338,6 +12349,71 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get media_console_transfers => 'Transferencias';
+
+  @override
+  String get media_console_missing => 'Faltantes';
+
+  @override
+  String get media_missing_empty => 'No hay archivos faltantes';
+
+  @override
+  String media_missing_offlineVolumes(int count) {
+    return '$count en volúmenes sin conexión';
+  }
+
+  @override
+  String get media_missing_repair => 'Reparar...';
+
+  @override
+  String get media_repair_title => 'Reparar archivos faltantes';
+
+  @override
+  String get media_repair_addFolder => 'Agregar carpeta...';
+
+  @override
+  String get media_repair_usePhotoLibrary => 'Buscar en la fototeca';
+
+  @override
+  String get media_repair_useStore => 'Usar el almacén multimedia en la nube';
+
+  @override
+  String get media_repair_scan => 'Buscar';
+
+  @override
+  String media_repair_prefixMove(String from, String to, int count) {
+    return 'Movimiento de carpeta detectado: $from a $to cubre $count archivos';
+  }
+
+  @override
+  String get media_repair_confidence_exact => 'Exacto';
+
+  @override
+  String get media_repair_confidence_probable => 'Nombre y tamaño';
+
+  @override
+  String get media_repair_confidence_edited => 'Archivo editado';
+
+  @override
+  String get media_repair_confidence_unmatched => 'Sin candidato';
+
+  @override
+  String get media_repair_unverified => 'No verificado contra el almacén';
+
+  @override
+  String media_repair_apply(int count) {
+    return 'Volver a vincular $count archivos';
+  }
+
+  @override
+  String media_repair_summary(
+    int relinked,
+    int cloudBacked,
+    int reuploads,
+    int failed,
+    int skipped,
+  ) {
+    return '$relinked revinculados, $cloudBacked en la nube, $reuploads resubidas en cola, $failed fallidos, $skipped omitidos';
+  }
 
   @override
   String get media_console_unlinked => 'Sin vincular';

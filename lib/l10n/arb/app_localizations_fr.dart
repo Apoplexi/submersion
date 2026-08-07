@@ -11831,6 +11831,17 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String get media_diveMediaSection_replaceButton => 'Relier';
+
+  @override
+  String get media_diveMediaSection_replaceEditedContent =>
+      'Le contenu de ce fichier diffère de l\'original. Le relier entraînera son renvoi vers votre stockage multimédia.';
+
+  @override
+  String get media_diveMediaSection_replaceEditedTitle =>
+      'Le contenu du fichier diffère';
+
+  @override
   String get media_diveMediaSection_unlinkButton => 'Dissocier';
 
   @override
@@ -12388,6 +12399,71 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get media_console_transfers => 'Transferts';
+
+  @override
+  String get media_console_missing => 'Manquants';
+
+  @override
+  String get media_missing_empty => 'Aucun fichier manquant';
+
+  @override
+  String media_missing_offlineVolumes(int count) {
+    return '$count sur des volumes hors ligne';
+  }
+
+  @override
+  String get media_missing_repair => 'Réparer...';
+
+  @override
+  String get media_repair_title => 'Réparer les fichiers manquants';
+
+  @override
+  String get media_repair_addFolder => 'Ajouter un dossier...';
+
+  @override
+  String get media_repair_usePhotoLibrary => 'Rechercher dans la photothèque';
+
+  @override
+  String get media_repair_useStore => 'Utiliser le stockage multimédia cloud';
+
+  @override
+  String get media_repair_scan => 'Analyser';
+
+  @override
+  String media_repair_prefixMove(String from, String to, int count) {
+    return 'Déplacement de dossier détecté : $from vers $to couvre $count fichiers';
+  }
+
+  @override
+  String get media_repair_confidence_exact => 'Exact';
+
+  @override
+  String get media_repair_confidence_probable => 'Nom et taille';
+
+  @override
+  String get media_repair_confidence_edited => 'Fichier modifié';
+
+  @override
+  String get media_repair_confidence_unmatched => 'Aucun candidat';
+
+  @override
+  String get media_repair_unverified => 'Non vérifié auprès du stockage';
+
+  @override
+  String media_repair_apply(int count) {
+    return 'Relier $count fichiers';
+  }
+
+  @override
+  String media_repair_summary(
+    int relinked,
+    int cloudBacked,
+    int reuploads,
+    int failed,
+    int skipped,
+  ) {
+    return '$relinked reliés, $cloudBacked sur le cloud, $reuploads renvois en file, $failed échoués, $skipped ignorés';
+  }
 
   @override
   String get media_console_unlinked => 'Non liés';
