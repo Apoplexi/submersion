@@ -3,9 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 
-/// The Media section's internal destinations. Later phases append values
-/// (missing, importMedia); both layouts render whatever the enum contains,
-/// so growth is enum-plus-registry only.
+/// The Media section's internal destinations, in the order they are shown.
+/// Both layouts render whatever the enum contains, so growth is
+/// enum-plus-registry only.
+///
+/// Declaration order IS display order, which is why `sources` sits mid-enum
+/// rather than at the end. Nothing persists an ordinal: the selection lives
+/// in [MediaSectionPage]'s State as a value, and the `index`/`values[i]`
+/// pair below is a round trip through one TabBar within a single build. A
+/// value may therefore be inserted wherever it belongs in the list.
 enum MediaConsoleSection {
   library,
   unlinked,

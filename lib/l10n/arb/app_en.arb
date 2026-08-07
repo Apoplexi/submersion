@@ -7202,6 +7202,10 @@
   "@media_smartAlbum_delete": {
     "description": "Filter bar: remove a smart album"
   },
+  "media_smartAlbum_deleteFailed": "Could not delete album",
+  "@media_smartAlbum_deleteFailed": {
+    "description": "Filter bar: the smart album delete did not go through"
+  },
   "media_smartAlbum_saved": "Album saved",
   "@media_smartAlbum_saved": {
     "description": "Filter bar: confirmation snackbar"

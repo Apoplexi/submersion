@@ -29,8 +29,15 @@ final watcherAutoApplyProvider =
           WatcherAutoApplyNotifier(ref.watch(appSettingsRepositoryProvider)),
     );
 
-/// Reads the persisted auto-apply setting. Default on; only an explicit
-/// "false" turns it off.
+/// Reads the persisted auto-apply setting.
+///
+/// On when nothing has been stored, and otherwise only when the stored
+/// value is exactly "true". [WatcherAutoApplyNotifier.setEnabled] is the
+/// only writer and only ever writes "true" or "false", so anything else is
+/// corruption -- and this gate decides whether the watcher may rewrite
+/// `media.local_path` without asking. An unrecognised value therefore
+/// resolves to off: the direction that can only cost a repair the user can
+/// still run by hand, rather than one they opted out of.
 Future<bool> readWatcherAutoApply(AppSettingsRepository settings) async {
   final raw = await settings.getRawSetting(kWatcherAutoApplySettingKey);
   return raw == null || raw == 'true';

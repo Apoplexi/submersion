@@ -12220,6 +12220,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get media_smartAlbum_delete => 'Delete album';
 
   @override
+  String get media_smartAlbum_deleteFailed => 'Could not delete album';
+
+  @override
   String get media_smartAlbum_saved => 'Album saved';
 
   @override

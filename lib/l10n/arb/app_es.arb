@@ -3927,6 +3927,7 @@
   "media_smartAlbum_saveTitle": "Nombra este álbum",
   "media_smartAlbum_albums": "Álbumes",
   "media_smartAlbum_delete": "Eliminar álbum",
+  "media_smartAlbum_deleteFailed": "No se pudo eliminar el álbum",
   "media_smartAlbum_saved": "Álbum guardado",
   "media_sources_lastScanned": "Último análisis {date}",
   "media_sources_scanResult": "{indexed} archivos indexados, {repaired} revinculados",

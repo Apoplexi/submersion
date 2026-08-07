@@ -3927,6 +3927,7 @@
   "media_smartAlbum_saveTitle": "Naam dit album",
   "media_smartAlbum_albums": "Albums",
   "media_smartAlbum_delete": "Album verwijderen",
+  "media_smartAlbum_deleteFailed": "Album verwijderen mislukt",
   "media_smartAlbum_saved": "Album opgeslagen",
   "media_sources_lastScanned": "Laatst gescand {date}",
   "media_sources_scanResult": "{indexed} bestanden geïndexeerd, {repaired} opnieuw gekoppeld",

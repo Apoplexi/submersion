@@ -75,6 +75,25 @@ class MediaLibraryFilterBar extends ConsumerWidget {
     );
   }
 
+  /// Deletes an album and says so when it fails. Awaited rather than fired
+  /// and forgotten: an unawaited repository call turns a failed delete into
+  /// an uncaught async error and leaves the album on screen with no
+  /// explanation for why it came back.
+  Future<void> _deleteAlbum(
+    BuildContext context,
+    WidgetRef ref,
+    String id,
+  ) async {
+    try {
+      await ref.read(mediaSmartAlbumRepositoryProvider).delete(id);
+    } catch (e) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(context.l10n.media_smartAlbum_deleteFailed)),
+      );
+    }
+  }
+
   Future<void> _saveAlbum(BuildContext context, WidgetRef ref) async {
     final name = await showMediaSmartAlbumNameDialog(context);
     if (name == null) return;
@@ -207,11 +226,12 @@ class MediaLibraryFilterBar extends ConsumerWidget {
                         IconButton(
                           icon: const Icon(Icons.delete_outline, size: 18),
                           tooltip: context.l10n.media_smartAlbum_delete,
-                          onPressed: () {
+                          onPressed: () async {
                             Navigator.of(menuContext).pop();
-                            ref
-                                .read(mediaSmartAlbumRepositoryProvider)
-                                .delete(album.id);
+                            // The bar's own context, not the menu's: the
+                            // menu is gone by the time a failure needs
+                            // somewhere to show itself.
+                            await _deleteAlbum(context, ref, album.id);
                           },
                         ),
                       ],

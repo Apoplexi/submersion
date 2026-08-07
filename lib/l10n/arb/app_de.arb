@@ -3927,6 +3927,7 @@
   "media_smartAlbum_saveTitle": "Album benennen",
   "media_smartAlbum_albums": "Alben",
   "media_smartAlbum_delete": "Album löschen",
+  "media_smartAlbum_deleteFailed": "Album konnte nicht gelöscht werden",
   "media_smartAlbum_saved": "Album gespeichert",
   "media_sources_lastScanned": "Zuletzt gescannt {date}",
   "media_sources_scanResult": "{indexed} Dateien indiziert, {repaired} neu verknüpft",

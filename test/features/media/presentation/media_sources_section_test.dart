@@ -17,14 +17,19 @@ import 'package:submersion/l10n/arb/app_localizations.dart';
 import '../../../support/fake_app_settings_repository.dart';
 
 class _FakeScanner implements WatchedFolderScanner {
-  _FakeScanner({this.throws = false});
+  _FakeScanner({this.throws = false, this.onScan});
 
   final bool throws;
+
+  /// Stands in for the side effects a real pass has on the cache -- most
+  /// importantly stamping the roots it scanned.
+  final Future<void> Function()? onScan;
   int calls = 0;
 
   @override
   Future<WatcherScanReport> scan({required DateTime now}) async {
     calls++;
+    await onScan?.call();
     if (throws) throw const FileSystemException('volume went away');
     return const WatcherScanReport(
       filesIndexed: 12,
@@ -174,6 +179,26 @@ void main() {
     expect(find.text('12 files indexed, 2 re-linked'), findsOneWidget);
   });
 
+  testWidgets('a scan refreshes the last-scanned stamp on the tile', (
+    tester,
+  ) async {
+    // The stamps are cached per root, so a scan owes them an invalidation.
+    // Without it the tile keeps reporting the state before the scan.
+    await watched.addRoot('/nas/Dives');
+    scanner = _FakeScanner(
+      onScan: () => watched.stampScanned('/nas/Dives', DateTime(2026, 8, 6, 9)),
+    );
+    await tester.pumpWidget(host());
+    await tester.pumpAndSettle();
+    expect(find.text('Never scanned'), findsOneWidget);
+
+    await tester.tap(find.text('Scan now'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Never scanned'), findsNothing);
+    expect(find.textContaining('Last scanned'), findsOneWidget);
+  });
+
   testWidgets('a failed scan says so instead of going quiet', (tester) async {
     scanner = _FakeScanner(throws: true);
     await watched.addRoot('/nas/Dives');
@@ -204,6 +229,23 @@ void main() {
       final settings = FakeAppSettingsRepository();
       settings.values[kWatcherAutoApplySettingKey] = 'true';
       expect(await readWatcherAutoApply(settings), isTrue);
+    });
+
+    test('an unrecognised stored value resolves to off, not on', () async {
+      // setEnabled only ever writes "true" or "false", so anything else is
+      // corruption. This gate decides whether media.local_path may be
+      // rewritten without asking, so an unreadable value has to fall to the
+      // side that costs a repair rather than the side that performs one
+      // the user opted out of.
+      for (final raw in ['', '0', 'FALSE', 'True', 'yes', 'null']) {
+        final settings = FakeAppSettingsRepository();
+        settings.values[kWatcherAutoApplySettingKey] = raw;
+        expect(
+          await readWatcherAutoApply(settings),
+          isFalse,
+          reason: 'stored "$raw" should not enable automatic repair',
+        );
+      }
     });
 
     test('the scanner gate reads storage, not a primed default', () async {

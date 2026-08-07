@@ -19,6 +19,24 @@ final sourceCountsProvider = FutureProvider<Map<MediaSourceType, int>>((
   return repo.countBySourceType();
 });
 
+/// When a watched root was last scanned, memoized per root.
+///
+/// A `FutureBuilder` built inline would re-issue this query on every
+/// rebuild of the tile -- and every scan, add, and remove rebuilds the
+/// whole list. Riverpod caches the result per root instead, so the query
+/// runs once and re-runs only when something invalidates it.
+final watchedRootLastScanProvider = FutureProvider.family<DateTime?, String>(
+  (ref, root) => ref.watch(watchedFolderRepositoryProvider).lastScanAt(root),
+);
+
+/// Re-reads everything a mutation of the watched set can have changed.
+/// Caching the stamps buys a query per rebuild but owes an invalidation:
+/// without this a scan would leave the tiles reporting the previous pass.
+void _refreshRoots(WidgetRef ref) {
+  ref.invalidate(watchedRootsProvider);
+  ref.invalidate(watchedRootLastScanProvider);
+}
+
 /// The Sources console section (Media section Phase 5): where media comes
 /// from -- browse by source type, and manage the folders the repair watcher
 /// keeps an eye on.
@@ -53,7 +71,7 @@ class MediaSourcesSectionView extends ConsumerWidget {
         await (pickFolderOverride?.call() ?? FilePicker.getDirectoryPath());
     if (path == null) return;
     await ref.read(watchedFolderRepositoryProvider).addRoot(path);
-    ref.invalidate(watchedRootsProvider);
+    _refreshRoots(ref);
   }
 
   Future<void> _scanNow(BuildContext context, WidgetRef ref) async {
@@ -63,14 +81,15 @@ class MediaSourcesSectionView extends ConsumerWidget {
     try {
       report = await ref.read(watcherScannerProvider).scan(now: DateTime.now());
     } catch (e) {
-      ref.invalidate(watchedRootsProvider);
+      // A failed scan can still have stamped some roots before it threw.
+      _refreshRoots(ref);
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(context.l10n.media_sources_scanFailed)),
       );
       return;
     }
-    ref.invalidate(watchedRootsProvider);
+    _refreshRoots(ref);
     if (!context.mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -158,30 +177,24 @@ class _WatchedRootTile extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final repo = ref.watch(watchedFolderRepositoryProvider);
-    return FutureBuilder<DateTime?>(
-      future: repo.lastScanAt(root),
-      builder: (context, snapshot) {
-        final stamp = snapshot.data;
-        return ListTile(
-          leading: const Icon(Icons.folder_outlined),
-          title: Text(root, maxLines: 1, overflow: TextOverflow.ellipsis),
-          subtitle: Text(
-            stamp == null
-                ? context.l10n.media_sources_neverScanned
-                : context.l10n.media_sources_lastScanned(
-                    DateFormat.yMMMd(locale).add_jm().format(stamp),
-                  ),
-          ),
-          trailing: IconButton(
-            icon: const Icon(Icons.clear),
-            onPressed: () async {
-              await repo.removeRoot(root);
-              ref.invalidate(watchedRootsProvider);
-            },
-          ),
-        );
-      },
+    final stamp = ref.watch(watchedRootLastScanProvider(root)).value;
+    return ListTile(
+      leading: const Icon(Icons.folder_outlined),
+      title: Text(root, maxLines: 1, overflow: TextOverflow.ellipsis),
+      subtitle: Text(
+        stamp == null
+            ? context.l10n.media_sources_neverScanned
+            : context.l10n.media_sources_lastScanned(
+                DateFormat.yMMMd(locale).add_jm().format(stamp),
+              ),
+      ),
+      trailing: IconButton(
+        icon: const Icon(Icons.clear),
+        onPressed: () async {
+          await ref.read(watchedFolderRepositoryProvider).removeRoot(root);
+          _refreshRoots(ref);
+        },
+      ),
     );
   }
 }

@@ -11857,6 +11857,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get media_smartAlbum_delete => '删除相册';
 
   @override
+  String get media_smartAlbum_deleteFailed => '无法删除相册';
+
+  @override
   String get media_smartAlbum_saved => '相册已保存';
 
   @override

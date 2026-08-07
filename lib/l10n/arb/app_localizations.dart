@@ -21073,6 +21073,12 @@ abstract class AppLocalizations {
   /// **'Delete album'**
   String get media_smartAlbum_delete;
 
+  /// Filter bar: the smart album delete did not go through
+  ///
+  /// In en, this message translates to:
+  /// **'Could not delete album'**
+  String get media_smartAlbum_deleteFailed;
+
   /// Filter bar: confirmation snackbar
   ///
   /// In en, this message translates to:

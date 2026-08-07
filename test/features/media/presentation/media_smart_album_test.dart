@@ -19,6 +19,10 @@ class _FakeAlbumRepo implements MediaSmartAlbumRepository {
   final List<MediaSmartAlbum> created = [];
   final List<String> deleted = [];
 
+  /// When set, [delete] throws instead of recording -- the stand-in for a
+  /// database that will not take the write.
+  Object? deleteError;
+
   @override
   Future<List<MediaSmartAlbum>> getAll() async => albums;
 
@@ -39,7 +43,11 @@ class _FakeAlbumRepo implements MediaSmartAlbumRepository {
   }
 
   @override
-  Future<void> delete(String id) async => deleted.add(id);
+  Future<void> delete(String id) async {
+    final error = deleteError;
+    if (error != null) throw error;
+    deleted.add(id);
+  }
 
   @override
   Stream<void> watchChanges() => const Stream.empty();
@@ -221,5 +229,26 @@ void main() {
     expect(repo.deleted, ['a1']);
     // Deleting must not also apply the album it removed.
     expect(containerOf(tester).read(mediaLibraryFilterProvider).siteId, isNull);
+  });
+
+  testWidgets('a delete that fails says so instead of failing silently', (
+    tester,
+  ) async {
+    // The menu is dismissed before the delete runs, so the failure has to
+    // find its way to the bar's own context or it has nowhere to show.
+    repo = _FakeAlbumRepo([
+      album('a1', 'Blue Hole video', const MediaLibraryFilter(siteId: 's1')),
+    ])..deleteError = StateError('database is not having it');
+    setWide(tester);
+    await tester.pumpWidget(host());
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Albums'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byIcon(Icons.delete_outline));
+    await tester.pumpAndSettle();
+
+    expect(repo.deleted, isEmpty);
+    expect(find.text('Could not delete album'), findsOneWidget);
   });
 }

@@ -46,12 +46,44 @@ void main() {
     expect(decoded.toDate, isNull);
   });
 
-  test('dates serialize as epoch millis', () {
-    final filter = MediaLibraryFilter(fromDate: DateTime(2026, 6, 1));
-    expect(
-      filter.toJson()['fromDate'],
-      DateTime(2026, 6, 1).millisecondsSinceEpoch,
-    );
+  group('dates cross a timezone intact', () {
+    // Album filters are calendar bounds, not instants: the repository
+    // normalises them with the same wall-clock-as-UTC rule that taken_at
+    // uses. Encoding the local *instant* would therefore hand a device in
+    // another zone a different calendar day. These tests pin the encoding
+    // to a value that does not depend on the host's UTC offset.
+    test('encode the wall-clock components, not the local instant', () {
+      final filter = MediaLibraryFilter(
+        fromDate: DateTime(2026, 6, 1),
+        toDate: DateTime(2026, 6, 30, 23, 59, 59, 999),
+      );
+      final json = filter.toJson();
+
+      expect(json['fromDate'], DateTime.utc(2026, 6, 1).millisecondsSinceEpoch);
+      expect(
+        json['toDate'],
+        DateTime.utc(2026, 6, 30, 23, 59, 59, 999).millisecondsSinceEpoch,
+      );
+    });
+
+    test('decode wall-clock millis back to the same calendar digits', () {
+      final decoded = MediaLibraryFilter.fromJson({
+        'fromDate': DateTime.utc(2026, 6, 1).millisecondsSinceEpoch,
+        'toDate': DateTime.utc(
+          2026,
+          6,
+          30,
+          23,
+          59,
+          59,
+          999,
+        ).millisecondsSinceEpoch,
+      });
+
+      expect(decoded.fromDate, DateTime(2026, 6, 1));
+      expect(decoded.toDate, DateTime(2026, 6, 30, 23, 59, 59, 999));
+      expect(decoded.fromDate!.isUtc, isFalse);
+    });
   });
 
   group('value equality', () {

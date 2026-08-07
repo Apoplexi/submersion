@@ -3855,6 +3855,7 @@
   "media_smartAlbum_saveTitle": "Assegna un nome",
   "media_smartAlbum_albums": "Album",
   "media_smartAlbum_delete": "Elimina album",
+  "media_smartAlbum_deleteFailed": "Impossibile eliminare l'album",
   "media_smartAlbum_saved": "Album salvato",
   "media_sources_lastScanned": "Ultima scansione {date}",
   "media_sources_scanResult": "{indexed} file indicizzati, {repaired} ricollegati",

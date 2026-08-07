@@ -1,3 +1,4 @@
+import 'package:submersion/core/util/wall_clock_utc.dart';
 import 'package:submersion/features/media/domain/entities/media_item.dart';
 import 'package:submersion/features/media/domain/entities/media_source_type.dart';
 
@@ -76,13 +77,21 @@ class MediaLibraryFilter {
 
   /// Serialized form stored by smart albums. Ids and enum names mean the
   /// same thing on every device, which is why an album can sync.
+  ///
+  /// The dates are written as wall-clock-as-UTC millis rather than as the
+  /// local instant. [fromDate] and [toDate] are calendar bounds -- what
+  /// matters is the day the user picked, and MediaLibraryRepository already
+  /// compares them against `taken_at`, which is itself stored wall-clock.
+  /// Encoding the instant would hand a device in another timezone a bound
+  /// shifted by the offset between them, quietly moving an album's day
+  /// boundary by up to a day.
   Map<String, dynamic> toJson() => {
     'mediaType': mediaType?.name,
     'siteId': siteId,
     'tripId': tripId,
     'diveId': diveId,
-    'fromDate': fromDate?.millisecondsSinceEpoch,
-    'toDate': toDate?.millisecondsSinceEpoch,
+    'fromDate': _dateToMillis(fromDate),
+    'toDate': _dateToMillis(toDate),
     'sourceType': sourceType?.name,
     'health': health?.name,
   };
@@ -111,8 +120,12 @@ class MediaLibraryFilter {
     return null;
   }
 
-  static DateTime? _dateFromMillis(Object? raw) =>
-      raw is int ? DateTime.fromMillisecondsSinceEpoch(raw) : null;
+  static int? _dateToMillis(DateTime? date) =>
+      date == null ? null : asWallClockUtc(date).millisecondsSinceEpoch;
+
+  static DateTime? _dateFromMillis(Object? raw) => raw is int
+      ? fromWallClockUtc(DateTime.fromMillisecondsSinceEpoch(raw, isUtc: true))
+      : null;
 
   @override
   bool operator ==(Object other) {

@@ -24,8 +24,6 @@ class IndexedFile {
   final int sizeBytes;
   final int mtimeMillis;
   final String? contentHash;
-
-  String get absolutePath => '$rootPath/$relativePath';
 }
 
 /// Per-device watcher state (Media section Phase 5): which folders to scan

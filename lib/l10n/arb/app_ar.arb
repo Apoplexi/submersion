@@ -3927,6 +3927,7 @@
   "media_smartAlbum_saveTitle": "تسمية هذا الألبوم",
   "media_smartAlbum_albums": "الألبومات",
   "media_smartAlbum_delete": "حذف الألبوم",
+  "media_smartAlbum_deleteFailed": "تعذّر حذف الألبوم",
   "media_smartAlbum_saved": "تم حفظ الألبوم",
   "media_sources_lastScanned": "آخر فحص {date}",
   "media_sources_scanResult": "تمت فهرسة {indexed} ملفات، وأعيد ربط {repaired}",

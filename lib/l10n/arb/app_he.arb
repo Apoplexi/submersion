@@ -3855,6 +3855,7 @@
   "media_smartAlbum_saveTitle": "שם לאלבום",
   "media_smartAlbum_albums": "אלבומים",
   "media_smartAlbum_delete": "מחיקת אלבום",
+  "media_smartAlbum_deleteFailed": "מחיקת האלבום נכשלה",
   "media_smartAlbum_saved": "האלבום נשמר",
   "media_sources_lastScanned": "נסרק לאחרונה {date}",
   "media_sources_scanResult": "{indexed} קבצים נסרקו, {repaired} קושרו מחדש",

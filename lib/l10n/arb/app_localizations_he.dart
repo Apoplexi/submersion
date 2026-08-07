@@ -12114,6 +12114,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get media_smartAlbum_delete => 'מחיקת אלבום';
 
   @override
+  String get media_smartAlbum_deleteFailed => 'מחיקת האלבום נכשלה';
+
+  @override
   String get media_smartAlbum_saved => 'האלבום נשמר';
 
   @override

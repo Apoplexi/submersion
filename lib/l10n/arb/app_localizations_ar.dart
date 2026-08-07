@@ -12196,6 +12196,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get media_smartAlbum_delete => 'حذف الألبوم';
 
   @override
+  String get media_smartAlbum_deleteFailed => 'تعذّر حذف الألبوم';
+
+  @override
   String get media_smartAlbum_saved => 'تم حفظ الألبوم';
 
   @override

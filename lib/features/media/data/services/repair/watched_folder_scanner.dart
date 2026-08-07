@@ -127,6 +127,14 @@ class WatchedFolderScanner {
       if (listingComplete) {
         await watched.deleteIndexed(root, stored.keys.toSet().difference(seen));
       }
+      // Stamped even after a partial listing, on purpose. The stamp drives
+      // the daily cadence, and the cadence gate treats a null stamp as
+      // "due" -- so skipping it for a root that is permanently unreadable
+      // would re-walk the whole archive every time the Media console
+      // builds. Nothing is lost by stamping: everything reachable was
+      // indexed, auto-repair still runs against it below, and the only
+      // consequence of the skipped prune is that stale index rows survive
+      // one more day.
       await watched.stampScanned(root, now);
     }
 

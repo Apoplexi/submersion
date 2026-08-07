@@ -12382,6 +12382,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String get media_smartAlbum_delete => 'Album törlése';
 
   @override
+  String get media_smartAlbum_deleteFailed => 'Az album törlése nem sikerült';
+
+  @override
   String get media_smartAlbum_saved => 'Album mentve';
 
   @override

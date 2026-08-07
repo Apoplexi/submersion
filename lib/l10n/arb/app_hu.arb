@@ -3855,6 +3855,7 @@
   "media_smartAlbum_saveTitle": "Album elnevezése",
   "media_smartAlbum_albums": "Albumok",
   "media_smartAlbum_delete": "Album törlése",
+  "media_smartAlbum_deleteFailed": "Az album törlése nem sikerült",
   "media_smartAlbum_saved": "Album mentve",
   "media_sources_lastScanned": "Utoljára vizsgálva: {date}",
   "media_sources_scanResult": "{indexed} fájl indexelve, {repaired} újracsatolva",

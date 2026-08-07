@@ -4079,6 +4079,7 @@
   "media_smartAlbum_saveTitle": "为相册命名",
   "media_smartAlbum_albums": "相册",
   "media_smartAlbum_delete": "删除相册",
+  "media_smartAlbum_deleteFailed": "无法删除相册",
   "media_smartAlbum_saved": "相册已保存",
   "media_sources_lastScanned": "上次扫描 {date}",
   "media_sources_scanResult": "已索引 {indexed} 个文件，重新关联 {repaired} 个",

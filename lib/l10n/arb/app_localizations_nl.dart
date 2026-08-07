@@ -12327,6 +12327,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get media_smartAlbum_delete => 'Album verwijderen';
 
   @override
+  String get media_smartAlbum_deleteFailed => 'Album verwijderen mislukt';
+
+  @override
   String get media_smartAlbum_saved => 'Album opgeslagen';
 
   @override
