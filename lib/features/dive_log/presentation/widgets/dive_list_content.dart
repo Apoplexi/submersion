@@ -12,6 +12,7 @@ import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/dive_log/presentation/providers/highlight_providers.dart';
 import 'package:submersion/features/dive_log/presentation/providers/view_config_providers.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/dive_list_item.dart';
+import 'package:submersion/shared/widgets/export_destination_sheet.dart';
 import 'package:submersion/shared/widgets/list_view_mode_toggle.dart';
 import 'package:submersion/shared/widgets/master_detail/map_view_toggle_button.dart';
 import 'package:submersion/shared/widgets/master_detail/responsive_breakpoints.dart';
@@ -54,6 +55,9 @@ bool inDateRange(DiveSummary d, DateTimeRange r) {
   final end = DateTime(r.end.year, r.end.month, r.end.day);
   return !day.isBefore(start) && !day.isAfter(end);
 }
+
+/// Formats offered by the bulk export sheet.
+enum _BulkExportFormat { pdf, csv, uddf }
 
 /// Content widget for the dive list, used in master-detail layout.
 ///
@@ -517,7 +521,10 @@ class _DiveListContentState extends ConsumerState<DiveListContent> {
               subtitle: Text(context.l10n.diveLog_bulkExport_pdfDescription),
               onTap: () {
                 Navigator.pop(sheetContext);
-                _exportSelectedAs('pdf');
+                _exportSelectedAs(
+                  _BulkExportFormat.pdf,
+                  context.l10n.diveLog_bulkExport_pdf,
+                );
               },
             ),
             ListTile(
@@ -526,7 +533,10 @@ class _DiveListContentState extends ConsumerState<DiveListContent> {
               subtitle: Text(context.l10n.diveLog_bulkExport_csvDescription),
               onTap: () {
                 Navigator.pop(sheetContext);
-                _exportSelectedAs('csv');
+                _exportSelectedAs(
+                  _BulkExportFormat.csv,
+                  context.l10n.diveLog_bulkExport_csv,
+                );
               },
             ),
             ListTile(
@@ -535,7 +545,10 @@ class _DiveListContentState extends ConsumerState<DiveListContent> {
               subtitle: Text(context.l10n.diveLog_bulkExport_uddfDescription),
               onTap: () {
                 Navigator.pop(sheetContext);
-                _exportSelectedAs('uddf');
+                _exportSelectedAs(
+                  _BulkExportFormat.uddf,
+                  context.l10n.diveLog_bulkExport_uddf,
+                );
               },
             ),
             const SizedBox(height: 8),
@@ -545,7 +558,21 @@ class _DiveListContentState extends ConsumerState<DiveListContent> {
     );
   }
 
-  Future<void> _exportSelectedAs(String format) async {
+  Future<void> _exportSelectedAs(
+    _BulkExportFormat format,
+    String formatLabel,
+  ) async {
+    final destination = await showExportDestinationSheet(
+      context,
+      title: formatLabel,
+    );
+    if (destination == null || !mounted) return;
+
+    // Saving opens the native save panel, which must not be raised while a
+    // modal route is up - so that path drops the progress dialog first.
+    final keepDialogForDelivery = destination == ExportDestination.share;
+    var dialogVisible = true;
+
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -566,39 +593,59 @@ class _DiveListContentState extends ConsumerState<DiveListContent> {
         _selectedIds.toList(),
       );
       final exportService = ref.read(exportServiceProvider);
+      final sites = selectedDives
+          .where((d) => d.site != null)
+          .map((d) => d.site!)
+          .toSet()
+          .toList();
 
-      switch (format) {
-        case 'pdf':
-          await exportService.exportDivesToPdf(selectedDives);
-          break;
-        case 'csv':
-          await exportService.exportDivesToCsv(selectedDives);
-          break;
-        case 'uddf':
-          final sites = selectedDives
-              .where((d) => d.site != null)
-              .map((d) => d.site!)
-              .toSet()
-              .toList();
-          await exportService.exportDivesToUddf(selectedDives, sites: sites);
-          break;
-      }
-
-      if (mounted) {
+      if (!keepDialogForDelivery) {
+        if (!mounted) return;
         Navigator.of(context).pop();
-        _exitSelectionMode();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              context.l10n.diveLog_bulkExport_success(selectedDives.length),
-            ),
-            backgroundColor: Colors.green,
-          ),
-        );
+        dialogVisible = false;
       }
+
+      final sharing = destination == ExportDestination.share;
+      final path = switch (format) {
+        _BulkExportFormat.pdf =>
+          sharing
+              ? await exportService.exportDivesToPdf(selectedDives)
+              : await exportService.saveDivesToPdfFile(selectedDives),
+        _BulkExportFormat.csv =>
+          sharing
+              ? await exportService.exportDivesToCsv(selectedDives)
+              : await exportService.saveDivesCsvToFile(selectedDives),
+        _BulkExportFormat.uddf =>
+          sharing
+              ? await exportService.exportDivesToUddf(
+                  selectedDives,
+                  sites: sites,
+                )
+              : await exportService.saveDivesToUddfFile(
+                  selectedDives,
+                  sites: sites,
+                ),
+      };
+
+      if (!mounted) return;
+      if (dialogVisible) {
+        Navigator.of(context).pop();
+        dialogVisible = false;
+      }
+      // A null path means the save panel was dismissed - not a failure.
+      if (path == null) return;
+      _exitSelectionMode();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            context.l10n.diveLog_bulkExport_success(selectedDives.length),
+          ),
+          backgroundColor: Colors.green,
+        ),
+      );
     } catch (e) {
       if (mounted) {
-        Navigator.of(context).pop();
+        if (dialogVisible) Navigator.of(context).pop();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(context.l10n.diveLog_bulkExport_failed(e.toString())),

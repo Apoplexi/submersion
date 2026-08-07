@@ -7,6 +7,11 @@ import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 
 /// Save string content to a file and open the system share sheet.
+///
+/// This is the "share" half of the export idiom. Callers that want the user to
+/// pick a destination on disk should use the matching `save*ToFile` helper
+/// instead -- those return `null` when the save dialog is cancelled, which this
+/// function has no way to express.
 Future<String> saveAndShareFile(
   String content,
   String fileName,
@@ -27,6 +32,8 @@ Future<String> saveAndShareFile(
 }
 
 /// Save raw bytes to a file and open the system share sheet.
+///
+/// See [saveAndShareFile] for why this never opens a save dialog.
 Future<String> saveAndShareFileBytes(
   List<int> bytes,
   String fileName,

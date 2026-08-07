@@ -8,6 +8,7 @@ import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:submersion/core/constants/list_view_mode.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/shared/widgets/master_detail/detail_scroll_retainer.dart';
+import 'package:submersion/shared/widgets/export_destination_sheet.dart';
 import 'package:submersion/shared/widgets/master_detail/responsive_breakpoints.dart';
 import 'package:submersion/features/buddies/data/repositories/buddy_repository.dart';
 import 'package:submersion/features/buddies/domain/entities/buddy.dart';
@@ -334,6 +335,12 @@ class _BuddyDetailContent extends ConsumerWidget {
     final scaffoldMessenger = ScaffoldMessenger.of(context);
     final l10n = context.l10n;
 
+    final destination = await showExportDestinationSheet(
+      context,
+      title: l10n.buddies_action_shareDives,
+    );
+    if (destination == null) return;
+
     // Show preparing message
     scaffoldMessenger.showSnackBar(
       SnackBar(
@@ -381,12 +388,16 @@ class _BuddyDetailContent extends ConsumerWidget {
 
       scaffoldMessenger.hideCurrentSnackBar();
 
-      // Export to UDDF (this opens the share sheet)
+      // Hand the UDDF to the share sheet, or to a save panel on the user's
+      // request. Either way no success snackbar follows: the share sheet and
+      // the save panel each provide their own feedback.
       final exportService = ref.read(exportServiceProvider);
-      await exportService.exportDivesToUddf(dives, sites: sites);
-
-      // Note: Success snackbar may not show if share sheet is still active
-      // That's fine - the share sheet itself provides feedback
+      switch (destination) {
+        case ExportDestination.share:
+          await exportService.exportDivesToUddf(dives, sites: sites);
+        case ExportDestination.saveToFile:
+          await exportService.saveDivesToUddfFile(dives, sites: sites);
+      }
     } catch (e) {
       scaffoldMessenger.hideCurrentSnackBar();
       scaffoldMessenger.showSnackBar(

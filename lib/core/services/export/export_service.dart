@@ -238,6 +238,16 @@ class ExportService {
     diveTankPressures: diveTankPressures,
   );
 
+  Future<String?> saveDivesToUddfFile(
+    List<Dive> dives, {
+    List<DiveSite>? sites,
+    Map<String, Map<String, List<TankPressurePoint>>>? diveTankPressures,
+  }) => _uddf.saveDivesToUddfFile(
+    dives,
+    sites: sites,
+    diveTankPressures: diveTankPressures,
+  );
+
   Future<String> exportAllDataToUddf({
     required List<Dive> dives,
     List<DiveSite>? sites,
