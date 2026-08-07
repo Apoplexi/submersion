@@ -12057,6 +12057,16 @@ class AppLocalizationsHe extends AppLocalizations {
   String get media_console_transfers => 'העברות';
 
   @override
+  String get media_console_import => 'ייבוא';
+
+  @override
+  String get media_import_launch => 'ייבוא מדיה...';
+
+  @override
+  String get media_import_intro =>
+      'מדיה מיובאת נשמרת בספרייה שלך וניתן לקשר אותה לצלילות באופן אוטומטי.';
+
+  @override
   String get media_console_missing => 'חסרים';
 
   @override
@@ -12123,6 +12133,22 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get media_console_unlinked => 'לא מקושרים';
+
+  @override
+  String get media_import_linkTitle => 'קישור מדיה מיובאת';
+
+  @override
+  String media_import_linkConfirm(int count) {
+    return 'קישור $count פריטים';
+  }
+
+  @override
+  String get media_import_staysUnlinked => 'נשאר בלא מקושרים';
+
+  @override
+  String media_import_linkedResult(int count) {
+    return '$count פריטים קושרו';
+  }
 
   @override
   String get media_inbox_chooseDive => 'בחירת צלילה';

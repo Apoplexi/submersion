@@ -12351,6 +12351,16 @@ class AppLocalizationsEs extends AppLocalizations {
   String get media_console_transfers => 'Transferencias';
 
   @override
+  String get media_console_import => 'Importar';
+
+  @override
+  String get media_import_launch => 'Importar contenido...';
+
+  @override
+  String get media_import_intro =>
+      'El contenido importado se conserva en su biblioteca y puede vincularse a las inmersiones automáticamente.';
+
+  @override
   String get media_console_missing => 'Faltantes';
 
   @override
@@ -12417,6 +12427,22 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get media_console_unlinked => 'Sin vincular';
+
+  @override
+  String get media_import_linkTitle => 'Vincular contenido importado';
+
+  @override
+  String media_import_linkConfirm(int count) {
+    return 'Vincular $count elementos';
+  }
+
+  @override
+  String get media_import_staysUnlinked => 'Permanece sin vincular';
+
+  @override
+  String media_import_linkedResult(int count) {
+    return '$count elementos vinculados';
+  }
 
   @override
   String get media_inbox_chooseDive => 'Elegir inmersión';

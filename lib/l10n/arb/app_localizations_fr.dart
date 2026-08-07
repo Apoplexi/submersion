@@ -12401,6 +12401,16 @@ class AppLocalizationsFr extends AppLocalizations {
   String get media_console_transfers => 'Transferts';
 
   @override
+  String get media_console_import => 'Importer';
+
+  @override
+  String get media_import_launch => 'Importer des médias...';
+
+  @override
+  String get media_import_intro =>
+      'Les médias importés sont conservés dans votre bibliothèque et peuvent être liés automatiquement aux plongées.';
+
+  @override
   String get media_console_missing => 'Manquants';
 
   @override
@@ -12467,6 +12477,22 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get media_console_unlinked => 'Non liés';
+
+  @override
+  String get media_import_linkTitle => 'Lier les médias importés';
+
+  @override
+  String media_import_linkConfirm(int count) {
+    return 'Lier $count éléments';
+  }
+
+  @override
+  String get media_import_staysUnlinked => 'Reste dans Non liés';
+
+  @override
+  String media_import_linkedResult(int count) {
+    return '$count éléments liés';
+  }
 
   @override
   String get media_inbox_chooseDive => 'Choisir la plongée';

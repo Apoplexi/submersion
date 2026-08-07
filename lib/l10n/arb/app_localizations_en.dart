@@ -12163,6 +12163,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get media_console_transfers => 'Transfers';
 
   @override
+  String get media_console_import => 'Import';
+
+  @override
+  String get media_import_launch => 'Import media...';
+
+  @override
+  String get media_import_intro =>
+      'Imported media is kept in your library and can be linked to dives automatically.';
+
+  @override
   String get media_console_missing => 'Missing';
 
   @override
@@ -12229,6 +12239,22 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get media_console_unlinked => 'Unlinked';
+
+  @override
+  String get media_import_linkTitle => 'Link imported media';
+
+  @override
+  String media_import_linkConfirm(int count) {
+    return 'Link $count items';
+  }
+
+  @override
+  String get media_import_staysUnlinked => 'Stays in Unlinked';
+
+  @override
+  String media_import_linkedResult(int count) {
+    return '$count items linked';
+  }
 
   @override
   String get media_inbox_chooseDive => 'Choose dive';

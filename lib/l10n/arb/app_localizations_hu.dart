@@ -12323,6 +12323,16 @@ class AppLocalizationsHu extends AppLocalizations {
   String get media_console_transfers => 'Átvitelek';
 
   @override
+  String get media_console_import => 'Importálás';
+
+  @override
+  String get media_import_launch => 'Média importálása...';
+
+  @override
+  String get media_import_intro =>
+      'Az importált média a könyvtáradban marad, és automatikusan csatolható a merülésekhez.';
+
+  @override
   String get media_console_missing => 'Hiányzó';
 
   @override
@@ -12389,6 +12399,22 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get media_console_unlinked => 'Nem csatolt';
+
+  @override
+  String get media_import_linkTitle => 'Importált média csatolása';
+
+  @override
+  String media_import_linkConfirm(int count) {
+    return '$count elem csatolása';
+  }
+
+  @override
+  String get media_import_staysUnlinked => 'A Nem csatolt között marad';
+
+  @override
+  String media_import_linkedResult(int count) {
+    return '$count elem csatolva';
+  }
 
   @override
   String get media_inbox_chooseDive => 'Merülés kiválasztása';

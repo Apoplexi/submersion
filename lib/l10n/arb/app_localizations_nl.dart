@@ -12268,6 +12268,16 @@ class AppLocalizationsNl extends AppLocalizations {
   String get media_console_transfers => 'Overdrachten';
 
   @override
+  String get media_console_import => 'Importeren';
+
+  @override
+  String get media_import_launch => 'Media importeren...';
+
+  @override
+  String get media_import_intro =>
+      'Geïmporteerde media blijft in je bibliotheek en kan automatisch aan duiken worden gekoppeld.';
+
+  @override
   String get media_console_missing => 'Ontbrekend';
 
   @override
@@ -12334,6 +12344,22 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get media_console_unlinked => 'Niet gekoppeld';
+
+  @override
+  String get media_import_linkTitle => 'Geïmporteerde media koppelen';
+
+  @override
+  String media_import_linkConfirm(int count) {
+    return '$count items koppelen';
+  }
+
+  @override
+  String get media_import_staysUnlinked => 'Blijft bij Niet gekoppeld';
+
+  @override
+  String media_import_linkedResult(int count) {
+    return '$count items gekoppeld';
+  }
 
   @override
   String get media_inbox_chooseDive => 'Duik kiezen';

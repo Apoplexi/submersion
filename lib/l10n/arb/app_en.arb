@@ -7125,6 +7125,18 @@
   "@media_console_transfers": {
     "description": "Media console sidebar/tab label for the transfers view"
   },
+  "media_console_import": "Import",
+  "@media_console_import": {
+    "description": "Media console sidebar/tab label for the import section"
+  },
+  "media_import_launch": "Import media...",
+  "@media_import_launch": {
+    "description": "Import section: open the picker"
+  },
+  "media_import_intro": "Imported media is kept in your library and can be linked to dives automatically.",
+  "@media_import_intro": {
+    "description": "Import section intro text"
+  },
   "media_console_missing": "Missing",
   "@media_console_missing": {
     "description": "Media console sidebar/tab label for the missing-files view"
@@ -7234,6 +7246,32 @@
   "media_console_unlinked": "Unlinked",
   "@media_console_unlinked": {
     "description": "Media console sidebar/tab label for the unlinked inbox"
+  },
+  "media_import_linkTitle": "Link imported media",
+  "@media_import_linkTitle": {
+    "description": "Title of the post-import batch link screen"
+  },
+  "media_import_linkConfirm": "Link {count} items",
+  "@media_import_linkConfirm": {
+    "description": "Confirm button on the post-import batch link screen",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "media_import_staysUnlinked": "Stays in Unlinked",
+  "@media_import_staysUnlinked": {
+    "description": "Row subtitle for imports without a confident dive match"
+  },
+  "media_import_linkedResult": "{count} items linked",
+  "@media_import_linkedResult": {
+    "description": "Snackbar after the batch link applies",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "media_inbox_chooseDive": "Choose dive",
   "@media_inbox_chooseDive": {
