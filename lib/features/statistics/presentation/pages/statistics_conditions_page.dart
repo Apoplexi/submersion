@@ -2,7 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:submersion/core/providers/provider.dart';
 
 import 'package:submersion/core/accessibility/semantic_helpers.dart';
+// Aliased: flutter/material exports a Visibility widget that collides with the
+// app's Visibility enum.
+import 'package:submersion/core/constants/enums.dart' as enums;
+import 'package:submersion/core/domain/visibility/visibility_scale.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
+import 'package:submersion/features/dive_log/presentation/formatters/visibility_display.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/features/statistics/data/repositories/statistics_repository.dart';
 import 'package:submersion/features/statistics/presentation/providers/statistics_providers.dart';
@@ -55,7 +60,18 @@ class StatisticsConditionsPage extends ConsumerWidget {
       title: context.l10n.statistics_conditions_visibility_title,
       subtitle: context.l10n.statistics_conditions_visibility_subtitle,
       child: visibilityAsync.when(
-        data: (data) {
+        data: (raw) {
+          // The repository returns stable keys; localization happens here.
+          final units = UnitFormatter(ref.watch(settingsProvider));
+          final data = raw
+              .map(
+                (d) => DistributionSegment(
+                  label: _visibilityLabel(context, d.label, units),
+                  count: d.count,
+                  percentage: d.percentage,
+                ),
+              )
+              .toList();
           final description = data
               .map((d) => '${d.label}: ${d.percentage.toStringAsFixed(0)}%')
               .join(', ');
@@ -85,6 +101,33 @@ class StatisticsConditionsPage extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  /// Turns a repository key into display text.
+  ///
+  /// A calibrated band becomes its localized adjective. A `legacy_<bucket>`
+  /// key becomes the range that bucket covers, marked as pre-measurement, so
+  /// it is never confused with a calibrated reading.
+  static String _visibilityLabel(
+    BuildContext context,
+    String key,
+    UnitFormatter units,
+  ) {
+    final l10n = context.l10n;
+    if (key.startsWith('legacy_')) {
+      final name = key.substring('legacy_'.length);
+      final bucket = enums.Visibility.values.firstWhere(
+        (v) => v.name == name,
+        orElse: () => enums.Visibility.unknown,
+      );
+      final band = formatLegacyVisibilityBand(bucket, l10n, units);
+      return l10n.statistics_conditions_visibility_legacySuffix(band ?? name);
+    }
+    final band = VisibilityBand.values.firstWhere(
+      (b) => b.name == key,
+      orElse: () => VisibilityBand.poor,
+    );
+    return visibilityBandName(band, l10n);
   }
 
   Widget _buildWaterTypeSection(BuildContext context, WidgetRef ref) {
