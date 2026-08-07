@@ -3,7 +3,6 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
@@ -12,6 +11,7 @@ import 'package:video_player/video_player.dart';
 
 import 'package:submersion/core/constants/feature_flags.dart';
 import 'package:submersion/core/providers/provider.dart';
+import 'package:submersion/core/router/section_navigation.dart';
 import 'package:submersion/core/services/lightroom/lightroom_api_client.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
@@ -318,17 +318,12 @@ class _MediaViewerPageState extends ConsumerState<MediaViewerPage> {
                     onClose: () => Navigator.of(context).pop(),
                     onShare: () => _shareCurrentPhoto(currentItem),
                     onWriteMetadata: () => _writeMetadataToPhoto(currentItem),
+                    // The viewer is deliberately NOT popped first: leaving it
+                    // on the stack is what lets Back return the user to the
+                    // photo they launched from, with its page index, zoom and
+                    // overlay toggles intact, rather than to the bare grid.
                     onGoToDive: widget.showGoToDive && currentDiveId != null
-                        ? () {
-                            // push, not go: `/dives/:diveId` is a child route,
-                            // so a stack-replacing `go` would rebuild the stack
-                            // as [dive list, dive detail] and strand the user
-                            // on the dive list when they press back. Pushing
-                            // keeps the section they came from underneath.
-                            final router = GoRouter.of(context);
-                            Navigator.of(context).pop();
-                            router.push('/dives/$currentDiveId');
-                          }
+                        ? () => context.pushOrReturnTo('/dives/$currentDiveId')
                         : null,
                     hasEnrichment: enrichment?.depthMeters != null,
                     showPerdixToggle: perdixAvailable,
@@ -447,13 +442,29 @@ class _MediaViewerPageState extends ConsumerState<MediaViewerPage> {
     );
     if (!dialogResult.confirmed || !mounted) return;
 
-    // Show loading indicator
+    // Show loading indicator. The navigator is captured up front so the
+    // dialog can still be dismissed if this page is unmounted while the
+    // write is in flight -- otherwise a non-dismissible barrier is stranded
+    // over the whole app. `barrierDismissible: false` blocks barrier taps
+    // only, so Android's Back button can still pop this dialog out from
+    // under us; the flag keeps the dismissal from popping whatever route
+    // happens to be on top instead.
     debugPrint('[MediaViewerPage] Showing loading dialog...');
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (_) =>
-          const Center(child: CircularProgressIndicator(color: Colors.white)),
+    final rootNavigator = Navigator.of(context, rootNavigator: true);
+    var loadingDialogOpen = true;
+    void dismissLoadingDialog() {
+      if (!loadingDialogOpen) return;
+      loadingDialogOpen = false;
+      rootNavigator.pop();
+    }
+
+    unawaited(
+      showDialog<void>(
+        context: context,
+        barrierDismissible: false,
+        builder: (_) =>
+            const Center(child: CircularProgressIndicator(color: Colors.white)),
+      ).whenComplete(() => loadingDialogOpen = false),
     );
     debugPrint('[MediaViewerPage] Loading dialog shown, calling service...');
 
@@ -476,13 +487,8 @@ class _MediaViewerPageState extends ConsumerState<MediaViewerPage> {
 
       // Dismiss loading - use rootNavigator to match where showDialog placed the dialog
       debugPrint('[MediaViewerPage] Dismissing loading dialog...');
-      if (mounted) {
-        debugPrint(
-          '[MediaViewerPage] mounted=true, calling pop with rootNavigator...',
-        );
-        Navigator.of(context, rootNavigator: true).pop();
-        debugPrint('[MediaViewerPage] pop() completed');
-      }
+      dismissLoadingDialog();
+      debugPrint('[MediaViewerPage] pop() completed');
 
       debugPrint('[MediaViewerPage] About to show success/error message...');
       if (success) {
@@ -505,11 +511,11 @@ class _MediaViewerPageState extends ConsumerState<MediaViewerPage> {
       );
     } on MetadataWriteException catch (e) {
       debugPrint('[MediaViewerPage] MetadataWriteException: ${e.message}');
-      if (mounted) Navigator.of(context, rootNavigator: true).pop();
+      dismissLoadingDialog();
       _showError(e.message);
     } catch (e) {
       debugPrint('[MediaViewerPage] Exception: $e');
-      if (mounted) Navigator.of(context, rootNavigator: true).pop();
+      dismissLoadingDialog();
       _showError(
         l10n.media_photoViewer_failedToWriteMetadataError(e.toString()),
       );
@@ -725,6 +731,11 @@ class _VideoItemState extends ConsumerState<_VideoItem> {
   }
 
   Future<void> _initializeVideo() async {
+    // Held outside the try so a throw from initialize() can still dispose it:
+    // `_controller` is only assigned after a successful init, so dispose()
+    // cannot clean up a controller that never got that far, and each leak
+    // orphans a native decoder/texture for the process lifetime.
+    VideoPlayerController? pending;
     try {
       final path = await ref.read(resolvedFilePathProvider(widget.item).future);
 
@@ -737,6 +748,7 @@ class _VideoItemState extends ConsumerState<_VideoItem> {
       }
 
       final controller = VideoPlayerController.file(File(path));
+      pending = controller;
       await controller.initialize();
 
       if (!mounted) {
@@ -749,8 +761,11 @@ class _VideoItemState extends ConsumerState<_VideoItem> {
         _isInitialized = true;
         _isLoading = false;
       });
+      // Ownership has moved to _controller; dispose() owns it from here.
+      pending = null;
       widget.onControllerChanged(widget.item.id, controller);
     } catch (e) {
+      await pending?.dispose();
       if (mounted) {
         setState(() {
           _error = 'failedToLoadVideo';

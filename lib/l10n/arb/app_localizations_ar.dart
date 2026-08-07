@@ -12417,6 +12417,12 @@ class AppLocalizationsAr extends AppLocalizations {
   String get media_library_unlinkedHeader => 'غير مرتبطة';
 
   @override
+  String get media_library_diveHeaderHint => 'فتح هذه الغطسة';
+
+  @override
+  String get media_library_untitledDiveHeader => 'غطسة بدون عنوان';
+
+  @override
   String get media_library_viewMode_byDive => 'حسب الغطسة';
 
   @override

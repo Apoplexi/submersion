@@ -12076,6 +12076,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get media_library_unlinkedHeader => '未关联';
 
   @override
+  String get media_library_diveHeaderHint => '打开此潜水';
+
+  @override
+  String get media_library_untitledDiveHeader => '未命名潜水';
+
+  @override
   String get media_library_viewMode_byDive => '按潜水';
 
   @override

@@ -12649,6 +12649,12 @@ class AppLocalizationsPt extends AppLocalizations {
   String get media_library_unlinkedHeader => 'Sem vínculo';
 
   @override
+  String get media_library_diveHeaderHint => 'Abrir este mergulho';
+
+  @override
+  String get media_library_untitledDiveHeader => 'Mergulho sem título';
+
+  @override
   String get media_library_viewMode_byDive => 'Por mergulho';
 
   @override

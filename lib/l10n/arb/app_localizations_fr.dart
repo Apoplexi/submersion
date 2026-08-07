@@ -12681,6 +12681,12 @@ class AppLocalizationsFr extends AppLocalizations {
   String get media_library_unlinkedHeader => 'Non liés';
 
   @override
+  String get media_library_diveHeaderHint => 'Ouvrir cette plongée';
+
+  @override
+  String get media_library_untitledDiveHeader => 'Plongée sans titre';
+
+  @override
   String get media_library_viewMode_byDive => 'Par plongée';
 
   @override

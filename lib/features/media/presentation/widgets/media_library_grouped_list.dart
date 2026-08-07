@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
+import 'package:submersion/core/router/section_navigation.dart';
 import 'package:submersion/features/media/domain/entities/media_library_filter.dart';
 import 'package:submersion/features/media/presentation/widgets/media_library_grid.dart';
 import 'package:submersion/features/media/presentation/widgets/media_library_groupers.dart';
@@ -49,7 +49,10 @@ class MediaLibraryGroupedList extends StatelessWidget {
         final locale = Localizations.localeOf(context).toString();
         return DateFormat.yMMMd(locale).format(date);
       }
-      return '';
+      // A linked dive with no number, site or date still needs a visible
+      // label: the header is this view's only route to that dive, and an
+      // empty string renders a zero-size, untappable target.
+      return context.l10n.media_library_untitledDiveHeader;
     }
     return parts.join(' · ');
   }
@@ -86,23 +89,43 @@ class MediaLibraryGroupedList extends StatelessWidget {
         );
       } else if (header is DiveGroupHeader) {
         final label = _diveHeaderLabel(context, header);
+        final diveId = header.diveId;
+        // Inert while a selection is in progress, matching the tiles below it:
+        // a tap landing a few pixels high must not navigate away from a
+        // half-built selection.
+        final navigable = diveId != null && selectedIds.isEmpty;
         rows.add(
-          Padding(
-            padding: const EdgeInsets.fromLTRB(12, 12, 12, 4),
-            child: header.diveId != null
-                ? InkWell(
-                    // push, not go: `/dives/:diveId` is a child route, so a
-                    // stack-replacing `go` would strand the user on the dive
-                    // list when they press back instead of returning them to
-                    // the library.
-                    onTap: () => context.push('/dives/${header.diveId}'),
-                    child: Text(
-                      label,
-                      style: Theme.of(context).textTheme.titleMedium,
+          navigable
+              ? Semantics(
+                  button: true,
+                  label: label,
+                  hint: context.l10n.media_library_diveHeaderHint,
+                  child: InkWell(
+                    onTap: () => context.pushOrReturnTo('/dives/$diveId'),
+                    // Padding inside the InkWell so it contributes to the hit
+                    // box, with a 48dp floor per Material's tap-target rule.
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(minHeight: 48),
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(12, 12, 12, 4),
+                        child: Align(
+                          alignment: AlignmentDirectional.centerStart,
+                          child: Text(
+                            label,
+                            style: Theme.of(context).textTheme.titleMedium,
+                          ),
+                        ),
+                      ),
                     ),
-                  )
-                : Text(label, style: Theme.of(context).textTheme.titleMedium),
-          ),
+                  ),
+                )
+              : Padding(
+                  padding: const EdgeInsets.fromLTRB(12, 12, 12, 4),
+                  child: Text(
+                    label,
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                ),
         );
       }
       rows.add(

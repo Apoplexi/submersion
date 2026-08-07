@@ -12643,6 +12643,12 @@ class AppLocalizationsIt extends AppLocalizations {
   String get media_library_unlinkedHeader => 'Non collegati';
 
   @override
+  String get media_library_diveHeaderHint => 'Apri questa immersione';
+
+  @override
+  String get media_library_untitledDiveHeader => 'Immersione senza titolo';
+
+  @override
   String get media_library_viewMode_byDive => 'Per immersione';
 
   @override

@@ -12636,6 +12636,12 @@ class AppLocalizationsDe extends AppLocalizations {
   String get media_library_unlinkedHeader => 'Nicht verknüpft';
 
   @override
+  String get media_library_diveHeaderHint => 'Diesen Tauchgang öffnen';
+
+  @override
+  String get media_library_untitledDiveHeader => 'Unbenannter Tauchgang';
+
+  @override
   String get media_library_viewMode_byDive => 'Nach Tauchgang';
 
   @override

@@ -12335,6 +12335,12 @@ class AppLocalizationsHe extends AppLocalizations {
   String get media_library_unlinkedHeader => 'לא מקושרים';
 
   @override
+  String get media_library_diveHeaderHint => 'פתיחת צלילה זו';
+
+  @override
+  String get media_library_untitledDiveHeader => 'צלילה ללא שם';
+
+  @override
   String get media_library_viewMode_byDive => 'לפי צלילה';
 
   @override

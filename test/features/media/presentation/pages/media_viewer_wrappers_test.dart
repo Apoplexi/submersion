@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
 // Override is not re-exported by flutter_riverpod; test/helpers/mock_providers
 // reaches for it the same way.
 // ignore: implementation_imports
@@ -45,8 +46,9 @@ class _UnavailableResolver implements MediaSourceResolver {
   Future<VerifyResult> verify(MediaItem item) async => VerifyResult.available;
 }
 
-MediaItem item(String id) => MediaItem(
+MediaItem item(String id, {String? diveId}) => MediaItem(
   id: id,
+  diveId: diveId,
   mediaType: MediaType.photo,
   sourceType: MediaSourceType.platformGallery,
   takenAt: DateTime.utc(2026, 7, 1, 10),
@@ -197,6 +199,84 @@ void main() {
       );
       expect(find.textContaining('trip query failed'), findsOneWidget);
       expect(find.byType(MediaViewerPage), findsNothing);
+    });
+
+    testWidgets('Go to dive keeps the trip gallery beneath the dive', (
+      tester,
+    ) async {
+      // TripPhotoViewerPage is the OTHER showGoToDive consumer, so the shared
+      // callback silently retargets this surface too. Without coverage a
+      // change to trip routing could regress it with the suite green.
+      final router = GoRouter(
+        initialLocation: '/trips/t1/gallery',
+        routes: [
+          ShellRoute(
+            builder: (context, state, child) => Scaffold(body: child),
+            routes: [
+              GoRoute(
+                path: '/trips/:tripId/gallery',
+                builder: (context, state) => const TripPhotoViewerPage(
+                  tripId: 't1',
+                  initialMediaId: 'm1',
+                ),
+              ),
+              GoRoute(
+                path: '/dives',
+                builder: (context, state) => const Text('Dive List'),
+                routes: [
+                  GoRoute(
+                    path: ':diveId',
+                    builder: (context, state) => Scaffold(
+                      appBar: AppBar(),
+                      body: const Text('Dive Detail'),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ],
+      );
+      addTearDown(router.dispose);
+
+      await tester.runAsync(() async {
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              sharedPreferencesProvider.overrideWithValue(prefs),
+              mediaSourceResolverRegistryProvider.overrideWithValue(
+                MediaSourceResolverRegistry({
+                  MediaSourceType.platformGallery: _UnavailableResolver(),
+                }),
+              ),
+              flatMediaListForTripProvider.overrideWith(
+                (ref, id) async => [item('m1', diveId: 'd1')],
+              ),
+            ],
+            child: MaterialApp.router(
+              routerConfig: router,
+              locale: const Locale('en'),
+              localizationsDelegates: AppLocalizations.localizationsDelegates,
+              supportedLocales: AppLocalizations.supportedLocales,
+            ),
+          ),
+        );
+        await Future<void>.delayed(const Duration(milliseconds: 100));
+        await tester.pump();
+        await Future<void>.delayed(const Duration(milliseconds: 100));
+        await tester.pump();
+      });
+
+      await tester.tap(find.byTooltip('Go to dive'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Dive Detail'), findsOneWidget);
+      expect(router.state.uri.toString(), '/dives/d1');
+      expect(find.text('Dive List', skipOffstage: false), findsNothing);
+
+      await tester.tap(find.byType(BackButton));
+      await tester.pumpAndSettle();
+      expect(find.byType(MediaViewerPage), findsOneWidget);
     });
   });
 }

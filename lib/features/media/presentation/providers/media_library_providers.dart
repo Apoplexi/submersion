@@ -121,7 +121,14 @@ class MediaLibraryNotifier extends StateNotifier<MediaLibraryState> {
   StreamSubscription<void>? _changesSub;
 
   Future<void> loadFirstPage() async {
-    state = const MediaLibraryState(isLoading: true);
+    // Keep the entries already on screen while refreshing. Emptying them here
+    // trips the library view's first-load spinner, which replaces the whole
+    // grid and so disposes every tile -- and each tile re-resolves from
+    // initState when it remounts. That churn is invisible but real on any
+    // media change (writing metadata, a transfer completing), and the library
+    // page now stays mounted underneath a pushed dive detail. A genuine first
+    // load still shows the spinner, because entries are empty then anyway.
+    state = state.copyWith(isLoading: true);
     try {
       final page = await _repo.getPage(diverId: _diverId, filter: _filter);
       if (!mounted) return;

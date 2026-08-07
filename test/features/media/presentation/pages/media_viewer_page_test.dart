@@ -153,39 +153,48 @@ void main() {
   testWidgets('Go to dive leaves the media section beneath the dive detail', (
     tester,
   ) async {
-    // Mirrors the real router: :diveId is a CHILD of /dives, so a stack-
-    // replacing navigation would synthesize the dive list underneath.
+    // Shell-shaped like production: app_router puts BOTH /media and
+    // /dives/:diveId inside one ShellRoute with no parentNavigatorKey, so the
+    // pushed page lands on the same shell navigator that already carries the
+    // imperatively pushed viewer. A flat router would exercise a different
+    // go_router path and hide that interaction. :diveId is a CHILD of /dives,
+    // which is what makes a stack-replacing `go` synthesize the dive list.
     final router = GoRouter(
       initialLocation: '/media',
       routes: [
-        GoRoute(
-          path: '/media',
-          builder: (context, state) => Scaffold(
-            body: Builder(
-              builder: (inner) => TextButton(
-                onPressed: () => Navigator.of(inner).push(
-                  MaterialPageRoute<void>(
-                    fullscreenDialog: true,
-                    builder: (_) => MediaViewerPage(
-                      mediaList: [item('a', diveId: 'd1')],
-                      initialMediaId: 'a',
-                      showGoToDive: true,
-                    ),
-                  ),
-                ),
-                child: const Text('Media Section'),
-              ),
-            ),
-          ),
-        ),
-        GoRoute(
-          path: '/dives',
-          builder: (context, state) => const Scaffold(body: Text('Dive List')),
+        ShellRoute(
+          builder: (context, state, child) => Scaffold(body: child),
           routes: [
             GoRoute(
-              path: ':diveId',
-              builder: (context, state) =>
-                  Scaffold(appBar: AppBar(), body: const Text('Dive Detail')),
+              path: '/media',
+              builder: (context, state) => Builder(
+                builder: (inner) => TextButton(
+                  onPressed: () => Navigator.of(inner).push(
+                    MaterialPageRoute<void>(
+                      fullscreenDialog: true,
+                      builder: (_) => MediaViewerPage(
+                        mediaList: [item('a', diveId: 'd1')],
+                        initialMediaId: 'a',
+                        showGoToDive: true,
+                      ),
+                    ),
+                  ),
+                  child: const Text('Media Section'),
+                ),
+              ),
+            ),
+            GoRoute(
+              path: '/dives',
+              builder: (context, state) => const Text('Dive List'),
+              routes: [
+                GoRoute(
+                  path: ':diveId',
+                  builder: (context, state) => Scaffold(
+                    appBar: AppBar(),
+                    body: const Text('Dive Detail'),
+                  ),
+                ),
+              ],
             ),
           ],
         ),
@@ -221,11 +230,20 @@ void main() {
     await tester.tap(find.byTooltip('Go to dive'));
     await tester.pumpAndSettle();
     expect(find.text('Dive Detail'), findsOneWidget);
+    // Pin the router itself, not just what is painted: a plain Navigator.push
+    // of the same page would satisfy the widget assertions while leaving the
+    // router desynchronized from the screen.
+    expect(router.state.uri.toString(), '/dives/d1');
+    // skipOffstage: false -- the guarantee is that the dive list is never
+    // MATERIALIZED underneath, not merely that it is currently invisible.
+    expect(find.text('Dive List', skipOffstage: false), findsNothing);
 
     await tester.tap(find.byType(BackButton));
     await tester.pumpAndSettle();
 
-    expect(find.text('Media Section'), findsOneWidget);
-    expect(find.text('Dive List'), findsNothing);
+    // Back returns to the photo the user launched from, with the media
+    // section still beneath it.
+    expect(find.byTooltip('Go to dive'), findsOneWidget);
+    expect(find.text('Media Section', skipOffstage: false), findsOneWidget);
   });
 }

@@ -12603,6 +12603,12 @@ class AppLocalizationsHu extends AppLocalizations {
   String get media_library_unlinkedHeader => 'Nem csatolt';
 
   @override
+  String get media_library_diveHeaderHint => 'Merülés megnyitása';
+
+  @override
+  String get media_library_untitledDiveHeader => 'Névtelen merülés';
+
+  @override
   String get media_library_viewMode_byDive => 'Merülés szerint';
 
   @override

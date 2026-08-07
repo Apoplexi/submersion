@@ -21445,6 +21445,18 @@ abstract class AppLocalizations {
   /// **'Unlinked'**
   String get media_library_unlinkedHeader;
 
+  /// Accessibility hint for the by-dive group header, which opens the dive
+  ///
+  /// In en, this message translates to:
+  /// **'Open this dive'**
+  String get media_library_diveHeaderHint;
+
+  /// By-dive view header for a linked dive with no number, site or date
+  ///
+  /// In en, this message translates to:
+  /// **'Untitled dive'**
+  String get media_library_untitledDiveHeader;
+
   /// Library view mode: grouped by dive
   ///
   /// In en, this message translates to:

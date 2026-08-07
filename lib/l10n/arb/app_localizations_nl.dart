@@ -12548,6 +12548,12 @@ class AppLocalizationsNl extends AppLocalizations {
   String get media_library_unlinkedHeader => 'Niet gekoppeld';
 
   @override
+  String get media_library_diveHeaderHint => 'Deze duik openen';
+
+  @override
+  String get media_library_untitledDiveHeader => 'Naamloze duik';
+
+  @override
   String get media_library_viewMode_byDive => 'Per duik';
 
   @override

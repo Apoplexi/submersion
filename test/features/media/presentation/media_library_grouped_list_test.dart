@@ -117,31 +117,37 @@ void main() {
   testWidgets('a dive header leaves the library beneath the dive detail', (
     tester,
   ) async {
-    // Mirrors the real router: :diveId is a CHILD of /dives, so a stack-
-    // replacing navigation would synthesize the dive list underneath.
+    // Shell-shaped like production: app_router nests both /media and
+    // /dives/:diveId inside one ShellRoute, and :diveId is a CHILD of /dives,
+    // which is what makes a stack-replacing `go` synthesize the dive list.
     final router = GoRouter(
       initialLocation: '/media',
       routes: [
-        GoRoute(
-          path: '/media',
-          builder: (context, state) => Scaffold(
-            body: MediaLibraryGroupedList(
-              groups: [diveGroup(diveId: 'd1', diveNumber: 9)],
-              hasMore: false,
-              onLoadMore: () {},
-              onTileTap: (_) {},
-              selectedIds: const {},
-            ),
-          ),
-        ),
-        GoRoute(
-          path: '/dives',
-          builder: (context, state) => const Scaffold(body: Text('Dive List')),
+        ShellRoute(
+          builder: (context, state, child) => Scaffold(body: child),
           routes: [
             GoRoute(
-              path: ':diveId',
-              builder: (context, state) =>
-                  Scaffold(appBar: AppBar(), body: const Text('Dive Detail')),
+              path: '/media',
+              builder: (context, state) => MediaLibraryGroupedList(
+                groups: [diveGroup(diveId: 'd1', diveNumber: 9)],
+                hasMore: false,
+                onLoadMore: () {},
+                onTileTap: (_) {},
+                selectedIds: const {},
+              ),
+            ),
+            GoRoute(
+              path: '/dives',
+              builder: (context, state) => const Text('Dive List'),
+              routes: [
+                GoRoute(
+                  path: ':diveId',
+                  builder: (context, state) => Scaffold(
+                    appBar: AppBar(),
+                    body: const Text('Dive Detail'),
+                  ),
+                ),
+              ],
             ),
           ],
         ),
@@ -162,12 +168,46 @@ void main() {
     await tester.tap(find.text('#9'));
     await tester.pumpAndSettle();
     expect(find.text('Dive Detail'), findsOneWidget);
+    expect(router.state.uri.toString(), '/dives/d1');
+    // skipOffstage: false -- the dive list must never be materialized, not
+    // merely be invisible.
+    expect(find.text('Dive List', skipOffstage: false), findsNothing);
 
     await tester.tap(find.byType(BackButton));
     await tester.pumpAndSettle();
 
     expect(find.text('#9'), findsOneWidget);
-    expect(find.text('Dive List'), findsNothing);
+    expect(find.text('Dive List', skipOffstage: false), findsNothing);
+  });
+
+  testWidgets('a dive header is inert while a selection is in progress', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      host(
+        [
+          diveGroup(diveId: 'd1', diveNumber: 9, entries: [entry('a')]),
+        ],
+        selectedIds: const {'a'},
+      ),
+    );
+    await tester.pump();
+
+    // Tiles toggle selection during multi-select; the header must not
+    // navigate out from under a half-built selection.
+    expect(find.byType(InkWell), findsNothing);
+    expect(find.text('#9'), findsOneWidget);
+  });
+
+  testWidgets('a linked dive with no label still shows a tappable header', (
+    tester,
+  ) async {
+    await tester.pumpWidget(host([diveGroup(diveId: 'd1')]));
+    await tester.pump();
+
+    expect(find.text('Untitled dive'), findsOneWidget);
+    final size = tester.getSize(find.byType(InkWell));
+    expect(size.height, greaterThanOrEqualTo(48));
   });
 
   testWidgets('tiles report taps with their entry', (tester) async {
@@ -203,9 +243,11 @@ void main() {
     );
     await tester.pump();
 
+    // Over-drag deliberately: the list clamps at maxScrollExtent, so this
+    // reaches the end regardless of how tall the group headers are.
     await tester.drag(
       find.byType(MediaLibraryGroupedList),
-      const Offset(0, -4000),
+      const Offset(0, -20000),
     );
     await tester.pump();
 
@@ -224,9 +266,11 @@ void main() {
     );
     await tester.pump();
 
+    // Over-drag deliberately: the list clamps at maxScrollExtent, so this
+    // reaches the end regardless of how tall the group headers are.
     await tester.drag(
       find.byType(MediaLibraryGroupedList),
-      const Offset(0, -4000),
+      const Offset(0, -20000),
     );
     await tester.pump();
 

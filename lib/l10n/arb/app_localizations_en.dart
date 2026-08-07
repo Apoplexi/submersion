@@ -12441,6 +12441,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get media_library_unlinkedHeader => 'Unlinked';
 
   @override
+  String get media_library_diveHeaderHint => 'Open this dive';
+
+  @override
+  String get media_library_untitledDiveHeader => 'Untitled dive';
+
+  @override
   String get media_library_viewMode_byDive => 'By dive';
 
   @override
