@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/services/export/csv/csv_export_service.dart';
 import 'package:submersion/core/services/export/excel/excel_export_service.dart';
+import 'package:submersion/core/services/export/export_service.dart';
 import 'package:submersion/core/services/export/kml/kml_export_service.dart';
 import 'package:submersion/core/services/export/shared/file_export_utils.dart';
 import 'package:submersion/core/services/export/uddf/uddf_export_service.dart';
@@ -124,6 +125,23 @@ void main() {
 
       expect(await service.saveDivesToUddfFile([]), target);
       expect(await File(target).readAsString(), contains('<uddf'));
+    });
+  });
+
+  group('ExportService facade', () {
+    test('saveDivesToUddfFile delegates to the UDDF service', () async {
+      final dir = await Directory.systemTemp.createTemp('uddf_facade_test');
+      addTearDown(() => dir.delete(recursive: true));
+      final target = '${dir.path}/facade.uddf';
+      mockPicker.saveFileResult = target;
+
+      expect(await ExportService().saveDivesToUddfFile([]), target);
+      expect(await File(target).readAsString(), contains('<uddf'));
+    });
+
+    test('saveDivesToUddfFile propagates cancellation', () async {
+      mockPicker.saveFileResult = null;
+      expect(await ExportService().saveDivesToUddfFile([]), isNull);
     });
   });
 }
