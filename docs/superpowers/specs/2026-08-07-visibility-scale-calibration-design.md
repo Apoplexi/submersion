@@ -71,6 +71,30 @@ TextColumn get visibility => text().nullable()();
 The migration adds the column and performs **no backfill**. Existing rows keep
 their bucket word and `visibilityMeters` stays `null`.
 
+### Migration mechanics
+
+This codebase does not use plain `m.addColumn()` in the version ladder. Every
+column addition is an idempotent `_assert<Thing>Column()` helper that inspects
+`PRAGMA table_info` first, and is called from **two** places: the version gate in
+`onUpgrade`, and the `beforeOpen` backstop. See `_assertDefaultCurrencyColumn`
+(`database.dart:4093`) and `_assertTripReturnFlightColumn` (`database.dart:4111`).
+
+The reason is documented at `database.dart:7353-7355`: versions are reserved by
+parallel branches (v138 by #603, v140 by the media section, v143 by the media
+integration branch). A database that upgraded on one branch can arrive at
+another already past the version gate and would never run a ladder-only
+`addColumn`. The `beforeOpen` backstop is its only path to the column.
+
+Each helper must return early when `PRAGMA table_info` is empty, so minimal
+migration-test fixtures that lack the table do not fail.
+
+### Version selection
+
+`currentSchemaVersion` is `142` on `origin/main` (`database.dart:2935`). v143 is
+claimed by the unmerged media integration branch (PR #894), so this work takes
+**v144**. Re-check the ladder against `origin/main` before pushing - version
+claims move.
+
 ### Precedence and clearing
 
 Numeric wins. Reads resolve in this order:
@@ -167,16 +191,30 @@ Visibility   15-50 ft
 ```
 
 We know only that the dive fell somewhere in that band; asserting an adjective
-would be a guess. This requires the band string to be unit-aware, so the
-hardcoded English in `enums.dart` is replaced by ARB messages with numeric
-placeholders.
+would be a guess.
 
-The `Visibility` enum itself is **retained** - it is still needed to decode the
-legacy column, and UDDF and Subsurface importers still reference it for files
-that carry a bucket rather than a number. What is removed is
-`Visibility.displayName`, replaced by metric band bounds on each value plus a
-localized, unit-aware renderer that formats those bounds. Statistics legacy
-segment labels use the same renderer, so they are unit-aware too.
+The `Visibility` enum is **retained** - it still decodes the legacy column, and
+the UDDF and Subsurface importers still need it for files carrying a bucket
+rather than a number.
+
+`Visibility.displayName` is also **retained, unchanged**.
+`environment_enum_display.dart:6-10` documents a deliberate decision: enum
+`displayName` stays English because it feeds data interchange (CSV/Excel export,
+the field extractor) where a stable, locale-independent value is wanted. The
+sibling enums follow this and it is not this change's business to overturn it.
+
+What is **added** is metric band bounds on each enum value plus a localized,
+unit-aware band renderer, following the existing
+`localizedName(AppLocalizations l10n)` extension pattern in
+`environment_enum_display.dart`. Statistics legacy segment labels use the same
+renderer, so they are unit-aware too.
+
+This incidentally fixes a live bug. The keys `enum_visibility_excellent`
+through `enum_visibility_poor` exist in all twelve locale ARB files but are
+referenced by zero lines of Dart - the hardcoded English `displayName` is what
+actually renders. Visibility was missed when its sibling enums were localized
+for issue #622, so non-English users currently see English visibility labels.
+Wiring the renderer through `localizedName` resolves it.
 
 ## Statistics
 
