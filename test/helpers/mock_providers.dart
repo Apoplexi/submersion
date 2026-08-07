@@ -28,7 +28,8 @@ typedef Override = riverpod.Override;
 /// Mock SettingsNotifier that doesn't access the database
 class MockSettingsNotifier extends StateNotifier<AppSettings>
     implements SettingsNotifier {
-  MockSettingsNotifier() : super(const AppSettings());
+  MockSettingsNotifier([AppSettings? initial])
+    : super(initial ?? const AppSettings());
 
   @override
   Future<void> setDepthUnit(DepthUnit unit) async =>
@@ -159,6 +160,27 @@ class MockSettingsNotifier extends StateNotifier<AppSettings>
     }
     state = state.copyWith(hiddenHomeChips: hidden);
   }
+
+  @override
+  Future<void> setHomeCardEnabled(String cardId, bool enabled) async {
+    final hidden = {...state.hiddenHomeCards};
+    if (enabled) {
+      hidden.remove(cardId);
+    } else {
+      hidden.add(cardId);
+    }
+    state = state.copyWith(hiddenHomeCards: hidden);
+  }
+
+  @override
+  Future<void> setHomeCardOrder(List<String> order) async =>
+      state = state.copyWith(homeCardOrder: order);
+
+  @override
+  Future<void> resetHomeCards() async => state = state.copyWith(
+    homeCardOrder: const <String>[],
+    hiddenHomeCards: const <String>{},
+  );
 
   @override
   Future<void> setSafetyRuleEnabled(SafetyRuleId rule, bool enabled) async {
