@@ -63,7 +63,7 @@ class BulkScalarInputs {
     this.rating,
     this.isFavorite,
     this.waterType,
-    this.visibility,
+    this.visibilityMeters,
     this.currentDirection,
     this.currentStrength,
     this.swellHeight,
@@ -100,7 +100,11 @@ class BulkScalarInputs {
   final int? rating;
   final bool? isFavorite;
   final String? waterType;
-  final String? visibility;
+
+  /// Measured visibility in meters. Replaces the pre-v144 bucket string:
+  /// applying it also clears the legacy bucket on every touched dive, matching
+  /// the precedence rule in the dive repository.
+  final double? visibilityMeters;
   final String? currentDirection;
   final String? currentStrength;
   final double? swellHeight;
@@ -148,7 +152,12 @@ DivesCompanion buildScalarCompanion(
         isFavorite: Value(i.isFavorite ?? false),
       ),
       BulkField.waterType => c.copyWith(waterType: Value(i.waterType)),
-      BulkField.visibility => c.copyWith(visibility: Value(i.visibility)),
+      BulkField.visibility => c.copyWith(
+        visibilityMeters: Value(i.visibilityMeters),
+        // Clear the legacy bucket so a bulk-set measurement cannot leave a
+        // dive carrying a contradicting band.
+        visibility: const Value(null),
+      ),
       BulkField.currentDirection => c.copyWith(
         currentDirection: Value(i.currentDirection),
       ),
