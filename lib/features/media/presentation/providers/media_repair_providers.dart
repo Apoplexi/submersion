@@ -1,4 +1,5 @@
 import 'package:submersion/core/providers/provider.dart';
+import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/features/divers/presentation/providers/diver_providers.dart';
 import 'package:submersion/features/media/data/services/repair/folder_candidate_source.dart';
 import 'package:submersion/features/media/data/services/repair/media_repair_service.dart';
@@ -68,15 +69,22 @@ class RepairWizardNotifier extends StateNotifier<RepairWizardState> {
   RepairWizardNotifier({
     required this.loadMissingRows,
     required this.buildSources,
-    required this.isVolumeOnline,
+    required this.newVolumeProbe,
     required this.applyProposals,
   }) : super(const RepairWizardIdle());
 
   final Future<List<MediaItem>> Function() loadMissingRows;
   final List<CandidateSource> Function(RepairWizardConfig config) buildSources;
-  final Future<bool> Function(String path) isVolumeOnline;
+
+  /// Builds the volume probe for ONE harvest pass. A factory rather than a
+  /// bare probe so each scan re-reads mount state (the user may plug the
+  /// missing drive in between scans) while a single scan still probes each
+  /// mount root once, however many rows live on it.
+  final Future<bool> Function(String path) Function() newVolumeProbe;
   final Future<RepairApplyReport> Function(List<RepairProposal> proposals)
   applyProposals;
+
+  static const _log = LoggerService('RepairWizardNotifier');
 
   final Set<String> _checked = {};
   List<RepairProposal> _proposals = const [];
@@ -102,6 +110,7 @@ class RepairWizardNotifier extends StateNotifier<RepairWizardState> {
 
       // An unmounted volume is not broken: exclude those rows entirely so
       // the wizard never proposes replacing files that still exist.
+      final isVolumeOnline = newVolumeProbe();
       final targets = <MediaItem>[];
       for (final row in rows) {
         final path = row.localPath ?? row.filePath;
@@ -149,6 +158,9 @@ class RepairWizardNotifier extends StateNotifier<RepairWizardState> {
 
       state = RepairWizardReview(proposals: _proposals, prefixMove: prefixMove);
     } catch (e) {
+      // Logged here because the pane shows a generic localized message: the
+      // raw exception is untranslated and can name internal paths.
+      _log.warning('Repair harvest failed: $e');
       state = RepairWizardError(e);
     }
   }
@@ -163,6 +175,7 @@ class RepairWizardNotifier extends StateNotifier<RepairWizardState> {
       final report = await applyProposals(accepted);
       state = RepairWizardDone(report: report);
     } catch (e) {
+      _log.warning('Repair apply failed: $e');
       state = RepairWizardError(e);
     }
   }
@@ -227,7 +240,7 @@ final repairWizardProvider =
               },
             ),
         ],
-        isVolumeOnline: (path) => VolumeStatus().isVolumeOnline(path),
+        newVolumeProbe: () => VolumeStatus().newPassProbe(),
         applyProposals: (proposals) =>
             ref.read(mediaRepairServiceProvider).apply(proposals),
       );

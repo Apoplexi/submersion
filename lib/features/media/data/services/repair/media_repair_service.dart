@@ -5,6 +5,7 @@ import 'package:uuid/uuid.dart';
 import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/features/media/data/repositories/media_repository.dart';
 import 'package:submersion/features/media/data/services/repair/folder_candidate_source.dart';
+import 'package:submersion/features/media/domain/entities/media_source_type.dart';
 import 'package:submersion/features/media/domain/services/media_repair_types.dart';
 import 'package:submersion/features/media_store/data/media_transfer_queue_repository.dart';
 
@@ -15,7 +16,7 @@ class RepairWrite {
     this.newLocalPath,
     this.newBookmarkRef,
     this.newPlatformAssetId,
-    this.toGallery = false,
+    this.newSourceType = MediaSourceType.localFile,
   });
 
   final String mediaId;
@@ -23,8 +24,12 @@ class RepairWrite {
   final String? newBookmarkRef;
   final String? newPlatformAssetId;
 
-  /// True flips the row to platformGallery with [newPlatformAssetId].
-  final bool toGallery;
+  /// The source type the repaired row RESOLVES as, which the repair always
+  /// restates rather than inherits: a candidate file on disk means
+  /// [MediaSourceType.localFile] even when the row arrived as a gallery
+  /// asset, and [MediaSourceType.platformGallery] pairs with
+  /// [newPlatformAssetId].
+  final MediaSourceType newSourceType;
 }
 
 /// Outcome counts of one apply pass, in wizard-summary terms.
@@ -97,7 +102,7 @@ class MediaRepairService {
             RepairWrite(
               mediaId: proposal.item.id,
               newPlatformAssetId: candidate.assetId,
-              toGallery: true,
+              newSourceType: MediaSourceType.platformGallery,
             ),
           );
           continue;
@@ -131,6 +136,9 @@ class MediaRepairService {
             mediaId: proposal.item.id,
             newLocalPath: candidate.path,
             newBookmarkRef: newRef,
+            // A file on disk resolves through LocalFileResolver whatever
+            // the row used to be.
+            newSourceType: MediaSourceType.localFile,
           ),
         );
         if (!matches) {

@@ -11837,7 +11837,7 @@ class AppLocalizationsZh extends AppLocalizations {
     int failed,
     int skipped,
   ) {
-    return '$relinked 个已重新关联，$cloudBacked 个云端备份,$reuploads 个重新上传已排队，$failed 个失败，$skipped 个已跳过';
+    return '$relinked 个已重新关联，$cloudBacked 个云端备份，$reuploads 个重新上传已排队，$failed 个失败，$skipped 个已跳过';
   }
 
   @override

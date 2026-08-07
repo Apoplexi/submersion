@@ -27,7 +27,8 @@ class _SeededWizardNotifier extends RepairWizardNotifier {
   }) : super(
          loadMissingRows: () async => const [],
          buildSources: (_) => const [],
-         isVolumeOnline: (_) async => true,
+         newVolumeProbe: () =>
+             (_) async => true,
          applyProposals: (_) async => const RepairApplyReport(
            relinked: 0,
            cloudBacked: 0,
@@ -153,5 +154,27 @@ void main() {
       ),
       findsOneWidget,
     );
+  });
+
+  testWidgets('error state shows a localized message, not the exception', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      host(
+        _SeededWizardNotifier(
+          RepairWizardError(
+            Exception('/Users/someone/Secret Folder key=abc123'),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(
+      find.text('Something went wrong. Please try again.'),
+      findsOneWidget,
+    );
+    expect(find.textContaining('Secret Folder'), findsNothing);
+    expect(find.textContaining('Exception'), findsNothing);
   });
 }

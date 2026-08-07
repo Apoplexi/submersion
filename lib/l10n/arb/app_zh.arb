@@ -4068,7 +4068,7 @@
   "media_repair_confidence_unmatched": "无候选项",
   "media_repair_unverified": "未通过存储验证",
   "media_repair_apply": "重新关联 {count} 个文件",
-  "media_repair_summary": "{relinked} 个已重新关联，{cloudBacked} 个云端备份,{reuploads} 个重新上传已排队，{failed} 个失败，{skipped} 个已跳过",
+  "media_repair_summary": "{relinked} 个已重新关联，{cloudBacked} 个云端备份，{reuploads} 个重新上传已排队，{failed} 个失败，{skipped} 个已跳过",
   "media_console_unlinked": "未关联",
   "media_inbox_chooseDive": "选择潜水",
   "media_inbox_empty": "没有未关联的媒体",

@@ -50,12 +50,15 @@ void main() {
     String id, {
     String? contentHash,
     bool stampRemote = false,
+    MediaSourceType sourceType = MediaSourceType.localFile,
+    String? platformAssetId,
   }) async {
     final created = await repo.createMedia(
       MediaItem(
         id: id,
         mediaType: MediaType.photo,
-        sourceType: MediaSourceType.localFile,
+        sourceType: sourceType,
+        platformAssetId: platformAssetId,
         filePath: '/gone/$id.jpg',
         localPath: '/gone/$id.jpg',
         originalFilename: '$id.jpg',
@@ -198,6 +201,35 @@ void main() {
     final repaired = (await repo.getMediaById('a'))!;
     expect(repaired.sourceType, MediaSourceType.platformGallery);
     expect(repaired.platformAssetId, 'asset-9');
+    expect(repaired.isOrphaned, isFalse);
+  });
+
+  test('file proposal on a gallery row retargets it to localFile', () async {
+    // A photo deleted from the device library but restored to disk: the row
+    // must stop routing through PlatformGalleryResolver, or lifting the
+    // orphan flag would only hide the breakage.
+    final (file, hash) = await tempFile('a.jpg', 'aaaa');
+    await seed(
+      'a',
+      contentHash: hash,
+      sourceType: MediaSourceType.platformGallery,
+      platformAssetId: 'dead-asset',
+    );
+    final item = (await repo.getMediaById('a'))!;
+
+    final report = await service().apply([
+      RepairProposal(
+        item: item,
+        confidence: RepairConfidence.exact,
+        candidate: RepairCandidate.file(path: file.path, sizeBytes: 4),
+      ),
+    ]);
+
+    expect(report.relinked, 1);
+    final repaired = (await repo.getMediaById('a'))!;
+    expect(repaired.sourceType, MediaSourceType.localFile);
+    expect(repaired.platformAssetId, isNull);
+    expect(repaired.localPath, file.path);
     expect(repaired.isOrphaned, isFalse);
   });
 

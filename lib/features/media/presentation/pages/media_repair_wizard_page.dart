@@ -46,8 +46,22 @@ class _MediaRepairWizardPageState extends ConsumerState<MediaRepairWizardPage> {
           prefixMove,
         ),
         RepairWizardDone(:final report) => _summaryPane(context, report),
-        RepairWizardError(:final error) => Center(child: Text('$error')),
+        // The exception goes to the log, not the screen: it is untranslated
+        // and can name internal paths and store keys.
+        RepairWizardError() => _errorPane(context),
       },
+    );
+  }
+
+  Widget _errorPane(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Text(
+          context.l10n.common_error_tryAgain,
+          textAlign: TextAlign.center,
+        ),
+      ),
     );
   }
 
