@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 
 import 'package:submersion/core/constants/card_color.dart';
+import 'package:submersion/core/domain/visibility/visibility_scale.dart';
 import 'package:submersion/core/constants/dive_detail_sections.dart';
 import 'package:submersion/core/constants/list_view_mode.dart';
 import 'package:submersion/core/constants/map_style.dart';
@@ -69,6 +70,10 @@ class DiverSettingsRepository {
               altitudeUnit: Value(s.altitudeUnit.name),
               sacUnit: Value(s.sacUnit.name),
               defaultCurrency: Value(s.defaultCurrency),
+              visibilityScalePreset: Value(s.visibilityScalePreset.name),
+              visibilityScaleExcellentM: Value(s.visibilityScaleExcellentM),
+              visibilityScaleGoodM: Value(s.visibilityScaleGoodM),
+              visibilityScaleModerateM: Value(s.visibilityScaleModerateM),
               timeFormat: Value(s.timeFormat.name),
               dateFormat: Value(s.dateFormat.name),
               themeMode: Value(_themeModeToString(s.themeMode)),
@@ -221,6 +226,10 @@ class DiverSettingsRepository {
           altitudeUnit: Value(settings.altitudeUnit.name),
           sacUnit: Value(settings.sacUnit.name),
           defaultCurrency: Value(settings.defaultCurrency),
+          visibilityScalePreset: Value(settings.visibilityScalePreset.name),
+          visibilityScaleExcellentM: Value(settings.visibilityScaleExcellentM),
+          visibilityScaleGoodM: Value(settings.visibilityScaleGoodM),
+          visibilityScaleModerateM: Value(settings.visibilityScaleModerateM),
           timeFormat: Value(settings.timeFormat.name),
           dateFormat: Value(settings.dateFormat.name),
           themeMode: Value(_themeModeToString(settings.themeMode)),
@@ -415,6 +424,12 @@ class DiverSettingsRepository {
       altitudeUnit: _parseAltitudeUnit(row.altitudeUnit),
       sacUnit: _parseSacUnit(row.sacUnit),
       defaultCurrency: row.defaultCurrency,
+      visibilityScalePreset: _parseVisibilityScalePreset(
+        row.visibilityScalePreset,
+      ),
+      visibilityScaleExcellentM: row.visibilityScaleExcellentM,
+      visibilityScaleGoodM: row.visibilityScaleGoodM,
+      visibilityScaleModerateM: row.visibilityScaleModerateM,
       timeFormat: _parseTimeFormat(row.timeFormat),
       dateFormat: _parseDateFormat(row.dateFormat),
       themeMode: _parseThemeMode(row.themeMode),
@@ -577,6 +592,16 @@ class DiverSettingsRepository {
     return SacUnit.values.firstWhere(
       (e) => e.name == value,
       orElse: () => SacUnit.pressurePerMin,
+    );
+  }
+
+  /// Falls back to tropical, which reproduces the pre-v144 thresholds, so an
+  /// unrecognized stored value degrades to the previous behaviour rather than
+  /// throwing.
+  VisibilityScalePreset _parseVisibilityScalePreset(String value) {
+    return VisibilityScalePreset.values.firstWhere(
+      (e) => e.name == value,
+      orElse: () => VisibilityScalePreset.tropical,
     );
   }
 

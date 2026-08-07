@@ -4,6 +4,7 @@ import 'package:submersion/core/constants/card_color.dart';
 import 'package:submersion/core/constants/dive_detail_sections.dart';
 import 'package:submersion/core/constants/list_view_mode.dart';
 import 'package:submersion/core/constants/map_style.dart';
+import 'package:submersion/core/domain/visibility/visibility_scale.dart';
 import 'package:submersion/features/dive_sites/domain/matching/site_match_sensitivity.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/core/theme/app_theme_preset.dart';
@@ -112,6 +113,31 @@ class AppSettings {
   /// ISO 4217 code used as the default currency for new priced items
   /// (e.g. equipment purchase price).
   final String defaultCurrency;
+
+  /// Per-diver calibration deciding which measured visibility distances read
+  /// as excellent/good/moderate/poor.
+  ///
+  /// Presentational only: dives store the measured distance, so changing this
+  /// re-labels the logbook without altering a single dive.
+  final VisibilityScalePreset visibilityScalePreset;
+
+  /// Custom calibration thresholds in meters, used only when
+  /// [visibilityScalePreset] is [VisibilityScalePreset.custom].
+  final double? visibilityScaleExcellentM;
+  final double? visibilityScaleGoodM;
+  final double? visibilityScaleModerateM;
+
+  /// The resolved scale for the current preference.
+  ///
+  /// Custom values that are absent or invalid degrade to tropical rather than
+  /// producing an unreachable band, so a corrupt preference falls back to the
+  /// pre-v144 behaviour instead of rendering nonsense.
+  VisibilityScale get visibilityScale => VisibilityScale.forPreset(
+    visibilityScalePreset,
+    excellentM: visibilityScaleExcellentM,
+    goodM: visibilityScaleGoodM,
+    moderateM: visibilityScaleModerateM,
+  );
   final TimeFormat timeFormat;
   final DateFormatPreference dateFormat;
   final ThemeMode themeMode;
@@ -411,6 +437,10 @@ class AppSettings {
     this.altitudeUnit = AltitudeUnit.meters,
     this.sacUnit = SacUnit.pressurePerMin,
     this.defaultCurrency = 'USD',
+    this.visibilityScalePreset = VisibilityScalePreset.tropical,
+    this.visibilityScaleExcellentM,
+    this.visibilityScaleGoodM,
+    this.visibilityScaleModerateM,
     this.timeFormat = TimeFormat.twelveHour,
     this.dateFormat = DateFormatPreference.mmmDYYYY,
     this.themeMode = ThemeMode.system,
@@ -563,6 +593,10 @@ class AppSettings {
     AltitudeUnit? altitudeUnit,
     SacUnit? sacUnit,
     String? defaultCurrency,
+    VisibilityScalePreset? visibilityScalePreset,
+    double? visibilityScaleExcellentM,
+    double? visibilityScaleGoodM,
+    double? visibilityScaleModerateM,
     TimeFormat? timeFormat,
     DateFormatPreference? dateFormat,
     ThemeMode? themeMode,
@@ -681,6 +715,13 @@ class AppSettings {
       altitudeUnit: altitudeUnit ?? this.altitudeUnit,
       sacUnit: sacUnit ?? this.sacUnit,
       defaultCurrency: defaultCurrency ?? this.defaultCurrency,
+      visibilityScalePreset:
+          visibilityScalePreset ?? this.visibilityScalePreset,
+      visibilityScaleExcellentM:
+          visibilityScaleExcellentM ?? this.visibilityScaleExcellentM,
+      visibilityScaleGoodM: visibilityScaleGoodM ?? this.visibilityScaleGoodM,
+      visibilityScaleModerateM:
+          visibilityScaleModerateM ?? this.visibilityScaleModerateM,
       timeFormat: timeFormat ?? this.timeFormat,
       dateFormat: dateFormat ?? this.dateFormat,
       themeMode: themeMode ?? this.themeMode,
