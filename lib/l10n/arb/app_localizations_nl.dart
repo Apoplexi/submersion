@@ -3120,11 +3120,79 @@ class AppLocalizationsNl extends AppLocalizations {
   String get dashboard_gauges_noDivesYet => 'Nog geen duiken';
 
   @override
-  String get settings_homeChips_pageTitle => 'Statuschips van start';
+  String get settings_homeChips_pageTitle => 'Startscherm';
 
   @override
   String get settings_homeChips_description =>
       'Kies welke statuschips bovenaan het tabblad Start verschijnen.';
+
+  @override
+  String get settings_homeCards_sectionTitle => 'Startkaarten';
+
+  @override
+  String get settings_homeCards_description =>
+      'Kies welke kaarten op het tabblad Start verschijnen en sleep ze om de volgorde te wijzigen.';
+
+  @override
+  String get settings_homeCards_autoHides =>
+      'Wordt automatisch verborgen wanneer leeg';
+
+  @override
+  String get settings_homeCards_resetToDefault => 'Standaardwaarden herstellen';
+
+  @override
+  String get settings_homeCards_resetDialog_title =>
+      'Startindeling herstellen?';
+
+  @override
+  String get settings_homeCards_resetDialog_message =>
+      'Herstelt de standaardvolgorde van de kaarten en toont ze allemaal weer.';
+
+  @override
+  String get settings_homeCards_resetDialog_cancel => 'Annuleren';
+
+  @override
+  String get settings_homeCards_resetDialog_confirm => 'Herstellen';
+
+  @override
+  String get settings_homeCards_card_hero => 'Welkomstkop';
+
+  @override
+  String get settings_homeCards_card_gaugeStrip => 'Statuschips';
+
+  @override
+  String get settings_homeCards_card_preDive => 'Pre-dive checklist';
+
+  @override
+  String get settings_homeCards_card_recentDives => 'Recente duiken';
+
+  @override
+  String get settings_homeCards_card_quickActions => 'Snelle acties';
+
+  @override
+  String get settings_homeCards_card_milestones => 'Mijlpalen';
+
+  @override
+  String get settings_homeCards_card_photoRibbon => 'Recente foto\'s';
+
+  @override
+  String get settings_homeCards_card_onThisDay => 'Op deze dag';
+
+  @override
+  String get settings_homeCards_card_yearInReview => 'Jaaroverzicht';
+
+  @override
+  String get settings_homeCards_card_activeCourses => 'Cursusvoortgang';
+
+  @override
+  String get settings_homeCards_card_recentSitesMap =>
+      'Kaart met recente duikstekken';
+
+  @override
+  String get dashboard_allHidden_message => 'Alle startkaarten zijn verborgen.';
+
+  @override
+  String get dashboard_allHidden_customize => 'Start aanpassen';
 
   @override
   String get settings_homeChips_flightWindow => 'Duikvenster voor vlucht';

@@ -3086,11 +3086,76 @@ class AppLocalizationsEn extends AppLocalizations {
   String get dashboard_gauges_noDivesYet => 'No dives yet';
 
   @override
-  String get settings_homeChips_pageTitle => 'Home status chips';
+  String get settings_homeChips_pageTitle => 'Home screen';
 
   @override
   String get settings_homeChips_description =>
       'Choose which status chips appear at the top of the Home tab.';
+
+  @override
+  String get settings_homeCards_sectionTitle => 'Home cards';
+
+  @override
+  String get settings_homeCards_description =>
+      'Choose which cards appear on the Home tab and drag to reorder them.';
+
+  @override
+  String get settings_homeCards_autoHides => 'Hides automatically when empty';
+
+  @override
+  String get settings_homeCards_resetToDefault => 'Reset to default';
+
+  @override
+  String get settings_homeCards_resetDialog_title => 'Reset Home layout?';
+
+  @override
+  String get settings_homeCards_resetDialog_message =>
+      'This restores the default card order and shows all cards again.';
+
+  @override
+  String get settings_homeCards_resetDialog_cancel => 'Cancel';
+
+  @override
+  String get settings_homeCards_resetDialog_confirm => 'Reset';
+
+  @override
+  String get settings_homeCards_card_hero => 'Welcome header';
+
+  @override
+  String get settings_homeCards_card_gaugeStrip => 'Status chips';
+
+  @override
+  String get settings_homeCards_card_preDive => 'Pre-dive checklist';
+
+  @override
+  String get settings_homeCards_card_recentDives => 'Recent dives';
+
+  @override
+  String get settings_homeCards_card_quickActions => 'Quick actions';
+
+  @override
+  String get settings_homeCards_card_milestones => 'Milestones';
+
+  @override
+  String get settings_homeCards_card_photoRibbon => 'Recent photos';
+
+  @override
+  String get settings_homeCards_card_onThisDay => 'On this day';
+
+  @override
+  String get settings_homeCards_card_yearInReview => 'Year in review';
+
+  @override
+  String get settings_homeCards_card_activeCourses => 'Course progress';
+
+  @override
+  String get settings_homeCards_card_recentSitesMap => 'Recent sites map';
+
+  @override
+  String get dashboard_allHidden_message => 'All Home cards are hidden.';
+
+  @override
+  String get dashboard_allHidden_customize => 'Customize Home';
 
   @override
   String get settings_homeChips_flightWindow => 'Flight dive window';

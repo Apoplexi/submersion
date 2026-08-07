@@ -3146,11 +3146,81 @@ class AppLocalizationsEs extends AppLocalizations {
   String get dashboard_gauges_noDivesYet => 'Aún sin inmersiones';
 
   @override
-  String get settings_homeChips_pageTitle => 'Chips de estado de Inicio';
+  String get settings_homeChips_pageTitle => 'Pantalla de inicio';
 
   @override
   String get settings_homeChips_description =>
       'Elige qué chips de estado aparecen en la parte superior de la pestaña Inicio.';
+
+  @override
+  String get settings_homeCards_sectionTitle => 'Tarjetas de Inicio';
+
+  @override
+  String get settings_homeCards_description =>
+      'Elige qué tarjetas aparecen en la pestaña Inicio y arrástralas para reordenarlas.';
+
+  @override
+  String get settings_homeCards_autoHides =>
+      'Se oculta automáticamente cuando está vacía';
+
+  @override
+  String get settings_homeCards_resetToDefault =>
+      'Restablecer valores predeterminados';
+
+  @override
+  String get settings_homeCards_resetDialog_title =>
+      '¿Restablecer el diseño de Inicio?';
+
+  @override
+  String get settings_homeCards_resetDialog_message =>
+      'Restaura el orden predeterminado de las tarjetas y vuelve a mostrarlas todas.';
+
+  @override
+  String get settings_homeCards_resetDialog_cancel => 'Cancelar';
+
+  @override
+  String get settings_homeCards_resetDialog_confirm => 'Restablecer';
+
+  @override
+  String get settings_homeCards_card_hero => 'Cabecera de bienvenida';
+
+  @override
+  String get settings_homeCards_card_gaugeStrip => 'Chips de estado';
+
+  @override
+  String get settings_homeCards_card_preDive => 'Lista previa a la inmersión';
+
+  @override
+  String get settings_homeCards_card_recentDives => 'Inmersiones recientes';
+
+  @override
+  String get settings_homeCards_card_quickActions => 'Acciones rápidas';
+
+  @override
+  String get settings_homeCards_card_milestones => 'Hitos';
+
+  @override
+  String get settings_homeCards_card_photoRibbon => 'Fotos recientes';
+
+  @override
+  String get settings_homeCards_card_onThisDay => 'Tal día como hoy';
+
+  @override
+  String get settings_homeCards_card_yearInReview => 'Resumen del año';
+
+  @override
+  String get settings_homeCards_card_activeCourses => 'Progreso del curso';
+
+  @override
+  String get settings_homeCards_card_recentSitesMap =>
+      'Mapa de puntos recientes';
+
+  @override
+  String get dashboard_allHidden_message =>
+      'Todas las tarjetas de Inicio están ocultas.';
+
+  @override
+  String get dashboard_allHidden_customize => 'Personalizar Inicio';
 
   @override
   String get settings_homeChips_flightWindow =>

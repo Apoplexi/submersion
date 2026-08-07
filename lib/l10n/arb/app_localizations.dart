@@ -5336,7 +5336,7 @@ abstract class AppLocalizations {
   /// No description provided for @settings_homeChips_pageTitle.
   ///
   /// In en, this message translates to:
-  /// **'Home status chips'**
+  /// **'Home screen'**
   String get settings_homeChips_pageTitle;
 
   /// No description provided for @settings_homeChips_description.
@@ -5344,6 +5344,132 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Choose which status chips appear at the top of the Home tab.'**
   String get settings_homeChips_description;
+
+  /// No description provided for @settings_homeCards_sectionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Home cards'**
+  String get settings_homeCards_sectionTitle;
+
+  /// No description provided for @settings_homeCards_description.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose which cards appear on the Home tab and drag to reorder them.'**
+  String get settings_homeCards_description;
+
+  /// No description provided for @settings_homeCards_autoHides.
+  ///
+  /// In en, this message translates to:
+  /// **'Hides automatically when empty'**
+  String get settings_homeCards_autoHides;
+
+  /// No description provided for @settings_homeCards_resetToDefault.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset to default'**
+  String get settings_homeCards_resetToDefault;
+
+  /// No description provided for @settings_homeCards_resetDialog_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset Home layout?'**
+  String get settings_homeCards_resetDialog_title;
+
+  /// No description provided for @settings_homeCards_resetDialog_message.
+  ///
+  /// In en, this message translates to:
+  /// **'This restores the default card order and shows all cards again.'**
+  String get settings_homeCards_resetDialog_message;
+
+  /// No description provided for @settings_homeCards_resetDialog_cancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get settings_homeCards_resetDialog_cancel;
+
+  /// No description provided for @settings_homeCards_resetDialog_confirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset'**
+  String get settings_homeCards_resetDialog_confirm;
+
+  /// No description provided for @settings_homeCards_card_hero.
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome header'**
+  String get settings_homeCards_card_hero;
+
+  /// No description provided for @settings_homeCards_card_gaugeStrip.
+  ///
+  /// In en, this message translates to:
+  /// **'Status chips'**
+  String get settings_homeCards_card_gaugeStrip;
+
+  /// No description provided for @settings_homeCards_card_preDive.
+  ///
+  /// In en, this message translates to:
+  /// **'Pre-dive checklist'**
+  String get settings_homeCards_card_preDive;
+
+  /// No description provided for @settings_homeCards_card_recentDives.
+  ///
+  /// In en, this message translates to:
+  /// **'Recent dives'**
+  String get settings_homeCards_card_recentDives;
+
+  /// No description provided for @settings_homeCards_card_quickActions.
+  ///
+  /// In en, this message translates to:
+  /// **'Quick actions'**
+  String get settings_homeCards_card_quickActions;
+
+  /// No description provided for @settings_homeCards_card_milestones.
+  ///
+  /// In en, this message translates to:
+  /// **'Milestones'**
+  String get settings_homeCards_card_milestones;
+
+  /// No description provided for @settings_homeCards_card_photoRibbon.
+  ///
+  /// In en, this message translates to:
+  /// **'Recent photos'**
+  String get settings_homeCards_card_photoRibbon;
+
+  /// No description provided for @settings_homeCards_card_onThisDay.
+  ///
+  /// In en, this message translates to:
+  /// **'On this day'**
+  String get settings_homeCards_card_onThisDay;
+
+  /// No description provided for @settings_homeCards_card_yearInReview.
+  ///
+  /// In en, this message translates to:
+  /// **'Year in review'**
+  String get settings_homeCards_card_yearInReview;
+
+  /// No description provided for @settings_homeCards_card_activeCourses.
+  ///
+  /// In en, this message translates to:
+  /// **'Course progress'**
+  String get settings_homeCards_card_activeCourses;
+
+  /// No description provided for @settings_homeCards_card_recentSitesMap.
+  ///
+  /// In en, this message translates to:
+  /// **'Recent sites map'**
+  String get settings_homeCards_card_recentSitesMap;
+
+  /// No description provided for @dashboard_allHidden_message.
+  ///
+  /// In en, this message translates to:
+  /// **'All Home cards are hidden.'**
+  String get dashboard_allHidden_message;
+
+  /// No description provided for @dashboard_allHidden_customize.
+  ///
+  /// In en, this message translates to:
+  /// **'Customize Home'**
+  String get dashboard_allHidden_customize;
 
   /// No description provided for @settings_homeChips_flightWindow.
   ///

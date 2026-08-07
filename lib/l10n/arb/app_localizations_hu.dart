@@ -3128,11 +3128,81 @@ class AppLocalizationsHu extends AppLocalizations {
   String get dashboard_gauges_noDivesYet => 'Még nincs merülés';
 
   @override
-  String get settings_homeChips_pageTitle => 'Kezdőlap állapotjelzői';
+  String get settings_homeChips_pageTitle => 'Kezdőképernyő';
 
   @override
   String get settings_homeChips_description =>
       'Válaszd ki, mely állapotjelzők jelenjenek meg a Kezdőlap tetején.';
+
+  @override
+  String get settings_homeCards_sectionTitle => 'Kezdőlap kártyái';
+
+  @override
+  String get settings_homeCards_description =>
+      'Válaszd ki, mely kártyák jelenjenek meg a Kezdőlapon, és húzással rendezd át őket.';
+
+  @override
+  String get settings_homeCards_autoHides =>
+      'Automatikusan elrejtőzik, ha üres';
+
+  @override
+  String get settings_homeCards_resetToDefault =>
+      'Alapértelmezés visszaállítása';
+
+  @override
+  String get settings_homeCards_resetDialog_title =>
+      'Visszaállítod a Kezdőlap elrendezését?';
+
+  @override
+  String get settings_homeCards_resetDialog_message =>
+      'Visszaállítja a kártyák alapértelmezett sorrendjét, és újra megjeleníti mindet.';
+
+  @override
+  String get settings_homeCards_resetDialog_cancel => 'Mégse';
+
+  @override
+  String get settings_homeCards_resetDialog_confirm => 'Visszaállítás';
+
+  @override
+  String get settings_homeCards_card_hero => 'Üdvözlő fejléc';
+
+  @override
+  String get settings_homeCards_card_gaugeStrip => 'Állapotjelzők';
+
+  @override
+  String get settings_homeCards_card_preDive => 'Merülés előtti ellenőrzőlista';
+
+  @override
+  String get settings_homeCards_card_recentDives => 'Legutóbbi merülések';
+
+  @override
+  String get settings_homeCards_card_quickActions => 'Gyorsműveletek';
+
+  @override
+  String get settings_homeCards_card_milestones => 'Mérföldkövek';
+
+  @override
+  String get settings_homeCards_card_photoRibbon => 'Legutóbbi fotók';
+
+  @override
+  String get settings_homeCards_card_onThisDay => 'Ezen a napon';
+
+  @override
+  String get settings_homeCards_card_yearInReview => 'Éves visszatekintés';
+
+  @override
+  String get settings_homeCards_card_activeCourses => 'Tanfolyam előrehaladása';
+
+  @override
+  String get settings_homeCards_card_recentSitesMap =>
+      'Legutóbbi merülőhelyek térképe';
+
+  @override
+  String get dashboard_allHidden_message =>
+      'Minden kezdőlapi kártya el van rejtve.';
+
+  @override
+  String get dashboard_allHidden_customize => 'Kezdőlap testreszabása';
 
   @override
   String get settings_homeChips_flightWindow => 'Merülési ablak repülés előtt';

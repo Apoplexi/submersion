@@ -3153,11 +3153,80 @@ class AppLocalizationsDe extends AppLocalizations {
   String get dashboard_gauges_noDivesYet => 'Noch keine Tauchgänge';
 
   @override
-  String get settings_homeChips_pageTitle => 'Status-Chips der Startseite';
+  String get settings_homeChips_pageTitle => 'Startbildschirm';
 
   @override
   String get settings_homeChips_description =>
       'Wähle, welche Status-Chips oben im Start-Tab erscheinen.';
+
+  @override
+  String get settings_homeCards_sectionTitle => 'Startseiten-Karten';
+
+  @override
+  String get settings_homeCards_description =>
+      'Wähle, welche Karten im Start-Tab erscheinen, und ziehe sie in die gewünschte Reihenfolge.';
+
+  @override
+  String get settings_homeCards_autoHides =>
+      'Wird automatisch ausgeblendet, wenn leer';
+
+  @override
+  String get settings_homeCards_resetToDefault => 'Auf Standard zurücksetzen';
+
+  @override
+  String get settings_homeCards_resetDialog_title =>
+      'Start-Layout zurücksetzen?';
+
+  @override
+  String get settings_homeCards_resetDialog_message =>
+      'Stellt die Standardreihenfolge der Karten wieder her und zeigt alle Karten wieder an.';
+
+  @override
+  String get settings_homeCards_resetDialog_cancel => 'Abbrechen';
+
+  @override
+  String get settings_homeCards_resetDialog_confirm => 'Zurücksetzen';
+
+  @override
+  String get settings_homeCards_card_hero => 'Begrüßungsbereich';
+
+  @override
+  String get settings_homeCards_card_gaugeStrip => 'Status-Chips';
+
+  @override
+  String get settings_homeCards_card_preDive => 'Pre-Dive-Checkliste';
+
+  @override
+  String get settings_homeCards_card_recentDives => 'Letzte Tauchgänge';
+
+  @override
+  String get settings_homeCards_card_quickActions => 'Schnellaktionen';
+
+  @override
+  String get settings_homeCards_card_milestones => 'Meilensteine';
+
+  @override
+  String get settings_homeCards_card_photoRibbon => 'Neueste Fotos';
+
+  @override
+  String get settings_homeCards_card_onThisDay => 'An diesem Tag';
+
+  @override
+  String get settings_homeCards_card_yearInReview => 'Jahresrückblick';
+
+  @override
+  String get settings_homeCards_card_activeCourses => 'Kursfortschritt';
+
+  @override
+  String get settings_homeCards_card_recentSitesMap =>
+      'Karte der letzten Tauchplätze';
+
+  @override
+  String get dashboard_allHidden_message =>
+      'Alle Startseiten-Karten sind ausgeblendet.';
+
+  @override
+  String get dashboard_allHidden_customize => 'Startseite anpassen';
 
   @override
   String get settings_homeChips_flightWindow => 'Tauchfenster vor dem Flug';

@@ -3078,11 +3078,77 @@ class AppLocalizationsAr extends AppLocalizations {
   String get dashboard_gauges_noDivesYet => 'لا توجد غطسات بعد';
 
   @override
-  String get settings_homeChips_pageTitle => 'شرائح حالة الصفحة الرئيسية';
+  String get settings_homeChips_pageTitle => 'الشاشة الرئيسية';
 
   @override
   String get settings_homeChips_description =>
       'اختر شرائح الحالة التي تظهر أعلى تبويب الرئيسية.';
+
+  @override
+  String get settings_homeCards_sectionTitle => 'بطاقات الرئيسية';
+
+  @override
+  String get settings_homeCards_description =>
+      'اختر البطاقات التي تظهر في تبويب الرئيسية واسحبها لإعادة ترتيبها.';
+
+  @override
+  String get settings_homeCards_autoHides => 'تُخفى تلقائيًا عندما تكون فارغة';
+
+  @override
+  String get settings_homeCards_resetToDefault => 'إعادة التعيين إلى الافتراضي';
+
+  @override
+  String get settings_homeCards_resetDialog_title =>
+      'إعادة تعيين تخطيط الرئيسية؟';
+
+  @override
+  String get settings_homeCards_resetDialog_message =>
+      'يستعيد الترتيب الافتراضي للبطاقات ويعرضها جميعًا من جديد.';
+
+  @override
+  String get settings_homeCards_resetDialog_cancel => 'إلغاء';
+
+  @override
+  String get settings_homeCards_resetDialog_confirm => 'إعادة تعيين';
+
+  @override
+  String get settings_homeCards_card_hero => 'ترويسة الترحيب';
+
+  @override
+  String get settings_homeCards_card_gaugeStrip => 'شرائح الحالة';
+
+  @override
+  String get settings_homeCards_card_preDive => 'قائمة فحص ما قبل الغوص';
+
+  @override
+  String get settings_homeCards_card_recentDives => 'الغوصات الأخيرة';
+
+  @override
+  String get settings_homeCards_card_quickActions => 'إجراءات سريعة';
+
+  @override
+  String get settings_homeCards_card_milestones => 'الإنجازات';
+
+  @override
+  String get settings_homeCards_card_photoRibbon => 'الصور الأخيرة';
+
+  @override
+  String get settings_homeCards_card_onThisDay => 'في مثل هذا اليوم';
+
+  @override
+  String get settings_homeCards_card_yearInReview => 'حصاد العام';
+
+  @override
+  String get settings_homeCards_card_activeCourses => 'تقدّم الدورة';
+
+  @override
+  String get settings_homeCards_card_recentSitesMap => 'خريطة المواقع الأخيرة';
+
+  @override
+  String get dashboard_allHidden_message => 'جميع بطاقات الرئيسية مخفية.';
+
+  @override
+  String get dashboard_allHidden_customize => 'تخصيص الرئيسية';
 
   @override
   String get settings_homeChips_flightWindow => 'نافذة الغوص قبل الرحلة';

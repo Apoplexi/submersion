@@ -3141,11 +3141,79 @@ class AppLocalizationsIt extends AppLocalizations {
   String get dashboard_gauges_noDivesYet => 'Nessuna immersione';
 
   @override
-  String get settings_homeChips_pageTitle => 'Chip di stato della Home';
+  String get settings_homeChips_pageTitle => 'Schermata Home';
 
   @override
   String get settings_homeChips_description =>
       'Scegli quali chip di stato compaiono in cima alla scheda Home.';
+
+  @override
+  String get settings_homeCards_sectionTitle => 'Schede della Home';
+
+  @override
+  String get settings_homeCards_description =>
+      'Scegli quali schede compaiono nella Home e trascinale per riordinarle.';
+
+  @override
+  String get settings_homeCards_autoHides =>
+      'Si nasconde automaticamente quando è vuota';
+
+  @override
+  String get settings_homeCards_resetToDefault => 'Ripristina predefiniti';
+
+  @override
+  String get settings_homeCards_resetDialog_title =>
+      'Ripristinare il layout della Home?';
+
+  @override
+  String get settings_homeCards_resetDialog_message =>
+      'Ripristina l\'ordine predefinito delle schede e le mostra tutte di nuovo.';
+
+  @override
+  String get settings_homeCards_resetDialog_cancel => 'Annulla';
+
+  @override
+  String get settings_homeCards_resetDialog_confirm => 'Ripristina';
+
+  @override
+  String get settings_homeCards_card_hero => 'Intestazione di benvenuto';
+
+  @override
+  String get settings_homeCards_card_gaugeStrip => 'Chip di stato';
+
+  @override
+  String get settings_homeCards_card_preDive => 'Checklist pre-immersione';
+
+  @override
+  String get settings_homeCards_card_recentDives => 'Immersioni recenti';
+
+  @override
+  String get settings_homeCards_card_quickActions => 'Azioni rapide';
+
+  @override
+  String get settings_homeCards_card_milestones => 'Traguardi';
+
+  @override
+  String get settings_homeCards_card_photoRibbon => 'Foto recenti';
+
+  @override
+  String get settings_homeCards_card_onThisDay => 'In questo giorno';
+
+  @override
+  String get settings_homeCards_card_yearInReview => 'Anno in rassegna';
+
+  @override
+  String get settings_homeCards_card_activeCourses => 'Avanzamento corsi';
+
+  @override
+  String get settings_homeCards_card_recentSitesMap => 'Mappa dei siti recenti';
+
+  @override
+  String get dashboard_allHidden_message =>
+      'Tutte le schede della Home sono nascoste.';
+
+  @override
+  String get dashboard_allHidden_customize => 'Personalizza Home';
 
   @override
   String get settings_homeChips_flightWindow =>

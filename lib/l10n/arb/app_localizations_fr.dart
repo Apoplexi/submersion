@@ -3156,11 +3156,81 @@ class AppLocalizationsFr extends AppLocalizations {
   String get dashboard_gauges_noDivesYet => 'Aucune plongée';
 
   @override
-  String get settings_homeChips_pageTitle => 'Pastilles d\'état de l\'accueil';
+  String get settings_homeChips_pageTitle => 'Écran d\'accueil';
 
   @override
   String get settings_homeChips_description =>
       'Choisissez les pastilles d\'état affichées en haut de l\'onglet Accueil.';
+
+  @override
+  String get settings_homeCards_sectionTitle => 'Cartes de l\'accueil';
+
+  @override
+  String get settings_homeCards_description =>
+      'Choisissez les cartes affichées dans l\'onglet Accueil et faites-les glisser pour les réordonner.';
+
+  @override
+  String get settings_homeCards_autoHides =>
+      'Masquée automatiquement lorsqu\'elle est vide';
+
+  @override
+  String get settings_homeCards_resetToDefault => 'Réinitialiser par défaut';
+
+  @override
+  String get settings_homeCards_resetDialog_title =>
+      'Réinitialiser la disposition de l\'accueil ?';
+
+  @override
+  String get settings_homeCards_resetDialog_message =>
+      'Restaure l\'ordre par défaut des cartes et les affiche toutes à nouveau.';
+
+  @override
+  String get settings_homeCards_resetDialog_cancel => 'Annuler';
+
+  @override
+  String get settings_homeCards_resetDialog_confirm => 'Réinitialiser';
+
+  @override
+  String get settings_homeCards_card_hero => 'En-tête de bienvenue';
+
+  @override
+  String get settings_homeCards_card_gaugeStrip => 'Pastilles d\'état';
+
+  @override
+  String get settings_homeCards_card_preDive => 'Check-list pré-plongée';
+
+  @override
+  String get settings_homeCards_card_recentDives => 'Plongées récentes';
+
+  @override
+  String get settings_homeCards_card_quickActions => 'Actions rapides';
+
+  @override
+  String get settings_homeCards_card_milestones => 'Jalons';
+
+  @override
+  String get settings_homeCards_card_photoRibbon => 'Photos récentes';
+
+  @override
+  String get settings_homeCards_card_onThisDay => 'Ce jour-là';
+
+  @override
+  String get settings_homeCards_card_yearInReview =>
+      'Rétrospective de l\'année';
+
+  @override
+  String get settings_homeCards_card_activeCourses => 'Progression des cours';
+
+  @override
+  String get settings_homeCards_card_recentSitesMap =>
+      'Carte des sites récents';
+
+  @override
+  String get dashboard_allHidden_message =>
+      'Toutes les cartes de l\'accueil sont masquées.';
+
+  @override
+  String get dashboard_allHidden_customize => 'Personnaliser l\'accueil';
 
   @override
   String get settings_homeChips_flightWindow => 'Fenêtre de plongée avant vol';

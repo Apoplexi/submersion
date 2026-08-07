@@ -3055,11 +3055,76 @@ class AppLocalizationsHe extends AppLocalizations {
   String get dashboard_gauges_noDivesYet => 'אין צלילות עדיין';
 
   @override
-  String get settings_homeChips_pageTitle => 'שבבי מצב של דף הבית';
+  String get settings_homeChips_pageTitle => 'מסך הבית';
 
   @override
   String get settings_homeChips_description =>
       'בחר אילו שבבי מצב יופיעו בראש לשונית הבית.';
+
+  @override
+  String get settings_homeCards_sectionTitle => 'כרטיסי דף הבית';
+
+  @override
+  String get settings_homeCards_description =>
+      'בחר אילו כרטיסים יופיעו בלשונית הבית וגרור כדי לסדר מחדש.';
+
+  @override
+  String get settings_homeCards_autoHides => 'מוסתר אוטומטית כשהוא ריק';
+
+  @override
+  String get settings_homeCards_resetToDefault => 'איפוס לברירת המחדל';
+
+  @override
+  String get settings_homeCards_resetDialog_title => 'לאפס את פריסת דף הבית?';
+
+  @override
+  String get settings_homeCards_resetDialog_message =>
+      'משחזר את סדר הכרטיסים המוגדר כברירת מחדל ומציג את כולם מחדש.';
+
+  @override
+  String get settings_homeCards_resetDialog_cancel => 'ביטול';
+
+  @override
+  String get settings_homeCards_resetDialog_confirm => 'איפוס';
+
+  @override
+  String get settings_homeCards_card_hero => 'כותרת פתיחה';
+
+  @override
+  String get settings_homeCards_card_gaugeStrip => 'שבבי מצב';
+
+  @override
+  String get settings_homeCards_card_preDive => 'רשימת בדיקה לפני צלילה';
+
+  @override
+  String get settings_homeCards_card_recentDives => 'צלילות אחרונות';
+
+  @override
+  String get settings_homeCards_card_quickActions => 'פעולות מהירות';
+
+  @override
+  String get settings_homeCards_card_milestones => 'אבני דרך';
+
+  @override
+  String get settings_homeCards_card_photoRibbon => 'תמונות אחרונות';
+
+  @override
+  String get settings_homeCards_card_onThisDay => 'ביום זה';
+
+  @override
+  String get settings_homeCards_card_yearInReview => 'סיכום השנה';
+
+  @override
+  String get settings_homeCards_card_activeCourses => 'התקדמות בקורס';
+
+  @override
+  String get settings_homeCards_card_recentSitesMap => 'מפת אתרים אחרונים';
+
+  @override
+  String get dashboard_allHidden_message => 'כל כרטיסי דף הבית מוסתרים.';
+
+  @override
+  String get dashboard_allHidden_customize => 'התאמה אישית של דף הבית';
 
   @override
   String get settings_homeChips_flightWindow => 'חלון צלילה לפני טיסה';

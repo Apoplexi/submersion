@@ -3147,11 +3147,80 @@ class AppLocalizationsPt extends AppLocalizations {
   String get dashboard_gauges_noDivesYet => 'Ainda sem mergulhos';
 
   @override
-  String get settings_homeChips_pageTitle => 'Chips de estado do Início';
+  String get settings_homeChips_pageTitle => 'Ecrã inicial';
 
   @override
   String get settings_homeChips_description =>
       'Escolha que chips de estado aparecem no topo do separador Início.';
+
+  @override
+  String get settings_homeCards_sectionTitle => 'Cartões do Início';
+
+  @override
+  String get settings_homeCards_description =>
+      'Escolha que cartões aparecem no separador Início e arraste-os para reordenar.';
+
+  @override
+  String get settings_homeCards_autoHides =>
+      'Oculta-se automaticamente quando vazio';
+
+  @override
+  String get settings_homeCards_resetToDefault => 'Repor predefinições';
+
+  @override
+  String get settings_homeCards_resetDialog_title =>
+      'Repor o esquema do Início?';
+
+  @override
+  String get settings_homeCards_resetDialog_message =>
+      'Repõe a ordem predefinida dos cartões e volta a mostrá-los todos.';
+
+  @override
+  String get settings_homeCards_resetDialog_cancel => 'Cancelar';
+
+  @override
+  String get settings_homeCards_resetDialog_confirm => 'Repor';
+
+  @override
+  String get settings_homeCards_card_hero => 'Cabeçalho de boas-vindas';
+
+  @override
+  String get settings_homeCards_card_gaugeStrip => 'Chips de estado';
+
+  @override
+  String get settings_homeCards_card_preDive => 'Checklist pré-mergulho';
+
+  @override
+  String get settings_homeCards_card_recentDives => 'Mergulhos recentes';
+
+  @override
+  String get settings_homeCards_card_quickActions => 'Ações rápidas';
+
+  @override
+  String get settings_homeCards_card_milestones => 'Marcos';
+
+  @override
+  String get settings_homeCards_card_photoRibbon => 'Fotos recentes';
+
+  @override
+  String get settings_homeCards_card_onThisDay => 'Neste dia';
+
+  @override
+  String get settings_homeCards_card_yearInReview => 'Retrospetiva do ano';
+
+  @override
+  String get settings_homeCards_card_activeCourses => 'Progresso do curso';
+
+  @override
+  String get settings_homeCards_card_recentSitesMap =>
+      'Mapa de locais recentes';
+
+  @override
+  String get dashboard_allHidden_message =>
+      'Todos os cartões do Início estão ocultos.';
+
+  @override
+  String get dashboard_allHidden_customize => 'Personalizar Início';
 
   @override
   String get settings_homeChips_flightWindow =>
