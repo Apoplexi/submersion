@@ -16112,6 +16112,16 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
+  String surfaceInterval_gasWarning_modExceeded(
+    Object ppO2,
+    Object depth,
+    Object limit,
+    Object mod,
+  ) {
+    return 'ppO₂ $ppO2 בעומק $depth חורג מ-$limit. ה-MOD של תערובת זו הוא $mod.';
+  }
+
+  @override
   String surfaceInterval_heSemantics(Object percent) {
     return 'הליום: $percent%';
   }
@@ -16123,6 +16133,9 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get surfaceInterval_result_currentInterval => 'מרווח נוכחי';
+
+  @override
+  String get surfaceInterval_result_gasUnsafe => 'הגז אינו בטוח בעומק זה';
 
   @override
   String get surfaceInterval_result_inDeco => 'בדקו';
@@ -16165,7 +16178,14 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
-  String get surfaceInterval_secondDive_gasAir => '(אוויר)';
+  String surfaceInterval_secondDive_heSemantics(Object percent) {
+    return 'הליום צלילה שנייה: $percent%';
+  }
+
+  @override
+  String surfaceInterval_secondDive_o2Semantics(Object percent) {
+    return 'חמצן צלילה שנייה: $percent%';
+  }
 
   @override
   String surfaceInterval_secondDive_timeSemantics(Object time) {

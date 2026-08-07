@@ -15684,6 +15684,16 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String surfaceInterval_gasWarning_modExceeded(
+    Object ppO2,
+    Object depth,
+    Object limit,
+    Object mod,
+  ) {
+    return '$depth 处 ppO₂ $ppO2 超过 $limit。此混合气的最大工作深度为 $mod。';
+  }
+
+  @override
   String surfaceInterval_heSemantics(Object percent) {
     return '氦气: $percent%';
   }
@@ -15695,6 +15705,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get surfaceInterval_result_currentInterval => '当前间隔';
+
+  @override
+  String get surfaceInterval_result_gasUnsafe => '此深度下气体不安全';
 
   @override
   String get surfaceInterval_result_inDeco => '在减压';
@@ -15735,7 +15748,14 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get surfaceInterval_secondDive_gasAir => '(空气)';
+  String surfaceInterval_secondDive_heSemantics(Object percent) {
+    return '第二潜水氦气: $percent%';
+  }
+
+  @override
+  String surfaceInterval_secondDive_o2Semantics(Object percent) {
+    return '第二潜水氧气: $percent%';
+  }
 
   @override
   String surfaceInterval_secondDive_timeSemantics(Object time) {

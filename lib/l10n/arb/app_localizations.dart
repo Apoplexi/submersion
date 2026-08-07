@@ -27787,6 +27787,17 @@ abstract class AppLocalizations {
   /// **'Trimix {o2}/{he}'**
   String surfaceInterval_gasMix_trimix(Object o2, Object he);
 
+  /// Warning shown when the planned depth exceeds the MOD of the selected mix
+  ///
+  /// In en, this message translates to:
+  /// **'ppO₂ {ppO2} at {depth} exceeds {limit}. MOD for this mix is {mod}.'**
+  String surfaceInterval_gasWarning_modExceeded(
+    Object ppO2,
+    Object depth,
+    Object limit,
+    Object mod,
+  );
+
   /// Accessibility label for helium slider
   ///
   /// In en, this message translates to:
@@ -27804,6 +27815,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Current Interval'**
   String get surfaceInterval_result_currentInterval;
+
+  /// Result card status when either dive exceeds its gas MOD
+  ///
+  /// In en, this message translates to:
+  /// **'Gas unsafe at this depth'**
+  String get surfaceInterval_result_gasUnsafe;
 
   /// Shown when the second dive would require decompression stops
   ///
@@ -27864,11 +27881,17 @@ abstract class AppLocalizations {
   /// **'Second dive depth: {depth} {unit}'**
   String surfaceInterval_secondDive_depthSemantics(Object depth, Object unit);
 
-  /// Label indicating the second dive uses air
+  /// Accessibility label for the second dive helium slider
   ///
   /// In en, this message translates to:
-  /// **'(Air)'**
-  String get surfaceInterval_secondDive_gasAir;
+  /// **'Second dive helium: {percent}%'**
+  String surfaceInterval_secondDive_heSemantics(Object percent);
+
+  /// Accessibility label for the second dive O2 slider
+  ///
+  /// In en, this message translates to:
+  /// **'Second dive O2: {percent}%'**
+  String surfaceInterval_secondDive_o2Semantics(Object percent);
 
   /// Accessibility label for second dive time slider
   ///

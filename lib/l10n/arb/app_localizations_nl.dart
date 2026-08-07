@@ -16402,6 +16402,16 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String surfaceInterval_gasWarning_modExceeded(
+    Object ppO2,
+    Object depth,
+    Object limit,
+    Object mod,
+  ) {
+    return 'ppO₂ $ppO2 op $depth overschrijdt $limit. De MOD voor dit mengsel is $mod.';
+  }
+
+  @override
   String surfaceInterval_heSemantics(Object percent) {
     return 'Helium: $percent%';
   }
@@ -16413,6 +16423,9 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get surfaceInterval_result_currentInterval => 'Huidig interval';
+
+  @override
+  String get surfaceInterval_result_gasUnsafe => 'Gas onveilig op deze diepte';
 
   @override
   String get surfaceInterval_result_inDeco => 'In deco';
@@ -16456,7 +16469,14 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
-  String get surfaceInterval_secondDive_gasAir => '(Lucht)';
+  String surfaceInterval_secondDive_heSemantics(Object percent) {
+    return 'Tweede duik helium: $percent%';
+  }
+
+  @override
+  String surfaceInterval_secondDive_o2Semantics(Object percent) {
+    return 'Tweede duik O2: $percent%';
+  }
 
   @override
   String surfaceInterval_secondDive_timeSemantics(Object time) {
