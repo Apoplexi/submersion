@@ -10,6 +10,7 @@ import 'package:submersion/features/dive_types/presentation/dive_type_display.da
 import 'package:submersion/features/dive_types/presentation/providers/dive_type_providers.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/features/tags/presentation/providers/tag_providers.dart';
+import 'package:submersion/features/buddies/presentation/providers/buddy_providers.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_providers.dart';
 import 'package:submersion/shared/widgets/app_date_picker.dart';
 
@@ -37,6 +38,7 @@ class DiveFilterSheet extends ConsumerStatefulWidget {
 }
 
 class _DiveFilterSheetState extends ConsumerState<DiveFilterSheet> {
+  late final FocusNode _buddyFocusNode;
   late DateTime? _startDate;
   late DateTime? _endDate;
   late String? _diveTypeId;
@@ -66,6 +68,7 @@ class _DiveFilterSheetState extends ConsumerState<DiveFilterSheet> {
   @override
   void initState() {
     super.initState();
+    _buddyFocusNode = FocusNode();
     final filter = widget.ref.read(widget.filterProvider);
     _startDate = filter.startDate;
     _endDate = filter.endDate;
@@ -97,6 +100,7 @@ class _DiveFilterSheetState extends ConsumerState<DiveFilterSheet> {
 
   @override
   void dispose() {
+    _buddyFocusNode.dispose();
     _minDepthController.dispose();
     _maxDepthController.dispose();
     _buddyNameController.dispose();
@@ -569,15 +573,130 @@ class _DiveFilterSheetState extends ConsumerState<DiveFilterSheet> {
                 style: Theme.of(context).textTheme.titleMedium,
               ),
               const SizedBox(height: 8),
-              TextField(
-                controller: _buddyNameController,
-                decoration: InputDecoration(
-                  labelText: context.l10n.diveLog_filter_buddyName,
-                  hintText: context.l10n.diveLog_filter_buddyHint,
-                  prefixIcon: const Icon(Icons.person),
-                ),
-                onChanged: (value) {
-                  _buddyNameFilter = value.isEmpty ? null : value;
+              LayoutBuilder(
+                builder: (context, _) {
+                  final buddiesAsync = ref.watch(allBuddiesProvider);
+                  final allBuddyNames =
+                      buddiesAsync.valueOrNull
+                          ?.map((b) => b.name)
+                          .toSet()
+                          .toList() ??
+                      const <String>[];
+
+                  return RawAutocomplete<String>(
+                    textEditingController: _buddyNameController,
+                    focusNode: _buddyFocusNode,
+                    optionsBuilder: (TextEditingValue textEditingValue) {
+                      final text = textEditingValue.text;
+                      final parts = text
+                          .split(',')
+                          .map((e) => e.trim())
+                          .toList();
+                      final currentBuddies = parts.length > 1
+                          ? parts
+                                .sublist(0, parts.length - 1)
+                                .map((e) => e.toLowerCase())
+                                .toSet()
+                          : <String>{};
+
+                      final buddyNames = allBuddyNames
+                          .where(
+                            (name) =>
+                                !currentBuddies.contains(name.toLowerCase()),
+                          )
+                          .toList();
+
+                      if (text.isEmpty) {
+                        return [];
+                      }
+
+                      final lastPart = text
+                          .split(',')
+                          .last
+                          .trim()
+                          .toLowerCase();
+
+                      if (lastPart.isEmpty) {
+                        return buddyNames;
+                      }
+
+                      return buddyNames.where((String option) {
+                        return option.toLowerCase().contains(lastPart);
+                      }).toList();
+                    },
+                    onSelected: (String selection) {
+                      final text = _buddyNameFilter ?? '';
+                      final parts = text.split(',');
+                      String newText;
+                      if (parts.length > 1 || text.contains(',')) {
+                        parts.removeLast();
+                        final prefix = parts.join(',');
+                        newText = prefix.trim().isEmpty
+                            ? selection
+                            : '${prefix.trim()}, $selection';
+                      } else {
+                        newText = selection;
+                      }
+
+                      _buddyNameController.text = newText;
+                      _buddyNameController.selection = TextSelection.collapsed(
+                        offset: newText.length,
+                      );
+
+                      setState(() {
+                        _buddyNameFilter = newText;
+                      });
+                    },
+                    fieldViewBuilder:
+                        (
+                          context,
+                          textEditingController,
+                          focusNode,
+                          onFieldSubmitted,
+                        ) {
+                          return TextField(
+                            controller: textEditingController,
+                            focusNode: focusNode,
+                            decoration: InputDecoration(
+                              labelText: context.l10n.diveLog_filter_buddyName,
+                              hintText: context.l10n.diveLog_filter_buddyHint,
+                              prefixIcon: const Icon(Icons.person),
+                            ),
+                            onChanged: (value) {
+                              setState(() {
+                                _buddyNameFilter = value.isEmpty ? null : value;
+                              });
+                            },
+                            // Commits the highlighted suggestion when the
+                            // options list is open; a no-op otherwise, so
+                            // free-text entry still submits normally.
+                            onSubmitted: (_) => onFieldSubmitted(),
+                          );
+                        },
+                    optionsViewBuilder: (context, onSelected, options) {
+                      return Align(
+                        alignment: Alignment.topLeft,
+                        child: Material(
+                          elevation: 4.0,
+                          child: ConstrainedBox(
+                            constraints: const BoxConstraints(maxHeight: 200),
+                            child: ListView.builder(
+                              padding: EdgeInsets.zero,
+                              shrinkWrap: true,
+                              itemCount: options.length,
+                              itemBuilder: (BuildContext context, int index) {
+                                final String option = options.elementAt(index);
+                                return ListTile(
+                                  title: Text(option),
+                                  onTap: () => onSelected(option),
+                                );
+                              },
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  );
                 },
               ),
               const SizedBox(height: 24),

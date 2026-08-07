@@ -256,13 +256,21 @@ class DiveFilterState {
         }
       }
       if (buddyNameFilter != null && buddyNameFilter!.isNotEmpty) {
-        final query = buddyNameFilter!.toLowerCase();
-        final matchesLegacy = (dive.buddy?.toLowerCase() ?? '').contains(query);
-        final matchesJunction = dive.buddies.any(
-          (b) => b.buddy.name.toLowerCase().contains(query),
-        );
-        if (!matchesLegacy && !matchesJunction) {
-          return false;
+        final filters = buddyNameFilter!
+            .split(',')
+            .map((s) => s.trim().toLowerCase())
+            .where((s) => s.isNotEmpty)
+            .toList();
+
+        for (final filterLower in filters) {
+          final legacyBuddyText = dive.buddy?.toLowerCase() ?? '';
+          final hasLegacyMatch = legacyBuddyText.contains(filterLower);
+          final hasLinkedBuddyMatch = dive.buddies.any(
+            (b) => b.buddy.name.toLowerCase().contains(filterLower),
+          );
+          if (!hasLegacyMatch && !hasLinkedBuddyMatch) {
+            return false;
+          }
         }
       }
       if (diveIds.isNotEmpty && !diveIds.contains(dive.id)) {
@@ -282,7 +290,7 @@ class DiveFilterState {
         if (dive.rating == null || dive.rating! < minRating!) return false;
       }
       if (minBottomTimeMinutes != null || maxBottomTimeMinutes != null) {
-        final durationMinutes = dive.bottomTime?.inMinutes;
+        final durationMinutes = (dive.bottomTime)?.inMinutes;
         if (durationMinutes == null) return false;
         if (minBottomTimeMinutes != null &&
             durationMinutes < minBottomTimeMinutes!) {
