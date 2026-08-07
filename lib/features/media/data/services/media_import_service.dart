@@ -1,9 +1,16 @@
+import 'dart:io';
+
+import 'package:path/path.dart' as p;
+import 'package:path_provider/path_provider.dart';
+
 import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
 import 'package:submersion/features/media/data/repositories/media_repository.dart';
 import 'package:submersion/features/media/data/services/enrichment_service.dart';
 import 'package:submersion/features/media/data/services/photo_picker_service.dart';
+import 'package:submersion/features/media/data/services/trip_media_scanner.dart';
 import 'package:submersion/features/media/domain/entities/media_item.dart';
+import 'package:submersion/features/media/domain/entities/media_source_type.dart';
 
 /// Result of a media import operation.
 class ImportResult {
@@ -44,8 +51,50 @@ class MediaImportService {
   MediaImportService({
     required MediaRepository mediaRepository,
     required EnrichmentService enrichmentService,
+    Future<Directory> Function()? documentsDirectory,
+    this.onMediaCreated,
   }) : _mediaRepository = mediaRepository,
-       _enrichmentService = enrichmentService;
+       _enrichmentService = enrichmentService,
+       _documentsDirectory =
+           documentsDirectory ?? getApplicationDocumentsDirectory;
+
+  final Future<Directory> Function() _documentsDirectory;
+
+  /// Invoked after every successful createMedia so the media store can
+  /// enqueue an upload. Null when no store is configured.
+  final void Function(String mediaId)? onMediaCreated;
+
+  /// Copies [sourceFile] into the app documents directory (subdir
+  /// 'scanned_logs/') and creates a localFile media row linked to
+  /// [diveId]. Used by the OCR scan flow to attach the source page photo.
+  Future<MediaItem> importLocalFileForDive({
+    required File sourceFile,
+    required String diveId,
+    DateTime? takenAt,
+  }) async {
+    final docs = await _documentsDirectory();
+    final dir = Directory(p.join(docs.path, 'scanned_logs'));
+    await dir.create(recursive: true);
+    final sourceExt = p.extension(sourceFile.path);
+    final ext = sourceExt.isEmpty ? '.jpg' : sourceExt;
+    final destName = '${DateTime.now().millisecondsSinceEpoch}$ext';
+    final dest = await sourceFile.copy(p.join(dir.path, destName));
+    final now = DateTime.now();
+    final item = MediaItem(
+      id: '',
+      diveId: diveId,
+      mediaType: MediaType.photo,
+      sourceType: MediaSourceType.localFile,
+      filePath: dest.path,
+      originalFilename: p.basename(sourceFile.path),
+      takenAt: takenAt ?? now,
+      createdAt: now,
+      updatedAt: now,
+    );
+    final created = await _mediaRepository.createMedia(item);
+    onMediaCreated?.call(created.id);
+    return created;
+  }
 
   /// Import selected assets for a dive.
   ///
@@ -64,15 +113,31 @@ class MediaImportService {
       'Starting import of ${selectedAssets.length} assets for dive ${dive.id}',
     );
 
-    // Fetch already-linked asset IDs for this dive
-    final existingAssetIds = await _mediaRepository.getLinkedAssetIdsForDive(
-      dive.id,
-    );
+    // Two dedupe keys, one per origin. Gallery picks are matched on their
+    // platform asset id; desktop picks are localFile rows with a null
+    // platform_asset_id (see [_createMediaItemFromAsset]), invisible to that
+    // query, so they are matched on the path instead.
+    //
+    // Each lookup only feeds one branch of the filter below, so query a
+    // lookup only when the selection actually contains that kind of asset:
+    // a mobile pick has no paths to compare and a desktop pick has no
+    // gallery ids, and either way the unused set would be dead work.
+    bool hasPath(AssetInfo a) => a.filePath != null && a.filePath!.isNotEmpty;
+    final anyPaths = selectedAssets.any(hasPath);
+    final anyGallery = selectedAssets.any((a) => !hasPath(a));
+
+    final existingAssetIds = anyGallery
+        ? await _mediaRepository.getLinkedAssetIdsForDive(dive.id)
+        : const <String>{};
+    final existingPaths = anyPaths
+        ? await _mediaRepository.getLinkedLocalPathsForDive(dive.id)
+        : const <String>{};
 
     // Filter out duplicates before processing
-    final newAssets = selectedAssets
-        .where((a) => !existingAssetIds.contains(a.id))
-        .toList();
+    final newAssets = selectedAssets.where((a) {
+      if (hasPath(a)) return !existingPaths.contains(a.filePath);
+      return !existingAssetIds.contains(a.id);
+    }).toList();
     final skippedCount = selectedAssets.length - newAssets.length;
 
     if (skippedCount > 0) {
@@ -100,6 +165,7 @@ class MediaImportService {
         }
 
         imported.add(saved);
+        onMediaCreated?.call(saved.id);
         _log.info('Imported asset ${asset.id} as media ${saved.id}');
       } catch (e, stackTrace) {
         _log.error(
@@ -125,15 +191,48 @@ class MediaImportService {
   MediaItem _createMediaItemFromAsset(AssetInfo asset, String diveId) {
     final now = DateTime.now();
 
+    // Windows / Linux have no platform photo library: the picker opens a file
+    // dialog and the asset's id is a synthetic key into an in-memory map on
+    // the picker service. Persisting such a row with the default
+    // platformGallery sourceType left every path column blank and sent
+    // display through PlatformGalleryResolver -> photo_manager, which has no
+    // desktop-Windows backend, so the photo rendered "File not found" and the
+    // pointer died with the process. When the picker hands us a real path,
+    // store a localFile row instead: LocalFileResolver reads localPath
+    // straight off disk on every desktop platform and survives a restart.
+    final path = asset.filePath;
+    final isLocalFile = path != null && path.isNotEmpty;
+
     return MediaItem(
       id: '',
       diveId: diveId,
-      platformAssetId: asset.id,
+      // Deliberately null for a localFile row. The desktop picker's asset id
+      // is a synthetic in-memory key, and several features gate purely on
+      // `platformAssetId != null` -- MediaItem.isGalleryPhoto,
+      // PhotoViewerPage's write-metadata action, resolvedFilePathProvider's
+      // gallery fast path -- so carrying it would route a Windows file
+      // through photo_manager, which has no backend there. Duplicate
+      // detection for these rows keys on localPath instead.
+      platformAssetId: isLocalFile ? null : asset.id,
       originalFilename: asset.filename,
       mediaType: asset.isVideo ? MediaType.video : MediaType.photo,
+      sourceType: isLocalFile
+          ? MediaSourceType.localFile
+          : MediaSourceType.platformGallery,
+      localPath: isLocalFile ? path : null,
       latitude: asset.latitude,
       longitude: asset.longitude,
-      takenAt: asset.createDateTime,
+      // AssetInfo.createDateTime is contractually LOCAL (photo_manager's
+      // convention on mobile; the desktop picker mirrors it by reinterpreting
+      // the file's wall-clock capture digits as a local DateTime). MediaItem
+      // .takenAt is wall-clock-UTC -- MediaRepository persists
+      // `takenAt.millisecondsSinceEpoch` verbatim and hydrates it back with
+      // `isUtc: true`. Storing the local value would bake the host's UTC
+      // offset into that number, and the fullscreen viewer's metadata overlay,
+      // which formats the hydrated UTC value directly, would show a capture
+      // time shifted by that offset. The gallery-scan write path
+      // (TripMediaScanner) already normalises the same way.
+      takenAt: TripMediaScanner.toWallClockUtc(asset.createDateTime),
       width: asset.width,
       height: asset.height,
       durationSeconds: asset.durationSeconds,

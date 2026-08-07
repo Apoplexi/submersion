@@ -19,6 +19,10 @@ enum UnavailableKind {
 
   /// Service connector account needs to be (re-)authenticated.
   signInRequired,
+
+  /// The file's volume (network share, external disk) is not mounted right
+  /// now. Recovers by itself when the volume comes back; never orphaned.
+  volumeOffline,
 }
 
 /// A handle to displayable media bytes — or, when unavailable, a structured
@@ -35,7 +39,17 @@ sealed class MediaSourceData {
 /// Maps to `Image.file` / `VideoPlayerController.file`.
 class FileData extends MediaSourceData {
   final File file;
-  const FileData({required this.file});
+
+  /// Whether [file] holds a still image standing in for the item rather than
+  /// the item's own bytes — a poster frame derived from a video.
+  ///
+  /// A video row's [FileData] is normally raw video that `Image.file` cannot
+  /// decode, so the view substitutes a placeholder. A poster is the one case
+  /// where a video's file IS decodable, and only the producer knows which it
+  /// handed back: `MediaItemView` sees the same `FileData` either way.
+  final bool isPoster;
+
+  const FileData({required this.file, this.isPoster = false});
 }
 
 /// Bytes live at an HTTP(S) URL that requires the given headers.

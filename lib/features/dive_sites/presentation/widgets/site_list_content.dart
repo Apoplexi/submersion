@@ -10,6 +10,7 @@ import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:submersion/features/maps/data/services/tile_cache_service.dart';
 import 'package:submersion/features/maps/presentation/providers/map_tile_providers.dart';
 import 'package:submersion/features/maps/presentation/widgets/map_attribution.dart';
+import 'package:submersion/features/maps/presentation/widgets/trackpad_zoom_map.dart';
 import 'package:submersion/core/models/sort_state.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/shared/widgets/entity_table/entity_table_view.dart';
@@ -27,6 +28,7 @@ import 'package:submersion/features/dive_sites/presentation/widgets/compact_site
 import 'package:submersion/features/dive_sites/presentation/widgets/dense_site_list_tile.dart';
 import 'package:submersion/features/dive_sites/presentation/widgets/site_filter_sheet.dart';
 import 'package:submersion/shared/widgets/debounced_search_results.dart';
+import 'package:submersion/shared/widgets/feature_accent.dart';
 
 /// Content widget for the site list, used in master-detail layout.
 class SiteListContent extends ConsumerStatefulWidget {
@@ -401,7 +403,10 @@ class _SiteListContentState extends ConsumerState<SiteListContent> {
       appBar: _isSelectionMode
           ? _buildSelectionAppBar(sitesAsync.valueOrNull ?? [])
           : AppBar(
-              title: Text(context.l10n.diveSites_list_appBar_title),
+              title: FeatureAppBarTitle(
+                featureId: 'sites',
+                title: context.l10n.diveSites_list_appBar_title,
+              ),
               actions: [
                 IconButton(
                   icon: const Icon(Icons.map),
@@ -440,7 +445,9 @@ class _SiteListContentState extends ConsumerState<SiteListContent> {
                 PopupMenuButton<String>(
                   icon: const Icon(Icons.more_vert),
                   onSelected: (value) {
-                    if (value == 'import') {
+                    if (value == 'select') {
+                      _enterSelectionMode(null);
+                    } else if (value == 'import') {
                       context.push('/sites/import');
                     } else if (value.startsWith('view_')) {
                       final mode = ListViewMode.fromName(
@@ -462,6 +469,14 @@ class _SiteListContentState extends ConsumerState<SiteListContent> {
                         ],
                       ),
                       const PopupMenuDivider(),
+                      PopupMenuItem(
+                        value: 'select',
+                        child: ListTile(
+                          leading: const Icon(Icons.checklist),
+                          title: Text(context.l10n.diveSites_list_menu_select),
+                          contentPadding: EdgeInsets.zero,
+                        ),
+                      ),
                       PopupMenuItem(
                         value: 'import',
                         child: ListTile(
@@ -587,8 +602,9 @@ class _SiteListContentState extends ConsumerState<SiteListContent> {
       child: Row(
         children: [
           const SizedBox(width: 8),
-          Text(
-            context.l10n.diveSites_list_appBar_title,
+          FeatureAppBarTitle(
+            featureId: 'sites',
+            title: context.l10n.diveSites_list_appBar_title,
             style: Theme.of(
               context,
             ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
@@ -636,7 +652,9 @@ class _SiteListContentState extends ConsumerState<SiteListContent> {
           PopupMenuButton<String>(
             icon: const Icon(Icons.more_vert, size: 20),
             onSelected: (value) {
-              if (value == 'import') {
+              if (value == 'select') {
+                _enterSelectionMode(null);
+              } else if (value == 'import') {
                 context.push('/sites/import');
               } else if (value.startsWith('view_')) {
                 final mode = ListViewMode.fromName(
@@ -658,6 +676,10 @@ class _SiteListContentState extends ConsumerState<SiteListContent> {
                   ],
                 ),
                 const PopupMenuDivider(),
+                PopupMenuItem(
+                  value: 'select',
+                  child: Text(context.l10n.diveSites_list_menu_select),
+                ),
                 PopupMenuItem(
                   value: 'import',
                   child: Text(context.l10n.diveSites_list_menu_import),
@@ -1187,7 +1209,7 @@ class SiteSearchDelegate extends SearchDelegate<DiveSite?> {
 }
 
 /// List item widget for displaying a dive site summary
-class SiteListTile extends ConsumerWidget {
+class SiteListTile extends ConsumerStatefulWidget {
   final String name;
   final String? location;
   final double? minDepth;
@@ -1236,11 +1258,32 @@ class SiteListTile extends ConsumerWidget {
   bool get _hasLocation => latitude != null && longitude != null;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<SiteListTile> createState() => _SiteListTileState();
+}
+
+class _SiteListTileState extends ConsumerState<SiteListTile> {
+  final MapController _mapController = MapController();
+
+  @override
+  Widget build(BuildContext context) {
+    final name = widget.name;
+    final location = widget.location;
+    final difficulty = widget.difficulty;
+    final diveCount = widget.diveCount;
+    final rating = widget.rating;
+    final onTap = widget.onTap;
+    final onLongPress = widget.onLongPress;
+    final isSelectionMode = widget.isSelectionMode;
+    final isSelected = widget.isSelected;
+    final isChecked = widget.isChecked;
+    final latitude = widget.latitude;
+    final longitude = widget.longitude;
+    final showSharedBadge = widget.showSharedBadge;
+
     final colorScheme = Theme.of(context).colorScheme;
     final showMapBackground = ref.watch(showMapBackgroundOnSiteCardsProvider);
     final shouldShowMap =
-        showMapBackground && _hasLocation && !isSelected && !isChecked;
+        showMapBackground && widget._hasLocation && !isSelected && !isChecked;
     final useLightText = shouldShowMap;
     final primaryTextColor = useLightText ? Colors.white : null;
     final secondaryTextColor = useLightText
@@ -1288,7 +1331,7 @@ class SiteListTile extends ConsumerWidget {
                   if (location != null) ...[
                     const SizedBox(height: 4),
                     Text(
-                      location!,
+                      location,
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         color: secondaryTextColor,
                       ),
@@ -1312,9 +1355,9 @@ class SiteListTile extends ConsumerWidget {
                       color: Theme.of(context).colorScheme.primary,
                     ),
                   ),
-                if (_depthString != null)
+                if (widget._depthString != null)
                   Text(
-                    _depthString!,
+                    widget._depthString!,
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       color: secondaryTextColor,
                       fontWeight: FontWeight.w500,
@@ -1322,7 +1365,7 @@ class SiteListTile extends ConsumerWidget {
                   ),
                 if (difficulty != null)
                   Text(
-                    difficulty!,
+                    difficulty,
                     style: Theme.of(
                       context,
                     ).textTheme.bodySmall?.copyWith(color: secondaryTextColor),
@@ -1340,7 +1383,7 @@ class SiteListTile extends ConsumerWidget {
                     children: [
                       const Icon(Icons.star, color: Colors.amber, size: 16),
                       Text(
-                        rating!.toStringAsFixed(1),
+                        rating.toStringAsFixed(1),
                         style: TextStyle(color: primaryTextColor),
                       ),
                     ],
@@ -1368,25 +1411,29 @@ class SiteListTile extends ConsumerWidget {
             child: Stack(
               children: [
                 Positioned.fill(
-                  child: FlutterMap(
-                    options: MapOptions(
-                      initialCenter: siteLocation,
-                      initialZoom: 13.0,
-                      interactionOptions: const InteractionOptions(
-                        flags: InteractiveFlag.none,
+                  child: TrackpadZoomMap(
+                    controller: _mapController,
+                    child: FlutterMap(
+                      mapController: _mapController,
+                      options: MapOptions(
+                        initialCenter: siteLocation,
+                        initialZoom: 13.0,
+                        interactionOptions: const InteractionOptions(
+                          flags: InteractiveFlag.none,
+                        ),
                       ),
+                      children: [
+                        TileLayer(
+                          urlTemplate: ref.watch(mapTileUrlProvider),
+                          userAgentPackageName: 'app.submersion',
+                          maxZoom: ref.watch(mapTileMaxZoomProvider),
+                          tileProvider: TileCacheService.instance.isInitialized
+                              ? TileCacheService.instance.getTileProvider()
+                              : null,
+                        ),
+                        const MapAttribution(),
+                      ],
                     ),
-                    children: [
-                      TileLayer(
-                        urlTemplate: ref.watch(mapTileUrlProvider),
-                        userAgentPackageName: 'app.submersion',
-                        maxZoom: ref.watch(mapTileMaxZoomProvider),
-                        tileProvider: TileCacheService.instance.isInitialized
-                            ? TileCacheService.instance.getTileProvider()
-                            : null,
-                      ),
-                      const MapAttribution(),
-                    ],
                   ),
                 ),
                 Positioned.fill(

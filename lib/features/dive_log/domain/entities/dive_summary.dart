@@ -11,6 +11,7 @@ import 'package:submersion/features/tags/domain/entities/tag.dart';
 class DiveSummary extends Equatable {
   final String id;
   final int? diveNumber;
+  final String? name;
   final DateTime dateTime;
   final DateTime? entryTime;
   final double? maxDepth;
@@ -19,7 +20,7 @@ class DiveSummary extends Equatable {
   final double? waterTemp;
   final int? rating;
   final bool isFavorite;
-  final String diveTypeId;
+  final List<String> diveTypeIds;
   final List<Tag> tags;
 
   // Site fields (from LEFT JOIN, avoids loading full DiveSite object)
@@ -32,9 +33,14 @@ class DiveSummary extends Equatable {
   // Cursor field for pagination: COALESCE(entry_time, dive_date_time)
   final int sortTimestamp;
 
+  /// Count of non-dismissed safety review findings (drives the quiet
+  /// list badge). Zero when unanalyzed or clean.
+  final int safetyFindingCount;
+
   const DiveSummary({
     required this.id,
     this.diveNumber,
+    this.name,
     required this.dateTime,
     this.entryTime,
     this.maxDepth,
@@ -43,7 +49,7 @@ class DiveSummary extends Equatable {
     this.waterTemp,
     this.rating,
     this.isFavorite = false,
-    this.diveTypeId = 'recreational',
+    this.diveTypeIds = const ['recreational'],
     this.tags = const [],
     this.siteName,
     this.siteCountry,
@@ -51,6 +57,7 @@ class DiveSummary extends Equatable {
     this.siteLatitude,
     this.siteLongitude,
     required this.sortTimestamp,
+    this.safetyFindingCount = 0,
   });
 
   /// Creates a DiveSummary from a full Dive entity.
@@ -63,6 +70,7 @@ class DiveSummary extends Equatable {
     return DiveSummary(
       id: dive.id,
       diveNumber: dive.diveNumber,
+      name: dive.name,
       dateTime: dive.dateTime,
       entryTime: dive.entryTime,
       maxDepth: dive.maxDepth,
@@ -71,7 +79,7 @@ class DiveSummary extends Equatable {
       waterTemp: dive.waterTemp,
       rating: dive.rating,
       isFavorite: dive.isFavorite,
-      diveTypeId: dive.diveTypeId,
+      diveTypeIds: dive.diveTypeIds,
       tags: dive.tags,
       siteName: dive.site?.name,
       siteCountry: dive.site?.country,
@@ -79,7 +87,18 @@ class DiveSummary extends Equatable {
       siteLatitude: dive.site?.location?.latitude,
       siteLongitude: dive.site?.location?.longitude,
       sortTimestamp: ts.millisecondsSinceEpoch,
+      // Optimistic conversions can't know the count; the next DB read
+      // corrects it.
+      safetyFindingCount: 0,
     );
+  }
+
+  /// User-defined name, normalized for display: trimmed, with empty or
+  /// whitespace-only values treated as unset (null). Mirrors
+  /// [Dive.effectiveName].
+  String? get effectiveName {
+    final trimmed = name?.trim();
+    return (trimmed == null || trimmed.isEmpty) ? null : trimmed;
   }
 
   /// Formatted location string matching DiveSite.locationString
@@ -94,9 +113,14 @@ class DiveSummary extends Equatable {
     return parts.isEmpty ? null : parts.join(', ');
   }
 
+  /// Representative (first) dive type slug. Always present (>= 1 invariant).
+  String get diveTypeId =>
+      diveTypeIds.isEmpty ? 'recreational' : diveTypeIds.first;
+
   DiveSummary copyWith({
     String? id,
     int? diveNumber,
+    String? name,
     DateTime? dateTime,
     DateTime? entryTime,
     double? maxDepth,
@@ -105,7 +129,7 @@ class DiveSummary extends Equatable {
     double? waterTemp,
     int? rating,
     bool? isFavorite,
-    String? diveTypeId,
+    List<String>? diveTypeIds,
     List<Tag>? tags,
     String? siteName,
     String? siteCountry,
@@ -113,10 +137,12 @@ class DiveSummary extends Equatable {
     double? siteLatitude,
     double? siteLongitude,
     int? sortTimestamp,
+    int? safetyFindingCount,
   }) {
     return DiveSummary(
       id: id ?? this.id,
       diveNumber: diveNumber ?? this.diveNumber,
+      name: name ?? this.name,
       dateTime: dateTime ?? this.dateTime,
       entryTime: entryTime ?? this.entryTime,
       maxDepth: maxDepth ?? this.maxDepth,
@@ -125,7 +151,7 @@ class DiveSummary extends Equatable {
       waterTemp: waterTemp ?? this.waterTemp,
       rating: rating ?? this.rating,
       isFavorite: isFavorite ?? this.isFavorite,
-      diveTypeId: diveTypeId ?? this.diveTypeId,
+      diveTypeIds: diveTypeIds ?? this.diveTypeIds,
       tags: tags ?? this.tags,
       siteName: siteName ?? this.siteName,
       siteCountry: siteCountry ?? this.siteCountry,
@@ -133,6 +159,7 @@ class DiveSummary extends Equatable {
       siteLatitude: siteLatitude ?? this.siteLatitude,
       siteLongitude: siteLongitude ?? this.siteLongitude,
       sortTimestamp: sortTimestamp ?? this.sortTimestamp,
+      safetyFindingCount: safetyFindingCount ?? this.safetyFindingCount,
     );
   }
 
@@ -140,6 +167,7 @@ class DiveSummary extends Equatable {
   List<Object?> get props => [
     id,
     diveNumber,
+    name,
     dateTime,
     entryTime,
     maxDepth,
@@ -148,7 +176,7 @@ class DiveSummary extends Equatable {
     waterTemp,
     rating,
     isFavorite,
-    diveTypeId,
+    diveTypeIds,
     tags,
     siteName,
     siteCountry,
@@ -156,6 +184,7 @@ class DiveSummary extends Equatable {
     siteLatitude,
     siteLongitude,
     sortTimestamp,
+    safetyFindingCount,
   ];
 }
 

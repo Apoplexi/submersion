@@ -55,7 +55,7 @@ class ImportDuplicateResult {
 
 /// Checks import payload entities against existing data for duplicates.
 ///
-/// Uses the same matching strategies as [UddfDuplicateChecker]:
+/// Matching strategies:
 /// - Name matching (case-insensitive) for simple entities
 /// - Lat/lon proximity (100m) for sites
 /// - Name + type compound matching for equipment and certifications
@@ -93,6 +93,7 @@ class ImportDuplicateChecker {
     required List<DiveTypeEntity> existingDiveTypes,
     Map<String, String> existingSourceUuidByDiveId = const {},
     DiveMatcher matcher = const DiveMatcher(),
+    bool checkIntraBatch = false,
   }) {
     final duplicates = <ImportEntityType, Set<int>>{};
     final entityMatches = <ImportEntityType, Map<int, EntityMatchResult>>{};
@@ -168,6 +169,7 @@ class ImportDuplicateChecker {
             existingDives,
             existingSourceUuidByDiveId,
             matcher,
+            checkIntraBatch: checkIntraBatch,
           )
         : <int, DiveMatchResult>{};
 
@@ -671,11 +673,87 @@ class ImportDuplicateChecker {
     List<Map<String, dynamic>> importedDives,
     List<Dive> existingDives,
     Map<String, String> existingSourceUuidByDiveId,
-    DiveMatcher matcher,
-  ) {
-    if (existingDives.isEmpty) return {};
+    DiveMatcher matcher, {
+    bool checkIntraBatch = false,
+  }) {
+    // The intra-batch pass must run even against an empty database — a
+    // first-ever bulk import is exactly where cross-file duplicates appear.
+    if (existingDives.isEmpty && !checkIntraBatch) return {};
 
     final matches = <int, DiveMatchResult>{};
+    final handled = <int>{};
+
+    // Pass I (batch imports only): match dives against EARLIER dives in the
+    // same payload. Runs before the database passes so an in-batch duplicate
+    // is not also double-reported against the database.
+    if (checkIntraBatch) {
+      final seenUuidAt = <String, int>{};
+      for (var i = 0; i < importedDives.length; i++) {
+        final uuid = importedDives[i]['sourceUuid'] as String?;
+        if (uuid == null || uuid.isEmpty) continue;
+        final earlier = seenUuidAt[uuid];
+        if (earlier != null) {
+          matches[i] = DiveMatchResult(
+            diveId: '',
+            inBatchIndex: earlier,
+            score: _sourceUuidMatchScore,
+            timeDifferenceMs: 0,
+            siteName: importedDives[earlier]['_sourceFile'] as String?,
+          );
+          handled.add(i);
+        } else {
+          seenUuidAt[uuid] = i;
+        }
+      }
+
+      for (var i = 1; i < importedDives.length; i++) {
+        if (handled.contains(i)) continue;
+        final dateTime = importedDives[i]['dateTime'] as DateTime?;
+        if (dateTime == null) continue;
+        final maxDepth = importedDives[i]['maxDepth'] as double? ?? 0;
+        final durationSeconds =
+            ((importedDives[i]['runtime'] as Duration?) ??
+                    (importedDives[i]['duration'] as Duration?))
+                ?.inSeconds ??
+            0;
+
+        for (var j = 0; j < i; j++) {
+          if (handled.contains(j)) continue;
+          final otherDateTime = importedDives[j]['dateTime'] as DateTime?;
+          if (otherDateTime == null) continue;
+          final otherDepth = importedDives[j]['maxDepth'] as double? ?? 0;
+          final otherDuration =
+              ((importedDives[j]['runtime'] as Duration?) ??
+                      (importedDives[j]['duration'] as Duration?))
+                  ?.inSeconds ??
+              0;
+
+          final score = matcher.calculateMatchScore(
+            wearableStartTime: dateTime,
+            wearableMaxDepth: maxDepth,
+            wearableDurationSeconds: durationSeconds,
+            existingStartTime: otherDateTime,
+            existingMaxDepth: otherDepth,
+            existingDurationSeconds: otherDuration,
+          );
+
+          if (matcher.isPossibleDuplicate(score)) {
+            matches[i] = DiveMatchResult(
+              diveId: '',
+              inBatchIndex: j,
+              score: score,
+              timeDifferenceMs: dateTime
+                  .difference(otherDateTime)
+                  .inMilliseconds
+                  .abs(),
+              siteName: importedDives[j]['_sourceFile'] as String?,
+            );
+            handled.add(i);
+            break;
+          }
+        }
+      }
+    }
 
     // Pass 0: exact match by source_uuid. When a user imports MacDive's
     // SQLite and later re-imports the same dives from UDDF (or vice versa),
@@ -698,9 +776,9 @@ class ImportDuplicateChecker {
       });
     }
 
-    final handled = <int>{};
     if (existingBySourceUuid.isNotEmpty) {
       for (var i = 0; i < importedDives.length; i++) {
+        if (handled.contains(i)) continue;
         final uuid = importedDives[i]['sourceUuid'] as String?;
         if (uuid == null || uuid.isEmpty) continue;
         final existing = existingBySourceUuid[uuid];
@@ -711,6 +789,10 @@ class ImportDuplicateChecker {
           score: _sourceUuidMatchScore,
           timeDifferenceMs: 0,
           siteName: existing.site?.name,
+          // The incoming dive's source data is already present on `existing`
+          // (same source_uuid) — a re-import, not a new source. The wizard
+          // defaults these to skip and excludes them from bulk-consolidate.
+          matchedExistingSource: true,
         );
         handled.add(i);
       }

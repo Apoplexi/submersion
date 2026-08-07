@@ -7,6 +7,8 @@ import 'package:submersion/core/services/database_service.dart';
 import 'package:submersion/core/services/sync/sync_event_bus.dart';
 import 'package:submersion/features/equipment/domain/entities/equipment_set.dart'
     as domain;
+import 'package:submersion/features/equipment/domain/entities/equipment_set_geofence.dart'
+    as domain;
 import 'package:submersion/features/equipment/data/repositories/equipment_repository_impl.dart';
 
 class EquipmentSetRepository {
@@ -38,6 +40,7 @@ class EquipmentSetRepository {
   Future<domain.EquipmentSet?> getSetById(
     String id, {
     bool includeItems = false,
+    bool includeGeofences = false,
   }) async {
     final query = _db.select(_db.equipmentSets)..where((t) => t.id.equals(id));
     final row = await query.getSingleOrNull();
@@ -49,6 +52,9 @@ class EquipmentSetRepository {
     if (includeItems) {
       final items = await _equipmentRepo.getEquipmentByIds(equipmentIds);
       set = set.copyWith(items: items);
+    }
+    if (includeGeofences) {
+      set = set.copyWith(geofences: await getGeofencesForSet(id));
     }
     return set;
   }
@@ -159,13 +165,27 @@ class EquipmentSetRepository {
     SyncEventBus.notifyLocalChange();
   }
 
-  /// Delete an equipment set
+  /// Delete an equipment set.
+  ///
+  /// Geofences are a first-class synced child cascade-deleted by SQLite, but
+  /// cascades emit no deletion-log entries, so each geofence must be tombstoned
+  /// explicitly or a peer will resurrect it. Done in one transaction with the
+  /// set deletion (mirrors the buddy/certification deletion path).
   Future<void> deleteSet(String id) async {
-    await (_db.delete(_db.equipmentSets)..where((t) => t.id.equals(id))).go();
-    await _syncRepository.logDeletion(
-      entityType: 'equipmentSets',
-      recordId: id,
-    );
+    await _db.transaction(() async {
+      final geofences = await getGeofencesForSet(id);
+      await (_db.delete(_db.equipmentSets)..where((t) => t.id.equals(id))).go();
+      for (final g in geofences) {
+        await _syncRepository.logDeletion(
+          entityType: 'equipmentSetGeofences',
+          recordId: g.id,
+        );
+      }
+      await _syncRepository.logDeletion(
+        entityType: 'equipmentSets',
+        recordId: id,
+      );
+    });
     SyncEventBus.notifyLocalChange();
   }
 
@@ -225,6 +245,177 @@ class EquipmentSetRepository {
     SyncEventBus.notifyLocalChange();
   }
 
+  /// Set [id] as the diver's default equipment set, clearing the flag from the
+  /// diver's other sets. The scope is derived from the target set's own owner
+  /// so the clear/promote/mark-pending steps always cover the same diver, even
+  /// if a caller passes a mismatched [diverId] (the parameter is retained for
+  /// API compatibility but the target row is authoritative). Runs in a single
+  /// transaction so a partial write cannot leave two defaults.
+  Future<void> setAsDefault(String id, {String? diverId}) async {
+    await _db.transaction(() async {
+      final now = DateTime.now().millisecondsSinceEpoch;
+
+      final target = await (_db.select(
+        _db.equipmentSets,
+      )..where((t) => t.id.equals(id))).getSingleOrNull();
+      if (target == null) return;
+      final ownerId = target.diverId;
+
+      await (_db.update(_db.equipmentSets)..where(
+            (t) => ownerId == null
+                ? t.diverId.isNull()
+                : t.diverId.equals(ownerId),
+          ))
+          .write(
+            EquipmentSetsCompanion(
+              isDefault: const Value(false),
+              updatedAt: Value(now),
+            ),
+          );
+
+      await (_db.update(
+        _db.equipmentSets,
+      )..where((t) => t.id.equals(id))).write(
+        EquipmentSetsCompanion(
+          isDefault: const Value(true),
+          updatedAt: Value(now),
+        ),
+      );
+
+      // The promoted row is in scope by construction (its owner defines the
+      // scope), so this sweep marks it and every demoted sibling pending.
+      final affected =
+          await (_db.select(_db.equipmentSets)..where(
+                (t) => ownerId == null
+                    ? t.diverId.isNull()
+                    : t.diverId.equals(ownerId),
+              ))
+              .get();
+      for (final row in affected) {
+        await _syncRepository.markRecordPending(
+          entityType: 'equipmentSets',
+          recordId: row.id,
+          localUpdatedAt: now,
+        );
+      }
+    });
+    SyncEventBus.notifyLocalChange();
+  }
+
+  /// Clear the default flag from a single set, leaving the diver with no
+  /// default (nothing auto-applies until a default is set again).
+  Future<void> clearDefault(String id) async {
+    final now = DateTime.now().millisecondsSinceEpoch;
+    await (_db.update(_db.equipmentSets)..where((t) => t.id.equals(id))).write(
+      EquipmentSetsCompanion(
+        isDefault: const Value(false),
+        updatedAt: Value(now),
+      ),
+    );
+    await _syncRepository.markRecordPending(
+      entityType: 'equipmentSets',
+      recordId: id,
+      localUpdatedAt: now,
+    );
+    SyncEventBus.notifyLocalChange();
+  }
+
+  /// All geofences for a set.
+  Future<List<domain.EquipmentSetGeofence>> getGeofencesForSet(
+    String setId,
+  ) async {
+    final rows = await (_db.select(
+      _db.equipmentSetGeofences,
+    )..where((t) => t.setId.equals(setId))).get();
+    return rows.map(_mapRowToGeofence).toList();
+  }
+
+  /// All geofences belonging to the given diver's sets (or all sets when
+  /// [diverId] is null).
+  Future<List<domain.EquipmentSetGeofence>> getAllGeofences({
+    String? diverId,
+  }) async {
+    final setQuery = _db.select(_db.equipmentSets);
+    if (diverId != null) {
+      setQuery.where((t) => t.diverId.equals(diverId));
+    }
+    final setIds = (await setQuery.get()).map((s) => s.id).toSet();
+    if (setIds.isEmpty) return [];
+    final rows = await (_db.select(
+      _db.equipmentSetGeofences,
+    )..where((t) => t.setId.isIn(setIds))).get();
+    return rows.map(_mapRowToGeofence).toList();
+  }
+
+  Future<void> addGeofence(domain.EquipmentSetGeofence fence) async {
+    final now = DateTime.now().millisecondsSinceEpoch;
+    await _db
+        .into(_db.equipmentSetGeofences)
+        .insert(
+          EquipmentSetGeofencesCompanion(
+            id: Value(fence.id),
+            setId: Value(fence.setId),
+            label: Value(fence.label),
+            latitude: Value(fence.latitude),
+            longitude: Value(fence.longitude),
+            radiusMeters: Value(fence.radiusMeters),
+            createdAt: Value(now),
+            updatedAt: Value(now),
+          ),
+        );
+    await _syncRepository.markRecordPending(
+      entityType: 'equipmentSetGeofences',
+      recordId: fence.id,
+      localUpdatedAt: now,
+    );
+    SyncEventBus.notifyLocalChange();
+  }
+
+  Future<void> updateGeofence(domain.EquipmentSetGeofence fence) async {
+    final now = DateTime.now().millisecondsSinceEpoch;
+    await (_db.update(
+      _db.equipmentSetGeofences,
+    )..where((t) => t.id.equals(fence.id))).write(
+      EquipmentSetGeofencesCompanion(
+        label: Value(fence.label),
+        latitude: Value(fence.latitude),
+        longitude: Value(fence.longitude),
+        radiusMeters: Value(fence.radiusMeters),
+        updatedAt: Value(now),
+      ),
+    );
+    await _syncRepository.markRecordPending(
+      entityType: 'equipmentSetGeofences',
+      recordId: fence.id,
+      localUpdatedAt: now,
+    );
+    SyncEventBus.notifyLocalChange();
+  }
+
+  Future<void> removeGeofence(String geofenceId) async {
+    await (_db.delete(
+      _db.equipmentSetGeofences,
+    )..where((t) => t.id.equals(geofenceId))).go();
+    await _syncRepository.logDeletion(
+      entityType: 'equipmentSetGeofences',
+      recordId: geofenceId,
+    );
+    SyncEventBus.notifyLocalChange();
+  }
+
+  domain.EquipmentSetGeofence _mapRowToGeofence(EquipmentSetGeofence row) {
+    return domain.EquipmentSetGeofence(
+      id: row.id,
+      setId: row.setId,
+      label: row.label,
+      latitude: row.latitude,
+      longitude: row.longitude,
+      radiusMeters: row.radiusMeters,
+      createdAt: DateTime.fromMillisecondsSinceEpoch(row.createdAt),
+      updatedAt: DateTime.fromMillisecondsSinceEpoch(row.updatedAt),
+    );
+  }
+
   domain.EquipmentSet _mapRowToSet(
     EquipmentSet row,
     List<String> equipmentIds,
@@ -235,6 +426,7 @@ class EquipmentSetRepository {
       name: row.name,
       description: row.description,
       equipmentIds: equipmentIds,
+      isDefault: row.isDefault,
       createdAt: DateTime.fromMillisecondsSinceEpoch(row.createdAt),
       updatedAt: DateTime.fromMillisecondsSinceEpoch(row.updatedAt),
     );

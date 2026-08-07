@@ -24,10 +24,7 @@ final diverMergeRepositoryProvider = Provider<DiverMergeRepository>((ref) {
 /// `ref.read(allDiversProvider.future)` reads still resolve.
 final allDiversProvider = FutureProvider<List<Diver>>((ref) async {
   final repository = ref.watch(diverRepositoryProvider);
-  final sub = repository.watchDiversChanges().listen(
-    (_) => ref.invalidateSelf(),
-  );
-  ref.onDispose(sub.cancel);
+  ref.invalidateSelfWhen(repository.watchDiversChanges());
   return repository.getAllDivers();
 });
 
@@ -58,6 +55,37 @@ final diverByIdProvider = FutureProvider.family<Diver?, String>((
 /// Key for storing current diver ID in SharedPreferences.
 /// Public so the backup restore flow can sync this value.
 const String currentDiverIdKey = 'current_diver_id';
+
+/// After the local database content has been replaced wholesale (backup
+/// restore, or adopting a replaced sync library), realign the active diver:
+/// validate the restored settings' active diver against the divers table,
+/// fall back to the default diver, and persist the result to
+/// SharedPreferences so startup picks up the right diver.
+Future<void> realignActiveDiverAfterDataReplace(SharedPreferences prefs) async {
+  try {
+    final repository = DiverRepository();
+
+    var restoredId = await repository.getActiveDiverIdFromSettings();
+
+    if (restoredId != null) {
+      final diver = await repository.getDiverById(restoredId);
+      if (diver == null) {
+        restoredId = null;
+      }
+    }
+
+    if (restoredId == null) {
+      final defaultDiver = await repository.getDefaultDiver();
+      restoredId = defaultDiver?.id;
+    }
+
+    if (restoredId != null) {
+      await prefs.setString(currentDiverIdKey, restoredId);
+    }
+  } catch (_) {
+    // Non-fatal: startup validation in CurrentDiverIdNotifier handles it.
+  }
+}
 
 /// Current diver ID provider (persisted to both SharedPreferences and DB)
 final currentDiverIdProvider =
@@ -301,11 +329,7 @@ final diverStatsProvider = FutureProvider.family<DiverStats, String>((
   final repository = ref.watch(diverRepositoryProvider);
   // The stats read the `dives` table, so self-invalidate when dives change
   // (e.g. after a sync) to keep the per-tile counts on the diver list fresh.
-  final diveSub = ref
-      .read(diveRepositoryProvider)
-      .watchDivesChanges()
-      .listen((_) => ref.invalidateSelf());
-  ref.onDispose(diveSub.cancel);
+  ref.invalidateSelfWhen(ref.read(diveRepositoryProvider).watchDivesChanges());
   final diveCount = await repository.getDiveCountForDiver(diverId);
   final totalTime = await repository.getTotalBottomTimeForDiver(diverId);
   return DiverStats(diveCount: diveCount, totalBottomTimeSeconds: totalTime);

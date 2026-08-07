@@ -4,6 +4,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:submersion/core/data/repositories/sync_repository.dart';
 import 'package:submersion/core/services/database_service.dart';
+import 'package:submersion/core/services/sync/library_epoch.dart';
+import 'package:submersion/core/services/sync/library_epoch_store.dart';
 import 'package:submersion/core/services/sync/sync_initializer.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/features/settings/presentation/providers/sync_providers.dart';
@@ -159,6 +161,36 @@ void main() {
       expect(
         await initializer.reconcileDeviceIdentity(),
         DeviceIdentityStatus.unchanged,
+      );
+    });
+
+    test('restore-detect realigns the library epoch from its mirror', () async {
+      // Establish identity anchors and a mirrored library epoch.
+      await repository.setDeviceId('live-device');
+      expect(
+        await initializer.reconcileDeviceIdentity(),
+        DeviceIdentityStatus.seeded,
+      );
+      const liveMarker = LibraryEpochMarker(
+        epochId: 'live-epoch',
+        replacedAt: 1,
+        deviceId: 'd1',
+      );
+      await LibraryEpochStore(prefs).setLastAccepted(liveMarker);
+
+      // A restore swaps the whole DB: foreign device id, stale epoch.
+      await repository.setDeviceId('backup-device');
+      await repository.setLastAcceptedEpochId('stale-epoch-from-backup');
+
+      final status = await initializer.reconcileDeviceIdentity();
+
+      expect(status, DeviceIdentityStatus.rebaselined);
+      expect(
+        await repository.getLastAcceptedEpochId(),
+        'live-epoch',
+        reason:
+            'the in-DB epoch must be realigned from the mirror, or a plain '
+            'Merge-mode restore would wrongly prompt this device to adopt',
       );
     });
 

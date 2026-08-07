@@ -43,6 +43,31 @@ class UnitFormatter {
     return '${converted.toStringAsFixed(decimals)}${settings.depthUnit.symbol}';
   }
 
+  /// Format a geographic distance (meters) for site lists and pickers.
+  ///
+  /// Unlike [formatDistance] (depth-unit m/ft, for short surface drift), this
+  /// auto-scales across the full range of site distances and respects the
+  /// diver's metric/imperial preference (derived from depth unit): metric -> m
+  /// under 1 km else km; imperial -> ft under 1 mile else mi. Unit symbols are
+  /// latin (m/km/ft/mi), consistent with [formatDepth].
+  String formatGeoDistance(double meters) {
+    final isMetric = settings.depthUnit == DepthUnit.meters;
+    if (isMetric) {
+      if (meters < 1000) return '${meters.round()} m';
+      final km = meters / 1000;
+      final text = km < 10 ? km.toStringAsFixed(1) : km.round().toString();
+      return '$text km';
+    }
+    final feet = meters * 3.28084;
+    const feetPerMile = 5280.0;
+    if (feet < feetPerMile) return '${feet.round()} ft';
+    final miles = feet / feetPerMile;
+    final text = miles < 10
+        ? miles.toStringAsFixed(1)
+        : miles.round().toString();
+    return '$text mi';
+  }
+
   // ============================================================================
   // Temperature
   // ============================================================================
@@ -168,6 +193,30 @@ class UnitFormatter {
   }
 
   // ============================================================================
+  // SAC (Surface Air Consumption)
+  // ============================================================================
+
+  /// The diver's SAC unit mode: volume-based (L/min) or pressure-based
+  /// (bar/min or psi/min).
+  SacUnit get sacUnit => settings.sacUnit;
+
+  /// SAC display suffix: "L/min", "cuft/min", "bar/min", or "psi/min".
+  ///
+  /// Volume mode uses the volume unit; pressure mode uses the pressure unit.
+  String get sacSymbol => settings.sacUnit == SacUnit.litersPerMin
+      ? '$volumeSymbol/min'
+      : '$pressureSymbol/min';
+
+  /// Convert a base SAC value into the diver's preferred unit.
+  ///
+  /// In volume mode the input is L/min (from `Dive.sac`) and is converted to
+  /// the volume unit. In pressure mode the input is bar/min (from
+  /// `Dive.sacPressure`) and is converted to the pressure unit.
+  double convertSac(double value) => settings.sacUnit == SacUnit.litersPerMin
+      ? convertVolume(value)
+      : convertPressure(value);
+
+  // ============================================================================
   // Weight
   // ============================================================================
 
@@ -190,6 +239,35 @@ class UnitFormatter {
   double weightToKg(double value) {
     return settings.weightUnit.convert(value, WeightUnit.kilograms);
   }
+
+  // ============================================================================
+  // Height
+  // ============================================================================
+
+  /// Centimeters per inch.
+  static const double _cmPerInch = 2.54;
+
+  /// Whether body height should be shown in metric (cm) rather than imperial
+  /// (feet/inches). There is no dedicated height unit, so this is derived from
+  /// the depth unit, consistent with [formatGeoDistance].
+  bool get heightIsMetric => settings.depthUnit == DepthUnit.meters;
+
+  /// Format a stored height (centimeters) in the diver's preferred units:
+  /// metric renders whole centimeters ("175 cm"); imperial renders feet and
+  /// inches ("5' 9\""), rounding to the nearest whole inch and carrying 12
+  /// inches into the next foot.
+  String formatHeight(double? cm) {
+    if (cm == null) return '--';
+    if (heightIsMetric) return '${cm.round()} cm';
+    final totalInches = (cm / _cmPerInch).round();
+    final feet = totalInches ~/ 12;
+    final inches = totalInches % 12;
+    return '$feet\' $inches"';
+  }
+
+  /// Build a stored height (centimeters) from imperial feet and inches.
+  double feetInchesToCm(double feet, double inches) =>
+      (feet * 12 + inches) * _cmPerInch;
 
   // ============================================================================
   // Altitude
@@ -223,6 +301,26 @@ class UnitFormatter {
     if (bar == null) return '--';
     final mbar = bar * 1000;
     return '${mbar.toStringAsFixed(decimals)} mbar';
+  }
+
+  /// Inches of mercury per bar.
+  static const double _inHgPerBar = 29.5300;
+
+  /// Barometric pressure symbol.
+  ///
+  /// Metric divers expect mbar, imperial divers expect inHg. Derived from the
+  /// depth unit, consistent with wind speed -- the tank pressure unit
+  /// (bar/psi) measures a different quantity and must not drive this.
+  String get surfacePressureSymbol =>
+      settings.depthUnit == DepthUnit.meters ? 'mbar' : 'inHg';
+
+  /// Format a surface (barometric) pressure stored in bar.
+  String formatSurfacePressure(double? bar) {
+    if (bar == null) return '--';
+    if (settings.depthUnit == DepthUnit.meters) {
+      return '${(bar * 1000).toStringAsFixed(0)} $surfacePressureSymbol';
+    }
+    return '${(bar * _inHgPerBar).toStringAsFixed(2)} $surfacePressureSymbol';
   }
 
   /// Get altitude unit symbol

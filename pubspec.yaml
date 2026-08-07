@@ -1,7 +1,7 @@
 name: submersion
 description: An open-source dive logging application for scuba divers.
 publish_to: 'none'
-version: 1.4.9+95
+version: 1.7.3+120
 
 environment:
   sdk: ^3.10.0
@@ -14,7 +14,6 @@ dependencies:
 
   # Core
   cupertino_icons: ^1.0.8
-  material_design_icons_flutter: ^7.0.7296
 
   # State Management
   flutter_riverpod: ^3.1.0
@@ -24,7 +23,16 @@ dependencies:
   # Database
   drift: ^2.30.0
   sqlite3: ^2.9.4
-  sqlite3_flutter_libs: ^0.5.41
+  # SQLCipher-enabled replacement for sqlite3_flutter_libs (same maintainer,
+  # same sqlite3 Dart API). One native lib serves both plaintext and encrypted
+  # databases; the codec only engages when PRAGMA key is set.
+  # Pinned to 0.6.x on purpose: 0.7.0+eol is an empty tombstone release that
+  # removes the native SQLCipher bundling entirely (same pattern as the old
+  # sqlite3_flutter_libs 0.6.0+eol, issue #433). It is only safe once we
+  # migrate to sqlite3 3.x (UPGRADING_TO_V3.md). Build-time note: Windows and
+  # Linux builds compile SQLCipher and need OpenSSL installed on the build
+  # machine (choco install openssl / apt install libssl-dev).
+  sqlcipher_flutter_libs: ">=0.6.8 <0.7.0"
   path_provider: ^2.1.5
   path: ^1.9.0
 
@@ -49,6 +57,11 @@ dependencies:
 
   # Networking
   http: ^1.2.2
+  # Network-type detection for media store transfer policies (Wi-Fi vs
+  # cellular vs offline).
+  connectivity_plus: ^6.1.0
+  # FFI for reading the Windows certificate store (TLS trust on Windows).
+  ffi: ^2.1.0
 
   # Cloud Storage
   google_sign_in: ^7.2.0
@@ -59,18 +72,28 @@ dependencies:
   # Platform Integration
   libdivecomputer_plugin:
     path: packages/libdivecomputer_plugin
+  submersion_saf:
+    path: packages/submersion_saf
+  submersion_ocr:
+    path: packages/submersion_ocr
+  submersion_transcoder:
+    path: packages/submersion_transcoder
   permission_handler: ^12.0.1
   file_picker: ^11.0.2
   image_picker: ^1.1.2
   share_plus: ^12.0.1
   desktop_drop: ^0.7.0
-  receive_sharing_intent: ^1.8.1
+  # Pinned <1.9.0: 1.9.0 is Swift Package Manager-only and drops CocoaPods
+  # support, which breaks the iOS/macOS build (this project uses CocoaPods).
+  receive_sharing_intent: ">=1.8.1 <1.9.0"
   url_launcher: ^6.3.1
   flutter_contacts: ^2.0.2
   geolocator: ^14.0.2
   geocoding: ^4.0.0
   photo_manager: ^3.6.0
-  native_exif: ^0.7.0
+  native_exif: ^0.8.0
+  # Pure-Dart decode/resize/JPEG-encode for media store thumbnails.
+  image: ^4.3.0
   health: ^13.3.0  # Cross-platform health data (HealthKit, Health Connect)
 
   # Storage
@@ -88,6 +111,7 @@ dependencies:
   pdf: ^3.11.1
   csv: ^6.0.0
   excel: ^4.0.6
+  archive: ^3.6.1  # ZIP expansion for DiveCloud export archives
   fit_tool: ^1.0.5  # Garmin FIT file parsing for dive imports
   logger: ^2.0.0  # Used to suppress fit_tool's verbose warnings
   collection: ^1.18.0
@@ -97,14 +121,18 @@ dependencies:
 
   # Auto-Update
   auto_updater: ^1.0.0
-  package_info_plus: ^8.0.0
+  package_info_plus: ^9.0.1
 
   # Notifications
-  flutter_local_notifications: ^21.0.0
+  flutter_local_notifications: ^22.0.1
   workmanager: ^0.9.0+3
   timezone: ^0.11.0
   google_fonts: ^8.0.2
   linked_scroll_controller: ^0.2.0
+  cryptography: ^2.9.0
+  cryptography_flutter: ^2.3.4
+  flutter_web_auth_2: ^5.0.3
+  local_auth: ^3.0.2
 
 dev_dependencies:
   flutter_test:
@@ -122,20 +150,16 @@ dev_dependencies:
   riverpod_generator: ^4.0.0+1
   mockito: ^5.6.1
   plugin_platform_interface: ^2.1.8
+  path_provider_platform_interface: ^2.1.3  # mock docs dir in db service tests
+  flutter_web_auth_2_platform_interface: ^5.0.0  # mock auth in redirect-capture test
   fake_async: ^1.3.3  # synthetic clock + Timer driving for unit tests
 
 dependency_overrides:
-  # Pin to 9.4.5 to avoid CNAuthorizationStatusLimited compile error
-  # See: https://github.com/Baseflow/flutter-permission-handler/issues/1450
-  permission_handler_apple: 9.4.5
   # fit_tool (3 years unmaintained) has stale deps; overrides are safe because:
   # - csv: fit_tool uses csv for optional CSV export, not core FIT binary parsing
   # - logger: fit_tool uses basic logging; logger 2.x is backward-compatible
   csv: ^6.0.0
   logger: ^2.0.0
-  # Pin to 12.3.0 — v12.4.0 calls NSProcessInfo.isiOSAppOnVision which is
-  # unavailable with Xcode 16.2's SDK, causing iOS build failure in CI.
-  device_info_plus: 12.3.0
   # Vendored with threading fix for #83 — WinSparkle callbacks were calling
   # event_sink_->Success() from background threads, violating Flutter's
   # platform channel threading requirement.
@@ -153,3 +177,11 @@ flutter:
 
   shaders:
     - shaders/heatmap.frag
+
+  # Vendored Material Design Icons font (replaces material_design_icons_flutter,
+  # which extends the now-sealed IconData and breaks on Flutter 3.44+).
+  # Glyphs are referenced via lib/core/icons/mdi_icons.dart.
+  fonts:
+    - family: Material Design Icons
+      fonts:
+        - asset: assets/fonts/materialdesignicons-webfont.ttf

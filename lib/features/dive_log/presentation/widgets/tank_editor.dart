@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:uuid/uuid.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 
@@ -161,24 +162,21 @@ class _TankEditorState extends ConsumerState<TankEditor> {
     return 'L';
   }
 
-  void _notifyChange() {
+  /// Current volume (liters) and working pressure (bar) parsed from the
+  /// controllers and converted from the user's units to metric. Shared by
+  /// [_notifyChange] and [_saveAsPreset] so both agree on the conversion.
+  ({double? volumeLiters, double? workingPressureBar}) _metricSpecs() {
     final settings = ref.read(settingsProvider);
     final units = UnitFormatter(settings);
-
-    // Convert from user's preferred units back to metric for storage
     final volumeDisplay = double.tryParse(_volumeController.text);
     final workingPressureDisplay = double.tryParse(
       _workingPressureController.text,
     );
-    final startPressureDisplay = double.tryParse(_startPressureController.text);
-    final endPressureDisplay = double.tryParse(_endPressureController.text);
-
-    // Convert working pressure to bar first (needed for cuft->liters conversion)
+    // Convert working pressure to bar first (needed for cuft->liters).
     final workingPressureBar = workingPressureDisplay != null
         ? units.pressureToBar(workingPressureDisplay)
         : null;
-
-    // For tank volume: convert cuft (gas capacity) back to liters (water volume)
+    // Tank volume: convert cuft (gas capacity) back to liters (water volume).
     double? volumeLiters;
     if (volumeDisplay != null) {
       if (settings.volumeUnit == VolumeUnit.cubicFeet) {
@@ -191,17 +189,88 @@ class _TankEditorState extends ConsumerState<TankEditor> {
           volumeLiters = (volumeDisplay * 28.3168) / workingPressureBar;
         }
       } else {
-        // Metric: value is already in liters
+        // Metric: value is already in liters.
         volumeLiters = volumeDisplay;
       }
     }
+    return (volumeLiters: volumeLiters, workingPressureBar: workingPressureBar);
+  }
+
+  /// Saves the tank's current specs (volume, working pressure, material) as a
+  /// reusable custom preset, then selects it.
+  Future<void> _saveAsPreset() async {
+    final specs = _metricSpecs();
+    final volumeLiters = specs.volumeLiters;
+    final workingPressureBar = specs.workingPressureBar;
+    if (volumeLiters == null ||
+        volumeLiters <= 0 ||
+        workingPressureBar == null ||
+        workingPressureBar <= 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(context.l10n.diveLog_tank_saveAsPreset_needSpecs),
+        ),
+      );
+      return;
+    }
+
+    final displayName = (await _promptPresetName())?.trim();
+    if (displayName == null || displayName.isEmpty) return;
+
+    final preset = TankPresetEntity.create(
+      id: const Uuid().v4(),
+      name: TankPresetEntity.generateSlug(displayName),
+      displayName: displayName,
+      volumeLiters: volumeLiters,
+      workingPressureBar: workingPressureBar,
+      material: _material ?? TankMaterial.aluminum,
+    );
+    try {
+      final saved = await ref
+          .read(tankPresetListNotifierProvider.notifier)
+          .addPreset(preset);
+      if (!mounted) return;
+      setState(() => _selectedPreset = saved);
+      _notifyChange();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            context.l10n.diveLog_tank_saveAsPreset_saved(saved.displayName),
+          ),
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            context.l10n.tankPresets_edit_errorSaving(e.toString()),
+          ),
+          backgroundColor: Theme.of(context).colorScheme.error,
+        ),
+      );
+    }
+  }
+
+  Future<String?> _promptPresetName() => showDialog<String>(
+    context: context,
+    builder: (_) => _PresetNameDialog(initialName: widget.tank.name),
+  );
+
+  void _notifyChange() {
+    final settings = ref.read(settingsProvider);
+    final units = UnitFormatter(settings);
+    final specs = _metricSpecs();
+
+    final startPressureDisplay = double.tryParse(_startPressureController.text);
+    final endPressureDisplay = double.tryParse(_endPressureController.text);
 
     widget.onChanged(
       DiveTank(
         id: widget.tank.id,
         name: widget.tank.name,
-        volume: volumeLiters,
-        workingPressure: workingPressureBar,
+        volume: specs.volumeLiters,
+        workingPressure: specs.workingPressureBar,
         startPressure: startPressureDisplay != null
             ? units.pressureToBar(startPressureDisplay)
             : null,
@@ -216,6 +285,9 @@ class _TankEditorState extends ConsumerState<TankEditor> {
         material: _material,
         order: widget.tank.order,
         presetName: _selectedPreset?.name,
+        // Preserve source-computer attribution through edits; only
+        // consolidation/unlink flows may change it.
+        computerId: widget.tank.computerId,
       ),
     );
   }
@@ -246,7 +318,18 @@ class _TankEditorState extends ConsumerState<TankEditor> {
 
             // Volume, material, working pressure
             _buildTankSpecsRow(units),
-            const SizedBox(height: 16),
+            const SizedBox(height: 4),
+
+            // Save the current specs as a reusable custom preset.
+            Align(
+              alignment: Alignment.centerRight,
+              child: TextButton.icon(
+                onPressed: _saveAsPreset,
+                icon: const Icon(Icons.bookmark_add_outlined, size: 18),
+                label: Text(context.l10n.diveLog_tank_saveAsPreset),
+              ),
+            ),
+            const SizedBox(height: 12),
 
             // Gas mix with templates
             _buildGasMixSection(),
@@ -747,5 +830,54 @@ class _TankEditorState extends ConsumerState<TankEditor> {
       _heController.text = template.he.toString();
     });
     _notifyChange();
+  }
+}
+
+/// Small dialog that asks for a name for a new tank preset. Owns its text
+/// controller so it is disposed cleanly after the dialog closes.
+class _PresetNameDialog extends StatefulWidget {
+  const _PresetNameDialog({this.initialName});
+
+  final String? initialName;
+
+  @override
+  State<_PresetNameDialog> createState() => _PresetNameDialogState();
+}
+
+class _PresetNameDialogState extends State<_PresetNameDialog> {
+  late final TextEditingController _controller = TextEditingController(
+    text: widget.initialName ?? '',
+  );
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text(context.l10n.diveLog_tank_saveAsPreset_nameTitle),
+      content: TextField(
+        controller: _controller,
+        autofocus: true,
+        textCapitalization: TextCapitalization.words,
+        decoration: InputDecoration(
+          hintText: context.l10n.diveLog_tank_saveAsPreset_nameHint,
+        ),
+        onSubmitted: (value) => Navigator.of(context).pop(value),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: Text(context.l10n.common_action_cancel),
+        ),
+        FilledButton(
+          onPressed: () => Navigator.of(context).pop(_controller.text),
+          child: Text(context.l10n.common_action_save),
+        ),
+      ],
+    );
   }
 }

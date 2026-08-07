@@ -109,6 +109,7 @@ class ProfileSample {
     this.pressureBar,
     this.tankIndex,
     this.heartRate,
+    this.heading,
     this.setpoint,
     this.ppo2,
     this.cns,
@@ -117,6 +118,13 @@ class ProfileSample {
     this.decoTime,
     this.decoDepth,
     this.tts,
+    this.o2Sensor1,
+    this.o2Sensor2,
+    this.o2Sensor3,
+    this.o2Sensor4,
+    this.o2Sensor5,
+    this.o2Sensor6,
+    this.gasMixIndex,
   });
 
   int timeSeconds;
@@ -130,6 +138,10 @@ class ProfileSample {
   int? tankIndex;
 
   int? heartRate;
+
+  /// Compass heading in degrees (0-359) from DC_SAMPLE_BEARING; null when the
+  /// computer does not report bearing samples.
+  double? heading;
 
   double? setpoint;
 
@@ -147,6 +159,25 @@ class ProfileSample {
 
   int? tts;
 
+  /// Individual CCR O2 cell ppO2 readings in bar (sensor 1..6), null when that
+  /// cell has no reading. libdivecomputer reports these per-sensor via
+  /// DC_SAMPLE_PPO2; [ppo2] holds the aggregate/computed value.
+  double? o2Sensor1;
+
+  double? o2Sensor2;
+
+  double? o2Sensor3;
+
+  double? o2Sensor4;
+
+  double? o2Sensor5;
+
+  double? o2Sensor6;
+
+  /// Active gas mix index at this sample (from DC_SAMPLE_GASMIX), carried forward
+  /// from the most recent gas switch; null if the computer reported no gas.
+  int? gasMixIndex;
+
   Object encode() {
     return <Object?>[
       timeSeconds,
@@ -155,6 +186,7 @@ class ProfileSample {
       pressureBar,
       tankIndex,
       heartRate,
+      heading,
       setpoint,
       ppo2,
       cns,
@@ -163,6 +195,13 @@ class ProfileSample {
       decoTime,
       decoDepth,
       tts,
+      o2Sensor1,
+      o2Sensor2,
+      o2Sensor3,
+      o2Sensor4,
+      o2Sensor5,
+      o2Sensor6,
+      gasMixIndex,
     ];
   }
 
@@ -175,14 +214,22 @@ class ProfileSample {
       pressureBar: result[3] as double?,
       tankIndex: result[4] as int?,
       heartRate: result[5] as int?,
-      setpoint: result[6] as double?,
-      ppo2: result[7] as double?,
-      cns: result[8] as double?,
-      rbt: result[9] as int?,
-      decoType: result[10] as int?,
-      decoTime: result[11] as int?,
-      decoDepth: result[12] as double?,
-      tts: result[13] as int?,
+      heading: result[6] as double?,
+      setpoint: result[7] as double?,
+      ppo2: result[8] as double?,
+      cns: result[9] as double?,
+      rbt: result[10] as int?,
+      decoType: result[11] as int?,
+      decoTime: result[12] as int?,
+      decoDepth: result[13] as double?,
+      tts: result[14] as int?,
+      o2Sensor1: result[15] as double?,
+      o2Sensor2: result[16] as double?,
+      o2Sensor3: result[17] as double?,
+      o2Sensor4: result[18] as double?,
+      o2Sensor5: result[19] as double?,
+      o2Sensor6: result[20] as double?,
+      gasMixIndex: result[21] as int?,
     );
   }
 }
@@ -221,6 +268,7 @@ class TankInfo {
     this.volumeLiters,
     this.startPressureBar,
     this.endPressureBar,
+    this.usage,
   });
 
   int index;
@@ -233,6 +281,10 @@ class TankInfo {
 
   double? endPressureBar;
 
+  /// Tank usage from libdivecomputer's `dc_usage_t` (1=oxygen, 2=diluent,
+  /// 3=sidemount); null when the computer reported no usage (DC_USAGE_NONE).
+  int? usage;
+
   Object encode() {
     return <Object?>[
       index,
@@ -240,6 +292,7 @@ class TankInfo {
       volumeLiters,
       startPressureBar,
       endPressureBar,
+      usage,
     ];
   }
 
@@ -251,6 +304,7 @@ class TankInfo {
       volumeLiters: result[2] as double?,
       startPressureBar: result[3] as double?,
       endPressureBar: result[4] as double?,
+      usage: result[5] as int?,
     );
   }
 }

@@ -4,24 +4,15 @@ import 'package:flutter/services.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:submersion/shared/widgets/forms/form_row.dart';
 import 'package:submersion/shared/widgets/forms/form_section.dart';
-import 'package:submersion/shared/widgets/forms/stat_strip.dart';
-
-/// A profile-derived value offered on a hero stat cell.
-class ProfileSuggestion {
-  const ProfileSuggestion({required this.value, required this.onUse});
-
-  /// Already formatted in the diver's units (e.g. "28.6").
-  final String value;
-  final VoidCallback onUse;
-}
 
 /// Group 1 of the dive form: always expanded, owns the core facts.
-/// Hero: max depth / bottom time / avg depth. Rows: dive number, entry,
-/// exit, surface interval, runtime, site, profile.
+/// Rows: dive number, entry, exit, surface interval, max depth, avg depth,
+/// bottom time, runtime, site, then site extras and the profile block.
 class TheDiveSection extends StatelessWidget {
   const TheDiveSection({
     super.key,
     required this.depthSymbol,
+    required this.nameController,
     required this.maxDepthController,
     required this.avgDepthController,
     required this.bottomTimeController,
@@ -44,6 +35,7 @@ class TheDiveSection extends StatelessWidget {
   });
 
   final String depthSymbol;
+  final TextEditingController nameController;
   final TextEditingController maxDepthController;
   final TextEditingController avgDepthController;
   final TextEditingController bottomTimeController;
@@ -72,56 +64,20 @@ class TheDiveSection extends StatelessWidget {
   /// buttons), stripped of its Card wrapper.
   final Widget? profileChild;
 
-  StatCell _cell(
-    String label,
-    String? unit,
-    TextEditingController controller,
-    ProfileSuggestion? suggestion, {
-    TextInputType? keyboardType,
-  }) {
-    return StatCell(
-      label: label,
-      unit: unit,
-      controller: controller,
-      profileValue: suggestion?.value,
-      onUseProfileValue: suggestion == null ? null : (_) => suggestion.onUse(),
-      keyboardType:
-          keyboardType ?? const TextInputType.numberWithOptions(decimal: true),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     return FormSection(
       label: l10n.diveLog_edit_group_theDive,
+      icon: Icons.show_chart,
       expanded: true,
       onToggle: null,
-      hero: StatStrip(
-        cells: [
-          _cell(
-            l10n.diveLog_edit_label_maxDepth,
-            depthSymbol,
-            maxDepthController,
-            maxDepthSuggestion,
-          ),
-          _cell(
-            l10n.diveLog_edit_label_bottomTime,
-            'min',
-            bottomTimeController,
-            bottomTimeSuggestion,
-            // Whole minutes; parsed with int.parse on save.
-            keyboardType: TextInputType.number,
-          ),
-          _cell(
-            l10n.diveLog_edit_label_avgDepth,
-            depthSymbol,
-            avgDepthController,
-            avgDepthSuggestion,
-          ),
-        ],
-      ),
       children: [
+        FormRow.text(
+          label: l10n.diveLog_edit_label_diveName,
+          controller: nameController,
+          placeholder: l10n.diveLog_edit_diveNamePlaceholder,
+        ),
         FormRow.text(
           label: l10n.diveLog_edit_label_diveNumber,
           controller: diveNumberController,
@@ -142,12 +98,41 @@ class TheDiveSection extends StatelessWidget {
         ),
         ?surfaceIntervalRow,
         FormRow.text(
+          label: l10n.diveLog_edit_label_maxDepth,
+          controller: maxDepthController,
+          suffixText: depthSymbol,
+          keyboardType: const TextInputType.numberWithOptions(decimal: true),
+          inputFormatters: [
+            FilteringTextInputFormatter.allow(RegExp(r'[0-9.\-]')),
+          ],
+          profileSuggestion: maxDepthSuggestion,
+        ),
+        FormRow.text(
+          label: l10n.diveLog_edit_label_avgDepth,
+          controller: avgDepthController,
+          suffixText: depthSymbol,
+          keyboardType: const TextInputType.numberWithOptions(decimal: true),
+          inputFormatters: [
+            FilteringTextInputFormatter.allow(RegExp(r'[0-9.\-]')),
+          ],
+          profileSuggestion: avgDepthSuggestion,
+        ),
+        FormRow.text(
+          label: l10n.diveLog_edit_label_bottomTime,
+          controller: bottomTimeController,
+          suffixText: 'min',
+          keyboardType: TextInputType.number,
+          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+          profileSuggestion: bottomTimeSuggestion,
+        ),
+        FormRow.text(
           label: l10n.diveLog_edit_label_runtime,
           controller: runtimeController,
           suffixText: 'min',
           keyboardType: TextInputType.number,
           inputFormatters: [FilteringTextInputFormatter.digitsOnly],
           placeholder: l10n.diveLog_edit_row_notSet,
+          profileSuggestion: runtimeSuggestion,
         ),
         FormRow.picker(
           label: l10n.diveLog_edit_row_site,

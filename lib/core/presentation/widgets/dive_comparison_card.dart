@@ -87,6 +87,34 @@ class DiveComparisonCard extends ConsumerWidget {
     final settings = ref.watch(settingsProvider);
     final units = UnitFormatter(settings);
 
+    // An empty id means the duplicate is another dive within the SAME import
+    // batch (DiveMatchResult.inBatchIndex) — there is no existing database
+    // dive to load or compare against, but the action selector must still
+    // render so the user can flip the default skip to import-as-new.
+    if (existingDiveId.isEmpty) {
+      final content = Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Text(
+              context.l10n.universalImport_review_inBatchDuplicate,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
+            ),
+          ),
+          _buildActionButtons(context, ref),
+        ],
+      );
+      if (embedded) return content;
+      return Card(
+        margin: const EdgeInsets.only(bottom: 12),
+        clipBehavior: Clip.antiAlias,
+        child: content,
+      );
+    }
+
     final existingAsync = ref.watch(diveProvider(existingDiveId));
     final profileAsync = ref.watch(diveProfileProvider(existingDiveId));
 
@@ -450,7 +478,7 @@ class DiveComparisonCard extends ConsumerWidget {
         _ActionButton(
           label: 'Consolidate',
           subtitle: 'Add as 2nd computer reading',
-          onPressed: null, // Disabled — consolidation is under development.
+          onPressed: callbackFor(DuplicateAction.consolidate, onConsolidate),
           style: styleFor(
             DuplicateAction.consolidate,
             _ActionButtonStyle.outlined,

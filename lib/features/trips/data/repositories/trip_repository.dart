@@ -8,6 +8,7 @@ import 'package:submersion/core/services/database_service.dart';
 import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/core/services/sync/sync_event_bus.dart';
 import 'package:submersion/core/constants/enums.dart';
+import 'package:submersion/features/checklists/data/repositories/trip_checklist_repository.dart';
 import 'package:submersion/features/dive_log/data/repositories/dive_repository_impl.dart';
 import 'package:submersion/features/trips/data/repositories/itinerary_day_repository.dart';
 import 'package:submersion/features/trips/data/repositories/liveaboard_details_repository.dart';
@@ -84,33 +85,7 @@ class TripRepository {
       ORDER BY start_date DESC
     ''', variables: variables).get();
 
-    return results.map((row) {
-      return domain.Trip(
-        id: row.data['id'] as String,
-        diverId: row.data['diver_id'] as String?,
-        name: row.data['name'] as String,
-        startDate: DateTime.fromMillisecondsSinceEpoch(
-          row.data['start_date'] as int,
-        ),
-        endDate: DateTime.fromMillisecondsSinceEpoch(
-          row.data['end_date'] as int,
-        ),
-        location: row.data['location'] as String?,
-        resortName: row.data['resort_name'] as String?,
-        liveaboardName: row.data['liveaboard_name'] as String?,
-        notes: (row.data['notes'] as String?) ?? '',
-        tripType: TripType.fromName(
-          (row.data['trip_type'] as String?) ?? 'shore',
-        ),
-        isShared: (row.data['is_shared'] as int? ?? 0) != 0,
-        createdAt: DateTime.fromMillisecondsSinceEpoch(
-          row.data['created_at'] as int,
-        ),
-        updatedAt: DateTime.fromMillisecondsSinceEpoch(
-          row.data['updated_at'] as int,
-        ),
-      );
-    }).toList();
+    return results.map((row) => _mapDataToTrip(row.data)).toList();
   }
 
   /// Create a new trip
@@ -135,6 +110,9 @@ class TripRepository {
               notes: Value(trip.notes),
               tripType: Value(trip.tripType.name),
               isShared: Value(trip.isShared),
+              returnFlightAt: Value(
+                trip.returnFlightAt?.millisecondsSinceEpoch,
+              ),
               createdAt: Value(now.millisecondsSinceEpoch),
               updatedAt: Value(now.millisecondsSinceEpoch),
             ),
@@ -176,6 +154,8 @@ class TripRepository {
           notes: Value(trip.notes),
           tripType: Value(trip.tripType.name),
           isShared: Value(trip.isShared),
+          // Value(null) writes SQL NULL, so clearing the flight time works.
+          returnFlightAt: Value(trip.returnFlightAt?.millisecondsSinceEpoch),
           updatedAt: Value(now),
         ),
       );
@@ -266,24 +246,38 @@ class TripRepository {
   /// Delete a trip and all associated child records.
   /// Removes liveaboard details, itinerary days, and dive associations
   /// before deleting the trip itself.
+  ///
+  /// The whole cascade runs in one transaction so a failure partway through
+  /// (e.g. a checklist delete throwing) rolls back every prior step instead
+  /// of leaving the trip half-deleted. Drift nested transactions join the
+  /// parent, so the child repositories' own `markRecordPending`/`logDeletion`
+  /// writes are safe inside this wrapper. Those child repos also fire their
+  /// own `SyncEventBus.notifyLocalChange()` mid-transaction; that is
+  /// pre-existing, debounced-downstream behavior and is left as-is. This
+  /// method's own notify is deferred until after the transaction commits so
+  /// listeners never observe a rolled-back delete as "changed".
   Future<void> deleteTrip(String id) async {
     try {
       _log.info('Deleting trip: $id');
 
-      // Delete child records with non-nullable FKs first
-      await LiveaboardDetailsRepository().deleteByTripId(id);
-      await ItineraryDayRepository().deleteByTripId(id);
+      await _db.transaction(() async {
+        // Delete child records with non-nullable FKs first
+        await LiveaboardDetailsRepository().deleteByTripId(id);
+        await ItineraryDayRepository().deleteByTripId(id);
+        await TripChecklistRepository().deleteByTripId(id);
 
-      // Remove trip association from dives (nullable FK)
-      await _db.customUpdate(
-        'UPDATE dives SET trip_id = NULL WHERE trip_id = ?',
-        variables: [Variable.withString(id)],
-        updates: {_db.dives},
-      );
+        // Remove trip association from dives (nullable FK)
+        await _db.customUpdate(
+          'UPDATE dives SET trip_id = NULL WHERE trip_id = ?',
+          variables: [Variable.withString(id)],
+          updates: {_db.dives},
+        );
 
-      // Delete the trip
-      await (_db.delete(_db.trips)..where((t) => t.id.equals(id))).go();
-      await _syncRepository.logDeletion(entityType: 'trips', recordId: id);
+        // Delete the trip
+        await (_db.delete(_db.trips)..where((t) => t.id.equals(id))).go();
+        await _syncRepository.logDeletion(entityType: 'trips', recordId: id);
+      });
+
       SyncEventBus.notifyLocalChange();
       _log.info('Deleted trip: $id');
     } catch (e, stackTrace) {
@@ -565,31 +559,7 @@ class TripRepository {
 
     if (result == null) return null;
 
-    return domain.Trip(
-      id: result.data['id'] as String,
-      diverId: result.data['diver_id'] as String?,
-      name: result.data['name'] as String,
-      startDate: DateTime.fromMillisecondsSinceEpoch(
-        result.data['start_date'] as int,
-      ),
-      endDate: DateTime.fromMillisecondsSinceEpoch(
-        result.data['end_date'] as int,
-      ),
-      location: result.data['location'] as String?,
-      resortName: result.data['resort_name'] as String?,
-      liveaboardName: result.data['liveaboard_name'] as String?,
-      notes: (result.data['notes'] as String?) ?? '',
-      tripType: TripType.fromName(
-        (result.data['trip_type'] as String?) ?? 'shore',
-      ),
-      isShared: (result.data['is_shared'] as int? ?? 0) != 0,
-      createdAt: DateTime.fromMillisecondsSinceEpoch(
-        result.data['created_at'] as int,
-      ),
-      updatedAt: DateTime.fromMillisecondsSinceEpoch(
-        result.data['updated_at'] as int,
-      ),
-    );
+    return _mapDataToTrip(result.data);
   }
 
   /// Get all trips with their statistics.
@@ -638,31 +608,7 @@ class TripRepository {
     ''', variables: variables).get();
 
     return rows.map((row) {
-      final trip = domain.Trip(
-        id: row.data['id'] as String,
-        diverId: row.data['diver_id'] as String?,
-        name: row.data['name'] as String,
-        startDate: DateTime.fromMillisecondsSinceEpoch(
-          row.data['start_date'] as int,
-        ),
-        endDate: DateTime.fromMillisecondsSinceEpoch(
-          row.data['end_date'] as int,
-        ),
-        location: row.data['location'] as String?,
-        resortName: row.data['resort_name'] as String?,
-        liveaboardName: row.data['liveaboard_name'] as String?,
-        notes: (row.data['notes'] as String?) ?? '',
-        tripType: TripType.fromName(
-          (row.data['trip_type'] as String?) ?? 'shore',
-        ),
-        isShared: (row.data['is_shared'] as int? ?? 0) != 0,
-        createdAt: DateTime.fromMillisecondsSinceEpoch(
-          row.data['created_at'] as int,
-        ),
-        updatedAt: DateTime.fromMillisecondsSinceEpoch(
-          row.data['updated_at'] as int,
-        ),
-      );
+      final trip = _mapDataToTrip(row.data);
       return domain.TripWithStats(
         trip: trip,
         diveCount: row.data['dive_count'] as int,
@@ -686,8 +632,45 @@ class TripRepository {
       notes: row.notes,
       tripType: TripType.fromName(row.tripType),
       isShared: row.isShared,
+      // Wall-clock-as-UTC: decode with isUtc so the stored components are
+      // preserved rather than shifted into the device's timezone.
+      returnFlightAt: row.returnFlightAt != null
+          ? DateTime.fromMillisecondsSinceEpoch(
+              row.returnFlightAt!,
+              isUtc: true,
+            )
+          : null,
       createdAt: DateTime.fromMillisecondsSinceEpoch(row.createdAt),
       updatedAt: DateTime.fromMillisecondsSinceEpoch(row.updatedAt),
+    );
+  }
+
+  /// Shared mapper for customSelect rows (searchTrips, findTripForDate,
+  /// getAllTripsWithStats) so a new trips column cannot silently miss one
+  /// of the hand-written sites.
+  domain.Trip _mapDataToTrip(Map<String, Object?> data) {
+    return domain.Trip(
+      id: data['id'] as String,
+      diverId: data['diver_id'] as String?,
+      name: data['name'] as String,
+      startDate: DateTime.fromMillisecondsSinceEpoch(data['start_date'] as int),
+      endDate: DateTime.fromMillisecondsSinceEpoch(data['end_date'] as int),
+      location: data['location'] as String?,
+      resortName: data['resort_name'] as String?,
+      liveaboardName: data['liveaboard_name'] as String?,
+      notes: (data['notes'] as String?) ?? '',
+      tripType: TripType.fromName((data['trip_type'] as String?) ?? 'shore'),
+      isShared: (data['is_shared'] as int? ?? 0) != 0,
+      // Wall-clock-as-UTC: decode with isUtc so the stored components are
+      // preserved rather than shifted into the device's timezone.
+      returnFlightAt: data['return_flight_at'] != null
+          ? DateTime.fromMillisecondsSinceEpoch(
+              data['return_flight_at'] as int,
+              isUtc: true,
+            )
+          : null,
+      createdAt: DateTime.fromMillisecondsSinceEpoch(data['created_at'] as int),
+      updatedAt: DateTime.fromMillisecondsSinceEpoch(data['updated_at'] as int),
     );
   }
 }

@@ -5,14 +5,18 @@ import 'package:path_provider/path_provider.dart';
 import 'package:submersion/core/providers/provider.dart';
 
 import 'package:submersion/core/domain/entities/storage_config.dart';
+import 'package:submersion/core/services/database_location_service.dart';
 import 'package:submersion/core/services/database_migration_service.dart';
 import 'package:submersion/core/services/database_service.dart';
+import 'package:submersion/core/services/security/database_security_service.dart';
 import 'package:submersion/features/settings/presentation/pages/reset_complete_page.dart';
 import 'package:submersion/features/settings/presentation/providers/storage_providers.dart';
+import 'package:submersion/features/settings/presentation/providers/sync_providers.dart';
 import 'package:submersion/features/settings/presentation/widgets/existing_database_dialog.dart';
 import 'package:submersion/features/settings/presentation/widgets/migration_confirmation_dialog.dart';
 import 'package:submersion/features/settings/presentation/widgets/migration_progress_dialog.dart';
 import 'package:submersion/features/settings/presentation/widgets/reset_database_dialog.dart';
+import 'package:submersion/features/settings/presentation/widgets/storage_volume_chooser_dialog.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 
 class StorageSettingsPage extends ConsumerStatefulWidget {
@@ -417,6 +421,17 @@ class _StorageSettingsPageState extends ConsumerState<StorageSettingsPage> {
     final confirmed = await ResetDatabaseDialog.show(context);
     if (!confirmed || !mounted) return;
 
+    // Turn cloud sync off before wiping. Otherwise the post-reset launch sync
+    // re-pulls the entire cloud library and resurrects the data the user just
+    // cleared (the reset appears to do nothing). Best-effort: a failure here
+    // must not block the reset -- the worst case is the old re-pull behaviour.
+    try {
+      await ref.read(syncStateProvider.notifier).disableForDatabaseReset();
+    } catch (e, st) {
+      debugPrint('Could not disable cloud sync during reset: $e\n$st');
+    }
+    if (!mounted) return;
+
     // Generate a timestamped backup path
     final appDir = await getApplicationDocumentsDirectory();
     final backupDir = p.join(appDir.path, 'Submersion', 'Backups');
@@ -425,6 +440,22 @@ class _StorageSettingsPageState extends ConsumerState<StorageSettingsPage> {
 
     try {
       await DatabaseService.instance.resetDatabase(backupPath: backupPath);
+
+      // A fresh database starts unprotected: the data the credential
+      // protected is gone, and keeping a lock over an empty database with a
+      // credential the user may not remember would only strand them again.
+      // Runs AFTER resetDatabase so the pre-reset backup still decrypt-
+      // exported with the old key; the fresh file was created encrypted
+      // (key still set), so decrypt the empty database first.
+      final security = DatabaseSecurityService.instance;
+      if (security.encryptionEnabled) {
+        await security.disableEncryption();
+      }
+      if (security.appLockEnabled) {
+        await security.disableSecurity(
+          dbPath: await DatabaseService.instance.databasePath,
+        );
+      }
 
       if (!mounted) return;
       ResetCompletePage.show(context);
@@ -487,10 +518,43 @@ class _StorageSettingsPageState extends ConsumerState<StorageSettingsPage> {
     await _selectAndMigrateToCustomFolder();
   }
 
+  /// Android-only: lets the user pick which app-specific external volume
+  /// (internal storage or SD card) holds the database. The chooser is only
+  /// invoked from the Android pick branch; other platforms never call it.
+  // Thin showDialog glue; the dialog content lives in the widget-tested
+  // StorageVolumeChooserDialog.
+  // coverage:ignore-start
+  Future<ExternalVolumeOption?> _chooseStorageVolume(
+    List<ExternalVolumeOption> options,
+  ) async {
+    if (!mounted) return null;
+    return showDialog<ExternalVolumeOption>(
+      context: context,
+      builder: (_) => StorageVolumeChooserDialog(options: options),
+    );
+  }
+  // coverage:ignore-end
+
   Future<void> _selectAndMigrateToCustomFolder() async {
     // Pick a folder
     final notifier = ref.read(storageConfigNotifierProvider.notifier);
-    final pickResult = await notifier.pickCustomFolder();
+    final FolderPickResultWithBookmark? pickResult;
+    try {
+      pickResult = await notifier.pickCustomFolder(
+        chooser: _chooseStorageVolume,
+      );
+    } on FolderPickException catch (e) {
+      // The picker itself failed (e.g. no XDG desktop portal on Linux):
+      // silently doing nothing made the setting look broken (#218).
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('${context.l10n.common_label_error}: ${e.message}'),
+          ),
+        );
+      }
+      return;
+    }
 
     if (pickResult == null || !mounted) return;
 

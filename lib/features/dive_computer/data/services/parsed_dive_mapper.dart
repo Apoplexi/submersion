@@ -1,4 +1,7 @@
 import 'package:libdivecomputer_plugin/libdivecomputer_plugin.dart' as pigeon;
+import 'package:submersion/core/constants/enums.dart';
+import 'package:submersion/features/dive_computer/data/services/libdc_dive_mode.dart';
+import 'package:submersion/features/dive_computer/data/services/parsed_tank_resolver.dart';
 import 'package:submersion/features/dive_computer/domain/entities/downloaded_dive.dart';
 
 /// Convert a Pigeon ParsedDive to the app's DownloadedDive format.
@@ -44,6 +47,7 @@ DownloadedDive parsedDiveToDownloaded(pigeon.ParsedDive parsed) {
     gfLow: parsed.gfLow,
     gfHigh: parsed.gfHigh,
     decoConservatism: parsed.decoConservatism,
+    diveMode: DiveMode.fromCode(mapLibdcDiveModeCode(parsed.diveMode)),
     profile: parsed.samples
         .map(
           (s) => ProfileSample(
@@ -53,6 +57,7 @@ DownloadedDive parsedDiveToDownloaded(pigeon.ParsedDive parsed) {
             pressure: s.pressureBar,
             tankIndex: s.tankIndex,
             heartRate: s.heartRate,
+            heading: s.heading,
             setpoint: s.setpoint,
             ppo2: s.ppo2,
             cns: s.cns,
@@ -63,28 +68,19 @@ DownloadedDive parsedDiveToDownloaded(pigeon.ParsedDive parsed) {
             tts: s.tts,
             ndl: s.decoType == 0 ? s.decoTime : null,
             ceiling: s.decoType != null && s.decoType != 0 ? s.decoDepth : null,
+            o2Sensor1: s.o2Sensor1,
+            o2Sensor2: s.o2Sensor2,
+            o2Sensor3: s.o2Sensor3,
+            o2Sensor4: s.o2Sensor4,
+            o2Sensor5: s.o2Sensor5,
+            o2Sensor6: s.o2Sensor6,
           ),
         )
         .toList(),
-    tanks: parsed.tanks.map((t) {
-      // The tank's gas-mix link can be DC_GASMIX_UNKNOWN (e.g. Shearwater
-      // single-gas dives leave the tank unlinked). Fall back to the primary
-      // mix rather than assuming air, which would mislabel an EAN dive.
-      final gasMix = parsed.gasMixes.firstWhere(
-        (g) => g.index == t.gasMixIndex,
-        orElse: () => parsed.gasMixes.isNotEmpty
-            ? parsed.gasMixes.first
-            : pigeon.GasMix(index: 0, o2Percent: 21.0, hePercent: 0.0),
-      );
-      return DownloadedTank(
-        index: t.index,
-        o2Percent: gasMix.o2Percent,
-        hePercent: gasMix.hePercent,
-        startPressure: t.startPressureBar,
-        endPressure: t.endPressureBar,
-        volumeLiters: t.volumeLiters,
-      );
-    }).toList(),
+    // Gas-mix linking, tankless synthesis, and gas-switch derivation live in
+    // the shared resolver so the download and reparse paths cannot drift apart.
+    tanks: resolveParsedTanks(parsed),
+    gasSwitches: resolveGasSwitches(parsed),
     events: parsed.events
         .map(
           (e) => DownloadedEvent(

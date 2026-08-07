@@ -95,6 +95,16 @@ class LocalFilesDiagnosticsService {
     for (final item in all) {
       try {
         final result = await _resolver.verify(item);
+        // Transient states keep the row's current orphan flag rather than
+        // flagging files that are still on disk: an unmounted volume
+        // reappears on remount, and a present-but-unreadable file (sandbox
+        // denial, revoked permission) comes back when access is re-granted.
+        // This is the contract VerifyResult documents.
+        if (result == VerifyResult.volumeOffline ||
+            result == VerifyResult.transientError) {
+          await _repository.updateMedia(item.copyWith(lastVerifiedAt: now));
+          continue;
+        }
         final isOrphan = result != VerifyResult.available;
         if (item.isOrphaned != isOrphan) flipped++;
         await _repository.updateMedia(

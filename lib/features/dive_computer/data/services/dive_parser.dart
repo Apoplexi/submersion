@@ -1,7 +1,7 @@
 import 'package:submersion/features/dive_log/data/repositories/dive_computer_repository_impl.dart';
 import 'package:submersion/features/dive_computer/domain/entities/downloaded_dive.dart';
 export '../../../../features/dive_log/data/repositories/dive_computer_repository_impl.dart'
-    show EventData, TankData;
+    show EventData, TankData, GasSwitchData;
 
 /// Service for parsing downloaded dive data into app entities.
 ///
@@ -27,6 +27,7 @@ class DiveParser {
           pressure: sample.pressure,
           temperature: sample.temperature,
           heartRate: sample.heartRate,
+          heading: sample.heading,
           // Preserve tank index for multi-tank pressure tracking
           tankIndex: sample.tankIndex,
           // Decompression and rebreather data
@@ -41,6 +42,12 @@ class DiveParser {
           decoTime: sample.decoTime,
           decoDepth: sample.decoDepth,
           tts: sample.tts,
+          o2Sensor1: sample.o2Sensor1,
+          o2Sensor2: sample.o2Sensor2,
+          o2Sensor3: sample.o2Sensor3,
+          o2Sensor4: sample.o2Sensor4,
+          o2Sensor5: sample.o2Sensor5,
+          o2Sensor6: sample.o2Sensor6,
         ),
       );
     }
@@ -63,11 +70,25 @@ class DiveParser {
           startPressure: tank.startPressure,
           endPressure: tank.endPressure,
           volumeLiters: tank.volumeLiters,
+          role: tank.role,
         ),
       );
     }
 
     return tanks;
+  }
+
+  /// Convert a downloaded dive's gas switches to GasSwitchData.
+  List<GasSwitchData> parseGasSwitches(DownloadedDive dive) {
+    return dive.gasSwitches
+        .map(
+          (s) => GasSwitchData(
+            timestamp: s.timeSeconds,
+            depth: s.depth,
+            toTankIndex: s.toTankIndex,
+          ),
+        )
+        .toList();
   }
 
   /// Extract the maximum depth from a dive's profile.

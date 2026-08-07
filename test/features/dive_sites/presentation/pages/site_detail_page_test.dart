@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:submersion/core/constants/list_view_mode.dart';
 import 'package:submersion/core/providers/provider.dart';
+import 'package:submersion/features/dive_3d/application/career_providers.dart';
+import 'package:submersion/features/dive_3d/domain/career/career_geometry_service.dart';
+import 'package:submersion/features/dive_3d/presentation/pages/career_terrain_page.dart';
 import 'package:submersion/features/divers/domain/entities/diver.dart';
 import 'package:submersion/features/divers/presentation/providers/diver_providers.dart';
 import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
@@ -190,6 +194,119 @@ void main() {
         expect(find.text('Delete shared site?'), findsOneWidget);
       },
     );
+  });
+
+  group('SiteDetailPage embedded seascape action', () {
+    testWidgets('embedded header shows the seascape button for a site with '
+        'coordinates', (tester) async {
+      const gpsSite = DiveSite(
+        id: 'gps-site',
+        name: 'Salt Pier',
+        location: GeoPoint(12.151, -68.299),
+      );
+      final overrides = await getBaseOverrides();
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            ...overrides,
+            siteProvider(gpsSite.id).overrideWith((ref) async => gpsSite),
+            siteDiveCountProvider(gpsSite.id).overrideWith((ref) async => 0),
+          ],
+          child: MaterialApp(
+            locale: const Locale('en'),
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: SiteDetailPage(siteId: gpsSite.id, embedded: true),
+          ),
+        ),
+      );
+      // Bounded pumps: the coordinates make the body render a map, whose
+      // tile loading never settles under flutter_test.
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+      expect(find.byTooltip('Site Seascape'), findsOneWidget);
+    });
+
+    testWidgets('embedded header hides the seascape button without '
+        'coordinates', (tester) async {
+      const bareSite = DiveSite(id: 'bare-site', name: 'Mystery');
+      final overrides = await getBaseOverrides();
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            ...overrides,
+            siteProvider(bareSite.id).overrideWith((ref) async => bareSite),
+            siteDiveCountProvider(bareSite.id).overrideWith((ref) async => 0),
+          ],
+          child: MaterialApp(
+            locale: const Locale('en'),
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: SiteDetailPage(siteId: bareSite.id, embedded: true),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(find.byTooltip('Site Seascape'), findsNothing);
+    });
+  });
+
+  group('SiteDetailPage embedded 3D history action', () {
+    const bareSite = DiveSite(id: 'history-site', name: 'Mystery');
+
+    testWidgets('embedded header shows the 3D history button even without '
+        'coordinates', (tester) async {
+      final overrides = await getBaseOverrides();
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            ...overrides,
+            siteProvider(bareSite.id).overrideWith((ref) async => bareSite),
+            siteDiveCountProvider(bareSite.id).overrideWith((ref) async => 0),
+          ],
+          child: MaterialApp(
+            locale: const Locale('en'),
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: SiteDetailPage(siteId: bareSite.id, embedded: true),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(find.byTooltip('3D History'), findsOneWidget);
+    });
+
+    testWidgets('embedded 3D history button opens the career terrain page', (
+      tester,
+    ) async {
+      final overrides = await getBaseOverrides();
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            ...overrides,
+            siteProvider(bareSite.id).overrideWith((ref) async => bareSite),
+            siteDiveCountProvider(bareSite.id).overrideWith((ref) async => 0),
+            careerGeometryProvider((
+              query: careerSiteQuery(bareSite.id),
+              colorMode: CareerColorMode.recency,
+            )).overrideWith((ref) async => null),
+          ],
+          child: MaterialApp(
+            locale: const Locale('en'),
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: SiteDetailPage(siteId: bareSite.id, embedded: true),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byTooltip('3D History'));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(CareerTerrainPage), findsOneWidget);
+      expect(find.text('No dives with profiles to show'), findsOneWidget);
+    });
   });
 
   group('SiteDetailPage loading/error/not-found states', () {
@@ -522,6 +639,68 @@ void main() {
     });
   });
 
+  group('SiteDetailPage map section', () {
+    const locatedSite = DiveSite(
+      id: 'located-site',
+      name: 'Located Site',
+      location: GeoPoint(12.34, 56.78),
+    );
+
+    testWidgets('renders inline preview map when site has coordinates', (
+      tester,
+    ) async {
+      _setMobileTestSurfaceSize(tester);
+      final overrides = await getBaseOverrides();
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            ...overrides,
+            siteProvider(locatedSite.id).overrideWith((_) async => locatedSite),
+            siteDiveCountProvider(locatedSite.id).overrideWith((_) async => 0),
+          ],
+          child: MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: SiteDetailPage(siteId: locatedSite.id),
+          ),
+        ),
+      );
+      // Avoid pumpAndSettle: the FlutterMap tile layer animates indefinitely.
+      await tester.pump();
+      await tester.pump(const Duration(seconds: 1));
+      expect(find.byType(FlutterMap), findsWidgets);
+    });
+
+    testWidgets('opens fullscreen map when fullscreen button tapped', (
+      tester,
+    ) async {
+      _setMobileTestSurfaceSize(tester);
+      final overrides = await getBaseOverrides();
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            ...overrides,
+            siteProvider(locatedSite.id).overrideWith((_) async => locatedSite),
+            siteDiveCountProvider(locatedSite.id).overrideWith((_) async => 0),
+          ],
+          child: MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: SiteDetailPage(siteId: locatedSite.id),
+          ),
+        ),
+      );
+      await tester.pump();
+      await tester.pump(const Duration(seconds: 1));
+      expect(find.byType(FlutterMap), findsWidgets);
+      await tester.tap(find.byIcon(Icons.fullscreen));
+      await tester.pump();
+      await tester.pump(const Duration(seconds: 1));
+      // The fullscreen route also renders a FlutterMap.
+      expect(find.byType(FlutterMap), findsWidgets);
+    });
+  });
+
   group('SiteDetailPage embedded layout', () {
     testWidgets('renders embedded header for site with location string', (
       tester,
@@ -696,6 +875,43 @@ void main() {
       await tester.tap(editButton);
       await tester.pumpAndSettle();
       expect(find.text('EDIT_PAGE'), findsOneWidget);
+    });
+  });
+
+  group('SiteDetailPage location fields', () {
+    testWidgets('shows city, island, and body of water when set', (
+      tester,
+    ) async {
+      _setMobileTestSurfaceSize(tester);
+      const site = DiveSite(
+        id: 'loc-1',
+        name: 'Site',
+        city: 'Cebu City',
+        island: 'Malapascua',
+        bodyOfWater: 'Visayan Sea',
+      );
+      final overrides = await getBaseOverrides();
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            ...overrides,
+            siteProvider(site.id).overrideWith((ref) async => site),
+            siteDiveCountProvider(site.id).overrideWith((ref) async => 0),
+          ],
+          child: const MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: Scaffold(
+              body: SiteDetailPage(siteId: 'loc-1', embedded: true),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Cebu City'), findsWidgets);
+      expect(find.text('Malapascua'), findsWidgets);
+      expect(find.text('Visayan Sea'), findsOneWidget);
     });
   });
 }

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+import 'package:submersion/core/icons/mdi_icons.dart';
 import 'package:uuid/uuid.dart';
 
 import 'package:submersion/core/constants/enums.dart';
@@ -39,13 +39,15 @@ class PlanTankList extends ConsumerWidget {
                   ),
                 ),
                 const SizedBox(width: 8),
-                Text(
-                  context.l10n.divePlanner_label_tanks,
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    color: theme.colorScheme.primary,
+                Expanded(
+                  child: Text(
+                    context.l10n.divePlanner_label_tanks,
+                    overflow: TextOverflow.ellipsis,
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      color: theme.colorScheme.primary,
+                    ),
                   ),
                 ),
-                const Spacer(),
                 IconButton(
                   icon: const Icon(Icons.add),
                   tooltip: context.l10n.divePlanner_action_addTank,

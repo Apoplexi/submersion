@@ -8,6 +8,7 @@ import 'package:submersion/features/courses/domain/constants/course_field.dart';
 import 'package:submersion/features/courses/domain/entities/course.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_providers.dart';
+import 'package:submersion/features/dive_log/presentation/providers/dive_repository_provider.dart';
 import 'package:submersion/features/dive_log/presentation/providers/view_config_providers.dart';
 import 'package:submersion/features/divers/presentation/providers/diver_providers.dart';
 import 'package:submersion/shared/models/entity_card_view_config.dart';
@@ -29,10 +30,7 @@ final allCoursesProvider = FutureProvider<List<Course>>((ref) async {
   final validatedDiverId = await ref.watch(
     validatedCurrentDiverIdProvider.future,
   );
-  final sub = repository.watchCoursesChanges().listen(
-    (_) => ref.invalidateSelf(),
-  );
-  ref.onDispose(sub.cancel);
+  ref.invalidateSelfWhen(repository.watchCoursesChanges());
   return repository.getAllCourses(diverId: validatedDiverId);
 });
 
@@ -122,6 +120,9 @@ final courseForDiveProvider = FutureProvider.family<Course?, String>((
   diveId,
 ) async {
   final repository = ref.watch(courseRepositoryProvider);
+  ref.invalidateSelfWhen(
+    ref.watch(diveRepositoryProvider).watchDiveDetailChanges(),
+  );
   return repository.getCourseForDive(diveId);
 });
 

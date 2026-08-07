@@ -25,6 +25,8 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:submersion/core/providers/provider.dart';
+import 'package:submersion/features/dive_log/presentation/providers/dive_repository_provider.dart';
+import 'package:submersion/features/media/domain/services/dive_photo_matcher.dart';
 import 'package:submersion/core/services/database_service.dart';
 import 'package:submersion/features/media/data/repositories/network_credentials_repository.dart';
 import 'package:submersion/features/media/data/services/network_credentials_service.dart';
@@ -35,6 +37,8 @@ import 'package:submersion/features/media/data/repositories/media_repository.dar
 import 'package:submersion/features/media/data/utils/url_validator.dart';
 import 'package:submersion/features/media/domain/entities/extracted_metadata.dart';
 import 'package:submersion/features/media/presentation/providers/media_providers.dart';
+import 'package:submersion/features/media_store/data/media_deletion_coordinator.dart';
+import 'package:submersion/features/media_store/presentation/providers/media_store_providers.dart';
 
 /// Two-mode segmented control for the URL tab. URLs is the bulk paste-and-add
 /// flow (Phase 3a). Manifest mode is a Phase 3b placeholder card.
@@ -116,14 +120,21 @@ class UrlTabNotifier extends StateNotifier<UrlTabState> {
     required NetworkFetchPipeline pipeline,
     required NetworkCredentialsService credentials,
     required MediaRepository mediaRepository,
+    MediaDeletionCoordinator? deletionCoordinator,
   }) : _pipeline = pipeline,
        _credentials = credentials,
        _mediaRepository = mediaRepository,
+       _deletionCoordinator = deletionCoordinator,
        super(const UrlTabState());
 
   final NetworkFetchPipeline _pipeline;
   final NetworkCredentialsService _credentials;
   final MediaRepository _mediaRepository;
+
+  /// Routes undo deletions through the orphan-prevention fast path when
+  /// wired (production); direct-construction tests fall back to the
+  /// repository.
+  final MediaDeletionCoordinator? _deletionCoordinator;
 
   void setMode(UrlTabMode mode) {
     state = state.copyWith(mode: mode);
@@ -168,8 +179,13 @@ class UrlTabNotifier extends StateNotifier<UrlTabState> {
   /// `FilesTabNotifier.undoCommit` — the pipeline does not expose a
   /// `deleteIds` helper, so we go through the repository.
   Future<void> undoCommit(List<String> ids) async {
-    for (final id in ids) {
-      await _mediaRepository.deleteMedia(id);
+    final coordinator = _deletionCoordinator;
+    if (coordinator != null) {
+      await coordinator.deleteMultipleMedia(ids);
+    } else {
+      for (final id in ids) {
+        await _mediaRepository.deleteMedia(id);
+      }
     }
     state = state.copyWith(committedIds: const []);
   }
@@ -267,6 +283,32 @@ final networkFetchPipelineProvider = Provider<NetworkFetchPipeline>((ref) {
   return NetworkFetchPipeline(
     db: DatabaseService.instance.database,
     extractor: ref.watch(urlMetadataExtractorProvider),
+    // Auto-match candidates: dives within two days of the photo timestamp
+    // (same entry/exit fallbacks the Lightroom scanner applies).
+    diveBoundsLoader: (takenAt) async {
+      final dives = await ref
+          .read(diveRepositoryProvider)
+          .getDivesInRange(
+            takenAt.subtract(const Duration(days: 2)),
+            takenAt.add(const Duration(days: 2)),
+          );
+      return [
+        for (final dive in dives)
+          () {
+            final entry = dive.entryTime ?? dive.dateTime;
+            final exit =
+                dive.exitTime ??
+                (dive.effectiveRuntime != null
+                    ? entry.add(dive.effectiveRuntime!)
+                    : entry.add(const Duration(minutes: 60)));
+            return DiveBounds(
+              diveId: dive.id,
+              entryTime: entry,
+              exitTime: exit,
+            );
+          }(),
+      ];
+    },
   );
 });
 
@@ -279,5 +321,6 @@ final urlTabNotifierProvider =
         pipeline: ref.watch(networkFetchPipelineProvider),
         credentials: ref.watch(networkCredentialsServiceProvider),
         mediaRepository: ref.watch(mediaRepositoryProvider),
+        deletionCoordinator: ref.read(mediaDeletionCoordinatorProvider),
       ),
     );

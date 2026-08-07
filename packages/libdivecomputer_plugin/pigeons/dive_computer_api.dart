@@ -58,6 +58,7 @@ class ProfileSample {
     this.pressureBar,
     this.tankIndex,
     this.heartRate,
+    this.heading,
     this.setpoint,
     this.ppo2,
     this.cns,
@@ -66,6 +67,13 @@ class ProfileSample {
     this.decoTime,
     this.decoDepth,
     this.tts,
+    this.o2Sensor1,
+    this.o2Sensor2,
+    this.o2Sensor3,
+    this.o2Sensor4,
+    this.o2Sensor5,
+    this.o2Sensor6,
+    this.gasMixIndex,
   });
   final int timeSeconds;
   final double depthMeters;
@@ -73,6 +81,10 @@ class ProfileSample {
   final double? pressureBar;
   final int? tankIndex;
   final int? heartRate;
+
+  /// Compass heading in degrees (0-359) from DC_SAMPLE_BEARING; null when the
+  /// computer does not report bearing samples.
+  final double? heading;
   final double? setpoint;
   final double? ppo2;
   final double? cns;
@@ -81,6 +93,20 @@ class ProfileSample {
   final int? decoTime;
   final double? decoDepth;
   final int? tts;
+
+  /// Individual CCR O2 cell ppO2 readings in bar (sensor 1..6), null when that
+  /// cell has no reading. libdivecomputer reports these per-sensor via
+  /// DC_SAMPLE_PPO2; [ppo2] holds the aggregate/computed value.
+  final double? o2Sensor1;
+  final double? o2Sensor2;
+  final double? o2Sensor3;
+  final double? o2Sensor4;
+  final double? o2Sensor5;
+  final double? o2Sensor6;
+
+  /// Active gas mix index at this sample (from DC_SAMPLE_GASMIX), carried forward
+  /// from the most recent gas switch; null if the computer reported no gas.
+  final int? gasMixIndex;
 }
 
 class GasMix {
@@ -101,12 +127,17 @@ class TankInfo {
     this.volumeLiters,
     this.startPressureBar,
     this.endPressureBar,
+    this.usage,
   });
   final int index;
   final int gasMixIndex;
   final double? volumeLiters;
   final double? startPressureBar;
   final double? endPressureBar;
+
+  /// Tank usage from libdivecomputer's `dc_usage_t` (1=oxygen, 2=diluent,
+  /// 3=sidemount); null when the computer reported no usage (DC_USAGE_NONE).
+  final int? usage;
 }
 
 class DiveEvent {

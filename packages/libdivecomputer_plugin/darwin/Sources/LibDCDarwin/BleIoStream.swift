@@ -8,23 +8,8 @@ import Foundation
 /// This class translates those calls to async CoreBluetooth operations,
 /// blocking with semaphores until the BLE operation completes.
 class BleIoStream: NSObject, CBPeripheralDelegate {
-    private struct CharacteristicCandidate {
-        let score: Int
-        let write: CBCharacteristic
-        let notify: CBCharacteristic
-    }
-
-    private static let preferredServiceUUIDs: Set<CBUUID> = [
-        CBUUID(string: "CB3C4555-D670-4670-BC20-B61DBC851E9A"),
-    ]
-
-    private static let preferredWriteUUIDs: Set<CBUUID> = [
-        CBUUID(string: "6606AB42-89D5-4A00-A8CE-4EB5E1414EE0"),
-    ]
-
-    private static let preferredNotifyUUIDs: Set<CBUUID> = [
-        CBUUID(string: "A60B8E5C-B267-44D7-9764-837CAF96489E"),
-    ]
+    // Characteristic scoring and the device-specific Tx/Rx preferences live in
+    // BleCharacteristicSelector so they can be unit-tested standalone.
 
     private static let pelagicGen1TxCharacteristic = CBUUID(
         string: "6606AB42-89D5-4A00-A8CE-4EB5E1414EE0"
@@ -45,13 +30,11 @@ class BleIoStream: NSObject, CBPeripheralDelegate {
 
     private var writeCharacteristic: CBCharacteristic?
     private var notifyCharacteristic: CBCharacteristic?
-    private var bestCandidate: CharacteristicCandidate?
+    private var discoveredServices: [(service: CBService, characteristics: [CBCharacteristic])] = []
     private var remainingServiceDiscoveries = 0
     private var discoverySignaled = false
 
-    private let readLock = NSLock()
-    private var readBuffer = Data()
-    private let readSemaphore = DispatchSemaphore(value: 0)
+    private let packetBuffer = PacketReadBuffer()
     private let writeSemaphore = DispatchSemaphore(value: 0)
     private let writeReadySemaphore = DispatchSemaphore(value: 0)
     private let connectSemaphore = DispatchSemaphore(value: 0)
@@ -117,15 +100,15 @@ class BleIoStream: NSObject, CBPeripheralDelegate {
     func connectAndDiscover() -> Bool {
         NativeLogger.d(
             "BleIoStream", category: "BLE",
-            "connectAndDiscover start for \(peripheral.identifier.uuidString)"
-                + " (peripheralState=\(peripheral.state.rawValue)"
-                + " centralState=\(centralManager.state.rawValue))"
+            "connectAndDiscover start for \(self.peripheral.identifier.uuidString)"
+                + " (peripheralState=\(self.peripheral.state.rawValue)"
+                + " centralState=\(self.centralManager.state.rawValue))"
         )
 
         guard centralManager.state == .poweredOn else {
             NativeLogger.w(
                 "BleIoStream", category: "BLE",
-                "Central not powered on (state=\(centralManager.state.rawValue))"
+                "Central not powered on (state=\(self.centralManager.state.rawValue))"
             )
             return false
         }
@@ -135,7 +118,7 @@ class BleIoStream: NSObject, CBPeripheralDelegate {
         waitingForNotifyEnable = false
         discoverySignaled = false
         remainingServiceDiscoveries = 0
-        bestCandidate = nil
+        discoveredServices.removeAll()
         writeCharacteristic = nil
         notifyCharacteristic = nil
         hasSeenNotify = false
@@ -179,6 +162,12 @@ class BleIoStream: NSObject, CBPeripheralDelegate {
             }
         }
 
+        // CoreBluetooth exposes no connection-interval/priority API (unlike
+        // Android's requestConnectionPriority or Windows' preferred connection
+        // parameters): iOS negotiates the interval from the peripheral's
+        // preferred values. High-rate dumps (e.g. the OSTC nano logbook, #280)
+        // therefore rely on the device pacing itself; the hw_ostc3 read fix
+        // handles correctly-delivered data and a retry covers transient loss.
         NativeLogger.d("BleIoStream", category: "BLE", "Connected; discovering services")
         peripheral.discoverServices(nil)
         let discoverResult = discoverSemaphore.wait(timeout: .now() + .seconds(10))
@@ -198,8 +187,8 @@ class BleIoStream: NSObject, CBPeripheralDelegate {
         NativeLogger.d("BleIoStream", category: "BLE",
             "Post-notify settle delay complete (\(Int(Self.notifySettleDelaySeconds * 1000)) ms)")
         NativeLogger.d("BleIoStream", category: "BLE",
-            "Discovery ready (write=\(writeCharacteristic?.uuid.uuidString ?? "nil")"
-                + " notify=\(notifyCharacteristic?.uuid.uuidString ?? "nil"))")
+            "Discovery ready (write=\(self.writeCharacteristic?.uuid.uuidString ?? "nil")"
+                + " notify=\(self.notifyCharacteristic?.uuid.uuidString ?? "nil"))")
         return true
     }
 
@@ -224,11 +213,7 @@ class BleIoStream: NSObject, CBPeripheralDelegate {
         let stream = Unmanaged<BleIoStream>.fromOpaque(userdata!).takeUnretainedValue()
         guard let actual else {
             var transferred: size_t = 0
-            let status = stream.performRead(data: data!, size: size, actual: &transferred)
-            if status != Int32(LIBDC_STATUS_SUCCESS) {
-                return status
-            }
-            return transferred == size ? Int32(LIBDC_STATUS_SUCCESS) : Int32(LIBDC_STATUS_TIMEOUT)
+            return stream.performRead(data: data!, size: size, actual: &transferred)
         }
         return stream.performRead(data: data!, size: size, actual: actual)
     }
@@ -260,21 +245,14 @@ class BleIoStream: NSObject, CBPeripheralDelegate {
 
     private static let cPoll: libdc_io_poll_fn = { userdata, timeout in
         let stream = Unmanaged<BleIoStream>.fromOpaque(userdata!).takeUnretainedValue()
-        stream.readLock.lock()
-        let available = stream.readBuffer.count
-        stream.readLock.unlock()
-        if available > 0 { return Int32(LIBDC_STATUS_SUCCESS) }
+        if stream.packetBuffer.hasData { return Int32(LIBDC_STATUS_SUCCESS) }
 
         if timeout == 0 { return Int32(LIBDC_STATUS_TIMEOUT) }
 
         let deadline: DispatchTime = timeout < 0 ? .distantFuture :
             .now() + .milliseconds(Int(timeout))
-        let result = stream.readSemaphore.wait(timeout: deadline)
-        if result == .timedOut { return Int32(LIBDC_STATUS_TIMEOUT) }
-
-        // Re-signal since we consumed the signal but didn't consume data.
-        stream.readSemaphore.signal()
-        return Int32(LIBDC_STATUS_SUCCESS)
+        return stream.packetBuffer.poll(deadline: deadline)
+            ? Int32(LIBDC_STATUS_SUCCESS) : Int32(LIBDC_STATUS_TIMEOUT)
     }
 
     // MARK: - I/O Operations
@@ -284,28 +262,19 @@ class BleIoStream: NSObject, CBPeripheralDelegate {
         let deadline: DispatchTime = timeoutMs == Int.max ? .distantFuture :
             .now() + .milliseconds(timeoutMs)
 
-        while true {
-            readLock.lock()
-            let available = readBuffer.count
-            if available > 0 {
-                let bytesToRead = min(size, readBuffer.count)
-                _ = readBuffer.withUnsafeBytes { ptr in
-                    memcpy(data, ptr.baseAddress!, bytesToRead)
-                }
-                readBuffer.removeFirst(bytesToRead)
-                readLock.unlock()
-                actual.pointee = bytesToRead
-                return Int32(LIBDC_STATUS_SUCCESS)
-            }
-            readLock.unlock()
-
-            if readSemaphore.wait(timeout: deadline) == .timedOut {
-                actual.pointee = 0
-                consecutiveReadTimeouts += 1
-                maybeFlipWriteModeAfterReadTimeout()
-                return Int32(LIBDC_STATUS_TIMEOUT)
-            }
+        // The buffer returns bytes from at most one BLE notification per
+        // call: libdivecomputer's packet parsers size each read from the
+        // packet header and would silently drop a second packet coalesced
+        // into the same read (lost FLAG_LAST ack -> spurious timeout).
+        guard let bytesToRead = packetBuffer.read(
+            into: data, maxBytes: size, deadline: deadline) else {
+            actual.pointee = 0
+            consecutiveReadTimeouts += 1
+            maybeFlipWriteModeAfterReadTimeout()
+            return Int32(LIBDC_STATUS_TIMEOUT)
         }
+        actual.pointee = bytesToRead
+        return Int32(LIBDC_STATUS_SUCCESS)
     }
 
     private func performWrite(data: UnsafeRawPointer, size: size_t,
@@ -391,10 +360,7 @@ class BleIoStream: NSObject, CBPeripheralDelegate {
             return Int32(LIBDC_STATUS_SUCCESS)
         }
 
-        readLock.lock()
-        readBuffer.removeAll(keepingCapacity: true)
-        readLock.unlock()
-        drainSemaphore(readSemaphore)
+        packetBuffer.purge()
         return Int32(LIBDC_STATUS_SUCCESS)
     }
 
@@ -443,9 +409,13 @@ class BleIoStream: NSObject, CBPeripheralDelegate {
         let properties = characteristic.properties
         guard properties.contains(.write) && properties.contains(.writeWithoutResponse) else { return }
         writeWithoutResponsePreferred.toggle()
+        // Snapshot before logging: the message is built later on the logger
+        // queue, and reading this mutable flag there would race with the I/O
+        // queue that toggles it.
+        let preferWithoutResponse = writeWithoutResponsePreferred
         NativeLogger.d("BleIoStream", category: "BLE",
             "Read timed out before response; flipping preferred write mode to"
-                + " \(writeWithoutResponsePreferred ? "withoutResponse" : "withResponse")"
+                + " \(preferWithoutResponse ? "withoutResponse" : "withResponse")"
         )
     }
 
@@ -606,7 +576,12 @@ class BleIoStream: NSObject, CBPeripheralDelegate {
         } else if let characteristics = service.characteristics {
             NativeLogger.d("BleIoStream", category: "BLE",
                 "Discovered \(characteristics.count) characteristics for \(service.uuid.uuidString)")
-            updateBestCandidate(service: service, characteristics: characteristics)
+            for characteristic in characteristics {
+                NativeLogger.d("BleIoStream", category: "BLE",
+                    "  characteristic \(characteristic.uuid.uuidString)"
+                        + " (\(Self.propertySummary(characteristic.properties)))")
+            }
+            discoveredServices.append((service: service, characteristics: characteristics))
         }
 
         if remainingServiceDiscoveries > 0 {
@@ -632,14 +607,17 @@ class BleIoStream: NSObject, CBPeripheralDelegate {
         guard let value = characteristic.value else { return }
         hasSeenNotify = true
         consecutiveReadTimeouts = 0
+        // Hand the payload to the consumer before logging. Under the OSTC
+        // download fire-hose (hundreds of notifications/second) any work left on
+        // this CoreBluetooth delegate queue delays draining the next
+        // notification; if the queue falls behind, iOS drops notifications and
+        // the download loses bytes (issue #394). append() is O(1) and the log
+        // is dispatched off this queue by NativeLogger.
+        packetBuffer.append(value)
         NativeLogger.d("BleIoStream", category: "BLE",
             "notify \(characteristic.uuid.uuidString)"
                 + " bytes=\(value.count)"
                 + " data=\(Self.hexString(value, maxBytes: Self.maxLogBytes))")
-        readLock.lock()
-        readBuffer.append(value)
-        readLock.unlock()
-        readSemaphore.signal()
     }
 
     func peripheral(_ peripheral: CBPeripheral,
@@ -691,81 +669,51 @@ class BleIoStream: NSObject, CBPeripheralDelegate {
         discoverSemaphore.signal()
     }
 
-    private func updateBestCandidate(service: CBService, characteristics: [CBCharacteristic]) {
-        var bestWrite: (characteristic: CBCharacteristic, score: Int)?
-        var bestNotify: (characteristic: CBCharacteristic, score: Int)?
-
-        for characteristic in characteristics {
-            let props = characteristic.properties
-
-            if props.contains(.write) || props.contains(.writeWithoutResponse) {
-                var writeScore = 0
-                if props.contains(.writeWithoutResponse) { writeScore += 4 }
-                if props.contains(.write) { writeScore += 2 }
-                if Self.preferredWriteUUIDs.contains(characteristic.uuid) { writeScore += 1000 }
-                if bestWrite == nil || writeScore > bestWrite!.score {
-                    bestWrite = (characteristic, writeScore)
-                }
-            }
-
-            if props.contains(.notify) || props.contains(.indicate) {
-                var notifyScore = 0
-                if props.contains(.notify) { notifyScore += 4 }
-                if props.contains(.indicate) { notifyScore += 2 }
-                if Self.preferredNotifyUUIDs.contains(characteristic.uuid) { notifyScore += 1000 }
-                if bestNotify == nil || notifyScore > bestNotify!.score {
-                    bestNotify = (characteristic, notifyScore)
-                }
-            }
-        }
-
-        guard let write = bestWrite, let notify = bestNotify else {
-            return
-        }
-
-        var serviceScore = write.score + notify.score
-        if Self.preferredServiceUUIDs.contains(service.uuid) {
-            serviceScore += 1000
-        }
-
-        if let existing = bestCandidate, existing.score >= serviceScore {
-            return
-        }
-
-        bestCandidate = CharacteristicCandidate(
-            score: serviceScore,
-            write: write.characteristic,
-            notify: notify.characteristic
-        )
-    }
-
     private func finalizeCharacteristicSelection() {
-        guard let candidate = bestCandidate else {
+        let services = discoveredServices.map { entry in
+            BleCharacteristicSelector.Service(
+                uuid: entry.service.uuid,
+                characteristics: entry.characteristics.map {
+                    BleCharacteristicSelector.Characteristic(
+                        uuid: $0.uuid, properties: $0.properties)
+                }
+            )
+        }
+
+        guard let selection = BleCharacteristicSelector.select(services: services) else {
             NativeLogger.w("BleIoStream", category: "BLE",
                 "No suitable write/notify characteristic pair found")
             signalDiscoveryReady()
             return
         }
 
-        writeCharacteristic = candidate.write
-        notifyCharacteristic = candidate.notify
-        writeWithoutResponsePreferred = initialWriteWithoutResponsePreference(for: candidate.write)
+        // `services` is built from `discoveredServices` in the same order, so
+        // the selection's indices address the exact live characteristics --
+        // unambiguous even if the peripheral exposes duplicate service UUIDs.
+        let entry = discoveredServices[selection.serviceIndex]
+        let writeChar = entry.characteristics[selection.writeIndex]
+        let notifyChar = entry.characteristics[selection.notifyIndex]
+
+        writeCharacteristic = writeChar
+        notifyCharacteristic = notifyChar
+        writeWithoutResponsePreferred = initialWriteWithoutResponsePreference(for: writeChar)
         NativeLogger.d("BleIoStream", category: "BLE",
-            "Selected write=\(candidate.write.uuid.uuidString)"
-                + " (\(Self.propertySummary(candidate.write.properties)))"
-                + " notify=\(candidate.notify.uuid.uuidString)"
-                + " (\(Self.propertySummary(candidate.notify.properties)))"
-                + " (score=\(candidate.score))")
+            "Selected write=\(writeChar.uuid.uuidString)"
+                + " (\(Self.propertySummary(writeChar.properties)))"
+                + " notify=\(notifyChar.uuid.uuidString)"
+                + " (\(Self.propertySummary(notifyChar.properties)))"
+                + " (score=\(selection.score))")
+        let preferWithoutResponse = writeWithoutResponsePreferred
         NativeLogger.d("BleIoStream", category: "BLE",
             "Initial write mode preference:"
-                + " \(writeWithoutResponsePreferred ? "withoutResponse" : "withResponse")")
-        if candidate.notify.isNotifying {
+                + " \(preferWithoutResponse ? "withoutResponse" : "withResponse")")
+        if notifyChar.isNotifying {
             isReady = true
             signalDiscoveryReady()
             return
         }
         waitingForNotifyEnable = true
-        peripheral.setNotifyValue(true, for: candidate.notify)
+        peripheral.setNotifyValue(true, for: notifyChar)
     }
 }
 

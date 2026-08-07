@@ -5,13 +5,14 @@ import 'package:submersion/core/database/database.dart';
 import 'package:submersion/core/services/database_service.dart';
 import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/core/services/sync/hlc.dart';
+import 'package:submersion/core/services/sync/sync_event_bus.dart';
 import 'package:submersion/core/services/sync/sync_clock.dart';
 
 /// Sync status for individual records
 enum SyncStatus { synced, pending, conflict }
 
 /// Cloud provider types
-enum CloudProviderType { icloud, googledrive, s3 }
+enum CloudProviderType { icloud, googledrive, s3, dropbox }
 
 /// Repository for managing sync metadata and tracking
 class SyncRepository {
@@ -30,17 +31,44 @@ class SyncRepository {
     'divers': (table: 'divers', pk: 'id'),
     'diverSettings': (table: 'diver_settings', pk: 'id'),
     'buddies': (table: 'buddies', pk: 'id'),
+    'buddyRoles': (table: 'buddy_roles', pk: 'id'),
+    'mediaStores': (table: 'media_stores', pk: 'id'),
+    'connectedAccounts': (table: 'connected_accounts', pk: 'id'),
+    'mediaSubscriptions': (table: 'media_subscriptions', pk: 'id'),
     'diveCenters': (table: 'dive_centers', pk: 'id'),
     'trips': (table: 'trips', pk: 'id'),
     'liveaboardDetails': (table: 'liveaboard_detail_records', pk: 'id'),
     'itineraryDays': (table: 'trip_itinerary_days', pk: 'id'),
+    'checklistTemplates': (table: 'checklist_templates', pk: 'id'),
+    'checklistTemplateItems': (table: 'checklist_template_items', pk: 'id'),
+    'tripChecklistItems': (table: 'trip_checklist_items', pk: 'id'),
+    'preDiveChecklistTemplates': (
+      table: 'pre_dive_checklist_templates',
+      pk: 'id',
+    ),
+    'preDiveChecklistTemplateItems': (
+      table: 'pre_dive_checklist_template_items',
+      pk: 'id',
+    ),
+    'preDiveSessions': (table: 'pre_dive_sessions', pk: 'id'),
+    'preDiveSessionItems': (table: 'pre_dive_session_items', pk: 'id'),
+    'gpsTracks': (table: 'gps_tracks', pk: 'id'),
+    'divePlans': (table: 'dive_plans', pk: 'id'),
+    'divePlanTanks': (table: 'dive_plan_tanks', pk: 'id'),
+    'divePlanSegments': (table: 'dive_plan_segments', pk: 'id'),
     'equipment': (table: 'equipment', pk: 'id'),
     'equipmentSets': (table: 'equipment_sets', pk: 'id'),
+    'equipmentAttributes': (table: 'equipment_attributes', pk: 'id'),
     'diveTypes': (table: 'dive_types', pk: 'id'),
+    'diveRoles': (table: 'dive_roles', pk: 'id'),
+    'diverWeightEntries': (table: 'diver_weight_entries', pk: 'id'),
     'tankPresets': (table: 'tank_presets', pk: 'id'),
     'diveComputers': (table: 'dive_computers', pk: 'id'),
     'tags': (table: 'tags', pk: 'id'),
     'courses': (table: 'courses', pk: 'id'),
+    // HLC merge-root only: the courseRequirementDives junction is clockless
+    // and rides the parent requirement's hlc (equipment_set_items pattern).
+    'courseRequirements': (table: 'course_requirements', pk: 'id'),
     'dives': (table: 'dives', pk: 'id'),
     'diveSites': (table: 'dive_sites', pk: 'id'),
     'certifications': (table: 'certifications', pk: 'id'),
@@ -48,6 +76,13 @@ class SyncRepository {
     'settings': (table: 'settings', pk: 'key'),
     'csvPresets': (table: 'csv_presets', pk: 'id'),
     'viewConfigs': (table: 'view_configs', pk: 'id'),
+    'media': (table: 'media', pk: 'id'),
+    'mediaEnrichment': (table: 'media_enrichment', pk: 'id'),
+    'species': (table: 'species', pk: 'id'),
+    'fieldPresets': (table: 'field_presets', pk: 'id'),
+    'qualityFindings': (table: 'quality_findings', pk: 'id'),
+    'emergencyChambers': (table: 'emergency_chambers', pk: 'id'),
+    'incidents': (table: 'incidents', pk: 'id'),
   };
 
   // ============================================================================
@@ -74,7 +109,14 @@ class SyncRepository {
       }
       if (existing != null) return existing;
 
-      // Create new metadata with a unique device ID
+      // Create new metadata with a unique device ID. The seed uses
+      // insertOrIgnore because getSingleOrNull above and this insert are not
+      // atomic: on a fresh database two callers race to seed the 'global' row
+      // (the launch reconcile via getDeviceId and the Cloud Sync page via
+      // getLastSyncTime). Without insertOrIgnore the loser throws
+      // SqliteException(1555) UNIQUE constraint failed, which the page surfaces
+      // as "Failed to load sync state". First writer wins; the loser is a
+      // no-op and re-reads the winning row below.
       final now = DateTime.now().millisecondsSinceEpoch;
       final deviceId = _uuid.v4();
 
@@ -88,6 +130,7 @@ class SyncRepository {
               createdAt: Value(now),
               updatedAt: Value(now),
             ),
+            mode: InsertMode.insertOrIgnore,
           );
 
       _log.info('Created sync metadata with deviceId: $deviceId');
@@ -185,16 +228,33 @@ class SyncRepository {
     return token;
   }
 
-  /// Get the last sync timestamp
-  Future<DateTime?> getLastSyncTime() async {
+  /// Get the last sync timestamp.
+  ///
+  /// With [forProvider], the cursor is returned only if it was minted against
+  /// that provider (or is a legacy unstamped cursor). A cursor belonging to a
+  /// different backend reads as null -- "never synced here" -- so first
+  /// contact with a switched backend stays detectable. Pass null only for
+  /// display contexts that want the raw timestamp regardless of backend.
+  Future<DateTime?> getLastSyncTime({String? forProvider}) async {
     final metadata = await getOrCreateMetadata();
     if (metadata.lastSyncTimestamp == null) return null;
+    if (forProvider != null &&
+        metadata.lastSyncProvider != null &&
+        metadata.lastSyncProvider != forProvider) {
+      return null;
+    }
     return DateTime.fromMillisecondsSinceEpoch(metadata.lastSyncTimestamp!);
   }
 
-  /// Update the last sync timestamp
-  Future<void> updateLastSyncTime(DateTime syncTime) async {
+  /// Update the last sync timestamp, stamping the provider it was minted
+  /// against. [providerId] should only be omitted by legacy-path tests; every
+  /// production writer knows its provider.
+  Future<void> updateLastSyncTime(
+    DateTime syncTime, {
+    String? providerId,
+  }) async {
     try {
+      await getOrCreateMetadata();
       final now = DateTime.now().millisecondsSinceEpoch;
 
       await (_db.update(
@@ -202,6 +262,7 @@ class SyncRepository {
       )..where((t) => t.id.equals(_globalMetadataId))).write(
         SyncMetadataCompanion(
           lastSyncTimestamp: Value(syncTime.millisecondsSinceEpoch),
+          lastSyncProvider: Value(providerId),
           updatedAt: Value(now),
         ),
       );
@@ -217,7 +278,29 @@ class SyncRepository {
     }
   }
 
-  /// Set the cloud provider
+  /// Claim a legacy (unstamped) cursor for [providerId]. Used at backend
+  /// switch time: an unstamped cursor is valid for any provider, so without
+  /// claiming it for the backend it was actually minted against, switching
+  /// right after upgrading would carry it to the new backend.
+  /// No-op when the cursor is absent or already stamped.
+  Future<void> stampLegacyCursorProvider(String providerId) async {
+    final metadata = await getOrCreateMetadata();
+    if (metadata.lastSyncTimestamp == null) return;
+    if (metadata.lastSyncProvider != null) return;
+    final now = DateTime.now().millisecondsSinceEpoch;
+    await (_db.update(
+      _db.syncMetadata,
+    )..where((t) => t.id.equals(_globalMetadataId))).write(
+      SyncMetadataCompanion(
+        lastSyncProvider: Value(providerId),
+        updatedAt: Value(now),
+      ),
+    );
+  }
+
+  /// Set the cloud provider. Clearing it (null) also clears the sync
+  /// account selection; setting a bare type leaves any account id in place
+  /// (the account-aware writer is [setSyncAccount]).
   Future<void> setCloudProvider(CloudProviderType? provider) async {
     try {
       final now = DateTime.now().millisecondsSinceEpoch;
@@ -227,11 +310,17 @@ class SyncRepository {
       )..where((t) => t.id.equals(_globalMetadataId))).write(
         SyncMetadataCompanion(
           syncProvider: Value(provider?.name),
+          syncAccountId: provider == null
+              ? const Value(null)
+              : const Value.absent(),
           updatedAt: Value(now),
         ),
       );
 
       _log.info('Set cloud provider to: ${provider?.name}');
+      // Selection changed: let account-derived UI (pending-setup routes)
+      // recompute while Settings stays mounted.
+      SyncEventBus.notifyLocalChange();
     } catch (e, stackTrace) {
       _log.error(
         'Failed to set cloud provider',
@@ -240,6 +329,32 @@ class SyncRepository {
       );
       rethrow;
     }
+  }
+
+  /// Selects the connected account driving sync. Writes the provider name
+  /// too so pre-account readers (and a rollback build) keep working.
+  Future<void> setSyncAccount({
+    required String accountId,
+    required CloudProviderType providerType,
+  }) async {
+    final now = DateTime.now().millisecondsSinceEpoch;
+    await (_db.update(
+      _db.syncMetadata,
+    )..where((t) => t.id.equals(_globalMetadataId))).write(
+      SyncMetadataCompanion(
+        syncProvider: Value(providerType.name),
+        syncAccountId: Value(accountId),
+        updatedAt: Value(now),
+      ),
+    );
+    SyncEventBus.notifyLocalChange();
+  }
+
+  /// The connected account driving sync, or null pre-account-migration or
+  /// when no provider is selected.
+  Future<String?> getSyncAccountId() async {
+    final metadata = await getOrCreateMetadata();
+    return metadata.syncAccountId;
   }
 
   /// Get the current cloud provider
@@ -284,6 +399,35 @@ class SyncRepository {
     return metadata.remoteFileId;
   }
 
+  /// The library epoch this device last accepted, or null in the pre-epoch
+  /// world. Dual-anchored with LibraryEpochStore's SharedPreferences mirror.
+  Future<String?> getLastAcceptedEpochId() async {
+    final metadata = await getOrCreateMetadata();
+    return metadata.lastAcceptedEpochId;
+  }
+
+  Future<void> setLastAcceptedEpochId(String? epochId) async {
+    try {
+      await getOrCreateMetadata();
+      final now = DateTime.now().millisecondsSinceEpoch;
+      await (_db.update(
+        _db.syncMetadata,
+      )..where((t) => t.id.equals(_globalMetadataId))).write(
+        SyncMetadataCompanion(
+          lastAcceptedEpochId: Value(epochId),
+          updatedAt: Value(now),
+        ),
+      );
+    } catch (e, stackTrace) {
+      _log.error(
+        'Failed to set last accepted epoch id',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      rethrow;
+    }
+  }
+
   // ============================================================================
   // Sync Records Operations
   // ============================================================================
@@ -326,6 +470,37 @@ class SyncRepository {
       );
       rethrow;
     }
+  }
+
+  /// One-time self-heal for enrichment rows written before schema v130, when
+  /// media_enrichment had no `hlc` column and never synced. Such rows carry
+  /// `hlc IS NULL` and are invisible to the incremental export (which filters
+  /// `hlc > watermark`; SQL `NULL > x` is false). markRecordPending stamps a
+  /// fresh HLC (above every peer watermark) so they replicate on the next sync
+  /// and heal peers that lost the depth/time association.
+  ///
+  /// Self-limiting: rows written by saveEnrichment always get an HLC, so once
+  /// every legacy row is stamped this finds nothing.
+  Future<void> backfillMediaEnrichmentHlc() async {
+    final rows = await _db
+        .customSelect(
+          'SELECT id, created_at FROM media_enrichment WHERE hlc IS NULL',
+        )
+        .get();
+    if (rows.isEmpty) return;
+    // One transaction for the whole backfill: markRecordPending's own
+    // per-row transaction nests as a savepoint, so a library with many
+    // linked photos commits once instead of once per row (the per-row fsync
+    // was the sync-start cost flagged in review).
+    await _db.transaction(() async {
+      for (final row in rows) {
+        await markRecordPending(
+          entityType: 'mediaEnrichment',
+          recordId: row.read<String>('id'),
+          localUpdatedAt: row.read<int>('created_at'),
+        );
+      }
+    });
   }
 
   /// Stamp a fresh Hybrid Logical Clock onto the just-written entity row, if
@@ -378,6 +553,10 @@ class SyncRepository {
         .getSingleOrNull();
     return row?.read<String?>('m');
   }
+
+  /// Public accessor for [_maxRowHlc] -- the highest hlc across conflict-capable
+  /// tables. Used by stale-restore detection.
+  Future<String?> maxRowHlc() => _maxRowHlc();
 
   /// Pick the greater of [a]/[b] by (physicalTime, counter) and rebuild it with
   /// [nodeId] so the clock always issues under THIS device's identity.
@@ -618,16 +797,37 @@ class SyncRepository {
       final id = _uuid.v4();
       final now = deletedAt ?? DateTime.now().millisecondsSinceEpoch;
 
-      await _db
-          .into(_db.deletionLog)
-          .insert(
-            DeletionLogCompanion(
-              id: Value(id),
-              entityType: Value(entityType),
-              recordId: Value(recordId),
-              deletedAt: Value(now),
-            ),
-          );
+      // Stamp a monotonic HLC so the changeset writer can publish only NEW
+      // tombstones (filtered by hlc > publishedHlcHigh) instead of re-sending
+      // the whole deletion log every sync. Deliberately NOT gated on
+      // _hlcTargets: write-once child deletions (diveTanks, diveProfileEvents,
+      // ...) have no row hlc but their tombstones still need one. Configure the
+      // clock first -- deletes routinely fire outside a sync. A null hlc (clock
+      // unconfigurable) still rides every full base, so no tombstone is lost.
+      await ensureSyncClockConfigured();
+      final hlc = SyncClock.instance.issue();
+
+      await _db.transaction(() async {
+        // One tombstone per record: replace any prior tombstone for this key
+        // so its deletedAt/hlc advance (re-delete refreshes the stamp) and the
+        // v114 unique index is never violated.
+        await (_db.delete(_db.deletionLog)..where(
+              (t) =>
+                  t.entityType.equals(entityType) & t.recordId.equals(recordId),
+            ))
+            .go();
+        await _db
+            .into(_db.deletionLog)
+            .insert(
+              DeletionLogCompanion(
+                id: Value(id),
+                entityType: Value(entityType),
+                recordId: Value(recordId),
+                deletedAt: Value(now),
+                hlc: Value(hlc),
+              ),
+            );
+      });
 
       _log.info('Logged deletion: $entityType/$recordId');
     } catch (e, stackTrace) {
@@ -719,21 +919,31 @@ class SyncRepository {
     }
   }
 
-  /// Clear old deletions (older than given days)
-  Future<void> clearOldDeletions({int olderThanDays = 90}) async {
+  /// Fleet-acked tombstone GC: delete tombstones that (a) are older than the
+  /// safety floor, (b) carry an HLC (a null-hlc tombstone cannot be compared
+  /// so it is kept and rides every base -- rare and harmless), and (c) sort at
+  /// or below [upToHlc], the minimum HLC every live peer's manifest
+  /// acknowledges having applied from us. A null [upToHlc] means no live peer
+  /// constrains GC (single-device library): the floor alone applies.
+  /// Replaces the old unconditional 90-day purge, which silently resurrected
+  /// records on devices offline longer than the window.
+  Future<void> clearAcknowledgedDeletions({
+    required String? upToHlc,
+    required int floorCutoffMillis,
+  }) async {
     try {
-      final cutoff = DateTime.now()
-          .subtract(Duration(days: olderThanDays))
-          .millisecondsSinceEpoch;
-
-      await (_db.delete(
-        _db.deletionLog,
-      )..where((t) => t.deletedAt.isSmallerThanValue(cutoff))).go();
-
-      _log.info('Cleared deletions older than $olderThanDays days');
+      await (_db.delete(_db.deletionLog)..where((t) {
+            final base =
+                t.deletedAt.isSmallerThanValue(floorCutoffMillis) &
+                t.hlc.isNotNull();
+            if (upToHlc == null) return base;
+            return base & t.hlc.isSmallerOrEqualValue(upToHlc);
+          }))
+          .go();
+      _log.info('Cleared acknowledged deletions (upTo: $upToHlc)');
     } catch (e, stackTrace) {
       _log.error(
-        'Failed to clear old deletions',
+        'Failed to clear acknowledged deletions',
         error: e,
         stackTrace: stackTrace,
       );
@@ -788,12 +998,21 @@ class SyncRepository {
         await clearAllDeletions();
       }
 
+      // Changeset transport position is not data history: a reset must
+      // cold-start the transport so the next sync re-pulls every peer from
+      // scratch and republishes a fresh base. Leaving a provider-keyed publish
+      // row behind would make the next publish append a changeset against a
+      // base whose own manifest no longer exists.
+      await _db.delete(_db.syncPeerCursors).go();
+      await _db.delete(_db.localPublishStates).go();
+
       final now = DateTime.now().millisecondsSinceEpoch;
       await (_db.update(
         _db.syncMetadata,
       )..where((t) => t.id.equals(_globalMetadataId))).write(
         SyncMetadataCompanion(
           lastSyncTimestamp: const Value(null),
+          lastSyncProvider: const Value(null),
           remoteFileId: const Value(null),
           updatedAt: Value(now),
         ),
@@ -849,11 +1068,18 @@ class SyncRepository {
   /// Preserve the live device identity (captured by the caller *before* the
   /// restore) and clear the sync baseline so the next sync performs a clean
   /// full reconcile of the restored data instead of replaying a stale position.
-  Future<void> rebaselineAfterRestore({String? preserveDeviceId}) async {
+  Future<void> rebaselineAfterRestore({
+    String? preserveDeviceId,
+    String? preserveEpochId,
+  }) async {
     if (preserveDeviceId != null && preserveDeviceId.isNotEmpty) {
       await setDeviceId(preserveDeviceId);
     }
     await resetSyncState();
+    // The restored database carries the backup's stale epoch; overwrite it
+    // with the live value captured by the caller before the swap (or null
+    // when this install has never accepted an epoch).
+    await setLastAcceptedEpochId(preserveEpochId);
     // Drop the in-memory clock so it re-seeds from the restored rows under this
     // device's id on the next write. (issue() advances physical time to now()
     // regardless, so local writes are never ordered behind the restored data.)

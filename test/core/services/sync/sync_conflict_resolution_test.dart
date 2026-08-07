@@ -178,5 +178,46 @@ void main() {
       );
       expect(copies.first.id, isNot('d-both'));
     });
+
+    test(
+      'keepRemote preserves a nullable key the remote conflict map omits',
+      () async {
+        final diveRepo = DiveRepository();
+        // A fully-synced local dive that carries a name.
+        await diveRepo.createDive(
+          createTestDiveWithBottomTime(
+            id: 'd-omit',
+            maxDepth: 10,
+          ).copyWith(name: 'Local Name'),
+        );
+        await SyncRepository().resetSyncState();
+
+        // A conflicting remote version that changed maxDepth but -- like an
+        // older build predating the name column -- OMITS the name key. Without
+        // the keepRemote overlay, `.toCompanion(false)` would write NULL and
+        // clear the local name (data loss).
+        final local = await SyncDataSerializer().fetchRecord('dives', 'd-omit');
+        final remote = {...local!, 'maxDepth': 99.0}..remove('name');
+        await raiseConflict('dives', 'd-omit', remote);
+
+        await buildService().resolveConflict(
+          'dives',
+          'd-omit',
+          ConflictResolution.keepRemote,
+        );
+
+        final dive = await diveRepo.getDiveById('d-omit');
+        expect(
+          dive!.maxDepth,
+          99,
+          reason: 'keepRemote applies the remote value',
+        );
+        expect(
+          dive.name,
+          'Local Name',
+          reason: 'a key the remote omits must keep its local value (overlay)',
+        );
+      },
+    );
   });
 }

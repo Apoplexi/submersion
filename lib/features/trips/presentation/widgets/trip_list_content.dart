@@ -20,6 +20,8 @@ import 'package:submersion/features/trips/domain/entities/trip.dart';
 import 'package:submersion/features/trips/presentation/providers/trip_providers.dart';
 import 'package:submersion/features/trips/presentation/widgets/compact_trip_list_tile.dart';
 import 'package:submersion/features/trips/presentation/widgets/dense_trip_list_tile.dart';
+import 'package:submersion/features/trips/presentation/widgets/upcoming_trip_banner.dart';
+import 'package:submersion/shared/widgets/feature_accent.dart';
 
 /// Content widget for the trip list, used in master-detail layout.
 class TripListContent extends ConsumerStatefulWidget {
@@ -164,7 +166,10 @@ class _TripListContentState extends ConsumerState<TripListContent> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(context.l10n.trips_appBar_title),
+        title: FeatureAppBarTitle(
+          featureId: 'trips',
+          title: context.l10n.trips_appBar_title,
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.search),
@@ -285,8 +290,9 @@ class _TripListContentState extends ConsumerState<TripListContent> {
       child: Row(
         children: [
           const SizedBox(width: 8),
-          Text(
-            context.l10n.trips_appBar_title,
+          FeatureAppBarTitle(
+            featureId: 'trips',
+            title: context.l10n.trips_appBar_title,
             style: Theme.of(
               context,
             ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
@@ -396,6 +402,18 @@ class _TripListContentState extends ConsumerState<TripListContent> {
         .watch(allDiversProvider)
         .when(data: (d) => d.length, loading: () => 0, error: (_, _) => 0);
 
+    final upcoming = trips.where((t) => t.trip.isUpcoming).toList()
+      ..sort((a, b) => a.trip.startDate.compareTo(b.trip.startDate));
+    final past = trips.where((t) => !t.trip.isUpcoming).toList();
+    // Flatten into one item list: header sentinels + trips, so the
+    // existing ListView.builder/itemBuilder structure is preserved.
+    final rows = <Object>[
+      if (upcoming.isNotEmpty) _SectionHeader.upcoming,
+      ...upcoming,
+      if (upcoming.isNotEmpty && past.isNotEmpty) _SectionHeader.past,
+      ...past,
+    ];
+
     return RefreshIndicator(
       onRefresh: () async {
         await ref.read(tripListNotifierProvider.notifier).refresh();
@@ -407,9 +425,24 @@ class _TripListContentState extends ConsumerState<TripListContent> {
             child: ListView.builder(
               controller: _scrollController,
               padding: const EdgeInsets.only(bottom: 80),
-              itemCount: trips.length,
+              itemCount: rows.length,
               itemBuilder: (context, index) {
-                final tripWithStats = trips[index];
+                final row = rows[index];
+                if (row is _SectionHeader) {
+                  return Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
+                    child: Text(
+                      row == _SectionHeader.upcoming
+                          ? context.l10n.trips_list_upcomingSection
+                          : context.l10n.trips_list_pastSection,
+                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                        color: Theme.of(context).colorScheme.primary,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  );
+                }
+                final tripWithStats = row as TripWithStats;
                 final isSelected =
                     widget.selectedId == tripWithStats.trip.id ||
                     ref.watch(highlightedTripIdProvider) ==
@@ -417,7 +450,7 @@ class _TripListContentState extends ConsumerState<TripListContent> {
                 final viewMode = ref.watch(tripListViewModeProvider);
                 final showSharedBadge =
                     tripWithStats.trip.isShared && diversCount >= 2;
-                return switch (viewMode) {
+                final tile = switch (viewMode) {
                   ListViewMode.detailed => TripListTile(
                     tripWithStats: tripWithStats,
                     isSelected: isSelected,
@@ -437,6 +470,17 @@ class _TripListContentState extends ConsumerState<TripListContent> {
                     showSharedBadge: showSharedBadge,
                   ),
                 };
+                if (!tripWithStats.trip.isUpcoming) return tile;
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(20, 4, 20, 0),
+                      child: UpcomingTripBanner(trip: tripWithStats.trip),
+                    ),
+                    tile,
+                  ],
+                );
               },
             ),
           ),
@@ -574,12 +618,24 @@ class TripListTile extends StatelessWidget {
             : null,
         child: ListTile(
           onTap: onTap,
-          leading: CircleAvatar(
-            backgroundColor: theme.colorScheme.primaryContainer,
-            child: Icon(
-              trip.isLiveaboard ? Icons.sailing : Icons.flight_takeoff,
-              color: theme.colorScheme.onPrimaryContainer,
-            ),
+          leading: Consumer(
+            builder: (context, ref, _) {
+              final accent = resolveFeatureAccent(
+                context,
+                ref,
+                surface: AccentSurface.list,
+                featureId: 'trips',
+              );
+              return CircleAvatar(
+                backgroundColor:
+                    accent?.withValues(alpha: 0.15) ??
+                    theme.colorScheme.primaryContainer,
+                child: Icon(
+                  trip.isLiveaboard ? Icons.sailing : Icons.flight_takeoff,
+                  color: accent ?? theme.colorScheme.onPrimaryContainer,
+                ),
+              );
+            },
           ),
           title: Row(
             children: [
@@ -754,14 +810,28 @@ class TripSearchDelegate extends SearchDelegate<Trip?> {
                 final trip = trips[index];
                 final dateFormat = DateFormat.yMMMd();
                 return ListTile(
-                  leading: CircleAvatar(
-                    backgroundColor: Theme.of(
-                      context,
-                    ).colorScheme.primaryContainer,
-                    child: Icon(
-                      trip.isLiveaboard ? Icons.sailing : Icons.flight_takeoff,
-                      color: Theme.of(context).colorScheme.onPrimaryContainer,
-                    ),
+                  leading: Builder(
+                    builder: (context) {
+                      final accent = resolveFeatureAccent(
+                        context,
+                        ref,
+                        surface: AccentSurface.list,
+                        featureId: 'trips',
+                      );
+                      return CircleAvatar(
+                        backgroundColor:
+                            accent?.withValues(alpha: 0.15) ??
+                            Theme.of(context).colorScheme.primaryContainer,
+                        child: Icon(
+                          trip.isLiveaboard
+                              ? Icons.sailing
+                              : Icons.flight_takeoff,
+                          color:
+                              accent ??
+                              Theme.of(context).colorScheme.onPrimaryContainer,
+                        ),
+                      );
+                    },
                   ),
                   title: Text(trip.name),
                   subtitle: Text(
@@ -783,3 +853,5 @@ class TripSearchDelegate extends SearchDelegate<Trip?> {
     );
   }
 }
+
+enum _SectionHeader { upcoming, past }

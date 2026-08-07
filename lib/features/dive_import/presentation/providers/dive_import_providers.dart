@@ -2,6 +2,9 @@ import 'dart:io';
 
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/features/dive_log/data/repositories/dive_repository_impl.dart';
+import 'package:submersion/features/dive_log/domain/services/dive_altitude_enricher.dart';
+import 'package:submersion/features/equipment/data/services/dive_equipment_defaulter.dart';
+import 'package:submersion/features/pre_dive/data/services/checklist_dive_linker.dart';
 import 'package:submersion/features/dive_import/data/services/fit_parser_service.dart';
 import 'package:submersion/features/dive_import/data/services/healthkit_service.dart';
 import 'package:submersion/features/dive_import/domain/entities/imported_dive.dart';
@@ -345,6 +348,9 @@ class DiveImportNotifier extends StateNotifier<DiveImportState> {
     var skipped = 0;
 
     try {
+      // One instance for the run: its lookup cache collapses a batch of dives
+      // at the same location into a single elevation request.
+      final altitudeEnricher = DiveAltitudeEnricher();
       for (final sourceId in state.selectedDiveIds) {
         final iDive = state.getDiveById(sourceId);
         if (iDive == null) continue;
@@ -379,6 +385,9 @@ class DiveImportNotifier extends StateNotifier<DiveImportState> {
         );
 
         await repository.createDive(dive);
+        await DiveEquipmentDefaulter().applyForImportedDive(dive);
+        await ChecklistDiveLinker().applyForImportedDive(dive);
+        await altitudeEnricher.applyForImportedDive(dive);
         imported++;
       }
 

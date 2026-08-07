@@ -4,7 +4,11 @@ import 'package:uuid/uuid.dart';
 import 'package:submersion/core/data/repositories/sync_repository.dart';
 import 'package:submersion/core/services/cloud_storage/cloud_storage_provider.dart';
 import 'package:submersion/core/services/logger_service.dart';
+import 'package:submersion/core/services/sync/changeset_log/changeset_log_layout.dart';
+import 'package:submersion/core/services/sync/library_epoch_store.dart';
 import 'package:submersion/core/services/sync/sync_clock.dart';
+import 'package:submersion/core/services/sync/sync_preferences.dart'
+    show syncLastProviderPrefsKey;
 
 /// Handles sync initialization and checks on app launch
 class SyncInitializer {
@@ -12,7 +16,9 @@ class SyncInitializer {
 
   final _uuid = const Uuid();
 
-  static const _lastProviderKey = 'sync_last_provider';
+  // Single definition lives in sync_preferences.dart so the pre-provider
+  // escape-hatch path clears the same key.
+  static const _lastProviderKey = syncLastProviderPrefsKey;
 
   /// Mirrors the in-DB sync device id outside the database (which a restore
   /// would otherwise rewind silently). A mismatch on launch is one signal that
@@ -128,6 +134,7 @@ class SyncInitializer {
         );
         await _syncRepository.rebaselineAfterRestore(
           preserveDeviceId: sentinelDeviceId,
+          preserveEpochId: LibraryEpochStore(_prefs).lastAcceptedEpochId,
         );
         // Re-establish anchors on the restored DB, mirroring the preserved id.
         await _establishAnchors(sentinelDeviceId);
@@ -209,9 +216,20 @@ class SyncInitializer {
   /// install is uploading under this device id (a twin). A null nonce is
   /// never foreign: it was written by a pre-nonce build of this same device,
   /// and flagging it would false-positive every upgrader's first sync.
+  ///
+  /// An empty ring is never foreign either: it means this install has no
+  /// record of ever uploading here -- lost or reset SharedPreferences (a
+  /// reinstall that kept the database, a DB-only restore, OS prefs cleanup)
+  /// rather than evidence of a twin. Adopting on it would mint a fresh
+  /// identity (and re-upload a full base) after every such loss (#733). A
+  /// genuine whole-container clone carries the cloned, non-empty ring, so
+  /// twin detection still fires for it: whichever twin uploads first puts a
+  /// nonce in the manifest that the other's cloned ring does not contain.
   bool isForeignUploadNonce(String? nonce, String providerId) {
     if (nonce == null) return false;
-    return !_recordedUploadNonces(providerId).contains(nonce);
+    final recorded = _recordedUploadNonces(providerId);
+    if (recorded.isEmpty) return false;
+    return !recorded.contains(nonce);
   }
 
   /// Check sync status on app launch
@@ -245,8 +263,13 @@ class SyncInitializer {
         );
       }
 
-      // Get local last sync time
-      final localLastSync = await _syncRepository.getLastSyncTime();
+      // Get local last sync time, scoped to this provider: a cursor from a
+      // backend we switched away from must not read as "synced here", or the
+      // launch check would report up-to-date against a backend we have never
+      // actually synced with.
+      final localLastSync = await _syncRepository.getLastSyncTime(
+        forProvider: provider.providerId,
+      );
 
       // Per-device sync files: every device writes its own
       // submersion_sync_<deviceId>.json. Whether a launch sync is worthwhile is
@@ -321,24 +344,21 @@ class SyncInitializer {
     }
   }
 
-  /// Lists every *other* device's sync file. Excludes our own per-device file
-  /// and any iCloud "conflicted copy" duplicates. A legacy shared
-  /// `submersion_sync.json` (written by pre-per-device builds) still counts as
-  /// a peer file so its data is detected. Mirrors the per-device file
-  /// resolution in `SyncService.performSync`.
+  /// Lists every *other* device's changeset-log manifest -- one per peer
+  /// device, our own excluded. A manifest's modifiedTime tracks that peer's
+  /// last publish, which is the freshness signal both the launch check and the
+  /// first-contact guard need. iCloud "conflicted copy" duplicates are
+  /// naturally excluded: they do not end in the canonical `.manifest.json`.
   Future<List<CloudFileInfo>> peerSyncFiles(
     CloudStorageProvider provider,
   ) async {
     final deviceId = await _syncRepository.getDeviceId();
-    final ownFileName =
-        '${CloudStorageProviderMixin.syncFilePrefix}$deviceId'
-        '${CloudStorageProviderMixin.syncFileExtension}';
     final files = await provider.listFiles(
-      namePattern: CloudStorageProviderMixin.syncFileStem,
+      namePattern: ChangesetLogLayout.prefix,
     );
     return files
-        .where((f) => !_isConflictCopy(f.name))
-        .where((f) => f.name != ownFileName)
+        .where((f) => ChangesetLogLayout.isManifest(f.name))
+        .where((f) => ChangesetLogLayout.deviceIdOf(f.name) != deviceId)
         .toList();
   }
 
@@ -349,11 +369,6 @@ class SyncInitializer {
       if (f.modifiedTime.isAfter(newest)) newest = f.modifiedTime;
     }
     return newest;
-  }
-
-  bool _isConflictCopy(String filename) {
-    final lower = filename.toLowerCase();
-    return lower.contains('conflicted copy') || lower.contains('conflict');
   }
 }
 

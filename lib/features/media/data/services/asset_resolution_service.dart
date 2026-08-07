@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/features/media/data/repositories/local_asset_cache_repository.dart';
 import 'package:submersion/features/media/data/services/photo_picker_service.dart';
+import 'package:submersion/features/media/data/services/trip_media_scanner.dart';
 import 'package:submersion/features/media/domain/entities/media_item.dart';
 
 /// Status of an asset resolution attempt.
@@ -130,18 +131,54 @@ class AssetResolutionService {
       );
     }
 
-    // Step 3: Search gallery by metadata (with query coalescing)
-    const timeWindow = Duration(seconds: 5);
-    final start = item.takenAt.subtract(timeWindow);
-    final end = item.takenAt.add(timeWindow);
-
-    List<AssetInfo> candidates;
+    // A gallery query against a library the app cannot access yet returns
+    // zero candidates -- indistinguishable from "genuinely no matching
+    // photo" unless permission is checked directly. Skip the query (and,
+    // critically, skip caching an unresolved result) when permission isn't
+    // in place: caching would apply the 24h+ backoff to a transient,
+    // user-recoverable condition, leaving the item stuck as unavailable
+    // long after permission is granted.
+    final PhotoPermissionStatus permission;
     try {
-      candidates = await _getAssetsCoalesced(start, end);
+      permission = await _photoPickerService.checkPermission();
     } catch (e) {
-      _log.error('Gallery query failed for media ${item.id}', error: e);
+      // checkPermission() ultimately hits platform code; treat a
+      // platform-channel failure like any other gallery failure rather than
+      // letting it bubble out of resolveAssetId() and break a Riverpod
+      // provider watching it.
+      _log.error('Permission check failed for media ${item.id}', error: e);
       return const ResolutionResult(status: ResolutionStatus.unavailable);
     }
+    if (permission != PhotoPermissionStatus.authorized &&
+        permission != PhotoPermissionStatus.limited) {
+      _log.info(
+        'Skipping gallery search for media ${item.id}: permission is $permission',
+      );
+      return const ResolutionResult(status: ResolutionStatus.unavailable);
+    }
+
+    // Step 3: Search gallery by metadata (with query coalescing). The gallery
+    // API takes LOCAL bounds, so one narrow window is queried per reading the
+    // matchers below will compare against -- see [_galleryReadings]. Two
+    // +-5s windows keep each query cheap; spanning a single window across both
+    // would cover the whole UTC offset and pull in hours of unrelated assets.
+    const timeWindow = Duration(seconds: 5);
+    final byId = <String, AssetInfo>{};
+    for (final reading in _galleryReadings(item.takenAt)) {
+      try {
+        final found = await _getAssetsCoalesced(
+          reading.subtract(timeWindow),
+          reading.add(timeWindow),
+        );
+        for (final asset in found) {
+          byId[asset.id] = asset;
+        }
+      } catch (e) {
+        _log.error('Gallery query failed for media ${item.id}', error: e);
+        return const ResolutionResult(status: ResolutionStatus.unavailable);
+      }
+    }
+    final candidates = byId.values.toList();
 
     if (candidates.isEmpty) {
       await _cacheUnresolved(item.id);
@@ -163,22 +200,49 @@ class AssetResolutionService {
       );
     }
 
-    // Tier 2: timestamp + dimensions
-    final tier2Match = matchByTimestampAndDimensions(item, candidates);
-    if (tier2Match != null) {
+    // Tier 2: exact capture second + dimensions. This runs BEFORE the fuzzy
+    // window below because widening the window destroys the signal for an
+    // interval/burst sequence: frames shot every two seconds share their
+    // dimensions and carry no usable filename, so +-2s sees the neighbours and
+    // gives up, while the exact second identifies the frame outright. Capture
+    // timestamps survive an iCloud round-trip unchanged, so an exact hit is
+    // trustworthy even when the asset ID came from another device.
+    final exactMatch = matchByTimestampAndDimensions(
+      item,
+      candidates,
+      tolerance: Duration.zero,
+    );
+    if (exactMatch != null) {
       await _cacheRepository.cacheResolution(
         mediaId: item.id,
-        localAssetId: tier2Match,
-        method: 'timestamp_dimensions',
+        localAssetId: exactMatch,
+        method: 'exact_timestamp_dimensions',
       );
-      _log.info('Resolved via timestamp+dimensions: $tier2Match');
+      _log.info('Resolved via exact timestamp+dimensions: $exactMatch');
       return ResolutionResult(
-        localAssetId: tier2Match,
+        localAssetId: exactMatch,
         status: ResolutionStatus.resolved,
       );
     }
 
-    // Tier 3: unresolved
+    // Tier 3: timestamp within +-2s + dimensions, for rows whose stored
+    // capture time drifted from the gallery's (re-imports, editors that
+    // rewrite EXIF).
+    final tier3Match = matchByTimestampAndDimensions(item, candidates);
+    if (tier3Match != null) {
+      await _cacheRepository.cacheResolution(
+        mediaId: item.id,
+        localAssetId: tier3Match,
+        method: 'timestamp_dimensions',
+      );
+      _log.info('Resolved via timestamp+dimensions: $tier3Match');
+      return ResolutionResult(
+        localAssetId: tier3Match,
+        status: ResolutionStatus.resolved,
+      );
+    }
+
+    // Tier 4: unresolved
     await _cacheUnresolved(item.id);
     _log.info('Could not resolve media ${item.id} -- marked unresolved');
     return const ResolutionResult(status: ResolutionStatus.unavailable);
@@ -264,36 +328,110 @@ class AssetResolutionService {
 
   /// Tier 1: Match by original filename and timestamp within +/-5 seconds.
   /// Returns the matching asset ID, or null if zero or multiple matches.
+  ///
+  /// An EMPTY filename counts as absent, on either side. photo_manager's
+  /// darwin layer serializes an asset title as "" (not null) unless
+  /// FilterOption.needTitle is set, and imports store that "" verbatim, so
+  /// without this guard a null-only check lets '' == '' satisfy the filename
+  /// test and quietly degrades this tier into a timestamp-only match that can
+  /// bind the wrong asset.
   static String? matchByFilenameAndTimestamp(
     MediaItem item,
     List<AssetInfo> candidates,
   ) {
-    if (item.originalFilename == null) return null;
+    final filename = item.originalFilename;
+    if (filename == null || filename.isEmpty) return null;
 
+    final readings = _galleryReadings(item.takenAt);
     final matches = candidates.where((c) {
-      if (c.filename != item.originalFilename) return false;
-      final diff = c.createDateTime.difference(item.takenAt).abs();
-      return diff <= const Duration(seconds: 5);
+      final candidateName = c.filename;
+      if (candidateName == null || candidateName.isEmpty) return false;
+      if (candidateName != filename) return false;
+      return readings.any(
+        (r) =>
+            c.createDateTime.difference(r).abs() <= const Duration(seconds: 5),
+      );
     }).toList();
 
     return matches.length == 1 ? matches.first.id : null;
   }
 
-  /// Tier 2: Match by dimensions and timestamp within +/-2 seconds.
+  /// Tier 2/3: Match by dimensions and timestamp within [tolerance].
   /// Returns the matching asset ID, or null if zero or multiple matches.
+  ///
+  /// [tolerance] is caller-supplied because the two useful widths trade off
+  /// against each other. [Duration.zero] demands the exact capture second,
+  /// which is what separates the frames of an interval/burst sequence
+  /// (identical dimensions, no usable filename, neighbours a second or two
+  /// away); the default +-2s absorbs clock drift between the stored row and
+  /// the gallery but sees those neighbours and refuses to guess.
   static String? matchByTimestampAndDimensions(
     MediaItem item,
-    List<AssetInfo> candidates,
-  ) {
+    List<AssetInfo> candidates, {
+    Duration tolerance = const Duration(seconds: 2),
+  }) {
     if (item.width == null || item.height == null) return null;
 
+    final itemSeconds = _galleryReadings(
+      item.takenAt,
+    ).map(_truncateToSecond).toList();
     final matches = candidates.where((c) {
       if (c.width != item.width || c.height != item.height) return false;
-      final diff = c.createDateTime.difference(item.takenAt).abs();
-      return diff <= const Duration(seconds: 2);
+      final candidateSecond = _truncateToSecond(c.createDateTime);
+      return itemSeconds.any(
+        (s) => candidateSecond.difference(s).abs() <= tolerance,
+      );
     }).toList();
 
     return matches.length == 1 ? matches.first.id : null;
+  }
+
+  /// The readings of a stored [MediaItem.takenAt] that could line up with a
+  /// gallery candidate's LOCAL [AssetInfo.createDateTime].
+  ///
+  /// `taken_at` is meant to hold wall-clock-as-UTC (the same convention as dive
+  /// entry times), so restating its calendar fields as local is the correct
+  /// reading and is listed first.
+  ///
+  /// Rows written by the import path before it normalised, however, hold the
+  /// INSTANT of a local [DateTime]; [MediaRepository] hydrates every row as UTC
+  /// regardless, so those rows arrive with their fields shifted by the offset
+  /// that was in force at import and it is the RAW value that already lines up
+  /// with a candidate's instant. Nothing in the schema distinguishes the two
+  /// populations, so both readings are offered rather than guessing: comparing
+  /// only the restated one would make every photo linked before the fix
+  /// unresolvable the moment its `platformAssetId` went stale.
+  ///
+  /// Callers accept a candidate matching EITHER reading, and the tiers keep
+  /// refusing whenever more than one candidate qualifies -- so a library that
+  /// happens to hold a second plausible asset exactly one UTC offset away is
+  /// declined rather than mis-bound.
+  ///
+  /// On a host running at UTC the two coincide and the list collapses to one.
+  static List<DateTime> _galleryReadings(DateTime takenAt) {
+    final restated = TripMediaScanner.wallClockUtcToLocal(takenAt);
+    if (restated.isAtSameMomentAs(takenAt)) return [restated];
+    return [restated, takenAt];
+  }
+
+  /// Both sides are compared at second granularity so [Duration.zero] means
+  /// "the same capture second" rather than "the same instant".
+  ///
+  /// The two sides do not carry the same precision: photo_manager derives
+  /// createDateTime from an integer `createDateSecond`, so a gallery candidate
+  /// can never have a sub-second component, while a stored takenAt is epoch
+  /// MILLISECONDS and could acquire one from a non-gallery import path. Without
+  /// this, such a row could never satisfy the exact tier - no candidate would
+  /// be reachable - and it would silently fall through to the ambiguous fuzzy
+  /// window that this tier exists to bypass.
+  static DateTime _truncateToSecond(DateTime t) {
+    final micros = t.microsecondsSinceEpoch;
+    // Dart's % is non-negative for a positive divisor, so this floors
+    // correctly on both sides of the epoch.
+    return DateTime.fromMicrosecondsSinceEpoch(
+      micros - (micros % Duration.microsecondsPerSecond),
+      isUtc: t.isUtc,
+    );
   }
 }
 

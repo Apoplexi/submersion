@@ -3,6 +3,8 @@ import 'package:libdivecomputer_plugin/libdivecomputer_plugin.dart' as pigeon;
 import 'package:uuid/uuid.dart';
 
 import 'package:submersion/core/database/database.dart';
+import 'package:submersion/features/dive_computer/data/services/libdc_dive_mode.dart';
+import 'package:submersion/features/dive_computer/data/services/parsed_tank_resolver.dart';
 
 /// Service responsible for applying re-parsed dive computer data back to the
 /// database while respecting the computer-authored vs user-authored field
@@ -77,7 +79,9 @@ class ReparseService {
 
       // ------------------------------------------------------------------
       // 5. Replace DiveProfileEvents, GasSwitches, TankPressureProfiles
-      //    These tables have no computerId column, so delete by diveId.
+      //    GasSwitches has no computerId column, so it is always deleted by
+      //    diveId; events and tank pressure carry computerId and are stamped
+      //    with this source's computer below.
       // ------------------------------------------------------------------
 
       // Check if this is a multi-source dive
@@ -88,7 +92,7 @@ class ReparseService {
 
       // Only replace events/switches/pressure for single-source dives.
       // Multi-source dives skip this to avoid destroying data from other
-      // sources (these tables lack a computerId column for per-source
+      // sources (gas_switches lacks a computerId column for per-source
       // scoping).
       if (!isMultiSource) {
         await (db.delete(
@@ -102,23 +106,36 @@ class ReparseService {
         )..where((t) => t.diveId.equals(diveId))).go();
 
         // Re-insert events from parsed data
-        await _insertEvents(diveId: diveId, parsed: parsed, now: now);
+        await _insertEvents(
+          diveId: diveId,
+          computerId: computerId,
+          parsed: parsed,
+          now: now,
+        );
       }
 
       // ------------------------------------------------------------------
       // 6. DiveTanks carry-over (primary + single-source only)
-      //    dive_tanks has no computerId, so skip for non-primary or
-      //    multi-source dives to avoid overwriting data from other sources.
+      //    Skip for non-primary or multi-source dives to avoid overwriting
+      //    tank data owned by other sources.
       // ------------------------------------------------------------------
       if (sourceRow.isPrimary && !isMultiSource) {
         final tankIdsByIndex = await _carryOverTanks(
           diveId: diveId,
+          computerId: computerId,
           parsed: parsed,
         );
         await _replaceTankPressureProfiles(
           diveId: diveId,
+          computerId: computerId,
           parsed: parsed,
           tankIdsByIndex: tankIdsByIndex,
+        );
+        await _insertGasSwitches(
+          diveId: diveId,
+          parsed: parsed,
+          tankIdsByIndex: tankIdsByIndex,
+          now: now,
         );
       }
     });
@@ -359,17 +376,29 @@ class ReparseService {
         exitTime: Value(exitTimeMs),
         bottomTime: Value(bottomTimeSeconds ?? parsed.durationSeconds),
         waterTemp: Value(parsed.minTemperatureCelsius),
-        diveMode: Value(_mapDiveMode(parsed.diveMode)),
+        diveMode: Value(mapLibdcDiveModeCode(parsed.diveMode)),
         cnsEnd: Value(_extractMaxCns(parsed.samples)),
         otu: const Value.absent(), // OTU is not directly in ParsedDive
         gradientFactorLow: Value(parsed.gfLow),
         gradientFactorHigh: Value(parsed.gfHigh),
         decoAlgorithm: Value(parsed.decoAlgorithm),
         decoConservatism: Value(parsed.decoConservatism),
-        entryLatitude: Value(parsed.entryLatitude),
-        entryLongitude: Value(parsed.entryLongitude),
-        exitLatitude: Value(parsed.exitLatitude),
-        exitLongitude: Value(parsed.exitLongitude),
+        // Only overwrite dive GPS when the computer actually parsed a fix.
+        // Value.absent() preserves positions stamped from other sources
+        // (GPS track logs, manual entry); the dive_data_sources row above
+        // still records exactly what the computer provided.
+        entryLatitude: parsed.entryLatitude != null
+            ? Value(parsed.entryLatitude)
+            : const Value.absent(),
+        entryLongitude: parsed.entryLongitude != null
+            ? Value(parsed.entryLongitude)
+            : const Value.absent(),
+        exitLatitude: parsed.exitLatitude != null
+            ? Value(parsed.exitLatitude)
+            : const Value.absent(),
+        exitLongitude: parsed.exitLongitude != null
+            ? Value(parsed.exitLongitude)
+            : const Value.absent(),
         updatedAt: Value(now.millisecondsSinceEpoch),
       ),
     );
@@ -407,6 +436,7 @@ class ReparseService {
             depth: Value(s.depthMeters),
             temperature: Value(s.temperatureCelsius),
             heartRate: Value(s.heartRate),
+            heading: Value(s.heading),
             setpoint: Value(s.setpoint),
             ppO2: Value(s.ppo2),
             cns: Value(s.cns),
@@ -417,6 +447,12 @@ class ReparseService {
             rbt: Value(s.rbt),
             decoType: Value(s.decoType),
             tts: Value(s.tts),
+            o2Sensor1: Value(s.o2Sensor1),
+            o2Sensor2: Value(s.o2Sensor2),
+            o2Sensor3: Value(s.o2Sensor3),
+            o2Sensor4: Value(s.o2Sensor4),
+            o2Sensor5: Value(s.o2Sensor5),
+            o2Sensor6: Value(s.o2Sensor6),
           ),
         );
       }
@@ -425,6 +461,7 @@ class ReparseService {
 
   Future<void> _insertEvents({
     required String diveId,
+    required String? computerId,
     required pigeon.ParsedDive parsed,
     required DateTime now,
   }) async {
@@ -442,6 +479,7 @@ class ReparseService {
           DiveProfileEventsCompanion(
             id: Value(_uuid.v4()),
             diveId: Value(diveId),
+            computerId: Value(computerId),
             timestamp: Value(e.timeSeconds),
             eventType: Value(eventType),
             severity: Value(_eventSeverity(eventType)),
@@ -457,10 +495,48 @@ class ReparseService {
     });
   }
 
+  /// Re-inserts gas switches derived from per-sample gas-mix transitions.
+  ///
+  /// The gas-usage timeline is driven solely by the `gas_switches` table; the
+  /// switches were cleared by the single-source replace step above, so without
+  /// this the dive would show the starting gas for its whole duration even when
+  /// the diver switched mixes. Each switch maps its cylinder index (assigned by
+  /// the shared resolver) to the freshly carried-over tank id.
+  Future<void> _insertGasSwitches({
+    required String diveId,
+    required pigeon.ParsedDive parsed,
+    required Map<int, String> tankIdsByIndex,
+    required DateTime now,
+  }) async {
+    final switches = resolveGasSwitches(parsed);
+    if (switches.isEmpty) return;
+
+    final nowMs = now.millisecondsSinceEpoch;
+
+    await db.batch((batch) {
+      for (final sw in switches) {
+        final tankId = tankIdsByIndex[sw.toTankIndex];
+        if (tankId == null) continue;
+        batch.insert(
+          db.gasSwitches,
+          GasSwitchesCompanion(
+            id: Value(_uuid.v4()),
+            diveId: Value(diveId),
+            timestamp: Value(sw.timeSeconds),
+            tankId: Value(tankId),
+            depth: Value(sw.depth),
+            createdAt: Value(nowMs),
+          ),
+        );
+      }
+    });
+  }
+
   /// Re-creates/updates dive_tanks from parsed data and returns a map of
   /// tank index -> tank row id, used to attach tank pressure profiles.
   Future<Map<int, String>> _carryOverTanks({
     required String diveId,
+    required String? computerId,
     required pigeon.ParsedDive parsed,
   }) async {
     final tankIdsByIndex = <int, String>{};
@@ -477,18 +553,11 @@ class ReparseService {
     // Build a set of new tank orders from parsed
     final newTankOrders = <int>{};
 
-    for (final tank in parsed.tanks) {
+    // Gas-mix linking and tankless synthesis (computers that report gas
+    // mixes but no tank records) live in the shared resolver so this path
+    // cannot drift from the live-download mapper.
+    for (final tank in resolveParsedTanks(parsed)) {
       newTankOrders.add(tank.index);
-
-      // Resolve gas mix. The tank's gas-mix link can be DC_GASMIX_UNKNOWN
-      // (e.g. Shearwater single-gas dives); fall back to the primary mix
-      // rather than assuming air, which would mislabel an EAN dive.
-      final gasMix = parsed.gasMixes.firstWhere(
-        (g) => g.index == tank.gasMixIndex,
-        orElse: () => parsed.gasMixes.isNotEmpty
-            ? parsed.gasMixes.first
-            : pigeon.GasMix(index: 0, o2Percent: 21.0, hePercent: 0.0),
-      );
 
       final existing = existingByOrder[tank.index];
       if (existing != null) {
@@ -500,10 +569,10 @@ class ReparseService {
           DiveTanksCompanion(
             volume: Value(tank.volumeLiters),
             workingPressure: const Value.absent(),
-            startPressure: Value(tank.startPressureBar),
-            endPressure: Value(tank.endPressureBar),
-            o2Percent: Value(gasMix.o2Percent),
-            hePercent: Value(gasMix.hePercent),
+            startPressure: Value(tank.startPressure),
+            endPressure: Value(tank.endPressure),
+            o2Percent: Value(tank.o2Percent),
+            hePercent: Value(tank.hePercent),
             // tankName, presetName, equipmentId, tankRole, tankMaterial
             // are user-authored -- NOT touched
           ),
@@ -518,13 +587,14 @@ class ReparseService {
               DiveTanksCompanion(
                 id: Value(newTankId),
                 diveId: Value(diveId),
+                computerId: Value(computerId),
                 volume: Value(tank.volumeLiters),
-                startPressure: Value(tank.startPressureBar),
-                endPressure: Value(tank.endPressureBar),
-                o2Percent: Value(gasMix.o2Percent),
-                hePercent: Value(gasMix.hePercent),
+                startPressure: Value(tank.startPressure),
+                endPressure: Value(tank.endPressure),
+                o2Percent: Value(tank.o2Percent),
+                hePercent: Value(tank.hePercent),
                 tankOrder: Value(tank.index),
-                tankRole: const Value('backGas'),
+                tankRole: Value(tank.role ?? 'backGas'),
               ),
             );
       }
@@ -550,6 +620,7 @@ class ReparseService {
   /// were already cleared by the single-source replace step above.
   Future<void> _replaceTankPressureProfiles({
     required String diveId,
+    required String? computerId,
     required pigeon.ParsedDive parsed,
     required Map<int, String> tankIdsByIndex,
   }) async {
@@ -581,6 +652,7 @@ class ReparseService {
               id: _uuid.v4(),
               diveId: diveId,
               tankId: tankId,
+              computerId: Value(computerId),
               timestamp: point.timestamp,
               pressure: point.pressure,
             ),
@@ -674,20 +746,6 @@ class ReparseService {
     if (ascentStartTimestamp <= descentEndTimestamp) return null;
 
     return ascentStartTimestamp - descentEndTimestamp;
-  }
-
-  /// Map dive mode strings from libdivecomputer to the app's enum values.
-  static String _mapDiveMode(String? mode) {
-    switch (mode) {
-      case 'open_circuit':
-        return 'oc';
-      case 'ccr':
-        return 'ccr';
-      case 'scr':
-        return 'scr';
-      default:
-        return 'oc';
-    }
   }
 
   /// Extract maximum CNS percentage from profile samples.

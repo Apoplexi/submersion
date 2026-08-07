@@ -2,6 +2,8 @@ import 'package:equatable/equatable.dart';
 
 import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/core/deco/constants/buhlmann_coefficients.dart';
+import 'package:submersion/core/utils/gas_compressibility.dart';
+import 'package:submersion/features/buddies/domain/entities/buddy.dart';
 import 'package:submersion/features/dive_centers/domain/entities/dive_center.dart';
 import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
 import 'package:submersion/features/dive_types/domain/entities/dive_type_entity.dart';
@@ -16,6 +18,8 @@ class Dive extends Equatable {
   final String id;
   final String? diverId;
   final int? diveNumber;
+  // User-defined dive name (#400). Null = never named.
+  final String? name;
   final DateTime dateTime; // Legacy field, kept for compatibility
   final DateTime? entryTime; // When diver entered water
   final DateTime? exitTime; // When diver exited water
@@ -39,10 +43,24 @@ class Dive extends Equatable {
   final double? waterTemp; // celsius
   final double? airTemp; // celsius
   final Visibility? visibility;
-  final String diveTypeId; // References dive_types table
+
+  /// References dive_types table (>= 1; first is the representative).
+  final List<String> diveTypeIds;
   final DiveTypeEntity? diveType; // Loaded dive type entity (for display)
   final String? buddy;
   final String? diveMaster;
+
+  /// Buddies and dive guides recorded on this dive via the many-to-many
+  /// `dive_buddies` junction (#553), each paired with their [DiveRole].
+  ///
+  /// Display-only: hydrated for list/table views (see
+  /// `DiveRepository.getAllDives`) and never persisted from this entity — the
+  /// dive editor writes the junction directly. Empty on the legacy scalar-only
+  /// path, in which case the [buddy] / [diveMaster] text fields are the source.
+  final List<BuddyWithRole> buddies;
+
+  /// The active diver's own role on this dive (dive_roles id, #547).
+  final String? diverRoleId;
   final int? rating; // 1-5 stars
   // Conditions fields
   final CurrentDirection? currentDirection;
@@ -72,6 +90,9 @@ class Dive extends Equatable {
   final WeightType? weightType;
   // Multiple weight entries per dive (v1.0)
   final List<DiveWeight> weights;
+  // Post-dive weighting feedback (v104); magnitude in kg, direction implied.
+  final WeightingFeedback? weightingFeedback;
+  final double? weightingFeedbackKg;
   // Favorites and tags (v1.1/v1.5)
   final bool isFavorite;
   final List<Tag> tags;
@@ -123,6 +144,11 @@ class Dive extends Equatable {
   final Precipitation? precipitation;
   final double? humidity; // 0-100
   final String? weatherDescription;
+
+  /// Raw WMO weather code from the forecast provider, when available.
+  /// Drives the localized weather description at display time.
+  final int? weatherCode;
+
   final WeatherSource? weatherSource;
   final DateTime? weatherFetchedAt;
 
@@ -130,6 +156,7 @@ class Dive extends Equatable {
     required this.id,
     this.diverId,
     this.diveNumber,
+    this.name,
     required this.dateTime,
     this.entryTime,
     this.exitTime,
@@ -152,10 +179,12 @@ class Dive extends Equatable {
     this.waterTemp,
     this.airTemp,
     this.visibility,
-    this.diveTypeId = 'recreational',
+    this.diveTypeIds = const ['recreational'],
     this.diveType,
     this.buddy,
     this.diveMaster,
+    this.buddies = const [],
+    this.diverRoleId,
     this.rating,
     this.currentDirection,
     this.currentStrength,
@@ -176,6 +205,8 @@ class Dive extends Equatable {
     this.weightAmount,
     this.weightType,
     this.weights = const [],
+    this.weightingFeedback,
+    this.weightingFeedbackKg,
     this.isFavorite = false,
     this.tags = const [],
     // CCR/SCR fields (v1.5)
@@ -210,6 +241,7 @@ class Dive extends Equatable {
     this.precipitation,
     this.humidity,
     this.weatherDescription,
+    this.weatherCode,
     this.weatherSource,
     this.weatherFetchedAt,
   });
@@ -217,15 +249,30 @@ class Dive extends Equatable {
   /// Effective start time of the dive (entryTime if set, otherwise dateTime)
   DateTime get effectiveEntryTime => entryTime ?? dateTime;
 
-  /// Display name for the dive type (uses entity name if loaded, otherwise capitalizes ID)
-  String get diveTypeName {
-    if (diveType != null) {
-      return diveType!.name;
-    }
-    // Fallback: capitalize the ID (e.g., 'recreational' -> 'Recreational')
-    if (diveTypeId.isEmpty) return 'Recreational';
-    return diveTypeId[0].toUpperCase() +
-        diveTypeId.substring(1).replaceAll('_', ' ');
+  /// User-defined name, normalized for display: trimmed, with empty or
+  /// whitespace-only values treated as unset (null). In-app writes never
+  /// store such values, but synced rows from other writers can; display
+  /// fallbacks and exports should use this instead of [name].
+  String? get effectiveName {
+    final trimmed = name?.trim();
+    return (trimmed == null || trimmed.isEmpty) ? null : trimmed;
+  }
+
+  /// Display name for the representative (first) dive type.
+  String get diveTypeName => diveType?.name ?? diveTypeDisplayName(diveTypeId);
+
+  /// Representative (first) dive type slug. Always present (>= 1 invariant).
+  String get diveTypeId =>
+      diveTypeIds.isEmpty ? 'recreational' : diveTypeIds.first;
+
+  /// Display names for all of this dive's types.
+  List<String> get diveTypeNames =>
+      diveTypeIds.map(diveTypeDisplayName).toList();
+
+  /// Capitalize a slug for display, e.g. 'deep_wreck' -> 'Deep wreck'.
+  static String diveTypeDisplayName(String id) {
+    if (id.isEmpty) return 'Recreational';
+    return id[0].toUpperCase() + id.substring(1).replaceAll('_', ' ');
   }
 
   /// Best available runtime for this dive.
@@ -260,6 +307,10 @@ class Dive extends Equatable {
   /// Whether this is an SCR dive
   bool get isSCR => diveMode == DiveMode.scr;
 
+  /// Whether this is a gauge (bottom-timer) dive: depth+time only, no gas
+  /// or decompression modeling.
+  bool get isGauge => diveMode == DiveMode.gauge;
+
   /// Whether this is any type of rebreather dive
   bool get isRebreather => isCCR || isSCR;
 
@@ -278,6 +329,7 @@ class Dive extends Equatable {
 
   /// Air consumption rate in L/min at surface (Surface Air Consumption)
   /// Calculates total gas consumed across all tanks with valid data.
+  /// Uses gas compressibility (Z-factor) and bar→atm conversion for accuracy.
   double? get sac {
     if (tanks.isEmpty || effectiveRuntime == null || avgDepth == null) {
       return null;
@@ -302,9 +354,22 @@ class Dive extends Equatable {
       final pressureUsed = tank.startPressure! - tank.endPressure!;
       if (pressureUsed <= 0) continue;
 
-      // Gas in liters at surface = tank_volume × pressure_used
-      // Example: 12L tank, 100 bar used = 1200 liters at surface
-      final gasLiters = tank.volume! * pressureUsed;
+      // Gas volume using real-gas compressibility correction
+      final startVolume = gasVolume(
+        tankSizeLiters: tank.volume!,
+        pressureBar: tank.startPressure!,
+        o2Percent: tank.gasMix.o2,
+        hePercent: tank.gasMix.he,
+      );
+      final endVolume = gasVolume(
+        tankSizeLiters: tank.volume!,
+        pressureBar: tank.endPressure!,
+        o2Percent: tank.gasMix.o2,
+        hePercent: tank.gasMix.he,
+      );
+      final gasLiters = startVolume - endVolume;
+      if (gasLiters <= 0) continue;
+
       totalGasLiters += gasLiters;
       tanksWithData++;
     }
@@ -328,26 +393,29 @@ class Dive extends Equatable {
 
     final avgPressureAtm = (avgDepth! / 10) + 1; // Convert depth to ATM
 
-    // Sum pressure consumed across all tanks with data
-    double totalPressureUsed = 0;
-    int tanksWithData = 0;
-
-    for (final tank in tanks) {
-      if (tank.startPressure == null || tank.endPressure == null) {
-        continue;
-      }
-
-      final pressureUsed = tank.startPressure! - tank.endPressure!;
-      if (pressureUsed <= 0) continue;
-
-      totalPressureUsed += pressureUsed;
-      tanksWithData++;
+    // For multi-tank dives use back gas only; single-tank dives use that tank.
+    // If no tank has TankRole.backGas, fall back to the first tank.
+    final DiveTank referenceTank;
+    if (tanks.length == 1) {
+      referenceTank = tanks.first;
+    } else {
+      referenceTank = tanks.firstWhere(
+        (t) => t.role == TankRole.backGas,
+        orElse: () => tanks.first,
+      );
     }
 
-    if (tanksWithData == 0 || totalPressureUsed <= 0) return null;
+    if (referenceTank.startPressure == null ||
+        referenceTank.endPressure == null) {
+      return null;
+    }
 
-    // SAC in bar/min at surface (average across all tanks)
-    return (totalPressureUsed / tanksWithData) / minutes / avgPressureAtm;
+    final pressureUsed =
+        referenceTank.startPressure! - referenceTank.endPressure!;
+    if (pressureUsed <= 0) return null;
+
+    // SAC in bar/min at surface
+    return pressureUsed / minutes / avgPressureAtm;
   }
 
   /// Calculate bottom time from dive profile data.
@@ -463,6 +531,7 @@ class Dive extends Equatable {
     String? id,
     String? diverId,
     int? diveNumber,
+    String? name,
     DateTime? dateTime,
     DateTime? entryTime,
     DateTime? exitTime,
@@ -485,10 +554,12 @@ class Dive extends Equatable {
     double? waterTemp,
     double? airTemp,
     Visibility? visibility,
-    String? diveTypeId,
+    List<String>? diveTypeIds,
     DiveTypeEntity? diveType,
     String? buddy,
     String? diveMaster,
+    List<BuddyWithRole>? buddies,
+    String? diverRoleId,
     int? rating,
     CurrentDirection? currentDirection,
     CurrentStrength? currentStrength,
@@ -509,6 +580,8 @@ class Dive extends Equatable {
     double? weightAmount,
     WeightType? weightType,
     List<DiveWeight>? weights,
+    WeightingFeedback? weightingFeedback,
+    double? weightingFeedbackKg,
     bool? isFavorite,
     List<Tag>? tags,
     // CCR/SCR fields
@@ -543,6 +616,7 @@ class Dive extends Equatable {
     Precipitation? precipitation,
     double? humidity,
     String? weatherDescription,
+    int? weatherCode,
     WeatherSource? weatherSource,
     DateTime? weatherFetchedAt,
   }) {
@@ -550,6 +624,7 @@ class Dive extends Equatable {
       id: id ?? this.id,
       diverId: diverId ?? this.diverId,
       diveNumber: diveNumber ?? this.diveNumber,
+      name: name ?? this.name,
       dateTime: dateTime ?? this.dateTime,
       entryTime: entryTime ?? this.entryTime,
       exitTime: exitTime ?? this.exitTime,
@@ -572,10 +647,12 @@ class Dive extends Equatable {
       waterTemp: waterTemp ?? this.waterTemp,
       airTemp: airTemp ?? this.airTemp,
       visibility: visibility ?? this.visibility,
-      diveTypeId: diveTypeId ?? this.diveTypeId,
+      diveTypeIds: diveTypeIds ?? this.diveTypeIds,
       diveType: diveType ?? this.diveType,
       buddy: buddy ?? this.buddy,
       diveMaster: diveMaster ?? this.diveMaster,
+      buddies: buddies ?? this.buddies,
+      diverRoleId: diverRoleId ?? this.diverRoleId,
       rating: rating ?? this.rating,
       currentDirection: currentDirection ?? this.currentDirection,
       currentStrength: currentStrength ?? this.currentStrength,
@@ -596,6 +673,8 @@ class Dive extends Equatable {
       weightAmount: weightAmount ?? this.weightAmount,
       weightType: weightType ?? this.weightType,
       weights: weights ?? this.weights,
+      weightingFeedback: weightingFeedback ?? this.weightingFeedback,
+      weightingFeedbackKg: weightingFeedbackKg ?? this.weightingFeedbackKg,
       isFavorite: isFavorite ?? this.isFavorite,
       tags: tags ?? this.tags,
       // CCR/SCR fields
@@ -630,6 +709,7 @@ class Dive extends Equatable {
       precipitation: precipitation ?? this.precipitation,
       humidity: humidity ?? this.humidity,
       weatherDescription: weatherDescription ?? this.weatherDescription,
+      weatherCode: weatherCode ?? this.weatherCode,
       weatherSource: weatherSource ?? this.weatherSource,
       weatherFetchedAt: weatherFetchedAt ?? this.weatherFetchedAt,
     );
@@ -640,6 +720,7 @@ class Dive extends Equatable {
     id,
     diverId,
     diveNumber,
+    name,
     dateTime,
     entryTime,
     exitTime,
@@ -662,10 +743,12 @@ class Dive extends Equatable {
     waterTemp,
     airTemp,
     visibility,
-    diveTypeId,
+    diveTypeIds,
     diveType,
     buddy,
     diveMaster,
+    buddies,
+    diverRoleId,
     rating,
     currentDirection,
     currentStrength,
@@ -686,6 +769,8 @@ class Dive extends Equatable {
     weightAmount,
     weightType,
     weights,
+    weightingFeedback,
+    weightingFeedbackKg,
     isFavorite,
     tags,
     // CCR/SCR fields
@@ -720,6 +805,7 @@ class Dive extends Equatable {
     precipitation,
     humidity,
     weatherDescription,
+    weatherCode,
     weatherSource,
     weatherFetchedAt,
   ];
@@ -731,9 +817,17 @@ class DiveProfilePoint extends Equatable {
   final double depth; // meters
   final double? temperature; // celsius
   final int? heartRate; // bpm
+  final double? heading; // compass heading in degrees (0-359); null if absent
   // CCR/SCR rebreather data (v1.5)
   final double? setpoint; // Current setpoint at this sample (bar)
   final double? ppO2; // Measured/calculated ppO2 (bar)
+  // Individual O2 cell readings (bar), stored raw; null when absent
+  final double? o2Sensor1;
+  final double? o2Sensor2;
+  final double? o2Sensor3;
+  final double? o2Sensor4;
+  final double? o2Sensor5;
+  final double? o2Sensor6;
   // Wearable integration (v2.0)
   final String? heartRateSource; // 'diveComputer', 'appleWatch', 'garmin'
   // Decompression data
@@ -750,8 +844,15 @@ class DiveProfilePoint extends Equatable {
     required this.depth,
     this.temperature,
     this.heartRate,
+    this.heading,
     this.setpoint,
     this.ppO2,
+    this.o2Sensor1,
+    this.o2Sensor2,
+    this.o2Sensor3,
+    this.o2Sensor4,
+    this.o2Sensor5,
+    this.o2Sensor6,
     this.heartRateSource,
     this.cns,
     this.ndl,
@@ -767,8 +868,15 @@ class DiveProfilePoint extends Equatable {
     double? depth,
     double? temperature,
     int? heartRate,
+    double? heading,
     double? setpoint,
     double? ppO2,
+    double? o2Sensor1,
+    double? o2Sensor2,
+    double? o2Sensor3,
+    double? o2Sensor4,
+    double? o2Sensor5,
+    double? o2Sensor6,
     String? heartRateSource,
     double? cns,
     int? ndl,
@@ -783,8 +891,15 @@ class DiveProfilePoint extends Equatable {
       depth: depth ?? this.depth,
       temperature: temperature ?? this.temperature,
       heartRate: heartRate ?? this.heartRate,
+      heading: heading ?? this.heading,
       setpoint: setpoint ?? this.setpoint,
       ppO2: ppO2 ?? this.ppO2,
+      o2Sensor1: o2Sensor1 ?? this.o2Sensor1,
+      o2Sensor2: o2Sensor2 ?? this.o2Sensor2,
+      o2Sensor3: o2Sensor3 ?? this.o2Sensor3,
+      o2Sensor4: o2Sensor4 ?? this.o2Sensor4,
+      o2Sensor5: o2Sensor5 ?? this.o2Sensor5,
+      o2Sensor6: o2Sensor6 ?? this.o2Sensor6,
       heartRateSource: heartRateSource ?? this.heartRateSource,
       cns: cns ?? this.cns,
       ndl: ndl ?? this.ndl,
@@ -802,8 +917,15 @@ class DiveProfilePoint extends Equatable {
     depth,
     temperature,
     heartRate,
+    heading,
     setpoint,
     ppO2,
+    o2Sensor1,
+    o2Sensor2,
+    o2Sensor3,
+    o2Sensor4,
+    o2Sensor5,
+    o2Sensor6,
     heartRateSource,
     cns,
     ndl,
@@ -849,6 +971,16 @@ class DiveTank extends Equatable {
   final int order; // for multi-tank ordering
   final String? presetName; // name of preset used (e.g., 'al80', 'hp100')
 
+  /// The dive computer this tank was attributed to, for multi-source dives.
+  /// Null means the tank is unattributed (single-source dive, or a manually
+  /// entered/edited tank not tied to a specific computer).
+  final String? computerId;
+
+  /// Deco gas-switch depth override in meters (planning only); null = auto
+  /// (MOD at the deco pO2). Subsurface per-cylinder "Deco switch at", v120.
+  /// Unused for logged-dive tanks.
+  final double? decoSwitchDepth;
+
   const DiveTank({
     required this.id,
     this.name,
@@ -861,6 +993,8 @@ class DiveTank extends Equatable {
     this.material,
     this.order = 0,
     this.presetName,
+    this.computerId,
+    this.decoSwitchDepth,
   });
 
   /// Pressure consumed during dive
@@ -883,6 +1017,9 @@ class DiveTank extends Equatable {
     int? order,
     String? presetName,
     bool clearPresetName = false,
+    String? computerId,
+    double? decoSwitchDepth,
+    bool clearDecoSwitchDepth = false,
   }) {
     return DiveTank(
       id: id ?? this.id,
@@ -896,6 +1033,10 @@ class DiveTank extends Equatable {
       material: material ?? this.material,
       order: order ?? this.order,
       presetName: clearPresetName ? null : (presetName ?? this.presetName),
+      computerId: computerId ?? this.computerId,
+      decoSwitchDepth: clearDecoSwitchDepth
+          ? null
+          : (decoSwitchDepth ?? this.decoSwitchDepth),
     );
   }
 
@@ -912,6 +1053,8 @@ class DiveTank extends Equatable {
     material,
     order,
     presetName,
+    computerId,
+    decoSwitchDepth,
   ];
 }
 

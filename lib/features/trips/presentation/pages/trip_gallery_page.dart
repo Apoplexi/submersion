@@ -68,7 +68,7 @@ class TripGalleryPage extends ConsumerWidget {
       // Get trip and dives
       final trip = await ref.read(tripByIdProvider(tripId).future);
       if (trip == null) {
-        if (context.mounted) Navigator.of(context).pop();
+        if (context.mounted) Navigator.of(context, rootNavigator: true).pop();
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(context.l10n.trips_gallery_tripNotFound)),
@@ -80,7 +80,7 @@ class TripGalleryPage extends ConsumerWidget {
       final dives = await ref.read(divesForTripProvider(tripId).future);
 
       if (dives.isEmpty) {
-        if (context.mounted) Navigator.of(context).pop();
+        if (context.mounted) Navigator.of(context, rootNavigator: true).pop();
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(context.l10n.trips_gallery_addDivesFirst)),
@@ -111,7 +111,7 @@ class TripGalleryPage extends ConsumerWidget {
       );
 
       if (!context.mounted) return;
-      Navigator.of(context).pop(); // Dismiss loading
+      Navigator.of(context, rootNavigator: true).pop(); // Dismiss loading
 
       if (result == null) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -132,7 +132,7 @@ class TripGalleryPage extends ConsumerWidget {
       // Import selected photos
       await _importPhotos(context, ref, dialogResult.selectedPhotos);
     } catch (e) {
-      if (context.mounted) Navigator.of(context).pop();
+      if (context.mounted) Navigator.of(context, rootNavigator: true).pop();
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -189,7 +189,7 @@ class TripGalleryPage extends ConsumerWidget {
       ref.invalidate(flatMediaListForTripProvider(tripId));
 
       if (!context.mounted) return;
-      Navigator.of(context).pop(); // Dismiss progress
+      Navigator.of(context, rootNavigator: true).pop(); // Dismiss progress
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -197,7 +197,7 @@ class TripGalleryPage extends ConsumerWidget {
         ),
       );
     } catch (e) {
-      if (context.mounted) Navigator.of(context).pop();
+      if (context.mounted) Navigator.of(context, rootNavigator: true).pop();
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(

@@ -33,12 +33,18 @@ final allCertificationsProvider = FutureProvider<List<Certification>>((
   final validatedDiverId = await ref.watch(
     validatedCurrentDiverIdProvider.future,
   );
-  final sub = repository.watchCertificationsChanges().listen(
-    (_) => ref.invalidateSelf(),
-  );
-  ref.onDispose(sub.cancel);
+  ref.invalidateSelfWhen(repository.watchCertificationsChanges());
   return repository.getAllCertifications(diverId: validatedDiverId);
 });
+
+/// Certifications owned by a specific buddy (issue #553). Self-invalidates on
+/// any certifications-table change, including sync.
+final buddyCertificationsProvider =
+    FutureProvider.family<List<Certification>, String>((ref, buddyId) async {
+      final repository = ref.watch(certificationRepositoryProvider);
+      ref.invalidateSelfWhen(repository.watchCertificationsChanges());
+      return repository.getCertificationsByBuddy(buddyId);
+    });
 
 /// Certification sort state provider
 final certificationSortProvider =

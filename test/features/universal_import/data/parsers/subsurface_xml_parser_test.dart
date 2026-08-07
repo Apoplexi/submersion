@@ -570,15 +570,23 @@ void main() {
       expect(profile[1]['decoType'], 2);
     });
 
-    test('maps sample po2 to ppO2', () async {
+    test('carries delta-encoded ndl, tts, cns, and in_deco forward across '
+        'samples that omit them', () async {
+      // Subsurface only writes these attributes when the value changes
+      // from the previous sample; omission means "unchanged".
       final result = await parser.parse(
         xmlBytes('''
 <divelog program='subsurface' version='3'>
 <dives>
-<dive number='1' date='2025-01-15' time='10:00:00' duration='2:00 min'>
-  <divecomputer model='Test CCR'>
+<dive number='1' date='2025-01-15' time='10:00:00' duration='6:00 min'>
+  <divecomputer model='Test'>
   <depth max='20.0 m' mean='15.0 m' />
-  <sample time='1:00 min' depth='20.0 m' po2='1.21' />
+  <sample time='1:00 min' depth='20.0 m' />
+  <sample time='2:00 min' depth='20.0 m' ndl='0:00 min' tts='8:00 min' cns='12%' in_deco='1' />
+  <sample time='3:00 min' depth='18.0 m' />
+  <sample time='4:00 min' depth='15.0 m' tts='5:00 min' />
+  <sample time='5:00 min' depth='6.0 m' tts='0:00 min' in_deco='0' />
+  <sample time='6:00 min' depth='3.0 m' />
   </divecomputer>
 </dive>
 </dives>
@@ -589,7 +597,239 @@ void main() {
       final dive = result.entitiesOf(ImportEntityType.dives).first;
       final profile = dive['profile'] as List<Map<String, dynamic>>;
 
-      expect(profile.single['ppO2'], 1.21);
+      // Before the first occurrence the values are genuinely unknown
+      expect(profile[0]['tts'], isNull);
+      expect(profile[0]['ndl'], isNull);
+      expect(profile[0]['cns'], isNull);
+      expect(profile[0]['decoType'], isNull);
+
+      // Explicit values
+      expect(profile[1]['tts'], 480);
+      expect(profile[1]['ndl'], 0);
+      expect(profile[1]['cns'], 12.0);
+      expect(profile[1]['decoType'], 2);
+
+      // Omitted attributes hold the previous value
+      expect(profile[2]['tts'], 480);
+      expect(profile[2]['ndl'], 0);
+      expect(profile[2]['cns'], 12.0);
+      expect(profile[2]['decoType'], 2);
+
+      expect(profile[3]['tts'], 300);
+
+      // Explicit tts=0 with in_deco=0 ends the obligation
+      expect(profile[4]['tts'], 0);
+      expect(profile[4]['decoType'], isNull);
+
+      // And the zero/cleared state also carries forward
+      expect(profile[5]['tts'], 0);
+      expect(profile[5]['decoType'], isNull);
+    });
+
+    test('maps delta-encoded stopdepth to ceiling and carries it forward '
+        'across samples that omit it', () async {
+      // Subsurface writes stopdepth only when the computer's stop depth
+      // changes; omission means "unchanged", so the value is sticky like
+      // ndl/tts/cns/in_deco.
+      final result = await parser.parse(
+        xmlBytes('''
+<divelog program='subsurface' version='3'>
+<dives>
+<dive number='1' date='2025-01-15' time='10:00:00' duration='4:00 min'>
+  <divecomputer model='Test'>
+  <depth max='40.0 m' mean='30.0 m' />
+  <sample time='1:00 min' depth='40.0 m' />
+  <sample time='2:00 min' depth='40.0 m' in_deco='1' stopdepth='6.0 m' />
+  <sample time='3:00 min' depth='38.0 m' />
+  <sample time='4:00 min' depth='30.0 m' stopdepth='9.0 m' />
+  </divecomputer>
+</dive>
+</dives>
+</divelog>
+'''),
+      );
+
+      final dive = result.entitiesOf(ImportEntityType.dives).first;
+      final profile = dive['profile'] as List<Map<String, dynamic>>;
+
+      // Before the first stopdepth the ceiling is genuinely unknown.
+      expect(profile[0]['ceiling'], isNull);
+      // Explicit stop depth maps straight to ceiling (meters).
+      expect(profile[1]['ceiling'], 6.0);
+      // A sample that omits stopdepth inherits the previous value.
+      expect(profile[2]['ceiling'], 6.0);
+      // The next explicit value takes over.
+      expect(profile[3]['ceiling'], 9.0);
+    });
+
+    test(
+      "stopdepth '0.0 m' clears the obligation instead of being skipped",
+      () async {
+        // 0.0 m is a real "no stop" value, not missing data, so it maps to no
+        // ceiling and that cleared state carries forward.
+        final result = await parser.parse(
+          xmlBytes('''
+<divelog program='subsurface' version='3'>
+<dives>
+<dive number='1' date='2025-01-15' time='10:00:00' duration='3:00 min'>
+  <divecomputer model='Test'>
+  <depth max='40.0 m' mean='20.0 m' />
+  <sample time='1:00 min' depth='40.0 m' in_deco='1' stopdepth='6.0 m' />
+  <sample time='2:00 min' depth='6.0 m' in_deco='0' stopdepth='0.0 m' />
+  <sample time='3:00 min' depth='3.0 m' />
+  </divecomputer>
+</dive>
+</dives>
+</divelog>
+'''),
+        );
+
+        final dive = result.entitiesOf(ImportEntityType.dives).first;
+        final profile = dive['profile'] as List<Map<String, dynamic>>;
+
+        expect(profile[0]['ceiling'], 6.0);
+        // 0.0 m resolves to no obligation.
+        expect(profile[1]['ceiling'], isNull);
+        // The cleared state carries forward to samples that omit stopdepth.
+        expect(profile[2]['ceiling'], isNull);
+      },
+    );
+
+    test('re-acquires a ceiling after a stopdepth 0.0 clear', () async {
+      // A sawtooth profile can clear the obligation and then incur it again;
+      // an explicit stopdepth after a 0.0 must restore the ceiling rather than
+      // latch the cleared state.
+      final result = await parser.parse(
+        xmlBytes('''
+<divelog program='subsurface' version='3'>
+<dives>
+<dive number='1' date='2025-01-15' time='10:00:00' duration='4:00 min'>
+  <divecomputer model='Test'>
+  <depth max='40.0 m' mean='25.0 m' />
+  <sample time='1:00 min' depth='40.0 m' in_deco='1' stopdepth='6.0 m' />
+  <sample time='2:00 min' depth='5.0 m' in_deco='0' stopdepth='0.0 m' />
+  <sample time='3:00 min' depth='38.0 m' in_deco='1' stopdepth='9.0 m' />
+  <sample time='4:00 min' depth='36.0 m' />
+  </divecomputer>
+</dive>
+</dives>
+</divelog>
+'''),
+      );
+
+      final dive = result.entitiesOf(ImportEntityType.dives).first;
+      final profile = dive['profile'] as List<Map<String, dynamic>>;
+
+      expect(profile[0]['ceiling'], 6.0);
+      expect(profile[1]['ceiling'], isNull);
+      // Re-acquired after the clear.
+      expect(profile[2]['ceiling'], 9.0);
+      // And the re-acquired value carries forward.
+      expect(profile[3]['ceiling'], 9.0);
+    });
+
+    test(
+      'maps sample po2 to setpoint (not ppO2) and carries it forward',
+      () async {
+        // Subsurface exports the CCR setpoint as `po2`, delta-encoded (written
+        // only when it changes). It is NOT the measured ppO2.
+        final result = await parser.parse(
+          xmlBytes('''
+<divelog program='subsurface' version='3'>
+<dives>
+<dive number='1' date='2025-01-15' time='10:00:00' duration='3:00 min'>
+  <divecomputer model='Test CCR' dctype='CCR'>
+  <depth max='20.0 m' mean='15.0 m' />
+  <sample time='0:10 min' depth='5.0 m' po2='0.7' />
+  <sample time='1:00 min' depth='20.0 m' />
+  <sample time='2:00 min' depth='20.0 m' po2='1.3' />
+  <sample time='3:00 min' depth='15.0 m' />
+  </divecomputer>
+</dive>
+</dives>
+</divelog>
+'''),
+        );
+
+        final dive = result.entitiesOf(ImportEntityType.dives).first;
+        final profile = dive['profile'] as List<Map<String, dynamic>>;
+
+        // po2 feeds setpoint, carried forward across samples that omit it.
+        expect(profile[0]['setpoint'], 0.7);
+        expect(profile[1]['setpoint'], 0.7);
+        expect(profile[2]['setpoint'], 1.3);
+        expect(profile[3]['setpoint'], 1.3);
+        // po2 must NOT be stored as measured ppO2.
+        expect(profile.every((p) => !p.containsKey('ppO2')), isTrue);
+      },
+    );
+
+    test(
+      'maps dc_supplied_ppo2 to ppO2, carried forward (delta-encoded)',
+      () async {
+        final result = await parser.parse(
+          xmlBytes('''
+<divelog program='subsurface' version='3'>
+<dives>
+<dive number='1' date='2025-01-15' time='10:00:00' duration='3:00 min'>
+  <divecomputer model='Test CCR' dctype='CCR'>
+  <depth max='20.0 m' mean='15.0 m' />
+  <sample time='1:00 min' depth='20.0 m' dc_supplied_ppo2='1.26' />
+  <sample time='2:00 min' depth='20.0 m' />
+  <sample time='3:00 min' depth='20.0 m' dc_supplied_ppo2='1.30' />
+  </divecomputer>
+</dive>
+</dives>
+</divelog>
+'''),
+        );
+
+        final dive = result.entitiesOf(ImportEntityType.dives).first;
+        final profile = dive['profile'] as List<Map<String, dynamic>>;
+
+        expect(profile[0]['ppO2'], 1.26);
+        // dc_supplied_ppo2 is delta-encoded: an absent value means unchanged.
+        expect(profile[1]['ppO2'], 1.26);
+        expect(profile[2]['ppO2'], 1.30);
+      },
+    );
+
+    test('imports O2 cells and carries each forward (delta-encoded)', () async {
+      final result = await parser.parse(
+        xmlBytes('''
+<divelog program='subsurface' version='3'>
+<dives>
+<dive number='1' date='2025-01-15' time='10:00:00' duration='3:00 min'>
+  <divecomputer model='Test CCR' dctype='CCR' no_o2sensors='3'>
+  <depth max='20.0 m' mean='15.0 m' />
+  <sample time='1:00 min' depth='20.0 m' sensor1='0.641 bar' sensor2='0.659 bar' sensor3='0.664 bar' />
+  <sample time='2:00 min' depth='20.0 m' sensor1='0.700 bar' />
+  <sample time='3:00 min' depth='20.0 m' />
+  </divecomputer>
+</dive>
+</dives>
+</divelog>
+'''),
+      );
+
+      final dive = result.entitiesOf(ImportEntityType.dives).first;
+      final profile = dive['profile'] as List<Map<String, dynamic>>;
+
+      expect(profile[0]['o2Sensor1'], 0.641);
+      expect(profile[0]['o2Sensor2'], 0.659);
+      expect(profile[0]['o2Sensor3'], 0.664);
+      // Each cell is delta-encoded: only sensor1 changed at 2:00, the others
+      // carry forward; at 3:00 nothing is written so all three carry forward.
+      expect(profile[1]['o2Sensor1'], 0.700);
+      expect(profile[1]['o2Sensor2'], 0.659);
+      expect(profile[1]['o2Sensor3'], 0.664);
+      expect(profile[2]['o2Sensor1'], 0.700);
+      expect(profile[2]['o2Sensor2'], 0.659);
+      expect(profile[2]['o2Sensor3'], 0.664);
+      // Cell 4 never appears -> stays absent (not synthesized).
+      expect(profile[0].containsKey('o2Sensor4'), isFalse);
+      // Cells are never averaged into ppO2 on import.
+      expect(profile.every((p) => !p.containsKey('ppO2')), isTrue);
     });
   });
 
@@ -1840,6 +2080,76 @@ $diveXml
               'value 1.4 is NOT below 0.18, so it falls into the ppO2High default',
         );
         expect(events[0]['value'], 1.4);
+      },
+    );
+  });
+
+  group('CCR fixtures (real Subsurface exports)', () {
+    Future<List<Map<String, dynamic>>> profileOf(String path) async {
+      final bytes = Uint8List.fromList(await File(path).readAsBytes());
+      final result = await parser.parse(bytes);
+      final dive = result.entitiesOf(ImportEntityType.dives).first;
+      return dive['profile'] as List<Map<String, dynamic>>;
+    }
+
+    test(
+      '002 (cells only, no calculated po2): cells imported, ppO2 stays null',
+      () async {
+        final profile = await profileOf(
+          'test/dives/002_ccr_only_low_sp_no_calculated_po2.ssrf.xml',
+        );
+
+        // Only one po2 (0.7) appears; it is the setpoint, carried forward.
+        expect(profile.first['setpoint'], 0.7);
+        expect(profile.last['setpoint'], 0.7);
+        // No dc_supplied_ppo2 anywhere -> measured ppO2 never set.
+        expect(profile.any((p) => p.containsKey('ppO2')), isFalse);
+        // Individual cells are imported raw.
+        expect(profile.any((p) => p.containsKey('o2Sensor1')), isTrue);
+      },
+    );
+
+    test(
+      '003 (setpoint switch + calculated po2): setpoint, ppO2 and cells',
+      () async {
+        final profile = await profileOf(
+          'test/dives/003_ccr_with_setpoint_switch_and_calculated_po2.ssrf.xml',
+        );
+
+        // Setpoint switch low -> high -> low, carried forward between changes.
+        final setpoints = profile
+            .map((p) => p['setpoint'] as double?)
+            .whereType<double>()
+            .toSet();
+        expect(setpoints, containsAll(<double>[0.7, 1.3]));
+        // Calculated ppO2 (dc_supplied_ppo2) is imported as measured ppO2.
+        expect(profile.any((p) => p.containsKey('ppO2')), isTrue);
+        // Individual cells are imported raw.
+        expect(profile.any((p) => p.containsKey('o2Sensor1')), isTrue);
+      },
+    );
+
+    test(
+      '003 (deco stop schedule): stopdepth maps to a non-null ceiling from the '
+      'first stop onward with the 6/9/12/15 m schedule intact',
+      () async {
+        final profile = await profileOf(
+          'test/dives/003_ccr_with_setpoint_switch_and_calculated_po2.ssrf.xml',
+        );
+
+        // The opening samples are pre-deco and carry no ceiling.
+        expect(profile.first['ceiling'], isNull);
+        // The computer reports stop depths that reach the app as ceilings.
+        expect(profile.any((p) => p['ceiling'] != null), isTrue);
+        // The full stop schedule survives the import rather than being thrown
+        // away (previously every ceiling was null).
+        final ceilings = profile
+            .map((p) => p['ceiling'] as double?)
+            .whereType<double>()
+            .toSet();
+        expect(ceilings, containsAll(<double>[6.0, 9.0, 12.0, 15.0]));
+        // stopdepth '0.0 m' near the end clears the obligation.
+        expect(profile.last['ceiling'], isNull);
       },
     );
   });

@@ -139,10 +139,13 @@ typedef struct {
     double temperature;        // celsius (NAN if unavailable)
     double pressure;           // bar (NAN if unavailable)
     unsigned int tank;         // tank index (UINT32_MAX if unavailable)
+    unsigned int gasmix;       // active gas mix index (UINT32_MAX if unavailable)
     // New fields for full sample capture
     unsigned int heartbeat;    // bpm (UINT32_MAX if unavailable)
+    unsigned int heading;      // compass heading in degrees 0-359 (UINT32_MAX if unavailable)
     double setpoint;           // bar (NAN if unavailable)
-    double ppo2;               // bar (NAN if unavailable, first sensor)
+    double ppo2;               // bar (NAN if unavailable; aggregate/computed)
+    double o2_sensor[6];       // per-cell ppO2 in bar (NAN if that cell absent)
     double cns;                // percentage 0-100 (NAN if unavailable)
     unsigned int rbt;          // remaining bottom time in seconds (UINT32_MAX if unavailable)
     // Decompression status at this sample
@@ -163,6 +166,7 @@ typedef struct {
     double workpressure;       // bar
     double beginpressure;      // bar
     double endpressure;        // bar
+    unsigned int usage;        // dc_usage_t (0=none, 1=oxygen, 2=diluent, 3=sidemount)
 } libdc_tank_t;
 
 #define LIBDC_MAX_EVENTS 256

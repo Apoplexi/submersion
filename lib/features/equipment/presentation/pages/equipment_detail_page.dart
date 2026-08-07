@@ -1,20 +1,30 @@
 import 'package:flutter/material.dart';
-import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+import 'package:submersion/core/icons/mdi_icons.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:submersion/core/constants/list_view_mode.dart';
+import 'package:submersion/core/utils/currency.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
+import 'package:submersion/shared/widgets/app_date_picker.dart';
+import 'package:submersion/shared/widgets/master_detail/detail_scroll_retainer.dart';
 import 'package:submersion/shared/widgets/master_detail/responsive_breakpoints.dart';
 
 import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_providers.dart';
 import 'package:submersion/features/trips/presentation/providers/trip_providers.dart';
+import 'package:collection/collection.dart';
+import 'package:submersion/features/equipment/domain/constants/equipment_attribute_catalog.dart';
 import 'package:submersion/features/equipment/domain/entities/equipment_item.dart';
+import 'package:submersion/features/equipment/domain/entities/service_clock_status.dart';
 import 'package:submersion/features/equipment/domain/entities/service_record.dart';
 import 'package:submersion/features/equipment/presentation/providers/equipment_providers.dart';
+import 'package:submersion/features/equipment/presentation/utils/equipment_attribute_l10n.dart';
+import 'package:submersion/features/equipment/presentation/utils/equipment_attribute_units.dart';
+import 'package:submersion/features/cylinder_configs/presentation/widgets/unit_configurations_card.dart';
+import 'package:submersion/features/equipment/presentation/widgets/service_clocks_card.dart';
 
 class EquipmentDetailPage extends ConsumerStatefulWidget {
   final String equipmentId;
@@ -125,18 +135,39 @@ class _EquipmentDetailContent extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final settings = ref.watch(settingsProvider);
     final units = UnitFormatter(settings);
+    // Service state now derives from the clock engine, not the legacy
+    // isServiceDue getter: any overdue clock lights the header.
+    final isServiceOverdue =
+        ref
+            .watch(serviceClockStatusesProvider(equipmentId))
+            .value
+            ?.any((s) => s.severity == ServiceClockSeverity.overdue) ??
+        false;
 
     final body = SingleChildScrollView(
+      controller: DetailScrollController.maybeOf(context),
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildHeaderSection(context, equipment),
+          _buildHeaderSection(context, equipment, isServiceOverdue),
           const SizedBox(height: 24),
           _buildDetailsSection(context, ref, equipment, units),
-          if (equipment.serviceIntervalDays != null) ...[
+          const SizedBox(height: 24),
+          ServiceClocksCard(
+            equipmentId: equipmentId,
+            equipmentType: equipment.type,
+            onLogService: (status) => _showAddServiceDialogForKind(
+              context,
+              ref,
+              serviceKindId: status.kind.id,
+            ),
+          ),
+          // Only rebreathers own configurations; every other type would show
+          // a card that can never be anything but empty.
+          if (equipment.type == EquipmentType.rebreather) ...[
             const SizedBox(height: 24),
-            _buildServiceSection(context, equipment, units),
+            UnitConfigurationsCard(equipmentId: equipmentId),
           ],
           const SizedBox(height: 24),
           _ServiceHistorySection(equipmentId: equipmentId),
@@ -151,7 +182,7 @@ class _EquipmentDetailContent extends ConsumerWidget {
     if (embedded) {
       return Column(
         children: [
-          _buildEmbeddedHeader(context, ref, equipment),
+          _buildEmbeddedHeader(context, ref, equipment, isServiceOverdue),
           Expanded(child: body),
         ],
       );
@@ -181,6 +212,7 @@ class _EquipmentDetailContent extends ConsumerWidget {
     BuildContext context,
     WidgetRef ref,
     EquipmentItem equipment,
+    bool isServiceOverdue,
   ) {
     final colorScheme = Theme.of(context).colorScheme;
 
@@ -196,13 +228,13 @@ class _EquipmentDetailContent extends ConsumerWidget {
         children: [
           CircleAvatar(
             radius: 20,
-            backgroundColor: equipment.isServiceDue
+            backgroundColor: isServiceOverdue
                 ? colorScheme.errorContainer
                 : colorScheme.tertiaryContainer,
             child: Icon(
               _getIconForType(equipment.type),
               size: 20,
-              color: equipment.isServiceDue
+              color: isServiceOverdue
                   ? colorScheme.onErrorContainer
                   : colorScheme.onTertiaryContainer,
             ),
@@ -253,15 +285,6 @@ class _EquipmentDetailContent extends ConsumerWidget {
     EquipmentItem equipment,
   ) {
     return [
-      if (equipment.isActive)
-        PopupMenuItem(
-          value: 'service',
-          child: ListTile(
-            leading: const Icon(Icons.build),
-            title: Text(context.l10n.equipment_menu_markAsServiced),
-            contentPadding: EdgeInsets.zero,
-          ),
-        ),
       PopupMenuItem(
         value: equipment.isActive ? 'retire' : 'reactivate',
         child: ListTile(
@@ -288,7 +311,11 @@ class _EquipmentDetailContent extends ConsumerWidget {
     ];
   }
 
-  Widget _buildHeaderSection(BuildContext context, EquipmentItem equipment) {
+  Widget _buildHeaderSection(
+    BuildContext context,
+    EquipmentItem equipment,
+    bool isServiceOverdue,
+  ) {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -298,13 +325,13 @@ class _EquipmentDetailContent extends ConsumerWidget {
               children: [
                 CircleAvatar(
                   radius: 32,
-                  backgroundColor: equipment.isServiceDue
+                  backgroundColor: isServiceOverdue
                       ? Theme.of(context).colorScheme.errorContainer
                       : Theme.of(context).colorScheme.tertiaryContainer,
                   child: Icon(
                     _getIconForType(equipment.type),
                     size: 32,
-                    color: equipment.isServiceDue
+                    color: isServiceOverdue
                         ? Theme.of(context).colorScheme.onErrorContainer
                         : Theme.of(context).colorScheme.onTertiaryContainer,
                   ),
@@ -343,7 +370,7 @@ class _EquipmentDetailContent extends ConsumerWidget {
                 ),
               ],
             ),
-            if (equipment.isServiceDue) ...[
+            if (isServiceOverdue) ...[
               const SizedBox(height: 16),
               Container(
                 padding: const EdgeInsets.all(12),
@@ -558,12 +585,24 @@ class _EquipmentDetailContent extends ConsumerWidget {
                 context.l10n.equipment_detail_serialNumberLabel,
                 equipment.serialNumber!,
               ),
-            if (equipment.size != null)
-              _buildDetailRow(
-                context,
-                context.l10n.equipment_detail_sizeLabel,
-                equipment.size!,
-              ),
+            // Curated attributes in catalog order, then custom fields.
+            for (final def in EquipmentAttributeCatalog.attributesFor(
+              equipment.type,
+            ))
+              if (equipment.attributes.firstWhereOrNull(
+                    (a) => !a.isCustom && a.key == def.key,
+                  )
+                  case final attr? when attr.hasValue)
+                _buildDetailRow(
+                  context,
+                  attributeLabel(context.l10n, def.key),
+                  formatAttributeValue(attr, def, units, context.l10n),
+                ),
+            for (final attr
+                in equipment.attributes.where((a) => a.isCustom).toList()
+                  ..sort((a, b) => a.sortOrder.compareTo(b.sortOrder)))
+              if (attr.hasValue)
+                _buildDetailRow(context, attr.key, attr.valueText ?? ''),
             if (equipment.purchaseDate != null)
               _buildDetailRow(
                 context,
@@ -574,7 +613,10 @@ class _EquipmentDetailContent extends ConsumerWidget {
               _buildDetailRow(
                 context,
                 context.l10n.equipment_detail_purchasePriceLabel,
-                '${equipment.purchasePrice!.toStringAsFixed(2)} ${equipment.purchaseCurrency}',
+                formatMoney(
+                  equipment.purchasePrice!,
+                  equipment.purchaseCurrency,
+                ),
               ),
             if (equipment.ownershipDuration != null)
               _buildDetailRow(
@@ -588,98 +630,23 @@ class _EquipmentDetailContent extends ConsumerWidget {
     );
   }
 
-  Widget _buildServiceSection(
+  /// Opens the add-service dialog pre-tagged with a clock's kind so the
+  /// saved record resets that clock.
+  void _showAddServiceDialogForKind(
     BuildContext context,
-    EquipmentItem equipment,
-    UnitFormatter units,
-  ) {
-    final daysUntil = equipment.daysUntilService;
-    final isOverdue = daysUntil != null && daysUntil < 0;
-
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Icon(Icons.build, color: Theme.of(context).colorScheme.primary),
-                const SizedBox(width: 8),
-                Text(
-                  context.l10n.equipment_detail_serviceInfoTitle,
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
-              ],
-            ),
-            const Divider(),
-            _buildDetailRow(
-              context,
-              context.l10n.equipment_detail_serviceIntervalLabel,
-              context.l10n.equipment_detail_serviceIntervalValue(
-                equipment.serviceIntervalDays!,
-              ),
-            ),
-            if (equipment.lastServiceDate != null)
-              _buildDetailRow(
-                context,
-                context.l10n.equipment_detail_lastServiceLabel,
-                units.formatDate(equipment.lastServiceDate),
-              ),
-            if (equipment.nextServiceDue != null)
-              _buildDetailRow(
-                context,
-                context.l10n.equipment_detail_nextServiceDueLabel,
-                units.formatDate(equipment.nextServiceDue),
-              ),
-            if (daysUntil != null)
-              Padding(
-                padding: const EdgeInsets.only(top: 8),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 8,
-                  ),
-                  decoration: BoxDecoration(
-                    color: isOverdue
-                        ? Theme.of(context).colorScheme.errorContainer
-                        : daysUntil < 30
-                        ? Theme.of(context).colorScheme.tertiaryContainer
-                        : Theme.of(context).colorScheme.surfaceContainerHighest,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        isOverdue ? Icons.warning : Icons.schedule,
-                        size: 16,
-                        color: isOverdue
-                            ? Theme.of(context).colorScheme.onErrorContainer
-                            : Theme.of(context).colorScheme.onSurfaceVariant,
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        isOverdue
-                            ? context.l10n.equipment_detail_daysOverdue(
-                                daysUntil.abs(),
-                              )
-                            : context.l10n.equipment_detail_daysUntilService(
-                                daysUntil,
-                              ),
-                        style: TextStyle(
-                          color: isOverdue
-                              ? Theme.of(context).colorScheme.onErrorContainer
-                              : Theme.of(context).colorScheme.onSurfaceVariant,
-                          fontWeight: isOverdue ? FontWeight.bold : null,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-          ],
-        ),
+    WidgetRef ref, {
+    required String serviceKindId,
+  }) {
+    showDialog(
+      context: context,
+      builder: (context) => ServiceRecordDialog(
+        equipmentId: equipmentId,
+        serviceKindId: serviceKindId,
+        onSave: (record) async {
+          await ref
+              .read(serviceRecordNotifierProvider(equipmentId).notifier)
+              .addRecord(record);
+        },
       ),
     );
   }
@@ -728,7 +695,16 @@ class _EquipmentDetailContent extends ConsumerWidget {
               color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
           ),
-          Text(value, style: Theme.of(context).textTheme.bodyMedium),
+          const SizedBox(width: 16),
+          // Flexible so long values (e.g. free-text custom fields) wrap
+          // instead of overflowing the row.
+          Flexible(
+            child: Text(
+              value,
+              style: Theme.of(context).textTheme.bodyMedium,
+              textAlign: TextAlign.end,
+            ),
+          ),
         ],
       ),
     );
@@ -781,18 +757,6 @@ class _EquipmentDetailContent extends ConsumerWidget {
     final notifier = ref.read(equipmentListNotifierProvider.notifier);
 
     switch (action) {
-      case 'service':
-        await notifier.markAsServiced(equipmentId);
-        ref.invalidate(equipmentItemProvider(equipmentId));
-        if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(context.l10n.equipment_snackbar_markedAsServiced),
-            ),
-          );
-        }
-        break;
-
       case 'retire':
         await notifier.retireEquipment(equipmentId);
         ref.invalidate(equipmentItemProvider(equipmentId));
@@ -877,6 +841,8 @@ class _EquipmentDetailContent extends ConsumerWidget {
         return Icons.flashlight_on;
       case EquipmentType.camera:
         return Icons.camera_alt;
+      case EquipmentType.transmitter:
+        return Icons.sensors;
       default:
         return Icons.backpack;
     }
@@ -960,36 +926,55 @@ class _ServiceHistorySection extends ConsumerWidget {
 
                 return Column(
                   children: [
-                    // Total cost summary
+                    // Total cost summary, one row per currency: a history
+                    // priced in more than one currency has no single total.
                     totalCostAsync.when(
-                      data: (totalCost) {
-                        if (totalCost > 0) {
-                          return Container(
-                            padding: const EdgeInsets.all(12),
-                            margin: const EdgeInsets.only(bottom: 12),
-                            decoration: BoxDecoration(
-                              color: Theme.of(
-                                context,
-                              ).colorScheme.surfaceContainerHighest,
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  context.l10n.equipment_service_totalCostLabel,
-                                  style: Theme.of(context).textTheme.bodyMedium,
+                      data: (rawTotals) {
+                        final totals = sumByCurrency<MapEntry<String, double>>(
+                          rawTotals.entries,
+                          amountOf: (e) => e.value,
+                          currencyOf: (e) => e.key,
+                          fallbackCode: ref.watch(defaultCurrencyProvider),
+                        ).where((e) => e.value > 0).toList();
+                        if (totals.isEmpty) return const SizedBox.shrink();
+                        return Container(
+                          padding: const EdgeInsets.all(12),
+                          margin: const EdgeInsets.only(bottom: 12),
+                          decoration: BoxDecoration(
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.surfaceContainerHighest,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Column(
+                            children: [
+                              for (final entry in totals)
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      context
+                                          .l10n
+                                          .equipment_service_totalCostLabel,
+                                      style: Theme.of(
+                                        context,
+                                      ).textTheme.bodyMedium,
+                                    ),
+                                    Text(
+                                      formatMoney(entry.value, entry.key),
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .titleMedium
+                                          ?.copyWith(
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                    ),
+                                  ],
                                 ),
-                                Text(
-                                  '\$${totalCost.toStringAsFixed(2)}',
-                                  style: Theme.of(context).textTheme.titleMedium
-                                      ?.copyWith(fontWeight: FontWeight.bold),
-                                ),
-                              ],
-                            ),
-                          );
-                        }
-                        return const SizedBox.shrink();
+                            ],
+                          ),
+                        );
                       },
                       loading: () => const SizedBox.shrink(),
                       error: (_, _) => const SizedBox.shrink(),
@@ -1147,7 +1132,7 @@ class _ServiceRecordTile extends ConsumerWidget {
         children: [
           if (record.cost != null)
             Text(
-              '\$${record.cost!.toStringAsFixed(2)}',
+              formatMoney(record.cost!, record.currency),
               style: Theme.of(
                 context,
               ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
@@ -1210,12 +1195,16 @@ class _ServiceRecordTile extends ConsumerWidget {
 class ServiceRecordDialog extends ConsumerStatefulWidget {
   final String equipmentId;
   final ServiceRecord? existingRecord;
+
+  /// Pre-selects which service clock this record fulfills.
+  final String? serviceKindId;
   final Future<void> Function(ServiceRecord) onSave;
 
   const ServiceRecordDialog({
     super.key,
     required this.equipmentId,
     this.existingRecord,
+    this.serviceKindId,
     required this.onSave,
   });
 
@@ -1230,9 +1219,16 @@ class _ServiceRecordDialogState extends ConsumerState<ServiceRecordDialog> {
   late DateTime _serviceDate;
   final _providerController = TextEditingController();
   final _costController = TextEditingController();
+  final _currencyController = TextEditingController();
   final _notesController = TextEditingController();
   DateTime? _nextServiceDue;
+  String? _serviceKindId;
   bool _isSaving = false;
+
+  /// The code this dialog opened with: the record's stored currency when
+  /// editing, the diver's default for a new record. Currency is free text, so
+  /// this can be outside the presets; keeping it lets the dropdown offer it.
+  String _initialCurrencyCode = '';
 
   bool get isEditing => widget.existingRecord != null;
 
@@ -1245,18 +1241,31 @@ class _ServiceRecordDialogState extends ConsumerState<ServiceRecordDialog> {
       _serviceDate = record.serviceDate;
       _providerController.text = record.provider ?? '';
       _costController.text = record.cost?.toString() ?? '';
+      _initialCurrencyCode = record.currency;
       _notesController.text = record.notes;
       _nextServiceDue = record.nextServiceDue;
+      _serviceKindId = record.serviceKindId;
     } else {
       _serviceType = ServiceType.annual;
       _serviceDate = DateTime.now();
+      _serviceKindId = widget.serviceKindId;
+      _initialCurrencyCode = _fallbackCurrencyCode();
     }
+    _currencyController.text = _initialCurrencyCode;
+  }
+
+  /// The code to store when the currency field is left blank: the diver's
+  /// default, or USD if that is somehow unset (the column is NOT NULL).
+  String _fallbackCurrencyCode() {
+    final code = ref.read(defaultCurrencyProvider).trim().toUpperCase();
+    return code.isEmpty ? 'USD' : code;
   }
 
   @override
   void dispose() {
     _providerController.dispose();
     _costController.dispose();
+    _currencyController.dispose();
     _notesController.dispose();
     super.dispose();
   }
@@ -1302,6 +1311,49 @@ class _ServiceRecordDialogState extends ConsumerState<ServiceRecordDialog> {
                 ),
                 const SizedBox(height: 16),
 
+                // Service clock this record fulfills (resets that clock)
+                ref
+                    .watch(serviceKindsProvider)
+                    .maybeWhen(
+                      data: (kinds) => Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          DropdownButtonFormField<String?>(
+                            initialValue:
+                                kinds.any((k) => k.id == _serviceKindId)
+                                ? _serviceKindId
+                                : null,
+                            decoration: InputDecoration(
+                              labelText: context
+                                  .l10n
+                                  .equipment_serviceClocks_appliesToClock,
+                              prefixIcon: const Icon(Icons.av_timer),
+                            ),
+                            items: [
+                              DropdownMenuItem<String?>(
+                                value: null,
+                                child: Text(
+                                  context
+                                      .l10n
+                                      .equipment_serviceClocks_noClockOption,
+                                ),
+                              ),
+                              for (final kind in kinds)
+                                DropdownMenuItem<String?>(
+                                  value: kind.id,
+                                  child: Text(kind.name),
+                                ),
+                            ],
+                            onChanged: (value) {
+                              setState(() => _serviceKindId = value);
+                            },
+                          ),
+                          const SizedBox(height: 16),
+                        ],
+                      ),
+                      orElse: () => const SizedBox.shrink(),
+                    ),
+
                 // Service date picker
                 Semantics(
                   button: true,
@@ -1335,28 +1387,77 @@ class _ServiceRecordDialogState extends ConsumerState<ServiceRecordDialog> {
                 ),
                 const SizedBox(height: 16),
 
-                // Cost field
-                TextFormField(
-                  controller: _costController,
-                  decoration: InputDecoration(
-                    labelText: context.l10n.equipment_serviceDialog_costLabel,
-                    prefixIcon: const Icon(Icons.attach_money),
-                    hintText: context.l10n.equipment_serviceDialog_costHint,
-                  ),
-                  keyboardType: const TextInputType.numberWithOptions(
-                    decimal: true,
-                  ),
-                  validator: (value) {
-                    if (value != null && value.isNotEmpty) {
-                      final parsed = double.tryParse(value);
-                      if (parsed == null || parsed < 0) {
-                        return context
-                            .l10n
-                            .equipment_serviceDialog_costValidation;
-                      }
-                    }
-                    return null;
-                  },
+                // Cost field, with the currency it is priced in.
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      flex: 2,
+                      // Rebuild the cost field when the currency changes so
+                      // its prefix shows the right symbol (EUR -> €, ...).
+                      child: ValueListenableBuilder<TextEditingValue>(
+                        valueListenable: _currencyController,
+                        builder: (context, value, _) {
+                          final symbol = currencySymbol(value.text);
+                          return TextFormField(
+                            controller: _costController,
+                            decoration: InputDecoration(
+                              labelText: context
+                                  .l10n
+                                  .equipment_serviceDialog_costLabel,
+                              prefixText: symbol.isEmpty ? null : '$symbol ',
+                              hintText:
+                                  context.l10n.equipment_serviceDialog_costHint,
+                            ),
+                            keyboardType: const TextInputType.numberWithOptions(
+                              decimal: true,
+                            ),
+                            validator: (value) {
+                              if (value != null && value.isNotEmpty) {
+                                final parsed = double.tryParse(value);
+                                if (parsed == null || parsed < 0) {
+                                  return context
+                                      .l10n
+                                      .equipment_serviceDialog_costValidation;
+                                }
+                              }
+                              return null;
+                            },
+                          );
+                        },
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      // Editable dropdown: common currencies as presets, but
+                      // any ISO code can still be typed. The stored code leads
+                      // the list when it is outside the presets.
+                      child: DropdownMenu<String>(
+                        controller: _currencyController,
+                        expandedInsets: EdgeInsets.zero,
+                        requestFocusOnTap: true,
+                        enableFilter: true,
+                        label: Text(
+                          context.l10n.equipment_serviceDialog_currencyLabel,
+                        ),
+                        dropdownMenuEntries: [
+                          for (final code in currencyCodesWith(
+                            _initialCurrencyCode,
+                          ))
+                            DropdownMenuEntry(
+                              value: code,
+                              label: code,
+                              leadingIcon: SizedBox(
+                                width: 28,
+                                child: Center(
+                                  child: Text(currencySymbol(code)),
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 16),
 
@@ -1441,7 +1542,7 @@ class _ServiceRecordDialogState extends ConsumerState<ServiceRecordDialog> {
   }
 
   Future<void> _pickServiceDate() async {
-    final picked = await showDatePicker(
+    final picked = await showAppDatePicker(
       context: context,
       initialDate: _serviceDate,
       firstDate: DateTime(1950),
@@ -1453,7 +1554,7 @@ class _ServiceRecordDialogState extends ConsumerState<ServiceRecordDialog> {
   }
 
   Future<void> _pickNextServiceDate() async {
-    final picked = await showDatePicker(
+    final picked = await showAppDatePicker(
       context: context,
       initialDate:
           _nextServiceDue ?? DateTime.now().add(const Duration(days: 365)),
@@ -1476,6 +1577,7 @@ class _ServiceRecordDialogState extends ConsumerState<ServiceRecordDialog> {
         id: widget.existingRecord?.id ?? '',
         equipmentId: widget.equipmentId,
         serviceType: _serviceType,
+        serviceKindId: _serviceKindId,
         serviceDate: _serviceDate,
         provider: _providerController.text.trim().isEmpty
             ? null
@@ -1483,7 +1585,9 @@ class _ServiceRecordDialogState extends ConsumerState<ServiceRecordDialog> {
         cost: _costController.text.isEmpty
             ? null
             : double.tryParse(_costController.text),
-        currency: 'USD',
+        currency: _currencyController.text.trim().isEmpty
+            ? _fallbackCurrencyCode()
+            : _currencyController.text.trim().toUpperCase(),
         nextServiceDue: _nextServiceDue,
         notes: _notesController.text.trim(),
         createdAt: widget.existingRecord?.createdAt ?? now,

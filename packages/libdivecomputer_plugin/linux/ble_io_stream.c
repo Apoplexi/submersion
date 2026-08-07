@@ -11,6 +11,16 @@ static const char* PREFERRED_WRITE_UUID =
     "6606ab42-89d5-4a00-a8ce-4eb5e1414ee0";
 static const char* PREFERRED_NOTIFY_UUID =
     "a60b8e5c-b267-44d7-9764-837caf96489e";
+// Halcyon Symbios device-centric Tx/Rx endpoints. The app WRITES commands to
+// the device's Rx (00000101) and READS replies (indications) from its Tx
+// (00000201) -- matching Subsurface's qt-ble.cpp. Both chars advertise
+// read+write+indicate and tie on raw score, so these biases pick the pair.
+// PR #356 biased them backwards (wrote to Tx) and the device never answered
+// (issue #288).
+static const char* HALCYON_SYMBIOS_TX_UUID =
+    "00000201-8c3b-4f2c-a59e-8c08224f3253";
+static const char* HALCYON_SYMBIOS_RX_UUID =
+    "00000101-8c3b-4f2c-a59e-8c08224f3253";
 
 static const guint32 BLE_IOCTL_TYPE = 'b';
 static const guint32 BLE_IOCTL_GET_NAME = 0;
@@ -22,7 +32,7 @@ BleIoStream* ble_io_stream_new(void) {
     BleIoStream* stream = g_new0(BleIoStream, 1);
     g_mutex_init(&stream->read_mutex);
     g_cond_init(&stream->read_cond);
-    stream->read_buffer = g_byte_array_new();
+    stream->read_chunks = g_queue_new();
     stream->timeout_ms = 10000;
     g_mutex_init(&stream->pin_mutex);
     g_cond_init(&stream->pin_cond);
@@ -130,8 +140,10 @@ static void on_properties_changed(GDBusConnection* connection,
         value_var, &n_bytes, sizeof(guint8));
 
     if (n_bytes > 0 && bytes) {
+        GByteArray* chunk = g_byte_array_sized_new((guint)n_bytes);
+        g_byte_array_append(chunk, bytes, (guint)n_bytes);
         g_mutex_lock(&stream->read_mutex);
-        g_byte_array_append(stream->read_buffer, bytes, (guint)n_bytes);
+        g_queue_push_tail(stream->read_chunks, chunk);
         g_cond_signal(&stream->read_cond);
         g_mutex_unlock(&stream->read_mutex);
     }
@@ -161,6 +173,12 @@ gboolean ble_io_stream_connect(BleIoStream* stream,
         g_warning("BleIoStream: Connect failed: %s", error->message);
         return FALSE;
     }
+
+    // Note: BlueZ exposes no simple per-connection priority/interval API on
+    // org.bluez.Device1 (unlike Android's requestConnectionPriority or
+    // Windows' preferred connection parameters), so high-rate dumps (e.g. the
+    // OSTC nano logbook, #280) rely on the device pacing itself plus the
+    // hw_ostc3 read fix; transient notification loss is covered by a retry.
 
     // Get the device name.
     stream->device_name = get_string_property(
@@ -227,7 +245,8 @@ gboolean ble_io_stream_connect(BleIoStream* stream,
             int ws = 0;
             if (can_write_no_rsp) ws += 4;
             if (can_write) ws += 2;
-            if (g_ascii_strcasecmp(uuid, PREFERRED_WRITE_UUID) == 0) {
+            if (g_ascii_strcasecmp(uuid, PREFERRED_WRITE_UUID) == 0 ||
+                g_ascii_strcasecmp(uuid, HALCYON_SYMBIOS_RX_UUID) == 0) {
                 ws += 1000;
             }
             if (ws > best_write_score) {
@@ -245,7 +264,8 @@ gboolean ble_io_stream_connect(BleIoStream* stream,
             int ns = 0;
             if (can_notify) ns += 4;
             if (can_indicate) ns += 2;
-            if (g_ascii_strcasecmp(uuid, PREFERRED_NOTIFY_UUID) == 0) {
+            if (g_ascii_strcasecmp(uuid, PREFERRED_NOTIFY_UUID) == 0 ||
+                g_ascii_strcasecmp(uuid, HALCYON_SYMBIOS_TX_UUID) == 0) {
                 ns += 1000;
             }
             if (ns > best_notify_score) {
@@ -312,7 +332,7 @@ static int ble_read(void* userdata, void* data, size_t size,
                           : g_get_monotonic_time() +
                                 (gint64)stream->timeout_ms * 1000;
 
-    while (stream->read_buffer->len == 0) {
+    while (g_queue_is_empty(stream->read_chunks)) {
         if (stream->timeout_ms == G_MAXINT32) {
             g_cond_wait(&stream->read_cond, &stream->read_mutex);
         } else {
@@ -325,10 +345,20 @@ static int ble_read(void* userdata, void* data, size_t size,
         }
     }
 
-    size_t bytes_to_read = MIN(size, stream->read_buffer->len);
-    memcpy(data, stream->read_buffer->data, bytes_to_read);
-    g_byte_array_remove_range(stream->read_buffer, 0,
-                              (guint)bytes_to_read);
+    // Return bytes from at most one notification per read: the packet
+    // parsers size each read from the packet header and would silently
+    // drop a second packet coalesced into the same read (lost FLAG_LAST
+    // ack -> spurious timeout). A partially consumed notification stays
+    // at the head of the queue.
+    GByteArray* chunk = (GByteArray*)g_queue_peek_head(stream->read_chunks);
+    size_t bytes_to_read = MIN(size, chunk->len);
+    memcpy(data, chunk->data, bytes_to_read);
+    if (bytes_to_read < chunk->len) {
+        g_byte_array_remove_range(chunk, 0, (guint)bytes_to_read);
+    } else {
+        g_queue_pop_head(stream->read_chunks);
+        g_byte_array_unref(chunk);
+    }
     g_mutex_unlock(&stream->read_mutex);
 
     if (actual) *actual = bytes_to_read;
@@ -520,7 +550,7 @@ static int ble_poll(void* userdata, int timeout) {
     BleIoStream* stream = (BleIoStream*)userdata;
     g_mutex_lock(&stream->read_mutex);
 
-    if (stream->read_buffer->len > 0) {
+    if (!g_queue_is_empty(stream->read_chunks)) {
         g_mutex_unlock(&stream->read_mutex);
         return LIBDC_STATUS_SUCCESS;
     }
@@ -530,15 +560,22 @@ static int ble_poll(void* userdata, int timeout) {
         return LIBDC_STATUS_TIMEOUT;
     }
 
-    gboolean signaled;
+    // GCond waits can wake spuriously; re-check the predicate in a loop.
+    gboolean signaled = TRUE;
     if (timeout < 0) {
-        g_cond_wait(&stream->read_cond, &stream->read_mutex);
-        signaled = TRUE;
+        while (g_queue_is_empty(stream->read_chunks)) {
+            g_cond_wait(&stream->read_cond, &stream->read_mutex);
+        }
     } else {
         gint64 deadline =
             g_get_monotonic_time() + (gint64)timeout * 1000;
-        signaled = g_cond_wait_until(
-            &stream->read_cond, &stream->read_mutex, deadline);
+        while (g_queue_is_empty(stream->read_chunks)) {
+            if (!g_cond_wait_until(&stream->read_cond,
+                                   &stream->read_mutex, deadline)) {
+                signaled = FALSE;
+                break;
+            }
+        }
     }
 
     g_mutex_unlock(&stream->read_mutex);
@@ -549,7 +586,10 @@ static int ble_purge(void* userdata, unsigned int direction) {
     if ((direction & DIRECTION_INPUT) == 0) return LIBDC_STATUS_SUCCESS;
     BleIoStream* stream = (BleIoStream*)userdata;
     g_mutex_lock(&stream->read_mutex);
-    g_byte_array_set_size(stream->read_buffer, 0);
+    GByteArray* chunk;
+    while ((chunk = g_queue_pop_head(stream->read_chunks)) != NULL) {
+        g_byte_array_unref(chunk);
+    }
     g_mutex_unlock(&stream->read_mutex);
     return LIBDC_STATUS_SUCCESS;
 }
@@ -601,7 +641,13 @@ void ble_io_stream_free(BleIoStream* stream) {
 
     g_mutex_clear(&stream->read_mutex);
     g_cond_clear(&stream->read_cond);
-    if (stream->read_buffer) g_byte_array_unref(stream->read_buffer);
+    if (stream->read_chunks) {
+        GByteArray* chunk;
+        while ((chunk = g_queue_pop_head(stream->read_chunks)) != NULL) {
+            g_byte_array_unref(chunk);
+        }
+        g_queue_free(stream->read_chunks);
+    }
     g_free(stream->device_path);
     g_free(stream->write_path);
     g_free(stream->notify_path);

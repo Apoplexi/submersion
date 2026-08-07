@@ -1,5 +1,3 @@
-import 'dart:typed_data';
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -9,6 +7,7 @@ import 'package:submersion/features/dive_log/data/repositories/dive_repository_i
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/features/settings/presentation/providers/sync_providers.dart';
 
+import '../../../helpers/changeset_test_helpers.dart';
 import '../../../helpers/fake_cloud_storage_provider.dart';
 import '../../../helpers/mock_providers.dart';
 import '../../../helpers/test_database.dart';
@@ -55,10 +54,7 @@ void main() {
               as FakeCloudStorageProvider;
 
       await seedLocalDive('local-1');
-      cloud.seedFile(
-        'submersion_sync_peer-device.json',
-        Uint8List.fromList([1, 2, 3]),
-      );
+      await seedPeerManifest(cloud, 'peer-device');
 
       final info = await container
           .read(syncStateProvider.notifier)
@@ -76,10 +72,7 @@ void main() {
               as FakeCloudStorageProvider;
 
       await seedLocalDive('local-2');
-      cloud.seedFile(
-        'submersion_sync_peer-device.json',
-        Uint8List.fromList([1, 2, 3]),
-      );
+      await seedPeerManifest(cloud, 'peer-device');
       await SyncRepository().updateLastSyncTime(DateTime(2026, 1, 1));
 
       final info = await container
@@ -89,16 +82,43 @@ void main() {
       expect(info, isNull, reason: 'the guard protects only the FIRST contact');
     });
 
+    test('fires again when the cursor was minted against a different '
+        'backend', () async {
+      final container = await makeContainer();
+      final cloud =
+          container.read(cloudStorageProviderProvider)
+              as FakeCloudStorageProvider;
+
+      await seedLocalDive('local-7');
+      await seedPeerManifest(cloud, 'peer-device');
+      // The device synced before -- but against the backend it just switched
+      // away from. For THIS backend the next sync is still first contact.
+      await SyncRepository().updateLastSyncTime(
+        DateTime(2026, 1, 1),
+        providerId: 'old-backend',
+      );
+
+      final info = await container
+          .read(syncStateProvider.notifier)
+          .firstSyncMergeInfo();
+
+      expect(
+        info,
+        isNotNull,
+        reason:
+            'a cursor carried over from another backend must not mask first '
+            'contact with this one -- that bypass silently merges whatever '
+            'library lives on the new backend',
+      );
+    });
+
     test('returns null with no local data', () async {
       final container = await makeContainer();
       final cloud =
           container.read(cloudStorageProviderProvider)
               as FakeCloudStorageProvider;
 
-      cloud.seedFile(
-        'submersion_sync_peer-device.json',
-        Uint8List.fromList([1, 2, 3]),
-      );
+      await seedPeerManifest(cloud, 'peer-device');
 
       final info = await container
           .read(syncStateProvider.notifier)
@@ -132,10 +152,7 @@ void main() {
               as FakeCloudStorageProvider;
 
       await seedLocalDive('local-4');
-      cloud.seedFile(
-        'submersion_sync_peer-device.json',
-        Uint8List.fromList([1, 2, 3]),
-      );
+      await seedPeerManifest(cloud, 'peer-device');
       final filesBefore = cloud.fileCount;
 
       await container.read(syncStateProvider.notifier).performSync(auto: true);
@@ -164,13 +181,16 @@ void main() {
         notifier.performSync(),
       ]);
 
+      final manifestPublishes = cloud.operationLog
+          .where((o) => o.startsWith('upload:') && o.contains('.manifest.json'))
+          .length;
       expect(
-        cloud.uploadAttempts,
+        manifestPublishes,
         1,
         reason:
             'simultaneous triggers must collapse into one sync -- two '
-            'concurrent uploads to the same per-device filename is the '
-            'conflicted-copy race the per-device files exist to prevent',
+            'concurrent publishes to the same per-device manifest is the '
+            'conflicted-copy race the per-device logs exist to prevent',
       );
     });
 
@@ -181,10 +201,7 @@ void main() {
               as FakeCloudStorageProvider;
 
       await seedLocalDive('local-5');
-      cloud.seedFile(
-        'submersion_sync_peer-device.json',
-        Uint8List.fromList([1, 2, 3]),
-      );
+      await seedPeerManifest(cloud, 'peer-device');
       await container.read(syncStateProvider.notifier).performSync(auto: true);
 
       await container.read(syncStateProvider.notifier).performSync();
@@ -193,7 +210,7 @@ void main() {
       expect(state.firstSyncAwaitingConfirmation, isFalse);
       final deviceId = await SyncRepository().getDeviceId();
       expect(
-        await cloud.fileExists('submersion_sync_$deviceId.json'),
+        await hasPublishedLog(cloud, deviceId),
         isTrue,
         reason: 'the manual (user-confirmed) path performs the sync',
       );

@@ -2,12 +2,14 @@ import 'package:submersion/core/providers/provider.dart';
 
 import 'package:submersion/features/dive_log/domain/entities/gas_switch.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_providers.dart';
+import 'package:submersion/features/dive_log/presentation/providers/dive_repository_provider.dart';
 
 /// Provider for gas switches of a specific dive
 /// Returns gas switches with full tank info for display purposes
 final gasSwitchesProvider =
     FutureProvider.family<List<GasSwitchWithTank>, String>((ref, diveId) async {
       final repository = ref.watch(diveRepositoryProvider);
+      ref.invalidateSelfWhen(repository.watchDiveDetailChanges());
       return repository.getGasSwitchesForDive(diveId);
     });
 

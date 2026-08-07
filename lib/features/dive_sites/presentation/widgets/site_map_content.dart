@@ -7,15 +7,22 @@ import 'package:latlong2/latlong.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:submersion/features/dive_sites/data/repositories/site_repository_impl.dart';
+import 'package:submersion/features/dive_sites/data/services/dive_site_api_service.dart';
 import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
+import 'package:submersion/features/dive_sites/presentation/providers/built_in_sites_providers.dart';
 import 'package:submersion/features/dive_sites/presentation/providers/site_providers.dart';
+import 'package:submersion/features/dive_sites/presentation/widgets/built_in_site_info_card.dart';
+import 'package:submersion/features/dive_sites/presentation/widgets/built_in_site_marker_layer.dart';
+import 'package:submersion/features/dive_sites/presentation/widgets/built_in_sites_toggle_button.dart';
 import 'package:submersion/features/maps/data/services/tile_cache_service.dart';
 import 'package:submersion/features/maps/domain/entities/heat_map_point.dart';
 import 'package:submersion/features/maps/presentation/providers/heat_map_providers.dart';
 import 'package:submersion/features/maps/presentation/widgets/heat_map_controls.dart';
 import 'package:submersion/features/maps/presentation/widgets/heat_map_layer.dart';
 import 'package:submersion/features/maps/presentation/widgets/map_attribution.dart';
+import 'package:submersion/features/maps/presentation/widgets/map_compass_button.dart';
 import 'package:submersion/features/maps/presentation/providers/map_tile_providers.dart';
+import 'package:submersion/features/maps/presentation/widgets/trackpad_zoom_map.dart';
 import 'package:submersion/shared/widgets/map_list_layout/map_info_card.dart';
 
 /// Map content widget for displaying dive sites on a map.
@@ -53,6 +60,11 @@ class _SiteMapContentState extends ConsumerState<SiteMapContent>
     with TickerProviderStateMixin {
   final MapController _mapController = MapController();
   bool _mapReady = false;
+
+  /// Externally-keyed selection for a tapped built-in (bundled) site. Held
+  /// locally rather than in the shared selection, which is keyed to the user's
+  /// own sites.
+  String? _selectedBuiltInId;
 
   static const _defaultCenter = LatLng(20.0, -157.0);
   static const _defaultZoom = 3.0;
@@ -124,6 +136,15 @@ class _SiteMapContentState extends ConsumerState<SiteMapContent>
     final heatMapAsync = ref.watch(siteCoverageHeatMapProvider);
     final heatMapSettings = ref.watch(heatMapSettingsProvider);
 
+    // Clear a built-in selection when built-in sites are hidden, so the info
+    // card cannot outlive its markers. Uses listen (not watch) to avoid
+    // rebuilding the map on toggle, which would recreate the FlutterMap.
+    ref.listen<bool>(showBuiltInSitesProvider, (prev, next) {
+      if (!next && _selectedBuiltInId != null) {
+        setState(() => _selectedBuiltInId = null);
+      }
+    });
+
     return sitesAsync.when(
       data: (sitesWithCounts) => _buildMapWithInfoCard(
         context,
@@ -162,6 +183,7 @@ class _SiteMapContentState extends ConsumerState<SiteMapContent>
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
+                  const BuiltInSitesToggleButton(),
                   const HeatMapToggleButton(),
                   IconButton(
                     icon: const Icon(Icons.my_location, size: 20),
@@ -175,7 +197,20 @@ class _SiteMapContentState extends ConsumerState<SiteMapContent>
             ),
           ),
         ),
-        if (selectedSite != null)
+        if (_selectedBuiltInId != null)
+          Positioned(
+            left: 16,
+            right: 16,
+            bottom: 16,
+            child: Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 400),
+                child:
+                    _buildBuiltInInfoCard(context) ?? const SizedBox.shrink(),
+              ),
+            ),
+          )
+        else if (selectedSite != null)
           Positioned(
             left: 16,
             right: 16,
@@ -242,88 +277,123 @@ class _SiteMapContentState extends ConsumerState<SiteMapContent>
 
     return Stack(
       children: [
-        FlutterMap(
-          mapController: _mapController,
-          options: MapOptions(
-            initialCenter: center,
-            initialZoom: zoom,
-            minZoom: 2.0,
-            maxZoom: 18.0,
-            onMapReady: () {
-              _mapReady = true;
-            },
-            onTap: (_, _) {
-              widget.onItemSelected(null);
-            },
-            cameraConstraint: CameraConstraint.contain(
-              bounds: LatLngBounds(
-                const LatLng(-90, -180),
-                const LatLng(90, 180),
+        TrackpadZoomMap(
+          controller: _mapController,
+          child: FlutterMap(
+            mapController: _mapController,
+            options: MapOptions(
+              initialCenter: center,
+              initialZoom: zoom,
+              minZoom: 2.0,
+              maxZoom: 18.0,
+              onMapReady: () {
+                _mapReady = true;
+              },
+              onTap: (_, _) {
+                widget.onItemSelected(null);
+                setState(() => _selectedBuiltInId = null);
+              },
+              cameraConstraint: CameraConstraint.contain(
+                bounds: LatLngBounds(
+                  const LatLng(-90, -180),
+                  const LatLng(90, 180),
+                ),
               ),
             ),
-          ),
-          children: [
-            TileLayer(
-              urlTemplate: ref.watch(mapTileUrlProvider),
-              userAgentPackageName: 'app.submersion',
-              maxZoom: ref.watch(mapTileMaxZoomProvider),
-              tileProvider: TileCacheService.instance.isInitialized
-                  ? TileCacheService.instance.getTileProvider()
-                  : null,
-            ),
-            MarkerClusterLayerWidget(
-              options: MarkerClusterLayerOptions(
-                maxClusterRadius: 80,
-                size: const Size(50, 50),
-                markers: sitesWithLocation.map((siteWithCount) {
-                  final site = siteWithCount.site;
-                  final diveCount = siteWithCount.diveCount;
-                  final isSelected = widget.selectedId == site.id;
-                  return Marker(
-                    point: LatLng(
-                      site.location!.latitude,
-                      site.location!.longitude,
+            children: [
+              TileLayer(
+                urlTemplate: ref.watch(mapTileUrlProvider),
+                userAgentPackageName: 'app.submersion',
+                maxZoom: ref.watch(mapTileMaxZoomProvider),
+                tileProvider: TileCacheService.instance.isInitialized
+                    ? TileCacheService.instance.getTileProvider()
+                    : null,
+              ),
+              // Built-in (bundled) sites layer - below the user markers so the
+              // user's own sites always draw on top. Shown only when toggled.
+              Consumer(
+                builder: (context, ref, _) {
+                  final show = ref.watch(showBuiltInSitesProvider);
+                  if (!show) return const SizedBox.shrink();
+                  final builtInAsync = ref.watch(visibleBuiltInSitesProvider);
+                  return builtInAsync.maybeWhen(
+                    data: (builtIn) => BuiltInSiteMarkerLayer(
+                      sites: builtIn,
+                      selectedExternalId: _selectedBuiltInId,
+                      onTap: (site) {
+                        widget.onItemSelected(null);
+                        setState(() => _selectedBuiltInId = site.externalId);
+                        _animateToLocation(
+                          LatLng(site.latitude!, site.longitude!),
+                        );
+                      },
                     ),
-                    width: isSelected ? 50 : 40,
-                    height: isSelected ? 50 : 40,
-                    child: Semantics(
-                      button: true,
-                      label: context.l10n
-                          .diveSites_map_semantics_diveSiteMarker(site.name),
-                      child: GestureDetector(
-                        onTap: () => _onMarkerTapped(site),
-                        child: _buildMarker(
-                          context,
-                          site,
-                          diveCount,
-                          isSelected,
+                    orElse: () => const SizedBox.shrink(),
+                  );
+                },
+              ),
+              MarkerClusterLayerWidget(
+                options: MarkerClusterLayerOptions(
+                  maxClusterRadius: 80,
+                  size: const Size(50, 50),
+                  markers: sitesWithLocation.map((siteWithCount) {
+                    final site = siteWithCount.site;
+                    final diveCount = siteWithCount.diveCount;
+                    final isSelected = widget.selectedId == site.id;
+                    return Marker(
+                      point: LatLng(
+                        site.location!.latitude,
+                        site.location!.longitude,
+                      ),
+                      width: isSelected ? 50 : 40,
+                      height: isSelected ? 50 : 40,
+                      child: Semantics(
+                        button: true,
+                        label: context.l10n
+                            .diveSites_map_semantics_diveSiteMarker(site.name),
+                        child: GestureDetector(
+                          onTap: () => _onMarkerTapped(site),
+                          child: _buildMarker(
+                            context,
+                            site,
+                            diveCount,
+                            isSelected,
+                          ),
                         ),
                       ),
-                    ),
-                  );
-                }).toList(),
-                builder: (context, markers) {
-                  return _buildClusterMarker(context, markers.length);
-                },
-                zoomToBoundsOnClick: false,
-                onClusterTap: (node) {
-                  _animateToCluster(node.bounds);
-                },
-              ),
-            ),
-            // Heat map layer - rendered on top of markers when visible
-            if (heatMapSettings.isVisible)
-              heatMapAsync.when(
-                data: (points) => HeatMapLayer(
-                  points: points,
-                  radius: heatMapSettings.radius,
-                  opacity: heatMapSettings.opacity,
+                    );
+                  }).toList(),
+                  builder: (context, markers) {
+                    return _buildClusterMarker(context, markers.length);
+                  },
+                  zoomToBoundsOnClick: false,
+                  onClusterTap: (node) {
+                    _animateToCluster(node.bounds);
+                  },
                 ),
-                loading: () => const SizedBox.shrink(),
-                error: (_, _) => const SizedBox.shrink(),
               ),
-            const MapAttribution(),
-          ],
+              // Heat map layer - rendered on top of markers when visible
+              if (heatMapSettings.isVisible)
+                heatMapAsync.when(
+                  data: (points) => HeatMapLayer(
+                    points: points,
+                    radius: heatMapSettings.radius,
+                    opacity: heatMapSettings.opacity,
+                  ),
+                  loading: () => const SizedBox.shrink(),
+                  error: (_, _) => const SizedBox.shrink(),
+                ),
+              const MapAttribution(),
+            ],
+          ),
+        ),
+
+        // Reset-to-north compass (hidden until the map is rotated), tucked
+        // below the heat-map toggle so the two controls stack rather than overlap.
+        Positioned(
+          top: 64,
+          right: 8,
+          child: MapCompassButton(controller: _mapController),
         ),
 
         // Empty state overlay
@@ -486,6 +556,7 @@ class _SiteMapContentState extends ConsumerState<SiteMapContent>
   }
 
   void _onMarkerTapped(DiveSite site) {
+    setState(() => _selectedBuiltInId = null);
     if (widget.selectedId == site.id) {
       widget.onItemSelected(null);
     } else {
@@ -495,6 +566,42 @@ class _SiteMapContentState extends ConsumerState<SiteMapContent>
         LatLng(site.location!.latitude, site.location!.longitude),
       );
     }
+  }
+
+  Widget? _buildBuiltInInfoCard(BuildContext context) {
+    final async = ref.watch(visibleBuiltInSitesProvider);
+    final site = async.maybeWhen(
+      data: (list) =>
+          list.where((s) => s.externalId == _selectedBuiltInId).firstOrNull,
+      orElse: () => null,
+    );
+    if (site == null) return null;
+    return BuiltInSiteInfoCard(site: site, onAdd: () => _addBuiltInSite(site));
+  }
+
+  Future<void> _addBuiltInSite(ExternalDiveSite site) async {
+    try {
+      await ref
+          .read(siteListNotifierProvider.notifier)
+          .addSite(site.toDiveSite());
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(context.l10n.diveSites_map_builtInSites_addError),
+          backgroundColor: Theme.of(context).colorScheme.error,
+        ),
+      );
+      return;
+    }
+    // addSite reloads the notifier but not the map's FutureProvider; invalidate
+    // so the new site appears and the built-in duplicate is deduped out.
+    ref.invalidate(sitesWithCountsProvider);
+    if (!mounted) return;
+    setState(() => _selectedBuiltInId = null);
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(context.l10n.diveSites_map_builtInSites_added)),
+    );
   }
 
   Future<void> _animateToCluster(LatLngBounds bounds) async {

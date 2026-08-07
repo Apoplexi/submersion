@@ -1,8 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:submersion/core/providers/ref_invalidate_on_change.dart';
 import 'package:submersion/core/tide/entities/tide_extremes.dart';
 import 'package:submersion/core/tide/entities/tide_prediction.dart';
 import 'package:submersion/core/tide/tide_calculator.dart';
+import 'package:submersion/features/dive_log/presentation/providers/dive_repository_provider.dart';
 import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
 import 'package:submersion/features/tides/data/repositories/tide_record_repository.dart';
 import 'package:submersion/features/tides/data/services/tide_data_service.dart';
@@ -24,6 +26,9 @@ final tideRecordForDiveProvider = FutureProvider.family<TideRecord?, String>((
   diveId,
 ) async {
   final repository = ref.watch(tideRecordRepositoryProvider);
+  ref.invalidateSelfWhen(
+    ref.watch(diveRepositoryProvider).watchDiveDetailChanges(),
+  );
   return repository.getTideRecordForDive(diveId);
 });
 

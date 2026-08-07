@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+import 'package:submersion/core/icons/mdi_icons.dart';
 import 'package:submersion/core/constants/card_color.dart';
 import 'package:submersion/core/constants/list_view_mode.dart';
 import 'package:submersion/core/constants/profile_metrics.dart';
@@ -440,6 +440,19 @@ class SectionAppearancePage extends ConsumerWidget {
         ),
       ),
       SwitchListTile(
+        title: Text(context.l10n.settings_appearance_metricsFollowViewport),
+        subtitle: Text(
+          context.l10n.settings_appearance_metricsFollowViewport_subtitle,
+        ),
+        secondary: const Icon(Icons.height),
+        value: settings.profileMetricsFollowViewport,
+        onChanged: (value) {
+          ref
+              .read(settingsProvider.notifier)
+              .setProfileMetricsFollowViewport(value);
+        },
+      ),
+      SwitchListTile(
         title: Text(context.l10n.settings_appearance_maxDepthMarker),
         subtitle: Text(
           context.l10n.settings_appearance_maxDepthMarker_subtitleFull,
@@ -457,7 +470,7 @@ class SectionAppearancePage extends ConsumerWidget {
               .l10n
               .settings_appearance_pressureThresholdMarkers_subtitleFull,
         ),
-        secondary: Icon(MdiIcons.divingScubaTank),
+        secondary: const Icon(MdiIcons.divingScubaTank),
         value: settings.showPressureThresholdMarkers,
         onChanged: (value) {
           ref
@@ -609,8 +622,10 @@ class SectionAppearancePage extends ConsumerWidget {
       settings.defaultShowHeartRate,
       settings.defaultShowSac,
       settings.defaultShowEvents,
+      settings.defaultShowPhotoMarkers,
       settings.showCeilingOnProfile,
       settings.showAscentRateColors,
+      settings.defaultShowAscentRateLine,
       settings.showNdlOnProfile,
       settings.defaultShowTts,
       settings.defaultShowCns,

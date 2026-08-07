@@ -23,7 +23,10 @@ import 'package:submersion/features/dive_centers/data/repositories/dive_center_r
 import 'package:submersion/features/dive_centers/domain/entities/dive_center.dart';
 import 'package:submersion/features/dive_centers/presentation/providers/dive_center_providers.dart';
 import 'package:submersion/features/dive_import/data/services/uddf_entity_importer.dart';
+import 'package:submersion/features/dive_import/domain/services/dive_matcher.dart';
 import 'package:submersion/features/dive_log/data/repositories/dive_repository_impl.dart';
+import 'package:submersion/features/dive_log/data/services/dive_consolidation_service.dart';
+import 'package:submersion/features/dive_log/data/services/dive_merge_snapshot.dart';
 import 'package:submersion/features/dive_log/data/repositories/tank_pressure_repository.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_providers.dart';
@@ -35,6 +38,7 @@ import 'package:submersion/features/dive_types/domain/entities/dive_type_entity.
 import 'package:submersion/features/dive_types/presentation/providers/dive_type_providers.dart';
 import 'package:submersion/features/divers/domain/entities/diver.dart';
 import 'package:submersion/features/divers/presentation/providers/diver_providers.dart';
+import 'package:submersion/features/import_wizard/domain/models/import_file_outcome.dart';
 import 'package:submersion/features/equipment/data/repositories/equipment_repository_impl.dart';
 import 'package:submersion/features/equipment/data/repositories/equipment_set_repository_impl.dart';
 import 'package:submersion/features/equipment/domain/entities/equipment_item.dart';
@@ -62,6 +66,7 @@ import 'package:submersion/features/universal_import/data/models/import_enums.da
     as ui;
 import 'package:submersion/features/universal_import/data/models/import_options.dart';
 import 'package:submersion/features/universal_import/data/models/import_payload.dart';
+import 'package:submersion/features/universal_import/data/models/picked_import_file.dart';
 import 'package:submersion/features/universal_import/data/parsers/subsurface_xml_parser.dart';
 import 'package:submersion/features/universal_import/presentation/providers/universal_import_providers.dart';
 
@@ -80,6 +85,7 @@ import 'package:submersion/features/universal_import/presentation/providers/univ
   MockSpec<CourseRepository>(),
   MockSpec<TankPresetRepository>(),
   MockSpec<UddfEntityImporter>(),
+  MockSpec<DiveConsolidationService>(),
 ])
 import 'universal_adapter_test.mocks.dart';
 
@@ -90,6 +96,30 @@ typedef Override = riverpod.Override;
 // ---------------------------------------------------------------------------
 
 final _now = DateTime.now();
+
+/// Minimal snapshot for a stubbed [DiveConsolidationService.apply]. The fold
+/// is exercised for real by dive_consolidation_service_test and the download
+/// adapter's consolidate integration test; here we only assert the adapter's
+/// wiring (that it delegates to apply and adjusts its counts).
+const _emptySnapshot = DiveMergeSnapshot(
+  mergedDiveId: 'target-dive',
+  diveRows: [],
+  profileRows: [],
+  tankRows: [],
+  weightRows: [],
+  customFieldRows: [],
+  equipmentRows: [],
+  diveTypeRows: [],
+  tagRows: [],
+  buddyRows: [],
+  sightingRows: [],
+  eventRows: [],
+  gasSwitchRows: [],
+  tankPressureRows: [],
+  dataSourceRows: [],
+  tideRows: [],
+  mediaDiveIds: {},
+);
 
 Diver _testDiver() =>
     Diver(id: 'diver-1', name: 'Test Diver', createdAt: _now, updatedAt: _now);
@@ -121,7 +151,24 @@ class _TestableImportNotifier extends UniversalImportNotifier {
   }
 
   void setFileName(String name) {
-    state = state.copyWith(fileName: name);
+    setFiles([name]);
+  }
+
+  void setFiles(List<String> names) {
+    state = state.copyWith(
+      files: [
+        for (final name in names)
+          PickedImportFile(
+            name: name,
+            bytes: Uint8List(0),
+            detection: const DetectionResult(
+              format: ui.ImportFormat.unknown,
+              confidence: 0,
+            ),
+            status: ImportFileStatus.pending,
+          ),
+      ],
+    );
   }
 
   void setDetectedCsvPreset(CsvPreset? preset) {
@@ -197,6 +244,7 @@ List<Override> _fullOverrides({
   required ImportPayload payload,
   ImportOptions? options,
   Diver? diver,
+  List<String> fileNames = const [],
   List<Dive> existingDives = const [],
   List<DiveSite> existingSites = const [],
   List<Trip> existingTrips = const [],
@@ -247,6 +295,7 @@ List<Override> _fullOverrides({
       final notifier = _TestableImportNotifier(ref);
       notifier.setPayload(payload);
       if (options != null) notifier.setOptions(options);
+      if (fileNames.isNotEmpty) notifier.setFiles(fileNames);
       return notifier;
     }),
     settingsProvider.overrideWith((ref) => _TestSettingsNotifier()),
@@ -319,20 +368,19 @@ void main() {
       );
     });
 
-    testWidgets('supportedDuplicateActions contains skip and importAsNew', (
-      tester,
-    ) async {
+    testWidgets('supportedDuplicateActions includes skip, importAsNew, and '
+        'consolidate', (tester) async {
       await _runWithAdapter(
         tester,
         overrides: _buildBundleOverrides(),
         callback: (adapter) async {
           expect(
             adapter.supportedDuplicateActions,
-            containsAll([DuplicateAction.skip, DuplicateAction.importAsNew]),
-          );
-          expect(
-            adapter.supportedDuplicateActions,
-            isNot(contains(DuplicateAction.consolidate)),
+            containsAll([
+              DuplicateAction.skip,
+              DuplicateAction.importAsNew,
+              DuplicateAction.consolidate,
+            ]),
           );
         },
       );
@@ -420,6 +468,259 @@ void main() {
             adapter.defaultTagName,
             matches(RegExp(r'^dive_log\.csv Import \d{4}-\d{2}-\d{2}$')),
           );
+        },
+      );
+    });
+  });
+
+  // -------------------------------------------------------------------------
+  // performImport -- consolidate
+  // -------------------------------------------------------------------------
+
+  group('performImport() - consolidate', () {
+    testWidgets('folds a consolidate-flagged dive into its matched dive and '
+        'reports it as consolidated, not imported', (tester) async {
+      final mockConsolidation = MockDiveConsolidationService();
+      when(
+        mockConsolidation.apply(
+          targetDiveId: anyNamed('targetDiveId'),
+          secondaryDiveIds: anyNamed('secondaryDiveIds'),
+        ),
+      ).thenAnswer(
+        (invocation) async => DiveConsolidationOutcome(
+          targetDiveId: invocation.namedArguments[#targetDiveId] as String,
+          snapshot: _emptySnapshot,
+        ),
+      );
+
+      final payload = ImportPayload(
+        entities: {
+          ui.ImportEntityType.dives: [
+            {
+              'dateTime': DateTime(2026, 7, 1, 9, 0),
+              'maxDepth': 24.5,
+              'runtime': const Duration(minutes: 40),
+            },
+          ],
+        },
+      );
+
+      await _runWithAdapter(
+        tester,
+        overrides: [
+          ..._fullOverrides(payload: payload, diver: _testDiver()),
+          diveConsolidationServiceProvider.overrideWithValue(mockConsolidation),
+        ],
+        callback: (adapter) async {
+          final base = await adapter.buildBundle();
+          // Flag the single incoming dive as a duplicate of an existing dive
+          // and mark it for consolidation, mirroring what the review step
+          // hands to performImport.
+          final bundle = ImportBundle(
+            source: base.source,
+            groups: {
+              wizard.ImportEntityType.dives: EntityGroup(
+                items: base.groups[wizard.ImportEntityType.dives]!.items,
+                duplicateIndices: const {0},
+                matchResults: const {
+                  0: DiveMatchResult(
+                    diveId: 'target-dive',
+                    score: 0.9,
+                    timeDifferenceMs: 0,
+                  ),
+                },
+              ),
+            },
+          );
+
+          final result = await adapter.performImport(
+            bundle,
+            {
+              wizard.ImportEntityType.dives: {0},
+            },
+            {
+              wizard.ImportEntityType.dives: {0: DuplicateAction.consolidate},
+            },
+          );
+
+          expect(result.consolidatedCount, equals(1));
+          // The folded dive was imported as a standalone then tombstoned by the
+          // fold, so it must NOT also be counted as a new imported dive.
+          expect(
+            result.importedCounts[wizard.ImportEntityType.dives] ?? 0,
+            equals(0),
+          );
+          verify(
+            mockConsolidation.apply(
+              targetDiveId: 'target-dive',
+              secondaryDiveIds: anyNamed('secondaryDiveIds'),
+            ),
+          ).called(1);
+        },
+      );
+    });
+
+    testWidgets('reports a stranded dive as imported when both the fold and '
+        'its cleanup fail (does not hide it)', (tester) async {
+      final mockConsolidation = MockDiveConsolidationService();
+      when(
+        mockConsolidation.apply(
+          targetDiveId: anyNamed('targetDiveId'),
+          secondaryDiveIds: anyNamed('secondaryDiveIds'),
+        ),
+      ).thenThrow(ArgumentError('fold failed'));
+
+      // The compensating delete also fails, so the standalone dive cannot be
+      // removed and is left stranded in the DB.
+      final mockDiveRepo = MockDiveRepository();
+      when(mockDiveRepo.bulkDeleteDives(any)).thenThrow(Exception('delete'));
+
+      final payload = ImportPayload(
+        entities: {
+          ui.ImportEntityType.dives: [
+            {
+              'dateTime': DateTime(2026, 7, 1, 9, 0),
+              'maxDepth': 24.5,
+              'runtime': const Duration(minutes: 40),
+            },
+          ],
+        },
+      );
+
+      await _runWithAdapter(
+        tester,
+        overrides: [
+          ..._fullOverrides(
+            payload: payload,
+            diver: _testDiver(),
+            mockDiveRepo: mockDiveRepo,
+          ),
+          diveConsolidationServiceProvider.overrideWithValue(mockConsolidation),
+        ],
+        callback: (adapter) async {
+          final base = await adapter.buildBundle();
+          final bundle = ImportBundle(
+            source: base.source,
+            groups: {
+              wizard.ImportEntityType.dives: EntityGroup(
+                items: base.groups[wizard.ImportEntityType.dives]!.items,
+                duplicateIndices: const {0},
+                matchResults: const {
+                  0: DiveMatchResult(
+                    diveId: 'target-dive',
+                    score: 0.9,
+                    timeDifferenceMs: 0,
+                  ),
+                },
+              ),
+            },
+          );
+
+          final result = await adapter.performImport(
+            bundle,
+            {
+              wizard.ImportEntityType.dives: {0},
+            },
+            {
+              wizard.ImportEntityType.dives: {0: DuplicateAction.consolidate},
+            },
+          );
+
+          // The fold failed AND the standalone could not be deleted, so the
+          // dive is still present -- it must be reported as imported, not
+          // silently hidden.
+          expect(result.consolidatedCount, equals(0));
+          expect(
+            result.importedCounts[wizard.ImportEntityType.dives] ?? 0,
+            equals(1),
+          );
+        },
+      );
+    });
+  });
+
+  // -------------------------------------------------------------------------
+  // performImport -- per-file outcomes (bulk import)
+  // -------------------------------------------------------------------------
+
+  group('performImport() - per-file outcomes', () {
+    testWidgets('attributes imported dives to files by _sourceFileId', (
+      tester,
+    ) async {
+      // Two files, one dive each, attributed by the collision-free id.
+      final payload = ImportPayload(
+        entities: {
+          ui.ImportEntityType.dives: [
+            {
+              'dateTime': DateTime(2026, 5, 1, 9, 0),
+              'maxDepth': 20.0,
+              'runtime': const Duration(minutes: 30),
+              '_sourceFile': 'jan.fit',
+              '_sourceFileId': 'f0',
+            },
+            {
+              'dateTime': DateTime(2026, 6, 1, 9, 0),
+              'maxDepth': 18.0,
+              'runtime': const Duration(minutes: 35),
+              '_sourceFile': 'feb.uddf',
+              '_sourceFileId': 'f1',
+            },
+          ],
+        },
+        metadata: const {'batchFileCount': 2},
+      );
+
+      await _runWithAdapter(
+        tester,
+        overrides: _fullOverrides(
+          payload: payload,
+          diver: _testDiver(),
+          fileNames: ['jan.fit', 'feb.uddf'],
+        ),
+        callback: (adapter) async {
+          final bundle = await adapter.buildBundle();
+          final result = await adapter.performImport(bundle, {
+            wizard.ImportEntityType.dives: {0, 1},
+          }, const {});
+
+          expect(result.fileOutcomes, hasLength(2));
+          final byName = {for (final o in result.fileOutcomes) o.fileName: o};
+          expect(byName['jan.fit']!.status, ImportFileOutcomeStatus.imported);
+          expect(byName['jan.fit']!.importedDives, 1);
+          expect(byName['feb.uddf']!.importedDives, 1);
+        },
+      );
+    });
+
+    testWidgets('single-file import produces no per-file outcomes', (
+      tester,
+    ) async {
+      final payload = ImportPayload(
+        entities: {
+          ui.ImportEntityType.dives: [
+            {
+              'dateTime': DateTime(2026, 5, 1, 9, 0),
+              'maxDepth': 20.0,
+              'runtime': const Duration(minutes: 30),
+            },
+          ],
+        },
+      );
+
+      await _runWithAdapter(
+        tester,
+        overrides: _fullOverrides(
+          payload: payload,
+          diver: _testDiver(),
+          fileNames: ['solo.uddf'],
+        ),
+        callback: (adapter) async {
+          final bundle = await adapter.buildBundle();
+          final result = await adapter.performImport(bundle, {
+            wizard.ImportEntityType.dives: {0},
+          }, const {});
+
+          expect(result.fileOutcomes, isEmpty);
         },
       );
     });
@@ -553,6 +854,32 @@ void main() {
           final item = bundle.groups[ImportEntityType.dives]!.items.first;
 
           expect(item.subtitle, contains('35 min'));
+        },
+      );
+    });
+
+    testWidgets('dive subtitle includes source file for batch imports', (
+      tester,
+    ) async {
+      final payload = ImportPayload(
+        entities: {
+          ui.ImportEntityType.dives: [
+            {
+              'dateTime': DateTime(2026, 3, 15, 10, 0),
+              'maxDepth': 20.0,
+              '_sourceFile': 'january.fit',
+            },
+          ],
+        },
+      );
+
+      await _runWithAdapter(
+        tester,
+        overrides: _buildBundleOverrides(payload: payload),
+        callback: (adapter) async {
+          final bundle = await adapter.buildBundle();
+          final item = bundle.groups[ImportEntityType.dives]!.items.first;
+          expect(item.subtitle, contains('january.fit'));
         },
       );
     });
@@ -1531,7 +1858,7 @@ void main() {
         maxDepth: 30.0,
         runtime: const Duration(minutes: 45),
         notes: '',
-        diveTypeId: '',
+        diveTypeIds: [''],
         tanks: const [],
         profile: const [],
         equipment: const [],
@@ -2986,6 +3313,86 @@ void main() {
   // -------------------------------------------------------------------------
 
   group('performImport() - _resolveSelections edge cases', () {
+    testWidgets(
+      'consolidate on a base-selected buddy links instead of importing a twin '
+      '(#756)',
+      (tester) async {
+        final payload = ImportPayload(
+          entities: {
+            ui.ImportEntityType.buddies: [
+              {'name': 'Jane Doe', 'uddfId': 'Jane Doe'},
+            ],
+            ui.ImportEntityType.dives: [
+              {
+                'dateTime': DateTime(2026, 3, 15, 10, 0),
+                'maxDepth': 20.0,
+                'runtime': const Duration(minutes: 30),
+                'buddyRefs': ['Jane Doe'],
+              },
+            ],
+          },
+        );
+
+        final existingBuddy = Buddy(
+          id: 'buddy-1',
+          name: 'Jane Doe',
+          createdAt: _now,
+          updatedAt: _now,
+        );
+
+        final mockDiveRepo = MockDiveRepository();
+        when(mockDiveRepo.getAllDives()).thenAnswer((_) async => <Dive>[]);
+        when(mockDiveRepo.createDive(any)).thenAnswer(
+          (invocation) async => invocation.positionalArguments[0] as Dive,
+        );
+
+        final mockBuddyRepo = MockBuddyRepository();
+        when(
+          mockBuddyRepo.addBuddyToDive(any, any, any),
+        ).thenAnswer((_) async {});
+
+        final mockTankPresetRepo = MockTankPresetRepository();
+        when(
+          mockTankPresetRepo.getPresetById(any),
+        ).thenAnswer((_) async => null);
+
+        await _runWithAdapter(
+          tester,
+          overrides: _fullOverrides(
+            payload: payload,
+            diver: _testDiver(),
+            existingBuddies: [existingBuddy],
+            mockDiveRepo: mockDiveRepo,
+            mockBuddyRepo: mockBuddyRepo,
+            mockTankPresetRepo: mockTankPresetRepo,
+          ),
+          callback: (adapter) async {
+            final bundle = await adapter.buildBundle();
+            // performImport needs the duplicate-checked bundle: that is what
+            // carries entityMatches (and what the wizard passes in).
+            final checked = await adapter.checkDuplicates(bundle);
+            await adapter.performImport(
+              checked,
+              {
+                // The duplicate index is ALSO in the base selection set --
+                // the shape that used to leak past the consolidate action.
+                wizard.ImportEntityType.buddies: {0},
+                wizard.ImportEntityType.dives: {0},
+              },
+              {
+                wizard.ImportEntityType.buddies: {
+                  0: DuplicateAction.consolidate,
+                },
+              },
+            );
+
+            verifyNever(mockBuddyRepo.createBuddy(any));
+            verify(mockBuddyRepo.addBuddyToDive(any, 'buddy-1', any)).called(1);
+          },
+        );
+      },
+    );
+
     testWidgets(
       'items with no duplicate action are included from base selection',
       (tester) async {

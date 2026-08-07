@@ -4,6 +4,7 @@
 #include <chrono>
 #include <condition_variable>
 #include <cstdint>
+#include <deque>
 #include <functional>
 #include <mutex>
 #include <string>
@@ -86,8 +87,17 @@ class BleIoStream {
   static const winrt::guid kPreferredServiceUuid;
   static const winrt::guid kPreferredWriteUuid;
   static const winrt::guid kPreferredNotifyUuid;
+  static const winrt::guid kHalcyonSymbiosTxUuid;
+  static const winrt::guid kHalcyonSymbiosRxUuid;
 
   winrt::Windows::Devices::Bluetooth::BluetoothLEDevice device_{nullptr};
+  // Held for the connection's lifetime to keep a throughput-optimized
+  // (low-interval) connection request active; released in Close(). A faster
+  // connection interval lets a dive computer's serial->BLE bridge drain its
+  // buffer during bulk logbook dumps without dropping notifications (#280).
+  winrt::Windows::Devices::Bluetooth::
+      BluetoothLEPreferredConnectionParametersRequest
+          preferred_connection_request_{nullptr};
   winrt::Windows::Devices::Bluetooth::GenericAttributeProfile::
       GattCharacteristic write_characteristic_{nullptr};
   winrt::Windows::Devices::Bluetooth::GenericAttributeProfile::
@@ -96,7 +106,10 @@ class BleIoStream {
 
   std::mutex read_mutex_;
   std::condition_variable read_cv_;
-  std::vector<uint8_t> read_buffer_;
+  // One entry per GATT notification. libdivecomputer's packet parsers
+  // require each read to return bytes from at most one notification;
+  // coalescing them into a flat buffer loses packet boundaries.
+  std::deque<std::vector<uint8_t>> read_chunks_;
 
   int timeout_ms_ = 10000;
   std::string device_name_;

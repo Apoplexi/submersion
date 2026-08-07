@@ -1,20 +1,34 @@
+import 'dart:async' show Completer, unawaited;
 import 'dart:io';
 
+import 'package:flutter/foundation.dart' show kReleaseMode;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqlite3/sqlite3.dart' as sqlite3;
+import 'package:url_launcher/url_launcher.dart';
 
 import 'package:submersion/core/database/database.dart';
 import 'package:submersion/core/database/database_version_exception.dart';
 import 'package:submersion/core/domain/entities/migration_progress.dart';
+import 'package:submersion/core/presentation/pages/lock_escape_dialogs.dart';
+import 'package:submersion/core/presentation/pages/lock_screen_view.dart';
+import 'package:submersion/core/presentation/startup_brightness.dart';
 import 'package:submersion/core/presentation/widgets/backup_status_views.dart';
 import 'package:submersion/core/presentation/widgets/ocean_background.dart';
+import 'package:submersion/core/presentation/widgets/version_mismatch_view.dart';
+import 'package:submersion/core/services/accounts/account_deduplicator.dart';
+import 'package:submersion/core/services/accounts/account_startup_migration.dart';
 import 'package:submersion/core/services/background_service.dart';
 import 'package:submersion/core/services/database_location_service.dart';
 import 'package:submersion/core/services/database_service.dart';
 import 'package:submersion/core/services/local_cache_database_service.dart';
+import 'package:submersion/core/services/security/biometric_service.dart';
+import 'package:submersion/core/services/security/database_locked_exception.dart';
+import 'package:submersion/core/services/security/database_security_service.dart';
+import 'package:submersion/core/services/security/database_security_sidecar.dart';
+import 'package:submersion/core/services/security/locked_database_escape.dart';
 import 'package:submersion/core/services/log_file_service.dart';
 import 'package:submersion/core/services/notification_service.dart';
 import 'package:submersion/features/backup/data/repositories/backup_preferences.dart';
@@ -23,6 +37,10 @@ import 'package:submersion/features/backup/data/services/pre_migration_backup_se
 import 'package:submersion/features/backup/domain/exceptions/backup_failed_exception.dart';
 import 'package:submersion/features/maps/data/services/tile_cache_service.dart';
 import 'package:submersion/features/marine_life/data/repositories/species_repository.dart';
+import 'package:submersion/features/media/data/repositories/media_repository.dart';
+import 'package:submersion/features/media_store/data/media_deletion_coordinator.dart';
+import 'package:submersion/features/media_store/data/media_orphan_backlog_sweep.dart';
+import 'package:submersion/features/media_store/data/media_transfer_queue_repository.dart';
 import 'package:submersion/main.dart' show SubmersionRestart;
 
 /// Callback signature for the service initializer used by [StartupWrapper].
@@ -39,8 +57,30 @@ typedef ServiceInitializer =
 typedef SchemaVersionProbe =
     ({bool needsMigration, int totalSteps}) Function(String dbPath);
 
+/// Runs [step], measuring its wall time, and prints a
+/// `[startup] <name>: <ms>ms` attribution line in debug/profile builds.
+///
+/// A top-level function (rather than a private closure) so the real startup
+/// call sites in [StartupWrapper] and unit tests can both reach it; at those
+/// call sites it wraps platform singletons that only run during app launch.
+/// [log] defaults to `!kReleaseMode` and is injectable so tests can exercise
+/// both branches.
+Future<void> timeStartupStep(
+  String name,
+  Future<void> Function() step, {
+  bool log = !kReleaseMode,
+}) async {
+  final sw = Stopwatch()..start();
+  await step();
+  sw.stop();
+  if (log) {
+    debugPrint('[startup] $name: ${sw.elapsedMilliseconds}ms');
+  }
+}
+
 enum _StartupState {
   initializing,
+  locked,
   backingUp,
   migrating,
   backupFailed,
@@ -105,11 +145,21 @@ class _StartupWrapperState extends State<StartupWrapper>
   BackupFailedException? _backupError;
   sqlite3.SqliteException? _readonlyError;
 
+  /// Completed by the unlock handlers to resume [_runInitialization] past
+  /// the lock gate.
+  Completer<void>? _unlockCompleter;
+  bool _biometricAvailable = false;
+
+  /// Navigator key for the splash MaterialApp, so the escape-hatch dialogs
+  /// (Task: recovery code / start fresh) have a dialog-capable context.
+  final GlobalKey<NavigatorState> _splashNavigatorKey =
+      GlobalKey<NavigatorState>();
+
   /// Drives the dissolve of the splash layer over the mounted app beneath.
   /// Forward-only; starts when _state first reaches ready.
   late final AnimationController _splashFadeController = AnimationController(
     vsync: this,
-    duration: const Duration(milliseconds: 900),
+    duration: const Duration(milliseconds: 750),
   );
 
   /// True once the fade completes, at which point the splash widget is
@@ -121,6 +171,11 @@ class _StartupWrapperState extends State<StartupWrapper>
     super.initState();
     _splashFadeController.addStatusListener((status) {
       if (status == AnimationStatus.completed && mounted) {
+        // coverage:ignore-start
+        if (!kReleaseMode) {
+          debugPrint('[startup] splash fade complete');
+        }
+        // coverage:ignore-end
         setState(() => _splashRemoved = true);
       }
     });
@@ -138,6 +193,10 @@ class _StartupWrapperState extends State<StartupWrapper>
       // Determine if migration is needed before opening the database
       final dbPath = await widget.locationService.getDatabasePath();
 
+      // App Security gate: must resolve BEFORE the schema probe below, which
+      // needs the cipher key to read an encrypted file.
+      await _resolveSecurityGate(dbPath);
+
       final int? storedVersion;
       final bool needsMigration;
       final int totalSteps;
@@ -149,7 +208,10 @@ class _StartupWrapperState extends State<StartupWrapper>
         storedVersion =
             null; // probe path doesn't expose storedVersion; backup uses 0 default
       } else {
-        storedVersion = DatabaseService.getStoredSchemaVersion(dbPath);
+        storedVersion = DatabaseService.getStoredSchemaVersion(
+          dbPath,
+          keyHex: DatabaseService.instance.databaseKeyHex,
+        );
         final sv = storedVersion;
         needsMigration =
             sv != null && sv > 0 && sv < AppDatabase.currentSchemaVersion;
@@ -192,6 +254,18 @@ class _StartupWrapperState extends State<StartupWrapper>
       ]);
 
       if (mounted) {
+        // coverage:ignore-start
+        final readyAt = Stopwatch()..start();
+        if (!kReleaseMode) {
+          debugPrint('[startup] ready; building app under splash');
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            debugPrint(
+              '[startup] first frame after ready: '
+              '${readyAt.elapsedMilliseconds}ms',
+            );
+          });
+        }
+        // coverage:ignore-end
         setState(() => _state = _StartupState.ready);
         _splashFadeController.forward();
       }
@@ -203,6 +277,18 @@ class _StartupWrapperState extends State<StartupWrapper>
           _dbVersion = e.databaseVersion;
           _appVersion = e.appVersion;
         });
+      }
+    } on DatabaseLockedException {
+      // The cached/typed key did not open the file (e.g. a keychain restored
+      // from another device). Fall back to the password prompt — the sidecar
+      // is authoritative and unlockWithSecret re-derives from it — then
+      // retry initialization from the top.
+      _unlockCompleter = Completer<void>();
+      if (mounted) setState(() => _state = _StartupState.locked);
+      await _unlockCompleter!.future;
+      if (mounted) {
+        setState(() => _state = _StartupState.initializing);
+        await _runInitialization();
       }
     } on sqlite3.SqliteException catch (e) {
       if (DatabaseService.isRecoverableReadonlyError(e)) {
@@ -236,6 +322,164 @@ class _StartupWrapperState extends State<StartupWrapper>
     }
   }
 
+  /// Resolves the App Security gate before any database access.
+  ///
+  /// - App Lock on: show the lock screen and wait for a successful unlock.
+  /// - Encryption on, App Lock off: load the cached key silently; only a
+  ///   missing cached key (new device, keychain wipe) shows the prompt —
+  ///   the database is physically unopenable without it.
+  /// - Both off: no-op.
+  ///
+  /// Also self-heals a flag/file mismatch: the file header is the truth
+  /// (an interrupted enable/disable or restored prefs can disagree).
+  Future<void> _resolveSecurityGate(String dbPath) async {
+    final security = DatabaseSecurityService.instance;
+    await security.configure(prefs: widget.prefs);
+
+    final fileEncrypted = isEncryptedDatabaseFile(dbPath);
+    if (!fileEncrypted && security.encryptionEnabled) {
+      // Interrupted disable-encryption run: the file is plaintext, the flag
+      // is stale. The file wins.
+      await security.preferences.setDbEncryptionEnabled(false);
+      await security.refreshDerivedKey();
+    } else if (fileEncrypted && !security.encryptionEnabled) {
+      // Encrypted-LOOKING file with the flag off. A corrupt plaintext
+      // database has the same non-SQLite header, so only conclude
+      // "interrupted enable-encryption" when the keyslot sidecar is present
+      // to corroborate it (enableSecurity always writes one and it travels
+      // with the database); otherwise leave the file to the existing
+      // corruption-recovery flow.
+      if (DatabaseSecuritySidecar.existsFor(dbPath)) {
+        await security.preferences.setDbEncryptionEnabled(true);
+        await security.refreshDerivedKey();
+      }
+    }
+
+    if (security.appLockEnabled || security.encryptionEnabled) {
+      final cached = await security.tryLoadCachedKey();
+      final mustPrompt =
+          security.appLockEnabled || (security.encryptionEnabled && !cached);
+      if (mustPrompt) {
+        _biometricAvailable =
+            cached &&
+            security.preferences.appLockBiometricsEnabled &&
+            await BiometricService().isAvailable();
+        _unlockCompleter = Completer<void>();
+        if (mounted) setState(() => _state = _StartupState.locked);
+        await _unlockCompleter!.future;
+        if (mounted) setState(() => _state = _StartupState.initializing);
+      }
+    }
+
+    // Sidecar self-heal: unlocked via the cached key but the durable wrapped
+    // copy is gone (deleted, excluded from a folder sync, ...). Rebuild it
+    // now — the cached key is the only unlock left, and losing it too would
+    // strand the database permanently. Declining just reoffers next launch.
+    if ((security.appLockEnabled || security.encryptionEnabled) &&
+        security.isUnlocked &&
+        !DatabaseSecuritySidecar.existsFor(dbPath)) {
+      final ctx = _splashNavigatorKey.currentContext;
+      if (ctx != null && ctx.mounted) {
+        String? newCode;
+        final repaired = await showSidecarRepairDialog(
+          ctx,
+          onSubmit: (password) async {
+            try {
+              newCode = await security.rebuildSidecar(
+                password: password,
+                dbPath: dbPath,
+              );
+              return true;
+            } catch (_) {
+              return false;
+            }
+          },
+        );
+        final codeCtx = _splashNavigatorKey.currentContext;
+        if (repaired == true &&
+            newCode != null &&
+            codeCtx != null &&
+            codeCtx.mounted) {
+          await showNewRecoveryCodeDialog(codeCtx, newCode!);
+        }
+      }
+    }
+
+    DatabaseService.instance.databaseKeyHex = security.databaseKeyHex;
+  }
+
+  /// The last secret (password OR recovery code) that successfully unwrapped
+  /// the Master Key this session. Needed by the forced password reset after
+  /// a recovery-code unlock (changePassword requires the current secret).
+  String? _lastAcceptedSecret;
+
+  /// Unlocks without completing the gate — the recovery-code dialog uses
+  /// this so the forced password reset can finish BEFORE startup proceeds
+  /// (the splash layer, and any dialog on it, is torn down at ready).
+  Future<bool> _unlockSecretOnly(String secret) async {
+    final security = DatabaseSecurityService.instance;
+    final dbPath = await widget.locationService.getDatabasePath();
+    final ok = await security.unlockWithSecret(secret, dbPath: dbPath);
+    if (ok) _lastAcceptedSecret = secret;
+    return ok;
+  }
+
+  Future<bool> _unlockWithPassword(String secret) async {
+    final ok = await _unlockSecretOnly(secret);
+    if (ok) _unlockCompleter?.complete();
+    return ok;
+  }
+
+  Future<void> _handleRecoveryUnlock() async {
+    final ctx = _splashNavigatorKey.currentContext;
+    if (ctx == null) return;
+    final ok = await showRecoveryCodeUnlockDialog(
+      ctx,
+      onSubmit: _unlockSecretOnly,
+    );
+    if (ok != true) return;
+    // Recovery implies the password is lost: force a new one before
+    // continuing (per spec), while the splash layer is still mounted.
+    final resetCtx = _splashNavigatorKey.currentContext;
+    final currentSecret = _lastAcceptedSecret;
+    if (resetCtx != null && resetCtx.mounted && currentSecret != null) {
+      await showForcedPasswordResetDialog(
+        resetCtx,
+        onSubmit: (newPassword) async {
+          final dbPath = await widget.locationService.getDatabasePath();
+          await DatabaseSecurityService.instance.changePassword(
+            currentSecret: currentSecret,
+            newPassword: newPassword,
+            dbPath: dbPath,
+          );
+        },
+      );
+    }
+    _unlockCompleter?.complete();
+  }
+
+  Future<void> _handleStartFresh() async {
+    final ctx = _splashNavigatorKey.currentContext;
+    if (ctx == null) return;
+    final confirmed = await showStartFreshConfirmDialog(ctx);
+    if (confirmed != true) return;
+    final dbPath = await widget.locationService.getDatabasePath();
+    await setAsideLockedDatabase(dbPath: dbPath, prefs: widget.prefs);
+    await DatabaseSecurityService.instance.clearInMemoryState();
+    DatabaseService.instance.databaseKeyHex = null;
+    // Resume initialization: the database file is gone, so a fresh empty
+    // database is created and the first-run wizard takes over.
+    _unlockCompleter?.complete();
+  }
+
+  Future<bool> _unlockWithBiometric() async {
+    final ok = await BiometricService().authenticate(
+      reason: 'Unlock your dive log',
+    );
+    if (ok) _unlockCompleter?.complete();
+    return ok;
+  }
+
   /// Attempt to recover the database from a hot-journal-readonly error by
   /// reopening in read-write mode (which forces SQLite to finish the
   /// rollback), then retry initialization from the top.
@@ -249,7 +493,10 @@ class _StartupWrapperState extends State<StartupWrapper>
     });
     try {
       final dbPath = await widget.locationService.getDatabasePath();
-      final recovered = DatabaseService.recoverHotJournal(dbPath);
+      final recovered = DatabaseService.recoverHotJournal(
+        dbPath,
+        keyHex: DatabaseService.instance.databaseKeyHex,
+      );
       if (!recovered) {
         if (mounted) {
           setState(() {
@@ -289,23 +536,80 @@ class _StartupWrapperState extends State<StartupWrapper>
       return;
     }
 
-    await DatabaseService.instance.initialize(
-      locationService: widget.locationService,
-      onMigrationProgress: onProgress,
+    // Real service bootstrap. Each step wraps a platform singleton or a real
+    // database, so this block runs during app launch rather than unit tests
+    // (cf. the coverage-ignored bootstrap in lib/main.dart). The wall-time
+    // attribution itself lives in the unit-tested [timeStartupStep].
+    // coverage:ignore-start
+    await timeStartupStep(
+      'database',
+      () => DatabaseService.instance.initialize(
+        locationService: widget.locationService,
+        onMigrationProgress: onProgress,
+      ),
     );
 
-    await LocalCacheDatabaseService.instance.initialize();
-    await NotificationService.instance.initialize();
-    await initializeBackgroundService();
+    await timeStartupStep(
+      'localCache',
+      LocalCacheDatabaseService.instance.initialize,
+    );
+    await timeStartupStep('accountMigration', () async {
+      final prefs = await SharedPreferences.getInstance();
+      await AccountStartupMigration(prefs: prefs).run();
+      // After the migration, so rows it seeds are already at their
+      // deterministic ids and the pass finds nothing to do on a fresh
+      // install. Both swallow their own errors: neither can block startup.
+      await AccountDeduplicator(prefs: prefs).run();
+    });
+    await timeStartupStep(
+      'notifications',
+      NotificationService.instance.initialize,
+    );
+    await timeStartupStep('backgroundService', initializeBackgroundService);
 
-    try {
-      await TileCacheService.instance.initialize();
-    } catch (e) {
-      debugPrint('Warning: Tile cache initialization failed: $e');
-    }
+    await timeStartupStep('tileCache', () async {
+      try {
+        await TileCacheService.instance.initialize();
+      } catch (e) {
+        debugPrint('Warning: Tile cache initialization failed: $e');
+      }
+    });
 
-    final speciesRepository = SpeciesRepository();
-    await speciesRepository.seedBuiltInSpecies();
+    await timeStartupStep('speciesSeed', () async {
+      final speciesRepository = SpeciesRepository();
+      await speciesRepository.seedBuiltInSpecies();
+    });
+
+    // One-time orphaned-media backlog sweep (orphan-prevention spec 4.3).
+    // Fire-and-forget: it must not delay first frame, runs against the
+    // now-open databases, and self-guards with a persisted flag that is
+    // only set on success (a failed run retries next launch).
+    final mediaRepository = MediaRepository();
+    final sweep = MediaOrphanBacklogSweep(
+      mediaRepository: mediaRepository,
+      coordinator: MediaDeletionCoordinator(
+        mediaRepository: mediaRepository,
+        queue: () => MediaTransferQueueRepository(),
+      ),
+      prefs: SharedPreferences.getInstance,
+    );
+    // An async closure rather than `.catchError` on the Future<int>: it
+    // hands `unawaited` a genuine Future<void> instead of a swept-row count
+    // nobody reads, and it keeps the stack trace. Nothing surfaces this
+    // failure to the user and the retry is a whole launch away, so the
+    // trace is the only diagnostic there will be. Untyped catch on purpose:
+    // an uninitialized local cache database throws StateError, not
+    // Exception, and a failed sweep must never take down startup.
+    unawaited(() async {
+      try {
+        await sweep.runIfNeeded();
+      } catch (e, stackTrace) {
+        debugPrint(
+          'Orphaned-media backlog sweep failed (will retry): $e\n$stackTrace',
+        );
+      }
+    }());
+    // coverage:ignore-end
   }
 
   Future<void> _runPreMigrationBackup({
@@ -325,6 +629,7 @@ class _StartupWrapperState extends State<StartupWrapper>
 
     final PreMigrationBackupService service;
     final String appVersion;
+    BackupDirLease? lease;
     if (widget.preMigrationBackupFactory != null) {
       service = widget.preMigrationBackupFactory!(
         livePath: dbPath,
@@ -334,18 +639,29 @@ class _StartupWrapperState extends State<StartupWrapper>
     } else {
       final info = await PackageInfo.fromPlatform();
       appVersion = '${info.version}.${info.buildNumber}';
+      // Arm any security-scoped bookmark for the custom location (and
+      // self-heal a stale one to the sandbox default) before the safety copy.
+      // Layer 1's fallback below still applies if writing to the armed path
+      // fails, so a pre-migration backup can never brick startup.
+      lease = await BackupService.resolveBackupsDirectoryLeased(prefs);
       service = PreMigrationBackupService(
         livePathProvider: () async => dbPath,
-        backupsDirProvider: () => BackupService.resolveBackupsDirectory(prefs),
+        backupsDirProvider: () async => lease!.path,
+        fallbackBackupsDirProvider:
+            BackupService.resolveDefaultBackupsDirectory,
         preferences: prefs,
       );
     }
 
-    await service.backupIfMigrationPending(
-      stored: stored,
-      target: AppDatabase.currentSchemaVersion,
-      appVersion: appVersion,
-    );
+    try {
+      await service.backupIfMigrationPending(
+        stored: stored,
+        target: AppDatabase.currentSchemaVersion,
+        appVersion: appVersion,
+      );
+    } finally {
+      await lease?.release();
+    }
   }
 
   /// Re-runs backup → services → ready without the 1-second splash delay used
@@ -363,7 +679,12 @@ class _StartupWrapperState extends State<StartupWrapper>
     });
     try {
       final dbPath = await widget.locationService.getDatabasePath();
-      final stored = DatabaseService.getStoredSchemaVersion(dbPath) ?? 0;
+      final stored =
+          DatabaseService.getStoredSchemaVersion(
+            dbPath,
+            keyHex: DatabaseService.instance.databaseKeyHex,
+          ) ??
+          0;
       await _runPreMigrationBackup(dbPath: dbPath, stored: stored);
       if (!mounted) return;
       final totalSteps = AppDatabase.migrationStepCount(stored);
@@ -389,6 +710,21 @@ class _StartupWrapperState extends State<StartupWrapper>
           _errorMessage = '$e';
         });
       }
+    }
+  }
+
+  static final Uri _latestReleaseUri = Uri.parse(
+    VersionMismatchView.latestReleaseUrl,
+  );
+
+  Future<void> _openLatestRelease() async {
+    try {
+      await launchUrl(_latestReleaseUri, mode: LaunchMode.externalApplication);
+    } catch (_) {
+      // Leaving the user on this screen is the only safe fallback: the
+      // database is untouched and must stay that way. VersionMismatchView
+      // renders this same URL beneath the button, so a launch failure still
+      // leaves the user an address they can type in manually.
     }
   }
 
@@ -428,7 +764,11 @@ class _StartupWrapperState extends State<StartupWrapper>
 
   @override
   Widget build(BuildContext context) {
-    final isDark = MediaQuery.platformBrightnessOf(context) == Brightness.dark;
+    final brightness = resolveStartupBrightness(
+      widget.prefs,
+      MediaQuery.platformBrightnessOf(context),
+    );
+    final isDark = brightness == Brightness.dark;
     final backgroundColor = isDark ? const Color(0xFF121212) : Colors.white;
     final textColor = isDark ? Colors.white : Colors.black87;
     final subtitleColor = isDark ? Colors.white70 : Colors.black54;
@@ -450,6 +790,7 @@ class _StartupWrapperState extends State<StartupWrapper>
               ),
               child: MaterialApp(
                 debugShowCheckedModeBanner: false,
+                navigatorKey: _splashNavigatorKey,
                 home:
                     (_state == _StartupState.error ||
                         _state == _StartupState.backupFailed ||
@@ -465,6 +806,17 @@ class _StartupWrapperState extends State<StartupWrapper>
                           ),
                         ),
                       )
+                    : _state == _StartupState.locked
+                    ? LockScreenView(
+                        key: const ValueKey('locked'),
+                        brightness: brightness,
+                        onSubmitSecret: _unlockWithPassword,
+                        onBiometric: _biometricAvailable
+                            ? _unlockWithBiometric
+                            : null,
+                        onUseRecoveryCode: _handleRecoveryUnlock,
+                        onStartFresh: _handleStartFresh,
+                      )
                     : Scaffold(
                         // Use 'splash' key for both initializing and migrating
                         // so AnimatedSize handles the progress bar transition
@@ -472,6 +824,7 @@ class _StartupWrapperState extends State<StartupWrapper>
                         // Scaffold crossfade.
                         key: const ValueKey('splash'),
                         body: OceanBackground(
+                          brightness: brightness,
                           child: SafeArea(
                             child: Center(child: _buildSplashContent(isDark)),
                           ),
@@ -569,41 +922,13 @@ class _StartupWrapperState extends State<StartupWrapper>
     }
 
     if (_isVersionMismatch) {
-      return Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(Icons.update, size: 64, color: Colors.orange),
-            const SizedBox(height: 24),
-            Text(
-              'Update Required',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: textColor,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Your dive data was saved by a newer version of '
-              'Submersion (schema v$_dbVersion). This version '
-              'only supports up to schema v$_appVersion.',
-              style: TextStyle(fontSize: 14, color: subtitleColor),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Please update Submersion to the latest version. '
-              'Your data is safe and has not been modified.',
-              style: TextStyle(fontSize: 14, color: subtitleColor),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 24),
-            FilledButton(onPressed: _closeApp, child: const Text('Close')),
-          ],
-        ),
+      return VersionMismatchView(
+        databaseVersion: _dbVersion,
+        appVersion: _appVersion,
+        textColor: textColor,
+        subtitleColor: subtitleColor,
+        onDownloadLatest: _openLatestRelease,
+        onClose: _closeApp,
       );
     }
 

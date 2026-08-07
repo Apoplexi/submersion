@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:submersion/features/data_quality/presentation/providers/quality_inbox_providers.dart';
 import 'package:submersion/features/dive_sites/presentation/providers/site_match_review_notifier.dart';
 import 'package:submersion/features/import_wizard/domain/models/import_bundle.dart';
+import 'package:submersion/features/import_wizard/domain/models/import_file_outcome.dart';
 import 'package:submersion/features/import_wizard/presentation/providers/import_wizard_providers.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 
@@ -50,7 +52,10 @@ class ImportSummaryStep extends ConsumerWidget {
       consolidatedCount: result.consolidatedCount,
       updatedCount: result.updatedCount,
       skippedCount: result.skippedCount,
+      attachedPhotoCount: result.attachedPhotoCount,
+      unmatchedPhotoCount: result.unmatchedPhotoCount,
       importedDiveIds: result.importedDiveIds,
+      fileOutcomes: result.fileOutcomes,
       onDone: onDone,
       onViewDives: onViewDives,
     );
@@ -66,7 +71,10 @@ class _SuccessView extends StatelessWidget {
   final int consolidatedCount;
   final int updatedCount;
   final int skippedCount;
+  final int attachedPhotoCount;
+  final int unmatchedPhotoCount;
   final List<String> importedDiveIds;
+  final List<ImportFileOutcome> fileOutcomes;
   final VoidCallback onDone;
   final VoidCallback onViewDives;
 
@@ -75,7 +83,10 @@ class _SuccessView extends StatelessWidget {
     required this.consolidatedCount,
     this.updatedCount = 0,
     required this.skippedCount,
+    this.attachedPhotoCount = 0,
+    this.unmatchedPhotoCount = 0,
     this.importedDiveIds = const [],
+    this.fileOutcomes = const [],
     required this.onDone,
     required this.onViewDives,
   });
@@ -164,6 +175,20 @@ class _SuccessView extends StatelessWidget {
                 count: consolidatedCount,
                 key: const Key('import_summary_consolidated_row'),
               ),
+            if (attachedPhotoCount > 0)
+              _CountRow(
+                icon: Icons.photo_library_outlined,
+                label: l10n.universalImport_label_photosAttached,
+                count: attachedPhotoCount,
+                key: const Key('import_summary_photos_row'),
+              ),
+            if (unmatchedPhotoCount > 0)
+              _CountRow(
+                icon: Icons.hide_image_outlined,
+                label: l10n.universalImport_label_photosUnmatched,
+                count: unmatchedPhotoCount,
+                key: const Key('import_summary_unmatched_photos_row'),
+              ),
             if (skippedCount > 0)
               _CountRow(
                 icon: Icons.skip_next,
@@ -171,6 +196,43 @@ class _SuccessView extends StatelessWidget {
                 count: skippedCount,
                 key: const Key('import_summary_skipped_row'),
               ),
+            if (importedDiveIds.isNotEmpty)
+              Consumer(
+                builder: (context, ref, _) {
+                  final count =
+                      ref
+                          .watch(
+                            importedDivesOpenFindingsCountProvider(
+                              importedDivesFindingsKey(importedDiveIds),
+                            ),
+                          )
+                          .value ??
+                      0;
+                  if (count == 0) return const SizedBox.shrink();
+                  return ListTile(
+                    dense: true,
+                    contentPadding: EdgeInsets.zero,
+                    leading: const Icon(Icons.rule),
+                    title: Text(l10n.dataQuality_summary_flagged(count)),
+                    trailing: TextButton(
+                      onPressed: () => context.push(
+                        '/dives/quality?dive=${importedDiveIds.join(',')}',
+                      ),
+                      child: Text(l10n.dataQuality_summary_review),
+                    ),
+                  );
+                },
+              ),
+            if (fileOutcomes.isNotEmpty) ...[
+              const SizedBox(height: 16),
+              Text(
+                l10n.universalImport_summary_filesTitle,
+                style: theme.textTheme.titleMedium,
+              ),
+              const SizedBox(height: 8),
+              for (final outcome in fileOutcomes)
+                _FileOutcomeRow(outcome: outcome),
+            ],
             const SizedBox(height: 32),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -308,6 +370,65 @@ class _ErrorView extends StatelessWidget {
             OutlinedButton(onPressed: onDone, child: const Text('Done')),
           ],
         ),
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Per-file outcome row (bulk imports)
+// ---------------------------------------------------------------------------
+
+class _FileOutcomeRow extends StatelessWidget {
+  final ImportFileOutcome outcome;
+
+  const _FileOutcomeRow({required this.outcome});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final l10n = context.l10n;
+
+    final icon = switch (outcome.status) {
+      ImportFileOutcomeStatus.imported => Icons.check_circle_outline,
+      ImportFileOutcomeStatus.parseFailed => Icons.error_outline,
+      ImportFileOutcomeStatus.needsIndividualImport => Icons.block,
+      ImportFileOutcomeStatus.unsupported => Icons.help_outline,
+    };
+    final label = switch (outcome.status) {
+      ImportFileOutcomeStatus.imported =>
+        l10n.universalImport_summary_fileImported(outcome.importedDives),
+      ImportFileOutcomeStatus.parseFailed =>
+        l10n.universalImport_summary_fileParseFailed,
+      ImportFileOutcomeStatus.needsIndividualImport =>
+        l10n.universalImport_summary_fileNeedsIndividualImport,
+      ImportFileOutcomeStatus.unsupported =>
+        l10n.universalImport_summary_fileUnsupported,
+    };
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 18, color: theme.colorScheme.onSurfaceVariant),
+          const SizedBox(width: 10),
+          ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 200),
+            child: Text(
+              outcome.fileName,
+              style: theme.textTheme.bodySmall,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+          const SizedBox(width: 10),
+          Text(
+            label,
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+          ),
+        ],
       ),
     );
   }

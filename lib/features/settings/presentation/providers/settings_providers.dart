@@ -11,13 +11,26 @@ import 'package:submersion/core/theme/app_theme_registry.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:submersion/core/constants/profile_metrics.dart';
+import 'package:submersion/features/dive_log/domain/entities/safety_finding.dart';
+import 'package:submersion/features/safety/domain/services/no_fly_service.dart';
 import 'package:submersion/core/constants/units.dart';
+import 'package:submersion/core/deco/entities/cns_calculation_method.dart';
+import 'package:submersion/core/presentation/startup_brightness.dart';
 import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/features/divers/presentation/providers/diver_providers.dart';
 import 'package:submersion/features/notifications/data/services/notification_scheduler.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/tissue_color_schemes.dart';
 import 'package:submersion/features/settings/data/repositories/app_settings_repository.dart';
 import 'package:submersion/features/settings/data/repositories/diver_settings_repository.dart';
+
+/// Which cylinders the simulated (ideal) ascent may breathe.
+enum AscentGasSet {
+  /// Every cylinder recorded on the dive (default).
+  allCarried,
+
+  /// Only deco/stage/bailout cylinders plus the current back gas.
+  decoStageOnly,
+}
 
 /// Unit system preset
 enum UnitPreset {
@@ -37,8 +50,10 @@ class SettingsKeys {
   static const String volumeUnit = 'volume_unit';
   static const String weightUnit = 'weight_unit';
   static const String sacUnit = 'sac_unit';
+  static const String defaultCurrency = 'default_currency';
   static const String unitPreset = 'unit_preset';
   static const String themeMode = 'theme_mode';
+  static const String displayZoom = 'display_zoom';
   static const String defaultDiveType = 'default_dive_type';
   static const String defaultTankVolume = 'default_tank_volume';
   static const String defaultStartPressure = 'default_start_pressure';
@@ -55,10 +70,33 @@ class SettingsKeys {
   static const String ascentRateWarning = 'ascent_rate_warning';
   static const String ascentRateCritical = 'ascent_rate_critical';
   static const String showCeilingOnProfile = 'show_ceiling_on_profile';
+  static const String showDecoStopsOnProfile = 'show_deco_stops_on_profile';
+  static const String defaultDecoStopSource = 'default_deco_stop_source';
   static const String showAscentRateColors = 'show_ascent_rate_colors';
   static const String showNdlOnProfile = 'show_ndl_on_profile';
   static const String lastStopDepth = 'last_stop_depth';
   static const String decoStopIncrement = 'deco_stop_increment';
+  static const String pscrRatio = 'pscr_ratio';
+
+  // Fullscreen profile view instrument tile preferences (device-local,
+  // stored directly in SharedPreferences rather than per-diver in the DB).
+  static const String fullscreenTileOrder = 'fullscreen_tile_order';
+  static const String fullscreenHiddenTiles = 'fullscreen_hidden_tiles';
+  static const String hiddenHomeChips = 'hidden_home_chips';
+  static const String fullscreenReadoutCardX = 'fullscreen_readout_card_x';
+  static const String fullscreenReadoutCardY = 'fullscreen_readout_card_y';
+
+  // Whether profile-chart metric overlays follow the visible depth window when
+  // zoomed (device-local, stored directly in SharedPreferences rather than
+  // per-diver in the DB).
+  static const String profileMetricsFollowViewport =
+      'profile_metrics_follow_viewport';
+
+  // Perdix-style media overlay preferences (device-local, stored directly in
+  // SharedPreferences rather than per-diver in the DB).
+  static const String perdixOverlayEnabled = 'perdix_overlay_enabled';
+  static const String perdixOverlayX = 'perdix_overlay_x';
+  static const String perdixOverlayY = 'perdix_overlay_y';
 }
 
 /// App settings state
@@ -70,10 +108,23 @@ class AppSettings {
   final WeightUnit weightUnit;
   final AltitudeUnit altitudeUnit;
   final SacUnit sacUnit;
+
+  /// ISO 4217 code used as the default currency for new priced items
+  /// (e.g. equipment purchase price).
+  final String defaultCurrency;
   final TimeFormat timeFormat;
   final DateFormatPreference dateFormat;
   final ThemeMode themeMode;
   final String themePresetId;
+
+  /// Color accents: tint main navigation icons with each feature's color.
+  final bool accentNavIcons;
+
+  /// Color accents: show a tinted feature icon beside page titles.
+  final bool accentSectionHeaders;
+
+  /// Color accents: tint leading icons in lists and settings pages.
+  final bool accentListIcons;
   final String locale;
   final String defaultDiveType;
   final double defaultTankVolume;
@@ -106,6 +157,24 @@ class AppSettings {
   /// Show ceiling curve on dive profile
   final bool showCeilingOnProfile;
 
+  /// Show deco stop band on dive profile
+  final bool showDecoStopsOnProfile;
+
+  /// Master toggle for the post-dive safety review
+  final bool safetyReviewEnabled;
+
+  /// SafetyRuleId.dbValue strings whose findings are hidden in the UI
+  final Set<String> safetyReviewDisabledRules;
+
+  /// Flying-after-diving conservatism preset
+  final NoFlyPreset noFlyPreset;
+
+  /// Bundled chamber ids hidden from the emergency card
+  final Set<String> hiddenChamberIds;
+
+  /// Manual emergency-card region override (ISO country code)
+  final String? emergencyRegion;
+
   /// Show color-coded ascent rate on dive profile
   final bool showAscentRateColors;
 
@@ -117,6 +186,14 @@ class AppSettings {
 
   /// Deco stop increment in meters (typically 3)
   final double decoStopIncrement;
+
+  /// Passive-SCR ratio (Subsurface `pscr_ratio`, default 100). A device-local
+  /// planning preference describing the diver's pSCR unit; larger values add
+  /// more fresh gas and shrink the inspired-O2 drop.
+  final double pscrRatio;
+
+  /// Which carried gases feed the ideal (best-gas) ascent projection.
+  final AscentGasSet ascentGasSet;
 
   /// Whether O2 is considered narcotic (true = more conservative)
   final bool o2Narcotic;
@@ -130,11 +207,18 @@ class AppSettings {
   /// Default data source for ceiling metric (computer or calculated)
   final MetricDataSource defaultCeilingSource;
 
+  /// Default data source for deco stop band (computer or calculated)
+  final MetricDataSource defaultDecoStopSource;
+
   /// Default data source for TTS metric (computer or calculated)
   final MetricDataSource defaultTtsSource;
 
   /// Default data source for CNS metric (computer or calculated)
   final MetricDataSource defaultCnsSource;
+
+  /// Algorithm used for calculated CNS%; see
+  /// docs/plans/2026-07-16-cns-calculation-method-setting-design.md
+  final CnsCalculationMethod cnsCalculationMethod;
 
   // Appearance settings
   /// Which attribute to use for card background coloring
@@ -248,13 +332,24 @@ class AppSettings {
   /// Default visibility for gas switch markers on dive profile
   final bool defaultShowGasSwitchMarkers;
 
+  /// Default visibility for photo markers on dive profile
+  final bool defaultShowPhotoMarkers;
+
   /// Default visibility for the gas-usage timeline strip on the dive profile
   final bool defaultShowGasTimeline;
+
+  /// Default visibility for the separate ascent-rate magnitude line on the
+  /// dive profile (distinct from [showAscentRateColors], which tints the depth
+  /// line by velocity band).
+  final bool defaultShowAscentRateLine;
 
   // Notification settings
   final bool notificationsEnabled;
   final List<int> serviceReminderDays;
   final TimeOfDay reminderTime;
+
+  /// Days before a trip starts to nag about gear due before the trip ends.
+  final int tripServiceLeadDays;
 
   /// Show field-level data source attribution badges on dive details
   final bool showDataSourceBadges;
@@ -275,6 +370,38 @@ class AppSettings {
   /// Ordered list of dive detail section visibility preferences
   final List<DiveDetailSectionConfig> diveDetailSections;
 
+  /// Instrument tile order for the fullscreen profile view.
+  /// Empty means the built-in priority order.
+  final List<String> fullscreenTileOrder;
+
+  /// Instrument tiles the user has hidden in the fullscreen profile view.
+  final List<String> fullscreenHiddenTiles;
+
+  /// Home dashboard gauge-strip chip types the user has hidden.
+  /// Ids are [HomeChipType.name] values; empty means all chips shown.
+  /// Device-local, not per-diver.
+  final Set<String> hiddenHomeChips;
+
+  /// Fullscreen readout card position as fractions (0..1) of the movable
+  /// range; null means the default corner. See DraggableReadoutCard.
+  final double? fullscreenReadoutCardX;
+  final double? fullscreenReadoutCardY;
+
+  /// Whether the dive profile chart's secondary-axis metric overlays (NDL,
+  /// ppO2, GF, ...) follow the visible depth window when zoomed instead of
+  /// magnifying with the depth axis and scrolling out of view. Device-local,
+  /// not per-diver. See MetricBand.
+  final bool profileMetricsFollowViewport;
+
+  /// Perdix-style media overlay: shown over photos/videos when enabled.
+  /// Device-local, not per-diver.
+  final bool perdixOverlayEnabled;
+
+  /// Perdix overlay position as fractions (0..1) of the movable range;
+  /// null means the default corner. See DraggablePerdixOverlay.
+  final double? perdixOverlayX;
+  final double? perdixOverlayY;
+
   const AppSettings({
     this.depthUnit = DepthUnit.meters,
     this.temperatureUnit = TemperatureUnit.celsius,
@@ -283,10 +410,14 @@ class AppSettings {
     this.weightUnit = WeightUnit.kilograms,
     this.altitudeUnit = AltitudeUnit.meters,
     this.sacUnit = SacUnit.pressurePerMin,
+    this.defaultCurrency = 'USD',
     this.timeFormat = TimeFormat.twelveHour,
     this.dateFormat = DateFormatPreference.mmmDYYYY,
     this.themeMode = ThemeMode.system,
     this.themePresetId = 'submersion',
+    this.accentNavIcons = false,
+    this.accentSectionHeaders = false,
+    this.accentListIcons = false,
     this.locale = 'system',
     this.defaultDiveType = 'recreational',
     this.defaultTankVolume = 12.0,
@@ -302,16 +433,26 @@ class AppSettings {
     this.ascentRateWarning = 9.0,
     this.ascentRateCritical = 12.0,
     this.showCeilingOnProfile = true,
-    this.showAscentRateColors = true,
+    this.showDecoStopsOnProfile = true,
+    this.safetyReviewEnabled = true,
+    this.safetyReviewDisabledRules = const {},
+    this.noFlyPreset = NoFlyPreset.standard,
+    this.hiddenChamberIds = const {},
+    this.emergencyRegion,
+    this.showAscentRateColors = false,
     this.showNdlOnProfile = true,
     this.lastStopDepth = 3.0,
     this.decoStopIncrement = 3.0,
+    this.pscrRatio = 100.0,
+    this.ascentGasSet = AscentGasSet.allCarried,
     this.o2Narcotic = true,
     this.endLimit = 30.0,
     this.defaultNdlSource = MetricDataSource.calculated,
     this.defaultCeilingSource = MetricDataSource.calculated,
+    this.defaultDecoStopSource = MetricDataSource.calculated,
     this.defaultTtsSource = MetricDataSource.calculated,
     this.defaultCnsSource = MetricDataSource.calculated,
+    this.cnsCalculationMethod = CnsCalculationMethod.shearwater,
     // Appearance defaults
     this.cardColorAttribute = CardColorAttribute.none,
     this.diveListViewMode = ListViewMode.detailed,
@@ -350,10 +491,13 @@ class AppSettings {
     this.defaultShowCns = false,
     this.defaultShowOtu = false,
     this.defaultShowGasSwitchMarkers = true,
+    this.defaultShowPhotoMarkers = true,
     this.defaultShowGasTimeline = false,
+    this.defaultShowAscentRateLine = false,
     // Notification defaults
     this.notificationsEnabled = true,
     this.serviceReminderDays = const [7, 14, 30],
+    this.tripServiceLeadDays = 14,
     this.reminderTime = const TimeOfDay(hour: 9, minute: 0),
     this.showDataSourceBadges = true,
     this.showProfilePanelInTableView = true,
@@ -366,6 +510,15 @@ class AppSettings {
     this.showDetailsPaneCertifications = false,
     this.showDetailsPaneCourses = false,
     this.diveDetailSections = DiveDetailSectionConfig.defaultSections,
+    this.fullscreenTileOrder = const [],
+    this.fullscreenHiddenTiles = const [],
+    this.hiddenHomeChips = const <String>{},
+    this.fullscreenReadoutCardX,
+    this.fullscreenReadoutCardY,
+    this.profileMetricsFollowViewport = false,
+    this.perdixOverlayEnabled = false,
+    this.perdixOverlayX,
+    this.perdixOverlayY,
   });
 
   /// Compute the current unit preset based on actual unit values
@@ -409,10 +562,14 @@ class AppSettings {
     WeightUnit? weightUnit,
     AltitudeUnit? altitudeUnit,
     SacUnit? sacUnit,
+    String? defaultCurrency,
     TimeFormat? timeFormat,
     DateFormatPreference? dateFormat,
     ThemeMode? themeMode,
     String? themePresetId,
+    bool? accentNavIcons,
+    bool? accentSectionHeaders,
+    bool? accentListIcons,
     String? locale,
     String? defaultDiveType,
     double? defaultTankVolume,
@@ -428,16 +585,27 @@ class AppSettings {
     double? ascentRateWarning,
     double? ascentRateCritical,
     bool? showCeilingOnProfile,
+    bool? showDecoStopsOnProfile,
+    bool? safetyReviewEnabled,
+    Set<String>? safetyReviewDisabledRules,
+    NoFlyPreset? noFlyPreset,
+    Set<String>? hiddenChamberIds,
+    String? emergencyRegion,
+    bool clearEmergencyRegion = false,
     bool? showAscentRateColors,
     bool? showNdlOnProfile,
     double? lastStopDepth,
     double? decoStopIncrement,
+    double? pscrRatio,
+    AscentGasSet? ascentGasSet,
     bool? o2Narcotic,
     double? endLimit,
     MetricDataSource? defaultNdlSource,
     MetricDataSource? defaultCeilingSource,
+    MetricDataSource? defaultDecoStopSource,
     MetricDataSource? defaultTtsSource,
     MetricDataSource? defaultCnsSource,
+    CnsCalculationMethod? cnsCalculationMethod,
     CardColorAttribute? cardColorAttribute,
     ListViewMode? diveListViewMode,
     ListViewMode? siteListViewMode,
@@ -475,9 +643,12 @@ class AppSettings {
     bool? defaultShowCns,
     bool? defaultShowOtu,
     bool? defaultShowGasSwitchMarkers,
+    bool? defaultShowPhotoMarkers,
     bool? defaultShowGasTimeline,
+    bool? defaultShowAscentRateLine,
     bool? notificationsEnabled,
     List<int>? serviceReminderDays,
+    int? tripServiceLeadDays,
     TimeOfDay? reminderTime,
     bool? showDataSourceBadges,
     bool? showProfilePanelInTableView,
@@ -491,6 +662,15 @@ class AppSettings {
     bool? showDetailsPaneCourses,
     List<DiveDetailSectionConfig>? diveDetailSections,
     bool clearDiveDetailSections = false,
+    List<String>? fullscreenTileOrder,
+    List<String>? fullscreenHiddenTiles,
+    Set<String>? hiddenHomeChips,
+    double? fullscreenReadoutCardX,
+    double? fullscreenReadoutCardY,
+    bool? profileMetricsFollowViewport,
+    bool? perdixOverlayEnabled,
+    double? perdixOverlayX,
+    double? perdixOverlayY,
   }) {
     return AppSettings(
       depthUnit: depthUnit ?? this.depthUnit,
@@ -500,10 +680,14 @@ class AppSettings {
       weightUnit: weightUnit ?? this.weightUnit,
       altitudeUnit: altitudeUnit ?? this.altitudeUnit,
       sacUnit: sacUnit ?? this.sacUnit,
+      defaultCurrency: defaultCurrency ?? this.defaultCurrency,
       timeFormat: timeFormat ?? this.timeFormat,
       dateFormat: dateFormat ?? this.dateFormat,
       themeMode: themeMode ?? this.themeMode,
       themePresetId: themePresetId ?? this.themePresetId,
+      accentNavIcons: accentNavIcons ?? this.accentNavIcons,
+      accentSectionHeaders: accentSectionHeaders ?? this.accentSectionHeaders,
+      accentListIcons: accentListIcons ?? this.accentListIcons,
       locale: locale ?? this.locale,
       defaultDiveType: defaultDiveType ?? this.defaultDiveType,
       defaultTankVolume: defaultTankVolume ?? this.defaultTankVolume,
@@ -521,16 +705,31 @@ class AppSettings {
       ascentRateWarning: ascentRateWarning ?? this.ascentRateWarning,
       ascentRateCritical: ascentRateCritical ?? this.ascentRateCritical,
       showCeilingOnProfile: showCeilingOnProfile ?? this.showCeilingOnProfile,
+      showDecoStopsOnProfile:
+          showDecoStopsOnProfile ?? this.showDecoStopsOnProfile,
+      safetyReviewEnabled: safetyReviewEnabled ?? this.safetyReviewEnabled,
+      safetyReviewDisabledRules:
+          safetyReviewDisabledRules ?? this.safetyReviewDisabledRules,
+      noFlyPreset: noFlyPreset ?? this.noFlyPreset,
+      hiddenChamberIds: hiddenChamberIds ?? this.hiddenChamberIds,
+      emergencyRegion: clearEmergencyRegion
+          ? null
+          : (emergencyRegion ?? this.emergencyRegion),
       showAscentRateColors: showAscentRateColors ?? this.showAscentRateColors,
       showNdlOnProfile: showNdlOnProfile ?? this.showNdlOnProfile,
       lastStopDepth: lastStopDepth ?? this.lastStopDepth,
       decoStopIncrement: decoStopIncrement ?? this.decoStopIncrement,
+      pscrRatio: pscrRatio ?? this.pscrRatio,
+      ascentGasSet: ascentGasSet ?? this.ascentGasSet,
       o2Narcotic: o2Narcotic ?? this.o2Narcotic,
       endLimit: endLimit ?? this.endLimit,
       defaultNdlSource: defaultNdlSource ?? this.defaultNdlSource,
       defaultCeilingSource: defaultCeilingSource ?? this.defaultCeilingSource,
+      defaultDecoStopSource:
+          defaultDecoStopSource ?? this.defaultDecoStopSource,
       defaultTtsSource: defaultTtsSource ?? this.defaultTtsSource,
       defaultCnsSource: defaultCnsSource ?? this.defaultCnsSource,
+      cnsCalculationMethod: cnsCalculationMethod ?? this.cnsCalculationMethod,
       cardColorAttribute: cardColorAttribute ?? this.cardColorAttribute,
       diveListViewMode: diveListViewMode ?? this.diveListViewMode,
       siteListViewMode: siteListViewMode ?? this.siteListViewMode,
@@ -580,10 +779,15 @@ class AppSettings {
       defaultShowOtu: defaultShowOtu ?? this.defaultShowOtu,
       defaultShowGasSwitchMarkers:
           defaultShowGasSwitchMarkers ?? this.defaultShowGasSwitchMarkers,
+      defaultShowPhotoMarkers:
+          defaultShowPhotoMarkers ?? this.defaultShowPhotoMarkers,
       defaultShowGasTimeline:
           defaultShowGasTimeline ?? this.defaultShowGasTimeline,
+      defaultShowAscentRateLine:
+          defaultShowAscentRateLine ?? this.defaultShowAscentRateLine,
       notificationsEnabled: notificationsEnabled ?? this.notificationsEnabled,
       serviceReminderDays: serviceReminderDays ?? this.serviceReminderDays,
+      tripServiceLeadDays: tripServiceLeadDays ?? this.tripServiceLeadDays,
       reminderTime: reminderTime ?? this.reminderTime,
       showDataSourceBadges: showDataSourceBadges ?? this.showDataSourceBadges,
       showProfilePanelInTableView:
@@ -604,6 +808,19 @@ class AppSettings {
       diveDetailSections: clearDiveDetailSections
           ? DiveDetailSectionConfig.defaultSections
           : (diveDetailSections ?? this.diveDetailSections),
+      fullscreenTileOrder: fullscreenTileOrder ?? this.fullscreenTileOrder,
+      fullscreenHiddenTiles:
+          fullscreenHiddenTiles ?? this.fullscreenHiddenTiles,
+      hiddenHomeChips: hiddenHomeChips ?? this.hiddenHomeChips,
+      fullscreenReadoutCardX:
+          fullscreenReadoutCardX ?? this.fullscreenReadoutCardX,
+      fullscreenReadoutCardY:
+          fullscreenReadoutCardY ?? this.fullscreenReadoutCardY,
+      profileMetricsFollowViewport:
+          profileMetricsFollowViewport ?? this.profileMetricsFollowViewport,
+      perdixOverlayEnabled: perdixOverlayEnabled ?? this.perdixOverlayEnabled,
+      perdixOverlayX: perdixOverlayX ?? this.perdixOverlayX,
+      perdixOverlayY: perdixOverlayY ?? this.perdixOverlayY,
     );
   }
 }
@@ -691,16 +908,71 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
     _isLoading = true;
 
     try {
+      // Fullscreen profile tile preferences are device-local (not per-diver),
+      // so they're read straight from SharedPreferences rather than the
+      // per-diver settings repository.
+      final prefs = _ref.read(sharedPreferencesProvider);
+      final fullscreenTileOrder =
+          prefs.getStringList(SettingsKeys.fullscreenTileOrder) ?? const [];
+      final fullscreenHiddenTiles =
+          prefs.getStringList(SettingsKeys.fullscreenHiddenTiles) ?? const [];
+      final hiddenHomeChips =
+          prefs.getStringList(SettingsKeys.hiddenHomeChips)?.toSet() ??
+          const <String>{};
+      final fullscreenReadoutCardX = prefs.getDouble(
+        SettingsKeys.fullscreenReadoutCardX,
+      );
+      final fullscreenReadoutCardY = prefs.getDouble(
+        SettingsKeys.fullscreenReadoutCardY,
+      );
+      // pSCR ratio is a device-local planning preference (kept out of the
+      // per-diver settings table), so it is read straight from SharedPreferences
+      // like the fullscreen tile prefs above.
+      final pscrRatio = prefs.getDouble(SettingsKeys.pscrRatio);
+      // Profile-chart overlay scaling is a device-local viewing preference,
+      // kept out of the per-diver settings table like the prefs above.
+      final profileMetricsFollowViewport =
+          prefs.getBool(SettingsKeys.profileMetricsFollowViewport) ?? false;
+      final perdixOverlayEnabled =
+          prefs.getBool(SettingsKeys.perdixOverlayEnabled) ?? false;
+      final perdixOverlayX = prefs.getDouble(SettingsKeys.perdixOverlayX);
+      final perdixOverlayY = prefs.getDouble(SettingsKeys.perdixOverlayY);
+
       final diverId = _validatedDiverId;
       if (diverId == null) {
         // No diver selected, use defaults
-        state = const AppSettings();
+        state = AppSettings(
+          fullscreenTileOrder: fullscreenTileOrder,
+          fullscreenHiddenTiles: fullscreenHiddenTiles,
+          hiddenHomeChips: hiddenHomeChips,
+          fullscreenReadoutCardX: fullscreenReadoutCardX,
+          fullscreenReadoutCardY: fullscreenReadoutCardY,
+          pscrRatio: pscrRatio ?? 100.0,
+          profileMetricsFollowViewport: profileMetricsFollowViewport,
+          perdixOverlayEnabled: perdixOverlayEnabled,
+          perdixOverlayX: perdixOverlayX,
+          perdixOverlayY: perdixOverlayY,
+        );
+        await _writeCachedThemeMode(prefs);
         return;
       }
 
       // Load settings from database
       final settings = await _repository.getOrCreateSettingsForDiver(diverId);
-      state = settings;
+      state = settings.copyWith(
+        fullscreenTileOrder: fullscreenTileOrder,
+        fullscreenHiddenTiles: fullscreenHiddenTiles,
+        hiddenHomeChips: hiddenHomeChips,
+        fullscreenReadoutCardX: fullscreenReadoutCardX,
+        fullscreenReadoutCardY: fullscreenReadoutCardY,
+        pscrRatio: pscrRatio,
+        profileMetricsFollowViewport: profileMetricsFollowViewport,
+        perdixOverlayEnabled: perdixOverlayEnabled,
+        perdixOverlayX: perdixOverlayX,
+        perdixOverlayY: perdixOverlayY,
+      );
+
+      await _writeCachedThemeMode(prefs);
 
       // Schedule notifications with the loaded settings
       _scheduleNotificationsIfNeeded();
@@ -731,9 +1003,63 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
   }
 
   Future<void> _saveSettings() async {
+    // Fullscreen profile tile preferences are device-local (not per-diver),
+    // so they're always persisted to SharedPreferences, independent of
+    // whether a diver is currently selected.
+    final prefs = _ref.read(sharedPreferencesProvider);
+    await prefs.setStringList(
+      SettingsKeys.fullscreenTileOrder,
+      state.fullscreenTileOrder,
+    );
+    await prefs.setStringList(
+      SettingsKeys.fullscreenHiddenTiles,
+      state.fullscreenHiddenTiles,
+    );
+    await prefs.setStringList(
+      SettingsKeys.hiddenHomeChips,
+      state.hiddenHomeChips.toList()..sort(),
+    );
+    final readoutCardX = state.fullscreenReadoutCardX;
+    if (readoutCardX != null) {
+      await prefs.setDouble(SettingsKeys.fullscreenReadoutCardX, readoutCardX);
+    }
+    final readoutCardY = state.fullscreenReadoutCardY;
+    if (readoutCardY != null) {
+      await prefs.setDouble(SettingsKeys.fullscreenReadoutCardY, readoutCardY);
+    }
+    await prefs.setDouble(SettingsKeys.pscrRatio, state.pscrRatio);
+    await prefs.setBool(
+      SettingsKeys.profileMetricsFollowViewport,
+      state.profileMetricsFollowViewport,
+    );
+    await prefs.setBool(
+      SettingsKeys.perdixOverlayEnabled,
+      state.perdixOverlayEnabled,
+    );
+    final perdixX = state.perdixOverlayX;
+    if (perdixX != null) {
+      await prefs.setDouble(SettingsKeys.perdixOverlayX, perdixX);
+    }
+    final perdixY = state.perdixOverlayY;
+    if (perdixY != null) {
+      await prefs.setDouble(SettingsKeys.perdixOverlayY, perdixY);
+    }
+
+    await _writeCachedThemeMode(prefs);
+
     final diverId = _validatedDiverId;
     if (diverId == null) return;
     await _repository.updateSettingsForDiver(diverId, state);
+  }
+
+  /// Mirrors the effective theme mode into SharedPreferences so the startup
+  /// splash and setup wizard (which render before the database opens) can
+  /// resolve dark mode. See [resolveStartupBrightness].
+  Future<void> _writeCachedThemeMode(SharedPreferences prefs) async {
+    await prefs.setString(
+      cachedThemeModeKey,
+      cachedThemeModeValue(state.themeMode),
+    );
   }
 
   Future<void> setDepthUnit(DepthUnit unit) async {
@@ -766,6 +1092,11 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
     await _saveSettings();
   }
 
+  Future<void> setDefaultCurrency(String currencyCode) async {
+    state = state.copyWith(defaultCurrency: currencyCode.trim().toUpperCase());
+    await _saveSettings();
+  }
+
   Future<void> setAltitudeUnit(AltitudeUnit unit) async {
     state = state.copyWith(altitudeUnit: unit);
     await _saveSettings();
@@ -788,6 +1119,21 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
 
   Future<void> setThemePresetId(String presetId) async {
     state = state.copyWith(themePresetId: presetId);
+    await _saveSettings();
+  }
+
+  Future<void> setAccentNavIcons(bool value) async {
+    state = state.copyWith(accentNavIcons: value);
+    await _saveSettings();
+  }
+
+  Future<void> setAccentSectionHeaders(bool value) async {
+    state = state.copyWith(accentSectionHeaders: value);
+    await _saveSettings();
+  }
+
+  Future<void> setAccentListIcons(bool value) async {
+    state = state.copyWith(accentListIcons: value);
     await _saveSettings();
   }
 
@@ -881,6 +1227,62 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
     await _saveSettings();
   }
 
+  Future<void> setShowDecoStopsOnProfile(bool value) async {
+    state = state.copyWith(showDecoStopsOnProfile: value);
+    await _saveSettings();
+  }
+
+  Future<void> setSafetyReviewEnabled(bool value) async {
+    state = state.copyWith(safetyReviewEnabled: value);
+    await _saveSettings();
+  }
+
+  /// Show or hide one home gauge-strip chip type (id = HomeChipType.name).
+  Future<void> setHomeChipEnabled(String chipId, bool enabled) async {
+    final hidden = {...state.hiddenHomeChips};
+    if (enabled) {
+      hidden.remove(chipId);
+    } else {
+      hidden.add(chipId);
+    }
+    state = state.copyWith(hiddenHomeChips: hidden);
+    await _saveSettings();
+  }
+
+  Future<void> setSafetyRuleEnabled(SafetyRuleId rule, bool enabled) async {
+    final rules = {...state.safetyReviewDisabledRules};
+    if (enabled) {
+      rules.remove(rule.dbValue);
+    } else {
+      rules.add(rule.dbValue);
+    }
+    state = state.copyWith(safetyReviewDisabledRules: rules);
+    await _saveSettings();
+  }
+
+  Future<void> setNoFlyPreset(NoFlyPreset preset) async {
+    state = state.copyWith(noFlyPreset: preset);
+    await _saveSettings();
+  }
+
+  Future<void> setChamberHidden(String chamberId, bool hidden) async {
+    final ids = {...state.hiddenChamberIds};
+    if (hidden) {
+      ids.add(chamberId);
+    } else {
+      ids.remove(chamberId);
+    }
+    state = state.copyWith(hiddenChamberIds: ids);
+    await _saveSettings();
+  }
+
+  Future<void> setEmergencyRegion(String? countryCode) async {
+    state = countryCode == null
+        ? state.copyWith(clearEmergencyRegion: true)
+        : state.copyWith(emergencyRegion: countryCode);
+    await _saveSettings();
+  }
+
   Future<void> setShowAscentRateColors(bool value) async {
     state = state.copyWith(showAscentRateColors: value);
     await _saveSettings();
@@ -903,8 +1305,19 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
     await _saveSettings();
   }
 
+  Future<void> setPscrRatio(double value) async {
+    final clamped = value.clamp(1.0, 1000.0);
+    state = state.copyWith(pscrRatio: clamped);
+    await _saveSettings();
+  }
+
   Future<void> setO2Narcotic(bool value) async {
     state = state.copyWith(o2Narcotic: value);
+    await _saveSettings();
+  }
+
+  Future<void> setAscentGasSet(AscentGasSet value) async {
+    state = state.copyWith(ascentGasSet: value);
     await _saveSettings();
   }
 
@@ -924,6 +1337,11 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
     await _saveSettings();
   }
 
+  Future<void> setDefaultDecoStopSource(MetricDataSource value) async {
+    state = state.copyWith(defaultDecoStopSource: value);
+    await _saveSettings();
+  }
+
   Future<void> setDefaultTtsSource(MetricDataSource value) async {
     state = state.copyWith(defaultTtsSource: value);
     await _saveSettings();
@@ -931,6 +1349,11 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
 
   Future<void> setDefaultCnsSource(MetricDataSource value) async {
     state = state.copyWith(defaultCnsSource: value);
+    await _saveSettings();
+  }
+
+  Future<void> setCnsCalculationMethod(CnsCalculationMethod value) async {
+    state = state.copyWith(cnsCalculationMethod: value);
     await _saveSettings();
   }
 
@@ -1116,8 +1539,18 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
     await _saveSettings();
   }
 
+  Future<void> setDefaultShowPhotoMarkers(bool value) async {
+    state = state.copyWith(defaultShowPhotoMarkers: value);
+    await _saveSettings();
+  }
+
   Future<void> setDefaultShowGasTimeline(bool value) async {
     state = state.copyWith(defaultShowGasTimeline: value);
+    await _saveSettings();
+  }
+
+  Future<void> setDefaultShowAscentRateLine(bool value) async {
+    state = state.copyWith(defaultShowAscentRateLine: value);
     await _saveSettings();
   }
 
@@ -1140,6 +1573,11 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
     await _saveSettings();
   }
 
+  Future<void> setTripServiceLeadDays(int days) async {
+    state = state.copyWith(tripServiceLeadDays: days);
+    await _saveSettings();
+  }
+
   Future<void> setShowDataSourceBadges(bool value) async {
     state = state.copyWith(showDataSourceBadges: value);
     await _saveSettings();
@@ -1159,6 +1597,52 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
 
   Future<void> resetDiveDetailSections() async {
     state = state.copyWith(clearDiveDetailSections: true);
+    await _saveSettings();
+  }
+
+  Future<void> setFullscreenTilePreferences({
+    required List<String> order,
+    required List<String> hidden,
+  }) async {
+    state = state.copyWith(
+      fullscreenTileOrder: order,
+      fullscreenHiddenTiles: hidden,
+    );
+    await _saveSettings();
+  }
+
+  Future<void> setFullscreenReadoutCardPosition(double x, double y) async {
+    // Positions are fractions of the card's movable range; clamp so
+    // persisted values always honor the 0..1 contract (an out-of-range
+    // value would seed the card off-screen on next launch). Dart's clamp
+    // already maps non-finite values in-range (compareTo orders NaN after
+    // all values, so NaN.clamp(0, 1) is 1.0), but canonicalize them to the
+    // default top-right corner (1, 0) explicitly rather than rely on that
+    // ordering accident. Matches DraggableReadoutCard.defaultFraction.
+    state = state.copyWith(
+      fullscreenReadoutCardX: x.isFinite ? x.clamp(0.0, 1.0) : 1.0,
+      fullscreenReadoutCardY: y.isFinite ? y.clamp(0.0, 1.0) : 0.0,
+    );
+    await _saveSettings();
+  }
+
+  Future<void> setProfileMetricsFollowViewport(bool value) async {
+    state = state.copyWith(profileMetricsFollowViewport: value);
+    await _saveSettings();
+  }
+
+  Future<void> setPerdixOverlayEnabled(bool value) async {
+    state = state.copyWith(perdixOverlayEnabled: value);
+    await _saveSettings();
+  }
+
+  Future<void> setPerdixOverlayPosition(double x, double y) async {
+    // Same 0..1 fraction contract and non-finite canonicalization as
+    // setFullscreenReadoutCardPosition; default corner is top-right (1, 0).
+    state = state.copyWith(
+      perdixOverlayX: x.isFinite ? x.clamp(0.0, 1.0) : 1.0,
+      perdixOverlayY: y.isFinite ? y.clamp(0.0, 1.0) : 0.0,
+    );
     await _saveSettings();
   }
 
@@ -1245,6 +1729,10 @@ final sacUnitProvider = Provider<SacUnit>((ref) {
   return ref.watch(settingsProvider.select((s) => s.sacUnit));
 });
 
+final defaultCurrencyProvider = Provider<String>((ref) {
+  return ref.watch(settingsProvider.select((s) => s.defaultCurrency));
+});
+
 final altitudeUnitProvider = Provider<AltitudeUnit>((ref) {
   return ref.watch(settingsProvider.select((s) => s.altitudeUnit));
 });
@@ -1260,6 +1748,21 @@ final themePresetProvider = Provider<AppThemePreset>((ref) {
 
 final localeProvider = Provider<String>((ref) {
   return ref.watch(settingsProvider.select((s) => s.locale));
+});
+
+/// Color accent toggles. Narrow selects so each surface rebuilds only when
+/// its own toggle changes, not on every settings mutation -- the navigation
+/// scaffold wraps every page, so a broad watch would rebuild the whole shell.
+final accentNavIconsProvider = Provider<bool>((ref) {
+  return ref.watch(settingsProvider.select((s) => s.accentNavIcons));
+});
+
+final accentSectionHeadersProvider = Provider<bool>((ref) {
+  return ref.watch(settingsProvider.select((s) => s.accentSectionHeaders));
+});
+
+final accentListIconsProvider = Provider<bool>((ref) {
+  return ref.watch(settingsProvider.select((s) => s.accentListIcons));
 });
 
 /// Decompression settings convenience providers
@@ -1291,6 +1794,10 @@ final cnsWarningThresholdProvider = Provider<int>((ref) {
   return ref.watch(settingsProvider.select((s) => s.cnsWarningThreshold));
 });
 
+final cnsCalculationMethodProvider = Provider<CnsCalculationMethod>((ref) {
+  return ref.watch(settingsProvider.select((s) => s.cnsCalculationMethod));
+});
+
 final ascentRateWarningProvider = Provider<double>((ref) {
   return ref.watch(settingsProvider.select((s) => s.ascentRateWarning));
 });
@@ -1303,6 +1810,24 @@ final showCeilingOnProfileProvider = Provider<bool>((ref) {
   return ref.watch(settingsProvider.select((s) => s.showCeilingOnProfile));
 });
 
+final showDecoStopsOnProfileProvider = Provider<bool>((ref) {
+  return ref.watch(settingsProvider.select((s) => s.showDecoStopsOnProfile));
+});
+
+final safetyReviewEnabledProvider = Provider<bool>((ref) {
+  return ref.watch(settingsProvider.select((s) => s.safetyReviewEnabled));
+});
+
+/// The set of safety-rule dbValues the active diver has disabled. Backed by a
+/// `select` on the settings so it only notifies when the rule set actually
+/// changes (AppSettings.copyWith reuses the same Set instance for unrelated
+/// edits), not on every settings write. Consumers (dive-list badge count,
+/// SafetyReviewSection) filter findings by this set so badge visibility and
+/// the detail section stay aligned.
+final safetyReviewDisabledRulesProvider = Provider<Set<String>>((ref) {
+  return ref.watch(settingsProvider.select((s) => s.safetyReviewDisabledRules));
+});
+
 final showAscentRateColorsProvider = Provider<bool>((ref) {
   return ref.watch(settingsProvider.select((s) => s.showAscentRateColors));
 });
@@ -1313,6 +1838,17 @@ final showNdlOnProfileProvider = Provider<bool>((ref) {
 
 final lastStopDepthProvider = Provider<double>((ref) {
   return ref.watch(settingsProvider.select((s) => s.lastStopDepth));
+});
+
+/// The device-local passive-SCR ratio (Subsurface `pscr_ratio`, default 100).
+/// Persisted to SharedPreferences, not per-diver, so switching the active diver
+/// does not change it.
+final pscrRatioProvider = Provider<double>((ref) {
+  return ref.watch(settingsProvider.select((s) => s.pscrRatio));
+});
+
+final ascentGasSetProvider = Provider<AscentGasSet>((ref) {
+  return ref.watch(settingsProvider.select((s) => s.ascentGasSet));
 });
 
 final decoStopIncrementProvider = Provider<double>((ref) {

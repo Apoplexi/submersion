@@ -20,6 +20,18 @@ const winrt::guid BleIoStream::kPreferredWriteUuid{
 const winrt::guid BleIoStream::kPreferredNotifyUuid{
     0xA60B8E5C, 0xB267, 0x44D7,
     {0x97, 0x64, 0x83, 0x7C, 0xAF, 0x96, 0x48, 0x9E}};
+// Halcyon Symbios device-centric Tx/Rx endpoints. The app WRITES commands to
+// the device's Rx (00000101) and READS replies (indications) from its Tx
+// (00000201) -- matching Subsurface's qt-ble.cpp. Both chars advertise
+// read+write+indicate and tie on raw score, so these biases pick the pair.
+// PR #356 biased them backwards (wrote to Tx) and the device never answered
+// (issue #288).
+const winrt::guid BleIoStream::kHalcyonSymbiosTxUuid{
+    0x00000201, 0x8C3B, 0x4F2C,
+    {0xA5, 0x9E, 0x8C, 0x08, 0x22, 0x4F, 0x32, 0x53}};
+const winrt::guid BleIoStream::kHalcyonSymbiosRxUuid{
+    0x00000101, 0x8C3B, 0x4F2C,
+    {0xA5, 0x9E, 0x8C, 0x08, 0x22, 0x4F, 0x32, 0x53}};
 
 static constexpr uint32_t kBleIoctlType = 'b';
 static constexpr uint32_t kBleIoctlGetName = 0;
@@ -39,6 +51,21 @@ bool BleIoStream::ConnectAndDiscover(uint64_t bluetooth_address) {
         if (!device_) return false;
 
         device_name_ = winrt::to_string(device_.Name());
+
+        // Request a throughput-optimized (low-interval) connection so a dive
+        // computer's serial->BLE bridge can drain its buffer during bulk
+        // logbook/profile dumps without overflowing and dropping
+        // notifications (issue #280, OSTC nano). Best-effort: hold the request
+        // for the connection's lifetime; ignore failures on Windows < 2004 or
+        // unsupported controllers.
+        try {
+            preferred_connection_request_ =
+                device_.RequestPreferredConnectionParameters(
+                    BluetoothLEPreferredConnectionParameters::
+                        ThroughputOptimized());
+        } catch (...) {
+        }
+
         return DiscoverCharacteristics();
     } catch (...) {
         return false;
@@ -91,7 +118,10 @@ bool BleIoStream::DiscoverCharacteristics() {
                     GattCharacteristicProperties::None) {
                     ws += 2;
                 }
-                if (ch.Uuid() == kPreferredWriteUuid) ws += 1000;
+                if (ch.Uuid() == kPreferredWriteUuid ||
+                    ch.Uuid() == kHalcyonSymbiosRxUuid) {
+                    ws += 1000;
+                }
                 if (ws > best_write_score) {
                     best_write = ch;
                     best_write_score = ws;
@@ -112,7 +142,10 @@ bool BleIoStream::DiscoverCharacteristics() {
                     GattCharacteristicProperties::None) {
                     ns += 2;
                 }
-                if (ch.Uuid() == kPreferredNotifyUuid) ns += 1000;
+                if (ch.Uuid() == kPreferredNotifyUuid ||
+                    ch.Uuid() == kHalcyonSymbiosTxUuid) {
+                    ns += 1000;
+                }
                 if (ns > best_notify_score) {
                     best_notify = ch;
                     best_notify_score = ns;
@@ -173,7 +206,7 @@ void BleIoStream::OnCharacteristicValueChanged(
 
     {
         std::lock_guard<std::mutex> lock(read_mutex_);
-        read_buffer_.insert(read_buffer_.end(), data.begin(), data.end());
+        read_chunks_.push_back(std::move(data));
     }
     read_cv_.notify_one();
 }
@@ -206,6 +239,9 @@ void BleIoStream::Close() {
         notify_characteristic_ = nullptr;
     }
     write_characteristic_ = nullptr;
+    // Release the throughput-optimized connection request (reverts to the
+    // controller's default interval) before tearing down the device.
+    preferred_connection_request_ = nullptr;
     if (device_) {
         device_.Close();
         device_ = nullptr;
@@ -387,16 +423,16 @@ int BleIoStream::IoctlCallback(void* userdata, unsigned int request,
 int BleIoStream::PollCallback(void* userdata, int timeout) {
     auto* stream = static_cast<BleIoStream*>(userdata);
     std::unique_lock<std::mutex> lock(stream->read_mutex_);
-    if (!stream->read_buffer_.empty()) return LIBDC_STATUS_SUCCESS;
+    if (!stream->read_chunks_.empty()) return LIBDC_STATUS_SUCCESS;
     if (timeout == 0) return LIBDC_STATUS_TIMEOUT;
 
     if (timeout < 0) {
         stream->read_cv_.wait(
-            lock, [stream] { return !stream->read_buffer_.empty(); });
+            lock, [stream] { return !stream->read_chunks_.empty(); });
     } else {
         if (!stream->read_cv_.wait_for(
                 lock, std::chrono::milliseconds(timeout),
-                [stream] { return !stream->read_buffer_.empty(); })) {
+                [stream] { return !stream->read_chunks_.empty(); })) {
             return LIBDC_STATUS_TIMEOUT;
         }
     }
@@ -407,7 +443,7 @@ int BleIoStream::PurgeCallback(void* userdata, unsigned int direction) {
     if ((direction & kDirectionInput) == 0) return LIBDC_STATUS_SUCCESS;
     auto* stream = static_cast<BleIoStream*>(userdata);
     std::lock_guard<std::mutex> lock(stream->read_mutex_);
-    stream->read_buffer_.clear();
+    stream->read_chunks_.clear();
     return LIBDC_STATUS_SUCCESS;
 }
 
@@ -419,24 +455,33 @@ int BleIoStream::PerformRead(void* data, size_t size, size_t* actual) {
                         : std::chrono::steady_clock::now() +
                               std::chrono::milliseconds(timeout_ms_);
 
-    while (read_buffer_.empty()) {
+    while (read_chunks_.empty()) {
         if (timeout_ms_ == INT32_MAX) {
             read_cv_.wait(
-                lock, [this] { return !read_buffer_.empty(); });
+                lock, [this] { return !read_chunks_.empty(); });
         } else {
             if (!read_cv_.wait_until(
                     lock, deadline,
-                    [this] { return !read_buffer_.empty(); })) {
+                    [this] { return !read_chunks_.empty(); })) {
                 *actual = 0;
                 return LIBDC_STATUS_TIMEOUT;
             }
         }
     }
 
-    size_t bytes_to_read = std::min(size, read_buffer_.size());
-    std::memcpy(data, read_buffer_.data(), bytes_to_read);
-    read_buffer_.erase(read_buffer_.begin(),
-                       read_buffer_.begin() + bytes_to_read);
+    // Return bytes from at most one notification per read: the packet
+    // parsers size each read from the packet header and would silently
+    // drop a second packet coalesced into the same read (lost FLAG_LAST
+    // ack -> spurious timeout). A partially consumed notification stays
+    // at the front of the queue.
+    std::vector<uint8_t>& chunk = read_chunks_.front();
+    size_t bytes_to_read = std::min(size, chunk.size());
+    std::memcpy(data, chunk.data(), bytes_to_read);
+    if (bytes_to_read < chunk.size()) {
+        chunk.erase(chunk.begin(), chunk.begin() + bytes_to_read);
+    } else {
+        read_chunks_.pop_front();
+    }
     *actual = bytes_to_read;
     return LIBDC_STATUS_SUCCESS;
 }

@@ -1015,11 +1015,61 @@ void main() {
       expect(t0.tankRole, 'backGas');
       expect(t0.tankMaterial, 'aluminum');
 
-      // Tank 2: new tank inserted
+      // Tank 2: new tank inserted, stamped with the source's computerId
       final t2 = tanks.firstWhere((t) => t.tankOrder == 2);
       expect(t2.o2Percent, 100.0);
       expect(t2.startPressure, 200.0);
       expect(t2.endPressure, 100.0);
+      expect(t2.computerId, 'comp-1');
+    });
+
+    test('synthesizes tanks from gas mixes when the computer reports no '
+        'tank records (transmitter-less, e.g. Aqualung i330R)', () async {
+      await insertDive('dive-1');
+      await insertComputer('comp-1');
+      await insertSource(
+        id: 'src-1',
+        diveId: 'dive-1',
+        computerId: 'comp-1',
+        isPrimary: true,
+      );
+      // No existing tank rows: the original tank-driven import dropped the
+      // gas mixes entirely, so the dive fell back to the 21% air default.
+
+      final parsed = makeParsedDive(
+        tanks: [], // no transmitter: parser reports gas mixes only
+        gasMixes: [
+          pigeon.GasMix(index: 0, o2Percent: 32.0, hePercent: 0.0),
+          pigeon.GasMix(index: 1, o2Percent: 50.0, hePercent: 0.0),
+        ],
+      );
+
+      await service.applyParsedUpdate(
+        diveId: 'dive-1',
+        sourceRowId: 'src-1',
+        parsed: parsed,
+        descriptorVendor: null,
+        descriptorProduct: null,
+        descriptorModel: null,
+        libdivecomputerVersion: null,
+      );
+
+      final tanks =
+          await (db.select(db.diveTanks)
+                ..where((t) => t.diveId.equals('dive-1'))
+                ..orderBy([(t) => OrderingTerm.asc(t.tankOrder)]))
+              .get();
+
+      expect(tanks.length, 2);
+      expect(tanks[0].tankOrder, 0);
+      expect(tanks[0].o2Percent, 32.0);
+      expect(tanks[0].hePercent, 0.0);
+      // The computer reported gases, not cylinders: no pressures/volume.
+      expect(tanks[0].startPressure, isNull);
+      expect(tanks[0].endPressure, isNull);
+      expect(tanks[0].volume, isNull);
+      expect(tanks[1].tankOrder, 1);
+      expect(tanks[1].o2Percent, 50.0);
     });
 
     test('re-inserts tank pressure profiles and backfills start/end pressure '
@@ -1109,6 +1159,11 @@ void main() {
       expect(profiles.first.pressure, 220.0);
       expect(profiles.last.pressure, 90.0);
       expect(profiles.every((p) => p.tankId == 'tank-0'), isTrue);
+      expect(
+        profiles.every((p) => p.computerId == 'comp-1'),
+        isTrue,
+        reason: 'pressure profiles are stamped with the source computerId',
+      );
 
       // Tank start/end pressure backfilled from first/last sample.
       final tank = await (db.select(
@@ -1116,6 +1171,118 @@ void main() {
       )..where((t) => t.diveId.equals('dive-1'))).getSingle();
       expect(tank.startPressure, 220.0);
       expect(tank.endPressure, 90.0);
+    });
+
+    test('derives and inserts gas switches from per-sample gas-mix '
+        'transitions on a single-source primary re-parse', () async {
+      // Shearwater-style multi-gas dive: transmitter tank 0 breathes 32%, then
+      // the diver switches to a 99% deco gas (no transmitter -> synthesized
+      // cylinder). The switch is only encoded as a per-sample gasMixIndex
+      // change, so the gas_switches table must be derived from it.
+      const unknownGasMixIndex = 4294967295;
+
+      await insertDive('dive-1');
+      await insertComputer('comp-1');
+      await insertSource(
+        id: 'src-1',
+        diveId: 'dive-1',
+        computerId: 'comp-1',
+        isPrimary: true,
+      );
+
+      // A stale switch that must be cleared and replaced by the re-parse.
+      await db
+          .into(db.diveTanks)
+          .insert(
+            const DiveTanksCompanion(
+              id: Value('stale-tank'),
+              diveId: Value('dive-1'),
+              o2Percent: Value(21.0),
+              hePercent: Value(0.0),
+              tankOrder: Value(0),
+            ),
+          );
+      await db
+          .into(db.gasSwitches)
+          .insert(
+            GasSwitchesCompanion(
+              id: const Value('stale-switch'),
+              diveId: const Value('dive-1'),
+              timestamp: const Value(10),
+              tankId: const Value('stale-tank'),
+              createdAt: Value(nowMs),
+            ),
+          );
+
+      final parsed = makeParsedDive(
+        gasMixes: [
+          pigeon.GasMix(index: 0, o2Percent: 32.0, hePercent: 0.0),
+          pigeon.GasMix(index: 1, o2Percent: 99.0, hePercent: 0.0),
+        ],
+        tanks: [
+          pigeon.TankInfo(
+            index: 0,
+            gasMixIndex: unknownGasMixIndex,
+            startPressureBar: 240.0,
+            endPressureBar: 90.0,
+          ),
+        ],
+        samples: [
+          pigeon.ProfileSample(
+            timeSeconds: 0,
+            depthMeters: 0.0,
+            tankIndex: 0,
+            gasMixIndex: 0,
+          ),
+          pigeon.ProfileSample(
+            timeSeconds: 120,
+            depthMeters: 25.0,
+            tankIndex: 0,
+            gasMixIndex: 0,
+          ),
+          pigeon.ProfileSample(
+            timeSeconds: 180,
+            depthMeters: 6.0,
+            tankIndex: 0,
+            gasMixIndex: 1,
+          ),
+          pigeon.ProfileSample(
+            timeSeconds: 240,
+            depthMeters: 5.0,
+            tankIndex: 0,
+            gasMixIndex: 1,
+          ),
+        ],
+      );
+
+      await service.applyParsedUpdate(
+        diveId: 'dive-1',
+        sourceRowId: 'src-1',
+        parsed: parsed,
+        descriptorVendor: null,
+        descriptorProduct: null,
+        descriptorModel: null,
+        libdivecomputerVersion: null,
+      );
+
+      final switches = await (db.select(
+        db.gasSwitches,
+      )..where((t) => t.diveId.equals('dive-1'))).get();
+
+      expect(
+        switches,
+        hasLength(1),
+        reason: 'one switch at the 32%->99% change',
+      );
+      expect(switches.single.id, isNot('stale-switch'));
+      expect(switches.single.timestamp, 180);
+      expect(switches.single.depth, 6.0);
+
+      // The switch must point at the 99% deco cylinder.
+      final decoTank = await (db.select(
+        db.diveTanks,
+      )..where((t) => t.o2Percent.equals(99.0))).getSingle();
+      expect(switches.single.tankId, decoTank.id);
     });
 
     test('multi-source dive skips event/gasSwitch/tankPressure deletion '
@@ -1310,6 +1477,11 @@ void main() {
                 ..orderBy([(t) => OrderingTerm.asc(t.timestamp)]))
               .get();
       expect(events.length, 7);
+      expect(
+        events.every((e) => e.computerId == 'comp-1'),
+        isTrue,
+        reason: 'events are stamped with the source computerId',
+      );
 
       expect(events[0].eventType, 'bookmark');
       expect(events[0].severity, 'info');
@@ -1421,7 +1593,7 @@ void main() {
         isPrimary: true,
       );
 
-      final parsed = makeParsedDive(diveMode: 'gauge');
+      final parsed = makeParsedDive(diveMode: 'unrecognized_mode');
 
       await service.applyParsedUpdate(
         diveId: 'dive-1',
@@ -1435,6 +1607,32 @@ void main() {
 
       final dive = await getDive('dive-1');
       expect(dive.diveMode, 'oc');
+    });
+
+    test('gauge diveMode maps to gauge', () async {
+      await insertDive('dive-1', diveMode: 'oc');
+      await insertComputer('comp-1');
+      await insertSource(
+        id: 'src-1',
+        diveId: 'dive-1',
+        computerId: 'comp-1',
+        isPrimary: true,
+      );
+
+      final parsed = makeParsedDive(diveMode: 'gauge');
+
+      await service.applyParsedUpdate(
+        diveId: 'dive-1',
+        sourceRowId: 'src-1',
+        parsed: parsed,
+        descriptorVendor: null,
+        descriptorProduct: null,
+        descriptorModel: null,
+        libdivecomputerVersion: null,
+      );
+
+      final dive = await getDive('dive-1');
+      expect(dive.diveMode, 'gauge');
     });
 
     test('null diveMode maps to oc', () async {
@@ -2316,6 +2514,70 @@ void main() {
     });
   });
 
+  group('Coverage: null-computerId source stamps null attribution', () {
+    test('new tank, tank pressure profile, and event rows all carry a null '
+        'computerId when the source has none (manual import, no computer '
+        'association)', () async {
+      await insertDive('dive-1');
+      await insertSource(
+        id: 'src-1',
+        diveId: 'dive-1',
+        computerId: null,
+        isPrimary: true,
+      );
+      // No pre-existing tanks: exercises the _carryOverTanks new-tank
+      // insert branch, which is the one that stamps computerId.
+
+      final parsed = makeParsedDive(
+        tanks: [pigeon.TankInfo(index: 0, gasMixIndex: 0, volumeLiters: 12.0)],
+        gasMixes: [pigeon.GasMix(index: 0, o2Percent: 32.0, hePercent: 0.0)],
+        samples: [
+          pigeon.ProfileSample(
+            timeSeconds: 0,
+            depthMeters: 0.0,
+            pressureBar: 200.0,
+            tankIndex: 0,
+          ),
+          pigeon.ProfileSample(
+            timeSeconds: 60,
+            depthMeters: 18.0,
+            pressureBar: 100.0,
+            tankIndex: 0,
+          ),
+        ],
+        events: [pigeon.DiveEvent(timeSeconds: 30, type: 'bookmark')],
+      );
+
+      await service.applyParsedUpdate(
+        diveId: 'dive-1',
+        sourceRowId: 'src-1',
+        parsed: parsed,
+        descriptorVendor: null,
+        descriptorProduct: null,
+        descriptorModel: null,
+        libdivecomputerVersion: null,
+      );
+
+      final tanks = await (db.select(
+        db.diveTanks,
+      )..where((t) => t.diveId.equals('dive-1'))).get();
+      expect(tanks, hasLength(1));
+      expect(tanks.single.computerId, isNull);
+
+      final pressures = await (db.select(
+        db.tankPressureProfiles,
+      )..where((t) => t.diveId.equals('dive-1'))).get();
+      expect(pressures, isNotEmpty);
+      expect(pressures.every((p) => p.computerId == null), isTrue);
+
+      final events = await (db.select(
+        db.diveProfileEvents,
+      )..where((t) => t.diveId.equals('dive-1'))).get();
+      expect(events, hasLength(1));
+      expect(events.single.computerId, isNull);
+    });
+  });
+
   group('Coverage: _carryOverTanks gas mix fallback', () {
     test(
       'unmatched gasMixIndex falls back to the primary (first) mix',
@@ -2329,8 +2591,11 @@ void main() {
           isPrimary: true,
         );
 
-        // Tank gas-mix link unmatched (e.g. DC_GASMIX_UNKNOWN on a Shearwater
-        // single-gas dive): must resolve to the dive's primary mix, not air.
+        // Tank gas-mix link unmatched (e.g. DC_GASMIX_UNKNOWN on Shearwater)
+        // and no per-sample gas to disambiguate: the transmitter tank resolves
+        // to the dive's primary mix (not a hardcoded air default), and the
+        // second reported gas is kept as a pressureless cylinder rather than
+        // being dropped.
         final parsed = makeParsedDive(
           tanks: [
             pigeon.TankInfo(
@@ -2360,10 +2625,14 @@ void main() {
         final tanks = await (db.select(
           db.diveTanks,
         )..where((t) => t.diveId.equals('dive-1'))).get();
-        expect(tanks.length, 1);
-        // Primary mix (index 0 = EAN32), NOT a hardcoded 21% air default.
-        expect(tanks.first.o2Percent, 32.0);
-        expect(tanks.first.hePercent, 0.0);
+        expect(tanks.length, 2);
+        // Transmitter tank: primary mix (index 0 = EAN32), with its pressures.
+        final backGas = tanks.firstWhere((t) => t.o2Percent == 32.0);
+        expect(backGas.tankOrder, 0);
+        expect(backGas.startPressure, 200.0);
+        // Second gas kept as a pressureless cylinder.
+        final other = tanks.firstWhere((t) => t.o2Percent == 21.0);
+        expect(other.startPressure, isNull);
       },
     );
 

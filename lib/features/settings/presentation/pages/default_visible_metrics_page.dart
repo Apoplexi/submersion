@@ -53,6 +53,11 @@ class DefaultVisibleMetricsPage extends ConsumerWidget {
             value: settings.defaultShowEvents,
             onChanged: notifier.setDefaultShowEvents,
           ),
+          SwitchListTile(
+            title: Text(context.l10n.settings_appearance_metric_photoMarkers),
+            value: settings.defaultShowPhotoMarkers,
+            onChanged: notifier.setDefaultShowPhotoMarkers,
+          ),
           const Divider(),
           _buildSectionHeader(
             context,
@@ -64,11 +69,19 @@ class DefaultVisibleMetricsPage extends ConsumerWidget {
             onChanged: notifier.setShowCeilingOnProfile,
           ),
           SwitchListTile(
-            title: Text(
-              context.l10n.settings_appearance_metric_ascentRateColors,
-            ),
+            title: Text(context.l10n.diveLog_legend_label_decoStops),
+            value: settings.showDecoStopsOnProfile,
+            onChanged: notifier.setShowDecoStopsOnProfile,
+          ),
+          SwitchListTile(
+            title: Text(context.l10n.diveLog_legend_label_ascentRate),
             value: settings.showAscentRateColors,
             onChanged: notifier.setShowAscentRateColors,
+          ),
+          SwitchListTile(
+            title: Text(context.l10n.diveLog_legend_label_ascentRateLine),
+            value: settings.defaultShowAscentRateLine,
+            onChanged: notifier.setDefaultShowAscentRateLine,
           ),
           SwitchListTile(
             title: Text(context.l10n.settings_appearance_metric_ndl),

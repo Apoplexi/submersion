@@ -1,7 +1,11 @@
+import 'dart:io';
 import 'dart:typed_data';
+
+import 'package:flutter/foundation.dart' show visibleForTesting;
 
 import 'package:extension_google_sign_in_as_googleapis_auth/extension_google_sign_in_as_googleapis_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:http/http.dart' as http;
 import 'package:googleapis/drive/v3.dart' as drive;
 import 'package:googleapis_auth/googleapis_auth.dart' as gapis_auth;
 
@@ -150,6 +154,21 @@ class GoogleDriveStorageProvider
     return api;
   }
 
+  /// Test seam: injects a [drive.DriveApi] (backed by a mock HTTP client) so
+  /// the transfer paths are exercisable without a Google sign-in — the real
+  /// api is only ever minted from an authenticated session.
+  @visibleForTesting
+  void debugSetDriveApi(drive.DriveApi api) => _driveApi = api;
+
+  /// Authenticated HTTP client for the media store's raw REST calls.
+  /// Enables silent auth (the media attach itself is the opt-in) and
+  /// returns null when no Google session can be established.
+  Future<http.Client?> mediaHttpClient() async {
+    _allowSilentAuth = true;
+    if (await isAuthenticated()) return _authClient;
+    return null;
+  }
+
   @override
   Future<UploadResult> uploadFile(
     Uint8List data,
@@ -215,6 +234,85 @@ class GoogleDriveStorageProvider
       _log.info('Downloaded file: $fileId (${allBytes.length} bytes)');
       return Uint8List.fromList(allBytes);
     } catch (e, stackTrace) {
+      _log.error(
+        'Failed to download file: $fileId',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      throw CloudStorageException('Download failed: $e', e, stackTrace);
+    }
+  }
+
+  /// Streams the local file into the Drive SDK ([drive.Media] takes a byte
+  /// stream), so the artifact is never resident in memory.
+  @override
+  Future<UploadResult> uploadFileFromPath(
+    String sourcePath,
+    String filename, {
+    String? folderId,
+  }) async {
+    try {
+      final targetFolder = folderId ?? await getOrCreateSyncFolder();
+      final existingFile = await _findFile(filename, targetFolder);
+
+      final source = File(sourcePath);
+      final media = drive.Media(source.openRead(), await source.length());
+
+      drive.File result;
+      if (existingFile != null) {
+        result = await _api.files.update(
+          drive.File(),
+          existingFile.id!,
+          uploadMedia: media,
+        );
+        _log.info('Updated file: $filename (${result.id})');
+      } else {
+        final fileMetadata = drive.File()
+          ..name = filename
+          ..parents = [targetFolder];
+        result = await _api.files.create(fileMetadata, uploadMedia: media);
+        _log.info('Created file: $filename (${result.id})');
+      }
+
+      return UploadResult(fileId: result.id!, uploadTime: DateTime.now());
+    } catch (e, stackTrace) {
+      _log.error(
+        'Failed to upload file: $filename',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      throw CloudStorageException('Upload failed: $e', e, stackTrace);
+    }
+  }
+
+  /// Pipes the download stream straight to disk. The buffering downloadFile
+  /// holds three concurrent copies of the payload at peak (chunk list,
+  /// expanded list, Uint8List); this holds one chunk.
+  @override
+  Future<void> downloadToFile(String fileId, String destinationPath) async {
+    try {
+      final response = await _api.files.get(
+        fileId,
+        downloadOptions: drive.DownloadOptions.fullMedia,
+      );
+      if (response is! drive.Media) {
+        throw const CloudStorageException('Invalid download response');
+      }
+      final sink = File(destinationPath).openWrite();
+      try {
+        await response.stream.pipe(sink);
+      } finally {
+        await sink.close();
+      }
+    } catch (e, stackTrace) {
+      final partial = File(destinationPath);
+      if (await partial.exists()) {
+        try {
+          await partial.delete();
+        } catch (_) {
+          // Best-effort cleanup of a partial download.
+        }
+      }
       _log.error(
         'Failed to download file: $fileId',
         error: e,

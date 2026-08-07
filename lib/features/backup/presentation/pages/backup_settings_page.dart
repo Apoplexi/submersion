@@ -3,17 +3,22 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:submersion_saf/submersion_saf.dart';
 
 import 'package:submersion/core/database/database.dart';
 import 'package:submersion/core/providers/provider.dart';
+import 'package:submersion/core/services/backup_bookmark_service.dart';
+import 'package:submersion/core/services/cloud_storage/cloud_storage_provider.dart';
 import 'package:submersion/features/backup/domain/entities/backup_record.dart';
 import 'package:submersion/features/backup/domain/entities/backup_settings.dart';
-import 'package:submersion/features/backup/presentation/pages/restore_complete_page.dart';
+import 'package:submersion/features/backup/domain/exceptions/backup_encrypted_exception.dart';
 import 'package:submersion/features/backup/presentation/providers/backup_providers.dart';
+import 'package:submersion/features/backup/presentation/widgets/backup_encryption_section.dart';
 import 'package:submersion/features/backup/presentation/widgets/backup_history_tile.dart';
 import 'package:submersion/features/backup/presentation/widgets/export_bottom_sheet.dart';
 import 'package:submersion/features/backup/presentation/widgets/restore_confirmation_dialog.dart';
 import 'package:submersion/features/settings/presentation/providers/sync_providers.dart';
+import 'package:submersion/features/settings/presentation/widgets/encryption_passphrase_dialog.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 
 class BackupSettingsPage extends ConsumerWidget {
@@ -23,12 +28,8 @@ class BackupSettingsPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final settings = ref.watch(backupSettingsProvider);
     final operationState = ref.watch(backupOperationProvider);
-    ref.listen<BackupOperationState>(backupOperationProvider, (previous, next) {
-      if (next.status == BackupOperationStatus.restoreComplete &&
-          context.mounted) {
-        RestoreCompletePage.show(context);
-      }
-    });
+    // Restore completion (RestoreCompletePage + restartApp) is handled app-wide
+    // in SubmersionApp, so it fires even if this page is disposed mid-restore.
     final historyAsync = ref.watch(backupHistoryProvider);
     final cloudProvider = ref.watch(cloudStorageProviderProvider);
     final isInProgress =
@@ -65,6 +66,9 @@ class BackupSettingsPage extends ConsumerWidget {
           const Divider(),
           // Auto-backup section
           _buildAutoBackupSection(context, ref, settings, cloudProvider),
+          const Divider(),
+          // Backup encryption section (issue #580)
+          const BackupEncryptionSection(),
           const Divider(),
           // History section
           _buildHistorySection(context, ref, historyAsync),
@@ -165,13 +169,14 @@ class BackupSettingsPage extends ConsumerWidget {
   // ===========================================================================
 
   void _handleExport(BuildContext context, WidgetRef ref) {
+    final encrypted = ref.read(backupSettingsProvider).backupEncryptionEnabled;
     ExportBottomSheet.show(
       context,
       onSaveToFile: () async {
         final result = await FilePicker.saveFile(
           dialogTitle: context.l10n.backup_export_title,
-          fileName: _generateDefaultFilename(),
-          allowedExtensions: ['db', 'sqlite'],
+          fileName: _generateDefaultFilename(encrypted),
+          allowedExtensions: encrypted ? ['sbe'] : ['db', 'sqlite'],
           type: FileType.custom,
         );
         if (result != null && context.mounted) {
@@ -191,11 +196,11 @@ class BackupSettingsPage extends ConsumerWidget {
     );
   }
 
-  String _generateDefaultFilename() {
+  String _generateDefaultFilename(bool encrypted) {
     final now = DateTime.now();
     final formatted =
         '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
-    return 'submersion_backup_$formatted.db';
+    return 'submersion_backup_$formatted.${encrypted ? 'sbe' : 'db'}';
   }
 
   // ===========================================================================
@@ -237,13 +242,32 @@ class BackupSettingsPage extends ConsumerWidget {
 
     if (!context.mounted) return;
 
-    final confirmed = await RestoreConfirmationDialog.show(
+    final mode = await RestoreConfirmationDialog.show(
       context,
       record,
       currentSchemaVersion: AppDatabase.currentSchemaVersion,
+      offerReplace: ref.read(cloudStorageProviderProvider) != null,
     );
-    if (confirmed) {
-      ref.read(backupOperationProvider.notifier).restoreFromFilePath(filePath);
+    if (mode != null) {
+      try {
+        await ref
+            .read(backupOperationProvider.notifier)
+            .restoreFromFilePath(filePath, mode: mode);
+      } on BackupEncryptedException {
+        if (!context.mounted) return;
+        await showEncryptionPassphraseDialog(
+          context,
+          title: context.l10n.settings_backupEncryption_restoreUnlockTitle,
+          hint: context.l10n.settings_backupEncryption_restoreUnlockHint,
+          onSubmit: (secret) => ref
+              .read(backupOperationProvider.notifier)
+              .restoreFromFilePath(
+                filePath,
+                mode: mode,
+                encryptionSecret: secret,
+              ),
+        );
+      }
     }
   }
 
@@ -353,13 +377,32 @@ class BackupSettingsPage extends ConsumerWidget {
   ) async {
     switch (action) {
       case 'restore':
-        final confirmed = await RestoreConfirmationDialog.show(
+        final mode = await RestoreConfirmationDialog.show(
           context,
           record,
           currentSchemaVersion: AppDatabase.currentSchemaVersion,
+          offerReplace: ref.read(cloudStorageProviderProvider) != null,
         );
-        if (confirmed) {
-          ref.read(backupOperationProvider.notifier).restoreFromBackup(record);
+        if (mode != null) {
+          try {
+            await ref
+                .read(backupOperationProvider.notifier)
+                .restoreFromBackup(record, mode: mode);
+          } on BackupEncryptedException {
+            if (!context.mounted) return;
+            await showEncryptionPassphraseDialog(
+              context,
+              title: context.l10n.settings_backupEncryption_restoreUnlockTitle,
+              hint: context.l10n.settings_backupEncryption_restoreUnlockHint,
+              onSubmit: (secret) => ref
+                  .read(backupOperationProvider.notifier)
+                  .restoreFromBackup(
+                    record,
+                    mode: mode,
+                    encryptionSecret: secret,
+                  ),
+            );
+          }
         }
       case 'delete':
         final confirmed = await _showDeleteConfirmation(context);
@@ -401,8 +444,15 @@ class BackupSettingsPage extends ConsumerWidget {
     BuildContext context,
     WidgetRef ref,
     BackupSettings settings,
-    dynamic cloudProvider,
+    CloudStorageProvider? cloudProvider,
   ) {
+    // Cloud backup and a custom location are mutually exclusive
+    // destinations; while cloud backup is on, the location row names the
+    // configured cloud service instead of a folder.
+    final cloudDestination =
+        settings.cloudBackupEnabled && cloudProvider != null
+        ? cloudProvider.providerName
+        : null;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -420,28 +470,6 @@ class BackupSettingsPage extends ConsumerWidget {
           value: settings.enabled,
           onChanged: (value) =>
               ref.read(backupSettingsProvider.notifier).setEnabled(value),
-        ),
-        // Backup location
-        ListTile(
-          title: Text(context.l10n.backup_location_title),
-          subtitle: Text(
-            settings.backupLocation ?? context.l10n.backup_location_default,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-          trailing: TextButton(
-            onPressed: () async {
-              final path = await FilePicker.getDirectoryPath(
-                dialogTitle: context.l10n.backup_location_title,
-              );
-              if (path != null) {
-                ref
-                    .read(backupSettingsProvider.notifier)
-                    .setBackupLocation(path);
-              }
-            },
-            child: Text(context.l10n.backup_location_change),
-          ),
         ),
         // Frequency
         if (settings.enabled)
@@ -483,6 +511,65 @@ class BackupSettingsPage extends ConsumerWidget {
               }).toList(),
             ),
           ),
+        // Backup location: the destination row sits directly above the
+        // Cloud backup switch it is mutually exclusive with.
+        ListTile(
+          title: Text(context.l10n.backup_location_title),
+          subtitle: Text(
+            cloudDestination ??
+                ref.read(backupSettingsProvider.notifier).locationLabel ??
+                settings.backupLocation ??
+                context.l10n.backup_location_default,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+          trailing: TextButton(
+            onPressed: () async {
+              final BackupFolderPick? picked;
+              if (Platform.isIOS) {
+                // iOS: capture a security-scoped bookmark directly -- a bare
+                // file_picker path would lose its scope on the next launch.
+                picked = await BackupBookmarkService.pickFolder();
+              } else if (Platform.isAndroid) {
+                // Android: pick a SAF tree (content:// URI). A file_picker path
+                // is unwritable under scoped storage, so persist the URI + its
+                // display name and skip the bookmark flow entirely. Native +
+                // platform-gated, so the branch body is excluded from coverage;
+                // setSafBackupLocation itself is unit-tested separately.
+                // coverage:ignore-start
+                final folder = await SubmersionSaf.pickFolder();
+                if (folder != null) {
+                  await ref
+                      .read(backupSettingsProvider.notifier)
+                      .setSafBackupLocation(folder.uri, folder.displayName);
+                }
+                return;
+                // coverage:ignore-end
+              } else {
+                final path = await FilePicker.getDirectoryPath(
+                  dialogTitle: context.l10n.backup_location_title,
+                );
+                picked = path == null
+                    ? null
+                    : BackupFolderPick(
+                        path: path,
+                        bookmark: BackupBookmarkService.isSupported
+                            ? await BackupBookmarkService.createBookmark(path)
+                            : null,
+                      );
+              }
+              if (picked != null) {
+                await ref
+                    .read(backupSettingsProvider.notifier)
+                    .setBackupLocationWithBookmark(
+                      picked.path,
+                      picked.bookmark,
+                    );
+              }
+            },
+            child: Text(context.l10n.backup_location_change),
+          ),
+        ),
         // Cloud sync
         if (cloudProvider != null)
           SwitchListTile(

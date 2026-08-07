@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+import 'package:submersion/core/icons/mdi_icons.dart';
 
 import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/core/constants/list_view_mode.dart';
@@ -16,9 +16,11 @@ import 'package:submersion/shared/widgets/debounced_search_results.dart';
 import 'package:submersion/shared/widgets/sort_bottom_sheet.dart';
 import 'package:submersion/features/equipment/domain/constants/equipment_field.dart';
 import 'package:submersion/features/equipment/domain/entities/equipment_item.dart';
+import 'package:submersion/features/equipment/domain/entities/service_clock_status.dart';
 import 'package:submersion/features/equipment/presentation/providers/equipment_providers.dart';
 import 'package:submersion/features/equipment/presentation/widgets/dense_equipment_list_tile.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
+import 'package:submersion/shared/widgets/feature_accent.dart';
 
 /// Special filter value for computed "service due" items
 const String _serviceDueFilter = '_service_due_';
@@ -103,12 +105,19 @@ class _EquipmentListContentState extends ConsumerState<EquipmentListContent> {
     }
   }
 
+  /// Invalidate whatever provider the visible list is actually reading.
+  /// Must mirror the selection in [build]: the default (no filter) view
+  /// reads activeEquipmentProvider, so invalidating only the status family
+  /// would leave pull-to-refresh and error-retry showing stale rows.
   void _invalidateCurrentProvider(WidgetRef ref) {
     if (_selectedFilter == _serviceDueFilter) {
       ref.invalidate(serviceDueEquipmentProvider);
+    } else if (_selectedFilter == null) {
+      ref.invalidate(activeEquipmentProvider);
     } else {
-      final status = _selectedFilter as EquipmentStatus?;
-      ref.invalidate(equipmentByStatusProvider(status));
+      ref.invalidate(
+        equipmentByStatusProvider(_selectedFilter as EquipmentStatus),
+      );
     }
   }
 
@@ -116,26 +125,48 @@ class _EquipmentListContentState extends ConsumerState<EquipmentListContent> {
   Widget build(BuildContext context) {
     final sort = ref.watch(equipmentSortProvider);
     final viewMode = ref.watch(equipmentListViewModeProvider);
+    // The urgency map drives the Service Due sort and (in table mode) the
+    // forecast columns, and it evaluates clocks for all active gear -- so only
+    // watch it when needed, not on the common name/type list sorts.
+    final needsUrgency =
+        viewMode == ListViewMode.table ||
+        sort.field == EquipmentSortField.serviceDue;
+    final serviceUrgency = needsUrgency
+        ? (ref.watch(equipmentServiceUrgencyProvider).value ??
+              const <String, ServiceClockStatus>{})
+        : const <String, ServiceClockStatus>{};
 
     final AsyncValue<List<EquipmentItem>> equipmentAsync;
     if (_selectedFilter == _serviceDueFilter) {
       equipmentAsync = ref.watch(serviceDueEquipmentProvider);
+    } else if (_selectedFilter == null) {
+      // The default view hides retired gear; the Retired status filter is
+      // the way to see it (#636).
+      equipmentAsync = ref.watch(activeEquipmentProvider);
     } else {
-      final status = _selectedFilter as EquipmentStatus?;
+      final status = _selectedFilter as EquipmentStatus;
       equipmentAsync = ref.watch(equipmentByStatusProvider(status));
     }
 
     // Table mode uses a dedicated scaffold with column configuration support.
     if (viewMode == ListViewMode.table) {
       final sortedAsync = equipmentAsync.whenData(
-        (equipment) => applyEquipmentSorting(equipment, sort),
+        (equipment) => applyEquipmentSorting(
+          equipment,
+          sort,
+          serviceUrgency: serviceUrgency,
+        ),
       );
       return _buildTableModeScaffold(context, sortedAsync);
     }
 
     final content = equipmentAsync.when(
       data: (equipment) {
-        final sorted = applyEquipmentSorting(equipment, sort);
+        final sorted = applyEquipmentSorting(
+          equipment,
+          sort,
+          serviceUrgency: serviceUrgency,
+        );
         return sorted.isEmpty
             ? _buildEmptyState(context, ref)
             : _buildEquipmentList(context, ref, sorted);
@@ -157,7 +188,10 @@ class _EquipmentListContentState extends ConsumerState<EquipmentListContent> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(context.l10n.equipment_appBar_title),
+        title: FeatureAppBarTitle(
+          featureId: 'equipment',
+          title: context.l10n.equipment_appBar_title,
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.sort),
@@ -244,11 +278,13 @@ class _EquipmentListContentState extends ConsumerState<EquipmentListContent> {
         final notifier = ref.read(equipmentTableConfigProvider.notifier);
         final settings = ref.watch(settingsProvider);
         final units = UnitFormatter(settings);
+        final serviceUrgency =
+            ref.watch(equipmentServiceUrgencyProvider).value ?? const {};
 
         return EntityTableView<EquipmentItem, EquipmentField>(
           entities: equipment,
           idExtractor: (e) => e.id,
-          adapter: EquipmentFieldAdapter.instance,
+          adapter: EquipmentFieldAdapter(worstClocks: serviceUrgency),
           config: config,
           units: units,
           onSortFieldChanged: notifier.setSortField,
@@ -281,8 +317,9 @@ class _EquipmentListContentState extends ConsumerState<EquipmentListContent> {
       child: Row(
         children: [
           const SizedBox(width: 8),
-          Text(
-            context.l10n.equipment_appBar_title,
+          FeatureAppBarTitle(
+            featureId: 'equipment',
+            title: context.l10n.equipment_appBar_title,
             style: Theme.of(
               context,
             ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
@@ -542,7 +579,7 @@ class _EquipmentListContentState extends ConsumerState<EquipmentListContent> {
 }
 
 /// List item widget for displaying equipment
-class EquipmentListTile extends StatelessWidget {
+class EquipmentListTile extends ConsumerWidget {
   final EquipmentItem item;
   final bool isSelected;
   final VoidCallback? onTap;
@@ -555,8 +592,17 @@ class EquipmentListTile extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
+    final worstClock = ref.watch(equipmentWorstClockProvider).value?[item.id];
+    final isOverdue =
+        worstClock?.status.severity == ServiceClockSeverity.overdue;
+    final accent = resolveFeatureAccent(
+      context,
+      ref,
+      surface: AccentSurface.list,
+      featureId: 'equipment',
+    );
 
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
@@ -566,24 +612,28 @@ class EquipmentListTile extends StatelessWidget {
       child: ListTile(
         onTap: onTap,
         leading: CircleAvatar(
-          backgroundColor: item.isServiceDue
+          // An overdue service is a status signal, so it keeps the error
+          // colors even with accents on -- a cosmetic preference must not
+          // hide a service warning.
+          backgroundColor: isOverdue
               ? theme.colorScheme.errorContainer
-              : theme.colorScheme.tertiaryContainer,
+              : accent?.withValues(alpha: 0.15) ??
+                    theme.colorScheme.tertiaryContainer,
           child: Icon(
             _getIconForType(item.type),
-            color: item.isServiceDue
+            color: isOverdue
                 ? theme.colorScheme.onErrorContainer
-                : theme.colorScheme.onTertiaryContainer,
+                : accent ?? theme.colorScheme.onTertiaryContainer,
           ),
         ),
         title: Text(item.name),
         subtitle: item.fullName != item.name ? Text(item.fullName) : null,
-        trailing: _buildTrailing(context),
+        trailing: _buildTrailing(context, worstClock),
       ),
     );
   }
 
-  Widget _buildTrailing(BuildContext context) {
+  Widget _buildTrailing(BuildContext context, DueClock? worstClock) {
     final theme = Theme.of(context);
 
     final typeLabel = Text(
@@ -593,7 +643,9 @@ class EquipmentListTile extends StatelessWidget {
       ),
     );
 
-    if (item.isServiceDue) {
+    if (worstClock != null) {
+      final overdue =
+          worstClock.status.severity == ServiceClockSeverity.overdue;
       return Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.end,
@@ -601,28 +653,16 @@ class EquipmentListTile extends StatelessWidget {
           typeLabel,
           const SizedBox(height: 2),
           Text(
-            'Service Due',
+            overdue
+                ? context.l10n.equipment_list_worstClock(
+                    worstClock.status.kind.name,
+                  )
+                : worstClock.status.kind.name,
             style: theme.textTheme.labelSmall?.copyWith(
-              color: theme.colorScheme.error,
+              color: overdue
+                  ? theme.colorScheme.error
+                  : theme.colorScheme.tertiary,
               fontWeight: FontWeight.w600,
-            ),
-          ),
-        ],
-      );
-    }
-
-    if (item.daysUntilService != null) {
-      final days = item.daysUntilService!;
-      return Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          typeLabel,
-          const SizedBox(height: 2),
-          Text(
-            'Service in $days days',
-            style: theme.textTheme.labelSmall?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
             ),
           ),
         ],
@@ -673,6 +713,8 @@ class EquipmentListTile extends StatelessWidget {
         return Icons.flashlight_on;
       case EquipmentType.camera:
         return Icons.camera_alt;
+      case EquipmentType.transmitter:
+        return Icons.sensors;
       default:
         return Icons.backpack;
     }

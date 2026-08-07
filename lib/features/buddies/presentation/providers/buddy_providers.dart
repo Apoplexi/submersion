@@ -2,7 +2,6 @@ import 'package:submersion/core/constants/sort_options.dart';
 import 'package:submersion/core/models/sort_state.dart';
 import 'package:submersion/core/providers/provider.dart';
 
-import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart'
     as domain;
 import 'package:submersion/features/dive_log/presentation/providers/dive_providers.dart';
@@ -12,6 +11,8 @@ import 'package:submersion/features/divers/presentation/providers/diver_provider
 import 'package:submersion/features/buddies/data/repositories/buddy_repository.dart';
 import 'package:submersion/features/buddies/domain/constants/buddy_field.dart';
 import 'package:submersion/features/buddies/domain/entities/buddy.dart';
+import 'package:submersion/features/dive_roles/domain/entities/dive_role.dart';
+import 'package:submersion/features/buddies/domain/entities/buddy_role_credential.dart';
 import 'package:submersion/shared/models/entity_card_view_config.dart';
 import 'package:submersion/shared/models/entity_table_config.dart';
 import 'package:submersion/shared/providers/entity_table_config_providers.dart';
@@ -33,10 +34,7 @@ final allBuddiesProvider = FutureProvider<List<Buddy>>((ref) async {
     validatedCurrentDiverIdProvider.future,
   );
 
-  final sub = repository.watchBuddiesChanges().listen(
-    (_) => ref.invalidateSelf(),
-  );
-  ref.onDispose(sub.cancel);
+  ref.invalidateSelfWhen(repository.watchBuddiesChanges());
 
   return repository.getAllBuddies(diverId: validatedDiverId);
 });
@@ -56,15 +54,10 @@ final allBuddiesWithDiveCountProvider =
       final validatedDiverId = await ref.watch(
         validatedCurrentDiverIdProvider.future,
       );
-      final buddiesSub = repository.watchBuddiesChanges().listen(
-        (_) => ref.invalidateSelf(),
+      ref.invalidateSelfWhen(repository.watchBuddiesChanges());
+      ref.invalidateSelfWhen(
+        ref.read(diveRepositoryProvider).watchDivesChanges(),
       );
-      ref.onDispose(buddiesSub.cancel);
-      final divesSub = ref
-          .read(diveRepositoryProvider)
-          .watchDivesChanges()
-          .listen((_) => ref.invalidateSelf());
-      ref.onDispose(divesSub.cancel);
       return repository.getAllBuddiesWithDiveCount(diverId: validatedDiverId);
     });
 
@@ -144,7 +137,30 @@ final buddyByIdProvider = FutureProvider.family<Buddy?, String>((
 final buddiesForDiveProvider =
     FutureProvider.family<List<BuddyWithRole>, String>((ref, diveId) async {
       final repository = ref.watch(buddyRepositoryProvider);
+      ref.invalidateSelfWhen(
+        ref.watch(diveRepositoryProvider).watchDiveDetailChanges(),
+      );
       return repository.getBuddiesForDive(diveId);
+    });
+
+/// Professional credentials for one buddy. Self-invalidates on any
+/// buddy_roles table change (local edit or sync apply).
+final buddyRolesProvider =
+    FutureProvider.family<List<BuddyRoleCredential>, String>((
+      ref,
+      buddyId,
+    ) async {
+      final repository = ref.watch(buddyRepositoryProvider);
+      ref.invalidateSelfWhen(repository.watchBuddyRolesChanges());
+      return repository.getRolesForBuddy(buddyId);
+    });
+
+/// All credentials keyed by buddy id, for pickers annotating many buddies.
+final allBuddyRolesProvider =
+    FutureProvider<Map<String, List<BuddyRoleCredential>>>((ref) async {
+      final repository = ref.watch(buddyRepositoryProvider);
+      ref.invalidateSelfWhen(repository.watchBuddyRolesChanges());
+      return repository.getAllRoles();
     });
 
 /// Buddy search provider
@@ -385,7 +401,7 @@ class DiveBuddiesNotifier extends StateNotifier<List<BuddyWithRole>> {
     }
   }
 
-  void addBuddy(Buddy buddy, BuddyRole role) {
+  void addBuddy(Buddy buddy, DiveRole role) {
     // Check if buddy is already added
     final existing = state.indexWhere((b) => b.buddy.id == buddy.id);
     if (existing >= 0) {
@@ -404,7 +420,7 @@ class DiveBuddiesNotifier extends StateNotifier<List<BuddyWithRole>> {
     state = state.where((b) => b.buddy.id != buddyId).toList();
   }
 
-  void updateRole(String buddyId, BuddyRole role) {
+  void updateRole(String buddyId, DiveRole role) {
     state = state.map((b) {
       if (b.buddy.id == buddyId) {
         return BuddyWithRole(buddy: b.buddy, role: role);

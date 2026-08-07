@@ -1,24 +1,19 @@
+import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart' show visibleForTesting;
+import 'package:path/path.dart' as p;
 import 'package:submersion/core/providers/provider.dart';
-import 'package:submersion/core/services/export/models/uddf_import_result.dart';
 import 'package:submersion/features/buddies/presentation/providers/buddy_providers.dart';
 import 'package:submersion/features/certifications/presentation/providers/certification_providers.dart';
-import 'package:submersion/features/courses/presentation/providers/course_providers.dart';
 import 'package:submersion/features/dive_centers/presentation/providers/dive_center_providers.dart';
-import 'package:submersion/features/dive_import/data/services/uddf_entity_importer.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_providers.dart';
 import 'package:submersion/features/dive_sites/presentation/providers/site_providers.dart';
 import 'package:submersion/features/dive_types/presentation/providers/dive_type_providers.dart';
-import 'package:submersion/features/divers/presentation/providers/diver_providers.dart';
 import 'package:submersion/features/equipment/presentation/providers/equipment_providers.dart';
-import 'package:submersion/features/equipment/presentation/providers/equipment_set_providers.dart';
-import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/features/tags/presentation/providers/tag_providers.dart';
-import 'package:submersion/features/tank_presets/domain/services/default_tank_preset_resolver.dart';
-import 'package:submersion/features/tank_presets/presentation/providers/tank_preset_providers.dart';
 import 'package:submersion/features/trips/presentation/providers/trip_providers.dart';
 import 'package:submersion/features/universal_import/data/models/detection_result.dart';
 import 'package:submersion/features/universal_import/data/models/field_mapping.dart';
@@ -30,19 +25,16 @@ import 'package:submersion/features/universal_import/data/csv/presets/built_in_p
 import 'package:submersion/features/universal_import/data/csv/presets/preset_registry.dart';
 import 'package:submersion/features/universal_import/presentation/providers/csv_preset_providers.dart';
 import 'package:submersion/features/universal_import/data/parsers/csv_import_parser.dart';
-import 'package:submersion/features/universal_import/data/parsers/fit_import_parser.dart';
 import 'package:submersion/features/universal_import/data/parsers/import_parser.dart';
-import 'package:submersion/features/universal_import/data/parsers/macdive_sqlite_parser.dart';
-import 'package:submersion/features/universal_import/data/parsers/macdive_xml_parser.dart';
-import 'package:submersion/features/universal_import/data/parsers/placeholder_parser.dart';
-import 'package:submersion/features/universal_import/data/parsers/subsurface_xml_parser.dart';
-import 'package:submersion/features/universal_import/data/parsers/shearwater_cloud_parser.dart';
-import 'package:submersion/features/universal_import/data/parsers/uddf_import_parser.dart';
 import 'package:submersion/features/universal_import/data/services/format_detector.dart';
+import 'package:submersion/features/universal_import/data/models/picked_import_file.dart';
+import 'package:submersion/features/universal_import/data/parsers/parser_registry.dart';
+import 'package:submersion/features/universal_import/data/services/batch_parse_service.dart';
 import 'package:submersion/features/universal_import/data/services/macdive_db_reader.dart';
+import 'package:submersion/features/universal_import/data/services/payload_merger.dart';
 import 'package:submersion/features/universal_import/data/services/shearwater_db_reader.dart';
 import 'package:submersion/features/universal_import/data/services/import_duplicate_checker.dart';
-import 'package:submersion/features/universal_import/presentation/providers/import_consolidation_service.dart';
+import 'package:submersion/features/universal_import/data/services/zip_expansion_service.dart';
 import 'package:submersion/features/universal_import/presentation/providers/universal_import_state.dart';
 
 export 'package:submersion/features/universal_import/presentation/providers/universal_import_state.dart';
@@ -53,9 +45,23 @@ export 'package:submersion/features/universal_import/presentation/providers/univ
 
 /// Manages the universal import wizard flow.
 class UniversalImportNotifier extends StateNotifier<UniversalImportState> {
-  UniversalImportNotifier(this._ref) : super(const UniversalImportState());
+  UniversalImportNotifier(
+    this._ref, {
+    BatchParseService batchParseService = const BatchParseService(),
+    ZipExpansionService zipExpansionService = const ZipExpansionService(),
+  }) : _batchParseService = batchParseService,
+       _zipExpansion = zipExpansionService,
+       super(const UniversalImportState());
 
   final Ref _ref;
+
+  /// Injectable so tests can drive deterministic batch-parse outcomes
+  /// (progress, cancellation) without real file timing.
+  final BatchParseService _batchParseService;
+
+  /// Expands ZIP archives (DiveCloud exports) into their member files at
+  /// intake so members flow through normal detection and batching.
+  final ZipExpansionService _zipExpansion;
 
   /// Build a [PresetRegistry] that includes both built-in and user-saved
   /// presets so auto-detection scores against all of them.
@@ -106,6 +112,62 @@ class UniversalImportNotifier extends StateNotifier<UniversalImportState> {
     return detection;
   }
 
+  /// Stores photo/temp-dir bookkeeping from a ZIP expansion into state.
+  ///
+  /// Always overwrites, even for a non-ZIP (empty) expansion: otherwise the
+  /// photo map from a previous ZIP import would linger through a subsequent
+  /// non-ZIP import (pickFiles/pickFolder do not fully reset state) and its
+  /// photos could be misattached to the new dives. Temp dirs superseded by
+  /// this expansion are deleted so extracted data does not accumulate.
+  void _applyExpansionExtras(ArchiveExpansion expansion) {
+    final superseded = [
+      for (final dir in state.zipTempDirPaths)
+        if (!expansion.tempDirPaths.contains(dir)) dir,
+    ];
+    state = state.copyWith(
+      photoPathsByBaseName: expansion.photoPathsByBaseName,
+      unmatchedPhotoCount: expansion.unmatchedPhotoPaths.length,
+      zipTempDirPaths: expansion.tempDirPaths,
+    );
+    _deleteTempDirs(superseded);
+  }
+
+  /// Best-effort, fire-and-forget deletion of extracted-ZIP temp directories.
+  void _deleteTempDirs(List<String> paths) {
+    if (paths.isEmpty) return;
+    unawaited(() async {
+      for (final path in paths) {
+        try {
+          final dir = Directory(path);
+          if (dir.existsSync()) await dir.delete(recursive: true);
+        } catch (_) {
+          // Temp cleanup is best-effort; the OS reclaims systemTemp anyway.
+        }
+      }
+    }());
+  }
+
+  /// Single-file load by path (used when a ZIP expands to exactly one
+  /// member and by the classic picker path).
+  Future<void> _loadSingleFromFilePath(String filePath) async {
+    final bytes = await File(filePath).readAsBytes();
+    final detection = await _detectFormat(bytes);
+    state = state.copyWith(
+      isLoading: false,
+      files: [
+        PickedImportFile(
+          name: p.basename(filePath),
+          path: filePath,
+          bytes: bytes,
+          detection: detection,
+          status: ImportFileStatus.pending,
+        ),
+      ],
+      detectionResult: detection,
+      currentStep: ImportWizardStep.sourceConfirmation,
+    );
+  }
+
   // -- External File Loading (drag-and-drop / sharing intents) --
 
   /// Load a file from raw bytes, bypassing the file picker.
@@ -120,9 +182,35 @@ class UniversalImportNotifier extends StateNotifier<UniversalImportState> {
   ) async {
     // Reset to a clean slate so stale fileBytes/detectionResult from a
     // previous run don't leak through if detection fails or is unsupported.
+    final staleTempDirs = state.zipTempDirPaths;
     state = const UniversalImportState().copyWith(isLoading: true);
+    _deleteTempDirs(staleTempDirs);
 
     try {
+      if (ZipExpansionService.isZipBytes(bytes)) {
+        final expansion = await _zipExpansion.expandZipBytes(bytes, fileName);
+        _applyExpansionExtras(expansion);
+        if (expansion.filePaths.isEmpty) {
+          state = state.copyWith(
+            isLoading: false,
+            error: 'No importable files found in archive',
+          );
+          return const DetectionResult(
+            format: ImportFormat.unknown,
+            confidence: 0.0,
+            warnings: ['No importable files found in archive'],
+          );
+        }
+        if (expansion.filePaths.length == 1) {
+          await _loadSingleFromFilePath(expansion.filePaths.first);
+        } else {
+          await _loadBatchFromPaths(expansion.filePaths);
+        }
+        state = state.copyWith(wasLoadedExternally: true);
+        return state.detectionResult ??
+            const DetectionResult(format: ImportFormat.unknown, confidence: 0);
+      }
+
       final detection = await _detectFormat(bytes);
 
       // Don't advance to sourceConfirmation for unsupported formats so the
@@ -135,8 +223,14 @@ class UniversalImportNotifier extends StateNotifier<UniversalImportState> {
 
       state = state.copyWith(
         isLoading: false,
-        fileBytes: bytes,
-        fileName: fileName,
+        files: [
+          PickedImportFile(
+            name: fileName,
+            bytes: bytes,
+            detection: detection,
+            status: ImportFileStatus.pending,
+          ),
+        ],
         detectionResult: detection,
         currentStep: ImportWizardStep.sourceConfirmation,
         wasLoadedExternally: true,
@@ -158,8 +252,11 @@ class UniversalImportNotifier extends StateNotifier<UniversalImportState> {
 
   // -- Step 0: File Selection --
 
-  /// Pick a file and run format detection.
-  Future<void> pickFile() async {
+  /// Pick one or more files and run format detection.
+  ///
+  /// A single selection keeps the classic wizard flow (Confirm Source, CSV
+  /// mapping); multiple selections enter the batch triage flow.
+  Future<void> pickFiles() async {
     // Reset to fileSelection so the canAdvance provider transitions
     // false -> true when detection completes, enabling auto-advance
     // even when re-selecting a file.
@@ -172,7 +269,7 @@ class UniversalImportNotifier extends StateNotifier<UniversalImportState> {
     try {
       final result = await FilePicker.pickFiles(
         type: FileType.any,
-        allowMultiple: false,
+        allowMultiple: true,
       );
 
       if (result == null || result.files.isEmpty) {
@@ -180,31 +277,162 @@ class UniversalImportNotifier extends StateNotifier<UniversalImportState> {
         return;
       }
 
-      final pickedFile = result.files.first;
-      final filePath = pickedFile.path;
-      if (filePath == null) {
+      final pickedPaths = [
+        for (final f in result.files)
+          if (f.path != null) f.path!,
+      ];
+      final expansion = await _zipExpansion.expandAll(pickedPaths);
+      _applyExpansionExtras(expansion);
+
+      if (expansion.filePaths.isEmpty) {
         state = state.copyWith(
           isLoading: false,
-          error: 'Could not access file',
+          error: 'No importable files found in archive',
         );
         return;
       }
-
-      final bytes = await File(filePath).readAsBytes();
-      final fileName = pickedFile.name;
-      final detection = await _detectFormat(bytes);
-
-      state = state.copyWith(
-        isLoading: false,
-        fileBytes: bytes,
-        fileName: fileName,
-        detectionResult: detection,
-        currentStep: ImportWizardStep.sourceConfirmation,
-      );
+      if (expansion.filePaths.length == 1) {
+        await _loadSingleFromFilePath(expansion.filePaths.first);
+        return;
+      }
+      await _loadBatchFromPaths(expansion.filePaths);
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
         error: 'Failed to pick file: $e',
+      );
+    }
+  }
+
+  /// Load many files by path: detect each (bytes read then discarded),
+  /// classify CSV/unsupported as excluded, and enter the triage step.
+  Future<void> _loadBatchFromPaths(List<String> paths) async {
+    final files = <PickedImportFile>[];
+    for (final path in paths) {
+      final name = p.basename(path);
+      try {
+        final bytes = await File(path).readAsBytes();
+        final detection = await _detectFormat(bytes);
+        final status = detection.format == ImportFormat.csv
+            ? ImportFileStatus.excludedCsv
+            : detection.format.isSupported
+            ? ImportFileStatus.pending
+            : ImportFileStatus.unsupported;
+        files.add(
+          PickedImportFile(
+            name: name,
+            path: path,
+            detection: detection,
+            status: status,
+          ),
+        );
+      } catch (e) {
+        files.add(
+          PickedImportFile(
+            name: name,
+            path: path,
+            detection: const DetectionResult(
+              format: ImportFormat.unknown,
+              confidence: 0,
+            ),
+            status: ImportFileStatus.failed,
+            error: e.toString(),
+          ),
+        );
+      }
+    }
+
+    final firstPending = files.where(
+      (f) => f.status == ImportFileStatus.pending,
+    );
+    state = state.copyWith(
+      isLoading: false,
+      files: files,
+      // Gate providers key off detectionResult; use the first importable
+      // file's detection so canAdvance behaves for batches too. When the
+      // batch has no importable file, CLEAR any stale detection so the
+      // wizard cannot advance past triage.
+      detectionResult: firstPending.isNotEmpty
+          ? firstPending.first.detection
+          : null,
+      clearDetectionResult: firstPending.isEmpty,
+      currentStep: ImportWizardStep.sourceConfirmation,
+    );
+  }
+
+  /// Load multiple files by path (drag-and-drop). Resets prior state and
+  /// enters the triage step. Marks the load as external so the wizard does
+  /// not reset it on init.
+  Future<void> loadFilesFromPaths(List<String> paths) async {
+    final staleTempDirs = state.zipTempDirPaths;
+    state = const UniversalImportState().copyWith(isLoading: true);
+    _deleteTempDirs(staleTempDirs);
+    final expansion = await _zipExpansion.expandAll(paths);
+    _applyExpansionExtras(expansion);
+    if (expansion.filePaths.isEmpty) {
+      state = state.copyWith(
+        isLoading: false,
+        error: 'No importable files found in archive',
+      );
+      return;
+    }
+    if (expansion.filePaths.length == 1) {
+      await _loadSingleFromFilePath(expansion.filePaths.first);
+    } else {
+      await _loadBatchFromPaths(expansion.filePaths);
+    }
+    state = state.copyWith(wasLoadedExternally: true);
+  }
+
+  /// Desktop only: pick a folder and recursively gather importable files.
+  Future<void> pickFolder() async {
+    state = state.copyWith(
+      isLoading: true,
+      clearError: true,
+      currentStep: ImportWizardStep.fileSelection,
+    );
+
+    try {
+      final dirPath = await FilePicker.getDirectoryPath();
+      if (dirPath == null) {
+        state = state.copyWith(isLoading: false);
+        return;
+      }
+
+      final paths = await scanFolderForImportableFiles(dirPath);
+      if (paths.isEmpty) {
+        state = state.copyWith(
+          isLoading: false,
+          error: 'No importable files found in the selected folder',
+        );
+        return;
+      }
+
+      // Folder scans surface ZIPs (DiveCloud exports); expand them so
+      // members flow through the batch like directly picked files.
+      final expansion = await _zipExpansion.expandAll(paths);
+      _applyExpansionExtras(expansion);
+      final expandedPaths = expansion.filePaths;
+
+      if (expandedPaths.isEmpty) {
+        state = state.copyWith(
+          isLoading: false,
+          error: 'No importable files found in the selected folder',
+        );
+        return;
+      }
+
+      if (expandedPaths.length == 1) {
+        // Single hit: behave exactly like a single-file pick.
+        await _loadSingleFromFilePath(expandedPaths.first);
+        return;
+      }
+
+      await _loadBatchFromPaths(expandedPaths);
+    } catch (e) {
+      state = state.copyWith(
+        isLoading: false,
+        error: 'Failed to scan folder: $e',
       );
     }
   }
@@ -235,6 +463,11 @@ class UniversalImportNotifier extends StateNotifier<UniversalImportState> {
     SourceApp? overrideApp,
     ImportFormat? overrideFormat,
   }) async {
+    if (state.isBatch) {
+      await _parseBatch();
+      return;
+    }
+
     final detection = state.detectionResult;
     if (detection == null) return;
 
@@ -249,7 +482,11 @@ class UniversalImportNotifier extends StateNotifier<UniversalImportState> {
     final sourceApp =
         effectiveOverride ?? detection.sourceApp ?? SourceApp.generic;
 
-    final options = ImportOptions(sourceApp: sourceApp, format: format);
+    final options = ImportOptions(
+      sourceApp: sourceApp,
+      format: format,
+      fileName: state.fileName,
+    );
 
     // For CSV files, run pipeline detection to check for multi-file presets.
     if (format == ImportFormat.csv && state.fileBytes != null) {
@@ -361,6 +598,83 @@ class UniversalImportNotifier extends StateNotifier<UniversalImportState> {
     await _parseAndCheckDuplicates();
   }
 
+  // -- Batch Parsing (multi-file imports) --
+
+  bool _batchParseCancelled = false;
+
+  /// Cooperative cancel; takes effect at the next file boundary.
+  void cancelBatchParse() {
+    _batchParseCancelled = true;
+  }
+
+  Future<void> _parseBatch() async {
+    _batchParseCancelled = false;
+    state = state.copyWith(
+      isLoading: true,
+      clearError: true,
+      parseTotal: state.pendingFiles.length,
+      parseCurrent: 0,
+    );
+
+    final result = await _batchParseService.parseAll(
+      state.files,
+      onProgress: (current, total) {
+        state = state.copyWith(parseCurrent: current, parseTotal: total);
+      },
+      isCancelled: () => _batchParseCancelled,
+    );
+
+    if (result.cancelled) {
+      // Stay on triage; reset parse bookkeeping so a re-run starts clean.
+      // Files already parsed this run must be reset to pending: their
+      // FilePayloads (result.parsed) are not retained in state, and
+      // parseAll skips non-pending files, so on a re-run they would be
+      // silently dropped from the merged import. Resetting makes a re-run
+      // re-parse and merge them.
+      final resetFiles = [
+        for (final f in result.files)
+          f.status == ImportFileStatus.parsed
+              ? f.copyWith(status: ImportFileStatus.pending, diveCount: 0)
+              : f,
+      ];
+      state = state.copyWith(
+        isLoading: false,
+        files: resetFiles,
+        parseCurrent: 0,
+        parseTotal: 0,
+        currentStep: ImportWizardStep.sourceConfirmation,
+      );
+      return;
+    }
+
+    if (result.parsed.isEmpty) {
+      // Clear the detection result so the Confirm Source / triage step's
+      // canAdvance gate (universalAdapterSourceReadyProvider, which only checks
+      // detectionResult.isFormatSupported) goes false -- there is no payload to
+      // review, so Next must not stay enabled.
+      state = state.copyWith(
+        isLoading: false,
+        files: result.files,
+        clearDetectionResult: true,
+        error: 'No data could be parsed from the selected files',
+      );
+      return;
+    }
+
+    final payload = const PayloadMerger().merge(result.parsed);
+    final dupResult = await _checkDuplicates(payload);
+    final selections = _defaultSelections(payload, dupResult);
+
+    state = state.copyWith(
+      isLoading: false,
+      files: result.files,
+      payload: payload,
+      duplicateResult: dupResult,
+      selections: selections,
+      currentStep: ImportWizardStep.review,
+    );
+  }
+
   // -- Parsing + Duplicate Check --
 
   Future<void> _parseAndCheckDuplicates() async {
@@ -399,22 +713,7 @@ class UniversalImportNotifier extends StateNotifier<UniversalImportState> {
       final dupResult = await _checkDuplicates(payload);
 
       // Build default selections: all selected, minus duplicates
-      final selections = <ImportEntityType, Set<int>>{};
-      for (final type in payload.availableTypes) {
-        final items = payload.entitiesOf(type);
-        final allIndices = Set<int>.from(List.generate(items.length, (i) => i));
-
-        if (type == ImportEntityType.dives) {
-          // Exclude dives matched as duplicates
-          selections[type] = allIndices.difference(
-            Set<int>.from(dupResult.diveMatches.keys),
-          );
-        } else {
-          // Exclude items flagged as duplicates
-          final dups = dupResult.duplicates[type] ?? const {};
-          selections[type] = allIndices.difference(dups);
-        }
-      }
+      final selections = _defaultSelections(payload, dupResult);
 
       state = state.copyWith(
         isLoading: false,
@@ -432,19 +731,37 @@ class UniversalImportNotifier extends StateNotifier<UniversalImportState> {
   }
 
   ImportParser _parserFor(ImportFormat format, {PresetRegistry? registry}) {
-    return switch (format) {
-      ImportFormat.csv => CsvImportParser(
+    if (format == ImportFormat.csv) {
+      return CsvImportParser(
         customMapping: state.fieldMapping,
         pipeline: registry != null ? CsvPipeline(registry: registry) : null,
-      ),
-      ImportFormat.uddf => UddfImportParser(),
-      ImportFormat.macdiveXml => const MacDiveXmlParser(),
-      ImportFormat.macdiveSqlite => const MacDiveSqliteParser(),
-      ImportFormat.subsurfaceXml => SubsurfaceXmlParser(),
-      ImportFormat.fit => const FitImportParser(),
-      ImportFormat.shearwaterDb => ShearwaterCloudParser(),
-      _ => const PlaceholderParser(),
-    };
+      );
+    }
+    return parserForFormat(format);
+  }
+
+  /// Default review selections: everything selected, minus duplicates.
+  Map<ImportEntityType, Set<int>> _defaultSelections(
+    ImportPayload payload,
+    ImportDuplicateResult dupResult,
+  ) {
+    final selections = <ImportEntityType, Set<int>>{};
+    for (final type in payload.availableTypes) {
+      final items = payload.entitiesOf(type);
+      final allIndices = Set<int>.from(List.generate(items.length, (i) => i));
+
+      if (type == ImportEntityType.dives) {
+        // Exclude dives matched as duplicates
+        selections[type] = allIndices.difference(
+          Set<int>.from(dupResult.diveMatches.keys),
+        );
+      } else {
+        // Exclude items flagged as duplicates
+        final dups = dupResult.duplicates[type] ?? const {};
+        selections[type] = allIndices.difference(dups);
+      }
+    }
+    return selections;
   }
 
   Future<ImportDuplicateResult> _checkDuplicates(ImportPayload payload) async {
@@ -476,6 +793,7 @@ class UniversalImportNotifier extends StateNotifier<UniversalImportState> {
       existingTags: existingTags,
       existingDiveTypes: existingDiveTypes,
       existingSourceUuidByDiveId: existingSourceUuidByDiveId,
+      checkIntraBatch: (payload.metadata['batchFileCount'] as int? ?? 1) > 1,
     );
   }
 
@@ -510,230 +828,23 @@ class UniversalImportNotifier extends StateNotifier<UniversalImportState> {
     );
   }
 
-  /// Set the duplicate resolution for a specific dive index.
-  ///
-  /// When [resolution] is [DiveDuplicateResolution.consolidate] or
-  /// [DiveDuplicateResolution.importAsNew], the dive index is added to the
-  /// selection so it participates in the import step. When [resolution] is
-  /// [DiveDuplicateResolution.skip], it is removed from the selection.
-  void setDiveResolution(int index, DiveDuplicateResolution resolution) {
-    final updatedResolutions = Map<int, DiveDuplicateResolution>.from(
-      state.diveResolutions,
-    )..[index] = resolution;
-
-    final currentSelection = Set<int>.from(
-      state.selectionFor(ImportEntityType.dives),
-    );
-    if (resolution == DiveDuplicateResolution.skip) {
-      currentSelection.remove(index);
-    } else {
-      currentSelection.add(index);
-    }
-
-    state = state.copyWith(
-      diveResolutions: updatedResolutions,
-      selections: {
-        ...state.selections,
-        ImportEntityType.dives: currentSelection,
-      },
-    );
-  }
-
-  // -- Step 4: Import --
-
-  /// Perform the import with current selections.
-  Future<void> performImport() async {
-    final payload = state.payload;
-    if (payload == null) return;
-
-    state = state.copyWith(
-      currentStep: ImportWizardStep.importing,
-      isImporting: true,
-      clearError: true,
-    );
-
-    try {
-      final currentDiver = await _ref.read(currentDiverProvider.future);
-      if (currentDiver == null) {
-        state = state.copyWith(
-          isImporting: false,
-          error: 'Please create a diver profile before importing',
-        );
-        return;
-      }
-
-      // Partition dive selections: consolidate vs normal import.
-      final consolidateIndices = <int>{};
-      final normalDiveSelection = Set<int>.from(
-        state.selectionFor(ImportEntityType.dives),
-      );
-      for (final entry in state.diveResolutions.entries) {
-        if (entry.value == DiveDuplicateResolution.consolidate) {
-          consolidateIndices.add(entry.key);
-          normalDiveSelection.remove(entry.key);
-        }
-      }
-
-      // Convert to UDDF format for reuse of UddfEntityImporter
-      final uddfData = _toUddfResult(payload);
-      final uddfSelections = _toUddfSelections({
-        ...state.selections,
-        ImportEntityType.dives: normalDiveSelection,
-      });
-
-      final repos = ImportRepositories(
-        tripRepository: _ref.read(tripRepositoryProvider),
-        equipmentRepository: _ref.read(equipmentRepositoryProvider),
-        equipmentSetRepository: _ref.read(equipmentSetRepositoryProvider),
-        buddyRepository: _ref.read(buddyRepositoryProvider),
-        diveCenterRepository: _ref.read(diveCenterRepositoryProvider),
-        certificationRepository: _ref.read(certificationRepositoryProvider),
-        tagRepository: _ref.read(tagRepositoryProvider),
-        diveTypeRepository: _ref.read(diveTypeRepositoryProvider),
-        siteRepository: _ref.read(siteRepositoryProvider),
-        diveRepository: _ref.read(diveRepositoryProvider),
-        tankPressureRepository: _ref.read(tankPressureRepositoryProvider),
-        courseRepository: _ref.read(courseRepositoryProvider),
-      );
-
-      final settings = _ref.read(settingsProvider);
-      final resolver = DefaultTankPresetResolver(
-        repository: _ref.read(tankPresetRepositoryProvider),
-      );
-      final defaultTankPreset = await resolver.resolve(
-        settings.defaultTankPreset,
-      );
-      final importer = UddfEntityImporter(
-        defaultTankPreset: defaultTankPreset,
-        defaultStartPressure: settings.defaultStartPressure,
-        applyDefaultTankToImports: settings.applyDefaultTankToImports,
-      );
-      final result = await importer.import(
-        data: uddfData,
-        selections: uddfSelections,
-        repositories: repos,
-        diverId: currentDiver.id,
-        onProgress: (phase, current, total) {
-          state = state.copyWith(
-            importPhase: phase.name,
-            importCurrent: current,
-            importTotal: total,
-          );
-        },
-      );
-
-      // Run consolidations for dives marked with the consolidate resolution.
-      var consolidatedCount = 0;
-      if (consolidateIndices.isNotEmpty) {
-        final diveRepo = _ref.read(diveRepositoryProvider);
-        final diveItems = payload.entitiesOf(ImportEntityType.dives);
-        consolidatedCount = await performConsolidations(
-          indices: consolidateIndices,
-          diveItems: diveItems,
-          duplicateResult: state.duplicateResult,
-          diveRepository: diveRepo,
-        );
-      }
-
-      _invalidateProviders();
-
-      final counts = <ImportEntityType, int>{
-        if ((result.dives + consolidatedCount) > 0)
-          ImportEntityType.dives: result.dives + consolidatedCount,
-        if (result.sites > 0) ImportEntityType.sites: result.sites,
-        if (result.trips > 0) ImportEntityType.trips: result.trips,
-        if (result.equipment > 0) ImportEntityType.equipment: result.equipment,
-        if (result.equipmentSets > 0)
-          ImportEntityType.equipmentSets: result.equipmentSets,
-        if (result.buddies > 0) ImportEntityType.buddies: result.buddies,
-        if (result.diveCenters > 0)
-          ImportEntityType.diveCenters: result.diveCenters,
-        if (result.certifications > 0)
-          ImportEntityType.certifications: result.certifications,
-        if (result.courses > 0) ImportEntityType.courses: result.courses,
-        if (result.tags > 0) ImportEntityType.tags: result.tags,
-        if (result.diveTypes > 0) ImportEntityType.diveTypes: result.diveTypes,
-      };
-
-      state = state.copyWith(
-        currentStep: ImportWizardStep.summary,
-        isImporting: false,
-        importCounts: counts,
-      );
-    } catch (e) {
-      state = state.copyWith(isImporting: false, error: 'Import failed: $e');
-    }
-  }
-
-  // -- Adapter Helpers --
-
-  static UddfImportResult _toUddfResult(ImportPayload payload) {
-    return UddfImportResult(
-      dives: payload.entitiesOf(ImportEntityType.dives),
-      sites: payload.entitiesOf(ImportEntityType.sites),
-      trips: payload.entitiesOf(ImportEntityType.trips),
-      equipment: payload.entitiesOf(ImportEntityType.equipment),
-      buddies: payload.entitiesOf(ImportEntityType.buddies),
-      diveCenters: payload.entitiesOf(ImportEntityType.diveCenters),
-      certifications: payload.entitiesOf(ImportEntityType.certifications),
-      tags: payload.entitiesOf(ImportEntityType.tags),
-      customDiveTypes: payload.entitiesOf(ImportEntityType.diveTypes),
-      equipmentSets: payload.entitiesOf(ImportEntityType.equipmentSets),
-      courses: payload.entitiesOf(ImportEntityType.courses),
-    );
-  }
-
-  static UddfImportSelections _toUddfSelections(
-    Map<ImportEntityType, Set<int>> sel,
-  ) {
-    return UddfImportSelections(
-      trips: sel[ImportEntityType.trips] ?? const {},
-      equipment: sel[ImportEntityType.equipment] ?? const {},
-      buddies: sel[ImportEntityType.buddies] ?? const {},
-      diveCenters: sel[ImportEntityType.diveCenters] ?? const {},
-      certifications: sel[ImportEntityType.certifications] ?? const {},
-      tags: sel[ImportEntityType.tags] ?? const {},
-      diveTypes: sel[ImportEntityType.diveTypes] ?? const {},
-      sites: sel[ImportEntityType.sites] ?? const {},
-      equipmentSets: sel[ImportEntityType.equipmentSets] ?? const {},
-      dives: sel[ImportEntityType.dives] ?? const {},
-      courses: sel[ImportEntityType.courses] ?? const {},
-    );
-  }
-
-  // -- Provider Invalidation --
-
-  void _invalidateProviders() {
-    _ref.invalidate(sitesProvider);
-    _ref.invalidate(sitesWithCountsProvider);
-    _ref.invalidate(siteListNotifierProvider);
-    _ref.invalidate(allBuddiesProvider);
-    _ref.invalidate(buddyListNotifierProvider);
-    _ref.invalidate(allEquipmentProvider);
-    _ref.invalidate(activeEquipmentProvider);
-    _ref.invalidate(retiredEquipmentProvider);
-    _ref.invalidate(serviceDueEquipmentProvider);
-    _ref.invalidate(equipmentListNotifierProvider);
-    _ref.invalidate(equipmentSetsProvider);
-    _ref.invalidate(allTripsProvider);
-    _ref.invalidate(allDiveCentersProvider);
-    _ref.invalidate(allCertificationsProvider);
-    _ref.invalidate(diveTypesProvider);
-    _ref.invalidate(tagsProvider);
-    _ref.invalidate(diveListNotifierProvider);
-    _ref.invalidate(paginatedDiveListProvider);
-    _ref.invalidate(diveStatisticsProvider);
-    _ref.invalidate(diveRecordsProvider);
-    _ref.invalidate(allBuddiesWithDiveCountProvider);
-  }
-
   /// Clear the external-load flag after the wizard has consumed it.
   void clearExternalLoadFlag() {
     state = state.copyWith(wasLoadedExternally: false);
   }
 
+  @visibleForTesting
+  void debugSetFilesForTest(List<PickedImportFile> files) {
+    state = state.copyWith(
+      files: files,
+      currentStep: ImportWizardStep.sourceConfirmation,
+    );
+  }
+
   void reset() {
+    final staleTempDirs = state.zipTempDirPaths;
     state = const UniversalImportState();
+    _deleteTempDirs(staleTempDirs);
   }
 }
 

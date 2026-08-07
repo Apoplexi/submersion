@@ -92,9 +92,17 @@ LibdivecomputerPluginParsedDive* convert_parsed_dive(
             int64_t* tank_index =
                 (s->tank == UINT32_MAX) ? NULL : &tank_val;
 
+            int64_t gmi_val = (int64_t)s->gasmix;
+            int64_t* gas_mix_index =
+                (s->gasmix == UINT32_MAX) ? NULL : &gmi_val;
+
             int64_t hr_val = (int64_t)s->heartbeat;
             int64_t* heart_rate =
                 (s->heartbeat == UINT32_MAX) ? NULL : &hr_val;
+
+            double heading_val = (double)s->heading;
+            double* heading =
+                (s->heading == UINT32_MAX) ? NULL : &heading_val;
 
             int64_t rbt_val = (int64_t)s->rbt;
             int64_t* rbt = (s->rbt == UINT32_MAX) ? NULL : &rbt_val;
@@ -114,11 +122,22 @@ LibdivecomputerPluginParsedDive* convert_parsed_dive(
                     ? NULL
                     : &tts_val;
 
+            // Per-cell O2 ppO2: NaN -> NULL. cell_vals must outlive the
+            // constructor call (it copies each value).
+            double cell_vals[6];
+            double* o2_sensor[6];
+            for (int c = 0; c < 6; c++) {
+                cell_vals[c] = s->o2_sensor[c];
+                o2_sensor[c] = isnan(cell_vals[c]) ? NULL : &cell_vals[c];
+            }
+
             LibdivecomputerPluginProfileSample* sample =
                 libdivecomputer_plugin_profile_sample_new(
                     time_seconds, s->depth, temp_c, pressure, tank_index,
-                    heart_rate, setpoint, ppo2, cns, rbt, deco_type,
-                    deco_time, deco_depth, tts);
+                    heart_rate, heading, setpoint, ppo2, cns, rbt, deco_type,
+                    deco_time, deco_depth, tts, o2_sensor[0], o2_sensor[1],
+                    o2_sensor[2], o2_sensor[3], o2_sensor[4], o2_sensor[5],
+                    gas_mix_index);
 
             fl_value_append_take(
                 samples,
@@ -155,9 +174,12 @@ LibdivecomputerPluginParsedDive* convert_parsed_dive(
         double ep_val = tk->endpressure;
         double* end_p = (ep_val == 0.0) ? NULL : &ep_val;
 
+        int64_t usage_val = (int64_t)tk->usage;
+        int64_t* usage = (tk->usage == 0) ? NULL : &usage_val;
+
         LibdivecomputerPluginTankInfo* tank =
             libdivecomputer_plugin_tank_info_new(
-                (int64_t)i, (int64_t)tk->gasmix, volume, begin_p, end_p);
+                (int64_t)i, (int64_t)tk->gasmix, volume, begin_p, end_p, usage);
         fl_value_append_take(
             tanks,
             fl_value_new_custom_object(134, G_OBJECT(tank)));

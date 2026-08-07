@@ -8,9 +8,10 @@ import 'package:submersion/features/import_wizard/domain/adapters/import_source_
 import 'package:submersion/features/import_wizard/domain/models/duplicate_action.dart';
 import 'package:submersion/features/import_wizard/domain/models/import_bundle.dart';
 import 'package:submersion/features/import_wizard/domain/models/import_cancellation_token.dart';
+import 'package:submersion/features/import_wizard/domain/models/import_file_outcome.dart';
 import 'package:submersion/features/import_wizard/domain/models/import_phase.dart';
 import 'package:submersion/features/import_wizard/domain/models/unified_import_result.dart';
-import 'package:submersion/features/import_wizard/domain/models/wizard_step_def.dart';
+import 'package:submersion/shared/widgets/wizard/wizard_step_def.dart';
 import 'package:submersion/features/import_wizard/presentation/providers/import_wizard_providers.dart';
 import 'package:submersion/features/import_wizard/presentation/widgets/import_summary_step.dart';
 import 'package:submersion/features/dive_sites/presentation/providers/site_match_review_notifier.dart';
@@ -1045,6 +1046,173 @@ void main() {
 
       expect(find.text('Courses'), findsOneWidget);
       expect(find.text('3'), findsOneWidget);
+    });
+  });
+
+  group('ImportSummaryStep - per-file outcomes (bulk import)', () {
+    testWidgets('renders a row per file with each outcome status', (
+      tester,
+    ) async {
+      await tester.binding.setSurfaceSize(const Size(800, 900));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+
+      final notifier = _makeNotifier();
+      notifier.state = notifier.state.copyWith(
+        importResult: const UnifiedImportResult(
+          importedCounts: {ImportEntityType.dives: 3},
+          consolidatedCount: 0,
+          skippedCount: 0,
+          fileOutcomes: [
+            ImportFileOutcome(
+              fileName: 'jan.fit',
+              formatName: 'Garmin FIT',
+              status: ImportFileOutcomeStatus.imported,
+              importedDives: 2,
+            ),
+            ImportFileOutcome(
+              fileName: 'feb.uddf',
+              formatName: 'UDDF',
+              status: ImportFileOutcomeStatus.imported,
+              importedDives: 1,
+            ),
+            ImportFileOutcome(
+              fileName: 'broken.uddf',
+              formatName: 'UDDF',
+              status: ImportFileOutcomeStatus.parseFailed,
+              error: 'bad xml',
+            ),
+            ImportFileOutcome(
+              fileName: 'log.csv',
+              formatName: 'CSV',
+              status: ImportFileOutcomeStatus.needsIndividualImport,
+            ),
+            ImportFileOutcome(
+              fileName: 'mystery.dat',
+              formatName: 'Unknown',
+              status: ImportFileOutcomeStatus.unsupported,
+            ),
+          ],
+        ),
+      );
+
+      await tester.pumpWidget(_buildWidget(notifier));
+      await tester.pump();
+
+      // Section header (from l10n).
+      expect(find.text('Files'), findsOneWidget);
+      // One row per file.
+      expect(find.text('jan.fit'), findsOneWidget);
+      expect(find.text('feb.uddf'), findsOneWidget);
+      expect(find.text('broken.uddf'), findsOneWidget);
+      expect(find.text('log.csv'), findsOneWidget);
+      expect(find.text('mystery.dat'), findsOneWidget);
+      // Status labels for the non-imported outcomes.
+      expect(find.text('Could not be read'), findsNothing);
+      expect(find.text('Failed to read'), findsOneWidget);
+      expect(find.text('Needs individual import'), findsOneWidget);
+      expect(find.text('Unsupported format'), findsOneWidget);
+      // Imported count label (pluralized).
+      expect(find.text('2 dives imported'), findsOneWidget);
+      expect(find.text('1 dive imported'), findsOneWidget);
+    });
+
+    testWidgets('single-file imports render no file outcome section', (
+      tester,
+    ) async {
+      await tester.binding.setSurfaceSize(const Size(800, 600));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+
+      final notifier = _makeNotifier();
+      notifier.state = notifier.state.copyWith(
+        importResult: const UnifiedImportResult(
+          importedCounts: {ImportEntityType.dives: 1},
+          consolidatedCount: 0,
+          skippedCount: 0,
+        ),
+      );
+
+      await tester.pumpWidget(_buildWidget(notifier));
+      await tester.pump();
+
+      expect(find.text('Files'), findsNothing);
+    });
+  });
+
+  group('ImportSummaryStep - photo rows (ZIP imports)', () {
+    testWidgets('shows photos-attached row when attachedPhotoCount > 0', (
+      tester,
+    ) async {
+      await tester.binding.setSurfaceSize(const Size(800, 600));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+
+      final notifier = _makeNotifier();
+      notifier.state = notifier.state.copyWith(
+        importResult: const UnifiedImportResult(
+          importedCounts: {ImportEntityType.dives: 2},
+          consolidatedCount: 0,
+          skippedCount: 0,
+          attachedPhotoCount: 3,
+        ),
+      );
+
+      await tester.pumpWidget(_buildWidget(notifier));
+      await tester.pump();
+
+      expect(
+        find.byKey(const Key('import_summary_photos_row')),
+        findsOneWidget,
+      );
+      expect(find.text('Photos attached'), findsOneWidget);
+      expect(find.text('3'), findsOneWidget);
+    });
+
+    testWidgets('shows unmatched-photos row when unmatchedPhotoCount > 0', (
+      tester,
+    ) async {
+      await tester.binding.setSurfaceSize(const Size(800, 600));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+
+      final notifier = _makeNotifier();
+      notifier.state = notifier.state.copyWith(
+        importResult: const UnifiedImportResult(
+          importedCounts: {ImportEntityType.dives: 2},
+          consolidatedCount: 0,
+          skippedCount: 0,
+          unmatchedPhotoCount: 1,
+        ),
+      );
+
+      await tester.pumpWidget(_buildWidget(notifier));
+      await tester.pump();
+
+      expect(
+        find.byKey(const Key('import_summary_unmatched_photos_row')),
+        findsOneWidget,
+      );
+      expect(find.text('Photos not matched to a dive'), findsOneWidget);
+    });
+
+    testWidgets('hides both photo rows when counts are 0', (tester) async {
+      await tester.binding.setSurfaceSize(const Size(800, 600));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+
+      final notifier = _makeNotifier();
+      notifier.state = notifier.state.copyWith(
+        importResult: const UnifiedImportResult(
+          importedCounts: {ImportEntityType.dives: 2},
+          consolidatedCount: 0,
+          skippedCount: 0,
+        ),
+      );
+
+      await tester.pumpWidget(_buildWidget(notifier));
+      await tester.pump();
+
+      expect(find.byKey(const Key('import_summary_photos_row')), findsNothing);
+      expect(
+        find.byKey(const Key('import_summary_unmatched_photos_row')),
+        findsNothing,
+      );
     });
   });
 }

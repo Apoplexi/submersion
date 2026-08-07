@@ -319,33 +319,7 @@ class _DcAdapterDownloadStepState extends ConsumerState<DcAdapterDownloadStep> {
     // from a previous session is ignored — only fresh transitions trigger.
     ref.listen<DownloadState>(downloadNotifierProvider, (previous, next) {
       if (!_captured && next.phase == DownloadPhase.complete) {
-        _captured = true;
-        widget.adapter.setDownloadedDives(next.downloadedDives);
-
-        // No new dives — show an informational message instead of advancing
-        // to an empty Review step.
-        if (next.downloadedDives.isEmpty) {
-          if (mounted) setState(() => _noDives = true);
-          return;
-        }
-
-        WidgetsBinding.instance.addPostFrameCallback((_) async {
-          if (!mounted) return;
-
-          final discoveryState = ref.read(discoveryNotifierProvider);
-          final device = discoveryState.selectedDevice;
-          if (device != null) {
-            await widget.adapter.ensureComputer(
-              device: device,
-              serialNumber: next.serialNumber,
-              firmwareVersion: next.firmwareVersion,
-            );
-          }
-
-          if (mounted) {
-            ref.read(dcAdapterDownloadCanAdvanceProvider.notifier).state = true;
-          }
-        });
+        _captureAndAdvance(next);
       }
     });
 
@@ -396,17 +370,91 @@ class _DcAdapterDownloadStepState extends ConsumerState<DcAdapterDownloadStep> {
       );
     }
 
+    // The first-sync cutoff prompt only ever applies when this computer has
+    // no stored fingerprint yet and the caller isn't forcing a full
+    // re-download -- in every other case the default's value is irrelevant.
+    // Only wait on the provider when it could matter: firstSyncCutoffDefault
+    // is a FutureProvider backed by a real Drift query, so the very first
+    // watch always yields AsyncLoading (valueOrNull == null) synchronously.
+    // If DownloadStepWidget were constructed immediately with that
+    // transient null, its initState would read "no cutoff" and
+    // unconditionally auto-start the download before the query resolves;
+    // the later rebuild with the real value could arrive after the
+    // download already started (or, worse, after this widget's state
+    // already decided not to show the prompt), silently skipping it.
+    // Gating here -- the same pattern already used above for
+    // _computerResolved and deviceDescriptorsProvider -- ensures
+    // DownloadStepWidget only ever sees the final, settled value.
+    final promptCouldApply =
+        computer?.lastDiveFingerprint == null &&
+        !widget.adapter.forceFullDownload;
+    DateTime? cutoffDefault;
+    if (promptCouldApply) {
+      final cutoffAsync = ref.watch(firstSyncCutoffDefaultProvider);
+      if (cutoffAsync.isLoading) {
+        return const Center(child: CircularProgressIndicator());
+      }
+      // A diver with an empty log (or no active diver) resolves to null
+      // here and falls through to the normal auto-start path below --
+      // this branch never hangs once the future settles, error or not.
+      cutoffDefault = cutoffAsync.valueOrNull;
+    }
+
     return DownloadStepWidget(
       device: device,
       computer: computer,
       forceFullDownload: widget.adapter.forceFullDownload,
+      firstSyncCutoffDefault: cutoffDefault,
       onComplete: () {
         // Handled by the state watcher above.
       },
       onError: (error) {
         // Download errors are shown by the DownloadStepWidget itself.
       },
+      onImportPartial: () {
+        // The user chose to keep the dives delivered before an interrupted
+        // download. For drivers that deliver oldest-first (as Shearwater
+        // does), this is a contiguous prefix of the oldest dives, so capturing
+        // it advances the fingerprint to a correct resume point for the next
+        // download. Ordering depends on the native driver, not this code.
+        _captureAndAdvance(ref.read(downloadNotifierProvider));
+      },
     );
+  }
+
+  /// Captures the downloaded dives into the adapter and advances the wizard to
+  /// the Review step. Shared by the normal completion path and the
+  /// import-partial action for an interrupted download.
+  void _captureAndAdvance(DownloadState state) {
+    if (_captured) return;
+    _captured = true;
+    widget.adapter.setSinceCutoff(state.sinceCutoff);
+    widget.adapter.setDownloadedDives(state.downloadedDives);
+
+    // No dives — show an informational message instead of advancing to an
+    // empty Review step.
+    if (state.downloadedDives.isEmpty) {
+      if (mounted) setState(() => _noDives = true);
+      return;
+    }
+
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (!mounted) return;
+
+      final discoveryState = ref.read(discoveryNotifierProvider);
+      final device = discoveryState.selectedDevice;
+      if (device != null) {
+        await widget.adapter.ensureComputer(
+          device: device,
+          serialNumber: state.serialNumber,
+          firmwareVersion: state.firmwareVersion,
+        );
+      }
+
+      if (mounted) {
+        ref.read(dcAdapterDownloadCanAdvanceProvider.notifier).state = true;
+      }
+    });
   }
 }
 

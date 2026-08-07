@@ -61,6 +61,7 @@ void main() {
         ProviderScope(
           overrides: [
             diveStatisticsProvider.overrideWith((ref) async => fixture),
+            filteredDiveStatisticsProvider.overrideWith((ref) async => fixture),
             diveRecordsProvider.overrideWith((ref) async => DiveRecords()),
             diveTypeDistributionProvider.overrideWith((ref) async => []),
             sharedPreferencesProvider.overrideWithValue(prefs),
@@ -124,6 +125,7 @@ void main() {
         ProviderScope(
           overrides: [
             diveStatisticsProvider.overrideWith((ref) async => stats),
+            filteredDiveStatisticsProvider.overrideWith((ref) async => stats),
             diveRecordsProvider.overrideWith((ref) async => records),
             diveTypeDistributionProvider.overrideWith((ref) async => []),
             sharedPreferencesProvider.overrideWithValue(prefs),
@@ -176,6 +178,7 @@ void main() {
         ProviderScope(
           overrides: [
             diveStatisticsProvider.overrideWith((ref) async => stats),
+            filteredDiveStatisticsProvider.overrideWith((ref) async => stats),
             diveRecordsProvider.overrideWith((ref) async => records),
             diveTypeDistributionProvider.overrideWith((ref) async => []),
             sharedPreferencesProvider.overrideWithValue(prefs),
@@ -248,6 +251,7 @@ void main() {
         ProviderScope(
           overrides: [
             diveStatisticsProvider.overrideWith((ref) async => stats),
+            filteredDiveStatisticsProvider.overrideWith((ref) async => stats),
             diveRecordsProvider.overrideWith((ref) async => records),
             diveTypeDistributionProvider.overrideWith((ref) async => []),
             sharedPreferencesProvider.overrideWithValue(prefs),
@@ -299,6 +303,7 @@ void main() {
         ProviderScope(
           overrides: [
             diveStatisticsProvider.overrideWith((ref) async => stats),
+            filteredDiveStatisticsProvider.overrideWith((ref) async => stats),
             diveRecordsProvider.overrideWith((ref) async => DiveRecords()),
             diveTypeDistributionProvider.overrideWith((ref) async => []),
             sharedPreferencesProvider.overrideWithValue(prefs),
@@ -336,6 +341,7 @@ void main() {
         ProviderScope(
           overrides: [
             diveStatisticsProvider.overrideWith((ref) async => stats),
+            filteredDiveStatisticsProvider.overrideWith((ref) async => stats),
             diveRecordsProvider.overrideWith((ref) async => DiveRecords()),
             diveTypeDistributionProvider.overrideWith((ref) async => []),
             sharedPreferencesProvider.overrideWithValue(prefs),
@@ -394,6 +400,7 @@ void main() {
         ProviderScope(
           overrides: [
             diveStatisticsProvider.overrideWith((ref) async => stats),
+            filteredDiveStatisticsProvider.overrideWith((ref) async => stats),
             diveRecordsProvider.overrideWith((ref) async => DiveRecords()),
             diveTypeDistributionProvider.overrideWith((ref) async => []),
             sharedPreferencesProvider.overrideWithValue(prefs),
@@ -452,13 +459,6 @@ void main() {
               return const Scaffold(body: Text('New Dive'));
             },
           ),
-          GoRoute(
-            path: '/transfer/import-wizard',
-            builder: (ctx, state) {
-              navigatedTo = '/transfer/import-wizard';
-              return const Scaffold(body: Text('Import Wizard'));
-            },
-          ),
         ],
       );
 
@@ -466,6 +466,7 @@ void main() {
         ProviderScope(
           overrides: [
             diveStatisticsProvider.overrideWith((ref) async => stats),
+            filteredDiveStatisticsProvider.overrideWith((ref) async => stats),
             diveRecordsProvider.overrideWith((ref) async => DiveRecords()),
             diveTypeDistributionProvider.overrideWith((ref) async => []),
             sharedPreferencesProvider.overrideWithValue(prefs),
@@ -484,11 +485,21 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('No dives logged yet'), findsOneWidget);
-      expect(find.text('Log a Dive'), findsOneWidget);
-      expect(find.text('Import Dives'), findsOneWidget);
+      expect(
+        find.text('Tap the button below to log your first dive'),
+        findsOneWidget,
+      );
+      expect(find.text('Log Your First Dive'), findsOneWidget);
       expect(find.text('Total Dives'), findsNothing);
 
-      await tester.tap(find.text('Log a Dive'));
+      // The button opens the same add-dive sheet as the dive list empty state.
+      await tester.tap(find.text('Log Your First Dive'));
+      await tester.pumpAndSettle();
+      expect(find.text('Log Dive Manually'), findsOneWidget);
+      expect(find.text('Import from Computer'), findsOneWidget);
+      expect(find.text('Scan Paper Log'), findsOneWidget);
+
+      await tester.tap(find.text('Log Dive Manually'));
       await tester.pumpAndSettle();
       expect(navigatedTo, equals('/dives/new'));
     });
@@ -509,6 +520,7 @@ void main() {
         ProviderScope(
           overrides: [
             diveStatisticsProvider.overrideWith((ref) async => stats),
+            filteredDiveStatisticsProvider.overrideWith((ref) async => stats),
             diveRecordsProvider.overrideWith((ref) async => DiveRecords()),
             diveTypeDistributionProvider.overrideWith((ref) async => []),
             sharedPreferencesProvider.overrideWithValue(prefs),
@@ -566,6 +578,7 @@ void main() {
         ProviderScope(
           overrides: [
             diveStatisticsProvider.overrideWith((ref) async => stats),
+            filteredDiveStatisticsProvider.overrideWith((ref) async => stats),
             diveRecordsProvider.overrideWith((ref) async => DiveRecords()),
             diveTypeDistributionProvider.overrideWith((ref) async => diveTypes),
             sharedPreferencesProvider.overrideWithValue(prefs),
@@ -601,6 +614,7 @@ void main() {
         ProviderScope(
           overrides: [
             diveStatisticsProvider.overrideWith((ref) async => stats),
+            filteredDiveStatisticsProvider.overrideWith((ref) async => stats),
             diveRecordsProvider.overrideWith((ref) async => DiveRecords()),
             diveTypeDistributionProvider.overrideWith((ref) async => []),
             sharedPreferencesProvider.overrideWithValue(prefs),

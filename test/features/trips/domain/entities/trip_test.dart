@@ -214,6 +214,21 @@ void main() {
       );
       expect(trip.durationDays, equals(7));
     });
+
+    test('counts calendar days across a spring-forward DST boundary', () {
+      // Mar 8 2026 is a US spring-forward (a 23-hour local day). Counting
+      // elapsed hours (the old Duration.inDays) would report 71h -> 3 days;
+      // calendar counting keeps it at the correct inclusive 4.
+      final trip = Trip(
+        id: 't1',
+        name: 'DST Trip',
+        startDate: DateTime(2026, 3, 7),
+        endDate: DateTime(2026, 3, 10),
+        createdAt: DateTime(2026),
+        updatedAt: DateTime(2026),
+      );
+      expect(trip.durationDays, equals(4));
+    });
   });
 
   group('Trip.isResort', () {
@@ -323,6 +338,42 @@ void main() {
 
     test('ignores time-of-day component', () {
       expect(trip.containsDate(DateTime(2024, 6, 1, 23, 59, 59)), isTrue);
+    });
+  });
+
+  group('Trip.returnFlightAt', () {
+    final base = Trip(
+      id: 't1',
+      name: 'Red Sea',
+      startDate: DateTime.utc(2026, 8, 1),
+      endDate: DateTime.utc(2026, 8, 10),
+      createdAt: DateTime.utc(2026, 7, 1),
+      updatedAt: DateTime.utc(2026, 7, 1),
+    );
+
+    test('defaults to null and is preserved by unrelated copyWith', () {
+      expect(base.returnFlightAt, isNull);
+      final withFlight = base.copyWith(
+        returnFlightAt: DateTime.utc(2026, 8, 10, 14, 30),
+      );
+      expect(
+        withFlight.copyWith(name: 'Renamed').returnFlightAt,
+        DateTime.utc(2026, 8, 10, 14, 30),
+      );
+    });
+
+    test('copyWith clears returnFlightAt with an explicit null', () {
+      final withFlight = base.copyWith(
+        returnFlightAt: DateTime.utc(2026, 8, 10, 14, 30),
+      );
+      expect(withFlight.copyWith(returnFlightAt: null).returnFlightAt, isNull);
+    });
+
+    test('participates in equality', () {
+      expect(
+        base.copyWith(returnFlightAt: DateTime.utc(2026, 8, 10, 14, 30)),
+        isNot(equals(base)),
+      );
     });
   });
 

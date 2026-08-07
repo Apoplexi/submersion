@@ -33,6 +33,12 @@ void main() {
       diveRepository: mockDiveRepo,
     );
 
+    // Default: no known source keys (importDives prefetches this once per
+    // batch for the fingerprint pass).
+    when(
+      mockDiveRepo.getSourceKeysByDiveId(diverId: anyNamed('diverId')),
+    ).thenAnswer((_) async => {});
+
     // Default: no duplicates found
     when(
       mockComputerRepo.findMatchingDiveWithScore(
@@ -40,7 +46,6 @@ void main() {
         toleranceMinutes: anyNamed('toleranceMinutes'),
         durationSeconds: anyNamed('durationSeconds'),
         maxDepth: anyNamed('maxDepth'),
-        fingerprint: anyNamed('fingerprint'),
         diverId: anyNamed('diverId'),
       ),
     ).thenAnswer((_) async => null);
@@ -62,6 +67,7 @@ void main() {
         gfHigh: anyNamed('gfHigh'),
         decoConservatism: anyNamed('decoConservatism'),
         events: anyNamed('events'),
+        gasSwitches: anyNamed('gasSwitches'),
         diveNumber: anyNamed('diveNumber'),
         forceNew: anyNamed('forceNew'),
         rawData: anyNamed('rawData'),
@@ -146,6 +152,7 @@ void main() {
           gfHigh: anyNamed('gfHigh'),
           decoConservatism: anyNamed('decoConservatism'),
           events: anyNamed('events'),
+          gasSwitches: anyNamed('gasSwitches'),
           diveNumber: 1,
           rawData: anyNamed('rawData'),
           rawFingerprint: anyNamed('rawFingerprint'),
@@ -172,6 +179,7 @@ void main() {
           gfHigh: anyNamed('gfHigh'),
           decoConservatism: anyNamed('decoConservatism'),
           events: anyNamed('events'),
+          gasSwitches: anyNamed('gasSwitches'),
           diveNumber: 2,
           rawData: anyNamed('rawData'),
           rawFingerprint: anyNamed('rawFingerprint'),
@@ -198,6 +206,7 @@ void main() {
           gfHigh: anyNamed('gfHigh'),
           decoConservatism: anyNamed('decoConservatism'),
           events: anyNamed('events'),
+          gasSwitches: anyNamed('gasSwitches'),
           diveNumber: 3,
           rawData: anyNamed('rawData'),
           rawFingerprint: anyNamed('rawFingerprint'),
@@ -268,6 +277,7 @@ void main() {
             gfHigh: anyNamed('gfHigh'),
             decoConservatism: anyNamed('decoConservatism'),
             events: anyNamed('events'),
+            gasSwitches: anyNamed('gasSwitches'),
             diveNumber: 1,
             rawData: anyNamed('rawData'),
             rawFingerprint: anyNamed('rawFingerprint'),
@@ -295,6 +305,7 @@ void main() {
             gfHigh: anyNamed('gfHigh'),
             decoConservatism: anyNamed('decoConservatism'),
             events: anyNamed('events'),
+            gasSwitches: anyNamed('gasSwitches'),
             diveNumber: 2,
             rawData: anyNamed('rawData'),
             rawFingerprint: anyNamed('rawFingerprint'),
@@ -346,6 +357,7 @@ void main() {
             gfHigh: anyNamed('gfHigh'),
             decoConservatism: anyNamed('decoConservatism'),
             events: anyNamed('events'),
+            gasSwitches: anyNamed('gasSwitches'),
             diveNumber: 6,
             rawData: anyNamed('rawData'),
             rawFingerprint: anyNamed('rawFingerprint'),
@@ -378,7 +390,6 @@ void main() {
             toleranceMinutes: anyNamed('toleranceMinutes'),
             durationSeconds: anyNamed('durationSeconds'),
             maxDepth: anyNamed('maxDepth'),
-            fingerprint: anyNamed('fingerprint'),
             diverId: anyNamed('diverId'),
           ),
         ).thenAnswer(
@@ -418,6 +429,7 @@ void main() {
             gfHigh: anyNamed('gfHigh'),
             decoConservatism: anyNamed('decoConservatism'),
             events: anyNamed('events'),
+            gasSwitches: anyNamed('gasSwitches'),
             diveNumber: anyNamed('diveNumber'),
             forceNew: true,
             rawData: anyNamed('rawData'),
@@ -468,6 +480,7 @@ void main() {
           gfHigh: anyNamed('gfHigh'),
           decoConservatism: anyNamed('decoConservatism'),
           events: anyNamed('events'),
+          gasSwitches: anyNamed('gasSwitches'),
           diveNumber: anyNamed('diveNumber'),
           forceNew: true,
           rawData: anyNamed('rawData'),
@@ -532,6 +545,7 @@ void main() {
           gfHigh: anyNamed('gfHigh'),
           decoConservatism: anyNamed('decoConservatism'),
           events: anyNamed('events'),
+          gasSwitches: anyNamed('gasSwitches'),
           diveNumber: 4,
           rawData: anyNamed('rawData'),
           rawFingerprint: anyNamed('rawFingerprint'),
@@ -616,6 +630,7 @@ void main() {
             gfHigh: anyNamed('gfHigh'),
             decoConservatism: anyNamed('decoConservatism'),
             events: anyNamed('events'),
+            gasSwitches: anyNamed('gasSwitches'),
             diveNumber: anyNamed('diveNumber'),
             forceNew: anyNamed('forceNew'),
             rawData: anyNamed('rawData'),
@@ -628,6 +643,81 @@ void main() {
         ).called(1);
       },
     );
+
+    test('resolveConflict with replaceSource forwards the dive gas switches to '
+        'importProfile', () async {
+      final dive = DownloadedDive(
+        fingerprint: 'fp-replace-gas',
+        startTime: DateTime(2026, 4, 6, 9, 0),
+        durationSeconds: 3000,
+        maxDepth: 25.0,
+        profile: const [],
+        tanks: const [],
+        events: const [],
+        gasSwitches: const [
+          GasSwitchEvent(timeSeconds: 600, depth: 12.0, toTankIndex: 1),
+        ],
+        rawData: Uint8List.fromList([0xDE, 0xAD]),
+      );
+
+      final conflict = ImportConflict(
+        downloaded: dive,
+        existingDiveId: 'existing-dive-77',
+        duplicateResult: const DuplicateResult(
+          matchingDiveId: 'existing-dive-77',
+          confidence: DuplicateConfidence.exact,
+          score: 0.95,
+        ),
+      );
+
+      when(
+        mockComputerRepo.clearSourceAndProfiles(
+          diveId: anyNamed('diveId'),
+          computerId: anyNamed('computerId'),
+        ),
+      ).thenAnswer((_) async {});
+
+      await service.resolveConflict(
+        conflict,
+        ConflictResolution.replaceSource,
+        computer.id,
+      );
+
+      final captured =
+          verify(
+                mockComputerRepo.importProfile(
+                  computerId: anyNamed('computerId'),
+                  profileStartTime: anyNamed('profileStartTime'),
+                  points: anyNamed('points'),
+                  durationSeconds: anyNamed('durationSeconds'),
+                  maxDepth: anyNamed('maxDepth'),
+                  avgDepth: anyNamed('avgDepth'),
+                  isPrimary: anyNamed('isPrimary'),
+                  diverId: anyNamed('diverId'),
+                  tanks: anyNamed('tanks'),
+                  decoAlgorithm: anyNamed('decoAlgorithm'),
+                  gfLow: anyNamed('gfLow'),
+                  gfHigh: anyNamed('gfHigh'),
+                  decoConservatism: anyNamed('decoConservatism'),
+                  events: anyNamed('events'),
+                  gasSwitches: captureAnyNamed('gasSwitches'),
+                  diveNumber: anyNamed('diveNumber'),
+                  forceNew: anyNamed('forceNew'),
+                  rawData: anyNamed('rawData'),
+                  rawFingerprint: anyNamed('rawFingerprint'),
+                  descriptorVendor: anyNamed('descriptorVendor'),
+                  descriptorProduct: anyNamed('descriptorProduct'),
+                  descriptorModel: anyNamed('descriptorModel'),
+                  libdivecomputerVersion: anyNamed('libdivecomputerVersion'),
+                ),
+              ).captured.single
+              as List<GasSwitchData>;
+
+      expect(captured, hasLength(1));
+      expect(captured.single.timestamp, 600);
+      expect(captured.single.depth, 12.0);
+      expect(captured.single.toTankIndex, 1);
+    });
 
     test('resolveConflict with consolidate returns null', () async {
       final dive = DownloadedDive(
@@ -667,5 +757,143 @@ void main() {
         ),
       );
     });
+  });
+
+  // ---------------------------------------------------------------------------
+  // detectDuplicate (Task 8 finding 1)
+  // ---------------------------------------------------------------------------
+
+  group('detectDuplicate', () {
+    test('sets matchedExistingSource=true and score 1.0 on a fingerprint hit '
+        'against an existing dive\'s source keys', () async {
+      final dive = DownloadedDive(
+        fingerprint: 'fp-source-hit',
+        startTime: DateTime(2026, 5, 1, 9, 0),
+        durationSeconds: 3000,
+        maxDepth: 20.0,
+        profile: const [],
+        tanks: const [],
+        events: const [],
+        rawFingerprint: Uint8List.fromList([0xAA, 0xBB, 0xCC]),
+      );
+
+      when(
+        mockDiveRepo.getSourceKeysByDiveId(diverId: anyNamed('diverId')),
+      ).thenAnswer(
+        (_) async => {
+          'existing-dive-source-hit': {'AABBCC'},
+        },
+      );
+
+      final result = await service.detectDuplicate(dive, diverId: 'diver-1');
+
+      expect(result.isDuplicate, isTrue);
+      expect(result.matchingDiveId, 'existing-dive-source-hit');
+      expect(result.score, 1.0);
+      expect(result.confidence, DuplicateConfidence.exact);
+      expect(result.matchedExistingSource, isTrue);
+
+      // The fingerprint pass short-circuits fuzzy matching entirely.
+      verifyNever(
+        mockComputerRepo.findMatchingDiveWithScore(
+          profileStartTime: anyNamed('profileStartTime'),
+          toleranceMinutes: anyNamed('toleranceMinutes'),
+          durationSeconds: anyNamed('durationSeconds'),
+          maxDepth: anyNamed('maxDepth'),
+          diverId: anyNamed('diverId'),
+        ),
+      );
+    });
+
+    test('a prefetched sourceKeysCache is used instead of querying the '
+        'repository per dive', () async {
+      final dive = DownloadedDive(
+        fingerprint: 'fp-cached-hit',
+        startTime: DateTime(2026, 5, 1, 10, 0),
+        durationSeconds: 3000,
+        maxDepth: 20.0,
+        profile: const [],
+        tanks: const [],
+        events: const [],
+        rawFingerprint: Uint8List.fromList([0xAA, 0xBB, 0xCC]),
+      );
+
+      final result = await service.detectDuplicate(
+        dive,
+        diverId: 'diver-1',
+        sourceKeysCache: {
+          'existing-dive-cached': {'AABBCC'},
+        },
+      );
+
+      expect(result.isDuplicate, isTrue);
+      expect(result.matchingDiveId, 'existing-dive-cached');
+      expect(result.matchedExistingSource, isTrue);
+      // The cache fully replaces the per-dive repository query.
+      verifyNever(
+        mockDiveRepo.getSourceKeysByDiveId(diverId: anyNamed('diverId')),
+      );
+    });
+
+    test('leaves matchedExistingSource=false for a fuzzy time/depth/duration '
+        'match with no source-key hit', () async {
+      final dive = DownloadedDive(
+        fingerprint: 'fp-fuzzy',
+        startTime: DateTime(2026, 5, 2, 9, 0),
+        durationSeconds: 3000,
+        maxDepth: 20.0,
+        profile: const [],
+        tanks: const [],
+        events: const [],
+        rawFingerprint: Uint8List.fromList([0x11, 0x22, 0x33]),
+      );
+
+      // No source-key hit for this fingerprint.
+      when(
+        mockDiveRepo.getSourceKeysByDiveId(diverId: anyNamed('diverId')),
+      ).thenAnswer((_) async => {});
+
+      when(
+        mockComputerRepo.findMatchingDiveWithScore(
+          profileStartTime: anyNamed('profileStartTime'),
+          toleranceMinutes: anyNamed('toleranceMinutes'),
+          durationSeconds: anyNamed('durationSeconds'),
+          maxDepth: anyNamed('maxDepth'),
+          diverId: anyNamed('diverId'),
+        ),
+      ).thenAnswer(
+        (_) async => const DiveMatchResult(
+          diveId: 'existing-dive-fuzzy',
+          score: 0.8,
+          timeDifferenceMs: 60000,
+        ),
+      );
+
+      final result = await service.detectDuplicate(dive, diverId: 'diver-1');
+
+      expect(result.isDuplicate, isTrue);
+      expect(result.matchingDiveId, 'existing-dive-fuzzy');
+      expect(result.matchedExistingSource, isFalse);
+    });
+
+    test(
+      'leaves matchedExistingSource=false when no match is found at all',
+      () async {
+        final dive = DownloadedDive(
+          fingerprint: 'fp-none',
+          startTime: DateTime(2026, 5, 3, 9, 0),
+          durationSeconds: 3000,
+          maxDepth: 20.0,
+          profile: const [],
+          tanks: const [],
+          events: const [],
+        );
+
+        final result = await service.detectDuplicate(dive, diverId: 'diver-1');
+
+        expect(result.isDuplicate, isFalse);
+        expect(result.matchedExistingSource, isFalse);
+      },
+    );
   });
 }

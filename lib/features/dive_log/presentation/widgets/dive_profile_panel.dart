@@ -248,6 +248,10 @@ class _DiveProfilePanelContentState
     final tankPressures = ref
         .watch(tankPressuresProvider(widget.diveId))
         .valueOrNull;
+    // Chart-only: real pressures augmented with linear estimates (#197).
+    final estimatedTankPressures = ref
+        .watch(estimatedTankPressuresProvider(widget.diveId))
+        .valueOrNull;
     final settings = ref.watch(settingsProvider);
     final units = UnitFormatter(settings);
     final colorScheme = Theme.of(context).colorScheme;
@@ -366,11 +370,15 @@ class _DiveProfilePanelContentState
                   diveDuration: dive.effectiveRuntime,
                   maxDepth: dive.maxDepth,
                   ceilingCurve: analysis?.ceilingCurve,
+                  decoStopCurve: analysis?.decoStopCurve,
                   ascentRates: analysis?.ascentRates,
                   events: analysis?.events,
                   ndlCurve: analysis?.ndlCurve,
                   sacCurve: analysis?.smoothedSacCurve,
                   ppO2Curve: analysis?.ppO2Curve,
+                  o2SensorCurves: analysis?.o2SensorCurves,
+                  ppO2FromSensorAverage:
+                      analysis?.ppO2FromSensorAverage ?? false,
                   ppN2Curve: analysis?.ppN2Curve,
                   ppHeCurve: analysis?.ppHeCurve,
                   modCurve: analysis?.modCurve,
@@ -385,7 +393,9 @@ class _DiveProfilePanelContentState
                   showMaxDepthMarker: showMaxDepthMarker,
                   showPressureThresholdMarkers: showPressureThresholdMarkers,
                   tanks: dive.tanks,
-                  tankPressures: tankPressures,
+                  tankPressures:
+                      estimatedTankPressures?.pressures ?? tankPressures,
+                  estimatedTankIds: estimatedTankPressures?.estimatedTankIds,
                   gasSwitches: gasSwitches,
                   gasSegments: (dive.tanks.isEmpty || dive.profile.isEmpty)
                       ? null
@@ -393,6 +403,7 @@ class _DiveProfilePanelContentState
                           tanks: dive.tanks,
                           gasSwitches: gasSwitches ?? const [],
                           diveDurationSeconds: dive.profile.last.timestamp,
+                          firstSampleSeconds: dive.profile.first.timestamp,
                         ),
                   diveDurationSeconds: dive.profile.isEmpty
                       ? null

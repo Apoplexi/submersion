@@ -1,6 +1,7 @@
 import 'package:drift/drift.dart';
 import 'package:uuid/uuid.dart';
 
+import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/core/data/repositories/sync_repository.dart';
 import 'package:submersion/core/database/database.dart' as db;
 import 'package:submersion/core/database/database.dart'
@@ -12,9 +13,17 @@ import 'package:submersion/core/database/database.dart'
         DiveProfileEventsCompanion,
         DivesCompanion,
         DiveTanksCompanion,
+        GasSwitchesCompanion,
         DiveProfile,
         DiveProfileEvent,
         TankPressureProfilesCompanion;
+import 'package:submersion/core/matching/match_scorer.dart';
+import 'package:submersion/features/dive_log/data/repositories/safety_findings_repository.dart';
+import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart'
+    show GeoPoint;
+import 'package:submersion/features/dive_log/domain/services/dive_altitude_enricher.dart';
+import 'package:submersion/features/equipment/data/services/dive_equipment_defaulter.dart';
+import 'package:submersion/features/pre_dive/data/services/checklist_dive_linker.dart';
 import 'package:submersion/core/services/database_service.dart';
 import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/core/services/sync/sync_event_bus.dart';
@@ -23,10 +32,18 @@ import 'package:submersion/features/dive_log/domain/entities/dive_computer.dart'
 
 /// Repository for managing dive computers and multi-profile support.
 class DiveComputerRepository {
+  DiveComputerRepository({DiveAltitudeEnricher? altitudeEnricher})
+    : _altitudeEnricher = altitudeEnricher ?? DiveAltitudeEnricher();
+
   AppDatabase get _db => DatabaseService.instance.database;
   final SyncRepository _syncRepository = SyncRepository();
   final _uuid = const Uuid();
   final _log = LoggerService.forClass(DiveComputerRepository);
+
+  /// Held for the repository's lifetime so a multi-dive download shares one
+  /// elevation-lookup cache: a trip's worth of dives at the same site costs a
+  /// single request (and a single failure) instead of one per dive.
+  final DiveAltitudeEnricher _altitudeEnricher;
 
   // ============================================================================
   // CRUD Operations for Dive Computers
@@ -129,6 +146,50 @@ class DiveComputerRepository {
     } catch (e, stackTrace) {
       _log.error(
         'Failed to find dive computer by bluetooth address: $address',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      rethrow;
+    }
+  }
+
+  /// Find a computer by its stable hardware identity.
+  ///
+  /// BLE identifiers are host-specific and are therefore only useful for a
+  /// local connection. The serial number, together with manufacturer/model,
+  /// identifies the physical computer across devices.
+  Future<domain.DiveComputer?> findByHardwareIdentity({
+    required String manufacturer,
+    required String model,
+    required String serialNumber,
+    String? diverId,
+  }) async {
+    try {
+      final query = _db.select(_db.diveComputers)
+        ..orderBy([(t) => OrderingTerm.desc(t.updatedAt)]);
+      final normalizedDiverId = diverId?.trim();
+      if (normalizedDiverId != null && normalizedDiverId.isNotEmpty) {
+        query.where((t) => t.diverId.equals(normalizedDiverId));
+      }
+
+      // Matched in Dart (rather than pushed into the SQL filter) because a
+      // stored serialNumber/manufacturer/model may itself carry whitespace
+      // from an older import; trimming only the input would miss that row.
+      final rows = await query.get();
+      final normalizedSerial = serialNumber.trim();
+      final normalizedManufacturer = manufacturer.trim().toLowerCase();
+      final normalizedModel = model.trim().toLowerCase();
+      for (final row in rows) {
+        if (row.serialNumber?.trim() == normalizedSerial &&
+            row.manufacturer?.trim().toLowerCase() == normalizedManufacturer &&
+            row.model?.trim().toLowerCase() == normalizedModel) {
+          return _mapRowToComputer(row);
+        }
+      }
+      return null;
+    } catch (e, stackTrace) {
+      _log.error(
+        'Failed to find dive computer by hardware identity',
         error: e,
         stackTrace: stackTrace,
       );
@@ -624,7 +685,6 @@ class DiveComputerRepository {
     int toleranceMinutes = 5,
     int? durationSeconds,
     double? maxDepth,
-    String? fingerprint,
     String? diverId,
   }) async {
     try {
@@ -667,6 +727,23 @@ class DiveComputerRepository {
 
       if (result.isEmpty) return null;
 
+      // Weighted scorer for downloads: time 40%, depth 35%, duration 25%.
+      // Time is scored in milliseconds over the SQL tolerance window, depth in
+      // absolute meters (0-5 m), duration in seconds (0-10 min). Missing depth
+      // or duration scores 1.0 (a `full: 0` band on a 0 value). No time gate:
+      // the SQL pre-filter already bounds candidates to the tolerance window.
+      final scorer = MatchScorer(
+        timeWeight: 0.40,
+        depthWeight: 0.35,
+        durationWeight: 0.25,
+        timeFull: 0,
+        timeZero: toleranceMs.toDouble(),
+        depthFull: 0,
+        depthZero: 5.0,
+        durationFull: 0,
+        durationZero: 600,
+      );
+
       // Score each candidate and find the best match
       DiveMatchResult? bestMatch;
       double bestScore = 0.0;
@@ -677,31 +754,18 @@ class DiveComputerRepository {
         final diveDuration = row.data['bottom_time'] as int?;
         final diveMaxDepth = row.data['max_depth'] as double?;
 
-        // Calculate component scores
-        final timeScore = 1.0 - (timeDiff / toleranceMs).clamp(0.0, 1.0);
-        var durationScore = 1.0;
-        var depthScore = 1.0;
-        int? durationDiff;
-        double? depthDiff;
+        final durationDiff = (durationSeconds != null && diveDuration != null)
+            ? (diveDuration - durationSeconds).abs()
+            : null;
+        final depthDiff = (maxDepth != null && diveMaxDepth != null)
+            ? (diveMaxDepth - maxDepth).abs()
+            : null;
 
-        // Duration comparison (if available)
-        if (durationSeconds != null && diveDuration != null) {
-          durationDiff = (diveDuration - durationSeconds).abs();
-          // Score based on duration difference (within 5 min = 100%, 10 min = 0%)
-          durationScore = 1.0 - (durationDiff / 600).clamp(0.0, 1.0);
-        }
-
-        // Depth comparison (if available)
-        if (maxDepth != null && diveMaxDepth != null) {
-          depthDiff = (diveMaxDepth - maxDepth).abs();
-          // Score based on depth difference (within 0.5m = 100%, 5m = 0%)
-          depthScore = 1.0 - (depthDiff / 5.0).clamp(0.0, 1.0);
-        }
-
-        // Weighted composite score
-        // Time is most important (40%), then depth (35%), then duration (25%)
-        final score =
-            (timeScore * 0.40) + (depthScore * 0.35) + (durationScore * 0.25);
+        final score = scorer.score(
+          timeValue: timeDiff.toDouble(),
+          depthValue: depthDiff ?? 0.0,
+          durationValue: durationDiff?.toDouble() ?? 0.0,
+        );
 
         if (score > bestScore) {
           bestScore = score;
@@ -812,10 +876,12 @@ class DiveComputerRepository {
     String? diverId,
     List<TankData>? tanks,
     String? decoAlgorithm,
+    DiveMode diveMode = DiveMode.oc,
     int? gfLow,
     int? gfHigh,
     int? decoConservatism,
     List<EventData>? events,
+    List<GasSwitchData>? gasSwitches,
     int? diveNumber,
     bool forceNew = false,
     Uint8List? rawData,
@@ -881,6 +947,12 @@ class DiveComputerRepository {
                 runtime: Value(durationSeconds),
                 maxDepth: Value(maxDepth),
                 avgDepth: Value(effectiveAvgDepth),
+                // Populated so DiveConsolidationService (Task 5) can attribute
+                // consolidated children and enforce its same-computer guard;
+                // without this the dives row's own computerId stayed null
+                // even though every child row (profiles, tanks, data source)
+                // already carried it.
+                computerId: Value(computerId),
                 diveComputerModel: Value(computer?.fullName),
                 diveComputerSerial: Value(computer?.serialNumber),
                 diveComputerFirmware: Value(computer?.firmwareVersion),
@@ -888,6 +960,7 @@ class DiveComputerRepository {
                 gradientFactorHigh: Value(gfHigh),
                 decoAlgorithm: Value(decoAlgorithm),
                 decoConservatism: Value(decoConservatism),
+                diveMode: Value(diveMode.code),
                 createdAt: Value(now),
                 updatedAt: Value(now),
                 entryLatitude: Value(entryLatitude),
@@ -901,6 +974,37 @@ class DiveComputerRepository {
           entityType: 'dives',
           recordId: diveId,
           localUpdatedAt: now,
+        );
+
+        // Auto-apply the diver's default / geofenced equipment set to this
+        // freshly downloaded dive (only when it has no equipment yet). Entry
+        // and exit GPS fixes drive geofence matching.
+        final defaultPoints = <GeoPoint>[
+          if (entryLatitude != null && entryLongitude != null)
+            GeoPoint(entryLatitude, entryLongitude),
+          if (exitLatitude != null && exitLongitude != null)
+            GeoPoint(exitLatitude, exitLongitude),
+        ];
+        await DiveEquipmentDefaulter().applyDefaultEquipmentIfEmpty(
+          diveId: diveId,
+          diverId: diverId,
+          divePoints: defaultPoints,
+        );
+
+        // Auto-link a pre-dive checklist session started shortly before
+        // this dive's entry time.
+        await ChecklistDiveLinker().autoLinkForDive(
+          diveId: diveId,
+          diverId: diverId,
+          diveStart: DateTime.fromMillisecondsSinceEpoch(entryTimeMs),
+        );
+
+        // Fill altitude from the entry/exit GPS fixes (best-effort). Awaited
+        // rather than fire-and-forget so the write cannot outlive the download
+        // and race a database close; the shared cache keeps the cost bounded.
+        await _altitudeEnricher.applyForDownloadedDive(
+          diveId: diveId,
+          points: defaultPoints,
         );
 
         // Create a data source record for provenance tracking.
@@ -1005,6 +1109,7 @@ class DiveComputerRepository {
               pressure: const Value(null),
               temperature: Value(point.temperature),
               heartRate: Value(point.heartRate),
+              heading: Value(point.heading),
               isPrimary: Value(isPrimary),
               // Decompression and rebreather data
               setpoint: Value(point.setpoint),
@@ -1016,13 +1121,33 @@ class DiveComputerRepository {
               rbt: Value(point.rbt),
               decoType: Value(point.decoType),
               tts: Value(point.tts),
+              o2Sensor1: Value(point.o2Sensor1),
+              o2Sensor2: Value(point.o2Sensor2),
+              o2Sensor3: Value(point.o2Sensor3),
+              o2Sensor4: Value(point.o2Sensor4),
+              o2Sensor5: Value(point.o2Sensor5),
+              o2Sensor6: Value(point.o2Sensor6),
             ),
           );
         }
       });
 
+      // Profile data changed (new source added or re-imported): drop any
+      // stored safety review so it recomputes against the new profile.
+      // No-op for a brand-new dive.
+      await SafetyFindingsRepository.clearReviewForDive(
+        _db,
+        _syncRepository,
+        diveId,
+      );
+
       // Map to track tank index → tank ID for pressure data
       final tankIdsByIndex = <int, String>{};
+      // Map gas mix (o2%, he%) → tank ID, so gas switches can be linked to the
+      // cylinder that actually holds the gas even when the stored tank order
+      // does not match the parsed cylinder index (e.g. a replace-source
+      // re-download that keeps pre-existing, possibly user-edited, tanks).
+      final tankIdByGas = <(double, double), String>{};
 
       // Insert tanks for new dives (batch insert for performance)
       if (isNewDive && tanks != null && tanks.isNotEmpty) {
@@ -1031,19 +1156,21 @@ class DiveComputerRepository {
           for (final tank in tanks) {
             final tankId = _uuid.v4();
             tankIdsByIndex[tank.index] = tankId;
+            tankIdByGas[(tank.o2Percent, tank.hePercent)] = tankId;
 
             batch.insert(
               _db.diveTanks,
               DiveTanksCompanion(
                 id: Value(tankId),
                 diveId: Value(diveId),
+                computerId: Value(computerId),
                 volume: Value(tank.volumeLiters),
                 startPressure: Value(tank.startPressure),
                 endPressure: Value(tank.endPressure),
                 o2Percent: Value(tank.o2Percent),
                 hePercent: Value(tank.hePercent),
                 tankOrder: Value(tank.index),
-                tankRole: const Value('backGas'),
+                tankRole: Value(tank.role ?? 'backGas'),
               ),
             );
             _log.info(
@@ -1062,6 +1189,7 @@ class DiveComputerRepository {
                 .get();
         for (final tank in existingTanks) {
           tankIdsByIndex[tank.tankOrder] = tank.id;
+          tankIdByGas[(tank.o2Percent, tank.hePercent)] = tank.id;
         }
       }
 
@@ -1096,6 +1224,7 @@ class DiveComputerRepository {
                   id: _uuid.v4(),
                   diveId: diveId,
                   tankId: tankId,
+                  computerId: Value(computerId),
                   timestamp: point.timestamp,
                   pressure: point.pressure,
                 ),
@@ -1145,6 +1274,43 @@ class DiveComputerRepository {
         }
       }
 
+      // Batch insert gas switches. The gas-usage timeline is driven solely by
+      // the gas_switches table. A switch is linked to the cylinder holding the
+      // gas it switched to: prefer matching by gas mix (robust when stored tank
+      // order differs from the parsed cylinder index, e.g. replace-source
+      // re-downloads), and only fall back to the cylinder index for new dives
+      // whose tanks were just created from this same parse. Switches that match
+      // no cylinder are dropped rather than risk a wrong-tank link.
+      if (gasSwitches != null && gasSwitches.isNotEmpty) {
+        final gasByIndex = {
+          if (tanks != null)
+            for (final t in tanks) t.index: (t.o2Percent, t.hePercent),
+        };
+        var inserted = 0;
+        await _db.batch((batch) {
+          for (final sw in gasSwitches) {
+            final gas = gasByIndex[sw.toTankIndex];
+            final tankId =
+                (gas != null ? tankIdByGas[gas] : null) ??
+                (isNewDive ? tankIdsByIndex[sw.toTankIndex] : null);
+            if (tankId == null) continue;
+            inserted++;
+            batch.insert(
+              _db.gasSwitches,
+              GasSwitchesCompanion(
+                id: Value(_uuid.v4()),
+                diveId: Value(diveId),
+                timestamp: Value(sw.timestamp),
+                tankId: Value(tankId),
+                depth: Value(sw.depth),
+                createdAt: Value(now),
+              ),
+            );
+          }
+        });
+        _log.info('Imported $inserted gas switches for dive $diveId');
+      }
+
       // Batch insert dive events
       if (events != null && events.isNotEmpty) {
         await _db.batch((batch) {
@@ -1160,6 +1326,7 @@ class DiveComputerRepository {
               DiveProfileEventsCompanion(
                 id: Value(_uuid.v4()),
                 diveId: Value(diveId),
+                computerId: Value(computerId),
                 timestamp: Value(event.timestamp),
                 eventType: Value(eventType),
                 severity: Value(_eventSeverity(eventType)),
@@ -1548,6 +1715,9 @@ class ProfilePointData {
   final double? temperature;
   final int? heartRate;
 
+  /// Compass heading in degrees (0-359); null when not reported.
+  final double? heading;
+
   /// Tank index for pressure (0-based), used for multi-tank pressure tracking
   final int? tankIndex;
 
@@ -1584,12 +1754,21 @@ class ProfilePointData {
   /// Time to surface in seconds
   final int? tts;
 
+  /// Individual CCR O2 cell ppO2 readings in bar (sensor 1..6)
+  final double? o2Sensor1;
+  final double? o2Sensor2;
+  final double? o2Sensor3;
+  final double? o2Sensor4;
+  final double? o2Sensor5;
+  final double? o2Sensor6;
+
   const ProfilePointData({
     required this.timestamp,
     required this.depth,
     this.pressure,
     this.temperature,
     this.heartRate,
+    this.heading,
     this.tankIndex,
     this.setpoint,
     this.ppO2,
@@ -1602,6 +1781,12 @@ class ProfilePointData {
     this.decoTime,
     this.decoDepth,
     this.tts,
+    this.o2Sensor1,
+    this.o2Sensor2,
+    this.o2Sensor3,
+    this.o2Sensor4,
+    this.o2Sensor5,
+    this.o2Sensor6,
   });
 }
 
@@ -1636,6 +1821,9 @@ class TankData {
   final double? endPressure;
   final double? volumeLiters;
 
+  /// Inferred cylinder role (a [TankRole] name), or null for the default.
+  final String? role;
+
   const TankData({
     required this.index,
     required this.o2Percent,
@@ -1643,6 +1831,25 @@ class TankData {
     this.startPressure,
     this.endPressure,
     this.volumeLiters,
+    this.role,
+  });
+}
+
+/// Data class for importing a gas switch (a change to the cylinder at [toTankIndex]).
+class GasSwitchData {
+  /// Time offset from dive start in seconds
+  final int timestamp;
+
+  /// Depth at the switch in meters
+  final double depth;
+
+  /// Index of the cylinder switched to (matches [TankData.index])
+  final int toTankIndex;
+
+  const GasSwitchData({
+    required this.timestamp,
+    required this.depth,
+    required this.toTankIndex,
   });
 }
 

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -169,6 +170,74 @@ void main() {
       expect(find.text('Dive Sites'), findsOneWidget);
     },
   );
+
+  // ---------------------------------------------------------------------------
+  // Overflow-menu entry into selection mode (discoverable merge)
+  // ---------------------------------------------------------------------------
+
+  group('overflow menu "Select sites"', () {
+    testWidgets('enters selection mode from the compact app bar', (
+      tester,
+    ) async {
+      _setMobileTestSurfaceSize(tester);
+      final overrides = await _buildPhoneOverrides(
+        sites: [
+          _makeSite(id: 's1', name: 'Alpha Site'),
+          _makeSite(id: 's2', name: 'Bravo Site'),
+        ],
+        viewMode: ListViewMode.detailed,
+      );
+      await tester.pumpWidget(
+        testApp(
+          overrides: overrides,
+          child: const SiteListContent(showAppBar: false),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // No selection UI before opening the menu.
+      expect(find.byIcon(Icons.select_all), findsNothing);
+
+      await tester.tap(find.byIcon(Icons.more_vert));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Select sites'));
+      await tester.pumpAndSettle();
+
+      // Selection app bar is now shown (select-all affordance present).
+      expect(find.byIcon(Icons.select_all), findsOneWidget);
+    });
+
+    testWidgets('enters selection mode from the wide app bar', (tester) async {
+      tester.view.devicePixelRatio = 1.0;
+      tester.view.physicalSize = const Size(1200, 900);
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      final overrides = await _buildPhoneOverrides(
+        sites: [
+          _makeSite(id: 's1', name: 'Alpha Site'),
+          _makeSite(id: 's2', name: 'Bravo Site'),
+        ],
+        viewMode: ListViewMode.detailed,
+      );
+      await tester.pumpWidget(
+        testApp(
+          overrides: overrides,
+          child: const SiteListContent(showAppBar: true),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.byIcon(Icons.select_all), findsNothing);
+
+      await tester.tap(find.byIcon(Icons.more_vert));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Select sites'));
+      await tester.pumpAndSettle();
+
+      expect(find.byIcon(Icons.select_all), findsOneWidget);
+    });
+  });
 
   // ---------------------------------------------------------------------------
   // Phone-mode highlight
@@ -661,6 +730,81 @@ void main() {
       await tester.pumpAndSettle();
       expect(selectedId, 's1');
     });
+  });
+
+  // ---------------------------------------------------------------------------
+  // Mini-map background (SiteListTile renders a FlutterMap when the site has a
+  // location and the showMapBackgroundOnSiteCards setting is enabled).
+  // ---------------------------------------------------------------------------
+  group('site card mini-map', () {
+    testWidgets('SiteListTile renders a FlutterMap for a located site when map '
+        'background is enabled', (tester) async {
+      await tester.pumpWidget(
+        testApp(
+          overrides: [
+            settingsProvider.overrideWith((ref) => MockSettingsNotifier()),
+            showMapBackgroundOnSiteCardsProvider.overrideWithValue(true),
+          ],
+          child: const SiteListTile(
+            name: 'Blue Hole',
+            location: 'Belize',
+            latitude: 17.3155,
+            longitude: -87.5346,
+          ),
+        ),
+      );
+      await tester.pump();
+
+      expect(find.byType(SiteListTile), findsOneWidget);
+      expect(find.byType(FlutterMap), findsWidgets);
+    });
+
+    testWidgets(
+      'SiteListContent detailed view renders a mini-map for a located site',
+      (tester) async {
+        _setMobileTestSurfaceSize(tester);
+        SharedPreferences.setMockInitialValues({});
+        final p = await SharedPreferences.getInstance();
+
+        final sites = [
+          SiteWithDiveCount(
+            site: const DiveSite(
+              id: 's1',
+              name: 'Located Reef',
+              location: GeoPoint(17.3155, -87.5346),
+            ),
+            diveCount: 0,
+          ),
+        ];
+
+        await tester.pumpWidget(
+          testApp(
+            overrides: [
+              sharedPreferencesProvider.overrideWithValue(p),
+              settingsProvider.overrideWith((ref) => MockSettingsNotifier()),
+              showMapBackgroundOnSiteCardsProvider.overrideWithValue(true),
+              currentDiverIdProvider.overrideWith(
+                (ref) => MockCurrentDiverIdNotifier(),
+              ),
+              sortedSitesWithCountsProvider.overrideWithValue(
+                AsyncValue.data(sites),
+              ),
+              siteListNotifierProvider.overrideWith(
+                (ref) => _MockSiteListNotifier(),
+              ),
+              siteListViewModeProvider.overrideWith(
+                (ref) => ListViewMode.detailed,
+              ),
+              highlightedSiteIdProvider.overrideWith((ref) => null),
+            ],
+            child: const SiteListContent(showAppBar: false),
+          ),
+        );
+        await tester.pump();
+
+        expect(find.byType(FlutterMap), findsWidgets);
+      },
+    );
   });
 }
 

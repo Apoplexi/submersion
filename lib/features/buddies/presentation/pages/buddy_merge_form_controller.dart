@@ -2,6 +2,28 @@ import 'package:flutter/material.dart';
 
 import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/features/buddies/domain/entities/buddy.dart';
+import 'package:submersion/features/buddies/domain/entities/buddy_role_credential.dart';
+
+/// Computes the professional-credential set expected after a merge.
+///
+/// [rolesByCandidate] holds each merge candidate's credentials in merge-list
+/// order (survivor first). Earlier candidates win role collisions, mirroring
+/// BuddyMergeRepository's relink semantics where the survivor's row is kept
+/// and a duplicate's colliding credential is dropped.
+List<BuddyRoleCredential> mergeRoleCredentials(
+  List<List<BuddyRoleCredential>> rolesByCandidate,
+) {
+  final seenRoles = <BuddyRole>{};
+  final merged = <BuddyRoleCredential>[];
+  for (final candidateRoles in rolesByCandidate) {
+    for (final credential in candidateRoles) {
+      if (seenRoles.add(credential.role)) {
+        merged.add(credential);
+      }
+    }
+  }
+  return merged;
+}
 
 /// Data loaded for a buddy merge operation.
 class MergeLoadData {
@@ -29,30 +51,23 @@ class MergeFieldCandidate<T> {
 class BuddyMergeFormController {
   final Map<String, List<MergeFieldCandidate<String>>> textCandidates = {};
   final Map<String, int> fieldIndices = {};
-  List<MergeFieldCandidate<CertificationLevel?>> certLevelCandidates = [];
-  List<MergeFieldCandidate<CertificationAgency?>> certAgencyCandidates = [];
   List<MergeFieldCandidate<String?>> photoCandidates = [];
   String? mergedPhotoPath;
   bool isInitialized = false;
 
-  /// Initialize merge candidate state from loaded buddies.
-  ///
-  /// Sets text controller values and returns initial cert level/agency values
-  /// for the caller to apply to its own state.
-  ({CertificationLevel? certLevel, CertificationAgency? certAgency})
-  initialize({
+  /// Initialize merge candidate state from loaded buddies. Sets the text
+  /// controller values and the merged photo path. Certifications are NOT
+  /// cycled here (issue #553): the survivor inherits the union of certs at the
+  /// repository level, so the buddy edit form hides its cert section in merge
+  /// mode.
+  void initialize({
     required List<Buddy> buddies,
     required TextEditingController nameController,
     required TextEditingController emailController,
     required TextEditingController phoneController,
     required TextEditingController notesController,
   }) {
-    if (isInitialized) {
-      return (
-        certLevel: certLevelCandidates[fieldIndices['certLevel'] ?? 0].value,
-        certAgency: certAgencyCandidates[fieldIndices['certAgency'] ?? 0].value,
-      );
-    }
+    if (isInitialized) return;
     isInitialized = true;
 
     _initializeTextField(
@@ -84,29 +99,6 @@ class BuddyMergeFormController {
       isMeaningful: (value) => value.trim().isNotEmpty,
     );
 
-    certLevelCandidates = _buildDistinctCandidates<CertificationLevel?>(
-      buddies,
-      (buddy) => buddy.certificationLevel,
-      equals: (a, b) => a == b,
-    );
-    fieldIndices['certLevel'] = _firstMeaningfulIndex(
-      certLevelCandidates,
-      (value) => value != null,
-    );
-    final certLevel = certLevelCandidates[fieldIndices['certLevel'] ?? 0].value;
-
-    certAgencyCandidates = _buildDistinctCandidates<CertificationAgency?>(
-      buddies,
-      (buddy) => buddy.certificationAgency,
-      equals: (a, b) => a == b,
-    );
-    fieldIndices['certAgency'] = _firstMeaningfulIndex(
-      certAgencyCandidates,
-      (value) => value != null,
-    );
-    final certAgency =
-        certAgencyCandidates[fieldIndices['certAgency'] ?? 0].value;
-
     photoCandidates = _buildDistinctCandidates<String?>(
       buddies,
       (buddy) => buddy.photoPath,
@@ -117,8 +109,6 @@ class BuddyMergeFormController {
       (value) => value != null && value.isNotEmpty,
     );
     mergedPhotoPath = photoCandidates[fieldIndices['photo'] ?? 0].value;
-
-    return (certLevel: certLevel, certAgency: certAgency);
   }
 
   void _initializeTextField({
@@ -190,25 +180,5 @@ class BuddyMergeFormController {
     if (candidates == null || candidates.length < 2) return;
     final nextIndex = ((fieldIndices[key] ?? 0) + 1) % candidates.length;
     selectTextFieldCandidate(key, nextIndex, controller: controller);
-  }
-
-  /// Cycle to the next certification level candidate.
-  /// Returns the new value for the caller to apply via setState.
-  CertificationLevel? cycleCertLevel() {
-    if (certLevelCandidates.length < 2) return null;
-    final nextIndex =
-        ((fieldIndices['certLevel'] ?? 0) + 1) % certLevelCandidates.length;
-    fieldIndices['certLevel'] = nextIndex;
-    return certLevelCandidates[nextIndex].value;
-  }
-
-  /// Cycle to the next certification agency candidate.
-  /// Returns the new value for the caller to apply via setState.
-  CertificationAgency? cycleCertAgency() {
-    if (certAgencyCandidates.length < 2) return null;
-    final nextIndex =
-        ((fieldIndices['certAgency'] ?? 0) + 1) % certAgencyCandidates.length;
-    fieldIndices['certAgency'] = nextIndex;
-    return certAgencyCandidates[nextIndex].value;
   }
 }

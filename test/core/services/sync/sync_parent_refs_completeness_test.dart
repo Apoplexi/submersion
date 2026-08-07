@@ -20,13 +20,21 @@ void main() {
     'dives': 'dives',
     'diver_settings': 'diverSettings',
     'buddies': 'buddies',
+    'buddy_roles': 'buddyRoles',
     'dive_centers': 'diveCenters',
     'trips': 'trips',
     'liveaboard_detail_records': 'liveaboardDetails',
     'trip_itinerary_days': 'itineraryDays',
+    'checklist_templates': 'checklistTemplates',
+    'checklist_template_items': 'checklistTemplateItems',
+    'trip_checklist_items': 'tripChecklistItems',
     'equipment': 'equipment',
     'equipment_sets': 'equipmentSets',
     'equipment_set_items': 'equipmentSetItems',
+    'equipment_set_geofences': 'equipmentSetGeofences',
+    'cylinder_configs': 'cylinderConfigs',
+    'cylinder_config_items': 'cylinderConfigItems',
+    'quality_findings': 'qualityFindings',
     'dive_types': 'diveTypes',
     'tank_presets': 'tankPresets',
     'dive_computers': 'diveComputers',
@@ -51,10 +59,35 @@ void main() {
     'tank_pressure_profiles': 'tankPressureProfiles',
     'tide_records': 'tideRecords',
     'sightings': 'sightings',
+    'incidents': 'incidents',
     'certifications': 'certifications',
     'service_records': 'serviceRecords',
     'settings': 'settings',
     'media': 'media',
+    'media_enrichment': 'mediaEnrichment',
+    'course_requirements': 'courseRequirements',
+    'course_requirement_dives': 'courseRequirementDives',
+    'emergency_chambers': 'emergencyChambers',
+    'media_stores': 'mediaStores',
+    'connected_accounts': 'connectedAccounts',
+    'media_subscriptions': 'mediaSubscriptions',
+    'service_kinds': 'serviceKinds',
+    'service_schedules': 'serviceSchedules',
+    'gps_tracks': 'gpsTracks',
+    'diver_weight_entries': 'diverWeightEntries',
+    'dive_roles': 'diveRoles',
+    'equipment_attributes': 'equipmentAttributes',
+    'dive_dive_types': 'diveDiveTypes',
+    'dive_safety_reviews': 'diveSafetyReviews',
+    'dive_safety_findings': 'diveSafetyFindings',
+    'dive_plans': 'divePlans',
+    'dive_plan_tanks': 'divePlanTanks',
+    'dive_plan_segments': 'divePlanSegments',
+    'dive_plan_equipment': 'divePlanEquipment',
+    'pre_dive_checklist_templates': 'preDiveChecklistTemplates',
+    'pre_dive_checklist_template_items': 'preDiveChecklistTemplateItems',
+    'pre_dive_sessions': 'preDiveSessions',
+    'pre_dive_session_items': 'preDiveSessionItems',
   };
 
   // Parent table -> entityType for parents a user can delete (and thus
@@ -74,6 +107,8 @@ void main() {
     'dive_centers': 'diveCenters',
     'species': 'species',
     'dive_computers': 'diveComputers',
+    'checklist_templates': 'checklistTemplates',
+    'media': 'media',
   };
 
   String camel(String snake) {
@@ -159,6 +194,23 @@ void main() {
       reason:
           'Nullability mismatch (decides skip vs. clear-the-reference):\n'
           '${wrongNullable.join('\n')}',
+    );
+  });
+
+  test('syncedTables covers every merge-applied entity (no silent drift)', () {
+    // The FK guard above only checks tables listed in syncedTables. If a new
+    // synced entity is added to SyncService.entityHasUpdatedAt but not here,
+    // its FKs would go unverified -- so keep this map complete.
+    final covered = syncedTables.values.toSet();
+    final missing = SyncService.entityHasUpdatedAt.keys
+        .where((e) => !covered.contains(e))
+        .toList();
+    expect(
+      missing,
+      isEmpty,
+      reason:
+          'These merge-applied entities are missing from syncedTables, so '
+          'their FK guards are unverified:\n${missing.join('\n')}',
     );
   });
 }

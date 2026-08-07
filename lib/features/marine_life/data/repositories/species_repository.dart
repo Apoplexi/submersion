@@ -204,6 +204,57 @@ class SpeciesRepository {
     }).toList();
   }
 
+  /// Batched variant of [getSightingsForDive]: one query for many dives.
+  /// Returns a map keyed by dive id; dives without sightings are absent.
+  ///
+  /// The dive ids are queried in chunks so the bound-variable count never
+  /// exceeds SQLite's default limit (999) on very large trips.
+  Future<Map<String, List<domain.Sighting>>> getSightingsForDives(
+    List<String> diveIds,
+  ) async {
+    if (diveIds.isEmpty) return {};
+
+    const chunkSize = 900; // safely under SQLite's 999 bound-variable limit
+    final byDive = <String, List<domain.Sighting>>{};
+
+    for (var start = 0; start < diveIds.length; start += chunkSize) {
+      final end = (start + chunkSize < diveIds.length)
+          ? start + chunkSize
+          : diveIds.length;
+      final chunk = diveIds.sublist(start, end);
+      final placeholders = List.filled(chunk.length, '?').join(', ');
+      final results = await _db
+          .customSelect(
+            '''
+      SELECT s.*, sp.common_name, sp.category
+      FROM sightings s
+      JOIN species sp ON s.species_id = sp.id
+      WHERE s.dive_id IN ($placeholders)
+      ORDER BY sp.category ASC, sp.common_name ASC
+    ''',
+            variables: [for (final id in chunk) Variable.withString(id)],
+          )
+          .get();
+
+      for (final row in results) {
+        final sighting = domain.Sighting(
+          id: row.data['id'] as String,
+          diveId: row.data['dive_id'] as String,
+          speciesId: row.data['species_id'] as String,
+          speciesName: row.data['common_name'] as String,
+          speciesCategory: SpeciesCategory.values.firstWhere(
+            (c) => c.name == row.data['category'],
+            orElse: () => SpeciesCategory.other,
+          ),
+          count: row.data['count'] as int,
+          notes: (row.data['notes'] as String?) ?? '',
+        );
+        byDive.putIfAbsent(sighting.diveId, () => []).add(sighting);
+      }
+    }
+    return byDive;
+  }
+
   /// Update sighting
   Future<void> updateSighting(domain.Sighting sighting) async {
     await (_db.update(
@@ -277,6 +328,92 @@ class SpeciesRepository {
       localUpdatedAt: now,
     );
     SyncEventBus.notifyLocalChange();
+  }
+
+  Future<void> _bumpDive(String diveId, int now) async {
+    await (_db.update(_db.dives)..where((t) => t.id.equals(diveId))).write(
+      DivesCompanion(updatedAt: Value(now)),
+    );
+    await _syncRepository.markRecordPending(
+      entityType: 'dives',
+      recordId: diveId,
+      localUpdatedAt: now,
+    );
+  }
+
+  /// Add each sighting template to every dive (fresh id + diveId per dive).
+  /// No notify/transaction — BulkDiveEditService owns those.
+  Future<void> bulkAddSightings(
+    List<String> diveIds,
+    List<domain.Sighting> sightings,
+  ) async {
+    if (diveIds.isEmpty || sightings.isEmpty) return;
+    final now = DateTime.now().millisecondsSinceEpoch;
+    for (final diveId in diveIds) {
+      for (final sighting in sightings) {
+        final id = _uuid.v4();
+        await _db
+            .into(_db.sightings)
+            .insert(
+              SightingsCompanion(
+                id: Value(id),
+                diveId: Value(diveId),
+                speciesId: Value(sighting.speciesId),
+                count: Value(sighting.count),
+                notes: Value(sighting.notes),
+              ),
+            );
+        await _syncRepository.markRecordPending(
+          entityType: 'sightings',
+          recordId: id,
+          localUpdatedAt: now,
+        );
+      }
+      await _bumpDive(diveId, now);
+    }
+  }
+
+  /// Replace each dive's sightings with [sightings]. No notify/transaction.
+  Future<void> bulkReplaceSightings(
+    List<String> diveIds,
+    List<domain.Sighting> sightings,
+  ) async {
+    if (diveIds.isEmpty) return;
+    final now = DateTime.now().millisecondsSinceEpoch;
+    for (final diveId in diveIds) {
+      final existing = await (_db.select(
+        _db.sightings,
+      )..where((t) => t.diveId.equals(diveId))).get();
+      await (_db.delete(
+        _db.sightings,
+      )..where((t) => t.diveId.equals(diveId))).go();
+      for (final row in existing) {
+        await _syncRepository.logDeletion(
+          entityType: 'sightings',
+          recordId: row.id,
+        );
+      }
+      for (final sighting in sightings) {
+        final id = _uuid.v4();
+        await _db
+            .into(_db.sightings)
+            .insert(
+              SightingsCompanion(
+                id: Value(id),
+                diveId: Value(diveId),
+                speciesId: Value(sighting.speciesId),
+                count: Value(sighting.count),
+                notes: Value(sighting.notes),
+              ),
+            );
+        await _syncRepository.markRecordPending(
+          entityType: 'sightings',
+          recordId: id,
+          localUpdatedAt: now,
+        );
+      }
+      await _bumpDive(diveId, now);
+    }
   }
 
   /// Seed built-in species from the bundled JSON asset.

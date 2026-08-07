@@ -31,6 +31,12 @@ S3ApiClient clientWith(S3Config config, MockClient mock) => S3ApiClient(
   retryDelay: Duration.zero,
 );
 
+String malformedAuthBody(String expectedRegion) =>
+    '<?xml version="1.0" encoding="UTF-8"?>'
+    '<Error><Code>AuthorizationHeaderMalformed</Code>'
+    '<Message>the region is wrong; expecting $expectedRegion</Message>'
+    '<Region>$expectedRegion</Region></Error>';
+
 void main() {
   group('request shape', () {
     test(
@@ -89,6 +95,28 @@ void main() {
         expect(
           seen.url.toString(),
           'https://s3.eu-west-1.amazonaws.com/dive-sync/k.json',
+        );
+      },
+    );
+
+    test(
+      'dotted AWS bucket routes path-style to dodge the wildcard cert (#335)',
+      () async {
+        late http.Request seen;
+        final mock = MockClient((request) async {
+          seen = request;
+          return http.Response.bytes([9], 200);
+        });
+        // pathStyle defaults to false for AWS; the dot must force it anyway,
+        // otherwise the host would be my.dive.bucket.s3...amazonaws.com and
+        // fail the *.s3.<region>.amazonaws.com TLS handshake.
+        final config = awsConfig().copyWith(bucket: 'my.dive.bucket');
+        await clientWith(config, mock).getObject('k.json');
+
+        expect(seen.url.host, 's3.eu-west-1.amazonaws.com');
+        expect(
+          seen.url.toString(),
+          'https://s3.eu-west-1.amazonaws.com/my.dive.bucket/k.json',
         );
       },
     );
@@ -532,5 +560,318 @@ void main() {
         expect(info!.lastModified, DateTime.utc(2026, 6, 9, 12));
       },
     );
+  });
+
+  group('region correction', () {
+    test('adopts x-amz-bucket-region hint, replays on the corrected AWS host, '
+        'and reports the correction', () async {
+      final urls = <String>[];
+      final mock = MockClient((request) async {
+        urls.add(request.url.toString());
+        if (urls.length == 1) {
+          return http.Response(
+            '',
+            301,
+            headers: {'x-amz-bucket-region': 'us-west-2'},
+          );
+        }
+        expect(
+          request.headers['authorization'],
+          contains('/us-west-2/s3/aws4_request'),
+        );
+        return http.Response('', 200);
+      });
+      String? corrected;
+      final client = S3ApiClient(
+        awsConfig(), // configured region: eu-west-1
+        httpClient: mock,
+        now: () => DateTime.utc(2026, 6, 12),
+        retryDelay: Duration.zero,
+        onRegionCorrected: (region) => corrected = region,
+      );
+
+      await client.putObject('k.json', Uint8List.fromList([1]));
+
+      expect(urls, hasLength(2));
+      expect(
+        urls[0],
+        startsWith('https://dive-sync.s3.eu-west-1.amazonaws.com/'),
+      );
+      expect(
+        urls[1],
+        startsWith('https://dive-sync.s3.us-west-2.amazonaws.com/'),
+      );
+      expect(corrected, 'us-west-2');
+    });
+
+    test('adopts the Region element of an AuthorizationHeaderMalformed body '
+        '(R2-style custom endpoint)', () async {
+      var requests = 0;
+      final mock = MockClient((request) async {
+        requests++;
+        if (requests == 1) {
+          return http.Response(malformedAuthBody('auto'), 400);
+        }
+        expect(
+          request.headers['authorization'],
+          contains('/auto/s3/aws4_request'),
+        );
+        return http.Response('', 200);
+      });
+      String? corrected;
+      final client = S3ApiClient(
+        minioConfig(),
+        httpClient: mock,
+        now: () => DateTime.utc(2026, 6, 12),
+        retryDelay: Duration.zero,
+        onRegionCorrected: (region) => corrected = region,
+      );
+
+      await client.putObject('k.json', Uint8List.fromList([1]));
+
+      expect(requests, 2);
+      expect(corrected, 'auto');
+    });
+
+    test('a failed replay throws and does not report a correction', () async {
+      var requests = 0;
+      final mock = MockClient((_) async {
+        requests++;
+        return http.Response(malformedAuthBody('auto'), 400);
+      });
+      String? corrected;
+      final client = S3ApiClient(
+        minioConfig(),
+        httpClient: mock,
+        now: () => DateTime.utc(2026, 6, 12),
+        retryDelay: Duration.zero,
+        onRegionCorrected: (region) => corrected = region,
+      );
+
+      await expectLater(
+        client.putObject('k.json', Uint8List.fromList([1])),
+        throwsA(isA<CloudStorageException>()),
+      );
+      expect(requests, 2); // one correction replay, then give up
+      expect(corrected, isNull);
+    });
+
+    test('a hint equal to the effective region is not replayed', () async {
+      var requests = 0;
+      final mock = MockClient((_) async {
+        requests++;
+        return http.Response(malformedAuthBody('eu-west-1'), 400);
+      });
+      final client = S3ApiClient(
+        awsConfig(), // already eu-west-1
+        httpClient: mock,
+        now: () => DateTime.utc(2026, 6, 12),
+        retryDelay: Duration.zero,
+      );
+
+      await expectLater(
+        client.getObject('k.json'),
+        throwsA(isA<CloudStorageException>()),
+      );
+      expect(requests, 1);
+    });
+
+    test('the corrected region sticks for later requests', () async {
+      var requests = 0;
+      final mock = MockClient((request) async {
+        requests++;
+        if (requests == 1) {
+          return http.Response(
+            '',
+            301,
+            headers: {'x-amz-bucket-region': 'us-west-2'},
+          );
+        }
+        expect(
+          request.headers['authorization'],
+          contains('/us-west-2/s3/aws4_request'),
+        );
+        return http.Response('', 200);
+      });
+      final client = S3ApiClient(
+        awsConfig(),
+        httpClient: mock,
+        now: () => DateTime.utc(2026, 6, 12),
+        retryDelay: Duration.zero,
+      );
+
+      await client.putObject('a.json', Uint8List.fromList([1]));
+      await client.putObject('b.json', Uint8List.fromList([2]));
+      expect(requests, 3); // 1 hinted failure + replay, then 1 clean send
+    });
+
+    test('a 5xx replay still falls through to the normal retry', () async {
+      var requests = 0;
+      final mock = MockClient((request) async {
+        requests++;
+        if (requests == 1) {
+          return http.Response(
+            '',
+            301,
+            headers: {'x-amz-bucket-region': 'us-west-2'},
+          );
+        }
+        expect(
+          request.headers['authorization'],
+          contains('/us-west-2/s3/aws4_request'),
+        );
+        if (requests == 2) return http.Response('oops', 500);
+        return http.Response('', 200);
+      });
+      String? corrected;
+      final client = S3ApiClient(
+        awsConfig(),
+        httpClient: mock,
+        now: () => DateTime.utc(2026, 6, 12),
+        retryDelay: Duration.zero,
+        onRegionCorrected: (region) => corrected = region,
+      );
+
+      await client.putObject('k.json', Uint8List.fromList([1]));
+
+      expect(requests, 3); // hinted 301, 5xx replay, successful retry
+      expect(corrected, isNull); // the replay itself did not succeed
+    });
+
+    test('a wrong regional AWS endpoint moves to the corrected host', () async {
+      final urls = <String>[];
+      final mock = MockClient((request) async {
+        urls.add(request.url.toString());
+        if (urls.length == 1) {
+          return http.Response(
+            '',
+            301,
+            headers: {'x-amz-bucket-region': 'us-west-2'},
+          );
+        }
+        expect(
+          request.headers['authorization'],
+          contains('/us-west-2/s3/aws4_request'),
+        );
+        return http.Response('', 200);
+      });
+      String? corrected;
+      final config = S3Config(
+        endpoint: 'https://s3.eu-west-1.amazonaws.com',
+        region: 'eu-west-1',
+        bucket: 'dive-sync',
+        pathStyle: false,
+        accessKeyId: 'ak',
+        secretAccessKey: 'sk',
+      );
+      final client = S3ApiClient(
+        config,
+        httpClient: mock,
+        now: () => DateTime.utc(2026, 6, 12),
+        retryDelay: Duration.zero,
+        onRegionCorrected: (region) => corrected = region,
+      );
+
+      await client.putObject('k.json', Uint8List.fromList([1]));
+
+      expect(urls, hasLength(2));
+      expect(
+        urls[0],
+        startsWith('https://dive-sync.s3.eu-west-1.amazonaws.com/'),
+      );
+      expect(
+        urls[1],
+        startsWith('https://dive-sync.s3.us-west-2.amazonaws.com/'),
+      );
+      expect(corrected, 'us-west-2');
+    });
+
+    test(
+      'region correction preserves the dualstack variant of the host',
+      () async {
+        final urls = <String>[];
+        final mock = MockClient((request) async {
+          urls.add(request.url.toString());
+          if (urls.length == 1) {
+            return http.Response(
+              '',
+              301,
+              headers: {'x-amz-bucket-region': 'us-west-2'},
+            );
+          }
+          return http.Response('', 200);
+        });
+        final config = S3Config(
+          endpoint: 'https://s3.dualstack.eu-west-1.amazonaws.com',
+          region: 'eu-west-1',
+          bucket: 'dive-sync',
+          pathStyle: false,
+          accessKeyId: 'ak',
+          secretAccessKey: 'sk',
+        );
+        final client = S3ApiClient(
+          config,
+          httpClient: mock,
+          now: () => DateTime.utc(2026, 6, 12),
+          retryDelay: Duration.zero,
+        );
+
+        await client.putObject('k.json', Uint8List.fromList([1]));
+
+        expect(urls, hasLength(2));
+        expect(
+          urls[1],
+          startsWith('https://dive-sync.s3.dualstack.us-west-2.amazonaws.com/'),
+          reason:
+              'rebuilding the corrected host must keep dualstack, or the replay '
+              'silently regresses IPv6/dualstack connectivity',
+        );
+      },
+    );
+
+    test('non-AWS custom endpoint hosts never get rewritten', () async {
+      var requests = 0;
+      final mock = MockClient((request) async {
+        requests++;
+        expect(request.url.host, 'nas.local');
+        if (requests == 1) {
+          return http.Response(malformedAuthBody('auto'), 400);
+        }
+        return http.Response('', 200);
+      });
+      final client = S3ApiClient(
+        minioConfig(),
+        httpClient: mock,
+        now: () => DateTime.utc(2026, 6, 12),
+        retryDelay: Duration.zero,
+      );
+
+      await client.putObject('k.json', Uint8List.fromList([1]));
+      expect(requests, 2);
+    });
+
+    test('AuthorizationHeaderMalformed without a usable hint explains the '
+        'region problem', () async {
+      final mock = MockClient(
+        (_) async => http.Response(
+          '<?xml version="1.0" encoding="UTF-8"?>'
+          '<Error><Code>AuthorizationHeaderMalformed</Code>'
+          '<Message>the region is wrong</Message></Error>',
+          400,
+        ),
+      );
+      final client = clientWith(minioConfig(), mock);
+
+      await expectLater(
+        client.putObject('k.json', Uint8List.fromList([1])),
+        throwsA(
+          isA<CloudStorageException>().having(
+            (e) => e.message,
+            'message',
+            contains('signature region'),
+          ),
+        ),
+      );
+    });
   });
 }

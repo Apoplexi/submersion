@@ -98,11 +98,16 @@ void main() {
       'diveBuddies',
       'certifications',
       'courses',
+      'courseRequirements',
+      'courseRequirementDives',
       'serviceRecords',
       'diveCenters',
       'trips',
       'liveaboardDetails',
       'itineraryDays',
+      'checklistTemplates',
+      'checklistTemplateItems',
+      'tripChecklistItems',
       'tags',
       'diveTags',
       'diveTypes',
@@ -114,6 +119,8 @@ void main() {
       'species',
       'sightings',
       'diveProfileEvents',
+      'diveSafetyReviews',
+      'diveSafetyFindings',
       'gasSwitches',
       'diveCustomFields',
       'diveDataSources',
@@ -150,6 +157,25 @@ void main() {
       expect(await serializer.fetchRecord('totallyUnknown', 'x'), isNull);
     });
 
+    test('does not export a dive computer BLE address', () async {
+      await db.customStatement(
+        '''
+        INSERT INTO dive_computers
+          (id, name, bluetooth_address, created_at, updated_at)
+        VALUES (?, ?, ?, ?, ?)
+        ''',
+        ['computer-1', 'Petrel 3', 'host-local-address', 1, 1],
+      );
+
+      final record = await serializer.fetchRecord(
+        'diveComputers',
+        'computer-1',
+      );
+
+      expect(record, isNotNull);
+      expect(record, isNot(contains('bluetoothAddress')));
+    });
+
     test('fetches a seeded row for each single-PK entity type', () async {
       // Drift enables foreign_keys by default; turn it off so a minimal
       // placeholder row needn't satisfy parent references (these throwaway
@@ -172,6 +198,14 @@ void main() {
         (type: 'diveBuddies', table: db.diveBuddies.actualTableName),
         (type: 'certifications', table: db.certifications.actualTableName),
         (type: 'courses', table: db.courses.actualTableName),
+        (
+          type: 'courseRequirements',
+          table: db.courseRequirements.actualTableName,
+        ),
+        (
+          type: 'courseRequirementDives',
+          table: db.courseRequirementDives.actualTableName,
+        ),
         (type: 'serviceRecords', table: db.serviceRecords.actualTableName),
         (type: 'diveCenters', table: db.diveCenters.actualTableName),
         (type: 'trips', table: db.trips.actualTableName),
@@ -180,6 +214,18 @@ void main() {
           table: db.liveaboardDetailRecords.actualTableName,
         ),
         (type: 'itineraryDays', table: db.tripItineraryDays.actualTableName),
+        (
+          type: 'checklistTemplates',
+          table: db.checklistTemplates.actualTableName,
+        ),
+        (
+          type: 'checklistTemplateItems',
+          table: db.checklistTemplateItems.actualTableName,
+        ),
+        (
+          type: 'tripChecklistItems',
+          table: db.tripChecklistItems.actualTableName,
+        ),
         (type: 'tags', table: db.tags.actualTableName),
         (type: 'diveTags', table: db.diveTags.actualTableName),
         (type: 'diveTypes', table: db.diveTypes.actualTableName),
@@ -196,6 +242,14 @@ void main() {
         (
           type: 'diveProfileEvents',
           table: db.diveProfileEvents.actualTableName,
+        ),
+        (
+          type: 'diveSafetyReviews',
+          table: db.diveSafetyReviews.actualTableName,
+        ),
+        (
+          type: 'diveSafetyFindings',
+          table: db.diveSafetyFindings.actualTableName,
         ),
         (type: 'gasSwitches', table: db.gasSwitches.actualTableName),
         (type: 'diveCustomFields', table: db.diveCustomFields.actualTableName),
@@ -231,6 +285,35 @@ void main() {
         greaterThanOrEqualTo(25),
         reason: 'most entity types should seed+fetch; failures: $failures',
       );
+    });
+  });
+
+  group('SyncDataSerializer.deleteRecord for safety entities', () {
+    test('deletes a dive_safety_reviews row by dive_id', () async {
+      await db.customStatement('PRAGMA foreign_keys = OFF');
+      await seedMinimalRow(db.diveSafetyReviews.actualTableName, 'dive-1');
+      expect(
+        await serializer.fetchRecord('diveSafetyReviews', 'dive-1'),
+        isNotNull,
+      );
+
+      await serializer.deleteRecord('diveSafetyReviews', 'dive-1');
+      expect(
+        await serializer.fetchRecord('diveSafetyReviews', 'dive-1'),
+        isNull,
+      );
+    });
+
+    test('deletes a dive_safety_findings row by id', () async {
+      await db.customStatement('PRAGMA foreign_keys = OFF');
+      await seedMinimalRow(db.diveSafetyFindings.actualTableName, 'f1');
+      expect(
+        await serializer.fetchRecord('diveSafetyFindings', 'f1'),
+        isNotNull,
+      );
+
+      await serializer.deleteRecord('diveSafetyFindings', 'f1');
+      expect(await serializer.fetchRecord('diveSafetyFindings', 'f1'), isNull);
     });
   });
 }

@@ -155,6 +155,9 @@ struct ProfileSample {
   var pressureBar: Double? = nil
   var tankIndex: Int64? = nil
   var heartRate: Int64? = nil
+  /// Compass heading in degrees (0-359) from DC_SAMPLE_BEARING; null when the
+  /// computer does not report bearing samples.
+  var heading: Double? = nil
   var setpoint: Double? = nil
   var ppo2: Double? = nil
   var cns: Double? = nil
@@ -163,6 +166,18 @@ struct ProfileSample {
   var decoTime: Int64? = nil
   var decoDepth: Double? = nil
   var tts: Int64? = nil
+  /// Individual CCR O2 cell ppO2 readings in bar (sensor 1..6), null when that
+  /// cell has no reading. libdivecomputer reports these per-sensor via
+  /// DC_SAMPLE_PPO2; [ppo2] holds the aggregate/computed value.
+  var o2Sensor1: Double? = nil
+  var o2Sensor2: Double? = nil
+  var o2Sensor3: Double? = nil
+  var o2Sensor4: Double? = nil
+  var o2Sensor5: Double? = nil
+  var o2Sensor6: Double? = nil
+  /// Active gas mix index at this sample (from DC_SAMPLE_GASMIX), carried forward
+  /// from the most recent gas switch; null if the computer reported no gas.
+  var gasMixIndex: Int64? = nil
 
 
   // swift-format-ignore: AlwaysUseLowerCamelCase
@@ -173,14 +188,22 @@ struct ProfileSample {
     let pressureBar: Double? = nilOrValue(pigeonVar_list[3])
     let tankIndex: Int64? = nilOrValue(pigeonVar_list[4])
     let heartRate: Int64? = nilOrValue(pigeonVar_list[5])
-    let setpoint: Double? = nilOrValue(pigeonVar_list[6])
-    let ppo2: Double? = nilOrValue(pigeonVar_list[7])
-    let cns: Double? = nilOrValue(pigeonVar_list[8])
-    let rbt: Int64? = nilOrValue(pigeonVar_list[9])
-    let decoType: Int64? = nilOrValue(pigeonVar_list[10])
-    let decoTime: Int64? = nilOrValue(pigeonVar_list[11])
-    let decoDepth: Double? = nilOrValue(pigeonVar_list[12])
-    let tts: Int64? = nilOrValue(pigeonVar_list[13])
+    let heading: Double? = nilOrValue(pigeonVar_list[6])
+    let setpoint: Double? = nilOrValue(pigeonVar_list[7])
+    let ppo2: Double? = nilOrValue(pigeonVar_list[8])
+    let cns: Double? = nilOrValue(pigeonVar_list[9])
+    let rbt: Int64? = nilOrValue(pigeonVar_list[10])
+    let decoType: Int64? = nilOrValue(pigeonVar_list[11])
+    let decoTime: Int64? = nilOrValue(pigeonVar_list[12])
+    let decoDepth: Double? = nilOrValue(pigeonVar_list[13])
+    let tts: Int64? = nilOrValue(pigeonVar_list[14])
+    let o2Sensor1: Double? = nilOrValue(pigeonVar_list[15])
+    let o2Sensor2: Double? = nilOrValue(pigeonVar_list[16])
+    let o2Sensor3: Double? = nilOrValue(pigeonVar_list[17])
+    let o2Sensor4: Double? = nilOrValue(pigeonVar_list[18])
+    let o2Sensor5: Double? = nilOrValue(pigeonVar_list[19])
+    let o2Sensor6: Double? = nilOrValue(pigeonVar_list[20])
+    let gasMixIndex: Int64? = nilOrValue(pigeonVar_list[21])
 
     return ProfileSample(
       timeSeconds: timeSeconds,
@@ -189,6 +212,7 @@ struct ProfileSample {
       pressureBar: pressureBar,
       tankIndex: tankIndex,
       heartRate: heartRate,
+      heading: heading,
       setpoint: setpoint,
       ppo2: ppo2,
       cns: cns,
@@ -196,7 +220,14 @@ struct ProfileSample {
       decoType: decoType,
       decoTime: decoTime,
       decoDepth: decoDepth,
-      tts: tts
+      tts: tts,
+      o2Sensor1: o2Sensor1,
+      o2Sensor2: o2Sensor2,
+      o2Sensor3: o2Sensor3,
+      o2Sensor4: o2Sensor4,
+      o2Sensor5: o2Sensor5,
+      o2Sensor6: o2Sensor6,
+      gasMixIndex: gasMixIndex
     )
   }
   func toList() -> [Any?] {
@@ -207,6 +238,7 @@ struct ProfileSample {
       pressureBar,
       tankIndex,
       heartRate,
+      heading,
       setpoint,
       ppo2,
       cns,
@@ -215,6 +247,13 @@ struct ProfileSample {
       decoTime,
       decoDepth,
       tts,
+      o2Sensor1,
+      o2Sensor2,
+      o2Sensor3,
+      o2Sensor4,
+      o2Sensor5,
+      o2Sensor6,
+      gasMixIndex,
     ]
   }
 }
@@ -254,6 +293,9 @@ struct TankInfo {
   var volumeLiters: Double? = nil
   var startPressureBar: Double? = nil
   var endPressureBar: Double? = nil
+  /// Tank usage from libdivecomputer's `dc_usage_t` (1=oxygen, 2=diluent,
+  /// 3=sidemount); null when the computer reported no usage (DC_USAGE_NONE).
+  var usage: Int64? = nil
 
 
   // swift-format-ignore: AlwaysUseLowerCamelCase
@@ -263,13 +305,15 @@ struct TankInfo {
     let volumeLiters: Double? = nilOrValue(pigeonVar_list[2])
     let startPressureBar: Double? = nilOrValue(pigeonVar_list[3])
     let endPressureBar: Double? = nilOrValue(pigeonVar_list[4])
+    let usage: Int64? = nilOrValue(pigeonVar_list[5])
 
     return TankInfo(
       index: index,
       gasMixIndex: gasMixIndex,
       volumeLiters: volumeLiters,
       startPressureBar: startPressureBar,
-      endPressureBar: endPressureBar
+      endPressureBar: endPressureBar,
+      usage: usage
     )
   }
   func toList() -> [Any?] {
@@ -279,6 +323,7 @@ struct TankInfo {
       volumeLiters,
       startPressureBar,
       endPressureBar,
+      usage,
     ]
   }
 }

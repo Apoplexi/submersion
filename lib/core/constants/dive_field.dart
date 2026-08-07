@@ -29,6 +29,7 @@ enum DiveField {
   diveNumber,
   dateTime,
   siteName,
+  diveName,
   maxDepth,
   avgDepth,
   bottomTime,
@@ -115,6 +116,7 @@ enum DiveField {
     DiveField.diveNumber,
     DiveField.dateTime,
     DiveField.siteName,
+    DiveField.diveName,
     DiveField.siteLocation,
     DiveField.maxDepth,
     DiveField.bottomTime,
@@ -141,6 +143,7 @@ extension DiveFieldMetadata on DiveField {
       case DiveField.diveNumber:
       case DiveField.dateTime:
       case DiveField.siteName:
+      case DiveField.diveName:
       case DiveField.maxDepth:
       case DiveField.avgDepth:
       case DiveField.bottomTime:
@@ -234,6 +237,8 @@ extension DiveFieldMetadata on DiveField {
         return 'Date & Time';
       case DiveField.siteName:
         return 'Site Name';
+      case DiveField.diveName:
+        return 'Dive Name';
       case DiveField.maxDepth:
         return 'Max Depth';
       case DiveField.avgDepth:
@@ -354,6 +359,8 @@ extension DiveFieldMetadata on DiveField {
         return 'Date';
       case DiveField.siteName:
         return 'Site';
+      case DiveField.diveName:
+        return 'Name';
       case DiveField.maxDepth:
         return 'Max D';
       case DiveField.avgDepth:
@@ -474,6 +481,8 @@ extension DiveFieldMetadata on DiveField {
         return Icons.calendar_today;
       case DiveField.siteName:
         return Icons.place;
+      case DiveField.diveName:
+        return Icons.drive_file_rename_outline;
       case DiveField.maxDepth:
         return Icons.arrow_downward;
       case DiveField.avgDepth:
@@ -593,6 +602,7 @@ extension DiveFieldMetadata on DiveField {
       case DiveField.siteLatitude:
       case DiveField.siteLongitude:
       case DiveField.weatherDescription:
+      case DiveField.diveName:
         return false;
       default:
         return true;

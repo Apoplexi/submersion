@@ -1,6 +1,7 @@
 import 'package:submersion/core/providers/provider.dart';
 
 import 'package:submersion/core/constants/enums.dart';
+import 'package:submersion/features/dive_log/presentation/providers/dive_repository_provider.dart';
 import 'package:submersion/features/marine_life/data/repositories/species_repository.dart';
 import 'package:submersion/features/marine_life/domain/entities/species.dart';
 
@@ -12,10 +13,7 @@ final speciesRepositoryProvider = Provider<SpeciesRepository>((ref) {
 /// All species provider
 final allSpeciesProvider = FutureProvider<List<Species>>((ref) async {
   final repository = ref.watch(speciesRepositoryProvider);
-  final sub = repository.watchSpeciesChanges().listen(
-    (_) => ref.invalidateSelf(),
-  );
-  ref.onDispose(sub.cancel);
+  ref.invalidateSelfWhen(repository.watchSpeciesChanges());
   return repository.getAllSpecies();
 });
 
@@ -56,6 +54,9 @@ final diveSightingsProvider = FutureProvider.family<List<Sighting>, String>((
   diveId,
 ) async {
   final repository = ref.watch(speciesRepositoryProvider);
+  ref.invalidateSelfWhen(
+    ref.watch(diveRepositoryProvider).watchDiveDetailChanges(),
+  );
   return repository.getSightingsForDive(diveId);
 });
 

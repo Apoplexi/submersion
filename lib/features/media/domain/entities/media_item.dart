@@ -91,6 +91,13 @@ class MediaItem extends Equatable {
   final String? connectorAccountId;
   final String? remoteAssetId;
   final String? originDeviceId;
+  final String? contentHash;
+  final int? contentSizeBytes;
+  final DateTime? remoteUploadedAt;
+  final DateTime? remoteThumbUploadedAt;
+  final String? compressedLevel;
+  final int? compressedSizeBytes;
+  final DateTime? remoteCompressedUploadedAt;
   final DateTime createdAt;
   final DateTime updatedAt;
   final MediaEnrichment? enrichment;
@@ -127,6 +134,13 @@ class MediaItem extends Equatable {
     this.connectorAccountId,
     this.remoteAssetId,
     this.originDeviceId,
+    this.contentHash,
+    this.contentSizeBytes,
+    this.remoteUploadedAt,
+    this.remoteThumbUploadedAt,
+    this.compressedLevel,
+    this.compressedSizeBytes,
+    this.remoteCompressedUploadedAt,
     required this.createdAt,
     required this.updatedAt,
     this.enrichment,
@@ -137,6 +151,53 @@ class MediaItem extends Equatable {
 
   /// Returns true if this is a video
   bool get isVideo => mediaType == MediaType.video;
+
+  /// Filename to use when writing this item's bytes to a temp file for
+  /// sharing. Falls back to a media-type-appropriate default when
+  /// [originalFilename] is missing or blank -- some import sources (e.g.
+  /// the desktop file picker) report an empty string rather than null,
+  /// which a plain `??` fallback misses and produces an empty path.
+  String get shareFilename {
+    final name = originalFilename;
+    if (name != null && name.isNotEmpty) return name;
+    return isVideo ? 'dive_video.mp4' : 'dive_photo.jpg';
+  }
+
+  /// MIME type to advertise when sharing this item, derived from
+  /// [shareFilename]'s extension so the advertised type never disagrees with
+  /// the filename (and likely the bytes) some share targets inspect. Falls
+  /// back to a media-type-appropriate default for a missing or unrecognized
+  /// extension.
+  String get shareMimeType {
+    final name = shareFilename;
+    final dot = name.lastIndexOf('.');
+    final ext = dot >= 0 && dot < name.length - 1
+        ? name.substring(dot + 1).toLowerCase()
+        : '';
+    switch (ext) {
+      case 'jpg':
+      case 'jpeg':
+        return 'image/jpeg';
+      case 'png':
+        return 'image/png';
+      case 'gif':
+        return 'image/gif';
+      case 'webp':
+        return 'image/webp';
+      case 'heic':
+        return 'image/heic';
+      case 'heif':
+        return 'image/heif';
+      case 'mp4':
+        return 'video/mp4';
+      case 'mov':
+        return 'video/quicktime';
+      case 'm4v':
+        return 'video/x-m4v';
+      default:
+        return isVideo ? 'video/mp4' : 'image/jpeg';
+    }
+  }
 
   /// Returns formatted duration string (e.g., "1:30" for 90 seconds)
   String? get durationString {
@@ -178,6 +239,13 @@ class MediaItem extends Equatable {
     Object? connectorAccountId = _undefined,
     Object? remoteAssetId = _undefined,
     Object? originDeviceId = _undefined,
+    Object? contentHash = _undefined,
+    Object? contentSizeBytes = _undefined,
+    Object? remoteUploadedAt = _undefined,
+    Object? remoteThumbUploadedAt = _undefined,
+    Object? compressedLevel = _undefined,
+    Object? compressedSizeBytes = _undefined,
+    Object? remoteCompressedUploadedAt = _undefined,
     DateTime? createdAt,
     DateTime? updatedAt,
     Object? enrichment = _undefined,
@@ -244,6 +312,27 @@ class MediaItem extends Equatable {
       originDeviceId: originDeviceId == _undefined
           ? this.originDeviceId
           : originDeviceId as String?,
+      contentHash: contentHash == _undefined
+          ? this.contentHash
+          : contentHash as String?,
+      contentSizeBytes: contentSizeBytes == _undefined
+          ? this.contentSizeBytes
+          : contentSizeBytes as int?,
+      remoteUploadedAt: remoteUploadedAt == _undefined
+          ? this.remoteUploadedAt
+          : remoteUploadedAt as DateTime?,
+      remoteThumbUploadedAt: remoteThumbUploadedAt == _undefined
+          ? this.remoteThumbUploadedAt
+          : remoteThumbUploadedAt as DateTime?,
+      compressedLevel: compressedLevel == _undefined
+          ? this.compressedLevel
+          : compressedLevel as String?,
+      compressedSizeBytes: compressedSizeBytes == _undefined
+          ? this.compressedSizeBytes
+          : compressedSizeBytes as int?,
+      remoteCompressedUploadedAt: remoteCompressedUploadedAt == _undefined
+          ? this.remoteCompressedUploadedAt
+          : remoteCompressedUploadedAt as DateTime?,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       enrichment: enrichment == _undefined
@@ -285,6 +374,13 @@ class MediaItem extends Equatable {
     connectorAccountId,
     remoteAssetId,
     originDeviceId,
+    contentHash,
+    contentSizeBytes,
+    remoteUploadedAt,
+    remoteThumbUploadedAt,
+    compressedLevel,
+    compressedSizeBytes,
+    remoteCompressedUploadedAt,
     createdAt,
     updatedAt,
     enrichment,
@@ -404,7 +500,8 @@ class MediaSpeciesTag extends Equatable {
   ];
 }
 
-/// A pending suggestion to link a photo from the gallery to a dive
+/// A pending suggestion to link a photo from the gallery or an external
+/// connector (Lightroom) to a dive
 class PendingPhotoSuggestion extends Equatable {
   final String id;
   final String diveId;
@@ -414,6 +511,11 @@ class PendingPhotoSuggestion extends Equatable {
   final bool dismissed;
   final DateTime createdAt;
 
+  /// Set on connector suggestions: the ConnectedAccounts roster row and the
+  /// service-side asset id. Null on device-gallery suggestions.
+  final String? connectorAccountId;
+  final String? remoteAssetId;
+
   const PendingPhotoSuggestion({
     required this.id,
     required this.diveId,
@@ -422,6 +524,8 @@ class PendingPhotoSuggestion extends Equatable {
     this.thumbnailPath,
     this.dismissed = false,
     required this.createdAt,
+    this.connectorAccountId,
+    this.remoteAssetId,
   });
 
   @override
@@ -433,6 +537,8 @@ class PendingPhotoSuggestion extends Equatable {
     thumbnailPath,
     dismissed,
     createdAt,
+    connectorAccountId,
+    remoteAssetId,
   ];
 }
 

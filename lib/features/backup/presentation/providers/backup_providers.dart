@@ -3,11 +3,18 @@ import 'dart:io';
 
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/core/services/database_service.dart';
+import 'package:submersion/core/services/sync/library_epoch_store.dart';
+import 'package:submersion/core/services/sync/post_restore_sync_store.dart';
 import 'package:submersion/features/backup/data/repositories/backup_preferences.dart';
+import 'package:submersion/features/backup/data/services/backup_encryption_key_store.dart';
+import 'package:submersion/features/backup/data/services/backup_encryption_service.dart';
 import 'package:submersion/features/backup/data/services/backup_service.dart';
 import 'package:submersion/features/backup/domain/entities/backup_record.dart';
+import 'package:submersion/core/services/sync/crypto/sync_encryption_service.dart'
+    show WrongPassphraseException;
+import 'package:submersion/features/backup/domain/exceptions/backup_encrypted_exception.dart';
 import 'package:submersion/features/backup/domain/entities/backup_settings.dart';
-import 'package:submersion/features/divers/data/repositories/diver_repository.dart';
+import 'package:submersion/features/backup/domain/entities/restore_mode.dart';
 import 'package:submersion/features/divers/presentation/providers/diver_providers.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/features/settings/presentation/providers/sync_providers.dart';
@@ -27,6 +34,29 @@ final backupServiceProvider = Provider<BackupService>((ref) {
     dbAdapter: DefaultBackupDatabaseAdapter(DatabaseService.instance),
     preferences: ref.watch(backupPreferencesProvider),
     cloudProvider: ref.watch(cloudStorageProviderProvider),
+    epochStore: LibraryEpochStore(ref.watch(sharedPreferencesProvider)),
+    postRestoreSyncStore: PostRestoreSyncStore(
+      ref.watch(sharedPreferencesProvider),
+    ),
+    encryptionKeyStore: ref.watch(encryptionKeyStoreProvider),
+    syncPreferences: ref.watch(syncPreferencesProvider),
+    backupEncryptionKeyStore: ref.watch(backupEncryptionKeyStoreProvider),
+  );
+});
+
+/// Backup-encryption key custody (issue #580), independent of sync encryption.
+final backupEncryptionKeyStoreProvider = Provider<BackupEncryptionKeyStore>((
+  ref,
+) {
+  return BackupEncryptionKeyStore();
+});
+
+/// Backup-encryption key lifecycle (enable / change / regenerate).
+final backupEncryptionServiceProvider = Provider<BackupEncryptionService>((
+  ref,
+) {
+  return BackupEncryptionService(
+    keyStore: ref.watch(backupEncryptionKeyStoreProvider),
   );
 });
 
@@ -45,6 +75,11 @@ class BackupSettingsNotifier extends StateNotifier<BackupSettings> {
     state = state.copyWith(enabled: value);
   }
 
+  Future<void> setBackupEncryptionEnabled(bool value) async {
+    await _prefs.setBackupEncryptionEnabled(value);
+    state = state.copyWith(backupEncryptionEnabled: value);
+  }
+
   Future<void> setFrequency(BackupFrequency frequency) async {
     await _prefs.setFrequency(frequency);
     state = state.copyWith(frequency: frequency);
@@ -55,13 +90,61 @@ class BackupSettingsNotifier extends StateNotifier<BackupSettings> {
     state = state.copyWith(retentionCount: count);
   }
 
+  /// Cloud backup and a custom backup location are mutually exclusive
+  /// destinations: enabling cloud backup reverts the location to the
+  /// default, and choosing a custom location turns cloud backup off.
+  ///
+  /// The two keys are persisted in separate awaited steps, so the conflicting
+  /// key is always cleared BEFORE the new one is set. That way a crash between
+  /// the writes can only leave a "both off" state, never the invalid "cloud
+  /// backup on + custom location set" combination.
   Future<void> setCloudBackupEnabled(bool value) async {
+    if (value) await _prefs.setBackupLocation(null);
     await _prefs.setCloudBackupEnabled(value);
-    state = state.copyWith(cloudBackupEnabled: value);
+    state = _prefs.getSettings();
   }
 
   Future<void> setBackupLocation(String? path) async {
+    if (path != null) await _prefs.setCloudBackupEnabled(false);
     await _prefs.setBackupLocation(path);
+    state = _prefs.getSettings();
+  }
+
+  /// Sets a custom backup location together with its security-scoped bookmark
+  /// (Apple platforms). The bookmark is what lets the location survive an app
+  /// restart; a null bookmark is fine on desktop, where bare paths persist.
+  ///
+  /// Like [setBackupLocation], choosing a custom location turns cloud backup
+  /// off -- the conflicting cloud key is cleared before the location is set.
+  Future<void> setBackupLocationWithBookmark(
+    String path,
+    List<int>? bookmark,
+  ) async {
+    await _prefs.setCloudBackupEnabled(false);
+    await _prefs.setBackupLocation(path);
+    await _prefs.setBackupLocationBookmark(bookmark);
+    state = _prefs.getSettings();
+  }
+
+  /// Android SAF: persist a `content://` tree URI as the location plus its human
+  /// label for display. Turns cloud backup off, like any custom location.
+  Future<void> setSafBackupLocation(String uri, String label) async {
+    await _prefs.setCloudBackupEnabled(false);
+    await _prefs.setBackupLocation(uri);
+    await _prefs.setBackupLocationLabel(label);
+    state = _prefs.getSettings();
+  }
+
+  /// Display label for a custom location (e.g. the SAF folder name), or null.
+  String? get locationLabel => _prefs.backupLocationLabel;
+
+  /// Sign-out hook: cloud sync is being disabled, so cloud backup loses its
+  /// destination. Resets the location to default only when cloud backup was
+  /// actually on -- an unrelated custom location is none of sync's business.
+  Future<void> disableCloudBackup() async {
+    if (!state.cloudBackupEnabled) return;
+    await _prefs.setCloudBackupEnabled(false);
+    await _prefs.setBackupLocation(null);
     state = _prefs.getSettings();
   }
 
@@ -89,21 +172,32 @@ class BackupOperationState {
   final String? message;
   final BackupRecord? lastRecord;
 
+  /// True only while a database *restore* is running (a subset of the
+  /// [BackupOperationStatus.inProgress] states). Restore briefly closes and
+  /// reopens the database, so the whole app must be blocked from interaction
+  /// until it finishes — but routine backups/exports/deletes, which also use
+  /// `inProgress`, must NOT block the app. The global restore barrier keys off
+  /// this flag, not `status`.
+  final bool isRestoring;
+
   const BackupOperationState({
     this.status = BackupOperationStatus.idle,
     this.message,
     this.lastRecord,
+    this.isRestoring = false,
   });
 
   BackupOperationState copyWith({
     BackupOperationStatus? status,
     String? message,
     BackupRecord? lastRecord,
+    bool? isRestoring,
   }) {
     return BackupOperationState(
       status: status ?? this.status,
       message: message ?? this.message,
       lastRecord: lastRecord ?? this.lastRecord,
+      isRestoring: isRestoring ?? this.isRestoring,
     );
   }
 }
@@ -119,38 +213,12 @@ class BackupOperationNotifier extends StateNotifier<BackupOperationState> {
 
   BackupService get _service => _ref.read(backupServiceProvider);
 
-  /// After a restore, read the active diver ID from the restored database's
-  /// Settings table and push it into SharedPreferences so the app picks up
-  /// the correct diver on restart.
+  /// After a restore, realign the active diver from the restored database's
+  /// Settings table (shared with the sync library adoption flow).
   Future<void> _syncActiveDiverAfterRestore() async {
-    try {
-      final repository = DiverRepository();
-      final prefs = _ref.read(sharedPreferencesProvider);
-
-      // Read the active diver ID that was stored in the restored DB
-      var restoredId = await repository.getActiveDiverIdFromSettings();
-
-      // Validate it actually exists in the restored divers table
-      if (restoredId != null) {
-        final diver = await repository.getDiverById(restoredId);
-        if (diver == null) {
-          restoredId = null;
-        }
-      }
-
-      // Fall back to the default diver if the stored ID was invalid
-      if (restoredId == null) {
-        final defaultDiver = await repository.getDefaultDiver();
-        restoredId = defaultDiver?.id;
-      }
-
-      // Sync to SharedPreferences so startup picks up the right diver
-      if (restoredId != null) {
-        await prefs.setString(currentDiverIdKey, restoredId);
-      }
-    } catch (_) {
-      // Non-fatal: startup validation in CurrentDiverIdNotifier will handle it
-    }
+    await realignActiveDiverAfterDataReplace(
+      _ref.read(sharedPreferencesProvider),
+    );
   }
 
   /// Perform a manual backup
@@ -180,21 +248,41 @@ class BackupOperationNotifier extends StateNotifier<BackupOperationState> {
   }
 
   /// Restore from a specific backup record
-  Future<void> restoreFromBackup(BackupRecord record) async {
+  Future<void> restoreFromBackup(
+    BackupRecord record, {
+    RestoreMode mode = RestoreMode.merge,
+    String? encryptionSecret,
+  }) async {
     if (state.status == BackupOperationStatus.inProgress) return;
 
     state = const BackupOperationState(
       status: BackupOperationStatus.inProgress,
       message: 'Restoring backup...',
+      isRestoring: true,
     );
 
     try {
-      await _service.restoreFromBackup(record);
+      await _service.restoreFromBackup(
+        record,
+        mode: mode,
+        encryptionSecret: encryptionSecret,
+        onMigrationProgress: _onRestoreMigrationProgress,
+      );
       await _syncActiveDiverAfterRestore();
       state = const BackupOperationState(
         status: BackupOperationStatus.restoreComplete,
       );
       _ref.invalidate(backupHistoryProvider);
+    } on BackupEncryptedException {
+      // The page prompts for the passphrase and retries with the secret.
+      state = const BackupOperationState(status: BackupOperationStatus.idle);
+      rethrow;
+    } on WrongPassphraseException {
+      // A wrong secret during the retry must reach the passphrase dialog so it
+      // can keep itself open and show the inline error; the generic catch below
+      // would swallow it into an error state and close the dialog on success.
+      state = const BackupOperationState(status: BackupOperationStatus.idle);
+      rethrow;
     } catch (e) {
       state = BackupOperationState(
         status: BackupOperationStatus.error,
@@ -279,12 +367,17 @@ class BackupOperationNotifier extends StateNotifier<BackupOperationState> {
   }
 
   /// Restore from an arbitrary file path
-  Future<void> restoreFromFilePath(String filePath) async {
+  Future<void> restoreFromFilePath(
+    String filePath, {
+    RestoreMode mode = RestoreMode.merge,
+    String? encryptionSecret,
+  }) async {
     if (state.status == BackupOperationStatus.inProgress) return;
 
     state = const BackupOperationState(
       status: BackupOperationStatus.inProgress,
       message: 'Validating backup file...',
+      isRestoring: true,
     );
 
     try {
@@ -301,20 +394,47 @@ class BackupOperationNotifier extends StateNotifier<BackupOperationState> {
       state = const BackupOperationState(
         status: BackupOperationStatus.inProgress,
         message: 'Restoring backup...',
+        isRestoring: true,
       );
 
-      await _service.restoreFromFile(filePath);
+      await _service.restoreFromFile(
+        filePath,
+        mode: mode,
+        encryptionSecret: encryptionSecret,
+        onMigrationProgress: _onRestoreMigrationProgress,
+      );
       await _syncActiveDiverAfterRestore();
       state = const BackupOperationState(
         status: BackupOperationStatus.restoreComplete,
       );
       _ref.invalidate(backupHistoryProvider);
+    } on BackupEncryptedException {
+      // The page prompts for the passphrase and retries with the secret.
+      state = const BackupOperationState(status: BackupOperationStatus.idle);
+      rethrow;
+    } on WrongPassphraseException {
+      // A wrong secret during the retry must reach the passphrase dialog so it
+      // can keep itself open and show the inline error; the generic catch below
+      // would swallow it into an error state and close the dialog on success.
+      state = const BackupOperationState(status: BackupOperationStatus.idle);
+      rethrow;
     } catch (e) {
       state = BackupOperationState(
         status: BackupOperationStatus.error,
         message: 'Restore failed: $e',
       );
     }
+  }
+
+  /// Surface migration-ladder progress while a restored older-schema backup
+  /// upgrades to the current schema — the only long phase of the swap, and
+  /// otherwise a silent stall behind the restore barrier.
+  void _onRestoreMigrationProgress(int currentStep, int totalSteps) {
+    state = BackupOperationState(
+      status: BackupOperationStatus.inProgress,
+      message: 'Upgrading database (step $currentStep of $totalSteps)...',
+      isRestoring: true,
+    );
   }
 
   /// Reset status back to idle

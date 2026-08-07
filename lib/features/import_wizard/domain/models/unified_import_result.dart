@@ -1,4 +1,5 @@
 import 'package:submersion/features/import_wizard/domain/models/import_bundle.dart';
+import 'package:submersion/features/import_wizard/domain/models/import_file_outcome.dart';
 
 /// The outcome of a completed unified import wizard run.
 ///
@@ -26,6 +27,16 @@ class UnifiedImportResult {
   /// Non-null when the import failed with an error.
   final String? errorMessage;
 
+  /// Per-file outcomes for bulk imports; empty for single-file/DC imports.
+  final List<ImportFileOutcome> fileOutcomes;
+
+  /// Number of photos attached to imported dives (ZIP imports only).
+  final int attachedPhotoCount;
+
+  /// Photos in an imported archive that matched no dive file — surfaced in
+  /// the summary so photos are never silently dropped.
+  final int unmatchedPhotoCount;
+
   const UnifiedImportResult({
     required this.importedCounts,
     required this.consolidatedCount,
@@ -33,5 +44,8 @@ class UnifiedImportResult {
     required this.skippedCount,
     this.importedDiveIds = const [],
     this.errorMessage,
+    this.fileOutcomes = const [],
+    this.attachedPhotoCount = 0,
+    this.unmatchedPhotoCount = 0,
   });
 }

@@ -92,16 +92,33 @@ ParsedDive ConvertParsedDive(const libdc_parsed_dive_t& dive) {
                 std::isnan(s.deco_depth) ? std::nullopt
                                          : std::optional<double>(s.deco_depth);
 
+            // Per-cell O2 ppO2: NaN -> nullopt.
+            std::optional<double> o2_sensor[6];
+            for (int c = 0; c < 6; c++) {
+                o2_sensor[c] = std::isnan(s.o2_sensor[c])
+                                   ? std::nullopt
+                                   : std::optional<double>(s.o2_sensor[c]);
+            }
+
             // Nullable ints: UINT32_MAX -> nullptr.
             std::optional<int64_t> tank_index =
                 (s.tank == UINT32_MAX)
                     ? std::nullopt
                     : std::optional<int64_t>(static_cast<int64_t>(s.tank));
+            std::optional<int64_t> gas_mix_index =
+                (s.gasmix == UINT32_MAX)
+                    ? std::nullopt
+                    : std::optional<int64_t>(static_cast<int64_t>(s.gasmix));
             std::optional<int64_t> heart_rate =
                 (s.heartbeat == UINT32_MAX)
                     ? std::nullopt
                     : std::optional<int64_t>(
                           static_cast<int64_t>(s.heartbeat));
+            std::optional<double> heading =
+                (s.heading == UINT32_MAX)
+                    ? std::nullopt
+                    : std::optional<double>(
+                          static_cast<double>(s.heading));
             std::optional<int64_t> rbt =
                 (s.rbt == UINT32_MAX)
                     ? std::nullopt
@@ -130,6 +147,7 @@ ParsedDive ConvertParsedDive(const libdc_parsed_dive_t& dive) {
                     pressure ? &*pressure : nullptr,
                     tank_index ? &*tank_index : nullptr,
                     heart_rate ? &*heart_rate : nullptr,
+                    heading ? &*heading : nullptr,
                     setpoint ? &*setpoint : nullptr,
                     ppo2 ? &*ppo2 : nullptr,
                     cns ? &*cns : nullptr,
@@ -137,7 +155,14 @@ ParsedDive ConvertParsedDive(const libdc_parsed_dive_t& dive) {
                     deco_type ? &*deco_type : nullptr,
                     deco_time ? &*deco_time : nullptr,
                     deco_depth ? &*deco_depth : nullptr,
-                    tts ? &*tts : nullptr)));
+                    tts ? &*tts : nullptr,
+                    o2_sensor[0] ? &*o2_sensor[0] : nullptr,
+                    o2_sensor[1] ? &*o2_sensor[1] : nullptr,
+                    o2_sensor[2] ? &*o2_sensor[2] : nullptr,
+                    o2_sensor[3] ? &*o2_sensor[3] : nullptr,
+                    o2_sensor[4] ? &*o2_sensor[4] : nullptr,
+                    o2_sensor[5] ? &*o2_sensor[5] : nullptr,
+                    gas_mix_index ? &*gas_mix_index : nullptr)));
         }
     }
 
@@ -166,13 +191,17 @@ ParsedDive ConvertParsedDive(const libdc_parsed_dive_t& dive) {
             (begin_p == 0.0) ? std::nullopt : std::optional<double>(begin_p);
         std::optional<double> opt_end =
             (end_p == 0.0) ? std::nullopt : std::optional<double>(end_p);
+        std::optional<int64_t> opt_usage =
+            (tk.usage == 0) ? std::nullopt
+                            : std::optional<int64_t>(static_cast<int64_t>(tk.usage));
 
         tanks.push_back(flutter::CustomEncodableValue(TankInfo(
             static_cast<int64_t>(i),
             static_cast<int64_t>(tk.gasmix),
             opt_vol ? &*opt_vol : nullptr,
             opt_begin ? &*opt_begin : nullptr,
-            opt_end ? &*opt_end : nullptr)));
+            opt_end ? &*opt_end : nullptr,
+            opt_usage ? &*opt_usage : nullptr)));
     }
 
     // Convert events.

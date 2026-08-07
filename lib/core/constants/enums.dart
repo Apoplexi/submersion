@@ -1,26 +1,5 @@
 import 'dart:ui' show Color;
 
-/// Types of dives
-enum DiveType {
-  recreational('Recreational'),
-  technical('Technical'),
-  freedive('Freedive'),
-  training('Training'),
-  wreck('Wreck'),
-  cave('Cave'),
-  ice('Ice'),
-  night('Night'),
-  drift('Drift'),
-  deep('Deep'),
-  altitude('Altitude'),
-  shore('Shore'),
-  boat('Boat'),
-  liveaboard('Liveaboard');
-
-  final String displayName;
-  const DiveType(this.displayName);
-}
-
 /// Types of diving equipment
 enum EquipmentType {
   regulator('Regulator'),
@@ -30,7 +9,9 @@ enum EquipmentType {
   fins('Fins'),
   mask('Mask'),
   computer('Dive Computer'),
+  transmitter('Transmitter'),
   tank('Tank'),
+  rebreather('Rebreather'),
   weights('Weights'),
   light('Light'),
   camera('Camera'),
@@ -178,6 +159,41 @@ enum CertificationLevel {
   sidemount('Sidemount'),
   rebreather('Rebreather'),
   techDiver('Tech Diver'),
+  // Generic ladder additions (issue #546)
+  masterDiver('Master Diver'),
+  assistantInstructor('Assistant Instructor'),
+  // Technical ladder additions
+  extendedRange('Extended Range'),
+  advancedTrimix('Advanced Trimix'),
+  // CMAS star grades
+  cmas1StarDiver('1★ Diver'),
+  cmas2StarDiver('2★ Diver'),
+  cmas3StarDiver('3★ Diver'),
+  cmas4StarDiver('4★ Diver'),
+  cmas3StarDiverAssistantInstructor('3★ Diver - Assistant Instructor'),
+  cmas4StarDiverAssistantInstructor('4★ Diver - Assistant Instructor'),
+  cmas1StarInstructor('1★ Instructor'),
+  cmas2StarInstructor('2★ Instructor'),
+  cmas3StarInstructor('3★ Instructor'),
+  // BSAC grades
+  bsacOceanDiver('Ocean Diver'),
+  bsacSportsDiver('Sports Diver'),
+  bsacDiveLeader('Dive Leader'),
+  bsacAdvancedDiver('Advanced Diver'),
+  bsacFirstClassDiver('First Class Diver'),
+  bsacOpenWaterInstructor('Open Water Instructor'),
+  bsacAdvancedInstructor('Advanced Instructor'),
+  bsacNationalInstructor('National Instructor'),
+  // GUE ratings
+  gueFundamentals('Fundamentals'),
+  gueRec1('Rec 1'),
+  gueRec2('Rec 2'),
+  gueRec3('Rec 3'),
+  gueTech1('Tech 1'),
+  gueTech2('Tech 2'),
+  gueCave1('Cave 1'),
+  gueCave2('Cave 2'),
+  gueDpv('DPV'),
   other('Other');
 
   final String displayName;
@@ -260,6 +276,19 @@ enum WeightType {
   const WeightType(this.displayName);
 }
 
+/// Post-dive weighting feedback: was the carried weight right? (v104)
+///
+/// Turns raw weight history into corrected training data for the weight
+/// prediction engine.
+enum WeightingFeedback {
+  correct('Felt right'),
+  overweighted('Overweighted'),
+  underweighted('Underweighted');
+
+  final String displayName;
+  const WeightingFeedback(this.displayName);
+}
+
 /// Tank role/purpose during a dive
 enum TankRole {
   backGas('Back Gas'),
@@ -290,7 +319,8 @@ enum TankMaterial {
 enum DiveMode {
   oc('Open Circuit'),
   ccr('Closed Circuit Rebreather'),
-  scr('Semi-Closed Rebreather');
+  scr('Semi-Closed Rebreather'),
+  gauge('Gauge');
 
   final String displayName;
   const DiveMode(this.displayName);

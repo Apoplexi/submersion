@@ -1,3 +1,8 @@
+import 'dart:convert';
+import 'dart:io';
+import 'dart:typed_data';
+
+import 'package:file_picker/file_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:xml/xml.dart';
 
@@ -11,11 +16,12 @@ import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
 class UddfExportService {
   final _dateFormat = DateFormat('yyyy-MM-dd');
 
-  Future<String> exportDivesToUddf(
+  /// Build the UDDF document for [dives] without delivering it anywhere.
+  String generateDivesUddfContent(
     List<Dive> dives, {
     List<DiveSite>? sites,
     Map<String, Map<String, List<TankPressurePoint>>>? diveTankPressures,
-  }) async {
+  }) {
     final builder = XmlBuilder();
 
     builder.processing('xml', 'version="1.0" encoding="UTF-8"');
@@ -229,8 +235,10 @@ class UddfExportService {
                                 },
                               );
                             }
-                            // Dive type
-                            builder.element('divetype', nest: dive.diveTypeId);
+                            // Dive type(s)
+                            for (final typeId in dive.diveTypeIds) {
+                              builder.element('divetype', nest: typeId);
+                            }
                             // Entry method
                             if (dive.entryMethod != null) {
                               builder.element(
@@ -545,9 +553,56 @@ class UddfExportService {
     );
 
     final xmlDoc = builder.buildDocument();
-    final xmlString = xmlDoc.toXmlString(pretty: true, indent: '  ');
-    final fileName = 'dives_export_${_dateFormat.format(DateTime.now())}.uddf';
-    return saveAndShareFile(xmlString, fileName, 'application/xml');
+    return xmlDoc.toXmlString(pretty: true, indent: '  ');
+  }
+
+  String _fileName() =>
+      'dives_export_${_dateFormat.format(DateTime.now())}.uddf';
+
+  /// Export [dives] to UDDF and offer the file via the system share sheet.
+  Future<String> exportDivesToUddf(
+    List<Dive> dives, {
+    List<DiveSite>? sites,
+    Map<String, Map<String, List<TankPressurePoint>>>? diveTankPressures,
+  }) async {
+    final xmlString = generateDivesUddfContent(
+      dives,
+      sites: sites,
+      diveTankPressures: diveTankPressures,
+    );
+    return saveAndShareFile(xmlString, _fileName(), 'application/xml');
+  }
+
+  /// Export [dives] to UDDF and save to a user-selected location.
+  ///
+  /// Returns the chosen path, or null if the save dialog was cancelled.
+  Future<String?> saveDivesToUddfFile(
+    List<Dive> dives, {
+    List<DiveSite>? sites,
+    Map<String, Map<String, List<TankPressurePoint>>>? diveTankPressures,
+  }) async {
+    final xmlString = generateDivesUddfContent(
+      dives,
+      sites: sites,
+      diveTankPressures: diveTankPressures,
+    );
+
+    final result = await FilePicker.saveFile(
+      dialogTitle: 'Save UDDF File',
+      fileName: _fileName(),
+      type: FileType.custom,
+      allowedExtensions: ['uddf', 'xml'],
+      bytes: Uint8List.fromList(utf8.encode(xmlString)),
+    );
+
+    if (result == null) return null;
+
+    // On some platforms, saveFile returns a path but doesn't write the file.
+    if (!Platform.isAndroid) {
+      await File(result).writeAsString(xmlString);
+    }
+
+    return result;
   }
 
   String _visibilityToUddf(enums.Visibility visibility) {
