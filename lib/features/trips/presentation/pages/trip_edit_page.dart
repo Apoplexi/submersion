@@ -923,14 +923,17 @@ class _TripEditPageState extends ConsumerState<TripEditPage> {
           _originalTrip?.startDate != _startDate ||
           _originalTrip?.endDate != _endDate;
 
-      if (mounted && datesChanged && trip.diverId != null) {
+      final activeDiverId = await ref.read(
+        validatedCurrentDiverIdProvider.future,
+      );
+      if (mounted && datesChanged && activeDiverId != null) {
         final candidates = await ref
             .read(tripRepositoryProvider)
             .findCandidateDivesForTrip(
               tripId: savedId,
               startDate: _startDate,
               endDate: _endDate,
-              diverId: trip.diverId!,
+              diverId: activeDiverId,
             );
 
         if (candidates.isNotEmpty && mounted) {
