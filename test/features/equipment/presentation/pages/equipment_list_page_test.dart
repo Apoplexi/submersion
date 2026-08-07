@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/core/constants/list_view_mode.dart';
 import 'package:submersion/core/constants/sort_options.dart';
 import 'package:submersion/core/models/sort_state.dart';
@@ -201,6 +202,35 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.byType(FloatingActionButton), findsOneWidget);
+    });
+
+    testWidgets('compact FAB opens the full editor at /equipment/new', (
+      tester,
+    ) async {
+      tester.view.devicePixelRatio = 1.0;
+      tester.view.physicalSize = const Size(400, 800);
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      final overrides = await _buildOverrides();
+      await tester.pumpWidget(
+        _buildTestWidget(
+          child: const EquipmentListPage(),
+          overrides: overrides,
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byType(FloatingActionButton));
+      await tester.pumpAndSettle();
+
+      // 'new' is the /equipment/new route stub. Adding gear must land on
+      // EquipmentEditPage, which offers the type-specific attribute fields
+      // (dry weight, buoyancy, ...) up front. A quick-add sheet with only
+      // generic fields would force a save-then-edit round trip.
+      expect(find.text('new'), findsOneWidget);
     });
 
     testWidgets('table mode shows column settings button', (tester) async {
@@ -591,7 +621,10 @@ void main() {
     });
   });
 
-  group('AddEquipmentSheet purchase date (#765)', () {
+  // The compact "add equipment" flow used to run through a quick-add bottom
+  // sheet; it now pushes EquipmentEditPage like every other layout. These
+  // groups follow that behaviour onto the surviving form.
+  group('new-equipment purchase date (#765)', () {
     testWidgets('the purchase-date button opens the date picker', (
       tester,
     ) async {
@@ -606,22 +639,17 @@ void main() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: overrides,
-          child: MaterialApp(
-            locale: const Locale('en'),
+          child: const MaterialApp(
+            locale: Locale('en'),
             localizationsDelegates: AppLocalizations.localizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
-            // The sheet normally gets its Material from showModalBottomSheet.
-            home: Scaffold(
-              body: Consumer(
-                builder: (context, ref, _) => AddEquipmentSheet(ref: ref),
-              ),
-            ),
+            home: EquipmentEditPage(),
           ),
         ),
       );
       await tester.pumpAndSettle();
 
-      final dateButton = find.widgetWithText(OutlinedButton, 'Date');
+      final dateButton = find.widgetWithText(OutlinedButton, 'Select Date');
       await tester.scrollUntilVisible(
         dateButton,
         200,
@@ -638,8 +666,8 @@ void main() {
     });
   });
 
-  group('AddEquipmentSheet currency', () {
-    Future<DropdownMenu<String>> pumpSheet(
+  group('new-equipment currency', () {
+    Future<DropdownMenu<String>> pumpEditor(
       WidgetTester tester, {
       required String defaultCurrency,
     }) async {
@@ -657,15 +685,11 @@ void main() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: overrides,
-          child: MaterialApp(
-            locale: const Locale('en'),
+          child: const MaterialApp(
+            locale: Locale('en'),
             localizationsDelegates: AppLocalizations.localizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
-            home: Scaffold(
-              body: Consumer(
-                builder: (context, ref, _) => AddEquipmentSheet(ref: ref),
-              ),
-            ),
+            home: EquipmentEditPage(),
           ),
         ),
       );
@@ -684,7 +708,7 @@ void main() {
     testWidgets('opens in the diver default currency rather than USD', (
       tester,
     ) async {
-      final menu = await pumpSheet(tester, defaultCurrency: 'EUR');
+      final menu = await pumpEditor(tester, defaultCurrency: 'EUR');
 
       expect(menu.controller?.text, 'EUR');
       // The price field's prefix follows the selected currency.
@@ -694,10 +718,68 @@ void main() {
     testWidgets('a non-preset default currency is still offered', (
       tester,
     ) async {
-      final menu = await pumpSheet(tester, defaultCurrency: 'ISK');
+      final menu = await pumpEditor(tester, defaultCurrency: 'ISK');
 
       expect(menu.controller?.text, 'ISK');
       expect(menu.dropdownMenuEntries.map((e) => e.value).first, 'ISK');
+    });
+  });
+
+  group('new-equipment type-specific attributes', () {
+    testWidgets('the add form offers the selected type\'s catalog fields', (
+      tester,
+    ) async {
+      tester.view.devicePixelRatio = 1.0;
+      tester.view.physicalSize = const Size(800, 1600);
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      final overrides = await getBaseOverrides();
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: overrides,
+          child: const MaterialApp(
+            locale: Locale('en'),
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: EquipmentEditPage(),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // The form opens on Regulator: its own catalog fields, plus the
+      // universal dry weight / buoyancy pair the quick-add sheet never had.
+      expect(
+        find.byKey(const ValueKey('attr-field-connection')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const ValueKey('attr-field-dry_weight_kg')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const ValueKey('attr-field-thickness_mm')),
+        findsNothing,
+      );
+
+      // Switching type swaps the field set in place -- no save-then-reopen.
+      await tester.tap(find.byType(DropdownButtonFormField<EquipmentType>));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text(EquipmentType.wetsuit.displayName).last);
+      await tester.pumpAndSettle();
+
+      expect(
+        find.byKey(const ValueKey('attr-field-thickness_mm')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const ValueKey('attr-field-suit_style')),
+        findsOneWidget,
+      );
+      expect(find.byKey(const ValueKey('attr-field-connection')), findsNothing);
     });
   });
 }
