@@ -31,6 +31,12 @@ void main() {
     role: DiveRole.builtInBuddy(),
   );
 
+  domain.BuddyWithRole bwrRole(String id, String roleId) =>
+      domain.BuddyWithRole(
+        buddy: bwr(id).buddy,
+        role: DiveRole.synthetic(roleId),
+      );
+
   test('bulkAddBuddies links each buddy to each dive', () async {
     await repository.bulkAddBuddies(['d1', 'd2'], [bwr('x'), bwr('y')]);
     final d1 = await (db.select(
@@ -94,4 +100,34 @@ void main() {
       expect(rows.single.role, 'instructor'); // role updated in place
     },
   );
+
+  test(
+    'bulkAddBuddies leaves existing roles alone when not overwriting',
+    () async {
+      await repository.bulkAddBuddies(['d1'], [bwrRole('x', 'instructor')]);
+      // Membership-only add across both dives: d1 keeps instructor, d2 is new.
+      await repository.bulkAddBuddies(
+        ['d1', 'd2'],
+        [bwrRole('x', DiveRole.buddyId)],
+        overwriteRole: false,
+      );
+      final rows = await db.select(db.diveBuddies).get();
+      expect(rows.length, 2);
+      expect(
+        {for (final r in rows) r.diveId: r.role},
+        {'d1': 'instructor', 'd2': DiveRole.buddyId},
+      );
+    },
+  );
+
+  test('unanimousBuddyRolesForDives omits buddies with mixed roles', () async {
+    await repository.bulkAddBuddies(['d1', 'd2'], [bwrRole('same', 'student')]);
+    await repository.bulkAddBuddies(['d1'], [bwrRole('mixed', 'instructor')]);
+    await repository.bulkAddBuddies(['d2'], [bwrRole('mixed', 'student')]);
+
+    final roles = await repository.unanimousBuddyRolesForDives(['d1', 'd2']);
+    expect(roles['same'], 'student');
+    expect(roles.containsKey('mixed'), isFalse);
+    expect(await repository.unanimousBuddyRolesForDives(const []), isEmpty);
+  });
 }

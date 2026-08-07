@@ -44,6 +44,27 @@ class BuddyRepository {
     return {for (final r in rows) r.read(j.buddyId)!: r.read(countExpr)!};
   }
 
+  /// {buddyId: the role id every one of [diveIds] agrees on for that buddy}.
+  /// Buddies whose links disagree are omitted, so a caller filling in missing
+  /// links can reuse a unanimous role without flattening a deliberate mix.
+  /// HAVING MIN(role) = MAX(role) keeps the mixed rows in SQLite rather than
+  /// shipping every junction row to Dart on the bulk-edit load path.
+  Future<Map<String, String>> unanimousBuddyRolesForDives(
+    List<String> diveIds,
+  ) async {
+    if (diveIds.isEmpty) return {};
+    final j = _db.diveBuddies;
+    final minRole = j.role.min();
+    final maxRole = j.role.max();
+    final rows =
+        await (_db.selectOnly(j)
+              ..addColumns([j.buddyId, minRole])
+              ..where(j.diveId.isIn(diveIds))
+              ..groupBy([j.buddyId], having: minRole.equalsExp(maxRole)))
+            .get();
+    return {for (final r in rows) r.read(j.buddyId)!: r.read(minRole)!};
+  }
+
   final SyncRepository _syncRepository = SyncRepository();
   final CertificationRepository _certRepo = CertificationRepository();
   final _uuid = const Uuid();
@@ -596,12 +617,15 @@ class BuddyRepository {
     );
   }
 
-  /// Add each buddy (with role) to every dive. Upserts role if already linked.
+  /// Add each buddy (with role) to every dive. Upserts role if already linked,
+  /// unless [overwriteRole] is false — a membership-only add must leave the
+  /// role each existing link already carries untouched (#893).
   /// No notify/transaction — BulkDiveEditService owns those.
   Future<void> bulkAddBuddies(
     List<String> diveIds,
-    List<domain.BuddyWithRole> buddies,
-  ) async {
+    List<domain.BuddyWithRole> buddies, {
+    bool overwriteRole = true,
+  }) async {
     if (diveIds.isEmpty || buddies.isEmpty) return;
     final now = DateTime.now().millisecondsSinceEpoch;
     for (final diveId in diveIds) {
@@ -613,6 +637,7 @@ class BuddyRepository {
                 ))
                 .getSingleOrNull();
         if (existing != null) {
+          if (!overwriteRole) continue;
           await (_db.update(_db.diveBuddies)..where(
                 (t) => t.diveId.equals(diveId) & t.buddyId.equals(bwr.buddy.id),
               ))

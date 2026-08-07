@@ -935,7 +935,15 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
 
   Map<String, int> _buddyCounts = {};
   final Map<String, Buddy> _buddyById = {};
+
+  /// Roles the user picked in the buddy picker during this edit. Membership
+  /// alone never lands here, so an entry means "apply this role" (#893).
   final Map<String, DiveRole> _buddyRoleById = {};
+
+  /// Role id each buddy already carries on every selected dive that has them,
+  /// so filling in the missing links reuses it instead of the default Buddy.
+  /// Buddies with a mix of roles across the selection are absent.
+  final Map<String, String> _existingBuddyRoleIds = {};
   List<BulkMembershipItem> _buddyMembers = [];
   MembershipDelta _buddyDelta = MembershipDelta.empty;
 
@@ -1281,11 +1289,35 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
         ),
       );
     }
-    if (_buddyDelta.addIds.isNotEmpty) {
+    // Membership and role are separate instructions. A row the user only
+    // ticked on must not rewrite the role of links that already exist, while a
+    // role picked in the picker applies even when membership does not change
+    // because the buddy is already on every selected dive (#893).
+    final membershipOnlyAdds = _buddyDelta.addIds
+        .where((id) => !_buddyRoleById.containsKey(id))
+        .toList();
+    final pickedRoleAdds = _buddyRoleById.keys
+        .where(
+          (id) =>
+              !_buddyDelta.removeIds.contains(id) &&
+              (_buddyDelta.addIds.contains(id) ||
+                  _buddyOnEverySelectedDive(id)),
+        )
+        .toList();
+    if (membershipOnlyAdds.isNotEmpty) {
       ops.add(
         BuddiesOp(
           mode: BulkCollectionMode.add,
-          buddies: _buddyDelta.addIds.map(_buddyWithRole).toList(),
+          buddies: membershipOnlyAdds.map(_buddyWithRole).toList(),
+          overwriteRole: false,
+        ),
+      );
+    }
+    if (pickedRoleAdds.isNotEmpty) {
+      ops.add(
+        BuddiesOp(
+          mode: BulkCollectionMode.add,
+          buddies: pickedRoleAdds.map(_buddyWithRole).toList(),
         ),
       );
     }
@@ -3164,6 +3196,7 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
     final typeCounts = await repo.diveTypeCountsForDives(ids);
     final buddyRepo = ref.read(buddyRepositoryProvider);
     final buddyCounts = await buddyRepo.buddyCountsForDives(ids);
+    final buddyRoles = await buddyRepo.unanimousBuddyRolesForDives(ids);
 
     final equip = await EquipmentRepository().getEquipmentByIds(
       equipCounts.keys.toList(),
@@ -3217,6 +3250,9 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
       _buddyById
         ..clear()
         ..addAll(buddyMap);
+      _existingBuddyRoleIds
+        ..clear()
+        ..addAll(buddyRoles);
       _buddyMembers = [
         for (final id in buddyCounts.keys)
           BulkMembershipItem(
@@ -3447,8 +3483,27 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
           createdAt: DateTime.now(),
           updatedAt: DateTime.now(),
         ),
-    role: _buddyRoleById[id] ?? DiveRole.builtInBuddy(),
+    role: _roleForBuddy(id),
   );
+
+  /// Mirrors BulkMembershipEditor's "on all" presence, which is what makes a
+  /// picked role a no-op for the membership delta.
+  bool _buddyOnEverySelectedDive(String id) {
+    final total = widget.bulkDiveIds!.length;
+    return total > 0 && (_buddyCounts[id] ?? 0) >= total;
+  }
+
+  /// A picked role wins; otherwise reuse the role the buddy already has across
+  /// the selection so a membership-only add cannot demote them to Buddy. Only
+  /// the id reaches the database, so an unresolved id stays synthetic (#893).
+  DiveRole _roleForBuddy(String id) {
+    final picked = _buddyRoleById[id];
+    if (picked != null) return picked;
+    final existing = _existingBuddyRoleIds[id];
+    return existing == null
+        ? DiveRole.builtInBuddy()
+        : DiveRole.synthetic(existing);
+  }
 
   void _saveEquipmentAsSet() {
     if (_selectedEquipment.isEmpty) return;

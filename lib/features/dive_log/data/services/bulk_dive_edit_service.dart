@@ -249,10 +249,14 @@ class BulkDiveEditService {
           case BulkCollectionMode.replace:
             await _diveRepo.bulkReplaceEquipment(ids, equipmentIds);
         }
-      case BuddiesOp(:final mode, :final buddies):
+      case BuddiesOp(:final mode, :final buddies, :final overwriteRole):
         switch (mode) {
           case BulkCollectionMode.add:
-            await _buddyRepo.bulkAddBuddies(ids, buddies);
+            await _buddyRepo.bulkAddBuddies(
+              ids,
+              buddies,
+              overwriteRole: overwriteRole,
+            );
           case BulkCollectionMode.remove:
             await _buddyRepo.bulkRemoveBuddies(
               ids,
