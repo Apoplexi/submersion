@@ -4090,6 +4090,30 @@ void main() {
       expect(find.byType(PhotoMarkerOverlay), findsNothing);
     });
 
+    testWidgets('a marker tap opens its preview card on the same frame', (
+      tester,
+    ) async {
+      // The chart's double-tap-to-zoom recognizer is an ancestor of the
+      // overlay and holds the pointer's gesture arena for kDoubleTapTimeout.
+      // Marker taps must not wait it out: assert with a single pump, with no
+      // clock advance, so a regression shows up as a stalled card.
+      await tester.pumpWidget(_buildChart(photoMarkers: [_photoMarker()]));
+      await tester.pump();
+      expect(find.byKey(const ValueKey('photoMarkerCard')), findsNothing);
+
+      await tester.tap(find.byIcon(Icons.camera_alt));
+      await tester.pump();
+      expect(find.byKey(const ValueKey('photoMarkerCard')), findsOneWidget);
+
+      // Tapping the marker again closes the card, likewise immediately.
+      await tester.tap(find.byIcon(Icons.camera_alt));
+      await tester.pump();
+      expect(find.byKey(const ValueKey('photoMarkerCard')), findsNothing);
+
+      // Drain the recognizer's uncancellable kDoubleTapMinTime countdowns.
+      await tester.pump(const Duration(milliseconds: 400));
+    });
+
     testWidgets('hides the overlay when the legend toggle is off', (
       tester,
     ) async {
