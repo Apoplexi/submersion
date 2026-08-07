@@ -24,6 +24,10 @@ class _TestSettingsNotifier extends StateNotifier<AppSettings>
     state = state.copyWith(pressureUnit: unit);
   }
 
+  void updateGradientFactorsForTest(int low, int high) {
+    state = state.copyWith(gfLow: low, gfHigh: high);
+  }
+
   @override
   Future<void> setMapStyle(MapStyle style) async =>
       state = state.copyWith(mapStyle: style);
@@ -158,6 +162,67 @@ void main() {
       final state = container.read(divePlanNotifierProvider);
       expect(state.gfLow, 35);
       expect(state.gfHigh, 75);
+    });
+
+    test('changing deco settings does not discard the in-progress plan', () {
+      final settingsNotifier = _TestSettingsNotifier(gfLow: 50, gfHigh: 85);
+      final container = ProviderContainer(
+        overrides: [settingsProvider.overrideWith((ref) => settingsNotifier)],
+      );
+      addTearDown(container.dispose);
+
+      container
+          .read(divePlanNotifierProvider.notifier)
+          .addSimplePlan(maxDepth: 30.0, bottomTimeMinutes: 20);
+      final planned = container.read(divePlanNotifierProvider);
+      expect(planned.segments, isNotEmpty);
+
+      settingsNotifier.updateGradientFactorsForTest(20, 60);
+
+      final state = container.read(divePlanNotifierProvider);
+      expect(state.id, planned.id);
+      expect(state.segments, planned.segments);
+      // The plan keeps the gradient factors it was built with; settings seed
+      // new plans, they do not retroactively rewrite an open one.
+      expect(state.gfLow, 50);
+      expect(state.gfHigh, 85);
+    });
+
+    test('an untouched plan follows later gradient factor settings', () {
+      final settingsNotifier = _TestSettingsNotifier(gfLow: 50, gfHigh: 85);
+      final container = ProviderContainer(
+        overrides: [settingsProvider.overrideWith((ref) => settingsNotifier)],
+      );
+      addTearDown(container.dispose);
+
+      expect(container.read(divePlanNotifierProvider).gfLow, 50);
+
+      // Settings hydrate from the database after this provider is first read.
+      settingsNotifier.updateGradientFactorsForTest(20, 60);
+
+      final state = container.read(divePlanNotifierProvider);
+      expect(state.gfLow, 20);
+      expect(state.gfHigh, 60);
+      // Adopting a setting is not a diver edit, so it must not arm Save.
+      expect(state.isDirty, isFalse);
+    });
+
+    test('a hand-tuned plan ignores later gradient factor settings', () {
+      final settingsNotifier = _TestSettingsNotifier(gfLow: 50, gfHigh: 85);
+      final container = ProviderContainer(
+        overrides: [settingsProvider.overrideWith((ref) => settingsNotifier)],
+      );
+      addTearDown(container.dispose);
+
+      container
+          .read(divePlanNotifierProvider.notifier)
+          .updateGradientFactors(10, 20);
+
+      settingsNotifier.updateGradientFactorsForTest(20, 60);
+
+      final state = container.read(divePlanNotifierProvider);
+      expect(state.gfLow, 10);
+      expect(state.gfHigh, 20);
     });
 
     test('newPlan uses gradient factor fallback when no callback provided', () {

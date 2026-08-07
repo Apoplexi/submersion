@@ -44,12 +44,24 @@ final planCalculatorServiceProvider = Provider<PlanCalculatorService>((ref) {
   );
 });
 
+/// The diver's configured gradient factors as one value, so a listener fires
+/// once when either half changes and not at all for unrelated settings.
+final planGradientFactorSettingsProvider = Provider<PlanGradientFactors>((ref) {
+  return (low: ref.watch(gfLowProvider), high: ref.watch(gfHighProvider));
+});
+
 // ============================================================================
 // State Notifiers
 // ============================================================================
 
 /// StateNotifier for managing dive plan editing state.
 class DivePlanNotifier extends StateNotifier<DivePlanState> {
+  /// Snapshot taken at construction, deliberately not kept in sync with the
+  /// diver's settings -- see [divePlanNotifierProvider] for why this notifier
+  /// cannot subscribe to them. Only safe for calls that read no setting, which
+  /// today means [PlanCalculatorService.generateProfilePoints] (pure geometry).
+  /// Deco math belongs in [planOutcomeProvider], which recomputes on every
+  /// settings change.
   final PlanCalculatorService _calculator;
   final double Function() _getDefaultReservePressure;
   final PlanGradientFactors Function() _getDefaultGradientFactors;
@@ -135,6 +147,27 @@ class DivePlanNotifier extends StateNotifier<DivePlanState> {
     state = _createInitialState(
       reservePressure: _getDefaultReservePressure(),
       getGradientFactors: _getDefaultGradientFactors,
+    );
+  }
+
+  /// Move an untouched plan onto the diver's current gradient factors.
+  ///
+  /// Settings hydrate from the database after this notifier is built, and the
+  /// diver may change them with the planner open; either way a plan they have
+  /// not started yet should show the factors they actually dive. A plan with
+  /// segments, unsaved edits, or a persisted record is their work and is left
+  /// alone -- including a hand-tuned GF, which marks the plan dirty.
+  ///
+  /// Adopting a setting is not a diver edit, so this does not set `isDirty`.
+  void adoptGradientFactorsIfPristine(PlanGradientFactors gradientFactors) {
+    if (isPersisted || state.isDirty || state.segments.isNotEmpty) return;
+    if (state.gfLow == gradientFactors.low &&
+        state.gfHigh == gradientFactors.high) {
+      return;
+    }
+    state = state.copyWith(
+      gfLow: gradientFactors.low,
+      gfHigh: gradientFactors.high,
     );
   }
 
@@ -592,11 +625,19 @@ class DivePlanNotifier extends StateNotifier<DivePlanState> {
 }
 
 /// Provider for the dive plan notifier.
+///
+/// This provider must never rebuild: rebuilding a StateNotifierProvider
+/// constructs a new notifier, which throws away the plan the diver is editing.
+/// Everything it needs is therefore resolved with `read` rather than `watch` --
+/// settings through closures evaluated when a new plan is created, and
+/// [planCalculatorServiceProvider] once at construction. Watching the latter
+/// rebound the notifier on every deco settings change, silently discarding an
+/// in-progress plan.
 final divePlanNotifierProvider =
     StateNotifierProvider<DivePlanNotifier, DivePlanState>((ref) {
-      final calculator = ref.watch(planCalculatorServiceProvider);
-      // Default reserve: 50 bar for metric, 500 psi (~34.47 bar) for imperial
       final read = ref.read;
+      final calculator = read(planCalculatorServiceProvider);
+      // Default reserve: 50 bar for metric, 500 psi (~34.47 bar) for imperial
       double defaultReserve() {
         final unit = read(pressureUnitProvider);
         return unit == PressureUnit.psi
@@ -604,18 +645,28 @@ final divePlanNotifierProvider =
             : DivePlanState.kDefaultReservePressureBar;
       }
 
-      // A new plan starts on the diver's own deco settings; per-plan edits and
-      // saved plans override this and are never overwritten by it.
+      // A new plan starts on the diver's own deco settings. Once they have
+      // touched or saved it, it is theirs: see adoptGradientFactorsIfPristine.
       PlanGradientFactors defaultGradientFactors() =>
-          (low: read(gfLowProvider), high: read(gfHighProvider));
+          read(planGradientFactorSettingsProvider);
 
-      return DivePlanNotifier(
+      final notifier = DivePlanNotifier(
         calculator,
         reservePressure: defaultReserve(),
         getDefaultReservePressure: defaultReserve,
         getDefaultGradientFactors: defaultGradientFactors,
-        repository: ref.watch(divePlanRepositoryProvider),
+        repository: read(divePlanRepositoryProvider),
       );
+
+      // `listen`, never `watch`: this reacts to settings without rebuilding,
+      // which is what lets an untouched plan track the diver's gradient
+      // factors while an in-progress one survives the same change.
+      ref.listen<PlanGradientFactors>(
+        planGradientFactorSettingsProvider,
+        (_, next) => notifier.adoptGradientFactorsIfPristine(next),
+      );
+
+      return notifier;
     });
 
 // ============================================================================
