@@ -319,7 +319,15 @@ class PdfTemplatePadi extends PdfTemplateBuilder {
                 // Conditions row
                 pw.Row(
                   children: [
-                    _buildPadiField('Vis', dive.visibility?.displayName ?? '-'),
+                    // Measured distance from v144; pre-v144 dives fall back to
+                    // their bucket label. Bare metres matches how this
+                    // template renders depth.
+                    _buildPadiField(
+                      'Vis',
+                      dive.visibilityMeters != null
+                          ? '${dive.visibilityMeters!.toStringAsFixed(0)}m'
+                          : (dive.visibility?.displayName ?? '-'),
+                    ),
                     if (tank != null) ...[
                       _buildPadiField(
                         'Air',

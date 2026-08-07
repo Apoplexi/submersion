@@ -350,7 +350,11 @@ class PdfTemplateNaui extends PdfTemplateBuilder {
                           ),
                           _buildNauiField(
                             'Vis',
-                            dive.visibility?.displayName ?? '-',
+                            // Measured distance from v144; pre-v144 dives fall
+                            // back to their bucket label.
+                            dive.visibilityMeters != null
+                                ? '${dive.visibilityMeters!.toStringAsFixed(0)}m'
+                                : (dive.visibility?.displayName ?? '-'),
                           ),
                           if (dive.currentStrength != null)
                             _buildNauiField(
