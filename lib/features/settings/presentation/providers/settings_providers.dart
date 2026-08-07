@@ -1138,6 +1138,26 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
     await _saveSettings();
   }
 
+  /// Sets the visibility calibration.
+  ///
+  /// Custom thresholds are retained even while a named preset is active, so
+  /// switching away and back restores them; [VisibilityScale.forPreset]
+  /// ignores them unless the preset is custom.
+  Future<void> setVisibilityScale({
+    required VisibilityScalePreset preset,
+    double? excellentM,
+    double? goodM,
+    double? moderateM,
+  }) async {
+    state = state.copyWith(
+      visibilityScalePreset: preset,
+      visibilityScaleExcellentM: excellentM,
+      visibilityScaleGoodM: goodM,
+      visibilityScaleModerateM: moderateM,
+    );
+    await _saveSettings();
+  }
+
   Future<void> setAltitudeUnit(AltitudeUnit unit) async {
     state = state.copyWith(altitudeUnit: unit);
     await _saveSettings();
