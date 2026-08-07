@@ -1687,3 +1687,37 @@ differs per test directory: the arrange/act/assert bodies in Tasks 3, 7, 8, 9,
 10, 11, and 12 are specified by behaviour and must be filled using the
 neighbouring tests' existing setup. Every assertion is stated; only the fixture
 wiring is delegated.
+
+## Deviations found during implementation
+
+Recorded here so the plan matches what was built.
+
+1. **Migration mechanics.** The plan's first draft assumed `m.addColumn()`.
+   The codebase actually uses idempotent `_assert<Thing>Column()` helpers called
+   from both the version gate and the `beforeOpen` backstop, because parallel
+   branches reserve version numbers. Corrected before Task 2 was written.
+   `AppDatabase.migrationVersions` also had to gain 144, which the plan missed.
+
+2. **`Visibility.displayName` is retained.** `environment_enum_display.dart:6-10`
+   documents that enum `displayName` stays English for data interchange. The
+   band renderer was added alongside it rather than replacing it.
+
+3. **Bulk edit was converted too** (Task 8). Not in the plan. Leaving it would
+   have kept the tropical-only bucket list in a live surface and let bulk edits
+   write the legacy column onto new dives.
+
+4. **Two extra read consumers** (Task 9): `dive_merge_builder.dart` would have
+   dropped the measurement during multi-computer consolidation, and the three
+   PDF logbook templates would have printed nothing for measured dives.
+
+5. **Subsurface and CSV import were NOT converted** (Task 12). The plan assumed
+   Subsurface's `visibility` attribute was a distance. It is a subjective 1-5
+   star rating (`subsurface_xml_parser.dart:973`), so mapping it to meters
+   would fabricate a measurement. CSV headers are ambiguous for the same reason.
+
+6. **Four mock `SettingsNotifier` subclasses** needed the new method stubbed;
+   they implement the notifier interface, so any added method breaks them.
+
+7. **`Dive.copyWith` cannot clear a nullable field** (project-wide `?? this.x`
+   idiom), so the clearing test constructs the dive instead. The edit form saves
+   the same way, so this matches real usage rather than working around it.

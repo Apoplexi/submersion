@@ -175,6 +175,17 @@ Consumers: dive detail, compact and dense dive list tiles, the dive table
 column, `DiveFieldExtractor` (`dive_field_extractor.dart:50`), and the CSV and
 Excel exporters.
 
+Two further consumers surfaced during implementation and are covered:
+`dive_merge_builder.dart` (multi-computer consolidation would otherwise drop
+the measurement when merging two records of the same dive) and the three PDF
+logbook templates (which would otherwise print nothing for measured dives).
+
+The bulk-edit form is converted too. It is a second entry surface
+(`BulkScalarInputs`, applied via `buildScalarCompanion`), and leaving it on the
+enum would have kept the tropical-only bucket list in a live surface and let
+bulk edits write the legacy column onto new dives. It now carries
+`visibilityMeters` and clears the legacy bucket when applied.
+
 Rendered form for a numeric dive, in the diver's units:
 
 ```
@@ -238,8 +249,8 @@ shrink naturally as dives are edited.
 | ------ | -------- |
 | UDDF import | Store the parsed distance in `visibilityMeters` instead of bucketing it |
 | UDDF full import | Same |
-| Subsurface XML import | Route the parsed integer to `visibilityMeters` |
-| CSV import | Map a `visibility` header to the numeric column, parsing a unit suffix when present |
+| Subsurface XML import | **No change** - see below |
+| CSV import | **No change** - see below |
 | UDDF export | Emit the true value for numeric dives; fall back to today's representative mapping only for legacy dives |
 | CSV / Excel export | Replace the single `Visibility` column with `Visibility` (numeric, diver's units) and `Visibility Rating` (adjective) |
 
@@ -251,6 +262,20 @@ column.
 
 The UDDF changes are a strict improvement: they remove an existing lossy
 round trip rather than adding behaviour.
+
+### Why Subsurface and CSV import are unchanged
+
+UDDF's `<visibility>` is a distance in meters per the spec, so carrying the
+number through is simply not losing data. Subsurface is different:
+`subsurface_xml_parser.dart:973` maps its `visibility` attribute as a
+subjective **1-5 star rating** (`1 || 2 -> poor`, `3 -> moderate`, ...), not a
+distance. Converting a 3-star rating into "10 m" would invent a measurement
+nobody took, which is exactly the failure this design exists to avoid, so
+Subsurface keeps writing the legacy bucket.
+
+CSV import is left alone for the same reason: a column headed "visibility"
+could be either a distance or a rating, and there is no way to tell from the
+header. Guessing would fabricate.
 
 ## Settings UI
 
