@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:submersion/core/constants/list_view_mode.dart';
+import 'package:submersion/core/theme/full_themes/console_theme.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/features/divers/domain/entities/diver.dart';
 import 'package:submersion/features/divers/presentation/providers/diver_providers.dart';
@@ -807,6 +810,117 @@ void main() {
       await tester.pumpAndSettle();
       // Widget rendered without error.
       expect(find.byType(TripListContent), findsOneWidget);
+    });
+  });
+
+  group('TripListTile typography', () {
+    // The detailed trip card must resolve to the same text theme roles as the
+    // detailed dive and site cards (titleMedium + w600 for the title,
+    // bodyMedium for the date line). Several theme presets differ between the
+    // title and body roles -- console_theme puts a monospace family on title
+    // roles only, minimalist_theme uses w500 for title roles and w300 for body
+    // roles -- so a title that falls back to a body role renders in a visibly
+    // different font from the rest of the app's lists.
+
+    Future<TextStyle> pumpAndResolve(
+      WidgetTester tester,
+      String text, {
+      required String tripName,
+    }) async {
+      final overrides = await _buildPhoneOverrides(
+        trips: [_makeTrip(id: 't1', name: tripName, diveCount: 12)],
+        viewMode: ListViewMode.detailed,
+      );
+      await tester.pumpWidget(
+        testApp(
+          overrides: overrides,
+          child: const TripListContent(showAppBar: false),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // RenderParagraph carries the *effective* style, i.e. the widget's own
+      // style merged with any inherited DefaultTextStyle. Reading Text.style
+      // alone would not catch a title that silently inherits ListTile's
+      // Material 3 default of bodyLarge.
+      return tester.renderObject<RenderParagraph>(find.text(text)).text.style!;
+    }
+
+    testWidgets('title uses titleMedium like dive and site cards', (
+      tester,
+    ) async {
+      final effective = await pumpAndResolve(
+        tester,
+        'Maldives Trip',
+        tripName: 'Maldives Trip',
+      );
+
+      final theme = Theme.of(tester.element(find.byType(TripListTile)));
+      final titleMedium = theme.textTheme.titleMedium!;
+
+      expect(effective.fontFamily, titleMedium.fontFamily);
+      expect(effective.fontSize, titleMedium.fontSize);
+      expect(effective.fontWeight, FontWeight.w600);
+    });
+
+    testWidgets('date line uses bodyMedium like the dive card date line', (
+      tester,
+    ) async {
+      final effective = await pumpAndResolve(
+        tester,
+        'Jun 1, 2024 - Jun 7, 2024',
+        tripName: 'Maldives Trip',
+      );
+
+      final theme = Theme.of(tester.element(find.byType(TripListTile)));
+      final bodyMedium = theme.textTheme.bodyMedium!;
+
+      expect(effective.fontFamily, bodyMedium.fontFamily);
+      expect(effective.fontSize, bodyMedium.fontSize);
+      expect(effective.color, theme.colorScheme.onSurfaceVariant);
+    });
+
+    testWidgets('renders the detailed card without overflow', (tester) async {
+      await pumpAndResolve(tester, 'Maldives Trip', tripName: 'Maldives Trip');
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('title keeps the title font family under the console theme', (
+      tester,
+    ) async {
+      // The console preset is the sharpest case: it puts a monospace family on
+      // the title roles but restores the system family for the body roles. A
+      // trip title that falls back to a body role therefore renders in a
+      // literally different typeface from the dive and site titles.
+      GoogleFonts.config.allowRuntimeFetching = false;
+
+      final titleFamily = consoleLight.textTheme.titleMedium!.fontFamily;
+      final bodyFamily = consoleLight.textTheme.bodyLarge!.fontFamily;
+      // Guard the guard: if these ever converge the assertion below proves
+      // nothing, and this test should be pointed at another preset.
+      expect(titleFamily, isNot(bodyFamily));
+
+      final overrides = await _buildPhoneOverrides(
+        trips: [_makeTrip(id: 't1', name: 'Maldives Trip', diveCount: 12)],
+        viewMode: ListViewMode.detailed,
+      );
+      await tester.pumpWidget(
+        testApp(
+          overrides: overrides,
+          child: Theme(
+            data: consoleLight,
+            child: const TripListContent(showAppBar: false),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final effective = tester
+          .renderObject<RenderParagraph>(find.text('Maldives Trip'))
+          .text
+          .style!;
+
+      expect(effective.fontFamily, titleFamily);
     });
   });
 }
