@@ -5,6 +5,7 @@ import 'package:submersion/core/services/export/csv/csv_export_service.dart';
 import 'package:submersion/core/services/export/excel/excel_export_service.dart';
 import 'package:submersion/core/services/export/kml/kml_export_service.dart';
 import 'package:submersion/core/services/export/shared/file_export_utils.dart';
+import 'package:submersion/core/services/export/uddf/uddf_export_service.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
 import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
 import 'package:submersion/features/equipment/domain/entities/equipment_item.dart';
@@ -106,46 +107,23 @@ void main() {
     });
   });
 
-  // Unit tests run on a desktop host, so saveAndShareFile takes the
-  // save-dialog branch (rather than the mobile share sheet).
-  group('saveAndShareFile on desktop saves to the chosen path', () {
-    late Directory dir;
-    setUp(() async {
-      dir = await Directory.systemTemp.createTemp('export_save_test');
-    });
-    tearDown(() async => dir.delete(recursive: true));
+  group('UddfExportService save to file', () {
+    late UddfExportService service;
+    setUp(() => service = UddfExportService());
 
-    test('writes string content to the picker-chosen path', () async {
-      final target = '${dir.path}/dives_export.csv';
-      mockPicker.saveFileResult = target;
-
-      final path = await saveAndShareFile(
-        'a,b,c',
-        'dives_export.csv',
-        'text/csv',
-      );
-
-      expect(path, target);
-      expect(await File(target).readAsString(), 'a,b,c');
-    });
-
-    test('writes bytes to the picker-chosen path', () async {
-      final target = '${dir.path}/out.bin';
-      mockPicker.saveFileResult = target;
-
-      final path = await saveAndShareFileBytes(
-        [1, 2, 3],
-        'out.bin',
-        'application/octet-stream',
-      );
-
-      expect(path, target);
-      expect(await File(target).readAsBytes(), [1, 2, 3]);
-    });
-
-    test('returns an empty path when the save dialog is cancelled', () async {
+    test('saveDivesToUddfFile returns null when cancelled', () async {
       mockPicker.saveFileResult = null;
-      expect(await saveAndShareFile('x', 'x.csv', 'text/csv'), isEmpty);
+      expect(await service.saveDivesToUddfFile([]), isNull);
+    });
+
+    test('saveDivesToUddfFile writes the UDDF to the chosen path', () async {
+      final dir = await Directory.systemTemp.createTemp('uddf_save_test');
+      addTearDown(() => dir.delete(recursive: true));
+      final target = '${dir.path}/dives.uddf';
+      mockPicker.saveFileResult = target;
+
+      expect(await service.saveDivesToUddfFile([]), target);
+      expect(await File(target).readAsString(), contains('<uddf'));
     });
   });
 }

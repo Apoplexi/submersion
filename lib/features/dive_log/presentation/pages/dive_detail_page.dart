@@ -43,6 +43,7 @@ import 'package:submersion/features/dive_log/presentation/pages/fullscreen_profi
 import 'package:submersion/features/dive_log/presentation/utils/sac_normalization.dart';
 import 'package:submersion/features/planner/presentation/providers/plan_overlay_provider.dart';
 import 'package:submersion/features/pre_dive/presentation/widgets/dive_pre_dive_section.dart';
+import 'package:submersion/shared/widgets/export_destination_sheet.dart';
 import 'package:submersion/shared/widgets/master_detail/detail_scroll_retainer.dart';
 import 'package:submersion/shared/widgets/master_detail/responsive_breakpoints.dart';
 import 'package:submersion/features/dive_log/presentation/providers/profile_playback_provider.dart';
@@ -4933,8 +4934,12 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
                 _handleSingleDiveExport(
                   context,
                   ref,
-                  () =>
+                  title: context.l10n.diveLog_export_csv,
+                  shareFn: () =>
                       ref.read(exportServiceProvider).exportDivesToCsv([dive]),
+                  saveFn: () => ref
+                      .read(exportServiceProvider)
+                      .saveDivesCsvToFile([dive]),
                 );
               },
             ),
@@ -4943,13 +4948,18 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
               title: Text(context.l10n.diveLog_export_uddf),
               subtitle: Text(context.l10n.diveLog_export_uddfDescription),
               onTap: () {
+                final sites = [if (dive.site != null) dive.site!];
                 Navigator.of(sheetContext).pop();
                 _handleSingleDiveExport(
                   context,
                   ref,
-                  () => ref.read(exportServiceProvider).exportDivesToUddf([
-                    dive,
-                  ], sites: dive.site != null ? [dive.site!] : []),
+                  title: context.l10n.diveLog_export_uddf,
+                  shareFn: () => ref
+                      .read(exportServiceProvider)
+                      .exportDivesToUddf([dive], sites: sites),
+                  saveFn: () => ref
+                      .read(exportServiceProvider)
+                      .saveDivesToUddfFile([dive], sites: sites),
                 );
               },
             ),
@@ -4981,39 +4991,58 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
     );
   }
 
+  /// Ask where the export should go, then run the matching delivery.
+  ///
+  /// The save path deliberately runs without the progress dialog: the system
+  /// save panel must not open while a modal route is up (see [_exportDivePdf],
+  /// which pops its dialog before calling the picker for the same reason).
+  /// Generating a single dive's CSV/UDDF is in-memory work, so there is nothing
+  /// to report progress on.
   Future<void> _handleSingleDiveExport(
     BuildContext context,
-    WidgetRef ref,
-    Future<String> Function() exportFn,
-  ) async {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (dialogContext) => AlertDialog(
-        content: Row(
-          children: [
-            const CircularProgressIndicator(),
-            const SizedBox(width: 24),
-            Text(context.l10n.diveLog_export_exporting),
-          ],
+    WidgetRef ref, {
+    required String title,
+    required Future<String> Function() shareFn,
+    required Future<String?> Function() saveFn,
+  }) async {
+    final destination = await showExportDestinationSheet(context, title: title);
+    if (destination == null || !context.mounted) return;
+
+    final showProgress = destination == ExportDestination.share;
+    if (showProgress) {
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (dialogContext) => AlertDialog(
+          content: Row(
+            children: [
+              const CircularProgressIndicator(),
+              const SizedBox(width: 24),
+              Text(context.l10n.diveLog_export_exporting),
+            ],
+          ),
         ),
-      ),
-    );
+      );
+    }
 
     try {
-      await exportFn();
-      if (context.mounted) {
-        Navigator.of(context).pop();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(context.l10n.diveLog_export_success),
-            backgroundColor: Colors.green,
-          ),
-        );
-      }
+      final path = switch (destination) {
+        ExportDestination.share => await shareFn(),
+        ExportDestination.saveToFile => await saveFn(),
+      };
+      if (!context.mounted) return;
+      if (showProgress) Navigator.of(context).pop();
+      // A null path means the save panel was dismissed - not a failure.
+      if (path == null) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(context.l10n.diveLog_export_success),
+          backgroundColor: Colors.green,
+        ),
+      );
     } catch (e) {
       if (context.mounted) {
-        Navigator.of(context).pop();
+        if (showProgress) Navigator.of(context).pop();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(context.l10n.diveLog_export_failed(e.toString())),

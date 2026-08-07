@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
@@ -7,43 +6,17 @@ import 'package:gal/gal.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 
-/// Desktop platforms expect a "Save As" dialog; the system share sheet is a
-/// mobile idiom (and on macOS it offers AirDrop/Messages, which makes no sense
-/// for a data export).
-bool get _isDesktop =>
-    Platform.isMacOS || Platform.isWindows || Platform.isLinux;
-
-/// Prompt for a save location and write [bytes] there. Returns the chosen path,
-/// or an empty string if the user cancelled.
-Future<String> _saveToUserFile(Uint8List bytes, String fileName) async {
-  final dot = fileName.lastIndexOf('.');
-  final ext = dot >= 0 ? fileName.substring(dot + 1) : '';
-  final path = await FilePicker.saveFile(
-    dialogTitle: 'Save Export',
-    fileName: fileName,
-    type: ext.isEmpty ? FileType.any : FileType.custom,
-    allowedExtensions: ext.isEmpty ? null : [ext],
-    bytes: bytes,
-  );
-  if (path == null) return '';
-  // On desktop, saveFile returns a path but does not write the file itself.
-  if (!Platform.isAndroid) {
-    await File(path).writeAsBytes(bytes);
-  }
-  return path;
-}
-
-/// Save string content to a file. On desktop the user picks the location; on
-/// mobile it is written to the app directory and offered via the share sheet.
+/// Save string content to a file and open the system share sheet.
+///
+/// This is the "share" half of the export idiom. Callers that want the user to
+/// pick a destination on disk should use the matching `save*ToFile` helper
+/// instead -- those return `null` when the save dialog is cancelled, which this
+/// function has no way to express.
 Future<String> saveAndShareFile(
   String content,
   String fileName,
   String mimeType,
 ) async {
-  if (_isDesktop) {
-    return _saveToUserFile(Uint8List.fromList(utf8.encode(content)), fileName);
-  }
-
   final directory = await getApplicationDocumentsDirectory();
   final file = File('${directory.path}/$fileName');
   await file.writeAsString(content);
@@ -58,17 +31,14 @@ Future<String> saveAndShareFile(
   return file.path;
 }
 
-/// Save raw bytes to a file. On desktop the user picks the location; on mobile
-/// it is written to the app directory and offered via the share sheet.
+/// Save raw bytes to a file and open the system share sheet.
+///
+/// See [saveAndShareFile] for why this never opens a save dialog.
 Future<String> saveAndShareFileBytes(
   List<int> bytes,
   String fileName,
   String mimeType,
 ) async {
-  if (_isDesktop) {
-    return _saveToUserFile(Uint8List.fromList(bytes), fileName);
-  }
-
   final directory = await getApplicationDocumentsDirectory();
   final file = File('${directory.path}/$fileName');
   await file.writeAsBytes(bytes);

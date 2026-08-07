@@ -6,8 +6,6 @@ import 'package:submersion/core/services/export/export_service.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
 import 'package:submersion/features/trips/domain/entities/trip.dart';
 
-import '../../helpers/mock_file_picker_platform.dart';
-
 void main() {
   late ExportService exportService;
   late Directory testDir;
@@ -39,11 +37,6 @@ void main() {
             return null;
           },
         );
-
-    // On desktop the export saves to a user-chosen path via a save dialog;
-    // point that dialog at the temp dir so the written file can be read back.
-    FilePickerPlatform.instance = MockFilePickerPlatform()
-      ..saveFileResult = '${testDir.path}/export_output';
   });
 
   tearDownAll(() async {
