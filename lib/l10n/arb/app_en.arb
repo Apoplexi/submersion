@@ -6673,6 +6673,15 @@
   "@media_diveMediaSection_deleteButton": {
     "description": "Dive media selection: destructive delete action"
   },
+  "media_diveMediaSection_deleteError": "Failed to delete: {error}",
+  "@media_diveMediaSection_deleteError": {
+    "description": "Error snackbar when the dive media bulk delete fails",
+    "placeholders": {
+      "error": {
+        "type": "Object"
+      }
+    }
+  },
   "media_diveMediaSection_deleteSelectedContent": "This removes them from the app and any media store. This cannot be undone.",
   "@media_diveMediaSection_deleteSelectedContent": {
     "description": "Body of the dive media bulk delete confirmation"

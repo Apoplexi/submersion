@@ -11545,6 +11545,11 @@ class AppLocalizationsAr extends AppLocalizations {
   String get media_diveMediaSection_deleteButton => 'حذف';
 
   @override
+  String media_diveMediaSection_deleteError(Object error) {
+    return 'فشل في الحذف: $error';
+  }
+
+  @override
   String get media_diveMediaSection_deleteSelectedContent =>
       'ستتم إزالتها من التطبيق ومن أي مخزن وسائط. لا يمكن التراجع عن هذا.';
 

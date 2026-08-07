@@ -3759,6 +3759,7 @@
   "media_diveMediaSection_thumbnailLabel": "عرض الصورة. اضغط مطولًا لإلغاء الربط",
   "media_diveMediaSection_title": "الصور والفيديو",
   "media_diveMediaSection_deleteButton": "حذف",
+  "media_diveMediaSection_deleteError": "فشل في الحذف: {error}",
   "media_diveMediaSection_deleteSelectedContent": "ستتم إزالتها من التطبيق ومن أي مخزن وسائط. لا يمكن التراجع عن هذا.",
   "media_diveMediaSection_deleteSelectedSuccess": "تم حذف {count} عناصر",
   "media_diveMediaSection_deleteSelectedTitle": "حذف {count} عناصر؟",

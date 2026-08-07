@@ -11760,6 +11760,11 @@ class AppLocalizationsPt extends AppLocalizations {
   String get media_diveMediaSection_deleteButton => 'Excluir';
 
   @override
+  String media_diveMediaSection_deleteError(Object error) {
+    return 'Falha ao excluir: $error';
+  }
+
+  @override
   String get media_diveMediaSection_deleteSelectedContent =>
       'Isso os remove do aplicativo e de qualquer armazenamento de mídia. Não pode ser desfeito.';
 

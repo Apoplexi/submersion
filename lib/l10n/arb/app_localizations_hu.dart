@@ -11719,6 +11719,11 @@ class AppLocalizationsHu extends AppLocalizations {
   String get media_diveMediaSection_deleteButton => 'Törlés';
 
   @override
+  String media_diveMediaSection_deleteError(Object error) {
+    return 'Nem sikerult a torles: $error';
+  }
+
+  @override
   String get media_diveMediaSection_deleteSelectedContent =>
       'Ez eltávolítja őket az alkalmazásból és minden médiatárból. Nem vonható vissza.';
 

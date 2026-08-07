@@ -205,6 +205,35 @@ void main() {
       expect(mediaRepo.reassigned?.$2, 'd7');
     });
 
+    testWidgets('a confident match on an unnumbered dive falls back to the '
+        'generic label instead of "#0"', (tester) async {
+      await tester.pumpWidget(
+        host(
+          entries: [MediaLibraryEntry(item: mediaItem('m1'))],
+          suggestions: {
+            'm1': const InboxSuggestion(
+              match: TimestampMatch(
+                kind: TimestampMatchKind.confident,
+                diveId: 'd7',
+              ),
+            ),
+          },
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Link to #0'), findsNothing);
+      // The chip carries the generic label; the menu item shares the string,
+      // so the chip is identified by its avatar icon.
+      final chip = tester.widget<ActionChip>(find.byType(ActionChip));
+      expect(((chip.label as Text).data), 'Link to dive');
+
+      await tester.tap(find.byType(ActionChip));
+      await tester.pumpAndSettle();
+      expect(mediaRepo.reassigned?.$1, ['m1']);
+      expect(mediaRepo.reassigned?.$2, 'd7');
+    });
+
     testWidgets('Keep calls markRetainedInLibrary', (tester) async {
       await tester.pumpWidget(
         host(

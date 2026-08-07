@@ -11466,6 +11466,11 @@ class AppLocalizationsHe extends AppLocalizations {
   String get media_diveMediaSection_deleteButton => 'מחיקה';
 
   @override
+  String media_diveMediaSection_deleteError(Object error) {
+    return 'המחיקה נכשלה: $error';
+  }
+
+  @override
   String get media_diveMediaSection_deleteSelectedContent =>
       'פעולה זו מסירה אותם מהאפליקציה ומכל מאגר מדיה. לא ניתן לבטל זאת.';
 

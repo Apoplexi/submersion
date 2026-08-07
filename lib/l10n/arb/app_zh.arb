@@ -3903,6 +3903,7 @@
   "media_diveMediaSection_thumbnailLabel": "查看照片。长按以选择",
   "media_diveMediaSection_title": "照片 & 视频",
   "media_diveMediaSection_deleteButton": "删除",
+  "media_diveMediaSection_deleteError": "删除失败：{error}",
   "media_diveMediaSection_deleteSelectedContent": "这会将它们从应用和任何媒体存储中移除。此操作无法撤销。",
   "media_diveMediaSection_deleteSelectedSuccess": "已删除 {count} 个项目",
   "media_diveMediaSection_deleteSelectedTitle": "删除 {count} 个项目？",

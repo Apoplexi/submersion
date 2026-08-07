@@ -11218,6 +11218,11 @@ class AppLocalizationsZh extends AppLocalizations {
   String get media_diveMediaSection_deleteButton => '删除';
 
   @override
+  String media_diveMediaSection_deleteError(Object error) {
+    return '删除失败：$error';
+  }
+
+  @override
   String get media_diveMediaSection_deleteSelectedContent =>
       '这会将它们从应用和任何媒体存储中移除。此操作无法撤销。';
 

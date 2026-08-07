@@ -11745,6 +11745,11 @@ class AppLocalizationsDe extends AppLocalizations {
   String get media_diveMediaSection_deleteButton => 'Löschen';
 
   @override
+  String media_diveMediaSection_deleteError(Object error) {
+    return 'Löschen fehlgeschlagen: $error';
+  }
+
+  @override
   String get media_diveMediaSection_deleteSelectedContent =>
       'Dies entfernt sie aus der App und aus jedem Medienspeicher. Dies kann nicht rückgängig gemacht werden.';
 

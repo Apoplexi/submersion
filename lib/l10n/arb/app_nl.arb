@@ -3759,6 +3759,7 @@
   "media_diveMediaSection_thumbnailLabel": "Foto bekijken. Lang indrukken om te ontkoppelen",
   "media_diveMediaSection_title": "Foto's & video",
   "media_diveMediaSection_deleteButton": "Verwijderen",
+  "media_diveMediaSection_deleteError": "Verwijderen mislukt: {error}",
   "media_diveMediaSection_deleteSelectedContent": "Dit verwijdert ze uit de app en elke mediaopslag. Dit kan niet ongedaan worden gemaakt.",
   "media_diveMediaSection_deleteSelectedSuccess": "{count} items verwijderd",
   "media_diveMediaSection_deleteSelectedTitle": "{count} items verwijderen?",

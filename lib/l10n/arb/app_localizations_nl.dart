@@ -11668,6 +11668,11 @@ class AppLocalizationsNl extends AppLocalizations {
   String get media_diveMediaSection_deleteButton => 'Verwijderen';
 
   @override
+  String media_diveMediaSection_deleteError(Object error) {
+    return 'Verwijderen mislukt: $error';
+  }
+
+  @override
   String get media_diveMediaSection_deleteSelectedContent =>
       'Dit verwijdert ze uit de app en elke mediaopslag. Dit kan niet ongedaan worden gemaakt.';
 

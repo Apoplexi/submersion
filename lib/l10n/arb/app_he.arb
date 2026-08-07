@@ -3687,6 +3687,7 @@
   "media_diveMediaSection_thumbnailLabel": "הצג תמונה. לחיצה ארוכה לביטול קישור",
   "media_diveMediaSection_title": "תמונות וסרטונים",
   "media_diveMediaSection_deleteButton": "מחיקה",
+  "media_diveMediaSection_deleteError": "המחיקה נכשלה: {error}",
   "media_diveMediaSection_deleteSelectedContent": "פעולה זו מסירה אותם מהאפליקציה ומכל מאגר מדיה. לא ניתן לבטל זאת.",
   "media_diveMediaSection_deleteSelectedSuccess": "{count} פריטים נמחקו",
   "media_diveMediaSection_deleteSelectedTitle": "למחוק {count} פריטים?",

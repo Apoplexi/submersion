@@ -20042,6 +20042,12 @@ abstract class AppLocalizations {
   /// **'Delete'**
   String get media_diveMediaSection_deleteButton;
 
+  /// Error snackbar when the dive media bulk delete fails
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to delete: {error}'**
+  String media_diveMediaSection_deleteError(Object error);
+
   /// Body of the dive media bulk delete confirmation
   ///
   /// In en, this message translates to:

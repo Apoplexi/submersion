@@ -3687,6 +3687,7 @@
   "media_diveMediaSection_thumbnailLabel": "Visualizza foto. Premi a lungo per scollegare",
   "media_diveMediaSection_title": "Foto e video",
   "media_diveMediaSection_deleteButton": "Elimina",
+  "media_diveMediaSection_deleteError": "Eliminazione non riuscita: {error}",
   "media_diveMediaSection_deleteSelectedContent": "Questo li rimuove dall'app e da qualsiasi archivio multimediale. Non può essere annullato.",
   "media_diveMediaSection_deleteSelectedSuccess": "{count} elementi eliminati",
   "media_diveMediaSection_deleteSelectedTitle": "Eliminare {count} elementi?",

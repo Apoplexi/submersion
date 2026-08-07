@@ -3759,6 +3759,7 @@
   "media_diveMediaSection_thumbnailLabel": "Ver foto. Mantener presionado para desvincular",
   "media_diveMediaSection_title": "Fotos y video",
   "media_diveMediaSection_deleteButton": "Eliminar",
+  "media_diveMediaSection_deleteError": "Error al eliminar: {error}",
   "media_diveMediaSection_deleteSelectedContent": "Esto los elimina de la aplicación y de cualquier almacén multimedia. No se puede deshacer.",
   "media_diveMediaSection_deleteSelectedSuccess": "{count} elementos eliminados",
   "media_diveMediaSection_deleteSelectedTitle": "¿Eliminar {count} elementos?",

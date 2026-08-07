@@ -11564,6 +11564,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get media_diveMediaSection_deleteButton => 'Delete';
 
   @override
+  String media_diveMediaSection_deleteError(Object error) {
+    return 'Failed to delete: $error';
+  }
+
+  @override
   String get media_diveMediaSection_deleteSelectedContent =>
       'This removes them from the app and any media store. This cannot be undone.';
 
