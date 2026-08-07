@@ -3175,8 +3175,10 @@
   "diveLog_chartSection_markers": "Markers",
   "diveLog_chartSection_decompression": "Decompression",
   "diveLog_chartSection_gasAnalysis": "Gas Analysis",
+  "diveLog_chartSection_display": "Display",
   "diveLog_chartSection_other": "Other",
   "diveLog_chartSection_tankPressures": "Tank Pressures",
+  "diveLog_chartOption_metricsFollowViewport": "Keep overlays in view",
   "diveLog_pressure_estimatedSuffix": "(est.)",
   "@diveLog_pressure_estimatedSuffix": {
     "description": "Short suffix appended to a tank label when its pressure line is a linear start-to-end estimate rather than measured air-integrated data. Abbreviation of 'estimated'."
@@ -7765,6 +7767,8 @@
   "settings_appearance_pressureThresholdMarkers": "Pressure threshold markers",
   "settings_appearance_pressureThresholdMarkers_subtitle": "Show markers when tank pressure crosses thresholds",
   "settings_appearance_pressureThresholdMarkers_subtitleFull": "Show markers when tank pressure crosses 2/3, 1/2, and 1/3 thresholds",
+  "settings_appearance_metricsFollowViewport": "Keep overlays in view when zooming",
+  "settings_appearance_metricsFollowViewport_subtitle": "Fit overlays such as NDL and ppO2 to the visible area instead of magnifying them with the depth axis",
   "settings_appearance_rightYAxisMetric": "Right Y-axis metric",
   "settings_appearance_rightYAxisMetric_subtitle": "Default metric shown on right axis",
   "settings_appearance_subsection_decompressionMetrics": "Decompression Metrics",

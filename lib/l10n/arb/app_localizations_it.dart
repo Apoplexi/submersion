@@ -5778,10 +5778,17 @@ class AppLocalizationsIt extends AppLocalizations {
   String get diveLog_chartSection_gasAnalysis => 'Analisi dei gas';
 
   @override
+  String get diveLog_chartSection_display => 'Visualizzazione';
+
+  @override
   String get diveLog_chartSection_other => 'Altro';
 
   @override
   String get diveLog_chartSection_tankPressures => 'Pressioni delle bombole';
+
+  @override
+  String get diveLog_chartOption_metricsFollowViewport =>
+      'Mantieni le sovrapposizioni in vista';
 
   @override
   String get diveLog_pressure_estimatedSuffix => '(stim.)';
@@ -13484,6 +13491,14 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String get settings_appearance_pressureThresholdMarkers_subtitleFull =>
       'Mostra i marcatori quando la pressione della bombola supera le soglie di 2/3, 1/2 e 1/3';
+
+  @override
+  String get settings_appearance_metricsFollowViewport =>
+      'Mantieni le sovrapposizioni in vista durante lo zoom';
+
+  @override
+  String get settings_appearance_metricsFollowViewport_subtitle =>
+      'Adatta le sovrapposizioni come NDL e ppO2 all\'area visibile invece di ingrandirle con l\'asse della profondità';
 
   @override
   String get settings_appearance_rightYAxisMetric => 'Metrica asse Y destro';

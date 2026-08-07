@@ -5757,10 +5757,17 @@ class AppLocalizationsHu extends AppLocalizations {
   String get diveLog_chartSection_gasAnalysis => 'Gazelemzes';
 
   @override
+  String get diveLog_chartSection_display => 'Megjelenítés';
+
+  @override
   String get diveLog_chartSection_other => 'Egyeb';
 
   @override
   String get diveLog_chartSection_tankPressures => 'Palacknyomasok';
+
+  @override
+  String get diveLog_chartOption_metricsFollowViewport =>
+      'Rétegek nézetben tartása';
 
   @override
   String get diveLog_pressure_estimatedSuffix => '(becs.)';
@@ -13440,6 +13447,14 @@ class AppLocalizationsHu extends AppLocalizations {
   @override
   String get settings_appearance_pressureThresholdMarkers_subtitleFull =>
       'Jelolok megjelenites, amikor a palack nyomas atlepi a 2/3, 1/2 es 1/3 küszöbértekeket';
+
+  @override
+  String get settings_appearance_metricsFollowViewport =>
+      'Rétegek nézetben tartása nagyításkor';
+
+  @override
+  String get settings_appearance_metricsFollowViewport_subtitle =>
+      'Az olyan rétegek, mint az NDL és a ppO2, a látható területhez igazodjanak, ahelyett hogy a mélységtengellyel együtt nagyítódnának';
 
   @override
   String get settings_appearance_rightYAxisMetric => 'Jobb Y-tengely metrika';

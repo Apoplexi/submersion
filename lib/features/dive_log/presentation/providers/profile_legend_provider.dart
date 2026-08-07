@@ -73,6 +73,13 @@ class ProfileLegendState {
   // Collapsible section expanded/collapsed state (session-only)
   final Map<String, bool> sectionExpanded;
 
+  /// Whether secondary-axis metric overlays follow the visible depth window
+  /// when zoomed, instead of magnifying with the depth axis and potentially
+  /// leaving the viewport. Seeds from the device-local
+  /// [AppSettings.profileMetricsFollowViewport]; this is a rendering mode, not
+  /// a series toggle, so it is excluded from [activeSecondaryCount].
+  final bool metricsFollowViewport;
+
   const ProfileLegendState({
     this.rightAxisMetric,
     this.rightAxisHidden = false,
@@ -115,7 +122,9 @@ class ProfileLegendState {
       'gasAnalysis': false,
       'other': false,
       'tankPressures': true,
+      'display': false,
     },
+    this.metricsFollowViewport = false,
   });
 
   /// Count of active secondary toggles (for badge display)
@@ -186,6 +195,7 @@ class ProfileLegendState {
     Map<String, bool>? showTankPressure,
     bool? showGas,
     Map<String, bool>? sectionExpanded,
+    bool? metricsFollowViewport,
   }) {
     return ProfileLegendState(
       rightAxisMetric: clearRightAxisMetric
@@ -224,6 +234,8 @@ class ProfileLegendState {
       showTankPressure: showTankPressure ?? this.showTankPressure,
       showGas: showGas ?? this.showGas,
       sectionExpanded: sectionExpanded ?? this.sectionExpanded,
+      metricsFollowViewport:
+          metricsFollowViewport ?? this.metricsFollowViewport,
     );
   }
 
@@ -265,6 +277,7 @@ class ProfileLegendState {
           decoStopSource == other.decoStopSource &&
           mapEquals(showTankPressure, other.showTankPressure) &&
           showGas == other.showGas &&
+          metricsFollowViewport == other.metricsFollowViewport &&
           mapEquals(sectionExpanded, other.sectionExpanded);
 
   @override
@@ -302,6 +315,7 @@ class ProfileLegendState {
     decoStopSource,
     ...showTankPressure.entries,
     showGas,
+    metricsFollowViewport,
     ...sectionExpanded.entries,
   ]);
 }
@@ -355,6 +369,7 @@ class ProfileLegend extends _$ProfileLegend {
           defaultTtsSource: s.defaultTtsSource,
           defaultCnsSource: s.defaultCnsSource,
           defaultDecoStopSource: s.defaultDecoStopSource,
+          profileMetricsFollowViewport: s.profileMetricsFollowViewport,
         ),
       ),
     );
@@ -390,7 +405,14 @@ class ProfileLegend extends _$ProfileLegend {
       ttsSource: settings.defaultTtsSource,
       cnsSource: settings.defaultCnsSource,
       decoStopSource: settings.defaultDecoStopSource,
+      metricsFollowViewport: settings.profileMetricsFollowViewport,
     );
+  }
+
+  /// Flip the overlay scaling mode for this chart session only, leaving the
+  /// device-local default untouched.
+  void toggleMetricsFollowViewport() {
+    state = state.copyWith(metricsFollowViewport: !state.metricsFollowViewport);
   }
 
   /// Set the right axis metric for this session (also un-hides it)

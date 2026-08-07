@@ -423,6 +423,10 @@ class _MockSettingsNotifier extends StateNotifier<AppSettings>
       );
 
   @override
+  Future<void> setProfileMetricsFollowViewport(bool value) async =>
+      state = state.copyWith(profileMetricsFollowViewport: value);
+
+  @override
   Future<void> setPerdixOverlayEnabled(bool value) async =>
       state = state.copyWith(perdixOverlayEnabled: value);
 

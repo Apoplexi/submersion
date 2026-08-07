@@ -5784,10 +5784,17 @@ class AppLocalizationsPt extends AppLocalizations {
   String get diveLog_chartSection_gasAnalysis => 'Analise de gases';
 
   @override
+  String get diveLog_chartSection_display => 'Exibição';
+
+  @override
   String get diveLog_chartSection_other => 'Outros';
 
   @override
   String get diveLog_chartSection_tankPressures => 'Pressoes dos cilindros';
+
+  @override
+  String get diveLog_chartOption_metricsFollowViewport =>
+      'Manter as sobreposições visíveis';
 
   @override
   String get diveLog_pressure_estimatedSuffix => '(est.)';
@@ -13489,6 +13496,14 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get settings_appearance_pressureThresholdMarkers_subtitleFull =>
       'Mostrar marcadores quando a pressao do cilindro cruza os limites de 2/3, 1/2 e 1/3';
+
+  @override
+  String get settings_appearance_metricsFollowViewport =>
+      'Manter as sobreposições visíveis ao ampliar';
+
+  @override
+  String get settings_appearance_metricsFollowViewport_subtitle =>
+      'Ajustar as sobreposições como NDL e ppO2 à área visível em vez de ampliá-las com o eixo de profundidade';
 
   @override
   String get settings_appearance_rightYAxisMetric =>

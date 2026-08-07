@@ -5627,10 +5627,17 @@ class AppLocalizationsHe extends AppLocalizations {
   String get diveLog_chartSection_gasAnalysis => 'ניתוח גזים';
 
   @override
+  String get diveLog_chartSection_display => 'תצוגה';
+
+  @override
   String get diveLog_chartSection_other => 'אחר';
 
   @override
   String get diveLog_chartSection_tankPressures => 'לחצי מיכלים';
+
+  @override
+  String get diveLog_chartOption_metricsFollowViewport =>
+      'שמירת שכבות העל בתצוגה';
 
   @override
   String get diveLog_pressure_estimatedSuffix => '(משוער)';
@@ -13156,6 +13163,14 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String get settings_appearance_pressureThresholdMarkers_subtitleFull =>
       'הצג סמנים כאשר לחץ הבלון חוצה ספי 2/3, 1/2 ו-1/3';
+
+  @override
+  String get settings_appearance_metricsFollowViewport =>
+      'שמירת שכבות העל בתצוגה בעת זום';
+
+  @override
+  String get settings_appearance_metricsFollowViewport_subtitle =>
+      'התאמת שכבות על כגון NDL ו-ppO2 לאזור הנראה במקום להגדיל אותן יחד עם ציר העומק';
 
   @override
   String get settings_appearance_rightYAxisMetric => 'מדד ציר Y ימני';

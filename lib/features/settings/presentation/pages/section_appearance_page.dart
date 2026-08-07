@@ -440,6 +440,19 @@ class SectionAppearancePage extends ConsumerWidget {
         ),
       ),
       SwitchListTile(
+        title: Text(context.l10n.settings_appearance_metricsFollowViewport),
+        subtitle: Text(
+          context.l10n.settings_appearance_metricsFollowViewport_subtitle,
+        ),
+        secondary: const Icon(Icons.height),
+        value: settings.profileMetricsFollowViewport,
+        onChanged: (value) {
+          ref
+              .read(settingsProvider.notifier)
+              .setProfileMetricsFollowViewport(value);
+        },
+      ),
+      SwitchListTile(
         title: Text(context.l10n.settings_appearance_maxDepthMarker),
         subtitle: Text(
           context.l10n.settings_appearance_maxDepthMarker_subtitleFull,

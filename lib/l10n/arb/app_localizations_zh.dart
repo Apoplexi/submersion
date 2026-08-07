@@ -5488,10 +5488,16 @@ class AppLocalizationsZh extends AppLocalizations {
   String get diveLog_chartSection_gasAnalysis => '气体分析';
 
   @override
+  String get diveLog_chartSection_display => '显示';
+
+  @override
   String get diveLog_chartSection_other => '其他';
 
   @override
   String get diveLog_chartSection_tankPressures => '气瓶压力';
+
+  @override
+  String get diveLog_chartOption_metricsFollowViewport => '保持叠加层在视图内';
 
   @override
   String get diveLog_pressure_estimatedSuffix => '(估算)';
@@ -12848,6 +12854,13 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String get settings_appearance_pressureThresholdMarkers_subtitleFull =>
       '当气瓶压力超过 2/3、1/2 和 1/3 阈值时显示标记';
+
+  @override
+  String get settings_appearance_metricsFollowViewport => '缩放时保持叠加层在视图内';
+
+  @override
+  String get settings_appearance_metricsFollowViewport_subtitle =>
+      '将 NDL、ppO2 等叠加层适配到可见区域，而不是随深度轴一起放大';
 
   @override
   String get settings_appearance_rightYAxisMetric => '右Y轴指标';

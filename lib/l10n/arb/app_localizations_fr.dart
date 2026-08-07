@@ -5802,10 +5802,17 @@ class AppLocalizationsFr extends AppLocalizations {
   String get diveLog_chartSection_gasAnalysis => 'Analyse des gaz';
 
   @override
+  String get diveLog_chartSection_display => 'Affichage';
+
+  @override
   String get diveLog_chartSection_other => 'Autre';
 
   @override
   String get diveLog_chartSection_tankPressures => 'Pressions des blocs';
+
+  @override
+  String get diveLog_chartOption_metricsFollowViewport =>
+      'Garder les superpositions visibles';
 
   @override
   String get diveLog_pressure_estimatedSuffix => '(est.)';
@@ -13527,6 +13534,14 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get settings_appearance_pressureThresholdMarkers_subtitleFull =>
       'Afficher les marqueurs lorsque la pression du bloc franchit les seuils de 2/3, 1/2 et 1/3';
+
+  @override
+  String get settings_appearance_metricsFollowViewport =>
+      'Garder les superpositions visibles lors du zoom';
+
+  @override
+  String get settings_appearance_metricsFollowViewport_subtitle =>
+      'Ajuster les superpositions telles que NDL et ppO2 à la zone visible au lieu de les agrandir avec l\'axe de profondeur';
 
   @override
   String get settings_appearance_rightYAxisMetric =>

@@ -5675,10 +5675,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String get diveLog_chartSection_gasAnalysis => 'Gas Analysis';
 
   @override
+  String get diveLog_chartSection_display => 'Display';
+
+  @override
   String get diveLog_chartSection_other => 'Other';
 
   @override
   String get diveLog_chartSection_tankPressures => 'Tank Pressures';
+
+  @override
+  String get diveLog_chartOption_metricsFollowViewport =>
+      'Keep overlays in view';
 
   @override
   String get diveLog_pressure_estimatedSuffix => '(est.)';
@@ -13270,6 +13277,14 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get settings_appearance_pressureThresholdMarkers_subtitleFull =>
       'Show markers when tank pressure crosses 2/3, 1/2, and 1/3 thresholds';
+
+  @override
+  String get settings_appearance_metricsFollowViewport =>
+      'Keep overlays in view when zooming';
+
+  @override
+  String get settings_appearance_metricsFollowViewport_subtitle =>
+      'Fit overlays such as NDL and ppO2 to the visible area instead of magnifying them with the depth axis';
 
   @override
   String get settings_appearance_rightYAxisMetric => 'Right Y-axis metric';
