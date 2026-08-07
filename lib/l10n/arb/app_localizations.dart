@@ -20965,6 +20965,210 @@ abstract class AppLocalizations {
   /// **'Imported media is kept in your library and can be linked to dives automatically.'**
   String get media_import_intro;
 
+  /// Media console label for the sources section
+  ///
+  /// In en, this message translates to:
+  /// **'Sources'**
+  String get media_console_sources;
+
+  /// Sources section: per-source browse list header
+  ///
+  /// In en, this message translates to:
+  /// **'Browse by source'**
+  String get media_sources_browseHeader;
+
+  /// Sources section: watcher folder list header
+  ///
+  /// In en, this message translates to:
+  /// **'Watched folders'**
+  String get media_sources_watchedHeader;
+
+  /// Sources section: register a watched folder
+  ///
+  /// In en, this message translates to:
+  /// **'Add folder...'**
+  String get media_sources_addWatched;
+
+  /// Sources section: the watcher scan threw
+  ///
+  /// In en, this message translates to:
+  /// **'Scan failed'**
+  String get media_sources_scanFailed;
+
+  /// Sources section: run the watcher immediately
+  ///
+  /// In en, this message translates to:
+  /// **'Scan now'**
+  String get media_sources_scanNow;
+
+  /// Sources section: watcher auto-apply toggle
+  ///
+  /// In en, this message translates to:
+  /// **'Automatically re-link exact matches'**
+  String get media_sources_autoApply;
+
+  /// Sources section: a root with no scan yet
+  ///
+  /// In en, this message translates to:
+  /// **'Never scanned'**
+  String get media_sources_neverScanned;
+
+  /// Source type name
+  ///
+  /// In en, this message translates to:
+  /// **'Photo library'**
+  String get media_source_gallery;
+
+  /// Source type name
+  ///
+  /// In en, this message translates to:
+  /// **'Local files'**
+  String get media_source_localFile;
+
+  /// Source type name
+  ///
+  /// In en, this message translates to:
+  /// **'Web links'**
+  String get media_source_networkUrl;
+
+  /// Source type name
+  ///
+  /// In en, this message translates to:
+  /// **'Subscriptions'**
+  String get media_source_manifest;
+
+  /// Source type name
+  ///
+  /// In en, this message translates to:
+  /// **'Connected services'**
+  String get media_source_connector;
+
+  /// Source type name
+  ///
+  /// In en, this message translates to:
+  /// **'Cloud media store'**
+  String get media_source_mediaStore;
+
+  /// Source type name
+  ///
+  /// In en, this message translates to:
+  /// **'Signatures'**
+  String get media_source_signature;
+
+  /// Repair audit view title
+  ///
+  /// In en, this message translates to:
+  /// **'Repair history'**
+  String get media_repairHistory_title;
+
+  /// Repair audit view empty state
+  ///
+  /// In en, this message translates to:
+  /// **'No repairs yet'**
+  String get media_repairHistory_empty;
+
+  /// Repair audit action label
+  ///
+  /// In en, this message translates to:
+  /// **'Re-linked'**
+  String get media_repairHistory_action_relink;
+
+  /// Repair audit action label
+  ///
+  /// In en, this message translates to:
+  /// **'Cloud-backed'**
+  String get media_repairHistory_action_cloudBacked;
+
+  /// Repair audit action label
+  ///
+  /// In en, this message translates to:
+  /// **'Auto re-linked'**
+  String get media_repairHistory_action_autoRelink;
+
+  /// Filter bar: save the current filter
+  ///
+  /// In en, this message translates to:
+  /// **'Save as album'**
+  String get media_smartAlbum_save;
+
+  /// Filter bar: album name dialog title
+  ///
+  /// In en, this message translates to:
+  /// **'Name this album'**
+  String get media_smartAlbum_saveTitle;
+
+  /// Filter bar: smart album menu
+  ///
+  /// In en, this message translates to:
+  /// **'Albums'**
+  String get media_smartAlbum_albums;
+
+  /// Filter bar: remove a smart album
+  ///
+  /// In en, this message translates to:
+  /// **'Delete album'**
+  String get media_smartAlbum_delete;
+
+  /// Filter bar: the smart album delete did not go through
+  ///
+  /// In en, this message translates to:
+  /// **'Could not delete album'**
+  String get media_smartAlbum_deleteFailed;
+
+  /// Filter bar: confirmation snackbar
+  ///
+  /// In en, this message translates to:
+  /// **'Album saved'**
+  String get media_smartAlbum_saved;
+
+  /// No description provided for @media_sources_lastScanned.
+  ///
+  /// In en, this message translates to:
+  /// **'Last scanned {date}'**
+  String media_sources_lastScanned(String date);
+
+  /// No description provided for @media_sources_scanResult.
+  ///
+  /// In en, this message translates to:
+  /// **'{indexed} files indexed, {repaired} re-linked'**
+  String media_sources_scanResult(int indexed, int repaired);
+
+  /// Repair history: candidate came from a folder scan
+  ///
+  /// In en, this message translates to:
+  /// **'folder scan'**
+  String get media_repairHistory_sourceFolder;
+
+  /// Repair history: candidate came from the gallery
+  ///
+  /// In en, this message translates to:
+  /// **'photo library'**
+  String get media_repairHistory_sourcePhotoLibrary;
+
+  /// Repair history: row was made cloud-backed from the store
+  ///
+  /// In en, this message translates to:
+  /// **'cloud media store'**
+  String get media_repairHistory_sourceStore;
+
+  /// Repair history: applied automatically by the folder watcher
+  ///
+  /// In en, this message translates to:
+  /// **'watched folders'**
+  String get media_repairHistory_sourceWatcher;
+
+  /// Repair history: the user picked the file by hand
+  ///
+  /// In en, this message translates to:
+  /// **'manual re-link'**
+  String get media_repairHistory_sourceManual;
+
+  /// No description provided for @media_repairHistory_source.
+  ///
+  /// In en, this message translates to:
+  /// **'via {source}'**
+  String media_repairHistory_source(String source);
+
   /// Media console sidebar/tab label for the missing-files view
   ///
   /// In en, this message translates to:

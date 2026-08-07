@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/database/database.dart';
 import 'package:submersion/features/media/data/repositories/media_library_repository.dart';
 import 'package:submersion/features/media/data/repositories/media_repository.dart';
+import 'package:submersion/features/media/data/services/trip_media_scanner.dart';
 import 'package:submersion/features/media/domain/entities/media_item.dart';
 import 'package:submersion/features/media/domain/entities/media_library_filter.dart';
 import 'package:submersion/features/media/domain/entities/media_source_type.dart';
@@ -67,8 +68,14 @@ void main() {
           diveNumber: Value(number),
           siteId: Value(siteId),
           tripId: Value(tripId),
+          // Dive times are wall-clock-as-UTC by design (parsed_dive_mapper
+          // builds them with DateTime.utc(components)), so the fixture has
+          // to store them that way or the seeded day drifts by the host
+          // offset the moment anything reads them back with isUtc: true.
           diveDateTime: Value(
-            (dateTime ?? DateTime(2026, 1, 1)).millisecondsSinceEpoch,
+            TripMediaScanner.toWallClockUtc(
+              dateTime ?? DateTime(2026, 1, 1),
+            ).millisecondsSinceEpoch,
           ),
           createdAt: Value(epoch),
           updatedAt: Value(epoch),
@@ -91,7 +98,11 @@ void main() {
       localPath: '/tmp/$id',
       originalFilename: '$id.jpg',
       diveId: diveId,
-      takenAt: takenAt,
+      // Production normalises to wall-clock-as-UTC before persisting (see
+      // MediaImportService). Seeding a local instant instead would encode
+      // the very convention error these tests are meant to catch, and would
+      // make the date-range assertions pass or fail by host timezone.
+      takenAt: TripMediaScanner.toWallClockUtc(takenAt),
       isOrphaned: isOrphaned,
       createdAt: DateTime(2026, 1, 1),
       updatedAt: DateTime(2026, 1, 1),
@@ -278,6 +289,61 @@ void main() {
       expect(unlinked.diveNumber, isNull);
       expect(unlinked.siteName, isNull);
     });
+
+    test('the joined dive time keeps its wall-clock components', () async {
+      // dive_date_time is wall-clock-as-UTC, exactly as DiveRepositoryImpl
+      // hydrates it. Reading it as a local instant shifts every by-dive
+      // group header by the host's UTC offset.
+      final page = await repo.getPage(diverId: 'd1');
+      final onDive1 = page.entries.firstWhere((e) => e.item.id == 'p1');
+      expect(onDive1.diveDateTime!.isUtc, isTrue);
+      expect(onDive1.diveDateTime!.year, 2026);
+      expect(onDive1.diveDateTime!.month, 6);
+      expect(onDive1.diveDateTime!.day, 12);
+    });
+
+    test('a date range is read as wall-clock, not as an instant', () async {
+      // Both ends of the day are exercised: on a host west of UTC the
+      // early-morning bound straddles backwards, east of UTC the late-evening
+      // one straddles forwards, so one of the two has teeth in any non-UTC
+      // zone. A bound compared as a raw instant slides the window by the
+      // host offset and drops the boundary row.
+      await insertMedia('edge-early', DateTime(2026, 9, 1, 0, 30));
+      await insertMedia('edge-late', DateTime(2026, 9, 1, 23, 30));
+
+      final onlyThatDay = await repo.getPage(
+        diverId: 'd1',
+        filter: MediaLibraryFilter(
+          fromDate: DateTime(2026, 9, 1),
+          toDate: DateTime(2026, 9, 1, 23, 59, 59, 999),
+        ),
+      );
+
+      expect(onlyThatDay.entries.map((e) => e.item.id).toSet(), {
+        'edge-early',
+        'edge-late',
+      });
+    });
+
+    test('legacy camelCase signature rows stay out of the library', () async {
+      // parseMediaType still accepts 'instructorSignature', so rows written
+      // by an older build can carry it; filtering only on the snake_case
+      // spelling lets them leak into the library and its counts.
+      await insertMedia(
+        'sig-legacy',
+        DateTime(2026, 6, 12, 11, 30),
+        diveId: 'dive-1',
+        mediaType: MediaType.instructorSignature,
+        sourceType: MediaSourceType.signature,
+      );
+      await db.customStatement(
+        "UPDATE media SET file_type = 'instructorSignature' WHERE id = ?",
+        ['sig-legacy'],
+      );
+
+      final page = await repo.getPage(diverId: 'd1');
+      expect(page.entries.map((e) => e.item.id), isNot(contains('sig-legacy')));
+    });
   });
 
   group('counts', () {
@@ -290,6 +356,65 @@ void main() {
 
     test('countMissing counts is_orphaned rows', () async {
       expect(await repo.countMissing(), 1);
+    });
+
+    test('countMissing excludes signatures in either spelling', () async {
+      // Signatures are excluded from every library surface; countMissing
+      // originally excluded nothing at all, so a broken signature pointer
+      // inflated the Missing badge and sent the user to a repair wizard
+      // that would not show it.
+      await insertMedia(
+        'sig-missing',
+        DateTime(2026, 6, 12, 11, 30),
+        diveId: 'dive-1',
+        mediaType: MediaType.instructorSignature,
+        sourceType: MediaSourceType.signature,
+        isOrphaned: true,
+      );
+      expect(await repo.countMissing(), 1);
+
+      await db.customStatement(
+        "UPDATE media SET file_type = 'instructorSignature' WHERE id = ?",
+        ['sig-missing'],
+      );
+      expect(await repo.countMissing(), 1);
+    });
+
+    test('counts exclude legacy camelCase signatures', () async {
+      await insertMedia(
+        'sig-legacy-unlinked',
+        DateTime(2026, 5, 5),
+        mediaType: MediaType.instructorSignature,
+        sourceType: MediaSourceType.signature,
+      );
+      await db.customStatement(
+        "UPDATE media SET file_type = 'instructorSignature' WHERE id = ?",
+        ['sig-legacy-unlinked'],
+      );
+
+      // Unchanged from the baseline: the legacy signature is not an
+      // unlinked library item, and does not appear under any source type.
+      expect(await repo.countUnlinked(), 1);
+      final bySource = await repo.countBySourceType();
+      expect(bySource.containsKey(MediaSourceType.signature), isFalse);
+    });
+
+    test('countBySourceType buckets every non-signature row', () async {
+      final counts = await repo.countBySourceType();
+      expect(counts[MediaSourceType.localFile], 7);
+      expect(counts[MediaSourceType.networkUrl], 1);
+      expect(counts.containsKey(MediaSourceType.signature), isFalse);
+    });
+
+    test('countBySourceType omits source types with no rows', () async {
+      final counts = await repo.countBySourceType();
+      expect(
+        counts.keys,
+        unorderedEquals(<MediaSourceType>[
+          MediaSourceType.localFile,
+          MediaSourceType.networkUrl,
+        ]),
+      );
     });
   });
 }

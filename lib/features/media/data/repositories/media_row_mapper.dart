@@ -97,6 +97,16 @@ domain.MediaEnrichment mediaEnrichmentFromRow(MediaEnrichmentData row) {
   );
 }
 
+/// Every file_type spelling that means "instructor signature".
+///
+/// Signatures are excluded from every library surface, so the exclusion has
+/// to know about the legacy camelCase spelling [parseMediaType] still
+/// accepts -- filtering on the snake_case value alone lets old rows through.
+const List<String> kSignatureFileTypes = [
+  'instructor_signature',
+  'instructorSignature',
+];
+
 /// Parses database file_type string to MediaType enum.
 /// Handles both snake_case (database format) and camelCase (legacy) for
 /// compatibility.

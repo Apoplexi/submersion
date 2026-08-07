@@ -323,5 +323,43 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text('Delete'), findsNothing);
     });
+
+    testWidgets('the close button leaves selection mode', (tester) async {
+      await tester.pumpWidget(host([entry('a'), entry('b')]));
+      await tester.pumpAndSettle();
+
+      await tester.longPress(find.byType(MediaLibraryTile).first);
+      await tester.pumpAndSettle();
+      expect(find.text('Delete'), findsOneWidget);
+
+      await tester.tap(find.byIcon(Icons.close));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Delete'), findsNothing);
+      final container = ProviderScope.containerOf(
+        tester.element(find.byType(MediaLibraryView)),
+      );
+      expect(container.read(mediaSelectionProvider), isEmpty);
+    });
+
+    testWidgets('cancelling the delete confirmation deletes nothing', (
+      tester,
+    ) async {
+      await tester.pumpWidget(host([entry('a'), entry('b')]));
+      await tester.pumpAndSettle();
+
+      await tester.longPress(find.byType(MediaLibraryTile).first);
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Delete'));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Cancel'));
+      await tester.pumpAndSettle();
+
+      expect(coordinator.deleted, isEmpty);
+      // Still in selection mode: cancelling the dialog is not cancelling
+      // the selection.
+      expect(find.text('Delete'), findsOneWidget);
+    });
   });
 }

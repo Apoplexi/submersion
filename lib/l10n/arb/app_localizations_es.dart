@@ -12361,6 +12361,116 @@ class AppLocalizationsEs extends AppLocalizations {
       'El contenido importado se conserva en su biblioteca y puede vincularse a las inmersiones automáticamente.';
 
   @override
+  String get media_console_sources => 'Orígenes';
+
+  @override
+  String get media_sources_browseHeader => 'Explorar por origen';
+
+  @override
+  String get media_sources_watchedHeader => 'Carpetas vigiladas';
+
+  @override
+  String get media_sources_addWatched => 'Agregar carpeta...';
+
+  @override
+  String get media_sources_scanFailed => 'Error al analizar';
+
+  @override
+  String get media_sources_scanNow => 'Buscar ahora';
+
+  @override
+  String get media_sources_autoApply =>
+      'Volver a vincular automáticamente las coincidencias exactas';
+
+  @override
+  String get media_sources_neverScanned => 'Nunca analizada';
+
+  @override
+  String get media_source_gallery => 'Fototeca';
+
+  @override
+  String get media_source_localFile => 'Archivos locales';
+
+  @override
+  String get media_source_networkUrl => 'Enlaces web';
+
+  @override
+  String get media_source_manifest => 'Suscripciones';
+
+  @override
+  String get media_source_connector => 'Servicios conectados';
+
+  @override
+  String get media_source_mediaStore => 'Almacén multimedia en la nube';
+
+  @override
+  String get media_source_signature => 'Firmas';
+
+  @override
+  String get media_repairHistory_title => 'Historial de reparaciones';
+
+  @override
+  String get media_repairHistory_empty => 'Aún no hay reparaciones';
+
+  @override
+  String get media_repairHistory_action_relink => 'Revinculado';
+
+  @override
+  String get media_repairHistory_action_cloudBacked => 'En la nube';
+
+  @override
+  String get media_repairHistory_action_autoRelink =>
+      'Revinculado automáticamente';
+
+  @override
+  String get media_smartAlbum_save => 'Guardar como álbum';
+
+  @override
+  String get media_smartAlbum_saveTitle => 'Nombra este álbum';
+
+  @override
+  String get media_smartAlbum_albums => 'Álbumes';
+
+  @override
+  String get media_smartAlbum_delete => 'Eliminar álbum';
+
+  @override
+  String get media_smartAlbum_deleteFailed => 'No se pudo eliminar el álbum';
+
+  @override
+  String get media_smartAlbum_saved => 'Álbum guardado';
+
+  @override
+  String media_sources_lastScanned(String date) {
+    return 'Último análisis $date';
+  }
+
+  @override
+  String media_sources_scanResult(int indexed, int repaired) {
+    return '$indexed archivos indexados, $repaired revinculados';
+  }
+
+  @override
+  String get media_repairHistory_sourceFolder => 'análisis de carpetas';
+
+  @override
+  String get media_repairHistory_sourcePhotoLibrary => 'fototeca';
+
+  @override
+  String get media_repairHistory_sourceStore => 'almacén multimedia en la nube';
+
+  @override
+  String get media_repairHistory_sourceWatcher => 'carpetas vigiladas';
+
+  @override
+  String get media_repairHistory_sourceManual => 'revinculación manual';
+
+  @override
+  String media_repairHistory_source(String source) {
+    return 'vía $source';
+  }
+
+  @override
   String get media_console_missing => 'Faltantes';
 
   @override

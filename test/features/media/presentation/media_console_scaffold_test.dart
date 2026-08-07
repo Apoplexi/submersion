@@ -67,6 +67,10 @@ void main() {
     await tester.pumpWidget(
       host(selected: MediaConsoleSection.library, onSelect: (s) => tapped = s),
     );
+    // The tab strip scrolls at phone width -- later sections sit off-screen
+    // until dragged into view.
+    await tester.ensureVisible(find.text('Transfers'));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Transfers'));
     expect(tapped, MediaConsoleSection.transfers);
   });

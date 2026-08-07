@@ -7137,6 +7137,149 @@
   "@media_import_intro": {
     "description": "Import section intro text"
   },
+  "media_console_sources": "Sources",
+  "@media_console_sources": {
+    "description": "Media console label for the sources section"
+  },
+  "media_sources_browseHeader": "Browse by source",
+  "@media_sources_browseHeader": {
+    "description": "Sources section: per-source browse list header"
+  },
+  "media_sources_watchedHeader": "Watched folders",
+  "@media_sources_watchedHeader": {
+    "description": "Sources section: watcher folder list header"
+  },
+  "media_sources_addWatched": "Add folder...",
+  "@media_sources_addWatched": {
+    "description": "Sources section: register a watched folder"
+  },
+  "media_sources_scanFailed": "Scan failed",
+  "@media_sources_scanFailed": {
+    "description": "Sources section: the watcher scan threw"
+  },
+  "media_sources_scanNow": "Scan now",
+  "@media_sources_scanNow": {
+    "description": "Sources section: run the watcher immediately"
+  },
+  "media_sources_autoApply": "Automatically re-link exact matches",
+  "@media_sources_autoApply": {
+    "description": "Sources section: watcher auto-apply toggle"
+  },
+  "media_sources_neverScanned": "Never scanned",
+  "@media_sources_neverScanned": {
+    "description": "Sources section: a root with no scan yet"
+  },
+  "media_source_gallery": "Photo library",
+  "@media_source_gallery": {
+    "description": "Source type name"
+  },
+  "media_source_localFile": "Local files",
+  "@media_source_localFile": {
+    "description": "Source type name"
+  },
+  "media_source_networkUrl": "Web links",
+  "@media_source_networkUrl": {
+    "description": "Source type name"
+  },
+  "media_source_manifest": "Subscriptions",
+  "@media_source_manifest": {
+    "description": "Source type name"
+  },
+  "media_source_connector": "Connected services",
+  "@media_source_connector": {
+    "description": "Source type name"
+  },
+  "media_source_mediaStore": "Cloud media store",
+  "@media_source_mediaStore": {
+    "description": "Source type name"
+  },
+  "media_source_signature": "Signatures",
+  "@media_source_signature": {
+    "description": "Source type name"
+  },
+  "media_repairHistory_title": "Repair history",
+  "@media_repairHistory_title": {
+    "description": "Repair audit view title"
+  },
+  "media_repairHistory_empty": "No repairs yet",
+  "@media_repairHistory_empty": {
+    "description": "Repair audit view empty state"
+  },
+  "media_repairHistory_action_relink": "Re-linked",
+  "@media_repairHistory_action_relink": {
+    "description": "Repair audit action label"
+  },
+  "media_repairHistory_action_cloudBacked": "Cloud-backed",
+  "@media_repairHistory_action_cloudBacked": {
+    "description": "Repair audit action label"
+  },
+  "media_repairHistory_action_autoRelink": "Auto re-linked",
+  "@media_repairHistory_action_autoRelink": {
+    "description": "Repair audit action label"
+  },
+  "media_smartAlbum_save": "Save as album",
+  "@media_smartAlbum_save": {
+    "description": "Filter bar: save the current filter"
+  },
+  "media_smartAlbum_saveTitle": "Name this album",
+  "@media_smartAlbum_saveTitle": {
+    "description": "Filter bar: album name dialog title"
+  },
+  "media_smartAlbum_albums": "Albums",
+  "@media_smartAlbum_albums": {
+    "description": "Filter bar: smart album menu"
+  },
+  "media_smartAlbum_delete": "Delete album",
+  "@media_smartAlbum_delete": {
+    "description": "Filter bar: remove a smart album"
+  },
+  "media_smartAlbum_deleteFailed": "Could not delete album",
+  "@media_smartAlbum_deleteFailed": {
+    "description": "Filter bar: the smart album delete did not go through"
+  },
+  "media_smartAlbum_saved": "Album saved",
+  "@media_smartAlbum_saved": {
+    "description": "Filter bar: confirmation snackbar"
+  },
+  "media_sources_lastScanned": "Last scanned {date}",
+  "@media_sources_lastScanned": {
+    "placeholders": {
+      "date": { "type": "String" }
+    }
+  },
+  "media_sources_scanResult": "{indexed} files indexed, {repaired} re-linked",
+  "@media_sources_scanResult": {
+    "placeholders": {
+      "indexed": { "type": "int" },
+      "repaired": { "type": "int" }
+    }
+  },
+  "media_repairHistory_sourceFolder": "folder scan",
+  "@media_repairHistory_sourceFolder": {
+    "description": "Repair history: candidate came from a folder scan"
+  },
+  "media_repairHistory_sourcePhotoLibrary": "photo library",
+  "@media_repairHistory_sourcePhotoLibrary": {
+    "description": "Repair history: candidate came from the gallery"
+  },
+  "media_repairHistory_sourceStore": "cloud media store",
+  "@media_repairHistory_sourceStore": {
+    "description": "Repair history: row was made cloud-backed from the store"
+  },
+  "media_repairHistory_sourceWatcher": "watched folders",
+  "@media_repairHistory_sourceWatcher": {
+    "description": "Repair history: applied automatically by the folder watcher"
+  },
+  "media_repairHistory_sourceManual": "manual re-link",
+  "@media_repairHistory_sourceManual": {
+    "description": "Repair history: the user picked the file by hand"
+  },
+  "media_repairHistory_source": "via {source}",
+  "@media_repairHistory_source": {
+    "placeholders": {
+      "source": { "type": "String" }
+    }
+  },
   "media_console_missing": "Missing",
   "@media_console_missing": {
     "description": "Media console sidebar/tab label for the missing-files view"

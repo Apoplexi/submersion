@@ -12333,6 +12333,116 @@ class AppLocalizationsHu extends AppLocalizations {
       'Az importált média a könyvtáradban marad, és automatikusan csatolható a merülésekhez.';
 
   @override
+  String get media_console_sources => 'Források';
+
+  @override
+  String get media_sources_browseHeader => 'Böngészés forrás szerint';
+
+  @override
+  String get media_sources_watchedHeader => 'Figyelt mappák';
+
+  @override
+  String get media_sources_addWatched => 'Mappa hozzáadása...';
+
+  @override
+  String get media_sources_scanFailed => 'A keresés sikertelen';
+
+  @override
+  String get media_sources_scanNow => 'Keresés most';
+
+  @override
+  String get media_sources_autoApply =>
+      'Pontos egyezések automatikus újracsatolása';
+
+  @override
+  String get media_sources_neverScanned => 'Még nem vizsgált';
+
+  @override
+  String get media_source_gallery => 'Fotókönyvtár';
+
+  @override
+  String get media_source_localFile => 'Helyi fájlok';
+
+  @override
+  String get media_source_networkUrl => 'Webhivatkozások';
+
+  @override
+  String get media_source_manifest => 'Feliratkozások';
+
+  @override
+  String get media_source_connector => 'Csatlakoztatott szolgáltatások';
+
+  @override
+  String get media_source_mediaStore => 'Felhő médiatár';
+
+  @override
+  String get media_source_signature => 'Aláírások';
+
+  @override
+  String get media_repairHistory_title => 'Javítási előzmények';
+
+  @override
+  String get media_repairHistory_empty => 'Még nincs javítás';
+
+  @override
+  String get media_repairHistory_action_relink => 'Újracsatolva';
+
+  @override
+  String get media_repairHistory_action_cloudBacked => 'Felhőalapú';
+
+  @override
+  String get media_repairHistory_action_autoRelink =>
+      'Automatikusan újracsatolva';
+
+  @override
+  String get media_smartAlbum_save => 'Mentés albumként';
+
+  @override
+  String get media_smartAlbum_saveTitle => 'Album elnevezése';
+
+  @override
+  String get media_smartAlbum_albums => 'Albumok';
+
+  @override
+  String get media_smartAlbum_delete => 'Album törlése';
+
+  @override
+  String get media_smartAlbum_deleteFailed => 'Az album törlése nem sikerült';
+
+  @override
+  String get media_smartAlbum_saved => 'Album mentve';
+
+  @override
+  String media_sources_lastScanned(String date) {
+    return 'Utoljára vizsgálva: $date';
+  }
+
+  @override
+  String media_sources_scanResult(int indexed, int repaired) {
+    return '$indexed fájl indexelve, $repaired újracsatolva';
+  }
+
+  @override
+  String get media_repairHistory_sourceFolder => 'mappavizsgálat';
+
+  @override
+  String get media_repairHistory_sourcePhotoLibrary => 'fotókönyvtár';
+
+  @override
+  String get media_repairHistory_sourceStore => 'felhőalapú médiatár';
+
+  @override
+  String get media_repairHistory_sourceWatcher => 'figyelt mappák';
+
+  @override
+  String get media_repairHistory_sourceManual => 'kézi újracsatolás';
+
+  @override
+  String media_repairHistory_source(String source) {
+    return 'forrás: $source';
+  }
+
+  @override
   String get media_console_missing => 'Hiányzó';
 
   @override

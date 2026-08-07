@@ -12067,6 +12067,114 @@ class AppLocalizationsHe extends AppLocalizations {
       'מדיה מיובאת נשמרת בספרייה שלך וניתן לקשר אותה לצלילות באופן אוטומטי.';
 
   @override
+  String get media_console_sources => 'מקורות';
+
+  @override
+  String get media_sources_browseHeader => 'עיון לפי מקור';
+
+  @override
+  String get media_sources_watchedHeader => 'תיקיות במעקב';
+
+  @override
+  String get media_sources_addWatched => 'הוספת תיקייה...';
+
+  @override
+  String get media_sources_scanFailed => 'הסריקה נכשלה';
+
+  @override
+  String get media_sources_scanNow => 'סריקה עכשיו';
+
+  @override
+  String get media_sources_autoApply => 'קישור אוטומטי של התאמות מדויקות';
+
+  @override
+  String get media_sources_neverScanned => 'לא נסרק מעולם';
+
+  @override
+  String get media_source_gallery => 'ספריית תמונות';
+
+  @override
+  String get media_source_localFile => 'קבצים מקומיים';
+
+  @override
+  String get media_source_networkUrl => 'קישורי אינטרנט';
+
+  @override
+  String get media_source_manifest => 'מנויים';
+
+  @override
+  String get media_source_connector => 'שירותים מחוברים';
+
+  @override
+  String get media_source_mediaStore => 'מאגר מדיה בענן';
+
+  @override
+  String get media_source_signature => 'חתימות';
+
+  @override
+  String get media_repairHistory_title => 'היסטוריית תיקונים';
+
+  @override
+  String get media_repairHistory_empty => 'אין תיקונים עדיין';
+
+  @override
+  String get media_repairHistory_action_relink => 'קושר מחדש';
+
+  @override
+  String get media_repairHistory_action_cloudBacked => 'מגובה בענן';
+
+  @override
+  String get media_repairHistory_action_autoRelink => 'קושר מחדש אוטומטית';
+
+  @override
+  String get media_smartAlbum_save => 'שמירה כאלבום';
+
+  @override
+  String get media_smartAlbum_saveTitle => 'שם לאלבום';
+
+  @override
+  String get media_smartAlbum_albums => 'אלבומים';
+
+  @override
+  String get media_smartAlbum_delete => 'מחיקת אלבום';
+
+  @override
+  String get media_smartAlbum_deleteFailed => 'מחיקת האלבום נכשלה';
+
+  @override
+  String get media_smartAlbum_saved => 'האלבום נשמר';
+
+  @override
+  String media_sources_lastScanned(String date) {
+    return 'נסרק לאחרונה $date';
+  }
+
+  @override
+  String media_sources_scanResult(int indexed, int repaired) {
+    return '$indexed קבצים נסרקו, $repaired קושרו מחדש';
+  }
+
+  @override
+  String get media_repairHistory_sourceFolder => 'סריקת תיקיות';
+
+  @override
+  String get media_repairHistory_sourcePhotoLibrary => 'ספריית התמונות';
+
+  @override
+  String get media_repairHistory_sourceStore => 'אחסון מדיה בענן';
+
+  @override
+  String get media_repairHistory_sourceWatcher => 'תיקיות במעקב';
+
+  @override
+  String get media_repairHistory_sourceManual => 'קישור ידני';
+
+  @override
+  String media_repairHistory_source(String source) {
+    return 'דרך $source';
+  }
+
+  @override
   String get media_console_missing => 'חסרים';
 
   @override

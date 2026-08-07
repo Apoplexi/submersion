@@ -1,3 +1,4 @@
+import 'package:submersion/core/util/wall_clock_utc.dart';
 import 'package:submersion/features/media/domain/entities/media_item.dart';
 import 'package:submersion/features/media/domain/entities/media_source_type.dart';
 
@@ -73,6 +74,58 @@ class MediaLibraryFilter {
   }
 
   static const Object _undefined = Object();
+
+  /// Serialized form stored by smart albums. Ids and enum names mean the
+  /// same thing on every device, which is why an album can sync.
+  ///
+  /// The dates are written as wall-clock-as-UTC millis rather than as the
+  /// local instant. [fromDate] and [toDate] are calendar bounds -- what
+  /// matters is the day the user picked, and MediaLibraryRepository already
+  /// compares them against `taken_at`, which is itself stored wall-clock.
+  /// Encoding the instant would hand a device in another timezone a bound
+  /// shifted by the offset between them, quietly moving an album's day
+  /// boundary by up to a day.
+  Map<String, dynamic> toJson() => {
+    'mediaType': mediaType?.name,
+    'siteId': siteId,
+    'tripId': tripId,
+    'diveId': diveId,
+    'fromDate': _dateToMillis(fromDate),
+    'toDate': _dateToMillis(toDate),
+    'sourceType': sourceType?.name,
+    'health': health?.name,
+  };
+
+  /// Decodes leniently: an album written by a newer version (or a value
+  /// this build no longer knows) degrades to "no constraint" rather than
+  /// throwing and taking the library view down with it.
+  static MediaLibraryFilter fromJson(Map<String, dynamic> json) {
+    return MediaLibraryFilter(
+      mediaType: _enumByName(MediaType.values, json['mediaType']),
+      siteId: json['siteId'] as String?,
+      tripId: json['tripId'] as String?,
+      diveId: json['diveId'] as String?,
+      fromDate: _dateFromMillis(json['fromDate']),
+      toDate: _dateFromMillis(json['toDate']),
+      sourceType: _enumByName(MediaSourceType.values, json['sourceType']),
+      health: _enumByName(MediaHealthFilter.values, json['health']),
+    );
+  }
+
+  static T? _enumByName<T extends Enum>(List<T> values, Object? raw) {
+    if (raw is! String) return null;
+    for (final value in values) {
+      if (value.name == raw) return value;
+    }
+    return null;
+  }
+
+  static int? _dateToMillis(DateTime? date) =>
+      date == null ? null : asWallClockUtc(date).millisecondsSinceEpoch;
+
+  static DateTime? _dateFromMillis(Object? raw) => raw is int
+      ? fromWallClockUtc(DateTime.fromMillisecondsSinceEpoch(raw, isUtc: true))
+      : null;
 
   @override
   bool operator ==(Object other) {

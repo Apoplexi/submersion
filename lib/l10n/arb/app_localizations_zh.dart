@@ -11809,6 +11809,114 @@ class AppLocalizationsZh extends AppLocalizations {
   String get media_import_intro => '导入的媒体会保留在您的媒体库中，并可自动关联到潜水。';
 
   @override
+  String get media_console_sources => '来源';
+
+  @override
+  String get media_sources_browseHeader => '按来源浏览';
+
+  @override
+  String get media_sources_watchedHeader => '监视的文件夹';
+
+  @override
+  String get media_sources_addWatched => '添加文件夹...';
+
+  @override
+  String get media_sources_scanFailed => '扫描失败';
+
+  @override
+  String get media_sources_scanNow => '立即扫描';
+
+  @override
+  String get media_sources_autoApply => '自动重新关联完全匹配项';
+
+  @override
+  String get media_sources_neverScanned => '从未扫描';
+
+  @override
+  String get media_source_gallery => '照片图库';
+
+  @override
+  String get media_source_localFile => '本地文件';
+
+  @override
+  String get media_source_networkUrl => '网络链接';
+
+  @override
+  String get media_source_manifest => '订阅';
+
+  @override
+  String get media_source_connector => '已连接的服务';
+
+  @override
+  String get media_source_mediaStore => '云媒体存储';
+
+  @override
+  String get media_source_signature => '签名';
+
+  @override
+  String get media_repairHistory_title => '修复历史';
+
+  @override
+  String get media_repairHistory_empty => '尚无修复记录';
+
+  @override
+  String get media_repairHistory_action_relink => '已重新关联';
+
+  @override
+  String get media_repairHistory_action_cloudBacked => '云端备份';
+
+  @override
+  String get media_repairHistory_action_autoRelink => '已自动重新关联';
+
+  @override
+  String get media_smartAlbum_save => '保存为相册';
+
+  @override
+  String get media_smartAlbum_saveTitle => '为相册命名';
+
+  @override
+  String get media_smartAlbum_albums => '相册';
+
+  @override
+  String get media_smartAlbum_delete => '删除相册';
+
+  @override
+  String get media_smartAlbum_deleteFailed => '无法删除相册';
+
+  @override
+  String get media_smartAlbum_saved => '相册已保存';
+
+  @override
+  String media_sources_lastScanned(String date) {
+    return '上次扫描 $date';
+  }
+
+  @override
+  String media_sources_scanResult(int indexed, int repaired) {
+    return '已索引 $indexed 个文件，重新关联 $repaired 个';
+  }
+
+  @override
+  String get media_repairHistory_sourceFolder => '文件夹扫描';
+
+  @override
+  String get media_repairHistory_sourcePhotoLibrary => '照片图库';
+
+  @override
+  String get media_repairHistory_sourceStore => '云媒体存储';
+
+  @override
+  String get media_repairHistory_sourceWatcher => '监视的文件夹';
+
+  @override
+  String get media_repairHistory_sourceManual => '手动重新关联';
+
+  @override
+  String media_repairHistory_source(String source) {
+    return '通过 $source';
+  }
+
+  @override
   String get media_console_missing => '缺失';
 
   @override

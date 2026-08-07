@@ -63,15 +63,19 @@ List<MediaLibraryGroup> groupByDive(List<MediaLibraryEntry> entries) {
   return groups;
 }
 
-/// Groups an already-sorted page stream into local calendar days in
-/// first-seen order. The timestamp is the item's takenAt (the entity
-/// defaults it from createdAt at hydration), converted to local time so day
-/// boundaries match what the user's clock says.
+/// Groups an already-sorted page stream into calendar days in first-seen
+/// order. The timestamp is the item's takenAt (the entity defaults it from
+/// createdAt at hydration).
+///
+/// takenAt is wall-clock-as-UTC: its components ALREADY read as the time the
+/// shutter fired, so they are used directly. Calling toLocal() here would
+/// shift them by the host's UTC offset and file a photo taken just after
+/// midnight under the previous day.
 List<MediaLibraryGroup> groupByTimeline(List<MediaLibraryEntry> entries) {
   final byDay = <DateTime, List<MediaLibraryEntry>>{};
   for (final entry in entries) {
-    final local = entry.item.takenAt.toLocal();
-    final day = DateTime(local.year, local.month, local.day);
+    final at = entry.item.takenAt;
+    final day = DateTime(at.year, at.month, at.day);
     byDay.putIfAbsent(day, () => []).add(entry);
   }
   return [
