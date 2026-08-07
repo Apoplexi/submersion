@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/deco/entities/deco_status.dart';
 import 'package:submersion/core/deco/entities/tissue_compartment.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/compact_tissue_loading_card.dart';
+import 'package:submersion/features/dive_log/presentation/widgets/tissue_area_chart.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/tissue_heat_map.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
@@ -227,13 +228,44 @@ void main() {
       );
       await tester.pumpAndSettle();
 
+      // The card renders exactly one of the two visualizations, chosen by
+      // tissueVizMode, so the rendered chart type is what proves the tap
+      // took effect. AppSettings defaults to TissueVizMode.heatMap.
+      expect(find.byType(TissueHeatMapStrip), findsOneWidget);
+      expect(find.byType(TissueAreaChart), findsNothing);
+
       await tester.tap(find.byIcon(Icons.area_chart));
       await tester.pumpAndSettle();
-      expect(tester.takeException(), isNull);
+      expect(find.byType(TissueAreaChart), findsOneWidget);
+      expect(find.byType(TissueHeatMapStrip), findsNothing);
 
       await tester.tap(find.byIcon(Icons.grid_on));
       await tester.pumpAndSettle();
-      expect(tester.takeException(), isNull);
+      expect(find.byType(TissueHeatMapStrip), findsOneWidget);
+      expect(find.byType(TissueAreaChart), findsNothing);
+    });
+
+    testWidgets('tint the active visualization mode icon', (tester) async {
+      await tester.pumpWidget(
+        buildCard(status: _multiCompStatus, decoStatuses: [_multiCompStatus]),
+      );
+      await tester.pumpAndSettle();
+
+      final primary = Theme.of(
+        tester.element(find.byType(CompactTissueLoadingCard)),
+      ).colorScheme.primary;
+
+      Color? colorOf(IconData icon) =>
+          tester.widget<Icon>(find.byIcon(icon)).color;
+
+      expect(colorOf(Icons.grid_on), primary);
+      expect(colorOf(Icons.area_chart), isNot(primary));
+
+      await tester.tap(find.byIcon(Icons.area_chart));
+      await tester.pumpAndSettle();
+
+      expect(colorOf(Icons.area_chart), primary);
+      expect(colorOf(Icons.grid_on), isNot(primary));
     });
   });
 
