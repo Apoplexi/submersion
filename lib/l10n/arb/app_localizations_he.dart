@@ -22616,4 +22616,68 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String get reef_attribution_protectedSeas =>
       'גבולות אזורים ימיים מוגנים. CC BY 4.0.';
+
+  @override
+  String get enum_visibilityBand_excellent => 'מצוינת';
+
+  @override
+  String get enum_visibilityBand_good => 'טובה';
+
+  @override
+  String get enum_visibilityBand_moderate => 'בינונית';
+
+  @override
+  String get enum_visibilityBand_poor => 'ירודה';
+
+  @override
+  String visibility_range_between(String min, String max, String unit) {
+    return '$min-$max $unit';
+  }
+
+  @override
+  String visibility_range_over(String min, String unit) {
+    return 'מעל $min $unit';
+  }
+
+  @override
+  String visibility_range_under(String max, String unit) {
+    return 'מתחת ל-$max $unit';
+  }
+
+  @override
+  String get settings_visibilityScale_title => 'סולם ראות';
+
+  @override
+  String get settings_visibilityScale_subtitle =>
+      'אילו מרחקים נחשבים ראות טובה במקום שבו אתה צולל';
+
+  @override
+  String get settings_visibilityScale_preset_tropical => 'טרופי';
+
+  @override
+  String get settings_visibilityScale_preset_temperate => 'ממוזג';
+
+  @override
+  String get settings_visibilityScale_preset_coldWater => 'מים קרים / יבשתיים';
+
+  @override
+  String get settings_visibilityScale_preset_custom => 'מותאם אישית';
+
+  @override
+  String get settings_visibilityScale_customExcellent => 'מצוינת מ-';
+
+  @override
+  String get settings_visibilityScale_customGood => 'טובה מ-';
+
+  @override
+  String get settings_visibilityScale_customModerate => 'בינונית מ-';
+
+  @override
+  String get settings_visibilityScale_invalidOrder =>
+      'כל ערך חייב להיות קטן מזה שמעליו וגדול מאפס';
+
+  @override
+  String statistics_conditions_visibility_legacySuffix(String band) {
+    return '$band (נרשם לפני מדידה)';
+  }
 }

@@ -23022,4 +23022,69 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get reef_attribution_protectedSeas =>
       'Grenzen van beschermde zeegebieden. CC BY 4.0.';
+
+  @override
+  String get enum_visibilityBand_excellent => 'Uitstekend';
+
+  @override
+  String get enum_visibilityBand_good => 'Goed';
+
+  @override
+  String get enum_visibilityBand_moderate => 'Matig';
+
+  @override
+  String get enum_visibilityBand_poor => 'Slecht';
+
+  @override
+  String visibility_range_between(String min, String max, String unit) {
+    return '$min-$max $unit';
+  }
+
+  @override
+  String visibility_range_over(String min, String unit) {
+    return 'meer dan $min $unit';
+  }
+
+  @override
+  String visibility_range_under(String max, String unit) {
+    return 'minder dan $max $unit';
+  }
+
+  @override
+  String get settings_visibilityScale_title => 'Zichtschaal';
+
+  @override
+  String get settings_visibilityScale_subtitle =>
+      'Welke afstanden gelden als goed zicht waar jij duikt';
+
+  @override
+  String get settings_visibilityScale_preset_tropical => 'Tropisch';
+
+  @override
+  String get settings_visibilityScale_preset_temperate => 'Gematigd';
+
+  @override
+  String get settings_visibilityScale_preset_coldWater =>
+      'Koud water / Binnenwater';
+
+  @override
+  String get settings_visibilityScale_preset_custom => 'Aangepast';
+
+  @override
+  String get settings_visibilityScale_customExcellent => 'Uitstekend vanaf';
+
+  @override
+  String get settings_visibilityScale_customGood => 'Goed vanaf';
+
+  @override
+  String get settings_visibilityScale_customModerate => 'Matig vanaf';
+
+  @override
+  String get settings_visibilityScale_invalidOrder =>
+      'Elke waarde moet kleiner zijn dan die erboven en groter dan nul';
+
+  @override
+  String statistics_conditions_visibility_legacySuffix(String band) {
+    return '$band (vastgelegd vóór meting)';
+  }
 }
