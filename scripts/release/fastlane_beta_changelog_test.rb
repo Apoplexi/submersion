@@ -36,8 +36,13 @@ end
 def default_platform(_name); end
 def desc(_text); end
 
-# Lane bodies are never run here, so the block is deliberately not yielded.
-def lane(_name, &_block); end
+# Lane bodies are recorded rather than run. Most are never invoked, but the Play
+# beta lane is executed against stubs further down, because the wiring between
+# the changelog helper and the upload action is what broke in production.
+LANES = {}
+def lane(name, &block)
+  LANES[name] = block
+end
 
 # Platform blocks are yielded so the `def`s inside them land at top level.
 def platform(_name)
@@ -126,74 +131,129 @@ end
 
 load File.join(ROOT, 'android', 'fastlane', 'Fastfile')
 
+# Where the notes have to land, derived the way *supply* derives it rather than
+# the way the Fastfile does, so this check keeps its value if the writer moves.
+#
+# fastlane runs lane bodies and helper methods in the `fastlane` directory, but
+# wraps every action in Dir.chdir("..") to reach the project directory. supply
+# resolves its default metadata_path from there, by globbing
+# "./fastlane/metadata/android". A helper writing to that same relative path
+# therefore landed one directory deeper than supply looked, supply resolved
+# metadata_path to nil, and every Play beta uploaded successfully with no release
+# notes at all - the Android half of the gap this file exists to close.
+supply_metadata_path =
+  File.expand_path(File.join(ROOT, 'android', 'fastlane', 'metadata', 'android'))
+
+check(PLAY_METADATA_ROOT == supply_metadata_path,
+      "notes are written to #{PLAY_METADATA_ROOT}, but supply reads #{supply_metadata_path}")
+check(File.absolute_path(PLAY_METADATA_ROOT) == PLAY_METADATA_ROOT,
+      'PLAY_METADATA_ROOT is relative, so which directory fastlane happens to be ' \
+      'in decides whether supply finds the notes')
+
 Dir.mktmpdir do |tmp|
-  Dir.chdir(tmp) do
-    changelog_path = lambda do |code|
-      File.join(tmp, 'fastlane', 'metadata', 'android', 'en-US', 'changelogs', "#{code}.txt")
+  changelog_path = lambda do |code|
+    File.join(tmp, 'en-US', 'changelogs', "#{code}.txt")
+  end
+
+  # Missing inputs must not write a file, and must report that the upload
+  # should skip changelogs rather than blanking the notes already on Play.
+  with_env('PLAY_BETA_CHANGELOG' => nil, 'PLAY_VERSION_CODE' => '123') do
+    check(write_beta_changelog(tmp).nil?, 'missing notes did not disable changelog upload')
+    check(!File.exist?(changelog_path.call(123)), 'missing notes still wrote a changelog file')
+  end
+
+  with_env('PLAY_BETA_CHANGELOG' => 'something', 'PLAY_VERSION_CODE' => nil) do
+    check(write_beta_changelog(tmp).nil?, 'missing version code did not disable changelog upload')
+  end
+
+  with_env('PLAY_BETA_CHANGELOG' => '  ', 'PLAY_VERSION_CODE' => '123') do
+    check(write_beta_changelog(tmp).nil?, 'blank notes did not disable changelog upload')
+  end
+
+  # A non-numeric version code would silently produce a file supply never
+  # reads, so it fails loudly instead.
+  with_env('PLAY_BETA_CHANGELOG' => 'notes', 'PLAY_VERSION_CODE' => 'v1.2.3') do
+    raised = begin
+      write_beta_changelog(tmp)
+      false
+    rescue ArgumentError
+      true
+    end
+    check(raised, 'a non-numeric PLAY_VERSION_CODE was accepted')
+  end
+
+  with_env('PLAY_BETA_CHANGELOG' => "New in this build\n- a real change",
+           'PLAY_VERSION_CODE' => '5163') do
+    check(write_beta_changelog(tmp) == tmp, 'valid inputs did not report the metadata root')
+    written = File.read(changelog_path.call(5163))
+    check(written.include?('a real change'), 'notes were not written to the changelog file')
+  end
+
+  # Same file-based contract as the TestFlight lanes, so the workflow never
+  # interpolates commit-derived text into a shell or environment assignment.
+  Dir.mktmpdir do |notes_dir|
+    notes_file = File.join(notes_dir, 'beta-notes-play.txt')
+    File.write(notes_file, "New in this build\n- a change from a file\n")
+
+    with_env('PLAY_BETA_CHANGELOG_FILE' => notes_file, 'PLAY_BETA_CHANGELOG' => nil,
+             'PLAY_VERSION_CODE' => '5165') do
+      check(write_beta_changelog(tmp) == tmp, 'file-based notes did not report the metadata root')
+      check(File.read(changelog_path.call(5165)).include?('a change from a file'),
+            'file-based notes were not written to the changelog file')
     end
 
-    # Missing inputs must not write a file, and must report that the upload
-    # should skip changelogs rather than blanking the notes already on Play.
-    with_env('PLAY_BETA_CHANGELOG' => nil, 'PLAY_VERSION_CODE' => '123') do
-      check(write_beta_changelog == false, 'missing notes did not disable changelog upload')
-      check(!File.exist?(changelog_path.call(123)), 'missing notes still wrote a changelog file')
-    end
-
-    with_env('PLAY_BETA_CHANGELOG' => 'something', 'PLAY_VERSION_CODE' => nil) do
-      check(write_beta_changelog == false, 'missing version code did not disable changelog upload')
-    end
-
-    with_env('PLAY_BETA_CHANGELOG' => '  ', 'PLAY_VERSION_CODE' => '123') do
-      check(write_beta_changelog == false, 'blank notes did not disable changelog upload')
-    end
-
-    # A non-numeric version code would silently produce a file supply never
-    # reads, so it fails loudly instead.
-    with_env('PLAY_BETA_CHANGELOG' => 'notes', 'PLAY_VERSION_CODE' => 'v1.2.3') do
-      raised = begin
-        write_beta_changelog
-        false
-      rescue ArgumentError
-        true
-      end
-      check(raised, 'a non-numeric PLAY_VERSION_CODE was accepted')
-    end
-
-    with_env('PLAY_BETA_CHANGELOG' => "New in this build\n- a real change",
-             'PLAY_VERSION_CODE' => '5163') do
-      check(write_beta_changelog == true, 'valid inputs did not enable changelog upload')
-      written = File.read(changelog_path.call(5163))
-      check(written.include?('a real change'), 'notes were not written to the changelog file')
-    end
-
-    # Same file-based contract as the TestFlight lanes, so the workflow never
-    # interpolates commit-derived text into a shell or environment assignment.
-    Dir.mktmpdir do |notes_dir|
-      notes_file = File.join(notes_dir, 'beta-notes-play.txt')
-      File.write(notes_file, "New in this build\n- a change from a file\n")
-
-      with_env('PLAY_BETA_CHANGELOG_FILE' => notes_file, 'PLAY_BETA_CHANGELOG' => nil,
-               'PLAY_VERSION_CODE' => '5165') do
-        check(write_beta_changelog == true, 'file-based notes did not enable changelog upload')
-        check(File.read(changelog_path.call(5165)).include?('a change from a file'),
-              'file-based notes were not written to the changelog file')
-      end
-
-      with_env('PLAY_BETA_CHANGELOG_FILE' => File.join(notes_dir, 'nope.txt'),
-               'PLAY_BETA_CHANGELOG' => nil, 'PLAY_VERSION_CODE' => '5166') do
-        check(write_beta_changelog == false, 'a missing notes file did not disable changelog upload')
-        check(!File.exist?(changelog_path.call(5166)), 'a missing notes file still wrote a changelog')
-      end
-    end
-
-    with_env('PLAY_BETA_CHANGELOG' => 'y' * 900, 'PLAY_VERSION_CODE' => '5164') do
-      write_beta_changelog
-      written = File.read(changelog_path.call(5164))
-      check(written.length <= 500,
-            "Play changelog was #{written.length} chars, over Google's 500 limit")
+    with_env('PLAY_BETA_CHANGELOG_FILE' => File.join(notes_dir, 'nope.txt'),
+             'PLAY_BETA_CHANGELOG' => nil, 'PLAY_VERSION_CODE' => '5166') do
+      check(write_beta_changelog(tmp).nil?, 'a missing notes file did not disable changelog upload')
+      check(!File.exist?(changelog_path.call(5166)), 'a missing notes file still wrote a changelog')
     end
   end
+
+  with_env('PLAY_BETA_CHANGELOG' => 'y' * 900, 'PLAY_VERSION_CODE' => '5164') do
+    write_beta_changelog(tmp)
+    written = File.read(changelog_path.call(5164))
+    check(written.length <= 500,
+          "Play changelog was #{written.length} chars, over Google's 500 limit")
+  end
 end
+
+# --- Play lane wiring -------------------------------------------------------
+# Writing the notes is only half of it: the lane also has to tell supply where
+# they are. It did not, and nothing failed - supply uploaded the AAB, reported
+# success, and left the release notes empty. Run the real lane body against
+# stubs so the helper and the action cannot drift apart again.
+
+$upload_params = nil
+$stub_changelog_root = nil
+
+def find_aab
+  '/nonexistent/Submersion-test-Android.aab'
+end
+
+def upload_to_play_store(params)
+  $upload_params = params
+end
+
+def write_beta_changelog(_metadata_root = nil)
+  $stub_changelog_root
+end
+
+$stub_changelog_root = '/somewhere/else/metadata/android'
+LANES[:upload_beta].call
+check($upload_params[:metadata_path] == $stub_changelog_root,
+      "the lane pointed supply at #{$upload_params[:metadata_path].inspect} " \
+      "instead of #{$stub_changelog_root.inspect}, where the notes were written")
+check($upload_params[:skip_upload_changelogs] == false,
+      'the lane skipped changelog upload even though notes were written')
+
+# With nothing written, the upload must still name a metadata path (nil is not a
+# value supply accepts) while leaving the notes already on Play untouched.
+$stub_changelog_root = nil
+$upload_params = nil
+LANES[:upload_beta].call
+check($upload_params[:skip_upload_changelogs] == true,
+      'the lane uploaded changelogs when there were no notes to upload')
+check(!$upload_params[:metadata_path].nil?, 'the lane passed a nil metadata_path')
 
 # --- Report -----------------------------------------------------------------
 
