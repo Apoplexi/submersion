@@ -5,7 +5,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/features/buddies/domain/entities/buddy.dart';
 import 'package:submersion/features/buddies/presentation/providers/buddy_providers.dart';
 import 'package:submersion/features/dive_log/domain/models/dive_filter_state.dart';
-import 'package:submersion/features/dive_log/presentation/providers/dive_providers.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/dive_filter_sheet.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
 
@@ -209,5 +208,47 @@ void main() {
       container.read(filterProvider).buddyNameFilter,
       'Alice Anderson, Bob Brown',
     );
+  });
+
+  testWidgets('buddy autocomplete commits highlighted suggestion on submit', (
+    tester,
+  ) async {
+    await openSheet(tester);
+
+    final buddyField = find.byWidgetPredicate(
+      (w) => w is TextField && w.decoration?.labelText == 'Buddy Name',
+    );
+
+    await tester.scrollUntilVisible(
+      buddyField,
+      100.0,
+      scrollable: scrollable(),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.enterText(buddyField, 'Ali');
+    await tester.pumpAndSettle();
+
+    expect(find.text('Alice Anderson'), findsOneWidget);
+
+    // Submitting from the keyboard commits the highlighted suggestion rather
+    // than leaving the partial text in the field.
+    await tester.testTextInput.receiveAction(TextInputAction.done);
+    await tester.pumpAndSettle();
+
+    expect(find.widgetWithText(TextField, 'Alice Anderson'), findsOneWidget);
+
+    final applyButton = find.text('Apply Filters');
+    await tester.scrollUntilVisible(
+      applyButton,
+      100.0,
+      scrollable: scrollable(),
+    );
+    await tester.tap(applyButton);
+    await tester.pumpAndSettle();
+
+    final element = tester.element(find.byType(MaterialApp));
+    final container = ProviderScope.containerOf(element);
+    expect(container.read(filterProvider).buddyNameFilter, 'Alice Anderson');
   });
 }

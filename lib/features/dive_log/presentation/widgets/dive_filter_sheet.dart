@@ -667,6 +667,10 @@ class _DiveFilterSheetState extends ConsumerState<DiveFilterSheet> {
                                 _buddyNameFilter = value.isEmpty ? null : value;
                               });
                             },
+                            // Commits the highlighted suggestion when the
+                            // options list is open; a no-op otherwise, so
+                            // free-text entry still submits normally.
+                            onSubmitted: (_) => onFieldSubmitted(),
                           );
                         },
                     optionsViewBuilder: (context, onSelected, options) {

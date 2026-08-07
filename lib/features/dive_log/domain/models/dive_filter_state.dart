@@ -263,13 +263,12 @@ class DiveFilterState {
             .toList();
 
         for (final filterLower in filters) {
-          final fullDive = dive;
-          final buddyLower = fullDive.buddy?.toLowerCase() ?? '';
-          final hasLegacyMatch = buddyLower.contains(filterLower);
-          final hasJointMatch = fullDive.buddies.any(
+          final legacyBuddyText = dive.buddy?.toLowerCase() ?? '';
+          final hasLegacyMatch = legacyBuddyText.contains(filterLower);
+          final hasLinkedBuddyMatch = dive.buddies.any(
             (b) => b.buddy.name.toLowerCase().contains(filterLower),
           );
-          if (!hasLegacyMatch && !hasJointMatch) {
+          if (!hasLegacyMatch && !hasLinkedBuddyMatch) {
             return false;
           }
         }
