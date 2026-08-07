@@ -122,6 +122,7 @@ class ProfileLegendState {
       'gasAnalysis': false,
       'other': false,
       'tankPressures': true,
+      'display': false,
     },
     this.metricsFollowViewport = false,
   });

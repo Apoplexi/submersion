@@ -65,9 +65,6 @@ void main() {
     });
 
     test('equal bands share a hash code', () {
-      // The chart folds band.hashCode into its bar-cache signatures, so two
-      // equal bands must agree or the cache would rebuild every frame - and
-      // two different bands must not collide, or it would serve stale bars.
       const a = MetricBand(top: 4, span: 16);
       const b = MetricBand(top: 4, span: 16);
       const different = MetricBand(top: 4, span: 8);
@@ -75,7 +72,25 @@ void main() {
       expect(a, b);
       expect(a.hashCode, b.hashCode);
       expect(a, isNot(different));
-      expect(a.hashCode, isNot(different.hashCode));
+    });
+
+    test('cache keys agree for equal bands and differ for unequal ones', () {
+      // The chart folds cacheKey into its bar-cache signatures. Equal bands
+      // must agree or the cache would rebuild every frame; unequal bands must
+      // differ or the cache would serve stale bars - the off-screen-metric bug
+      // again, through the cache. Unlike a hash this admits no collisions, so
+      // the inequality is a real guarantee and not a probabilistic one.
+      const a = MetricBand(top: 4, span: 16);
+      const b = MetricBand(top: 4, span: 16);
+
+      expect(a.cacheKey, b.cacheKey);
+      expect(a.cacheKey, isNot(const MetricBand(top: 4, span: 8).cacheKey));
+      expect(a.cacheKey, isNot(const MetricBand(top: 8, span: 16).cacheKey));
+      // Neither field may be swallowed by the separator.
+      expect(
+        const MetricBand(top: 1, span: 23).cacheKey,
+        isNot(const MetricBand(top: 12, span: 3).cacheKey),
+      );
     });
 
     test('MetricBand.full starts at the surface', () {

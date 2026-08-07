@@ -62,6 +62,16 @@ class MetricBand {
     return minValue + t * (maxValue - minValue);
   }
 
+  /// Exact, collision-free identity of this band for cache keys.
+  ///
+  /// The chart folds the band into its bar-cache signatures, because every
+  /// band-mapped bar's Y position moves with it. A hash would be wrong there:
+  /// two unequal bands sharing a hash bucket would be served each other's
+  /// spots, silently reintroducing the off-screen-metric bug this type exists
+  /// to fix. Two doubles round-trip exactly through their decimal form, so
+  /// distinct bands always produce distinct keys.
+  String get cacheKey => '$top:$span';
+
   @override
   bool operator ==(Object other) =>
       other is MetricBand && other.top == top && other.span == span;

@@ -3170,6 +3170,77 @@ void main() {
       );
     });
 
+    testWidgets('a vertical pan re-maps the NDL line without re-selecting '
+        'which samples it draws', (tester) async {
+      // Which samples a curve draws depends on the visible X window alone; the
+      // metric band only decides where they land vertically. A vertical pan
+      // therefore has to rebuild the bars (their Y positions move with the
+      // band) while arriving at exactly the same sample selection - which is
+      // what lets the decimation memo skip the work. Pinning the X list makes
+      // that invariant fail loudly if decimation ever grows a Y dependency.
+      await tester.pumpWidget(
+        _buildChartAllMetrics(
+          profile: _makeProfile(points: 60),
+          ndlCurve: List.filled(60, 3600),
+          metricsFollowViewport: true,
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // Zoom in far enough that the visible window actually clips the curve;
+      // one wheel notch is 1.1x, and clipping only bites past 2x.
+      final chart = find.byType(LineChart).first;
+      final center = tester.getCenter(chart);
+      for (var i = 0; i < 16; i++) {
+        await tester.sendEventToBinding(
+          PointerScrollEvent(
+            position: center,
+            scrollDelta: const Offset(0, -100),
+          ),
+        );
+      }
+      await tester.pump();
+
+      final zoomed = chartData(tester);
+      final before = ndlBars(tester).first.spots;
+      expect(
+        before.length,
+        lessThan(60),
+        reason:
+            'the visible window must actually be clipping the curve, '
+            'or this asserts nothing about decimation',
+      );
+
+      final gesture = await tester.startGesture(
+        center,
+        kind: PointerDeviceKind.mouse,
+      );
+      await gesture.moveBy(const Offset(0, -60));
+      await gesture.up();
+      await tester.pumpAndSettle();
+
+      final panned = chartData(tester);
+      expect(
+        (panned.minY - zoomed.minY).abs(),
+        greaterThan(1e-9),
+        reason: 'the drag must actually move the visible depth window',
+      );
+
+      final after = ndlBars(tester).first.spots;
+      expect(
+        after.map((s) => s.x).toList(),
+        before.map((s) => s.x).toList(),
+        reason:
+            'a vertical pan leaves the visible X window untouched, so the '
+            'same samples must be selected',
+      );
+      expect(
+        after.map((s) => s.y).toList(),
+        isNot(before.map((s) => s.y).toList()),
+        reason: 'the same samples must still be re-mapped into the new band',
+      );
+    });
+
     testWidgets('off by default: NDL still zooms with the depth axis', (
       tester,
     ) async {

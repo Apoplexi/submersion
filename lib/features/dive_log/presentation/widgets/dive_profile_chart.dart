@@ -1,3 +1,4 @@
+import 'dart:collection';
 import 'dart:math' as math;
 
 import 'package:fl_chart/fl_chart.dart';
@@ -880,11 +881,47 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
     return 'z$zoomBucket-p$panBucket';
   }
 
+  /// Memo for [_decimatedCurveIndices], keyed by list identity and scoped by
+  /// [_decimationScope] to the inputs the answer actually depends on.
+  ///
+  /// Which samples a curve draws is a function of the profile and the visible
+  /// *X* window only — never of the metric band. But the band is folded into
+  /// every bar-cache signature (it has to be: band-mapped spots move with it),
+  /// so with viewport-following metrics on, a vertical pan invalidates every
+  /// group and would re-run all fourteen analysis curves' O(n) envelope
+  /// decimation to arrive at the indices it just discarded. Re-emitting the
+  /// spots is unavoidable; re-deciding which ones is not.
+  final Map<List<num>, List<int>> _decimatedIndicesCache =
+      HashMap<List<num>, List<int>>.identity();
+
+  /// Inputs [_decimatedCurveIndices] reads besides [values]. Exact, not
+  /// bucketed: the memo only ever returns an answer it would have recomputed
+  /// identically, so it adds no staleness of its own on top of the coarse
+  /// [_viewportDecimationBucket] the bar cache already tolerates.
+  String _decimationScope = '';
+
+  /// Drops the memo when the profile or the visible X window changes. Called
+  /// once per build, before any series builder runs.
+  void _syncDecimationScope() {
+    final scope = _sigOf([
+      identityHashCode(widget.profile),
+      _viewport.isZoomed,
+      _viewport.offsetX,
+      _viewport.visibleWidth,
+    ]);
+    if (scope == _decimationScope) return;
+    _decimationScope = scope;
+    _decimatedIndicesCache.clear();
+  }
+
   /// Indices of [values] (parallel to [widget.profile]) to render: clipped
   /// to the visible window expanded by half a window on each side, then
   /// decimated to [_curvePointBudget] preserving the value envelope
   /// (min/max per bucket, global extreme, endpoints).
-  List<int> _decimatedCurveIndices(List<num> values) {
+  List<int> _decimatedCurveIndices(List<num> values) => _decimatedIndicesCache
+      .putIfAbsent(values, () => _computeDecimatedCurveIndices(values));
+
+  List<int> _computeDecimatedCurveIndices(List<num> values) {
     final n = math.min(widget.profile.length, values.length);
     if (n == 0) return const [];
     var start = 0;
@@ -1609,8 +1646,14 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
     final totalMaxDepth = _totalMaxDepth(units);
     // Every band-mapped bar's Y position moves with the visible depth window,
     // so the band belongs in each signature that covers one — otherwise a zoom
-    // or vertical pan is served stale bars from the cache.
-    final metricBandSig = _metricBand(totalMaxDepth).hashCode;
+    // or vertical pan is served stale bars from the cache. Every group holds at
+    // least one band-mapped series, so this sits in the common part.
+    //
+    // Rebuilding those bars is unavoidable: their spots genuinely move. What is
+    // avoidable is re-deciding *which* samples to draw, which depends on the X
+    // window alone — see _syncDecimationScope.
+    final metricBandSig = _metricBand(totalMaxDepth).cacheKey;
+    _syncDecimationScope();
     final commonSig = _sigOf([
       identityHashCode(widget.profile),
       identityHashCode(legendState),
