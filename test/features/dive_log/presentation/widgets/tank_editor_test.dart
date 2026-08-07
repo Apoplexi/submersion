@@ -52,6 +52,10 @@ void main() {
             ),
           ].cast(),
           child: MaterialApp(
+            // Pinned: an unpinned MaterialApp resolves against the host
+            // machine's locale list, so English label assertions below fail
+            // on a non-English dev machine.
+            locale: const Locale('en'),
             localizationsDelegates: AppLocalizations.localizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
             home: Scaffold(
@@ -115,6 +119,10 @@ void main() {
             ),
           ].cast(),
           child: MaterialApp(
+            // Pinned: an unpinned MaterialApp resolves against the host
+            // machine's locale list, so English label assertions below fail
+            // on a non-English dev machine.
+            locale: const Locale('en'),
             localizationsDelegates: AppLocalizations.localizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
             home: Scaffold(
@@ -179,6 +187,10 @@ void main() {
             ),
           ].cast(),
           child: MaterialApp(
+            // Pinned: an unpinned MaterialApp resolves against the host
+            // machine's locale list, so English label assertions below fail
+            // on a non-English dev machine.
+            locale: const Locale('en'),
             localizationsDelegates: AppLocalizations.localizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
             home: Scaffold(
@@ -251,6 +263,10 @@ void main() {
             ),
           ].cast(),
           child: MaterialApp(
+            // Pinned: an unpinned MaterialApp resolves against the host
+            // machine's locale list, so English label assertions below fail
+            // on a non-English dev machine.
+            locale: const Locale('en'),
             localizationsDelegates: AppLocalizations.localizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
             home: Scaffold(
@@ -327,6 +343,10 @@ void main() {
             ),
           ].cast(),
           child: MaterialApp(
+            // Pinned: an unpinned MaterialApp resolves against the host
+            // machine's locale list, so English label assertions below fail
+            // on a non-English dev machine.
+            locale: const Locale('en'),
             localizationsDelegates: AppLocalizations.localizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
             home: Scaffold(
@@ -361,6 +381,73 @@ void main() {
       expect(added.isBuiltIn, isFalse);
       expect(find.textContaining('Saved preset'), findsOneWidget);
     });
+
+    testWidgets('Save as preset reports a failed save instead of throwing', (
+      tester,
+    ) async {
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+      final builtInPresets = TankPresets.all
+          .map((p) => TankPresetEntity.fromBuiltIn(p))
+          .toList();
+      final notifier = _MockTankPresetListNotifier(builtInPresets)
+        ..addPresetError = Exception('db is down');
+
+      const tank = DiveTank(
+        id: 'tank-1',
+        volume: 11.1,
+        workingPressure: 232.0,
+        gasMix: GasMix(o2: 21.0, he: 0.0),
+      );
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            sharedPreferencesProvider.overrideWithValue(prefs),
+            settingsProvider.overrideWith((ref) => MockSettingsNotifier()),
+            currentDiverIdProvider.overrideWith(
+              (ref) => MockCurrentDiverIdNotifier(),
+            ),
+            tankPresetListNotifierProvider.overrideWith((ref) => notifier),
+            tankPresetsProvider.overrideWith(
+              (ref) => Future.value(builtInPresets),
+            ),
+          ].cast(),
+          child: MaterialApp(
+            // Pinned: an unpinned MaterialApp resolves against the host
+            // machine's locale list, so English label assertions below fail
+            // on a non-English dev machine.
+            locale: const Locale('en'),
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: Scaffold(
+              body: SingleChildScrollView(
+                child: TankEditor(tank: tank, tankNumber: 1, onChanged: (_) {}),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Save as preset'));
+      await tester.pumpAndSettle();
+      await tester.enterText(
+        find.descendant(
+          of: find.byType(AlertDialog),
+          matching: find.byType(TextField),
+        ),
+        'My AL80',
+      );
+      await tester.tap(find.widgetWithText(FilledButton, 'Save'));
+      await tester.pumpAndSettle();
+
+      // The failure is reported to the user, not raised as a framework error,
+      // and no preset is selected.
+      expect(tester.takeException(), isNull);
+      expect(find.textContaining('Error saving preset'), findsOneWidget);
+      expect(find.textContaining('Saved preset'), findsNothing);
+    });
   });
 }
 
@@ -376,8 +463,13 @@ class _MockTankPresetListNotifier
 
   TankPresetEntity? lastAddedPreset;
 
+  /// When set, [addPreset] throws this instead of succeeding, standing in for
+  /// a failed database write.
+  Object? addPresetError;
+
   @override
   Future<TankPresetEntity> addPreset(TankPresetEntity preset) async {
+    if (addPresetError != null) throw addPresetError!;
     lastAddedPreset = preset;
     return preset;
   }

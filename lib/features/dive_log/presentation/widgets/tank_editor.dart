@@ -225,19 +225,31 @@ class _TankEditorState extends ConsumerState<TankEditor> {
       workingPressureBar: workingPressureBar,
       material: _material ?? TankMaterial.aluminum,
     );
-    final saved = await ref
-        .read(tankPresetListNotifierProvider.notifier)
-        .addPreset(preset);
-    if (!mounted) return;
-    setState(() => _selectedPreset = saved);
-    _notifyChange();
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          context.l10n.diveLog_tank_saveAsPreset_saved(saved.displayName),
+    try {
+      final saved = await ref
+          .read(tankPresetListNotifierProvider.notifier)
+          .addPreset(preset);
+      if (!mounted) return;
+      setState(() => _selectedPreset = saved);
+      _notifyChange();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            context.l10n.diveLog_tank_saveAsPreset_saved(saved.displayName),
+          ),
         ),
-      ),
-    );
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            context.l10n.tankPresets_edit_errorSaving(e.toString()),
+          ),
+          backgroundColor: Theme.of(context).colorScheme.error,
+        ),
+      );
+    }
   }
 
   Future<String?> _promptPresetName() => showDialog<String>(
