@@ -1,4 +1,9 @@
 {
+  "diveLog_tank_saveAsPreset": "שמור כתבנית",
+  "diveLog_tank_saveAsPreset_needSpecs": "הזן תחילה נפח ולחץ עבודה",
+  "diveLog_tank_saveAsPreset_nameTitle": "שמור תבנית בלון",
+  "diveLog_tank_saveAsPreset_nameHint": "לדוגמה AL80 שלי",
+  "diveLog_tank_saveAsPreset_saved": "התבנית \"{name}\" נשמרה",
   "settings_units_defaultCurrency": "מטבע ברירת מחדל",
   "settings_units_dialog_defaultCurrency": "מטבע ברירת מחדל",
   "diveSites_list_menu_select": "בחירת אתרים",

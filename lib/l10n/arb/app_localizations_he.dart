@@ -6945,6 +6945,23 @@ class AppLocalizationsHe extends AppLocalizations {
   String get diveLog_tank_selectPreset => 'בחר תבנית...';
 
   @override
+  String get diveLog_tank_saveAsPreset => 'שמור כתבנית';
+
+  @override
+  String get diveLog_tank_saveAsPreset_needSpecs => 'הזן תחילה נפח ולחץ עבודה';
+
+  @override
+  String get diveLog_tank_saveAsPreset_nameTitle => 'שמור תבנית בלון';
+
+  @override
+  String get diveLog_tank_saveAsPreset_nameHint => 'לדוגמה AL80 שלי';
+
+  @override
+  String diveLog_tank_saveAsPreset_saved(String name) {
+    return 'התבנית \"$name\" נשמרה';
+  }
+
+  @override
   String diveLog_tank_title(Object number) {
     return 'בלון $number';
   }

@@ -1,4 +1,9 @@
 {
+  "diveLog_tank_saveAsPreset": "حفظ كإعداد مسبق",
+  "diveLog_tank_saveAsPreset_needSpecs": "أدخل الحجم وضغط العمل أولاً",
+  "diveLog_tank_saveAsPreset_nameTitle": "حفظ إعداد الأسطوانة المسبق",
+  "diveLog_tank_saveAsPreset_nameHint": "مثال: AL80 خاصتي",
+  "diveLog_tank_saveAsPreset_saved": "تم حفظ الإعداد المسبق \"{name}\"",
   "settings_units_defaultCurrency": "العملة الافتراضية",
   "settings_units_dialog_defaultCurrency": "العملة الافتراضية",
   "diveSites_list_menu_select": "تحديد المواقع",

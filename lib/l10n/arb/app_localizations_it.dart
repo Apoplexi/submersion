@@ -7127,6 +7127,24 @@ class AppLocalizationsIt extends AppLocalizations {
   String get diveLog_tank_selectPreset => 'Seleziona preset...';
 
   @override
+  String get diveLog_tank_saveAsPreset => 'Salva come preset';
+
+  @override
+  String get diveLog_tank_saveAsPreset_needSpecs =>
+      'Inserisci prima volume e pressione di esercizio';
+
+  @override
+  String get diveLog_tank_saveAsPreset_nameTitle => 'Salva preset bombola';
+
+  @override
+  String get diveLog_tank_saveAsPreset_nameHint => 'es. La mia AL80';
+
+  @override
+  String diveLog_tank_saveAsPreset_saved(String name) {
+    return 'Preset \"$name\" salvato';
+  }
+
+  @override
   String diveLog_tank_title(Object number) {
     return 'Bombola $number';
   }

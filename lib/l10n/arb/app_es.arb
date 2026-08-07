@@ -1,4 +1,9 @@
 {
+  "diveLog_tank_saveAsPreset": "Guardar como preajuste",
+  "diveLog_tank_saveAsPreset_needSpecs": "Introduce primero un volumen y una presión de trabajo",
+  "diveLog_tank_saveAsPreset_nameTitle": "Guardar preajuste de tanque",
+  "diveLog_tank_saveAsPreset_nameHint": "p. ej. Mi AL80",
+  "diveLog_tank_saveAsPreset_saved": "Preajuste \"{name}\" guardado",
   "settings_units_defaultCurrency": "Moneda predeterminada",
   "settings_units_dialog_defaultCurrency": "Moneda predeterminada",
   "diveSites_list_menu_select": "Seleccionar puntos",

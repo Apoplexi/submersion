@@ -1,4 +1,9 @@
 {
+  "diveLog_tank_saveAsPreset": "Mentés előre beállításként",
+  "diveLog_tank_saveAsPreset_needSpecs": "Először adjon meg térfogatot és üzemi nyomást",
+  "diveLog_tank_saveAsPreset_nameTitle": "Palack előre beállítás mentése",
+  "diveLog_tank_saveAsPreset_nameHint": "pl. Az én AL80-am",
+  "diveLog_tank_saveAsPreset_saved": "\"{name}\" előre beállítás mentve",
   "settings_units_defaultCurrency": "Alapértelmezett pénznem",
   "settings_units_dialog_defaultCurrency": "Alapértelmezett pénznem",
   "diveSites_list_menu_select": "Merülőhelyek kiválasztása",

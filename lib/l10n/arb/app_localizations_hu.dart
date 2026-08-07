@@ -7104,6 +7104,25 @@ class AppLocalizationsHu extends AppLocalizations {
   String get diveLog_tank_selectPreset => 'Valasszon elore beallitast...';
 
   @override
+  String get diveLog_tank_saveAsPreset => 'Mentés előre beállításként';
+
+  @override
+  String get diveLog_tank_saveAsPreset_needSpecs =>
+      'Először adjon meg térfogatot és üzemi nyomást';
+
+  @override
+  String get diveLog_tank_saveAsPreset_nameTitle =>
+      'Palack előre beállítás mentése';
+
+  @override
+  String get diveLog_tank_saveAsPreset_nameHint => 'pl. Az én AL80-am';
+
+  @override
+  String diveLog_tank_saveAsPreset_saved(String name) {
+    return '\"$name\" előre beállítás mentve';
+  }
+
+  @override
   String diveLog_tank_title(Object number) {
     return '$number. palack';
   }
