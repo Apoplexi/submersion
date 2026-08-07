@@ -11234,6 +11234,28 @@ class AppLocalizationsZh extends AppLocalizations {
   String get media_diveMediaSection_title => '照片 & 视频';
 
   @override
+  String get media_diveMediaSection_deleteButton => '删除';
+
+  @override
+  String media_diveMediaSection_deleteError(Object error) {
+    return '删除失败：$error';
+  }
+
+  @override
+  String get media_diveMediaSection_deleteSelectedContent =>
+      '这会将它们从应用和任何媒体存储中移除。此操作无法撤销。';
+
+  @override
+  String media_diveMediaSection_deleteSelectedSuccess(int count) {
+    return '已删除 $count 个项目';
+  }
+
+  @override
+  String media_diveMediaSection_deleteSelectedTitle(int count) {
+    return '删除 $count 个项目？';
+  }
+
+  @override
   String get media_diveMediaSection_unlinkButton => '取消关联';
 
   @override
@@ -11768,6 +11790,29 @@ class AppLocalizationsZh extends AppLocalizations {
   String get media_console_transfers => '传输';
 
   @override
+  String get media_console_unlinked => '未关联';
+
+  @override
+  String get media_inbox_chooseDive => '选择潜水';
+
+  @override
+  String get media_inbox_empty => '没有未关联的媒体';
+
+  @override
+  String get media_inbox_keep => '保留';
+
+  @override
+  String media_inbox_linkChip(int number) {
+    return '关联到 #$number';
+  }
+
+  @override
+  String get media_inbox_linkToDive => '关联到潜水';
+
+  @override
+  String get media_inbox_linkToSite => '关联到潜点';
+
+  @override
   String get media_library_empty => '暂无媒体';
 
   @override
@@ -11792,12 +11837,27 @@ class AppLocalizationsZh extends AppLocalizations {
   String get media_library_filter_clear => '清除筛选';
 
   @override
+  String get media_divePicker_title => '移至潜水';
+
+  @override
+  String get media_divePicker_search => '搜索潜水';
+
+  @override
   String get media_library_deleteConfirmBody => '这会将它们从应用和任何媒体存储中移除。此操作无法撤销。';
 
   @override
   String media_library_deleteConfirmTitle(int count) {
     return '删除 $count 个项目？';
   }
+
+  @override
+  String get media_library_moveToDive => '移至潜水';
+
+  @override
+  String get media_library_unlinkFromSite => '取消关联潜点';
+
+  @override
+  String get media_library_unlinkSelected => '取消关联';
 
   @override
   String media_library_selectedCount(int count) {

@@ -11685,6 +11685,28 @@ class AppLocalizationsNl extends AppLocalizations {
   String get media_diveMediaSection_title => 'Foto\'s & video';
 
   @override
+  String get media_diveMediaSection_deleteButton => 'Verwijderen';
+
+  @override
+  String media_diveMediaSection_deleteError(Object error) {
+    return 'Verwijderen mislukt: $error';
+  }
+
+  @override
+  String get media_diveMediaSection_deleteSelectedContent =>
+      'Dit verwijdert ze uit de app en elke mediaopslag. Dit kan niet ongedaan worden gemaakt.';
+
+  @override
+  String media_diveMediaSection_deleteSelectedSuccess(int count) {
+    return '$count items verwijderd';
+  }
+
+  @override
+  String media_diveMediaSection_deleteSelectedTitle(int count) {
+    return '$count items verwijderen?';
+  }
+
+  @override
   String get media_diveMediaSection_unlinkButton => 'Ontkoppelen';
 
   @override
@@ -12235,6 +12257,29 @@ class AppLocalizationsNl extends AppLocalizations {
   String get media_console_transfers => 'Overdrachten';
 
   @override
+  String get media_console_unlinked => 'Niet gekoppeld';
+
+  @override
+  String get media_inbox_chooseDive => 'Duik kiezen';
+
+  @override
+  String get media_inbox_empty => 'Geen niet-gekoppelde media';
+
+  @override
+  String get media_inbox_keep => 'Behouden';
+
+  @override
+  String media_inbox_linkChip(int number) {
+    return 'Koppelen aan #$number';
+  }
+
+  @override
+  String get media_inbox_linkToDive => 'Aan duik koppelen';
+
+  @override
+  String get media_inbox_linkToSite => 'Aan duikstek koppelen';
+
+  @override
   String get media_library_empty => 'Nog geen media';
 
   @override
@@ -12259,6 +12304,12 @@ class AppLocalizationsNl extends AppLocalizations {
   String get media_library_filter_clear => 'Filters wissen';
 
   @override
+  String get media_divePicker_title => 'Naar duik verplaatsen';
+
+  @override
+  String get media_divePicker_search => 'Duiken zoeken';
+
+  @override
   String get media_library_deleteConfirmBody =>
       'Dit verwijdert ze uit de app en elke mediaopslag. Dit kan niet ongedaan worden gemaakt.';
 
@@ -12266,6 +12317,15 @@ class AppLocalizationsNl extends AppLocalizations {
   String media_library_deleteConfirmTitle(int count) {
     return '$count items verwijderen?';
   }
+
+  @override
+  String get media_library_moveToDive => 'Naar duik verplaatsen';
+
+  @override
+  String get media_library_unlinkFromSite => 'Loskoppelen van duikstek';
+
+  @override
+  String get media_library_unlinkSelected => 'Loskoppelen';
 
   @override
   String media_library_selectedCount(int count) {

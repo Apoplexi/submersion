@@ -11736,6 +11736,28 @@ class AppLocalizationsHu extends AppLocalizations {
   String get media_diveMediaSection_title => 'Fotok es videok';
 
   @override
+  String get media_diveMediaSection_deleteButton => 'Törlés';
+
+  @override
+  String media_diveMediaSection_deleteError(Object error) {
+    return 'Nem sikerult a torles: $error';
+  }
+
+  @override
+  String get media_diveMediaSection_deleteSelectedContent =>
+      'Ez eltávolítja őket az alkalmazásból és minden médiatárból. Nem vonható vissza.';
+
+  @override
+  String media_diveMediaSection_deleteSelectedSuccess(int count) {
+    return '$count elem törölve';
+  }
+
+  @override
+  String media_diveMediaSection_deleteSelectedTitle(int count) {
+    return '$count elem törlése?';
+  }
+
+  @override
   String get media_diveMediaSection_unlinkButton => 'Levalasztas';
 
   @override
@@ -12290,6 +12312,29 @@ class AppLocalizationsHu extends AppLocalizations {
   String get media_console_transfers => 'Átvitelek';
 
   @override
+  String get media_console_unlinked => 'Nem csatolt';
+
+  @override
+  String get media_inbox_chooseDive => 'Merülés kiválasztása';
+
+  @override
+  String get media_inbox_empty => 'Nincs nem csatolt média';
+
+  @override
+  String get media_inbox_keep => 'Megtartás';
+
+  @override
+  String media_inbox_linkChip(int number) {
+    return 'Csatolás: #$number';
+  }
+
+  @override
+  String get media_inbox_linkToDive => 'Csatolás merüléshez';
+
+  @override
+  String get media_inbox_linkToSite => 'Csatolás merülőhelyhez';
+
+  @override
   String get media_library_empty => 'Még nincs média';
 
   @override
@@ -12314,6 +12359,12 @@ class AppLocalizationsHu extends AppLocalizations {
   String get media_library_filter_clear => 'Szűrők törlése';
 
   @override
+  String get media_divePicker_title => 'Áthelyezés merüléshez';
+
+  @override
+  String get media_divePicker_search => 'Merülések keresése';
+
+  @override
   String get media_library_deleteConfirmBody =>
       'Ez eltávolítja őket az alkalmazásból és minden médiatárból. Nem vonható vissza.';
 
@@ -12321,6 +12372,15 @@ class AppLocalizationsHu extends AppLocalizations {
   String media_library_deleteConfirmTitle(int count) {
     return '$count elem törlése?';
   }
+
+  @override
+  String get media_library_moveToDive => 'Áthelyezés merüléshez';
+
+  @override
+  String get media_library_unlinkFromSite => 'Leválasztás a merülőhelyről';
+
+  @override
+  String get media_library_unlinkSelected => 'Leválasztás';
 
   @override
   String media_library_selectedCount(int count) {

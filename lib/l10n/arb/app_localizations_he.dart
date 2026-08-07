@@ -11483,6 +11483,28 @@ class AppLocalizationsHe extends AppLocalizations {
   String get media_diveMediaSection_title => 'תמונות וסרטונים';
 
   @override
+  String get media_diveMediaSection_deleteButton => 'מחיקה';
+
+  @override
+  String media_diveMediaSection_deleteError(Object error) {
+    return 'המחיקה נכשלה: $error';
+  }
+
+  @override
+  String get media_diveMediaSection_deleteSelectedContent =>
+      'פעולה זו מסירה אותם מהאפליקציה ומכל מאגר מדיה. לא ניתן לבטל זאת.';
+
+  @override
+  String media_diveMediaSection_deleteSelectedSuccess(int count) {
+    return '$count פריטים נמחקו';
+  }
+
+  @override
+  String media_diveMediaSection_deleteSelectedTitle(int count) {
+    return 'למחוק $count פריטים?';
+  }
+
+  @override
   String get media_diveMediaSection_unlinkButton => 'בטל קישור';
 
   @override
@@ -12025,6 +12047,29 @@ class AppLocalizationsHe extends AppLocalizations {
   String get media_console_transfers => 'העברות';
 
   @override
+  String get media_console_unlinked => 'לא מקושרים';
+
+  @override
+  String get media_inbox_chooseDive => 'בחירת צלילה';
+
+  @override
+  String get media_inbox_empty => 'אין מדיה לא מקושרת';
+
+  @override
+  String get media_inbox_keep => 'שמירה';
+
+  @override
+  String media_inbox_linkChip(int number) {
+    return 'קישור אל #$number';
+  }
+
+  @override
+  String get media_inbox_linkToDive => 'קישור לצלילה';
+
+  @override
+  String get media_inbox_linkToSite => 'קישור לאתר';
+
+  @override
   String get media_library_empty => 'אין מדיה עדיין';
 
   @override
@@ -12049,6 +12094,12 @@ class AppLocalizationsHe extends AppLocalizations {
   String get media_library_filter_clear => 'ניקוי מסננים';
 
   @override
+  String get media_divePicker_title => 'העברה לצלילה';
+
+  @override
+  String get media_divePicker_search => 'חיפוש צלילות';
+
+  @override
   String get media_library_deleteConfirmBody =>
       'פעולה זו מסירה אותם מהאפליקציה ומכל מאגר מדיה. לא ניתן לבטל זאת.';
 
@@ -12056,6 +12107,15 @@ class AppLocalizationsHe extends AppLocalizations {
   String media_library_deleteConfirmTitle(int count) {
     return 'למחוק $count פריטים?';
   }
+
+  @override
+  String get media_library_moveToDive => 'העברה לצלילה';
+
+  @override
+  String get media_library_unlinkFromSite => 'ניתוק מהאתר';
+
+  @override
+  String get media_library_unlinkSelected => 'ניתוק';
 
   @override
   String media_library_selectedCount(int count) {

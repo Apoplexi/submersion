@@ -11778,6 +11778,28 @@ class AppLocalizationsPt extends AppLocalizations {
   String get media_diveMediaSection_title => 'Fotos e Video';
 
   @override
+  String get media_diveMediaSection_deleteButton => 'Excluir';
+
+  @override
+  String media_diveMediaSection_deleteError(Object error) {
+    return 'Falha ao excluir: $error';
+  }
+
+  @override
+  String get media_diveMediaSection_deleteSelectedContent =>
+      'Isso os remove do aplicativo e de qualquer armazenamento de mídia. Não pode ser desfeito.';
+
+  @override
+  String media_diveMediaSection_deleteSelectedSuccess(int count) {
+    return '$count itens excluídos';
+  }
+
+  @override
+  String media_diveMediaSection_deleteSelectedTitle(int count) {
+    return 'Excluir $count itens?';
+  }
+
+  @override
   String get media_diveMediaSection_unlinkButton => 'Desvincular';
 
   @override
@@ -12334,6 +12356,29 @@ class AppLocalizationsPt extends AppLocalizations {
   String get media_console_transfers => 'Transferências';
 
   @override
+  String get media_console_unlinked => 'Sem vínculo';
+
+  @override
+  String get media_inbox_chooseDive => 'Escolher mergulho';
+
+  @override
+  String get media_inbox_empty => 'Nenhuma mídia sem vínculo';
+
+  @override
+  String get media_inbox_keep => 'Manter';
+
+  @override
+  String media_inbox_linkChip(int number) {
+    return 'Vincular a #$number';
+  }
+
+  @override
+  String get media_inbox_linkToDive => 'Vincular a um mergulho';
+
+  @override
+  String get media_inbox_linkToSite => 'Vincular a um ponto';
+
+  @override
   String get media_library_empty => 'Nenhuma mídia ainda';
 
   @override
@@ -12358,6 +12403,12 @@ class AppLocalizationsPt extends AppLocalizations {
   String get media_library_filter_clear => 'Limpar filtros';
 
   @override
+  String get media_divePicker_title => 'Mover para um mergulho';
+
+  @override
+  String get media_divePicker_search => 'Pesquisar mergulhos';
+
+  @override
   String get media_library_deleteConfirmBody =>
       'Isso os remove do aplicativo e de qualquer armazenamento de mídia. Não pode ser desfeito.';
 
@@ -12365,6 +12416,15 @@ class AppLocalizationsPt extends AppLocalizations {
   String media_library_deleteConfirmTitle(int count) {
     return 'Excluir $count itens?';
   }
+
+  @override
+  String get media_library_moveToDive => 'Mover para um mergulho';
+
+  @override
+  String get media_library_unlinkFromSite => 'Desvincular do ponto';
+
+  @override
+  String get media_library_unlinkSelected => 'Desvincular';
 
   @override
   String media_library_selectedCount(int count) {

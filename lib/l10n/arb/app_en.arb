@@ -6691,6 +6691,39 @@
   "media_diveMediaSection_selectedCount": "{count} selected",
   "media_diveMediaSection_thumbnailLabel": "View photo. Long press to select",
   "media_diveMediaSection_title": "Photos & Video",
+  "media_diveMediaSection_deleteButton": "Delete",
+  "@media_diveMediaSection_deleteButton": {
+    "description": "Dive media selection: destructive delete action"
+  },
+  "media_diveMediaSection_deleteError": "Failed to delete: {error}",
+  "@media_diveMediaSection_deleteError": {
+    "description": "Error snackbar when the dive media bulk delete fails",
+    "placeholders": {
+      "error": {
+        "type": "Object"
+      }
+    }
+  },
+  "media_diveMediaSection_deleteSelectedContent": "This removes them from the app and any media store. This cannot be undone.",
+  "@media_diveMediaSection_deleteSelectedContent": {
+    "description": "Body of the dive media bulk delete confirmation"
+  },
+  "media_diveMediaSection_deleteSelectedSuccess": "Deleted {count} items",
+  "@media_diveMediaSection_deleteSelectedSuccess": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "media_diveMediaSection_deleteSelectedTitle": "Delete {count} items?",
+  "@media_diveMediaSection_deleteSelectedTitle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "media_diveMediaSection_unlinkButton": "Unlink",
   "media_diveMediaSection_unlinkDialogContent": "Remove this photo from the dive? The photo will remain in your gallery.",
   "media_diveMediaSection_unlinkDialogTitle": "Unlink Photo",
@@ -7080,6 +7113,39 @@
   "@media_console_transfers": {
     "description": "Media console sidebar/tab label for the transfers view"
   },
+  "media_console_unlinked": "Unlinked",
+  "@media_console_unlinked": {
+    "description": "Media console sidebar/tab label for the unlinked inbox"
+  },
+  "media_inbox_chooseDive": "Choose dive",
+  "@media_inbox_chooseDive": {
+    "description": "Inbox chip for an ambiguous auto-match"
+  },
+  "media_inbox_empty": "No unlinked media",
+  "@media_inbox_empty": {
+    "description": "Empty state for the unlinked inbox"
+  },
+  "media_inbox_keep": "Keep",
+  "@media_inbox_keep": {
+    "description": "Inbox action: keep the item in the library unlinked"
+  },
+  "media_inbox_linkChip": "Link to #{number}",
+  "@media_inbox_linkChip": {
+    "description": "Inbox chip for a confident auto-match",
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "media_inbox_linkToDive": "Link to dive",
+  "@media_inbox_linkToDive": {
+    "description": "Inbox menu action: pick a dive manually"
+  },
+  "media_inbox_linkToSite": "Link to site",
+  "@media_inbox_linkToSite": {
+    "description": "Inbox menu action: pick a site manually"
+  },
   "media_library_empty": "No media yet",
   "@media_library_empty": {
     "description": "Empty state for the media library"
@@ -7112,6 +7178,14 @@
   "@media_library_filter_clear": {
     "description": "Library filter chip: reset every filter"
   },
+  "media_divePicker_title": "Move to dive",
+  "@media_divePicker_title": {
+    "description": "Title of the dive picker sheet"
+  },
+  "media_divePicker_search": "Search dives",
+  "@media_divePicker_search": {
+    "description": "Search hint in the dive picker sheet"
+  },
   "media_library_deleteConfirmBody": "This removes them from the app and any media store. This cannot be undone.",
   "@media_library_deleteConfirmBody": {
     "description": "Body of the bulk delete confirmation dialog"
@@ -7124,6 +7198,18 @@
         "type": "int"
       }
     }
+  },
+  "media_library_moveToDive": "Move to dive",
+  "@media_library_moveToDive": {
+    "description": "Library selection action: reassign media to a dive"
+  },
+  "media_library_unlinkFromSite": "Unlink from site",
+  "@media_library_unlinkFromSite": {
+    "description": "Library selection action: clear the site link"
+  },
+  "media_library_unlinkSelected": "Unlink",
+  "@media_library_unlinkSelected": {
+    "description": "Library selection action: clear the dive link"
   },
   "media_library_selectedCount": "{count} selected",
   "@media_library_selectedCount": {

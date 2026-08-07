@@ -11581,6 +11581,28 @@ class AppLocalizationsEn extends AppLocalizations {
   String get media_diveMediaSection_title => 'Photos & Video';
 
   @override
+  String get media_diveMediaSection_deleteButton => 'Delete';
+
+  @override
+  String media_diveMediaSection_deleteError(Object error) {
+    return 'Failed to delete: $error';
+  }
+
+  @override
+  String get media_diveMediaSection_deleteSelectedContent =>
+      'This removes them from the app and any media store. This cannot be undone.';
+
+  @override
+  String media_diveMediaSection_deleteSelectedSuccess(int count) {
+    return 'Deleted $count items';
+  }
+
+  @override
+  String media_diveMediaSection_deleteSelectedTitle(int count) {
+    return 'Delete $count items?';
+  }
+
+  @override
   String get media_diveMediaSection_unlinkButton => 'Unlink';
 
   @override
@@ -12130,6 +12152,29 @@ class AppLocalizationsEn extends AppLocalizations {
   String get media_console_transfers => 'Transfers';
 
   @override
+  String get media_console_unlinked => 'Unlinked';
+
+  @override
+  String get media_inbox_chooseDive => 'Choose dive';
+
+  @override
+  String get media_inbox_empty => 'No unlinked media';
+
+  @override
+  String get media_inbox_keep => 'Keep';
+
+  @override
+  String media_inbox_linkChip(int number) {
+    return 'Link to #$number';
+  }
+
+  @override
+  String get media_inbox_linkToDive => 'Link to dive';
+
+  @override
+  String get media_inbox_linkToSite => 'Link to site';
+
+  @override
   String get media_library_empty => 'No media yet';
 
   @override
@@ -12154,6 +12199,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get media_library_filter_clear => 'Clear filters';
 
   @override
+  String get media_divePicker_title => 'Move to dive';
+
+  @override
+  String get media_divePicker_search => 'Search dives';
+
+  @override
   String get media_library_deleteConfirmBody =>
       'This removes them from the app and any media store. This cannot be undone.';
 
@@ -12161,6 +12212,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String media_library_deleteConfirmTitle(int count) {
     return 'Delete $count items?';
   }
+
+  @override
+  String get media_library_moveToDive => 'Move to dive';
+
+  @override
+  String get media_library_unlinkFromSite => 'Unlink from site';
+
+  @override
+  String get media_library_unlinkSelected => 'Unlink';
 
   @override
   String media_library_selectedCount(int count) {

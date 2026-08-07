@@ -20066,6 +20066,36 @@ abstract class AppLocalizations {
   /// **'Photos & Video'**
   String get media_diveMediaSection_title;
 
+  /// Dive media selection: destructive delete action
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get media_diveMediaSection_deleteButton;
+
+  /// Error snackbar when the dive media bulk delete fails
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to delete: {error}'**
+  String media_diveMediaSection_deleteError(Object error);
+
+  /// Body of the dive media bulk delete confirmation
+  ///
+  /// In en, this message translates to:
+  /// **'This removes them from the app and any media store. This cannot be undone.'**
+  String get media_diveMediaSection_deleteSelectedContent;
+
+  /// No description provided for @media_diveMediaSection_deleteSelectedSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Deleted {count} items'**
+  String media_diveMediaSection_deleteSelectedSuccess(int count);
+
+  /// No description provided for @media_diveMediaSection_deleteSelectedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete {count} items?'**
+  String media_diveMediaSection_deleteSelectedTitle(int count);
+
   /// No description provided for @media_diveMediaSection_unlinkButton.
   ///
   /// In en, this message translates to:
@@ -20899,6 +20929,48 @@ abstract class AppLocalizations {
   /// **'Transfers'**
   String get media_console_transfers;
 
+  /// Media console sidebar/tab label for the unlinked inbox
+  ///
+  /// In en, this message translates to:
+  /// **'Unlinked'**
+  String get media_console_unlinked;
+
+  /// Inbox chip for an ambiguous auto-match
+  ///
+  /// In en, this message translates to:
+  /// **'Choose dive'**
+  String get media_inbox_chooseDive;
+
+  /// Empty state for the unlinked inbox
+  ///
+  /// In en, this message translates to:
+  /// **'No unlinked media'**
+  String get media_inbox_empty;
+
+  /// Inbox action: keep the item in the library unlinked
+  ///
+  /// In en, this message translates to:
+  /// **'Keep'**
+  String get media_inbox_keep;
+
+  /// Inbox chip for a confident auto-match
+  ///
+  /// In en, this message translates to:
+  /// **'Link to #{number}'**
+  String media_inbox_linkChip(int number);
+
+  /// Inbox menu action: pick a dive manually
+  ///
+  /// In en, this message translates to:
+  /// **'Link to dive'**
+  String get media_inbox_linkToDive;
+
+  /// Inbox menu action: pick a site manually
+  ///
+  /// In en, this message translates to:
+  /// **'Link to site'**
+  String get media_inbox_linkToSite;
+
   /// Empty state for the media library
   ///
   /// In en, this message translates to:
@@ -20947,6 +21019,18 @@ abstract class AppLocalizations {
   /// **'Clear filters'**
   String get media_library_filter_clear;
 
+  /// Title of the dive picker sheet
+  ///
+  /// In en, this message translates to:
+  /// **'Move to dive'**
+  String get media_divePicker_title;
+
+  /// Search hint in the dive picker sheet
+  ///
+  /// In en, this message translates to:
+  /// **'Search dives'**
+  String get media_divePicker_search;
+
   /// Body of the bulk delete confirmation dialog
   ///
   /// In en, this message translates to:
@@ -20958,6 +21042,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Delete {count} items?'**
   String media_library_deleteConfirmTitle(int count);
+
+  /// Library selection action: reassign media to a dive
+  ///
+  /// In en, this message translates to:
+  /// **'Move to dive'**
+  String get media_library_moveToDive;
+
+  /// Library selection action: clear the site link
+  ///
+  /// In en, this message translates to:
+  /// **'Unlink from site'**
+  String get media_library_unlinkFromSite;
+
+  /// Library selection action: clear the dive link
+  ///
+  /// In en, this message translates to:
+  /// **'Unlink'**
+  String get media_library_unlinkSelected;
 
   /// Selection bar count label
   ///

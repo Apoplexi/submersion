@@ -11562,6 +11562,28 @@ class AppLocalizationsAr extends AppLocalizations {
   String get media_diveMediaSection_title => 'الصور والفيديو';
 
   @override
+  String get media_diveMediaSection_deleteButton => 'حذف';
+
+  @override
+  String media_diveMediaSection_deleteError(Object error) {
+    return 'فشل في الحذف: $error';
+  }
+
+  @override
+  String get media_diveMediaSection_deleteSelectedContent =>
+      'ستتم إزالتها من التطبيق ومن أي مخزن وسائط. لا يمكن التراجع عن هذا.';
+
+  @override
+  String media_diveMediaSection_deleteSelectedSuccess(int count) {
+    return 'تم حذف $count عناصر';
+  }
+
+  @override
+  String media_diveMediaSection_deleteSelectedTitle(int count) {
+    return 'حذف $count عناصر؟';
+  }
+
+  @override
   String get media_diveMediaSection_unlinkButton => 'إلغاء الربط';
 
   @override
@@ -12107,6 +12129,29 @@ class AppLocalizationsAr extends AppLocalizations {
   String get media_console_transfers => 'عمليات النقل';
 
   @override
+  String get media_console_unlinked => 'غير مرتبطة';
+
+  @override
+  String get media_inbox_chooseDive => 'اختيار الغطسة';
+
+  @override
+  String get media_inbox_empty => 'لا توجد وسائط غير مرتبطة';
+
+  @override
+  String get media_inbox_keep => 'احتفاظ';
+
+  @override
+  String media_inbox_linkChip(int number) {
+    return 'ربط بالغطسة رقم $number';
+  }
+
+  @override
+  String get media_inbox_linkToDive => 'ربط بغطسة';
+
+  @override
+  String get media_inbox_linkToSite => 'ربط بموقع';
+
+  @override
   String get media_library_empty => 'لا توجد وسائط بعد';
 
   @override
@@ -12131,6 +12176,12 @@ class AppLocalizationsAr extends AppLocalizations {
   String get media_library_filter_clear => 'مسح عوامل التصفية';
 
   @override
+  String get media_divePicker_title => 'نقل إلى غطسة';
+
+  @override
+  String get media_divePicker_search => 'البحث في الغطسات';
+
+  @override
   String get media_library_deleteConfirmBody =>
       'ستتم إزالتها من التطبيق ومن أي مخزن وسائط. لا يمكن التراجع عن هذا.';
 
@@ -12138,6 +12189,15 @@ class AppLocalizationsAr extends AppLocalizations {
   String media_library_deleteConfirmTitle(int count) {
     return 'حذف $count عناصر؟';
   }
+
+  @override
+  String get media_library_moveToDive => 'نقل إلى غطسة';
+
+  @override
+  String get media_library_unlinkFromSite => 'إلغاء الربط بالموقع';
+
+  @override
+  String get media_library_unlinkSelected => 'إلغاء الربط';
 
   @override
   String media_library_selectedCount(int count) {

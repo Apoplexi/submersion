@@ -11762,6 +11762,28 @@ class AppLocalizationsEs extends AppLocalizations {
   String get media_diveMediaSection_title => 'Fotos y video';
 
   @override
+  String get media_diveMediaSection_deleteButton => 'Eliminar';
+
+  @override
+  String media_diveMediaSection_deleteError(Object error) {
+    return 'Error al eliminar: $error';
+  }
+
+  @override
+  String get media_diveMediaSection_deleteSelectedContent =>
+      'Esto los elimina de la aplicación y de cualquier almacén multimedia. No se puede deshacer.';
+
+  @override
+  String media_diveMediaSection_deleteSelectedSuccess(int count) {
+    return '$count elementos eliminados';
+  }
+
+  @override
+  String media_diveMediaSection_deleteSelectedTitle(int count) {
+    return '¿Eliminar $count elementos?';
+  }
+
+  @override
   String get media_diveMediaSection_unlinkButton => 'Desvincular';
 
   @override
@@ -12318,6 +12340,29 @@ class AppLocalizationsEs extends AppLocalizations {
   String get media_console_transfers => 'Transferencias';
 
   @override
+  String get media_console_unlinked => 'Sin vincular';
+
+  @override
+  String get media_inbox_chooseDive => 'Elegir inmersión';
+
+  @override
+  String get media_inbox_empty => 'No hay contenido multimedia sin vincular';
+
+  @override
+  String get media_inbox_keep => 'Conservar';
+
+  @override
+  String media_inbox_linkChip(int number) {
+    return 'Vincular a #$number';
+  }
+
+  @override
+  String get media_inbox_linkToDive => 'Vincular a una inmersión';
+
+  @override
+  String get media_inbox_linkToSite => 'Vincular a un sitio';
+
+  @override
   String get media_library_empty => 'Todavía no hay contenido multimedia';
 
   @override
@@ -12342,6 +12387,12 @@ class AppLocalizationsEs extends AppLocalizations {
   String get media_library_filter_clear => 'Borrar filtros';
 
   @override
+  String get media_divePicker_title => 'Mover a una inmersión';
+
+  @override
+  String get media_divePicker_search => 'Buscar inmersiones';
+
+  @override
   String get media_library_deleteConfirmBody =>
       'Esto los elimina de la aplicación y de cualquier almacén multimedia. No se puede deshacer.';
 
@@ -12349,6 +12400,15 @@ class AppLocalizationsEs extends AppLocalizations {
   String media_library_deleteConfirmTitle(int count) {
     return '¿Eliminar $count elementos?';
   }
+
+  @override
+  String get media_library_moveToDive => 'Mover a una inmersión';
+
+  @override
+  String get media_library_unlinkFromSite => 'Desvincular del sitio';
+
+  @override
+  String get media_library_unlinkSelected => 'Desvincular';
 
   @override
   String media_library_selectedCount(int count) {

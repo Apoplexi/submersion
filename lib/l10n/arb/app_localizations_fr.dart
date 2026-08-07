@@ -11809,6 +11809,28 @@ class AppLocalizationsFr extends AppLocalizations {
   String get media_diveMediaSection_title => 'Photos et video';
 
   @override
+  String get media_diveMediaSection_deleteButton => 'Supprimer';
+
+  @override
+  String media_diveMediaSection_deleteError(Object error) {
+    return 'Echec de la suppression : $error';
+  }
+
+  @override
+  String get media_diveMediaSection_deleteSelectedContent =>
+      'Cela les supprime de l\'application et de tout stockage multimédia. Cette action est irréversible.';
+
+  @override
+  String media_diveMediaSection_deleteSelectedSuccess(int count) {
+    return '$count éléments supprimés';
+  }
+
+  @override
+  String media_diveMediaSection_deleteSelectedTitle(int count) {
+    return 'Supprimer $count éléments ?';
+  }
+
+  @override
   String get media_diveMediaSection_unlinkButton => 'Dissocier';
 
   @override
@@ -12368,6 +12390,29 @@ class AppLocalizationsFr extends AppLocalizations {
   String get media_console_transfers => 'Transferts';
 
   @override
+  String get media_console_unlinked => 'Non liés';
+
+  @override
+  String get media_inbox_chooseDive => 'Choisir la plongée';
+
+  @override
+  String get media_inbox_empty => 'Aucun média non lié';
+
+  @override
+  String get media_inbox_keep => 'Conserver';
+
+  @override
+  String media_inbox_linkChip(int number) {
+    return 'Lier à #$number';
+  }
+
+  @override
+  String get media_inbox_linkToDive => 'Lier à une plongée';
+
+  @override
+  String get media_inbox_linkToSite => 'Lier à un site';
+
+  @override
   String get media_library_empty => 'Aucun média pour le moment';
 
   @override
@@ -12392,6 +12437,12 @@ class AppLocalizationsFr extends AppLocalizations {
   String get media_library_filter_clear => 'Effacer les filtres';
 
   @override
+  String get media_divePicker_title => 'Déplacer vers une plongée';
+
+  @override
+  String get media_divePicker_search => 'Rechercher des plongées';
+
+  @override
   String get media_library_deleteConfirmBody =>
       'Cela les supprime de l\'application et de tout stockage multimédia. Cette action est irréversible.';
 
@@ -12399,6 +12450,15 @@ class AppLocalizationsFr extends AppLocalizations {
   String media_library_deleteConfirmTitle(int count) {
     return 'Supprimer $count éléments ?';
   }
+
+  @override
+  String get media_library_moveToDive => 'Déplacer vers une plongée';
+
+  @override
+  String get media_library_unlinkFromSite => 'Dissocier du site';
+
+  @override
+  String get media_library_unlinkSelected => 'Dissocier';
 
   @override
   String media_library_selectedCount(int count) {

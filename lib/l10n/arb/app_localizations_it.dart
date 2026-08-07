@@ -11773,6 +11773,28 @@ class AppLocalizationsIt extends AppLocalizations {
   String get media_diveMediaSection_title => 'Foto e video';
 
   @override
+  String get media_diveMediaSection_deleteButton => 'Elimina';
+
+  @override
+  String media_diveMediaSection_deleteError(Object error) {
+    return 'Eliminazione non riuscita: $error';
+  }
+
+  @override
+  String get media_diveMediaSection_deleteSelectedContent =>
+      'Questo li rimuove dall\'app e da qualsiasi archivio multimediale. Non può essere annullato.';
+
+  @override
+  String media_diveMediaSection_deleteSelectedSuccess(int count) {
+    return '$count elementi eliminati';
+  }
+
+  @override
+  String media_diveMediaSection_deleteSelectedTitle(int count) {
+    return 'Eliminare $count elementi?';
+  }
+
+  @override
   String get media_diveMediaSection_unlinkButton => 'Scollega';
 
   @override
@@ -12330,6 +12352,29 @@ class AppLocalizationsIt extends AppLocalizations {
   String get media_console_transfers => 'Trasferimenti';
 
   @override
+  String get media_console_unlinked => 'Non collegati';
+
+  @override
+  String get media_inbox_chooseDive => 'Scegli immersione';
+
+  @override
+  String get media_inbox_empty => 'Nessun contenuto multimediale non collegato';
+
+  @override
+  String get media_inbox_keep => 'Mantieni';
+
+  @override
+  String media_inbox_linkChip(int number) {
+    return 'Collega a #$number';
+  }
+
+  @override
+  String get media_inbox_linkToDive => 'Collega a un\'immersione';
+
+  @override
+  String get media_inbox_linkToSite => 'Collega a un sito';
+
+  @override
   String get media_library_empty => 'Ancora nessun contenuto multimediale';
 
   @override
@@ -12354,6 +12399,12 @@ class AppLocalizationsIt extends AppLocalizations {
   String get media_library_filter_clear => 'Cancella filtri';
 
   @override
+  String get media_divePicker_title => 'Sposta in un\'immersione';
+
+  @override
+  String get media_divePicker_search => 'Cerca immersioni';
+
+  @override
   String get media_library_deleteConfirmBody =>
       'Questo li rimuove dall\'app e da qualsiasi archivio multimediale. Non può essere annullato.';
 
@@ -12361,6 +12412,15 @@ class AppLocalizationsIt extends AppLocalizations {
   String media_library_deleteConfirmTitle(int count) {
     return 'Eliminare $count elementi?';
   }
+
+  @override
+  String get media_library_moveToDive => 'Sposta in un\'immersione';
+
+  @override
+  String get media_library_unlinkFromSite => 'Scollega dal sito';
+
+  @override
+  String get media_library_unlinkSelected => 'Scollega';
 
   @override
   String media_library_selectedCount(int count) {
