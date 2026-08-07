@@ -101,6 +101,9 @@ void main() {
             customTankPresetsProvider.overrideWith((ref) async => []),
           ].cast(),
           child: MaterialApp(
+            // Every assertion below matches an English label, so pin the
+            // locale instead of inheriting the ambient platform one.
+            locale: const Locale('en'),
             localizationsDelegates: AppLocalizations.localizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
             home: Scaffold(

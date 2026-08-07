@@ -47,26 +47,22 @@ class BuddyRepository {
   /// {buddyId: the role id every one of [diveIds] agrees on for that buddy}.
   /// Buddies whose links disagree are omitted, so a caller filling in missing
   /// links can reuse a unanimous role without flattening a deliberate mix.
+  /// HAVING MIN(role) = MAX(role) keeps the mixed rows in SQLite rather than
+  /// shipping every junction row to Dart on the bulk-edit load path.
   Future<Map<String, String>> unanimousBuddyRolesForDives(
     List<String> diveIds,
   ) async {
     if (diveIds.isEmpty) return {};
-    final rows = await (_db.select(
-      _db.diveBuddies,
-    )..where((t) => t.diveId.isIn(diveIds))).get();
-    final roles = <String, String>{};
-    final mixed = <String>{};
-    for (final row in rows) {
-      if (mixed.contains(row.buddyId)) continue;
-      final seen = roles[row.buddyId];
-      if (seen == null) {
-        roles[row.buddyId] = row.role;
-      } else if (seen != row.role) {
-        mixed.add(row.buddyId);
-        roles.remove(row.buddyId);
-      }
-    }
-    return roles;
+    final j = _db.diveBuddies;
+    final minRole = j.role.min();
+    final maxRole = j.role.max();
+    final rows =
+        await (_db.selectOnly(j)
+              ..addColumns([j.buddyId, minRole])
+              ..where(j.diveId.isIn(diveIds))
+              ..groupBy([j.buddyId], having: minRole.equalsExp(maxRole)))
+            .get();
+    return {for (final r in rows) r.read(j.buddyId)!: r.read(minRole)!};
   }
 
   final SyncRepository _syncRepository = SyncRepository();
