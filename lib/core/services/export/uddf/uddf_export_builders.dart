@@ -606,11 +606,8 @@ class UddfExportBuilders {
                 nest: (dive.waterTemp! + 273.15).toString(),
               );
             }
-            if (dive.visibility != null) {
-              builder.element(
-                'visibility',
-                nest: _visibilityToUddf(dive.visibility!),
-              );
+            if (visibilityForUddf(dive) case final vis?) {
+              builder.element('visibility', nest: vis);
             }
             if (dive.rating != null) {
               builder.element(
@@ -1605,6 +1602,19 @@ class UddfExportBuilders {
     }
 
     return closest?.pressure;
+  }
+
+  /// UDDF carries visibility as a distance in meters.
+  ///
+  /// Dives logged from v144 export their real measurement; pre-v144 dives
+  /// still export the representative midpoint of their bucket. Null when the
+  /// dive has no visibility at all.
+  static String? visibilityForUddf(Dive dive) {
+    final meters = dive.visibilityMeters;
+    if (meters != null) return meters.toStringAsFixed(1);
+    final legacy = dive.visibility;
+    if (legacy == null || legacy == enums.Visibility.unknown) return null;
+    return _visibilityToUddf(legacy);
   }
 
   static String _visibilityToUddf(enums.Visibility visibility) {
