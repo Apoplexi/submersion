@@ -74,4 +74,48 @@ void main() {
     expect(second.skippedDuplicates, 1);
     expect(second.imported.single.platformAssetId, 'g2');
   });
+
+  group('media store enqueue', () {
+    late List<String> enqueued;
+    late MediaImportService storeBacked;
+
+    setUp(() {
+      enqueued = [];
+      storeBacked = MediaImportService(
+        mediaRepository: repo,
+        enrichmentService: const EnrichmentService(),
+        onMediaCreated: enqueued.add,
+      );
+    });
+
+    test('library import enqueues every created row by saved id', () async {
+      final result = await storeBacked.importPhotosToLibrary(
+        selectedAssets: [assetInfo('g1'), assetInfo('g2')],
+      );
+
+      expect(result.imported, hasLength(2));
+      expect(enqueued, [for (final item in result.imported) item.id]);
+    });
+
+    test('skipped duplicates are not re-enqueued', () async {
+      await storeBacked.importPhotosToLibrary(
+        selectedAssets: [assetInfo('g1')],
+      );
+      enqueued.clear();
+
+      final second = await storeBacked.importPhotosToLibrary(
+        selectedAssets: [assetInfo('g1'), assetInfo('g2')],
+      );
+
+      expect(second.skippedDuplicates, 1);
+      expect(enqueued, [second.imported.single.id]);
+    });
+
+    test('a null onMediaCreated does not throw', () async {
+      await expectLater(
+        service.importPhotosToLibrary(selectedAssets: [assetInfo('g1')]),
+        completes,
+      );
+    });
+  });
 }

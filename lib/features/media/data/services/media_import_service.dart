@@ -215,7 +215,12 @@ class MediaImportService {
     for (final asset in newAssets) {
       try {
         final item = _createMediaItemFromAsset(asset, retainInLibrary: true);
-        imported.add(await _mediaRepository.createMedia(item));
+        final saved = await _mediaRepository.createMedia(item);
+        imported.add(saved);
+        // Library rows are unlinked, but the store queue keys on the media
+        // id alone, never on a dive. Skipping the enqueue would sync the
+        // row to other devices while its bytes stayed on this one.
+        onMediaCreated?.call(saved.id);
       } catch (e) {
         failures[asset.id] = e.toString();
       }

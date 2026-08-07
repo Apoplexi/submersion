@@ -18,16 +18,26 @@ class MediaImportView extends ConsumerWidget {
   @visibleForTesting
   final Future<List<String>> Function(BuildContext context)? launchOverride;
 
+  /// Lower bound of the gallery tab's date window for a dive-less import.
+  ///
+  /// The mobile picker turns this into a hard photo_manager
+  /// `DateTimeCond(min:)`, so a "recent enough" sentinel would quietly hide
+  /// everything older -- scanned film and slide libraries being exactly the
+  /// media a diver back-fills. Epoch is photo_manager's own no-lower-bound
+  /// value (`DateTimeCond.def()`), so it reads as unbounded to the native
+  /// query rather than as an arbitrary cutoff.
+  static final DateTime libraryWindowStart =
+      DateTime.fromMillisecondsSinceEpoch(0);
+
   Future<List<String>> _pickAndImport(
     BuildContext context,
     WidgetRef ref,
   ) async {
     // No dive context: there is no meaningful date window, so the gallery
-    // tab gets an effectively-unbounded one (desktop file dialogs ignore
-    // it entirely).
+    // tab gets an unbounded one (desktop file dialogs ignore it entirely).
     final selected = await showPhotoPicker(
       context: context,
-      diveStartTime: DateTime(2000),
+      diveStartTime: libraryWindowStart,
       diveEndTime: DateTime.now().add(const Duration(days: 1)),
       buffer: Duration.zero,
     );
