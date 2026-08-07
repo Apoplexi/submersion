@@ -8,6 +8,7 @@ import 'package:submersion/features/dive_log/domain/entities/dive.dart';
 import 'package:submersion/features/media/data/repositories/media_repository.dart';
 import 'package:submersion/features/media/data/services/enrichment_service.dart';
 import 'package:submersion/features/media/data/services/photo_picker_service.dart';
+import 'package:submersion/features/media/data/services/trip_media_scanner.dart';
 import 'package:submersion/features/media/domain/entities/media_item.dart';
 import 'package:submersion/features/media/domain/entities/media_source_type.dart';
 
@@ -215,7 +216,12 @@ class MediaImportService {
     for (final asset in newAssets) {
       try {
         final item = _createMediaItemFromAsset(asset, retainInLibrary: true);
-        imported.add(await _mediaRepository.createMedia(item));
+        final saved = await _mediaRepository.createMedia(item);
+        imported.add(saved);
+        // Library rows are unlinked, but the store queue keys on the media
+        // id alone, never on a dive. Skipping the enqueue would sync the
+        // row to other devices while its bytes stayed on this one.
+        onMediaCreated?.call(saved.id);
       } catch (e) {
         failures[asset.id] = e.toString();
       }
@@ -265,7 +271,17 @@ class MediaImportService {
       localPath: isLocalFile ? path : null,
       latitude: asset.latitude,
       longitude: asset.longitude,
-      takenAt: asset.createDateTime,
+      // AssetInfo.createDateTime is contractually LOCAL (photo_manager's
+      // convention on mobile; the desktop picker mirrors it by reinterpreting
+      // the file's wall-clock capture digits as a local DateTime). MediaItem
+      // .takenAt is wall-clock-UTC -- MediaRepository persists
+      // `takenAt.millisecondsSinceEpoch` verbatim and hydrates it back with
+      // `isUtc: true`. Storing the local value would bake the host's UTC
+      // offset into that number, and the fullscreen viewer's metadata overlay,
+      // which formats the hydrated UTC value directly, would show a capture
+      // time shifted by that offset. The gallery-scan write path
+      // (TripMediaScanner) already normalises the same way.
+      takenAt: TripMediaScanner.toWallClockUtc(asset.createDateTime),
       width: asset.width,
       height: asset.height,
       durationSeconds: asset.durationSeconds,

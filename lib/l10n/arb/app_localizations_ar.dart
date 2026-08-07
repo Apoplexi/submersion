@@ -9,6 +9,11 @@ class AppLocalizationsAr extends AppLocalizations {
   AppLocalizationsAr([String locale = 'ar']) : super(locale);
 
   @override
+  String diveLog_edit_flightWindowWarning(String time) {
+    return 'ينتهي هذا الغوص بعد آخر وقت آمن للصعود إلى السطح قبل رحلتك ($time)';
+  }
+
+  @override
   String diveLog_edit_geofenceSuggestion_near(String location) {
     return 'بالقرب من $location';
   }
@@ -3048,6 +3053,15 @@ class AppLocalizationsAr extends AppLocalizations {
   String get dashboard_gauges_noFlyClear => 'حظر الطيران 0:00';
 
   @override
+  String dashboard_gauges_flightWindow(String hours, String minutes) {
+    return 'نافذة الغوص $hours:$minutes';
+  }
+
+  @override
+  String get dashboard_gauges_flightWindowClosed =>
+      'لا مزيد من الغوص قبل الرحلة';
+
+  @override
   String dashboard_gauges_noFlyRemaining(String hours, String minutes) {
     return 'حظر الطيران $hours:$minutes';
   }
@@ -3069,6 +3083,9 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get settings_homeChips_description =>
       'اختر شرائح الحالة التي تظهر أعلى تبويب الرئيسية.';
+
+  @override
+  String get settings_homeChips_flightWindow => 'نافذة الغوص قبل الرحلة';
 
   @override
   String get settings_homeChips_gear => 'صيانة المعدات';
@@ -10636,6 +10653,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get equipment_serviceDialog_costLabel => 'التكلفة';
 
   @override
+  String get equipment_serviceDialog_currencyLabel => 'العملة';
+
+  @override
   String get equipment_serviceDialog_costValidation => 'أدخل مبلغاً صالحاً';
 
   @override
@@ -11543,6 +11563,11 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get media_diveMediaSection_deleteButton => 'حذف';
+
+  @override
+  String media_diveMediaSection_deleteError(Object error) {
+    return 'فشل في الحذف: $error';
+  }
 
   @override
   String get media_diveMediaSection_deleteSelectedContent =>
@@ -12868,6 +12893,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get settings_about_reportIssue => 'الإبلاغ عن مشكلة';
+
+  @override
+  String get settings_about_reportIssue_copy => 'نسخ الرابط';
 
   @override
   String get settings_about_reportIssue_snackbar =>
@@ -15233,6 +15261,12 @@ class AppLocalizationsAr extends AppLocalizations {
   String get settings_units_sacRate => 'معدل SAC';
 
   @override
+  String get settings_units_defaultCurrency => 'العملة الافتراضية';
+
+  @override
+  String get settings_units_dialog_defaultCurrency => 'العملة الافتراضية';
+
+  @override
   String get settings_units_sac_pressurePerMinute => 'الضغط في الدقيقة';
 
   @override
@@ -17570,6 +17604,15 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get trips_edit_label_resortName => 'اسم المنتجع';
+
+  @override
+  String get trips_edit_label_returnFlight => 'رحلة العودة';
+
+  @override
+  String get trips_edit_returnFlightClear => 'مسح رحلة العودة';
+
+  @override
+  String get trips_edit_returnFlightNotSet => 'غير محدد';
 
   @override
   String get trips_edit_label_startDate => 'تاريخ البدء';
@@ -20404,6 +20447,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get diveLog_edit_section_environment => 'البيئة';
 
   @override
+  String get diveLog_edit_subsection_autofill => 'تعبئة تلقائية';
+
+  @override
   String get diveLog_edit_subsection_weather => 'الطقس';
 
   @override
@@ -22061,6 +22107,28 @@ class AppLocalizationsAr extends AppLocalizations {
       'فترات إرشادية بعد غطسة واحدة بلا توقفات، وغطسات متكررة، وغطسات بتخفيف الضغط';
 
   @override
+  String get flightWindow_closed => 'لا مزيد من الغوص قبل رحلتك';
+
+  @override
+  String get flightWindow_conflict =>
+      'تمتد فترة حظر الطيران إلى ما بعد إقلاع رحلتك';
+
+  @override
+  String flightWindow_departs(String time) {
+    return 'تقلع الرحلة $time';
+  }
+
+  @override
+  String flightWindow_openTitle(String remaining) {
+    return 'الوقت المتبقي للغوص: $remaining';
+  }
+
+  @override
+  String flightWindow_surfaceBy(String time) {
+    return 'اصعد إلى السطح قبل $time';
+  }
+
+  @override
   String safetyHub_noFly_active_title(String remaining) {
     return 'حظر الطيران: متبقٍ $remaining';
   }
@@ -22357,6 +22425,156 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get settings_section_safety_subtitle =>
       'قواعد المراجعة والطيران بعد الغوص';
+
+  @override
+  String get settings_section_security_title => 'أمان التطبيق';
+
+  @override
+  String get settings_section_security_subtitle =>
+      'قفل التطبيق وتشفير قاعدة البيانات';
+
+  @override
+  String get settings_security_appLock => 'قفل التطبيق';
+
+  @override
+  String get settings_security_appLock_subtitle =>
+      'طلب كلمة المرور أو القياسات الحيوية لفتح التطبيق';
+
+  @override
+  String get settings_security_biometrics => 'فتح القفل بالقياسات الحيوية';
+
+  @override
+  String get settings_security_autoLock => 'القفل التلقائي';
+
+  @override
+  String get settings_security_autoLock_immediately => 'فورًا';
+
+  @override
+  String settings_security_autoLock_minutes(int minutes) {
+    String _temp0 = intl.Intl.pluralLogic(
+      minutes,
+      locale: localeName,
+      other: 'بعد $minutes دقائق',
+      one: 'بعد دقيقة واحدة',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get settings_security_autoLock_never => 'أبدًا';
+
+  @override
+  String get settings_security_encryption => 'تشفير قاعدة البيانات';
+
+  @override
+  String get settings_security_encryption_subtitle =>
+      'احمِ ملف سجل الغوص الخاص بك بالتشفير أثناء التخزين';
+
+  @override
+  String get settings_security_encryption_progress_backup =>
+      'جارٍ إنشاء نسخة احتياطية...';
+
+  @override
+  String get settings_security_encryption_progress_encrypt =>
+      'جارٍ تشفير قاعدة البيانات...';
+
+  @override
+  String get settings_security_encryption_progress_decrypt =>
+      'جارٍ فك تشفير قاعدة البيانات...';
+
+  @override
+  String get settings_security_encryption_progress_reopen =>
+      'جارٍ إعادة فتح قاعدة البيانات...';
+
+  @override
+  String get settings_security_changePassword => 'تغيير كلمة المرور';
+
+  @override
+  String get settings_security_regenerateRecovery => 'رمز استرداد جديد';
+
+  @override
+  String get settings_security_setPassword => 'تعيين كلمة مرور التطبيق';
+
+  @override
+  String get settings_security_password => 'كلمة المرور';
+
+  @override
+  String get settings_security_confirmPassword => 'تأكيد كلمة المرور';
+
+  @override
+  String get settings_security_currentPassword => 'كلمة المرور الحالية';
+
+  @override
+  String get settings_security_newPassword => 'كلمة المرور الجديدة';
+
+  @override
+  String get settings_security_passwordTooShort =>
+      'يجب أن تتكون كلمة المرور من 4 أحرف على الأقل.';
+
+  @override
+  String get settings_security_passwordMismatch =>
+      'كلمتا المرور غير متطابقتين.';
+
+  @override
+  String get settings_security_wrongPassword => 'كلمة المرور غير صحيحة.';
+
+  @override
+  String get settings_security_recoveryCode_title => 'رمز الاسترداد الخاص بك';
+
+  @override
+  String get settings_security_recoveryCode_explain =>
+      'دوّنه واحفظه في مكان آمن. إنه الطريقة الوحيدة لفتح التطبيق إذا نسيت كلمة المرور، وهو يحل محل أي رمز استرداد سابق.';
+
+  @override
+  String get settings_security_recoveryCode_savedConfirm =>
+      'لقد حفظت رمز الاسترداد الخاص بي';
+
+  @override
+  String get settings_security_disableBlockedByEncryption_title =>
+      'التشفير مفعّل';
+
+  @override
+  String get settings_security_disableBlockedByEncryption_body =>
+      'أوقف تشفير قاعدة البيانات أولاً قبل إيقاف قفل التطبيق. تحتاج قاعدة البيانات المشفرة إلى بيانات اعتماد.';
+
+  @override
+  String get settings_security_enableEncryption_title =>
+      'هل تريد تشفير قاعدة البيانات؟';
+
+  @override
+  String get settings_security_enableEncryption_body =>
+      'يتم أولاً إنشاء نسخة احتياطية، ثم يُعاد تشفير ملف قاعدة البيانات في مكانه. قد يستغرق ذلك وقتًا مع السجلات الكبيرة.';
+
+  @override
+  String get settings_security_disableEncryption_title =>
+      'هل تريد إيقاف التشفير؟';
+
+  @override
+  String get settings_security_disableEncryption_body =>
+      'سيُخزَّن ملف قاعدة البيانات على القرص من دون تشفير مرة أخرى.';
+
+  @override
+  String get settings_security_turnOffAppLock_title =>
+      'هل تريد إيقاف قفل التطبيق؟';
+
+  @override
+  String get settings_security_turnOffAppLock_body =>
+      'سيُفتح التطبيق من دون طلب كلمة المرور.';
+
+  @override
+  String get settings_security_unlock_title => 'أدخل كلمة المرور';
+
+  @override
+  String get settings_security_cancel => 'إلغاء';
+
+  @override
+  String get settings_security_continue => 'متابعة';
+
+  @override
+  String get settings_security_done => 'تم';
+
+  @override
+  String get settings_security_turnOff => 'إيقاف';
 
   @override
   String get dataQuality_inbox_title => 'جودة البيانات';

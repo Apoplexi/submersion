@@ -227,9 +227,31 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text('Unlink from site'), findsOneWidget);
 
+      // Only the site-linked id is sent: unlinkFromSite latches
+      // retainInLibrary, which would permanently un-sweep 'a' otherwise.
       await tester.tap(find.text('Unlink from site'));
       await tester.pumpAndSettle();
-      expect(mediaRepo.unlinkedFromSite.toSet(), {'a', 'b'});
+      expect(mediaRepo.unlinkedFromSite.toSet(), {'b'});
+    });
+
+    testWidgets('Unlink sends only the dive-linked ids', (tester) async {
+      await tester.pumpWidget(
+        host([entry('a'), entry('b', diveId: 'd1'), entry('c', siteId: 's1')]),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.longPress(find.byType(MediaLibraryTile).first);
+      await tester.pumpAndSettle();
+      await tester.tap(find.byType(MediaLibraryTile).at(1));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byType(MediaLibraryTile).at(2));
+      await tester.pumpAndSettle();
+      expect(find.text('3 selected'), findsOneWidget);
+
+      await tester.tap(find.text('Unlink'));
+      await tester.pumpAndSettle();
+
+      expect(mediaRepo.unlinkedFromDive.toSet(), {'b'});
     });
 
     testWidgets('Move to dive opens the picker and reassigns', (tester) async {

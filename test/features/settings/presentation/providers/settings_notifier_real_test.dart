@@ -186,6 +186,31 @@ void main() {
       );
     });
 
+    test('setDefaultCurrency normalises and persists the code', () async {
+      container.read(settingsProvider.notifier);
+      await waitForInit();
+
+      expect(container.read(settingsProvider).defaultCurrency, 'USD');
+
+      // Free-text entry elsewhere means the code can arrive padded or in the
+      // wrong case; the setter is the single place that normalises it.
+      await container
+          .read(settingsProvider.notifier)
+          .setDefaultCurrency('  eur ');
+      expect(container.read(settingsProvider).defaultCurrency, 'EUR');
+
+      // The derived provider the equipment pages read tracks the change.
+      expect(container.read(defaultCurrencyProvider), 'EUR');
+    });
+
+    test('setDefaultCurrency accepts a code outside the presets', () async {
+      container.read(settingsProvider.notifier);
+      await waitForInit();
+
+      await container.read(settingsProvider.notifier).setDefaultCurrency('isk');
+      expect(container.read(settingsProvider).defaultCurrency, 'ISK');
+    });
+
     test('sets showDetailsPaneSites to true', () async {
       container.read(settingsProvider.notifier);
       await waitForInit();

@@ -71,6 +71,10 @@ class Trips extends Table {
   TextColumn get tripType => text().withDefault(const Constant('shore'))();
   TextColumn get notes => text().withDefault(const Constant(''))();
   BoolColumn get isShared => boolean().withDefault(const Constant(false))();
+
+  /// Return flight departure, wall-clock-as-UTC epoch ms (v142). Drives the
+  /// remaining-dive-window countdown; null when the trip has no flight set.
+  IntColumn get returnFlightAt => integer().nullable()();
   IntColumn get createdAt => integer()();
   IntColumn get updatedAt => integer()();
 
@@ -1520,6 +1524,7 @@ class DiverSettings extends Table {
   TextColumn get altitudeUnit => text().withDefault(const Constant('meters'))();
   TextColumn get sacUnit =>
       text().withDefault(const Constant('litersPerMin'))();
+  TextColumn get defaultCurrency => text().withDefault(const Constant('USD'))();
   // Time/Date format settings
   TextColumn get timeFormat =>
       text().withDefault(const Constant('twelveHour'))();
@@ -3159,9 +3164,14 @@ class AppDatabase extends _$AppDatabase {
     139,
     // v140: media.retain_in_library (Media section Phase 1).
     140,
+    // v141: diver_settings.default_currency (default currency for priced
+    // items). Renumbered from v138 and then v139 as those went to the
+    // divelogs.de branch and the cylinder configs respectively.
+    141,
+    // v142: trips.return_flight_at (return-flight dive-window countdown).
+    142,
     // v143: media_repair_log (per-device) + media_smart_albums (synced),
-    // Media section Phase 5. 141 (equipment currency) and 142 (trip return
-    // flight) live on main and arrive with the merge.
+    // Media section Phase 5.
     143,
   ];
 
@@ -3379,7 +3389,17 @@ class AppDatabase extends _$AppDatabase {
       'AND bottom_time = runtime',
     ).get();
 
+    var processed = 0;
     for (final candidate in candidates) {
+      // On an imported library nearly every dive is a candidate, and during a
+      // migration the executor is a synchronous main-isolate NativeDatabase:
+      // drift's awaits complete in microtasks, so this loop would run as one
+      // unbroken microtask chain that never reaches the timer/vsync queue —
+      // freezing the migration spinner for the whole step. A real event-loop
+      // yield every few dives lets the UI animate while the backfill runs.
+      if (processed++ % 25 == 24) {
+        await Future<void>.delayed(Duration.zero);
+      }
       final diveId = candidate.read<String>('id');
       final runtimeSeconds = candidate.read<int>('runtime');
 
@@ -4146,6 +4166,38 @@ class AppDatabase extends _$AppDatabase {
     if (!names.contains('weather_code')) {
       await customStatement(
         'ALTER TABLE dives ADD COLUMN weather_code INTEGER',
+      );
+    }
+  }
+
+  /// Idempotent DDL for the v141 diver_settings.default_currency column.
+  /// Called from the v141 onUpgrade step and the beforeOpen backstop, and
+  /// self-guarding when the table is absent (minimal migration-test fixtures).
+  Future<void> _assertDefaultCurrencyColumn() async {
+    final cols = await customSelect(
+      "PRAGMA table_info('diver_settings')",
+    ).get();
+    if (cols.isEmpty) return;
+    final names = cols.map((c) => c.read<String>('name')).toSet();
+    if (!names.contains('default_currency')) {
+      await customStatement(
+        "ALTER TABLE diver_settings ADD COLUMN default_currency TEXT NOT NULL DEFAULT 'USD'",
+      );
+    }
+  }
+
+  /// Idempotent DDL for the v142 return-flight column. Called from the v142
+  /// onUpgrade step and the beforeOpen backstop, matching the
+  /// _assertWeatherCodeColumn pattern so a schema-version collision cannot
+  /// strand a database without it. Self-guarding when the table is absent
+  /// (minimal migration-test fixtures).
+  Future<void> _assertTripReturnFlightColumn() async {
+    final cols = await customSelect("PRAGMA table_info('trips')").get();
+    if (cols.isEmpty) return;
+    final names = cols.map((c) => c.read<String>('name')).toSet();
+    if (!names.contains('return_flight_at')) {
+      await customStatement(
+        'ALTER TABLE trips ADD COLUMN return_flight_at INTEGER',
       );
     }
   }
@@ -7382,6 +7434,20 @@ class AppDatabase extends _$AppDatabase {
           await _assertMediaRetainInLibraryColumn();
         }
         if (from < 140) await reportProgress();
+        // v141: default currency for priced items (e.g. equipment). A DB
+        // that upgraded past 141 on a parallel branch never enters this block;
+        // the beforeOpen backstop below is its only path to the column.
+        if (from < 141) {
+          await _assertDefaultCurrencyColumn();
+        }
+        if (from < 141) await reportProgress();
+        // v142: trips.return_flight_at (return-flight dive-window countdown).
+        // v138 (#603) is reserved by a parallel branch; the beforeOpen
+        // backstop heals any DB stranded between.
+        if (from < 142) {
+          await _assertTripReturnFlightColumn();
+        }
+        if (from < 142) await reportProgress();
         // v143: repair history + smart albums (Media section Phase 5).
         if (from < 143) {
           await _assertMediaPhase5Schema();
@@ -7408,10 +7474,18 @@ class AppDatabase extends _$AppDatabase {
         // v137 backstop: re-assert dives.weather_code.
         await _assertWeatherCodeColumn();
 
-        // v140 backstop: re-assert media.retain_in_library.
+        // v140 backstop: re-assert media.retain_in_library. A device
+        // already at 141/142 never enters the `from < 140` block above, so
+        // this is the ONLY path that gives it the column.
         await _assertMediaRetainInLibraryColumn();
 
-        // v143 backstop: re-assert the Phase 5 tables.
+        // v141 backstop: re-assert diver_settings.default_currency.
+        await _assertDefaultCurrencyColumn();
+
+        // v143 backstop: re-assert the Phase 5 tables. Same reason as the
+        // v140 backstop above -- a parallel branch that claims 143 or higher
+        // for something else would carry a device past the `from < 143`
+        // block without ever creating these tables.
         await _assertMediaPhase5Schema();
 
         // v106 backstop: re-assert connector-suggestion columns (the helper
@@ -7505,6 +7579,9 @@ class AppDatabase extends _$AppDatabase {
         // database stranded at any lower version by a parallel-branch
         // version collision self-heals here.
         await _assertCylinderConfigSchema();
+
+        // v142 backstop: re-assert trips.return_flight_at.
+        await _assertTripReturnFlightColumn();
 
         // Built-in dive types are reference data: identical on every device and
         // undeletable through DiveTypeRepository. Nothing else restores them --

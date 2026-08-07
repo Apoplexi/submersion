@@ -50,6 +50,16 @@ class MediaSelectionBar extends ConsumerWidget {
 
   List<String> get _ids => selectedItems.map((m) => m.id).toList();
 
+  /// Ids of the selection that actually carry a dive link. The unlink ops
+  /// latch `retainInLibrary`, which permanently excludes a row from the
+  /// orphan sweep - so they must only ever see rows the action applies to.
+  List<String> get _diveLinkedIds =>
+      selectedItems.where((m) => m.diveId != null).map((m) => m.id).toList();
+
+  /// Same guard for the site link.
+  List<String> get _siteLinkedIds =>
+      selectedItems.where((m) => m.siteId != null).map((m) => m.id).toList();
+
   Future<void> _moveToDive(BuildContext context, WidgetRef ref) async {
     final diveId = await showDivePickerSheet(context);
     if (diveId == null) return;
@@ -93,7 +103,7 @@ class MediaSelectionBar extends ConsumerWidget {
                         onPressed: () async {
                           await ref
                               .read(mediaRepositoryProvider)
-                              .unlinkFromDive(_ids);
+                              .unlinkFromDive(_diveLinkedIds);
                           ref.read(mediaSelectionProvider.notifier).clear();
                         },
                       ),
@@ -104,7 +114,7 @@ class MediaSelectionBar extends ConsumerWidget {
                         onPressed: () async {
                           await ref
                               .read(mediaRepositoryProvider)
-                              .unlinkFromSite(_ids);
+                              .unlinkFromSite(_siteLinkedIds);
                           ref.read(mediaSelectionProvider.notifier).clear();
                         },
                       ),

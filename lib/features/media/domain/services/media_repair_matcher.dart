@@ -11,10 +11,16 @@ PrefixMove? detectPrefixMove({
 }) {
   final votes = <String, ({String from, String to, Set<String> covered})>{};
 
+  // Split each found path ONCE: a folder scan can surface tens of thousands
+  // of paths, and splitting inside the nested loop would redo that work per
+  // broken row.
+  final foundSegmentsByPath = [
+    for (final foundPath in foundPaths) foundPath.split('/'),
+  ];
+
   for (final brokenPath in brokenPaths) {
     final brokenSegments = brokenPath.split('/');
-    for (final foundPath in foundPaths) {
-      final foundSegments = foundPath.split('/');
+    for (final foundSegments in foundSegmentsByPath) {
       // Longest shared trailing-segment run between the two paths.
       var shared = 0;
       while (shared < brokenSegments.length - 1 &&

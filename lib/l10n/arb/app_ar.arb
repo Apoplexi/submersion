@@ -1,5 +1,15 @@
 {
+  "settings_units_defaultCurrency": "العملة الافتراضية",
+  "settings_units_dialog_defaultCurrency": "العملة الافتراضية",
   "diveSites_list_menu_select": "تحديد المواقع",
+  "diveLog_edit_flightWindowWarning": "ينتهي هذا الغوص بعد آخر وقت آمن للصعود إلى السطح قبل رحلتك ({time})",
+  "@diveLog_edit_flightWindowWarning": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
   "diveLog_edit_geofenceSuggestion_near": "بالقرب من {location}",
   "diveLog_edit_geofenceSuggestion_title": "اقتراح المعدات",
   "diveLog_edit_geofenceSuggestion_body": "تطبيق مجموعة \"{setName}\"؟",
@@ -3409,6 +3419,7 @@
   "equipment_serviceDialog_clearNextServiceDateTooltip": "مسح تاريخ الصيانة القادمة",
   "equipment_serviceDialog_costHint": "0.00",
   "equipment_serviceDialog_costLabel": "التكلفة",
+  "equipment_serviceDialog_currencyLabel": "العملة",
   "equipment_serviceDialog_costValidation": "أدخل مبلغاً صالحاً",
   "equipment_serviceDialog_editTitle": "تعديل سجل الصيانة",
   "equipment_serviceDialog_nextServiceDueLabel": "موعد الصيانة القادمة",
@@ -3759,6 +3770,7 @@
   "media_diveMediaSection_thumbnailLabel": "عرض الصورة. اضغط مطولًا لإلغاء الربط",
   "media_diveMediaSection_title": "الصور والفيديو",
   "media_diveMediaSection_deleteButton": "حذف",
+  "media_diveMediaSection_deleteError": "فشل في الحذف: {error}",
   "media_diveMediaSection_deleteSelectedContent": "ستتم إزالتها من التطبيق ومن أي مخزن وسائط. لا يمكن التراجع عن هذا.",
   "media_diveMediaSection_deleteSelectedSuccess": "تم حذف {count} عناصر",
   "media_diveMediaSection_deleteSelectedTitle": "حذف {count} عناصر؟",
@@ -4119,6 +4131,7 @@
   "settings_about_header": "حول",
   "settings_about_openSourceLicenses": "تراخيص المصادر المفتوحة",
   "settings_about_reportIssue": "الإبلاغ عن مشكلة",
+  "settings_about_reportIssue_copy": "نسخ الرابط",
   "settings_about_reportIssue_snackbar": "قم بزيارة github.com/submersion-app/submersion/issues",
   "settings_about_version": "الإصدار {version}",
   "settings_appBar_title": "الإعدادات",
@@ -5423,6 +5436,9 @@
   "trips_edit_label_notes": "ملاحظات",
   "trips_edit_label_operatorName": "Operator / Charter",
   "trips_edit_label_resortName": "اسم المنتجع",
+  "trips_edit_label_returnFlight": "رحلة العودة",
+  "trips_edit_returnFlightClear": "مسح رحلة العودة",
+  "trips_edit_returnFlightNotSet": "غير محدد",
   "trips_edit_label_startDate": "تاريخ البدء",
   "trips_edit_label_tripName": "اسم الرحلة *",
   "trips_edit_label_tripType": "Trip Type",
@@ -5791,6 +5807,7 @@
   "diveComputer_download_newDivesOnlyTitle": "تنزيل الغطسات الجديدة فقط",
   "diveComputer_download_upToDate": "لم يتم العثور على غطسات جديدة -- سجلك محدّث",
   "diveLog_edit_section_environment": "البيئة",
+  "diveLog_edit_subsection_autofill": "تعبئة تلقائية",
   "diveLog_edit_subsection_weather": "الطقس",
   "diveLog_edit_subsection_diveConditions": "ظروف الغوص",
   "diveLog_edit_label_windSpeed": "سرعة الرياح",
@@ -5852,12 +5869,25 @@
   "dashboard_gauges_insuranceExpired": "انتهى التأمين",
   "dashboard_gauges_noInsurance": "لا يوجد تأمين مسجل",
   "dashboard_gauges_noFlyClear": "حظر الطيران 0:00",
+  "dashboard_gauges_flightWindow": "نافذة الغوص {hours}:{minutes}",
+  "@dashboard_gauges_flightWindow": {
+    "placeholders": {
+      "hours": {
+        "type": "String"
+      },
+      "minutes": {
+        "type": "String"
+      }
+    }
+  },
+  "dashboard_gauges_flightWindowClosed": "لا مزيد من الغوص قبل الرحلة",
   "dashboard_gauges_noFlyRemaining": "حظر الطيران {hours}:{minutes}",
   "dashboard_gauges_lastDiveDays": "آخر غطسة منذ {days} يوم",
   "dashboard_gauges_lastDiveToday": "غطست اليوم",
   "dashboard_gauges_noDivesYet": "لا توجد غطسات بعد",
   "settings_homeChips_pageTitle": "شرائح حالة الصفحة الرئيسية",
   "settings_homeChips_description": "اختر شرائح الحالة التي تظهر أعلى تبويب الرئيسية.",
+  "settings_homeChips_flightWindow": "نافذة الغوص قبل الرحلة",
   "settings_homeChips_gear": "صيانة المعدات",
   "settings_homeChips_insurance": "التأمين",
   "settings_homeChips_noFly": "مؤقت حظر الطيران",
@@ -6642,6 +6672,32 @@
   "safetySettings_noFlyPreset_standard": "قياسي (12/18/24 س)",
   "safetySettings_noFlyPreset_strict": "صارم (18/24/48 س)",
   "safetySettings_noFlyPreset_subtitle": "فترات إرشادية بعد غطسة واحدة بلا توقفات، وغطسات متكررة، وغطسات بتخفيف الضغط",
+  "flightWindow_closed": "لا مزيد من الغوص قبل رحلتك",
+  "flightWindow_conflict": "تمتد فترة حظر الطيران إلى ما بعد إقلاع رحلتك",
+  "flightWindow_departs": "تقلع الرحلة {time}",
+  "@flightWindow_departs": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "flightWindow_openTitle": "الوقت المتبقي للغوص: {remaining}",
+  "@flightWindow_openTitle": {
+    "placeholders": {
+      "remaining": {
+        "type": "String"
+      }
+    }
+  },
+  "flightWindow_surfaceBy": "اصعد إلى السطح قبل {time}",
+  "@flightWindow_surfaceBy": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
   "safetyHub_noFly_active_title": "حظر الطيران: متبقٍ {remaining}",
   "@safetyHub_noFly_active_title": {
     "placeholders": {
@@ -6962,5 +7018,53 @@
   "reef_attribution_wri": "وجود الشعاب ومستوى التهديد. CC BY 3.0.",
   "reef_attribution_noaa": "درجة حرارة سطح البحر والإجهاد الحراري. ملكية عامة.",
   "reef_attribution_gbif": "سجلات تواجد الأنواع، مصفاة على CC0 و CC BY 4.0.",
-  "reef_attribution_protectedSeas": "حدود المناطق البحرية المحمية. CC BY 4.0."
+  "reef_attribution_protectedSeas": "حدود المناطق البحرية المحمية. CC BY 4.0.",
+  "settings_section_security_title": "أمان التطبيق",
+  "settings_section_security_subtitle": "قفل التطبيق وتشفير قاعدة البيانات",
+  "settings_security_appLock": "قفل التطبيق",
+  "settings_security_appLock_subtitle": "طلب كلمة المرور أو القياسات الحيوية لفتح التطبيق",
+  "settings_security_biometrics": "فتح القفل بالقياسات الحيوية",
+  "settings_security_autoLock": "القفل التلقائي",
+  "settings_security_autoLock_immediately": "فورًا",
+  "settings_security_autoLock_minutes": "{minutes, plural, =1{بعد دقيقة واحدة} other{بعد {minutes} دقائق}}",
+  "@settings_security_autoLock_minutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "settings_security_autoLock_never": "أبدًا",
+  "settings_security_encryption": "تشفير قاعدة البيانات",
+  "settings_security_encryption_subtitle": "احمِ ملف سجل الغوص الخاص بك بالتشفير أثناء التخزين",
+  "settings_security_encryption_progress_backup": "جارٍ إنشاء نسخة احتياطية...",
+  "settings_security_encryption_progress_encrypt": "جارٍ تشفير قاعدة البيانات...",
+  "settings_security_encryption_progress_decrypt": "جارٍ فك تشفير قاعدة البيانات...",
+  "settings_security_encryption_progress_reopen": "جارٍ إعادة فتح قاعدة البيانات...",
+  "settings_security_changePassword": "تغيير كلمة المرور",
+  "settings_security_regenerateRecovery": "رمز استرداد جديد",
+  "settings_security_setPassword": "تعيين كلمة مرور التطبيق",
+  "settings_security_password": "كلمة المرور",
+  "settings_security_confirmPassword": "تأكيد كلمة المرور",
+  "settings_security_currentPassword": "كلمة المرور الحالية",
+  "settings_security_newPassword": "كلمة المرور الجديدة",
+  "settings_security_passwordTooShort": "يجب أن تتكون كلمة المرور من 4 أحرف على الأقل.",
+  "settings_security_passwordMismatch": "كلمتا المرور غير متطابقتين.",
+  "settings_security_wrongPassword": "كلمة المرور غير صحيحة.",
+  "settings_security_recoveryCode_title": "رمز الاسترداد الخاص بك",
+  "settings_security_recoveryCode_explain": "دوّنه واحفظه في مكان آمن. إنه الطريقة الوحيدة لفتح التطبيق إذا نسيت كلمة المرور، وهو يحل محل أي رمز استرداد سابق.",
+  "settings_security_recoveryCode_savedConfirm": "لقد حفظت رمز الاسترداد الخاص بي",
+  "settings_security_disableBlockedByEncryption_title": "التشفير مفعّل",
+  "settings_security_disableBlockedByEncryption_body": "أوقف تشفير قاعدة البيانات أولاً قبل إيقاف قفل التطبيق. تحتاج قاعدة البيانات المشفرة إلى بيانات اعتماد.",
+  "settings_security_enableEncryption_title": "هل تريد تشفير قاعدة البيانات؟",
+  "settings_security_enableEncryption_body": "يتم أولاً إنشاء نسخة احتياطية، ثم يُعاد تشفير ملف قاعدة البيانات في مكانه. قد يستغرق ذلك وقتًا مع السجلات الكبيرة.",
+  "settings_security_disableEncryption_title": "هل تريد إيقاف التشفير؟",
+  "settings_security_disableEncryption_body": "سيُخزَّن ملف قاعدة البيانات على القرص من دون تشفير مرة أخرى.",
+  "settings_security_turnOffAppLock_title": "هل تريد إيقاف قفل التطبيق؟",
+  "settings_security_turnOffAppLock_body": "سيُفتح التطبيق من دون طلب كلمة المرور.",
+  "settings_security_unlock_title": "أدخل كلمة المرور",
+  "settings_security_cancel": "إلغاء",
+  "settings_security_continue": "متابعة",
+  "settings_security_done": "تم",
+  "settings_security_turnOff": "إيقاف"
 }

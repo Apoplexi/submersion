@@ -9,7 +9,16 @@ import 'package:submersion/core/services/database_service.dart';
 /// circular import.
 abstract class BackupDatabaseAdapter {
   Future<void> backup(String destinationPath);
-  Future<void> restore(String backupPath);
+
+  /// Swap the live database for [backupPath].
+  ///
+  /// [onMigrationProgress] fires per migration step when the restored file
+  /// carries an older schema and the reopen runs the upgrade ladder — the only
+  /// long-running phase of the swap, and otherwise invisible to the user.
+  Future<void> restore(
+    String backupPath, {
+    void Function(int currentStep, int totalSteps)? onMigrationProgress,
+  });
   Future<String> get databasePath;
   AppDatabase get database;
 }
@@ -30,7 +39,11 @@ class DefaultBackupDatabaseAdapter implements BackupDatabaseAdapter {
       _dbAdapter.backup(destinationPath);
 
   @override
-  Future<void> restore(String backupPath) => _dbAdapter.restore(backupPath);
+  Future<void> restore(
+    String backupPath, {
+    void Function(int currentStep, int totalSteps)? onMigrationProgress,
+  }) =>
+      _dbAdapter.restore(backupPath, onMigrationProgress: onMigrationProgress);
 
   @override
   Future<String> get databasePath => _dbAdapter.databasePath;

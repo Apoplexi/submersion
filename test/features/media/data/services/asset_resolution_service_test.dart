@@ -689,4 +689,163 @@ void main() {
       );
     });
   });
+
+  // MediaItem.takenAt is stored wall-clock-as-UTC, while photo_manager reports
+  // AssetInfo.createDateTime as LOCAL. Both matchers used to compare the two
+  // as instants, so on any host west or east of UTC the difference was the
+  // host's offset rather than real clock drift, and every tier missed. The
+  // picker write path masked this by persisting an unnormalised local
+  // timestamp; once that was corrected these comparisons had to convert.
+  //
+  // NOTE: these cases can only fail on a host whose local time is not UTC --
+  // where the two conventions coincide there is nothing to convert. CI runners
+  // default to UTC, so treat them as a guard for developer machines.
+  group('wall-clock-UTC takenAt against a local gallery candidate', () {
+    List<AssetInfo> candidatesAt(DateTime local) => [
+      AssetInfo(
+        id: 'local-match',
+        type: AssetType.image,
+        createDateTime: local,
+        width: 4032,
+        height: 3024,
+        filename: 'IMG_001.jpg',
+      ),
+    ];
+
+    test('tier 1 matches on filename plus the same wall-clock second', () {
+      final item = createTestItem(
+        originalFilename: 'IMG_001.jpg',
+        takenAt: DateTime.utc(2025, 6, 15, 10, 30, 0),
+      );
+
+      expect(
+        AssetResolutionService.matchByFilenameAndTimestamp(
+          item,
+          candidatesAt(DateTime(2025, 6, 15, 10, 30, 1)),
+        ),
+        equals('local-match'),
+      );
+    });
+
+    test('tier 2 matches on the exact wall-clock capture second', () {
+      final item = createTestItem(
+        originalFilename: '',
+        takenAt: DateTime.utc(2025, 6, 15, 10, 30, 0),
+      );
+
+      expect(
+        AssetResolutionService.matchByTimestampAndDimensions(
+          item,
+          candidatesAt(DateTime(2025, 6, 15, 10, 30, 0)),
+          tolerance: Duration.zero,
+        ),
+        equals('local-match'),
+      );
+    });
+
+    test('a genuinely distant candidate is still rejected', () {
+      final item = createTestItem(
+        originalFilename: 'IMG_001.jpg',
+        takenAt: DateTime.utc(2025, 6, 15, 10, 30, 0),
+      );
+
+      expect(
+        AssetResolutionService.matchByFilenameAndTimestamp(
+          item,
+          candidatesAt(DateTime(2025, 6, 15, 10, 31, 0)),
+        ),
+        isNull,
+      );
+    });
+
+    // Rows written by the pre-normalisation import path hold the INSTANT of a
+    // local DateTime, which MediaRepository then hydrates as UTC -- so their
+    // calendar fields are the capture time plus the host offset, and it is the
+    // raw value, not the restated one, that lines up with a gallery candidate.
+    // Nothing in the schema distinguishes them from correctly-written rows, so
+    // both readings have to be tried or every already-linked photo becomes
+    // unresolvable the moment its platformAssetId goes stale.
+    DateTime legacyStored(DateTime captureLocal) =>
+        DateTime.fromMillisecondsSinceEpoch(
+          captureLocal.millisecondsSinceEpoch,
+          isUtc: true,
+        );
+
+    test('tier 1 still matches a legacy row written as a local instant', () {
+      final capture = DateTime(2025, 6, 15, 10, 30, 0);
+      final item = createTestItem(
+        originalFilename: 'IMG_001.jpg',
+        takenAt: legacyStored(capture),
+      );
+
+      expect(
+        AssetResolutionService.matchByFilenameAndTimestamp(
+          item,
+          candidatesAt(capture),
+        ),
+        equals('local-match'),
+      );
+    });
+
+    test('tier 2 still matches a legacy row written as a local instant', () {
+      final capture = DateTime(2025, 6, 15, 10, 30, 0);
+      final item = createTestItem(
+        originalFilename: '',
+        takenAt: legacyStored(capture),
+      );
+
+      expect(
+        AssetResolutionService.matchByTimestampAndDimensions(
+          item,
+          candidatesAt(capture),
+          tolerance: Duration.zero,
+        ),
+        equals('local-match'),
+      );
+    });
+
+    test('offering both readings still refuses an ambiguous pair', () {
+      // One candidate sits on each reading of the same stored value, so the
+      // row cannot be attributed to either without guessing.
+      final capture = DateTime(2025, 6, 15, 10, 30, 0);
+      final stored = legacyStored(capture);
+      final item = createTestItem(
+        originalFilename: 'IMG_001.jpg',
+        takenAt: stored,
+      );
+
+      final ambiguous = [
+        AssetInfo(
+          id: 'on-legacy-reading',
+          type: AssetType.image,
+          createDateTime: capture,
+          width: 4032,
+          height: 3024,
+          filename: 'IMG_001.jpg',
+        ),
+        AssetInfo(
+          id: 'on-restated-reading',
+          type: AssetType.image,
+          createDateTime: DateTime(
+            stored.year,
+            stored.month,
+            stored.day,
+            stored.hour,
+            stored.minute,
+            stored.second,
+          ),
+          width: 4032,
+          height: 3024,
+          filename: 'IMG_001.jpg',
+        ),
+      ];
+
+      // Vacuous on a UTC host, where the two readings collapse to one and the
+      // list above holds two candidates at the same instant -- still ambiguous.
+      expect(
+        AssetResolutionService.matchByFilenameAndTimestamp(item, ambiguous),
+        isNull,
+      );
+    });
+  });
 }

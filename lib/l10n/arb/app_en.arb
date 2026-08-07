@@ -1,4 +1,12 @@
 {
+  "diveLog_edit_flightWindowWarning": "This dive ends after the latest safe surfacing time for your flight ({time})",
+  "@diveLog_edit_flightWindowWarning": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
   "diveLog_edit_geofenceSuggestion_near": "Near {location}",
   "@diveLog_edit_geofenceSuggestion_near": {
     "placeholders": {
@@ -1904,6 +1912,18 @@
   "dashboard_gauges_insuranceExpired": "Insurance expired",
   "dashboard_gauges_noInsurance": "No insurance on file",
   "dashboard_gauges_noFlyClear": "No-fly 0:00",
+  "dashboard_gauges_flightWindow": "Dive window {hours}:{minutes}",
+  "@dashboard_gauges_flightWindow": {
+    "placeholders": {
+      "hours": {
+        "type": "String"
+      },
+      "minutes": {
+        "type": "String"
+      }
+    }
+  },
+  "dashboard_gauges_flightWindowClosed": "No more diving before flight",
   "dashboard_gauges_noFlyRemaining": "No-fly {hours}:{minutes}",
   "@dashboard_gauges_noFlyRemaining": {
     "placeholders": {
@@ -1927,6 +1947,7 @@
   "dashboard_gauges_noDivesYet": "No dives yet",
   "settings_homeChips_pageTitle": "Home status chips",
   "settings_homeChips_description": "Choose which status chips appear at the top of the Home tab.",
+  "settings_homeChips_flightWindow": "Flight dive window",
   "settings_homeChips_gear": "Gear service",
   "settings_homeChips_insurance": "Insurance",
   "settings_homeChips_noFly": "No-fly timer",
@@ -5997,6 +6018,7 @@
   "equipment_serviceDialog_clearNextServiceDateTooltip": "Clear Next Service Date",
   "equipment_serviceDialog_costHint": "0.00",
   "equipment_serviceDialog_costLabel": "Cost",
+  "equipment_serviceDialog_currencyLabel": "Currency",
   "equipment_serviceDialog_costValidation": "Enter a valid amount",
   "equipment_serviceDialog_editTitle": "Edit Service Record",
   "equipment_serviceDialog_nextServiceDueLabel": "Next Service Due",
@@ -6672,6 +6694,15 @@
   "media_diveMediaSection_deleteButton": "Delete",
   "@media_diveMediaSection_deleteButton": {
     "description": "Dive media selection: destructive delete action"
+  },
+  "media_diveMediaSection_deleteError": "Failed to delete: {error}",
+  "@media_diveMediaSection_deleteError": {
+    "description": "Error snackbar when the dive media bulk delete fails",
+    "placeholders": {
+      "error": {
+        "type": "Object"
+      }
+    }
   },
   "media_diveMediaSection_deleteSelectedContent": "This removes them from the app and any media store. This cannot be undone.",
   "@media_diveMediaSection_deleteSelectedContent": {
@@ -7848,6 +7879,7 @@
   "settings_about_header": "About",
   "settings_about_openSourceLicenses": "Open Source Licenses",
   "settings_about_reportIssue": "Report an Issue",
+  "settings_about_reportIssue_copy": "Copy link",
   "settings_about_reportIssue_snackbar": "Visit github.com/submersion-app/submersion/issues",
   "settings_about_version": "Version {version}",
   "@settings_about_version": {
@@ -8828,6 +8860,8 @@
   "settings_units_pressure_psi": "PSI",
   "settings_units_quickSelect": "Quick Select",
   "settings_units_sacRate": "SAC Rate",
+  "settings_units_defaultCurrency": "Default Currency",
+  "settings_units_dialog_defaultCurrency": "Default Currency",
   "settings_units_sac_pressurePerMinute": "Pressure per minute",
   "settings_units_sac_pressurePerMinute_subtitle": "No tank volume needed (bar/min or psi/min)",
   "settings_units_sac_volumePerMinute": "Volume per minute",
@@ -10624,6 +10658,9 @@
   "trips_edit_label_location": "Location",
   "trips_edit_label_notes": "Notes",
   "trips_edit_label_resortName": "Resort Name",
+  "trips_edit_label_returnFlight": "Return Flight",
+  "trips_edit_returnFlightClear": "Clear return flight",
+  "trips_edit_returnFlightNotSet": "Not set",
   "trips_edit_label_startDate": "Start Date",
   "trips_edit_label_tripName": "Trip Name *",
   "trips_edit_sectionTitle_dates": "Trip Dates",
@@ -13304,6 +13341,7 @@
   "settings_dataSources_appleHealth_poweredBy": "Powered by Apple HealthKit",
   "settings_dataSources_noSources": "No data source integrations are available on this platform.",
   "diveLog_edit_section_environment": "Environment",
+  "diveLog_edit_subsection_autofill": "Auto-fill",
   "diveLog_edit_subsection_weather": "Weather",
   "diveLog_edit_subsection_diveConditions": "Dive Conditions",
   "diveLog_edit_label_windSpeed": "Wind Speed",
@@ -14374,6 +14412,32 @@
   "safetySettings_noFlyPreset_standard": "Standard (12/18/24 h)",
   "safetySettings_noFlyPreset_strict": "Strict (18/24/48 h)",
   "safetySettings_noFlyPreset_subtitle": "Guideline intervals after a single no-deco dive, repetitive dives, and deco dives",
+  "flightWindow_closed": "No more diving before your flight",
+  "flightWindow_conflict": "Your no-fly time extends past your flight departure",
+  "flightWindow_departs": "Flight departs {time}",
+  "@flightWindow_departs": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "flightWindow_openTitle": "Time left to dive: {remaining}",
+  "@flightWindow_openTitle": {
+    "placeholders": {
+      "remaining": {
+        "type": "String"
+      }
+    }
+  },
+  "flightWindow_surfaceBy": "Surface by {time}",
+  "@flightWindow_surfaceBy": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
   "safetyHub_noFly_active_title": "No-fly: {remaining} remaining",
   "@safetyHub_noFly_active_title": {
     "placeholders": {
@@ -14562,6 +14626,54 @@
   "planning_card_noFly_subtitle": "Guideline countdown from your last dives",
   "settings_section_safety_title": "Safety",
   "settings_section_safety_subtitle": "Review rules & flying after diving",
+  "settings_section_security_title": "App Security",
+  "settings_section_security_subtitle": "App lock & database encryption",
+  "settings_security_appLock": "App Lock",
+  "settings_security_appLock_subtitle": "Require your password or biometrics to open the app",
+  "settings_security_biometrics": "Unlock with biometrics",
+  "settings_security_autoLock": "Auto-lock",
+  "settings_security_autoLock_immediately": "Immediately",
+  "settings_security_autoLock_minutes": "{minutes, plural, =1{After 1 minute} other{After {minutes} minutes}}",
+  "@settings_security_autoLock_minutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "settings_security_autoLock_never": "Never",
+  "settings_security_encryption": "Encrypt database",
+  "settings_security_encryption_subtitle": "Protect your dive log file with at-rest encryption",
+  "settings_security_encryption_progress_backup": "Creating safety backup...",
+  "settings_security_encryption_progress_encrypt": "Encrypting database...",
+  "settings_security_encryption_progress_decrypt": "Decrypting database...",
+  "settings_security_encryption_progress_reopen": "Reopening database...",
+  "settings_security_changePassword": "Change password",
+  "settings_security_regenerateRecovery": "New recovery code",
+  "settings_security_setPassword": "Set app password",
+  "settings_security_password": "Password",
+  "settings_security_confirmPassword": "Confirm password",
+  "settings_security_currentPassword": "Current password",
+  "settings_security_newPassword": "New password",
+  "settings_security_passwordTooShort": "Password must be at least 4 characters.",
+  "settings_security_passwordMismatch": "Passwords do not match.",
+  "settings_security_wrongPassword": "Incorrect password.",
+  "settings_security_recoveryCode_title": "Your recovery code",
+  "settings_security_recoveryCode_explain": "Write this down and keep it safe. It is the only way to unlock the app if you forget your password, and it replaces any previous recovery code.",
+  "settings_security_recoveryCode_savedConfirm": "I saved my recovery code",
+  "settings_security_disableBlockedByEncryption_title": "Encryption is on",
+  "settings_security_disableBlockedByEncryption_body": "Turn off database encryption before turning off App Lock. The encrypted database needs a credential.",
+  "settings_security_enableEncryption_title": "Encrypt database?",
+  "settings_security_enableEncryption_body": "A safety backup is created first, then the database file is re-encrypted in place. This can take a while for large dive logs.",
+  "settings_security_disableEncryption_title": "Turn off encryption?",
+  "settings_security_disableEncryption_body": "The database file will be stored unencrypted on disk again.",
+  "settings_security_turnOffAppLock_title": "Turn off App Lock?",
+  "settings_security_turnOffAppLock_body": "The app will open without asking for your password.",
+  "settings_security_unlock_title": "Enter your password",
+  "settings_security_cancel": "Cancel",
+  "settings_security_continue": "Continue",
+  "settings_security_done": "Done",
+  "settings_security_turnOff": "Turn off",
   "dataQuality_inbox_title": "Data quality",
   "dataQuality_badge_tooltip": "Data quality review",
   "dataQuality_scan_start": "Scan library",

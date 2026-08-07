@@ -28,12 +28,15 @@ final missingViewProvider =
 /// them).
 final missingOfflineCountProvider = FutureProvider<int>((ref) async {
   final state = ref.watch(missingViewProvider);
-  final volumes = VolumeStatus();
+  // One probe per mount root per pass: a page of rows from the same
+  // unreachable share must not stat it once per row. A fresh probe each
+  // time the provider recomputes, so remounting is picked up.
+  final isOnline = VolumeStatus().newPassProbe();
   var offline = 0;
   for (final entry in state.entries) {
     final path = entry.item.localPath ?? entry.item.filePath;
     if (path == null || path.isEmpty) continue;
-    if (!await volumes.isVolumeOnline(path)) offline++;
+    if (!await isOnline(path)) offline++;
   }
   return offline;
 });

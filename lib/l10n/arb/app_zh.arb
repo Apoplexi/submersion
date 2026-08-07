@@ -1,5 +1,15 @@
 {
+  "settings_units_defaultCurrency": "默认货币",
+  "settings_units_dialog_defaultCurrency": "默认货币",
   "diveSites_list_menu_select": "选择潜水点",
+  "diveLog_edit_flightWindowWarning": "此次潜水的结束时间晚于您航班的最后安全出水时间({time})",
+  "@diveLog_edit_flightWindowWarning": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
   "diveLog_edit_geofenceSuggestion_near": "靠近 {location}",
   "diveLog_edit_geofenceSuggestion_title": "装备建议",
   "diveLog_edit_geofenceSuggestion_body": "应用\"{setName}\"套装？",
@@ -1928,6 +1938,7 @@
   "diveLog_edit_snackbar_unableToCalculateMaxDepth": "无法从轮廓计算最大深度",
   "diveLog_edit_snackbar_unableToCalculateRuntime": "无法从轮廓计算运行时间",
   "diveLog_edit_subsection_diveConditions": "潜水条件",
+  "diveLog_edit_subsection_autofill": "自动填充",
   "diveLog_edit_subsection_weather": "天气",
   "diveLog_edit_summary_items": "{count, plural, one{1 件装备} other{{count} 件装备}}",
   "diveLog_edit_summary_notes": "笔记",
@@ -3551,6 +3562,7 @@
   "equipment_serviceDialog_clearNextServiceDateTooltip": "清除下次维护日期",
   "equipment_serviceDialog_costHint": "0.00",
   "equipment_serviceDialog_costLabel": "费用",
+  "equipment_serviceDialog_currencyLabel": "货币",
   "equipment_serviceDialog_costValidation": "请输入有效金额",
   "equipment_serviceDialog_editTitle": "编辑维护记录",
   "equipment_serviceDialog_nextServiceDueLabel": "下次维护日期",
@@ -3903,6 +3915,7 @@
   "media_diveMediaSection_thumbnailLabel": "查看照片。长按以选择",
   "media_diveMediaSection_title": "照片 & 视频",
   "media_diveMediaSection_deleteButton": "删除",
+  "media_diveMediaSection_deleteError": "删除失败：{error}",
   "media_diveMediaSection_deleteSelectedContent": "这会将它们从应用和任何媒体存储中移除。此操作无法撤销。",
   "media_diveMediaSection_deleteSelectedSuccess": "已删除 {count} 个项目",
   "media_diveMediaSection_deleteSelectedTitle": "删除 {count} 个项目？",
@@ -4105,7 +4118,7 @@
   "media_repair_confidence_unmatched": "无候选项",
   "media_repair_unverified": "未通过存储验证",
   "media_repair_apply": "重新关联 {count} 个文件",
-  "media_repair_summary": "{relinked} 个已重新关联，{cloudBacked} 个云端备份,{reuploads} 个重新上传已排队，{failed} 个失败，{skipped} 个已跳过",
+  "media_repair_summary": "{relinked} 个已重新关联，{cloudBacked} 个云端备份，{reuploads} 个重新上传已排队，{failed} 个失败，{skipped} 个已跳过",
   "media_console_unlinked": "未关联",
   "media_import_linkTitle": "关联导入的媒体",
   "media_import_linkConfirm": "关联 {count} 个项目",
@@ -4271,6 +4284,7 @@
   "settings_about_header": "关于",
   "settings_about_openSourceLicenses": "开源许可证",
   "settings_about_reportIssue": "报告问题",
+  "settings_about_reportIssue_copy": "复制链接",
   "settings_about_reportIssue_snackbar": "请访问 github.com/submersion-app/submersion/issues",
   "settings_about_version": "版本 {version}",
   "settings_appBar_title": "设置",
@@ -5604,6 +5618,9 @@
   "trips_edit_label_notes": "备注",
   "trips_edit_label_operatorName": "运营商/包船",
   "trips_edit_label_resortName": "度假村名称",
+  "trips_edit_label_returnFlight": "返程航班",
+  "trips_edit_returnFlightClear": "清除返程航班",
+  "trips_edit_returnFlightNotSet": "未设置",
   "trips_edit_label_startDate": "开始日期",
   "trips_edit_label_tripName": "旅行名称 *",
   "trips_edit_label_tripType": "旅行类型",
@@ -5852,12 +5869,25 @@
   "dashboard_gauges_insuranceExpired": "保险已过期",
   "dashboard_gauges_noInsurance": "未登记保险",
   "dashboard_gauges_noFlyClear": "禁飞 0:00",
+  "dashboard_gauges_flightWindow": "潜水窗口 {hours}:{minutes}",
+  "@dashboard_gauges_flightWindow": {
+    "placeholders": {
+      "hours": {
+        "type": "String"
+      },
+      "minutes": {
+        "type": "String"
+      }
+    }
+  },
+  "dashboard_gauges_flightWindowClosed": "航班前请勿再潜水",
   "dashboard_gauges_noFlyRemaining": "禁飞 {hours}:{minutes}",
   "dashboard_gauges_lastDiveDays": "上次潜水 {days} 天前",
   "dashboard_gauges_lastDiveToday": "今天潜过水",
   "dashboard_gauges_noDivesYet": "暂无潜水记录",
   "settings_homeChips_pageTitle": "主页状态标签",
   "settings_homeChips_description": "选择主页顶部显示哪些状态标签。",
+  "settings_homeChips_flightWindow": "航班前潜水窗口",
   "settings_homeChips_gear": "装备保养",
   "settings_homeChips_insurance": "保险",
   "settings_homeChips_noFly": "禁飞计时",
@@ -6642,6 +6672,32 @@
   "safetySettings_noFlyPreset_standard": "标准(12/18/24 小时)",
   "safetySettings_noFlyPreset_strict": "严格(18/24/48 小时)",
   "safetySettings_noFlyPreset_subtitle": "单次免减压潜水、重复潜水和减压潜水后的指导间隔",
+  "flightWindow_closed": "航班前请勿再潜水",
+  "flightWindow_conflict": "您的禁飞时间超过了航班起飞时间",
+  "flightWindow_departs": "航班 {time} 起飞",
+  "@flightWindow_departs": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "flightWindow_openTitle": "剩余潜水时间:{remaining}",
+  "@flightWindow_openTitle": {
+    "placeholders": {
+      "remaining": {
+        "type": "String"
+      }
+    }
+  },
+  "flightWindow_surfaceBy": "请在 {time} 前出水",
+  "@flightWindow_surfaceBy": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
   "safetyHub_noFly_active_title": "禁飞:剩余 {remaining}",
   "@safetyHub_noFly_active_title": {
     "placeholders": {
@@ -6962,5 +7018,53 @@
   "reef_attribution_wri": "珊瑚礁分布与威胁等级。CC BY 3.0。",
   "reef_attribution_noaa": "海表温度与白化热压力。公共领域。",
   "reef_attribution_gbif": "物种出现记录，已筛选为 CC0 和 CC BY 4.0。",
-  "reef_attribution_protectedSeas": "海洋保护区边界。CC BY 4.0。"
+  "reef_attribution_protectedSeas": "海洋保护区边界。CC BY 4.0。",
+  "settings_section_security_title": "应用安全",
+  "settings_section_security_subtitle": "应用锁定与数据库加密",
+  "settings_security_appLock": "应用锁定",
+  "settings_security_appLock_subtitle": "打开应用时需要密码或生物识别",
+  "settings_security_biometrics": "使用生物识别解锁",
+  "settings_security_autoLock": "自动锁定",
+  "settings_security_autoLock_immediately": "立即",
+  "settings_security_autoLock_minutes": "{minutes, plural, =1{1 分钟后} other{{minutes} 分钟后}}",
+  "@settings_security_autoLock_minutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "settings_security_autoLock_never": "从不",
+  "settings_security_encryption": "加密数据库",
+  "settings_security_encryption_subtitle": "使用静态加密保护您的潜水日志文件",
+  "settings_security_encryption_progress_backup": "正在创建安全备份...",
+  "settings_security_encryption_progress_encrypt": "正在加密数据库...",
+  "settings_security_encryption_progress_decrypt": "正在解密数据库...",
+  "settings_security_encryption_progress_reopen": "正在重新打开数据库...",
+  "settings_security_changePassword": "更改密码",
+  "settings_security_regenerateRecovery": "新恢复代码",
+  "settings_security_setPassword": "设置应用密码",
+  "settings_security_password": "密码",
+  "settings_security_confirmPassword": "确认密码",
+  "settings_security_currentPassword": "当前密码",
+  "settings_security_newPassword": "新密码",
+  "settings_security_passwordTooShort": "密码至少需要 4 个字符。",
+  "settings_security_passwordMismatch": "两次输入的密码不一致。",
+  "settings_security_wrongPassword": "密码错误。",
+  "settings_security_recoveryCode_title": "您的恢复代码",
+  "settings_security_recoveryCode_explain": "请抄写并妥善保管。如果忘记密码，它是解锁应用的唯一方式，并会替换之前的任何恢复代码。",
+  "settings_security_recoveryCode_savedConfirm": "我已保存恢复代码",
+  "settings_security_disableBlockedByEncryption_title": "加密已启用",
+  "settings_security_disableBlockedByEncryption_body": "请先关闭数据库加密，再关闭应用锁定。加密的数据库需要凭据。",
+  "settings_security_enableEncryption_title": "要加密数据库吗？",
+  "settings_security_enableEncryption_body": "首先会创建安全备份，然后就地重新加密数据库文件。日志较大时可能需要一些时间。",
+  "settings_security_disableEncryption_title": "要关闭加密吗？",
+  "settings_security_disableEncryption_body": "数据库文件将重新以未加密形式存储在磁盘上。",
+  "settings_security_turnOffAppLock_title": "要关闭应用锁定吗？",
+  "settings_security_turnOffAppLock_body": "应用打开时将不再要求输入密码。",
+  "settings_security_unlock_title": "输入您的密码",
+  "settings_security_cancel": "取消",
+  "settings_security_continue": "继续",
+  "settings_security_done": "完成",
+  "settings_security_turnOff": "关闭"
 }

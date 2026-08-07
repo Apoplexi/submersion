@@ -40,7 +40,8 @@ void main() {
     return RepairWizardNotifier(
       loadMissingRows: () async => missingRows,
       buildSources: (config) => [_FakeSource(harvest)],
-      isVolumeOnline: (path) async => !offlinePaths.contains(path),
+      newVolumeProbe: () =>
+          (path) async => !offlinePaths.contains(path),
       applyProposals: (proposals) async {
         appliedProposals = proposals;
         return report ??
@@ -91,6 +92,38 @@ void main() {
 
     final state = n.state as RepairWizardReview;
     expect(state.proposals.map((p) => p.item.id), ['a']);
+  });
+
+  test('each harvest builds exactly one volume probe', () async {
+    // The probe memoizes per mount root, so one per pass keeps an
+    // unreachable share to a single stat however many rows sit on it -
+    // while a rescan still re-reads mount state.
+    var probesBuilt = 0;
+    final n = RepairWizardNotifier(
+      loadMissingRows: () async => [
+        broken('a', localPath: '/nas/a.jpg'),
+        broken('b', localPath: '/nas/b.jpg'),
+        broken('c', localPath: '/nas/c.jpg'),
+      ],
+      buildSources: (_) => const [],
+      newVolumeProbe: () {
+        probesBuilt++;
+        return (_) async => true;
+      },
+      applyProposals: (_) async => const RepairApplyReport(
+        relinked: 0,
+        cloudBacked: 0,
+        reuploadsQueued: 0,
+        failed: 0,
+        skipped: 0,
+      ),
+    );
+
+    await n.harvest(const RepairWizardConfig());
+    expect(probesBuilt, 1);
+
+    await n.harvest(const RepairWizardConfig());
+    expect(probesBuilt, 2);
   });
 
   test(

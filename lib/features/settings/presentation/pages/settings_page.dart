@@ -2,14 +2,17 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:submersion/core/icons/mdi_icons.dart';
+import 'package:submersion/core/utils/currency.dart';
 import 'package:submersion/core/constants/map_style.dart';
 import 'package:submersion/core/deco/entities/cns_calculation_method.dart';
 import 'package:submersion/core/providers/provider.dart';
 
 import 'package:submersion/features/settings/presentation/pages/column_config_page.dart';
 import 'package:submersion/features/settings/presentation/pages/safety_settings_page.dart';
+import 'package:submersion/features/settings/presentation/pages/security_settings_page.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/core/constants/profile_metrics.dart';
 import 'package:submersion/features/settings/presentation/pages/home_appearance_page.dart';
@@ -59,22 +62,29 @@ const _cnsSourceSubsurfaceUrl =
     'https://github.com/subsurface/subsurface/commit/a0912b38bd';
 
 /// Opens the GitHub issues page in an external browser. Falls back to a
-/// snackbar if the URL cannot be launched or an error occurs.
+/// snackbar with a copy-link action if the launch fails.
 Future<void> launchReportIssue(BuildContext context) async {
   final uri = Uri.parse(reportIssueUrl);
   var didLaunch = false;
 
-  if (await canLaunchUrl(uri)) {
-    try {
-      didLaunch = await launchUrl(uri, mode: LaunchMode.externalApplication);
-    } catch (_) {
-      didLaunch = false;
-    }
+  // No canLaunchUrl guard: it false-negatives for https on Android 11+
+  // unless the scheme is declared in the manifest <queries> block.
+  try {
+    didLaunch = await launchUrl(uri, mode: LaunchMode.externalApplication);
+  } catch (_) {
+    didLaunch = false;
   }
 
   if (!didLaunch && context.mounted) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(context.l10n.settings_about_reportIssue_snackbar)),
+      SnackBar(
+        content: Text(context.l10n.settings_about_reportIssue_snackbar),
+        action: SnackBarAction(
+          label: context.l10n.settings_about_reportIssue_copy,
+          onPressed: () =>
+              Clipboard.setData(const ClipboardData(text: reportIssueUrl)),
+        ),
+      ),
     );
   }
 }
@@ -134,6 +144,8 @@ class SettingsPage extends ConsumerWidget {
         return const DiverProfileHubPage();
       case 'safety':
         return const SafetySettingsPage();
+      case 'security':
+        return const SecuritySettingsPage();
       case 'units':
         return _UnitsSectionContent(ref: ref);
       case 'decompression':
@@ -268,6 +280,8 @@ class _SettingsSectionDetailPage extends ConsumerWidget {
         return const DiverProfileHubPage();
       case 'safety':
         return const SafetySettingsPage();
+      case 'security':
+        return const SecuritySettingsPage();
       case 'units':
         return _UnitsSectionContent(ref: ref);
       case 'decompression':
@@ -345,6 +359,7 @@ class _MobileSettingsTile extends StatelessWidget {
       'dataSources' => context.l10n.settings_section_dataSources_title,
       'sharedData' => context.l10n.settings_sharedData_sectionTitle,
       'safety' => context.l10n.settings_section_safety_title,
+      'security' => context.l10n.settings_section_security_title,
       _ => section.title,
     };
   }
@@ -361,6 +376,7 @@ class _MobileSettingsTile extends StatelessWidget {
       'about' => context.l10n.settings_section_about_subtitle,
       'dataSources' => context.l10n.settings_section_dataSources_subtitle,
       'safety' => context.l10n.settings_section_safety_subtitle,
+      'security' => context.l10n.settings_section_security_subtitle,
       _ => section.subtitle,
     };
   }
@@ -474,6 +490,17 @@ class _UnitsSectionContent extends ConsumerWidget {
                       : '${settings.pressureUnit.symbol}/min',
                   onTap: () =>
                       _showSacUnitPicker(context, ref, settings.sacUnit),
+                ),
+                const Divider(height: 1),
+                _buildUnitTile(
+                  context,
+                  title: context.l10n.settings_units_defaultCurrency,
+                  value: settings.defaultCurrency,
+                  onTap: () => _showCurrencyPicker(
+                    context,
+                    ref,
+                    settings.defaultCurrency,
+                  ),
                 ),
               ],
             ),
@@ -816,6 +843,51 @@ class _UnitsSectionContent extends ConsumerWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  void _showCurrencyPicker(
+    BuildContext context,
+    WidgetRef ref,
+    String currentCode,
+  ) {
+    final current = currentCode.trim().toUpperCase();
+    final codes = currencyCodesWith(current);
+    showDialog<void>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(context.l10n.settings_units_dialog_defaultCurrency),
+        content: SizedBox(
+          width: double.maxFinite,
+          child: ListView(
+            shrinkWrap: true,
+            children: [
+              for (final code in codes)
+                ListTile(
+                  title: Text('$code  ${currencySymbol(code)}'),
+                  trailing: code == current
+                      ? Icon(
+                          Icons.check,
+                          color: Theme.of(context).colorScheme.primary,
+                        )
+                      : null,
+                  onTap: () {
+                    ref
+                        .read(settingsProvider.notifier)
+                        .setDefaultCurrency(code);
+                    Navigator.of(dialogContext).pop();
+                  },
+                ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(),
+            child: Text(context.l10n.common_action_cancel),
+          ),
+        ],
       ),
     );
   }

@@ -9,6 +9,11 @@ class AppLocalizationsNl extends AppLocalizations {
   AppLocalizationsNl([String locale = 'nl']) : super(locale);
 
   @override
+  String diveLog_edit_flightWindowWarning(String time) {
+    return 'Deze duik eindigt na het laatste veilige opstijgmoment voor je vlucht ($time)';
+  }
+
+  @override
   String diveLog_edit_geofenceSuggestion_near(String location) {
     return 'Bij $location';
   }
@@ -3090,6 +3095,15 @@ class AppLocalizationsNl extends AppLocalizations {
   String get dashboard_gauges_noFlyClear => 'Vliegverbod 0:00';
 
   @override
+  String dashboard_gauges_flightWindow(String hours, String minutes) {
+    return 'Duikvenster $hours:$minutes';
+  }
+
+  @override
+  String get dashboard_gauges_flightWindowClosed =>
+      'Niet meer duiken vóór de vlucht';
+
+  @override
   String dashboard_gauges_noFlyRemaining(String hours, String minutes) {
     return 'Vliegverbod $hours:$minutes';
   }
@@ -3111,6 +3125,9 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get settings_homeChips_description =>
       'Kies welke statuschips bovenaan het tabblad Start verschijnen.';
+
+  @override
+  String get settings_homeChips_flightWindow => 'Duikvenster voor vlucht';
 
   @override
   String get settings_homeChips_gear => 'Uitrustingsonderhoud';
@@ -10742,6 +10759,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get equipment_serviceDialog_costLabel => 'Kosten';
 
   @override
+  String get equipment_serviceDialog_currencyLabel => 'Valuta';
+
+  @override
   String get equipment_serviceDialog_costValidation =>
       'Voer een geldig bedrag in';
 
@@ -11666,6 +11686,11 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get media_diveMediaSection_deleteButton => 'Verwijderen';
+
+  @override
+  String media_diveMediaSection_deleteError(Object error) {
+    return 'Verwijderen mislukt: $error';
+  }
 
   @override
   String get media_diveMediaSection_deleteSelectedContent =>
@@ -12999,6 +13024,9 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get settings_about_reportIssue => 'Probleem melden';
+
+  @override
+  String get settings_about_reportIssue_copy => 'Link kopiëren';
 
   @override
   String get settings_about_reportIssue_snackbar =>
@@ -15383,6 +15411,12 @@ class AppLocalizationsNl extends AppLocalizations {
   String get settings_units_sacRate => 'SAC-snelheid';
 
   @override
+  String get settings_units_defaultCurrency => 'Standaardvaluta';
+
+  @override
+  String get settings_units_dialog_defaultCurrency => 'Standaardvaluta';
+
+  @override
   String get settings_units_sac_pressurePerMinute => 'Druk per minuut';
 
   @override
@@ -17747,6 +17781,15 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get trips_edit_label_resortName => 'Resortnaam';
+
+  @override
+  String get trips_edit_label_returnFlight => 'Terugvlucht';
+
+  @override
+  String get trips_edit_returnFlightClear => 'Terugvlucht wissen';
+
+  @override
+  String get trips_edit_returnFlightNotSet => 'Niet ingesteld';
 
   @override
   String get trips_edit_label_startDate => 'Startdatum';
@@ -20606,6 +20649,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get diveLog_edit_section_environment => 'Omgeving';
 
   @override
+  String get diveLog_edit_subsection_autofill => 'Automatisch invullen';
+
+  @override
   String get diveLog_edit_subsection_weather => 'Weer';
 
   @override
@@ -22289,6 +22335,28 @@ class AppLocalizationsNl extends AppLocalizations {
       'Richttijden na een enkele duik zonder deco, herhalingsduiken en decoduiken';
 
   @override
+  String get flightWindow_closed => 'Niet meer duiken vóór je vlucht';
+
+  @override
+  String get flightWindow_conflict =>
+      'Je no-flytijd loopt door tot na je vertrek';
+
+  @override
+  String flightWindow_departs(String time) {
+    return 'Vlucht vertrekt $time';
+  }
+
+  @override
+  String flightWindow_openTitle(String remaining) {
+    return 'Resterende duiktijd: $remaining';
+  }
+
+  @override
+  String flightWindow_surfaceBy(String time) {
+    return 'Boven water vóór $time';
+  }
+
+  @override
   String safetyHub_noFly_active_title(String remaining) {
     return 'Vliegverbod: nog $remaining';
   }
@@ -22588,6 +22656,156 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get settings_section_safety_subtitle =>
       'Controleregels & vliegen na het duiken';
+
+  @override
+  String get settings_section_security_title => 'App-beveiliging';
+
+  @override
+  String get settings_section_security_subtitle =>
+      'App-vergrendeling & databaseversleuteling';
+
+  @override
+  String get settings_security_appLock => 'App-vergrendeling';
+
+  @override
+  String get settings_security_appLock_subtitle =>
+      'Vereis je wachtwoord of biometrie om de app te openen';
+
+  @override
+  String get settings_security_biometrics => 'Ontgrendelen met biometrie';
+
+  @override
+  String get settings_security_autoLock => 'Automatisch vergrendelen';
+
+  @override
+  String get settings_security_autoLock_immediately => 'Onmiddellijk';
+
+  @override
+  String settings_security_autoLock_minutes(int minutes) {
+    String _temp0 = intl.Intl.pluralLogic(
+      minutes,
+      locale: localeName,
+      other: 'Na $minutes minuten',
+      one: 'Na 1 minuut',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get settings_security_autoLock_never => 'Nooit';
+
+  @override
+  String get settings_security_encryption => 'Database versleutelen';
+
+  @override
+  String get settings_security_encryption_subtitle =>
+      'Bescherm je duiklogbestand met versleuteling in rust';
+
+  @override
+  String get settings_security_encryption_progress_backup =>
+      'Veiligheidsback-up maken...';
+
+  @override
+  String get settings_security_encryption_progress_encrypt =>
+      'Database versleutelen...';
+
+  @override
+  String get settings_security_encryption_progress_decrypt =>
+      'Database ontsleutelen...';
+
+  @override
+  String get settings_security_encryption_progress_reopen =>
+      'Database opnieuw openen...';
+
+  @override
+  String get settings_security_changePassword => 'Wachtwoord wijzigen';
+
+  @override
+  String get settings_security_regenerateRecovery => 'Nieuwe herstelcode';
+
+  @override
+  String get settings_security_setPassword => 'App-wachtwoord instellen';
+
+  @override
+  String get settings_security_password => 'Wachtwoord';
+
+  @override
+  String get settings_security_confirmPassword => 'Bevestig wachtwoord';
+
+  @override
+  String get settings_security_currentPassword => 'Huidig wachtwoord';
+
+  @override
+  String get settings_security_newPassword => 'Nieuw wachtwoord';
+
+  @override
+  String get settings_security_passwordTooShort =>
+      'Het wachtwoord moet minimaal 4 tekens bevatten.';
+
+  @override
+  String get settings_security_passwordMismatch =>
+      'De wachtwoorden komen niet overeen.';
+
+  @override
+  String get settings_security_wrongPassword => 'Onjuist wachtwoord.';
+
+  @override
+  String get settings_security_recoveryCode_title => 'Je herstelcode';
+
+  @override
+  String get settings_security_recoveryCode_explain =>
+      'Schrijf deze op en bewaar hem veilig. Het is de enige manier om de app te ontgrendelen als je je wachtwoord vergeet, en hij vervangt elke eerdere herstelcode.';
+
+  @override
+  String get settings_security_recoveryCode_savedConfirm =>
+      'Ik heb mijn herstelcode opgeslagen';
+
+  @override
+  String get settings_security_disableBlockedByEncryption_title =>
+      'Versleuteling is ingeschakeld';
+
+  @override
+  String get settings_security_disableBlockedByEncryption_body =>
+      'Schakel eerst de databaseversleuteling uit voordat je de app-vergrendeling uitschakelt. De versleutelde database heeft een toegangscode nodig.';
+
+  @override
+  String get settings_security_enableEncryption_title =>
+      'Database versleutelen?';
+
+  @override
+  String get settings_security_enableEncryption_body =>
+      'Er wordt eerst een veiligheidsback-up gemaakt, daarna wordt het databasebestand ter plekke opnieuw versleuteld. Dit kan even duren bij grote logboeken.';
+
+  @override
+  String get settings_security_disableEncryption_title =>
+      'Versleuteling uitschakelen?';
+
+  @override
+  String get settings_security_disableEncryption_body =>
+      'Het databasebestand wordt weer onversleuteld op schijf opgeslagen.';
+
+  @override
+  String get settings_security_turnOffAppLock_title =>
+      'App-vergrendeling uitschakelen?';
+
+  @override
+  String get settings_security_turnOffAppLock_body =>
+      'De app opent voortaan zonder om je wachtwoord te vragen.';
+
+  @override
+  String get settings_security_unlock_title => 'Voer je wachtwoord in';
+
+  @override
+  String get settings_security_cancel => 'Annuleren';
+
+  @override
+  String get settings_security_continue => 'Doorgaan';
+
+  @override
+  String get settings_security_done => 'Klaar';
+
+  @override
+  String get settings_security_turnOff => 'Uitschakelen';
 
   @override
   String get dataQuality_inbox_title => 'Datakwaliteit';

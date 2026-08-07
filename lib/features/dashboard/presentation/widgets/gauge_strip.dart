@@ -5,6 +5,7 @@ import 'package:submersion/core/providers/provider.dart';
 
 import 'package:submersion/features/dashboard/presentation/providers/gauge_providers.dart';
 import 'package:submersion/features/equipment/domain/entities/service_clock_status.dart';
+import 'package:submersion/features/safety/domain/services/no_fly_service.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 
@@ -174,6 +175,39 @@ class GaugeStrip extends ConsumerWidget {
             tone: _Tone.ok,
           ),
         );
+      }
+    }
+
+    if (_shown(hidden, HomeChipType.flightWindow)) {
+      final flight = g.flightWindow;
+      if (flight != null) {
+        switch (flight.state) {
+          case FlightWindowState.open:
+            final remaining = flight.remaining(NoFlyService.wallClockNowUtc());
+            chips.add(
+              _chip(
+                context,
+                icon: Icons.flight_takeoff_outlined,
+                label: l10n.dashboard_gauges_flightWindow(
+                  remaining.inHours.toString(),
+                  (remaining.inMinutes % 60).toString().padLeft(2, '0'),
+                ),
+                tone: _Tone.warn,
+                onTap: () => context.goNamed('noFly'),
+              ),
+            );
+          case FlightWindowState.closed:
+          case FlightWindowState.conflict:
+            chips.add(
+              _chip(
+                context,
+                icon: Icons.flight_takeoff_outlined,
+                label: l10n.dashboard_gauges_flightWindowClosed,
+                tone: _Tone.alert,
+                onTap: () => context.goNamed('noFly'),
+              ),
+            );
+        }
       }
     }
 

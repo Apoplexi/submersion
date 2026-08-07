@@ -820,6 +820,10 @@ jobs:
           restore-keys: |
             pub-${{ runner.os }}-
 
+      # libssl-dev is required by sqlcipher_flutter_libs: the Linux build
+      # compiles SQLCipher from source and links it against OpenSSL. The
+      # hosted runner image happens to ship the headers today, so declaring
+      # it keeps a future image change from silently breaking the build.
       - name: Install Linux dependencies
         run: |
           sudo apt-get update
@@ -832,7 +836,8 @@ jobs:
             liblzma-dev \
             libstdc++-12-dev \
             libsecret-1-dev \
-            libwebkit2gtk-4.1-dev
+            libwebkit2gtk-4.1-dev \
+            libssl-dev
 
       - name: Disable Swift Package Manager (project uses CocoaPods)
         run: flutter config --no-enable-swift-package-manager

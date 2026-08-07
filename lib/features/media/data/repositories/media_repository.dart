@@ -1059,22 +1059,27 @@ class MediaRepository {
     final now = DateTime.now().millisecondsSinceEpoch;
     await _db.transaction(() async {
       for (final write in writes) {
+        // sourceType is the resolver dispatch key, so a repair must always
+        // restate it: relinking a dead gallery row to a file on disk while
+        // leaving sourceType alone would keep routing the row through
+        // PlatformGalleryResolver, turning a visibly-missing item into a
+        // silently-missing one the moment the orphan flag lifts.
+        final toGallery =
+            write.newSourceType == MediaSourceType.platformGallery;
         await (_db.update(
           _db.media,
         )..where((t) => t.id.equals(write.mediaId))).write(
           MediaCompanion(
-            localPath: write.toGallery
+            localPath: toGallery
                 ? const Value(null)
                 : Value(write.newLocalPath),
-            bookmarkRef: write.newBookmarkRef == null && !write.toGallery
+            bookmarkRef: write.newBookmarkRef == null && !toGallery
                 ? const Value.absent()
                 : Value(write.newBookmarkRef),
-            platformAssetId: write.toGallery
-                ? Value(write.newPlatformAssetId)
-                : const Value.absent(),
-            sourceType: write.toGallery
-                ? Value(MediaSourceType.platformGallery.name)
-                : const Value.absent(),
+            // Null for a file repair: the old asset id addresses an asset
+            // that no longer exists on this device.
+            platformAssetId: Value(write.newPlatformAssetId),
+            sourceType: Value(write.newSourceType.name),
             isOrphaned: const Value(false),
             lastVerifiedAt: Value(now),
             updatedAt: Value(now),

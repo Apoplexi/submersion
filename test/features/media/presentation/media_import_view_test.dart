@@ -61,6 +61,17 @@ void main() {
     expect(page.mediaIds, ['m1', 'm2']);
   });
 
+  test('the library import window has no effective lower bound', () {
+    // A dive-less import must offer the whole gallery. The mobile picker
+    // turns this bound into a hard photo_manager createTimeCond, so any
+    // "recent enough" sentinel silently hides older assets -- scanned film
+    // and slide libraries, which is exactly the media divers back-fill.
+    expect(
+      MediaImportView.libraryWindowStart.millisecondsSinceEpoch,
+      lessThanOrEqualTo(0),
+    );
+  });
+
   testWidgets('an empty import stays on the view', (tester) async {
     await tester.pumpWidget(host(launchOverride: (context) async => []));
     await tester.pumpAndSettle();

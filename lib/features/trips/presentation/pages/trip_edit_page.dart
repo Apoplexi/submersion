@@ -53,6 +53,7 @@ class _TripEditPageState extends ConsumerState<TripEditPage> {
   LiveaboardDetails? _originalLiveaboardDetails;
 
   DateTime _startDate = DateTime.now();
+  DateTime? _returnFlightAt;
   DateTime _endDate = DateTime.now().add(const Duration(days: 7));
   bool _isLoading = false;
   bool _isSaving = false;
@@ -127,6 +128,7 @@ class _TripEditPageState extends ConsumerState<TripEditPage> {
         setState(() {
           _startDate = trip.startDate;
           _endDate = trip.endDate;
+          _returnFlightAt = trip.returnFlightAt;
           _isShared = trip.isShared;
           _isLoading = false;
           _hasChanges = false;
@@ -278,6 +280,34 @@ class _TripEditPageState extends ConsumerState<TripEditPage> {
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
                         color: Theme.of(context).colorScheme.primary,
                       ),
+                    ),
+                  ),
+                  // Return flight (optional; drives the no-fly countdown)
+                  Semantics(
+                    button: true,
+                    label: context.l10n.trips_edit_label_returnFlight,
+                    child: ListTile(
+                      leading: const Icon(Icons.flight_land),
+                      title: Text(context.l10n.trips_edit_label_returnFlight),
+                      subtitle: Text(
+                        _returnFlightAt == null
+                            ? context.l10n.trips_edit_returnFlightNotSet
+                            : '${dateFormat.format(_returnFlightAt!)}, '
+                                  '${TimeOfDay.fromDateTime(_returnFlightAt!).format(context)}',
+                      ),
+                      trailing: _returnFlightAt == null
+                          ? const Icon(Icons.edit)
+                          : IconButton(
+                              tooltip:
+                                  context.l10n.trips_edit_returnFlightClear,
+                              icon: const Icon(Icons.clear),
+                              onPressed: () => setState(() {
+                                _returnFlightAt = null;
+                                _hasChanges = true;
+                              }),
+                            ),
+                      contentPadding: EdgeInsets.zero,
+                      onTap: _selectReturnFlight,
                     ),
                   ),
                   const SizedBox(height: 24),
@@ -704,6 +734,36 @@ class _TripEditPageState extends ConsumerState<TripEditPage> {
     }
   }
 
+  Future<void> _selectReturnFlight() async {
+    final initial =
+        _returnFlightAt ??
+        DateTime(_endDate.year, _endDate.month, _endDate.day, 12);
+    final pickedDate = await showAppDatePicker(
+      context: context,
+      initialDate: initial,
+      firstDate: DateTime(1950),
+      lastDate: DateTime(2100),
+    );
+    if (pickedDate == null || !mounted) return;
+    final pickedTime = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.fromDateTime(initial),
+    );
+    if (pickedTime == null || !mounted) return;
+    setState(() {
+      // Wall-clock-as-UTC, the same frame as dive times, so the no-fly
+      // math can compare this directly against dive end times.
+      _returnFlightAt = DateTime.utc(
+        pickedDate.year,
+        pickedDate.month,
+        pickedDate.day,
+        pickedTime.hour,
+        pickedTime.minute,
+      );
+      _hasChanges = true;
+    });
+  }
+
   Future<bool> _onWillPop() async {
     if (_hasChanges) {
       return await _showDiscardDialog() ?? false;
@@ -796,6 +856,7 @@ class _TripEditPageState extends ConsumerState<TripEditPage> {
         tripType: _tripType,
         notes: _notesController.text.trim(),
         isShared: _isShared,
+        returnFlightAt: _returnFlightAt,
         createdAt: _originalTrip?.createdAt ?? now,
         updatedAt: now,
       );

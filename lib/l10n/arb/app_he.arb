@@ -1,5 +1,15 @@
 {
+  "settings_units_defaultCurrency": "מטבע ברירת מחדל",
+  "settings_units_dialog_defaultCurrency": "מטבע ברירת מחדל",
   "diveSites_list_menu_select": "בחירת אתרים",
+  "diveLog_edit_flightWindowWarning": "הצלילה הזו מסתיימת אחרי הזמן הבטוח האחרון לעלייה לפני הטיסה שלך ({time})",
+  "@diveLog_edit_flightWindowWarning": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
   "diveLog_edit_geofenceSuggestion_near": "ליד {location}",
   "diveLog_edit_geofenceSuggestion_title": "הצעת ציוד",
   "diveLog_edit_geofenceSuggestion_body": "להחיל את ערכת \"{setName}\"?",
@@ -3337,6 +3347,7 @@
   "equipment_serviceDialog_clearNextServiceDateTooltip": "נקה תאריך טיפול הבא",
   "equipment_serviceDialog_costHint": "0.00",
   "equipment_serviceDialog_costLabel": "עלות",
+  "equipment_serviceDialog_currencyLabel": "מטבע",
   "equipment_serviceDialog_costValidation": "הזן סכום חוקי",
   "equipment_serviceDialog_editTitle": "ערוך רשומת טיפול",
   "equipment_serviceDialog_nextServiceDueLabel": "הטיפול הבא",
@@ -3687,6 +3698,7 @@
   "media_diveMediaSection_thumbnailLabel": "הצג תמונה. לחיצה ארוכה לביטול קישור",
   "media_diveMediaSection_title": "תמונות וסרטונים",
   "media_diveMediaSection_deleteButton": "מחיקה",
+  "media_diveMediaSection_deleteError": "המחיקה נכשלה: {error}",
   "media_diveMediaSection_deleteSelectedContent": "פעולה זו מסירה אותם מהאפליקציה ומכל מאגר מדיה. לא ניתן לבטל זאת.",
   "media_diveMediaSection_deleteSelectedSuccess": "{count} פריטים נמחקו",
   "media_diveMediaSection_deleteSelectedTitle": "למחוק {count} פריטים?",
@@ -4047,6 +4059,7 @@
   "settings_about_header": "אודות",
   "settings_about_openSourceLicenses": "רישיונות קוד פתוח",
   "settings_about_reportIssue": "דווח על בעיה",
+  "settings_about_reportIssue_copy": "העתקת קישור",
   "settings_about_reportIssue_snackbar": "בקר ב-github.com/submersion-app/submersion/issues",
   "settings_about_version": "גרסה {version}",
   "settings_appBar_title": "הגדרות",
@@ -5423,6 +5436,9 @@
   "trips_edit_label_notes": "הערות",
   "trips_edit_label_operatorName": "Operator / Charter",
   "trips_edit_label_resortName": "שם אתר הנופש",
+  "trips_edit_label_returnFlight": "טיסת חזרה",
+  "trips_edit_returnFlightClear": "נקה טיסת חזרה",
+  "trips_edit_returnFlightNotSet": "לא הוגדר",
   "trips_edit_label_startDate": "תאריך התחלה",
   "trips_edit_label_tripName": "שם הטיול *",
   "trips_edit_label_tripType": "Trip Type",
@@ -5791,6 +5807,7 @@
   "diveComputer_download_newDivesOnlyTitle": "הורד צלילות חדשות בלבד",
   "diveComputer_download_upToDate": "לא נמצאו צלילות חדשות -- היומן שלך מעודכן",
   "diveLog_edit_section_environment": "סביבה",
+  "diveLog_edit_subsection_autofill": "מילוי אוטומטי",
   "diveLog_edit_subsection_weather": "מזג אוויר",
   "diveLog_edit_subsection_diveConditions": "תנאי צלילה",
   "diveLog_edit_label_windSpeed": "מהירות רוח",
@@ -5852,12 +5869,25 @@
   "dashboard_gauges_insuranceExpired": "הביטוח פג תוקף",
   "dashboard_gauges_noInsurance": "אין ביטוח רשום",
   "dashboard_gauges_noFlyClear": "איסור טיסה 0:00",
+  "dashboard_gauges_flightWindow": "חלון צלילה {hours}:{minutes}",
+  "@dashboard_gauges_flightWindow": {
+    "placeholders": {
+      "hours": {
+        "type": "String"
+      },
+      "minutes": {
+        "type": "String"
+      }
+    }
+  },
+  "dashboard_gauges_flightWindowClosed": "אין יותר צלילות לפני הטיסה",
   "dashboard_gauges_noFlyRemaining": "איסור טיסה {hours}:{minutes}",
   "dashboard_gauges_lastDiveDays": "צלילה אחרונה לפני {days} ימים",
   "dashboard_gauges_lastDiveToday": "צללת היום",
   "dashboard_gauges_noDivesYet": "אין צלילות עדיין",
   "settings_homeChips_pageTitle": "שבבי מצב של דף הבית",
   "settings_homeChips_description": "בחר אילו שבבי מצב יופיעו בראש לשונית הבית.",
+  "settings_homeChips_flightWindow": "חלון צלילה לפני טיסה",
   "settings_homeChips_gear": "תחזוקת ציוד",
   "settings_homeChips_insurance": "ביטוח",
   "settings_homeChips_noFly": "טיימר איסור טיסה",
@@ -6642,6 +6672,32 @@
   "safetySettings_noFlyPreset_standard": "רגיל (12/18/24 ש')",
   "safetySettings_noFlyPreset_strict": "מחמיר (18/24/48 ש')",
   "safetySettings_noFlyPreset_subtitle": "מרווחים מנחים אחרי צלילה בודדת ללא דקו, צלילות חוזרות וצלילות דקומפרסיה",
+  "flightWindow_closed": "אין יותר צלילות לפני הטיסה",
+  "flightWindow_conflict": "זמן איסור הטיסה שלך נמשך מעבר להמראה",
+  "flightWindow_departs": "הטיסה ממריאה {time}",
+  "@flightWindow_departs": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "flightWindow_openTitle": "זמן צלילה שנותר: {remaining}",
+  "@flightWindow_openTitle": {
+    "placeholders": {
+      "remaining": {
+        "type": "String"
+      }
+    }
+  },
+  "flightWindow_surfaceBy": "לעלות אל פני השטח עד {time}",
+  "@flightWindow_surfaceBy": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
   "safetyHub_noFly_active_title": "איסור טיסה: נותרו {remaining}",
   "@safetyHub_noFly_active_title": {
     "placeholders": {
@@ -6962,5 +7018,53 @@
   "reef_attribution_wri": "נוכחות שונית ורמת איום. CC BY 3.0.",
   "reef_attribution_noaa": "טמפרטורת פני הים ועקת חום. נחלת הכלל.",
   "reef_attribution_gbif": "רשומות תצפית מינים, מסוננות ל-CC0 ו-CC BY 4.0.",
-  "reef_attribution_protectedSeas": "גבולות אזורים ימיים מוגנים. CC BY 4.0."
+  "reef_attribution_protectedSeas": "גבולות אזורים ימיים מוגנים. CC BY 4.0.",
+  "settings_section_security_title": "אבטחת האפליקציה",
+  "settings_section_security_subtitle": "נעילת אפליקציה והצפנת מסד הנתונים",
+  "settings_security_appLock": "נעילת אפליקציה",
+  "settings_security_appLock_subtitle": "דרישת סיסמה או ביומטריה לפתיחת האפליקציה",
+  "settings_security_biometrics": "ביטול נעילה באמצעות ביומטריה",
+  "settings_security_autoLock": "נעילה אוטומטית",
+  "settings_security_autoLock_immediately": "מיד",
+  "settings_security_autoLock_minutes": "{minutes, plural, =1{אחרי דקה אחת} other{אחרי {minutes} דקות}}",
+  "@settings_security_autoLock_minutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "settings_security_autoLock_never": "אף פעם",
+  "settings_security_encryption": "הצפנת מסד הנתונים",
+  "settings_security_encryption_subtitle": "הגנו על קובץ יומן הצלילות שלכם באמצעות הצפנה במנוחה",
+  "settings_security_encryption_progress_backup": "יוצר גיבוי בטיחות...",
+  "settings_security_encryption_progress_encrypt": "מצפין את מסד הנתונים...",
+  "settings_security_encryption_progress_decrypt": "מפענח את מסד הנתונים...",
+  "settings_security_encryption_progress_reopen": "פותח מחדש את מסד הנתונים...",
+  "settings_security_changePassword": "שינוי סיסמה",
+  "settings_security_regenerateRecovery": "קוד שחזור חדש",
+  "settings_security_setPassword": "הגדרת סיסמת אפליקציה",
+  "settings_security_password": "סיסמה",
+  "settings_security_confirmPassword": "אישור סיסמה",
+  "settings_security_currentPassword": "סיסמה נוכחית",
+  "settings_security_newPassword": "סיסמה חדשה",
+  "settings_security_passwordTooShort": "הסיסמה חייבת להכיל לפחות 4 תווים.",
+  "settings_security_passwordMismatch": "הסיסמאות אינן תואמות.",
+  "settings_security_wrongPassword": "סיסמה שגויה.",
+  "settings_security_recoveryCode_title": "קוד השחזור שלכם",
+  "settings_security_recoveryCode_explain": "רשמו אותו ושמרו אותו במקום בטוח. זו הדרך היחידה לפתוח את האפליקציה אם תשכחו את הסיסמה, והוא מחליף כל קוד שחזור קודם.",
+  "settings_security_recoveryCode_savedConfirm": "שמרתי את קוד השחזור שלי",
+  "settings_security_disableBlockedByEncryption_title": "ההצפנה פעילה",
+  "settings_security_disableBlockedByEncryption_body": "כבו תחילה את הצפנת מסד הנתונים לפני כיבוי נעילת האפליקציה. מסד הנתונים המוצפן דורש אמצעי אימות.",
+  "settings_security_enableEncryption_title": "להצפין את מסד הנתונים?",
+  "settings_security_enableEncryption_body": "תחילה נוצר גיבוי בטיחות ואז קובץ מסד הנתונים מוצפן מחדש במקומו. זה עשוי להימשך זמן מה ביומנים גדולים.",
+  "settings_security_disableEncryption_title": "לכבות את ההצפנה?",
+  "settings_security_disableEncryption_body": "קובץ מסד הנתונים יישמר שוב ללא הצפנה בדיסק.",
+  "settings_security_turnOffAppLock_title": "לכבות את נעילת האפליקציה?",
+  "settings_security_turnOffAppLock_body": "האפליקציה תיפתח מבלי לבקש את הסיסמה.",
+  "settings_security_unlock_title": "הזינו את הסיסמה",
+  "settings_security_cancel": "ביטול",
+  "settings_security_continue": "המשך",
+  "settings_security_done": "סיום",
+  "settings_security_turnOff": "כיבוי"
 }

@@ -1,5 +1,15 @@
 {
+  "settings_units_defaultCurrency": "Moneda predeterminada",
+  "settings_units_dialog_defaultCurrency": "Moneda predeterminada",
   "diveSites_list_menu_select": "Seleccionar puntos",
+  "diveLog_edit_flightWindowWarning": "Esta inmersión termina después de la última hora segura para emerger antes de tu vuelo ({time})",
+  "@diveLog_edit_flightWindowWarning": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
   "diveLog_edit_geofenceSuggestion_near": "Cerca de {location}",
   "diveLog_edit_geofenceSuggestion_title": "Sugerencia de equipo",
   "diveLog_edit_geofenceSuggestion_body": "¿Aplicar tu conjunto \"{setName}\"?",
@@ -3409,6 +3419,7 @@
   "equipment_serviceDialog_clearNextServiceDateTooltip": "Borrar fecha del proximo servicio",
   "equipment_serviceDialog_costHint": "0.00",
   "equipment_serviceDialog_costLabel": "Costo",
+  "equipment_serviceDialog_currencyLabel": "Moneda",
   "equipment_serviceDialog_costValidation": "Ingresa un monto valido",
   "equipment_serviceDialog_editTitle": "Editar registro de servicio",
   "equipment_serviceDialog_nextServiceDueLabel": "Proximo servicio",
@@ -3759,6 +3770,7 @@
   "media_diveMediaSection_thumbnailLabel": "Ver foto. Mantener presionado para desvincular",
   "media_diveMediaSection_title": "Fotos y video",
   "media_diveMediaSection_deleteButton": "Eliminar",
+  "media_diveMediaSection_deleteError": "Error al eliminar: {error}",
   "media_diveMediaSection_deleteSelectedContent": "Esto los elimina de la aplicación y de cualquier almacén multimedia. No se puede deshacer.",
   "media_diveMediaSection_deleteSelectedSuccess": "{count} elementos eliminados",
   "media_diveMediaSection_deleteSelectedTitle": "¿Eliminar {count} elementos?",
@@ -4119,6 +4131,7 @@
   "settings_about_header": "Acerca de",
   "settings_about_openSourceLicenses": "Licencias de codigo abierto",
   "settings_about_reportIssue": "Reportar un problema",
+  "settings_about_reportIssue_copy": "Copiar enlace",
   "settings_about_reportIssue_snackbar": "Visita github.com/submersion-app/submersion/issues",
   "settings_about_version": "Version {version}",
   "settings_appBar_title": "Ajustes",
@@ -5423,6 +5436,9 @@
   "trips_edit_label_notes": "Notas",
   "trips_edit_label_operatorName": "Operator / Charter",
   "trips_edit_label_resortName": "Nombre del resort",
+  "trips_edit_label_returnFlight": "Vuelo de regreso",
+  "trips_edit_returnFlightClear": "Borrar vuelo de regreso",
+  "trips_edit_returnFlightNotSet": "Sin definir",
   "trips_edit_label_startDate": "Fecha de inicio",
   "trips_edit_label_tripName": "Nombre del viaje *",
   "trips_edit_label_tripType": "Trip Type",
@@ -5791,6 +5807,7 @@
   "diveComputer_download_newDivesOnlyTitle": "Descargar solo inmersiones nuevas",
   "diveComputer_download_upToDate": "No se encontraron inmersiones nuevas -- tu registro está al día",
   "diveLog_edit_section_environment": "Entorno",
+  "diveLog_edit_subsection_autofill": "Autocompletar",
   "diveLog_edit_subsection_weather": "Clima",
   "diveLog_edit_subsection_diveConditions": "Condiciones de buceo",
   "diveLog_edit_label_windSpeed": "Velocidad del viento",
@@ -5852,12 +5869,25 @@
   "dashboard_gauges_insuranceExpired": "Seguro vencido",
   "dashboard_gauges_noInsurance": "Sin seguro registrado",
   "dashboard_gauges_noFlyClear": "No volar 0:00",
+  "dashboard_gauges_flightWindow": "Ventana de buceo {hours}:{minutes}",
+  "@dashboard_gauges_flightWindow": {
+    "placeholders": {
+      "hours": {
+        "type": "String"
+      },
+      "minutes": {
+        "type": "String"
+      }
+    }
+  },
+  "dashboard_gauges_flightWindowClosed": "No más buceo antes del vuelo",
   "dashboard_gauges_noFlyRemaining": "No volar {hours}:{minutes}",
   "dashboard_gauges_lastDiveDays": "Última inmersión hace {days}d",
   "dashboard_gauges_lastDiveToday": "Buceaste hoy",
   "dashboard_gauges_noDivesYet": "Aún sin inmersiones",
   "settings_homeChips_pageTitle": "Chips de estado de Inicio",
   "settings_homeChips_description": "Elige qué chips de estado aparecen en la parte superior de la pestaña Inicio.",
+  "settings_homeChips_flightWindow": "Ventana de buceo antes del vuelo",
   "settings_homeChips_gear": "Mantenimiento del equipo",
   "settings_homeChips_insurance": "Seguro",
   "settings_homeChips_noFly": "Temporizador de no volar",
@@ -6642,6 +6672,32 @@
   "safetySettings_noFlyPreset_standard": "Estándar (12/18/24 h)",
   "safetySettings_noFlyPreset_strict": "Estricto (18/24/48 h)",
   "safetySettings_noFlyPreset_subtitle": "Intervalos orientativos tras una única inmersión sin deco, inmersiones sucesivas e inmersiones con deco",
+  "flightWindow_closed": "No bucees más antes de tu vuelo",
+  "flightWindow_conflict": "Tu tiempo de no volar se extiende más allá de la salida del vuelo",
+  "flightWindow_departs": "El vuelo sale {time}",
+  "@flightWindow_departs": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "flightWindow_openTitle": "Tiempo restante para bucear: {remaining}",
+  "@flightWindow_openTitle": {
+    "placeholders": {
+      "remaining": {
+        "type": "String"
+      }
+    }
+  },
+  "flightWindow_surfaceBy": "Emerger antes de {time}",
+  "@flightWindow_surfaceBy": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
   "safetyHub_noFly_active_title": "No volar: quedan {remaining}",
   "@safetyHub_noFly_active_title": {
     "placeholders": {
@@ -6962,5 +7018,53 @@
   "reef_attribution_wri": "Presencia de arrecife y nivel de amenaza. CC BY 3.0.",
   "reef_attribution_noaa": "Temperatura superficial del mar y estrés térmico. Dominio público.",
   "reef_attribution_gbif": "Registros de presencia de especies, filtrados a CC0 y CC BY 4.0.",
-  "reef_attribution_protectedSeas": "Límites de áreas marinas protegidas. CC BY 4.0."
+  "reef_attribution_protectedSeas": "Límites de áreas marinas protegidas. CC BY 4.0.",
+  "settings_section_security_title": "Seguridad de la app",
+  "settings_section_security_subtitle": "Bloqueo de la app y cifrado de la base de datos",
+  "settings_security_appLock": "Bloqueo de la app",
+  "settings_security_appLock_subtitle": "Requiere tu contraseña o biometría para abrir la app",
+  "settings_security_biometrics": "Desbloquear con biometría",
+  "settings_security_autoLock": "Bloqueo automático",
+  "settings_security_autoLock_immediately": "Inmediatamente",
+  "settings_security_autoLock_minutes": "{minutes, plural, =1{Después de 1 minuto} other{Después de {minutes} minutos}}",
+  "@settings_security_autoLock_minutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "settings_security_autoLock_never": "Nunca",
+  "settings_security_encryption": "Cifrar base de datos",
+  "settings_security_encryption_subtitle": "Protege tu archivo de registro de buceo con cifrado en reposo",
+  "settings_security_encryption_progress_backup": "Creando copia de seguridad...",
+  "settings_security_encryption_progress_encrypt": "Cifrando base de datos...",
+  "settings_security_encryption_progress_decrypt": "Descifrando base de datos...",
+  "settings_security_encryption_progress_reopen": "Reabriendo base de datos...",
+  "settings_security_changePassword": "Cambiar contraseña",
+  "settings_security_regenerateRecovery": "Nuevo código de recuperación",
+  "settings_security_setPassword": "Establecer contraseña de la app",
+  "settings_security_password": "Contraseña",
+  "settings_security_confirmPassword": "Confirmar contraseña",
+  "settings_security_currentPassword": "Contraseña actual",
+  "settings_security_newPassword": "Nueva contraseña",
+  "settings_security_passwordTooShort": "La contraseña debe tener al menos 4 caracteres.",
+  "settings_security_passwordMismatch": "Las contraseñas no coinciden.",
+  "settings_security_wrongPassword": "Contraseña incorrecta.",
+  "settings_security_recoveryCode_title": "Tu código de recuperación",
+  "settings_security_recoveryCode_explain": "Anótalo y guárdalo en un lugar seguro. Es la única forma de desbloquear la app si olvidas tu contraseña, y reemplaza cualquier código de recuperación anterior.",
+  "settings_security_recoveryCode_savedConfirm": "He guardado mi código de recuperación",
+  "settings_security_disableBlockedByEncryption_title": "El cifrado está activado",
+  "settings_security_disableBlockedByEncryption_body": "Desactiva el cifrado de la base de datos antes de desactivar el bloqueo de la app. La base de datos cifrada necesita una credencial.",
+  "settings_security_enableEncryption_title": "¿Cifrar la base de datos?",
+  "settings_security_enableEncryption_body": "Primero se crea una copia de seguridad y después el archivo de la base de datos se vuelve a cifrar en el mismo lugar. Puede tardar un poco con registros grandes.",
+  "settings_security_disableEncryption_title": "¿Desactivar el cifrado?",
+  "settings_security_disableEncryption_body": "El archivo de la base de datos volverá a guardarse sin cifrar en el disco.",
+  "settings_security_turnOffAppLock_title": "¿Desactivar el bloqueo de la app?",
+  "settings_security_turnOffAppLock_body": "La app se abrirá sin pedir tu contraseña.",
+  "settings_security_unlock_title": "Introduce tu contraseña",
+  "settings_security_cancel": "Cancelar",
+  "settings_security_continue": "Continuar",
+  "settings_security_done": "Hecho",
+  "settings_security_turnOff": "Desactivar"
 }

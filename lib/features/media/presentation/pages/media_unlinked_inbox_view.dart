@@ -138,10 +138,14 @@ class MediaUnlinkedInboxView extends ConsumerWidget {
                     suggestion.match.kind == TimestampMatchKind.confident)
                   ActionChip(
                     avatar: const Icon(Icons.link, size: 18),
+                    // Unnumbered dives have no "#N" to show; fall back to the
+                    // generic label rather than rendering "Link to #0".
                     label: Text(
-                      context.l10n.media_inbox_linkChip(
-                        suggestion.diveNumber ?? 0,
-                      ),
+                      suggestion.diveNumber == null
+                          ? context.l10n.media_inbox_linkToDive
+                          : context.l10n.media_inbox_linkChip(
+                              suggestion.diveNumber!,
+                            ),
                     ),
                     onPressed: () =>
                         _linkToDive(ref, item.id, suggestion.match.diveId!),
@@ -159,16 +163,16 @@ class MediaUnlinkedInboxView extends ConsumerWidget {
                     ),
                   ),
                 PopupMenuButton<String>(
-                  onSelected: (action) {
+                  onSelected: (action) async {
                     switch (action) {
                       case 'linkDive':
-                        _pickAndLinkDive(context, ref, item.id);
+                        await _pickAndLinkDive(context, ref, item.id);
                       case 'linkSite':
-                        _pickAndLinkSite(context, ref, item.id);
+                        await _pickAndLinkSite(context, ref, item.id);
                       case 'keep':
-                        ref.read(mediaRepositoryProvider).markRetainedInLibrary(
-                          [item.id],
-                        );
+                        await ref
+                            .read(mediaRepositoryProvider)
+                            .markRetainedInLibrary([item.id]);
                     }
                   },
                   itemBuilder: (context) => [

@@ -1,5 +1,15 @@
 {
+  "settings_units_defaultCurrency": "Alapértelmezett pénznem",
+  "settings_units_dialog_defaultCurrency": "Alapértelmezett pénznem",
   "diveSites_list_menu_select": "Merülőhelyek kiválasztása",
+  "diveLog_edit_flightWindowWarning": "Ez a merülés a járatod előtti utolsó biztonságos felszínre érési idő után ér véget ({time})",
+  "@diveLog_edit_flightWindowWarning": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
   "diveLog_edit_geofenceSuggestion_near": "{location} közelében",
   "diveLog_edit_geofenceSuggestion_title": "Felszerelési javaslat",
   "diveLog_edit_geofenceSuggestion_body": "Alkalmazza a(z) \"{setName}\" készletet?",
@@ -3337,6 +3347,7 @@
   "equipment_serviceDialog_clearNextServiceDateTooltip": "Kovetkezo szerviz datum torlese",
   "equipment_serviceDialog_costHint": "0.00",
   "equipment_serviceDialog_costLabel": "Koltseg",
+  "equipment_serviceDialog_currencyLabel": "Penznem",
   "equipment_serviceDialog_costValidation": "Adjon meg ervenyes osszeget",
   "equipment_serviceDialog_editTitle": "Szervizrekord szerkesztese",
   "equipment_serviceDialog_nextServiceDueLabel": "Kovetkezo szerviz esedekesseg",
@@ -3687,6 +3698,7 @@
   "media_diveMediaSection_thumbnailLabel": "Foto megtekintese. Hosszu nyomas a levalasztashoz",
   "media_diveMediaSection_title": "Fotok es videok",
   "media_diveMediaSection_deleteButton": "Törlés",
+  "media_diveMediaSection_deleteError": "Nem sikerult a torles: {error}",
   "media_diveMediaSection_deleteSelectedContent": "Ez eltávolítja őket az alkalmazásból és minden médiatárból. Nem vonható vissza.",
   "media_diveMediaSection_deleteSelectedSuccess": "{count} elem törölve",
   "media_diveMediaSection_deleteSelectedTitle": "{count} elem törlése?",
@@ -4047,6 +4059,7 @@
   "settings_about_header": "Rolunk",
   "settings_about_openSourceLicenses": "Nyilt forrasu licencek",
   "settings_about_reportIssue": "Hiba bejelentese",
+  "settings_about_reportIssue_copy": "Link másolása",
   "settings_about_reportIssue_snackbar": "Latogasson el: github.com/submersion-app/submersion/issues",
   "settings_about_version": "Verzio {version}",
   "settings_appBar_title": "Beallitasok",
@@ -5351,6 +5364,9 @@
   "trips_edit_label_notes": "Jegyzetek",
   "trips_edit_label_operatorName": "Operator / Charter",
   "trips_edit_label_resortName": "Udulohely neve",
+  "trips_edit_label_returnFlight": "Visszaúti járat",
+  "trips_edit_returnFlightClear": "Visszaúti járat törlése",
+  "trips_edit_returnFlightNotSet": "Nincs megadva",
   "trips_edit_label_startDate": "Kezdes datuma",
   "trips_edit_label_tripName": "Ut neve *",
   "trips_edit_label_tripType": "Trip Type",
@@ -5791,6 +5807,7 @@
   "buoyancy_whatIfDelta": "{delta} a ténylegeshez",
   "diveDetailSection_weights_name": "Súlyok",
   "diveLog_edit_section_environment": "Környezet",
+  "diveLog_edit_subsection_autofill": "Automatikus kitöltés",
   "diveLog_edit_subsection_weather": "Időjárás",
   "diveLog_edit_subsection_diveConditions": "Merülési körülmények",
   "diveLog_edit_label_windSpeed": "Szélsebesség",
@@ -5852,12 +5869,25 @@
   "dashboard_gauges_insuranceExpired": "A biztosítás lejárt",
   "dashboard_gauges_noInsurance": "Nincs rögzített biztosítás",
   "dashboard_gauges_noFlyClear": "Repülési tilalom 0:00",
+  "dashboard_gauges_flightWindow": "Merülési ablak {hours}:{minutes}",
+  "@dashboard_gauges_flightWindow": {
+    "placeholders": {
+      "hours": {
+        "type": "String"
+      },
+      "minutes": {
+        "type": "String"
+      }
+    }
+  },
+  "dashboard_gauges_flightWindowClosed": "A repülés előtt már nincs merülés",
   "dashboard_gauges_noFlyRemaining": "Repülési tilalom {hours}:{minutes}",
   "dashboard_gauges_lastDiveDays": "Utolsó merülés {days} napja",
   "dashboard_gauges_lastDiveToday": "Ma merültél",
   "dashboard_gauges_noDivesYet": "Még nincs merülés",
   "settings_homeChips_pageTitle": "Kezdőlap állapotjelzői",
   "settings_homeChips_description": "Válaszd ki, mely állapotjelzők jelenjenek meg a Kezdőlap tetején.",
+  "settings_homeChips_flightWindow": "Merülési ablak repülés előtt",
   "settings_homeChips_gear": "Felszerelés szervize",
   "settings_homeChips_insurance": "Biztosítás",
   "settings_homeChips_noFly": "Repülési tilalom időzítő",
@@ -6642,6 +6672,32 @@
   "safetySettings_noFlyPreset_standard": "Normál (12/18/24 ó)",
   "safetySettings_noFlyPreset_strict": "Szigorú (18/24/48 ó)",
   "safetySettings_noFlyPreset_subtitle": "Irányadó időközök egyetlen nullidős merülés, ismétlő merülések és dekós merülések után",
+  "flightWindow_closed": "A repülés előtt már ne merülj",
+  "flightWindow_conflict": "A repülési tilalmad túlnyúlik a járat indulásán",
+  "flightWindow_departs": "A járat indul: {time}",
+  "@flightWindow_departs": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "flightWindow_openTitle": "Hátralévő merülési idő: {remaining}",
+  "@flightWindow_openTitle": {
+    "placeholders": {
+      "remaining": {
+        "type": "String"
+      }
+    }
+  },
+  "flightWindow_surfaceBy": "Felszínre érés eddig: {time}",
+  "@flightWindow_surfaceBy": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
   "safetyHub_noFly_active_title": "Repülési tilalom: {remaining} van hátra",
   "@safetyHub_noFly_active_title": {
     "placeholders": {
@@ -6962,5 +7018,53 @@
   "reef_attribution_wri": "Zátony jelenléte és veszélyeztetettsége. CC BY 3.0.",
   "reef_attribution_noaa": "Tengerfelszíni hőmérséklet és hőstressz. Közkincs.",
   "reef_attribution_gbif": "Fajelőfordulási adatok, CC0 és CC BY 4.0 szűrve.",
-  "reef_attribution_protectedSeas": "Védett tengeri területek határai. CC BY 4.0."
+  "reef_attribution_protectedSeas": "Védett tengeri területek határai. CC BY 4.0.",
+  "settings_section_security_title": "Alkalmazásbiztonság",
+  "settings_section_security_subtitle": "Alkalmazászár és adatbázis-titkosítás",
+  "settings_security_appLock": "Alkalmazászár",
+  "settings_security_appLock_subtitle": "Jelszó vagy biometria szükséges az alkalmazás megnyitásához",
+  "settings_security_biometrics": "Feloldás biometriával",
+  "settings_security_autoLock": "Automatikus zárolás",
+  "settings_security_autoLock_immediately": "Azonnal",
+  "settings_security_autoLock_minutes": "{minutes, plural, =1{1 perc után} other{{minutes} perc után}}",
+  "@settings_security_autoLock_minutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "settings_security_autoLock_never": "Soha",
+  "settings_security_encryption": "Adatbázis titkosítása",
+  "settings_security_encryption_subtitle": "Védje merülési naplófájlját nyugalmi titkosítással",
+  "settings_security_encryption_progress_backup": "Biztonsági mentés készítése...",
+  "settings_security_encryption_progress_encrypt": "Adatbázis titkosítása...",
+  "settings_security_encryption_progress_decrypt": "Adatbázis visszafejtése...",
+  "settings_security_encryption_progress_reopen": "Adatbázis újranyitása...",
+  "settings_security_changePassword": "Jelszó módosítása",
+  "settings_security_regenerateRecovery": "Új helyreállítási kód",
+  "settings_security_setPassword": "Alkalmazásjelszó beállítása",
+  "settings_security_password": "Jelszó",
+  "settings_security_confirmPassword": "Jelszó megerősítése",
+  "settings_security_currentPassword": "Jelenlegi jelszó",
+  "settings_security_newPassword": "Új jelszó",
+  "settings_security_passwordTooShort": "A jelszónak legalább 4 karakterből kell állnia.",
+  "settings_security_passwordMismatch": "A jelszavak nem egyeznek.",
+  "settings_security_wrongPassword": "Hibás jelszó.",
+  "settings_security_recoveryCode_title": "Az Ön helyreállítási kódja",
+  "settings_security_recoveryCode_explain": "Írja fel és őrizze biztonságos helyen. Ez az egyetlen módja az alkalmazás feloldásának, ha elfelejti a jelszavát, és minden korábbi helyreállítási kódot érvénytelenít.",
+  "settings_security_recoveryCode_savedConfirm": "Elmentettem a helyreállítási kódomat",
+  "settings_security_disableBlockedByEncryption_title": "A titkosítás be van kapcsolva",
+  "settings_security_disableBlockedByEncryption_body": "Először kapcsolja ki az adatbázis-titkosítást, mielőtt kikapcsolná az alkalmazászárat. A titkosított adatbázishoz hitelesítő adat szükséges.",
+  "settings_security_enableEncryption_title": "Titkosítja az adatbázist?",
+  "settings_security_enableEncryption_body": "Először biztonsági mentés készül, majd az adatbázisfájl helyben újratitkosítódik. Nagy naplóknál ez eltarthat egy ideig.",
+  "settings_security_disableEncryption_title": "Kikapcsolja a titkosítást?",
+  "settings_security_disableEncryption_body": "Az adatbázisfájl ismét titkosítás nélkül tárolódik a lemezen.",
+  "settings_security_turnOffAppLock_title": "Kikapcsolja az alkalmazászárat?",
+  "settings_security_turnOffAppLock_body": "Az alkalmazás jelszókérés nélkül nyílik meg.",
+  "settings_security_unlock_title": "Adja meg a jelszavát",
+  "settings_security_cancel": "Mégse",
+  "settings_security_continue": "Folytatás",
+  "settings_security_done": "Kész",
+  "settings_security_turnOff": "Kikapcsolás"
 }

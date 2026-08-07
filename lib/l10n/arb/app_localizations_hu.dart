@@ -9,6 +9,11 @@ class AppLocalizationsHu extends AppLocalizations {
   AppLocalizationsHu([String locale = 'hu']) : super(locale);
 
   @override
+  String diveLog_edit_flightWindowWarning(String time) {
+    return 'Ez a merülés a járatod előtti utolsó biztonságos felszínre érési idő után ér véget ($time)';
+  }
+
+  @override
   String diveLog_edit_geofenceSuggestion_near(String location) {
     return '$location közelében';
   }
@@ -3098,6 +3103,15 @@ class AppLocalizationsHu extends AppLocalizations {
   String get dashboard_gauges_noFlyClear => 'Repülési tilalom 0:00';
 
   @override
+  String dashboard_gauges_flightWindow(String hours, String minutes) {
+    return 'Merülési ablak $hours:$minutes';
+  }
+
+  @override
+  String get dashboard_gauges_flightWindowClosed =>
+      'A repülés előtt már nincs merülés';
+
+  @override
   String dashboard_gauges_noFlyRemaining(String hours, String minutes) {
     return 'Repülési tilalom $hours:$minutes';
   }
@@ -3119,6 +3133,9 @@ class AppLocalizationsHu extends AppLocalizations {
   @override
   String get settings_homeChips_description =>
       'Válaszd ki, mely állapotjelzők jelenjenek meg a Kezdőlap tetején.';
+
+  @override
+  String get settings_homeChips_flightWindow => 'Merülési ablak repülés előtt';
 
   @override
   String get settings_homeChips_gear => 'Felszerelés szervize';
@@ -10793,6 +10810,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String get equipment_serviceDialog_costLabel => 'Koltseg';
 
   @override
+  String get equipment_serviceDialog_currencyLabel => 'Penznem';
+
+  @override
   String get equipment_serviceDialog_costValidation =>
       'Adjon meg ervenyes osszeget';
 
@@ -11717,6 +11737,11 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get media_diveMediaSection_deleteButton => 'Törlés';
+
+  @override
+  String media_diveMediaSection_deleteError(Object error) {
+    return 'Nem sikerult a torles: $error';
+  }
 
   @override
   String get media_diveMediaSection_deleteSelectedContent =>
@@ -13055,6 +13080,9 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get settings_about_reportIssue => 'Hiba bejelentese';
+
+  @override
+  String get settings_about_reportIssue_copy => 'Link másolása';
 
   @override
   String get settings_about_reportIssue_snackbar =>
@@ -15463,6 +15491,12 @@ class AppLocalizationsHu extends AppLocalizations {
   String get settings_units_sacRate => 'SAC ertek';
 
   @override
+  String get settings_units_defaultCurrency => 'Alapértelmezett pénznem';
+
+  @override
+  String get settings_units_dialog_defaultCurrency => 'Alapértelmezett pénznem';
+
+  @override
   String get settings_units_sac_pressurePerMinute => 'Nyomas percenként';
 
   @override
@@ -17840,6 +17874,15 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get trips_edit_label_resortName => 'Udulohely neve';
+
+  @override
+  String get trips_edit_label_returnFlight => 'Visszaúti járat';
+
+  @override
+  String get trips_edit_returnFlightClear => 'Visszaúti járat törlése';
+
+  @override
+  String get trips_edit_returnFlightNotSet => 'Nincs megadva';
 
   @override
   String get trips_edit_label_startDate => 'Kezdes datuma';
@@ -20706,6 +20749,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String get diveLog_edit_section_environment => 'Környezet';
 
   @override
+  String get diveLog_edit_subsection_autofill => 'Automatikus kitöltés';
+
+  @override
   String get diveLog_edit_subsection_weather => 'Időjárás';
 
   @override
@@ -22385,6 +22431,28 @@ class AppLocalizationsHu extends AppLocalizations {
       'Irányadó időközök egyetlen nullidős merülés, ismétlő merülések és dekós merülések után';
 
   @override
+  String get flightWindow_closed => 'A repülés előtt már ne merülj';
+
+  @override
+  String get flightWindow_conflict =>
+      'A repülési tilalmad túlnyúlik a járat indulásán';
+
+  @override
+  String flightWindow_departs(String time) {
+    return 'A járat indul: $time';
+  }
+
+  @override
+  String flightWindow_openTitle(String remaining) {
+    return 'Hátralévő merülési idő: $remaining';
+  }
+
+  @override
+  String flightWindow_surfaceBy(String time) {
+    return 'Felszínre érés eddig: $time';
+  }
+
+  @override
   String safetyHub_noFly_active_title(String remaining) {
     return 'Repülési tilalom: $remaining van hátra';
   }
@@ -22685,6 +22753,156 @@ class AppLocalizationsHu extends AppLocalizations {
   @override
   String get settings_section_safety_subtitle =>
       'Áttekintési szabályok és repülés merülés után';
+
+  @override
+  String get settings_section_security_title => 'Alkalmazásbiztonság';
+
+  @override
+  String get settings_section_security_subtitle =>
+      'Alkalmazászár és adatbázis-titkosítás';
+
+  @override
+  String get settings_security_appLock => 'Alkalmazászár';
+
+  @override
+  String get settings_security_appLock_subtitle =>
+      'Jelszó vagy biometria szükséges az alkalmazás megnyitásához';
+
+  @override
+  String get settings_security_biometrics => 'Feloldás biometriával';
+
+  @override
+  String get settings_security_autoLock => 'Automatikus zárolás';
+
+  @override
+  String get settings_security_autoLock_immediately => 'Azonnal';
+
+  @override
+  String settings_security_autoLock_minutes(int minutes) {
+    String _temp0 = intl.Intl.pluralLogic(
+      minutes,
+      locale: localeName,
+      other: '$minutes perc után',
+      one: '1 perc után',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get settings_security_autoLock_never => 'Soha';
+
+  @override
+  String get settings_security_encryption => 'Adatbázis titkosítása';
+
+  @override
+  String get settings_security_encryption_subtitle =>
+      'Védje merülési naplófájlját nyugalmi titkosítással';
+
+  @override
+  String get settings_security_encryption_progress_backup =>
+      'Biztonsági mentés készítése...';
+
+  @override
+  String get settings_security_encryption_progress_encrypt =>
+      'Adatbázis titkosítása...';
+
+  @override
+  String get settings_security_encryption_progress_decrypt =>
+      'Adatbázis visszafejtése...';
+
+  @override
+  String get settings_security_encryption_progress_reopen =>
+      'Adatbázis újranyitása...';
+
+  @override
+  String get settings_security_changePassword => 'Jelszó módosítása';
+
+  @override
+  String get settings_security_regenerateRecovery => 'Új helyreállítási kód';
+
+  @override
+  String get settings_security_setPassword => 'Alkalmazásjelszó beállítása';
+
+  @override
+  String get settings_security_password => 'Jelszó';
+
+  @override
+  String get settings_security_confirmPassword => 'Jelszó megerősítése';
+
+  @override
+  String get settings_security_currentPassword => 'Jelenlegi jelszó';
+
+  @override
+  String get settings_security_newPassword => 'Új jelszó';
+
+  @override
+  String get settings_security_passwordTooShort =>
+      'A jelszónak legalább 4 karakterből kell állnia.';
+
+  @override
+  String get settings_security_passwordMismatch => 'A jelszavak nem egyeznek.';
+
+  @override
+  String get settings_security_wrongPassword => 'Hibás jelszó.';
+
+  @override
+  String get settings_security_recoveryCode_title =>
+      'Az Ön helyreállítási kódja';
+
+  @override
+  String get settings_security_recoveryCode_explain =>
+      'Írja fel és őrizze biztonságos helyen. Ez az egyetlen módja az alkalmazás feloldásának, ha elfelejti a jelszavát, és minden korábbi helyreállítási kódot érvénytelenít.';
+
+  @override
+  String get settings_security_recoveryCode_savedConfirm =>
+      'Elmentettem a helyreállítási kódomat';
+
+  @override
+  String get settings_security_disableBlockedByEncryption_title =>
+      'A titkosítás be van kapcsolva';
+
+  @override
+  String get settings_security_disableBlockedByEncryption_body =>
+      'Először kapcsolja ki az adatbázis-titkosítást, mielőtt kikapcsolná az alkalmazászárat. A titkosított adatbázishoz hitelesítő adat szükséges.';
+
+  @override
+  String get settings_security_enableEncryption_title =>
+      'Titkosítja az adatbázist?';
+
+  @override
+  String get settings_security_enableEncryption_body =>
+      'Először biztonsági mentés készül, majd az adatbázisfájl helyben újratitkosítódik. Nagy naplóknál ez eltarthat egy ideig.';
+
+  @override
+  String get settings_security_disableEncryption_title =>
+      'Kikapcsolja a titkosítást?';
+
+  @override
+  String get settings_security_disableEncryption_body =>
+      'Az adatbázisfájl ismét titkosítás nélkül tárolódik a lemezen.';
+
+  @override
+  String get settings_security_turnOffAppLock_title =>
+      'Kikapcsolja az alkalmazászárat?';
+
+  @override
+  String get settings_security_turnOffAppLock_body =>
+      'Az alkalmazás jelszókérés nélkül nyílik meg.';
+
+  @override
+  String get settings_security_unlock_title => 'Adja meg a jelszavát';
+
+  @override
+  String get settings_security_cancel => 'Mégse';
+
+  @override
+  String get settings_security_continue => 'Folytatás';
+
+  @override
+  String get settings_security_done => 'Kész';
+
+  @override
+  String get settings_security_turnOff => 'Kikapcsolás';
 
   @override
   String get dataQuality_inbox_title => 'Adatminőség';
