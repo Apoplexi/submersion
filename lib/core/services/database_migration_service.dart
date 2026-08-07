@@ -8,6 +8,7 @@ import 'package:sqlite3/sqlite3.dart' as sqlite3;
 import 'package:submersion/core/domain/entities/storage_config.dart';
 import 'package:submersion/core/services/database_location_service.dart';
 import 'package:submersion/core/services/database_service.dart';
+import 'package:submersion/core/services/security/database_security_sidecar.dart';
 
 /// Result of a database migration operation
 class MigrationResult {
@@ -546,8 +547,12 @@ class DatabaseMigrationService {
       debugInfo?.writeln('DEBUG: File exists, size: $fileSize bytes');
 
       // Use sqlite3 directly to avoid Drift's migration system triggering
-      // when opening a database with a different schema version
-      final db = sqlite3.sqlite3.open(dbPath);
+      // when opening a database with a different schema version. openRaw
+      // applies the cipher key when the live database is encrypted.
+      final db = DatabaseService.openRaw(
+        dbPath,
+        keyHex: DatabaseService.instance.databaseKeyHex,
+      );
       try {
         // Run integrity check (quick_check is faster and avoids long stalls)
         final result = db.select('PRAGMA quick_check');
@@ -626,6 +631,14 @@ class DatabaseMigrationService {
     if (await walSource.exists()) {
       await walSource.copy('$destPath-wal');
     }
+
+    // The security keyslot sidecar must travel with the database: without it
+    // a keychain wipe at the new location would leave the encrypted file
+    // permanently unopenable (the sidecar is the durable wrapped key copy).
+    final sidecarSource = File(DatabaseSecuritySidecar.pathFor(sourcePath));
+    if (await sidecarSource.exists()) {
+      await sidecarSource.copy(DatabaseSecuritySidecar.pathFor(destPath));
+    }
   }
 
   /// Verify that the database is functional by running a simple query
@@ -689,8 +702,12 @@ class DatabaseMigrationService {
 
   Future<_DatabaseCounts> _fetchDatabaseCounts(String dbPath) async {
     // Use sqlite3 directly to avoid Drift's migration system triggering
-    // when opening a database with a different schema version
-    final db = sqlite3.sqlite3.open(dbPath);
+    // when opening a database with a different schema version. openRaw
+    // applies the cipher key when the live database is encrypted.
+    final db = DatabaseService.openRaw(
+      dbPath,
+      keyHex: DatabaseService.instance.databaseKeyHex,
+    );
     try {
       // Query each table individually to handle missing tables gracefully
       // (older database versions may not have all tables)

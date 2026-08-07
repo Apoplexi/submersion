@@ -107,7 +107,10 @@ class _NoopBackupAdapter implements BackupDatabaseAdapter {
   Future<void> backup(String destinationPath) async {}
 
   @override
-  Future<void> restore(String backupPath) async {}
+  Future<void> restore(
+    String backupPath, {
+    void Function(int, int)? onMigrationProgress,
+  }) async {}
 
   @override
   Future<String> get databasePath async => '/noop';
@@ -1014,6 +1017,54 @@ void main() {
       );
 
       expect(find.textContaining('First sync is waiting'), findsOneWidget);
+    });
+
+    testWidgets('shows the update banner when peers run a newer version', (
+      tester,
+    ) async {
+      await pumpPage(
+        tester,
+        selectedProvider: CloudProviderType.icloud,
+        syncState: const SyncState(newerSchemaPeerCount: 2),
+      );
+
+      expect(
+        find.textContaining('newer version of Submersion'),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('update banner text is paired with its container colour', (
+      tester,
+    ) async {
+      await pumpPage(
+        tester,
+        selectedProvider: CloudProviderType.icloud,
+        syncState: const SyncState(newerSchemaPeerCount: 2),
+      );
+
+      // Material does not re-derive text colour from the Card background, so
+      // without an explicit colour this text falls back to onSurface while the
+      // icon beside it uses onSecondaryContainer.
+      final banner = tester.widget<Text>(
+        find.textContaining('newer version of Submersion'),
+      );
+      final scheme = Theme.of(
+        tester.element(find.textContaining('newer version of Submersion')),
+      ).colorScheme;
+      expect(banner.style?.color, scheme.onSecondaryContainer);
+    });
+
+    testWidgets('no update banner when no newer-schema peers were held', (
+      tester,
+    ) async {
+      await pumpPage(
+        tester,
+        selectedProvider: CloudProviderType.icloud,
+        syncState: const SyncState(),
+      );
+
+      expect(find.textContaining('newer version of Submersion'), findsNothing);
     });
 
     testWidgets('shows the replace banner while adoption is pending', (

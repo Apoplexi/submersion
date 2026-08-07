@@ -34,6 +34,7 @@ class HomeAppearancePage extends ConsumerWidget {
       HomeChipType.backup => l10n.settings_homeChips_backup,
       HomeChipType.sync => l10n.settings_homeChips_sync,
       HomeChipType.dataQuality => l10n.settings_homeChips_dataQuality,
+      HomeChipType.flightWindow => l10n.settings_homeChips_flightWindow,
     };
 
     final content = ListView(

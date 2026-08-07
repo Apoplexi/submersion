@@ -11,9 +11,8 @@ import 'package:submersion/core/services/log_file_service.dart';
 import 'package:submersion/core/services/logger_service.dart';
 
 import 'package:submersion/app.dart';
-import 'package:submersion/core/domain/entities/storage_config.dart';
+import 'package:submersion/core/database/sqlcipher_setup.dart';
 import 'package:submersion/core/services/database_location_service.dart';
-import 'package:submersion/core/services/security_scoped_bookmark_service.dart';
 import 'package:submersion/core/presentation/pages/startup_page.dart';
 import 'package:submersion/features/data_quality/presentation/providers/quality_detector_toggles.dart';
 import 'package:submersion/features/media/data/network_cache_config.dart';
@@ -35,6 +34,10 @@ void main() {
 Future<void> _bootstrap() async {
   // coverage:ignore-end
   WidgetsFlutterBinding.ensureInitialized();
+
+  // SQLCipher loader override for this (main) isolate — must run before
+  // anything can touch the database, including the startup schema probe.
+  setupSqlcipher();
 
   // Route uncaught Flutter framework and platform errors into the debug log so
   // future crashes are diagnosable from the user-shared log (issue #318).
@@ -86,53 +89,11 @@ Future<void> _bootstrap() async {
   debugPrint('  mode: ${storageConfig.mode}');
   debugPrint('  customFolderPath: ${storageConfig.customFolderPath}');
 
-  // If using custom folder, we need to restore access via security-scoped bookmark
-  // macOS sandbox revokes folder access after app restart - bookmarks restore it
-  if (storageConfig.mode == StorageLocationMode.customFolder &&
-      storageConfig.customFolderPath != null) {
-    // Try to resolve the security-scoped bookmark to restore folder access
-    if (SecurityScopedBookmarkService.isSupported &&
-        locationService.hasStoredBookmark()) {
-      debugPrint('  Resolving security-scoped bookmark...');
-      final resolvedPath = await locationService.resolveStoredBookmark();
-
-      if (resolvedPath != null) {
-        debugPrint('  Bookmark resolved successfully: $resolvedPath');
-      } else {
-        debugPrint('  Failed to resolve bookmark - access may be blocked');
-      }
-    }
-
-    // Verify the database is actually accessible after bookmark resolution
-    final dbPath = await locationService.getDatabasePath();
-    debugPrint('  database path: $dbPath');
-
-    bool canAccess = false;
-    try {
-      final file = File(dbPath);
-      if (await file.exists()) {
-        // Try to read the first few bytes to verify actual access
-        final raf = await file.open(mode: FileMode.read);
-        await raf.read(16); // Read SQLite header
-        await raf.close();
-        canAccess = true;
-        debugPrint('  database accessible: true');
-      } else {
-        debugPrint('  database file does not exist');
-      }
-    } catch (e) {
-      debugPrint('  database accessible: false (error: $e)');
-      canAccess = false;
-    }
-
-    if (!canAccess) {
-      // Can't access database at custom location, reset to default
-      debugPrint(
-        '  WARNING: Resetting to default because database is not accessible',
-      );
-      await locationService.resetToDefault();
-    }
-  }
+  // Restore/verify a custom database location. The check auto-resets ONLY
+  // on sandbox (bookmark) platforms; elsewhere the user's choice is kept
+  // even if the file is momentarily inaccessible (#218).
+  final locationCheck = await locationService.validateCustomLocationAtStartup();
+  debugPrint('  custom location check: $locationCheck');
 
   // Launch the app immediately -- database init happens inside StartupWrapper
   // so the user sees a splash screen while initialization runs

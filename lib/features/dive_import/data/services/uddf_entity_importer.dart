@@ -3,6 +3,7 @@ import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/core/database/database.dart'
     show DiveDataSourcesCompanion, DiveSitesCompanion, DivesCompanion;
 import 'package:submersion/core/services/export/export_service.dart';
+import 'package:submersion/features/dive_log/domain/services/dive_altitude_enricher.dart';
 import 'package:submersion/features/equipment/data/services/dive_equipment_defaulter.dart';
 import 'package:submersion/features/pre_dive/data/services/checklist_dive_linker.dart';
 import 'package:submersion/core/services/location_service.dart';
@@ -241,12 +242,20 @@ class UddfEntityImporter {
   /// If [cancelToken] is non-null, the dive-import loop polls
   /// [ImportCancellationToken.isCancelled] between each dive and returns the
   /// partial result already persisted when cancellation is observed.
+  ///
+  /// [preResolvedBuddyIds] and [preResolvedTagIds] map source refs
+  /// (uddfId/name) to EXISTING database ids for flagged duplicates the
+  /// reviewer chose not to import as new rows. Seeding the id mappings with
+  /// them makes dive linking resolve to the existing record instead of
+  /// silently dropping the association (#756).
   Future<UddfEntityImportResult> import({
     required UddfImportResult data,
     required UddfImportSelections selections,
     required ImportRepositories repositories,
     required String diverId,
     bool retainSourceDiveNumbers = false,
+    Map<String, String> preResolvedBuddyIds = const {},
+    Map<String, String> preResolvedTagIds = const {},
     ImportProgressCallback? onProgress,
     ImportCancellationToken? cancelToken,
   }) async {
@@ -255,9 +264,9 @@ class UddfEntityImporter {
     // ID mappings for cross-references
     final tripIdMapping = <String, String>{};
     final equipmentIdMapping = <String, String>{};
-    final buddyIdMapping = <String, String>{};
+    final buddyIdMapping = <String, String>{...preResolvedBuddyIds};
     final diveCenterIdMapping = <String, String>{};
-    final tagIdMapping = <String, String>{};
+    final tagIdMapping = <String, String>{...preResolvedTagIds};
     final siteIdMapping = <String, DiveSite>{};
     final courseIdMapping = <String, String>{};
 
@@ -1074,6 +1083,10 @@ class UddfEntityImporter {
         ? null
         : await repos.diveRepository.getNextDiveNumber(diverId: diverId);
 
+    // One instance for the run: its lookup cache collapses a batch of dives
+    // at the same location into a single elevation request.
+    final altitudeEnricher = DiveAltitudeEnricher();
+
     for (final i in sortedSelected) {
       if (cancelToken?.isCancelled ?? false) break;
 
@@ -1323,6 +1336,7 @@ class UddfEntityImporter {
       await repos.diveRepository.createDive(dive);
       await DiveEquipmentDefaulter().applyForImportedDive(dive);
       await ChecklistDiveLinker().applyForImportedDive(dive);
+      await altitudeEnricher.applyForImportedDive(dive);
       importedDiveIds.add(diveId);
       diveIdByIndex[i] = diveId;
 

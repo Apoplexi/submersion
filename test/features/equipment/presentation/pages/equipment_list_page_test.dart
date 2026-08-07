@@ -100,6 +100,7 @@ Future<List<Override>> _buildOverrides({
     settingsProvider.overrideWith((ref) => MockSettingsNotifier()),
     currentDiverIdProvider.overrideWith((ref) => MockCurrentDiverIdNotifier()),
     equipmentByStatusProvider.overrideWith((ref, status) => <EquipmentItem>[]),
+    activeEquipmentProvider.overrideWith((ref) async => <EquipmentItem>[]),
     equipmentListNotifierProvider.overrideWith((ref) => _MockEquipNotifier()),
     equipmentListViewModeProvider.overrideWith((ref) => viewMode),
     equipmentTableConfigProvider.overrideWith(
@@ -587,6 +588,116 @@ void main() {
       tester.takeException();
 
       expect(find.byType(EquipmentEditPage), findsOneWidget);
+    });
+  });
+
+  group('AddEquipmentSheet purchase date (#765)', () {
+    testWidgets('the purchase-date button opens the date picker', (
+      tester,
+    ) async {
+      tester.view.devicePixelRatio = 1.0;
+      tester.view.physicalSize = const Size(800, 1600);
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      final overrides = await getBaseOverrides();
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: overrides,
+          child: MaterialApp(
+            locale: const Locale('en'),
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            // The sheet normally gets its Material from showModalBottomSheet.
+            home: Scaffold(
+              body: Consumer(
+                builder: (context, ref, _) => AddEquipmentSheet(ref: ref),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final dateButton = find.widgetWithText(OutlinedButton, 'Date');
+      await tester.scrollUntilVisible(
+        dateButton,
+        200,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.tap(dateButton);
+      await tester.pumpAndSettle();
+
+      expect(find.byType(DatePickerDialog), findsOneWidget);
+
+      await tester.tap(find.text('Cancel'));
+      await tester.pumpAndSettle();
+      expect(find.byType(DatePickerDialog), findsNothing);
+    });
+  });
+
+  group('AddEquipmentSheet currency', () {
+    Future<DropdownMenu<String>> pumpSheet(
+      WidgetTester tester, {
+      required String defaultCurrency,
+    }) async {
+      tester.view.devicePixelRatio = 1.0;
+      tester.view.physicalSize = const Size(800, 1600);
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      final settings = MockSettingsNotifier();
+      final overrides = await getBaseOverrides(settingsNotifier: settings);
+      await settings.setDefaultCurrency(defaultCurrency);
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: overrides,
+          child: MaterialApp(
+            locale: const Locale('en'),
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: Scaffold(
+              body: Consumer(
+                builder: (context, ref, _) => AddEquipmentSheet(ref: ref),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final menu = find.byType(DropdownMenu<String>);
+      await tester.scrollUntilVisible(
+        menu,
+        200,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.pumpAndSettle();
+      return tester.widget<DropdownMenu<String>>(menu);
+    }
+
+    testWidgets('opens in the diver default currency rather than USD', (
+      tester,
+    ) async {
+      final menu = await pumpSheet(tester, defaultCurrency: 'EUR');
+
+      expect(menu.controller?.text, 'EUR');
+      // The price field's prefix follows the selected currency.
+      expect(find.textContaining('€'), findsWidgets);
+    });
+
+    testWidgets('a non-preset default currency is still offered', (
+      tester,
+    ) async {
+      final menu = await pumpSheet(tester, defaultCurrency: 'ISK');
+
+      expect(menu.controller?.text, 'ISK');
+      expect(menu.dropdownMenuEntries.map((e) => e.value).first, 'ISK');
     });
   });
 }

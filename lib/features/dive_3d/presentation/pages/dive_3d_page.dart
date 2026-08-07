@@ -34,8 +34,9 @@ enum SceneKind { dive, tissue, computers }
 /// Fullscreen interactive 3D scene for one dive. Pushed via a plain
 /// Navigator route from the dive detail page. Owns the scrub ValueNotifier
 /// and the playback AnimationController; the viewport and readout observe
-/// them without provider round-trips. Switches between the single-dive
-/// scene and the repetitive-chain tissue landscape.
+/// them without provider round-trips. The profile chart opens the dive
+/// scene (switchable to the computers comparison on multi-source dives);
+/// the tissue loading card opens the tissue landscape directly.
 class Dive3dPage extends ConsumerStatefulWidget {
   final String diveId;
   final SceneKind initialMode;
@@ -145,7 +146,7 @@ class _Dive3dPageState extends ConsumerState<Dive3dPage>
     return _sceneScaffold(
       scene: surface.scene,
       readout: TissueReadoutPanel(statuses: statuses, position: _position),
-      controls: _buildTissueControls(),
+      controls: const SizedBox.shrink(),
       onMarkerTap: null,
       cornerOverlay: TissueLegend(colorFn: colorFn),
       surfaceGrid: surface.grid,
@@ -259,9 +260,14 @@ class _Dive3dPageState extends ConsumerState<Dive3dPage>
     );
   }
 
+  /// Dive/computers scene toggle. The tissue scene is not offered here: it
+  /// has its own entry point on the tissue loading card of the dive detail
+  /// page. With tissue gone, the switcher only has a job on multi-source
+  /// dives, so it disappears entirely for single-source ones.
   Widget _sceneSwitcher() {
     final multiSource =
         ref.watch(isMultiDataSourceDiveProvider(widget.diveId)).value ?? false;
+    if (!multiSource) return const SizedBox.shrink();
     return SegmentedButton<SceneKind>(
       style: const ButtonStyle(visualDensity: VisualDensity.compact),
       segments: [
@@ -270,14 +276,9 @@ class _Dive3dPageState extends ConsumerState<Dive3dPage>
           label: Text(context.l10n.dive3d_scene_dive),
         ),
         ButtonSegment(
-          value: SceneKind.tissue,
-          label: Text(context.l10n.dive3d_scene_tissue),
+          value: SceneKind.computers,
+          label: Text(context.l10n.dive3d_scene_computers),
         ),
-        if (multiSource)
-          ButtonSegment(
-            value: SceneKind.computers,
-            label: Text(context.l10n.dive3d_scene_computers),
-          ),
       ],
       selected: {_sceneKind},
       onSelectionChanged: (s) => setState(() => _sceneKind = s.first),
@@ -326,17 +327,6 @@ class _Dive3dPageState extends ConsumerState<Dive3dPage>
           }),
         ),
       ],
-    );
-  }
-
-  Widget _buildTissueControls() {
-    // The color scale follows the diver's tissue heat-map scheme setting,
-    // so the 3D and 2D graphs always match. Only the scene switcher here.
-    return Wrap(
-      spacing: 6,
-      runSpacing: 6,
-      crossAxisAlignment: WrapCrossAlignment.center,
-      children: [_sceneSwitcher()],
     );
   }
 

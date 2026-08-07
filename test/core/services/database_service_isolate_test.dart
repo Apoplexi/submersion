@@ -381,6 +381,47 @@ void main() {
     },
   );
 
+  test('restore succeeds while a watch() subscription is paused', () async {
+    // Riverpod 3 auto-pauses the streams of providers nobody is listening to,
+    // and drift's graceful close() awaits streamQueries.close(), which hangs
+    // while ANY watch() subscription is paused. In a real session there is
+    // almost always at least one paused watch stream (any previously visited
+    // page), so a strict close that trusts the graceful close with a throwing
+    // timeout makes restore fail with TimeoutException until retried.
+    final defaultPath = p.join(tempDir.path, 'Submersion', 'submersion.db');
+    await DatabaseService.instance.initialize(
+      locationService: _FakeLocation(defaultPath),
+    );
+    await DatabaseService.instance.database
+        .customSelect('SELECT 1')
+        .getSingle();
+    final backupPath = p.join(tempDir.path, 'backup.db');
+    await DatabaseService.instance.backup(backupPath);
+
+    // Simulate Riverpod's auto-pause: subscribe to a watch() stream, then
+    // pause the subscription and leave it paused across the restore.
+    final subscription = DatabaseService.instance.database
+        .customSelect('SELECT 1 AS v')
+        .watch()
+        .listen((_) {});
+    subscription.pause();
+    addTearDown(() async {
+      try {
+        await subscription.cancel();
+      } catch (_) {
+        // The stream's database was closed by the restore; a cancel error
+        // here is irrelevant to the assertion.
+      }
+    });
+
+    await DatabaseService.instance.restore(backupPath);
+
+    final one = await DatabaseService.instance.database
+        .customSelect('SELECT 1 AS v')
+        .getSingle();
+    expect(one.read<int>('v'), 1);
+  });
+
   test('restore with a missing backup file leaves the live DB open', () async {
     // A restore pointed at a nonexistent file must be a true no-op: it must
     // NOT close the database (which would open an unavailable window for

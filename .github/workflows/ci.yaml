@@ -382,6 +382,18 @@ jobs:
           python3 -m coverage xml --include="$guards" \
             -o coverage/scripts.xml
 
+      - name: Run appcast beta feed test
+        run: ./scripts/generate_appcast_beta_test.sh
+
+      - name: Run release notes HTML test
+        run: ./scripts/generate_release_notes_html_test.sh
+
+      - name: Run beta release notes test
+        run: ./scripts/release/beta_release_notes_test.sh
+
+      - name: Run fastlane beta changelog test
+        run: ruby scripts/release/fastlane_beta_changelog_test.rb
+
       - name: Upload coverage
         uses: codecov/codecov-action@v7
         if: always()
@@ -657,6 +669,19 @@ jobs:
             --entitlements macos/Runner/ReleaseNoSandbox.entitlements \
             build/macos/Build/Products/Release/submersion.app
 
+      # Zip with ditto before upload: upload-artifact would otherwise root the
+      # archive inside the .app bundle (losing the submersion.app wrapper) and
+      # strip the symlinks, permission bits, and codesign seal the bundle
+      # needs to be runnable.
+      - name: Zip macOS app bundle
+        if: >
+          github.event_name == 'pull_request' ||
+          (github.ref == 'refs/heads/main' && github.event_name == 'push')
+        run: |
+          ditto -c -k --keepParent \
+            build/macos/Build/Products/Release/submersion.app \
+            build/macos/Build/Products/Release/submersion-macos.zip
+
       - name: Upload macOS artifact
         uses: actions/upload-artifact@v7
         if: >
@@ -664,7 +689,7 @@ jobs:
           (github.ref == 'refs/heads/main' && github.event_name == 'push')
         with:
           name: macos-build
-          path: build/macos/Build/Products/Release/submersion.app
+          path: build/macos/Build/Products/Release/submersion-macos.zip
           retention-days: 7
 
   build-android:
@@ -801,6 +826,10 @@ jobs:
           restore-keys: |
             pub-${{ runner.os }}-
 
+      # libssl-dev is required by sqlcipher_flutter_libs: the Linux build
+      # compiles SQLCipher from source and links it against OpenSSL. The
+      # hosted runner image happens to ship the headers today, so declaring
+      # it keeps a future image change from silently breaking the build.
       - name: Install Linux dependencies
         run: |
           sudo apt-get update
@@ -813,7 +842,8 @@ jobs:
             liblzma-dev \
             libstdc++-12-dev \
             libsecret-1-dev \
-            libwebkit2gtk-4.1-dev
+            libwebkit2gtk-4.1-dev \
+            libssl-dev
 
       - name: Disable Swift Package Manager (project uses CocoaPods)
         run: flutter config --no-enable-swift-package-manager

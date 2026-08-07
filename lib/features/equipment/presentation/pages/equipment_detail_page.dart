@@ -4,8 +4,10 @@ import 'package:submersion/core/providers/provider.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:submersion/core/constants/list_view_mode.dart';
+import 'package:submersion/core/utils/currency.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
+import 'package:submersion/shared/widgets/app_date_picker.dart';
 import 'package:submersion/shared/widgets/master_detail/detail_scroll_retainer.dart';
 import 'package:submersion/shared/widgets/master_detail/responsive_breakpoints.dart';
 
@@ -21,6 +23,7 @@ import 'package:submersion/features/equipment/domain/entities/service_record.dar
 import 'package:submersion/features/equipment/presentation/providers/equipment_providers.dart';
 import 'package:submersion/features/equipment/presentation/utils/equipment_attribute_l10n.dart';
 import 'package:submersion/features/equipment/presentation/utils/equipment_attribute_units.dart';
+import 'package:submersion/features/cylinder_configs/presentation/widgets/unit_configurations_card.dart';
 import 'package:submersion/features/equipment/presentation/widgets/service_clocks_card.dart';
 
 class EquipmentDetailPage extends ConsumerStatefulWidget {
@@ -160,6 +163,12 @@ class _EquipmentDetailContent extends ConsumerWidget {
               serviceKindId: status.kind.id,
             ),
           ),
+          // Only rebreathers own configurations; every other type would show
+          // a card that can never be anything but empty.
+          if (equipment.type == EquipmentType.rebreather) ...[
+            const SizedBox(height: 24),
+            UnitConfigurationsCard(equipmentId: equipmentId),
+          ],
           const SizedBox(height: 24),
           _ServiceHistorySection(equipmentId: equipmentId),
           if (equipment.notes.isNotEmpty) ...[
@@ -604,7 +613,10 @@ class _EquipmentDetailContent extends ConsumerWidget {
               _buildDetailRow(
                 context,
                 context.l10n.equipment_detail_purchasePriceLabel,
-                '${equipment.purchasePrice!.toStringAsFixed(2)} ${equipment.purchaseCurrency}',
+                formatMoney(
+                  equipment.purchasePrice!,
+                  equipment.purchaseCurrency,
+                ),
               ),
             if (equipment.ownershipDuration != null)
               _buildDetailRow(
@@ -914,36 +926,55 @@ class _ServiceHistorySection extends ConsumerWidget {
 
                 return Column(
                   children: [
-                    // Total cost summary
+                    // Total cost summary, one row per currency: a history
+                    // priced in more than one currency has no single total.
                     totalCostAsync.when(
-                      data: (totalCost) {
-                        if (totalCost > 0) {
-                          return Container(
-                            padding: const EdgeInsets.all(12),
-                            margin: const EdgeInsets.only(bottom: 12),
-                            decoration: BoxDecoration(
-                              color: Theme.of(
-                                context,
-                              ).colorScheme.surfaceContainerHighest,
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  context.l10n.equipment_service_totalCostLabel,
-                                  style: Theme.of(context).textTheme.bodyMedium,
+                      data: (rawTotals) {
+                        final totals = sumByCurrency<MapEntry<String, double>>(
+                          rawTotals.entries,
+                          amountOf: (e) => e.value,
+                          currencyOf: (e) => e.key,
+                          fallbackCode: ref.watch(defaultCurrencyProvider),
+                        ).where((e) => e.value > 0).toList();
+                        if (totals.isEmpty) return const SizedBox.shrink();
+                        return Container(
+                          padding: const EdgeInsets.all(12),
+                          margin: const EdgeInsets.only(bottom: 12),
+                          decoration: BoxDecoration(
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.surfaceContainerHighest,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Column(
+                            children: [
+                              for (final entry in totals)
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      context
+                                          .l10n
+                                          .equipment_service_totalCostLabel,
+                                      style: Theme.of(
+                                        context,
+                                      ).textTheme.bodyMedium,
+                                    ),
+                                    Text(
+                                      formatMoney(entry.value, entry.key),
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .titleMedium
+                                          ?.copyWith(
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                    ),
+                                  ],
                                 ),
-                                Text(
-                                  '\$${totalCost.toStringAsFixed(2)}',
-                                  style: Theme.of(context).textTheme.titleMedium
-                                      ?.copyWith(fontWeight: FontWeight.bold),
-                                ),
-                              ],
-                            ),
-                          );
-                        }
-                        return const SizedBox.shrink();
+                            ],
+                          ),
+                        );
                       },
                       loading: () => const SizedBox.shrink(),
                       error: (_, _) => const SizedBox.shrink(),
@@ -1101,7 +1132,7 @@ class _ServiceRecordTile extends ConsumerWidget {
         children: [
           if (record.cost != null)
             Text(
-              '\$${record.cost!.toStringAsFixed(2)}',
+              formatMoney(record.cost!, record.currency),
               style: Theme.of(
                 context,
               ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
@@ -1188,10 +1219,16 @@ class _ServiceRecordDialogState extends ConsumerState<ServiceRecordDialog> {
   late DateTime _serviceDate;
   final _providerController = TextEditingController();
   final _costController = TextEditingController();
+  final _currencyController = TextEditingController();
   final _notesController = TextEditingController();
   DateTime? _nextServiceDue;
   String? _serviceKindId;
   bool _isSaving = false;
+
+  /// The code this dialog opened with: the record's stored currency when
+  /// editing, the diver's default for a new record. Currency is free text, so
+  /// this can be outside the presets; keeping it lets the dropdown offer it.
+  String _initialCurrencyCode = '';
 
   bool get isEditing => widget.existingRecord != null;
 
@@ -1204,6 +1241,7 @@ class _ServiceRecordDialogState extends ConsumerState<ServiceRecordDialog> {
       _serviceDate = record.serviceDate;
       _providerController.text = record.provider ?? '';
       _costController.text = record.cost?.toString() ?? '';
+      _initialCurrencyCode = record.currency;
       _notesController.text = record.notes;
       _nextServiceDue = record.nextServiceDue;
       _serviceKindId = record.serviceKindId;
@@ -1211,13 +1249,23 @@ class _ServiceRecordDialogState extends ConsumerState<ServiceRecordDialog> {
       _serviceType = ServiceType.annual;
       _serviceDate = DateTime.now();
       _serviceKindId = widget.serviceKindId;
+      _initialCurrencyCode = _fallbackCurrencyCode();
     }
+    _currencyController.text = _initialCurrencyCode;
+  }
+
+  /// The code to store when the currency field is left blank: the diver's
+  /// default, or USD if that is somehow unset (the column is NOT NULL).
+  String _fallbackCurrencyCode() {
+    final code = ref.read(defaultCurrencyProvider).trim().toUpperCase();
+    return code.isEmpty ? 'USD' : code;
   }
 
   @override
   void dispose() {
     _providerController.dispose();
     _costController.dispose();
+    _currencyController.dispose();
     _notesController.dispose();
     super.dispose();
   }
@@ -1339,28 +1387,77 @@ class _ServiceRecordDialogState extends ConsumerState<ServiceRecordDialog> {
                 ),
                 const SizedBox(height: 16),
 
-                // Cost field
-                TextFormField(
-                  controller: _costController,
-                  decoration: InputDecoration(
-                    labelText: context.l10n.equipment_serviceDialog_costLabel,
-                    prefixIcon: const Icon(Icons.attach_money),
-                    hintText: context.l10n.equipment_serviceDialog_costHint,
-                  ),
-                  keyboardType: const TextInputType.numberWithOptions(
-                    decimal: true,
-                  ),
-                  validator: (value) {
-                    if (value != null && value.isNotEmpty) {
-                      final parsed = double.tryParse(value);
-                      if (parsed == null || parsed < 0) {
-                        return context
-                            .l10n
-                            .equipment_serviceDialog_costValidation;
-                      }
-                    }
-                    return null;
-                  },
+                // Cost field, with the currency it is priced in.
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      flex: 2,
+                      // Rebuild the cost field when the currency changes so
+                      // its prefix shows the right symbol (EUR -> €, ...).
+                      child: ValueListenableBuilder<TextEditingValue>(
+                        valueListenable: _currencyController,
+                        builder: (context, value, _) {
+                          final symbol = currencySymbol(value.text);
+                          return TextFormField(
+                            controller: _costController,
+                            decoration: InputDecoration(
+                              labelText: context
+                                  .l10n
+                                  .equipment_serviceDialog_costLabel,
+                              prefixText: symbol.isEmpty ? null : '$symbol ',
+                              hintText:
+                                  context.l10n.equipment_serviceDialog_costHint,
+                            ),
+                            keyboardType: const TextInputType.numberWithOptions(
+                              decimal: true,
+                            ),
+                            validator: (value) {
+                              if (value != null && value.isNotEmpty) {
+                                final parsed = double.tryParse(value);
+                                if (parsed == null || parsed < 0) {
+                                  return context
+                                      .l10n
+                                      .equipment_serviceDialog_costValidation;
+                                }
+                              }
+                              return null;
+                            },
+                          );
+                        },
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      // Editable dropdown: common currencies as presets, but
+                      // any ISO code can still be typed. The stored code leads
+                      // the list when it is outside the presets.
+                      child: DropdownMenu<String>(
+                        controller: _currencyController,
+                        expandedInsets: EdgeInsets.zero,
+                        requestFocusOnTap: true,
+                        enableFilter: true,
+                        label: Text(
+                          context.l10n.equipment_serviceDialog_currencyLabel,
+                        ),
+                        dropdownMenuEntries: [
+                          for (final code in currencyCodesWith(
+                            _initialCurrencyCode,
+                          ))
+                            DropdownMenuEntry(
+                              value: code,
+                              label: code,
+                              leadingIcon: SizedBox(
+                                width: 28,
+                                child: Center(
+                                  child: Text(currencySymbol(code)),
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 16),
 
@@ -1445,7 +1542,7 @@ class _ServiceRecordDialogState extends ConsumerState<ServiceRecordDialog> {
   }
 
   Future<void> _pickServiceDate() async {
-    final picked = await showDatePicker(
+    final picked = await showAppDatePicker(
       context: context,
       initialDate: _serviceDate,
       firstDate: DateTime(1950),
@@ -1457,7 +1554,7 @@ class _ServiceRecordDialogState extends ConsumerState<ServiceRecordDialog> {
   }
 
   Future<void> _pickNextServiceDate() async {
-    final picked = await showDatePicker(
+    final picked = await showAppDatePicker(
       context: context,
       initialDate:
           _nextServiceDue ?? DateTime.now().add(const Duration(days: 365)),
@@ -1488,7 +1585,9 @@ class _ServiceRecordDialogState extends ConsumerState<ServiceRecordDialog> {
         cost: _costController.text.isEmpty
             ? null
             : double.tryParse(_costController.text),
-        currency: 'USD',
+        currency: _currencyController.text.trim().isEmpty
+            ? _fallbackCurrencyCode()
+            : _currencyController.text.trim().toUpperCase(),
         nextServiceDue: _nextServiceDue,
         notes: _notesController.text.trim(),
         createdAt: widget.existingRecord?.createdAt ?? now,

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/features/media/data/repositories/local_asset_cache_repository.dart';
 import 'package:submersion/features/media/data/services/photo_picker_service.dart';
+import 'package:submersion/features/media/data/services/trip_media_scanner.dart';
 import 'package:submersion/features/media/domain/entities/media_item.dart';
 
 /// Status of an asset resolution attempt.
@@ -130,18 +131,54 @@ class AssetResolutionService {
       );
     }
 
-    // Step 3: Search gallery by metadata (with query coalescing)
-    const timeWindow = Duration(seconds: 5);
-    final start = item.takenAt.subtract(timeWindow);
-    final end = item.takenAt.add(timeWindow);
-
-    List<AssetInfo> candidates;
+    // A gallery query against a library the app cannot access yet returns
+    // zero candidates -- indistinguishable from "genuinely no matching
+    // photo" unless permission is checked directly. Skip the query (and,
+    // critically, skip caching an unresolved result) when permission isn't
+    // in place: caching would apply the 24h+ backoff to a transient,
+    // user-recoverable condition, leaving the item stuck as unavailable
+    // long after permission is granted.
+    final PhotoPermissionStatus permission;
     try {
-      candidates = await _getAssetsCoalesced(start, end);
+      permission = await _photoPickerService.checkPermission();
     } catch (e) {
-      _log.error('Gallery query failed for media ${item.id}', error: e);
+      // checkPermission() ultimately hits platform code; treat a
+      // platform-channel failure like any other gallery failure rather than
+      // letting it bubble out of resolveAssetId() and break a Riverpod
+      // provider watching it.
+      _log.error('Permission check failed for media ${item.id}', error: e);
       return const ResolutionResult(status: ResolutionStatus.unavailable);
     }
+    if (permission != PhotoPermissionStatus.authorized &&
+        permission != PhotoPermissionStatus.limited) {
+      _log.info(
+        'Skipping gallery search for media ${item.id}: permission is $permission',
+      );
+      return const ResolutionResult(status: ResolutionStatus.unavailable);
+    }
+
+    // Step 3: Search gallery by metadata (with query coalescing). The gallery
+    // API takes LOCAL bounds, so one narrow window is queried per reading the
+    // matchers below will compare against -- see [_galleryReadings]. Two
+    // +-5s windows keep each query cheap; spanning a single window across both
+    // would cover the whole UTC offset and pull in hours of unrelated assets.
+    const timeWindow = Duration(seconds: 5);
+    final byId = <String, AssetInfo>{};
+    for (final reading in _galleryReadings(item.takenAt)) {
+      try {
+        final found = await _getAssetsCoalesced(
+          reading.subtract(timeWindow),
+          reading.add(timeWindow),
+        );
+        for (final asset in found) {
+          byId[asset.id] = asset;
+        }
+      } catch (e) {
+        _log.error('Gallery query failed for media ${item.id}', error: e);
+        return const ResolutionResult(status: ResolutionStatus.unavailable);
+      }
+    }
+    final candidates = byId.values.toList();
 
     if (candidates.isEmpty) {
       await _cacheUnresolved(item.id);
@@ -305,12 +342,15 @@ class AssetResolutionService {
     final filename = item.originalFilename;
     if (filename == null || filename.isEmpty) return null;
 
+    final readings = _galleryReadings(item.takenAt);
     final matches = candidates.where((c) {
       final candidateName = c.filename;
       if (candidateName == null || candidateName.isEmpty) return false;
       if (candidateName != filename) return false;
-      final diff = c.createDateTime.difference(item.takenAt).abs();
-      return diff <= const Duration(seconds: 5);
+      return readings.any(
+        (r) =>
+            c.createDateTime.difference(r).abs() <= const Duration(seconds: 5),
+      );
     }).toList();
 
     return matches.length == 1 ? matches.first.id : null;
@@ -332,16 +372,46 @@ class AssetResolutionService {
   }) {
     if (item.width == null || item.height == null) return null;
 
-    final itemSecond = _truncateToSecond(item.takenAt);
+    final itemSeconds = _galleryReadings(
+      item.takenAt,
+    ).map(_truncateToSecond).toList();
     final matches = candidates.where((c) {
       if (c.width != item.width || c.height != item.height) return false;
-      final diff = _truncateToSecond(
-        c.createDateTime,
-      ).difference(itemSecond).abs();
-      return diff <= tolerance;
+      final candidateSecond = _truncateToSecond(c.createDateTime);
+      return itemSeconds.any(
+        (s) => candidateSecond.difference(s).abs() <= tolerance,
+      );
     }).toList();
 
     return matches.length == 1 ? matches.first.id : null;
+  }
+
+  /// The readings of a stored [MediaItem.takenAt] that could line up with a
+  /// gallery candidate's LOCAL [AssetInfo.createDateTime].
+  ///
+  /// `taken_at` is meant to hold wall-clock-as-UTC (the same convention as dive
+  /// entry times), so restating its calendar fields as local is the correct
+  /// reading and is listed first.
+  ///
+  /// Rows written by the import path before it normalised, however, hold the
+  /// INSTANT of a local [DateTime]; [MediaRepository] hydrates every row as UTC
+  /// regardless, so those rows arrive with their fields shifted by the offset
+  /// that was in force at import and it is the RAW value that already lines up
+  /// with a candidate's instant. Nothing in the schema distinguishes the two
+  /// populations, so both readings are offered rather than guessing: comparing
+  /// only the restated one would make every photo linked before the fix
+  /// unresolvable the moment its `platformAssetId` went stale.
+  ///
+  /// Callers accept a candidate matching EITHER reading, and the tiers keep
+  /// refusing whenever more than one candidate qualifies -- so a library that
+  /// happens to hold a second plausible asset exactly one UTC offset away is
+  /// declined rather than mis-bound.
+  ///
+  /// On a host running at UTC the two coincide and the list collapses to one.
+  static List<DateTime> _galleryReadings(DateTime takenAt) {
+    final restated = TripMediaScanner.wallClockUtcToLocal(takenAt);
+    if (restated.isAtSameMomentAs(takenAt)) return [restated];
+    return [restated, takenAt];
   }
 
   /// Both sides are compared at second granularity so [Duration.zero] means

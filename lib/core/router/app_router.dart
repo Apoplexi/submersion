@@ -63,6 +63,8 @@ import 'package:submersion/features/dive_sites/presentation/pages/site_match_rev
 import 'package:submersion/features/equipment/presentation/pages/equipment_list_page.dart';
 import 'package:submersion/features/equipment/presentation/pages/equipment_detail_page.dart';
 import 'package:submersion/features/equipment/presentation/pages/equipment_edit_page.dart';
+import 'package:submersion/features/cylinder_configs/presentation/pages/cylinder_config_edit_page.dart';
+import 'package:submersion/features/cylinder_configs/presentation/pages/cylinder_config_list_page.dart';
 import 'package:submersion/features/equipment/presentation/pages/equipment_set_list_page.dart';
 import 'package:submersion/features/equipment/presentation/pages/service_kind_list_page.dart';
 import 'package:submersion/features/equipment/presentation/pages/equipment_set_detail_page.dart';
@@ -510,6 +512,29 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                 name: 'manageServiceTypes',
                 builder: (context, state) => const ServiceKindListPage(),
               ),
+              // Must precede the ':equipmentId' catch-all below, which would
+              // otherwise swallow 'cylinder-configs' as an equipment id.
+              GoRoute(
+                path: 'cylinder-configs',
+                name: 'cylinderConfigs',
+                builder: (context, state) => const CylinderConfigListPage(),
+                routes: [
+                  GoRoute(
+                    path: 'new',
+                    name: 'newCylinderConfig',
+                    builder: (context, state) => CylinderConfigEditPage(
+                      equipmentId: state.uri.queryParameters['equipmentId'],
+                    ),
+                  ),
+                  GoRoute(
+                    path: ':configId',
+                    name: 'cylinderConfigEdit',
+                    builder: (context, state) => CylinderConfigEditPage(
+                      configId: state.pathParameters['configId'],
+                    ),
+                  ),
+                ],
+              ),
               GoRoute(
                 path: ':equipmentId',
                 name: 'equipmentDetail',
@@ -541,6 +566,13 @@ final appRouterProvider = Provider<GoRouter>((ref) {
               GoRoute(
                 path: 'new',
                 name: 'newBuddy',
+                // Bulk dive editing opens the buddy picker inside a
+                // showDialog (root navigator by default); "Add New Buddy"
+                // must land on that same root navigator or it renders
+                // underneath the still-open dialog/bottom sheet instead of
+                // in the foreground (see app_router_test.dart and
+                // buddy_picker_navigation_render_test.dart).
+                parentNavigatorKey: rootNavigatorKey,
                 builder: (context, state) {
                   final extra = state.extra as Map<String, dynamic>?;
                   return BuddyEditPage(

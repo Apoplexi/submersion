@@ -8,6 +8,7 @@ import 'package:submersion/core/domain/entities/storage_config.dart';
 import 'package:submersion/core/services/database_location_service.dart';
 import 'package:submersion/core/services/database_migration_service.dart';
 import 'package:submersion/core/services/database_service.dart';
+import 'package:submersion/core/services/security/database_security_service.dart';
 import 'package:submersion/features/settings/presentation/pages/reset_complete_page.dart';
 import 'package:submersion/features/settings/presentation/providers/storage_providers.dart';
 import 'package:submersion/features/settings/presentation/providers/sync_providers.dart';
@@ -440,6 +441,22 @@ class _StorageSettingsPageState extends ConsumerState<StorageSettingsPage> {
     try {
       await DatabaseService.instance.resetDatabase(backupPath: backupPath);
 
+      // A fresh database starts unprotected: the data the credential
+      // protected is gone, and keeping a lock over an empty database with a
+      // credential the user may not remember would only strand them again.
+      // Runs AFTER resetDatabase so the pre-reset backup still decrypt-
+      // exported with the old key; the fresh file was created encrypted
+      // (key still set), so decrypt the empty database first.
+      final security = DatabaseSecurityService.instance;
+      if (security.encryptionEnabled) {
+        await security.disableEncryption();
+      }
+      if (security.appLockEnabled) {
+        await security.disableSecurity(
+          dbPath: await DatabaseService.instance.databasePath,
+        );
+      }
+
       if (!mounted) return;
       ResetCompletePage.show(context);
     } catch (e) {
@@ -521,9 +538,23 @@ class _StorageSettingsPageState extends ConsumerState<StorageSettingsPage> {
   Future<void> _selectAndMigrateToCustomFolder() async {
     // Pick a folder
     final notifier = ref.read(storageConfigNotifierProvider.notifier);
-    final pickResult = await notifier.pickCustomFolder(
-      chooser: _chooseStorageVolume,
-    );
+    final FolderPickResultWithBookmark? pickResult;
+    try {
+      pickResult = await notifier.pickCustomFolder(
+        chooser: _chooseStorageVolume,
+      );
+    } on FolderPickException catch (e) {
+      // The picker itself failed (e.g. no XDG desktop portal on Linux):
+      // silently doing nothing made the setting look broken (#218).
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('${context.l10n.common_label_error}: ${e.message}'),
+          ),
+        );
+      }
+      return;
+    }
 
     if (pickResult == null || !mounted) return;
 

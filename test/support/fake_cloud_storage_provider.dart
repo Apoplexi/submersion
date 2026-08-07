@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:submersion/core/services/cloud_storage/cloud_storage_provider.dart';
@@ -77,6 +78,22 @@ class FakeCloudStorageProvider implements CloudStorageProvider {
       throw CloudStorageException('Fake: not found: $fileId');
     }
     return Uint8List.fromList(data);
+  }
+
+  @override
+  Future<UploadResult> uploadFileFromPath(
+    String sourcePath,
+    String filename, {
+    String? folderId,
+  }) async {
+    final data = await File(sourcePath).readAsBytes();
+    return uploadFile(data, filename, folderId: folderId);
+  }
+
+  @override
+  Future<void> downloadToFile(String fileId, String destinationPath) async {
+    final bytes = await downloadFile(fileId);
+    await File(destinationPath).writeAsBytes(bytes, flush: true);
   }
 
   @override

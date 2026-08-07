@@ -136,7 +136,7 @@ void main() {
     await tester.pump(const Duration(seconds: 1));
   });
 
-  testWidgets('switching to the tissue scene shows the tissue readout', (
+  testWidgets('launching in tissue mode shows the tissue readout', (
     tester,
   ) async {
     final overrides = await getBaseOverrides();
@@ -145,9 +145,6 @@ void main() {
       testApp(
         overrides: [
           ...overrides,
-          dive3dSceneDataProvider(
-            'd1',
-          ).overrideWith((ref) async => readoutSceneData()),
           tissueDecoStatusesProvider(
             'd1',
           ).overrideWith((ref) async => statuses),
@@ -159,14 +156,9 @@ void main() {
           ),
           tissueRuntimeSecondsProvider('d1').overrideWith((ref) async => 1400),
         ],
-        child: const Dive3dPage(diveId: 'd1'),
+        child: const Dive3dPage(diveId: 'd1', initialMode: SceneKind.tissue),
       ),
     );
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 50));
-
-    // Tap the "Tissues" segment of the scene switcher.
-    await tester.tap(find.text('Tissues'));
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 100));
 
@@ -174,9 +166,20 @@ void main() {
     // The legend that explains how to read the graph is shown.
     expect(find.byType(TissueLegend), findsOneWidget);
     expect(find.text('On-gassing'), findsOneWidget);
+    // The tissue view stands alone: no scene switcher back to the profile
+    // scenes.
+    expect(find.text('Tissues'), findsNothing);
+    expect(find.text('Dive'), findsNothing);
 
     await tester.pumpWidget(const SizedBox.shrink());
     await tester.pump(const Duration(seconds: 1));
+  });
+
+  testWidgets('profile-launched 3D view offers no Tissues segment', (
+    tester,
+  ) async {
+    await pumpPage(tester);
+    expect(find.text('Tissues'), findsNothing);
   });
 
   testWidgets('hovering the tissue surface shows the value tooltip', (
@@ -192,21 +195,15 @@ void main() {
       testApp(
         overrides: [
           ...overrides,
-          dive3dSceneDataProvider(
-            'd1',
-          ).overrideWith((ref) async => readoutSceneData()),
           tissueDecoStatusesProvider(
             'd1',
           ).overrideWith((ref) async => statuses),
           tissueSurfaceProvider('d1').overrideWith((ref) async => result),
           tissueRuntimeSecondsProvider('d1').overrideWith((ref) async => 1400),
         ],
-        child: const Dive3dPage(diveId: 'd1'),
+        child: const Dive3dPage(diveId: 'd1', initialMode: SceneKind.tissue),
       ),
     );
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 50));
-    await tester.tap(find.text('Tissues'));
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 100));
 

@@ -50,6 +50,7 @@ class SettingsKeys {
   static const String volumeUnit = 'volume_unit';
   static const String weightUnit = 'weight_unit';
   static const String sacUnit = 'sac_unit';
+  static const String defaultCurrency = 'default_currency';
   static const String unitPreset = 'unit_preset';
   static const String themeMode = 'theme_mode';
   static const String displayZoom = 'display_zoom';
@@ -85,6 +86,12 @@ class SettingsKeys {
   static const String fullscreenReadoutCardX = 'fullscreen_readout_card_x';
   static const String fullscreenReadoutCardY = 'fullscreen_readout_card_y';
 
+  // Whether profile-chart metric overlays follow the visible depth window when
+  // zoomed (device-local, stored directly in SharedPreferences rather than
+  // per-diver in the DB).
+  static const String profileMetricsFollowViewport =
+      'profile_metrics_follow_viewport';
+
   // Perdix-style media overlay preferences (device-local, stored directly in
   // SharedPreferences rather than per-diver in the DB).
   static const String perdixOverlayEnabled = 'perdix_overlay_enabled';
@@ -101,10 +108,23 @@ class AppSettings {
   final WeightUnit weightUnit;
   final AltitudeUnit altitudeUnit;
   final SacUnit sacUnit;
+
+  /// ISO 4217 code used as the default currency for new priced items
+  /// (e.g. equipment purchase price).
+  final String defaultCurrency;
   final TimeFormat timeFormat;
   final DateFormatPreference dateFormat;
   final ThemeMode themeMode;
   final String themePresetId;
+
+  /// Color accents: tint main navigation icons with each feature's color.
+  final bool accentNavIcons;
+
+  /// Color accents: show a tinted feature icon beside page titles.
+  final bool accentSectionHeaders;
+
+  /// Color accents: tint leading icons in lists and settings pages.
+  final bool accentListIcons;
   final String locale;
   final String defaultDiveType;
   final double defaultTankVolume;
@@ -367,6 +387,12 @@ class AppSettings {
   final double? fullscreenReadoutCardX;
   final double? fullscreenReadoutCardY;
 
+  /// Whether the dive profile chart's secondary-axis metric overlays (NDL,
+  /// ppO2, GF, ...) follow the visible depth window when zoomed instead of
+  /// magnifying with the depth axis and scrolling out of view. Device-local,
+  /// not per-diver. See MetricBand.
+  final bool profileMetricsFollowViewport;
+
   /// Perdix-style media overlay: shown over photos/videos when enabled.
   /// Device-local, not per-diver.
   final bool perdixOverlayEnabled;
@@ -384,10 +410,14 @@ class AppSettings {
     this.weightUnit = WeightUnit.kilograms,
     this.altitudeUnit = AltitudeUnit.meters,
     this.sacUnit = SacUnit.pressurePerMin,
+    this.defaultCurrency = 'USD',
     this.timeFormat = TimeFormat.twelveHour,
     this.dateFormat = DateFormatPreference.mmmDYYYY,
     this.themeMode = ThemeMode.system,
     this.themePresetId = 'submersion',
+    this.accentNavIcons = false,
+    this.accentSectionHeaders = false,
+    this.accentListIcons = false,
     this.locale = 'system',
     this.defaultDiveType = 'recreational',
     this.defaultTankVolume = 12.0,
@@ -485,6 +515,7 @@ class AppSettings {
     this.hiddenHomeChips = const <String>{},
     this.fullscreenReadoutCardX,
     this.fullscreenReadoutCardY,
+    this.profileMetricsFollowViewport = false,
     this.perdixOverlayEnabled = false,
     this.perdixOverlayX,
     this.perdixOverlayY,
@@ -531,10 +562,14 @@ class AppSettings {
     WeightUnit? weightUnit,
     AltitudeUnit? altitudeUnit,
     SacUnit? sacUnit,
+    String? defaultCurrency,
     TimeFormat? timeFormat,
     DateFormatPreference? dateFormat,
     ThemeMode? themeMode,
     String? themePresetId,
+    bool? accentNavIcons,
+    bool? accentSectionHeaders,
+    bool? accentListIcons,
     String? locale,
     String? defaultDiveType,
     double? defaultTankVolume,
@@ -632,6 +667,7 @@ class AppSettings {
     Set<String>? hiddenHomeChips,
     double? fullscreenReadoutCardX,
     double? fullscreenReadoutCardY,
+    bool? profileMetricsFollowViewport,
     bool? perdixOverlayEnabled,
     double? perdixOverlayX,
     double? perdixOverlayY,
@@ -644,10 +680,14 @@ class AppSettings {
       weightUnit: weightUnit ?? this.weightUnit,
       altitudeUnit: altitudeUnit ?? this.altitudeUnit,
       sacUnit: sacUnit ?? this.sacUnit,
+      defaultCurrency: defaultCurrency ?? this.defaultCurrency,
       timeFormat: timeFormat ?? this.timeFormat,
       dateFormat: dateFormat ?? this.dateFormat,
       themeMode: themeMode ?? this.themeMode,
       themePresetId: themePresetId ?? this.themePresetId,
+      accentNavIcons: accentNavIcons ?? this.accentNavIcons,
+      accentSectionHeaders: accentSectionHeaders ?? this.accentSectionHeaders,
+      accentListIcons: accentListIcons ?? this.accentListIcons,
       locale: locale ?? this.locale,
       defaultDiveType: defaultDiveType ?? this.defaultDiveType,
       defaultTankVolume: defaultTankVolume ?? this.defaultTankVolume,
@@ -776,6 +816,8 @@ class AppSettings {
           fullscreenReadoutCardX ?? this.fullscreenReadoutCardX,
       fullscreenReadoutCardY:
           fullscreenReadoutCardY ?? this.fullscreenReadoutCardY,
+      profileMetricsFollowViewport:
+          profileMetricsFollowViewport ?? this.profileMetricsFollowViewport,
       perdixOverlayEnabled: perdixOverlayEnabled ?? this.perdixOverlayEnabled,
       perdixOverlayX: perdixOverlayX ?? this.perdixOverlayX,
       perdixOverlayY: perdixOverlayY ?? this.perdixOverlayY,
@@ -887,6 +929,10 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
       // per-diver settings table), so it is read straight from SharedPreferences
       // like the fullscreen tile prefs above.
       final pscrRatio = prefs.getDouble(SettingsKeys.pscrRatio);
+      // Profile-chart overlay scaling is a device-local viewing preference,
+      // kept out of the per-diver settings table like the prefs above.
+      final profileMetricsFollowViewport =
+          prefs.getBool(SettingsKeys.profileMetricsFollowViewport) ?? false;
       final perdixOverlayEnabled =
           prefs.getBool(SettingsKeys.perdixOverlayEnabled) ?? false;
       final perdixOverlayX = prefs.getDouble(SettingsKeys.perdixOverlayX);
@@ -902,6 +948,7 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
           fullscreenReadoutCardX: fullscreenReadoutCardX,
           fullscreenReadoutCardY: fullscreenReadoutCardY,
           pscrRatio: pscrRatio ?? 100.0,
+          profileMetricsFollowViewport: profileMetricsFollowViewport,
           perdixOverlayEnabled: perdixOverlayEnabled,
           perdixOverlayX: perdixOverlayX,
           perdixOverlayY: perdixOverlayY,
@@ -919,6 +966,7 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
         fullscreenReadoutCardX: fullscreenReadoutCardX,
         fullscreenReadoutCardY: fullscreenReadoutCardY,
         pscrRatio: pscrRatio,
+        profileMetricsFollowViewport: profileMetricsFollowViewport,
         perdixOverlayEnabled: perdixOverlayEnabled,
         perdixOverlayX: perdixOverlayX,
         perdixOverlayY: perdixOverlayY,
@@ -981,6 +1029,10 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
     }
     await prefs.setDouble(SettingsKeys.pscrRatio, state.pscrRatio);
     await prefs.setBool(
+      SettingsKeys.profileMetricsFollowViewport,
+      state.profileMetricsFollowViewport,
+    );
+    await prefs.setBool(
       SettingsKeys.perdixOverlayEnabled,
       state.perdixOverlayEnabled,
     );
@@ -1040,6 +1092,11 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
     await _saveSettings();
   }
 
+  Future<void> setDefaultCurrency(String currencyCode) async {
+    state = state.copyWith(defaultCurrency: currencyCode.trim().toUpperCase());
+    await _saveSettings();
+  }
+
   Future<void> setAltitudeUnit(AltitudeUnit unit) async {
     state = state.copyWith(altitudeUnit: unit);
     await _saveSettings();
@@ -1062,6 +1119,21 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
 
   Future<void> setThemePresetId(String presetId) async {
     state = state.copyWith(themePresetId: presetId);
+    await _saveSettings();
+  }
+
+  Future<void> setAccentNavIcons(bool value) async {
+    state = state.copyWith(accentNavIcons: value);
+    await _saveSettings();
+  }
+
+  Future<void> setAccentSectionHeaders(bool value) async {
+    state = state.copyWith(accentSectionHeaders: value);
+    await _saveSettings();
+  }
+
+  Future<void> setAccentListIcons(bool value) async {
+    state = state.copyWith(accentListIcons: value);
     await _saveSettings();
   }
 
@@ -1554,6 +1626,11 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
     await _saveSettings();
   }
 
+  Future<void> setProfileMetricsFollowViewport(bool value) async {
+    state = state.copyWith(profileMetricsFollowViewport: value);
+    await _saveSettings();
+  }
+
   Future<void> setPerdixOverlayEnabled(bool value) async {
     state = state.copyWith(perdixOverlayEnabled: value);
     await _saveSettings();
@@ -1652,6 +1729,10 @@ final sacUnitProvider = Provider<SacUnit>((ref) {
   return ref.watch(settingsProvider.select((s) => s.sacUnit));
 });
 
+final defaultCurrencyProvider = Provider<String>((ref) {
+  return ref.watch(settingsProvider.select((s) => s.defaultCurrency));
+});
+
 final altitudeUnitProvider = Provider<AltitudeUnit>((ref) {
   return ref.watch(settingsProvider.select((s) => s.altitudeUnit));
 });
@@ -1667,6 +1748,21 @@ final themePresetProvider = Provider<AppThemePreset>((ref) {
 
 final localeProvider = Provider<String>((ref) {
   return ref.watch(settingsProvider.select((s) => s.locale));
+});
+
+/// Color accent toggles. Narrow selects so each surface rebuilds only when
+/// its own toggle changes, not on every settings mutation -- the navigation
+/// scaffold wraps every page, so a broad watch would rebuild the whole shell.
+final accentNavIconsProvider = Provider<bool>((ref) {
+  return ref.watch(settingsProvider.select((s) => s.accentNavIcons));
+});
+
+final accentSectionHeadersProvider = Provider<bool>((ref) {
+  return ref.watch(settingsProvider.select((s) => s.accentSectionHeaders));
+});
+
+final accentListIconsProvider = Provider<bool>((ref) {
+  return ref.watch(settingsProvider.select((s) => s.accentListIcons));
 });
 
 /// Decompression settings convenience providers

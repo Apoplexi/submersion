@@ -4,6 +4,17 @@
   "diveLog_tank_saveAsPreset_nameTitle": "保存气瓶预设",
   "diveLog_tank_saveAsPreset_nameHint": "例如 我的 AL80",
   "diveLog_tank_saveAsPreset_saved": "已保存预设 \"{name}\"",
+  "settings_units_defaultCurrency": "默认货币",
+  "settings_units_dialog_defaultCurrency": "默认货币",
+  "diveSites_list_menu_select": "选择潜水点",
+  "diveLog_edit_flightWindowWarning": "此次潜水的结束时间晚于您航班的最后安全出水时间({time})",
+  "@diveLog_edit_flightWindowWarning": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
   "diveLog_edit_geofenceSuggestion_near": "靠近 {location}",
   "diveLog_edit_geofenceSuggestion_title": "装备建议",
   "diveLog_edit_geofenceSuggestion_body": "应用\"{setName}\"套装？",
@@ -946,9 +957,6 @@
     }
   },
   "preDive_dashboard_start": "开始潜前检查",
-  "tools_preDive_title": "潜前检查清单",
-  "tools_preDive_subtitle": "执行并查看检查清单记录",
-  "tools_preDive_description": "潜伴检查、CCR 组装清单和装备打包，并保留审核记录",
   "trips_detail_preDive_action": "潜前检查清单",
   "settings_manage_preDiveChecklists": "潜前检查清单",
   "settings_manage_preDiveChecklists_subtitle": "潜伴检查、CCR 组装清单、装备打包",
@@ -1327,11 +1335,16 @@
   "diveComputer_downloadStep_cancel": "取消",
   "diveComputer_downloadStep_cancelled": "下载已取消",
   "diveComputer_downloadStep_depthMeters": "{depth}m",
+  "diveComputer_downloadStep_downloadAll": "下载所有潜水记录",
   "diveComputer_downloadStep_downloadFailed": "下载失败",
+  "diveComputer_downloadStep_downloadNew": "下载新的潜水记录",
   "diveComputer_downloadStep_downloadedDives": "已下载的潜水",
   "diveComputer_downloadStep_durationMin": "{duration} 分钟",
   "diveComputer_downloadStep_errorOccurred": "发生错误",
   "diveComputer_downloadStep_errorSemanticLabel": "下载错误：{error}",
+  "diveComputer_downloadStep_firstSyncBody": "您的潜水日志中已有潜水记录。您可以跳过下载已有的潜水记录。",
+  "diveComputer_downloadStep_firstSyncTitle": "首次从此潜水电脑下载",
+  "diveComputer_downloadStep_onlyAfterDate": "仅下载{date}之后的潜水记录",
   "diveComputer_downloadStep_percentAccessibility": "，{percent} 百分比",
   "diveComputer_downloadStep_preparing": "准备中...",
   "diveComputer_downloadStep_progressPercent": "{percent}%",
@@ -1438,6 +1451,8 @@
   "diveDetailSection_tanks_description": "气瓶列表、气体混合、压力、单瓶耗气率",
   "diveDetailSection_tanks_name": "气瓶",
   "diveDetailSection_tide_description": "潮汐周期图和时间",
+  "diveDetailSection_reefHealth_name": "珊瑚礁健康",
+  "diveDetailSection_reefHealth_description": "潜水当天的珊瑚白化热压力",
   "diveDetailSection_tide_name": "潮汐",
   "diveDetailSection_weights_description": "配重明细、总重量",
   "diveDetailSection_buoyancy_name": "浮力",
@@ -1619,7 +1634,9 @@
   "diveLog_ccr_sectionScrubber": "二氧化碳吸收剂",
   "diveLog_ccr_sectionSetpoints": "设定点 (bar)",
   "diveLog_ccr_title": "密闭循环呼吸器设置",
+  "diveLog_chartOption_metricsFollowViewport": "保持叠加层在视图内",
   "diveLog_chartSection_decompression": "减压",
+  "diveLog_chartSection_display": "显示",
   "diveLog_chartSection_gasAnalysis": "气体分析",
   "diveLog_chartSection_markers": "标记",
   "diveLog_chartSection_other": "其他",
@@ -1928,6 +1945,7 @@
   "diveLog_edit_snackbar_unableToCalculateMaxDepth": "无法从轮廓计算最大深度",
   "diveLog_edit_snackbar_unableToCalculateRuntime": "无法从轮廓计算运行时间",
   "diveLog_edit_subsection_diveConditions": "潜水条件",
+  "diveLog_edit_subsection_autofill": "自动填充",
   "diveLog_edit_subsection_weather": "天气",
   "diveLog_edit_summary_items": "{count, plural, one{1 件装备} other{{count} 件装备}}",
   "diveLog_edit_summary_notes": "笔记",
@@ -3366,6 +3384,42 @@
   "equipment_serviceClocks_overdueSince": "自 {date} 起逾期",
   "equipment_serviceClocks_overdue": "已逾期",
   "equipment_serviceClocks_divesLeft": "剩余 {remaining}/{total} 次潜水",
+  "cylinderConfigs_title": "气瓶配置",
+  "cylinderConfigs_empty": "尚无配置",
+  "cylinderConfigs_emptyBody": "保存一次稀释气与备用气配置，即可应用到任何一次潜水。",
+  "cylinderConfigs_new": "新建配置",
+  "cylinderConfigs_name": "名称",
+  "cylinderConfigs_nameRequired": "请输入名称",
+  "cylinderConfigs_forUnit": "所属设备",
+  "cylinderConfigs_noUnit": "通用气体方案",
+  "cylinderConfigs_gasPlans": "气体方案",
+  "cylinderConfigs_addCylinder": "添加气瓶",
+  "cylinderConfigs_role": "用途",
+  "cylinderConfigs_startPressure": "起始压力",
+  "cylinderConfigs_label": "标签",
+  "cylinderConfigs_fromPreset": "从预设填入",
+  "cylinderConfigs_deleteTitle": "删除此配置？",
+  "cylinderConfigs_deleteBody": "已应用过的潜水不会改变。",
+  "cylinderConfigs_applyAction": "应用配置",
+  "cylinderConfigs_applyAdded": "{count, plural, other{已添加 {count} 个气瓶}}",
+  "@cylinderConfigs_applyAdded": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "cylinderConfigs_applyKept": "{count, plural, other{保留 {count} 个}}",
+  "@cylinderConfigs_applyKept": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "cylinderConfigs_applyNothingToDo": "该潜水已与配置一致",
+  "cylinderConfigs_sectionTitle": "配置",
+  "equipment_serviceClocks_hoursSource": "根据已记录的潜水时间计算",
   "equipment_serviceClocks_hoursLeft": "剩余 {remaining}/{total} 小时",
   "equipment_serviceClocks_manageKinds": "管理维护类型",
   "equipment_serviceClocks_appliesToClock": "适用的倒计时",
@@ -3515,6 +3569,7 @@
   "equipment_serviceDialog_clearNextServiceDateTooltip": "清除下次维护日期",
   "equipment_serviceDialog_costHint": "0.00",
   "equipment_serviceDialog_costLabel": "费用",
+  "equipment_serviceDialog_currencyLabel": "货币",
   "equipment_serviceDialog_costValidation": "请输入有效金额",
   "equipment_serviceDialog_editTitle": "编辑维护记录",
   "equipment_serviceDialog_nextServiceDueLabel": "下次维护日期",
@@ -3735,6 +3790,7 @@
   "gas_tmx2135_description": "常氧三混气 21/35",
   "gas_tmx2135_displayName": "Tx 21/35",
   "importWizard_tagsLabel": "标签",
+  "importWizard_review_olderDivesSkipped": "{count, plural, other{已跳过 {count} 次较早的潜水 — 已在您的日志中}}",
   "maps_compass_resetLabel": "将地图方向重置为正北",
   "maps_compass_resetTooltip": "正北朝上",
   "maps_heatMap_hide": "隐藏热力图",
@@ -4138,6 +4194,7 @@
   "settings_about_header": "关于",
   "settings_about_openSourceLicenses": "开源许可证",
   "settings_about_reportIssue": "报告问题",
+  "settings_about_reportIssue_copy": "复制链接",
   "settings_about_reportIssue_snackbar": "请访问 github.com/submersion-app/submersion/issues",
   "settings_about_version": "版本 {version}",
   "settings_appBar_title": "设置",
@@ -4206,6 +4263,8 @@
   "settings_appearance_pressureThresholdMarkers": "压力阈值标记",
   "settings_appearance_pressureThresholdMarkers_subtitle": "当气瓶压力超过阈值时显示标记",
   "settings_appearance_pressureThresholdMarkers_subtitleFull": "当气瓶压力超过 2/3、1/2 和 1/3 阈值时显示标记",
+  "settings_appearance_metricsFollowViewport": "缩放时保持叠加层在视图内",
+  "settings_appearance_metricsFollowViewport_subtitle": "将 NDL、ppO2 等叠加层适配到可见区域，而不是随深度轴一起放大",
   "settings_appearance_rightYAxisMetric": "右Y轴指标",
   "settings_appearance_rightYAxisMetric_subtitle": "右轴默认显示的指标",
   "settings_appearance_subsection_decompressionMetrics": "减压指标",
@@ -4257,6 +4316,7 @@
   "settings_cloudSync_header_syncBehavior": "同步行为",
   "settings_cloudSync_lastSynced": "上次同步：{time}",
   "settings_cloudSync_pendingChanges": "{count, plural, =1{1 个待同步更改} other{{count} 个待同步更改}}",
+  "settings_cloudSync_peerRequiresUpdate_banner": "{count, plural, =1{1 台设备正在从更新版本的 Submersion 同步。请更新此设备以接收其最新更改。} other{{count} 台设备正在从更新版本的 Submersion 同步。请更新此设备以接收它们的最新更改。}}",
   "settings_cloudSync_provider_connected": "已连接",
   "settings_cloudSync_provider_connectedTo": "已连接到 {providerName}",
   "settings_cloudSync_provider_connectionFailed": "{providerName} 连接失败：{error}",
@@ -4705,6 +4765,65 @@
   "settings_units_weight": "重量",
   "settings_units_weight_kilograms": "千克 (kg)",
   "settings_units_weight_pounds": "磅 (lbs)",
+  "settings_updates_automaticUpdates": "自动更新",
+  "settings_updates_automaticUpdatesSubtitle": "定期检查更新",
+  "settings_updates_betaDialogBody": "Beta 版本会随每次更改发布，可能会先于稳定版升级您的潜水日志数据库。之后切换回稳定版不会降级应用，并且所有相互同步的设备应使用相同的更新渠道。每次数据库升级前都会自动创建备份。",
+  "settings_updates_betaDialogConfirm": "切换到 Beta",
+  "settings_updates_betaDialogTitle": "接收 Beta 更新？",
+  "settings_updates_channel": "更新渠道",
+  "settings_updates_channelBadgeBeta": "{version} (Beta)",
+  "@settings_updates_channelBadgeBeta": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "settings_updates_channelBeta": "Beta",
+  "settings_updates_channelBetaSubtitle": "每次更改都会发布新版本，先于稳定版",
+  "settings_updates_channelStable": "稳定版",
+  "settings_updates_channelStableSubtitle": "仅提供经过测试的版本",
+  "settings_updates_checkForUpdates": "检查更新",
+  "settings_updates_checking": "正在检查...",
+  "settings_updates_downloading": "正在下载... {progress}%",
+  "@settings_updates_downloading": {
+    "placeholders": {
+      "progress": {
+        "type": "String"
+      }
+    }
+  },
+  "settings_updates_error": "错误：{message}",
+  "@settings_updates_error": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "settings_updates_header": "更新",
+  "settings_updates_joinBeta": "加入 Beta 计划",
+  "settings_updates_joinBetaSubtitle": "通过 Beta 计划抢先体验新功能",
+  "settings_updates_lastChecked": "上次检查",
+  "settings_updates_never": "从未",
+  "settings_updates_readyToInstall": "版本 {version} 已准备好安装",
+  "@settings_updates_readyToInstall": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "settings_updates_stableSwitchNotice": "在下一个稳定版比当前 Beta 版更新之前，将保持在此 Beta 版上。",
+  "settings_updates_upToDate": "已是最新版本",
+  "settings_updates_versionAvailable": "版本 {version} 可用",
+  "@settings_updates_versionAvailable": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
   "signatures_action_clear": "清除",
   "signatures_action_closeSignatureView": "关闭签名视图",
   "signatures_action_deleteSignature": "删除签名",
@@ -5177,23 +5296,14 @@
   "tides_semantic_tideCycle": "潮汐周期，状态：{state}，高度：{height}",
   "tides_semantic_tideState": "潮汐状态：{state}",
   "tides_title": "潮汐",
-  "tools_deco_description": "计算免减压极限、所需减压停留以及多层潜水轮廓的中枢神经系统毒性/氧毒性单位暴露量。",
-  "tools_deco_subtitle": "规划需要减压停留的潜水",
-  "tools_deco_title": "减压计算器",
-  "tools_disclaimer": "这些计算器仅供计划参考。请务必验证计算结果并遵循您的潜水训练。",
-  "tools_gas_description": "四种专用气体计算器：\n• 最大作业深度 - 气体混合物的最大作业深度\n• 最佳混合气 - 目标深度的理想氧气百分比\n• 耗气量 - 气体使用量估算\n• 底限储备 - 紧急储备计算",
-  "tools_gas_subtitle": "最大作业深度、最佳混合气、耗气量、底限储备",
-  "tools_gas_title": "气体计算器",
   "tools_gpsLogger_description": "在潜水日记录你的位置，自动将导入的潜水与 GPS 位置匹配。",
   "tools_gpsLogger_subtitle": "记录水面轨迹",
   "tools_gpsLogger_title": "GPS 记录器",
-  "tools_title": "工具",
   "tools_weight_aluminumImperial": "空瓶时浮力较大（+4 lbs）",
   "tools_weight_aluminumMetric": "空瓶时浮力较大（+2 kg）",
   "tools_weight_bodyWeightOptional": "体重（可选）",
   "tools_weight_carbonFiberImperial": "浮力很大（+7 lbs）",
   "tools_weight_carbonFiberMetric": "浮力很大（+3 kg）",
-  "tools_weight_description": "根据您的防寒服、气瓶材质、水型和体重估算所需配重。",
   "tools_weight_disclaimer": "这仅为估算值。请务必在潜水开始时进行浮力检查并根据需要调整。浮力控制装置、个人浮力和呼吸模式等因素都会影响您的实际配重需求。",
   "tools_weight_exposureSuit": "防寒服",
   "tools_weight_gasCapacity": "• 气体容量：{capacity} cuft",
@@ -5204,7 +5314,6 @@
   "tools_weight_resultAccessibility": "推荐配重: {weight} {unit}",
   "tools_weight_steelImperial": "负浮力（-4 lbs）",
   "tools_weight_steelMetric": "负浮力（-2 kg）",
-  "tools_weight_subtitle": "适合您装备配置的推荐配重",
   "tools_weight_tankMaterial": "气瓶材质",
   "tools_weight_tankSpecifications": "气瓶规格",
   "tools_weight_title": "配重计算器",
@@ -5224,6 +5333,14 @@
   "transfer_computers_loading": "加载中...",
   "transfer_computers_manageTitle": "管理潜水电脑",
   "transfer_computers_noComputersSaved": "没有已保存的潜水电脑",
+  "transfer_computers_diveCount": "{count, plural, other{{count} 次潜水}}",
+  "transfer_computers_downloadTooltip": "下载潜水记录",
+  "transfer_computers_knownComputersHeader": "已知潜水电脑",
+  "transfer_computers_lastDownloadDaysAgo": "{days} 天前",
+  "transfer_computers_lastDownloadHoursAgo": "{hours, plural, other{{hours} 小时前}}",
+  "transfer_computers_lastDownloadMinutesAgo": "{minutes} 分钟前",
+  "transfer_computers_lastDownloadNever": "从未",
+  "transfer_computers_lastDownloadYesterday": "昨天",
   "transfer_computers_savedCount": "{count} 台已保存的{count, plural, =1{潜水电脑} other{潜水电脑}}",
   "transfer_computers_sectionHeader": "潜水电脑",
   "transfer_csvExport_cancelButton": "取消",
@@ -5413,6 +5530,9 @@
   "trips_edit_label_notes": "备注",
   "trips_edit_label_operatorName": "运营商/包船",
   "trips_edit_label_resortName": "度假村名称",
+  "trips_edit_label_returnFlight": "返程航班",
+  "trips_edit_returnFlightClear": "清除返程航班",
+  "trips_edit_returnFlightNotSet": "未设置",
   "trips_edit_label_startDate": "开始日期",
   "trips_edit_label_tripName": "旅行名称 *",
   "trips_edit_label_tripType": "旅行类型",
@@ -5661,12 +5781,25 @@
   "dashboard_gauges_insuranceExpired": "保险已过期",
   "dashboard_gauges_noInsurance": "未登记保险",
   "dashboard_gauges_noFlyClear": "禁飞 0:00",
+  "dashboard_gauges_flightWindow": "潜水窗口 {hours}:{minutes}",
+  "@dashboard_gauges_flightWindow": {
+    "placeholders": {
+      "hours": {
+        "type": "String"
+      },
+      "minutes": {
+        "type": "String"
+      }
+    }
+  },
+  "dashboard_gauges_flightWindowClosed": "航班前请勿再潜水",
   "dashboard_gauges_noFlyRemaining": "禁飞 {hours}:{minutes}",
   "dashboard_gauges_lastDiveDays": "上次潜水 {days} 天前",
   "dashboard_gauges_lastDiveToday": "今天潜过水",
   "dashboard_gauges_noDivesYet": "暂无潜水记录",
   "settings_homeChips_pageTitle": "主页状态标签",
   "settings_homeChips_description": "选择主页顶部显示哪些状态标签。",
+  "settings_homeChips_flightWindow": "航班前潜水窗口",
   "settings_homeChips_gear": "装备保养",
   "settings_homeChips_insurance": "保险",
   "settings_homeChips_noFly": "禁飞计时",
@@ -5689,7 +5822,7 @@
   "dashboard_gauges_backupDays": "{days} 天前备份",
   "dashboard_gauges_syncPending": "{count} 条未同步",
   "dashboard_gauges_synced": "已同步",
-  "dashboard_gauges_dataIssues": "{count} 个数据问题",
+  "dashboard_gauges_dataIssues": "{count, plural, =1{1 个数据问题} other{{count} 个数据问题}}",
   "dashboard_gauges_retry": "状态不可用 - 点按重试",
   "dashboard_urgent_title": "需要注意",
   "dashboard_photos_title": "最近照片",
@@ -5738,6 +5871,13 @@
   "listViewMode_table": "表格",
   "settings_appearance_general": "常规",
   "settings_appearance_sections": "部分",
+  "settings_appearance_colorAccents": "彩色强调",
+  "settings_appearance_accentNavIcons": "彩色导航图标",
+  "settings_appearance_accentNavIcons_subtitle": "使用各功能区的颜色为主菜单图标着色",
+  "settings_appearance_accentSectionHeaders": "彩色分区标题",
+  "settings_appearance_accentSectionHeaders_subtitle": "在页面标题旁显示彩色功能图标",
+  "settings_appearance_accentListIcons": "彩色列表图标",
+  "settings_appearance_accentListIcons_subtitle": "为列表和设置页面中的图标着色",
   "settings_appearance_showDetailsPane": "显示详情面板",
   "settings_appearance_showDetailsPane_subtitle": "在表格旁边显示详情面板",
   "settings_appearance_showProfilePanel": "在表格视图中显示配置文件面板",
@@ -5753,6 +5893,9 @@
   "universalImport_dive_decideAction": "决定",
   "universalImport_label_consolidate": "合并",
   "universalImport_label_importAsNew": "作为新导入",
+  "universalImport_entityAction_linkBadge": "关联",
+  "universalImport_entityAction_linkExisting": "关联现有记录",
+  "universalImport_entityAction_linkExistingSubtitle": "使用匹配的记录",
   "universalImport_pending_chooseAction": "选择操作",
   "universalImport_pending_gateHint": "{count} 个重复项需要决定",
   "universalImport_pending_needsDecision": "需要决定",
@@ -6235,6 +6378,24 @@
   "attrLabel_sole_type": "鞋底",
   "attrLabel_buoyancy_kg": "浮力",
   "attrLabel_dry_weight_kg": "干重",
+  "attrLabel_unit_type": "设备类型",
+  "attrLabel_mount_configuration": "安装方式",
+  "attrLabel_scrubber_type": "药罐类型",
+  "attrLabel_scrubber_duration_h": "药罐时长（小时）",
+  "attrLabel_o2_cell_count": "氧电池",
+  "attrLabel_diluent_cylinder_l": "稀释气瓶",
+  "attrLabel_o2_cylinder_l": "O2 气瓶",
+  "attrChoice_unit_type_eccr": "电子式 CCR (eCCR)",
+  "attrChoice_unit_type_mccr": "手动式 CCR (mCCR)",
+  "attrChoice_unit_type_hccr": "混合式 CCR (hCCR)",
+  "attrChoice_unit_type_scr_cmf": "SCR - 恒定质量流量",
+  "attrChoice_unit_type_scr_pascr": "SCR - 被动补气",
+  "attrChoice_unit_type_scr_escr": "SCR - 电子控制",
+  "attrChoice_mount_configuration_back": "背挂式",
+  "attrChoice_mount_configuration_chest": "胸挂式",
+  "attrChoice_mount_configuration_sidemount": "侧挂式",
+  "attrChoice_scrubber_type_axial": "轴向",
+  "attrChoice_scrubber_type_radial": "径向",
   "attrChoice_suit_style_full": "全身湿衣",
   "attrChoice_suit_style_shorty": "短款湿衣",
   "attrChoice_suit_style_two_piece": "两件式",
@@ -6423,6 +6584,32 @@
   "safetySettings_noFlyPreset_standard": "标准(12/18/24 小时)",
   "safetySettings_noFlyPreset_strict": "严格(18/24/48 小时)",
   "safetySettings_noFlyPreset_subtitle": "单次免减压潜水、重复潜水和减压潜水后的指导间隔",
+  "flightWindow_closed": "航班前请勿再潜水",
+  "flightWindow_conflict": "您的禁飞时间超过了航班起飞时间",
+  "flightWindow_departs": "航班 {time} 起飞",
+  "@flightWindow_departs": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "flightWindow_openTitle": "剩余潜水时间:{remaining}",
+  "@flightWindow_openTitle": {
+    "placeholders": {
+      "remaining": {
+        "type": "String"
+      }
+    }
+  },
+  "flightWindow_surfaceBy": "请在 {time} 前出水",
+  "@flightWindow_surfaceBy": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
   "safetyHub_noFly_active_title": "禁飞:剩余 {remaining}",
   "@safetyHub_noFly_active_title": {
     "placeholders": {
@@ -6709,5 +6896,87 @@
   "settings_mediaStorage_quality_reuploadQueued": "重新上传已加入队列",
   "settings_mediaStorage_quality_linuxFfmpegHint": "安装 ffmpeg 以启用视频压缩。在此之前将上传原始文件。",
   "settings_mediaStorage_quality_saveFailed": "无法保存上传质量。请重试。",
-  "settings_mediaStorage_quality_noTranscoderHint": "此设备无法压缩视频。将从此设备上传原始文件。"
+  "settings_mediaStorage_quality_noTranscoderHint": "此设备无法压缩视频。将从此设备上传原始文件。",
+  "reef_section_title": "珊瑚礁",
+  "reef_section_sourcesTooltip": "数据来源",
+  "reef_section_loadError": "目前无法加载珊瑚礁数据",
+  "reef_habitat_title": "珊瑚礁生境",
+  "reef_habitat_onReef": "位于珊瑚礁上",
+  "reef_habitat_onReefWithThreat": "位于珊瑚礁上，威胁等级 {threat}",
+  "reef_habitat_noReef": "此位置没有已制图的珊瑚礁",
+  "reef_habitat_unavailable": "目前无法查询珊瑚礁生境",
+  "reef_health_title": "珊瑚礁健康",
+  "reef_health_unavailable": "目前无法查询珊瑚礁健康状况",
+  "reef_health_noData": "此位置没有珊瑚礁健康数据",
+  "reef_health_degreeHeatingWeeks": "热度周 {value} 摄氏度周",
+  "reef_health_seaSurface": "海表温度 {value}",
+  "reef_health_asOf": "数据日期 {date}",
+  "reef_health_levelNoStress": "无热压力",
+  "reef_health_levelWatch": "白化观察",
+  "reef_health_levelWarning": "白化警告",
+  "reef_health_levelAlert1": "白化警报 1 级",
+  "reef_health_levelAlert2": "白化警报 2 级",
+  "reef_health_levelAlert3": "白化警报 3 级",
+  "reef_health_levelAlert4": "白化警报 4 级",
+  "reef_health_levelAlert5": "白化警报 5 级",
+  "reef_protection_title": "保护区",
+  "reef_protection_none": "不在海洋保护区内",
+  "reef_protection_unavailable": "目前无法查询保护状态",
+  "reef_protection_viewRegulations": "查看规定",
+  "reef_protection_iucn": "IUCN {category}",
+  "reef_species_recordedNearby": "附近记录",
+  "reef_species_addToExpected": "添加到预期物种",
+  "reef_attribution_title": "珊瑚礁数据来源",
+  "reef_attribution_wri": "珊瑚礁分布与威胁等级。CC BY 3.0。",
+  "reef_attribution_noaa": "海表温度与白化热压力。公共领域。",
+  "reef_attribution_gbif": "物种出现记录，已筛选为 CC0 和 CC BY 4.0。",
+  "reef_attribution_protectedSeas": "海洋保护区边界。CC BY 4.0。",
+  "settings_section_security_title": "应用安全",
+  "settings_section_security_subtitle": "应用锁定与数据库加密",
+  "settings_security_appLock": "应用锁定",
+  "settings_security_appLock_subtitle": "打开应用时需要密码或生物识别",
+  "settings_security_biometrics": "使用生物识别解锁",
+  "settings_security_autoLock": "自动锁定",
+  "settings_security_autoLock_immediately": "立即",
+  "settings_security_autoLock_minutes": "{minutes, plural, =1{1 分钟后} other{{minutes} 分钟后}}",
+  "@settings_security_autoLock_minutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "settings_security_autoLock_never": "从不",
+  "settings_security_encryption": "加密数据库",
+  "settings_security_encryption_subtitle": "使用静态加密保护您的潜水日志文件",
+  "settings_security_encryption_progress_backup": "正在创建安全备份...",
+  "settings_security_encryption_progress_encrypt": "正在加密数据库...",
+  "settings_security_encryption_progress_decrypt": "正在解密数据库...",
+  "settings_security_encryption_progress_reopen": "正在重新打开数据库...",
+  "settings_security_changePassword": "更改密码",
+  "settings_security_regenerateRecovery": "新恢复代码",
+  "settings_security_setPassword": "设置应用密码",
+  "settings_security_password": "密码",
+  "settings_security_confirmPassword": "确认密码",
+  "settings_security_currentPassword": "当前密码",
+  "settings_security_newPassword": "新密码",
+  "settings_security_passwordTooShort": "密码至少需要 4 个字符。",
+  "settings_security_passwordMismatch": "两次输入的密码不一致。",
+  "settings_security_wrongPassword": "密码错误。",
+  "settings_security_recoveryCode_title": "您的恢复代码",
+  "settings_security_recoveryCode_explain": "请抄写并妥善保管。如果忘记密码，它是解锁应用的唯一方式，并会替换之前的任何恢复代码。",
+  "settings_security_recoveryCode_savedConfirm": "我已保存恢复代码",
+  "settings_security_disableBlockedByEncryption_title": "加密已启用",
+  "settings_security_disableBlockedByEncryption_body": "请先关闭数据库加密，再关闭应用锁定。加密的数据库需要凭据。",
+  "settings_security_enableEncryption_title": "要加密数据库吗？",
+  "settings_security_enableEncryption_body": "首先会创建安全备份，然后就地重新加密数据库文件。日志较大时可能需要一些时间。",
+  "settings_security_disableEncryption_title": "要关闭加密吗？",
+  "settings_security_disableEncryption_body": "数据库文件将重新以未加密形式存储在磁盘上。",
+  "settings_security_turnOffAppLock_title": "要关闭应用锁定吗？",
+  "settings_security_turnOffAppLock_body": "应用打开时将不再要求输入密码。",
+  "settings_security_unlock_title": "输入您的密码",
+  "settings_security_cancel": "取消",
+  "settings_security_continue": "继续",
+  "settings_security_done": "完成",
+  "settings_security_turnOff": "关闭"
 }

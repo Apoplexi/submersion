@@ -7,6 +7,7 @@ import 'package:latlong2/latlong.dart';
 import 'package:submersion/features/checklists/presentation/widgets/trip_checklist_section.dart';
 import 'package:submersion/features/trips/domain/entities/trip.dart';
 import 'package:submersion/features/trips/domain/entities/trip_story.dart';
+import 'package:submersion/features/trips/presentation/widgets/story/trip_flight_countdown_card.dart';
 import 'package:submersion/features/trips/presentation/widgets/story/trip_story_day_card.dart';
 import 'package:submersion/features/trips/presentation/widgets/story/trip_story_day_header.dart';
 import 'package:submersion/features/trips/presentation/widgets/story/trip_story_hero.dart';
@@ -279,6 +280,15 @@ class _TripStoryViewState extends ConsumerState<TripStoryView>
           ),
         ),
       ),
+      // Return-flight dive-window countdown, shown while the trip is
+      // underway. The card hides itself once the flight departs.
+      if (trip.returnFlightAt != null && trip.isInProgress)
+        SliverPadding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          sliver: SliverToBoxAdapter(
+            child: TripFlightCountdownCard(tripId: trip.id),
+          ),
+        ),
       if (trip.isLiveaboard)
         SliverPadding(
           padding: const EdgeInsets.symmetric(horizontal: 16),

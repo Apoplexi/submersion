@@ -4,6 +4,17 @@
   "diveLog_tank_saveAsPreset_nameTitle": "Guardar preset do cilindro",
   "diveLog_tank_saveAsPreset_nameHint": "ex. O meu AL80",
   "diveLog_tank_saveAsPreset_saved": "Preset \"{name}\" guardado",
+  "settings_units_defaultCurrency": "Moeda padrão",
+  "settings_units_dialog_defaultCurrency": "Moeda padrão",
+  "diveSites_list_menu_select": "Selecionar pontos",
+  "diveLog_edit_flightWindowWarning": "Este mergulho termina depois do último horário seguro para emergir antes do seu voo ({time})",
+  "@diveLog_edit_flightWindowWarning": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
   "diveLog_edit_geofenceSuggestion_near": "Perto de {location}",
   "diveLog_edit_geofenceSuggestion_title": "Sugestão de equipamento",
   "diveLog_edit_geofenceSuggestion_body": "Aplicar o conjunto \"{setName}\"?",
@@ -852,9 +863,6 @@
     }
   },
   "preDive_dashboard_start": "Iniciar verificação pré-mergulho",
-  "tools_preDive_title": "Listas de Verificação Pré-Mergulho",
-  "tools_preDive_subtitle": "Executar e revisar sessões de lista de verificação",
-  "tools_preDive_description": "Verificações de dupla, listas de montagem de CCR e preparação de equipamento com trilha de auditoria",
   "trips_detail_preDive_action": "Lista de verificação pré-mergulho",
   "settings_manage_preDiveChecklists": "Listas de Verificação Pré-Mergulho",
   "settings_manage_preDiveChecklists_subtitle": "Verificações de dupla, listas de montagem de CCR, preparação de equipamento",
@@ -1233,11 +1241,16 @@
   "diveComputer_downloadStep_cancel": "Cancelar",
   "diveComputer_downloadStep_cancelled": "Download cancelado",
   "diveComputer_downloadStep_depthMeters": "{depth}m",
+  "diveComputer_downloadStep_downloadAll": "Baixar todos os mergulhos",
   "diveComputer_downloadStep_downloadFailed": "Falha no download",
+  "diveComputer_downloadStep_downloadNew": "Baixar novos mergulhos",
   "diveComputer_downloadStep_downloadedDives": "Mergulhos Baixados",
   "diveComputer_downloadStep_durationMin": "{duration} min",
   "diveComputer_downloadStep_errorOccurred": "Ocorreu um erro",
   "diveComputer_downloadStep_errorSemanticLabel": "Erro no download: {error}",
+  "diveComputer_downloadStep_firstSyncBody": "Seu diário já tem mergulhos. Você pode pular o download de mergulhos que já possui.",
+  "diveComputer_downloadStep_firstSyncTitle": "Primeiro download deste computador de mergulho",
+  "diveComputer_downloadStep_onlyAfterDate": "Baixar apenas mergulhos após {date}",
   "diveComputer_downloadStep_percentAccessibility": ", {percent} por cento",
   "diveComputer_downloadStep_preparing": "Preparando...",
   "diveComputer_downloadStep_progressPercent": "{percent}%",
@@ -1346,6 +1359,8 @@
   "diveDetailSection_tanks_description": "Lista de cilindros, misturas de gas, pressoes, SAC por cilindro",
   "diveDetailSection_tanks_name": "Cilindros",
   "diveDetailSection_tide_description": "Grafico do ciclo de mare e horarios",
+  "diveDetailSection_reefHealth_name": "Saúde do recife",
+  "diveDetailSection_reefHealth_description": "Estresse térmico de branqueamento de corais na data do mergulho",
   "diveDetailSection_tide_name": "Mare",
   "diveDetailSection_weights_description": "Detalhamento de peso, peso total",
   "diveDetailSection_buoyancy_name": "Flutuabilidade",
@@ -3224,6 +3239,42 @@
   "equipment_serviceClocks_overdueSince": "Atrasado desde {date}",
   "equipment_serviceClocks_overdue": "Atrasado",
   "equipment_serviceClocks_divesLeft": "Restam {remaining} de {total} mergulhos",
+  "cylinderConfigs_title": "Configurações de garrafas",
+  "cylinderConfigs_empty": "Ainda sem configurações",
+  "cylinderConfigs_emptyBody": "Guarde uma montagem de diluente e bailout uma vez e aplique-a a qualquer mergulho.",
+  "cylinderConfigs_new": "Nova configuração",
+  "cylinderConfigs_name": "Nome",
+  "cylinderConfigs_nameRequired": "Introduza um nome",
+  "cylinderConfigs_forUnit": "Para a unidade",
+  "cylinderConfigs_noUnit": "Plano de gás genérico",
+  "cylinderConfigs_gasPlans": "Planos de gás",
+  "cylinderConfigs_addCylinder": "Adicionar garrafa",
+  "cylinderConfigs_role": "Função",
+  "cylinderConfigs_startPressure": "Pressão inicial",
+  "cylinderConfigs_label": "Etiqueta",
+  "cylinderConfigs_fromPreset": "A partir de predefinição",
+  "cylinderConfigs_deleteTitle": "Eliminar a configuração?",
+  "cylinderConfigs_deleteBody": "Os mergulhos onde já foi aplicada não são alterados.",
+  "cylinderConfigs_applyAction": "Aplicar configuração",
+  "cylinderConfigs_applyAdded": "{count, plural, =1{1 garrafa adicionada} other{{count} garrafas adicionadas}}",
+  "@cylinderConfigs_applyAdded": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "cylinderConfigs_applyKept": "{count, plural, =1{1 mantida} other{{count} mantidas}}",
+  "@cylinderConfigs_applyKept": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "cylinderConfigs_applyNothingToDo": "Este mergulho já corresponde à configuração",
+  "cylinderConfigs_sectionTitle": "Configurações",
+  "equipment_serviceClocks_hoursSource": "Calculado a partir do tempo de mergulho registado",
   "equipment_serviceClocks_hoursLeft": "Restam {remaining} de {total} horas",
   "equipment_serviceClocks_manageKinds": "Gerenciar tipos de manutenção",
   "equipment_serviceClocks_appliesToClock": "Aplica-se ao prazo",
@@ -3373,6 +3424,7 @@
   "equipment_serviceDialog_clearNextServiceDateTooltip": "Limpar Data da Proxima Manutencao",
   "equipment_serviceDialog_costHint": "0,00",
   "equipment_serviceDialog_costLabel": "Custo",
+  "equipment_serviceDialog_currencyLabel": "Moeda",
   "equipment_serviceDialog_costValidation": "Insira um valor valido",
   "equipment_serviceDialog_editTitle": "Editar Registro de Manutencao",
   "equipment_serviceDialog_nextServiceDueLabel": "Proxima Manutencao",
@@ -3987,6 +4039,7 @@
   "settings_about_header": "Sobre",
   "settings_about_openSourceLicenses": "Licencas de Codigo Aberto",
   "settings_about_reportIssue": "Relatar um Problema",
+  "settings_about_reportIssue_copy": "Copiar link",
   "settings_about_reportIssue_snackbar": "Acesse github.com/submersion-app/submersion/issues",
   "settings_about_version": "Versao {version}",
   "settings_appBar_title": "Configuracoes",
@@ -4053,6 +4106,8 @@
   "settings_appearance_pressureThresholdMarkers": "Marcadores de limite de pressao",
   "settings_appearance_pressureThresholdMarkers_subtitle": "Mostrar marcadores quando a pressao do cilindro cruza limites",
   "settings_appearance_pressureThresholdMarkers_subtitleFull": "Mostrar marcadores quando a pressao do cilindro cruza os limites de 2/3, 1/2 e 1/3",
+  "settings_appearance_metricsFollowViewport": "Manter as sobreposições visíveis ao ampliar",
+  "settings_appearance_metricsFollowViewport_subtitle": "Ajustar as sobreposições como NDL e ppO2 à área visível em vez de ampliá-las com o eixo de profundidade",
   "settings_appearance_rightYAxisMetric": "Metrica do eixo Y direito",
   "settings_appearance_rightYAxisMetric_subtitle": "Metrica padrao exibida no eixo direito",
   "settings_appearance_subsection_decompressionMetrics": "Metricas de Descompressao",
@@ -4104,6 +4159,7 @@
   "settings_cloudSync_header_syncBehavior": "Comportamento de Sincronizacao",
   "settings_cloudSync_lastSynced": "Ultima sincronizacao: {time}",
   "settings_cloudSync_pendingChanges": "{count, plural, =1{1 alteracao pendente} other{{count} alteracoes pendentes}}",
+  "settings_cloudSync_peerRequiresUpdate_banner": "{count, plural, =1{1 dispositivo sincroniza a partir de uma versão mais recente do Submersion. Atualize este dispositivo para receber as alterações mais recentes dele.} other{{count} dispositivos sincronizam a partir de uma versão mais recente do Submersion. Atualize este dispositivo para receber as alterações mais recentes deles.}}",
   "settings_cloudSync_provider_connected": "Conectado",
   "settings_cloudSync_provider_connectedTo": "Conectado a {providerName}",
   "settings_cloudSync_provider_connectionFailed": "Falha na conexao com {providerName}: {error}",
@@ -4531,6 +4587,65 @@
   "settings_units_weight": "Peso",
   "settings_units_weight_kilograms": "Quilogramas (kg)",
   "settings_units_weight_pounds": "Libras (lbs)",
+  "settings_updates_automaticUpdates": "Atualizações automáticas",
+  "settings_updates_automaticUpdatesSubtitle": "Verificar atualizações periodicamente",
+  "settings_updates_betaDialogBody": "As versões beta são publicadas a cada alteração e podem atualizar o banco de dados do seu registro de mergulhos antes da versão estável. Voltar depois para o canal estável não fará downgrade do app, e todos os dispositivos que sincronizam entre si devem usar o mesmo canal. Um backup é feito automaticamente antes de qualquer atualização do banco de dados.",
+  "settings_updates_betaDialogConfirm": "Mudar para Beta",
+  "settings_updates_betaDialogTitle": "Receber atualizações beta?",
+  "settings_updates_channel": "Canal de atualização",
+  "settings_updates_channelBadgeBeta": "{version} (Beta)",
+  "@settings_updates_channelBadgeBeta": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "settings_updates_channelBeta": "Beta",
+  "settings_updates_channelBetaSubtitle": "Novas versões a cada alteração, antes da estável",
+  "settings_updates_channelStable": "Estável",
+  "settings_updates_channelStableSubtitle": "Apenas versões testadas",
+  "settings_updates_checkForUpdates": "Verificar atualizações",
+  "settings_updates_checking": "Verificando...",
+  "settings_updates_downloading": "Baixando... {progress}%",
+  "@settings_updates_downloading": {
+    "placeholders": {
+      "progress": {
+        "type": "String"
+      }
+    }
+  },
+  "settings_updates_error": "Erro: {message}",
+  "@settings_updates_error": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "settings_updates_header": "Atualizações",
+  "settings_updates_joinBeta": "Participar do Beta",
+  "settings_updates_joinBetaSubtitle": "Receba novos recursos antes através do programa beta",
+  "settings_updates_lastChecked": "Última verificação",
+  "settings_updates_never": "Nunca",
+  "settings_updates_readyToInstall": "Versão {version} pronta para instalar",
+  "@settings_updates_readyToInstall": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "settings_updates_stableSwitchNotice": "Você permanecerá nesta beta até que a próxima versão estável seja mais recente que ela.",
+  "settings_updates_upToDate": "Atualizado",
+  "settings_updates_versionAvailable": "Versão {version} disponível",
+  "@settings_updates_versionAvailable": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
   "signatures_action_clear": "Limpar",
   "signatures_action_closeSignatureView": "Fechar visualização de assinatura",
   "signatures_action_deleteSignature": "Excluir assinatura",
@@ -4873,6 +4988,7 @@
   "tags_empty": "Nenhuma tag ainda. Crie tags ao editar mergulhos.",
   "tags_hint_addMoreTags": "Adicionar mais tags...",
   "importWizard_tagsLabel": "Tags",
+  "importWizard_review_olderDivesSkipped": "{count, plural, one{1 mergulho mais antigo ignorado — já está no seu registo} other{{count} mergulhos mais antigos ignorados — já estão no seu registo}}",
   "tags_hint_addTags": "Adicionar tags...",
   "tags_manage_bulkDeleteMessage": "Estas etiquetas serao removidas de {diveCount, plural, =0{0 mergulhos} =1{1 mergulho} other{{diveCount} mergulhos}} no total. Esta acao nao pode ser desfeita.",
   "tags_manage_bulkDeleteTitle": "Excluir {count} Etiquetas?",
@@ -5011,23 +5127,14 @@
   "tides_semantic_tideCycle": "Ciclo de maré, estado: {state}, altura: {height}",
   "tides_semantic_tideState": "Estado da maré: {state}",
   "tides_title": "Marés",
-  "tools_deco_description": "Calcule limites de nao descompressao, paradas deco necessarias e exposicao CNS/OTU para perfis de mergulho multinivel.",
-  "tools_deco_subtitle": "Planeje mergulhos com paradas de descompressao",
-  "tools_deco_title": "Calculadora Deco",
-  "tools_disclaimer": "Estas calculadoras sao apenas para fins de planeamento. Sempre verifique os calculos e siga o seu treinamento de mergulho.",
-  "tools_gas_description": "Quatro calculadoras de gas especializadas:\n- MOD - Profundidade maxima operacional para uma mistura\n- Best Mix - O2% ideal para uma profundidade alvo\n- Consumo - Estimativa de uso de gas\n- Rock Bottom - Calculo de reserva de emergencia",
-  "tools_gas_subtitle": "MOD, Best Mix, Consumo, Rock Bottom",
-  "tools_gas_title": "Calculadoras de Gas",
   "tools_gpsLogger_description": "Grave sua posição durante um dia de mergulho e associe automaticamente os mergulhos importados a localizações GPS.",
   "tools_gpsLogger_subtitle": "Grave uma trilha de superfície",
   "tools_gpsLogger_title": "Registrador GPS",
-  "tools_title": "Ferramentas",
   "tools_weight_aluminumImperial": "Mais flutuante quando vazio (+4 lbs)",
   "tools_weight_aluminumMetric": "Mais flutuante quando vazio (+2 kg)",
   "tools_weight_bodyWeightOptional": "Peso Corporal (opcional)",
   "tools_weight_carbonFiberImperial": "Muito flutuante (+7 lbs)",
   "tools_weight_carbonFiberMetric": "Muito flutuante (+3 kg)",
-  "tools_weight_description": "Estime o lastro necessario com base na sua roupa, material do cilindro, tipo de agua e peso corporal.",
   "tools_weight_disclaimer": "Isto e apenas uma estimativa. Sempre faca uma verificacao de flutuabilidade no inicio do mergulho e ajuste conforme necessario. Fatores como colete, flutuabilidade pessoal e padroes respiratorios afetarao os seus requisitos reais de lastro.",
   "tools_weight_exposureSuit": "Roupa de Mergulho",
   "tools_weight_gasCapacity": "- Capacidade de gas: {capacity} cuft",
@@ -5038,7 +5145,6 @@
   "tools_weight_resultAccessibility": "Lastro recomendado: {weight} {unit}",
   "tools_weight_steelImperial": "Flutuabilidade negativa (-4 lbs)",
   "tools_weight_steelMetric": "Flutuabilidade negativa (-2 kg)",
-  "tools_weight_subtitle": "Lastro recomendado para o seu equipamento",
   "tools_weight_tankMaterial": "Material do Cilindro",
   "tools_weight_tankSpecifications": "Especificacoes do Cilindro",
   "tools_weight_title": "Calculadora de Lastro",
@@ -5058,6 +5164,14 @@
   "transfer_computers_loading": "Carregando...",
   "transfer_computers_manageTitle": "Gerenciar Computadores",
   "transfer_computers_noComputersSaved": "Nenhum computador salvo",
+  "transfer_computers_diveCount": "{count, plural, =1{1 mergulho} other{{count} mergulhos}}",
+  "transfer_computers_downloadTooltip": "Baixar mergulhos",
+  "transfer_computers_knownComputersHeader": "Computadores conhecidos",
+  "transfer_computers_lastDownloadDaysAgo": "há {days} dias",
+  "transfer_computers_lastDownloadHoursAgo": "{hours, plural, =1{há 1 hora} other{há {hours} horas}}",
+  "transfer_computers_lastDownloadMinutesAgo": "há {minutes} min",
+  "transfer_computers_lastDownloadNever": "Nunca",
+  "transfer_computers_lastDownloadYesterday": "Ontem",
   "transfer_computers_savedCount": "{count} {count, plural, =1{computador salvo} other{computadores salvos}}",
   "transfer_computers_sectionHeader": "Computadores de Mergulho",
   "transfer_csvExport_cancelButton": "Cancelar",
@@ -5232,6 +5346,9 @@
   "trips_edit_label_notes": "Notas",
   "trips_edit_label_operatorName": "Operator / Charter",
   "trips_edit_label_resortName": "Nome do Resort",
+  "trips_edit_label_returnFlight": "Voo de volta",
+  "trips_edit_returnFlightClear": "Limpar voo de volta",
+  "trips_edit_returnFlightNotSet": "Não definido",
   "trips_edit_label_startDate": "Data de Inicio",
   "trips_edit_label_tripName": "Nome da Viagem *",
   "trips_edit_label_tripType": "Trip Type",
@@ -5576,7 +5693,9 @@
   "settings_dataSources_appleHealth_importAction": "Import from Apple Watch",
   "settings_dataSources_appleHealth_privacy": "Your health data is stored locally and is never shared with third parties.",
   "settings_dataSources_noSources": "No data source integrations are available on this platform.",
+  "diveLog_chartOption_metricsFollowViewport": "Manter as sobreposições visíveis",
   "diveLog_chartSection_decompression": "Descompressao",
+  "diveLog_chartSection_display": "Exibição",
   "diveLog_chartSection_gasAnalysis": "Analise de gases",
   "diveLog_chartSection_markers": "Marcadores",
   "diveLog_chartSection_other": "Outros",
@@ -5600,6 +5719,7 @@
   "diveComputer_download_newDivesOnlyTitle": "Baixar apenas novos mergulhos",
   "diveComputer_download_upToDate": "Nenhum mergulho novo encontrado -- seu registro está atualizado",
   "diveLog_edit_section_environment": "Ambiente",
+  "diveLog_edit_subsection_autofill": "Preenchimento automático",
   "diveLog_edit_subsection_weather": "Clima",
   "diveLog_edit_subsection_diveConditions": "Condições de mergulho",
   "diveLog_edit_label_windSpeed": "Velocidade do vento",
@@ -5661,12 +5781,25 @@
   "dashboard_gauges_insuranceExpired": "Seguro expirado",
   "dashboard_gauges_noInsurance": "Sem seguro registado",
   "dashboard_gauges_noFlyClear": "Não voar 0:00",
+  "dashboard_gauges_flightWindow": "Janela de mergulho {hours}:{minutes}",
+  "@dashboard_gauges_flightWindow": {
+    "placeholders": {
+      "hours": {
+        "type": "String"
+      },
+      "minutes": {
+        "type": "String"
+      }
+    }
+  },
+  "dashboard_gauges_flightWindowClosed": "Não mergulhe mais antes do voo",
   "dashboard_gauges_noFlyRemaining": "Não voar {hours}:{minutes}",
   "dashboard_gauges_lastDiveDays": "Último mergulho há {days}d",
   "dashboard_gauges_lastDiveToday": "Mergulhou hoje",
   "dashboard_gauges_noDivesYet": "Ainda sem mergulhos",
   "settings_homeChips_pageTitle": "Chips de estado do Início",
   "settings_homeChips_description": "Escolha que chips de estado aparecem no topo do separador Início.",
+  "settings_homeChips_flightWindow": "Janela de mergulho antes do voo",
   "settings_homeChips_gear": "Manutenção do equipamento",
   "settings_homeChips_insurance": "Seguro",
   "settings_homeChips_noFly": "Temporizador de não voar",
@@ -5689,7 +5822,7 @@
   "dashboard_gauges_backupDays": "Cópia há {days}d",
   "dashboard_gauges_syncPending": "{count} por sincronizar",
   "dashboard_gauges_synced": "Sincronizado",
-  "dashboard_gauges_dataIssues": "{count} problemas de dados",
+  "dashboard_gauges_dataIssues": "{count, plural, =1{1 problema de dados} other{{count} problemas de dados}}",
   "dashboard_gauges_retry": "Estado indisponível - toque para tentar novamente",
   "dashboard_urgent_title": "Requer atenção",
   "dashboard_photos_title": "Fotos recentes",
@@ -5738,6 +5871,13 @@
   "listViewMode_table": "Tabela",
   "settings_appearance_general": "Geral",
   "settings_appearance_sections": "Seções",
+  "settings_appearance_colorAccents": "Acentos de cor",
+  "settings_appearance_accentNavIcons": "Ícones de navegação coloridos",
+  "settings_appearance_accentNavIcons_subtitle": "Colorir os ícones do menu principal com a cor de cada seção",
+  "settings_appearance_accentSectionHeaders": "Cabeçalhos de seção coloridos",
+  "settings_appearance_accentSectionHeaders_subtitle": "Mostrar um ícone de seção colorido ao lado dos títulos das páginas",
+  "settings_appearance_accentListIcons": "Ícones de lista coloridos",
+  "settings_appearance_accentListIcons_subtitle": "Colorir os ícones nas listas e nas páginas de configurações",
   "settings_appearance_showDetailsPane": "Mostrar painel de detalhes",
   "settings_appearance_showDetailsPane_subtitle": "Exibir painel de detalhes ao lado da tabela",
   "settings_appearance_showProfilePanel": "Mostrar painel de perfil na visualização de tabela",
@@ -5753,6 +5893,9 @@
   "universalImport_dive_decideAction": "Decidir",
   "universalImport_label_consolidate": "Consolidar",
   "universalImport_label_importAsNew": "Importar como novo",
+  "universalImport_entityAction_linkBadge": "VINCULAR",
+  "universalImport_entityAction_linkExisting": "Vincular ao existente",
+  "universalImport_entityAction_linkExistingSubtitle": "Usar o registro correspondente",
   "universalImport_pending_chooseAction": "Escolher uma acao",
   "universalImport_pending_gateHint": "{count} duplicado(s) precisam de uma decisao",
   "universalImport_pending_needsDecision": "Decisao necessaria",
@@ -6235,6 +6378,24 @@
   "attrLabel_sole_type": "Sola",
   "attrLabel_buoyancy_kg": "Flutuabilidade",
   "attrLabel_dry_weight_kg": "Peso seco",
+  "attrLabel_unit_type": "Tipo de unidade",
+  "attrLabel_mount_configuration": "Montagem",
+  "attrLabel_scrubber_type": "Tipo de cal",
+  "attrLabel_scrubber_duration_h": "Duração da cal (h)",
+  "attrLabel_o2_cell_count": "Células de O2",
+  "attrLabel_diluent_cylinder_l": "Cilindro de diluente",
+  "attrLabel_o2_cylinder_l": "Cilindro de O2",
+  "attrChoice_unit_type_eccr": "CCR eletrónico (eCCR)",
+  "attrChoice_unit_type_mccr": "CCR manual (mCCR)",
+  "attrChoice_unit_type_hccr": "CCR híbrido (hCCR)",
+  "attrChoice_unit_type_scr_cmf": "SCR - fluxo mássico constante",
+  "attrChoice_unit_type_scr_pascr": "SCR - adição passiva",
+  "attrChoice_unit_type_scr_escr": "SCR - controlo eletrónico",
+  "attrChoice_mount_configuration_back": "Montagem dorsal",
+  "attrChoice_mount_configuration_chest": "Montagem frontal",
+  "attrChoice_mount_configuration_sidemount": "Sidemount",
+  "attrChoice_scrubber_type_axial": "Axial",
+  "attrChoice_scrubber_type_radial": "Radial",
   "attrChoice_suit_style_full": "Roupa inteira",
   "attrChoice_suit_style_shorty": "Shorty",
   "attrChoice_suit_style_two_piece": "Duas peças",
@@ -6423,6 +6584,32 @@
   "safetySettings_noFlyPreset_standard": "Padrão (12/18/24 h)",
   "safetySettings_noFlyPreset_strict": "Rigoroso (18/24/48 h)",
   "safetySettings_noFlyPreset_subtitle": "Intervalos orientativos após um único mergulho sem deco, mergulhos repetitivos e mergulhos com deco",
+  "flightWindow_closed": "Não mergulhe mais antes do seu voo",
+  "flightWindow_conflict": "Seu tempo de não voar ultrapassa a partida do voo",
+  "flightWindow_departs": "O voo parte {time}",
+  "@flightWindow_departs": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "flightWindow_openTitle": "Tempo restante para mergulhar: {remaining}",
+  "@flightWindow_openTitle": {
+    "placeholders": {
+      "remaining": {
+        "type": "String"
+      }
+    }
+  },
+  "flightWindow_surfaceBy": "Emergir até {time}",
+  "@flightWindow_surfaceBy": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
   "safetyHub_noFly_active_title": "Não voar: faltam {remaining}",
   "@safetyHub_noFly_active_title": {
     "placeholders": {
@@ -6709,5 +6896,87 @@
   "settings_mediaStorage_quality_reuploadQueued": "Novo envio na fila",
   "settings_mediaStorage_quality_linuxFfmpegHint": "Instale o ffmpeg para ativar a compressão de vídeo. Até lá, os originais são enviados.",
   "settings_mediaStorage_quality_saveFailed": "Não foi possível guardar a qualidade de envio. Tente novamente.",
-  "settings_mediaStorage_quality_noTranscoderHint": "Este dispositivo não consegue comprimir vídeo. A partir dele são enviados os originais."
+  "settings_mediaStorage_quality_noTranscoderHint": "Este dispositivo não consegue comprimir vídeo. A partir dele são enviados os originais.",
+  "reef_section_title": "Recife",
+  "reef_section_sourcesTooltip": "Fontes de dados",
+  "reef_section_loadError": "Não foi possível carregar os dados do recife agora",
+  "reef_habitat_title": "Hábitat do recife",
+  "reef_habitat_onReef": "Em um recife de coral",
+  "reef_habitat_onReefWithThreat": "Em um recife de coral, nível de ameaça {threat}",
+  "reef_habitat_noReef": "Nenhum recife de coral mapeado nesta localização",
+  "reef_habitat_unavailable": "Não foi possível verificar o hábitat do recife agora",
+  "reef_health_title": "Saúde do recife",
+  "reef_health_unavailable": "Não foi possível verificar a saúde do recife agora",
+  "reef_health_noData": "Sem dados de saúde do recife para esta localização",
+  "reef_health_degreeHeatingWeeks": "Semanas de aquecimento {value} C-semanas",
+  "reef_health_seaSurface": "Superfície do mar {value}",
+  "reef_health_asOf": "Em {date}",
+  "reef_health_levelNoStress": "Sem estresse térmico",
+  "reef_health_levelWatch": "Vigilância de branqueamento",
+  "reef_health_levelWarning": "Aviso de branqueamento",
+  "reef_health_levelAlert1": "Alerta de branqueamento nível 1",
+  "reef_health_levelAlert2": "Alerta de branqueamento nível 2",
+  "reef_health_levelAlert3": "Alerta de branqueamento nível 3",
+  "reef_health_levelAlert4": "Alerta de branqueamento nível 4",
+  "reef_health_levelAlert5": "Alerta de branqueamento nível 5",
+  "reef_protection_title": "Área protegida",
+  "reef_protection_none": "Fora de área marinha protegida",
+  "reef_protection_unavailable": "Não foi possível verificar o estado de proteção agora",
+  "reef_protection_viewRegulations": "Ver regulamentos",
+  "reef_protection_iucn": "IUCN {category}",
+  "reef_species_recordedNearby": "Registrado nas proximidades",
+  "reef_species_addToExpected": "Adicionar às espécies esperadas",
+  "reef_attribution_title": "Fontes de dados do recife",
+  "reef_attribution_wri": "Presença de recife e nível de ameaça. CC BY 3.0.",
+  "reef_attribution_noaa": "Temperatura da superfície do mar e estresse térmico. Domínio público.",
+  "reef_attribution_gbif": "Registros de ocorrência de espécies, filtrados para CC0 e CC BY 4.0.",
+  "reef_attribution_protectedSeas": "Limites de áreas marinhas protegidas. CC BY 4.0.",
+  "settings_section_security_title": "Segurança do app",
+  "settings_section_security_subtitle": "Bloqueio do app e criptografia do banco de dados",
+  "settings_security_appLock": "Bloqueio do app",
+  "settings_security_appLock_subtitle": "Exigir sua senha ou biometria para abrir o app",
+  "settings_security_biometrics": "Desbloquear com biometria",
+  "settings_security_autoLock": "Bloqueio automático",
+  "settings_security_autoLock_immediately": "Imediatamente",
+  "settings_security_autoLock_minutes": "{minutes, plural, =1{Após 1 minuto} other{Após {minutes} minutos}}",
+  "@settings_security_autoLock_minutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "settings_security_autoLock_never": "Nunca",
+  "settings_security_encryption": "Criptografar banco de dados",
+  "settings_security_encryption_subtitle": "Proteja o arquivo do seu registro de mergulhos com criptografia em repouso",
+  "settings_security_encryption_progress_backup": "Criando backup de segurança...",
+  "settings_security_encryption_progress_encrypt": "Criptografando banco de dados...",
+  "settings_security_encryption_progress_decrypt": "Descriptografando banco de dados...",
+  "settings_security_encryption_progress_reopen": "Reabrindo banco de dados...",
+  "settings_security_changePassword": "Alterar senha",
+  "settings_security_regenerateRecovery": "Novo código de recuperação",
+  "settings_security_setPassword": "Definir senha do app",
+  "settings_security_password": "Senha",
+  "settings_security_confirmPassword": "Confirmar senha",
+  "settings_security_currentPassword": "Senha atual",
+  "settings_security_newPassword": "Nova senha",
+  "settings_security_passwordTooShort": "A senha deve ter pelo menos 4 caracteres.",
+  "settings_security_passwordMismatch": "As senhas não coincidem.",
+  "settings_security_wrongPassword": "Senha incorreta.",
+  "settings_security_recoveryCode_title": "Seu código de recuperação",
+  "settings_security_recoveryCode_explain": "Anote-o e guarde-o em local seguro. É a única forma de desbloquear o app se você esquecer sua senha, e ele substitui qualquer código de recuperação anterior.",
+  "settings_security_recoveryCode_savedConfirm": "Salvei meu código de recuperação",
+  "settings_security_disableBlockedByEncryption_title": "A criptografia está ativada",
+  "settings_security_disableBlockedByEncryption_body": "Desative a criptografia do banco de dados antes de desativar o bloqueio do app. O banco criptografado precisa de uma credencial.",
+  "settings_security_enableEncryption_title": "Criptografar o banco de dados?",
+  "settings_security_enableEncryption_body": "Primeiro é criado um backup de segurança e depois o arquivo do banco é recriptografado no local. Pode demorar com registros grandes.",
+  "settings_security_disableEncryption_title": "Desativar a criptografia?",
+  "settings_security_disableEncryption_body": "O arquivo do banco de dados voltará a ser armazenado sem criptografia no disco.",
+  "settings_security_turnOffAppLock_title": "Desativar o bloqueio do app?",
+  "settings_security_turnOffAppLock_body": "O app abrirá sem pedir sua senha.",
+  "settings_security_unlock_title": "Digite sua senha",
+  "settings_security_cancel": "Cancelar",
+  "settings_security_continue": "Continuar",
+  "settings_security_done": "Concluído",
+  "settings_security_turnOff": "Desativar"
 }

@@ -71,6 +71,10 @@ class Trips extends Table {
   TextColumn get tripType => text().withDefault(const Constant('shore'))();
   TextColumn get notes => text().withDefault(const Constant(''))();
   BoolColumn get isShared => boolean().withDefault(const Constant(false))();
+
+  /// Return flight departure, wall-clock-as-UTC epoch ms (v142). Drives the
+  /// remaining-dive-window countdown; null when the trip has no flight set.
+  IntColumn get returnFlightAt => integer().nullable()();
   IntColumn get createdAt => integer()();
   IntColumn get updatedAt => integer()();
 
@@ -1465,6 +1469,7 @@ class DiverSettings extends Table {
   TextColumn get altitudeUnit => text().withDefault(const Constant('meters'))();
   TextColumn get sacUnit =>
       text().withDefault(const Constant('litersPerMin'))();
+  TextColumn get defaultCurrency => text().withDefault(const Constant('USD'))();
   // Time/Date format settings
   TextColumn get timeFormat =>
       text().withDefault(const Constant('twelveHour'))();
@@ -1473,6 +1478,13 @@ class DiverSettings extends Table {
   TextColumn get themeMode => text().withDefault(const Constant('system'))();
   TextColumn get themePreset =>
       text().withDefault(const Constant('submersion'))();
+  // Color accents (optional per-surface icon tinting; all default off)
+  BoolColumn get accentNavIcons =>
+      boolean().withDefault(const Constant(false))();
+  BoolColumn get accentSectionHeaders =>
+      boolean().withDefault(const Constant(false))();
+  BoolColumn get accentListIcons =>
+      boolean().withDefault(const Constant(false))();
   // Locale (language preference: 'system', 'en', 'es', 'fr', etc.)
   TextColumn get locale => text().withDefault(const Constant('system'))();
   // Defaults
@@ -2109,29 +2121,93 @@ const String kSeedBuiltInServiceKindsSql = '''
     (id, diver_id, name, applicable_types, default_interval_days,
      default_interval_dives, default_interval_hours, auto_attach,
      is_built_in, created_at, updated_at)
-  SELECT t.id, NULL, t.name, t.types, t.days, t.dives, NULL, t.auto, 1,
+  SELECT t.id, NULL, t.name, t.types, t.days, t.dives, t.hours, t.auto, 1,
          n.now_ms, n.now_ms
   FROM (
     SELECT 'hydro' AS id, 'Hydrostatic test' AS name, '["tank"]' AS types,
-           1825 AS days, NULL AS dives, 1 AS auto
+           1825 AS days, NULL AS dives, NULL AS hours, 1 AS auto
     UNION ALL SELECT 'vip', 'Visual inspection (VIP)', '["tank"]',
-           365, NULL, 1
-    UNION ALL SELECT 'o2-clean', 'O2 clean', '["tank"]', 365, NULL, 0
+           365, NULL, NULL, 1
+    UNION ALL SELECT 'o2-clean', 'O2 clean', '["tank"]', 365, NULL, NULL, 0
     UNION ALL SELECT 'regulator-service', 'Regulator service',
-           '["regulator"]', 365, 100, 1
+           '["regulator"]', 365, 100, NULL, 1
     UNION ALL SELECT 'computer-battery', 'Computer battery', '["computer"]',
-           730, NULL, 1
+           730, NULL, NULL, 1
     UNION ALL SELECT 'transmitter-battery', 'Transmitter battery',
-           '["transmitter"]', 365, NULL, 1
+           '["transmitter"]', 365, NULL, NULL, 1
     UNION ALL SELECT 'bcd-inspection', 'BCD/wing inspection', '["bcd"]',
-           365, NULL, 1
+           365, NULL, NULL, 1
     UNION ALL SELECT 'drysuit-seals', 'Drysuit seals', '["drysuit"]',
-           730, NULL, 0
+           730, NULL, NULL, 0
+    -- A scrubber is consumed by loop time, not by the calendar, so this is
+    -- the only built-in with an hours-only clock. 3.0 h is conservative
+    -- across the 2-6 h range real units are rated for; the diver overrides
+    -- it per unit via ServiceSchedule.intervalHours.
+    UNION ALL SELECT 'scrubber-repack', 'Scrubber repack', '["rebreather"]',
+           NULL, NULL, 3.0, 1
+    UNION ALL SELECT 'o2-cell-replacement', 'O2 cell replacement',
+           '["rebreather"]', 365, NULL, NULL, 1
+    UNION ALL SELECT 'rebreather-annual', 'Rebreather annual service',
+           '["rebreather"]', 365, NULL, NULL, 1
     UNION ALL SELECT 'general-service', 'General service', '[]',
-           NULL, NULL, 0
+           NULL, NULL, NULL, 0
   ) t
   CROSS JOIN (SELECT CAST(strftime('%s','now') AS INTEGER) * 1000 AS now_ms) n
 ''';
+
+/// A named, reusable set of cylinders. equipment_id set means "a config for
+/// this rebreather"; null means a generic gas plan usable on any dive.
+/// ON DELETE SET NULL demotes a config when its unit is deleted rather than
+/// destroying a painstakingly entered bailout plan.
+class CylinderConfigs extends Table {
+  TextColumn get id => text()();
+  TextColumn get diverId => text().nullable().references(Divers, #id)();
+  TextColumn get equipmentId => text().nullable().references(
+    Equipment,
+    #id,
+    onDelete: KeyAction.setNull,
+  )();
+  TextColumn get name => text()();
+  TextColumn get description => text().withDefault(const Constant(''))();
+  IntColumn get sortOrder => integer().withDefault(const Constant(0))();
+  IntColumn get createdAt => integer()();
+  IntColumn get updatedAt => integer()();
+
+  /// Hybrid Logical Clock for cross-device conflict resolution
+  /// (nullable: rows written before HLC rollout fall back to updatedAt).
+  TextColumn get hlc => text().nullable()();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
+/// One cylinder in a configuration. The spec columns are a SNAPSHOT: a tank
+/// preset may populate them at edit time, but there is deliberately no FK to
+/// tank_presets. A config records what the diver actually dives, so a later
+/// edit to a preset must not rewrite the meaning of a saved config.
+class CylinderConfigItems extends Table {
+  TextColumn get id => text()();
+  TextColumn get configId =>
+      text().references(CylinderConfigs, #id, onDelete: KeyAction.cascade)();
+  IntColumn get sortOrder => integer().withDefault(const Constant(0))();
+  TextColumn get label => text().nullable()();
+  TextColumn get tankRole => text()(); // TankRole.name
+  RealColumn get volumeL => real().nullable()();
+  RealColumn get workingPressureBar => real().nullable()();
+  TextColumn get tankMaterial => text().nullable()(); // TankMaterial.name
+  RealColumn get o2Percent => real().withDefault(const Constant(21.0))();
+  RealColumn get hePercent => real().withDefault(const Constant(0.0))();
+  RealColumn get defaultStartPressureBar => real().nullable()();
+  IntColumn get createdAt => integer()();
+  IntColumn get updatedAt => integer()();
+
+  /// Hybrid Logical Clock for cross-device conflict resolution
+  /// (nullable: rows written before HLC rollout fall back to updatedAt).
+  TextColumn get hlc => text().nullable()();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}
 
 /// Custom tank presets (user-defined tank configurations)
 class TankPresets extends Table {
@@ -2845,6 +2921,8 @@ String legacyDataSourceId(String diveId) => '$kLegacyDataSourceIdPrefix$diveId';
     ConnectedAccounts,
     ServiceKinds,
     ServiceSchedules,
+    CylinderConfigs,
+    CylinderConfigItems,
   ],
 )
 class AppDatabase extends _$AppDatabase {
@@ -2854,7 +2932,7 @@ class AppDatabase extends _$AppDatabase {
 
   /// The current schema version as a static constant so that pre-open checks
   /// (e.g. version-mismatch guard) can reference it without an instance.
-  static const int currentSchemaVersion = 137;
+  static const int currentSchemaVersion = 142;
 
   /// Every schema version that has a migration block in onUpgrade.
   /// Used to calculate progress step counts. When adding a new migration,
@@ -3017,10 +3095,23 @@ class AppDatabase extends _$AppDatabase {
     // v134: media compressed-rendition columns (adjustable upload quality
     // Phase A). Renumbered from v130 as main advanced past it at merge time.
     134,
+    // v135: color accent toggle columns on diver_settings.
+    135,
     136,
     // v137: dives.weather_code, plus a one-time clear of the English weather
     // prose this app generated itself so it can be re-rendered localized.
     137,
+    // v138 is reserved by the divelogs.de branch (connected_accounts.diver_id).
+    // v139: cylinder_configs + cylinder_config_items (reusable diluent and
+    // bailout setups).
+    139,
+    // v140 is reserved by the media-section branch (media.retain_in_library).
+    // v141: diver_settings.default_currency (default currency for priced
+    // items). Renumbered from v138 and then v139 as those went to the
+    // divelogs.de branch and the cylinder configs respectively.
+    141,
+    // v142: trips.return_flight_at (return-flight dive-window countdown).
+    142,
   ];
 
   /// Idempotent DDL for the v106 connector-suggestion columns (Lightroom
@@ -3237,7 +3328,17 @@ class AppDatabase extends _$AppDatabase {
       'AND bottom_time = runtime',
     ).get();
 
+    var processed = 0;
     for (final candidate in candidates) {
+      // On an imported library nearly every dive is a candidate, and during a
+      // migration the executor is a synchronous main-isolate NativeDatabase:
+      // drift's awaits complete in microtasks, so this loop would run as one
+      // unbroken microtask chain that never reaches the timer/vsync queue —
+      // freezing the migration spinner for the whole step. A real event-loop
+      // yield every few dives lets the UI animate while the backfill runs.
+      if (processed++ % 25 == 24) {
+        await Future<void>.delayed(Duration.zero);
+      }
       final diveId = candidate.read<String>('id');
       final runtimeSeconds = candidate.read<int>('runtime');
 
@@ -3384,6 +3485,60 @@ class AppDatabase extends _$AppDatabase {
       'ON quality_findings (status)',
     );
   }
+
+  /// v139: cylinder configuration tables. CREATE TABLE IF NOT EXISTS, so this
+  /// is safe to call from both onUpgrade and the beforeOpen backstop
+  /// (parallel-branch version-collision self-heal).
+  ///
+  /// o2_percent / he_percent carry the same non-null defaults as dive_tanks
+  /// so a configuration cylinder is never in an "unset gas" state.
+  Future<void> _assertCylinderConfigSchema() async {
+    await customStatement('''
+      CREATE TABLE IF NOT EXISTS cylinder_configs (
+        id TEXT NOT NULL PRIMARY KEY,
+        diver_id TEXT REFERENCES divers (id),
+        equipment_id TEXT REFERENCES equipment (id) ON DELETE SET NULL,
+        name TEXT NOT NULL,
+        description TEXT NOT NULL DEFAULT '',
+        sort_order INTEGER NOT NULL DEFAULT 0,
+        created_at INTEGER NOT NULL,
+        updated_at INTEGER NOT NULL,
+        hlc TEXT
+      )
+    ''');
+    await customStatement('''
+      CREATE TABLE IF NOT EXISTS cylinder_config_items (
+        id TEXT NOT NULL PRIMARY KEY,
+        config_id TEXT NOT NULL
+          REFERENCES cylinder_configs (id) ON DELETE CASCADE,
+        sort_order INTEGER NOT NULL DEFAULT 0,
+        label TEXT,
+        tank_role TEXT NOT NULL,
+        volume_l REAL,
+        working_pressure_bar REAL,
+        tank_material TEXT,
+        o2_percent REAL NOT NULL DEFAULT 21.0,
+        he_percent REAL NOT NULL DEFAULT 0.0,
+        default_start_pressure_bar REAL,
+        created_at INTEGER NOT NULL,
+        updated_at INTEGER NOT NULL,
+        hlc TEXT
+      )
+    ''');
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_cylinder_configs_equipment '
+      'ON cylinder_configs (equipment_id)',
+    );
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_cylinder_config_items_config '
+      'ON cylinder_config_items (config_id)',
+    );
+  }
+
+  /// Test hook: re-assert the v139 tables on demand so tests can prove the
+  /// stranded-database self-heal path is idempotent.
+  Future<void> assertCylinderConfigSchemaForTest() =>
+      _assertCylinderConfigSchema();
 
   /// v127: pre-dive checklist tables. Migrator.createTable is IF NOT EXISTS,
   /// so this is safe to call from both onUpgrade and the beforeOpen backstop
@@ -3555,6 +3710,28 @@ class AppDatabase extends _$AppDatabase {
         'ALTER TABLE diver_settings ADD COLUMN default_deco_stop_source '
         'INTEGER NOT NULL DEFAULT 1',
       );
+    }
+  }
+
+  /// v135: color accent toggle columns on diver_settings. Idempotent; safe
+  /// to call from both onUpgrade and the beforeOpen backstop.
+  Future<void> _assertAccentColorSettingsColumns() async {
+    final cols = await customSelect(
+      "PRAGMA table_info('diver_settings')",
+    ).get();
+    if (cols.isEmpty) return;
+    final names = cols.map((c) => c.read<String>('name')).toSet();
+    for (final column in const [
+      'accent_nav_icons',
+      'accent_section_headers',
+      'accent_list_icons',
+    ]) {
+      if (!names.contains(column)) {
+        await customStatement(
+          'ALTER TABLE diver_settings ADD COLUMN $column '
+          'INTEGER NOT NULL DEFAULT 0 CHECK ($column IN (0, 1))',
+        );
+      }
     }
   }
 
@@ -3906,6 +4083,38 @@ class AppDatabase extends _$AppDatabase {
     if (!names.contains('weather_code')) {
       await customStatement(
         'ALTER TABLE dives ADD COLUMN weather_code INTEGER',
+      );
+    }
+  }
+
+  /// Idempotent DDL for the v141 diver_settings.default_currency column.
+  /// Called from the v141 onUpgrade step and the beforeOpen backstop, and
+  /// self-guarding when the table is absent (minimal migration-test fixtures).
+  Future<void> _assertDefaultCurrencyColumn() async {
+    final cols = await customSelect(
+      "PRAGMA table_info('diver_settings')",
+    ).get();
+    if (cols.isEmpty) return;
+    final names = cols.map((c) => c.read<String>('name')).toSet();
+    if (!names.contains('default_currency')) {
+      await customStatement(
+        "ALTER TABLE diver_settings ADD COLUMN default_currency TEXT NOT NULL DEFAULT 'USD'",
+      );
+    }
+  }
+
+  /// Idempotent DDL for the v142 return-flight column. Called from the v142
+  /// onUpgrade step and the beforeOpen backstop, matching the
+  /// _assertWeatherCodeColumn pattern so a schema-version collision cannot
+  /// strand a database without it. Self-guarding when the table is absent
+  /// (minimal migration-test fixtures).
+  Future<void> _assertTripReturnFlightColumn() async {
+    final cols = await customSelect("PRAGMA table_info('trips')").get();
+    if (cols.isEmpty) return;
+    final names = cols.map((c) => c.read<String>('name')).toSet();
+    if (!names.contains('return_flight_at')) {
+      await customStatement(
+        'ALTER TABLE trips ADD COLUMN return_flight_at INTEGER',
       );
     }
   }
@@ -7109,9 +7318,16 @@ class AppDatabase extends _$AppDatabase {
           await _assertMediaCompressedRenditionColumns();
         }
         if (from < 134) await reportProgress();
+        // v135: color accent toggle columns on diver_settings. Devices that
+        // upgraded through main's v136/v137 before this merge skipped 135;
+        // the beforeOpen backstop re-asserts the columns for them.
+        if (from < 135) {
+          await _assertAccentColorSettingsColumns();
+        }
+        if (from < 135) await reportProgress();
         // v136: media_stores.last_sweep_at (Verify Library fleet cadence).
-        // v135 is reserved by a parallel branch; deliberately skipped here,
-        // mirroring the v132-over-v131 precedent.
+        // v136 shipped while v135 was still on its branch, so a DB can be at
+        // 136+ without the accent columns; see the v135 note above.
         if (from < 136) {
           await _assertMediaStoresLastSweepColumn();
         }
@@ -7123,6 +7339,24 @@ class AppDatabase extends _$AppDatabase {
           await _clearGeneratedWeatherDescriptions();
         }
         if (from < 137) await reportProgress();
+        if (from < 139) {
+          await _assertCylinderConfigSchema();
+          await reportProgress();
+        }
+        // v141: default currency for priced items (e.g. equipment). A DB
+        // that upgraded past 141 on a parallel branch never enters this block;
+        // the beforeOpen backstop below is its only path to the column.
+        if (from < 141) {
+          await _assertDefaultCurrencyColumn();
+        }
+        if (from < 141) await reportProgress();
+        // v142: trips.return_flight_at (return-flight dive-window countdown).
+        // v138 (#603) and v140 (media section) are reserved by parallel
+        // branches; the beforeOpen backstop heals any DB stranded between.
+        if (from < 142) {
+          await _assertTripReturnFlightColumn();
+        }
+        if (from < 142) await reportProgress();
       },
       beforeOpen: (details) async {
         // Enable foreign keys
@@ -7143,6 +7377,9 @@ class AppDatabase extends _$AppDatabase {
 
         // v137 backstop: re-assert dives.weather_code.
         await _assertWeatherCodeColumn();
+
+        // v141 backstop: re-assert diver_settings.default_currency.
+        await _assertDefaultCurrencyColumn();
 
         // v106 backstop: re-assert connector-suggestion columns (the helper
         // is self-guarding when the suggestions table is absent).
@@ -7227,6 +7464,17 @@ class AppDatabase extends _$AppDatabase {
 
         // v133 backstop: re-assert the deco stop band settings columns.
         await _assertDecoStopSettingsColumns();
+
+        // v135 backstop: re-assert color accent toggle columns.
+        await _assertAccentColorSettingsColumns();
+
+        // v139 backstop: re-assert the cylinder configuration tables. A
+        // database stranded at any lower version by a parallel-branch
+        // version collision self-heals here.
+        await _assertCylinderConfigSchema();
+
+        // v142 backstop: re-assert trips.return_flight_at.
+        await _assertTripReturnFlightColumn();
 
         // Built-in dive types are reference data: identical on every device and
         // undeletable through DiveTypeRepository. Nothing else restores them --

@@ -4,9 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
+import 'package:submersion/core/providers/async_value_extensions.dart';
 import 'package:submersion/features/safety/domain/services/no_fly_service.dart';
 import 'package:submersion/features/safety/presentation/formatters/no_fly_format.dart';
+import 'package:submersion/features/safety/presentation/providers/flight_window_providers.dart';
 import 'package:submersion/features/safety/presentation/providers/no_fly_providers.dart';
+import 'package:submersion/features/safety/presentation/widgets/flight_window_card.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 
@@ -64,6 +67,20 @@ class _NoFlyPageState extends ConsumerState<NoFlyPage> {
               icon: Icons.hourglass_empty,
               text: l10n.common_label_loading,
             ),
+          // Forward-looking window for the active trip's return flight, if
+          // one is set. The page's minute ticker keeps the countdown fresh.
+          Builder(
+            builder: (context) {
+              final flight = ref
+                  .watch(activeTripFlightWindowProvider)
+                  .valueOrNull;
+              if (flight == null) return const SizedBox.shrink();
+              return Padding(
+                padding: const EdgeInsets.only(top: 8),
+                child: FlightWindowCard(status: flight),
+              );
+            },
+          ),
         ],
       ),
     );

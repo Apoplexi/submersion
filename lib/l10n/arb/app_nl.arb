@@ -4,6 +4,17 @@
   "diveLog_tank_saveAsPreset_nameTitle": "Flesvoorinstelling opslaan",
   "diveLog_tank_saveAsPreset_nameHint": "bijv. Mijn AL80",
   "diveLog_tank_saveAsPreset_saved": "Voorinstelling \"{name}\" opgeslagen",
+  "settings_units_defaultCurrency": "Standaardvaluta",
+  "settings_units_dialog_defaultCurrency": "Standaardvaluta",
+  "diveSites_list_menu_select": "Duikstekken selecteren",
+  "diveLog_edit_flightWindowWarning": "Deze duik eindigt na het laatste veilige opstijgmoment voor je vlucht ({time})",
+  "@diveLog_edit_flightWindowWarning": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
   "diveLog_edit_geofenceSuggestion_near": "Bij {location}",
   "diveLog_edit_geofenceSuggestion_title": "Uitrustingssuggestie",
   "diveLog_edit_geofenceSuggestion_body": "Set \"{setName}\" toepassen?",
@@ -852,9 +863,6 @@
     }
   },
   "preDive_dashboard_start": "Pre-dive check starten",
-  "tools_preDive_title": "Pre-dive checklists",
-  "tools_preDive_subtitle": "Checklistsessies uitvoeren en bekijken",
-  "tools_preDive_description": "Buddychecks, CCR-opbouwlijsten en het inpakken van uitrusting, met een audittrail",
   "trips_detail_preDive_action": "Pre-dive checklist",
   "settings_manage_preDiveChecklists": "Pre-dive checklists",
   "settings_manage_preDiveChecklists_subtitle": "Buddychecks, CCR-opbouwlijsten, uitrusting inpakken",
@@ -1233,11 +1241,16 @@
   "diveComputer_downloadStep_cancel": "Annuleren",
   "diveComputer_downloadStep_cancelled": "Download geannuleerd",
   "diveComputer_downloadStep_depthMeters": "{depth}m",
+  "diveComputer_downloadStep_downloadAll": "Alle duiken downloaden",
   "diveComputer_downloadStep_downloadFailed": "Download mislukt",
+  "diveComputer_downloadStep_downloadNew": "Nieuwe duiken downloaden",
   "diveComputer_downloadStep_downloadedDives": "Gedownloade duiken",
   "diveComputer_downloadStep_durationMin": "{duration} min",
   "diveComputer_downloadStep_errorOccurred": "Er is een fout opgetreden",
   "diveComputer_downloadStep_errorSemanticLabel": "Downloadfout: {error}",
+  "diveComputer_downloadStep_firstSyncBody": "Je logboek bevat al duiken. Je kunt het downloaden van duiken die je al hebt overslaan.",
+  "diveComputer_downloadStep_firstSyncTitle": "Eerste download van deze duikcomputer",
+  "diveComputer_downloadStep_onlyAfterDate": "Alleen duiken na {date} downloaden",
   "diveComputer_downloadStep_percentAccessibility": ", {percent} procent",
   "diveComputer_downloadStep_preparing": "Voorbereiden...",
   "diveComputer_downloadStep_progressPercent": "{percent}%",
@@ -1346,6 +1359,8 @@
   "diveDetailSection_tanks_description": "Flessenlijst, gasmixen, drukken, SAC per fles",
   "diveDetailSection_tanks_name": "Flessen",
   "diveDetailSection_tide_description": "Getijdecyclusgrafiek en timing",
+  "diveDetailSection_reefHealth_name": "Rifgezondheid",
+  "diveDetailSection_reefHealth_description": "Hittestress door koraalverbleking op de duikdatum",
   "diveDetailSection_tide_name": "Getij",
   "diveDetailSection_weights_description": "Gewichtsoverzicht, totaalgewicht",
   "diveDetailSection_buoyancy_name": "Drijfvermogen",
@@ -3224,6 +3239,42 @@
   "equipment_serviceClocks_overdueSince": "Achterstallig sinds {date}",
   "equipment_serviceClocks_overdue": "Te laat",
   "equipment_serviceClocks_divesLeft": "{remaining} van {total} duiken resterend",
+  "cylinderConfigs_title": "Flesconfiguraties",
+  "cylinderConfigs_empty": "Nog geen configuraties",
+  "cylinderConfigs_emptyBody": "Sla een diluent- en bailout-opstelling één keer op en pas hem toe op elke duik.",
+  "cylinderConfigs_new": "Nieuwe configuratie",
+  "cylinderConfigs_name": "Naam",
+  "cylinderConfigs_nameRequired": "Voer een naam in",
+  "cylinderConfigs_forUnit": "Voor unit",
+  "cylinderConfigs_noUnit": "Algemeen gasplan",
+  "cylinderConfigs_gasPlans": "Gasplannen",
+  "cylinderConfigs_addCylinder": "Fles toevoegen",
+  "cylinderConfigs_role": "Rol",
+  "cylinderConfigs_startPressure": "Begindruk",
+  "cylinderConfigs_label": "Label",
+  "cylinderConfigs_fromPreset": "Uit voorinstelling",
+  "cylinderConfigs_deleteTitle": "Configuratie verwijderen?",
+  "cylinderConfigs_deleteBody": "Duiken waarop hij al is toegepast veranderen niet.",
+  "cylinderConfigs_applyAction": "Configuratie toepassen",
+  "cylinderConfigs_applyAdded": "{count, plural, =1{1 fles toegevoegd} other{{count} flessen toegevoegd}}",
+  "@cylinderConfigs_applyAdded": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "cylinderConfigs_applyKept": "{count, plural, =1{1 behouden} other{{count} behouden}}",
+  "@cylinderConfigs_applyKept": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "cylinderConfigs_applyNothingToDo": "Deze duik komt al overeen met de configuratie",
+  "cylinderConfigs_sectionTitle": "Configuraties",
+  "equipment_serviceClocks_hoursSource": "Berekend op basis van geregistreerde duiktijd",
   "equipment_serviceClocks_hoursLeft": "{remaining} van {total} uur resterend",
   "equipment_serviceClocks_manageKinds": "Servicetypen beheren",
   "equipment_serviceClocks_appliesToClock": "Gekoppeld aan interval",
@@ -3373,6 +3424,7 @@
   "equipment_serviceDialog_clearNextServiceDateTooltip": "Volgende servicedatum wissen",
   "equipment_serviceDialog_costHint": "0,00",
   "equipment_serviceDialog_costLabel": "Kosten",
+  "equipment_serviceDialog_currencyLabel": "Valuta",
   "equipment_serviceDialog_costValidation": "Voer een geldig bedrag in",
   "equipment_serviceDialog_editTitle": "Servicerecord bewerken",
   "equipment_serviceDialog_nextServiceDueLabel": "Volgende service gepland",
@@ -3987,6 +4039,7 @@
   "settings_about_header": "Over",
   "settings_about_openSourceLicenses": "Open source-licenties",
   "settings_about_reportIssue": "Probleem melden",
+  "settings_about_reportIssue_copy": "Link kopiëren",
   "settings_about_reportIssue_snackbar": "Ga naar github.com/submersion-app/submersion/issues",
   "settings_about_version": "Versie {version}",
   "settings_appBar_title": "Instellingen",
@@ -4053,6 +4106,8 @@
   "settings_appearance_pressureThresholdMarkers": "Drukdrempelmarkeringen",
   "settings_appearance_pressureThresholdMarkers_subtitle": "Toon markeringen wanneer flesdruk drempels overschrijdt",
   "settings_appearance_pressureThresholdMarkers_subtitleFull": "Toon markeringen wanneer flesdruk de 2/3, 1/2 en 1/3 drempels overschrijdt",
+  "settings_appearance_metricsFollowViewport": "Overlays in beeld houden bij zoomen",
+  "settings_appearance_metricsFollowViewport_subtitle": "Overlays zoals NDL en ppO2 aanpassen aan het zichtbare gebied in plaats van ze mee te vergroten met de diepteas",
   "settings_appearance_rightYAxisMetric": "Metriek rechter Y-as",
   "settings_appearance_rightYAxisMetric_subtitle": "Standaardmetriek getoond op de rechter as",
   "settings_appearance_subsection_decompressionMetrics": "Decompressiemetrieken",
@@ -4104,6 +4159,7 @@
   "settings_cloudSync_header_syncBehavior": "Synchronisatiegedrag",
   "settings_cloudSync_lastSynced": "Laatst gesynchroniseerd: {time}",
   "settings_cloudSync_pendingChanges": "{count, plural, =1{1 wachtende wijziging} other{{count} wachtende wijzigingen}}",
+  "settings_cloudSync_peerRequiresUpdate_banner": "{count, plural, =1{1 apparaat synchroniseert vanaf een nieuwere versie van Submersion. Werk dit apparaat bij om de nieuwste wijzigingen ervan te ontvangen.} other{{count} apparaten synchroniseren vanaf een nieuwere versie van Submersion. Werk dit apparaat bij om hun nieuwste wijzigingen te ontvangen.}}",
   "settings_cloudSync_provider_connected": "Verbonden",
   "settings_cloudSync_provider_connectedTo": "Verbonden met {providerName}",
   "settings_cloudSync_provider_connectionFailed": "Verbinding met {providerName} mislukt: {error}",
@@ -4531,6 +4587,65 @@
   "settings_units_weight": "Gewicht",
   "settings_units_weight_kilograms": "Kilogram (kg)",
   "settings_units_weight_pounds": "Pond (lbs)",
+  "settings_updates_automaticUpdates": "Automatische updates",
+  "settings_updates_automaticUpdatesSubtitle": "Periodiek controleren op updates",
+  "settings_updates_betaDialogBody": "Bètabuilds worden bij elke wijziging gepubliceerd en kunnen de database van je duiklogboek upgraden vóór de stabiele versie. Later terugschakelen naar stabiel zet de app niet terug naar een oudere versie, en alle apparaten die met elkaar synchroniseren moeten hetzelfde kanaal gebruiken. Vóór elke database-upgrade wordt automatisch een back-up gemaakt.",
+  "settings_updates_betaDialogConfirm": "Overschakelen naar bèta",
+  "settings_updates_betaDialogTitle": "Bèta-updates ontvangen?",
+  "settings_updates_channel": "Updatekanaal",
+  "settings_updates_channelBadgeBeta": "{version} (Bèta)",
+  "@settings_updates_channelBadgeBeta": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "settings_updates_channelBeta": "Bèta",
+  "settings_updates_channelBetaSubtitle": "Nieuwe builds bij elke wijziging, vóór de stabiele versie",
+  "settings_updates_channelStable": "Stabiel",
+  "settings_updates_channelStableSubtitle": "Alleen geteste releases",
+  "settings_updates_checkForUpdates": "Controleren op updates",
+  "settings_updates_checking": "Controleren...",
+  "settings_updates_downloading": "Downloaden... {progress}%",
+  "@settings_updates_downloading": {
+    "placeholders": {
+      "progress": {
+        "type": "String"
+      }
+    }
+  },
+  "settings_updates_error": "Fout: {message}",
+  "@settings_updates_error": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "settings_updates_header": "Updates",
+  "settings_updates_joinBeta": "Doe mee aan de bèta",
+  "settings_updates_joinBetaSubtitle": "Krijg nieuwe functies eerder via het bètaprogramma",
+  "settings_updates_lastChecked": "Laatst gecontroleerd",
+  "settings_updates_never": "Nooit",
+  "settings_updates_readyToInstall": "Versie {version} klaar om te installeren",
+  "@settings_updates_readyToInstall": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "settings_updates_stableSwitchNotice": "Je blijft op deze bèta totdat de volgende stabiele versie nieuwer is.",
+  "settings_updates_upToDate": "Up-to-date",
+  "settings_updates_versionAvailable": "Versie {version} beschikbaar",
+  "@settings_updates_versionAvailable": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
   "signatures_action_clear": "Wissen",
   "signatures_action_closeSignatureView": "Handtekeningweergave sluiten",
   "signatures_action_deleteSignature": "Handtekening verwijderen",
@@ -4873,6 +4988,7 @@
   "tags_empty": "Nog geen tags. Maak tags aan bij het bewerken van duiken.",
   "tags_hint_addMoreTags": "Meer tags toevoegen...",
   "importWizard_tagsLabel": "Tags",
+  "importWizard_review_olderDivesSkipped": "{count, plural, one{1 oudere duik overgeslagen — al in je logboek} other{{count} oudere duiken overgeslagen — al in je logboek}}",
   "tags_hint_addTags": "Tags toevoegen...",
   "tags_manage_bulkDeleteMessage": "Deze tags worden verwijderd van in totaal {diveCount, plural, =0{0 duiken} =1{1 duik} other{{diveCount} duiken}}. Dit kan niet ongedaan worden gemaakt.",
   "tags_manage_bulkDeleteTitle": "{count} tags verwijderen?",
@@ -5011,23 +5127,14 @@
   "tides_semantic_tideCycle": "Getijdencyclus, status: {state}, hoogte: {height}",
   "tides_semantic_tideState": "Getijdenstatus: {state}",
   "tides_title": "Getijden",
-  "tools_deco_description": "Bereken no-decompressielimieten, vereiste decostops en CNS/OTU-blootstelling voor duikprofielen op meerdere niveaus.",
-  "tools_deco_subtitle": "Plan duiken met decostops",
-  "tools_deco_title": "Decocalculator",
-  "tools_disclaimer": "Deze calculators zijn alleen bedoeld voor planningsdoeleinden. Controleer berekeningen altijd en volg je duikopleiding.",
-  "tools_gas_description": "Vier gespecialiseerde gascalculators:\n• MOD - Maximale werkdiepte voor een gasmengsel\n• Beste mix - Ideaal O2% voor een doeldiepte\n• Verbruik - Schatting gasverbruik\n• Rock Bottom - Berekening noodreserve",
-  "tools_gas_subtitle": "MOD, Beste mix, Verbruik, Rock Bottom",
-  "tools_gas_title": "Gascalculators",
   "tools_gpsLogger_description": "Registreer je positie tijdens een duikdag en koppel geïmporteerde duiken automatisch aan GPS-locaties.",
   "tools_gpsLogger_subtitle": "Neem een oppervlaktetrack op",
   "tools_gpsLogger_title": "GPS-logger",
-  "tools_title": "Gereedschap",
   "tools_weight_aluminumImperial": "Meer drijvend wanneer leeg (+4 lbs)",
   "tools_weight_aluminumMetric": "Meer drijvend wanneer leeg (+2 kg)",
   "tools_weight_bodyWeightOptional": "Lichaamsgewicht (optioneel)",
   "tools_weight_carbonFiberImperial": "Zeer drijvend (+7 lbs)",
   "tools_weight_carbonFiberMetric": "Zeer drijvend (+3 kg)",
-  "tools_weight_description": "Schat het gewicht dat je nodig hebt op basis van je duikpak, flesmateriaal, watertype en lichaamsgewicht.",
   "tools_weight_disclaimer": "Dit is slechts een schatting. Voer altijd een drijfproef uit aan het begin van je duik en pas aan waar nodig. Factoren zoals trimvest, persoonlijke drijfkracht en adempatronen beinvloeden je werkelijke gewichtsbehoefte.",
   "tools_weight_exposureSuit": "Duikpak",
   "tools_weight_gasCapacity": "• Gascapaciteit: {capacity} cuft",
@@ -5038,7 +5145,6 @@
   "tools_weight_resultAccessibility": "Aanbevolen gewicht: {weight} {unit}",
   "tools_weight_steelImperial": "Negatief drijvend (-4 lbs)",
   "tools_weight_steelMetric": "Negatief drijvend (-2 kg)",
-  "tools_weight_subtitle": "Aanbevolen gewicht voor je opstelling",
   "tools_weight_tankMaterial": "Flesmateriaal",
   "tools_weight_tankSpecifications": "Flesspecificaties",
   "tools_weight_title": "Gewichtscalculator",
@@ -5058,6 +5164,14 @@
   "transfer_computers_loading": "Laden...",
   "transfer_computers_manageTitle": "Computers beheren",
   "transfer_computers_noComputersSaved": "Geen computers opgeslagen",
+  "transfer_computers_diveCount": "{count, plural, =1{1 duik} other{{count} duiken}}",
+  "transfer_computers_downloadTooltip": "Duiken downloaden",
+  "transfer_computers_knownComputersHeader": "Bekende computers",
+  "transfer_computers_lastDownloadDaysAgo": "{days} dagen geleden",
+  "transfer_computers_lastDownloadHoursAgo": "{hours, plural, =1{1 uur geleden} other{{hours} uur geleden}}",
+  "transfer_computers_lastDownloadMinutesAgo": "{minutes} min geleden",
+  "transfer_computers_lastDownloadNever": "Nooit",
+  "transfer_computers_lastDownloadYesterday": "Gisteren",
   "transfer_computers_savedCount": "{count} opgeslagen {count, plural, =1{computer} other{computers}}",
   "transfer_computers_sectionHeader": "Duikcomputers",
   "transfer_csvExport_cancelButton": "Annuleren",
@@ -5232,6 +5346,9 @@
   "trips_edit_label_notes": "Notities",
   "trips_edit_label_operatorName": "Operator / Charter",
   "trips_edit_label_resortName": "Resortnaam",
+  "trips_edit_label_returnFlight": "Terugvlucht",
+  "trips_edit_returnFlightClear": "Terugvlucht wissen",
+  "trips_edit_returnFlightNotSet": "Niet ingesteld",
   "trips_edit_label_startDate": "Startdatum",
   "trips_edit_label_tripName": "Reisnaam *",
   "trips_edit_label_tripType": "Trip Type",
@@ -5576,7 +5693,9 @@
   "settings_dataSources_appleHealth_importAction": "Import from Apple Watch",
   "settings_dataSources_appleHealth_privacy": "Your health data is stored locally and is never shared with third parties.",
   "settings_dataSources_noSources": "No data source integrations are available on this platform.",
+  "diveLog_chartOption_metricsFollowViewport": "Overlays in beeld houden",
   "diveLog_chartSection_decompression": "Decompressie",
+  "diveLog_chartSection_display": "Weergave",
   "diveLog_chartSection_gasAnalysis": "Gasanalyse",
   "diveLog_chartSection_markers": "Markeringen",
   "diveLog_chartSection_other": "Overig",
@@ -5600,6 +5719,7 @@
   "diveComputer_download_newDivesOnlyTitle": "Alleen nieuwe duiken downloaden",
   "diveComputer_download_upToDate": "Geen nieuwe duiken gevonden -- je logboek is up-to-date",
   "diveLog_edit_section_environment": "Omgeving",
+  "diveLog_edit_subsection_autofill": "Automatisch invullen",
   "diveLog_edit_subsection_weather": "Weer",
   "diveLog_edit_subsection_diveConditions": "Duikomstandigheden",
   "diveLog_edit_label_windSpeed": "Windsnelheid",
@@ -5661,12 +5781,25 @@
   "dashboard_gauges_insuranceExpired": "Verzekering verlopen",
   "dashboard_gauges_noInsurance": "Geen verzekering geregistreerd",
   "dashboard_gauges_noFlyClear": "Vliegverbod 0:00",
+  "dashboard_gauges_flightWindow": "Duikvenster {hours}:{minutes}",
+  "@dashboard_gauges_flightWindow": {
+    "placeholders": {
+      "hours": {
+        "type": "String"
+      },
+      "minutes": {
+        "type": "String"
+      }
+    }
+  },
+  "dashboard_gauges_flightWindowClosed": "Niet meer duiken vóór de vlucht",
   "dashboard_gauges_noFlyRemaining": "Vliegverbod {hours}:{minutes}",
   "dashboard_gauges_lastDiveDays": "Laatste duik {days}d geleden",
   "dashboard_gauges_lastDiveToday": "Vandaag gedoken",
   "dashboard_gauges_noDivesYet": "Nog geen duiken",
   "settings_homeChips_pageTitle": "Statuschips van start",
   "settings_homeChips_description": "Kies welke statuschips bovenaan het tabblad Start verschijnen.",
+  "settings_homeChips_flightWindow": "Duikvenster voor vlucht",
   "settings_homeChips_gear": "Uitrustingsonderhoud",
   "settings_homeChips_insurance": "Verzekering",
   "settings_homeChips_noFly": "Vliegverbod-timer",
@@ -5689,7 +5822,7 @@
   "dashboard_gauges_backupDays": "Back-up {days}d geleden",
   "dashboard_gauges_syncPending": "{count} niet gesynchroniseerd",
   "dashboard_gauges_synced": "Gesynchroniseerd",
-  "dashboard_gauges_dataIssues": "{count} dataproblemen",
+  "dashboard_gauges_dataIssues": "{count, plural, =1{1 dataprobleem} other{{count} dataproblemen}}",
   "dashboard_gauges_retry": "Status niet beschikbaar - tik om opnieuw te proberen",
   "dashboard_urgent_title": "Vereist aandacht",
   "dashboard_photos_title": "Recente foto's",
@@ -5738,6 +5871,13 @@
   "listViewMode_table": "Tabel",
   "settings_appearance_general": "Algemeen",
   "settings_appearance_sections": "Secties",
+  "settings_appearance_colorAccents": "Kleuraccenten",
+  "settings_appearance_accentNavIcons": "Gekleurde navigatiepictogrammen",
+  "settings_appearance_accentNavIcons_subtitle": "Pictogrammen in het hoofdmenu kleuren met de kleur van elk onderdeel",
+  "settings_appearance_accentSectionHeaders": "Gekleurde sectiekoppen",
+  "settings_appearance_accentSectionHeaders_subtitle": "Een gekleurd sectiepictogram naast paginatitels tonen",
+  "settings_appearance_accentListIcons": "Gekleurde lijstpictogrammen",
+  "settings_appearance_accentListIcons_subtitle": "Pictogrammen in lijsten en instellingenpagina's kleuren",
   "settings_appearance_showDetailsPane": "Detailvenster tonen",
   "settings_appearance_showDetailsPane_subtitle": "Detailvenster naast de tabel weergeven",
   "settings_appearance_showProfilePanel": "Profielpaneel tonen in tabelweergave",
@@ -5753,6 +5893,9 @@
   "universalImport_dive_decideAction": "Beslissen",
   "universalImport_label_consolidate": "Consolideren",
   "universalImport_label_importAsNew": "Als nieuw importeren",
+  "universalImport_entityAction_linkBadge": "KOPPEL",
+  "universalImport_entityAction_linkExisting": "Koppelen aan bestaande",
+  "universalImport_entityAction_linkExistingSubtitle": "Gebruik het overeenkomende record",
   "universalImport_pending_chooseAction": "Kies een actie",
   "universalImport_pending_gateHint": "{count} duplicaat/duplicaten vereist een beslissing",
   "universalImport_pending_needsDecision": "Beslissing nodig",
@@ -6235,6 +6378,24 @@
   "attrLabel_sole_type": "Zool",
   "attrLabel_buoyancy_kg": "Drijfvermogen",
   "attrLabel_dry_weight_kg": "Drooggewicht",
+  "attrLabel_unit_type": "Type unit",
+  "attrLabel_mount_configuration": "Montage",
+  "attrLabel_scrubber_type": "Type scrubber",
+  "attrLabel_scrubber_duration_h": "Scrubberduur (u)",
+  "attrLabel_o2_cell_count": "O2-cellen",
+  "attrLabel_diluent_cylinder_l": "Diluentfles",
+  "attrLabel_o2_cylinder_l": "O2-fles",
+  "attrChoice_unit_type_eccr": "Elektronische CCR (eCCR)",
+  "attrChoice_unit_type_mccr": "Handmatige CCR (mCCR)",
+  "attrChoice_unit_type_hccr": "Hybride CCR (hCCR)",
+  "attrChoice_unit_type_scr_cmf": "SCR - constante massastroom",
+  "attrChoice_unit_type_scr_pascr": "SCR - passieve toevoeging",
+  "attrChoice_unit_type_scr_escr": "SCR - elektronisch geregeld",
+  "attrChoice_mount_configuration_back": "Rugmontage",
+  "attrChoice_mount_configuration_chest": "Borstmontage",
+  "attrChoice_mount_configuration_sidemount": "Sidemount",
+  "attrChoice_scrubber_type_axial": "Axiaal",
+  "attrChoice_scrubber_type_radial": "Radiaal",
   "attrChoice_suit_style_full": "Volledig pak",
   "attrChoice_suit_style_shorty": "Shorty",
   "attrChoice_suit_style_two_piece": "Tweedelig",
@@ -6423,6 +6584,32 @@
   "safetySettings_noFlyPreset_standard": "Standaard (12/18/24 u)",
   "safetySettings_noFlyPreset_strict": "Strikt (18/24/48 u)",
   "safetySettings_noFlyPreset_subtitle": "Richttijden na een enkele duik zonder deco, herhalingsduiken en decoduiken",
+  "flightWindow_closed": "Niet meer duiken vóór je vlucht",
+  "flightWindow_conflict": "Je no-flytijd loopt door tot na je vertrek",
+  "flightWindow_departs": "Vlucht vertrekt {time}",
+  "@flightWindow_departs": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "flightWindow_openTitle": "Resterende duiktijd: {remaining}",
+  "@flightWindow_openTitle": {
+    "placeholders": {
+      "remaining": {
+        "type": "String"
+      }
+    }
+  },
+  "flightWindow_surfaceBy": "Boven water vóór {time}",
+  "@flightWindow_surfaceBy": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
   "safetyHub_noFly_active_title": "Vliegverbod: nog {remaining}",
   "@safetyHub_noFly_active_title": {
     "placeholders": {
@@ -6709,5 +6896,87 @@
   "settings_mediaStorage_quality_reuploadQueued": "Opnieuw uploaden in wachtrij",
   "settings_mediaStorage_quality_linuxFfmpegHint": "Installeer ffmpeg om videocompressie in te schakelen. Tot die tijd worden originelen geüpload.",
   "settings_mediaStorage_quality_saveFailed": "Kan de uploadkwaliteit niet opslaan. Probeer het opnieuw.",
-  "settings_mediaStorage_quality_noTranscoderHint": "Dit apparaat kan geen video comprimeren. Vanaf dit apparaat worden originelen geüpload."
+  "settings_mediaStorage_quality_noTranscoderHint": "Dit apparaat kan geen video comprimeren. Vanaf dit apparaat worden originelen geüpload.",
+  "reef_section_title": "Rif",
+  "reef_section_sourcesTooltip": "Gegevensbronnen",
+  "reef_section_loadError": "Rifgegevens konden nu niet worden geladen",
+  "reef_habitat_title": "Rifhabitat",
+  "reef_habitat_onReef": "Op een koraalrif",
+  "reef_habitat_onReefWithThreat": "Op een koraalrif, dreigingsniveau {threat}",
+  "reef_habitat_noReef": "Geen gekarteerd koraalrif op deze locatie",
+  "reef_habitat_unavailable": "Rifhabitat kon nu niet worden gecontroleerd",
+  "reef_health_title": "Rifgezondheid",
+  "reef_health_unavailable": "Rifgezondheid kon nu niet worden gecontroleerd",
+  "reef_health_noData": "Geen rifgezondheidsgegevens voor deze locatie",
+  "reef_health_degreeHeatingWeeks": "Degree Heating Weeks {value} C-weken",
+  "reef_health_seaSurface": "Zeeoppervlak {value}",
+  "reef_health_asOf": "Per {date}",
+  "reef_health_levelNoStress": "Geen hittestress",
+  "reef_health_levelWatch": "Verbleking waakzaamheid",
+  "reef_health_levelWarning": "Verbleking waarschuwing",
+  "reef_health_levelAlert1": "Verblekingsalarm niveau 1",
+  "reef_health_levelAlert2": "Verblekingsalarm niveau 2",
+  "reef_health_levelAlert3": "Verblekingsalarm niveau 3",
+  "reef_health_levelAlert4": "Verblekingsalarm niveau 4",
+  "reef_health_levelAlert5": "Verblekingsalarm niveau 5",
+  "reef_protection_title": "Beschermd gebied",
+  "reef_protection_none": "Niet in een beschermd zeegebied",
+  "reef_protection_unavailable": "Beschermingsstatus kon nu niet worden gecontroleerd",
+  "reef_protection_viewRegulations": "Regels bekijken",
+  "reef_protection_iucn": "IUCN {category}",
+  "reef_species_recordedNearby": "In de buurt geregistreerd",
+  "reef_species_addToExpected": "Toevoegen aan verwachte soorten",
+  "reef_attribution_title": "Rifgegevensbronnen",
+  "reef_attribution_wri": "Rifaanwezigheid en dreigingsniveau. CC BY 3.0.",
+  "reef_attribution_noaa": "Zeeoppervlaktetemperatuur en hittestress. Publiek domein.",
+  "reef_attribution_gbif": "Waarnemingen van soorten, gefilterd op CC0 en CC BY 4.0.",
+  "reef_attribution_protectedSeas": "Grenzen van beschermde zeegebieden. CC BY 4.0.",
+  "settings_section_security_title": "App-beveiliging",
+  "settings_section_security_subtitle": "App-vergrendeling & databaseversleuteling",
+  "settings_security_appLock": "App-vergrendeling",
+  "settings_security_appLock_subtitle": "Vereis je wachtwoord of biometrie om de app te openen",
+  "settings_security_biometrics": "Ontgrendelen met biometrie",
+  "settings_security_autoLock": "Automatisch vergrendelen",
+  "settings_security_autoLock_immediately": "Onmiddellijk",
+  "settings_security_autoLock_minutes": "{minutes, plural, =1{Na 1 minuut} other{Na {minutes} minuten}}",
+  "@settings_security_autoLock_minutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "settings_security_autoLock_never": "Nooit",
+  "settings_security_encryption": "Database versleutelen",
+  "settings_security_encryption_subtitle": "Bescherm je duiklogbestand met versleuteling in rust",
+  "settings_security_encryption_progress_backup": "Veiligheidsback-up maken...",
+  "settings_security_encryption_progress_encrypt": "Database versleutelen...",
+  "settings_security_encryption_progress_decrypt": "Database ontsleutelen...",
+  "settings_security_encryption_progress_reopen": "Database opnieuw openen...",
+  "settings_security_changePassword": "Wachtwoord wijzigen",
+  "settings_security_regenerateRecovery": "Nieuwe herstelcode",
+  "settings_security_setPassword": "App-wachtwoord instellen",
+  "settings_security_password": "Wachtwoord",
+  "settings_security_confirmPassword": "Bevestig wachtwoord",
+  "settings_security_currentPassword": "Huidig wachtwoord",
+  "settings_security_newPassword": "Nieuw wachtwoord",
+  "settings_security_passwordTooShort": "Het wachtwoord moet minimaal 4 tekens bevatten.",
+  "settings_security_passwordMismatch": "De wachtwoorden komen niet overeen.",
+  "settings_security_wrongPassword": "Onjuist wachtwoord.",
+  "settings_security_recoveryCode_title": "Je herstelcode",
+  "settings_security_recoveryCode_explain": "Schrijf deze op en bewaar hem veilig. Het is de enige manier om de app te ontgrendelen als je je wachtwoord vergeet, en hij vervangt elke eerdere herstelcode.",
+  "settings_security_recoveryCode_savedConfirm": "Ik heb mijn herstelcode opgeslagen",
+  "settings_security_disableBlockedByEncryption_title": "Versleuteling is ingeschakeld",
+  "settings_security_disableBlockedByEncryption_body": "Schakel eerst de databaseversleuteling uit voordat je de app-vergrendeling uitschakelt. De versleutelde database heeft een toegangscode nodig.",
+  "settings_security_enableEncryption_title": "Database versleutelen?",
+  "settings_security_enableEncryption_body": "Er wordt eerst een veiligheidsback-up gemaakt, daarna wordt het databasebestand ter plekke opnieuw versleuteld. Dit kan even duren bij grote logboeken.",
+  "settings_security_disableEncryption_title": "Versleuteling uitschakelen?",
+  "settings_security_disableEncryption_body": "Het databasebestand wordt weer onversleuteld op schijf opgeslagen.",
+  "settings_security_turnOffAppLock_title": "App-vergrendeling uitschakelen?",
+  "settings_security_turnOffAppLock_body": "De app opent voortaan zonder om je wachtwoord te vragen.",
+  "settings_security_unlock_title": "Voer je wachtwoord in",
+  "settings_security_cancel": "Annuleren",
+  "settings_security_continue": "Doorgaan",
+  "settings_security_done": "Klaar",
+  "settings_security_turnOff": "Uitschakelen"
 }

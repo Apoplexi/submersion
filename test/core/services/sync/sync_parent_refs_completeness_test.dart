@@ -32,6 +32,8 @@ void main() {
     'equipment_sets': 'equipmentSets',
     'equipment_set_items': 'equipmentSetItems',
     'equipment_set_geofences': 'equipmentSetGeofences',
+    'cylinder_configs': 'cylinderConfigs',
+    'cylinder_config_items': 'cylinderConfigItems',
     'quality_findings': 'qualityFindings',
     'dive_types': 'diveTypes',
     'tank_presets': 'tankPresets',

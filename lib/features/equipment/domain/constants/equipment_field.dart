@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 
 import 'package:submersion/core/constants/enums.dart';
+import 'package:submersion/core/utils/currency.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/equipment/domain/entities/equipment_item.dart';
 import 'package:submersion/features/equipment/domain/entities/service_clock_status.dart';
@@ -257,7 +257,7 @@ class EquipmentFieldAdapter
       EquipmentField.status => (value as EquipmentStatus).displayName,
       EquipmentField.isActive => (value as bool) ? 'Yes' : 'No',
       EquipmentField.purchaseDate => units.formatDate(value as DateTime),
-      EquipmentField.purchasePrice => _formatPrice(value as double),
+      EquipmentField.purchasePrice => _formatPrice(value as double, units),
       EquipmentField.lastServiceDate => units.formatDate(value as DateTime),
       EquipmentField.nextServiceDue => units.formatDate(value as DateTime),
       EquipmentField.daysUntilService => _formatDaysUntilService(value as int),
@@ -266,8 +266,10 @@ class EquipmentFieldAdapter
     };
   }
 
-  String _formatPrice(double price) {
-    return NumberFormat.currency(symbol: r'$', decimalDigits: 2).format(price);
+  String _formatPrice(double price, UnitFormatter units) {
+    // No per-item currency in this configurable-column context; use the
+    // diver's default currency instead of a hardcoded '$'.
+    return formatMoney(price, units.settings.defaultCurrency);
   }
 
   String _formatDaysUntilService(int days) {

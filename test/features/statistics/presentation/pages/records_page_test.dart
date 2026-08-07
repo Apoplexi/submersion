@@ -30,6 +30,18 @@ class _MockSettingsNotifier extends StateNotifier<AppSettings>
   _MockSettingsNotifier() : super(const AppSettings());
 
   @override
+  Future<void> setAccentNavIcons(bool value) async =>
+      state = state.copyWith(accentNavIcons: value);
+
+  @override
+  Future<void> setAccentSectionHeaders(bool value) async =>
+      state = state.copyWith(accentSectionHeaders: value);
+
+  @override
+  Future<void> setAccentListIcons(bool value) async =>
+      state = state.copyWith(accentListIcons: value);
+
+  @override
   Future<void> setChamberHidden(String chamberId, bool hidden) async {
     final ids = {...state.hiddenChamberIds};
     if (hidden) {
@@ -73,6 +85,10 @@ class _MockSettingsNotifier extends StateNotifier<AppSettings>
   @override
   Future<void> setSacUnit(SacUnit unit) async =>
       state = state.copyWith(sacUnit: unit);
+
+  @override
+  Future<void> setDefaultCurrency(String currencyCode) async =>
+      state = state.copyWith(defaultCurrency: currencyCode);
   @override
   Future<void> setAltitudeUnit(AltitudeUnit unit) async =>
       state = state.copyWith(altitudeUnit: unit);
@@ -390,6 +406,10 @@ class _MockSettingsNotifier extends StateNotifier<AppSettings>
         fullscreenReadoutCardX: x,
         fullscreenReadoutCardY: y,
       );
+
+  @override
+  Future<void> setProfileMetricsFollowViewport(bool value) async =>
+      state = state.copyWith(profileMetricsFollowViewport: value);
 
   @override
   Future<void> setPerdixOverlayEnabled(bool value) async =>

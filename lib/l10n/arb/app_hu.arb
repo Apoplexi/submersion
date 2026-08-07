@@ -4,6 +4,17 @@
   "diveLog_tank_saveAsPreset_nameTitle": "Palack előre beállítás mentése",
   "diveLog_tank_saveAsPreset_nameHint": "pl. Az én AL80-am",
   "diveLog_tank_saveAsPreset_saved": "\"{name}\" előre beállítás mentve",
+  "settings_units_defaultCurrency": "Alapértelmezett pénznem",
+  "settings_units_dialog_defaultCurrency": "Alapértelmezett pénznem",
+  "diveSites_list_menu_select": "Merülőhelyek kiválasztása",
+  "diveLog_edit_flightWindowWarning": "Ez a merülés a járatod előtti utolsó biztonságos felszínre érési idő után ér véget ({time})",
+  "@diveLog_edit_flightWindowWarning": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
   "diveLog_edit_geofenceSuggestion_near": "{location} közelében",
   "diveLog_edit_geofenceSuggestion_title": "Felszerelési javaslat",
   "diveLog_edit_geofenceSuggestion_body": "Alkalmazza a(z) \"{setName}\" készletet?",
@@ -852,9 +863,6 @@
     }
   },
   "preDive_dashboard_start": "Merülés előtti ellenőrzés indítása",
-  "tools_preDive_title": "Merülés előtti ellenőrzőlisták",
-  "tools_preDive_subtitle": "Ellenőrzőlista-munkamenetek futtatása és áttekintése",
-  "tools_preDive_description": "Társellenőrzések, CCR összeszerelési listák és felszereléscsomagolás naplózott előzményekkel",
   "trips_detail_preDive_action": "Merülés előtti ellenőrzőlista",
   "settings_manage_preDiveChecklists": "Merülés előtti ellenőrzőlisták",
   "settings_manage_preDiveChecklists_subtitle": "Társellenőrzések, CCR összeszerelési listák, felszereléscsomagolás",
@@ -1233,11 +1241,16 @@
   "diveComputer_downloadStep_cancel": "Megse",
   "diveComputer_downloadStep_cancelled": "Letoltes megszakitva",
   "diveComputer_downloadStep_depthMeters": "{depth}m",
+  "diveComputer_downloadStep_downloadAll": "Összes merülés letöltése",
   "diveComputer_downloadStep_downloadFailed": "A letoltes sikertelen",
+  "diveComputer_downloadStep_downloadNew": "Új merülések letöltése",
   "diveComputer_downloadStep_downloadedDives": "Letoltott merulesek",
   "diveComputer_downloadStep_durationMin": "{duration} min",
   "diveComputer_downloadStep_errorOccurred": "Hiba tortent",
   "diveComputer_downloadStep_errorSemanticLabel": "Letoltesi hiba: {error}",
+  "diveComputer_downloadStep_firstSyncBody": "A naplód már tartalmaz merüléseket. Kihagyhatod a már meglévő merülések letöltését.",
+  "diveComputer_downloadStep_firstSyncTitle": "Első letöltés erről a merülésszámítógépről",
+  "diveComputer_downloadStep_onlyAfterDate": "Csak a {date} utáni merülések letöltése",
   "diveComputer_downloadStep_percentAccessibility": ", {percent} szazalek",
   "diveComputer_downloadStep_preparing": "Elokeszites...",
   "diveComputer_downloadStep_progressPercent": "{percent}%",
@@ -3154,6 +3167,42 @@
   "equipment_serviceClocks_overdueSince": "{date} óta esedékes",
   "equipment_serviceClocks_overdue": "Lejárt",
   "equipment_serviceClocks_divesLeft": "{remaining} / {total} merülés van hátra",
+  "cylinderConfigs_title": "Palackkonfigurációk",
+  "cylinderConfigs_empty": "Még nincs konfiguráció",
+  "cylinderConfigs_emptyBody": "Mentsd el egyszer a diluent- és bailout-összeállítást, majd alkalmazd bármelyik merülésre.",
+  "cylinderConfigs_new": "Új konfiguráció",
+  "cylinderConfigs_name": "Név",
+  "cylinderConfigs_nameRequired": "Adj meg egy nevet",
+  "cylinderConfigs_forUnit": "Készülékhez",
+  "cylinderConfigs_noUnit": "Általános gázterv",
+  "cylinderConfigs_gasPlans": "Gáztervek",
+  "cylinderConfigs_addCylinder": "Palack hozzáadása",
+  "cylinderConfigs_role": "Szerep",
+  "cylinderConfigs_startPressure": "Kezdőnyomás",
+  "cylinderConfigs_label": "Címke",
+  "cylinderConfigs_fromPreset": "Sablonból",
+  "cylinderConfigs_deleteTitle": "Törlöd a konfigurációt?",
+  "cylinderConfigs_deleteBody": "A már alkalmazott merülések nem változnak.",
+  "cylinderConfigs_applyAction": "Konfiguráció alkalmazása",
+  "cylinderConfigs_applyAdded": "{count, plural, other{{count} palack hozzáadva}}",
+  "@cylinderConfigs_applyAdded": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "cylinderConfigs_applyKept": "{count, plural, other{{count} megtartva}}",
+  "@cylinderConfigs_applyKept": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "cylinderConfigs_applyNothingToDo": "Ez a merülés már megegyezik a konfigurációval",
+  "cylinderConfigs_sectionTitle": "Konfigurációk",
+  "equipment_serviceClocks_hoursSource": "A naplózott merülési idő alapján számolva",
   "equipment_serviceClocks_hoursLeft": "{remaining} / {total} óra van hátra",
   "equipment_serviceClocks_manageKinds": "Szerviztípusok kezelése",
   "equipment_serviceClocks_appliesToClock": "Kapcsolódó intervallum",
@@ -3303,6 +3352,7 @@
   "equipment_serviceDialog_clearNextServiceDateTooltip": "Kovetkezo szerviz datum torlese",
   "equipment_serviceDialog_costHint": "0.00",
   "equipment_serviceDialog_costLabel": "Koltseg",
+  "equipment_serviceDialog_currencyLabel": "Penznem",
   "equipment_serviceDialog_costValidation": "Adjon meg ervenyes osszeget",
   "equipment_serviceDialog_editTitle": "Szervizrekord szerkesztese",
   "equipment_serviceDialog_nextServiceDueLabel": "Kovetkezo szerviz esedekesseg",
@@ -3917,6 +3967,7 @@
   "settings_about_header": "Rolunk",
   "settings_about_openSourceLicenses": "Nyilt forrasu licencek",
   "settings_about_reportIssue": "Hiba bejelentese",
+  "settings_about_reportIssue_copy": "Link másolása",
   "settings_about_reportIssue_snackbar": "Latogasson el: github.com/submersion-app/submersion/issues",
   "settings_about_version": "Verzio {version}",
   "settings_appBar_title": "Beallitasok",
@@ -3983,6 +4034,8 @@
   "settings_appearance_pressureThresholdMarkers": "Nyomas küszöbértek jelolok",
   "settings_appearance_pressureThresholdMarkers_subtitle": "Jelolok megjelenites, amikor a palack nyomas atlepi a küszöbértekeket",
   "settings_appearance_pressureThresholdMarkers_subtitleFull": "Jelolok megjelenites, amikor a palack nyomas atlepi a 2/3, 1/2 es 1/3 küszöbértekeket",
+  "settings_appearance_metricsFollowViewport": "Rétegek nézetben tartása nagyításkor",
+  "settings_appearance_metricsFollowViewport_subtitle": "Az olyan rétegek, mint az NDL és a ppO2, a látható területhez igazodjanak, ahelyett hogy a mélységtengellyel együtt nagyítódnának",
   "settings_appearance_rightYAxisMetric": "Jobb Y-tengely metrika",
   "settings_appearance_rightYAxisMetric_subtitle": "Alapertelmezett metrika a jobb tengelyen",
   "settings_appearance_subsection_decompressionMetrics": "Dekompresszios metrikak",
@@ -4034,6 +4087,7 @@
   "settings_cloudSync_header_syncBehavior": "Szinkronizalasi viselkedes",
   "settings_cloudSync_lastSynced": "Utolso szinkronizalas: {time}",
   "settings_cloudSync_pendingChanges": "{count, plural, =1{1 függo valtoztatas} other{{count} függo valtoztatas}}",
+  "settings_cloudSync_peerRequiresUpdate_banner": "{count, plural, =1{1 eszköz a Submersion újabb verziójából szinkronizál. Frissítsd ezt az eszközt, hogy megkapd a legújabb változtatásait.} other{{count} eszköz a Submersion újabb verziójából szinkronizál. Frissítsd ezt az eszközt, hogy megkapd a legújabb változtatásaikat.}}",
   "settings_cloudSync_provider_connected": "Csatlakoztatva",
   "settings_cloudSync_provider_connectedTo": "Csatlakoztatva: {providerName}",
   "settings_cloudSync_provider_connectionFailed": "{providerName} csatlakozas sikertelen: {error}",
@@ -4461,6 +4515,65 @@
   "settings_units_weight": "Suly",
   "settings_units_weight_kilograms": "Kilogramm (kg)",
   "settings_units_weight_pounds": "Font (lbs)",
+  "settings_updates_automaticUpdates": "Automatikus frissítések",
+  "settings_updates_automaticUpdatesSubtitle": "Frissítések rendszeres keresése",
+  "settings_updates_betaDialogBody": "A béta buildek minden változtatásból megjelennek, és a merülési napló adatbázisát a stabil kiadás előtt frissíthetik. Ha később visszaváltasz a stabil csatornára, az alkalmazás nem áll vissza korábbi verzióra, és az együtt szinkronizáló eszközöknek ugyanazt a csatornát érdemes használniuk. Minden adatbázis-frissítés előtt automatikusan biztonsági mentés készül.",
+  "settings_updates_betaDialogConfirm": "Váltás bétára",
+  "settings_updates_betaDialogTitle": "Szeretnél béta frissítéseket kapni?",
+  "settings_updates_channel": "Frissítési csatorna",
+  "settings_updates_channelBadgeBeta": "{version} (Béta)",
+  "@settings_updates_channelBadgeBeta": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "settings_updates_channelBeta": "Béta",
+  "settings_updates_channelBetaSubtitle": "Új buildek minden változtatásból, a stabil előtt",
+  "settings_updates_channelStable": "Stabil",
+  "settings_updates_channelStableSubtitle": "Csak tesztelt kiadások",
+  "settings_updates_checkForUpdates": "Frissítések keresése",
+  "settings_updates_checking": "Keresés...",
+  "settings_updates_downloading": "Letöltés... {progress}%",
+  "@settings_updates_downloading": {
+    "placeholders": {
+      "progress": {
+        "type": "String"
+      }
+    }
+  },
+  "settings_updates_error": "Hiba: {message}",
+  "@settings_updates_error": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "settings_updates_header": "Frissítések",
+  "settings_updates_joinBeta": "Csatlakozz a bétához",
+  "settings_updates_joinBetaSubtitle": "Kapd meg korábban az új funkciókat a bétaprogramon keresztül",
+  "settings_updates_lastChecked": "Utolsó ellenőrzés",
+  "settings_updates_never": "Soha",
+  "settings_updates_readyToInstall": "A(z) {version} verzió telepítésre kész",
+  "@settings_updates_readyToInstall": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "settings_updates_stableSwitchNotice": "Ezen a bétán maradsz, amíg a következő stabil kiadás nem lesz nála újabb.",
+  "settings_updates_upToDate": "Naprakész",
+  "settings_updates_versionAvailable": "A(z) {version} verzió elérhető",
+  "@settings_updates_versionAvailable": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
   "signatures_action_clear": "Törlés",
   "signatures_action_closeSignatureView": "Aláírás nézet bezárása",
   "signatures_action_deleteSignature": "Aláírás törlése",
@@ -4803,6 +4916,7 @@
   "tags_empty": "Még nincsenek címkék. Hozz létre címkéket a merülések szerkesztésekor.",
   "tags_hint_addMoreTags": "További címkék hozzáadása...",
   "importWizard_tagsLabel": "Tags",
+  "importWizard_review_olderDivesSkipped": "{count, plural, one{1 régebbi merülés kihagyva — már szerepel a naplódban} other{{count} régebbi merülés kihagyva — már szerepel a naplódban}}",
   "tags_hint_addTags": "Címkék hozzáadása...",
   "tags_manage_bulkDeleteMessage": "Ezek a címkék eltávolításra kerülnek összesen {diveCount, plural, =0{0 merülésből} =1{1 merülésből} other{{diveCount} merülésből}}. Ez nem vonható vissza.",
   "tags_manage_bulkDeleteTitle": "{count} címke törlése?",
@@ -4941,23 +5055,14 @@
   "tides_semantic_tideCycle": "Árapály ciklus, állapot: {state}, magasság: {height}",
   "tides_semantic_tideState": "Árapály állapot: {state}",
   "tides_title": "Árapály",
-  "tools_deco_description": "Szamitsa ki a dekompresszio nelküli limiteket, szukseges deko megalokat es a CNS/OTU terhelest többszintu merülesi profilokhoz.",
-  "tools_deco_subtitle": "Merulesek tervezese dekompressziós megalokkal",
-  "tools_deco_title": "Deko szamologep",
-  "tools_disclaimer": "Ezek a szamologepek csak tervezesi celokat szolgalnak. Mindig ellenorizze a szamitasokat es kovesse a merulesi kepzeset.",
-  "tools_gas_description": "Negy specialis gaz szamologep:\n- MOD - Maximalis üzemi melyseg egy gazkeverekhez\n- Legjobb keverek - Idealis O₂% egy cel melyseghez\n- Fogyasztas - Gaz felhasznalasi becsles\n- Rock Bottom - Veszhelyzeti tartalek szamitas",
-  "tools_gas_subtitle": "MOD, Legjobb keverek, Fogyasztas, Rock Bottom",
-  "tools_gas_title": "Gaz szamologepek",
   "tools_gpsLogger_description": "Rögzítsd a pozíciódat a merülőnap során, és párosítsd automatikusan az importált merüléseket GPS-helyekhez.",
   "tools_gpsLogger_subtitle": "Felszíni útvonal rögzítése",
   "tools_gpsLogger_title": "GPS-naplózó",
-  "tools_title": "Eszkozok",
   "tools_weight_aluminumImperial": "Uresbben pozitivabb (+4 lbs)",
   "tools_weight_aluminumMetric": "Uresbben pozitivabb (+2 kg)",
   "tools_weight_bodyWeightOptional": "Testtomeg (opcionalis)",
   "tools_weight_carbonFiberImperial": "Nagyon pozitiv (+7 lbs)",
   "tools_weight_carbonFiberMetric": "Nagyon pozitiv (+3 kg)",
-  "tools_weight_description": "Becsülje meg a szükseges sülyt az expoziciós ruha, palackanyag, viztipus es testtomeg alapjan.",
   "tools_weight_disclaimer": "Ez csak becsles. Mindig vegezzen felhajtoeroprobat a merules elejen, es szukseg szerint modositsa. A BCD, egyeni felhajtoeroe es legzesi szokasok befolyasolhatjak a tenyleges sulyigenyeket.",
   "tools_weight_exposureSuit": "Merulesi ruha",
   "tools_weight_gasCapacity": "- Gaz kapacitas: {capacity} cuft",
@@ -4968,7 +5073,6 @@
   "tools_weight_resultAccessibility": "Ajanlott suly: {weight} {unit}",
   "tools_weight_steelImperial": "Negativ felhajtoeroe (-4 lbs)",
   "tools_weight_steelMetric": "Negativ felhajtoeroe (-2 kg)",
-  "tools_weight_subtitle": "Ajanlott suly az összeallitasahoz",
   "tools_weight_tankMaterial": "Palack anyag",
   "tools_weight_tankSpecifications": "Palack specifikaciok",
   "tools_weight_title": "Sulyszamologep",
@@ -4988,6 +5092,14 @@
   "transfer_computers_loading": "Betoltes...",
   "transfer_computers_manageTitle": "Szamitogepek kezelese",
   "transfer_computers_noComputersSaved": "Nincsenek mentett szamitogepek",
+  "transfer_computers_diveCount": "{count, plural, =1{1 merülés} other{{count} merülés}}",
+  "transfer_computers_downloadTooltip": "Merülések letöltése",
+  "transfer_computers_knownComputersHeader": "Ismert számítógépek",
+  "transfer_computers_lastDownloadDaysAgo": "{days} napja",
+  "transfer_computers_lastDownloadHoursAgo": "{hours, plural, other{{hours} órája}}",
+  "transfer_computers_lastDownloadMinutesAgo": "{minutes} perce",
+  "transfer_computers_lastDownloadNever": "Soha",
+  "transfer_computers_lastDownloadYesterday": "Tegnap",
   "transfer_computers_savedCount": "{count} mentett {count, plural, =1{szamitogep} other{szamitogep}}",
   "transfer_computers_sectionHeader": "Merülesi szamitogepek",
   "transfer_csvExport_cancelButton": "Megse",
@@ -5162,6 +5274,9 @@
   "trips_edit_label_notes": "Jegyzetek",
   "trips_edit_label_operatorName": "Operator / Charter",
   "trips_edit_label_resortName": "Udulohely neve",
+  "trips_edit_label_returnFlight": "Visszaúti járat",
+  "trips_edit_returnFlightClear": "Visszaúti járat törlése",
+  "trips_edit_returnFlightNotSet": "Nincs megadva",
   "trips_edit_label_startDate": "Kezdes datuma",
   "trips_edit_label_tripName": "Ut neve *",
   "trips_edit_label_tripType": "Trip Type",
@@ -5506,7 +5621,9 @@
   "settings_dataSources_appleHealth_importAction": "Import from Apple Watch",
   "settings_dataSources_appleHealth_privacy": "Your health data is stored locally and is never shared with third parties.",
   "settings_dataSources_noSources": "No data source integrations are available on this platform.",
+  "diveLog_chartOption_metricsFollowViewport": "Rétegek nézetben tartása",
   "diveLog_chartSection_decompression": "Dekompresszio",
+  "diveLog_chartSection_display": "Megjelenítés",
   "diveLog_chartSection_gasAnalysis": "Gazelemzes",
   "diveLog_chartSection_markers": "Jelolok",
   "diveLog_chartSection_other": "Egyeb",
@@ -5560,6 +5677,8 @@
   "diveDetailSection_tanks_description": "Palack lista, gázkeverékek, nyomások, palackonkénti SAC",
   "diveDetailSection_tanks_name": "Palackok",
   "diveDetailSection_tide_description": "Árapály-ciklus grafikon és időzítés",
+  "diveDetailSection_reefHealth_name": "Zátony állapota",
+  "diveDetailSection_reefHealth_description": "Korallfehéredési hőstressz a merülés napján",
   "diveDetailSection_tide_name": "Árapály",
   "diveDetailSection_weights_description": "Súly lebontás, teljes súly",
   "diveDetailSection_buoyancy_name": "Felhajtóerő",
@@ -5600,6 +5719,7 @@
   "buoyancy_whatIfDelta": "{delta} a ténylegeshez",
   "diveDetailSection_weights_name": "Súlyok",
   "diveLog_edit_section_environment": "Környezet",
+  "diveLog_edit_subsection_autofill": "Automatikus kitöltés",
   "diveLog_edit_subsection_weather": "Időjárás",
   "diveLog_edit_subsection_diveConditions": "Merülési körülmények",
   "diveLog_edit_label_windSpeed": "Szélsebesség",
@@ -5661,12 +5781,25 @@
   "dashboard_gauges_insuranceExpired": "A biztosítás lejárt",
   "dashboard_gauges_noInsurance": "Nincs rögzített biztosítás",
   "dashboard_gauges_noFlyClear": "Repülési tilalom 0:00",
+  "dashboard_gauges_flightWindow": "Merülési ablak {hours}:{minutes}",
+  "@dashboard_gauges_flightWindow": {
+    "placeholders": {
+      "hours": {
+        "type": "String"
+      },
+      "minutes": {
+        "type": "String"
+      }
+    }
+  },
+  "dashboard_gauges_flightWindowClosed": "A repülés előtt már nincs merülés",
   "dashboard_gauges_noFlyRemaining": "Repülési tilalom {hours}:{minutes}",
   "dashboard_gauges_lastDiveDays": "Utolsó merülés {days} napja",
   "dashboard_gauges_lastDiveToday": "Ma merültél",
   "dashboard_gauges_noDivesYet": "Még nincs merülés",
   "settings_homeChips_pageTitle": "Kezdőlap állapotjelzői",
   "settings_homeChips_description": "Válaszd ki, mely állapotjelzők jelenjenek meg a Kezdőlap tetején.",
+  "settings_homeChips_flightWindow": "Merülési ablak repülés előtt",
   "settings_homeChips_gear": "Felszerelés szervize",
   "settings_homeChips_insurance": "Biztosítás",
   "settings_homeChips_noFly": "Repülési tilalom időzítő",
@@ -5689,7 +5822,7 @@
   "dashboard_gauges_backupDays": "Mentés {days} napja",
   "dashboard_gauges_syncPending": "{count} nem szinkronizált",
   "dashboard_gauges_synced": "Szinkronizálva",
-  "dashboard_gauges_dataIssues": "{count} adatprobléma",
+  "dashboard_gauges_dataIssues": "{count, plural, =1{1 adatprobléma} other{{count} adatprobléma}}",
   "dashboard_gauges_retry": "Az állapot nem érhető el - koppints az újrapróbáláshoz",
   "dashboard_urgent_title": "Figyelmet igényel",
   "dashboard_photos_title": "Legutóbbi fotók",
@@ -5738,6 +5871,13 @@
   "listViewMode_table": "Táblázat",
   "settings_appearance_general": "Általános",
   "settings_appearance_sections": "Szekciók",
+  "settings_appearance_colorAccents": "Színes kiemelések",
+  "settings_appearance_accentNavIcons": "Színes navigációs ikonok",
+  "settings_appearance_accentNavIcons_subtitle": "A főmenü ikonjainak színezése az egyes területek színével",
+  "settings_appearance_accentSectionHeaders": "Színes szekciófejlécek",
+  "settings_appearance_accentSectionHeaders_subtitle": "Színes szekcióikon megjelenítése az oldalcímek mellett",
+  "settings_appearance_accentListIcons": "Színes listaikonok",
+  "settings_appearance_accentListIcons_subtitle": "Ikonok színezése a listákban és a beállítási oldalakon",
   "settings_appearance_showDetailsPane": "Részletek panel megjelenítése",
   "settings_appearance_showDetailsPane_subtitle": "Részletek panel megjelenítése a táblázat mellett",
   "settings_appearance_showProfilePanel": "Profil panel megjelenítése táblázat nézetben",
@@ -5753,6 +5893,9 @@
   "universalImport_dive_decideAction": "Dontes",
   "universalImport_label_consolidate": "Osszevonas",
   "universalImport_label_importAsNew": "Importalas ujkent",
+  "universalImport_entityAction_linkBadge": "CSATOL",
+  "universalImport_entityAction_linkExisting": "Összekapcsolás a meglévővel",
+  "universalImport_entityAction_linkExistingSubtitle": "A talált rekord használata",
   "universalImport_pending_chooseAction": "Valassz muveletet",
   "universalImport_pending_gateHint": "{count} duplikatum dontest igenyel",
   "universalImport_pending_needsDecision": "Dontes szukseges",
@@ -6235,6 +6378,24 @@
   "attrLabel_sole_type": "Talp",
   "attrLabel_buoyancy_kg": "Felhajtóerő",
   "attrLabel_dry_weight_kg": "Száraz tömeg",
+  "attrLabel_unit_type": "Készülék típusa",
+  "attrLabel_mount_configuration": "Rögzítés",
+  "attrLabel_scrubber_type": "Abszorber típusa",
+  "attrLabel_scrubber_duration_h": "Abszorber élettartama (ó)",
+  "attrLabel_o2_cell_count": "O2-cellák",
+  "attrLabel_diluent_cylinder_l": "Diluent palack",
+  "attrLabel_o2_cylinder_l": "O2 palack",
+  "attrChoice_unit_type_eccr": "Elektronikus CCR (eCCR)",
+  "attrChoice_unit_type_mccr": "Manuális CCR (mCCR)",
+  "attrChoice_unit_type_hccr": "Hibrid CCR (hCCR)",
+  "attrChoice_unit_type_scr_cmf": "SCR - állandó tömegáram",
+  "attrChoice_unit_type_scr_pascr": "SCR - passzív adagolás",
+  "attrChoice_unit_type_scr_escr": "SCR - elektronikus szabályozás",
+  "attrChoice_mount_configuration_back": "Háti rögzítés",
+  "attrChoice_mount_configuration_chest": "Mellkasi rögzítés",
+  "attrChoice_mount_configuration_sidemount": "Oldalra szerelt",
+  "attrChoice_scrubber_type_axial": "Axiális",
+  "attrChoice_scrubber_type_radial": "Radiális",
   "attrChoice_suit_style_full": "Egész ruha",
   "attrChoice_suit_style_shorty": "Shorty",
   "attrChoice_suit_style_two_piece": "Kétrészes",
@@ -6423,6 +6584,32 @@
   "safetySettings_noFlyPreset_standard": "Normál (12/18/24 ó)",
   "safetySettings_noFlyPreset_strict": "Szigorú (18/24/48 ó)",
   "safetySettings_noFlyPreset_subtitle": "Irányadó időközök egyetlen nullidős merülés, ismétlő merülések és dekós merülések után",
+  "flightWindow_closed": "A repülés előtt már ne merülj",
+  "flightWindow_conflict": "A repülési tilalmad túlnyúlik a járat indulásán",
+  "flightWindow_departs": "A járat indul: {time}",
+  "@flightWindow_departs": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "flightWindow_openTitle": "Hátralévő merülési idő: {remaining}",
+  "@flightWindow_openTitle": {
+    "placeholders": {
+      "remaining": {
+        "type": "String"
+      }
+    }
+  },
+  "flightWindow_surfaceBy": "Felszínre érés eddig: {time}",
+  "@flightWindow_surfaceBy": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
   "safetyHub_noFly_active_title": "Repülési tilalom: {remaining} van hátra",
   "@safetyHub_noFly_active_title": {
     "placeholders": {
@@ -6709,5 +6896,87 @@
   "settings_mediaStorage_quality_reuploadQueued": "Újratöltés sorba állítva",
   "settings_mediaStorage_quality_linuxFfmpegHint": "Telepítse az ffmpeg-et a videótömörítés engedélyezéséhez. Addig az eredetik kerülnek feltöltésre.",
   "settings_mediaStorage_quality_saveFailed": "A feltöltési minőség mentése nem sikerült. Próbáld újra.",
-  "settings_mediaStorage_quality_noTranscoderHint": "Ez az eszköz nem tud videót tömöríteni. Róla az eredetik töltődnek fel."
+  "settings_mediaStorage_quality_noTranscoderHint": "Ez az eszköz nem tud videót tömöríteni. Róla az eredetik töltődnek fel.",
+  "reef_section_title": "Zátony",
+  "reef_section_sourcesTooltip": "Adatforrások",
+  "reef_section_loadError": "A zátonyadatok most nem tölthetők be",
+  "reef_habitat_title": "Zátony élőhely",
+  "reef_habitat_onReef": "Korallzátonyon",
+  "reef_habitat_onReefWithThreat": "Korallzátonyon, veszélyeztetettségi szint: {threat}",
+  "reef_habitat_noReef": "Nincs térképezett korallzátony ezen a helyen",
+  "reef_habitat_unavailable": "A zátony élőhelye most nem ellenőrizhető",
+  "reef_health_title": "Zátony állapota",
+  "reef_health_unavailable": "A zátony állapota most nem ellenőrizhető",
+  "reef_health_noData": "Nincs zátonyállapot-adat ehhez a helyhez",
+  "reef_health_degreeHeatingWeeks": "Hőterhelési hetek {value} C-hét",
+  "reef_health_seaSurface": "Tengerfelszín {value}",
+  "reef_health_asOf": "Dátum: {date}",
+  "reef_health_levelNoStress": "Nincs hőstressz",
+  "reef_health_levelWatch": "Fehéredési megfigyelés",
+  "reef_health_levelWarning": "Fehéredési figyelmeztetés",
+  "reef_health_levelAlert1": "Fehéredési riasztás 1. szint",
+  "reef_health_levelAlert2": "Fehéredési riasztás 2. szint",
+  "reef_health_levelAlert3": "Fehéredési riasztás 3. szint",
+  "reef_health_levelAlert4": "Fehéredési riasztás 4. szint",
+  "reef_health_levelAlert5": "Fehéredési riasztás 5. szint",
+  "reef_protection_title": "Védett terület",
+  "reef_protection_none": "Nem védett tengeri területen",
+  "reef_protection_unavailable": "A védettségi állapot most nem ellenőrizhető",
+  "reef_protection_viewRegulations": "Szabályok megtekintése",
+  "reef_protection_iucn": "IUCN {category}",
+  "reef_species_recordedNearby": "Közelben rögzítve",
+  "reef_species_addToExpected": "Hozzáadás a várható fajokhoz",
+  "reef_attribution_title": "Zátony adatforrásai",
+  "reef_attribution_wri": "Zátony jelenléte és veszélyeztetettsége. CC BY 3.0.",
+  "reef_attribution_noaa": "Tengerfelszíni hőmérséklet és hőstressz. Közkincs.",
+  "reef_attribution_gbif": "Fajelőfordulási adatok, CC0 és CC BY 4.0 szűrve.",
+  "reef_attribution_protectedSeas": "Védett tengeri területek határai. CC BY 4.0.",
+  "settings_section_security_title": "Alkalmazásbiztonság",
+  "settings_section_security_subtitle": "Alkalmazászár és adatbázis-titkosítás",
+  "settings_security_appLock": "Alkalmazászár",
+  "settings_security_appLock_subtitle": "Jelszó vagy biometria szükséges az alkalmazás megnyitásához",
+  "settings_security_biometrics": "Feloldás biometriával",
+  "settings_security_autoLock": "Automatikus zárolás",
+  "settings_security_autoLock_immediately": "Azonnal",
+  "settings_security_autoLock_minutes": "{minutes, plural, =1{1 perc után} other{{minutes} perc után}}",
+  "@settings_security_autoLock_minutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "settings_security_autoLock_never": "Soha",
+  "settings_security_encryption": "Adatbázis titkosítása",
+  "settings_security_encryption_subtitle": "Védje merülési naplófájlját nyugalmi titkosítással",
+  "settings_security_encryption_progress_backup": "Biztonsági mentés készítése...",
+  "settings_security_encryption_progress_encrypt": "Adatbázis titkosítása...",
+  "settings_security_encryption_progress_decrypt": "Adatbázis visszafejtése...",
+  "settings_security_encryption_progress_reopen": "Adatbázis újranyitása...",
+  "settings_security_changePassword": "Jelszó módosítása",
+  "settings_security_regenerateRecovery": "Új helyreállítási kód",
+  "settings_security_setPassword": "Alkalmazásjelszó beállítása",
+  "settings_security_password": "Jelszó",
+  "settings_security_confirmPassword": "Jelszó megerősítése",
+  "settings_security_currentPassword": "Jelenlegi jelszó",
+  "settings_security_newPassword": "Új jelszó",
+  "settings_security_passwordTooShort": "A jelszónak legalább 4 karakterből kell állnia.",
+  "settings_security_passwordMismatch": "A jelszavak nem egyeznek.",
+  "settings_security_wrongPassword": "Hibás jelszó.",
+  "settings_security_recoveryCode_title": "Az Ön helyreállítási kódja",
+  "settings_security_recoveryCode_explain": "Írja fel és őrizze biztonságos helyen. Ez az egyetlen módja az alkalmazás feloldásának, ha elfelejti a jelszavát, és minden korábbi helyreállítási kódot érvénytelenít.",
+  "settings_security_recoveryCode_savedConfirm": "Elmentettem a helyreállítási kódomat",
+  "settings_security_disableBlockedByEncryption_title": "A titkosítás be van kapcsolva",
+  "settings_security_disableBlockedByEncryption_body": "Először kapcsolja ki az adatbázis-titkosítást, mielőtt kikapcsolná az alkalmazászárat. A titkosított adatbázishoz hitelesítő adat szükséges.",
+  "settings_security_enableEncryption_title": "Titkosítja az adatbázist?",
+  "settings_security_enableEncryption_body": "Először biztonsági mentés készül, majd az adatbázisfájl helyben újratitkosítódik. Nagy naplóknál ez eltarthat egy ideig.",
+  "settings_security_disableEncryption_title": "Kikapcsolja a titkosítást?",
+  "settings_security_disableEncryption_body": "Az adatbázisfájl ismét titkosítás nélkül tárolódik a lemezen.",
+  "settings_security_turnOffAppLock_title": "Kikapcsolja az alkalmazászárat?",
+  "settings_security_turnOffAppLock_body": "Az alkalmazás jelszókérés nélkül nyílik meg.",
+  "settings_security_unlock_title": "Adja meg a jelszavát",
+  "settings_security_cancel": "Mégse",
+  "settings_security_continue": "Folytatás",
+  "settings_security_done": "Kész",
+  "settings_security_turnOff": "Kikapcsolás"
 }
