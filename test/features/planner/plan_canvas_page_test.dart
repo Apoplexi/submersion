@@ -275,7 +275,8 @@ void main() {
     await tester.pumpWidget(harness());
     seed(tester);
     await tester.pumpAndSettle();
-    await tester.tap(find.text('30/70'));
+    // Header chip shows the diver's GF settings (AppSettings default 50/85).
+    await tester.tap(find.text('50/85'));
     await tester.pumpAndSettle();
     expect(find.byType(PlanDecoSection), findsOneWidget);
   });

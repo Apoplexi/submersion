@@ -12,11 +12,16 @@ import 'package:submersion/features/settings/presentation/providers/settings_pro
 
 class _TestSettingsNotifier extends StateNotifier<AppSettings>
     implements SettingsNotifier {
-  _TestSettingsNotifier({PressureUnit pressureUnit = PressureUnit.bar})
-    : super(AppSettings(pressureUnit: pressureUnit));
+  _TestSettingsNotifier({
+    PressureUnit pressureUnit = PressureUnit.bar,
+    int gfLow = 50,
+    int gfHigh = 85,
+  }) : super(
+         AppSettings(pressureUnit: pressureUnit, gfLow: gfLow, gfHigh: gfHigh),
+       );
 
   void updatePressureUnitForTest(PressureUnit unit) {
-    state = AppSettings(pressureUnit: unit);
+    state = state.copyWith(pressureUnit: unit);
   }
 
   @override
@@ -115,6 +120,55 @@ void main() {
         expect(state.reservePressure, closeTo(34.47, 0.5));
       },
     );
+
+    test(
+      'initial plan seeds gradient factors from the diver deco settings',
+      () {
+        final container = ProviderContainer(
+          overrides: [
+            settingsProvider.overrideWith(
+              (ref) => _TestSettingsNotifier(gfLow: 35, gfHigh: 75),
+            ),
+          ],
+        );
+        addTearDown(container.dispose);
+
+        final state = container.read(divePlanNotifierProvider);
+        expect(state.gfLow, 35);
+        expect(state.gfHigh, 75);
+      },
+    );
+
+    test('newPlan re-reads gradient factors from the diver deco settings', () {
+      final container = ProviderContainer(
+        overrides: [
+          settingsProvider.overrideWith(
+            (ref) => _TestSettingsNotifier(gfLow: 35, gfHigh: 75),
+          ),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      final notifier = container.read(divePlanNotifierProvider.notifier);
+      notifier.updateGradientFactors(10, 20);
+      expect(container.read(divePlanNotifierProvider).gfLow, 10);
+
+      notifier.newPlan();
+
+      final state = container.read(divePlanNotifierProvider);
+      expect(state.gfLow, 35);
+      expect(state.gfHigh, 75);
+    });
+
+    test('newPlan uses gradient factor fallback when no callback provided', () {
+      final notifier = DivePlanNotifier(PlanCalculatorService());
+      addTearDown(notifier.dispose);
+
+      notifier.newPlan();
+
+      expect(notifier.state.gfLow, 30);
+      expect(notifier.state.gfHigh, 70);
+    });
 
     test('newPlan uses reservePressure fallback when no callback provided', () {
       final notifier = DivePlanNotifier(

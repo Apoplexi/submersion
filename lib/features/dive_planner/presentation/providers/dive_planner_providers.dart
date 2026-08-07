@@ -18,6 +18,10 @@ import 'package:submersion/features/planner/presentation/providers/plan_reposito
 
 const _uuid = Uuid();
 
+/// A gradient factor pair as a percentage (0-100). The two halves are only
+/// meaningful together, so they travel as one value.
+typedef PlanGradientFactors = ({int low, int high});
+
 // ============================================================================
 // Service Providers
 // ============================================================================
@@ -48,6 +52,7 @@ final planCalculatorServiceProvider = Provider<PlanCalculatorService>((ref) {
 class DivePlanNotifier extends StateNotifier<DivePlanState> {
   final PlanCalculatorService _calculator;
   final double Function() _getDefaultReservePressure;
+  final PlanGradientFactors Function() _getDefaultGradientFactors;
   final DivePlanRepository? _repository;
 
   /// The persisted aggregate this state was loaded from (or last saved as);
@@ -69,21 +74,38 @@ class DivePlanNotifier extends StateNotifier<DivePlanState> {
     this._calculator, {
     double reservePressure = DivePlanState.kDefaultReservePressureBar,
     double Function()? getDefaultReservePressure,
+    PlanGradientFactors Function()? getDefaultGradientFactors,
     DivePlanRepository? repository,
   }) : _getDefaultReservePressure =
            getDefaultReservePressure ?? (() => reservePressure),
+       _getDefaultGradientFactors =
+           getDefaultGradientFactors ?? _fallbackGradientFactors,
        _repository = repository,
-       super(_createInitialState(reservePressure: reservePressure));
+       super(
+         _createInitialState(
+           reservePressure: reservePressure,
+           getGradientFactors:
+               getDefaultGradientFactors ?? _fallbackGradientFactors,
+         ),
+       );
+
+  static PlanGradientFactors _fallbackGradientFactors() =>
+      (low: DivePlanState.kFallbackGfLow, high: DivePlanState.kFallbackGfHigh);
 
   static DivePlanState _createInitialState({
     double reservePressure = DivePlanState.kDefaultReservePressureBar,
+    PlanGradientFactors Function() getGradientFactors =
+        _fallbackGradientFactors,
   }) {
     final now = DateTime.now();
+    final gradientFactors = getGradientFactors();
     return DivePlanState(
       id: _uuid.v4(),
       name: 'New Dive Plan',
       segments: [],
       tanks: [_createDefaultTank()],
+      gfLow: gradientFactors.low,
+      gfHigh: gradientFactors.high,
       reservePressure: reservePressure,
       createdAt: now,
       updatedAt: now,
@@ -110,7 +132,10 @@ class DivePlanNotifier extends StateNotifier<DivePlanState> {
   /// Reset to a new empty plan.
   void newPlan() {
     _loaded = null;
-    state = _createInitialState(reservePressure: _getDefaultReservePressure());
+    state = _createInitialState(
+      reservePressure: _getDefaultReservePressure(),
+      getGradientFactors: _getDefaultGradientFactors,
+    );
   }
 
   /// Load an existing plan for editing.
@@ -579,10 +604,16 @@ final divePlanNotifierProvider =
             : DivePlanState.kDefaultReservePressureBar;
       }
 
+      // A new plan starts on the diver's own deco settings; per-plan edits and
+      // saved plans override this and are never overwritten by it.
+      PlanGradientFactors defaultGradientFactors() =>
+          (low: read(gfLowProvider), high: read(gfHighProvider));
+
       return DivePlanNotifier(
         calculator,
         reservePressure: defaultReserve(),
         getDefaultReservePressure: defaultReserve,
+        getDefaultGradientFactors: defaultGradientFactors,
         repository: ref.watch(divePlanRepositoryProvider),
       );
     });
