@@ -27,16 +27,39 @@ enum EquipmentType {
   const EquipmentType(this.displayName);
 }
 
-/// Visibility conditions
+/// Visibility conditions.
+///
+/// Legacy from v144: dives logged before measured visibility store one of
+/// these buckets instead of a distance. New dives store
+/// `dives.visibility_meters` and derive their adjective from the diver's
+/// calibration, so the same distance can read "Good" for a cold-water diver
+/// and "Moderate" for a tropical one.
+///
+/// [bandMinM] and [bandMaxM] record what a bucket actually means, so the UI
+/// can show a legacy dive's honest range rather than guessing a point value.
+///
+/// [displayName] stays English on purpose: it feeds data interchange
+/// (CSV/Excel export, the field extractor) where a stable, locale-independent
+/// value is wanted. On-screen text goes through the formatters in
+/// `dive_log/presentation/formatters/visibility_display.dart`.
 enum Visibility {
-  excellent('Excellent (>30m / >100ft)'),
-  good('Good (15-30m / 50-100ft)'),
-  moderate('Moderate (5-15m / 15-50ft)'),
-  poor('Poor (<5m / <15ft)'),
-  unknown('Unknown');
+  excellent('Excellent (>30m / >100ft)', 30, null),
+  good('Good (15-30m / 50-100ft)', 15, 30),
+  moderate('Moderate (5-15m / 15-50ft)', 5, 15),
+  poor('Poor (<5m / <15ft)', null, 5),
+  unknown('Unknown', null, null);
 
   final String displayName;
-  const Visibility(this.displayName);
+
+  /// Inclusive lower bound of the band in meters, or null when unbounded
+  /// below.
+  final double? bandMinM;
+
+  /// Exclusive upper bound of the band in meters, or null when unbounded
+  /// above.
+  final double? bandMaxM;
+
+  const Visibility(this.displayName, this.bandMinM, this.bandMaxM);
 }
 
 /// Current strength
