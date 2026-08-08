@@ -12,6 +12,7 @@ import 'package:submersion/features/gps_log/presentation/providers/gps_track_map
 import 'package:submersion/features/gps_log/presentation/widgets/gps_track_polyline_layer.dart';
 import 'package:submersion/features/gps_log/presentation/widgets/track_color_legend.dart';
 import 'package:submersion/features/gps_log/presentation/widgets/track_point_info_card.dart';
+import 'package:submersion/features/gps_log/presentation/widgets/track_stats_header.dart';
 import 'package:submersion/features/maps/presentation/widgets/map_attribution.dart';
 import 'package:submersion/features/maps/presentation/widgets/map_compass_button.dart';
 import 'package:submersion/features/maps/presentation/widgets/submersion_tile_layer.dart';
@@ -85,10 +86,25 @@ class _GpsTrackDetailPageState extends ConsumerState<GpsTrackDetailPage> {
           if (points.length < 2) {
             return Center(child: Text(l10n.gpsTrack_detail_noPoints));
           }
-          return _TrackMap(
-            trackId: widget.trackId,
-            fallbackPoints: points,
-            controller: _mapController,
+          return Column(
+            children: [
+              TrackStatsHeader(
+                points: points,
+                diveCount:
+                    ref
+                        .watch(divesOnTrackProvider(widget.trackId))
+                        .value
+                        ?.length ??
+                    0,
+              ),
+              Expanded(
+                child: _TrackMap(
+                  trackId: widget.trackId,
+                  fallbackPoints: points,
+                  controller: _mapController,
+                ),
+              ),
+            ],
           );
         },
       ),
