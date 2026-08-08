@@ -108,6 +108,31 @@ class ReefDataCache extends Table {
   Set<Column> get primaryKey => {provider, coordKey, variant};
 }
 
+/// Simplified GPS track geometry, cached per level of detail.
+///
+/// NOT synced and never backed up: every device can re-derive this from the
+/// gps_tracks points blob in milliseconds, so paying the main database's
+/// schema-bump, HLC, tombstone, and backup costs would buy nothing.
+class GpsTrackGeometryCache extends Table {
+  TextColumn get trackId => text()();
+
+  /// 'thumbnail' (50 m tolerance) | 'overview' (10 m) | 'detail' (2 m)
+  TextColumn get lodLevel => text()();
+
+  /// Gzipped JSON in the same format as gps_tracks.points. Null when
+  /// [status] is not 'ok'.
+  BlobColumn get points => blob().nullable()();
+
+  /// 'ok' | 'empty' | 'unavailable'. An explicit negative is cached so a
+  /// genuinely empty track is not re-derived on every scroll.
+  TextColumn get status => text()();
+
+  IntColumn get createdAt => integer()();
+
+  @override
+  Set<Column> get primaryKey => {trackId, lodLevel};
+}
+
 @DriftDatabase(
   tables: [
     LocalAssetCache,
@@ -115,13 +140,14 @@ class ReefDataCache extends Table {
     MediaCacheEntries,
     BathymetryCache,
     ReefDataCache,
+    GpsTrackGeometryCache,
   ],
 )
 class LocalCacheDatabase extends _$LocalCacheDatabase {
   LocalCacheDatabase(super.e);
 
   @override
-  int get schemaVersion => 8;
+  int get schemaVersion => 9;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -163,6 +189,12 @@ class LocalCacheDatabase extends _$LocalCacheDatabase {
       if (from < 8) {
         await m.createTable(reefDataCache);
       }
+      // v9: simplified GPS track geometry, keyed by (track, LOD). Every
+      // stored schema below 9 lacks it, including v1, for the same reason
+      // reef_data_cache did.
+      if (from < 9) {
+        await m.createTable(gpsTrackGeometryCache);
+      }
     },
     beforeOpen: (details) async {
       // Ladder-collision self-heal: a parallel branch that also claimed v7
@@ -192,6 +224,16 @@ class LocalCacheDatabase extends _$LocalCacheDatabase {
           status TEXT NOT NULL,
           fetched_at INTEGER NOT NULL,
           PRIMARY KEY (provider, coord_key, variant)
+        )
+      ''');
+      await customStatement('''
+        CREATE TABLE IF NOT EXISTS gps_track_geometry_cache (
+          track_id TEXT NOT NULL,
+          lod_level TEXT NOT NULL,
+          points BLOB NULL,
+          status TEXT NOT NULL,
+          created_at INTEGER NOT NULL,
+          PRIMARY KEY (track_id, lod_level)
         )
       ''');
     },
