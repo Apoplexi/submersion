@@ -19528,6 +19528,21 @@ class AppLocalizationsHe extends AppLocalizations {
   String get gpsLogger_tracksHeader => 'מסלולים שהוקלטו';
 
   @override
+  String get gpsTrack_map_title => 'מפת מסלולים';
+
+  @override
+  String get gpsTrack_map_noTracks => 'אין מסלולים מוקלטים להצגה.';
+
+  @override
+  String get gpsTrack_map_showMap => 'הצג מפה';
+
+  @override
+  String get gpsTrack_filter_all => 'כל התאריכים';
+
+  @override
+  String get gpsTrack_filter_clear => 'נקה סינון תאריכים';
+
+  @override
   String get gpsTrack_inspect_speed => 'מהירות';
 
   @override

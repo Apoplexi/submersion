@@ -20051,6 +20051,21 @@ class AppLocalizationsEs extends AppLocalizations {
   String get gpsLogger_tracksHeader => 'Tracks grabados';
 
   @override
+  String get gpsTrack_map_title => 'Mapa de tracks';
+
+  @override
+  String get gpsTrack_map_noTracks => 'No hay tracks grabados para mostrar.';
+
+  @override
+  String get gpsTrack_map_showMap => 'Mostrar mapa';
+
+  @override
+  String get gpsTrack_filter_all => 'Todas las fechas';
+
+  @override
+  String get gpsTrack_filter_clear => 'Quitar filtro de fechas';
+
+  @override
   String get gpsTrack_inspect_speed => 'Velocidad';
 
   @override

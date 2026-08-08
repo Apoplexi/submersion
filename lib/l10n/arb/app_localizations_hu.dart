@@ -19971,6 +19971,22 @@ class AppLocalizationsHu extends AppLocalizations {
   String get gpsLogger_tracksHeader => 'Rögzített útvonalak';
 
   @override
+  String get gpsTrack_map_title => 'Nyomvonaltérkép';
+
+  @override
+  String get gpsTrack_map_noTracks =>
+      'Nincs megjeleníthető rögzített nyomvonal.';
+
+  @override
+  String get gpsTrack_map_showMap => 'Térkép megjelenítése';
+
+  @override
+  String get gpsTrack_filter_all => 'Minden dátum';
+
+  @override
+  String get gpsTrack_filter_clear => 'Dátumszűrő törlése';
+
+  @override
   String get gpsTrack_inspect_speed => 'Sebesség';
 
   @override

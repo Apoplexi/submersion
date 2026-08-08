@@ -136,6 +136,7 @@ import 'package:submersion/features/planner/presentation/pages/plan_chart_fullsc
 import 'package:submersion/features/planning/presentation/pages/planning_page.dart';
 import 'package:submersion/features/gps_log/presentation/pages/gps_logger_page.dart';
 import 'package:submersion/features/gps_log/presentation/pages/gps_track_detail_page.dart';
+import 'package:submersion/features/gps_log/presentation/pages/gps_track_map_page.dart';
 import 'package:submersion/features/weight_planner/presentation/pages/weight_planner_page.dart';
 import 'package:submersion/features/deco_calculator/presentation/pages/deco_calculator_page.dart';
 import 'package:submersion/features/gas_calculators/presentation/pages/gas_calculators_page.dart';
@@ -864,6 +865,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             routes: [
               // Static children MUST precede ':id' - ':id' matches any single
               // segment and would otherwise swallow them.
+              GoRoute(
+                path: 'map',
+                name: 'gpsTrackMap',
+                builder: (context, state) => const GpsTrackMapPage(),
+              ),
               GoRoute(
                 path: ':id',
                 name: 'gpsTrackDetail',

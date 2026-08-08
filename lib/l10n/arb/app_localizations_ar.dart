@@ -19672,6 +19672,21 @@ class AppLocalizationsAr extends AppLocalizations {
   String get gpsLogger_tracksHeader => 'المسارات المسجّلة';
 
   @override
+  String get gpsTrack_map_title => 'خريطة المسارات';
+
+  @override
+  String get gpsTrack_map_noTracks => 'لا توجد مسارات مسجّلة لعرضها.';
+
+  @override
+  String get gpsTrack_map_showMap => 'عرض الخريطة';
+
+  @override
+  String get gpsTrack_filter_all => 'كل التواريخ';
+
+  @override
+  String get gpsTrack_filter_clear => 'مسح عامل تصفية التاريخ';
+
+  @override
   String get gpsTrack_inspect_speed => 'السرعة';
 
   @override

@@ -19868,6 +19868,21 @@ class AppLocalizationsNl extends AppLocalizations {
   String get gpsLogger_tracksHeader => 'Opgenomen tracks';
 
   @override
+  String get gpsTrack_map_title => 'Trackkaart';
+
+  @override
+  String get gpsTrack_map_noTracks => 'Geen opgenomen tracks om te tonen.';
+
+  @override
+  String get gpsTrack_map_showMap => 'Kaart tonen';
+
+  @override
+  String get gpsTrack_filter_all => 'Alle datums';
+
+  @override
+  String get gpsTrack_filter_clear => 'Datumfilter wissen';
+
+  @override
   String get gpsTrack_inspect_speed => 'Snelheid';
 
   @override

@@ -20029,6 +20029,21 @@ class AppLocalizationsIt extends AppLocalizations {
   String get gpsLogger_tracksHeader => 'Tracce registrate';
 
   @override
+  String get gpsTrack_map_title => 'Mappa tracce';
+
+  @override
+  String get gpsTrack_map_noTracks => 'Nessuna traccia registrata da mostrare.';
+
+  @override
+  String get gpsTrack_map_showMap => 'Mostra mappa';
+
+  @override
+  String get gpsTrack_filter_all => 'Tutte le date';
+
+  @override
+  String get gpsTrack_filter_clear => 'Rimuovi filtro date';
+
+  @override
   String get gpsTrack_inspect_speed => 'Velocità';
 
   @override

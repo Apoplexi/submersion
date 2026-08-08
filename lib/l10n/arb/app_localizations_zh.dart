@@ -19006,6 +19006,21 @@ class AppLocalizationsZh extends AppLocalizations {
   String get gpsLogger_tracksHeader => '已记录的轨迹';
 
   @override
+  String get gpsTrack_map_title => '轨迹地图';
+
+  @override
+  String get gpsTrack_map_noTracks => '没有可显示的已记录轨迹。';
+
+  @override
+  String get gpsTrack_map_showMap => '显示地图';
+
+  @override
+  String get gpsTrack_filter_all => '所有日期';
+
+  @override
+  String get gpsTrack_filter_clear => '清除日期筛选';
+
+  @override
   String get gpsTrack_inspect_speed => '速度';
 
   @override

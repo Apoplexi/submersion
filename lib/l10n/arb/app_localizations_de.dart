@@ -19998,6 +19998,21 @@ class AppLocalizationsDe extends AppLocalizations {
   String get gpsLogger_tracksHeader => 'Aufgezeichnete Tracks';
 
   @override
+  String get gpsTrack_map_title => 'Trackkarte';
+
+  @override
+  String get gpsTrack_map_noTracks => 'Keine aufgezeichneten Tracks vorhanden.';
+
+  @override
+  String get gpsTrack_map_showMap => 'Karte anzeigen';
+
+  @override
+  String get gpsTrack_filter_all => 'Alle Daten';
+
+  @override
+  String get gpsTrack_filter_clear => 'Datumsfilter zurücksetzen';
+
+  @override
   String get gpsTrack_inspect_speed => 'Geschwindigkeit';
 
   @override

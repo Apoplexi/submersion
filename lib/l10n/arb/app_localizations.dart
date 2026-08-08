@@ -33383,6 +33383,36 @@ abstract class AppLocalizations {
   /// **'Recorded tracks'**
   String get gpsLogger_tracksHeader;
 
+  /// No description provided for @gpsTrack_map_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Track Map'**
+  String get gpsTrack_map_title;
+
+  /// No description provided for @gpsTrack_map_noTracks.
+  ///
+  /// In en, this message translates to:
+  /// **'No recorded tracks to show.'**
+  String get gpsTrack_map_noTracks;
+
+  /// No description provided for @gpsTrack_map_showMap.
+  ///
+  /// In en, this message translates to:
+  /// **'Show map'**
+  String get gpsTrack_map_showMap;
+
+  /// No description provided for @gpsTrack_filter_all.
+  ///
+  /// In en, this message translates to:
+  /// **'All dates'**
+  String get gpsTrack_filter_all;
+
+  /// No description provided for @gpsTrack_filter_clear.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear date filter'**
+  String get gpsTrack_filter_clear;
+
   /// No description provided for @gpsTrack_inspect_speed.
   ///
   /// In en, this message translates to:

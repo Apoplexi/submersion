@@ -20107,6 +20107,21 @@ class AppLocalizationsFr extends AppLocalizations {
   String get gpsLogger_tracksHeader => 'Traces enregistrées';
 
   @override
+  String get gpsTrack_map_title => 'Carte des traces';
+
+  @override
+  String get gpsTrack_map_noTracks => 'Aucune trace enregistrée à afficher.';
+
+  @override
+  String get gpsTrack_map_showMap => 'Afficher la carte';
+
+  @override
+  String get gpsTrack_filter_all => 'Toutes les dates';
+
+  @override
+  String get gpsTrack_filter_clear => 'Effacer le filtre de dates';
+
+  @override
   String get gpsTrack_inspect_speed => 'Vitesse';
 
   @override

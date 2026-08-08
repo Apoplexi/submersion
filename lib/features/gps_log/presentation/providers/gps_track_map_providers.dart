@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart' show DateTimeRange;
 
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
@@ -106,6 +107,34 @@ final trackForDiveProvider = FutureProvider.family<GpsTrack?, String>((
   final match = GpsTrackMatcher.trackCovering(tracks, _entryMillis(dive));
   if (match == null) return null;
   return ref.watch(gpsTrackDetailProvider(match.id).future);
+});
+
+/// Optional date bound on the overview map.
+///
+/// Null means unbounded. Track start times are wall-clock-as-UTC, so the
+/// range's DateTime values compare against them directly with no conversion.
+final trackDateFilterProvider = StateProvider<DateTimeRange?>((ref) => null);
+
+/// Completed tracks narrowed by [trackDateFilterProvider].
+///
+/// "Every track ever" is the one query in this feature that grows without
+/// bound, so the overview map reads through this rather than gpsTracksProvider.
+final filteredTracksProvider = FutureProvider<List<GpsTrack>>((ref) async {
+  final tracks = await ref.watch(gpsTracksProvider.future);
+  final range = ref.watch(trackDateFilterProvider);
+  if (range == null) return tracks;
+
+  final from = range.start.millisecondsSinceEpoch;
+  // Inclusive of the end date's full day.
+  final to = range.end
+      .add(const Duration(days: 1))
+      .subtract(const Duration(milliseconds: 1))
+      .millisecondsSinceEpoch;
+
+  return [
+    for (final track in tracks)
+      if (track.startTime >= from && track.startTime <= to) track,
+  ];
 });
 
 /// Active colorization mode on the track detail map.

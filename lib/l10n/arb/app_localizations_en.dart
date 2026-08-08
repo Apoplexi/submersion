@@ -19690,6 +19690,21 @@ class AppLocalizationsEn extends AppLocalizations {
   String get gpsLogger_tracksHeader => 'Recorded tracks';
 
   @override
+  String get gpsTrack_map_title => 'Track Map';
+
+  @override
+  String get gpsTrack_map_noTracks => 'No recorded tracks to show.';
+
+  @override
+  String get gpsTrack_map_showMap => 'Show map';
+
+  @override
+  String get gpsTrack_filter_all => 'All dates';
+
+  @override
+  String get gpsTrack_filter_clear => 'Clear date filter';
+
+  @override
   String get gpsTrack_inspect_speed => 'Speed';
 
   @override

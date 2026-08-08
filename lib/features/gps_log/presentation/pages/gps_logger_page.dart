@@ -198,6 +198,13 @@ class _GpsLoggerPageState extends ConsumerState<GpsLoggerPage> {
           featureId: 'gps-log',
           title: l10n.tools_gpsLogger_title,
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.map_outlined),
+            tooltip: l10n.gpsTrack_map_showMap,
+            onPressed: () => context.push('/gps-log/map'),
+          ),
+        ],
       ),
       // CustomScrollView rather than ListView: each row now carries a live
       // FlutterMap thumbnail, and a non-builder list would instantiate one

@@ -20037,6 +20037,21 @@ class AppLocalizationsPt extends AppLocalizations {
   String get gpsLogger_tracksHeader => 'Trilhas gravadas';
 
   @override
+  String get gpsTrack_map_title => 'Mapa de trilhas';
+
+  @override
+  String get gpsTrack_map_noTracks => 'Não há trilhas gravadas para mostrar.';
+
+  @override
+  String get gpsTrack_map_showMap => 'Mostrar mapa';
+
+  @override
+  String get gpsTrack_filter_all => 'Todas as datas';
+
+  @override
+  String get gpsTrack_filter_clear => 'Limpar filtro de datas';
+
+  @override
   String get gpsTrack_inspect_speed => 'Velocidade';
 
   @override
