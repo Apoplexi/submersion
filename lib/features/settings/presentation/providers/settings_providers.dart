@@ -83,6 +83,12 @@ class SettingsKeys {
   static const String fullscreenTileOrder = 'fullscreen_tile_order';
   static const String fullscreenHiddenTiles = 'fullscreen_hidden_tiles';
   static const String hiddenHomeChips = 'hidden_home_chips';
+
+  // Home card layout is device-local like the chip toggles above (stored
+  // directly in SharedPreferences rather than per-diver in the DB).
+  static const String homeCardOrder = 'home_card_order';
+  static const String hiddenHomeCards = 'hidden_home_cards';
+
   static const String fullscreenReadoutCardX = 'fullscreen_readout_card_x';
   static const String fullscreenReadoutCardY = 'fullscreen_readout_card_y';
 
@@ -382,6 +388,14 @@ class AppSettings {
   /// Device-local, not per-diver.
   final Set<String> hiddenHomeChips;
 
+  /// Display order of home screen cards ([HomeCardType.name] values).
+  /// Empty means the default order. Device-local, not per-diver.
+  final List<String> homeCardOrder;
+
+  /// Home screen cards the user has toggled off ([HomeCardType.name]
+  /// values). Device-local, not per-diver.
+  final Set<String> hiddenHomeCards;
+
   /// Fullscreen readout card position as fractions (0..1) of the movable
   /// range; null means the default corner. See DraggableReadoutCard.
   final double? fullscreenReadoutCardX;
@@ -513,6 +527,8 @@ class AppSettings {
     this.fullscreenTileOrder = const [],
     this.fullscreenHiddenTiles = const [],
     this.hiddenHomeChips = const <String>{},
+    this.homeCardOrder = const <String>[],
+    this.hiddenHomeCards = const <String>{},
     this.fullscreenReadoutCardX,
     this.fullscreenReadoutCardY,
     this.profileMetricsFollowViewport = false,
@@ -665,6 +681,8 @@ class AppSettings {
     List<String>? fullscreenTileOrder,
     List<String>? fullscreenHiddenTiles,
     Set<String>? hiddenHomeChips,
+    List<String>? homeCardOrder,
+    Set<String>? hiddenHomeCards,
     double? fullscreenReadoutCardX,
     double? fullscreenReadoutCardY,
     bool? profileMetricsFollowViewport,
@@ -812,6 +830,8 @@ class AppSettings {
       fullscreenHiddenTiles:
           fullscreenHiddenTiles ?? this.fullscreenHiddenTiles,
       hiddenHomeChips: hiddenHomeChips ?? this.hiddenHomeChips,
+      homeCardOrder: homeCardOrder ?? this.homeCardOrder,
+      hiddenHomeCards: hiddenHomeCards ?? this.hiddenHomeCards,
       fullscreenReadoutCardX:
           fullscreenReadoutCardX ?? this.fullscreenReadoutCardX,
       fullscreenReadoutCardY:
@@ -919,6 +939,20 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
       final hiddenHomeChips =
           prefs.getStringList(SettingsKeys.hiddenHomeChips)?.toSet() ??
           const <String>{};
+      List<String> homeCardOrder;
+      Set<String> hiddenHomeCards;
+      try {
+        homeCardOrder =
+            prefs.getStringList(SettingsKeys.homeCardOrder) ?? const [];
+        hiddenHomeCards =
+            prefs.getStringList(SettingsKeys.hiddenHomeCards)?.toSet() ??
+            const <String>{};
+      } catch (_) {
+        // Corrupt pref types must never block the dashboard; fall back to
+        // the default layout.
+        homeCardOrder = const [];
+        hiddenHomeCards = const <String>{};
+      }
       final fullscreenReadoutCardX = prefs.getDouble(
         SettingsKeys.fullscreenReadoutCardX,
       );
@@ -945,6 +979,8 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
           fullscreenTileOrder: fullscreenTileOrder,
           fullscreenHiddenTiles: fullscreenHiddenTiles,
           hiddenHomeChips: hiddenHomeChips,
+          homeCardOrder: homeCardOrder,
+          hiddenHomeCards: hiddenHomeCards,
           fullscreenReadoutCardX: fullscreenReadoutCardX,
           fullscreenReadoutCardY: fullscreenReadoutCardY,
           pscrRatio: pscrRatio ?? 100.0,
@@ -963,6 +999,8 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
         fullscreenTileOrder: fullscreenTileOrder,
         fullscreenHiddenTiles: fullscreenHiddenTiles,
         hiddenHomeChips: hiddenHomeChips,
+        homeCardOrder: homeCardOrder,
+        hiddenHomeCards: hiddenHomeCards,
         fullscreenReadoutCardX: fullscreenReadoutCardX,
         fullscreenReadoutCardY: fullscreenReadoutCardY,
         pscrRatio: pscrRatio,
@@ -1018,6 +1056,11 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
     await prefs.setStringList(
       SettingsKeys.hiddenHomeChips,
       state.hiddenHomeChips.toList()..sort(),
+    );
+    await prefs.setStringList(SettingsKeys.homeCardOrder, state.homeCardOrder);
+    await prefs.setStringList(
+      SettingsKeys.hiddenHomeCards,
+      state.hiddenHomeCards.toList()..sort(),
     );
     final readoutCardX = state.fullscreenReadoutCardX;
     if (readoutCardX != null) {
@@ -1246,6 +1289,33 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
       hidden.add(chipId);
     }
     state = state.copyWith(hiddenHomeChips: hidden);
+    await _saveSettings();
+  }
+
+  /// Show or hide one home card (id = HomeCardType.name).
+  Future<void> setHomeCardEnabled(String cardId, bool enabled) async {
+    final hidden = {...state.hiddenHomeCards};
+    if (enabled) {
+      hidden.remove(cardId);
+    } else {
+      hidden.add(cardId);
+    }
+    state = state.copyWith(hiddenHomeCards: hidden);
+    await _saveSettings();
+  }
+
+  /// Persist the home card display order (HomeCardType.name values).
+  Future<void> setHomeCardOrder(List<String> order) async {
+    state = state.copyWith(homeCardOrder: List.unmodifiable(order));
+    await _saveSettings();
+  }
+
+  /// Restore the default home card order and visibility.
+  Future<void> resetHomeCards() async {
+    state = state.copyWith(
+      homeCardOrder: const <String>[],
+      hiddenHomeCards: const <String>{},
+    );
     await _saveSettings();
   }
 

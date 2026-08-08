@@ -2975,10 +2975,76 @@ class AppLocalizationsZh extends AppLocalizations {
   String get dashboard_gauges_noDivesYet => '暂无潜水记录';
 
   @override
-  String get settings_homeChips_pageTitle => '主页状态标签';
+  String get settings_homeChips_pageTitle => '主页屏幕';
 
   @override
   String get settings_homeChips_description => '选择主页顶部显示哪些状态标签。';
+
+  @override
+  String get settings_homeChips_sectionTitle => '状态标签';
+
+  @override
+  String get settings_homeCards_sectionTitle => '主页卡片';
+
+  @override
+  String get settings_homeCards_description => '选择主页显示哪些卡片，并拖动以重新排序。';
+
+  @override
+  String get settings_homeCards_autoHides => '为空时自动隐藏';
+
+  @override
+  String get settings_homeCards_resetToDefault => '恢复默认';
+
+  @override
+  String get settings_homeCards_resetDialog_title => '重置主页布局？';
+
+  @override
+  String get settings_homeCards_resetDialog_message => '将恢复默认卡片顺序并重新显示所有卡片。';
+
+  @override
+  String get settings_homeCards_resetDialog_cancel => '取消';
+
+  @override
+  String get settings_homeCards_resetDialog_confirm => '重置';
+
+  @override
+  String get settings_homeCards_card_hero => '欢迎页眉';
+
+  @override
+  String get settings_homeCards_card_gaugeStrip => '状态标签';
+
+  @override
+  String get settings_homeCards_card_preDive => '潜水前检查清单';
+
+  @override
+  String get settings_homeCards_card_recentDives => '最近潜水';
+
+  @override
+  String get settings_homeCards_card_quickActions => '快捷操作';
+
+  @override
+  String get settings_homeCards_card_milestones => '里程碑';
+
+  @override
+  String get settings_homeCards_card_photoRibbon => '最近照片';
+
+  @override
+  String get settings_homeCards_card_onThisDay => '历史上的今天';
+
+  @override
+  String get settings_homeCards_card_yearInReview => '年度回顾';
+
+  @override
+  String get settings_homeCards_card_activeCourses => '课程进度';
+
+  @override
+  String get settings_homeCards_card_recentSitesMap => '最近潜点地图';
+
+  @override
+  String get dashboard_allHidden_message => '所有主页卡片均已隐藏。';
+
+  @override
+  String get dashboard_allHidden_customize => '自定义主页';
 
   @override
   String get settings_homeChips_flightWindow => '航班前潜水窗口';
