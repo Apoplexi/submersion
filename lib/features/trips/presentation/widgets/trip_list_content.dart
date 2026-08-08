@@ -618,6 +618,21 @@ class TripListTile extends StatelessWidget {
             : null,
         child: ListTile(
           onTap: onTap,
+          // ListTile's Material 3 defaults resolve the title to bodyLarge and
+          // the subtitle to bodyMedium. The detailed dive and site cards are
+          // hand-rolled and ask for titleMedium/bodyMedium explicitly, so the
+          // roles are restated here to keep all three lists on the same text
+          // theme roles. Theme presets differ between the title and body roles
+          // (console uses a monospace family for title roles only, minimalist
+          // uses w500 for title roles and w300 for body roles), so inheriting
+          // the default renders trip titles in a different font from the rest
+          // of the app's lists.
+          titleTextStyle: theme.textTheme.titleMedium?.copyWith(
+            fontWeight: FontWeight.w600,
+          ),
+          subtitleTextStyle: theme.textTheme.bodyMedium?.copyWith(
+            color: theme.colorScheme.onSurfaceVariant,
+          ),
           leading: Consumer(
             builder: (context, ref, _) {
               final accent = resolveFeatureAccent(
@@ -657,9 +672,10 @@ class TripListTile extends StatelessWidget {
           subtitle: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Date range takes the subtitle role from the ListTile above,
+              // matching the dive card's date line.
               Text(
                 '${dateFormat.format(trip.startDate)} - ${dateFormat.format(trip.endDate)}',
-                style: theme.textTheme.bodySmall,
               ),
               if (trip.subtitle != null)
                 Text(
@@ -810,6 +826,14 @@ class TripSearchDelegate extends SearchDelegate<Trip?> {
                 final trip = trips[index];
                 final dateFormat = DateFormat.yMMMd();
                 return ListTile(
+                  // Same text theme roles as TripListTile so search results do
+                  // not fall back to ListTile's bodyLarge title default.
+                  titleTextStyle: Theme.of(context).textTheme.titleMedium
+                      ?.copyWith(fontWeight: FontWeight.w600),
+                  subtitleTextStyle: Theme.of(context).textTheme.bodyMedium
+                      ?.copyWith(
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
                   leading: Builder(
                     builder: (context) {
                       final accent = resolveFeatureAccent(
