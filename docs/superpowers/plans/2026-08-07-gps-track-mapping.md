@@ -4532,3 +4532,1086 @@ flutter analyze
 ```
 
 ---
+
+## Phase 4: Dive Detail Integration
+
+---
+
+### Task 20: Optional track layer on DiveLocationsMap
+
+**Files:**
+- Modify: `lib/features/dive_log/presentation/widgets/dive_locations_map.dart`
+- Test: `test/features/dive_log/presentation/widgets/dive_locations_map_track_test.dart`
+
+**Interfaces:**
+- Consumes: `TrackRun` (Task 3), `GpsTrackPolylineLayer` (Task 9)
+- Produces: `DiveLocationsMap` gains `final List<TrackRun>? trackRuns;` and `final bool fitToTrack;`
+
+Additive and default-null, so all four existing call sites — the dive detail header, the Surface GPS section, the fullscreen locations page, and the match-sites review — keep working untouched.
+
+- [ ] **Step 1: Write the failing test**
+
+Create `test/features/dive_log/presentation/widgets/dive_locations_map_track_test.dart`:
+
+```dart
+import 'package:flutter/material.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:submersion/features/dive_log/presentation/widgets/dive_locations_map.dart';
+import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
+import 'package:submersion/features/gps_log/domain/entities/gps_track.dart';
+import 'package:submersion/features/gps_log/domain/track_colorization.dart';
+
+import '../../../../helpers/mock_providers.dart';
+
+GpsTrackPoint p(int t) => GpsTrackPoint(
+      timestamp: t,
+      latitude: 12.345 + t * 0.0001,
+      longitude: 98.765 + t * 0.0001,
+    );
+
+final _runs = [
+  TrackRun(points: [p(0), p(1), p(2), p(3)], bucket: 0),
+];
+
+Future<void> _pump(
+  WidgetTester tester, {
+  List<TrackRun>? trackRuns,
+}) async {
+  final base = await getBaseOverrides();
+  await tester.binding.setSurfaceSize(const Size(600, 600));
+  addTearDown(() => tester.binding.setSurfaceSize(null));
+  await tester.pumpWidget(
+    ProviderScope(
+      overrides: base,
+      child: MaterialApp(
+        home: Scaffold(
+          body: DiveLocationsMap(
+            entry: const GeoPoint(12.345, 98.765),
+            exit: const GeoPoint(12.346, 98.766),
+            interactive: true,
+            trackRuns: trackRuns,
+          ),
+        ),
+      ),
+    ),
+  );
+  await tester.pumpAndSettle();
+}
+
+void main() {
+  testWidgets('draws no polyline layer when trackRuns is null',
+      (tester) async {
+    await _pump(tester);
+    expect(find.byType(PolylineLayer<int>), findsNothing);
+  });
+
+  testWidgets('draws the track when runs are supplied', (tester) async {
+    await _pump(tester, trackRuns: _runs);
+    expect(find.byType(PolylineLayer<int>), findsOneWidget);
+  });
+
+  testWidgets('still renders the entry and exit markers with a track',
+      (tester) async {
+    await _pump(tester, trackRuns: _runs);
+    expect(find.byKey(const ValueKey('gps-entry-marker')), findsOneWidget);
+    expect(find.byKey(const ValueKey('gps-exit-marker')), findsOneWidget);
+  });
+
+  testWidgets('handles an empty run list without throwing', (tester) async {
+    await _pump(tester, trackRuns: const []);
+    expect(tester.takeException(), isNull);
+  });
+}
+```
+
+- [ ] **Step 2: Run test to verify it fails**
+
+Run: `flutter test test/features/dive_log/presentation/widgets/dive_locations_map_track_test.dart`
+Expected: FAIL — `DiveLocationsMap` has no `trackRuns` parameter.
+
+- [ ] **Step 3: Add the parameters**
+
+In `dive_locations_map.dart`, add to the constructor and fields:
+
+```dart
+  /// Optional surface track to draw beneath the markers.
+  ///
+  /// Null for every caller that predates GPS track rendering. When supplied,
+  /// the track is drawn first so entry/exit/site markers stay on top.
+  final List<TrackRun>? trackRuns;
+
+  /// When true and [trackRuns] is non-empty, the camera fits the track's
+  /// extent instead of just the marker points.
+  final bool fitToTrack;
+```
+
+In `build`, insert the layer immediately after the `TileLayer` and before the `MarkerLayer`:
+
+```dart
+              if (trackRuns != null && trackRuns!.isNotEmpty)
+                GpsTrackPolylineLayer(
+                  runs: trackRuns!,
+                  mode: TrackColorMode.uniform,
+                  strokeWidth: 3.0,
+                ),
+```
+
+When `fitToTrack` is true, extend the `points` list used for `CameraFit.bounds` with every run point before computing the fit. Keep the existing `maxZoom: 16.0` cap — a track spanning a few hundred metres would otherwise zoom past the tile provider's limit and render blank, which is the exact bug the existing comment at line 100 documents.
+
+- [ ] **Step 4: Replace the inline TileLayer**
+
+If Task 10 Step 7a has not already been applied here, replace the inline `TileLayer` with `submersionTileLayer(ref)` now.
+
+- [ ] **Step 5: Run all dive_log map tests**
+
+Run: `flutter test test/features/dive_log/`
+Expected: PASS, no regressions in the four existing call sites.
+
+- [ ] **Step 6: Format, analyze, commit**
+
+```bash
+dart format .
+flutter analyze
+git add lib/features/dive_log/presentation/widgets/dive_locations_map.dart test/features/dive_log/presentation/widgets/dive_locations_map_track_test.dart
+git commit -m "Add optional surface track layer to DiveLocationsMap"
+```
+
+---
+
+### Task 21: Windowed track in the Surface GPS section
+
+**Files:**
+- Modify: `lib/features/dive_log/presentation/widgets/surface_gps_section.dart`
+- Modify: `lib/features/dive_log/presentation/providers/dive_detail_ui_providers.dart`
+- Modify: `lib/l10n/arb/app_en.arb` plus all locale ARBs
+- Test: `test/features/dive_log/presentation/widgets/surface_gps_section_test.dart` (extend)
+- Test: `test/features/dive_log/presentation/widgets/surface_gps_track_test.dart`
+
+**Interfaces:**
+- Consumes: `trackForDiveProvider` (Task 12), `windowTrack` (Task 2), `bucketizeTrack` (Task 3), `DiveLocationsMap.trackRuns` (Task 20)
+- Produces: `surfaceGpsFullTrackProvider` → `StateProvider<bool>`
+
+Two constraints carried from the spec:
+
+- **The lazy gate must survive.** `surface_gps_section.dart:105-109` builds map content only when the section is expanded, so a collapsed section performs no blob decode. Watching `trackForDiveProvider` at the top of `build` would defeat that — it must be watched inside `_content`, which only runs when expanded.
+- **Adding a provider dependency to a shared widget breaks its existing consumer tests.** Every current `SurfaceGpsSection` test needs `trackForDiveProvider` overridden or it will hit the real repository. Step 5 handles this explicitly.
+
+- [ ] **Step 1: Add l10n strings**
+
+```json
+  "diveLog_detail_surfaceGps_track": "Surface track",
+  "@diveLog_detail_surfaceGps_track": {
+    "description": "Row label for the GPS surface track covering this dive"
+  },
+  "diveLog_detail_surfaceGps_trackFixes": "{count, plural, =1{1 fix} other{{count} fixes}}",
+  "@diveLog_detail_surfaceGps_trackFixes": {
+    "description": "Count of GPS positions in the surface track",
+    "placeholders": {"count": {"type": "int"}}
+  },
+  "diveLog_detail_surfaceGps_showFullTrack": "Full track",
+  "@diveLog_detail_surfaceGps_showFullTrack": {
+    "description": "Chip that expands the map from the dive window to the whole recording"
+  }
+```
+
+Translate into all locales, then `flutter gen-l10n`.
+
+- [ ] **Step 2: Write the failing test**
+
+Create `test/features/dive_log/presentation/widgets/surface_gps_track_test.dart`:
+
+```dart
+import 'package:flutter/material.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:submersion/features/dive_log/domain/entities/dive.dart';
+import 'package:submersion/features/dive_log/presentation/providers/dive_detail_ui_providers.dart';
+import 'package:submersion/features/dive_log/presentation/widgets/surface_gps_section.dart';
+import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
+import 'package:submersion/features/gps_log/domain/entities/gps_track.dart';
+import 'package:submersion/features/gps_log/presentation/providers/gps_track_map_providers.dart';
+import 'package:submersion/l10n/arb/app_localizations.dart';
+
+import '../../../../helpers/mock_providers.dart';
+
+/// Dive from 09:00 to 09:45 wall-clock.
+Dive _dive() => Dive(
+      id: 'dive-1',
+      diveNumber: 1,
+      dateTime: DateTime.utc(2026, 5, 22, 9),
+      bottomTime: const Duration(minutes: 45),
+      maxDepth: 30.0,
+      entryLocation: const GeoPoint(12.34567, 98.76543),
+      exitLocation: const GeoPoint(12.34612, 98.76489),
+    );
+
+/// Track from 08:00 to 12:00, one fix every 15 minutes.
+GpsTrack _track() {
+  final startSec = DateTime.utc(2026, 5, 22, 8).millisecondsSinceEpoch ~/ 1000;
+  return GpsTrack(
+    id: 'track-1',
+    startTime: DateTime.utc(2026, 5, 22, 8).millisecondsSinceEpoch,
+    endTime: DateTime.utc(2026, 5, 22, 12).millisecondsSinceEpoch,
+    pointCount: 17,
+    points: [
+      for (var i = 0; i < 17; i++)
+        GpsTrackPoint(
+          timestamp: startSec + i * 900,
+          latitude: 12.345 + i * 0.0002,
+          longitude: 98.765 + i * 0.0002,
+        ),
+    ],
+  );
+}
+
+Future<void> _pump(WidgetTester tester, {GpsTrack? track}) async {
+  final base = await getBaseOverrides();
+  await tester.binding.setSurfaceSize(const Size(600, 1200));
+  addTearDown(() => tester.binding.setSurfaceSize(null));
+  final originalOnError = FlutterError.onError;
+  FlutterError.onError = (d) {
+    if (d.toString().contains('overflowed')) return;
+    originalOnError?.call(d);
+  };
+  addTearDown(() => FlutterError.onError = originalOnError);
+
+  await tester.pumpWidget(
+    ProviderScope(
+      overrides: [
+        ...base,
+        surfaceGpsSectionExpandedProvider.overrideWithValue(true),
+        trackForDiveProvider('dive-1').overrideWith((ref) async => track),
+      ],
+      child: MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        home: Scaffold(body: SurfaceGpsSection(dive: _dive())),
+      ),
+    ),
+  );
+  await tester.pumpAndSettle();
+}
+
+void main() {
+  testWidgets('shows a track row when a track covers the dive',
+      (tester) async {
+    await _pump(tester, track: _track());
+    expect(find.text('Surface track'), findsOneWidget);
+  });
+
+  testWidgets('shows no track row when no track covers the dive',
+      (tester) async {
+    await _pump(tester, track: null);
+    expect(find.text('Surface track'), findsNothing);
+  });
+
+  testWidgets('draws only the dive window plus margin by default',
+      (tester) async {
+    await _pump(tester, track: _track());
+    final layer = tester.widget<PolylineLayer<int>>(
+      find.byType(PolylineLayer<int>),
+    );
+    final drawn = layer.polylines.fold<int>(
+      0,
+      (sum, line) => sum + line.points.length,
+    );
+    // Dive 09:00-09:45 plus 15 min either side = 08:45..10:00 = 6 fixes
+    // at 15-minute spacing. The full track has 17.
+    expect(drawn, lessThan(17));
+    expect(drawn, greaterThan(1));
+  });
+
+  testWidgets('the full-track chip expands to the whole recording',
+      (tester) async {
+    await _pump(tester, track: _track());
+    await tester.tap(find.text('Full track'));
+    await tester.pumpAndSettle();
+
+    final layer = tester.widget<PolylineLayer<int>>(
+      find.byType(PolylineLayer<int>),
+    );
+    final drawn = layer.polylines.fold<int>(
+      0,
+      (sum, line) => sum + line.points.length,
+    );
+    expect(drawn, 17);
+  });
+
+  testWidgets('a collapsed section never resolves the track', (tester) async {
+    var resolved = false;
+    final base = await getBaseOverrides();
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          ...base,
+          surfaceGpsSectionExpandedProvider.overrideWithValue(false),
+          trackForDiveProvider('dive-1').overrideWith((ref) async {
+            resolved = true;
+            return _track();
+          }),
+        ],
+        child: MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: Scaffold(body: SurfaceGpsSection(dive: _dive())),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    // The lazy gate exists so a collapsed section costs nothing. Watching
+    // the track provider outside _content would silently break that.
+    expect(resolved, isFalse);
+  });
+}
+```
+
+- [ ] **Step 3: Run test to verify it fails**
+
+Run: `flutter test test/features/dive_log/presentation/widgets/surface_gps_track_test.dart`
+Expected: FAIL — no `Surface track` row.
+
+- [ ] **Step 4: Implement the integration**
+
+Add to `dive_detail_ui_providers.dart`:
+
+```dart
+/// Whether the Surface GPS map shows the whole recording rather than just
+/// the dive's own window.
+final surfaceGpsFullTrackProvider = StateProvider<bool>((ref) => false);
+```
+
+In `surface_gps_section.dart`, inside `_content` (never in `build`), watch `trackForDiveProvider(widget.dive.id)`. When it resolves to a track:
+
+- Compute the window as `dive.dateTime` minus 15 minutes to `dive.dateTime + bottomTime` plus 15 minutes, both converted to epoch **seconds** to match point timestamps.
+- Call `windowTrack` unless `surfaceGpsFullTrackProvider` is true, in which case use `track.effectivePoints` whole.
+- Pass `bucketizeTrack(points, TrackColorMode.uniform)` to `DiveLocationsMap.trackRuns`, with `fitToTrack: true`.
+- Add a `FilterChip` labelled `l10n.diveLog_detail_surfaceGps_showFullTrack` bound to the provider.
+- Add a coordinate-style row: leading route icon, label `l10n.diveLog_detail_surfaceGps_track`, subtitle `l10n.diveLog_detail_surfaceGps_trackFixes(track.pointCount)`, tapping pushes `/gps-log/${track.id}`.
+
+Label the row "Surface track". Never call it the diver's route — during the dive the recording phone is on the boat, so this is the surface support path, and on a drift dive that distinction is the whole point.
+
+- [ ] **Step 5: Repair the existing SurfaceGpsSection tests**
+
+`SurfaceGpsSection` now depends on a new provider, which will make every existing test in `test/features/dive_log/presentation/widgets/surface_gps_section_test.dart` and `test/features/dive_log/presentation/pages/dive_surface_gps_section_test.dart` hit the real repository.
+
+Add to the override list in **both** files' pump helpers:
+
+```dart
+        trackForDiveProvider(_dive().id).overrideWith((ref) async => null),
+```
+
+- [ ] **Step 6: Run the full dive_log suite**
+
+Run: `flutter test test/features/dive_log/`
+Expected: PASS. If any test fails with a database or repository error, it is missing the override from Step 5.
+
+- [ ] **Step 7: Format, analyze, commit**
+
+```bash
+dart format .
+flutter analyze
+git add lib/features/dive_log/ lib/l10n/ test/features/dive_log/
+git commit -m "Show the covering surface track in the dive Surface GPS section"
+```
+
+---
+
+**Phase 4 complete.** All four rendering surfaces are live.
+
+```bash
+flutter test
+flutter analyze
+```
+
+---
+
+## Phase 5: Export
+
+---
+
+### Task 22: saveTextToFile helper
+
+**Files:**
+- Modify: `lib/core/services/export/shared/file_export_utils.dart`
+- Test: `test/core/services/export/shared/save_text_to_file_test.dart`
+
+**Interfaces:**
+- Produces: `Future<String?> saveTextToFile(String content, String fileName, {required String dialogTitle, required List<String> allowedExtensions})`
+
+`file_export_utils.dart` has `saveAndShareFile` (share sheet, returns `String`) and picker-based `saveImageToFile` / `savePdfToFile` (return `String?`, null on cancel), but **nothing that saves a string to a picked location**. Without this, a "Save to..." menu item would silently behave as share-only.
+
+- [ ] **Step 1: Write the failing test**
+
+Create `test/core/services/export/shared/save_text_to_file_test.dart`. Model it on the existing `test/core/services/export/file_picker_save_test.dart`, which already stubs `FilePicker.platform`:
+
+```dart
+import 'package:flutter_test/flutter_test.dart';
+import 'package:submersion/core/services/export/shared/file_export_utils.dart';
+
+void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
+  test('returns null when the user cancels the picker', () async {
+    // Install the cancelling FilePicker stub from file_picker_save_test.dart.
+    final result = await saveTextToFile(
+      '<gpx/>',
+      'track.gpx',
+      dialogTitle: 'Save GPX',
+      allowedExtensions: const ['gpx'],
+    );
+    expect(result, isNull);
+  });
+
+  test('returns the chosen path and writes the content', () async {
+    // Install a stub returning a temp-directory path.
+    final result = await saveTextToFile(
+      '<gpx>hello</gpx>',
+      'track.gpx',
+      dialogTitle: 'Save GPX',
+      allowedExtensions: const ['gpx'],
+    );
+    expect(result, isNotNull);
+    expect(await File(result!).readAsString(), '<gpx>hello</gpx>');
+  });
+}
+```
+
+Lift the FilePicker stub out of `file_picker_save_test.dart` into `test/helpers/` if it is currently file-private, so both tests share one implementation.
+
+- [ ] **Step 2: Run test to verify it fails**
+
+Run: `flutter test test/core/services/export/shared/save_text_to_file_test.dart`
+Expected: FAIL — `saveTextToFile` isn't defined.
+
+- [ ] **Step 3: Implement it**
+
+Add to `file_export_utils.dart`, next to `savePdfToFile` so the picker-based savers stay together:
+
+```dart
+/// Save string content to a user-selected file location.
+///
+/// Opens a file picker dialog allowing the user to choose where to save.
+/// Returns the saved file path, or null if the user cancelled.
+///
+/// The string counterpart to [savePdfToFile]. Distinct from
+/// [saveAndShareFile], which always opens the share sheet and cannot be
+/// cancelled.
+Future<String?> saveTextToFile(
+  String content,
+  String fileName, {
+  required String dialogTitle,
+  required List<String> allowedExtensions,
+}) async {
+  final bytes = Uint8List.fromList(utf8.encode(content));
+  final result = await FilePicker.saveFile(
+    dialogTitle: dialogTitle,
+    fileName: fileName,
+    type: FileType.custom,
+    allowedExtensions: allowedExtensions,
+    bytes: bytes,
+  );
+
+  if (result == null) return null;
+
+  // Matching savePdfToFile: on some platforms saveFile returns a path but
+  // does not write the bytes itself.
+  if (!Platform.isAndroid) {
+    await File(result).writeAsBytes(bytes);
+  }
+
+  return result;
+}
+```
+
+Add `import 'dart:convert';` to the file.
+
+- [ ] **Step 4: Run test, format, analyze, commit**
+
+```bash
+flutter test test/core/services/export/
+dart format .
+flutter analyze
+git add lib/core/services/export/shared/file_export_utils.dart test/core/services/export/
+git commit -m "Add saveTextToFile helper for picker-based text exports"
+```
+
+---
+
+### Task 23: GPX document builder
+
+**Files:**
+- Create: `lib/core/services/export/gpx/gpx_track_builder.dart`
+- Test: `test/core/services/export/gpx/gpx_track_builder_test.dart`
+
+**Interfaces:**
+- Consumes: `GpsTrack.effectivePoints` (Task 6)
+- Produces: `String buildGpxDocument(GpsTrack track, {required String creator})`
+
+A pure string builder with no I/O, so it is golden-testable. **Export must reverse the timezone conversion:** stored timestamps are wall-clock-as-UTC, and GPX `<time>` is real UTC, so subtract `tzOffsetMinutes` before formatting. A round trip through export and re-import must be lossless.
+
+- [ ] **Step 1: Write the failing test**
+
+Create `test/core/services/export/gpx/gpx_track_builder_test.dart`:
+
+```dart
+import 'package:flutter_test/flutter_test.dart';
+import 'package:submersion/core/services/export/gpx/gpx_track_builder.dart';
+import 'package:submersion/features/gps_log/domain/entities/gps_track.dart';
+
+GpsTrack _track({
+  int tzOffsetMinutes = 0,
+  String? name,
+  int? trimStart,
+  int? trimEnd,
+}) {
+  // 2026-05-22 08:00:00 wall clock.
+  final startSec = DateTime.utc(2026, 5, 22, 8).millisecondsSinceEpoch ~/ 1000;
+  return GpsTrack(
+    id: 'track-1',
+    startTime: startSec * 1000,
+    endTime: (startSec + 120) * 1000,
+    tzOffsetMinutes: tzOffsetMinutes,
+    name: name,
+    trimStartTime: trimStart,
+    trimEndTime: trimEnd,
+    pointCount: 3,
+    points: [
+      GpsTrackPoint(
+        timestamp: startSec,
+        latitude: 20.5,
+        longitude: -87.25,
+        accuracy: 5.0,
+      ),
+      GpsTrackPoint(
+        timestamp: startSec + 60,
+        latitude: 20.51,
+        longitude: -87.26,
+      ),
+      GpsTrackPoint(
+        timestamp: startSec + 120,
+        latitude: 20.52,
+        longitude: -87.27,
+      ),
+    ],
+  );
+}
+
+void main() {
+  test('emits a well-formed gpx root with the creator', () {
+    final gpx = buildGpxDocument(_track(), creator: 'Submersion');
+    expect(gpx, startsWith('<?xml version="1.0" encoding="UTF-8"?>'));
+    expect(gpx, contains('<gpx'));
+    expect(gpx, contains('version="1.1"'));
+    expect(gpx, contains('creator="Submersion"'));
+    expect(gpx, contains('</gpx>'));
+  });
+
+  test('emits one trkpt per fix with lat and lon attributes', () {
+    final gpx = buildGpxDocument(_track(), creator: 'Submersion');
+    expect('<trkpt'.allMatches(gpx).length, 3);
+    expect(gpx, contains('lat="20.5"'));
+    expect(gpx, contains('lon="-87.25"'));
+  });
+
+  test('writes real UTC times for a zero offset', () {
+    final gpx = buildGpxDocument(_track(), creator: 'Submersion');
+    expect(gpx, contains('<time>2026-05-22T08:00:00Z</time>'));
+  });
+
+  test('subtracts tzOffsetMinutes to recover real UTC', () {
+    // Recorded at 08:00 local in UTC-5, so real UTC is 13:00.
+    final gpx = buildGpxDocument(
+      _track(tzOffsetMinutes: -300),
+      creator: 'Submersion',
+    );
+    expect(gpx, contains('<time>2026-05-22T13:00:00Z</time>'));
+  });
+
+  test('handles a positive offset', () {
+    // 08:00 local in UTC+8 is 00:00 real UTC.
+    final gpx = buildGpxDocument(
+      _track(tzOffsetMinutes: 480),
+      creator: 'Submersion',
+    );
+    expect(gpx, contains('<time>2026-05-22T00:00:00Z</time>'));
+  });
+
+  test('includes the track name when set', () {
+    final gpx = buildGpxDocument(
+      _track(name: 'Palancar morning'),
+      creator: 'Submersion',
+    );
+    expect(gpx, contains('<name>Palancar morning</name>'));
+  });
+
+  test('escapes XML metacharacters in the name', () {
+    final gpx = buildGpxDocument(
+      _track(name: 'Reef & <Wall>'),
+      creator: 'Submersion',
+    );
+    expect(gpx, contains('Reef &amp; &lt;Wall&gt;'));
+    expect(gpx, isNot(contains('<Wall>')));
+  });
+
+  test('emits hdop from accuracy where present', () {
+    final gpx = buildGpxDocument(_track(), creator: 'Submersion');
+    expect(gpx, contains('<hdop>5.0</hdop>'));
+    // Only the first fix has accuracy.
+    expect('<hdop>'.allMatches(gpx).length, 1);
+  });
+
+  test('honours trim bounds via effectivePoints', () {
+    final startSec = DateTime.utc(2026, 5, 22, 8).millisecondsSinceEpoch;
+    final gpx = buildGpxDocument(
+      _track(trimStart: startSec + 60000),
+      creator: 'Submersion',
+    );
+    // The 08:00 fix is trimmed away; two remain.
+    expect('<trkpt'.allMatches(gpx).length, 2);
+  });
+
+  test('emits an empty trkseg for a track with no points', () {
+    const empty = GpsTrack(id: 'e', startTime: 0, endTime: 1);
+    final gpx = buildGpxDocument(empty, creator: 'Submersion');
+    expect(gpx, contains('<trkseg>'));
+    expect(gpx, isNot(contains('<trkpt')));
+  });
+}
+```
+
+- [ ] **Step 2: Run test to verify it fails**
+
+Run: `flutter test test/core/services/export/gpx/gpx_track_builder_test.dart`
+Expected: FAIL — `buildGpxDocument` isn't defined.
+
+- [ ] **Step 3: Implement the builder**
+
+Create `lib/core/services/export/gpx/gpx_track_builder.dart`:
+
+```dart
+import 'package:xml/xml.dart';
+
+import 'package:submersion/features/gps_log/domain/entities/gps_track.dart';
+
+/// Converts a stored wall-clock-as-UTC epoch second into real UTC.
+///
+/// Points are stored as the recording device's local wall clock reinterpreted
+/// as UTC, so recovering the true instant means subtracting the offset that
+/// was folded in at record time. GPX <time> is unambiguously real UTC.
+DateTime realUtcFrom(int wallClockEpochSeconds, int tzOffsetMinutes) {
+  return DateTime.fromMillisecondsSinceEpoch(
+    wallClockEpochSeconds * 1000,
+    isUtc: true,
+  ).subtract(Duration(minutes: tzOffsetMinutes));
+}
+
+/// ISO 8601 with a trailing Z, which is what GPX consumers expect.
+String _formatGpxTime(DateTime utc) {
+  String two(int v) => v.toString().padLeft(2, '0');
+  return '${utc.year.toString().padLeft(4, '0')}-'
+      '${two(utc.month)}-${two(utc.day)}T'
+      '${two(utc.hour)}:${two(utc.minute)}:${two(utc.second)}Z';
+}
+
+/// Builds a GPX 1.1 document for [track].
+///
+/// Pure: no file I/O, no share sheet. Respects trim bounds by reading
+/// [GpsTrack.effectivePoints].
+String buildGpxDocument(GpsTrack track, {required String creator}) {
+  final builder = XmlBuilder();
+  builder.processing('xml', 'version="1.0" encoding="UTF-8"');
+  builder.element(
+    'gpx',
+    nest: () {
+      builder.attribute('version', '1.1');
+      builder.attribute('creator', creator);
+      builder.attribute('xmlns', 'http://www.topografix.com/GPX/1/1');
+
+      builder.element(
+        'trk',
+        nest: () {
+          final name = track.name;
+          if (name != null && name.isNotEmpty) {
+            // XmlBuilder.text escapes metacharacters for us.
+            builder.element('name', nest: () => builder.text(name));
+          }
+          builder.element(
+            'trkseg',
+            nest: () {
+              for (final point in track.effectivePoints) {
+                builder.element(
+                  'trkpt',
+                  nest: () {
+                    builder.attribute('lat', point.latitude.toString());
+                    builder.attribute('lon', point.longitude.toString());
+                    builder.element(
+                      'time',
+                      nest: () => builder.text(
+                        _formatGpxTime(
+                          realUtcFrom(point.timestamp, track.tzOffsetMinutes),
+                        ),
+                      ),
+                    );
+                    final accuracy = point.accuracy;
+                    if (accuracy != null) {
+                      builder.element(
+                        'hdop',
+                        nest: () => builder.text(accuracy.toString()),
+                      );
+                    }
+                  },
+                );
+              }
+            },
+          );
+        },
+      );
+    },
+  );
+
+  return builder.buildDocument().toXmlString(pretty: true, indent: '  ');
+}
+```
+
+- [ ] **Step 4: Run test to verify it passes**
+
+Run: `flutter test test/core/services/export/gpx/gpx_track_builder_test.dart`
+Expected: PASS, 10 tests.
+
+- [ ] **Step 5: Format, analyze, commit**
+
+```bash
+dart format .
+flutter analyze
+git add lib/core/services/export/gpx/ test/core/services/export/gpx/
+git commit -m "Add GPX document builder for GPS tracks"
+```
+
+---
+
+### Task 24: GPX export service and KML gx:Track
+
+**Files:**
+- Create: `lib/core/services/export/gpx/gpx_export_service.dart`
+- Modify: `lib/core/services/export/kml/kml_export_service.dart`
+- Test: `test/core/services/export/gpx/gpx_export_service_test.dart`
+- Test: `test/core/services/export/kml/kml_track_export_test.dart`
+
+**Interfaces:**
+- Consumes: `buildGpxDocument` (Task 23), `saveTextToFile` (Task 22), `realUtcFrom` (Task 23)
+- Produces:
+  - `GpxExportService.shareTrack(GpsTrack)` → `Future<String>`
+  - `GpxExportService.saveTrackToFile(GpsTrack)` → `Future<String?>`
+  - `KmlExportService.generateTrackKml(GpsTrack)` → `Future<String>`
+  - `KmlExportService.shareTrackKml(GpsTrack)` / `saveTrackKmlToFile(GpsTrack)`
+
+`<gx:Track>` interleaves `<when>` and `<gx:coord>` in matching order, and `<gx:coord>` is space-separated `lon lat alt` — the opposite axis order from GPX attributes, which is a classic source of tracks rendering in the Indian Ocean.
+
+- [ ] **Step 1: Write the failing KML test**
+
+Create `test/core/services/export/kml/kml_track_export_test.dart`:
+
+```dart
+import 'package:flutter_test/flutter_test.dart';
+import 'package:submersion/core/services/export/kml/kml_export_service.dart';
+import 'package:submersion/features/gps_log/domain/entities/gps_track.dart';
+
+GpsTrack _track({int tzOffsetMinutes = 0}) {
+  final startSec = DateTime.utc(2026, 5, 22, 8).millisecondsSinceEpoch ~/ 1000;
+  return GpsTrack(
+    id: 'track-1',
+    startTime: startSec * 1000,
+    endTime: (startSec + 60) * 1000,
+    tzOffsetMinutes: tzOffsetMinutes,
+    pointCount: 2,
+    points: [
+      GpsTrackPoint(timestamp: startSec, latitude: 20.5, longitude: -87.25),
+      GpsTrackPoint(
+        timestamp: startSec + 60,
+        latitude: 20.51,
+        longitude: -87.26,
+      ),
+    ],
+  );
+}
+
+void main() {
+  late KmlExportService service;
+
+  setUp(() => service = KmlExportService());
+
+  test('declares the gx namespace', () async {
+    final kml = await service.generateTrackKml(_track());
+    expect(kml, contains('xmlns:gx="http://www.google.com/kml/ext/2.2"'));
+  });
+
+  test('emits matching counts of when and gx:coord', () async {
+    final kml = await service.generateTrackKml(_track());
+    expect('<when>'.allMatches(kml).length, 2);
+    expect('<gx:coord>'.allMatches(kml).length, 2);
+  });
+
+  test('writes gx:coord as lon lat alt, not lat lon', () async {
+    final kml = await service.generateTrackKml(_track());
+    // Longitude first. Getting this backwards puts a Cozumel track in the
+    // Indian Ocean.
+    expect(kml, contains('<gx:coord>-87.25 20.5 0</gx:coord>'));
+  });
+
+  test('converts wall-clock timestamps back to real UTC', () async {
+    final kml = await service.generateTrackKml(_track(tzOffsetMinutes: -300));
+    expect(kml, contains('<when>2026-05-22T13:00:00Z</when>'));
+  });
+
+  test('produces an empty gx:Track for a track with no points', () async {
+    const empty = GpsTrack(id: 'e', startTime: 0, endTime: 1);
+    final kml = await service.generateTrackKml(empty);
+    expect(kml, contains('<gx:Track>'));
+    expect(kml, isNot(contains('<when>')));
+  });
+}
+```
+
+- [ ] **Step 2: Write the failing GPX service test**
+
+Create `test/core/services/export/gpx/gpx_export_service_test.dart` asserting that `saveTrackToFile` returns null when the picker is cancelled and a path otherwise, reusing the FilePicker stub helper from Task 22. Assert the filename pattern is `submersion_track_YYYY-MM-DD.gpx`.
+
+- [ ] **Step 3: Run tests to verify they fail**
+
+Run: `flutter test test/core/services/export/`
+Expected: FAIL — `generateTrackKml` isn't defined.
+
+- [ ] **Step 4: Implement the GPX service**
+
+Create `lib/core/services/export/gpx/gpx_export_service.dart`:
+
+```dart
+import 'package:intl/intl.dart';
+
+import 'package:submersion/core/services/export/gpx/gpx_track_builder.dart';
+import 'package:submersion/core/services/export/shared/file_export_utils.dart';
+import 'package:submersion/features/gps_log/domain/entities/gps_track.dart';
+
+const String _kGpxMimeType = 'application/gpx+xml';
+
+/// GPX export for recorded GPS surface tracks.
+class GpxExportService {
+  final _dateFormat = DateFormat('yyyy-MM-dd');
+
+  String _fileNameFor(GpsTrack track) {
+    // Track times are wall-clock-as-UTC: format the UTC components.
+    final date = DateTime.fromMillisecondsSinceEpoch(
+      track.startTime,
+      isUtc: true,
+    );
+    return 'submersion_track_${_dateFormat.format(date)}.gpx';
+  }
+
+  /// Writes the track and opens the system share sheet. Cannot be cancelled.
+  Future<String> shareTrack(GpsTrack track) {
+    return saveAndShareFile(
+      buildGpxDocument(track, creator: 'Submersion'),
+      _fileNameFor(track),
+      _kGpxMimeType,
+    );
+  }
+
+  /// Prompts for a location and writes the track there.
+  /// Returns null if the user cancelled.
+  Future<String?> saveTrackToFile(GpsTrack track) {
+    return saveTextToFile(
+      buildGpxDocument(track, creator: 'Submersion'),
+      _fileNameFor(track),
+      dialogTitle: 'Save GPX',
+      allowedExtensions: const ['gpx'],
+    );
+  }
+}
+```
+
+- [ ] **Step 5: Add gx:Track to the KML service**
+
+Add to `KmlExportService`:
+
+```dart
+  /// Builds a KML document containing [track] as a timestamped gx:Track.
+  ///
+  /// Note the axis order: gx:coord is "lon lat alt", the reverse of GPX's
+  /// lat/lon attributes.
+  Future<String> generateTrackKml(GpsTrack track) async {
+    final buffer = StringBuffer()
+      ..writeln('<?xml version="1.0" encoding="UTF-8"?>')
+      ..writeln('<kml xmlns="http://www.opengis.net/kml/2.2" '
+          'xmlns:gx="http://www.google.com/kml/ext/2.2">')
+      ..writeln('  <Document>')
+      ..writeln('    <Placemark>')
+      ..writeln('      <gx:Track>');
+
+    for (final point in track.effectivePoints) {
+      final utc = realUtcFrom(point.timestamp, track.tzOffsetMinutes);
+      buffer.writeln('        <when>${_formatKmlTime(utc)}</when>');
+    }
+    for (final point in track.effectivePoints) {
+      buffer.writeln(
+        '        <gx:coord>${point.longitude} ${point.latitude} 0</gx:coord>',
+      );
+    }
+
+    buffer
+      ..writeln('      </gx:Track>')
+      ..writeln('    </Placemark>')
+      ..writeln('  </Document>')
+      ..writeln('</kml>');
+    return buffer.toString();
+  }
+
+  String _formatKmlTime(DateTime utc) {
+    String two(int v) => v.toString().padLeft(2, '0');
+    return '${utc.year.toString().padLeft(4, '0')}-'
+        '${two(utc.month)}-${two(utc.day)}T'
+        '${two(utc.hour)}:${two(utc.minute)}:${two(utc.second)}Z';
+  }
+
+  Future<String> shareTrackKml(GpsTrack track) async {
+    return saveAndShareFile(
+      await generateTrackKml(track),
+      'submersion_track_${_dateFormat.format(DateTime.fromMillisecondsSinceEpoch(track.startTime, isUtc: true))}.kml',
+      'application/vnd.google-earth.kml+xml',
+    );
+  }
+
+  Future<String?> saveTrackKmlToFile(GpsTrack track) async {
+    return saveTextToFile(
+      await generateTrackKml(track),
+      'submersion_track_${_dateFormat.format(DateTime.fromMillisecondsSinceEpoch(track.startTime, isUtc: true))}.kml',
+      dialogTitle: 'Save KML',
+      allowedExtensions: const ['kml'],
+    );
+  }
+```
+
+Import `gpx_track_builder.dart` for `realUtcFrom` rather than duplicating the conversion — one implementation, one place for the sign to be wrong.
+
+- [ ] **Step 6: Run tests, format, analyze, commit**
+
+```bash
+flutter test test/core/services/export/
+dart format .
+flutter analyze
+git add lib/core/services/export/ test/core/services/export/
+git commit -m "Add GPX export service and KML gx:Track output"
+```
+
+---
+
+### Task 25: Export menu on the track detail page
+
+**Files:**
+- Modify: `lib/features/gps_log/presentation/pages/gps_track_detail_page.dart`
+- Modify: `lib/l10n/arb/app_en.arb` plus all locale ARBs
+- Test: `test/features/gps_log/gps_track_export_menu_test.dart`
+
+**Interfaces:**
+- Consumes: `GpxExportService`, `KmlExportService.shareTrackKml` (Task 24)
+
+- [ ] **Step 1: Add l10n strings**
+
+```json
+  "gpsTrack_action_export": "Export",
+  "@gpsTrack_action_export": {"description": "Overflow menu entry that exports the track"},
+  "gpsTrack_action_shareGpx": "Share as GPX",
+  "@gpsTrack_action_shareGpx": {"description": "Share the track via the system share sheet as GPX"},
+  "gpsTrack_action_saveGpx": "Save as GPX...",
+  "@gpsTrack_action_saveGpx": {"description": "Save the track to a chosen location as GPX"},
+  "gpsTrack_action_shareKml": "Share as KML",
+  "@gpsTrack_action_shareKml": {"description": "Share the track via the system share sheet as KML"},
+  "gpsTrack_action_saveKml": "Save as KML...",
+  "@gpsTrack_action_saveKml": {"description": "Save the track to a chosen location as KML"},
+  "gpsTrack_export_saved": "Saved to {path}",
+  "@gpsTrack_export_saved": {
+    "description": "Confirmation after a successful save",
+    "placeholders": {"path": {"type": "String"}}
+  },
+  "gpsTrack_export_failed": "Export failed.",
+  "@gpsTrack_export_failed": {"description": "Shown when writing the export file throws"}
+```
+
+The trailing `...` on the save entries follows the platform convention that a menu item opening a further dialog is elided. Translate into all locales, then `flutter gen-l10n`.
+
+- [ ] **Step 2: Write the failing test**
+
+Create `test/features/gps_log/gps_track_export_menu_test.dart`:
+
+```dart
+  testWidgets('the overflow menu offers all four export entries',
+      (tester) async {
+    // Pump the detail page, tap the overflow icon, expand Export.
+    expect(find.text('Share as GPX'), findsOneWidget);
+    expect(find.text('Save as GPX...'), findsOneWidget);
+    expect(find.text('Share as KML'), findsOneWidget);
+    expect(find.text('Save as KML...'), findsOneWidget);
+  });
+
+  testWidgets('a cancelled save shows no confirmation', (tester) async {
+    // Override the export service with one whose saveTrackToFile returns
+    // null. Tap Save as GPX. Assert no SnackBar appears - a cancel is not
+    // a failure and must not be reported as one.
+    expect(find.byType(SnackBar), findsNothing);
+  });
+
+  testWidgets('a successful save confirms with the path', (tester) async {
+    expect(find.textContaining('Saved to'), findsOneWidget);
+  });
+
+  testWidgets('a throwing export shows a failure message', (tester) async {
+    expect(find.text('Export failed.'), findsOneWidget);
+  });
+```
+
+Fill the harness bodies using the `_pump` helper from `gps_track_detail_page_test.dart`, adding a `gpxExportServiceProvider` override. Introduce that provider in Step 3 so the service is injectable.
+
+- [ ] **Step 3: Add the export providers and menu**
+
+Add to `gps_track_map_providers.dart`:
+
+```dart
+final gpxExportServiceProvider = Provider<GpxExportService>(
+  (ref) => GpxExportService(),
+);
+final kmlExportServiceProvider = Provider<KmlExportService>(
+  (ref) => KmlExportService(),
+);
+```
+
+Add a `PopupMenuButton` to the detail page app bar with an Export submenu. Handle the three outcomes distinctly:
+
+- **null return** — the user cancelled. Show nothing. A cancel is not an error, and reporting it as one trains people to ignore the message.
+- **a path** — show `l10n.gpsTrack_export_saved(path)`.
+- **a throw** — log via `LoggerService` and show `l10n.gpsTrack_export_failed`.
+
+Capture `ScaffoldMessenger.of(context)` before the await, and guard on `mounted` after — the standard async-gap pattern used in `gps_logger_page.dart:69`.
+
+- [ ] **Step 4: Run tests, format, analyze, commit**
+
+```bash
+flutter test test/features/gps_log/
+dart format .
+flutter analyze
+git add lib/features/gps_log/ lib/l10n/ test/features/gps_log/
+git commit -m "Add GPX and KML export entries to the track detail menu"
+```
+
+---
+
+**Phase 5 complete.** Tracks can leave the app as GPX or KML, via share sheet or a chosen location.
+
+```bash
+flutter test
+flutter analyze
+```
+
+---
