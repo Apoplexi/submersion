@@ -238,22 +238,43 @@ def write_beta_changelog(_metadata_root = nil)
   $stub_changelog_root
 end
 
+# Runs the recorded lane body and returns the params it handed the upload action,
+# or nil. Guarded rather than called bare: this file collects failures and prints
+# them together at the end, so a renamed lane or a lane that never reaches the
+# upload has to be reported as a failure, not raised as a NoMethodError that
+# aborts the run and takes every earlier failure's message with it.
+def run_upload_beta_lane
+  $upload_params = nil
+  lane_body = LANES[:upload_beta]
+  unless lane_body
+    check(false, 'the android Fastfile no longer defines an upload_beta lane to check')
+    return nil
+  end
+
+  lane_body.call
+  check(!$upload_params.nil?, 'the upload_beta lane never called upload_to_play_store')
+  $upload_params
+end
+
 $stub_changelog_root = '/somewhere/else/metadata/android'
-LANES[:upload_beta].call
-check($upload_params[:metadata_path] == $stub_changelog_root,
-      "the lane pointed supply at #{$upload_params[:metadata_path].inspect} " \
-      "instead of #{$stub_changelog_root.inspect}, where the notes were written")
-check($upload_params[:skip_upload_changelogs] == false,
-      'the lane skipped changelog upload even though notes were written')
+params = run_upload_beta_lane
+if params
+  check(params[:metadata_path] == $stub_changelog_root,
+        "the lane pointed supply at #{params[:metadata_path].inspect} " \
+        "instead of #{$stub_changelog_root.inspect}, where the notes were written")
+  check(params[:skip_upload_changelogs] == false,
+        'the lane skipped changelog upload even though notes were written')
+end
 
 # With nothing written, the upload must still name a metadata path (nil is not a
 # value supply accepts) while leaving the notes already on Play untouched.
 $stub_changelog_root = nil
-$upload_params = nil
-LANES[:upload_beta].call
-check($upload_params[:skip_upload_changelogs] == true,
-      'the lane uploaded changelogs when there were no notes to upload')
-check(!$upload_params[:metadata_path].nil?, 'the lane passed a nil metadata_path')
+params = run_upload_beta_lane
+if params
+  check(params[:skip_upload_changelogs] == true,
+        'the lane uploaded changelogs when there were no notes to upload')
+  check(!params[:metadata_path].nil?, 'the lane passed a nil metadata_path')
+end
 
 # --- Report -----------------------------------------------------------------
 
