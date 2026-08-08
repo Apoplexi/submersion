@@ -823,22 +823,31 @@ void main() {
     // roles -- so a title that falls back to a body role renders in a visibly
     // different font from the rest of the app's lists.
 
+    // Trip dates are formatted with DateFormat.yMMMd(), which resolves against
+    // Intl.defaultLocale -- a process global that app.dart sets from the app
+    // locale -- NOT the MaterialApp locale. Pin it so the date lookups below
+    // state their real dependency instead of riding on intl's implicit en_US
+    // fallback, and restore it so the global stays contained. No
+    // initializeDateFormatting is needed because GlobalMaterialLocalizations
+    // does it for widget tests.
+    setUp(() {
+      final previousLocale = Intl.defaultLocale;
+      Intl.defaultLocale = 'en';
+      addTearDown(() => Intl.defaultLocale = previousLocale);
+    });
+
+    // RenderParagraph carries the *effective* style, i.e. the widget's own
+    // style merged with any inherited DefaultTextStyle. Reading Text.style
+    // alone would not catch a title that silently inherits ListTile's
+    // Material 3 default of bodyLarge.
+    TextStyle effectiveStyleOf(WidgetTester tester, String text) =>
+        tester.renderObject<RenderParagraph>(find.text(text)).text.style!;
+
     Future<TextStyle> pumpAndResolve(
       WidgetTester tester,
       String text, {
       required String tripName,
     }) async {
-      // TripListTile dates itself with DateFormat.yMMMd(), which resolves
-      // against Intl.defaultLocale -- a process global that app.dart sets from
-      // the app locale -- NOT the MaterialApp locale. Pin it so the
-      // "Jun 1, 2024 - Jun 7, 2024" lookup states its real dependency instead
-      // of riding on intl's implicit en_US fallback, and restore it so the
-      // global stays contained. No initializeDateFormatting is needed here
-      // because GlobalMaterialLocalizations does it for widget tests.
-      final previousLocale = Intl.defaultLocale;
-      Intl.defaultLocale = 'en';
-      addTearDown(() => Intl.defaultLocale = previousLocale);
-
       final overrides = await _buildPhoneOverrides(
         trips: [_makeTrip(id: 't1', name: tripName, diveCount: 12)],
         viewMode: ListViewMode.detailed,
@@ -851,11 +860,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      // RenderParagraph carries the *effective* style, i.e. the widget's own
-      // style merged with any inherited DefaultTextStyle. Reading Text.style
-      // alone would not catch a title that silently inherits ListTile's
-      // Material 3 default of bodyLarge.
-      return tester.renderObject<RenderParagraph>(find.text(text)).text.style!;
+      return effectiveStyleOf(tester, text);
     }
 
     testWidgets('title uses titleMedium like dive and site cards', (
@@ -895,6 +900,56 @@ void main() {
     testWidgets('renders the detailed card without overflow', (tester) async {
       await pumpAndResolve(tester, 'Maldives Trip', tripName: 'Maldives Trip');
       expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('search results use the same roles as the trip card', (
+      tester,
+    ) async {
+      // The site search delegate renders its results with the real
+      // SiteListTile, so trip search results have to match the trip card too.
+      // The list underneath the search route stays in the widget tree, so the
+      // result trip is given a distinct name and date range to keep the
+      // find.text lookups unambiguous.
+      final result = _makeTrip(
+        id: 't2',
+        name: 'Maldives Trip',
+        startDate: DateTime(2025, 3, 2),
+        endDate: DateTime(2025, 3, 9),
+      );
+      final overrides = await _buildPhoneOverrides(
+        trips: [_makeTrip(id: 't1', name: 'Alpha Trip')],
+        viewMode: ListViewMode.detailed,
+      );
+      overrides.add(
+        tripSearchProvider.overrideWith((ref, query) async => [result.trip]),
+      );
+
+      await tester.pumpWidget(
+        testApp(
+          overrides: overrides,
+          child: const TripListContent(showAppBar: true),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byIcon(Icons.search));
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byType(TextField), 'Mal');
+      await tester.pumpAndSettle();
+
+      // Resolve the expectations from the search route's own context:
+      // showSearch installs the delegate's appBarTheme, so reading the roles
+      // from anywhere else could compare against a different ThemeData.
+      final theme = Theme.of(tester.element(find.text('Maldives Trip')));
+
+      final title = effectiveStyleOf(tester, 'Maldives Trip');
+      expect(title.fontFamily, theme.textTheme.titleMedium!.fontFamily);
+      expect(title.fontSize, theme.textTheme.titleMedium!.fontSize);
+      expect(title.fontWeight, FontWeight.w600);
+
+      final subtitle = effectiveStyleOf(tester, 'Mar 2, 2025 - Mar 9, 2025');
+      expect(subtitle.fontSize, theme.textTheme.bodyMedium!.fontSize);
+      expect(subtitle.color, theme.colorScheme.onSurfaceVariant);
     });
 
     testWidgets('title keeps the title font family under the console theme', (
