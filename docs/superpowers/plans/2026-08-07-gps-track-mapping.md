@@ -1831,3 +1831,638 @@ flutter analyze
 ```
 
 ---
+
+## Phase 2: Track Detail Page
+
+First user-visible value. At the end of this phase a diver can tap a track and see where the boat went.
+
+---
+
+### Task 9: Polyline layer from colorization runs
+
+**Files:**
+- Create: `lib/features/gps_log/presentation/widgets/gps_track_polyline_layer.dart`
+- Test: `test/features/gps_log/gps_track_polyline_layer_test.dart`
+
+**Interfaces:**
+- Consumes: `TrackRun`, `TrackColorMode`, `kTrackColorBuckets` (Task 3)
+- Produces:
+  - `List<Color> trackBucketColors(ColorScheme scheme, TrackColorMode mode, int buckets)`
+  - `List<Polyline> buildTrackPolylines({required List<TrackRun> runs, required TrackColorMode mode, required ColorScheme scheme, double strokeWidth = 4.0, Color? uniformColor})`
+  - `class GpsTrackPolylineLayer extends StatelessWidget` wrapping `PolylineLayer`
+
+Each `Polyline` carries its run index as `hitValue`, which is how Task 13 resolves a tap back to a point. The colour ramp is generated from the theme rather than hard-coded so it reads correctly in both light and dark.
+
+- [ ] **Step 1: Write the failing test**
+
+Create `test/features/gps_log/gps_track_polyline_layer_test.dart`:
+
+```dart
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:submersion/features/gps_log/domain/entities/gps_track.dart';
+import 'package:submersion/features/gps_log/domain/track_colorization.dart';
+import 'package:submersion/features/gps_log/presentation/widgets/gps_track_polyline_layer.dart';
+
+GpsTrackPoint p(int t) =>
+    GpsTrackPoint(timestamp: t, latitude: t * 0.001, longitude: 0.0);
+
+TrackRun run(int bucket, int count) => TrackRun(
+      points: List.generate(count, (i) => p(bucket * 100 + i)),
+      bucket: bucket,
+    );
+
+void main() {
+  final scheme = ColorScheme.fromSeed(seedColor: Colors.blue);
+
+  group('trackBucketColors', () {
+    test('returns one colour per bucket', () {
+      final colors = trackBucketColors(scheme, TrackColorMode.speed, 8);
+      expect(colors.length, 8);
+    });
+
+    test('produces visually distinct endpoints', () {
+      final colors = trackBucketColors(scheme, TrackColorMode.speed, 8);
+      expect(colors.first, isNot(equals(colors.last)));
+    });
+
+    test('uniform mode returns a single colour', () {
+      final colors = trackBucketColors(scheme, TrackColorMode.uniform, 8);
+      expect(colors.length, 1);
+    });
+  });
+
+  group('buildTrackPolylines', () {
+    test('emits one polyline per run', () {
+      final runs = [run(0, 3), run(3, 4), run(7, 2)];
+      final lines = buildTrackPolylines(
+        runs: runs,
+        mode: TrackColorMode.speed,
+        scheme: scheme,
+      );
+      expect(lines.length, 3);
+    });
+
+    test('carries the run index as hitValue for tap resolution', () {
+      final runs = [run(0, 3), run(3, 4)];
+      final lines = buildTrackPolylines(
+        runs: runs,
+        mode: TrackColorMode.speed,
+        scheme: scheme,
+      );
+      expect(lines[0].hitValue, 0);
+      expect(lines[1].hitValue, 1);
+    });
+
+    test('maps each run to the colour for its bucket', () {
+      final colors = trackBucketColors(scheme, TrackColorMode.speed, 8);
+      final runs = [run(0, 2), run(7, 2)];
+      final lines = buildTrackPolylines(
+        runs: runs,
+        mode: TrackColorMode.speed,
+        scheme: scheme,
+      );
+      expect(lines[0].color, colors[0]);
+      expect(lines[1].color, colors[7]);
+    });
+
+    test('uniform mode honours an explicit uniformColor override', () {
+      final runs = [run(0, 3)];
+      final lines = buildTrackPolylines(
+        runs: runs,
+        mode: TrackColorMode.uniform,
+        scheme: scheme,
+        uniformColor: const Color(0xFF123456),
+      );
+      expect(lines.single.color, const Color(0xFF123456));
+    });
+
+    test('converts every point to a LatLng in order', () {
+      final runs = [run(0, 3)];
+      final lines = buildTrackPolylines(
+        runs: runs,
+        mode: TrackColorMode.uniform,
+        scheme: scheme,
+      );
+      expect(lines.single.points.length, 3);
+      expect(lines.single.points.first.latitude, closeTo(0.0, 1e-9));
+    });
+
+    test('returns empty for no runs', () {
+      final lines = buildTrackPolylines(
+        runs: const [],
+        mode: TrackColorMode.speed,
+        scheme: scheme,
+      );
+      expect(lines, isEmpty);
+    });
+
+    test('clamps an out-of-range bucket rather than throwing', () {
+      final lines = buildTrackPolylines(
+        runs: [run(99, 2)],
+        mode: TrackColorMode.speed,
+        scheme: scheme,
+      );
+      expect(lines.length, 1);
+    });
+  });
+}
+```
+
+- [ ] **Step 2: Run test to verify it fails**
+
+Run: `flutter test test/features/gps_log/gps_track_polyline_layer_test.dart`
+Expected: FAIL — `trackBucketColors` isn't defined.
+
+- [ ] **Step 3: Write the implementation**
+
+Create `lib/features/gps_log/presentation/widgets/gps_track_polyline_layer.dart`:
+
+```dart
+import 'package:flutter/material.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong.dart';
+
+import 'package:submersion/features/gps_log/domain/track_colorization.dart';
+
+/// Sequential ramp endpoints for each colorization mode.
+///
+/// Speed runs cool (slow) to warm (fast); elapsed time runs light to dark in
+/// the theme's primary hue. Both are generated from the active [ColorScheme]
+/// rather than hard-coded so they hold up in light and dark themes.
+List<Color> trackBucketColors(
+  ColorScheme scheme,
+  TrackColorMode mode,
+  int buckets,
+) {
+  if (mode == TrackColorMode.uniform) return [scheme.primary];
+
+  final (Color from, Color to) = switch (mode) {
+    TrackColorMode.speed => (scheme.tertiary, scheme.error),
+    TrackColorMode.elapsed => (scheme.primaryContainer, scheme.primary),
+    TrackColorMode.uniform => (scheme.primary, scheme.primary),
+  };
+
+  if (buckets <= 1) return [to];
+  return [
+    for (var i = 0; i < buckets; i++)
+      Color.lerp(from, to, i / (buckets - 1))!,
+  ];
+}
+
+/// Converts colorization runs into one [Polyline] per run.
+///
+/// Each polyline carries its run index as [Polyline.hitValue] so a tap can be
+/// resolved back to a specific span of the track.
+List<Polyline<int>> buildTrackPolylines({
+  required List<TrackRun> runs,
+  required TrackColorMode mode,
+  required ColorScheme scheme,
+  double strokeWidth = 4.0,
+  Color? uniformColor,
+}) {
+  if (runs.isEmpty) return const [];
+
+  final colors = trackBucketColors(scheme, mode, kTrackColorBuckets);
+
+  return [
+    for (var i = 0; i < runs.length; i++)
+      Polyline<int>(
+        points: [
+          for (final p in runs[i].points) LatLng(p.latitude, p.longitude),
+        ],
+        color: mode == TrackColorMode.uniform
+            ? (uniformColor ?? colors.first)
+            : colors[runs[i].bucket.clamp(0, colors.length - 1)],
+        strokeWidth: strokeWidth,
+        strokeCap: StrokeCap.round,
+        strokeJoin: StrokeJoin.round,
+        hitValue: i,
+      ),
+  ];
+}
+
+/// Draws a colorized track as a flutter_map layer.
+class GpsTrackPolylineLayer extends StatelessWidget {
+  const GpsTrackPolylineLayer({
+    super.key,
+    required this.runs,
+    required this.mode,
+    this.strokeWidth = 4.0,
+    this.uniformColor,
+    this.hitNotifier,
+  });
+
+  final List<TrackRun> runs;
+  final TrackColorMode mode;
+  final double strokeWidth;
+  final Color? uniformColor;
+  final LayerHitNotifier<int>? hitNotifier;
+
+  @override
+  Widget build(BuildContext context) {
+    return PolylineLayer<int>(
+      hitNotifier: hitNotifier,
+      polylines: buildTrackPolylines(
+        runs: runs,
+        mode: mode,
+        scheme: Theme.of(context).colorScheme,
+        strokeWidth: strokeWidth,
+        uniformColor: uniformColor,
+      ),
+    );
+  }
+}
+```
+
+- [ ] **Step 4: Run test to verify it passes**
+
+Run: `flutter test test/features/gps_log/gps_track_polyline_layer_test.dart`
+Expected: PASS, 11 tests.
+
+- [ ] **Step 5: Format, analyze, commit**
+
+```bash
+dart format .
+flutter analyze
+git add lib/features/gps_log/presentation/widgets/gps_track_polyline_layer.dart test/features/gps_log/gps_track_polyline_layer_test.dart
+git commit -m "Add polyline layer builder for colorized GPS tracks"
+```
+
+---
+
+### Task 10: Track detail route and page skeleton
+
+**Files:**
+- Create: `lib/features/gps_log/presentation/pages/gps_track_detail_page.dart`
+- Modify: `lib/core/router/app_router.dart`
+- Modify: `lib/features/gps_log/presentation/pages/gps_logger_page.dart`
+- Modify: `lib/l10n/arb/app_en.arb` plus all locale ARBs
+- Test: `test/features/gps_log/gps_track_detail_page_test.dart`
+- Test: `test/core/router/app_router_gps_track_test.dart`
+
+**Interfaces:**
+- Consumes: `gpsTrackDetailProvider`, `gpsTrackGeometryProvider`, `TrackLod` (Task 8); `GpsTrackPolylineLayer` (Task 9)
+- Produces: route `/gps-log/:id` named `gpsTrackDetail`; `GpsTrackDetailPage({required String trackId})`
+
+The static `/gps-log/map` route is added in Task 19, but its ordering constraint is established here: any static child of `/gps-log` must be declared **before** `:id` or the parameter route swallows it.
+
+- [ ] **Step 1: Write the failing router test**
+
+Create `test/core/router/app_router_gps_track_test.dart`, following the structure-assertion style used by the `dive planner back-navigation` group in `test/core/router/app_router_test.dart`:
+
+```dart
+import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
+import 'package:submersion/core/router/app_router.dart';
+
+/// Recursively collects every path in the route tree.
+List<String> _allPaths(List<RouteBase> routes) => [
+      for (final r in routes) ...[
+        if (r is GoRoute) r.path,
+        ..._allPaths(r.routes),
+      ],
+    ];
+
+void main() {
+  test('/gps-log has a :id child route', () {
+    final paths = _allPaths(appRouter.configuration.routes);
+    expect(paths, contains(':id'));
+  });
+
+  test('static gps-log children are declared before the :id route', () {
+    // A static sibling declared after :id would never match - go_router
+    // takes the first matching route, and :id matches any single segment.
+    final gpsLog = _findRoute(appRouter.configuration.routes, '/gps-log');
+    final childPaths = [
+      for (final r in gpsLog.routes.whereType<GoRoute>()) r.path,
+    ];
+    final idIndex = childPaths.indexOf(':id');
+    expect(idIndex, isNot(-1), reason: ':id child must exist');
+    for (var i = 0; i < childPaths.length; i++) {
+      if (childPaths[i] == ':id') continue;
+      expect(
+        i,
+        lessThan(idIndex),
+        reason: 'static child "${childPaths[i]}" must precede :id',
+      );
+    }
+  });
+}
+
+GoRoute _findRoute(List<RouteBase> routes, String path) {
+  for (final r in routes) {
+    if (r is GoRoute && r.path == path) return r;
+    try {
+      return _findRoute(r.routes, path);
+    } catch (_) {
+      // keep searching siblings
+    }
+  }
+  throw StateError('route $path not found');
+}
+```
+
+Adjust `appRouter` to whatever the router instance or provider is actually named in `app_router.dart` — grep for the `GoRouter(` construction and match it.
+
+- [ ] **Step 2: Run test to verify it fails**
+
+Run: `flutter test test/core/router/app_router_gps_track_test.dart`
+Expected: FAIL — `:id` is not in the route tree.
+
+- [ ] **Step 3: Add l10n strings**
+
+Add to `lib/l10n/arb/app_en.arb`:
+
+```json
+  "gpsTrack_detail_title": "GPS Track",
+  "@gpsTrack_detail_title": {
+    "description": "App bar title for a single recorded GPS surface track"
+  },
+  "gpsTrack_detail_notFound": "This track is no longer available.",
+  "@gpsTrack_detail_notFound": {
+    "description": "Shown when a track id in the URL does not resolve"
+  },
+  "gpsTrack_detail_unreadable": "Track data could not be read.",
+  "@gpsTrack_detail_unreadable": {
+    "description": "Shown when a track's stored points blob fails to decode"
+  },
+  "gpsTrack_detail_noPoints": "This track has no recorded positions.",
+  "@gpsTrack_detail_noPoints": {
+    "description": "Shown when a track exists but contains zero fixes"
+  }
+```
+
+Then translate all four into every locale ARB: ar, de, es, fr, he, hu, it, nl, pt, zh. Do not leave English strings in the other files.
+
+- [ ] **Step 4: Regenerate localizations**
+
+```bash
+flutter gen-l10n
+```
+
+- [ ] **Step 5: Write the failing page test**
+
+Create `test/features/gps_log/gps_track_detail_page_test.dart`. Copy the pump harness shape from `test/features/dive_log/presentation/widgets/surface_gps_section_test.dart` — `getBaseOverrides()` from `test/helpers/mock_providers.dart`, an explicit surface size, and `AppLocalizations.localizationsDelegates`:
+
+```dart
+import 'package:flutter/material.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:submersion/features/gps_log/domain/entities/gps_track.dart';
+import 'package:submersion/features/gps_log/presentation/pages/gps_track_detail_page.dart';
+import 'package:submersion/features/gps_log/presentation/providers/gps_track_map_providers.dart';
+import 'package:submersion/l10n/arb/app_localizations.dart';
+
+import '../../helpers/mock_providers.dart';
+
+GpsTrackPoint p(int t) =>
+    GpsTrackPoint(timestamp: t, latitude: 20.0 + t * 0.001, longitude: -87.0);
+
+GpsTrack _track() => GpsTrack(
+      id: 'track-1',
+      startTime: 1700000000000,
+      endTime: 1700003600000,
+      pointCount: 4,
+      points: [p(0), p(1), p(2), p(3)],
+    );
+
+Future<void> _pump(
+  WidgetTester tester, {
+  required List<Override> overrides,
+}) async {
+  final base = await getBaseOverrides();
+  await tester.binding.setSurfaceSize(const Size(800, 1200));
+  addTearDown(() => tester.binding.setSurfaceSize(null));
+  await tester.pumpWidget(
+    ProviderScope(
+      overrides: [...base, ...overrides],
+      child: MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        home: const GpsTrackDetailPage(trackId: 'track-1'),
+      ),
+    ),
+  );
+  await tester.pumpAndSettle();
+}
+
+void main() {
+  testWidgets('renders a map with the track drawn', (tester) async {
+    await _pump(tester, overrides: [
+      gpsTrackDetailProvider('track-1').overrideWith((ref) async => _track()),
+      gpsTrackGeometryProvider(('track-1', TrackLod.detail))
+          .overrideWith((ref) async => _track().points),
+    ]);
+
+    expect(find.byType(FlutterMap), findsOneWidget);
+    expect(find.byType(PolylineLayer<int>), findsOneWidget);
+  });
+
+  testWidgets('shows a not-found message for a missing track',
+      (tester) async {
+    await _pump(tester, overrides: [
+      gpsTrackDetailProvider('track-1').overrideWith((ref) async => null),
+      gpsTrackGeometryProvider(('track-1', TrackLod.detail))
+          .overrideWith((ref) async => const <GpsTrackPoint>[]),
+    ]);
+
+    expect(find.text('This track is no longer available.'), findsOneWidget);
+    expect(find.byType(FlutterMap), findsNothing);
+  });
+
+  testWidgets('shows an unreadable message when decoding throws',
+      (tester) async {
+    await _pump(tester, overrides: [
+      gpsTrackDetailProvider('track-1')
+          .overrideWith((ref) async => throw const FormatException('bad gzip')),
+      gpsTrackGeometryProvider(('track-1', TrackLod.detail))
+          .overrideWith((ref) async => const <GpsTrackPoint>[]),
+    ]);
+
+    expect(find.text('Track data could not be read.'), findsOneWidget);
+  });
+
+  testWidgets('shows an empty message for a track with no fixes',
+      (tester) async {
+    await _pump(tester, overrides: [
+      gpsTrackDetailProvider('track-1')
+          .overrideWith((ref) async => const GpsTrack(
+                id: 'track-1',
+                startTime: 1700000000000,
+                endTime: 1700003600000,
+              )),
+      gpsTrackGeometryProvider(('track-1', TrackLod.detail))
+          .overrideWith((ref) async => const <GpsTrackPoint>[]),
+    ]);
+
+    expect(
+      find.text('This track has no recorded positions.'),
+      findsOneWidget,
+    );
+  });
+}
+```
+
+- [ ] **Step 6: Run test to verify it fails**
+
+Run: `flutter test test/features/gps_log/gps_track_detail_page_test.dart`
+Expected: FAIL — `GpsTrackDetailPage` isn't defined.
+
+- [ ] **Step 7: Write the page**
+
+Create `lib/features/gps_log/presentation/pages/gps_track_detail_page.dart`:
+
+```dart
+import 'package:flutter/material.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:latlong2/latlong.dart';
+
+import 'package:submersion/features/gps_log/domain/entities/gps_track.dart';
+import 'package:submersion/features/gps_log/domain/track_colorization.dart';
+import 'package:submersion/features/gps_log/domain/track_geometry.dart';
+import 'package:submersion/features/gps_log/data/repositories/track_geometry_cache_repository.dart';
+import 'package:submersion/features/gps_log/presentation/providers/gps_track_map_providers.dart';
+import 'package:submersion/features/gps_log/presentation/widgets/gps_track_polyline_layer.dart';
+import 'package:submersion/features/maps/presentation/providers/map_tile_providers.dart';
+import 'package:submersion/features/maps/presentation/widgets/map_attribution.dart';
+import 'package:submersion/features/maps/presentation/widgets/map_compass_button.dart';
+import 'package:submersion/features/maps/presentation/widgets/trackpad_zoom_map.dart';
+import 'package:submersion/l10n/l10n_extension.dart';
+
+/// Full-screen map of one recorded GPS surface track.
+class GpsTrackDetailPage extends ConsumerStatefulWidget {
+  const GpsTrackDetailPage({super.key, required this.trackId});
+
+  final String trackId;
+
+  @override
+  ConsumerState<GpsTrackDetailPage> createState() =>
+      _GpsTrackDetailPageState();
+}
+
+class _GpsTrackDetailPageState extends ConsumerState<GpsTrackDetailPage> {
+  final MapController _mapController = MapController();
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final trackAsync = ref.watch(gpsTrackDetailProvider(widget.trackId));
+
+    return Scaffold(
+      appBar: AppBar(title: Text(l10n.gpsTrack_detail_title)),
+      body: trackAsync.when(
+        loading: () => const Center(child: CircularProgressIndicator()),
+        // A corrupt or undecodable blob must not crash the page. Surface it
+        // as a readable message; deletion is offered from the list.
+        error: (_, __) => Center(child: Text(l10n.gpsTrack_detail_unreadable)),
+        data: (track) {
+          if (track == null) {
+            return Center(child: Text(l10n.gpsTrack_detail_notFound));
+          }
+          final points = track.effectivePoints;
+          if (points.isEmpty) {
+            return Center(child: Text(l10n.gpsTrack_detail_noPoints));
+          }
+          return _TrackMap(
+            trackId: widget.trackId,
+            fallbackPoints: points,
+            controller: _mapController,
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _TrackMap extends ConsumerWidget {
+  const _TrackMap({
+    required this.trackId,
+    required this.fallbackPoints,
+    required this.controller,
+  });
+
+  final String trackId;
+  final List<GpsTrackPoint> fallbackPoints;
+  final MapController controller;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    // Fall back to the unsimplified points while the isolate is working, so
+    // the map draws immediately rather than flashing empty.
+    final points = ref
+            .watch(gpsTrackGeometryProvider((trackId, TrackLod.detail)))
+            .value ??
+        fallbackPoints;
+    final runs = bucketizeTrack(points, TrackColorMode.uniform);
+    final bounds = trackBounds(points)!;
+
+    return TrackpadZoomMap(
+      controller: controller,
+      child: FlutterMap(
+        mapController: controller,
+        options: MapOptions(
+          initialCameraFit: CameraFit.bounds(
+            bounds: LatLngBounds(
+              LatLng(bounds.minLat, bounds.minLon),
+              LatLng(bounds.maxLat, bounds.maxLon),
+            ),
+            padding: const EdgeInsets.all(48),
+          ),
+        ),
+        children: [
+          ref.watch(mapTileLayerProvider),
+          GpsTrackPolylineLayer(
+            runs: runs,
+            mode: TrackColorMode.uniform,
+          ),
+          const MapAttribution(),
+          MapCompassButton(controller: controller),
+        ],
+      ),
+    );
+  }
+}
+```
+
+Resolve `mapTileLayerProvider` and the exact `MapAttribution` / `MapCompassButton` constructor signatures against `dive_activity_map_page.dart`, which already composes all three — copy its usage rather than guessing.
+
+- [ ] **Step 8: Register the route**
+
+In `lib/core/router/app_router.dart`, add a child of the existing `/gps-log` route (around line 857). Declare it **last** among that route's children so future static siblings can be inserted before it:
+
+```dart
+            routes: [
+              // Static children MUST precede ':id' - ':id' matches any single
+              // segment and would otherwise swallow them.
+              GoRoute(
+                path: ':id',
+                name: 'gpsTrackDetail',
+                builder: (context, state) => GpsTrackDetailPage(
+                  trackId: state.pathParameters['id']!,
+                ),
+              ),
+            ],
+```
+
+- [ ] **Step 9: Make list rows navigate**
+
+In `gps_logger_page.dart`, add `onTap: () => context.push('/gps-log/${track.id}')` to the track `ListTile` (around line 235) and a trailing chevron alongside the existing delete button.
+
+- [ ] **Step 10: Run all the tests**
+
+Run: `flutter test test/features/gps_log/ test/core/router/`
+Expected: PASS.
+
+- [ ] **Step 11: Format, analyze, commit**
+
+```bash
+dart format .
+flutter analyze
+git add lib/features/gps_log/presentation/pages/gps_track_detail_page.dart lib/core/router/app_router.dart lib/features/gps_log/presentation/pages/gps_logger_page.dart lib/l10n/ test/features/gps_log/gps_track_detail_page_test.dart test/core/router/app_router_gps_track_test.dart
+git commit -m "Add GPS track detail page at /gps-log/:id"
+```
+
+---
