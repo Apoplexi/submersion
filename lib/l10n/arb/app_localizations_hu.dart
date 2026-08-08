@@ -19931,6 +19931,30 @@ class AppLocalizationsHu extends AppLocalizations {
   String get gpsLogger_tracksHeader => 'Rögzített útvonalak';
 
   @override
+  String get gpsTrack_inspect_speed => 'Sebesség';
+
+  @override
+  String get gpsTrack_inspect_accuracy => 'Pontosság';
+
+  @override
+  String get gpsTrack_stats_distance => 'Távolság';
+
+  @override
+  String get gpsTrack_stats_duration => 'Időtartam';
+
+  @override
+  String get gpsTrack_stats_avgSpeed => 'Átl. sebesség';
+
+  @override
+  String get gpsTrack_stats_maxSpeed => 'Max. sebesség';
+
+  @override
+  String get gpsTrack_stats_fixes => 'Pontok';
+
+  @override
+  String get gpsTrack_stats_dives => 'Merülések';
+
+  @override
   String get gpsTrack_colorMode_uniform => 'Egyszínű';
 
   @override

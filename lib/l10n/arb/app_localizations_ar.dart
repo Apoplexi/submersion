@@ -19637,6 +19637,30 @@ class AppLocalizationsAr extends AppLocalizations {
   String get gpsLogger_tracksHeader => 'المسارات المسجّلة';
 
   @override
+  String get gpsTrack_inspect_speed => 'السرعة';
+
+  @override
+  String get gpsTrack_inspect_accuracy => 'الدقة';
+
+  @override
+  String get gpsTrack_stats_distance => 'المسافة';
+
+  @override
+  String get gpsTrack_stats_duration => 'المدة';
+
+  @override
+  String get gpsTrack_stats_avgSpeed => 'متوسط السرعة';
+
+  @override
+  String get gpsTrack_stats_maxSpeed => 'أقصى سرعة';
+
+  @override
+  String get gpsTrack_stats_fixes => 'النقاط';
+
+  @override
+  String get gpsTrack_stats_dives => 'الغطسات';
+
+  @override
   String get gpsTrack_colorMode_uniform => 'عادي';
 
   @override

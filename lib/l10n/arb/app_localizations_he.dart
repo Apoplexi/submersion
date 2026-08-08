@@ -19492,6 +19492,30 @@ class AppLocalizationsHe extends AppLocalizations {
   String get gpsLogger_tracksHeader => 'מסלולים שהוקלטו';
 
   @override
+  String get gpsTrack_inspect_speed => 'מהירות';
+
+  @override
+  String get gpsTrack_inspect_accuracy => 'דיוק';
+
+  @override
+  String get gpsTrack_stats_distance => 'מרחק';
+
+  @override
+  String get gpsTrack_stats_duration => 'משך';
+
+  @override
+  String get gpsTrack_stats_avgSpeed => 'מהירות ממוצעת';
+
+  @override
+  String get gpsTrack_stats_maxSpeed => 'מהירות מרבית';
+
+  @override
+  String get gpsTrack_stats_fixes => 'נקודות';
+
+  @override
+  String get gpsTrack_stats_dives => 'צלילות';
+
+  @override
   String get gpsTrack_colorMode_uniform => 'אחיד';
 
   @override

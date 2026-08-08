@@ -33330,6 +33330,54 @@ abstract class AppLocalizations {
   /// **'Recorded tracks'**
   String get gpsLogger_tracksHeader;
 
+  /// No description provided for @gpsTrack_inspect_speed.
+  ///
+  /// In en, this message translates to:
+  /// **'Speed'**
+  String get gpsTrack_inspect_speed;
+
+  /// No description provided for @gpsTrack_inspect_accuracy.
+  ///
+  /// In en, this message translates to:
+  /// **'Accuracy'**
+  String get gpsTrack_inspect_accuracy;
+
+  /// No description provided for @gpsTrack_stats_distance.
+  ///
+  /// In en, this message translates to:
+  /// **'Distance'**
+  String get gpsTrack_stats_distance;
+
+  /// No description provided for @gpsTrack_stats_duration.
+  ///
+  /// In en, this message translates to:
+  /// **'Duration'**
+  String get gpsTrack_stats_duration;
+
+  /// No description provided for @gpsTrack_stats_avgSpeed.
+  ///
+  /// In en, this message translates to:
+  /// **'Avg speed'**
+  String get gpsTrack_stats_avgSpeed;
+
+  /// No description provided for @gpsTrack_stats_maxSpeed.
+  ///
+  /// In en, this message translates to:
+  /// **'Max speed'**
+  String get gpsTrack_stats_maxSpeed;
+
+  /// No description provided for @gpsTrack_stats_fixes.
+  ///
+  /// In en, this message translates to:
+  /// **'Fixes'**
+  String get gpsTrack_stats_fixes;
+
+  /// No description provided for @gpsTrack_stats_dives.
+  ///
+  /// In en, this message translates to:
+  /// **'Dives'**
+  String get gpsTrack_stats_dives;
+
   /// No description provided for @gpsTrack_colorMode_uniform.
   ///
   /// In en, this message translates to:

@@ -11,6 +11,7 @@ import 'package:submersion/features/gps_log/domain/track_geometry.dart';
 import 'package:submersion/features/gps_log/presentation/providers/gps_track_map_providers.dart';
 import 'package:submersion/features/gps_log/presentation/widgets/gps_track_polyline_layer.dart';
 import 'package:submersion/features/gps_log/presentation/widgets/track_color_legend.dart';
+import 'package:submersion/features/gps_log/presentation/widgets/track_point_info_card.dart';
 import 'package:submersion/features/maps/presentation/widgets/map_attribution.dart';
 import 'package:submersion/features/maps/presentation/widgets/map_compass_button.dart';
 import 'package:submersion/features/maps/presentation/widgets/submersion_tile_layer.dart';
@@ -95,7 +96,7 @@ class _GpsTrackDetailPageState extends ConsumerState<GpsTrackDetailPage> {
   }
 }
 
-class _TrackMap extends ConsumerWidget {
+class _TrackMap extends ConsumerStatefulWidget {
   const _TrackMap({
     required this.trackId,
     required this.fallbackPoints,
@@ -107,7 +108,42 @@ class _TrackMap extends ConsumerWidget {
   final MapController controller;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<_TrackMap> createState() => _TrackMapState();
+}
+
+class _TrackMapState extends ConsumerState<_TrackMap> {
+  final LayerHitNotifier<int> _hitNotifier = ValueNotifier(null);
+  ({GpsTrackPoint point, double speedMps})? _inspected;
+
+  String get trackId => widget.trackId;
+  List<GpsTrackPoint> get fallbackPoints => widget.fallbackPoints;
+  MapController get controller => widget.controller;
+
+  @override
+  void dispose() {
+    _hitNotifier.dispose();
+    super.dispose();
+  }
+
+  /// Resolves a tap on the polyline back to a real recorded fix.
+  void _handleTap(List<TrackRun> runs, List<GpsTrackPoint> fullPoints) {
+    final hit = _hitNotifier.value;
+    if (hit == null || hit.hitValues.isEmpty) {
+      setState(() => _inspected = null);
+      return;
+    }
+    final runIndex = hit.hitValues.first;
+    if (runIndex < 0 || runIndex >= runs.length) return;
+    final found = nearestPointInRun(
+      fullPoints: fullPoints,
+      run: runs[runIndex],
+      tapped: hit.coordinate,
+    );
+    setState(() => _inspected = found);
+  }
+
+  @override
+  Widget build(BuildContext context) {
     // Fall back to the unsimplified points while the isolate is working, so
     // the map draws immediately rather than flashing empty.
     final points =
@@ -117,6 +153,8 @@ class _TrackMap extends ConsumerWidget {
     final mode = ref.watch(trackColorModeProvider);
     final runs = bucketizeTrack(drawable, mode);
     final bounds = trackBounds(drawable)!;
+
+    final inspected = _inspected;
 
     return Stack(
       children: [
@@ -139,8 +177,18 @@ class _TrackMap extends ConsumerWidget {
               ),
               children: [
                 submersionTileLayer(ref),
-                GpsTrackPolylineLayer(runs: runs, mode: mode),
-                MarkerLayer(markers: _markers(context, ref, drawable)),
+                // The notifier is populated by the layer's own hit test, so
+                // the tap handler has to wrap the layer - MapOptions.onTap
+                // fires without it being set.
+                GestureDetector(
+                  onTap: () => _handleTap(runs, drawable),
+                  child: GpsTrackPolylineLayer(
+                    runs: runs,
+                    mode: mode,
+                    hitNotifier: _hitNotifier,
+                  ),
+                ),
+                MarkerLayer(markers: _markers(context, drawable)),
                 const MapAttribution(),
                 MapCompassButton(controller: controller),
               ],
@@ -155,6 +203,16 @@ class _TrackMap extends ConsumerWidget {
             speedRangeMps: speedRange(drawable),
           ),
         ),
+        if (inspected != null)
+          Positioned(
+            right: 12,
+            bottom: 12,
+            child: TrackPointInfoCard(
+              point: inspected.point,
+              speedMps: inspected.speedMps,
+              onDismiss: () => setState(() => _inspected = null),
+            ),
+          ),
       ],
     );
   }
@@ -165,11 +223,7 @@ class _TrackMap extends ConsumerWidget {
   /// itself: flutter_map reuses Marker.key for every repeated world copy it
   /// renders at low zoom, which would make those copies duplicate-keyed
   /// siblings in the layer's Stack.
-  List<Marker> _markers(
-    BuildContext context,
-    WidgetRef ref,
-    List<GpsTrackPoint> points,
-  ) {
+  List<Marker> _markers(BuildContext context, List<GpsTrackPoint> points) {
     final scheme = Theme.of(context).colorScheme;
     final dives = ref.watch(divesOnTrackProvider(trackId)).value ?? const [];
 

@@ -19996,6 +19996,30 @@ class AppLocalizationsPt extends AppLocalizations {
   String get gpsLogger_tracksHeader => 'Trilhas gravadas';
 
   @override
+  String get gpsTrack_inspect_speed => 'Velocidade';
+
+  @override
+  String get gpsTrack_inspect_accuracy => 'Precisão';
+
+  @override
+  String get gpsTrack_stats_distance => 'Distância';
+
+  @override
+  String get gpsTrack_stats_duration => 'Duração';
+
+  @override
+  String get gpsTrack_stats_avgSpeed => 'Vel. média';
+
+  @override
+  String get gpsTrack_stats_maxSpeed => 'Vel. máx.';
+
+  @override
+  String get gpsTrack_stats_fixes => 'Pontos';
+
+  @override
+  String get gpsTrack_stats_dives => 'Mergulhos';
+
+  @override
   String get gpsTrack_colorMode_uniform => 'Simples';
 
   @override
