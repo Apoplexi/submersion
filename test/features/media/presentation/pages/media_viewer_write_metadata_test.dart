@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -16,6 +18,14 @@ import 'package:submersion/features/settings/presentation/providers/settings_pro
 import 'package:submersion/l10n/arb/app_localizations.dart';
 
 import '../../../../helpers/test_database.dart';
+
+/// Mirrors `MetadataWriteService.isSupported`, which is checked BEFORE the
+/// platform channel: on an unsupported host the service throws outright, so
+/// the mocked channel is unreachable and a test asserting its result can never
+/// pass there. Tests that only assert the viewer recovers (spinner dropped, a
+/// SnackBar shown) hold on every platform and are deliberately NOT skipped.
+final bool _metadataWriteSupported =
+    Platform.isIOS || Platform.isMacOS || Platform.isAndroid;
 
 class _UnavailableResolver implements MediaSourceResolver {
   @override
@@ -192,7 +202,7 @@ void main() {
     expect(find.text('Dive data written to photo'), findsOneWidget);
     // The modal spinner must not outlive the write.
     expect(find.byType(CircularProgressIndicator), findsNothing);
-  });
+  }, skip: !_metadataWriteSupported);
 
   testWidgets('a native refusal is reported as a failure', (tester) async {
     handler = (_) async => false;
@@ -207,7 +217,7 @@ void main() {
     expect(find.byType(SnackBar), findsOneWidget);
     expect(find.textContaining('The operation returned false'), findsOneWidget);
     expect(find.byType(CircularProgressIndicator), findsNothing);
-  });
+  }, skip: !_metadataWriteSupported);
 
   testWidgets('a native error surfaces and drops the spinner', (tester) async {
     handler = (_) async =>
