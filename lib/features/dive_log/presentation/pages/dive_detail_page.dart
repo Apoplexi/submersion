@@ -51,6 +51,8 @@ import 'package:submersion/features/dive_log/presentation/providers/profile_trac
 import 'package:submersion/features/dive_log/presentation/providers/profile_range_provider.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/buoyancy_section.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/collapsible_section.dart';
+import 'package:submersion/features/dive_log/presentation/providers/safety_review_providers.dart';
+import 'package:submersion/features/dive_log/presentation/widgets/safety_finding_highlight.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/safety_review_section.dart';
 import 'package:submersion/features/safety/domain/services/altitude_flag.dart';
 import 'package:submersion/features/safety/presentation/widgets/linked_incidents_row.dart';
@@ -1642,6 +1644,9 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
                 final trackingIndex = ref.watch(
                   profileTrackingIndexProvider(diveId),
                 );
+                final selectedFinding = ref.watch(
+                  selectedSafetyFindingProvider(diveId),
+                );
                 return Stack(
                   children: [
                     MouseRegion(
@@ -1725,6 +1730,10 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
                                 trackingIndex < chartProfile.length
                             ? chartProfile[trackingIndex].timestamp
                             : null,
+                        highlightRange: profileHighlightRangeFor(
+                          selectedFinding,
+                          Theme.of(context).colorScheme,
+                        ),
                         onPointSelected: (index) {
                           ref
                                   .read(

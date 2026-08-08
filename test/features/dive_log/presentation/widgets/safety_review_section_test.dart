@@ -277,6 +277,191 @@ void main() {
     await tester.pumpAndSettle();
     expect(section().isExpanded, isFalse);
   });
+
+  group('finding selection', () {
+    SafetyFinding secondFinding() => SafetyFinding(
+      id: 'f2',
+      diveId: 'dive-1',
+      ruleId: SafetyRuleId.missedDecoStop,
+      severity: SafetySeverity.caution,
+      startTimestamp: 600,
+      endTimestamp: 700,
+      value: 2.0,
+      engineVersion: 1,
+      createdAt: now,
+    );
+
+    ProviderContainer containerOf(WidgetTester tester) =>
+        ProviderScope.containerOf(
+          tester.element(find.byType(SafetyReviewSection)),
+        );
+
+    Future<void> pumpSelectable(
+      WidgetTester tester,
+      SafetyReview review, {
+      ScrollController? controller,
+    }) async {
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            settingsProvider.overrideWith((ref) => MockSettingsNotifier()),
+            safetyReviewProvider('dive-1').overrideWith((ref) async => review),
+            safetyFindingsRepositoryProvider.overrideWithValue(
+              _RecordingSafetyRepo(),
+            ),
+          ],
+          child: localizedMaterialApp(
+            home: Scaffold(
+              body: SingleChildScrollView(
+                controller: controller,
+                child: const Column(
+                  children: [
+                    SizedBox(height: 2000),
+                    SafetyReviewSection(diveId: 'dive-1'),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+    }
+
+    testWidgets('tapping a finding selects it', (tester) async {
+      await pumpSelectable(tester, reviewWith([rapidAscent()]));
+
+      await tester.scrollUntilVisible(
+        find.textContaining('Ascent exceeded'),
+        400,
+      );
+      await tester.tap(find.textContaining('Ascent exceeded'));
+      await tester.pumpAndSettle();
+
+      final selected = containerOf(
+        tester,
+      ).read(selectedSafetyFindingProvider('dive-1'));
+      expect(selected?.id, 'f1');
+    });
+
+    testWidgets('tapping the selected finding clears the selection', (
+      tester,
+    ) async {
+      await pumpSelectable(tester, reviewWith([rapidAscent()]));
+
+      await tester.scrollUntilVisible(
+        find.textContaining('Ascent exceeded'),
+        400,
+      );
+      await tester.tap(find.textContaining('Ascent exceeded'));
+      await tester.pumpAndSettle();
+      // Selecting scrolled the view back to the top; scroll down again to
+      // reach the tile for the second tap.
+      await tester.scrollUntilVisible(
+        find.textContaining('Ascent exceeded'),
+        400,
+      );
+      await tester.tap(find.textContaining('Ascent exceeded'));
+      await tester.pumpAndSettle();
+
+      expect(
+        containerOf(tester).read(selectedSafetyFindingProvider('dive-1')),
+        isNull,
+      );
+    });
+
+    testWidgets('tapping a different finding replaces the selection', (
+      tester,
+    ) async {
+      await pumpSelectable(
+        tester,
+        reviewWith([rapidAscent(), secondFinding()]),
+      );
+
+      await tester.scrollUntilVisible(
+        find.textContaining('Ascent exceeded'),
+        400,
+      );
+      await tester.tap(find.textContaining('Ascent exceeded'));
+      await tester.pumpAndSettle();
+      await tester.scrollUntilVisible(find.textContaining('ceiling'), 400);
+      await tester.tap(find.textContaining('ceiling'));
+      await tester.pumpAndSettle();
+
+      final selected = containerOf(
+        tester,
+      ).read(selectedSafetyFindingProvider('dive-1'));
+      expect(selected?.id, 'f2');
+    });
+
+    testWidgets('selecting scrolls the page toward the chart (offset 0)', (
+      tester,
+    ) async {
+      final controller = ScrollController();
+      addTearDown(controller.dispose);
+      await pumpSelectable(
+        tester,
+        reviewWith([rapidAscent()]),
+        controller: controller,
+      );
+
+      controller.jumpTo(controller.position.maxScrollExtent);
+      await tester.pump();
+      await tester.tap(find.textContaining('Ascent exceeded'));
+      await tester.pumpAndSettle();
+
+      expect(controller.offset, 0);
+    });
+
+    testWidgets('dismissing the selected finding clears the selection', (
+      tester,
+    ) async {
+      await pumpSelectable(tester, reviewWith([rapidAscent()]));
+
+      await tester.scrollUntilVisible(
+        find.textContaining('Ascent exceeded'),
+        400,
+      );
+      await tester.tap(find.textContaining('Ascent exceeded'));
+      await tester.pumpAndSettle();
+      await tester.scrollUntilVisible(find.byIcon(Icons.close), 400);
+      await tester.tap(find.byIcon(Icons.close));
+      await tester.pumpAndSettle();
+
+      expect(
+        containerOf(tester).read(selectedSafetyFindingProvider('dive-1')),
+        isNull,
+      );
+    });
+
+    testWidgets('a finding without timestamps is not tappable', (tester) async {
+      await pumpSelectable(
+        tester,
+        reviewWith([
+          SafetyFinding(
+            id: 'f-no-time',
+            diveId: 'dive-1',
+            ruleId: SafetyRuleId.sawtoothProfile,
+            severity: SafetySeverity.info,
+            startTimestamp: null,
+            endTimestamp: null,
+            value: 4.0,
+            engineVersion: 1,
+            createdAt: now,
+          ),
+        ]),
+      );
+
+      await tester.scrollUntilVisible(find.byType(ListTile), 400);
+      await tester.tap(find.byType(ListTile));
+      await tester.pumpAndSettle();
+
+      expect(
+        containerOf(tester).read(selectedSafetyFindingProvider('dive-1')),
+        isNull,
+      );
+    });
+  });
 }
 
 /// Records [setDismissed] calls without touching a database.

@@ -14,11 +14,13 @@ import 'package:submersion/features/dive_log/presentation/providers/gas_switch_p
 import 'package:submersion/features/dive_log/presentation/providers/profile_analysis_provider.dart';
 import 'package:submersion/features/dive_log/presentation/providers/profile_playback_provider.dart';
 import 'package:submersion/features/dive_log/presentation/providers/profile_review_provider.dart';
+import 'package:submersion/features/dive_log/presentation/providers/safety_review_providers.dart';
 import 'package:submersion/features/dive_log/presentation/utils/sac_normalization.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/dive_profile_chart.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/draggable_readout_card.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/photo_marker_layout.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/profile_instrument_bar.dart';
+import 'package:submersion/features/dive_log/presentation/widgets/safety_finding_highlight.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/source_bar.dart';
 import 'package:submersion/features/media/presentation/providers/media_providers.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
@@ -146,6 +148,9 @@ class _FullscreenProfilePageState extends ConsumerState<FullscreenProfilePage> {
         .watch(estimatedTankPressuresProvider(widget.diveId))
         .value;
     final reviewTimestamp = ref.watch(profileReviewProvider(widget.diveId));
+    final selectedFinding = ref.watch(
+      selectedSafetyFindingProvider(widget.diveId),
+    );
     final showMaxDepthMarker = ref.watch(showMaxDepthMarkerProvider);
     final showPressureThresholdMarkers = ref.watch(
       showPressureThresholdMarkersProvider,
@@ -388,6 +393,10 @@ class _FullscreenProfilePageState extends ConsumerState<FullscreenProfilePage> {
                               ? null
                               : chartProfile.last.timestamp,
                           highlightedTimestamp: reviewTimestamp,
+                          highlightRange: profileHighlightRangeFor(
+                            selectedFinding,
+                            Theme.of(context).colorScheme,
+                          ),
                           onPointSelected: (index) {
                             if (index == null || index >= chartProfile.length) {
                               return;

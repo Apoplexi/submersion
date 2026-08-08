@@ -11,6 +11,8 @@ import 'package:submersion/features/dive_3d/presentation/pages/dive_3d_page.dart
 import 'package:submersion/features/dive_log/data/services/profile_analysis_service.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive_data_source.dart';
+import 'package:submersion/features/dive_log/domain/entities/safety_finding.dart';
+import 'package:submersion/features/dive_log/presentation/providers/safety_review_providers.dart';
 import 'package:submersion/features/dive_log/domain/entities/gas_switch.dart';
 import 'package:submersion/features/divers/presentation/providers/diver_providers.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
@@ -1402,6 +1404,59 @@ void main() {
             '0.8 bar/min converted on the 7.0 L cylinder -- a single shared '
             'volume would print 8.8 L/min here too',
       );
+    });
+  });
+
+  group('safety finding highlight wiring', () {
+    Dive diveWithProfile() => Dive(
+      id: 'dive-highlight',
+      dateTime: DateTime(2026, 1, 1, 10),
+      profile: List.generate(
+        20,
+        (i) => DiveProfilePoint(timestamp: i * 60, depth: 15),
+      ),
+    );
+
+    testWidgets('selected finding reaches the chart as a highlight range', (
+      tester,
+    ) async {
+      final dive = diveWithProfile();
+      await _pumpDetailPage(tester, dive);
+
+      final container = ProviderScope.containerOf(
+        tester.element(find.byType(DiveDetailPage)),
+      );
+      container
+          .read(selectedSafetyFindingProvider(dive.id).notifier)
+          .state = SafetyFinding(
+        id: 'f1',
+        diveId: dive.id,
+        ruleId: SafetyRuleId.rapidAscent,
+        severity: SafetySeverity.significant,
+        startTimestamp: 300,
+        endTimestamp: 420,
+        value: 14.0,
+        engineVersion: 1,
+        createdAt: DateTime.utc(2026, 8, 7),
+      );
+      await tester.pump();
+
+      final chart = tester.widget<DiveProfileChart>(
+        find.byType(DiveProfileChart),
+      );
+      expect(chart.highlightRange, isNotNull);
+      expect(chart.highlightRange!.startTimestamp, 300);
+      expect(chart.highlightRange!.endTimestamp, 420);
+    });
+
+    testWidgets('no selection means no highlight range', (tester) async {
+      final dive = diveWithProfile();
+      await _pumpDetailPage(tester, dive);
+
+      final chart = tester.widget<DiveProfileChart>(
+        find.byType(DiveProfileChart),
+      );
+      expect(chart.highlightRange, isNull);
     });
   });
 }

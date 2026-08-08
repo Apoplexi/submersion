@@ -32,6 +32,7 @@ import 'package:submersion/features/dive_log/presentation/widgets/photo_marker_l
 import 'package:submersion/features/dive_log/presentation/widgets/photo_marker_overlay.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/profile_chart_viewport.dart';
+import 'package:submersion/features/dive_log/presentation/widgets/profile_highlight_range.dart';
 import 'package:submersion/core/ui/trackpad_zoom_recognizer.dart';
 
 /// Opacity of the shaded region between the ceiling and the surface.
@@ -193,6 +194,11 @@ class DiveProfileChart extends ConsumerStatefulWidget {
   /// Optional highlighted timestamp in seconds (e.g. from heat map hover).
   /// Renders a subtle vertical line at this position.
   final int? highlightedTimestamp;
+
+  /// Optional time range to emphasize (e.g. the selected safety finding).
+  /// A true range renders as a translucent vertical band with edge lines;
+  /// an instant (start == end) renders as a single dashed cursor line.
+  final ProfileHighlightRange? highlightRange;
 
   // Advanced decompression/gas curves
   /// ppO2 curve in bar
@@ -496,6 +502,7 @@ class DiveProfileChart extends ConsumerStatefulWidget {
     this.exportKey,
     this.playbackTimestamp,
     this.highlightedTimestamp,
+    this.highlightRange,
     this.ppO2Curve,
     this.o2SensorCurves,
     this.ppO2FromSensorAverage = false,
@@ -2580,10 +2587,17 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
                 ),
               ],
             ),
+            rangeAnnotations: RangeAnnotations(
+              verticalRangeAnnotations: _buildHighlightRangeAnnotations(
+                visibleMinX,
+                visibleMaxX,
+              ),
+            ),
             extraLinesData: ExtraLinesData(
               verticalLines: [
                 ..._buildPlaybackCursor(colorScheme),
                 ..._buildHighlightCursor(colorScheme),
+                ..._buildHighlightRangeLines(visibleMinX, visibleMaxX),
                 if (_showEvents && widget.events != null)
                   ..._buildEventVerticalLines(colorScheme),
               ],
@@ -4964,6 +4978,68 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
         strokeWidth: 1,
         dashArray: [3, 3],
       ),
+    ];
+  }
+
+  /// Translucent band for the externally highlighted time range, clamped to
+  /// the visible window (fl_chart asserts annotations stay within bounds).
+  /// Instant ranges draw no band; see [_buildHighlightRangeLines].
+  List<VerticalRangeAnnotation> _buildHighlightRangeAnnotations(
+    double visibleMinX,
+    double visibleMaxX,
+  ) {
+    final range = widget.highlightRange;
+    if (range == null || range.startTimestamp == range.endTimestamp) {
+      return [];
+    }
+    final span = visibleHighlightSpan(
+      range,
+      visibleMinX: visibleMinX,
+      visibleMaxX: visibleMaxX,
+    );
+    if (span == null) return [];
+    return [
+      VerticalRangeAnnotation(
+        x1: span.x1,
+        x2: span.x2,
+        color: range.color.withValues(alpha: 0.12),
+      ),
+    ];
+  }
+
+  /// Edge lines for a range highlight (only the edges inside the visible
+  /// window), or the single dashed cursor for an instant highlight.
+  List<VerticalLine> _buildHighlightRangeLines(
+    double visibleMinX,
+    double visibleMaxX,
+  ) {
+    final range = widget.highlightRange;
+    if (range == null) return [];
+    final start = range.startTimestamp.toDouble();
+    final end = range.endTimestamp.toDouble();
+
+    bool inWindow(double x) => x >= visibleMinX && x <= visibleMaxX;
+
+    if (range.startTimestamp == range.endTimestamp) {
+      if (!inWindow(start)) return [];
+      return [
+        VerticalLine(
+          x: start,
+          color: range.color,
+          strokeWidth: 1.5,
+          dashArray: [3, 3],
+        ),
+      ];
+    }
+
+    return [
+      for (final x in [start, end])
+        if (inWindow(x))
+          VerticalLine(
+            x: x,
+            color: range.color.withValues(alpha: 0.7),
+            strokeWidth: 1,
+          ),
     ];
   }
 
