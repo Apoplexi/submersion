@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:go_router/go_router.dart';
 import 'package:latlong2/latlong.dart';
 
 import 'package:submersion/core/providers/provider.dart';
@@ -139,6 +140,7 @@ class _TrackMap extends ConsumerWidget {
               children: [
                 submersionTileLayer(ref),
                 GpsTrackPolylineLayer(runs: runs, mode: mode),
+                MarkerLayer(markers: _markers(context, ref, drawable)),
                 const MapAttribution(),
                 MapCompassButton(controller: controller),
               ],
@@ -154,6 +156,70 @@ class _TrackMap extends ConsumerWidget {
           ),
         ),
       ],
+    );
+  }
+
+  /// Start and end pins, plus one pin per dive logged during this track.
+  ///
+  /// Keys live on the marker CHILD via KeyedSubtree, never on the Marker
+  /// itself: flutter_map reuses Marker.key for every repeated world copy it
+  /// renders at low zoom, which would make those copies duplicate-keyed
+  /// siblings in the layer's Stack.
+  List<Marker> _markers(
+    BuildContext context,
+    WidgetRef ref,
+    List<GpsTrackPoint> points,
+  ) {
+    final scheme = Theme.of(context).colorScheme;
+    final dives = ref.watch(divesOnTrackProvider(trackId)).value ?? const [];
+
+    return [
+      Marker(
+        point: LatLng(points.first.latitude, points.first.longitude),
+        width: 24,
+        height: 24,
+        child: KeyedSubtree(
+          key: const ValueKey('track-start-marker'),
+          child: _pin(scheme, Icons.play_arrow, scheme.tertiary),
+        ),
+      ),
+      Marker(
+        point: LatLng(points.last.latitude, points.last.longitude),
+        width: 24,
+        height: 24,
+        child: KeyedSubtree(
+          key: const ValueKey('track-end-marker'),
+          child: _pin(scheme, Icons.stop, scheme.outline),
+        ),
+      ),
+      for (final dive in dives)
+        if (dive.entryLocation != null)
+          Marker(
+            point: LatLng(
+              dive.entryLocation!.latitude,
+              dive.entryLocation!.longitude,
+            ),
+            width: 32,
+            height: 32,
+            child: KeyedSubtree(
+              key: ValueKey('track-dive-marker-${dive.id}'),
+              child: GestureDetector(
+                onTap: () => context.push('/dives/${dive.id}'),
+                child: _pin(scheme, Icons.scuba_diving, scheme.primary),
+              ),
+            ),
+          ),
+    ];
+  }
+
+  Widget _pin(ColorScheme scheme, IconData icon, Color color) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: scheme.surface,
+        shape: BoxShape.circle,
+        border: Border.all(color: color, width: 2),
+      ),
+      child: Icon(icon, size: 14, color: color),
     );
   }
 }

@@ -1,8 +1,11 @@
 import 'package:flutter/foundation.dart';
 
 import 'package:submersion/core/providers/provider.dart';
+import 'package:submersion/features/dive_log/domain/entities/dive.dart';
+import 'package:submersion/features/dive_log/presentation/providers/dive_providers.dart';
 import 'package:submersion/features/gps_log/data/repositories/track_geometry_cache_repository.dart';
 import 'package:submersion/features/gps_log/domain/entities/gps_track.dart';
+import 'package:submersion/features/gps_log/domain/gps_track_matcher.dart';
 import 'package:submersion/features/gps_log/domain/track_colorization.dart';
 import 'package:submersion/features/gps_log/domain/track_geometry.dart';
 import 'package:submersion/features/gps_log/presentation/providers/gps_log_providers.dart';
@@ -59,6 +62,51 @@ final gpsTrackGeometryProvider =
       await cache.write(trackId, lod, simplified);
       return simplified;
     });
+
+/// Wall-clock-as-UTC epoch milliseconds for a dive's entry.
+///
+/// millisecondsSinceEpoch is absolute regardless of the DateTime's utc flag,
+/// so this compares directly against gps_tracks.startTime, which stores the
+/// same wall-clock-as-UTC value.
+int _entryMillis(Dive dive) => dive.effectiveEntryTime.millisecondsSinceEpoch;
+
+/// Dives whose entry falls inside [trackId]'s recording window.
+///
+/// Uses [GpsTrackMatcher.trackCovering] rather than a bare range test so the
+/// markers show exactly the dives this track could have stamped - same
+/// 30-minute tolerance the match sweep applies.
+final divesOnTrackProvider = FutureProvider.family<List<Dive>, String>((
+  ref,
+  trackId,
+) async {
+  final track = await ref.watch(gpsTrackDetailProvider(trackId).future);
+  // An in-progress track has no closed window to test dives against.
+  if (track == null || track.endTime == null) return const [];
+
+  final dives = await ref.watch(divesProvider.future);
+  return [
+    for (final dive in dives)
+      if (GpsTrackMatcher.trackCovering([track], _entryMillis(dive)) != null)
+        dive,
+  ];
+});
+
+/// The track, if any, whose window covers [diveId].
+final trackForDiveProvider = FutureProvider.family<GpsTrack?, String>((
+  ref,
+  diveId,
+) async {
+  final dive = await ref.watch(diveProvider(diveId).future);
+  if (dive == null) return null;
+
+  // Lean read first - never decode every blob just to find the match.
+  final tracks = await ref
+      .watch(gpsTrackRepositoryProvider)
+      .getCompletedTracks(includePoints: false);
+  final match = GpsTrackMatcher.trackCovering(tracks, _entryMillis(dive));
+  if (match == null) return null;
+  return ref.watch(gpsTrackDetailProvider(match.id).future);
+});
 
 /// Active colorization mode on the track detail map.
 ///
