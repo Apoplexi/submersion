@@ -77,6 +77,49 @@ void main() {
     expect(seriesPainter().ghost, isNull);
   });
 
+  testWidgets('overlay chips render a single row strip and drive selection', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      testApp(
+        overrides: _overrides(),
+        child: const Scaffold(
+          body: Stack(
+            children: [
+              Positioned(
+                left: 8,
+                right: 56,
+                bottom: 8,
+                child: Align(
+                  alignment: Alignment.bottomLeft,
+                  child: ContingencyChips(overlay: true),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+    final container = ProviderScope.containerOf(
+      tester.element(find.byType(ContingencyChips)),
+    );
+    // No segments: the selector renders nothing.
+    expect(find.text('Base'), findsNothing);
+
+    container
+        .read(divePlanNotifierProvider.notifier)
+        .addSimplePlan(maxDepth: 45, bottomTimeMinutes: 25);
+    await tester.pumpAndSettle();
+
+    expect(find.text('Base'), findsOneWidget);
+    // Overlay mode is a single-row strip, not the wrapping layout.
+    expect(find.byType(Wrap), findsNothing);
+
+    await tester.tap(find.text('+5m'));
+    await tester.pumpAndSettle();
+    expect(container.read(selectedDeviationProvider), 'deeper');
+  });
+
   testWidgets('sheet lists deviation tables and turn pressure', (tester) async {
     await tester.pumpWidget(
       testApp(
