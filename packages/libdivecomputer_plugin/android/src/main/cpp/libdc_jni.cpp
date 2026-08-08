@@ -766,6 +766,7 @@ Java_com_submersion_libdivecomputer_LibdcWrapper_nativeDownloadRun(
                     g_log_forward.jvm = jvm;
                     g_log_forward.writeLibdc = writeMethod;
                     g_log_forward.traceInstance = env->NewGlobalRef(inst);
+                    env->DeleteLocalRef(inst);
                 }
             }
             env->DeleteLocalRef(traceCls);
