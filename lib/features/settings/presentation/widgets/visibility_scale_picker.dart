@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
 import 'package:submersion/core/domain/visibility/visibility_scale.dart';
+import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
+import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
 
 /// The visibility calibration picker, split out of `settings_page.dart` so it
@@ -11,6 +13,83 @@ import 'package:submersion/l10n/arb/app_localizations.dart';
 /// excellent/good/moderate/poor. It is purely presentational: dives store the
 /// measured distance, so changing it re-labels a logbook without altering a
 /// single dive.
+
+/// Opens the calibration picker.
+///
+/// Choosing a named preset saves immediately; choosing Custom hands off to
+/// [showCustomVisibilityScaleDialog].
+void showVisibilityScalePicker(
+  BuildContext context,
+  WidgetRef ref,
+  AppSettings settings,
+) {
+  showDialog<void>(
+    context: context,
+    builder: (dialogContext) => AlertDialog(
+      title: Text(AppLocalizations.of(context).settings_visibilityScale_title),
+      content: VisibilityScalePresetList(
+        selected: settings.visibilityScalePreset,
+        units: UnitFormatter(settings),
+        onSelected: (preset) {
+          Navigator.of(dialogContext).pop();
+          if (preset == VisibilityScalePreset.custom) {
+            showCustomVisibilityScaleDialog(context, ref, settings);
+            return;
+          }
+          ref
+              .read(settingsProvider.notifier)
+              .setVisibilityScale(preset: preset);
+        },
+      ),
+    ),
+  );
+}
+
+/// Opens the custom-threshold dialog.
+///
+/// Seeds from the diver's retained custom columns rather than
+/// [AppSettings.visibilityScale]: that getter resolves to the *named* preset's
+/// bounds whenever one is active, so reopening Custom after switching away and
+/// back would show the preset's numbers and hide the values the diver entered.
+void showCustomVisibilityScaleDialog(
+  BuildContext context,
+  WidgetRef ref,
+  AppSettings settings,
+) {
+  final active = settings.visibilityScale;
+  final seed = VisibilityScale(
+    excellentAtOrAboveM:
+        settings.visibilityScaleExcellentM ?? active.excellentAtOrAboveM,
+    goodAtOrAboveM: settings.visibilityScaleGoodM ?? active.goodAtOrAboveM,
+    moderateAtOrAboveM:
+        settings.visibilityScaleModerateM ?? active.moderateAtOrAboveM,
+  );
+
+  showDialog<void>(
+    context: context,
+    builder: (dialogContext) => AlertDialog(
+      title: Text(
+        AppLocalizations.of(context).settings_visibilityScale_preset_custom,
+      ),
+      content: CustomVisibilityScaleForm(
+        initial: seed,
+        units: UnitFormatter(settings),
+        onCancel: () => Navigator.of(dialogContext).pop(),
+        onSubmit: (scale) {
+          ref
+              .read(settingsProvider.notifier)
+              .setVisibilityScale(
+                preset: VisibilityScalePreset.custom,
+                excellentM: scale.excellentAtOrAboveM,
+                goodM: scale.goodAtOrAboveM,
+                moderateM: scale.moderateAtOrAboveM,
+              );
+          Navigator.of(dialogContext).pop();
+        },
+      ),
+    ),
+  );
+}
 
 /// Localized label for a calibration preset.
 String visibilityPresetLabel(

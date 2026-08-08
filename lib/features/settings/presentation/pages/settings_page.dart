@@ -13,7 +13,6 @@ import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/features/settings/presentation/pages/column_config_page.dart';
 import 'package:submersion/features/settings/presentation/pages/safety_settings_page.dart';
 import 'package:submersion/features/settings/presentation/pages/security_settings_page.dart';
-import 'package:submersion/core/domain/visibility/visibility_scale.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/settings/presentation/widgets/visibility_scale_picker.dart';
 import 'package:submersion/core/constants/profile_metrics.dart';
@@ -513,7 +512,7 @@ class _UnitsSectionContent extends ConsumerWidget {
                     settings.visibilityScalePreset,
                   ),
                   onTap: () =>
-                      _showVisibilityScalePicker(context, ref, settings),
+                      showVisibilityScalePicker(context, ref, settings),
                 ),
               ],
             ),
@@ -657,82 +656,6 @@ class _UnitsSectionContent extends ConsumerWidget {
               },
             );
           }).toList(),
-        ),
-      ),
-    );
-  }
-
-  /// Opens the visibility calibration picker.
-  ///
-  /// Purely presentational: dives store the measured distance, so switching
-  /// preset re-labels the whole logbook and loses nothing. The dialog bodies
-  /// live in `widgets/visibility_scale_picker.dart` so they can be tested
-  /// without driving this page.
-  void _showVisibilityScalePicker(
-    BuildContext context,
-    WidgetRef ref,
-    AppSettings settings,
-  ) {
-    showDialog(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: Text(context.l10n.settings_visibilityScale_title),
-        content: VisibilityScalePresetList(
-          selected: settings.visibilityScalePreset,
-          units: UnitFormatter(settings),
-          onSelected: (preset) {
-            Navigator.of(dialogContext).pop();
-            if (preset == VisibilityScalePreset.custom) {
-              _showCustomVisibilityScaleDialog(context, ref, settings);
-              return;
-            }
-            ref
-                .read(settingsProvider.notifier)
-                .setVisibilityScale(preset: preset);
-          },
-        ),
-      ),
-    );
-  }
-
-  void _showCustomVisibilityScaleDialog(
-    BuildContext context,
-    WidgetRef ref,
-    AppSettings settings,
-  ) {
-    // Seed from the diver's retained custom thresholds, not from
-    // settings.visibilityScale: that getter resolves to the *named* preset's
-    // bounds whenever one is active, so opening Custom after switching away
-    // and back would show the preset's numbers and hide the values the diver
-    // actually entered.
-    final active = settings.visibilityScale;
-    final seed = VisibilityScale(
-      excellentAtOrAboveM:
-          settings.visibilityScaleExcellentM ?? active.excellentAtOrAboveM,
-      goodAtOrAboveM: settings.visibilityScaleGoodM ?? active.goodAtOrAboveM,
-      moderateAtOrAboveM:
-          settings.visibilityScaleModerateM ?? active.moderateAtOrAboveM,
-    );
-
-    showDialog(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: Text(context.l10n.settings_visibilityScale_preset_custom),
-        content: CustomVisibilityScaleForm(
-          initial: seed,
-          units: UnitFormatter(settings),
-          onCancel: () => Navigator.of(dialogContext).pop(),
-          onSubmit: (scale) {
-            ref
-                .read(settingsProvider.notifier)
-                .setVisibilityScale(
-                  preset: VisibilityScalePreset.custom,
-                  excellentM: scale.excellentAtOrAboveM,
-                  goodM: scale.goodAtOrAboveM,
-                  moderateM: scale.moderateAtOrAboveM,
-                );
-            Navigator.of(dialogContext).pop();
-          },
         ),
       ),
     );

@@ -1,11 +1,40 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/constants/units.dart';
+import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/core/domain/visibility/visibility_scale.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/features/settings/presentation/widgets/visibility_scale_picker.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
+
+/// Stands in for SettingsNotifier so the picker's saves can be inspected
+/// without a database. Only setVisibilityScale is exercised here.
+class _RecordingSettingsNotifier extends StateNotifier<AppSettings>
+    implements SettingsNotifier {
+  final List<AppSettings> saved;
+
+  _RecordingSettingsNotifier(super.initial, this.saved);
+
+  @override
+  Future<void> setVisibilityScale({
+    required VisibilityScalePreset preset,
+    double? excellentM,
+    double? goodM,
+    double? moderateM,
+  }) async {
+    state = state.copyWith(
+      visibilityScalePreset: preset,
+      visibilityScaleExcellentM: excellentM,
+      visibilityScaleGoodM: goodM,
+      visibilityScaleModerateM: moderateM,
+    );
+    saved.add(state);
+  }
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
 
 void main() {
   const metric = UnitFormatter(AppSettings(depthUnit: DepthUnit.meters));
@@ -277,6 +306,143 @@ void main() {
 
       expect(cancelled, isTrue);
       expect(submitted, isNull);
+    });
+  });
+
+  group('showVisibilityScalePicker', () {
+    /// Pumps a button that opens the picker for [settings], recording every
+    /// calibration the notifier is asked to save.
+    Future<List<AppSettings>> pumpPicker(
+      WidgetTester tester,
+      AppSettings settings,
+    ) async {
+      final saved = <AppSettings>[];
+      final notifier = _RecordingSettingsNotifier(settings, saved);
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [settingsProvider.overrideWith((ref) => notifier)],
+          child: MaterialApp(
+            locale: const Locale('en'),
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: Consumer(
+              builder: (context, ref, _) => Scaffold(
+                body: Center(
+                  child: ElevatedButton(
+                    onPressed: () =>
+                        showVisibilityScalePicker(context, ref, settings),
+                    child: const Text('open'),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.tap(find.text('open'));
+      await tester.pumpAndSettle();
+      return saved;
+    }
+
+    testWidgets('opens with the presets listed', (tester) async {
+      await pumpPicker(tester, const AppSettings());
+      expect(find.text('Visibility scale'), findsOneWidget);
+      expect(find.text('Cold water / Inland'), findsOneWidget);
+    });
+
+    testWidgets('choosing a named preset saves it and closes', (tester) async {
+      final saved = await pumpPicker(tester, const AppSettings());
+
+      await tester.tap(find.text('Cold water / Inland'));
+      await tester.pumpAndSettle();
+
+      expect(saved, hasLength(1));
+      expect(
+        saved.single.visibilityScalePreset,
+        VisibilityScalePreset.coldWater,
+      );
+      expect(find.text('Visibility scale'), findsNothing);
+    });
+
+    testWidgets('choosing Custom opens the threshold form', (tester) async {
+      final saved = await pumpPicker(tester, const AppSettings());
+
+      await tester.tap(find.text('Custom'));
+      await tester.pumpAndSettle();
+
+      // Nothing saved yet: the form has to be submitted first.
+      expect(saved, isEmpty);
+      expect(find.byType(TextField), findsNWidgets(3));
+    });
+
+    testWidgets('the custom form seeds from retained thresholds, not the '
+        'active preset', (tester) async {
+      // The diver set 18/9/3, then switched to Cold water. Reopening Custom
+      // must show 18/9/3, not the cold-water 12/6/2.
+      await pumpPicker(
+        tester,
+        const AppSettings(
+          visibilityScalePreset: VisibilityScalePreset.coldWater,
+          visibilityScaleExcellentM: 18,
+          visibilityScaleGoodM: 9,
+          visibilityScaleModerateM: 3,
+        ),
+      );
+
+      await tester.tap(find.text('Custom'));
+      await tester.pumpAndSettle();
+
+      expect(find.widgetWithText(TextField, '18'), findsOneWidget);
+      expect(find.widgetWithText(TextField, '9'), findsOneWidget);
+      expect(find.widgetWithText(TextField, '3'), findsOneWidget);
+      expect(find.widgetWithText(TextField, '12'), findsNothing);
+    });
+
+    testWidgets('submitting the custom form saves metric thresholds', (
+      tester,
+    ) async {
+      final saved = await pumpPicker(tester, const AppSettings());
+
+      await tester.tap(find.text('Custom'));
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byType(TextField).at(0), '18');
+      await tester.enterText(find.byType(TextField).at(1), '9');
+      await tester.enterText(find.byType(TextField).at(2), '3');
+      await tester.tap(find.text('Save'));
+      await tester.pumpAndSettle();
+
+      expect(saved, hasLength(1));
+      expect(saved.single.visibilityScalePreset, VisibilityScalePreset.custom);
+      expect(saved.single.visibilityScaleExcellentM, 18);
+      expect(saved.single.visibilityScale.bandFor(9), VisibilityBand.good);
+      expect(find.byType(TextField), findsNothing);
+    });
+
+    testWidgets('cancelling the custom form saves nothing', (tester) async {
+      final saved = await pumpPicker(tester, const AppSettings());
+
+      await tester.tap(find.text('Custom'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Cancel'));
+      await tester.pumpAndSettle();
+
+      expect(saved, isEmpty);
+      expect(find.byType(TextField), findsNothing);
+    });
+
+    testWidgets('an invalid custom set keeps the form open', (tester) async {
+      final saved = await pumpPicker(tester, const AppSettings());
+
+      await tester.tap(find.text('Custom'));
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byType(TextField).at(0), '5');
+      await tester.enterText(find.byType(TextField).at(1), '10');
+      await tester.enterText(find.byType(TextField).at(2), '20');
+      await tester.tap(find.text('Save'));
+      await tester.pumpAndSettle();
+
+      expect(saved, isEmpty);
+      expect(find.byType(TextField), findsNWidgets(3));
     });
   });
 
