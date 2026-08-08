@@ -20054,6 +20054,27 @@ class AppLocalizationsPt extends AppLocalizations {
   String get gpsLogger_tracksHeader => 'Trilhas gravadas';
 
   @override
+  String get gpsTrack_export_saved => 'Trilha guardada';
+
+  @override
+  String get gpsTrack_action_export => 'Exportar';
+
+  @override
+  String get gpsTrack_action_shareGpx => 'Partilhar como GPX';
+
+  @override
+  String get gpsTrack_action_saveGpx => 'Guardar como GPX...';
+
+  @override
+  String get gpsTrack_action_shareKml => 'Partilhar como KML';
+
+  @override
+  String get gpsTrack_action_saveKml => 'Guardar como KML...';
+
+  @override
+  String get gpsTrack_export_failed => 'Falha na exportação.';
+
+  @override
   String get gpsTrack_map_title => 'Mapa de trilhas';
 
   @override

@@ -33401,6 +33401,48 @@ abstract class AppLocalizations {
   /// **'Recorded tracks'**
   String get gpsLogger_tracksHeader;
 
+  /// No description provided for @gpsTrack_export_saved.
+  ///
+  /// In en, this message translates to:
+  /// **'Track saved'**
+  String get gpsTrack_export_saved;
+
+  /// No description provided for @gpsTrack_action_export.
+  ///
+  /// In en, this message translates to:
+  /// **'Export'**
+  String get gpsTrack_action_export;
+
+  /// No description provided for @gpsTrack_action_shareGpx.
+  ///
+  /// In en, this message translates to:
+  /// **'Share as GPX'**
+  String get gpsTrack_action_shareGpx;
+
+  /// No description provided for @gpsTrack_action_saveGpx.
+  ///
+  /// In en, this message translates to:
+  /// **'Save as GPX...'**
+  String get gpsTrack_action_saveGpx;
+
+  /// No description provided for @gpsTrack_action_shareKml.
+  ///
+  /// In en, this message translates to:
+  /// **'Share as KML'**
+  String get gpsTrack_action_shareKml;
+
+  /// No description provided for @gpsTrack_action_saveKml.
+  ///
+  /// In en, this message translates to:
+  /// **'Save as KML...'**
+  String get gpsTrack_action_saveKml;
+
+  /// No description provided for @gpsTrack_export_failed.
+  ///
+  /// In en, this message translates to:
+  /// **'Export failed.'**
+  String get gpsTrack_export_failed;
+
   /// No description provided for @gpsTrack_map_title.
   ///
   /// In en, this message translates to:

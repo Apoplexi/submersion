@@ -19545,6 +19545,27 @@ class AppLocalizationsHe extends AppLocalizations {
   String get gpsLogger_tracksHeader => 'מסלולים שהוקלטו';
 
   @override
+  String get gpsTrack_export_saved => 'המסלול נשמר';
+
+  @override
+  String get gpsTrack_action_export => 'ייצוא';
+
+  @override
+  String get gpsTrack_action_shareGpx => 'שיתוף כ-GPX';
+
+  @override
+  String get gpsTrack_action_saveGpx => 'שמירה כ-GPX...';
+
+  @override
+  String get gpsTrack_action_shareKml => 'שיתוף כ-KML';
+
+  @override
+  String get gpsTrack_action_saveKml => 'שמירה כ-KML...';
+
+  @override
+  String get gpsTrack_export_failed => 'הייצוא נכשל.';
+
+  @override
   String get gpsTrack_map_title => 'מפת מסלולים';
 
   @override

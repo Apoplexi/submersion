@@ -19885,6 +19885,27 @@ class AppLocalizationsNl extends AppLocalizations {
   String get gpsLogger_tracksHeader => 'Opgenomen tracks';
 
   @override
+  String get gpsTrack_export_saved => 'Track opgeslagen';
+
+  @override
+  String get gpsTrack_action_export => 'Exporteren';
+
+  @override
+  String get gpsTrack_action_shareGpx => 'Delen als GPX';
+
+  @override
+  String get gpsTrack_action_saveGpx => 'Opslaan als GPX...';
+
+  @override
+  String get gpsTrack_action_shareKml => 'Delen als KML';
+
+  @override
+  String get gpsTrack_action_saveKml => 'Opslaan als KML...';
+
+  @override
+  String get gpsTrack_export_failed => 'Exporteren mislukt.';
+
+  @override
   String get gpsTrack_map_title => 'Trackkaart';
 
   @override

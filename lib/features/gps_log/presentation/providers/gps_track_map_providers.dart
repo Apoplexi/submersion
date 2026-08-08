@@ -2,6 +2,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart' show DateTimeRange;
 
 import 'package:submersion/core/providers/provider.dart';
+import 'package:submersion/core/services/export/gpx/gpx_export_service.dart';
+import 'package:submersion/core/services/export/kml/kml_export_service.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_providers.dart';
 import 'package:submersion/features/gps_log/data/repositories/track_geometry_cache_repository.dart';
@@ -136,6 +138,14 @@ final filteredTracksProvider = FutureProvider<List<GpsTrack>>((ref) async {
       if (track.startTime >= from && track.startTime <= to) track,
   ];
 });
+
+final gpxExportServiceProvider = Provider<GpxExportService>(
+  (ref) => GpxExportService(),
+);
+
+final kmlExportServiceProvider = Provider<KmlExportService>(
+  (ref) => KmlExportService(),
+);
 
 /// Active colorization mode on the track detail map.
 ///

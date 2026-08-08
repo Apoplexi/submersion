@@ -19023,6 +19023,27 @@ class AppLocalizationsZh extends AppLocalizations {
   String get gpsLogger_tracksHeader => '已记录的轨迹';
 
   @override
+  String get gpsTrack_export_saved => '轨迹已保存';
+
+  @override
+  String get gpsTrack_action_export => '导出';
+
+  @override
+  String get gpsTrack_action_shareGpx => '分享为 GPX';
+
+  @override
+  String get gpsTrack_action_saveGpx => '保存为 GPX...';
+
+  @override
+  String get gpsTrack_action_shareKml => '分享为 KML';
+
+  @override
+  String get gpsTrack_action_saveKml => '保存为 KML...';
+
+  @override
+  String get gpsTrack_export_failed => '导出失败。';
+
+  @override
   String get gpsTrack_map_title => '轨迹地图';
 
   @override

@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:latlong2/latlong.dart';
 
 import 'package:submersion/core/providers/provider.dart';
+import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/features/gps_log/data/repositories/track_geometry_cache_repository.dart';
 import 'package:submersion/features/gps_log/domain/entities/gps_track.dart';
 import 'package:submersion/features/gps_log/domain/track_colorization.dart';
@@ -29,8 +30,41 @@ class GpsTrackDetailPage extends ConsumerStatefulWidget {
   ConsumerState<GpsTrackDetailPage> createState() => _GpsTrackDetailPageState();
 }
 
+/// Which export the overflow menu triggered.
+enum _ExportAction { shareGpx, saveGpx, shareKml, saveKml }
+
 class _GpsTrackDetailPageState extends ConsumerState<GpsTrackDetailPage> {
   final MapController _mapController = MapController();
+  final _log = LoggerService.forClass(GpsTrackDetailPage);
+
+  Future<void> _export(_ExportAction action, GpsTrack track) async {
+    final l10n = context.l10n;
+    final messenger = ScaffoldMessenger.of(context);
+    final gpx = ref.read(gpxExportServiceProvider);
+    final kml = ref.read(kmlExportServiceProvider);
+
+    try {
+      final String? path = switch (action) {
+        _ExportAction.shareGpx => await gpx.shareTrack(track),
+        _ExportAction.saveGpx => await gpx.saveTrackToFile(track),
+        _ExportAction.shareKml => await kml.shareTrackKml(track),
+        _ExportAction.saveKml => await kml.saveTrackKmlToFile(track),
+      };
+      if (!mounted) return;
+      // A null path means the user cancelled the picker. That is not a
+      // failure, and reporting it as one trains people to ignore the message.
+      if (path == null) return;
+      messenger.showSnackBar(
+        SnackBar(content: Text(l10n.gpsTrack_export_saved)),
+      );
+    } catch (e, stackTrace) {
+      _log.error('GPS track export failed', error: e, stackTrace: stackTrace);
+      if (!mounted) return;
+      messenger.showSnackBar(
+        SnackBar(content: Text(l10n.gpsTrack_export_failed)),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -39,9 +73,37 @@ class _GpsTrackDetailPageState extends ConsumerState<GpsTrackDetailPage> {
 
     final mode = ref.watch(trackColorModeProvider);
 
+    final track = trackAsync.value;
+
     return Scaffold(
       appBar: AppBar(
         title: Text(l10n.gpsTrack_detail_title),
+        actions: [
+          if (track != null)
+            PopupMenuButton<_ExportAction>(
+              key: const ValueKey('gps-track-overflow'),
+              tooltip: l10n.gpsTrack_action_export,
+              onSelected: (action) => _export(action, track),
+              itemBuilder: (context) => [
+                PopupMenuItem(
+                  value: _ExportAction.shareGpx,
+                  child: Text(l10n.gpsTrack_action_shareGpx),
+                ),
+                PopupMenuItem(
+                  value: _ExportAction.saveGpx,
+                  child: Text(l10n.gpsTrack_action_saveGpx),
+                ),
+                PopupMenuItem(
+                  value: _ExportAction.shareKml,
+                  child: Text(l10n.gpsTrack_action_shareKml),
+                ),
+                PopupMenuItem(
+                  value: _ExportAction.saveKml,
+                  child: Text(l10n.gpsTrack_action_saveKml),
+                ),
+              ],
+            ),
+        ],
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(52),
           child: Padding(

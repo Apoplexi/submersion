@@ -19689,6 +19689,27 @@ class AppLocalizationsAr extends AppLocalizations {
   String get gpsLogger_tracksHeader => 'المسارات المسجّلة';
 
   @override
+  String get gpsTrack_export_saved => 'تم حفظ المسار';
+
+  @override
+  String get gpsTrack_action_export => 'تصدير';
+
+  @override
+  String get gpsTrack_action_shareGpx => 'مشاركة كملف GPX';
+
+  @override
+  String get gpsTrack_action_saveGpx => 'حفظ كملف GPX...';
+
+  @override
+  String get gpsTrack_action_shareKml => 'مشاركة كملف KML';
+
+  @override
+  String get gpsTrack_action_saveKml => 'حفظ كملف KML...';
+
+  @override
+  String get gpsTrack_export_failed => 'فشل التصدير.';
+
+  @override
   String get gpsTrack_map_title => 'خريطة المسارات';
 
   @override

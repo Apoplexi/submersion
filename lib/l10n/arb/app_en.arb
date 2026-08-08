@@ -12569,6 +12569,13 @@
     }
   },
   "gpsLogger_tracksHeader": "Recorded tracks",
+  "gpsTrack_export_saved": "Track saved",
+  "gpsTrack_action_export": "Export",
+  "gpsTrack_action_shareGpx": "Share as GPX",
+  "gpsTrack_action_saveGpx": "Save as GPX...",
+  "gpsTrack_action_shareKml": "Share as KML",
+  "gpsTrack_action_saveKml": "Save as KML...",
+  "gpsTrack_export_failed": "Export failed.",
   "gpsTrack_map_title": "Track Map",
   "gpsTrack_map_noTracks": "No recorded tracks to show.",
   "gpsTrack_map_showMap": "Show map",

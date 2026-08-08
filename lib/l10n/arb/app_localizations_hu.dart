@@ -19988,6 +19988,27 @@ class AppLocalizationsHu extends AppLocalizations {
   String get gpsLogger_tracksHeader => 'Rögzített útvonalak';
 
   @override
+  String get gpsTrack_export_saved => 'Nyomvonal mentve';
+
+  @override
+  String get gpsTrack_action_export => 'Exportálás';
+
+  @override
+  String get gpsTrack_action_shareGpx => 'Megosztás GPX-ként';
+
+  @override
+  String get gpsTrack_action_saveGpx => 'Mentés GPX-ként...';
+
+  @override
+  String get gpsTrack_action_shareKml => 'Megosztás KML-ként';
+
+  @override
+  String get gpsTrack_action_saveKml => 'Mentés KML-ként...';
+
+  @override
+  String get gpsTrack_export_failed => 'Az exportálás sikertelen.';
+
+  @override
   String get gpsTrack_map_title => 'Nyomvonaltérkép';
 
   @override

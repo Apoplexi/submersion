@@ -20046,6 +20046,27 @@ class AppLocalizationsIt extends AppLocalizations {
   String get gpsLogger_tracksHeader => 'Tracce registrate';
 
   @override
+  String get gpsTrack_export_saved => 'Traccia salvata';
+
+  @override
+  String get gpsTrack_action_export => 'Esporta';
+
+  @override
+  String get gpsTrack_action_shareGpx => 'Condividi come GPX';
+
+  @override
+  String get gpsTrack_action_saveGpx => 'Salva come GPX...';
+
+  @override
+  String get gpsTrack_action_shareKml => 'Condividi come KML';
+
+  @override
+  String get gpsTrack_action_saveKml => 'Salva come KML...';
+
+  @override
+  String get gpsTrack_export_failed => 'Esportazione non riuscita.';
+
+  @override
   String get gpsTrack_map_title => 'Mappa tracce';
 
   @override
