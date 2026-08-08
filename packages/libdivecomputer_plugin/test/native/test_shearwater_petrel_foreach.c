@@ -99,9 +99,11 @@ typedef struct {
   unsigned char pages[MAX_PAGES][MANIFEST_SIZE];
   int npages;
   int next_page;
+  int manifest_nak;  // NAK (DC_STATUS_UNSUPPORTED) any page past the scripted ones
   struct {
     unsigned char id;
     int fail;  // serve DC_STATUS_TIMEOUT this many more times, then succeed
+    int nak;   // device refuses this dive outright (DC_STATUS_UNSUPPORTED)
   } dives[MAX_DIVES];
   int ndives;
 } script_t;
@@ -121,6 +123,17 @@ static void script_add_dive(unsigned char id, int fail) {
   assert(g_script.ndives < MAX_DIVES);  // fail fast on script overflow
   g_script.dives[g_script.ndives].id = id;
   g_script.dives[g_script.ndives].fail = fail;
+  g_script.dives[g_script.ndives].nak = 0;
+  g_script.ndives++;
+}
+
+// The device refuses this dive's download init outright, the way a real unit
+// NAKs a manifest record whose dive data it can no longer serve (issue #766).
+static void script_add_dive_nak(unsigned char id) {
+  assert(g_script.ndives < MAX_DIVES);
+  g_script.dives[g_script.ndives].id = id;
+  g_script.dives[g_script.ndives].fail = 0;
+  g_script.dives[g_script.ndives].nak = 1;
   g_script.ndives++;
 }
 
@@ -265,7 +278,10 @@ dc_status_t shearwater_common_download(shearwater_common_device_t *device,
 
   if (address == MANIFEST_ADDR) {
     if (g_script.next_page >= g_script.npages)
-      return DC_STATUS_IO;  // the driver asked for more pages than scripted
+      // Past the scripted pages: a real device NAKs the request when the
+      // record area ends exactly on a page boundary (manifest_nak); an
+      // unscripted request in any other test is still a script error (IO).
+      return g_script.manifest_nak ? DC_STATUS_UNSUPPORTED : DC_STATUS_IO;
     if (!dc_buffer_append(buffer, g_script.pages[g_script.next_page],
                           MANIFEST_SIZE))
       return DC_STATUS_NOMEMORY;
@@ -276,6 +292,8 @@ dc_status_t shearwater_common_download(shearwater_common_device_t *device,
   for (int i = 0; i < g_script.ndives; i++) {
     unsigned char id = g_script.dives[i].id;
     if (BASE_ADDR + (unsigned int)id * 0x1000 != address) continue;
+    if (g_script.dives[i].nak)
+      return DC_STATUS_UNSUPPORTED;
     if (g_script.dives[i].fail > 0) {
       g_script.dives[i].fail--;
       return DC_STATUS_TIMEOUT;
@@ -672,6 +690,140 @@ static void test_floor_deleted_record_below_floor_unaffected(void) {
            g_last_progress.maximum);
 }
 
+// ---------------------------------------------------------------------------
+// Issue #766: the reporter's Petrel 3 and Nerd 2 NAK the download init for
+// the OLDEST manifest record (data the device can no longer serve), and with
+// oldest-first delivery that refusal struck before any dive was delivered, so
+// every download attempt aborted with zero dives. A refused record must be
+// skipped -- it is deterministic, the retry loop cannot help, and the data is
+// gone -- while refusal of EVERY record must still surface as an error so a
+// wrong logbook base address stays diagnosable.
+// ---------------------------------------------------------------------------
+
+// The oldest record is refused: the pass must skip it, deliver everything
+// else, and end with exact progress accounting.
+static void check_nak_oldest_dive_skipped(void) {
+  script_reset();
+  g_script.npages = 1;
+  set_record(0, 0, 0, 3);  // newest
+  set_record(0, 1, 0, 2);
+  set_record(0, 2, 0, 1);  // oldest; the device refuses to serve it
+  script_add_dive_nak(1);
+  script_add_dive(2, 0);
+  script_add_dive(3, 0);
+
+  cb_state_t s;
+  dc_status_t rc = run_foreach(NULL, &s);
+  const unsigned char want[] = {2, 3};
+  expect(rc == DC_STATUS_SUCCESS,
+         "a refused oldest dive does not abort the pass (#766)");
+  expect(order_is(&s, want, 2),
+         "the refused dive is skipped and the rest delivered oldest first");
+  if (s.n != 2 || memcmp(s.order, want, 2) != 0) print_order(&s);
+  expect(g_last_progress.current == g_last_progress.maximum,
+         "final progress reaches 100% despite the skipped dive");
+  // 1 manifest page + 2 delivered dives; the refused record is dropped from
+  // the maximum like a deleted or below-floor record.
+  expect(g_last_progress.maximum == 3 * NSTEPS,
+         "the refused dive is dropped from the progress maximum");
+  if (g_last_progress.current != g_last_progress.maximum ||
+      g_last_progress.maximum != 3 * NSTEPS)
+    printf("  final progress %u / %u\n", g_last_progress.current,
+           g_last_progress.maximum);
+}
+
+// A refusal in the middle of the pass must skip only that dive: everything
+// after it (newer) still downloads, unlike the keep-partial path that ends
+// the pass at the first persistent TIMEOUT.
+static void check_nak_mid_pass_skipped(void) {
+  script_reset();
+  g_script.npages = 1;
+  set_record(0, 0, 0, 3);  // newest
+  set_record(0, 1, 0, 2);  // refused
+  set_record(0, 2, 0, 1);  // oldest
+  script_add_dive(1, 0);
+  script_add_dive_nak(2);
+  script_add_dive(3, 0);
+
+  cb_state_t s;
+  dc_status_t rc = run_foreach(NULL, &s);
+  const unsigned char want[] = {1, 3};
+  expect(rc == DC_STATUS_SUCCESS, "a mid-pass refusal does not end the pass");
+  expect(order_is(&s, want, 2),
+         "only the refused dive is skipped; newer dives still download");
+  if (s.n != 2 || memcmp(s.order, want, 2) != 0) print_order(&s);
+}
+
+// Every record refused and nothing delivered: this is NOT a poisoned oldest
+// record but something systemic (e.g. requesting dives at the wrong logbook
+// base address), and reporting success with zero dives would make it
+// undiagnosable. The error must propagate.
+static void check_all_nak_still_errors(void) {
+  script_reset();
+  g_script.npages = 1;
+  set_record(0, 0, 0, 2);  // newest
+  set_record(0, 1, 0, 1);  // oldest
+  script_add_dive_nak(1);
+  script_add_dive_nak(2);
+
+  cb_state_t s;
+  dc_status_t rc = run_foreach(NULL, &s);
+  expect(rc != DC_STATUS_SUCCESS,
+         "refusal of every dive with nothing delivered stays an error");
+  expect(s.n == 0, "no dives delivered when every request is refused");
+  if (s.n != 0) print_order(&s);
+}
+
+// A logbook whose record area ends exactly on a page boundary: the walk
+// cannot tell a full final page from a truncated one, so it requests one
+// page too many and the device NAKs it. That refusal is the normal end of
+// the manifest, not an error (#766).
+static void check_manifest_nak_after_full_page_ends_walk(void) {
+  script_reset();
+  g_script.npages = 1;
+  g_script.manifest_nak = 1;
+  for (int slot = 0; slot < (int)RECORD_COUNT; slot++) {
+    unsigned char id = (unsigned char)(RECORD_COUNT - slot);  // ids 48..1
+    set_record(0, slot, 0, id);
+    script_add_dive(id, 0);
+  }
+
+  cb_state_t s;
+  dc_status_t rc = run_foreach(NULL, &s);
+  unsigned char want[RECORD_COUNT];
+  for (int i = 0; i < (int)RECORD_COUNT; i++) want[i] = (unsigned char)(i + 1);
+  expect(rc == DC_STATUS_SUCCESS,
+         "a refused page after a full page ends the manifest walk");
+  expect(order_is(&s, want, (int)RECORD_COUNT),
+         "every dive from the full page is still delivered oldest first");
+  if (s.n != (int)RECORD_COUNT) print_order(&s);
+  expect(g_last_progress.current == g_last_progress.maximum,
+         "final progress reaches 100% after the refused page");
+  // 1 delivered page + 48 dives; the refused page contributes nothing.
+  expect(g_last_progress.maximum == (1 + RECORD_COUNT) * NSTEPS,
+         "the refused page is dropped from the progress maximum");
+  if (g_last_progress.current != g_last_progress.maximum ||
+      g_last_progress.maximum != (1 + RECORD_COUNT) * NSTEPS)
+    printf("  final progress %u / %u\n", g_last_progress.current,
+           g_last_progress.maximum);
+}
+
+// A refusal of the FIRST page is not an end-of-manifest signal: nothing was
+// read yet, so something is wrong with the device or the request, and the
+// error must propagate rather than masquerade as an empty logbook.
+static void check_manifest_nak_first_page_still_errors(void) {
+  script_reset();
+  g_script.npages = 0;
+  g_script.manifest_nak = 1;
+
+  cb_state_t s;
+  dc_status_t rc = run_foreach(NULL, &s);
+  expect(rc != DC_STATUS_SUCCESS,
+         "a refused first manifest page stays an error");
+  expect(s.n == 0, "no dives delivered on a refused first page");
+  if (s.n != 0) print_order(&s);
+}
+
 int main(void) {
   check_oldest_first();
   check_deleted_records_preserved();
@@ -685,6 +837,11 @@ int main(void) {
   test_exact_match_behavior_unchanged();
   test_zero_fingerprint_downloads_all();
   test_floor_deleted_record_below_floor_unaffected();
+  check_nak_oldest_dive_skipped();
+  check_nak_mid_pass_skipped();
+  check_all_nak_still_errors();
+  check_manifest_nak_after_full_page_ends_walk();
+  check_manifest_nak_first_page_still_errors();
 
   if (failures == 0) {
     printf("All shearwater_petrel_foreach tests passed.\n");
