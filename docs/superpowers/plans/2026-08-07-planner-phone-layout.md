@@ -10,7 +10,7 @@
 
 ## Global Constraints
 
-- Work ONLY in the worktree: `/Users/ericgriffin/repos/submersion-app/submersion/.claude/worktrees/planner-phone-layout`. Every Read/Edit/Write absolute path must start with that root; run every command from that directory (`pwd` first if unsure).
+- Work ONLY in the isolated worktree for this branch: `<repo-root>/.claude/worktrees/planner-phone-layout`. Every Read/Edit/Write absolute path must start with that worktree root; run every command from that directory (`pwd` first if unsure).
 - Branch: `worktree-planner-phone-layout`. Commit after each task; no pushes.
 - Commit messages: plain summary line only. NO `Co-Authored-By:` trailer, NO session-URL trailer.
 - `dart format .` must produce no changes before each commit (format the whole project, not just touched files).
