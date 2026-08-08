@@ -365,7 +365,21 @@ class UnitFormatter {
   }
 
   /// Wind speed unit symbol.
-  String get windSpeedSymbol => _isMetricWind ? 'km/h' : 'kts';
+  String get windSpeedSymbol => speedSymbol;
+
+  /// Speed unit symbol: km/h in metric, knots in imperial.
+  String get speedSymbol => _isMetricWind ? 'km/h' : 'kts';
+
+  /// Format a speed from m/s in the diver's preferred unit.
+  ///
+  /// Shares [convertWindSpeed]'s conversion rather than adding a second one:
+  /// two speed formatters that disagreed on units would be a bug. The
+  /// imperial branch yields knots, which is also the marine convention for
+  /// boat speed on a GPS surface track.
+  String formatSpeed(double metersPerSecond, {int decimals = 1}) {
+    final converted = convertWindSpeed(metersPerSecond);
+    return '${converted.toStringAsFixed(decimals)} $speedSymbol';
+  }
 
   // ============================================================================
   // Date/Time Formatting
