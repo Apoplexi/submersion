@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:submersion/core/constants/list_view_mode.dart';
-import 'package:submersion/core/theme/full_themes/console_theme.dart';
 import 'package:submersion/core/providers/provider.dart';
+import 'package:submersion/core/theme/full_themes/console_theme.dart';
 import 'package:submersion/features/divers/domain/entities/diver.dart';
 import 'package:submersion/features/divers/presentation/providers/diver_providers.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
@@ -827,6 +828,17 @@ void main() {
       String text, {
       required String tripName,
     }) async {
+      // TripListTile dates itself with DateFormat.yMMMd(), which resolves
+      // against Intl.defaultLocale -- a process global that app.dart sets from
+      // the app locale -- NOT the MaterialApp locale. Pin it so the
+      // "Jun 1, 2024 - Jun 7, 2024" lookup states its real dependency instead
+      // of riding on intl's implicit en_US fallback, and restore it so the
+      // global stays contained. No initializeDateFormatting is needed here
+      // because GlobalMaterialLocalizations does it for widget tests.
+      final previousLocale = Intl.defaultLocale;
+      Intl.defaultLocale = 'en';
+      addTearDown(() => Intl.defaultLocale = previousLocale);
+
       final overrides = await _buildPhoneOverrides(
         trips: [_makeTrip(id: 't1', name: tripName, diveCount: 12)],
         viewMode: ListViewMode.detailed,
@@ -892,6 +904,18 @@ void main() {
       // the title roles but restores the system family for the body roles. A
       // trip title that falls back to a body role therefore renders in a
       // literally different typeface from the dive and site titles.
+      //
+      // Touching consoleLight lazily initializes it, which calls
+      // GoogleFonts.jetBrainsMonoTextTheme(). Disabling runtime fetching keeps
+      // that from reaching the network; the family name is carried on the
+      // TextStyle regardless of whether the font bytes ever load, which is all
+      // this test reads.
+      //
+      // The app_theme_registry_test hardening (await GoogleFonts.pendingFonts()
+      // plus a debugPrint override) does NOT transfer here, because that file
+      // uses plain test(). Inside testWidgets, awaiting pendingFonts() from a
+      // tear-down never completes, and reassigning debugPrint trips
+      // debugAssertAllFoundationVarsUnset, which runs before tear-downs.
       GoogleFonts.config.allowRuntimeFetching = false;
 
       final titleFamily = consoleLight.textTheme.titleMedium!.fontFamily;
