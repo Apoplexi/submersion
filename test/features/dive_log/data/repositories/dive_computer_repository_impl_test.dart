@@ -440,6 +440,30 @@ void main() {
       )..where((t) => t.id.equals(computerId))).get();
       expect(computers, isEmpty);
     });
+
+    test('deletes a computer linked as a dive\'s primary computer with foreign '
+        'keys enforced (issue #823)', () async {
+      // The app's real connection runs with PRAGMA foreign_keys = ON, but
+      // the in-memory test database defaults to OFF, which masked the
+      // missing dives.computer_id clearing: deleting a computer that any
+      // dive referenced failed with SqliteException(787) on devices.
+      await db.customStatement('PRAGMA foreign_keys = ON');
+      final computerId = await insertComputer();
+      final diveId = await insertDive(computerId: computerId);
+
+      await repository.deleteComputer(computerId);
+
+      // Computer gone; the dive survives with the link cleared.
+      final computers = await (db.select(
+        db.diveComputers,
+      )..where((t) => t.id.equals(computerId))).get();
+      expect(computers, isEmpty);
+      final dives = await (db.select(
+        db.dives,
+      )..where((t) => t.id.equals(diveId))).get();
+      expect(dives, hasLength(1));
+      expect(dives.first.computerId, isNull);
+    });
   });
 
   // ---------------------------------------------------------------------------
