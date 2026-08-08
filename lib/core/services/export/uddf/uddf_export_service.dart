@@ -6,7 +6,6 @@ import 'package:file_picker/file_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:xml/xml.dart';
 
-import 'package:submersion/core/constants/enums.dart' as enums;
 import 'package:submersion/core/services/export/shared/file_export_utils.dart';
 import 'package:submersion/core/services/export/uddf/uddf_export_builders.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
@@ -408,11 +407,9 @@ class UddfExportService {
                                 nest: (dive.waterTemp! + 273.15).toString(),
                               ); // Kelvin
                             }
-                            if (dive.visibility != null) {
-                              builder.element(
-                                'visibility',
-                                nest: _visibilityToUddf(dive.visibility!),
-                              );
+                            if (UddfExportBuilders.visibilityForUddf(dive)
+                                case final vis?) {
+                              builder.element('visibility', nest: vis);
                             }
                             if (dive.rating != null) {
                               builder.element(
@@ -603,20 +600,5 @@ class UddfExportService {
     }
 
     return result;
-  }
-
-  String _visibilityToUddf(enums.Visibility visibility) {
-    switch (visibility) {
-      case enums.Visibility.excellent:
-        return '30'; // meters
-      case enums.Visibility.good:
-        return '20';
-      case enums.Visibility.moderate:
-        return '10';
-      case enums.Visibility.poor:
-        return '5';
-      case enums.Visibility.unknown:
-        return '0';
-    }
   }
 }

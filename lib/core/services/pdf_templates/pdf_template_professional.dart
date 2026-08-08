@@ -407,7 +407,11 @@ class PdfTemplateProfessional extends PdfTemplateBuilder {
                     ),
                     _buildMetricRow(
                       'Visibility',
-                      dive.visibility?.displayName ?? '-',
+                      // Measured distance from v144; pre-v144 dives fall back
+                      // to their bucket label.
+                      dive.visibilityMeters != null
+                          ? '${dive.visibilityMeters!.toStringAsFixed(0)}m'
+                          : (dive.visibility?.displayName ?? '-'),
                     ),
                     if (tank != null)
                       _buildMetricRow('Gas', tank.gasMix.name)

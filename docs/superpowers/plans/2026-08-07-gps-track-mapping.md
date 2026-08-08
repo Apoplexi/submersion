@@ -49,7 +49,7 @@ Every task's requirements implicitly include this section.
 
 | Path | Change |
 |---|---|
-| `lib/core/database/database.dart` | `gps_tracks` +5 columns, `currentSchemaVersion` 142 to 144, migration step |
+| `lib/core/database/database.dart` | `gps_tracks` +5 columns, `currentSchemaVersion` 142 to 145, migration step |
 | `lib/core/database/local_cache_database.dart` | `gps_track_geometry_cache` table, v8 to v9, self-heal |
 | `lib/core/utils/unit_formatter.dart` | `formatSpeed` |
 | `lib/core/services/export/shared/file_export_utils.dart` | `saveTextToFile` |
@@ -935,7 +935,7 @@ git fetch origin
 git show origin/main:lib/core/database/database.dart | grep -n "currentSchemaVersion ="
 ```
 
-Expected: `142`. If it is not 142, stop and pick the next free version, updating every reference in this task.
+Expected: `144`. If it is not 144, stop and pick the next free version, updating every reference in this task. This check has already fired once: main was at 142 when the plan was written and reached 144 (visibility scale calibration) before this branch merged, so the step was renumbered from 144 to 145.
 
 - [ ] **Step 2: Read an existing migration step to copy its shape**
 
@@ -992,8 +992,8 @@ void main() {
     expect(row.trimEndTime, isNull);
   });
 
-  test('schema version is 144', () {
-    expect(db.schemaVersion, 144);
+  test('schema version is 145', () {
+    expect(db.schemaVersion, 145);
   });
 }
 ```
@@ -1027,10 +1027,10 @@ In `lib/core/database/database.dart`, inside `class GpsTracks extends Table`, af
 
 - [ ] **Step 6: Bump the version and add the migration step**
 
-Change `currentSchemaVersion` from `142` to `144`, then add to the migration chain, matching the surrounding style:
+Change `currentSchemaVersion` from `142` to `145`, then add to the migration chain, matching the surrounding style:
 
 ```dart
-      if (from < 144) {
+      if (from < 145) {
         await m.addColumn(gpsTracks, gpsTracks.source);
         await m.addColumn(gpsTracks, gpsTracks.sourceRef);
         await m.addColumn(gpsTracks, gpsTracks.name);

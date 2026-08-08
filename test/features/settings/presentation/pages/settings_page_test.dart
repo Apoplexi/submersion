@@ -29,6 +29,7 @@ import 'package:submersion/features/dive_sites/domain/matching/site_match_sensit
 import 'package:submersion/core/constants/dive_detail_sections.dart';
 import 'package:submersion/core/constants/list_view_mode.dart';
 import 'package:submersion/core/constants/profile_metrics.dart';
+import 'package:submersion/core/domain/visibility/visibility_scale.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/tissue_color_schemes.dart';
 import 'package:submersion/core/services/log_file_service.dart';
 import 'package:submersion/features/settings/presentation/providers/debug_log_providers.dart';
@@ -104,6 +105,18 @@ class _MockSettingsNotifier extends StateNotifier<AppSettings>
   @override
   Future<void> setDefaultCurrency(String currencyCode) async =>
       state = state.copyWith(defaultCurrency: currencyCode);
+  @override
+  Future<void> setVisibilityScale({
+    required VisibilityScalePreset preset,
+    double? excellentM,
+    double? goodM,
+    double? moderateM,
+  }) async => state = state.copyWith(
+    visibilityScalePreset: preset,
+    visibilityScaleExcellentM: excellentM,
+    visibilityScaleGoodM: goodM,
+    visibilityScaleModerateM: moderateM,
+  );
   @override
   Future<void> setAltitudeUnit(AltitudeUnit unit) async =>
       state = state.copyWith(altitudeUnit: unit);
@@ -186,6 +199,27 @@ class _MockSettingsNotifier extends StateNotifier<AppSettings>
     }
     state = state.copyWith(hiddenHomeChips: hidden);
   }
+
+  @override
+  Future<void> setHomeCardEnabled(String cardId, bool enabled) async {
+    final hidden = {...state.hiddenHomeCards};
+    if (enabled) {
+      hidden.remove(cardId);
+    } else {
+      hidden.add(cardId);
+    }
+    state = state.copyWith(hiddenHomeCards: hidden);
+  }
+
+  @override
+  Future<void> setHomeCardOrder(List<String> order) async =>
+      state = state.copyWith(homeCardOrder: order);
+
+  @override
+  Future<void> resetHomeCards() async => state = state.copyWith(
+    homeCardOrder: const <String>[],
+    hiddenHomeCards: const <String>{},
+  );
 
   @override
   Future<void> setSafetyRuleEnabled(SafetyRuleId rule, bool enabled) async {

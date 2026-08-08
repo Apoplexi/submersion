@@ -2975,10 +2975,76 @@ class AppLocalizationsZh extends AppLocalizations {
   String get dashboard_gauges_noDivesYet => '暂无潜水记录';
 
   @override
-  String get settings_homeChips_pageTitle => '主页状态标签';
+  String get settings_homeChips_pageTitle => '主页屏幕';
 
   @override
   String get settings_homeChips_description => '选择主页顶部显示哪些状态标签。';
+
+  @override
+  String get settings_homeChips_sectionTitle => '状态标签';
+
+  @override
+  String get settings_homeCards_sectionTitle => '主页卡片';
+
+  @override
+  String get settings_homeCards_description => '选择主页显示哪些卡片，并拖动以重新排序。';
+
+  @override
+  String get settings_homeCards_autoHides => '为空时自动隐藏';
+
+  @override
+  String get settings_homeCards_resetToDefault => '恢复默认';
+
+  @override
+  String get settings_homeCards_resetDialog_title => '重置主页布局？';
+
+  @override
+  String get settings_homeCards_resetDialog_message => '将恢复默认卡片顺序并重新显示所有卡片。';
+
+  @override
+  String get settings_homeCards_resetDialog_cancel => '取消';
+
+  @override
+  String get settings_homeCards_resetDialog_confirm => '重置';
+
+  @override
+  String get settings_homeCards_card_hero => '欢迎页眉';
+
+  @override
+  String get settings_homeCards_card_gaugeStrip => '状态标签';
+
+  @override
+  String get settings_homeCards_card_preDive => '潜水前检查清单';
+
+  @override
+  String get settings_homeCards_card_recentDives => '最近潜水';
+
+  @override
+  String get settings_homeCards_card_quickActions => '快捷操作';
+
+  @override
+  String get settings_homeCards_card_milestones => '里程碑';
+
+  @override
+  String get settings_homeCards_card_photoRibbon => '最近照片';
+
+  @override
+  String get settings_homeCards_card_onThisDay => '历史上的今天';
+
+  @override
+  String get settings_homeCards_card_yearInReview => '年度回顾';
+
+  @override
+  String get settings_homeCards_card_activeCourses => '课程进度';
+
+  @override
+  String get settings_homeCards_card_recentSitesMap => '最近潜点地图';
+
+  @override
+  String get dashboard_allHidden_message => '所有主页卡片均已隐藏。';
+
+  @override
+  String get dashboard_allHidden_customize => '自定义主页';
 
   @override
   String get settings_homeChips_flightWindow => '航班前潜水窗口';
@@ -9516,80 +9582,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get enum_weightType_trimWeights => '配平配重';
 
   @override
-  String get equipment_addSheet_brandHint => '例如 Scubapro';
-
-  @override
-  String get equipment_addSheet_brandLabel => '品牌';
-
-  @override
-  String get equipment_addSheet_closeTooltip => '关闭';
-
-  @override
-  String get equipment_addSheet_currencyLabel => '货币';
-
-  @override
-  String get equipment_addSheet_dateLabel => '日期';
-
-  @override
-  String equipment_addSheet_errorSnackbar(Object error) {
-    return '添加装备出错：$error';
-  }
-
-  @override
-  String get equipment_addSheet_modelHint => '例如 MK25 EVO';
-
-  @override
-  String get equipment_addSheet_modelLabel => '型号';
-
-  @override
-  String get equipment_addSheet_nameHint => '例如：我的主调节器';
-
-  @override
-  String get equipment_addSheet_nameLabel => '名称';
-
-  @override
-  String get equipment_addSheet_nameValidation => '请输入名称';
-
-  @override
-  String get equipment_addSheet_notesHint => '其他备注...';
-
-  @override
-  String get equipment_addSheet_notesLabel => '备注';
-
-  @override
-  String get equipment_addSheet_priceLabel => '价格';
-
-  @override
-  String get equipment_addSheet_purchaseInfoTitle => '购买信息';
-
-  @override
-  String get equipment_addSheet_serialNumberLabel => '序列编号';
-
-  @override
-  String get equipment_addSheet_serviceIntervalHint => '例如 365 表示每年';
-
-  @override
-  String get equipment_addSheet_serviceIntervalLabel => '维护间隔（天）';
-
-  @override
-  String get equipment_addSheet_sizeHint => 'e.g., M, L, 42';
-
-  @override
-  String get equipment_addSheet_sizeLabel => '尺寸';
-
-  @override
-  String get equipment_addSheet_submitButton => '添加装备';
-
-  @override
-  String get equipment_addSheet_successSnackbar => '装备添加成功';
-
-  @override
-  String get equipment_addSheet_title => '添加装备';
-
-  @override
-  String get equipment_addSheet_typeLabel => '类型';
-
-  @override
   String get equipment_appBar_title => '装备';
 
   @override
@@ -15684,6 +15676,16 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String surfaceInterval_gasWarning_modExceeded(
+    Object ppO2,
+    Object depth,
+    Object limit,
+    Object mod,
+  ) {
+    return '$depth 处 ppO₂ $ppO2 超过 $limit。此混合气的最大工作深度为 $mod。';
+  }
+
+  @override
   String surfaceInterval_heSemantics(Object percent) {
     return '氦气: $percent%';
   }
@@ -15695,6 +15697,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get surfaceInterval_result_currentInterval => '当前间隔';
+
+  @override
+  String get surfaceInterval_result_gasUnsafe => '此深度下气体不安全';
 
   @override
   String get surfaceInterval_result_inDeco => '在减压';
@@ -15735,7 +15740,14 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get surfaceInterval_secondDive_gasAir => '(空气)';
+  String surfaceInterval_secondDive_heSemantics(Object percent) {
+    return '第二潜水氦气: $percent%';
+  }
+
+  @override
+  String surfaceInterval_secondDive_o2Semantics(Object percent) {
+    return '第二潜水氧气: $percent%';
+  }
 
   @override
   String surfaceInterval_secondDive_timeSemantics(Object time) {
@@ -16645,7 +16657,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get trips_diveScan_noMatches => '未找到匹配的潜水';
 
   @override
-  String get trips_diveScan_noDiver => '为此行程指定潜水员以扫描潜水记录';
+  String get trips_diveScan_noDiver => '请选择当前潜水员以扫描潜水记录';
 
   @override
   String get trips_diveScan_selectAll => '全选';
@@ -17488,6 +17500,27 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get universalImport_entityAction_linkExistingSubtitle => '使用匹配的记录';
+
+  @override
+  String get universalImport_entityAction_replaceBadge => '替换';
+
+  @override
+  String get universalImport_entityAction_replaceExisting => '替换现有';
+
+  @override
+  String get universalImport_entityAction_replaceExistingSubtitle => '用导入的数据覆盖';
+
+  @override
+  String get universalImport_entityAction_skip => '跳过';
+
+  @override
+  String get universalImport_entityAction_skipSubtitle => '放弃此次导入';
+
+  @override
+  String get universalImport_entityAction_importAsNew => '作为新导入';
+
+  @override
+  String get universalImport_entityAction_importAsNewSubtitle => '创建单独条目';
 
   @override
   String get universalImport_pending_chooseAction => '选择操作';
@@ -22080,4 +22113,66 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get reef_attribution_protectedSeas => '海洋保护区边界。CC BY 4.0。';
+
+  @override
+  String get enum_visibilityBand_excellent => '极佳';
+
+  @override
+  String get enum_visibilityBand_good => '良好';
+
+  @override
+  String get enum_visibilityBand_moderate => '一般';
+
+  @override
+  String get enum_visibilityBand_poor => '较差';
+
+  @override
+  String visibility_range_between(String min, String max, String unit) {
+    return '$min-$max $unit';
+  }
+
+  @override
+  String visibility_range_over(String min, String unit) {
+    return '超过 $min $unit';
+  }
+
+  @override
+  String visibility_range_under(String max, String unit) {
+    return '不足 $max $unit';
+  }
+
+  @override
+  String get settings_visibilityScale_title => '能见度标准';
+
+  @override
+  String get settings_visibilityScale_subtitle => '在你潜水的水域，多远算是良好能见度';
+
+  @override
+  String get settings_visibilityScale_preset_tropical => '热带';
+
+  @override
+  String get settings_visibilityScale_preset_temperate => '温带';
+
+  @override
+  String get settings_visibilityScale_preset_coldWater => '冷水 / 内陆';
+
+  @override
+  String get settings_visibilityScale_preset_custom => '自定义';
+
+  @override
+  String get settings_visibilityScale_customExcellent => '极佳（不低于）';
+
+  @override
+  String get settings_visibilityScale_customGood => '良好（不低于）';
+
+  @override
+  String get settings_visibilityScale_customModerate => '一般（不低于）';
+
+  @override
+  String get settings_visibilityScale_invalidOrder => '每个数值必须小于上一个，且大于零';
+
+  @override
+  String statistics_conditions_visibility_legacySuffix(String band) {
+    return '$band（测量功能之前记录）';
+  }
 }

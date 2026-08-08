@@ -211,7 +211,12 @@ final visibilityDistributionProvider =
       final repository = ref.watch(statisticsRepositoryProvider);
       final currentDiverId = ref.watch(currentDiverIdProvider);
       final filter = ref.watch(statisticsFilterProvider);
+      // Watched, not read: changing the calibration must re-bin the chart.
+      final scale = ref.watch(
+        settingsProvider.select((s) => s.visibilityScale),
+      );
       return repository.getVisibilityDistribution(
+        scale: scale,
         diverId: currentDiverId,
         filter: filter,
       );

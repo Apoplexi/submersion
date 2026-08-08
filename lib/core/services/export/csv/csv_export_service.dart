@@ -127,7 +127,10 @@ class CsvExportService {
       'Runtime (min)',
       'Water Temp (°C)',
       'Air Temp (°C)',
-      'Visibility',
+      // Split at v144: the measured distance is machine-readable, the rating
+      // column carries a pre-v144 dive's bucket label.
+      'Visibility (m)',
+      'Visibility Rating',
       'Dive Type',
       'Buddy',
       'Dive Master',
@@ -166,6 +169,7 @@ class CsvExportService {
         dive.runtime?.inMinutes ?? '',
         dive.waterTemp?.toStringAsFixed(0) ?? '',
         dive.airTemp?.toStringAsFixed(0) ?? '',
+        dive.visibilityMeters?.toStringAsFixed(1) ?? '',
         dive.visibility?.displayName ?? '',
         dive.diveTypeNames.join('; '),
         dive.buddy ?? '',

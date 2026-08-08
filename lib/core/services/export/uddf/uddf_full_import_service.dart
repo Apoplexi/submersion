@@ -1989,7 +1989,12 @@ class UddfFullImportService {
         'visibility',
       );
       if (visibilityText != null) {
-        diveData['visibility'] = _parseUddfVisibility(visibilityText);
+        // UDDF carries visibility as a distance in meters. Keep the measured
+        // value rather than collapsing it into a bucket (see v144).
+        final meters = double.tryParse(visibilityText);
+        if (meters != null && meters > 0) {
+          diveData['visibilityMeters'] = meters;
+        }
       }
 
       // Parse rating
@@ -2075,20 +2080,6 @@ class UddfFullImportService {
     }
 
     return diveData;
-  }
-
-  enums.Visibility _parseUddfVisibility(String value) {
-    final meters = double.tryParse(value) ?? 0;
-    if (meters >= 30) {
-      return enums.Visibility.excellent;
-    } else if (meters >= 15) {
-      return enums.Visibility.good;
-    } else if (meters >= 5) {
-      return enums.Visibility.moderate;
-    } else if (meters > 0) {
-      return enums.Visibility.poor;
-    }
-    return enums.Visibility.unknown;
   }
 
   /// Interpolates sparse temperature data across profile points.

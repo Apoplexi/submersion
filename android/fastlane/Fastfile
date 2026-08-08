@@ -15,6 +15,21 @@ default_platform(:android)
 # Google Play rejects a release-notes body over 500 characters per locale.
 PLAY_CHANGELOG_LIMIT = 500
 
+# Where supply looks for release notes. fastlane runs lane bodies and helper
+# methods in this `fastlane` directory but wraps every action in Dir.chdir(".."),
+# and supply resolves its default metadata_path from there by globbing
+# "./fastlane/metadata/android". Writing to that same path from a helper landed
+# the notes one directory deeper than supply looked, so supply resolved
+# metadata_path to nil, skipped its whole metadata phase, and reported a
+# successful upload with no release notes attached - which is what Play beta
+# testers saw while TestFlight testers got the full changelog.
+#
+# Anchored to this file rather than to the working directory. Keep it at the top
+# level: fastlane evaluates the Fastfile with __FILE__ set to a bare "Fastfile",
+# so __dir__ only resolves while fastlane's own chdir into this folder is still
+# in effect.
+PLAY_METADATA_ROOT = File.expand_path(File.join(__dir__, "metadata", "android"))
+
 platform :android do
   desc "Upload AAB to internal testing track"
   lane :upload do
@@ -57,17 +72,22 @@ platform :android do
   lane :upload_beta do
     aab_path = find_aab
     track = beta_track
-    has_changelog = write_beta_changelog
+    changelog_root = write_beta_changelog
 
     UI.message("Uploading to the '#{track}' testing track...")
     upload_to_play_store(
       aab: aab_path,
       track: track,
       release_status: "completed",
+      # Passed explicitly, and taken from the helper that just wrote the file, so
+      # the directory supply reads is the directory the notes went into. supply's
+      # own default is resolved from a different working directory than lane code
+      # runs in, which silently cost every Play beta its release notes.
+      metadata_path: changelog_root || PLAY_METADATA_ROOT,
       skip_upload_metadata: true,
       # Beta testers need to know what a build changed; the other lanes stay
       # silent because their notes are managed in the Play Console.
-      skip_upload_changelogs: !has_changelog,
+      skip_upload_changelogs: changelog_root.nil?,
       skip_upload_images: true,
       skip_upload_screenshots: true,
     )
@@ -137,11 +157,12 @@ platform :android do
   end
 
   # Writes the beta release notes where supply expects them:
-  # fastlane/metadata/android/<locale>/changelogs/<versionCode>.txt. The file is
-  # generated per build rather than committed, so the notes always match the AAB
-  # being uploaded. Returns false when there is nothing to write, which leaves
-  # the existing Play notes untouched instead of blanking them.
-  def write_beta_changelog
+  # <metadata_root>/<locale>/changelogs/<versionCode>.txt. The file is generated
+  # per build rather than committed, so the notes always match the AAB being
+  # uploaded. Returns the absolute metadata root so the caller can hand supply
+  # the same path, or nil when there is nothing to write, which leaves the
+  # existing Play notes untouched instead of blanking them.
+  def write_beta_changelog(metadata_root = PLAY_METADATA_ROOT)
     notes = read_beta_notes.strip
     version_code = ENV["PLAY_VERSION_CODE"].to_s.strip
 
@@ -150,7 +171,7 @@ platform :android do
         "PLAY_BETA_CHANGELOG or PLAY_VERSION_CODE is unset; uploading without " \
         "release notes."
       )
-      return false
+      return nil
     end
 
     unless version_code.match?(/\A\d+\z/)
@@ -166,11 +187,11 @@ platform :android do
       )
     end
 
-    dir = File.join("fastlane", "metadata", "android", "en-US", "changelogs")
+    dir = File.join(metadata_root, "en-US", "changelogs")
     FileUtils.mkdir_p(dir)
     File.write(File.join(dir, "#{version_code}.txt"), notes[0, PLAY_CHANGELOG_LIMIT])
-    UI.message("Wrote Play release notes for version code #{version_code}.")
-    true
+    UI.message("Wrote Play release notes for version code #{version_code} to #{dir}.")
+    metadata_root
   end
 
   # Finds the AAB file. Checks for the renamed artifact first (CI),

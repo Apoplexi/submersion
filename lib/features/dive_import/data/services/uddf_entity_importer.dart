@@ -91,6 +91,11 @@ class UddfImportSelections {
   final Set<int> tags;
   final Set<int> diveTypes;
   final Set<int> sites;
+
+  /// Maps import-list index → existing site ID for sites the user chose to
+  /// overwrite. These indices are NOT included in [sites] (which creates new
+  /// entries); instead, the matching existing site is updated in place.
+  final Map<int, String> siteOverrides;
   final Set<int> equipmentSets;
   final Set<int> dives;
   final Set<int> courses;
@@ -104,6 +109,7 @@ class UddfImportSelections {
     this.tags = const {},
     this.diveTypes = const {},
     this.sites = const {},
+    this.siteOverrides = const {},
     this.equipmentSets = const {},
     this.dives = const {},
     this.courses = const {},
@@ -351,6 +357,7 @@ class UddfEntityImporter {
     final sitesCount = await _importSites(
       data.sites,
       selections.sites,
+      selections.siteOverrides,
       repositories.siteRepository,
       diverId,
       siteIdMapping,
@@ -821,6 +828,7 @@ class UddfEntityImporter {
   Future<int> _importSites(
     List<Map<String, dynamic>> items,
     Set<int> selected,
+    Map<int, String> overrides,
     SiteRepository repository,
     String diverId,
     Map<String, DiveSite> idMapping,
@@ -831,11 +839,14 @@ class UddfEntityImporter {
     // dives referencing them still get linked correctly.
     final existingSites = await repository.getAllSites(diverId: diverId);
     final existingByName = <String, DiveSite>{};
+    final existingById = <String, DiveSite>{};
     for (final site in existingSites) {
       existingByName[site.name.toLowerCase()] = site;
+      existingById[site.id] = site;
     }
     for (var i = 0; i < items.length; i++) {
       if (selected.contains(i)) continue; // will be imported below
+      if (overrides.containsKey(i)) continue; // will be overwritten below
       final uddfId = items[i]['uddfId'] as String?;
       final name = items[i]['name'] as String?;
       if (uddfId != null && name != null) {
@@ -846,9 +857,111 @@ class UddfEntityImporter {
       }
     }
 
-    if (selected.isEmpty) return 0;
-    onProgress?.call(ImportPhase.sites, 0, selected.length);
+    final totalWork = selected.length + overrides.length;
+    if (totalWork == 0) return 0;
+    onProgress?.call(ImportPhase.sites, 0, totalWork);
     var count = 0;
+
+    // Handle overwrite (replaceSource): update existing sites in place.
+    //
+    // Unlike the create path below, this builds the row from the EXISTING
+    // entity via copyWith so fields absent from the import payload keep their
+    // current values. Constructing a fresh DiveSite here would reset every
+    // unmapped field to its constructor default -- notably isShared, city,
+    // island, photoIds and conditions -- because updateSite writes the whole
+    // column set, not just the fields the import happened to supply.
+    for (final entry in overrides.entries) {
+      final i = entry.key;
+      final existingId = entry.value;
+      if (i < 0 || i >= items.length) {
+        _log.warning(
+          'Site override index $i is out of range (${items.length} items); '
+          'skipping',
+        );
+        continue;
+      }
+      final siteData = items[i];
+      final name = siteData['name'] as String?;
+      if (name == null || name.isEmpty) {
+        _log.warning('Site override at index $i has no name; skipping');
+        continue;
+      }
+
+      final existing = existingById[existingId];
+      if (existing == null) {
+        _log.warning(
+          'Site override at index $i targets unknown site $existingId; '
+          'skipping',
+        );
+        continue;
+      }
+
+      final uddfId = siteData['uddfId'] as String?;
+      final lat = siteData['latitude'] as double?;
+      final lon = siteData['longitude'] as double?;
+
+      String? country = siteData['country'] as String?;
+      String? region = siteData['region'] as String?;
+
+      // Auto-lookup country/region if coordinates exist but fields are empty.
+      if (lat != null && lon != null && (country == null || region == null)) {
+        try {
+          final geocodeResult = await LocationService.instance.reverseGeocode(
+            lat,
+            lon,
+          );
+          country ??= geocodeResult.country;
+          region ??= geocodeResult.region;
+        } catch (_) {
+          // Geocoding is best-effort
+        }
+      }
+
+      final difficultyStr = siteData['difficulty'] as String?;
+      final difficulty = difficultyStr != null
+          ? SiteDifficulty.fromString(difficultyStr)
+          : null;
+
+      // Every argument is nullable and copyWith treats null as "keep the
+      // existing value", so absent payload fields are preserved.
+      final overwrittenSite = existing.copyWith(
+        name: name,
+        description: siteData['description'] as String?,
+        location: (lat != null && lon != null) ? GeoPoint(lat, lon) : null,
+        minDepth: siteData['minDepth'] as double?,
+        maxDepth: siteData['maxDepth'] as double?,
+        difficulty: difficulty,
+        country: country,
+        region: region,
+        rating: siteData['rating'] as double?,
+        notes: siteData['notes'] as String?,
+        hazards: siteData['hazards'] as String?,
+        accessNotes: siteData['accessNotes'] as String?,
+        mooringNumber: siteData['mooringNumber'] as String?,
+        parkingInfo: siteData['parkingInfo'] as String?,
+        altitude: siteData['altitude'] as double?,
+      );
+
+      // Core fields and the importer-only metadata columns go out as one
+      // UPDATE so a failure can't leave the row half-overwritten.
+      final waterType = siteData['waterType'] as String?;
+      final bodyOfWater = siteData['bodyOfWater'] as String?;
+      await repository.updateSiteWithImportedMetadata(
+        overwrittenSite,
+        DiveSitesCompanion(
+          waterType: waterType != null
+              ? Value(waterType)
+              : const Value.absent(),
+          bodyOfWater: bodyOfWater != null
+              ? Value(bodyOfWater)
+              : const Value.absent(),
+        ),
+      );
+
+      if (uddfId != null) idMapping[uddfId] = overwrittenSite;
+      count++;
+      onProgress?.call(ImportPhase.sites, count, totalWork);
+    }
 
     for (var i = 0; i < items.length; i++) {
       if (!selected.contains(i)) continue;
@@ -925,7 +1038,7 @@ class UddfEntityImporter {
 
       if (uddfId != null) idMapping[uddfId] = createdSite;
       count++;
-      onProgress?.call(ImportPhase.sites, count, selected.length);
+      onProgress?.call(ImportPhase.sites, count, totalWork);
     }
 
     return count;
@@ -1269,6 +1382,7 @@ class UddfEntityImporter {
         rating: diveData['rating'] as int?,
         notes: notes,
         visibility: _parseEnum(diveData['visibility'], Visibility.values),
+        visibilityMeters: diveData['visibilityMeters'] as double?,
         diveTypeIds: diveTypeIds,
         profile: profile,
         tanks: tanks,

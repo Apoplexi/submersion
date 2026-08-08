@@ -39,6 +39,10 @@ class _TestAdapter implements ImportSourceAdapter {
   };
 
   @override
+  Set<DuplicateAction> duplicateActionsFor(ImportEntityType type) =>
+      supportedDuplicateActions;
+
+  @override
   dynamic noSuchMethod(Invocation invocation) =>
       throw UnimplementedError(invocation.memberName.toString());
 }
@@ -205,6 +209,12 @@ void main() {
       when(mockAdapter.acquisitionSteps).thenReturn([]);
       when(
         mockAdapter.supportedDuplicateActions,
+      ).thenReturn({DuplicateAction.skip, DuplicateAction.importAsNew});
+      // The notifier gates writes on the per-type set, so the mock has to
+      // answer duplicateActionsFor too -- unstubbed it returns an empty set
+      // and every setDuplicateAction/applyBulkAction call becomes a no-op.
+      when(
+        mockAdapter.duplicateActionsFor(any),
       ).thenReturn({DuplicateAction.skip, DuplicateAction.importAsNew});
       notifier = ImportWizardNotifier(
         mockAdapter,

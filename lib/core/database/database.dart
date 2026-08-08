@@ -597,7 +597,18 @@ class Dives extends Table {
   RealColumn get avgDepth => real().nullable()();
   RealColumn get waterTemp => real().nullable()();
   RealColumn get airTemp => real().nullable()();
+
+  /// Legacy visibility bucket (pre-v144). Retained read-only so dives logged
+  /// before measured visibility keep the band they were filed under; cleared
+  /// when [visibilityMeters] is written. New code must not write this.
   TextColumn get visibility => text().nullable()();
+
+  /// v144: measured horizontal visibility in meters, canonical from v144 on.
+  ///
+  /// Storing the measurement rather than a judgment is what lets the
+  /// good/poor adjective be calibrated per diver: six meters is six meters in
+  /// Cozumel and in Puget Sound, only the adjective differs.
+  RealColumn get visibilityMeters => real().nullable()();
   TextColumn get diveType =>
       text().withDefault(const Constant('recreational'))();
   TextColumn get buddy => text().nullable()();
@@ -1486,6 +1497,22 @@ class DiverSettings extends Table {
   TextColumn get sacUnit =>
       text().withDefault(const Constant('litersPerMin'))();
   TextColumn get defaultCurrency => text().withDefault(const Constant('USD'))();
+
+  /// v144: per-diver calibration deciding which measured distances count as
+  /// excellent/good/moderate/poor visibility.
+  ///
+  /// Presentational only -- dives always store the measured distance, so
+  /// changing this re-labels a logbook without altering any dive. Defaults to
+  /// 'tropical', which reproduces the thresholds hardcoded before v144 so
+  /// upgrading re-labels nobody's existing dives.
+  TextColumn get visibilityScalePreset =>
+      text().withDefault(const Constant('tropical'))();
+
+  /// Custom calibration thresholds in meters, used only when
+  /// [visibilityScalePreset] is 'custom'.
+  RealColumn get visibilityScaleExcellentM => real().nullable()();
+  RealColumn get visibilityScaleGoodM => real().nullable()();
+  RealColumn get visibilityScaleModerateM => real().nullable()();
   // Time/Date format settings
   TextColumn get timeFormat =>
       text().withDefault(const Constant('twelveHour'))();
@@ -2948,7 +2975,7 @@ class AppDatabase extends _$AppDatabase {
 
   /// The current schema version as a static constant so that pre-open checks
   /// (e.g. version-mismatch guard) can reference it without an instance.
-  static const int currentSchemaVersion = 144;
+  static const int currentSchemaVersion = 145;
 
   /// Every schema version that has a migration block in onUpgrade.
   /// Used to calculate progress step counts. When adding a new migration,
@@ -3128,6 +3155,15 @@ class AppDatabase extends _$AppDatabase {
     141,
     // v142: trips.return_flight_at (return-flight dive-window countdown).
     142,
+    // v143 is reserved by the media integration branch (PR #894).
+    // v144: dives.visibility_meters plus the diver_settings visibility scale
+    // calibration columns (measured visibility replaces the tropical-biased
+    // bucket enum).
+    144,
+    // v145: gps_tracks provenance, label, and non-destructive trim bounds.
+    // Renumbered from v144 as main took that step for the visibility scale
+    // work at merge time.
+    145,
   ];
 
   /// Idempotent DDL for the v106 connector-suggestion columns (Lightroom
@@ -4124,9 +4160,9 @@ class AppDatabase extends _$AppDatabase {
   /// _assertWeatherCodeColumn pattern so a schema-version collision cannot
   /// strand a database without it. Self-guarding when the table is absent
   /// (minimal migration-test fixtures).
-  /// v144: gps_tracks provenance, label, and non-destructive trim bounds.
+  /// v145: gps_tracks provenance, label, and non-destructive trim bounds.
   ///
-  /// Self-guarding like its siblings: a DB that upgraded past 144 on a
+  /// Self-guarding like its siblings: a DB that upgraded past 145 on a
   /// parallel branch never enters the migration block, so the beforeOpen
   /// backstop is its only path to these columns.
   Future<void> _assertGpsTrackColumns() async {
@@ -4165,6 +4201,59 @@ class AppDatabase extends _$AppDatabase {
     if (!names.contains('return_flight_at')) {
       await customStatement(
         'ALTER TABLE trips ADD COLUMN return_flight_at INTEGER',
+      );
+    }
+  }
+
+  /// Idempotent DDL for the v144 dives.visibility_meters column. Called from
+  /// the v144 onUpgrade step and the beforeOpen backstop, matching the
+  /// _assertTripReturnFlightColumn pattern so a schema-version collision
+  /// cannot strand a database without it. Self-guarding when the table is
+  /// absent (minimal migration-test fixtures).
+  ///
+  /// Deliberately does not backfill the legacy `visibility` bucket: a bucket
+  /// only says the dive fell somewhere in a range, so deriving a number would
+  /// fabricate precision the diver never entered.
+  Future<void> _assertVisibilityMetersColumn() async {
+    final cols = await customSelect("PRAGMA table_info('dives')").get();
+    if (cols.isEmpty) return;
+    final names = cols.map((c) => c.read<String>('name')).toSet();
+    if (!names.contains('visibility_meters')) {
+      await customStatement(
+        'ALTER TABLE dives ADD COLUMN visibility_meters REAL',
+      );
+    }
+  }
+
+  /// Idempotent DDL for the v144 diver_settings visibility calibration
+  /// columns. Same dual-call contract as [_assertVisibilityMetersColumn].
+  Future<void> _assertVisibilityScaleColumns() async {
+    final cols = await customSelect(
+      "PRAGMA table_info('diver_settings')",
+    ).get();
+    if (cols.isEmpty) return;
+    final names = cols.map((c) => c.read<String>('name')).toSet();
+    if (!names.contains('visibility_scale_preset')) {
+      await customStatement(
+        'ALTER TABLE diver_settings ADD COLUMN visibility_scale_preset '
+        "TEXT NOT NULL DEFAULT 'tropical'",
+      );
+    }
+    if (!names.contains('visibility_scale_excellent_m')) {
+      await customStatement(
+        'ALTER TABLE diver_settings ADD COLUMN visibility_scale_excellent_m '
+        'REAL',
+      );
+    }
+    if (!names.contains('visibility_scale_good_m')) {
+      await customStatement(
+        'ALTER TABLE diver_settings ADD COLUMN visibility_scale_good_m REAL',
+      );
+    }
+    if (!names.contains('visibility_scale_moderate_m')) {
+      await customStatement(
+        'ALTER TABLE diver_settings ADD COLUMN visibility_scale_moderate_m '
+        'REAL',
       );
     }
   }
@@ -7407,13 +7496,22 @@ class AppDatabase extends _$AppDatabase {
           await _assertTripReturnFlightColumn();
         }
         if (from < 142) await reportProgress();
-        // v144: gps_tracks source/source_ref/name + non-destructive trim
-        // bounds. v143 is reserved by the media integration branch; the
-        // beforeOpen backstop heals any DB stranded between.
+        // v144: dives.visibility_meters + the diver_settings visibility
+        // calibration columns. v143 is reserved by the media integration
+        // branch (PR #894); the beforeOpen backstop heals any DB stranded
+        // between.
         if (from < 144) {
-          await _assertGpsTrackColumns();
+          await _assertVisibilityMetersColumn();
+          await _assertVisibilityScaleColumns();
         }
         if (from < 144) await reportProgress();
+        // v145: gps_tracks source/source_ref/name + non-destructive trim
+        // bounds. Renumbered from v144 as main took that step for the
+        // visibility scale work at merge time.
+        if (from < 145) {
+          await _assertGpsTrackColumns();
+        }
+        if (from < 145) await reportProgress();
       },
       beforeOpen: (details) async {
         // Enable foreign keys
@@ -7533,7 +7631,12 @@ class AppDatabase extends _$AppDatabase {
         // v142 backstop: re-assert trips.return_flight_at.
         await _assertTripReturnFlightColumn();
 
-        // v144 backstop: re-assert the gps_tracks provenance and trim columns.
+        // v144 backstop: re-assert the measured-visibility column and the
+        // diver_settings calibration columns.
+        await _assertVisibilityMetersColumn();
+        await _assertVisibilityScaleColumns();
+
+        // v145 backstop: re-assert the gps_tracks provenance and trim columns.
         await _assertGpsTrackColumns();
 
         // Built-in dive types are reference data: identical on every device and

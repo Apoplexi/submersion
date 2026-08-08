@@ -5,6 +5,7 @@ import 'package:http/testing.dart';
 import 'package:riverpod/src/framework.dart' as riverpod show Override;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:submersion/core/constants/card_color.dart';
+import 'package:submersion/core/domain/visibility/visibility_scale.dart';
 import 'package:submersion/core/constants/list_view_mode.dart';
 import 'package:submersion/core/constants/map_style.dart';
 import 'package:submersion/features/data_quality/presentation/providers/data_quality_providers.dart';
@@ -28,7 +29,8 @@ typedef Override = riverpod.Override;
 /// Mock SettingsNotifier that doesn't access the database
 class MockSettingsNotifier extends StateNotifier<AppSettings>
     implements SettingsNotifier {
-  MockSettingsNotifier() : super(const AppSettings());
+  MockSettingsNotifier([AppSettings? initial])
+    : super(initial ?? const AppSettings());
 
   @override
   Future<void> setDepthUnit(DepthUnit unit) async =>
@@ -52,6 +54,18 @@ class MockSettingsNotifier extends StateNotifier<AppSettings>
   @override
   Future<void> setDefaultCurrency(String currencyCode) async =>
       state = state.copyWith(defaultCurrency: currencyCode);
+  @override
+  Future<void> setVisibilityScale({
+    required VisibilityScalePreset preset,
+    double? excellentM,
+    double? goodM,
+    double? moderateM,
+  }) async => state = state.copyWith(
+    visibilityScalePreset: preset,
+    visibilityScaleExcellentM: excellentM,
+    visibilityScaleGoodM: goodM,
+    visibilityScaleModerateM: moderateM,
+  );
   @override
   Future<void> setAltitudeUnit(AltitudeUnit unit) async =>
       state = state.copyWith(altitudeUnit: unit);
@@ -159,6 +173,27 @@ class MockSettingsNotifier extends StateNotifier<AppSettings>
     }
     state = state.copyWith(hiddenHomeChips: hidden);
   }
+
+  @override
+  Future<void> setHomeCardEnabled(String cardId, bool enabled) async {
+    final hidden = {...state.hiddenHomeCards};
+    if (enabled) {
+      hidden.remove(cardId);
+    } else {
+      hidden.add(cardId);
+    }
+    state = state.copyWith(hiddenHomeCards: hidden);
+  }
+
+  @override
+  Future<void> setHomeCardOrder(List<String> order) async =>
+      state = state.copyWith(homeCardOrder: order);
+
+  @override
+  Future<void> resetHomeCards() async => state = state.copyWith(
+    homeCardOrder: const <String>[],
+    hiddenHomeCards: const <String>{},
+  );
 
   @override
   Future<void> setSafetyRuleEnabled(SafetyRuleId rule, bool enabled) async {

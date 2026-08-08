@@ -5336,7 +5336,7 @@ abstract class AppLocalizations {
   /// No description provided for @settings_homeChips_pageTitle.
   ///
   /// In en, this message translates to:
-  /// **'Home status chips'**
+  /// **'Home screen'**
   String get settings_homeChips_pageTitle;
 
   /// No description provided for @settings_homeChips_description.
@@ -5344,6 +5344,138 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Choose which status chips appear at the top of the Home tab.'**
   String get settings_homeChips_description;
+
+  /// No description provided for @settings_homeChips_sectionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Status chips'**
+  String get settings_homeChips_sectionTitle;
+
+  /// No description provided for @settings_homeCards_sectionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Home cards'**
+  String get settings_homeCards_sectionTitle;
+
+  /// No description provided for @settings_homeCards_description.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose which cards appear on the Home tab and drag to reorder them.'**
+  String get settings_homeCards_description;
+
+  /// No description provided for @settings_homeCards_autoHides.
+  ///
+  /// In en, this message translates to:
+  /// **'Hides automatically when empty'**
+  String get settings_homeCards_autoHides;
+
+  /// No description provided for @settings_homeCards_resetToDefault.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset to default'**
+  String get settings_homeCards_resetToDefault;
+
+  /// No description provided for @settings_homeCards_resetDialog_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset Home layout?'**
+  String get settings_homeCards_resetDialog_title;
+
+  /// No description provided for @settings_homeCards_resetDialog_message.
+  ///
+  /// In en, this message translates to:
+  /// **'This restores the default card order and shows all cards again.'**
+  String get settings_homeCards_resetDialog_message;
+
+  /// No description provided for @settings_homeCards_resetDialog_cancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get settings_homeCards_resetDialog_cancel;
+
+  /// No description provided for @settings_homeCards_resetDialog_confirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset'**
+  String get settings_homeCards_resetDialog_confirm;
+
+  /// No description provided for @settings_homeCards_card_hero.
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome header'**
+  String get settings_homeCards_card_hero;
+
+  /// No description provided for @settings_homeCards_card_gaugeStrip.
+  ///
+  /// In en, this message translates to:
+  /// **'Status chips'**
+  String get settings_homeCards_card_gaugeStrip;
+
+  /// No description provided for @settings_homeCards_card_preDive.
+  ///
+  /// In en, this message translates to:
+  /// **'Pre-dive checklist'**
+  String get settings_homeCards_card_preDive;
+
+  /// No description provided for @settings_homeCards_card_recentDives.
+  ///
+  /// In en, this message translates to:
+  /// **'Recent dives'**
+  String get settings_homeCards_card_recentDives;
+
+  /// No description provided for @settings_homeCards_card_quickActions.
+  ///
+  /// In en, this message translates to:
+  /// **'Quick actions'**
+  String get settings_homeCards_card_quickActions;
+
+  /// No description provided for @settings_homeCards_card_milestones.
+  ///
+  /// In en, this message translates to:
+  /// **'Milestones'**
+  String get settings_homeCards_card_milestones;
+
+  /// No description provided for @settings_homeCards_card_photoRibbon.
+  ///
+  /// In en, this message translates to:
+  /// **'Recent photos'**
+  String get settings_homeCards_card_photoRibbon;
+
+  /// No description provided for @settings_homeCards_card_onThisDay.
+  ///
+  /// In en, this message translates to:
+  /// **'On this day'**
+  String get settings_homeCards_card_onThisDay;
+
+  /// No description provided for @settings_homeCards_card_yearInReview.
+  ///
+  /// In en, this message translates to:
+  /// **'Year in review'**
+  String get settings_homeCards_card_yearInReview;
+
+  /// No description provided for @settings_homeCards_card_activeCourses.
+  ///
+  /// In en, this message translates to:
+  /// **'Course progress'**
+  String get settings_homeCards_card_activeCourses;
+
+  /// No description provided for @settings_homeCards_card_recentSitesMap.
+  ///
+  /// In en, this message translates to:
+  /// **'Recent sites map'**
+  String get settings_homeCards_card_recentSitesMap;
+
+  /// No description provided for @dashboard_allHidden_message.
+  ///
+  /// In en, this message translates to:
+  /// **'All Home cards are hidden.'**
+  String get dashboard_allHidden_message;
+
+  /// No description provided for @dashboard_allHidden_customize.
+  ///
+  /// In en, this message translates to:
+  /// **'Customize Home'**
+  String get dashboard_allHidden_customize;
 
   /// No description provided for @settings_homeChips_flightWindow.
   ///
@@ -17031,150 +17163,6 @@ abstract class AppLocalizations {
   /// **'Trim Weights'**
   String get enum_weightType_trimWeights;
 
-  /// No description provided for @equipment_addSheet_brandHint.
-  ///
-  /// In en, this message translates to:
-  /// **'e.g., Scubapro'**
-  String get equipment_addSheet_brandHint;
-
-  /// No description provided for @equipment_addSheet_brandLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'Brand'**
-  String get equipment_addSheet_brandLabel;
-
-  /// No description provided for @equipment_addSheet_closeTooltip.
-  ///
-  /// In en, this message translates to:
-  /// **'Close'**
-  String get equipment_addSheet_closeTooltip;
-
-  /// No description provided for @equipment_addSheet_currencyLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'Currency'**
-  String get equipment_addSheet_currencyLabel;
-
-  /// No description provided for @equipment_addSheet_dateLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'Date'**
-  String get equipment_addSheet_dateLabel;
-
-  /// No description provided for @equipment_addSheet_errorSnackbar.
-  ///
-  /// In en, this message translates to:
-  /// **'Error adding equipment: {error}'**
-  String equipment_addSheet_errorSnackbar(Object error);
-
-  /// No description provided for @equipment_addSheet_modelHint.
-  ///
-  /// In en, this message translates to:
-  /// **'e.g., MK25 EVO'**
-  String get equipment_addSheet_modelHint;
-
-  /// No description provided for @equipment_addSheet_modelLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'Model'**
-  String get equipment_addSheet_modelLabel;
-
-  /// No description provided for @equipment_addSheet_nameHint.
-  ///
-  /// In en, this message translates to:
-  /// **'e.g., My Primary Regulator'**
-  String get equipment_addSheet_nameHint;
-
-  /// No description provided for @equipment_addSheet_nameLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'Name'**
-  String get equipment_addSheet_nameLabel;
-
-  /// No description provided for @equipment_addSheet_nameValidation.
-  ///
-  /// In en, this message translates to:
-  /// **'Please enter a name'**
-  String get equipment_addSheet_nameValidation;
-
-  /// No description provided for @equipment_addSheet_notesHint.
-  ///
-  /// In en, this message translates to:
-  /// **'Additional notes...'**
-  String get equipment_addSheet_notesHint;
-
-  /// No description provided for @equipment_addSheet_notesLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'Notes'**
-  String get equipment_addSheet_notesLabel;
-
-  /// No description provided for @equipment_addSheet_priceLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'Price'**
-  String get equipment_addSheet_priceLabel;
-
-  /// No description provided for @equipment_addSheet_purchaseInfoTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Purchase Information'**
-  String get equipment_addSheet_purchaseInfoTitle;
-
-  /// No description provided for @equipment_addSheet_serialNumberLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'Serial Number'**
-  String get equipment_addSheet_serialNumberLabel;
-
-  /// No description provided for @equipment_addSheet_serviceIntervalHint.
-  ///
-  /// In en, this message translates to:
-  /// **'e.g., 365 for yearly'**
-  String get equipment_addSheet_serviceIntervalHint;
-
-  /// No description provided for @equipment_addSheet_serviceIntervalLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'Service Interval (days)'**
-  String get equipment_addSheet_serviceIntervalLabel;
-
-  /// No description provided for @equipment_addSheet_sizeHint.
-  ///
-  /// In en, this message translates to:
-  /// **'e.g., M, L, 42'**
-  String get equipment_addSheet_sizeHint;
-
-  /// No description provided for @equipment_addSheet_sizeLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'Size'**
-  String get equipment_addSheet_sizeLabel;
-
-  /// No description provided for @equipment_addSheet_submitButton.
-  ///
-  /// In en, this message translates to:
-  /// **'Add Equipment'**
-  String get equipment_addSheet_submitButton;
-
-  /// No description provided for @equipment_addSheet_successSnackbar.
-  ///
-  /// In en, this message translates to:
-  /// **'Equipment added successfully'**
-  String get equipment_addSheet_successSnackbar;
-
-  /// No description provided for @equipment_addSheet_title.
-  ///
-  /// In en, this message translates to:
-  /// **'Add Equipment'**
-  String get equipment_addSheet_title;
-
-  /// No description provided for @equipment_addSheet_typeLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'Type'**
-  String get equipment_addSheet_typeLabel;
-
   /// No description provided for @equipment_appBar_title.
   ///
   /// In en, this message translates to:
@@ -27787,6 +27775,17 @@ abstract class AppLocalizations {
   /// **'Trimix {o2}/{he}'**
   String surfaceInterval_gasMix_trimix(Object o2, Object he);
 
+  /// Warning shown when the planned depth exceeds the MOD of the selected mix
+  ///
+  /// In en, this message translates to:
+  /// **'ppO₂ {ppO2} at {depth} exceeds {limit}. MOD for this mix is {mod}.'**
+  String surfaceInterval_gasWarning_modExceeded(
+    Object ppO2,
+    Object depth,
+    Object limit,
+    Object mod,
+  );
+
   /// Accessibility label for helium slider
   ///
   /// In en, this message translates to:
@@ -27804,6 +27803,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Current Interval'**
   String get surfaceInterval_result_currentInterval;
+
+  /// Result card status when either dive exceeds its gas MOD
+  ///
+  /// In en, this message translates to:
+  /// **'Gas unsafe at this depth'**
+  String get surfaceInterval_result_gasUnsafe;
 
   /// Shown when the second dive would require decompression stops
   ///
@@ -27864,11 +27869,17 @@ abstract class AppLocalizations {
   /// **'Second dive depth: {depth} {unit}'**
   String surfaceInterval_secondDive_depthSemantics(Object depth, Object unit);
 
-  /// Label indicating the second dive uses air
+  /// Accessibility label for the second dive helium slider
   ///
   /// In en, this message translates to:
-  /// **'(Air)'**
-  String get surfaceInterval_secondDive_gasAir;
+  /// **'Second dive helium: {percent}%'**
+  String surfaceInterval_secondDive_heSemantics(Object percent);
+
+  /// Accessibility label for the second dive O2 slider
+  ///
+  /// In en, this message translates to:
+  /// **'Second dive O2: {percent}%'**
+  String surfaceInterval_secondDive_o2Semantics(Object percent);
 
   /// Accessibility label for second dive time slider
   ///
@@ -29395,7 +29406,7 @@ abstract class AppLocalizations {
   /// No description provided for @trips_diveScan_noDiver.
   ///
   /// In en, this message translates to:
-  /// **'Assign a diver to this trip to scan for dives'**
+  /// **'Select an active diver to scan for dives'**
   String get trips_diveScan_noDiver;
 
   /// No description provided for @trips_diveScan_selectAll.
@@ -30879,6 +30890,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Use the matched record'**
   String get universalImport_entityAction_linkExistingSubtitle;
+
+  /// Collapsed-header badge on a duplicate row whose action is replace-the-existing-record
+  ///
+  /// In en, this message translates to:
+  /// **'REPLACE'**
+  String get universalImport_entityAction_replaceBadge;
+
+  /// Action button on a duplicate site row: overwrite the matched existing record with the imported data
+  ///
+  /// In en, this message translates to:
+  /// **'Replace existing'**
+  String get universalImport_entityAction_replaceExisting;
+
+  /// Subtitle under the replace-existing action button
+  ///
+  /// In en, this message translates to:
+  /// **'Overwrite with imported data'**
+  String get universalImport_entityAction_replaceExistingSubtitle;
+
+  /// Action button on a duplicate entity row: do not import this item
+  ///
+  /// In en, this message translates to:
+  /// **'Skip'**
+  String get universalImport_entityAction_skip;
+
+  /// Subtitle under the skip action button
+  ///
+  /// In en, this message translates to:
+  /// **'Discard this import'**
+  String get universalImport_entityAction_skipSubtitle;
+
+  /// Action button on a duplicate entity row: create a separate new record instead of reusing the match
+  ///
+  /// In en, this message translates to:
+  /// **'Import as New'**
+  String get universalImport_entityAction_importAsNew;
+
+  /// Subtitle under the import-as-new action button
+  ///
+  /// In en, this message translates to:
+  /// **'Create separate entry'**
+  String get universalImport_entityAction_importAsNewSubtitle;
 
   /// Prompt shown above the action buttons on an expanded pending duplicate row, telling the user to pick an action
   ///
@@ -38805,6 +38858,114 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Marine protected area boundaries. CC BY 4.0.'**
   String get reef_attribution_protectedSeas;
+
+  /// No description provided for @enum_visibilityBand_excellent.
+  ///
+  /// In en, this message translates to:
+  /// **'Excellent'**
+  String get enum_visibilityBand_excellent;
+
+  /// No description provided for @enum_visibilityBand_good.
+  ///
+  /// In en, this message translates to:
+  /// **'Good'**
+  String get enum_visibilityBand_good;
+
+  /// No description provided for @enum_visibilityBand_moderate.
+  ///
+  /// In en, this message translates to:
+  /// **'Moderate'**
+  String get enum_visibilityBand_moderate;
+
+  /// No description provided for @enum_visibilityBand_poor.
+  ///
+  /// In en, this message translates to:
+  /// **'Poor'**
+  String get enum_visibilityBand_poor;
+
+  /// No description provided for @visibility_range_between.
+  ///
+  /// In en, this message translates to:
+  /// **'{min}-{max} {unit}'**
+  String visibility_range_between(String min, String max, String unit);
+
+  /// No description provided for @visibility_range_over.
+  ///
+  /// In en, this message translates to:
+  /// **'over {min} {unit}'**
+  String visibility_range_over(String min, String unit);
+
+  /// No description provided for @visibility_range_under.
+  ///
+  /// In en, this message translates to:
+  /// **'under {max} {unit}'**
+  String visibility_range_under(String max, String unit);
+
+  /// No description provided for @settings_visibilityScale_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Visibility scale'**
+  String get settings_visibilityScale_title;
+
+  /// No description provided for @settings_visibilityScale_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Which distances count as good visibility where you dive'**
+  String get settings_visibilityScale_subtitle;
+
+  /// No description provided for @settings_visibilityScale_preset_tropical.
+  ///
+  /// In en, this message translates to:
+  /// **'Tropical'**
+  String get settings_visibilityScale_preset_tropical;
+
+  /// No description provided for @settings_visibilityScale_preset_temperate.
+  ///
+  /// In en, this message translates to:
+  /// **'Temperate'**
+  String get settings_visibilityScale_preset_temperate;
+
+  /// No description provided for @settings_visibilityScale_preset_coldWater.
+  ///
+  /// In en, this message translates to:
+  /// **'Cold water / Inland'**
+  String get settings_visibilityScale_preset_coldWater;
+
+  /// No description provided for @settings_visibilityScale_preset_custom.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom'**
+  String get settings_visibilityScale_preset_custom;
+
+  /// No description provided for @settings_visibilityScale_customExcellent.
+  ///
+  /// In en, this message translates to:
+  /// **'Excellent at or above'**
+  String get settings_visibilityScale_customExcellent;
+
+  /// No description provided for @settings_visibilityScale_customGood.
+  ///
+  /// In en, this message translates to:
+  /// **'Good at or above'**
+  String get settings_visibilityScale_customGood;
+
+  /// No description provided for @settings_visibilityScale_customModerate.
+  ///
+  /// In en, this message translates to:
+  /// **'Moderate at or above'**
+  String get settings_visibilityScale_customModerate;
+
+  /// No description provided for @settings_visibilityScale_invalidOrder.
+  ///
+  /// In en, this message translates to:
+  /// **'Each value must be smaller than the one above it, and greater than zero'**
+  String get settings_visibilityScale_invalidOrder;
+
+  /// No description provided for @statistics_conditions_visibility_legacySuffix.
+  ///
+  /// In en, this message translates to:
+  /// **'{band} (logged before measurement)'**
+  String statistics_conditions_visibility_legacySuffix(String band);
 }
 
 class _AppLocalizationsDelegate

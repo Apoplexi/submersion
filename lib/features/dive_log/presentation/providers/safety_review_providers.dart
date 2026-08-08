@@ -58,3 +58,11 @@ final safetyReviewProvider = FutureProvider.family<SafetyReview?, String>((
   await repo.saveReview(review);
   return review;
 });
+
+/// The safety finding currently selected for profile-chart highlighting, or
+/// null when none. Session state keyed by dive ID: the safety review section
+/// writes it on tile tap; the detail and fullscreen profile charts read it.
+/// Stores the whole finding (timestamps, severity) so chart consumers never
+/// depend on the async [safetyReviewProvider]. Not persisted.
+final selectedSafetyFindingProvider =
+    StateProvider.family<SafetyFinding?, String>((ref, diveId) => null);

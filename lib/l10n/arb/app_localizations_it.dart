@@ -3141,11 +3141,82 @@ class AppLocalizationsIt extends AppLocalizations {
   String get dashboard_gauges_noDivesYet => 'Nessuna immersione';
 
   @override
-  String get settings_homeChips_pageTitle => 'Chip di stato della Home';
+  String get settings_homeChips_pageTitle => 'Schermata Home';
 
   @override
   String get settings_homeChips_description =>
       'Scegli quali chip di stato compaiono in cima alla scheda Home.';
+
+  @override
+  String get settings_homeChips_sectionTitle => 'Chip di stato';
+
+  @override
+  String get settings_homeCards_sectionTitle => 'Schede della Home';
+
+  @override
+  String get settings_homeCards_description =>
+      'Scegli quali schede compaiono nella Home e trascinale per riordinarle.';
+
+  @override
+  String get settings_homeCards_autoHides =>
+      'Si nasconde automaticamente quando è vuota';
+
+  @override
+  String get settings_homeCards_resetToDefault => 'Ripristina predefiniti';
+
+  @override
+  String get settings_homeCards_resetDialog_title =>
+      'Ripristinare il layout della Home?';
+
+  @override
+  String get settings_homeCards_resetDialog_message =>
+      'Ripristina l\'ordine predefinito delle schede e le mostra tutte di nuovo.';
+
+  @override
+  String get settings_homeCards_resetDialog_cancel => 'Annulla';
+
+  @override
+  String get settings_homeCards_resetDialog_confirm => 'Ripristina';
+
+  @override
+  String get settings_homeCards_card_hero => 'Intestazione di benvenuto';
+
+  @override
+  String get settings_homeCards_card_gaugeStrip => 'Chip di stato';
+
+  @override
+  String get settings_homeCards_card_preDive => 'Checklist pre-immersione';
+
+  @override
+  String get settings_homeCards_card_recentDives => 'Immersioni recenti';
+
+  @override
+  String get settings_homeCards_card_quickActions => 'Azioni rapide';
+
+  @override
+  String get settings_homeCards_card_milestones => 'Traguardi';
+
+  @override
+  String get settings_homeCards_card_photoRibbon => 'Foto recenti';
+
+  @override
+  String get settings_homeCards_card_onThisDay => 'In questo giorno';
+
+  @override
+  String get settings_homeCards_card_yearInReview => 'Anno in rassegna';
+
+  @override
+  String get settings_homeCards_card_activeCourses => 'Avanzamento corsi';
+
+  @override
+  String get settings_homeCards_card_recentSitesMap => 'Mappa dei siti recenti';
+
+  @override
+  String get dashboard_allHidden_message =>
+      'Tutte le schede della Home sono nascoste.';
+
+  @override
+  String get dashboard_allHidden_customize => 'Personalizza Home';
 
   @override
   String get settings_homeChips_flightWindow =>
@@ -9949,82 +10020,6 @@ class AppLocalizationsIt extends AppLocalizations {
   String get enum_weightType_trimWeights => 'Pesi di trim';
 
   @override
-  String get equipment_addSheet_brandHint => 'es. Scubapro';
-
-  @override
-  String get equipment_addSheet_brandLabel => 'Marca';
-
-  @override
-  String get equipment_addSheet_closeTooltip => 'Chiudi';
-
-  @override
-  String get equipment_addSheet_currencyLabel => 'Valuta';
-
-  @override
-  String get equipment_addSheet_dateLabel => 'Data';
-
-  @override
-  String equipment_addSheet_errorSnackbar(Object error) {
-    return 'Errore nell\'aggiunta dell\'attrezzatura: $error';
-  }
-
-  @override
-  String get equipment_addSheet_modelHint => 'es. MK25 EVO';
-
-  @override
-  String get equipment_addSheet_modelLabel => 'Modello';
-
-  @override
-  String get equipment_addSheet_nameHint => 'es. Il mio erogatore principale';
-
-  @override
-  String get equipment_addSheet_nameLabel => 'Nome';
-
-  @override
-  String get equipment_addSheet_nameValidation => 'Inserisci un nome';
-
-  @override
-  String get equipment_addSheet_notesHint => 'Note aggiuntive...';
-
-  @override
-  String get equipment_addSheet_notesLabel => 'Note';
-
-  @override
-  String get equipment_addSheet_priceLabel => 'Prezzo';
-
-  @override
-  String get equipment_addSheet_purchaseInfoTitle => 'Informazioni acquisto';
-
-  @override
-  String get equipment_addSheet_serialNumberLabel => 'Numero di serie';
-
-  @override
-  String get equipment_addSheet_serviceIntervalHint => 'es. 365 per annuale';
-
-  @override
-  String get equipment_addSheet_serviceIntervalLabel =>
-      'Intervallo manutenzione (giorni)';
-
-  @override
-  String get equipment_addSheet_sizeHint => 'es. M, L, 42';
-
-  @override
-  String get equipment_addSheet_sizeLabel => 'Taglia';
-
-  @override
-  String get equipment_addSheet_submitButton => 'Aggiungi attrezzatura';
-
-  @override
-  String get equipment_addSheet_successSnackbar =>
-      'Attrezzatura aggiunta con successo';
-
-  @override
-  String get equipment_addSheet_title => 'Aggiungi attrezzatura';
-
-  @override
-  String get equipment_addSheet_typeLabel => 'Tipo';
-
-  @override
   String get equipment_appBar_title => 'Attrezzatura';
 
   @override
@@ -16543,6 +16538,16 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
+  String surfaceInterval_gasWarning_modExceeded(
+    Object ppO2,
+    Object depth,
+    Object limit,
+    Object mod,
+  ) {
+    return 'ppO₂ $ppO2 a $depth supera $limit. La MOD di questa miscela è $mod.';
+  }
+
+  @override
   String surfaceInterval_heSemantics(Object percent) {
     return 'Elio: $percent%';
   }
@@ -16554,6 +16559,10 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get surfaceInterval_result_currentInterval => 'Intervallo Corrente';
+
+  @override
+  String get surfaceInterval_result_gasUnsafe =>
+      'Miscela non sicura a questa profondità';
 
   @override
   String get surfaceInterval_result_inDeco => 'In deco';
@@ -16597,7 +16606,14 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
-  String get surfaceInterval_secondDive_gasAir => '(Aria)';
+  String surfaceInterval_secondDive_heSemantics(Object percent) {
+    return 'Elio seconda immersione: $percent%';
+  }
+
+  @override
+  String surfaceInterval_secondDive_o2Semantics(Object percent) {
+    return 'O2 seconda immersione: $percent%';
+  }
 
   @override
   String surfaceInterval_secondDive_timeSemantics(Object time) {
@@ -17546,7 +17562,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get trips_diveScan_noDiver =>
-      'Assegna un subacqueo a questo viaggio per cercare le immersioni';
+      'Seleziona un subacqueo attivo per cercare le immersioni';
 
   @override
   String get trips_diveScan_selectAll => 'Seleziona tutto';
@@ -18428,6 +18444,31 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String get universalImport_entityAction_linkExistingSubtitle =>
       'Usa il record corrispondente';
+
+  @override
+  String get universalImport_entityAction_replaceBadge => 'SOSTITUISCI';
+
+  @override
+  String get universalImport_entityAction_replaceExisting =>
+      'Sostituisci esistente';
+
+  @override
+  String get universalImport_entityAction_replaceExistingSubtitle =>
+      'Sovrascrivi con i dati importati';
+
+  @override
+  String get universalImport_entityAction_skip => 'Salta';
+
+  @override
+  String get universalImport_entityAction_skipSubtitle =>
+      'Scarta questa importazione';
+
+  @override
+  String get universalImport_entityAction_importAsNew => 'Importa come nuovo';
+
+  @override
+  String get universalImport_entityAction_importAsNewSubtitle =>
+      'Crea una voce separata';
 
   @override
   String get universalImport_pending_chooseAction => 'Scegli un\'azione';
@@ -23257,4 +23298,69 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String get reef_attribution_protectedSeas =>
       'Confini delle aree marine protette. CC BY 4.0.';
+
+  @override
+  String get enum_visibilityBand_excellent => 'Eccellente';
+
+  @override
+  String get enum_visibilityBand_good => 'Buona';
+
+  @override
+  String get enum_visibilityBand_moderate => 'Moderata';
+
+  @override
+  String get enum_visibilityBand_poor => 'Scarsa';
+
+  @override
+  String visibility_range_between(String min, String max, String unit) {
+    return '$min-$max $unit';
+  }
+
+  @override
+  String visibility_range_over(String min, String unit) {
+    return 'oltre $min $unit';
+  }
+
+  @override
+  String visibility_range_under(String max, String unit) {
+    return 'meno di $max $unit';
+  }
+
+  @override
+  String get settings_visibilityScale_title => 'Scala di visibilità';
+
+  @override
+  String get settings_visibilityScale_subtitle =>
+      'Quali distanze contano come buona visibilità dove ti immergi';
+
+  @override
+  String get settings_visibilityScale_preset_tropical => 'Tropicale';
+
+  @override
+  String get settings_visibilityScale_preset_temperate => 'Temperata';
+
+  @override
+  String get settings_visibilityScale_preset_coldWater =>
+      'Acque fredde / Interne';
+
+  @override
+  String get settings_visibilityScale_preset_custom => 'Personalizzata';
+
+  @override
+  String get settings_visibilityScale_customExcellent => 'Eccellente da';
+
+  @override
+  String get settings_visibilityScale_customGood => 'Buona da';
+
+  @override
+  String get settings_visibilityScale_customModerate => 'Moderata da';
+
+  @override
+  String get settings_visibilityScale_invalidOrder =>
+      'Ogni valore deve essere inferiore a quello sopra e maggiore di zero';
+
+  @override
+  String statistics_conditions_visibility_legacySuffix(String band) {
+    return '$band (registrato prima della misurazione)';
+  }
 }

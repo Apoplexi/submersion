@@ -4,6 +4,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive_data_source.dart';
+import 'package:submersion/features/dive_log/domain/entities/safety_finding.dart';
+import 'package:submersion/features/dive_log/presentation/providers/safety_review_providers.dart';
 import 'package:submersion/features/dive_log/domain/entities/source_profile.dart';
 import 'package:submersion/features/dive_log/presentation/pages/fullscreen_profile_page.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_providers.dart';
@@ -351,6 +353,39 @@ void main() {
             .profile,
         hasLength(40),
       );
+    },
+  );
+
+  testWidgets(
+    'selected safety finding carries into fullscreen as a highlight',
+    (tester) async {
+      await tester.pumpWidget(_wrap(_defaultOverrides()));
+      await tester.pumpAndSettle();
+
+      final container = ProviderScope.containerOf(
+        tester.element(find.byType(FullscreenProfilePage)),
+      );
+      container
+          .read(selectedSafetyFindingProvider('d1').notifier)
+          .state = SafetyFinding(
+        id: 'f1',
+        diveId: 'd1',
+        ruleId: SafetyRuleId.missedDecoStop,
+        severity: SafetySeverity.caution,
+        startTimestamp: 120,
+        endTimestamp: 240,
+        value: 2.0,
+        engineVersion: 1,
+        createdAt: DateTime.utc(2026, 8, 7),
+      );
+      await tester.pump();
+
+      final chart = tester.widget<DiveProfileChart>(
+        find.byType(DiveProfileChart),
+      );
+      expect(chart.highlightRange, isNotNull);
+      expect(chart.highlightRange!.startTimestamp, 120);
+      expect(chart.highlightRange!.endTimestamp, 240);
     },
   );
 }

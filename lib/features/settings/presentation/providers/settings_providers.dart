@@ -4,6 +4,7 @@ import 'package:submersion/core/constants/card_color.dart';
 import 'package:submersion/core/constants/dive_detail_sections.dart';
 import 'package:submersion/core/constants/list_view_mode.dart';
 import 'package:submersion/core/constants/map_style.dart';
+import 'package:submersion/core/domain/visibility/visibility_scale.dart';
 import 'package:submersion/features/dive_sites/domain/matching/site_match_sensitivity.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/core/theme/app_theme_preset.dart';
@@ -83,6 +84,12 @@ class SettingsKeys {
   static const String fullscreenTileOrder = 'fullscreen_tile_order';
   static const String fullscreenHiddenTiles = 'fullscreen_hidden_tiles';
   static const String hiddenHomeChips = 'hidden_home_chips';
+
+  // Home card layout is device-local like the chip toggles above (stored
+  // directly in SharedPreferences rather than per-diver in the DB).
+  static const String homeCardOrder = 'home_card_order';
+  static const String hiddenHomeCards = 'hidden_home_cards';
+
   static const String fullscreenReadoutCardX = 'fullscreen_readout_card_x';
   static const String fullscreenReadoutCardY = 'fullscreen_readout_card_y';
 
@@ -112,6 +119,31 @@ class AppSettings {
   /// ISO 4217 code used as the default currency for new priced items
   /// (e.g. equipment purchase price).
   final String defaultCurrency;
+
+  /// Per-diver calibration deciding which measured visibility distances read
+  /// as excellent/good/moderate/poor.
+  ///
+  /// Presentational only: dives store the measured distance, so changing this
+  /// re-labels the logbook without altering a single dive.
+  final VisibilityScalePreset visibilityScalePreset;
+
+  /// Custom calibration thresholds in meters, used only when
+  /// [visibilityScalePreset] is [VisibilityScalePreset.custom].
+  final double? visibilityScaleExcellentM;
+  final double? visibilityScaleGoodM;
+  final double? visibilityScaleModerateM;
+
+  /// The resolved scale for the current preference.
+  ///
+  /// Custom values that are absent or invalid degrade to tropical rather than
+  /// producing an unreachable band, so a corrupt preference falls back to the
+  /// pre-v144 behaviour instead of rendering nonsense.
+  VisibilityScale get visibilityScale => VisibilityScale.forPreset(
+    visibilityScalePreset,
+    excellentM: visibilityScaleExcellentM,
+    goodM: visibilityScaleGoodM,
+    moderateM: visibilityScaleModerateM,
+  );
   final TimeFormat timeFormat;
   final DateFormatPreference dateFormat;
   final ThemeMode themeMode;
@@ -382,6 +414,14 @@ class AppSettings {
   /// Device-local, not per-diver.
   final Set<String> hiddenHomeChips;
 
+  /// Display order of home screen cards ([HomeCardType.name] values).
+  /// Empty means the default order. Device-local, not per-diver.
+  final List<String> homeCardOrder;
+
+  /// Home screen cards the user has toggled off ([HomeCardType.name]
+  /// values). Device-local, not per-diver.
+  final Set<String> hiddenHomeCards;
+
   /// Fullscreen readout card position as fractions (0..1) of the movable
   /// range; null means the default corner. See DraggableReadoutCard.
   final double? fullscreenReadoutCardX;
@@ -411,6 +451,10 @@ class AppSettings {
     this.altitudeUnit = AltitudeUnit.meters,
     this.sacUnit = SacUnit.pressurePerMin,
     this.defaultCurrency = 'USD',
+    this.visibilityScalePreset = VisibilityScalePreset.tropical,
+    this.visibilityScaleExcellentM,
+    this.visibilityScaleGoodM,
+    this.visibilityScaleModerateM,
     this.timeFormat = TimeFormat.twelveHour,
     this.dateFormat = DateFormatPreference.mmmDYYYY,
     this.themeMode = ThemeMode.system,
@@ -513,6 +557,8 @@ class AppSettings {
     this.fullscreenTileOrder = const [],
     this.fullscreenHiddenTiles = const [],
     this.hiddenHomeChips = const <String>{},
+    this.homeCardOrder = const <String>[],
+    this.hiddenHomeCards = const <String>{},
     this.fullscreenReadoutCardX,
     this.fullscreenReadoutCardY,
     this.profileMetricsFollowViewport = false,
@@ -563,6 +609,10 @@ class AppSettings {
     AltitudeUnit? altitudeUnit,
     SacUnit? sacUnit,
     String? defaultCurrency,
+    VisibilityScalePreset? visibilityScalePreset,
+    double? visibilityScaleExcellentM,
+    double? visibilityScaleGoodM,
+    double? visibilityScaleModerateM,
     TimeFormat? timeFormat,
     DateFormatPreference? dateFormat,
     ThemeMode? themeMode,
@@ -665,6 +715,8 @@ class AppSettings {
     List<String>? fullscreenTileOrder,
     List<String>? fullscreenHiddenTiles,
     Set<String>? hiddenHomeChips,
+    List<String>? homeCardOrder,
+    Set<String>? hiddenHomeCards,
     double? fullscreenReadoutCardX,
     double? fullscreenReadoutCardY,
     bool? profileMetricsFollowViewport,
@@ -681,6 +733,13 @@ class AppSettings {
       altitudeUnit: altitudeUnit ?? this.altitudeUnit,
       sacUnit: sacUnit ?? this.sacUnit,
       defaultCurrency: defaultCurrency ?? this.defaultCurrency,
+      visibilityScalePreset:
+          visibilityScalePreset ?? this.visibilityScalePreset,
+      visibilityScaleExcellentM:
+          visibilityScaleExcellentM ?? this.visibilityScaleExcellentM,
+      visibilityScaleGoodM: visibilityScaleGoodM ?? this.visibilityScaleGoodM,
+      visibilityScaleModerateM:
+          visibilityScaleModerateM ?? this.visibilityScaleModerateM,
       timeFormat: timeFormat ?? this.timeFormat,
       dateFormat: dateFormat ?? this.dateFormat,
       themeMode: themeMode ?? this.themeMode,
@@ -812,6 +871,8 @@ class AppSettings {
       fullscreenHiddenTiles:
           fullscreenHiddenTiles ?? this.fullscreenHiddenTiles,
       hiddenHomeChips: hiddenHomeChips ?? this.hiddenHomeChips,
+      homeCardOrder: homeCardOrder ?? this.homeCardOrder,
+      hiddenHomeCards: hiddenHomeCards ?? this.hiddenHomeCards,
       fullscreenReadoutCardX:
           fullscreenReadoutCardX ?? this.fullscreenReadoutCardX,
       fullscreenReadoutCardY:
@@ -919,6 +980,20 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
       final hiddenHomeChips =
           prefs.getStringList(SettingsKeys.hiddenHomeChips)?.toSet() ??
           const <String>{};
+      List<String> homeCardOrder;
+      Set<String> hiddenHomeCards;
+      try {
+        homeCardOrder =
+            prefs.getStringList(SettingsKeys.homeCardOrder) ?? const [];
+        hiddenHomeCards =
+            prefs.getStringList(SettingsKeys.hiddenHomeCards)?.toSet() ??
+            const <String>{};
+      } catch (_) {
+        // Corrupt pref types must never block the dashboard; fall back to
+        // the default layout.
+        homeCardOrder = const [];
+        hiddenHomeCards = const <String>{};
+      }
       final fullscreenReadoutCardX = prefs.getDouble(
         SettingsKeys.fullscreenReadoutCardX,
       );
@@ -945,6 +1020,8 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
           fullscreenTileOrder: fullscreenTileOrder,
           fullscreenHiddenTiles: fullscreenHiddenTiles,
           hiddenHomeChips: hiddenHomeChips,
+          homeCardOrder: homeCardOrder,
+          hiddenHomeCards: hiddenHomeCards,
           fullscreenReadoutCardX: fullscreenReadoutCardX,
           fullscreenReadoutCardY: fullscreenReadoutCardY,
           pscrRatio: pscrRatio ?? 100.0,
@@ -963,6 +1040,8 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
         fullscreenTileOrder: fullscreenTileOrder,
         fullscreenHiddenTiles: fullscreenHiddenTiles,
         hiddenHomeChips: hiddenHomeChips,
+        homeCardOrder: homeCardOrder,
+        hiddenHomeCards: hiddenHomeCards,
         fullscreenReadoutCardX: fullscreenReadoutCardX,
         fullscreenReadoutCardY: fullscreenReadoutCardY,
         pscrRatio: pscrRatio,
@@ -1018,6 +1097,11 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
     await prefs.setStringList(
       SettingsKeys.hiddenHomeChips,
       state.hiddenHomeChips.toList()..sort(),
+    );
+    await prefs.setStringList(SettingsKeys.homeCardOrder, state.homeCardOrder);
+    await prefs.setStringList(
+      SettingsKeys.hiddenHomeCards,
+      state.hiddenHomeCards.toList()..sort(),
     );
     final readoutCardX = state.fullscreenReadoutCardX;
     if (readoutCardX != null) {
@@ -1094,6 +1178,26 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
 
   Future<void> setDefaultCurrency(String currencyCode) async {
     state = state.copyWith(defaultCurrency: currencyCode.trim().toUpperCase());
+    await _saveSettings();
+  }
+
+  /// Sets the visibility calibration.
+  ///
+  /// Custom thresholds are retained even while a named preset is active, so
+  /// switching away and back restores them; [VisibilityScale.forPreset]
+  /// ignores them unless the preset is custom.
+  Future<void> setVisibilityScale({
+    required VisibilityScalePreset preset,
+    double? excellentM,
+    double? goodM,
+    double? moderateM,
+  }) async {
+    state = state.copyWith(
+      visibilityScalePreset: preset,
+      visibilityScaleExcellentM: excellentM,
+      visibilityScaleGoodM: goodM,
+      visibilityScaleModerateM: moderateM,
+    );
     await _saveSettings();
   }
 
@@ -1246,6 +1350,33 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
       hidden.add(chipId);
     }
     state = state.copyWith(hiddenHomeChips: hidden);
+    await _saveSettings();
+  }
+
+  /// Show or hide one home card (id = HomeCardType.name).
+  Future<void> setHomeCardEnabled(String cardId, bool enabled) async {
+    final hidden = {...state.hiddenHomeCards};
+    if (enabled) {
+      hidden.remove(cardId);
+    } else {
+      hidden.add(cardId);
+    }
+    state = state.copyWith(hiddenHomeCards: hidden);
+    await _saveSettings();
+  }
+
+  /// Persist the home card display order (HomeCardType.name values).
+  Future<void> setHomeCardOrder(List<String> order) async {
+    state = state.copyWith(homeCardOrder: List.unmodifiable(order));
+    await _saveSettings();
+  }
+
+  /// Restore the default home card order and visibility.
+  Future<void> resetHomeCards() async {
+    state = state.copyWith(
+      homeCardOrder: const <String>[],
+      hiddenHomeCards: const <String>{},
+    );
     await _saveSettings();
   }
 

@@ -42,7 +42,15 @@ class Dive extends Equatable {
   final List<MarineSighting> sightings;
   final double? waterTemp; // celsius
   final double? airTemp; // celsius
+  /// Legacy visibility bucket, for dives logged before v144. Superseded by
+  /// [visibilityMeters] whenever that is non-null.
   final Visibility? visibility;
+
+  /// Measured horizontal visibility in meters. Canonical from v144.
+  ///
+  /// The good/poor adjective is derived at display time from the diver's
+  /// calibration, so this stores only what was actually observed.
+  final double? visibilityMeters;
 
   /// References dive_types table (>= 1; first is the representative).
   final List<String> diveTypeIds;
@@ -179,6 +187,7 @@ class Dive extends Equatable {
     this.waterTemp,
     this.airTemp,
     this.visibility,
+    this.visibilityMeters,
     this.diveTypeIds = const ['recreational'],
     this.diveType,
     this.buddy,
@@ -554,6 +563,7 @@ class Dive extends Equatable {
     double? waterTemp,
     double? airTemp,
     Visibility? visibility,
+    double? visibilityMeters,
     List<String>? diveTypeIds,
     DiveTypeEntity? diveType,
     String? buddy,
@@ -647,6 +657,7 @@ class Dive extends Equatable {
       waterTemp: waterTemp ?? this.waterTemp,
       airTemp: airTemp ?? this.airTemp,
       visibility: visibility ?? this.visibility,
+      visibilityMeters: visibilityMeters ?? this.visibilityMeters,
       diveTypeIds: diveTypeIds ?? this.diveTypeIds,
       diveType: diveType ?? this.diveType,
       buddy: buddy ?? this.buddy,
@@ -743,6 +754,7 @@ class Dive extends Equatable {
     waterTemp,
     airTemp,
     visibility,
+    visibilityMeters,
     diveTypeIds,
     diveType,
     buddy,

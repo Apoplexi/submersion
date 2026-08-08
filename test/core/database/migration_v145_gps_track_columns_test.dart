@@ -12,7 +12,7 @@ void main() {
 
   tearDown(tearDownTestDatabase);
 
-  test('gps_tracks carries the v144 columns', () async {
+  test('gps_tracks carries the v145 columns', () async {
     final columns = await db
         .customSelect("PRAGMA table_info('gps_tracks')")
         .get();
@@ -46,10 +46,11 @@ void main() {
     expect(row.trimEndTime, isNull);
   });
 
-  test('schema version is at least 144', () {
+  test('schema version is at least 145', () {
     // greaterThanOrEqualTo, matching migration_v142_trip_return_flight_test:
     // parallel branches bump this ladder, and an exact assertion would fail
-    // on merge for no real reason.
-    expect(AppDatabase.currentSchemaVersion, greaterThanOrEqualTo(144));
+    // on merge for no real reason. This step was itself renumbered from v144
+    // when main took that rung for the visibility scale work.
+    expect(AppDatabase.currentSchemaVersion, greaterThanOrEqualTo(145));
   });
 }

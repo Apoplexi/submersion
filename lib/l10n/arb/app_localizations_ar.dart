@@ -3078,11 +3078,80 @@ class AppLocalizationsAr extends AppLocalizations {
   String get dashboard_gauges_noDivesYet => 'لا توجد غطسات بعد';
 
   @override
-  String get settings_homeChips_pageTitle => 'شرائح حالة الصفحة الرئيسية';
+  String get settings_homeChips_pageTitle => 'الشاشة الرئيسية';
 
   @override
   String get settings_homeChips_description =>
       'اختر شرائح الحالة التي تظهر أعلى تبويب الرئيسية.';
+
+  @override
+  String get settings_homeChips_sectionTitle => 'شرائح الحالة';
+
+  @override
+  String get settings_homeCards_sectionTitle => 'بطاقات الرئيسية';
+
+  @override
+  String get settings_homeCards_description =>
+      'اختر البطاقات التي تظهر في تبويب الرئيسية واسحبها لإعادة ترتيبها.';
+
+  @override
+  String get settings_homeCards_autoHides => 'تُخفى تلقائيًا عندما تكون فارغة';
+
+  @override
+  String get settings_homeCards_resetToDefault => 'إعادة التعيين إلى الافتراضي';
+
+  @override
+  String get settings_homeCards_resetDialog_title =>
+      'إعادة تعيين تخطيط الرئيسية؟';
+
+  @override
+  String get settings_homeCards_resetDialog_message =>
+      'يستعيد الترتيب الافتراضي للبطاقات ويعرضها جميعًا من جديد.';
+
+  @override
+  String get settings_homeCards_resetDialog_cancel => 'إلغاء';
+
+  @override
+  String get settings_homeCards_resetDialog_confirm => 'إعادة تعيين';
+
+  @override
+  String get settings_homeCards_card_hero => 'ترويسة الترحيب';
+
+  @override
+  String get settings_homeCards_card_gaugeStrip => 'شرائح الحالة';
+
+  @override
+  String get settings_homeCards_card_preDive => 'قائمة فحص ما قبل الغوص';
+
+  @override
+  String get settings_homeCards_card_recentDives => 'الغوصات الأخيرة';
+
+  @override
+  String get settings_homeCards_card_quickActions => 'إجراءات سريعة';
+
+  @override
+  String get settings_homeCards_card_milestones => 'الإنجازات';
+
+  @override
+  String get settings_homeCards_card_photoRibbon => 'الصور الأخيرة';
+
+  @override
+  String get settings_homeCards_card_onThisDay => 'في مثل هذا اليوم';
+
+  @override
+  String get settings_homeCards_card_yearInReview => 'حصاد العام';
+
+  @override
+  String get settings_homeCards_card_activeCourses => 'تقدّم الدورة';
+
+  @override
+  String get settings_homeCards_card_recentSitesMap => 'خريطة المواقع الأخيرة';
+
+  @override
+  String get dashboard_allHidden_message => 'جميع بطاقات الرئيسية مخفية.';
+
+  @override
+  String get dashboard_allHidden_customize => 'تخصيص الرئيسية';
 
   @override
   String get settings_homeChips_flightWindow => 'نافذة الغوص قبل الرحلة';
@@ -9781,82 +9850,6 @@ class AppLocalizationsAr extends AppLocalizations {
   String get enum_weightType_trimWeights => 'أثقال التوازن';
 
   @override
-  String get equipment_addSheet_brandHint => 'مثال: Scubapro';
-
-  @override
-  String get equipment_addSheet_brandLabel => 'العلامة التجارية';
-
-  @override
-  String get equipment_addSheet_closeTooltip => 'إغلاق';
-
-  @override
-  String get equipment_addSheet_currencyLabel => 'العملة';
-
-  @override
-  String get equipment_addSheet_dateLabel => 'التاريخ';
-
-  @override
-  String equipment_addSheet_errorSnackbar(Object error) {
-    return 'خطأ في إضافة المعدات: $error';
-  }
-
-  @override
-  String get equipment_addSheet_modelHint => 'مثال: MK25 EVO';
-
-  @override
-  String get equipment_addSheet_modelLabel => 'الطراز';
-
-  @override
-  String get equipment_addSheet_nameHint => 'مثال: منظم الغوص الرئيسي';
-
-  @override
-  String get equipment_addSheet_nameLabel => 'الاسم';
-
-  @override
-  String get equipment_addSheet_nameValidation => 'يرجى إدخال اسم';
-
-  @override
-  String get equipment_addSheet_notesHint => 'ملاحظات إضافية...';
-
-  @override
-  String get equipment_addSheet_notesLabel => 'ملاحظات';
-
-  @override
-  String get equipment_addSheet_priceLabel => 'السعر';
-
-  @override
-  String get equipment_addSheet_purchaseInfoTitle => 'معلومات الشراء';
-
-  @override
-  String get equipment_addSheet_serialNumberLabel => 'الرقم التسلسلي';
-
-  @override
-  String get equipment_addSheet_serviceIntervalHint =>
-      'مثال: 365 للصيانة السنوية';
-
-  @override
-  String get equipment_addSheet_serviceIntervalLabel =>
-      'فترة الصيانة (بالأيام)';
-
-  @override
-  String get equipment_addSheet_sizeHint => 'مثال: M, L, 42';
-
-  @override
-  String get equipment_addSheet_sizeLabel => 'المقاس';
-
-  @override
-  String get equipment_addSheet_submitButton => 'إضافة معدات';
-
-  @override
-  String get equipment_addSheet_successSnackbar => 'تمت إضافة المعدات بنجاح';
-
-  @override
-  String get equipment_addSheet_title => 'إضافة معدات';
-
-  @override
-  String get equipment_addSheet_typeLabel => 'النوع';
-
-  @override
   String get equipment_appBar_title => 'المعدات';
 
   @override
@@ -16235,6 +16228,16 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String surfaceInterval_gasWarning_modExceeded(
+    Object ppO2,
+    Object depth,
+    Object limit,
+    Object mod,
+  ) {
+    return 'ppO₂ $ppO2 على عمق $depth يتجاوز $limit. أقصى عمق تشغيل لهذا الخليط هو $mod.';
+  }
+
+  @override
   String surfaceInterval_heSemantics(Object percent) {
     return 'الهيليوم: $percent%';
   }
@@ -16246,6 +16249,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get surfaceInterval_result_currentInterval => 'الفترة الحالية';
+
+  @override
+  String get surfaceInterval_result_gasUnsafe => 'الغاز غير آمن على هذا العمق';
 
   @override
   String get surfaceInterval_result_inDeco => 'في تخفيف الضغط';
@@ -16289,7 +16295,14 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
-  String get surfaceInterval_secondDive_gasAir => '(هواء)';
+  String surfaceInterval_secondDive_heSemantics(Object percent) {
+    return 'هيليوم الغطسة الثانية: $percent%';
+  }
+
+  @override
+  String surfaceInterval_secondDive_o2Semantics(Object percent) {
+    return 'أكسجين الغطسة الثانية: $percent%';
+  }
 
   @override
   String surfaceInterval_secondDive_timeSemantics(Object time) {
@@ -17225,8 +17238,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get trips_diveScan_noMatches => 'لم يتم العثور على غوصات مطابقة';
 
   @override
-  String get trips_diveScan_noDiver =>
-      'عيّن غوّاصًا لهذه الرحلة للبحث عن الغطسات';
+  String get trips_diveScan_noDiver => 'اختر غوّاصًا نشطًا للبحث عن الغطسات';
 
   @override
   String get trips_diveScan_selectAll => 'تحديد الكل';
@@ -18099,6 +18111,29 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get universalImport_entityAction_linkExistingSubtitle =>
       'استخدام السجل المطابق';
+
+  @override
+  String get universalImport_entityAction_replaceBadge => 'استبدال';
+
+  @override
+  String get universalImport_entityAction_replaceExisting => 'استبدال الحالي';
+
+  @override
+  String get universalImport_entityAction_replaceExistingSubtitle =>
+      'الكتابة فوقه بالبيانات المستوردة';
+
+  @override
+  String get universalImport_entityAction_skip => 'تخطي';
+
+  @override
+  String get universalImport_entityAction_skipSubtitle => 'تجاهل هذا الاستيراد';
+
+  @override
+  String get universalImport_entityAction_importAsNew => 'استيراد كجديد';
+
+  @override
+  String get universalImport_entityAction_importAsNewSubtitle =>
+      'إنشاء إدخال منفصل';
 
   @override
   String get universalImport_pending_chooseAction => 'اختر إجراء';
@@ -22840,4 +22875,68 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get reef_attribution_protectedSeas =>
       'حدود المناطق البحرية المحمية. CC BY 4.0.';
+
+  @override
+  String get enum_visibilityBand_excellent => 'ممتازة';
+
+  @override
+  String get enum_visibilityBand_good => 'جيدة';
+
+  @override
+  String get enum_visibilityBand_moderate => 'متوسطة';
+
+  @override
+  String get enum_visibilityBand_poor => 'ضعيفة';
+
+  @override
+  String visibility_range_between(String min, String max, String unit) {
+    return '$min-$max $unit';
+  }
+
+  @override
+  String visibility_range_over(String min, String unit) {
+    return 'أكثر من $min $unit';
+  }
+
+  @override
+  String visibility_range_under(String max, String unit) {
+    return 'أقل من $max $unit';
+  }
+
+  @override
+  String get settings_visibilityScale_title => 'مقياس الرؤية';
+
+  @override
+  String get settings_visibilityScale_subtitle =>
+      'المسافات التي تُعد رؤية جيدة في مواقع غوصك';
+
+  @override
+  String get settings_visibilityScale_preset_tropical => 'استوائية';
+
+  @override
+  String get settings_visibilityScale_preset_temperate => 'معتدلة';
+
+  @override
+  String get settings_visibilityScale_preset_coldWater => 'مياه باردة / داخلية';
+
+  @override
+  String get settings_visibilityScale_preset_custom => 'مخصصة';
+
+  @override
+  String get settings_visibilityScale_customExcellent => 'ممتازة عند أو فوق';
+
+  @override
+  String get settings_visibilityScale_customGood => 'جيدة عند أو فوق';
+
+  @override
+  String get settings_visibilityScale_customModerate => 'متوسطة عند أو فوق';
+
+  @override
+  String get settings_visibilityScale_invalidOrder =>
+      'يجب أن تكون كل قيمة أصغر من التي فوقها وأكبر من صفر';
+
+  @override
+  String statistics_conditions_visibility_legacySuffix(String band) {
+    return '$band (مسجلة قبل القياس)';
+  }
 }

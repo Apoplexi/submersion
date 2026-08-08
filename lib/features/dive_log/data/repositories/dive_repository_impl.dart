@@ -973,7 +973,14 @@ class DiveRepository {
               avgDepth: Value(dive.avgDepth),
               waterTemp: Value(dive.waterTemp),
               airTemp: Value(dive.airTemp),
-              visibility: Value(dive.visibility?.name),
+              visibilityMeters: Value(dive.visibilityMeters),
+              // A measured distance supersedes the legacy bucket. Value(null)
+              // rather than Value.absent(): absent() preserves the existing
+              // column on a companion write, which would leave the dive
+              // carrying both a measurement and a contradicting bucket.
+              visibility: dive.visibilityMeters != null
+                  ? const Value(null)
+                  : Value(dive.visibility?.name),
               diveType: Value(dive.diveTypeId),
               buddy: Value(dive.buddy),
               diveMaster: Value(dive.diveMaster),
@@ -1221,7 +1228,14 @@ class DiveRepository {
           avgDepth: Value(dive.avgDepth),
           waterTemp: Value(dive.waterTemp),
           airTemp: Value(dive.airTemp),
-          visibility: Value(dive.visibility?.name),
+          visibilityMeters: Value(dive.visibilityMeters),
+          // A measured distance supersedes the legacy bucket. Value(null)
+          // rather than Value.absent(): absent() preserves the existing column
+          // on a companion write, which would leave the dive carrying both a
+          // measurement and a contradicting bucket.
+          visibility: dive.visibilityMeters != null
+              ? const Value(null)
+              : Value(dive.visibility?.name),
           diveType: Value(dive.diveTypeId),
           buddy: Value(dive.buddy),
           diveMaster: Value(dive.diveMaster),
@@ -2944,6 +2958,7 @@ class DiveRepository {
               orElse: () => Visibility.unknown,
             )
           : null,
+      visibilityMeters: row.visibilityMeters,
       diveTypeIds: diveTypeIds ?? [row.diveType],
       buddy: row.buddy,
       diveMaster: row.diveMaster,
@@ -3315,6 +3330,7 @@ class DiveRepository {
               orElse: () => Visibility.unknown,
             )
           : null,
+      visibilityMeters: row.visibilityMeters,
       diveTypeIds: diveTypeIds,
       buddy: row.buddy,
       diveMaster: row.diveMaster,

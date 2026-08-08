@@ -438,6 +438,81 @@ void main() {
       expect(find.text('Import as New'), findsOneWidget);
     });
 
+    testWidgets('hides Replace existing when the tab does not support it', (
+      tester,
+    ) async {
+      tester.view.physicalSize = const Size(800, 600);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+
+      await tester.pumpWidget(
+        _buildList(
+          group: _buddyGroupWithMatch,
+          // _nonDiveActions omits replaceSource: the Universal adapter only
+          // implements overwrite-in-place for sites, so a buddies tab must
+          // not offer a button whose import path would drop the row.
+          availableActions: _nonDiveActions,
+        ),
+      );
+      await tester.pump();
+      await expandCard(tester);
+
+      expect(find.text('Replace existing'), findsNothing);
+      // The supported actions are still there.
+      expect(find.text('Skip'), findsOneWidget);
+      expect(find.text('Import as New'), findsOneWidget);
+    });
+
+    testWidgets('shows Replace existing when the tab supports it', (
+      tester,
+    ) async {
+      tester.view.physicalSize = const Size(800, 600);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+
+      int? changedIndex;
+      DuplicateAction? changedAction;
+
+      await tester.pumpWidget(
+        _buildList(
+          group: _buddyGroupWithMatch,
+          availableActions: {..._nonDiveActions, DuplicateAction.replaceSource},
+          onDuplicateActionChanged: (i, a) {
+            changedIndex = i;
+            changedAction = a;
+          },
+        ),
+      );
+      await tester.pump();
+      await expandCard(tester);
+
+      expect(find.text('Replace existing'), findsOneWidget);
+
+      await tester.tap(find.text('Replace existing'));
+      await tester.pump();
+
+      expect(changedIndex, equals(0));
+      expect(changedAction, equals(DuplicateAction.replaceSource));
+    });
+
+    testWidgets('replaceSource row shows the REPLACE badge', (tester) async {
+      tester.view.physicalSize = const Size(800, 600);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+
+      await tester.pumpWidget(
+        _buildList(
+          group: _buddyGroupWithMatch,
+          availableActions: {..._nonDiveActions, DuplicateAction.replaceSource},
+          duplicateActions: {0: DuplicateAction.replaceSource},
+        ),
+      );
+      await tester.pump();
+
+      // Same word as the dive card's badge for this action -- not "OVERWRITE".
+      expect(find.text('REPLACE'), findsOneWidget);
+    });
+
     testWidgets('tapping Link to existing reports consolidate', (tester) async {
       tester.view.physicalSize = const Size(800, 600);
       tester.view.devicePixelRatio = 1.0;

@@ -3153,11 +3153,83 @@ class AppLocalizationsDe extends AppLocalizations {
   String get dashboard_gauges_noDivesYet => 'Noch keine Tauchgänge';
 
   @override
-  String get settings_homeChips_pageTitle => 'Status-Chips der Startseite';
+  String get settings_homeChips_pageTitle => 'Startbildschirm';
 
   @override
   String get settings_homeChips_description =>
       'Wähle, welche Status-Chips oben im Start-Tab erscheinen.';
+
+  @override
+  String get settings_homeChips_sectionTitle => 'Status-Chips';
+
+  @override
+  String get settings_homeCards_sectionTitle => 'Startseiten-Karten';
+
+  @override
+  String get settings_homeCards_description =>
+      'Wähle, welche Karten im Start-Tab erscheinen, und ziehe sie in die gewünschte Reihenfolge.';
+
+  @override
+  String get settings_homeCards_autoHides =>
+      'Wird automatisch ausgeblendet, wenn leer';
+
+  @override
+  String get settings_homeCards_resetToDefault => 'Auf Standard zurücksetzen';
+
+  @override
+  String get settings_homeCards_resetDialog_title =>
+      'Start-Layout zurücksetzen?';
+
+  @override
+  String get settings_homeCards_resetDialog_message =>
+      'Stellt die Standardreihenfolge der Karten wieder her und zeigt alle Karten wieder an.';
+
+  @override
+  String get settings_homeCards_resetDialog_cancel => 'Abbrechen';
+
+  @override
+  String get settings_homeCards_resetDialog_confirm => 'Zurücksetzen';
+
+  @override
+  String get settings_homeCards_card_hero => 'Begrüßungsbereich';
+
+  @override
+  String get settings_homeCards_card_gaugeStrip => 'Status-Chips';
+
+  @override
+  String get settings_homeCards_card_preDive => 'Pre-Dive-Checkliste';
+
+  @override
+  String get settings_homeCards_card_recentDives => 'Letzte Tauchgänge';
+
+  @override
+  String get settings_homeCards_card_quickActions => 'Schnellaktionen';
+
+  @override
+  String get settings_homeCards_card_milestones => 'Meilensteine';
+
+  @override
+  String get settings_homeCards_card_photoRibbon => 'Neueste Fotos';
+
+  @override
+  String get settings_homeCards_card_onThisDay => 'An diesem Tag';
+
+  @override
+  String get settings_homeCards_card_yearInReview => 'Jahresrückblick';
+
+  @override
+  String get settings_homeCards_card_activeCourses => 'Kursfortschritt';
+
+  @override
+  String get settings_homeCards_card_recentSitesMap =>
+      'Karte der letzten Tauchplätze';
+
+  @override
+  String get dashboard_allHidden_message =>
+      'Alle Startseiten-Karten sind ausgeblendet.';
+
+  @override
+  String get dashboard_allHidden_customize => 'Startseite anpassen';
 
   @override
   String get settings_homeChips_flightWindow => 'Tauchfenster vor dem Flug';
@@ -9953,83 +10025,6 @@ class AppLocalizationsDe extends AppLocalizations {
   String get enum_weightType_trimWeights => 'Trimmgewichte';
 
   @override
-  String get equipment_addSheet_brandHint => 'z. B. Scubapro';
-
-  @override
-  String get equipment_addSheet_brandLabel => 'Marke';
-
-  @override
-  String get equipment_addSheet_closeTooltip => 'Schließen';
-
-  @override
-  String get equipment_addSheet_currencyLabel => 'Währung';
-
-  @override
-  String get equipment_addSheet_dateLabel => 'Datum';
-
-  @override
-  String equipment_addSheet_errorSnackbar(Object error) {
-    return 'Fehler beim Hinzufügen der Ausrüstung: $error';
-  }
-
-  @override
-  String get equipment_addSheet_modelHint => 'z. B. MK25 EVO';
-
-  @override
-  String get equipment_addSheet_modelLabel => 'Modell';
-
-  @override
-  String get equipment_addSheet_nameHint => 'z. B. Mein Hauptatemregler';
-
-  @override
-  String get equipment_addSheet_nameLabel => 'Name';
-
-  @override
-  String get equipment_addSheet_nameValidation =>
-      'Bitte geben Sie einen Namen ein';
-
-  @override
-  String get equipment_addSheet_notesHint => 'Zusätzliche Notizen...';
-
-  @override
-  String get equipment_addSheet_notesLabel => 'Notizen';
-
-  @override
-  String get equipment_addSheet_priceLabel => 'Preis';
-
-  @override
-  String get equipment_addSheet_purchaseInfoTitle => 'Kaufinformationen';
-
-  @override
-  String get equipment_addSheet_serialNumberLabel => 'Seriennummer';
-
-  @override
-  String get equipment_addSheet_serviceIntervalHint => 'z. B. 365 für jährlich';
-
-  @override
-  String get equipment_addSheet_serviceIntervalLabel =>
-      'Wartungsintervall (Tage)';
-
-  @override
-  String get equipment_addSheet_sizeHint => 'z. B. M, L, 42';
-
-  @override
-  String get equipment_addSheet_sizeLabel => 'Größe';
-
-  @override
-  String get equipment_addSheet_submitButton => 'Ausrüstung hinzufügen';
-
-  @override
-  String get equipment_addSheet_successSnackbar =>
-      'Ausrüstung erfolgreich hinzugefügt';
-
-  @override
-  String get equipment_addSheet_title => 'Ausrüstung hinzufügen';
-
-  @override
-  String get equipment_addSheet_typeLabel => 'Typ';
-
-  @override
   String get equipment_appBar_title => 'Ausrüstung';
 
   @override
@@ -16511,6 +16506,16 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String surfaceInterval_gasWarning_modExceeded(
+    Object ppO2,
+    Object depth,
+    Object limit,
+    Object mod,
+  ) {
+    return 'ppO₂ $ppO2 auf $depth überschreitet $limit. MOD für dieses Gemisch ist $mod.';
+  }
+
+  @override
   String surfaceInterval_heSemantics(Object percent) {
     return 'Helium: $percent%';
   }
@@ -16522,6 +16527,9 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get surfaceInterval_result_currentInterval => 'Aktuelles Intervall';
+
+  @override
+  String get surfaceInterval_result_gasUnsafe => 'Gas in dieser Tiefe unsicher';
 
   @override
   String get surfaceInterval_result_inDeco => 'In Deko';
@@ -16566,7 +16574,14 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
-  String get surfaceInterval_secondDive_gasAir => '(Luft)';
+  String surfaceInterval_secondDive_heSemantics(Object percent) {
+    return 'Zweiter Tauchgang Helium: $percent%';
+  }
+
+  @override
+  String surfaceInterval_secondDive_o2Semantics(Object percent) {
+    return 'Zweiter Tauchgang O2: $percent%';
+  }
 
   @override
   String surfaceInterval_secondDive_timeSemantics(Object time) {
@@ -17515,7 +17530,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get trips_diveScan_noDiver =>
-      'Weise dieser Reise einen Taucher zu, um nach Tauchgängen zu suchen';
+      'Wähle einen aktiven Taucher aus, um nach Tauchgängen zu suchen';
 
   @override
   String get trips_diveScan_selectAll => 'Alle auswählen';
@@ -18396,6 +18411,31 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get universalImport_entityAction_linkExistingSubtitle =>
       'Vorhandenen Eintrag verwenden';
+
+  @override
+  String get universalImport_entityAction_replaceBadge => 'ERSETZEN';
+
+  @override
+  String get universalImport_entityAction_replaceExisting =>
+      'Vorhandenen ersetzen';
+
+  @override
+  String get universalImport_entityAction_replaceExistingSubtitle =>
+      'Mit importierten Daten überschreiben';
+
+  @override
+  String get universalImport_entityAction_skip => 'Überspringen';
+
+  @override
+  String get universalImport_entityAction_skipSubtitle =>
+      'Diesen Import verwerfen';
+
+  @override
+  String get universalImport_entityAction_importAsNew => 'Als neu importieren';
+
+  @override
+  String get universalImport_entityAction_importAsNewSubtitle =>
+      'Separaten Eintrag erstellen';
 
   @override
   String get universalImport_pending_chooseAction => 'Aktion auswählen';
@@ -23222,4 +23262,69 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get reef_attribution_protectedSeas =>
       'Grenzen von Meeresschutzgebieten. CC BY 4.0.';
+
+  @override
+  String get enum_visibilityBand_excellent => 'Ausgezeichnet';
+
+  @override
+  String get enum_visibilityBand_good => 'Gut';
+
+  @override
+  String get enum_visibilityBand_moderate => 'Mäßig';
+
+  @override
+  String get enum_visibilityBand_poor => 'Schlecht';
+
+  @override
+  String visibility_range_between(String min, String max, String unit) {
+    return '$min-$max $unit';
+  }
+
+  @override
+  String visibility_range_over(String min, String unit) {
+    return 'über $min $unit';
+  }
+
+  @override
+  String visibility_range_under(String max, String unit) {
+    return 'unter $max $unit';
+  }
+
+  @override
+  String get settings_visibilityScale_title => 'Sichtweiten-Skala';
+
+  @override
+  String get settings_visibilityScale_subtitle =>
+      'Welche Entfernungen an deinen Tauchplätzen als gute Sicht gelten';
+
+  @override
+  String get settings_visibilityScale_preset_tropical => 'Tropisch';
+
+  @override
+  String get settings_visibilityScale_preset_temperate => 'Gemäßigt';
+
+  @override
+  String get settings_visibilityScale_preset_coldWater =>
+      'Kaltwasser / Binnengewässer';
+
+  @override
+  String get settings_visibilityScale_preset_custom => 'Benutzerdefiniert';
+
+  @override
+  String get settings_visibilityScale_customExcellent => 'Ausgezeichnet ab';
+
+  @override
+  String get settings_visibilityScale_customGood => 'Gut ab';
+
+  @override
+  String get settings_visibilityScale_customModerate => 'Mäßig ab';
+
+  @override
+  String get settings_visibilityScale_invalidOrder =>
+      'Jeder Wert muss kleiner als der darüber und größer als null sein';
+
+  @override
+  String statistics_conditions_visibility_legacySuffix(String band) {
+    return '$band (vor der Messung erfasst)';
+  }
 }

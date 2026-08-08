@@ -3128,11 +3128,84 @@ class AppLocalizationsHu extends AppLocalizations {
   String get dashboard_gauges_noDivesYet => 'Még nincs merülés';
 
   @override
-  String get settings_homeChips_pageTitle => 'Kezdőlap állapotjelzői';
+  String get settings_homeChips_pageTitle => 'Kezdőképernyő';
 
   @override
   String get settings_homeChips_description =>
       'Válaszd ki, mely állapotjelzők jelenjenek meg a Kezdőlap tetején.';
+
+  @override
+  String get settings_homeChips_sectionTitle => 'Állapotjelzők';
+
+  @override
+  String get settings_homeCards_sectionTitle => 'Kezdőlap kártyái';
+
+  @override
+  String get settings_homeCards_description =>
+      'Válaszd ki, mely kártyák jelenjenek meg a Kezdőlapon, és húzással rendezd át őket.';
+
+  @override
+  String get settings_homeCards_autoHides =>
+      'Automatikusan elrejtőzik, ha üres';
+
+  @override
+  String get settings_homeCards_resetToDefault =>
+      'Alapértelmezés visszaállítása';
+
+  @override
+  String get settings_homeCards_resetDialog_title =>
+      'Visszaállítod a Kezdőlap elrendezését?';
+
+  @override
+  String get settings_homeCards_resetDialog_message =>
+      'Visszaállítja a kártyák alapértelmezett sorrendjét, és újra megjeleníti mindet.';
+
+  @override
+  String get settings_homeCards_resetDialog_cancel => 'Mégse';
+
+  @override
+  String get settings_homeCards_resetDialog_confirm => 'Visszaállítás';
+
+  @override
+  String get settings_homeCards_card_hero => 'Üdvözlő fejléc';
+
+  @override
+  String get settings_homeCards_card_gaugeStrip => 'Állapotjelzők';
+
+  @override
+  String get settings_homeCards_card_preDive => 'Merülés előtti ellenőrzőlista';
+
+  @override
+  String get settings_homeCards_card_recentDives => 'Legutóbbi merülések';
+
+  @override
+  String get settings_homeCards_card_quickActions => 'Gyorsműveletek';
+
+  @override
+  String get settings_homeCards_card_milestones => 'Mérföldkövek';
+
+  @override
+  String get settings_homeCards_card_photoRibbon => 'Legutóbbi fotók';
+
+  @override
+  String get settings_homeCards_card_onThisDay => 'Ezen a napon';
+
+  @override
+  String get settings_homeCards_card_yearInReview => 'Éves visszatekintés';
+
+  @override
+  String get settings_homeCards_card_activeCourses => 'Tanfolyam előrehaladása';
+
+  @override
+  String get settings_homeCards_card_recentSitesMap =>
+      'Legutóbbi merülőhelyek térképe';
+
+  @override
+  String get dashboard_allHidden_message =>
+      'Minden kezdőlapi kártya el van rejtve.';
+
+  @override
+  String get dashboard_allHidden_customize => 'Kezdőlap testreszabása';
 
   @override
   String get settings_homeChips_flightWindow => 'Merülési ablak repülés előtt';
@@ -9932,83 +10005,6 @@ class AppLocalizationsHu extends AppLocalizations {
   String get enum_weightType_trimWeights => 'Trim sulyok';
 
   @override
-  String get equipment_addSheet_brandHint => 'pl. Scubapro';
-
-  @override
-  String get equipment_addSheet_brandLabel => 'Marka';
-
-  @override
-  String get equipment_addSheet_closeTooltip => 'Bezaras';
-
-  @override
-  String get equipment_addSheet_currencyLabel => 'Penznem';
-
-  @override
-  String get equipment_addSheet_dateLabel => 'Datum';
-
-  @override
-  String equipment_addSheet_errorSnackbar(Object error) {
-    return 'Hiba a felszereles hozzaadasakor: $error';
-  }
-
-  @override
-  String get equipment_addSheet_modelHint => 'pl. MK25 EVO';
-
-  @override
-  String get equipment_addSheet_modelLabel => 'Modell';
-
-  @override
-  String get equipment_addSheet_nameHint => 'pl. Elsooleges automata';
-
-  @override
-  String get equipment_addSheet_nameLabel => 'Nev';
-
-  @override
-  String get equipment_addSheet_nameValidation => 'Kerem adjon meg egy nevet';
-
-  @override
-  String get equipment_addSheet_notesHint => 'Tovabbl megjegyzesek...';
-
-  @override
-  String get equipment_addSheet_notesLabel => 'Megjegyzesek';
-
-  @override
-  String get equipment_addSheet_priceLabel => 'Ar';
-
-  @override
-  String get equipment_addSheet_purchaseInfoTitle => 'Vasarlasi informaciok';
-
-  @override
-  String get equipment_addSheet_serialNumberLabel => 'Sorozatszam';
-
-  @override
-  String get equipment_addSheet_serviceIntervalHint =>
-      'pl. 365 az eves szervizhez';
-
-  @override
-  String get equipment_addSheet_serviceIntervalLabel =>
-      'Szerviz intervallum (nap)';
-
-  @override
-  String get equipment_addSheet_sizeHint => 'pl. M, L, 42';
-
-  @override
-  String get equipment_addSheet_sizeLabel => 'Meret';
-
-  @override
-  String get equipment_addSheet_submitButton => 'Felszereles hozzaadasa';
-
-  @override
-  String get equipment_addSheet_successSnackbar =>
-      'Felszereles sikeresen hozzaadva';
-
-  @override
-  String get equipment_addSheet_title => 'Felszereles hozzaadasa';
-
-  @override
-  String get equipment_addSheet_typeLabel => 'Tipus';
-
-  @override
   String get equipment_appBar_title => 'Felszereles';
 
   @override
@@ -16493,6 +16489,16 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String surfaceInterval_gasWarning_modExceeded(
+    Object ppO2,
+    Object depth,
+    Object limit,
+    Object mod,
+  ) {
+    return 'ppO₂ $ppO2 $depth mélységben meghaladja a $limit értéket. A keverék MOD-ja $mod.';
+  }
+
+  @override
   String surfaceInterval_heSemantics(Object percent) {
     return 'Hélium: $percent%';
   }
@@ -16504,6 +16510,10 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get surfaceInterval_result_currentInterval => 'Jelenlegi intervallum';
+
+  @override
+  String get surfaceInterval_result_gasUnsafe =>
+      'A gáz nem biztonságos ezen a mélységen';
 
   @override
   String get surfaceInterval_result_inDeco => 'Dekóban';
@@ -16547,7 +16557,14 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
-  String get surfaceInterval_secondDive_gasAir => '(Levegő)';
+  String surfaceInterval_secondDive_heSemantics(Object percent) {
+    return 'Második merülés hélium: $percent%';
+  }
+
+  @override
+  String surfaceInterval_secondDive_o2Semantics(Object percent) {
+    return 'Második merülés O2: $percent%';
+  }
 
   @override
   String surfaceInterval_secondDive_timeSemantics(Object time) {
@@ -17493,7 +17510,7 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get trips_diveScan_noDiver =>
-      'Rendelj egy búvárt ehhez az úthoz a merülések kereséséhez';
+      'Válassz ki egy aktív búvárt a merülések kereséséhez';
 
   @override
   String get trips_diveScan_selectAll => 'Osszes kivalasztasa';
@@ -18375,6 +18392,29 @@ class AppLocalizationsHu extends AppLocalizations {
   @override
   String get universalImport_entityAction_linkExistingSubtitle =>
       'A talált rekord használata';
+
+  @override
+  String get universalImport_entityAction_replaceBadge => 'CSERE';
+
+  @override
+  String get universalImport_entityAction_replaceExisting => 'Meglévő cseréje';
+
+  @override
+  String get universalImport_entityAction_replaceExistingSubtitle =>
+      'Felülírás az importált adatokkal';
+
+  @override
+  String get universalImport_entityAction_skip => 'Kihagyás';
+
+  @override
+  String get universalImport_entityAction_skipSubtitle => 'Az import elvetése';
+
+  @override
+  String get universalImport_entityAction_importAsNew => 'Importálás újként';
+
+  @override
+  String get universalImport_entityAction_importAsNewSubtitle =>
+      'Külön bejegyzés létrehozása';
 
   @override
   String get universalImport_pending_chooseAction => 'Valassz muveletet';
@@ -23178,4 +23218,68 @@ class AppLocalizationsHu extends AppLocalizations {
   @override
   String get reef_attribution_protectedSeas =>
       'Védett tengeri területek határai. CC BY 4.0.';
+
+  @override
+  String get enum_visibilityBand_excellent => 'Kiváló';
+
+  @override
+  String get enum_visibilityBand_good => 'Jó';
+
+  @override
+  String get enum_visibilityBand_moderate => 'Közepes';
+
+  @override
+  String get enum_visibilityBand_poor => 'Gyenge';
+
+  @override
+  String visibility_range_between(String min, String max, String unit) {
+    return '$min-$max $unit';
+  }
+
+  @override
+  String visibility_range_over(String min, String unit) {
+    return 'több mint $min $unit';
+  }
+
+  @override
+  String visibility_range_under(String max, String unit) {
+    return 'kevesebb mint $max $unit';
+  }
+
+  @override
+  String get settings_visibilityScale_title => 'Látótávolság-skála';
+
+  @override
+  String get settings_visibilityScale_subtitle =>
+      'Mekkora távolság számít jó látásnak ott, ahol merülsz';
+
+  @override
+  String get settings_visibilityScale_preset_tropical => 'Trópusi';
+
+  @override
+  String get settings_visibilityScale_preset_temperate => 'Mérsékelt';
+
+  @override
+  String get settings_visibilityScale_preset_coldWater => 'Hidegvízi / Belvízi';
+
+  @override
+  String get settings_visibilityScale_preset_custom => 'Egyéni';
+
+  @override
+  String get settings_visibilityScale_customExcellent => 'Kiváló ettől';
+
+  @override
+  String get settings_visibilityScale_customGood => 'Jó ettől';
+
+  @override
+  String get settings_visibilityScale_customModerate => 'Közepes ettől';
+
+  @override
+  String get settings_visibilityScale_invalidOrder =>
+      'Minden értéknek kisebbnek kell lennie a felette lévőnél és nagyobbnak nullánál';
+
+  @override
+  String statistics_conditions_visibility_legacySuffix(String band) {
+    return '$band (mérés előtt rögzítve)';
+  }
 }

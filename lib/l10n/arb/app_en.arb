@@ -1945,8 +1945,30 @@
   },
   "dashboard_gauges_lastDiveToday": "Dove today",
   "dashboard_gauges_noDivesYet": "No dives yet",
-  "settings_homeChips_pageTitle": "Home status chips",
+  "settings_homeChips_pageTitle": "Home screen",
   "settings_homeChips_description": "Choose which status chips appear at the top of the Home tab.",
+  "settings_homeChips_sectionTitle": "Status chips",
+  "settings_homeCards_sectionTitle": "Home cards",
+  "settings_homeCards_description": "Choose which cards appear on the Home tab and drag to reorder them.",
+  "settings_homeCards_autoHides": "Hides automatically when empty",
+  "settings_homeCards_resetToDefault": "Reset to default",
+  "settings_homeCards_resetDialog_title": "Reset Home layout?",
+  "settings_homeCards_resetDialog_message": "This restores the default card order and shows all cards again.",
+  "settings_homeCards_resetDialog_cancel": "Cancel",
+  "settings_homeCards_resetDialog_confirm": "Reset",
+  "settings_homeCards_card_hero": "Welcome header",
+  "settings_homeCards_card_gaugeStrip": "Status chips",
+  "settings_homeCards_card_preDive": "Pre-dive checklist",
+  "settings_homeCards_card_recentDives": "Recent dives",
+  "settings_homeCards_card_quickActions": "Quick actions",
+  "settings_homeCards_card_milestones": "Milestones",
+  "settings_homeCards_card_photoRibbon": "Recent photos",
+  "settings_homeCards_card_onThisDay": "On this day",
+  "settings_homeCards_card_yearInReview": "Year in review",
+  "settings_homeCards_card_activeCourses": "Course progress",
+  "settings_homeCards_card_recentSitesMap": "Recent sites map",
+  "dashboard_allHidden_message": "All Home cards are hidden.",
+  "dashboard_allHidden_customize": "Customize Home",
   "settings_homeChips_flightWindow": "Flight dive window",
   "settings_homeChips_gear": "Gear service",
   "settings_homeChips_insurance": "Insurance",
@@ -5644,30 +5666,6 @@
   "enum_weightType_integrated": "Integrated Weights",
   "enum_weightType_mixed": "Mixed/Combined",
   "enum_weightType_trimWeights": "Trim Weights",
-  "equipment_addSheet_brandHint": "e.g., Scubapro",
-  "equipment_addSheet_brandLabel": "Brand",
-  "equipment_addSheet_closeTooltip": "Close",
-  "equipment_addSheet_currencyLabel": "Currency",
-  "equipment_addSheet_dateLabel": "Date",
-  "equipment_addSheet_errorSnackbar": "Error adding equipment: {error}",
-  "equipment_addSheet_modelHint": "e.g., MK25 EVO",
-  "equipment_addSheet_modelLabel": "Model",
-  "equipment_addSheet_nameHint": "e.g., My Primary Regulator",
-  "equipment_addSheet_nameLabel": "Name",
-  "equipment_addSheet_nameValidation": "Please enter a name",
-  "equipment_addSheet_notesHint": "Additional notes...",
-  "equipment_addSheet_notesLabel": "Notes",
-  "equipment_addSheet_priceLabel": "Price",
-  "equipment_addSheet_purchaseInfoTitle": "Purchase Information",
-  "equipment_addSheet_serialNumberLabel": "Serial Number",
-  "equipment_addSheet_serviceIntervalHint": "e.g., 365 for yearly",
-  "equipment_addSheet_serviceIntervalLabel": "Service Interval (days)",
-  "equipment_addSheet_sizeHint": "e.g., M, L, 42",
-  "equipment_addSheet_sizeLabel": "Size",
-  "equipment_addSheet_submitButton": "Add Equipment",
-  "equipment_addSheet_successSnackbar": "Equipment added successfully",
-  "equipment_addSheet_title": "Add Equipment",
-  "equipment_addSheet_typeLabel": "Type",
   "equipment_appBar_title": "Equipment",
   "equipment_deleteDialog_cancel": "Cancel",
   "equipment_deleteDialog_confirm": "Delete",
@@ -6128,13 +6126,6 @@
   "equipment_summary_totalValue": "Total Value",
   "equipment_tab_equipment": "Equipment",
   "equipment_tab_sets": "Sets",
-  "@equipment_addSheet_errorSnackbar": {
-    "placeholders": {
-      "error": {
-        "type": "Object"
-      }
-    }
-  },
   "@equipment_detail_daysOverdue": {
     "placeholders": {
       "days": {
@@ -9528,9 +9519,11 @@
   "surfaceInterval_gasMix_air": "Air",
   "surfaceInterval_gasMix_ean": "EAN{percent}",
   "surfaceInterval_gasMix_trimix": "Trimix {o2}/{he}",
+  "surfaceInterval_gasWarning_modExceeded": "ppO₂ {ppO2} at {depth} exceeds {limit}. MOD for this mix is {mod}.",
   "surfaceInterval_heSemantics": "Helium: {percent}%",
   "surfaceInterval_o2Semantics": "O2: {percent}%",
   "surfaceInterval_result_currentInterval": "Current Interval",
+  "surfaceInterval_result_gasUnsafe": "Gas unsafe at this depth",
   "surfaceInterval_result_inDeco": "In deco",
   "surfaceInterval_result_increaseInterval": "Increase surface interval or reduce second dive depth/time",
   "surfaceInterval_result_minimumInterval": "Minimum Surface Interval",
@@ -9540,7 +9533,8 @@
   "surfaceInterval_result_safeToDive": "Safe to dive",
   "surfaceInterval_result_semantics": "Minimum surface interval: {interval}. Current interval: {current}. NDL for second dive: {ndl}. {status}",
   "surfaceInterval_secondDive_depthSemantics": "Second dive depth: {depth} {unit}",
-  "surfaceInterval_secondDive_gasAir": "(Air)",
+  "surfaceInterval_secondDive_heSemantics": "Second dive helium: {percent}%",
+  "surfaceInterval_secondDive_o2Semantics": "Second dive O2: {percent}%",
   "surfaceInterval_secondDive_timeSemantics": "Second dive time: {time} minutes",
   "surfaceInterval_secondDive_title": "Second Dive",
   "surfaceInterval_tissueRecovery_chartSemantics": "Tissue recovery chart showing 16 compartment off-gassing over a {interval} surface interval",
@@ -9650,6 +9644,27 @@
       }
     }
   },
+  "@surfaceInterval_gasWarning_modExceeded": {
+    "description": "Warning shown when the planned depth exceeds the MOD of the selected mix",
+    "placeholders": {
+      "ppO2": {
+        "type": "Object",
+        "example": "1.60"
+      },
+      "depth": {
+        "type": "Object",
+        "example": "30 m"
+      },
+      "limit": {
+        "type": "Object",
+        "example": "1.40"
+      },
+      "mod": {
+        "type": "Object",
+        "example": "25 m"
+      }
+    }
+  },
   "@surfaceInterval_heSemantics": {
     "description": "Accessibility label for helium slider",
     "placeholders": {
@@ -9670,6 +9685,9 @@
   },
   "@surfaceInterval_result_currentInterval": {
     "description": "Label for the current surface interval column"
+  },
+  "@surfaceInterval_result_gasUnsafe": {
+    "description": "Result card status when either dive exceeds its gas MOD"
   },
   "@surfaceInterval_result_inDeco": {
     "description": "Shown when the second dive would require decompression stops"
@@ -9732,8 +9750,23 @@
       }
     }
   },
-  "@surfaceInterval_secondDive_gasAir": {
-    "description": "Label indicating the second dive uses air"
+  "@surfaceInterval_secondDive_heSemantics": {
+    "description": "Accessibility label for the second dive helium slider",
+    "placeholders": {
+      "percent": {
+        "type": "Object",
+        "example": "10"
+      }
+    }
+  },
+  "@surfaceInterval_secondDive_o2Semantics": {
+    "description": "Accessibility label for the second dive O2 slider",
+    "placeholders": {
+      "percent": {
+        "type": "Object",
+        "example": "32"
+      }
+    }
   },
   "@surfaceInterval_secondDive_timeSemantics": {
     "description": "Accessibility label for second dive time slider",
@@ -10170,7 +10203,7 @@
     }
   },
   "trips_diveScan_noMatches": "No matching dives found",
-  "trips_diveScan_noDiver": "Assign a diver to this trip to scan for dives",
+  "trips_diveScan_noDiver": "Select an active diver to scan for dives",
   "trips_diveScan_selectAll": "Select all",
   "trips_diveScan_subtitle": "{count} dives found in date range",
   "@trips_diveScan_subtitle": {
@@ -10704,6 +10737,13 @@
   "universalImport_entityAction_linkBadge": "LINK",
   "universalImport_entityAction_linkExisting": "Link to existing",
   "universalImport_entityAction_linkExistingSubtitle": "Use the matched record",
+  "universalImport_entityAction_replaceBadge": "REPLACE",
+  "universalImport_entityAction_replaceExisting": "Replace existing",
+  "universalImport_entityAction_replaceExistingSubtitle": "Overwrite with imported data",
+  "universalImport_entityAction_skip": "Skip",
+  "universalImport_entityAction_skipSubtitle": "Discard this import",
+  "universalImport_entityAction_importAsNew": "Import as New",
+  "universalImport_entityAction_importAsNewSubtitle": "Create separate entry",
   "universalImport_pending_chooseAction": "Choose an action",
   "universalImport_pending_gateHint": "{count} duplicate(s) need a decision",
   "universalImport_pending_needsDecision": "Needs decision",
@@ -11027,6 +11067,27 @@
   },
   "@universalImport_entityAction_linkExistingSubtitle": {
     "description": "Subtitle under the link-to-existing action button"
+  },
+  "@universalImport_entityAction_replaceBadge": {
+    "description": "Collapsed-header badge on a duplicate row whose action is replace-the-existing-record"
+  },
+  "@universalImport_entityAction_replaceExisting": {
+    "description": "Action button on a duplicate site row: overwrite the matched existing record with the imported data"
+  },
+  "@universalImport_entityAction_replaceExistingSubtitle": {
+    "description": "Subtitle under the replace-existing action button"
+  },
+  "@universalImport_entityAction_skip": {
+    "description": "Action button on a duplicate entity row: do not import this item"
+  },
+  "@universalImport_entityAction_skipSubtitle": {
+    "description": "Subtitle under the skip action button"
+  },
+  "@universalImport_entityAction_importAsNew": {
+    "description": "Action button on a duplicate entity row: create a separate new record instead of reusing the match"
+  },
+  "@universalImport_entityAction_importAsNewSubtitle": {
+    "description": "Subtitle under the import-as-new action button"
   },
   "@universalImport_pending_chooseAction": {
     "description": "Prompt shown above the action buttons on an expanded pending duplicate row, telling the user to pick an action"
@@ -14624,5 +14685,63 @@
   "reef_attribution_wri": "Reef presence and threat level. CC BY 3.0.",
   "reef_attribution_noaa": "Sea surface temperature and bleaching heat stress. Public domain.",
   "reef_attribution_gbif": "Species occurrence records, filtered to CC0 and CC BY 4.0.",
-  "reef_attribution_protectedSeas": "Marine protected area boundaries. CC BY 4.0."
+  "reef_attribution_protectedSeas": "Marine protected area boundaries. CC BY 4.0.",
+  "enum_visibilityBand_excellent": "Excellent",
+  "enum_visibilityBand_good": "Good",
+  "enum_visibilityBand_moderate": "Moderate",
+  "enum_visibilityBand_poor": "Poor",
+  "visibility_range_between": "{min}-{max} {unit}",
+  "@visibility_range_between": {
+    "placeholders": {
+      "min": {
+        "type": "String"
+      },
+      "max": {
+        "type": "String"
+      },
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "visibility_range_over": "over {min} {unit}",
+  "@visibility_range_over": {
+    "placeholders": {
+      "min": {
+        "type": "String"
+      },
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "visibility_range_under": "under {max} {unit}",
+  "@visibility_range_under": {
+    "placeholders": {
+      "max": {
+        "type": "String"
+      },
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "settings_visibilityScale_title": "Visibility scale",
+  "settings_visibilityScale_subtitle": "Which distances count as good visibility where you dive",
+  "settings_visibilityScale_preset_tropical": "Tropical",
+  "settings_visibilityScale_preset_temperate": "Temperate",
+  "settings_visibilityScale_preset_coldWater": "Cold water / Inland",
+  "settings_visibilityScale_preset_custom": "Custom",
+  "settings_visibilityScale_customExcellent": "Excellent at or above",
+  "settings_visibilityScale_customGood": "Good at or above",
+  "settings_visibilityScale_customModerate": "Moderate at or above",
+  "settings_visibilityScale_invalidOrder": "Each value must be smaller than the one above it, and greater than zero",
+  "statistics_conditions_visibility_legacySuffix": "{band} (logged before measurement)",
+  "@statistics_conditions_visibility_legacySuffix": {
+    "placeholders": {
+      "band": {
+        "type": "String"
+      }
+    }
+  }
 }

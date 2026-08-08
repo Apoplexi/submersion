@@ -1,6 +1,5 @@
 import 'package:xml/xml.dart';
 
-import 'package:submersion/core/constants/enums.dart' as enums;
 import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/core/services/export/uddf/uddf_import_parsers.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
@@ -728,7 +727,13 @@ class UddfImportService {
 
       final visibilityText = _getElementText(afterElement, 'visibility');
       if (visibilityText != null) {
-        diveData['visibility'] = _parseUddfVisibility(visibilityText);
+        // UDDF carries visibility as a distance in meters. Keep the measured
+        // value: bucketing it here is what made the round trip lossy before
+        // v144, turning a file's 6.4 m into "moderate" and then back into 10.
+        final meters = double.tryParse(visibilityText);
+        if (meters != null && meters > 0) {
+          diveData['visibilityMeters'] = meters;
+        }
       }
 
       // Parse rating
@@ -827,20 +832,6 @@ class UddfImportService {
     }
 
     return diveData;
-  }
-
-  enums.Visibility _parseUddfVisibility(String value) {
-    final meters = double.tryParse(value) ?? 0;
-    if (meters >= 30) {
-      return enums.Visibility.excellent;
-    } else if (meters >= 15) {
-      return enums.Visibility.good;
-    } else if (meters >= 5) {
-      return enums.Visibility.moderate;
-    } else if (meters > 0) {
-      return enums.Visibility.poor;
-    }
-    return enums.Visibility.unknown;
   }
 
   /// Interpolates sparse temperature data across profile points.

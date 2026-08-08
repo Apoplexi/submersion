@@ -327,6 +327,12 @@ class DiveComputerAdapter implements ImportSourceAdapter {
     DuplicateAction.replaceSource,
   };
 
+  /// A dive computer download only ever produces dives, so there is no
+  /// entity type that needs a narrower set than the adapter-wide one.
+  @override
+  Set<DuplicateAction> duplicateActionsFor(ImportEntityType type) =>
+      supportedDuplicateActions;
+
   @override
   List<WizardStepDef> get acquisitionSteps {
     if (isKnownComputer) {

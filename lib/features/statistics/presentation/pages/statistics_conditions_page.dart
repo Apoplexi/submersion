@@ -3,6 +3,7 @@ import 'package:submersion/core/providers/provider.dart';
 
 import 'package:submersion/core/accessibility/semantic_helpers.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
+import 'package:submersion/features/dive_log/presentation/formatters/visibility_display.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/features/statistics/data/repositories/statistics_repository.dart';
 import 'package:submersion/features/statistics/presentation/providers/statistics_providers.dart';
@@ -55,7 +56,22 @@ class StatisticsConditionsPage extends ConsumerWidget {
       title: context.l10n.statistics_conditions_visibility_title,
       subtitle: context.l10n.statistics_conditions_visibility_subtitle,
       child: visibilityAsync.when(
-        data: (data) {
+        data: (raw) {
+          // The repository returns stable keys; localization happens here.
+          final units = UnitFormatter(ref.watch(settingsProvider));
+          final data = raw
+              .map(
+                (d) => DistributionSegment(
+                  label: visibilityDistributionLabel(
+                    d.label,
+                    context.l10n,
+                    units,
+                  ),
+                  count: d.count,
+                  percentage: d.percentage,
+                ),
+              )
+              .toList();
           final description = data
               .map((d) => '${d.label}: ${d.percentage.toStringAsFixed(0)}%')
               .join(', ');

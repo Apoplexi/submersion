@@ -1,9 +1,12 @@
 import 'dart:math' as math;
 
+import 'package:flutter/foundation.dart';
+
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/core/deco/buhlmann_algorithm.dart';
 import 'package:submersion/core/deco/constants/buhlmann_coefficients.dart';
 import 'package:submersion/core/deco/entities/tissue_compartment.dart';
+import 'package:submersion/core/deco/o2_toxicity_calculator.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 
 // =============================================================================
@@ -28,6 +31,12 @@ final siSecondDiveDepthProvider = StateProvider<double>((ref) => 18.0);
 /// Second dive time in minutes.
 final siSecondDiveTimeProvider = StateProvider<int>((ref) => 45);
 
+/// Second dive O2 percentage (21 = air, 32 = EAN32, etc.).
+final siSecondDiveO2Provider = StateProvider<double>((ref) => 21.0);
+
+/// Second dive Helium percentage (0 for recreational, >0 for trimix).
+final siSecondDiveHeProvider = StateProvider<double>((ref) => 0.0);
+
 /// Current surface interval for chart visualization (minutes).
 final siSurfaceIntervalProvider = StateProvider<int>((ref) => 60);
 
@@ -45,6 +54,94 @@ final siFirstDiveFN2Provider = Provider<double>((ref) {
 /// Helium fraction for first dive gas.
 final siFirstDiveFHeProvider = Provider<double>((ref) {
   return ref.watch(siFirstDiveHeProvider) / 100.0;
+});
+
+/// Nitrogen fraction for second dive gas.
+final siSecondDiveFN2Provider = Provider<double>((ref) {
+  final o2 = ref.watch(siSecondDiveO2Provider);
+  final he = ref.watch(siSecondDiveHeProvider);
+  return (100 - o2 - he) / 100.0;
+});
+
+/// Helium fraction for second dive gas.
+final siSecondDiveFHeProvider = Provider<double>((ref) {
+  return ref.watch(siSecondDiveHeProvider) / 100.0;
+});
+
+// =============================================================================
+// Oxygen Exposure (ppO2 / MOD)
+// =============================================================================
+
+/// Oxygen exposure for one dive's gas at that dive's planned depth.
+@immutable
+class SiGasSafety {
+  /// The planned depth this exposure was evaluated at, in meters.
+  final double depthMeters;
+
+  /// Partial pressure of oxygen at [depthMeters], in bar.
+  final double ppO2;
+
+  /// Maximum operating depth for this mix at [limit], in meters.
+  final double modMeters;
+
+  /// The diver's configured working ppO2 ceiling, in bar.
+  final double limit;
+
+  const SiGasSafety({
+    required this.depthMeters,
+    required this.ppO2,
+    required this.modMeters,
+    required this.limit,
+  });
+
+  /// Whether the planned depth puts the diver past their ppO2 ceiling.
+  ///
+  /// The ceiling itself is allowed; only exposure above it is a violation. The
+  /// tolerance keeps a mix that lands exactly on the limit from tripping the
+  /// warning through floating point noise.
+  bool get exceedsMod => ppO2 > limit + 1e-9;
+}
+
+SiGasSafety _gasSafetyAt({
+  required double depthMeters,
+  required double o2Percent,
+  required double limit,
+}) {
+  final o2Fraction = o2Percent / 100.0;
+  return SiGasSafety(
+    depthMeters: depthMeters,
+    ppO2: O2ToxicityCalculator.calculatePpO2(depthMeters, o2Fraction),
+    modMeters: O2ToxicityCalculator.calculateMod(o2Fraction, maxPpO2: limit),
+    limit: limit,
+  );
+}
+
+/// Oxygen exposure for the first dive's gas at the first dive's depth.
+final siFirstDiveGasSafetyProvider = Provider<SiGasSafety>((ref) {
+  return _gasSafetyAt(
+    depthMeters: ref.watch(siFirstDiveDepthProvider),
+    o2Percent: ref.watch(siFirstDiveO2Provider),
+    limit: ref.watch(ppO2MaxWorkingProvider),
+  );
+});
+
+/// Oxygen exposure for the second dive's gas at the second dive's depth.
+final siSecondDiveGasSafetyProvider = Provider<SiGasSafety>((ref) {
+  return _gasSafetyAt(
+    depthMeters: ref.watch(siSecondDiveDepthProvider),
+    o2Percent: ref.watch(siSecondDiveO2Provider),
+    limit: ref.watch(ppO2MaxWorkingProvider),
+  );
+});
+
+/// Whether both planned dives stay within the diver's working ppO2 ceiling.
+///
+/// Kept separate from [siSecondDiveIsSafeProvider] so the no-deco verdict and
+/// the oxygen verdict stay independently testable and independently explainable
+/// to the diver.
+final siGasMixesAreSafeProvider = Provider<bool>((ref) {
+  return !ref.watch(siFirstDiveGasSafetyProvider).exceedsMod &&
+      !ref.watch(siSecondDiveGasSafetyProvider).exceedsMod;
 });
 
 /// Tissue compartments state after first dive completes.
@@ -86,6 +183,8 @@ final siRecoveredCompartmentsProvider = Provider<List<TissueCompartment>>((
 final siSecondDiveNdlProvider = Provider<int>((ref) {
   final recoveredCompartments = ref.watch(siRecoveredCompartmentsProvider);
   final secondDiveDepth = ref.watch(siSecondDiveDepthProvider);
+  final fN2 = ref.watch(siSecondDiveFN2Provider);
+  final fHe = ref.watch(siSecondDiveFHeProvider);
   final settings = ref.watch(settingsProvider);
 
   final algorithm = BuhlmannAlgorithm(
@@ -96,8 +195,8 @@ final siSecondDiveNdlProvider = Provider<int>((ref) {
 
   return algorithm.calculateNdl(
     depthMeters: secondDiveDepth,
-    fN2: airN2Fraction,
-    fHe: 0.0,
+    fN2: fN2,
+    fHe: fHe,
   );
 });
 
@@ -116,6 +215,8 @@ final siMinimumIntervalProvider = Provider<int>((ref) {
   final postDiveCompartments = ref.watch(siPostDiveCompartmentsProvider);
   final secondDiveDepth = ref.watch(siSecondDiveDepthProvider);
   final secondDiveTime = ref.watch(siSecondDiveTimeProvider);
+  final fN2 = ref.watch(siSecondDiveFN2Provider);
+  final fHe = ref.watch(siSecondDiveFHeProvider);
   final settings = ref.watch(settingsProvider);
 
   final requiredNdlSeconds = secondDiveTime * 60;
@@ -142,8 +243,8 @@ final siMinimumIntervalProvider = Provider<int>((ref) {
 
     final ndl = algorithm.calculateNdl(
       depthMeters: secondDiveDepth,
-      fN2: airN2Fraction,
-      fHe: 0.0,
+      fN2: fN2,
+      fHe: fHe,
     );
 
     if (ndl >= requiredNdlSeconds) {
@@ -294,6 +395,8 @@ void resetSurfaceIntervalInputs(WidgetRef ref) {
   ref.read(siFirstDiveHeProvider.notifier).state = 0.0;
   ref.read(siSecondDiveDepthProvider.notifier).state = 18.0;
   ref.read(siSecondDiveTimeProvider.notifier).state = 45;
+  ref.read(siSecondDiveO2Provider.notifier).state = 21.0;
+  ref.read(siSecondDiveHeProvider.notifier).state = 0.0;
   ref.read(siSurfaceIntervalProvider.notifier).state = 60;
 }
 

@@ -242,7 +242,9 @@ class SubsurfaceXmlParser implements ImportParser {
       if (airTemp != null) result['airTemp'] = airTemp;
     }
 
-    // Visibility enum
+    // Visibility enum. Deliberately NOT mapped to visibilityMeters: unlike
+    // UDDF, Subsurface's visibility attribute is a subjective 1-5 star rating,
+    // not a distance, so converting it would invent a measurement nobody took.
     final visibilityVal = _parseInt(dive.getAttribute('visibility'));
     final visibility = _mapVisibility(visibilityVal);
     if (visibility != null) result['visibility'] = visibility;

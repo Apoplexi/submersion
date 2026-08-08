@@ -3055,11 +3055,79 @@ class AppLocalizationsHe extends AppLocalizations {
   String get dashboard_gauges_noDivesYet => 'אין צלילות עדיין';
 
   @override
-  String get settings_homeChips_pageTitle => 'שבבי מצב של דף הבית';
+  String get settings_homeChips_pageTitle => 'מסך הבית';
 
   @override
   String get settings_homeChips_description =>
       'בחר אילו שבבי מצב יופיעו בראש לשונית הבית.';
+
+  @override
+  String get settings_homeChips_sectionTitle => 'שבבי מצב';
+
+  @override
+  String get settings_homeCards_sectionTitle => 'כרטיסי דף הבית';
+
+  @override
+  String get settings_homeCards_description =>
+      'בחר אילו כרטיסים יופיעו בלשונית הבית וגרור כדי לסדר מחדש.';
+
+  @override
+  String get settings_homeCards_autoHides => 'מוסתר אוטומטית כשהוא ריק';
+
+  @override
+  String get settings_homeCards_resetToDefault => 'איפוס לברירת המחדל';
+
+  @override
+  String get settings_homeCards_resetDialog_title => 'לאפס את פריסת דף הבית?';
+
+  @override
+  String get settings_homeCards_resetDialog_message =>
+      'משחזר את סדר הכרטיסים המוגדר כברירת מחדל ומציג את כולם מחדש.';
+
+  @override
+  String get settings_homeCards_resetDialog_cancel => 'ביטול';
+
+  @override
+  String get settings_homeCards_resetDialog_confirm => 'איפוס';
+
+  @override
+  String get settings_homeCards_card_hero => 'כותרת פתיחה';
+
+  @override
+  String get settings_homeCards_card_gaugeStrip => 'שבבי מצב';
+
+  @override
+  String get settings_homeCards_card_preDive => 'רשימת בדיקה לפני צלילה';
+
+  @override
+  String get settings_homeCards_card_recentDives => 'צלילות אחרונות';
+
+  @override
+  String get settings_homeCards_card_quickActions => 'פעולות מהירות';
+
+  @override
+  String get settings_homeCards_card_milestones => 'אבני דרך';
+
+  @override
+  String get settings_homeCards_card_photoRibbon => 'תמונות אחרונות';
+
+  @override
+  String get settings_homeCards_card_onThisDay => 'ביום זה';
+
+  @override
+  String get settings_homeCards_card_yearInReview => 'סיכום השנה';
+
+  @override
+  String get settings_homeCards_card_activeCourses => 'התקדמות בקורס';
+
+  @override
+  String get settings_homeCards_card_recentSitesMap => 'מפת אתרים אחרונים';
+
+  @override
+  String get dashboard_allHidden_message => 'כל כרטיסי דף הבית מוסתרים.';
+
+  @override
+  String get dashboard_allHidden_customize => 'התאמה אישית של דף הבית';
 
   @override
   String get settings_homeChips_flightWindow => 'חלון צלילה לפני טיסה';
@@ -9724,80 +9792,6 @@ class AppLocalizationsHe extends AppLocalizations {
   String get enum_weightType_trimWeights => 'משקולות טרים';
 
   @override
-  String get equipment_addSheet_brandHint => 'לדוגמה, Scubapro';
-
-  @override
-  String get equipment_addSheet_brandLabel => 'מותג';
-
-  @override
-  String get equipment_addSheet_closeTooltip => 'סגור';
-
-  @override
-  String get equipment_addSheet_currencyLabel => 'מטבע';
-
-  @override
-  String get equipment_addSheet_dateLabel => 'תאריך';
-
-  @override
-  String equipment_addSheet_errorSnackbar(Object error) {
-    return 'שגיאה בהוספת ציוד: $error';
-  }
-
-  @override
-  String get equipment_addSheet_modelHint => 'לדוגמה, MK25 EVO';
-
-  @override
-  String get equipment_addSheet_modelLabel => 'דגם';
-
-  @override
-  String get equipment_addSheet_nameHint => 'לדוגמה, הרגולטור הראשי שלי';
-
-  @override
-  String get equipment_addSheet_nameLabel => 'שם';
-
-  @override
-  String get equipment_addSheet_nameValidation => 'נא להזין שם';
-
-  @override
-  String get equipment_addSheet_notesHint => 'הערות נוספות...';
-
-  @override
-  String get equipment_addSheet_notesLabel => 'הערות';
-
-  @override
-  String get equipment_addSheet_priceLabel => 'מחיר';
-
-  @override
-  String get equipment_addSheet_purchaseInfoTitle => 'פרטי רכישה';
-
-  @override
-  String get equipment_addSheet_serialNumberLabel => 'מספר סידורי';
-
-  @override
-  String get equipment_addSheet_serviceIntervalHint => 'לדוגמה, 365 לשנתי';
-
-  @override
-  String get equipment_addSheet_serviceIntervalLabel => 'מרווח טיפול (ימים)';
-
-  @override
-  String get equipment_addSheet_sizeHint => 'לדוגמה, M, L, 42';
-
-  @override
-  String get equipment_addSheet_sizeLabel => 'מידה';
-
-  @override
-  String get equipment_addSheet_submitButton => 'הוסף ציוד';
-
-  @override
-  String get equipment_addSheet_successSnackbar => 'הציוד נוסף בהצלחה';
-
-  @override
-  String get equipment_addSheet_title => 'הוסף ציוד';
-
-  @override
-  String get equipment_addSheet_typeLabel => 'סוג';
-
-  @override
   String get equipment_appBar_title => 'ציוד';
 
   @override
@@ -16112,6 +16106,16 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
+  String surfaceInterval_gasWarning_modExceeded(
+    Object ppO2,
+    Object depth,
+    Object limit,
+    Object mod,
+  ) {
+    return 'ppO₂ $ppO2 בעומק $depth חורג מ-$limit. ה-MOD של תערובת זו הוא $mod.';
+  }
+
+  @override
   String surfaceInterval_heSemantics(Object percent) {
     return 'הליום: $percent%';
   }
@@ -16123,6 +16127,9 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get surfaceInterval_result_currentInterval => 'מרווח נוכחי';
+
+  @override
+  String get surfaceInterval_result_gasUnsafe => 'הגז אינו בטוח בעומק זה';
 
   @override
   String get surfaceInterval_result_inDeco => 'בדקו';
@@ -16165,7 +16172,14 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
-  String get surfaceInterval_secondDive_gasAir => '(אוויר)';
+  String surfaceInterval_secondDive_heSemantics(Object percent) {
+    return 'הליום צלילה שנייה: $percent%';
+  }
+
+  @override
+  String surfaceInterval_secondDive_o2Semantics(Object percent) {
+    return 'חמצן צלילה שנייה: $percent%';
+  }
 
   @override
   String surfaceInterval_secondDive_timeSemantics(Object time) {
@@ -17094,8 +17108,7 @@ class AppLocalizationsHe extends AppLocalizations {
   String get trips_diveScan_noMatches => 'לא נמצאו צלילות תואמות';
 
   @override
-  String get trips_diveScan_noDiver =>
-      'שייך צולל לטיול זה כדי לסרוק אחר צלילות';
+  String get trips_diveScan_noDiver => 'בחר צולל פעיל כדי לסרוק אחר צלילות';
 
   @override
   String get trips_diveScan_selectAll => 'בחר הכל';
@@ -17969,6 +17982,29 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String get universalImport_entityAction_linkExistingSubtitle =>
       'שימוש ברשומה התואמת';
+
+  @override
+  String get universalImport_entityAction_replaceBadge => 'החלפה';
+
+  @override
+  String get universalImport_entityAction_replaceExisting => 'החלף את הקיים';
+
+  @override
+  String get universalImport_entityAction_replaceExistingSubtitle =>
+      'דרוס בנתונים המיובאים';
+
+  @override
+  String get universalImport_entityAction_skip => 'דלג';
+
+  @override
+  String get universalImport_entityAction_skipSubtitle => 'בטל ייבוא זה';
+
+  @override
+  String get universalImport_entityAction_importAsNew => 'ייבוא כחדש';
+
+  @override
+  String get universalImport_entityAction_importAsNewSubtitle =>
+      'צור רשומה נפרדת';
 
   @override
   String get universalImport_pending_chooseAction => 'בחר פעולה';
@@ -22673,4 +22709,68 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String get reef_attribution_protectedSeas =>
       'גבולות אזורים ימיים מוגנים. CC BY 4.0.';
+
+  @override
+  String get enum_visibilityBand_excellent => 'מצוינת';
+
+  @override
+  String get enum_visibilityBand_good => 'טובה';
+
+  @override
+  String get enum_visibilityBand_moderate => 'בינונית';
+
+  @override
+  String get enum_visibilityBand_poor => 'ירודה';
+
+  @override
+  String visibility_range_between(String min, String max, String unit) {
+    return '$min-$max $unit';
+  }
+
+  @override
+  String visibility_range_over(String min, String unit) {
+    return 'מעל $min $unit';
+  }
+
+  @override
+  String visibility_range_under(String max, String unit) {
+    return 'מתחת ל-$max $unit';
+  }
+
+  @override
+  String get settings_visibilityScale_title => 'סולם ראות';
+
+  @override
+  String get settings_visibilityScale_subtitle =>
+      'אילו מרחקים נחשבים ראות טובה במקום שבו אתה צולל';
+
+  @override
+  String get settings_visibilityScale_preset_tropical => 'טרופי';
+
+  @override
+  String get settings_visibilityScale_preset_temperate => 'ממוזג';
+
+  @override
+  String get settings_visibilityScale_preset_coldWater => 'מים קרים / יבשתיים';
+
+  @override
+  String get settings_visibilityScale_preset_custom => 'מותאם אישית';
+
+  @override
+  String get settings_visibilityScale_customExcellent => 'מצוינת מ-';
+
+  @override
+  String get settings_visibilityScale_customGood => 'טובה מ-';
+
+  @override
+  String get settings_visibilityScale_customModerate => 'בינונית מ-';
+
+  @override
+  String get settings_visibilityScale_invalidOrder =>
+      'כל ערך חייב להיות קטן מזה שמעליו וגדול מאפס';
+
+  @override
+  String statistics_conditions_visibility_legacySuffix(String band) {
+    return '$band (נרשם לפני מדידה)';
+  }
 }

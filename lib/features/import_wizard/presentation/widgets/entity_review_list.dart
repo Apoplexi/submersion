@@ -348,6 +348,7 @@ class EntityReviewList extends StatelessWidget {
       entityMatch: entityMatch,
       selectedAction: action,
       onActionChanged: (a) => onDuplicateActionChanged(index, a),
+      availableActions: availableActions,
       isPending: pendingIndices.contains(index),
     );
   }
@@ -536,6 +537,9 @@ class _EntityDuplicateCard extends StatefulWidget {
   final DuplicateAction? selectedAction;
   final ValueChanged<DuplicateAction> onActionChanged;
 
+  /// Which action buttons the expanded comparison panel may offer.
+  final Set<DuplicateAction> availableActions;
+
   /// Whether this row still needs an explicit user decision.
   ///
   /// When true the card renders a warning-colored 1.5-px border and a
@@ -547,6 +551,7 @@ class _EntityDuplicateCard extends StatefulWidget {
     required this.entityMatch,
     required this.selectedAction,
     required this.onActionChanged,
+    required this.availableActions,
     this.isPending = false,
   });
 
@@ -567,16 +572,13 @@ class _EntityDuplicateCardState extends State<_EntityDuplicateCard> {
     // the tertiary warning colour so the border reads as "undecided" rather
     // than implying a skip. The pending branch below also uses tertiary, so
     // this fallback only matters for the rare non-pending-null case.
-    final Color borderColor;
-    if (widget.selectedAction == null) {
-      borderColor = colorScheme.tertiary;
-    } else if (isImporting) {
-      borderColor = Colors.green;
-    } else if (widget.selectedAction == DuplicateAction.consolidate) {
-      borderColor = colorScheme.primary;
-    } else {
-      borderColor = colorScheme.error;
-    }
+    final Color borderColor = switch (widget.selectedAction) {
+      null => colorScheme.tertiary,
+      DuplicateAction.importAsNew => Colors.green,
+      DuplicateAction.consolidate => colorScheme.primary,
+      DuplicateAction.replaceSource => Colors.blue.shade700,
+      DuplicateAction.skip => colorScheme.error,
+    };
 
     final BorderSide borderSide = widget.isPending
         ? BorderSide(color: colorScheme.tertiary, width: 1.5)
@@ -676,6 +678,7 @@ class _EntityDuplicateCardState extends State<_EntityDuplicateCard> {
                 entityMatch: widget.entityMatch!,
                 selectedAction: widget.selectedAction,
                 onActionChanged: widget.onActionChanged,
+                availableActions: widget.availableActions,
                 isPending: widget.isPending,
               ),
           ],
@@ -694,6 +697,10 @@ class _EntityComparisonPanel extends StatelessWidget {
   final DuplicateAction? selectedAction;
   final ValueChanged<DuplicateAction> onActionChanged;
 
+  /// Which action buttons to render. Filtered per entity type by the adapter
+  /// so a tab never offers an action whose import path would drop the row.
+  final Set<DuplicateAction> availableActions;
+
   /// Whether the enclosing row still needs an explicit user decision.
   ///
   /// When `true` AND [selectedAction] is `null`, a "Choose an action" label
@@ -704,6 +711,7 @@ class _EntityComparisonPanel extends StatelessWidget {
     required this.entityMatch,
     required this.selectedAction,
     required this.onActionChanged,
+    required this.availableActions,
     this.isPending = false,
   });
 
@@ -783,32 +791,55 @@ class _EntityComparisonPanel extends StatelessWidget {
                 spacing: 8,
                 runSpacing: 4,
                 children: [
-                  _EntityActionButton(
-                    label:
-                        context.l10n.universalImport_entityAction_linkExisting,
-                    subtitle: context
-                        .l10n
-                        .universalImport_entityAction_linkExistingSubtitle,
-                    isSelected: selectedAction == DuplicateAction.consolidate,
-                    color: colorScheme.primary,
-                    onPressed: () =>
-                        onActionChanged(DuplicateAction.consolidate),
-                  ),
-                  _EntityActionButton(
-                    label: 'Skip',
-                    subtitle: 'Discard this import',
-                    isSelected: selectedAction == DuplicateAction.skip,
-                    color: colorScheme.error,
-                    onPressed: () => onActionChanged(DuplicateAction.skip),
-                  ),
-                  _EntityActionButton(
-                    label: 'Import as New',
-                    subtitle: 'Create separate entry',
-                    isSelected: selectedAction == DuplicateAction.importAsNew,
-                    color: Colors.green.shade700,
-                    onPressed: () =>
-                        onActionChanged(DuplicateAction.importAsNew),
-                  ),
+                  if (availableActions.contains(DuplicateAction.consolidate))
+                    _EntityActionButton(
+                      label: context
+                          .l10n
+                          .universalImport_entityAction_linkExisting,
+                      subtitle: context
+                          .l10n
+                          .universalImport_entityAction_linkExistingSubtitle,
+                      isSelected: selectedAction == DuplicateAction.consolidate,
+                      color: colorScheme.primary,
+                      onPressed: () =>
+                          onActionChanged(DuplicateAction.consolidate),
+                    ),
+                  if (availableActions.contains(DuplicateAction.skip))
+                    _EntityActionButton(
+                      label: context.l10n.universalImport_entityAction_skip,
+                      subtitle: context
+                          .l10n
+                          .universalImport_entityAction_skipSubtitle,
+                      isSelected: selectedAction == DuplicateAction.skip,
+                      color: colorScheme.error,
+                      onPressed: () => onActionChanged(DuplicateAction.skip),
+                    ),
+                  if (availableActions.contains(DuplicateAction.importAsNew))
+                    _EntityActionButton(
+                      label:
+                          context.l10n.universalImport_entityAction_importAsNew,
+                      subtitle: context
+                          .l10n
+                          .universalImport_entityAction_importAsNewSubtitle,
+                      isSelected: selectedAction == DuplicateAction.importAsNew,
+                      color: Colors.green.shade700,
+                      onPressed: () =>
+                          onActionChanged(DuplicateAction.importAsNew),
+                    ),
+                  if (availableActions.contains(DuplicateAction.replaceSource))
+                    _EntityActionButton(
+                      label: context
+                          .l10n
+                          .universalImport_entityAction_replaceExisting,
+                      subtitle: context
+                          .l10n
+                          .universalImport_entityAction_replaceExistingSubtitle,
+                      isSelected:
+                          selectedAction == DuplicateAction.replaceSource,
+                      color: Colors.blue.shade700,
+                      onPressed: () =>
+                          onActionChanged(DuplicateAction.replaceSource),
+                    ),
                 ],
               ),
             ],
@@ -971,7 +1002,13 @@ class _SimpleActionBadge extends StatelessWidget {
         context.l10n.universalImport_entityAction_linkBadge,
         theme.colorScheme.primary,
       ),
-      _ => ('SKIP', theme.colorScheme.error),
+      // "REPLACE", matching the dive card's badge for the same action rather
+      // than introducing a second word ("Overwrite") for one enum value.
+      DuplicateAction.replaceSource => (
+        context.l10n.universalImport_entityAction_replaceBadge,
+        Colors.blue.shade700,
+      ),
+      DuplicateAction.skip => ('SKIP', theme.colorScheme.error),
     };
 
     return Container(
