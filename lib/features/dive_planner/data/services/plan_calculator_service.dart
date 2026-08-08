@@ -58,6 +58,25 @@ class PlanCalculatorService {
     this.cnsMethod = CnsCalculationMethod.shearwater,
   });
 
+  /// A copy that decompresses on the given gradient factors, leaving every
+  /// other threshold as the diver configured it.
+  ///
+  /// A plan carries its own gradient factors -- seeded from the diver's deco
+  /// settings, then editable per plan -- so results computed for that plan
+  /// must use them rather than whatever the settings currently say.
+  PlanCalculatorService withGradientFactors(int gfLow, int gfHigh) {
+    return PlanCalculatorService(
+      gfLow: gfLow,
+      gfHigh: gfHigh,
+      ppO2Warning: ppO2Warning,
+      ppO2Critical: ppO2Critical,
+      cnsWarningThreshold: cnsWarningThreshold,
+      defaultAscentRate: defaultAscentRate,
+      defaultDescentRate: defaultDescentRate,
+      cnsMethod: cnsMethod,
+    );
+  }
+
   /// Calculate complete plan results from segments.
   ///
   /// [segments] - The dive plan segments in order.
