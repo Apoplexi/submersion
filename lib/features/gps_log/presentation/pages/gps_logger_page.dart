@@ -13,6 +13,7 @@ import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/gps_log/data/services/gps_track_recorder.dart';
 import 'package:submersion/features/gps_log/domain/entities/gps_track.dart';
 import 'package:submersion/features/gps_log/presentation/providers/gps_log_providers.dart';
+import 'package:submersion/features/gps_log/presentation/widgets/gps_track_thumbnail.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:submersion/shared/widgets/feature_accent.dart';
@@ -198,65 +199,86 @@ class _GpsLoggerPageState extends ConsumerState<GpsLoggerPage> {
           title: l10n.tools_gpsLogger_title,
         ),
       ),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
-          if (_canRecord) ...[
-            _RecordCard(
-              state: state,
-              formatAge: _formatAge,
-              onStart: _startLogging,
-              onStop: () => ref.read(gpsTrackRecorderProvider).stop(),
-            ),
-            const SizedBox(height: 16),
-          ],
-          OutlinedButton.icon(
-            icon: const Icon(Icons.add_location_alt_outlined),
-            label: Text(l10n.gpsLogger_matchButton),
-            onPressed: _matchNow,
-          ),
-          const SizedBox(height: 24),
-          Text(l10n.gpsLogger_tracksHeader, style: theme.textTheme.titleMedium),
-          const SizedBox(height: 8),
-          if (tracks.isEmpty)
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 24),
-              child: Center(
-                child: Text(
-                  l10n.gpsLogger_noTracks,
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant,
+      // CustomScrollView rather than ListView: each row now carries a live
+      // FlutterMap thumbnail, and a non-builder list would instantiate one
+      // per track in the database on first paint.
+      body: CustomScrollView(
+        slivers: [
+          SliverPadding(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+            sliver: SliverList.list(
+              children: [
+                if (_canRecord) ...[
+                  _RecordCard(
+                    state: state,
+                    formatAge: _formatAge,
+                    onStart: _startLogging,
+                    onStop: () => ref.read(gpsTrackRecorderProvider).stop(),
                   ),
+                  const SizedBox(height: 16),
+                ],
+                OutlinedButton.icon(
+                  icon: const Icon(Icons.add_location_alt_outlined),
+                  label: Text(l10n.gpsLogger_matchButton),
+                  onPressed: _matchNow,
                 ),
-              ),
-            )
-          else
-            for (final track in tracks)
-              ListTile(
-                onTap: () => context.push('/gps-log/${track.id}'),
-                leading: const Icon(Icons.route_outlined),
-                // Track times are wall-clock-as-UTC: format the UTC
-                // components directly, never convert to device-local.
-                title: Text(
-                  DateFormat.yMMMd().add_jm().format(
-                    DateTime.fromMillisecondsSinceEpoch(
-                      track.startTime,
-                      isUtc: true,
+                const SizedBox(height: 24),
+                Text(
+                  l10n.gpsLogger_tracksHeader,
+                  style: theme.textTheme.titleMedium,
+                ),
+                const SizedBox(height: 8),
+                if (tracks.isEmpty)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 24),
+                    child: Center(
+                      child: Text(
+                        l10n.gpsLogger_noTracks,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
+                      ),
                     ),
                   ),
-                ),
-                subtitle: Text(
-                  l10n.gpsLogger_trackSubtitle(
-                    track.pointCount,
-                    _formatTrackDuration(track),
+              ],
+            ),
+          ),
+          SliverPadding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+            sliver: SliverList.builder(
+              itemCount: tracks.length,
+              itemBuilder: (context, index) {
+                final track = tracks[index];
+                return ListTile(
+                  onTap: () => context.push('/gps-log/${track.id}'),
+                  contentPadding: EdgeInsets.zero,
+                  minLeadingWidth: kTrackThumbnailWidth,
+                  leading: GpsTrackThumbnail(trackId: track.id),
+                  // Track times are wall-clock-as-UTC: format the UTC
+                  // components directly, never convert to device-local.
+                  title: Text(
+                    DateFormat.yMMMd().add_jm().format(
+                      DateTime.fromMillisecondsSinceEpoch(
+                        track.startTime,
+                        isUtc: true,
+                      ),
+                    ),
                   ),
-                ),
-                trailing: IconButton(
-                  icon: const Icon(Icons.delete_outline),
-                  tooltip: l10n.common_action_delete,
-                  onPressed: () => _deleteTrack(track),
-                ),
-              ),
+                  subtitle: Text(
+                    l10n.gpsLogger_trackSubtitle(
+                      track.pointCount,
+                      _formatTrackDuration(track),
+                    ),
+                  ),
+                  trailing: IconButton(
+                    icon: const Icon(Icons.delete_outline),
+                    tooltip: l10n.common_action_delete,
+                    onPressed: () => _deleteTrack(track),
+                  ),
+                );
+              },
+            ),
+          ),
         ],
       ),
     );

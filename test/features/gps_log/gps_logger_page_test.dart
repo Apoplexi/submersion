@@ -14,6 +14,7 @@ import 'package:submersion/features/gps_log/data/services/gps_track_recorder.dar
 import 'package:submersion/features/gps_log/domain/entities/gps_track.dart';
 import 'package:submersion/features/gps_log/presentation/pages/gps_logger_page.dart';
 import 'package:submersion/features/gps_log/presentation/providers/gps_log_providers.dart';
+import 'package:submersion/features/gps_log/presentation/widgets/gps_track_thumbnail.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
 
@@ -123,6 +124,15 @@ void main() {
         GoRoute(
           path: '/gps-log',
           builder: (context, state) => const GpsLoggerPage(),
+          routes: [
+            // Stub stand-in for the real detail page: this harness only needs
+            // to prove the row pushes the right location.
+            GoRoute(
+              path: ':id',
+              builder: (context, state) =>
+                  const Scaffold(body: Text('TRACK-DETAIL-PAGE')),
+            ),
+          ],
         ),
         GoRoute(
           path: '/dives/match-sites',
@@ -251,10 +261,24 @@ void main() {
     await tester.pumpWidget(await app());
     await tester.pumpAndSettle();
     expect(find.text('No GPS tracks recorded yet'), findsNothing);
-    expect(find.byIcon(Icons.route_outlined), findsOneWidget);
+    // The leading affordance is now a map preview, not a route glyph.
+    expect(find.byType(GpsTrackThumbnail), findsOneWidget);
     // 1 point, 90 minutes, compact app-wide duration style.
     expect(find.text('1 point, 1h 30m'), findsOneWidget);
     expect(find.byIcon(Icons.delete_outline), findsOneWidget);
+  });
+
+  testWidgets('tapping a track row navigates to its detail route', (
+    tester,
+  ) async {
+    await seedCompletedTrack();
+
+    await tester.pumpWidget(await app());
+    await tester.pumpAndSettle();
+    await tester.tap(find.byType(ListTile));
+    await tester.pumpAndSettle();
+
+    expect(find.text('TRACK-DETAIL-PAGE'), findsOneWidget);
   });
 
   testWidgets('match action reports positioned dives and links to review', (
@@ -403,6 +427,6 @@ void main() {
       findsOneWidget,
     );
     // The recovered track now renders as a completed tile.
-    expect(find.byIcon(Icons.route_outlined), findsOneWidget);
+    expect(find.byType(GpsTrackThumbnail), findsOneWidget);
   });
 }
