@@ -5644,30 +5644,6 @@
   "enum_weightType_integrated": "Integrated Weights",
   "enum_weightType_mixed": "Mixed/Combined",
   "enum_weightType_trimWeights": "Trim Weights",
-  "equipment_addSheet_brandHint": "e.g., Scubapro",
-  "equipment_addSheet_brandLabel": "Brand",
-  "equipment_addSheet_closeTooltip": "Close",
-  "equipment_addSheet_currencyLabel": "Currency",
-  "equipment_addSheet_dateLabel": "Date",
-  "equipment_addSheet_errorSnackbar": "Error adding equipment: {error}",
-  "equipment_addSheet_modelHint": "e.g., MK25 EVO",
-  "equipment_addSheet_modelLabel": "Model",
-  "equipment_addSheet_nameHint": "e.g., My Primary Regulator",
-  "equipment_addSheet_nameLabel": "Name",
-  "equipment_addSheet_nameValidation": "Please enter a name",
-  "equipment_addSheet_notesHint": "Additional notes...",
-  "equipment_addSheet_notesLabel": "Notes",
-  "equipment_addSheet_priceLabel": "Price",
-  "equipment_addSheet_purchaseInfoTitle": "Purchase Information",
-  "equipment_addSheet_serialNumberLabel": "Serial Number",
-  "equipment_addSheet_serviceIntervalHint": "e.g., 365 for yearly",
-  "equipment_addSheet_serviceIntervalLabel": "Service Interval (days)",
-  "equipment_addSheet_sizeHint": "e.g., M, L, 42",
-  "equipment_addSheet_sizeLabel": "Size",
-  "equipment_addSheet_submitButton": "Add Equipment",
-  "equipment_addSheet_successSnackbar": "Equipment added successfully",
-  "equipment_addSheet_title": "Add Equipment",
-  "equipment_addSheet_typeLabel": "Type",
   "equipment_appBar_title": "Equipment",
   "equipment_deleteDialog_cancel": "Cancel",
   "equipment_deleteDialog_confirm": "Delete",
@@ -6128,13 +6104,6 @@
   "equipment_summary_totalValue": "Total Value",
   "equipment_tab_equipment": "Equipment",
   "equipment_tab_sets": "Sets",
-  "@equipment_addSheet_errorSnackbar": {
-    "placeholders": {
-      "error": {
-        "type": "Object"
-      }
-    }
-  },
   "@equipment_detail_daysOverdue": {
     "placeholders": {
       "days": {
