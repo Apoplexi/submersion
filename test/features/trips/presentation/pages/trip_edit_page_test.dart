@@ -695,6 +695,59 @@ void main() {
         expect(dialog.initialDate, DateTime(2023, 1, 15));
       },
     );
+
+    testWidgets(
+      'end date picker keeps opening at an explicitly picked end date',
+      (tester) async {
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              tripRepositoryProvider.overrideWithValue(_MockTripRepository()),
+              tripListNotifierProvider.overrideWith((ref) {
+                return _MockTripListNotifier([]);
+              }),
+            ],
+            child: const MaterialApp(
+              locale: Locale('en'),
+              localizationsDelegates: AppLocalizations.localizationsDelegates,
+              supportedLocales: AppLocalizations.supportedLocales,
+              home: TripEditPage(),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        // Explicitly pick an end date. _startDate defaults to today for a
+        // new trip and bounds the end picker's firstDate, so the target
+        // must stay safely in the future regardless of when this runs.
+        final target = DateTime(DateTime.now().year + 2, 3, 10);
+        await tester.tap(find.text('End Date'));
+        await tester.pumpAndSettle();
+        await tester.tap(find.byIcon(Icons.edit_outlined));
+        await tester.pumpAndSettle();
+        final month = target.month.toString().padLeft(2, '0');
+        final day = target.day.toString().padLeft(2, '0');
+        await tester.enterText(
+          find.descendant(
+            of: find.byType(DatePickerDialog),
+            matching: find.byType(TextField),
+          ),
+          '$month/$day/${target.year}',
+        );
+        await tester.tap(find.text('OK'));
+        await tester.pumpAndSettle();
+
+        // Reopening the end-date picker must keep showing the diver's own
+        // choice, not fall back to _startDate now that it's been touched.
+        await tester.tap(find.text('End Date'));
+        await tester.pumpAndSettle();
+
+        final dialog = tester.widget<DatePickerDialog>(
+          find.byType(DatePickerDialog),
+        );
+        expect(dialog.initialDate, target);
+      },
+    );
   });
 
   group('TripEditPage - save flow', () {

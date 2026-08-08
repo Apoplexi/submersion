@@ -55,10 +55,12 @@ class _TripEditPageState extends ConsumerState<TripEditPage> {
   DateTime _startDate = DateTime.now();
   DateTime? _returnFlightAt;
   DateTime _endDate = DateTime.now().add(const Duration(days: 7));
-  // False until the diver deliberately sets an end date (picked here, or
-  // loaded from an existing trip) -- while false, _endDate is just the
-  // placeholder default, so the end-date picker should open at _startDate
-  // instead of dragging the diver back through the calendar to it.
+  // Controls where the end-date picker opens, not whether _endDate still
+  // holds the placeholder value -- _endDate can also get auto-synced to
+  // _startDate (below) while this stays false. False until the diver
+  // deliberately sets an end date (picked here, or loaded from an existing
+  // trip); while false, the picker opens at _startDate instead of dragging
+  // the diver back through the calendar to it.
   bool _endDateTouched = false;
   bool _isLoading = false;
   bool _isSaving = false;
