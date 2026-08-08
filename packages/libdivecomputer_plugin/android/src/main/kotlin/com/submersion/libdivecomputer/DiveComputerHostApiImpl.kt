@@ -386,13 +386,23 @@ class DiveComputerHostApiImpl(
         // Devices using encrypted BLE services (e.g. Aqualung i300C on
         // the Pelagic service) need an established bond. createBond()
         // works here because we have an active GATT connection.
-        if (!bleStream.ensureBonded()) {
-            reportError("bond_failed", "Failed to pair with device")
-            bleStream.close()
-            LibdcWrapper.nativeDownloadSessionFree(sessionPtr)
-            downloadSessionPtr = 0
-            activeBleStream = null
-            return
+        // Shearwater devices are exempt: their protocol needs no bond,
+        // and holding one blocks Shearwater Cloud until the user unpairs
+        // (issue #910) -- see BondPolicy.
+        if (BondPolicy.requiresProactiveBond(device.vendor)) {
+            if (!bleStream.ensureBonded()) {
+                reportError("bond_failed", "Failed to pair with device")
+                bleStream.close()
+                LibdcWrapper.nativeDownloadSessionFree(sessionPtr)
+                downloadSessionPtr = 0
+                activeBleStream = null
+                return
+            }
+        } else {
+            NativeLogger.d(
+                TAG, "BLE",
+                "Skipping proactive bond for ${device.vendor} (BondPolicy)"
+            )
         }
 
         val downloadCallback = makeDownloadCallback()
