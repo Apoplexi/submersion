@@ -12569,6 +12569,13 @@
     }
   },
   "gpsLogger_tracksHeader": "Recorded tracks",
+  "gpsTrack_action_trim": "Trim...",
+  "gpsTrack_action_split": "Split...",
+  "gpsTrack_action_resetTrim": "Reset trim",
+  "gpsTrack_edit_applyTrim": "Apply trim",
+  "gpsTrack_edit_confirmSplit": "Split here",
+  "gpsTrack_edit_splitWarning": "Splitting creates two tracks and removes the original. This cannot be undone.",
+  "gpsTrack_edit_cancel": "Cancel",
   "gpsTrack_import_action": "Import track...",
   "gpsTrack_import_reviewTitle": "Review Import",
   "gpsTrack_import_timezone": "Recorded in",

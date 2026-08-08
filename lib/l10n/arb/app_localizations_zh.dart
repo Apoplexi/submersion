@@ -19023,6 +19023,27 @@ class AppLocalizationsZh extends AppLocalizations {
   String get gpsLogger_tracksHeader => '已记录的轨迹';
 
   @override
+  String get gpsTrack_action_trim => '裁剪...';
+
+  @override
+  String get gpsTrack_action_split => '拆分...';
+
+  @override
+  String get gpsTrack_action_resetTrim => '重置裁剪';
+
+  @override
+  String get gpsTrack_edit_applyTrim => '应用裁剪';
+
+  @override
+  String get gpsTrack_edit_confirmSplit => '在此拆分';
+
+  @override
+  String get gpsTrack_edit_splitWarning => '拆分会创建两条轨迹并删除原轨迹，此操作无法撤销。';
+
+  @override
+  String get gpsTrack_edit_cancel => '取消';
+
+  @override
   String get gpsTrack_import_action => '导入轨迹...';
 
   @override

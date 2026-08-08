@@ -19988,6 +19988,28 @@ class AppLocalizationsHu extends AppLocalizations {
   String get gpsLogger_tracksHeader => 'Rögzített útvonalak';
 
   @override
+  String get gpsTrack_action_trim => 'Vágás...';
+
+  @override
+  String get gpsTrack_action_split => 'Felosztás...';
+
+  @override
+  String get gpsTrack_action_resetTrim => 'Vágás visszaállítása';
+
+  @override
+  String get gpsTrack_edit_applyTrim => 'Vágás alkalmazása';
+
+  @override
+  String get gpsTrack_edit_confirmSplit => 'Felosztás itt';
+
+  @override
+  String get gpsTrack_edit_splitWarning =>
+      'A felosztás két nyomvonalat hoz létre és törli az eredetit. Ezt nem lehet visszavonni.';
+
+  @override
+  String get gpsTrack_edit_cancel => 'Mégse';
+
+  @override
   String get gpsTrack_import_action => 'Nyomvonal importálása...';
 
   @override

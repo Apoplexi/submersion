@@ -33401,6 +33401,48 @@ abstract class AppLocalizations {
   /// **'Recorded tracks'**
   String get gpsLogger_tracksHeader;
 
+  /// No description provided for @gpsTrack_action_trim.
+  ///
+  /// In en, this message translates to:
+  /// **'Trim...'**
+  String get gpsTrack_action_trim;
+
+  /// No description provided for @gpsTrack_action_split.
+  ///
+  /// In en, this message translates to:
+  /// **'Split...'**
+  String get gpsTrack_action_split;
+
+  /// No description provided for @gpsTrack_action_resetTrim.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset trim'**
+  String get gpsTrack_action_resetTrim;
+
+  /// No description provided for @gpsTrack_edit_applyTrim.
+  ///
+  /// In en, this message translates to:
+  /// **'Apply trim'**
+  String get gpsTrack_edit_applyTrim;
+
+  /// No description provided for @gpsTrack_edit_confirmSplit.
+  ///
+  /// In en, this message translates to:
+  /// **'Split here'**
+  String get gpsTrack_edit_confirmSplit;
+
+  /// No description provided for @gpsTrack_edit_splitWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'Splitting creates two tracks and removes the original. This cannot be undone.'**
+  String get gpsTrack_edit_splitWarning;
+
+  /// No description provided for @gpsTrack_edit_cancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get gpsTrack_edit_cancel;
+
   /// No description provided for @gpsTrack_import_action.
   ///
   /// In en, this message translates to:

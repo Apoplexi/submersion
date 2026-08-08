@@ -20068,6 +20068,28 @@ class AppLocalizationsEs extends AppLocalizations {
   String get gpsLogger_tracksHeader => 'Tracks grabados';
 
   @override
+  String get gpsTrack_action_trim => 'Recortar...';
+
+  @override
+  String get gpsTrack_action_split => 'Dividir...';
+
+  @override
+  String get gpsTrack_action_resetTrim => 'Quitar recorte';
+
+  @override
+  String get gpsTrack_edit_applyTrim => 'Aplicar recorte';
+
+  @override
+  String get gpsTrack_edit_confirmSplit => 'Dividir aquí';
+
+  @override
+  String get gpsTrack_edit_splitWarning =>
+      'Al dividir se crean dos tracks y se elimina el original. Esto no se puede deshacer.';
+
+  @override
+  String get gpsTrack_edit_cancel => 'Cancelar';
+
+  @override
   String get gpsTrack_import_action => 'Importar track...';
 
   @override

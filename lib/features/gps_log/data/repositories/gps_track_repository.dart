@@ -1,4 +1,5 @@
 import 'package:drift/drift.dart';
+import 'package:flutter/foundation.dart' show visibleForTesting;
 import 'package:uuid/uuid.dart';
 
 import 'package:submersion/core/data/repositories/sync_repository.dart';
@@ -100,6 +101,106 @@ class GpsTrackRepository {
       );
       rethrow;
     }
+  }
+
+  /// Test-only hook recording write operations in order.
+  ///
+  /// Exists so [splitTrack]'s ordering guarantee can be asserted directly:
+  /// the final state looks identical whichever order the writes happened in,
+  /// and the ordering is the entire safety property.
+  @visibleForTesting
+  void Function(String)? debugOnWrite;
+
+  /// Sets non-destructive trim bounds. The points blob is untouched.
+  ///
+  /// Passing null for a bound leaves that end open; [clearTrim] removes both.
+  /// Because the blob is never rewritten, trimming is free, fully reversible,
+  /// a tiny sync payload, and incapable of losing a fix.
+  Future<void> setTrimBounds(String id, {int? startMs, int? endMs}) async {
+    try {
+      await (_db.update(_db.gpsTracks)..where((t) => t.id.equals(id))).write(
+        GpsTracksCompanion(
+          trimStartTime: Value(startMs),
+          trimEndTime: Value(endMs),
+          updatedAt: Value(DateTime.now().millisecondsSinceEpoch),
+        ),
+      );
+      SyncEventBus.notifyLocalChange();
+    } catch (e, stackTrace) {
+      _log.error(
+        'Failed to set trim bounds on GPS track $id',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      rethrow;
+    }
+  }
+
+  /// Removes both trim bounds, restoring the full recording.
+  Future<void> clearTrim(String id) => setTrimBounds(id);
+
+  /// Splits [id] into two tracks at [atWallClockMs].
+  ///
+  /// The fix at the split point goes to the FIRST child. Returns the two new
+  /// ids.
+  ///
+  /// ORDERING IS THE SAFETY PROPERTY: both children are written BEFORE the
+  /// parent is tombstoned. A crash between those steps leaves two children
+  /// and the parent - duplicates the user can delete. The reverse order
+  /// would leave nothing.
+  Future<(String, String)> splitTrack(String id, int atWallClockMs) async {
+    final track = await getTrack(id, includePoints: true);
+    if (track == null) {
+      throw ArgumentError.value(id, 'id', 'No such track');
+    }
+
+    final atSeconds = atWallClockMs ~/ 1000;
+    final points = track.effectivePoints;
+    final first = [
+      for (final p in points)
+        if (p.timestamp <= atSeconds) p,
+    ];
+    final second = [
+      for (final p in points)
+        if (p.timestamp > atSeconds) p,
+    ];
+
+    if (first.isEmpty || second.isEmpty) {
+      throw ArgumentError.value(
+        atWallClockMs,
+        'atWallClockMs',
+        'Split point must leave fixes on both sides',
+      );
+    }
+
+    final baseName = track.name;
+    final firstId = await insertImportedTrack(
+      points: first,
+      startTimeMs: first.first.timestamp * 1000,
+      endTimeMs: first.last.timestamp * 1000,
+      tzOffsetMinutes: track.tzOffsetMinutes,
+      source: track.source,
+      sourceRef: track.sourceRef,
+      name: baseName == null ? null : '$baseName (1)',
+    );
+    debugOnWrite?.call('insert:$firstId');
+
+    final secondId = await insertImportedTrack(
+      points: second,
+      startTimeMs: second.first.timestamp * 1000,
+      endTimeMs: second.last.timestamp * 1000,
+      tzOffsetMinutes: track.tzOffsetMinutes,
+      source: track.source,
+      sourceRef: track.sourceRef,
+      name: baseName == null ? null : '$baseName (2)',
+    );
+    debugOnWrite?.call('insert:$secondId');
+
+    // Only now that both children are durable.
+    await deleteTrack(id);
+    debugOnWrite?.call('delete:$id');
+
+    return (firstId, secondId);
   }
 
   Future<void> appendBufferPoint(

@@ -19689,6 +19689,28 @@ class AppLocalizationsAr extends AppLocalizations {
   String get gpsLogger_tracksHeader => 'المسارات المسجّلة';
 
   @override
+  String get gpsTrack_action_trim => 'اقتصاص...';
+
+  @override
+  String get gpsTrack_action_split => 'تقسيم...';
+
+  @override
+  String get gpsTrack_action_resetTrim => 'إلغاء الاقتصاص';
+
+  @override
+  String get gpsTrack_edit_applyTrim => 'تطبيق الاقتصاص';
+
+  @override
+  String get gpsTrack_edit_confirmSplit => 'قسّم هنا';
+
+  @override
+  String get gpsTrack_edit_splitWarning =>
+      'ينشئ التقسيم مسارين ويحذف الأصل. لا يمكن التراجع عن ذلك.';
+
+  @override
+  String get gpsTrack_edit_cancel => 'إلغاء';
+
+  @override
   String get gpsTrack_import_action => 'استيراد مسار...';
 
   @override

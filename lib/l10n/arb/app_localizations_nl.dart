@@ -19885,6 +19885,28 @@ class AppLocalizationsNl extends AppLocalizations {
   String get gpsLogger_tracksHeader => 'Opgenomen tracks';
 
   @override
+  String get gpsTrack_action_trim => 'Bijsnijden...';
+
+  @override
+  String get gpsTrack_action_split => 'Splitsen...';
+
+  @override
+  String get gpsTrack_action_resetTrim => 'Bijsnijden ongedaan maken';
+
+  @override
+  String get gpsTrack_edit_applyTrim => 'Bijsnijden toepassen';
+
+  @override
+  String get gpsTrack_edit_confirmSplit => 'Hier splitsen';
+
+  @override
+  String get gpsTrack_edit_splitWarning =>
+      'Splitsen maakt twee tracks en verwijdert het origineel. Dit kan niet ongedaan worden gemaakt.';
+
+  @override
+  String get gpsTrack_edit_cancel => 'Annuleren';
+
+  @override
   String get gpsTrack_import_action => 'Track importeren...';
 
   @override

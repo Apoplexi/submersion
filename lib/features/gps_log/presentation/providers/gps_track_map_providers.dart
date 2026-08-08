@@ -140,6 +140,32 @@ final filteredTracksProvider = FutureProvider<List<GpsTrack>>((ref) async {
   ];
 });
 
+/// Trims a track and drops its cached geometry.
+///
+/// Cache invalidation lives here rather than in the repository so the data
+/// layer stays unaware of the presentation cache.
+final trimTrackProvider = Provider(
+  (ref) => (String id, {int? startMs, int? endMs}) async {
+    await ref
+        .read(gpsTrackRepositoryProvider)
+        .setTrimBounds(id, startMs: startMs, endMs: endMs);
+    await ref.read(trackGeometryCacheRepositoryProvider).invalidate(id);
+    ref.invalidate(gpsTrackDetailProvider(id));
+  },
+);
+
+/// Splits a track and drops the parent's cached geometry.
+final splitTrackProvider = Provider(
+  (ref) => (String id, int atWallClockMs) async {
+    final result = await ref
+        .read(gpsTrackRepositoryProvider)
+        .splitTrack(id, atWallClockMs);
+    await ref.read(trackGeometryCacheRepositoryProvider).invalidate(id);
+    ref.invalidate(gpsTracksProvider);
+    return result;
+  },
+);
+
 final trackImportServiceProvider = Provider<TrackImportService>(
   (ref) => TrackImportService(),
 );

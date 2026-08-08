@@ -14,6 +14,7 @@ import 'package:submersion/features/gps_log/presentation/widgets/gps_track_polyl
 import 'package:submersion/features/gps_log/presentation/widgets/track_color_legend.dart';
 import 'package:submersion/features/gps_log/presentation/widgets/track_point_info_card.dart';
 import 'package:submersion/features/gps_log/presentation/widgets/track_stats_header.dart';
+import 'package:submersion/features/gps_log/presentation/widgets/track_timeline_scrubber.dart';
 import 'package:submersion/features/maps/presentation/widgets/map_attribution.dart';
 import 'package:submersion/features/maps/presentation/widgets/map_compass_button.dart';
 import 'package:submersion/features/maps/presentation/widgets/submersion_tile_layer.dart';
@@ -30,14 +31,149 @@ class GpsTrackDetailPage extends ConsumerStatefulWidget {
   ConsumerState<GpsTrackDetailPage> createState() => _GpsTrackDetailPageState();
 }
 
-/// Which export the overflow menu triggered.
-enum _ExportAction { shareGpx, saveGpx, shareKml, saveKml }
+/// Which overflow-menu entry was chosen.
+enum _TrackAction {
+  shareGpx,
+  saveGpx,
+  shareKml,
+  saveKml,
+  trim,
+  split,
+  resetTrim,
+}
+
+/// Which editing affordance the detail page is showing.
+enum TrackEditMode { none, trim, split }
+
+/// Active editing mode on the track detail page.
+final trackEditModeProvider = StateProvider<TrackEditMode>(
+  (ref) => TrackEditMode.none,
+);
 
 class _GpsTrackDetailPageState extends ConsumerState<GpsTrackDetailPage> {
   final MapController _mapController = MapController();
   final _log = LoggerService.forClass(GpsTrackDetailPage);
 
-  Future<void> _export(_ExportAction action, GpsTrack track) async {
+  /// Live scrubber values, applied only when the user confirms.
+  int? _pendingStartMs;
+  int? _pendingEndMs;
+
+  Future<void> _onMenu(_TrackAction action, GpsTrack track) async {
+    switch (action) {
+      case _TrackAction.trim:
+        _pendingStartMs = null;
+        _pendingEndMs = null;
+        ref.read(trackEditModeProvider.notifier).state = TrackEditMode.trim;
+      case _TrackAction.split:
+        _pendingStartMs = null;
+        ref.read(trackEditModeProvider.notifier).state = TrackEditMode.split;
+      case _TrackAction.resetTrim:
+        await ref.read(trimTrackProvider)(track.id);
+      default:
+        await _export(action, track);
+    }
+  }
+
+  Future<void> _applyTrim(GpsTrack track) async {
+    await ref.read(trimTrackProvider)(
+      track.id,
+      startMs: _pendingStartMs,
+      endMs: _pendingEndMs,
+    );
+    if (!mounted) return;
+    ref.read(trackEditModeProvider.notifier).state = TrackEditMode.none;
+  }
+
+  Future<void> _applySplit(GpsTrack track) async {
+    final at = _pendingStartMs;
+    if (at == null) return;
+    final messenger = ScaffoldMessenger.of(context);
+    try {
+      await ref.read(splitTrackProvider)(track.id, at);
+      if (!mounted) return;
+      ref.read(trackEditModeProvider.notifier).state = TrackEditMode.none;
+      Navigator.of(context).pop();
+    } on ArgumentError catch (e) {
+      if (!mounted) return;
+      messenger.showSnackBar(SnackBar(content: Text('${e.message}')));
+    }
+  }
+
+  /// Trim or split controls, shown only while the corresponding mode is on.
+  Widget _buildEditPanel(
+    BuildContext context,
+    GpsTrack track,
+    List<GpsTrackPoint> points,
+  ) {
+    final mode = ref.watch(trackEditModeProvider);
+    if (mode == TrackEditMode.none) return const SizedBox.shrink();
+
+    final l10n = context.l10n;
+    final theme = Theme.of(context);
+    final startMs = points.first.timestamp * 1000;
+    final endMs = points.last.timestamp * 1000;
+    final isSplit = mode == TrackEditMode.split;
+
+    return Card(
+      key: const ValueKey('gps-track-edit-panel'),
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            TrackTimelineScrubber(
+              startMs: startMs,
+              endMs: endMs,
+              mode: isSplit
+                  ? TrackScrubberMode.single
+                  : TrackScrubberMode.range,
+              onChanged: (s, e) {
+                _pendingStartMs = s;
+                _pendingEndMs = isSplit ? null : e;
+              },
+            ),
+            if (isSplit) ...[
+              const SizedBox(height: 4),
+              // Trim is reversible and split is not, so only split warns.
+              Text(
+                l10n.gpsTrack_edit_splitWarning,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.error,
+                ),
+              ),
+            ],
+            const SizedBox(height: 8),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                TextButton(
+                  key: const ValueKey('gps-track-edit-cancel'),
+                  onPressed: () =>
+                      ref.read(trackEditModeProvider.notifier).state =
+                          TrackEditMode.none,
+                  child: Text(l10n.gpsTrack_edit_cancel),
+                ),
+                const SizedBox(width: 8),
+                FilledButton(
+                  key: const ValueKey('gps-track-edit-apply'),
+                  onPressed: () =>
+                      isSplit ? _applySplit(track) : _applyTrim(track),
+                  child: Text(
+                    isSplit
+                        ? l10n.gpsTrack_edit_confirmSplit
+                        : l10n.gpsTrack_edit_applyTrim,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _export(_TrackAction action, GpsTrack track) async {
     final l10n = context.l10n;
     final messenger = ScaffoldMessenger.of(context);
     final gpx = ref.read(gpxExportServiceProvider);
@@ -45,10 +181,11 @@ class _GpsTrackDetailPageState extends ConsumerState<GpsTrackDetailPage> {
 
     try {
       final String? path = switch (action) {
-        _ExportAction.shareGpx => await gpx.shareTrack(track),
-        _ExportAction.saveGpx => await gpx.saveTrackToFile(track),
-        _ExportAction.shareKml => await kml.shareTrackKml(track),
-        _ExportAction.saveKml => await kml.saveTrackKmlToFile(track),
+        _TrackAction.shareGpx => await gpx.shareTrack(track),
+        _TrackAction.saveGpx => await gpx.saveTrackToFile(track),
+        _TrackAction.shareKml => await kml.shareTrackKml(track),
+        _TrackAction.saveKml => await kml.saveTrackKmlToFile(track),
+        _ => null,
       };
       if (!mounted) return;
       // A null path means the user cancelled the picker. That is not a
@@ -80,27 +217,42 @@ class _GpsTrackDetailPageState extends ConsumerState<GpsTrackDetailPage> {
         title: Text(l10n.gpsTrack_detail_title),
         actions: [
           if (track != null)
-            PopupMenuButton<_ExportAction>(
+            PopupMenuButton<_TrackAction>(
               key: const ValueKey('gps-track-overflow'),
               tooltip: l10n.gpsTrack_action_export,
-              onSelected: (action) => _export(action, track),
+              onSelected: (action) => _onMenu(action, track),
               itemBuilder: (context) => [
                 PopupMenuItem(
-                  value: _ExportAction.shareGpx,
+                  value: _TrackAction.shareGpx,
                   child: Text(l10n.gpsTrack_action_shareGpx),
                 ),
                 PopupMenuItem(
-                  value: _ExportAction.saveGpx,
+                  value: _TrackAction.saveGpx,
                   child: Text(l10n.gpsTrack_action_saveGpx),
                 ),
                 PopupMenuItem(
-                  value: _ExportAction.shareKml,
+                  value: _TrackAction.shareKml,
                   child: Text(l10n.gpsTrack_action_shareKml),
                 ),
                 PopupMenuItem(
-                  value: _ExportAction.saveKml,
+                  value: _TrackAction.saveKml,
                   child: Text(l10n.gpsTrack_action_saveKml),
                 ),
+                const PopupMenuDivider(),
+                PopupMenuItem(
+                  value: _TrackAction.trim,
+                  child: Text(l10n.gpsTrack_action_trim),
+                ),
+                PopupMenuItem(
+                  value: _TrackAction.split,
+                  child: Text(l10n.gpsTrack_action_split),
+                ),
+                // Only offered when there is a trim to undo.
+                if (track.trimStartTime != null || track.trimEndTime != null)
+                  PopupMenuItem(
+                    value: _TrackAction.resetTrim,
+                    child: Text(l10n.gpsTrack_action_resetTrim),
+                  ),
               ],
             ),
         ],
@@ -159,6 +311,7 @@ class _GpsTrackDetailPageState extends ConsumerState<GpsTrackDetailPage> {
                         ?.length ??
                     0,
               ),
+              _buildEditPanel(context, track, points),
               Expanded(
                 child: _TrackMap(
                   trackId: widget.trackId,

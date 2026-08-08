@@ -19545,6 +19545,28 @@ class AppLocalizationsHe extends AppLocalizations {
   String get gpsLogger_tracksHeader => 'מסלולים שהוקלטו';
 
   @override
+  String get gpsTrack_action_trim => 'חיתוך...';
+
+  @override
+  String get gpsTrack_action_split => 'פיצול...';
+
+  @override
+  String get gpsTrack_action_resetTrim => 'איפוס החיתוך';
+
+  @override
+  String get gpsTrack_edit_applyTrim => 'החל חיתוך';
+
+  @override
+  String get gpsTrack_edit_confirmSplit => 'פצל כאן';
+
+  @override
+  String get gpsTrack_edit_splitWarning =>
+      'פיצול יוצר שני מסלולים ומוחק את המקורי. לא ניתן לבטל פעולה זו.';
+
+  @override
+  String get gpsTrack_edit_cancel => 'ביטול';
+
+  @override
   String get gpsTrack_import_action => 'ייבוא מסלול...';
 
   @override

@@ -20124,6 +20124,28 @@ class AppLocalizationsFr extends AppLocalizations {
   String get gpsLogger_tracksHeader => 'Traces enregistrées';
 
   @override
+  String get gpsTrack_action_trim => 'Rogner...';
+
+  @override
+  String get gpsTrack_action_split => 'Diviser...';
+
+  @override
+  String get gpsTrack_action_resetTrim => 'Annuler le rognage';
+
+  @override
+  String get gpsTrack_edit_applyTrim => 'Appliquer le rognage';
+
+  @override
+  String get gpsTrack_edit_confirmSplit => 'Diviser ici';
+
+  @override
+  String get gpsTrack_edit_splitWarning =>
+      'La division crée deux traces et supprime l\'originale. Cette action est irréversible.';
+
+  @override
+  String get gpsTrack_edit_cancel => 'Annuler';
+
+  @override
   String get gpsTrack_import_action => 'Importer une trace...';
 
   @override
