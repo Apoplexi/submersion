@@ -7174,3 +7174,743 @@ flutter analyze
 ```
 
 ---
+
+## Phase 7: Trim and Split
+
+The only phase that mutates a synced record. Ordering matters here in a way it does not anywhere else in this plan.
+
+---
+
+### Task 33: Non-destructive trim
+
+**Files:**
+- Modify: `lib/features/gps_log/data/repositories/gps_track_repository.dart`
+- Modify: `lib/features/gps_log/presentation/providers/gps_track_map_providers.dart`
+- Test: `test/features/gps_log/gps_track_trim_test.dart`
+
+**Interfaces:**
+- Consumes: `effectivePoints` (Task 6), `TrackGeometryCacheRepository.invalidate` (Task 8)
+- Produces:
+  - `GpsTrackRepository.setTrimBounds(String id, {int? startMs, int? endMs})` → `Future<void>`
+  - `GpsTrackRepository.clearTrim(String id)` → `Future<void>`
+
+Trim writes only the two bound columns. **The points blob is never rewritten**, which makes trimming free, fully reversible, a tiny sync payload, and incapable of losing a fix. That is the entire reason the design chose bounds over truncation.
+
+- [ ] **Step 1: Write the failing test**
+
+Create `test/features/gps_log/gps_track_trim_test.dart`:
+
+```dart
+import 'package:flutter_test/flutter_test.dart';
+import 'package:submersion/features/gps_log/data/repositories/gps_track_repository.dart';
+import 'package:submersion/features/gps_log/domain/entities/gps_track.dart';
+
+import '../../helpers/test_database.dart';
+
+void main() {
+  late GpsTrackRepository repo;
+
+  setUp(() async {
+    await setUpTestDatabase();
+    repo = GpsTrackRepository();
+  });
+
+  tearDown(tearDownTestDatabase);
+
+  /// Track from 08:00 to 12:00 with a fix every hour.
+  Future<String> seed() async {
+    final startMs = DateTime.utc(2026, 5, 22, 8).millisecondsSinceEpoch;
+    final id = await repo.startTrack(startTimeMs: startMs, tzOffsetMinutes: 0);
+    for (var h = 0; h <= 4; h++) {
+      await repo.appendBufferPoint(
+        id,
+        GpsTrackPoint(
+          timestamp: startMs ~/ 1000 + h * 3600,
+          latitude: 20.0 + h * 0.01,
+          longitude: -87.0,
+        ),
+      );
+    }
+    await repo.finalizeTrack(
+      id,
+      endTimeMs: DateTime.utc(2026, 5, 22, 12).millisecondsSinceEpoch,
+    );
+    return id;
+  }
+
+  test('setTrimBounds narrows effectivePoints', () async {
+    final id = await seed();
+    await repo.setTrimBounds(
+      id,
+      startMs: DateTime.utc(2026, 5, 22, 9).millisecondsSinceEpoch,
+      endMs: DateTime.utc(2026, 5, 22, 11).millisecondsSinceEpoch,
+    );
+    final track = await repo.getTrack(id);
+    expect(track!.effectivePoints.length, 3);
+  });
+
+  test('trimming never rewrites the points blob', () async {
+    final id = await seed();
+    final before = (await repo.getTrack(id))!.points.length;
+
+    await repo.setTrimBounds(
+      id,
+      startMs: DateTime.utc(2026, 5, 22, 10).millisecondsSinceEpoch,
+    );
+
+    final after = await repo.getTrack(id);
+    // The stored points are untouched; only the view of them narrows.
+    expect(after!.points.length, before);
+    expect(after.effectivePoints.length, lessThan(before));
+  });
+
+  test('clearTrim restores every fix', () async {
+    final id = await seed();
+    await repo.setTrimBounds(
+      id,
+      startMs: DateTime.utc(2026, 5, 22, 10).millisecondsSinceEpoch,
+    );
+    await repo.clearTrim(id);
+
+    final track = await repo.getTrack(id);
+    expect(track!.effectivePoints.length, 5);
+    expect(track.trimStartTime, isNull);
+    expect(track.trimEndTime, isNull);
+  });
+
+  test('a start-only trim leaves the end open', () async {
+    final id = await seed();
+    await repo.setTrimBounds(
+      id,
+      startMs: DateTime.utc(2026, 5, 22, 10).millisecondsSinceEpoch,
+    );
+    final track = await repo.getTrack(id);
+    expect(track!.trimEndTime, isNull);
+    expect(track.effectivePoints.length, 3);
+  });
+
+  test('trimming bumps updatedAt so the change syncs', () async {
+    final id = await seed();
+    final before = (await repo.getTrack(id))!;
+    await Future<void>.delayed(const Duration(milliseconds: 5));
+    await repo.setTrimBounds(
+      id,
+      startMs: DateTime.utc(2026, 5, 22, 10).millisecondsSinceEpoch,
+    );
+    final after = await repo.getTrack(id);
+    expect(after!.updatedAt, greaterThan(before.updatedAt));
+  });
+
+  test('a trim excluding everything yields no points but keeps the blob',
+      () async {
+    final id = await seed();
+    await repo.setTrimBounds(
+      id,
+      startMs: DateTime.utc(2026, 5, 23).millisecondsSinceEpoch,
+    );
+    final track = await repo.getTrack(id);
+    expect(track!.effectivePoints, isEmpty);
+    expect(track.points, isNotEmpty);
+  });
+}
+```
+
+If `GpsTrack` has no `updatedAt` field yet, add it in Task 6's entity work or drop that one test — do not assert against a field that does not exist.
+
+- [ ] **Step 2: Run test to verify it fails**
+
+Run: `flutter test test/features/gps_log/gps_track_trim_test.dart`
+Expected: FAIL — `setTrimBounds` isn't defined.
+
+- [ ] **Step 3: Implement the writes**
+
+Add to `GpsTrackRepository`:
+
+```dart
+  /// Sets non-destructive trim bounds. The points blob is untouched.
+  ///
+  /// Passing null for a bound leaves that end open. Use [clearTrim] to
+  /// remove both.
+  Future<void> setTrimBounds(
+    String id, {
+    int? startMs,
+    int? endMs,
+  }) async {
+    await (_db.update(_db.gpsTracks)..where((t) => t.id.equals(id))).write(
+      GpsTracksCompanion(
+        trimStartTime: Value(startMs),
+        trimEndTime: Value(endMs),
+        updatedAt: Value(DateTime.now().millisecondsSinceEpoch),
+      ),
+    );
+    SyncEventBus.notifyLocalChange();
+  }
+
+  /// Removes both trim bounds, restoring the full recording.
+  Future<void> clearTrim(String id) => setTrimBounds(id);
+```
+
+- [ ] **Step 4: Invalidate the geometry cache**
+
+Trim changes which points a track represents, so every cached LOD for it is stale. Wire this in the provider layer rather than the repository, so the data layer stays unaware of the presentation cache:
+
+```dart
+/// Trims a track and drops its cached geometry.
+final trimTrackProvider = Provider(
+  (ref) => (String id, {int? startMs, int? endMs}) async {
+    await ref
+        .read(gpsTrackRepositoryProvider)
+        .setTrimBounds(id, startMs: startMs, endMs: endMs);
+    await ref.read(trackGeometryCacheRepositoryProvider).invalidate(id);
+    ref.invalidate(gpsTrackDetailProvider(id));
+  },
+);
+```
+
+- [ ] **Step 5: Run tests, format, analyze, commit**
+
+```bash
+flutter test test/features/gps_log/
+dart format .
+flutter analyze
+git add lib/features/gps_log/ test/features/gps_log/gps_track_trim_test.dart
+git commit -m "Add non-destructive trim bounds for GPS tracks"
+```
+
+---
+
+### Task 34: Ordered split
+
+**Files:**
+- Modify: `lib/features/gps_log/data/repositories/gps_track_repository.dart`
+- Test: `test/features/gps_log/gps_track_split_test.dart`
+
+**Interfaces:**
+- Consumes: `insertImportedTrack` (Task 31), `effectivePoints` (Task 6)
+- Produces: `GpsTrackRepository.splitTrack(String id, int atWallClockMs)` → `Future<(String, String)>`
+
+**Write both children before tombstoning the parent.** A crash between those steps then leaves two children *and* the parent — visible duplicates the user can delete. Tombstoning first and crashing before the writes would leave nothing at all. That ordering is the entire safety property of this task and the test asserts it directly.
+
+- [ ] **Step 1: Write the failing test**
+
+Create `test/features/gps_log/gps_track_split_test.dart`:
+
+```dart
+import 'package:flutter_test/flutter_test.dart';
+import 'package:submersion/features/gps_log/data/repositories/gps_track_repository.dart';
+import 'package:submersion/features/gps_log/domain/entities/gps_track.dart';
+
+import '../../helpers/test_database.dart';
+
+void main() {
+  late GpsTrackRepository repo;
+
+  setUp(() async {
+    await setUpTestDatabase();
+    repo = GpsTrackRepository();
+  });
+
+  tearDown(tearDownTestDatabase);
+
+  /// 08:00 to 12:00, one fix per hour, five fixes.
+  Future<String> seed({String? name}) async {
+    final startMs = DateTime.utc(2026, 5, 22, 8).millisecondsSinceEpoch;
+    final id = await repo.startTrack(
+      startTimeMs: startMs,
+      tzOffsetMinutes: -300,
+    );
+    for (var h = 0; h <= 4; h++) {
+      await repo.appendBufferPoint(
+        id,
+        GpsTrackPoint(
+          timestamp: startMs ~/ 1000 + h * 3600,
+          latitude: 20.0 + h * 0.01,
+          longitude: -87.0,
+        ),
+      );
+    }
+    await repo.finalizeTrack(
+      id,
+      endTimeMs: DateTime.utc(2026, 5, 22, 12).millisecondsSinceEpoch,
+    );
+    return id;
+  }
+
+  test('produces two tracks covering all the original fixes', () async {
+    final id = await seed();
+    final (firstId, secondId) = await repo.splitTrack(
+      id,
+      DateTime.utc(2026, 5, 22, 10).millisecondsSinceEpoch,
+    );
+
+    final first = await repo.getTrack(firstId);
+    final second = await repo.getTrack(secondId);
+    expect(first!.points.length + second!.points.length, 5);
+  });
+
+  test('puts the split point in the first child', () async {
+    final id = await seed();
+    final (firstId, secondId) = await repo.splitTrack(
+      id,
+      DateTime.utc(2026, 5, 22, 10).millisecondsSinceEpoch,
+    );
+    expect((await repo.getTrack(firstId))!.points.length, 3);
+    expect((await repo.getTrack(secondId))!.points.length, 2);
+  });
+
+  test('tombstones the parent', () async {
+    final id = await seed();
+    await repo.splitTrack(
+      id,
+      DateTime.utc(2026, 5, 22, 10).millisecondsSinceEpoch,
+    );
+    expect(await repo.getTrack(id), isNull);
+  });
+
+  test('children inherit tzOffsetMinutes and source', () async {
+    final id = await seed();
+    final (firstId, secondId) = await repo.splitTrack(
+      id,
+      DateTime.utc(2026, 5, 22, 10).millisecondsSinceEpoch,
+    );
+    for (final childId in [firstId, secondId]) {
+      final child = await repo.getTrack(childId);
+      expect(child!.tzOffsetMinutes, -300);
+      expect(child.source, 'phone');
+    }
+  });
+
+  test('children exist before the parent is deleted', () async {
+    // The safety property: if this ordering ever inverts, a crash mid-split
+    // destroys the track instead of duplicating it.
+    final id = await seed();
+    final observed = <String>[];
+    repo.debugOnWrite = observed.add;
+
+    await repo.splitTrack(
+      id,
+      DateTime.utc(2026, 5, 22, 10).millisecondsSinceEpoch,
+    );
+
+    expect(observed.length, 3);
+    expect(observed.last, 'delete:$id');
+    expect(observed.sublist(0, 2).every((e) => e.startsWith('insert:')), isTrue);
+  });
+
+  test('rejects a split point outside the track span', () async {
+    final id = await seed();
+    expect(
+      () => repo.splitTrack(
+        id,
+        DateTime.utc(2026, 5, 23).millisecondsSinceEpoch,
+      ),
+      throwsArgumentError,
+    );
+  });
+
+  test('rejects a split that would leave a child empty', () async {
+    final id = await seed();
+    expect(
+      () => repo.splitTrack(
+        id,
+        DateTime.utc(2026, 5, 22, 8).millisecondsSinceEpoch,
+      ),
+      throwsArgumentError,
+    );
+  });
+
+  test('splitting respects existing trim bounds', () async {
+    final id = await seed();
+    await repo.setTrimBounds(
+      id,
+      startMs: DateTime.utc(2026, 5, 22, 9).millisecondsSinceEpoch,
+    );
+    final (firstId, secondId) = await repo.splitTrack(
+      id,
+      DateTime.utc(2026, 5, 22, 10).millisecondsSinceEpoch,
+    );
+    // The 08:00 fix was trimmed away, so only four survive the split.
+    final first = await repo.getTrack(firstId);
+    final second = await repo.getTrack(secondId);
+    expect(first!.points.length + second!.points.length, 4);
+  });
+}
+```
+
+- [ ] **Step 2: Run test to verify it fails**
+
+Run: `flutter test test/features/gps_log/gps_track_split_test.dart`
+Expected: FAIL — `splitTrack` isn't defined.
+
+- [ ] **Step 3: Add the write observer seam**
+
+The ordering test needs to observe write order. Add to `GpsTrackRepository`:
+
+```dart
+  /// Test-only hook recording write operations in order.
+  ///
+  /// Exists so the split-ordering guarantee can be asserted directly rather
+  /// than inferred from final state - final state looks identical whichever
+  /// order the writes happened in.
+  @visibleForTesting
+  void Function(String)? debugOnWrite;
+```
+
+- [ ] **Step 4: Implement the split**
+
+```dart
+  /// Splits [id] into two tracks at [atWallClockMs].
+  ///
+  /// The fix at the split point goes to the first child. Returns the two new
+  /// ids.
+  ///
+  /// ORDERING IS THE SAFETY PROPERTY: both children are written BEFORE the
+  /// parent is tombstoned. A crash between those steps leaves two children
+  /// and the parent - duplicates the user can delete. The reverse order
+  /// would leave nothing.
+  Future<(String, String)> splitTrack(String id, int atWallClockMs) async {
+    final track = await getTrack(id, includePoints: true);
+    if (track == null) {
+      throw ArgumentError.value(id, 'id', 'No such track');
+    }
+
+    final atSeconds = atWallClockMs ~/ 1000;
+    final points = track.effectivePoints;
+    final first = [
+      for (final p in points)
+        if (p.timestamp <= atSeconds) p,
+    ];
+    final second = [
+      for (final p in points)
+        if (p.timestamp > atSeconds) p,
+    ];
+
+    if (first.isEmpty || second.isEmpty) {
+      throw ArgumentError.value(
+        atWallClockMs,
+        'atWallClockMs',
+        'Split point must leave fixes on both sides',
+      );
+    }
+
+    final baseName = track.name;
+    final firstId = await insertImportedTrack(
+      points: first,
+      startTimeMs: first.first.timestamp * 1000,
+      endTimeMs: first.last.timestamp * 1000,
+      tzOffsetMinutes: track.tzOffsetMinutes,
+      source: track.source,
+      sourceRef: track.sourceRef,
+      name: baseName == null ? null : '$baseName (1)',
+    );
+    debugOnWrite?.call('insert:$firstId');
+
+    final secondId = await insertImportedTrack(
+      points: second,
+      startTimeMs: second.first.timestamp * 1000,
+      endTimeMs: second.last.timestamp * 1000,
+      tzOffsetMinutes: track.tzOffsetMinutes,
+      source: track.source,
+      sourceRef: track.sourceRef,
+      name: baseName == null ? null : '$baseName (2)',
+    );
+    debugOnWrite?.call('insert:$secondId');
+
+    // Only now that both children are durable.
+    await deleteTrack(id);
+    debugOnWrite?.call('delete:$id');
+
+    return (firstId, secondId);
+  }
+```
+
+- [ ] **Step 5: Add the provider wrapper**
+
+```dart
+/// Splits a track and drops the parent's cached geometry.
+final splitTrackProvider = Provider(
+  (ref) => (String id, int atWallClockMs) async {
+    final result =
+        await ref.read(gpsTrackRepositoryProvider).splitTrack(id, atWallClockMs);
+    await ref.read(trackGeometryCacheRepositoryProvider).invalidate(id);
+    ref.invalidate(gpsTracksProvider);
+    return result;
+  },
+);
+```
+
+- [ ] **Step 6: Run tests, format, analyze, commit**
+
+```bash
+flutter test test/features/gps_log/
+dart format .
+flutter analyze
+git add lib/features/gps_log/ test/features/gps_log/gps_track_split_test.dart
+git commit -m "Add ordered GPS track split with write-before-tombstone safety"
+```
+
+---
+
+### Task 35: Trim and split UI
+
+**Files:**
+- Create: `lib/features/gps_log/presentation/widgets/track_timeline_scrubber.dart`
+- Modify: `lib/features/gps_log/presentation/pages/gps_track_detail_page.dart`
+- Modify: `lib/l10n/arb/app_en.arb` plus all locale ARBs
+- Test: `test/features/gps_log/track_timeline_scrubber_test.dart`
+- Test: `test/features/gps_log/gps_track_edit_mode_test.dart`
+
+**Interfaces:**
+- Consumes: `trimTrackProvider` (Task 33), `splitTrackProvider` (Task 34)
+- Produces:
+  - `class TrackTimelineScrubber extends StatelessWidget`
+  - `trackEditModeProvider` → `StateProvider<TrackEditMode>` where `enum TrackEditMode { none, trim, split }`
+
+- [ ] **Step 1: Add l10n strings**
+
+```json
+  "gpsTrack_action_trim": "Trim...",
+  "@gpsTrack_action_trim": {"description": "Menu entry that enters trim mode"},
+  "gpsTrack_action_split": "Split...",
+  "@gpsTrack_action_split": {"description": "Menu entry that enters split mode"},
+  "gpsTrack_action_resetTrim": "Reset trim",
+  "@gpsTrack_action_resetTrim": {"description": "Removes existing trim bounds"},
+  "gpsTrack_action_rename": "Rename...",
+  "@gpsTrack_action_rename": {"description": "Menu entry that renames the track"},
+  "gpsTrack_edit_applyTrim": "Apply trim",
+  "@gpsTrack_edit_applyTrim": {"description": "Commits the dragged trim bounds"},
+  "gpsTrack_edit_confirmSplit": "Split here",
+  "@gpsTrack_edit_confirmSplit": {"description": "Commits the split at the handle position"},
+  "gpsTrack_edit_splitWarning": "Splitting creates two tracks and removes the original. This cannot be undone.",
+  "@gpsTrack_edit_splitWarning": {"description": "Warns that split is destructive, unlike trim"},
+  "gpsTrack_edit_cancel": "Cancel",
+  "@gpsTrack_edit_cancel": {"description": "Leaves edit mode without changes"}
+```
+
+Translate into all locales, then `flutter gen-l10n`.
+
+- [ ] **Step 2: Write the failing scrubber test**
+
+Create `test/features/gps_log/track_timeline_scrubber_test.dart`:
+
+```dart
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:submersion/features/gps_log/presentation/widgets/track_timeline_scrubber.dart';
+
+void main() {
+  const startMs = 1700000000000;
+  const endMs = 1700003600000;
+
+  testWidgets('renders two handles in trim mode', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: TrackTimelineScrubber(
+            startMs: startMs,
+            endMs: endMs,
+            mode: TrackScrubberMode.range,
+            onChanged: (_, __) {},
+          ),
+        ),
+      ),
+    );
+    expect(find.byType(RangeSlider), findsOneWidget);
+  });
+
+  testWidgets('renders one handle in split mode', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: TrackTimelineScrubber(
+            startMs: startMs,
+            endMs: endMs,
+            mode: TrackScrubberMode.single,
+            onChanged: (_, __) {},
+          ),
+        ),
+      ),
+    );
+    expect(find.byType(Slider), findsOneWidget);
+    expect(find.byType(RangeSlider), findsNothing);
+  });
+
+  testWidgets('reports millisecond values, not slider fractions',
+      (tester) async {
+    int? reportedStart;
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: TrackTimelineScrubber(
+            startMs: startMs,
+            endMs: endMs,
+            mode: TrackScrubberMode.range,
+            onChanged: (s, e) => reportedStart = s,
+          ),
+        ),
+      ),
+    );
+    await tester.drag(find.byType(RangeSlider), const Offset(40, 0));
+    await tester.pumpAndSettle();
+    expect(reportedStart, isNotNull);
+    expect(reportedStart, greaterThanOrEqualTo(startMs));
+    expect(reportedStart, lessThanOrEqualTo(endMs));
+  });
+
+  testWidgets('labels the ends with wall-clock times, not device-local',
+      (tester) async {
+    // The times shown must be the recording device's wall clock. Formatting
+    // via toLocal() would shift them for anyone viewing from another zone.
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: TrackTimelineScrubber(
+            startMs: DateTime.utc(2026, 5, 22, 8).millisecondsSinceEpoch,
+            endMs: DateTime.utc(2026, 5, 22, 12).millisecondsSinceEpoch,
+            mode: TrackScrubberMode.range,
+            onChanged: (_, __) {},
+          ),
+        ),
+      ),
+    );
+    expect(find.textContaining('8:00'), findsWidgets);
+  });
+
+  testWidgets('handles a zero-length span without dividing by zero',
+      (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: TrackTimelineScrubber(
+            startMs: startMs,
+            endMs: startMs,
+            mode: TrackScrubberMode.range,
+            onChanged: (_, __) {},
+          ),
+        ),
+      ),
+    );
+    expect(tester.takeException(), isNull);
+  });
+}
+```
+
+- [ ] **Step 3: Run test to verify it fails**
+
+Run: `flutter test test/features/gps_log/track_timeline_scrubber_test.dart`
+Expected: FAIL — `TrackTimelineScrubber` isn't defined.
+
+- [ ] **Step 4: Build the scrubber**
+
+Create `track_timeline_scrubber.dart` with `enum TrackScrubberMode { range, single }`, wrapping a `RangeSlider` or `Slider` over the track's millisecond span. Label both ends with `DateFormat.jm()` applied to `DateTime.fromMillisecondsSinceEpoch(ms, isUtc: true)` — UTC components directly, never `toLocal()`.
+
+Guard `endMs == startMs` by rendering a disabled slider rather than dividing by a zero span.
+
+- [ ] **Step 5: Wire edit mode into the detail page**
+
+Add `trackEditModeProvider`, and to the overflow menu: Rename, Trim, Split, Reset trim (only when bounds exist), Delete.
+
+In trim mode, show the scrubber over the map with the excluded portions of the polyline dimmed live as handles move, plus Apply and Cancel. Apply calls `trimTrackProvider`.
+
+In split mode, show a single handle, a marker on the map at that position, and the `gpsTrack_edit_splitWarning` text. Split is the one destructive operation here — trim is reversible and split is not, so it gets an explicit confirmation while trim does not.
+
+- [ ] **Step 6: Write the edit mode test**
+
+Create `test/features/gps_log/gps_track_edit_mode_test.dart` asserting:
+
+```dart
+  testWidgets('Trim shows a range scrubber and an Apply action',
+      (tester) async {
+    expect(find.byType(RangeSlider), findsOneWidget);
+    expect(find.text('Apply trim'), findsOneWidget);
+  });
+
+  testWidgets('Split warns that the operation is destructive',
+      (tester) async {
+    expect(
+      find.text(
+        'Splitting creates two tracks and removes the original. '
+        'This cannot be undone.',
+      ),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets('Reset trim appears only when the track has bounds',
+      (tester) async {
+    // With trimStartTime null, the entry is absent; with it set, present.
+  });
+
+  testWidgets('Cancel leaves edit mode without writing', (tester) async {
+    // Assert the repository received no setTrimBounds call.
+  });
+```
+
+Fill the harness bodies from the existing detail page test.
+
+- [ ] **Step 7: Run the full suite, format, analyze, commit**
+
+```bash
+flutter test
+dart format .
+flutter analyze
+git add lib/features/gps_log/ lib/l10n/ test/features/gps_log/
+git commit -m "Add trim and split editing UI for GPS tracks"
+```
+
+---
+
+**Phase 7 complete.** All seven phases done.
+
+---
+
+## Final Verification
+
+Before opening the pull request:
+
+```bash
+# Whole suite, not just the touched features
+flutter test
+
+# Whole project. Never pipe to tail - it masks the exit code, and infos
+# are fatal in CI.
+flutter analyze
+
+# Formatting across the project, not just changed files
+dart format .
+git diff --exit-code
+
+# Confirm the schema version claim still holds against the remote
+git fetch origin
+git show origin/main:lib/core/database/database.dart | grep "currentSchemaVersion ="
+```
+
+Manual passes that automated tests cannot cover:
+
+1. **Thumbnail scroll performance** on a physical device with 50+ tracks (Task 17 Step 6).
+2. **A real GPX round trip**: export a recorded track, re-import the file, confirm the fix count, timestamps, and dive matching all survive.
+3. **Offline behaviour**: enable airplane mode, open the GPS Log, confirm thumbnails fall back to shapes rather than showing broken tiles.
+4. **Cross-device sync**: trim a track on one device, confirm the bounds appear on a second; split on one, confirm two children and no parent on the other.
+
+## Spec Coverage
+
+| Spec section | Tasks |
+|---|---|
+| Domain core (geometry, colorization) | 1, 2, 3 |
+| Bucketed runs rather than gradient | 9 |
+| Level-of-detail cache | 7, 8 |
+| Providers | 8, 12 |
+| Surface 1: row thumbnail | 15, 16, 17 |
+| Surface 2: track detail | 10, 11, 12, 13, 14 |
+| Surface 3: overview map | 18, 19 |
+| Surface 4: dive detail | 20, 21 |
+| Schema v144 | 5 |
+| Local cache schema v9 | 7 |
+| Import (GPX, KML, CSV, FIT) | 26, 27, 28, 29, 30, 31, 32 |
+| Export (GPX, KML) | 22, 23, 24, 25 |
+| Trim and split | 33, 34, 35 |
+| Speed units | 4 |
+| effectivePoints accessor | 6 |
+| Error handling | 10 (unreadable/empty), 16 (offline), 32 (parse failure), 25 (cancel vs failure) |
+| Antimeridian | 2 |
+| Testing strategy | every task |
