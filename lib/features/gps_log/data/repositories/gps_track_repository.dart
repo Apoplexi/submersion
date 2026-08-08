@@ -241,6 +241,11 @@ class GpsTrackRepository {
       points: includePoints && row.points != null
           ? decodeTrackPoints(Uint8List.fromList(row.points!))
           : const [],
+      source: row.source,
+      sourceRef: row.sourceRef,
+      name: row.name,
+      trimStartTime: row.trimStartTime,
+      trimEndTime: row.trimEndTime,
     );
   }
 }
