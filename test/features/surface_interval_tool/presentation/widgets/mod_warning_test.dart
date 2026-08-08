@@ -32,6 +32,8 @@ Future<ProviderContainer> _pump(
         ),
       ],
       child: MaterialApp(
+        // Pinned: the assertions match English strings.
+        locale: const Locale('en'),
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         home: Scaffold(body: SingleChildScrollView(child: child)),

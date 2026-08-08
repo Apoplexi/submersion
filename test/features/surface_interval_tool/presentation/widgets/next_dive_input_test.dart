@@ -22,6 +22,8 @@ Future<ProviderContainer> _pumpCard(WidgetTester tester) async {
         settingsProvider.overrideWith((ref) => _TestSettingsNotifier()),
       ],
       child: const MaterialApp(
+        // Pinned: the assertions match English strings.
+        locale: Locale('en'),
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         home: Scaffold(body: SingleChildScrollView(child: NextDiveInput())),
