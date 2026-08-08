@@ -4049,23 +4049,77 @@ Create `test/features/gps_log/gps_track_list_scroll_perf_test.dart`:
 
 ```dart
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:submersion/features/gps_log/data/repositories/track_geometry_cache_repository.dart';
+import 'package:submersion/features/gps_log/domain/entities/gps_track.dart';
+import 'package:submersion/features/gps_log/presentation/pages/gps_logger_page.dart';
+import 'package:submersion/features/gps_log/presentation/providers/gps_log_providers.dart';
+import 'package:submersion/features/gps_log/presentation/providers/gps_track_map_providers.dart';
 import 'package:submersion/features/gps_log/presentation/widgets/gps_track_thumbnail.dart';
+import 'package:submersion/l10n/arb/app_localizations.dart';
+
+import '../../helpers/mock_providers.dart';
+
+/// Fifty tracks, one per day, three fixes each.
+List<GpsTrack> _fiftyTracks() => [
+      for (var d = 0; d < 50; d++)
+        GpsTrack(
+          id: 'track-$d',
+          startTime: DateTime.utc(2026, 5, 1)
+              .add(Duration(days: d))
+              .millisecondsSinceEpoch,
+          endTime: DateTime.utc(2026, 5, 1)
+              .add(Duration(days: d, hours: 4))
+              .millisecondsSinceEpoch,
+          pointCount: 3,
+          points: [
+            for (var i = 0; i < 3; i++)
+              GpsTrackPoint(
+                timestamp: DateTime.utc(2026, 5, 1)
+                        .add(Duration(days: d, minutes: i))
+                        .millisecondsSinceEpoch ~/
+                    1000,
+                latitude: 20.0 + i * 0.001,
+                longitude: -87.0 + i * 0.001,
+              ),
+          ],
+        ),
+    ];
+
+Future<void> _pumpFifty(WidgetTester tester) async {
+  final base = await getBaseOverrides();
+  final tracks = _fiftyTracks();
+  await tester.binding.setSurfaceSize(const Size(390, 844));
+  addTearDown(() => tester.binding.setSurfaceSize(null));
+
+  await tester.pumpWidget(
+    ProviderScope(
+      overrides: [
+        ...base,
+        gpsTracksProvider.overrideWith((ref) async => tracks),
+        for (final track in tracks)
+          gpsTrackGeometryProvider((track.id, TrackLod.thumbnail))
+              .overrideWith((ref) async => track.points),
+      ],
+      child: MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        home: const GpsLoggerPage(),
+      ),
+    ),
+  );
+  await tester.pumpAndSettle();
+}
 
 void main() {
   testWidgets('a 50-track list builds only the visible thumbnails',
       (tester) async {
-    // Seed 50 completed tracks, pump GpsLoggerPage at a phone surface size
-    // (390x844), and assert the builder has not instantiated all 50.
-    //
-    // This is the guard that matters: if the list eagerly builds every row,
-    // 50 FlutterMap instances exist at once and the remedy in Step 6 is
+    await _pumpFifty(tester);
+
+    // The guard that matters: if the list eagerly builds every row, 50
+    // FlutterMap instances exist at once and the remedy in Step 6 becomes
     // required. A handful on screen is fine.
-    await tester.binding.setSurfaceSize(const Size(390, 844));
-    addTearDown(() => tester.binding.setSurfaceSize(null));
-
-    // ... pump the page with 50 seeded tracks ...
-
     final built = find.byType(GpsTrackThumbnail).evaluate().length;
     expect(
       built,
@@ -4076,19 +4130,18 @@ void main() {
 
   testWidgets('scrolling a 50-track list settles without exceptions',
       (tester) async {
-    await tester.binding.setSurfaceSize(const Size(390, 844));
-    addTearDown(() => tester.binding.setSurfaceSize(null));
+    await _pumpFifty(tester);
 
-    // ... pump the page with 50 seeded tracks ...
-
-    await tester.fling(find.byType(CustomScrollView), const Offset(0, -3000), 1000);
+    await tester.fling(
+      find.byType(CustomScrollView),
+      const Offset(0, -3000),
+      1000,
+    );
     await tester.pumpAndSettle();
     expect(tester.takeException(), isNull);
   });
 }
 ```
-
-Fill the seeding sections using the repository helpers from `gps_track_repository_test.dart`.
 
 - [ ] **Step 5: Run the tests**
 
@@ -4949,6 +5002,8 @@ flutter analyze
 Create `test/core/services/export/shared/save_text_to_file_test.dart`. Model it on the existing `test/core/services/export/file_picker_save_test.dart`, which already stubs `FilePicker.platform`:
 
 ```dart
+import 'dart:io';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/services/export/shared/file_export_utils.dart';
 
@@ -6754,12 +6809,14 @@ git commit -m "Extract the full GPS track from FIT record messages"
 - Consumes: every parser (Tasks 27-30), `toWallClockEpochSecondsAt` / `inferOffsetFromDives` (Task 26)
 - Produces:
   - `enum TrackFileFormat { gpx, kml, csv, fit }`
-  - `TrackFileFormat? sniffFormat(String fileName, String content)`
-  - `class TrackImportCandidate { final ParsedTrack parsed; final TrackFileFormat format; final String sourceRef; final int tzOffsetMinutes; final String? duplicateOfTrackId; }`
-  - `TrackImportService.prepare(...)` → `Future<TrackImportCandidate>`
+  - `TrackFileFormat? sniffFormat(String fileName, Uint8List bytes)`
+  - `class TrackImportCandidate { final ParsedTrack parsed; final TrackFileFormat format; final String sourceRef; final int tzOffsetMinutes; final String? duplicateOfTrackId; }` plus `copyWith`
+  - `TrackImportService.prepare({required String fileName, required Uint8List bytes, CsvColumnMapping? csvMapping})` → `Future<TrackImportCandidate>`
   - `TrackImportService.commit(TrackImportCandidate)` → `Future<String>`
   - `GpsTrackRepository.insertImportedTrack(...)` → `Future<String>`
   - `bool overlapsMoreThan(int aStart, int aEnd, int bStart, int bEnd, double fraction)`
+
+**The service takes bytes, not a string.** Three of the four formats are text, but **FIT is binary** — a `String` parameter cannot carry it, and `utf8.decode` on a FIT file throws. `prepare` accepts `Uint8List` and decodes to UTF-8 only for the text formats.
 
 **Dedupe rule from the spec:** an incoming track is a probable duplicate when its span overlaps an existing track's span by more than **80%** *and* the two share a `source`. Flagged candidates surface as a choice; nothing is dropped or merged silently. Different sources overlapping in time import normally — a phone recording and a handheld recording of the same boat day are legitimately two records.
 
@@ -6770,16 +6827,19 @@ git commit -m "Extract the full GPS track from FIT record messages"
 Create `test/features/gps_log/track_import_service_test.dart`:
 
 ```dart
+import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/features/gps_log/data/repositories/gps_track_repository.dart';
+import 'package:submersion/features/gps_log/data/services/track_import/parsed_track.dart';
 import 'package:submersion/features/gps_log/data/services/track_import/track_import_service.dart';
 
 import '../../helpers/test_database.dart';
 
-String _fixture(String name) =>
-    File('test/fixtures/gps_tracks/$name').readAsStringSync();
+Uint8List _bytes(String name) =>
+    File('test/fixtures/gps_tracks/$name').readAsBytesSync();
 
 void main() {
   late TrackImportService service;
@@ -6794,27 +6854,54 @@ void main() {
   tearDown(tearDownTestDatabase);
 
   group('sniffFormat', () {
+    Uint8List utf8Bytes(String s) => Uint8List.fromList(utf8.encode(s));
+
     test('recognises gpx by extension', () {
-      expect(sniffFormat('track.gpx', '<gpx/>'), TrackFileFormat.gpx);
+      expect(
+        sniffFormat('track.gpx', utf8Bytes('<gpx/>')),
+        TrackFileFormat.gpx,
+      );
     });
 
     test('recognises kml by extension', () {
-      expect(sniffFormat('track.kml', '<kml/>'), TrackFileFormat.kml);
+      expect(
+        sniffFormat('track.kml', utf8Bytes('<kml/>')),
+        TrackFileFormat.kml,
+      );
     });
 
     test('recognises csv by extension', () {
-      expect(sniffFormat('track.csv', 'a,b,c'), TrackFileFormat.csv);
+      expect(
+        sniffFormat('track.csv', utf8Bytes('a,b,c')),
+        TrackFileFormat.csv,
+      );
+    });
+
+    test('recognises fit by its binary magic, not just the extension', () {
+      // A FIT file carries ASCII ".FIT" at byte offset 8.
+      final fit = Uint8List(16)
+        ..setAll(8, utf8.encode('.FIT'));
+      expect(sniffFormat('download.bin', fit), TrackFileFormat.fit);
     });
 
     test('falls back to content sniffing for an unknown extension', () {
       expect(
-        sniffFormat('track.dat', '<?xml version="1.0"?><gpx><trk/></gpx>'),
+        sniffFormat(
+          'track.dat',
+          utf8Bytes('<?xml version="1.0"?><gpx><trk/></gpx>'),
+        ),
         TrackFileFormat.gpx,
       );
     });
 
     test('returns null for something unrecognisable', () {
-      expect(sniffFormat('notes.txt', 'hello world'), isNull);
+      expect(sniffFormat('notes.txt', utf8Bytes('hello world')), isNull);
+    });
+
+    test('returns null for binary that is not FIT, without throwing', () {
+      // utf8.decode on arbitrary bytes throws; sniffing must not.
+      final noise = Uint8List.fromList([0xFF, 0xFE, 0x00, 0x01, 0x80]);
+      expect(sniffFormat('mystery.bin', noise), isNull);
     });
   });
 
@@ -6844,7 +6931,7 @@ void main() {
     test('parses a GPX file into a candidate', () async {
       final candidate = await service.prepare(
         fileName: 'sample.gpx',
-        content: _fixture('sample.gpx'),
+        bytes: _bytes('sample.gpx'),
       );
       expect(candidate.format, TrackFileFormat.gpx);
       expect(candidate.parsed.fixes.length, 3);
@@ -6855,7 +6942,7 @@ void main() {
         () async {
       final candidate = await service.prepare(
         fileName: 'sample.gpx',
-        content: _fixture('sample.gpx'),
+        bytes: _bytes('sample.gpx'),
       );
       expect(
         candidate.tzOffsetMinutes,
@@ -6866,7 +6953,7 @@ void main() {
     test('flags nothing as duplicate on an empty database', () async {
       final candidate = await service.prepare(
         fileName: 'sample.gpx',
-        content: _fixture('sample.gpx'),
+        bytes: _bytes('sample.gpx'),
       );
       expect(candidate.duplicateOfTrackId, isNull);
     });
@@ -6876,7 +6963,7 @@ void main() {
     test('writes a track with the right source and sourceRef', () async {
       final candidate = await service.prepare(
         fileName: 'sample.gpx',
-        content: _fixture('sample.gpx'),
+        bytes: _bytes('sample.gpx'),
       );
       final id = await service.commit(candidate);
 
@@ -6890,7 +6977,7 @@ void main() {
         () async {
       final base = await service.prepare(
         fileName: 'sample.gpx',
-        content: _fixture('sample.gpx'),
+        bytes: _bytes('sample.gpx'),
       );
       // Force UTC-5: 13:00 real UTC must land as 08:00 wall clock.
       final candidate = base.copyWith(tzOffsetMinutes: -300);
@@ -6908,13 +6995,13 @@ void main() {
     test('flags a re-import of the same file as a duplicate', () async {
       final first = await service.prepare(
         fileName: 'sample.gpx',
-        content: _fixture('sample.gpx'),
+        bytes: _bytes('sample.gpx'),
       );
       await service.commit(first);
 
       final second = await service.prepare(
         fileName: 'sample.gpx',
-        content: _fixture('sample.gpx'),
+        bytes: _bytes('sample.gpx'),
       );
       expect(second.duplicateOfTrackId, isNotNull);
     });
@@ -6923,7 +7010,7 @@ void main() {
         () async {
       final gpx = await service.prepare(
         fileName: 'sample.gpx',
-        content: _fixture('sample.gpx'),
+        bytes: _bytes('sample.gpx'),
       );
       await service.commit(gpx);
 
@@ -6931,7 +7018,7 @@ void main() {
       // same boat day are two legitimate records, not a duplicate.
       final csv = await service.prepare(
         fileName: 'sample.csv',
-        content: _fixture('sample.csv'),
+        bytes: _bytes('sample.csv'),
       );
       expect(csv.duplicateOfTrackId, isNull);
     });
@@ -6941,7 +7028,7 @@ void main() {
       expect(
         () => service.prepare(
           fileName: 'no_time.gpx',
-          content: _fixture('no_time.gpx'),
+          bytes: _bytes('no_time.gpx'),
         ),
         throwsA(isA<TrackParseException>()),
       );
@@ -7001,6 +7088,131 @@ Add to `GpsTrackRepository`, following the existing `finalizeTrack` / `_writeBlo
 - [ ] **Step 4: Implement the service**
 
 Create `lib/features/gps_log/data/services/track_import/track_import_service.dart` with `sniffFormat`, `overlapsMoreThan`, `TrackImportCandidate` (including a `copyWith`), `prepare`, and `commit`.
+
+`sniffFormat` works on bytes, checks the FIT magic before attempting any text decode, and never throws on binary input:
+
+```dart
+/// FIT files carry the ASCII bytes ".FIT" at offset 8.
+bool _looksLikeFit(Uint8List bytes) {
+  if (bytes.length < 12) return false;
+  return bytes[8] == 0x2E && // .
+      bytes[9] == 0x46 && //  F
+      bytes[10] == 0x49 && // I
+      bytes[11] == 0x54; //   T
+}
+
+/// Identifies a track file from its name and its bytes.
+///
+/// Checks the FIT magic first: FIT is binary, and utf8.decode on arbitrary
+/// bytes throws. Returns null rather than guessing when nothing matches.
+TrackFileFormat? sniffFormat(String fileName, Uint8List bytes) {
+  if (_looksLikeFit(bytes)) return TrackFileFormat.fit;
+
+  final extension = fileName.toLowerCase().split('.').last;
+  switch (extension) {
+    case 'gpx':
+      return TrackFileFormat.gpx;
+    case 'kml':
+      return TrackFileFormat.kml;
+    case 'csv':
+      return TrackFileFormat.csv;
+    case 'fit':
+      return TrackFileFormat.fit;
+  }
+
+  // Unknown extension: sniff the content, but only if it decodes as text.
+  final String text;
+  try {
+    text = utf8.decode(bytes);
+  } on FormatException {
+    return null;
+  }
+
+  final head = text.trimLeft().toLowerCase();
+  if (head.contains('<gpx')) return TrackFileFormat.gpx;
+  if (head.contains('<kml')) return TrackFileFormat.kml;
+  return null;
+}
+```
+
+`prepare` then decodes to text only for the three text formats:
+
+```dart
+Future<TrackImportCandidate> prepare({
+  required String fileName,
+  required Uint8List bytes,
+  CsvColumnMapping? csvMapping,
+}) async {
+  final format = sniffFormat(fileName, bytes);
+  if (format == null) {
+    throw const TrackParseException('Unrecognised file type');
+  }
+
+  final ParsedTrack parsed;
+  if (format == TrackFileFormat.fit) {
+    // FIT goes through the existing binary parser, not a text decode.
+    final records = await FitParserService().readRecords(bytes);
+    final track = extractFitTrack(records);
+    if (track == null) {
+      throw const TrackParseException('No GPS positions in that FIT file');
+    }
+    parsed = track;
+  } else {
+    final text = utf8.decode(bytes);
+    parsed = switch (format) {
+      TrackFileFormat.gpx => parseGpx(text),
+      TrackFileFormat.kml => parseKml(text),
+      TrackFileFormat.csv => parseCsv(
+          text,
+          csvMapping ??
+              guessCsvMapping(readCsvHeaders(text)) ??
+              (throw const TrackParseException(
+                'Could not identify the latitude, longitude, and time columns',
+              )),
+        ),
+      TrackFileFormat.fit => throw StateError('handled above'),
+    };
+  }
+
+  final firstFixUtc = parsed.fixes.first.utc;
+  final dives = await DiveRepository().getAllDives();
+  final tzOffsetMinutes = inferOffsetFromDives(firstFixUtc, dives) ??
+      DateTime.now().timeZoneOffset.inMinutes;
+
+  // Span of the incoming track in wall-clock-as-UTC milliseconds, which is
+  // the frame existing tracks are stored in.
+  final startMs =
+      toWallClockEpochSecondsAt(firstFixUtc, tzOffsetMinutes) * 1000;
+  final endMs =
+      toWallClockEpochSecondsAt(parsed.fixes.last.utc, tzOffsetMinutes) * 1000;
+
+  // Same source only: a phone recording and a handheld recording of the
+  // same boat day are two legitimate records, not a duplicate.
+  String? duplicateOfTrackId;
+  final existing = await GpsTrackRepository()
+      .getCompletedTracks(includePoints: false);
+  for (final track in existing) {
+    final trackEnd = track.endTime;
+    if (trackEnd == null || track.source != format.name) continue;
+    if (overlapsMoreThan(startMs, endMs, track.startTime, trackEnd, 0.8)) {
+      duplicateOfTrackId = track.id;
+      break;
+    }
+  }
+
+  return TrackImportCandidate(
+    parsed: parsed,
+    format: format,
+    sourceRef: fileName,
+    tzOffsetMinutes: tzOffsetMinutes,
+    duplicateOfTrackId: duplicateOfTrackId,
+  );
+}
+```
+
+Resolve `DiveRepository().getAllDives()` to the actual accessor in `lib/features/dive_log/data/repositories/` — grep for the method the match service already uses to load dives and reuse it.
+
+Resolve `FitParserService().readRecords` to whatever entry point `fit_parser_service.dart` actually exposes for reading records from bytes — read it and match, adding a method if none is public yet.
 
 `overlapsMoreThan` compares the intersection against the **shorter** of the two spans, so a five-minute clip fully inside a four-hour track counts as a duplicate of it:
 
@@ -7146,7 +7358,19 @@ Create `csv_column_mapping_form.dart` as a set of dropdowns, one per required fi
 
 - [ ] **Step 4: Add the entry point and route**
 
-Add an `Import track...` entry to the GPS Log app bar overflow that opens `FilePicker.pickFiles(allowedExtensions: ['gpx', 'kml', 'csv', 'fit'])`, calls `service.prepare`, and pushes the review page. Catch `TrackParseException` and show `gpsTrack_import_failed` rather than letting it escape.
+Add an `Import track...` entry to the GPS Log app bar overflow that opens:
+
+```dart
+    final result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: const ['gpx', 'kml', 'csv', 'fit'],
+      // Needed so FIT, which is binary, arrives intact rather than as a
+      // path we would then have to read separately on every platform.
+      withData: true,
+    );
+```
+
+then calls `service.prepare(fileName: result.files.single.name, bytes: result.files.single.bytes!)` and pushes the review page. Catch `TrackParseException` and show `gpsTrack_import_failed(e.message)` rather than letting it escape.
 
 Register `/gps-log/import` **before** `:id`, alongside `map`.
 
@@ -7291,14 +7515,20 @@ void main() {
 
   test('trimming bumps updatedAt so the change syncs', () async {
     final id = await seed();
-    final before = (await repo.getTrack(id))!;
+    final db = DatabaseService.instance.database;
+
+    Future<int> updatedAt() async => (await (db.select(db.gpsTracks)
+              ..where((t) => t.id.equals(id)))
+            .getSingle())
+        .updatedAt;
+
+    final before = await updatedAt();
     await Future<void>.delayed(const Duration(milliseconds: 5));
     await repo.setTrimBounds(
       id,
       startMs: DateTime.utc(2026, 5, 22, 10).millisecondsSinceEpoch,
     );
-    final after = await repo.getTrack(id);
-    expect(after!.updatedAt, greaterThan(before.updatedAt));
+    expect(await updatedAt(), greaterThan(before));
   });
 
   test('a trim excluding everything yields no points but keeps the blob',
@@ -7315,7 +7545,9 @@ void main() {
 }
 ```
 
-If `GpsTrack` has no `updatedAt` field yet, add it in Task 6's entity work or drop that one test — do not assert against a field that does not exist.
+Note the `updatedAt` test reads the Drift row directly rather than going through `GpsTrack`. The **column** exists on `gps_tracks`, but the **domain entity does not expose it** — `gps_track.dart` carries no `updatedAt` field. Do not add one just for this assertion; the timestamp is sync bookkeeping, not something any view needs.
+
+Add `import 'package:submersion/core/services/database_service.dart';` to the test file.
 
 - [ ] **Step 2: Run test to verify it fails**
 
