@@ -5615,3 +5615,1562 @@ flutter analyze
 ```
 
 ---
+
+## Phase 6: Import
+
+---
+
+### Task 26: Timezone resolution for imported tracks
+
+**Files:**
+- Create: `lib/features/gps_log/data/services/track_import/track_timezone_resolver.dart`
+- Test: `test/features/gps_log/track_timezone_resolver_test.dart`
+
+**Interfaces:**
+- Produces:
+  - `int toWallClockEpochSecondsAt(DateTime realUtc, int tzOffsetMinutes)`
+  - `int? inferOffsetFromDives(DateTime firstFixUtc, List<Dive> dives)`
+
+**This is the trap that would silently break everything downstream.** GPX `<time>` and KML `<when>` carry real UTC. The app stores wall-clock-as-UTC. The existing `toWallClockEpochSeconds` in `track_point_codec.dart` converts via `timestamp.toLocal()` — the **importing** device's zone. Import a Cozumel track while sitting in Seattle and every fix lands two hours off, so dive matching finds nothing and no error is raised anywhere.
+
+The importer must resolve the *track's* offset, not the importer's, and store it in the existing `tzOffsetMinutes` column.
+
+- [ ] **Step 1: Write the failing test**
+
+Create `test/features/gps_log/track_timezone_resolver_test.dart`:
+
+```dart
+import 'package:flutter_test/flutter_test.dart';
+import 'package:submersion/features/dive_log/domain/entities/dive.dart';
+import 'package:submersion/features/gps_log/data/services/track_import/track_timezone_resolver.dart';
+
+Dive _dive(DateTime entryWallClock) => Dive(
+      id: 'd',
+      diveNumber: 1,
+      dateTime: entryWallClock,
+      maxDepth: 30.0,
+    );
+
+void main() {
+  group('toWallClockEpochSecondsAt', () {
+    test('is identity for a zero offset', () {
+      final utc = DateTime.utc(2026, 5, 22, 13, 0, 0);
+      final result = toWallClockEpochSecondsAt(utc, 0);
+      expect(result, utc.millisecondsSinceEpoch ~/ 1000);
+    });
+
+    test('shifts a negative offset back to local wall clock', () {
+      // 13:00 real UTC in UTC-5 is 08:00 on the wall.
+      final utc = DateTime.utc(2026, 5, 22, 13);
+      final result = toWallClockEpochSecondsAt(utc, -300);
+      final asWallClock = DateTime.fromMillisecondsSinceEpoch(
+        result * 1000,
+        isUtc: true,
+      );
+      expect(asWallClock.hour, 8);
+      expect(asWallClock.day, 22);
+    });
+
+    test('shifts a positive offset forward', () {
+      // 00:00 real UTC in UTC+8 is 08:00 on the wall, same day.
+      final utc = DateTime.utc(2026, 5, 22, 0);
+      final result = toWallClockEpochSecondsAt(utc, 480);
+      final asWallClock = DateTime.fromMillisecondsSinceEpoch(
+        result * 1000,
+        isUtc: true,
+      );
+      expect(asWallClock.hour, 8);
+      expect(asWallClock.day, 22);
+    });
+
+    test('rolls the date backwards when the offset crosses midnight', () {
+      // 02:00 real UTC in UTC-5 is 21:00 the previous day.
+      final utc = DateTime.utc(2026, 5, 22, 2);
+      final result = toWallClockEpochSecondsAt(utc, -300);
+      final asWallClock = DateTime.fromMillisecondsSinceEpoch(
+        result * 1000,
+        isUtc: true,
+      );
+      expect(asWallClock.day, 21);
+      expect(asWallClock.hour, 21);
+    });
+
+    test('round-trips against the export conversion', () {
+      // realUtcFrom is the inverse used by GPX export; the pair must
+      // compose to identity or an export/re-import cycle drifts.
+      final utc = DateTime.utc(2026, 5, 22, 13, 45, 30);
+      const offset = -300;
+      final wall = toWallClockEpochSecondsAt(utc, offset);
+      final back = DateTime.fromMillisecondsSinceEpoch(
+        wall * 1000,
+        isUtc: true,
+      ).subtract(const Duration(minutes: offset));
+      expect(back, utc);
+    });
+  });
+
+  group('inferOffsetFromDives', () {
+    test('returns null when there are no dives', () {
+      expect(
+        inferOffsetFromDives(DateTime.utc(2026, 5, 22, 13), const []),
+        isNull,
+      );
+    });
+
+    test('infers the offset from the nearest dive on the same day', () {
+      // Dive entry wall clock 08:30; track's first fix is 13:00 real UTC.
+      // The implied offset is -270 min, snapped to the nearest 15 min.
+      final offset = inferOffsetFromDives(
+        DateTime.utc(2026, 5, 22, 13),
+        [_dive(DateTime.utc(2026, 5, 22, 8, 30))],
+      );
+      expect(offset, -270);
+    });
+
+    test('snaps a near-miss to a whole quarter hour', () {
+      // 08:32 implies -268; real zones are multiples of 15.
+      final offset = inferOffsetFromDives(
+        DateTime.utc(2026, 5, 22, 13),
+        [_dive(DateTime.utc(2026, 5, 22, 8, 32))],
+      );
+      expect(offset! % 15, 0);
+    });
+
+    test('returns null when no dive is within a day of the track', () {
+      expect(
+        inferOffsetFromDives(
+          DateTime.utc(2026, 5, 22, 13),
+          [_dive(DateTime.utc(2026, 8, 1, 8))],
+        ),
+        isNull,
+      );
+    });
+
+    test('rejects an implied offset outside the real range', () {
+      // A dive 20 hours off implies an impossible zone; better to admit
+      // we do not know than to store a fiction.
+      expect(
+        inferOffsetFromDives(
+          DateTime.utc(2026, 5, 22, 13),
+          [_dive(DateTime.utc(2026, 5, 21, 17))],
+        ),
+        isNull,
+      );
+    });
+  });
+}
+```
+
+- [ ] **Step 2: Run test to verify it fails**
+
+Run: `flutter test test/features/gps_log/track_timezone_resolver_test.dart`
+Expected: FAIL — `toWallClockEpochSecondsAt` isn't defined.
+
+- [ ] **Step 3: Implement the resolver**
+
+Create `lib/features/gps_log/data/services/track_import/track_timezone_resolver.dart`:
+
+```dart
+import 'package:submersion/features/dive_log/domain/entities/dive.dart';
+
+/// Real UTC offsets range from -12:00 to +14:00.
+const int _kMinOffsetMinutes = -720;
+const int _kMaxOffsetMinutes = 840;
+
+/// Converts a real-UTC instant into the app's wall-clock-as-UTC epoch
+/// seconds, using an EXPLICIT offset.
+///
+/// Deliberately distinct from [toWallClockEpochSeconds] in
+/// track_point_codec.dart, which uses the running device's local zone. That
+/// is correct while recording (the device IS the recorder) and wrong on
+/// import (the device is wherever the diver happens to be sitting).
+int toWallClockEpochSecondsAt(DateTime realUtc, int tzOffsetMinutes) {
+  return realUtc
+          .add(Duration(minutes: tzOffsetMinutes))
+          .millisecondsSinceEpoch ~/
+      1000;
+}
+
+/// Best guess at the offset a track was recorded under, from dives logged
+/// around the same time.
+///
+/// Dive entry times are already wall-clock-as-UTC, so the difference between
+/// a dive's stored entry and the track's real-UTC first fix IS the offset.
+/// Returns null when nothing plausible can be inferred - the import review
+/// step then asks rather than guessing.
+int? inferOffsetFromDives(DateTime firstFixUtc, List<Dive> dives) {
+  if (dives.isEmpty) return null;
+
+  Dive? nearest;
+  var smallestGap = const Duration(days: 1);
+  for (final dive in dives) {
+    final gap = dive.dateTime.difference(firstFixUtc).abs();
+    if (gap < smallestGap) {
+      smallestGap = gap;
+      nearest = dive;
+    }
+  }
+  if (nearest == null) return null;
+
+  final impliedMinutes =
+      nearest.dateTime.difference(firstFixUtc).inMinutes;
+
+  // Snap to a quarter hour: every real-world zone is a multiple of 15.
+  final snapped = (impliedMinutes / 15).round() * 15;
+
+  if (snapped < _kMinOffsetMinutes || snapped > _kMaxOffsetMinutes) {
+    return null;
+  }
+  return snapped;
+}
+```
+
+- [ ] **Step 4: Run test to verify it passes**
+
+Run: `flutter test test/features/gps_log/track_timezone_resolver_test.dart`
+Expected: PASS, 10 tests.
+
+- [ ] **Step 5: Format, analyze, commit**
+
+```bash
+dart format .
+flutter analyze
+git add lib/features/gps_log/data/services/track_import/ test/features/gps_log/track_timezone_resolver_test.dart
+git commit -m "Add timezone resolver for imported GPS tracks"
+```
+
+---
+
+### Task 27: GPX track parser
+
+**Files:**
+- Create: `lib/features/gps_log/data/services/track_import/parsed_track.dart`
+- Create: `lib/features/gps_log/data/services/track_import/gpx_track_parser.dart`
+- Test: `test/features/gps_log/gpx_track_parser_test.dart`
+- Test fixture: `test/fixtures/gps_tracks/sample.gpx`
+
+**Interfaces:**
+- Produces:
+  - `class ParsedTrack { final String? name; final List<({DateTime utc, double lat, double lon, double? accuracy})> fixes; }`
+  - `class TrackParseException implements Exception { final String message; }`
+  - `ParsedTrack parseGpx(String xml)`
+
+Parsers return real-UTC fixes. Converting to wall-clock-as-UTC happens once, in the import service, after the offset is resolved — never in a parser.
+
+**Per-point timestamps are required.** They are optional in the GPX schema, but a track without them can be neither matched to dives nor colorized. Rejecting is better than threading a nullable timestamp through the whole model.
+
+- [ ] **Step 1: Create the fixture**
+
+Create `test/fixtures/gps_tracks/sample.gpx`:
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx version="1.1" creator="Garmin" xmlns="http://www.topografix.com/GPX/1/1">
+  <trk>
+    <name>Cozumel Day 3</name>
+    <trkseg>
+      <trkpt lat="20.500000" lon="-87.250000">
+        <time>2026-05-22T13:00:00Z</time>
+        <hdop>5.0</hdop>
+      </trkpt>
+      <trkpt lat="20.510000" lon="-87.260000">
+        <time>2026-05-22T13:01:00Z</time>
+      </trkpt>
+      <trkpt lat="20.520000" lon="-87.270000">
+        <time>2026-05-22T13:02:00Z</time>
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>
+```
+
+Also create `test/fixtures/gps_tracks/no_time.gpx` (identical but with every `<time>` element removed) and `test/fixtures/gps_tracks/multi_seg.gpx` (two `<trkseg>` blocks of two points each).
+
+- [ ] **Step 2: Write the failing test**
+
+Create `test/features/gps_log/gpx_track_parser_test.dart`:
+
+```dart
+import 'dart:io';
+
+import 'package:flutter_test/flutter_test.dart';
+import 'package:submersion/features/gps_log/data/services/track_import/gpx_track_parser.dart';
+import 'package:submersion/features/gps_log/data/services/track_import/parsed_track.dart';
+
+String _fixture(String name) =>
+    File('test/fixtures/gps_tracks/$name').readAsStringSync();
+
+void main() {
+  test('parses every trkpt', () {
+    final track = parseGpx(_fixture('sample.gpx'));
+    expect(track.fixes.length, 3);
+  });
+
+  test('reads the track name', () {
+    expect(parseGpx(_fixture('sample.gpx')).name, 'Cozumel Day 3');
+  });
+
+  test('reads coordinates from the attributes', () {
+    final first = parseGpx(_fixture('sample.gpx')).fixes.first;
+    expect(first.lat, closeTo(20.5, 1e-9));
+    expect(first.lon, closeTo(-87.25, 1e-9));
+  });
+
+  test('parses time as real UTC, not local', () {
+    final first = parseGpx(_fixture('sample.gpx')).fixes.first;
+    expect(first.utc.isUtc, isTrue);
+    expect(first.utc, DateTime.utc(2026, 5, 22, 13, 0, 0));
+  });
+
+  test('reads hdop into accuracy where present', () {
+    final fixes = parseGpx(_fixture('sample.gpx')).fixes;
+    expect(fixes[0].accuracy, closeTo(5.0, 1e-9));
+    expect(fixes[1].accuracy, isNull);
+  });
+
+  test('flattens multiple track segments in document order', () {
+    final track = parseGpx(_fixture('multi_seg.gpx'));
+    expect(track.fixes.length, 4);
+    expect(
+      track.fixes.map((f) => f.utc.millisecondsSinceEpoch).toList(),
+      orderedEquals(
+        List<int>.from(
+          track.fixes.map((f) => f.utc.millisecondsSinceEpoch),
+        )..sort(),
+      ),
+    );
+  });
+
+  test('rejects a file with no per-point timestamps', () {
+    expect(
+      () => parseGpx(_fixture('no_time.gpx')),
+      throwsA(isA<TrackParseException>()),
+    );
+  });
+
+  test('rejects a file with no track points at all', () {
+    expect(
+      () => parseGpx('<gpx version="1.1"><trk><trkseg/></trk></gpx>'),
+      throwsA(isA<TrackParseException>()),
+    );
+  });
+
+  test('rejects malformed XML with a TrackParseException, not a raw throw',
+      () {
+    expect(
+      () => parseGpx('<gpx><trk>'),
+      throwsA(isA<TrackParseException>()),
+    );
+  });
+
+  test('rejects a trkpt with out-of-range coordinates', () {
+    const bad = '<gpx version="1.1"><trk><trkseg>'
+        '<trkpt lat="200.0" lon="-87.0"><time>2026-05-22T13:00:00Z</time>'
+        '</trkpt></trkseg></trk></gpx>';
+    expect(() => parseGpx(bad), throwsA(isA<TrackParseException>()));
+  });
+}
+```
+
+- [ ] **Step 3: Run test to verify it fails**
+
+Run: `flutter test test/features/gps_log/gpx_track_parser_test.dart`
+Expected: FAIL — `parseGpx` isn't defined.
+
+- [ ] **Step 4: Implement the shared model and the parser**
+
+Create `lib/features/gps_log/data/services/track_import/parsed_track.dart`:
+
+```dart
+/// One fix as it came out of a file, before any timezone reinterpretation.
+typedef ParsedFix = ({
+  DateTime utc,
+  double lat,
+  double lon,
+  double? accuracy,
+});
+
+/// A track as parsed from a file.
+///
+/// Times are REAL UTC. Conversion to the app's wall-clock-as-UTC convention
+/// happens once in the import service, after the track's offset is resolved -
+/// never in a parser, which has no way to know the offset.
+class ParsedTrack {
+  final String? name;
+  final List<ParsedFix> fixes;
+
+  const ParsedTrack({this.name, required this.fixes});
+}
+
+/// A file could not be understood as a track.
+class TrackParseException implements Exception {
+  final String message;
+  const TrackParseException(this.message);
+
+  @override
+  String toString() => 'TrackParseException: $message';
+}
+
+/// Rejects coordinates outside the valid range.
+void validateCoordinate(double lat, double lon) {
+  if (lat < -90 || lat > 90 || lon < -180 || lon > 180) {
+    throw TrackParseException('Coordinate out of range: $lat, $lon');
+  }
+}
+```
+
+Create `lib/features/gps_log/data/services/track_import/gpx_track_parser.dart`:
+
+```dart
+import 'package:xml/xml.dart';
+
+import 'package:submersion/features/gps_log/data/services/track_import/parsed_track.dart';
+
+/// Parses a GPX 1.0 or 1.1 document into a [ParsedTrack].
+///
+/// Requires a <time> on every <trkpt>. The schema makes it optional, but a
+/// track without timestamps cannot be matched to dives or colorized by speed
+/// or elapsed time, so accepting one would mean carrying a nullable timestamp
+/// through every downstream feature to serve a file nobody can use.
+ParsedTrack parseGpx(String xml) {
+  final XmlDocument document;
+  try {
+    document = XmlDocument.parse(xml);
+  } on XmlException catch (e) {
+    throw TrackParseException('Not valid XML: ${e.message}');
+  }
+
+  // findAllElements without a namespace matches regardless of the default
+  // xmlns, which varies between GPX 1.0 and 1.1 producers.
+  final trackPoints = document.findAllElements('trkpt').toList();
+  if (trackPoints.isEmpty) {
+    throw const TrackParseException('No <trkpt> elements found');
+  }
+
+  final fixes = <ParsedFix>[];
+  for (final node in trackPoints) {
+    final latText = node.getAttribute('lat');
+    final lonText = node.getAttribute('lon');
+    if (latText == null || lonText == null) {
+      throw const TrackParseException('<trkpt> missing lat or lon');
+    }
+    final lat = double.tryParse(latText);
+    final lon = double.tryParse(lonText);
+    if (lat == null || lon == null) {
+      throw TrackParseException('Unparseable coordinate: $latText, $lonText');
+    }
+    validateCoordinate(lat, lon);
+
+    final timeText =
+        node.findElements('time').firstOrNull?.innerText.trim();
+    if (timeText == null || timeText.isEmpty) {
+      throw const TrackParseException(
+        'Every track point needs a <time>; this file has points without one',
+      );
+    }
+    final parsed = DateTime.tryParse(timeText);
+    if (parsed == null) {
+      throw TrackParseException('Unparseable time: $timeText');
+    }
+
+    final hdopText = node.findElements('hdop').firstOrNull?.innerText.trim();
+
+    fixes.add((
+      utc: parsed.toUtc(),
+      lat: lat,
+      lon: lon,
+      accuracy: hdopText == null ? null : double.tryParse(hdopText),
+    ));
+  }
+
+  fixes.sort((a, b) => a.utc.compareTo(b.utc));
+
+  return ParsedTrack(
+    name: document.findAllElements('name').firstOrNull?.innerText.trim(),
+    fixes: List.unmodifiable(fixes),
+  );
+}
+```
+
+- [ ] **Step 5: Run test to verify it passes**
+
+Run: `flutter test test/features/gps_log/gpx_track_parser_test.dart`
+Expected: PASS, 10 tests.
+
+- [ ] **Step 6: Format, analyze, commit**
+
+```bash
+dart format .
+flutter analyze
+git add lib/features/gps_log/data/services/track_import/ test/features/gps_log/gpx_track_parser_test.dart test/fixtures/gps_tracks/
+git commit -m "Add GPX track parser"
+```
+
+---
+
+### Task 28: KML track parser
+
+**Files:**
+- Create: `lib/features/gps_log/data/services/track_import/kml_track_parser.dart`
+- Test: `test/features/gps_log/kml_track_parser_test.dart`
+- Test fixtures: `test/fixtures/gps_tracks/sample.kml`, `linestring.kml`
+
+**Interfaces:**
+- Consumes: `ParsedTrack`, `TrackParseException`, `validateCoordinate` (Task 27)
+- Produces: `ParsedTrack parseKml(String xml)`
+
+`<gx:coord>` is `lon lat alt`, the reverse of GPX's attribute order. Getting this backwards silently relocates a Cozumel track to the Indian Ocean, so it gets its own test.
+
+Plain `<LineString>` has no timestamps and is therefore rejected, consistent with the GPX rule.
+
+- [ ] **Step 1: Create the fixtures**
+
+Create `test/fixtures/gps_tracks/sample.kml`:
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2"
+     xmlns:gx="http://www.google.com/kml/ext/2.2">
+  <Document>
+    <Placemark>
+      <name>Cozumel Day 3</name>
+      <gx:Track>
+        <when>2026-05-22T13:00:00Z</when>
+        <when>2026-05-22T13:01:00Z</when>
+        <when>2026-05-22T13:02:00Z</when>
+        <gx:coord>-87.25 20.50 0</gx:coord>
+        <gx:coord>-87.26 20.51 0</gx:coord>
+        <gx:coord>-87.27 20.52 0</gx:coord>
+      </gx:Track>
+    </Placemark>
+  </Document>
+</kml>
+```
+
+Create `test/fixtures/gps_tracks/linestring.kml` with a `<LineString><coordinates>` block and no `<when>` elements.
+
+- [ ] **Step 2: Write the failing test**
+
+Create `test/features/gps_log/kml_track_parser_test.dart`:
+
+```dart
+import 'dart:io';
+
+import 'package:flutter_test/flutter_test.dart';
+import 'package:submersion/features/gps_log/data/services/track_import/kml_track_parser.dart';
+import 'package:submersion/features/gps_log/data/services/track_import/parsed_track.dart';
+
+String _fixture(String name) =>
+    File('test/fixtures/gps_tracks/$name').readAsStringSync();
+
+void main() {
+  test('parses every when/coord pair', () {
+    expect(parseKml(_fixture('sample.kml')).fixes.length, 3);
+  });
+
+  test('reads gx:coord as lon lat, not lat lon', () {
+    // The fixture's first coord is "-87.25 20.50 0". Reading it backwards
+    // would put this track off the coast of Somalia.
+    final first = parseKml(_fixture('sample.kml')).fixes.first;
+    expect(first.lat, closeTo(20.50, 1e-9));
+    expect(first.lon, closeTo(-87.25, 1e-9));
+  });
+
+  test('pairs the nth when with the nth coord', () {
+    final fixes = parseKml(_fixture('sample.kml')).fixes;
+    expect(fixes[1].utc, DateTime.utc(2026, 5, 22, 13, 1));
+    expect(fixes[1].lon, closeTo(-87.26, 1e-9));
+  });
+
+  test('reads the placemark name', () {
+    expect(parseKml(_fixture('sample.kml')).name, 'Cozumel Day 3');
+  });
+
+  test('rejects a LineString with no timestamps', () {
+    expect(
+      () => parseKml(_fixture('linestring.kml')),
+      throwsA(isA<TrackParseException>()),
+    );
+  });
+
+  test('rejects mismatched when and coord counts', () {
+    const bad = '<kml xmlns:gx="x"><gx:Track>'
+        '<when>2026-05-22T13:00:00Z</when>'
+        '<gx:coord>-87.25 20.5 0</gx:coord>'
+        '<gx:coord>-87.26 20.51 0</gx:coord>'
+        '</gx:Track></kml>';
+    expect(() => parseKml(bad), throwsA(isA<TrackParseException>()));
+  });
+
+  test('rejects malformed XML', () {
+    expect(() => parseKml('<kml>'), throwsA(isA<TrackParseException>()));
+  });
+
+  test('rejects a coord with fewer than two components', () {
+    const bad = '<kml xmlns:gx="x"><gx:Track>'
+        '<when>2026-05-22T13:00:00Z</when>'
+        '<gx:coord>-87.25</gx:coord>'
+        '</gx:Track></kml>';
+    expect(() => parseKml(bad), throwsA(isA<TrackParseException>()));
+  });
+}
+```
+
+- [ ] **Step 3: Run test to verify it fails**
+
+Run: `flutter test test/features/gps_log/kml_track_parser_test.dart`
+Expected: FAIL — `parseKml` isn't defined.
+
+- [ ] **Step 4: Implement the parser**
+
+Create `lib/features/gps_log/data/services/track_import/kml_track_parser.dart`:
+
+```dart
+import 'package:xml/xml.dart';
+
+import 'package:submersion/features/gps_log/data/services/track_import/parsed_track.dart';
+
+/// Parses a KML <gx:Track> into a [ParsedTrack].
+///
+/// Only the timestamped gx:Track form is supported. A plain <LineString>
+/// carries geometry with no times, and a track without times cannot be
+/// matched to dives or colorized - same rule as the GPX parser.
+ParsedTrack parseKml(String xml) {
+  final XmlDocument document;
+  try {
+    document = XmlDocument.parse(xml);
+  } on XmlException catch (e) {
+    throw TrackParseException('Not valid XML: ${e.message}');
+  }
+
+  final whens = document.findAllElements('when').toList();
+  // The element is namespace-prefixed in every real producer, but match on
+  // the local name so an unprefixed document still parses.
+  final coords = document
+      .descendants
+      .whereType<XmlElement>()
+      .where((e) => e.name.local == 'coord')
+      .toList();
+
+  if (whens.isEmpty || coords.isEmpty) {
+    throw const TrackParseException(
+      'No <gx:Track> with timestamps found. A plain LineString has no times '
+      'and cannot be imported.',
+    );
+  }
+  if (whens.length != coords.length) {
+    throw TrackParseException(
+      'Mismatched <when> (${whens.length}) and <gx:coord> '
+      '(${coords.length}) counts',
+    );
+  }
+
+  final fixes = <ParsedFix>[];
+  for (var i = 0; i < whens.length; i++) {
+    final time = DateTime.tryParse(whens[i].innerText.trim());
+    if (time == null) {
+      throw TrackParseException('Unparseable time: ${whens[i].innerText}');
+    }
+
+    // gx:coord is "lon lat alt" - the reverse of GPX's lat/lon attributes.
+    final parts = coords[i].innerText.trim().split(RegExp(r'\s+'));
+    if (parts.length < 2) {
+      throw TrackParseException('Malformed coord: ${coords[i].innerText}');
+    }
+    final lon = double.tryParse(parts[0]);
+    final lat = double.tryParse(parts[1]);
+    if (lat == null || lon == null) {
+      throw TrackParseException('Unparseable coord: ${coords[i].innerText}');
+    }
+    validateCoordinate(lat, lon);
+
+    fixes.add((utc: time.toUtc(), lat: lat, lon: lon, accuracy: null));
+  }
+
+  fixes.sort((a, b) => a.utc.compareTo(b.utc));
+
+  return ParsedTrack(
+    name: document.findAllElements('name').firstOrNull?.innerText.trim(),
+    fixes: List.unmodifiable(fixes),
+  );
+}
+```
+
+- [ ] **Step 5: Run test, format, analyze, commit**
+
+```bash
+flutter test test/features/gps_log/kml_track_parser_test.dart
+dart format .
+flutter analyze
+git add lib/features/gps_log/data/services/track_import/kml_track_parser.dart test/features/gps_log/kml_track_parser_test.dart test/fixtures/gps_tracks/
+git commit -m "Add KML gx:Track parser"
+```
+
+---
+
+### Task 29: CSV track parser and column mapping
+
+**Files:**
+- Create: `lib/features/gps_log/data/services/track_import/csv_track_parser.dart`
+- Test: `test/features/gps_log/csv_track_parser_test.dart`
+- Test fixture: `test/fixtures/gps_tracks/sample.csv`
+
+**Interfaces:**
+- Consumes: `ParsedTrack`, `TrackParseException`, `validateCoordinate` (Task 27)
+- Produces:
+  - `class CsvColumnMapping { final int latIndex, lonIndex, timeIndex; final int? accuracyIndex; final String? timeFormat; }`
+  - `List<String> readCsvHeaders(String csv)`
+  - `CsvColumnMapping? guessCsvMapping(List<String> headers)`
+  - `ParsedTrack parseCsv(String csv, CsvColumnMapping mapping)`
+
+Unlike the XML formats, CSV has no schema, so the user must confirm the mapping. `guessCsvMapping` proposes one from common header names; the UI presents it for confirmation rather than applying it silently.
+
+- [ ] **Step 1: Create the fixture**
+
+Create `test/fixtures/gps_tracks/sample.csv`:
+
+```
+timestamp,latitude,longitude,accuracy
+2026-05-22T13:00:00Z,20.500000,-87.250000,5.0
+2026-05-22T13:01:00Z,20.510000,-87.260000,
+2026-05-22T13:02:00Z,20.520000,-87.270000,4.2
+```
+
+- [ ] **Step 2: Write the failing test**
+
+Create `test/features/gps_log/csv_track_parser_test.dart`:
+
+```dart
+import 'dart:io';
+
+import 'package:flutter_test/flutter_test.dart';
+import 'package:submersion/features/gps_log/data/services/track_import/csv_track_parser.dart';
+import 'package:submersion/features/gps_log/data/services/track_import/parsed_track.dart';
+
+String _fixture() =>
+    File('test/fixtures/gps_tracks/sample.csv').readAsStringSync();
+
+void main() {
+  group('readCsvHeaders', () {
+    test('returns the header row', () {
+      expect(
+        readCsvHeaders(_fixture()),
+        ['timestamp', 'latitude', 'longitude', 'accuracy'],
+      );
+    });
+
+    test('throws on an empty file', () {
+      expect(() => readCsvHeaders(''), throwsA(isA<TrackParseException>()));
+    });
+  });
+
+  group('guessCsvMapping', () {
+    test('recognises the common header names', () {
+      final mapping = guessCsvMapping(
+        ['timestamp', 'latitude', 'longitude', 'accuracy'],
+      );
+      expect(mapping!.timeIndex, 0);
+      expect(mapping.latIndex, 1);
+      expect(mapping.lonIndex, 2);
+      expect(mapping.accuracyIndex, 3);
+    });
+
+    test('recognises abbreviated headers case-insensitively', () {
+      final mapping = guessCsvMapping(['Time', 'Lat', 'Lon']);
+      expect(mapping!.timeIndex, 0);
+      expect(mapping.latIndex, 1);
+      expect(mapping.lonIndex, 2);
+      expect(mapping.accuracyIndex, isNull);
+    });
+
+    test('returns null when a required column cannot be identified', () {
+      expect(guessCsvMapping(['a', 'b', 'c']), isNull);
+    });
+  });
+
+  group('parseCsv', () {
+    const mapping = CsvColumnMapping(
+      timeIndex: 0,
+      latIndex: 1,
+      lonIndex: 2,
+      accuracyIndex: 3,
+    );
+
+    test('parses every data row', () {
+      expect(parseCsv(_fixture(), mapping).fixes.length, 3);
+    });
+
+    test('parses times as real UTC', () {
+      final first = parseCsv(_fixture(), mapping).fixes.first;
+      expect(first.utc, DateTime.utc(2026, 5, 22, 13));
+      expect(first.utc.isUtc, isTrue);
+    });
+
+    test('leaves accuracy null for a blank cell', () {
+      final fixes = parseCsv(_fixture(), mapping).fixes;
+      expect(fixes[0].accuracy, closeTo(5.0, 1e-9));
+      expect(fixes[1].accuracy, isNull);
+    });
+
+    test('rejects a row with an unparseable coordinate', () {
+      const bad = 'time,lat,lon\n2026-05-22T13:00:00Z,north,-87.0\n';
+      expect(
+        () => parseCsv(
+          bad,
+          const CsvColumnMapping(timeIndex: 0, latIndex: 1, lonIndex: 2),
+        ),
+        throwsA(isA<TrackParseException>()),
+      );
+    });
+
+    test('rejects a row with an unparseable time', () {
+      const bad = 'time,lat,lon\nyesterday,20.5,-87.0\n';
+      expect(
+        () => parseCsv(
+          bad,
+          const CsvColumnMapping(timeIndex: 0, latIndex: 1, lonIndex: 2),
+        ),
+        throwsA(isA<TrackParseException>()),
+      );
+    });
+
+    test('rejects a file with a header but no data rows', () {
+      expect(
+        () => parseCsv(
+          'time,lat,lon\n',
+          const CsvColumnMapping(timeIndex: 0, latIndex: 1, lonIndex: 2),
+        ),
+        throwsA(isA<TrackParseException>()),
+      );
+    });
+
+    test('skips a trailing blank line rather than failing on it', () {
+      const withBlank = 'time,lat,lon\n2026-05-22T13:00:00Z,20.5,-87.0\n\n';
+      final track = parseCsv(
+        withBlank,
+        const CsvColumnMapping(timeIndex: 0, latIndex: 1, lonIndex: 2),
+      );
+      expect(track.fixes.length, 1);
+    });
+  });
+}
+```
+
+- [ ] **Step 3: Run test to verify it fails**
+
+Run: `flutter test test/features/gps_log/csv_track_parser_test.dart`
+Expected: FAIL — `readCsvHeaders` isn't defined.
+
+- [ ] **Step 4: Implement the parser**
+
+Create `lib/features/gps_log/data/services/track_import/csv_track_parser.dart`. Use the `csv` package if it is already a dependency (check `pubspec.yaml`; `csv_export_service.dart` may already pull it in), otherwise split on commas with quote handling.
+
+```dart
+import 'package:submersion/features/gps_log/data/services/track_import/parsed_track.dart';
+
+/// Which CSV column holds which field.
+///
+/// CSV has no schema, so unlike GPX and KML this cannot be inferred with
+/// confidence. [guessCsvMapping] proposes one; the import review step
+/// presents it for confirmation rather than applying it silently.
+class CsvColumnMapping {
+  final int timeIndex;
+  final int latIndex;
+  final int lonIndex;
+  final int? accuracyIndex;
+
+  const CsvColumnMapping({
+    required this.timeIndex,
+    required this.latIndex,
+    required this.lonIndex,
+    this.accuracyIndex,
+  });
+}
+
+const _kTimeHeaders = {'time', 'timestamp', 'datetime', 'date_time', 'utc'};
+const _kLatHeaders = {'lat', 'latitude', 'y'};
+const _kLonHeaders = {'lon', 'lng', 'long', 'longitude', 'x'};
+const _kAccuracyHeaders = {'accuracy', 'hdop', 'precision', 'error'};
+
+List<String> readCsvHeaders(String csv) {
+  final lines = const LineSplitter().convert(csv);
+  if (lines.isEmpty || lines.first.trim().isEmpty) {
+    throw const TrackParseException('File is empty');
+  }
+  return [for (final h in lines.first.split(',')) h.trim()];
+}
+
+/// Proposes a mapping from common header names, or null when the required
+/// three cannot be identified.
+CsvColumnMapping? guessCsvMapping(List<String> headers) {
+  int? find(Set<String> candidates) {
+    for (var i = 0; i < headers.length; i++) {
+      if (candidates.contains(headers[i].toLowerCase().trim())) return i;
+    }
+    return null;
+  }
+
+  final time = find(_kTimeHeaders);
+  final lat = find(_kLatHeaders);
+  final lon = find(_kLonHeaders);
+  if (time == null || lat == null || lon == null) return null;
+
+  return CsvColumnMapping(
+    timeIndex: time,
+    latIndex: lat,
+    lonIndex: lon,
+    accuracyIndex: find(_kAccuracyHeaders),
+  );
+}
+
+ParsedTrack parseCsv(String csv, CsvColumnMapping mapping) {
+  final lines = const LineSplitter().convert(csv);
+  if (lines.length < 2) {
+    throw const TrackParseException('File has a header but no data rows');
+  }
+
+  final fixes = <ParsedFix>[];
+  for (var i = 1; i < lines.length; i++) {
+    final line = lines[i].trim();
+    // Trailing newlines are normal; a blank line is not an error.
+    if (line.isEmpty) continue;
+
+    final cells = line.split(',');
+    String? cell(int? index) {
+      if (index == null || index >= cells.length) return null;
+      final value = cells[index].trim();
+      return value.isEmpty ? null : value;
+    }
+
+    final timeText = cell(mapping.timeIndex);
+    final time = timeText == null ? null : DateTime.tryParse(timeText);
+    if (time == null) {
+      throw TrackParseException('Row ${i + 1}: unparseable time "$timeText"');
+    }
+
+    final lat = double.tryParse(cell(mapping.latIndex) ?? '');
+    final lon = double.tryParse(cell(mapping.lonIndex) ?? '');
+    if (lat == null || lon == null) {
+      throw TrackParseException('Row ${i + 1}: unparseable coordinate');
+    }
+    validateCoordinate(lat, lon);
+
+    fixes.add((
+      utc: time.toUtc(),
+      lat: lat,
+      lon: lon,
+      accuracy: double.tryParse(cell(mapping.accuracyIndex) ?? ''),
+    ));
+  }
+
+  if (fixes.isEmpty) {
+    throw const TrackParseException('No usable data rows');
+  }
+  fixes.sort((a, b) => a.utc.compareTo(b.utc));
+  return ParsedTrack(fixes: List.unmodifiable(fixes));
+}
+```
+
+Add `import 'dart:convert';` for `LineSplitter`.
+
+- [ ] **Step 5: Run test, format, analyze, commit**
+
+```bash
+flutter test test/features/gps_log/csv_track_parser_test.dart
+dart format .
+flutter analyze
+git add lib/features/gps_log/data/services/track_import/csv_track_parser.dart test/features/gps_log/csv_track_parser_test.dart test/fixtures/gps_tracks/
+git commit -m "Add CSV track parser with column mapping"
+```
+
+---
+
+### Task 30: FIT track extraction
+
+**Files:**
+- Create: `lib/features/dive_import/data/services/fit/fit_track_extractor.dart`
+- Modify: `lib/features/dive_import/data/services/fit_parser_service.dart`
+- Test: `test/features/dive_import/fit_track_extractor_test.dart`
+
+**Interfaces:**
+- Consumes: `ParsedTrack`, `ParsedFix` (Task 27)
+- Produces: `ParsedTrack? extractFitTrack(List<dynamic> records)`
+
+Nearly free. `fit_parser_service.dart:128-137` **already** walks every FIT record reading `positionLat`/`positionLong` — and keeps only the last one, to use as the dive's exit fix. The whole position stream is right there and currently discarded.
+
+- [ ] **Step 1: Read the existing loop**
+
+Run: `sed -n '120,145p' lib/features/dive_import/data/services/fit_parser_service.dart`
+
+Note the exact record type and the field names. `fit_tool` returns positions already in degrees (the field carries the semicircle scale), per the comment in `fit_summary_extractor.dart:35-36` — do **not** apply `semicircleToDegrees` a second time.
+
+- [ ] **Step 2: Write the failing test**
+
+Create `test/features/dive_import/fit_track_extractor_test.dart`. Model the record stubs on whatever `fit_tool` message type the parser iterates — read `fit_profile_extractor.dart` for how existing tests fake records, and follow it:
+
+```dart
+import 'package:flutter_test/flutter_test.dart';
+import 'package:submersion/features/dive_import/data/services/fit/fit_track_extractor.dart';
+
+void main() {
+  test('returns null when no record carries a position', () {
+    final records = [_record(null, null, DateTime.utc(2026, 5, 22, 13))];
+    expect(extractFitTrack(records), isNull);
+  });
+
+  test('collects every positioned record', () {
+    final records = [
+      _record(20.50, -87.25, DateTime.utc(2026, 5, 22, 13, 0)),
+      _record(20.51, -87.26, DateTime.utc(2026, 5, 22, 13, 1)),
+      _record(20.52, -87.27, DateTime.utc(2026, 5, 22, 13, 2)),
+    ];
+    expect(extractFitTrack(records)!.fixes.length, 3);
+  });
+
+  test('skips records with no position but keeps the rest', () {
+    final records = [
+      _record(20.50, -87.25, DateTime.utc(2026, 5, 22, 13, 0)),
+      _record(null, null, DateTime.utc(2026, 5, 22, 13, 1)),
+      _record(20.52, -87.27, DateTime.utc(2026, 5, 22, 13, 2)),
+    ];
+    expect(extractFitTrack(records)!.fixes.length, 2);
+  });
+
+  test('keeps positions in degrees without re-scaling', () {
+    // fit_tool already applies the semicircle scale. Applying it again
+    // would collapse every coordinate toward zero.
+    final records = [
+      _record(20.50, -87.25, DateTime.utc(2026, 5, 22, 13, 0)),
+      _record(20.51, -87.26, DateTime.utc(2026, 5, 22, 13, 1)),
+    ];
+    final fixes = extractFitTrack(records)!.fixes;
+    expect(fixes.first.lat, closeTo(20.50, 1e-6));
+    expect(fixes.first.lon, closeTo(-87.25, 1e-6));
+  });
+
+  test('returns null for a single positioned record (nothing to draw)', () {
+    final records = [
+      _record(20.50, -87.25, DateTime.utc(2026, 5, 22, 13, 0)),
+    ];
+    expect(extractFitTrack(records), isNull);
+  });
+
+  test('orders fixes by timestamp', () {
+    final records = [
+      _record(20.52, -87.27, DateTime.utc(2026, 5, 22, 13, 2)),
+      _record(20.50, -87.25, DateTime.utc(2026, 5, 22, 13, 0)),
+    ];
+    final fixes = extractFitTrack(records)!.fixes;
+    expect(fixes.first.utc.minute, 0);
+  });
+
+  test('rejects out-of-range coordinates rather than importing them', () {
+    final records = [
+      _record(200.0, -87.25, DateTime.utc(2026, 5, 22, 13, 0)),
+      _record(20.51, -87.26, DateTime.utc(2026, 5, 22, 13, 1)),
+    ];
+    expect(extractFitTrack(records)!.fixes.length, 1);
+  });
+}
+```
+
+Write `_record(lat, lon, time)` as a small fake matching the record shape the parser consumes.
+
+- [ ] **Step 3: Run test to verify it fails**
+
+Run: `flutter test test/features/dive_import/fit_track_extractor_test.dart`
+Expected: FAIL — `extractFitTrack` isn't defined.
+
+- [ ] **Step 4: Implement the extractor**
+
+Create `lib/features/dive_import/data/services/fit/fit_track_extractor.dart`:
+
+```dart
+import 'package:submersion/features/gps_log/data/services/track_import/parsed_track.dart';
+
+/// Harvests the full position stream from a FIT file's record messages.
+///
+/// fit_parser_service already iterates these records reading positionLat and
+/// positionLong, but keeps only the last one as the dive's exit fix - the
+/// rest of the stream is discarded. This collects all of it into a track.
+///
+/// Positions come back from fit_tool already in degrees (the field carries
+/// the semicircle scale), so no conversion is applied here. Applying
+/// semicircleToDegrees a second time would collapse every coordinate.
+///
+/// Returns null when fewer than two positioned records exist - one fix is a
+/// point, not a track.
+ParsedTrack? extractFitTrack(List<dynamic> records) {
+  final fixes = <ParsedFix>[];
+
+  for (final record in records) {
+    final lat = record.positionLat as double?;
+    final lon = record.positionLong as double?;
+    final time = record.timestamp as DateTime?;
+    if (lat == null || lon == null || time == null) continue;
+
+    // A corrupt record should cost one fix, not the whole track.
+    try {
+      validateCoordinate(lat, lon);
+    } on TrackParseException {
+      continue;
+    }
+
+    fixes.add((utc: time.toUtc(), lat: lat, lon: lon, accuracy: null));
+  }
+
+  if (fixes.length < 2) return null;
+  fixes.sort((a, b) => a.utc.compareTo(b.utc));
+  return ParsedTrack(fixes: List.unmodifiable(fixes));
+}
+```
+
+Adjust the field accessors to the real `fit_tool` record type discovered in Step 1, and type the parameter properly rather than leaving it `List<dynamic>` if a concrete type is available.
+
+- [ ] **Step 5: Surface it from the parser service**
+
+In `fit_parser_service.dart`, call `extractFitTrack(records)` alongside the existing exit-fix loop and expose the result on the parse result object so the import pipeline can pick it up. Do not change the existing entry/exit behaviour.
+
+- [ ] **Step 6: Run tests, format, analyze, commit**
+
+```bash
+flutter test test/features/dive_import/
+dart format .
+flutter analyze
+git add lib/features/dive_import/ test/features/dive_import/
+git commit -m "Extract the full GPS track from FIT record messages"
+```
+
+---
+
+### Task 31: Import service with format sniffing and dedupe
+
+**Files:**
+- Create: `lib/features/gps_log/data/services/track_import/track_import_service.dart`
+- Modify: `lib/features/gps_log/data/repositories/gps_track_repository.dart`
+- Test: `test/features/gps_log/track_import_service_test.dart`
+
+**Interfaces:**
+- Consumes: every parser (Tasks 27-30), `toWallClockEpochSecondsAt` / `inferOffsetFromDives` (Task 26)
+- Produces:
+  - `enum TrackFileFormat { gpx, kml, csv, fit }`
+  - `TrackFileFormat? sniffFormat(String fileName, String content)`
+  - `class TrackImportCandidate { final ParsedTrack parsed; final TrackFileFormat format; final String sourceRef; final int tzOffsetMinutes; final String? duplicateOfTrackId; }`
+  - `TrackImportService.prepare(...)` → `Future<TrackImportCandidate>`
+  - `TrackImportService.commit(TrackImportCandidate)` → `Future<String>`
+  - `GpsTrackRepository.insertImportedTrack(...)` → `Future<String>`
+  - `bool overlapsMoreThan(int aStart, int aEnd, int bStart, int bEnd, double fraction)`
+
+**Dedupe rule from the spec:** an incoming track is a probable duplicate when its span overlaps an existing track's span by more than **80%** *and* the two share a `source`. Flagged candidates surface as a choice; nothing is dropped or merged silently. Different sources overlapping in time import normally — a phone recording and a handheld recording of the same boat day are legitimately two records.
+
+**prepare and commit are separate** so the review step can adjust the offset before anything is written.
+
+- [ ] **Step 1: Write the failing test**
+
+Create `test/features/gps_log/track_import_service_test.dart`:
+
+```dart
+import 'dart:io';
+
+import 'package:flutter_test/flutter_test.dart';
+import 'package:submersion/features/gps_log/data/repositories/gps_track_repository.dart';
+import 'package:submersion/features/gps_log/data/services/track_import/track_import_service.dart';
+
+import '../../helpers/test_database.dart';
+
+String _fixture(String name) =>
+    File('test/fixtures/gps_tracks/$name').readAsStringSync();
+
+void main() {
+  late TrackImportService service;
+  late GpsTrackRepository repo;
+
+  setUp(() async {
+    await setUpTestDatabase();
+    repo = GpsTrackRepository();
+    service = TrackImportService();
+  });
+
+  tearDown(tearDownTestDatabase);
+
+  group('sniffFormat', () {
+    test('recognises gpx by extension', () {
+      expect(sniffFormat('track.gpx', '<gpx/>'), TrackFileFormat.gpx);
+    });
+
+    test('recognises kml by extension', () {
+      expect(sniffFormat('track.kml', '<kml/>'), TrackFileFormat.kml);
+    });
+
+    test('recognises csv by extension', () {
+      expect(sniffFormat('track.csv', 'a,b,c'), TrackFileFormat.csv);
+    });
+
+    test('falls back to content sniffing for an unknown extension', () {
+      expect(
+        sniffFormat('track.dat', '<?xml version="1.0"?><gpx><trk/></gpx>'),
+        TrackFileFormat.gpx,
+      );
+    });
+
+    test('returns null for something unrecognisable', () {
+      expect(sniffFormat('notes.txt', 'hello world'), isNull);
+    });
+  });
+
+  group('overlapsMoreThan', () {
+    test('detects a full overlap', () {
+      expect(overlapsMoreThan(0, 100, 0, 100, 0.8), isTrue);
+    });
+
+    test('detects a 90 percent overlap', () {
+      expect(overlapsMoreThan(0, 100, 10, 110, 0.8), isTrue);
+    });
+
+    test('rejects a 50 percent overlap', () {
+      expect(overlapsMoreThan(0, 100, 50, 150, 0.8), isFalse);
+    });
+
+    test('rejects disjoint spans', () {
+      expect(overlapsMoreThan(0, 100, 200, 300, 0.8), isFalse);
+    });
+
+    test('rejects touching-but-not-overlapping spans', () {
+      expect(overlapsMoreThan(0, 100, 100, 200, 0.8), isFalse);
+    });
+  });
+
+  group('prepare', () {
+    test('parses a GPX file into a candidate', () async {
+      final candidate = await service.prepare(
+        fileName: 'sample.gpx',
+        content: _fixture('sample.gpx'),
+      );
+      expect(candidate.format, TrackFileFormat.gpx);
+      expect(candidate.parsed.fixes.length, 3);
+      expect(candidate.sourceRef, 'sample.gpx');
+    });
+
+    test('defaults the offset to device-local when no dives overlap',
+        () async {
+      final candidate = await service.prepare(
+        fileName: 'sample.gpx',
+        content: _fixture('sample.gpx'),
+      );
+      expect(
+        candidate.tzOffsetMinutes,
+        DateTime.now().timeZoneOffset.inMinutes,
+      );
+    });
+
+    test('flags nothing as duplicate on an empty database', () async {
+      final candidate = await service.prepare(
+        fileName: 'sample.gpx',
+        content: _fixture('sample.gpx'),
+      );
+      expect(candidate.duplicateOfTrackId, isNull);
+    });
+  });
+
+  group('commit', () {
+    test('writes a track with the right source and sourceRef', () async {
+      final candidate = await service.prepare(
+        fileName: 'sample.gpx',
+        content: _fixture('sample.gpx'),
+      );
+      final id = await service.commit(candidate);
+
+      final track = await repo.getTrack(id);
+      expect(track!.source, 'gpx');
+      expect(track.sourceRef, 'sample.gpx');
+      expect(track.pointCount, 3);
+    });
+
+    test('converts fixes to wall-clock-as-UTC using the resolved offset',
+        () async {
+      final base = await service.prepare(
+        fileName: 'sample.gpx',
+        content: _fixture('sample.gpx'),
+      );
+      // Force UTC-5: 13:00 real UTC must land as 08:00 wall clock.
+      final candidate = base.copyWith(tzOffsetMinutes: -300);
+      final id = await service.commit(candidate);
+
+      final track = await repo.getTrack(id);
+      final first = DateTime.fromMillisecondsSinceEpoch(
+        track!.points.first.timestamp * 1000,
+        isUtc: true,
+      );
+      expect(first.hour, 8);
+      expect(track.tzOffsetMinutes, -300);
+    });
+
+    test('flags a re-import of the same file as a duplicate', () async {
+      final first = await service.prepare(
+        fileName: 'sample.gpx',
+        content: _fixture('sample.gpx'),
+      );
+      await service.commit(first);
+
+      final second = await service.prepare(
+        fileName: 'sample.gpx',
+        content: _fixture('sample.gpx'),
+      );
+      expect(second.duplicateOfTrackId, isNotNull);
+    });
+
+    test('does not flag an overlapping track from a different source',
+        () async {
+      final gpx = await service.prepare(
+        fileName: 'sample.gpx',
+        content: _fixture('sample.gpx'),
+      );
+      await service.commit(gpx);
+
+      // Same times, arriving as CSV: a phone and a handheld recording the
+      // same boat day are two legitimate records, not a duplicate.
+      final csv = await service.prepare(
+        fileName: 'sample.csv',
+        content: _fixture('sample.csv'),
+      );
+      expect(csv.duplicateOfTrackId, isNull);
+    });
+
+    test('rejects a timestamp-less file with a TrackParseException',
+        () async {
+      expect(
+        () => service.prepare(
+          fileName: 'no_time.gpx',
+          content: _fixture('no_time.gpx'),
+        ),
+        throwsA(isA<TrackParseException>()),
+      );
+    });
+  });
+}
+```
+
+- [ ] **Step 2: Run test to verify it fails**
+
+Run: `flutter test test/features/gps_log/track_import_service_test.dart`
+Expected: FAIL — `TrackImportService` isn't defined.
+
+- [ ] **Step 3: Add the repository insert**
+
+Add to `GpsTrackRepository`, following the existing `finalizeTrack` / `_writeBlob` pattern for HLC and `SyncEventBus.notifyLocalChange()`:
+
+```dart
+  /// Inserts a fully-formed imported track in one write.
+  ///
+  /// Unlike startTrack/appendBufferPoint/finalizeTrack, an import already has
+  /// every point in hand, so it skips the local buffer entirely.
+  Future<String> insertImportedTrack({
+    required List<domain.GpsTrackPoint> points,
+    required int startTimeMs,
+    required int endTimeMs,
+    required int tzOffsetMinutes,
+    required String source,
+    String? sourceRef,
+    String? name,
+  }) async {
+    final id = _uuid.v4();
+    final now = DateTime.now().millisecondsSinceEpoch;
+    await _db.into(_db.gpsTracks).insert(
+          GpsTracksCompanion.insert(
+            id: id,
+            startTime: startTimeMs,
+            endTime: Value(endTimeMs),
+            tzOffsetMinutes: Value(tzOffsetMinutes),
+            pointCount: Value(points.length),
+            points: Value(encodeTrackPoints(points)),
+            // Always restate source explicitly. A Value.absent() here would
+            // silently fall back to the 'phone' default and misattribute an
+            // imported track.
+            source: Value(source),
+            sourceRef: Value(sourceRef),
+            name: Value(name),
+            createdAt: now,
+            updatedAt: now,
+          ),
+        );
+    SyncEventBus.notifyLocalChange();
+    return id;
+  }
+```
+
+- [ ] **Step 4: Implement the service**
+
+Create `lib/features/gps_log/data/services/track_import/track_import_service.dart` with `sniffFormat`, `overlapsMoreThan`, `TrackImportCandidate` (including a `copyWith`), `prepare`, and `commit`.
+
+`overlapsMoreThan` compares the intersection against the **shorter** of the two spans, so a five-minute clip fully inside a four-hour track counts as a duplicate of it:
+
+```dart
+/// True when [a] and [b] overlap by more than [fraction] of the shorter span.
+bool overlapsMoreThan(
+  int aStart,
+  int aEnd,
+  int bStart,
+  int bEnd,
+  double fraction,
+) {
+  final overlapStart = aStart > bStart ? aStart : bStart;
+  final overlapEnd = aEnd < bEnd ? aEnd : bEnd;
+  final overlap = overlapEnd - overlapStart;
+  if (overlap <= 0) return false;
+
+  final aSpan = aEnd - aStart;
+  final bSpan = bEnd - bStart;
+  final shorter = aSpan < bSpan ? aSpan : bSpan;
+  if (shorter <= 0) return false;
+
+  return overlap / shorter > fraction;
+}
+```
+
+`prepare` sniffs the format, runs the matching parser, resolves the offset via `inferOffsetFromDives` falling back to `DateTime.now().timeZoneOffset.inMinutes`, then checks every existing track of the same `source` with `overlapsMoreThan(..., 0.8)`.
+
+`commit` maps each `ParsedFix` through `toWallClockEpochSecondsAt(fix.utc, candidate.tzOffsetMinutes)` and calls `insertImportedTrack`, then triggers the existing match sweep via `gpsTrackMatchServiceProvider`.
+
+- [ ] **Step 5: Run tests, format, analyze, commit**
+
+```bash
+flutter test test/features/gps_log/
+dart format .
+flutter analyze
+git add lib/features/gps_log/ test/features/gps_log/
+git commit -m "Add track import service with format sniffing and dedupe"
+```
+
+---
+
+### Task 32: Import UI and review step
+
+**Files:**
+- Create: `lib/features/gps_log/presentation/pages/track_import_review_page.dart`
+- Create: `lib/features/gps_log/presentation/widgets/csv_column_mapping_form.dart`
+- Modify: `lib/features/gps_log/presentation/pages/gps_logger_page.dart`
+- Modify: `lib/core/router/app_router.dart`
+- Modify: `lib/l10n/arb/app_en.arb` plus all locale ARBs
+- Test: `test/features/gps_log/track_import_review_page_test.dart`
+
+**Interfaces:**
+- Consumes: `TrackImportService`, `TrackImportCandidate` (Task 31); `guessCsvMapping`, `CsvColumnMapping` (Task 29)
+
+- [ ] **Step 1: Add l10n strings**
+
+```json
+  "gpsTrack_import_action": "Import track...",
+  "@gpsTrack_import_action": {"description": "Menu entry that opens a file picker to import a GPS track"},
+  "gpsTrack_import_reviewTitle": "Review Import",
+  "@gpsTrack_import_reviewTitle": {"description": "Title of the import review screen"},
+  "gpsTrack_import_fixCount": "{count, plural, =1{1 fix} other{{count} fixes}}",
+  "@gpsTrack_import_fixCount": {
+    "description": "Number of positions in the track being imported",
+    "placeholders": {"count": {"type": "int"}}
+  },
+  "gpsTrack_import_timezone": "Recorded in",
+  "@gpsTrack_import_timezone": {"description": "Label for the timezone offset selector"},
+  "gpsTrack_import_timezoneHint": "Times in the file are UTC. Set the zone the track was recorded in so it lines up with your dives.",
+  "@gpsTrack_import_timezoneHint": {"description": "Explains why the offset matters"},
+  "gpsTrack_import_duplicate": "This looks like a duplicate of an existing track.",
+  "@gpsTrack_import_duplicate": {"description": "Warning when the incoming track overlaps an existing one"},
+  "gpsTrack_import_confirm": "Import",
+  "@gpsTrack_import_confirm": {"description": "Button that commits the import"},
+  "gpsTrack_import_failed": "Could not read that file: {reason}",
+  "@gpsTrack_import_failed": {
+    "description": "Shown when parsing fails",
+    "placeholders": {"reason": {"type": "String"}}
+  },
+  "gpsTrack_import_csvMapping": "Match the columns",
+  "@gpsTrack_import_csvMapping": {"description": "Heading for the CSV column mapping form"}
+```
+
+Translate into all locales, then `flutter gen-l10n`.
+
+- [ ] **Step 2: Write the failing test**
+
+Create `test/features/gps_log/track_import_review_page_test.dart`:
+
+```dart
+  testWidgets('shows the fix count and inferred timezone', (tester) async {
+    // Pump the review page with a prepared GPX candidate of 3 fixes and
+    // offset -300.
+    expect(find.text('3 fixes'), findsOneWidget);
+    expect(find.textContaining('UTC-5'), findsOneWidget);
+  });
+
+  testWidgets('changing the offset updates the previewed first fix time',
+      (tester) async {
+    // The whole reason this screen exists: the user must be able to see and
+    // correct the offset before anything is written.
+  });
+
+  testWidgets('warns when the candidate is flagged as a duplicate',
+      (tester) async {
+    expect(
+      find.text('This looks like a duplicate of an existing track.'),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets('shows the column mapping form for a CSV candidate',
+      (tester) async {
+    expect(find.text('Match the columns'), findsOneWidget);
+  });
+
+  testWidgets('does not show the mapping form for a GPX candidate',
+      (tester) async {
+    expect(find.text('Match the columns'), findsNothing);
+  });
+
+  testWidgets('a parse failure shows the reason and offers no Import button',
+      (tester) async {
+    expect(find.textContaining('Could not read that file'), findsOneWidget);
+    expect(find.text('Import'), findsNothing);
+  });
+```
+
+Fill the harness bodies using the `_pump` pattern from the other gps_log page tests.
+
+- [ ] **Step 3: Build the review page**
+
+Create `track_import_review_page.dart` showing:
+
+- Track name (editable), fix count, and the time span rendered from the *currently selected* offset.
+- A timezone offset selector defaulting to `candidate.tzOffsetMinutes`, with `gpsTrack_import_timezoneHint` beneath it. Changing it re-renders the previewed times live, so a wrong guess is visible before it is committed rather than after dives fail to match.
+- A duplicate warning banner with skip / import-anyway when `duplicateOfTrackId` is set.
+- The CSV mapping form when `format == TrackFileFormat.csv`, pre-filled from `guessCsvMapping`.
+- An Import button calling `service.commit`, then popping with a confirmation.
+
+Create `csv_column_mapping_form.dart` as a set of dropdowns, one per required field, populated from `readCsvHeaders`.
+
+- [ ] **Step 4: Add the entry point and route**
+
+Add an `Import track...` entry to the GPS Log app bar overflow that opens `FilePicker.pickFiles(allowedExtensions: ['gpx', 'kml', 'csv', 'fit'])`, calls `service.prepare`, and pushes the review page. Catch `TrackParseException` and show `gpsTrack_import_failed` rather than letting it escape.
+
+Register `/gps-log/import` **before** `:id`, alongside `map`.
+
+- [ ] **Step 5: Extend the router test**
+
+Add to `test/core/router/app_router_gps_track_test.dart` a case asserting `/gps-log/import` resolves to the import route and not `gpsTrackDetail`, mirroring the `/gps-log/map` cases.
+
+- [ ] **Step 6: Run tests, format, analyze, commit**
+
+```bash
+flutter test test/features/gps_log/ test/core/router/
+dart format .
+flutter analyze
+git add lib/features/gps_log/ lib/core/router/app_router.dart lib/l10n/ test/
+git commit -m "Add GPS track import UI with timezone review and CSV mapping"
+```
+
+---
+
+**Phase 6 complete.** Tracks arrive from GPX, KML, CSV, and FIT, with the timezone confirmed before anything is written.
+
+```bash
+flutter test
+flutter analyze
+```
+
+---
