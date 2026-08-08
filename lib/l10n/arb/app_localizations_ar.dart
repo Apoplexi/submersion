@@ -18101,6 +18101,29 @@ class AppLocalizationsAr extends AppLocalizations {
       'استخدام السجل المطابق';
 
   @override
+  String get universalImport_entityAction_replaceBadge => 'استبدال';
+
+  @override
+  String get universalImport_entityAction_replaceExisting => 'استبدال الحالي';
+
+  @override
+  String get universalImport_entityAction_replaceExistingSubtitle =>
+      'الكتابة فوقه بالبيانات المستوردة';
+
+  @override
+  String get universalImport_entityAction_skip => 'تخطي';
+
+  @override
+  String get universalImport_entityAction_skipSubtitle => 'تجاهل هذا الاستيراد';
+
+  @override
+  String get universalImport_entityAction_importAsNew => 'استيراد كجديد';
+
+  @override
+  String get universalImport_entityAction_importAsNewSubtitle =>
+      'إنشاء إدخال منفصل';
+
+  @override
   String get universalImport_pending_chooseAction => 'اختر إجراء';
 
   @override

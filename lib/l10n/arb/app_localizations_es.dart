@@ -18446,6 +18446,31 @@ class AppLocalizationsEs extends AppLocalizations {
       'Usar el registro coincidente';
 
   @override
+  String get universalImport_entityAction_replaceBadge => 'REEMPLAZAR';
+
+  @override
+  String get universalImport_entityAction_replaceExisting =>
+      'Reemplazar existente';
+
+  @override
+  String get universalImport_entityAction_replaceExistingSubtitle =>
+      'Sobrescribir con los datos importados';
+
+  @override
+  String get universalImport_entityAction_skip => 'Omitir';
+
+  @override
+  String get universalImport_entityAction_skipSubtitle =>
+      'Descartar esta importación';
+
+  @override
+  String get universalImport_entityAction_importAsNew => 'Importar como nuevo';
+
+  @override
+  String get universalImport_entityAction_importAsNewSubtitle =>
+      'Crear una entrada separada';
+
+  @override
   String get universalImport_pending_chooseAction => 'Elegir una accion';
 
   @override

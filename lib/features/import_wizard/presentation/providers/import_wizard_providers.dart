@@ -208,9 +208,15 @@ class ImportWizardNotifier extends StateNotifier<ImportWizardState> {
     state = state.copyWith(isCancellationRequested: true);
   }
 
-  /// The duplicate actions supported by the underlying adapter.
+  /// The duplicate actions supported by the underlying adapter, across all
+  /// entity types. Prefer [duplicateActionsFor] when a specific tab is in
+  /// scope: some adapters implement an action for only some entity types.
   Set<DuplicateAction> get supportedDuplicateActions =>
       _adapter.supportedDuplicateActions;
+
+  /// The duplicate actions the adapter supports for entities of [type].
+  Set<DuplicateAction> duplicateActionsFor(ImportEntityType type) =>
+      _adapter.duplicateActionsFor(type);
 
   // -------------------------------------------------------------------------
   // setBundle
@@ -502,11 +508,11 @@ class ImportWizardNotifier extends StateNotifier<ImportWizardState> {
     DuplicateAction action,
   ) {
     assert(
-      _adapter.supportedDuplicateActions.contains(action),
+      _adapter.duplicateActionsFor(type).contains(action),
       'DuplicateAction $action is not supported by adapter '
-      '${_adapter.runtimeType}',
+      '${_adapter.runtimeType} for entity type $type',
     );
-    if (!_adapter.supportedDuplicateActions.contains(action)) return;
+    if (!_adapter.duplicateActionsFor(type).contains(action)) return;
 
     final actionsForType =
         state.duplicateActions[type] ?? const <int, DuplicateAction>{};
@@ -565,11 +571,11 @@ class ImportWizardNotifier extends StateNotifier<ImportWizardState> {
   /// eligible matches.
   void applyBulkAction(ImportEntityType type, DuplicateAction action) {
     assert(
-      _adapter.supportedDuplicateActions.contains(action),
+      _adapter.duplicateActionsFor(type).contains(action),
       'DuplicateAction $action is not supported by adapter '
-      '${_adapter.runtimeType}',
+      '${_adapter.runtimeType} for entity type $type',
     );
-    if (!_adapter.supportedDuplicateActions.contains(action)) return;
+    if (!_adapter.duplicateActionsFor(type).contains(action)) return;
 
     final pending = state.pendingFor(type);
     if (pending.isEmpty) return;

@@ -17490,6 +17490,27 @@ class AppLocalizationsZh extends AppLocalizations {
   String get universalImport_entityAction_linkExistingSubtitle => '使用匹配的记录';
 
   @override
+  String get universalImport_entityAction_replaceBadge => '替换';
+
+  @override
+  String get universalImport_entityAction_replaceExisting => '替换现有';
+
+  @override
+  String get universalImport_entityAction_replaceExistingSubtitle => '用导入的数据覆盖';
+
+  @override
+  String get universalImport_entityAction_skip => '跳过';
+
+  @override
+  String get universalImport_entityAction_skipSubtitle => '放弃此次导入';
+
+  @override
+  String get universalImport_entityAction_importAsNew => '作为新导入';
+
+  @override
+  String get universalImport_entityAction_importAsNewSubtitle => '创建单独条目';
+
+  @override
   String get universalImport_pending_chooseAction => '选择操作';
 
   @override

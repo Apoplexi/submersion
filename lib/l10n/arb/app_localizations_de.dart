@@ -18398,6 +18398,31 @@ class AppLocalizationsDe extends AppLocalizations {
       'Vorhandenen Eintrag verwenden';
 
   @override
+  String get universalImport_entityAction_replaceBadge => 'ERSETZEN';
+
+  @override
+  String get universalImport_entityAction_replaceExisting =>
+      'Vorhandenen ersetzen';
+
+  @override
+  String get universalImport_entityAction_replaceExistingSubtitle =>
+      'Mit importierten Daten überschreiben';
+
+  @override
+  String get universalImport_entityAction_skip => 'Überspringen';
+
+  @override
+  String get universalImport_entityAction_skipSubtitle =>
+      'Diesen Import verwerfen';
+
+  @override
+  String get universalImport_entityAction_importAsNew => 'Als neu importieren';
+
+  @override
+  String get universalImport_entityAction_importAsNewSubtitle =>
+      'Separaten Eintrag erstellen';
+
+  @override
   String get universalImport_pending_chooseAction => 'Aktion auswählen';
 
   @override

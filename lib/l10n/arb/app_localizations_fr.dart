@@ -18501,6 +18501,32 @@ class AppLocalizationsFr extends AppLocalizations {
       'Utiliser la fiche correspondante';
 
   @override
+  String get universalImport_entityAction_replaceBadge => 'REMPLACER';
+
+  @override
+  String get universalImport_entityAction_replaceExisting =>
+      'Remplacer l\'existant';
+
+  @override
+  String get universalImport_entityAction_replaceExistingSubtitle =>
+      'Écraser avec les données importées';
+
+  @override
+  String get universalImport_entityAction_skip => 'Ignorer';
+
+  @override
+  String get universalImport_entityAction_skipSubtitle =>
+      'Abandonner cet import';
+
+  @override
+  String get universalImport_entityAction_importAsNew =>
+      'Importer comme nouveau';
+
+  @override
+  String get universalImport_entityAction_importAsNewSubtitle =>
+      'Créer une fiche distincte';
+
+  @override
   String get universalImport_pending_chooseAction => 'Choisir une action';
 
   @override

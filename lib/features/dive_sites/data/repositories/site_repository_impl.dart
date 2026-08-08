@@ -117,39 +117,72 @@ class SiteRepository {
   }
 
   /// Update an existing site
-  Future<void> updateSite(domain.DiveSite site) async {
+  Future<void> updateSite(domain.DiveSite site) => _writeSiteUpdate(site);
+
+  /// Update an existing site and, in the same statement, apply importer-only
+  /// columns that do not flow through the [domain.DiveSite] entity.
+  ///
+  /// The UDDF importer's overwrite path needs both halves to land together:
+  /// writing the core fields and then patching `waterType`/`bodyOfWater` in a
+  /// second statement would leave the row with new core data and stale
+  /// metadata if the second write threw. Merging them into one UPDATE makes
+  /// the pair atomic without a transaction, and marks the row pending for
+  /// sync exactly once.
+  ///
+  /// Columns set on [metadataPatch] win over the values derived from [site].
+  Future<void> updateSiteWithImportedMetadata(
+    domain.DiveSite site,
+    DiveSitesCompanion metadataPatch,
+  ) => _writeSiteUpdate(site, metadataPatch: metadataPatch);
+
+  Future<void> _writeSiteUpdate(
+    domain.DiveSite site, {
+    DiveSitesCompanion? metadataPatch,
+  }) async {
     try {
       _log.info('Updating site: ${site.id}');
       final now = DateTime.now().millisecondsSinceEpoch;
 
+      var companion = DiveSitesCompanion(
+        name: Value(site.name),
+        description: Value(site.description),
+        latitude: Value(site.location?.latitude),
+        longitude: Value(site.location?.longitude),
+        minDepth: Value(site.minDepth),
+        maxDepth: Value(site.maxDepth),
+        difficulty: Value(site.difficulty?.name),
+        waterType: Value(site.waterType?.name),
+        country: Value(site.country),
+        region: Value(site.region),
+        city: Value(site.city),
+        island: Value(site.island),
+        bodyOfWater: Value(site.bodyOfWater),
+        rating: Value(site.rating),
+        notes: Value(site.notes),
+        hazards: Value(site.hazards),
+        accessNotes: Value(site.accessNotes),
+        mooringNumber: Value(site.mooringNumber),
+        parkingInfo: Value(site.parkingInfo),
+        altitude: Value(site.altitude),
+        isShared: Value(site.isShared),
+        updatedAt: Value(now),
+      );
+      if (metadataPatch != null) {
+        // Only the columns actually present on the patch override the
+        // entity-derived values; `Value.absent()` leaves them alone.
+        if (metadataPatch.waterType.present) {
+          companion = companion.copyWith(waterType: metadataPatch.waterType);
+        }
+        if (metadataPatch.bodyOfWater.present) {
+          companion = companion.copyWith(
+            bodyOfWater: metadataPatch.bodyOfWater,
+          );
+        }
+      }
+
       await (_db.update(
         _db.diveSites,
-      )..where((t) => t.id.equals(site.id))).write(
-        DiveSitesCompanion(
-          name: Value(site.name),
-          description: Value(site.description),
-          latitude: Value(site.location?.latitude),
-          longitude: Value(site.location?.longitude),
-          minDepth: Value(site.minDepth),
-          maxDepth: Value(site.maxDepth),
-          difficulty: Value(site.difficulty?.name),
-          waterType: Value(site.waterType?.name),
-          country: Value(site.country),
-          region: Value(site.region),
-          city: Value(site.city),
-          island: Value(site.island),
-          bodyOfWater: Value(site.bodyOfWater),
-          rating: Value(site.rating),
-          notes: Value(site.notes),
-          hazards: Value(site.hazards),
-          accessNotes: Value(site.accessNotes),
-          mooringNumber: Value(site.mooringNumber),
-          parkingInfo: Value(site.parkingInfo),
-          altitude: Value(site.altitude),
-          isShared: Value(site.isShared),
-          updatedAt: Value(now),
-        ),
-      );
+      )..where((t) => t.id.equals(site.id))).write(companion);
       await _syncRepository.markRecordPending(
         entityType: 'diveSites',
         recordId: site.id,

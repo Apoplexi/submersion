@@ -18430,6 +18430,31 @@ class AppLocalizationsIt extends AppLocalizations {
       'Usa il record corrispondente';
 
   @override
+  String get universalImport_entityAction_replaceBadge => 'SOSTITUISCI';
+
+  @override
+  String get universalImport_entityAction_replaceExisting =>
+      'Sostituisci esistente';
+
+  @override
+  String get universalImport_entityAction_replaceExistingSubtitle =>
+      'Sovrascrivi con i dati importati';
+
+  @override
+  String get universalImport_entityAction_skip => 'Salta';
+
+  @override
+  String get universalImport_entityAction_skipSubtitle =>
+      'Scarta questa importazione';
+
+  @override
+  String get universalImport_entityAction_importAsNew => 'Importa come nuovo';
+
+  @override
+  String get universalImport_entityAction_importAsNewSubtitle =>
+      'Crea una voce separata';
+
+  @override
   String get universalImport_pending_chooseAction => 'Scegli un\'azione';
 
   @override

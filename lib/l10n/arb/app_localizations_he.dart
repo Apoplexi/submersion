@@ -17971,6 +17971,29 @@ class AppLocalizationsHe extends AppLocalizations {
       'שימוש ברשומה התואמת';
 
   @override
+  String get universalImport_entityAction_replaceBadge => 'החלפה';
+
+  @override
+  String get universalImport_entityAction_replaceExisting => 'החלף את הקיים';
+
+  @override
+  String get universalImport_entityAction_replaceExistingSubtitle =>
+      'דרוס בנתונים המיובאים';
+
+  @override
+  String get universalImport_entityAction_skip => 'דלג';
+
+  @override
+  String get universalImport_entityAction_skipSubtitle => 'בטל ייבוא זה';
+
+  @override
+  String get universalImport_entityAction_importAsNew => 'ייבוא כחדש';
+
+  @override
+  String get universalImport_entityAction_importAsNewSubtitle =>
+      'צור רשומה נפרדת';
+
+  @override
   String get universalImport_pending_chooseAction => 'בחר פעולה';
 
   @override
