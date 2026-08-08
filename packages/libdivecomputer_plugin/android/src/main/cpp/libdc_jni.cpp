@@ -650,6 +650,17 @@ static int jni_io_close(void *userdata) {
     return LIBDC_STATUS_SUCCESS;
 }
 
+// Context for the libdivecomputer log callback: WARNING/ERROR messages are
+// forwarded to NativeTrace.writeLibdc so they land in the user-exportable
+// debug log, not only logcat. Cached once per process; the global ref and
+// jmethodID stay valid for the app's lifetime.
+struct LogForwardContext {
+    JavaVM *jvm;
+    jobject traceInstance;  // global ref to NativeTrace.INSTANCE
+    jmethodID writeLibdc;   // writeLibdc(String, String)
+};
+static LogForwardContext g_log_forward = {nullptr, nullptr, nullptr};
+
 extern "C" JNIEXPORT jint JNICALL
 Java_com_submersion_libdivecomputer_LibdcWrapper_nativeDownloadRun(
     JNIEnv *env, jclass,
@@ -737,11 +748,37 @@ Java_com_submersion_libdivecomputer_LibdcWrapper_nativeDownloadRun(
         }
     }
 
+    // Resolve NativeTrace once so the libdivecomputer log callback can
+    // forward WARNING/ERROR diagnostics into the user-exportable debug log.
+    // Issue #766 took three rounds of user logs to localize because the
+    // protocol-level messages only ever reached logcat.
+    if (g_log_forward.traceInstance == nullptr) {
+        jclass traceCls =
+            env->FindClass("com/submersion/libdivecomputer/NativeTrace");
+        if (traceCls != nullptr) {
+            jfieldID instField = env->GetStaticFieldID(traceCls, "INSTANCE",
+                "Lcom/submersion/libdivecomputer/NativeTrace;");
+            jmethodID writeMethod = env->GetMethodID(traceCls, "writeLibdc",
+                "(Ljava/lang/String;Ljava/lang/String;)V");
+            if (instField != nullptr && writeMethod != nullptr) {
+                jobject inst = env->GetStaticObjectField(traceCls, instField);
+                if (inst != nullptr) {
+                    g_log_forward.jvm = jvm;
+                    g_log_forward.writeLibdc = writeMethod;
+                    g_log_forward.traceInstance = env->NewGlobalRef(inst);
+                    env->DeleteLocalRef(inst);
+                }
+            }
+            env->DeleteLocalRef(traceCls);
+        }
+        env->ExceptionClear();
+    }
+
     // Register libdivecomputer log callback so internal diagnostic messages
     // appear in logcat. Android's NativeLogger already wraps Log.d(), so
     // logcat output is captured by the platform-level logging infrastructure.
     libdc_set_log_callback(
-        [](int level, const char *message, void *) {
+        [](int level, const char *message, void *userdata) {
             // Map dc_loglevel_t: ERROR=1, WARNING=2, INFO=3, DEBUG=4+
             android_LogPriority priority;
             switch (level) {
@@ -759,8 +796,30 @@ Java_com_submersion_libdivecomputer_LibdcWrapper_nativeDownloadRun(
                 break;
             }
             __android_log_print(priority, "libdc", "%s", message);
+
+            // Forward WARNING/ERROR into the crash-survivable debug log so
+            // protocol-level failures reach user-exported logs.
+            auto *fwd = static_cast<LogForwardContext *>(userdata);
+            if (fwd == nullptr || fwd->traceInstance == nullptr || level > 2)
+                return;
+            JNIEnv *cbEnv;
+            if (fwd->jvm->GetEnv(reinterpret_cast<void **>(&cbEnv),
+                                 JNI_VERSION_1_6) != JNI_OK) {
+                // Only forward from already-attached threads (the download
+                // thread entered through JNI); logging must stay passive.
+                return;
+            }
+            jstring jlevel = cbEnv->NewStringUTF(level == 1 ? "ERROR" : "WARN");
+            jstring jmessage = cbEnv->NewStringUTF(message);
+            if (jlevel != nullptr && jmessage != nullptr) {
+                cbEnv->CallVoidMethod(fwd->traceInstance, fwd->writeLibdc,
+                                      jlevel, jmessage);
+            }
+            cbEnv->ExceptionClear();
+            if (jlevel != nullptr) cbEnv->DeleteLocalRef(jlevel);
+            if (jmessage != nullptr) cbEnv->DeleteLocalRef(jmessage);
         },
-        nullptr
+        &g_log_forward
     );
 
     // Run the download.

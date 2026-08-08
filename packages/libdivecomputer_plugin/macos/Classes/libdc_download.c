@@ -28,6 +28,12 @@
 struct libdc_download_session {
     volatile int cancelled;
     dc_context_t *context;
+    // Last ERROR-level message libdivecomputer logged during this session's
+    // run. The generic "Download failed" surfaced to the app hid the
+    // protocol-level cause (issue #766 took three rounds of user logs to
+    // localize); appending this message to error_buf puts the diagnosis in
+    // the app log and the UI on every platform.
+    char last_error[160];
 };
 
 // Data passed through the download pipeline callbacks.
@@ -535,9 +541,16 @@ static void libdc_logfunc_wrapper(dc_context_t *context, dc_loglevel_t loglevel,
                                    const char *file, unsigned int line,
                                    const char *function, const char *message,
                                    void *userdata) {
-    (void)context; (void)file; (void)line; (void)function; (void)userdata;
+    (void)context; (void)file; (void)line; (void)function;
     if (g_log_callback != NULL && message != NULL) {
         g_log_callback((int)loglevel, message, g_log_userdata);
+    }
+    // Keep the most recent ERROR so a failed run can report its actual
+    // protocol-level cause instead of a bare "Download failed".
+    libdc_download_session_t *session = (libdc_download_session_t *)userdata;
+    if (session != NULL && message != NULL && loglevel == DC_LOGLEVEL_ERROR) {
+        strncpy(session->last_error, message, sizeof(session->last_error) - 1);
+        session->last_error[sizeof(session->last_error) - 1] = '\0';
     }
 }
 
@@ -554,11 +567,10 @@ libdc_download_session_t *libdc_download_session_new(void) {
     }
 
     // Route libdivecomputer's internal diagnostic messages through the
-    // registered log callback if one has been set.
-    if (g_log_callback != NULL) {
-        dc_context_set_loglevel(session->context, DC_LOGLEVEL_ALL);
-        dc_context_set_logfunc(session->context, libdc_logfunc_wrapper, NULL);
-    }
+    // registered log callback if one has been set, and capture the last
+    // error-level message for failure reporting either way.
+    dc_context_set_loglevel(session->context, DC_LOGLEVEL_ALL);
+    dc_context_set_logfunc(session->context, libdc_logfunc_wrapper, session);
 
     return session;
 }
@@ -600,6 +612,7 @@ int libdc_download_run(
     state.callbacks = callbacks;
     state.error_buf = error_buf;
     state.error_buf_size = error_buf_size;
+    session->last_error[0] = '\0';
 
     // 1. Find matching descriptor.
     state.descriptor = find_descriptor(vendor, product, model);
@@ -678,6 +691,14 @@ int libdc_download_run(
         if (session->cancelled) {
             set_error(&state, "Download cancelled");
             result = LIBDC_STATUS_CANCELLED;
+        } else if (session->last_error[0] != '\0') {
+            // Surface the protocol-level cause libdivecomputer logged, not
+            // just the generic failure (issue #766).
+            char msg[224];
+            snprintf(msg, sizeof(msg), "Download failed: %s",
+                     session->last_error);
+            set_error(&state, msg);
+            result = (int)status;
         } else {
             set_error(&state, "Download failed");
             result = (int)status;
