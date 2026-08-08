@@ -644,6 +644,57 @@ void main() {
       Navigator.of(tester.element(find.byType(DatePickerDialog))).pop();
       await tester.pumpAndSettle();
     });
+
+    testWidgets(
+      'end date picker opens positioned at the just-picked start date',
+      (tester) async {
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              tripRepositoryProvider.overrideWithValue(_MockTripRepository()),
+              tripListNotifierProvider.overrideWith((ref) {
+                return _MockTripListNotifier([]);
+              }),
+            ],
+            child: const MaterialApp(
+              // Pin the locale: this test types a US-format date.
+              locale: Locale('en'),
+              localizationsDelegates: AppLocalizations.localizationsDelegates,
+              supportedLocales: AppLocalizations.supportedLocales,
+              home: TripEditPage(),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        // Pick a start date far in the past -- well before the default
+        // end date (today + 7 days), so the auto-sync in _selectDate that
+        // pushes _endDate forward when start moves past it never fires.
+        // This is exactly the reported scenario: picking a start date
+        // leaves the stale, far-away default end date behind.
+        await tester.tap(find.text('Start Date'));
+        await tester.pumpAndSettle();
+        await tester.tap(find.byIcon(Icons.edit_outlined));
+        await tester.pumpAndSettle();
+        await tester.enterText(
+          find.descendant(
+            of: find.byType(DatePickerDialog),
+            matching: find.byType(TextField),
+          ),
+          '01/15/2023',
+        );
+        await tester.tap(find.text('OK'));
+        await tester.pumpAndSettle();
+
+        await tester.tap(find.text('End Date'));
+        await tester.pumpAndSettle();
+
+        final dialog = tester.widget<DatePickerDialog>(
+          find.byType(DatePickerDialog),
+        );
+        expect(dialog.initialDate, DateTime(2023, 1, 15));
+      },
+    );
   });
 
   group('TripEditPage - save flow', () {

@@ -55,6 +55,11 @@ class _TripEditPageState extends ConsumerState<TripEditPage> {
   DateTime _startDate = DateTime.now();
   DateTime? _returnFlightAt;
   DateTime _endDate = DateTime.now().add(const Duration(days: 7));
+  // False until the diver deliberately sets an end date (picked here, or
+  // loaded from an existing trip) -- while false, _endDate is just the
+  // placeholder default, so the end-date picker should open at _startDate
+  // instead of dragging the diver back through the calendar to it.
+  bool _endDateTouched = false;
   bool _isLoading = false;
   bool _isSaving = false;
   bool _hasChanges = false;
@@ -128,6 +133,7 @@ class _TripEditPageState extends ConsumerState<TripEditPage> {
         setState(() {
           _startDate = trip.startDate;
           _endDate = trip.endDate;
+          _endDateTouched = true;
           _returnFlightAt = trip.returnFlightAt;
           _isShared = trip.isShared;
           _isLoading = false;
@@ -708,7 +714,9 @@ class _TripEditPageState extends ConsumerState<TripEditPage> {
   }
 
   Future<void> _selectDate(BuildContext context, bool isStartDate) async {
-    final initialDate = isStartDate ? _startDate : _endDate;
+    final initialDate = isStartDate
+        ? _startDate
+        : (_endDateTouched ? _endDate : _startDate);
     final firstDate = isStartDate ? DateTime(1950) : _startDate;
     final lastDate = DateTime(2100);
 
@@ -728,6 +736,7 @@ class _TripEditPageState extends ConsumerState<TripEditPage> {
           }
         } else {
           _endDate = pickedDate;
+          _endDateTouched = true;
         }
         _hasChanges = true;
       });
