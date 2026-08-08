@@ -23258,4 +23258,70 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get reef_attribution_protectedSeas =>
       'Límites de áreas marinas protegidas. CC BY 4.0.';
+
+  @override
+  String get enum_visibilityBand_excellent => 'Excelente';
+
+  @override
+  String get enum_visibilityBand_good => 'Buena';
+
+  @override
+  String get enum_visibilityBand_moderate => 'Moderada';
+
+  @override
+  String get enum_visibilityBand_poor => 'Mala';
+
+  @override
+  String visibility_range_between(String min, String max, String unit) {
+    return '$min-$max $unit';
+  }
+
+  @override
+  String visibility_range_over(String min, String unit) {
+    return 'más de $min $unit';
+  }
+
+  @override
+  String visibility_range_under(String max, String unit) {
+    return 'menos de $max $unit';
+  }
+
+  @override
+  String get settings_visibilityScale_title => 'Escala de visibilidad';
+
+  @override
+  String get settings_visibilityScale_subtitle =>
+      'Qué distancias cuentan como buena visibilidad donde buceas';
+
+  @override
+  String get settings_visibilityScale_preset_tropical => 'Tropical';
+
+  @override
+  String get settings_visibilityScale_preset_temperate => 'Templada';
+
+  @override
+  String get settings_visibilityScale_preset_coldWater =>
+      'Agua fría / Interior';
+
+  @override
+  String get settings_visibilityScale_preset_custom => 'Personalizada';
+
+  @override
+  String get settings_visibilityScale_customExcellent =>
+      'Excelente a partir de';
+
+  @override
+  String get settings_visibilityScale_customGood => 'Buena a partir de';
+
+  @override
+  String get settings_visibilityScale_customModerate => 'Moderada a partir de';
+
+  @override
+  String get settings_visibilityScale_invalidOrder =>
+      'Cada valor debe ser menor que el anterior y mayor que cero';
+
+  @override
+  String statistics_conditions_visibility_legacySuffix(String band) {
+    return '$band (registrado antes de la medición)';
+  }
 }

@@ -14,6 +14,7 @@ import 'package:submersion/features/settings/presentation/pages/column_config_pa
 import 'package:submersion/features/settings/presentation/pages/safety_settings_page.dart';
 import 'package:submersion/features/settings/presentation/pages/security_settings_page.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
+import 'package:submersion/features/settings/presentation/widgets/visibility_scale_picker.dart';
 import 'package:submersion/core/constants/profile_metrics.dart';
 import 'package:submersion/features/settings/presentation/pages/home_appearance_page.dart';
 import 'package:submersion/features/settings/presentation/pages/section_appearance_page.dart';
@@ -501,6 +502,17 @@ class _UnitsSectionContent extends ConsumerWidget {
                     ref,
                     settings.defaultCurrency,
                   ),
+                ),
+                const Divider(height: 1),
+                _buildUnitTile(
+                  context,
+                  title: context.l10n.settings_visibilityScale_title,
+                  value: visibilityPresetLabel(
+                    context.l10n,
+                    settings.visibilityScalePreset,
+                  ),
+                  onTap: () =>
+                      showVisibilityScalePicker(context, ref, settings),
                 ),
               ],
             ),

@@ -5,6 +5,7 @@ import 'package:http/testing.dart';
 import 'package:riverpod/src/framework.dart' as riverpod show Override;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:submersion/core/constants/card_color.dart';
+import 'package:submersion/core/domain/visibility/visibility_scale.dart';
 import 'package:submersion/core/constants/list_view_mode.dart';
 import 'package:submersion/core/constants/map_style.dart';
 import 'package:submersion/features/data_quality/presentation/providers/data_quality_providers.dart';
@@ -53,6 +54,18 @@ class MockSettingsNotifier extends StateNotifier<AppSettings>
   @override
   Future<void> setDefaultCurrency(String currencyCode) async =>
       state = state.copyWith(defaultCurrency: currencyCode);
+  @override
+  Future<void> setVisibilityScale({
+    required VisibilityScalePreset preset,
+    double? excellentM,
+    double? goodM,
+    double? moderateM,
+  }) async => state = state.copyWith(
+    visibilityScalePreset: preset,
+    visibilityScaleExcellentM: excellentM,
+    visibilityScaleGoodM: goodM,
+    visibilityScaleModerateM: moderateM,
+  );
   @override
   Future<void> setAltitudeUnit(AltitudeUnit unit) async =>
       state = state.copyWith(altitudeUnit: unit);

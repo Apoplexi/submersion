@@ -38744,6 +38744,114 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Marine protected area boundaries. CC BY 4.0.'**
   String get reef_attribution_protectedSeas;
+
+  /// No description provided for @enum_visibilityBand_excellent.
+  ///
+  /// In en, this message translates to:
+  /// **'Excellent'**
+  String get enum_visibilityBand_excellent;
+
+  /// No description provided for @enum_visibilityBand_good.
+  ///
+  /// In en, this message translates to:
+  /// **'Good'**
+  String get enum_visibilityBand_good;
+
+  /// No description provided for @enum_visibilityBand_moderate.
+  ///
+  /// In en, this message translates to:
+  /// **'Moderate'**
+  String get enum_visibilityBand_moderate;
+
+  /// No description provided for @enum_visibilityBand_poor.
+  ///
+  /// In en, this message translates to:
+  /// **'Poor'**
+  String get enum_visibilityBand_poor;
+
+  /// No description provided for @visibility_range_between.
+  ///
+  /// In en, this message translates to:
+  /// **'{min}-{max} {unit}'**
+  String visibility_range_between(String min, String max, String unit);
+
+  /// No description provided for @visibility_range_over.
+  ///
+  /// In en, this message translates to:
+  /// **'over {min} {unit}'**
+  String visibility_range_over(String min, String unit);
+
+  /// No description provided for @visibility_range_under.
+  ///
+  /// In en, this message translates to:
+  /// **'under {max} {unit}'**
+  String visibility_range_under(String max, String unit);
+
+  /// No description provided for @settings_visibilityScale_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Visibility scale'**
+  String get settings_visibilityScale_title;
+
+  /// No description provided for @settings_visibilityScale_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Which distances count as good visibility where you dive'**
+  String get settings_visibilityScale_subtitle;
+
+  /// No description provided for @settings_visibilityScale_preset_tropical.
+  ///
+  /// In en, this message translates to:
+  /// **'Tropical'**
+  String get settings_visibilityScale_preset_tropical;
+
+  /// No description provided for @settings_visibilityScale_preset_temperate.
+  ///
+  /// In en, this message translates to:
+  /// **'Temperate'**
+  String get settings_visibilityScale_preset_temperate;
+
+  /// No description provided for @settings_visibilityScale_preset_coldWater.
+  ///
+  /// In en, this message translates to:
+  /// **'Cold water / Inland'**
+  String get settings_visibilityScale_preset_coldWater;
+
+  /// No description provided for @settings_visibilityScale_preset_custom.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom'**
+  String get settings_visibilityScale_preset_custom;
+
+  /// No description provided for @settings_visibilityScale_customExcellent.
+  ///
+  /// In en, this message translates to:
+  /// **'Excellent at or above'**
+  String get settings_visibilityScale_customExcellent;
+
+  /// No description provided for @settings_visibilityScale_customGood.
+  ///
+  /// In en, this message translates to:
+  /// **'Good at or above'**
+  String get settings_visibilityScale_customGood;
+
+  /// No description provided for @settings_visibilityScale_customModerate.
+  ///
+  /// In en, this message translates to:
+  /// **'Moderate at or above'**
+  String get settings_visibilityScale_customModerate;
+
+  /// No description provided for @settings_visibilityScale_invalidOrder.
+  ///
+  /// In en, this message translates to:
+  /// **'Each value must be smaller than the one above it, and greater than zero'**
+  String get settings_visibilityScale_invalidOrder;
+
+  /// No description provided for @statistics_conditions_visibility_legacySuffix.
+  ///
+  /// In en, this message translates to:
+  /// **'{band} (logged before measurement)'**
+  String statistics_conditions_visibility_legacySuffix(String band);
 }
 
 class _AppLocalizationsDelegate

@@ -22056,4 +22056,66 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get reef_attribution_protectedSeas => '海洋保护区边界。CC BY 4.0。';
+
+  @override
+  String get enum_visibilityBand_excellent => '极佳';
+
+  @override
+  String get enum_visibilityBand_good => '良好';
+
+  @override
+  String get enum_visibilityBand_moderate => '一般';
+
+  @override
+  String get enum_visibilityBand_poor => '较差';
+
+  @override
+  String visibility_range_between(String min, String max, String unit) {
+    return '$min-$max $unit';
+  }
+
+  @override
+  String visibility_range_over(String min, String unit) {
+    return '超过 $min $unit';
+  }
+
+  @override
+  String visibility_range_under(String max, String unit) {
+    return '不足 $max $unit';
+  }
+
+  @override
+  String get settings_visibilityScale_title => '能见度标准';
+
+  @override
+  String get settings_visibilityScale_subtitle => '在你潜水的水域，多远算是良好能见度';
+
+  @override
+  String get settings_visibilityScale_preset_tropical => '热带';
+
+  @override
+  String get settings_visibilityScale_preset_temperate => '温带';
+
+  @override
+  String get settings_visibilityScale_preset_coldWater => '冷水 / 内陆';
+
+  @override
+  String get settings_visibilityScale_preset_custom => '自定义';
+
+  @override
+  String get settings_visibilityScale_customExcellent => '极佳（不低于）';
+
+  @override
+  String get settings_visibilityScale_customGood => '良好（不低于）';
+
+  @override
+  String get settings_visibilityScale_customModerate => '一般（不低于）';
+
+  @override
+  String get settings_visibilityScale_invalidOrder => '每个数值必须小于上一个，且大于零';
+
+  @override
+  String statistics_conditions_visibility_legacySuffix(String band) {
+    return '$band（测量功能之前记录）';
+  }
 }

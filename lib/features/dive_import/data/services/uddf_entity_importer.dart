@@ -1382,6 +1382,7 @@ class UddfEntityImporter {
         rating: diveData['rating'] as int?,
         notes: notes,
         visibility: _parseEnum(diveData['visibility'], Visibility.values),
+        visibilityMeters: diveData['visibilityMeters'] as double?,
         diveTypeIds: diveTypeIds,
         profile: profile,
         tanks: tanks,

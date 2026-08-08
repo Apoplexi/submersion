@@ -22818,4 +22818,68 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get reef_attribution_protectedSeas =>
       'حدود المناطق البحرية المحمية. CC BY 4.0.';
+
+  @override
+  String get enum_visibilityBand_excellent => 'ممتازة';
+
+  @override
+  String get enum_visibilityBand_good => 'جيدة';
+
+  @override
+  String get enum_visibilityBand_moderate => 'متوسطة';
+
+  @override
+  String get enum_visibilityBand_poor => 'ضعيفة';
+
+  @override
+  String visibility_range_between(String min, String max, String unit) {
+    return '$min-$max $unit';
+  }
+
+  @override
+  String visibility_range_over(String min, String unit) {
+    return 'أكثر من $min $unit';
+  }
+
+  @override
+  String visibility_range_under(String max, String unit) {
+    return 'أقل من $max $unit';
+  }
+
+  @override
+  String get settings_visibilityScale_title => 'مقياس الرؤية';
+
+  @override
+  String get settings_visibilityScale_subtitle =>
+      'المسافات التي تُعد رؤية جيدة في مواقع غوصك';
+
+  @override
+  String get settings_visibilityScale_preset_tropical => 'استوائية';
+
+  @override
+  String get settings_visibilityScale_preset_temperate => 'معتدلة';
+
+  @override
+  String get settings_visibilityScale_preset_coldWater => 'مياه باردة / داخلية';
+
+  @override
+  String get settings_visibilityScale_preset_custom => 'مخصصة';
+
+  @override
+  String get settings_visibilityScale_customExcellent => 'ممتازة عند أو فوق';
+
+  @override
+  String get settings_visibilityScale_customGood => 'جيدة عند أو فوق';
+
+  @override
+  String get settings_visibilityScale_customModerate => 'متوسطة عند أو فوق';
+
+  @override
+  String get settings_visibilityScale_invalidOrder =>
+      'يجب أن تكون كل قيمة أصغر من التي فوقها وأكبر من صفر';
+
+  @override
+  String statistics_conditions_visibility_legacySuffix(String band) {
+    return '$band (مسجلة قبل القياس)';
+  }
 }

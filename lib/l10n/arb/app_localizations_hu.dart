@@ -23160,4 +23160,68 @@ class AppLocalizationsHu extends AppLocalizations {
   @override
   String get reef_attribution_protectedSeas =>
       'Védett tengeri területek határai. CC BY 4.0.';
+
+  @override
+  String get enum_visibilityBand_excellent => 'Kiváló';
+
+  @override
+  String get enum_visibilityBand_good => 'Jó';
+
+  @override
+  String get enum_visibilityBand_moderate => 'Közepes';
+
+  @override
+  String get enum_visibilityBand_poor => 'Gyenge';
+
+  @override
+  String visibility_range_between(String min, String max, String unit) {
+    return '$min-$max $unit';
+  }
+
+  @override
+  String visibility_range_over(String min, String unit) {
+    return 'több mint $min $unit';
+  }
+
+  @override
+  String visibility_range_under(String max, String unit) {
+    return 'kevesebb mint $max $unit';
+  }
+
+  @override
+  String get settings_visibilityScale_title => 'Látótávolság-skála';
+
+  @override
+  String get settings_visibilityScale_subtitle =>
+      'Mekkora távolság számít jó látásnak ott, ahol merülsz';
+
+  @override
+  String get settings_visibilityScale_preset_tropical => 'Trópusi';
+
+  @override
+  String get settings_visibilityScale_preset_temperate => 'Mérsékelt';
+
+  @override
+  String get settings_visibilityScale_preset_coldWater => 'Hidegvízi / Belvízi';
+
+  @override
+  String get settings_visibilityScale_preset_custom => 'Egyéni';
+
+  @override
+  String get settings_visibilityScale_customExcellent => 'Kiváló ettől';
+
+  @override
+  String get settings_visibilityScale_customGood => 'Jó ettől';
+
+  @override
+  String get settings_visibilityScale_customModerate => 'Közepes ettől';
+
+  @override
+  String get settings_visibilityScale_invalidOrder =>
+      'Minden értéknek kisebbnek kell lennie a felette lévőnél és nagyobbnak nullánál';
+
+  @override
+  String statistics_conditions_visibility_legacySuffix(String band) {
+    return '$band (mérés előtt rögzítve)';
+  }
 }

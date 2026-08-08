@@ -17,6 +17,7 @@ import 'package:submersion/core/constants/map_style.dart';
 import 'package:submersion/features/dive_sites/domain/matching/site_match_sensitivity.dart';
 import 'package:submersion/core/constants/dive_detail_sections.dart';
 import 'package:submersion/core/constants/profile_metrics.dart';
+import 'package:submersion/core/domain/visibility/visibility_scale.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/tissue_color_schemes.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/features/statistics/presentation/pages/records_page.dart';
@@ -89,6 +90,18 @@ class _MockSettingsNotifier extends StateNotifier<AppSettings>
   @override
   Future<void> setDefaultCurrency(String currencyCode) async =>
       state = state.copyWith(defaultCurrency: currencyCode);
+  @override
+  Future<void> setVisibilityScale({
+    required VisibilityScalePreset preset,
+    double? excellentM,
+    double? goodM,
+    double? moderateM,
+  }) async => state = state.copyWith(
+    visibilityScalePreset: preset,
+    visibilityScaleExcellentM: excellentM,
+    visibilityScaleGoodM: goodM,
+    visibilityScaleModerateM: moderateM,
+  );
   @override
   Future<void> setAltitudeUnit(AltitudeUnit unit) async =>
       state = state.copyWith(altitudeUnit: unit);

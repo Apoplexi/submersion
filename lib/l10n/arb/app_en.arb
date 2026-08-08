@@ -14666,5 +14666,63 @@
   "reef_attribution_wri": "Reef presence and threat level. CC BY 3.0.",
   "reef_attribution_noaa": "Sea surface temperature and bleaching heat stress. Public domain.",
   "reef_attribution_gbif": "Species occurrence records, filtered to CC0 and CC BY 4.0.",
-  "reef_attribution_protectedSeas": "Marine protected area boundaries. CC BY 4.0."
+  "reef_attribution_protectedSeas": "Marine protected area boundaries. CC BY 4.0.",
+  "enum_visibilityBand_excellent": "Excellent",
+  "enum_visibilityBand_good": "Good",
+  "enum_visibilityBand_moderate": "Moderate",
+  "enum_visibilityBand_poor": "Poor",
+  "visibility_range_between": "{min}-{max} {unit}",
+  "@visibility_range_between": {
+    "placeholders": {
+      "min": {
+        "type": "String"
+      },
+      "max": {
+        "type": "String"
+      },
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "visibility_range_over": "over {min} {unit}",
+  "@visibility_range_over": {
+    "placeholders": {
+      "min": {
+        "type": "String"
+      },
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "visibility_range_under": "under {max} {unit}",
+  "@visibility_range_under": {
+    "placeholders": {
+      "max": {
+        "type": "String"
+      },
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "settings_visibilityScale_title": "Visibility scale",
+  "settings_visibilityScale_subtitle": "Which distances count as good visibility where you dive",
+  "settings_visibilityScale_preset_tropical": "Tropical",
+  "settings_visibilityScale_preset_temperate": "Temperate",
+  "settings_visibilityScale_preset_coldWater": "Cold water / Inland",
+  "settings_visibilityScale_preset_custom": "Custom",
+  "settings_visibilityScale_customExcellent": "Excellent at or above",
+  "settings_visibilityScale_customGood": "Good at or above",
+  "settings_visibilityScale_customModerate": "Moderate at or above",
+  "settings_visibilityScale_invalidOrder": "Each value must be smaller than the one above it, and greater than zero",
+  "statistics_conditions_visibility_legacySuffix": "{band} (logged before measurement)",
+  "@statistics_conditions_visibility_legacySuffix": {
+    "placeholders": {
+      "band": {
+        "type": "String"
+      }
+    }
+  }
 }
