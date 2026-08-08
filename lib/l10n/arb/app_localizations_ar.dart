@@ -19637,6 +19637,19 @@ class AppLocalizationsAr extends AppLocalizations {
   String get gpsLogger_tracksHeader => 'المسارات المسجّلة';
 
   @override
+  String get gpsTrack_detail_title => 'مسار GPS';
+
+  @override
+  String get gpsTrack_detail_notFound => 'هذا المسار لم يعد متاحًا.';
+
+  @override
+  String get gpsTrack_detail_unreadable => 'تعذّرت قراءة بيانات المسار.';
+
+  @override
+  String get gpsTrack_detail_noPoints =>
+      'لا يحتوي هذا المسار على مواقع مسجّلة.';
+
+  @override
   String get maps_compass_resetLabel => 'إعادة ضبط اتجاه الخريطة نحو الشمال';
 
   @override

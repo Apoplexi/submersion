@@ -19829,6 +19829,20 @@ class AppLocalizationsNl extends AppLocalizations {
   String get gpsLogger_tracksHeader => 'Opgenomen tracks';
 
   @override
+  String get gpsTrack_detail_title => 'GPS-track';
+
+  @override
+  String get gpsTrack_detail_notFound => 'Deze track is niet meer beschikbaar.';
+
+  @override
+  String get gpsTrack_detail_unreadable =>
+      'Trackgegevens konden niet worden gelezen.';
+
+  @override
+  String get gpsTrack_detail_noPoints =>
+      'Deze track bevat geen opgenomen posities.';
+
+  @override
   String get maps_compass_resetLabel =>
       'Kaartoriëntatie terugzetten naar het noorden';
 

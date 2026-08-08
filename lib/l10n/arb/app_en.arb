@@ -12497,6 +12497,10 @@
     }
   },
   "gpsLogger_tracksHeader": "Recorded tracks",
+  "gpsTrack_detail_title": "GPS Track",
+  "gpsTrack_detail_notFound": "This track is no longer available.",
+  "gpsTrack_detail_unreadable": "Track data could not be read.",
+  "gpsTrack_detail_noPoints": "This track has no recorded positions.",
   "maps_compass_resetLabel": "Reset map orientation to north",
   "maps_compass_resetTooltip": "North up",
   "maps_heatMap_hide": "Hide Heat Map",

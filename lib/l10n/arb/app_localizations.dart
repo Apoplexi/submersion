@@ -33330,6 +33330,30 @@ abstract class AppLocalizations {
   /// **'Recorded tracks'**
   String get gpsLogger_tracksHeader;
 
+  /// No description provided for @gpsTrack_detail_title.
+  ///
+  /// In en, this message translates to:
+  /// **'GPS Track'**
+  String get gpsTrack_detail_title;
+
+  /// No description provided for @gpsTrack_detail_notFound.
+  ///
+  /// In en, this message translates to:
+  /// **'This track is no longer available.'**
+  String get gpsTrack_detail_notFound;
+
+  /// No description provided for @gpsTrack_detail_unreadable.
+  ///
+  /// In en, this message translates to:
+  /// **'Track data could not be read.'**
+  String get gpsTrack_detail_unreadable;
+
+  /// No description provided for @gpsTrack_detail_noPoints.
+  ///
+  /// In en, this message translates to:
+  /// **'This track has no recorded positions.'**
+  String get gpsTrack_detail_noPoints;
+
   /// No description provided for @maps_compass_resetLabel.
   ///
   /// In en, this message translates to:

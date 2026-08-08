@@ -19996,6 +19996,20 @@ class AppLocalizationsPt extends AppLocalizations {
   String get gpsLogger_tracksHeader => 'Trilhas gravadas';
 
   @override
+  String get gpsTrack_detail_title => 'Trilha GPS';
+
+  @override
+  String get gpsTrack_detail_notFound => 'Esta trilha já não está disponível.';
+
+  @override
+  String get gpsTrack_detail_unreadable =>
+      'Não foi possível ler os dados da trilha.';
+
+  @override
+  String get gpsTrack_detail_noPoints =>
+      'Esta trilha não tem posições registadas.';
+
+  @override
   String get maps_compass_resetLabel =>
       'Redefinir a orientação do mapa para o norte';
 

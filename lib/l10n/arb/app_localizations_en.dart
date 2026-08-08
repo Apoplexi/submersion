@@ -19655,6 +19655,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get gpsLogger_tracksHeader => 'Recorded tracks';
 
   @override
+  String get gpsTrack_detail_title => 'GPS Track';
+
+  @override
+  String get gpsTrack_detail_notFound => 'This track is no longer available.';
+
+  @override
+  String get gpsTrack_detail_unreadable => 'Track data could not be read.';
+
+  @override
+  String get gpsTrack_detail_noPoints =>
+      'This track has no recorded positions.';
+
+  @override
   String get maps_compass_resetLabel => 'Reset map orientation to north';
 
   @override

@@ -19931,6 +19931,19 @@ class AppLocalizationsHu extends AppLocalizations {
   String get gpsLogger_tracksHeader => 'Rögzített útvonalak';
 
   @override
+  String get gpsTrack_detail_title => 'GPS-nyomvonal';
+
+  @override
+  String get gpsTrack_detail_notFound => 'Ez a nyomvonal már nem érhető el.';
+
+  @override
+  String get gpsTrack_detail_unreadable => 'A nyomvonal adatai nem olvashatók.';
+
+  @override
+  String get gpsTrack_detail_noPoints =>
+      'Ez a nyomvonal nem tartalmaz rögzített pozíciókat.';
+
+  @override
   String get maps_compass_resetLabel =>
       'Terkep tajolasanak visszaallitasa eszakra';
 

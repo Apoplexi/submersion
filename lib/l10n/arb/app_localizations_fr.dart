@@ -20063,6 +20063,20 @@ class AppLocalizationsFr extends AppLocalizations {
   String get gpsLogger_tracksHeader => 'Traces enregistrées';
 
   @override
+  String get gpsTrack_detail_title => 'Trace GPS';
+
+  @override
+  String get gpsTrack_detail_notFound => 'Cette trace n\'est plus disponible.';
+
+  @override
+  String get gpsTrack_detail_unreadable =>
+      'Impossible de lire les données de la trace.';
+
+  @override
+  String get gpsTrack_detail_noPoints =>
+      'Cette trace ne contient aucune position enregistrée.';
+
+  @override
   String get maps_compass_resetLabel =>
       'Réinitialiser l\'orientation de la carte vers le nord';
 

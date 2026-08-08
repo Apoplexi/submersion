@@ -18973,6 +18973,18 @@ class AppLocalizationsZh extends AppLocalizations {
   String get gpsLogger_tracksHeader => '已记录的轨迹';
 
   @override
+  String get gpsTrack_detail_title => 'GPS 轨迹';
+
+  @override
+  String get gpsTrack_detail_notFound => '此轨迹已不可用。';
+
+  @override
+  String get gpsTrack_detail_unreadable => '无法读取轨迹数据。';
+
+  @override
+  String get gpsTrack_detail_noPoints => '此轨迹没有记录的位置。';
+
+  @override
   String get maps_compass_resetLabel => '将地图方向重置为正北';
 
   @override

@@ -106,6 +106,37 @@ void main() {
       expect(route!.redirect, isNotNull);
       expect(route.builder, isNull);
     });
+
+    test('gpsTrackDetail is a child of gps-log with a :id path', () {
+      final gpsLog = _findRouteByName(router.configuration.routes, 'gpsLog');
+      final detail = gpsLog!.routes.whereType<GoRoute>().firstWhere(
+        (r) => r.name == 'gpsTrackDetail',
+        orElse: () =>
+            throw StateError('gpsTrackDetail not a direct child of gpsLog'),
+      );
+      expect(detail.path, ':id');
+    });
+
+    test('static gps-log children are declared before the :id route', () {
+      // A static sibling declared AFTER ':id' would never match - go_router
+      // takes the first matching route and ':id' matches any single segment.
+      // Asserting structure, not findMatch(): fullPath is identical either
+      // way and does not distinguish the bug.
+      final gpsLog = _findRouteByName(router.configuration.routes, 'gpsLog');
+      final childPaths = [
+        for (final r in gpsLog!.routes.whereType<GoRoute>()) r.path,
+      ];
+      final idIndex = childPaths.indexOf(':id');
+      expect(idIndex, isNot(-1), reason: ':id child must exist');
+      for (var i = 0; i < childPaths.length; i++) {
+        if (childPaths[i] == ':id') continue;
+        expect(
+          i,
+          lessThan(idIndex),
+          reason: 'static child "${childPaths[i]}" must precede :id',
+        );
+      }
+    });
   });
 
   group('app_router route configuration', () {

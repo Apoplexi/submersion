@@ -19492,6 +19492,18 @@ class AppLocalizationsHe extends AppLocalizations {
   String get gpsLogger_tracksHeader => 'מסלולים שהוקלטו';
 
   @override
+  String get gpsTrack_detail_title => 'מסלול GPS';
+
+  @override
+  String get gpsTrack_detail_notFound => 'מסלול זה אינו זמין עוד.';
+
+  @override
+  String get gpsTrack_detail_unreadable => 'לא ניתן היה לקרוא את נתוני המסלול.';
+
+  @override
+  String get gpsTrack_detail_noPoints => 'למסלול זה אין מיקומים מוקלטים.';
+
+  @override
   String get maps_compass_resetLabel => 'איפוס כיוון המפה לצפון';
 
   @override

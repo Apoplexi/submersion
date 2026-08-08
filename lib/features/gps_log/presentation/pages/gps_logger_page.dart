@@ -233,6 +233,7 @@ class _GpsLoggerPageState extends ConsumerState<GpsLoggerPage> {
           else
             for (final track in tracks)
               ListTile(
+                onTap: () => context.push('/gps-log/${track.id}'),
                 leading: const Icon(Icons.route_outlined),
                 // Track times are wall-clock-as-UTC: format the UTC
                 // components directly, never convert to device-local.

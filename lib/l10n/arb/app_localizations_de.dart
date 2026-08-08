@@ -19958,6 +19958,21 @@ class AppLocalizationsDe extends AppLocalizations {
   String get gpsLogger_tracksHeader => 'Aufgezeichnete Tracks';
 
   @override
+  String get gpsTrack_detail_title => 'GPS-Track';
+
+  @override
+  String get gpsTrack_detail_notFound =>
+      'Dieser Track ist nicht mehr verfügbar.';
+
+  @override
+  String get gpsTrack_detail_unreadable =>
+      'Track-Daten konnten nicht gelesen werden.';
+
+  @override
+  String get gpsTrack_detail_noPoints =>
+      'Dieser Track enthält keine aufgezeichneten Positionen.';
+
+  @override
   String get maps_compass_resetLabel =>
       'Kartenausrichtung nach Norden zurücksetzen';
 

@@ -20008,6 +20008,20 @@ class AppLocalizationsEs extends AppLocalizations {
   String get gpsLogger_tracksHeader => 'Tracks grabados';
 
   @override
+  String get gpsTrack_detail_title => 'Track GPS';
+
+  @override
+  String get gpsTrack_detail_notFound => 'Este track ya no está disponible.';
+
+  @override
+  String get gpsTrack_detail_unreadable =>
+      'No se pudieron leer los datos del track.';
+
+  @override
+  String get gpsTrack_detail_noPoints =>
+      'Este track no tiene posiciones registradas.';
+
+  @override
   String get maps_compass_resetLabel =>
       'Restablecer la orientación del mapa al norte';
 
