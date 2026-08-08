@@ -15,6 +15,19 @@ import 'package:submersion/l10n/arb/app_localizations.dart';
 /// for data interchange; everything here honours the active locale and the
 /// diver's unit settings.
 
+/// Parses a visibility entry field into meters, or null when the text is
+/// empty, unparseable, or negative.
+///
+/// Never coerces a bad value to zero. Text that fails to parse (stray
+/// characters, a locale decimal comma) means visibility is unknown, not that
+/// the diver measured zero visibility; persisting 0 would record a
+/// measurement nobody took and bin the dive into the worst band.
+double? parseVisibilityInput(String text, UnitFormatter units) {
+  final parsed = double.tryParse(text.trim());
+  if (parsed == null || parsed < 0) return null;
+  return units.depthToMeters(parsed);
+}
+
 /// Localized name for a calibrated band.
 String visibilityBandName(VisibilityBand band, AppLocalizations l10n) =>
     switch (band) {

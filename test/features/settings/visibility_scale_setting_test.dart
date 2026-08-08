@@ -51,6 +51,44 @@ void main() {
     });
   });
 
+  group('custom thresholds survive a trip through a named preset', () {
+    test('the stored custom values are retained while a preset is active', () {
+      // setVisibilityScale keeps the custom columns populated so switching
+      // away and back restores them. The settings dialog must seed from those
+      // columns, not from visibilityScale, which resolves to the *named*
+      // preset's bounds whenever one is active.
+      const settings = AppSettings(
+        visibilityScalePreset: VisibilityScalePreset.coldWater,
+        visibilityScaleExcellentM: 18,
+        visibilityScaleGoodM: 9,
+        visibilityScaleModerateM: 3,
+      );
+
+      // What the dialog must NOT seed from:
+      expect(settings.visibilityScale, VisibilityScale.coldWater);
+      expect(settings.visibilityScale.excellentAtOrAboveM, 12);
+
+      // What it must seed from:
+      expect(settings.visibilityScaleExcellentM, 18);
+      expect(settings.visibilityScaleGoodM, 9);
+      expect(settings.visibilityScaleModerateM, 3);
+    });
+
+    test('switching back to custom restores the retained thresholds', () {
+      const active = AppSettings(
+        visibilityScalePreset: VisibilityScalePreset.coldWater,
+        visibilityScaleExcellentM: 18,
+        visibilityScaleGoodM: 9,
+        visibilityScaleModerateM: 3,
+      );
+      final restored = active.copyWith(
+        visibilityScalePreset: VisibilityScalePreset.custom,
+      );
+      expect(restored.visibilityScale.excellentAtOrAboveM, 18);
+      expect(restored.visibilityScale.bandFor(9), VisibilityBand.good);
+    });
+  });
+
   group('AppSettings integration', () {
     test('changing the preset changes only the derived scale', () {
       const before = AppSettings();

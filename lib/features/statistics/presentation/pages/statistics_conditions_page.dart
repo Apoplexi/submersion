@@ -123,11 +123,11 @@ class StatisticsConditionsPage extends ConsumerWidget {
       final band = formatLegacyVisibilityBand(bucket, l10n, units);
       return l10n.statistics_conditions_visibility_legacySuffix(band ?? name);
     }
-    final band = VisibilityBand.values.firstWhere(
-      (b) => b.name == key,
-      orElse: () => VisibilityBand.poor,
-    );
-    return visibilityBandName(band, l10n);
+    // An unrecognized key can only come from a repository bug, so surface it
+    // verbatim. Falling back to a real band would label unknown data "Poor",
+    // which reads as a legitimate result and hides the defect.
+    final band = VisibilityBand.values.where((b) => b.name == key).firstOrNull;
+    return band == null ? key : visibilityBandName(band, l10n);
   }
 
   Widget _buildWaterTypeSection(BuildContext context, WidgetRef ref) {

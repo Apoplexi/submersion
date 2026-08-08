@@ -1077,11 +1077,7 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
       rating: _rating > 0 ? _rating : null,
       isFavorite: _bulkFavorite,
       waterType: _waterType?.name,
-      visibilityMeters: _visibilityController.text.isNotEmpty
-          ? units.depthToMeters(
-              double.tryParse(_visibilityController.text) ?? 0,
-            )
-          : null,
+      visibilityMeters: _visibilityMetersInput(units),
       currentDirection: _currentDirection?.name,
       currentStrength: _currentStrength?.name,
       swellHeight: _swellHeightController.text.isNotEmpty
@@ -3643,18 +3639,20 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
     );
   }
 
+  /// The visibility field's value converted to meters, or null when the field
+  /// is empty or does not parse. See [parseVisibilityInput].
+  double? _visibilityMetersInput(UnitFormatter units) =>
+      parseVisibilityInput(_visibilityController.text, units);
+
   /// Caption under the visibility field: the adjective the diver's calibration
   /// assigns to what they just typed, or, for a legacy dive not yet given a
   /// number, the range its stored bucket covers.
   String? _visibilityCaption(UnitFormatter units) {
     final l10n = context.l10n;
-    final typed = double.tryParse(_visibilityController.text);
-    if (typed != null) {
+    final meters = _visibilityMetersInput(units);
+    if (meters != null) {
       final scale = ref.read(settingsProvider).visibilityScale;
-      return visibilityBandName(
-        scale.bandFor(units.depthToMeters(typed)),
-        l10n,
-      );
+      return visibilityBandName(scale.bandFor(meters), l10n);
     }
     if (_selectedVisibility != Visibility.unknown) {
       return formatLegacyVisibilityBand(_selectedVisibility, l10n, units);
@@ -3667,8 +3665,10 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
       if (_waterType != null) _waterType!.displayName,
       if (_waterTempController.text.isNotEmpty)
         '${_waterTempController.text} ${units.temperatureSymbol}',
-      if (_visibilityController.text.isNotEmpty)
-        '${_visibilityController.text}${units.depthSymbol}'
+      // Through the formatter rather than hand-concatenated, so the summary
+      // matches how every other distance in the app renders.
+      if (_visibilityMetersInput(units) case final meters?)
+        units.formatDistance(meters)
       else if (_selectedVisibility != Visibility.unknown)
         formatLegacyVisibilityBand(_selectedVisibility, context.l10n, units) ??
             '',

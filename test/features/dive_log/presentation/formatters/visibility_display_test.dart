@@ -20,6 +20,45 @@ void main() {
     en = await AppLocalizations.delegate.load(const Locale('en'));
   });
 
+  group('parseVisibilityInput', () {
+    test('parses a plain metric entry', () {
+      expect(parseVisibilityInput('6', metric), 6.0);
+      expect(parseVisibilityInput('6.4', metric), closeTo(6.4, 0.0001));
+    });
+
+    test('converts an imperial entry to meters for storage', () {
+      expect(parseVisibilityInput('20', imperial), closeTo(6.096, 0.001));
+    });
+
+    test('tolerates surrounding whitespace', () {
+      expect(parseVisibilityInput('  6  ', metric), 6.0);
+    });
+
+    test('returns null for an empty field', () {
+      expect(parseVisibilityInput('', metric), isNull);
+      expect(parseVisibilityInput('   ', metric), isNull);
+    });
+
+    test('returns null rather than zero for unparseable text', () {
+      // The regression this guards: `double.tryParse(..) ?? 0` persisted a
+      // measured zero for junk input, which then binned the dive as the worst
+      // band. Unknown visibility must stay unknown.
+      expect(parseVisibilityInput('abc', metric), isNull);
+      expect(parseVisibilityInput('6,4', metric), isNull);
+      expect(parseVisibilityInput('--', metric), isNull);
+    });
+
+    test('returns null for a negative entry', () {
+      expect(parseVisibilityInput('-5', metric), isNull);
+    });
+
+    test('accepts an explicit zero, which is a real measurement', () {
+      // Zero visibility is a genuine silt-out reading; only *unparseable*
+      // input is unknown.
+      expect(parseVisibilityInput('0', metric), 0.0);
+    });
+  });
+
   group('visibilityBandName', () {
     test('names every band', () {
       expect(visibilityBandName(VisibilityBand.excellent, en), 'Excellent');

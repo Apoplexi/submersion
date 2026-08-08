@@ -1611,7 +1611,9 @@ class UddfExportBuilders {
   /// dive has no visibility at all.
   static String? visibilityForUddf(Dive dive) {
     final meters = dive.visibilityMeters;
-    if (meters != null) return meters.toStringAsFixed(1);
+    // Unrounded: toStringAsFixed(1) would turn a stored 6.44 into 6.4, which
+    // is precision loss on the way out and defeats a true round trip.
+    if (meters != null) return meters.toString();
     final legacy = dive.visibility;
     if (legacy == null || legacy == enums.Visibility.unknown) return null;
     return _visibilityToUddf(legacy);

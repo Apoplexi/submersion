@@ -970,9 +970,10 @@ class StatisticsRepository {
 
   /// Get visibility distribution, binned by the diver's calibration.
   ///
-  /// Binning happens in Dart rather than SQL because SQL cannot see [scale],
-  /// and the whole point of storing a measurement is that the same dives
-  /// re-bin when the diver changes their calibration.
+  /// The calibration thresholds are passed into SQL as variables, so SQLite
+  /// still does the aggregation and only the handful of grouped rows cross
+  /// into Dart. Changing the calibration re-bins the same dives, which is the
+  /// whole point of storing a measurement rather than a judgment.
   ///
   /// Labels are stable keys, not display text: a measured dive yields the
   /// [VisibilityBand] name, and a pre-v144 dive yields `legacy_<bucket>`. The
@@ -987,27 +988,43 @@ class StatisticsRepository {
     try {
       final diverFilter = diverId != null ? 'AND diver_id = ?' : '';
       final df = _diveFilter(filter, alias: 'dives');
-      final params = diverId != null ? [diverId, ...df.params] : [...df.params];
+      // Threshold variables come first: they appear before the diver and
+      // filter placeholders in the statement below, and Drift binds
+      // positionally.
+      final scaleParams = [
+        scale.excellentAtOrAboveM,
+        scale.goodAtOrAboveM,
+        scale.moderateAtOrAboveM,
+      ];
+      final params = diverId != null
+          ? [...scaleParams, diverId, ...df.params]
+          : [...scaleParams, ...df.params];
 
       final results = await _db.customSelect('''
-        SELECT
-          visibility,
-          visibility_meters
-        FROM dives
-        WHERE (
-          visibility_meters IS NOT NULL
-          OR (visibility IS NOT NULL AND visibility != '')
-        ) $diverFilter ${df.clause}
+        SELECT bucket, COUNT(*) AS count FROM (
+          SELECT CASE
+            WHEN visibility_meters IS NOT NULL THEN
+              CASE
+                WHEN visibility_meters >= ? THEN 'excellent'
+                WHEN visibility_meters >= ? THEN 'good'
+                WHEN visibility_meters >= ? THEN 'moderate'
+                ELSE 'poor'
+              END
+            ELSE 'legacy_' || visibility
+          END AS bucket
+          FROM dives
+          WHERE (
+            visibility_meters IS NOT NULL
+            OR (visibility IS NOT NULL AND visibility != '')
+          ) $diverFilter ${df.clause}
+        )
+        GROUP BY bucket
         ''', variables: params.map((p) => Variable(p)).toList()).get();
 
-      final counts = <String, int>{};
-      for (final row in results) {
-        final meters = row.read<double?>('visibility_meters');
-        final key = meters != null
-            ? scale.bandFor(meters).name
-            : 'legacy_${row.read<String>('visibility')}';
-        counts[key] = (counts[key] ?? 0) + 1;
-      }
+      final counts = <String, int>{
+        for (final row in results)
+          row.read<String>('bucket'): row.read<int>('count'),
+      };
 
       final total = counts.values.fold<int>(0, (sum, c) => sum + c);
       if (total == 0) return [];

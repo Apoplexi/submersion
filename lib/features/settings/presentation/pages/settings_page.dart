@@ -745,17 +745,24 @@ class _UnitsSectionContent extends ConsumerWidget {
     AppSettings settings,
   ) {
     final units = UnitFormatter(settings);
-    final current = settings.visibilityScale;
+    // Seed from the diver's retained custom thresholds, not from
+    // settings.visibilityScale: that getter resolves to the *named* preset's
+    // bounds whenever one is active, so opening Custom after switching away
+    // and back would show the preset's numbers and hide the values the diver
+    // actually entered. Falls back to the active scale only when no custom
+    // thresholds have ever been saved.
+    final active = settings.visibilityScale;
+    final excellentM =
+        settings.visibilityScaleExcellentM ?? active.excellentAtOrAboveM;
+    final goodM = settings.visibilityScaleGoodM ?? active.goodAtOrAboveM;
+    final moderateM =
+        settings.visibilityScaleModerateM ?? active.moderateAtOrAboveM;
     String initial(double meters) =>
         units.convertDepth(meters).toStringAsFixed(0);
 
-    final excellent = TextEditingController(
-      text: initial(current.excellentAtOrAboveM),
-    );
-    final good = TextEditingController(text: initial(current.goodAtOrAboveM));
-    final moderate = TextEditingController(
-      text: initial(current.moderateAtOrAboveM),
-    );
+    final excellent = TextEditingController(text: initial(excellentM));
+    final good = TextEditingController(text: initial(goodM));
+    final moderate = TextEditingController(text: initial(moderateM));
 
     showDialog(
       context: context,

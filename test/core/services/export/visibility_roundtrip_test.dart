@@ -22,6 +22,15 @@ void main() {
       );
     });
 
+    test('a distance finer than 0.1 m is not rounded away', () {
+      // toStringAsFixed(1) would have turned 6.44 into "6.4", quietly losing
+      // precision on the way out and defeating a true round trip.
+      final exported = UddfExportBuilders.visibilityForUddf(
+        buildDive(visibilityMeters: 6.44),
+      );
+      expect(double.parse(exported!), closeTo(6.44, 0.0001));
+    });
+
     test('a large measured distance is not clamped to a bucket midpoint', () {
       expect(
         UddfExportBuilders.visibilityForUddf(buildDive(visibilityMeters: 42.5)),
