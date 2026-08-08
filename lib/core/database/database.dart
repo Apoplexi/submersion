@@ -379,6 +379,22 @@ class GpsTracks extends Table {
   TextColumn get deviceName => text().nullable()();
   IntColumn get pointCount => integer().withDefault(const Constant(0))();
 
+  /// Provenance: 'phone' | 'gpx' | 'fit' | 'kml' | 'csv'. Rendering code
+  /// treats this as opaque -- no view logic branches on it.
+  TextColumn get source => text().withDefault(const Constant('phone'))();
+
+  /// Originating filename or device, for imported tracks.
+  TextColumn get sourceRef => text().nullable()();
+
+  /// User-editable label.
+  TextColumn get name => text().nullable()();
+
+  /// Non-destructive trim bounds, wall-clock-as-UTC epoch MILLISECONDS.
+  /// The points blob is never rewritten by a trim, so trimming is fully
+  /// reversible and cannot lose a fix.
+  IntColumn get trimStartTime => integer().nullable()();
+  IntColumn get trimEndTime => integer().nullable()();
+
   /// Gzipped JSON array of [wallClockEpochSeconds, lat, lon, accuracyMeters]
   BlobColumn get points => blob().nullable()();
   IntColumn get createdAt => integer()();
@@ -2932,7 +2948,7 @@ class AppDatabase extends _$AppDatabase {
 
   /// The current schema version as a static constant so that pre-open checks
   /// (e.g. version-mismatch guard) can reference it without an instance.
-  static const int currentSchemaVersion = 142;
+  static const int currentSchemaVersion = 144;
 
   /// Every schema version that has a migration block in onUpgrade.
   /// Used to calculate progress step counts. When adding a new migration,
@@ -4108,6 +4124,40 @@ class AppDatabase extends _$AppDatabase {
   /// _assertWeatherCodeColumn pattern so a schema-version collision cannot
   /// strand a database without it. Self-guarding when the table is absent
   /// (minimal migration-test fixtures).
+  /// v144: gps_tracks provenance, label, and non-destructive trim bounds.
+  ///
+  /// Self-guarding like its siblings: a DB that upgraded past 144 on a
+  /// parallel branch never enters the migration block, so the beforeOpen
+  /// backstop is its only path to these columns.
+  Future<void> _assertGpsTrackColumns() async {
+    final cols = await customSelect("PRAGMA table_info('gps_tracks')").get();
+    if (cols.isEmpty) return;
+    final names = cols.map((c) => c.read<String>('name')).toSet();
+    if (!names.contains('source')) {
+      await customStatement(
+        "ALTER TABLE gps_tracks ADD COLUMN source TEXT NOT NULL DEFAULT 'phone'",
+      );
+    }
+    if (!names.contains('source_ref')) {
+      await customStatement(
+        'ALTER TABLE gps_tracks ADD COLUMN source_ref TEXT',
+      );
+    }
+    if (!names.contains('name')) {
+      await customStatement('ALTER TABLE gps_tracks ADD COLUMN name TEXT');
+    }
+    if (!names.contains('trim_start_time')) {
+      await customStatement(
+        'ALTER TABLE gps_tracks ADD COLUMN trim_start_time INTEGER',
+      );
+    }
+    if (!names.contains('trim_end_time')) {
+      await customStatement(
+        'ALTER TABLE gps_tracks ADD COLUMN trim_end_time INTEGER',
+      );
+    }
+  }
+
   Future<void> _assertTripReturnFlightColumn() async {
     final cols = await customSelect("PRAGMA table_info('trips')").get();
     if (cols.isEmpty) return;
@@ -7357,6 +7407,13 @@ class AppDatabase extends _$AppDatabase {
           await _assertTripReturnFlightColumn();
         }
         if (from < 142) await reportProgress();
+        // v144: gps_tracks source/source_ref/name + non-destructive trim
+        // bounds. v143 is reserved by the media integration branch; the
+        // beforeOpen backstop heals any DB stranded between.
+        if (from < 144) {
+          await _assertGpsTrackColumns();
+        }
+        if (from < 144) await reportProgress();
       },
       beforeOpen: (details) async {
         // Enable foreign keys
@@ -7475,6 +7532,9 @@ class AppDatabase extends _$AppDatabase {
 
         // v142 backstop: re-assert trips.return_flight_at.
         await _assertTripReturnFlightColumn();
+
+        // v144 backstop: re-assert the gps_tracks provenance and trim columns.
+        await _assertGpsTrackColumns();
 
         // Built-in dive types are reference data: identical on every device and
         // undeletable through DiveTypeRepository. Nothing else restores them --
