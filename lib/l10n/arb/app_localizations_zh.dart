@@ -16615,7 +16615,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get trips_diveScan_noMatches => '未找到匹配的潜水';
 
   @override
-  String get trips_diveScan_noDiver => '为此行程指定潜水员以扫描潜水记录';
+  String get trips_diveScan_noDiver => '请选择当前潜水员以扫描潜水记录';
 
   @override
   String get trips_diveScan_selectAll => '全选';

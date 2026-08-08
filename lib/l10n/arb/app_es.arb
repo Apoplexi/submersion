@@ -5659,7 +5659,7 @@
     }
   },
   "trips_diveScan_noMatches": "No se encontraron inmersiones coincidentes",
-  "trips_diveScan_noDiver": "Asigna un buceador a este viaje para buscar inmersiones",
+  "trips_diveScan_noDiver": "Selecciona un buceador activo para buscar inmersiones",
   "trips_diveScan_selectAll": "Seleccionar todo",
   "trips_diveScan_subtitle": "{count} inmersiones encontradas en el rango de fechas",
   "@trips_diveScan_subtitle": {

@@ -5587,7 +5587,7 @@
     }
   },
   "trips_diveScan_noMatches": "Aucune plongee correspondante trouvee",
-  "trips_diveScan_noDiver": "Attribuez un plongeur à ce voyage pour rechercher des plongées",
+  "trips_diveScan_noDiver": "Sélectionnez un plongeur actif pour rechercher des plongées",
   "trips_diveScan_selectAll": "Tout selectionner",
   "trips_diveScan_subtitle": "{count} plongees trouvees dans la plage de dates",
   "@trips_diveScan_subtitle": {

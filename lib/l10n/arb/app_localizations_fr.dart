@@ -17584,7 +17584,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get trips_diveScan_noDiver =>
-      'Attribuez un plongeur à ce voyage pour rechercher des plongées';
+      'Sélectionnez un plongeur actif pour rechercher des plongées';
 
   @override
   String get trips_diveScan_selectAll => 'Tout selectionner';

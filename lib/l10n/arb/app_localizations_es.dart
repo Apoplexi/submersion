@@ -17528,7 +17528,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get trips_diveScan_noDiver =>
-      'Asigna un buceador a este viaje para buscar inmersiones';
+      'Selecciona un buceador activo para buscar inmersiones';
 
   @override
   String get trips_diveScan_selectAll => 'Seleccionar todo';

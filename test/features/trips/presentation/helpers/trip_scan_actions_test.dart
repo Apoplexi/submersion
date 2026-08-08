@@ -124,20 +124,23 @@ Future<void> pumpActionButton(
 }
 
 void main() {
-  testWidgets('scanForTripDives explains when there is no diver', (
+  testWidgets('scanForTripDives explains when there is no active diver', (
     tester,
   ) async {
+    // The trip has an owner; what is missing is the *active* diver, so the
+    // guard and its message must both be about the active diver. The base
+    // overrides pin currentDiverIdProvider to null.
     await pumpActionButton(
       tester,
       const [],
-      (context, ref) => scanForTripDives(context, ref, _trip()),
+      (context, ref) => scanForTripDives(context, ref, _trip(diverId: 'BAB')),
     );
     await tester.tap(find.text('go'));
     await tester.pumpAndSettle();
     // No scan runs, but the user gets feedback instead of a silent no-op.
     expect(find.byType(CircularProgressIndicator), findsNothing);
     expect(
-      find.text('Assign a diver to this trip to scan for dives'),
+      find.text('Select an active diver to scan for dives'),
       findsOneWidget,
     );
   });

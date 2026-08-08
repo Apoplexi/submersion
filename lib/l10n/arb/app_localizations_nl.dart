@@ -17366,7 +17366,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get trips_diveScan_noDiver =>
-      'Wijs een duiker toe aan deze reis om naar duiken te zoeken';
+      'Selecteer een actieve duiker om naar duiken te zoeken';
 
   @override
   String get trips_diveScan_selectAll => 'Alles selecteren';

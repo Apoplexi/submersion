@@ -5659,7 +5659,7 @@
     }
   },
   "trips_diveScan_noMatches": "Nenhum mergulho correspondente encontrado",
-  "trips_diveScan_noDiver": "Atribua um mergulhador a esta viagem para procurar mergulhos",
+  "trips_diveScan_noDiver": "Selecione um mergulhador ativo para procurar mergulhos",
   "trips_diveScan_selectAll": "Selecionar tudo",
   "trips_diveScan_subtitle": "{count} mergulhos encontrados no intervalo de datas",
   "@trips_diveScan_subtitle": {

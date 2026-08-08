@@ -17191,8 +17191,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get trips_diveScan_noMatches => 'لم يتم العثور على غوصات مطابقة';
 
   @override
-  String get trips_diveScan_noDiver =>
-      'عيّن غوّاصًا لهذه الرحلة للبحث عن الغطسات';
+  String get trips_diveScan_noDiver => 'اختر غوّاصًا نشطًا للبحث عن الغطسات';
 
   @override
   String get trips_diveScan_selectAll => 'تحديد الكل';

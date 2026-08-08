@@ -29341,7 +29341,7 @@ abstract class AppLocalizations {
   /// No description provided for @trips_diveScan_noDiver.
   ///
   /// In en, this message translates to:
-  /// **'Assign a diver to this trip to scan for dives'**
+  /// **'Select an active diver to scan for dives'**
   String get trips_diveScan_noDiver;
 
   /// No description provided for @trips_diveScan_selectAll.

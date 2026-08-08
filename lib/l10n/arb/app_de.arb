@@ -5659,7 +5659,7 @@
     }
   },
   "trips_diveScan_noMatches": "Keine passenden Tauchgänge gefunden",
-  "trips_diveScan_noDiver": "Weise dieser Reise einen Taucher zu, um nach Tauchgängen zu suchen",
+  "trips_diveScan_noDiver": "Wähle einen aktiven Taucher aus, um nach Tauchgängen zu suchen",
   "trips_diveScan_selectAll": "Alle auswählen",
   "trips_diveScan_subtitle": "{count} Tauchgänge im Datumsbereich gefunden",
   "@trips_diveScan_subtitle": {

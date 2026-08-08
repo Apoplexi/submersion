@@ -17482,7 +17482,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get trips_diveScan_noDiver =>
-      'Weise dieser Reise einen Taucher zu, um nach Tauchgängen zu suchen';
+      'Wähle einen aktiven Taucher aus, um nach Tauchgängen zu suchen';
 
   @override
   String get trips_diveScan_selectAll => 'Alle auswählen';

@@ -17062,8 +17062,7 @@ class AppLocalizationsHe extends AppLocalizations {
   String get trips_diveScan_noMatches => 'לא נמצאו צלילות תואמות';
 
   @override
-  String get trips_diveScan_noDiver =>
-      'שייך צולל לטיול זה כדי לסרוק אחר צלילות';
+  String get trips_diveScan_noDiver => 'בחר צולל פעיל כדי לסרוק אחר צלילות';
 
   @override
   String get trips_diveScan_selectAll => 'בחר הכל';
