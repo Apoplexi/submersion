@@ -19689,6 +19689,48 @@ class AppLocalizationsAr extends AppLocalizations {
   String get gpsLogger_tracksHeader => 'المسارات المسجّلة';
 
   @override
+  String get gpsTrack_import_action => 'استيراد مسار...';
+
+  @override
+  String get gpsTrack_import_reviewTitle => 'مراجعة الاستيراد';
+
+  @override
+  String get gpsTrack_import_timezone => 'سُجّل في';
+
+  @override
+  String get gpsTrack_import_timezoneHint =>
+      'الأوقات في الملف بتوقيت UTC. حدّد المنطقة الزمنية التي سُجّل فيها المسار ليتوافق مع غطساتك.';
+
+  @override
+  String get gpsTrack_import_duplicate =>
+      'يبدو أن هذا نسخة مكررة من مسار موجود.';
+
+  @override
+  String get gpsTrack_import_confirm => 'استيراد';
+
+  @override
+  String get gpsTrack_import_csvMapping => 'طابق الأعمدة';
+
+  @override
+  String get gpsTrack_import_firstFix => 'أول نقطة';
+
+  @override
+  String gpsTrack_import_fixCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count نقطة',
+      one: 'نقطة واحدة',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String gpsTrack_import_failed(String reason) {
+    return 'تعذّرت قراءة الملف: $reason';
+  }
+
+  @override
   String get gpsTrack_export_saved => 'تم حفظ المسار';
 
   @override

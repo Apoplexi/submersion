@@ -20046,6 +20046,48 @@ class AppLocalizationsIt extends AppLocalizations {
   String get gpsLogger_tracksHeader => 'Tracce registrate';
 
   @override
+  String get gpsTrack_import_action => 'Importa traccia...';
+
+  @override
+  String get gpsTrack_import_reviewTitle => 'Verifica importazione';
+
+  @override
+  String get gpsTrack_import_timezone => 'Registrata in';
+
+  @override
+  String get gpsTrack_import_timezoneHint =>
+      'Gli orari nel file sono UTC. Imposta il fuso in cui è stata registrata la traccia perché coincida con le tue immersioni.';
+
+  @override
+  String get gpsTrack_import_duplicate =>
+      'Sembra un duplicato di una traccia esistente.';
+
+  @override
+  String get gpsTrack_import_confirm => 'Importa';
+
+  @override
+  String get gpsTrack_import_csvMapping => 'Abbina le colonne';
+
+  @override
+  String get gpsTrack_import_firstFix => 'Primo punto';
+
+  @override
+  String gpsTrack_import_fixCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count punti',
+      one: '1 punto',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String gpsTrack_import_failed(String reason) {
+    return 'Impossibile leggere il file: $reason';
+  }
+
+  @override
   String get gpsTrack_export_saved => 'Traccia salvata';
 
   @override

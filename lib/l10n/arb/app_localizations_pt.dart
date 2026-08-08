@@ -20054,6 +20054,48 @@ class AppLocalizationsPt extends AppLocalizations {
   String get gpsLogger_tracksHeader => 'Trilhas gravadas';
 
   @override
+  String get gpsTrack_import_action => 'Importar trilha...';
+
+  @override
+  String get gpsTrack_import_reviewTitle => 'Rever importação';
+
+  @override
+  String get gpsTrack_import_timezone => 'Gravada em';
+
+  @override
+  String get gpsTrack_import_timezoneHint =>
+      'As horas no ficheiro estão em UTC. Defina o fuso em que a trilha foi gravada para coincidir com os seus mergulhos.';
+
+  @override
+  String get gpsTrack_import_duplicate =>
+      'Isto parece um duplicado de uma trilha existente.';
+
+  @override
+  String get gpsTrack_import_confirm => 'Importar';
+
+  @override
+  String get gpsTrack_import_csvMapping => 'Associar colunas';
+
+  @override
+  String get gpsTrack_import_firstFix => 'Primeiro ponto';
+
+  @override
+  String gpsTrack_import_fixCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count pontos',
+      one: '1 ponto',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String gpsTrack_import_failed(String reason) {
+    return 'Não foi possível ler o ficheiro: $reason';
+  }
+
+  @override
   String get gpsTrack_export_saved => 'Trilha guardada';
 
   @override

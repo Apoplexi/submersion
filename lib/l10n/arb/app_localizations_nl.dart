@@ -19885,6 +19885,48 @@ class AppLocalizationsNl extends AppLocalizations {
   String get gpsLogger_tracksHeader => 'Opgenomen tracks';
 
   @override
+  String get gpsTrack_import_action => 'Track importeren...';
+
+  @override
+  String get gpsTrack_import_reviewTitle => 'Import controleren';
+
+  @override
+  String get gpsTrack_import_timezone => 'Opgenomen in';
+
+  @override
+  String get gpsTrack_import_timezoneHint =>
+      'De tijden in het bestand zijn UTC. Stel de zone in waarin de track is opgenomen zodat die aansluit op je duiken.';
+
+  @override
+  String get gpsTrack_import_duplicate =>
+      'Dit lijkt een duplicaat van een bestaande track.';
+
+  @override
+  String get gpsTrack_import_confirm => 'Importeren';
+
+  @override
+  String get gpsTrack_import_csvMapping => 'Kolommen koppelen';
+
+  @override
+  String get gpsTrack_import_firstFix => 'Eerste punt';
+
+  @override
+  String gpsTrack_import_fixCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count punten',
+      one: '1 punt',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String gpsTrack_import_failed(String reason) {
+    return 'Kan dat bestand niet lezen: $reason';
+  }
+
+  @override
   String get gpsTrack_export_saved => 'Track opgeslagen';
 
   @override

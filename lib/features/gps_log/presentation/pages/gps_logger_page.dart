@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -12,7 +13,11 @@ import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/gps_log/data/services/gps_track_recorder.dart';
 import 'package:submersion/features/gps_log/domain/entities/gps_track.dart';
+import 'package:submersion/features/gps_log/data/services/track_import/parsed_track.dart';
+import 'package:submersion/features/gps_log/data/services/track_import/track_import_service.dart';
+import 'package:submersion/features/gps_log/presentation/pages/track_import_review_page.dart';
 import 'package:submersion/features/gps_log/presentation/providers/gps_log_providers.dart';
+import 'package:submersion/features/gps_log/presentation/providers/gps_track_map_providers.dart';
 import 'package:submersion/features/gps_log/presentation/widgets/gps_track_thumbnail.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
@@ -139,6 +144,51 @@ class _GpsLoggerPageState extends ConsumerState<GpsLoggerPage> {
     );
   }
 
+  Future<void> _importTrack() async {
+    final l10n = context.l10n;
+    final messenger = ScaffoldMessenger.of(context);
+    final navigator = Navigator.of(context);
+
+    final picked = await FilePicker.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: const ['gpx', 'kml', 'csv', 'fit'],
+      // Needed so FIT, which is binary, arrives intact rather than as a path
+      // we would then have to read separately on every platform.
+      withData: true,
+    );
+    final file = picked?.files.singleOrNull;
+    final bytes = file?.bytes;
+    if (file == null || bytes == null) return;
+
+    final TrackImportCandidate candidate;
+    try {
+      candidate = await ref
+          .read(trackImportServiceProvider)
+          .prepare(fileName: file.name, bytes: bytes);
+    } on TrackParseException catch (e) {
+      if (!mounted) return;
+      messenger.showSnackBar(
+        SnackBar(content: Text(l10n.gpsTrack_import_failed(e.message))),
+      );
+      return;
+    } catch (e, stackTrace) {
+      _log.error('Track import failed', error: e, stackTrace: stackTrace);
+      if (!mounted) return;
+      messenger.showSnackBar(
+        SnackBar(content: Text(l10n.gpsTrack_import_failed('$e'))),
+      );
+      return;
+    }
+
+    if (!mounted) return;
+    await navigator.push<bool>(
+      MaterialPageRoute(
+        builder: (_) =>
+            TrackImportReviewPage(candidate: candidate, bytes: bytes),
+      ),
+    );
+  }
+
   Future<void> _deleteTrack(GpsTrack track) async {
     final l10n = context.l10n;
     final confirmed = await showDialog<bool>(
@@ -203,6 +253,12 @@ class _GpsLoggerPageState extends ConsumerState<GpsLoggerPage> {
             icon: const Icon(Icons.map_outlined),
             tooltip: l10n.gpsTrack_map_showMap,
             onPressed: () => context.push('/gps-log/map'),
+          ),
+          IconButton(
+            key: const ValueKey('gps-track-import'),
+            icon: const Icon(Icons.file_open_outlined),
+            tooltip: l10n.gpsTrack_import_action,
+            onPressed: _importTrack,
           ),
         ],
       ),

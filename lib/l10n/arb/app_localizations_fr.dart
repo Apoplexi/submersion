@@ -20124,6 +20124,48 @@ class AppLocalizationsFr extends AppLocalizations {
   String get gpsLogger_tracksHeader => 'Traces enregistrées';
 
   @override
+  String get gpsTrack_import_action => 'Importer une trace...';
+
+  @override
+  String get gpsTrack_import_reviewTitle => 'Vérifier l\'import';
+
+  @override
+  String get gpsTrack_import_timezone => 'Enregistrée en';
+
+  @override
+  String get gpsTrack_import_timezoneHint =>
+      'Les heures du fichier sont en UTC. Indiquez le fuseau d\'enregistrement pour qu\'elles correspondent à vos plongées.';
+
+  @override
+  String get gpsTrack_import_duplicate =>
+      'Cela ressemble à un doublon d\'une trace existante.';
+
+  @override
+  String get gpsTrack_import_confirm => 'Importer';
+
+  @override
+  String get gpsTrack_import_csvMapping => 'Associer les colonnes';
+
+  @override
+  String get gpsTrack_import_firstFix => 'Premier point';
+
+  @override
+  String gpsTrack_import_fixCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count points',
+      one: '1 point',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String gpsTrack_import_failed(String reason) {
+    return 'Impossible de lire ce fichier : $reason';
+  }
+
+  @override
   String get gpsTrack_export_saved => 'Trace enregistrée';
 
   @override

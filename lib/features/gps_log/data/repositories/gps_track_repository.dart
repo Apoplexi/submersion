@@ -54,6 +54,54 @@ class GpsTrackRepository {
     }
   }
 
+  /// Inserts a fully-formed imported track in one write.
+  ///
+  /// Unlike startTrack/appendBufferPoint/finalizeTrack, an import already has
+  /// every point in hand, so it skips the local recording buffer entirely.
+  Future<String> insertImportedTrack({
+    required List<domain.GpsTrackPoint> points,
+    required int startTimeMs,
+    required int endTimeMs,
+    required int tzOffsetMinutes,
+    required String source,
+    String? sourceRef,
+    String? name,
+  }) async {
+    try {
+      final id = _uuid.v4();
+      final now = DateTime.now().millisecondsSinceEpoch;
+      await _db
+          .into(_db.gpsTracks)
+          .insert(
+            GpsTracksCompanion.insert(
+              id: id,
+              startTime: startTimeMs,
+              endTime: Value(endTimeMs),
+              tzOffsetMinutes: Value(tzOffsetMinutes),
+              pointCount: Value(points.length),
+              points: Value(encodeTrackPoints(points)),
+              // Always restate source explicitly. A Value.absent() here would
+              // silently fall back to the 'phone' default and misattribute an
+              // imported track.
+              source: Value(source),
+              sourceRef: Value(sourceRef),
+              name: Value(name),
+              createdAt: now,
+              updatedAt: now,
+            ),
+          );
+      SyncEventBus.notifyLocalChange();
+      return id;
+    } catch (e, stackTrace) {
+      _log.error(
+        'Failed to insert imported GPS track',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      rethrow;
+    }
+  }
+
   Future<void> appendBufferPoint(
     String trackId,
     domain.GpsTrackPoint point,

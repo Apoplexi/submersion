@@ -19707,6 +19707,48 @@ class AppLocalizationsEn extends AppLocalizations {
   String get gpsLogger_tracksHeader => 'Recorded tracks';
 
   @override
+  String get gpsTrack_import_action => 'Import track...';
+
+  @override
+  String get gpsTrack_import_reviewTitle => 'Review Import';
+
+  @override
+  String get gpsTrack_import_timezone => 'Recorded in';
+
+  @override
+  String get gpsTrack_import_timezoneHint =>
+      'Times in the file are UTC. Set the zone the track was recorded in so it lines up with your dives.';
+
+  @override
+  String get gpsTrack_import_duplicate =>
+      'This looks like a duplicate of an existing track.';
+
+  @override
+  String get gpsTrack_import_confirm => 'Import';
+
+  @override
+  String get gpsTrack_import_csvMapping => 'Match the columns';
+
+  @override
+  String get gpsTrack_import_firstFix => 'First fix';
+
+  @override
+  String gpsTrack_import_fixCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count fixes',
+      one: '1 fix',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String gpsTrack_import_failed(String reason) {
+    return 'Could not read that file: $reason';
+  }
+
+  @override
   String get gpsTrack_export_saved => 'Track saved';
 
   @override

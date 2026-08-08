@@ -12569,6 +12569,32 @@
     }
   },
   "gpsLogger_tracksHeader": "Recorded tracks",
+  "gpsTrack_import_action": "Import track...",
+  "gpsTrack_import_reviewTitle": "Review Import",
+  "gpsTrack_import_timezone": "Recorded in",
+  "gpsTrack_import_timezoneHint": "Times in the file are UTC. Set the zone the track was recorded in so it lines up with your dives.",
+  "gpsTrack_import_duplicate": "This looks like a duplicate of an existing track.",
+  "gpsTrack_import_confirm": "Import",
+  "gpsTrack_import_csvMapping": "Match the columns",
+  "gpsTrack_import_firstFix": "First fix",
+  "gpsTrack_import_fixCount": "{count, plural, =1{1 fix} other{{count} fixes}}",
+  "@gpsTrack_import_fixCount": {
+    "description": "Number of positions in the track being imported",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "gpsTrack_import_failed": "Could not read that file: {reason}",
+  "@gpsTrack_import_failed": {
+    "description": "Shown when parsing an imported track file fails",
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
   "gpsTrack_export_saved": "Track saved",
   "gpsTrack_action_export": "Export",
   "gpsTrack_action_shareGpx": "Share as GPX",

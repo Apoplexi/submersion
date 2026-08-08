@@ -19988,6 +19988,48 @@ class AppLocalizationsHu extends AppLocalizations {
   String get gpsLogger_tracksHeader => 'Rögzített útvonalak';
 
   @override
+  String get gpsTrack_import_action => 'Nyomvonal importálása...';
+
+  @override
+  String get gpsTrack_import_reviewTitle => 'Importálás ellenőrzése';
+
+  @override
+  String get gpsTrack_import_timezone => 'Rögzítés helye';
+
+  @override
+  String get gpsTrack_import_timezoneHint =>
+      'A fájlban szereplő idők UTC szerintiek. Add meg a rögzítés időzónáját, hogy illeszkedjen a merüléseidhez.';
+
+  @override
+  String get gpsTrack_import_duplicate =>
+      'Ez egy meglévő nyomvonal másolatának tűnik.';
+
+  @override
+  String get gpsTrack_import_confirm => 'Importálás';
+
+  @override
+  String get gpsTrack_import_csvMapping => 'Oszlopok megfeleltetése';
+
+  @override
+  String get gpsTrack_import_firstFix => 'Első pont';
+
+  @override
+  String gpsTrack_import_fixCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count pont',
+      one: '1 pont',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String gpsTrack_import_failed(String reason) {
+    return 'A fájl nem olvasható: $reason';
+  }
+
+  @override
   String get gpsTrack_export_saved => 'Nyomvonal mentve';
 
   @override

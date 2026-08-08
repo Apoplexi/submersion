@@ -19023,6 +19023,47 @@ class AppLocalizationsZh extends AppLocalizations {
   String get gpsLogger_tracksHeader => '已记录的轨迹';
 
   @override
+  String get gpsTrack_import_action => '导入轨迹...';
+
+  @override
+  String get gpsTrack_import_reviewTitle => '检查导入';
+
+  @override
+  String get gpsTrack_import_timezone => '记录时区';
+
+  @override
+  String get gpsTrack_import_timezoneHint =>
+      '文件中的时间为 UTC。请设置记录轨迹时所在的时区，以便与您的潜水记录对应。';
+
+  @override
+  String get gpsTrack_import_duplicate => '这看起来与已有轨迹重复。';
+
+  @override
+  String get gpsTrack_import_confirm => '导入';
+
+  @override
+  String get gpsTrack_import_csvMapping => '匹配列';
+
+  @override
+  String get gpsTrack_import_firstFix => '首个定位点';
+
+  @override
+  String gpsTrack_import_fixCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 个定位点',
+      one: '1 个定位点',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String gpsTrack_import_failed(String reason) {
+    return '无法读取该文件：$reason';
+  }
+
+  @override
   String get gpsTrack_export_saved => '轨迹已保存';
 
   @override

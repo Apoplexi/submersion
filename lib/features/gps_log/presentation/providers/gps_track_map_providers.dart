@@ -7,6 +7,7 @@ import 'package:submersion/core/services/export/kml/kml_export_service.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_providers.dart';
 import 'package:submersion/features/gps_log/data/repositories/track_geometry_cache_repository.dart';
+import 'package:submersion/features/gps_log/data/services/track_import/track_import_service.dart';
 import 'package:submersion/features/gps_log/domain/entities/gps_track.dart';
 import 'package:submersion/features/gps_log/domain/gps_track_matcher.dart';
 import 'package:submersion/features/gps_log/domain/track_colorization.dart';
@@ -138,6 +139,10 @@ final filteredTracksProvider = FutureProvider<List<GpsTrack>>((ref) async {
       if (track.startTime >= from && track.startTime <= to) track,
   ];
 });
+
+final trackImportServiceProvider = Provider<TrackImportService>(
+  (ref) => TrackImportService(),
+);
 
 final gpxExportServiceProvider = Provider<GpxExportService>(
   (ref) => GpxExportService(),

@@ -19545,6 +19545,47 @@ class AppLocalizationsHe extends AppLocalizations {
   String get gpsLogger_tracksHeader => 'מסלולים שהוקלטו';
 
   @override
+  String get gpsTrack_import_action => 'ייבוא מסלול...';
+
+  @override
+  String get gpsTrack_import_reviewTitle => 'בדיקת ייבוא';
+
+  @override
+  String get gpsTrack_import_timezone => 'הוקלט באזור';
+
+  @override
+  String get gpsTrack_import_timezoneHint =>
+      'הזמנים בקובץ הם UTC. בחר את אזור הזמן שבו הוקלט המסלול כדי שיתאים לצלילות שלך.';
+
+  @override
+  String get gpsTrack_import_duplicate => 'נראה שזהו כפיל של מסלול קיים.';
+
+  @override
+  String get gpsTrack_import_confirm => 'ייבוא';
+
+  @override
+  String get gpsTrack_import_csvMapping => 'התאמת עמודות';
+
+  @override
+  String get gpsTrack_import_firstFix => 'נקודה ראשונה';
+
+  @override
+  String gpsTrack_import_fixCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count נקודות',
+      one: 'נקודה אחת',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String gpsTrack_import_failed(String reason) {
+    return 'לא ניתן לקרוא את הקובץ: $reason';
+  }
+
+  @override
   String get gpsTrack_export_saved => 'המסלול נשמר';
 
   @override

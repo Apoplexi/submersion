@@ -33401,6 +33401,66 @@ abstract class AppLocalizations {
   /// **'Recorded tracks'**
   String get gpsLogger_tracksHeader;
 
+  /// No description provided for @gpsTrack_import_action.
+  ///
+  /// In en, this message translates to:
+  /// **'Import track...'**
+  String get gpsTrack_import_action;
+
+  /// No description provided for @gpsTrack_import_reviewTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Review Import'**
+  String get gpsTrack_import_reviewTitle;
+
+  /// No description provided for @gpsTrack_import_timezone.
+  ///
+  /// In en, this message translates to:
+  /// **'Recorded in'**
+  String get gpsTrack_import_timezone;
+
+  /// No description provided for @gpsTrack_import_timezoneHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Times in the file are UTC. Set the zone the track was recorded in so it lines up with your dives.'**
+  String get gpsTrack_import_timezoneHint;
+
+  /// No description provided for @gpsTrack_import_duplicate.
+  ///
+  /// In en, this message translates to:
+  /// **'This looks like a duplicate of an existing track.'**
+  String get gpsTrack_import_duplicate;
+
+  /// No description provided for @gpsTrack_import_confirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Import'**
+  String get gpsTrack_import_confirm;
+
+  /// No description provided for @gpsTrack_import_csvMapping.
+  ///
+  /// In en, this message translates to:
+  /// **'Match the columns'**
+  String get gpsTrack_import_csvMapping;
+
+  /// No description provided for @gpsTrack_import_firstFix.
+  ///
+  /// In en, this message translates to:
+  /// **'First fix'**
+  String get gpsTrack_import_firstFix;
+
+  /// Number of positions in the track being imported
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 fix} other{{count} fixes}}'**
+  String gpsTrack_import_fixCount(int count);
+
+  /// Shown when parsing an imported track file fails
+  ///
+  /// In en, this message translates to:
+  /// **'Could not read that file: {reason}'**
+  String gpsTrack_import_failed(String reason);
+
   /// No description provided for @gpsTrack_export_saved.
   ///
   /// In en, this message translates to:
