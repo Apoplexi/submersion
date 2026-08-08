@@ -5794,6 +5794,7 @@
   "dashboard_gauges_noDivesYet": "Nessuna immersione",
   "settings_homeChips_pageTitle": "Schermata Home",
   "settings_homeChips_description": "Scegli quali chip di stato compaiono in cima alla scheda Home.",
+  "settings_homeChips_sectionTitle": "Chip di stato",
   "settings_homeCards_sectionTitle": "Schede della Home",
   "settings_homeCards_description": "Scegli quali schede compaiono nella Home e trascinale per riordinarle.",
   "settings_homeCards_autoHides": "Si nasconde automaticamente quando è vuota",

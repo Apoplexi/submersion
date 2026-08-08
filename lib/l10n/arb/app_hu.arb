@@ -5794,6 +5794,7 @@
   "dashboard_gauges_noDivesYet": "Még nincs merülés",
   "settings_homeChips_pageTitle": "Kezdőképernyő",
   "settings_homeChips_description": "Válaszd ki, mely állapotjelzők jelenjenek meg a Kezdőlap tetején.",
+  "settings_homeChips_sectionTitle": "Állapotjelzők",
   "settings_homeCards_sectionTitle": "Kezdőlap kártyái",
   "settings_homeCards_description": "Válaszd ki, mely kártyák jelenjenek meg a Kezdőlapon, és húzással rendezd át őket.",
   "settings_homeCards_autoHides": "Automatikusan elrejtőzik, ha üres",

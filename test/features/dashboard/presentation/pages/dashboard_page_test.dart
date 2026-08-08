@@ -291,4 +291,31 @@ void main() {
     await tester.pump(const Duration(milliseconds: 300));
     expect(tester.takeException(), isNull);
   });
+
+  testWidgets(
+    'all cards hidden with active urgent banner shows banner AND empty state',
+    (tester) async {
+      await pumpDashboard(
+        tester,
+        settingsNotifier: MockSettingsNotifier(
+          AppSettings(
+            hiddenHomeCards: {for (final c in HomeCardType.values) c.name},
+          ),
+        ),
+        alerts: const DashboardAlerts(
+          insuranceExpiringSoon: false,
+          insuranceExpired: true,
+        ),
+      );
+
+      final l10n = await AppLocalizations.delegate.load(const Locale('en'));
+      expect(find.byType(UrgentBanner), findsOneWidget);
+      expect(find.text(l10n.dashboard_allHidden_message), findsOneWidget);
+      final bannerY = tester.getTopLeft(find.byType(UrgentBanner)).dy;
+      final messageY = tester
+          .getTopLeft(find.text(l10n.dashboard_allHidden_message))
+          .dy;
+      expect(bannerY, lessThan(messageY));
+    },
+  );
 }

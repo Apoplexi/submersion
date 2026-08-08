@@ -3135,6 +3135,9 @@ class AppLocalizationsHu extends AppLocalizations {
       'Válaszd ki, mely állapotjelzők jelenjenek meg a Kezdőlap tetején.';
 
   @override
+  String get settings_homeChips_sectionTitle => 'Állapotjelzők';
+
+  @override
   String get settings_homeCards_sectionTitle => 'Kezdőlap kártyái';
 
   @override

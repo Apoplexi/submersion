@@ -3093,6 +3093,9 @@ class AppLocalizationsEn extends AppLocalizations {
       'Choose which status chips appear at the top of the Home tab.';
 
   @override
+  String get settings_homeChips_sectionTitle => 'Status chips';
+
+  @override
   String get settings_homeCards_sectionTitle => 'Home cards';
 
   @override

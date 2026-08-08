@@ -3127,6 +3127,9 @@ class AppLocalizationsNl extends AppLocalizations {
       'Kies welke statuschips bovenaan het tabblad Start verschijnen.';
 
   @override
+  String get settings_homeChips_sectionTitle => 'Statuschips';
+
+  @override
   String get settings_homeCards_sectionTitle => 'Startkaarten';
 
   @override

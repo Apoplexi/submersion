@@ -122,7 +122,7 @@ class HomeAppearancePage extends ConsumerWidget {
         ),
         const SliverToBoxAdapter(child: Divider(height: 24)),
         SliverToBoxAdapter(
-          child: sectionHeader(l10n.settings_homeChips_pageTitle),
+          child: sectionHeader(l10n.settings_homeChips_sectionTitle),
         ),
         SliverToBoxAdapter(
           child: sectionDescription(l10n.settings_homeChips_description),

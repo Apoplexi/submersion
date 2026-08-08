@@ -5794,6 +5794,7 @@
   "dashboard_gauges_noDivesYet": "Noch keine Tauchgänge",
   "settings_homeChips_pageTitle": "Startbildschirm",
   "settings_homeChips_description": "Wähle, welche Status-Chips oben im Start-Tab erscheinen.",
+  "settings_homeChips_sectionTitle": "Status-Chips",
   "settings_homeCards_sectionTitle": "Startseiten-Karten",
   "settings_homeCards_description": "Wähle, welche Karten im Start-Tab erscheinen, und ziehe sie in die gewünschte Reihenfolge.",
   "settings_homeCards_autoHides": "Wird automatisch ausgeblendet, wenn leer",

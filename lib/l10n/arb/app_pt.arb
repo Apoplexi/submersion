@@ -5794,6 +5794,7 @@
   "dashboard_gauges_noDivesYet": "Ainda sem mergulhos",
   "settings_homeChips_pageTitle": "Ecrã inicial",
   "settings_homeChips_description": "Escolha que chips de estado aparecem no topo do separador Início.",
+  "settings_homeChips_sectionTitle": "Chips de estado",
   "settings_homeCards_sectionTitle": "Cartões do Início",
   "settings_homeCards_description": "Escolha que cartões aparecem no separador Início e arraste-os para reordenar.",
   "settings_homeCards_autoHides": "Oculta-se automaticamente quando vazio",

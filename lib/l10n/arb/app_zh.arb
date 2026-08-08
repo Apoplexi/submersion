@@ -5794,6 +5794,7 @@
   "dashboard_gauges_noDivesYet": "暂无潜水记录",
   "settings_homeChips_pageTitle": "主页屏幕",
   "settings_homeChips_description": "选择主页顶部显示哪些状态标签。",
+  "settings_homeChips_sectionTitle": "状态标签",
   "settings_homeCards_sectionTitle": "主页卡片",
   "settings_homeCards_description": "选择主页显示哪些卡片，并拖动以重新排序。",
   "settings_homeCards_autoHides": "为空时自动隐藏",

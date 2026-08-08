@@ -109,6 +109,20 @@ void main() {
     expect(notifier.state.homeCardOrder, isEmpty);
   });
 
+  testWidgets('chips section header says Status chips, not the page title', (
+    tester,
+  ) async {
+    await pumpPage(tester);
+    final l10n = await AppLocalizations.delegate.load(const Locale('en'));
+    await tester.scrollUntilVisible(
+      find.text(l10n.settings_homeChips_sectionTitle),
+      100,
+    );
+    expect(find.text(l10n.settings_homeChips_sectionTitle), findsOneWidget);
+    // The page title ("Home screen") must not double as the section header.
+    expect(find.text(l10n.settings_homeChips_pageTitle), findsOneWidget);
+  });
+
   testWidgets('stored order drives the card tile order', (tester) async {
     await pumpPage(
       tester,

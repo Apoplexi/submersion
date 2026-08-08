@@ -5794,6 +5794,7 @@
   "dashboard_gauges_noDivesYet": "لا توجد غطسات بعد",
   "settings_homeChips_pageTitle": "الشاشة الرئيسية",
   "settings_homeChips_description": "اختر شرائح الحالة التي تظهر أعلى تبويب الرئيسية.",
+  "settings_homeChips_sectionTitle": "شرائح الحالة",
   "settings_homeCards_sectionTitle": "بطاقات الرئيسية",
   "settings_homeCards_description": "اختر البطاقات التي تظهر في تبويب الرئيسية واسحبها لإعادة ترتيبها.",
   "settings_homeCards_autoHides": "تُخفى تلقائيًا عندما تكون فارغة",

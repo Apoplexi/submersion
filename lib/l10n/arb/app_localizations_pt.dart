@@ -3154,6 +3154,9 @@ class AppLocalizationsPt extends AppLocalizations {
       'Escolha que chips de estado aparecem no topo do separador Início.';
 
   @override
+  String get settings_homeChips_sectionTitle => 'Chips de estado';
+
+  @override
   String get settings_homeCards_sectionTitle => 'Cartões do Início';
 
   @override

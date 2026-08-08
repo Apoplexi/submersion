@@ -5794,6 +5794,7 @@
   "dashboard_gauges_noDivesYet": "Aucune plongée",
   "settings_homeChips_pageTitle": "Écran d'accueil",
   "settings_homeChips_description": "Choisissez les pastilles d'état affichées en haut de l'onglet Accueil.",
+  "settings_homeChips_sectionTitle": "Pastilles d'état",
   "settings_homeCards_sectionTitle": "Cartes de l'accueil",
   "settings_homeCards_description": "Choisissez les cartes affichées dans l'onglet Accueil et faites-les glisser pour les réordonner.",
   "settings_homeCards_autoHides": "Masquée automatiquement lorsqu'elle est vide",

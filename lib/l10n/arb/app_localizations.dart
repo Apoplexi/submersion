@@ -5345,6 +5345,12 @@ abstract class AppLocalizations {
   /// **'Choose which status chips appear at the top of the Home tab.'**
   String get settings_homeChips_description;
 
+  /// No description provided for @settings_homeChips_sectionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Status chips'**
+  String get settings_homeChips_sectionTitle;
+
   /// No description provided for @settings_homeCards_sectionTitle.
   ///
   /// In en, this message translates to:

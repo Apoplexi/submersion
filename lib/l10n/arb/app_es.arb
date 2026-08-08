@@ -5794,6 +5794,7 @@
   "dashboard_gauges_noDivesYet": "Aún sin inmersiones",
   "settings_homeChips_pageTitle": "Pantalla de inicio",
   "settings_homeChips_description": "Elige qué chips de estado aparecen en la parte superior de la pestaña Inicio.",
+  "settings_homeChips_sectionTitle": "Chips de estado",
   "settings_homeCards_sectionTitle": "Tarjetas de Inicio",
   "settings_homeCards_description": "Elige qué tarjetas aparecen en la pestaña Inicio y arrástralas para reordenarlas.",
   "settings_homeCards_autoHides": "Se oculta automáticamente cuando está vacía",

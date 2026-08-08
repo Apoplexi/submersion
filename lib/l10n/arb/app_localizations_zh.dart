@@ -2981,6 +2981,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settings_homeChips_description => '选择主页顶部显示哪些状态标签。';
 
   @override
+  String get settings_homeChips_sectionTitle => '状态标签';
+
+  @override
   String get settings_homeCards_sectionTitle => '主页卡片';
 
   @override

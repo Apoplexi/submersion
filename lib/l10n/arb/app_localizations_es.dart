@@ -3153,6 +3153,9 @@ class AppLocalizationsEs extends AppLocalizations {
       'Elige qué chips de estado aparecen en la parte superior de la pestaña Inicio.';
 
   @override
+  String get settings_homeChips_sectionTitle => 'Chips de estado';
+
+  @override
   String get settings_homeCards_sectionTitle => 'Tarjetas de Inicio';
 
   @override

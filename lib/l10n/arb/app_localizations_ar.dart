@@ -3085,6 +3085,9 @@ class AppLocalizationsAr extends AppLocalizations {
       'اختر شرائح الحالة التي تظهر أعلى تبويب الرئيسية.';
 
   @override
+  String get settings_homeChips_sectionTitle => 'شرائح الحالة';
+
+  @override
   String get settings_homeCards_sectionTitle => 'بطاقات الرئيسية';
 
   @override

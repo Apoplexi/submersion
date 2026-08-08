@@ -3062,6 +3062,9 @@ class AppLocalizationsHe extends AppLocalizations {
       'בחר אילו שבבי מצב יופיעו בראש לשונית הבית.';
 
   @override
+  String get settings_homeChips_sectionTitle => 'שבבי מצב';
+
+  @override
   String get settings_homeCards_sectionTitle => 'כרטיסי דף הבית';
 
   @override

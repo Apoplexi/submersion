@@ -105,8 +105,17 @@ class DashboardPage extends ConsumerWidget {
           child: SingleChildScrollView(
             physics: const AlwaysScrollableScrollPhysics(),
             padding: const EdgeInsets.all(16),
-            child: entries.isEmpty
-                ? const _AllCardsHiddenState()
+            // Keyed off visibleCards, not entries: entries includes the
+            // pinned urgent banner, which must not suppress the
+            // all-cards-hidden CTA (it renders above it instead).
+            child: visibleCards.isEmpty
+                ? Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      if (showUrgent) const UrgentBanner(),
+                      const _AllCardsHiddenState(),
+                    ],
+                  )
                 : DashboardGrid(entries: entries),
           ),
         ),

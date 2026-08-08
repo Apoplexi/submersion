@@ -5794,6 +5794,7 @@
   "dashboard_gauges_noDivesYet": "Nog geen duiken",
   "settings_homeChips_pageTitle": "Startscherm",
   "settings_homeChips_description": "Kies welke statuschips bovenaan het tabblad Start verschijnen.",
+  "settings_homeChips_sectionTitle": "Statuschips",
   "settings_homeCards_sectionTitle": "Startkaarten",
   "settings_homeCards_description": "Kies welke kaarten op het tabblad Start verschijnen en sleep ze om de volgorde te wijzigen.",
   "settings_homeCards_autoHides": "Wordt automatisch verborgen wanneer leeg",

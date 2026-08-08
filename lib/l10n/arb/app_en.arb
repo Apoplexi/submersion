@@ -1947,6 +1947,7 @@
   "dashboard_gauges_noDivesYet": "No dives yet",
   "settings_homeChips_pageTitle": "Home screen",
   "settings_homeChips_description": "Choose which status chips appear at the top of the Home tab.",
+  "settings_homeChips_sectionTitle": "Status chips",
   "settings_homeCards_sectionTitle": "Home cards",
   "settings_homeCards_description": "Choose which cards appear on the Home tab and drag to reorder them.",
   "settings_homeCards_autoHides": "Hides automatically when empty",

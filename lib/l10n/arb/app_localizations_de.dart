@@ -3160,6 +3160,9 @@ class AppLocalizationsDe extends AppLocalizations {
       'Wähle, welche Status-Chips oben im Start-Tab erscheinen.';
 
   @override
+  String get settings_homeChips_sectionTitle => 'Status-Chips';
+
+  @override
   String get settings_homeCards_sectionTitle => 'Startseiten-Karten';
 
   @override

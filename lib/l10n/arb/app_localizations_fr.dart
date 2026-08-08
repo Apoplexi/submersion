@@ -3163,6 +3163,9 @@ class AppLocalizationsFr extends AppLocalizations {
       'Choisissez les pastilles d\'état affichées en haut de l\'onglet Accueil.';
 
   @override
+  String get settings_homeChips_sectionTitle => 'Pastilles d\'état';
+
+  @override
   String get settings_homeCards_sectionTitle => 'Cartes de l\'accueil';
 
   @override

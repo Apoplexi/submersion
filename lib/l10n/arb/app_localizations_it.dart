@@ -3148,6 +3148,9 @@ class AppLocalizationsIt extends AppLocalizations {
       'Scegli quali chip di stato compaiono in cima alla scheda Home.';
 
   @override
+  String get settings_homeChips_sectionTitle => 'Chip di stato';
+
+  @override
   String get settings_homeCards_sectionTitle => 'Schede della Home';
 
   @override
