@@ -12,7 +12,7 @@ import 'package:submersion/features/surface_interval_tool/presentation/widgets/t
 ///
 /// Allows divers to:
 /// 1. Input first dive parameters (depth, time, gas mix)
-/// 2. Input desired second dive parameters (depth, time)
+/// 2. Input desired second dive parameters (depth, time, gas mix)
 /// 3. Calculate the minimum surface interval needed
 /// 4. Visualize tissue off-gassing over time
 class SurfaceIntervalToolPage extends ConsumerWidget {

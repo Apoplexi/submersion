@@ -16228,6 +16228,16 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String surfaceInterval_gasWarning_modExceeded(
+    Object ppO2,
+    Object depth,
+    Object limit,
+    Object mod,
+  ) {
+    return 'ppO₂ $ppO2 على عمق $depth يتجاوز $limit. أقصى عمق تشغيل لهذا الخليط هو $mod.';
+  }
+
+  @override
   String surfaceInterval_heSemantics(Object percent) {
     return 'الهيليوم: $percent%';
   }
@@ -16239,6 +16249,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get surfaceInterval_result_currentInterval => 'الفترة الحالية';
+
+  @override
+  String get surfaceInterval_result_gasUnsafe => 'الغاز غير آمن على هذا العمق';
 
   @override
   String get surfaceInterval_result_inDeco => 'في تخفيف الضغط';
@@ -16282,7 +16295,14 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
-  String get surfaceInterval_secondDive_gasAir => '(هواء)';
+  String surfaceInterval_secondDive_heSemantics(Object percent) {
+    return 'هيليوم الغطسة الثانية: $percent%';
+  }
+
+  @override
+  String surfaceInterval_secondDive_o2Semantics(Object percent) {
+    return 'أكسجين الغطسة الثانية: $percent%';
+  }
 
   @override
   String surfaceInterval_secondDive_timeSemantics(Object time) {

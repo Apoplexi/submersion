@@ -16489,6 +16489,16 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String surfaceInterval_gasWarning_modExceeded(
+    Object ppO2,
+    Object depth,
+    Object limit,
+    Object mod,
+  ) {
+    return 'ppO₂ $ppO2 $depth mélységben meghaladja a $limit értéket. A keverék MOD-ja $mod.';
+  }
+
+  @override
   String surfaceInterval_heSemantics(Object percent) {
     return 'Hélium: $percent%';
   }
@@ -16500,6 +16510,10 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get surfaceInterval_result_currentInterval => 'Jelenlegi intervallum';
+
+  @override
+  String get surfaceInterval_result_gasUnsafe =>
+      'A gáz nem biztonságos ezen a mélységen';
 
   @override
   String get surfaceInterval_result_inDeco => 'Dekóban';
@@ -16543,7 +16557,14 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
-  String get surfaceInterval_secondDive_gasAir => '(Levegő)';
+  String surfaceInterval_secondDive_heSemantics(Object percent) {
+    return 'Második merülés hélium: $percent%';
+  }
+
+  @override
+  String surfaceInterval_secondDive_o2Semantics(Object percent) {
+    return 'Második merülés O2: $percent%';
+  }
 
   @override
   String surfaceInterval_secondDive_timeSemantics(Object time) {
