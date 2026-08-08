@@ -133,7 +133,20 @@ void main() {
     });
   });
 
+  group('VisibilityScale.toString', () {
+    test('names all three thresholds for debugging', () {
+      final text = VisibilityScale.coldWater.toString();
+      expect(text, contains('12'));
+      expect(text, contains('6'));
+      expect(text, contains('2'));
+    });
+  });
+
   group('VisibilityScale equality', () {
+    test('differs from a non-scale value', () {
+      expect(VisibilityScale.tropical == Object(), isFalse);
+    });
+
     test('scales with identical thresholds are equal', () {
       const a = VisibilityScale(
         excellentAtOrAboveM: 30,

@@ -119,6 +119,44 @@ void main() {
     });
   });
 
+  group('visibilityDistributionLabel', () {
+    test('a band key becomes its localized adjective', () {
+      expect(visibilityDistributionLabel('excellent', en, metric), 'Excellent');
+      expect(visibilityDistributionLabel('good', en, metric), 'Good');
+      expect(visibilityDistributionLabel('moderate', en, metric), 'Moderate');
+      expect(visibilityDistributionLabel('poor', en, metric), 'Poor');
+    });
+
+    test('a legacy key becomes its range, marked pre-measurement', () {
+      final text = visibilityDistributionLabel('legacy_moderate', en, metric);
+      expect(text, contains('5'));
+      expect(text, contains('15'));
+      expect(text, contains('before measurement'));
+    });
+
+    test('legacy ranges honour the diver units', () {
+      final text = visibilityDistributionLabel('legacy_moderate', en, imperial);
+      expect(text, contains('ft'));
+    });
+
+    test('an unknown key is surfaced verbatim, not labelled Poor', () {
+      // Falling back to a real band would make a repository bug look like a
+      // legitimate result.
+      expect(visibilityDistributionLabel('nonsense', en, metric), 'nonsense');
+    });
+
+    test('an unknown legacy bucket keeps its raw name', () {
+      final text = visibilityDistributionLabel('legacy_bogus', en, metric);
+      expect(text, contains('bogus'));
+    });
+
+    test('a legacy unknown bucket falls back to its name', () {
+      // Visibility.unknown has no range, so there is nothing to render.
+      final text = visibilityDistributionLabel('legacy_unknown', en, metric);
+      expect(text, contains('unknown'));
+    });
+  });
+
   group('formatLegacyVisibilityBand', () {
     test('renders a bounded band as a range, never an adjective', () {
       final text = formatLegacyVisibilityBand(Visibility.moderate, en, metric)!;

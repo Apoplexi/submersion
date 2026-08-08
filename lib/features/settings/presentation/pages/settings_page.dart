@@ -15,6 +15,7 @@ import 'package:submersion/features/settings/presentation/pages/safety_settings_
 import 'package:submersion/features/settings/presentation/pages/security_settings_page.dart';
 import 'package:submersion/core/domain/visibility/visibility_scale.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
+import 'package:submersion/features/settings/presentation/widgets/visibility_scale_picker.dart';
 import 'package:submersion/core/constants/profile_metrics.dart';
 import 'package:submersion/features/settings/presentation/pages/home_appearance_page.dart';
 import 'package:submersion/features/settings/presentation/pages/section_appearance_page.dart';
@@ -507,8 +508,8 @@ class _UnitsSectionContent extends ConsumerWidget {
                 _buildUnitTile(
                   context,
                   title: context.l10n.settings_visibilityScale_title,
-                  value: _visibilityPresetLabel(
-                    context,
+                  value: visibilityPresetLabel(
+                    context.l10n,
                     settings.visibilityScalePreset,
                   ),
                   onTap: () =>
@@ -661,201 +662,79 @@ class _UnitsSectionContent extends ConsumerWidget {
     );
   }
 
-  static String _visibilityPresetLabel(
-    BuildContext context,
-    VisibilityScalePreset preset,
-  ) => switch (preset) {
-    VisibilityScalePreset.tropical =>
-      context.l10n.settings_visibilityScale_preset_tropical,
-    VisibilityScalePreset.temperate =>
-      context.l10n.settings_visibilityScale_preset_temperate,
-    VisibilityScalePreset.coldWater =>
-      context.l10n.settings_visibilityScale_preset_coldWater,
-    VisibilityScalePreset.custom =>
-      context.l10n.settings_visibilityScale_preset_custom,
-  };
-
-  /// Picks which distances count as good visibility.
+  /// Opens the visibility calibration picker.
   ///
   /// Purely presentational: dives store the measured distance, so switching
-  /// preset re-labels the whole logbook and loses nothing.
+  /// preset re-labels the whole logbook and loses nothing. The dialog bodies
+  /// live in `widgets/visibility_scale_picker.dart` so they can be tested
+  /// without driving this page.
   void _showVisibilityScalePicker(
     BuildContext context,
     WidgetRef ref,
     AppSettings settings,
   ) {
-    final units = UnitFormatter(settings);
-    String bounds(VisibilityScale scale) =>
-        '${units.convertDepth(scale.excellentAtOrAboveM).toStringAsFixed(0)}'
-        ' / ${units.convertDepth(scale.goodAtOrAboveM).toStringAsFixed(0)}'
-        ' / ${units.convertDepth(scale.moderateAtOrAboveM).toStringAsFixed(0)}'
-        '${units.depthSymbol}';
-
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
         title: Text(context.l10n.settings_visibilityScale_title),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(0, 0, 0, 8),
-              child: Text(
-                context.l10n.settings_visibilityScale_subtitle,
-                style: Theme.of(context).textTheme.bodySmall,
-              ),
-            ),
-            ...VisibilityScalePreset.values.map((preset) {
-              final isSelected = preset == settings.visibilityScalePreset;
-              final subtitle = preset == VisibilityScalePreset.custom
-                  ? null
-                  : bounds(VisibilityScale.forPreset(preset));
-              return ListTile(
-                title: Text(_visibilityPresetLabel(context, preset)),
-                subtitle: subtitle == null ? null : Text(subtitle),
-                trailing: isSelected
-                    ? Icon(
-                        Icons.check,
-                        color: Theme.of(context).colorScheme.primary,
-                      )
-                    : null,
-                onTap: () {
-                  Navigator.of(dialogContext).pop();
-                  if (preset == VisibilityScalePreset.custom) {
-                    _showCustomVisibilityScaleDialog(context, ref, settings);
-                    return;
-                  }
-                  ref
-                      .read(settingsProvider.notifier)
-                      .setVisibilityScale(preset: preset);
-                },
-              );
-            }),
-          ],
+        content: VisibilityScalePresetList(
+          selected: settings.visibilityScalePreset,
+          units: UnitFormatter(settings),
+          onSelected: (preset) {
+            Navigator.of(dialogContext).pop();
+            if (preset == VisibilityScalePreset.custom) {
+              _showCustomVisibilityScaleDialog(context, ref, settings);
+              return;
+            }
+            ref
+                .read(settingsProvider.notifier)
+                .setVisibilityScale(preset: preset);
+          },
         ),
       ),
     );
   }
 
-  /// Custom thresholds, entered in the diver's depth unit and stored metric.
   void _showCustomVisibilityScaleDialog(
     BuildContext context,
     WidgetRef ref,
     AppSettings settings,
   ) {
-    final units = UnitFormatter(settings);
     // Seed from the diver's retained custom thresholds, not from
     // settings.visibilityScale: that getter resolves to the *named* preset's
     // bounds whenever one is active, so opening Custom after switching away
     // and back would show the preset's numbers and hide the values the diver
-    // actually entered. Falls back to the active scale only when no custom
-    // thresholds have ever been saved.
+    // actually entered.
     final active = settings.visibilityScale;
-    final excellentM =
-        settings.visibilityScaleExcellentM ?? active.excellentAtOrAboveM;
-    final goodM = settings.visibilityScaleGoodM ?? active.goodAtOrAboveM;
-    final moderateM =
-        settings.visibilityScaleModerateM ?? active.moderateAtOrAboveM;
-    String initial(double meters) =>
-        units.convertDepth(meters).toStringAsFixed(0);
-
-    final excellent = TextEditingController(text: initial(excellentM));
-    final good = TextEditingController(text: initial(goodM));
-    final moderate = TextEditingController(text: initial(moderateM));
+    final seed = VisibilityScale(
+      excellentAtOrAboveM:
+          settings.visibilityScaleExcellentM ?? active.excellentAtOrAboveM,
+      goodAtOrAboveM: settings.visibilityScaleGoodM ?? active.goodAtOrAboveM,
+      moderateAtOrAboveM:
+          settings.visibilityScaleModerateM ?? active.moderateAtOrAboveM,
+    );
 
     showDialog(
       context: context,
-      builder: (dialogContext) {
-        String? error;
-        return StatefulBuilder(
-          builder: (builderContext, setState) => AlertDialog(
-            title: Text(context.l10n.settings_visibilityScale_preset_custom),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                for (final (label, controller) in [
-                  (
-                    context.l10n.settings_visibilityScale_customExcellent,
-                    excellent,
-                  ),
-                  (context.l10n.settings_visibilityScale_customGood, good),
-                  (
-                    context.l10n.settings_visibilityScale_customModerate,
-                    moderate,
-                  ),
-                ])
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 4),
-                    child: TextField(
-                      controller: controller,
-                      keyboardType: const TextInputType.numberWithOptions(
-                        decimal: true,
-                      ),
-                      decoration: InputDecoration(
-                        labelText: label,
-                        suffixText: units.depthSymbol,
-                      ),
-                    ),
-                  ),
-                if (error != null)
-                  Padding(
-                    padding: const EdgeInsets.only(top: 8),
-                    child: Text(
-                      error!,
-                      style: TextStyle(
-                        color: Theme.of(builderContext).colorScheme.error,
-                      ),
-                    ),
-                  ),
-              ],
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(dialogContext).pop(),
-                child: Text(context.l10n.common_action_cancel),
-              ),
-              TextButton(
-                onPressed: () {
-                  double? toMeters(TextEditingController c) {
-                    final parsed = double.tryParse(c.text.trim());
-                    return parsed == null ? null : units.depthToMeters(parsed);
-                  }
-
-                  final e = toMeters(excellent);
-                  final g = toMeters(good);
-                  final m = toMeters(moderate);
-                  final candidate = e == null || g == null || m == null
-                      ? null
-                      : VisibilityScale(
-                          excellentAtOrAboveM: e,
-                          goodAtOrAboveM: g,
-                          moderateAtOrAboveM: m,
-                        );
-                  if (candidate == null || !candidate.isValid) {
-                    setState(() {
-                      error =
-                          context.l10n.settings_visibilityScale_invalidOrder;
-                    });
-                    return;
-                  }
-                  ref
-                      .read(settingsProvider.notifier)
-                      .setVisibilityScale(
-                        preset: VisibilityScalePreset.custom,
-                        excellentM: e,
-                        goodM: g,
-                        moderateM: m,
-                      );
-                  Navigator.of(dialogContext).pop();
-                },
-                child: Text(context.l10n.common_action_save),
-              ),
-            ],
-          ),
-        );
-      },
+      builder: (dialogContext) => AlertDialog(
+        title: Text(context.l10n.settings_visibilityScale_preset_custom),
+        content: CustomVisibilityScaleForm(
+          initial: seed,
+          units: UnitFormatter(settings),
+          onCancel: () => Navigator.of(dialogContext).pop(),
+          onSubmit: (scale) {
+            ref
+                .read(settingsProvider.notifier)
+                .setVisibilityScale(
+                  preset: VisibilityScalePreset.custom,
+                  excellentM: scale.excellentAtOrAboveM,
+                  goodM: scale.goodAtOrAboveM,
+                  moderateM: scale.moderateAtOrAboveM,
+                );
+            Navigator.of(dialogContext).pop();
+          },
+        ),
+      ),
     );
   }
 

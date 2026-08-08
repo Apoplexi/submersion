@@ -6,7 +6,6 @@ import 'package:file_picker/file_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:xml/xml.dart';
 
-import 'package:submersion/core/constants/enums.dart' as enums;
 import 'package:submersion/core/services/export/shared/file_export_utils.dart';
 import 'package:submersion/core/services/export/uddf/uddf_export_builders.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
@@ -408,7 +407,8 @@ class UddfExportService {
                                 nest: (dive.waterTemp! + 273.15).toString(),
                               ); // Kelvin
                             }
-                            if (_visibilityForUddf(dive) case final vis?) {
+                            if (UddfExportBuilders.visibilityForUddf(dive)
+                                case final vis?) {
                               builder.element('visibility', nest: vis);
                             }
                             if (dive.rating != null) {
@@ -600,36 +600,5 @@ class UddfExportService {
     }
 
     return result;
-  }
-
-  /// UDDF carries visibility as a distance in meters.
-  ///
-  /// Dives logged from v144 have a real measurement, which exports verbatim.
-  /// Pre-v144 dives only have a bucket, so they still export the
-  /// representative midpoint they always did. Returns null when the dive has
-  /// no visibility at all.
-  String? _visibilityForUddf(Dive dive) {
-    final meters = dive.visibilityMeters;
-    // Unrounded: toStringAsFixed(1) would turn a stored 6.44 into 6.4, which
-    // is precision loss on the way out and defeats a true round trip.
-    if (meters != null) return meters.toString();
-    final legacy = dive.visibility;
-    if (legacy == null || legacy == enums.Visibility.unknown) return null;
-    return _visibilityToUddf(legacy);
-  }
-
-  String _visibilityToUddf(enums.Visibility visibility) {
-    switch (visibility) {
-      case enums.Visibility.excellent:
-        return '30'; // meters
-      case enums.Visibility.good:
-        return '20';
-      case enums.Visibility.moderate:
-        return '10';
-      case enums.Visibility.poor:
-        return '5';
-      case enums.Visibility.unknown:
-        return '0';
-    }
   }
 }

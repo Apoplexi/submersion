@@ -54,6 +54,35 @@ String formatMeasuredVisibility(
   return '$distance · $band';
 }
 
+/// Turns a statistics distribution key into display text.
+///
+/// The repository emits stable keys rather than display text: a calibrated
+/// band yields its [VisibilityBand] name, and a pre-v144 dive yields
+/// `legacy_<bucket>`. A legacy key renders as the range that bucket covers,
+/// marked as pre-measurement, so it is never mistaken for a calibrated
+/// reading.
+///
+/// An unrecognized key can only come from a repository bug, so it is surfaced
+/// verbatim. Falling back to a real band would label unknown data as a
+/// legitimate result and hide the defect.
+String visibilityDistributionLabel(
+  String key,
+  AppLocalizations l10n,
+  UnitFormatter units,
+) {
+  const legacyPrefix = 'legacy_';
+  if (key.startsWith(legacyPrefix)) {
+    final name = key.substring(legacyPrefix.length);
+    final bucket = Visibility.values.where((v) => v.name == name).firstOrNull;
+    final band = bucket == null
+        ? null
+        : formatLegacyVisibilityBand(bucket, l10n, units);
+    return l10n.statistics_conditions_visibility_legacySuffix(band ?? name);
+  }
+  final band = VisibilityBand.values.where((b) => b.name == key).firstOrNull;
+  return band == null ? key : visibilityBandName(band, l10n);
+}
+
 /// Renders a pre-v144 bucket as the distance range it actually means, for
 /// example "5-15m".
 ///

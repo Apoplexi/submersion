@@ -2,10 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:submersion/core/providers/provider.dart';
 
 import 'package:submersion/core/accessibility/semantic_helpers.dart';
-// Aliased: flutter/material exports a Visibility widget that collides with the
-// app's Visibility enum.
-import 'package:submersion/core/constants/enums.dart' as enums;
-import 'package:submersion/core/domain/visibility/visibility_scale.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/dive_log/presentation/formatters/visibility_display.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
@@ -66,7 +62,11 @@ class StatisticsConditionsPage extends ConsumerWidget {
           final data = raw
               .map(
                 (d) => DistributionSegment(
-                  label: _visibilityLabel(context, d.label, units),
+                  label: visibilityDistributionLabel(
+                    d.label,
+                    context.l10n,
+                    units,
+                  ),
                   count: d.count,
                   percentage: d.percentage,
                 ),
@@ -101,33 +101,6 @@ class StatisticsConditionsPage extends ConsumerWidget {
         ),
       ),
     );
-  }
-
-  /// Turns a repository key into display text.
-  ///
-  /// A calibrated band becomes its localized adjective. A `legacy_<bucket>`
-  /// key becomes the range that bucket covers, marked as pre-measurement, so
-  /// it is never confused with a calibrated reading.
-  static String _visibilityLabel(
-    BuildContext context,
-    String key,
-    UnitFormatter units,
-  ) {
-    final l10n = context.l10n;
-    if (key.startsWith('legacy_')) {
-      final name = key.substring('legacy_'.length);
-      final bucket = enums.Visibility.values.firstWhere(
-        (v) => v.name == name,
-        orElse: () => enums.Visibility.unknown,
-      );
-      final band = formatLegacyVisibilityBand(bucket, l10n, units);
-      return l10n.statistics_conditions_visibility_legacySuffix(band ?? name);
-    }
-    // An unrecognized key can only come from a repository bug, so surface it
-    // verbatim. Falling back to a real band would label unknown data "Poor",
-    // which reads as a legitimate result and hides the defect.
-    final band = VisibilityBand.values.where((b) => b.name == key).firstOrNull;
-    return band == null ? key : visibilityBandName(band, l10n);
   }
 
   Widget _buildWaterTypeSection(BuildContext context, WidgetRef ref) {
