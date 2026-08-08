@@ -12497,6 +12497,13 @@
     }
   },
   "gpsLogger_tracksHeader": "Recorded tracks",
+  "gpsTrack_colorMode_uniform": "Plain",
+  "gpsTrack_colorMode_speed": "Speed",
+  "gpsTrack_colorMode_elapsed": "Time",
+  "gpsTrack_legend_slower": "Slower",
+  "gpsTrack_legend_faster": "Faster",
+  "gpsTrack_legend_start": "Start",
+  "gpsTrack_legend_end": "End",
   "gpsTrack_detail_title": "GPS Track",
   "gpsTrack_detail_notFound": "This track is no longer available.",
   "gpsTrack_detail_unreadable": "Track data could not be read.",

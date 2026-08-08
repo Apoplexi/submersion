@@ -19829,6 +19829,27 @@ class AppLocalizationsNl extends AppLocalizations {
   String get gpsLogger_tracksHeader => 'Opgenomen tracks';
 
   @override
+  String get gpsTrack_colorMode_uniform => 'Effen';
+
+  @override
+  String get gpsTrack_colorMode_speed => 'Snelheid';
+
+  @override
+  String get gpsTrack_colorMode_elapsed => 'Tijd';
+
+  @override
+  String get gpsTrack_legend_slower => 'Langzamer';
+
+  @override
+  String get gpsTrack_legend_faster => 'Sneller';
+
+  @override
+  String get gpsTrack_legend_start => 'Start';
+
+  @override
+  String get gpsTrack_legend_end => 'Einde';
+
+  @override
   String get gpsTrack_detail_title => 'GPS-track';
 
   @override

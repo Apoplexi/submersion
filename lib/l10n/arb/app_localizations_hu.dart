@@ -19931,6 +19931,27 @@ class AppLocalizationsHu extends AppLocalizations {
   String get gpsLogger_tracksHeader => 'Rögzített útvonalak';
 
   @override
+  String get gpsTrack_colorMode_uniform => 'Egyszínű';
+
+  @override
+  String get gpsTrack_colorMode_speed => 'Sebesség';
+
+  @override
+  String get gpsTrack_colorMode_elapsed => 'Idő';
+
+  @override
+  String get gpsTrack_legend_slower => 'Lassabb';
+
+  @override
+  String get gpsTrack_legend_faster => 'Gyorsabb';
+
+  @override
+  String get gpsTrack_legend_start => 'Kezdet';
+
+  @override
+  String get gpsTrack_legend_end => 'Vég';
+
+  @override
   String get gpsTrack_detail_title => 'GPS-nyomvonal';
 
   @override

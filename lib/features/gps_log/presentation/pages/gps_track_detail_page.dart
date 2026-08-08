@@ -9,6 +9,7 @@ import 'package:submersion/features/gps_log/domain/track_colorization.dart';
 import 'package:submersion/features/gps_log/domain/track_geometry.dart';
 import 'package:submersion/features/gps_log/presentation/providers/gps_track_map_providers.dart';
 import 'package:submersion/features/gps_log/presentation/widgets/gps_track_polyline_layer.dart';
+import 'package:submersion/features/gps_log/presentation/widgets/track_color_legend.dart';
 import 'package:submersion/features/maps/presentation/widgets/map_attribution.dart';
 import 'package:submersion/features/maps/presentation/widgets/map_compass_button.dart';
 import 'package:submersion/features/maps/presentation/widgets/submersion_tile_layer.dart';
@@ -33,8 +34,42 @@ class _GpsTrackDetailPageState extends ConsumerState<GpsTrackDetailPage> {
     final l10n = context.l10n;
     final trackAsync = ref.watch(gpsTrackDetailProvider(widget.trackId));
 
+    final mode = ref.watch(trackColorModeProvider);
+
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.gpsTrack_detail_title)),
+      appBar: AppBar(
+        title: Text(l10n.gpsTrack_detail_title),
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(52),
+          child: Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: SegmentedButton<TrackColorMode>(
+              showSelectedIcon: false,
+              segments: [
+                ButtonSegment(
+                  value: TrackColorMode.uniform,
+                  label: Text(l10n.gpsTrack_colorMode_uniform),
+                ),
+                ButtonSegment(
+                  value: TrackColorMode.speed,
+                  label: Text(l10n.gpsTrack_colorMode_speed),
+                ),
+                ButtonSegment(
+                  value: TrackColorMode.elapsed,
+                  label: Text(l10n.gpsTrack_colorMode_elapsed),
+                ),
+              ],
+              selected: {mode},
+              onSelectionChanged: (selection) {
+                // Only bucketizeTrack re-runs; the decoded and simplified
+                // geometry stay resident, so this is a frame not a reload.
+                ref.read(trackColorModeProvider.notifier).state =
+                    selection.first;
+              },
+            ),
+          ),
+        ),
+      ),
       body: trackAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         // A corrupt or undecodable blob must not crash the page. Surface it
@@ -78,32 +113,47 @@ class _TrackMap extends ConsumerWidget {
         ref.watch(gpsTrackGeometryProvider((trackId, TrackLod.detail))).value ??
         fallbackPoints;
     final drawable = points.length >= 2 ? points : fallbackPoints;
-    final runs = bucketizeTrack(drawable, TrackColorMode.uniform);
+    final mode = ref.watch(trackColorModeProvider);
+    final runs = bucketizeTrack(drawable, mode);
     final bounds = trackBounds(drawable)!;
 
-    return TrackpadZoomMap(
-      controller: controller,
-      child: FlutterMap(
-        mapController: controller,
-        options: MapOptions(
-          initialCameraFit: CameraFit.bounds(
-            bounds: LatLngBounds(
-              LatLng(bounds.minLat, bounds.minLon),
-              LatLng(bounds.maxLat, bounds.maxLon),
+    return Stack(
+      children: [
+        Positioned.fill(
+          child: TrackpadZoomMap(
+            controller: controller,
+            child: FlutterMap(
+              mapController: controller,
+              options: MapOptions(
+                initialCameraFit: CameraFit.bounds(
+                  bounds: LatLngBounds(
+                    LatLng(bounds.minLat, bounds.minLon),
+                    LatLng(bounds.maxLat, bounds.maxLon),
+                  ),
+                  padding: const EdgeInsets.all(48),
+                  // A track a few hundred metres wide would otherwise fit
+                  // past the tile provider's max zoom and render blank.
+                  maxZoom: 16.0,
+                ),
+              ),
+              children: [
+                submersionTileLayer(ref),
+                GpsTrackPolylineLayer(runs: runs, mode: mode),
+                const MapAttribution(),
+                MapCompassButton(controller: controller),
+              ],
             ),
-            padding: const EdgeInsets.all(48),
-            // A track a few hundred metres wide would otherwise fit past the
-            // tile provider's max zoom and render blank.
-            maxZoom: 16.0,
           ),
         ),
-        children: [
-          submersionTileLayer(ref),
-          GpsTrackPolylineLayer(runs: runs, mode: TrackColorMode.uniform),
-          const MapAttribution(),
-          MapCompassButton(controller: controller),
-        ],
-      ),
+        Positioned(
+          left: 12,
+          bottom: 12,
+          child: TrackColorLegend(
+            mode: mode,
+            speedRangeMps: speedRange(drawable),
+          ),
+        ),
+      ],
     );
   }
 }

@@ -19492,6 +19492,27 @@ class AppLocalizationsHe extends AppLocalizations {
   String get gpsLogger_tracksHeader => 'מסלולים שהוקלטו';
 
   @override
+  String get gpsTrack_colorMode_uniform => 'אחיד';
+
+  @override
+  String get gpsTrack_colorMode_speed => 'מהירות';
+
+  @override
+  String get gpsTrack_colorMode_elapsed => 'זמן';
+
+  @override
+  String get gpsTrack_legend_slower => 'אטי יותר';
+
+  @override
+  String get gpsTrack_legend_faster => 'מהיר יותר';
+
+  @override
+  String get gpsTrack_legend_start => 'התחלה';
+
+  @override
+  String get gpsTrack_legend_end => 'סוף';
+
+  @override
   String get gpsTrack_detail_title => 'מסלול GPS';
 
   @override

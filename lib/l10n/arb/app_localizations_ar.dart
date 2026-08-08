@@ -19637,6 +19637,27 @@ class AppLocalizationsAr extends AppLocalizations {
   String get gpsLogger_tracksHeader => 'المسارات المسجّلة';
 
   @override
+  String get gpsTrack_colorMode_uniform => 'عادي';
+
+  @override
+  String get gpsTrack_colorMode_speed => 'السرعة';
+
+  @override
+  String get gpsTrack_colorMode_elapsed => 'الوقت';
+
+  @override
+  String get gpsTrack_legend_slower => 'أبطأ';
+
+  @override
+  String get gpsTrack_legend_faster => 'أسرع';
+
+  @override
+  String get gpsTrack_legend_start => 'البداية';
+
+  @override
+  String get gpsTrack_legend_end => 'النهاية';
+
+  @override
   String get gpsTrack_detail_title => 'مسار GPS';
 
   @override

@@ -33330,6 +33330,48 @@ abstract class AppLocalizations {
   /// **'Recorded tracks'**
   String get gpsLogger_tracksHeader;
 
+  /// No description provided for @gpsTrack_colorMode_uniform.
+  ///
+  /// In en, this message translates to:
+  /// **'Plain'**
+  String get gpsTrack_colorMode_uniform;
+
+  /// No description provided for @gpsTrack_colorMode_speed.
+  ///
+  /// In en, this message translates to:
+  /// **'Speed'**
+  String get gpsTrack_colorMode_speed;
+
+  /// No description provided for @gpsTrack_colorMode_elapsed.
+  ///
+  /// In en, this message translates to:
+  /// **'Time'**
+  String get gpsTrack_colorMode_elapsed;
+
+  /// No description provided for @gpsTrack_legend_slower.
+  ///
+  /// In en, this message translates to:
+  /// **'Slower'**
+  String get gpsTrack_legend_slower;
+
+  /// No description provided for @gpsTrack_legend_faster.
+  ///
+  /// In en, this message translates to:
+  /// **'Faster'**
+  String get gpsTrack_legend_faster;
+
+  /// No description provided for @gpsTrack_legend_start.
+  ///
+  /// In en, this message translates to:
+  /// **'Start'**
+  String get gpsTrack_legend_start;
+
+  /// No description provided for @gpsTrack_legend_end.
+  ///
+  /// In en, this message translates to:
+  /// **'End'**
+  String get gpsTrack_legend_end;
+
   /// No description provided for @gpsTrack_detail_title.
   ///
   /// In en, this message translates to:

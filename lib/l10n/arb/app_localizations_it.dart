@@ -19988,6 +19988,27 @@ class AppLocalizationsIt extends AppLocalizations {
   String get gpsLogger_tracksHeader => 'Tracce registrate';
 
   @override
+  String get gpsTrack_colorMode_uniform => 'Tinta unita';
+
+  @override
+  String get gpsTrack_colorMode_speed => 'Velocità';
+
+  @override
+  String get gpsTrack_colorMode_elapsed => 'Tempo';
+
+  @override
+  String get gpsTrack_legend_slower => 'Più lento';
+
+  @override
+  String get gpsTrack_legend_faster => 'Più veloce';
+
+  @override
+  String get gpsTrack_legend_start => 'Inizio';
+
+  @override
+  String get gpsTrack_legend_end => 'Fine';
+
+  @override
   String get gpsTrack_detail_title => 'Traccia GPS';
 
   @override

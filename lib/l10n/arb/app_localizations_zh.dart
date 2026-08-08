@@ -18973,6 +18973,27 @@ class AppLocalizationsZh extends AppLocalizations {
   String get gpsLogger_tracksHeader => '已记录的轨迹';
 
   @override
+  String get gpsTrack_colorMode_uniform => '单色';
+
+  @override
+  String get gpsTrack_colorMode_speed => '速度';
+
+  @override
+  String get gpsTrack_colorMode_elapsed => '时间';
+
+  @override
+  String get gpsTrack_legend_slower => '较慢';
+
+  @override
+  String get gpsTrack_legend_faster => '较快';
+
+  @override
+  String get gpsTrack_legend_start => '起点';
+
+  @override
+  String get gpsTrack_legend_end => '终点';
+
+  @override
   String get gpsTrack_detail_title => 'GPS 轨迹';
 
   @override
