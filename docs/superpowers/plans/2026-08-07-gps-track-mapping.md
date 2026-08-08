@@ -3496,3 +3496,1039 @@ flutter analyze
 ```
 
 ---
+
+## Phase 3: Thumbnails and Overview Map
+
+---
+
+### Task 15: Tile-less track shape painter
+
+**Files:**
+- Create: `lib/features/gps_log/presentation/widgets/track_shape_painter.dart`
+- Test: `test/features/gps_log/track_shape_painter_test.dart`
+
+**Interfaces:**
+- Consumes: `trackBounds` (Task 2)
+- Produces:
+  - `class TrackShapePainter extends CustomPainter`
+  - `class TrackShapeChip extends StatelessWidget` — bounded, self-sizing wrapper
+
+This is the offline fallback for row thumbnails. Recording a track on a boat means recording it with no signal, so tiles failing is the **normal** case for this feature, not an edge case. The shape alone still identifies a dive day.
+
+- [ ] **Step 1: Write the failing test**
+
+Create `test/features/gps_log/track_shape_painter_test.dart`:
+
+```dart
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:submersion/features/gps_log/domain/entities/gps_track.dart';
+import 'package:submersion/features/gps_log/presentation/widgets/track_shape_painter.dart';
+
+GpsTrackPoint p(double lat, double lon) =>
+    GpsTrackPoint(timestamp: 0, latitude: lat, longitude: lon);
+
+void main() {
+  group('shouldRepaint', () {
+    test('repaints when the points change', () {
+      final a = TrackShapePainter(
+        points: [p(0, 0), p(1, 1)],
+        color: Colors.blue,
+      );
+      final b = TrackShapePainter(
+        points: [p(0, 0), p(2, 2)],
+        color: Colors.blue,
+      );
+      expect(b.shouldRepaint(a), isTrue);
+    });
+
+    test('repaints when the colour changes', () {
+      final points = [p(0, 0), p(1, 1)];
+      final a = TrackShapePainter(points: points, color: Colors.blue);
+      final b = TrackShapePainter(points: points, color: Colors.red);
+      expect(b.shouldRepaint(a), isTrue);
+    });
+
+    test('does not repaint for identical inputs', () {
+      final points = [p(0, 0), p(1, 1)];
+      final a = TrackShapePainter(points: points, color: Colors.blue);
+      final b = TrackShapePainter(points: points, color: Colors.blue);
+      expect(b.shouldRepaint(a), isFalse);
+    });
+  });
+
+  group('TrackShapeChip', () {
+    testWidgets('renders at the requested size', (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: Center(
+              child: TrackShapeChip(
+                points: [p(0, 0), p(0.01, 0.01), p(0, 0.02)],
+                width: 88,
+                height: 64,
+              ),
+            ),
+          ),
+        ),
+      );
+      final size = tester.getSize(find.byType(TrackShapeChip));
+      expect(size.width, 88);
+      expect(size.height, 64);
+    });
+
+    testWidgets('renders an empty track without throwing', (tester) async {
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: Center(
+              child: TrackShapeChip(points: [], width: 88, height: 64),
+            ),
+          ),
+        ),
+      );
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('renders a single-point track without dividing by zero',
+        (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: Center(
+              child: TrackShapeChip(
+                points: [p(5, 5)],
+                width: 88,
+                height: 64,
+              ),
+            ),
+          ),
+        ),
+      );
+      expect(tester.takeException(), isNull);
+    });
+  });
+}
+```
+
+- [ ] **Step 2: Run test to verify it fails**
+
+Run: `flutter test test/features/gps_log/track_shape_painter_test.dart`
+Expected: FAIL — `TrackShapePainter` isn't defined.
+
+- [ ] **Step 3: Write the implementation**
+
+Create `lib/features/gps_log/presentation/widgets/track_shape_painter.dart`:
+
+```dart
+import 'package:flutter/material.dart';
+
+import 'package:submersion/features/gps_log/domain/entities/gps_track.dart';
+import 'package:submersion/features/gps_log/domain/track_geometry.dart';
+
+/// Draws a track's shape with no basemap, scaled to fill the canvas.
+///
+/// The offline fallback for row thumbnails. A GPS track is recorded on a boat,
+/// where there is usually no signal to fetch tiles with, so this path runs
+/// often enough to deserve being good rather than being a stub.
+class TrackShapePainter extends CustomPainter {
+  TrackShapePainter({required this.points, required this.color});
+
+  final List<GpsTrackPoint> points;
+  final Color color;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    if (points.length < 2) return;
+
+    final bounds = trackBounds(points);
+    if (bounds == null) return;
+
+    final latSpan = bounds.maxLat - bounds.minLat;
+    final lonSpan = bounds.maxLon - bounds.minLon;
+
+    // A perfectly straight north-south or east-west track has a zero span on
+    // one axis; substituting 1 collapses that axis to the canvas centre
+    // instead of producing NaN.
+    final safeLatSpan = latSpan == 0 ? 1.0 : latSpan;
+    final safeLonSpan = lonSpan == 0 ? 1.0 : lonSpan;
+
+    // Preserve aspect ratio: use the tighter scale on both axes, then centre.
+    const padding = 6.0;
+    final usableWidth = size.width - padding * 2;
+    final usableHeight = size.height - padding * 2;
+    final scale = (usableWidth / safeLonSpan) < (usableHeight / safeLatSpan)
+        ? usableWidth / safeLonSpan
+        : usableHeight / safeLatSpan;
+
+    final drawnWidth = safeLonSpan * scale;
+    final drawnHeight = safeLatSpan * scale;
+    final offsetX = (size.width - drawnWidth) / 2;
+    final offsetY = (size.height - drawnHeight) / 2;
+
+    final path = Path();
+    for (var i = 0; i < points.length; i++) {
+      final x = offsetX + (points[i].longitude - bounds.minLon) * scale;
+      // Screen y grows downward, latitude grows northward: invert.
+      final y = offsetY + (bounds.maxLat - points[i].latitude) * scale;
+      if (i == 0) {
+        path.moveTo(x, y);
+      } else {
+        path.lineTo(x, y);
+      }
+    }
+
+    canvas.drawPath(
+      path,
+      Paint()
+        ..color = color
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 2.0
+        ..strokeCap = StrokeCap.round
+        ..strokeJoin = StrokeJoin.round
+        ..isAntiAlias = true,
+    );
+  }
+
+  @override
+  bool shouldRepaint(TrackShapePainter oldDelegate) =>
+      oldDelegate.color != color || !identical(oldDelegate.points, points);
+}
+
+/// A fixed-size tinted chip containing a [TrackShapePainter].
+class TrackShapeChip extends StatelessWidget {
+  const TrackShapeChip({
+    super.key,
+    required this.points,
+    required this.width,
+    required this.height,
+  });
+
+  final List<GpsTrackPoint> points;
+  final double width;
+  final double height;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return SizedBox(
+      width: width,
+      height: height,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: scheme.surfaceContainerHighest,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: CustomPaint(
+          painter: TrackShapePainter(points: points, color: scheme.primary),
+        ),
+      ),
+    );
+  }
+}
+```
+
+Note `shouldRepaint` compares point lists by identity. Every geometry list in this feature comes from `List.unmodifiable` in `simplifyTrack` or the cache repository, so a changed track always produces a new instance. Deep-comparing thousands of points on every frame would cost more than the repaint it avoids.
+
+- [ ] **Step 4: Run test to verify it passes**
+
+Run: `flutter test test/features/gps_log/track_shape_painter_test.dart`
+Expected: PASS, 6 tests.
+
+- [ ] **Step 5: Format, analyze, commit**
+
+```bash
+dart format .
+flutter analyze
+git add lib/features/gps_log/presentation/widgets/track_shape_painter.dart test/features/gps_log/track_shape_painter_test.dart
+git commit -m "Add tile-less track shape painter for offline thumbnails"
+```
+
+---
+
+### Task 16: Row thumbnail mini-map
+
+**Files:**
+- Create: `lib/features/gps_log/presentation/widgets/gps_track_thumbnail.dart`
+- Test: `test/features/gps_log/gps_track_thumbnail_test.dart`
+
+**Interfaces:**
+- Consumes: `gpsTrackGeometryProvider` with `TrackLod.thumbnail` (Task 8); `trackBounds` (Task 2); `TrackShapeChip` (Task 15); `submersionTileLayer` (Task 10)
+- Produces: `class GpsTrackThumbnail extends ConsumerWidget` — fixed 88x64
+
+Three properties this widget must have, each for a specific reason:
+
+1. **`InteractiveFlag.none`** so it never enters the gesture arena against the parent `ListView`. Without this, a drag starting on a thumbnail fights the list scroll.
+2. **Zoom clamped to <= 12** so tracks from one trip resolve to the same cached tiles. A week in Cozumel then costs a handful of tile fetches total instead of four per row.
+3. **`RepaintBoundary`** so a thumbnail repaint does not dirty the whole row.
+
+- [ ] **Step 1: Write the failing test**
+
+Create `test/features/gps_log/gps_track_thumbnail_test.dart`:
+
+```dart
+import 'package:flutter/material.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:submersion/features/gps_log/data/repositories/track_geometry_cache_repository.dart';
+import 'package:submersion/features/gps_log/domain/entities/gps_track.dart';
+import 'package:submersion/features/gps_log/presentation/providers/gps_track_map_providers.dart';
+import 'package:submersion/features/gps_log/presentation/widgets/gps_track_thumbnail.dart';
+import 'package:submersion/features/gps_log/presentation/widgets/track_shape_painter.dart';
+
+import '../../helpers/mock_providers.dart';
+
+GpsTrackPoint p(int t) => GpsTrackPoint(
+      timestamp: t,
+      latitude: 20.0 + t * 0.001,
+      longitude: -87.0 + t * 0.001,
+    );
+
+Future<void> _pump(
+  WidgetTester tester, {
+  required List<GpsTrackPoint> geometry,
+}) async {
+  final base = await getBaseOverrides();
+  await tester.pumpWidget(
+    ProviderScope(
+      overrides: [
+        ...base,
+        gpsTrackGeometryProvider(('track-1', TrackLod.thumbnail))
+            .overrideWith((ref) async => geometry),
+      ],
+      child: const MaterialApp(
+        home: Scaffold(
+          body: Center(child: GpsTrackThumbnail(trackId: 'track-1')),
+        ),
+      ),
+    ),
+  );
+  await tester.pumpAndSettle();
+}
+
+void main() {
+  testWidgets('renders at exactly 88x64', (tester) async {
+    await _pump(tester, geometry: [p(0), p(1), p(2)]);
+    final size = tester.getSize(find.byType(GpsTrackThumbnail));
+    expect(size.width, 88);
+    expect(size.height, 64);
+  });
+
+  testWidgets('renders a non-interactive map when geometry is available',
+      (tester) async {
+    await _pump(tester, geometry: [p(0), p(1), p(2)]);
+    final map = tester.widget<FlutterMap>(find.byType(FlutterMap));
+    expect(map.options.interactionOptions.flags, InteractiveFlag.none);
+  });
+
+  testWidgets('clamps the camera to zoom 12 or lower', (tester) async {
+    // Three fixes within ~300 m would otherwise fit at zoom ~17, which
+    // would fetch tiles no other row shares.
+    await _pump(tester, geometry: [p(0), p(1), p(2)]);
+    final map = tester.widget<FlutterMap>(find.byType(FlutterMap));
+    final fit = map.options.initialCameraFit;
+    expect(fit, isA<CameraFit>());
+    // maxZoom is carried on the CameraFit.bounds variant.
+    expect(fit.toString(), contains('12'));
+  });
+
+  testWidgets('is wrapped in a RepaintBoundary', (tester) async {
+    await _pump(tester, geometry: [p(0), p(1), p(2)]);
+    expect(
+      find.ancestor(
+        of: find.byType(FlutterMap),
+        matching: find.byType(RepaintBoundary),
+      ),
+      findsWidgets,
+    );
+  });
+
+  testWidgets('falls back to the shape chip for an empty track',
+      (tester) async {
+    await _pump(tester, geometry: const []);
+    expect(find.byType(TrackShapeChip), findsOneWidget);
+    expect(find.byType(FlutterMap), findsNothing);
+  });
+
+  testWidgets('shows the shape chip while geometry is still loading',
+      (tester) async {
+    final base = await getBaseOverrides();
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          ...base,
+          gpsTrackGeometryProvider(('track-1', TrackLod.thumbnail))
+              .overrideWith((ref) => Future.delayed(
+                    const Duration(seconds: 5),
+                    () => <GpsTrackPoint>[],
+                  )),
+        ],
+        child: const MaterialApp(
+          home: Scaffold(
+            body: Center(child: GpsTrackThumbnail(trackId: 'track-1')),
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+    expect(find.byType(TrackShapeChip), findsOneWidget);
+    // Drain the pending timer so the test does not fail on a live timer.
+    await tester.pump(const Duration(seconds: 6));
+  });
+}
+```
+
+- [ ] **Step 2: Run test to verify it fails**
+
+Run: `flutter test test/features/gps_log/gps_track_thumbnail_test.dart`
+Expected: FAIL — `GpsTrackThumbnail` isn't defined.
+
+- [ ] **Step 3: Write the implementation**
+
+Create `lib/features/gps_log/presentation/widgets/gps_track_thumbnail.dart`:
+
+```dart
+import 'package:flutter/material.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:latlong2/latlong.dart';
+
+import 'package:submersion/features/gps_log/data/repositories/track_geometry_cache_repository.dart';
+import 'package:submersion/features/gps_log/domain/entities/gps_track.dart';
+import 'package:submersion/features/gps_log/domain/track_geometry.dart';
+import 'package:submersion/features/gps_log/presentation/providers/gps_track_map_providers.dart';
+import 'package:submersion/features/gps_log/presentation/widgets/track_shape_painter.dart';
+import 'package:submersion/features/maps/presentation/widgets/submersion_tile_layer.dart';
+
+const double _kThumbWidth = 88;
+const double _kThumbHeight = 64;
+
+/// Highest zoom a thumbnail will fit to.
+///
+/// Deliberately low. Tracks recorded on the same trip then share basemap
+/// tiles, so a week of dives costs a handful of tile fetches for the whole
+/// list rather than four per row.
+const double _kThumbMaxZoom = 12.0;
+
+/// A small non-interactive map preview of one recorded track.
+class GpsTrackThumbnail extends ConsumerWidget {
+  const GpsTrackThumbnail({super.key, required this.trackId});
+
+  final String trackId;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final geometry =
+        ref.watch(gpsTrackGeometryProvider((trackId, TrackLod.thumbnail)));
+
+    // While loading, and on any error, show the tile-less shape rather than a
+    // spinner: a list of spinners reads as broken, and the shape is the point.
+    final points = geometry.value ?? const <GpsTrackPoint>[];
+    final bounds = points.length >= 2 ? trackBounds(points) : null;
+
+    if (bounds == null) {
+      return TrackShapeChip(
+        points: points,
+        width: _kThumbWidth,
+        height: _kThumbHeight,
+      );
+    }
+
+    return RepaintBoundary(
+      child: SizedBox(
+        width: _kThumbWidth,
+        height: _kThumbHeight,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(8),
+          child: FlutterMap(
+            options: MapOptions(
+              // Never interactive: a live map here would fight the parent
+              // ListView for the gesture arena on every drag.
+              interactionOptions: const InteractionOptions(
+                flags: InteractiveFlag.none,
+              ),
+              initialCameraFit: CameraFit.bounds(
+                bounds: LatLngBounds(
+                  LatLng(bounds.minLat, bounds.minLon),
+                  LatLng(bounds.maxLat, bounds.maxLon),
+                ),
+                padding: const EdgeInsets.all(8),
+                maxZoom: _kThumbMaxZoom,
+              ),
+            ),
+            children: [
+              submersionTileLayer(ref, maxZoomOverride: _kThumbMaxZoom),
+              PolylineLayer(
+                polylines: [
+                  Polyline(
+                    points: [
+                      for (final p in points) LatLng(p.latitude, p.longitude),
+                    ],
+                    color: Theme.of(context).colorScheme.primary,
+                    strokeWidth: 2.5,
+                    strokeCap: StrokeCap.round,
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+```
+
+- [ ] **Step 4: Run test to verify it passes**
+
+Run: `flutter test test/features/gps_log/gps_track_thumbnail_test.dart`
+Expected: PASS, 6 tests.
+
+- [ ] **Step 5: Format, analyze, commit**
+
+```bash
+dart format .
+flutter analyze
+git add lib/features/gps_log/presentation/widgets/gps_track_thumbnail.dart test/features/gps_log/gps_track_thumbnail_test.dart
+git commit -m "Add non-interactive map thumbnail for GPS track rows"
+```
+
+---
+
+### Task 17: Wire thumbnails into the list and measure scroll performance
+
+**Files:**
+- Modify: `lib/features/gps_log/presentation/pages/gps_logger_page.dart`
+- Test: `test/features/gps_log/gps_logger_page_test.dart` (extend)
+- Test: `test/features/gps_log/gps_track_list_scroll_perf_test.dart`
+
+**Interfaces:**
+- Consumes: `GpsTrackThumbnail` (Task 16)
+
+**This task contains the go/no-go measurement for the whole thumbnail approach.** Twenty visible rows means twenty live `FlutterMap` instances, each with a controller, camera, and tile manager. If the measurement fails, the documented remedy is in Step 6 — do not skip the measurement and hope.
+
+- [ ] **Step 1: Convert the track list to a builder**
+
+`gps_logger_page.dart` currently renders tracks with a `for` loop inside a `ListView` (around line 234), which builds **every** row eagerly. With thumbnails attached that would instantiate one `FlutterMap` per track in the database on first paint.
+
+Replace the outer `ListView` with a `CustomScrollView`: keep the record card and match button in a `SliverToBoxAdapter`, and move the track list into a `SliverList.builder` so only visible rows are built.
+
+- [ ] **Step 2: Attach the thumbnail**
+
+Replace the `ListTile`'s `leading: const Icon(Icons.route_outlined)` with:
+
+```dart
+                leading: GpsTrackThumbnail(trackId: track.id),
+```
+
+and widen `ListTile.minLeadingWidth` to 88 so the thumbnail is not clipped.
+
+- [ ] **Step 3: Extend the existing page test**
+
+Add to `test/features/gps_log/gps_logger_page_test.dart`:
+
+```dart
+  testWidgets('each track row shows a thumbnail', (tester) async {
+    // Pump the page with two completed tracks in the repository.
+    expect(find.byType(GpsTrackThumbnail), findsNWidgets(2));
+  });
+
+  testWidgets('tapping a row navigates to the track detail route',
+      (tester) async {
+    // Pump with a router observer; tap the first row; assert the pushed
+    // location is '/gps-log/<id>'.
+  });
+```
+
+Fill both bodies using the harness already in that file.
+
+- [ ] **Step 4: Write the scroll performance test**
+
+Create `test/features/gps_log/gps_track_list_scroll_perf_test.dart`:
+
+```dart
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:submersion/features/gps_log/presentation/widgets/gps_track_thumbnail.dart';
+
+void main() {
+  testWidgets('a 50-track list builds only the visible thumbnails',
+      (tester) async {
+    // Seed 50 completed tracks, pump GpsLoggerPage at a phone surface size
+    // (390x844), and assert the builder has not instantiated all 50.
+    //
+    // This is the guard that matters: if the list eagerly builds every row,
+    // 50 FlutterMap instances exist at once and the remedy in Step 6 is
+    // required. A handful on screen is fine.
+    await tester.binding.setSurfaceSize(const Size(390, 844));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+
+    // ... pump the page with 50 seeded tracks ...
+
+    final built = find.byType(GpsTrackThumbnail).evaluate().length;
+    expect(
+      built,
+      lessThan(15),
+      reason: 'SliverList.builder must not build offscreen rows',
+    );
+  });
+
+  testWidgets('scrolling a 50-track list settles without exceptions',
+      (tester) async {
+    await tester.binding.setSurfaceSize(const Size(390, 844));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+
+    // ... pump the page with 50 seeded tracks ...
+
+    await tester.fling(find.byType(CustomScrollView), const Offset(0, -3000), 1000);
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
+  });
+}
+```
+
+Fill the seeding sections using the repository helpers from `gps_track_repository_test.dart`.
+
+- [ ] **Step 5: Run the tests**
+
+Run: `flutter test test/features/gps_log/`
+Expected: PASS.
+
+- [ ] **Step 6: Measure on a real device, and apply the remedy only if needed**
+
+Automated widget tests confirm the *build* behaviour but cannot measure frame time. Run the app on a physical Android or iOS device with at least 50 recorded tracks and scroll the GPS Log list:
+
+```bash
+flutter run --profile -d <device-id>
+```
+
+Watch the performance overlay. If frame times stay under 16 ms, this task is done.
+
+**If it janks, apply the documented remedy rather than inventing one:** pre-render each thumbnail once to PNG bytes and cache them in the local cache DB (a `points BLOB` sibling column, or a second table keyed by `trackId`), then render rows as `Image.memory`. The list then holds zero `FlutterMap` instances. Add this as its own task before continuing to Task 18, and note the measured frame times in its commit message.
+
+- [ ] **Step 7: Format, analyze, commit**
+
+```bash
+dart format .
+flutter analyze
+git add lib/features/gps_log/presentation/pages/gps_logger_page.dart test/features/gps_log/
+git commit -m "Show track thumbnails in the GPS log list"
+```
+
+---
+
+### Task 18: All-tracks overview map
+
+**Files:**
+- Create: `lib/features/gps_log/presentation/pages/gps_track_map_page.dart`
+- Modify: `lib/core/router/app_router.dart`
+- Modify: `lib/features/gps_log/presentation/pages/gps_logger_page.dart`
+- Modify: `lib/l10n/arb/app_en.arb` plus all locale ARBs
+- Test: `test/features/gps_log/gps_track_map_page_test.dart`
+- Test: `test/core/router/app_router_gps_track_test.dart` (extend)
+
+**Interfaces:**
+- Consumes: `gpsTracksProvider` (existing), `gpsTrackGeometryProvider` (Task 8), `MapListScaffold`, `mapListSelectionProvider`
+- Produces: route `/gps-log/map` named `gpsTrackMap`; `GpsTrackMapPage`
+
+`MapListScaffold` gives desktop a split pane at >= 1100 px and mobile a map with an info-card overlay, both for free. `DiveActivityMapPage` is the reference consumer.
+
+**The route must be declared before `:id`.** Task 10's router test already asserts this; adding `map` after `:id` will fail it.
+
+- [ ] **Step 1: Extend the router test**
+
+Add to `test/core/router/app_router_gps_track_test.dart`:
+
+```dart
+  test('/gps-log/map resolves to the overview, not the :id detail', () {
+    final match = appRouter.configuration.findMatch(
+      Uri.parse('/gps-log/map'),
+    );
+    final names = [
+      for (final m in match.matches)
+        if (m.route is GoRoute) (m.route as GoRoute).name,
+    ];
+    expect(names, contains('gpsTrackMap'));
+    expect(names, isNot(contains('gpsTrackDetail')));
+  });
+
+  test('/gps-log/some-uuid still resolves to the detail page', () {
+    final match = appRouter.configuration.findMatch(
+      Uri.parse('/gps-log/abc-123'),
+    );
+    final names = [
+      for (final m in match.matches)
+        if (m.route is GoRoute) (m.route as GoRoute).name,
+    ];
+    expect(names, contains('gpsTrackDetail'));
+  });
+```
+
+Adjust `findMatch` to the current go_router API if the signature differs — check the version in `pubspec.lock`.
+
+- [ ] **Step 2: Run test to verify it fails**
+
+Run: `flutter test test/core/router/app_router_gps_track_test.dart`
+Expected: FAIL — `/gps-log/map` matches `gpsTrackDetail`.
+
+- [ ] **Step 3: Add l10n strings**
+
+```json
+  "gpsTrack_map_title": "Track Map",
+  "@gpsTrack_map_title": {"description": "App bar title for the all-tracks overview map"},
+  "gpsTrack_map_noTracks": "No recorded tracks to show.",
+  "@gpsTrack_map_noTracks": {"description": "Empty state on the overview map"},
+  "gpsTrack_map_showMap": "Show map",
+  "@gpsTrack_map_showMap": {"description": "Tooltip on the GPS log action that opens the overview map"}
+```
+
+Translate into all locales, then `flutter gen-l10n`.
+
+- [ ] **Step 4: Write the failing page test**
+
+Create `test/features/gps_log/gps_track_map_page_test.dart`:
+
+```dart
+import 'package:flutter/material.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:submersion/features/gps_log/data/repositories/track_geometry_cache_repository.dart';
+import 'package:submersion/features/gps_log/domain/entities/gps_track.dart';
+import 'package:submersion/features/gps_log/presentation/pages/gps_track_map_page.dart';
+import 'package:submersion/features/gps_log/presentation/providers/gps_log_providers.dart';
+import 'package:submersion/features/gps_log/presentation/providers/gps_track_map_providers.dart';
+import 'package:submersion/l10n/arb/app_localizations.dart';
+import 'package:submersion/shared/providers/map_list_selection_provider.dart';
+
+import '../../helpers/mock_providers.dart';
+
+GpsTrackPoint p(int t, double base) => GpsTrackPoint(
+      timestamp: t,
+      latitude: base + t * 0.001,
+      longitude: -87.0 + t * 0.001,
+    );
+
+GpsTrack _track(String id, double base) => GpsTrack(
+      id: id,
+      startTime: 1700000000000,
+      endTime: 1700003600000,
+      pointCount: 3,
+      points: [p(0, base), p(1, base), p(2, base)],
+    );
+
+Future<void> _pump(WidgetTester tester, {Size size = const Size(1400, 900)}) async {
+  final base = await getBaseOverrides();
+  await tester.binding.setSurfaceSize(size);
+  addTearDown(() => tester.binding.setSurfaceSize(null));
+  await tester.pumpWidget(
+    ProviderScope(
+      overrides: [
+        ...base,
+        gpsTracksProvider.overrideWith(
+          (ref) async => [_track('t1', 20.0), _track('t2', 25.0)],
+        ),
+        gpsTrackGeometryProvider(('t1', TrackLod.thumbnail))
+            .overrideWith((ref) async => _track('t1', 20.0).points),
+        gpsTrackGeometryProvider(('t2', TrackLod.thumbnail))
+            .overrideWith((ref) async => _track('t2', 25.0).points),
+      ],
+      child: MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        home: const GpsTrackMapPage(),
+      ),
+    ),
+  );
+  await tester.pumpAndSettle();
+}
+
+void main() {
+  testWidgets('draws every track on one map', (tester) async {
+    await _pump(tester);
+    expect(find.byType(FlutterMap), findsOneWidget);
+    final layers = find.byType(PolylineLayer).evaluate().length;
+    expect(layers, greaterThanOrEqualTo(1));
+  });
+
+  testWidgets('shows a list pane on a desktop-width surface', (tester) async {
+    await _pump(tester);
+    expect(find.text('Track Map'), findsOneWidget);
+    // MapListScaffold renders the list pane at >= 1100 px.
+    expect(find.byType(ListView), findsWidgets);
+  });
+
+  testWidgets('shows only the map on a phone-width surface', (tester) async {
+    await _pump(tester, size: const Size(390, 844));
+    expect(find.byType(FlutterMap), findsOneWidget);
+  });
+
+  testWidgets('shows an empty state when there are no tracks',
+      (tester) async {
+    final base = await getBaseOverrides();
+    await tester.binding.setSurfaceSize(const Size(1400, 900));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          ...base,
+          gpsTracksProvider.overrideWith((ref) async => <GpsTrack>[]),
+        ],
+        child: MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: const GpsTrackMapPage(),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(find.text('No recorded tracks to show.'), findsOneWidget);
+  });
+
+  testWidgets('selecting a track in the list highlights it on the map',
+      (tester) async {
+    await _pump(tester);
+    final container = ProviderScope.containerOf(
+      tester.element(find.byType(GpsTrackMapPage)),
+    );
+    container
+        .read(mapListSelectionProvider('gps-tracks').notifier)
+        .select('t1');
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
+  });
+}
+```
+
+Adjust the `mapListSelectionProvider` notifier method name to whatever `lib/shared/providers/map_list_selection_provider.dart` actually exposes — read it first.
+
+- [ ] **Step 5: Run test to verify it fails**
+
+Run: `flutter test test/features/gps_log/gps_track_map_page_test.dart`
+Expected: FAIL — `GpsTrackMapPage` isn't defined.
+
+- [ ] **Step 6: Write the page**
+
+Create `lib/features/gps_log/presentation/pages/gps_track_map_page.dart` following `dive_activity_map_page.dart`'s structure:
+
+- `MapListScaffold(sectionKey: 'gps-tracks', title: l10n.gpsTrack_map_title, onBackPressed: () => context.go('/gps-log'), listPane: ..., mapPane: ...)`
+- The map pane draws every track at `TrackLod.thumbnail` in `colorScheme.outline` (muted), and the selected track at `TrackLod.overview` in `colorScheme.primary` with a thicker stroke, drawn last so it sits on top.
+- On selection change, animate the camera to that track's bounds using `calculateZoomForBounds` from `map_utils.dart`.
+- The list pane reuses the track row from `gps_logger_page.dart`; extract that row into `lib/features/gps_log/presentation/widgets/gps_track_list_tile.dart` so both pages share one implementation rather than diverging.
+- Tapping a track on the map sets `mapListSelectionProvider('gps-tracks')`.
+
+- [ ] **Step 7: Register the route before `:id`**
+
+```dart
+            routes: [
+              // MUST precede ':id' - ':id' matches any single segment and
+              // would otherwise swallow '/gps-log/map'.
+              GoRoute(
+                path: 'map',
+                name: 'gpsTrackMap',
+                builder: (context, state) => const GpsTrackMapPage(),
+              ),
+              GoRoute(
+                path: ':id',
+                name: 'gpsTrackDetail',
+                builder: (context, state) => GpsTrackDetailPage(
+                  trackId: state.pathParameters['id']!,
+                ),
+              ),
+            ],
+```
+
+- [ ] **Step 8: Add the app bar action**
+
+In `gps_logger_page.dart`, add to the `AppBar` actions:
+
+```dart
+          IconButton(
+            icon: const Icon(Icons.map_outlined),
+            tooltip: l10n.gpsTrack_map_showMap,
+            onPressed: () => context.push('/gps-log/map'),
+          ),
+```
+
+- [ ] **Step 9: Run tests, format, analyze, commit**
+
+```bash
+flutter test test/features/gps_log/ test/core/router/
+dart format .
+flutter analyze
+git add lib/features/gps_log/ lib/core/router/app_router.dart lib/l10n/ test/
+git commit -m "Add all-tracks overview map at /gps-log/map"
+```
+
+---
+
+### Task 19: Date range filter on the overview map
+
+**Files:**
+- Modify: `lib/features/gps_log/presentation/pages/gps_track_map_page.dart`
+- Modify: `lib/features/gps_log/presentation/providers/gps_track_map_providers.dart`
+- Modify: `lib/l10n/arb/app_en.arb` plus all locale ARBs
+- Test: `test/features/gps_log/gps_track_date_filter_test.dart`
+
+**Interfaces:**
+- Produces:
+  - `trackDateFilterProvider` → `StateProvider<DateTimeRange?>`
+  - `filteredTracksProvider` → `FutureProvider<List<GpsTrack>>`
+
+"Every track ever" is the one query in this feature that grows without bound, so the overview needs a bound the user controls.
+
+- [ ] **Step 1: Add l10n strings**
+
+```json
+  "gpsTrack_filter_all": "All dates",
+  "@gpsTrack_filter_all": {"description": "Date filter chip label when no range is set"},
+  "gpsTrack_filter_clear": "Clear date filter",
+  "@gpsTrack_filter_clear": {"description": "Tooltip for removing the active date range"}
+```
+
+Translate into all locales, then `flutter gen-l10n`.
+
+- [ ] **Step 2: Write the failing test**
+
+Create `test/features/gps_log/gps_track_date_filter_test.dart`:
+
+```dart
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:submersion/features/gps_log/domain/entities/gps_track.dart';
+import 'package:submersion/features/gps_log/presentation/providers/gps_log_providers.dart';
+import 'package:submersion/features/gps_log/presentation/providers/gps_track_map_providers.dart';
+
+GpsTrack _track(String id, DateTime start) => GpsTrack(
+      id: id,
+      startTime: start.millisecondsSinceEpoch,
+      endTime: start.add(const Duration(hours: 4)).millisecondsSinceEpoch,
+    );
+
+void main() {
+  ProviderContainer _container() {
+    final container = ProviderContainer(
+      overrides: [
+        gpsTracksProvider.overrideWith((ref) async => [
+              _track('may', DateTime.utc(2026, 5, 10)),
+              _track('june', DateTime.utc(2026, 6, 15)),
+              _track('july', DateTime.utc(2026, 7, 20)),
+            ]),
+      ],
+    );
+    addTearDown(container.dispose);
+    return container;
+  }
+
+  test('returns every track when no filter is set', () async {
+    final container = _container();
+    expect((await container.read(filteredTracksProvider.future)).length, 3);
+  });
+
+  test('includes only tracks starting inside the range', () async {
+    final container = _container();
+    container.read(trackDateFilterProvider.notifier).state = DateTimeRange(
+      start: DateTime.utc(2026, 6, 1),
+      end: DateTime.utc(2026, 6, 30),
+    );
+    final tracks = await container.read(filteredTracksProvider.future);
+    expect(tracks.map((t) => t.id).toList(), ['june']);
+  });
+
+  test('includes a track starting exactly on the range end', () async {
+    final container = _container();
+    container.read(trackDateFilterProvider.notifier).state = DateTimeRange(
+      start: DateTime.utc(2026, 5, 1),
+      end: DateTime.utc(2026, 5, 10),
+    );
+    final tracks = await container.read(filteredTracksProvider.future);
+    expect(tracks.map((t) => t.id).toList(), ['may']);
+  });
+
+  test('returns empty when the range matches nothing', () async {
+    final container = _container();
+    container.read(trackDateFilterProvider.notifier).state = DateTimeRange(
+      start: DateTime.utc(2025, 1, 1),
+      end: DateTime.utc(2025, 12, 31),
+    );
+    expect(await container.read(filteredTracksProvider.future), isEmpty);
+  });
+
+  test('clearing the filter restores every track', () async {
+    final container = _container();
+    container.read(trackDateFilterProvider.notifier).state = DateTimeRange(
+      start: DateTime.utc(2026, 6, 1),
+      end: DateTime.utc(2026, 6, 30),
+    );
+    await container.read(filteredTracksProvider.future);
+    container.read(trackDateFilterProvider.notifier).state = null;
+    expect((await container.read(filteredTracksProvider.future)).length, 3);
+  });
+}
+```
+
+- [ ] **Step 3: Run test to verify it fails**
+
+Run: `flutter test test/features/gps_log/gps_track_date_filter_test.dart`
+Expected: FAIL — `trackDateFilterProvider` isn't defined.
+
+- [ ] **Step 4: Implement the providers**
+
+Add to `gps_track_map_providers.dart`:
+
+```dart
+/// Optional date bound on the overview map.
+///
+/// Null means unbounded. Track start times are wall-clock-as-UTC, so the
+/// range's DateTime values are compared against them directly with no
+/// timezone conversion.
+final trackDateFilterProvider = StateProvider<DateTimeRange?>((ref) => null);
+
+/// Completed tracks narrowed by [trackDateFilterProvider].
+final filteredTracksProvider = FutureProvider<List<GpsTrack>>((ref) async {
+  final tracks = await ref.watch(gpsTracksProvider.future);
+  final range = ref.watch(trackDateFilterProvider);
+  if (range == null) return tracks;
+
+  final from = range.start.millisecondsSinceEpoch;
+  // Inclusive of the end date's full day.
+  final to = range.end
+      .add(const Duration(days: 1))
+      .subtract(const Duration(milliseconds: 1))
+      .millisecondsSinceEpoch;
+
+  return [
+    for (final track in tracks)
+      if (track.startTime >= from && track.startTime <= to) track,
+  ];
+});
+```
+
+Add `import 'package:flutter/material.dart';` for `DateTimeRange`.
+
+- [ ] **Step 5: Wire the filter chip**
+
+In `GpsTrackMapPage`, switch the source from `gpsTracksProvider` to `filteredTracksProvider`, and add an app bar action showing either `l10n.gpsTrack_filter_all` or the formatted range. Tapping it opens `showDateRangePicker`; a clear button resets to null.
+
+- [ ] **Step 6: Run tests, format, analyze, commit**
+
+```bash
+flutter test test/features/gps_log/
+dart format .
+flutter analyze
+git add lib/features/gps_log/ lib/l10n/ test/features/gps_log/
+git commit -m "Add date range filter to the GPS track overview map"
+```
+
+---
+
+**Phase 3 complete.** The GPS Log list shows a map preview per row, and an overview map draws every track with selection bound to the list.
+
+```bash
+flutter test
+flutter analyze
+```
+
+---
