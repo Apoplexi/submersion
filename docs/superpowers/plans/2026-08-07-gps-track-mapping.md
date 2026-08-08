@@ -2413,7 +2413,7 @@ class _TrackMap extends ConsumerWidget {
           ),
         ),
         children: [
-          ref.watch(mapTileLayerProvider),
+          submersionTileLayer(ref),
           GpsTrackPolylineLayer(
             runs: runs,
             mode: TrackColorMode.uniform,
@@ -2427,7 +2427,40 @@ class _TrackMap extends ConsumerWidget {
 }
 ```
 
-Resolve `mapTileLayerProvider` and the exact `MapAttribution` / `MapCompassButton` constructor signatures against `dive_activity_map_page.dart`, which already composes all three — copy its usage rather than guessing.
+There is **no** `mapTileLayerProvider` in this codebase. `map_tile_providers.dart` exposes only `mapTileUrlProvider`, `mapTileMaxZoomProvider`, and `mapTileAttributionProvider`, and every map builds its own `TileLayer` inline. Rather than paste a fourth copy, extract the shared helper in the next step.
+
+Confirm the exact `MapAttribution` and `MapCompassButton` constructor signatures against `dive_activity_map_page.dart`, which already composes both.
+
+- [ ] **Step 7a: Extract the shared tile layer helper**
+
+Four maps now build an identical `TileLayer`. Create `lib/features/maps/presentation/widgets/submersion_tile_layer.dart`:
+
+```dart
+import 'package:flutter_map/flutter_map.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import 'package:submersion/features/maps/data/services/tile_cache_service.dart';
+import 'package:submersion/features/maps/presentation/providers/map_tile_providers.dart';
+
+/// The app's standard basemap layer: configured tile URL, the diver's max
+/// zoom, and the offline cache when it has been initialized.
+///
+/// Extracted because four maps had grown byte-identical copies of this.
+TileLayer submersionTileLayer(WidgetRef ref, {double? maxZoomOverride}) {
+  return TileLayer(
+    urlTemplate: ref.watch(mapTileUrlProvider),
+    userAgentPackageName: 'app.submersion',
+    maxZoom: maxZoomOverride ?? ref.watch(mapTileMaxZoomProvider),
+    tileProvider: TileCacheService.instance.isInitialized
+        ? TileCacheService.instance.getTileProvider()
+        : null,
+  );
+}
+```
+
+Then replace the inline `TileLayer` in `dive_locations_map.dart` (around line 170) with `submersionTileLayer(ref)`. Leave the other maps alone for now — `dive_locations_map.dart` is being modified in Phase 4 anyway, so it is in scope; the rest are not.
+
+Run `flutter test test/features/dive_log/` afterwards to confirm no map test regressed.
 
 - [ ] **Step 8: Register the route**
 
@@ -2463,6 +2496,1003 @@ dart format .
 flutter analyze
 git add lib/features/gps_log/presentation/pages/gps_track_detail_page.dart lib/core/router/app_router.dart lib/features/gps_log/presentation/pages/gps_logger_page.dart lib/l10n/ test/features/gps_log/gps_track_detail_page_test.dart test/core/router/app_router_gps_track_test.dart
 git commit -m "Add GPS track detail page at /gps-log/:id"
+```
+
+---
+
+### Task 11: Colorization toggle and legend
+
+**Files:**
+- Create: `lib/features/gps_log/presentation/widgets/track_color_legend.dart`
+- Modify: `lib/features/gps_log/presentation/pages/gps_track_detail_page.dart`
+- Modify: `lib/l10n/arb/app_en.arb` plus all locale ARBs
+- Test: `test/features/gps_log/track_color_legend_test.dart`
+- Test: `test/features/gps_log/gps_track_detail_colorization_test.dart`
+
+**Interfaces:**
+- Consumes: `TrackColorMode`, `speedRange` (Task 3); `trackBucketColors` (Task 9); `UnitFormatter.formatSpeed` (Task 4)
+- Produces:
+  - `trackColorModeProvider` → `StateProvider<TrackColorMode>` defaulting to `TrackColorMode.uniform`
+  - `class TrackColorLegend extends ConsumerWidget`
+
+Switching mode must re-run only `bucketizeTrack` — never re-decode or re-simplify. That is what makes the toggle a frame rather than a reload, and the test asserts it by counting geometry-provider reads.
+
+- [ ] **Step 1: Add l10n strings**
+
+Add to `lib/l10n/arb/app_en.arb`:
+
+```json
+  "gpsTrack_colorMode_uniform": "Plain",
+  "@gpsTrack_colorMode_uniform": {
+    "description": "Track colorization mode: single colour"
+  },
+  "gpsTrack_colorMode_speed": "Speed",
+  "@gpsTrack_colorMode_speed": {
+    "description": "Track colorization mode: colour by boat speed"
+  },
+  "gpsTrack_colorMode_elapsed": "Time",
+  "@gpsTrack_colorMode_elapsed": {
+    "description": "Track colorization mode: colour by elapsed time"
+  },
+  "gpsTrack_legend_slower": "Slower",
+  "@gpsTrack_legend_slower": {
+    "description": "Low end of the speed colour legend"
+  },
+  "gpsTrack_legend_faster": "Faster",
+  "@gpsTrack_legend_faster": {
+    "description": "High end of the speed colour legend"
+  },
+  "gpsTrack_legend_start": "Start",
+  "@gpsTrack_legend_start": {
+    "description": "Low end of the elapsed-time colour legend"
+  },
+  "gpsTrack_legend_end": "End",
+  "@gpsTrack_legend_end": {
+    "description": "High end of the elapsed-time colour legend"
+  }
+```
+
+Translate all seven into ar, de, es, fr, he, hu, it, nl, pt, zh, then run `flutter gen-l10n`.
+
+- [ ] **Step 2: Write the failing legend test**
+
+Create `test/features/gps_log/track_color_legend_test.dart`:
+
+```dart
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:submersion/features/gps_log/domain/track_colorization.dart';
+import 'package:submersion/features/gps_log/presentation/widgets/track_color_legend.dart';
+import 'package:submersion/l10n/arb/app_localizations.dart';
+
+import '../../helpers/mock_providers.dart';
+
+Future<void> _pump(
+  WidgetTester tester, {
+  required TrackColorMode mode,
+  ({double min, double max})? range,
+}) async {
+  final base = await getBaseOverrides();
+  await tester.pumpWidget(
+    ProviderScope(
+      overrides: base,
+      child: MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        home: Scaffold(
+          body: TrackColorLegend(mode: mode, speedRangeMps: range),
+        ),
+      ),
+    ),
+  );
+  await tester.pumpAndSettle();
+}
+
+void main() {
+  testWidgets('renders nothing in uniform mode', (tester) async {
+    await _pump(tester, mode: TrackColorMode.uniform);
+    expect(find.byType(SizedBox), findsWidgets);
+    expect(find.text('Slower'), findsNothing);
+  });
+
+  testWidgets('speed mode labels both ends with formatted speeds',
+      (tester) async {
+    await _pump(
+      tester,
+      mode: TrackColorMode.speed,
+      range: (min: 0.0, max: 10.0),
+    );
+    // 0 m/s and 10 m/s = 0.0 and 36.0 km/h under the default metric setting.
+    expect(find.textContaining('0.0'), findsWidgets);
+    expect(find.textContaining('36.0'), findsWidgets);
+  });
+
+  testWidgets('elapsed mode labels start and end', (tester) async {
+    await _pump(tester, mode: TrackColorMode.elapsed);
+    expect(find.text('Start'), findsOneWidget);
+    expect(find.text('End'), findsOneWidget);
+  });
+
+  testWidgets('speed mode with no range falls back to generic labels',
+      (tester) async {
+    await _pump(tester, mode: TrackColorMode.speed);
+    expect(find.text('Slower'), findsOneWidget);
+    expect(find.text('Faster'), findsOneWidget);
+  });
+}
+```
+
+- [ ] **Step 3: Run test to verify it fails**
+
+Run: `flutter test test/features/gps_log/track_color_legend_test.dart`
+Expected: FAIL — `TrackColorLegend` isn't defined.
+
+- [ ] **Step 4: Write the legend widget**
+
+Create `lib/features/gps_log/presentation/widgets/track_color_legend.dart`:
+
+```dart
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import 'package:submersion/core/utils/unit_formatter.dart';
+import 'package:submersion/features/gps_log/domain/track_colorization.dart';
+import 'package:submersion/features/gps_log/presentation/widgets/gps_track_polyline_layer.dart';
+import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
+import 'package:submersion/l10n/l10n_extension.dart';
+
+/// Colour key for the active track colorization mode.
+///
+/// Renders nothing in uniform mode - a single-colour line needs no legend.
+class TrackColorLegend extends ConsumerWidget {
+  const TrackColorLegend({
+    super.key,
+    required this.mode,
+    this.speedRangeMps,
+  });
+
+  final TrackColorMode mode;
+  final ({double min, double max})? speedRangeMps;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    if (mode == TrackColorMode.uniform) return const SizedBox.shrink();
+
+    final l10n = context.l10n;
+    final theme = Theme.of(context);
+    final colors = trackBucketColors(
+      theme.colorScheme,
+      mode,
+      kTrackColorBuckets,
+    );
+
+    final String lowLabel;
+    final String highLabel;
+    if (mode == TrackColorMode.speed) {
+      final range = speedRangeMps;
+      if (range == null) {
+        lowLabel = l10n.gpsTrack_legend_slower;
+        highLabel = l10n.gpsTrack_legend_faster;
+      } else {
+        final units = UnitFormatter(ref.watch(settingsProvider));
+        lowLabel = units.formatSpeed(range.min);
+        highLabel = units.formatSpeed(range.max);
+      }
+    } else {
+      lowLabel = l10n.gpsTrack_legend_start;
+      highLabel = l10n.gpsTrack_legend_end;
+    }
+
+    return Card(
+      color: theme.colorScheme.surface.withValues(alpha: 0.9),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                for (final color in colors)
+                  Container(width: 16, height: 10, color: color),
+              ],
+            ),
+            const SizedBox(height: 4),
+            SizedBox(
+              width: 16.0 * colors.length,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(lowLabel, style: theme.textTheme.labelSmall),
+                  Text(highLabel, style: theme.textTheme.labelSmall),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+```
+
+- [ ] **Step 5: Run test to verify it passes**
+
+Run: `flutter test test/features/gps_log/track_color_legend_test.dart`
+Expected: PASS, 4 tests.
+
+- [ ] **Step 6: Write the failing toggle test**
+
+Create `test/features/gps_log/gps_track_detail_colorization_test.dart`. Reuse the `_pump` harness shape from `gps_track_detail_page_test.dart`:
+
+```dart
+import 'package:flutter/material.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:submersion/features/gps_log/domain/entities/gps_track.dart';
+import 'package:submersion/features/gps_log/data/repositories/track_geometry_cache_repository.dart';
+import 'package:submersion/features/gps_log/presentation/pages/gps_track_detail_page.dart';
+import 'package:submersion/features/gps_log/presentation/providers/gps_track_map_providers.dart';
+import 'package:submersion/features/gps_log/presentation/widgets/track_color_legend.dart';
+import 'package:submersion/l10n/arb/app_localizations.dart';
+
+import '../../helpers/mock_providers.dart';
+
+GpsTrackPoint p(int t) => GpsTrackPoint(
+      timestamp: t,
+      latitude: 20.0 + t * 0.001,
+      longitude: -87.0 + t * 0.001,
+    );
+
+final _points = [p(0), p(10), p(20), p(30), p(40)];
+
+GpsTrack _track() => GpsTrack(
+      id: 'track-1',
+      startTime: 1700000000000,
+      endTime: 1700003600000,
+      pointCount: _points.length,
+      points: _points,
+    );
+
+void main() {
+  testWidgets('toggling to Speed shows the legend without re-reading geometry',
+      (tester) async {
+    var geometryReads = 0;
+    final base = await getBaseOverrides();
+    await tester.binding.setSurfaceSize(const Size(900, 1200));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          ...base,
+          gpsTrackDetailProvider('track-1')
+              .overrideWith((ref) async => _track()),
+          gpsTrackGeometryProvider(('track-1', TrackLod.detail))
+              .overrideWith((ref) async {
+            geometryReads++;
+            return _points;
+          }),
+        ],
+        child: MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: const GpsTrackDetailPage(trackId: 'track-1'),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(geometryReads, 1);
+    expect(find.byType(TrackColorLegend), findsOneWidget);
+
+    await tester.tap(find.text('Speed'));
+    await tester.pumpAndSettle();
+
+    // The whole point of the run-bucketing design: changing colour mode
+    // re-runs bucketize only. No second decode, no second simplify.
+    expect(geometryReads, 1);
+    expect(find.byType(PolylineLayer<int>), findsOneWidget);
+  });
+
+  testWidgets('defaults to plain mode', (tester) async {
+    final base = await getBaseOverrides();
+    await tester.binding.setSurfaceSize(const Size(900, 1200));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          ...base,
+          gpsTrackDetailProvider('track-1')
+              .overrideWith((ref) async => _track()),
+          gpsTrackGeometryProvider(('track-1', TrackLod.detail))
+              .overrideWith((ref) async => _points),
+        ],
+        child: MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: const GpsTrackDetailPage(trackId: 'track-1'),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    // Uniform mode draws no legend content.
+    expect(find.text('Start'), findsNothing);
+    expect(find.text('Slower'), findsNothing);
+  });
+}
+```
+
+- [ ] **Step 7: Run test to verify it fails**
+
+Run: `flutter test test/features/gps_log/gps_track_detail_colorization_test.dart`
+Expected: FAIL — no `Speed` control on the page.
+
+- [ ] **Step 8: Add the mode provider and wire the toggle**
+
+Add to `gps_track_map_providers.dart`:
+
+```dart
+/// Active colorization mode on the track detail map.
+///
+/// Held outside the geometry providers on purpose: changing it must re-run
+/// bucketizeTrack only, never the decode or the simplify.
+final trackColorModeProvider =
+    StateProvider<TrackColorMode>((ref) => TrackColorMode.uniform);
+```
+
+In `gps_track_detail_page.dart`, add a `SegmentedButton<TrackColorMode>` to the app bar `bottom` (or as a `PreferredSize` strip) with the three l10n labels, reading and writing `trackColorModeProvider`. In `_TrackMap`, replace the hard-coded `TrackColorMode.uniform` with `ref.watch(trackColorModeProvider)` in both the `bucketizeTrack` call and the `GpsTrackPolylineLayer` mode, and overlay `TrackColorLegend` bottom-left inside a `Stack` with `speedRangeMps: speedRange(points)`.
+
+- [ ] **Step 9: Run tests to verify they pass**
+
+Run: `flutter test test/features/gps_log/`
+Expected: PASS.
+
+- [ ] **Step 10: Format, analyze, commit**
+
+```bash
+dart format .
+flutter analyze
+git add lib/features/gps_log/ lib/l10n/ test/features/gps_log/
+git commit -m "Add track colorization toggle and colour legend"
+```
+
+---
+
+### Task 12: Dive markers on the track
+
+**Files:**
+- Modify: `lib/features/gps_log/presentation/providers/gps_track_map_providers.dart`
+- Modify: `lib/features/gps_log/presentation/pages/gps_track_detail_page.dart`
+- Test: `test/features/gps_log/dives_on_track_provider_test.dart`
+- Test: `test/features/gps_log/gps_track_detail_markers_test.dart`
+
+**Interfaces:**
+- Consumes: `gpsTrackDetailProvider` (Task 8)
+- Produces:
+  - `divesOnTrackProvider(String trackId)` → `FutureProvider.family<List<Dive>, String>`
+  - `trackForDiveProvider(String diveId)` → `FutureProvider.family<GpsTrack?, String>`
+
+`trackForDiveProvider` is consumed by Phase 4, not here, but both directions of the same relationship belong in one reviewable unit.
+
+Track `startTime`/`endTime` are epoch **milliseconds** and `Dive.dateTime` is a `DateTime`. Compare in the wall-clock-as-UTC frame: a dive belongs to a track when its entry instant falls between the track's start and end.
+
+- [ ] **Step 1: Write the failing provider test**
+
+Create `test/features/gps_log/dives_on_track_provider_test.dart`:
+
+```dart
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:submersion/features/gps_log/data/repositories/gps_track_repository.dart';
+import 'package:submersion/features/gps_log/domain/entities/gps_track.dart';
+import 'package:submersion/features/gps_log/presentation/providers/gps_track_map_providers.dart';
+
+import '../../helpers/test_database.dart';
+
+void main() {
+  late GpsTrackRepository repo;
+
+  setUp(() async {
+    await setUpTestDatabase();
+    repo = GpsTrackRepository();
+  });
+
+  tearDown(tearDownTestDatabase);
+
+  /// A track spanning 08:00 to 12:00 wall-clock on 2026-05-22.
+  Future<String> seedTrack() async {
+    final start = DateTime.utc(2026, 5, 22, 8).millisecondsSinceEpoch;
+    final end = DateTime.utc(2026, 5, 22, 12).millisecondsSinceEpoch;
+    final id = await repo.startTrack(startTimeMs: start, tzOffsetMinutes: 0);
+    await repo.appendBufferPoint(
+      id,
+      GpsTrackPoint(
+        timestamp: start ~/ 1000,
+        latitude: 20.0,
+        longitude: -87.0,
+      ),
+    );
+    await repo.finalizeTrack(id, endTimeMs: end);
+    return id;
+  }
+
+  test('returns only dives whose entry falls inside the track window',
+      () async {
+    final trackId = await seedTrack();
+    // Seed three dives through the dive repository: 07:00 (before),
+    // 09:30 (inside), 13:00 (after). Use the same dive-seeding helper the
+    // existing test/features/gps_log/gps_track_match_service_test.dart uses
+    // so the row shape matches.
+    await seedDive(DateTime.utc(2026, 5, 22, 7));
+    await seedDive(DateTime.utc(2026, 5, 22, 9, 30));
+    await seedDive(DateTime.utc(2026, 5, 22, 13));
+
+    final container = ProviderContainer();
+    addTearDown(container.dispose);
+
+    final dives = await container.read(divesOnTrackProvider(trackId).future);
+    expect(dives.length, 1);
+    expect(dives.single.dateTime.hour, 9);
+  });
+
+  test('returns empty for a track with no dives', () async {
+    final trackId = await seedTrack();
+    final container = ProviderContainer();
+    addTearDown(container.dispose);
+    expect(await container.read(divesOnTrackProvider(trackId).future), isEmpty);
+  });
+
+  test('trackForDiveProvider finds the covering track', () async {
+    final trackId = await seedTrack();
+    final diveId = await seedDive(DateTime.utc(2026, 5, 22, 9, 30));
+
+    final container = ProviderContainer();
+    addTearDown(container.dispose);
+
+    final track = await container.read(trackForDiveProvider(diveId).future);
+    expect(track, isNotNull);
+    expect(track!.id, trackId);
+  });
+
+  test('trackForDiveProvider returns null when no track covers the dive',
+      () async {
+    await seedTrack();
+    final diveId = await seedDive(DateTime.utc(2026, 5, 23, 9, 30));
+
+    final container = ProviderContainer();
+    addTearDown(container.dispose);
+
+    expect(await container.read(trackForDiveProvider(diveId).future), isNull);
+  });
+
+  test('an unfinished track (null endTime) matches no dives', () async {
+    final start = DateTime.utc(2026, 5, 22, 8).millisecondsSinceEpoch;
+    final id = await repo.startTrack(startTimeMs: start, tzOffsetMinutes: 0);
+    await seedDive(DateTime.utc(2026, 5, 22, 9));
+
+    final container = ProviderContainer();
+    addTearDown(container.dispose);
+
+    expect(await container.read(divesOnTrackProvider(id).future), isEmpty);
+  });
+}
+```
+
+Open `test/features/gps_log/gps_track_match_service_test.dart` and lift its dive-seeding helper into a shared `seedDive(DateTime entry)` in `test/helpers/` so both files use one implementation, then import it here.
+
+- [ ] **Step 2: Run test to verify it fails**
+
+Run: `flutter test test/features/gps_log/dives_on_track_provider_test.dart`
+Expected: FAIL — `divesOnTrackProvider` isn't defined.
+
+- [ ] **Step 3: Implement both providers**
+
+Add to `gps_track_map_providers.dart`:
+
+```dart
+/// Dives whose entry instant falls inside [trackId]'s recording window.
+///
+/// Both sides are wall-clock-as-UTC, so they compare directly with no
+/// timezone conversion - that is the whole reason the recorder stores
+/// timestamps this way.
+final divesOnTrackProvider =
+    FutureProvider.family<List<Dive>, String>((ref, trackId) async {
+  final track = await ref.watch(gpsTrackDetailProvider(trackId).future);
+  final endTime = track?.endTime;
+  // An in-progress track has no closed window to test dives against.
+  if (track == null || endTime == null) return const [];
+
+  final dives = await ref.watch(allDivesProvider.future);
+  return [
+    for (final dive in dives)
+      if (_entryMillis(dive) >= track.startTime &&
+          _entryMillis(dive) <= endTime)
+        dive,
+  ];
+});
+
+/// The track, if any, whose window covers [diveId].
+final trackForDiveProvider =
+    FutureProvider.family<GpsTrack?, String>((ref, diveId) async {
+  final dive = await ref.watch(diveByIdProvider(diveId).future);
+  if (dive == null) return null;
+  final entry = _entryMillis(dive);
+
+  final tracks = await ref
+      .watch(gpsTrackRepositoryProvider)
+      .getCompletedTracks(includePoints: false);
+  for (final track in tracks) {
+    final endTime = track.endTime;
+    if (endTime == null) continue;
+    if (entry >= track.startTime && entry <= endTime) {
+      // Hydrate only the one that matched - never decode every blob.
+      return ref.watch(gpsTrackDetailProvider(track.id).future);
+    }
+  }
+  return null;
+});
+
+int _entryMillis(Dive dive) => dive.dateTime.millisecondsSinceEpoch;
+```
+
+Resolve `allDivesProvider` and `diveByIdProvider` to the actual provider names in `lib/features/dive_log/presentation/providers/dive_providers.dart` — grep for them rather than assuming. Add the `Dive` import back to this file.
+
+- [ ] **Step 4: Run test to verify it passes**
+
+Run: `flutter test test/features/gps_log/dives_on_track_provider_test.dart`
+Expected: PASS, 5 tests.
+
+- [ ] **Step 5: Write the failing marker test**
+
+Create `test/features/gps_log/gps_track_detail_markers_test.dart`, using the `_pump` harness from `gps_track_detail_page_test.dart` plus a `divesOnTrackProvider` override returning two dives with `entryLocation` set. Assert:
+
+```dart
+  testWidgets('renders one marker per dive plus start and end', (tester) async {
+    // With 2 dives on the track, expect 2 dive markers, 1 start marker,
+    // 1 end marker = 4 keyed marker children.
+    expect(find.byKey(const ValueKey('track-start-marker')), findsOneWidget);
+    expect(find.byKey(const ValueKey('track-end-marker')), findsOneWidget);
+    expect(find.byKey(const ValueKey('track-dive-marker-dive-1')),
+        findsOneWidget);
+    expect(find.byKey(const ValueKey('track-dive-marker-dive-2')),
+        findsOneWidget);
+  });
+
+  testWidgets('renders no dive markers when the track has none',
+      (tester) async {
+    expect(find.byKey(const ValueKey('track-start-marker')), findsOneWidget);
+    expect(
+      find.byWidgetPredicate(
+        (w) => w.key.toString().contains('track-dive-marker'),
+      ),
+      findsNothing,
+    );
+  });
+```
+
+Write the full harness bodies following the existing file — these assertions are the contract, the pump setup is mechanical.
+
+- [ ] **Step 6: Add the marker layer**
+
+In `_TrackMap`, add a `MarkerLayer` after the polyline layer with a start marker, an end marker, and one marker per dive from `divesOnTrackProvider`. Tapping a dive marker calls `context.push('/dives/${dive.id}')`.
+
+Put keys on the marker **child** via `KeyedSubtree`, never on the `Marker` itself. flutter_map reuses `Marker.key` for every repeated world copy it renders at low zoom, which produces duplicate-keyed siblings in the layer's `Stack`. `dive_locations_map.dart:117-121` documents this exact trap.
+
+- [ ] **Step 7: Run tests, format, analyze, commit**
+
+```bash
+flutter test test/features/gps_log/
+dart format .
+flutter analyze
+git add lib/features/gps_log/ test/features/gps_log/ test/helpers/
+git commit -m "Add dive markers and track-dive association providers"
+```
+
+---
+
+### Task 13: Tap a point to read time, speed, and accuracy
+
+**Files:**
+- Modify: `lib/features/gps_log/presentation/pages/gps_track_detail_page.dart`
+- Create: `lib/features/gps_log/presentation/widgets/track_point_info_card.dart`
+- Modify: `lib/l10n/arb/app_en.arb` plus all locale ARBs
+- Test: `test/features/gps_log/track_point_lookup_test.dart`
+- Test: `test/features/gps_log/gps_track_detail_inspect_test.dart`
+
+**Interfaces:**
+- Consumes: `Polyline.hitValue` from Task 9, `speedMpsBetween` from Task 2
+- Produces:
+  - `({GpsTrackPoint point, double speedMps})? nearestPointInRun({required List<GpsTrackPoint> fullPoints, required TrackRun run, required LatLng tapped})`
+  - `class TrackPointInfoCard extends ConsumerWidget`
+
+**The lookup resolves against the full decoded point list, not the simplified one.** A tap must report a real recorded fix with its real timestamp and accuracy, not whichever survivor of decimation happened to land nearby.
+
+- [ ] **Step 1: Write the failing lookup test**
+
+Create `test/features/gps_log/track_point_lookup_test.dart`:
+
+```dart
+import 'package:flutter_test/flutter_test.dart';
+import 'package:latlong2/latlong.dart';
+import 'package:submersion/features/gps_log/domain/entities/gps_track.dart';
+import 'package:submersion/features/gps_log/domain/track_colorization.dart';
+import 'package:submersion/features/gps_log/presentation/widgets/track_point_info_card.dart';
+
+GpsTrackPoint p(int t, double lat) =>
+    GpsTrackPoint(timestamp: t, latitude: lat, longitude: 0.0, accuracy: 5.0);
+
+void main() {
+  // Full track at 1 Hz; the simplified run keeps only the endpoints.
+  final full = [
+    p(0, 0.0000),
+    p(1, 0.0001),
+    p(2, 0.0002),
+    p(3, 0.0003),
+    p(4, 0.0004),
+  ];
+  final run = TrackRun(points: [full.first, full.last], bucket: 0);
+
+  test('returns a fix that survived decimation only in the full list', () {
+    // Tap nearest to the t=2 fix, which is NOT in the simplified run.
+    final hit = nearestPointInRun(
+      fullPoints: full,
+      run: run,
+      tapped: const LatLng(0.0002, 0.0),
+    );
+    expect(hit, isNotNull);
+    expect(hit!.point.timestamp, 2);
+  });
+
+  test('reports the speed of the leg arriving at that fix', () {
+    final hit = nearestPointInRun(
+      fullPoints: full,
+      run: run,
+      tapped: const LatLng(0.0002, 0.0),
+    );
+    // 0.0001 deg latitude = 11.12 m, over 1 s.
+    expect(hit!.speedMps, closeTo(11.12, 0.05));
+  });
+
+  test('clamps the search to the run span, not the whole track', () {
+    final shortRun = TrackRun(points: [full[0], full[1]], bucket: 0);
+    final hit = nearestPointInRun(
+      fullPoints: full,
+      run: shortRun,
+      tapped: const LatLng(0.0004, 0.0),
+    );
+    // Tapped near t=4, but the run only spans t=0..1, so it clamps to t=1.
+    expect(hit!.point.timestamp, 1);
+  });
+
+  test('returns zero speed for the very first fix', () {
+    final hit = nearestPointInRun(
+      fullPoints: full,
+      run: run,
+      tapped: const LatLng(0.0, 0.0),
+    );
+    expect(hit!.point.timestamp, 0);
+    expect(hit.speedMps, 0.0);
+  });
+
+  test('returns null for an empty run', () {
+    final hit = nearestPointInRun(
+      fullPoints: full,
+      run: const TrackRun(points: [], bucket: 0),
+      tapped: const LatLng(0.0, 0.0),
+    );
+    expect(hit, isNull);
+  });
+}
+```
+
+- [ ] **Step 2: Run test to verify it fails**
+
+Run: `flutter test test/features/gps_log/track_point_lookup_test.dart`
+Expected: FAIL — `nearestPointInRun` isn't defined.
+
+- [ ] **Step 3: Add l10n strings**
+
+```json
+  "gpsTrack_inspect_time": "Time",
+  "@gpsTrack_inspect_time": {"description": "Label for a tapped fix's timestamp"},
+  "gpsTrack_inspect_speed": "Speed",
+  "@gpsTrack_inspect_speed": {"description": "Label for a tapped fix's speed"},
+  "gpsTrack_inspect_accuracy": "Accuracy",
+  "@gpsTrack_inspect_accuracy": {"description": "Label for a tapped fix's GPS accuracy"}
+```
+
+Translate into all locales, then `flutter gen-l10n`.
+
+- [ ] **Step 4: Implement the lookup and the card**
+
+Create `lib/features/gps_log/presentation/widgets/track_point_info_card.dart`:
+
+```dart
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
+import 'package:latlong2/latlong.dart';
+
+import 'package:submersion/core/utils/unit_formatter.dart';
+import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
+import 'package:submersion/core/utils/geo_math.dart';
+import 'package:submersion/features/gps_log/domain/entities/gps_track.dart';
+import 'package:submersion/features/gps_log/domain/track_colorization.dart';
+import 'package:submersion/features/gps_log/domain/track_geometry.dart';
+import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
+import 'package:submersion/l10n/l10n_extension.dart';
+
+/// Finds the recorded fix nearest [tapped] within the span [run] covers.
+///
+/// Searches [fullPoints] rather than the run's own (simplified) points: a tap
+/// must report a real recorded fix with its real timestamp and accuracy, not
+/// whichever survivor of decimation happened to land nearby. The run only
+/// bounds the search window.
+({GpsTrackPoint point, double speedMps})? nearestPointInRun({
+  required List<GpsTrackPoint> fullPoints,
+  required TrackRun run,
+  required LatLng tapped,
+}) {
+  if (run.points.isEmpty || fullPoints.isEmpty) return null;
+
+  final fromTime = run.points.first.timestamp;
+  final toTime = run.points.last.timestamp;
+  final target = GeoPoint(tapped.latitude, tapped.longitude);
+
+  GpsTrackPoint? best;
+  var bestIndex = -1;
+  var bestDistance = double.infinity;
+
+  for (var i = 0; i < fullPoints.length; i++) {
+    final candidate = fullPoints[i];
+    if (candidate.timestamp < fromTime || candidate.timestamp > toTime) {
+      continue;
+    }
+    final d = distanceMeters(toGeoPoint(candidate), target);
+    if (d < bestDistance) {
+      bestDistance = d;
+      best = candidate;
+      bestIndex = i;
+    }
+  }
+
+  if (best == null) return null;
+  final speed = bestIndex > 0
+      ? speedMpsBetween(fullPoints[bestIndex - 1], best)
+      : 0.0;
+  return (point: best, speedMps: speed);
+}
+
+/// Shows the timestamp, speed, and accuracy of a tapped fix.
+class TrackPointInfoCard extends ConsumerWidget {
+  const TrackPointInfoCard({
+    super.key,
+    required this.point,
+    required this.speedMps,
+    required this.onDismiss,
+  });
+
+  final GpsTrackPoint point;
+  final double speedMps;
+  final VoidCallback onDismiss;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
+    final theme = Theme.of(context);
+    final units = UnitFormatter(ref.watch(settingsProvider));
+
+    // Wall-clock-as-UTC: format the UTC components directly. Calling
+    // toLocal() here would shift every displayed time by the viewing
+    // device's offset.
+    final time = DateTime.fromMillisecondsSinceEpoch(
+      point.timestamp * 1000,
+      isUtc: true,
+    );
+
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 12, 8, 12),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    DateFormat.jms().format(time),
+                    style: theme.textTheme.titleMedium,
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    '${l10n.gpsTrack_inspect_speed}: '
+                    '${units.formatSpeed(speedMps)}',
+                    style: theme.textTheme.bodySmall,
+                  ),
+                  if (point.accuracy != null)
+                    Text(
+                      '${l10n.gpsTrack_inspect_accuracy}: '
+                      '${units.formatDistance(point.accuracy!)}',
+                      style: theme.textTheme.bodySmall,
+                    ),
+                ],
+              ),
+            ),
+            IconButton(
+              icon: const Icon(Icons.close),
+              onPressed: onDismiss,
+              tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+```
+
+- [ ] **Step 5: Run test to verify it passes**
+
+Run: `flutter test test/features/gps_log/track_point_lookup_test.dart`
+Expected: PASS, 5 tests.
+
+- [ ] **Step 6: Wire the hit notifier**
+
+In `_TrackMap`, create a `LayerHitNotifier<int> hitNotifier = ValueNotifier(null)` in a `StatefulWidget`, pass it to `GpsTrackPolylineLayer`, and wrap the polyline layer in a `GestureDetector` that on tap reads `hitNotifier.value?.hitValues.firstOrNull`, maps it to `runs[index]`, calls `nearestPointInRun` with `hitNotifier.value!.coordinate`, and stores the result in local state. Render `TrackPointInfoCard` in the `Stack` when set.
+
+Dispose the notifier in `dispose()`.
+
+- [ ] **Step 7: Write and run the widget test**
+
+Create `test/features/gps_log/gps_track_detail_inspect_test.dart` asserting that tapping the map centre (over the drawn line) shows a `TrackPointInfoCard`, and tapping its close button removes it. Use the `_pump` harness from `gps_track_detail_page_test.dart`.
+
+Run: `flutter test test/features/gps_log/`
+Expected: PASS.
+
+- [ ] **Step 8: Format, analyze, commit**
+
+```bash
+dart format .
+flutter analyze
+git add lib/features/gps_log/ lib/l10n/ test/features/gps_log/
+git commit -m "Add tap-to-inspect for recorded track fixes"
+```
+
+---
+
+### Task 14: Track statistics header
+
+**Files:**
+- Create: `lib/features/gps_log/presentation/widgets/track_stats_header.dart`
+- Modify: `lib/features/gps_log/presentation/pages/gps_track_detail_page.dart`
+- Modify: `lib/l10n/arb/app_en.arb` plus all locale ARBs
+- Test: `test/features/gps_log/track_stats_header_test.dart`
+
+**Interfaces:**
+- Consumes: `trackDistanceMeters`, `speedRange` (Tasks 2-3); `divesOnTrackProvider` (Task 12); `UnitFormatter.formatSpeed` (Task 4)
+- Produces: `class TrackStatsHeader extends ConsumerWidget`
+
+- [ ] **Step 1: Add l10n strings**
+
+```json
+  "gpsTrack_stats_distance": "Distance",
+  "@gpsTrack_stats_distance": {"description": "Total along-track distance"},
+  "gpsTrack_stats_duration": "Duration",
+  "@gpsTrack_stats_duration": {"description": "Track recording duration"},
+  "gpsTrack_stats_avgSpeed": "Avg speed",
+  "@gpsTrack_stats_avgSpeed": {"description": "Average speed over the track"},
+  "gpsTrack_stats_maxSpeed": "Max speed",
+  "@gpsTrack_stats_maxSpeed": {"description": "Fastest leg speed on the track"},
+  "gpsTrack_stats_fixes": "Fixes",
+  "@gpsTrack_stats_fixes": {"description": "Count of recorded GPS positions"},
+  "gpsTrack_stats_dives": "Dives",
+  "@gpsTrack_stats_dives": {"description": "Count of dives logged during this track"}
+```
+
+Translate into all locales, then `flutter gen-l10n`.
+
+- [ ] **Step 2: Write the failing test**
+
+Create `test/features/gps_log/track_stats_header_test.dart`:
+
+```dart
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:submersion/features/gps_log/domain/entities/gps_track.dart';
+import 'package:submersion/features/gps_log/presentation/widgets/track_stats_header.dart';
+import 'package:submersion/l10n/arb/app_localizations.dart';
+
+import '../../helpers/mock_providers.dart';
+
+GpsTrackPoint p(int t, double lat) =>
+    GpsTrackPoint(timestamp: t, latitude: lat, longitude: 0.0);
+
+Future<void> _pump(WidgetTester tester, List<GpsTrackPoint> points,
+    {int diveCount = 0}) async {
+  final base = await getBaseOverrides();
+  await tester.binding.setSurfaceSize(const Size(900, 400));
+  addTearDown(() => tester.binding.setSurfaceSize(null));
+  await tester.pumpWidget(
+    ProviderScope(
+      overrides: base,
+      child: MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        home: Scaffold(
+          body: TrackStatsHeader(points: points, diveCount: diveCount),
+        ),
+      ),
+    ),
+  );
+  await tester.pumpAndSettle();
+}
+
+void main() {
+  testWidgets('reports fix count and dive count', (tester) async {
+    await _pump(
+      tester,
+      [p(0, 0.0), p(10, 0.001), p(20, 0.002)],
+      diveCount: 2,
+    );
+    expect(find.text('3'), findsOneWidget);
+    expect(find.text('2'), findsOneWidget);
+  });
+
+  testWidgets('renders zeroed stats for an empty track without throwing',
+      (tester) async {
+    await _pump(tester, const []);
+    expect(find.byType(TrackStatsHeader), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('renders a single-fix track without dividing by zero',
+      (tester) async {
+    await _pump(tester, [p(0, 0.0)]);
+    expect(tester.takeException(), isNull);
+  });
+}
+```
+
+- [ ] **Step 3: Run test to verify it fails**
+
+Run: `flutter test test/features/gps_log/track_stats_header_test.dart`
+Expected: FAIL — `TrackStatsHeader` isn't defined.
+
+- [ ] **Step 4: Implement the header**
+
+Create `lib/features/gps_log/presentation/widgets/track_stats_header.dart` as a horizontally scrollable row of label/value pairs. Compute distance with `trackDistanceMeters`, duration from first-to-last timestamp, average speed as distance over duration (guarding zero duration), and max speed from `speedRange`. Format distance with `units.formatDistance` and both speeds with `units.formatSpeed`.
+
+Wrap the row in `SingleChildScrollView(scrollDirection: Axis.horizontal)` so six stat tiles never overflow on a narrow phone.
+
+- [ ] **Step 5: Mount it on the detail page**
+
+Add `TrackStatsHeader` above the map in `GpsTrackDetailPage`, passing `points` and `divesOnTrackProvider(trackId).value?.length ?? 0`.
+
+- [ ] **Step 6: Run tests, format, analyze, commit**
+
+```bash
+flutter test test/features/gps_log/
+dart format .
+flutter analyze
+git add lib/features/gps_log/ lib/l10n/ test/features/gps_log/
+git commit -m "Add track statistics header to the detail page"
+```
+
+---
+
+**Phase 2 complete.** A diver can open a recorded track, see the path drawn on a map, colorize it by speed or elapsed time, see where their dives happened, tap any point for time and speed, and read the day's totals.
+
+```bash
+flutter test
+flutter analyze
 ```
 
 ---
