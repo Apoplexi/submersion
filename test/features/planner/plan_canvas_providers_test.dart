@@ -9,8 +9,10 @@ import 'package:submersion/features/settings/presentation/providers/settings_pro
 
 class _TestSettingsNotifier extends StateNotifier<AppSettings>
     implements SettingsNotifier {
-  _TestSettingsNotifier({int gfLow = 50, int gfHigh = 85})
-    : super(AppSettings(gfLow: gfLow, gfHigh: gfHigh));
+  // Null means "leave at the AppSettings default", so these fixtures cannot
+  // drift away from the real defaults.
+  _TestSettingsNotifier({int? gfLow, int? gfHigh})
+    : super(const AppSettings().copyWith(gfLow: gfLow, gfHigh: gfHigh));
 
   @override
   Future<void> setMapStyle(MapStyle style) async =>
@@ -20,7 +22,7 @@ class _TestSettingsNotifier extends StateNotifier<AppSettings>
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
-ProviderContainer _container({int gfLow = 50, int gfHigh = 85}) {
+ProviderContainer _container({int? gfLow, int? gfHigh}) {
   final container = ProviderContainer(
     overrides: [
       settingsProvider.overrideWith(

@@ -12,13 +12,16 @@ import 'package:submersion/features/settings/presentation/providers/settings_pro
 
 class _TestSettingsNotifier extends StateNotifier<AppSettings>
     implements SettingsNotifier {
-  _TestSettingsNotifier({
-    PressureUnit pressureUnit = PressureUnit.bar,
-    int gfLow = 50,
-    int gfHigh = 85,
-  }) : super(
-         AppSettings(pressureUnit: pressureUnit, gfLow: gfLow, gfHigh: gfHigh),
-       );
+  // Null means "leave at the AppSettings default", so these fixtures cannot
+  // drift away from the real defaults.
+  _TestSettingsNotifier({PressureUnit? pressureUnit, int? gfLow, int? gfHigh})
+    : super(
+        const AppSettings().copyWith(
+          pressureUnit: pressureUnit,
+          gfLow: gfLow,
+          gfHigh: gfHigh,
+        ),
+      );
 
   void updatePressureUnitForTest(PressureUnit unit) {
     state = state.copyWith(pressureUnit: unit);
@@ -223,6 +226,29 @@ void main() {
       final state = container.read(divePlanNotifierProvider);
       expect(state.gfLow, 10);
       expect(state.gfHigh, 20);
+    });
+
+    test('plan results follow the plan gradient factors, not the settings', () {
+      // Settings stay liberal throughout; only the plan's own factors move.
+      int ttsForPlanFactors(int low, int high) {
+        final container = ProviderContainer(
+          overrides: [
+            settingsProvider.overrideWith(
+              (ref) => _TestSettingsNotifier(gfLow: 90, gfHigh: 95),
+            ),
+          ],
+        );
+        addTearDown(container.dispose);
+
+        final notifier = container.read(divePlanNotifierProvider.notifier);
+        notifier.addSimplePlan(maxDepth: 45.0, bottomTimeMinutes: 25);
+        notifier.updateGradientFactors(low, high);
+        return container.read(planResultsProvider).ttsAtBottom;
+      }
+
+      // planIsValidProvider gates convert-to-dive off these results, so they
+      // have to describe the plan the diver is actually looking at.
+      expect(ttsForPlanFactors(20, 55), greaterThan(ttsForPlanFactors(90, 95)));
     });
 
     test('newPlan uses gradient factor fallback when no callback provided', () {

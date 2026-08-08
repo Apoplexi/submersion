@@ -82,22 +82,39 @@ class DivePlanNotifier extends StateNotifier<DivePlanState> {
   /// production caller must set [_loaded] as [loadPlanById] does.
   bool get isPersisted => _loaded != null;
 
-  DivePlanNotifier(
-    this._calculator, {
+  /// Resolves each defaulted source once, so the initial plan and every later
+  /// [newPlan] are provably built from the same one. Dart forbids reading a
+  /// field in an initializer list, so without this hop the private constructor
+  /// would have to repeat each `??` in its `super` call.
+  factory DivePlanNotifier(
+    PlanCalculatorService calculator, {
     double reservePressure = DivePlanState.kDefaultReservePressureBar,
     double Function()? getDefaultReservePressure,
     PlanGradientFactors Function()? getDefaultGradientFactors,
     DivePlanRepository? repository,
-  }) : _getDefaultReservePressure =
-           getDefaultReservePressure ?? (() => reservePressure),
-       _getDefaultGradientFactors =
-           getDefaultGradientFactors ?? _fallbackGradientFactors,
+  }) {
+    return DivePlanNotifier._(
+      calculator,
+      getDefaultReservePressure:
+          getDefaultReservePressure ?? (() => reservePressure),
+      getDefaultGradientFactors:
+          getDefaultGradientFactors ?? _fallbackGradientFactors,
+      repository: repository,
+    );
+  }
+
+  DivePlanNotifier._(
+    this._calculator, {
+    required double Function() getDefaultReservePressure,
+    required PlanGradientFactors Function() getDefaultGradientFactors,
+    DivePlanRepository? repository,
+  }) : _getDefaultReservePressure = getDefaultReservePressure,
+       _getDefaultGradientFactors = getDefaultGradientFactors,
        _repository = repository,
        super(
          _createInitialState(
-           reservePressure: reservePressure,
-           getGradientFactors:
-               getDefaultGradientFactors ?? _fallbackGradientFactors,
+           reservePressure: getDefaultReservePressure(),
+           getGradientFactors: getDefaultGradientFactors,
          ),
        );
 
@@ -105,9 +122,8 @@ class DivePlanNotifier extends StateNotifier<DivePlanState> {
       (low: DivePlanState.kFallbackGfLow, high: DivePlanState.kFallbackGfHigh);
 
   static DivePlanState _createInitialState({
-    double reservePressure = DivePlanState.kDefaultReservePressureBar,
-    PlanGradientFactors Function() getGradientFactors =
-        _fallbackGradientFactors,
+    required double reservePressure,
+    required PlanGradientFactors Function() getGradientFactors,
   }) {
     final now = DateTime.now();
     final gradientFactors = getGradientFactors();
@@ -676,9 +692,17 @@ final divePlanNotifierProvider =
 /// Provider for auto-calculated plan results.
 ///
 /// This automatically recalculates whenever the plan state changes.
+///
+/// The gradient factors come from the plan, not the settings: the plan is
+/// seeded from the diver's settings but is editable per plan, and
+/// [planIsValidProvider] gates convert-to-dive off these results. Computing
+/// them on the settings pair would judge a plan by factors it is not using,
+/// and diverge from [planOutcomeProvider], which the canvas displays.
 final planResultsProvider = Provider<PlanResult>((ref) {
   final state = ref.watch(divePlanNotifierProvider);
-  final calculator = ref.watch(planCalculatorServiceProvider);
+  final calculator = ref
+      .watch(planCalculatorServiceProvider)
+      .withGradientFactors(state.gfLow, state.gfHigh);
 
   if (state.segments.isEmpty) {
     return PlanResult.empty();
