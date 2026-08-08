@@ -65,18 +65,31 @@ void main() {
       verifyNever(mockPicker.getAssetsInDateRange(any, any));
     });
 
+    test('a cache hit costs no platform round-trip', () async {
+      // The cached mapping is trusted rather than proven with a speculative
+      // 50px fetch whose bytes are discarded. Staleness is detected by the
+      // caller's real thumbnail fetch, which learns the same thing for free;
+      // the old pre-check doubled every tile's PhotoKit traffic. Measured on a
+      // 434-photo library: 1,568 verify round-trips costing 150s of wall time.
+      when(mockPicker.supportsGalleryBrowsing).thenReturn(true);
+      when(
+        mockCache.getCachedAssetId('media-1'),
+      ).thenAnswer((_) async => 'cached-local-id');
+
+      final result = await service.resolveAssetId(createTestItem());
+
+      expect(result.localAssetId, equals('cached-local-id'));
+      expect(result.status, equals(ResolutionStatus.resolved));
+      verifyNever(mockPicker.getThumbnail(any, size: anyNamed('size')));
+      verifyNever(mockPicker.getAssetsInDateRange(any, any));
+    });
+
     test(
-      'clears cache and re-resolves when cached ID is no longer loadable',
+      'reresolve clears the stale mapping and re-resolves from the gallery',
       () async {
         when(mockPicker.supportsGalleryBrowsing).thenReturn(true);
-        when(
-          mockCache.getCachedAssetId('media-1'),
-        ).thenAnswer((_) async => 'stale-cached-id');
-        // The cached asset is no longer loadable
-        when(
-          mockPicker.getThumbnail('stale-cached-id', size: 50),
-        ).thenAnswer((_) async => null);
-        // After clearing, no cache entry
+        // The caller reached here because the real thumbnail fetch for the
+        // cached id came back empty, so the mapping is known to be stale.
         when(mockCache.getCacheEntry('media-1')).thenAnswer((_) async => null);
         // The original ID also doesn't work
         when(
@@ -107,7 +120,7 @@ void main() {
           ),
         ).thenAnswer((_) async {});
 
-        final result = await service.resolveAssetId(createTestItem());
+        final result = await service.reresolve(createTestItem());
 
         // Should have cleared the stale cache entry
         verify(mockCache.clearEntry('media-1')).called(1);

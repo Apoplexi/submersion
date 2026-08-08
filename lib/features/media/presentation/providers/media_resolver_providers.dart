@@ -10,6 +10,7 @@ import 'package:submersion/features/media/data/resolvers/local_file_resolver.dar
 import 'package:submersion/features/media/data/resolvers/platform_gallery_resolver.dart';
 import 'package:submersion/features/media/data/resolvers/signature_resolver.dart';
 import 'package:submersion/features/media/data/services/exif_extractor.dart';
+import 'package:submersion/features/media/data/services/gallery_thumbnail_cache.dart';
 import 'package:submersion/features/media/data/services/local_bookmark_storage.dart';
 import 'package:submersion/features/media/data/services/local_files_diagnostics_service.dart';
 import 'package:submersion/features/media/data/services/local_media_platform.dart';
@@ -36,7 +37,18 @@ import 'package:submersion/features/media_store/presentation/providers/media_sto
 final platformGalleryResolverProvider = Provider<PlatformGalleryResolver>(
   (ref) => PlatformGalleryResolver(
     resolutionService: ref.watch(assetResolutionServiceProvider),
+    thumbnailCache: ref.watch(galleryThumbnailCacheProvider),
   ),
+);
+
+/// Process-wide thumbnail memo + PhotoKit concurrency gate.
+///
+/// Deliberately its own provider rather than a field constructed inside
+/// [platformGalleryResolverProvider]: the cache is only worth having if it
+/// outlives resolver rebuilds, and keeping it separate also lets diagnostics
+/// and gallery-change handlers reach it to [GalleryThumbnailCache.clear] it.
+final galleryThumbnailCacheProvider = Provider<GalleryThumbnailCache>(
+  (ref) => GalleryThumbnailCache(),
 );
 
 /// Singleton [SignatureResolver].
