@@ -5569,7 +5569,7 @@
     }
   },
   "trips_diveScan_noMatches": "Nessuna immersione corrispondente trovata",
-  "trips_diveScan_noDiver": "Assegna un subacqueo a questo viaggio per cercare le immersioni",
+  "trips_diveScan_noDiver": "Seleziona un subacqueo attivo per cercare le immersioni",
   "trips_diveScan_selectAll": "Seleziona tutto",
   "trips_diveScan_subtitle": "{count} immersioni trovate nell'intervallo di date",
   "@trips_diveScan_subtitle": {

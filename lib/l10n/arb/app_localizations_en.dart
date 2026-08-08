@@ -17257,7 +17257,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get trips_diveScan_noDiver =>
-      'Assign a diver to this trip to scan for dives';
+      'Select an active diver to scan for dives';
 
   @override
   String get trips_diveScan_selectAll => 'Select all';

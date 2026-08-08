@@ -17562,7 +17562,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get trips_diveScan_noDiver =>
-      'Assegna un subacqueo a questo viaggio per cercare le immersioni';
+      'Seleziona un subacqueo attivo per cercare le immersioni';
 
   @override
   String get trips_diveScan_selectAll => 'Seleziona tutto';

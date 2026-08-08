@@ -5473,7 +5473,7 @@
   "trips_diveScan_groupOtherTrips": "在其他旅行中（{count}）",
   "trips_diveScan_groupUnassigned": "未分配（{count}）",
   "trips_diveScan_noMatches": "未找到匹配的潜水",
-  "trips_diveScan_noDiver": "为此行程指定潜水员以扫描潜水记录",
+  "trips_diveScan_noDiver": "请选择当前潜水员以扫描潜水记录",
   "trips_diveScan_selectAll": "全选",
   "trips_diveScan_subtitle": "在日期范围内找到 {count} 次潜水",
   "trips_diveScan_title": "将潜水添加到旅行",

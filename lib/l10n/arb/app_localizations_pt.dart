@@ -17573,7 +17573,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get trips_diveScan_noDiver =>
-      'Atribua um mergulhador a esta viagem para procurar mergulhos';
+      'Selecione um mergulhador ativo para procurar mergulhos';
 
   @override
   String get trips_diveScan_selectAll => 'Selecionar tudo';

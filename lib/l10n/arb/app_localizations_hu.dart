@@ -17510,7 +17510,7 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get trips_diveScan_noDiver =>
-      'Rendelj egy búvárt ehhez az úthoz a merülések kereséséhez';
+      'Válassz ki egy aktív búvárt a merülések kereséséhez';
 
   @override
   String get trips_diveScan_selectAll => 'Osszes kivalasztasa';

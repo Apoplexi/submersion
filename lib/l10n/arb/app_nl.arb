@@ -5645,7 +5645,7 @@
     }
   },
   "trips_diveScan_noMatches": "Geen overeenkomende duiken gevonden",
-  "trips_diveScan_noDiver": "Wijs een duiker toe aan deze reis om naar duiken te zoeken",
+  "trips_diveScan_noDiver": "Selecteer een actieve duiker om naar duiken te zoeken",
   "trips_diveScan_selectAll": "Alles selecteren",
   "trips_diveScan_subtitle": "{count} duiken gevonden in het datumbereik",
   "@trips_diveScan_subtitle": {
