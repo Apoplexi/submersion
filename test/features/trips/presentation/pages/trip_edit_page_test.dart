@@ -739,6 +739,93 @@ void main() {
       expect(find.text('Trip updated successfully'), findsOneWidget);
     });
 
+    testWidgets('save with unchanged dates runs no scan and no diver lookup', (
+      tester,
+    ) async {
+      final repo = _RecordingScanRepo();
+      var diverLookups = 0;
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            tripRepositoryProvider.overrideWithValue(repo),
+            tripListNotifierProvider.overrideWith(
+              (ref) => _MockTripListNotifier([]),
+            ),
+            validatedCurrentDiverIdProvider.overrideWith((ref) async {
+              diverLookups++;
+              return 'MAB';
+            }),
+          ],
+          child: const MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: TripEditPage(tripId: 'test-id'),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      // Edit the name only, leaving both dates alone.
+      await tester.enterText(
+        find.widgetWithText(TextFormField, 'Trip Name *'),
+        'Updated Name',
+      );
+      await tester.tap(find.text('Save'));
+      await tester.pumpAndSettle();
+
+      expect(repo.scanCalls, 0);
+      // The trip already has an owner, so the `??` at the top of _saveTrip
+      // short-circuits and never resolves the provider. That leaves the scan
+      // as the only possible reader, and it must not run for unchanged dates.
+      expect(diverLookups, 0);
+    });
+
+    testWidgets(
+      'post-save scan searches the active diver, not the trip owner',
+      (tester) async {
+        // Trip is owned by BAB but shared with, and being edited by, MAB.
+        final repo = _RecordingScanRepo();
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              tripRepositoryProvider.overrideWithValue(repo),
+              tripListNotifierProvider.overrideWith(
+                (ref) => _MockTripListNotifier([]),
+              ),
+              validatedCurrentDiverIdProvider.overrideWith(
+                (ref) async => 'MAB',
+              ),
+            ],
+            child: const MaterialApp(
+              localizationsDelegates: AppLocalizations.localizationsDelegates,
+              supportedLocales: AppLocalizations.supportedLocales,
+              home: TripEditPage(tripId: 'test-id'),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        // Move the start date so the post-save scan is triggered.
+        await tester.tap(find.text('Start Date'));
+        await tester.pumpAndSettle();
+        await tester.tap(
+          find.descendant(
+            of: find.byType(DatePickerDialog),
+            matching: find.text('18'),
+          ),
+        );
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('OK'));
+        await tester.pumpAndSettle();
+
+        await tester.tap(find.text('Save'));
+        await tester.pumpAndSettle();
+
+        expect(repo.scanCalls, 1);
+        // Ownership stays with BAB; the dives searched belong to the viewer.
+        expect(repo.scannedDiverId, 'MAB');
+      },
+    );
+
     testWidgets('save errors show error snackbar', (tester) async {
       final notifier = _ThrowingTripListNotifier();
       await tester.pumpWidget(
@@ -1377,6 +1464,37 @@ class _MockTripRepository implements TripRepository {
 }
 
 /// Mock repository that returns a test trip
+/// Existing trip owned by another diver, recording which diver the post-save
+/// scan actually queries. Mirrors the shared-trip case from issue #891.
+class _RecordingScanRepo extends _MockTripRepositoryWithTrip {
+  String? scannedDiverId;
+  int scanCalls = 0;
+
+  @override
+  Future<Trip?> getTripById(String id) async => Trip(
+    id: 'test-id',
+    diverId: 'BAB',
+    name: 'Existing Trip',
+    startDate: DateTime(2024, 1, 15),
+    endDate: DateTime(2024, 1, 22),
+    location: 'Test Location',
+    createdAt: DateTime.now(),
+    updatedAt: DateTime.now(),
+  );
+
+  @override
+  Future<List<DiveCandidate>> findCandidateDivesForTrip({
+    required String tripId,
+    required DateTime startDate,
+    required DateTime endDate,
+    required String diverId,
+  }) async {
+    scanCalls++;
+    scannedDiverId = diverId;
+    return [];
+  }
+}
+
 class _MockTripRepositoryWithTrip implements TripRepository {
   @override
   Future<Trip> createTrip(Trip trip) async => trip;
