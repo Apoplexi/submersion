@@ -103,4 +103,40 @@ void main() {
     expect(lines.single.x, 90);
     expect(lines.single.dashArray, isNotNull);
   });
+
+  // A finding can outlive the displayed axis: on a multi-source dive the
+  // chart may show a shorter source than the one the findings were computed
+  // from. fl_chart asserts on out-of-bounds annotations, so the guard must
+  // drop the highlight entirely instead of crashing.
+  testWidgets('a range highlight beyond the profile renders nothing', (
+    tester,
+  ) async {
+    await pumpChart(
+      tester,
+      highlightRange: const ProfileHighlightRange(
+        startTimestamp: 400,
+        endTimestamp: 500,
+        color: Colors.teal,
+      ),
+    );
+    final data = chartData(tester);
+    expect(data.rangeAnnotations.verticalRangeAnnotations, isEmpty);
+    expect(data.extraLinesData.verticalLines, isEmpty);
+  });
+
+  testWidgets('an instant highlight beyond the profile renders nothing', (
+    tester,
+  ) async {
+    await pumpChart(
+      tester,
+      highlightRange: const ProfileHighlightRange(
+        startTimestamp: 400,
+        endTimestamp: 400,
+        color: Colors.teal,
+      ),
+    );
+    final data = chartData(tester);
+    expect(data.rangeAnnotations.verticalRangeAnnotations, isEmpty);
+    expect(data.extraLinesData.verticalLines, isEmpty);
+  });
 }
