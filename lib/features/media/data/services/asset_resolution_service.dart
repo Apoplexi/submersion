@@ -299,6 +299,45 @@ class AssetResolutionService {
     }
   }
 
+  /// The 1-minute local bucket enclosing [start]..[end], used both as the
+  /// gallery query window and as the coalescing cache key.
+  ///
+  /// **`toLocal()` is the load-bearing part.** `DateTime(y, m, d, h, min)`
+  /// always builds a LOCAL instant out of whatever calendar fields it is
+  /// handed, so feeding it a UTC `DateTime` silently reinterprets those UTC
+  /// fields as local -- shifting the window by the whole UTC offset. That is
+  /// exactly the transformation [_galleryReadings] applies to produce its
+  /// *restated* reading, so without this conversion both readings collapsed
+  /// onto the same bucket and the RAW-instant reading was never queried at
+  /// all. On this developer's library that silently stranded 112 of 116
+  /// unresolvable rows: every one had exactly one matching asset sitting in
+  /// the Photos library at its raw capture second, 4-5 hours outside the only
+  /// window ever searched.
+  ///
+  /// Note the bug is invisible at UTC, where the two readings coincide -- see
+  /// the tests for what that means for coverage.
+  static (DateTime, DateTime) galleryQueryBucket(DateTime start, DateTime end) {
+    final localStart = start.toLocal();
+    final localEnd = end.toLocal();
+    return (
+      DateTime(
+        localStart.year,
+        localStart.month,
+        localStart.day,
+        localStart.hour,
+        localStart.minute,
+      ),
+      // minute + 1 so the bucket encloses `end`; Dart normalises the overflow.
+      DateTime(
+        localEnd.year,
+        localEnd.month,
+        localEnd.day,
+        localEnd.hour,
+        localEnd.minute + 1,
+      ),
+    );
+  }
+
   /// Get gallery assets for a time range, coalescing concurrent queries.
   ///
   /// When opening a dive with many photos, all providers fire near-simultaneously
@@ -308,22 +347,7 @@ class AssetResolutionService {
     DateTime start,
     DateTime end,
   ) async {
-    // Round to 1-minute buckets to maximize cache hits across photos
-    // from the same dive (whose +-5s windows will overlap heavily)
-    final bucketStart = DateTime(
-      start.year,
-      start.month,
-      start.day,
-      start.hour,
-      start.minute,
-    );
-    final bucketEnd = DateTime(
-      end.year,
-      end.month,
-      end.day,
-      end.hour,
-      end.minute + 1,
-    );
+    final (bucketStart, bucketEnd) = galleryQueryBucket(start, end);
     final cacheKey =
         '${bucketStart.millisecondsSinceEpoch}~${bucketEnd.millisecondsSinceEpoch}';
 

@@ -407,6 +407,62 @@ void main() {
     });
   });
 
+  group('galleryQueryBucket', () {
+    // These lock the instant-preserving contract. Be aware that the bug they
+    // were written for -- reinterpreting a UTC DateTime's calendar fields as
+    // local -- is INVISIBLE on a host running at UTC, where the two readings
+    // coincide. CI runs Linux at UTC, so these pass there either way; they
+    // genuinely discriminate only off-UTC. Keeping them anyway: they document
+    // and pin the contract, and the last assertion below fails everywhere if
+    // the toLocal() calls are removed and replaced with field copying.
+    test('a UTC input lands in a bucket that still contains that instant', () {
+      final instant = DateTime.utc(2026, 12, 27, 14, 2, 36);
+      final (start, end) = AssetResolutionService.galleryQueryBucket(
+        instant.subtract(const Duration(seconds: 5)),
+        instant.add(const Duration(seconds: 5)),
+      );
+
+      expect(start.isAfter(instant), isFalse);
+      expect(end.isBefore(instant), isFalse);
+    });
+
+    test('the same instant buckets identically however it is expressed', () {
+      // A UTC DateTime and its toLocal() twin are the SAME instant, so they
+      // must produce the same query window. Under the old field-copying code
+      // they produced windows a whole UTC offset apart, which is what stranded
+      // the raw-instant reading.
+      final utc = DateTime.utc(2026, 12, 27, 14, 2, 36);
+      final local = utc.toLocal();
+
+      final fromUtc = AssetResolutionService.galleryQueryBucket(utc, utc);
+      final fromLocal = AssetResolutionService.galleryQueryBucket(local, local);
+
+      expect(fromUtc.$1, equals(fromLocal.$1));
+      expect(fromUtc.$2, equals(fromLocal.$2));
+    });
+
+    test('the bucket is always a local DateTime, whatever went in', () {
+      // The gallery API takes local bounds; handing it a UTC DateTime is how
+      // the window drifted in the first place.
+      final (start, end) = AssetResolutionService.galleryQueryBucket(
+        DateTime.utc(2026, 12, 27, 14, 2, 36),
+        DateTime.utc(2026, 12, 27, 14, 2, 46),
+      );
+
+      expect(start.isUtc, isFalse);
+      expect(end.isUtc, isFalse);
+    });
+
+    test('the end bucket rolls over the hour correctly', () {
+      final (_, end) = AssetResolutionService.galleryQueryBucket(
+        DateTime(2026, 12, 27, 14, 59, 55),
+        DateTime(2026, 12, 27, 14, 59, 58),
+      );
+
+      expect(end, equals(DateTime(2026, 12, 27, 15, 0)));
+    });
+  });
+
   group('matchByFilenameAndTimestamp (tier 1)', () {
     test('matches single asset with same filename and close timestamp', () {
       final item = createTestItem(

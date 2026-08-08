@@ -152,7 +152,7 @@ class LocalCacheDatabase extends _$LocalCacheDatabase {
   LocalCacheDatabase(super.e);
 
   @override
-  int get schemaVersion => 9;
+  int get schemaVersion => 10;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -198,6 +198,26 @@ class LocalCacheDatabase extends _$LocalCacheDatabase {
       if (from < 9) {
         await m.createTable(watchedRoots);
         await m.createTable(watchedFolderIndex);
+      }
+      // v10: drop poisoned negative resolutions. The gallery search window was
+      // computed by copying a UTC DateTime's calendar fields into a LOCAL
+      // DateTime, which shifted it by the whole UTC offset and meant the
+      // raw-instant reading of taken_at was never actually queried. Rows that
+      // only match on that reading were therefore recorded `unresolved` and
+      // locked behind a 24h/3d/7d backoff, so the fix would not take effect
+      // for up to a week. These entries are a pure derived negative cache --
+      // deleting them costs one gallery re-scan each and nothing else.
+      //
+      // Resolved mappings are deliberately left alone: they are correct, and
+      // re-deriving them would cost a full gallery scan per row for nothing.
+      //
+      // No beforeOpen backstop, unlike the createTable steps above: if a
+      // ladder collision skips this, the only consequence is that the stale
+      // negatives expire on their own within 7 days.
+      if (from < 10) {
+        await customStatement(
+          "DELETE FROM local_asset_cache WHERE resolution_method = 'unresolved'",
+        );
       }
     },
     beforeOpen: (details) async {
