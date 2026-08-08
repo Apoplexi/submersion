@@ -74,4 +74,127 @@ void main() {
       expect(result.map((e) => e.timestamp).toList(), [100, 200, 300]);
     });
   });
+
+  group('windowTrack', () {
+    final points = [
+      p(0.0, 0.0, t: 100),
+      p(0.0, 0.001, t: 200),
+      p(0.0, 0.002, t: 300),
+      p(0.0, 0.003, t: 400),
+    ];
+
+    test('includes points inside the window inclusively', () {
+      final result = windowTrack(
+        points,
+        fromEpochSeconds: 200,
+        toEpochSeconds: 300,
+      );
+      expect(result.map((e) => e.timestamp).toList(), [200, 300]);
+    });
+
+    test('returns everything when the window spans the track', () {
+      final result = windowTrack(
+        points,
+        fromEpochSeconds: 0,
+        toEpochSeconds: 1000,
+      );
+      expect(result.length, 4);
+    });
+
+    test('returns empty when the window misses the track entirely', () {
+      final result = windowTrack(
+        points,
+        fromEpochSeconds: 500,
+        toEpochSeconds: 600,
+      );
+      expect(result, isEmpty);
+    });
+
+    test('handles an inverted window by returning empty', () {
+      final result = windowTrack(
+        points,
+        fromEpochSeconds: 300,
+        toEpochSeconds: 200,
+      );
+      expect(result, isEmpty);
+    });
+  });
+
+  group('trackBounds', () {
+    test('returns null for an empty track', () {
+      expect(trackBounds(const []), isNull);
+    });
+
+    test('computes a simple bounding box', () {
+      final bounds = trackBounds([p(10.0, 20.0), p(12.0, 25.0), p(11.0, 22.0)]);
+      expect(bounds!.minLat, 10.0);
+      expect(bounds.maxLat, 12.0);
+      expect(bounds.minLon, 20.0);
+      expect(bounds.maxLon, 25.0);
+    });
+
+    test('collapses to a point for a single fix', () {
+      final bounds = trackBounds([p(5.0, -3.0)]);
+      expect(bounds!.minLat, 5.0);
+      expect(bounds.maxLat, 5.0);
+      expect(bounds.minLon, -3.0);
+      expect(bounds.maxLon, -3.0);
+    });
+
+    test('normalizes an antimeridian crossing to a narrow span', () {
+      // 179.9 E to 179.9 W is 0.2 deg wide, not 359.8. The unwrapped
+      // maxLon exceeds 180, which is what the camera fit expects.
+      final bounds = trackBounds([p(0.0, 179.9), p(0.0, -179.9)]);
+      expect(bounds!.maxLon - bounds.minLon, closeTo(0.2, 1e-9));
+      expect(bounds.minLon, closeTo(179.9, 1e-9));
+      expect(bounds.maxLon, closeTo(180.1, 1e-9));
+    });
+
+    test(
+      'does not unwrap a track that merely spans a wide longitude range',
+      () {
+        // A genuine 60 deg span must stay 60 deg, not get folded.
+        final bounds = trackBounds([p(0.0, -30.0), p(0.0, 30.0)]);
+        expect(bounds!.minLon, -30.0);
+        expect(bounds.maxLon, 30.0);
+      },
+    );
+  });
+
+  group('speedMpsBetween', () {
+    test('computes metres per second over the elapsed time', () {
+      // 0.001 deg latitude = 111.19 m, over 10 s = 11.119 m/s
+      final a = p(0.0, 0.0, t: 0);
+      final b = p(0.001, 0.0, t: 10);
+      expect(speedMpsBetween(a, b), closeTo(11.12, 0.02));
+    });
+
+    test('returns zero when no time elapsed', () {
+      final a = p(0.0, 0.0, t: 50);
+      final b = p(0.001, 0.0, t: 50);
+      expect(speedMpsBetween(a, b), 0.0);
+    });
+
+    test(
+      'returns zero for a backwards timestamp rather than a negative speed',
+      () {
+        final a = p(0.0, 0.0, t: 100);
+        final b = p(0.001, 0.0, t: 50);
+        expect(speedMpsBetween(a, b), 0.0);
+      },
+    );
+  });
+
+  group('trackDistanceMeters', () {
+    test('sums consecutive leg distances', () {
+      // Two legs of 0.001 deg latitude each = 2 * 111.19 m
+      final points = [p(0.0, 0.0), p(0.001, 0.0), p(0.002, 0.0)];
+      expect(trackDistanceMeters(points), closeTo(222.39, 0.1));
+    });
+
+    test('is zero for fewer than two points', () {
+      expect(trackDistanceMeters(const []), 0.0);
+      expect(trackDistanceMeters([p(1, 1)]), 0.0);
+    });
+  });
 }

@@ -108,3 +108,81 @@ List<GpsTrackPoint> simplifyTrack(
 
 /// Converts a track point to the [GeoPoint] the shared geo helpers take.
 GeoPoint toGeoPoint(GpsTrackPoint p) => GeoPoint(p.latitude, p.longitude);
+
+/// Points whose timestamp falls within [fromEpochSeconds]..[toEpochSeconds]
+/// inclusive. Both bounds are wall-clock-as-UTC epoch SECONDS.
+List<GpsTrackPoint> windowTrack(
+  List<GpsTrackPoint> points, {
+  required int fromEpochSeconds,
+  required int toEpochSeconds,
+}) {
+  if (fromEpochSeconds > toEpochSeconds) return const [];
+  return List.unmodifiable([
+    for (final p in points)
+      if (p.timestamp >= fromEpochSeconds && p.timestamp <= toEpochSeconds) p,
+  ]);
+}
+
+/// Bounding box of [points], or null when empty.
+///
+/// Longitudes are unwrapped across the antimeridian: a track running from
+/// 179.9 E to 179.9 W reports minLon 179.9 and maxLon 180.1 (a 0.2 deg span)
+/// rather than the 359.8 deg span a naive min/max would produce, which would
+/// fit the camera to the entire globe.
+({double minLat, double maxLat, double minLon, double maxLon})? trackBounds(
+  List<GpsTrackPoint> points,
+) {
+  if (points.isEmpty) return null;
+
+  var minLat = points.first.latitude;
+  var maxLat = points.first.latitude;
+  for (final p in points) {
+    if (p.latitude < minLat) minLat = p.latitude;
+    if (p.latitude > maxLat) maxLat = p.latitude;
+  }
+
+  var minLon = points.first.longitude;
+  var maxLon = points.first.longitude;
+  for (final p in points) {
+    if (p.longitude < minLon) minLon = p.longitude;
+    if (p.longitude > maxLon) maxLon = p.longitude;
+  }
+
+  // A raw span wider than half the globe means the track almost certainly
+  // wraps the antimeridian rather than genuinely circling the planet. Re-run
+  // the extent with western longitudes shifted into a continuous frame.
+  if (maxLon - minLon > 180.0) {
+    var shiftedMin = double.infinity;
+    var shiftedMax = double.negativeInfinity;
+    for (final p in points) {
+      final lon = p.longitude < 0 ? p.longitude + 360.0 : p.longitude;
+      if (lon < shiftedMin) shiftedMin = lon;
+      if (lon > shiftedMax) shiftedMax = lon;
+    }
+    minLon = shiftedMin;
+    maxLon = shiftedMax;
+  }
+
+  return (minLat: minLat, maxLat: maxLat, minLon: minLon, maxLon: maxLon);
+}
+
+/// Ground speed in metres per second between two consecutive fixes.
+///
+/// Returns 0 for zero or negative elapsed time. GPS logs do occasionally
+/// carry out-of-order or duplicated timestamps, and a negative speed would
+/// poison bucketing and the max-speed statistic.
+double speedMpsBetween(GpsTrackPoint a, GpsTrackPoint b) {
+  final elapsed = b.timestamp - a.timestamp;
+  if (elapsed <= 0) return 0.0;
+  return distanceMeters(toGeoPoint(a), toGeoPoint(b)) / elapsed;
+}
+
+/// Total along-track distance in metres.
+double trackDistanceMeters(List<GpsTrackPoint> points) {
+  if (points.length < 2) return 0.0;
+  var total = 0.0;
+  for (var i = 1; i < points.length; i++) {
+    total += distanceMeters(toGeoPoint(points[i - 1]), toGeoPoint(points[i]));
+  }
+  return total;
+}
