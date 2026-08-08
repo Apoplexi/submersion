@@ -4,9 +4,10 @@ import 'package:latlong2/latlong.dart';
 
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
-import 'package:submersion/features/maps/data/services/tile_cache_service.dart';
-import 'package:submersion/features/maps/presentation/providers/map_tile_providers.dart';
+import 'package:submersion/features/gps_log/domain/track_colorization.dart';
+import 'package:submersion/features/gps_log/presentation/widgets/gps_track_polyline_layer.dart';
 import 'package:submersion/features/maps/presentation/widgets/map_attribution.dart';
+import 'package:submersion/features/maps/presentation/widgets/submersion_tile_layer.dart';
 import 'package:submersion/features/maps/presentation/widgets/map_compass_button.dart';
 import 'package:submersion/features/maps/presentation/widgets/trackpad_zoom_map.dart';
 
@@ -32,6 +33,8 @@ class DiveLocationsMap extends ConsumerStatefulWidget {
     this.controller,
     this.initialCenter,
     this.initialZoom,
+    this.trackRuns,
+    this.fitToTrack = false,
   });
 
   /// GPS entry fix.
@@ -53,6 +56,16 @@ class DiveLocationsMap extends ConsumerStatefulWidget {
   /// points. The header passes this to preserve its fixed zoom-12 look.
   final LatLng? initialCenter;
   final double? initialZoom;
+
+  /// Optional GPS surface track to draw beneath the markers.
+  ///
+  /// Null for every caller that predates GPS track rendering. Drawn first so
+  /// the entry/exit/site pins stay on top.
+  final List<TrackRun>? trackRuns;
+
+  /// When true and [trackRuns] is non-empty, the camera fits the track's
+  /// extent as well as the marker points.
+  final bool fitToTrack;
 
   @override
   ConsumerState<DiveLocationsMap> createState() => _DiveLocationsMapState();
@@ -78,10 +91,16 @@ class _DiveLocationsMapState extends ConsumerState<DiveLocationsMap> {
 
     final colorScheme = Theme.of(context).colorScheme;
 
+    final trackRuns = widget.trackRuns;
+    final hasTrack = trackRuns != null && trackRuns.isNotEmpty;
+
     final points = <LatLng>[
       if (entry != null) LatLng(entry.latitude, entry.longitude),
       if (exit != null) LatLng(exit.latitude, exit.longitude),
       if (site != null) LatLng(site.latitude, site.longitude),
+      if (hasTrack && widget.fitToTrack)
+        for (final run in trackRuns)
+          for (final p in run.points) LatLng(p.latitude, p.longitude),
     ];
     if (points.isEmpty) return const SizedBox.shrink();
 
@@ -166,14 +185,15 @@ class _DiveLocationsMapState extends ConsumerState<DiveLocationsMap> {
               ),
             ),
             children: [
-              TileLayer(
-                urlTemplate: ref.watch(mapTileUrlProvider),
-                userAgentPackageName: 'app.submersion',
-                maxZoom: ref.watch(mapTileMaxZoomProvider),
-                tileProvider: TileCacheService.instance.isInitialized
-                    ? TileCacheService.instance.getTileProvider()
-                    : null,
-              ),
+              submersionTileLayer(ref),
+              // Drawn before the drift line and markers so the surface track
+              // sits underneath both.
+              if (hasTrack)
+                GpsTrackPolylineLayer(
+                  runs: trackRuns,
+                  mode: TrackColorMode.uniform,
+                  strokeWidth: 3.0,
+                ),
               if (entry != null && exit != null)
                 PolylineLayer(
                   polylines: [

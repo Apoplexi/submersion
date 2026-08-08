@@ -12943,6 +12943,23 @@ class AppLocalizationsEn extends AppLocalizations {
   String get diveLog_detail_surfaceGps_site => 'Site';
 
   @override
+  String get diveLog_detail_surfaceGps_track => 'Surface track';
+
+  @override
+  String get diveLog_detail_surfaceGps_showFullTrack => 'Full track';
+
+  @override
+  String diveLog_detail_surfaceGps_trackFixes(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count fixes',
+      one: '1 fix',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get diveLog_detail_locationsMap_title => 'Dive Locations';
 
   @override

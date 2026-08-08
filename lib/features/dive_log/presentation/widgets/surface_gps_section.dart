@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:go_router/go_router.dart';
 import 'package:latlong2/latlong.dart';
 
 import 'package:submersion/core/providers/provider.dart';
@@ -13,6 +14,10 @@ import 'package:submersion/features/dive_log/presentation/widgets/collapsible_se
 import 'package:submersion/features/dive_log/presentation/widgets/dive_locations_map.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/field_attribution_badge.dart';
 import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
+import 'package:submersion/features/gps_log/domain/entities/gps_track.dart';
+import 'package:submersion/features/gps_log/domain/track_colorization.dart';
+import 'package:submersion/features/gps_log/domain/track_geometry.dart';
+import 'package:submersion/features/gps_log/presentation/providers/gps_track_map_providers.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 
@@ -110,6 +115,31 @@ class _SurfaceGpsSectionState extends ConsumerState<SurfaceGpsSection> {
     );
   }
 
+  /// Points of the covering track, windowed to the dive unless the user has
+  /// asked for the whole recording.
+  ///
+  /// Resolved here rather than in [build] so a collapsed section performs no
+  /// blob decode - watching the track provider one level up would defeat the
+  /// laziness the contentBuilder gate exists for.
+  List<TrackRun> _trackRuns(GpsTrack track) {
+    if (ref.watch(surfaceGpsFullTrackProvider)) {
+      return bucketizeTrack(track.effectivePoints, TrackColorMode.uniform);
+    }
+    // Wall-clock-as-UTC seconds, matching the point timestamps.
+    const marginSeconds = 15 * 60;
+    final dive = widget.dive;
+    final entrySec = dive.effectiveEntryTime.millisecondsSinceEpoch ~/ 1000;
+    final exitSec = entrySec + (dive.bottomTime?.inSeconds ?? 0);
+    return bucketizeTrack(
+      windowTrack(
+        track.effectivePoints,
+        fromEpochSeconds: entrySec - marginSeconds,
+        toEpochSeconds: exitSec + marginSeconds,
+      ),
+      TrackColorMode.uniform,
+    );
+  }
+
   Widget _content(
     BuildContext context,
     GeoPoint? entry,
@@ -117,7 +147,11 @@ class _SurfaceGpsSectionState extends ConsumerState<SurfaceGpsSection> {
     GeoPoint? site,
     String? driftText,
   ) {
+    final l10n = context.l10n;
     final colorScheme = Theme.of(context).colorScheme;
+    final track = ref.watch(trackForDiveProvider(widget.dive.id)).value;
+    final runs = track == null ? null : _trackRuns(track);
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
       child: Column(
@@ -137,6 +171,8 @@ class _SurfaceGpsSectionState extends ConsumerState<SurfaceGpsSection> {
                       site: site,
                       interactive: true,
                       controller: _controller,
+                      trackRuns: runs,
+                      fitToTrack: runs != null && runs.isNotEmpty,
                     ),
                   ),
                   Positioned(
@@ -204,6 +240,46 @@ class _SurfaceGpsSectionState extends ConsumerState<SurfaceGpsSection> {
                   const SizedBox(width: 8),
                   Text(
                     '${context.l10n.diveLog_detail_label_drift}: $driftText',
+                  ),
+                ],
+              ),
+            ),
+          if (track != null)
+            Padding(
+              padding: const EdgeInsets.only(top: 8),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.route_outlined,
+                    size: 16,
+                    color: colorScheme.onSurfaceVariant,
+                  ),
+                  const SizedBox(width: 8),
+                  // "Surface track", never "your route": during the dive the
+                  // recording phone is on the boat, so this is the surface
+                  // support path, not the diver's.
+                  Expanded(
+                    child: InkWell(
+                      key: const ValueKey('gps-track-link'),
+                      onTap: () => context.push('/gps-log/${track.id}'),
+                      child: Text(
+                        '${l10n.diveLog_detail_surfaceGps_track}: '
+                        '${l10n.diveLog_detail_surfaceGps_trackFixes(track.pointCount)}',
+                        style: TextStyle(
+                          color: colorScheme.primary,
+                          decoration: TextDecoration.underline,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  FilterChip(
+                    key: const ValueKey('gps-track-full-chip'),
+                    label: Text(l10n.diveLog_detail_surfaceGps_showFullTrack),
+                    selected: ref.watch(surfaceGpsFullTrackProvider),
+                    onSelected: (value) =>
+                        ref.read(surfaceGpsFullTrackProvider.notifier).state =
+                            value,
                   ),
                 ],
               ),

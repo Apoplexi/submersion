@@ -13115,6 +13115,23 @@ class AppLocalizationsHu extends AppLocalizations {
   String get diveLog_detail_surfaceGps_site => 'Merülőhely';
 
   @override
+  String get diveLog_detail_surfaceGps_track => 'Felszíni nyomvonal';
+
+  @override
+  String get diveLog_detail_surfaceGps_showFullTrack => 'Teljes nyomvonal';
+
+  @override
+  String diveLog_detail_surfaceGps_trackFixes(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count pont',
+      one: '1 pont',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get diveLog_detail_locationsMap_title => 'Merülési helyszínek';
 
   @override

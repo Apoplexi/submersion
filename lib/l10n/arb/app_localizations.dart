@@ -22243,6 +22243,24 @@ abstract class AppLocalizations {
   /// **'Site'**
   String get diveLog_detail_surfaceGps_site;
 
+  /// No description provided for @diveLog_detail_surfaceGps_track.
+  ///
+  /// In en, this message translates to:
+  /// **'Surface track'**
+  String get diveLog_detail_surfaceGps_track;
+
+  /// No description provided for @diveLog_detail_surfaceGps_showFullTrack.
+  ///
+  /// In en, this message translates to:
+  /// **'Full track'**
+  String get diveLog_detail_surfaceGps_showFullTrack;
+
+  /// Count of GPS positions in the surface track covering this dive
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 fix} other{{count} fixes}}'**
+  String diveLog_detail_surfaceGps_trackFixes(int count);
+
   /// No description provided for @diveLog_detail_locationsMap_title.
   ///
   /// In en, this message translates to:

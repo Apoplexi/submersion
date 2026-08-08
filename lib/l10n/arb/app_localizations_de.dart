@@ -13144,6 +13144,23 @@ class AppLocalizationsDe extends AppLocalizations {
   String get diveLog_detail_surfaceGps_site => 'Tauchplatz';
 
   @override
+  String get diveLog_detail_surfaceGps_track => 'Oberflächentrack';
+
+  @override
+  String get diveLog_detail_surfaceGps_showFullTrack => 'Ganzer Track';
+
+  @override
+  String diveLog_detail_surfaceGps_trackFixes(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Punkte',
+      one: '1 Punkt',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get diveLog_detail_locationsMap_title => 'Tauchorte';
 
   @override

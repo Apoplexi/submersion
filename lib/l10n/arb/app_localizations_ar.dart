@@ -12923,6 +12923,23 @@ class AppLocalizationsAr extends AppLocalizations {
   String get diveLog_detail_surfaceGps_site => 'الموقع';
 
   @override
+  String get diveLog_detail_surfaceGps_track => 'مسار السطح';
+
+  @override
+  String get diveLog_detail_surfaceGps_showFullTrack => 'المسار الكامل';
+
+  @override
+  String diveLog_detail_surfaceGps_trackFixes(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count نقطة',
+      one: 'نقطة واحدة',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get diveLog_detail_locationsMap_title => 'مواقع الغوص';
 
   @override

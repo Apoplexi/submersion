@@ -13154,6 +13154,23 @@ class AppLocalizationsEs extends AppLocalizations {
   String get diveLog_detail_surfaceGps_site => 'Punto de buceo';
 
   @override
+  String get diveLog_detail_surfaceGps_track => 'Track de superficie';
+
+  @override
+  String get diveLog_detail_surfaceGps_showFullTrack => 'Track completo';
+
+  @override
+  String diveLog_detail_surfaceGps_trackFixes(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count puntos',
+      one: '1 punto',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get diveLog_detail_locationsMap_title => 'Ubicaciones de buceo';
 
   @override

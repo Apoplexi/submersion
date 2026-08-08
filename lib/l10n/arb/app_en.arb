@@ -7616,6 +7616,17 @@
   "diveLog_detail_surfaceGps_entryOnly": "Entry point recorded",
   "diveLog_detail_surfaceGps_exitOnly": "Exit point recorded",
   "diveLog_detail_surfaceGps_site": "Site",
+  "diveLog_detail_surfaceGps_track": "Surface track",
+  "diveLog_detail_surfaceGps_showFullTrack": "Full track",
+  "diveLog_detail_surfaceGps_trackFixes": "{count, plural, =1{1 fix} other{{count} fixes}}",
+  "@diveLog_detail_surfaceGps_trackFixes": {
+    "description": "Count of GPS positions in the surface track covering this dive",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "diveLog_detail_locationsMap_title": "Dive Locations",
   "diveLog_detail_coordinatesCopied": "Coordinates copied to clipboard",
   "diveLog_detail_openInMaps": "Open in Maps",

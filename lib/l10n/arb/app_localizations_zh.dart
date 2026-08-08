@@ -12537,6 +12537,23 @@ class AppLocalizationsZh extends AppLocalizations {
   String get diveLog_detail_surfaceGps_site => '潜点';
 
   @override
+  String get diveLog_detail_surfaceGps_track => '水面轨迹';
+
+  @override
+  String get diveLog_detail_surfaceGps_showFullTrack => '完整轨迹';
+
+  @override
+  String diveLog_detail_surfaceGps_trackFixes(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 个定位点',
+      one: '1 个定位点',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get diveLog_detail_locationsMap_title => '潜水位置';
 
   @override

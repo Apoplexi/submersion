@@ -13201,6 +13201,23 @@ class AppLocalizationsFr extends AppLocalizations {
   String get diveLog_detail_surfaceGps_site => 'Site';
 
   @override
+  String get diveLog_detail_surfaceGps_track => 'Trace de surface';
+
+  @override
+  String get diveLog_detail_surfaceGps_showFullTrack => 'Trace complète';
+
+  @override
+  String diveLog_detail_surfaceGps_trackFixes(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count points',
+      one: '1 point',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get diveLog_detail_locationsMap_title => 'Lieux de plongée';
 
   @override

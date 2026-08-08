@@ -13161,6 +13161,23 @@ class AppLocalizationsPt extends AppLocalizations {
   String get diveLog_detail_surfaceGps_site => 'Ponto de mergulho';
 
   @override
+  String get diveLog_detail_surfaceGps_track => 'Trilha de superfície';
+
+  @override
+  String get diveLog_detail_surfaceGps_showFullTrack => 'Trilha completa';
+
+  @override
+  String diveLog_detail_surfaceGps_trackFixes(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count pontos',
+      one: '1 ponto',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get diveLog_detail_locationsMap_title => 'Locais de mergulho';
 
   @override

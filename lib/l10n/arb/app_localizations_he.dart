@@ -12833,6 +12833,23 @@ class AppLocalizationsHe extends AppLocalizations {
   String get diveLog_detail_surfaceGps_site => 'אתר';
 
   @override
+  String get diveLog_detail_surfaceGps_track => 'מסלול פני השטח';
+
+  @override
+  String get diveLog_detail_surfaceGps_showFullTrack => 'מסלול מלא';
+
+  @override
+  String diveLog_detail_surfaceGps_trackFixes(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count נקודות',
+      one: 'נקודה אחת',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get diveLog_detail_locationsMap_title => 'מיקומי צלילה';
 
   @override
