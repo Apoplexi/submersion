@@ -37,6 +37,45 @@ The Moon, lunar perigee, node, and solar perigee formulas all correctly use
 century coefficients; only `h` is wrong. Correct values (Meeus):
 `280.46646 + 36000.76983 T + 0.0003032 T^2`.
 
+### Root cause 3: missing Doodson phase constants (found during planning)
+
+The equilibrium argument computed from the six Doodson integers omits the
+per-constituent additive phase constant from Schureman's tables. In this
+codebase's convention (tau = 15t + h - s, solar time from midnight), the
+correct constants are: O1-group diurnals (O1, Q1, 2Q1, Rho1, Sig1, P1, Pi1)
+-90 degrees; K1-group diurnals (K1, J1, OO1, The1, Chi1, Phi1, M1)
++90 degrees; L2 and R2 +180 degrees; all others 0. Without them every
+diurnal constituent is roughly 180 degrees out of phase: a purely diurnal
+station (Pensacola) predicts high tide ~12 hours from the true time.
+
+### Root cause 4: Julian date off by half a day (found during planning)
+
+`AstronomicalArguments._toJulianDate` uses the integer Julian Day Number
+formula (noon-based) but treats the result as a midnight-based Julian Date.
+Every astronomical longitude is therefore evaluated 12 hours late (Moon
+longitude off by 6.6 degrees), making M2 predictions ~25 minutes late. Fix:
+subtract 32045.5 instead of 32045. The existing test asserting T close to 0
+at J2000 noon cannot catch this: the error (0.5/36525) is inside its 0.001
+tolerance.
+
+### Root cause 5: two wrong Doodson table entries (found during planning)
+
+In `harmonic_constituents.dart`, `The1` duplicates J1's coefficients
+(correct: `[1, 2, -2, 1, 0, 0]`) and `M1` has the lunar perigee sign flipped
+(correct: `[1, 0, 0, 1, 0, 0]`). Verified by differentiating the Doodson sum
+against each constituent's published angular speed.
+
+### Validation of the combined fix
+
+A Python port of the corrected algorithm was validated during planning
+against NOAA's published high/low predictions (station constituents in,
+published extremes out) for three tidally distinct stations — San Francisco
+9414290 (mixed), Boston 8443970 (semi-diurnal), Pensacola 8729840 (diurnal)
+— on 2026-09-15 and 2027-06-15. Worst error across all stations and dates:
+15.6 minutes on extreme times, 0.071 m on extreme heights. This confirms the
+five fixes above are complete and the golden-test tolerances below are
+achievable.
+
 ### Contributing factors
 
 - `assets/data/tide/constituents_sites.json` is labeled
