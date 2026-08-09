@@ -27,7 +27,15 @@ cat <<HTML_TEMPLATE
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<meta name="color-scheme" content="light dark">
 <style>
+  /* Explicit dark-mode opt-in. Some WKWebView versions only match the
+     prefers-color-scheme dark media query when the page declares
+     color-scheme support, and the declaration lets WebKit pick matching
+     UA defaults (form controls, scrollbars) in Sparkle's web view. */
+  :root {
+    color-scheme: light dark;
+  }
   body {
     font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
     margin: 16px;

@@ -391,6 +391,9 @@ jobs:
       - name: Run beta release notes test
         run: ./scripts/release/beta_release_notes_test.sh
 
+      - name: Run changelog generator test
+        run: ./scripts/release/generate_changelog_test.sh
+
       - name: Run fastlane beta changelog test
         run: ruby scripts/release/fastlane_beta_changelog_test.rb
 
