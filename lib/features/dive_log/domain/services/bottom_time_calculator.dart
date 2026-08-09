@@ -4,8 +4,8 @@
 /// Bottom time is defined as surface departure to the start of the final
 /// ascent (US Navy / dive-table convention): the descent counts; safety
 /// and deco stops during the final ascent do not. The start of the final
-/// ascent is approximated as the last profile sample at or below a depth
-/// threshold, which makes multilevel dives (a deep excursion followed by a
+/// ascent is approximated as the last profile sample at or deeper than a
+/// depth threshold, which makes multilevel dives (a deep excursion followed by a
 /// long shallower tail) measure correctly -- the retired heuristic (time
 /// at/above 85% of max depth) collapsed them to the deep segment only.
 class BottomTimeCalculator {
