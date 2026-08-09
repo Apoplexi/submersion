@@ -1969,9 +1969,10 @@ const String kSeedBuiltInDiveTypesSql = '''
 ''';
 
 /// Per-dive role vocabulary: built-in + custom (v103, issues #551/#547).
-/// Built-in ids are the legacy BuddyRole enum names so existing
-/// dive_buddies.role strings resolve without data migration; custom ids
-/// are UUIDs so renames never break references.
+/// Built-in ids are the historical per-dive role names (buddy, diveGuide,
+/// instructor, student, diveMaster, solo) so existing dive_buddies.role
+/// strings resolve without data migration; custom ids are UUIDs so
+/// renames never break references.
 @DataClassName('DiveRoleRow')
 class DiveRoles extends Table {
   TextColumn get id => text()();

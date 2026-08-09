@@ -99,19 +99,6 @@ enum SpeciesCategory {
   const SpeciesCategory(this.displayName);
 }
 
-/// Buddy role on a dive
-enum BuddyRole {
-  buddy('Buddy'),
-  diveGuide('Dive Guide'),
-  instructor('Instructor'),
-  student('Student'),
-  diveMaster('Divemaster'),
-  solo('Solo');
-
-  final String displayName;
-  const BuddyRole(this.displayName);
-}
-
 /// Certification agencies
 enum CertificationAgency {
   padi('PADI'),

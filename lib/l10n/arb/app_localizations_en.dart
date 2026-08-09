@@ -1494,35 +1494,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get buddies_edit_merge_notEnoughBody => 'Not enough buddies to merge.';
 
   @override
-  String get buddies_section_professionalRoles => 'Professional Roles';
-
-  @override
-  String get buddies_roles_addRole => 'Add role';
-
-  @override
-  String get buddies_roles_role => 'Role';
-
-  @override
-  String get buddies_roles_agency => 'Agency';
-
-  @override
-  String get buddies_roles_credentialNumber => 'Credential number';
-
-  @override
-  String get buddies_roles_removeTooltip => 'Remove role';
-
-  @override
-  String get buddies_roles_emptyHint =>
-      'Add instructor or divemaster credentials to reuse them when logging certifications and courses.';
-
-  @override
   String get buddies_instructorPicker_label => 'Instructor from buddies';
 
   @override
   String get buddies_instructorPicker_none => 'None (manual entry)';
-
-  @override
-  String get buddies_detail_section_professionalRoles => 'Professional Roles';
 
   @override
   String get certifications_appBar_addCertification => 'Add Certification';
@@ -9123,24 +9098,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get enum_ascentRate_warning => 'Warning';
-
-  @override
-  String get enum_buddyRole_buddy => 'Buddy';
-
-  @override
-  String get enum_buddyRole_diveGuide => 'Dive Guide';
-
-  @override
-  String get enum_buddyRole_diveMaster => 'Divemaster';
-
-  @override
-  String get enum_buddyRole_instructor => 'Instructor';
-
-  @override
-  String get enum_buddyRole_solo => 'Solo';
-
-  @override
-  String get enum_buddyRole_student => 'Student';
 
   @override
   String get enum_certificationAgency_bsac => 'BSAC';

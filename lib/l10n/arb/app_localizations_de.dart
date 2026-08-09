@@ -1523,35 +1523,10 @@ class AppLocalizationsDe extends AppLocalizations {
       'Nicht genügend Tauchpartner zum Zusammenführen.';
 
   @override
-  String get buddies_section_professionalRoles => 'Berufliche Rollen';
-
-  @override
-  String get buddies_roles_addRole => 'Rolle hinzufügen';
-
-  @override
-  String get buddies_roles_role => 'Rolle';
-
-  @override
-  String get buddies_roles_agency => 'Organisation';
-
-  @override
-  String get buddies_roles_credentialNumber => 'Zertifizierungsnummer';
-
-  @override
-  String get buddies_roles_removeTooltip => 'Rolle entfernen';
-
-  @override
-  String get buddies_roles_emptyHint =>
-      'Fügen Sie Tauchlehrer- oder Divemaster-Qualifikationen hinzu, um sie beim Erfassen von Zertifizierungen und Kursen wiederzuverwenden.';
-
-  @override
   String get buddies_instructorPicker_label => 'Tauchlehrer aus Tauchpartnern';
 
   @override
   String get buddies_instructorPicker_none => 'Keiner (manuelle Eingabe)';
-
-  @override
-  String get buddies_detail_section_professionalRoles => 'Berufliche Rollen';
 
   @override
   String get certifications_appBar_addCertification =>
@@ -9275,24 +9250,6 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get enum_ascentRate_warning => 'Warnung';
-
-  @override
-  String get enum_buddyRole_buddy => 'Tauchpartner';
-
-  @override
-  String get enum_buddyRole_diveGuide => 'Tauchguide';
-
-  @override
-  String get enum_buddyRole_diveMaster => 'Divemaster';
-
-  @override
-  String get enum_buddyRole_instructor => 'Tauchlehrer';
-
-  @override
-  String get enum_buddyRole_solo => 'Solo';
-
-  @override
-  String get enum_buddyRole_student => 'Tauchschüler';
 
   @override
   String get enum_certificationAgency_bsac => 'BSAC';

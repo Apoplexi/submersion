@@ -1519,35 +1519,10 @@ class AppLocalizationsIt extends AppLocalizations {
       'Compagni insufficienti per l\'unione.';
 
   @override
-  String get buddies_section_professionalRoles => 'Ruoli Professionali';
-
-  @override
-  String get buddies_roles_addRole => 'Aggiungi ruolo';
-
-  @override
-  String get buddies_roles_role => 'Ruolo';
-
-  @override
-  String get buddies_roles_agency => 'Agenzia';
-
-  @override
-  String get buddies_roles_credentialNumber => 'Numero di credenziale';
-
-  @override
-  String get buddies_roles_removeTooltip => 'Rimuovi ruolo';
-
-  @override
-  String get buddies_roles_emptyHint =>
-      'Aggiungi le credenziali di istruttore o divemaster per riutilizzarle durante la registrazione di certificazioni e corsi.';
-
-  @override
   String get buddies_instructorPicker_label => 'Istruttore dai compagni';
 
   @override
   String get buddies_instructorPicker_none => 'Nessuno (inserimento manuale)';
-
-  @override
-  String get buddies_detail_section_professionalRoles => 'Ruoli Professionali';
 
   @override
   String get certifications_appBar_addCertification =>
@@ -9268,24 +9243,6 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get enum_ascentRate_warning => 'Attenzione';
-
-  @override
-  String get enum_buddyRole_buddy => 'Compagno';
-
-  @override
-  String get enum_buddyRole_diveGuide => 'Guida subacquea';
-
-  @override
-  String get enum_buddyRole_diveMaster => 'Divemaster';
-
-  @override
-  String get enum_buddyRole_instructor => 'Istruttore';
-
-  @override
-  String get enum_buddyRole_solo => 'Solitario';
-
-  @override
-  String get enum_buddyRole_student => 'Allievo';
 
   @override
   String get enum_certificationAgency_bsac => 'BSAC';
