@@ -78,18 +78,11 @@ class BuddyListPage extends ConsumerWidget {
           columnSettingsAction: IconButton(
             icon: const Icon(Icons.view_column_outlined),
             tooltip: 'Column settings',
-            onPressed: () {
-              final config = ref.read(buddyTableConfigProvider);
-              final notifier = ref.read(buddyTableConfigProvider.notifier);
-              showEntityTableColumnPicker<BuddyField>(
-                context,
-                config: config,
-                adapter: BuddyFieldAdapter.instance,
-                onToggleColumn: notifier.toggleColumn,
-                onReorderColumn: notifier.reorderColumn,
-                onTogglePin: notifier.togglePin,
-              );
-            },
+            onPressed: () => showEntityTableColumnPicker<BuddyField>(
+              context,
+              configProvider: buddyTableConfigProvider,
+              adapter: BuddyFieldAdapter.instance,
+            ),
           ),
           appBarActions: [
             IconButton(

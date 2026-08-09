@@ -1,27 +1,37 @@
 import 'package:flutter/material.dart';
 
+import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/shared/constants/entity_field.dart';
 import 'package:submersion/shared/models/entity_table_config.dart';
+import 'package:submersion/shared/providers/entity_table_config_providers.dart';
+
+/// The provider type backing an entity table's column configuration.
+///
+/// Every entity table declares its provider with this shape, so the picker can
+/// accept any of them behind a single type parameter.
+typedef EntityTableConfigProvider<F extends EntityField> =
+    StateNotifierProvider<
+      EntityTableConfigNotifier<F>,
+      EntityTableViewConfig<F>
+    >;
 
 /// Shows the [EntityTableColumnPicker] as a modal bottom sheet.
+///
+/// Takes the config provider itself rather than a config value: the sheet
+/// subscribes to it, so pin, add, remove, and reorder are reflected while the
+/// sheet stays open.
 void showEntityTableColumnPicker<F extends EntityField>(
   BuildContext context, {
-  required EntityTableViewConfig<F> config,
+  required EntityTableConfigProvider<F> configProvider,
   required EntityFieldAdapter<dynamic, F> adapter,
-  required void Function(F field) onToggleColumn,
-  required void Function(int oldIndex, int newIndex) onReorderColumn,
-  required void Function(F field) onTogglePin,
 }) {
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,
     useSafeArea: true,
     builder: (context) => EntityTableColumnPicker<F>(
-      config: config,
+      configProvider: configProvider,
       adapter: adapter,
-      onToggleColumn: onToggleColumn,
-      onReorderColumn: onReorderColumn,
-      onTogglePin: onTogglePin,
     ),
   );
 }
@@ -31,24 +41,20 @@ void showEntityTableColumnPicker<F extends EntityField>(
 ///
 /// Top section: reorderable list of visible columns with pin/remove controls.
 /// Bottom section: available fields grouped by category with add buttons.
-class EntityTableColumnPicker<F extends EntityField> extends StatelessWidget {
-  final EntityTableViewConfig<F> config;
+class EntityTableColumnPicker<F extends EntityField> extends ConsumerWidget {
+  final EntityTableConfigProvider<F> configProvider;
   final EntityFieldAdapter<dynamic, F> adapter;
-  final void Function(F field) onToggleColumn;
-  final void Function(int oldIndex, int newIndex) onReorderColumn;
-  final void Function(F field) onTogglePin;
 
   const EntityTableColumnPicker({
     super.key,
-    required this.config,
+    required this.configProvider,
     required this.adapter,
-    required this.onToggleColumn,
-    required this.onReorderColumn,
-    required this.onTogglePin,
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final config = ref.watch(configProvider);
+    final notifier = ref.read(configProvider.notifier);
     final theme = Theme.of(context);
     final visibleFields = config.columns.map((c) => c.field).toSet();
 
@@ -116,7 +122,7 @@ class EntityTableColumnPicker<F extends EntityField> extends StatelessWidget {
                     physics: const NeverScrollableScrollPhysics(),
                     buildDefaultDragHandles: false,
                     itemCount: config.columns.length,
-                    onReorderItem: onReorderColumn,
+                    onReorderItem: notifier.reorderColumn,
                     itemBuilder: (context, index) {
                       final col = config.columns[index];
                       return ListTile(
@@ -139,7 +145,7 @@ class EntityTableColumnPicker<F extends EntityField> extends StatelessWidget {
                               ),
                               visualDensity: VisualDensity.compact,
                               tooltip: col.isPinned ? 'Unpin' : 'Pin',
-                              onPressed: () => onTogglePin(col.field),
+                              onPressed: () => notifier.togglePin(col.field),
                             ),
                             if (!col.isPinned)
                               IconButton(
@@ -149,7 +155,8 @@ class EntityTableColumnPicker<F extends EntityField> extends StatelessWidget {
                                 ),
                                 visualDensity: VisualDensity.compact,
                                 tooltip: 'Remove',
-                                onPressed: () => onToggleColumn(col.field),
+                                onPressed: () =>
+                                    notifier.toggleColumn(col.field),
                               ),
                           ],
                         ),
@@ -175,7 +182,7 @@ class EntityTableColumnPicker<F extends EntityField> extends StatelessWidget {
                       categoryName: entry.key,
                       fields: entry.value,
                       visibleFields: visibleFields,
-                      onAdd: onToggleColumn,
+                      onAdd: notifier.toggleColumn,
                     ),
 
                   const SizedBox(height: 32),

@@ -115,18 +115,11 @@ class _EquipmentListPageState extends ConsumerState<EquipmentListPage>
           columnSettingsAction: IconButton(
             icon: const Icon(Icons.view_column_outlined),
             tooltip: 'Column settings',
-            onPressed: () {
-              final config = ref.read(equipmentTableConfigProvider);
-              final notifier = ref.read(equipmentTableConfigProvider.notifier);
-              showEntityTableColumnPicker<EquipmentField>(
-                context,
-                config: config,
-                adapter: EquipmentFieldAdapter.instance,
-                onToggleColumn: notifier.toggleColumn,
-                onReorderColumn: notifier.reorderColumn,
-                onTogglePin: notifier.togglePin,
-              );
-            },
+            onPressed: () => showEntityTableColumnPicker<EquipmentField>(
+              context,
+              configProvider: equipmentTableConfigProvider,
+              adapter: EquipmentFieldAdapter.instance,
+            ),
           ),
           appBarActions: [
             IconButton(
