@@ -63,6 +63,14 @@ Set<String> _collectRoutePaths(List<RouteBase> routes) {
   return paths;
 }
 
+/// Route paths in declaration order, which [_collectRoutePaths] discards.
+List<String> _orderedRoutePaths(List<RouteBase> routes) => [
+  for (final route in routes) ...[
+    if (route is GoRoute) route.path,
+    ..._orderedRoutePaths(route.routes),
+  ],
+];
+
 void main() {
   late GoRouter router;
   late ProviderContainer container;
@@ -107,35 +115,44 @@ void main() {
       expect(route.builder, isNull);
     });
 
-    test('gpsTrackDetail is a child of gps-log with a :id path', () {
+    test('gpsTrackDetail is a SIBLING of gps-log, not a child', () {
+      // go_router builds one page per matched segment and /gps-log has its
+      // own pageBuilder, so nesting stacked a GpsLoggerPage underneath the
+      // detail page - two Back presses to leave, the first landing on a
+      // logger page the diver never opened.
       final gpsLog = _findRouteByName(router.configuration.routes, 'gpsLog');
-      final detail = gpsLog!.routes.whereType<GoRoute>().firstWhere(
-        (r) => r.name == 'gpsTrackDetail',
-        orElse: () =>
-            throw StateError('gpsTrackDetail not a direct child of gpsLog'),
+      expect(
+        gpsLog!.routes.whereType<GoRoute>().map((r) => r.name),
+        isNot(contains('gpsTrackDetail')),
       );
-      expect(detail.path, ':id');
+
+      final detail = _findRouteByName(
+        router.configuration.routes,
+        'gpsTrackDetail',
+      );
+      expect(detail!.path, '/gps-log/:id');
     });
 
-    test('static gps-log children are declared before the :id route', () {
-      // A static sibling declared AFTER ':id' would never match - go_router
-      // takes the first matching route and ':id' matches any single segment.
-      // Asserting structure, not findMatch(): fullPath is identical either
-      // way and does not distinguish the bug.
+    test('gpsTrackMap is a sibling too', () {
       final gpsLog = _findRouteByName(router.configuration.routes, 'gpsLog');
-      final childPaths = [
-        for (final r in gpsLog!.routes.whereType<GoRoute>()) r.path,
-      ];
-      final idIndex = childPaths.indexOf(':id');
-      expect(idIndex, isNot(-1), reason: ':id child must exist');
-      for (var i = 0; i < childPaths.length; i++) {
-        if (childPaths[i] == ':id') continue;
-        expect(
-          i,
-          lessThan(idIndex),
-          reason: 'static child "${childPaths[i]}" must precede :id',
-        );
-      }
+      expect(
+        gpsLog!.routes.whereType<GoRoute>().map((r) => r.name),
+        isNot(contains('gpsTrackMap')),
+      );
+      final map = _findRouteByName(router.configuration.routes, 'gpsTrackMap');
+      expect(map!.path, '/gps-log/map');
+    });
+
+    test('the static gps-log route is declared before the :id route', () {
+      // ':id' matches any single segment, so a static sibling declared after
+      // it would never match.
+      // _collectRoutePaths returns a Set, which cannot express order.
+      final paths = _orderedRoutePaths(router.configuration.routes);
+      final mapIndex = paths.indexOf('/gps-log/map');
+      final idIndex = paths.indexOf('/gps-log/:id');
+      expect(mapIndex, isNot(-1));
+      expect(idIndex, isNot(-1));
+      expect(mapIndex, lessThan(idIndex));
     });
   });
 

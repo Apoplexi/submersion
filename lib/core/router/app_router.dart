@@ -862,21 +862,28 @@ final appRouterProvider = Provider<GoRouter>((ref) {
               key: state.pageKey,
               child: const GpsLoggerPage(),
             ),
-            routes: [
-              // Static children MUST precede ':id' - ':id' matches any single
-              // segment and would otherwise swallow them.
-              GoRoute(
-                path: 'map',
-                name: 'gpsTrackMap',
-                builder: (context, state) => const GpsTrackMapPage(),
-              ),
-              GoRoute(
-                path: ':id',
-                name: 'gpsTrackDetail',
-                builder: (context, state) =>
-                    GpsTrackDetailPage(trackId: state.pathParameters['id']!),
-              ),
-            ],
+          ),
+
+          // The track map and track detail are SIBLINGS of /gps-log, not
+          // children. go_router builds one page per matched segment, and
+          // /gps-log has its own pageBuilder, so nesting them stacked a
+          // GpsLoggerPage underneath: pushing a track from the dive detail's
+          // Surface GPS link needed two Back presses, the first landing on a
+          // logger page the diver never visited. Same failure the editPlan
+          // route above was fixed for.
+          //
+          // Static path declared before the parameterised one so 'map' is
+          // not swallowed by ':id'.
+          GoRoute(
+            path: '/gps-log/map',
+            name: 'gpsTrackMap',
+            builder: (context, state) => const GpsTrackMapPage(),
+          ),
+          GoRoute(
+            path: '/gps-log/:id',
+            name: 'gpsTrackDetail',
+            builder: (context, state) =>
+                GpsTrackDetailPage(trackId: state.pathParameters['id']!),
           ),
 
           // Near-miss incident log (entry point: Settings > Manage)
