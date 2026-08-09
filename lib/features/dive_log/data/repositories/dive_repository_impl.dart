@@ -4389,23 +4389,30 @@ class DiveRepository {
     return _dropDuplicateSamples(rows).map(_profilePointFromRow).toList();
   }
 
-  /// Drops rows that repeat a (timestamp, depth) already seen.
+  /// Drops rows that repeat a sample already seen, comparing every column
+  /// except the primary key.
   ///
   /// A repeated download or import can store two identical copies of every
   /// sample. The duplicates carry no information but do change the analysis:
   /// half the sample pairs then share a timestamp and contribute a zero rate,
-  /// which halves every smoothed ascent rate and hides real violations. Rows
-  /// that share a timestamp but disagree on depth are two data sources rather
-  /// than duplicates, and are left for source attribution to resolve.
+  /// which halves every smoothed ascent rate and hides real violations.
+  ///
+  /// The comparison is deliberately over the whole row. Two computers on one
+  /// dive can agree on depth at the same second while each carrying data the
+  /// other lacks, so a (timestamp, depth) key would silently discard one
+  /// computer's temperature or heart rate. `dive_profiles` stores only sample
+  /// data alongside its id -- no per-row sync or audit columns -- so full-row
+  /// equality means exactly "the same sample, stored twice".
   ///
   /// Applied to every read that builds `Dive.profile`. Analysis curves are
   /// index-aligned against that list by their consumers, so [getDiveById] and
   /// [getMergedProfile] must always agree on its length.
   static List<DiveProfile> _dropDuplicateSamples(List<DiveProfile> rows) {
-    final seen = <(int, double)>{};
+    const idPlaceholder = '';
+    final seen = <DiveProfile>{};
     return [
       for (final row in rows)
-        if (seen.add((row.timestamp, row.depth))) row,
+        if (seen.add(row.copyWith(id: idPlaceholder))) row,
     ];
   }
 

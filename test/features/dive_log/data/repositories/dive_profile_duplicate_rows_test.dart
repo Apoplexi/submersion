@@ -38,8 +38,15 @@ void main() {
         id: 'dup',
         dateTime: DateTime.utc(2026, 8, 1, 10),
         profile: [
+          // Populated sample fields, so this proves whole-row equality rather
+          // than only equality across a row of nulls.
           for (var t = 0; t <= 300; t += 10)
-            domain.DiveProfilePoint(timestamp: t, depth: t / 10.0),
+            domain.DiveProfilePoint(
+              timestamp: t,
+              depth: t / 10.0,
+              temperature: 24.5,
+              heartRate: 70 + t ~/ 100,
+            ),
         ],
       ),
     );
@@ -76,6 +83,40 @@ void main() {
       full!.profile.map((p) => p.timestamp).toList(),
       equals(merged.map((p) => p.timestamp).toList()),
     );
+  });
+
+  test('samples matching on timestamp and depth but not on other recorded '
+      'fields are kept', () async {
+    // Two computers can agree on depth at the same second and still each
+    // carry data the other does not. Keying only on (timestamp, depth) would
+    // silently throw one computer's temperature or heart rate away.
+    await repository.createDive(
+      domain.Dive(
+        id: 'meta',
+        dateTime: DateTime.utc(2026, 8, 1, 13),
+        profile: [
+          for (var t = 0; t <= 100; t += 10)
+            domain.DiveProfilePoint(timestamp: t, depth: t / 10.0),
+        ],
+      ),
+    );
+    final rows = await (db.select(
+      db.diveProfiles,
+    )..where((t) => t.diveId.equals('meta'))).get();
+    for (final row in rows) {
+      await db
+          .into(db.diveProfiles)
+          .insert(
+            row
+                .toCompanion(false)
+                .copyWith(
+                  id: Value('${row.id}-hr'),
+                  heartRate: const Value(72),
+                ),
+          );
+    }
+
+    expect(await repository.getMergedProfile('meta'), hasLength(22));
   });
 
   test('samples that share a timestamp but differ in depth are kept', () async {
