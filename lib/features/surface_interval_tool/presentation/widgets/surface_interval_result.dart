@@ -31,20 +31,27 @@ class SurfaceIntervalResult extends ConsumerWidget {
     // and in one of those states waiting is not the remedy at all.
     final String intervalText;
     final String intervalSemanticsText;
+    // Set when the outcome itself is the headline, which is exactly when there
+    // is no interval: "wait longer than this planner shows" and "change the
+    // dive" both say more than the plain not-yet-safe wording does.
+    final String? outcomeStatus;
     switch (minInterval.outcome) {
       case SiIntervalOutcome.withinHorizon:
         final hours = minInterval.minutes! ~/ 60;
         final minutes = minInterval.minutes! % 60;
         intervalText = hours > 0 ? '${hours}h ${minutes}m' : '$minutes min';
         intervalSemanticsText = intervalText;
+        outcomeStatus = null;
       case SiIntervalOutcome.beyondHorizon:
         intervalText = '> ${horizonHours}h';
         intervalSemanticsText = context.l10n
             .surfaceInterval_result_beyondHorizonShort(horizonHours);
+        outcomeStatus = intervalSemanticsText;
       case SiIntervalOutcome.impossible:
         intervalText = '—';
         intervalSemanticsText =
             context.l10n.surfaceInterval_result_notAchievable;
+        outcomeStatus = intervalSemanticsText;
     }
 
     // Format NDL for display
@@ -68,24 +75,14 @@ class SurfaceIntervalResult extends ConsumerWidget {
         intervalSemanticsText,
         currentText,
         ndlText,
-        // Oxygen is the acute risk, so it leads when both are wrong. The states
-        // without an interval come next, because they say something the plain
-        // "not yet safe" wording does not: change the dive, or expect to wait
-        // past what this planner shows.
+        // Oxygen is the acute risk, so it leads when both are wrong, then any
+        // outcome that carries its own headline.
         !gasIsSafe
             ? context.l10n.surfaceInterval_result_gasUnsafe
-            : switch (minInterval.outcome) {
-                SiIntervalOutcome.impossible =>
-                  context.l10n.surfaceInterval_result_notAchievable,
-                SiIntervalOutcome.beyondHorizon =>
-                  context.l10n.surfaceInterval_result_beyondHorizonShort(
-                    horizonHours,
-                  ),
-                SiIntervalOutcome.withinHorizon =>
-                  ndlIsSafe
+            : outcomeStatus ??
+                  (ndlIsSafe
                       ? context.l10n.surfaceInterval_result_safeToDive
-                      : context.l10n.surfaceInterval_result_notYetSafe,
-              },
+                      : context.l10n.surfaceInterval_result_notYetSafe),
       ),
       child: Card(
         color: isSafe

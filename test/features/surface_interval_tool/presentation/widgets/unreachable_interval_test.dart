@@ -103,6 +103,30 @@ void main() {
       expect(find.textContaining('$maxMinutes min'), findsOneWidget);
     });
 
+    testWidgets('does not announce a bare em dash to a screen reader', (
+      tester,
+    ) async {
+      final handle = tester.ensureSemantics();
+      final container = await _pump(tester);
+
+      await _setPlan(
+        tester,
+        container,
+        firstDepth: 18.0,
+        firstTime: 45,
+        secondDepth: 18.0,
+        secondTime: 45,
+      );
+
+      final label = tester
+          .getSemantics(find.byType(SurfaceIntervalResult))
+          .label;
+      expect(label, contains('Not achievable at any surface interval'));
+      expect(label, isNot(contains('—')));
+
+      handle.dispose();
+    });
+
     testWidgets('stops advising a longer wait that cannot help', (
       tester,
     ) async {
@@ -152,6 +176,34 @@ void main() {
         reason: 'this dive is possible, it just needs a longer wait',
       );
       expect(find.textContaining('More than 6 hours'), findsOneWidget);
+    });
+
+    testWidgets('reads the wait out rather than announcing "> 6h"', (
+      tester,
+    ) async {
+      final handle = tester.ensureSemantics();
+      final container = await _pump(tester);
+
+      await _setPlan(
+        tester,
+        container,
+        firstDepth: 60.0,
+        firstTime: 120,
+        secondDepth: 12.0,
+        secondTime: 60,
+      );
+
+      final label = tester
+          .getSemantics(find.byType(SurfaceIntervalResult))
+          .label;
+      expect(
+        label,
+        contains('More than 6 hours'),
+        reason: 'a screen reader must not be handed the "> 6h" glyph',
+      );
+      expect(label, isNot(contains('> 6h')));
+
+      handle.dispose();
     });
   });
 
