@@ -6541,6 +6541,16 @@
   },
   "safetyReview_dismiss": "Negeren",
   "safetyReview_restore": "Herstellen",
+  "safetyReview_details": "Details",
+  "safetyReview_clearHighlight": "Markering wissen",
+  "safetyReview_findingGroupSemantics": "{count, plural, =1{1 veiligheidsbevinding} other{{count} veiligheidsbevindingen}}",
+  "@safetyReview_findingGroupSemantics": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "safetyReview_showDismissed": "{count, plural, =1{Toon 1 genegeerde} other{Toon {count} genegeerde}}",
   "@safetyReview_showDismissed": {
     "placeholders": {

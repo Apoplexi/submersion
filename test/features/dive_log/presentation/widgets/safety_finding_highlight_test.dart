@@ -60,9 +60,62 @@ void main() {
       expect(profileHighlightRangeFor(null, scheme), isNull);
     });
 
-    test('returns null when either timestamp is missing', () {
+    test('returns null when the start timestamp is missing', () {
       expect(profileHighlightRangeFor(finding(start: null), scheme), isNull);
-      expect(profileHighlightRangeFor(finding(end: null), scheme), isNull);
+      expect(
+        profileHighlightRangeFor(finding(start: null, end: null), scheme),
+        isNull,
+      );
+    });
+
+    test('a start-only finding maps to an instant range', () {
+      final range = profileHighlightRangeFor(finding(end: null), scheme);
+      expect(range, isNotNull);
+      expect(range!.startTimestamp, 300);
+      expect(range.endTimestamp, 300);
+    });
+  });
+
+  group('chartSafetyFindings', () {
+    SafetyFinding entry(
+      String id, {
+      int? start,
+      SafetyRuleId rule = SafetyRuleId.rapidAscent,
+      DateTime? dismissedAt,
+    }) {
+      return SafetyFinding(
+        id: id,
+        diveId: 'dive-1',
+        ruleId: rule,
+        severity: SafetySeverity.caution,
+        startTimestamp: start,
+        engineVersion: 1,
+        dismissedAt: dismissedAt,
+        createdAt: now,
+      );
+    }
+
+    test('filters dismissed, disabled-rule, and timestampless findings', () {
+      final review = SafetyReview(
+        diveId: 'dive-1',
+        engineVersion: 1,
+        reviewedAt: now,
+        findings: [
+          entry('keep', start: 200),
+          entry('dismissed', start: 100, dismissedAt: now),
+          entry('no-time'),
+          entry('disabled', start: 50, rule: SafetyRuleId.sawtoothProfile),
+          entry('earlier', start: 10),
+        ],
+      );
+      final result = chartSafetyFindings(review, {
+        SafetyRuleId.sawtoothProfile.dbValue,
+      });
+      expect(result.map((f) => f.id), ['earlier', 'keep']);
+    });
+
+    test('null review yields an empty list', () {
+      expect(chartSafetyFindings(null, const {}), isEmpty);
     });
   });
 }

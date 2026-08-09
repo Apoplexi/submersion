@@ -21979,6 +21979,24 @@ abstract class AppLocalizations {
   /// **'Restore'**
   String get safetyReview_restore;
 
+  /// Link in the chart finding callout that scrolls to the full safety review section
+  ///
+  /// In en, this message translates to:
+  /// **'Details'**
+  String get safetyReview_details;
+
+  /// Tooltip/semantics for the button that clears the chart safety highlight
+  ///
+  /// In en, this message translates to:
+  /// **'Clear highlight'**
+  String get safetyReview_clearHighlight;
+
+  /// Semantics label for a clustered chip in the chart safety lane
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 safety observation} other{{count} safety observations}}'**
+  String safetyReview_findingGroupSemantics(int count);
+
   /// No description provided for @safetySettings_title.
   ///
   /// In en, this message translates to:
