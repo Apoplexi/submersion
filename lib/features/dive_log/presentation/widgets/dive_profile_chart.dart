@@ -1970,7 +1970,7 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
                   final intent = chartDragIntent(
                     kind: _activePointerKind,
                     pointerCount: _activePointerCount,
-                    doubleTapHold: _doubleTapHold,
+                    isZoomed: _viewport.isZoomed || _doubleTapHold,
                   );
                   if (intent != ChartDragIntent.pan) return;
                   setState(() {
