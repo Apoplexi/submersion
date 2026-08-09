@@ -30,10 +30,10 @@ localisation across 11 locales, `flutter_test` for widget tests.
   `certification_ecard_stack.dart` and `certification_wallet_page.dart` need no
   edits.
 - Widget tests that assert English labels must pin `locale: const Locale('en')`.
-- Run all commands from the worktree root:
-  `/Users/ericgriffin/repos/submersion-app/submersion/.claude/worktrees/cert-wallet-card-photos`.
-  Pass worktree-absolute paths to Read/Edit/Write; a main-checkout absolute path
-  silently edits the wrong tree.
+- Run all commands from the worktree root, `<repo>/.claude/worktrees/cert-wallet-card-photos`.
+  Pass paths rooted at that worktree to Read/Edit/Write; an absolute path rooted
+  at the main checkout silently edits the wrong tree, so tests keep passing
+  against files you did not change.
 
 ## File Structure
 
