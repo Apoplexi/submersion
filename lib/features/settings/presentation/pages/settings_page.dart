@@ -222,6 +222,23 @@ class SettingsMobileContent extends ConsumerWidget {
   }
 }
 
+/// Settings sections that render a page of their own, mapped to that page's
+/// route.
+///
+/// [SettingsSectionDetailPage] supplies a Scaffold and an AppBar, so sections
+/// whose content is itself a Scaffold with an AppBar (Diver Profile, Safety,
+/// Debug) would show two stacked app bars inside it. Appearance is listed too
+/// because it has a dedicated page, keeping that route canonical.
+///
+/// Used both by the settings list tile and by the '/settings/section/:id'
+/// route's redirect, so a deep link to that path cannot bypass it.
+const settingsSectionDedicatedRoutes = <String, String>{
+  'profile': '/settings/diver-profile',
+  'appearance': '/settings/appearance',
+  'safety': '/settings/safety',
+  'debug': '/settings/debug-logs',
+};
+
 /// Mobile detail page for a single settings section.
 ///
 /// Reached by pushing the '/settings/section/:sectionId' child route, which
@@ -384,36 +401,19 @@ class _MobileSettingsTile extends StatelessWidget {
   }
 
   void _navigateToSection(BuildContext context, String sectionId) {
-    // Navigate to the appropriate page based on section
-    switch (sectionId) {
-      case 'profile':
-        context.push('/settings/diver-profile');
-        break;
-      case 'appearance':
-        context.push('/settings/appearance');
-        break;
-      // Safety and Debug render pages that already supply their own Scaffold
-      // and AppBar, so routing them through the shared section wrapper (which
-      // supplies both as well) stacks two app bars. Both have dedicated
-      // routes -- use them.
-      case 'safety':
-        context.push('/settings/safety');
-        break;
-      case 'debug':
-        context.push('/settings/debug-logs');
-        break;
-      default:
-        // Sections without a dedicated page get the shared section route.
-        // PUSH (not go): go() replaces the location in place, leaving nothing
-        // on the stack for the system back gesture to pop, so Android closed
-        // the whole app (#647).
-        //
-        // This pushes a child route rather than '/settings?selected=<id>'.
-        // The latter re-matched the '/settings' tab root, whose pageBuilder
-        // returns a NoTransitionPage so bottom-nav tab switches do not
-        // animate -- which also robbed every pushed section of its slide-in.
-        context.push('/settings/section/$sectionId');
-    }
+    // Sections without a page of their own get the shared section route.
+    // PUSH (not go): go() replaces the location in place, leaving nothing on
+    // the stack for the system back gesture to pop, so Android closed the
+    // whole app (#647).
+    //
+    // This pushes a child route rather than '/settings?selected=<id>'. The
+    // latter re-matched the '/settings' tab root, whose pageBuilder returns a
+    // NoTransitionPage so bottom-nav tab switches do not animate -- which
+    // also robbed every pushed section of its slide-in.
+    context.push(
+      settingsSectionDedicatedRoutes[sectionId] ??
+          '/settings/section/$sectionId',
+    );
   }
 }
 

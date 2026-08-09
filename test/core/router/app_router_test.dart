@@ -825,6 +825,64 @@ void main() {
       );
     });
 
+    testWidgets('the section route redirects ids that have a page of their '
+        'own', (tester) async {
+      // SettingsSectionDetailPage supplies a Scaffold and an AppBar, so a
+      // deep link to /settings/section/safety would stack a second app bar
+      // on top of SafetySettingsPage's. Fixing only the list tile leaves the
+      // URL reachable; the route itself has to normalize it.
+      late BuildContext capturedContext;
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Builder(
+            builder: (context) {
+              capturedContext = context;
+              return const SizedBox.shrink();
+            },
+          ),
+        ),
+      );
+
+      final route = _findRouteByName(
+        router.configuration.routes,
+        'settingsSection',
+      );
+      expect(route, isNotNull);
+      expect(route!.redirect, isNotNull);
+
+      Future<String?> redirectFor(String sectionId) async {
+        return route.redirect!(
+          capturedContext,
+          GoRouterState(
+            router.configuration,
+            uri: Uri.parse('/settings/section/$sectionId'),
+            matchedLocation: '/settings/section/$sectionId',
+            fullPath: '/settings/section/:sectionId',
+            pathParameters: {'sectionId': sectionId},
+            pageKey: ValueKey('/settings/section/$sectionId'),
+          ),
+        );
+      }
+
+      // Sections whose content is its own Scaffold with its own AppBar.
+      expect(await redirectFor('safety'), '/settings/safety');
+      expect(await redirectFor('debug'), '/settings/debug-logs');
+      expect(await redirectFor('profile'), '/settings/diver-profile');
+      // Has a dedicated page too, so the route stays canonical.
+      expect(await redirectFor('appearance'), '/settings/appearance');
+
+      // Genuine section content belongs in the wrapper and must not redirect.
+      expect(await redirectFor('about'), isNull);
+      expect(await redirectFor('units'), isNull);
+      expect(
+        await redirectFor('security'),
+        isNull,
+        reason:
+            'SecuritySettingsPage returns plain content and relies on the '
+            "wrapper's Scaffold for its snackbars",
+      );
+    });
+
     testWidgets('the section route passes its path parameter through', (
       tester,
     ) async {

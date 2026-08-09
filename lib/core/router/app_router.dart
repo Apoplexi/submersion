@@ -905,6 +905,13 @@ final appRouterProvider = Provider<GoRouter>((ref) {
               GoRoute(
                 path: 'section/:sectionId',
                 name: 'settingsSection',
+                // Sections that render a full page of their own would get a
+                // second app bar from the wrapper, so send deep links to the
+                // dedicated route. Returns null for genuine section content,
+                // which belongs in the wrapper.
+                redirect: (context, state) =>
+                    settingsSectionDedicatedRoutes[state
+                        .pathParameters['sectionId']],
                 builder: (context, state) => SettingsSectionDetailPage(
                   sectionId: state.pathParameters['sectionId']!,
                 ),
