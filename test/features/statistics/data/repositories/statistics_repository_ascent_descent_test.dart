@@ -66,13 +66,14 @@ void main() {
     List<(int, double)> samples, {
     bool isPrimary = true,
     String? computerId,
+    String idPrefix = 'row',
   }) async {
     await db.batch((batch) {
       for (final (index, sample) in samples.indexed) {
         batch.insert(
           db.diveProfiles,
           DiveProfilesCompanion(
-            id: Value('$diveId-${computerId ?? 'dc'}-$index'),
+            id: Value('$diveId-${computerId ?? 'dc'}-$idPrefix-$index'),
             diveId: Value(diveId),
             computerId: Value(computerId),
             isPrimary: Value(isPrimary),
@@ -175,6 +176,22 @@ void main() {
       expect(rates.avgDescent, closeTo(15.0, 0.01));
     },
   );
+
+  test('is unaffected by exact duplicate profile rows', () async {
+    await dive('a');
+    // A repeated import stores every sample twice. Point-to-point rates halve
+    // on this data (the duplicate contributes a zero-length interval), which is
+    // why getDiveById and getMergedProfile collapse duplicates before analysis.
+    // Averaging depth per time bucket weights the repeats evenly, so the
+    // bucket means -- and the rates between them -- are unchanged.
+    await profile('a', textbookProfile());
+    await profile('a', textbookProfile(), idPrefix: 'reimport');
+
+    final rates = await repo.getAscentDescentRates();
+
+    expect(rates.avgAscent, closeTo(6.0, 0.01));
+    expect(rates.avgDescent, closeTo(15.0, 0.01));
+  });
 
   test('counts only the primary profile of a multi-computer dive', () async {
     await dive('a');
