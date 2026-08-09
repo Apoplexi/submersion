@@ -226,8 +226,8 @@ class _TripStoryViewState extends ConsumerState<TripStoryView>
   }
 
   /// One day chapter: a SliverMainAxisGroup whose pinned header sticks below
-  /// the map until the next day's group pushes it out. Surface days render
-  /// their slim row with no header.
+  /// the map until the next day's group pushes it out. Every day gets the same
+  /// header, surface days included - theirs simply has no body under it.
   Widget _daySliver(TripStory story, int index, int? todayIndex) {
     final day = story.days[index];
     final showTodayDivider = todayIndex != null && index == todayIndex;
@@ -246,11 +246,6 @@ class _TripStoryViewState extends ConsumerState<TripStoryView>
       ),
     );
 
-    if (day.isSurface) {
-      return SliverMainAxisGroup(
-        slivers: [if (showTodayDivider) divider, body],
-      );
-    }
     return SliverMainAxisGroup(
       slivers: [
         if (showTodayDivider) divider,

@@ -17,6 +17,11 @@ import 'package:submersion/l10n/l10n_extension.dart';
 /// Days with logged weather get a trailing badge: conditions icon plus air
 /// temperature in the diver's temperature unit.
 ///
+/// Every day of the trip gets one of these, including surface days (which
+/// carry no card body at all and are nothing but this header). Presenting a
+/// dive-free day in some slimmer, quieter form makes it read as a lesser entry
+/// and easy to miss when scanning the story.
+///
 /// Mounted in a [PinnedHeaderSliver] inside a SliverMainAxisGroup, so it sticks
 /// at the top of its day chapter until the next day's header pushes it out.
 /// PinnedHeaderSliver lets the header size itself, so scaled accessibility text
@@ -38,7 +43,11 @@ class TripStoryDayHeader extends ConsumerWidget {
     // an empty port to null, but sync and import payloads write the nullable
     // column directly, and a site name is equally free to be blank. Joining
     // either verbatim would render a doubled separator ("Dive Day -  - Site").
+    // A surface day has no itinerary and no dives by definition, so it owns the
+    // subtitle outright - it reads in the same slot where an itinerary day
+    // leads with its day type ("Dive Day", "Travel Day").
     final subtitleParts = <String>[
+      if (day.isSurface) context.l10n.trips_story_surfaceDay,
       if (itinerary != null) itinerary.dayType.localizedName(context),
       if (itinerary?.portName != null) itinerary!.portName!,
       ...day.siteNames,

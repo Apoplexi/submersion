@@ -103,14 +103,18 @@ void main() {
     expect(find.byType(DiveListItem), findsOneWidget);
   });
 
-  testWidgets('surface day renders the slim variant', (tester) async {
+  testWidgets('surface day renders no card body', (tester) async {
+    // The whole day is now its sticky header - title, date, and the "Surface
+    // day" label all live there, leaving the card with nothing to draw.
     final day = TripStoryDay(
       date: DateTime(2026, 3, 9),
       dayNumber: 3,
       kind: TripStoryDayKind.past,
     );
     await pumpCard(tester, day);
-    expect(find.textContaining('Surface day'), findsOneWidget);
+    expect(find.textContaining('Surface day'), findsNothing);
+    expect(find.textContaining('Day 3'), findsNothing);
+    expect(find.byType(Card), findsNothing);
     expect(find.byType(DayRhythmBar), findsNothing);
   });
 
