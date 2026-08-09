@@ -26,6 +26,15 @@ echo "$BODY_RULE" | grep -q "color: #222" || fail "body text colour missing"
 echo "$BODY_RULE" | grep -q "background-color: #fff" \
   || fail "body background colour missing; dark-mode web views paint #222 text on a dark page"
 
+# The page must opt in to dark mode with a color-scheme declaration (meta tag
+# and :root CSS). Some WKWebView versions only match prefers-color-scheme: dark
+# when the page declares color-scheme support, and it keeps WebKit's UA
+# defaults consistent with the active appearance in Sparkle's web view.
+echo "$OUT" | grep -q '<meta name="color-scheme" content="light dark">' \
+  || fail "color-scheme meta tag missing; some WKWebViews need it to match the dark media query"
+echo "$OUT" | sed -n '/:root {/,/}/p' | grep -q "color-scheme: light dark" \
+  || fail ":root color-scheme declaration missing; some WKWebViews need it to match the dark media query"
+
 # Dark mode must be handled explicitly with the inverse pair, plus a visible
 # h2 border (the light #ddd border disappears on a dark background).
 DARK_RULE=$(echo "$OUT" | sed -n '/@media (prefers-color-scheme: dark)/,/^  }/p')
