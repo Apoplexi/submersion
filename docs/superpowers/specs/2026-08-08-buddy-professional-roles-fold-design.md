@@ -50,8 +50,12 @@ role selector in the buddy picker, and `unanimousBuddyRolesForDives`.
   directly below it. `primaryCertification()` ranks by ladder index, so this
   placement keeps primary-cert derivation correct.
 - New helper `CertificationLevel.isInstructorLevel`: true for `instructor`,
-  `masterInstructor`, `courseDirector`. This is the only derived-professional
-  rule added; no broader `isProfessional` until something needs it.
+  `masterInstructor`, `courseDirector`, and the agency instructor grades
+  already in the enum — `cmas1StarInstructor`, `cmas2StarInstructor`,
+  `cmas3StarInstructor`, `bsacOpenWaterInstructor`, `bsacAdvancedInstructor`,
+  `bsacNationalInstructor`. Assistant-instructor grades are excluded (they
+  cannot independently certify). This is the only derived-professional rule
+  added; no broader `isProfessional` until something needs it.
 - Deleted: `BuddyRoleCredential`, `kProfessionalBuddyRoles`. The `BuddyRole`
   enum is deleted if nothing else references it after the fold (per-dive roles
   moved to the `dive_roles` table in #551; `buddy_roles` was its last
@@ -88,9 +92,11 @@ user-deleted migrated cert is never resurrected — same lesson as #553):
    `(buddyId, agency, level)`, do not insert; but if that cert lacks a
    `cardNumber` and the credential has one, backfill it.
 3. Otherwise insert a buddy-owned certification with deterministic id
-   `buddyrolecert-<buddyId>-<role>` (upsert, mirroring #553's
-   `buddycert-<buddyId>` pattern so all devices converge on identical rows),
-   `name` = level display name, agency/cardNumber/notes carried over.
+   `buddyrolecert-<rowId>` (reusing the buddy_roles row's own id: synced
+   replicas share row ids, so independent per-device migrations converge on
+   identical cert rows — same intent as #553's `buddycert-<buddyId>`),
+   `name` = level display name, agency/cardNumber/notes and original
+   created/updated timestamps carried over.
 4. `DROP TABLE buddy_roles`; remove the table from the Drift schema.
 
 Update tripwire/contract tests: `parentRefs` completeness, streaming parity,
@@ -108,10 +114,13 @@ migration version tests.
 - Inbound legacy payloads: an old-schema peer can still publish `buddyRoles`
   entries; the upgraded device must skip unknown entity keys gracefully.
   Verify the serializer's default path does this; if it throws, add a skip.
-- Old backups: restoring a pre-v145 backup must surface credentials as certs.
-  If restore goes through DB-file + `onUpgrade`, this is automatic; if any
-  restore path replays serializer entities directly, it needs the same
-  role-to-cert conversion shim. The plan phase pins down which paths apply.
+- Old backups: restoring a pre-v145 backup surfaces credentials as certs
+  automatically — verified: backup restore swaps in the SQLite file and
+  reopens through the migration ladder (`DatabaseService.restore` →
+  `initialize`), so `onUpgrade` converts the rows. No serializer shim.
+  Cloud-sync adopt of an old base silently skips the buddyRoles section
+  (`entityHasUpdatedAt` filter); convergence happens when that peer
+  upgrades and runs the same deterministic migration.
 
 ## Merge and internal cleanup
 
