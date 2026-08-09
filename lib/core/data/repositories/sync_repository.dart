@@ -31,7 +31,6 @@ class SyncRepository {
     'divers': (table: 'divers', pk: 'id'),
     'diverSettings': (table: 'diver_settings', pk: 'id'),
     'buddies': (table: 'buddies', pk: 'id'),
-    'buddyRoles': (table: 'buddy_roles', pk: 'id'),
     'mediaStores': (table: 'media_stores', pk: 'id'),
     'connectedAccounts': (table: 'connected_accounts', pk: 'id'),
     'mediaSubscriptions': (table: 'media_subscriptions', pk: 'id'),
