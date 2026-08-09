@@ -26,8 +26,6 @@ class CertificationOption {
   final CertificationLevel? level;
   final String? headerKey;
 
-  bool get isHeader => headerKey != null;
-
   @override
   bool operator ==(Object other) =>
       other is CertificationOption &&
@@ -36,9 +34,4 @@ class CertificationOption {
 
   @override
   int get hashCode => Object.hash(level, headerKey);
-
-  @override
-  String toString() => isHeader
-      ? 'CertificationOption.header($headerKey)'
-      : 'CertificationOption.value($level)';
 }
