@@ -192,12 +192,29 @@ void main() {
 
   group('AstronomicalArguments', () {
     test('calculates arguments for J2000 epoch', () {
-      // At J2000.0 epoch (Jan 1, 2000, 12:00 TT), T should be 0
+      // At J2000.0 epoch (Jan 1, 2000, 12:00 TT), T should be 0.
+      // The 1e-7 tolerance catches a half-day Julian date error
+      // (0.5/36525 = 1.37e-5), which the old 0.001 tolerance missed.
       final time = DateTime.utc(2000, 1, 1, 12, 0, 0);
       final args = AstronomicalArguments.forDateTime(time);
 
-      // T should be very close to 0 at J2000
-      expect(args.T, closeTo(0.0, 0.001));
+      expect(args.T, closeTo(0.0, 1e-7));
+    });
+
+    test('lunar mean longitude matches Meeus worked example 47.a', () {
+      // Meeus, Astronomical Algorithms: 1992 April 12.0 TD, L' = 134.290182
+      // deg. TD-UT difference (~59 s) moves the Moon ~0.009 deg.
+      final args = AstronomicalArguments.forDateTime(DateTime.utc(1992, 4, 12));
+      expect(args.s, closeTo(134.290182, 0.02));
+    });
+
+    test('solar mean longitude matches Meeus worked example 25.a', () {
+      // Meeus: 1992 October 13.0 TD, L0 = 201.80720 deg. Catches the
+      // millennia-vs-century coefficient bug (h advanced 10x too fast).
+      final args = AstronomicalArguments.forDateTime(
+        DateTime.utc(1992, 10, 13),
+      );
+      expect(args.h, closeTo(201.80720, 0.01));
     });
 
     test('calculates arguments for known date', () {
