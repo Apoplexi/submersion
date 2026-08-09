@@ -39,6 +39,28 @@ class _TrackTimelineScrubberState extends ConsumerState<TrackTimelineScrubber> {
   late double _single = (widget.startMs + (widget.endMs - widget.startMs) / 2)
       .toDouble();
 
+  /// Re-anchors the handles when the span itself changes.
+  ///
+  /// The handles were seeded once from the first build. Applying a trim
+  /// shrinks effectivePoints, so the panel rebuilds with a narrower span
+  /// while this State survives - and Slider asserts when its value falls
+  /// outside min..max, so the old handles would take the page down rather
+  /// than merely look wrong.
+  @override
+  void didUpdateWidget(TrackTimelineScrubber oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.startMs == widget.startMs &&
+        oldWidget.endMs == widget.endMs) {
+      return;
+    }
+    setState(() {
+      _low = widget.startMs.toDouble();
+      _high = widget.endMs.toDouble();
+      _single = (widget.startMs + (widget.endMs - widget.startMs) / 2)
+          .toDouble();
+    });
+  }
+
   /// Wall-clock-as-UTC, rendered in the diver's 12h/24h preference rather
   /// than a hardcoded 24-hour clock.
   String _label(num ms) => UnitFormatter(

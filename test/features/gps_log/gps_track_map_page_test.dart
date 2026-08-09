@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -48,6 +50,7 @@ Future<void> _pump(
           )).overrideWith((ref) async => t.points),
       ],
       child: MaterialApp(
+        locale: const Locale('en'),
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         // MapListScaffold branches on MediaQuery width (>=1100 is the
@@ -123,5 +126,76 @@ void main() {
       find.byKey(const ValueKey('gps-track-date-filter-clear')),
       findsNothing,
     );
+  });
+
+  testWidgets('shows a spinner while loading, not the empty state', (
+    tester,
+  ) async {
+    // Reading `value ?? []` as authoritative flashed "No recorded tracks" on
+    // every cold open and after every filter change.
+    final gate = Completer<List<GpsTrack>>();
+    final base = await getBaseOverrides();
+    const size = Size(1400, 900);
+    await tester.binding.setSurfaceSize(size);
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          ...base,
+          gpsTracksProvider.overrideWith((ref) => gate.future),
+        ],
+        child: const MaterialApp(
+          locale: Locale('en'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: MediaQuery(
+            data: MediaQueryData(size: size),
+            child: GpsTrackMapPage(),
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+
+    expect(find.byType(CircularProgressIndicator), findsOneWidget);
+    expect(find.text('No recorded tracks to show.'), findsNothing);
+
+    gate.complete(const []);
+    await tester.pumpAndSettle();
+    expect(find.byType(CircularProgressIndicator), findsNothing);
+    expect(find.text('No recorded tracks to show.'), findsOneWidget);
+  });
+
+  testWidgets('a failed query says so instead of claiming there are none', (
+    tester,
+  ) async {
+    final base = await getBaseOverrides();
+    const size = Size(1400, 900);
+    await tester.binding.setSurfaceSize(size);
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          ...base,
+          gpsTracksProvider.overrideWith(
+            (ref) async => throw Exception('db down'),
+          ),
+        ],
+        child: const MaterialApp(
+          locale: Locale('en'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: MediaQuery(
+            data: MediaQueryData(size: size),
+            child: GpsTrackMapPage(),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('No recorded tracks to show.'), findsNothing);
   });
 }

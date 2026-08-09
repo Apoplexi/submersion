@@ -6,6 +6,7 @@ import 'package:submersion/features/gps_log/data/repositories/track_geometry_cac
 import 'package:submersion/features/gps_log/domain/entities/gps_track.dart';
 import 'package:submersion/features/gps_log/presentation/pages/gps_track_detail_page.dart';
 import 'package:submersion/features/gps_log/presentation/providers/gps_track_map_providers.dart';
+import 'package:submersion/features/gps_log/presentation/widgets/track_stats_header.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
 
 import '../../helpers/mock_providers.dart';
@@ -49,6 +50,7 @@ Future<int> _pumpCountingReads(
         }),
       ],
       child: const MaterialApp(
+        locale: Locale('en'),
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         home: GpsTrackDetailPage(trackId: 'track-1'),
@@ -90,5 +92,32 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Start'), findsOneWidget);
     expect(find.text('End'), findsOneWidget);
+  });
+
+  testWidgets('a mode toggle does not rebuild the stats header', (
+    tester,
+  ) async {
+    // The page used to watch trackColorModeProvider in its own build, so a
+    // toggle rebuilt the whole Scaffold body - and TrackStatsHeader
+    // recomputes distance and speedRange over the full decoded list, up to
+    // ~20k points, on every rebuild. Scoping the watch to the selector keeps
+    // the toggle to the frame it is supposed to cost.
+    await _pumpCountingReads(tester, (_) {});
+
+    final before = tester.element(find.byType(TrackStatsHeader));
+    final beforeWidget = tester.widget<TrackStatsHeader>(
+      find.byType(TrackStatsHeader),
+    );
+
+    await tester.tap(find.text('Speed'));
+    await tester.pumpAndSettle();
+
+    // Same Element and the very same Widget instance: Flutter never asked
+    // the header to build again.
+    expect(tester.element(find.byType(TrackStatsHeader)), same(before));
+    expect(
+      tester.widget<TrackStatsHeader>(find.byType(TrackStatsHeader)),
+      same(beforeWidget),
+    );
   });
 }

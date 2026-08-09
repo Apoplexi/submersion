@@ -117,4 +117,77 @@ void main() {
     expect(tester.takeException(), isNull);
     expect(find.byType(RangeSlider), findsNothing);
   });
+
+  testWidgets('re-anchors the handles when the span narrows', (tester) async {
+    // Applying a trim shrinks effectivePoints, so the panel rebuilds with a
+    // narrower span while this State survives. The handles were seeded once,
+    // so they stayed on the old span - and Slider asserts when its value
+    // falls outside min..max, taking the page down rather than just looking
+    // wrong.
+    int? reportedStart;
+    final wide = DateTime.utc(2026, 5, 22, 8).millisecondsSinceEpoch;
+    final wideEnd = DateTime.utc(2026, 5, 22, 18).millisecondsSinceEpoch;
+    final narrow = DateTime.utc(2026, 5, 22, 14).millisecondsSinceEpoch;
+
+    Widget host(int startMs, int endMs) => ProviderScope(
+      overrides: [
+        settingsProvider.overrideWith(
+          (ref) => _TestSettingsNotifier(TimeFormat.twentyFourHour),
+        ),
+      ],
+      child: MaterialApp(
+        home: Scaffold(
+          body: TrackTimelineScrubber(
+            startMs: startMs,
+            endMs: endMs,
+            mode: TrackScrubberMode.range,
+            onChanged: (s, _) => reportedStart = s,
+          ),
+        ),
+      ),
+    );
+
+    await tester.pumpWidget(host(wide, wideEnd));
+    await tester.pumpAndSettle();
+
+    // The trim lands: same widget, narrower span.
+    await tester.pumpWidget(host(narrow, wideEnd));
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
+
+    final slider = tester.widget<RangeSlider>(find.byType(RangeSlider));
+    expect(slider.values.start, greaterThanOrEqualTo(narrow.toDouble()));
+    expect(slider.values.end, lessThanOrEqualTo(wideEnd.toDouble()));
+
+    await tester.drag(find.byType(RangeSlider), const Offset(20, 0));
+    await tester.pumpAndSettle();
+    expect(reportedStart, greaterThanOrEqualTo(narrow));
+  });
+
+  testWidgets('an unchanged span leaves a dragged handle alone', (
+    tester,
+  ) async {
+    // Only a span change re-anchors; an ordinary parent rebuild must not
+    // snap the handle the diver just moved back to the start.
+    await _pump(tester, mode: TrackScrubberMode.range);
+    // Grab the START thumb specifically: a drag from the widget centre is
+    // equidistant and RangeSlider picks the end one.
+    final box = tester.getRect(find.byType(RangeSlider));
+    await tester.dragFrom(
+      Offset(box.left + 24, box.center.dy),
+      const Offset(40, 0),
+    );
+    await tester.pumpAndSettle();
+    final moved = tester
+        .widget<RangeSlider>(find.byType(RangeSlider))
+        .values
+        .start;
+    expect(moved, greaterThan(_startMs.toDouble()));
+
+    await tester.pump();
+    expect(
+      tester.widget<RangeSlider>(find.byType(RangeSlider)).values.start,
+      moved,
+    );
+  });
 }

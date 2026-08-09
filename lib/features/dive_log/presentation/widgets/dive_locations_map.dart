@@ -105,15 +105,46 @@ class _DiveLocationsMapState extends ConsumerState<DiveLocationsMap> {
     final trackRuns = widget.trackRuns;
     final hasTrack = trackRuns != null && trackRuns.isNotEmpty;
 
+    // Marker points only. The track's extent is folded into the bounds below
+    // without materializing a LatLng per fix: these runs carry the FULL
+    // decoded track, not a simplified LOD, so a boat day would allocate
+    // ~20k objects on every build just to be handed to fromPoints and
+    // discarded.
     final points = <LatLng>[
       if (entry != null) LatLng(entry.latitude, entry.longitude),
       if (exit != null) LatLng(exit.latitude, exit.longitude),
       if (site != null) LatLng(site.latitude, site.longitude),
-      if (hasTrack && widget.fitToTrack)
-        for (final run in trackRuns)
-          for (final p in run.points) LatLng(p.latitude, p.longitude),
     ];
-    if (points.isEmpty) return const SizedBox.shrink();
+    final fitTrack = hasTrack && widget.fitToTrack;
+    if (points.isEmpty && !fitTrack) return const SizedBox.shrink();
+
+    // Extent of everything the camera must cover, accumulated in place.
+    var minLat = double.infinity;
+    var maxLat = double.negativeInfinity;
+    var minLon = double.infinity;
+    var maxLon = double.negativeInfinity;
+    var extentCount = 0;
+    void extend(double lat, double lon) {
+      if (lat < minLat) minLat = lat;
+      if (lat > maxLat) maxLat = lat;
+      if (lon < minLon) minLon = lon;
+      if (lon > maxLon) maxLon = lon;
+      extentCount++;
+    }
+
+    for (final p in points) {
+      extend(p.latitude, p.longitude);
+    }
+    if (fitTrack) {
+      for (final run in trackRuns) {
+        for (final p in run.points) {
+          extend(p.latitude, p.longitude);
+        }
+      }
+    }
+    if (extentCount == 0) return const SizedBox.shrink();
+
+    final anchor = points.isNotEmpty ? points.first : LatLng(minLat, minLon);
 
     LatLng center;
     double zoom;
@@ -121,11 +152,11 @@ class _DiveLocationsMapState extends ConsumerState<DiveLocationsMap> {
     if (initialCenter != null) {
       center = initialCenter;
       zoom = initialZoom ?? 12.0;
-    } else if (points.length >= 2) {
-      center = points.first;
+    } else if (extentCount >= 2) {
+      center = anchor;
       zoom = 13.0;
       fit = CameraFit.bounds(
-        bounds: LatLngBounds.fromPoints(points),
+        bounds: LatLngBounds(LatLng(minLat, minLon), LatLng(maxLat, maxLon)),
         padding: const EdgeInsets.all(48),
         // Entry/exit/site fixes are often within meters of each other; fitting
         // that tight bounds would zoom past the tile provider's max zoom and
@@ -133,7 +164,7 @@ class _DiveLocationsMapState extends ConsumerState<DiveLocationsMap> {
         maxZoom: 16.0,
       );
     } else {
-      center = points.first;
+      center = anchor;
       zoom = 14.0;
     }
 

@@ -52,8 +52,8 @@ class _GpsTrackMapPageState extends ConsumerState<GpsTrackMapPage> {
     final l10n = context.l10n;
     // Capped: every track drawn here hydrates a full point blob and, on a cold
     // cache, spawns its own simplification isolate.
-    final tracks =
-        ref.watch(overviewTracksProvider).value ?? const <GpsTrack>[];
+    final tracksAsync = ref.watch(overviewTracksProvider);
+    final tracks = tracksAsync.value ?? const <GpsTrack>[];
     final truncated = ref.watch(overviewTracksTruncatedProvider);
     final selection = ref.watch(mapListSelectionProvider(_kSectionKey));
     final range = ref.watch(trackDateFilterProvider);
@@ -90,13 +90,24 @@ class _GpsTrackMapPageState extends ConsumerState<GpsTrackMapPage> {
             ? l10n.gpsTrack_map_truncated(kOverviewTrackLimit)
             : null,
       ),
-      mapPane: tracks.isEmpty
-          ? Center(child: Text(l10n.gpsTrack_map_noTracks))
-          : _OverviewMap(
-              tracks: tracks,
-              selectedId: selection.selectedId,
-              controller: _mapController,
-            ),
+      // Distinguish "still loading" from "genuinely none": reading
+      // `value ?? []` as authoritative flashed "No recorded tracks" on every
+      // cold open and after every filter change, and showed the same message
+      // when the query had actually failed.
+      mapPane: switch (tracksAsync) {
+        AsyncLoading() when tracks.isEmpty => const Center(
+          child: CircularProgressIndicator(),
+        ),
+        AsyncError() => Center(child: Text(l10n.common_error_tryAgain)),
+        _ when tracks.isEmpty => Center(
+          child: Text(l10n.gpsTrack_map_noTracks),
+        ),
+        _ => _OverviewMap(
+          tracks: tracks,
+          selectedId: selection.selectedId,
+          controller: _mapController,
+        ),
+      },
     );
   }
 }

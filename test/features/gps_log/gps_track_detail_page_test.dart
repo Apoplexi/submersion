@@ -34,6 +34,7 @@ Future<void> _pump(
     ProviderScope(
       overrides: [...base, ...overrides],
       child: const MaterialApp(
+        locale: Locale('en'),
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         home: GpsTrackDetailPage(trackId: 'track-1'),

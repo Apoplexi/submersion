@@ -52,6 +52,7 @@ Future<void> _pump(WidgetTester tester, {required List<Dive> dives}) async {
         divesOnTrackProvider('track-1').overrideWith((ref) async => dives),
       ],
       child: const MaterialApp(
+        locale: Locale('en'),
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         home: GpsTrackDetailPage(trackId: 'track-1'),

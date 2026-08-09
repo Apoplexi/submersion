@@ -14,15 +14,30 @@ const double _metersPerDegreeLatitude = 111194.93;
 /// is far below the tightest simplification tolerance (2 m). Working in this
 /// plane makes perpendicular point-to-segment distance trivial, which is what
 /// Douglas-Peucker needs.
+///
+/// The longitude delta is unwrapped, so a track crossing the antimeridian
+/// stays locally continuous. Raw subtraction reads the step from 179.9 to
+/// -179.9 - about 11 km of boat travel - as -359.8 degrees, roughly 40,000 km
+/// west. Every deviation Douglas-Peucker measured against that segment was
+/// then meaningless, so a dateline track simplified to garbage.
 ({double east, double north}) projectLocal(
   GpsTrackPoint origin,
   GpsTrackPoint p,
 ) {
   final metersPerLon = metersPerDegreeLongitude(origin.latitude);
   return (
-    east: (p.longitude - origin.longitude) * metersPerLon,
+    east: unwrapLongitudeDelta(p.longitude - origin.longitude) * metersPerLon,
     north: (p.latitude - origin.latitude) * _metersPerDegreeLatitude,
   );
+}
+
+/// Maps a raw longitude difference into [-180, 180], taking the short way
+/// round. Two points 0.2 degrees apart across the dateline differ by 0.2, not
+/// 359.8.
+double unwrapLongitudeDelta(double delta) {
+  if (delta > 180.0) return delta - 360.0;
+  if (delta < -180.0) return delta + 360.0;
+  return delta;
 }
 
 /// Perpendicular distance in metres from [point] to the segment [a]-[b].

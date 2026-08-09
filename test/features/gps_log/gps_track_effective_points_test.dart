@@ -58,7 +58,7 @@ void main() {
     });
   });
 
-  group('new v144 fields', () {
+  group('new v145 fields', () {
     test('source defaults to phone', () {
       expect(const GpsTrack(id: 'a', startTime: 0).source, 'phone');
     });

@@ -64,7 +64,9 @@ class TrackGeometryCacheRepository {
     if (row.status != 'ok') return const [];
     final blob = row.points;
     if (blob == null) return const [];
-    return decodeTrackPoints(Uint8List.fromList(blob));
+    // Drift hands back a Uint8List already; copying it would double the peak
+    // allocation on every read of a large cached geometry.
+    return decodeTrackPoints(blob);
   }
 
   Future<void> write(

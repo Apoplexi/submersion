@@ -62,6 +62,7 @@ Future<void> _pumpFifty(WidgetTester tester) async {
           )).overrideWith((ref) async => track.points),
       ],
       child: const MaterialApp(
+        locale: Locale('en'),
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         home: GpsLoggerPage(),

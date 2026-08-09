@@ -223,8 +223,6 @@ class _GpsTrackDetailPageState extends ConsumerState<GpsTrackDetailPage> {
     final l10n = context.l10n;
     final trackAsync = ref.watch(gpsTrackDetailProvider(widget.trackId));
 
-    final mode = ref.watch(trackColorModeProvider);
-
     final track = trackAsync.value;
 
     return Scaffold(
@@ -271,34 +269,11 @@ class _GpsTrackDetailPageState extends ConsumerState<GpsTrackDetailPage> {
               ],
             ),
         ],
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(52),
+        bottom: const PreferredSize(
+          preferredSize: Size.fromHeight(52),
           child: Padding(
-            padding: const EdgeInsets.only(bottom: 8),
-            child: SegmentedButton<TrackColorMode>(
-              showSelectedIcon: false,
-              segments: [
-                ButtonSegment(
-                  value: TrackColorMode.uniform,
-                  label: Text(l10n.gpsTrack_colorMode_uniform),
-                ),
-                ButtonSegment(
-                  value: TrackColorMode.speed,
-                  label: Text(l10n.gpsTrack_colorMode_speed),
-                ),
-                ButtonSegment(
-                  value: TrackColorMode.elapsed,
-                  label: Text(l10n.gpsTrack_colorMode_elapsed),
-                ),
-              ],
-              selected: {mode},
-              onSelectionChanged: (selection) {
-                // Only bucketizeTrack re-runs; the decoded and simplified
-                // geometry stay resident, so this is a frame not a reload.
-                ref.read(trackColorModeProvider.notifier).state =
-                    selection.first;
-              },
-            ),
+            padding: EdgeInsets.only(bottom: 8),
+            child: _ColorModeSelector(),
           ),
         ),
       ),
@@ -338,6 +313,45 @@ class _GpsTrackDetailPageState extends ConsumerState<GpsTrackDetailPage> {
           );
         },
       ),
+    );
+  }
+}
+
+/// The colour-mode toggle, watching trackColorModeProvider on its own.
+///
+/// Watching it in the page's build instead meant a toggle rebuilt the whole
+/// Scaffold body, and TrackStatsHeader recomputes distance and speedRange
+/// over the full decoded list - up to ~20k points - on every rebuild. The
+/// toggle is supposed to cost a frame; that made it O(n) twice.
+class _ColorModeSelector extends ConsumerWidget {
+  const _ColorModeSelector();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
+    final mode = ref.watch(trackColorModeProvider);
+    return SegmentedButton<TrackColorMode>(
+      showSelectedIcon: false,
+      segments: [
+        ButtonSegment(
+          value: TrackColorMode.uniform,
+          label: Text(l10n.gpsTrack_colorMode_uniform),
+        ),
+        ButtonSegment(
+          value: TrackColorMode.speed,
+          label: Text(l10n.gpsTrack_colorMode_speed),
+        ),
+        ButtonSegment(
+          value: TrackColorMode.elapsed,
+          label: Text(l10n.gpsTrack_colorMode_elapsed),
+        ),
+      ],
+      selected: {mode},
+      onSelectionChanged: (selection) {
+        // Only bucketizeTrack re-runs; the decoded and simplified geometry
+        // stay resident, so this is a frame not a reload.
+        ref.read(trackColorModeProvider.notifier).state = selection.first;
+      },
     );
   }
 }

@@ -95,7 +95,7 @@ void main() {
     );
   });
 
-  test('v144 columns survive a serialize round trip', () async {
+  test('v145 columns survive a serialize round trip', () async {
     final id = await seedTrack();
     final db = DatabaseService.instance.database;
     await (db.update(db.gpsTracks)..where((t) => t.id.equals(id))).write(
@@ -119,7 +119,7 @@ void main() {
   test(
     'an incoming payload without source hydrates the phone default',
     () async {
-      // A peer on a pre-v144 schema omits the column entirely. It must land as
+      // A peer on a pre-v145 schema omits the column entirely. It must land as
       // 'phone', never as null, or effectivePoints and the import dedupe rule
       // both see a source they cannot match. Handled generically by
       // _withSchemaDefaults (#858 / PR #867), not by a per-entity fallback map.

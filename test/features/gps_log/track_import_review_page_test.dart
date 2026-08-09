@@ -74,6 +74,7 @@ Future<_SpyImportService> _pump(
     ProviderScope(
       overrides: [...base, trackImportServiceProvider.overrideWithValue(spy)],
       child: MaterialApp(
+        locale: const Locale('en'),
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         home: TrackImportReviewPage(

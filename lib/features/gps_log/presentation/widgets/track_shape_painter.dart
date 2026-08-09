@@ -3,6 +3,61 @@ import 'package:flutter/material.dart';
 import 'package:submersion/features/gps_log/domain/entities/gps_track.dart';
 import 'package:submersion/features/gps_log/domain/track_geometry.dart';
 
+/// Canvas positions for [points] in a [size] box: aspect-preserving, centred,
+/// with a 6 px inset.
+///
+/// Pulled out of [TrackShapePainter.paint] so the layout can be asserted
+/// without rasterizing - toImage() hangs under flutter test.
+///
+/// Returns fewer than two offsets when there is nothing to draw.
+List<Offset> trackShapeOffsets(List<GpsTrackPoint> points, Size size) {
+  if (points.length < 2) return const [];
+  final bounds = trackBounds(points);
+  if (bounds == null) return const [];
+
+  final latSpan = bounds.maxLat - bounds.minLat;
+  final lonSpan = bounds.maxLon - bounds.minLon;
+
+  // A perfectly straight north-south or east-west track has a zero span on
+  // one axis. Substituting 1 keeps the scale finite instead of producing NaN.
+  final safeLatSpan = latSpan == 0 ? 1.0 : latSpan;
+  final safeLonSpan = lonSpan == 0 ? 1.0 : lonSpan;
+
+  // Preserve aspect ratio: use the tighter scale on both axes, then centre.
+  const padding = 6.0;
+  final usableWidth = size.width - padding * 2;
+  final usableHeight = size.height - padding * 2;
+  final scale = (usableWidth / safeLonSpan) < (usableHeight / safeLatSpan)
+      ? usableWidth / safeLonSpan
+      : usableHeight / safeLatSpan;
+
+  final drawnWidth = safeLonSpan * scale;
+  final drawnHeight = safeLatSpan * scale;
+  final offsetX = (size.width - drawnWidth) / 2;
+  final offsetY = (size.height - drawnHeight) / 2;
+
+  // The substituted span above is arbitrary, so on a collapsed axis every
+  // point would land on the LEADING edge of a box that wide - visibly off
+  // centre. Shift the collapsed axis to the box's midpoint.
+  final centreX = lonSpan == 0 ? drawnWidth / 2 : 0.0;
+  final centreY = latSpan == 0 ? drawnHeight / 2 : 0.0;
+
+  return [
+    for (final p in points)
+      Offset(
+        // trackBounds may report an unwrapped maxLon above 180 for a track
+        // that crosses the antimeridian. Read every point through the same
+        // frame, or the western half draws hundreds of degrees off canvas.
+        offsetX +
+            centreX +
+            (longitudeInBoundsFrame(p.longitude, bounds) - bounds.minLon) *
+                scale,
+        // Screen y grows downward, latitude grows northward: invert.
+        offsetY + centreY + (bounds.maxLat - p.latitude) * scale,
+      ),
+  ];
+}
+
 /// Draws a track's shape with no basemap, scaled to fill the canvas.
 ///
 /// The offline fallback for row thumbnails. A GPS track is recorded on a boat,
@@ -16,49 +71,12 @@ class TrackShapePainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    if (points.length < 2) return;
+    final offsets = trackShapeOffsets(points, size);
+    if (offsets.length < 2) return;
 
-    final bounds = trackBounds(points);
-    if (bounds == null) return;
-
-    // trackBounds may report an unwrapped maxLon above 180 for a track that
-    // crosses the antimeridian. Read every point through the same frame, or
-    // the western half draws hundreds of degrees off canvas.
-    double lonOf(GpsTrackPoint p) =>
-        longitudeInBoundsFrame(p.longitude, bounds);
-
-    final latSpan = bounds.maxLat - bounds.minLat;
-    final lonSpan = bounds.maxLon - bounds.minLon;
-
-    // A perfectly straight north-south or east-west track has a zero span on
-    // one axis; substituting 1 collapses that axis to the canvas centre
-    // instead of producing NaN.
-    final safeLatSpan = latSpan == 0 ? 1.0 : latSpan;
-    final safeLonSpan = lonSpan == 0 ? 1.0 : lonSpan;
-
-    // Preserve aspect ratio: use the tighter scale on both axes, then centre.
-    const padding = 6.0;
-    final usableWidth = size.width - padding * 2;
-    final usableHeight = size.height - padding * 2;
-    final scale = (usableWidth / safeLonSpan) < (usableHeight / safeLatSpan)
-        ? usableWidth / safeLonSpan
-        : usableHeight / safeLatSpan;
-
-    final drawnWidth = safeLonSpan * scale;
-    final drawnHeight = safeLatSpan * scale;
-    final offsetX = (size.width - drawnWidth) / 2;
-    final offsetY = (size.height - drawnHeight) / 2;
-
-    final path = Path();
-    for (var i = 0; i < points.length; i++) {
-      final x = offsetX + (lonOf(points[i]) - bounds.minLon) * scale;
-      // Screen y grows downward, latitude grows northward: invert.
-      final y = offsetY + (bounds.maxLat - points[i].latitude) * scale;
-      if (i == 0) {
-        path.moveTo(x, y);
-      } else {
-        path.lineTo(x, y);
-      }
+    final path = Path()..moveTo(offsets.first.dx, offsets.first.dy);
+    for (var i = 1; i < offsets.length; i++) {
+      path.lineTo(offsets[i].dx, offsets[i].dy);
     }
 
     canvas.drawPath(

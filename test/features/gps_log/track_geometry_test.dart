@@ -22,6 +22,57 @@ void main() {
       expect(offset.east, 0.0);
       expect(offset.north, 0.0);
     });
+
+    test('takes the short way across the antimeridian', () {
+      // 179.95 E to 179.95 W is 0.1 deg of boat travel, about 11 km at the
+      // equator. Raw subtraction read it as -359.9 deg, roughly 40,000 km
+      // WEST, which made every Douglas-Peucker deviation meaningless.
+      final offset = projectLocal(p(0.0, 179.95), p(0.0, -179.95));
+      expect(offset.east, closeTo(0.1 * 111320.0, 1.0));
+    });
+
+    test('unwraps in both directions', () {
+      expect(unwrapLongitudeDelta(-359.9), closeTo(0.1, 1e-9));
+      expect(unwrapLongitudeDelta(359.9), closeTo(-0.1, 1e-9));
+      expect(unwrapLongitudeDelta(-0.1), closeTo(-0.1, 1e-9));
+      expect(unwrapLongitudeDelta(0.1), closeTo(0.1, 1e-9));
+      // Exactly 180 is left alone: it is equidistant either way.
+      expect(unwrapLongitudeDelta(180.0), 180.0);
+    });
+  });
+
+  group('simplifyTrack across the antimeridian', () {
+    test('keeps a detour that a wrapped projection would have hidden', () {
+      // A straight dateline run with one 500 m northward jog. Before the
+      // unwrap, every point past the crossing sat ~40,000 km away in the
+      // projection, so the jog's perpendicular deviation rounded to nothing
+      // beside it and simplification threw the shape away.
+      final points = [
+        p(0.0, 179.98, t: 0),
+        p(0.0, 179.99, t: 10),
+        p(0.0045, -180 + 0.0, t: 20),
+        p(0.0, -179.99, t: 30),
+        p(0.0, -179.98, t: 40),
+      ];
+      final simplified = simplifyTrack(points, 100.0);
+      expect(simplified.length, greaterThan(2));
+      expect(
+        simplified.any((q) => q.latitude > 0.004),
+        isTrue,
+        reason: 'the jog was simplified away',
+      );
+    });
+
+    test('still collapses a genuinely straight dateline run', () {
+      final points = [
+        p(0.0, 179.98, t: 0),
+        p(0.0, 179.99, t: 10),
+        p(0.0, -180.0, t: 20),
+        p(0.0, -179.99, t: 30),
+        p(0.0, -179.98, t: 40),
+      ];
+      expect(simplifyTrack(points, 100.0).length, 2);
+    });
   });
 
   group('simplifyTrack', () {

@@ -67,6 +67,7 @@ Future<void> _pump(WidgetTester tester, GpxExportService gpx) async {
         gpxExportServiceProvider.overrideWithValue(gpx),
       ],
       child: const MaterialApp(
+        locale: Locale('en'),
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         home: GpsTrackDetailPage(trackId: 'track-1'),
@@ -140,6 +141,7 @@ void main() {
           )).overrideWith((ref) async => const <GpsTrackPoint>[]),
         ],
         child: const MaterialApp(
+          locale: Locale('en'),
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
           home: GpsTrackDetailPage(trackId: 'track-1'),
