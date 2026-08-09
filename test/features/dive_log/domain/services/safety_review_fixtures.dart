@@ -27,22 +27,7 @@ ProfileAnalysis analyzeFixture({
 /// Each segment is (targetDepth, durationSeconds); sampling every 10 s.
 ({List<double> depths, List<int> timestamps}) buildProfile(
   List<(double, int)> segments,
-) {
-  final depths = <double>[0];
-  final timestamps = <int>[0];
-  var t = 0;
-  var d = 0.0;
-  for (final (target, duration) in segments) {
-    final steps = duration ~/ 10;
-    for (var i = 1; i <= steps; i++) {
-      t += 10;
-      depths.add(d + (target - d) * i / steps);
-      timestamps.add(t);
-    }
-    d = target;
-  }
-  return (depths: depths, timestamps: timestamps);
-}
+) => _buildProfile(segments, 10);
 
 /// Like [buildProfile] but samples every 2 s, matching the rate most dive
 /// computers record at. The smoothing window the ascent-rate calculator
@@ -50,15 +35,38 @@ ProfileAnalysis analyzeFixture({
 /// so brief excursions only survive smoothing on a finely sampled profile.
 ({List<double> depths, List<int> timestamps}) buildFineProfile(
   List<(double, int)> segments,
+) => _buildProfile(segments, 2);
+
+/// Emits one sample every [intervalSeconds], interpolating linearly to each
+/// segment's target depth.
+///
+/// Segment durations must be positive multiples of [intervalSeconds]. A
+/// ragged duration would be truncated, silently shifting every later sample
+/// and changing the rates these fixtures exist to pin down; a duration below
+/// one interval is worse still, moving the diver to the target depth without
+/// emitting any sample of the move. Both are asserted rather than tolerated,
+/// because a fixture that quietly describes a different dive than it reads as
+/// is the failure mode these safety-rule tests can least afford.
+({List<double> depths, List<int> timestamps}) _buildProfile(
+  List<(double, int)> segments,
+  int intervalSeconds,
 ) {
+  for (final (target, duration) in segments) {
+    assert(
+      duration >= intervalSeconds && duration % intervalSeconds == 0,
+      'segment (${target}m, ${duration}s) is not a positive multiple of the '
+      '${intervalSeconds}s sampling interval',
+    );
+  }
+
   final depths = <double>[0];
   final timestamps = <int>[0];
   var t = 0;
   var d = 0.0;
   for (final (target, duration) in segments) {
-    final steps = duration ~/ 2;
+    final steps = duration ~/ intervalSeconds;
     for (var i = 1; i <= steps; i++) {
-      t += 2;
+      t += intervalSeconds;
       depths.add(d + (target - d) * i / steps);
       timestamps.add(t);
     }
