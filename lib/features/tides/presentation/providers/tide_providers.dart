@@ -14,6 +14,7 @@ import 'package:submersion/features/tides/data/services/noaa_station_service.dar
 import 'package:submersion/features/tides/data/services/tide_constituent_resolver.dart';
 import 'package:submersion/features/tides/data/services/tide_data_service.dart';
 import 'package:submersion/features/tides/domain/entities/tide_record.dart';
+import 'package:submersion/features/tides/domain/services/tide_record_heal.dart';
 
 /// Provider for the [TideDataService] singleton.
 final tideDataServiceProvider = Provider<TideDataService>((ref) {
@@ -36,6 +37,42 @@ final tideRecordForDiveProvider = FutureProvider.family<TideRecord?, String>((
   );
   return repository.getTideRecordForDive(diveId);
 });
+
+/// Provider for a dive's tide record, lazily self-healing rows written
+/// by the pre-2026 broken engine. When the stored record disagrees with
+/// a fresh computation beyond the heal thresholds it is overwritten and
+/// the new record returned. Converges: post-fix records match the fresh
+/// computation and are never rewritten.
+final healedTideRecordProvider =
+    FutureProvider.family<
+      TideRecord?,
+      ({String diveId, GeoPoint? location, DateTime entryTime})
+    >((ref, params) async {
+      final repository = ref.watch(tideRecordRepositoryProvider);
+      ref.invalidateSelfWhen(
+        ref.watch(diveRepositoryProvider).watchDiveDetailChanges(),
+      );
+      final stored = await repository.getTideRecordForDive(params.diveId);
+      if (stored == null) return null;
+
+      final location = params.location;
+      if (location == null) return stored;
+
+      final resolved = await ref.watch(
+        resolvedTideDataProvider(location).future,
+      );
+      if (resolved == null) return stored;
+
+      final status = await resolved.calculator.getStatusAsync(params.entryTime);
+      final fresh = TideRecord.fromStatus(
+        id: stored.id,
+        diveId: params.diveId,
+        status: status,
+      );
+      if (!tideRecordNeedsHeal(stored: stored, fresh: fresh)) return stored;
+
+      return repository.createFromStatus(diveId: params.diveId, status: status);
+    });
 
 /// Provider for tide data metadata.
 final tideMetadataProvider = FutureProvider<TideDataMetadata?>((ref) async {

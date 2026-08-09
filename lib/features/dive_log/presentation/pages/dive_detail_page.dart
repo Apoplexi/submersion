@@ -3458,8 +3458,15 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
       );
     }
 
-    // First try to get stored tide record
-    final tideRecordAsync = ref.watch(tideRecordForDiveProvider(dive.id));
+    // First try to get stored tide record (lazily self-healed against a
+    // fresh computation when the site has coordinates)
+    final tideRecordAsync = ref.watch(
+      healedTideRecordProvider((
+        diveId: dive.id,
+        location: dive.site?.location,
+        entryTime: dive.effectiveEntryTime,
+      )),
+    );
 
     return tideRecordAsync.when(
       data: (tideRecord) {
