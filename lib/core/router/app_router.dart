@@ -894,6 +894,21 @@ final appRouterProvider = Provider<GoRouter>((ref) {
               child: const SettingsPage(),
             ),
             routes: [
+              // Shared detail route for settings sections that have no
+              // dedicated page of their own (About, Units, Data, ...).
+              // Deliberately a child route with a plain builder: go_router
+              // then wraps it in the platform-adaptive MaterialPage, so these
+              // sections slide in exactly like '/settings/appearance'.
+              // Rendering them by re-matching '/settings?selected=<id>'
+              // instead reused this route's NoTransitionPage and made them
+              // appear instantly.
+              GoRoute(
+                path: 'section/:sectionId',
+                name: 'settingsSection',
+                builder: (context, state) => SettingsSectionDetailPage(
+                  sectionId: state.pathParameters['sectionId']!,
+                ),
+              ),
               GoRoute(
                 path: 'storage',
                 name: 'storageSettings',

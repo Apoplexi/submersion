@@ -777,4 +777,91 @@ void main() {
       expect(await route.redirect!(capturedContext, state), isNull);
     });
   });
+
+  group('settings sections are pushed as animated child routes', () {
+    // Settings sub-sections used to navigate two different ways. Sections
+    // with a dedicated route (Appearance -> /settings/appearance) push a
+    // child GoRoute, which go_router wraps in a platform-adaptive
+    // MaterialPage, so they slide in. Sections without one (About, Units,
+    // Data, ...) pushed '/settings?selected=<id>', which re-matches the
+    // '/settings' route itself -- a bottom-nav tab root whose pageBuilder
+    // returns a NoTransitionPage. Correct for switching tabs, but it made
+    // those sections snap into place with no animation.
+    //
+    // The fix gives them a real child route. It deliberately does not make
+    // '/settings' itself animate when '?selected=' is present: the desktop
+    // master-detail pane navigates with go() (a stable pageKey), so swapping
+    // the page type under the same key would fail Page.canUpdate's
+    // runtimeType check and slide the whole split view on every click.
+    test('a section child route exists under /settings', () {
+      final route = _findRouteByName(
+        router.configuration.routes,
+        'settingsSection',
+      );
+      expect(route, isNotNull);
+      expect(route!.path, 'section/:sectionId');
+    });
+
+    test('the section route uses builder, so go_router animates it', () {
+      final route = _findRouteByName(
+        router.configuration.routes,
+        'settingsSection',
+      );
+      expect(route, isNotNull);
+      expect(
+        route!.builder,
+        isNotNull,
+        reason:
+            'builder lets go_router pick the platform-adaptive MaterialPage, '
+            'which is what makes /settings/appearance slide in.',
+      );
+      expect(
+        route.pageBuilder,
+        isNull,
+        reason:
+            'a custom pageBuilder here would risk reintroducing the '
+            'NoTransitionPage that suppressed the animation.',
+      );
+    });
+
+    testWidgets('the settings tab root itself still has no transition', (
+      tester,
+    ) async {
+      late BuildContext capturedContext;
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Builder(
+            builder: (context) {
+              capturedContext = context;
+              return const SizedBox.shrink();
+            },
+          ),
+        ),
+      );
+
+      final route = _findRouteByName(router.configuration.routes, 'settings');
+      expect(route, isNotNull);
+      expect(route!.pageBuilder, isNotNull);
+
+      final page = route.pageBuilder!(
+        capturedContext,
+        GoRouterState(
+          router.configuration,
+          uri: Uri.parse('/settings'),
+          matchedLocation: '/settings',
+          fullPath: '/settings',
+          pathParameters: const {},
+          pageKey: const ValueKey('/settings'),
+        ),
+      );
+
+      expect(
+        page,
+        isA<NoTransitionPage<dynamic>>(),
+        reason:
+            '/settings is a bottom-nav destination; switching tabs must not '
+            'animate, matching every other tab root.',
+      );
+    });
+  });
 }

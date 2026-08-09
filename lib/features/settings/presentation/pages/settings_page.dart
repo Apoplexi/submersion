@@ -127,7 +127,7 @@ class SettingsPage extends ConsumerWidget {
 
     if (selectedSection != null) {
       // Show section detail page
-      return _SettingsSectionDetailPage(sectionId: selectedSection, ref: ref);
+      return SettingsSectionDetailPage(sectionId: selectedSection);
     }
 
     // Mobile: Show section list
@@ -222,15 +222,16 @@ class SettingsMobileContent extends ConsumerWidget {
   }
 }
 
-/// Mobile detail page for settings sections accessed via query params.
-class _SettingsSectionDetailPage extends ConsumerWidget {
+/// Mobile detail page for a single settings section.
+///
+/// Reached by pushing the '/settings/section/:sectionId' child route, which
+/// go_router wraps in a platform-adaptive page so the section slides in like
+/// every other sub-page. Also rendered directly by [SettingsPage] for legacy
+/// `/settings?selected=<id>` deep links.
+class SettingsSectionDetailPage extends ConsumerWidget {
   final String sectionId;
-  final WidgetRef ref;
 
-  const _SettingsSectionDetailPage({
-    required this.sectionId,
-    required this.ref,
-  });
+  const SettingsSectionDetailPage({super.key, required this.sectionId});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -392,13 +393,16 @@ class _MobileSettingsTile extends StatelessWidget {
         context.push('/settings/appearance');
         break;
       default:
-        // For sections that don't have dedicated pages, show them in a
-        // detail page using query params. PUSH (not go): go() replaces the
-        // location in place, leaving nothing on the stack for the system
-        // back gesture to pop, so Android closed the whole app (#647).
-        final state = GoRouterState.of(context);
-        final currentPath = state.uri.path;
-        context.push('$currentPath?selected=$sectionId');
+        // Sections without a dedicated page get the shared section route.
+        // PUSH (not go): go() replaces the location in place, leaving nothing
+        // on the stack for the system back gesture to pop, so Android closed
+        // the whole app (#647).
+        //
+        // This pushes a child route rather than '/settings?selected=<id>'.
+        // The latter re-matched the '/settings' tab root, whose pageBuilder
+        // returns a NoTransitionPage so bottom-nav tab switches do not
+        // animate -- which also robbed every pushed section of its slide-in.
+        context.push('/settings/section/$sectionId');
     }
   }
 }

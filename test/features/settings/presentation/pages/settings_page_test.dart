@@ -1440,12 +1440,26 @@ void main() {
       await tester.binding.setSurfaceSize(const Size(400, 800));
       addTearDown(() => tester.binding.setSurfaceSize(null));
 
+      // Mirror the real route config: '/settings' is a bottom-nav tab root
+      // that must not animate when tabs are switched, and sections live on
+      // an animated child route beneath it.
       final router = GoRouter(
         initialLocation: initialLocation,
         routes: [
           GoRoute(
             path: '/settings',
-            builder: (context, state) => const SettingsPage(),
+            pageBuilder: (context, state) => NoTransitionPage(
+              key: state.pageKey,
+              child: const SettingsPage(),
+            ),
+            routes: [
+              GoRoute(
+                path: 'section/:sectionId',
+                builder: (context, state) => SettingsSectionDetailPage(
+                  sectionId: state.pathParameters['sectionId']!,
+                ),
+              ),
+            ],
           ),
         ],
       );
@@ -1465,7 +1479,44 @@ void main() {
       return router;
     }
 
-    testWidgets('opening a query-param section pushes a poppable route so the '
+    testWidgets('opening a section animates it into place instead of '
+        'snapping', (tester) async {
+      // Appearance slid in because it pushes a child GoRoute; About, Data and
+      // the rest re-matched the '/settings' tab root, whose NoTransitionPage
+      // suppressed the animation. Every section must now animate the same
+      // way.
+      final router = await pumpSettingsList(tester);
+
+      await tester.scrollUntilVisible(find.text('Data'), 100);
+      await tester.tap(find.text('Data'));
+      await tester.pumpAndSettle();
+
+      expect(
+        router.state.uri.toString(),
+        '/settings/section/data',
+        reason:
+            'the section must be its own child route; re-matching /settings '
+            'reuses that tab root page, which never animates',
+      );
+
+      // Assert on the route rather than a frame-by-frame position: the tap
+      // ripple keeps animations running either way, so only the pushed
+      // route's own transition duration distinguishes a slide from a snap.
+      final route = ModalRoute.of(
+        tester.element(find.byType(SettingsSectionDetailPage)),
+      );
+      expect(route, isNotNull);
+      expect(
+        route!.transitionDuration,
+        greaterThan(Duration.zero),
+        reason:
+            'a NoTransitionPage route has a zero-length transition, which is '
+            'exactly the snap this fixes',
+      );
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('opening a section pushes a poppable route so the '
         'system back gesture returns to Settings instead of closing the app', (
       tester,
     ) async {
