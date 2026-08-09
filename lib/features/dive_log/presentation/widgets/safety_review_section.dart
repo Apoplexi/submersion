@@ -136,23 +136,12 @@ class _SafetyReviewSectionState extends ConsumerState<SafetyReviewSection> {
     );
   }
 
-  Future<void> _setDismissed(SafetyFinding finding, bool dismissed) async {
-    if (dismissed) {
-      final selectedNotifier = ref.read(
-        selectedSafetyFindingProvider(widget.diveId).notifier,
-      );
-      if (selectedNotifier.state?.id == finding.id) {
-        selectedNotifier.state = null;
-      }
-    }
-    await ref
-        .read(safetyFindingsRepositoryProvider)
-        .setDismissed(
-          findingId: finding.id,
-          dismissed: dismissed,
-          now: DateTime.now(),
-        );
-    ref.invalidate(safetyReviewProvider(widget.diveId));
+  Future<void> _setDismissed(SafetyFinding finding, bool dismissed) {
+    return setSafetyFindingDismissed(
+      ref,
+      finding: finding,
+      dismissed: dismissed,
+    );
   }
 }
 

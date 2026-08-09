@@ -1458,5 +1458,84 @@ void main() {
       );
       expect(chart.highlightRange, isNull);
     });
+
+    SafetyFinding laneFinding(String diveId) => SafetyFinding(
+      id: 'f-lane',
+      diveId: diveId,
+      ruleId: SafetyRuleId.rapidAscent,
+      severity: SafetySeverity.caution,
+      startTimestamp: 300,
+      endTimestamp: 420,
+      value: 14.0,
+      engineVersion: 1,
+      createdAt: DateTime.utc(2026, 8, 9),
+    );
+
+    Future<void> pumpWithReview(
+      WidgetTester tester,
+      Dive dive,
+      SafetyFinding finding,
+    ) async {
+      final overrides = await getBaseOverrides();
+      overrides.add(
+        safetyReviewProvider(dive.id).overrideWith(
+          (ref) async => SafetyReview(
+            diveId: dive.id,
+            engineVersion: 1,
+            reviewedAt: DateTime.utc(2026, 8, 9),
+            findings: [finding],
+          ),
+        ),
+      );
+      final originalOnError = FlutterError.onError;
+      FlutterError.onError = (d) {
+        if (d.toString().contains('overflowed')) return;
+        originalOnError?.call(d);
+      };
+      await tester.pumpWidget(_buildDetailPage(dive, overrides));
+      await tester.pump();
+      await tester.pump(const Duration(seconds: 1));
+      FlutterError.onError = originalOnError;
+    }
+
+    testWidgets('active findings reach the chart as lane findings', (
+      tester,
+    ) async {
+      final dive = diveWithProfile();
+      await pumpWithReview(tester, dive, laneFinding(dive.id));
+
+      final chart = tester.widget<DiveProfileChart>(
+        find.byType(DiveProfileChart),
+      );
+      expect(chart.safetyFindings, isNotNull);
+      expect(chart.safetyFindings!.map((f) => f.id), ['f-lane']);
+      expect(chart.onSafetyFindingTap, isNotNull);
+      expect(chart.onSafetyFindingDismiss, isNotNull);
+      expect(chart.onSafetyFindingDetails, isNotNull);
+    });
+
+    testWidgets('chart tap callback toggles the selection provider', (
+      tester,
+    ) async {
+      final dive = diveWithProfile();
+      final finding = laneFinding(dive.id);
+      await pumpWithReview(tester, dive, finding);
+
+      final chart = tester.widget<DiveProfileChart>(
+        find.byType(DiveProfileChart),
+      );
+      final container = ProviderScope.containerOf(
+        tester.element(find.byType(DiveDetailPage)),
+      );
+
+      chart.onSafetyFindingTap!(finding);
+      expect(
+        container.read(selectedSafetyFindingProvider(dive.id))?.id,
+        'f-lane',
+      );
+
+      chart.onSafetyFindingTap!(finding);
+      expect(container.read(selectedSafetyFindingProvider(dive.id)), isNull);
+    });
   });
 }
