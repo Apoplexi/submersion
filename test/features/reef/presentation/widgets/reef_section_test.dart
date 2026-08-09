@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/intl.dart' show Intl;
+import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/core/constants/units.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
@@ -29,21 +30,25 @@ ReefSnapshot _snapshot({
   species: const ReefPart.empty(),
 );
 
-Widget _harness(ReefSnapshot snapshot) {
+Widget _harness(ReefSnapshot snapshot, {WaterType? waterType}) {
+  final request = ReefSnapshotRequest(
+    location: _location,
+    fetchHealth: waterType != WaterType.fresh,
+  );
   return ProviderScope(
     overrides: [
-      reefSnapshotProvider(
-        const ReefSnapshotRequest(location: _location),
-      ).overrideWith((ref) async => snapshot),
-      // ReefHealthCard reads the diver's unit setting, which chains through
-      // settingsProvider to SharedPreferences. Overriding at the narrowest
-      // point severs that chain without mocking preferences.
+      reefSnapshotProvider(request).overrideWith((ref) async => snapshot),
+      // WaterConditionsCard reads the diver's unit setting, which chains
+      // through settingsProvider to SharedPreferences. Overriding at the
+      // narrowest point severs that chain without mocking preferences.
       temperatureUnitProvider.overrideWithValue(TemperatureUnit.celsius),
     ],
     child: localizedMaterialApp(
       locale: const Locale('en'),
-      home: const Scaffold(
-        body: SingleChildScrollView(child: ReefSection(location: _location)),
+      home: Scaffold(
+        body: SingleChildScrollView(
+          child: ReefSection(location: _location, waterType: waterType),
+        ),
       ),
     ),
   );
@@ -85,6 +90,7 @@ void main() {
     await tester.pumpWidget(
       _harness(
         _snapshot(
+          habitat: const ReefPart.ok(ReefHabitat(onReef: true)),
           health: ReefPart.ok(
             ReefHealth(
               sst: 30.1,
@@ -102,6 +108,71 @@ void main() {
     // The trap this guards: a reassuring level over a dying reef.
     expect(find.textContaining('15.6'), findsOneWidget);
     expect(find.textContaining('Bleaching watch'), findsOneWidget);
+  });
+
+  testWidgets('titles the section Ecosystem', (tester) async {
+    await tester.pumpWidget(_harness(_snapshot()));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Ecosystem'), findsOneWidget);
+    expect(find.text('Reef'), findsNothing);
+  });
+
+  testWidgets('hides the habitat row when the site is not on a reef', (
+    tester,
+  ) async {
+    await tester.pumpWidget(_harness(_snapshot()));
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('No mapped coral reef'), findsNothing);
+    expect(find.textContaining('Reef habitat'), findsNothing);
+  });
+
+  testWidgets('keeps the habitat row when the check failed', (tester) async {
+    await tester.pumpWidget(
+      _harness(_snapshot(habitat: const ReefPart.unavailable())),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('Could not check reef habitat'), findsOneWidget);
+  });
+
+  testWidgets('shows the freshwater message for freshwater sites', (
+    tester,
+  ) async {
+    await tester.pumpWidget(_harness(_snapshot(), waterType: WaterType.fresh));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.textContaining('Satellite water temperature covers oceans only'),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets('suppresses stress lines at a confirmed non-reef site', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      _harness(
+        _snapshot(
+          health: ReefPart.ok(
+            ReefHealth(
+              sst: 14.2,
+              sstAnomaly: 0.3,
+              degreeHeatingWeeks: 0.0,
+              hotspot: -0.5,
+              alertLevel: BleachingAlertLevel.noStress,
+              observedAt: DateTime.utc(2026, 8, 1, 12),
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('14.2'), findsOneWidget);
+    expect(find.textContaining('stress'), findsNothing);
+    expect(find.textContaining('Degree Heating'), findsNothing);
   });
 
   testWidgets('distinguishes not-protected from could-not-check', (
@@ -130,6 +201,7 @@ void main() {
     await tester.pumpWidget(
       _harness(
         _snapshot(
+          habitat: const ReefPart.ok(ReefHabitat(onReef: true)),
           health: ReefPart.ok(
             ReefHealth(
               degreeHeatingWeeks: 1.2,

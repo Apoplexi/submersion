@@ -200,7 +200,7 @@ class _SiteDetailContentState extends ConsumerState<_SiteDetailContent> {
 
           // Reef Section (only if site has coordinates)
           if (site.hasCoordinates) ...[
-            ReefSection(location: site.location!),
+            ReefSection(location: site.location!, waterType: site.waterType),
             const SizedBox(height: 16),
           ],
 

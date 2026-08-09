@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
+import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
+import 'package:submersion/features/reef/domain/entities/reef_data_status.dart';
 import 'package:submersion/features/reef/presentation/providers/reef_providers.dart';
 import 'package:submersion/features/reef/presentation/widgets/reef_attribution_sheet.dart';
 import 'package:submersion/features/reef/presentation/widgets/reef_habitat_card.dart';
@@ -9,20 +11,29 @@ import 'package:submersion/features/reef/presentation/widgets/water_conditions_c
 import 'package:submersion/features/reef/presentation/widgets/reef_protection_card.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 
-/// Reef information for a dive site: habitat, health, and protected status.
+/// Ecosystem information for a dive site: habitat when on a reef, satellite
+/// water conditions, and protected status.
 ///
-/// Fetched from four online sources when the site is viewed, then cached.
-/// Hidden entirely for sites without coordinates.
+/// Fetched from online sources when the site is viewed, then cached. Hidden
+/// entirely for sites without coordinates.
 class ReefSection extends ConsumerWidget {
   final GeoPoint location;
 
-  const ReefSection({super.key, required this.location});
+  /// Freshwater sites skip the NOAA fetch: its grid covers only oceans.
+  final WaterType? waterType;
+
+  const ReefSection({super.key, required this.location, this.waterType});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final snapshotAsync = ref.watch(
-      reefSnapshotProvider(ReefSnapshotRequest(location: location)),
+      reefSnapshotProvider(
+        ReefSnapshotRequest(
+          location: location,
+          fetchHealth: waterType != WaterType.fresh,
+        ),
+      ),
     );
 
     return Card(
@@ -60,8 +71,13 @@ class ReefSection extends ConsumerWidget {
             snapshotAsync.when(
               data: (snapshot) => Column(
                 children: [
-                  ReefHabitatCard(part: snapshot.habitat),
-                  WaterConditionsCard(health: snapshot.health),
+                  if (snapshot.habitat.status != ReefDataStatus.empty)
+                    ReefHabitatCard(part: snapshot.habitat),
+                  WaterConditionsCard(
+                    health: snapshot.health,
+                    habitat: snapshot.habitat,
+                    waterType: waterType,
+                  ),
                   ReefProtectionCard(part: snapshot.protection),
                 ],
               ),
