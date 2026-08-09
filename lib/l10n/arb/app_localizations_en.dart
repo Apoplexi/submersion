@@ -16256,6 +16256,16 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String surfaceInterval_result_beyondHorizon(Object hours) {
+    return 'The wait runs past the $hours hours this planner searches. Off-gassing continues, so a longer surface interval will get there.';
+  }
+
+  @override
+  String surfaceInterval_result_beyondHorizonShort(Object hours) {
+    return 'More than $hours hours';
+  }
+
+  @override
   String get surfaceInterval_result_currentInterval => 'Current Interval';
 
   @override
@@ -16279,6 +16289,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String surfaceInterval_result_ndlMinutes(Object minutes) {
     return '$minutes min NDL';
   }
+
+  @override
+  String surfaceInterval_result_noIntervalHelps(Object minutes) {
+    return 'No surface interval is enough. The longest no-stop dive at this depth on this mix is $minutes min. Shorten the second dive or reduce its depth.';
+  }
+
+  @override
+  String get surfaceInterval_result_notAchievable =>
+      'Not achievable at any surface interval';
 
   @override
   String get surfaceInterval_result_notYetSafe =>

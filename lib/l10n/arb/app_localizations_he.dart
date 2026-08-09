@@ -16115,6 +16115,16 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
+  String surfaceInterval_result_beyondHorizon(Object hours) {
+    return 'ההמתנה חורגת מ-$hours השעות שמתכנן זה מחפש. הסילוק ממשיך, ולכן מרווח שטח ארוך יותר יספיק.';
+  }
+
+  @override
+  String surfaceInterval_result_beyondHorizonShort(Object hours) {
+    return 'יותר מ-$hours שעות';
+  }
+
+  @override
   String get surfaceInterval_result_currentInterval => 'מרווח נוכחי';
 
   @override
@@ -16137,6 +16147,15 @@ class AppLocalizationsHe extends AppLocalizations {
   String surfaceInterval_result_ndlMinutes(Object minutes) {
     return '$minutes דקות NDL';
   }
+
+  @override
+  String surfaceInterval_result_noIntervalHelps(Object minutes) {
+    return 'שום מרווח שטח אינו מספיק. הצלילה הארוכה ביותר ללא דקומפרסיה בעומק זה עם תערובת זו היא $minutes דקות. קצר את הצלילה השנייה או הקטן את עומקה.';
+  }
+
+  @override
+  String get surfaceInterval_result_notAchievable =>
+      'לא ניתן להשגה בשום מרווח שטח';
 
   @override
   String get surfaceInterval_result_notYetSafe =>

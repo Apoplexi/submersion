@@ -9528,6 +9528,8 @@
   "surfaceInterval_gasWarning_modExceeded": "ppO₂ {ppO2} at {depth} exceeds {limit}. MOD for this mix is {mod}.",
   "surfaceInterval_heSemantics": "Helium: {percent}%",
   "surfaceInterval_o2Semantics": "O2: {percent}%",
+  "surfaceInterval_result_beyondHorizon": "The wait runs past the {hours} hours this planner searches. Off-gassing continues, so a longer surface interval will get there.",
+  "surfaceInterval_result_beyondHorizonShort": "More than {hours} hours",
   "surfaceInterval_result_currentInterval": "Current Interval",
   "surfaceInterval_result_gasUnsafe": "Gas unsafe at this depth",
   "surfaceInterval_result_inDeco": "In deco",
@@ -9535,6 +9537,8 @@
   "surfaceInterval_result_minimumInterval": "Minimum Surface Interval",
   "surfaceInterval_result_ndlForSecondDive": "NDL for 2nd Dive",
   "surfaceInterval_result_ndlMinutes": "{minutes} min NDL",
+  "surfaceInterval_result_noIntervalHelps": "No surface interval is enough. The longest no-stop dive at this depth on this mix is {minutes} min. Shorten the second dive or reduce its depth.",
+  "surfaceInterval_result_notAchievable": "Not achievable at any surface interval",
   "surfaceInterval_result_notYetSafe": "Not yet safe, increase surface interval",
   "surfaceInterval_result_safeToDive": "Safe to dive",
   "surfaceInterval_result_semantics": "Minimum surface interval: {interval}. Current interval: {current}. NDL for second dive: {ndl}. {status}",
@@ -9689,6 +9693,24 @@
       }
     }
   },
+  "@surfaceInterval_result_beyondHorizon": {
+    "description": "Explains that the second dive does fit on clean tissues but needs a longer surface interval than the planner searches",
+    "placeholders": {
+      "hours": {
+        "type": "Object",
+        "example": "6"
+      }
+    }
+  },
+  "@surfaceInterval_result_beyondHorizonShort": {
+    "description": "Shown in place of a minimum surface interval when the required wait is longer than the planner searches",
+    "placeholders": {
+      "hours": {
+        "type": "Object",
+        "example": "6"
+      }
+    }
+  },
   "@surfaceInterval_result_currentInterval": {
     "description": "Label for the current surface interval column"
   },
@@ -9715,6 +9737,18 @@
         "example": "15"
       }
     }
+  },
+  "@surfaceInterval_result_noIntervalHelps": {
+    "description": "Explains that the planned second dive busts the no-stop limit no matter how long the diver waits, and names the longest no-stop dive that is reachable",
+    "placeholders": {
+      "minutes": {
+        "type": "Object",
+        "example": "43"
+      }
+    }
+  },
+  "@surfaceInterval_result_notAchievable": {
+    "description": "Shown in place of a minimum surface interval when no interval makes the second dive a no-stop dive"
   },
   "@surfaceInterval_result_notYetSafe": {
     "description": "Status message when more surface interval time is needed"

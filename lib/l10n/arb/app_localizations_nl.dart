@@ -16406,6 +16406,16 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String surfaceInterval_result_beyondHorizon(Object hours) {
+    return 'De wachttijd valt buiten de $hours uur die deze planner doorzoekt. De ontgassing gaat door, dus een langer oppervlakte-interval volstaat.';
+  }
+
+  @override
+  String surfaceInterval_result_beyondHorizonShort(Object hours) {
+    return 'Meer dan $hours uur';
+  }
+
+  @override
   String get surfaceInterval_result_currentInterval => 'Huidig interval';
 
   @override
@@ -16429,6 +16439,15 @@ class AppLocalizationsNl extends AppLocalizations {
   String surfaceInterval_result_ndlMinutes(Object minutes) {
     return '$minutes min NDL';
   }
+
+  @override
+  String surfaceInterval_result_noIntervalHelps(Object minutes) {
+    return 'Geen enkel oppervlakte-interval is voldoende. De langste duik zonder decompressie op deze diepte met dit mengsel duurt $minutes min. Verkort de tweede duik of verminder de diepte.';
+  }
+
+  @override
+  String get surfaceInterval_result_notAchievable =>
+      'Niet haalbaar met welk oppervlakte-interval dan ook';
 
   @override
   String get surfaceInterval_result_notYetSafe =>

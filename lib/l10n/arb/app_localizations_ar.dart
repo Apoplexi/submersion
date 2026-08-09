@@ -16236,6 +16236,16 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String surfaceInterval_result_beyondHorizon(Object hours) {
+    return 'زمن الانتظار يتجاوز $hours ساعات التي يبحث فيها هذا المخطط. يستمر التخلص من النيتروجين، لذا ستكفي فترة سطح أطول.';
+  }
+
+  @override
+  String surfaceInterval_result_beyondHorizonShort(Object hours) {
+    return 'أكثر من $hours ساعات';
+  }
+
+  @override
   String get surfaceInterval_result_currentInterval => 'الفترة الحالية';
 
   @override
@@ -16259,6 +16269,15 @@ class AppLocalizationsAr extends AppLocalizations {
   String surfaceInterval_result_ndlMinutes(Object minutes) {
     return '$minutes دقيقة NDL';
   }
+
+  @override
+  String surfaceInterval_result_noIntervalHelps(Object minutes) {
+    return 'لا تكفي أي فترة سطح. أطول غطسة بدون توقف إلزامي على هذا العمق بهذا الخليط هي $minutes دقيقة. قلّل زمن الغطسة الثانية أو قلّل عمقها.';
+  }
+
+  @override
+  String get surfaceInterval_result_notAchievable =>
+      'غير قابل للتحقيق بأي فترة سطح';
 
   @override
   String get surfaceInterval_result_notYetSafe =>

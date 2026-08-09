@@ -16497,6 +16497,16 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String surfaceInterval_result_beyondHorizon(Object hours) {
+    return 'A várakozás túllépi azt a $hours órát, ameddig ez a tervező keres. A kitelítődés folytatódik, így egy hosszabb felszíni intervallum elegendő lesz.';
+  }
+
+  @override
+  String surfaceInterval_result_beyondHorizonShort(Object hours) {
+    return 'Több mint $hours óra';
+  }
+
+  @override
   String get surfaceInterval_result_currentInterval => 'Jelenlegi intervallum';
 
   @override
@@ -16521,6 +16531,15 @@ class AppLocalizationsHu extends AppLocalizations {
   String surfaceInterval_result_ndlMinutes(Object minutes) {
     return '$minutes perc NDL';
   }
+
+  @override
+  String surfaceInterval_result_noIntervalHelps(Object minutes) {
+    return 'Semmilyen felszíni intervallum nem elegendő. A leghosszabb dekompresszió nélküli merülés ezen a mélységen ezzel a keverékkel $minutes perc. Rövidítsd le a második merülést vagy csökkentsd a mélységét.';
+  }
+
+  @override
+  String get surfaceInterval_result_notAchievable =>
+      'Semmilyen felszíni intervallummal nem érhető el';
 
   @override
   String get surfaceInterval_result_notYetSafe =>

@@ -16513,6 +16513,16 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String surfaceInterval_result_beyondHorizon(Object hours) {
+    return 'Die Wartezeit liegt über den $hours Stunden, die dieser Planer durchsucht. Die Entsättigung geht weiter, ein längeres Oberflächenintervall reicht also aus.';
+  }
+
+  @override
+  String surfaceInterval_result_beyondHorizonShort(Object hours) {
+    return 'Mehr als $hours Stunden';
+  }
+
+  @override
   String get surfaceInterval_result_currentInterval => 'Aktuelles Intervall';
 
   @override
@@ -16537,6 +16547,15 @@ class AppLocalizationsDe extends AppLocalizations {
   String surfaceInterval_result_ndlMinutes(Object minutes) {
     return '$minutes Min Nullzeit';
   }
+
+  @override
+  String surfaceInterval_result_noIntervalHelps(Object minutes) {
+    return 'Kein Oberflächenintervall reicht aus. Der längste Nullzeit-Tauchgang in dieser Tiefe mit diesem Gemisch dauert $minutes Min. Zweiten Tauchgang kürzen oder dessen Tiefe reduzieren.';
+  }
+
+  @override
+  String get surfaceInterval_result_notAchievable =>
+      'Mit keinem Oberflächenintervall erreichbar';
 
   @override
   String get surfaceInterval_result_notYetSafe =>

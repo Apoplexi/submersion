@@ -16546,6 +16546,16 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
+  String surfaceInterval_result_beyondHorizon(Object hours) {
+    return 'L\'attesa supera le $hours ore esplorate da questo pianificatore. La desaturazione continua, quindi un intervallo di superficie più lungo sarà sufficiente.';
+  }
+
+  @override
+  String surfaceInterval_result_beyondHorizonShort(Object hours) {
+    return 'Più di $hours ore';
+  }
+
+  @override
   String get surfaceInterval_result_currentInterval => 'Intervallo Corrente';
 
   @override
@@ -16570,6 +16580,15 @@ class AppLocalizationsIt extends AppLocalizations {
   String surfaceInterval_result_ndlMinutes(Object minutes) {
     return '$minutes min NDL';
   }
+
+  @override
+  String surfaceInterval_result_noIntervalHelps(Object minutes) {
+    return 'Nessun intervallo di superficie è sufficiente. L\'immersione senza decompressione più lunga a questa profondità con questa miscela è di $minutes min. Accorcia la seconda immersione o riducine la profondità.';
+  }
+
+  @override
+  String get surfaceInterval_result_notAchievable =>
+      'Non raggiungibile con alcun intervallo di superficie';
 
   @override
   String get surfaceInterval_result_notYetSafe =>

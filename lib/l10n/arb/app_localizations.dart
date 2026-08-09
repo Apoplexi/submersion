@@ -27774,6 +27774,18 @@ abstract class AppLocalizations {
   /// **'O2: {percent}%'**
   String surfaceInterval_o2Semantics(Object percent);
 
+  /// Explains that the second dive does fit on clean tissues but needs a longer surface interval than the planner searches
+  ///
+  /// In en, this message translates to:
+  /// **'The wait runs past the {hours} hours this planner searches. Off-gassing continues, so a longer surface interval will get there.'**
+  String surfaceInterval_result_beyondHorizon(Object hours);
+
+  /// Shown in place of a minimum surface interval when the required wait is longer than the planner searches
+  ///
+  /// In en, this message translates to:
+  /// **'More than {hours} hours'**
+  String surfaceInterval_result_beyondHorizonShort(Object hours);
+
   /// Label for the current surface interval column
   ///
   /// In en, this message translates to:
@@ -27815,6 +27827,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{minutes} min NDL'**
   String surfaceInterval_result_ndlMinutes(Object minutes);
+
+  /// Explains that the planned second dive busts the no-stop limit no matter how long the diver waits, and names the longest no-stop dive that is reachable
+  ///
+  /// In en, this message translates to:
+  /// **'No surface interval is enough. The longest no-stop dive at this depth on this mix is {minutes} min. Shorten the second dive or reduce its depth.'**
+  String surfaceInterval_result_noIntervalHelps(Object minutes);
+
+  /// Shown in place of a minimum surface interval when no interval makes the second dive a no-stop dive
+  ///
+  /// In en, this message translates to:
+  /// **'Not achievable at any surface interval'**
+  String get surfaceInterval_result_notAchievable;
 
   /// Status message when more surface interval time is needed
   ///

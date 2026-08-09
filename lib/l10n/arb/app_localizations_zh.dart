@@ -15686,6 +15686,16 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String surfaceInterval_result_beyondHorizon(Object hours) {
+    return '所需等待时间超出此计划器搜索的 $hours 小时。脱饱和仍在继续，因此更长的水面间隔即可满足。';
+  }
+
+  @override
+  String surfaceInterval_result_beyondHorizonShort(Object hours) {
+    return '超过 $hours 小时';
+  }
+
+  @override
   String get surfaceInterval_result_currentInterval => '当前间隔';
 
   @override
@@ -15707,6 +15717,14 @@ class AppLocalizationsZh extends AppLocalizations {
   String surfaceInterval_result_ndlMinutes(Object minutes) {
     return '$minutes 分钟 NDL';
   }
+
+  @override
+  String surfaceInterval_result_noIntervalHelps(Object minutes) {
+    return '任何水面间隔都不够。在此深度使用此混合气体，最长的免减压潜水时间为 $minutes 分钟。请缩短第二次潜水或降低其深度。';
+  }
+
+  @override
+  String get surfaceInterval_result_notAchievable => '任何水面间隔都无法达成';
 
   @override
   String get surfaceInterval_result_notYetSafe => '尚不安全，请增加水面间隔';
