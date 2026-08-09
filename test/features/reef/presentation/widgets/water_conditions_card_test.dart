@@ -125,9 +125,7 @@ void main() {
       expect(find.textContaining('+0.4C'), findsOneWidget);
     });
 
-    testWidgets('converts anomaly as a delta, not an absolute', (
-      tester,
-    ) async {
+    testWidgets('converts anomaly as a delta, not an absolute', (tester) async {
       await tester.pumpWidget(
         _harness(
           health: ReefPart.ok(_health(anomaly: 0.5)),
