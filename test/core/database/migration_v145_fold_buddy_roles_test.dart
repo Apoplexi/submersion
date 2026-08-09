@@ -91,6 +91,15 @@ void main() {
             "created_at, updated_at) VALUES "
             "('r5', 'b3', 'mermaid', '444', 'padi', '', 1000, 2000)",
           );
+          // orphaned row: buddy_id references no buddies row (FK-off test
+          // databases can carry these). The JOIN in the migration excludes
+          // it entirely, so it must not fail and must not create a cert.
+          rawDb.execute(
+            "INSERT INTO buddy_roles "
+            "(id, buddy_id, role, credential_number, agency, notes, "
+            "created_at, updated_at) VALUES "
+            "('r6', 'b-orphan', 'instructor', '555', 'padi', '', 1000, 2000)",
+          );
         },
       );
 
@@ -165,23 +174,136 @@ void main() {
           )
           .get();
       expect(r5Cert, isEmpty);
-    },
-  );
 
-  test(
-    'a fresh v145+ database has no buddy_roles table (no-op shape)',
-    () async {
-      final db = AppDatabase(NativeDatabase.memory());
-      addTearDown(db.close);
-
-      final tables = await db
+      // orphaned row (buddy_id matches no buddies row): the JOIN excludes
+      // it, so no cert is created and the migration does not fail.
+      final r6Cert = await db
           .customSelect(
-            "SELECT name FROM sqlite_master WHERE name='buddy_roles'",
+            "SELECT * FROM certifications WHERE id = 'buddyrolecert-r6'",
           )
           .get();
-      expect(tables, isEmpty);
+      expect(r6Cert, isEmpty);
+
+      // Total count: the 2 pre-existing certs (c-dm, c-in) plus exactly the
+      // 2 new rows (r1, r4). r2/r3 backfill existing rows, r5/r6 create
+      // nothing -- any stray extra insert fails this loudly.
+      final allCerts = await db
+          .customSelect('SELECT id FROM certifications')
+          .get();
+      expect(allCerts, hasLength(4));
     },
   );
+
+  test('v145 onUpgrade block is a no-op when buddy_roles never existed '
+      '(the sqlite_master guard returns early)', () async {
+    final nativeDb = NativeDatabase.memory(
+      setup: (rawDb) {
+        rawDb.execute('PRAGMA user_version = 144');
+        // No buddy_roles table at all -- e.g. a DB that skipped straight
+        // from before v99 to v145 in one open, or already had it dropped
+        // by a parallel-branch collision. The guard must return early
+        // instead of failing on the missing table.
+        rawDb.execute('''
+          CREATE TABLE buddies (
+            id TEXT NOT NULL PRIMARY KEY, diver_id TEXT, name TEXT NOT NULL,
+            email TEXT, phone TEXT, photo_path TEXT,
+            notes TEXT NOT NULL DEFAULT '', created_at INTEGER NOT NULL,
+            updated_at INTEGER NOT NULL, hlc TEXT)
+        ''');
+        rawDb.execute('''
+          CREATE TABLE certifications (
+            id TEXT NOT NULL PRIMARY KEY, diver_id TEXT, buddy_id TEXT,
+            name TEXT NOT NULL, agency TEXT NOT NULL, level TEXT,
+            card_number TEXT, issue_date INTEGER, expiry_date INTEGER,
+            instructor_name TEXT, instructor_number TEXT, instructor_id TEXT,
+            photo_front_path TEXT, photo_back_path TEXT, photo_front BLOB,
+            photo_back BLOB, course_id TEXT, notes TEXT NOT NULL DEFAULT '',
+            created_at INTEGER NOT NULL, updated_at INTEGER NOT NULL, hlc TEXT)
+        ''');
+      },
+    );
+
+    // Opening must not throw: the v145 onUpgrade block runs (from < 145)
+    // and its guard must return early against the missing table.
+    final db = AppDatabase(nativeDb);
+    addTearDown(db.close);
+
+    final tables = await db
+        .customSelect("SELECT name FROM sqlite_master WHERE name='buddy_roles'")
+        .get();
+    expect(tables, isEmpty);
+
+    // Nothing was fabricated: certifications is still empty.
+    final certs = await db.customSelect('SELECT id FROM certifications').get();
+    expect(certs, isEmpty);
+  });
+
+  test('beforeOpen backstop converts and drops buddy_roles when a '
+      'parallel-branch collision stranded a DB past v145 without running the '
+      'onUpgrade block', () async {
+    final nativeDb = NativeDatabase.memory(
+      setup: (rawDb) {
+        // user_version already at the current schema version, so onUpgrade
+        // never runs -- only the beforeOpen backstop can repair this.
+        rawDb.execute(
+          'PRAGMA user_version = ${AppDatabase.currentSchemaVersion}',
+        );
+        rawDb.execute('''
+          CREATE TABLE buddies (
+            id TEXT NOT NULL PRIMARY KEY, diver_id TEXT, name TEXT NOT NULL,
+            email TEXT, phone TEXT, photo_path TEXT,
+            notes TEXT NOT NULL DEFAULT '', created_at INTEGER NOT NULL,
+            updated_at INTEGER NOT NULL, hlc TEXT)
+        ''');
+        rawDb.execute('''
+          CREATE TABLE certifications (
+            id TEXT NOT NULL PRIMARY KEY, diver_id TEXT, buddy_id TEXT,
+            name TEXT NOT NULL, agency TEXT NOT NULL, level TEXT,
+            card_number TEXT, issue_date INTEGER, expiry_date INTEGER,
+            instructor_name TEXT, instructor_number TEXT, instructor_id TEXT,
+            photo_front_path TEXT, photo_back_path TEXT, photo_front BLOB,
+            photo_back BLOB, course_id TEXT, notes TEXT NOT NULL DEFAULT '',
+            created_at INTEGER NOT NULL, updated_at INTEGER NOT NULL, hlc TEXT)
+        ''');
+        rawDb.execute('''
+          CREATE TABLE buddy_roles (
+            id TEXT NOT NULL PRIMARY KEY, buddy_id TEXT NOT NULL,
+            role TEXT NOT NULL, credential_number TEXT, agency TEXT,
+            notes TEXT NOT NULL DEFAULT '', created_at INTEGER NOT NULL,
+            updated_at INTEGER NOT NULL, hlc TEXT)
+        ''');
+        rawDb.execute(
+          "INSERT INTO buddies (id, name, created_at, updated_at) "
+          "VALUES ('b1', 'B1', 0, 0)",
+        );
+        rawDb.execute(
+          "INSERT INTO buddy_roles "
+          "(id, buddy_id, role, credential_number, agency, notes, "
+          "created_at, updated_at) VALUES "
+          "('r1', 'b1', 'instructor', '111', 'padi', 'note', 1000, 2000)",
+        );
+      },
+    );
+
+    final db = AppDatabase(nativeDb);
+    addTearDown(() => db.close());
+
+    // The backstop converted the stranded row...
+    final cert = await db
+        .customSelect(
+          "SELECT * FROM certifications WHERE id = 'buddyrolecert-r1'",
+        )
+        .getSingle();
+    expect(cert.data['buddy_id'], 'b1');
+    expect(cert.data['level'], 'instructor');
+    expect(cert.data['card_number'], '111');
+
+    // ...and dropped the orphaned table.
+    final tables = await db
+        .customSelect("SELECT name FROM sqlite_master WHERE name='buddy_roles'")
+        .get();
+    expect(tables, isEmpty);
+  });
 
   test('version ladder includes 145', () {
     expect(AppDatabase.currentSchemaVersion, greaterThanOrEqualTo(145));

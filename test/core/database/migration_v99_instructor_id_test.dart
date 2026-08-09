@@ -106,7 +106,7 @@ void main() {
     expect(row.data['instructor_id'], isNull);
   });
 
-  test('schema version is at least 97 and the migration list includes it', () {
+  test('schema version is at least 99 and the migration list includes it', () {
     expect(AppDatabase.currentSchemaVersion, greaterThanOrEqualTo(99));
     expect(AppDatabase.migrationVersions, contains(99));
   });

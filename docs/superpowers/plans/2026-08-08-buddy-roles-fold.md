@@ -715,6 +715,8 @@ Expected: FAIL (no v145 in ladder).
 
 (d) Remove the table: delete `class BuddyRoles` (lines 1753-1775), `BuddyRoles,` from `@DriftDatabase(tables: [...])` (:2881), `'buddy_roles'` from `_hlcTables` (:4263), `await m.createTable(buddyRoles);` in the v99 onUpgrade block (:7049), and `await createMigrator().createTable(buddyRoles);` in the beforeOpen backstop (:7613 — **mandatory**, or every open recreates the dropped table). Leave a one-line comment in the v99 block noting buddy_roles was created here historically and dropped in v145 (the version ladder must still make sense to readers).
 
+**Amended during execution per review finding:** the plan text above said `_migrateBuddyRolesToCertifications` is invoked from `onUpgrade` ONLY, "never beforeOpen." A review finding overrode this: the helper's own `DROP TABLE` makes its `sqlite_master` guard a strict no-op once `buddy_roles` is gone, so (unlike #553's inline-cert copy) it CANNOT resurrect a user-deleted cert, and it must also run as a guarded `beforeOpen` backstop (v106-style) to protect a DB whose `user_version` advanced past 145 without running the v145 block. See the design spec's "Data migration" section for the amended rationale.
+
 (e) Regenerate Drift code:
 
 Run: `dart run build_runner build --delete-conflicting-outputs`

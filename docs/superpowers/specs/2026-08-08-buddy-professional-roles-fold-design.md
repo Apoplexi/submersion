@@ -83,8 +83,8 @@ role selector in the buddy picker, and `unanimousBuddyRolesForDives`.
 Version claimed against main at `currentSchemaVersion = 144` on 2026-08-08;
 re-verify at implementation time — parallel branches may have taken 145.
 
-For each `buddy_roles` row, in `onUpgrade` (not `beforeOpen`, so a
-user-deleted migrated cert is never resurrected — same lesson as #553):
+For each `buddy_roles` row, in `onUpgrade` AND as a guarded `beforeOpen`
+backstop (amended during execution per review finding — see below):
 
 1. Map role to level: `instructor` -> `instructor`, `diveMaster` ->
    `diveMaster`, `diveGuide` -> `diveGuide`.
@@ -98,6 +98,20 @@ user-deleted migrated cert is never resurrected — same lesson as #553):
    `name` = level display name, agency/cardNumber/notes and original
    created/updated timestamps carried over.
 4. `DROP TABLE buddy_roles`; remove the table from the Drift schema.
+
+The helper also runs as a guarded `beforeOpen` backstop (v106-style,
+mirroring the other parallel-branch collision self-heals). This is safe
+unlike #553's inline-cert copy: that helper's source columns
+(`buddies.certification_level`/`_agency`) survive until v110, so re-running
+it in `beforeOpen` could resurrect a user-deleted cert from still-present
+source data. `_migrateBuddyRolesToCertifications` has no such hazard — its
+own `DROP TABLE` makes the `sqlite_master` guard a strict no-op the instant
+`buddy_roles` is gone, so there is no source data left to resurrect from
+after the first run. The backstop exists purely to protect a database whose
+`user_version` advanced past 145 (parallel-branch schema-version collision)
+without ever executing the v145 `onUpgrade` block: without it, that database
+would carry an orphaned `buddy_roles` table that nothing else reads, and its
+credentials would silently vanish from the UI forever.
 
 Update tripwire/contract tests: `parentRefs` completeness, streaming parity,
 migration version tests.

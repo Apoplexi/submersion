@@ -4003,11 +4003,19 @@ class AppDatabase extends _$AppDatabase {
 
   /// Fold buddy professional credentials (buddy_roles, issue #395) into
   /// buddy-owned certifications rows, then drop the table (v145; spec
-  /// 2026-08-08-buddy-professional-roles-fold). Invoked from onUpgrade ONLY,
-  /// never beforeOpen -- re-running on every open would resurrect
-  /// user-deleted certs. Ids are deterministic (`buddyrolecert-<rowId>`):
-  /// synced replicas share buddy_roles row ids, so independent per-device
-  /// migrations converge on identical cert rows instead of duplicating.
+  /// 2026-08-08-buddy-professional-roles-fold). Invoked from onUpgrade AND
+  /// as a guarded beforeOpen backstop -- unlike the #553 inline-cert copy
+  /// (whose source columns survive until v110, so it must never run in
+  /// beforeOpen), this helper's own DROP TABLE makes the sqlite_master guard
+  /// below a strict no-op once buddy_roles is gone, so re-running it on
+  /// every open cannot resurrect a user-deleted cert. The beforeOpen call
+  /// exists purely to protect a DB whose user_version advanced past 145
+  /// (parallel-branch schema-version collision) without ever running the
+  /// v145 block, which would otherwise strand it with an orphaned
+  /// buddy_roles table nothing else reads. Ids are deterministic
+  /// (`buddyrolecert-<rowId>`): synced replicas share buddy_roles row ids,
+  /// so independent per-device migrations converge on identical cert rows
+  /// instead of duplicating.
   Future<void> _migrateBuddyRolesToCertifications() async {
     final tables = await customSelect(
       "SELECT name FROM sqlite_master WHERE type='table' "
@@ -7651,6 +7659,22 @@ class AppDatabase extends _$AppDatabase {
         // diver_settings calibration columns.
         await _assertVisibilityMetersColumn();
         await _assertVisibilityScaleColumns();
+
+        // v145 backstop: re-run the buddy_roles fold (parallel-branch
+        // schema-version collision self-heal). This is safe to re-run on
+        // every open, unlike the #553 inline-cert copy above, which must
+        // NEVER run here -- that helper's source columns (buddies.
+        // certification_level/_agency) survive until v110, so re-running it
+        // in beforeOpen would resurrect a user-deleted buddy cert from
+        // still-present source data. _migrateBuddyRolesToCertifications has
+        // no such hazard: its own DROP TABLE makes the sqlite_master guard a
+        // strict no-op the moment buddy_roles is gone, so there is no source
+        // data left to resurrect from. Its purpose here is purely to protect
+        // a DB whose user_version advanced past 145 without ever running the
+        // v145 block -- without this backstop, that DB would carry an
+        // orphaned buddy_roles table whose credentials silently vanish from
+        // the UI forever (nothing else reads that table).
+        await _migrateBuddyRolesToCertifications();
 
         // Built-in dive types are reference data: identical on every device and
         // undeletable through DiveTypeRepository. Nothing else restores them --
