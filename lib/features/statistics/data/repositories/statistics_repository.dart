@@ -60,8 +60,16 @@ class StatisticsRepository {
   AppDatabase get _db => DatabaseService.instance.database;
   final _log = LoggerService.forClass(StatisticsRepository);
 
-  /// Smoothing window used by [getAscentDescentRates], in seconds. Matches the
-  /// per-dive calculator so both read the same shape out of a profile.
+  /// Smoothing interval used by [getAscentDescentRates], in seconds.
+  ///
+  /// Kept in sync with the per-dive calculator's configured target interval so
+  /// the two cannot drift apart on how much of a profile they smooth over. The
+  /// filters themselves differ: [AscentRateCalculator] takes an overlapping,
+  /// centred moving average over point-to-point rates (window rounded to an odd
+  /// count of samples, minimum three), while this query averages depth into
+  /// fixed non-overlapping buckets and differences consecutive bucket means.
+  /// Both suppress the same short-timescale noise; neither is a reimplementation
+  /// of the other, and their per-profile outputs are close but not identical.
   static const int _rateWindowSeconds =
       AscentRateCalculator.defaultSmoothingWindowSeconds;
 
@@ -1994,19 +2002,19 @@ class StatisticsRepository {
   /// that column (libdivecomputer reports no ascent-rate sample type), so it is
   /// null for every row and averaging it always yielded an empty section.
   ///
-  /// The derivation mirrors [AscentRateCalculator], which computes the same
-  /// quantity per-dive for the profile chart:
+  /// The derivation follows the same conventions as [AscentRateCalculator],
+  /// which computes rates per-dive for the profile chart, but smooths by a
+  /// different (cheaper, set-based) filter -- see [_rateWindowSeconds]:
   ///
-  /// - Samples are averaged into fixed [_rateWindowSeconds] windows. This is
-  ///   the SQL equivalent of the calculator's time-based smoothing: it makes
-  ///   the result independent of the computer's sample interval, and keeps
+  /// - Samples are averaged into fixed [_rateWindowSeconds] buckets, which
+  ///   makes the result independent of the computer's sample interval and keeps
   ///   depth-resolution noise from dominating (0.1 m between two 1 s samples is
   ///   already 6 m/min of pure quantisation noise).
-  /// - The rate between two windows uses their mean sample times, not the
-  ///   window width, so uneven occupancy at the edges cannot distort the
+  /// - The rate between two buckets uses their mean sample times, not the
+  ///   bucket width, so uneven occupancy at the edges cannot distort the
   ///   interval.
   /// - Positive is ascending, matching [AscentRatePoint.rateMetersPerMin].
-  /// - Windows slower than [_sustainedTransitThreshold] are excluded, so
+  /// - Buckets slower than [_sustainedTransitThreshold] are excluded, so
   ///   working a multi-level profile does not read as ascending or descending.
   ///
   /// Only primary profile rows are considered, so a dive logged by two
