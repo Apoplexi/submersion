@@ -163,12 +163,19 @@ class _MainScaffoldState extends ConsumerState<MainScaffold> {
 
   @override
   Widget build(BuildContext context) {
-    // Last-resort handler for the Android system back button. go_router's
-    // popRoute() walks the shell navigator first, so this only runs once
-    // nothing is left to pop -- which is the normal state after any
-    // context.go(), since go() replaces the stack instead of pushing onto it.
-    // Without this fallback the press falls through to SystemNavigator.pop()
-    // and closes the app instead of going back (#647).
+    // Last-resort handler for the Android system back button.
+    //
+    // go_router's popRoute() tries navigators innermost-first: its
+    // _findCurrentNavigators() collects [root, ...shells] and returns them
+    // reversed. So the shell's inner Navigator -- and any PopScope on the
+    // page it currently shows, such as EditFormScaffold's unsaved-changes
+    // guard -- gets to pop or decline before this ever runs.
+    //
+    // This PopScope is registered on the ROOT navigator's shell page, which
+    // makes it the LAST candidate. It therefore only fires when nothing can
+    // pop, the normal state after any context.go() because go() replaces the
+    // stack instead of pushing onto it. Without this fallback the press falls
+    // through to SystemNavigator.pop() and closes the app (#647).
     final upLocation = resolveUpLocation(GoRouterState.of(context).uri);
     return PopScope(
       // Only the dashboard resolves to null, so only the dashboard exits.
