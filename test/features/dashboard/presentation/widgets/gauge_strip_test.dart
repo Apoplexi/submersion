@@ -497,6 +497,20 @@ void main() {
       expect(find.text('No more diving before flight'), findsOneWidget);
     });
 
+    testWidgets('the open chip opens the no-fly calculator', (tester) async {
+      final spy = await pumpStrip(tester, gaugesWith(FlightWindowState.open));
+      final chip = find.textContaining('Dive window');
+      await tester.tap(find.ancestor(of: chip, matching: find.byType(InkWell)));
+      await tester.pumpAndSettle();
+      expect(spy.location, '/planning/no-fly');
+    });
+
+    testWidgets('the closed chip opens the no-fly calculator', (tester) async {
+      final spy = await pumpStrip(tester, gaugesWith(FlightWindowState.closed));
+      await tapChip(tester, 'No more diving before flight');
+      expect(spy.location, '/planning/no-fly');
+    });
+
     testWidgets('shows the closed message on conflict', (tester) async {
       await pumpStrip(tester, gaugesWith(FlightWindowState.conflict));
       expect(find.text('No more diving before flight'), findsOneWidget);
@@ -764,6 +778,24 @@ void main() {
         ),
       );
       expect(find.text('Backup ${kBackupAlertDays + 1}d ago'), findsOneWidget);
+    });
+
+    testWidgets('an existing backup also opens backup settings', (
+      tester,
+    ) async {
+      final spy = await pumpStrip(
+        tester,
+        DashboardGauges(
+          gearGauges: const [],
+          hasGear: true,
+          insurance: null,
+          noFlyStatus: null,
+          daysSinceLastDive: null,
+          lastBackupTime: DateTime.now(),
+        ),
+      );
+      await tapChip(tester, 'Backed up today');
+      expect(spy.location, '/settings/backup');
     });
   });
 
