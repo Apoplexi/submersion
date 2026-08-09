@@ -1625,15 +1625,24 @@ class AppLocalizationsZh extends AppLocalizations {
   String get certifications_ecardStack_empty_title => '暂无证书';
 
   @override
+  String get certifications_ecard_label_cardNumber => '卡号';
+
+  @override
   String certifications_ecard_label_certifiedBy(Object agency) {
     return '由 $agency 认证';
   }
+
+  @override
+  String get certifications_ecard_label_diver => '潜水员';
 
   @override
   String get certifications_ecard_label_instructor => '教练';
 
   @override
   String get certifications_ecard_label_issued => '签发日期';
+
+  @override
+  String get certifications_ecard_label_validUntil => '有效期至';
 
   @override
   String get certifications_ecard_statusBadge_expired => '已过期';

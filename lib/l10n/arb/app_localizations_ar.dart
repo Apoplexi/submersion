@@ -1698,15 +1698,24 @@ class AppLocalizationsAr extends AppLocalizations {
   String get certifications_ecardStack_empty_title => 'لا توجد شهادات بعد';
 
   @override
+  String get certifications_ecard_label_cardNumber => 'رقم البطاقة';
+
+  @override
   String certifications_ecard_label_certifiedBy(Object agency) {
     return 'معتمد من $agency';
   }
+
+  @override
+  String get certifications_ecard_label_diver => 'الغواص';
 
   @override
   String get certifications_ecard_label_instructor => 'المدرب';
 
   @override
   String get certifications_ecard_label_issued => 'تاريخ الإصدار';
+
+  @override
+  String get certifications_ecard_label_validUntil => 'صالحة حتى';
 
   @override
   String get certifications_ecard_statusBadge_expired => 'منتهية';

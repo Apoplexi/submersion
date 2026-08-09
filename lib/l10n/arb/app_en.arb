@@ -1083,9 +1083,12 @@
   "certifications_detail_tooltip_moreOptions": "More options",
   "certifications_ecardStack_empty_subtitle": "Add your first certification to see it here",
   "certifications_ecardStack_empty_title": "No certifications yet",
+  "certifications_ecard_label_cardNumber": "CARD NO.",
   "certifications_ecard_label_certifiedBy": "Certified by {agency}",
+  "certifications_ecard_label_diver": "DIVER",
   "certifications_ecard_label_instructor": "INSTRUCTOR",
   "certifications_ecard_label_issued": "ISSUED",
+  "certifications_ecard_label_validUntil": "VALID UNTIL",
   "certifications_ecard_statusBadge_expired": "EXPIRED",
   "certifications_ecard_statusBadge_expiring": "EXPIRING",
   "certifications_edit_appBar_add": "Add Certification",
@@ -1248,12 +1251,21 @@
       }
     }
   },
+  "@certifications_ecard_label_cardNumber": {
+    "description": "Uppercase field label above the certification card number on the generated wallet card"
+  },
   "@certifications_ecard_label_certifiedBy": {
     "placeholders": {
       "agency": {
         "type": "Object"
       }
     }
+  },
+  "@certifications_ecard_label_diver": {
+    "description": "Uppercase field label above the diver's name on the generated wallet card"
+  },
+  "@certifications_ecard_label_validUntil": {
+    "description": "Uppercase field label above the certification expiry date on the generated wallet card"
   },
   "@certifications_edit_datePicker_clearTooltip": {
     "placeholders": {

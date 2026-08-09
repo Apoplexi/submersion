@@ -1723,15 +1723,24 @@ class AppLocalizationsIt extends AppLocalizations {
       'Nessuna certificazione ancora';
 
   @override
+  String get certifications_ecard_label_cardNumber => 'N. TESSERA';
+
+  @override
   String certifications_ecard_label_certifiedBy(Object agency) {
     return 'Certificato da $agency';
   }
+
+  @override
+  String get certifications_ecard_label_diver => 'SUBACQUEO';
 
   @override
   String get certifications_ecard_label_instructor => 'ISTRUTTORE';
 
   @override
   String get certifications_ecard_label_issued => 'RILASCIATO';
+
+  @override
+  String get certifications_ecard_label_validUntil => 'VALIDA FINO AL';
 
   @override
   String get certifications_ecard_statusBadge_expired => 'SCADUTO';

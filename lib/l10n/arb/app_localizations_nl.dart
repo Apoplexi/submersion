@@ -1714,15 +1714,24 @@ class AppLocalizationsNl extends AppLocalizations {
       'Nog geen certificeringen';
 
   @override
+  String get certifications_ecard_label_cardNumber => 'KAARTNR.';
+
+  @override
   String certifications_ecard_label_certifiedBy(Object agency) {
     return 'Gecertificeerd door $agency';
   }
+
+  @override
+  String get certifications_ecard_label_diver => 'DUIKER';
 
   @override
   String get certifications_ecard_label_instructor => 'INSTRUCTEUR';
 
   @override
   String get certifications_ecard_label_issued => 'UITGEGEVEN';
+
+  @override
+  String get certifications_ecard_label_validUntil => 'GELDIG TOT';
 
   @override
   String get certifications_ecard_statusBadge_expired => 'VERLOPEN';

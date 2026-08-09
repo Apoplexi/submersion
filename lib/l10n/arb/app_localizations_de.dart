@@ -1726,15 +1726,24 @@ class AppLocalizationsDe extends AppLocalizations {
       'Noch keine Zertifizierungen';
 
   @override
+  String get certifications_ecard_label_cardNumber => 'KARTEN-NR.';
+
+  @override
   String certifications_ecard_label_certifiedBy(Object agency) {
     return 'Zertifiziert von $agency';
   }
+
+  @override
+  String get certifications_ecard_label_diver => 'TAUCHER';
 
   @override
   String get certifications_ecard_label_instructor => 'INSTRUCTOR';
 
   @override
   String get certifications_ecard_label_issued => 'AUSGESTELLT';
+
+  @override
+  String get certifications_ecard_label_validUntil => 'GÜLTIG BIS';
 
   @override
   String get certifications_ecard_statusBadge_expired => 'ABGELAUFEN';

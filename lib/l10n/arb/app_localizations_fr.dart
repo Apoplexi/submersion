@@ -1730,15 +1730,24 @@ class AppLocalizationsFr extends AppLocalizations {
   String get certifications_ecardStack_empty_title => 'Aucune certification';
 
   @override
+  String get certifications_ecard_label_cardNumber => 'N° DE CARTE';
+
+  @override
   String certifications_ecard_label_certifiedBy(Object agency) {
     return 'Certifie par $agency';
   }
+
+  @override
+  String get certifications_ecard_label_diver => 'PLONGEUR';
 
   @override
   String get certifications_ecard_label_instructor => 'MONITEUR';
 
   @override
   String get certifications_ecard_label_issued => 'DELIVRE';
+
+  @override
+  String get certifications_ecard_label_validUntil => 'VALABLE JUSQU\'AU';
 
   @override
   String get certifications_ecard_statusBadge_expired => 'EXPIRE';

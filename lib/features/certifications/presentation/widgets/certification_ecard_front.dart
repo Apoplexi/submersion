@@ -90,128 +90,191 @@ class CertificationEcardFront extends StatelessWidget {
           ),
           // Card content
           Padding(
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.all(16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                // Top row: agency name and status badge
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(
-                      child: Text(
-                        agency.displayName,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 1.2,
-                        ),
-                      ),
-                    ),
-                    _buildStatusBadge(context) ?? const SizedBox.shrink(),
-                  ],
-                ),
-                const Spacer(),
-                // Center: certification name
-                Text(
-                  certification.name,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 22,
-                    fontWeight: FontWeight.w600,
-                    letterSpacing: 0.5,
-                  ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                // Level display if present
-                if (certification.level != null) ...[
-                  const SizedBox(height: 4),
-                  Text(
-                    certification.level!.displayName,
-                    style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.85),
-                      fontSize: 14,
-                      fontWeight: FontWeight.w400,
-                    ),
-                  ),
-                ],
-                const Spacer(),
-                // Bottom row: diver info and issue date
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            diverName.toUpperCase(),
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                              letterSpacing: 1.5,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          if (certification.cardNumber != null &&
-                              certification.cardNumber!.isNotEmpty) ...[
-                            const SizedBox(height: 2),
-                            Text(
-                              certification.cardNumber!,
-                              style: TextStyle(
-                                color: Colors.white.withValues(alpha: 0.8),
-                                fontSize: 12,
-                                letterSpacing: 1.0,
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ],
-                        ],
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    if (certification.issueDate != null)
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            context.l10n.certifications_ecard_label_issued,
-                            style: TextStyle(
-                              color: Colors.white.withValues(alpha: 0.7),
-                              fontSize: 10,
-                              fontWeight: FontWeight.w500,
-                              letterSpacing: 1.0,
-                            ),
-                          ),
-                          const SizedBox(height: 2),
-                          Text(
-                            DateFormat(
-                              'MM/yy',
-                            ).format(certification.issueDate!),
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ],
-                      ),
-                  ],
-                ),
+                _buildHeader(context),
+                // Flexible so the hero is what gives way when a long name, a
+                // level and a full field grid all compete for a CR80 card on a
+                // narrow phone. The header and grid are the facts a dive
+                // operator reads, so they keep their intrinsic height.
+                Flexible(child: _buildHero()),
+                _buildFieldGrid(context),
               ],
             ),
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildHeader(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(
+          child: Text(
+            certification.agency.displayName,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 1.2,
+            ),
+          ),
+        ),
+        _buildStatusBadge(context) ?? const SizedBox.shrink(),
+      ],
+    );
+  }
+
+  Widget _buildHero() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Flexible(
+          child: Text(
+            certification.name,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 20,
+              fontWeight: FontWeight.w600,
+              letterSpacing: 0.5,
+            ),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+        if (certification.level != null) ...[
+          const SizedBox(height: 2),
+          Text(
+            certification.level!.displayName,
+            style: TextStyle(
+              color: Colors.white.withValues(alpha: 0.85),
+              fontSize: 13,
+              fontWeight: FontWeight.w400,
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
+      ],
+    );
+  }
+
+  /// The labelled facts a dive operator checks at check-in.
+  ///
+  /// Cells with no value are dropped rather than rendered blank, and the
+  /// remaining cells reflow two per row, so a bare certification produces a
+  /// tighter card instead of a grid of holes.
+  Widget _buildFieldGrid(BuildContext context) {
+    final cells = _buildFieldCells(context);
+    if (cells.isEmpty) return const SizedBox.shrink();
+
+    final rows = <List<_CardField>>[];
+    for (var i = 0; i < cells.length; i += 2) {
+      rows.add(cells.sublist(i, (i + 2).clamp(0, cells.length)));
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          height: 1,
+          margin: const EdgeInsets.only(bottom: 10),
+          color: Colors.white.withValues(alpha: 0.25),
+        ),
+        for (var i = 0; i < rows.length; i++) ...[
+          if (i > 0) const SizedBox(height: 8),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              for (final cell in rows[i])
+                Expanded(child: _buildFieldCell(cell)),
+              // Keep a lone cell in the left column instead of stretching it.
+              if (rows[i].length == 1) const Expanded(child: SizedBox.shrink()),
+            ],
+          ),
+        ],
+      ],
+    );
+  }
+
+  List<_CardField> _buildFieldCells(BuildContext context) {
+    final l10n = context.l10n;
+    final dateFormat = DateFormat.yMMM();
+    final cardNumber = certification.cardNumber;
+
+    return [
+      if (diverName.trim().isNotEmpty)
+        _CardField(
+          label: l10n.certifications_ecard_label_diver,
+          value: diverName.toUpperCase(),
+        ),
+      if (cardNumber != null && cardNumber.isNotEmpty)
+        _CardField(
+          label: l10n.certifications_ecard_label_cardNumber,
+          value: cardNumber,
+        ),
+      if (certification.issueDate != null)
+        _CardField(
+          label: l10n.certifications_ecard_label_issued,
+          value: dateFormat.format(certification.issueDate!),
+        ),
+      if (certification.expiryDate != null)
+        _CardField(
+          label: l10n.certifications_ecard_label_validUntil,
+          value: dateFormat.format(certification.expiryDate!),
+          valueColor: _expiryColor(),
+        ),
+    ];
+  }
+
+  /// Tints the expiry value to match the status badge.
+  ///
+  /// These are the badge's literal colours rather than [ColorScheme] roles,
+  /// because the card sits on an agency gradient, not on a theme surface. The
+  /// lighter shades keep the text legible against a dark gradient.
+  Color _expiryColor() {
+    if (certification.isExpired) return Colors.red.shade200;
+    if (certification.expiresWithin(90)) return Colors.orange.shade200;
+    return Colors.white;
+  }
+
+  Widget _buildFieldCell(_CardField field) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          field.label,
+          style: TextStyle(
+            color: Colors.white.withValues(alpha: 0.7),
+            fontSize: 9,
+            fontWeight: FontWeight.w500,
+            letterSpacing: 1.0,
+          ),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
+        const SizedBox(height: 2),
+        Text(
+          field.value,
+          style: TextStyle(
+            color: field.valueColor,
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+            letterSpacing: 0.5,
+          ),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
+      ],
     );
   }
 
@@ -255,6 +318,19 @@ class CertificationEcardFront extends StatelessWidget {
       ),
     );
   }
+}
+
+/// One labelled fact on the generated card front.
+class _CardField {
+  final String label;
+  final String value;
+  final Color valueColor;
+
+  const _CardField({
+    required this.label,
+    required this.value,
+    this.valueColor = Colors.white,
+  });
 }
 
 /// Custom painter for decorative wave pattern on the card.

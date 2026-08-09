@@ -1681,15 +1681,24 @@ class AppLocalizationsHe extends AppLocalizations {
   String get certifications_ecardStack_empty_title => 'אין עדיין הסמכות';
 
   @override
+  String get certifications_ecard_label_cardNumber => 'מספר כרטיס';
+
+  @override
   String certifications_ecard_label_certifiedBy(Object agency) {
     return 'הוסמך על ידי $agency';
   }
+
+  @override
+  String get certifications_ecard_label_diver => 'צוללן';
 
   @override
   String get certifications_ecard_label_instructor => 'מדריך';
 
   @override
   String get certifications_ecard_label_issued => 'הונפק';
+
+  @override
+  String get certifications_ecard_label_validUntil => 'בתוקף עד';
 
   @override
   String get certifications_ecard_statusBadge_expired => 'פג תוקף';

@@ -2936,11 +2936,23 @@ abstract class AppLocalizations {
   /// **'No certifications yet'**
   String get certifications_ecardStack_empty_title;
 
+  /// Uppercase field label above the certification card number on the generated wallet card
+  ///
+  /// In en, this message translates to:
+  /// **'CARD NO.'**
+  String get certifications_ecard_label_cardNumber;
+
   /// No description provided for @certifications_ecard_label_certifiedBy.
   ///
   /// In en, this message translates to:
   /// **'Certified by {agency}'**
   String certifications_ecard_label_certifiedBy(Object agency);
+
+  /// Uppercase field label above the diver's name on the generated wallet card
+  ///
+  /// In en, this message translates to:
+  /// **'DIVER'**
+  String get certifications_ecard_label_diver;
 
   /// No description provided for @certifications_ecard_label_instructor.
   ///
@@ -2953,6 +2965,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'ISSUED'**
   String get certifications_ecard_label_issued;
+
+  /// Uppercase field label above the certification expiry date on the generated wallet card
+  ///
+  /// In en, this message translates to:
+  /// **'VALID UNTIL'**
+  String get certifications_ecard_label_validUntil;
 
   /// No description provided for @certifications_ecard_statusBadge_expired.
   ///

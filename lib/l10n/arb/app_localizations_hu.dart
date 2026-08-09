@@ -1715,15 +1715,24 @@ class AppLocalizationsHu extends AppLocalizations {
       'Meg nincsenek kepesitesek';
 
   @override
+  String get certifications_ecard_label_cardNumber => 'KARTYASZAM';
+
+  @override
   String certifications_ecard_label_certifiedBy(Object agency) {
     return 'Kepesitette: $agency';
   }
+
+  @override
+  String get certifications_ecard_label_diver => 'BUVAR';
 
   @override
   String get certifications_ecard_label_instructor => 'OKTATO';
 
   @override
   String get certifications_ecard_label_issued => 'KIADAS';
+
+  @override
+  String get certifications_ecard_label_validUntil => 'LEJARAT';
 
   @override
   String get certifications_ecard_statusBadge_expired => 'LEJART';

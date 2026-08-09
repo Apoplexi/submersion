@@ -1692,15 +1692,24 @@ class AppLocalizationsEn extends AppLocalizations {
   String get certifications_ecardStack_empty_title => 'No certifications yet';
 
   @override
+  String get certifications_ecard_label_cardNumber => 'CARD NO.';
+
+  @override
   String certifications_ecard_label_certifiedBy(Object agency) {
     return 'Certified by $agency';
   }
+
+  @override
+  String get certifications_ecard_label_diver => 'DIVER';
 
   @override
   String get certifications_ecard_label_instructor => 'INSTRUCTOR';
 
   @override
   String get certifications_ecard_label_issued => 'ISSUED';
+
+  @override
+  String get certifications_ecard_label_validUntil => 'VALID UNTIL';
 
   @override
   String get certifications_ecard_statusBadge_expired => 'EXPIRED';

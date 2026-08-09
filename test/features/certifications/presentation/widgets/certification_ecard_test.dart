@@ -21,6 +21,7 @@ final _now = DateTime(2026, 8, 9);
 Certification _makeCert({
   String name = 'Open Water Diver',
   CertificationAgency agency = CertificationAgency.padi,
+  CertificationLevel? level,
   String? cardNumber,
   DateTime? issueDate,
   DateTime? expiryDate,
@@ -32,6 +33,7 @@ Certification _makeCert({
     id: 'cert-1',
     name: name,
     agency: agency,
+    level: level,
     cardNumber: cardNumber,
     issueDate: issueDate,
     expiryDate: expiryDate,
@@ -48,6 +50,7 @@ Future<void> _pumpCard(
   required Certification certification,
   String diverName = 'Eric Griffin',
   bool showBack = false,
+  double width = 320,
 }) async {
   await tester.pumpWidget(
     localizedMaterialApp(
@@ -55,7 +58,7 @@ Future<void> _pumpCard(
       home: Scaffold(
         body: Center(
           child: SizedBox(
-            width: 320,
+            width: width,
             child: CertificationEcard(
               certification: certification,
               diverName: diverName,
@@ -161,6 +164,89 @@ void main() {
 
       expect(find.byType(CertificationCardPhoto), findsNothing);
       expect(find.text('Open Water Diver'), findsOneWidget);
+    });
+  });
+
+  group('CertificationEcard generated front field grid', () {
+    testWidgets('shows labelled diver, card number, issue and expiry cells', (
+      tester,
+    ) async {
+      await _pumpCard(
+        tester,
+        certification: _makeCert(
+          cardNumber: '1802G4921',
+          issueDate: DateTime(2018, 3, 14),
+          expiryDate: DateTime(2030, 3, 14),
+        ),
+      );
+
+      expect(find.text('DIVER'), findsOneWidget);
+      expect(find.text('ERIC GRIFFIN'), findsOneWidget);
+      expect(find.text('CARD NO.'), findsOneWidget);
+      expect(find.text('1802G4921'), findsOneWidget);
+      expect(find.text('ISSUED'), findsOneWidget);
+      expect(find.text('VALID UNTIL'), findsOneWidget);
+    });
+
+    testWidgets('omits the expiry cell when the certification never expires', (
+      tester,
+    ) async {
+      await _pumpCard(
+        tester,
+        certification: _makeCert(issueDate: DateTime(2018, 3, 14)),
+      );
+
+      expect(find.text('ISSUED'), findsOneWidget);
+      expect(find.text('VALID UNTIL'), findsNothing);
+    });
+
+    testWidgets('omits the card number cell when the card number is empty', (
+      tester,
+    ) async {
+      await _pumpCard(tester, certification: _makeCert(cardNumber: ''));
+
+      expect(find.text('DIVER'), findsOneWidget);
+      expect(find.text('CARD NO.'), findsNothing);
+    });
+
+    testWidgets('omits the card number cell when the card number is null', (
+      tester,
+    ) async {
+      await _pumpCard(tester, certification: _makeCert());
+
+      expect(find.text('DIVER'), findsOneWidget);
+      expect(find.text('CARD NO.'), findsNothing);
+    });
+
+    testWidgets('renders no Spacer, so the card centre is not left blank', (
+      tester,
+    ) async {
+      await _pumpCard(tester, certification: _makeCert());
+
+      expect(find.byType(Spacer), findsNothing);
+    });
+
+    testWidgets('does not overflow on a narrow card with every field filled', (
+      tester,
+    ) async {
+      // The densest card the UI can produce: a long two-line name, a level,
+      // and all four grid cells, on the narrowest phone width the wallet's
+      // 0.85 viewportFraction yields. A RenderFlex overflow here surfaces as a
+      // test failure via the exception the framework reports during layout.
+      await _pumpCard(
+        tester,
+        width: 280,
+        certification: _makeCert(
+          name: 'Advanced Open Water Diver and Enriched Air Specialist',
+          level: CertificationLevel.advancedOpenWater,
+          cardNumber: '1802G4921',
+          issueDate: DateTime(2018, 3, 14),
+          expiryDate: DateTime(2030, 3, 14),
+        ),
+      );
+
+      expect(tester.takeException(), isNull);
+      expect(find.text('VALID UNTIL'), findsOneWidget);
     });
   });
 }
