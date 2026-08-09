@@ -13128,11 +13128,11 @@ class AppLocalizationsPt extends AppLocalizations {
       'Grafico do ciclo de mare e horarios';
 
   @override
-  String get diveDetailSection_reefHealth_name => 'Saúde do recife';
+  String get diveDetailSection_reefHealth_name => 'Condições da água';
 
   @override
   String get diveDetailSection_reefHealth_description =>
-      'Estresse térmico de branqueamento de corais na data do mergulho';
+      'Condições da água por satélite na data do mergulho';
 
   @override
   String get diveDetailSection_surfaceGps_name => 'GPS de superfície';
@@ -23165,14 +23165,14 @@ class AppLocalizationsPt extends AppLocalizations {
       'Este dispositivo não consegue comprimir vídeo. A partir dele são enviados os originais.';
 
   @override
-  String get reef_section_title => 'Recife';
+  String get reef_section_title => 'Ecossistema';
 
   @override
   String get reef_section_sourcesTooltip => 'Fontes de dados';
 
   @override
   String get reef_section_loadError =>
-      'Não foi possível carregar os dados do recife agora';
+      'Não foi possível carregar os dados do ecossistema agora';
 
   @override
   String get reef_habitat_title => 'Hábitat do recife';
@@ -23194,15 +23194,24 @@ class AppLocalizationsPt extends AppLocalizations {
       'Não foi possível verificar o hábitat do recife agora';
 
   @override
-  String get reef_health_title => 'Saúde do recife';
+  String get water_conditions_title => 'Condições da água';
 
   @override
-  String get reef_health_unavailable =>
-      'Não foi possível verificar a saúde do recife agora';
+  String get water_conditions_unavailable =>
+      'Não foi possível verificar as condições da água agora';
 
   @override
-  String get reef_health_noData =>
-      'Sem dados de saúde do recife para esta localização';
+  String get water_conditions_noData =>
+      'Sem dados de satélite da água para este local';
+
+  @override
+  String get water_conditions_freshwater =>
+      'A temperatura da água por satélite cobre apenas os oceanos';
+
+  @override
+  String water_conditions_anomaly(String value) {
+    return 'Anomalia $value';
+  }
 
   @override
   String reef_health_degreeHeatingWeeks(String value) {

@@ -12511,10 +12511,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get diveDetailSection_tide_description => '潮汐周期图和时间';
 
   @override
-  String get diveDetailSection_reefHealth_name => '珊瑚礁健康';
+  String get diveDetailSection_reefHealth_name => '水况';
 
   @override
-  String get diveDetailSection_reefHealth_description => '潜水当天的珊瑚白化热压力';
+  String get diveDetailSection_reefHealth_description => '潜水日期的卫星水况';
 
   @override
   String get diveDetailSection_surfaceGps_name => '水面 GPS';
@@ -21991,13 +21991,13 @@ class AppLocalizationsZh extends AppLocalizations {
       '此设备无法压缩视频。将从此设备上传原始文件。';
 
   @override
-  String get reef_section_title => '珊瑚礁';
+  String get reef_section_title => '生态系统';
 
   @override
   String get reef_section_sourcesTooltip => '数据来源';
 
   @override
-  String get reef_section_loadError => '目前无法加载珊瑚礁数据';
+  String get reef_section_loadError => '目前无法加载生态系统数据';
 
   @override
   String get reef_habitat_title => '珊瑚礁生境';
@@ -22017,13 +22017,21 @@ class AppLocalizationsZh extends AppLocalizations {
   String get reef_habitat_unavailable => '目前无法查询珊瑚礁生境';
 
   @override
-  String get reef_health_title => '珊瑚礁健康';
+  String get water_conditions_title => '水况';
 
   @override
-  String get reef_health_unavailable => '目前无法查询珊瑚礁健康状况';
+  String get water_conditions_unavailable => '目前无法检查水况';
 
   @override
-  String get reef_health_noData => '此位置没有珊瑚礁健康数据';
+  String get water_conditions_noData => '此位置没有卫星水文数据';
+
+  @override
+  String get water_conditions_freshwater => '卫星水温仅覆盖海洋';
+
+  @override
+  String water_conditions_anomaly(String value) {
+    return '距平 $value';
+  }
 
   @override
   String reef_health_degreeHeatingWeeks(String value) {

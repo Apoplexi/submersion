@@ -102,7 +102,7 @@ import 'package:submersion/features/signatures/presentation/widgets/signature_ca
 import 'package:submersion/features/signatures/presentation/widgets/signature_display_widget.dart';
 import 'package:submersion/features/tides/domain/entities/tide_record.dart';
 import 'package:submersion/features/reef/presentation/providers/reef_providers.dart';
-import 'package:submersion/features/reef/presentation/widgets/reef_health_card.dart';
+import 'package:submersion/features/reef/presentation/widgets/water_conditions_card.dart';
 import 'package:submersion/features/tides/presentation/providers/tide_providers.dart';
 import 'package:submersion/features/tides/presentation/widgets/tide_cycle_graph.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
@@ -3472,32 +3472,43 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
     );
   }
 
-  /// Reef thermal stress on the date of this dive.
+  /// Satellite water conditions on the date of this dive.
   ///
   /// Historical NOAA readings are immutable, so this is fetched once and
-  /// cached permanently. Hidden when the dive has no site coordinates.
+  /// cached permanently. Hidden when the dive has no site coordinates, and
+  /// for freshwater sites, whose water NOAA's ocean grid cannot see — a
+  /// permanent coverage explanation on every quarry dive would be noise.
   Widget _buildReefHealthSection(
     BuildContext context,
     WidgetRef ref,
     Dive dive,
   ) {
-    if (dive.site?.hasCoordinates != true) return const SizedBox.shrink();
+    final site = dive.site;
+    if (site?.hasCoordinates != true) return const SizedBox.shrink();
+    if (site!.waterType == WaterType.fresh) return const SizedBox.shrink();
 
+    final location = site.location!;
     final healthAsync = ref.watch(
       reefHealthForDiveProvider(
-        ReefHealthRequest(
-          location: dive.site!.location!,
-          date: dive.effectiveEntryTime,
-        ),
+        ReefHealthRequest(location: location, date: dive.effectiveEntryTime),
       ),
     );
+    final habitatAsync = ref.watch(reefHabitatProvider(location));
 
     return healthAsync.when(
       data: (part) => Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           const SizedBox(height: 24),
-          Card(child: ReefHealthCard(part: part)),
+          Card(
+            child: WaterConditionsCard(
+              health: part,
+              // Null while still resolving: the card then keeps the stress
+              // lines, the conservative default.
+              habitat: habitatAsync.valueOrNull,
+              waterType: site.waterType,
+            ),
+          ),
         ],
       ),
       loading: () => const SizedBox.shrink(),

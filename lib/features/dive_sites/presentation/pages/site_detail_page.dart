@@ -203,12 +203,16 @@ class _SiteDetailContentState extends ConsumerState<_SiteDetailContent> {
 
           // Reef Section (only if site has coordinates)
           if (site.hasCoordinates) ...[
-            ReefSection(location: site.location!),
+            ReefSection(location: site.location!, waterType: site.waterType),
             const SizedBox(height: 16),
           ],
 
           // Marine Life Section
-          SiteMarineLifeSection(siteId: site.id, location: site.location),
+          SiteMarineLifeSection(
+            siteId: site.id,
+            location: site.location,
+            waterType: site.waterType,
+          ),
           const SizedBox(height: 16),
 
           // Difficulty Section

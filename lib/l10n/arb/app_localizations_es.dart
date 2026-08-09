@@ -13122,11 +13122,11 @@ class AppLocalizationsEs extends AppLocalizations {
       'Grafico del ciclo de mareas y temporalizacion';
 
   @override
-  String get diveDetailSection_reefHealth_name => 'Salud del arrecife';
+  String get diveDetailSection_reefHealth_name => 'Condiciones del agua';
 
   @override
   String get diveDetailSection_reefHealth_description =>
-      'Estrés térmico por blanqueamiento de coral en la fecha del buceo';
+      'Condiciones del agua por satélite en la fecha de la inmersión';
 
   @override
   String get diveDetailSection_surfaceGps_name => 'GPS de superficie';
@@ -23184,14 +23184,14 @@ class AppLocalizationsEs extends AppLocalizations {
       'Este dispositivo no puede comprimir vídeo. Desde él se suben los originales.';
 
   @override
-  String get reef_section_title => 'Arrecife';
+  String get reef_section_title => 'Ecosistema';
 
   @override
   String get reef_section_sourcesTooltip => 'Fuentes de datos';
 
   @override
   String get reef_section_loadError =>
-      'No se pudieron cargar los datos del arrecife ahora';
+      'No se pudieron cargar los datos del ecosistema en este momento';
 
   @override
   String get reef_habitat_title => 'Hábitat del arrecife';
@@ -23213,15 +23213,24 @@ class AppLocalizationsEs extends AppLocalizations {
       'No se pudo comprobar el hábitat del arrecife ahora';
 
   @override
-  String get reef_health_title => 'Salud del arrecife';
+  String get water_conditions_title => 'Condiciones del agua';
 
   @override
-  String get reef_health_unavailable =>
-      'No se pudo comprobar la salud del arrecife ahora';
+  String get water_conditions_unavailable =>
+      'No se pudieron comprobar las condiciones del agua en este momento';
 
   @override
-  String get reef_health_noData =>
-      'No hay datos de salud del arrecife para esta ubicación';
+  String get water_conditions_noData =>
+      'No hay datos satelitales del agua para esta ubicación';
+
+  @override
+  String get water_conditions_freshwater =>
+      'La temperatura del agua por satélite solo cubre los océanos';
+
+  @override
+  String water_conditions_anomaly(String value) {
+    return 'Anomalía $value';
+  }
 
   @override
   String reef_health_degreeHeatingWeeks(String value) {
