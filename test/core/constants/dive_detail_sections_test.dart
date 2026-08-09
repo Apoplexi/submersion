@@ -666,7 +666,7 @@ void main() {
         DiveDetailSectionId.values,
         contains(DiveDetailSectionId.reefHealth),
       );
-      expect(DiveDetailSectionId.reefHealth.displayName, 'Reef Health');
+      expect(DiveDetailSectionId.reefHealth.displayName, 'Water Conditions');
       expect(DiveDetailSectionId.reefHealth.description.isNotEmpty, isTrue);
     });
 

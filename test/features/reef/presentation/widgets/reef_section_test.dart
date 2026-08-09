@@ -55,7 +55,7 @@ Widget _harness(ReefSnapshot snapshot, {WaterType? waterType}) {
 }
 
 void main() {
-  // ReefHealthCard formats the observation date with DateFormat.yMMMd(),
+  // WaterConditionsCard formats the observation date with DateFormat.yMMMd(),
   // which resolves against intl's process-global default locale. Pin it so
   // the expected month names do not depend on the test host's locale.
   String? previousDefaultLocale;

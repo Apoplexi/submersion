@@ -3402,32 +3402,43 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
     );
   }
 
-  /// Reef thermal stress on the date of this dive.
+  /// Satellite water conditions on the date of this dive.
   ///
   /// Historical NOAA readings are immutable, so this is fetched once and
-  /// cached permanently. Hidden when the dive has no site coordinates.
+  /// cached permanently. Hidden when the dive has no site coordinates, and
+  /// for freshwater sites, whose water NOAA's ocean grid cannot see — a
+  /// permanent coverage explanation on every quarry dive would be noise.
   Widget _buildReefHealthSection(
     BuildContext context,
     WidgetRef ref,
     Dive dive,
   ) {
-    if (dive.site?.hasCoordinates != true) return const SizedBox.shrink();
+    final site = dive.site;
+    if (site?.hasCoordinates != true) return const SizedBox.shrink();
+    if (site!.waterType == WaterType.fresh) return const SizedBox.shrink();
 
+    final location = site.location!;
     final healthAsync = ref.watch(
       reefHealthForDiveProvider(
-        ReefHealthRequest(
-          location: dive.site!.location!,
-          date: dive.effectiveEntryTime,
-        ),
+        ReefHealthRequest(location: location, date: dive.effectiveEntryTime),
       ),
     );
+    final habitatAsync = ref.watch(reefHabitatProvider(location));
 
     return healthAsync.when(
       data: (part) => Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           const SizedBox(height: 24),
-          Card(child: WaterConditionsCard(health: part)),
+          Card(
+            child: WaterConditionsCard(
+              health: part,
+              // Null while still resolving: the card then keeps the stress
+              // lines, the conservative default.
+              habitat: habitatAsync.valueOrNull,
+              waterType: site.waterType,
+            ),
+          ),
         ],
       ),
       loading: () => const SizedBox.shrink(),
