@@ -1979,31 +1979,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get certifications_summary_stat_valid => '有效';
 
   @override
-  String certifications_walletCard_countPlural(Object count) {
-    return '$count 个证书';
-  }
-
-  @override
-  String certifications_walletCard_countSingular(Object count) {
-    return '$count 个证书';
-  }
-
-  @override
-  String get certifications_walletCard_emptyFooter => '添加您的第一个证书';
-
-  @override
-  String get certifications_walletCard_error => '加载证书失败';
-
-  @override
-  String get certifications_walletCard_semanticLabel => '证书卡包。点击查看所有证书';
-
-  @override
-  String get certifications_walletCard_tapToAdd => '点击添加';
-
-  @override
-  String get certifications_walletCard_title => '证书卡包';
-
-  @override
   String get certifications_wallet_appBar_title => '证书卡包';
 
   @override

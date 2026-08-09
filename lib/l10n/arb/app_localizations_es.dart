@@ -2112,34 +2112,6 @@ class AppLocalizationsEs extends AppLocalizations {
   String get certifications_summary_stat_valid => 'Vigentes';
 
   @override
-  String certifications_walletCard_countPlural(Object count) {
-    return '$count certificaciones';
-  }
-
-  @override
-  String certifications_walletCard_countSingular(Object count) {
-    return '$count certificacion';
-  }
-
-  @override
-  String get certifications_walletCard_emptyFooter =>
-      'Agrega tu primera certificacion';
-
-  @override
-  String get certifications_walletCard_error =>
-      'Error al cargar certificaciones';
-
-  @override
-  String get certifications_walletCard_semanticLabel =>
-      'Cartera de certificaciones. Toca para ver todas las certificaciones';
-
-  @override
-  String get certifications_walletCard_tapToAdd => 'Toca para agregar';
-
-  @override
-  String get certifications_walletCard_title => 'Cartera de certificaciones';
-
-  @override
   String get certifications_wallet_appBar_title => 'Cartera de certificaciones';
 
   @override

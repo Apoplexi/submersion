@@ -3569,48 +3569,6 @@ abstract class AppLocalizations {
   /// **'Valid'**
   String get certifications_summary_stat_valid;
 
-  /// No description provided for @certifications_walletCard_countPlural.
-  ///
-  /// In en, this message translates to:
-  /// **'{count} certifications'**
-  String certifications_walletCard_countPlural(Object count);
-
-  /// No description provided for @certifications_walletCard_countSingular.
-  ///
-  /// In en, this message translates to:
-  /// **'{count} certification'**
-  String certifications_walletCard_countSingular(Object count);
-
-  /// No description provided for @certifications_walletCard_emptyFooter.
-  ///
-  /// In en, this message translates to:
-  /// **'Add your first certification'**
-  String get certifications_walletCard_emptyFooter;
-
-  /// No description provided for @certifications_walletCard_error.
-  ///
-  /// In en, this message translates to:
-  /// **'Failed to load certifications'**
-  String get certifications_walletCard_error;
-
-  /// No description provided for @certifications_walletCard_semanticLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'Certification Wallet. Tap to view all certifications'**
-  String get certifications_walletCard_semanticLabel;
-
-  /// No description provided for @certifications_walletCard_tapToAdd.
-  ///
-  /// In en, this message translates to:
-  /// **'Tap to add'**
-  String get certifications_walletCard_tapToAdd;
-
-  /// No description provided for @certifications_walletCard_title.
-  ///
-  /// In en, this message translates to:
-  /// **'Certification Wallet'**
-  String get certifications_walletCard_title;
-
   /// No description provided for @certifications_wallet_appBar_title.
   ///
   /// In en, this message translates to:

@@ -2097,34 +2097,6 @@ class AppLocalizationsNl extends AppLocalizations {
   String get certifications_summary_stat_valid => 'Geldig';
 
   @override
-  String certifications_walletCard_countPlural(Object count) {
-    return '$count certificeringen';
-  }
-
-  @override
-  String certifications_walletCard_countSingular(Object count) {
-    return '$count certificering';
-  }
-
-  @override
-  String get certifications_walletCard_emptyFooter =>
-      'Voeg je eerste certificering toe';
-
-  @override
-  String get certifications_walletCard_error =>
-      'Kan certificeringen niet laden';
-
-  @override
-  String get certifications_walletCard_semanticLabel =>
-      'Certificeringsportemonnee. Tik om alle certificeringen te bekijken';
-
-  @override
-  String get certifications_walletCard_tapToAdd => 'Tik om toe te voegen';
-
-  @override
-  String get certifications_walletCard_title => 'Certificeringsportemonnee';
-
-  @override
   String get certifications_wallet_appBar_title => 'Certificeringsportemonnee';
 
   @override

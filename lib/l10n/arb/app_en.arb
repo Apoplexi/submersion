@@ -1188,13 +1188,6 @@
   "certifications_summary_stat_expiringSoon": "Expiring Soon",
   "certifications_summary_stat_total": "Total",
   "certifications_summary_stat_valid": "Valid",
-  "certifications_walletCard_countPlural": "{count} certifications",
-  "certifications_walletCard_countSingular": "{count} certification",
-  "certifications_walletCard_emptyFooter": "Add your first certification",
-  "certifications_walletCard_error": "Failed to load certifications",
-  "certifications_walletCard_semanticLabel": "Certification Wallet. Tap to view all certifications",
-  "certifications_walletCard_tapToAdd": "Tap to add",
-  "certifications_walletCard_title": "Certification Wallet",
   "certifications_wallet_appBar_title": "Certification Wallet",
   "certifications_wallet_error_retry": "Retry",
   "certifications_wallet_error_title": "Failed to load certifications",
@@ -1385,20 +1378,6 @@
   "@certifications_share_error_certificate": {
     "placeholders": {
       "error": {
-        "type": "Object"
-      }
-    }
-  },
-  "@certifications_walletCard_countPlural": {
-    "placeholders": {
-      "count": {
-        "type": "Object"
-      }
-    }
-  },
-  "@certifications_walletCard_countSingular": {
-    "placeholders": {
-      "count": {
         "type": "Object"
       }
     }

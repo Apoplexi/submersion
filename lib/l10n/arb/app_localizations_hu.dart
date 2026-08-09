@@ -2097,34 +2097,6 @@ class AppLocalizationsHu extends AppLocalizations {
   String get certifications_summary_stat_valid => 'Ervenyes';
 
   @override
-  String certifications_walletCard_countPlural(Object count) {
-    return '$count tanusitvany';
-  }
-
-  @override
-  String certifications_walletCard_countSingular(Object count) {
-    return '$count tanusitvany';
-  }
-
-  @override
-  String get certifications_walletCard_emptyFooter =>
-      'Adja hozza az elso tanusitvanyt';
-
-  @override
-  String get certifications_walletCard_error =>
-      'Nem sikerult a tanusitványok betoltese';
-
-  @override
-  String get certifications_walletCard_semanticLabel =>
-      'Tanusitvany tarca. Koppintson az osszes tanusitvany megtekintésehez';
-
-  @override
-  String get certifications_walletCard_tapToAdd => 'Koppintson a hozzaadashoz';
-
-  @override
-  String get certifications_walletCard_title => 'Tanusitvany tarca';
-
-  @override
   String get certifications_wallet_appBar_title => 'Tanusitvany tarca';
 
   @override
