@@ -174,6 +174,10 @@ class DiveProfileChart extends ConsumerStatefulWidget {
   /// name would start to clip.
   static const double gasTimelineHeight = 18.0;
 
+  /// Minimum on-screen width of the safety-highlight band, in logical px.
+  /// Short and instant findings inflate to this so they stay visible.
+  static const double _minHighlightBandPx = 12.0;
+
   /// fl_chart default axisNameSize used for left and right axes.
   static const double _leftRightAxisNameSize = 16.0;
 
@@ -2174,6 +2178,25 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
     final visibleMinDepth = _viewport.offsetY * totalMaxDepth;
     final visibleMaxDepth = visibleMinDepth + visibleRangeY;
 
+    // Highlight band, inflated to a 12 px minimum so short/instant findings
+    // stay visible (spec: safety-findings-lane). Computed once and shared by
+    // the band annotation and its edge lines.
+    ({double x1, double x2})? highlightSpan;
+    if (widget.highlightRange != null) {
+      final plotInsets = _plotInsets(availableWidth, units);
+      final plotWidth = (availableWidth - plotInsets.left - plotInsets.right)
+          .clamp(1.0, double.infinity);
+      highlightSpan = highlightBandSpan(
+        widget.highlightRange!,
+        visibleMinX: visibleMinX,
+        visibleMaxX: visibleMaxX,
+        minWidthX:
+            DiveProfileChart._minHighlightBandPx *
+            (visibleMaxX - visibleMinX) /
+            plotWidth,
+      );
+    }
+
     // Same helper and same totalMaxDepth build() fed into the bar-cache
     // signatures, so the band the bars are drawn with can never diverge from
     // the band they are keyed on.
@@ -2589,15 +2612,14 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
             ),
             rangeAnnotations: RangeAnnotations(
               verticalRangeAnnotations: _buildHighlightRangeAnnotations(
-                visibleMinX,
-                visibleMaxX,
+                highlightSpan,
               ),
             ),
             extraLinesData: ExtraLinesData(
               verticalLines: [
                 ..._buildPlaybackCursor(colorScheme),
                 ..._buildHighlightCursor(colorScheme),
-                ..._buildHighlightRangeLines(visibleMinX, visibleMaxX),
+                ..._buildHighlightRangeLines(highlightSpan),
                 if (_showEvents && widget.events != null)
                   ..._buildEventVerticalLines(colorScheme),
               ],
@@ -4981,23 +5003,15 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
     ];
   }
 
-  /// Translucent band for the externally highlighted time range, clamped to
-  /// the visible window (fl_chart asserts annotations stay within bounds).
-  /// Instant ranges draw no band; see [_buildHighlightRangeLines].
+  /// Translucent band for the externally highlighted time range. [span] is
+  /// precomputed by [_buildChart] via [highlightBandSpan]: clamped to the
+  /// visible window and inflated to the 12 px minimum, so instants and short
+  /// ranges render the same visible band as wide ones.
   List<VerticalRangeAnnotation> _buildHighlightRangeAnnotations(
-    double visibleMinX,
-    double visibleMaxX,
+    ({double x1, double x2})? span,
   ) {
     final range = widget.highlightRange;
-    if (range == null || range.startTimestamp == range.endTimestamp) {
-      return [];
-    }
-    final span = visibleHighlightSpan(
-      range,
-      visibleMinX: visibleMinX,
-      visibleMaxX: visibleMaxX,
-    );
-    if (span == null) return [];
+    if (range == null || span == null) return [];
     return [
       VerticalRangeAnnotation(
         x1: span.x1,
@@ -5007,39 +5021,17 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
     ];
   }
 
-  /// Edge lines for a range highlight (only the edges inside the visible
-  /// window), or the single dashed cursor for an instant highlight.
-  List<VerticalLine> _buildHighlightRangeLines(
-    double visibleMinX,
-    double visibleMaxX,
-  ) {
+  /// Edge lines at the highlight band's (possibly inflated) edges.
+  List<VerticalLine> _buildHighlightRangeLines(({double x1, double x2})? span) {
     final range = widget.highlightRange;
-    if (range == null) return [];
-    final start = range.startTimestamp.toDouble();
-    final end = range.endTimestamp.toDouble();
-
-    bool inWindow(double x) => x >= visibleMinX && x <= visibleMaxX;
-
-    if (range.startTimestamp == range.endTimestamp) {
-      if (!inWindow(start)) return [];
-      return [
-        VerticalLine(
-          x: start,
-          color: range.color,
-          strokeWidth: 1.5,
-          dashArray: [3, 3],
-        ),
-      ];
-    }
-
+    if (range == null || span == null) return [];
     return [
-      for (final x in [start, end])
-        if (inWindow(x))
-          VerticalLine(
-            x: x,
-            color: range.color.withValues(alpha: 0.7),
-            strokeWidth: 1,
-          ),
+      for (final x in [span.x1, span.x2])
+        VerticalLine(
+          x: x,
+          color: range.color.withValues(alpha: 0.7),
+          strokeWidth: 1,
+        ),
     ];
   }
 
