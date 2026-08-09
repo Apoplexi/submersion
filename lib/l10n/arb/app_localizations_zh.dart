@@ -15709,6 +15709,14 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String surfaceInterval_result_noIntervalHelps(Object minutes) {
+    return '任何水面间隔都不够。在此深度使用此混合气体，最长的免减压潜水时间为 $minutes 分钟。请缩短第二次潜水或降低其深度。';
+  }
+
+  @override
+  String get surfaceInterval_result_notAchievable => '任何水面间隔都无法达成';
+
+  @override
   String get surfaceInterval_result_notYetSafe => '尚不安全，请增加水面间隔';
 
   @override

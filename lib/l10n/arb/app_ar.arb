@@ -4945,6 +4945,8 @@
   "surfaceInterval_result_minimumInterval": "الحد الأدنى لفترة السطح",
   "surfaceInterval_result_ndlForSecondDive": "NDL للغطسة الثانية",
   "surfaceInterval_result_ndlMinutes": "{minutes} دقيقة NDL",
+  "surfaceInterval_result_noIntervalHelps": "لا تكفي أي فترة سطح. أطول غطسة بدون توقف إلزامي على هذا العمق بهذا الخليط هي {minutes} دقيقة. قلّل زمن الغطسة الثانية أو قلّل عمقها.",
+  "surfaceInterval_result_notAchievable": "غير قابل للتحقيق بأي فترة سطح",
   "surfaceInterval_result_notYetSafe": "ليس آمناً بعد، زد فترة السطح",
   "surfaceInterval_result_safeToDive": "آمن للغوص",
   "surfaceInterval_result_semantics": "الحد الأدنى لفترة السطح: {interval}. الفترة الحالية: {current}. NDL للغطسة الثانية: {ndl}. {status}",

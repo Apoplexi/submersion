@@ -16281,6 +16281,15 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String surfaceInterval_result_noIntervalHelps(Object minutes) {
+    return 'No surface interval is enough. The longest no-stop dive at this depth on this mix is $minutes min. Shorten the second dive or reduce its depth.';
+  }
+
+  @override
+  String get surfaceInterval_result_notAchievable =>
+      'Not achievable at any surface interval';
+
+  @override
   String get surfaceInterval_result_notYetSafe =>
       'Not yet safe, increase surface interval';
 

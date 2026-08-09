@@ -4873,6 +4873,8 @@
   "surfaceInterval_result_minimumInterval": "Intervalle de surface minimum",
   "surfaceInterval_result_ndlForSecondDive": "DTR pour la 2e plongée",
   "surfaceInterval_result_ndlMinutes": "{minutes} min DTR",
+  "surfaceInterval_result_noIntervalHelps": "Aucun intervalle de surface ne suffit. La plongée sans palier la plus longue à cette profondeur avec ce mélange est de {minutes} min. Raccourcissez la deuxième plongée ou réduisez sa profondeur.",
+  "surfaceInterval_result_notAchievable": "Impossible quel que soit l'intervalle de surface",
   "surfaceInterval_result_notYetSafe": "Pas encore sûr, augmentez l'intervalle de surface",
   "surfaceInterval_result_safeToDive": "Sûr pour plonger",
   "surfaceInterval_result_semantics": "Intervalle de surface minimum : {interval}. Intervalle actuel : {current}. DTR pour la deuxième plongée : {ndl}. {status}",

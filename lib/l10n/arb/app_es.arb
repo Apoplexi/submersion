@@ -4945,6 +4945,8 @@
   "surfaceInterval_result_minimumInterval": "Intervalo de Superficie Mínimo",
   "surfaceInterval_result_ndlForSecondDive": "NDL para 2da Inmersión",
   "surfaceInterval_result_ndlMinutes": "{minutes} min NDL",
+  "surfaceInterval_result_noIntervalHelps": "Ningún intervalo de superficie es suficiente. La inmersión sin descompresión más larga a esta profundidad con esta mezcla es de {minutes} min. Acorta la segunda inmersión o reduce su profundidad.",
+  "surfaceInterval_result_notAchievable": "No alcanzable con ningún intervalo de superficie",
   "surfaceInterval_result_notYetSafe": "Aún no es seguro, aumenta el intervalo de superficie",
   "surfaceInterval_result_safeToDive": "Seguro para bucear",
   "surfaceInterval_result_semantics": "Intervalo de superficie mínimo: {interval}. Intervalo actual: {current}. NDL para segunda inmersión: {ndl}. {status}",

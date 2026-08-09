@@ -4945,6 +4945,8 @@
   "surfaceInterval_result_minimumInterval": "מרווח שטח מינימלי",
   "surfaceInterval_result_ndlForSecondDive": "NDL לצלילה ה-2",
   "surfaceInterval_result_ndlMinutes": "{minutes} דקות NDL",
+  "surfaceInterval_result_noIntervalHelps": "שום מרווח שטח אינו מספיק. הצלילה הארוכה ביותר ללא דקומפרסיה בעומק זה עם תערובת זו היא {minutes} דקות. קצר את הצלילה השנייה או הקטן את עומקה.",
+  "surfaceInterval_result_notAchievable": "לא ניתן להשגה בשום מרווח שטח",
   "surfaceInterval_result_notYetSafe": "עדיין לא בטוח, הגדל מרווח שטח",
   "surfaceInterval_result_safeToDive": "בטוח לצלול",
   "surfaceInterval_result_semantics": "מרווח שטח מינימלי: {interval}. מרווח נוכחי: {current}. NDL לצלילה שנייה: {ndl}. {status}",

@@ -16539,6 +16539,15 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String surfaceInterval_result_noIntervalHelps(Object minutes) {
+    return 'Kein Oberflächenintervall reicht aus. Der längste Nullzeit-Tauchgang in dieser Tiefe mit diesem Gemisch dauert $minutes Min. Zweiten Tauchgang kürzen oder dessen Tiefe reduzieren.';
+  }
+
+  @override
+  String get surfaceInterval_result_notAchievable =>
+      'Mit keinem Oberflächenintervall erreichbar';
+
+  @override
   String get surfaceInterval_result_notYetSafe =>
       'Noch nicht sicher, Oberflächenintervall erhöhen';
 

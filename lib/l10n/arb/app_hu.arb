@@ -4873,6 +4873,8 @@
   "surfaceInterval_result_minimumInterval": "Minimum felszíni intervallum",
   "surfaceInterval_result_ndlForSecondDive": "NDL a 2. merüléshez",
   "surfaceInterval_result_ndlMinutes": "{minutes} perc NDL",
+  "surfaceInterval_result_noIntervalHelps": "Semmilyen felszíni intervallum nem elegendő. A leghosszabb dekompresszió nélküli merülés ezen a mélységen ezzel a keverékkel {minutes} perc. Rövidítsd le a második merülést vagy csökkentsd a mélységét.",
+  "surfaceInterval_result_notAchievable": "Semmilyen felszíni intervallummal nem érhető el",
   "surfaceInterval_result_notYetSafe": "Még nem biztonságos, növeld a felszíni intervallumot",
   "surfaceInterval_result_safeToDive": "Biztonságos merülni",
   "surfaceInterval_result_semantics": "Minimum felszíni intervallum: {interval}. Jelenlegi intervallum: {current}. NDL a második merüléshez: {ndl}. {status}",

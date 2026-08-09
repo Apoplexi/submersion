@@ -5123,6 +5123,8 @@
   "surfaceInterval_result_minimumInterval": "最短水面间隔",
   "surfaceInterval_result_ndlForSecondDive": "第二次潜水的免减压极限",
   "surfaceInterval_result_ndlMinutes": "{minutes} 分钟 NDL",
+  "surfaceInterval_result_noIntervalHelps": "任何水面间隔都不够。在此深度使用此混合气体，最长的免减压潜水时间为 {minutes} 分钟。请缩短第二次潜水或降低其深度。",
+  "surfaceInterval_result_notAchievable": "任何水面间隔都无法达成",
   "surfaceInterval_result_notYetSafe": "尚不安全，请增加水面间隔",
   "surfaceInterval_result_safeToDive": "安全到潜水",
   "surfaceInterval_result_semantics": "最短水面间隔：{interval}。当前间隔：{current}。第二次潜水的免减压极限：{ndl}。{status}",

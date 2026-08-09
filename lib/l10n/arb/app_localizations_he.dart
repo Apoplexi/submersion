@@ -16139,6 +16139,15 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
+  String surfaceInterval_result_noIntervalHelps(Object minutes) {
+    return 'שום מרווח שטח אינו מספיק. הצלילה הארוכה ביותר ללא דקומפרסיה בעומק זה עם תערובת זו היא $minutes דקות. קצר את הצלילה השנייה או הקטן את עומקה.';
+  }
+
+  @override
+  String get surfaceInterval_result_notAchievable =>
+      'לא ניתן להשגה בשום מרווח שטח';
+
+  @override
   String get surfaceInterval_result_notYetSafe =>
       'עדיין לא בטוח, הגדל מרווח שטח';
 

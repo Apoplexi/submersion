@@ -24,10 +24,20 @@ class SurfaceIntervalResult extends ConsumerWidget {
     // and picked a mix they can actually breathe at the planned depth.
     final isSafe = ndlIsSafe && gasIsSafe;
 
-    // Format interval as hours:minutes
-    final hours = minInterval ~/ 60;
-    final minutes = minInterval % 60;
-    final intervalText = hours > 0 ? '${hours}h ${minutes}m' : '$minutes min';
+    // Format interval as hours:minutes. An unreachable plan has no interval to
+    // show: a number here would be read as "wait this long and you are fine",
+    // which is exactly the advice that does not apply.
+    final String intervalText;
+    final String intervalSemanticsText;
+    if (minInterval.isAchievable) {
+      final hours = minInterval.minutes! ~/ 60;
+      final minutes = minInterval.minutes! % 60;
+      intervalText = hours > 0 ? '${hours}h ${minutes}m' : '$minutes min';
+      intervalSemanticsText = intervalText;
+    } else {
+      intervalText = '—';
+      intervalSemanticsText = context.l10n.surfaceInterval_result_notAchievable;
+    }
 
     // Format NDL for display
     String ndlText;
@@ -47,12 +57,16 @@ class SurfaceIntervalResult extends ConsumerWidget {
 
     return Semantics(
       label: context.l10n.surfaceInterval_result_semantics(
-        intervalText,
+        intervalSemanticsText,
         currentText,
         ndlText,
-        // Oxygen is the acute risk, so it leads when both are wrong.
+        // Oxygen is the acute risk, so it leads when both are wrong. An
+        // unreachable plan outranks "wait longer" for the same reason: it tells
+        // the diver to change the plan rather than the clock.
         !gasIsSafe
             ? context.l10n.surfaceInterval_result_gasUnsafe
+            : !minInterval.isAchievable
+            ? context.l10n.surfaceInterval_result_notAchievable
             : ndlIsSafe
             ? context.l10n.surfaceInterval_result_safeToDive
             : context.l10n.surfaceInterval_result_notYetSafe,
@@ -140,11 +154,18 @@ class SurfaceIntervalResult extends ConsumerWidget {
                 ),
               ],
 
+              // An unreachable plan is always short on no-deco time, so this
+              // branch covers it too -- but the remedy is a different one, and
+              // telling the diver to wait longer would be dead wrong.
               if (!ndlIsSafe) ...[
                 const SizedBox(height: 16),
                 _ResultNotice(
                   icon: Icons.info_outline,
-                  message: context.l10n.surfaceInterval_result_increaseInterval,
+                  message: minInterval.isAchievable
+                      ? context.l10n.surfaceInterval_result_increaseInterval
+                      : context.l10n.surfaceInterval_result_noIntervalHelps(
+                          minInterval.maxNoStopSeconds ~/ 60,
+                        ),
                 ),
               ],
             ],

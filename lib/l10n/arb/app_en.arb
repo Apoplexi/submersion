@@ -9535,6 +9535,8 @@
   "surfaceInterval_result_minimumInterval": "Minimum Surface Interval",
   "surfaceInterval_result_ndlForSecondDive": "NDL for 2nd Dive",
   "surfaceInterval_result_ndlMinutes": "{minutes} min NDL",
+  "surfaceInterval_result_noIntervalHelps": "No surface interval is enough. The longest no-stop dive at this depth on this mix is {minutes} min. Shorten the second dive or reduce its depth.",
+  "surfaceInterval_result_notAchievable": "Not achievable at any surface interval",
   "surfaceInterval_result_notYetSafe": "Not yet safe, increase surface interval",
   "surfaceInterval_result_safeToDive": "Safe to dive",
   "surfaceInterval_result_semantics": "Minimum surface interval: {interval}. Current interval: {current}. NDL for second dive: {ndl}. {status}",
@@ -9715,6 +9717,18 @@
         "example": "15"
       }
     }
+  },
+  "@surfaceInterval_result_noIntervalHelps": {
+    "description": "Explains that the planned second dive busts the no-stop limit no matter how long the diver waits, and names the longest no-stop dive that is reachable",
+    "placeholders": {
+      "minutes": {
+        "type": "Object",
+        "example": "43"
+      }
+    }
+  },
+  "@surfaceInterval_result_notAchievable": {
+    "description": "Shown in place of a minimum surface interval when no interval makes the second dive a no-stop dive"
   },
   "@surfaceInterval_result_notYetSafe": {
     "description": "Status message when more surface interval time is needed"

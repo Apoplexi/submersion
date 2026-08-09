@@ -27816,6 +27816,18 @@ abstract class AppLocalizations {
   /// **'{minutes} min NDL'**
   String surfaceInterval_result_ndlMinutes(Object minutes);
 
+  /// Explains that the planned second dive busts the no-stop limit no matter how long the diver waits, and names the longest no-stop dive that is reachable
+  ///
+  /// In en, this message translates to:
+  /// **'No surface interval is enough. The longest no-stop dive at this depth on this mix is {minutes} min. Shorten the second dive or reduce its depth.'**
+  String surfaceInterval_result_noIntervalHelps(Object minutes);
+
+  /// Shown in place of a minimum surface interval when no interval makes the second dive a no-stop dive
+  ///
+  /// In en, this message translates to:
+  /// **'Not achievable at any surface interval'**
+  String get surfaceInterval_result_notAchievable;
+
   /// Status message when more surface interval time is needed
   ///
   /// In en, this message translates to:

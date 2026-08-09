@@ -16431,6 +16431,15 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String surfaceInterval_result_noIntervalHelps(Object minutes) {
+    return 'Geen enkel oppervlakte-interval is voldoende. De langste duik zonder decompressie op deze diepte met dit mengsel duurt $minutes min. Verkort de tweede duik of verminder de diepte.';
+  }
+
+  @override
+  String get surfaceInterval_result_notAchievable =>
+      'Niet haalbaar met welk oppervlakte-interval dan ook';
+
+  @override
   String get surfaceInterval_result_notYetSafe =>
       'Nog niet veilig, verhoog oppervlakte-interval';
 

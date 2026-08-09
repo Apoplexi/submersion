@@ -16572,6 +16572,15 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
+  String surfaceInterval_result_noIntervalHelps(Object minutes) {
+    return 'Nessun intervallo di superficie è sufficiente. L\'immersione senza decompressione più lunga a questa profondità con questa miscela è di $minutes min. Accorcia la seconda immersione o riducine la profondità.';
+  }
+
+  @override
+  String get surfaceInterval_result_notAchievable =>
+      'Non raggiungibile con alcun intervallo di superficie';
+
+  @override
   String get surfaceInterval_result_notYetSafe =>
       'Non ancora sicuro, aumenta l\'intervallo di superficie';
 

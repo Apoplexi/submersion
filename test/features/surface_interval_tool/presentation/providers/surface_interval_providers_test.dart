@@ -131,11 +131,16 @@ void main() {
       container.read(siSecondDiveO2Provider.notifier).state = 32.0;
       final nitroxInterval = container.read(siMinimumIntervalProvider);
 
-      expect(airInterval, greaterThan(0));
-      expect(airInterval, lessThan(360), reason: 'scenario must be achievable');
       expect(
-        nitroxInterval,
-        lessThan(airInterval),
+        airInterval.isAchievable,
+        isTrue,
+        reason: 'scenario must be achievable',
+      );
+      expect(nitroxInterval.isAchievable, isTrue);
+      expect(airInterval.minutes, greaterThan(0));
+      expect(
+        nitroxInterval.minutes,
+        lessThan(airInterval.minutes!),
         reason: 'A leaner nitrogen mix should shorten the required off-gassing',
       );
     });

@@ -4945,6 +4945,8 @@
   "surfaceInterval_result_minimumInterval": "Minimaal oppervlakte-interval",
   "surfaceInterval_result_ndlForSecondDive": "NDL voor 2e duik",
   "surfaceInterval_result_ndlMinutes": "{minutes} min NDL",
+  "surfaceInterval_result_noIntervalHelps": "Geen enkel oppervlakte-interval is voldoende. De langste duik zonder decompressie op deze diepte met dit mengsel duurt {minutes} min. Verkort de tweede duik of verminder de diepte.",
+  "surfaceInterval_result_notAchievable": "Niet haalbaar met welk oppervlakte-interval dan ook",
   "surfaceInterval_result_notYetSafe": "Nog niet veilig, verhoog oppervlakte-interval",
   "surfaceInterval_result_safeToDive": "Veilig om te duiken",
   "surfaceInterval_result_semantics": "Minimaal oppervlakte-interval: {interval}. Huidig interval: {current}. NDL voor tweede duik: {ndl}. {status}",

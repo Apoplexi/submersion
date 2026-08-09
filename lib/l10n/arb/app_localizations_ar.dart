@@ -16261,6 +16261,15 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String surfaceInterval_result_noIntervalHelps(Object minutes) {
+    return 'لا تكفي أي فترة سطح. أطول غطسة بدون توقف إلزامي على هذا العمق بهذا الخليط هي $minutes دقيقة. قلّل زمن الغطسة الثانية أو قلّل عمقها.';
+  }
+
+  @override
+  String get surfaceInterval_result_notAchievable =>
+      'غير قابل للتحقيق بأي فترة سطح';
+
+  @override
   String get surfaceInterval_result_notYetSafe =>
       'ليس آمناً بعد، زد فترة السطح';
 
