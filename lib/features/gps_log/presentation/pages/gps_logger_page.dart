@@ -15,6 +15,7 @@ import 'package:submersion/features/gps_log/domain/entities/gps_track.dart';
 import 'package:submersion/features/gps_log/data/services/track_import/parsed_track.dart';
 import 'package:submersion/features/gps_log/data/services/track_import/track_import_service.dart';
 import 'package:submersion/features/gps_log/presentation/pages/track_import_review_page.dart';
+import 'package:submersion/features/gps_log/presentation/track_parse_error_text.dart';
 import 'package:submersion/features/gps_log/presentation/providers/gps_log_providers.dart';
 import 'package:submersion/features/gps_log/presentation/providers/gps_track_map_providers.dart';
 import 'package:submersion/features/gps_log/presentation/widgets/gps_track_thumbnail.dart';
@@ -166,9 +167,12 @@ class _GpsLoggerPageState extends ConsumerState<GpsLoggerPage> {
           .read(trackImportServiceProvider)
           .prepare(fileName: file.name, bytes: bytes);
     } on TrackParseException catch (e) {
+      // e.message names the offending element or row, in English. It belongs
+      // in the log; the SnackBar gets the localized reason.
+      _log.warning('Track import rejected: ${e.message}');
       if (!mounted) return;
       messenger.showSnackBar(
-        SnackBar(content: Text(l10n.gpsTrack_import_failed(e.message))),
+        SnackBar(content: Text(trackParseErrorText(l10n, e))),
       );
       return;
     } catch (e, stackTrace) {

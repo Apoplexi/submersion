@@ -12611,6 +12611,22 @@
       }
     }
   },
+  "gpsTrack_importError_unsupportedFormat": "That file type is not supported. Import a GPX, KML, CSV, or FIT file.",
+  "@gpsTrack_importError_unsupportedFormat": {
+    "description": "Track import failed: the file extension is not one the app reads."
+  },
+  "gpsTrack_importError_unreadable": "That file could not be read. It may be damaged or incomplete.",
+  "@gpsTrack_importError_unreadable": {
+    "description": "Track import failed: the file is structurally unreadable."
+  },
+  "gpsTrack_importError_noPositions": "That file has no timestamped GPS positions.",
+  "@gpsTrack_importError_noPositions": {
+    "description": "Track import failed: the file parsed but holds no GPS positions."
+  },
+  "gpsTrack_importError_badData": "That file has a position or timestamp this app cannot read.",
+  "@gpsTrack_importError_badData": {
+    "description": "Track import failed: a coordinate or timestamp in the file is unusable."
+  },
   "gpsTrack_export_saved": "Track saved",
   "gpsTrack_action_export": "Export",
   "gpsTrack_action_shareGpx": "Share as GPX",

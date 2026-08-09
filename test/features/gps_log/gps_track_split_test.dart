@@ -15,7 +15,7 @@ void main() {
   tearDown(tearDownTestDatabase);
 
   /// 08:00 to 12:00, one fix per hour, five fixes, recorded in UTC-5.
-  Future<String> seed({String? name}) async {
+  Future<String> seed() async {
     final startMs = DateTime.utc(2026, 5, 22, 8).millisecondsSinceEpoch;
     final id = await repo.startTrack(
       startTimeMs: startMs,
@@ -36,6 +36,27 @@ void main() {
       endTimeMs: DateTime.utc(2026, 5, 22, 12).millisecondsSinceEpoch,
     );
     return id;
+  }
+
+  /// Same shape as [seed], but imported so it can carry a name - startTrack
+  /// has no name parameter, recordings are named only on import.
+  Future<String> seedNamed(String name) async {
+    final startMs = DateTime.utc(2026, 5, 22, 8).millisecondsSinceEpoch;
+    return repo.insertImportedTrack(
+      points: [
+        for (var h = 0; h <= 4; h++)
+          GpsTrackPoint(
+            timestamp: startMs ~/ 1000 + h * 3600,
+            latitude: 20.0 + h * 0.01,
+            longitude: -87.0,
+          ),
+      ],
+      startTimeMs: startMs,
+      endTimeMs: DateTime.utc(2026, 5, 22, 12).millisecondsSinceEpoch,
+      tzOffsetMinutes: -300,
+      source: 'import',
+      name: name,
+    );
   }
 
   final tenAm = DateTime.utc(2026, 5, 22, 10).millisecondsSinceEpoch;
@@ -73,10 +94,15 @@ void main() {
   });
 
   test('children get suffixed names when the parent had one', () async {
-    final id = await seed();
-    await repo.setTrimBounds(id);
+    final id = await seedNamed('Cozumel drift');
     final (firstId, secondId) = await repo.splitTrack(id, tenAm);
-    // The seeded track has no name, so children get none either.
+    expect((await repo.getTrack(firstId))!.name, 'Cozumel drift (1)');
+    expect((await repo.getTrack(secondId))!.name, 'Cozumel drift (2)');
+  });
+
+  test('an unnamed parent produces unnamed children, not "null (1)"', () async {
+    final id = await seed();
+    final (firstId, secondId) = await repo.splitTrack(id, tenAm);
     expect((await repo.getTrack(firstId))!.name, isNull);
     expect((await repo.getTrack(secondId))!.name, isNull);
   });

@@ -44,10 +44,38 @@ bool hasExplicitZone(String text) =>
   return (time: parsed.toUtc(), zoned: zoned);
 }
 
+/// Why a file could not be read as a track, in terms a diver can act on.
+///
+/// The parsers throw with an English [TrackParseException.message] naming the
+/// offending element, row, or value. That detail belongs in the log, not in a
+/// SnackBar it would be shipped to eleven locales untranslated - so each throw
+/// also carries one of these, and the UI localizes the reason.
+enum TrackParseReason {
+  /// The extension is not one this app reads.
+  unsupportedFormat,
+
+  /// Structurally unreadable: malformed XML, broken CSV, corrupt FIT.
+  unreadable,
+
+  /// Read fine, but contains no GPS positions.
+  noPositions,
+
+  /// Has positions, but a coordinate or timestamp in them is unusable.
+  badData,
+}
+
 /// A file could not be understood as a track.
 class TrackParseException implements Exception {
+  /// Technical detail, English. For the log and for tests, not for the UI.
   final String message;
-  const TrackParseException(this.message);
+
+  /// The localizable category. Defaults to [TrackParseReason.unreadable].
+  final TrackParseReason reason;
+
+  const TrackParseException(
+    this.message, {
+    this.reason = TrackParseReason.unreadable,
+  });
 
   @override
   String toString() => 'TrackParseException: $message';
@@ -56,6 +84,9 @@ class TrackParseException implements Exception {
 /// Rejects coordinates outside the valid range.
 void validateCoordinate(double lat, double lon) {
   if (lat < -90 || lat > 90 || lon < -180 || lon > 180) {
-    throw TrackParseException('Coordinate out of range: $lat, $lon');
+    throw TrackParseException(
+      'Coordinate out of range: $lat, $lon',
+      reason: TrackParseReason.badData,
+    );
   }
 }

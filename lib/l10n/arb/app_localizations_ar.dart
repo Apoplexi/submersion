@@ -12934,6 +12934,8 @@ class AppLocalizationsAr extends AppLocalizations {
       count,
       locale: localeName,
       other: '$count نقطة',
+      few: '$count نقاط',
+      two: 'نقطتان',
       one: 'نقطة واحدة',
     );
     return '$_temp0';
@@ -19747,6 +19749,8 @@ class AppLocalizationsAr extends AppLocalizations {
       count,
       locale: localeName,
       other: '$count نقطة',
+      few: '$count نقاط',
+      two: 'نقطتان',
       one: 'نقطة واحدة',
     );
     return '$_temp0';
@@ -19756,6 +19760,22 @@ class AppLocalizationsAr extends AppLocalizations {
   String gpsTrack_import_failed(String reason) {
     return 'تعذّرت قراءة الملف: $reason';
   }
+
+  @override
+  String get gpsTrack_importError_unsupportedFormat =>
+      'نوع الملف هذا غير مدعوم. قم باستيراد ملف GPX أو KML أو CSV أو FIT.';
+
+  @override
+  String get gpsTrack_importError_unreadable =>
+      'تعذرت قراءة هذا الملف. قد يكون تالفًا أو غير مكتمل.';
+
+  @override
+  String get gpsTrack_importError_noPositions =>
+      'لا يحتوي هذا الملف على مواقع GPS مؤرخة زمنيًا.';
+
+  @override
+  String get gpsTrack_importError_badData =>
+      'يحتوي هذا الملف على موقع أو طابع زمني يتعذر على التطبيق قراءته.';
 
   @override
   String get gpsTrack_export_saved => 'تم حفظ المسار';

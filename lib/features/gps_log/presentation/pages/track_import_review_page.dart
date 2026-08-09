@@ -10,6 +10,8 @@ import 'package:submersion/features/gps_log/data/services/track_import/track_tim
 import 'package:submersion/features/gps_log/presentation/providers/gps_track_map_providers.dart';
 import 'package:submersion/features/gps_log/presentation/widgets/csv_column_mapping_form.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
+import 'package:submersion/features/gps_log/data/services/track_import/parsed_track.dart';
+import 'package:submersion/features/gps_log/presentation/track_parse_error_text.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 
 /// Confirms a parsed track before writing it.
@@ -89,6 +91,12 @@ class _TrackImportReviewPageState extends ConsumerState<TrackImportReviewPage> {
           .commit(_candidate.copyWith(tzOffsetMinutes: _offsetMinutes));
       if (!mounted) return;
       navigator.pop(true);
+    } on TrackParseException catch (e) {
+      if (!mounted) return;
+      setState(() => _busy = false);
+      messenger.showSnackBar(
+        SnackBar(content: Text(trackParseErrorText(l10n, e))),
+      );
     } catch (e) {
       if (!mounted) return;
       setState(() => _busy = false);

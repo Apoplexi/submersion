@@ -16,6 +16,34 @@ void main() {
     expect(parseGpx(_fixture('sample.gpx')).name, 'Cozumel Day 3');
   });
 
+  test('prefers the track name over the file title in metadata', () {
+    // <metadata><name> comes first in document order, so a bare
+    // findAllElements('name').first named every Garmin export the same.
+    const xml = '''
+<gpx version="1.1">
+  <metadata><name>Garmin Connect Export</name></metadata>
+  <trk>
+    <name>Palancar Gardens</name>
+    <trkseg>
+      <trkpt lat="20.5" lon="-87.25"><time>2026-05-22T13:00:00Z</time></trkpt>
+      <trkpt lat="20.6" lon="-87.26"><time>2026-05-22T13:01:00Z</time></trkpt>
+    </trkseg>
+  </trk>
+</gpx>''';
+    expect(parseGpx(xml).name, 'Palancar Gardens');
+  });
+
+  test('falls back to the file title when the track is unnamed', () {
+    const xml = '''
+<gpx version="1.1">
+  <metadata><name>Garmin Connect Export</name></metadata>
+  <trk><trkseg>
+    <trkpt lat="20.5" lon="-87.25"><time>2026-05-22T13:00:00Z</time></trkpt>
+  </trkseg></trk>
+</gpx>''';
+    expect(parseGpx(xml).name, 'Garmin Connect Export');
+  });
+
   test('reads coordinates from the attributes', () {
     final first = parseGpx(_fixture('sample.gpx')).fixes.first;
     expect(first.lat, closeTo(20.5, 1e-9));

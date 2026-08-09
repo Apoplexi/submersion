@@ -20193,6 +20193,22 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String get gpsTrack_importError_unsupportedFormat =>
+      'Ce type de fichier n\'est pas pris en charge. Importez un fichier GPX, KML, CSV ou FIT.';
+
+  @override
+  String get gpsTrack_importError_unreadable =>
+      'Ce fichier n\'a pas pu être lu. Il est peut-être endommagé ou incomplet.';
+
+  @override
+  String get gpsTrack_importError_noPositions =>
+      'Ce fichier ne contient aucune position GPS horodatée.';
+
+  @override
+  String get gpsTrack_importError_badData =>
+      'Ce fichier contient une position ou un horodatage que l\'application ne peut pas lire.';
+
+  @override
   String get gpsTrack_export_saved => 'Trace enregistrée';
 
   @override

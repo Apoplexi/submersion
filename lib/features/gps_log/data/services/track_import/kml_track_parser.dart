@@ -27,12 +27,14 @@ ParsedTrack parseKml(String xml) {
     throw const TrackParseException(
       'No <gx:Track> with timestamps found. A plain LineString has no times '
       'and cannot be imported.',
+      reason: TrackParseReason.noPositions,
     );
   }
   if (whens.length != coords.length) {
     throw TrackParseException(
       'Mismatched <when> (${whens.length}) and <gx:coord> '
       '(${coords.length}) counts',
+      reason: TrackParseReason.badData,
     );
   }
 
@@ -41,7 +43,10 @@ ParsedTrack parseKml(String xml) {
   for (var i = 0; i < whens.length; i++) {
     final time = parseFixTime(whens[i].innerText);
     if (time == null) {
-      throw TrackParseException('Unparseable time: ${whens[i].innerText}');
+      throw TrackParseException(
+        'Unparseable time: ${whens[i].innerText}',
+        reason: TrackParseReason.badData,
+      );
     }
     if (time.zoned) anyZoned = true;
 
@@ -49,12 +54,18 @@ ParsedTrack parseKml(String xml) {
     // Reading it backwards silently relocates the track.
     final parts = coords[i].innerText.trim().split(RegExp(r'\s+'));
     if (parts.length < 2) {
-      throw TrackParseException('Malformed coord: ${coords[i].innerText}');
+      throw TrackParseException(
+        'Malformed coord: ${coords[i].innerText}',
+        reason: TrackParseReason.badData,
+      );
     }
     final lon = double.tryParse(parts[0]);
     final lat = double.tryParse(parts[1]);
     if (lat == null || lon == null) {
-      throw TrackParseException('Unparseable coord: ${coords[i].innerText}');
+      throw TrackParseException(
+        'Unparseable coord: ${coords[i].innerText}',
+        reason: TrackParseReason.badData,
+      );
     }
     validateCoordinate(lat, lon);
 
@@ -64,8 +75,29 @@ ParsedTrack parseKml(String xml) {
   fixes.sort((a, b) => a.utc.compareTo(b.utc));
 
   return ParsedTrack(
-    name: document.findAllElements('name').firstOrNull?.innerText.trim(),
+    name: _trackName(document, coords.first),
     fixes: List.unmodifiable(fixes),
     timesAreWallClock: !anyZoned,
   );
+}
+
+/// The name on the Placemark that holds the track, falling back to the
+/// document title.
+///
+/// A bare findAllElements('name').first picks up `<Document><name>`, which
+/// appears earlier in document order and titles the whole FILE, so every
+/// track exported from Google Earth imported under the same name.
+String? _trackName(XmlDocument document, XmlElement coord) {
+  for (XmlNode? node = coord.parent; node != null; node = node.parent) {
+    if (node is! XmlElement || node.name.local != 'Placemark') continue;
+    final name = node.findElements('name').firstOrNull?.innerText.trim();
+    if (name != null && name.isNotEmpty) return name;
+    break;
+  }
+  final fallback = document
+      .findAllElements('name')
+      .firstOrNull
+      ?.innerText
+      .trim();
+  return (fallback == null || fallback.isEmpty) ? null : fallback;
 }

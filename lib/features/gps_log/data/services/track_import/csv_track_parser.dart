@@ -91,14 +91,20 @@ ParsedTrack parseCsv(Uint8List bytes, CsvColumnMapping mapping) {
     final timeText = cell(mapping.timeIndex);
     final time = timeText == null ? null : parseFixTime(timeText);
     if (time == null) {
-      throw TrackParseException('Row ${i + 2}: unparseable time "$timeText"');
+      throw TrackParseException(
+        'Row ${i + 2}: unparseable time "$timeText"',
+        reason: TrackParseReason.badData,
+      );
     }
     if (time.zoned) anyZoned = true;
 
     final lat = double.tryParse(cell(mapping.latIndex) ?? '');
     final lon = double.tryParse(cell(mapping.lonIndex) ?? '');
     if (lat == null || lon == null) {
-      throw TrackParseException('Row ${i + 2}: unparseable coordinate');
+      throw TrackParseException(
+        'Row ${i + 2}: unparseable coordinate',
+        reason: TrackParseReason.badData,
+      );
     }
     validateCoordinate(lat, lon);
 
@@ -111,7 +117,10 @@ ParsedTrack parseCsv(Uint8List bytes, CsvColumnMapping mapping) {
   }
 
   if (fixes.isEmpty) {
-    throw const TrackParseException('No usable data rows');
+    throw const TrackParseException(
+      'No usable data rows',
+      reason: TrackParseReason.noPositions,
+    );
   }
   fixes.sort((a, b) => a.utc.compareTo(b.utc));
   return ParsedTrack(

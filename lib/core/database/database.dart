@@ -4155,12 +4155,8 @@ class AppDatabase extends _$AppDatabase {
     }
   }
 
-  /// Idempotent DDL for the v142 return-flight column. Called from the v142
-  /// onUpgrade step and the beforeOpen backstop, matching the
-  /// _assertWeatherCodeColumn pattern so a schema-version collision cannot
-  /// strand a database without it. Self-guarding when the table is absent
-  /// (minimal migration-test fixtures).
-  /// v145: gps_tracks provenance, label, and non-destructive trim bounds.
+  /// Idempotent DDL for the v145 gps_tracks provenance, label, and
+  /// non-destructive trim-bound columns.
   ///
   /// Self-guarding like its siblings: a DB that upgraded past 145 on a
   /// parallel branch never enters the migration block, so the beforeOpen
@@ -4194,6 +4190,11 @@ class AppDatabase extends _$AppDatabase {
     }
   }
 
+  /// Idempotent DDL for the v142 return-flight column. Called from the v142
+  /// onUpgrade step and the beforeOpen backstop, matching the
+  /// _assertWeatherCodeColumn pattern so a schema-version collision cannot
+  /// strand a database without it. Self-guarding when the table is absent
+  /// (minimal migration-test fixtures).
   Future<void> _assertTripReturnFlightColumn() async {
     final cols = await customSelect("PRAGMA table_info('trips')").get();
     if (cols.isEmpty) return;

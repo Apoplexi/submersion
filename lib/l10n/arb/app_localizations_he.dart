@@ -12844,6 +12844,7 @@ class AppLocalizationsHe extends AppLocalizations {
       count,
       locale: localeName,
       other: '$count נקודות',
+      two: 'שתי נקודות',
       one: 'נקודה אחת',
     );
     return '$_temp0';
@@ -19602,6 +19603,7 @@ class AppLocalizationsHe extends AppLocalizations {
       count,
       locale: localeName,
       other: '$count נקודות',
+      two: 'שתי נקודות',
       one: 'נקודה אחת',
     );
     return '$_temp0';
@@ -19611,6 +19613,22 @@ class AppLocalizationsHe extends AppLocalizations {
   String gpsTrack_import_failed(String reason) {
     return 'לא ניתן לקרוא את הקובץ: $reason';
   }
+
+  @override
+  String get gpsTrack_importError_unsupportedFormat =>
+      'סוג הקובץ אינו נתמך. ייבא קובץ GPX, KML, CSV או FIT.';
+
+  @override
+  String get gpsTrack_importError_unreadable =>
+      'לא ניתן לקרוא את הקובץ. ייתכן שהוא פגום או חלקי.';
+
+  @override
+  String get gpsTrack_importError_noPositions =>
+      'בקובץ אין מיקומי GPS עם חותמת זמן.';
+
+  @override
+  String get gpsTrack_importError_badData =>
+      'בקובץ יש מיקום או חותמת זמן שהאפליקציה אינה יכולה לקרוא.';
 
   @override
   String get gpsTrack_export_saved => 'המסלול נשמר';

@@ -145,7 +145,10 @@ class TrackImportService {
           .toList();
       final track = extractFitTrack(records);
       if (track == null) {
-        throw const TrackParseException('No GPS positions in that FIT file');
+        throw const TrackParseException(
+          'No GPS positions in that FIT file',
+          reason: TrackParseReason.noPositions,
+        );
       }
       return track;
     }
@@ -179,12 +182,18 @@ class TrackImportService {
   }) async {
     final format = sniffFormat(fileName, bytes);
     if (format == null) {
-      throw const TrackParseException('Unrecognised file type');
+      throw const TrackParseException(
+        'Unrecognised file type',
+        reason: TrackParseReason.unsupportedFormat,
+      );
     }
 
     final parsed = _parse(format, bytes, csvMapping);
     if (parsed.fixes.isEmpty) {
-      throw const TrackParseException('No positions in that file');
+      throw const TrackParseException(
+        'No positions in that file',
+        reason: TrackParseReason.noPositions,
+      );
     }
 
     final dives = await _diveRepository.getAllDives();

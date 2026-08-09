@@ -20057,6 +20057,22 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String get gpsTrack_importError_unsupportedFormat =>
+      'Ez a fájltípus nem támogatott. Importálj GPX-, KML-, CSV- vagy FIT-fájlt.';
+
+  @override
+  String get gpsTrack_importError_unreadable =>
+      'A fájl nem olvasható. Sérült vagy hiányos lehet.';
+
+  @override
+  String get gpsTrack_importError_noPositions =>
+      'A fájl nem tartalmaz időbélyeggel ellátott GPS-pozíciókat.';
+
+  @override
+  String get gpsTrack_importError_badData =>
+      'A fájl olyan pozíciót vagy időbélyeget tartalmaz, amelyet az alkalmazás nem tud beolvasni.';
+
+  @override
   String get gpsTrack_export_saved => 'Nyomvonal mentve';
 
   @override

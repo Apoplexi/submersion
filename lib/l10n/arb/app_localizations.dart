@@ -33509,6 +33509,30 @@ abstract class AppLocalizations {
   /// **'Could not read that file: {reason}'**
   String gpsTrack_import_failed(String reason);
 
+  /// Track import failed: the file extension is not one the app reads.
+  ///
+  /// In en, this message translates to:
+  /// **'That file type is not supported. Import a GPX, KML, CSV, or FIT file.'**
+  String get gpsTrack_importError_unsupportedFormat;
+
+  /// Track import failed: the file is structurally unreadable.
+  ///
+  /// In en, this message translates to:
+  /// **'That file could not be read. It may be damaged or incomplete.'**
+  String get gpsTrack_importError_unreadable;
+
+  /// Track import failed: the file parsed but holds no GPS positions.
+  ///
+  /// In en, this message translates to:
+  /// **'That file has no timestamped GPS positions.'**
+  String get gpsTrack_importError_noPositions;
+
+  /// Track import failed: a coordinate or timestamp in the file is unusable.
+  ///
+  /// In en, this message translates to:
+  /// **'That file has a position or timestamp this app cannot read.'**
+  String get gpsTrack_importError_badData;
+
   /// No description provided for @gpsTrack_export_saved.
   ///
   /// In en, this message translates to:

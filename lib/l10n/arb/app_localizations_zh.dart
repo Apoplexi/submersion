@@ -19090,6 +19090,19 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get gpsTrack_importError_unsupportedFormat =>
+      '不支持该文件类型。请导入 GPX、KML、CSV 或 FIT 文件。';
+
+  @override
+  String get gpsTrack_importError_unreadable => '无法读取该文件。它可能已损坏或不完整。';
+
+  @override
+  String get gpsTrack_importError_noPositions => '该文件没有带时间戳的 GPS 位置。';
+
+  @override
+  String get gpsTrack_importError_badData => '该文件包含本应用无法读取的位置或时间戳。';
+
+  @override
   String get gpsTrack_export_saved => '轨迹已保存';
 
   @override

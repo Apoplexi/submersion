@@ -30,6 +30,41 @@ void main() {
     expect(parseKml(_fixture('sample.kml')).name, 'Cozumel Day 3');
   });
 
+  test('prefers the placemark name over the document title', () {
+    // <Document><name> comes first in document order, so a bare
+    // findAllElements('name').first named every Google Earth export the same.
+    const xml = '''
+<kml xmlns:gx="http://www.google.com/kml/ext/2.2">
+  <Document>
+    <name>My Places</name>
+    <Placemark>
+      <name>Palancar Gardens</name>
+      <gx:Track>
+        <when>2026-05-22T13:00:00Z</when>
+        <gx:coord>-87.25 20.5 0</gx:coord>
+        <when>2026-05-22T13:01:00Z</when>
+        <gx:coord>-87.26 20.6 0</gx:coord>
+      </gx:Track>
+    </Placemark>
+  </Document>
+</kml>''';
+    expect(parseKml(xml).name, 'Palancar Gardens');
+  });
+
+  test('falls back to the document title for an unnamed placemark', () {
+    const xml = '''
+<kml xmlns:gx="http://www.google.com/kml/ext/2.2">
+  <Document>
+    <name>My Places</name>
+    <Placemark><gx:Track>
+      <when>2026-05-22T13:00:00Z</when>
+      <gx:coord>-87.25 20.5 0</gx:coord>
+    </gx:Track></Placemark>
+  </Document>
+</kml>''';
+    expect(parseKml(xml).name, 'My Places');
+  });
+
   test('parses times as real UTC', () {
     final first = parseKml(_fixture('sample.kml')).fixes.first;
     expect(first.utc.isUtc, isTrue);

@@ -19776,6 +19776,22 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get gpsTrack_importError_unsupportedFormat =>
+      'That file type is not supported. Import a GPX, KML, CSV, or FIT file.';
+
+  @override
+  String get gpsTrack_importError_unreadable =>
+      'That file could not be read. It may be damaged or incomplete.';
+
+  @override
+  String get gpsTrack_importError_noPositions =>
+      'That file has no timestamped GPS positions.';
+
+  @override
+  String get gpsTrack_importError_badData =>
+      'That file has a position or timestamp this app cannot read.';
+
+  @override
   String get gpsTrack_export_saved => 'Track saved';
 
   @override
