@@ -132,7 +132,9 @@ class AppShortcuts {
     return {
       // Navigation
       platformShortcut(LogicalKeyboardKey.keyN): () {
-        context.go('/dives/new');
+        // PUSH (not go): the digit shortcuts below switch tabs, but this
+        // opens a sub-page and must stay poppable (#647).
+        context.push('/dives/new');
       },
       platformShortcut(LogicalKeyboardKey.digit1): () {
         context.go('/dives');
@@ -157,7 +159,7 @@ class AppShortcuts {
 
       // Search
       platformShortcut(LogicalKeyboardKey.keyF): () {
-        context.go('/dives/search');
+        context.push('/dives/search');
       },
 
       // Settings

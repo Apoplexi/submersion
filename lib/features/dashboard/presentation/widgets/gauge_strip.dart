@@ -110,7 +110,7 @@ class GaugeStrip extends ConsumerWidget {
             icon: Icons.health_and_safety_outlined,
             label: l10n.dashboard_gauges_noInsurance,
             tone: _Tone.neutral,
-            onTap: () => context.go('/settings/diver-profile/insurance'),
+            onTap: () => context.push('/settings/diver-profile/insurance'),
           ),
         );
       } else if (insurance.isExpired) {
@@ -120,7 +120,7 @@ class GaugeStrip extends ConsumerWidget {
             icon: Icons.health_and_safety_outlined,
             label: l10n.dashboard_gauges_insuranceExpired,
             tone: _Tone.alert,
-            onTap: () => context.go('/settings/diver-profile/insurance'),
+            onTap: () => context.push('/settings/diver-profile/insurance'),
           ),
         );
       } else if (insurance.isExpiringSoon) {
@@ -134,7 +134,7 @@ class GaugeStrip extends ConsumerWidget {
               ).format(insurance.expiryDate!),
             ),
             tone: _Tone.warn,
-            onTap: () => context.go('/settings/diver-profile/insurance'),
+            onTap: () => context.push('/settings/diver-profile/insurance'),
           ),
         );
       } else {
@@ -144,7 +144,7 @@ class GaugeStrip extends ConsumerWidget {
             icon: Icons.health_and_safety_outlined,
             label: l10n.dashboard_gauges_insuranceOk,
             tone: _Tone.ok,
-            onTap: () => context.go('/settings/diver-profile/insurance'),
+            onTap: () => context.push('/settings/diver-profile/insurance'),
           ),
         );
       }

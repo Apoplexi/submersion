@@ -627,7 +627,9 @@ class DiveSearchDelegate extends SearchDelegate<String?> {
               siteLongitude: dive.siteLongitude,
               onTap: () {
                 close(context, dive.id);
-                context.go('/dives/${dive.id}');
+                // PUSH (not go): go() replaces the stack, leaving system back
+                // with nothing to pop -- it would close the app (#647).
+                context.push('/dives/${dive.id}');
               },
             );
           },
