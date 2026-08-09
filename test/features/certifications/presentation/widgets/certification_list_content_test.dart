@@ -481,6 +481,39 @@ void main() {
       expect(find.text('Open Water'), findsWidgets);
     });
 
+    testWidgets('accessibility label names the agency exactly once', (
+      tester,
+    ) async {
+      final handle = tester.ensureSemantics();
+
+      final overrides = await _buildPhoneOverrides(
+        certs: [
+          _makeCert(
+            id: 'n3',
+            name: 'PADI : Open Water',
+            level: CertificationLevel.openWater,
+          ),
+        ],
+      );
+
+      await tester.pumpWidget(
+        testApp(
+          overrides: overrides,
+          child: const CertificationListContent(showAppBar: true),
+        ),
+      );
+      await tester.pump();
+
+      // The label stands in for the whole tile, so it must carry the agency --
+      // but exactly once. It has been wrong in both directions: originally
+      // "PADI PADI : Open Water", then briefly with no agency at all.
+      expect(find.bySemanticsLabel('PADI Open Water'), findsOneWidget);
+
+      // Must be disposed before the test body ends; addTearDown runs after
+      // the framework's own handle check.
+      handle.dispose();
+    });
+
     testWidgets('a derived stored name is not shown verbatim', (tester) async {
       final overrides = await _buildOverrides(
         certs: [

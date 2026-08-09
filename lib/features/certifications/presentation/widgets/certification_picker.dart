@@ -188,9 +188,14 @@ class CertificationPickerSheet extends ConsumerWidget {
                   final isSelected = selectedCertification?.id == cert.id;
                   final dateFormat = DateFormat.yMMMd();
 
+                  // Keep the agency: this label replaces the tile's own
+                  // semantics, including the subtitle that shows the agency
+                  // visually. The title is derived so it is not said twice.
+                  final certName =
+                      '${cert.agency.displayName} ${certificationTitle(cert)}';
                   final certLabel = cert.issueDate != null
-                      ? '${certificationTitle(cert)}, issued ${dateFormat.format(cert.issueDate!)}${isSelected ? ', selected' : ''}${cert.isExpired ? ', expired' : ''}'
-                      : '${certificationTitle(cert)}${isSelected ? ', selected' : ''}${cert.isExpired ? ', expired' : ''}';
+                      ? '$certName, issued ${dateFormat.format(cert.issueDate!)}${isSelected ? ', selected' : ''}${cert.isExpired ? ', expired' : ''}'
+                      : '$certName${isSelected ? ', selected' : ''}${cert.isExpired ? ', expired' : ''}';
 
                   return Semantics(
                     label: certLabel,

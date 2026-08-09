@@ -351,9 +351,10 @@ class _CertificationEditPageState extends ConsumerState<CertificationEditPage> {
   /// Items for the certification dropdown, grouped into the agency's
   /// progression ladder and the cross-agency specialties.
   ///
-  /// Headers are disabled items with a null value. "Not specified" must stay
-  /// first: DropdownButton resolves a null selection to the first null-valued
-  /// item, and a header rendering as the selected label would be a bug.
+  /// Headers are disabled items carrying their own [CertificationOption.header]
+  /// value, so no two rows share a value -- see [CertificationOption] for why
+  /// DropdownButton requires that. "Not specified" leads the list because it is
+  /// the clear-selection choice, not for any correctness reason.
   List<DropdownMenuItem<CertificationOption>> _certificationItems(
     BuildContext context,
   ) {

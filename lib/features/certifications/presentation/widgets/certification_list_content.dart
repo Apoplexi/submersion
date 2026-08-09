@@ -537,7 +537,12 @@ class CertificationListTile extends StatelessWidget {
         : '';
 
     return Semantics(
-      label: '${certificationTitle(certification)}$issueDateLabel$statusLabel',
+      // Keep the agency: this label stands in for the whole tile, so dropping
+      // it would leave "Open Water" with no issuing agency. The title is
+      // derived rather than raw so the agency is not said twice.
+      label:
+          '${certification.agency.displayName} '
+          '${certificationTitle(certification)}$issueDateLabel$statusLabel',
       child: Card(
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
         color: isSelected

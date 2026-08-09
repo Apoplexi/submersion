@@ -277,8 +277,12 @@ class PdfTemplateProfessional extends PdfTemplateBuilder {
                         ),
                       ),
                       pw.SizedBox(width: 8),
+                      // This bullet is a single line with no separate agency
+                      // field, unlike the certifications section in
+                      // PdfSharedComponents -- so the agency stays here. The
+                      // title is derived so it is not printed twice.
                       pw.Text(
-                        certificationTitle(cert),
+                        '${cert.agency.displayName} - ${certificationTitle(cert)}',
                         style: const pw.TextStyle(fontSize: 10),
                       ),
                       if (cert.issueDate != null) ...[
