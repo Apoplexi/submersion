@@ -1503,6 +1503,52 @@ git commit -m "feat(backup): show safety sweep progress and a Skip button on the
 
 ---
 
+## As built: deviations from the plan
+
+Five things the plan got wrong, all corrected during execution. Recorded here
+because each one is a trap the next person will hit.
+
+1. **`Override` cannot be named.** Riverpod 3 does not export its `Override`
+   type, so `List<Override> rootProviderOverrides(...)` does not compile.
+   Leaving the return type to inference works but trips
+   `strict_top_level_inference`, and this project treats analyzer infos as
+   fatal. Final shape: return `List<dynamic>` and `.cast()` at each call site,
+   matching `test/helpers/test_app.dart`. (That helper reaches the real type via
+   an `// ignore: implementation_imports` import of
+   `package:riverpod/src/framework.dart` — acceptable in a test helper, not in
+   `lib/`.)
+
+2. **`LogFileService` has a required `logDirectory`.** It touches no filesystem
+   until `initialize()`, so tests construct it with any path.
+
+3. **Foreign keys ARE enforced by `setUpTestDatabase()`.** A `dives` row whose
+   `diver_id` has no `divers` parent fails with SQLITE_CONSTRAINT (787). Every
+   test fixture inserts the diver first.
+
+4. **`SettingsNotifier` needed two fixes, both latent bugs independent of
+   backups.** `state` starts at the `AppSettings` DEFAULTS and is replaced
+   asynchronously, so the scratch container would have graded dives against
+   default gradient factors — defeating its entire purpose. Added
+   `initialLoad`, awaited by `PostRestoreSafetyReview` before sweeping.
+   Separately, `_loadSettings` assigned `state` after an `await` with no
+   `mounted` check, throwing "Tried to use SettingsNotifier after dispose"
+   whenever a `ProviderScope` is torn down mid-load — reachable today via
+   `restartApp()`'s soft restart, not just the new container. Added the guard.
+   Consequence: four test fakes that `implements SettingsNotifier` had to gain
+   `Future<void> get initialLoad async {}` (`test/helpers/mock_providers.dart`,
+   `settings_page_test.dart`, `settings_page_shared_data_test.dart`,
+   `records_page_test.dart`).
+
+5. **`_analyzeFailed` was deleted, not reassigned.** Once the snackbar reads
+   `result.failed`, the field becomes write-only, which the analyzer flags.
+
+An extra test was added beyond the plan:
+`reads settings from the restored database, not the defaults` in
+`post_restore_safety_review_test.dart`. It switches the master toggle off in the
+restored diver's row and asserts the sweep no-ops — the only assertion that
+actually proves the scratch container reads restored settings rather than
+defaults, and the regression guard for deviation 4.
+
 ## Verification
 
 - [ ] `dart format .` reports no changes

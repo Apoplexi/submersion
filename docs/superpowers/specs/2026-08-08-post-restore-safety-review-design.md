@@ -197,6 +197,15 @@ final postRestoreSafetyReviewProvider =
 Tests override `postRestoreSafetyReviewProvider` with a fake that records the
 call, reports progress, or throws.
 
+A fresh container is necessary but not sufficient. `SettingsNotifier` starts at
+the `AppSettings` DEFAULTS and replaces its state asynchronously once the
+diver's row is read, so reading gradient factors immediately after building the
+container still yields defaults. `PostRestoreSafetyReview` therefore awaits a
+new `SettingsNotifier.initialLoad` before sweeping (guarded: a failed load
+leaves the defaults in place rather than aborting the restore). The same
+asynchrony required a `mounted` guard on `_loadSettings`'s post-await `state`
+assignment, since disposing the scratch container mid-load previously threw.
+
 ### 4. Progress and the Skip button
 
 `BackupOperationState` gains a structured field rather than another English
@@ -330,4 +339,5 @@ minimum.
 | `lib/features/backup/presentation/widgets/restore_barrier.dart` | Determinate progress, localized labels, Skip button |
 | `lib/core/providers/root_overrides.dart` | New: `rootProviderOverrides` |
 | `lib/main.dart` | Use `rootProviderOverrides` instead of an inline list |
+| `lib/features/settings/presentation/providers/settings_providers.dart` | Expose `initialLoad`; `mounted` guard on the post-await state write |
 | `lib/l10n/arb/app_*.arb` | Three new keys across nine locales |
