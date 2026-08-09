@@ -990,6 +990,17 @@ class AppLocalizationsAr extends AppLocalizations {
       'سيؤدي هذا إلى استبدال جميع البيانات الحالية ببيانات النسخة الاحتياطية. لا يمكن التراجع عن هذا الإجراء.';
 
   @override
+  String backup_restore_safetyReview_progress(int done, int total) {
+    return 'تم تحليل $done من $total غطسة';
+  }
+
+  @override
+  String get backup_restore_safetyReview_skip => 'تخطي';
+
+  @override
+  String get backup_restore_safetyReview_title => 'جارٍ تشغيل مراجعة السلامة';
+
+  @override
   String get backup_restoreComplete_continue => 'متابعة';
 
   @override

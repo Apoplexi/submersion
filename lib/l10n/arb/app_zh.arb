@@ -502,6 +502,19 @@
   "backup_restore_dialog_safetyNote": "恢复前将自动创建当前数据的安全备份。",
   "backup_restore_dialog_title": "恢复备份",
   "backup_restore_dialog_warning": "这将用备份数据替换所有当前数据。此操作无法撤消。",
+  "backup_restore_safetyReview_progress": "已分析 {done} / {total} 次潜水",
+  "@backup_restore_safetyReview_progress": {
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "backup_restore_safetyReview_skip": "跳过",
+  "backup_restore_safetyReview_title": "正在运行安全审查",
   "backup_schedule_enabled": "自动备份",
   "backup_schedule_enabled_subtitle": "按计划备份您的数据",
   "backup_schedule_frequency": "频率",

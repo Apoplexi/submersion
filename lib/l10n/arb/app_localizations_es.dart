@@ -1003,6 +1003,18 @@ class AppLocalizationsEs extends AppLocalizations {
       'Esto reemplazará TODOS los datos actuales con los datos de la copia. Esta acción no se puede deshacer.';
 
   @override
+  String backup_restore_safetyReview_progress(int done, int total) {
+    return 'Analizadas $done de $total inmersiones';
+  }
+
+  @override
+  String get backup_restore_safetyReview_skip => 'Omitir';
+
+  @override
+  String get backup_restore_safetyReview_title =>
+      'Ejecutando la revisión de seguridad';
+
+  @override
   String get backup_restoreComplete_continue => 'Continuar';
 
   @override

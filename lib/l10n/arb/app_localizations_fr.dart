@@ -1004,6 +1004,18 @@ class AppLocalizationsFr extends AppLocalizations {
       'Cela remplacera TOUTES les données actuelles par les données de la sauvegarde. Cette action est irréversible.';
 
   @override
+  String backup_restore_safetyReview_progress(int done, int total) {
+    return '$done plongées sur $total analysées';
+  }
+
+  @override
+  String get backup_restore_safetyReview_skip => 'Ignorer';
+
+  @override
+  String get backup_restore_safetyReview_title =>
+      'Analyse de sécurité en cours';
+
+  @override
   String get backup_restoreComplete_continue => 'Continuer';
 
   @override

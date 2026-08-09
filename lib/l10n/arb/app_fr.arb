@@ -408,6 +408,19 @@
   "backup_restore_dialog_safetyNote": "Une sauvegarde de sécurité de vos données actuelles sera créée automatiquement avant la restauration.",
   "backup_restore_dialog_title": "Restaurer la Sauvegarde",
   "backup_restore_dialog_warning": "Cela remplacera TOUTES les données actuelles par les données de la sauvegarde. Cette action est irréversible.",
+  "backup_restore_safetyReview_progress": "{done} plongées sur {total} analysées",
+  "@backup_restore_safetyReview_progress": {
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "backup_restore_safetyReview_skip": "Ignorer",
+  "backup_restore_safetyReview_title": "Analyse de sécurité en cours",
   "backup_schedule_enabled": "Sauvegardes automatiques",
   "backup_schedule_enabled_subtitle": "Sauvegarder vos données selon un calendrier",
   "backup_schedule_frequency": "Fréquence",

@@ -408,6 +408,19 @@
   "backup_restore_dialog_safetyNote": "Un backup di sicurezza dei dati correnti verrà creato automaticamente prima del ripristino.",
   "backup_restore_dialog_title": "Ripristina Backup",
   "backup_restore_dialog_warning": "Questo sostituirà TUTTI i dati correnti con i dati del backup. Questa azione non può essere annullata.",
+  "backup_restore_safetyReview_progress": "Analizzate {done} di {total} immersioni",
+  "@backup_restore_safetyReview_progress": {
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "backup_restore_safetyReview_skip": "Salta",
+  "backup_restore_safetyReview_title": "Revisione di sicurezza in corso",
   "backup_schedule_enabled": "Backup automatici",
   "backup_schedule_enabled_subtitle": "Esegui il backup dei dati secondo una pianificazione",
   "backup_schedule_frequency": "Frequenza",

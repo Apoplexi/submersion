@@ -408,6 +408,19 @@
   "backup_restore_dialog_safetyNote": "Se creará automáticamente una copia de seguridad de sus datos actuales antes de restaurar.",
   "backup_restore_dialog_title": "Restaurar Copia",
   "backup_restore_dialog_warning": "Esto reemplazará TODOS los datos actuales con los datos de la copia. Esta acción no se puede deshacer.",
+  "backup_restore_safetyReview_progress": "Analizadas {done} de {total} inmersiones",
+  "@backup_restore_safetyReview_progress": {
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "backup_restore_safetyReview_skip": "Omitir",
+  "backup_restore_safetyReview_title": "Ejecutando la revisión de seguridad",
   "backup_schedule_enabled": "Copias automáticas",
   "backup_schedule_enabled_subtitle": "Hacer copias de seguridad de forma programada",
   "backup_schedule_frequency": "Frecuencia",

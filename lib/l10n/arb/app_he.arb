@@ -408,6 +408,19 @@
   "backup_restore_dialog_safetyNote": "גיבוי בטיחות של הנתונים הנוכחיים שלך ייווצר אוטומטית לפני השחזור.",
   "backup_restore_dialog_title": "שחזור גיבוי",
   "backup_restore_dialog_warning": "פעולה זו תחליף את כל הנתונים הנוכחיים בנתוני הגיבוי. לא ניתן לבטל פעולה זו.",
+  "backup_restore_safetyReview_progress": "נותחו {done} מתוך {total} צלילות",
+  "@backup_restore_safetyReview_progress": {
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "backup_restore_safetyReview_skip": "דלג",
+  "backup_restore_safetyReview_title": "מריץ את סקירת הבטיחות",
   "backup_schedule_enabled": "גיבויים אוטומטיים",
   "backup_schedule_enabled_subtitle": "גבה את הנתונים לפי לוח זמנים",
   "backup_schedule_frequency": "תדירות",

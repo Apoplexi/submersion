@@ -976,6 +976,17 @@ class AppLocalizationsHe extends AppLocalizations {
       'פעולה זו תחליף את כל הנתונים הנוכחיים בנתוני הגיבוי. לא ניתן לבטל פעולה זו.';
 
   @override
+  String backup_restore_safetyReview_progress(int done, int total) {
+    return 'נותחו $done מתוך $total צלילות';
+  }
+
+  @override
+  String get backup_restore_safetyReview_skip => 'דלג';
+
+  @override
+  String get backup_restore_safetyReview_title => 'מריץ את סקירת הבטיחות';
+
+  @override
   String get backup_restoreComplete_continue => 'המשך';
 
   @override

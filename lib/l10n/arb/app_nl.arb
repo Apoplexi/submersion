@@ -408,6 +408,19 @@
   "backup_restore_dialog_safetyNote": "Er wordt automatisch een veiligheidsback-up van uw huidige gegevens gemaakt voor het herstellen.",
   "backup_restore_dialog_title": "Back-up Herstellen",
   "backup_restore_dialog_warning": "Dit vervangt ALLE huidige gegevens door de back-upgegevens. Deze actie kan niet ongedaan worden gemaakt.",
+  "backup_restore_safetyReview_progress": "{done} van {total} duiken geanalyseerd",
+  "@backup_restore_safetyReview_progress": {
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "backup_restore_safetyReview_skip": "Overslaan",
+  "backup_restore_safetyReview_title": "Veiligheidscontrole wordt uitgevoerd",
   "backup_schedule_enabled": "Automatische back-ups",
   "backup_schedule_enabled_subtitle": "Maak back-ups van uw gegevens volgens schema",
   "backup_schedule_frequency": "Frequentie",

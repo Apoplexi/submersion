@@ -982,6 +982,17 @@ class AppLocalizationsEn extends AppLocalizations {
       'This will replace ALL current data with the backup data. This action cannot be undone.';
 
   @override
+  String backup_restore_safetyReview_progress(int done, int total) {
+    return 'Analyzed $done of $total dives';
+  }
+
+  @override
+  String get backup_restore_safetyReview_skip => 'Skip';
+
+  @override
+  String get backup_restore_safetyReview_title => 'Running the safety review';
+
+  @override
   String get backup_restoreComplete_continue => 'Continue';
 
   @override

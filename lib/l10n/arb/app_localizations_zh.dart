@@ -932,6 +932,17 @@ class AppLocalizationsZh extends AppLocalizations {
   String get backup_restore_dialog_warning => '这将用备份数据替换所有当前数据。此操作无法撤消。';
 
   @override
+  String backup_restore_safetyReview_progress(int done, int total) {
+    return '已分析 $done / $total 次潜水';
+  }
+
+  @override
+  String get backup_restore_safetyReview_skip => '跳过';
+
+  @override
+  String get backup_restore_safetyReview_title => '正在运行安全审查';
+
+  @override
   String get backup_restoreComplete_continue => '继续';
 
   @override

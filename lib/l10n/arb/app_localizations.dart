@@ -1729,6 +1729,24 @@ abstract class AppLocalizations {
   /// **'This will replace ALL current data with the backup data. This action cannot be undone.'**
   String get backup_restore_dialog_warning;
 
+  /// No description provided for @backup_restore_safetyReview_progress.
+  ///
+  /// In en, this message translates to:
+  /// **'Analyzed {done} of {total} dives'**
+  String backup_restore_safetyReview_progress(int done, int total);
+
+  /// No description provided for @backup_restore_safetyReview_skip.
+  ///
+  /// In en, this message translates to:
+  /// **'Skip'**
+  String get backup_restore_safetyReview_skip;
+
+  /// No description provided for @backup_restore_safetyReview_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Running the safety review'**
+  String get backup_restore_safetyReview_title;
+
   /// No description provided for @backup_restoreComplete_continue.
   ///
   /// In en, this message translates to:

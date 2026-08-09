@@ -998,6 +998,18 @@ class AppLocalizationsIt extends AppLocalizations {
       'Questo sostituirà TUTTI i dati correnti con i dati del backup. Questa azione non può essere annullata.';
 
   @override
+  String backup_restore_safetyReview_progress(int done, int total) {
+    return 'Analizzate $done di $total immersioni';
+  }
+
+  @override
+  String get backup_restore_safetyReview_skip => 'Salta';
+
+  @override
+  String get backup_restore_safetyReview_title =>
+      'Revisione di sicurezza in corso';
+
+  @override
   String get backup_restoreComplete_continue => 'Continua';
 
   @override
