@@ -11,9 +11,12 @@ import 'package:submersion/features/dashboard/presentation/widgets/photo_ribbon_
 import 'package:submersion/features/dashboard/presentation/widgets/quick_actions_card.dart';
 import 'package:submersion/features/dashboard/presentation/widgets/year_in_review_card.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
+import 'package:submersion/features/dive_log/presentation/providers/dive_providers.dart';
 import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
 import 'package:submersion/features/media/domain/entities/media_item.dart';
 import 'package:submersion/features/media/domain/entities/media_source_type.dart';
+import 'package:submersion/features/media/presentation/pages/photo_viewer_page.dart';
+import 'package:submersion/features/media/presentation/providers/media_providers.dart';
 import 'package:submersion/features/statistics/data/repositories/statistics_repository.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
 
@@ -22,8 +25,17 @@ import '../../../../helpers/mock_providers.dart';
 final _t0 = DateTime(2026, 1, 1);
 
 /// Records where a tap navigated.
-class NavSpy {
+class NavSpy extends NavigatorObserver {
   String? location;
+
+  /// Routes pushed imperatively onto the root navigator (go_router's own
+  /// route pushes arrive here too, so callers match on route type).
+  final List<Route<dynamic>> pushedRoutes = [];
+
+  @override
+  void didPush(Route<dynamic> route, Route<dynamic>? previousRoute) {
+    pushedRoutes.add(route);
+  }
 }
 
 Future<NavSpy> pumpCard(
@@ -40,6 +52,7 @@ Future<NavSpy> pumpCard(
     },
   );
   final router = GoRouter(
+    observers: [spy],
     routes: [
       GoRoute(
         path: '/',
@@ -309,6 +322,42 @@ void main() {
       );
       expect(find.text('Recent photos'), findsOneWidget);
       expect(find.byType(ClipRRect), findsNWidgets(2));
+    });
+
+    testWidgets('tapping a photo opens the photo viewer, not the dive', (
+      tester,
+    ) async {
+      final spy = await pumpCard(
+        tester,
+        const PhotoRibbonCard(),
+        overrides: [
+          recentPhotosProvider.overrideWith(
+            (ref) async => [
+              MediaItem(
+                id: 'p1',
+                mediaType: MediaType.photo,
+                sourceType: MediaSourceType.platformGallery,
+                filePath: '/tmp/p1.jpg',
+                diveId: 'd1',
+                takenAt: _t0,
+                createdAt: _t0,
+                updatedAt: _t0,
+              ),
+            ],
+          ),
+          // The viewer resolves its own gallery from the dive; an empty list
+          // short-circuits its build before it reaches the profile providers,
+          // so this stays a navigation test rather than a viewer test.
+          mediaForDiveProvider('d1').overrideWith((ref) async => <MediaItem>[]),
+          diveProvider('d1').overrideWith((ref) async => null),
+        ],
+      );
+
+      await tester.tap(find.byType(ClipRRect).first);
+      await tester.pumpAndSettle();
+
+      expect(find.byType(PhotoViewerPage), findsOneWidget);
+      expect(spy.location, isNull);
     });
   });
 
