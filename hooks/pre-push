@@ -33,9 +33,24 @@ unset GIT_WORK_TREE
 echo "🔍 Running pre-push checks..."
 echo ""
 
-# Get the project root (where this hook lives)
-SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
+# Get the project root: the working tree actually being pushed.
+#
+# Resolve it from git, NOT from this script's location. core.hooksPath is an
+# absolute path into the main checkout, so "$0" is the same path no matter
+# which worktree is being pushed. Deriving the root from it made all three
+# checks run against the main checkout: they reported that tree's unrelated
+# problems (its build_runner output goes stale independently, since *.g.dart
+# and *.mocks.dart are gitignored and generated per tree) while saying nothing
+# about the change actually under push.
+#
+# GIT_DIR is unset above, so this resolves from the hook's working directory,
+# which git sets to the top of the worktree being pushed.
+PROJECT_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || true)"
+if [ -z "$PROJECT_ROOT" ]; then
+    # No work tree resolvable (unusual for a pre-push): keep the old behavior.
+    SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+    PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
+fi
 
 cd "$PROJECT_ROOT"
 
@@ -183,7 +198,14 @@ rm -f "$pattern_file"
 final=$(printf '%s\n' "$matched" | sort -u | while IFS= read -r t; do
     [ -n "$t" ] || continue
     [[ "$t" == *_test.dart ]] || continue
-    [ -f "$t" ] && printf '%s\n' "$t"
+    # Must be "|| continue", never '[ -f "$t" ] && printf'. This loop is the
+    # last command of a $(...) assignment, so a false test on the FINAL
+    # iteration makes the loop, the substitution, and then the assignment all
+    # exit 1 -- and set -e kills the hook with no message at all. Missing paths
+    # here are routine: the mirrored lib/x.dart -> test/x_test.dart mapping is
+    # speculative, and plenty of lib files have no mirrored test.
+    [ -f "$t" ] || continue
+    printf '%s\n' "$t"
 done)
 
 test_files=()
