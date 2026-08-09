@@ -12865,11 +12865,11 @@ class AppLocalizationsAr extends AppLocalizations {
       'رسم بياني لدورة المد والجزر والتوقيت';
 
   @override
-  String get diveDetailSection_reefHealth_name => 'صحة الشعاب المرجانية';
+  String get diveDetailSection_reefHealth_name => 'أحوال المياه';
 
   @override
   String get diveDetailSection_reefHealth_description =>
-      'الإجهاد الحراري لابيضاض المرجان في تاريخ الغوص';
+      'أحوال المياه عبر الأقمار الصناعية في تاريخ الغطسة';
 
   @override
   String get diveDetailSection_surfaceGps_name => 'GPS السطح';
@@ -22681,13 +22681,13 @@ class AppLocalizationsAr extends AppLocalizations {
       'لا يمكن لهذا الجهاز ضغط الفيديو. يتم رفع الملفات الأصلية منه.';
 
   @override
-  String get reef_section_title => 'الشعاب المرجانية';
+  String get reef_section_title => 'النظام البيئي';
 
   @override
   String get reef_section_sourcesTooltip => 'مصادر البيانات';
 
   @override
-  String get reef_section_loadError => 'تعذر تحميل بيانات الشعاب الآن';
+  String get reef_section_loadError => 'تعذّر تحميل بيانات النظام البيئي الآن';
 
   @override
   String get reef_habitat_title => 'موئل الشعاب';
@@ -22707,13 +22707,24 @@ class AppLocalizationsAr extends AppLocalizations {
   String get reef_habitat_unavailable => 'تعذر التحقق من موئل الشعاب الآن';
 
   @override
-  String get reef_health_title => 'صحة الشعاب المرجانية';
+  String get water_conditions_title => 'أحوال المياه';
 
   @override
-  String get reef_health_unavailable => 'تعذر التحقق من صحة الشعاب الآن';
+  String get water_conditions_unavailable =>
+      'تعذّر التحقق من أحوال المياه الآن';
 
   @override
-  String get reef_health_noData => 'لا توجد بيانات عن صحة الشعاب لهذا الموقع';
+  String get water_conditions_noData =>
+      'لا توجد بيانات مياه من الأقمار الصناعية لهذا الموقع';
+
+  @override
+  String get water_conditions_freshwater =>
+      'درجة حرارة المياه عبر الأقمار الصناعية تغطي المحيطات فقط';
+
+  @override
+  String water_conditions_anomaly(String value) {
+    return 'شذوذ $value';
+  }
 
   @override
   String reef_health_degreeHeatingWeeks(String value) {

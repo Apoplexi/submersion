@@ -22138,13 +22138,13 @@ abstract class AppLocalizations {
   /// No description provided for @diveDetailSection_reefHealth_name.
   ///
   /// In en, this message translates to:
-  /// **'Reef Health'**
+  /// **'Water Conditions'**
   String get diveDetailSection_reefHealth_name;
 
   /// No description provided for @diveDetailSection_reefHealth_description.
   ///
   /// In en, this message translates to:
-  /// **'Coral bleaching heat stress on the dive date'**
+  /// **'Satellite water conditions on the dive date'**
   String get diveDetailSection_reefHealth_description;
 
   /// No description provided for @diveDetailSection_surfaceGps_name.
@@ -38502,7 +38502,7 @@ abstract class AppLocalizations {
   /// No description provided for @reef_section_title.
   ///
   /// In en, this message translates to:
-  /// **'Reef'**
+  /// **'Ecosystem'**
   String get reef_section_title;
 
   /// No description provided for @reef_section_sourcesTooltip.
@@ -38514,7 +38514,7 @@ abstract class AppLocalizations {
   /// No description provided for @reef_section_loadError.
   ///
   /// In en, this message translates to:
-  /// **'Could not load reef data right now'**
+  /// **'Could not load ecosystem data right now'**
   String get reef_section_loadError;
 
   /// No description provided for @reef_habitat_title.
@@ -38547,23 +38547,35 @@ abstract class AppLocalizations {
   /// **'Could not check reef habitat right now'**
   String get reef_habitat_unavailable;
 
-  /// No description provided for @reef_health_title.
+  /// No description provided for @water_conditions_title.
   ///
   /// In en, this message translates to:
-  /// **'Reef health'**
-  String get reef_health_title;
+  /// **'Water conditions'**
+  String get water_conditions_title;
 
-  /// No description provided for @reef_health_unavailable.
+  /// No description provided for @water_conditions_unavailable.
   ///
   /// In en, this message translates to:
-  /// **'Could not check reef health right now'**
-  String get reef_health_unavailable;
+  /// **'Could not check water conditions right now'**
+  String get water_conditions_unavailable;
 
-  /// No description provided for @reef_health_noData.
+  /// No description provided for @water_conditions_noData.
   ///
   /// In en, this message translates to:
-  /// **'No reef health data for this location'**
-  String get reef_health_noData;
+  /// **'No satellite water data for this location'**
+  String get water_conditions_noData;
+
+  /// No description provided for @water_conditions_freshwater.
+  ///
+  /// In en, this message translates to:
+  /// **'Satellite water temperature covers oceans only'**
+  String get water_conditions_freshwater;
+
+  /// No description provided for @water_conditions_anomaly.
+  ///
+  /// In en, this message translates to:
+  /// **'Anomaly {value}'**
+  String water_conditions_anomaly(String value);
 
   /// No description provided for @reef_health_degreeHeatingWeeks.
   ///

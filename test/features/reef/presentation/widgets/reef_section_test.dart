@@ -32,7 +32,9 @@ ReefSnapshot _snapshot({
 Widget _harness(ReefSnapshot snapshot) {
   return ProviderScope(
     overrides: [
-      reefSnapshotProvider(_location).overrideWith((ref) async => snapshot),
+      reefSnapshotProvider(
+        const ReefSnapshotRequest(location: _location),
+      ).overrideWith((ref) async => snapshot),
       // ReefHealthCard reads the diver's unit setting, which chains through
       // settingsProvider to SharedPreferences. Overriding at the narrowest
       // point severs that chain without mocking preferences.

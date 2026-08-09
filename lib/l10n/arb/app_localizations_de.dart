@@ -13085,11 +13085,11 @@ class AppLocalizationsDe extends AppLocalizations {
       'Gezeitenzyklusdiagramm und Zeiten';
 
   @override
-  String get diveDetailSection_reefHealth_name => 'Riffgesundheit';
+  String get diveDetailSection_reefHealth_name => 'Wasserbedingungen';
 
   @override
   String get diveDetailSection_reefHealth_description =>
-      'Korallenbleiche-Hitzestress am Tauchtag';
+      'Satellitengestützte Wasserbedingungen am Tauchdatum';
 
   @override
   String get diveDetailSection_surfaceGps_name => 'Oberflächen-GPS';
@@ -23059,14 +23059,14 @@ class AppLocalizationsDe extends AppLocalizations {
       'Dieses Gerät kann keine Videos komprimieren. Von ihm werden Originale hochgeladen.';
 
   @override
-  String get reef_section_title => 'Riff';
+  String get reef_section_title => 'Ökosystem';
 
   @override
   String get reef_section_sourcesTooltip => 'Datenquellen';
 
   @override
   String get reef_section_loadError =>
-      'Riffdaten konnten gerade nicht geladen werden';
+      'Ökosystemdaten konnten gerade nicht geladen werden';
 
   @override
   String get reef_habitat_title => 'Riff-Lebensraum';
@@ -23088,14 +23088,24 @@ class AppLocalizationsDe extends AppLocalizations {
       'Riff-Lebensraum konnte gerade nicht geprüft werden';
 
   @override
-  String get reef_health_title => 'Riffgesundheit';
+  String get water_conditions_title => 'Wasserbedingungen';
 
   @override
-  String get reef_health_unavailable =>
-      'Riffgesundheit konnte gerade nicht geprüft werden';
+  String get water_conditions_unavailable =>
+      'Wasserbedingungen konnten gerade nicht geprüft werden';
 
   @override
-  String get reef_health_noData => 'Keine Riffgesundheitsdaten für diesen Ort';
+  String get water_conditions_noData =>
+      'Keine Satelliten-Wasserdaten für diesen Ort';
+
+  @override
+  String get water_conditions_freshwater =>
+      'Satellitengestützte Wassertemperatur deckt nur Ozeane ab';
+
+  @override
+  String water_conditions_anomaly(String value) {
+    return 'Anomalie $value';
+  }
 
   @override
   String reef_health_degreeHeatingWeeks(String value) {

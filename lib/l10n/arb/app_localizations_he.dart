@@ -12776,11 +12776,11 @@ class AppLocalizationsHe extends AppLocalizations {
   String get diveDetailSection_tide_description => 'גרף מחזור גאות ושפל וזמן';
 
   @override
-  String get diveDetailSection_reefHealth_name => 'בריאות השונית';
+  String get diveDetailSection_reefHealth_name => 'תנאי המים';
 
   @override
   String get diveDetailSection_reefHealth_description =>
-      'עקת חום מהלבנת אלמוגים בתאריך הצלילה';
+      'תנאי מים לווייניים בתאריך הצלילה';
 
   @override
   String get diveDetailSection_surfaceGps_name => 'GPS פני המים';
@@ -22518,13 +22518,14 @@ class AppLocalizationsHe extends AppLocalizations {
       'מכשיר זה אינו יכול לדחוס וידאו. ממנו מועלים הקבצים המקוריים.';
 
   @override
-  String get reef_section_title => 'שונית';
+  String get reef_section_title => 'מערכת אקולוגית';
 
   @override
   String get reef_section_sourcesTooltip => 'מקורות נתונים';
 
   @override
-  String get reef_section_loadError => 'לא ניתן לטעון כעת את נתוני השונית';
+  String get reef_section_loadError =>
+      'לא ניתן לטעון נתוני מערכת אקולוגית כרגע';
 
   @override
   String get reef_habitat_title => 'בית גידול השונית';
@@ -22544,13 +22545,22 @@ class AppLocalizationsHe extends AppLocalizations {
   String get reef_habitat_unavailable => 'לא ניתן לבדוק כעת את בית הגידול';
 
   @override
-  String get reef_health_title => 'בריאות השונית';
+  String get water_conditions_title => 'תנאי המים';
 
   @override
-  String get reef_health_unavailable => 'לא ניתן לבדוק כעת את בריאות השונית';
+  String get water_conditions_unavailable => 'לא ניתן לבדוק את תנאי המים כרגע';
 
   @override
-  String get reef_health_noData => 'אין נתוני בריאות שונית למיקום זה';
+  String get water_conditions_noData => 'אין נתוני לוויין על המים למיקום זה';
+
+  @override
+  String get water_conditions_freshwater =>
+      'טמפרטורת מים לוויינית מכסה אוקיינוסים בלבד';
+
+  @override
+  String water_conditions_anomaly(String value) {
+    return 'סטייה $value';
+  }
 
   @override
   String reef_health_degreeHeatingWeeks(String value) {

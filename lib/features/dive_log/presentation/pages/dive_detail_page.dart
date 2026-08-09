@@ -101,7 +101,7 @@ import 'package:submersion/features/signatures/presentation/widgets/signature_ca
 import 'package:submersion/features/signatures/presentation/widgets/signature_display_widget.dart';
 import 'package:submersion/features/tides/domain/entities/tide_record.dart';
 import 'package:submersion/features/reef/presentation/providers/reef_providers.dart';
-import 'package:submersion/features/reef/presentation/widgets/reef_health_card.dart';
+import 'package:submersion/features/reef/presentation/widgets/water_conditions_card.dart';
 import 'package:submersion/features/tides/presentation/providers/tide_providers.dart';
 import 'package:submersion/features/tides/presentation/widgets/tide_cycle_graph.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
@@ -3427,7 +3427,7 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
         mainAxisSize: MainAxisSize.min,
         children: [
           const SizedBox(height: 24),
-          Card(child: ReefHealthCard(part: part)),
+          Card(child: WaterConditionsCard(health: part)),
         ],
       ),
       loading: () => const SizedBox.shrink(),

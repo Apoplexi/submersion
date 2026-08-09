@@ -12886,11 +12886,11 @@ class AppLocalizationsEn extends AppLocalizations {
       'Tide cycle graph and timing';
 
   @override
-  String get diveDetailSection_reefHealth_name => 'Reef Health';
+  String get diveDetailSection_reefHealth_name => 'Water Conditions';
 
   @override
   String get diveDetailSection_reefHealth_description =>
-      'Coral bleaching heat stress on the dive date';
+      'Satellite water conditions on the dive date';
 
   @override
   String get diveDetailSection_surfaceGps_name => 'Surface GPS';
@@ -22707,13 +22707,14 @@ class AppLocalizationsEn extends AppLocalizations {
       'This device cannot compress video. Originals are uploaded from it.';
 
   @override
-  String get reef_section_title => 'Reef';
+  String get reef_section_title => 'Ecosystem';
 
   @override
   String get reef_section_sourcesTooltip => 'Data sources';
 
   @override
-  String get reef_section_loadError => 'Could not load reef data right now';
+  String get reef_section_loadError =>
+      'Could not load ecosystem data right now';
 
   @override
   String get reef_habitat_title => 'Reef habitat';
@@ -22734,13 +22735,24 @@ class AppLocalizationsEn extends AppLocalizations {
       'Could not check reef habitat right now';
 
   @override
-  String get reef_health_title => 'Reef health';
+  String get water_conditions_title => 'Water conditions';
 
   @override
-  String get reef_health_unavailable => 'Could not check reef health right now';
+  String get water_conditions_unavailable =>
+      'Could not check water conditions right now';
 
   @override
-  String get reef_health_noData => 'No reef health data for this location';
+  String get water_conditions_noData =>
+      'No satellite water data for this location';
+
+  @override
+  String get water_conditions_freshwater =>
+      'Satellite water temperature covers oceans only';
+
+  @override
+  String water_conditions_anomaly(String value) {
+    return 'Anomaly $value';
+  }
 
   @override
   String reef_health_degreeHeatingWeeks(String value) {

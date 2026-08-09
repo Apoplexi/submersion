@@ -5,7 +5,7 @@ import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
 import 'package:submersion/features/reef/presentation/providers/reef_providers.dart';
 import 'package:submersion/features/reef/presentation/widgets/reef_attribution_sheet.dart';
 import 'package:submersion/features/reef/presentation/widgets/reef_habitat_card.dart';
-import 'package:submersion/features/reef/presentation/widgets/reef_health_card.dart';
+import 'package:submersion/features/reef/presentation/widgets/water_conditions_card.dart';
 import 'package:submersion/features/reef/presentation/widgets/reef_protection_card.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 
@@ -61,7 +61,7 @@ class ReefSection extends ConsumerWidget {
               data: (snapshot) => Column(
                 children: [
                   ReefHabitatCard(part: snapshot.habitat),
-                  ReefHealthCard(part: snapshot.health),
+                  WaterConditionsCard(health: snapshot.health),
                   ReefProtectionCard(part: snapshot.protection),
                 ],
               ),

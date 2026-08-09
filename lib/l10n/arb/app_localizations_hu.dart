@@ -13056,11 +13056,11 @@ class AppLocalizationsHu extends AppLocalizations {
       'Árapály-ciklus grafikon és időzítés';
 
   @override
-  String get diveDetailSection_reefHealth_name => 'Zátony állapota';
+  String get diveDetailSection_reefHealth_name => 'Vízviszonyok';
 
   @override
   String get diveDetailSection_reefHealth_description =>
-      'Korallfehéredési hőstressz a merülés napján';
+      'Műholdas vízviszonyok a merülés napján';
 
   @override
   String get diveDetailSection_surfaceGps_name => 'Felszíni GPS';
@@ -23018,13 +23018,14 @@ class AppLocalizationsHu extends AppLocalizations {
       'Ez az eszköz nem tud videót tömöríteni. Róla az eredetik töltődnek fel.';
 
   @override
-  String get reef_section_title => 'Zátony';
+  String get reef_section_title => 'Ökoszisztéma';
 
   @override
   String get reef_section_sourcesTooltip => 'Adatforrások';
 
   @override
-  String get reef_section_loadError => 'A zátonyadatok most nem tölthetők be';
+  String get reef_section_loadError =>
+      'Az ökoszisztéma-adatok jelenleg nem tölthetők be';
 
   @override
   String get reef_habitat_title => 'Zátony élőhely';
@@ -23046,14 +23047,24 @@ class AppLocalizationsHu extends AppLocalizations {
       'A zátony élőhelye most nem ellenőrizhető';
 
   @override
-  String get reef_health_title => 'Zátony állapota';
+  String get water_conditions_title => 'Vízviszonyok';
 
   @override
-  String get reef_health_unavailable =>
-      'A zátony állapota most nem ellenőrizhető';
+  String get water_conditions_unavailable =>
+      'A vízviszonyok jelenleg nem ellenőrizhetők';
 
   @override
-  String get reef_health_noData => 'Nincs zátonyállapot-adat ehhez a helyhez';
+  String get water_conditions_noData =>
+      'Nincsenek műholdas vízadatok ehhez a helyhez';
+
+  @override
+  String get water_conditions_freshwater =>
+      'A műholdas vízhőmérséklet csak az óceánokat fedi le';
+
+  @override
+  String water_conditions_anomaly(String value) {
+    return 'Anomália $value';
+  }
 
   @override
   String reef_health_degreeHeatingWeeks(String value) {

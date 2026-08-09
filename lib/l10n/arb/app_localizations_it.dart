@@ -13097,11 +13097,11 @@ class AppLocalizationsIt extends AppLocalizations {
       'Grafico ciclo marea e tempi';
 
   @override
-  String get diveDetailSection_reefHealth_name => 'Salute della barriera';
+  String get diveDetailSection_reefHealth_name => 'Condizioni dell\'acqua';
 
   @override
   String get diveDetailSection_reefHealth_description =>
-      'Stress termico da sbiancamento dei coralli alla data dell\'immersione';
+      'Condizioni dell\'acqua da satellite alla data dell\'immersione';
 
   @override
   String get diveDetailSection_surfaceGps_name => 'GPS di superficie';
@@ -23094,14 +23094,14 @@ class AppLocalizationsIt extends AppLocalizations {
       'Questo dispositivo non può comprimere i video. Da esso vengono caricati gli originali.';
 
   @override
-  String get reef_section_title => 'Barriera';
+  String get reef_section_title => 'Ecosistema';
 
   @override
   String get reef_section_sourcesTooltip => 'Fonti dei dati';
 
   @override
   String get reef_section_loadError =>
-      'Impossibile caricare i dati della barriera in questo momento';
+      'Impossibile caricare i dati dell\'ecosistema al momento';
 
   @override
   String get reef_habitat_title => 'Habitat della barriera';
@@ -23123,15 +23123,24 @@ class AppLocalizationsIt extends AppLocalizations {
       'Impossibile verificare l\'habitat della barriera in questo momento';
 
   @override
-  String get reef_health_title => 'Salute della barriera';
+  String get water_conditions_title => 'Condizioni dell\'acqua';
 
   @override
-  String get reef_health_unavailable =>
-      'Impossibile verificare la salute della barriera in questo momento';
+  String get water_conditions_unavailable =>
+      'Impossibile verificare le condizioni dell\'acqua al momento';
 
   @override
-  String get reef_health_noData =>
-      'Nessun dato sulla salute della barriera per questa posizione';
+  String get water_conditions_noData =>
+      'Nessun dato satellitare sull\'acqua per questa posizione';
+
+  @override
+  String get water_conditions_freshwater =>
+      'La temperatura dell\'acqua da satellite copre solo gli oceani';
+
+  @override
+  String water_conditions_anomaly(String value) {
+    return 'Anomalia $value';
+  }
 
   @override
   String reef_health_degreeHeatingWeeks(String value) {
