@@ -129,15 +129,76 @@ void main() {
   });
 
   testWidgets('no subtitle line when there is nothing to say', (tester) async {
+    // A dive with no site on a day with no itinerary: nothing to subtitle with,
+    // but the dive keeps it off the surface-day path (which has its own label).
     final day = TripStoryDay(
       date: DateTime(2026, 3, 8),
       dayNumber: 2,
       kind: TripStoryDayKind.past,
+      dives: [Dive(id: 'd1', dateTime: DateTime(2026, 3, 8, 9))],
     );
     await pumpHeader(tester, day);
 
     // Only the title line renders.
     expect(find.byType(Text), findsOneWidget);
+  });
+
+  group('surface day', () {
+    TripStoryDay surfaceDay() => TripStoryDay(
+      date: DateTime(2026, 3, 8),
+      dayNumber: 2,
+      kind: TripStoryDayKind.past,
+    );
+
+    testWidgets('gets the same title line as any other day', (tester) async {
+      await pumpHeader(tester, surfaceDay());
+
+      expect(find.textContaining('Day 2'), findsOneWidget);
+      expect(find.textContaining('Mar 8'), findsOneWidget);
+    });
+
+    testWidgets('labels itself in the subtitle slot', (tester) async {
+      await pumpHeader(tester, surfaceDay());
+
+      expect(find.text('Surface day'), findsOneWidget);
+    });
+
+    testWidgets('title style matches a dive day title exactly', (tester) async {
+      // The point of the shared header: a surface day must not read as a
+      // lesser, smaller entry than the dive day above or below it.
+      await pumpHeader(tester, surfaceDay());
+      final surfaceStyle = tester
+          .widget<Text>(find.textContaining('Day 2'))
+          .style;
+
+      await pumpHeader(
+        tester,
+        TripStoryDay(
+          date: DateTime(2026, 3, 8),
+          dayNumber: 2,
+          kind: TripStoryDayKind.past,
+          dives: [
+            Dive(
+              id: 'd1',
+              dateTime: DateTime(2026, 3, 8, 9),
+              site: const DiveSite(id: 'site-a', name: 'Blue Corner'),
+            ),
+          ],
+        ),
+      );
+      final diveStyle = tester.widget<Text>(find.textContaining('Day 2')).style;
+
+      expect(surfaceStyle, diveStyle);
+      expect(surfaceStyle?.fontWeight, FontWeight.bold);
+    });
+
+    testWidgets('carries no leading icon', (tester) async {
+      // The old slim row led with a waves icon; no other day header does, so
+      // keeping it would reintroduce the asymmetry the shared header removes.
+      await pumpHeader(tester, surfaceDay());
+
+      expect(find.byType(Icon), findsNothing);
+    });
   });
 
   testWidgets('future day shows the planned chip', (tester) async {
@@ -153,11 +214,13 @@ void main() {
 
   testWidgets('short day still fills the minimum band height', (tester) async {
     // Title line only: shorter than the band, so the floor applies and every
-    // day header reads as the same height at default text scale.
+    // day header reads as the same height at default text scale. A siteless
+    // dive keeps the subtitle empty without taking the surface-day path.
     final day = TripStoryDay(
       date: DateTime(2026, 3, 8),
       dayNumber: 2,
       kind: TripStoryDayKind.past,
+      dives: [Dive(id: 'd1', dateTime: DateTime(2026, 3, 8, 9))],
     );
     await pumpHeader(tester, day);
 
