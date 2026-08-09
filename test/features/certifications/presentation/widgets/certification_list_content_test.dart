@@ -154,7 +154,7 @@ void main() {
       // Verify column headers appear (displayName values)
       expect(find.text('Name'), findsWidgets);
       expect(find.text('Agency'), findsOneWidget);
-      expect(find.text('Level'), findsOneWidget);
+      expect(find.text('Certification'), findsOneWidget);
       expect(find.text('Issue Date'), findsOneWidget);
       expect(find.text('Expiry Date'), findsOneWidget);
     });

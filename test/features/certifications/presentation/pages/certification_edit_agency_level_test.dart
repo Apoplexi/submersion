@@ -6,6 +6,7 @@ import 'package:submersion/features/certifications/data/repositories/certificati
 import 'package:submersion/features/certifications/domain/entities/certification.dart';
 import 'package:submersion/features/certifications/presentation/pages/certification_edit_page.dart';
 import 'package:submersion/features/certifications/presentation/providers/certification_providers.dart';
+import 'package:submersion/features/certifications/presentation/widgets/certification_option.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
 
 import '../../../../helpers/mock_providers.dart';
@@ -23,7 +24,19 @@ void main() {
     await tearDownTestDatabase();
   });
 
-  Future<Widget> buildHarness({String? certificationId}) async {
+  Future<Widget> buildHarness(
+    WidgetTester tester, {
+    String? certificationId,
+  }) async {
+    // The open dropdown is a lazy ListView clipped to the surface, so items
+    // past the fold are not in the widget tree at all. The longest menu
+    // (PADI: "Not specified" + 2 headers + 9 ladder + 10 specialties +
+    // "Other") needs roughly 1050px, so give every test a tall surface
+    // rather than scrolling in each one.
+    tester.view.physicalSize = const Size(800, 1600);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.reset);
+
     final overrides = await getBaseOverrides();
     return ProviderScope(
       overrides: [
@@ -45,8 +58,11 @@ void main() {
 
   Finder agencyDropdown() =>
       find.byType(DropdownButtonFormField<CertificationAgency>);
+  // The certification dropdown is keyed by CertificationOption, not
+  // CertificationLevel: group headers need their own distinct values so no
+  // two rows share one (see CertificationOption's doc comment).
   Finder levelDropdown() =>
-      find.byType(DropdownButtonFormField<CertificationLevel>);
+      find.byType(DropdownButtonFormField<CertificationOption>);
 
   Future<void> selectFromDropdown(
     WidgetTester tester,
@@ -67,7 +83,7 @@ void main() {
   }
 
   testWidgets('agency dropdown appears above level dropdown', (tester) async {
-    await tester.pumpWidget(await buildHarness());
+    await tester.pumpWidget(await buildHarness(tester));
     await tester.pumpAndSettle();
 
     expect(
@@ -79,7 +95,7 @@ void main() {
   testWidgets('selecting CMAS restricts levels to CMAS grades + specialties', (
     tester,
   ) async {
-    await tester.pumpWidget(await buildHarness());
+    await tester.pumpWidget(await buildHarness(tester));
     await tester.pumpAndSettle();
 
     await selectFromDropdown(tester, agencyDropdown(), 'CMAS');
@@ -95,7 +111,7 @@ void main() {
   });
 
   testWidgets('switching agency resets an incompatible level', (tester) async {
-    await tester.pumpWidget(await buildHarness());
+    await tester.pumpWidget(await buildHarness(tester));
     await tester.pumpAndSettle();
 
     // Default agency is PADI; pick a PADI-ladder level.
@@ -111,7 +127,7 @@ void main() {
   testWidgets('switching agency keeps a compatible (specialty) level', (
     tester,
   ) async {
-    await tester.pumpWidget(await buildHarness());
+    await tester.pumpWidget(await buildHarness(tester));
     await tester.pumpAndSettle();
 
     await selectFromDropdown(tester, levelDropdown(), 'Nitrox');
@@ -135,7 +151,9 @@ void main() {
         ),
       );
 
-      await tester.pumpWidget(await buildHarness(certificationId: cert.id));
+      await tester.pumpWidget(
+        await buildHarness(tester, certificationId: cert.id),
+      );
       await tester.pumpAndSettle();
 
       // Stored level renders even though it is not in the CMAS catalog.
@@ -152,4 +170,43 @@ void main() {
       expect(saved.agency, CertificationAgency.cmas);
     },
   );
+
+  testWidgets('certification dropdown shows group headers', (tester) async {
+    await tester.pumpWidget(await buildHarness(tester));
+    await tester.pumpAndSettle();
+
+    await tester.ensureVisible(levelDropdown());
+    await tester.pumpAndSettle();
+    await tester.tap(levelDropdown());
+    await tester.pumpAndSettle();
+
+    expect(find.text('Progression'), findsOneWidget);
+    expect(find.text('Specialties'), findsOneWidget);
+  });
+
+  testWidgets('group headers are not selectable', (tester) async {
+    await tester.pumpWidget(await buildHarness(tester));
+    await tester.pumpAndSettle();
+
+    await tester.ensureVisible(levelDropdown());
+    await tester.pumpAndSettle();
+    await tester.tap(levelDropdown());
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Progression'));
+    await tester.pumpAndSettle();
+
+    // The menu is still open and nothing was selected.
+    expect(find.text('Specialties'), findsOneWidget);
+  });
+
+  testWidgets('closed dropdown shows Not specified, not a group header', (
+    tester,
+  ) async {
+    await tester.pumpWidget(await buildHarness(tester));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Not specified'), findsOneWidget);
+    expect(find.text('Progression'), findsNothing);
+  });
 }

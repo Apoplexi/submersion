@@ -82,177 +82,125 @@ void main() {
     }
   }
 
-  group('Auto-generation logic', () {
-    testWidgets(
-      'new certification should have empty name initially (level is null)',
-      (tester) async {
-        await pumpEditPage(tester);
+  group('Name on card field', () {
+    testWidgets('is blank for a new certification', (tester) async {
+      await pumpEditPage(tester);
 
-        final nameField = find.byType(TextFormField).first;
-        expect(tester.widget<TextFormField>(nameField).controller?.text, '');
-      },
-    );
+      final nameField = find.byType(TextFormField).first;
+      expect(tester.widget<TextFormField>(nameField).controller?.text, '');
+    });
 
-    testWidgets('changing agency while level is null should NOT update name', (
+    testWidgets('is never auto-filled when a certification is picked', (
       tester,
     ) async {
       await pumpEditPage(tester);
 
-      // Change agency to SSI
-      await tester.tap(find.text('PADI').last);
+      await tester.tap(find.byIcon(Icons.workspace_premium).hitTestable());
       await tester.pumpAndSettle();
-      await tester.tap(find.text('SSI').last);
+      await tester.tap(find.text('Open Water').last);
       await tester.pumpAndSettle();
 
       final nameField = find.byType(TextFormField).first;
       expect(tester.widget<TextFormField>(nameField).controller?.text, '');
     });
 
-    testWidgets(
-      'selecting BOTH agency and level should update default name to "Agency : Level"',
-      (tester) async {
-        await pumpEditPage(tester);
-
-        // Select Level: Open Water
-        await tester.tap(find.byIcon(Icons.stairs).hitTestable());
-        await tester.pumpAndSettle();
-        await tester.tap(find.text('Open Water').last);
-        await tester.pumpAndSettle();
-
-        final nameField = find.byType(TextFormField).first;
-        expect(
-          tester.widget<TextFormField>(nameField).controller?.text,
-          'PADI : Open Water',
-        );
-
-        // Change agency to SSI
-        await tester.tap(find.text('PADI').last);
-        await tester.pumpAndSettle();
-        await tester.tap(find.text('SSI').last);
-        await tester.pumpAndSettle();
-
-        expect(
-          tester.widget<TextFormField>(nameField).controller?.text,
-          'SSI : Open Water',
-        );
-      },
-    );
-
-    testWidgets('clearing level should clear auto-generated name', (
+    testWidgets('a manually entered name survives an agency change', (
       tester,
     ) async {
       await pumpEditPage(tester);
 
-      // Select Level: Open Water
-      await tester.tap(find.byIcon(Icons.stairs).hitTestable());
-      await tester.pumpAndSettle();
-      await tester.tap(find.text('Open Water').last);
+      final nameField = find.byType(TextFormField).first;
+      await tester.enterText(nameField, 'My Special Cert');
       await tester.pumpAndSettle();
 
-      final nameField = find.byType(TextFormField).first;
+      // Tap the dropdown itself rather than its label text: entering text
+      // above scrolls the form, and the label's centre can end up under
+      // another field.
+      final agencyDropdown = find.byType(
+        DropdownButtonFormField<CertificationAgency>,
+      );
+      await tester.ensureVisible(agencyDropdown);
+      await tester.pumpAndSettle();
+      await tester.tap(agencyDropdown);
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('SSI').last);
+      await tester.pumpAndSettle();
+
       expect(
         tester.widget<TextFormField>(nameField).controller?.text,
-        'PADI : Open Water',
+        'My Special Cert',
       );
-
-      // Change agency to CMAS (which resets level if not compatible)
-      await tester.tap(find.text('PADI').last);
-      await tester.pumpAndSettle();
-      await tester.tap(find.text('CMAS').last);
-      await tester.pumpAndSettle();
-
-      // Level should have been reset to null because Open Water is not in CMAS catalog
-      expect(tester.widget<TextFormField>(nameField).controller?.text, '');
     });
 
-    testWidgets(
-      'manual edit should stop auto-update even after level selected',
-      (tester) async {
-        await pumpEditPage(tester);
-
-        final nameField = find.byType(TextFormField).first;
-
-        // Manually edit name
-        await tester.enterText(nameField, 'My Special Cert');
-        await tester.pumpAndSettle();
-
-        // Select level
-        await tester.tap(find.byIcon(Icons.stairs).hitTestable());
-        await tester.pumpAndSettle();
-        await tester.tap(find.text('Open Water').last);
-        await tester.pumpAndSettle();
-
-        // Name should NOT change
-        expect(
-          tester.widget<TextFormField>(nameField).controller?.text,
-          'My Special Cert',
-        );
-      },
-    );
-
-    testWidgets('matching default pattern manually resumes auto-update', (
+    testWidgets('shows blank when editing a cert with a derived name', (
       tester,
     ) async {
-      await pumpEditPage(tester);
+      final now = DateTime(2024);
+      await repository.createCertification(
+        Certification(
+          id: 'derived-1',
+          name: 'PADI : Open Water',
+          agency: CertificationAgency.padi,
+          level: CertificationLevel.openWater,
+          createdAt: now,
+          updatedAt: now,
+        ),
+      );
+
+      await pumpEditPage(tester, certificationId: 'derived-1');
 
       final nameField = find.byType(TextFormField).first;
-
-      // Select level
-      await tester.tap(find.byIcon(Icons.stairs).hitTestable());
-      await tester.pumpAndSettle();
-      await tester.tap(find.text('Open Water').last);
-      await tester.pumpAndSettle();
-
-      expect(
-        tester.widget<TextFormField>(nameField).controller?.text,
-        'PADI : Open Water',
-      );
-
-      // Manually edit to something else
-      await tester.enterText(nameField, 'Custom');
-      await tester.pumpAndSettle();
-
-      // Change agency - name should NOT change
-      await tester.tap(find.text('PADI').last);
-      await tester.pumpAndSettle();
-      await tester.tap(find.text('SSI').last);
-      await tester.pumpAndSettle();
-      expect(
-        tester.widget<TextFormField>(nameField).controller?.text,
-        'Custom',
-      );
-
-      // Manually set back to current default pattern "SSI : Open Water"
-      await tester.enterText(nameField, 'SSI : Open Water');
-      await tester.pumpAndSettle();
-
-      // Change agency back to PADI - name SHOULD change now
-      await tester.tap(find.text('SSI').last);
-      await tester.pumpAndSettle();
-      await tester.tap(find.text('PADI').last);
-      await tester.pumpAndSettle();
-      expect(
-        tester.widget<TextFormField>(nameField).controller?.text,
-        'PADI : Open Water',
-      );
+      expect(tester.widget<TextFormField>(nameField).controller?.text, '');
     });
   });
 
-  group('Form interactions and coverage', () {
-    testWidgets('validation error when name is empty on save', (tester) async {
+  group('Validation', () {
+    testWidgets('rejects a save with neither certification nor name', (
+      tester,
+    ) async {
       await pumpEditPage(tester);
 
-      // Clear auto-generated name if any (though it's empty by default now)
-      final nameField = find.byType(TextFormField).first;
-      await tester.enterText(nameField, '');
+      await tester.tap(find.text('Save'));
+      await tester.pumpAndSettle();
+
+      expect(
+        find.text('Choose a certification or enter a name'),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('accepts a save with a certification and no name', (
+      tester,
+    ) async {
+      await pumpEditPage(tester);
+
+      await tester.tap(find.byIcon(Icons.workspace_premium).hitTestable());
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Open Water').last);
       await tester.pumpAndSettle();
 
       await tester.tap(find.text('Save'));
       await tester.pumpAndSettle();
 
-      expect(find.text('Please enter a certification name'), findsOneWidget);
+      expect(find.text('Choose a certification or enter a name'), findsNothing);
     });
 
+    testWidgets('accepts a save with a name and no certification', (
+      tester,
+    ) async {
+      await pumpEditPage(tester);
+
+      await tester.enterText(find.byType(TextFormField).first, 'Custom Card');
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Save'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Choose a certification or enter a name'), findsNothing);
+    });
+  });
+
+  group('Form interactions and coverage', () {
     testWidgets('loading an existing certification prefills the form', (
       tester,
     ) async {

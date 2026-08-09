@@ -26,7 +26,7 @@ enum CertificationField implements EntityField {
   String get displayName => switch (this) {
     CertificationField.certName => 'Name',
     CertificationField.agency => 'Agency',
-    CertificationField.level => 'Level',
+    CertificationField.level => 'Certification',
     CertificationField.cardNumber => 'Card Number',
     CertificationField.issueDate => 'Issue Date',
     CertificationField.expiryDate => 'Expiry Date',
@@ -40,7 +40,7 @@ enum CertificationField implements EntityField {
   String get shortLabel => switch (this) {
     CertificationField.certName => 'Name',
     CertificationField.agency => 'Agency',
-    CertificationField.level => 'Level',
+    CertificationField.level => 'Certification',
     CertificationField.cardNumber => 'Card #',
     CertificationField.issueDate => 'Issued',
     CertificationField.expiryDate => 'Expires',
