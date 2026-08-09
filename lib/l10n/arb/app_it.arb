@@ -4862,7 +4862,7 @@
   "surfaceInterval_gasWarning_modExceeded": "ppO₂ {ppO2} a {depth} supera {limit}. La MOD di questa miscela è {mod}.",
   "surfaceInterval_heSemantics": "Elio: {percent}%",
   "surfaceInterval_o2Semantics": "O2: {percent}%",
-  "surfaceInterval_result_beyondHorizon": "Serve un intervallo di superficie di più di {hours} ore. Questo pianificatore non cerca oltre.",
+  "surfaceInterval_result_beyondHorizon": "L'attesa supera le {hours} ore esplorate da questo pianificatore. La desaturazione continua, quindi un intervallo di superficie più lungo sarà sufficiente.",
   "surfaceInterval_result_beyondHorizonShort": "Più di {hours} ore",
   "surfaceInterval_result_currentInterval": "Intervallo Corrente",
   "surfaceInterval_result_gasUnsafe": "Miscela non sicura a questa profondità",

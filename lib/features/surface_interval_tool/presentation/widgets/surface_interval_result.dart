@@ -31,27 +31,32 @@ class SurfaceIntervalResult extends ConsumerWidget {
     // and in one of those states waiting is not the remedy at all.
     final String intervalText;
     final String intervalSemanticsText;
-    // Set when the outcome itself is the headline, which is exactly when there
-    // is no interval: "wait longer than this planner shows" and "change the
-    // dive" both say more than the plain not-yet-safe wording does.
-    final String? outcomeStatus;
+    // What the diver should do about it, set exactly when there is no interval
+    // to show. It drives both the visible notice and the spoken summary, so a
+    // screen reader hears the remedy and the ceiling instead of hearing the
+    // headline restated.
+    final String? outcomeAdvice;
     switch (minInterval.outcome) {
       case SiIntervalOutcome.withinHorizon:
         final hours = minInterval.minutes! ~/ 60;
         final minutes = minInterval.minutes! % 60;
         intervalText = hours > 0 ? '${hours}h ${minutes}m' : '$minutes min';
         intervalSemanticsText = intervalText;
-        outcomeStatus = null;
+        outcomeAdvice = null;
       case SiIntervalOutcome.beyondHorizon:
         intervalText = '> ${horizonHours}h';
         intervalSemanticsText = context.l10n
             .surfaceInterval_result_beyondHorizonShort(horizonHours);
-        outcomeStatus = intervalSemanticsText;
+        outcomeAdvice = context.l10n.surfaceInterval_result_beyondHorizon(
+          horizonHours,
+        );
       case SiIntervalOutcome.impossible:
         intervalText = '—';
         intervalSemanticsText =
             context.l10n.surfaceInterval_result_notAchievable;
-        outcomeStatus = intervalSemanticsText;
+        outcomeAdvice = context.l10n.surfaceInterval_result_noIntervalHelps(
+          minInterval.cleanTissueNoStopSeconds ~/ 60,
+        );
     }
 
     // Format NDL for display
@@ -79,7 +84,7 @@ class SurfaceIntervalResult extends ConsumerWidget {
         // outcome that carries its own headline.
         !gasIsSafe
             ? context.l10n.surfaceInterval_result_gasUnsafe
-            : outcomeStatus ??
+            : outcomeAdvice ??
                   (ndlIsSafe
                       ? context.l10n.surfaceInterval_result_safeToDive
                       : context.l10n.surfaceInterval_result_notYetSafe),
@@ -175,18 +180,9 @@ class SurfaceIntervalResult extends ConsumerWidget {
                 const SizedBox(height: 16),
                 _ResultNotice(
                   icon: Icons.info_outline,
-                  message: switch (minInterval.outcome) {
-                    SiIntervalOutcome.withinHorizon =>
+                  message:
+                      outcomeAdvice ??
                       context.l10n.surfaceInterval_result_increaseInterval,
-                    SiIntervalOutcome.beyondHorizon =>
-                      context.l10n.surfaceInterval_result_beyondHorizon(
-                        horizonHours,
-                      ),
-                    SiIntervalOutcome.impossible =>
-                      context.l10n.surfaceInterval_result_noIntervalHelps(
-                        minInterval.cleanTissueNoStopSeconds ~/ 60,
-                      ),
-                  },
                 ),
               ],
             ],

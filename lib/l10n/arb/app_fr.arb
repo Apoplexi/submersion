@@ -4866,7 +4866,7 @@
   "surfaceInterval_gasWarning_modExceeded": "ppO₂ {ppO2} à {depth} dépasse {limit}. La MOD de ce mélange est {mod}.",
   "surfaceInterval_heSemantics": "Hélium : {percent}%",
   "surfaceInterval_o2Semantics": "O2 : {percent}%",
-  "surfaceInterval_result_beyondHorizon": "Un intervalle de surface de plus de {hours} heures est nécessaire. Ce planificateur ne cherche pas au-delà.",
+  "surfaceInterval_result_beyondHorizon": "L'attente dépasse les {hours} heures explorées par ce planificateur. La désaturation se poursuit, un intervalle de surface plus long suffira donc.",
   "surfaceInterval_result_beyondHorizonShort": "Plus de {hours} heures",
   "surfaceInterval_result_currentInterval": "Intervalle actuel",
   "surfaceInterval_result_gasUnsafe": "Gaz dangereux à cette profondeur",

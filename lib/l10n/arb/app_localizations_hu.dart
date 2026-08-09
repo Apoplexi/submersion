@@ -16498,7 +16498,7 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String surfaceInterval_result_beyondHorizon(Object hours) {
-    return 'Több mint $hours óra felszíni intervallum szükséges. Ez a tervező nem keres ennél tovább.';
+    return 'A várakozás túllépi azt a $hours órát, ameddig ez a tervező keres. A kitelítődés folytatódik, így egy hosszabb felszíni intervallum elegendő lesz.';
   }
 
   @override

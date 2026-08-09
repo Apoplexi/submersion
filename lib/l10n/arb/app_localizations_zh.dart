@@ -15687,7 +15687,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String surfaceInterval_result_beyondHorizon(Object hours) {
-    return '需要超过 $hours 小时的水面间隔。此计划器不会搜索更长的时间。';
+    return '所需等待时间超出此计划器搜索的 $hours 小时。脱饱和仍在继续，因此更长的水面间隔即可满足。';
   }
 
   @override

@@ -52,6 +52,9 @@ Future<void> _setPlan(
   await tester.pumpAndSettle();
 }
 
+int _occurrences(String haystack, String needle) =>
+    needle.allMatches(haystack).length;
+
 void main() {
   group('result card when no surface interval is enough', () {
     testWidgets('does not print a fabricated six hour wait', (tester) async {
@@ -127,6 +130,41 @@ void main() {
       handle.dispose();
     });
 
+    testWidgets('tells a screen reader the ceiling, and only once', (
+      tester,
+    ) async {
+      final handle = tester.ensureSemantics();
+      final container = await _pump(tester);
+
+      await _setPlan(
+        tester,
+        container,
+        firstDepth: 18.0,
+        firstTime: 45,
+        secondDepth: 18.0,
+        secondTime: 45,
+      );
+
+      final maxMinutes =
+          container.read(siMinimumIntervalProvider).cleanTissueNoStopSeconds ~/
+          60;
+      final label = tester
+          .getSemantics(find.byType(SurfaceIntervalResult))
+          .label;
+
+      // The remedy and the ceiling are the whole point of this state, and a
+      // screen reader has no other way to reach them.
+      expect(label, contains('$maxMinutes min'));
+      expect(label, contains('Shorten the second dive'));
+      expect(
+        _occurrences(label, 'Not achievable at any surface interval'),
+        1,
+        reason: 'the summary should add information, not restate itself',
+      );
+
+      handle.dispose();
+    });
+
     testWidgets('stops advising a longer wait that cannot help', (
       tester,
     ) async {
@@ -158,10 +196,10 @@ void main() {
       await _setPlan(
         tester,
         container,
-        firstDepth: 60.0,
+        firstDepth: 55.0,
         firstTime: 120,
         secondDepth: 12.0,
-        secondTime: 60,
+        secondTime: 100,
       );
 
       expect(
@@ -175,7 +213,10 @@ void main() {
         findsNothing,
         reason: 'this dive is possible, it just needs a longer wait',
       );
-      expect(find.textContaining('More than 6 hours'), findsOneWidget);
+      expect(
+        find.textContaining('runs past the 6 hours this planner searches'),
+        findsOneWidget,
+      );
     });
 
     testWidgets('reads the wait out rather than announcing "> 6h"', (
@@ -187,10 +228,10 @@ void main() {
       await _setPlan(
         tester,
         container,
-        firstDepth: 60.0,
+        firstDepth: 55.0,
         firstTime: 120,
         secondDepth: 12.0,
-        secondTime: 60,
+        secondTime: 100,
       );
 
       final label = tester
@@ -202,6 +243,14 @@ void main() {
         reason: 'a screen reader must not be handed the "> 6h" glyph',
       );
       expect(label, isNot(contains('> 6h')));
+
+      // The summary must explain the wait rather than say the same words twice.
+      expect(
+        _occurrences(label, 'More than 6 hours'),
+        1,
+        reason: 'the status slot should add information, not restate itself',
+      );
+      expect(label, contains('this planner searches'));
 
       handle.dispose();
     });

@@ -149,10 +149,10 @@ void main() {
       // diver to change a dive that is fine.
       final result = _planFor(
         container,
-        firstDepth: 60.0,
+        firstDepth: 55.0,
         firstTime: 120,
         secondDepth: 12.0,
-        secondTime: 60,
+        secondTime: 100,
       );
 
       expect(result.outcome, SiIntervalOutcome.beyondHorizon);

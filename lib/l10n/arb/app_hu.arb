@@ -4866,7 +4866,7 @@
   "surfaceInterval_gasWarning_modExceeded": "ppO₂ {ppO2} {depth} mélységben meghaladja a {limit} értéket. A keverék MOD-ja {mod}.",
   "surfaceInterval_heSemantics": "Hélium: {percent}%",
   "surfaceInterval_o2Semantics": "O2: {percent}%",
-  "surfaceInterval_result_beyondHorizon": "Több mint {hours} óra felszíni intervallum szükséges. Ez a tervező nem keres ennél tovább.",
+  "surfaceInterval_result_beyondHorizon": "A várakozás túllépi azt a {hours} órát, ameddig ez a tervező keres. A kitelítődés folytatódik, így egy hosszabb felszíni intervallum elegendő lesz.",
   "surfaceInterval_result_beyondHorizonShort": "Több mint {hours} óra",
   "surfaceInterval_result_currentInterval": "Jelenlegi intervallum",
   "surfaceInterval_result_gasUnsafe": "A gáz nem biztonságos ezen a mélységen",

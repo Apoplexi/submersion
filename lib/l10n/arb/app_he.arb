@@ -4938,7 +4938,7 @@
   "surfaceInterval_gasWarning_modExceeded": "ppO₂ {ppO2} בעומק {depth} חורג מ-{limit}. ה-MOD של תערובת זו הוא {mod}.",
   "surfaceInterval_heSemantics": "הליום: {percent}%",
   "surfaceInterval_o2Semantics": "O2: {percent}%",
-  "surfaceInterval_result_beyondHorizon": "נדרש מרווח שטח של יותר מ-{hours} שעות. מתכנן זה אינו מחפש מעבר לכך.",
+  "surfaceInterval_result_beyondHorizon": "ההמתנה חורגת מ-{hours} השעות שמתכנן זה מחפש. הסילוק ממשיך, ולכן מרווח שטח ארוך יותר יספיק.",
   "surfaceInterval_result_beyondHorizonShort": "יותר מ-{hours} שעות",
   "surfaceInterval_result_currentInterval": "מרווח נוכחי",
   "surfaceInterval_result_gasUnsafe": "הגז אינו בטוח בעומק זה",

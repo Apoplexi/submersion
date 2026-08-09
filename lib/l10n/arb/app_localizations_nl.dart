@@ -16407,7 +16407,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String surfaceInterval_result_beyondHorizon(Object hours) {
-    return 'Er is een oppervlakte-interval van meer dan $hours uur nodig. Deze planner zoekt niet verder vooruit.';
+    return 'De wachttijd valt buiten de $hours uur die deze planner doorzoekt. De ontgassing gaat door, dus een langer oppervlakte-interval volstaat.';
   }
 
   @override

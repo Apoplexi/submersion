@@ -115,10 +115,10 @@ void main() {
       await _setPlan(
         tester,
         container,
-        firstDepth: 60.0,
+        firstDepth: 55.0,
         firstTime: 120,
         secondDepth: 12.0,
-        secondTime: 60,
+        secondTime: 100,
       );
       expect(
         container.read(siMinimumIntervalProvider).outcome,

@@ -16237,7 +16237,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String surfaceInterval_result_beyondHorizon(Object hours) {
-    return 'يلزم فترة سطح تزيد عن $hours ساعات. لا يبحث هذا المخطط لمدة أطول من ذلك.';
+    return 'زمن الانتظار يتجاوز $hours ساعات التي يبحث فيها هذا المخطط. يستمر التخلص من النيتروجين، لذا ستكفي فترة سطح أطول.';
   }
 
   @override

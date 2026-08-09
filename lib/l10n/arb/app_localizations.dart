@@ -27777,7 +27777,7 @@ abstract class AppLocalizations {
   /// Explains that the second dive does fit on clean tissues but needs a longer surface interval than the planner searches
   ///
   /// In en, this message translates to:
-  /// **'More than {hours} hours of surface interval is needed. This planner does not search further ahead.'**
+  /// **'The wait runs past the {hours} hours this planner searches. Off-gassing continues, so a longer surface interval will get there.'**
   String surfaceInterval_result_beyondHorizon(Object hours);
 
   /// Shown in place of a minimum surface interval when the required wait is longer than the planner searches

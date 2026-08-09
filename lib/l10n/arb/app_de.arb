@@ -4938,7 +4938,7 @@
   "surfaceInterval_gasWarning_modExceeded": "ppO₂ {ppO2} auf {depth} überschreitet {limit}. MOD für dieses Gemisch ist {mod}.",
   "surfaceInterval_heSemantics": "Helium: {percent}%",
   "surfaceInterval_o2Semantics": "O2: {percent}%",
-  "surfaceInterval_result_beyondHorizon": "Es ist ein Oberflächenintervall von mehr als {hours} Stunden nötig. Dieser Planer sucht nicht weiter voraus.",
+  "surfaceInterval_result_beyondHorizon": "Die Wartezeit liegt über den {hours} Stunden, die dieser Planer durchsucht. Die Entsättigung geht weiter, ein längeres Oberflächenintervall reicht also aus.",
   "surfaceInterval_result_beyondHorizonShort": "Mehr als {hours} Stunden",
   "surfaceInterval_result_currentInterval": "Aktuelles Intervall",
   "surfaceInterval_result_gasUnsafe": "Gas in dieser Tiefe unsicher",

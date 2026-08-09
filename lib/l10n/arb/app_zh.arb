@@ -5116,7 +5116,7 @@
   "surfaceInterval_gasWarning_modExceeded": "{depth} 处 ppO₂ {ppO2} 超过 {limit}。此混合气的最大工作深度为 {mod}。",
   "surfaceInterval_heSemantics": "氦气: {percent}%",
   "surfaceInterval_o2Semantics": "O2: {percent}%",
-  "surfaceInterval_result_beyondHorizon": "需要超过 {hours} 小时的水面间隔。此计划器不会搜索更长的时间。",
+  "surfaceInterval_result_beyondHorizon": "所需等待时间超出此计划器搜索的 {hours} 小时。脱饱和仍在继续，因此更长的水面间隔即可满足。",
   "surfaceInterval_result_beyondHorizonShort": "超过 {hours} 小时",
   "surfaceInterval_result_currentInterval": "当前间隔",
   "surfaceInterval_result_gasUnsafe": "此深度下气体不安全",

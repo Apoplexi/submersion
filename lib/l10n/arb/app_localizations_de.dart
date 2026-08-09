@@ -16514,7 +16514,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String surfaceInterval_result_beyondHorizon(Object hours) {
-    return 'Es ist ein Oberflächenintervall von mehr als $hours Stunden nötig. Dieser Planer sucht nicht weiter voraus.';
+    return 'Die Wartezeit liegt über den $hours Stunden, die dieser Planer durchsucht. Die Entsättigung geht weiter, ein längeres Oberflächenintervall reicht also aus.';
   }
 
   @override

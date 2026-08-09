@@ -4938,7 +4938,7 @@
   "surfaceInterval_gasWarning_modExceeded": "ppO₂ {ppO2} op {depth} overschrijdt {limit}. De MOD voor dit mengsel is {mod}.",
   "surfaceInterval_heSemantics": "Helium: {percent}%",
   "surfaceInterval_o2Semantics": "O2: {percent}%",
-  "surfaceInterval_result_beyondHorizon": "Er is een oppervlakte-interval van meer dan {hours} uur nodig. Deze planner zoekt niet verder vooruit.",
+  "surfaceInterval_result_beyondHorizon": "De wachttijd valt buiten de {hours} uur die deze planner doorzoekt. De ontgassing gaat door, dus een langer oppervlakte-interval volstaat.",
   "surfaceInterval_result_beyondHorizonShort": "Meer dan {hours} uur",
   "surfaceInterval_result_currentInterval": "Huidig interval",
   "surfaceInterval_result_gasUnsafe": "Gas onveilig op deze diepte",

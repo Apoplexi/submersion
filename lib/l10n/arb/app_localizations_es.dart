@@ -16555,7 +16555,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String surfaceInterval_result_beyondHorizon(Object hours) {
-    return 'Se necesita un intervalo de superficie de más de $hours horas. Este planificador no busca más allá.';
+    return 'La espera supera las $hours horas que busca este planificador. La desaturación continúa, así que un intervalo de superficie más largo lo conseguirá.';
   }
 
   @override
