@@ -3074,6 +3074,7 @@
   "enum_certificationLevel_cavern": "洞穴潜水员",
   "enum_certificationLevel_courseDirector": "课程总监",
   "enum_certificationLevel_decompression": "减压",
+  "enum_certificationLevel_diveGuide": "潜水向导",
   "enum_certificationLevel_diveMaster": "潜水长",
   "enum_certificationLevel_instructor": "教练",
   "enum_certificationLevel_masterInstructor": "高级教练",

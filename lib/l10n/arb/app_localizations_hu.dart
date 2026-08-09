@@ -9329,6 +9329,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String get enum_certificationLevel_decompression => 'Dekompresszio';
 
   @override
+  String get enum_certificationLevel_diveGuide => 'Buvarvezeto';
+
+  @override
   String get enum_certificationLevel_diveMaster => 'Divemaster';
 
   @override

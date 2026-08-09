@@ -15831,6 +15831,12 @@ abstract class AppLocalizations {
   /// **'Decompression'**
   String get enum_certificationLevel_decompression;
 
+  /// No description provided for @enum_certificationLevel_diveGuide.
+  ///
+  /// In en, this message translates to:
+  /// **'Dive Guide'**
+  String get enum_certificationLevel_diveGuide;
+
   /// No description provided for @enum_certificationLevel_diveMaster.
   ///
   /// In en, this message translates to:

@@ -9120,6 +9120,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get enum_certificationLevel_decompression => 'דקומפרסיה';
 
   @override
+  String get enum_certificationLevel_diveGuide => 'מדריך צלילה';
+
+  @override
   String get enum_certificationLevel_diveMaster => 'דייבמאסטר';
 
   @override

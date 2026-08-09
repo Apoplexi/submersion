@@ -2941,6 +2941,7 @@
   "enum_certificationLevel_cavern": "Caverna Rasa",
   "enum_certificationLevel_courseDirector": "Diretor de Curso",
   "enum_certificationLevel_decompression": "Descompressao",
+  "enum_certificationLevel_diveGuide": "Guia de Mergulho",
   "enum_certificationLevel_diveMaster": "Divemaster",
   "enum_certificationLevel_instructor": "Instrutor",
   "enum_certificationLevel_masterInstructor": "Instrutor Master",

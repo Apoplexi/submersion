@@ -2869,6 +2869,7 @@
   "enum_certificationLevel_cavern": "Barlangi eloszoba",
   "enum_certificationLevel_courseDirector": "Tanfolyamigazgato",
   "enum_certificationLevel_decompression": "Dekompresszio",
+  "enum_certificationLevel_diveGuide": "Buvarvezeto",
   "enum_certificationLevel_diveMaster": "Divemaster",
   "enum_certificationLevel_instructor": "Oktato",
   "enum_certificationLevel_masterInstructor": "Mesteroktato",

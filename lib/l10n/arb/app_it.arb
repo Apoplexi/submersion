@@ -2869,6 +2869,7 @@
   "enum_certificationLevel_cavern": "Caverna",
   "enum_certificationLevel_courseDirector": "Course Director",
   "enum_certificationLevel_decompression": "Decompressione",
+  "enum_certificationLevel_diveGuide": "Guida subacquea",
   "enum_certificationLevel_diveMaster": "Divemaster",
   "enum_certificationLevel_instructor": "Istruttore",
   "enum_certificationLevel_masterInstructor": "Master Instructor",

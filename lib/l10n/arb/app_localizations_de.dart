@@ -9349,6 +9349,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get enum_certificationLevel_decompression => 'Dekompression';
 
   @override
+  String get enum_certificationLevel_diveGuide => 'Tauchguide';
+
+  @override
   String get enum_certificationLevel_diveMaster => 'Divemaster';
 
   @override

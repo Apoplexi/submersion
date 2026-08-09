@@ -2869,6 +2869,7 @@
   "enum_certificationLevel_cavern": "קברן",
   "enum_certificationLevel_courseDirector": "מנהל קורס",
   "enum_certificationLevel_decompression": "דקומפרסיה",
+  "enum_certificationLevel_diveGuide": "מדריך צלילה",
   "enum_certificationLevel_diveMaster": "דייבמאסטר",
   "enum_certificationLevel_instructor": "מדריך",
   "enum_certificationLevel_masterInstructor": "מדריך בכיר",

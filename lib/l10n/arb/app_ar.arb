@@ -2941,6 +2941,7 @@
   "enum_certificationLevel_cavern": "غوص مغارات",
   "enum_certificationLevel_courseDirector": "مدير دورات",
   "enum_certificationLevel_decompression": "تخفيف الضغط",
+  "enum_certificationLevel_diveGuide": "مرشد غوص",
   "enum_certificationLevel_diveMaster": "مدرب غوص رئيسي",
   "enum_certificationLevel_instructor": "مدرب",
   "enum_certificationLevel_masterInstructor": "مدرب رئيسي",

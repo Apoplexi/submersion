@@ -9278,6 +9278,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get enum_certificationLevel_decompression => 'Decompressie';
 
   @override
+  String get enum_certificationLevel_diveGuide => 'Duikgids';
+
+  @override
   String get enum_certificationLevel_diveMaster => 'Divemaster';
 
   @override

@@ -8916,6 +8916,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get enum_certificationLevel_decompression => '减压';
 
   @override
+  String get enum_certificationLevel_diveGuide => '潜水向导';
+
+  @override
   String get enum_certificationLevel_diveMaster => '潜水长';
 
   @override

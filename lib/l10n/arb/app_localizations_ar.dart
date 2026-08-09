@@ -9177,6 +9177,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get enum_certificationLevel_decompression => 'تخفيف الضغط';
 
   @override
+  String get enum_certificationLevel_diveGuide => 'مرشد غوص';
+
+  @override
   String get enum_certificationLevel_diveMaster => 'مدرب غوص رئيسي';
 
   @override

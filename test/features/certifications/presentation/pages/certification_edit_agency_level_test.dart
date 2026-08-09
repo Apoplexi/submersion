@@ -58,7 +58,17 @@ void main() {
     await tester.tap(dropdown);
     await tester.pumpAndSettle();
     // The overlay duplicates the selected item's label; .last hits the menu.
-    // Menu items below the fold must be scrolled into view first.
+    // The menu's internal ListView only mounts items within its sliver
+    // cache extent, so a plain finder can miss items below the fold -
+    // scrollUntilVisible drags the menu's Scrollable until the item is
+    // actually built before ensureVisible/tap touch it. Use the unmodified
+    // finder here (not `.last`), since `.last` throws on zero matches
+    // instead of reporting "not found yet".
+    await tester.scrollUntilVisible(
+      find.text(optionLabel),
+      100.0,
+      scrollable: find.byType(Scrollable).last,
+    );
     final item = find.text(optionLabel).last;
     await tester.ensureVisible(item);
     await tester.pumpAndSettle();

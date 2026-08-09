@@ -5444,6 +5444,7 @@
   "enum_certificationLevel_cavern": "Cavern",
   "enum_certificationLevel_courseDirector": "Course Director",
   "enum_certificationLevel_decompression": "Decompression",
+  "enum_certificationLevel_diveGuide": "Dive Guide",
   "enum_certificationLevel_diveMaster": "Divemaster",
   "enum_certificationLevel_instructor": "Instructor",
   "enum_certificationLevel_masterInstructor": "Master Instructor",

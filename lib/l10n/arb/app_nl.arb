@@ -2941,6 +2941,7 @@
   "enum_certificationLevel_cavern": "Cavernduiken",
   "enum_certificationLevel_courseDirector": "Cursusleider",
   "enum_certificationLevel_decompression": "Decompressie",
+  "enum_certificationLevel_diveGuide": "Duikgids",
   "enum_certificationLevel_diveMaster": "Divemaster",
   "enum_certificationLevel_instructor": "Instructeur",
   "enum_certificationLevel_masterInstructor": "Master Instructeur",
