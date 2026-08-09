@@ -2959,7 +2959,7 @@ class AppDatabase extends _$AppDatabase {
 
   /// The current schema version as a static constant so that pre-open checks
   /// (e.g. version-mismatch guard) can reference it without an instance.
-  static const int currentSchemaVersion = 144;
+  static const int currentSchemaVersion = 146;
 
   /// Every schema version that has a migration block in onUpgrade.
   /// Used to calculate progress step counts. When adding a new migration,
@@ -3144,6 +3144,10 @@ class AppDatabase extends _$AppDatabase {
     // calibration columns (measured visibility replaces the tropical-biased
     // bucket enum).
     144,
+    // v145 is reserved by the GPS track mapping branch (PR #908).
+    // v146: recompute machine-derived bottom times that the retired
+    // square-profile heuristic collapsed on multilevel dives.
+    146,
   ];
 
   /// Idempotent DDL for the v106 connector-suggestion columns (Lightroom
@@ -3429,6 +3433,111 @@ class AppDatabase extends _$AppDatabase {
     if (descentEnd == null || ascentStart == null) return null;
     if (ascentStart <= descentEnd) return null;
     return ascentStart - descentEnd;
+  }
+
+  /// v146 data fix: the retired bottom-time heuristic (time at/above 85% of
+  /// max depth -- kept frozen above in [_bottomTimeSecondsFromProfileRows])
+  /// collapsed multilevel dives to their deepest segment: 10 min at 29 m
+  /// followed by 40 min at 15 m reported ~9 min of bottom time. For any dive
+  /// whose stored bottom_time exactly reproduces the old heuristic's output
+  /// for its primary profile (i.e. it was machine-derived by an import,
+  /// download, or the v132 backfill -- user-typed values will not match),
+  /// recompute it with the multilevel-correct rule in
+  /// [_multilevelBottomTimeSecondsFromProfileRows].
+  ///
+  /// Both algorithms are frozen private copies so every device computes
+  /// identical values no matter which app version it migrates with; `hlc`
+  /// is left untouched (deterministic local recompute, no sync traffic
+  /// needed to converge, exactly like v132). onUpgrade only.
+  Future<void> _recomputeMultilevelBottomTimes() async {
+    final diveCols = await customSelect("PRAGMA table_info('dives')").get();
+    final diveColNames = diveCols.map((c) => c.read<String>('name')).toSet();
+    if (!diveColNames.contains('bottom_time')) {
+      return;
+    }
+    final profileCols = await customSelect(
+      "PRAGMA table_info('dive_profiles')",
+    ).get();
+    final profileColNames = profileCols
+        .map((c) => c.read<String>('name'))
+        .toSet();
+    if (!profileColNames.contains('dive_id') ||
+        !profileColNames.contains('is_primary') ||
+        !profileColNames.contains('timestamp') ||
+        !profileColNames.contains('depth')) {
+      return;
+    }
+
+    final candidates = await customSelect(
+      'SELECT id, bottom_time FROM dives WHERE bottom_time IS NOT NULL',
+    ).get();
+
+    var processed = 0;
+    for (final candidate in candidates) {
+      // Same event-loop yield as the v132 backfill: during a migration the
+      // executor completes drift awaits in microtasks, so an unbroken loop
+      // would freeze the migration progress spinner.
+      if (processed++ % 25 == 24) {
+        await Future<void>.delayed(Duration.zero);
+      }
+      final diveId = candidate.read<String>('id');
+      final storedSeconds = candidate.read<int>('bottom_time');
+
+      final points = await customSelect(
+        'SELECT timestamp, depth FROM dive_profiles '
+        'WHERE dive_id = ? AND is_primary = 1 '
+        'ORDER BY timestamp ASC',
+        variables: [Variable<String>(diveId)],
+      ).get();
+
+      // Fingerprint check: only values the old heuristic produced are
+      // machine-written; anything else is user data and stays.
+      final oldSeconds = _bottomTimeSecondsFromProfileRows(points);
+      if (oldSeconds == null || oldSeconds != storedSeconds) continue;
+
+      final newSeconds = _multilevelBottomTimeSecondsFromProfileRows(points);
+      if (newSeconds != null && newSeconds != storedSeconds) {
+        await customStatement('UPDATE dives SET bottom_time = ? WHERE id = ?', [
+          newSeconds,
+          diveId,
+        ]);
+      }
+    }
+  }
+
+  /// Multilevel-correct bottom time in seconds from timestamp-ordered
+  /// profile rows: surface departure (first sample) to the last sample
+  /// at/deeper than min(max(6 m, 33% of max depth), 85% of max depth).
+  /// Frozen copy of the v146-era BottomTimeCalculator so the migration is
+  /// deterministic across app versions; do not sync with later changes to
+  /// the domain calculator.
+  int? _multilevelBottomTimeSecondsFromProfileRows(List<QueryRow> points) {
+    if (points.length < 3) return null;
+
+    var maxDepth = 0.0;
+    for (final point in points) {
+      final depth = point.read<double>('depth');
+      if (depth > maxDepth) maxDepth = depth;
+    }
+    if (maxDepth <= 0) return null;
+
+    var threshold = maxDepth * 0.33;
+    if (threshold < 6.0) threshold = 6.0;
+    final cap = maxDepth * 0.85;
+    if (threshold > cap) threshold = cap;
+
+    int? ascentStart;
+    for (var i = points.length - 1; i >= 0; i--) {
+      if (points[i].read<double>('depth') >= threshold) {
+        ascentStart = points[i].read<int>('timestamp');
+        break;
+      }
+    }
+    if (ascentStart == null) return null;
+
+    final firstTimestamp = points.first.read<int>('timestamp');
+    final bottomSeconds = ascentStart - firstTimestamp;
+    return bottomSeconds > 0 ? bottomSeconds : null;
   }
 
   /// v114: collapse duplicate tombstones (newest deleted_at per entity_type +
@@ -7451,6 +7560,16 @@ class AppDatabase extends _$AppDatabase {
           await _assertVisibilityScaleColumns();
         }
         if (from < 144) await reportProgress();
+        // v145 is reserved by the GPS track mapping branch (PR #908).
+        // v146: recompute bottom times the retired square-profile heuristic
+        // derived too short on multilevel dives. Fingerprinted -- only
+        // stored values that exactly reproduce the old heuristic are
+        // machine-written and get replaced; user-typed values never match
+        // and are left alone. onUpgrade only, hlc untouched (v132 pattern).
+        if (from < 146) {
+          await _recomputeMultilevelBottomTimes();
+        }
+        if (from < 146) await reportProgress();
       },
       beforeOpen: (details) async {
         // Enable foreign keys
