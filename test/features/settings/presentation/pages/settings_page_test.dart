@@ -1459,6 +1459,14 @@ void main() {
                   sectionId: state.pathParameters['sectionId']!,
                 ),
               ),
+              // Sections whose content is already a full page have their own
+              // routes; stubbed here so the tile's target is observable
+              // without pulling in their provider graphs.
+              GoRoute(
+                path: 'safety',
+                builder: (context, state) =>
+                    const Scaffold(body: Text('safety page')),
+              ),
             ],
           ),
         ],
@@ -1478,6 +1486,27 @@ void main() {
       await tester.pumpAndSettle();
       return router;
     }
+
+    testWidgets('sections whose content is already a full page go to their '
+        'own route, not the shared section wrapper', (tester) async {
+      // SettingsSectionDetailPage supplies a Scaffold and an AppBar, so a
+      // section whose content is itself a Scaffold-with-AppBar (Safety,
+      // Debug) would render two stacked app bars. Both have dedicated
+      // routes; the tile must use them, the way Profile and Appearance do.
+      final router = await pumpSettingsList(tester);
+
+      await tester.scrollUntilVisible(find.text('Safety'), 100);
+      await tester.tap(find.text('Safety'));
+      await tester.pumpAndSettle();
+
+      expect(
+        router.state.uri.toString(),
+        '/settings/safety',
+        reason:
+            'routing Safety through /settings/section/safety nests '
+            'SafetySettingsPage inside the wrapper Scaffold',
+      );
+    });
 
     testWidgets('opening a section animates it into place instead of '
         'snapping', (tester) async {

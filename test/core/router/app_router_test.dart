@@ -13,6 +13,7 @@ import 'package:submersion/features/safety/presentation/pages/incident_edit_page
 import 'package:submersion/features/safety/presentation/pages/incidents_list_page.dart';
 import 'package:submersion/features/safety/presentation/pages/no_fly_page.dart';
 import 'package:submersion/features/settings/presentation/pages/section_appearance_page.dart';
+import 'package:submersion/features/settings/presentation/pages/settings_page.dart';
 import 'package:submersion/features/settings/presentation/pages/column_config_page.dart';
 
 /// Finds a [GoRoute] by name in a route tree recursively.
@@ -822,6 +823,43 @@ void main() {
             'a custom pageBuilder here would risk reintroducing the '
             'NoTransitionPage that suppressed the animation.',
       );
+    });
+
+    testWidgets('the section route passes its path parameter through', (
+      tester,
+    ) async {
+      late BuildContext capturedContext;
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Builder(
+            builder: (context) {
+              capturedContext = context;
+              return const SizedBox.shrink();
+            },
+          ),
+        ),
+      );
+
+      final route = _findRouteByName(
+        router.configuration.routes,
+        'settingsSection',
+      );
+      expect(route, isNotNull);
+
+      final widget = route!.builder!(
+        capturedContext,
+        GoRouterState(
+          router.configuration,
+          uri: Uri.parse('/settings/section/about'),
+          matchedLocation: '/settings/section/about',
+          fullPath: '/settings/section/:sectionId',
+          pathParameters: const {'sectionId': 'about'},
+          pageKey: const ValueKey('/settings/section/about'),
+        ),
+      );
+
+      expect(widget, isA<SettingsSectionDetailPage>());
+      expect((widget as SettingsSectionDetailPage).sectionId, 'about');
     });
 
     testWidgets('the settings tab root itself still has no transition', (

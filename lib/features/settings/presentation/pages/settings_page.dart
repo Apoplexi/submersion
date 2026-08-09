@@ -392,6 +392,16 @@ class _MobileSettingsTile extends StatelessWidget {
       case 'appearance':
         context.push('/settings/appearance');
         break;
+      // Safety and Debug render pages that already supply their own Scaffold
+      // and AppBar, so routing them through the shared section wrapper (which
+      // supplies both as well) stacks two app bars. Both have dedicated
+      // routes -- use them.
+      case 'safety':
+        context.push('/settings/safety');
+        break;
+      case 'debug':
+        context.push('/settings/debug-logs');
+        break;
       default:
         // Sections without a dedicated page get the shared section route.
         // PUSH (not go): go() replaces the location in place, leaving nothing
