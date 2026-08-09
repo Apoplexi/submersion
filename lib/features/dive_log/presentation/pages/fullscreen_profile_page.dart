@@ -6,6 +6,7 @@ import 'package:submersion/features/dive_log/data/services/gas_usage_segments_se
 import 'package:submersion/features/dive_log/data/services/profile_analysis_service.dart';
 import 'package:submersion/features/dive_log/data/services/profile_markers_service.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
+import 'package:submersion/features/dive_log/presentation/widgets/readout_card_placement.dart';
 import 'package:submersion/features/dive_log/domain/entities/source_profile.dart';
 import 'package:submersion/features/dive_log/domain/services/source_name_resolver.dart';
 import 'package:submersion/features/dive_log/presentation/providers/active_source_provider.dart';
@@ -67,6 +68,34 @@ class _FullscreenProfilePageState extends ConsumerState<FullscreenProfilePage> {
   void _onTooltipData(List<TooltipRow>? rows) {
     if (rows == null || rows.isEmpty) return; // sticky: keep last values
     setState(() => _readoutRows = rows);
+  }
+
+  /// Memoized default corner for the readout card, recomputed only when the
+  /// profile identity changes (the page rebuilds per playback tick).
+  Offset? _autoCorner;
+  List<DiveProfilePoint>? _autoCornerProfile;
+
+  /// Default readout-card corner: the chart corner the profile occupies
+  /// least (a saved dragged position always overrides this). Strided
+  /// sampling keeps this O(200) regardless of profile size.
+  Offset _defaultCardCorner(List<DiveProfilePoint> profile) {
+    if (!identical(profile, _autoCornerProfile)) {
+      _autoCornerProfile = profile;
+      final maxT = profile.isEmpty
+          ? 0.0
+          : profile
+                .map((p) => p.timestamp)
+                .reduce((a, b) => a > b ? a : b)
+                .toDouble();
+      final maxD = profile.fold(0.0, (m, p) => m > p.depth ? m : p.depth);
+      final stride = profile.length <= 200 ? 1 : profile.length ~/ 200;
+      _autoCorner = leastOccupiedReadoutCorner([
+        if (maxT > 0 && maxD > 0)
+          for (var i = 0; i < profile.length; i += stride)
+            Offset(profile[i].timestamp / maxT, profile[i].depth / maxD),
+      ]);
+    }
+    return _autoCorner!;
   }
 
   @override
@@ -493,7 +522,7 @@ class _FullscreenProfilePageState extends ConsumerState<FullscreenProfilePage> {
                                 settings.fullscreenReadoutCardX!,
                                 settings.fullscreenReadoutCardY!,
                               )
-                            : null,
+                            : _defaultCardCorner(chartProfile),
                         onDragEnd: (fraction) => ref
                             .read(settingsProvider.notifier)
                             .setFullscreenReadoutCardPosition(

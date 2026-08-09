@@ -23,6 +23,7 @@ import 'package:submersion/features/dive_log/domain/entities/profile_event.dart'
 import 'package:submersion/features/dive_log/domain/entities/safety_finding.dart';
 import 'package:submersion/features/dive_log/presentation/providers/profile_legend_provider.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/chart_series_cache.dart';
+import 'package:submersion/features/dive_log/presentation/widgets/chart_touch_recognizer.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/deco_stop_band.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/dive_profile_legend.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/profile_decimator.dart';
@@ -34,6 +35,7 @@ import 'package:submersion/features/dive_log/presentation/widgets/photo_marker_o
 import 'package:submersion/features/dive_log/presentation/widgets/safety_findings_overlay.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/profile_chart_viewport.dart';
+import 'package:submersion/features/dive_log/presentation/widgets/profile_event_labels.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/profile_highlight_range.dart';
 import 'package:submersion/core/ui/trackpad_zoom_recognizer.dart';
 
@@ -839,10 +841,6 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
   // Snapshot of the viewport at the start of a continuous gesture; continuous
   // gestures report cumulative scale/pan, so we apply them against this.
   ProfileChartViewport _gestureStartViewport = ProfileChartViewport.reset;
-  Offset _startFocalPoint = Offset.zero;
-
-  // Local position of the most recent (double-)tap, for tap-anchored zoom.
-  Offset _lastTapDownLocal = Offset.zero;
 
   // Active pointer kind, corrected on the first real pointer event. Chooses
   // pan-vs-scrub for single-pointer drags and is set by trackpad gestures.
@@ -852,11 +850,39 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
       ? PointerDeviceKind.touch
       : PointerDeviceKind.mouse;
 
-  // Cursor position at the start of a trackpad pan/zoom gesture.
+  // All touch pointers currently down, by pointer id, in chart-local coords.
+  // Fed by the passive Listener, which sees every event regardless of who
+  // wins the gesture arena; the two-finger pinch math reads from here.
+  final Map<int, Offset> _touchPositions = {};
 
-  // True between a double-tap-down and the finger lifting; lets a held-finger
-  // drag pan instead of scrub.
-  bool _doubleTapHold = false;
+  // True while ChartTouchClaimRecognizer holds the arena for a touch drag.
+  // The Listener only pans a touch drag when claimed, so a long-press scrub
+  // (which wins the arena before any movement) is never fought by a pan.
+  bool _touchDragClaimed = false;
+
+  // The two pointer ids driving the current two-finger gesture, plus its
+  // start geometry. Cumulative scale/pan is applied against
+  // _gestureStartViewport, never the live viewport (no compounding).
+  List<int> _pinchPointers = const [];
+  double _pinchStartDistance = 1;
+  Offset _pinchStartFocal = Offset.zero;
+
+  // Manual double-tap detection off PointerEvent.timeStamp. Replaces a
+  // DoubleTapGestureRecognizer, which held every tap's arena for 300 ms and
+  // delayed fl_chart's tap/pan resolution (tooltip lag; fast tap-then-drag
+  // misclassified). Timestamps are monotonic on real devices; flutter_test
+  // must pass explicit timeStamp values.
+  Duration? _lastTapUpStamp;
+  Offset _lastTapUpPosition = Offset.zero;
+  Offset _tapDownPosition = Offset.zero;
+  bool _tapMoved = false;
+  bool _doubleTapArmed = false;
+
+  // Whether the right-axis metric selector strip is rendered this build.
+  // Set in _buildChart alongside effectiveRightAxisMetric; a double-tap
+  // whose second tap lands in the strip must not zoom (the strip's own tap
+  // opens the metric menu).
+  bool _rightAxisSelectorActive = false;
 
   // Index of the last sample reported via hover, to de-dupe onPointSelected.
   int? _lastHoverIndex;
@@ -1917,22 +1943,67 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
                     (recognizer) => recognizer.onZoom = zoomAt,
                   ),
             },
-            child: GestureDetector(
-              onScaleStart: (details) {
-                _gestureStartViewport = _viewport;
-                _startFocalPoint = details.localFocalPoint;
+            child: Listener(
+              onPointerDown: (event) {
+                _activePointerCount++;
+                _activePointerKind = event.kind;
+                _lastPointerLocal = event.localPosition;
+                if (event.kind == PointerDeviceKind.touch) {
+                  _touchPositions[event.pointer] = event.localPosition;
+                }
+                // Tap bookkeeping is kind-agnostic: a mouse double-click
+                // zooms exactly like a touch double-tap.
+                if (_activePointerCount == 1) {
+                  _tapDownPosition = event.localPosition;
+                  _tapMoved = false;
+                  final lastUp = _lastTapUpStamp;
+                  _doubleTapArmed =
+                      lastUp != null &&
+                      event.timeStamp - lastUp < kDoubleTapTimeout &&
+                      (event.localPosition - _lastTapUpPosition).distance <=
+                          kDoubleTapSlop &&
+                      !_inRightAxisSelector(
+                        event.localPosition,
+                        constraints.biggest,
+                      );
+                } else {
+                  _doubleTapArmed = false;
+                  _tapMoved = true;
+                  if (_touchPositions.length == 2) {
+                    _beginPinch();
+                  }
+                }
               },
-              onScaleUpdate: (details) {
-                // Single-pointer drags are handled by Listener.onPointerMove
-                // (mouse pan) and fl_chart's own recognizer (touch scrub); they
-                // never reach onScaleUpdate, which only ever fires for a pinch.
-                if (details.pointerCount < 2) return;
-
-                // Trackpad pinch/scroll is handled by the
-                // TrackpadZoomGestureRecognizer (reliable cursor anchor); touch
-                // focal points are correct, so touch pinch is handled here.
-                if (_activePointerKind != PointerDeviceKind.touch) return;
-
+              onPointerMove: (event) {
+                final prev = _lastPointerLocal;
+                _lastPointerLocal = event.localPosition;
+                if (event.kind == PointerDeviceKind.touch) {
+                  _touchPositions[event.pointer] = event.localPosition;
+                }
+                if (!_tapMoved &&
+                    (event.localPosition - _tapDownPosition).distance >
+                        kTouchSlop) {
+                  _tapMoved = true;
+                  _doubleTapArmed = false;
+                }
+                if (prev == null) return;
+                final intent = chartDragIntent(
+                  kind: _activePointerKind,
+                  pointerCount: _activePointerCount,
+                  isZoomed: _viewport.isZoomed,
+                );
+                if (intent == ChartDragIntent.zoomPan &&
+                    _activePointerKind == PointerDeviceKind.touch) {
+                  _updatePinch(constraints, units);
+                  return;
+                }
+                if (intent != ChartDragIntent.pan) return;
+                // A touch drag only pans once the claim recognizer has won
+                // the arena; a long-press scrub keeps the drag otherwise.
+                if (_activePointerKind == PointerDeviceKind.touch &&
+                    !_touchDragClaimed) {
+                  return;
+                }
                 setState(() {
                   final box = constraints.biggest;
                   final insets = _plotInsets(constraints.maxWidth, units);
@@ -1944,145 +2015,100 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
                     1.0,
                     double.infinity,
                   );
-                  final focal = chartFocalFraction(
-                    _startFocalPoint,
-                    box,
-                    left: insets.left,
-                    right: insets.right,
-                    top: insets.top,
-                    bottom: insets.bottom,
+                  final d = event.localPosition - prev;
+                  _viewport = _viewport.pannedBy(
+                    -d.dx / plotW / _viewport.zoom,
+                    -d.dy / plotH / _viewport.zoom,
                   );
-                  // scale is cumulative from gesture start -> apply to snapshot.
-                  var vp = _gestureStartViewport.zoomedAt(
-                    focal.fx,
-                    focal.fy,
-                    details.scale,
-                  );
-                  final panPx = details.localFocalPoint - _startFocalPoint;
-                  vp = vp.pannedBy(
-                    -panPx.dx / plotW / vp.zoom,
-                    -panPx.dy / plotH / vp.zoom,
-                  );
-                  _viewport = vp;
                 });
               },
-              onDoubleTapDown: (details) {
-                _lastTapDownLocal = details.localPosition;
-                _doubleTapHold = true;
+              onPointerUp: (event) {
+                if (_activePointerCount > 0) _activePointerCount--;
+                _lastPointerLocal = null;
+                if (event.kind == PointerDeviceKind.touch) {
+                  _touchPositions.remove(event.pointer);
+                  if (_pinchPointers.contains(event.pointer)) {
+                    _touchPositions.length >= 2
+                        ? _beginPinch()
+                        : _pinchPointers = const [];
+                  }
+                }
+                if (_activePointerCount == 0 && !_tapMoved) {
+                  if (_doubleTapArmed) {
+                    _doubleTapArmed = false;
+                    _lastTapUpStamp = null;
+                    _toggleDoubleTapZoom(_tapDownPosition, constraints, units);
+                  } else if (!_inRightAxisSelector(
+                    event.localPosition,
+                    constraints.biggest,
+                  )) {
+                    // Selector-strip taps belong to the metric menu; they
+                    // neither arm (see onPointerDown) nor seed a double-tap.
+                    _lastTapUpStamp = event.timeStamp;
+                    _lastTapUpPosition = event.localPosition;
+                  }
+                }
               },
-              onDoubleTap: () {
-                _doubleTapHold = false;
-                setState(() {
-                  if (_viewport.isZoomed) {
-                    _viewport = ProfileChartViewport.reset;
-                  } else {
+              onPointerCancel: (event) {
+                if (_activePointerCount > 0) _activePointerCount--;
+                _lastPointerLocal = null;
+                _touchPositions.remove(event.pointer);
+                if (_pinchPointers.contains(event.pointer)) {
+                  _touchPositions.length >= 2
+                      ? _beginPinch()
+                      : _pinchPointers = const [];
+                }
+                _doubleTapArmed = false;
+              },
+              // Trackpad two-finger scroll/pinch is handled by the
+              // TrackpadZoomGestureRecognizer above (it wins the gesture arena so
+              // it cannot also scroll the enclosing page).
+              onPointerSignal: (event) {
+                if (event is PointerScrollEvent) {
+                  setState(() {
                     final box = constraints.biggest;
                     final insets = _plotInsets(constraints.maxWidth, units);
                     final focal = chartFocalFraction(
-                      _lastTapDownLocal,
+                      event.localPosition,
                       box,
                       left: insets.left,
                       right: insets.right,
                       top: insets.top,
                       bottom: insets.bottom,
                     );
-                    _viewport = _viewport.zoomedAt(focal.fx, focal.fy, 2.0);
-                  }
-                });
-              },
-              child: Listener(
-                onPointerDown: (event) {
-                  _activePointerCount++;
-                  _activePointerKind = event.kind;
-                  _lastPointerLocal = event.localPosition;
-                },
-                onPointerMove: (event) {
-                  final prev = _lastPointerLocal;
-                  _lastPointerLocal = event.localPosition;
-                  if (prev == null) return;
-                  final intent = chartDragIntent(
-                    kind: _activePointerKind,
-                    pointerCount: _activePointerCount,
-                    doubleTapHold: _doubleTapHold,
-                  );
-                  if (intent != ChartDragIntent.pan) return;
-                  setState(() {
-                    final box = constraints.biggest;
-                    final insets = _plotInsets(constraints.maxWidth, units);
-                    final plotW = (box.width - insets.left - insets.right)
-                        .clamp(1.0, double.infinity);
-                    final plotH = (box.height - insets.top - insets.bottom)
-                        .clamp(1.0, double.infinity);
-                    final d = event.localPosition - prev;
-                    _viewport = _viewport.pannedBy(
-                      -d.dx / plotW / _viewport.zoom,
-                      -d.dy / plotH / _viewport.zoom,
-                    );
+                    final factor = event.scrollDelta.dy < 0 ? 1.1 : 1 / 1.1;
+                    _viewport = _viewport.zoomedAt(focal.fx, focal.fy, factor);
                   });
-                },
-                onPointerUp: (event) {
-                  if (_activePointerCount > 0) _activePointerCount--;
-                  _lastPointerLocal = null;
-                  _doubleTapHold = false;
-                },
-                onPointerCancel: (event) {
-                  if (_activePointerCount > 0) _activePointerCount--;
-                  _lastPointerLocal = null;
-                  _doubleTapHold = false;
-                },
-                // Trackpad two-finger scroll/pinch is handled by the
-                // TrackpadZoomGestureRecognizer above (it wins the gesture arena so
-                // it cannot also scroll the enclosing page).
-                onPointerSignal: (event) {
-                  if (event is PointerScrollEvent) {
-                    setState(() {
-                      final box = constraints.biggest;
-                      final insets = _plotInsets(constraints.maxWidth, units);
-                      final focal = chartFocalFraction(
-                        event.localPosition,
-                        box,
-                        left: insets.left,
-                        right: insets.right,
-                        top: insets.top,
-                        bottom: insets.bottom,
-                      );
-                      final factor = event.scrollDelta.dy < 0 ? 1.1 : 1 / 1.1;
-                      _viewport = _viewport.zoomedAt(
-                        focal.fx,
-                        focal.fy,
-                        factor,
-                      );
-                    });
+                }
+              },
+              onPointerHover: (event) {
+                _activePointerKind = PointerDeviceKind.mouse;
+                final idx = _hoverIndex(
+                  event.localPosition,
+                  constraints.biggest,
+                  _plotInsets(constraints.maxWidth, units),
+                );
+                if (idx != _lastHoverIndex) {
+                  _lastHoverIndex = idx;
+                  widget.onPointSelected?.call(idx);
+                }
+              },
+              child: MouseRegion(
+                onExit: (_) {
+                  if (_lastHoverIndex != null) {
+                    _lastHoverIndex = null;
+                    widget.onPointSelected?.call(null);
                   }
                 },
-                onPointerHover: (event) {
-                  _activePointerKind = PointerDeviceKind.mouse;
-                  final idx = _hoverIndex(
-                    event.localPosition,
-                    constraints.biggest,
-                    _plotInsets(constraints.maxWidth, units),
-                  );
-                  if (idx != _lastHoverIndex) {
-                    _lastHoverIndex = idx;
-                    widget.onPointSelected?.call(idx);
-                  }
-                },
-                child: MouseRegion(
-                  onExit: (_) {
-                    if (_lastHoverIndex != null) {
-                      _lastHoverIndex = null;
-                      widget.onPointSelected?.call(null);
-                    }
-                  },
-                  child: _buildChart(
-                    context,
-                    units,
-                    availableWidth: constraints.maxWidth,
-                    hasTemperatureData: hasTemperatureData,
-                    hasPressureData: hasPressureData,
-                    hasHeartRateData: hasHeartRateData,
-                    totalMaxDepth: totalMaxDepth,
-                  ),
+                child: _buildChart(
+                  context,
+                  units,
+                  availableWidth: constraints.maxWidth,
+                  availableHeight: constraints.maxHeight,
+                  hasTemperatureData: hasTemperatureData,
+                  hasPressureData: hasPressureData,
+                  hasHeartRateData: hasHeartRateData,
+                  totalMaxDepth: totalMaxDepth,
                 ),
               ),
             ),
@@ -2090,6 +2116,109 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
         );
       },
     );
+  }
+
+  /// Whether [localPosition] falls inside the right-axis metric selector's
+  /// tap strip (mirrors the Positioned overlay in _buildChart: right 50 px,
+  /// excluding the bottom 30 px axis band). A second tap there is a
+  /// selector interaction, not a chart double-tap.
+  bool _inRightAxisSelector(Offset localPosition, Size box) =>
+      _rightAxisSelectorActive &&
+      localPosition.dx >= box.width - 50 &&
+      localPosition.dy <= box.height - 30;
+
+  // Arena outcome callbacks from ChartTouchClaimRecognizer. Only event
+  // handlers read the flag, so no rebuild is needed. Claiming also parks the
+  // tooltip: fl_chart emits a selection at pointer-down (pan-down/tap
+  // deadline) but is rejected mid-gesture once the claim wins, so it never
+  // sends the touch-end event that would clear that selection.
+  void _onTouchDragClaimed() {
+    _touchDragClaimed = true;
+    widget.onPointSelected?.call(null);
+  }
+
+  void _onTouchDragReleased() => _touchDragClaimed = false;
+
+  /// Snapshots the start of a two-finger gesture: the two driving pointers,
+  /// their separation and midpoint, and the viewport the cumulative
+  /// scale/pan is applied against. Re-invoked when the driving pair changes
+  /// (a third finger replacing a lifted one) so the gesture re-anchors
+  /// instead of jumping. Also parks the tooltip: fl_chart may still own the
+  /// first pointer's arena and would keep scrubbing under the pinch.
+  void _beginPinch() {
+    _pinchPointers = _touchPositions.keys.take(2).toList(growable: false);
+    final p0 = _touchPositions[_pinchPointers[0]]!;
+    final p1 = _touchPositions[_pinchPointers[1]]!;
+    _pinchStartDistance = (p0 - p1).distance.clamp(1.0, double.infinity);
+    _pinchStartFocal = (p0 + p1) / 2;
+    _gestureStartViewport = _viewport;
+    widget.onPointSelected?.call(null);
+  }
+
+  /// Applies the live two-finger scale/pan against the gesture-start
+  /// snapshot: zoom by the separation ratio anchored at the start focal
+  /// point, then pan by the focal point's movement.
+  void _updatePinch(BoxConstraints constraints, UnitFormatter units) {
+    if (_pinchPointers.length < 2) return;
+    final p0 = _touchPositions[_pinchPointers[0]];
+    final p1 = _touchPositions[_pinchPointers[1]];
+    if (p0 == null || p1 == null) return;
+    setState(() {
+      final box = constraints.biggest;
+      final insets = _plotInsets(constraints.maxWidth, units);
+      final plotW = (box.width - insets.left - insets.right).clamp(
+        1.0,
+        double.infinity,
+      );
+      final plotH = (box.height - insets.top - insets.bottom).clamp(
+        1.0,
+        double.infinity,
+      );
+      final focal = chartFocalFraction(
+        _pinchStartFocal,
+        box,
+        left: insets.left,
+        right: insets.right,
+        top: insets.top,
+        bottom: insets.bottom,
+      );
+      final scale =
+          (p0 - p1).distance.clamp(1.0, double.infinity) / _pinchStartDistance;
+      var vp = _gestureStartViewport.zoomedAt(focal.fx, focal.fy, scale);
+      final panPx = (p0 + p1) / 2 - _pinchStartFocal;
+      vp = vp.pannedBy(
+        -panPx.dx / plotW / vp.zoom,
+        -panPx.dy / plotH / vp.zoom,
+      );
+      _viewport = vp;
+    });
+  }
+
+  /// Double-tap toggle: zoom 2x anchored at the tap, or reset when already
+  /// zoomed. Invoked by the manual timestamp-based double-tap detection in
+  /// the Listener (see the field comments on _lastTapUpStamp).
+  void _toggleDoubleTapZoom(
+    Offset localPosition,
+    BoxConstraints constraints,
+    UnitFormatter units,
+  ) {
+    setState(() {
+      if (_viewport.isZoomed) {
+        _viewport = ProfileChartViewport.reset;
+      } else {
+        final box = constraints.biggest;
+        final insets = _plotInsets(constraints.maxWidth, units);
+        final focal = chartFocalFraction(
+          localPosition,
+          box,
+          left: insets.left,
+          right: insets.right,
+          top: insets.top,
+          bottom: insets.bottom,
+        );
+        _viewport = _viewport.zoomedAt(focal.fx, focal.fy, 2.0);
+      }
+    });
   }
 
   Widget _buildEmptyState(BuildContext context) {
@@ -2184,6 +2313,7 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
     BuildContext context,
     UnitFormatter units, {
     required double availableWidth,
+    required double availableHeight,
     required bool hasTemperatureData,
     required bool hasPressureData,
     required bool hasHeartRateData,
@@ -2267,6 +2397,7 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
     final rightAxisRange = effectiveRightAxisMetric != null
         ? _getMetricRange(effectiveRightAxisMetric, units)
         : null;
+    _rightAxisSelectorActive = effectiveRightAxisMetric != null;
 
     // Pressure bounds from multi-tank pressure data
     double? minPressure, maxPressure;
@@ -2661,7 +2792,16 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
                 ..._buildHighlightCursor(colorScheme),
                 ..._buildHighlightRangeLines(highlightSpan),
                 if (_showEvents && widget.events != null)
-                  ..._buildEventVerticalLines(colorScheme),
+                  ..._buildEventVerticalLines(
+                    colorScheme,
+                    availableWidth: availableWidth,
+                    availableHeight: availableHeight,
+                    units: units,
+                    visibleMinX: visibleMinX,
+                    visibleMaxX: visibleMaxX,
+                    visibleMinDepth: visibleMinDepth,
+                    visibleMaxDepth: visibleMaxDepth,
+                  ),
               ],
             ),
             lineTouchData: LineTouchData(
@@ -2685,6 +2825,12 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
                 ];
               },
               touchCallback: (event, response) {
+                // During a two-finger gesture fl_chart may still own the
+                // first pointer's arena (its pan won before the second
+                // finger landed) and would keep scrubbing under the pinch;
+                // the pinch owns the interaction, so ignore its events. The
+                // same applies while a one-finger pan drag is claimed.
+                if (_activePointerCount >= 2 || _touchDragClaimed) return;
                 final isTouchEnd =
                     event is FlPointerExitEvent ||
                     event is FlLongPressEnd ||
@@ -3450,6 +3596,32 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
           // (verticalLines lerp by index, and cursor lines shift the
           // indices), and smearing bars while panning. Render immediately.
           duration: Duration.zero,
+        ),
+        // Touch claim overlay. Stacked directly above the LineChart so it is
+        // hit-tested first: its recognizer joins each pointer's arena before
+        // fl_chart's internal pan/tap/long-press recognizers and therefore
+        // wins ties. Translucent, so fl_chart still receives every pointer
+        // (taps, long-press scrubs) that the recognizer does not claim. The
+        // interactive overlays stacked above (metric selector, photo
+        // markers) keep their priority over this layer.
+        Positioned.fill(
+          child: RawGestureDetector(
+            behavior: HitTestBehavior.translucent,
+            gestures: {
+              ChartTouchClaimRecognizer:
+                  GestureRecognizerFactoryWithHandlers<
+                    ChartTouchClaimRecognizer
+                  >(
+                    () => ChartTouchClaimRecognizer(
+                      isZoomed: () => _viewport.isZoomed,
+                      debugOwner: this,
+                    ),
+                    (recognizer) => recognizer
+                      ..onClaimed = _onTouchDragClaimed
+                      ..onReleased = _onTouchDragReleased,
+                  ),
+            },
+          ),
         ),
         // Right axis tap overlay for metric selection
         if (effectiveRightAxisMetric != null)
@@ -5104,7 +5276,47 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
   /// Groups events by timestamp and shows only the most severe event at each
   /// timestamp to avoid overlapping labels. Lines are colored by severity:
   /// info = primary, warning = orange, alert = red.
-  List<VerticalLine> _buildEventVerticalLines(ColorScheme colorScheme) {
+  /// Linearly interpolated profile depth (meters) at [timestamp] seconds.
+  /// Binary search keeps this O(log n) per event, cheap enough to run on
+  /// every pan/zoom rebuild.
+  double _depthAtTimestamp(double timestamp) {
+    final profile = widget.profile;
+    if (profile.isEmpty) return 0;
+    if (timestamp <= profile.first.timestamp) return profile.first.depth;
+    if (timestamp >= profile.last.timestamp) return profile.last.depth;
+    var lo = 0;
+    var hi = profile.length - 1;
+    while (hi - lo > 1) {
+      final mid = (lo + hi) ~/ 2;
+      if (profile[mid].timestamp <= timestamp) {
+        lo = mid;
+      } else {
+        hi = mid;
+      }
+    }
+    final a = profile[lo];
+    final b = profile[hi];
+    final span = (b.timestamp - a.timestamp).toDouble();
+    if (span <= 0) return a.depth;
+    final f = (timestamp - a.timestamp) / span;
+    return a.depth + (b.depth - a.depth) * f;
+  }
+
+  /// Minimum pixel spacing between event lines before the less severe of the
+  /// pair is dropped entirely (line and label). At phone plot widths a few
+  /// seconds is sub-pixel; drawing both just paints noise.
+  static const double _eventMinSpacingPx = 24;
+
+  List<VerticalLine> _buildEventVerticalLines(
+    ColorScheme colorScheme, {
+    required double availableWidth,
+    required double availableHeight,
+    required UnitFormatter units,
+    required double visibleMinX,
+    required double visibleMaxX,
+    required double visibleMinDepth,
+    required double visibleMaxDepth,
+  }) {
     final events = widget.events;
     if (events == null || events.isEmpty) return [];
 
@@ -5125,26 +5337,130 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
       }
     }
 
-    return byTimestamp.values.map((event) {
-      final color = _eventSeverityColor(event.severity, colorScheme);
-      return VerticalLine(
-        x: event.timestamp.toDouble(),
-        color: color,
-        strokeWidth: 1,
-        dashArray: [3, 3],
-        label: VerticalLineLabel(
-          show: true,
-          alignment: Alignment.topCenter,
-          padding: const EdgeInsets.only(bottom: 2),
-          style: TextStyle(
-            color: color,
-            fontSize: 9,
-            backgroundColor: colorScheme.surface.withValues(alpha: 0.8),
-          ),
-          labelResolver: (line) => event.displayName,
+    // Plot-rect pixel geometry, mirroring the insets fl_chart reserves.
+    final insets = _plotInsets(availableWidth, units);
+    final plotW = (availableWidth - insets.left - insets.right).clamp(
+      1.0,
+      double.infinity,
+    );
+    final plotH = (availableHeight - insets.top - insets.bottom).clamp(
+      1.0,
+      double.infinity,
+    );
+    final rangeX = (visibleMaxX - visibleMinX).clamp(1e-9, double.infinity);
+    final rangeY = (visibleMaxDepth - visibleMinDepth).clamp(
+      1e-9,
+      double.infinity,
+    );
+    double xPx(num t) => (t - visibleMinX) / rangeX * plotW;
+
+    // Pixel-space dedupe: events landing within _eventMinSpacingPx of an
+    // already kept neighbour keep only the most severe of the pair.
+    final ordered = byTimestamp.values.toList()
+      ..sort((a, b) => a.timestamp.compareTo(b.timestamp));
+    final kept = <ProfileEvent>[];
+    for (final event in ordered) {
+      if (kept.isNotEmpty &&
+          (xPx(event.timestamp) - xPx(kept.last.timestamp)).abs() <
+              _eventMinSpacingPx) {
+        if (event.severity.index > kept.last.severity.index) {
+          kept[kept.length - 1] = event;
+        }
+      } else {
+        kept.add(event);
+      }
+    }
+
+    // Collision-aware label placement for the events inside the visible
+    // window: anchored below the profile depth at the event's time (free
+    // water instead of the surface tail), flipped off the plot edges, and
+    // hidden when there is genuinely no room (see placeEventLabels).
+    const labelStyle = TextStyle(fontSize: 9);
+    final inWindow = <int>[];
+    final specs = <EventLabelSpec>[];
+    for (var i = 0; i < kept.length; i++) {
+      final t = kept[i].timestamp.toDouble();
+      if (t < visibleMinX || t > visibleMaxX) continue;
+      final painter = TextPainter(
+        text: TextSpan(text: kept[i].displayName, style: labelStyle),
+        // Deliberately LTR regardless of locale: fl_chart's painter lays
+        // vertical-line labels out with TextDirection.ltr
+        // (axis_chart_painter.dart), and this measurement must match the
+        // width it will actually paint with.
+        textDirection: TextDirection.ltr,
+      )..layout();
+      final anchorY =
+          ((_depthAtTimestamp(t) - visibleMinDepth) / rangeY * plotH).clamp(
+            0.0,
+            plotH,
+          );
+      inWindow.add(i);
+      specs.add(
+        EventLabelSpec(
+          xPx: xPx(t),
+          anchorYPx: anchorY,
+          textWidth: painter.width,
+          textHeight: painter.height,
         ),
       );
-    }).toList();
+      painter.dispose();
+    }
+    final placements = placeEventLabels(
+      specs,
+      plotWidth: plotW,
+      plotHeight: plotH,
+    );
+    final labelByEvent = <int, (EventLabelSpec, EventLabelPlacement)>{
+      for (var j = 0; j < inWindow.length; j++)
+        inWindow[j]: (specs[j], placements[j]),
+    };
+
+    return [
+      for (var i = 0; i < kept.length; i++)
+        _eventVerticalLine(kept[i], labelByEvent[i], colorScheme),
+    ];
+  }
+
+  VerticalLine _eventVerticalLine(
+    ProfileEvent event,
+    (EventLabelSpec, EventLabelPlacement)? label,
+    ColorScheme colorScheme,
+  ) {
+    final spec = label?.$1;
+    final placement = label?.$2;
+    final color = _eventSeverityColor(event.severity, colorScheme);
+    // fl_chart lays the label out inside
+    // Rect.fromLTRB(x - padding.right - textWidth, padding.top,
+    //               x + padding.left, ...)
+    // and Alignment.topLeft draws the text with its top-left corner at
+    // (rect.left, rect.top). Solving rect.left == placement.leftPx gives
+    // padding.right = xPx - leftPx - textWidth, which may be negative for a
+    // label centred on (or clamped across) the line - fl_chart's painter is
+    // pure arithmetic, so negative padding is well-defined here. padding.top
+    // is the pixel offset from the plot top; placements share that space.
+    final padding = placement == null || spec == null
+        ? EdgeInsets.zero
+        : EdgeInsets.only(
+            top: placement.topPx,
+            right: spec.xPx - placement.leftPx - spec.textWidth,
+          );
+    return VerticalLine(
+      x: event.timestamp.toDouble(),
+      color: color,
+      strokeWidth: 1,
+      dashArray: [3, 3],
+      label: VerticalLineLabel(
+        show: placement?.showText ?? false,
+        alignment: Alignment.topLeft,
+        padding: padding,
+        style: TextStyle(
+          color: color,
+          fontSize: 9,
+          backgroundColor: colorScheme.surface.withValues(alpha: 0.8),
+        ),
+        labelResolver: (line) => event.displayName,
+      ),
+    );
   }
 
   /// Returns the color for an event based on its severity level.
