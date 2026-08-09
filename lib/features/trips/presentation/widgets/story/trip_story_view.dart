@@ -235,6 +235,14 @@ class _TripStoryViewState extends ConsumerState<TripStoryView>
       padding: EdgeInsets.symmetric(horizontal: 16),
       sliver: SliverToBoxAdapter(child: _TodayDivider()),
     );
+    // Unconditional, even for the days whose card renders nothing (surface
+    // days, content-less planned days). It looks like dead weight there but is
+    // not: it carries _dayKeys[index], which _onScroll and _scrollToDay read
+    // positions from, and they skip days whose key context is unmounted -- so
+    // dropping it would quietly take those days out of active-day resolution.
+    // Its 8px bottom inset is also the gap between consecutive chapters, and
+    // is painted in the same surface color as the headers, so it separates
+    // them rather than showing as a blank band.
     final body = SliverPadding(
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
       sliver: SliverToBoxAdapter(
