@@ -6564,6 +6564,16 @@
   },
   "safetyReview_dismiss": "Ausblenden",
   "safetyReview_restore": "Wiederherstellen",
+  "safetyReview_details": "Details",
+  "safetyReview_clearHighlight": "Hervorhebung entfernen",
+  "safetyReview_findingGroupSemantics": "{count, plural, =1{1 Sicherheitshinweis} other{{count} Sicherheitshinweise}}",
+  "@safetyReview_findingGroupSemantics": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "safetyReview_showDismissed": "{count, plural, =1{1 Ausgeblendete anzeigen} other{{count} Ausgeblendete anzeigen}}",
   "@safetyReview_showDismissed": {
     "placeholders": {

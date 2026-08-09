@@ -6564,6 +6564,16 @@
   },
   "safetyReview_dismiss": "Ignora",
   "safetyReview_restore": "Ripristina",
+  "safetyReview_details": "Dettagli",
+  "safetyReview_clearHighlight": "Rimuovi evidenziazione",
+  "safetyReview_findingGroupSemantics": "{count, plural, =1{1 rilievo di sicurezza} other{{count} rilievi di sicurezza}}",
+  "@safetyReview_findingGroupSemantics": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "safetyReview_showDismissed": "{count, plural, =1{Mostra 1 ignorata} other{Mostra {count} ignorate}}",
   "@safetyReview_showDismissed": {
     "placeholders": {

@@ -6564,6 +6564,16 @@
   },
   "safetyReview_dismiss": "Elvetés",
   "safetyReview_restore": "Visszaállítás",
+  "safetyReview_details": "Részletek",
+  "safetyReview_clearHighlight": "Kiemelés törlése",
+  "safetyReview_findingGroupSemantics": "{count, plural, =1{1 biztonsági megállapítás} other{{count} biztonsági megállapítás}}",
+  "@safetyReview_findingGroupSemantics": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "safetyReview_showDismissed": "{count, plural, =1{1 elvetett megjelenítése} other{{count} elvetett megjelenítése}}",
   "@safetyReview_showDismissed": {
     "placeholders": {

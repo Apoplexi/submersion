@@ -7561,6 +7561,23 @@
   },
   "safetyReview_dismiss": "Dismiss",
   "safetyReview_restore": "Restore",
+  "safetyReview_details": "Details",
+  "@safetyReview_details": {
+    "description": "Link in the chart finding callout that scrolls to the full safety review section"
+  },
+  "safetyReview_clearHighlight": "Clear highlight",
+  "@safetyReview_clearHighlight": {
+    "description": "Tooltip/semantics for the button that clears the chart safety highlight"
+  },
+  "safetyReview_findingGroupSemantics": "{count, plural, =1{1 safety observation} other{{count} safety observations}}",
+  "@safetyReview_findingGroupSemantics": {
+    "description": "Semantics label for a clustered chip in the chart safety lane",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "safetySettings_title": "Safety review",
   "safetySettings_entry_subtitle": "Post-dive observations and rules",
   "safetySettings_masterToggle": "Post-dive safety review",

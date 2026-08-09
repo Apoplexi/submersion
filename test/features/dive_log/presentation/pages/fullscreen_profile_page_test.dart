@@ -356,36 +356,121 @@ void main() {
     },
   );
 
+  SafetyFinding laneFinding() => SafetyFinding(
+    id: 'f-lane',
+    diveId: 'd1',
+    ruleId: SafetyRuleId.rapidAscent,
+    severity: SafetySeverity.caution,
+    startTimestamp: 60,
+    endTimestamp: 120,
+    value: 14.0,
+    engineVersion: 1,
+    createdAt: DateTime.utc(2026, 8, 9),
+  );
+
+  List<Override> reviewOverrides(SafetyFinding finding) => [
+    ..._defaultOverrides(),
+    safetyReviewProvider('d1').overrideWith(
+      (ref) async => SafetyReview(
+        diveId: 'd1',
+        engineVersion: 1,
+        reviewedAt: DateTime.utc(2026, 8, 9),
+        findings: [finding],
+      ),
+    ),
+  ];
+
   testWidgets(
     'selected safety finding carries into fullscreen as a highlight',
     (tester) async {
-      await tester.pumpWidget(_wrap(_defaultOverrides()));
+      final finding = laneFinding();
+      await tester.pumpWidget(_wrap(reviewOverrides(finding)));
       await tester.pumpAndSettle();
 
       final container = ProviderScope.containerOf(
         tester.element(find.byType(FullscreenProfilePage)),
       );
-      container
-          .read(selectedSafetyFindingProvider('d1').notifier)
-          .state = SafetyFinding(
-        id: 'f1',
-        diveId: 'd1',
-        ruleId: SafetyRuleId.missedDecoStop,
-        severity: SafetySeverity.caution,
-        startTimestamp: 120,
-        endTimestamp: 240,
-        value: 2.0,
-        engineVersion: 1,
-        createdAt: DateTime.utc(2026, 8, 7),
-      );
+      container.read(selectedSafetyFindingProvider('d1').notifier).state =
+          finding;
       await tester.pump();
 
       final chart = tester.widget<DiveProfileChart>(
         find.byType(DiveProfileChart),
       );
       expect(chart.highlightRange, isNotNull);
-      expect(chart.highlightRange!.startTimestamp, 120);
-      expect(chart.highlightRange!.endTimestamp, 240);
+      expect(chart.highlightRange!.startTimestamp, 60);
+      expect(chart.highlightRange!.endTimestamp, 120);
     },
   );
+
+  testWidgets('a selection outside the gated lane renders no highlight', (
+    tester,
+  ) async {
+    // The stored review has no active row for the selection (dismissed), so
+    // the lane hides it; the highlight must be gated off with it.
+    final dismissed = SafetyFinding(
+      id: 'f-lane',
+      diveId: 'd1',
+      ruleId: SafetyRuleId.rapidAscent,
+      severity: SafetySeverity.caution,
+      startTimestamp: 60,
+      endTimestamp: 120,
+      value: 14.0,
+      engineVersion: 1,
+      dismissedAt: DateTime.utc(2026, 8, 9),
+      createdAt: DateTime.utc(2026, 8, 9),
+    );
+    await tester.pumpWidget(_wrap(reviewOverrides(dismissed)));
+    await tester.pumpAndSettle();
+
+    final container = ProviderScope.containerOf(
+      tester.element(find.byType(FullscreenProfilePage)),
+    );
+    container.read(selectedSafetyFindingProvider('d1').notifier).state =
+        dismissed;
+    await tester.pump();
+
+    final chart = tester.widget<DiveProfileChart>(
+      find.byType(DiveProfileChart),
+    );
+    expect(chart.highlightRange, isNull);
+    expect(chart.selectedSafetyFindingId, isNull);
+  });
+
+  testWidgets('lane findings and selection wiring reach the chart', (
+    tester,
+  ) async {
+    await tester.pumpWidget(_wrap(reviewOverrides(laneFinding())));
+    await tester.pumpAndSettle();
+
+    final chart = tester.widget<DiveProfileChart>(
+      find.byType(DiveProfileChart),
+    );
+    expect(chart.safetyFindings, isNotNull);
+    expect(chart.safetyFindings!.map((f) => f.id), ['f-lane']);
+    expect(chart.onSafetyFindingTap, isNotNull);
+    expect(chart.onSafetyFindingDismiss, isNotNull);
+    expect(chart.onSafetyFindingDetails, isNull); // no section in fullscreen
+  });
+
+  testWidgets('fullscreen tap callback toggles the shared provider', (
+    tester,
+  ) async {
+    final finding = laneFinding();
+    await tester.pumpWidget(_wrap(reviewOverrides(finding)));
+    await tester.pumpAndSettle();
+
+    final chart = tester.widget<DiveProfileChart>(
+      find.byType(DiveProfileChart),
+    );
+    final container = ProviderScope.containerOf(
+      tester.element(find.byType(FullscreenProfilePage)),
+    );
+
+    chart.onSafetyFindingTap!(finding);
+    expect(container.read(selectedSafetyFindingProvider('d1'))?.id, 'f-lane');
+
+    chart.onSafetyFindingTap!(finding);
+    expect(container.read(selectedSafetyFindingProvider('d1')), isNull);
+  });
 }

@@ -14,6 +14,7 @@ import 'package:submersion/features/dive_log/presentation/providers/gas_switch_p
 import 'package:submersion/features/dive_log/presentation/providers/profile_analysis_provider.dart';
 import 'package:submersion/features/dive_log/presentation/providers/profile_playback_provider.dart';
 import 'package:submersion/features/dive_log/presentation/providers/profile_review_provider.dart';
+import 'package:submersion/features/dive_log/domain/entities/safety_finding.dart';
 import 'package:submersion/features/dive_log/presentation/providers/safety_review_providers.dart';
 import 'package:submersion/features/dive_log/presentation/utils/sac_normalization.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/dive_profile_chart.dart';
@@ -151,6 +152,41 @@ class _FullscreenProfilePageState extends ConsumerState<FullscreenProfilePage> {
     final selectedFinding = ref.watch(
       selectedSafetyFindingProvider(widget.diveId),
     );
+    // Narrow selects (not a full settings watch): this page deliberately
+    // avoids rebuilding on unrelated settings writes.
+    final safetyReviewEnabled = ref.watch(
+      settingsProvider.select((s) => s.safetyReviewEnabled),
+    );
+    final safetyDisabledRules = ref.watch(
+      settingsProvider.select((s) => s.safetyReviewDisabledRules),
+    );
+    final safetyReview = ref.watch(safetyReviewProvider(widget.diveId)).value;
+    final laneFindings = safetyReviewEnabled
+        ? chartSafetyFindings(safetyReview, safetyDisabledRules)
+        : const <SafetyFinding>[];
+    // Gate the highlight on lane membership: with safety review (or the
+    // finding's rule) disabled the lane disappears, so an ungated highlight
+    // would be stuck on the chart with no UI to clear it.
+    final visibleSelectedFinding =
+        selectedFinding != null &&
+            laneFindings.any((f) => f.id == selectedFinding.id)
+        ? selectedFinding
+        : null;
+    // A finding dismissed elsewhere (callout, detail page, sync) must not
+    // stay highlighted: drop a selection with no matching active row.
+    ref.listen(safetyReviewProvider(widget.diveId), (previous, next) {
+      final review = next.value;
+      if (review == null) return;
+      final selected = ref.read(selectedSafetyFindingProvider(widget.diveId));
+      if (selected == null) return;
+      final stillActive = review.findings.any(
+        (f) => f.id == selected.id && !f.isDismissed,
+      );
+      if (!stillActive) {
+        ref.read(selectedSafetyFindingProvider(widget.diveId).notifier).state =
+            null;
+      }
+    });
     final showMaxDepthMarker = ref.watch(showMaxDepthMarkerProvider);
     final showPressureThresholdMarkers = ref.watch(
       showPressureThresholdMarkersProvider,
@@ -394,9 +430,30 @@ class _FullscreenProfilePageState extends ConsumerState<FullscreenProfilePage> {
                               : chartProfile.last.timestamp,
                           highlightedTimestamp: reviewTimestamp,
                           highlightRange: profileHighlightRangeFor(
-                            selectedFinding,
+                            visibleSelectedFinding,
                             Theme.of(context).colorScheme,
                           ),
+                          safetyFindings: laneFindings.isEmpty
+                              ? null
+                              : laneFindings,
+                          selectedSafetyFindingId: visibleSelectedFinding?.id,
+                          onSafetyFindingTap: (finding) {
+                            final selectionNotifier = ref.read(
+                              selectedSafetyFindingProvider(
+                                widget.diveId,
+                              ).notifier,
+                            );
+                            selectionNotifier.state =
+                                selectionNotifier.state?.id == finding.id
+                                ? null
+                                : finding;
+                          },
+                          onSafetyFindingDismiss: (finding) =>
+                              setSafetyFindingDismissed(
+                                ref,
+                                finding: finding,
+                                dismissed: true,
+                              ),
                           onPointSelected: (index) {
                             if (index == null || index >= chartProfile.length) {
                               return;

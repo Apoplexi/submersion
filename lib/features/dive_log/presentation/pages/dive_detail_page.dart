@@ -50,6 +50,7 @@ import 'package:submersion/features/dive_log/presentation/providers/profile_trac
 import 'package:submersion/features/dive_log/presentation/providers/profile_range_provider.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/buoyancy_section.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/collapsible_section.dart';
+import 'package:submersion/features/dive_log/domain/entities/safety_finding.dart';
 import 'package:submersion/features/dive_log/presentation/providers/safety_review_providers.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/safety_finding_highlight.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/safety_review_section.dart';
@@ -141,6 +142,20 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
 
   /// Key for capturing the profile chart as an image for PNG export
   final GlobalKey _profileChartExportKey = GlobalKey();
+  final GlobalKey _safetyReviewSectionKey = GlobalKey();
+
+  /// Scrolls the page so the safety review section is visible (callout
+  /// "Details" action). The selection stays active.
+  void _scrollToSafetySection() {
+    final ctx = _safetyReviewSectionKey.currentContext;
+    if (ctx == null) return;
+    Scrollable.ensureVisible(
+      ctx,
+      duration: const Duration(milliseconds: 400),
+      curve: Curves.easeInOutCubic,
+      alignment: 0.05,
+    );
+  }
 
   /// Key for capturing the entire dive details page as an image for PNG export
   final GlobalKey _pageExportKey = GlobalKey();
@@ -238,6 +253,22 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
       }
     }
 
+    // A finding dismissed elsewhere (section button, another device via sync,
+    // batch re-analysis) must not stay highlighted: drop a selection whose
+    // finding no longer exists as an active row.
+    ref.listen(safetyReviewProvider(diveId), (previous, next) {
+      final review = next.value;
+      if (review == null) return;
+      final selected = ref.read(selectedSafetyFindingProvider(diveId));
+      if (selected == null) return;
+      final stillActive = review.findings.any(
+        (f) => f.id == selected.id && !f.isDismissed,
+      );
+      if (!stillActive) {
+        ref.read(selectedSafetyFindingProvider(diveId).notifier).state = null;
+      }
+    });
+
     final diveAsync = ref.watch(diveProvider(diveId));
 
     return diveAsync.when(
@@ -313,7 +344,8 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
         // The widgets collapse to nothing when empty, so plain SizedBox
         // spacers would double up; each widget owns its own spacing.
         return [
-          if (dive.profile.isNotEmpty) SafetyReviewSection(diveId: dive.id),
+          if (dive.profile.isNotEmpty)
+            SafetyReviewSection(key: _safetyReviewSectionKey, diveId: dive.id),
           LinkedIncidentsRow(diveId: dive.id),
         ];
       },
@@ -1641,6 +1673,25 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
                 final selectedFinding = ref.watch(
                   selectedSafetyFindingProvider(diveId),
                 );
+                final safetyReview = ref
+                    .watch(safetyReviewProvider(diveId))
+                    .value;
+                final appSettings = ref.watch(settingsProvider);
+                final laneFindings = appSettings.safetyReviewEnabled
+                    ? chartSafetyFindings(
+                        safetyReview,
+                        appSettings.safetyReviewDisabledRules,
+                      )
+                    : const <SafetyFinding>[];
+                // Gate the highlight on lane membership: with safety review
+                // (or the finding's rule) disabled neither the lane nor the
+                // section renders, so an ungated highlight would be stuck on
+                // the chart with no UI to clear it.
+                final visibleSelectedFinding =
+                    selectedFinding != null &&
+                        laneFindings.any((f) => f.id == selectedFinding.id)
+                    ? selectedFinding
+                    : null;
                 return Stack(
                   children: [
                     MouseRegion(
@@ -1725,9 +1776,28 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
                             ? chartProfile[trackingIndex].timestamp
                             : null,
                         highlightRange: profileHighlightRangeFor(
-                          selectedFinding,
+                          visibleSelectedFinding,
                           Theme.of(context).colorScheme,
                         ),
+                        safetyFindings: laneFindings.isEmpty
+                            ? null
+                            : laneFindings,
+                        selectedSafetyFindingId: visibleSelectedFinding?.id,
+                        onSafetyFindingTap: (finding) {
+                          final notifier = ref.read(
+                            selectedSafetyFindingProvider(diveId).notifier,
+                          );
+                          notifier.state = notifier.state?.id == finding.id
+                              ? null
+                              : finding;
+                        },
+                        onSafetyFindingDismiss: (finding) =>
+                            setSafetyFindingDismissed(
+                              ref,
+                              finding: finding,
+                              dismissed: true,
+                            ),
+                        onSafetyFindingDetails: (_) => _scrollToSafetySection(),
                         onPointSelected: (index) {
                           ref
                                   .read(

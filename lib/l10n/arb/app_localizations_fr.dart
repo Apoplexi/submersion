@@ -13045,6 +13045,23 @@ class AppLocalizationsFr extends AppLocalizations {
   String get safetyReview_restore => 'Restaurer';
 
   @override
+  String get safetyReview_details => 'Détails';
+
+  @override
+  String get safetyReview_clearHighlight => 'Effacer la surbrillance';
+
+  @override
+  String safetyReview_findingGroupSemantics(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count observations de sécurité',
+      one: '1 observation de sécurité',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get safetySettings_title => 'Bilan de sécurité';
 
   @override

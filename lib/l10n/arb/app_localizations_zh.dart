@@ -12398,6 +12398,23 @@ class AppLocalizationsZh extends AppLocalizations {
   String get safetyReview_restore => '恢复';
 
   @override
+  String get safetyReview_details => '详情';
+
+  @override
+  String get safetyReview_clearHighlight => '清除高亮';
+
+  @override
+  String safetyReview_findingGroupSemantics(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 条安全提示',
+      one: '1 条安全提示',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get safetySettings_title => '安全回顾';
 
   @override

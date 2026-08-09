@@ -12960,6 +12960,23 @@ class AppLocalizationsHu extends AppLocalizations {
   String get safetyReview_restore => 'Visszaállítás';
 
   @override
+  String get safetyReview_details => 'Részletek';
+
+  @override
+  String get safetyReview_clearHighlight => 'Kiemelés törlése';
+
+  @override
+  String safetyReview_findingGroupSemantics(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count biztonsági megállapítás',
+      one: '1 biztonsági megállapítás',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get safetySettings_title => 'Biztonsági áttekintés';
 
   @override

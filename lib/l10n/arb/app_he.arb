@@ -6564,6 +6564,16 @@
   },
   "safetyReview_dismiss": "התעלם",
   "safetyReview_restore": "שחזר",
+  "safetyReview_details": "פרטים",
+  "safetyReview_clearHighlight": "ניקוי הדגשה",
+  "safetyReview_findingGroupSemantics": "{count, plural, =1{ממצא בטיחות אחד} other{{count} ממצאי בטיחות}}",
+  "@safetyReview_findingGroupSemantics": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "safetyReview_showDismissed": "{count, plural, =1{הצג תצפית אחת שהוסתרה} other{הצג {count} תצפיות שהוסתרו}}",
   "@safetyReview_showDismissed": {
     "placeholders": {

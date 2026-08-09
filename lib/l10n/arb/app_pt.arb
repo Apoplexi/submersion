@@ -6564,6 +6564,16 @@
   },
   "safetyReview_dismiss": "Dispensar",
   "safetyReview_restore": "Restaurar",
+  "safetyReview_details": "Detalhes",
+  "safetyReview_clearHighlight": "Limpar destaque",
+  "safetyReview_findingGroupSemantics": "{count, plural, =1{1 observação de segurança} other{{count} observações de segurança}}",
+  "@safetyReview_findingGroupSemantics": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "safetyReview_showDismissed": "{count, plural, =1{Mostrar 1 dispensada} other{Mostrar {count} dispensadas}}",
   "@safetyReview_showDismissed": {
     "placeholders": {

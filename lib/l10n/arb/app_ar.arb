@@ -6564,6 +6564,16 @@
   },
   "safetyReview_dismiss": "تجاهل",
   "safetyReview_restore": "استعادة",
+  "safetyReview_details": "التفاصيل",
+  "safetyReview_clearHighlight": "مسح التمييز",
+  "safetyReview_findingGroupSemantics": "{count, plural, =1{ملاحظة سلامة واحدة} other{{count} ملاحظات سلامة}}",
+  "@safetyReview_findingGroupSemantics": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "safetyReview_showDismissed": "{count, plural, =1{إظهار ملاحظة متجاهلة واحدة} other{إظهار {count} ملاحظات متجاهلة}}",
   "@safetyReview_showDismissed": {
     "placeholders": {
