@@ -153,6 +153,43 @@ void main() {
     });
   });
 
+  group('alert level labels', () {
+    const expectedLabels = {
+      BleachingAlertLevel.noStress: 'No thermal stress',
+      BleachingAlertLevel.watch: 'Bleaching watch',
+      BleachingAlertLevel.warning: 'Bleaching warning',
+      BleachingAlertLevel.alertLevel1: 'Bleaching alert level 1',
+      BleachingAlertLevel.alertLevel2: 'Bleaching alert level 2',
+      BleachingAlertLevel.alertLevel3: 'Bleaching alert level 3',
+      BleachingAlertLevel.alertLevel4: 'Bleaching alert level 4',
+      BleachingAlertLevel.alertLevel5: 'Bleaching alert level 5',
+    };
+
+    for (final entry in expectedLabels.entries) {
+      testWidgets('renders ${entry.key.name} as "${entry.value}"', (
+        tester,
+      ) async {
+        await tester.pumpWidget(
+          _harness(
+            health: ReefPart.ok(
+              ReefHealth(
+                sst: 28.0,
+                degreeHeatingWeeks: 5.0,
+                hotspot: 1.2,
+                alertLevel: entry.key,
+                observedAt: DateTime.utc(2026, 8, 1, 12),
+              ),
+            ),
+            habitat: const ReefPart.ok(ReefHabitat(onReef: true)),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.textContaining(entry.value), findsOneWidget);
+      });
+    }
+  });
+
   group('non-ok states', () {
     testWidgets('freshwater message wins over fetched data', (tester) async {
       await tester.pumpWidget(

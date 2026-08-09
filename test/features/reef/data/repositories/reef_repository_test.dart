@@ -87,6 +87,59 @@ void main() {
     },
   );
 
+  test('a successful health fetch round-trips through the cache', () async {
+    var healthCalls = 0;
+    final healthBody = jsonEncode({
+      'table': {
+        'columnNames': [
+          'time',
+          'latitude',
+          'longitude',
+          'CRW_SST',
+          'CRW_SSTANOMALY',
+          'CRW_HOTSPOT',
+          'CRW_DHW',
+          'CRW_DHW_mask',
+        ],
+        'rows': [
+          ['2026-07-23T12:00:00Z', 12.175, -68.275, 30.56, 1.15, 0.96, 3.68, 0],
+        ],
+      },
+    });
+    final counting = MockClient((_) async {
+      healthCalls++;
+      return http.Response(healthBody, 200);
+    });
+
+    final repo = buildRepository(healthClient: counting);
+    final first = await repo.snapshotFor(const GeoPoint(12.16, -68.28));
+    final second = await repo.snapshotFor(const GeoPoint(12.16, -68.28));
+
+    expect(healthCalls, 1);
+    expect(first.health.status, ReefDataStatus.ok);
+    expect(first.health.value!.sst, 30.56);
+    // The cached copy decodes to the same value the network produced.
+    expect(second.health, first.health);
+  });
+
+  test('snapshotFor with a date keys the health cache by that date', () async {
+    var healthCalls = 0;
+    final counting = MockClient((_) async {
+      healthCalls++;
+      return http.Response('down', 503);
+    });
+
+    final repo = buildRepository(healthClient: counting);
+    await repo.snapshotFor(
+      const GeoPoint(12.16, -68.28),
+      date: DateTime.utc(2023, 9, 1),
+    );
+    await repo.snapshotFor(const GeoPoint(12.16, -68.28));
+
+    // Different variants (dated vs current), so both fetch.
+    expect(healthCalls, 2);
+  });
+
   test('habitatFor serves the second call from cache', () async {
     final counting = MockClient((_) async {
       habitatCalls++;
