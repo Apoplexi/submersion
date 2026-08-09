@@ -4938,6 +4938,8 @@
   "surfaceInterval_gasWarning_modExceeded": "ppO₂ {ppO2} على عمق {depth} يتجاوز {limit}. أقصى عمق تشغيل لهذا الخليط هو {mod}.",
   "surfaceInterval_heSemantics": "الهيليوم: {percent}%",
   "surfaceInterval_o2Semantics": "O2: {percent}%",
+  "surfaceInterval_result_beyondHorizon": "يلزم فترة سطح تزيد عن {hours} ساعات. لا يبحث هذا المخطط لمدة أطول من ذلك.",
+  "surfaceInterval_result_beyondHorizonShort": "أكثر من {hours} ساعات",
   "surfaceInterval_result_currentInterval": "الفترة الحالية",
   "surfaceInterval_result_gasUnsafe": "الغاز غير آمن على هذا العمق",
   "surfaceInterval_result_inDeco": "في تخفيف الضغط",

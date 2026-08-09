@@ -16406,6 +16406,16 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String surfaceInterval_result_beyondHorizon(Object hours) {
+    return 'Er is een oppervlakte-interval van meer dan $hours uur nodig. Deze planner zoekt niet verder vooruit.';
+  }
+
+  @override
+  String surfaceInterval_result_beyondHorizonShort(Object hours) {
+    return 'Meer dan $hours uur';
+  }
+
+  @override
   String get surfaceInterval_result_currentInterval => 'Huidig interval';
 
   @override

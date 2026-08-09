@@ -66,7 +66,10 @@ void main() {
         secondTime: 45,
       );
 
-      expect(container.read(siMinimumIntervalProvider).isAchievable, isFalse);
+      expect(
+        container.read(siMinimumIntervalProvider).outcome,
+        SiIntervalOutcome.impossible,
+      );
       expect(
         find.text('6h 0m'),
         findsNothing,
@@ -90,7 +93,8 @@ void main() {
       );
 
       final maxMinutes =
-          container.read(siMinimumIntervalProvider).maxNoStopSeconds ~/ 60;
+          container.read(siMinimumIntervalProvider).cleanTissueNoStopSeconds ~/
+          60;
 
       expect(
         find.textContaining('No surface interval is enough'),
@@ -118,6 +122,36 @@ void main() {
         findsNothing,
         reason: 'waiting longer cannot fix a dive that busts the no-stop limit',
       );
+    });
+  });
+
+  group('result card when the wait runs past the planner horizon', () {
+    testWidgets('says wait longer rather than change the dive', (tester) async {
+      final container = await _pump(tester);
+
+      // Heavily loaded slow tissues: the dive fits on clean tissues, so the
+      // remedy is patience, not a different plan.
+      await _setPlan(
+        tester,
+        container,
+        firstDepth: 60.0,
+        firstTime: 120,
+        secondDepth: 12.0,
+        secondTime: 60,
+      );
+
+      expect(
+        container.read(siMinimumIntervalProvider).outcome,
+        SiIntervalOutcome.beyondHorizon,
+      );
+      expect(find.text('> 6h'), findsOneWidget);
+      expect(find.text('—'), findsNothing);
+      expect(
+        find.textContaining('No surface interval is enough'),
+        findsNothing,
+        reason: 'this dive is possible, it just needs a longer wait',
+      );
+      expect(find.textContaining('More than 6 hours'), findsOneWidget);
     });
   });
 

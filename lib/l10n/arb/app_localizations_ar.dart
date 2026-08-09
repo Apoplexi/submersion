@@ -16236,6 +16236,16 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String surfaceInterval_result_beyondHorizon(Object hours) {
+    return 'يلزم فترة سطح تزيد عن $hours ساعات. لا يبحث هذا المخطط لمدة أطول من ذلك.';
+  }
+
+  @override
+  String surfaceInterval_result_beyondHorizonShort(Object hours) {
+    return 'أكثر من $hours ساعات';
+  }
+
+  @override
   String get surfaceInterval_result_currentInterval => 'الفترة الحالية';
 
   @override

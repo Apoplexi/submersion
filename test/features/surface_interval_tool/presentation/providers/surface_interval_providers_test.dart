@@ -132,11 +132,11 @@ void main() {
       final nitroxInterval = container.read(siMinimumIntervalProvider);
 
       expect(
-        airInterval.isAchievable,
-        isTrue,
+        airInterval.outcome,
+        SiIntervalOutcome.withinHorizon,
         reason: 'scenario must be achievable',
       );
-      expect(nitroxInterval.isAchievable, isTrue);
+      expect(nitroxInterval.outcome, SiIntervalOutcome.withinHorizon);
       expect(airInterval.minutes, greaterThan(0));
       expect(
         nitroxInterval.minutes,

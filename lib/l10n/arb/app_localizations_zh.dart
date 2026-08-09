@@ -15686,6 +15686,16 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String surfaceInterval_result_beyondHorizon(Object hours) {
+    return '需要超过 $hours 小时的水面间隔。此计划器不会搜索更长的时间。';
+  }
+
+  @override
+  String surfaceInterval_result_beyondHorizonShort(Object hours) {
+    return '超过 $hours 小时';
+  }
+
+  @override
   String get surfaceInterval_result_currentInterval => '当前间隔';
 
   @override

@@ -16115,6 +16115,16 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
+  String surfaceInterval_result_beyondHorizon(Object hours) {
+    return 'נדרש מרווח שטח של יותר מ-$hours שעות. מתכנן זה אינו מחפש מעבר לכך.';
+  }
+
+  @override
+  String surfaceInterval_result_beyondHorizonShort(Object hours) {
+    return 'יותר מ-$hours שעות';
+  }
+
+  @override
   String get surfaceInterval_result_currentInterval => 'מרווח נוכחי';
 
   @override

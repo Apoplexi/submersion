@@ -24,19 +24,27 @@ class SurfaceIntervalResult extends ConsumerWidget {
     // and picked a mix they can actually breathe at the planned depth.
     final isSafe = ndlIsSafe && gasIsSafe;
 
-    // Format interval as hours:minutes. An unreachable plan has no interval to
-    // show: a number here would be read as "wait this long and you are fine",
-    // which is exactly the advice that does not apply.
+    const horizonHours = siMaxSearchIntervalMinutes ~/ 60;
+
+    // Format interval as hours:minutes. Neither state without an interval gets
+    // a number here: one would be read as "wait this long and you are fine",
+    // and in one of those states waiting is not the remedy at all.
     final String intervalText;
     final String intervalSemanticsText;
-    if (minInterval.isAchievable) {
-      final hours = minInterval.minutes! ~/ 60;
-      final minutes = minInterval.minutes! % 60;
-      intervalText = hours > 0 ? '${hours}h ${minutes}m' : '$minutes min';
-      intervalSemanticsText = intervalText;
-    } else {
-      intervalText = '—';
-      intervalSemanticsText = context.l10n.surfaceInterval_result_notAchievable;
+    switch (minInterval.outcome) {
+      case SiIntervalOutcome.withinHorizon:
+        final hours = minInterval.minutes! ~/ 60;
+        final minutes = minInterval.minutes! % 60;
+        intervalText = hours > 0 ? '${hours}h ${minutes}m' : '$minutes min';
+        intervalSemanticsText = intervalText;
+      case SiIntervalOutcome.beyondHorizon:
+        intervalText = '> ${horizonHours}h';
+        intervalSemanticsText = context.l10n
+            .surfaceInterval_result_beyondHorizonShort(horizonHours);
+      case SiIntervalOutcome.impossible:
+        intervalText = '—';
+        intervalSemanticsText =
+            context.l10n.surfaceInterval_result_notAchievable;
     }
 
     // Format NDL for display
@@ -60,16 +68,24 @@ class SurfaceIntervalResult extends ConsumerWidget {
         intervalSemanticsText,
         currentText,
         ndlText,
-        // Oxygen is the acute risk, so it leads when both are wrong. An
-        // unreachable plan outranks "wait longer" for the same reason: it tells
-        // the diver to change the plan rather than the clock.
+        // Oxygen is the acute risk, so it leads when both are wrong. The states
+        // without an interval come next, because they say something the plain
+        // "not yet safe" wording does not: change the dive, or expect to wait
+        // past what this planner shows.
         !gasIsSafe
             ? context.l10n.surfaceInterval_result_gasUnsafe
-            : !minInterval.isAchievable
-            ? context.l10n.surfaceInterval_result_notAchievable
-            : ndlIsSafe
-            ? context.l10n.surfaceInterval_result_safeToDive
-            : context.l10n.surfaceInterval_result_notYetSafe,
+            : switch (minInterval.outcome) {
+                SiIntervalOutcome.impossible =>
+                  context.l10n.surfaceInterval_result_notAchievable,
+                SiIntervalOutcome.beyondHorizon =>
+                  context.l10n.surfaceInterval_result_beyondHorizonShort(
+                    horizonHours,
+                  ),
+                SiIntervalOutcome.withinHorizon =>
+                  ndlIsSafe
+                      ? context.l10n.surfaceInterval_result_safeToDive
+                      : context.l10n.surfaceInterval_result_notYetSafe,
+              },
       ),
       child: Card(
         color: isSafe
@@ -154,18 +170,26 @@ class SurfaceIntervalResult extends ConsumerWidget {
                 ),
               ],
 
-              // An unreachable plan is always short on no-deco time, so this
-              // branch covers it too -- but the remedy is a different one, and
-              // telling the diver to wait longer would be dead wrong.
+              // Every state without an interval is also short on no-deco time,
+              // so this branch covers all three -- but each wants different
+              // advice, and telling an impossible plan to wait longer would be
+              // dead wrong.
               if (!ndlIsSafe) ...[
                 const SizedBox(height: 16),
                 _ResultNotice(
                   icon: Icons.info_outline,
-                  message: minInterval.isAchievable
-                      ? context.l10n.surfaceInterval_result_increaseInterval
-                      : context.l10n.surfaceInterval_result_noIntervalHelps(
-                          minInterval.maxNoStopSeconds ~/ 60,
-                        ),
+                  message: switch (minInterval.outcome) {
+                    SiIntervalOutcome.withinHorizon =>
+                      context.l10n.surfaceInterval_result_increaseInterval,
+                    SiIntervalOutcome.beyondHorizon =>
+                      context.l10n.surfaceInterval_result_beyondHorizon(
+                        horizonHours,
+                      ),
+                    SiIntervalOutcome.impossible =>
+                      context.l10n.surfaceInterval_result_noIntervalHelps(
+                        minInterval.cleanTissueNoStopSeconds ~/ 60,
+                      ),
+                  },
                 ),
               ],
             ],

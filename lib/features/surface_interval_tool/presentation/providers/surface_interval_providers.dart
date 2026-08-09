@@ -209,47 +209,69 @@ final siSecondDiveIsSafeProvider = Provider<bool>((ref) {
   return ndl > 0 && ndl >= secondDiveTime * 60;
 });
 
-/// Longest surface interval the tool searches, in minutes.
+/// Longest surface interval the planner searches, in minutes.
 ///
-/// Off-gassing at the surface is asymptotic: tissue tensions decay toward
-/// surface equilibrium, so the second dive's NDL climbs toward the no-stop time
-/// a diver with virgin tissues would get at that depth and mix, and then stops.
-/// Six hours is well past the point where that curve has flattened, so a plan
-/// that does not fit by then does not fit at any interval.
+/// This is a reporting horizon, not a physical limit. Compartment 16 has a 635
+/// minute nitrogen half-time, so a heavily loaded diver is still off-gassing
+/// well past six hours; a plan that does not fit inside the horizon may still
+/// fit after a longer wait. Only the clean-tissue no-stop limit settles whether
+/// a dive is possible at all.
 const int siMaxSearchIntervalMinutes = 360;
+
+/// Why the planner did or did not produce a surface interval.
+enum SiIntervalOutcome {
+  /// A wait inside [siMaxSearchIntervalMinutes] makes the second dive no-stop.
+  withinHorizon,
+
+  /// Off-gassing gets there eventually, but not inside the planner's horizon.
+  /// The remedy is a longer wait, not a different dive.
+  beyondHorizon,
+
+  /// The second dive busts its no-stop limit even on completely clean tissues,
+  /// so no surface interval of any length is enough. The remedy is a shorter or
+  /// shallower dive.
+  impossible,
+}
 
 /// How long a diver must wait on the surface before the planned second dive.
 @immutable
 class SiMinimumInterval {
+  /// Which of the three answers the planner arrived at.
+  final SiIntervalOutcome outcome;
+
   /// Shortest surface interval, in minutes, after which the second dive fits
-  /// inside its no-decompression limit. Null when no interval is enough.
+  /// inside its no-decompression limit.
+  ///
+  /// Set only for [SiIntervalOutcome.withinHorizon]; null otherwise, because
+  /// the planner has no honest number to offer in those states.
   final int? minutes;
 
-  /// The longest no-stop second dive that is reachable at all, in seconds --
-  /// the NDL once off-gassing has run its course.
+  /// No-stop limit at the second dive's depth and mix on clean tissues, in
+  /// seconds.
   ///
-  /// This is the number that explains an unreachable plan: waiting cannot buy
-  /// more bottom time than this, so the diver has to shorten the second dive or
-  /// make it shallower.
-  final int maxNoStopSeconds;
+  /// Surface time works toward this ceiling and can never beat it, which is
+  /// what separates "wait longer" from "change the dive". It depends only on
+  /// the second dive's depth and mix, not on how loaded the first dive left the
+  /// diver.
+  final int cleanTissueNoStopSeconds;
 
   const SiMinimumInterval({
+    required this.outcome,
     required this.minutes,
-    required this.maxNoStopSeconds,
+    required this.cleanTissueNoStopSeconds,
   });
 
-  /// Whether any surface interval turns the planned second dive into a no-stop
-  /// dive.
-  bool get isAchievable => minutes != null;
+  /// Whether the planner produced a concrete interval to wait.
+  bool get hasInterval => minutes != null;
 }
 
 /// Minimum surface interval needed before the planned second dive.
 ///
-/// Binary searches for the shortest wait whose NDL covers the planned dive. The
-/// upper bound is tested first, because the search alone cannot tell "no wait
-/// is long enough" apart from "the answer is exactly the bound" -- it used to
-/// return the bound either way, so an impossible plan was reported to the diver
-/// as a plausible six hour wait.
+/// Binary searches for the shortest wait whose NDL covers the planned dive, but
+/// only after settling two questions the search itself cannot answer. The
+/// search returns its own bounds when it finds nothing, so on its own it cannot
+/// tell "no wait is long enough" from "the answer is exactly the bound" -- that
+/// is what reported an impossible plan as a plausible six hour wait.
 final siMinimumIntervalProvider = Provider<SiMinimumInterval>((ref) {
   final postDiveCompartments = ref.watch(siPostDiveCompartmentsProvider);
   final secondDiveDepth = ref.watch(siSecondDiveDepthProvider);
@@ -279,18 +301,44 @@ final siMinimumIntervalProvider = Provider<SiMinimumInterval>((ref) {
     );
   }
 
-  // The ceiling on what waiting can buy. calculateNdl signals a standing deco
+  // Surface off-gassing drives every compartment toward equilibrium with
+  // surface air, so the second dive's NDL rises toward -- and never past -- the
+  // no-stop time a diver with clean tissues would get here. That makes the
+  // clean-tissue NDL an exact test for "no surface interval can ever be
+  // enough", and unlike a fixed horizon it does not depend on how far the slow
+  // compartments still have to unload. calculateNdl signals a standing deco
   // obligation with -1, which is not a duration, so floor it at zero.
-  final maxNoStopSeconds = math.max(0, ndlAfter(siMaxSearchIntervalMinutes));
+  final cleanTissue = BuhlmannAlgorithm(
+    gfLow: settings.gfLowDecimal,
+    gfHigh: settings.gfHighDecimal,
+  );
+  final cleanTissueNoStopSeconds = math.max(
+    0,
+    cleanTissue.calculateNdl(depthMeters: secondDiveDepth, fN2: fN2, fHe: fHe),
+  );
 
-  if (maxNoStopSeconds < requiredNdlSeconds) {
-    return SiMinimumInterval(minutes: null, maxNoStopSeconds: maxNoStopSeconds);
+  SiMinimumInterval result(SiIntervalOutcome outcome, int? minutes) {
+    return SiMinimumInterval(
+      outcome: outcome,
+      minutes: minutes,
+      cleanTissueNoStopSeconds: cleanTissueNoStopSeconds,
+    );
+  }
+
+  if (requiredNdlSeconds > cleanTissueNoStopSeconds) {
+    return result(SiIntervalOutcome.impossible, null);
+  }
+
+  // The dive does fit on clean tissues, so waiting is the right remedy -- but
+  // the diver may still need longer than the planner looks ahead.
+  if (ndlAfter(siMaxSearchIntervalMinutes) < requiredNdlSeconds) {
+    return result(SiIntervalOutcome.beyondHorizon, null);
   }
 
   // A diver who can roll straight into the next dive should not be handed a
   // one minute wait, which is what the bare search converges to.
   if (ndlAfter(0) >= requiredNdlSeconds) {
-    return SiMinimumInterval(minutes: 0, maxNoStopSeconds: maxNoStopSeconds);
+    return result(SiIntervalOutcome.withinHorizon, 0);
   }
 
   // Invariant: low is known to be too short, high is known to be sufficient.
@@ -307,7 +355,7 @@ final siMinimumIntervalProvider = Provider<SiMinimumInterval>((ref) {
     }
   }
 
-  return SiMinimumInterval(minutes: high, maxNoStopSeconds: maxNoStopSeconds);
+  return result(SiIntervalOutcome.withinHorizon, high);
 });
 
 /// Data class for a single point on the tissue recovery chart.

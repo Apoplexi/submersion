@@ -27774,6 +27774,18 @@ abstract class AppLocalizations {
   /// **'O2: {percent}%'**
   String surfaceInterval_o2Semantics(Object percent);
 
+  /// Explains that the second dive does fit on clean tissues but needs a longer surface interval than the planner searches
+  ///
+  /// In en, this message translates to:
+  /// **'More than {hours} hours of surface interval is needed. This planner does not search further ahead.'**
+  String surfaceInterval_result_beyondHorizon(Object hours);
+
+  /// Shown in place of a minimum surface interval when the required wait is longer than the planner searches
+  ///
+  /// In en, this message translates to:
+  /// **'More than {hours} hours'**
+  String surfaceInterval_result_beyondHorizonShort(Object hours);
+
   /// Label for the current surface interval column
   ///
   /// In en, this message translates to:

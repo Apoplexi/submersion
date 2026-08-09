@@ -16612,6 +16612,16 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String surfaceInterval_result_beyondHorizon(Object hours) {
+    return 'Un intervalle de surface de plus de $hours heures est nécessaire. Ce planificateur ne cherche pas au-delà.';
+  }
+
+  @override
+  String surfaceInterval_result_beyondHorizonShort(Object hours) {
+    return 'Plus de $hours heures';
+  }
+
+  @override
   String get surfaceInterval_result_currentInterval => 'Intervalle actuel';
 
   @override
