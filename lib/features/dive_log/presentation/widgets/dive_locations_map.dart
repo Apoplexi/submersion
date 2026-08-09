@@ -80,6 +80,17 @@ class _DiveLocationsMapState extends ConsumerState<DiveLocationsMap> {
   MapController get _effectiveController =>
       widget.controller ?? _fallbackController;
 
+  bool _mapReady = false;
+
+  /// The run list the camera is framed on, by identity.
+  ///
+  /// SurfaceGpsSection mounts this widget while trackForDiveProvider is still
+  /// AsyncLoading, so the first layout sees trackRuns == null and latches a
+  /// pin-only fit that saturates maxZoom 16 - a multi-km boat track then
+  /// renders almost entirely offscreen, and the full-track chip could never
+  /// move the camera, because initialCameraFit applies once.
+  List<TrackRun>? _framedOn;
+
   @override
   Widget build(BuildContext context) {
     final entry = widget.entry;
@@ -170,6 +181,16 @@ class _DiveLocationsMapState extends ConsumerState<DiveLocationsMap> {
         ),
     ];
 
+    if (_mapReady && !identical(_framedOn, trackRuns)) {
+      _framedOn = trackRuns;
+      final target = fit;
+      if (target != null) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) _effectiveController.fitCamera(target);
+        });
+      }
+    }
+
     return Stack(
       children: [
         TrackpadZoomMap(
@@ -179,6 +200,10 @@ class _DiveLocationsMapState extends ConsumerState<DiveLocationsMap> {
             options: MapOptions(
               initialCenter: center,
               initialZoom: zoom,
+              onMapReady: () {
+                _mapReady = true;
+                _framedOn = trackRuns;
+              },
               initialCameraFit: fit,
               interactionOptions: InteractionOptions(
                 flags: interactive ? InteractiveFlag.all : InteractiveFlag.none,

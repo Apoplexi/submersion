@@ -361,6 +361,15 @@ class _TrackMapState extends ConsumerState<_TrackMap> {
   final LayerHitNotifier<int> _hitNotifier = ValueNotifier(null);
   ({GpsTrackPoint point, double speedMps})? _inspected;
 
+  bool _mapReady = false;
+
+  /// The point list the camera is currently framed on, by identity.
+  ///
+  /// Every geometry list comes from a List.unmodifiable, so a trim or a
+  /// finished simplify always yields a NEW instance - which is exactly the
+  /// signal that the framing is stale.
+  List<GpsTrackPoint>? _framedOn;
+
   String get trackId => widget.trackId;
   List<GpsTrackPoint> get fallbackPoints => widget.fallbackPoints;
   MapController get controller => widget.controller;
@@ -369,6 +378,22 @@ class _TrackMapState extends ConsumerState<_TrackMap> {
   void dispose() {
     _hitNotifier.dispose();
     super.dispose();
+  }
+
+  /// Re-frames the camera when the drawn geometry changes identity.
+  ///
+  /// initialCameraFit only applies on first layout, so without this a trim,
+  /// a filter change, or geometry arriving after the first AsyncLoading frame
+  /// all leave the map showing the previous extent.
+  void _scheduleRefitIfNeeded(
+    List<GpsTrackPoint> drawable,
+    TrackCamera camera,
+  ) {
+    if (!_mapReady || identical(_framedOn, drawable)) return;
+    _framedOn = drawable;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) camera.applyTo(controller);
+    });
   }
 
   /// Resolves a tap on the polyline back to a real recorded fix.
@@ -403,6 +428,7 @@ class _TrackMapState extends ConsumerState<_TrackMap> {
     final camera = TrackCamera.forPoints(drawable)!;
 
     final inspected = _inspected;
+    _scheduleRefitIfNeeded(drawable, camera);
 
     return Stack(
       children: [
@@ -412,6 +438,10 @@ class _TrackMapState extends ConsumerState<_TrackMap> {
             child: FlutterMap(
               mapController: controller,
               options: MapOptions(
+                onMapReady: () {
+                  _mapReady = true;
+                  _framedOn = drawable;
+                },
                 initialCameraFit: camera.fit,
                 initialCenter: camera.center ?? const LatLng(0, 0),
                 initialZoom: camera.zoom ?? 13.0,

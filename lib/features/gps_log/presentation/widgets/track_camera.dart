@@ -20,6 +20,25 @@ class TrackCamera {
   final LatLng? center;
   final double? zoom;
 
+  /// Re-frames an already-mounted map.
+  ///
+  /// MapOptions.initialCameraFit is applied ONCE, behind a latch that only
+  /// reopens on a size change, and didUpdateWidget preserves the camera via
+  /// camera.withOptions. So a new fit passed as an option after first layout
+  /// does nothing: the filter changing, a trim landing, or the track arriving
+  /// after an AsyncLoading frame would all leave the old framing. Every other
+  /// map in this repo drives the camera imperatively for the same reason.
+  void applyTo(MapController controller) {
+    final f = fit;
+    if (f != null) {
+      controller.fitCamera(f);
+      return;
+    }
+    final c = center;
+    final z = zoom;
+    if (c != null && z != null) controller.move(c, z);
+  }
+
   /// Null when there is nothing to frame.
   static TrackCamera? forPoints(
     List<GpsTrackPoint> points, {

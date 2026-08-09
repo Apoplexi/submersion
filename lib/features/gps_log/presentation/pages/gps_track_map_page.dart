@@ -125,7 +125,7 @@ class _TrackListPane extends ConsumerWidget {
   }
 }
 
-class _OverviewMap extends ConsumerWidget {
+class _OverviewMap extends ConsumerStatefulWidget {
   const _OverviewMap({
     required this.tracks,
     required this.selectedId,
@@ -137,7 +137,22 @@ class _OverviewMap extends ConsumerWidget {
   final MapController controller;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<_OverviewMap> createState() => _OverviewMapState();
+}
+
+class _OverviewMapState extends ConsumerState<_OverviewMap> {
+  bool _mapReady = false;
+
+  /// Signature of the framing currently applied, so a filter change or a
+  /// late-arriving simplify re-frames but an unrelated rebuild does not.
+  String? _framedOn;
+
+  List<GpsTrack> get tracks => widget.tracks;
+  String? get selectedId => widget.selectedId;
+  MapController get controller => widget.controller;
+
+  @override
+  Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
 
     // Unselected tracks are muted and drawn first; the selected one is drawn
@@ -174,11 +189,27 @@ class _OverviewMap extends ConsumerWidget {
       return const SizedBox.shrink();
     }
 
+    // Re-frame when the visible set changes: the date filter narrowing, a
+    // selection promoting a track, or a per-track simplify finishing. A
+    // FutureProvider reload keeps its previous value, so the map never
+    // unmounts and initialCameraFit would never apply again.
+    final signature = '${tracks.length}:${allPoints.length}:$selectedId';
+    if (_mapReady && _framedOn != signature) {
+      _framedOn = signature;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) camera.applyTo(controller);
+      });
+    }
+
     return TrackpadZoomMap(
       controller: controller,
       child: FlutterMap(
         mapController: controller,
         options: MapOptions(
+          onMapReady: () {
+            _mapReady = true;
+            _framedOn = signature;
+          },
           initialCameraFit: camera.fit,
           initialCenter: camera.center ?? const LatLng(0, 0),
           initialZoom: camera.zoom ?? 13.0,
