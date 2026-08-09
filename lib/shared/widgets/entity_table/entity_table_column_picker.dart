@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:submersion/core/providers/provider.dart';
+import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:submersion/shared/constants/entity_field.dart';
 import 'package:submersion/shared/models/entity_table_config.dart';
 import 'package:submersion/shared/providers/entity_table_config_providers.dart';
@@ -89,11 +90,14 @@ class EntityTableColumnPicker<F extends EntityField> extends ConsumerWidget {
               child: Row(
                 children: [
                   Expanded(
-                    child: Text('Columns', style: theme.textTheme.titleLarge),
+                    child: Text(
+                      context.l10n.columnConfig_columns,
+                      style: theme.textTheme.titleLarge,
+                    ),
                   ),
                   TextButton(
                     onPressed: () => Navigator.of(context).pop(),
-                    child: const Text('Done'),
+                    child: Text(context.l10n.columnConfig_done),
                   ),
                 ],
               ),
@@ -110,7 +114,7 @@ class EntityTableColumnPicker<F extends EntityField> extends ConsumerWidget {
                   Padding(
                     padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
                     child: Text(
-                      'VISIBLE COLUMNS',
+                      context.l10n.columnConfig_visibleColumns.toUpperCase(),
                       style: theme.textTheme.labelSmall?.copyWith(
                         color: theme.colorScheme.onSurfaceVariant,
                         letterSpacing: 0.8,
@@ -170,7 +174,7 @@ class EntityTableColumnPicker<F extends EntityField> extends ConsumerWidget {
                   Padding(
                     padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
                     child: Text(
-                      'AVAILABLE FIELDS',
+                      context.l10n.columnConfig_availableFields.toUpperCase(),
                       style: theme.textTheme.labelSmall?.copyWith(
                         color: theme.colorScheme.onSurfaceVariant,
                         letterSpacing: 0.8,

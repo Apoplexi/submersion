@@ -457,5 +457,17 @@ void main() {
       expect(find.text('CORE'), findsNothing);
       expect(find.text('DETAILS'), findsNothing);
     });
+
+    testWidgets('sheet labels follow the app locale', (tester) async {
+      await tester.pumpWidget(_buildPickerLauncher(locale: const Locale('de')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Open Picker'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Spalten'), findsOneWidget);
+      expect(find.text('Fertig'), findsOneWidget);
+      expect(find.text('SICHTBARE SPALTEN'), findsOneWidget);
+      expect(find.text('VERFÜGBARE FELDER'), findsOneWidget);
+    });
   });
 }
