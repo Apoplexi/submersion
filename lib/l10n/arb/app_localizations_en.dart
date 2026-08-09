@@ -2424,28 +2424,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get preDive_start_begin => 'Begin';
 
   @override
-  String get preDive_section_title => 'Pre-Dive Check';
-
-  @override
-  String get preDive_section_link => 'Link a checklist session';
-
-  @override
-  String get preDive_section_unlink => 'Unlink';
-
-  @override
-  String get preDive_section_run => 'Run pre-dive checklist';
-
-  @override
-  String get preDive_section_noUnlinked => 'No unlinked checklist sessions';
-
-  @override
-  String get diveDetailSection_preDiveChecklist_name => 'Pre-Dive Check';
-
-  @override
-  String get diveDetailSection_preDiveChecklist_description =>
-      'Linked pre-dive checklist session';
-
-  @override
   String get diveLog_listPage_bottomSheet_preDiveChecklist =>
       'Start pre-dive checklist';
 

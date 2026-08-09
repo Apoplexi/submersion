@@ -4175,48 +4175,6 @@ abstract class AppLocalizations {
   /// **'Begin'**
   String get preDive_start_begin;
 
-  /// No description provided for @preDive_section_title.
-  ///
-  /// In en, this message translates to:
-  /// **'Pre-Dive Check'**
-  String get preDive_section_title;
-
-  /// No description provided for @preDive_section_link.
-  ///
-  /// In en, this message translates to:
-  /// **'Link a checklist session'**
-  String get preDive_section_link;
-
-  /// No description provided for @preDive_section_unlink.
-  ///
-  /// In en, this message translates to:
-  /// **'Unlink'**
-  String get preDive_section_unlink;
-
-  /// No description provided for @preDive_section_run.
-  ///
-  /// In en, this message translates to:
-  /// **'Run pre-dive checklist'**
-  String get preDive_section_run;
-
-  /// No description provided for @preDive_section_noUnlinked.
-  ///
-  /// In en, this message translates to:
-  /// **'No unlinked checklist sessions'**
-  String get preDive_section_noUnlinked;
-
-  /// No description provided for @diveDetailSection_preDiveChecklist_name.
-  ///
-  /// In en, this message translates to:
-  /// **'Pre-Dive Check'**
-  String get diveDetailSection_preDiveChecklist_name;
-
-  /// No description provided for @diveDetailSection_preDiveChecklist_description.
-  ///
-  /// In en, this message translates to:
-  /// **'Linked pre-dive checklist session'**
-  String get diveDetailSection_preDiveChecklist_description;
-
   /// No description provided for @diveLog_listPage_bottomSheet_preDiveChecklist.
   ///
   /// In en, this message translates to:

@@ -42,7 +42,6 @@ import 'package:submersion/features/dive_log/presentation/providers/profile_anal
 import 'package:submersion/features/dive_log/presentation/pages/fullscreen_profile_page.dart';
 import 'package:submersion/features/dive_log/presentation/utils/sac_normalization.dart';
 import 'package:submersion/features/planner/presentation/providers/plan_overlay_provider.dart';
-import 'package:submersion/features/pre_dive/presentation/widgets/dive_pre_dive_section.dart';
 import 'package:submersion/shared/widgets/export_destination_sheet.dart';
 import 'package:submersion/shared/widgets/master_detail/detail_scroll_retainer.dart';
 import 'package:submersion/shared/widgets/master_detail/responsive_breakpoints.dart';
@@ -470,11 +469,6 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
           const SizedBox(height: 24),
           _buildCustomFieldsSection(context, dive),
         ];
-      },
-      // Always renders: it is also the affordance for linking/running a
-      // pre-dive checklist, and stays one row tall without a session.
-      DiveDetailSectionId.preDiveChecklist: () {
-        return [const SizedBox(height: 24), DivePreDiveSection(dive: dive)];
       },
       DiveDetailSectionId.dataSources: () {
         return [
