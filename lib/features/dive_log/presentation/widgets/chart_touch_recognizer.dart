@@ -48,7 +48,11 @@ class ChartTouchClaimRecognizer extends OneSequenceGestureRecognizer {
     startTrackingPointer(event.pointer, event.transform);
     if (_downPositions.isEmpty) _zoomedAtFirstDown = isZoomed();
     _downPositions[event.pointer] = event.position;
-    if (_downPositions.length == 2 && !_claimed) {
+    // Every pointer joins its own fresh arena, so each one landing into a
+    // multi-touch gesture must be resolved explicitly - including pointers
+    // joining an already-claimed drag or pinch (resolve() only touches
+    // still-pending entries, so repeating it is safe).
+    if (_downPositions.length >= 2) {
       resolve(GestureDisposition.accepted);
     }
   }

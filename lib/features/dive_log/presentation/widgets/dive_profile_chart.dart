@@ -1909,9 +1909,12 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
                 _activePointerCount++;
                 _activePointerKind = event.kind;
                 _lastPointerLocal = event.localPosition;
-                if (event.kind != PointerDeviceKind.touch) return;
-                _touchPositions[event.pointer] = event.localPosition;
-                if (_touchPositions.length == 1) {
+                if (event.kind == PointerDeviceKind.touch) {
+                  _touchPositions[event.pointer] = event.localPosition;
+                }
+                // Tap bookkeeping is kind-agnostic: a mouse double-click
+                // zooms exactly like a touch double-tap.
+                if (_activePointerCount == 1) {
                   _tapDownPosition = event.localPosition;
                   _tapMoved = false;
                   final lastUp = _lastTapUpStamp;
@@ -1933,12 +1936,12 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
                 _lastPointerLocal = event.localPosition;
                 if (event.kind == PointerDeviceKind.touch) {
                   _touchPositions[event.pointer] = event.localPosition;
-                  if (!_tapMoved &&
-                      (event.localPosition - _tapDownPosition).distance >
-                          kTouchSlop) {
-                    _tapMoved = true;
-                    _doubleTapArmed = false;
-                  }
+                }
+                if (!_tapMoved &&
+                    (event.localPosition - _tapDownPosition).distance >
+                        kTouchSlop) {
+                  _tapMoved = true;
+                  _doubleTapArmed = false;
                 }
                 if (prev == null) return;
                 final intent = chartDragIntent(
@@ -1979,14 +1982,15 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
               onPointerUp: (event) {
                 if (_activePointerCount > 0) _activePointerCount--;
                 _lastPointerLocal = null;
-                if (event.kind != PointerDeviceKind.touch) return;
-                _touchPositions.remove(event.pointer);
-                if (_pinchPointers.contains(event.pointer)) {
-                  _touchPositions.length >= 2
-                      ? _beginPinch()
-                      : _pinchPointers = const [];
+                if (event.kind == PointerDeviceKind.touch) {
+                  _touchPositions.remove(event.pointer);
+                  if (_pinchPointers.contains(event.pointer)) {
+                    _touchPositions.length >= 2
+                        ? _beginPinch()
+                        : _pinchPointers = const [];
+                  }
                 }
-                if (_touchPositions.isEmpty && !_tapMoved) {
+                if (_activePointerCount == 0 && !_tapMoved) {
                   if (_doubleTapArmed) {
                     _doubleTapArmed = false;
                     _lastTapUpStamp = null;

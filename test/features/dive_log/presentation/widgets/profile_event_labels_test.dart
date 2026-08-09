@@ -156,6 +156,16 @@ void main() {
     expect(r0.overlaps(r1), isFalse);
   });
 
+  test('a plot shorter than the text does not throw (transient layouts)', () {
+    final placements = placeEventLabels(
+      [spec(xPx: 150, anchorYPx: 4, textHeight: 12)],
+      plotWidth: plotWidth,
+      plotHeight: 8,
+    );
+    expect(placements, hasLength(1));
+    expect(placements.first.topPx, 0);
+  });
+
   test('output length and order always match the input', () {
     final specs = [
       spec(xPx: 250, anchorYPx: 20),

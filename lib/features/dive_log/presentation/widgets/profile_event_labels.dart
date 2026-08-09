@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import 'dart:ui';
 
 /// Geometry of one event label candidate, in plot-rect pixel space.
@@ -94,7 +95,9 @@ List<EventLabelPlacement> placeEventLabels(
       left = spec.xPx - spec.textWidth / 2;
     }
 
-    final maxTop = plotHeight - spec.textHeight;
+    // Floor at 0: a transient layout can hand us a plot shorter than the
+    // text, and clamp() throws when its bounds are inverted.
+    final maxTop = math.max(0.0, plotHeight - spec.textHeight);
     bool collides(double top) {
       final rect = Rect.fromLTWH(left, top, spec.textWidth, spec.textHeight);
       return placedRects.any(rect.overlaps);

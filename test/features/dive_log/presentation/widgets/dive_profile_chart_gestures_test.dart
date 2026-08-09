@@ -193,6 +193,28 @@ void main() {
     );
   });
 
+  testWidgets('a mouse double-click zooms too (desktop parity)', (
+    tester,
+  ) async {
+    _ignoreOverflowErrors();
+    await tester.pumpWidget(_buildChart());
+    await tester.pumpAndSettle();
+
+    final center = tester.getCenter(find.byType(LineChart).first);
+    final fullSpan = _visibleSpan(tester);
+
+    final g1 = await tester.createGesture(kind: PointerDeviceKind.mouse);
+    await g1.down(center, timeStamp: Duration.zero);
+    await g1.up(timeStamp: const Duration(milliseconds: 40));
+    await tester.pump();
+    final g2 = await tester.createGesture(kind: PointerDeviceKind.mouse);
+    await g2.down(center, timeStamp: const Duration(milliseconds: 140));
+    await g2.up(timeStamp: const Duration(milliseconds: 180));
+    await tester.pump();
+
+    expect(_visibleSpan(tester), lessThan(fullSpan));
+  });
+
   testWidgets('two slow taps do not zoom', (tester) async {
     await tester.pumpWidget(_buildChart());
     await tester.pumpAndSettle();

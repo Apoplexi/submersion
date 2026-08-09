@@ -145,6 +145,30 @@ void main() {
     expect(releases, 1);
   });
 
+  testWidgets('a second finger joining an already-claimed drag is resolved '
+      'too; the stand-in pan never engages', (tester) async {
+    zoomed = true;
+    await tester.pumpWidget(harness());
+
+    // One-finger drag past slop: claimed (pan-while-zoomed).
+    final first = await tester.startGesture(const Offset(150, 200));
+    await first.moveBy(const Offset(30, 0));
+    await tester.pump();
+    expect(claims, 1);
+
+    // Second finger lands into the claimed gesture and moves: its own arena
+    // must be resolved for us, so the stand-in pan can never win it.
+    final second = await tester.startGesture(const Offset(250, 200));
+    await second.moveBy(const Offset(50, 0));
+    await tester.pump();
+    expect(standInPans, 0);
+
+    await first.up();
+    await second.up();
+    await tester.pump();
+    expect(releases, 1);
+  });
+
   testWidgets('a tap is never claimed, even while zoomed; the stand-in tap '
       'fires', (tester) async {
     zoomed = true;
