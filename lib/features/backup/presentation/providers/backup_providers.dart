@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/core/services/database_service.dart';
+import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/core/services/sync/library_epoch_store.dart';
 import 'package:submersion/core/services/sync/post_restore_sync_store.dart';
 import 'package:submersion/features/backup/data/repositories/backup_preferences.dart';
@@ -15,6 +16,7 @@ import 'package:submersion/core/services/sync/crypto/sync_encryption_service.dar
 import 'package:submersion/features/backup/domain/exceptions/backup_encrypted_exception.dart';
 import 'package:submersion/features/backup/domain/entities/backup_settings.dart';
 import 'package:submersion/features/backup/domain/entities/restore_mode.dart';
+import 'package:submersion/features/backup/presentation/providers/post_restore_safety_review.dart';
 import 'package:submersion/features/divers/presentation/providers/diver_providers.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/features/settings/presentation/providers/sync_providers.dart';
@@ -166,6 +168,16 @@ final backupSettingsProvider =
 /// Status of a backup operation
 enum BackupOperationStatus { idle, inProgress, success, restoreComplete, error }
 
+/// Progress of the whole-library safety review sweep that runs at the end of a
+/// restore. Structured rather than a pre-formatted string so the restore
+/// barrier can render it in the user's language.
+class SafetyReviewSweepProgress {
+  final int done;
+  final int total;
+
+  const SafetyReviewSweepProgress({required this.done, required this.total});
+}
+
 /// State for backup/restore operations
 class BackupOperationState {
   final BackupOperationStatus status;
@@ -180,11 +192,15 @@ class BackupOperationState {
   /// this flag, not `status`.
   final bool isRestoring;
 
+  /// Non-null only while the post-restore safety sweep is running.
+  final SafetyReviewSweepProgress? sweepProgress;
+
   const BackupOperationState({
     this.status = BackupOperationStatus.idle,
     this.message,
     this.lastRecord,
     this.isRestoring = false,
+    this.sweepProgress,
   });
 
   BackupOperationState copyWith({
@@ -192,12 +208,16 @@ class BackupOperationState {
     String? message,
     BackupRecord? lastRecord,
     bool? isRestoring,
+    SafetyReviewSweepProgress? sweepProgress,
   }) {
     return BackupOperationState(
       status: status ?? this.status,
       message: message ?? this.message,
       lastRecord: lastRecord ?? this.lastRecord,
       isRestoring: isRestoring ?? this.isRestoring,
+      // Deliberately not ??-merged: a null must be able to clear the progress
+      // when the sweep ends.
+      sweepProgress: sweepProgress,
     );
   }
 }
@@ -205,7 +225,9 @@ class BackupOperationState {
 /// Notifier managing backup/restore/delete operations with state transitions
 class BackupOperationNotifier extends StateNotifier<BackupOperationState> {
   final Ref _ref;
+  final _log = LoggerService.forClass(BackupOperationNotifier);
   Timer? _desktopBackupTimer;
+  bool _sweepSkipped = false;
 
   BackupOperationNotifier(this._ref) : super(const BackupOperationState()) {
     _startDesktopTimerIfNeeded();
@@ -219,6 +241,49 @@ class BackupOperationNotifier extends StateNotifier<BackupOperationState> {
     await realignActiveDiverAfterDataReplace(
       _ref.read(sharedPreferencesProvider),
     );
+  }
+
+  /// Stops the post-restore safety sweep at the next dive boundary.
+  ///
+  /// Lossless: unswept dives still compute lazily when opened, and
+  /// Settings > Safety > "Analyze all dives" remains available.
+  void skipSafetyReviewSweep() {
+    _sweepSkipped = true;
+  }
+
+  /// Analyze the restored library so safety findings and dive-list badges are
+  /// present immediately, instead of only after each dive is opened.
+  ///
+  /// Deliberately cannot fail the restore: by the time this runs the database
+  /// swap and the sync re-baseline have already succeeded, so a sweep error is
+  /// logged and swallowed rather than turning a completed restore into a
+  /// failed one. isRestoring stays true so the barrier keeps the app blocked.
+  Future<void> _runPostRestoreSafetyReview() async {
+    _sweepSkipped = false;
+    try {
+      await _ref
+          .read(postRestoreSafetyReviewProvider)
+          .run(
+            onProgress: (done, total) {
+              if (!mounted || total == 0) return;
+              state = BackupOperationState(
+                status: BackupOperationStatus.inProgress,
+                isRestoring: true,
+                sweepProgress: SafetyReviewSweepProgress(
+                  done: done,
+                  total: total,
+                ),
+              );
+            },
+            isCancelled: () => _sweepSkipped,
+          );
+    } catch (e, st) {
+      _log.error(
+        'Post-restore safety review failed; the restore itself is unaffected',
+        error: e,
+        stackTrace: st,
+      );
+    }
   }
 
   /// Perform a manual backup
@@ -269,6 +334,7 @@ class BackupOperationNotifier extends StateNotifier<BackupOperationState> {
         onMigrationProgress: _onRestoreMigrationProgress,
       );
       await _syncActiveDiverAfterRestore();
+      await _runPostRestoreSafetyReview();
       state = const BackupOperationState(
         status: BackupOperationStatus.restoreComplete,
       );
@@ -404,6 +470,7 @@ class BackupOperationNotifier extends StateNotifier<BackupOperationState> {
         onMigrationProgress: _onRestoreMigrationProgress,
       );
       await _syncActiveDiverAfterRestore();
+      await _runPostRestoreSafetyReview();
       state = const BackupOperationState(
         status: BackupOperationStatus.restoreComplete,
       );
