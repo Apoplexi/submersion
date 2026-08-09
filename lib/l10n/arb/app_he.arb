@@ -3515,6 +3515,7 @@
   "gpsLogger_stopButton": "עצור הקלטה",
   "gpsLogger_stripStatus": "מקליט מסלול GPS · {count, plural, one{נקודה אחת} two{שתי נקודות} other{{count} נקודות}}",
   "gpsLogger_trackSubtitle": "{count, plural, one{נקודה אחת} two{שתי נקודות} other{{count} נקודות}}, {duration}",
+  "gpsLogger_trackSubtitleTrimmed": "נחתך, {duration}",
   "gpsLogger_tracksHeader": "מסלולים שהוקלטו",
   "gpsTrack_action_trim": "חיתוך...",
   "gpsTrack_action_split": "פיצול...",

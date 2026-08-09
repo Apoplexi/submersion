@@ -5,15 +5,18 @@ import 'package:intl/intl.dart';
 import 'package:latlong2/latlong.dart';
 
 import 'package:submersion/core/providers/provider.dart';
+import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/gps_log/data/repositories/track_geometry_cache_repository.dart';
 import 'package:submersion/features/gps_log/domain/entities/gps_track.dart';
 import 'package:submersion/features/gps_log/presentation/providers/gps_track_map_providers.dart';
 import 'package:submersion/features/gps_log/presentation/widgets/gps_track_thumbnail.dart';
 import 'package:submersion/features/gps_log/presentation/widgets/track_camera.dart';
+import 'package:submersion/features/gps_log/presentation/widgets/track_row_labels.dart';
 import 'package:submersion/features/maps/presentation/widgets/map_attribution.dart';
 import 'package:submersion/features/maps/presentation/widgets/map_compass_button.dart';
 import 'package:submersion/features/maps/presentation/widgets/submersion_tile_layer.dart';
 import 'package:submersion/features/maps/presentation/widgets/trackpad_zoom_map.dart';
+import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:submersion/shared/providers/map_list_selection_provider.dart';
 import 'package:submersion/shared/widgets/map_list_layout/map_list_scaffold.dart';
@@ -114,6 +117,7 @@ class _TrackListPane extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
+    final units = UnitFormatter(ref.watch(settingsProvider));
     final notice = truncatedNotice;
     return ListView.builder(
       // The notice occupies index 0 so it scrolls with the rows rather than
@@ -143,13 +147,10 @@ class _TrackListPane extends ConsumerWidget {
           selected: track.id == selectedId,
           leading: GpsTrackThumbnail(trackId: track.id),
           minLeadingWidth: kTrackThumbnailWidth,
-          // Wall-clock-as-UTC: render the UTC components directly.
-          title: Text(
-            DateFormat.yMMMd().add_jm().format(
-              DateTime.fromMillisecondsSinceEpoch(track.startTime, isUtc: true),
-            ),
+          title: Text(formatTrackStart(units, track)),
+          subtitle: Text(
+            formatTrackSubtitle(l10n, track, formatTrackDuration(track)),
           ),
-          subtitle: Text('${l10n.gpsTrack_stats_fixes}: ${track.pointCount}'),
           onTap: () => ref
               .read(mapListSelectionProvider(_kSectionKey).notifier)
               .select(track.id),

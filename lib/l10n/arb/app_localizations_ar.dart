@@ -19686,6 +19686,11 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String gpsLogger_trackSubtitleTrimmed(String duration) {
+    return 'مقتطع، $duration';
+  }
+
+  @override
   String get gpsLogger_tracksHeader => 'المسارات المسجّلة';
 
   @override

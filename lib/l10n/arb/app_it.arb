@@ -3515,6 +3515,7 @@
   "gpsLogger_stopButton": "Interrompi registrazione",
   "gpsLogger_stripStatus": "Registrazione traccia GPS · {count, plural, one{{count} punto} other{{count} punti}}",
   "gpsLogger_trackSubtitle": "{count, plural, one{{count} punto} other{{count} punti}}, {duration}",
+  "gpsLogger_trackSubtitleTrimmed": "Ritagliata, {duration}",
   "gpsLogger_tracksHeader": "Tracce registrate",
   "gpsTrack_action_trim": "Ritaglia...",
   "gpsTrack_action_split": "Dividi...",

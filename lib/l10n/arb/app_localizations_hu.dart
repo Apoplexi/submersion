@@ -19985,6 +19985,11 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String gpsLogger_trackSubtitleTrimmed(String duration) {
+    return 'Levágva, $duration';
+  }
+
+  @override
   String get gpsLogger_tracksHeader => 'Rögzített útvonalak';
 
   @override

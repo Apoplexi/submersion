@@ -3587,6 +3587,7 @@
   "gpsLogger_stopButton": "Aufzeichnung beenden",
   "gpsLogger_stripStatus": "GPS-Track wird aufgezeichnet · {count, plural, one{{count} Punkt} other{{count} Punkte}}",
   "gpsLogger_trackSubtitle": "{count, plural, one{{count} Punkt} other{{count} Punkte}}, {duration}",
+  "gpsLogger_trackSubtitleTrimmed": "Gekürzt, {duration}",
   "gpsLogger_tracksHeader": "Aufgezeichnete Tracks",
   "gpsTrack_action_trim": "Zuschneiden...",
   "gpsTrack_action_split": "Teilen...",

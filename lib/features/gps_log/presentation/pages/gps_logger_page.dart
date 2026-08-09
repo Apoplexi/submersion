@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 
 import 'package:submersion/core/services/location_service.dart';
 import 'package:submersion/core/services/logger_service.dart';
@@ -19,6 +18,7 @@ import 'package:submersion/features/gps_log/presentation/pages/track_import_revi
 import 'package:submersion/features/gps_log/presentation/providers/gps_log_providers.dart';
 import 'package:submersion/features/gps_log/presentation/providers/gps_track_map_providers.dart';
 import 'package:submersion/features/gps_log/presentation/widgets/gps_track_thumbnail.dart';
+import 'package:submersion/features/gps_log/presentation/widgets/track_row_labels.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:submersion/shared/widgets/feature_accent.dart';
@@ -226,18 +226,11 @@ class _GpsLoggerPageState extends ConsumerState<GpsLoggerPage> {
     return _formatCompactDuration(age);
   }
 
-  String _formatTrackDuration(GpsTrack track) {
-    final end = track.endTime;
-    if (end == null) return '--';
-    return _formatCompactDuration(
-      Duration(milliseconds: end - track.startTime),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final theme = Theme.of(context);
+    final units = UnitFormatter(ref.watch(settingsProvider));
     final recorder = ref.watch(gpsTrackRecorderProvider);
     final state = ref.watch(gpsRecorderStateProvider).value ?? recorder.state;
     final tracks = ref.watch(gpsTracksProvider).value ?? const <GpsTrack>[];
@@ -323,18 +316,12 @@ class _GpsLoggerPageState extends ConsumerState<GpsLoggerPage> {
                   leading: GpsTrackThumbnail(trackId: track.id),
                   // Track times are wall-clock-as-UTC: format the UTC
                   // components directly, never convert to device-local.
-                  title: Text(
-                    DateFormat.yMMMd().add_jm().format(
-                      DateTime.fromMillisecondsSinceEpoch(
-                        track.startTime,
-                        isUtc: true,
-                      ),
-                    ),
-                  ),
+                  title: Text(formatTrackStart(units, track)),
                   subtitle: Text(
-                    l10n.gpsLogger_trackSubtitle(
-                      track.pointCount,
-                      _formatTrackDuration(track),
+                    formatTrackSubtitle(
+                      l10n,
+                      track,
+                      formatTrackDuration(track),
                     ),
                   ),
                   trailing: IconButton(

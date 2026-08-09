@@ -33395,6 +33395,12 @@ abstract class AppLocalizations {
   /// **'{count, plural, one{{count} point} other{{count} points}}, {duration}'**
   String gpsLogger_trackSubtitle(num count, String duration);
 
+  /// Track row subtitle when a trim makes the stored point count unusable.
+  ///
+  /// In en, this message translates to:
+  /// **'Trimmed, {duration}'**
+  String gpsLogger_trackSubtitleTrimmed(String duration);
+
   /// No description provided for @gpsLogger_tracksHeader.
   ///
   /// In en, this message translates to:

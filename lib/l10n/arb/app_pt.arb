@@ -3587,6 +3587,7 @@
   "gpsLogger_stopButton": "Parar registro",
   "gpsLogger_stripStatus": "Gravando trilha GPS · {count, plural, one{{count} ponto} other{{count} pontos}}",
   "gpsLogger_trackSubtitle": "{count, plural, one{{count} ponto} other{{count} pontos}}, {duration}",
+  "gpsLogger_trackSubtitleTrimmed": "Recortada, {duration}",
   "gpsLogger_tracksHeader": "Trilhas gravadas",
   "gpsTrack_action_trim": "Recortar...",
   "gpsTrack_action_split": "Dividir...",

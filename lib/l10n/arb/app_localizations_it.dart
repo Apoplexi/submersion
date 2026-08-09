@@ -20043,6 +20043,11 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
+  String gpsLogger_trackSubtitleTrimmed(String duration) {
+    return 'Ritagliata, $duration';
+  }
+
+  @override
   String get gpsLogger_tracksHeader => 'Tracce registrate';
 
   @override

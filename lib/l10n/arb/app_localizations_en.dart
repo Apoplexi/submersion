@@ -19704,6 +19704,11 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String gpsLogger_trackSubtitleTrimmed(String duration) {
+    return 'Trimmed, $duration';
+  }
+
+  @override
   String get gpsLogger_tracksHeader => 'Recorded tracks';
 
   @override

@@ -3515,6 +3515,7 @@
   "gpsLogger_stopButton": "Rögzítés leállítása",
   "gpsLogger_stripStatus": "GPS-útvonal rögzítése · {count, plural, one{{count} pont} other{{count} pont}}",
   "gpsLogger_trackSubtitle": "{count, plural, one{{count} pont} other{{count} pont}}, {duration}",
+  "gpsLogger_trackSubtitleTrimmed": "Levágva, {duration}",
   "gpsLogger_tracksHeader": "Rögzített útvonalak",
   "gpsTrack_action_trim": "Vágás...",
   "gpsTrack_action_split": "Felosztás...",

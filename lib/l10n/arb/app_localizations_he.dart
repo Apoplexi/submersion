@@ -19542,6 +19542,11 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
+  String gpsLogger_trackSubtitleTrimmed(String duration) {
+    return 'נחתך, $duration';
+  }
+
+  @override
   String get gpsLogger_tracksHeader => 'מסלולים שהוקלטו';
 
   @override

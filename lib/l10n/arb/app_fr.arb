@@ -3515,6 +3515,7 @@
   "gpsLogger_stopButton": "Arrêter l'enregistrement",
   "gpsLogger_stripStatus": "Enregistrement du tracé GPS · {count, plural, one{{count} point} other{{count} points}}",
   "gpsLogger_trackSubtitle": "{count, plural, one{{count} point} other{{count} points}}, {duration}",
+  "gpsLogger_trackSubtitleTrimmed": "Rognée, {duration}",
   "gpsLogger_tracksHeader": "Traces enregistrées",
   "gpsTrack_action_trim": "Rogner...",
   "gpsTrack_action_split": "Diviser...",

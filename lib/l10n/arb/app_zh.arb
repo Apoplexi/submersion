@@ -3732,6 +3732,7 @@
   "gpsLogger_stopButton": "停止记录",
   "gpsLogger_stripStatus": "正在记录 GPS 轨迹 · {count, plural, other{{count} 个点}}",
   "gpsLogger_trackSubtitle": "{count, plural, other{{count} 个点}}，{duration}",
+  "gpsLogger_trackSubtitleTrimmed": "已裁剪，{duration}",
   "gpsLogger_tracksHeader": "已记录的轨迹",
   "gpsTrack_action_trim": "裁剪...",
   "gpsTrack_action_split": "拆分...",

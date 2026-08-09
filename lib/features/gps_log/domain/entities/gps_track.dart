@@ -90,6 +90,19 @@ class GpsTrack {
     ]);
   }
 
+  /// Fix count inside the trim window, or null when it cannot be known here.
+  ///
+  /// [pointCount] is a stored scalar covering the WHOLE recording, so a
+  /// trimmed track's real count is only knowable once the blob is decoded.
+  /// List rows are deliberately hydrated without points, so they get null and
+  /// must omit the count rather than print an untrimmed one next to a trimmed
+  /// duration.
+  int? get effectivePointCount {
+    if (trimStartTime == null && trimEndTime == null) return pointCount;
+    if (points.isEmpty) return pointCount == 0 ? 0 : null;
+    return effectivePoints.length;
+  }
+
   GpsTrack copyWith({
     String? id,
     int? startTime,

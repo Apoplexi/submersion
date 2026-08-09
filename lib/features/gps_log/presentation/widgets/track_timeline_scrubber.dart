@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import 'package:submersion/core/providers/provider.dart';
+import 'package:submersion/core/utils/unit_formatter.dart';
+import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 
 /// Whether the scrubber picks a range (trim) or a single instant (split).
 enum TrackScrubberMode { range, single }
@@ -9,7 +11,7 @@ enum TrackScrubberMode { range, single }
 /// Labels format the UTC components directly - the times belong to the
 /// recording device's wall clock, so converting to the viewer's zone would
 /// shift every label for anyone reviewing a track from another country.
-class TrackTimelineScrubber extends StatefulWidget {
+class TrackTimelineScrubber extends ConsumerStatefulWidget {
   const TrackTimelineScrubber({
     super.key,
     required this.startMs,
@@ -27,18 +29,21 @@ class TrackTimelineScrubber extends StatefulWidget {
   final void Function(int startMs, int endMs) onChanged;
 
   @override
-  State<TrackTimelineScrubber> createState() => _TrackTimelineScrubberState();
+  ConsumerState<TrackTimelineScrubber> createState() =>
+      _TrackTimelineScrubberState();
 }
 
-class _TrackTimelineScrubberState extends State<TrackTimelineScrubber> {
+class _TrackTimelineScrubberState extends ConsumerState<TrackTimelineScrubber> {
   late double _low = widget.startMs.toDouble();
   late double _high = widget.endMs.toDouble();
   late double _single = (widget.startMs + (widget.endMs - widget.startMs) / 2)
       .toDouble();
 
-  String _label(num ms) => DateFormat.Hm().format(
-    DateTime.fromMillisecondsSinceEpoch(ms.toInt(), isUtc: true),
-  );
+  /// Wall-clock-as-UTC, rendered in the diver's 12h/24h preference rather
+  /// than a hardcoded 24-hour clock.
+  String _label(num ms) => UnitFormatter(
+    ref.watch(settingsProvider),
+  ).formatTime(DateTime.fromMillisecondsSinceEpoch(ms.toInt(), isUtc: true));
 
   @override
   Widget build(BuildContext context) {

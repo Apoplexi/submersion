@@ -3587,6 +3587,7 @@
   "gpsLogger_stopButton": "إيقاف التسجيل",
   "gpsLogger_stripStatus": "جارٍ تسجيل مسار GPS · {count, plural, one{نقطة واحدة} two{نقطتان} few{{count} نقاط} other{{count} نقطة}}",
   "gpsLogger_trackSubtitle": "{count, plural, one{نقطة واحدة} two{نقطتان} few{{count} نقاط} other{{count} نقطة}}، {duration}",
+  "gpsLogger_trackSubtitleTrimmed": "مقتطع، {duration}",
   "gpsLogger_tracksHeader": "المسارات المسجّلة",
   "gpsTrack_action_trim": "اقتصاص...",
   "gpsTrack_action_split": "تقسيم...",

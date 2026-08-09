@@ -19020,6 +19020,11 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String gpsLogger_trackSubtitleTrimmed(String duration) {
+    return '已裁剪，$duration';
+  }
+
+  @override
   String get gpsLogger_tracksHeader => '已记录的轨迹';
 
   @override

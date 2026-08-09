@@ -19882,6 +19882,11 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String gpsLogger_trackSubtitleTrimmed(String duration) {
+    return 'Bijgesneden, $duration';
+  }
+
+  @override
   String get gpsLogger_tracksHeader => 'Opgenomen tracks';
 
   @override

@@ -3587,6 +3587,7 @@
   "gpsLogger_stopButton": "Opname stoppen",
   "gpsLogger_stripStatus": "GPS-track wordt opgenomen · {count, plural, one{{count} punt} other{{count} punten}}",
   "gpsLogger_trackSubtitle": "{count, plural, one{{count} punt} other{{count} punten}}, {duration}",
+  "gpsLogger_trackSubtitleTrimmed": "Bijgesneden, {duration}",
   "gpsLogger_tracksHeader": "Opgenomen tracks",
   "gpsTrack_action_trim": "Bijsnijden...",
   "gpsTrack_action_split": "Splitsen...",

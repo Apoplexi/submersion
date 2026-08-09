@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:latlong2/latlong.dart';
 
 import 'package:submersion/core/providers/provider.dart';
@@ -92,7 +91,7 @@ class TrackPointInfoCard extends ConsumerWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    DateFormat.Hms().format(time),
+                    units.formatTimeWithSeconds(time),
                     style: theme.textTheme.titleMedium,
                   ),
                   const SizedBox(height: 2),

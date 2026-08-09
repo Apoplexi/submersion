@@ -44,7 +44,10 @@ class TrackStatsHeader extends ConsumerWidget {
     final maxSpeed = speedRange(points)?.max ?? 0.0;
 
     final tiles = <(String, String)>[
-      (l10n.gpsTrack_stats_distance, units.formatDistance(distance)),
+      // formatGeoDistance, not formatDistance: a surface track is kilometres
+      // long, and formatDistance is the depth-unit formatter, so a 74 km
+      // crossing rendered as "74000 m".
+      (l10n.gpsTrack_stats_distance, units.formatGeoDistance(distance)),
       (l10n.gpsTrack_stats_duration, _formatDuration(elapsed)),
       (l10n.gpsTrack_stats_avgSpeed, units.formatSpeed(avgSpeed)),
       (l10n.gpsTrack_stats_maxSpeed, units.formatSpeed(maxSpeed)),

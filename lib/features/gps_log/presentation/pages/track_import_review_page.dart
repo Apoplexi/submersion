@@ -1,14 +1,15 @@
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 
 import 'package:submersion/core/providers/provider.dart';
+import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/gps_log/data/services/track_import/csv_track_parser.dart';
 import 'package:submersion/features/gps_log/data/services/track_import/track_import_service.dart';
 import 'package:submersion/features/gps_log/data/services/track_import/track_timezone_resolver.dart';
 import 'package:submersion/features/gps_log/presentation/providers/gps_track_map_providers.dart';
 import 'package:submersion/features/gps_log/presentation/widgets/csv_column_mapping_form.dart';
+import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 
 /// Confirms a parsed track before writing it.
@@ -60,7 +61,8 @@ class _TrackImportReviewPageState extends ConsumerState<TrackImportReviewPage> {
       toWallClockEpochSecondsAt(fix.utc, _offsetMinutes) * 1000,
       isUtc: true,
     );
-    return DateFormat.yMMMd().add_jm().format(wall);
+    final units = UnitFormatter(ref.read(settingsProvider));
+    return '${units.formatDate(wall)} ${units.formatTime(wall)}';
   }
 
   void _remapCsv(CsvColumnMapping mapping) {

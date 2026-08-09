@@ -129,7 +129,12 @@ class _SurfaceGpsSectionState extends ConsumerState<SurfaceGpsSection> {
     const marginSeconds = 15 * 60;
     final dive = widget.dive;
     final entrySec = dive.effectiveEntryTime.millisecondsSinceEpoch ~/ 1000;
-    final exitSec = entrySec + (dive.bottomTime?.inSeconds ?? 0);
+    // effectiveRuntime, not bottomTime: runtime is surface-to-surface, which
+    // is the window the boat was out. bottomTime excludes descent and ascent,
+    // so on a deco dive it can fall short by twenty minutes or more, and it is
+    // null on plenty of imported dives - which collapsed the window to the
+    // entry instant plus the margin.
+    final exitSec = entrySec + (dive.effectiveRuntime?.inSeconds ?? 0);
     return bucketizeTrack(
       windowTrack(
         track.effectivePoints,
@@ -264,7 +269,10 @@ class _SurfaceGpsSectionState extends ConsumerState<SurfaceGpsSection> {
                       onTap: () => context.push('/gps-log/${track.id}'),
                       child: Text(
                         '${l10n.diveLog_detail_surfaceGps_track}: '
-                        '${l10n.diveLog_detail_surfaceGps_trackFixes(track.pointCount)}',
+                        // This provider hydrates points, so the trimmed count
+                        // is always knowable here; the fallback is only for
+                        // the impossible unhydrated case.
+                        '${l10n.diveLog_detail_surfaceGps_trackFixes(track.effectivePointCount ?? track.pointCount)}',
                         style: TextStyle(
                           color: colorScheme.primary,
                           decoration: TextDecoration.underline,

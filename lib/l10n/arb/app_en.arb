@@ -12568,6 +12568,15 @@
       }
     }
   },
+  "gpsLogger_trackSubtitleTrimmed": "Trimmed, {duration}",
+  "@gpsLogger_trackSubtitleTrimmed": {
+    "description": "Track row subtitle when a trim makes the stored point count unusable.",
+    "placeholders": {
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
   "gpsLogger_tracksHeader": "Recorded tracks",
   "gpsTrack_action_trim": "Trim...",
   "gpsTrack_action_split": "Split...",

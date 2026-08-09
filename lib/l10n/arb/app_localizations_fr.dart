@@ -20121,6 +20121,11 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String gpsLogger_trackSubtitleTrimmed(String duration) {
+    return 'Rognée, $duration';
+  }
+
+  @override
   String get gpsLogger_tracksHeader => 'Traces enregistrées';
 
   @override
