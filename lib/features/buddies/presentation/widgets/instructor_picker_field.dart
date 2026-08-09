@@ -13,7 +13,7 @@ import 'package:submersion/features/certifications/presentation/providers/certif
 /// Master Instructor, Course Director, etc. -- see
 /// [CertificationLevel.isInstructorLevel]) are grouped first and annotated
 /// with it; any buddy remains selectable (autofills name only).
-class InstructorPickerField extends ConsumerWidget {
+class InstructorPickerField extends ConsumerStatefulWidget {
   final String? instructorId;
   final void Function(Buddy? buddy, Certification? instructorCert) onSelected;
 
@@ -24,12 +24,37 @@ class InstructorPickerField extends ConsumerWidget {
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<InstructorPickerField> createState() =>
+      _InstructorPickerFieldState();
+}
+
+class _InstructorPickerFieldState extends ConsumerState<InstructorPickerField> {
+  Map<String, List<Certification>> _certsByBuddy =
+      const <String, List<Certification>>{};
+
+  @override
+  void initState() {
+    super.initState();
+    // A manual listener rather than `ref.watch(allBuddyCertificationsProvider)`
+    // in build(): this widget also watches allBuddiesProvider directly for
+    // the buddy list, and allBuddyCertificationsProvider transitively
+    // watches allBuddiesProvider too. Riverpod's TickerMode-driven auto-pause
+    // (which pauses `ref.watch` subscriptions while this widget is covered
+    // by another route) trips a pausedActiveSubscriptionCount assertion on
+    // resume for that diamond dependency. Manual listeners are exempt from
+    // auto-pause, sidestepping the bug while staying reactive via setState.
+    // Same pattern as BuddyPicker's _BuddySelectionSheetState (buddy_picker.dart).
+    ref.listenManual(allBuddyCertificationsProvider, (previous, next) {
+      final value = next.value ?? const <String, List<Certification>>{};
+      if (mounted) setState(() => _certsByBuddy = value);
+    }, fireImmediately: true);
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final buddiesAsync = ref.watch(allBuddiesProvider);
-    final certsAsync = ref.watch(allBuddyCertificationsProvider);
     final buddies = buddiesAsync.value ?? const <Buddy>[];
-    final certsByBuddy =
-        certsAsync.value ?? const <String, List<Certification>>{};
+    final certsByBuddy = _certsByBuddy;
     if (buddies.isEmpty) return const SizedBox.shrink();
 
     Certification? instructorCert(String buddyId) {
@@ -45,8 +70,8 @@ class InstructorPickerField extends ConsumerWidget {
     final others = buddies.where((b) => instructorCert(b.id) == null).toList();
     final ordered = [...credentialed, ...others];
     // Guard against a stale instructorId (buddy deleted / not yet synced).
-    final validValue = ordered.any((b) => b.id == instructorId)
-        ? instructorId
+    final validValue = ordered.any((b) => b.id == widget.instructorId)
+        ? widget.instructorId
         : null;
 
     return DropdownButtonFormField<String?>(
@@ -75,11 +100,11 @@ class InstructorPickerField extends ConsumerWidget {
       ],
       onChanged: (value) {
         if (value == null) {
-          onSelected(null, null);
+          widget.onSelected(null, null);
           return;
         }
         final buddy = ordered.firstWhere((b) => b.id == value);
-        onSelected(buddy, instructorCert(buddy.id));
+        widget.onSelected(buddy, instructorCert(buddy.id));
       },
     );
   }

@@ -9337,7 +9337,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get enum_certificationLevel_decompression => 'Decompression';
 
   @override
-  String get enum_certificationLevel_diveGuide => 'Guide de plongee';
+  String get enum_certificationLevel_diveGuide => 'Guide de plongée';
 
   @override
   String get enum_certificationLevel_diveMaster => 'Directeur de plongee';

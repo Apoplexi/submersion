@@ -4050,9 +4050,13 @@ class AppDatabase extends _$AppDatabase {
       final agency = r.read<String?>('agency') ?? 'other';
       final cardNumber = r.read<String?>('credential_number');
 
+      // ORDER BY id keeps the backfill target deterministic across replicas
+      // when a buddy has multiple pre-existing certs at the same
+      // (agency, level) -- this migration runs independently per device.
       final existing = await customSelect(
         'SELECT id, card_number FROM certifications '
-        'WHERE buddy_id = ? AND agency = ? AND level = ?',
+        'WHERE buddy_id = ? AND agency = ? AND level = ? '
+        'ORDER BY id',
         variables: [
           Variable<String>(buddyId),
           Variable<String>(agency),
