@@ -388,4 +388,65 @@ void main() {
       expect(chart.highlightRange!.endTimestamp, 240);
     },
   );
+
+  SafetyFinding laneFinding() => SafetyFinding(
+    id: 'f-lane',
+    diveId: 'd1',
+    ruleId: SafetyRuleId.rapidAscent,
+    severity: SafetySeverity.caution,
+    startTimestamp: 60,
+    endTimestamp: 120,
+    value: 14.0,
+    engineVersion: 1,
+    createdAt: DateTime.utc(2026, 8, 9),
+  );
+
+  List<Override> reviewOverrides(SafetyFinding finding) => [
+    ..._defaultOverrides(),
+    safetyReviewProvider('d1').overrideWith(
+      (ref) async => SafetyReview(
+        diveId: 'd1',
+        engineVersion: 1,
+        reviewedAt: DateTime.utc(2026, 8, 9),
+        findings: [finding],
+      ),
+    ),
+  ];
+
+  testWidgets('lane findings and selection wiring reach the chart', (
+    tester,
+  ) async {
+    await tester.pumpWidget(_wrap(reviewOverrides(laneFinding())));
+    await tester.pumpAndSettle();
+
+    final chart = tester.widget<DiveProfileChart>(
+      find.byType(DiveProfileChart),
+    );
+    expect(chart.safetyFindings, isNotNull);
+    expect(chart.safetyFindings!.map((f) => f.id), ['f-lane']);
+    expect(chart.onSafetyFindingTap, isNotNull);
+    expect(chart.onSafetyFindingDismiss, isNotNull);
+    expect(chart.onSafetyFindingDetails, isNull); // no section in fullscreen
+  });
+
+  testWidgets('fullscreen tap callback toggles the shared provider', (
+    tester,
+  ) async {
+    final finding = laneFinding();
+    await tester.pumpWidget(_wrap(reviewOverrides(finding)));
+    await tester.pumpAndSettle();
+
+    final chart = tester.widget<DiveProfileChart>(
+      find.byType(DiveProfileChart),
+    );
+    final container = ProviderScope.containerOf(
+      tester.element(find.byType(FullscreenProfilePage)),
+    );
+
+    chart.onSafetyFindingTap!(finding);
+    expect(container.read(selectedSafetyFindingProvider('d1'))?.id, 'f-lane');
+
+    chart.onSafetyFindingTap!(finding);
+    expect(container.read(selectedSafetyFindingProvider('d1')), isNull);
+  });
 }
