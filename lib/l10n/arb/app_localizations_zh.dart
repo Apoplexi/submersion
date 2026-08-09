@@ -16122,6 +16122,26 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String tides_source_noaaStation(String name, String distance) {
+    return 'NOAA 站点：$name（$distance）';
+  }
+
+  @override
+  String get tides_source_modelEstimate => '海洋模型估算';
+
+  @override
+  String get tides_source_modelCaveat => '基于卫星数据建模，复杂海岸线附近的时间和高度可能有偏差。';
+
+  @override
+  String get tides_source_sheetTitle => '潮汐数据来源';
+
+  @override
+  String get tides_source_datumMllw => '高度基于 MLLW（站点基准面）';
+
+  @override
+  String get tides_source_datumMsl => '高度基于平均海平面';
+
+  @override
   String get tides_title => '潮汐';
 
   @override

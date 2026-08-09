@@ -16699,6 +16699,28 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String tides_source_noaaStation(String name, String distance) {
+    return 'NOAA station: $name ($distance)';
+  }
+
+  @override
+  String get tides_source_modelEstimate => 'Ocean-model estimate';
+
+  @override
+  String get tides_source_modelCaveat =>
+      'Modeled from satellite data. Times and heights may differ near complex coastlines.';
+
+  @override
+  String get tides_source_sheetTitle => 'Tide data source';
+
+  @override
+  String get tides_source_datumMllw =>
+      'Heights relative to MLLW (station datum)';
+
+  @override
+  String get tides_source_datumMsl => 'Heights relative to mean sea level';
+
+  @override
   String get tides_title => 'Tides';
 
   @override
