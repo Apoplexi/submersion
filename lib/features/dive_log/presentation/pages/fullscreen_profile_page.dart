@@ -164,6 +164,14 @@ class _FullscreenProfilePageState extends ConsumerState<FullscreenProfilePage> {
     final laneFindings = safetyReviewEnabled
         ? chartSafetyFindings(safetyReview, safetyDisabledRules)
         : const <SafetyFinding>[];
+    // Gate the highlight on lane membership: with safety review (or the
+    // finding's rule) disabled the lane disappears, so an ungated highlight
+    // would be stuck on the chart with no UI to clear it.
+    final visibleSelectedFinding =
+        selectedFinding != null &&
+            laneFindings.any((f) => f.id == selectedFinding.id)
+        ? selectedFinding
+        : null;
     // A finding dismissed elsewhere (callout, detail page, sync) must not
     // stay highlighted: drop a selection with no matching active row.
     ref.listen(safetyReviewProvider(widget.diveId), (previous, next) {
@@ -422,13 +430,13 @@ class _FullscreenProfilePageState extends ConsumerState<FullscreenProfilePage> {
                               : chartProfile.last.timestamp,
                           highlightedTimestamp: reviewTimestamp,
                           highlightRange: profileHighlightRangeFor(
-                            selectedFinding,
+                            visibleSelectedFinding,
                             Theme.of(context).colorScheme,
                           ),
                           safetyFindings: laneFindings.isEmpty
                               ? null
                               : laneFindings,
-                          selectedSafetyFindingId: selectedFinding?.id,
+                          selectedSafetyFindingId: visibleSelectedFinding?.id,
                           onSafetyFindingTap: (finding) {
                             final selectionNotifier = ref.read(
                               selectedSafetyFindingProvider(

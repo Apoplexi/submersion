@@ -56,9 +56,13 @@ Widget _buildDetailPage(Dive dive, List<Override> overrides) {
 
 Future<void> _pumpDetailPage(WidgetTester tester, Dive dive) async {
   final overrides = await getBaseOverrides();
+  // Restore via addTearDown so a throwing pump cannot leak the filtered
+  // handler into later tests; the immediate restore below keeps the filter
+  // scoped to the pump itself on the happy path.
   final originalOnError = FlutterError.onError;
+  addTearDown(() => FlutterError.onError = originalOnError);
   FlutterError.onError = (d) {
-    if (d.toString().contains('overflowed')) return;
+    if (d.exceptionAsString().contains('overflowed')) return;
     originalOnError?.call(d);
   };
   await tester.pumpWidget(_buildDetailPage(dive, overrides));
@@ -1417,28 +1421,63 @@ void main() {
       ),
     );
 
+    SafetyFinding laneFinding(String diveId, {DateTime? dismissedAt}) =>
+        SafetyFinding(
+          id: 'f-lane',
+          diveId: diveId,
+          ruleId: SafetyRuleId.rapidAscent,
+          severity: SafetySeverity.caution,
+          startTimestamp: 300,
+          endTimestamp: 420,
+          value: 14.0,
+          engineVersion: 1,
+          dismissedAt: dismissedAt,
+          createdAt: DateTime.utc(2026, 8, 9),
+        );
+
+    Future<void> pumpWithReview(
+      WidgetTester tester,
+      Dive dive,
+      SafetyFinding finding,
+    ) async {
+      final overrides = await getBaseOverrides();
+      overrides.add(
+        safetyReviewProvider(dive.id).overrideWith(
+          (ref) async => SafetyReview(
+            diveId: dive.id,
+            engineVersion: 1,
+            reviewedAt: DateTime.utc(2026, 8, 9),
+            findings: [finding],
+          ),
+        ),
+      );
+      // Restore via addTearDown so a throwing pump cannot leak the filtered
+      // handler into later tests; the immediate restore below keeps the
+      // filter scoped to the pump itself on the happy path.
+      final originalOnError = FlutterError.onError;
+      addTearDown(() => FlutterError.onError = originalOnError);
+      FlutterError.onError = (d) {
+        if (d.exceptionAsString().contains('overflowed')) return;
+        originalOnError?.call(d);
+      };
+      await tester.pumpWidget(_buildDetailPage(dive, overrides));
+      await tester.pump();
+      await tester.pump(const Duration(seconds: 1));
+      FlutterError.onError = originalOnError;
+    }
+
     testWidgets('selected finding reaches the chart as a highlight range', (
       tester,
     ) async {
       final dive = diveWithProfile();
-      await _pumpDetailPage(tester, dive);
+      final finding = laneFinding(dive.id);
+      await pumpWithReview(tester, dive, finding);
 
       final container = ProviderScope.containerOf(
         tester.element(find.byType(DiveDetailPage)),
       );
-      container
-          .read(selectedSafetyFindingProvider(dive.id).notifier)
-          .state = SafetyFinding(
-        id: 'f1',
-        diveId: dive.id,
-        ruleId: SafetyRuleId.rapidAscent,
-        severity: SafetySeverity.significant,
-        startTimestamp: 300,
-        endTimestamp: 420,
-        value: 14.0,
-        engineVersion: 1,
-        createdAt: DateTime.utc(2026, 8, 7),
-      );
+      container.read(selectedSafetyFindingProvider(dive.id).notifier).state =
+          finding;
       await tester.pump();
 
       final chart = tester.widget<DiveProfileChart>(
@@ -1459,44 +1498,31 @@ void main() {
       expect(chart.highlightRange, isNull);
     });
 
-    SafetyFinding laneFinding(String diveId) => SafetyFinding(
-      id: 'f-lane',
-      diveId: diveId,
-      ruleId: SafetyRuleId.rapidAscent,
-      severity: SafetySeverity.caution,
-      startTimestamp: 300,
-      endTimestamp: 420,
-      value: 14.0,
-      engineVersion: 1,
-      createdAt: DateTime.utc(2026, 8, 9),
-    );
-
-    Future<void> pumpWithReview(
-      WidgetTester tester,
-      Dive dive,
-      SafetyFinding finding,
+    testWidgets('a selection outside the gated lane renders no highlight', (
+      tester,
     ) async {
-      final overrides = await getBaseOverrides();
-      overrides.add(
-        safetyReviewProvider(dive.id).overrideWith(
-          (ref) async => SafetyReview(
-            diveId: dive.id,
-            engineVersion: 1,
-            reviewedAt: DateTime.utc(2026, 8, 9),
-            findings: [finding],
-          ),
-        ),
+      final dive = diveWithProfile();
+      // The stored review's only finding is dismissed, so the lane (and the
+      // section tile) hide it; the highlight must be gated off with it.
+      final dismissed = laneFinding(
+        dive.id,
+        dismissedAt: DateTime.utc(2026, 8, 9),
       );
-      final originalOnError = FlutterError.onError;
-      FlutterError.onError = (d) {
-        if (d.toString().contains('overflowed')) return;
-        originalOnError?.call(d);
-      };
-      await tester.pumpWidget(_buildDetailPage(dive, overrides));
+      await pumpWithReview(tester, dive, dismissed);
+
+      final container = ProviderScope.containerOf(
+        tester.element(find.byType(DiveDetailPage)),
+      );
+      container.read(selectedSafetyFindingProvider(dive.id).notifier).state =
+          dismissed;
       await tester.pump();
-      await tester.pump(const Duration(seconds: 1));
-      FlutterError.onError = originalOnError;
-    }
+
+      final chart = tester.widget<DiveProfileChart>(
+        find.byType(DiveProfileChart),
+      );
+      expect(chart.highlightRange, isNull);
+      expect(chart.selectedSafetyFindingId, isNull);
+    });
 
     testWidgets('active findings reach the chart as lane findings', (
       tester,

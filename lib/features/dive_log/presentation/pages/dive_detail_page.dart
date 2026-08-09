@@ -1683,6 +1683,15 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
                         appSettings.safetyReviewDisabledRules,
                       )
                     : const <SafetyFinding>[];
+                // Gate the highlight on lane membership: with safety review
+                // (or the finding's rule) disabled neither the lane nor the
+                // section renders, so an ungated highlight would be stuck on
+                // the chart with no UI to clear it.
+                final visibleSelectedFinding =
+                    selectedFinding != null &&
+                        laneFindings.any((f) => f.id == selectedFinding.id)
+                    ? selectedFinding
+                    : null;
                 return Stack(
                   children: [
                     MouseRegion(
@@ -1767,13 +1776,13 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
                             ? chartProfile[trackingIndex].timestamp
                             : null,
                         highlightRange: profileHighlightRangeFor(
-                          selectedFinding,
+                          visibleSelectedFinding,
                           Theme.of(context).colorScheme,
                         ),
                         safetyFindings: laneFindings.isEmpty
                             ? null
                             : laneFindings,
-                        selectedSafetyFindingId: selectedFinding?.id,
+                        selectedSafetyFindingId: visibleSelectedFinding?.id,
                         onSafetyFindingTap: (finding) {
                           final notifier = ref.read(
                             selectedSafetyFindingProvider(diveId).notifier,
