@@ -118,6 +118,16 @@ final trackForDiveProvider = FutureProvider.family<GpsTrack?, String>((
 /// range's DateTime values compare against them directly with no conversion.
 final trackDateFilterProvider = StateProvider<DateTimeRange?>((ref) => null);
 
+/// Most tracks the overview map will draw at once.
+///
+/// The date filter defaults to unbounded, so without a cap a library of 200
+/// boat days would, on a cold cache, hydrate 200 full point blobs and spawn
+/// 200 concurrent compute() isolates in a single frame - each deep-copying
+/// its points across the port both ways. The local cache is never backed up,
+/// so a restored or reinstalled device starts cold. Newest first, because
+/// that is what a diver is looking for.
+const int kOverviewTrackLimit = 40;
+
 /// Completed tracks narrowed by [trackDateFilterProvider].
 ///
 /// "Every track ever" is the one query in this feature that grows without
@@ -138,6 +148,24 @@ final filteredTracksProvider = FutureProvider<List<GpsTrack>>((ref) async {
     for (final track in tracks)
       if (track.startTime >= from && track.startTime <= to) track,
   ];
+});
+
+/// What the overview map actually draws: [filteredTracksProvider] capped at
+/// [kOverviewTrackLimit].
+///
+/// gpsTracksProvider already returns newest first, so the cap keeps the most
+/// recent boat days.
+final overviewTracksProvider = FutureProvider<List<GpsTrack>>((ref) async {
+  final tracks = await ref.watch(filteredTracksProvider.future);
+  return tracks.length <= kOverviewTrackLimit
+      ? tracks
+      : tracks.sublist(0, kOverviewTrackLimit);
+});
+
+/// True when [overviewTracksProvider] dropped tracks the filter allowed.
+final overviewTracksTruncatedProvider = Provider<bool>((ref) {
+  final all = ref.watch(filteredTracksProvider).value?.length ?? 0;
+  return all > kOverviewTrackLimit;
 });
 
 /// Drops every cached and in-memory derivative of [id].

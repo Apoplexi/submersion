@@ -20103,6 +20103,11 @@ class AppLocalizationsDe extends AppLocalizations {
   String get gpsTrack_map_title => 'Trackkarte';
 
   @override
+  String gpsTrack_map_truncated(int count) {
+    return 'Die $count neuesten Tracks werden angezeigt. Grenzen Sie den Datumsfilter ein, um weitere zu sehen.';
+  }
+
+  @override
   String get gpsTrack_map_noTracks => 'Keine aufgezeichneten Tracks vorhanden.';
 
   @override

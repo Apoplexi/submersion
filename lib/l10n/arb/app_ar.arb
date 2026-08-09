@@ -3613,6 +3613,7 @@
   "gpsTrack_action_saveKml": "حفظ كملف KML...",
   "gpsTrack_export_failed": "فشل التصدير.",
   "gpsTrack_map_title": "خريطة المسارات",
+  "gpsTrack_map_truncated": "يتم عرض أحدث {count} مسار. قم بتضييق عامل تصفية التاريخ لعرض المسارات الأخرى.",
   "gpsTrack_map_noTracks": "لا توجد مسارات مسجّلة لعرضها.",
   "gpsTrack_map_showMap": "عرض الخريطة",
   "gpsTrack_filter_all": "كل التواريخ",

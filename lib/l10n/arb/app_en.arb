@@ -12610,6 +12610,15 @@
   "gpsTrack_action_saveKml": "Save as KML...",
   "gpsTrack_export_failed": "Export failed.",
   "gpsTrack_map_title": "Track Map",
+  "gpsTrack_map_truncated": "Showing the {count} most recent tracks. Narrow the date filter to see others.",
+  "@gpsTrack_map_truncated": {
+    "description": "Banner shown when the overview map caps how many tracks it draws.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "gpsTrack_map_noTracks": "No recorded tracks to show.",
   "gpsTrack_map_showMap": "Show map",
   "gpsTrack_filter_all": "All dates",

@@ -20076,6 +20076,11 @@ class AppLocalizationsHu extends AppLocalizations {
   String get gpsTrack_map_title => 'Nyomvonaltérkép';
 
   @override
+  String gpsTrack_map_truncated(int count) {
+    return 'A(z) $count legutóbbi nyomvonal látható. Szűkítsd a dátumszűrőt a többi megtekintéséhez.';
+  }
+
+  @override
   String get gpsTrack_map_noTracks =>
       'Nincs megjeleníthető rögzített nyomvonal.';
 

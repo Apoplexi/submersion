@@ -3613,6 +3613,7 @@
   "gpsTrack_action_saveKml": "Als KML speichern...",
   "gpsTrack_export_failed": "Export fehlgeschlagen.",
   "gpsTrack_map_title": "Trackkarte",
+  "gpsTrack_map_truncated": "Die {count} neuesten Tracks werden angezeigt. Grenzen Sie den Datumsfilter ein, um weitere zu sehen.",
   "gpsTrack_map_noTracks": "Keine aufgezeichneten Tracks vorhanden.",
   "gpsTrack_map_showMap": "Karte anzeigen",
   "gpsTrack_filter_all": "Alle Daten",

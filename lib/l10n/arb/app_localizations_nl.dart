@@ -19973,6 +19973,11 @@ class AppLocalizationsNl extends AppLocalizations {
   String get gpsTrack_map_title => 'Trackkaart';
 
   @override
+  String gpsTrack_map_truncated(int count) {
+    return 'De $count meest recente tracks worden getoond. Verfijn het datumfilter om andere te zien.';
+  }
+
+  @override
   String get gpsTrack_map_noTracks => 'Geen opgenomen tracks om te tonen.';
 
   @override

@@ -20142,6 +20142,11 @@ class AppLocalizationsPt extends AppLocalizations {
   String get gpsTrack_map_title => 'Mapa de trilhas';
 
   @override
+  String gpsTrack_map_truncated(int count) {
+    return 'Mostrando as $count trilhas mais recentes. Ajuste o filtro de datas para ver as outras.';
+  }
+
+  @override
   String get gpsTrack_map_noTracks => 'Não há trilhas gravadas para mostrar.';
 
   @override

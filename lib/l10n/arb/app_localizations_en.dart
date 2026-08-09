@@ -19795,6 +19795,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get gpsTrack_map_title => 'Track Map';
 
   @override
+  String gpsTrack_map_truncated(int count) {
+    return 'Showing the $count most recent tracks. Narrow the date filter to see others.';
+  }
+
+  @override
   String get gpsTrack_map_noTracks => 'No recorded tracks to show.';
 
   @override

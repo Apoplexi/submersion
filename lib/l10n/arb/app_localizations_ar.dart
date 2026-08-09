@@ -19777,6 +19777,11 @@ class AppLocalizationsAr extends AppLocalizations {
   String get gpsTrack_map_title => 'خريطة المسارات';
 
   @override
+  String gpsTrack_map_truncated(int count) {
+    return 'يتم عرض أحدث $count مسار. قم بتضييق عامل تصفية التاريخ لعرض المسارات الأخرى.';
+  }
+
+  @override
   String get gpsTrack_map_noTracks => 'لا توجد مسارات مسجّلة لعرضها.';
 
   @override

@@ -3541,6 +3541,7 @@
   "gpsTrack_action_saveKml": "שמירה כ-KML...",
   "gpsTrack_export_failed": "הייצוא נכשל.",
   "gpsTrack_map_title": "מפת מסלולים",
+  "gpsTrack_map_truncated": "מוצגים {count} המסלולים האחרונים. צמצם את מסנן התאריכים כדי לראות אחרים.",
   "gpsTrack_map_noTracks": "אין מסלולים מוקלטים להצגה.",
   "gpsTrack_map_showMap": "הצג מפה",
   "gpsTrack_filter_all": "כל התאריכים",

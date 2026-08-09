@@ -47,8 +47,11 @@ class _GpsTrackMapPageState extends ConsumerState<GpsTrackMapPage> {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
+    // Capped: every track drawn here hydrates a full point blob and, on a cold
+    // cache, spawns its own simplification isolate.
     final tracks =
-        ref.watch(filteredTracksProvider).value ?? const <GpsTrack>[];
+        ref.watch(overviewTracksProvider).value ?? const <GpsTrack>[];
+    final truncated = ref.watch(overviewTracksTruncatedProvider);
     final selection = ref.watch(mapListSelectionProvider(_kSectionKey));
     final range = ref.watch(trackDateFilterProvider);
 
@@ -80,6 +83,9 @@ class _GpsTrackMapPageState extends ConsumerState<GpsTrackMapPage> {
       listPane: _TrackListPane(
         tracks: tracks,
         selectedId: selection.selectedId,
+        truncatedNotice: truncated
+            ? l10n.gpsTrack_map_truncated(kOverviewTrackLimit)
+            : null,
       ),
       mapPane: tracks.isEmpty
           ? Center(child: Text(l10n.gpsTrack_map_noTracks))
@@ -93,17 +99,42 @@ class _GpsTrackMapPageState extends ConsumerState<GpsTrackMapPage> {
 }
 
 class _TrackListPane extends ConsumerWidget {
-  const _TrackListPane({required this.tracks, required this.selectedId});
+  const _TrackListPane({
+    required this.tracks,
+    required this.selectedId,
+    this.truncatedNotice,
+  });
 
   final List<GpsTrack> tracks;
   final String? selectedId;
 
+  /// Set when the cap dropped tracks the date filter allowed.
+  final String? truncatedNotice;
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
+    final notice = truncatedNotice;
     return ListView.builder(
-      itemCount: tracks.length,
+      // The notice occupies index 0 so it scrolls with the rows rather than
+      // stealing height from a narrow list pane.
+      itemCount: tracks.length + (notice == null ? 0 : 1),
       itemBuilder: (context, index) {
+        if (notice != null) {
+          if (index == 0) {
+            return Padding(
+              key: const ValueKey('gps-track-truncated-notice'),
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+              child: Text(
+                notice,
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
+              ),
+            );
+          }
+          index -= 1;
+        }
         final track = tracks[index];
         return ListTile(
           // See gps_logger_page: an unkeyed recycled row keeps the previous

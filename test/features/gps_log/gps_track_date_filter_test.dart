@@ -27,7 +27,54 @@ ProviderContainer _container() {
   return container;
 }
 
+/// gpsTracksProvider orders newest first; mirror that.
+ProviderContainer _manyContainer(int count) {
+  final container = ProviderContainer(
+    overrides: [
+      gpsTracksProvider.overrideWith(
+        (ref) async => [
+          for (var i = 0; i < count; i++)
+            _track('t$i', DateTime.utc(2026, 1, 1).add(Duration(days: -i))),
+        ],
+      ),
+    ],
+  );
+  addTearDown(container.dispose);
+  return container;
+}
+
 void main() {
+  test('the overview cap keeps the newest tracks', () async {
+    final container = _manyContainer(kOverviewTrackLimit + 12);
+    final tracks = await container.read(overviewTracksProvider.future);
+
+    // Uncapped, a cold cache would spawn one simplification isolate per track.
+    expect(tracks.length, kOverviewTrackLimit);
+    expect(tracks.first.id, 't0');
+    expect(tracks.last.id, 't${kOverviewTrackLimit - 1}');
+    expect(container.read(overviewTracksTruncatedProvider), isTrue);
+  });
+
+  test('a short list is passed through untouched', () async {
+    final container = _manyContainer(3);
+    expect((await container.read(overviewTracksProvider.future)).length, 3);
+    expect(container.read(overviewTracksTruncatedProvider), isFalse);
+  });
+
+  test('narrowing the filter below the cap clears the notice', () async {
+    final container = _manyContainer(kOverviewTrackLimit + 12);
+    await container.read(overviewTracksProvider.future);
+    expect(container.read(overviewTracksTruncatedProvider), isTrue);
+
+    container.read(trackDateFilterProvider.notifier).state = DateTimeRange(
+      start: DateTime.utc(2025, 12, 29),
+      end: DateTime.utc(2026, 1, 1),
+    );
+    final tracks = await container.read(overviewTracksProvider.future);
+    expect(tracks.length, 4);
+    expect(container.read(overviewTracksTruncatedProvider), isFalse);
+  });
+
   test('returns every track when no filter is set', () async {
     final container = _container();
     expect((await container.read(filteredTracksProvider.future)).length, 3);

@@ -19109,6 +19109,11 @@ class AppLocalizationsZh extends AppLocalizations {
   String get gpsTrack_map_title => '轨迹地图';
 
   @override
+  String gpsTrack_map_truncated(int count) {
+    return '正在显示最近的 $count 条轨迹。请缩小日期筛选范围以查看其他轨迹。';
+  }
+
+  @override
   String get gpsTrack_map_noTracks => '没有可显示的已记录轨迹。';
 
   @override

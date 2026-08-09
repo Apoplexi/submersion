@@ -3613,6 +3613,7 @@
   "gpsTrack_action_saveKml": "Opslaan als KML...",
   "gpsTrack_export_failed": "Exporteren mislukt.",
   "gpsTrack_map_title": "Trackkaart",
+  "gpsTrack_map_truncated": "De {count} meest recente tracks worden getoond. Verfijn het datumfilter om andere te zien.",
   "gpsTrack_map_noTracks": "Geen opgenomen tracks om te tonen.",
   "gpsTrack_map_showMap": "Kaart tonen",
   "gpsTrack_filter_all": "Alle datums",

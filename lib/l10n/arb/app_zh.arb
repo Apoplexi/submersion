@@ -3758,6 +3758,7 @@
   "gpsTrack_action_saveKml": "保存为 KML...",
   "gpsTrack_export_failed": "导出失败。",
   "gpsTrack_map_title": "轨迹地图",
+  "gpsTrack_map_truncated": "正在显示最近的 {count} 条轨迹。请缩小日期筛选范围以查看其他轨迹。",
   "gpsTrack_map_noTracks": "没有可显示的已记录轨迹。",
   "gpsTrack_map_showMap": "显示地图",
   "gpsTrack_filter_all": "所有日期",

@@ -20212,6 +20212,11 @@ class AppLocalizationsFr extends AppLocalizations {
   String get gpsTrack_map_title => 'Carte des traces';
 
   @override
+  String gpsTrack_map_truncated(int count) {
+    return 'Affichage des $count traces les plus récentes. Affinez le filtre de dates pour voir les autres.';
+  }
+
+  @override
   String get gpsTrack_map_noTracks => 'Aucune trace enregistrée à afficher.';
 
   @override

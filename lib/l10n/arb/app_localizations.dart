@@ -33551,6 +33551,12 @@ abstract class AppLocalizations {
   /// **'Track Map'**
   String get gpsTrack_map_title;
 
+  /// Banner shown when the overview map caps how many tracks it draws.
+  ///
+  /// In en, this message translates to:
+  /// **'Showing the {count} most recent tracks. Narrow the date filter to see others.'**
+  String gpsTrack_map_truncated(int count);
+
   /// No description provided for @gpsTrack_map_noTracks.
   ///
   /// In en, this message translates to:

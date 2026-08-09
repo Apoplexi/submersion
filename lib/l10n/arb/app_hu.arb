@@ -3541,6 +3541,7 @@
   "gpsTrack_action_saveKml": "Mentés KML-ként...",
   "gpsTrack_export_failed": "Az exportálás sikertelen.",
   "gpsTrack_map_title": "Nyomvonaltérkép",
+  "gpsTrack_map_truncated": "A(z) {count} legutóbbi nyomvonal látható. Szűkítsd a dátumszűrőt a többi megtekintéséhez.",
   "gpsTrack_map_noTracks": "Nincs megjeleníthető rögzített nyomvonal.",
   "gpsTrack_map_showMap": "Térkép megjelenítése",
   "gpsTrack_filter_all": "Minden dátum",

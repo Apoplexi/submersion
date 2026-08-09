@@ -19632,6 +19632,11 @@ class AppLocalizationsHe extends AppLocalizations {
   String get gpsTrack_map_title => 'מפת מסלולים';
 
   @override
+  String gpsTrack_map_truncated(int count) {
+    return 'מוצגים $count המסלולים האחרונים. צמצם את מסנן התאריכים כדי לראות אחרים.';
+  }
+
+  @override
   String get gpsTrack_map_noTracks => 'אין מסלולים מוקלטים להצגה.';
 
   @override

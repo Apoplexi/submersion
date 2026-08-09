@@ -3541,6 +3541,7 @@
   "gpsTrack_action_saveKml": "Salva come KML...",
   "gpsTrack_export_failed": "Esportazione non riuscita.",
   "gpsTrack_map_title": "Mappa tracce",
+  "gpsTrack_map_truncated": "Vengono mostrate le {count} tracce più recenti. Restringi il filtro per data per vedere le altre.",
   "gpsTrack_map_noTracks": "Nessuna traccia registrata da mostrare.",
   "gpsTrack_map_showMap": "Mostra mappa",
   "gpsTrack_filter_all": "Tutte le date",
