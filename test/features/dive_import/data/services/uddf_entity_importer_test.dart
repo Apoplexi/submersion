@@ -1043,10 +1043,11 @@ void main() {
 
         final dive =
             verify(mockDiveRepo.createDive(captureAny)).captured.single as Dive;
-        // Bottom threshold is 85% of 30 m = 25.5 m; the diver is at/above it from
-        // t=60 to t=1200, so bottom time is 1140 s, not the 1320 s runtime.
+        // Ascent threshold is min(max(6 m, 33% of 30 m), 85% of 30 m) =
+        // 9.9 m; the last sample at/deeper is t=1200 and bottom time runs
+        // from surface departure (t=0), so 1200 s, not the 1320 s runtime.
         expect(dive.runtime, const Duration(seconds: 1320));
-        expect(dive.bottomTime, const Duration(seconds: 1140));
+        expect(dive.bottomTime, const Duration(seconds: 1200));
         expect(dive.bottomTime!, lessThan(dive.runtime!));
       },
     );
