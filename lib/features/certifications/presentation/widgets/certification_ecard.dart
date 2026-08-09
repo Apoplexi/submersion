@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 
 import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:submersion/features/certifications/domain/entities/certification.dart';
+import 'package:submersion/features/certifications/presentation/widgets/certification_ecard_back.dart';
 
 /// A credit card-style widget displaying a certification with agency branding.
 ///
@@ -60,7 +61,7 @@ class CertificationEcard extends StatelessWidget {
               return FadeTransition(opacity: animation, child: child);
             },
             child: showBack
-                ? _CardBack(
+                ? CertificationEcardBack(
                     key: const ValueKey('back'),
                     certification: certification,
                   )
@@ -285,117 +286,6 @@ class _CardFront extends StatelessWidget {
     }
 
     return const SizedBox.shrink();
-  }
-}
-
-/// The back face of the certification card.
-class _CardBack extends StatelessWidget {
-  final Certification certification;
-
-  const _CardBack({super.key, required this.certification});
-
-  @override
-  Widget build(BuildContext context) {
-    // If there's a photo of the back, show it
-    if (certification.photoBack != null) {
-      return Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.2),
-              blurRadius: 12,
-              offset: const Offset(0, 6),
-            ),
-          ],
-        ),
-        clipBehavior: Clip.antiAlias,
-        child: Image.memory(certification.photoBack!, fit: BoxFit.cover),
-      );
-    }
-
-    // Generate a back design
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
-        color: const Color(0xFFE0E0E0),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.2),
-            blurRadius: 12,
-            offset: const Offset(0, 6),
-          ),
-        ],
-      ),
-      clipBehavior: Clip.antiAlias,
-      child: Column(
-        children: [
-          // Magnetic stripe
-          const SizedBox(height: 24),
-          Container(height: 40, color: const Color(0xFF424242)),
-          const SizedBox(height: 16),
-          // Card content
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Instructor info
-                  if (certification.instructorName != null &&
-                      certification.instructorName!.isNotEmpty) ...[
-                    Text(
-                      context.l10n.certifications_ecard_label_instructor,
-                      style: const TextStyle(
-                        color: Color(0xFF757575),
-                        fontSize: 10,
-                        fontWeight: FontWeight.w500,
-                        letterSpacing: 1.0,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      certification.instructorName!,
-                      style: const TextStyle(
-                        color: Color(0xFF424242),
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
-                  if (certification.instructorNumber != null &&
-                      certification.instructorNumber!.isNotEmpty) ...[
-                    const SizedBox(height: 2),
-                    Text(
-                      '#${certification.instructorNumber}',
-                      style: const TextStyle(
-                        color: Color(0xFF757575),
-                        fontSize: 12,
-                      ),
-                    ),
-                  ],
-                  const Spacer(),
-                  // Certified by agency
-                  Center(
-                    child: Text(
-                      context.l10n.certifications_ecard_label_certifiedBy(
-                        certification.agency.displayName,
-                      ),
-                      style: const TextStyle(
-                        color: Color(0xFF757575),
-                        fontSize: 12,
-                        fontStyle: FontStyle.italic,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
   }
 }
 
