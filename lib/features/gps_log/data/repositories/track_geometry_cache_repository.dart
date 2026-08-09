@@ -35,13 +35,28 @@ enum TrackLod {
 class TrackGeometryCacheRepository {
   LocalCacheDatabase get _db => LocalCacheDatabaseService.instance.database;
 
+  /// The local cache database, or null before it has been initialised.
+  ///
+  /// This store is a pure derived cache: if it is not up yet, the correct
+  /// behaviour is to behave as an empty cache, not to fail the caller. A
+  /// track delete must never fail because a cache was unavailable.
+  LocalCacheDatabase? get _dbOrNull {
+    try {
+      return _db;
+    } on StateError {
+      return null;
+    }
+  }
+
   /// Cached geometry, or null on a cache miss.
   ///
   /// An empty list is a real answer (the track has no drawable points) and
   /// is distinct from null (nothing cached yet).
   Future<List<GpsTrackPoint>?> read(String trackId, TrackLod lod) async {
+    final db = _dbOrNull;
+    if (db == null) return null;
     final row =
-        await (_db.select(_db.gpsTrackGeometryCache)
+        await (db.select(db.gpsTrackGeometryCache)
               ..where((t) => t.trackId.equals(trackId))
               ..where((t) => t.lodLevel.equals(lod.name)))
             .getSingleOrNull();
@@ -57,14 +72,17 @@ class TrackGeometryCacheRepository {
     TrackLod lod,
     List<GpsTrackPoint> points,
   ) async {
-    await _db
-        .into(_db.gpsTrackGeometryCache)
+    final db = _dbOrNull;
+    if (db == null) return;
+    await db
+        .into(db.gpsTrackGeometryCache)
         .insertOnConflictUpdate(
           GpsTrackGeometryCacheCompanion.insert(
             trackId: trackId,
             lodLevel: lod.name,
             status: points.isEmpty ? 'empty' : 'ok',
-            createdAt: DateTime.now().millisecondsSinceEpoch ~/ 1000,
+            // Milliseconds, matching every sibling table in this DB.
+            createdAt: DateTime.now().millisecondsSinceEpoch,
             points: points.isEmpty
                 ? const Value.absent()
                 : Value(encodeTrackPoints(points)),
@@ -75,8 +93,10 @@ class TrackGeometryCacheRepository {
   /// Drops every cached LOD for [trackId]. Called after a trim or split
   /// changes which points the track represents.
   Future<void> invalidate(String trackId) async {
-    await (_db.delete(
-      _db.gpsTrackGeometryCache,
+    final db = _dbOrNull;
+    if (db == null) return;
+    await (db.delete(
+      db.gpsTrackGeometryCache,
     )..where((t) => t.trackId.equals(trackId))).go();
   }
 }

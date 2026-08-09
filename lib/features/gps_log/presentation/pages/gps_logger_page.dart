@@ -209,7 +209,7 @@ class _GpsLoggerPageState extends ConsumerState<GpsLoggerPage> {
       ),
     );
     if (confirmed == true) {
-      await ref.read(gpsTrackRepositoryProvider).deleteTrack(track.id);
+      await ref.read(deleteTrackProvider)(track.id);
     }
   }
 

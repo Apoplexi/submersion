@@ -140,6 +140,21 @@ final filteredTracksProvider = FutureProvider<List<GpsTrack>>((ref) async {
   ];
 });
 
+/// Drops every cached and in-memory derivative of [id].
+///
+/// gpsTrackGeometryProvider returns early on a persisted cache hit, BEFORE it
+/// watches gpsTrackDetailProvider, so on a warm cache there is no dependency
+/// edge for a detail invalidation to travel along. Each LOD therefore has to
+/// be invalidated by name, or the map keeps drawing the pre-trim polyline
+/// while the stats header updates - the trim looks like it silently failed.
+Future<void> _evictTrack(Ref ref, String id) async {
+  await ref.read(trackGeometryCacheRepositoryProvider).invalidate(id);
+  for (final lod in TrackLod.values) {
+    ref.invalidate(gpsTrackGeometryProvider((id, lod)));
+  }
+  ref.invalidate(gpsTrackDetailProvider(id));
+}
+
 /// Trims a track and drops its cached geometry.
 ///
 /// Cache invalidation lives here rather than in the repository so the data
@@ -149,8 +164,7 @@ final trimTrackProvider = Provider(
     await ref
         .read(gpsTrackRepositoryProvider)
         .setTrimBounds(id, startMs: startMs, endMs: endMs);
-    await ref.read(trackGeometryCacheRepositoryProvider).invalidate(id);
-    ref.invalidate(gpsTrackDetailProvider(id));
+    await _evictTrack(ref, id);
   },
 );
 
@@ -160,9 +174,26 @@ final splitTrackProvider = Provider(
     final result = await ref
         .read(gpsTrackRepositoryProvider)
         .splitTrack(id, atWallClockMs);
-    await ref.read(trackGeometryCacheRepositoryProvider).invalidate(id);
+    await _evictTrack(ref, id);
+    // A dive detail page still linking to the deleted parent would otherwise
+    // navigate to a track that no longer exists.
+    ref.invalidate(trackForDiveProvider);
     ref.invalidate(gpsTracksProvider);
     return result;
+  },
+);
+
+/// Deletes a track and drops its cached geometry.
+///
+/// Without this the local cache keeps up to three orphan blobs per deleted
+/// track: it has no TTL, no foreign key, no GC, and nothing else in the app
+/// ever clears that database.
+final deleteTrackProvider = Provider(
+  (ref) => (String id) async {
+    await ref.read(gpsTrackRepositoryProvider).deleteTrack(id);
+    await _evictTrack(ref, id);
+    ref.invalidate(trackForDiveProvider);
+    ref.invalidate(gpsTracksProvider);
   },
 );
 
