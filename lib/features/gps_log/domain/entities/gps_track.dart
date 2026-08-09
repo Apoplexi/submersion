@@ -60,6 +60,17 @@ class GpsTrack {
     this.trimEndTime,
   });
 
+  /// Recording window start, honouring a non-destructive trim.
+  ///
+  /// Read this rather than [startTime] anywhere the question is "does this
+  /// track cover instant X" - a trim exists precisely so the drive to the
+  /// marina stops matching.
+  int get effectiveStartTime => trimStartTime ?? startTime;
+
+  /// Recording window end, honouring a non-destructive trim. Null while
+  /// recording.
+  int? get effectiveEndTime => trimEndTime ?? endTime;
+
   /// The points this track actually represents, honouring non-destructive
   /// trim bounds.
   ///

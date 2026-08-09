@@ -91,6 +91,14 @@ class GpsTrackRepository {
               updatedAt: now,
             ),
           );
+      // Without this the row's hlc stays NULL, and _exportGpsTracks filters
+      // on `hlc > hlcSince` - SQL NULL is never greater than anything - so
+      // the track would never ride an incremental changeset.
+      await _syncRepository.markRecordPending(
+        entityType: entityType,
+        recordId: id,
+        localUpdatedAt: now,
+      );
       SyncEventBus.notifyLocalChange();
       return id;
     } catch (e, stackTrace) {
@@ -118,12 +126,19 @@ class GpsTrackRepository {
   /// a tiny sync payload, and incapable of losing a fix.
   Future<void> setTrimBounds(String id, {int? startMs, int? endMs}) async {
     try {
+      final now = DateTime.now().millisecondsSinceEpoch;
       await (_db.update(_db.gpsTracks)..where((t) => t.id.equals(id))).write(
         GpsTracksCompanion(
           trimStartTime: Value(startMs),
           trimEndTime: Value(endMs),
-          updatedAt: Value(DateTime.now().millisecondsSinceEpoch),
+          updatedAt: Value(now),
         ),
+      );
+      // updatedAt alone does not replicate: the export filters on hlc.
+      await _syncRepository.markRecordPending(
+        entityType: entityType,
+        recordId: id,
+        localUpdatedAt: now,
       );
       SyncEventBus.notifyLocalChange();
     } catch (e, stackTrace) {

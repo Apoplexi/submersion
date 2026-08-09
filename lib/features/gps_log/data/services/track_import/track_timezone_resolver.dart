@@ -20,36 +20,87 @@ int toWallClockEpochSecondsAt(DateTime realUtc, int tzOffsetMinutes) {
       1000;
 }
 
-/// Best guess at the offset a track was recorded under, from dives logged
-/// around the same time.
-///
-/// Dive entry times are already wall-clock-as-UTC, so the difference between
-/// a dive's stored entry and the track's real-UTC first fix IS the offset.
-/// Returns null when nothing plausible can be inferred - the import review
-/// step then asks rather than guessing.
-int? inferOffsetFromDives(DateTime firstFixUtc, List<Dive> dives) {
-  if (dives.isEmpty) return null;
+/// Inclusive range of offsets, in minutes, that a dive permits.
+typedef OffsetRange = ({int lo, int hi});
 
-  Dive? nearest;
-  var smallestGap = const Duration(days: 1);
-  for (final dive in dives) {
-    final gap = dive.effectiveEntryTime.difference(firstFixUtc).abs();
-    if (gap < smallestGap) {
-      smallestGap = gap;
-      nearest = dive;
+/// Offsets consistent with [dive] having happened somewhere inside the
+/// track's real span, or null when no offset in the real-world range is.
+///
+/// A dive's stored entry is wall-clock-as-UTC: `W = R + Z`, where R is the
+/// real instant and Z the offset. We know W but NOT R, so a single dive
+/// cannot determine Z - it only constrains it, because R must lie inside the
+/// track:
+///
+///   `U_first <= W - Z <= U_last`  =>  `W - U_last <= Z <= W - U_first`
+///
+/// An earlier version returned `W - U_first` directly. That is Z plus the
+/// elapsed time from the first fix to the dive entry, so every imported point
+/// was shifted by the length of the boat ride - and on a two-tank day the
+/// nearest-dive search, running in the same conflated space, preferred the
+/// dive whose gap cancelled the offset entirely.
+OffsetRange? offsetRangeForDive(
+  Dive dive,
+  DateTime firstFixUtc,
+  DateTime lastFixUtc,
+) {
+  final w = dive.effectiveEntryTime;
+  final lo = w.difference(lastFixUtc).inMinutes;
+  final hi = w.difference(firstFixUtc).inMinutes;
+
+  final clampedLo = lo < _kMinOffsetMinutes ? _kMinOffsetMinutes : lo;
+  final clampedHi = hi > _kMaxOffsetMinutes ? _kMaxOffsetMinutes : hi;
+  if (clampedLo > clampedHi) return null;
+  return (lo: clampedLo, hi: clampedHi);
+}
+
+int _snapToQuarterHour(int minutes) => (minutes / 15).round() * 15;
+
+/// Best offset for a track, given the dives already logged.
+///
+/// Returns null when no dive constrains the answer, in which case the caller
+/// falls back to the device zone and the import review step asks.
+///
+/// Where a dive does constrain it, [deviceOffsetMinutes] is used as the prior:
+/// if it is already consistent with the track it is kept, otherwise it is
+/// pulled to the nearest offset that IS consistent. That is the least
+/// surprising correction - it only moves the answer when the device zone is
+/// demonstrably impossible for this track.
+int? resolveOffsetFromDives({
+  required DateTime firstFixUtc,
+  required DateTime lastFixUtc,
+  required List<Dive> dives,
+  required int deviceOffsetMinutes,
+}) {
+  final ranges = <OffsetRange>[
+    for (final dive in dives)
+      ?offsetRangeForDive(dive, firstFixUtc, lastFixUtc),
+  ];
+  if (ranges.isEmpty) return null;
+
+  // The device zone is plausible for this track: keep it.
+  for (final r in ranges) {
+    if (deviceOffsetMinutes >= r.lo && deviceOffsetMinutes <= r.hi) {
+      return deviceOffsetMinutes;
     }
   }
-  if (nearest == null) return null;
 
-  final impliedMinutes = nearest.effectiveEntryTime
-      .difference(firstFixUtc)
-      .inMinutes;
-
-  // Snap to a quarter hour: every real-world zone is a multiple of 15.
-  final snapped = (impliedMinutes / 15).round() * 15;
-
-  if (snapped < _kMinOffsetMinutes || snapped > _kMaxOffsetMinutes) {
-    return null;
+  // Otherwise pull to the nearest consistent offset.
+  int? best;
+  var bestDistance = 1 << 30;
+  for (final r in ranges) {
+    final clamped = deviceOffsetMinutes < r.lo ? r.lo : r.hi;
+    final distance = (clamped - deviceOffsetMinutes).abs();
+    if (distance < bestDistance) {
+      bestDistance = distance;
+      best = clamped;
+    }
   }
-  return snapped;
+  if (best == null) return null;
+
+  // Snap to a quarter hour, but stay inside the range that produced it.
+  final snapped = _snapToQuarterHour(best);
+  for (final r in ranges) {
+    if (snapped >= r.lo && snapped <= r.hi) return snapped;
+  }
+  return best;
 }

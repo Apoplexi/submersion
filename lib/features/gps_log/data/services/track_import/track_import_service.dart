@@ -187,9 +187,17 @@ class TrackImportService {
     }
 
     final dives = await _diveRepository.getAllDives();
+    final deviceOffset = DateTime.now().timeZoneOffset.inMinutes;
+    // A dive can only CONSTRAIN the offset, never determine it, so the device
+    // zone stays the prior and the review step remains the real answer.
     final tzOffsetMinutes =
-        inferOffsetFromDives(parsed.fixes.first.utc, dives) ??
-        DateTime.now().timeZoneOffset.inMinutes;
+        resolveOffsetFromDives(
+          firstFixUtc: parsed.fixes.first.utc,
+          lastFixUtc: parsed.fixes.last.utc,
+          dives: dives,
+          deviceOffsetMinutes: deviceOffset,
+        ) ??
+        deviceOffset;
 
     final startMs =
         toWallClockEpochSecondsAt(parsed.fixes.first.utc, tzOffsetMinutes) *
