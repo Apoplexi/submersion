@@ -339,14 +339,14 @@ void main() {
       );
     });
 
-    test('formats level using enum name', () {
+    test('formats level using its display name, not the enum identifier', () {
       expect(
         adapter.formatValue(
           CertificationField.level,
           CertificationLevel.advancedOpenWater,
           units,
         ),
-        equals('advancedOpenWater'),
+        equals('Advanced Open Water'),
       );
     });
 

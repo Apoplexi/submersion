@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:submersion/features/certifications/domain/certification_title.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:submersion/features/certifications/domain/entities/certification.dart';
 import 'package:submersion/features/certifications/presentation/pages/certification_edit_page.dart';
@@ -473,7 +474,7 @@ class _BuddyEditPageState extends ConsumerState<BuddyEditPage> {
                 ListTile(
                   contentPadding: EdgeInsets.zero,
                   leading: const Icon(Icons.card_membership),
-                  title: Text(cert.level?.displayName ?? cert.name),
+                  title: Text(certificationTitle(cert)),
                   subtitle: Text(cert.agency.displayName),
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,

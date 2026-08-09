@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
+import 'package:submersion/features/certifications/domain/certification_title.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:submersion/core/constants/list_view_mode.dart';
 import 'package:submersion/core/constants/sort_options.dart';
@@ -536,8 +537,7 @@ class CertificationListTile extends StatelessWidget {
         : '';
 
     return Semantics(
-      label:
-          '${certification.agency.displayName} ${certification.name}$issueDateLabel$statusLabel',
+      label: '${certificationTitle(certification)}$issueDateLabel$statusLabel',
       child: Card(
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
         color: isSelected
@@ -546,7 +546,7 @@ class CertificationListTile extends StatelessWidget {
         child: ListTile(
           onTap: onTap,
           leading: _buildLeadingIcon(context),
-          title: Text(certification.name),
+          title: Text(certificationTitle(certification)),
           subtitle: _buildSubtitle(context),
           trailing: _buildTrailing(context),
         ),

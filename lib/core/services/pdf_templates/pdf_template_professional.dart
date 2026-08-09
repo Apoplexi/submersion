@@ -5,6 +5,7 @@ import 'package:submersion/core/constants/pdf_templates.dart';
 import 'package:submersion/core/services/pdf_templates/pdf_fonts.dart';
 import 'package:submersion/core/services/pdf_templates/pdf_shared_components.dart';
 import 'package:submersion/core/services/pdf_templates/pdf_template_builder.dart';
+import 'package:submersion/features/certifications/domain/certification_title.dart';
 import 'package:submersion/features/certifications/domain/entities/certification.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
 import 'package:submersion/features/divers/domain/entities/diver.dart';
@@ -277,7 +278,7 @@ class PdfTemplateProfessional extends PdfTemplateBuilder {
                       ),
                       pw.SizedBox(width: 8),
                       pw.Text(
-                        '${cert.agency.displayName} - ${cert.name}',
+                        certificationTitle(cert),
                         style: const pw.TextStyle(fontSize: 10),
                       ),
                       if (cert.issueDate != null) ...[

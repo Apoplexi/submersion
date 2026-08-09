@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:submersion/core/providers/provider.dart';
+import 'package:submersion/features/certifications/domain/certification_title.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:submersion/features/certifications/domain/entities/certification.dart';
 import 'package:submersion/features/certifications/presentation/providers/certification_providers.dart';
@@ -278,7 +279,7 @@ class _MiniCertCard extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
           ),
           Text(
-            certification.name,
+            certificationTitle(certification),
             style: TextStyle(
               color: Colors.white.withValues(alpha: 0.9),
               fontSize: 11,

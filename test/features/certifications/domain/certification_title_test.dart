@@ -21,17 +21,17 @@ Certification cert({
 
 void main() {
   group('derivedCertificationTitle', () {
-    test('joins agency and level with a single space', () {
+    test('is the certification alone, with no agency prefix', () {
       expect(
         derivedCertificationTitle(
           CertificationAgency.padi,
           CertificationLevel.openWater,
         ),
-        'PADI Open Water',
+        'Open Water',
       );
     });
 
-    test('returns the agency alone when level is null', () {
+    test('falls back to the agency when level is null', () {
       expect(derivedCertificationTitle(CertificationAgency.ssi, null), 'SSI');
     });
   });
@@ -92,10 +92,7 @@ void main() {
 
   group('certificationTitle', () {
     test('derives when the stored name adds nothing', () {
-      expect(
-        certificationTitle(cert(name: 'PADI : Open Water')),
-        'PADI Open Water',
-      );
+      expect(certificationTitle(cert(name: 'PADI : Open Water')), 'Open Water');
     });
 
     test('prefers a custom name', () {

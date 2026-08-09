@@ -64,6 +64,12 @@ void main() {
   Finder levelDropdown() =>
       find.byType(DropdownButtonFormField<CertificationOption>);
 
+  // The "Name on card" hint renders the derived title, so a bare find.text
+  // for a certification matches both the dropdown and the hint. Scope to the
+  // dropdown when asserting what is selected.
+  Finder selectedCertification(String label) =>
+      find.descendant(of: levelDropdown(), matching: find.text(label));
+
   Future<void> selectFromDropdown(
     WidgetTester tester,
     Finder dropdown,
@@ -116,12 +122,12 @@ void main() {
 
     // Default agency is PADI; pick a PADI-ladder level.
     await selectFromDropdown(tester, levelDropdown(), 'Advanced Open Water');
-    expect(find.text('Advanced Open Water'), findsOneWidget);
+    expect(selectedCertification('Advanced Open Water'), findsOneWidget);
 
     await selectFromDropdown(tester, agencyDropdown(), 'CMAS');
 
-    expect(find.text('Advanced Open Water'), findsNothing);
-    expect(find.text('Not specified'), findsOneWidget);
+    expect(selectedCertification('Advanced Open Water'), findsNothing);
+    expect(selectedCertification('Not specified'), findsOneWidget);
   });
 
   testWidgets('switching agency keeps a compatible (specialty) level', (
@@ -133,7 +139,7 @@ void main() {
     await selectFromDropdown(tester, levelDropdown(), 'Nitrox');
     await selectFromDropdown(tester, agencyDropdown(), 'CMAS');
 
-    expect(find.text('Nitrox'), findsOneWidget);
+    expect(selectedCertification('Nitrox'), findsOneWidget);
   });
 
   testWidgets(
@@ -157,7 +163,7 @@ void main() {
       await tester.pumpAndSettle();
 
       // Stored level renders even though it is not in the CMAS catalog.
-      expect(find.text('Advanced Open Water'), findsOneWidget);
+      expect(selectedCertification('Advanced Open Water'), findsOneWidget);
 
       // Save without touching agency or level; the value must survive.
       await tester.tap(find.text('Save'));
@@ -206,7 +212,7 @@ void main() {
     await tester.pumpWidget(await buildHarness(tester));
     await tester.pumpAndSettle();
 
-    expect(find.text('Not specified'), findsOneWidget);
+    expect(selectedCertification('Not specified'), findsOneWidget);
     expect(find.text('Progression'), findsNothing);
   });
 }

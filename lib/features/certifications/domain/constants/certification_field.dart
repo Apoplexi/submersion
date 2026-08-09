@@ -5,6 +5,7 @@ import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/certifications/domain/entities/certification.dart';
 import 'package:submersion/shared/constants/entity_field.dart';
+import 'package:submersion/features/certifications/domain/certification_title.dart';
 
 /// Enumeration of every displayable field for the certification table view.
 enum CertificationField implements EntityField {
@@ -154,7 +155,9 @@ class CertificationFieldAdapter
   @override
   dynamic extractValue(CertificationField field, Certification entity) {
     return switch (field) {
-      CertificationField.certName => entity.name,
+      // Not entity.name: that is empty for certs without a custom name, and
+      // for legacy rows it repeats the Agency and Certification columns.
+      CertificationField.certName => certificationTitle(entity),
       CertificationField.agency => entity.agency,
       CertificationField.level => entity.level,
       CertificationField.cardNumber => entity.cardNumber,
@@ -176,7 +179,9 @@ class CertificationFieldAdapter
     if (value == null) return '--';
     return switch (field) {
       CertificationField.agency => (value as CertificationAgency).name,
-      CertificationField.level => (value as CertificationLevel).name,
+      // displayName, not name: the latter is the enum identifier, so the
+      // column read "openWater" rather than "Open Water".
+      CertificationField.level => (value as CertificationLevel).displayName,
       CertificationField.issueDate => _dateFormat.format(value as DateTime),
       CertificationField.expiryDate => _dateFormat.format(value as DateTime),
       _ => value is String ? (value.isEmpty ? '--' : value) : value.toString(),

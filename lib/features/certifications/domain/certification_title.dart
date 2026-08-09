@@ -11,15 +11,18 @@ import 'package:submersion/features/certifications/domain/entities/certification
 /// name and suppresses it. That is why [hasDerivedName] must keep matching
 /// the legacy spaced-colon format for as long as such rows can exist.
 
-/// "PADI Open Water", or the agency alone when [level] is null.
+/// The title to show when no custom name is stored: the certification alone
+/// ("Open Water"), falling back to the agency when there is no certification.
+///
+/// Deliberately does NOT prefix the agency. Every surface that shows a
+/// certification already shows its agency on a separate line or column -- the
+/// detail page's Agency row, the picker's subtitle, the PDF's agency line, the
+/// list's Agency column -- so prefixing here would just trade one duplication
+/// for another.
 String derivedCertificationTitle(
   CertificationAgency agency,
   CertificationLevel? level,
-) {
-  final agencyName = agency.displayName;
-  if (level == null) return agencyName;
-  return '$agencyName ${level.displayName}';
-}
+) => level?.displayName ?? agency.displayName;
 
 String _normalized(String value) =>
     value.trim().toLowerCase().replaceAll(RegExp(r'\s+'), ' ');

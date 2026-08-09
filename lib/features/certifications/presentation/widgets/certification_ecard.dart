@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 
 import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:submersion/features/certifications/domain/entities/certification.dart';
+import 'package:submersion/features/certifications/domain/certification_title.dart';
 
 /// A credit card-style widget displaying a certification with agency branding.
 ///
@@ -48,7 +49,7 @@ class CertificationEcard extends StatelessWidget {
 
     return Semantics(
       label:
-          '${certification.agency.displayName} ${certification.name} certification for $diverName$issueDateStr$statusStr. ${showBack ? 'Showing back' : 'Showing front'}. Tap to flip',
+          '${certification.agency.displayName} ${certificationTitle(certification)} certification for $diverName$issueDateStr$statusStr. ${showBack ? 'Showing back' : 'Showing front'}. Tap to flip',
       child: AspectRatio(
         aspectRatio: aspectRatio,
         child: GestureDetector(
@@ -146,7 +147,7 @@ class _CardFront extends StatelessWidget {
                 const Spacer(),
                 // Center: certification name
                 Text(
-                  certification.name,
+                  certificationTitle(certification),
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 22,
@@ -156,11 +157,12 @@ class _CardFront extends StatelessWidget {
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
-                // Level display if present
-                if (certification.level != null) ...[
+                // Only when the title above is a custom name -- otherwise it
+                // already contains the certification.
+                if (certificationSubtitle(certification) != null) ...[
                   const SizedBox(height: 4),
                   Text(
-                    certification.level!.displayName,
+                    certificationSubtitle(certification)!,
                     style: TextStyle(
                       color: Colors.white.withValues(alpha: 0.85),
                       fontSize: 14,

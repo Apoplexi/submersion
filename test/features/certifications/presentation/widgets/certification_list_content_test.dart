@@ -295,10 +295,13 @@ void main() {
       );
       await tester.pump();
 
-      expect(find.text('Open Water'), findsOneWidget);
+      // ml1 and ml4 store a name identical to their certification, so the
+      // Name column derives it and both columns show the same string; ml2 and
+      // ml3 store names that differ from theirs and are kept verbatim.
+      expect(find.text('Open Water'), findsNWidgets(2));
       expect(find.text('Advanced'), findsOneWidget);
       expect(find.text('Rescue'), findsOneWidget);
-      expect(find.text('Divemaster'), findsOneWidget);
+      expect(find.text('Divemaster'), findsNWidgets(2));
     });
 
     testWidgets('renders with various agencies', (tester) async {
@@ -455,5 +458,52 @@ void main() {
         expect(rescue.isSelected, isTrue);
       },
     );
+  });
+
+  group('title derivation', () {
+    testWidgets('a cert with no stored name still shows a title', (
+      tester,
+    ) async {
+      final overrides = await _buildOverrides(
+        certs: [
+          _makeCert(id: 'n1', name: '', level: CertificationLevel.openWater),
+        ],
+      );
+
+      await tester.pumpWidget(
+        testApp(
+          overrides: overrides,
+          child: const CertificationListContent(showAppBar: true),
+        ),
+      );
+      await tester.pump();
+
+      expect(find.text('Open Water'), findsWidgets);
+    });
+
+    testWidgets('a derived stored name is not shown verbatim', (tester) async {
+      final overrides = await _buildOverrides(
+        certs: [
+          _makeCert(
+            id: 'n2',
+            name: 'PADI : Open Water',
+            level: CertificationLevel.openWater,
+          ),
+        ],
+      );
+
+      await tester.pumpWidget(
+        testApp(
+          overrides: overrides,
+          child: const CertificationListContent(showAppBar: true),
+        ),
+      );
+      await tester.pump();
+
+      expect(find.text('PADI : Open Water'), findsNothing);
+      // The Name column derives the certification; the Agency column still
+      // carries "PADI" on its own, so the title must not repeat it.
+      expect(find.text('Open Water'), findsWidgets);
+    });
   });
 }

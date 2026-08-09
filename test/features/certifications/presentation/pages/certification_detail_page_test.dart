@@ -361,8 +361,10 @@ void main() {
     ) async {
       await pumpCert(tester, make('d1', 'PADI : Open Water'));
 
+      // The Certification row is present, the redundant Type row is not, and
+      // the legacy stored string is never shown verbatim.
       expect(find.text('Certification'), findsOneWidget);
-      expect(find.text('Open Water'), findsOneWidget);
+      expect(find.text('Type'), findsNothing);
       expect(find.text('PADI : Open Water'), findsNothing);
     });
 
