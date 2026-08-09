@@ -77,18 +77,11 @@ class CourseListPage extends ConsumerWidget {
           columnSettingsAction: IconButton(
             icon: const Icon(Icons.view_column_outlined),
             tooltip: 'Column settings',
-            onPressed: () {
-              final config = ref.read(courseTableConfigProvider);
-              final notifier = ref.read(courseTableConfigProvider.notifier);
-              showEntityTableColumnPicker<CourseField>(
-                context,
-                config: config,
-                adapter: CourseFieldAdapter.instance,
-                onToggleColumn: notifier.toggleColumn,
-                onReorderColumn: notifier.reorderColumn,
-                onTogglePin: notifier.togglePin,
-              );
-            },
+            onPressed: () => showEntityTableColumnPicker<CourseField>(
+              context,
+              configProvider: courseTableConfigProvider,
+              adapter: CourseFieldAdapter.instance,
+            ),
           ),
           appBarActions: [
             IconButton(
