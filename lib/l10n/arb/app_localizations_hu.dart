@@ -2457,30 +2457,6 @@ class AppLocalizationsHu extends AppLocalizations {
   String get preDive_start_begin => 'Kezdés';
 
   @override
-  String get preDive_section_title => 'Merülés előtti ellenőrzés';
-
-  @override
-  String get preDive_section_link => 'Ellenőrzőlista-munkamenet csatolása';
-
-  @override
-  String get preDive_section_unlink => 'Csatolás megszüntetése';
-
-  @override
-  String get preDive_section_run => 'Merülés előtti ellenőrzőlista futtatása';
-
-  @override
-  String get preDive_section_noUnlinked =>
-      'Nincsenek nem csatolt ellenőrzőlista-munkamenetek';
-
-  @override
-  String get diveDetailSection_preDiveChecklist_name =>
-      'Merülés előtti ellenőrzés';
-
-  @override
-  String get diveDetailSection_preDiveChecklist_description =>
-      'Kapcsolt merülés előtti ellenőrzőlista-munkamenet';
-
-  @override
   String get diveLog_listPage_bottomSheet_preDiveChecklist =>
       'Merülés előtti ellenőrzőlista indítása';
 

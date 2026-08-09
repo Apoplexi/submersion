@@ -2470,32 +2470,6 @@ class AppLocalizationsPt extends AppLocalizations {
   String get preDive_start_begin => 'Começar';
 
   @override
-  String get preDive_section_title => 'Verificação Pré-Mergulho';
-
-  @override
-  String get preDive_section_link =>
-      'Vincular uma sessão de lista de verificação';
-
-  @override
-  String get preDive_section_unlink => 'Desvincular';
-
-  @override
-  String get preDive_section_run =>
-      'Executar lista de verificação pré-mergulho';
-
-  @override
-  String get preDive_section_noUnlinked =>
-      'Nenhuma sessão de lista de verificação desvinculada';
-
-  @override
-  String get diveDetailSection_preDiveChecklist_name =>
-      'Verificação Pré-Mergulho';
-
-  @override
-  String get diveDetailSection_preDiveChecklist_description =>
-      'Sessão de lista de verificação pré-mergulho vinculada';
-
-  @override
   String get diveLog_listPage_bottomSheet_preDiveChecklist =>
       'Iniciar lista de verificação pré-mergulho';
 

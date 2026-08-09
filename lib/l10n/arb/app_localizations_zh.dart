@@ -2326,27 +2326,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get preDive_start_begin => '开始';
 
   @override
-  String get preDive_section_title => '潜前检查';
-
-  @override
-  String get preDive_section_link => '关联检查清单记录';
-
-  @override
-  String get preDive_section_unlink => '取消关联';
-
-  @override
-  String get preDive_section_run => '执行潜前检查清单';
-
-  @override
-  String get preDive_section_noUnlinked => '没有未关联的检查清单记录';
-
-  @override
-  String get diveDetailSection_preDiveChecklist_name => '潜前检查';
-
-  @override
-  String get diveDetailSection_preDiveChecklist_description => '已关联的潜前检查清单记录';
-
-  @override
   String get diveLog_listPage_bottomSheet_preDiveChecklist => '开始潜前检查清单';
 
   @override

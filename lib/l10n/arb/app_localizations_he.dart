@@ -2398,28 +2398,6 @@ class AppLocalizationsHe extends AppLocalizations {
   String get preDive_start_begin => 'התחל';
 
   @override
-  String get preDive_section_title => 'בדיקה לפני צלילה';
-
-  @override
-  String get preDive_section_link => 'קשר הרצת רשימת בדיקה';
-
-  @override
-  String get preDive_section_unlink => 'בטל קישור';
-
-  @override
-  String get preDive_section_run => 'הרץ רשימת בדיקה לפני צלילה';
-
-  @override
-  String get preDive_section_noUnlinked => 'אין הרצות רשימת בדיקה לא מקושרות';
-
-  @override
-  String get diveDetailSection_preDiveChecklist_name => 'בדיקה לפני צלילה';
-
-  @override
-  String get diveDetailSection_preDiveChecklist_description =>
-      'הרצת רשימת בדיקה לפני צלילה מקושרת';
-
-  @override
   String get diveLog_listPage_bottomSheet_preDiveChecklist =>
       'התחל רשימת בדיקה לפני צלילה';
 

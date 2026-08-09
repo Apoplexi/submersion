@@ -2475,30 +2475,6 @@ class AppLocalizationsDe extends AppLocalizations {
   String get preDive_start_begin => 'Beginnen';
 
   @override
-  String get preDive_section_title => 'Check vor dem Tauchgang';
-
-  @override
-  String get preDive_section_link => 'Checklisten-Durchlauf verknüpfen';
-
-  @override
-  String get preDive_section_unlink => 'Verknüpfung aufheben';
-
-  @override
-  String get preDive_section_run => 'Checkliste vor dem Tauchgang durchführen';
-
-  @override
-  String get preDive_section_noUnlinked =>
-      'Keine unverknüpften Checklisten-Durchläufe';
-
-  @override
-  String get diveDetailSection_preDiveChecklist_name =>
-      'Check vor dem Tauchgang';
-
-  @override
-  String get diveDetailSection_preDiveChecklist_description =>
-      'Verknüpfter Checklisten-Durchlauf vor dem Tauchgang';
-
-  @override
   String get diveLog_listPage_bottomSheet_preDiveChecklist =>
       'Checkliste vor dem Tauchgang starten';
 

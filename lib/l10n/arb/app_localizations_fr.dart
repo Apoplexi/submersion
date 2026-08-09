@@ -2478,30 +2478,6 @@ class AppLocalizationsFr extends AppLocalizations {
   String get preDive_start_begin => 'Commencer';
 
   @override
-  String get preDive_section_title => 'Vérification pré-plongée';
-
-  @override
-  String get preDive_section_link => 'Lier une session de checklist';
-
-  @override
-  String get preDive_section_unlink => 'Dissocier';
-
-  @override
-  String get preDive_section_run => 'Lancer la checklist pré-plongée';
-
-  @override
-  String get preDive_section_noUnlinked =>
-      'Aucune session de checklist non liée';
-
-  @override
-  String get diveDetailSection_preDiveChecklist_name =>
-      'Vérification pré-plongée';
-
-  @override
-  String get diveDetailSection_preDiveChecklist_description =>
-      'Session de checklist pré-plongée liée';
-
-  @override
   String get diveLog_listPage_bottomSheet_preDiveChecklist =>
       'Démarrer la checklist pré-plongée';
 

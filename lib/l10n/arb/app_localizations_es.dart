@@ -2474,31 +2474,6 @@ class AppLocalizationsEs extends AppLocalizations {
   String get preDive_start_begin => 'Comenzar';
 
   @override
-  String get preDive_section_title => 'Comprobación previa a la inmersión';
-
-  @override
-  String get preDive_section_link =>
-      'Vincular una sesión de lista de verificación';
-
-  @override
-  String get preDive_section_unlink => 'Desvincular';
-
-  @override
-  String get preDive_section_run => 'Ejecutar lista previa a la inmersión';
-
-  @override
-  String get preDive_section_noUnlinked =>
-      'No hay sesiones de lista sin vincular';
-
-  @override
-  String get diveDetailSection_preDiveChecklist_name =>
-      'Comprobación previa a la inmersión';
-
-  @override
-  String get diveDetailSection_preDiveChecklist_description =>
-      'Sesión de lista previa a la inmersión vinculada';
-
-  @override
   String get diveLog_listPage_bottomSheet_preDiveChecklist =>
       'Iniciar lista previa a la inmersión';
 

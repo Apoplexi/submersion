@@ -2418,29 +2418,6 @@ class AppLocalizationsAr extends AppLocalizations {
   String get preDive_start_begin => 'بدء';
 
   @override
-  String get preDive_section_title => 'فحص ما قبل الغوص';
-
-  @override
-  String get preDive_section_link => 'ربط جلسة قائمة تحقق';
-
-  @override
-  String get preDive_section_unlink => 'إلغاء الربط';
-
-  @override
-  String get preDive_section_run => 'تشغيل قائمة تحقق ما قبل الغوص';
-
-  @override
-  String get preDive_section_noUnlinked =>
-      'لا توجد جلسات قوائم تحقق غير مرتبطة';
-
-  @override
-  String get diveDetailSection_preDiveChecklist_name => 'فحص ما قبل الغوص';
-
-  @override
-  String get diveDetailSection_preDiveChecklist_description =>
-      'جلسة قائمة تحقق ما قبل الغوص المرتبطة';
-
-  @override
   String get diveLog_listPage_bottomSheet_preDiveChecklist =>
       'بدء قائمة تحقق ما قبل الغوص';
 

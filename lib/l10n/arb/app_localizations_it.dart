@@ -2467,30 +2467,6 @@ class AppLocalizationsIt extends AppLocalizations {
   String get preDive_start_begin => 'Inizia';
 
   @override
-  String get preDive_section_title => 'Controllo pre-immersione';
-
-  @override
-  String get preDive_section_link => 'Collega una sessione di checklist';
-
-  @override
-  String get preDive_section_unlink => 'Scollega';
-
-  @override
-  String get preDive_section_run => 'Esegui checklist pre-immersione';
-
-  @override
-  String get preDive_section_noUnlinked =>
-      'Nessuna sessione di checklist non collegata';
-
-  @override
-  String get diveDetailSection_preDiveChecklist_name =>
-      'Controllo pre-immersione';
-
-  @override
-  String get diveDetailSection_preDiveChecklist_description =>
-      'Sessione di checklist pre-immersione collegata';
-
-  @override
   String get diveLog_listPage_bottomSheet_preDiveChecklist =>
       'Avvia checklist pre-immersione';
 
