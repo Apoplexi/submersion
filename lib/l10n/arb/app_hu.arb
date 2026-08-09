@@ -408,6 +408,19 @@
   "backup_restore_dialog_safetyNote": "A jelenlegi adatokról automatikusan biztonsági mentés készül a visszaállítás előtt.",
   "backup_restore_dialog_title": "Mentés Visszaállítása",
   "backup_restore_dialog_warning": "Ez MINDEN jelenlegi adatot lecserél a mentés adataival. Ez a művelet nem vonható vissza.",
+  "backup_restore_safetyReview_progress": "{done} / {total} merülés elemezve",
+  "@backup_restore_safetyReview_progress": {
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "backup_restore_safetyReview_skip": "Kihagyás",
+  "backup_restore_safetyReview_title": "Biztonsági ellenőrzés folyamatban",
   "backup_schedule_enabled": "Automatikus mentések",
   "backup_schedule_enabled_subtitle": "Adatok mentése ütemezés szerint",
   "backup_schedule_frequency": "Gyakoriság",

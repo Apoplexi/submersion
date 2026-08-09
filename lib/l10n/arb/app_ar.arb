@@ -408,6 +408,19 @@
   "backup_restore_dialog_safetyNote": "سيتم إنشاء نسخة احتياطية آمنة من بياناتك الحالية تلقائياً قبل الاستعادة.",
   "backup_restore_dialog_title": "استعادة النسخة الاحتياطية",
   "backup_restore_dialog_warning": "سيؤدي هذا إلى استبدال جميع البيانات الحالية ببيانات النسخة الاحتياطية. لا يمكن التراجع عن هذا الإجراء.",
+  "backup_restore_safetyReview_progress": "تم تحليل {done} من {total} غطسة",
+  "@backup_restore_safetyReview_progress": {
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "backup_restore_safetyReview_skip": "تخطي",
+  "backup_restore_safetyReview_title": "جارٍ تشغيل مراجعة السلامة",
   "backup_schedule_enabled": "نسخ احتياطي تلقائي",
   "backup_schedule_enabled_subtitle": "نسخ البيانات احتياطياً وفقاً لجدول زمني",
   "backup_schedule_frequency": "التكرار",

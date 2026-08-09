@@ -993,6 +993,18 @@ class AppLocalizationsNl extends AppLocalizations {
       'Dit vervangt ALLE huidige gegevens door de back-upgegevens. Deze actie kan niet ongedaan worden gemaakt.';
 
   @override
+  String backup_restore_safetyReview_progress(int done, int total) {
+    return '$done van $total duiken geanalyseerd';
+  }
+
+  @override
+  String get backup_restore_safetyReview_skip => 'Overslaan';
+
+  @override
+  String get backup_restore_safetyReview_title =>
+      'Veiligheidscontrole wordt uitgevoerd';
+
+  @override
   String get backup_restoreComplete_continue => 'Doorgaan';
 
   @override

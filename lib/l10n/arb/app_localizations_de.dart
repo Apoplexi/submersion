@@ -997,6 +997,17 @@ class AppLocalizationsDe extends AppLocalizations {
       'Dies ersetzt ALLE aktuellen Daten durch die Sicherungsdaten. Diese Aktion kann nicht rückgängig gemacht werden.';
 
   @override
+  String backup_restore_safetyReview_progress(int done, int total) {
+    return '$done von $total Tauchgängen analysiert';
+  }
+
+  @override
+  String get backup_restore_safetyReview_skip => 'Überspringen';
+
+  @override
+  String get backup_restore_safetyReview_title => 'Sicherheitsprüfung läuft';
+
+  @override
   String get backup_restoreComplete_continue => 'Weiter';
 
   @override

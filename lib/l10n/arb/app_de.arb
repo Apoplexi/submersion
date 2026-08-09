@@ -408,6 +408,19 @@
   "backup_restore_dialog_safetyNote": "Eine Sicherheitskopie Ihrer aktuellen Daten wird automatisch vor der Wiederherstellung erstellt.",
   "backup_restore_dialog_title": "Sicherung Wiederherstellen",
   "backup_restore_dialog_warning": "Dies ersetzt ALLE aktuellen Daten durch die Sicherungsdaten. Diese Aktion kann nicht rückgängig gemacht werden.",
+  "backup_restore_safetyReview_progress": "{done} von {total} Tauchgängen analysiert",
+  "@backup_restore_safetyReview_progress": {
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "backup_restore_safetyReview_skip": "Überspringen",
+  "backup_restore_safetyReview_title": "Sicherheitsprüfung läuft",
   "backup_schedule_enabled": "Automatische Sicherungen",
   "backup_schedule_enabled_subtitle": "Daten nach Zeitplan sichern",
   "backup_schedule_frequency": "Häufigkeit",

@@ -996,6 +996,18 @@ class AppLocalizationsHu extends AppLocalizations {
       'Ez MINDEN jelenlegi adatot lecserél a mentés adataival. Ez a művelet nem vonható vissza.';
 
   @override
+  String backup_restore_safetyReview_progress(int done, int total) {
+    return '$done / $total merülés elemezve';
+  }
+
+  @override
+  String get backup_restore_safetyReview_skip => 'Kihagyás';
+
+  @override
+  String get backup_restore_safetyReview_title =>
+      'Biztonsági ellenőrzés folyamatban';
+
+  @override
   String get backup_restoreComplete_continue => 'Tovabb';
 
   @override

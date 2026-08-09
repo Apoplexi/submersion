@@ -997,6 +997,18 @@ class AppLocalizationsPt extends AppLocalizations {
       'Isso substituirá TODOS os dados atuais pelos dados do backup. Esta ação não pode ser desfeita.';
 
   @override
+  String backup_restore_safetyReview_progress(int done, int total) {
+    return 'Analisados $done de $total mergulhos';
+  }
+
+  @override
+  String get backup_restore_safetyReview_skip => 'Ignorar';
+
+  @override
+  String get backup_restore_safetyReview_title =>
+      'Executando a revisão de segurança';
+
+  @override
   String get backup_restoreComplete_continue => 'Continuar';
 
   @override

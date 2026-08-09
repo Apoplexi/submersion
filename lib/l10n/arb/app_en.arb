@@ -713,6 +713,19 @@
   "backup_restore_dialog_safetyNote": "A safety backup of your current data will be created automatically before restoring.",
   "backup_restore_dialog_title": "Restore Backup",
   "backup_restore_dialog_warning": "This will replace ALL current data with the backup data. This action cannot be undone.",
+  "backup_restore_safetyReview_progress": "Analyzed {done} of {total} dives",
+  "@backup_restore_safetyReview_progress": {
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "backup_restore_safetyReview_skip": "Skip",
+  "backup_restore_safetyReview_title": "Running the safety review",
   "backup_restoreComplete_continue": "Continue",
   "backup_restoreComplete_description": "Your data has been restored successfully. Tap continue to reload the app with your restored data.",
   "backup_restoreComplete_title": "Restore Complete",
