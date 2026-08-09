@@ -33,6 +33,7 @@ import 'package:submersion/features/dive_log/presentation/widgets/photo_marker_l
 import 'package:submersion/features/dive_log/presentation/widgets/photo_marker_overlay.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/profile_chart_viewport.dart';
+import 'package:submersion/features/dive_log/presentation/widgets/profile_event_labels.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/profile_highlight_range.dart';
 import 'package:submersion/core/ui/trackpad_zoom_recognizer.dart';
 
@@ -2051,6 +2052,7 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
                   context,
                   units,
                   availableWidth: constraints.maxWidth,
+                  availableHeight: constraints.maxHeight,
                   hasTemperatureData: hasTemperatureData,
                   hasPressureData: hasPressureData,
                   hasHeartRateData: hasHeartRateData,
@@ -2244,6 +2246,7 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
     BuildContext context,
     UnitFormatter units, {
     required double availableWidth,
+    required double availableHeight,
     required bool hasTemperatureData,
     required bool hasPressureData,
     required bool hasHeartRateData,
@@ -2698,7 +2701,16 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
                 ..._buildHighlightCursor(colorScheme),
                 ..._buildHighlightRangeLines(visibleMinX, visibleMaxX),
                 if (_showEvents && widget.events != null)
-                  ..._buildEventVerticalLines(colorScheme),
+                  ..._buildEventVerticalLines(
+                    colorScheme,
+                    availableWidth: availableWidth,
+                    availableHeight: availableHeight,
+                    units: units,
+                    visibleMinX: visibleMinX,
+                    visibleMaxX: visibleMaxX,
+                    visibleMinDepth: visibleMinDepth,
+                    visibleMaxDepth: visibleMaxDepth,
+                  ),
               ],
             ),
             lineTouchData: LineTouchData(
@@ -5179,7 +5191,47 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
   /// Groups events by timestamp and shows only the most severe event at each
   /// timestamp to avoid overlapping labels. Lines are colored by severity:
   /// info = primary, warning = orange, alert = red.
-  List<VerticalLine> _buildEventVerticalLines(ColorScheme colorScheme) {
+  /// Linearly interpolated profile depth (meters) at [timestamp] seconds.
+  /// Binary search keeps this O(log n) per event, cheap enough to run on
+  /// every pan/zoom rebuild.
+  double _depthAtTimestamp(double timestamp) {
+    final profile = widget.profile;
+    if (profile.isEmpty) return 0;
+    if (timestamp <= profile.first.timestamp) return profile.first.depth;
+    if (timestamp >= profile.last.timestamp) return profile.last.depth;
+    var lo = 0;
+    var hi = profile.length - 1;
+    while (hi - lo > 1) {
+      final mid = (lo + hi) ~/ 2;
+      if (profile[mid].timestamp <= timestamp) {
+        lo = mid;
+      } else {
+        hi = mid;
+      }
+    }
+    final a = profile[lo];
+    final b = profile[hi];
+    final span = (b.timestamp - a.timestamp).toDouble();
+    if (span <= 0) return a.depth;
+    final f = (timestamp - a.timestamp) / span;
+    return a.depth + (b.depth - a.depth) * f;
+  }
+
+  /// Minimum pixel spacing between event lines before the less severe of the
+  /// pair is dropped entirely (line and label). At phone plot widths a few
+  /// seconds is sub-pixel; drawing both just paints noise.
+  static const double _eventMinSpacingPx = 24;
+
+  List<VerticalLine> _buildEventVerticalLines(
+    ColorScheme colorScheme, {
+    required double availableWidth,
+    required double availableHeight,
+    required UnitFormatter units,
+    required double visibleMinX,
+    required double visibleMaxX,
+    required double visibleMinDepth,
+    required double visibleMaxDepth,
+  }) {
     final events = widget.events;
     if (events == null || events.isEmpty) return [];
 
@@ -5200,26 +5252,131 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
       }
     }
 
-    return byTimestamp.values.map((event) {
-      final color = _eventSeverityColor(event.severity, colorScheme);
-      return VerticalLine(
-        x: event.timestamp.toDouble(),
-        color: color,
-        strokeWidth: 1,
-        dashArray: [3, 3],
-        label: VerticalLineLabel(
-          show: true,
-          alignment: Alignment.topCenter,
-          padding: const EdgeInsets.only(bottom: 2),
-          style: TextStyle(
-            color: color,
-            fontSize: 9,
-            backgroundColor: colorScheme.surface.withValues(alpha: 0.8),
-          ),
-          labelResolver: (line) => event.displayName,
+    // Plot-rect pixel geometry, mirroring the insets fl_chart reserves.
+    final insets = _plotInsets(availableWidth, units);
+    final plotW = (availableWidth - insets.left - insets.right).clamp(
+      1.0,
+      double.infinity,
+    );
+    final plotH = (availableHeight - insets.top - insets.bottom).clamp(
+      1.0,
+      double.infinity,
+    );
+    final rangeX = (visibleMaxX - visibleMinX).clamp(1e-9, double.infinity);
+    final rangeY = (visibleMaxDepth - visibleMinDepth).clamp(
+      1e-9,
+      double.infinity,
+    );
+    double xPx(num t) => (t - visibleMinX) / rangeX * plotW;
+
+    // Pixel-space dedupe: events landing within _eventMinSpacingPx of an
+    // already kept neighbour keep only the most severe of the pair.
+    final ordered = byTimestamp.values.toList()
+      ..sort((a, b) => a.timestamp.compareTo(b.timestamp));
+    final kept = <ProfileEvent>[];
+    for (final event in ordered) {
+      if (kept.isNotEmpty &&
+          (xPx(event.timestamp) - xPx(kept.last.timestamp)).abs() <
+              _eventMinSpacingPx) {
+        if (event.severity.index > kept.last.severity.index) {
+          kept[kept.length - 1] = event;
+        }
+      } else {
+        kept.add(event);
+      }
+    }
+
+    // Collision-aware label placement for the events inside the visible
+    // window: anchored below the profile depth at the event's time (free
+    // water instead of the surface tail), flipped off the plot edges, and
+    // hidden when there is genuinely no room (see placeEventLabels).
+    const labelStyle = TextStyle(fontSize: 9);
+    final inWindow = <int>[];
+    final specs = <EventLabelSpec>[];
+    for (var i = 0; i < kept.length; i++) {
+      final t = kept[i].timestamp.toDouble();
+      if (t < visibleMinX || t > visibleMaxX) continue;
+      final painter = TextPainter(
+        text: TextSpan(text: kept[i].displayName, style: labelStyle),
+        textDirection: TextDirection.ltr,
+      )..layout();
+      final anchorY =
+          ((_depthAtTimestamp(t) - visibleMinDepth) / rangeY * plotH).clamp(
+            0.0,
+            plotH,
+          );
+      inWindow.add(i);
+      specs.add(
+        EventLabelSpec(
+          xPx: xPx(t),
+          anchorYPx: anchorY,
+          textWidth: painter.width,
+          textHeight: painter.height,
         ),
       );
-    }).toList();
+      painter.dispose();
+    }
+    final placements = placeEventLabels(
+      specs,
+      plotWidth: plotW,
+      plotHeight: plotH,
+    );
+    final placementByEvent = <int, EventLabelPlacement>{
+      for (var j = 0; j < inWindow.length; j++) inWindow[j]: placements[j],
+    };
+
+    return [
+      for (var i = 0; i < kept.length; i++)
+        _eventVerticalLine(kept[i], placementByEvent[i], colorScheme),
+    ];
+  }
+
+  VerticalLine _eventVerticalLine(
+    ProfileEvent event,
+    EventLabelPlacement? placement,
+    ColorScheme colorScheme,
+  ) {
+    final color = _eventSeverityColor(event.severity, colorScheme);
+    // fl_chart lays the label out inside
+    // Rect.fromLTRB(x - padding.right - textWidth, padding.top,
+    //               x + padding.left, ...):
+    // topCenter with zero horizontal padding centres the text on the line,
+    // topLeft puts its right edge padding.right left of the line, topRight
+    // its left edge padding.left right of the line. padding.top is the pixel
+    // offset from the plot top; placements are computed in the same space.
+    final alignment = switch (placement?.anchor) {
+      EventLabelAnchor.leftOfLine => Alignment.topLeft,
+      EventLabelAnchor.rightOfLine => Alignment.topRight,
+      _ => Alignment.topCenter,
+    };
+    final padding = switch (placement?.anchor) {
+      EventLabelAnchor.leftOfLine => EdgeInsets.only(
+        top: placement?.topPx ?? 0,
+        right: 4,
+      ),
+      EventLabelAnchor.rightOfLine => EdgeInsets.only(
+        top: placement?.topPx ?? 0,
+        left: 4,
+      ),
+      _ => EdgeInsets.only(top: placement?.topPx ?? 0),
+    };
+    return VerticalLine(
+      x: event.timestamp.toDouble(),
+      color: color,
+      strokeWidth: 1,
+      dashArray: [3, 3],
+      label: VerticalLineLabel(
+        show: placement?.showText ?? false,
+        alignment: alignment,
+        padding: padding,
+        style: TextStyle(
+          color: color,
+          fontSize: 9,
+          backgroundColor: colorScheme.surface.withValues(alpha: 0.8),
+        ),
+        labelResolver: (line) => event.displayName,
+      ),
+    );
   }
 
   /// Returns the color for an event based on its severity level.
