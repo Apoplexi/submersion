@@ -57,46 +57,54 @@ class CsvColumnMappingForm extends StatelessWidget {
           key: const ValueKey('csv-map-time'),
           label: l10n.diveLog_tooltip_time,
           value: mapping.timeIndex,
-          onSelected: (v) => v == null
-              ? null
-              : onChanged(
-                  CsvColumnMapping(
-                    timeIndex: v,
-                    latIndex: mapping.latIndex,
-                    lonIndex: mapping.lonIndex,
-                    accuracyIndex: mapping.accuracyIndex,
-                  ),
-                ),
+          onSelected: (v) {
+            // Required column: _dropdown omits the "-" item unless allowNone,
+            // so v is never null here. Ignoring it keeps the last valid
+            // choice rather than writing a mapping that cannot be parsed.
+            // The optional accuracy column below deliberately does pass null
+            // through, so the diver can un-map it.
+            if (v == null) return;
+            onChanged(
+              CsvColumnMapping(
+                timeIndex: v,
+                latIndex: mapping.latIndex,
+                lonIndex: mapping.lonIndex,
+                accuracyIndex: mapping.accuracyIndex,
+              ),
+            );
+          },
         ),
         _dropdown(
           key: const ValueKey('csv-map-lat'),
           label: l10n.diveCenters_field_latitude,
           value: mapping.latIndex,
-          onSelected: (v) => v == null
-              ? null
-              : onChanged(
-                  CsvColumnMapping(
-                    timeIndex: mapping.timeIndex,
-                    latIndex: v,
-                    lonIndex: mapping.lonIndex,
-                    accuracyIndex: mapping.accuracyIndex,
-                  ),
-                ),
+          onSelected: (v) {
+            if (v == null) return;
+            onChanged(
+              CsvColumnMapping(
+                timeIndex: mapping.timeIndex,
+                latIndex: v,
+                lonIndex: mapping.lonIndex,
+                accuracyIndex: mapping.accuracyIndex,
+              ),
+            );
+          },
         ),
         _dropdown(
           key: const ValueKey('csv-map-lon'),
           label: l10n.diveCenters_field_longitude,
           value: mapping.lonIndex,
-          onSelected: (v) => v == null
-              ? null
-              : onChanged(
-                  CsvColumnMapping(
-                    timeIndex: mapping.timeIndex,
-                    latIndex: mapping.latIndex,
-                    lonIndex: v,
-                    accuracyIndex: mapping.accuracyIndex,
-                  ),
-                ),
+          onSelected: (v) {
+            if (v == null) return;
+            onChanged(
+              CsvColumnMapping(
+                timeIndex: mapping.timeIndex,
+                latIndex: mapping.latIndex,
+                lonIndex: v,
+                accuracyIndex: mapping.accuracyIndex,
+              ),
+            );
+          },
         ),
         _dropdown(
           key: const ValueKey('csv-map-accuracy'),

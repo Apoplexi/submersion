@@ -3,6 +3,7 @@
 import 'package:drift/drift.dart';
 
 import 'package:submersion/core/database/local_cache_database.dart';
+import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/core/services/local_cache_database_service.dart';
 import 'package:submersion/features/gps_log/domain/entities/gps_track.dart';
 import 'package:submersion/features/gps_log/domain/track_point_codec.dart';
@@ -33,7 +34,20 @@ enum TrackLod {
 /// [LocalCacheDatabaseService.instance], matching GpsTrackRepository's
 /// convention of `AppDatabase get _db => DatabaseService.instance.database`.
 class TrackGeometryCacheRepository {
+  static final _log = LoggerService.forClass(TrackGeometryCacheRepository);
+
   LocalCacheDatabase get _db => LocalCacheDatabaseService.instance.database;
+
+  Future<void> _deleteRow(
+    LocalCacheDatabase db,
+    String trackId,
+    TrackLod lod,
+  ) async {
+    await (db.delete(db.gpsTrackGeometryCache)
+          ..where((t) => t.trackId.equals(trackId))
+          ..where((t) => t.lodLevel.equals(lod.name)))
+        .go();
+  }
 
   /// The local cache database, or null before it has been initialised.
   ///
@@ -64,9 +78,25 @@ class TrackGeometryCacheRepository {
     if (row.status != 'ok') return const [];
     final blob = row.points;
     if (blob == null) return const [];
-    // Drift hands back a Uint8List already; copying it would double the peak
-    // allocation on every read of a large cached geometry.
-    return decodeTrackPoints(blob);
+    try {
+      // Drift hands back a Uint8List already; copying it would double the
+      // peak allocation on every read of a large cached geometry.
+      return decodeTrackPoints(blob);
+    } catch (e, stackTrace) {
+      // Everything here is re-derivable from gps_tracks, so a corrupt blob
+      // must degrade to a cache miss, never to an error. Letting the throw
+      // escape poisoned the track permanently: this store has no TTL and no
+      // GC, so every subsequent read hit the same bad row and the map, the
+      // thumbnail, and the detail page stayed broken for a track whose
+      // underlying data was perfectly fine.
+      _log.warning(
+        'Discarding corrupt cached geometry for $trackId/${lod.name}',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      await _deleteRow(db, trackId, lod);
+      return null;
+    }
   }
 
   Future<void> write(
