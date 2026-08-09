@@ -38,12 +38,6 @@ final tideMetadataProvider = FutureProvider<TideDataMetadata?>((ref) async {
   return service.getMetadata();
 });
 
-/// Provider for available tide site IDs.
-final tideSiteIdsProvider = FutureProvider<List<String>>((ref) async {
-  final service = ref.watch(tideDataServiceProvider);
-  return service.getAvailableSiteIds();
-});
-
 /// Provider for a [TideCalculator] at a specific location.
 ///
 /// Usage:
