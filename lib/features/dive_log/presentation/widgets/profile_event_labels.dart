@@ -1,0 +1,144 @@
+import 'dart:ui';
+
+/// Geometry of one event label candidate, in plot-rect pixel space.
+class EventLabelSpec {
+  /// Pixel x of the event's vertical line within the plot rect.
+  final double xPx;
+
+  /// Pixel y of the profile depth at the event's time. Labels are anchored
+  /// just below this point: the free water column under the curve, instead
+  /// of the plot top where the surface (and the end-of-dive ascent tail)
+  /// lives.
+  final double anchorYPx;
+
+  final double textWidth;
+  final double textHeight;
+
+  const EventLabelSpec({
+    required this.xPx,
+    required this.anchorYPx,
+    required this.textWidth,
+    required this.textHeight,
+  });
+}
+
+/// Which side of the event line the label text sits on.
+enum EventLabelAnchor { center, leftOfLine, rightOfLine }
+
+/// Where (and whether) one event label is drawn. Placement i corresponds to
+/// spec i of the input.
+class EventLabelPlacement {
+  /// False when no collision-free slot exists; the event's vertical line is
+  /// still drawn, only the text is dropped.
+  final bool showText;
+
+  /// Pixel y of the label's top edge within the plot rect.
+  final double topPx;
+
+  final EventLabelAnchor anchor;
+
+  const EventLabelPlacement({
+    required this.showText,
+    required this.topPx,
+    required this.anchor,
+  });
+}
+
+/// Vertical clearance between stacked labels.
+const double _labelStackGap = 2;
+
+/// Horizontal clearance between a flipped label and its event line,
+/// mirrored by the chart-side EdgeInsets when mapping to VerticalLineLabel.
+const double _lineGap = 4;
+
+/// Places event labels below their profile-depth anchor with collision
+/// avoidance, replacing the previous fixed top-of-plot pinning that buried
+/// the shallow end-of-dive tail under a pile of ascent-event labels.
+///
+/// Rules, applied per label scanning left to right:
+///  - horizontal: centered on the event line; flipped fully left/right of
+///    the line when the centered extent would cross a plot edge;
+///  - vertical: `anchorYPx + gap` (just below the curve point), clamped
+///    into the plot; while the rect intersects an already-placed label it
+///    is stepped downward, and if it runs off the bottom the search retries
+///    upward from just above the anchor;
+///  - if neither direction has room, the text is hidden (`showText: false`)
+///    rather than stacked over the profile.
+List<EventLabelPlacement> placeEventLabels(
+  List<EventLabelSpec> specs, {
+  required double plotWidth,
+  required double plotHeight,
+  double gap = 4,
+}) {
+  final placements = List<EventLabelPlacement?>.filled(specs.length, null);
+  final placedRects = <Rect>[];
+
+  // Scan in x order so pushed-down labels cascade predictably, but write
+  // results back to the input index.
+  final order = List<int>.generate(specs.length, (i) => i)
+    ..sort((a, b) => specs[a].xPx.compareTo(specs[b].xPx));
+
+  for (final i in order) {
+    final spec = specs[i];
+
+    final EventLabelAnchor anchor;
+    final double left;
+    if (spec.xPx + spec.textWidth / 2 > plotWidth) {
+      anchor = EventLabelAnchor.leftOfLine;
+      left = spec.xPx - spec.textWidth - _lineGap;
+    } else if (spec.xPx - spec.textWidth / 2 < 0) {
+      anchor = EventLabelAnchor.rightOfLine;
+      left = spec.xPx + _lineGap;
+    } else {
+      anchor = EventLabelAnchor.center;
+      left = spec.xPx - spec.textWidth / 2;
+    }
+
+    final maxTop = plotHeight - spec.textHeight;
+    bool collides(double top) {
+      final rect = Rect.fromLTWH(left, top, spec.textWidth, spec.textHeight);
+      return placedRects.any(rect.overlaps);
+    }
+
+    double? resolvedTop;
+    // Downward from just below the anchor.
+    var top = (spec.anchorYPx + gap).clamp(0.0, maxTop);
+    while (top <= maxTop) {
+      if (!collides(top)) {
+        resolvedTop = top;
+        break;
+      }
+      top += spec.textHeight + _labelStackGap;
+    }
+    // Upward from just above the anchor.
+    if (resolvedTop == null) {
+      top = (spec.anchorYPx - gap - spec.textHeight).clamp(0.0, maxTop);
+      while (top >= 0) {
+        if (!collides(top)) {
+          resolvedTop = top;
+          break;
+        }
+        top -= spec.textHeight + _labelStackGap;
+      }
+    }
+
+    if (resolvedTop == null) {
+      placements[i] = EventLabelPlacement(
+        showText: false,
+        topPx: (spec.anchorYPx + gap).clamp(0.0, maxTop),
+        anchor: anchor,
+      );
+    } else {
+      placements[i] = EventLabelPlacement(
+        showText: true,
+        topPx: resolvedTop,
+        anchor: anchor,
+      );
+      placedRects.add(
+        Rect.fromLTWH(left, resolvedTop, spec.textWidth, spec.textHeight),
+      );
+    }
+  }
+
+  return placements.cast<EventLabelPlacement>();
+}
