@@ -136,16 +136,67 @@ void main() {
     expect(() => repo.splitTrack('nope', tenAm), throwsArgumentError);
   });
 
-  test('splitting respects existing trim bounds', () async {
+  test('splitting a trimmed track destroys nothing', () async {
+    // Trim promises reversibility ("the points blob is never rewritten...
+    // cannot lose a fix"). Building children from the trimmed VIEW and then
+    // hard-deleting the parent would break that the first time anyone split
+    // a trimmed track.
     final id = await seed();
     await repo.setTrimBounds(
       id,
       startMs: DateTime.utc(2026, 5, 22, 9).millisecondsSinceEpoch,
     );
     final (firstId, secondId) = await repo.splitTrack(id, tenAm);
-    // The 08:00 fix was trimmed away, so only four survive the split.
+
     final first = await repo.getTrack(firstId);
     final second = await repo.getTrack(secondId);
-    expect(first!.points.length + second!.points.length, 4);
+
+    // All five raw fixes survive, split across the two children.
+    expect(first!.points.length + second!.points.length, 5);
+    // The trim still applies, so the 08:00 fix stays hidden.
+    expect(first.effectivePoints.length + second.effectivePoints.length, 4);
+  });
+
+  test(
+    'children carry the parent trim bounds, so Reset trim recovers',
+    () async {
+      final trimStart = DateTime.utc(2026, 5, 22, 9).millisecondsSinceEpoch;
+      final id = await seed();
+      await repo.setTrimBounds(id, startMs: trimStart);
+      final (firstId, _) = await repo.splitTrack(id, tenAm);
+
+      final first = await repo.getTrack(firstId);
+      expect(first!.trimStartTime, trimStart);
+      // 08:00 is present in the blob but hidden by the bound.
+      expect(first.points.length, 3);
+      expect(first.effectivePoints.length, 2);
+
+      await repo.clearTrim(firstId);
+      expect((await repo.getTrack(firstId))!.effectivePoints.length, 3);
+    },
+  );
+
+  test('children inherit deviceName', () async {
+    final startMs = DateTime.utc(2026, 5, 22, 8).millisecondsSinceEpoch;
+    final id = await repo.startTrack(
+      startTimeMs: startMs,
+      tzOffsetMinutes: 0,
+      deviceName: 'Pixel 9',
+    );
+    for (var h = 0; h <= 2; h++) {
+      await repo.appendBufferPoint(
+        id,
+        GpsTrackPoint(
+          timestamp: startMs ~/ 1000 + h * 3600,
+          latitude: 20.0,
+          longitude: -87.0,
+        ),
+      );
+    }
+    await repo.finalizeTrack(id, endTimeMs: startMs + 7200000);
+
+    final (firstId, secondId) = await repo.splitTrack(id, startMs + 3600000);
+    expect((await repo.getTrack(firstId))!.deviceName, 'Pixel 9');
+    expect((await repo.getTrack(secondId))!.deviceName, 'Pixel 9');
   });
 }

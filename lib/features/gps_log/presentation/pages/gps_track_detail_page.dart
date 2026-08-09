@@ -46,7 +46,11 @@ enum _TrackAction {
 enum TrackEditMode { none, trim, split }
 
 /// Active editing mode on the track detail page.
-final trackEditModeProvider = StateProvider<TrackEditMode>(
+///
+/// autoDispose so leaving the page (by any route, not just Cancel) resets it.
+/// A plain StateProvider carried trim mode onto the NEXT track opened, where
+/// Apply would then act on a track the user never meant to edit.
+final trackEditModeProvider = StateProvider.autoDispose<TrackEditMode>(
   (ref) => TrackEditMode.none,
 );
 
@@ -59,13 +63,24 @@ class _GpsTrackDetailPageState extends ConsumerState<GpsTrackDetailPage> {
   int? _pendingEndMs;
 
   Future<void> _onMenu(_TrackAction action, GpsTrack track) async {
+    // Seed the pending values to what the scrubber will visibly show, so
+    // confirming WITHOUT dragging does exactly what the screen depicts.
+    // Leaving them null meant Apply wrote (null, null) - identical to
+    // clearTrim - silently erasing an existing trim.
+    final points = track.effectivePoints;
+    final spanStart = points.isEmpty ? null : points.first.timestamp * 1000;
+    final spanEnd = points.isEmpty ? null : points.last.timestamp * 1000;
+
     switch (action) {
       case _TrackAction.trim:
-        _pendingStartMs = null;
-        _pendingEndMs = null;
+        _pendingStartMs = spanStart;
+        _pendingEndMs = spanEnd;
         ref.read(trackEditModeProvider.notifier).state = TrackEditMode.trim;
       case _TrackAction.split:
-        _pendingStartMs = null;
+        // Matches TrackTimelineScrubber's initial single-handle position.
+        _pendingStartMs = (spanStart == null || spanEnd == null)
+            ? null
+            : spanStart + (spanEnd - spanStart) ~/ 2;
         ref.read(trackEditModeProvider.notifier).state = TrackEditMode.split;
       case _TrackAction.resetTrim:
         await ref.read(trimTrackProvider)(track.id);

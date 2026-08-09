@@ -67,6 +67,9 @@ class GpsTrackRepository {
     required String source,
     String? sourceRef,
     String? name,
+    String? deviceName,
+    int? trimStartTime,
+    int? trimEndTime,
   }) async {
     try {
       final id = _uuid.v4();
@@ -79,8 +82,11 @@ class GpsTrackRepository {
               startTime: startTimeMs,
               endTime: Value(endTimeMs),
               tzOffsetMinutes: Value(tzOffsetMinutes),
+              deviceName: Value(deviceName),
               pointCount: Value(points.length),
               points: Value(encodeTrackPoints(points)),
+              trimStartTime: Value(trimStartTime),
+              trimEndTime: Value(trimEndTime),
               // Always restate source explicitly. A Value.absent() here would
               // silently fall back to the 'phone' default and misattribute an
               // imported track.
@@ -163,6 +169,14 @@ class GpsTrackRepository {
   /// parent is tombstoned. A crash between those steps leaves two children
   /// and the parent - duplicates the user can delete. The reverse order
   /// would leave nothing.
+  ///
+  /// Splits the RAW blob, not [GpsTrack.effectivePoints], and carries the
+  /// parent's trim bounds to both children. Trim is documented as reversible
+  /// and incapable of losing a fix; building children from the trimmed view
+  /// and then hard-deleting the parent would have quietly broken that promise
+  /// the first time anyone split a trimmed track. Because the bounds are
+  /// absolute timestamps, the same pair clips correctly on each child's own
+  /// span, and Reset trim still recovers that child's hidden fixes.
   Future<(String, String)> splitTrack(String id, int atWallClockMs) async {
     final track = await getTrack(id, includePoints: true);
     if (track == null) {
@@ -170,7 +184,7 @@ class GpsTrackRepository {
     }
 
     final atSeconds = atWallClockMs ~/ 1000;
-    final points = track.effectivePoints;
+    final points = track.points;
     final first = [
       for (final p in points)
         if (p.timestamp <= atSeconds) p,
@@ -196,6 +210,9 @@ class GpsTrackRepository {
       tzOffsetMinutes: track.tzOffsetMinutes,
       source: track.source,
       sourceRef: track.sourceRef,
+      deviceName: track.deviceName,
+      trimStartTime: track.trimStartTime,
+      trimEndTime: track.trimEndTime,
       name: baseName == null ? null : '$baseName (1)',
     );
     debugOnWrite?.call('insert:$firstId');
@@ -207,6 +224,9 @@ class GpsTrackRepository {
       tzOffsetMinutes: track.tzOffsetMinutes,
       source: track.source,
       sourceRef: track.sourceRef,
+      deviceName: track.deviceName,
+      trimStartTime: track.trimStartTime,
+      trimEndTime: track.trimEndTime,
       name: baseName == null ? null : '$baseName (2)',
     );
     debugOnWrite?.call('insert:$secondId');
