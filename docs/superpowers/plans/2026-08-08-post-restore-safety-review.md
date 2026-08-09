@@ -1542,6 +1542,13 @@ because each one is a trap the next person will hit.
 5. **`_analyzeFailed` was deleted, not reassigned.** Once the snackbar reads
    `result.failed`, the field becomes write-only, which the analyzer flags.
 
+6. **The all-divers sweep needed one pass per diver** (found in PR #916 review,
+   fixed in `3202c07`). The plan's single container with `diverId: null` graded
+   every non-active diver's dives with the ACTIVE diver's gradient factors and
+   persisted the result stamped with the current `engineVersion`. Fixed with a
+   `SettingsNotifier.preloaded` constructor and one container per diver, plus a
+   trailing pass for dives with a null `diver_id`. See spec section 3b.
+
 An extra test was added beyond the plan:
 `reads settings from the restored database, not the defaults` in
 `post_restore_safety_review_test.dart`. It switches the master toggle off in the

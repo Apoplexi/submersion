@@ -197,6 +197,35 @@ final postRestoreSafetyReviewProvider =
 Tests override `postRestoreSafetyReviewProvider` with a fake that records the
 call, reports progress, or throws.
 
+### 3b. One pass per diver (added after PR #916 review)
+
+A single all-divers pass is not enough either. Decompression settings are
+per-diver (`diver_settings.gf_low` / `gf_high`, ppO2 ceilings, deco stop
+increment, CNS method), and `computeAnalysisForProfile` falls back to
+`gfLowProvider` / `gfHighProvider` whenever a dive carries no dive-specific
+GFs. Those derive from `settingsProvider`, which only ever loads the **active**
+diver's row. So one pass over every diver's dives would grade the non-active
+divers' dives with the active diver's gradient factors — and, because
+`saveReview` stamps the current `engineVersion`, persist them permanently.
+
+The sweep therefore runs one pass per diver, each in a container whose
+`settingsProvider` is overridden with a new `SettingsNotifier.preloaded`
+constructor pinned to that diver's stored `AppSettings` (no database load, no
+diver-change listener). Overriding the single root provider covers every
+derived provider, including `ProfileLegend`; enumerating the dozen derived
+providers would rot as the analysis pipeline grows. Dives whose `diver_id` is
+null (the column is nullable) get a trailing pass under the active diver's
+settings, matching the pre-existing behavior for unowned rows.
+
+Settings are read with `getSettingsForDiver`, deliberately not
+`getOrCreateSettingsForDiver`: the latter writes a defaults row when none
+exists, and a restore must not mint rows that would then sync out as genuine
+edits.
+
+Known limitation, pre-existing and out of scope: `getPreviousDiveTimes`
+(`dive_repository_impl.dart:4317`) is not diver-scoped, so residual CNS/tissue
+lookback can still pull a different diver's previous dive.
+
 A fresh container is necessary but not sufficient. `SettingsNotifier` starts at
 the `AppSettings` DEFAULTS and replaces its state asynchronously once the
 diver's row is read, so reading gradient factors immediately after building the
@@ -339,5 +368,5 @@ minimum.
 | `lib/features/backup/presentation/widgets/restore_barrier.dart` | Determinate progress, localized labels, Skip button |
 | `lib/core/providers/root_overrides.dart` | New: `rootProviderOverrides` |
 | `lib/main.dart` | Use `rootProviderOverrides` instead of an inline list |
-| `lib/features/settings/presentation/providers/settings_providers.dart` | Expose `initialLoad`; `mounted` guard on the post-await state write |
+| `lib/features/settings/presentation/providers/settings_providers.dart` | Expose `initialLoad`; `mounted` guard on the post-await state write; `SettingsNotifier.preloaded` for per-diver pinning |
 | `lib/l10n/arb/app_*.arb` | Three new keys across nine locales |
