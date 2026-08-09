@@ -121,6 +121,11 @@ String certificationTitle(Certification cert);
 
 /// The custom name, or null when there is nothing extra to show.
 String? customNameOrNull(Certification cert);
+
+/// The level, but only when the title is a custom name — otherwise the
+/// title already contains it. Surfaces that draw a title with a smaller
+/// line beneath it (e-card, card renderer, PDF) use this for that line.
+String? certificationSubtitle(Certification cert);
 ```
 
 `hasDerivedName` normalises case and collapses whitespace, then compares
@@ -174,8 +179,14 @@ The Certification dropdown renders grouped, non-selectable headers using
 ```
 -- Progression --      ladderFor(agency)
 -- Specialties --      specialtiesFor(agency)
--- Other --            CertificationLevel.other
+                       CertificationLevel.other   (no header)
 ```
+
+`CertificationLevel.other` trails the Specialties group **without** a header
+of its own. A header reading "Other" directly above an item reading "Other"
+is noise on screen and makes `find.text('Other')` ambiguous in tests, so the
+third header from the original sketch is dropped and the
+`certifications_edit_group_other` key is not created.
 
 The "Not specified" entry stays as the leading selectable `null` item, above
 the first header. The `ensure:` escape hatch for a stored value from another
@@ -250,7 +261,6 @@ Added:
 | `certifications_edit_helper_nameOnCard` | Optional |
 | `certifications_edit_group_progression` | Progression |
 | `certifications_edit_group_specialties` | Specialties |
-| `certifications_edit_group_other` | Other |
 | `certifications_edit_validation_certificationOrNameRequired` | Choose a certification or enter a name |
 | `certifications_detail_label_certification` | Certification |
 
