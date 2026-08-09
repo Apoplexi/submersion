@@ -321,6 +321,43 @@ critical one):
   (`Certification: Open Water`) and no `Type` row
 - a custom-name cert renders both rows
 
+## Implementation notes (2026-08-09)
+
+Three things diverged from the design above while building it. Each is
+recorded here so the document matches what shipped.
+
+**1. The dropdown is keyed by `CertificationOption`, not `CertificationLevel`.**
+The design assumed group headers could be `DropdownMenuItem(enabled: false)`
+with a null value, on the belief that Flutter skips its selected-value assert
+when the value is null. It does not. `DropdownButton._updateSelectedIndex`
+(`dropdown.dart:1427`) short-circuits only when *no enabled item* matches, and
+a selectable "Not specified" entry is enabled with a null value -- so the
+assert on the next line runs and counts all three null-valued items. At most
+one item in the list may carry any given value, null included. Since
+`CertificationLevel` has no spare values to use as header sentinels, a small
+wrapper type (`lib/features/certifications/presentation/widgets/certification_option.dart`)
+gives every row a distinct value.
+
+**2. The derived title carries no agency prefix.** The design specified
+"PADI Open Water". Implementing the PDF and picker surfaces showed that both
+render the agency on its own line directly beneath the title
+(`pdf_shared_components.dart`, `certification_picker.dart`), as do the detail
+page's Agency row and the list's Agency column -- so an agency-prefixed title
+would have replaced one duplication with another. `derivedCertificationTitle`
+is now `level?.displayName ?? agency.displayName`, matching the pattern the
+buddy pages already used. `hasDerivedName` is unaffected and still matches the
+legacy `"PADI : Open Water"`, which is the part that matters for existing rows.
+
+**3. Two pre-existing table bugs were fixed in passing.** Both are in
+`certification_field.dart`, the file the column rename already touched:
+`extractValue` returned the raw stored name for the Name column (blank once a
+name may be empty), and `formatValue` rendered the level with `.name` -- the
+enum identifier -- so the column read `openWater` instead of `Open Water`.
+
+**Not fixed, noted for later:** `formatValue` has the same enum-identifier bug
+for `CertificationField.agency`, which renders `padi` rather than `PADI`. Left
+alone as outside this change's scope.
+
 ## Risks
 
 | Risk | Mitigation |
