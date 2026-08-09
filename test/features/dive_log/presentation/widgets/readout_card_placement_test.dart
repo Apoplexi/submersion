@@ -38,6 +38,26 @@ void main() {
     expect(corner.dy, 1.0, reason: 'the top edge is fully occupied');
   });
 
+  test('points exactly on the 1.0 edges count toward the right/bottom '
+      'corner windows', () {
+    // A cluster parked exactly at the bottom-right edge (the last sample of
+    // a dive ending at max depth normalizes to exactly (1, 1)) plus a few
+    // interior points elsewhere. Exclusive edge handling would count the
+    // bottom-right window as empty and park the card on the cluster.
+    final profile = <Offset>[
+      for (var i = 0; i < 10; i++) const Offset(1, 1),
+      const Offset(0.1, 0.9),
+      const Offset(0.2, 0.85),
+      const Offset(0.1, 0.1),
+    ];
+    final corner = leastOccupiedReadoutCorner(profile);
+    expect(
+      corner,
+      const Offset(1, 0),
+      reason: 'top-right holds nothing; bottom-right holds the edge cluster',
+    );
+  });
+
   test('ties prefer top-right (the historical default)', () {
     // A single point dead center occupies no corner window.
     final corner = leastOccupiedReadoutCorner(const [Offset(0.5, 0.5)]);

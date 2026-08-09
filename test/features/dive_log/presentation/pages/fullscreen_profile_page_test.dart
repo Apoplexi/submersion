@@ -186,8 +186,9 @@ void main() {
       'profile occupies least', (tester) async {
     // Fast descent, long deep bottom, ascent tail rising into the top-right:
     // the old fixed top-right default sat exactly on that tail. For this
-    // shape the emptiest corner window is the bottom-left (the fast descent
-    // leaves it almost immediately).
+    // shape the emptiest corner window is the top-left - the fast descent
+    // leaves it almost immediately, while the max-depth bottom line (which
+    // normalizes to exactly y = 1.0) fills both bottom corner windows.
     final dive = Dive(
       id: 'd1',
       dateTime: DateTime(2026, 1, 1, 10),
@@ -214,7 +215,7 @@ void main() {
       tester
           .widget<DraggableReadoutCard>(find.byType(DraggableReadoutCard))
           .initialFraction,
-      const Offset(0, 1),
+      const Offset(0, 0),
       reason: 'the card must seed at the least occupied corner',
     );
     final chartRect = tester.getRect(find.byType(DiveProfileChart));
@@ -224,7 +225,7 @@ void main() {
       lessThan(chartRect.center.dx),
       reason: 'the card must avoid the occupied top-right corner',
     );
-    expect(cardRect.top, greaterThan(chartRect.center.dy));
+    expect(cardRect.top, lessThan(chartRect.center.dy));
   });
 
   testWidgets('chart fills most of the screen height', (tester) async {

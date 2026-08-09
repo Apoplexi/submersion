@@ -2005,7 +2005,12 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
                     _doubleTapArmed = false;
                     _lastTapUpStamp = null;
                     _toggleDoubleTapZoom(_tapDownPosition, constraints, units);
-                  } else {
+                  } else if (!_inRightAxisSelector(
+                    event.localPosition,
+                    constraints.biggest,
+                  )) {
+                    // Selector-strip taps belong to the metric menu; they
+                    // neither arm (see onPointerDown) nor seed a double-tap.
                     _lastTapUpStamp = event.timeStamp;
                     _lastTapUpPosition = event.localPosition;
                   }

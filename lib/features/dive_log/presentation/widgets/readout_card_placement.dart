@@ -40,7 +40,19 @@ Offset leastOccupiedReadoutCorner(List<Offset> normalizedProfile) {
       _cornerWidthFraction,
       _cornerHeightFraction,
     );
-    final count = normalizedProfile.where(window.contains).length;
+    // Inclusive on all edges: Rect.contains excludes right/bottom, but
+    // normalized profiles always hold exact 1.0 values (the last sample's
+    // time, the max-depth sample), which must count toward the right and
+    // bottom corner windows.
+    final count = normalizedProfile
+        .where(
+          (p) =>
+              p.dx >= window.left &&
+              p.dx <= window.right &&
+              p.dy >= window.top &&
+              p.dy <= window.bottom,
+        )
+        .length;
     if (count < bestCount) {
       bestCount = count;
       best = corner;

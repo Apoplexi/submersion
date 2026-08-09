@@ -264,6 +264,41 @@ void main() {
     );
   });
 
+  testWidgets('a selector-strip tap does not seed a double-tap for a '
+      'following plot tap', (tester) async {
+    await tester.pumpWidget(_buildChart(temperature: true));
+    await tester.pumpAndSettle();
+
+    final chartTopRight = tester.getTopRight(find.byType(LineChart).first);
+    final fullSpan = _visibleSpan(tester);
+
+    // First tap inside the strip (opens the metric menu), second tap on the
+    // plot nearby within the double-tap window: must not zoom. In the real
+    // app the modal menu blocks the second tap anyway; this pins the
+    // bookkeeping so the model does not depend on that.
+    final g1 = await tester.createGesture();
+    await g1.down(
+      chartTopRight + const Offset(-25, 60),
+      timeStamp: Duration.zero,
+    );
+    await g1.up(timeStamp: const Duration(milliseconds: 40));
+    await tester.pump();
+    // Dismiss the menu the strip tap opened before tapping the plot.
+    await tester.pumpAndSettle();
+    await tester.tapAt(const Offset(5, 5));
+    await tester.pumpAndSettle();
+
+    final g2 = await tester.createGesture();
+    await g2.down(
+      chartTopRight + const Offset(-90, 60),
+      timeStamp: const Duration(milliseconds: 140),
+    );
+    await g2.up(timeStamp: const Duration(milliseconds: 180));
+    await tester.pump();
+
+    expect(_visibleSpan(tester), fullSpan);
+  });
+
   testWidgets('two slow taps do not zoom', (tester) async {
     await tester.pumpWidget(_buildChart());
     await tester.pumpAndSettle();
