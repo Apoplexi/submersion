@@ -24,6 +24,7 @@ ParsedTrack parseGpx(String xml) {
   }
 
   final fixes = <ParsedFix>[];
+  var anyZoned = false;
   for (final node in trackPoints) {
     final latText = node.getAttribute('lat');
     final lonText = node.getAttribute('lon');
@@ -43,15 +44,16 @@ ParsedTrack parseGpx(String xml) {
         'Every track point needs a <time>; this file has points without one',
       );
     }
-    final parsed = DateTime.tryParse(timeText);
+    final parsed = parseFixTime(timeText);
     if (parsed == null) {
       throw TrackParseException('Unparseable time: $timeText');
     }
+    if (parsed.zoned) anyZoned = true;
 
     final hdopText = node.findElements('hdop').firstOrNull?.innerText.trim();
 
     fixes.add((
-      utc: parsed.toUtc(),
+      utc: parsed.time,
       lat: lat,
       lon: lon,
       accuracy: hdopText == null ? null : double.tryParse(hdopText),
@@ -63,5 +65,6 @@ ParsedTrack parseGpx(String xml) {
   return ParsedTrack(
     name: document.findAllElements('name').firstOrNull?.innerText.trim(),
     fixes: List.unmodifiable(fixes),
+    timesAreWallClock: !anyZoned,
   );
 }

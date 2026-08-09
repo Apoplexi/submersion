@@ -37,11 +37,13 @@ ParsedTrack parseKml(String xml) {
   }
 
   final fixes = <ParsedFix>[];
+  var anyZoned = false;
   for (var i = 0; i < whens.length; i++) {
-    final time = DateTime.tryParse(whens[i].innerText.trim());
+    final time = parseFixTime(whens[i].innerText);
     if (time == null) {
       throw TrackParseException('Unparseable time: ${whens[i].innerText}');
     }
+    if (time.zoned) anyZoned = true;
 
     // gx:coord is "lon lat alt" - the REVERSE of GPX's lat/lon attributes.
     // Reading it backwards silently relocates the track.
@@ -56,7 +58,7 @@ ParsedTrack parseKml(String xml) {
     }
     validateCoordinate(lat, lon);
 
-    fixes.add((utc: time.toUtc(), lat: lat, lon: lon, accuracy: null));
+    fixes.add((utc: time.time, lat: lat, lon: lon, accuracy: null));
   }
 
   fixes.sort((a, b) => a.utc.compareTo(b.utc));
@@ -64,5 +66,6 @@ ParsedTrack parseKml(String xml) {
   return ParsedTrack(
     name: document.findAllElements('name').firstOrNull?.innerText.trim(),
     fixes: List.unmodifiable(fixes),
+    timesAreWallClock: !anyZoned,
   );
 }

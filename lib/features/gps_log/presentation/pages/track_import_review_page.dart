@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
@@ -66,8 +65,7 @@ class _TrackImportReviewPageState extends ConsumerState<TrackImportReviewPage> {
 
   void _remapCsv(CsvColumnMapping mapping) {
     try {
-      final text = utf8.decode(widget.bytes);
-      final reparsed = parseCsv(text, mapping);
+      final reparsed = parseCsv(widget.bytes, mapping);
       setState(() {
         _mapping = mapping;
         _candidate = _candidate.copyWith(parsed: reparsed);
@@ -180,10 +178,9 @@ class _TrackImportReviewPageState extends ConsumerState<TrackImportReviewPage> {
           if (_candidate.format == TrackFileFormat.csv) ...[
             const SizedBox(height: 24),
             CsvColumnMappingForm(
-              headers: readCsvHeaders(utf8.decode(widget.bytes)),
+              headers: readCsvHeaders(widget.bytes),
               mapping:
-                  _mapping ??
-                  guessCsvMapping(readCsvHeaders(utf8.decode(widget.bytes)))!,
+                  _mapping ?? guessCsvMapping(readCsvHeaders(widget.bytes))!,
               onChanged: _remapCsv,
             ),
           ],

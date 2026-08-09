@@ -3,14 +3,45 @@ typedef ParsedFix = ({DateTime utc, double lat, double lon, double? accuracy});
 
 /// A track as parsed from a file.
 ///
-/// Times are REAL UTC. Conversion to the app's wall-clock-as-UTC convention
-/// happens once in the import service, after the track's offset is resolved -
-/// never in a parser, which has no way to know that offset.
+/// When [timesAreWallClock] is false, [ParsedFix.utc] is REAL UTC and the
+/// import service converts it using the resolved recording offset.
+///
+/// When it is true the source carried no zone designator at all, so the
+/// value written in the file already IS the recording device's wall clock -
+/// exactly what this app stores - and the offset must NOT be applied again.
+/// Parsing a naive timestamp with DateTime.parse yields a LOCAL DateTime, so
+/// treating it as real UTC folds in the importing machine's offset and the
+/// same file produces two different tracks on two computers.
 class ParsedTrack {
   final String? name;
   final List<ParsedFix> fixes;
+  final bool timesAreWallClock;
 
-  const ParsedTrack({this.name, required this.fixes});
+  const ParsedTrack({
+    this.name,
+    required this.fixes,
+    this.timesAreWallClock = false,
+  });
+}
+
+/// True when [text] ends in a UTC designator or a numeric offset.
+///
+/// `2026-05-22T13:00:00Z` and `...+02:00` are zoned; a bare
+/// `2026-05-22 13:00:00`, which is what most consumer GPS loggers emit, is
+/// not.
+bool hasExplicitZone(String text) =>
+    RegExp(r'(?:Z|z|[+-]\d{2}:?\d{2})$').hasMatch(text.trim());
+
+/// Parses a timestamp, reporting whether it carried a zone.
+///
+/// A naive value is parsed as if UTC so the result is identical on every
+/// machine; the caller then knows not to shift it again.
+({DateTime time, bool zoned})? parseFixTime(String text) {
+  final trimmed = text.trim();
+  final zoned = hasExplicitZone(trimmed);
+  final parsed = DateTime.tryParse(zoned ? trimmed : '${trimmed}Z');
+  if (parsed == null) return null;
+  return (time: parsed.toUtc(), zoned: zoned);
 }
 
 /// A file could not be understood as a track.

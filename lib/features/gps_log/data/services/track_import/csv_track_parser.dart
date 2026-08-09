@@ -1,6 +1,8 @@
-import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:submersion/features/gps_log/data/services/track_import/parsed_track.dart';
+import 'package:submersion/features/universal_import/data/csv/models/parsed_csv.dart';
+import 'package:submersion/features/universal_import/data/csv/pipeline/csv_parser.dart';
 
 /// Which CSV column holds which field.
 ///
@@ -26,13 +28,22 @@ const _kLatHeaders = {'lat', 'latitude', 'y'};
 const _kLonHeaders = {'lon', 'lng', 'long', 'longitude', 'x'};
 const _kAccuracyHeaders = {'accuracy', 'hdop', 'precision', 'error'};
 
-/// The header row, trimmed.
-List<String> readCsvHeaders(String csv) {
-  final lines = const LineSplitter().convert(csv);
-  if (lines.isEmpty || lines.first.trim().isEmpty) {
-    throw const TrackParseException('File is empty');
+/// Shared RFC-4180 reader.
+///
+/// Splitting on bare commas shifted every column after a quoted field
+/// containing one - a row like `...,"Boat, the",12.0,45.5,-80.1` silently
+/// plotted a Georgian Bay track in the Gulf of Aden. This wrapper already
+/// existed for the universal importer and handles quotes, embedded newlines,
+/// and line-ending normalisation.
+const _reader = CsvParser();
+
+/// The header row, trimmed and unquoted.
+List<String> readCsvHeaders(Uint8List bytes) {
+  try {
+    return _reader.parse(bytes).headers;
+  } on CsvParseException catch (e) {
+    throw TrackParseException(e.message);
   }
-  return [for (final h in lines.first.split(',')) h.trim()];
 }
 
 /// Proposes a mapping from common header names, or null when the required
@@ -58,19 +69,19 @@ CsvColumnMapping? guessCsvMapping(List<String> headers) {
   );
 }
 
-ParsedTrack parseCsv(String csv, CsvColumnMapping mapping) {
-  final lines = const LineSplitter().convert(csv);
-  if (lines.length < 2) {
-    throw const TrackParseException('File has a header but no data rows');
+ParsedTrack parseCsv(Uint8List bytes, CsvColumnMapping mapping) {
+  final ParsedCsv parsed;
+  try {
+    parsed = _reader.parse(bytes);
+  } on CsvParseException catch (e) {
+    throw TrackParseException(e.message);
   }
 
   final fixes = <ParsedFix>[];
-  for (var i = 1; i < lines.length; i++) {
-    final line = lines[i].trim();
-    // Trailing newlines are normal; a blank line is not an error.
-    if (line.isEmpty) continue;
+  var anyZoned = false;
 
-    final cells = line.split(',');
+  for (var i = 0; i < parsed.rows.length; i++) {
+    final cells = parsed.rows[i];
     String? cell(int? index) {
       if (index == null || index >= cells.length) return null;
       final value = cells[index].trim();
@@ -78,20 +89,21 @@ ParsedTrack parseCsv(String csv, CsvColumnMapping mapping) {
     }
 
     final timeText = cell(mapping.timeIndex);
-    final time = timeText == null ? null : DateTime.tryParse(timeText);
+    final time = timeText == null ? null : parseFixTime(timeText);
     if (time == null) {
-      throw TrackParseException('Row ${i + 1}: unparseable time "$timeText"');
+      throw TrackParseException('Row ${i + 2}: unparseable time "$timeText"');
     }
+    if (time.zoned) anyZoned = true;
 
     final lat = double.tryParse(cell(mapping.latIndex) ?? '');
     final lon = double.tryParse(cell(mapping.lonIndex) ?? '');
     if (lat == null || lon == null) {
-      throw TrackParseException('Row ${i + 1}: unparseable coordinate');
+      throw TrackParseException('Row ${i + 2}: unparseable coordinate');
     }
     validateCoordinate(lat, lon);
 
     fixes.add((
-      utc: time.toUtc(),
+      utc: time.time,
       lat: lat,
       lon: lon,
       accuracy: double.tryParse(cell(mapping.accuracyIndex) ?? ''),
@@ -102,5 +114,8 @@ ParsedTrack parseCsv(String csv, CsvColumnMapping mapping) {
     throw const TrackParseException('No usable data rows');
   }
   fixes.sort((a, b) => a.utc.compareTo(b.utc));
-  return ParsedTrack(fixes: List.unmodifiable(fixes));
+  return ParsedTrack(
+    fixes: List.unmodifiable(fixes),
+    timesAreWallClock: !anyZoned,
+  );
 }

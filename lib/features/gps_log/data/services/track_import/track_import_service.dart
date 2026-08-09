@@ -157,13 +157,14 @@ class TrackImportService {
       case TrackFileFormat.kml:
         return parseKml(text);
       case TrackFileFormat.csv:
-        final mapping = csvMapping ?? guessCsvMapping(readCsvHeaders(text));
+        // The CSV reader takes bytes: it owns decoding and RFC-4180 quoting.
+        final mapping = csvMapping ?? guessCsvMapping(readCsvHeaders(bytes));
         if (mapping == null) {
           throw const TrackParseException(
             'Could not identify the latitude, longitude, and time columns',
           );
         }
-        return parseCsv(text, mapping);
+        return parseCsv(bytes, mapping);
       case TrackFileFormat.fit:
         throw StateError('handled above');
     }
@@ -233,10 +234,14 @@ class TrackImportService {
   /// Writes [candidate] as a track and returns its id.
   Future<String> commit(TrackImportCandidate candidate) async {
     final offset = candidate.tzOffsetMinutes;
+    // A source with no zone designator already carries the recording
+    // device's wall clock, which is exactly what we store. Applying the
+    // offset again would shift it a second time.
+    final shift = candidate.parsed.timesAreWallClock ? 0 : offset;
     final points = [
       for (final fix in candidate.parsed.fixes)
         GpsTrackPoint(
-          timestamp: toWallClockEpochSecondsAt(fix.utc, offset),
+          timestamp: toWallClockEpochSecondsAt(fix.utc, shift),
           latitude: fix.lat,
           longitude: fix.lon,
           accuracy: fix.accuracy,
