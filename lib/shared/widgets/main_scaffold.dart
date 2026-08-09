@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:submersion/core/providers/provider.dart';
+import 'package:submersion/core/router/back_navigation.dart';
 import 'package:submersion/core/theme/feature_accent_colors.dart';
 import 'package:submersion/features/auto_update/presentation/widgets/update_banner.dart';
 import 'package:submersion/features/dive_computer/presentation/providers/download_providers.dart';
@@ -162,6 +163,25 @@ class _MainScaffoldState extends ConsumerState<MainScaffold> {
 
   @override
   Widget build(BuildContext context) {
+    // Last-resort handler for the Android system back button. go_router's
+    // popRoute() walks the shell navigator first, so this only runs once
+    // nothing is left to pop -- which is the normal state after any
+    // context.go(), since go() replaces the stack instead of pushing onto it.
+    // Without this fallback the press falls through to SystemNavigator.pop()
+    // and closes the app instead of going back (#647).
+    final upLocation = resolveUpLocation(GoRouterState.of(context).uri);
+    return PopScope(
+      // Only the dashboard resolves to null, so only the dashboard exits.
+      canPop: upLocation == null,
+      onPopInvokedWithResult: (didPop, _) {
+        if (didPop || upLocation == null) return;
+        context.go(upLocation);
+      },
+      child: _buildScaffold(context),
+    );
+  }
+
+  Widget _buildScaffold(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final isWideScreen = screenWidth >= 800;
     final isDesktopExtended = screenWidth >= 1200;
