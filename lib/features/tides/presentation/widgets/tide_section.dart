@@ -10,6 +10,7 @@ import 'package:submersion/features/settings/presentation/providers/settings_pro
 import 'package:submersion/features/tides/presentation/providers/tide_providers.dart';
 import 'package:submersion/features/tides/presentation/widgets/current_tide_indicator.dart';
 import 'package:submersion/features/tides/presentation/widgets/tide_chart.dart';
+import 'package:submersion/features/tides/presentation/widgets/tide_source_badge.dart';
 import 'package:submersion/features/tides/presentation/widgets/tide_times_table.dart';
 
 /// A complete tide information section for a dive site.
@@ -196,6 +197,9 @@ class _TideSectionContent extends ConsumerWidget {
                 ),
               ],
             ),
+
+            // Data provenance (NOAA station vs ocean-model estimate)
+            TideSourceBadge(location: location),
             const SizedBox(height: 12),
 
             // Current Status

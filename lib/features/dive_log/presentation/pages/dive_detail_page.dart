@@ -3445,6 +3445,12 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
   /// takes up zero space.  The 24-px top spacer is included only when the
   /// section actually renders content.
   Widget _buildTideSection(BuildContext context, WidgetRef ref, Dive dive) {
+    // Freshwater sites have no tides; hide the section entirely, even
+    // when an old stored record exists.
+    if (dive.site?.waterType == WaterType.fresh) {
+      return const SizedBox.shrink();
+    }
+
     Widget withSpacing(Widget card) {
       return Column(
         mainAxisSize: MainAxisSize.min,
@@ -3452,8 +3458,15 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
       );
     }
 
-    // First try to get stored tide record
-    final tideRecordAsync = ref.watch(tideRecordForDiveProvider(dive.id));
+    // First try to get stored tide record (lazily self-healed against a
+    // fresh computation when the site has coordinates)
+    final tideRecordAsync = ref.watch(
+      healedTideRecordProvider((
+        diveId: dive.id,
+        location: dive.site?.location,
+        entryTime: dive.effectiveEntryTime,
+      )),
+    );
 
     return tideRecordAsync.when(
       data: (tideRecord) {

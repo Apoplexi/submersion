@@ -28497,6 +28497,42 @@ abstract class AppLocalizations {
   /// **'Tide state: {state}'**
   String tides_semantic_tideState(Object state);
 
+  /// No description provided for @tides_source_noaaStation.
+  ///
+  /// In en, this message translates to:
+  /// **'NOAA station: {name} ({distance})'**
+  String tides_source_noaaStation(String name, String distance);
+
+  /// No description provided for @tides_source_modelEstimate.
+  ///
+  /// In en, this message translates to:
+  /// **'Ocean-model estimate'**
+  String get tides_source_modelEstimate;
+
+  /// No description provided for @tides_source_modelCaveat.
+  ///
+  /// In en, this message translates to:
+  /// **'Modeled from satellite data. Times and heights may differ near complex coastlines.'**
+  String get tides_source_modelCaveat;
+
+  /// No description provided for @tides_source_sheetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Tide data source'**
+  String get tides_source_sheetTitle;
+
+  /// No description provided for @tides_source_datumMllw.
+  ///
+  /// In en, this message translates to:
+  /// **'Heights relative to MLLW (station datum)'**
+  String get tides_source_datumMllw;
+
+  /// No description provided for @tides_source_datumMsl.
+  ///
+  /// In en, this message translates to:
+  /// **'Heights relative to mean sea level'**
+  String get tides_source_datumMsl;
+
   /// No description provided for @tides_title.
   ///
   /// In en, this message translates to:

@@ -16585,6 +16585,27 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
+  String tides_source_noaaStation(String name, String distance) {
+    return 'תחנת NOAA: $name ($distance)';
+  }
+
+  @override
+  String get tides_source_modelEstimate => 'אומדן מודל אוקיינוס';
+
+  @override
+  String get tides_source_modelCaveat =>
+      'מבוסס על נתוני לוויין. זמנים וגבהים עשויים להיות שונים ליד קווי חוף מורכבים.';
+
+  @override
+  String get tides_source_sheetTitle => 'מקור נתוני הגאות';
+
+  @override
+  String get tides_source_datumMllw => 'גבהים ביחס ל-MLLW (ייחוס התחנה)';
+
+  @override
+  String get tides_source_datumMsl => 'גבהים ביחס לגובה פני הים הממוצע';
+
+  @override
   String get tides_title => 'גאות';
 
   @override

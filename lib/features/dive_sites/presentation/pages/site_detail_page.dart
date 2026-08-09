@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:go_router/go_router.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/core/constants/list_view_mode.dart';
 import 'package:submersion/core/constants/units.dart';
 import 'package:submersion/core/deco/altitude_calculator.dart';
@@ -192,8 +193,10 @@ class _SiteDetailContentState extends ConsumerState<_SiteDetailContent> {
             const SizedBox(height: 16),
           ],
 
-          // Tide Section (only if site has coordinates)
-          if (site.hasCoordinates) ...[
+          // Tide Section (only for non-freshwater sites with coordinates:
+          // a quarry or lake has no tides, and a nearby ocean station must
+          // not leak in)
+          if (site.hasCoordinates && site.waterType != WaterType.fresh) ...[
             TideSection(location: site.location!),
             const SizedBox(height: 16),
           ],

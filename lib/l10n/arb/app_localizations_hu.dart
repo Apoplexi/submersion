@@ -16974,6 +16974,29 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String tides_source_noaaStation(String name, String distance) {
+    return 'NOAA állomás: $name ($distance)';
+  }
+
+  @override
+  String get tides_source_modelEstimate => 'Óceánmodell-becslés';
+
+  @override
+  String get tides_source_modelCaveat =>
+      'Műholdadatok alapján modellezve. Az időpontok és magasságok eltérhetnek összetett partvonalak közelében.';
+
+  @override
+  String get tides_source_sheetTitle => 'Árapályadatok forrása';
+
+  @override
+  String get tides_source_datumMllw =>
+      'Magasságok az MLLW-hez képest (állomási alapszint)';
+
+  @override
+  String get tides_source_datumMsl =>
+      'Magasságok a közepes tengerszinthez képest';
+
+  @override
   String get tides_title => 'Árapály';
 
   @override
