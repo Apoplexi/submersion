@@ -5,8 +5,8 @@ import 'package:latlong2/latlong.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/features/gps_log/data/repositories/track_geometry_cache_repository.dart';
 import 'package:submersion/features/gps_log/domain/entities/gps_track.dart';
-import 'package:submersion/features/gps_log/domain/track_geometry.dart';
 import 'package:submersion/features/gps_log/presentation/providers/gps_track_map_providers.dart';
+import 'package:submersion/features/gps_log/presentation/widgets/track_camera.dart';
 import 'package:submersion/features/gps_log/presentation/widgets/track_shape_painter.dart';
 import 'package:submersion/features/maps/presentation/widgets/submersion_tile_layer.dart';
 
@@ -35,9 +35,15 @@ class GpsTrackThumbnail extends ConsumerWidget {
     // While loading, and on any error, show the tile-less shape rather than a
     // spinner: a list of spinners reads as broken, and the shape is the point.
     final points = geometry.value ?? const <GpsTrackPoint>[];
-    final bounds = points.length >= 2 ? trackBounds(points) : null;
+    final camera = points.length >= 2
+        ? TrackCamera.forPoints(
+            points,
+            maxZoom: _kThumbMaxZoom,
+            padding: const EdgeInsets.all(8),
+          )
+        : null;
 
-    if (bounds == null) {
+    if (camera == null) {
       return TrackShapeChip(
         points: points,
         width: kTrackThumbnailWidth,
@@ -58,14 +64,9 @@ class GpsTrackThumbnail extends ConsumerWidget {
               interactionOptions: const InteractionOptions(
                 flags: InteractiveFlag.none,
               ),
-              initialCameraFit: CameraFit.bounds(
-                bounds: LatLngBounds(
-                  LatLng(bounds.minLat, bounds.minLon),
-                  LatLng(bounds.maxLat, bounds.maxLon),
-                ),
-                padding: const EdgeInsets.all(8),
-                maxZoom: _kThumbMaxZoom,
-              ),
+              initialCameraFit: camera.fit,
+              initialCenter: camera.center ?? const LatLng(0, 0),
+              initialZoom: camera.zoom ?? _kThumbMaxZoom,
             ),
             children: [
               submersionTileLayer(ref, maxZoomOverride: _kThumbMaxZoom),

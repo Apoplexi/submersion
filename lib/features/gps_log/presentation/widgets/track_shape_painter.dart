@@ -21,6 +21,12 @@ class TrackShapePainter extends CustomPainter {
     final bounds = trackBounds(points);
     if (bounds == null) return;
 
+    // trackBounds may report an unwrapped maxLon above 180 for a track that
+    // crosses the antimeridian. Read every point through the same frame, or
+    // the western half draws hundreds of degrees off canvas.
+    double lonOf(GpsTrackPoint p) =>
+        longitudeInBoundsFrame(p.longitude, bounds);
+
     final latSpan = bounds.maxLat - bounds.minLat;
     final lonSpan = bounds.maxLon - bounds.minLon;
 
@@ -45,7 +51,7 @@ class TrackShapePainter extends CustomPainter {
 
     final path = Path();
     for (var i = 0; i < points.length; i++) {
-      final x = offsetX + (points[i].longitude - bounds.minLon) * scale;
+      final x = offsetX + (lonOf(points[i]) - bounds.minLon) * scale;
       // Screen y grows downward, latitude grows northward: invert.
       final y = offsetY + (bounds.maxLat - points[i].latitude) * scale;
       if (i == 0) {

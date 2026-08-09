@@ -7,9 +7,9 @@ import 'package:latlong2/latlong.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/features/gps_log/data/repositories/track_geometry_cache_repository.dart';
 import 'package:submersion/features/gps_log/domain/entities/gps_track.dart';
-import 'package:submersion/features/gps_log/domain/track_geometry.dart';
 import 'package:submersion/features/gps_log/presentation/providers/gps_track_map_providers.dart';
 import 'package:submersion/features/gps_log/presentation/widgets/gps_track_thumbnail.dart';
+import 'package:submersion/features/gps_log/presentation/widgets/track_camera.dart';
 import 'package:submersion/features/maps/presentation/widgets/map_attribution.dart';
 import 'package:submersion/features/maps/presentation/widgets/map_compass_button.dart';
 import 'package:submersion/features/maps/presentation/widgets/submersion_tile_layer.dart';
@@ -169,8 +169,8 @@ class _OverviewMap extends ConsumerWidget {
       }
     }
 
-    final bounds = trackBounds(allPoints);
-    if (bounds == null) {
+    final camera = TrackCamera.forPoints(allPoints);
+    if (camera == null) {
       return const SizedBox.shrink();
     }
 
@@ -179,14 +179,9 @@ class _OverviewMap extends ConsumerWidget {
       child: FlutterMap(
         mapController: controller,
         options: MapOptions(
-          initialCameraFit: CameraFit.bounds(
-            bounds: LatLngBounds(
-              LatLng(bounds.minLat, bounds.minLon),
-              LatLng(bounds.maxLat, bounds.maxLon),
-            ),
-            padding: const EdgeInsets.all(48),
-            maxZoom: 16.0,
-          ),
+          initialCameraFit: camera.fit,
+          initialCenter: camera.center ?? const LatLng(0, 0),
+          initialZoom: camera.zoom ?? 13.0,
         ),
         children: [
           submersionTileLayer(ref),
