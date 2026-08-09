@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer' as developer;
 
 import 'package:drift/drift.dart';
 
@@ -45,17 +46,29 @@ class NoaaStationCacheRepository {
     )..where((t) => t.stationId.equals(stationId))).getSingleOrNull();
     if (row == null) return null;
 
+    // A malformed row (corruption, partial write) must behave like a
+    // cache miss so the resolver silently refetches and overwrites it,
+    // rather than erroring the tide UI.
     final constituents = <String, TideConstituent>{};
-    (json.decode(row.constituentsJson) as Map<String, dynamic>).forEach((
-      name,
-      c,
-    ) {
-      constituents[name] = TideConstituent(
-        name: name,
-        amplitude: ((c as Map<String, dynamic>)['amplitude'] as num).toDouble(),
-        phase: (c['phase'] as num).toDouble(),
+    try {
+      (json.decode(row.constituentsJson) as Map<String, dynamic>).forEach((
+        name,
+        c,
+      ) {
+        constituents[name] = TideConstituent(
+          name: name,
+          amplitude: ((c as Map<String, dynamic>)['amplitude'] as num)
+              .toDouble(),
+          phase: (c['phase'] as num).toDouble(),
+        );
+      });
+    } catch (e) {
+      developer.log(
+        'Corrupt cached constituents for station ${row.stationId}: $e',
+        name: 'NoaaStationCacheRepository',
       );
-    });
+      return null;
+    }
 
     return CachedNoaaStation(
       stationId: row.stationId,

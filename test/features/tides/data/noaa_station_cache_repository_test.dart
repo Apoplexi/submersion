@@ -1,3 +1,4 @@
+import 'package:drift/drift.dart' show Value;
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/database/local_cache_database.dart';
@@ -61,6 +62,29 @@ void main() {
     expect(cached.constituents, isEmpty);
     expect(cached.datumOffsetMllw, isNull);
   });
+
+  test(
+    'corrupt constituents JSON reads as a cache miss, not a throw',
+    () async {
+      // A malformed row must degrade like an absent one so the resolver
+      // refetches (overwriting it) instead of erroring the tide section.
+      await db
+          .into(db.noaaTideStations)
+          .insert(
+            NoaaTideStationsCompanion.insert(
+              stationId: '9414290',
+              name: 'San Francisco',
+              latitude: 37.806,
+              longitude: -122.466,
+              constituentsJson: const Value('{"M2": {broken'),
+              status: 'ok',
+              fetchedAt: DateTime.utc(2026, 8, 9).millisecondsSinceEpoch,
+            ),
+          );
+
+      expect(await repo.read('9414290'), isNull);
+    },
+  );
 
   test('write replaces an existing row', () async {
     await repo.write(

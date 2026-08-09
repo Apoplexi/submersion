@@ -19,6 +19,9 @@ Future<Widget> _host(TideDataSource? source) async {
       tideDataSourceProvider(_location).overrideWith((ref) async => source),
     ],
     child: const MaterialApp(
+      // Pinned: flutter_test forwards the HOST machine's locales, and
+      // these tests assert English literals.
+      locale: Locale('en'),
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       home: Scaffold(body: TideSourceBadge(location: _location)),
@@ -28,6 +31,14 @@ Future<Widget> _host(TideDataSource? source) async {
 
 void main() {
   testWidgets('station tier shows station name and distance', (tester) async {
+    // Simulate a non-English host to prove the locale pin holds: without
+    // `locale: Locale('en')` this run would resolve to French.
+    tester.platformDispatcher.localesTestValue = const [
+      Locale('fr'),
+      Locale('en'),
+    ];
+    addTearDown(tester.platformDispatcher.clearLocalesTestValue);
+
     await tester.pumpWidget(
       await _host(
         const TideDataSource.noaaStation(
