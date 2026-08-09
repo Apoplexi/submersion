@@ -1,12 +1,17 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:submersion/core/providers/ref_invalidate_on_change.dart';
+import 'package:submersion/core/services/local_cache_database_service.dart';
 import 'package:submersion/core/tide/entities/tide_extremes.dart';
 import 'package:submersion/core/tide/entities/tide_prediction.dart';
 import 'package:submersion/core/tide/tide_calculator.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_repository_provider.dart';
 import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
+import 'package:submersion/features/tides/data/repositories/noaa_station_cache_repository.dart';
 import 'package:submersion/features/tides/data/repositories/tide_record_repository.dart';
+import 'package:submersion/features/tides/data/services/noaa_station_index.dart';
+import 'package:submersion/features/tides/data/services/noaa_station_service.dart';
+import 'package:submersion/features/tides/data/services/tide_constituent_resolver.dart';
 import 'package:submersion/features/tides/data/services/tide_data_service.dart';
 import 'package:submersion/features/tides/domain/entities/tide_record.dart';
 
@@ -38,6 +43,52 @@ final tideMetadataProvider = FutureProvider<TideDataMetadata?>((ref) async {
   return service.getMetadata();
 });
 
+/// Provider for the NOAA station index (bundled asset).
+final noaaStationIndexProvider = FutureProvider<NoaaStationIndex?>((ref) async {
+  try {
+    return await NoaaStationIndex.load();
+  } catch (e) {
+    return null; // Missing asset: resolver degrades to FES-only.
+  }
+});
+
+/// Provider for the [NoaaStationService] singleton.
+final noaaStationServiceProvider = Provider<NoaaStationService>((ref) {
+  return NoaaStationService();
+});
+
+/// Provider for the [NoaaStationCacheRepository].
+final noaaStationCacheRepositoryProvider = Provider<NoaaStationCacheRepository>(
+  (ref) {
+    return NoaaStationCacheRepository(
+      LocalCacheDatabaseService.instance.database,
+    );
+  },
+);
+
+/// Provider for resolved tide data (calculator plus provenance) at a
+/// location. Station tier when a cached or fetchable NOAA station is
+/// within range, FES model tier otherwise, null when no data exists.
+final resolvedTideDataProvider =
+    FutureProvider.family<ResolvedTideData?, GeoPoint>((ref, location) async {
+      final index = await ref.watch(noaaStationIndexProvider.future);
+      final resolver = TideConstituentResolver(
+        stationIndex: index,
+        stationService: ref.watch(noaaStationServiceProvider),
+        cache: ref.watch(noaaStationCacheRepositoryProvider),
+        fesService: ref.watch(tideDataServiceProvider),
+      );
+      return resolver.resolve(location.latitude, location.longitude);
+    });
+
+/// Provider for the provenance of tide data at a location (badge UI).
+final tideDataSourceProvider = FutureProvider.family<TideDataSource?, GeoPoint>(
+  (ref, location) async {
+    final resolved = await ref.watch(resolvedTideDataProvider(location).future);
+    return resolved?.source;
+  },
+);
+
 /// Provider for a [TideCalculator] at a specific location.
 ///
 /// Usage:
@@ -46,11 +97,8 @@ final tideMetadataProvider = FutureProvider<TideDataMetadata?>((ref) async {
 /// ```
 final tideCalculatorProvider = FutureProvider.family<TideCalculator?, GeoPoint>(
   (ref, location) async {
-    final service = ref.watch(tideDataServiceProvider);
-    return service.getCalculatorForLocation(
-      location.latitude,
-      location.longitude,
-    );
+    final resolved = await ref.watch(resolvedTideDataProvider(location).future);
+    return resolved?.calculator;
   },
 );
 
@@ -59,8 +107,8 @@ final hasTideDataProvider = FutureProvider.family<bool, GeoPoint>((
   ref,
   location,
 ) async {
-  final service = ref.watch(tideDataServiceProvider);
-  return service.hasTideData(location.latitude, location.longitude);
+  final resolved = await ref.watch(resolvedTideDataProvider(location).future);
+  return resolved != null;
 });
 
 /// Provider for tide predictions at a location.
