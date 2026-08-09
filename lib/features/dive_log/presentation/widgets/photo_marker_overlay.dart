@@ -2,37 +2,12 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 import 'package:submersion/core/utils/unit_formatter.dart';
+import 'package:submersion/features/dive_log/presentation/widgets/eager_tap_gesture_recognizer.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/photo_marker_layout.dart';
 import 'package:submersion/features/media/domain/entities/media_item.dart';
 import 'package:submersion/features/media/presentation/pages/photo_viewer_page.dart';
 import 'package:submersion/features/media/presentation/widgets/media_item_view.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
-
-/// A tap that wins its gesture arena the instant the pointer lifts.
-///
-/// The overlay renders inside the chart's [GestureDetector], which handles
-/// double-tap-to-zoom. Flutter's [DoubleTapGestureRecognizer] holds the
-/// pointer's arena for [kDoubleTapTimeout] (300ms) after the first tap up,
-/// and a plain [TapGestureRecognizer] never self-accepts - it waits for the
-/// arena sweep that the hold defers. So an ordinary [GestureDetector.onTap]
-/// here lags 300ms behind the finger, and an impatient second tap lands
-/// inside the double-tap window, zooming the chart instead of acting on the
-/// marker. Resolving accepted on the up event ends the hold immediately.
-///
-/// Drags are unaffected: [PrimaryPointerGestureRecognizer] rejects this
-/// recognizer as soon as the pointer travels past `kTouchSlop`, so a pan
-/// that starts on a marker still pans the chart.
-class _EagerTapGestureRecognizer extends TapGestureRecognizer {
-  _EagerTapGestureRecognizer({super.debugOwner});
-
-  @override
-  void handlePrimaryPointer(PointerEvent event) {
-    if (event is PointerUpEvent) {
-      resolve(GestureDisposition.accepted);
-    }
-    super.handlePrimaryPointer(event);
-  }
-}
 
 /// Camera-icon markers over the dive profile chart at each photo's
 /// (time, depth), with a tap-to-preview thumbnail card.
@@ -41,7 +16,7 @@ class _EagerTapGestureRecognizer extends TapGestureRecognizer {
 /// its tap targets win hit-testing over the chart's pan/scrub/tooltip
 /// gestures without entering fl_chart's touch arena. The chart's own
 /// double-tap recognizer is an ancestor and does still share the arena;
-/// [_EagerTapGestureRecognizer] is what keeps these taps immediate.
+/// [EagerTapGestureRecognizer] is what keeps these taps immediate.
 class PhotoMarkerOverlay extends StatefulWidget {
   /// Time-sorted markers (see [photoMarkersFromMedia]).
   final List<PhotoChartMarker> markers;
@@ -120,7 +95,7 @@ class _PhotoMarkerOverlayState extends State<PhotoMarkerOverlay> {
     );
   }
 
-  /// [GestureDetector.onTap] equivalent backed by [_EagerTapGestureRecognizer].
+  /// [GestureDetector.onTap] equivalent backed by [EagerTapGestureRecognizer].
   Widget _eagerTap({
     Key? key,
     required HitTestBehavior behavior,
@@ -131,9 +106,9 @@ class _PhotoMarkerOverlayState extends State<PhotoMarkerOverlay> {
       key: key,
       behavior: behavior,
       gestures: {
-        _EagerTapGestureRecognizer:
-            GestureRecognizerFactoryWithHandlers<_EagerTapGestureRecognizer>(
-              () => _EagerTapGestureRecognizer(debugOwner: this),
+        EagerTapGestureRecognizer:
+            GestureRecognizerFactoryWithHandlers<EagerTapGestureRecognizer>(
+              () => EagerTapGestureRecognizer(debugOwner: this),
               (recognizer) => recognizer.onTap = onTap,
             ),
       },
