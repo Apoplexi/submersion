@@ -21,6 +21,7 @@ import 'package:submersion/core/matching/match_scorer.dart';
 import 'package:submersion/features/dive_log/data/repositories/safety_findings_repository.dart';
 import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart'
     show GeoPoint;
+import 'package:submersion/features/dive_log/domain/services/bottom_time_calculator.dart';
 import 'package:submersion/features/dive_log/domain/services/dive_altitude_enricher.dart';
 import 'package:submersion/features/equipment/data/services/dive_equipment_defaulter.dart';
 import 'package:submersion/features/pre_dive/data/services/checklist_dive_linker.dart';
@@ -1731,55 +1732,16 @@ class DiveComputerRepository {
 
   /// Calculate bottom time (seconds) from profile points.
   ///
-  /// Bottom time excludes descent and ascent phases. Uses the same algorithm
-  /// as [Dive.calculateBottomTimeFromProfile]: finds the first and last points
-  /// at or above 85% of max depth.
+  /// Delegates to [BottomTimeCalculator]: bottom time runs from surface
+  /// departure to the start of the final ascent, so multilevel dives
+  /// count their shallower segments.
   ///
   /// Returns null if profile data is insufficient for calculation.
-  int? _calculateBottomTimeFromPoints(
-    List<ProfilePointData> points, {
-    double depthThresholdPercent = 0.85,
-  }) {
-    if (points.length < 3) return null;
-
-    final sorted = List<ProfilePointData>.from(points)
-      ..sort((a, b) => a.timestamp.compareTo(b.timestamp));
-
-    double maxDepth = 0;
-    for (final point in sorted) {
-      if (point.depth > maxDepth) {
-        maxDepth = point.depth;
-      }
-    }
-
-    if (maxDepth <= 0) return null;
-
-    final bottomThreshold = maxDepth * depthThresholdPercent;
-
-    // First point at or above threshold = descent end
-    int? descentEndTimestamp;
-    for (final point in sorted) {
-      if (point.depth >= bottomThreshold) {
-        descentEndTimestamp = point.timestamp;
-        break;
-      }
-    }
-
-    // Last point at or above threshold = ascent start
-    int? ascentStartTimestamp;
-    for (int i = sorted.length - 1; i >= 0; i--) {
-      if (sorted[i].depth >= bottomThreshold) {
-        ascentStartTimestamp = sorted[i].timestamp;
-        break;
-      }
-    }
-
-    if (descentEndTimestamp == null || ascentStartTimestamp == null) {
-      return null;
-    }
-    if (ascentStartTimestamp <= descentEndTimestamp) return null;
-
-    return ascentStartTimestamp - descentEndTimestamp;
+  int? _calculateBottomTimeFromPoints(List<ProfilePointData> points) {
+    return BottomTimeCalculator.secondsFromSamples([
+      for (final point in points)
+        (timestamp: point.timestamp, depth: point.depth),
+    ]);
   }
 
   /// Map libdivecomputer event type strings to ProfileEventType enum names.
