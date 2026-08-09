@@ -431,9 +431,10 @@ class Dive extends Equatable {
   /// Calculate bottom time from dive profile data.
   ///
   /// Bottom time runs from surface departure to the start of the final
-  /// ascent (US Navy convention): the descent counts; safety and deco
-  /// stops during the final ascent do not. See [BottomTimeCalculator]
-  /// for the threshold rule.
+  /// ascent (US Navy convention): the descent counts; stops shallower
+  /// than the depth threshold (safety stops, shallow deco) do not, while
+  /// deeper stops still count. See [BottomTimeCalculator] for the
+  /// threshold rule.
   ///
   /// Returns null if profile data is insufficient for calculation.
   Duration? calculateBottomTimeFromProfile() {

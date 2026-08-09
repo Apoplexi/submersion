@@ -3440,10 +3440,11 @@ class AppDatabase extends _$AppDatabase {
   /// collapsed multilevel dives to their deepest segment: 10 min at 29 m
   /// followed by 40 min at 15 m reported ~9 min of bottom time. For any dive
   /// whose stored bottom_time exactly reproduces the old heuristic's output
-  /// for its primary profile (i.e. it was machine-derived by an import,
-  /// download, or the v132 backfill -- user-typed values will not match),
-  /// recompute it with the multilevel-correct rule in
-  /// [_multilevelBottomTimeSecondsFromProfileRows].
+  /// for its primary profile (in practice machine-derived by an import,
+  /// download, or the v132 backfill; a user-typed value that coincidentally
+  /// reproduces it is recomputed too, which still yields a
+  /// profile-consistent result), recompute it with the multilevel-correct
+  /// rule in [_multilevelBottomTimeSecondsFromProfileRows].
   ///
   /// Both algorithms are frozen private copies so every device computes
   /// identical values no matter which app version it migrates with; `hlc`
@@ -3490,8 +3491,9 @@ class AppDatabase extends _$AppDatabase {
         variables: [Variable<String>(diveId)],
       ).get();
 
-      // Fingerprint check: only values the old heuristic produced are
-      // machine-written; anything else is user data and stays.
+      // Fingerprint check: a value reproducing the old heuristic is
+      // treated as machine-written and replaced (a coincidental user match
+      // is recomputed too); anything else is user data and stays.
       final oldSeconds = _bottomTimeSecondsFromProfileRows(points);
       if (oldSeconds == null || oldSeconds != storedSeconds) continue;
 
@@ -7562,10 +7564,11 @@ class AppDatabase extends _$AppDatabase {
         if (from < 144) await reportProgress();
         // v145 is reserved by the GPS track mapping branch (PR #908).
         // v146: recompute bottom times the retired square-profile heuristic
-        // derived too short on multilevel dives. Fingerprinted -- only
-        // stored values that exactly reproduce the old heuristic are
-        // machine-written and get replaced; user-typed values never match
-        // and are left alone. onUpgrade only, hlc untouched (v132 pattern).
+        // derived too short on multilevel dives. Fingerprinted -- stored
+        // values that exactly reproduce the old heuristic get replaced
+        // (machine-derived, or a coincidental user match that recomputes to
+        // a profile-consistent value); anything else is treated as user
+        // data and left alone. onUpgrade only, hlc untouched (v132 pattern).
         if (from < 146) {
           await _recomputeMultilevelBottomTimes();
         }

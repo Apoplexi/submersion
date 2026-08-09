@@ -2,8 +2,10 @@
 /// computer repository.
 ///
 /// Bottom time is defined as surface departure to the start of the final
-/// ascent (US Navy / dive-table convention): the descent counts; safety
-/// and deco stops during the final ascent do not. The start of the final
+/// ascent (US Navy / dive-table convention): the descent counts; stops
+/// shallower than the threshold (safety stops, shallow deco) do not,
+/// while a stop deeper than the threshold -- a deep stop -- still counts
+/// (the accepted trade-off in the design spec). The start of the final
 /// ascent is approximated as the last profile sample at or deeper than a
 /// depth threshold, which makes multilevel dives (a deep excursion followed by a
 /// long shallower tail) measure correctly -- the retired heuristic (time
