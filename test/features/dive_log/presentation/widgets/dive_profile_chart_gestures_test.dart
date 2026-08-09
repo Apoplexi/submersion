@@ -34,17 +34,24 @@ class _TestSettingsNotifier extends StateNotifier<AppSettings>
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
-List<DiveProfilePoint> _makeProfile({int points = 20}) {
+List<DiveProfilePoint> _makeProfile({
+  int points = 20,
+  bool temperature = false,
+}) {
   return List.generate(
     points,
     (i) => DiveProfilePoint(
       timestamp: i * 30,
       depth: (i < points / 2 ? i * 3.0 : (points - i) * 3.0),
+      temperature: temperature ? 20.0 - i * 0.1 : null,
     ),
   );
 }
 
-Widget _buildChart({void Function(int? index)? onPointSelected}) {
+Widget _buildChart({
+  void Function(int? index)? onPointSelected,
+  bool temperature = false,
+}) {
   return ProviderScope(
     overrides: [
       settingsProvider.overrideWith((ref) => _TestSettingsNotifier()),
@@ -57,7 +64,7 @@ Widget _buildChart({void Function(int? index)? onPointSelected}) {
           width: 400,
           height: 300,
           child: DiveProfileChart(
-            profile: _makeProfile(),
+            profile: _makeProfile(temperature: temperature),
             onPointSelected: onPointSelected,
           ),
         ),
@@ -213,6 +220,48 @@ void main() {
     await tester.pump();
 
     expect(_visibleSpan(tester), lessThan(fullSpan));
+  });
+
+  testWidgets('a second tap landing on the right-axis metric selector strip '
+      'does not zoom the chart', (tester) async {
+    await tester.pumpWidget(_buildChart(temperature: true));
+    await tester.pumpAndSettle();
+
+    // The strip only exists when a right-axis metric is active.
+    expect(
+      find.byWidgetPredicate(
+        (w) =>
+            w is Semantics && w.properties.label == 'Change right axis metric',
+      ),
+      findsOneWidget,
+    );
+
+    final chartTopRight = tester.getTopRight(find.byType(LineChart).first);
+    final fullSpan = _visibleSpan(tester);
+
+    // First tap on the plot just left of the strip, second tap inside the
+    // strip within the double-tap window and slop: the second tap belongs
+    // to the selector (it opens the metric menu), not a chart double-tap.
+    final g1 = await tester.createGesture();
+    await g1.down(
+      chartTopRight + const Offset(-90, 60),
+      timeStamp: Duration.zero,
+    );
+    await g1.up(timeStamp: const Duration(milliseconds: 40));
+    await tester.pump();
+    final g2 = await tester.createGesture();
+    await g2.down(
+      chartTopRight + const Offset(-25, 60),
+      timeStamp: const Duration(milliseconds: 140),
+    );
+    await g2.up(timeStamp: const Duration(milliseconds: 180));
+    await tester.pumpAndSettle();
+
+    expect(
+      _visibleSpan(tester),
+      fullSpan,
+      reason: 'a selector-strip tap must never double as a chart double-tap',
+    );
   });
 
   testWidgets('two slow taps do not zoom', (tester) async {

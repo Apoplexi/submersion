@@ -141,17 +141,12 @@ void main() {
       )..layout();
       final padding = line.label.padding.resolve(TextDirection.ltr);
       // Approximate x from the data-space fraction; exact plot insets are
-      // irrelevant for an overlap check between labels.
+      // irrelevant for an overlap check between labels. All labels use
+      // Alignment.topLeft with the horizontal position encoded in
+      // padding.right (drawn left edge = x - padding.right - textWidth).
       final xFrac = (line.x - data.minX) / (data.maxX - data.minX);
       final x = xFrac * chartSize.width;
-      final double left;
-      if (line.label.alignment == Alignment.topLeft) {
-        left = x - padding.right - painter.width;
-      } else if (line.label.alignment == Alignment.topRight) {
-        left = x + padding.left;
-      } else {
-        left = x - painter.width / 2;
-      }
+      final left = x - padding.right - painter.width;
       rects.add(
         Rect.fromLTWH(left, padding.top, painter.width, painter.height),
       );
@@ -177,7 +172,15 @@ void main() {
 
     final lines = _eventLines(tester);
     expect(lines, hasLength(1));
-    expect(lines.first.label.alignment, Alignment.topLeft);
+    // The drawn left edge is x - padding.right - textWidth; a label pushed
+    // fully left of its line carries padding.right >= the flip gap, instead
+    // of the centered layout's negative padding (-textWidth / 2).
+    final padding = lines.first.label.padding.resolve(TextDirection.ltr);
+    expect(
+      padding.right,
+      greaterThanOrEqualTo(4),
+      reason: 'the label text must sit left of the line, not centered on it',
+    );
   });
 
   testWidgets('events seconds apart collapse to the most severe one', (

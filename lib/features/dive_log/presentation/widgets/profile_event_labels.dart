@@ -23,9 +23,6 @@ class EventLabelSpec {
   });
 }
 
-/// Which side of the event line the label text sits on.
-enum EventLabelAnchor { center, leftOfLine, rightOfLine }
-
 /// Where (and whether) one event label is drawn. Placement i corresponds to
 /// spec i of the input.
 class EventLabelPlacement {
@@ -36,20 +33,23 @@ class EventLabelPlacement {
   /// Pixel y of the label's top edge within the plot rect.
   final double topPx;
 
-  final EventLabelAnchor anchor;
+  /// Pixel x of the label's left edge within the plot rect. Centered on the
+  /// event line by default, shifted fully to one side of the line near a
+  /// plot edge, and always clamped so the text stays inside the plot even
+  /// when a long localized string barely fits.
+  final double leftPx;
 
   const EventLabelPlacement({
     required this.showText,
     required this.topPx,
-    required this.anchor,
+    required this.leftPx,
   });
 }
 
 /// Vertical clearance between stacked labels.
 const double _labelStackGap = 2;
 
-/// Horizontal clearance between a flipped label and its event line,
-/// mirrored by the chart-side EdgeInsets when mapping to VerticalLineLabel.
+/// Horizontal clearance between a flipped label and its event line.
 const double _lineGap = 4;
 
 /// Places event labels below their profile-depth anchor with collision
@@ -58,7 +58,9 @@ const double _lineGap = 4;
 ///
 /// Rules, applied per label scanning left to right:
 ///  - horizontal: centered on the event line; flipped fully left/right of
-///    the line when the centered extent would cross a plot edge;
+///    the line when the centered extent would cross a plot edge, and then
+///    clamped into the plot (a string wider than the remaining space slides
+///    inward rather than clipping);
 ///  - vertical: `anchorYPx + gap` (just below the curve point), clamped
 ///    into the plot; while the rect intersects an already-placed label it
 ///    is stepped downward, and if it runs off the bottom the search retries
@@ -82,18 +84,17 @@ List<EventLabelPlacement> placeEventLabels(
   for (final i in order) {
     final spec = specs[i];
 
-    final EventLabelAnchor anchor;
-    final double left;
+    final double desiredLeft;
     if (spec.xPx + spec.textWidth / 2 > plotWidth) {
-      anchor = EventLabelAnchor.leftOfLine;
-      left = spec.xPx - spec.textWidth - _lineGap;
+      desiredLeft = spec.xPx - spec.textWidth - _lineGap;
     } else if (spec.xPx - spec.textWidth / 2 < 0) {
-      anchor = EventLabelAnchor.rightOfLine;
-      left = spec.xPx + _lineGap;
+      desiredLeft = spec.xPx + _lineGap;
     } else {
-      anchor = EventLabelAnchor.center;
-      left = spec.xPx - spec.textWidth / 2;
+      desiredLeft = spec.xPx - spec.textWidth / 2;
     }
+    final left = desiredLeft
+        .clamp(0.0, math.max(0.0, plotWidth - spec.textWidth))
+        .toDouble();
 
     // Floor at 0: a transient layout can hand us a plot shorter than the
     // text, and clamp() throws when its bounds are inverted.
@@ -129,13 +130,13 @@ List<EventLabelPlacement> placeEventLabels(
       placements[i] = EventLabelPlacement(
         showText: false,
         topPx: (spec.anchorYPx + gap).clamp(0.0, maxTop),
-        anchor: anchor,
+        leftPx: left,
       );
     } else {
       placements[i] = EventLabelPlacement(
         showText: true,
         topPx: resolvedTop,
-        anchor: anchor,
+        leftPx: left,
       );
       placedRects.add(
         Rect.fromLTWH(left, resolvedTop, spec.textWidth, spec.textHeight),

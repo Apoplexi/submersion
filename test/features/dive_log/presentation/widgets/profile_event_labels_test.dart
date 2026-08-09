@@ -20,29 +20,9 @@ void main() {
     textHeight: textHeight,
   );
 
-  /// Reconstructs the pixel rect a placement produces, mirroring the
-  /// chart-side mapping (center / left-of-line / right-of-line with a 4 px
-  /// gap to the event line).
-  Rect rectOf(EventLabelSpec s, EventLabelPlacement p) {
-    switch (p.anchor) {
-      case EventLabelAnchor.center:
-        return Rect.fromLTWH(
-          s.xPx - s.textWidth / 2,
-          p.topPx,
-          s.textWidth,
-          s.textHeight,
-        );
-      case EventLabelAnchor.leftOfLine:
-        return Rect.fromLTWH(
-          s.xPx - s.textWidth - 4,
-          p.topPx,
-          s.textWidth,
-          s.textHeight,
-        );
-      case EventLabelAnchor.rightOfLine:
-        return Rect.fromLTWH(s.xPx + 4, p.topPx, s.textWidth, s.textHeight);
-    }
-  }
+  /// The pixel rect a placement produces.
+  Rect rectOf(EventLabelSpec s, EventLabelPlacement p) =>
+      Rect.fromLTWH(p.leftPx, p.topPx, s.textWidth, s.textHeight);
 
   test(
     'a lone label sits just below its depth anchor, centered on the line',
@@ -55,7 +35,7 @@ void main() {
       expect(placements, hasLength(1));
       expect(placements.first.showText, isTrue);
       expect(placements.first.topPx, 64); // anchor + default 4 px gap
-      expect(placements.first.anchor, EventLabelAnchor.center);
+      expect(placements.first.leftPx, 110); // xPx - textWidth / 2
     },
   );
 
@@ -75,7 +55,22 @@ void main() {
       plotWidth: plotWidth,
       plotHeight: plotHeight,
     );
-    expect(placements.first.anchor, EventLabelAnchor.leftOfLine);
+    expect(placements.first.leftPx, 290 - 80 - 4); // xPx - textWidth - gap
+  });
+
+  test('a label wider than the space left of the line clamps inside the '
+      'plot instead of underflowing', () {
+    final placements = placeEventLabels(
+      [spec(xPx: 295, anchorYPx: 40, textWidth: 293)],
+      plotWidth: plotWidth,
+      plotHeight: plotHeight,
+    );
+    expect(placements.first.leftPx, greaterThanOrEqualTo(0));
+    expect(
+      placements.first.leftPx + 293,
+      lessThanOrEqualTo(plotWidth),
+      reason: 'the label must stay fully inside the plot',
+    );
   });
 
   test('a label whose centered text would cross the left edge flips right '
@@ -85,7 +80,7 @@ void main() {
       plotWidth: plotWidth,
       plotHeight: plotHeight,
     );
-    expect(placements.first.anchor, EventLabelAnchor.rightOfLine);
+    expect(placements.first.leftPx, 10 + 4); // xPx + gap
   });
 
   test('overlapping labels are pushed apart vertically', () {
@@ -180,7 +175,7 @@ void main() {
     expect(placements, hasLength(3));
     // Placement i corresponds to spec i (order preserved even though the
     // algorithm scans left to right internally).
-    expect(placements[0].anchor, EventLabelAnchor.center);
+    expect(placements[0].leftPx, 250 - 40); // centered on its line
     expect(placements[1].topPx, greaterThanOrEqualTo(180));
     expect(placements[2].topPx, greaterThanOrEqualTo(100));
   });

@@ -844,6 +844,12 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
   bool _tapMoved = false;
   bool _doubleTapArmed = false;
 
+  // Whether the right-axis metric selector strip is rendered this build.
+  // Set in _buildChart alongside effectiveRightAxisMetric; a double-tap
+  // whose second tap lands in the strip must not zoom (the strip's own tap
+  // opens the metric menu).
+  bool _rightAxisSelectorActive = false;
+
   // Index of the last sample reported via hover, to de-dupe onPointSelected.
   int? _lastHoverIndex;
 
@@ -1922,7 +1928,11 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
                       lastUp != null &&
                       event.timeStamp - lastUp < kDoubleTapTimeout &&
                       (event.localPosition - _lastTapUpPosition).distance <=
-                          kDoubleTapSlop;
+                          kDoubleTapSlop &&
+                      !_inRightAxisSelector(
+                        event.localPosition,
+                        constraints.biggest,
+                      );
                 } else {
                   _doubleTapArmed = false;
                   _tapMoved = true;
@@ -2069,6 +2079,15 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
       },
     );
   }
+
+  /// Whether [localPosition] falls inside the right-axis metric selector's
+  /// tap strip (mirrors the Positioned overlay in _buildChart: right 50 px,
+  /// excluding the bottom 30 px axis band). A second tap there is a
+  /// selector interaction, not a chart double-tap.
+  bool _inRightAxisSelector(Offset localPosition, Size box) =>
+      _rightAxisSelectorActive &&
+      localPosition.dx >= box.width - 50 &&
+      localPosition.dy <= box.height - 30;
 
   // Arena outcome callbacks from ChartTouchClaimRecognizer. Only event
   // handlers read the flag, so no rebuild is needed. Claiming also parks the
@@ -2315,6 +2334,7 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
     final rightAxisRange = effectiveRightAxisMetric != null
         ? _getMetricRange(effectiveRightAxisMetric, units)
         : null;
+    _rightAxisSelectorActive = effectiveRightAxisMetric != null;
 
     // Pressure bounds from multi-tank pressure data
     double? minPressure, maxPressure;
@@ -5302,6 +5322,10 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
       if (t < visibleMinX || t > visibleMaxX) continue;
       final painter = TextPainter(
         text: TextSpan(text: kept[i].displayName, style: labelStyle),
+        // Deliberately LTR regardless of locale: fl_chart's painter lays
+        // vertical-line labels out with TextDirection.ltr
+        // (axis_chart_painter.dart), and this measurement must match the
+        // width it will actually paint with.
         textDirection: TextDirection.ltr,
       )..layout();
       final anchorY =
@@ -5325,45 +5349,40 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
       plotWidth: plotW,
       plotHeight: plotH,
     );
-    final placementByEvent = <int, EventLabelPlacement>{
-      for (var j = 0; j < inWindow.length; j++) inWindow[j]: placements[j],
+    final labelByEvent = <int, (EventLabelSpec, EventLabelPlacement)>{
+      for (var j = 0; j < inWindow.length; j++)
+        inWindow[j]: (specs[j], placements[j]),
     };
 
     return [
       for (var i = 0; i < kept.length; i++)
-        _eventVerticalLine(kept[i], placementByEvent[i], colorScheme),
+        _eventVerticalLine(kept[i], labelByEvent[i], colorScheme),
     ];
   }
 
   VerticalLine _eventVerticalLine(
     ProfileEvent event,
-    EventLabelPlacement? placement,
+    (EventLabelSpec, EventLabelPlacement)? label,
     ColorScheme colorScheme,
   ) {
+    final spec = label?.$1;
+    final placement = label?.$2;
     final color = _eventSeverityColor(event.severity, colorScheme);
     // fl_chart lays the label out inside
     // Rect.fromLTRB(x - padding.right - textWidth, padding.top,
-    //               x + padding.left, ...):
-    // topCenter with zero horizontal padding centres the text on the line,
-    // topLeft puts its right edge padding.right left of the line, topRight
-    // its left edge padding.left right of the line. padding.top is the pixel
-    // offset from the plot top; placements are computed in the same space.
-    final alignment = switch (placement?.anchor) {
-      EventLabelAnchor.leftOfLine => Alignment.topLeft,
-      EventLabelAnchor.rightOfLine => Alignment.topRight,
-      _ => Alignment.topCenter,
-    };
-    final padding = switch (placement?.anchor) {
-      EventLabelAnchor.leftOfLine => EdgeInsets.only(
-        top: placement?.topPx ?? 0,
-        right: 4,
-      ),
-      EventLabelAnchor.rightOfLine => EdgeInsets.only(
-        top: placement?.topPx ?? 0,
-        left: 4,
-      ),
-      _ => EdgeInsets.only(top: placement?.topPx ?? 0),
-    };
+    //               x + padding.left, ...)
+    // and Alignment.topLeft draws the text with its top-left corner at
+    // (rect.left, rect.top). Solving rect.left == placement.leftPx gives
+    // padding.right = xPx - leftPx - textWidth, which may be negative for a
+    // label centred on (or clamped across) the line - fl_chart's painter is
+    // pure arithmetic, so negative padding is well-defined here. padding.top
+    // is the pixel offset from the plot top; placements share that space.
+    final padding = placement == null || spec == null
+        ? EdgeInsets.zero
+        : EdgeInsets.only(
+            top: placement.topPx,
+            right: spec.xPx - placement.leftPx - spec.textWidth,
+          );
     return VerticalLine(
       x: event.timestamp.toDouble(),
       color: color,
@@ -5371,7 +5390,7 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
       dashArray: [3, 3],
       label: VerticalLineLabel(
         show: placement?.showText ?? false,
-        alignment: alignment,
+        alignment: Alignment.topLeft,
         padding: padding,
         style: TextStyle(
           color: color,
