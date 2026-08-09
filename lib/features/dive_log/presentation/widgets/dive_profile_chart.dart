@@ -20,6 +20,7 @@ import 'package:submersion/features/dive_log/data/services/profile_surface_lead_
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
 import 'package:submersion/features/dive_log/domain/entities/gas_switch.dart';
 import 'package:submersion/features/dive_log/domain/entities/profile_event.dart';
+import 'package:submersion/features/dive_log/domain/entities/safety_finding.dart';
 import 'package:submersion/features/dive_log/presentation/providers/profile_legend_provider.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/chart_series_cache.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/deco_stop_band.dart';
@@ -30,6 +31,7 @@ import 'package:submersion/features/dive_log/presentation/widgets/gas_colors.dar
 import 'package:submersion/features/dive_log/presentation/widgets/gas_timeline_strip.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/photo_marker_layout.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/photo_marker_overlay.dart';
+import 'package:submersion/features/dive_log/presentation/widgets/safety_findings_overlay.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/profile_chart_viewport.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/profile_highlight_range.dart';
@@ -200,9 +202,32 @@ class DiveProfileChart extends ConsumerStatefulWidget {
   final int? highlightedTimestamp;
 
   /// Optional time range to emphasize (e.g. the selected safety finding).
-  /// A true range renders as a translucent vertical band with edge lines;
-  /// an instant (start == end) renders as a single dashed cursor line.
+  /// Renders as a translucent vertical band with edge lines; short and
+  /// instant ranges inflate to a minimum on-screen width.
   final ProfileHighlightRange? highlightRange;
+
+  /// Safety findings shown as tappable chips in a lane below the plot.
+  /// Pre-filtered by the caller (chartSafetyFindings): non-dismissed,
+  /// rule-enabled, start-timestamped, sorted by start time. The lane renders
+  /// only when this is non-empty AND [onSafetyFindingTap] is provided.
+  final List<SafetyFinding>? safetyFindings;
+
+  /// Id of the finding whose chip shows the selected ring and callout.
+  final String? selectedSafetyFindingId;
+
+  /// Toggle request from a chip or the callout's clear button: callers
+  /// select the finding, or clear when it is already selected.
+  final void Function(SafetyFinding finding)? onSafetyFindingTap;
+
+  /// Callout "Dismiss" action.
+  final void Function(SafetyFinding finding)? onSafetyFindingDismiss;
+
+  /// Callout "Details" action (scroll to the safety section). Omit where no
+  /// detail surface exists (fullscreen); the callout hides the link.
+  final void Function(SafetyFinding finding)? onSafetyFindingDetails;
+
+  /// Height of the safety findings lane in logical pixels.
+  static const double safetyLaneHeight = 24.0;
 
   // Advanced decompression/gas curves
   /// ppO2 curve in bar
@@ -507,6 +532,11 @@ class DiveProfileChart extends ConsumerStatefulWidget {
     this.playbackTimestamp,
     this.highlightedTimestamp,
     this.highlightRange,
+    this.safetyFindings,
+    this.selectedSafetyFindingId,
+    this.onSafetyFindingTap,
+    this.onSafetyFindingDismiss,
+    this.onSafetyFindingDetails,
     this.ppO2Curve,
     this.o2SensorCurves,
     this.ppO2FromSensorAverage = false,
@@ -1540,10 +1570,9 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
           DiveProfileChart.rightAxisSize(availableWidth),
       bottom:
           DiveProfileChart._bottomAxisNameSize +
-          (hasGasStrip
-              ? DiveProfileChart._bottomTickReservedSize +
-                    DiveProfileChart.gasTimelineHeight
-              : DiveProfileChart._bottomTickReservedSize),
+          DiveProfileChart._bottomTickReservedSize +
+          (hasGasStrip ? DiveProfileChart.gasTimelineHeight : 0) +
+          (_hasSafetyLane ? DiveProfileChart.safetyLaneHeight : 0),
     );
   }
 
@@ -2106,6 +2135,12 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
       (widget.diveDurationSeconds != null && widget.diveDurationSeconds! > 0) &&
       showGas;
 
+  /// Whether the safety findings lane renders. Widget-param based (no
+  /// provider read) so it is safe from both build and gesture paths.
+  bool get _hasSafetyLane =>
+      (widget.safetyFindings?.isNotEmpty ?? false) &&
+      widget.onSafetyFindingTap != null;
+
   // ref.watch is correct here: _hasGasStrip is only read from build().
   // Gesture paths must use _gasStripVisible with ref.read (see _plotInsets).
   bool get _hasGasStrip => _gasStripVisible(
@@ -2341,10 +2376,10 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
                   // push the tick labels down by the strip's height so the
                   // strip can be Positioned in the resulting gap, directly
                   // between the plot area and the time labels.
-                  reservedSize: _hasGasStrip
-                      ? DiveProfileChart._bottomTickReservedSize +
-                            DiveProfileChart.gasTimelineHeight
-                      : DiveProfileChart._bottomTickReservedSize,
+                  reservedSize:
+                      DiveProfileChart._bottomTickReservedSize +
+                      (_hasGasStrip ? DiveProfileChart.gasTimelineHeight : 0) +
+                      (_hasSafetyLane ? DiveProfileChart.safetyLaneHeight : 0),
                   interval: _calculateTimeInterval(visibleRangeX),
                   getTitlesWidget: (value, meta) {
                     // Suppress interval ticks that are too close to the max
@@ -2357,9 +2392,14 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
                     final minutes = (value / 60).round();
                     return SideTitleWidget(
                       meta: meta,
-                      space: _hasGasStrip
-                          ? 8 + DiveProfileChart.gasTimelineHeight
-                          : 8,
+                      space:
+                          8 +
+                          (_hasGasStrip
+                              ? DiveProfileChart.gasTimelineHeight
+                              : 0) +
+                          (_hasSafetyLane
+                              ? DiveProfileChart.safetyLaneHeight
+                              : 0),
                       child: Text(
                         '$minutes',
                         style: Theme.of(context).textTheme.labelSmall,
@@ -3456,7 +3496,8 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
                 DiveProfileChart.rightAxisSize(availableWidth),
             bottom:
                 DiveProfileChart._bottomAxisNameSize +
-                DiveProfileChart._bottomTickReservedSize,
+                DiveProfileChart._bottomTickReservedSize +
+                (_hasSafetyLane ? DiveProfileChart.safetyLaneHeight : 0),
             height: DiveProfileChart.gasTimelineHeight,
             child: GasTimelineStrip(
               segments: widget.gasSegments!,
@@ -3496,6 +3537,28 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
               visibleMaxDepth: visibleMaxDepth,
               insets: _plotInsets(availableWidth, units),
               units: units,
+            ),
+          ),
+        // Safety findings lane + callout: a widget layer like the photo
+        // markers, occupying the extra bottom reservation added by
+        // _hasSafetyLane, directly between the gas strip (or plot) and the
+        // tick labels.
+        if (_hasSafetyLane)
+          Positioned.fill(
+            child: SafetyFindingsOverlay(
+              findings: widget.safetyFindings!,
+              selectedFindingId: widget.selectedSafetyFindingId,
+              visibleMinSeconds: visibleMinX,
+              visibleMaxSeconds: visibleMaxX,
+              insets: _plotInsets(availableWidth, units),
+              laneHeight: DiveProfileChart.safetyLaneHeight,
+              laneBottomOffset:
+                  DiveProfileChart._bottomAxisNameSize +
+                  DiveProfileChart._bottomTickReservedSize,
+              units: units,
+              onFindingTap: widget.onSafetyFindingTap!,
+              onFindingDismiss: widget.onSafetyFindingDismiss ?? (_) {},
+              onFindingDetails: widget.onSafetyFindingDetails,
             ),
           ),
       ],
@@ -3547,7 +3610,8 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
                 width / 2,
             bottom:
                 DiveProfileChart._bottomAxisNameSize +
-                DiveProfileChart._bottomTickReservedSize,
+                DiveProfileChart._bottomTickReservedSize +
+                (_hasSafetyLane ? DiveProfileChart.safetyLaneHeight : 0),
             height: DiveProfileChart.gasTimelineHeight,
             width: width,
             child: IgnorePointer(child: ColoredBox(color: color)),
