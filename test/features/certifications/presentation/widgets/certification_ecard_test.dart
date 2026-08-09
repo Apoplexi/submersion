@@ -97,4 +97,70 @@ void main() {
       expect(find.text('Jane Doe'), findsOneWidget);
     });
   });
+
+  group('CertificationEcard front face', () {
+    testWidgets('renders the uploaded photo when photoFront is set', (
+      tester,
+    ) async {
+      await _pumpCard(
+        tester,
+        certification: _makeCert(photoFront: _onePixelPng),
+      );
+
+      expect(find.byType(CertificationCardPhoto), findsOneWidget);
+    });
+
+    testWidgets('photo card repeats agency, name and diver in the strip', (
+      tester,
+    ) async {
+      await _pumpCard(
+        tester,
+        certification: _makeCert(
+          photoFront: _onePixelPng,
+          cardNumber: '1802G4921',
+        ),
+      );
+
+      // Exact joined strings, not textContaining: the generated card renders
+      // these same facts as separate Text widgets, so only a whole-line match
+      // proves the info strip is what is on screen.
+      expect(find.text('PADI  -  Open Water Diver'), findsOneWidget);
+      expect(find.text('ERIC GRIFFIN  -  1802G4921'), findsOneWidget);
+    });
+
+    testWidgets('photo card strip omits a missing card number', (tester) async {
+      await _pumpCard(
+        tester,
+        certification: _makeCert(photoFront: _onePixelPng),
+      );
+
+      // The detail line is the diver name alone, with no trailing separator.
+      expect(find.text('ERIC GRIFFIN'), findsOneWidget);
+      expect(find.textContaining('ERIC GRIFFIN  -  '), findsNothing);
+    });
+
+    testWidgets('photo card still shows the expired badge', (tester) async {
+      await _pumpCard(
+        tester,
+        certification: _makeCert(
+          photoFront: _onePixelPng,
+          expiryDate: DateTime(2020, 1, 1),
+        ),
+      );
+
+      // Assert the photo path is what rendered, so this cannot pass by way of
+      // the generated card's own badge.
+      expect(find.byType(CertificationCardPhoto), findsOneWidget);
+      expect(find.text('EXPIRED'), findsOneWidget);
+    });
+
+    testWidgets('renders the generated front when photoFront is null', (
+      tester,
+    ) async {
+      await _pumpCard(tester, certification: _makeCert());
+
+      expect(find.byType(CertificationCardPhoto), findsNothing);
+      expect(find.text('Open Water Diver'), findsOneWidget);
+    });
+  });
 }
