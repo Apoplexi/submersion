@@ -23,9 +23,12 @@ import '../../../../helpers/mock_providers.dart';
 
 final _t0 = DateTime(2026, 1, 1);
 
-/// Records where a chip tap navigated.
+/// Records where a chip tap navigated, and exposes the router so tests can
+/// assert that the destination was *stacked* over Home rather than replacing
+/// it (`push` vs `go`).
 class NavSpy {
   String? location;
+  late final GoRouter router;
 }
 
 const _emptyGauges = DashboardGauges(
@@ -69,13 +72,31 @@ Future<NavSpy> pumpStrip(
       GoRoute(path: '/trips', builder: (_, _) => stub('/trips')),
       GoRoute(path: '/courses', builder: (_, _) => stub('/courses')),
       GoRoute(
+        path: '/courses/:courseId',
+        builder: (_, state) =>
+            stub('/courses/${state.pathParameters['courseId']}'),
+      ),
+      GoRoute(path: '/dives', builder: (_, _) => stub('/dives')),
+      GoRoute(
         path: '/pre-dive-sessions/:id',
         builder: (_, state) =>
             stub('/pre-dive-sessions/${state.pathParameters['id']}'),
       ),
       GoRoute(
+        path: '/planning/no-fly',
+        builder: (_, _) => stub('/planning/no-fly'),
+      ),
+      GoRoute(
         path: '/settings/backup',
         builder: (_, _) => stub('/settings/backup'),
+      ),
+      GoRoute(
+        path: '/settings/cloud-sync',
+        builder: (_, _) => stub('/settings/cloud-sync'),
+      ),
+      GoRoute(
+        path: '/settings/media-storage/transfers',
+        builder: (_, _) => stub('/settings/media-storage/transfers'),
       ),
       GoRoute(
         path: '/dives/quality',
@@ -87,6 +108,7 @@ Future<NavSpy> pumpStrip(
       ),
     ],
   );
+  spy.router = router;
   await tester.pumpWidget(
     ProviderScope(
       overrides: [
@@ -274,7 +296,10 @@ void main() {
       expect(spy.location, '/settings/diver-profile/insurance');
     });
 
-    testWidgets('insurance without an expiry date reads as missing', (
+    // Expiry is optional on InsuranceEditPage, so a DAN policy recorded
+    // without a renewal date is a complete record, not a missing one. The
+    // chip must agree with DiverInsurance.isValid, which keys off provider.
+    testWidgets('a provider with no expiry date reads as insured', (
       tester,
     ) async {
       await pumpStrip(
@@ -282,7 +307,22 @@ void main() {
         const DashboardGauges(
           gearGauges: [],
           hasGear: true,
-          insurance: DiverInsurance(provider: 'DAN'),
+          insurance: DiverInsurance(provider: 'DAN', policyNumber: '12345'),
+          noFlyStatus: null,
+          daysSinceLastDive: null,
+        ),
+      );
+      expect(find.text('No insurance on file'), findsNothing);
+      expect(find.text('Insurance OK'), findsOneWidget);
+    });
+
+    testWidgets('a blank provider still reads as missing', (tester) async {
+      await pumpStrip(
+        tester,
+        const DashboardGauges(
+          gearGauges: [],
+          hasGear: true,
+          insurance: DiverInsurance(provider: ''),
           noFlyStatus: null,
           daysSinceLastDive: null,
         ),
@@ -361,6 +401,35 @@ void main() {
     testWidgets('clear when no restriction is active', (tester) async {
       await pumpStrip(tester, _emptyGauges);
       expect(find.text('No-fly 0:00'), findsOneWidget);
+    });
+
+    testWidgets('the clear chip opens the no-fly calculator', (tester) async {
+      final spy = await pumpStrip(tester, _emptyGauges);
+      await tapChip(tester, 'No-fly 0:00');
+      expect(spy.location, '/planning/no-fly');
+    });
+
+    testWidgets('the active chip opens the no-fly calculator', (tester) async {
+      final spy = await pumpStrip(
+        tester,
+        DashboardGauges(
+          gearGauges: const [],
+          hasGear: true,
+          insurance: null,
+          noFlyStatus: NoFlyStatus(
+            until: DateTime.now().toUtc().add(
+              const Duration(hours: 5, minutes: 30),
+            ),
+            category: NoFlyCategory.single,
+            interval: const Duration(hours: 12),
+          ),
+          daysSinceLastDive: null,
+        ),
+      );
+      final chip = find.textContaining('No-fly 5:');
+      await tester.tap(find.ancestor(of: chip, matching: find.byType(InkWell)));
+      await tester.pumpAndSettle();
+      expect(spy.location, '/planning/no-fly');
     });
 
     testWidgets('shows remaining time while active', (tester) async {
@@ -476,6 +545,29 @@ void main() {
       await pumpDays(tester, kCurrencyAlertDays + 1);
       expect(find.text('Last dive 366d ago'), findsOneWidget);
     });
+
+    testWidgets('opens the dive log', (tester) async {
+      final spy = await pumpStrip(
+        tester,
+        const DashboardGauges(
+          gearGauges: [],
+          hasGear: true,
+          insurance: null,
+          noFlyStatus: null,
+          daysSinceLastDive: 12,
+        ),
+      );
+      await tapChip(tester, 'Last dive 12d ago');
+      expect(spy.location, '/dives');
+    });
+
+    testWidgets('the no-dives-yet chip also opens the dive log', (
+      tester,
+    ) async {
+      final spy = await pumpStrip(tester, _emptyGauges);
+      await tapChip(tester, 'No dives yet');
+      expect(spy.location, '/dives');
+    });
   });
 
   group('attention chips', () {
@@ -551,7 +643,8 @@ void main() {
       );
       expect(find.text('AN/DP: 7/12'), findsOneWidget);
       await tapChip(tester, 'AN/DP: 7/12');
-      expect(spy.location, '/courses');
+      // The chip names one course, so it opens that course, not the list.
+      expect(spy.location, '/courses/c1');
     });
 
     testWidgets('uploads chip appears only with pending transfers', (
@@ -569,6 +662,22 @@ void main() {
         ),
       );
       expect(find.text('3 uploads pending'), findsOneWidget);
+    });
+
+    testWidgets('uploads chip opens the transfer queue', (tester) async {
+      final spy = await pumpStrip(
+        tester,
+        const DashboardGauges(
+          gearGauges: [],
+          hasGear: true,
+          insurance: null,
+          noFlyStatus: null,
+          daysSinceLastDive: null,
+          uploadsPending: 3,
+        ),
+      );
+      await tapChip(tester, '3 uploads pending');
+      expect(spy.location, '/settings/media-storage/transfers');
     });
 
     testWidgets('data quality chip navigates', (tester) async {
@@ -693,6 +802,65 @@ void main() {
         ),
       );
       expect(find.text('5 unsynced'), findsOneWidget);
+    });
+
+    testWidgets('opens cloud sync settings', (tester) async {
+      final spy = await pumpStrip(
+        tester,
+        const DashboardGauges(
+          gearGauges: [],
+          hasGear: true,
+          insurance: null,
+          noFlyStatus: null,
+          daysSinceLastDive: null,
+          syncEnabled: true,
+        ),
+      );
+      await tapChip(tester, 'Synced');
+      expect(spy.location, '/settings/cloud-sync');
+    });
+  });
+
+  group('navigation semantics', () {
+    // Every chip stacks its destination over Home so the back button returns
+    // there; `go` would replace Home and leave nothing to pop.
+    testWidgets('chip taps stack over Home so back returns', (tester) async {
+      final spy = await pumpStrip(tester, _emptyGauges);
+      expect(spy.router.canPop(), isFalse);
+      await tapChip(tester, 'No-fly 0:00');
+      expect(spy.location, '/planning/no-fly');
+      expect(spy.router.canPop(), isTrue);
+      spy.router.pop();
+      await tester.pumpAndSettle();
+      expect(find.byType(GaugeStrip), findsOneWidget);
+    });
+
+    testWidgets('every rendered chip is tappable', (tester) async {
+      await pumpStrip(
+        tester,
+        DashboardGauges(
+          gearGauges: [
+            _gearGauge('Reg', EquipmentType.regulator, ServiceClockSeverity.ok),
+          ],
+          hasGear: true,
+          insurance: const DiverInsurance(provider: 'DAN'),
+          noFlyStatus: null,
+          daysSinceLastDive: 12,
+          expiringCertCount: 2,
+          nextTrip: _trip('Bonaire', 12),
+          activeChecklistId: 'session-7',
+          firstCourse: _course('AN/DP', 7, 12),
+          uploadsPending: 3,
+          lastBackupTime: DateTime.now(),
+          syncEnabled: true,
+          dataQualityFindings: 4,
+        ),
+      );
+      final inkWells = tester.widgetList<InkWell>(find.byType(InkWell));
+      expect(inkWells, isNotEmpty);
+      for (final ink in inkWells) {
+        expect(ink.onTap, isNotNull);
+      }
     });
   });
 

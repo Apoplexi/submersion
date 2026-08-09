@@ -684,6 +684,38 @@ void main() {
     );
   });
 
+  // The GaugeStrip widget test navigates through a stub router, so a chip
+  // pointing at a path that does not exist in the real app would still pass
+  // there. These assert the destinations resolve against the real config.
+  group('home gauge-strip chip destinations resolve', () {
+    const destinations = <String>[
+      '/equipment',
+      '/equipment/new',
+      '/settings/diver-profile/insurance',
+      '/planning/no-fly',
+      '/dives',
+      '/certifications',
+      '/trips',
+      '/pre-dive-sessions/session-7',
+      '/courses/c1',
+      '/settings/media-storage/transfers',
+      '/settings/backup',
+      '/settings/cloud-sync',
+      '/dives/quality',
+    ];
+
+    for (final destination in destinations) {
+      test('$destination matches a route', () {
+        final match = router.configuration.findMatch(Uri.parse(destination));
+        expect(
+          match.isError,
+          isFalse,
+          reason: '$destination does not resolve to any route',
+        );
+      });
+    }
+  });
+
   group('app_router initialLocation', () {
     test('initial location is /dashboard', () {
       expect(
