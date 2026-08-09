@@ -400,6 +400,7 @@ class _TrackMapState extends ConsumerState<_TrackMap> {
   void _handleTap(List<TrackRun> runs, List<GpsTrackPoint> fullPoints) {
     final hit = _hitNotifier.value;
     if (hit == null || hit.hitValues.isEmpty) {
+      // Tapped the layer but missed the line: dismiss.
       setState(() => _inspected = null);
       return;
     }
@@ -452,7 +453,16 @@ class _TrackMapState extends ConsumerState<_TrackMap> {
                 // the tap handler has to wrap the layer - MapOptions.onTap
                 // fires without it being set.
                 GestureDetector(
-                  onTap: () => _handleTap(runs, drawable),
+                  // deferToChild (the default) means a tap that misses the
+                  // drawn line never reaches this handler, so the card could
+                  // only be dismissed with its close button.
+                  behavior: HitTestBehavior.translucent,
+                  // Resolve against the FULL decoded list, not the simplified
+                  // one: at the 2 m LOD a straight 3-minute transit keeps only
+                  // its endpoints, so tapping the middle reported a timestamp
+                  // up to ~90 s off with another fix's accuracy. This is the
+                  // contract track_point_lookup_test asserts.
+                  onTap: () => _handleTap(runs, fallbackPoints),
                   child: GpsTrackPolylineLayer(
                     runs: runs,
                     mode: mode,

@@ -55,6 +55,34 @@ Future<void> _pump(WidgetTester tester) async {
   await tester.pumpAndSettle();
 }
 
+/// Pumps with a heavily decimated geometry provider - only the endpoints -
+/// while the hydrated track still carries every fix.
+Future<void> _pumpDecimated(WidgetTester tester) async {
+  final base = await getBaseOverrides();
+  await tester.binding.setSurfaceSize(const Size(900, 1200));
+  addTearDown(() => tester.binding.setSurfaceSize(null));
+
+  await tester.pumpWidget(
+    ProviderScope(
+      overrides: [
+        ...base,
+        gpsTrackDetailProvider('track-1').overrideWith((ref) async => _track()),
+        gpsTrackGeometryProvider((
+          'track-1',
+          TrackLod.detail,
+        )).overrideWith((ref) async => [_points.first, _points.last]),
+        divesOnTrackProvider('track-1').overrideWith((ref) async => const []),
+      ],
+      child: const MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        home: GpsTrackDetailPage(trackId: 'track-1'),
+      ),
+    ),
+  );
+  await tester.pumpAndSettle();
+}
+
 void main() {
   testWidgets('no info card is shown before any tap', (tester) async {
     await _pump(tester);
@@ -80,18 +108,35 @@ void main() {
     expect(find.byType(TrackPointInfoCard), findsNothing);
   });
 
-  testWidgets('re-tapping the line keeps a card shown', (tester) async {
-    // Dismissal is via the close button only. flutter_map populates the hit
-    // notifier from the layer's own hit test, and a tap that misses the
-    // drawn line does not reliably re-notify, so "tap away to clear" cannot
-    // be implemented correctly on top of it - the close affordance is the
-    // documented path and is explicitly tested above.
+  testWidgets('tapping away from the line dismisses the card', (tester) async {
+    // The polyline GestureDetector defaulted to deferToChild, so a tap that
+    // missed the drawn line never reached the handler and the card could
+    // only be closed with its button. HitTestBehavior.translucent fixes it.
     await _pump(tester);
-    final centre = tester.getCenter(find.byType(FlutterMap));
-    await tester.tapAt(centre);
-    await tester.pumpAndSettle();
-    await tester.tapAt(centre);
+    await tester.tapAt(tester.getCenter(find.byType(FlutterMap)));
     await tester.pumpAndSettle();
     expect(find.byType(TrackPointInfoCard), findsOneWidget);
+
+    final topLeft = tester.getTopLeft(find.byType(FlutterMap));
+    await tester.tapAt(topLeft + const Offset(6, 6));
+    await tester.pumpAndSettle();
+    expect(find.byType(TrackPointInfoCard), findsNothing);
+  });
+
+  testWidgets('the inspected fix comes from the full list, not the LOD', (
+    tester,
+  ) async {
+    // The simplified geometry keeps only the endpoints of this straight run,
+    // so a card reporting a middle timestamp proves the lookup searched the
+    // full decoded list.
+    await _pumpDecimated(tester);
+    await tester.tapAt(tester.getCenter(find.byType(FlutterMap)));
+    await tester.pumpAndSettle();
+
+    final card = tester.widget<TrackPointInfoCard>(
+      find.byType(TrackPointInfoCard),
+    );
+    expect(card.point.timestamp, isNot(_points.first.timestamp));
+    expect(card.point.timestamp, isNot(_points.last.timestamp));
   });
 }

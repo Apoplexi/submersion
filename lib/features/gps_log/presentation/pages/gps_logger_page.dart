@@ -313,6 +313,10 @@ class _GpsLoggerPageState extends ConsumerState<GpsLoggerPage> {
               itemBuilder: (context, index) {
                 final track = tracks[index];
                 return ListTile(
+                  // Keyed by track: without this a recycled row keeps the
+                  // previous track's FlutterMap State, and its camera stays
+                  // on the previous region.
+                  key: ValueKey(track.id),
                   onTap: () => context.push('/gps-log/${track.id}'),
                   contentPadding: EdgeInsets.zero,
                   minLeadingWidth: kTrackThumbnailWidth,

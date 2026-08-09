@@ -106,6 +106,9 @@ class _TrackListPane extends ConsumerWidget {
       itemBuilder: (context, index) {
         final track = tracks[index];
         return ListTile(
+          // See gps_logger_page: an unkeyed recycled row keeps the previous
+          // track's map camera.
+          key: ValueKey(track.id),
           selected: track.id == selectedId,
           leading: GpsTrackThumbnail(trackId: track.id),
           minLeadingWidth: kTrackThumbnailWidth,
