@@ -182,6 +182,51 @@ void main() {
     expect(cardRect.bottom, greaterThan(chartRect.center.dy));
   });
 
+  testWidgets('without a saved position the card defaults to the corner the '
+      'profile occupies least', (tester) async {
+    // Fast descent, long deep bottom, ascent tail rising into the top-right:
+    // the old fixed top-right default sat exactly on that tail. For this
+    // shape the emptiest corner window is the bottom-left (the fast descent
+    // leaves it almost immediately).
+    final dive = Dive(
+      id: 'd1',
+      dateTime: DateTime(2026, 1, 1, 10),
+      profile: List.generate(61, (i) {
+        final t = i * 10;
+        final double depth;
+        if (t < 90) {
+          depth = 30.0 * t / 90;
+        } else if (t < 450) {
+          depth = 30;
+        } else {
+          depth = 30.0 * (600 - t) / 150;
+        }
+        return DiveProfilePoint(timestamp: t, depth: depth, temperature: 20);
+      }),
+    );
+    final overrides = _defaultOverrides()
+      ..removeAt(1)
+      ..insert(1, diveProvider(dive.id).overrideWith((ref) async => dive));
+    await tester.pumpWidget(_wrap(overrides));
+    await tester.pumpAndSettle();
+
+    expect(
+      tester
+          .widget<DraggableReadoutCard>(find.byType(DraggableReadoutCard))
+          .initialFraction,
+      const Offset(0, 1),
+      reason: 'the card must seed at the least occupied corner',
+    );
+    final chartRect = tester.getRect(find.byType(DiveProfileChart));
+    final cardRect = tester.getRect(find.byKey(const ValueKey('readout-card')));
+    expect(
+      cardRect.left,
+      lessThan(chartRect.center.dx),
+      reason: 'the card must avoid the occupied top-right corner',
+    );
+    expect(cardRect.top, greaterThan(chartRect.center.dy));
+  });
+
   testWidgets('chart fills most of the screen height', (tester) async {
     tester.view.physicalSize = const Size(1200, 900);
     tester.view.devicePixelRatio = 1.0;
