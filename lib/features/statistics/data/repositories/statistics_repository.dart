@@ -1,6 +1,7 @@
 import 'package:drift/drift.dart';
 
 import 'package:submersion/core/database/database.dart';
+import 'package:submersion/core/deco/ascent_rate_calculator.dart';
 import 'package:submersion/core/domain/visibility/visibility_scale.dart';
 import 'package:submersion/core/services/database_service.dart';
 import 'package:submersion/core/services/logger_service.dart';
@@ -58,6 +59,23 @@ class DistributionSegment {
 class StatisticsRepository {
   AppDatabase get _db => DatabaseService.instance.database;
   final _log = LoggerService.forClass(StatisticsRepository);
+
+  /// Smoothing window used by [getAscentDescentRates], in seconds. Matches the
+  /// per-dive calculator so both read the same shape out of a profile.
+  static const int _rateWindowSeconds =
+      AscentRateCalculator.defaultSmoothingWindowSeconds;
+
+  /// Slowest vertical rate that counts as ascending or descending rather than
+  /// working a multi-level profile, in m/min.
+  ///
+  /// A recreational profile spends most of its windows drifting slowly around
+  /// the bottom: on a representative library, windows in the 0.5-3 m/min band
+  /// outnumber genuine transit roughly four to one. Averaging those in drags
+  /// both figures down to around 2.4 m/min, which tells a diver nothing and is
+  /// not comparable to the ascent-rate limits they are trained against. Only
+  /// counting sustained movement keeps the card answering "how fast do I
+  /// actually go up and down".
+  static const double _sustainedTransitThreshold = 3.0;
 
   /// Builds the `AND <alias>.id IN (<subquery>)` fragment + raw params for a
   /// stats filter. Empty (no-op) when the filter has no active axes.
@@ -1968,7 +1986,32 @@ class StatisticsRepository {
   // Profile Analysis Statistics
   // ============================================================================
 
-  /// Get average ascent/descent rates
+  /// Get average ascent/descent rates in m/min, or null when the filtered
+  /// dives hold no vertical movement to average.
+  ///
+  /// Rates are derived from the stored depth samples rather than read from
+  /// `dive_profiles.ascent_rate`: no download or import path ever populates
+  /// that column (libdivecomputer reports no ascent-rate sample type), so it is
+  /// null for every row and averaging it always yielded an empty section.
+  ///
+  /// The derivation mirrors [AscentRateCalculator], which computes the same
+  /// quantity per-dive for the profile chart:
+  ///
+  /// - Samples are averaged into fixed [_rateWindowSeconds] windows. This is
+  ///   the SQL equivalent of the calculator's time-based smoothing: it makes
+  ///   the result independent of the computer's sample interval, and keeps
+  ///   depth-resolution noise from dominating (0.1 m between two 1 s samples is
+  ///   already 6 m/min of pure quantisation noise).
+  /// - The rate between two windows uses their mean sample times, not the
+  ///   window width, so uneven occupancy at the edges cannot distort the
+  ///   interval.
+  /// - Positive is ascending, matching [AscentRatePoint.rateMetersPerMin].
+  /// - Windows slower than [_sustainedTransitThreshold] are excluded, so
+  ///   working a multi-level profile does not read as ascending or descending.
+  ///
+  /// Only primary profile rows are considered, so a dive logged by two
+  /// computers — or one whose original profile was demoted by an edit — is
+  /// counted once rather than interleaving two sample streams.
   Future<({double? avgAscent, double? avgDescent})> getAscentDescentRates({
     String? diverId,
     DiveFilterState filter = const DiveFilterState(),
@@ -1979,12 +2022,38 @@ class StatisticsRepository {
       final params = diverId != null ? [diverId, ...df.params] : [...df.params];
 
       final results = await _db.customSelect('''
+        WITH windows AS (
+          SELECT
+            p.dive_id AS dive_id,
+            p.computer_id AS computer_id,
+            p.timestamp / $_rateWindowSeconds AS window_index,
+            AVG(p.depth) AS depth,
+            AVG(p.timestamp) AS at
+          FROM dive_profiles p
+          JOIN dives d ON d.id = p.dive_id
+          WHERE p.is_primary = 1 $diverFilter ${df.clause}
+          GROUP BY p.dive_id, p.computer_id, p.timestamp / $_rateWindowSeconds
+        ),
+        paired AS (
+          SELECT
+            depth,
+            at,
+            LAG(depth) OVER w AS prev_depth,
+            LAG(at) OVER w AS prev_at
+          FROM windows
+          WINDOW w AS (PARTITION BY dive_id, computer_id ORDER BY window_index)
+        ),
+        rates AS (
+          SELECT (prev_depth - depth) * 60.0 / (at - prev_at) AS rate
+          FROM paired
+          WHERE prev_at IS NOT NULL AND at > prev_at
+        )
         SELECT
-          AVG(CASE WHEN p.ascent_rate < 0 THEN ABS(p.ascent_rate) ELSE NULL END) AS avg_ascent,
-          AVG(CASE WHEN p.ascent_rate > 0 THEN p.ascent_rate ELSE NULL END) AS avg_descent
-        FROM dive_profiles p
-        JOIN dives d ON d.id = p.dive_id
-        WHERE p.ascent_rate IS NOT NULL $diverFilter ${df.clause}
+          AVG(CASE WHEN rate >= $_sustainedTransitThreshold THEN rate END)
+            AS avg_ascent,
+          AVG(CASE WHEN rate <= -$_sustainedTransitThreshold THEN -rate END)
+            AS avg_descent
+        FROM rates
         ''', variables: params.map((p) => Variable(p)).toList()).get();
 
       if (results.isEmpty) return (avgAscent: null, avgDescent: null);
