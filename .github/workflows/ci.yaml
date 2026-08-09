@@ -394,6 +394,13 @@ jobs:
       - name: Run fastlane beta changelog test
         run: ruby scripts/release/fastlane_beta_changelog_test.rb
 
+      - name: Run pre-push hook test
+        # Guards two hook bugs that both rejected pushes for reasons unrelated
+        # to the change being pushed: running the checks against the main
+        # checkout rather than the worktree, and a set -e abort that produced
+        # no error message. Stubs dart/flutter, so no toolchain is needed here.
+        run: ./scripts/pre_push_hook_test.sh
+
       - name: Upload coverage
         uses: codecov/codecov-action@v7
         if: always()
