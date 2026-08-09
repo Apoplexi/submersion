@@ -938,6 +938,27 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
 
   Future<void> get initialLoad => _initialLoad;
 
+  /// A notifier pinned to already-loaded [settings] for [diverId], performing
+  /// no database read and installing no diver-change listener.
+  ///
+  /// For batch work that must grade ONE diver's data with THAT diver's
+  /// settings. The post-restore safety sweep builds one container per diver and
+  /// overrides [settingsProvider] with this, so every settings-derived provider
+  /// — gradient factors, ppO2 ceilings, deco stop increment, and
+  /// [ProfileLegend]'s metric-source defaults — resolves to the dive's owning
+  /// diver instead of whoever happens to be active. Overriding the one root
+  /// provider covers them all; overriding each derived provider would rot as
+  /// the analysis pipeline grows.
+  SettingsNotifier.preloaded(
+    this._repository,
+    this._ref, {
+    required AppSettings settings,
+    required String? diverId,
+  }) : super(settings) {
+    _validatedDiverId = diverId;
+    _initialLoad = Future<void>.value();
+  }
+
   SettingsNotifier(this._repository, this._ref) : super(const AppSettings()) {
     _initialLoad = _initializeAndLoad();
 

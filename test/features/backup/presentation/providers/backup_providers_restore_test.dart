@@ -452,6 +452,30 @@ void main() {
     expect(service.lastSecret, 'pw');
   });
 
+  test('copyWith preserves sweep progress unless asked to clear it', () {
+    const state = BackupOperationState(
+      status: BackupOperationStatus.inProgress,
+      isRestoring: true,
+      sweepProgress: SafetyReviewSweepProgress(done: 3, total: 10),
+    );
+
+    // An unrelated copyWith must not blank an in-flight sweep.
+    final touched = state.copyWith(message: 'something else');
+    expect(touched.sweepProgress, isNotNull);
+    expect(touched.sweepProgress!.done, 3);
+
+    expect(state.copyWith(clearSweepProgress: true).sweepProgress, isNull);
+    expect(
+      state
+          .copyWith(
+            sweepProgress: const SafetyReviewSweepProgress(done: 4, total: 10),
+          )
+          .sweepProgress!
+          .done,
+      4,
+    );
+  });
+
   test('a restore runs the post-restore safety sweep', () async {
     final sweep = _FakePostRestoreSafetyReview();
     final container = makeContainer(sweep: sweep);

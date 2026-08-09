@@ -37,7 +37,13 @@ class SafetyReviewSweep {
 
   const SafetyReviewSweep(this._ref);
 
-  /// Analyzes every dive matching [diverId] (null means every diver).
+  /// Analyzes every dive matching [diverId] (null means every diver), or
+  /// exactly [diveIds] when supplied.
+  ///
+  /// Pass [diveIds] when the caller has already resolved the set and the
+  /// container is scoped to match it — the post-restore sweep runs one pass per
+  /// diver, each in a container pinned to that diver's settings, so it supplies
+  /// the ids rather than re-deriving them here. [diverId] is ignored then.
   ///
   /// [onProgress] fires once with (0, total) to size a progress bar, then after
   /// each dive. [isCancelled] is polled before each dive; returning true stops
@@ -45,6 +51,7 @@ class SafetyReviewSweep {
   /// lossless -- unswept dives still compute lazily on first view.
   Future<SafetyReviewSweepResult> run({
     String? diverId,
+    List<String>? diveIds,
     void Function(int done, int total)? onProgress,
     bool Function()? isCancelled,
   }) async {
@@ -54,17 +61,19 @@ class SafetyReviewSweep {
       return SafetyReviewSweepResult.empty;
     }
 
-    final diveIds = await _ref
-        .read(diveRepositoryProvider)
-        .getOrderedDiveIds(diverId: diverId);
+    final ids =
+        diveIds ??
+        await _ref
+            .read(diveRepositoryProvider)
+            .getOrderedDiveIds(diverId: diverId);
 
-    final total = diveIds.length;
+    final total = ids.length;
     onProgress?.call(0, total);
 
     var swept = 0;
     var failed = 0;
 
-    for (final diveId in diveIds) {
+    for (final diveId in ids) {
       if (isCancelled?.call() ?? false) {
         return SafetyReviewSweepResult(
           swept: swept,

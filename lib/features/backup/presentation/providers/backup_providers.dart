@@ -203,21 +203,26 @@ class BackupOperationState {
     this.sweepProgress,
   });
 
+  /// [clearSweepProgress] separates "leave the sweep progress alone" from
+  /// "clear it". Omitting [sweepProgress] means unchanged, matching every other
+  /// field, so an unrelated `copyWith` cannot silently blank an in-flight
+  /// sweep; pass `clearSweepProgress: true` to actually null it out.
   BackupOperationState copyWith({
     BackupOperationStatus? status,
     String? message,
     BackupRecord? lastRecord,
     bool? isRestoring,
     SafetyReviewSweepProgress? sweepProgress,
+    bool clearSweepProgress = false,
   }) {
     return BackupOperationState(
       status: status ?? this.status,
       message: message ?? this.message,
       lastRecord: lastRecord ?? this.lastRecord,
       isRestoring: isRestoring ?? this.isRestoring,
-      // Deliberately not ??-merged: a null must be able to clear the progress
-      // when the sweep ends.
-      sweepProgress: sweepProgress,
+      sweepProgress: clearSweepProgress
+          ? null
+          : (sweepProgress ?? this.sweepProgress),
     );
   }
 }
