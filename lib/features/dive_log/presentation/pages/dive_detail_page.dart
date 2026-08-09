@@ -50,6 +50,7 @@ import 'package:submersion/features/dive_log/presentation/providers/profile_trac
 import 'package:submersion/features/dive_log/presentation/providers/profile_range_provider.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/buoyancy_section.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/collapsible_section.dart';
+import 'package:submersion/features/dive_log/domain/entities/safety_finding.dart';
 import 'package:submersion/features/dive_log/presentation/providers/safety_review_providers.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/safety_finding_highlight.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/safety_review_section.dart';
@@ -101,7 +102,7 @@ import 'package:submersion/features/signatures/presentation/widgets/signature_ca
 import 'package:submersion/features/signatures/presentation/widgets/signature_display_widget.dart';
 import 'package:submersion/features/tides/domain/entities/tide_record.dart';
 import 'package:submersion/features/reef/presentation/providers/reef_providers.dart';
-import 'package:submersion/features/reef/presentation/widgets/reef_health_card.dart';
+import 'package:submersion/features/reef/presentation/widgets/water_conditions_card.dart';
 import 'package:submersion/features/tides/presentation/providers/tide_providers.dart';
 import 'package:submersion/features/tides/presentation/widgets/tide_cycle_graph.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
@@ -141,6 +142,20 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
 
   /// Key for capturing the profile chart as an image for PNG export
   final GlobalKey _profileChartExportKey = GlobalKey();
+  final GlobalKey _safetyReviewSectionKey = GlobalKey();
+
+  /// Scrolls the page so the safety review section is visible (callout
+  /// "Details" action). The selection stays active.
+  void _scrollToSafetySection() {
+    final ctx = _safetyReviewSectionKey.currentContext;
+    if (ctx == null) return;
+    Scrollable.ensureVisible(
+      ctx,
+      duration: const Duration(milliseconds: 400),
+      curve: Curves.easeInOutCubic,
+      alignment: 0.05,
+    );
+  }
 
   /// Key for capturing the entire dive details page as an image for PNG export
   final GlobalKey _pageExportKey = GlobalKey();
@@ -238,6 +253,22 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
       }
     }
 
+    // A finding dismissed elsewhere (section button, another device via sync,
+    // batch re-analysis) must not stay highlighted: drop a selection whose
+    // finding no longer exists as an active row.
+    ref.listen(safetyReviewProvider(diveId), (previous, next) {
+      final review = next.value;
+      if (review == null) return;
+      final selected = ref.read(selectedSafetyFindingProvider(diveId));
+      if (selected == null) return;
+      final stillActive = review.findings.any(
+        (f) => f.id == selected.id && !f.isDismissed,
+      );
+      if (!stillActive) {
+        ref.read(selectedSafetyFindingProvider(diveId).notifier).state = null;
+      }
+    });
+
     final diveAsync = ref.watch(diveProvider(diveId));
 
     return diveAsync.when(
@@ -313,7 +344,8 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
         // The widgets collapse to nothing when empty, so plain SizedBox
         // spacers would double up; each widget owns its own spacing.
         return [
-          if (dive.profile.isNotEmpty) SafetyReviewSection(diveId: dive.id),
+          if (dive.profile.isNotEmpty)
+            SafetyReviewSection(key: _safetyReviewSectionKey, diveId: dive.id),
           LinkedIncidentsRow(diveId: dive.id),
         ];
       },
@@ -1641,6 +1673,25 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
                 final selectedFinding = ref.watch(
                   selectedSafetyFindingProvider(diveId),
                 );
+                final safetyReview = ref
+                    .watch(safetyReviewProvider(diveId))
+                    .value;
+                final appSettings = ref.watch(settingsProvider);
+                final laneFindings = appSettings.safetyReviewEnabled
+                    ? chartSafetyFindings(
+                        safetyReview,
+                        appSettings.safetyReviewDisabledRules,
+                      )
+                    : const <SafetyFinding>[];
+                // Gate the highlight on lane membership: with safety review
+                // (or the finding's rule) disabled neither the lane nor the
+                // section renders, so an ungated highlight would be stuck on
+                // the chart with no UI to clear it.
+                final visibleSelectedFinding =
+                    selectedFinding != null &&
+                        laneFindings.any((f) => f.id == selectedFinding.id)
+                    ? selectedFinding
+                    : null;
                 return Stack(
                   children: [
                     MouseRegion(
@@ -1725,9 +1776,28 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
                             ? chartProfile[trackingIndex].timestamp
                             : null,
                         highlightRange: profileHighlightRangeFor(
-                          selectedFinding,
+                          visibleSelectedFinding,
                           Theme.of(context).colorScheme,
                         ),
+                        safetyFindings: laneFindings.isEmpty
+                            ? null
+                            : laneFindings,
+                        selectedSafetyFindingId: visibleSelectedFinding?.id,
+                        onSafetyFindingTap: (finding) {
+                          final notifier = ref.read(
+                            selectedSafetyFindingProvider(diveId).notifier,
+                          );
+                          notifier.state = notifier.state?.id == finding.id
+                              ? null
+                              : finding;
+                        },
+                        onSafetyFindingDismiss: (finding) =>
+                            setSafetyFindingDismissed(
+                              ref,
+                              finding: finding,
+                              dismissed: true,
+                            ),
+                        onSafetyFindingDetails: (_) => _scrollToSafetySection(),
                         onPointSelected: (index) {
                           ref
                                   .read(
@@ -3402,32 +3472,43 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
     );
   }
 
-  /// Reef thermal stress on the date of this dive.
+  /// Satellite water conditions on the date of this dive.
   ///
   /// Historical NOAA readings are immutable, so this is fetched once and
-  /// cached permanently. Hidden when the dive has no site coordinates.
+  /// cached permanently. Hidden when the dive has no site coordinates, and
+  /// for freshwater sites, whose water NOAA's ocean grid cannot see — a
+  /// permanent coverage explanation on every quarry dive would be noise.
   Widget _buildReefHealthSection(
     BuildContext context,
     WidgetRef ref,
     Dive dive,
   ) {
-    if (dive.site?.hasCoordinates != true) return const SizedBox.shrink();
+    final site = dive.site;
+    if (site?.hasCoordinates != true) return const SizedBox.shrink();
+    if (site!.waterType == WaterType.fresh) return const SizedBox.shrink();
 
+    final location = site.location!;
     final healthAsync = ref.watch(
       reefHealthForDiveProvider(
-        ReefHealthRequest(
-          location: dive.site!.location!,
-          date: dive.effectiveEntryTime,
-        ),
+        ReefHealthRequest(location: location, date: dive.effectiveEntryTime),
       ),
     );
+    final habitatAsync = ref.watch(reefHabitatProvider(location));
 
     return healthAsync.when(
       data: (part) => Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           const SizedBox(height: 24),
-          Card(child: ReefHealthCard(part: part)),
+          Card(
+            child: WaterConditionsCard(
+              health: part,
+              // Null while still resolving: the card then keeps the stress
+              // lines, the conservative default.
+              habitat: habitatAsync.valueOrNull,
+              waterType: site.waterType,
+            ),
+          ),
         ],
       ),
       loading: () => const SizedBox.shrink(),
@@ -3445,6 +3526,12 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
   /// takes up zero space.  The 24-px top spacer is included only when the
   /// section actually renders content.
   Widget _buildTideSection(BuildContext context, WidgetRef ref, Dive dive) {
+    // Freshwater sites have no tides; hide the section entirely, even
+    // when an old stored record exists.
+    if (dive.site?.waterType == WaterType.fresh) {
+      return const SizedBox.shrink();
+    }
+
     Widget withSpacing(Widget card) {
       return Column(
         mainAxisSize: MainAxisSize.min,
@@ -3452,8 +3539,15 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
       );
     }
 
-    // First try to get stored tide record
-    final tideRecordAsync = ref.watch(tideRecordForDiveProvider(dive.id));
+    // First try to get stored tide record (lazily self-healed against a
+    // fresh computation when the site has coordinates)
+    final tideRecordAsync = ref.watch(
+      healedTideRecordProvider((
+        diveId: dive.id,
+        location: dive.site?.location,
+        entryTime: dive.effectiveEntryTime,
+      )),
+    );
 
     return tideRecordAsync.when(
       data: (tideRecord) {

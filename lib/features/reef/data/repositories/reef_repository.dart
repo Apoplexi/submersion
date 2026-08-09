@@ -41,7 +41,17 @@ class ReefRepository {
        _species = species;
 
   /// Fetches all four parts for [point], using cache where fresh.
-  Future<ReefSnapshot> snapshotFor(GeoPoint point, {DateTime? date}) async {
+  ///
+  /// [includeHealth] is false for freshwater sites: NOAA's grid covers only
+  /// oceans, and skipping the fetch also skips the nearest-water-pixel
+  /// fallback that would otherwise hand a coastal quarry the adjacent ocean's
+  /// temperature. The health slot comes back [ReefDataStatus.empty] with no
+  /// network request and no cache write.
+  Future<ReefSnapshot> snapshotFor(
+    GeoPoint point, {
+    DateTime? date,
+    bool includeHealth = true,
+  }) async {
     final quantized = ReefCoordinateKey.quantize(point);
     final key = ReefCoordinateKey.format(point);
 
@@ -53,14 +63,16 @@ class ReefRepository {
         encode: (v) => jsonEncode(v.toJson()),
         decode: (j) => ReefHabitat.fromJson(j as Map<String, dynamic>),
       ),
-      _resolve<ReefHealth>(
-        provider: ReefProviderId.health,
-        coordKey: key,
-        variant: date == null ? '' : _dateVariant(date),
-        fetch: () => _health.fetch(quantized, date: date),
-        encode: (v) => jsonEncode(v.toJson()),
-        decode: (j) => ReefHealth.fromJson(j as Map<String, dynamic>),
-      ),
+      includeHealth
+          ? _resolve<ReefHealth>(
+              provider: ReefProviderId.health,
+              coordKey: key,
+              variant: date == null ? '' : _dateVariant(date),
+              fetch: () => _health.fetch(quantized, date: date),
+              encode: (v) => jsonEncode(v.toJson()),
+              decode: (j) => ReefHealth.fromJson(j as Map<String, dynamic>),
+            )
+          : Future.value(const ReefPart<ReefHealth>.empty()),
       _resolve<List<ReefProtection>>(
         provider: ReefProviderId.protection,
         coordKey: key,
@@ -99,6 +111,20 @@ class ReefRepository {
       fetch: () => _health.fetch(quantized, date: date),
       encode: (v) => jsonEncode(v.toJson()),
       decode: (j) => ReefHealth.fromJson(j as Map<String, dynamic>),
+    );
+  }
+
+  /// Fetches reef habitat alone, for surfaces that already have health data
+  /// from another lookup (the dive detail page). Shares cache entries and
+  /// in-flight dedupe with [snapshotFor].
+  Future<ReefPart<ReefHabitat>> habitatFor(GeoPoint point) {
+    final quantized = ReefCoordinateKey.quantize(point);
+    return _resolve<ReefHabitat>(
+      provider: ReefProviderId.habitat,
+      coordKey: ReefCoordinateKey.format(point),
+      fetch: () => _habitat.fetch(quantized),
+      encode: (v) => jsonEncode(v.toJson()),
+      decode: (j) => ReefHabitat.fromJson(j as Map<String, dynamic>),
     );
   }
 

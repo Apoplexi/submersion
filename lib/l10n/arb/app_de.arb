@@ -408,6 +408,19 @@
   "backup_restore_dialog_safetyNote": "Eine Sicherheitskopie Ihrer aktuellen Daten wird automatisch vor der Wiederherstellung erstellt.",
   "backup_restore_dialog_title": "Sicherung Wiederherstellen",
   "backup_restore_dialog_warning": "Dies ersetzt ALLE aktuellen Daten durch die Sicherungsdaten. Diese Aktion kann nicht rückgängig gemacht werden.",
+  "backup_restore_safetyReview_progress": "{done} von {total} Tauchgängen analysiert",
+  "@backup_restore_safetyReview_progress": {
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "backup_restore_safetyReview_skip": "Überspringen",
+  "backup_restore_safetyReview_title": "Sicherheitsprüfung läuft",
   "backup_schedule_enabled": "Automatische Sicherungen",
   "backup_schedule_enabled_subtitle": "Daten nach Zeitplan sichern",
   "backup_schedule_frequency": "Häufigkeit",
@@ -1344,8 +1357,8 @@
   "diveDetailSection_tanks_description": "Flaschenliste, Gasmischungen, Drucke, Flaschen-AMV",
   "diveDetailSection_tanks_name": "Flaschen",
   "diveDetailSection_tide_description": "Gezeitenzyklusdiagramm und Zeiten",
-  "diveDetailSection_reefHealth_name": "Riffgesundheit",
-  "diveDetailSection_reefHealth_description": "Korallenbleiche-Hitzestress am Tauchtag",
+  "diveDetailSection_reefHealth_name": "Wasserbedingungen",
+  "diveDetailSection_reefHealth_description": "Satellitengestützte Wasserbedingungen am Tauchdatum",
   "diveDetailSection_tide_name": "Gezeiten",
   "diveDetailSection_weights_description": "Gewichtsaufteilung, Gesamtgewicht",
   "diveDetailSection_buoyancy_name": "Auftrieb",
@@ -4912,6 +4925,8 @@
   "surfaceInterval_gasWarning_modExceeded": "ppO₂ {ppO2} auf {depth} überschreitet {limit}. MOD für dieses Gemisch ist {mod}.",
   "surfaceInterval_heSemantics": "Helium: {percent}%",
   "surfaceInterval_o2Semantics": "O2: {percent}%",
+  "surfaceInterval_result_beyondHorizon": "Die Wartezeit liegt über den {hours} Stunden, die dieser Planer durchsucht. Die Entsättigung geht weiter, ein längeres Oberflächenintervall reicht also aus.",
+  "surfaceInterval_result_beyondHorizonShort": "Mehr als {hours} Stunden",
   "surfaceInterval_result_currentInterval": "Aktuelles Intervall",
   "surfaceInterval_result_gasUnsafe": "Gas in dieser Tiefe unsicher",
   "surfaceInterval_result_inDeco": "In Deko",
@@ -4919,6 +4934,8 @@
   "surfaceInterval_result_minimumInterval": "Minimales Oberflächenintervall",
   "surfaceInterval_result_ndlForSecondDive": "Nullzeit für 2. Tauchgang",
   "surfaceInterval_result_ndlMinutes": "{minutes} Min Nullzeit",
+  "surfaceInterval_result_noIntervalHelps": "Kein Oberflächenintervall reicht aus. Der längste Nullzeit-Tauchgang in dieser Tiefe mit diesem Gemisch dauert {minutes} Min. Zweiten Tauchgang kürzen oder dessen Tiefe reduzieren.",
+  "surfaceInterval_result_notAchievable": "Mit keinem Oberflächenintervall erreichbar",
   "surfaceInterval_result_notYetSafe": "Noch nicht sicher, Oberflächenintervall erhöhen",
   "surfaceInterval_result_safeToDive": "Sicher zu tauchen",
   "surfaceInterval_result_semantics": "Minimales Oberflächenintervall: {interval}. Aktuelles Intervall: {current}. Nullzeit für zweiten Tauchgang: {ndl}. {status}",
@@ -5085,6 +5102,12 @@
   "tides_semantic_tideChart": "Gezeitendiagramm. {extremesSummary}",
   "tides_semantic_tideCycle": "Gezeitenzyklus, Status: {state}, Höhe: {height}",
   "tides_semantic_tideState": "Gezeitenstatus: {state}",
+  "tides_source_noaaStation": "NOAA-Station: {name} ({distance})",
+  "tides_source_modelEstimate": "Ozeanmodell-Schätzung",
+  "tides_source_modelCaveat": "Aus Satellitendaten modelliert. Zeiten und Höhen können in der Nähe komplexer Küstenlinien abweichen.",
+  "tides_source_sheetTitle": "Quelle der Gezeitendaten",
+  "tides_source_datumMllw": "Höhen relativ zu MLLW (Stationsdatum)",
+  "tides_source_datumMsl": "Höhen relativ zum mittleren Meeresspiegel",
   "tides_title": "Gezeiten",
   "tools_gpsLogger_description": "Zeichne deine Position während eines Tauchtags auf und ordne importierte Tauchgänge automatisch GPS-Positionen zu.",
   "tools_gpsLogger_subtitle": "Oberflächen-Track aufzeichnen",
@@ -6528,6 +6551,16 @@
   },
   "safetyReview_dismiss": "Ausblenden",
   "safetyReview_restore": "Wiederherstellen",
+  "safetyReview_details": "Details",
+  "safetyReview_clearHighlight": "Hervorhebung entfernen",
+  "safetyReview_findingGroupSemantics": "{count, plural, =1{1 Sicherheitshinweis} other{{count} Sicherheitshinweise}}",
+  "@safetyReview_findingGroupSemantics": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "safetyReview_showDismissed": "{count, plural, =1{1 Ausgeblendete anzeigen} other{{count} Ausgeblendete anzeigen}}",
   "@safetyReview_showDismissed": {
     "placeholders": {
@@ -6885,17 +6918,20 @@
   "settings_mediaStorage_quality_linuxFfmpegHint": "Installieren Sie ffmpeg, um Videokomprimierung zu aktivieren. Bis dahin werden Originale hochgeladen.",
   "settings_mediaStorage_quality_saveFailed": "Die Upload-Qualität konnte nicht gespeichert werden. Bitte erneut versuchen.",
   "settings_mediaStorage_quality_noTranscoderHint": "Dieses Gerät kann keine Videos komprimieren. Von ihm werden Originale hochgeladen.",
-  "reef_section_title": "Riff",
+  "reef_section_title": "Ökosystem",
   "reef_section_sourcesTooltip": "Datenquellen",
-  "reef_section_loadError": "Riffdaten konnten gerade nicht geladen werden",
+  "reef_section_loadError": "Ökosystemdaten konnten gerade nicht geladen werden",
   "reef_habitat_title": "Riff-Lebensraum",
   "reef_habitat_onReef": "Auf einem Korallenriff",
   "reef_habitat_onReefWithThreat": "Auf einem Korallenriff, Gefährdungsstufe {threat}",
   "reef_habitat_noReef": "Kein kartiertes Korallenriff an diesem Ort",
   "reef_habitat_unavailable": "Riff-Lebensraum konnte gerade nicht geprüft werden",
-  "reef_health_title": "Riffgesundheit",
-  "reef_health_unavailable": "Riffgesundheit konnte gerade nicht geprüft werden",
-  "reef_health_noData": "Keine Riffgesundheitsdaten für diesen Ort",
+  "water_conditions_title": "Wasserbedingungen",
+  "water_conditions_unavailable": "Wasserbedingungen konnten gerade nicht geprüft werden",
+  "water_conditions_noData": "Keine Satelliten-Wasserdaten für diesen Ort",
+  "water_conditions_freshwater": "Satellitengestützte Wassertemperatur deckt nur Ozeane ab",
+  "water_conditions_anomaly": "Anomalie {value}",
+  "@water_conditions_anomaly": {"placeholders": {"value": {"type": "String"}}},
   "reef_health_degreeHeatingWeeks": "Degree Heating Weeks {value} C-Wochen",
   "reef_health_seaSurface": "Wasseroberfläche {value}",
   "reef_health_asOf": "Stand {date}",

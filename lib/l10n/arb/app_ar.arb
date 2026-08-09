@@ -408,6 +408,19 @@
   "backup_restore_dialog_safetyNote": "سيتم إنشاء نسخة احتياطية آمنة من بياناتك الحالية تلقائياً قبل الاستعادة.",
   "backup_restore_dialog_title": "استعادة النسخة الاحتياطية",
   "backup_restore_dialog_warning": "سيؤدي هذا إلى استبدال جميع البيانات الحالية ببيانات النسخة الاحتياطية. لا يمكن التراجع عن هذا الإجراء.",
+  "backup_restore_safetyReview_progress": "تم تحليل {done} من {total} غطسة",
+  "@backup_restore_safetyReview_progress": {
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "backup_restore_safetyReview_skip": "تخطي",
+  "backup_restore_safetyReview_title": "جارٍ تشغيل مراجعة السلامة",
   "backup_schedule_enabled": "نسخ احتياطي تلقائي",
   "backup_schedule_enabled_subtitle": "نسخ البيانات احتياطياً وفقاً لجدول زمني",
   "backup_schedule_frequency": "التكرار",
@@ -1223,8 +1236,8 @@
   "diveDetailSection_tanks_description": "قائمة الأسطوانات، خلطات الغاز، الضغوط، SAC لكل أسطوانة",
   "diveDetailSection_tanks_name": "الأسطوانات",
   "diveDetailSection_tide_description": "رسم بياني لدورة المد والجزر والتوقيت",
-  "diveDetailSection_reefHealth_name": "صحة الشعاب المرجانية",
-  "diveDetailSection_reefHealth_description": "الإجهاد الحراري لابيضاض المرجان في تاريخ الغوص",
+  "diveDetailSection_reefHealth_name": "أحوال المياه",
+  "diveDetailSection_reefHealth_description": "أحوال المياه عبر الأقمار الصناعية في تاريخ الغطسة",
   "diveDetailSection_tide_name": "المد والجزر",
   "diveDetailSection_weights_description": "تفصيل الأوزان، إجمالي الوزن",
   "diveDetailSection_buoyancy_name": "الطفو",
@@ -4912,6 +4925,8 @@
   "surfaceInterval_gasWarning_modExceeded": "ppO₂ {ppO2} على عمق {depth} يتجاوز {limit}. أقصى عمق تشغيل لهذا الخليط هو {mod}.",
   "surfaceInterval_heSemantics": "الهيليوم: {percent}%",
   "surfaceInterval_o2Semantics": "O2: {percent}%",
+  "surfaceInterval_result_beyondHorizon": "زمن الانتظار يتجاوز {hours} ساعات التي يبحث فيها هذا المخطط. يستمر التخلص من النيتروجين، لذا ستكفي فترة سطح أطول.",
+  "surfaceInterval_result_beyondHorizonShort": "أكثر من {hours} ساعات",
   "surfaceInterval_result_currentInterval": "الفترة الحالية",
   "surfaceInterval_result_gasUnsafe": "الغاز غير آمن على هذا العمق",
   "surfaceInterval_result_inDeco": "في تخفيف الضغط",
@@ -4919,6 +4934,8 @@
   "surfaceInterval_result_minimumInterval": "الحد الأدنى لفترة السطح",
   "surfaceInterval_result_ndlForSecondDive": "NDL للغطسة الثانية",
   "surfaceInterval_result_ndlMinutes": "{minutes} دقيقة NDL",
+  "surfaceInterval_result_noIntervalHelps": "لا تكفي أي فترة سطح. أطول غطسة بدون توقف إلزامي على هذا العمق بهذا الخليط هي {minutes} دقيقة. قلّل زمن الغطسة الثانية أو قلّل عمقها.",
+  "surfaceInterval_result_notAchievable": "غير قابل للتحقيق بأي فترة سطح",
   "surfaceInterval_result_notYetSafe": "ليس آمناً بعد، زد فترة السطح",
   "surfaceInterval_result_safeToDive": "آمن للغوص",
   "surfaceInterval_result_semantics": "الحد الأدنى لفترة السطح: {interval}. الفترة الحالية: {current}. NDL للغطسة الثانية: {ndl}. {status}",
@@ -5085,6 +5102,12 @@
   "tides_semantic_tideChart": "مخطط المد والجزر. {extremesSummary}",
   "tides_semantic_tideCycle": "دورة المد والجزر، الحالة: {state}، الارتفاع: {height}",
   "tides_semantic_tideState": "حالة المد والجزر: {state}",
+  "tides_source_noaaStation": "محطة NOAA: {name} ({distance})",
+  "tides_source_modelEstimate": "تقدير نموذج المحيط",
+  "tides_source_modelCaveat": "نموذج مبني على بيانات الأقمار الصناعية. قد تختلف الأوقات والارتفاعات قرب السواحل المعقدة.",
+  "tides_source_sheetTitle": "مصدر بيانات المد والجزر",
+  "tides_source_datumMllw": "الارتفاعات نسبة إلى MLLW (مرجع المحطة)",
+  "tides_source_datumMsl": "الارتفاعات نسبة إلى متوسط مستوى سطح البحر",
   "tides_title": "المد والجزر",
   "tools_gpsLogger_description": "سجّل موقعك خلال يوم الغطس وتتم مطابقة الغطسات المستوردة مع مواقع GPS تلقائيًا.",
   "tools_gpsLogger_subtitle": "تسجيل مسار السطح",
@@ -6528,6 +6551,16 @@
   },
   "safetyReview_dismiss": "تجاهل",
   "safetyReview_restore": "استعادة",
+  "safetyReview_details": "التفاصيل",
+  "safetyReview_clearHighlight": "مسح التمييز",
+  "safetyReview_findingGroupSemantics": "{count, plural, =1{ملاحظة سلامة واحدة} other{{count} ملاحظات سلامة}}",
+  "@safetyReview_findingGroupSemantics": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "safetyReview_showDismissed": "{count, plural, =1{إظهار ملاحظة متجاهلة واحدة} other{إظهار {count} ملاحظات متجاهلة}}",
   "@safetyReview_showDismissed": {
     "placeholders": {
@@ -6885,17 +6918,20 @@
   "settings_mediaStorage_quality_linuxFfmpegHint": "ثبّت ffmpeg لتمكين ضغط الفيديو. حتى ذلك الحين يتم رفع النسخ الأصلية.",
   "settings_mediaStorage_quality_saveFailed": "تعذّر حفظ جودة الرفع. حاول مرة أخرى.",
   "settings_mediaStorage_quality_noTranscoderHint": "لا يمكن لهذا الجهاز ضغط الفيديو. يتم رفع الملفات الأصلية منه.",
-  "reef_section_title": "الشعاب المرجانية",
+  "reef_section_title": "النظام البيئي",
   "reef_section_sourcesTooltip": "مصادر البيانات",
-  "reef_section_loadError": "تعذر تحميل بيانات الشعاب الآن",
+  "reef_section_loadError": "تعذّر تحميل بيانات النظام البيئي الآن",
   "reef_habitat_title": "موئل الشعاب",
   "reef_habitat_onReef": "على شعاب مرجانية",
   "reef_habitat_onReefWithThreat": "على شعاب مرجانية، مستوى التهديد {threat}",
   "reef_habitat_noReef": "لا توجد شعاب مرجانية مرسومة في هذا الموقع",
   "reef_habitat_unavailable": "تعذر التحقق من موئل الشعاب الآن",
-  "reef_health_title": "صحة الشعاب المرجانية",
-  "reef_health_unavailable": "تعذر التحقق من صحة الشعاب الآن",
-  "reef_health_noData": "لا توجد بيانات عن صحة الشعاب لهذا الموقع",
+  "water_conditions_title": "أحوال المياه",
+  "water_conditions_unavailable": "تعذّر التحقق من أحوال المياه الآن",
+  "water_conditions_noData": "لا توجد بيانات مياه من الأقمار الصناعية لهذا الموقع",
+  "water_conditions_freshwater": "درجة حرارة المياه عبر الأقمار الصناعية تغطي المحيطات فقط",
+  "water_conditions_anomaly": "شذوذ {value}",
+  "@water_conditions_anomaly": {"placeholders": {"value": {"type": "String"}}},
   "reef_health_degreeHeatingWeeks": "أسابيع الحرارة المتراكمة {value} درجة-أسبوع",
   "reef_health_seaSurface": "سطح البحر {value}",
   "reef_health_asOf": "حتى {date}",

@@ -408,6 +408,19 @@
   "backup_restore_dialog_safetyNote": "גיבוי בטיחות של הנתונים הנוכחיים שלך ייווצר אוטומטית לפני השחזור.",
   "backup_restore_dialog_title": "שחזור גיבוי",
   "backup_restore_dialog_warning": "פעולה זו תחליף את כל הנתונים הנוכחיים בנתוני הגיבוי. לא ניתן לבטל פעולה זו.",
+  "backup_restore_safetyReview_progress": "נותחו {done} מתוך {total} צלילות",
+  "@backup_restore_safetyReview_progress": {
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "backup_restore_safetyReview_skip": "דלג",
+  "backup_restore_safetyReview_title": "מריץ את סקירת הבטיחות",
   "backup_schedule_enabled": "גיבויים אוטומטיים",
   "backup_schedule_enabled_subtitle": "גבה את הנתונים לפי לוח זמנים",
   "backup_schedule_frequency": "תדירות",
@@ -3992,8 +4005,8 @@
   "diveDetailSection_tanks_description": "רשימת בלונים, תערובות גז, לחצים, SAC לבלון",
   "diveDetailSection_tanks_name": "בלונים",
   "diveDetailSection_tide_description": "גרף מחזור גאות ושפל וזמן",
-  "diveDetailSection_reefHealth_name": "בריאות השונית",
-  "diveDetailSection_reefHealth_description": "עקת חום מהלבנת אלמוגים בתאריך הצלילה",
+  "diveDetailSection_reefHealth_name": "תנאי המים",
+  "diveDetailSection_reefHealth_description": "תנאי מים לווייניים בתאריך הצלילה",
   "diveDetailSection_tide_name": "גאות ושפל",
   "diveDetailSection_weights_description": "פירוט משקולות, משקל כולל",
   "diveDetailSection_buoyancy_name": "ציפה",
@@ -4912,6 +4925,8 @@
   "surfaceInterval_gasWarning_modExceeded": "ppO₂ {ppO2} בעומק {depth} חורג מ-{limit}. ה-MOD של תערובת זו הוא {mod}.",
   "surfaceInterval_heSemantics": "הליום: {percent}%",
   "surfaceInterval_o2Semantics": "O2: {percent}%",
+  "surfaceInterval_result_beyondHorizon": "ההמתנה חורגת מ-{hours} השעות שמתכנן זה מחפש. הסילוק ממשיך, ולכן מרווח שטח ארוך יותר יספיק.",
+  "surfaceInterval_result_beyondHorizonShort": "יותר מ-{hours} שעות",
   "surfaceInterval_result_currentInterval": "מרווח נוכחי",
   "surfaceInterval_result_gasUnsafe": "הגז אינו בטוח בעומק זה",
   "surfaceInterval_result_inDeco": "בדקו",
@@ -4919,6 +4934,8 @@
   "surfaceInterval_result_minimumInterval": "מרווח שטח מינימלי",
   "surfaceInterval_result_ndlForSecondDive": "NDL לצלילה ה-2",
   "surfaceInterval_result_ndlMinutes": "{minutes} דקות NDL",
+  "surfaceInterval_result_noIntervalHelps": "שום מרווח שטח אינו מספיק. הצלילה הארוכה ביותר ללא דקומפרסיה בעומק זה עם תערובת זו היא {minutes} דקות. קצר את הצלילה השנייה או הקטן את עומקה.",
+  "surfaceInterval_result_notAchievable": "לא ניתן להשגה בשום מרווח שטח",
   "surfaceInterval_result_notYetSafe": "עדיין לא בטוח, הגדל מרווח שטח",
   "surfaceInterval_result_safeToDive": "בטוח לצלול",
   "surfaceInterval_result_semantics": "מרווח שטח מינימלי: {interval}. מרווח נוכחי: {current}. NDL לצלילה שנייה: {ndl}. {status}",
@@ -5085,6 +5102,12 @@
   "tides_semantic_tideChart": "תרשים גאות. {extremesSummary}",
   "tides_semantic_tideCycle": "מחזור גאות, מצב: {state}, גובה: {height}",
   "tides_semantic_tideState": "מצב גאות: {state}",
+  "tides_source_noaaStation": "תחנת NOAA: {name} ({distance})",
+  "tides_source_modelEstimate": "אומדן מודל אוקיינוס",
+  "tides_source_modelCaveat": "מבוסס על נתוני לוויין. זמנים וגבהים עשויים להיות שונים ליד קווי חוף מורכבים.",
+  "tides_source_sheetTitle": "מקור נתוני הגאות",
+  "tides_source_datumMllw": "גבהים ביחס ל-MLLW (ייחוס התחנה)",
+  "tides_source_datumMsl": "גבהים ביחס לגובה פני הים הממוצע",
   "tides_title": "גאות",
   "tools_gpsLogger_description": "הקלט את מיקומך במהלך יום צלילה והתאם אוטומטית צלילות מיובאות למיקומי GPS.",
   "tools_gpsLogger_subtitle": "הקלטת מסלול פני המים",
@@ -6528,6 +6551,16 @@
   },
   "safetyReview_dismiss": "התעלם",
   "safetyReview_restore": "שחזר",
+  "safetyReview_details": "פרטים",
+  "safetyReview_clearHighlight": "ניקוי הדגשה",
+  "safetyReview_findingGroupSemantics": "{count, plural, =1{ממצא בטיחות אחד} other{{count} ממצאי בטיחות}}",
+  "@safetyReview_findingGroupSemantics": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "safetyReview_showDismissed": "{count, plural, =1{הצג תצפית אחת שהוסתרה} other{הצג {count} תצפיות שהוסתרו}}",
   "@safetyReview_showDismissed": {
     "placeholders": {
@@ -6885,17 +6918,20 @@
   "settings_mediaStorage_quality_linuxFfmpegHint": "התקן ffmpeg כדי לאפשר דחיסת וידאו. עד אז מועלים קבצי המקור.",
   "settings_mediaStorage_quality_saveFailed": "לא ניתן היה לשמור את איכות ההעלאה. נסה שוב.",
   "settings_mediaStorage_quality_noTranscoderHint": "מכשיר זה אינו יכול לדחוס וידאו. ממנו מועלים הקבצים המקוריים.",
-  "reef_section_title": "שונית",
+  "reef_section_title": "מערכת אקולוגית",
   "reef_section_sourcesTooltip": "מקורות נתונים",
-  "reef_section_loadError": "לא ניתן לטעון כעת את נתוני השונית",
+  "reef_section_loadError": "לא ניתן לטעון נתוני מערכת אקולוגית כרגע",
   "reef_habitat_title": "בית גידול השונית",
   "reef_habitat_onReef": "על שונית אלמוגים",
   "reef_habitat_onReefWithThreat": "על שונית אלמוגים, רמת איום {threat}",
   "reef_habitat_noReef": "אין שונית אלמוגים ממופה במיקום זה",
   "reef_habitat_unavailable": "לא ניתן לבדוק כעת את בית הגידול",
-  "reef_health_title": "בריאות השונית",
-  "reef_health_unavailable": "לא ניתן לבדוק כעת את בריאות השונית",
-  "reef_health_noData": "אין נתוני בריאות שונית למיקום זה",
+  "water_conditions_title": "תנאי המים",
+  "water_conditions_unavailable": "לא ניתן לבדוק את תנאי המים כרגע",
+  "water_conditions_noData": "אין נתוני לוויין על המים למיקום זה",
+  "water_conditions_freshwater": "טמפרטורת מים לוויינית מכסה אוקיינוסים בלבד",
+  "water_conditions_anomaly": "סטייה {value}",
+  "@water_conditions_anomaly": {"placeholders": {"value": {"type": "String"}}},
   "reef_health_degreeHeatingWeeks": "שבועות חום מצטברים {value} מעלות-שבוע",
   "reef_health_seaSurface": "פני הים {value}",
   "reef_health_asOf": "נכון ל-{date}",

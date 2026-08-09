@@ -982,6 +982,17 @@ class AppLocalizationsEn extends AppLocalizations {
       'This will replace ALL current data with the backup data. This action cannot be undone.';
 
   @override
+  String backup_restore_safetyReview_progress(int done, int total) {
+    return 'Analyzed $done of $total dives';
+  }
+
+  @override
+  String get backup_restore_safetyReview_skip => 'Skip';
+
+  @override
+  String get backup_restore_safetyReview_title => 'Running the safety review';
+
+  @override
   String get backup_restoreComplete_continue => 'Continue';
 
   @override
@@ -12740,6 +12751,23 @@ class AppLocalizationsEn extends AppLocalizations {
   String get safetyReview_restore => 'Restore';
 
   @override
+  String get safetyReview_details => 'Details';
+
+  @override
+  String get safetyReview_clearHighlight => 'Clear highlight';
+
+  @override
+  String safetyReview_findingGroupSemantics(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count safety observations',
+      one: '1 safety observation',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get safetySettings_title => 'Safety review';
 
   @override
@@ -12846,11 +12874,11 @@ class AppLocalizationsEn extends AppLocalizations {
       'Tide cycle graph and timing';
 
   @override
-  String get diveDetailSection_reefHealth_name => 'Reef Health';
+  String get diveDetailSection_reefHealth_name => 'Water Conditions';
 
   @override
   String get diveDetailSection_reefHealth_description =>
-      'Coral bleaching heat stress on the dive date';
+      'Satellite water conditions on the dive date';
 
   @override
   String get diveDetailSection_surfaceGps_name => 'Surface GPS';
@@ -16205,6 +16233,16 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String surfaceInterval_result_beyondHorizon(Object hours) {
+    return 'The wait runs past the $hours hours this planner searches. Off-gassing continues, so a longer surface interval will get there.';
+  }
+
+  @override
+  String surfaceInterval_result_beyondHorizonShort(Object hours) {
+    return 'More than $hours hours';
+  }
+
+  @override
   String get surfaceInterval_result_currentInterval => 'Current Interval';
 
   @override
@@ -16228,6 +16266,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String surfaceInterval_result_ndlMinutes(Object minutes) {
     return '$minutes min NDL';
   }
+
+  @override
+  String surfaceInterval_result_noIntervalHelps(Object minutes) {
+    return 'No surface interval is enough. The longest no-stop dive at this depth on this mix is $minutes min. Shorten the second dive or reduce its depth.';
+  }
+
+  @override
+  String get surfaceInterval_result_notAchievable =>
+      'Not achievable at any surface interval';
 
   @override
   String get surfaceInterval_result_notYetSafe =>
@@ -16657,6 +16704,28 @@ class AppLocalizationsEn extends AppLocalizations {
   String tides_semantic_tideState(Object state) {
     return 'Tide state: $state';
   }
+
+  @override
+  String tides_source_noaaStation(String name, String distance) {
+    return 'NOAA station: $name ($distance)';
+  }
+
+  @override
+  String get tides_source_modelEstimate => 'Ocean-model estimate';
+
+  @override
+  String get tides_source_modelCaveat =>
+      'Modeled from satellite data. Times and heights may differ near complex coastlines.';
+
+  @override
+  String get tides_source_sheetTitle => 'Tide data source';
+
+  @override
+  String get tides_source_datumMllw =>
+      'Heights relative to MLLW (station datum)';
+
+  @override
+  String get tides_source_datumMsl => 'Heights relative to mean sea level';
 
   @override
   String get tides_title => 'Tides';
@@ -22667,13 +22736,14 @@ class AppLocalizationsEn extends AppLocalizations {
       'This device cannot compress video. Originals are uploaded from it.';
 
   @override
-  String get reef_section_title => 'Reef';
+  String get reef_section_title => 'Ecosystem';
 
   @override
   String get reef_section_sourcesTooltip => 'Data sources';
 
   @override
-  String get reef_section_loadError => 'Could not load reef data right now';
+  String get reef_section_loadError =>
+      'Could not load ecosystem data right now';
 
   @override
   String get reef_habitat_title => 'Reef habitat';
@@ -22694,13 +22764,24 @@ class AppLocalizationsEn extends AppLocalizations {
       'Could not check reef habitat right now';
 
   @override
-  String get reef_health_title => 'Reef health';
+  String get water_conditions_title => 'Water conditions';
 
   @override
-  String get reef_health_unavailable => 'Could not check reef health right now';
+  String get water_conditions_unavailable =>
+      'Could not check water conditions right now';
 
   @override
-  String get reef_health_noData => 'No reef health data for this location';
+  String get water_conditions_noData =>
+      'No satellite water data for this location';
+
+  @override
+  String get water_conditions_freshwater =>
+      'Satellite water temperature covers oceans only';
+
+  @override
+  String water_conditions_anomaly(String value) {
+    return 'Anomaly $value';
+  }
 
   @override
   String reef_health_degreeHeatingWeeks(String value) {

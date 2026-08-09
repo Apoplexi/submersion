@@ -35,7 +35,10 @@ void main() {
 
   tearDown(() async => db.close());
 
-  ReefRepository buildRepository({http.Client? habitatClient}) {
+  ReefRepository buildRepository({
+    http.Client? habitatClient,
+    http.Client? healthClient,
+  }) {
     final ok = MockClient(
       (_) async => http.Response(jsonEncode({'features': []}), 200),
     );
@@ -43,7 +46,8 @@ void main() {
       cache: ReefCacheDao(db, now: () => clock),
       habitat: ReefHabitatService(client: habitatClient ?? ok),
       health: ReefHealthService(
-        client: MockClient((_) async => http.Response('down', 503)),
+        client:
+            healthClient ?? MockClient((_) async => http.Response('down', 503)),
       ),
       protection: ReefProtectionService(client: ok),
       species: NearbySpeciesService(
@@ -54,6 +58,124 @@ void main() {
       ),
     );
   }
+
+  test(
+    'includeHealth false issues no health request and caches nothing',
+    () async {
+      var healthCalls = 0;
+      final counting = MockClient((_) async {
+        healthCalls++;
+        return http.Response('down', 503);
+      });
+
+      final repo = buildRepository(healthClient: counting);
+      final snapshot = await repo.snapshotFor(
+        const GeoPoint(41.0, -81.5),
+        includeHealth: false,
+      );
+
+      expect(healthCalls, 0);
+      expect(snapshot.health.status, ReefDataStatus.empty);
+      // The other three parts fetched normally.
+      expect(snapshot.habitat.status, ReefDataStatus.empty);
+      expect(snapshot.protection.status, ReefDataStatus.empty);
+
+      // Nothing was cached for health: a later includeHealth fetch really
+      // goes to the network.
+      await repo.snapshotFor(const GeoPoint(41.0, -81.5));
+      expect(healthCalls, 1);
+    },
+  );
+
+  test('a successful health fetch round-trips through the cache', () async {
+    var healthCalls = 0;
+    final healthBody = jsonEncode({
+      'table': {
+        'columnNames': [
+          'time',
+          'latitude',
+          'longitude',
+          'CRW_SST',
+          'CRW_SSTANOMALY',
+          'CRW_HOTSPOT',
+          'CRW_DHW',
+          'CRW_DHW_mask',
+        ],
+        'rows': [
+          ['2026-07-23T12:00:00Z', 12.175, -68.275, 30.56, 1.15, 0.96, 3.68, 0],
+        ],
+      },
+    });
+    final counting = MockClient((_) async {
+      healthCalls++;
+      return http.Response(healthBody, 200);
+    });
+
+    final repo = buildRepository(healthClient: counting);
+    final first = await repo.snapshotFor(const GeoPoint(12.16, -68.28));
+    final second = await repo.snapshotFor(const GeoPoint(12.16, -68.28));
+
+    expect(healthCalls, 1);
+    expect(first.health.status, ReefDataStatus.ok);
+    expect(first.health.value!.sst, 30.56);
+    // The cached copy decodes to the same value the network produced.
+    expect(second.health, first.health);
+  });
+
+  test('snapshotFor with a date keys the health cache by that date', () async {
+    var healthCalls = 0;
+    final counting = MockClient((_) async {
+      healthCalls++;
+      return http.Response('down', 503);
+    });
+
+    final repo = buildRepository(healthClient: counting);
+    await repo.snapshotFor(
+      const GeoPoint(12.16, -68.28),
+      date: DateTime.utc(2023, 9, 1),
+    );
+    await repo.snapshotFor(const GeoPoint(12.16, -68.28));
+
+    // Different variants (dated vs current), so both fetch.
+    expect(healthCalls, 2);
+  });
+
+  test('habitatFor serves the second call from cache', () async {
+    final counting = MockClient((_) async {
+      habitatCalls++;
+      return http.Response(
+        jsonEncode({
+          'features': [
+            {
+              'attributes': {'threat_txt': 'High'},
+            },
+          ],
+        }),
+        200,
+      );
+    });
+
+    final repo = buildRepository(habitatClient: counting);
+    final first = await repo.habitatFor(const GeoPoint(12.16, -68.28));
+    final second = await repo.habitatFor(const GeoPoint(12.16, -68.28));
+
+    expect(habitatCalls, 1);
+    expect(first.value!.onReef, isTrue);
+    expect(second.value!.threatLevel, 'High');
+  });
+
+  test('habitatFor shares the cache entry with snapshotFor', () async {
+    final counting = MockClient((_) async {
+      habitatCalls++;
+      return http.Response(jsonEncode({'features': []}), 200);
+    });
+
+    final repo = buildRepository(habitatClient: counting);
+    await repo.snapshotFor(const GeoPoint(12.16, -68.28));
+    await repo.habitatFor(const GeoPoint(12.16, -68.28));
+
+    expect(habitatCalls, 1);
+  });
 
   test('one provider failing does not blank the others', () async {
     final repo = buildRepository();

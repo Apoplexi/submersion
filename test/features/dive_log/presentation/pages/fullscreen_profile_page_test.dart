@@ -182,6 +182,52 @@ void main() {
     expect(cardRect.bottom, greaterThan(chartRect.center.dy));
   });
 
+  testWidgets('without a saved position the card defaults to the corner the '
+      'profile occupies least', (tester) async {
+    // Fast descent, long deep bottom, ascent tail rising into the top-right:
+    // the old fixed top-right default sat exactly on that tail. For this
+    // shape the emptiest corner window is the top-left - the fast descent
+    // leaves it almost immediately, while the max-depth bottom line (which
+    // normalizes to exactly y = 1.0) fills both bottom corner windows.
+    final dive = Dive(
+      id: 'd1',
+      dateTime: DateTime(2026, 1, 1, 10),
+      profile: List.generate(61, (i) {
+        final t = i * 10;
+        final double depth;
+        if (t < 90) {
+          depth = 30.0 * t / 90;
+        } else if (t < 450) {
+          depth = 30;
+        } else {
+          depth = 30.0 * (600 - t) / 150;
+        }
+        return DiveProfilePoint(timestamp: t, depth: depth, temperature: 20);
+      }),
+    );
+    final overrides = _defaultOverrides()
+      ..removeAt(1)
+      ..insert(1, diveProvider(dive.id).overrideWith((ref) async => dive));
+    await tester.pumpWidget(_wrap(overrides));
+    await tester.pumpAndSettle();
+
+    expect(
+      tester
+          .widget<DraggableReadoutCard>(find.byType(DraggableReadoutCard))
+          .initialFraction,
+      const Offset(0, 0),
+      reason: 'the card must seed at the least occupied corner',
+    );
+    final chartRect = tester.getRect(find.byType(DiveProfileChart));
+    final cardRect = tester.getRect(find.byKey(const ValueKey('readout-card')));
+    expect(
+      cardRect.left,
+      lessThan(chartRect.center.dx),
+      reason: 'the card must avoid the occupied top-right corner',
+    );
+    expect(cardRect.top, lessThan(chartRect.center.dy));
+  });
+
   testWidgets('chart fills most of the screen height', (tester) async {
     tester.view.physicalSize = const Size(1200, 900);
     tester.view.devicePixelRatio = 1.0;
@@ -356,36 +402,121 @@ void main() {
     },
   );
 
+  SafetyFinding laneFinding() => SafetyFinding(
+    id: 'f-lane',
+    diveId: 'd1',
+    ruleId: SafetyRuleId.rapidAscent,
+    severity: SafetySeverity.caution,
+    startTimestamp: 60,
+    endTimestamp: 120,
+    value: 14.0,
+    engineVersion: 1,
+    createdAt: DateTime.utc(2026, 8, 9),
+  );
+
+  List<Override> reviewOverrides(SafetyFinding finding) => [
+    ..._defaultOverrides(),
+    safetyReviewProvider('d1').overrideWith(
+      (ref) async => SafetyReview(
+        diveId: 'd1',
+        engineVersion: 1,
+        reviewedAt: DateTime.utc(2026, 8, 9),
+        findings: [finding],
+      ),
+    ),
+  ];
+
   testWidgets(
     'selected safety finding carries into fullscreen as a highlight',
     (tester) async {
-      await tester.pumpWidget(_wrap(_defaultOverrides()));
+      final finding = laneFinding();
+      await tester.pumpWidget(_wrap(reviewOverrides(finding)));
       await tester.pumpAndSettle();
 
       final container = ProviderScope.containerOf(
         tester.element(find.byType(FullscreenProfilePage)),
       );
-      container
-          .read(selectedSafetyFindingProvider('d1').notifier)
-          .state = SafetyFinding(
-        id: 'f1',
-        diveId: 'd1',
-        ruleId: SafetyRuleId.missedDecoStop,
-        severity: SafetySeverity.caution,
-        startTimestamp: 120,
-        endTimestamp: 240,
-        value: 2.0,
-        engineVersion: 1,
-        createdAt: DateTime.utc(2026, 8, 7),
-      );
+      container.read(selectedSafetyFindingProvider('d1').notifier).state =
+          finding;
       await tester.pump();
 
       final chart = tester.widget<DiveProfileChart>(
         find.byType(DiveProfileChart),
       );
       expect(chart.highlightRange, isNotNull);
-      expect(chart.highlightRange!.startTimestamp, 120);
-      expect(chart.highlightRange!.endTimestamp, 240);
+      expect(chart.highlightRange!.startTimestamp, 60);
+      expect(chart.highlightRange!.endTimestamp, 120);
     },
   );
+
+  testWidgets('a selection outside the gated lane renders no highlight', (
+    tester,
+  ) async {
+    // The stored review has no active row for the selection (dismissed), so
+    // the lane hides it; the highlight must be gated off with it.
+    final dismissed = SafetyFinding(
+      id: 'f-lane',
+      diveId: 'd1',
+      ruleId: SafetyRuleId.rapidAscent,
+      severity: SafetySeverity.caution,
+      startTimestamp: 60,
+      endTimestamp: 120,
+      value: 14.0,
+      engineVersion: 1,
+      dismissedAt: DateTime.utc(2026, 8, 9),
+      createdAt: DateTime.utc(2026, 8, 9),
+    );
+    await tester.pumpWidget(_wrap(reviewOverrides(dismissed)));
+    await tester.pumpAndSettle();
+
+    final container = ProviderScope.containerOf(
+      tester.element(find.byType(FullscreenProfilePage)),
+    );
+    container.read(selectedSafetyFindingProvider('d1').notifier).state =
+        dismissed;
+    await tester.pump();
+
+    final chart = tester.widget<DiveProfileChart>(
+      find.byType(DiveProfileChart),
+    );
+    expect(chart.highlightRange, isNull);
+    expect(chart.selectedSafetyFindingId, isNull);
+  });
+
+  testWidgets('lane findings and selection wiring reach the chart', (
+    tester,
+  ) async {
+    await tester.pumpWidget(_wrap(reviewOverrides(laneFinding())));
+    await tester.pumpAndSettle();
+
+    final chart = tester.widget<DiveProfileChart>(
+      find.byType(DiveProfileChart),
+    );
+    expect(chart.safetyFindings, isNotNull);
+    expect(chart.safetyFindings!.map((f) => f.id), ['f-lane']);
+    expect(chart.onSafetyFindingTap, isNotNull);
+    expect(chart.onSafetyFindingDismiss, isNotNull);
+    expect(chart.onSafetyFindingDetails, isNull); // no section in fullscreen
+  });
+
+  testWidgets('fullscreen tap callback toggles the shared provider', (
+    tester,
+  ) async {
+    final finding = laneFinding();
+    await tester.pumpWidget(_wrap(reviewOverrides(finding)));
+    await tester.pumpAndSettle();
+
+    final chart = tester.widget<DiveProfileChart>(
+      find.byType(DiveProfileChart),
+    );
+    final container = ProviderScope.containerOf(
+      tester.element(find.byType(FullscreenProfilePage)),
+    );
+
+    chart.onSafetyFindingTap!(finding);
+    expect(container.read(selectedSafetyFindingProvider('d1'))?.id, 'f-lane');
+
+    chart.onSafetyFindingTap!(finding);
+    expect(container.read(selectedSafetyFindingProvider('d1')), isNull);
+  });
 }

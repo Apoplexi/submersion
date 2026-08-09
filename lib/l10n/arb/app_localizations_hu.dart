@@ -996,6 +996,18 @@ class AppLocalizationsHu extends AppLocalizations {
       'Ez MINDEN jelenlegi adatot lecserél a mentés adataival. Ez a művelet nem vonható vissza.';
 
   @override
+  String backup_restore_safetyReview_progress(int done, int total) {
+    return '$done / $total merülés elemezve';
+  }
+
+  @override
+  String get backup_restore_safetyReview_skip => 'Kihagyás';
+
+  @override
+  String get backup_restore_safetyReview_title =>
+      'Biztonsági ellenőrzés folyamatban';
+
+  @override
   String get backup_restoreComplete_continue => 'Tovabb';
 
   @override
@@ -12908,6 +12920,23 @@ class AppLocalizationsHu extends AppLocalizations {
   String get safetyReview_restore => 'Visszaállítás';
 
   @override
+  String get safetyReview_details => 'Részletek';
+
+  @override
+  String get safetyReview_clearHighlight => 'Kiemelés törlése';
+
+  @override
+  String safetyReview_findingGroupSemantics(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count biztonsági megállapítás',
+      one: '1 biztonsági megállapítás',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get safetySettings_title => 'Biztonsági áttekintés';
 
   @override
@@ -13016,11 +13045,11 @@ class AppLocalizationsHu extends AppLocalizations {
       'Árapály-ciklus grafikon és időzítés';
 
   @override
-  String get diveDetailSection_reefHealth_name => 'Zátony állapota';
+  String get diveDetailSection_reefHealth_name => 'Vízviszonyok';
 
   @override
   String get diveDetailSection_reefHealth_description =>
-      'Korallfehéredési hőstressz a merülés napján';
+      'Műholdas vízviszonyok a merülés napján';
 
   @override
   String get diveDetailSection_surfaceGps_name => 'Felszíni GPS';
@@ -16445,6 +16474,16 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String surfaceInterval_result_beyondHorizon(Object hours) {
+    return 'A várakozás túllépi azt a $hours órát, ameddig ez a tervező keres. A kitelítődés folytatódik, így egy hosszabb felszíni intervallum elegendő lesz.';
+  }
+
+  @override
+  String surfaceInterval_result_beyondHorizonShort(Object hours) {
+    return 'Több mint $hours óra';
+  }
+
+  @override
   String get surfaceInterval_result_currentInterval => 'Jelenlegi intervallum';
 
   @override
@@ -16469,6 +16508,15 @@ class AppLocalizationsHu extends AppLocalizations {
   String surfaceInterval_result_ndlMinutes(Object minutes) {
     return '$minutes perc NDL';
   }
+
+  @override
+  String surfaceInterval_result_noIntervalHelps(Object minutes) {
+    return 'Semmilyen felszíni intervallum nem elegendő. A leghosszabb dekompresszió nélküli merülés ezen a mélységen ezzel a keverékkel $minutes perc. Rövidítsd le a második merülést vagy csökkentsd a mélységét.';
+  }
+
+  @override
+  String get surfaceInterval_result_notAchievable =>
+      'Semmilyen felszíni intervallummal nem érhető el';
 
   @override
   String get surfaceInterval_result_notYetSafe =>
@@ -16901,6 +16949,29 @@ class AppLocalizationsHu extends AppLocalizations {
   String tides_semantic_tideState(Object state) {
     return 'Árapály állapot: $state';
   }
+
+  @override
+  String tides_source_noaaStation(String name, String distance) {
+    return 'NOAA állomás: $name ($distance)';
+  }
+
+  @override
+  String get tides_source_modelEstimate => 'Óceánmodell-becslés';
+
+  @override
+  String get tides_source_modelCaveat =>
+      'Műholdadatok alapján modellezve. Az időpontok és magasságok eltérhetnek összetett partvonalak közelében.';
+
+  @override
+  String get tides_source_sheetTitle => 'Árapályadatok forrása';
+
+  @override
+  String get tides_source_datumMllw =>
+      'Magasságok az MLLW-hez képest (állomási alapszint)';
+
+  @override
+  String get tides_source_datumMsl =>
+      'Magasságok a közepes tengerszinthez képest';
 
   @override
   String get tides_title => 'Árapály';
@@ -22978,13 +23049,14 @@ class AppLocalizationsHu extends AppLocalizations {
       'Ez az eszköz nem tud videót tömöríteni. Róla az eredetik töltődnek fel.';
 
   @override
-  String get reef_section_title => 'Zátony';
+  String get reef_section_title => 'Ökoszisztéma';
 
   @override
   String get reef_section_sourcesTooltip => 'Adatforrások';
 
   @override
-  String get reef_section_loadError => 'A zátonyadatok most nem tölthetők be';
+  String get reef_section_loadError =>
+      'Az ökoszisztéma-adatok jelenleg nem tölthetők be';
 
   @override
   String get reef_habitat_title => 'Zátony élőhely';
@@ -23006,14 +23078,24 @@ class AppLocalizationsHu extends AppLocalizations {
       'A zátony élőhelye most nem ellenőrizhető';
 
   @override
-  String get reef_health_title => 'Zátony állapota';
+  String get water_conditions_title => 'Vízviszonyok';
 
   @override
-  String get reef_health_unavailable =>
-      'A zátony állapota most nem ellenőrizhető';
+  String get water_conditions_unavailable =>
+      'A vízviszonyok jelenleg nem ellenőrizhetők';
 
   @override
-  String get reef_health_noData => 'Nincs zátonyállapot-adat ehhez a helyhez';
+  String get water_conditions_noData =>
+      'Nincsenek műholdas vízadatok ehhez a helyhez';
+
+  @override
+  String get water_conditions_freshwater =>
+      'A műholdas vízhőmérséklet csak az óceánokat fedi le';
+
+  @override
+  String water_conditions_anomaly(String value) {
+    return 'Anomália $value';
+  }
 
   @override
   String reef_health_degreeHeatingWeeks(String value) {

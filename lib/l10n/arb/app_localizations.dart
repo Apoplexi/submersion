@@ -1729,6 +1729,24 @@ abstract class AppLocalizations {
   /// **'This will replace ALL current data with the backup data. This action cannot be undone.'**
   String get backup_restore_dialog_warning;
 
+  /// No description provided for @backup_restore_safetyReview_progress.
+  ///
+  /// In en, this message translates to:
+  /// **'Analyzed {done} of {total} dives'**
+  String backup_restore_safetyReview_progress(int done, int total);
+
+  /// No description provided for @backup_restore_safetyReview_skip.
+  ///
+  /// In en, this message translates to:
+  /// **'Skip'**
+  String get backup_restore_safetyReview_skip;
+
+  /// No description provided for @backup_restore_safetyReview_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Running the safety review'**
+  String get backup_restore_safetyReview_title;
+
   /// No description provided for @backup_restoreComplete_continue.
   ///
   /// In en, this message translates to:
@@ -21901,6 +21919,24 @@ abstract class AppLocalizations {
   /// **'Restore'**
   String get safetyReview_restore;
 
+  /// Link in the chart finding callout that scrolls to the full safety review section
+  ///
+  /// In en, this message translates to:
+  /// **'Details'**
+  String get safetyReview_details;
+
+  /// Tooltip/semantics for the button that clears the chart safety highlight
+  ///
+  /// In en, this message translates to:
+  /// **'Clear highlight'**
+  String get safetyReview_clearHighlight;
+
+  /// Semantics label for a clustered chip in the chart safety lane
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 safety observation} other{{count} safety observations}}'**
+  String safetyReview_findingGroupSemantics(int count);
+
   /// No description provided for @safetySettings_title.
   ///
   /// In en, this message translates to:
@@ -22060,13 +22096,13 @@ abstract class AppLocalizations {
   /// No description provided for @diveDetailSection_reefHealth_name.
   ///
   /// In en, this message translates to:
-  /// **'Reef Health'**
+  /// **'Water Conditions'**
   String get diveDetailSection_reefHealth_name;
 
   /// No description provided for @diveDetailSection_reefHealth_description.
   ///
   /// In en, this message translates to:
-  /// **'Coral bleaching heat stress on the dive date'**
+  /// **'Satellite water conditions on the dive date'**
   String get diveDetailSection_reefHealth_description;
 
   /// No description provided for @diveDetailSection_surfaceGps_name.
@@ -27678,6 +27714,18 @@ abstract class AppLocalizations {
   /// **'O2: {percent}%'**
   String surfaceInterval_o2Semantics(Object percent);
 
+  /// Explains that the second dive does fit on clean tissues but needs a longer surface interval than the planner searches
+  ///
+  /// In en, this message translates to:
+  /// **'The wait runs past the {hours} hours this planner searches. Off-gassing continues, so a longer surface interval will get there.'**
+  String surfaceInterval_result_beyondHorizon(Object hours);
+
+  /// Shown in place of a minimum surface interval when the required wait is longer than the planner searches
+  ///
+  /// In en, this message translates to:
+  /// **'More than {hours} hours'**
+  String surfaceInterval_result_beyondHorizonShort(Object hours);
+
   /// Label for the current surface interval column
   ///
   /// In en, this message translates to:
@@ -27719,6 +27767,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{minutes} min NDL'**
   String surfaceInterval_result_ndlMinutes(Object minutes);
+
+  /// Explains that the planned second dive busts the no-stop limit no matter how long the diver waits, and names the longest no-stop dive that is reachable
+  ///
+  /// In en, this message translates to:
+  /// **'No surface interval is enough. The longest no-stop dive at this depth on this mix is {minutes} min. Shorten the second dive or reduce its depth.'**
+  String surfaceInterval_result_noIntervalHelps(Object minutes);
+
+  /// Shown in place of a minimum surface interval when no interval makes the second dive a no-stop dive
+  ///
+  /// In en, this message translates to:
+  /// **'Not achievable at any surface interval'**
+  String get surfaceInterval_result_notAchievable;
 
   /// Status message when more surface interval time is needed
   ///
@@ -28376,6 +28436,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Tide state: {state}'**
   String tides_semantic_tideState(Object state);
+
+  /// No description provided for @tides_source_noaaStation.
+  ///
+  /// In en, this message translates to:
+  /// **'NOAA station: {name} ({distance})'**
+  String tides_source_noaaStation(String name, String distance);
+
+  /// No description provided for @tides_source_modelEstimate.
+  ///
+  /// In en, this message translates to:
+  /// **'Ocean-model estimate'**
+  String get tides_source_modelEstimate;
+
+  /// No description provided for @tides_source_modelCaveat.
+  ///
+  /// In en, this message translates to:
+  /// **'Modeled from satellite data. Times and heights may differ near complex coastlines.'**
+  String get tides_source_modelCaveat;
+
+  /// No description provided for @tides_source_sheetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Tide data source'**
+  String get tides_source_sheetTitle;
+
+  /// No description provided for @tides_source_datumMllw.
+  ///
+  /// In en, this message translates to:
+  /// **'Heights relative to MLLW (station datum)'**
+  String get tides_source_datumMllw;
+
+  /// No description provided for @tides_source_datumMsl.
+  ///
+  /// In en, this message translates to:
+  /// **'Heights relative to mean sea level'**
+  String get tides_source_datumMsl;
 
   /// No description provided for @tides_title.
   ///
@@ -38424,7 +38520,7 @@ abstract class AppLocalizations {
   /// No description provided for @reef_section_title.
   ///
   /// In en, this message translates to:
-  /// **'Reef'**
+  /// **'Ecosystem'**
   String get reef_section_title;
 
   /// No description provided for @reef_section_sourcesTooltip.
@@ -38436,7 +38532,7 @@ abstract class AppLocalizations {
   /// No description provided for @reef_section_loadError.
   ///
   /// In en, this message translates to:
-  /// **'Could not load reef data right now'**
+  /// **'Could not load ecosystem data right now'**
   String get reef_section_loadError;
 
   /// No description provided for @reef_habitat_title.
@@ -38469,23 +38565,35 @@ abstract class AppLocalizations {
   /// **'Could not check reef habitat right now'**
   String get reef_habitat_unavailable;
 
-  /// No description provided for @reef_health_title.
+  /// No description provided for @water_conditions_title.
   ///
   /// In en, this message translates to:
-  /// **'Reef health'**
-  String get reef_health_title;
+  /// **'Water conditions'**
+  String get water_conditions_title;
 
-  /// No description provided for @reef_health_unavailable.
+  /// No description provided for @water_conditions_unavailable.
   ///
   /// In en, this message translates to:
-  /// **'Could not check reef health right now'**
-  String get reef_health_unavailable;
+  /// **'Could not check water conditions right now'**
+  String get water_conditions_unavailable;
 
-  /// No description provided for @reef_health_noData.
+  /// No description provided for @water_conditions_noData.
   ///
   /// In en, this message translates to:
-  /// **'No reef health data for this location'**
-  String get reef_health_noData;
+  /// **'No satellite water data for this location'**
+  String get water_conditions_noData;
+
+  /// No description provided for @water_conditions_freshwater.
+  ///
+  /// In en, this message translates to:
+  /// **'Satellite water temperature covers oceans only'**
+  String get water_conditions_freshwater;
+
+  /// No description provided for @water_conditions_anomaly.
+  ///
+  /// In en, this message translates to:
+  /// **'Anomaly {value}'**
+  String water_conditions_anomaly(String value);
 
   /// No description provided for @reef_health_degreeHeatingWeeks.
   ///

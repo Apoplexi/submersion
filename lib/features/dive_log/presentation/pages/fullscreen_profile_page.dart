@@ -6,6 +6,7 @@ import 'package:submersion/features/dive_log/data/services/gas_usage_segments_se
 import 'package:submersion/features/dive_log/data/services/profile_analysis_service.dart';
 import 'package:submersion/features/dive_log/data/services/profile_markers_service.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
+import 'package:submersion/features/dive_log/presentation/widgets/readout_card_placement.dart';
 import 'package:submersion/features/dive_log/domain/entities/source_profile.dart';
 import 'package:submersion/features/dive_log/domain/services/source_name_resolver.dart';
 import 'package:submersion/features/dive_log/presentation/providers/active_source_provider.dart';
@@ -14,6 +15,7 @@ import 'package:submersion/features/dive_log/presentation/providers/gas_switch_p
 import 'package:submersion/features/dive_log/presentation/providers/profile_analysis_provider.dart';
 import 'package:submersion/features/dive_log/presentation/providers/profile_playback_provider.dart';
 import 'package:submersion/features/dive_log/presentation/providers/profile_review_provider.dart';
+import 'package:submersion/features/dive_log/domain/entities/safety_finding.dart';
 import 'package:submersion/features/dive_log/presentation/providers/safety_review_providers.dart';
 import 'package:submersion/features/dive_log/presentation/utils/sac_normalization.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/dive_profile_chart.dart';
@@ -66,6 +68,34 @@ class _FullscreenProfilePageState extends ConsumerState<FullscreenProfilePage> {
   void _onTooltipData(List<TooltipRow>? rows) {
     if (rows == null || rows.isEmpty) return; // sticky: keep last values
     setState(() => _readoutRows = rows);
+  }
+
+  /// Memoized default corner for the readout card, recomputed only when the
+  /// profile identity changes (the page rebuilds per playback tick).
+  Offset? _autoCorner;
+  List<DiveProfilePoint>? _autoCornerProfile;
+
+  /// Default readout-card corner: the chart corner the profile occupies
+  /// least (a saved dragged position always overrides this). Strided
+  /// sampling keeps this O(200) regardless of profile size.
+  Offset _defaultCardCorner(List<DiveProfilePoint> profile) {
+    if (!identical(profile, _autoCornerProfile)) {
+      _autoCornerProfile = profile;
+      final maxT = profile.isEmpty
+          ? 0.0
+          : profile
+                .map((p) => p.timestamp)
+                .reduce((a, b) => a > b ? a : b)
+                .toDouble();
+      final maxD = profile.fold(0.0, (m, p) => m > p.depth ? m : p.depth);
+      final stride = profile.length <= 200 ? 1 : profile.length ~/ 200;
+      _autoCorner = leastOccupiedReadoutCorner([
+        if (maxT > 0 && maxD > 0)
+          for (var i = 0; i < profile.length; i += stride)
+            Offset(profile[i].timestamp / maxT, profile[i].depth / maxD),
+      ]);
+    }
+    return _autoCorner!;
   }
 
   @override
@@ -151,6 +181,41 @@ class _FullscreenProfilePageState extends ConsumerState<FullscreenProfilePage> {
     final selectedFinding = ref.watch(
       selectedSafetyFindingProvider(widget.diveId),
     );
+    // Narrow selects (not a full settings watch): this page deliberately
+    // avoids rebuilding on unrelated settings writes.
+    final safetyReviewEnabled = ref.watch(
+      settingsProvider.select((s) => s.safetyReviewEnabled),
+    );
+    final safetyDisabledRules = ref.watch(
+      settingsProvider.select((s) => s.safetyReviewDisabledRules),
+    );
+    final safetyReview = ref.watch(safetyReviewProvider(widget.diveId)).value;
+    final laneFindings = safetyReviewEnabled
+        ? chartSafetyFindings(safetyReview, safetyDisabledRules)
+        : const <SafetyFinding>[];
+    // Gate the highlight on lane membership: with safety review (or the
+    // finding's rule) disabled the lane disappears, so an ungated highlight
+    // would be stuck on the chart with no UI to clear it.
+    final visibleSelectedFinding =
+        selectedFinding != null &&
+            laneFindings.any((f) => f.id == selectedFinding.id)
+        ? selectedFinding
+        : null;
+    // A finding dismissed elsewhere (callout, detail page, sync) must not
+    // stay highlighted: drop a selection with no matching active row.
+    ref.listen(safetyReviewProvider(widget.diveId), (previous, next) {
+      final review = next.value;
+      if (review == null) return;
+      final selected = ref.read(selectedSafetyFindingProvider(widget.diveId));
+      if (selected == null) return;
+      final stillActive = review.findings.any(
+        (f) => f.id == selected.id && !f.isDismissed,
+      );
+      if (!stillActive) {
+        ref.read(selectedSafetyFindingProvider(widget.diveId).notifier).state =
+            null;
+      }
+    });
     final showMaxDepthMarker = ref.watch(showMaxDepthMarkerProvider);
     final showPressureThresholdMarkers = ref.watch(
       showPressureThresholdMarkersProvider,
@@ -394,9 +459,30 @@ class _FullscreenProfilePageState extends ConsumerState<FullscreenProfilePage> {
                               : chartProfile.last.timestamp,
                           highlightedTimestamp: reviewTimestamp,
                           highlightRange: profileHighlightRangeFor(
-                            selectedFinding,
+                            visibleSelectedFinding,
                             Theme.of(context).colorScheme,
                           ),
+                          safetyFindings: laneFindings.isEmpty
+                              ? null
+                              : laneFindings,
+                          selectedSafetyFindingId: visibleSelectedFinding?.id,
+                          onSafetyFindingTap: (finding) {
+                            final selectionNotifier = ref.read(
+                              selectedSafetyFindingProvider(
+                                widget.diveId,
+                              ).notifier,
+                            );
+                            selectionNotifier.state =
+                                selectionNotifier.state?.id == finding.id
+                                ? null
+                                : finding;
+                          },
+                          onSafetyFindingDismiss: (finding) =>
+                              setSafetyFindingDismissed(
+                                ref,
+                                finding: finding,
+                                dismissed: true,
+                              ),
                           onPointSelected: (index) {
                             if (index == null || index >= chartProfile.length) {
                               return;
@@ -436,7 +522,7 @@ class _FullscreenProfilePageState extends ConsumerState<FullscreenProfilePage> {
                                 settings.fullscreenReadoutCardX!,
                                 settings.fullscreenReadoutCardY!,
                               )
-                            : null,
+                            : _defaultCardCorner(chartProfile),
                         onDragEnd: (fraction) => ref
                             .read(settingsProvider.notifier)
                             .setFullscreenReadoutCardPosition(

@@ -118,18 +118,11 @@ class _SiteListPageState extends ConsumerState<SiteListPage> {
         columnSettingsAction: IconButton(
           icon: const Icon(Icons.view_column_outlined),
           tooltip: 'Column settings',
-          onPressed: () {
-            final config = ref.read(siteTableConfigProvider);
-            final notifier = ref.read(siteTableConfigProvider.notifier);
-            showEntityTableColumnPicker<SiteField>(
-              context,
-              config: config,
-              adapter: SiteFieldAdapter.instance,
-              onToggleColumn: notifier.toggleColumn,
-              onReorderColumn: notifier.reorderColumn,
-              onTogglePin: notifier.togglePin,
-            );
-          },
+          onPressed: () => showEntityTableColumnPicker<SiteField>(
+            context,
+            configProvider: siteTableConfigProvider,
+            adapter: SiteFieldAdapter.instance,
+          ),
         ),
         appBarActions: [
           IconButton(

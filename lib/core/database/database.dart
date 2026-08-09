@@ -2936,7 +2936,7 @@ class AppDatabase extends _$AppDatabase {
 
   /// The current schema version as a static constant so that pre-open checks
   /// (e.g. version-mismatch guard) can reference it without an instance.
-  static const int currentSchemaVersion = 145;
+  static const int currentSchemaVersion = 147;
 
   /// Every schema version that has a migration block in onUpgrade.
   /// Used to calculate progress step counts. When adding a new migration,
@@ -3121,10 +3121,15 @@ class AppDatabase extends _$AppDatabase {
     // calibration columns (measured visibility replaces the tropical-biased
     // bucket enum).
     144,
-    // v145: fold buddy_roles (professional credentials, issue #395) into
+    // v145 is reserved by the GPS track mapping branch (PR #908).
+    // v146: recompute machine-derived bottom times that the retired
+    // square-profile heuristic collapsed on multilevel dives.
+    146,
+    // v147: fold buddy_roles (professional credentials, issue #395) into
     // buddy-owned certifications rows and drop the table (spec
-    // 2026-08-08-buddy-professional-roles-fold).
-    145,
+    // 2026-08-08-buddy-professional-roles-fold). Originally authored as v145;
+    // renumbered when PR #908 reserved 145 and v146 landed first.
+    147,
   ];
 
   /// Idempotent DDL for the v106 connector-suggestion columns (Lightroom
@@ -3410,6 +3415,113 @@ class AppDatabase extends _$AppDatabase {
     if (descentEnd == null || ascentStart == null) return null;
     if (ascentStart <= descentEnd) return null;
     return ascentStart - descentEnd;
+  }
+
+  /// v146 data fix: the retired bottom-time heuristic (time at/above 85% of
+  /// max depth -- kept frozen above in [_bottomTimeSecondsFromProfileRows])
+  /// collapsed multilevel dives to their deepest segment: 10 min at 29 m
+  /// followed by 40 min at 15 m reported ~9 min of bottom time. For any dive
+  /// whose stored bottom_time exactly reproduces the old heuristic's output
+  /// for its primary profile (in practice machine-derived by an import,
+  /// download, or the v132 backfill; a user-typed value that coincidentally
+  /// reproduces it is recomputed too, which still yields a
+  /// profile-consistent result), recompute it with the multilevel-correct
+  /// rule in [_multilevelBottomTimeSecondsFromProfileRows].
+  ///
+  /// Both algorithms are frozen private copies so every device computes
+  /// identical values no matter which app version it migrates with; `hlc`
+  /// is left untouched (deterministic local recompute, no sync traffic
+  /// needed to converge, exactly like v132). onUpgrade only.
+  Future<void> _recomputeMultilevelBottomTimes() async {
+    final diveCols = await customSelect("PRAGMA table_info('dives')").get();
+    final diveColNames = diveCols.map((c) => c.read<String>('name')).toSet();
+    if (!diveColNames.contains('bottom_time')) {
+      return;
+    }
+    final profileCols = await customSelect(
+      "PRAGMA table_info('dive_profiles')",
+    ).get();
+    final profileColNames = profileCols
+        .map((c) => c.read<String>('name'))
+        .toSet();
+    if (!profileColNames.contains('dive_id') ||
+        !profileColNames.contains('is_primary') ||
+        !profileColNames.contains('timestamp') ||
+        !profileColNames.contains('depth')) {
+      return;
+    }
+
+    final candidates = await customSelect(
+      'SELECT id, bottom_time FROM dives WHERE bottom_time IS NOT NULL',
+    ).get();
+
+    var processed = 0;
+    for (final candidate in candidates) {
+      // Same event-loop yield as the v132 backfill: during a migration the
+      // executor completes drift awaits in microtasks, so an unbroken loop
+      // would freeze the migration progress spinner.
+      if (processed++ % 25 == 24) {
+        await Future<void>.delayed(Duration.zero);
+      }
+      final diveId = candidate.read<String>('id');
+      final storedSeconds = candidate.read<int>('bottom_time');
+
+      final points = await customSelect(
+        'SELECT timestamp, depth FROM dive_profiles '
+        'WHERE dive_id = ? AND is_primary = 1 '
+        'ORDER BY timestamp ASC',
+        variables: [Variable<String>(diveId)],
+      ).get();
+
+      // Fingerprint check: a value reproducing the old heuristic is
+      // treated as machine-written and replaced (a coincidental user match
+      // is recomputed too); anything else is user data and stays.
+      final oldSeconds = _bottomTimeSecondsFromProfileRows(points);
+      if (oldSeconds == null || oldSeconds != storedSeconds) continue;
+
+      final newSeconds = _multilevelBottomTimeSecondsFromProfileRows(points);
+      if (newSeconds != null && newSeconds != storedSeconds) {
+        await customStatement('UPDATE dives SET bottom_time = ? WHERE id = ?', [
+          newSeconds,
+          diveId,
+        ]);
+      }
+    }
+  }
+
+  /// Multilevel-correct bottom time in seconds from timestamp-ordered
+  /// profile rows: surface departure (first sample) to the last sample
+  /// at/deeper than min(max(6 m, 33% of max depth), 85% of max depth).
+  /// Frozen copy of the v146-era BottomTimeCalculator so the migration is
+  /// deterministic across app versions; do not sync with later changes to
+  /// the domain calculator.
+  int? _multilevelBottomTimeSecondsFromProfileRows(List<QueryRow> points) {
+    if (points.length < 3) return null;
+
+    var maxDepth = 0.0;
+    for (final point in points) {
+      final depth = point.read<double>('depth');
+      if (depth > maxDepth) maxDepth = depth;
+    }
+    if (maxDepth <= 0) return null;
+
+    var threshold = maxDepth * 0.33;
+    if (threshold < 6.0) threshold = 6.0;
+    final cap = maxDepth * 0.85;
+    if (threshold > cap) threshold = cap;
+
+    int? ascentStart;
+    for (var i = points.length - 1; i >= 0; i--) {
+      if (points[i].read<double>('depth') >= threshold) {
+        ascentStart = points[i].read<int>('timestamp');
+        break;
+      }
+    }
+    if (ascentStart == null) return null;
+
+    final firstTimestamp = points.first.read<int>('timestamp');
+    final bottomSeconds = ascentStart - firstTimestamp;
+    return bottomSeconds > 0 ? bottomSeconds : null;
   }
 
   /// v114: collapse duplicate tombstones (newest deleted_at per entity_type +
@@ -4003,7 +4115,7 @@ class AppDatabase extends _$AppDatabase {
   }
 
   /// Fold buddy professional credentials (buddy_roles, issue #395) into
-  /// buddy-owned certifications rows, then drop the table (v145; spec
+  /// buddy-owned certifications rows, then drop the table (v147; spec
   /// 2026-08-08-buddy-professional-roles-fold). Invoked from onUpgrade AND
   /// as a guarded beforeOpen backstop -- unlike the #553 inline-cert copy
   /// (whose source columns survive until v110, so it must never run in
@@ -4012,7 +4124,7 @@ class AppDatabase extends _$AppDatabase {
   /// every open cannot resurrect a user-deleted cert. The beforeOpen call
   /// exists purely to protect a DB whose user_version advanced past 145
   /// (parallel-branch schema-version collision) without ever running the
-  /// v145 block, which would otherwise strand it with an orphaned
+  /// v147 block, which would otherwise strand it with an orphaned
   /// buddy_roles table nothing else reads. Ids are deterministic
   /// (`buddyrolecert-<rowId>`): synced replicas share buddy_roles row ids,
   /// so independent per-device migrations converge on identical cert rows
@@ -7114,7 +7226,7 @@ class AppDatabase extends _$AppDatabase {
           // strand it.)
           //
           // This block also created the buddy_roles table historically
-          // (buddy professional credentials); v145 folds those rows into
+          // (buddy professional credentials); v147 folds those rows into
           // certifications and drops the table.
           final certCols = await customSelect(
             "PRAGMA table_info('certifications')",
@@ -7534,13 +7646,24 @@ class AppDatabase extends _$AppDatabase {
           await _assertVisibilityScaleColumns();
         }
         if (from < 144) await reportProgress();
-        if (from < 145) {
+        // v145 is reserved by the GPS track mapping branch (PR #908).
+        // v146: recompute bottom times the retired square-profile heuristic
+        // derived too short on multilevel dives. Fingerprinted -- stored
+        // values that exactly reproduce the old heuristic get replaced
+        // (machine-derived, or a coincidental user match that recomputes to
+        // a profile-consistent value); anything else is treated as user
+        // data and left alone. onUpgrade only, hlc untouched (v132 pattern).
+        if (from < 146) {
+          await _recomputeMultilevelBottomTimes();
+        }
+        if (from < 146) await reportProgress();
+        if (from < 147) {
           // Fold buddy professional credentials into certifications and drop
           // buddy_roles (spec 2026-08-08). Conversion + drop in one step; the
-          // sqlite_master guard makes a fresh v145 db a no-op.
+          // sqlite_master guard makes a fresh v147 db a no-op.
           await _migrateBuddyRolesToCertifications();
         }
-        if (from < 145) await reportProgress();
+        if (from < 147) await reportProgress();
       },
       beforeOpen: (details) async {
         // Enable foreign keys
@@ -7665,7 +7788,7 @@ class AppDatabase extends _$AppDatabase {
         await _assertVisibilityMetersColumn();
         await _assertVisibilityScaleColumns();
 
-        // v145 backstop: re-run the buddy_roles fold (parallel-branch
+        // v147 backstop: re-run the buddy_roles fold (parallel-branch
         // schema-version collision self-heal). This is safe to re-run on
         // every open, unlike the #553 inline-cert copy above, which must
         // NEVER run here -- that helper's source columns (buddies.
@@ -7676,7 +7799,7 @@ class AppDatabase extends _$AppDatabase {
         // strict no-op the moment buddy_roles is gone, so there is no source
         // data left to resurrect from. Its purpose here is purely to protect
         // a DB whose user_version advanced past 145 without ever running the
-        // v145 block -- without this backstop, that DB would carry an
+        // v147 block -- without this backstop, that DB would carry an
         // orphaned buddy_roles table whose credentials silently vanish from
         // the UI forever (nothing else reads that table).
         await _migrateBuddyRolesToCertifications();
@@ -7703,7 +7826,7 @@ class AppDatabase extends _$AppDatabase {
         // the v99 block without creating its objects, and no later migration
         // would ever repair that. The ALTER is PRAGMA-guarded, so re-assert
         // the v99 object on every open. (buddy_roles was also created here
-        // historically; v145 dropped it, so it must NOT be re-created below
+        // historically; v147 dropped it, so it must NOT be re-created below
         // -- doing so would resurrect the dropped table on every open.)
         final certCols = await customSelect(
           "PRAGMA table_info('certifications')",

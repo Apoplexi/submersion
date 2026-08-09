@@ -4,7 +4,7 @@
 
 **Goal:** Delete the `buddy_roles` table and derive buddy professional status (instructor/divemaster/dive guide) from buddy-owned `certifications` rows, migrating existing credential rows into certifications.
 
-**Architecture:** UI layers are rewired to certifications first (while the table still exists, so every commit compiles), then the data layer is deleted, then one coupled commit performs the v145 migration + Drift table removal + sync deregistration. Spec: `docs/superpowers/specs/2026-08-08-buddy-professional-roles-fold-design.md`.
+**Architecture:** UI layers are rewired to certifications first (while the table still exists, so every commit compiles), then the data layer is deleted, then one coupled commit performs the v147 migration + Drift table removal + sync deregistration. Spec: `docs/superpowers/specs/2026-08-08-buddy-professional-roles-fold-design.md`.
 
 **Tech Stack:** Flutter, Drift (SQLite), Riverpod, flutter_test.
 
@@ -17,7 +17,7 @@
 - Commit messages: plain summary line, NO Co-Authored-By line, NO session URL.
 - Scoped `flutter test <dir>` per task (widget/DB tests can be slow; use generous `--timeout 120s` if needed); the full suite runs once in Task 9.
 - l10n: any .arb change applies to ALL 11 locale files (`app_en.arb, app_ar, app_de, app_es, app_fr, app_he, app_hu, app_it, app_nl, app_pt, app_zh`); non-English text is translated, not copied English. Regenerate with `flutter gen-l10n` run from the worktree root.
-- Schema version: the plan claims **v145** (main was at 144 on 2026-08-08). Task 7 re-verifies `currentSchemaVersion` before writing the migration; if a parallel branch took 145, renumber consistently everywhere.
+- Schema version: originally claimed **v145** (main was at 144 on 2026-08-08); renumbered to **v147** during merge-conflict resolution on 2026-08-09 after PR #908 reserved 145 and v146 landed on main first.
 
 ---
 
@@ -553,7 +553,7 @@ git add -A && git commit -m "Delete buddy_roles data layer and merge plumbing"
 
 ---
 
-### Task 7: Migration v145 — convert rows, drop table, deregister from sync
+### Task 7: Migration v147 — convert rows, drop table, deregister from sync
 
 This task is compile-coupled (serializer references `_db.buddyRoles`): migration helper, Drift table removal, codegen, and sync deregistration land in ONE commit.
 
@@ -562,7 +562,7 @@ This task is compile-coupled (serializer references `_db.buddyRoles`): migration
 - Modify: `lib/core/data/repositories/sync_repository.dart:34`
 - Modify: `lib/core/services/sync/sync_service.dart:1068,1811,1927`
 - Modify: `lib/core/services/sync/sync_data_serializer.dart` (all sites: 233, 307, 382, 458, 698, 1202-1205, 1615-1619, 1981-1985, 2309-2314, 2907-2913, 3482-3483, 3716-3717, 3983-3986, 4496-4503)
-- Test: `test/core/database/migration_v145_fold_buddy_roles_test.dart` (new)
+- Test: `test/core/database/migration_v147_fold_buddy_roles_test.dart` (new)
 - Test: rewrite `test/core/database/migration_v99_buddy_roles_test.dart` → keep ONLY its `certifications.instructor_id` assertions (rename file to `migration_v99_instructor_id_test.dart`)
 - Delete: `test/core/services/sync/sync_buddy_roles_test.dart`
 - Modify: `test/core/services/sync/sync_parent_refs_completeness_test.dart:23`, `test/core/services/sync/sync_serializer_upsert_test.dart:102`
@@ -570,16 +570,16 @@ This task is compile-coupled (serializer references `_db.buddyRoles`): migration
 
 **Interfaces:**
 - Consumes: `CertificationLevel.diveGuide` (Task 1) as the `'diveGuide'` level string.
-- Produces: schema v145; no `buddyRoles`/`buddy_roles` reference anywhere in `lib/` after this task.
+- Produces: schema v147; no `buddyRoles`/`buddy_roles` reference anywhere in `lib/` after this task.
 
 - [ ] **Step 1: Re-verify the version number**
 
 Run: `grep -n "currentSchemaVersion = " lib/core/database/database.dart`
-Expected: `144`. If not, renumber v145 → next free version in every step below and in the spec.
+Expected: `144`. If not, renumber v147 → next free version in every step below and in the spec.
 
 - [ ] **Step 2: Write the failing migration test**
 
-`test/core/database/migration_v145_fold_buddy_roles_test.dart`, modeled on `migration_v110_drop_buddy_cert_columns_test.dart` (seed an old-version DB by hand-written DDL with `PRAGMA user_version = 144`, construct `AppDatabase(nativeDb)` to run onUpgrade, assert). Seed `buddies` (`b1`,`b2`,`b3`), `certifications` (empty plus the dedupe fixtures below), and `buddy_roles`:
+`test/core/database/migration_v147_fold_buddy_roles_test.dart`, modeled on `migration_v110_drop_buddy_cert_columns_test.dart` (seed an old-version DB by hand-written DDL with `PRAGMA user_version = 146`, construct `AppDatabase(nativeDb)` to run onUpgrade, assert). Seed `buddies` (`b1`,`b2`,`b3`), `certifications` (empty plus the dedupe fixtures below), and `buddy_roles`:
 
 | fixture | buddy_roles row | pre-existing cert | expected outcome |
 |---|---|---|---|
@@ -592,9 +592,9 @@ Expected: `144`. If not, renumber v145 → next free version in every step below
 Assertions after open: the five outcomes; `SELECT name FROM sqlite_master WHERE name='buddy_roles'` is empty; converted rows have `diver_id IS NULL`; version-ladder pair:
 
 ```dart
-test('version ladder includes 145', () {
-  expect(AppDatabase.currentSchemaVersion, greaterThanOrEqualTo(145));
-  expect(AppDatabase.migrationVersions, contains(145));
+test('version ladder includes 147', () {
+  expect(AppDatabase.currentSchemaVersion, greaterThanOrEqualTo(147));
+  expect(AppDatabase.migrationVersions, contains(147));
 });
 ```
 
@@ -602,18 +602,18 @@ Plus the v144-style no-op shape: a fixture DB without a `buddy_roles` table (fre
 
 - [ ] **Step 3: Run to verify failure**
 
-Run: `flutter test test/core/database/migration_v145_fold_buddy_roles_test.dart`
-Expected: FAIL (no v145 in ladder).
+Run: `flutter test test/core/database/migration_v147_fold_buddy_roles_test.dart`
+Expected: FAIL (no v147 in ladder).
 
 - [ ] **Step 4: Implement the migration in database.dart**
 
-(a) `currentSchemaVersion` 144 → 145; append `145` to `migrationVersions`.
+(a) `currentSchemaVersion` 146 → 147; append `147` to `migrationVersions`.
 
 (b) Add the helper next to `_migrateBuddyInlineCertifications` (line ~3994), same doc style:
 
 ```dart
   /// Fold buddy professional credentials (buddy_roles, issue #395) into
-  /// buddy-owned certifications rows, then drop the table (v145; spec
+  /// buddy-owned certifications rows, then drop the table (v147; spec
   /// 2026-08-08-buddy-professional-roles-fold). Invoked from onUpgrade ONLY,
   /// never beforeOpen -- re-running on every open would resurrect
   /// user-deleted certs. Ids are deterministic (`buddyrolecert-<rowId>`):
@@ -704,18 +704,18 @@ Expected: FAIL (no v145 in ladder).
 (c) onUpgrade block, after the `if (from < 144)` block, following house style:
 
 ```dart
-        if (from < 145) {
+        if (from < 147) {
           // Fold buddy professional credentials into certifications and drop
           // buddy_roles (spec 2026-08-08). Conversion + drop in one step; the
-          // sqlite_master guard makes a fresh v145 db a no-op.
+          // sqlite_master guard makes a fresh v147 db a no-op.
           await _migrateBuddyRolesToCertifications();
         }
-        if (from < 145) await reportProgress();
+        if (from < 147) await reportProgress();
 ```
 
-(d) Remove the table: delete `class BuddyRoles` (lines 1753-1775), `BuddyRoles,` from `@DriftDatabase(tables: [...])` (:2881), `'buddy_roles'` from `_hlcTables` (:4263), `await m.createTable(buddyRoles);` in the v99 onUpgrade block (:7049), and `await createMigrator().createTable(buddyRoles);` in the beforeOpen backstop (:7613 — **mandatory**, or every open recreates the dropped table). Leave a one-line comment in the v99 block noting buddy_roles was created here historically and dropped in v145 (the version ladder must still make sense to readers).
+(d) Remove the table: delete `class BuddyRoles` (lines 1753-1775), `BuddyRoles,` from `@DriftDatabase(tables: [...])` (:2881), `'buddy_roles'` from `_hlcTables` (:4263), `await m.createTable(buddyRoles);` in the v99 onUpgrade block (:7049), and `await createMigrator().createTable(buddyRoles);` in the beforeOpen backstop (:7613 — **mandatory**, or every open recreates the dropped table). Leave a one-line comment in the v99 block noting buddy_roles was created here historically and dropped in v147 (the version ladder must still make sense to readers).
 
-**Amended during execution per review finding:** the plan text above said `_migrateBuddyRolesToCertifications` is invoked from `onUpgrade` ONLY, "never beforeOpen." A review finding overrode this: the helper's own `DROP TABLE` makes its `sqlite_master` guard a strict no-op once `buddy_roles` is gone, so (unlike #553's inline-cert copy) it CANNOT resurrect a user-deleted cert, and it must also run as a guarded `beforeOpen` backstop (v106-style) to protect a DB whose `user_version` advanced past 145 without running the v145 block. See the design spec's "Data migration" section for the amended rationale.
+**Amended during execution per review finding:** the plan text above said `_migrateBuddyRolesToCertifications` is invoked from `onUpgrade` ONLY, "never beforeOpen." A review finding overrode this: the helper's own `DROP TABLE` makes its `sqlite_master` guard a strict no-op once `buddy_roles` is gone, so (unlike #553's inline-cert copy) it CANNOT resurrect a user-deleted cert, and it must also run as a guarded `beforeOpen` backstop (v106-style) to protect a DB whose `user_version` advanced past 147 without running the v147 block. See the design spec's "Data migration" section for the amended rationale.
 
 (e) Regenerate Drift code:
 
@@ -734,7 +734,7 @@ Run: `dart run build_runner build --delete-conflicting-outputs`
 - `sync_parent_refs_completeness_test.dart:23`: delete `'buddy_roles': 'buddyRoles',`
 - `sync_serializer_upsert_test.dart:102`: delete the `(type: 'buddyRoles', ...)` tuple
 - `migration_v99_buddy_roles_test.dart`: rename to `migration_v99_instructor_id_test.dart` (`git mv`), keep only the `certifications.instructor_id` assertions (creation on upgrade + backstop heal), delete every buddy_roles table assertion; update the file's doc comment.
-- Add to `migration_v145_fold_buddy_roles_test.dart` (or a small sibling sync test) the spec-required legacy-payload test:
+- Add to `migration_v147_fold_buddy_roles_test.dart` (or a small sibling sync test) the spec-required legacy-payload test:
 
 ```dart
 test('legacy buddyRoles payload section is silently ignored', () {
@@ -758,7 +758,7 @@ Expected: PASS, including `sync_base_streaming_parity_test.dart` ("entityHasUpda
 - [ ] **Step 8: Commit**
 
 ```bash
-git add -A && git commit -m "Migrate buddy_roles into certifications and drop the table (v145)"
+git add -A && git commit -m "Migrate buddy_roles into certifications and drop the table (v147)"
 ```
 
 ---
@@ -826,7 +826,7 @@ Expected: all green. Known flaky suites (backup, media upload/store, recovery-co
 
 - [ ] **Step 4: Spec/plan sync check**
 
-Confirm the spec's v145 claim still matches `currentSchemaVersion`; update the spec if Task 7 renumbered.
+Confirm the spec's v147 claim still matches `currentSchemaVersion`; update the spec if Task 7 renumbered.
 
 - [ ] **Step 5: Commit any residue and stop**
 

@@ -5,11 +5,11 @@ import 'package:submersion/core/services/sync/sync_data_serializer.dart';
 
 void main() {
   test(
-    'v145 folds buddy_roles rows into certifications and drops the table',
+    'v147 folds buddy_roles rows into certifications and drops the table',
     () async {
       final nativeDb = NativeDatabase.memory(
         setup: (rawDb) {
-          rawDb.execute('PRAGMA user_version = 144');
+          rawDb.execute('PRAGMA user_version = 146');
           rawDb.execute('''
           CREATE TABLE buddies (
             id TEXT NOT NULL PRIMARY KEY, diver_id TEXT, name TEXT NOT NULL,
@@ -194,13 +194,13 @@ void main() {
     },
   );
 
-  test('v145 onUpgrade block is a no-op when buddy_roles never existed '
+  test('v147 onUpgrade block is a no-op when buddy_roles never existed '
       '(the sqlite_master guard returns early)', () async {
     final nativeDb = NativeDatabase.memory(
       setup: (rawDb) {
-        rawDb.execute('PRAGMA user_version = 144');
+        rawDb.execute('PRAGMA user_version = 146');
         // No buddy_roles table at all -- e.g. a DB that skipped straight
-        // from before v99 to v145 in one open, or already had it dropped
+        // from before v99 to v147 in one open, or already had it dropped
         // by a parallel-branch collision. The guard must return early
         // instead of failing on the missing table.
         rawDb.execute('''
@@ -223,7 +223,7 @@ void main() {
       },
     );
 
-    // Opening must not throw: the v145 onUpgrade block runs (from < 145)
+    // Opening must not throw: the v147 onUpgrade block runs (from < 147)
     // and its guard must return early against the missing table.
     final db = AppDatabase(nativeDb);
     addTearDown(db.close);
@@ -239,7 +239,7 @@ void main() {
   });
 
   test('beforeOpen backstop converts and drops buddy_roles when a '
-      'parallel-branch collision stranded a DB past v145 without running the '
+      'parallel-branch collision stranded a DB past v147 without running the '
       'onUpgrade block', () async {
     final nativeDb = NativeDatabase.memory(
       setup: (rawDb) {
@@ -305,9 +305,9 @@ void main() {
     expect(tables, isEmpty);
   });
 
-  test('version ladder includes 145', () {
-    expect(AppDatabase.currentSchemaVersion, greaterThanOrEqualTo(145));
-    expect(AppDatabase.migrationVersions, contains(145));
+  test('version ladder includes 147', () {
+    expect(AppDatabase.currentSchemaVersion, greaterThanOrEqualTo(147));
+    expect(AppDatabase.migrationVersions, contains(147));
   });
 
   test('legacy buddyRoles payload section is silently ignored', () {

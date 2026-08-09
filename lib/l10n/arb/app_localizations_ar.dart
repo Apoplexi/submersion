@@ -990,6 +990,17 @@ class AppLocalizationsAr extends AppLocalizations {
       'سيؤدي هذا إلى استبدال جميع البيانات الحالية ببيانات النسخة الاحتياطية. لا يمكن التراجع عن هذا الإجراء.';
 
   @override
+  String backup_restore_safetyReview_progress(int done, int total) {
+    return 'تم تحليل $done من $total غطسة';
+  }
+
+  @override
+  String get backup_restore_safetyReview_skip => 'تخطي';
+
+  @override
+  String get backup_restore_safetyReview_title => 'جارٍ تشغيل مراجعة السلامة';
+
+  @override
   String get backup_restoreComplete_continue => 'متابعة';
 
   @override
@@ -12721,6 +12732,23 @@ class AppLocalizationsAr extends AppLocalizations {
   String get safetyReview_restore => 'استعادة';
 
   @override
+  String get safetyReview_details => 'التفاصيل';
+
+  @override
+  String get safetyReview_clearHighlight => 'مسح التمييز';
+
+  @override
+  String safetyReview_findingGroupSemantics(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count ملاحظات سلامة',
+      one: 'ملاحظة سلامة واحدة',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get safetySettings_title => 'مراجعة السلامة';
 
   @override
@@ -12825,11 +12853,11 @@ class AppLocalizationsAr extends AppLocalizations {
       'رسم بياني لدورة المد والجزر والتوقيت';
 
   @override
-  String get diveDetailSection_reefHealth_name => 'صحة الشعاب المرجانية';
+  String get diveDetailSection_reefHealth_name => 'أحوال المياه';
 
   @override
   String get diveDetailSection_reefHealth_description =>
-      'الإجهاد الحراري لابيضاض المرجان في تاريخ الغوص';
+      'أحوال المياه عبر الأقمار الصناعية في تاريخ الغطسة';
 
   @override
   String get diveDetailSection_surfaceGps_name => 'GPS السطح';
@@ -16185,6 +16213,16 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String surfaceInterval_result_beyondHorizon(Object hours) {
+    return 'زمن الانتظار يتجاوز $hours ساعات التي يبحث فيها هذا المخطط. يستمر التخلص من النيتروجين، لذا ستكفي فترة سطح أطول.';
+  }
+
+  @override
+  String surfaceInterval_result_beyondHorizonShort(Object hours) {
+    return 'أكثر من $hours ساعات';
+  }
+
+  @override
   String get surfaceInterval_result_currentInterval => 'الفترة الحالية';
 
   @override
@@ -16208,6 +16246,15 @@ class AppLocalizationsAr extends AppLocalizations {
   String surfaceInterval_result_ndlMinutes(Object minutes) {
     return '$minutes دقيقة NDL';
   }
+
+  @override
+  String surfaceInterval_result_noIntervalHelps(Object minutes) {
+    return 'لا تكفي أي فترة سطح. أطول غطسة بدون توقف إلزامي على هذا العمق بهذا الخليط هي $minutes دقيقة. قلّل زمن الغطسة الثانية أو قلّل عمقها.';
+  }
+
+  @override
+  String get surfaceInterval_result_notAchievable =>
+      'غير قابل للتحقيق بأي فترة سطح';
 
   @override
   String get surfaceInterval_result_notYetSafe =>
@@ -16639,6 +16686,28 @@ class AppLocalizationsAr extends AppLocalizations {
   String tides_semantic_tideState(Object state) {
     return 'حالة المد والجزر: $state';
   }
+
+  @override
+  String tides_source_noaaStation(String name, String distance) {
+    return 'محطة NOAA: $name ($distance)';
+  }
+
+  @override
+  String get tides_source_modelEstimate => 'تقدير نموذج المحيط';
+
+  @override
+  String get tides_source_modelCaveat =>
+      'نموذج مبني على بيانات الأقمار الصناعية. قد تختلف الأوقات والارتفاعات قرب السواحل المعقدة.';
+
+  @override
+  String get tides_source_sheetTitle => 'مصدر بيانات المد والجزر';
+
+  @override
+  String get tides_source_datumMllw => 'الارتفاعات نسبة إلى MLLW (مرجع المحطة)';
+
+  @override
+  String get tides_source_datumMsl =>
+      'الارتفاعات نسبة إلى متوسط مستوى سطح البحر';
 
   @override
   String get tides_title => 'المد والجزر';
@@ -22641,13 +22710,13 @@ class AppLocalizationsAr extends AppLocalizations {
       'لا يمكن لهذا الجهاز ضغط الفيديو. يتم رفع الملفات الأصلية منه.';
 
   @override
-  String get reef_section_title => 'الشعاب المرجانية';
+  String get reef_section_title => 'النظام البيئي';
 
   @override
   String get reef_section_sourcesTooltip => 'مصادر البيانات';
 
   @override
-  String get reef_section_loadError => 'تعذر تحميل بيانات الشعاب الآن';
+  String get reef_section_loadError => 'تعذّر تحميل بيانات النظام البيئي الآن';
 
   @override
   String get reef_habitat_title => 'موئل الشعاب';
@@ -22667,13 +22736,24 @@ class AppLocalizationsAr extends AppLocalizations {
   String get reef_habitat_unavailable => 'تعذر التحقق من موئل الشعاب الآن';
 
   @override
-  String get reef_health_title => 'صحة الشعاب المرجانية';
+  String get water_conditions_title => 'أحوال المياه';
 
   @override
-  String get reef_health_unavailable => 'تعذر التحقق من صحة الشعاب الآن';
+  String get water_conditions_unavailable =>
+      'تعذّر التحقق من أحوال المياه الآن';
 
   @override
-  String get reef_health_noData => 'لا توجد بيانات عن صحة الشعاب لهذا الموقع';
+  String get water_conditions_noData =>
+      'لا توجد بيانات مياه من الأقمار الصناعية لهذا الموقع';
+
+  @override
+  String get water_conditions_freshwater =>
+      'درجة حرارة المياه عبر الأقمار الصناعية تغطي المحيطات فقط';
+
+  @override
+  String water_conditions_anomaly(String value) {
+    return 'شذوذ $value';
+  }
 
   @override
   String reef_health_degreeHeatingWeeks(String value) {

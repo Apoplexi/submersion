@@ -78,10 +78,12 @@ role selector in the buddy picker, and `unanimousBuddyRolesForDives`.
   qualifying `Certification` instead of a `BuddyRoleCredential`. Any buddy
   remains selectable, as today.
 
-## Data migration (schema v145, single step)
+## Data migration (schema v147, single step)
 
-Version claimed against main at `currentSchemaVersion = 144` on 2026-08-08;
-re-verify at implementation time — parallel branches may have taken 145.
+Originally claimed as v145 against main at 144 (2026-08-08); renumbered to
+v147 on 2026-08-09 when PR #908 reserved 145 and the v146 bottom-time
+recompute landed on main first — exactly the parallel-branch collision this
+paragraph anticipated.
 
 For each `buddy_roles` row, in `onUpgrade` AND as a guarded `beforeOpen`
 backstop (amended during execution per review finding — see below):
@@ -108,8 +110,8 @@ source data. `_migrateBuddyRolesToCertifications` has no such hazard — its
 own `DROP TABLE` makes the `sqlite_master` guard a strict no-op the instant
 `buddy_roles` is gone, so there is no source data left to resurrect from
 after the first run. The backstop exists purely to protect a database whose
-`user_version` advanced past 145 (parallel-branch schema-version collision)
-without ever executing the v145 `onUpgrade` block: without it, that database
+`user_version` advanced past 147 (parallel-branch schema-version collision)
+without ever executing the v147 `onUpgrade` block: without it, that database
 would carry an orphaned `buddy_roles` table that nothing else reads, and its
 credentials would silently vanish from the UI forever.
 
@@ -128,7 +130,7 @@ migration version tests.
 - Inbound legacy payloads: an old-schema peer can still publish `buddyRoles`
   entries; the upgraded device must skip unknown entity keys gracefully.
   Verify the serializer's default path does this; if it throws, add a skip.
-- Old backups: restoring a pre-v145 backup surfaces credentials as certs
+- Old backups: restoring a pre-v147 backup surfaces credentials as certs
   automatically — verified: backup restore swaps in the SQLite file and
   reopens through the migration ladder (`DatabaseService.restore` →
   `initialize`), so `onUpgrade` converts the rows. No serializer shim.
@@ -148,7 +150,7 @@ migration version tests.
 
 ## Error handling and testing
 
-- Migration test (v145 tripwire style): seed v144 with credential rows — each
+- Migration test (v147 tripwire style): seed v146 with credential rows — each
   role; with and without matching certs; with and without card numbers —
   upgrade, assert converted rows, dedupe behavior, cardNumber backfill, and
   table absence.

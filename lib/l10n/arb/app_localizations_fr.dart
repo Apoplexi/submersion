@@ -1004,6 +1004,18 @@ class AppLocalizationsFr extends AppLocalizations {
       'Cela remplacera TOUTES les données actuelles par les données de la sauvegarde. Cette action est irréversible.';
 
   @override
+  String backup_restore_safetyReview_progress(int done, int total) {
+    return '$done plongées sur $total analysées';
+  }
+
+  @override
+  String get backup_restore_safetyReview_skip => 'Ignorer';
+
+  @override
+  String get backup_restore_safetyReview_title =>
+      'Analyse de sécurité en cours';
+
+  @override
   String get backup_restoreComplete_continue => 'Continuer';
 
   @override
@@ -12993,6 +13005,23 @@ class AppLocalizationsFr extends AppLocalizations {
   String get safetyReview_restore => 'Restaurer';
 
   @override
+  String get safetyReview_details => 'Détails';
+
+  @override
+  String get safetyReview_clearHighlight => 'Effacer la surbrillance';
+
+  @override
+  String safetyReview_findingGroupSemantics(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count observations de sécurité',
+      one: '1 observation de sécurité',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get safetySettings_title => 'Bilan de sécurité';
 
   @override
@@ -13101,11 +13130,11 @@ class AppLocalizationsFr extends AppLocalizations {
       'Graphique du cycle de maree et horaires';
 
   @override
-  String get diveDetailSection_reefHealth_name => 'Santé du récif';
+  String get diveDetailSection_reefHealth_name => 'Conditions de l\'eau';
 
   @override
   String get diveDetailSection_reefHealth_description =>
-      'Stress thermique de blanchissement corallien à la date de la plongée';
+      'Conditions de l\'eau par satellite à la date de la plongée';
 
   @override
   String get diveDetailSection_surfaceGps_name => 'GPS de surface';
@@ -16560,6 +16589,16 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String surfaceInterval_result_beyondHorizon(Object hours) {
+    return 'L\'attente dépasse les $hours heures explorées par ce planificateur. La désaturation se poursuit, un intervalle de surface plus long suffira donc.';
+  }
+
+  @override
+  String surfaceInterval_result_beyondHorizonShort(Object hours) {
+    return 'Plus de $hours heures';
+  }
+
+  @override
   String get surfaceInterval_result_currentInterval => 'Intervalle actuel';
 
   @override
@@ -16585,6 +16624,15 @@ class AppLocalizationsFr extends AppLocalizations {
   String surfaceInterval_result_ndlMinutes(Object minutes) {
     return '$minutes min DTR';
   }
+
+  @override
+  String surfaceInterval_result_noIntervalHelps(Object minutes) {
+    return 'Aucun intervalle de surface ne suffit. La plongée sans palier la plus longue à cette profondeur avec ce mélange est de $minutes min. Raccourcissez la deuxième plongée ou réduisez sa profondeur.';
+  }
+
+  @override
+  String get surfaceInterval_result_notAchievable =>
+      'Impossible quel que soit l\'intervalle de surface';
 
   @override
   String get surfaceInterval_result_notYetSafe =>
@@ -17018,6 +17066,29 @@ class AppLocalizationsFr extends AppLocalizations {
   String tides_semantic_tideState(Object state) {
     return 'État de la marée : $state';
   }
+
+  @override
+  String tides_source_noaaStation(String name, String distance) {
+    return 'Station NOAA : $name ($distance)';
+  }
+
+  @override
+  String get tides_source_modelEstimate => 'Estimation par modèle océanique';
+
+  @override
+  String get tides_source_modelCaveat =>
+      'Modélisé à partir de données satellitaires. Les heures et hauteurs peuvent différer près des côtes complexes.';
+
+  @override
+  String get tides_source_sheetTitle => 'Source des données de marée';
+
+  @override
+  String get tides_source_datumMllw =>
+      'Hauteurs par rapport au MLLW (datum de la station)';
+
+  @override
+  String get tides_source_datumMsl =>
+      'Hauteurs par rapport au niveau moyen de la mer';
 
   @override
   String get tides_title => 'Marées';
@@ -23134,14 +23205,14 @@ class AppLocalizationsFr extends AppLocalizations {
       'Cet appareil ne peut pas compresser la vidéo. Les originaux sont téléversés depuis celui-ci.';
 
   @override
-  String get reef_section_title => 'Récif';
+  String get reef_section_title => 'Écosystème';
 
   @override
   String get reef_section_sourcesTooltip => 'Sources de données';
 
   @override
   String get reef_section_loadError =>
-      'Impossible de charger les données du récif pour le moment';
+      'Impossible de charger les données de l\'écosystème pour le moment';
 
   @override
   String get reef_habitat_title => 'Habitat du récif';
@@ -23163,15 +23234,24 @@ class AppLocalizationsFr extends AppLocalizations {
       'Impossible de vérifier l\'habitat du récif pour le moment';
 
   @override
-  String get reef_health_title => 'Santé du récif';
+  String get water_conditions_title => 'Conditions de l\'eau';
 
   @override
-  String get reef_health_unavailable =>
-      'Impossible de vérifier la santé du récif pour le moment';
+  String get water_conditions_unavailable =>
+      'Impossible de vérifier les conditions de l\'eau pour le moment';
 
   @override
-  String get reef_health_noData =>
-      'Aucune donnée de santé du récif pour cet endroit';
+  String get water_conditions_noData =>
+      'Aucune donnée satellite sur l\'eau pour cet emplacement';
+
+  @override
+  String get water_conditions_freshwater =>
+      'La température de l\'eau par satellite ne couvre que les océans';
+
+  @override
+  String water_conditions_anomaly(String value) {
+    return 'Anomalie $value';
+  }
 
   @override
   String reef_health_degreeHeatingWeeks(String value) {
