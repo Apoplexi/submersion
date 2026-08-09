@@ -8,6 +8,7 @@ import 'package:submersion/core/database/local_cache_database.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/core/services/local_cache_database_service.dart';
 import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
+import 'package:submersion/features/reef/domain/entities/reef_data_status.dart';
 import 'package:submersion/features/reef/presentation/providers/reef_providers.dart';
 
 void main() {
@@ -63,8 +64,38 @@ void main() {
     addTearDown(container.dispose);
 
     final snapshot = await container.read(
-      reefSnapshotProvider(const GeoPoint(12.16, -68.28)).future,
+      reefSnapshotProvider(
+        const ReefSnapshotRequest(location: GeoPoint(12.16, -68.28)),
+      ).future,
     );
     expect(snapshot.habitat, isNotNull);
+  });
+
+  test('ReefSnapshotRequest equality covers the fetchHealth flag', () {
+    const location = GeoPoint(12.16, -68.28);
+    const a = ReefSnapshotRequest(location: location);
+    const b = ReefSnapshotRequest(location: location, fetchHealth: true);
+    const fresh = ReefSnapshotRequest(location: location, fetchHealth: false);
+
+    expect(a, b);
+    expect(a == fresh, isFalse);
+  });
+
+  test('reefHabitatProvider resolves through the overridden client', () async {
+    final container = ProviderContainer(
+      overrides: [
+        reefHttpClientProvider.overrideWithValue(
+          MockClient(
+            (_) async => http.Response(jsonEncode({'features': []}), 200),
+          ),
+        ),
+      ],
+    );
+    addTearDown(container.dispose);
+
+    final part = await container.read(
+      reefHabitatProvider(const GeoPoint(12.16, -68.28)).future,
+    );
+    expect(part.status, ReefDataStatus.empty);
   });
 }

@@ -21,7 +21,9 @@ class ReefSection extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final snapshotAsync = ref.watch(reefSnapshotProvider(location));
+    final snapshotAsync = ref.watch(
+      reefSnapshotProvider(ReefSnapshotRequest(location: location)),
+    );
 
     return Card(
       child: Padding(

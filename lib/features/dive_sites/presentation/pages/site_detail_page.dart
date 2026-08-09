@@ -205,7 +205,11 @@ class _SiteDetailContentState extends ConsumerState<_SiteDetailContent> {
           ],
 
           // Marine Life Section
-          SiteMarineLifeSection(siteId: site.id, location: site.location),
+          SiteMarineLifeSection(
+            siteId: site.id,
+            location: site.location,
+            waterType: site.waterType,
+          ),
           const SizedBox(height: 16),
 
           // Difficulty Section
