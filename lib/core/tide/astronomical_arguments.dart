@@ -138,7 +138,8 @@ class AstronomicalArguments {
         doodson[2] * h +
         doodson[3] * p +
         doodson[4] * (-n) + // Note: Doodson uses N' = -N
-        doodson[5] * ps;
+        doodson[5] * ps +
+        (doodsonPhaseConstants[constituent] ?? 0.0);
 
     // Add nodal correction u
     final u = nodalAngle(constituent);
