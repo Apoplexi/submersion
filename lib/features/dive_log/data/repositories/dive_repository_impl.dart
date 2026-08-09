@@ -3471,7 +3471,9 @@ class DiveRepository {
           computerId: t.computerId,
         );
       }).toList(),
-      profile: profileRows.map(_profilePointFromRow).toList(),
+      profile: _dropDuplicateSamples(
+        profileRows,
+      ).map(_profilePointFromRow).toList(),
       equipment: hydratedEquipmentItems,
       weights: weights,
       isFavorite: row.isFavorite,
@@ -4384,7 +4386,27 @@ class DiveRepository {
               ..where((t) => t.diveId.equals(diveId))
               ..orderBy([(t) => OrderingTerm.asc(t.timestamp)]))
             .get();
-    return rows.map(_profilePointFromRow).toList();
+    return _dropDuplicateSamples(rows).map(_profilePointFromRow).toList();
+  }
+
+  /// Drops rows that repeat a (timestamp, depth) already seen.
+  ///
+  /// A repeated download or import can store two identical copies of every
+  /// sample. The duplicates carry no information but do change the analysis:
+  /// half the sample pairs then share a timestamp and contribute a zero rate,
+  /// which halves every smoothed ascent rate and hides real violations. Rows
+  /// that share a timestamp but disagree on depth are two data sources rather
+  /// than duplicates, and are left for source attribution to resolve.
+  ///
+  /// Applied to every read that builds `Dive.profile`. Analysis curves are
+  /// index-aligned against that list by their consumers, so [getDiveById] and
+  /// [getMergedProfile] must always agree on its length.
+  static List<DiveProfile> _dropDuplicateSamples(List<DiveProfile> rows) {
+    final seen = <(int, double)>{};
+    return [
+      for (final row in rows)
+        if (seen.add((row.timestamp, row.depth))) row,
+    ];
   }
 
   /// Lean hydration for decompression/exposure analysis: the dive row's

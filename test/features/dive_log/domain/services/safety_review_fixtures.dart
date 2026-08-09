@@ -44,6 +44,29 @@ ProfileAnalysis analyzeFixture({
   return (depths: depths, timestamps: timestamps);
 }
 
+/// Like [buildProfile] but samples every 2 s, matching the rate most dive
+/// computers record at. The smoothing window the ascent-rate calculator
+/// derives from the sampling interval is much shorter at 2 s than at 10 s,
+/// so brief excursions only survive smoothing on a finely sampled profile.
+({List<double> depths, List<int> timestamps}) buildFineProfile(
+  List<(double, int)> segments,
+) {
+  final depths = <double>[0];
+  final timestamps = <int>[0];
+  var t = 0;
+  var d = 0.0;
+  for (final (target, duration) in segments) {
+    final steps = duration ~/ 2;
+    for (var i = 1; i <= steps; i++) {
+      t += 2;
+      depths.add(d + (target - d) * i / steps);
+      timestamps.add(t);
+    }
+    d = target;
+  }
+  return (depths: depths, timestamps: timestamps);
+}
+
 /// 18 m for 20 min, slow ascent with a 3-min stop at 5 m. No findings expected.
 ({List<double> depths, List<int> timestamps}) cleanDiveProfile() =>
     buildProfile([
@@ -82,17 +105,20 @@ ProfileAnalysis analyzeFixture({
       (0, 140), // ~7.7 m/min direct ascent
     ]);
 
-/// 20 m bottom with three 6 m up-and-back excursions (20 -> 14 -> 20),
-/// then a normal slow ascent with safety stop.
+/// 20 m bottom with four 8 m up-and-back excursions (20 -> 12 -> 20),
+/// then a normal slow ascent with safety stop. Four teeth of this amplitude
+/// clear the rule's bar; three 6 m teeth deliberately do not.
 ({List<double> depths, List<int> timestamps}) sawtoothProfile() =>
     buildProfile([
       (20, 120),
       (20, 300),
-      (14, 90), (20, 90), // tooth 1
+      (12, 120), (20, 120), // tooth 1
       (20, 120),
-      (14, 90), (20, 90), // tooth 2
+      (12, 120), (20, 120), // tooth 2
       (20, 120),
-      (14, 90), (20, 90), // tooth 3
+      (12, 120), (20, 120), // tooth 3
+      (20, 120),
+      (12, 120), (20, 120), // tooth 4
       (20, 120),
       (5, 190), // slow ascent
       (5, 180), // safety stop
