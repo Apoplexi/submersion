@@ -210,7 +210,13 @@ static void abandon_credit_flow_control(BleIoStream* stream,
                                         const gchar* reason) {
     g_warning("BleIoStream: Terminal I/O: %s; "
               "continuing without credit flow control", reason);
-    g_clear_pointer(&stream->credits_write_path, g_free);
+
+    // Closing the balance is what stops replenish_credits, and it is done
+    // under the balance mutex. credits_write_path is deliberately NOT freed
+    // here: this runs on the download thread while replenish_credits may be
+    // reading that pointer on the thread dispatching PropertiesChanged, so
+    // freeing it would be a use-after-free. It costs one short string to keep
+    // it until ble_io_stream_free, which runs after everything has stopped.
     credit_balance_set(stream->credits, 0, FALSE);
 
     // Unsubscribe rather than merely ignoring the credit indications, so the
@@ -277,10 +283,13 @@ static void on_credit_grant_complete(GObject* source, GAsyncResult* result,
 }
 
 static void replenish_credits(BleIoStream* stream) {
-    if (!stream->credits_write_path) return;
-
     struct BleCreditBalance* balance = stream->credits;
 
+    // The mutex-guarded `open` flag is the only gate, checked before
+    // credits_write_path is touched at all. Testing the pointer first would
+    // race the download thread, which is why that pointer is never freed
+    // while a connection is live -- see abandon_credit_flow_control.
+    //
     // Take the decrement, the check and the claim as one unit, so two packets
     // arriving together cannot both start a grant.
     g_mutex_lock(&balance->mutex);
