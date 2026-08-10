@@ -58,15 +58,34 @@ void main() {
 
   /// Polls the provider until [settled] holds, so the media-table tick ->
   /// invalidate -> rebuild round trip has a chance to run.
+  ///
+  /// The budget is derived from [MediaRepository.changeTickDebounce] rather
+  /// than hard-coded, so it stays proportionate if that window is ever
+  /// widened. Never settling fails here, naming the round trip that stalled,
+  /// instead of surfacing downstream as a bare value mismatch that reads like
+  /// a wrong query.
   Future<List<MediaItem>> pollPhotos(
     ProviderContainer container,
-    bool Function(List<MediaItem> photos) settled,
-  ) async {
-    var photos = const <MediaItem>[];
-    for (var i = 0; i < 50; i++) {
-      await Future<void>.delayed(const Duration(milliseconds: 20));
+    bool Function(List<MediaItem> photos) settled, {
+    required String awaiting,
+  }) async {
+    const interval = Duration(milliseconds: 20);
+    final budget = MediaRepository.changeTickDebounce * 20;
+    final deadline = DateTime.now().add(budget);
+
+    var photos = await container.read(recentPhotosProvider.future);
+    while (!settled(photos) && DateTime.now().isBefore(deadline)) {
+      await Future<void>.delayed(interval);
       photos = await container.read(recentPhotosProvider.future);
-      if (settled(photos)) break;
+    }
+
+    if (!settled(photos)) {
+      fail(
+        'Timed out after ${budget.inMilliseconds}ms waiting for $awaiting. '
+        'The media-table tick -> invalidateSelfWhen -> rebuild round trip '
+        'never settled; recentPhotosProvider still holds '
+        '${photos.map((p) => p.filePath).toList()}.',
+      );
     }
     return photos;
   }
@@ -110,6 +129,7 @@ void main() {
     final photos = await pollPhotos(
       container,
       (p) => !p.any((item) => item.id == doomed.id),
+      awaiting: 'the deleted photo to leave the ribbon',
     );
 
     expect(
@@ -154,6 +174,7 @@ void main() {
       final photos = await pollPhotos(
         container,
         (p) => p.any((item) => item.id == imported.id),
+        awaiting: 'the newly added photo to appear on the ribbon',
       );
 
       expect(photos.map((p) => p.id).toList(), [imported.id, existing.id]);
