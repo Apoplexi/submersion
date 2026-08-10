@@ -83,9 +83,14 @@ void main() {
 
     test('reads the units flag from opening record 0', () {
       final out = ShearwaterRawDecompressor.decompress(_hex(_compressedHex))!;
-      final open0 = out.indexOf(0x10);
-      expect(open0 % 32, 0);
-      expect(out[open0 + 8], 1, reason: '1 = imperial');
+      // Scan record boundaries: 0x10 is a record *type*, and the same byte
+      // value occurs freely inside sample payloads.
+      final open0 = [
+        for (var i = 0; i < out.length; i += 32)
+          if (out[i] == 0x10) i,
+      ];
+      expect(open0, hasLength(1));
+      expect(out[open0.single + 8], 1, reason: '1 = imperial');
     });
 
     test('rejects data whose bit count is not a multiple of 9', () {

@@ -143,6 +143,42 @@ void main() {
       expect(record['serviceDate'], isA<DateTime>());
     });
 
+    test('a service record with no date is dropped, not carried', () async {
+      final logbook = await MacDiveDbReader.readAll(bytes);
+      final payload = await MacDiveDiveMapper.toPayload(
+        MacDiveRawLogbook(
+          dives: logbook.dives,
+          sitesByPk: logbook.sitesByPk,
+          buddiesByPk: logbook.buddiesByPk,
+          tagsByPk: logbook.tagsByPk,
+          gearByPk: logbook.gearByPk,
+          tanksByPk: logbook.tanksByPk,
+          gasesByPk: logbook.gasesByPk,
+          tankAndGases: logbook.tankAndGases,
+          crittersByPk: logbook.crittersByPk,
+          certifications: logbook.certifications,
+          serviceRecords: [
+            MacDiveRawServiceRecord(
+              pk: 99,
+              uuid: 'no-date',
+              gearFk: logbook.gearByPk.keys.first,
+              servicedBy: 'Someone',
+            ),
+          ],
+          events: logbook.events,
+          diveToBuddyPks: logbook.diveToBuddyPks,
+          diveToTagPks: logbook.diveToTagPks,
+          diveToGearPks: logbook.diveToGearPks,
+          diveToCritterPks: logbook.diveToCritterPks,
+          unitsPreference: logbook.unitsPreference,
+        ),
+      );
+
+      // The importer requires a service date, so emitting a dateless record
+      // would only inflate the count shown in the review step.
+      expect(payload.entitiesOf(ImportEntityType.serviceRecords), isEmpty);
+    });
+
     test('a multi-diver library is flagged and tagged by diver', () async {
       final payload = await MacDiveDiveMapper.toPayload(_multiDiverLogbook());
 

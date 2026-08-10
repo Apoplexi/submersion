@@ -404,10 +404,15 @@ class MacDiveDiveMapper {
       if (gear == null) continue;
       final equipmentRef = _gearUddfId(gear);
       if (equipmentRef == null) continue;
+      // A record with no date cannot be persisted - the importer requires
+      // one - so drop it here rather than letting it inflate the counts the
+      // review step shows the diver.
+      final serviceDate = r.serviceDate;
+      if (serviceDate == null) continue;
       out.add({
         'equipmentRef': equipmentRef,
         'uddfId': r.uuid.isNotEmpty ? r.uuid : '${equipmentRef}_${r.pk}',
-        if (r.serviceDate != null) 'serviceDate': r.serviceDate,
+        'serviceDate': serviceDate,
         if (r.servicedBy != null) 'provider': r.servicedBy,
         if (r.notes != null) 'notes': r.notes,
         // MacDive does not categorise service events.

@@ -276,7 +276,6 @@ class MacDiveXmlParser implements ImportParser {
     if (d.tempLowCelsius != null) map['waterTemp'] = d.tempLowCelsius;
     if (d.airTempCelsius != null) map['airTemp'] = d.airTempCelsius;
     if (d.cns != null) map['cnsEnd'] = d.cns;
-    //  is the key UddfEntityImporter reads.
     // `decoAlgorithm` is the key UddfEntityImporter reads; emitting only
     // `decoModel` silently dropped MacDive's deco model on every import.
     if (d.decoModel != null) map['decoAlgorithm'] = d.decoModel;
