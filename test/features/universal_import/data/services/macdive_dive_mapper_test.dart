@@ -1,7 +1,9 @@
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:libdivecomputer_plugin/libdivecomputer_plugin.dart' as pigeon;
 
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
 import 'package:submersion/features/universal_import/data/models/import_enums.dart';
@@ -28,7 +30,7 @@ void main() {
   group('MacDiveDiveMapper', () {
     test('produces 3 dives, 2 sites, 2 buddies, 2 tags, 1 gear', () async {
       final logbook = await MacDiveDbReader.readAll(bytes);
-      final payload = MacDiveDiveMapper.toPayload(logbook);
+      final payload = await MacDiveDiveMapper.toPayload(logbook);
       expect(payload.entitiesOf(ImportEntityType.dives).length, 3);
       expect(payload.entitiesOf(ImportEntityType.sites).length, 2);
       expect(payload.entitiesOf(ImportEntityType.buddies).length, 2);
@@ -38,7 +40,7 @@ void main() {
 
     test('dive sourceUuid preserved', () async {
       final logbook = await MacDiveDbReader.readAll(bytes);
-      final payload = MacDiveDiveMapper.toPayload(logbook);
+      final payload = await MacDiveDiveMapper.toPayload(logbook);
       final dives = payload.entitiesOf(ImportEntityType.dives);
       final uuids = dives.map((d) => d['sourceUuid']).toSet();
       expect(uuids, {'dive-uuid-1', 'dive-uuid-2', 'dive-uuid-3'});
@@ -48,7 +50,7 @@ void main() {
       'dive 1 has tagRefs [Reef, Photography] and buddies [Alice, Bob]',
       () async {
         final logbook = await MacDiveDbReader.readAll(bytes);
-        final payload = MacDiveDiveMapper.toPayload(logbook);
+        final payload = await MacDiveDiveMapper.toPayload(logbook);
         final dive1 = payload
             .entitiesOf(ImportEntityType.dives)
             .firstWhere((d) => d['sourceUuid'] == 'dive-uuid-1');
@@ -59,7 +61,7 @@ void main() {
 
     test('dive 3 has no buddies or tags', () async {
       final logbook = await MacDiveDbReader.readAll(bytes);
-      final payload = MacDiveDiveMapper.toPayload(logbook);
+      final payload = await MacDiveDiveMapper.toPayload(logbook);
       final dive3 = payload
           .entitiesOf(ImportEntityType.dives)
           .firstWhere((d) => d['sourceUuid'] == 'dive-uuid-3');
@@ -69,7 +71,7 @@ void main() {
 
     test('dive 1 tanks include gas mix and pressures', () async {
       final logbook = await MacDiveDbReader.readAll(bytes);
-      final payload = MacDiveDiveMapper.toPayload(logbook);
+      final payload = await MacDiveDiveMapper.toPayload(logbook);
       final dive1 = payload
           .entitiesOf(ImportEntityType.dives)
           .firstWhere((d) => d['sourceUuid'] == 'dive-uuid-1');
@@ -108,7 +110,7 @@ void main() {
 
     test('sites: saltwater/freshwater mapped to enum names', () async {
       final logbook = await MacDiveDbReader.readAll(bytes);
-      final payload = MacDiveDiveMapper.toPayload(logbook);
+      final payload = await MacDiveDiveMapper.toPayload(logbook);
       final sites = payload.entitiesOf(ImportEntityType.sites);
       final salt = sites.firstWhere((s) => s['name'] == 'Test Reef');
       final fresh = sites.firstWhere((s) => s['name'] == 'Freshwater Springs');
@@ -122,7 +124,7 @@ void main() {
 
     test('sites: lat=0 lon=0 filtered to null', () async {
       final logbook = await MacDiveDbReader.readAll(bytes);
-      final payload = MacDiveDiveMapper.toPayload(logbook);
+      final payload = await MacDiveDiveMapper.toPayload(logbook);
       final fresh = payload
           .entitiesOf(ImportEntityType.sites)
           .firstWhere((s) => s['name'] == 'Freshwater Springs');
@@ -130,76 +132,132 @@ void main() {
       expect(fresh.containsKey('longitude'), isFalse);
     });
 
-    test(
-      'no profile key emitted (MacDive SQLite profiles unsupported)',
-      () async {
-        final logbook = await MacDiveDbReader.readAll(bytes);
-        final payload = MacDiveDiveMapper.toPayload(logbook);
-        // ZSAMPLES is AES-encrypted and ZRAWDATA is a MacDive-specific
-        // wrapper libdivecomputer can't parse, so the mapper does not emit
-        // profile samples. Matches macdive_xml_parser.dart's convention of
-        // omitting the key entirely when no samples are available.
-        for (final dive in payload.entitiesOf(ImportEntityType.dives)) {
-          expect(dive.containsKey('profile'), isFalse);
-        }
-      },
-    );
+    test('no profile key when a dive has no ZRAWDATA', () async {
+      final logbook = await MacDiveDbReader.readAll(bytes);
+      final payload = await MacDiveDiveMapper.toPayload(logbook);
+      // The synthetic fixture carries no raw blobs, so the key stays absent -
+      // matching macdive_xml_parser.dart's convention of omitting it when no
+      // samples are available.
+      for (final dive in payload.entitiesOf(ImportEntityType.dives)) {
+        expect(dive.containsKey('profile'), isFalse);
+      }
+      expect(payload.warnings, isEmpty);
+    });
+
+    test('ZRAWDATA is decompressed and parsed into profile samples', () async {
+      final calls = <(String, String, int)>[];
+      final payload = await MacDiveDiveMapper.toPayload(
+        _rawDataLogbook(),
+        parseRaw: (vendor, product, model, data) async {
+          calls.add((vendor, product, data.length));
+          return _parsedDive(
+            samples: [
+              pigeon.ProfileSample(
+                timeSeconds: 0,
+                depthMeters: 0.0,
+                temperatureCelsius: 25.0,
+                pressureBar: 200.0,
+              ),
+              pigeon.ProfileSample(
+                timeSeconds: 10,
+                depthMeters: 5.5,
+                temperatureCelsius: 24.0,
+                pressureBar: 198.0,
+              ),
+            ],
+          );
+        },
+      );
+
+      // Both Shearwater dives reached the parser; the manual dive did not.
+      expect(calls, hasLength(2));
+      expect(calls.first.$1, 'Shearwater');
+      expect(calls.first.$2, 'Teric');
+      // The raw blob was decompressed before parsing, not passed through.
+      expect(calls.first.$3, isNot(_compressedFixture.length));
+
+      final dives = payload.entitiesOf(ImportEntityType.dives);
+      final withProfile = dives.where((d) => d.containsKey('profile')).toList();
+      expect(withProfile, hasLength(2));
+
+      final profile = withProfile.first['profile'] as List;
+      expect(profile, hasLength(2));
+      expect(profile[1]['depth'], 5.5);
+      expect(profile[1]['temperature'], 24.0);
+      expect(profile[1]['allTankPressures'], [
+        {'pressure': 198.0, 'tankIndex': 0},
+      ]);
+      expect(payload.warnings, isEmpty);
+    });
 
     test(
-      'ZRAWDATA present → single aggregated warning pointing at XML export',
-      () {
-        final rawData = Uint8List.fromList(List.filled(32, 0x41));
-        final logbook = MacDiveRawLogbook(
-          dives: [
-            MacDiveRawDive(
-              pk: 1,
-              uuid: 'dive-1',
-              computer: 'Shearwater Teric',
-              rawDataBlob: rawData,
-            ),
-            MacDiveRawDive(
-              pk: 2,
-              uuid: 'dive-2',
-              computer: 'Shearwater Teric',
-              rawDataBlob: rawData,
-            ),
-            const MacDiveRawDive(
-              pk: 3,
-              uuid: 'dive-3',
-              computer: 'Manual',
-              rawDataBlob: null,
-            ),
-          ],
-          sitesByPk: const {},
-          buddiesByPk: const {},
-          tagsByPk: const {},
-          gearByPk: const {},
-          tanksByPk: const {},
-          gasesByPk: const {},
-          tankAndGases: const [],
-          crittersByPk: const {},
-          certifications: const [],
-          serviceRecords: const [],
-          events: const [],
-          diveToBuddyPks: const {},
-          diveToTagPks: const {},
-          diveToGearPks: const {},
-          diveToCritterPks: const {},
-          unitsPreference: 'Metric',
+      'unrecognised computer counts toward one aggregated warning',
+      () async {
+        final payload = await MacDiveDiveMapper.toPayload(
+          _rawDataLogbook(computer: 'Oceanic Matrix Master'),
+          parseRaw: (v, p, m, d) async =>
+              fail('parser must not be reached for an unknown model'),
         );
 
-        final payload = MacDiveDiveMapper.toPayload(logbook);
         expect(payload.warnings, hasLength(1));
         final w = payload.warnings.single;
         expect(w.severity, ImportWarningSeverity.info);
         expect(w.entityType, ImportEntityType.dives);
-        // Counts only the dives with non-empty ZRAWDATA (2 of 3).
         expect(w.message, contains('2 dive'));
         expect(w.message.toLowerCase(), contains('xml'));
       },
     );
 
-    test('no warning when logbook has no ZRAWDATA', () {
+    test('missing platform channel warns once, not once per dive', () async {
+      final payload = await MacDiveDiveMapper.toPayload(
+        _rawDataLogbook(),
+        parseRaw: (v, p, m, d) async =>
+            throw MissingPluginException('no channel'),
+      );
+
+      expect(payload.warnings, hasLength(1));
+      expect(payload.warnings.single.message, contains('this platform'));
+    });
+
+    test(
+      'ZSAMPLES without ZRAWDATA warns about the unreadable format',
+      () async {
+        final payload = await MacDiveDiveMapper.toPayload(
+          MacDiveRawLogbook(
+            dives: [
+              MacDiveRawDive(
+                pk: 1,
+                uuid: 'dive-1',
+                computer: 'Oceanic Matrix Master',
+                samplesBlob: Uint8List.fromList(List.filled(64, 0x42)),
+              ),
+            ],
+            sitesByPk: const {},
+            buddiesByPk: const {},
+            tagsByPk: const {},
+            gearByPk: const {},
+            tanksByPk: const {},
+            gasesByPk: const {},
+            tankAndGases: const [],
+            crittersByPk: const {},
+            certifications: const [],
+            serviceRecords: const [],
+            events: const [],
+            diveToBuddyPks: const {},
+            diveToTagPks: const {},
+            diveToGearPks: const {},
+            diveToCritterPks: const {},
+            unitsPreference: 'Metric',
+          ),
+        );
+
+        expect(payload.warnings, hasLength(1));
+        expect(payload.warnings.single.message, contains('1 dive'));
+        expect(payload.warnings.single.message, contains('cannot read'));
+      },
+    );
+
+    test('no warning when logbook has no ZRAWDATA', () async {
       const logbook = MacDiveRawLogbook(
         dives: [
           MacDiveRawDive(
@@ -226,24 +284,100 @@ void main() {
         diveToCritterPks: {},
         unitsPreference: 'Metric',
       );
-      final payload = MacDiveDiveMapper.toPayload(logbook);
+      final payload = await MacDiveDiveMapper.toPayload(logbook);
       expect(payload.warnings, isEmpty);
     });
 
     test('metadata includes source identifier and dive count', () async {
       final logbook = await MacDiveDbReader.readAll(bytes);
-      final payload = MacDiveDiveMapper.toPayload(logbook);
+      final payload = await MacDiveDiveMapper.toPayload(logbook);
       expect(payload.metadata['source'], 'macdive_sqlite');
       expect(payload.metadata['diveCount'], 3);
     });
 
     test('site entity carries sourceUuid from ZDIVESITE.ZUUID', () async {
       final logbook = await MacDiveDbReader.readAll(bytes);
-      final payload = MacDiveDiveMapper.toPayload(logbook);
+      final payload = await MacDiveDiveMapper.toPayload(logbook);
       final salt = payload
           .entitiesOf(ImportEntityType.sites)
           .firstWhere((s) => s['name'] == 'Test Reef');
       expect(salt['sourceUuid'], 'site-uuid-1');
     });
   });
+}
+
+/// A Shearwater-compressed log, byte-identical to the fixture in
+/// shearwater_raw_decompressor_test.dart, so this test exercises the real
+/// decompression path rather than a stub.
+final _compressedFixture = _hex(
+  '8801e021780c040d010bc0e061e80c043d078387a03010f4'
+  '520a0ca70360bdc02660351401c076a0b8183ac404f502e0'
+  '20e9d80e079f05c1c1dff02438352501c0f280b8383acc04'
+  'f702e020e9c80e03ba05c0c1d14026583301f600a420da70'
+  '3609ec01406021e81c0c3d018087a0f070f406021eed4143'
+  'c00000000000',
+);
+
+Uint8List _hex(String s) {
+  final out = Uint8List(s.length ~/ 2);
+  for (var i = 0; i < out.length; i++) {
+    out[i] = int.parse(s.substring(i * 2, i * 2 + 2), radix: 16);
+  }
+  return out;
+}
+
+/// Two dives carrying a real compressed blob plus one manual dive with none.
+MacDiveRawLogbook _rawDataLogbook({String computer = 'Shearwater Teric'}) {
+  return MacDiveRawLogbook(
+    dives: [
+      MacDiveRawDive(
+        pk: 1,
+        uuid: 'dive-1',
+        computer: computer,
+        rawDataBlob: _compressedFixture,
+      ),
+      MacDiveRawDive(
+        pk: 2,
+        uuid: 'dive-2',
+        computer: computer,
+        rawDataBlob: _compressedFixture,
+      ),
+      const MacDiveRawDive(pk: 3, uuid: 'dive-3', computer: 'Manual'),
+    ],
+    sitesByPk: const {},
+    buddiesByPk: const {},
+    tagsByPk: const {},
+    gearByPk: const {},
+    tanksByPk: const {},
+    gasesByPk: const {},
+    tankAndGases: const [],
+    crittersByPk: const {},
+    certifications: const [],
+    serviceRecords: const [],
+    events: const [],
+    diveToBuddyPks: const {},
+    diveToTagPks: const {},
+    diveToGearPks: const {},
+    diveToCritterPks: const {},
+    unitsPreference: 'Metric',
+  );
+}
+
+pigeon.ParsedDive _parsedDive({required List<pigeon.ProfileSample> samples}) {
+  return pigeon.ParsedDive(
+    fingerprint: 'fp',
+    dateTimeYear: 2026,
+    dateTimeMonth: 3,
+    dateTimeDay: 11,
+    dateTimeHour: 14,
+    dateTimeMinute: 9,
+    dateTimeSecond: 18,
+    maxDepthMeters: 25.4,
+    avgDepthMeters: 17.6,
+    durationSeconds: 3100,
+    samples: samples,
+    tanks: [],
+    gasMixes: [],
+    events: [],
+  );
 }

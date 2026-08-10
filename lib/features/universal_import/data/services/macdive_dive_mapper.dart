@@ -1,3 +1,6 @@
+import 'package:flutter/services.dart';
+import 'package:libdivecomputer_plugin/libdivecomputer_plugin.dart' as pigeon;
+
 import 'package:submersion/features/dive_log/domain/entities/dive.dart'
     show GasMix;
 import 'package:submersion/features/universal_import/data/models/import_enums.dart';
@@ -8,6 +11,19 @@ import 'package:submersion/features/universal_import/data/services/macdive_unit_
 import 'package:submersion/features/universal_import/data/services/macdive_value_mapper.dart';
 import 'package:submersion/features/universal_import/data/services/macdive_xml_models.dart'
     show MacDiveUnitSystem;
+import 'package:submersion/features/universal_import/data/services/parsed_dive_profile_mapper.dart';
+import 'package:submersion/features/universal_import/data/services/shearwater_filename_parser.dart';
+import 'package:submersion/features/universal_import/data/services/shearwater_raw_decompressor.dart';
+
+/// Signature of the native raw-parse call, injectable so tests can exercise
+/// the decode path without a platform channel.
+typedef MacDiveRawParseFn =
+    Future<pigeon.ParsedDive> Function(
+      String vendor,
+      String product,
+      int model,
+      Uint8List data,
+    );
 
 /// Maps a [MacDiveRawLogbook] (raw SQLite rows read by [MacDiveDbReader])
 /// into a unified [ImportPayload] the rest of the import pipeline consumes
@@ -15,12 +31,17 @@ import 'package:submersion/features/universal_import/data/services/macdive_xml_m
 /// `MacDiveXmlParser` so the downstream `UddfEntityImporter` processes
 /// both sources through the same code path.
 ///
-/// Profile samples are NOT decoded from the SQLite file. `ZSAMPLES` is
-/// AES-encrypted with a per-dive key; `ZRAWDATA` turned out to be a
-/// MacDive-specific wrapper rather than the raw Shearwater protocol dump
-/// libdivecomputer can parse. See `docs/import-formats/macdive-zsamples.md`.
-/// When dives carry non-empty `ZRAWDATA` a single aggregated [ImportWarning]
-/// points users at MacDive's XML export as the working profile path.
+/// Profile samples come from `ZRAWDATA`, which holds the raw Shearwater
+/// download stream still in its compressed form. [ShearwaterRawDecompressor]
+/// reverses the two compression passes to recover Petrel Native Format, which
+/// libdivecomputer parses directly. See
+/// `docs/import-formats/macdive-zsamples.md`.
+///
+/// `ZSAMPLES` is AES-encrypted with a per-dive key and remains undecodable,
+/// but it is also redundant: every dive that has `ZSAMPLES` from a Shearwater
+/// computer also has `ZRAWDATA`. Dives whose computer is not a Shearwater
+/// carry no `ZRAWDATA` at all; those raise one aggregated [ImportWarning]
+/// pointing at MacDive's XML export as the working profile path.
 class MacDiveDiveMapper {
   const MacDiveDiveMapper._();
 
@@ -30,7 +51,10 @@ class MacDiveDiveMapper {
   /// String enum-ish values (waterType, entryType) go through
   /// [MacDiveValueMapper] so unrecognised inputs are dropped rather than
   /// mis-stored.
-  static ImportPayload toPayload(MacDiveRawLogbook logbook) {
+  static Future<ImportPayload> toPayload(
+    MacDiveRawLogbook logbook, {
+    MacDiveRawParseFn? parseRaw,
+  }) async {
     final units = MacDiveUnitSystem.fromXml(logbook.unitsPreference);
     final converter = MacDiveUnitConverter(units);
     final warnings = <ImportWarning>[];
@@ -39,25 +63,78 @@ class MacDiveDiveMapper {
     final buddyMaps = _buildBuddyMaps(logbook);
     final tagMaps = _buildTagMaps(logbook);
     final gearMaps = _buildGearMaps(logbook, converter);
-    final diveMaps = [
-      for (final d in logbook.dives) _buildDiveMap(d, logbook, converter),
-    ];
 
-    // One aggregated warning per logbook so a 500-dive import does not
-    // produce 500 identical summary lines. Per-dive granularity buys us
-    // nothing here — the cause is format-level, not dive-level.
-    final zrawdataDives = logbook.dives
-        .where((d) => d.rawDataBlob != null && d.rawDataBlob!.isNotEmpty)
-        .length;
-    if (zrawdataDives > 0) {
+    final parse = parseRaw ?? _defaultParseRaw;
+    final diveMaps = <Map<String, dynamic>>[];
+    // Once the platform channel reports it is unavailable there is no point
+    // retrying it for the remaining 500 dives.
+    var ffiAvailable = true;
+    var undecoded = 0;
+    for (final d in logbook.dives) {
+      final map = _buildDiveMap(d, logbook, converter);
+      if (ffiAvailable && _hasRawProfile(d)) {
+        try {
+          if (!await _attachProfile(d, map, parse)) undecoded++;
+        } on MissingPluginException {
+          ffiAvailable = false;
+        } on PlatformException catch (e) {
+          if (e.code == 'UNSUPPORTED' || e.code == 'channel-error') {
+            ffiAvailable = false;
+          } else {
+            undecoded++;
+          }
+        } catch (_) {
+          // A single corrupt blob must not abort a 500-dive import.
+          undecoded++;
+        }
+      } else if (_hasRawProfile(d)) {
+        undecoded++;
+      }
+      diveMaps.add(map);
+    }
+
+    // Aggregated warnings, one per cause, so a 500-dive import does not
+    // produce 500 identical summary lines.
+    if (!ffiAvailable) {
+      warnings.add(
+        const ImportWarning(
+          severity: ImportWarningSeverity.info,
+          message:
+              'Dive profiles could not be decoded on this platform. Dive '
+              'details were imported without depth profiles.',
+          entityType: ImportEntityType.dives,
+        ),
+      );
+    } else if (undecoded > 0) {
       warnings.add(
         ImportWarning(
           severity: ImportWarningSeverity.info,
           message:
-              '$zrawdataDives dive(s) carry raw profile data in this SQLite file, '
-              'but MacDive stores it in a proprietary format Submersion cannot yet '
-              'decode. To import dive profiles, export from MacDive as XML '
-              '(File > Export > UDDF or MacDive XML) and import that file instead.',
+              '$undecoded dive(s) had profile data Submersion could not '
+              'decode. To import those profiles, export from MacDive as XML '
+              '(File > Export > MacDive XML) and import that file instead.',
+          entityType: ImportEntityType.dives,
+        ),
+      );
+    }
+
+    // Dives recorded on non-Shearwater computers keep their samples only in
+    // the encrypted ZSAMPLES column, so there is nothing to decode for them.
+    final encryptedOnly = logbook.dives
+        .where(
+          (d) =>
+              (d.samplesBlob?.isNotEmpty ?? false) &&
+              !(d.rawDataBlob?.isNotEmpty ?? false),
+        )
+        .length;
+    if (encryptedOnly > 0) {
+      warnings.add(
+        ImportWarning(
+          severity: ImportWarningSeverity.info,
+          message:
+              '$encryptedOnly dive(s) store their profile in a MacDive format '
+              'Submersion cannot read. Export those from MacDive as XML '
+              '(File > Export > MacDive XML) to import their profiles.',
           entityType: ImportEntityType.dives,
         ),
       );
@@ -79,6 +156,75 @@ class MacDiveDiveMapper {
         'units': units.name,
       },
     );
+  }
+
+  // ---- profile decoding ----
+
+  static Future<pigeon.ParsedDive> _defaultParseRaw(
+    String vendor,
+    String product,
+    int model,
+    Uint8List data,
+  ) => pigeon.DiveComputerHostApi().parseRawDiveData(
+    vendor,
+    product,
+    model,
+    data,
+  );
+
+  static bool _hasRawProfile(MacDiveRawDive d) =>
+      d.rawDataBlob != null && d.rawDataBlob!.isNotEmpty;
+
+  /// MacDive records the computer as a display string such as
+  /// "Shearwater Teric". Strip the vendor prefix and reuse the model table
+  /// the Shearwater Cloud importer already maintains.
+  static (String, String)? _vendorProduct(String? computer) {
+    if (computer == null) return null;
+    final trimmed = computer.trim();
+    if (trimmed.isEmpty) return null;
+    const prefix = 'Shearwater ';
+    final model = trimmed.startsWith(prefix)
+        ? trimmed.substring(prefix.length)
+        : trimmed;
+    return ShearwaterFilenameParser.vendorProduct(model);
+  }
+
+  /// Decodes [d]'s `ZRAWDATA` into profile samples on [map]. Returns false
+  /// when the dive carries raw bytes we could not turn into a profile, so the
+  /// caller can count it toward the aggregated warning.
+  static Future<bool> _attachProfile(
+    MacDiveRawDive d,
+    Map<String, dynamic> map,
+    MacDiveRawParseFn parse,
+  ) async {
+    final vendorProduct = _vendorProduct(d.computer);
+    if (vendorProduct == null) return false;
+
+    final decompressed = ShearwaterRawDecompressor.decompress(d.rawDataBlob!);
+    if (decompressed == null || decompressed.isEmpty) return false;
+
+    final parsed = await parse(
+      vendorProduct.$1,
+      vendorProduct.$2,
+      0,
+      decompressed,
+    );
+    final samples = ParsedDiveProfileMapper.samples(parsed);
+    if (samples.isEmpty) return false;
+
+    map['profile'] = samples;
+    // MacDive's own scalar fields win where it has them - the user may have
+    // corrected them - so parsed values only fill gaps.
+    map['maxDepth'] ??= parsed.maxDepthMeters;
+    map['avgDepth'] ??= parsed.avgDepthMeters;
+    map['decoAlgorithm'] ??= parsed.decoAlgorithm;
+    map['gradientFactorLow'] ??= parsed.gfLow;
+    map['gradientFactorHigh'] ??= parsed.gfHigh;
+    map['waterTemp'] ??= ParsedDiveProfileMapper.minSampleTemperature(parsed);
+    if (map['runtime'] == null && parsed.durationSeconds > 0) {
+      map['runtime'] = Duration(seconds: parsed.durationSeconds);
+    }
+    return true;
   }
 
   // ---- site / buddy / tag / gear ----
@@ -240,7 +386,9 @@ class MacDiveDiveMapper {
     if (airTemp != null) map['airTemp'] = airTemp;
 
     if (d.cns != null) map['cnsEnd'] = d.cns;
-    if (d.decoModel != null) map['decoModel'] = d.decoModel;
+    // `decoAlgorithm` is the key UddfEntityImporter reads; emitting only
+    // `decoModel` silently dropped MacDive's deco model on every import.
+    if (d.decoModel != null) map['decoAlgorithm'] = d.decoModel;
     if (d.gasModel != null) map['gasModel'] = d.gasModel;
     if (d.computer != null) map['diveComputerModel'] = d.computer;
     if (d.computerSerial != null) {
@@ -362,9 +510,9 @@ class MacDiveDiveMapper {
       map['tanks'] = tanks;
     }
 
-    // No `profile` key emitted — matches the XML parser convention of
-    // omitting the key when no samples are available. See class doc for
-    // why ZRAWDATA is not decoded here.
+    // The `profile` key is attached later by _attachProfile, once ZRAWDATA
+    // has been decompressed and parsed. Dives without decodable samples keep
+    // the key absent, matching the XML parser's convention.
 
     return map;
   }
