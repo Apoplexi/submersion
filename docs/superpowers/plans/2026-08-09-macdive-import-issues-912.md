@@ -45,6 +45,26 @@ Fixes: dive profiles missing; per-sample tank pressure.
 - Emit `allTankPressures` per sample so `_storeTankPressures` populates tank pressure.
 - Update `docs/import-formats/macdive-zsamples.md` — the NO-GO section is now historical.
 
+## Second finding: MacDive's Core Data store is mixed-unit
+
+"The pressure data is super weird" is a units bug, and a two-sided one.
+
+MacDive's SQLite store does **not** use one unit system:
+
+| Column | Stored as |
+|---|---|
+| `ZMAXDEPTH`, `ZAVERAGEDEPTH` | metres (SI), always |
+| `ZTEMPLOW`, `ZTEMPHIGH`, `ZAIRTEMP` | Celsius (SI), always |
+| `ZTANKANDGAS.ZAIRSTART` / `ZAIREND` | the diver's **display** unit |
+| `ZTANK.ZSIZE`, `ZTANK.ZWORKINGPRESSURE` | the diver's **display** unit |
+| `ZDIVE.ZWEIGHT` | the diver's **display** unit |
+
+Established by pairing the reference library against MacDive's own Imperial XML export of the same data: depth ratios are 3.2808 across 527 and 349 dives, `ZTEMPLOW` is the exact Celsius of the exported Fahrenheit across 513 dives, and pressures and cylinder sizes match the Imperial export 1:1 across 313–328 dives.
+
+The importer applied a single system to everything, taken from `ZMETADATA.ZALL` where `ZIDENTIFIER = 'SystemOfUnits'` — **a row the reference library does not contain**. That fell through to `unknown`, i.e. passthrough, so 3118 psi imported as 3118 bar and an 80 cft AL80 became an 80-litre cylinder (also wrecking SAC). Had the row been present and said Imperial, the mirror bug would have hit instead: a 25.4 m dive converted as feet becomes 7.7 m.
+
+Fix: `MacDiveUnitConverter.coreData()` leaves depth and temperature alone, and `MacDiveUnitInference` recovers the display unit from stored magnitudes when MacDive omits its declaration — cylinder pressures are ~200–300 bar or ~2400–3500 psi, more than an order of magnitude apart.
+
 ## Phase 2 — Dive-level mapper gaps
 
 - **Weight.** `uddf_entity_importer.dart:1283` appends `weightUsed` to notes. Build a `DiveWeight` row instead (and stop polluting notes). Affects MacDive, UDDF, and `uddf_import_service`.

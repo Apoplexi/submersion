@@ -155,7 +155,8 @@ void main() {
 
         expect(item.subtitle, contains('18.5m'));
         expect(item.subtitle, contains('42 min'));
-        expect(item.subtitle, contains('24.0'));
+        // A whole-degree reading no longer carries a '.0' (#912).
+        expect(item.subtitle, contains('24°C'));
       },
     );
 

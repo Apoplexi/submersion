@@ -1,16 +1,18 @@
 import 'package:flutter/services.dart';
 import 'package:libdivecomputer_plugin/libdivecomputer_plugin.dart' as pigeon;
 
+import 'package:submersion/core/constants/enums.dart'
+    show EquipmentStatus, ServiceType;
 import 'package:submersion/features/dive_log/domain/entities/dive.dart'
     show GasMix;
+import 'package:submersion/features/dive_types/domain/entities/dive_type_entity.dart';
 import 'package:submersion/features/universal_import/data/models/import_enums.dart';
 import 'package:submersion/features/universal_import/data/models/import_payload.dart';
 import 'package:submersion/features/universal_import/data/models/import_warning.dart';
 import 'package:submersion/features/universal_import/data/services/macdive_raw_types.dart';
 import 'package:submersion/features/universal_import/data/services/macdive_unit_converter.dart';
+import 'package:submersion/features/universal_import/data/services/macdive_unit_inference.dart';
 import 'package:submersion/features/universal_import/data/services/macdive_value_mapper.dart';
-import 'package:submersion/features/universal_import/data/services/macdive_xml_models.dart'
-    show MacDiveUnitSystem;
 import 'package:submersion/features/universal_import/data/services/parsed_dive_profile_mapper.dart';
 import 'package:submersion/features/universal_import/data/services/shearwater_filename_parser.dart';
 import 'package:submersion/features/universal_import/data/services/shearwater_raw_decompressor.dart';
@@ -45,9 +47,10 @@ typedef MacDiveRawParseFn =
 class MacDiveDiveMapper {
   const MacDiveDiveMapper._();
 
-  /// Builds an [ImportPayload] from [logbook]. Numeric values are
-  /// converted from MacDive's declared unit system (Imperial or Metric)
-  /// into Submersion's canonical SI units via [MacDiveUnitConverter].
+  /// Builds an [ImportPayload] from [logbook]. Numeric values are converted
+  /// into Submersion's canonical SI units via [MacDiveUnitConverter], whose
+  /// Core Data mode knows which MacDive columns are already SI and which
+  /// follow the diver's display unit.
   /// String enum-ish values (waterType, entryType) go through
   /// [MacDiveValueMapper] so unrecognised inputs are dropped rather than
   /// mis-stored.
@@ -55,14 +58,30 @@ class MacDiveDiveMapper {
     MacDiveRawLogbook logbook, {
     MacDiveRawParseFn? parseRaw,
   }) async {
-    final units = MacDiveUnitSystem.fromXml(logbook.unitsPreference);
-    final converter = MacDiveUnitConverter(units);
+    // MacDive routinely omits its own SystemOfUnits row, so fall back to
+    // inferring the display unit from the stored magnitudes rather than
+    // passing psi through as bar (#912).
+    final units = MacDiveUnitInference.resolve(logbook);
+    final converter = MacDiveUnitConverter.coreData(units);
     final warnings = <ImportWarning>[];
 
     final siteMaps = _buildSiteMaps(logbook, converter);
     final buddyMaps = _buildBuddyMaps(logbook);
     final tagMaps = _buildTagMaps(logbook);
     final gearMaps = _buildGearMaps(logbook, converter);
+    final diveTypeMaps = _buildDiveTypeMaps(logbook);
+    final diveCenterMaps = _buildDiveCenterMaps(logbook);
+    final certificationMaps = _buildCertificationMaps(logbook);
+    final serviceRecordMaps = _buildServiceRecordMaps(logbook);
+    // A MacDive library can hold several divers. Submersion imports into one
+    // diver, so without this the dives arrive as one undifferentiated list
+    // (#912). Tagging by diver name keeps them separable after import.
+    final diverNames = _diverNamesInUse(logbook);
+    final tagMapsWithDivers = <Map<String, dynamic>>[
+      ...tagMaps,
+      if (diverNames.length > 1)
+        for (final name in diverNames) {'name': name, 'uddfId': name},
+    ];
 
     final parse = parseRaw ?? _defaultParseRaw;
     final diveMaps = <Map<String, dynamic>>[];
@@ -71,7 +90,12 @@ class MacDiveDiveMapper {
     var ffiAvailable = true;
     var undecoded = 0;
     for (final d in logbook.dives) {
-      final map = _buildDiveMap(d, logbook, converter);
+      final map = _buildDiveMap(
+        d,
+        logbook,
+        converter,
+        multiDiver: diverNames.length > 1,
+      );
       if (ffiAvailable && _hasRawProfile(d)) {
         try {
           if (!await _attachProfile(d, map, parse)) undecoded++;
@@ -140,12 +164,62 @@ class MacDiveDiveMapper {
       );
     }
 
+    if (diverNames.length > 1) {
+      warnings.add(
+        ImportWarning(
+          severity: ImportWarningSeverity.warning,
+          message:
+              'This MacDive library contains dives for '
+              '${diverNames.length} divers (${diverNames.join(', ')}). '
+              'They will all be imported into the current diver profile, '
+              'each dive tagged with the name it was logged under.',
+          entityType: ImportEntityType.dives,
+        ),
+      );
+    }
+
+    // MacDive's sidebar logbooks are saved searches: membership is computed
+    // from an NSPredicate rather than stored, and no dive-to-logbook table
+    // exists, so there is nothing to import. Name them so the diver knows
+    // what did not come across.
+    final logNames = logbook.diveLogsByPk.values
+        .map((l) => l.name?.trim() ?? '')
+        .where((n) => n.isNotEmpty)
+        .toList();
+    if (logNames.isNotEmpty) {
+      warnings.add(
+        ImportWarning(
+          severity: ImportWarningSeverity.info,
+          message:
+              'MacDive logbooks (${logNames.join(', ')}) were not imported. '
+              'MacDive stores them as saved searches rather than as fixed '
+              'lists of dives, so they can be recreated as filters in '
+              'Submersion.',
+          entityType: ImportEntityType.dives,
+        ),
+      );
+    }
+
     final entities = <ImportEntityType, List<Map<String, dynamic>>>{};
     if (diveMaps.isNotEmpty) entities[ImportEntityType.dives] = diveMaps;
     if (siteMaps.isNotEmpty) entities[ImportEntityType.sites] = siteMaps;
     if (buddyMaps.isNotEmpty) entities[ImportEntityType.buddies] = buddyMaps;
-    if (tagMaps.isNotEmpty) entities[ImportEntityType.tags] = tagMaps;
+    if (tagMapsWithDivers.isNotEmpty) {
+      entities[ImportEntityType.tags] = tagMapsWithDivers;
+    }
     if (gearMaps.isNotEmpty) entities[ImportEntityType.equipment] = gearMaps;
+    if (diveTypeMaps.isNotEmpty) {
+      entities[ImportEntityType.diveTypes] = diveTypeMaps;
+    }
+    if (diveCenterMaps.isNotEmpty) {
+      entities[ImportEntityType.diveCenters] = diveCenterMaps;
+    }
+    if (certificationMaps.isNotEmpty) {
+      entities[ImportEntityType.certifications] = certificationMaps;
+    }
+    if (serviceRecordMaps.isNotEmpty) {
+      entities[ImportEntityType.serviceRecords] = serviceRecordMaps;
+    }
 
     return ImportPayload(
       entities: entities,
@@ -225,6 +299,127 @@ class MacDiveDiveMapper {
       map['runtime'] = Duration(seconds: parsed.durationSeconds);
     }
     return true;
+  }
+
+  // ---- dive types / centers / certifications / service records / divers ----
+
+  /// MacDive's dive-type vocabulary is user-extensible, and so is
+  /// Submersion's. Slugging the name lands the common ones ("Shore", "Boat",
+  /// "Night") straight onto the matching built-in id; anything else is
+  /// carried across as a custom type.
+  static List<Map<String, dynamic>> _buildDiveTypeMaps(
+    MacDiveRawLogbook logbook,
+  ) {
+    final out = <Map<String, dynamic>>[];
+    final seen = <String>{};
+    for (final t in logbook.diveTypesByPk.values) {
+      final name = t.name?.trim();
+      if (name == null || name.isEmpty) continue;
+      final slug = DiveTypeEntity.generateSlug(name);
+      if (slug.isEmpty || !seen.add(slug)) continue;
+      out.add({'id': slug, 'name': name, 'uddfId': slug});
+    }
+    return out;
+  }
+
+  static List<String> _diveTypeIdsFor(
+    MacDiveRawDive d,
+    MacDiveRawLogbook logbook,
+  ) {
+    final pks = logbook.diveToDiveTypePks[d.pk] ?? const <int>[];
+    final ids = <String>[];
+    for (final pk in pks) {
+      final name = logbook.diveTypesByPk[pk]?.name?.trim();
+      if (name == null || name.isEmpty) continue;
+      final slug = DiveTypeEntity.generateSlug(name);
+      if (slug.isNotEmpty && !ids.contains(slug)) ids.add(slug);
+    }
+    return ids;
+  }
+
+  /// MacDive records the operator as free text on each dive. Deduplicate the
+  /// names into real dive-center entities so they can be browsed and filtered
+  /// (#912), while `diveOperator` keeps carrying the original string.
+  static List<Map<String, dynamic>> _buildDiveCenterMaps(
+    MacDiveRawLogbook logbook,
+  ) {
+    final seen = <String>{};
+    final out = <Map<String, dynamic>>[];
+    for (final d in logbook.dives) {
+      final name = d.diveOperator?.trim();
+      if (name == null || name.isEmpty || !seen.add(name)) continue;
+      // Country comes from the site the operator was used at, which is the
+      // only geography MacDive associates with an operator.
+      final country = logbook.sitesByPk[d.diveSiteFk]?.country;
+      out.add({
+        'name': name,
+        'uddfId': name,
+        if (country != null && country.isNotEmpty) 'country': country,
+      });
+    }
+    return out;
+  }
+
+  static List<Map<String, dynamic>> _buildCertificationMaps(
+    MacDiveRawLogbook logbook,
+  ) {
+    final out = <Map<String, dynamic>>[];
+    for (final c in logbook.certifications) {
+      final name = c.name?.trim();
+      if (name == null || name.isEmpty) continue;
+      final shop = c.instructorShop?.trim() ?? '';
+      out.add({
+        'name': name,
+        'uddfId': c.uuid.isNotEmpty ? c.uuid : name,
+        if (c.agency != null) 'agency': c.agency,
+        // MacDive has no level field; the card name is the closest thing, and
+        // _parseCertificationLevel drops it when it matches nothing.
+        'level': name,
+        if (c.diverNumber != null) 'cardNumber': c.diverNumber,
+        if (c.attained != null) 'issueDate': c.attained,
+        if (c.expiry != null) 'expiryDate': c.expiry,
+        if (c.instructorName != null) 'instructorName': c.instructorName,
+        if (c.instructorNumber != null) 'instructorNumber': c.instructorNumber,
+        if (shop.isNotEmpty) 'notes': 'Shop: $shop',
+      });
+    }
+    return out;
+  }
+
+  /// MacDive keys service records to gear by row id; the equipment payload is
+  /// keyed by the gear's uddfId, so translate here rather than teaching the
+  /// importer about Core Data primary keys.
+  static List<Map<String, dynamic>> _buildServiceRecordMaps(
+    MacDiveRawLogbook logbook,
+  ) {
+    final out = <Map<String, dynamic>>[];
+    for (final r in logbook.serviceRecords) {
+      final gear = logbook.gearByPk[r.gearFk];
+      if (gear == null) continue;
+      final equipmentRef = _gearUddfId(gear);
+      if (equipmentRef == null) continue;
+      out.add({
+        'equipmentRef': equipmentRef,
+        'uddfId': r.uuid.isNotEmpty ? r.uuid : '${equipmentRef}_${r.pk}',
+        if (r.serviceDate != null) 'serviceDate': r.serviceDate,
+        if (r.servicedBy != null) 'provider': r.servicedBy,
+        if (r.notes != null) 'notes': r.notes,
+        // MacDive does not categorise service events.
+        'serviceType': ServiceType.annual.name,
+      });
+    }
+    return out;
+  }
+
+  /// Distinct diver names that actually have dives attached, in first-seen
+  /// order. Dives with no diver link contribute nothing.
+  static List<String> _diverNamesInUse(MacDiveRawLogbook logbook) {
+    final names = <String>[];
+    for (final d in logbook.dives) {
+      final name = logbook.diversByPk[d.diverFk]?.fullName;
+      if (name != null && !names.contains(name)) names.add(name);
+    }
+    return names;
   }
 
   // ---- site / buddy / tag / gear ----
@@ -322,16 +517,26 @@ class MacDiveDiveMapper {
       if (g.manufacturer != null) map['brand'] = g.manufacturer;
       if (g.model != null) map['model'] = g.model;
       if (g.serial != null) map['serialNumber'] = g.serial;
-      if (g.type != null) map['type'] = g.type;
+      final type = MacDiveValueMapper.equipmentType(g.type);
+      if (type != null) map['type'] = type.name;
       final weightKg = c.weightToKg(g.weight);
       if (weightKg != null) map['weight'] = weightKg;
-      if (g.price != null) map['price'] = g.price;
+      // Key must be `purchasePrice`; `_importEquipment` reads that name, so
+      // emitting `price` silently dropped every MacDive purchase price.
+      if (g.price != null) map['purchasePrice'] = g.price;
+      if (g.currency != null) map['purchaseCurrency'] = g.currency;
       if (g.datePurchase != null) map['purchaseDate'] = g.datePurchase;
       if (g.dateNextService != null) {
         map['nextServiceDate'] = g.dateNextService;
       }
       if (g.notes != null) map['notes'] = g.notes;
       if (g.uuid.isNotEmpty) map['sourceUuid'] = g.uuid;
+      // MacDive's "inactive" gear is retired gear (#912). Both markers are
+      // written because getActiveEquipment filters on each of them.
+      if (g.disabled) {
+        map['status'] = EquipmentStatus.retired.name;
+        map['isActive'] = false;
+      }
       out.add(map);
     }
     return out;
@@ -342,8 +547,9 @@ class MacDiveDiveMapper {
   static Map<String, dynamic> _buildDiveMap(
     MacDiveRawDive d,
     MacDiveRawLogbook logbook,
-    MacDiveUnitConverter c,
-  ) {
+    MacDiveUnitConverter c, {
+    bool multiDiver = false,
+  }) {
     final map = <String, dynamic>{};
 
     if (d.uuid.isNotEmpty) map['sourceUuid'] = d.uuid;
@@ -401,7 +607,13 @@ class MacDiveDiveMapper {
     }
     if (d.current != null) map['currentDirection'] = d.current;
     if (d.diveMaster != null) map['diveMaster'] = d.diveMaster;
-    if (d.diveOperator != null) map['diveOperator'] = d.diveOperator;
+    // Keep the free-text column populated for round-tripping, and also link
+    // the dive to the deduplicated DiveCenter entity (#912).
+    if (d.diveOperator != null) {
+      map['diveOperator'] = d.diveOperator;
+      final operator = d.diveOperator!.trim();
+      if (operator.isNotEmpty) map['diveCenterRef'] = operator;
+    }
     if (d.boatName != null) map['boatName'] = d.boatName;
     if (d.boatCaptain != null) map['boatCaptain'] = d.boatCaptain;
     if (d.visibility != null) map['visibility'] = d.visibility;
@@ -458,6 +670,10 @@ class MacDiveDiveMapper {
     ];
     if (equipmentRefs.isNotEmpty) map['equipmentRefs'] = equipmentRefs;
 
+    // Dive types - MacDive's own vocabulary, slugged onto Submersion ids.
+    final diveTypeIds = _diveTypeIdsFor(d, logbook);
+    if (diveTypeIds.isNotEmpty) map['diveTypeIds'] = diveTypeIds;
+
     // Tags - emit names under `tagRefs`.
     final tagPks = logbook.diveToTagPks[d.pk] ?? const <int>[];
     final tagNames = <String>[
@@ -465,6 +681,14 @@ class MacDiveDiveMapper {
         if ((logbook.tagsByPk[tpk]?.name ?? '').isNotEmpty)
           logbook.tagsByPk[tpk]!.name!,
     ];
+    // In a multi-diver library, tag each dive with the name it was logged
+    // under so the merged list stays separable (#912).
+    if (multiDiver) {
+      final diverName = logbook.diversByPk[d.diverFk]?.fullName;
+      if (diverName != null && !tagNames.contains(diverName)) {
+        tagNames.add(diverName);
+      }
+    }
     if (tagNames.isNotEmpty) map['tagRefs'] = tagNames;
 
     // Tanks: join ZTANKANDGAS rows with the referenced tank + gas. Sort

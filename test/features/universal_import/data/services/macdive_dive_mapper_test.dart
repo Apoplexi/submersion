@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -28,14 +27,178 @@ void main() {
   });
 
   group('MacDiveDiveMapper', () {
-    test('produces 3 dives, 2 sites, 2 buddies, 2 tags, 1 gear', () async {
+    test('produces 3 dives, 2 sites, 2 buddies, 2 tags, 2 gear', () async {
       final logbook = await MacDiveDbReader.readAll(bytes);
       final payload = await MacDiveDiveMapper.toPayload(logbook);
       expect(payload.entitiesOf(ImportEntityType.dives).length, 3);
       expect(payload.entitiesOf(ImportEntityType.sites).length, 2);
       expect(payload.entitiesOf(ImportEntityType.buddies).length, 2);
       expect(payload.entitiesOf(ImportEntityType.tags).length, 2);
-      expect(payload.entitiesOf(ImportEntityType.equipment).length, 1);
+      expect(payload.entitiesOf(ImportEntityType.equipment).length, 2);
+    });
+
+    test('maps MacDive dive types onto Submersion type ids', () async {
+      final logbook = await MacDiveDbReader.readAll(bytes);
+      final payload = await MacDiveDiveMapper.toPayload(logbook);
+
+      // "Shore" slugs onto the built-in id; "Aquarium" is carried across as
+      // a custom type (#912).
+      final types = payload.entitiesOf(ImportEntityType.diveTypes);
+      expect(types.map((t) => t['id']), containsAll(['shore', 'aquarium']));
+      expect(
+        types.firstWhere((t) => t['id'] == 'aquarium')['name'],
+        'Aquarium',
+      );
+
+      final dives = payload.entitiesOf(ImportEntityType.dives);
+      final dive1 = dives.firstWhere((d) => d['sourceUuid'] == 'dive-uuid-1');
+      expect(dive1['diveTypeIds'], containsAll(['shore', 'aquarium']));
+      final dive3 = dives.firstWhere((d) => d['sourceUuid'] == 'dive-uuid-3');
+      expect(dive3.containsKey('diveTypeIds'), isFalse);
+    });
+
+    test('operator becomes a dive center and a per-dive ref', () async {
+      final logbook = await MacDiveDbReader.readAll(bytes);
+      final payload = await MacDiveDiveMapper.toPayload(logbook);
+
+      final centers = payload.entitiesOf(ImportEntityType.diveCenters);
+      // Two dives share one operator, so it is deduplicated.
+      expect(centers, hasLength(1));
+      expect(centers.single['name'], 'Test Operator');
+      expect(centers.single['uddfId'], 'Test Operator');
+      expect(centers.single['country'], 'Mexico');
+
+      final dive1 = payload
+          .entitiesOf(ImportEntityType.dives)
+          .firstWhere((d) => d['sourceUuid'] == 'dive-uuid-1');
+      expect(dive1['diveCenterRef'], 'Test Operator');
+      // The free-text column keeps its value too.
+      expect(dive1['diveOperator'], 'Test Operator');
+    });
+
+    test('inactive MacDive gear imports as retired', () async {
+      final logbook = await MacDiveDbReader.readAll(bytes);
+      final payload = await MacDiveDiveMapper.toPayload(logbook);
+      final gear = payload.entitiesOf(ImportEntityType.equipment);
+
+      final active = gear.firstWhere((g) => g['name'] == 'Hydros Pro');
+      expect(active.containsKey('status'), isFalse);
+      expect(active.containsKey('isActive'), isFalse);
+
+      final retired = gear.firstWhere((g) => g['name'] == 'Old Regs');
+      expect(retired['status'], 'retired');
+      // Both markers are needed: getActiveEquipment filters on each.
+      expect(retired['isActive'], isFalse);
+    });
+
+    test('gear type strings map onto EquipmentType', () async {
+      final logbook = await MacDiveDbReader.readAll(bytes);
+      final payload = await MacDiveDiveMapper.toPayload(logbook);
+      final gear = payload.entitiesOf(ImportEntityType.equipment);
+
+      // "BCD - Wing" and "Reg - Longhose" match no enum name; without the
+      // value mapper both would land as `other`.
+      expect(gear.firstWhere((g) => g['name'] == 'Hydros Pro')['type'], 'bcd');
+      expect(
+        gear.firstWhere((g) => g['name'] == 'Old Regs')['type'],
+        'regulator',
+      );
+    });
+
+    test('gear price uses the key the importer reads', () async {
+      final logbook = await MacDiveDbReader.readAll(bytes);
+      final payload = await MacDiveDiveMapper.toPayload(logbook);
+      final active = payload
+          .entitiesOf(ImportEntityType.equipment)
+          .firstWhere((g) => g['name'] == 'Hydros Pro');
+      // `price` was silently dropped; `_importEquipment` reads purchasePrice.
+      expect(active['purchasePrice'], 499.0);
+      expect(active['purchaseCurrency'], 'USD');
+      expect(active.containsKey('price'), isFalse);
+    });
+
+    test('certifications reach the payload', () async {
+      final logbook = await MacDiveDbReader.readAll(bytes);
+      final payload = await MacDiveDiveMapper.toPayload(logbook);
+      final cert = payload.entitiesOf(ImportEntityType.certifications).single;
+      expect(cert['name'], 'Rescue Scuba Diver');
+      expect(cert['agency'], 'NAUI');
+      expect(cert['cardNumber'], '2649227');
+      expect(cert['instructorName'], 'Jose Salazar');
+      expect(cert['issueDate'], isA<DateTime>());
+      expect(cert['notes'], contains('Bamboo Reef'));
+    });
+
+    test('service records reference their gear by uddfId', () async {
+      final logbook = await MacDiveDbReader.readAll(bytes);
+      final payload = await MacDiveDiveMapper.toPayload(logbook);
+      final record = payload.entitiesOf(ImportEntityType.serviceRecords).single;
+      // Must match the equipment entity's uddfId so the importer can resolve
+      // it through equipmentIdMapping.
+      final gear = payload
+          .entitiesOf(ImportEntityType.equipment)
+          .firstWhere((g) => g['name'] == 'Hydros Pro');
+      expect(record['equipmentRef'], gear['uddfId']);
+      expect(record['provider'], 'Seals Watersports');
+      expect(record['serviceDate'], isA<DateTime>());
+    });
+
+    test('a multi-diver library is flagged and tagged by diver', () async {
+      final payload = await MacDiveDiveMapper.toPayload(_multiDiverLogbook());
+
+      // #912: several MacDive divers used to merge into one flat list with
+      // no way to tell them apart.
+      final warning = payload.warnings.singleWhere(
+        (w) => w.message.contains('2 divers'),
+      );
+      expect(warning.severity, ImportWarningSeverity.warning);
+      expect(warning.message, contains('Ann Lee'));
+      expect(warning.message, contains('Bo Ray'));
+
+      final dives = payload.entitiesOf(ImportEntityType.dives);
+      expect(dives.firstWhere((d) => d['sourceUuid'] == 'dive-1')['tagRefs'], [
+        'Ann Lee',
+      ]);
+      expect(dives.firstWhere((d) => d['sourceUuid'] == 'dive-2')['tagRefs'], [
+        'Bo Ray',
+      ]);
+      // A dive with no diver link gets no diver tag.
+      expect(
+        dives
+            .firstWhere((d) => d['sourceUuid'] == 'dive-3')
+            .containsKey('tagRefs'),
+        isFalse,
+      );
+
+      // The names are also emitted as tag entities so the refs resolve.
+      expect(
+        payload.entitiesOf(ImportEntityType.tags).map((t) => t['name']),
+        containsAll(['Ann Lee', 'Bo Ray']),
+      );
+    });
+
+    test('a single-diver library is not tagged or flagged', () async {
+      final payload = await MacDiveDiveMapper.toPayload(
+        _multiDiverLogbook(singleDiver: true),
+      );
+      expect(
+        payload.warnings.where((w) => w.message.contains('divers')),
+        isEmpty,
+      );
+      expect(payload.entitiesOf(ImportEntityType.tags), isEmpty);
+      for (final dive in payload.entitiesOf(ImportEntityType.dives)) {
+        expect(dive.containsKey('tagRefs'), isFalse);
+      }
+    });
+
+    test('MacDive logbooks are reported as not imported', () async {
+      final logbook = await MacDiveDbReader.readAll(bytes);
+      final payload = await MacDiveDiveMapper.toPayload(logbook);
+      final warning = payload.warnings.singleWhere(
+        (w) => w.message.contains('Tropical'),
+      );
+      expect(warning.severity, ImportWarningSeverity.info);
+      expect(warning.message, contains('saved searches'));
     });
 
     test('dive sourceUuid preserved', () async {
@@ -141,7 +304,11 @@ void main() {
       for (final dive in payload.entitiesOf(ImportEntityType.dives)) {
         expect(dive.containsKey('profile'), isFalse);
       }
-      expect(payload.warnings, isEmpty);
+      // The only warning is about the smart logbook, not about profiles.
+      expect(
+        payload.warnings.where((w) => w.message.contains('profile')),
+        isEmpty,
+      );
     });
 
     test('ZRAWDATA is decompressed and parsed into profile samples', () async {
@@ -344,6 +511,50 @@ MacDiveRawLogbook _rawDataLogbook({String computer = 'Shearwater Teric'}) {
       ),
       const MacDiveRawDive(pk: 3, uuid: 'dive-3', computer: 'Manual'),
     ],
+    sitesByPk: const {},
+    buddiesByPk: const {},
+    tagsByPk: const {},
+    gearByPk: const {},
+    tanksByPk: const {},
+    gasesByPk: const {},
+    tankAndGases: const [],
+    crittersByPk: const {},
+    certifications: const [],
+    serviceRecords: const [],
+    events: const [],
+    diveToBuddyPks: const {},
+    diveToTagPks: const {},
+    diveToGearPks: const {},
+    diveToCritterPks: const {},
+    unitsPreference: 'Metric',
+  );
+}
+
+/// Three dives across two MacDive divers, plus one dive with no diver link.
+/// With [singleDiver] the second diver is removed, so the library looks like
+/// the common one-diver case.
+MacDiveRawLogbook _multiDiverLogbook({bool singleDiver = false}) {
+  return MacDiveRawLogbook(
+    dives: const [
+      MacDiveRawDive(pk: 1, uuid: 'dive-1', diverFk: 1),
+      MacDiveRawDive(pk: 2, uuid: 'dive-2', diverFk: 2),
+      MacDiveRawDive(pk: 3, uuid: 'dive-3'),
+    ],
+    diversByPk: {
+      1: const MacDiveRawDiver(
+        pk: 1,
+        uuid: 'diver-1',
+        firstName: 'Ann',
+        lastName: 'Lee',
+      ),
+      if (!singleDiver)
+        2: const MacDiveRawDiver(
+          pk: 2,
+          uuid: 'diver-2',
+          firstName: 'Bo',
+          lastName: 'Ray',
+        ),
+    },
     sitesByPk: const {},
     buddiesByPk: const {},
     tagsByPk: const {},
