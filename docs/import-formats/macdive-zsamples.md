@@ -437,3 +437,40 @@ Coverage is 267/540 dives in that DB (49%), i.e. 100% of Shearwater dives and 76
 - The four "what a working implementation would need to investigate first" probes are all moot; none was the answer.
 
 `ZSAMPLES` findings (AES, per-dive key) still stand and are still NO-GO, but no longer matter.
+
+### Confirmed against libdivecomputer's own parser (2026-08-09)
+
+The decode above was first validated by decoding PNF independently in Python. It was then confirmed end to end by building an out-of-tree harness around the repo's own C wrapper (`packages/libdivecomputer_plugin/macos/Classes/libdc_download.c:728`, `libdc_parse_raw_dive`) and running libdivecomputer itself over both forms of the same blob.
+
+**Control — the compressed blob reproduces the historical failure exactly:**
+
+```
+ERROR: Opening or closing record 1 not found.
+[in shearwater_predator_parser.c:658 (shearwater_predator_parser_cache)]
+duration: 0 s   max depth: 0.00 m   samples: 0
+```
+
+**The decompressed blob parses cleanly**, and its samples match MacDive's own export to the limit of the export's precision. Six dives, three imperial and three metric, full sample series compared with the XML's ft/°F/psi converted to m/°C/bar:
+
+| pk | units | max depth libdc vs XML | max abs sample error (depth / temp / pressure) | samples |
+|---|---|---|---:|---:|
+| 258 | imperial | 9.85 vs 9.85 m | 0.0000 m / 0.0000 °C / 0.0000 bar | 238 |
+| 259 | imperial | 16.82 vs 16.82 m | 0.0000 / 0.0000 / 0.0000 | 312 |
+| 260 | imperial | 16.31 vs 16.31 m | 0.0000 / 0.0000 / 0.0000 | 276 |
+| 6 | metric | 21.70 vs 21.70 m | 0.0015 / 0.0000 / 0.0000 | 389 |
+| 11 | metric | 20.80 vs 20.80 m | 0.0015 / 0.0000 / 0.0000 | 350 |
+| 38 | metric | 15.60 vs 15.60 m | 0.0015 / 0.0000 / 0.0000 | 255 |
+
+The 1.5 mm residual is rounding in the XML's two-decimal feet, not a decode difference. libdivecomputer's own `parser->units` handling covers both the imperial and metric cases, so no unit conversion belongs on our side of the call.
+
+Model number does not matter within the Petrel family: "Petrel 2" (3) and "Tern" (12) produce byte-identical output to "Teric" (8) on the same blob, so an imprecise `ZCOMPUTER` → product mapping still parses.
+
+### Three benign differences to expect, none of them errors
+
+1. **Sample times are offset by one interval.** libdivecomputer labels the first sample `t = interval`; MacDive labels it `t = 0`. The values are identical.
+2. **libdivecomputer emits 2-5 more trailing samples** — surface samples MacDive trims from its export. The raw log keeps the real record.
+3. **`duration` differs by 13-69 s.** `DC_FIELD_DIVETIME` is the computer's own recorded dive time (a uint24 in the closing record, `shearwater_predator_parser.c:783`); MacDive's `<duration>` is just `nsamples × sampleInterval`. libdivecomputer's is the more authoritative figure, but the importer keeps MacDive's so the imported logbook matches what the diver already sees.
+
+### Caller-facing trap
+
+`libdc_parse_raw_dive` returned **rc = 0 with an empty error buffer** on the failed compressed parse, having produced a zeroed dive — `extract_dive_fields` swallows per-field failures. Any caller must validate sample count or max depth rather than trusting the return code, or a regression in the decompression step lands silently as a wave of empty dives. `MacDiveDiveMapper._attachProfile` treats an empty sample list as failure for exactly this reason.

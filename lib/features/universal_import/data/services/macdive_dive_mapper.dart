@@ -283,14 +283,20 @@ class MacDiveDiveMapper {
       0,
       decompressed,
     );
+    // A failed native parse does not always surface as an error: the macOS
+    // wrapper has been observed returning success with a zeroed dive (no
+    // samples, 0 m, epoch date). Treat "no samples" as the real signal, so a
+    // regression in decompression shows up as a warning rather than a wave of
+    // silently empty dives.
     final samples = ParsedDiveProfileMapper.samples(parsed);
     if (samples.isEmpty) return false;
 
     map['profile'] = samples;
     // MacDive's own scalar fields win where it has them - the user may have
-    // corrected them - so parsed values only fill gaps.
-    map['maxDepth'] ??= parsed.maxDepthMeters;
-    map['avgDepth'] ??= parsed.avgDepthMeters;
+    // corrected them - so parsed values only fill gaps, and only with values
+    // that mean something.
+    if (parsed.maxDepthMeters > 0) map['maxDepth'] ??= parsed.maxDepthMeters;
+    if (parsed.avgDepthMeters > 0) map['avgDepth'] ??= parsed.avgDepthMeters;
     map['decoAlgorithm'] ??= parsed.decoAlgorithm;
     map['gradientFactorLow'] ??= parsed.gfLow;
     map['gradientFactorHigh'] ??= parsed.gfHigh;
