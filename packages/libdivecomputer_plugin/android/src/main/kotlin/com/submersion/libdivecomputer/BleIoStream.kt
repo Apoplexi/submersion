@@ -810,6 +810,16 @@ class BleIoStream(
             BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT
         }
 
+        // Discard any permit left behind by an earlier write that timed out
+        // before its completion callback arrived. Without this, that stale
+        // permit satisfies this write's wait immediately: write() would report
+        // success while the write was still in flight, and the finally block
+        // would hand back the GATT gate, letting the next command write be
+        // issued on top of an operation Android still considers pending --
+        // which it then rejects, failing the download. darwin drains the same
+        // semaphore for the same reason before a with-response write.
+        writeSemaphore.drainPermits()
+
         if (!g.writeCharacteristic(char)) {
             NativeLogger.e(TAG, "BLE", "write: writeCharacteristic() returned false")
             return -1
