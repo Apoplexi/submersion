@@ -133,6 +133,9 @@ class BleIoStream(
     // Set while a mid-transfer top-up holds the GATT gate. Only touched on the
     // GATT callback thread.
     private var creditTopUpInFlight = false
+    // GATT status of the most recent command write, so writeLocked() can fail
+    // a write the peripheral rejected instead of reporting it as sent.
+    private var lastWriteStatus = BluetoothGatt.GATT_SUCCESS
     private var setupStep = SetupStep.NONE
 
     private val readQueue = LinkedBlockingQueue<ByteArray>()
@@ -201,6 +204,14 @@ class BleIoStream(
                     creditTopUpInFlight = false
                     gattOperation.release()
                 }
+                // A command write in flight gets no completion callback once
+                // the link is down either. libdivecomputer's negative "no
+                // timeout" maps to Long.MAX_VALUE, so its wait would never
+                // end; wake it with a failure status so it returns -1. A
+                // permit left unconsumed here is harmless because every write
+                // drains the semaphore before issuing.
+                lastWriteStatus = BluetoothGatt.GATT_FAILURE
+                writeSemaphore.release()
                 NativeLogger.d(TAG, "BLE", "onConnectionStateChange: disconnected status=$status")
                 connectSemaphore.release()
             }
@@ -455,6 +466,7 @@ class BleIoStream(
             // grant would otherwise fall through and wake a command write
             // that is still in flight.
             if (characteristic.uuid != writeCharacteristic?.uuid) return
+            lastWriteStatus = status
             writeSemaphore.release()
         }
     }
@@ -826,6 +838,7 @@ class BleIoStream(
         // which it then rejects, failing the download. darwin drains the same
         // semaphore for the same reason before a with-response write.
         writeSemaphore.drainPermits()
+        lastWriteStatus = BluetoothGatt.GATT_SUCCESS
 
         if (!g.writeCharacteristic(char)) {
             NativeLogger.e(TAG, "BLE", "write: writeCharacteristic() returned false")
@@ -837,6 +850,15 @@ class BleIoStream(
         // without this wait, a subsequent write would fail because
         // the previous one is still in flight.
         if (!writeSemaphore.tryAcquire(timeout, TimeUnit.MILLISECONDS)) return -1
+
+        // A write the peripheral rejected must be reported as a failure.
+        // Returning data.size regardless would tell libdivecomputer the
+        // command went out, leaving it waiting for a reply that can never
+        // come. darwin already fails the write on lastWriteError.
+        if (lastWriteStatus != BluetoothGatt.GATT_SUCCESS) {
+            NativeLogger.e(TAG, "BLE", "write: failed status=$lastWriteStatus")
+            return -1
+        }
 
         return data.size
     }

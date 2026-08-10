@@ -440,8 +440,11 @@ void BleIoStream::OnCharacteristicValueChanged(
     GattValueChangedEventArgs const& args) {
     // UART Credits TX shares this handler with UART Data TX but carries no
     // application data: injecting its indications into the read queue would
-    // corrupt the protocol stream.
-    if (notify_characteristic_ &&
+    // corrupt the protocol stream. The check is unconditional -- revoking the
+    // ValueChanged token does not wait for handlers already running, so a late
+    // one can arrive after Close() has cleared the characteristic, and a null
+    // characteristic must reject everything rather than accept everything.
+    if (!notify_characteristic_ ||
         sender.AttributeHandle() != notify_characteristic_.AttributeHandle()) {
         return;
     }

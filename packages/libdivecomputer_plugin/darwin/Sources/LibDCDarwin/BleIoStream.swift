@@ -15,6 +15,17 @@ class BleIoStream: NSObject, CBPeripheralDelegate {
         string: "6606AB42-89D5-4A00-A8CE-4EB5E1414EE0"
     )
     private static let notifySettleDelaySeconds: TimeInterval = 0.3
+    /// Bound on the opening credit grant.
+    ///
+    /// Deliberately fixed rather than derived from `timeoutMs`. This runs
+    /// inside connectAndDiscover, before libdivecomputer has been handed the
+    /// iostream callbacks, so `set_timeout` cannot have been called yet and
+    /// `timeoutMs` is still its 10000 ms initialiser -- the two are the same
+    /// number. Following the caller's timeout would also let libdivecomputer's
+    /// negative "no timeout" (mapped to `.distantFuture` on the I/O path) hang
+    /// connection setup indefinitely. The neighbouring setup waits are bounded
+    /// the same way: 15 s to connect, 10 s to discover.
+    private static let creditGrantTimeoutSeconds: DispatchTimeInterval = .seconds(10)
     private static let bleIoctlType: UInt32 = UInt32(Character("b").asciiValue!)
     private static let bleIoctlGetNameNumber: UInt32 = 0
     private static let bleIoctlGetPinCodeNumber: UInt32 = 1
@@ -239,7 +250,8 @@ class BleIoStream: NSObject, CBPeripheralDelegate {
                 + " \(creditsChar.uuid.uuidString)")
         peripheral.writeValue(Data([amount]), for: creditsChar, type: .withResponse)
 
-        if creditSemaphore.wait(timeout: .now() + .seconds(10)) == .timedOut {
+        if creditSemaphore.wait(
+            timeout: .now() + Self.creditGrantTimeoutSeconds) == .timedOut {
             return creditGrantFailed("timed out granting initial credits")
         }
         if let error = lastCreditWriteError {
