@@ -184,6 +184,23 @@ class BleIoStream(
             } else {
                 connected = false
                 lastDisconnectStatus = status
+                // A credit top-up that was accepted before the link dropped
+                // never gets its completion callback, so its permit would be
+                // held for the life of this object. Every later command write
+                // would then wait on the gate instead of failing fast -- and
+                // libdivecomputer passes a negative timeout for "no timeout",
+                // which write() maps to Long.MAX_VALUE, so the wait would be
+                // indefinite rather than merely slow. Clear the flag before
+                // releasing so a late callback cannot release it a second
+                // time; Semaphore has no permit ceiling, and an over-release
+                // would silently destroy the mutual exclusion the gate exists
+                // for. Both callbacks arrive on the same GATT callback thread,
+                // so this check and the one in onCharacteristicWrite cannot
+                // interleave.
+                if (creditTopUpInFlight) {
+                    creditTopUpInFlight = false
+                    gattOperation.release()
+                }
                 NativeLogger.d(TAG, "BLE", "onConnectionStateChange: disconnected status=$status")
                 connectSemaphore.release()
             }
