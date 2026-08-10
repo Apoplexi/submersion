@@ -1227,7 +1227,7 @@
 |---------|--------|-------|-------|
 | View community dive sites | 📋 Planned | v2.0 | Requires backend |
 | Explore nearby sites | 📋 Planned | v2.0 | GPS-based search |
-| User-submitted site photos | 📋 Planned | v2.0 | Photo gallery per site |
+| User-submitted site photos | ✅ Implemented | v1.5 | Site media section: photos, videos, and PDF/document attachments per site (issues #211/#627) |
 | Dive site reviews & ratings | 📋 Planned | v2.0 | Rate and review sites |
 
 **v2.0 Tasks:**

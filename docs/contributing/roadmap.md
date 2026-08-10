@@ -236,7 +236,7 @@ Community features and advanced integrations.
 
 - :crystal_ball: Community dive site database
 - :crystal_ball: User reviews and ratings
-- :crystal_ball: Site photo galleries
+- :white_check_mark: Site photo galleries (site media section with photo, video, and document attachments)
 - :crystal_ball: Discover nearby sites
 
 ### Advanced Features

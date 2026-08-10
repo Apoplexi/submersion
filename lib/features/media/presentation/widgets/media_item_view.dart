@@ -135,8 +135,9 @@ class _MediaItemViewState extends ConsumerState<MediaItemView> {
       // No store on this device: the row's stamps say the bytes exist
       // somewhere, but nothing here can reach them, so the native
       // placeholder is the honest answer.
-      if (runtime == null)
+      if (runtime == null) {
         return (data: native, videoPosterMissing: false, isStoreData: false);
+      }
       final remote = await runtime.resolver.tryResolveRemote(
         widget.item,
         thumbnail: widget.thumbnail,
