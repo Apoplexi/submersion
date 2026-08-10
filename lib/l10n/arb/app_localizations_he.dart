@@ -5559,13 +5559,6 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
-  String get diveLog_instruments_customize => 'התאמה אישית של מכשירים';
-
-  @override
-  String get diveLog_instruments_customizeHint =>
-      'הפעל או כבה מכשירים. גרור כדי לסדר מחדש.';
-
-  @override
   String get diveLog_legend_label_ascentRate => 'קצב עלייה';
 
   @override

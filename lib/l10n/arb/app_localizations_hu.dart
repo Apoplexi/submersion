@@ -5691,13 +5691,6 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
-  String get diveLog_instruments_customize => 'Műszerek testreszabása';
-
-  @override
-  String get diveLog_instruments_customizeHint =>
-      'Kapcsolja be vagy ki a műszereket. Húzza az átrendezéshez.';
-
-  @override
   String get diveLog_legend_label_ascentRate => 'Felszallasi sebesseg';
 
   @override
