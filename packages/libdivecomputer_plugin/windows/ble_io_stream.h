@@ -87,6 +87,8 @@ class BleIoStream {
   // ble_io_stream.cc and darwin's BleCharacteristicSelector.
   bool GrantInitialCredits();
   void ReplenishCredits();
+  // Unsubscribe from and forget the credit characteristics.
+  void ReleaseCreditCharacteristics();
 
   // Known service/characteristic UUIDs for dive computers.
   static const winrt::guid kPreferredServiceUuid;

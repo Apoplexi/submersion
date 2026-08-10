@@ -444,6 +444,14 @@ class BleIoStream(
     private fun abandonCreditFlowControl(reason: String) {
         NativeLogger.w(TAG, "BLE",
             "Terminal I/O: $reason; continuing without credit flow control")
+        // Stop the local stack forwarding credit indications we would only
+        // discard. This is a local call with no GATT operation behind it, so
+        // it cannot collide with the setup chain or the write gate. The CCCD
+        // disable that would also stop the module transmitting is deliberately
+        // not chained here: it would need another setup step on a path that
+        // only runs when a u-blox module rejects the grant, and the callbacks
+        // are already filtered out by onNotification.
+        creditsNotifyCharacteristic?.let { gatt?.setCharacteristicNotification(it, false) }
         creditsWriteCharacteristic = null
         creditsNotifyCharacteristic = null
     }

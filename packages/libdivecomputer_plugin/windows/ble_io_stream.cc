@@ -337,8 +337,7 @@ bool BleIoStream::GrantInitialCredits() {
         // dead. u-blox flow control is optional and the service already works
         // with no handshake at all, so fall back to that instead.
         if (credits_required_) return false;
-        std::lock_guard<std::mutex> lock(credits_mutex_);
-        credits_write_characteristic_ = nullptr;
+        ReleaseCreditCharacteristics();
         return true;
     }
 
@@ -347,6 +346,26 @@ bool BleIoStream::GrantInitialCredits() {
         terminal_io_credits_ = kTerminalIoInitialGrant;
     }
     return true;
+}
+
+void BleIoStream::ReleaseCreditCharacteristics() {
+    // Unsubscribe rather than merely ignoring the credit indications, so the
+    // module stops transmitting on a channel we have given up on and its
+    // airtime goes to the data stream instead.
+    if (credits_notify_characteristic_) {
+        credits_notify_characteristic_.ValueChanged(credits_notify_token_);
+        try {
+            credits_notify_characteristic_
+                .WriteClientCharacteristicConfigurationDescriptorAsync(
+                    GattClientCharacteristicConfigurationDescriptorValue::None)
+                .get();
+        } catch (...) {
+        }
+        credits_notify_characteristic_ = nullptr;
+    }
+    std::lock_guard<std::mutex> lock(credits_mutex_);
+    credits_write_characteristic_ = nullptr;
+    terminal_io_credits_ = 0;
 }
 
 void BleIoStream::ReplenishCredits() {
@@ -421,23 +440,7 @@ libdc_io_callbacks_t BleIoStream::MakeCallbacks() {
 }
 
 void BleIoStream::Close() {
-    if (credits_notify_characteristic_) {
-        credits_notify_characteristic_.ValueChanged(credits_notify_token_);
-        try {
-            credits_notify_characteristic_
-                .WriteClientCharacteristicConfigurationDescriptorAsync(
-                    GattClientCharacteristicConfigurationDescriptorValue::
-                        None)
-                .get();
-        } catch (...) {
-        }
-        credits_notify_characteristic_ = nullptr;
-    }
-    {
-        std::lock_guard<std::mutex> lock(credits_mutex_);
-        credits_write_characteristic_ = nullptr;
-        terminal_io_credits_ = 0;
-    }
+    ReleaseCreditCharacteristics();
     credits_required_ = false;
     if (notify_characteristic_) {
         notify_characteristic_.ValueChanged(notify_token_);

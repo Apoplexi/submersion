@@ -263,6 +263,19 @@ class BleIoStream: NSObject, CBPeripheralDelegate {
         NativeLogger.w("BleIoStream", category: "BLE",
             "Terminal I/O: \(reason); continuing without credit flow control")
         creditsWriteCharacteristic = nil
+
+        // Unsubscribe rather than merely ignoring the credit indications. The
+        // point is not the discarded delegate callbacks but that the module
+        // stops transmitting them at all: this fallback exists for the OSTC
+        // nano, whose downloads are already lost to a saturated delegate queue
+        // and BLE link (#394), so spending neither airtime nor queue time on a
+        // channel we have given up on matters.
+        if let creditsNotify = creditsNotifyCharacteristic {
+            if creditsNotify.isNotifying {
+                peripheral.setNotifyValue(false, for: creditsNotify)
+            }
+            creditsNotifyCharacteristic = nil
+        }
         return true
     }
 
@@ -769,8 +782,9 @@ class BleIoStream: NSObject, CBPeripheralDelegate {
             // A failed credits subscription is survivable on u-blox, whose
             // flow control is optional; on Telit it is the end of the road.
             if step == .creditsNotify, !creditsRequired {
+                // creditGrantFailed clears the credit characteristics; the
+                // subscription never came up here, so it has nothing to undo.
                 _ = creditGrantFailed(failure)
-                creditsNotifyCharacteristic = nil
                 subscribeToDataNotifications()
                 return
             }

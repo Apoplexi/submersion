@@ -157,6 +157,17 @@ static void abandon_credit_flow_control(BleIoStream* stream,
               "continuing without credit flow control", reason);
     g_clear_pointer(&stream->credits_write_path, g_free);
     stream->terminal_io_credits = 0;
+
+    // Unsubscribe rather than merely ignoring the credit indications, so the
+    // module stops transmitting on a channel we have given up on and its
+    // airtime goes to the data stream instead.
+    if (stream->connection && stream->credits_notify_path) {
+        g_dbus_connection_call(
+            stream->connection, "org.bluez", stream->credits_notify_path,
+            "org.bluez.GattCharacteristic1", "StopNotify",
+            NULL, NULL, G_DBUS_CALL_FLAGS_NONE, -1, NULL, NULL, NULL);
+        g_clear_pointer(&stream->credits_notify_path, g_free);
+    }
 }
 
 // Write the opening credit grant to Credits RX. A no-op (success) on devices
@@ -478,8 +489,9 @@ gboolean ble_io_stream_connect(BleIoStream* stream,
                           "failed: %s", error->message);
                 return FALSE;
             }
-            abandon_credit_flow_control(stream, error->message);
+            // The subscription never came up, so there is nothing to stop.
             g_clear_pointer(&stream->credits_notify_path, g_free);
+            abandon_credit_flow_control(stream, error->message);
         }
     }
 
