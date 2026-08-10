@@ -4,6 +4,8 @@ import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:submersion/core/database/local_cache_database.dart';
+import 'package:submersion/core/models/log_entry.dart';
+import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/core/services/media_store/media_object_store.dart';
 import 'package:submersion/features/media/data/repositories/media_repository.dart';
 import 'package:submersion/features/media/data/services/media_source_resolver_registry.dart';
@@ -89,6 +91,40 @@ void main() {
       expect(pipeline.processed, isEmpty);
     },
   );
+
+  // Catching the throw is what removes the stack trace that used to reach the
+  // zone handler, so this log line is now the only record of a preflight that
+  // keeps failing. It must carry the cause through LoggerService's structured
+  // error field (rendered as "| error: ..."), not interpolated into the text.
+  test('the suspended drain logs the cause as a structured error', () async {
+    await queue.enqueueUpload(mediaId: 'm1');
+    final worker = MediaStoreWorker(
+      queue: queue,
+      pipeline: pipeline,
+      preflight: () async => throw const MediaStoreException(
+        'get smv1/store.json failed: Could not reach S3 endpoint',
+        kind: MediaStoreErrorKind.transient,
+      ),
+    );
+    addTearDown(worker.dispose);
+
+    final entries = <LogEntry>[];
+    final sub = LoggerService.logStream.listen(entries.add);
+    addTearDown(sub.cancel);
+
+    await worker.drain();
+
+    expect(
+      entries.map((e) => e.message),
+      contains(
+        allOf(
+          contains('drain suspended'),
+          contains('| error: MediaStoreException(transient)'),
+          contains('smv1/store.json'),
+        ),
+      ),
+    );
+  });
 
   test(
     'a drain suspended by a throwing preflight can run again later',

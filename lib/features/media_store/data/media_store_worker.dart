@@ -114,14 +114,23 @@ class MediaStoreWorker {
   /// drain (#942). Suspending is also the safe reading: the check exists to
   /// stop transfers against a store this device may no longer be attached to,
   /// so "could not verify" must never be treated as "verified".
+  ///
+  /// The throw is logged with its error and stack trace, not interpolated into
+  /// the message: catching it is what stops the crash, so the log is now the
+  /// only record of a preflight that keeps failing, and a bare string would
+  /// make that state less diagnosable than the uncaught zone error it replaced.
   Future<bool> _preflightPasses() async {
     final preflight = _preflight;
     if (preflight == null) return true;
     try {
       if (await preflight()) return true;
       _log.warning('Media store preflight failed; drain suspended');
-    } on Object catch (e) {
-      _log.warning('Media store preflight could not run; drain suspended: $e');
+    } on Object catch (e, stackTrace) {
+      _log.warning(
+        'Media store preflight could not run; drain suspended',
+        error: e,
+        stackTrace: stackTrace,
+      );
     }
     return false;
   }

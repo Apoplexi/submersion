@@ -62,7 +62,13 @@ class S3ApiClient {
     Duration maxRetryDelay = defaultMaxRetryDelay,
     Random? random,
     this.onRegionCorrected,
-  }) : _config = config,
+  }) : assert(maxAttempts >= 1, 'a request must be attempted at least once'),
+       assert(
+         !retryDelay.isNegative && !maxRetryDelay.isNegative,
+         'a negative backoff reaches Random.nextInt with a non-positive max '
+         'and throws RangeError',
+       ),
+       _config = config,
        _region = config.region,
        _http = httpClient ?? http.Client(),
        _now = now ?? DateTime.now,

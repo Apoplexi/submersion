@@ -348,6 +348,35 @@ void main() {
       }
     });
 
+    // A negative delay survives backoffCeilingFor (it is below the cap, so it
+    // is returned as-is) and reaches Random.nextInt with a non-positive max,
+    // which throws RangeError deep inside a retry. Fail at construction
+    // instead, where the misconfiguration is visible.
+    test('rejects a retry configuration that cannot produce a delay', () {
+      S3ApiClient build({
+        int maxAttempts = 6,
+        Duration retryDelay = const Duration(milliseconds: 500),
+        Duration maxRetryDelay = const Duration(seconds: 16),
+      }) => S3ApiClient(
+        minioConfig(),
+        httpClient: MockClient((_) async => http.Response('', 200)),
+        maxAttempts: maxAttempts,
+        retryDelay: retryDelay,
+        maxRetryDelay: maxRetryDelay,
+      );
+
+      expect(() => build(maxAttempts: 0), throwsA(isA<AssertionError>()));
+      expect(
+        () => build(retryDelay: const Duration(milliseconds: -1)),
+        throwsA(isA<AssertionError>()),
+      );
+      expect(
+        () => build(maxRetryDelay: const Duration(seconds: -1)),
+        throwsA(isA<AssertionError>()),
+      );
+      expect(build, returnsNormally);
+    });
+
     // Equal jitter, not full jitter: the floor is the point. A run of
     // near-zero waits would spend the whole budget inside the dropout the
     // backoff exists to outlast.
