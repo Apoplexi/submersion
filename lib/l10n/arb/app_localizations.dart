@@ -20036,6 +20036,60 @@ abstract class AppLocalizations {
   /// **'Photo unlinked'**
   String get media_diveMediaSection_unlinkSuccess;
 
+  /// No description provided for @media_siteMediaSection_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Site Media'**
+  String get media_siteMediaSection_title;
+
+  /// No description provided for @media_siteMediaSection_addPhotos.
+  ///
+  /// In en, this message translates to:
+  /// **'Add photos or videos'**
+  String get media_siteMediaSection_addPhotos;
+
+  /// No description provided for @media_siteMediaSection_addDocument.
+  ///
+  /// In en, this message translates to:
+  /// **'Add document'**
+  String get media_siteMediaSection_addDocument;
+
+  /// No description provided for @media_siteMediaSection_emptyState.
+  ///
+  /// In en, this message translates to:
+  /// **'No maps, photos, or documents attached to this site'**
+  String get media_siteMediaSection_emptyState;
+
+  /// No description provided for @media_siteMediaSection_divePhotosGroup.
+  ///
+  /// In en, this message translates to:
+  /// **'Photos from dives here ({count})'**
+  String media_siteMediaSection_divePhotosGroup(int count);
+
+  /// No description provided for @media_siteMediaSection_divePhotoLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Dive photo'**
+  String get media_siteMediaSection_divePhotoLabel;
+
+  /// No description provided for @media_siteMediaSection_unlinkSelectedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove {count} attachments?'**
+  String media_siteMediaSection_unlinkSelectedTitle(int count);
+
+  /// No description provided for @media_siteMediaSection_unlinkSelectedContent.
+  ///
+  /// In en, this message translates to:
+  /// **'The selected items will be removed from this site. Files in your photo library or on disk are not deleted.'**
+  String get media_siteMediaSection_unlinkSelectedContent;
+
+  /// No description provided for @media_siteMediaSection_unlinkSelectedSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Removed {count} attachments'**
+  String media_siteMediaSection_unlinkSelectedSuccess(int count);
+
   /// No description provided for @media_diveScan_scanTooltip.
   ///
   /// In en, this message translates to:

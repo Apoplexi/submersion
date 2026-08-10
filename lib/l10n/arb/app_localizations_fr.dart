@@ -11802,6 +11802,41 @@ class AppLocalizationsFr extends AppLocalizations {
   String get media_diveMediaSection_unlinkSuccess => 'Photo dissociee';
 
   @override
+  String get media_siteMediaSection_title => 'Site Media';
+
+  @override
+  String get media_siteMediaSection_addPhotos => 'Add photos or videos';
+
+  @override
+  String get media_siteMediaSection_addDocument => 'Add document';
+
+  @override
+  String get media_siteMediaSection_emptyState =>
+      'No maps, photos, or documents attached to this site';
+
+  @override
+  String media_siteMediaSection_divePhotosGroup(int count) {
+    return 'Photos from dives here ($count)';
+  }
+
+  @override
+  String get media_siteMediaSection_divePhotoLabel => 'Dive photo';
+
+  @override
+  String media_siteMediaSection_unlinkSelectedTitle(int count) {
+    return 'Remove $count attachments?';
+  }
+
+  @override
+  String get media_siteMediaSection_unlinkSelectedContent =>
+      'The selected items will be removed from this site. Files in your photo library or on disk are not deleted.';
+
+  @override
+  String media_siteMediaSection_unlinkSelectedSuccess(int count) {
+    return 'Removed $count attachments';
+  }
+
+  @override
   String get media_diveScan_scanTooltip =>
       'Rechercher des photos dans la galerie';
 

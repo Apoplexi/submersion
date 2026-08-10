@@ -6691,6 +6691,15 @@
   "media_diveMediaSection_unlinkSelectedSuccess": "Unlinked {count} items",
   "media_diveMediaSection_unlinkSelectedTitle": "Unlink {count} items?",
   "media_diveMediaSection_unlinkSuccess": "Photo unlinked",
+  "media_siteMediaSection_title": "Site Media",
+  "media_siteMediaSection_addPhotos": "Add photos or videos",
+  "media_siteMediaSection_addDocument": "Add document",
+  "media_siteMediaSection_emptyState": "No maps, photos, or documents attached to this site",
+  "media_siteMediaSection_divePhotosGroup": "Photos from dives here ({count})",
+  "media_siteMediaSection_divePhotoLabel": "Dive photo",
+  "media_siteMediaSection_unlinkSelectedTitle": "Remove {count} attachments?",
+  "media_siteMediaSection_unlinkSelectedContent": "The selected items will be removed from this site. Files in your photo library or on disk are not deleted.",
+  "media_siteMediaSection_unlinkSelectedSuccess": "Removed {count} attachments",
   "media_diveScan_scanTooltip": "Scan gallery for photos",
   "media_diveScan_noPhotosFound": "No new photos found near this dive",
   "media_diveScan_accessDenied": "Photo library access is required to scan for photos",
@@ -6867,6 +6876,27 @@
     }
   },
   "@media_diveMediaSection_unlinkSelectedTitle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@media_siteMediaSection_divePhotosGroup": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@media_siteMediaSection_unlinkSelectedTitle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@media_siteMediaSection_unlinkSelectedSuccess": {
     "placeholders": {
       "count": {
         "type": "int"

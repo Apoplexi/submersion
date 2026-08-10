@@ -1,0 +1,362 @@
+import 'package:flutter/material.dart';
+
+import 'package:submersion/core/providers/provider.dart';
+import 'package:submersion/features/media/domain/entities/media_item.dart';
+import 'package:submersion/features/media/presentation/pages/site_media_viewer_page.dart';
+import 'package:submersion/features/media/presentation/providers/site_media_providers.dart';
+import 'package:submersion/features/media/presentation/widgets/media_grid.dart';
+import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
+import 'package:submersion/l10n/l10n_extension.dart';
+import 'package:submersion/shared/widgets/drag_select_grid_view.dart';
+
+/// Section widget displaying a site's media: direct attachments (maps,
+/// entry-point photos, documents) plus a collapsed group of photos from
+/// dives logged at the site.
+///
+/// Add actions and document opening are injected by the page so this widget
+/// stays free of picker/viewer wiring, mirroring [DiveMediaSection].
+class SiteMediaSection extends ConsumerStatefulWidget {
+  final String siteId;
+  final VoidCallback? onAddPhotosPressed;
+  final VoidCallback? onAddDocumentPressed;
+  final void Function(MediaItem)? onOpenDocument;
+
+  const SiteMediaSection({
+    super.key,
+    required this.siteId,
+    this.onAddPhotosPressed,
+    this.onAddDocumentPressed,
+    this.onOpenDocument,
+  });
+
+  @override
+  ConsumerState<SiteMediaSection> createState() => _SiteMediaSectionState();
+}
+
+class _SiteMediaSectionState extends ConsumerState<SiteMediaSection> {
+  bool _isSelectionMode = false;
+  Set<int> _selectedIndices = {};
+
+  void _exitSelectionMode() {
+    setState(() {
+      _isSelectionMode = false;
+      _selectedIndices = {};
+    });
+  }
+
+  void _selectAll(int totalCount) {
+    setState(() {
+      _selectedIndices = Set<int>.from(List.generate(totalCount, (i) => i));
+    });
+  }
+
+  Future<void> _unlinkSelected(
+    BuildContext context,
+    List<MediaItem> media,
+  ) async {
+    final selectedIds = _selectedIndices
+        .where((i) => i < media.length)
+        .map((i) => media[i].id)
+        .toList();
+
+    if (selectedIds.isEmpty) return;
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(
+          ctx.l10n.media_siteMediaSection_unlinkSelectedTitle(
+            selectedIds.length,
+          ),
+        ),
+        content: Text(ctx.l10n.media_siteMediaSection_unlinkSelectedContent),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: Text(ctx.l10n.media_diveMediaSection_cancelButton),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: Text(ctx.l10n.media_diveMediaSection_unlinkButton),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true && context.mounted) {
+      try {
+        await ref
+            .read(siteMediaListNotifierProvider(widget.siteId).notifier)
+            .deleteMultipleMedia(selectedIds);
+
+        _exitSelectionMode();
+
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                context.l10n.media_siteMediaSection_unlinkSelectedSuccess(
+                  selectedIds.length,
+                ),
+              ),
+            ),
+          );
+        }
+      } catch (e) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                context.l10n.media_diveMediaSection_unlinkError(e.toString()),
+              ),
+              backgroundColor: Theme.of(context).colorScheme.error,
+            ),
+          );
+        }
+      }
+    }
+  }
+
+  void _openItem(BuildContext context, MediaItem item, SiteViewerScope scope) {
+    if (item.isDocument) {
+      widget.onOpenDocument?.call(item);
+      return;
+    }
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        fullscreenDialog: true,
+        builder: (_) => SiteMediaViewerPage(
+          siteId: widget.siteId,
+          initialMediaId: item.id,
+          scope: scope,
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final mediaAsync = ref.watch(mediaForSiteProvider(widget.siteId));
+    final settings = ref.watch(settingsProvider);
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Header: selection mode or normal
+            if (_isSelectionMode)
+              mediaAsync.whenOrNull(
+                    data: (media) => MediaSelectionHeader(
+                      selectedCount: _selectedIndices.length,
+                      totalCount: media.length,
+                      onSelectAll: () => _selectAll(media.length),
+                      onCancel: _exitSelectionMode,
+                      onUnlinkSelected: () => _unlinkSelected(context, media),
+                      selectedCountLabel: context.l10n
+                          .media_diveMediaSection_selectedCount(
+                            _selectedIndices.length,
+                          ),
+                      selectAllLabel:
+                          context.l10n.media_diveMediaSection_selectAllButton,
+                      cancelTooltip: context
+                          .l10n
+                          .media_diveMediaSection_cancelSelectionButton,
+                      unlinkTooltip: context.l10n
+                          .media_diveMediaSection_unlinkSelectedButton(
+                            _selectedIndices.length,
+                          ),
+                    ),
+                  ) ??
+                  const SizedBox.shrink()
+            else
+              Row(
+                children: [
+                  Icon(
+                    Icons.photo_library,
+                    size: 20,
+                    color: colorScheme.primary,
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      context.l10n.media_siteMediaSection_title,
+                      style: textTheme.titleMedium,
+                    ),
+                  ),
+                  if (widget.onAddPhotosPressed != null ||
+                      widget.onAddDocumentPressed != null)
+                    PopupMenuButton<String>(
+                      icon: Icon(
+                        Icons.add_photo_alternate,
+                        color: colorScheme.primary,
+                      ),
+                      tooltip: context.l10n.media_diveMediaSection_addTooltip,
+                      onSelected: (value) {
+                        if (value == 'photos') {
+                          widget.onAddPhotosPressed?.call();
+                        }
+                        if (value == 'document') {
+                          widget.onAddDocumentPressed?.call();
+                        }
+                      },
+                      itemBuilder: (context) => [
+                        if (widget.onAddPhotosPressed != null)
+                          PopupMenuItem(
+                            value: 'photos',
+                            child: Text(
+                              context.l10n.media_siteMediaSection_addPhotos,
+                            ),
+                          ),
+                        if (widget.onAddDocumentPressed != null)
+                          PopupMenuItem(
+                            value: 'document',
+                            child: Text(
+                              context.l10n.media_siteMediaSection_addDocument,
+                            ),
+                          ),
+                      ],
+                    ),
+                ],
+              ),
+            const SizedBox(height: 16),
+            // Attachments grid
+            mediaAsync.when(
+              data: (media) {
+                if (media.isEmpty) {
+                  return MediaEmptyState(
+                    icon: Icons.map_outlined,
+                    message: context.l10n.media_siteMediaSection_emptyState,
+                  );
+                }
+                return DragSelectGridView<MediaItem>(
+                  items: media,
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  startInSelectionMode: _isSelectionMode,
+                  initialSelection: _selectedIndices,
+                  onSelectionChanged: (indices) {
+                    setState(() {
+                      _selectedIndices = indices;
+                    });
+                  },
+                  onSelectionModeChanged: (isSelecting) {
+                    setState(() {
+                      _isSelectionMode = isSelecting;
+                    });
+                  },
+                  onItemTap: (index) => _openItem(
+                    context,
+                    media[index],
+                    SiteViewerScope.attachments,
+                  ),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 4,
+                    crossAxisSpacing: 8,
+                    mainAxisSpacing: 8,
+                  ),
+                  // coverage:ignore-start
+                  // The itemBuilder closure only fires when the site has
+                  // media; rendering media tiles needs the populated-DB +
+                  // resolver pipeline (see DiveMediaSection's identical
+                  // exclusion).
+                  itemBuilder: (context, item, isSelected) =>
+                      MediaThumbnailTile(
+                        item: item,
+                        settings: settings,
+                        isSelectionMode: _isSelectionMode,
+                        isSelected: isSelected,
+                        semanticsLabel:
+                            context.l10n.media_diveMediaSection_thumbnailLabel,
+                      ),
+                  // coverage:ignore-end
+                );
+              },
+              loading: () => const SizedBox(
+                height: 100,
+                child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
+              ),
+              error: (error, stack) => Text(
+                context.l10n.media_diveMediaSection_errorLoading,
+                style: textTheme.bodyMedium?.copyWith(color: colorScheme.error),
+              ),
+            ),
+            // Photos from dives at this site, collapsed by default so site
+            // reference material (maps, documents) stays prominent.
+            _DivePhotosGroup(siteId: widget.siteId, settings: settings),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Collapsed, read-only group of photos aggregated from the site's dives.
+class _DivePhotosGroup extends ConsumerWidget {
+  final String siteId;
+  final AppSettings settings;
+
+  const _DivePhotosGroup({required this.siteId, required this.settings});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final groupedAsync = ref.watch(mediaFromDivesAtSiteProvider(siteId));
+    final textTheme = Theme.of(context).textTheme;
+
+    final grouped = groupedAsync.valueOrNull;
+    if (grouped == null || grouped.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    final flat = grouped.values.expand((list) => list).toList()
+      ..sort((a, b) => a.takenAt.compareTo(b.takenAt));
+
+    return ExpansionTile(
+      tilePadding: EdgeInsets.zero,
+      initiallyExpanded: false,
+      title: Text(
+        context.l10n.media_siteMediaSection_divePhotosGroup(flat.length),
+        style: textTheme.titleSmall,
+      ),
+      children: [
+        // coverage:ignore-start
+        // Rendering tiles needs the resolver pipeline; the collapsed tile
+        // header above is what widget tests assert on.
+        GridView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 4,
+            crossAxisSpacing: 8,
+            mainAxisSpacing: 8,
+          ),
+          itemCount: flat.length,
+          itemBuilder: (context, index) => GestureDetector(
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute(
+                fullscreenDialog: true,
+                builder: (_) => SiteMediaViewerPage(
+                  siteId: siteId,
+                  initialMediaId: flat[index].id,
+                  scope: SiteViewerScope.divePhotos,
+                ),
+              ),
+            ),
+            child: MediaThumbnailTile(
+              item: flat[index],
+              settings: settings,
+              isSelectionMode: false,
+              isSelected: false,
+              semanticsLabel:
+                  context.l10n.media_siteMediaSection_divePhotoLabel,
+            ),
+          ),
+        ),
+        // coverage:ignore-end
+      ],
+    );
+  }
+}
