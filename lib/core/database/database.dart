@@ -2936,7 +2936,7 @@ class AppDatabase extends _$AppDatabase {
 
   /// The current schema version as a static constant so that pre-open checks
   /// (e.g. version-mismatch guard) can reference it without an instance.
-  static const int currentSchemaVersion = 147;
+  static const int currentSchemaVersion = 148;
 
   /// Every schema version that has a migration block in onUpgrade.
   /// Used to calculate progress step counts. When adding a new migration,
@@ -3130,6 +3130,10 @@ class AppDatabase extends _$AppDatabase {
     // 2026-08-08-buddy-professional-roles-fold). Originally authored as v145;
     // renumbered when PR #908 reserved 145 and v146 landed first.
     147,
+    // v148: site media attachments (issues #211/#627): media(site_id) query
+    // index plus the site-side dedupe cleanup and partial unique index
+    // mirroring the dive-side v38 pair.
+    148,
   ];
 
   /// Idempotent DDL for the v106 connector-suggestion columns (Lightroom
@@ -7664,6 +7668,45 @@ class AppDatabase extends _$AppDatabase {
           await _migrateBuddyRolesToCertifications();
         }
         if (from < 147) await reportProgress();
+        if (from < 148) {
+          // Site media (issues #211/#627). Query index for the site gallery;
+          // dedupe cleanup + partial unique index mirroring the dive-side
+          // v38 pair so the same gallery asset cannot be linked to the same
+          // site twice. Keep the oldest duplicate (lowest created_at).
+          // Guarded on media.site_id existing so partial migration-test
+          // fixture databases (which build only the tables and columns their
+          // migration touches) pass through unharmed.
+          final mediaSiteCol = await customSelect(
+            "SELECT name FROM pragma_table_info('media') "
+            "WHERE name = 'site_id'",
+          ).get();
+          if (mediaSiteCol.isNotEmpty) {
+            await customStatement('''
+            CREATE INDEX IF NOT EXISTS idx_media_site_id
+            ON media(site_id)
+          ''');
+            await customStatement('''
+            DELETE FROM media WHERE id IN (
+              SELECT m.id FROM media m
+              INNER JOIN (
+                SELECT platform_asset_id, site_id, MIN(created_at) as min_created
+                FROM media
+                WHERE platform_asset_id IS NOT NULL AND site_id IS NOT NULL
+                GROUP BY platform_asset_id, site_id
+                HAVING COUNT(*) > 1
+              ) dupes ON m.platform_asset_id = dupes.platform_asset_id
+                AND m.site_id = dupes.site_id
+                AND m.created_at > dupes.min_created
+            )
+          ''');
+            await customStatement('''
+            CREATE UNIQUE INDEX IF NOT EXISTS idx_media_asset_site_unique
+            ON media(platform_asset_id, site_id)
+            WHERE platform_asset_id IS NOT NULL AND site_id IS NOT NULL
+          ''');
+          }
+        }
+        if (from < 148) await reportProgress();
       },
       beforeOpen: (details) async {
         // Enable foreign keys
