@@ -1656,15 +1656,24 @@ class AppLocalizationsHe extends AppLocalizations {
   String get certifications_ecardStack_empty_title => 'אין עדיין הסמכות';
 
   @override
+  String get certifications_ecard_label_cardNumber => 'מספר כרטיס';
+
+  @override
   String certifications_ecard_label_certifiedBy(Object agency) {
     return 'הוסמך על ידי $agency';
   }
+
+  @override
+  String get certifications_ecard_label_diver => 'צוללן';
 
   @override
   String get certifications_ecard_label_instructor => 'מדריך';
 
   @override
   String get certifications_ecard_label_issued => 'הונפק';
+
+  @override
+  String get certifications_ecard_label_validUntil => 'בתוקף עד';
 
   @override
   String get certifications_ecard_statusBadge_expired => 'פג תוקף';
@@ -2014,33 +2023,6 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get certifications_summary_stat_valid => 'בתוקף';
-
-  @override
-  String certifications_walletCard_countPlural(Object count) {
-    return '$count הסמכות';
-  }
-
-  @override
-  String certifications_walletCard_countSingular(Object count) {
-    return 'הסמכה $count';
-  }
-
-  @override
-  String get certifications_walletCard_emptyFooter =>
-      'הוסף את ההסמכה הראשונה שלך';
-
-  @override
-  String get certifications_walletCard_error => 'טעינת ההסמכות נכשלה';
-
-  @override
-  String get certifications_walletCard_semanticLabel =>
-      'ארנק הסמכות. הקש כדי לצפות בכל ההסמכות';
-
-  @override
-  String get certifications_walletCard_tapToAdd => 'הקש להוספה';
-
-  @override
-  String get certifications_walletCard_title => 'ארנק הסמכות';
 
   @override
   String get certifications_wallet_appBar_title => 'ארנק הסמכות';

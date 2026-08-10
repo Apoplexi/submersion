@@ -1705,15 +1705,24 @@ class AppLocalizationsFr extends AppLocalizations {
   String get certifications_ecardStack_empty_title => 'Aucune certification';
 
   @override
+  String get certifications_ecard_label_cardNumber => 'N° DE CARTE';
+
+  @override
   String certifications_ecard_label_certifiedBy(Object agency) {
     return 'Certifie par $agency';
   }
+
+  @override
+  String get certifications_ecard_label_diver => 'PLONGEUR';
 
   @override
   String get certifications_ecard_label_instructor => 'MONITEUR';
 
   @override
   String get certifications_ecard_label_issued => 'DELIVRE';
+
+  @override
+  String get certifications_ecard_label_validUntil => 'VALABLE JUSQU\'AU';
 
   @override
   String get certifications_ecard_statusBadge_expired => 'EXPIRE';
@@ -2085,35 +2094,6 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get certifications_summary_stat_valid => 'Valides';
-
-  @override
-  String certifications_walletCard_countPlural(Object count) {
-    return '$count certifications';
-  }
-
-  @override
-  String certifications_walletCard_countSingular(Object count) {
-    return '$count certification';
-  }
-
-  @override
-  String get certifications_walletCard_emptyFooter =>
-      'Ajoutez votre premiere certification';
-
-  @override
-  String get certifications_walletCard_error =>
-      'Echec du chargement des certifications';
-
-  @override
-  String get certifications_walletCard_semanticLabel =>
-      'Portefeuille de certifications. Appuyez pour voir toutes les certifications';
-
-  @override
-  String get certifications_walletCard_tapToAdd => 'Appuie pour ajouter';
-
-  @override
-  String get certifications_walletCard_title =>
-      'Portefeuille de certifications';
 
   @override
   String get certifications_wallet_appBar_title =>
