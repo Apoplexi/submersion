@@ -9484,6 +9484,9 @@ class AppLocalizationsIt extends AppLocalizations {
   String get enum_equipmentType_camera => 'Fotocamera';
 
   @override
+  String get enum_equipmentType_dpv => 'DPV';
+
+  @override
   String get enum_equipmentType_computer => 'Computer subacqueo';
 
   @override

@@ -9062,6 +9062,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get enum_equipmentType_camera => '相机';
 
   @override
+  String get enum_equipmentType_dpv => 'DPV';
+
+  @override
   String get enum_equipmentType_computer => '潜水电脑';
 
   @override

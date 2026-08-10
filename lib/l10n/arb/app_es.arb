@@ -1,5 +1,6 @@
 {
   "universalImport_action_importFromGarmin": "Importar desde dispositivo Garmin",
+  "enum_equipmentType_dpv": "DPV",
   "diveLog_tank_saveAsPreset": "Guardar como preajuste",
   "diveLog_tank_saveAsPreset_needSpecs": "Introduce primero un volumen y una presión de trabajo",
   "diveLog_tank_saveAsPreset_nameTitle": "Guardar preajuste de tanque",

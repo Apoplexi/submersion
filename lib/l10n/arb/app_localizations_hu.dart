@@ -9470,6 +9470,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String get enum_equipmentType_camera => 'Kamera';
 
   @override
+  String get enum_equipmentType_dpv => 'DPV';
+
+  @override
   String get enum_equipmentType_computer => 'Merulesszamitogep';
 
   @override

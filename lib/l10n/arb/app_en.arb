@@ -5498,6 +5498,7 @@
   "enum_equipmentType_bcd": "BCD",
   "enum_equipmentType_boots": "Boots",
   "enum_equipmentType_camera": "Camera",
+  "enum_equipmentType_dpv": "DPV",
   "enum_equipmentType_computer": "Dive Computer",
   "enum_equipmentType_drysuit": "Drysuit",
   "enum_equipmentType_fins": "Fins",

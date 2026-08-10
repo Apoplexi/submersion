@@ -9490,6 +9490,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get enum_equipmentType_camera => 'Cámara';
 
   @override
+  String get enum_equipmentType_dpv => 'DPV';
+
+  @override
   String get enum_equipmentType_computer => 'Ordenador de buceo';
 
   @override

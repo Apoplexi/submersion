@@ -1,5 +1,6 @@
 {
   "universalImport_action_importFromGarmin": "Importer depuis l'appareil Garmin",
+  "enum_equipmentType_dpv": "DPV",
   "diveLog_tank_saveAsPreset": "Enregistrer comme preset",
   "diveLog_tank_saveAsPreset_needSpecs": "Saisissez d'abord un volume et une pression de service",
   "diveLog_tank_saveAsPreset_nameTitle": "Enregistrer le preset de bloc",

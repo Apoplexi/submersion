@@ -1,5 +1,6 @@
 {
   "universalImport_action_importFromGarmin": "Importar do dispositivo Garmin",
+  "enum_equipmentType_dpv": "DPV",
   "diveLog_tank_saveAsPreset": "Guardar como preset",
   "diveLog_tank_saveAsPreset_needSpecs": "Introduza primeiro um volume e uma pressão de trabalho",
   "diveLog_tank_saveAsPreset_nameTitle": "Guardar preset do cilindro",

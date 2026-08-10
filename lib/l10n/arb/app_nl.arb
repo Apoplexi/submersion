@@ -1,5 +1,6 @@
 {
   "universalImport_action_importFromGarmin": "Importeren vanaf Garmin-apparaat",
+  "enum_equipmentType_dpv": "DPV",
   "diveLog_tank_saveAsPreset": "Als voorinstelling opslaan",
   "diveLog_tank_saveAsPreset_needSpecs": "Voer eerst een volume en werkdruk in",
   "diveLog_tank_saveAsPreset_nameTitle": "Flesvoorinstelling opslaan",

@@ -16125,6 +16125,12 @@ abstract class AppLocalizations {
   /// **'Camera'**
   String get enum_equipmentType_camera;
 
+  /// No description provided for @enum_equipmentType_dpv.
+  ///
+  /// In en, this message translates to:
+  /// **'DPV'**
+  String get enum_equipmentType_dpv;
+
   /// No description provided for @enum_equipmentType_computer.
   ///
   /// In en, this message translates to:

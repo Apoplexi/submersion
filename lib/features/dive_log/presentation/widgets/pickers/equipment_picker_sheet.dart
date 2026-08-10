@@ -163,6 +163,8 @@ class EquipmentPickerSheet extends ConsumerWidget {
         return Icons.flag;
       case EquipmentType.reel:
         return Icons.all_inclusive;
+      case EquipmentType.dpv:
+        return Icons.electric_scooter;
       case EquipmentType.other:
         return Icons.build;
     }

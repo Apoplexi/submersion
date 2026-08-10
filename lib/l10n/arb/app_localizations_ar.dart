@@ -9319,6 +9319,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get enum_equipmentType_camera => 'كاميرا';
 
   @override
+  String get enum_equipmentType_dpv => 'DPV';
+
+  @override
   String get enum_equipmentType_computer => 'حاسوب غوص';
 
   @override

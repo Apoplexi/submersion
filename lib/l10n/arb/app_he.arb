@@ -1,5 +1,6 @@
 {
   "universalImport_action_importFromGarmin": "ייבוא מהתקן Garmin",
+  "enum_equipmentType_dpv": "DPV",
   "diveLog_tank_saveAsPreset": "שמור כתבנית",
   "diveLog_tank_saveAsPreset_needSpecs": "הזן תחילה נפח ולחץ עבודה",
   "diveLog_tank_saveAsPreset_nameTitle": "שמור תבנית בלון",
