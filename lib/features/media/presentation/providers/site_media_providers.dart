@@ -2,8 +2,11 @@ import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_repository_provider.dart';
 import 'package:submersion/features/media/data/repositories/media_repository.dart';
+import 'package:submersion/features/media/data/services/document_import_service.dart';
 import 'package:submersion/features/media/domain/entities/media_item.dart';
 import 'package:submersion/features/media/presentation/providers/media_providers.dart';
+import 'package:submersion/features/media/presentation/providers/media_resolver_providers.dart';
+import 'package:submersion/features/media_store/presentation/providers/media_store_enqueue_provider.dart';
 import 'package:submersion/features/media_store/presentation/providers/media_store_providers.dart';
 
 /// Media directly attached to a site (attachments group), ordered by takenAt.
@@ -124,6 +127,16 @@ class SiteMediaListNotifier extends StateNotifier<AsyncValue<List<MediaItem>>> {
     await refresh();
   }
 }
+
+/// Reference-linking document attach service (dive and site targets).
+final documentImportServiceProvider = Provider<DocumentImportService>((ref) {
+  return DocumentImportService(
+    mediaRepository: ref.watch(mediaRepositoryProvider),
+    platform: ref.watch(localMediaPlatformProvider),
+    bookmarkStorage: ref.watch(localBookmarkStorageProvider),
+    onMediaCreated: ref.watch(mediaStoreEnqueueProvider),
+  );
+});
 
 /// StateNotifierProvider for site attachment mutations (family by siteId)
 final siteMediaListNotifierProvider =
