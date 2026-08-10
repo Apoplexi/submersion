@@ -48,11 +48,22 @@ class DiveMediaSection extends ConsumerStatefulWidget {
   final VoidCallback? onAddPressed;
   final VoidCallback? onScanPressed;
 
+  /// When provided, the add button becomes a menu offering photos and
+  /// documents; without it the button keeps its historical direct-tap
+  /// behavior for callers not yet migrated.
+  final VoidCallback? onAddDocumentPressed;
+
+  /// Invoked when a document tile is tapped (documents never enter the
+  /// photo viewer).
+  final void Function(MediaItem)? onOpenDocument;
+
   const DiveMediaSection({
     super.key,
     required this.diveId,
     this.onAddPressed,
     this.onScanPressed,
+    this.onAddDocumentPressed,
+    this.onOpenDocument,
   });
 
   @override
@@ -86,7 +97,7 @@ class _DiveMediaSectionState extends ConsumerState<DiveMediaSection> {
   void _scheduleEnrichmentBackfill(List<MediaItem>? items) {
     if (items == null) return;
     final missing = items
-        .where((m) => m.enrichment == null)
+        .where((m) => m.enrichment == null && !m.isDocument)
         .map((m) => m.id)
         .toSet();
     if (missing.difference(_enrichAttempted).isEmpty) return;
@@ -376,7 +387,8 @@ class _DiveMediaSectionState extends ConsumerState<DiveMediaSection> {
                       tooltip: context.l10n.settings_lightroom_scanNow,
                       onPressed: () => _scanLightroom(context),
                     ),
-                  if (widget.onAddPressed != null)
+                  if (widget.onAddPressed != null &&
+                      widget.onAddDocumentPressed == null)
                     IconButton(
                       icon: Icon(
                         Icons.add_photo_alternate,
@@ -385,6 +397,34 @@ class _DiveMediaSectionState extends ConsumerState<DiveMediaSection> {
                       visualDensity: VisualDensity.compact,
                       tooltip: context.l10n.media_diveMediaSection_addTooltip,
                       onPressed: widget.onAddPressed,
+                    )
+                  else if (widget.onAddPressed != null)
+                    PopupMenuButton<String>(
+                      icon: Icon(
+                        Icons.add_photo_alternate,
+                        color: colorScheme.primary,
+                      ),
+                      tooltip: context.l10n.media_diveMediaSection_addTooltip,
+                      onSelected: (value) {
+                        if (value == 'photos') widget.onAddPressed!();
+                        if (value == 'document') {
+                          widget.onAddDocumentPressed!();
+                        }
+                      },
+                      itemBuilder: (context) => [
+                        PopupMenuItem(
+                          value: 'photos',
+                          child: Text(
+                            context.l10n.media_siteMediaSection_addPhotos,
+                          ),
+                        ),
+                        PopupMenuItem(
+                          value: 'document',
+                          child: Text(
+                            context.l10n.media_siteMediaSection_addDocument,
+                          ),
+                        ),
+                      ],
                     ),
                 ],
               ),
@@ -415,12 +455,17 @@ class _DiveMediaSectionState extends ConsumerState<DiveMediaSection> {
                     });
                   },
                   onItemTap: (index) {
+                    final item = media[index];
+                    if (item.isDocument) {
+                      widget.onOpenDocument?.call(item);
+                      return;
+                    }
                     Navigator.of(context).push(
                       MaterialPageRoute(
                         fullscreenDialog: true,
                         builder: (_) => PhotoViewerPage(
                           diveId: widget.diveId,
-                          initialMediaId: media[index].id,
+                          initialMediaId: item.id,
                         ),
                       ),
                     );
