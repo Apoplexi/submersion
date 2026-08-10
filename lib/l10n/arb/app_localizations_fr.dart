@@ -11837,6 +11837,22 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String get media_documentViewer_title => 'Document';
+
+  @override
+  String get media_documentViewer_unavailable =>
+      'This document is not available on this device';
+
+  @override
+  String get media_documentViewer_availableOnOriginDevice =>
+      'It is available on the device it was added from, or via a configured media store.';
+
+  @override
+  String media_documentViewer_attached(int count) {
+    return 'Attached $count documents';
+  }
+
+  @override
   String get media_diveScan_scanTooltip =>
       'Rechercher des photos dans la galerie';
 

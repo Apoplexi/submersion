@@ -54,7 +54,16 @@ class MediaItemView extends ConsumerStatefulWidget {
 /// the video down to discover that is exactly what the resolver declines to
 /// do. Carried alongside the data rather than folded into it so the resolver
 /// contract stays a plain "bytes or a reason".
-typedef _Resolution = ({MediaSourceData data, bool videoPosterMissing});
+///
+/// [isStoreData] marks bytes served by the media-store fallback. Documents
+/// need it: a PDF's STORE THUMB is a renderable JPEG, while every other
+/// document resolution (local original, store original) is raw document
+/// bytes that Image widgets cannot decode.
+typedef _Resolution = ({
+  MediaSourceData data,
+  bool videoPosterMissing,
+  bool isStoreData,
+});
 
 class _MediaItemViewState extends ConsumerState<MediaItemView> {
   late Future<_Resolution> _future;
@@ -98,7 +107,7 @@ class _MediaItemViewState extends ConsumerState<MediaItemView> {
           )
         : await resolver.resolve(widget.item);
     if (native is! UnavailableData) {
-      return (data: native, videoPosterMissing: false);
+      return (data: native, videoPosterMissing: false, isStoreData: false);
     }
     // Media store fallback (design spec section 10): only engages when the
     // native source cannot produce bytes on this device and the row is
@@ -119,19 +128,22 @@ class _MediaItemViewState extends ConsumerState<MediaItemView> {
             widget.item.remoteCompressedUploadedAt != null ||
             (widget.thumbnail && widget.item.remoteThumbUploadedAt != null));
     if (!storeConfirmed) {
-      return (data: native, videoPosterMissing: false);
+      return (data: native, videoPosterMissing: false, isStoreData: false);
     }
     try {
       final runtime = await ref.read(mediaStoreRuntimeProvider.future);
       // No store on this device: the row's stamps say the bytes exist
       // somewhere, but nothing here can reach them, so the native
       // placeholder is the honest answer.
-      if (runtime == null) return (data: native, videoPosterMissing: false);
+      if (runtime == null)
+        return (data: native, videoPosterMissing: false, isStoreData: false);
       final remote = await runtime.resolver.tryResolveRemote(
         widget.item,
         thumbnail: widget.thumbnail,
       );
-      if (remote != null) return (data: remote, videoPosterMissing: false);
+      if (remote != null) {
+        return (data: remote, videoPosterMissing: false, isStoreData: true);
+      }
       // The movie tile claims something specific -- this video has no poster
       // frame -- so it is shown only when that is what happened: the store
       // holds the item, no thumb was ever stamped, and the resolver therefore
@@ -145,9 +157,10 @@ class _MediaItemViewState extends ConsumerState<MediaItemView> {
             widget.thumbnail &&
             widget.item.isVideo &&
             widget.item.remoteThumbUploadedAt == null,
+        isStoreData: false,
       );
     } catch (_) {
-      return (data: native, videoPosterMissing: false);
+      return (data: native, videoPosterMissing: false, isStoreData: false);
     }
   }
 
@@ -169,7 +182,16 @@ class _MediaItemViewState extends ConsumerState<MediaItemView> {
           return const _VideoThumbnailPlaceholder();
         }
         final data = resolution.data;
+        // A document resolves to raw document bytes (PDF, docx, ...), which
+        // the Image widgets cannot decode. The one renderable exception is
+        // a PDF's media-store THUMB: a JPEG served by the store fallback
+        // for a thumbnail request.
+        final documentRenderable = resolution.isStoreData && widget.thumbnail;
         return switch (data) {
+          FileData() when widget.item.isDocument && !documentRenderable =>
+            _DocumentThumbnailPlaceholder(item: widget.item),
+          BytesData() when widget.item.isDocument && !documentRenderable =>
+            _DocumentThumbnailPlaceholder(item: widget.item),
           // A video normally resolves to the raw video file, which Image.file
           // cannot decode. Show a placeholder instead of surfacing an
           // "Invalid image data" exception. A poster frame is the exception:
@@ -210,6 +232,45 @@ class _ShimmerThumbnail extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       color: Theme.of(context).colorScheme.surfaceContainerHighest,
+    );
+  }
+}
+
+/// Neutral tile shown for document attachments, whose raw bytes the Image
+/// widgets cannot render. The grid stacks its extension badge over this.
+class _DocumentThumbnailPlaceholder extends StatelessWidget {
+  final MediaItem item;
+  const _DocumentThumbnailPlaceholder({required this.item});
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return ColoredBox(
+      color: scheme.surfaceContainerHighest,
+      child: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              item.isPdf
+                  ? Icons.picture_as_pdf_outlined
+                  : Icons.description_outlined,
+              color: scheme.onSurfaceVariant,
+            ),
+            if (item.originalFilename != null)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 4),
+                child: Text(
+                  item.originalFilename!,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                    color: scheme.onSurfaceVariant,
+                  ),
+                ),
+              ),
+          ],
+        ),
+      ),
     );
   }
 }

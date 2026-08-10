@@ -20090,6 +20090,30 @@ abstract class AppLocalizations {
   /// **'Removed {count} attachments'**
   String media_siteMediaSection_unlinkSelectedSuccess(int count);
 
+  /// No description provided for @media_documentViewer_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Document'**
+  String get media_documentViewer_title;
+
+  /// No description provided for @media_documentViewer_unavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'This document is not available on this device'**
+  String get media_documentViewer_unavailable;
+
+  /// No description provided for @media_documentViewer_availableOnOriginDevice.
+  ///
+  /// In en, this message translates to:
+  /// **'It is available on the device it was added from, or via a configured media store.'**
+  String get media_documentViewer_availableOnOriginDevice;
+
+  /// No description provided for @media_documentViewer_attached.
+  ///
+  /// In en, this message translates to:
+  /// **'Attached {count} documents'**
+  String media_documentViewer_attached(int count);
+
   /// No description provided for @media_diveScan_scanTooltip.
   ///
   /// In en, this message translates to:

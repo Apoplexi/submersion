@@ -22,6 +22,7 @@ import 'package:submersion/features/maps/presentation/widgets/map_attribution.da
 import 'package:submersion/features/maps/presentation/widgets/trackpad_zoom_map.dart';
 import 'package:submersion/features/marine_life/presentation/widgets/site_marine_life_section.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
+import 'package:submersion/features/media/presentation/helpers/document_open_helper.dart';
 import 'package:submersion/features/media/presentation/helpers/site_media_import_helper.dart';
 import 'package:submersion/features/media/presentation/widgets/site_media_section.dart';
 import 'package:submersion/features/reef/presentation/widgets/reef_section.dart';
@@ -225,9 +226,13 @@ class _SiteDetailContentState extends ConsumerState<_SiteDetailContent> {
               ref: ref,
               siteId: site.id,
             ),
-            // Document attach/open flows are wired in the documents phase.
-            onAddDocumentPressed: null,
-            onOpenDocument: null,
+            onAddDocumentPressed: () => DocumentOpenHelper.pickAndAttach(
+              context: context,
+              ref: ref,
+              siteId: site.id,
+            ),
+            onOpenDocument: (item) =>
+                DocumentOpenHelper.open(context, ref, item),
           ),
           const SizedBox(height: 16),
 
