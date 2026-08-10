@@ -319,6 +319,10 @@ bool BleIoStream::DiscoverCharacteristics() {
         return false;
     }
 
+    // Publish the handle before subscribing, so the first callback already
+    // has something to match against.
+    notify_attribute_handle_.store(notify_characteristic_.AttributeHandle(),
+                                   std::memory_order_release);
     notify_token_ = notify_characteristic_.ValueChanged(
         {this, &BleIoStream::OnCharacteristicValueChanged});
 
@@ -443,12 +447,17 @@ void BleIoStream::OnCharacteristicValueChanged(
     GattValueChangedEventArgs const& args) {
     // UART Credits TX shares this handler with UART Data TX but carries no
     // application data: injecting its indications into the read queue would
-    // corrupt the protocol stream. The check is unconditional -- revoking the
-    // ValueChanged token does not wait for handlers already running, so a late
-    // one can arrive after Close() has cleared the characteristic, and a null
-    // characteristic must reject everything rather than accept everything.
-    if (!notify_characteristic_ ||
-        sender.AttributeHandle() != notify_characteristic_.AttributeHandle()) {
+    // corrupt the protocol stream.
+    //
+    // Compared against a cached handle rather than notify_characteristic_.
+    // Revoking the ValueChanged token does not wait for handlers already
+    // running, so this can be executing while Close() clears that member on
+    // the download thread; reading the WinRT object here would be a data race.
+    // Close() zeroes the handle first, and zero rejects everything, so a late
+    // callback is dropped rather than mis-routed.
+    const uint16_t expected_handle =
+        notify_attribute_handle_.load(std::memory_order_acquire);
+    if (expected_handle == 0 || sender.AttributeHandle() != expected_handle) {
         return;
     }
 
@@ -487,6 +496,10 @@ libdc_io_callbacks_t BleIoStream::MakeCallbacks() {
 void BleIoStream::Close() {
     ReleaseCreditCharacteristics();
     credits_required_ = false;
+    // Retire the handle before touching the characteristic, so any handler
+    // already running stops accepting data before the object it would
+    // otherwise have read is torn down.
+    notify_attribute_handle_.store(0, std::memory_order_release);
     if (notify_characteristic_) {
         notify_characteristic_.ValueChanged(notify_token_);
         try {

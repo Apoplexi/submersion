@@ -1,6 +1,7 @@
 #ifndef BLE_IO_STREAM_H_
 #define BLE_IO_STREAM_H_
 
+#include <atomic>
 #include <chrono>
 #include <condition_variable>
 #include <cstdint>
@@ -125,6 +126,13 @@ class BleIoStream {
   winrt::Windows::Devices::Bluetooth::GenericAttributeProfile::
       GattCharacteristic notify_characteristic_{nullptr};
   winrt::event_token notify_token_;
+  // ATT handle of the data notify characteristic, cached so the notification
+  // thread can identify a callback's source without reading
+  // notify_characteristic_ -- Close() clears that member concurrently, and
+  // revoking the ValueChanged token does not wait for handlers already
+  // running, so reading the WinRT object from the callback would be a data
+  // race. Zero means "no characteristic selected", which rejects everything.
+  std::atomic<uint16_t> notify_attribute_handle_{0};
   // UART Credits RX/TX, non-null only on Telit Terminal I/O devices.
   winrt::Windows::Devices::Bluetooth::GenericAttributeProfile::
       GattCharacteristic credits_write_characteristic_{nullptr};
