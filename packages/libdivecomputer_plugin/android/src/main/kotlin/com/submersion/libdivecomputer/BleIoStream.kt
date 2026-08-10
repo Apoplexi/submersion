@@ -130,10 +130,21 @@ class BleIoStream(
     // Whether a failed opening grant is fatal (Telit) or falls back to running
     // without flow control (u-blox, where it is optional).
     private var creditsRequired = false
+    // Set while a mid-transfer top-up holds the GATT gate. Only touched on the
+    // GATT callback thread.
+    private var creditTopUpInFlight = false
     private var setupStep = SetupStep.NONE
 
     private val readQueue = LinkedBlockingQueue<ByteArray>()
     private val writeSemaphore = Semaphore(0)
+    // One permit, held from the moment a GATT write is issued until its
+    // completion callback arrives. Android's BluetoothGatt carries a single
+    // busy flag and rejects writeCharacteristic() while any operation is
+    // pending, so command writes and credit top-ups must not overlap.
+    // Acquired with a timeout on the download thread; only ever tryAcquire()d
+    // on the callback thread, which must stay free to deliver the completion
+    // that releases it.
+    private val gattOperation = Semaphore(1)
     private val connectSemaphore = Semaphore(0)
     private var connected = false
     private var readBuffer = ByteArray(0)
@@ -381,6 +392,15 @@ class BleIoStream(
             // command write that is still in flight and desynchronise the
             // protocol.
             if (characteristic.uuid == creditsWriteCharacteristic?.uuid) {
+                // A mid-transfer top-up owns the GATT gate; release it before
+                // anything else can want it. Tracked by its own flag rather
+                // than inferred from setupStep, so the permit can never be
+                // released for a write that did not take one.
+                if (creditTopUpInFlight) {
+                    creditTopUpInFlight = false
+                    gattOperation.release()
+                    return
+                }
                 if (setupStep == SetupStep.INITIAL_CREDITS) {
                     setupStep = SetupStep.NONE
                     if (status == BluetoothGatt.GATT_SUCCESS) {
@@ -484,17 +504,28 @@ class BleIoStream(
         if (credits > 0) credits--
         if (credits > TIO_REFILL_THRESHOLD) return
 
+        // Never preempt a command write. Android permits one GATT operation in
+        // flight and rejects the loser, and a rejected command write fails the
+        // whole download, so credit maintenance always yields. tryAcquire and
+        // never a blocking acquire: this runs on the GATT callback thread,
+        // which must stay free to deliver the completion that frees the gate.
+        // Skipping is cheap -- there are TIO_REFILL_THRESHOLD packets of slack
+        // and the next one retries.
+        if (!gattOperation.tryAcquire()) return
+
         val grant = TIO_INITIAL_GRANT - TIO_REFILL_THRESHOLD
         creditsChar.value = byteArrayOf(grant.toByte())
         creditsChar.writeType = BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT
-        // Android permits one GATT operation in flight, so a top-up issued
-        // while a command write is pending is refused. Commit the grant only
-        // when the request was accepted; otherwise the next packet retries,
-        // with TIO_REFILL_THRESHOLD packets of slack to recover within.
+        // Commit the grant only when the request was accepted; otherwise the
+        // balance must stay as it is so the next packet asks again.
         if (g.writeCharacteristic(creditsChar)) {
+            creditTopUpInFlight = true
             credits += grant
             NativeLogger.d(TAG, "BLE",
                 "Terminal I/O: granted $grant more credits (balance=$credits)")
+        } else {
+            // No completion callback is coming, so release the gate here.
+            gattOperation.release()
         }
     }
 
@@ -695,6 +726,32 @@ class BleIoStream(
         }
 
         NativeLogger.d(TAG, "BLE", "write: ${data.size} bytes, timeout=$timeoutMs")
+
+        // Claim the GATT gate for the whole request/completion cycle so a
+        // credit top-up cannot be in flight when this write is issued. Android
+        // rejects writeCharacteristic() outright while another operation is
+        // pending, and a rejected command write fails the download with no
+        // retry -- unlike a rejected credit write, which simply waits for the
+        // next packet. Blocking here is safe: this is the libdivecomputer
+        // download thread, not the callback thread that releases the gate.
+        val timeout = if (timeoutMs < 0) Long.MAX_VALUE else timeoutMs.toLong()
+        if (!gattOperation.tryAcquire(timeout, TimeUnit.MILLISECONDS)) {
+            NativeLogger.e(TAG, "BLE", "write: timed out waiting for GATT to be free")
+            return -1
+        }
+        try {
+            return writeLocked(char, g, data, timeout)
+        } finally {
+            gattOperation.release()
+        }
+    }
+
+    private fun writeLocked(
+        char: BluetoothGattCharacteristic,
+        g: BluetoothGatt,
+        data: ByteArray,
+        timeout: Long
+    ): Int {
         char.value = data
         // Use WRITE_NO_RESPONSE when supported. Many BLE dive computers
         // (including Shearwater) only process WRITE_NO_RESPONSE at the
@@ -717,7 +774,6 @@ class BleIoStream(
         // Android BLE only allows one GATT operation at a time;
         // without this wait, a subsequent write would fail because
         // the previous one is still in flight.
-        val timeout = if (timeoutMs < 0) Long.MAX_VALUE else timeoutMs.toLong()
         if (!writeSemaphore.tryAcquire(timeout, TimeUnit.MILLISECONDS)) return -1
 
         return data.size
@@ -740,6 +796,7 @@ class BleIoStream(
         creditsNotifyCharacteristic = null
         credits = 0
         creditsRequired = false
+        creditTopUpInFlight = false
         setupStep = SetupStep.NONE
     }
 
