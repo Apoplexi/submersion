@@ -55,9 +55,18 @@ typedef struct {
     int has_pending_sample;
     unsigned int current_gasmix;  // active gas index, carried across samples
     libdc_sample_t current_sample;
-    // GPS reported as profile samples (see DC_SAMPLE_LOCATION below).
-    int has_field_location;   // DC_FIELD_LOCATION already supplied a fix
-    int sample_location_count;
+    // GPS reported as profile samples (see DC_SAMPLE_LOCATION below). Fixes
+    // are only collected here and resolved once the whole profile has been
+    // walked: which end of the dive a lone fix belongs to is knowable only
+    // relative to the profile's full length.
+    int has_field_entry;  // DC_FIELD_LOCATION already supplied the entry
+    int has_field_exit;   // ...and/or the exit
+    unsigned int location_count;
+    double first_latitude;
+    double first_longitude;
+    unsigned int first_location_time_ms;
+    double last_latitude;
+    double last_longitude;
 } sample_state_t;
 
 // ============================================================
@@ -268,29 +277,24 @@ static void sample_callback(dc_sample_type_t type,
         state->current_sample.deco_tts = value->deco.tts;
         break;
     case DC_SAMPLE_LOCATION:
-        // Issue #926. The Ratio / DiveSystem iX3M and iDive families do not
-        // implement DC_FIELD_LOCATION at all; they emit each GPS fix as a
-        // profile sample instead. Promote those to the dive-level entry/exit
-        // positions the rest of the app already understands: first fix is the
-        // entry point, the most recent one the exit point. A dive with a
-        // single fix keeps its exit unset rather than mirroring the entry --
-        // a duplicated point renders as a bogus second marker on the map.
-        if (state->has_field_location) {
-            break;  // a real DC_FIELD_LOCATION is authoritative
-        }
+        // Issue #926. Most GPS-capable families -- Ratio / DiveSystem iX3M and
+        // iDive, Halcyon Symbios, OSTC 4, Divesoft Freedom -- do not implement
+        // DC_FIELD_LOCATION at all, emitting each fix as a profile sample
+        // instead. Record the first and last usable fix and the time of the
+        // first; resolve_sample_locations() turns them into the dive-level
+        // entry/exit positions once the profile length is known.
         if (!is_usable_location(value->location.latitude,
                                 value->location.longitude)) {
             break;
         }
-        if (state->sample_location_count == 0) {
-            state->dive->entry_latitude = value->location.latitude;
-            state->dive->entry_longitude = value->location.longitude;
-        } else if (value->location.latitude != state->dive->entry_latitude ||
-                   value->location.longitude != state->dive->entry_longitude) {
-            state->dive->exit_latitude = value->location.latitude;
-            state->dive->exit_longitude = value->location.longitude;
+        if (state->location_count == 0) {
+            state->first_latitude = value->location.latitude;
+            state->first_longitude = value->location.longitude;
+            state->first_location_time_ms = state->current_sample.time_ms;
         }
-        state->sample_location_count++;
+        state->last_latitude = value->location.latitude;
+        state->last_longitude = value->location.longitude;
+        state->location_count++;
         break;
     case DC_SAMPLE_EVENT:
         push_event(state->dive,
@@ -301,6 +305,52 @@ static void sample_callback(dc_sample_type_t type,
         break;
     default:
         break;
+    }
+}
+
+// Turn the per-sample GPS fixes collected during the profile walk into the
+// dive-level entry/exit positions the rest of the app consumes. Must run after
+// the final push_sample() so the profile's length is known.
+static void resolve_sample_locations(sample_state_t *state) {
+    libdc_parsed_dive_t *dive = state->dive;
+
+    if (state->location_count == 0) {
+        return;
+    }
+
+    // Two different positions: the dive genuinely moved between the first and
+    // last lock, so they are the entry and exit points.
+    if (state->first_latitude != state->last_latitude ||
+        state->first_longitude != state->last_longitude) {
+        if (!state->has_field_entry) {
+            dive->entry_latitude = state->first_latitude;
+            dive->entry_longitude = state->first_longitude;
+        }
+        if (!state->has_field_exit) {
+            dive->exit_latitude = state->last_latitude;
+            dive->exit_longitude = state->last_longitude;
+        }
+        return;
+    }
+
+    // Every fix reported the same position, so this dive has one known point
+    // rather than an entry/exit pair. Writing it to both slots would render a
+    // bogus second marker, and always calling it the entry is wrong for a
+    // receiver that only got a lock after surfacing -- a real case now that
+    // OSTC 4 and Divesoft, which log fixes anywhere in the profile, reach this
+    // code. Let its timestamp pick the end it belongs to. Either slot resolves
+    // a dive site: the matcher falls back to the exit when entry is absent.
+    unsigned int profile_end_ms = dive->sample_count > 0
+        ? dive->samples[dive->sample_count - 1].time_ms
+        : 0;
+    if (state->first_location_time_ms <= profile_end_ms / 2) {
+        if (!state->has_field_entry) {
+            dive->entry_latitude = state->first_latitude;
+            dive->entry_longitude = state->first_longitude;
+        }
+    } else if (!state->has_field_exit) {
+        dive->exit_latitude = state->first_latitude;
+        dive->exit_longitude = state->first_longitude;
     }
 }
 
@@ -356,17 +406,20 @@ static int extract_dive_fields(dc_parser_t *parser, libdc_parsed_dive_t *dive) {
     // Patched libdivecomputer maps these to opening[9]/closing[9] record 9.
     // Families that report GPS per-sample instead are handled in
     // sample_callback's DC_SAMPLE_LOCATION branch.
-    int has_field_location = 0;
+    // Tracked per side: a parser that supplies only the entry via the field
+    // while reporting the exit per-sample must not lose its exit.
+    int has_field_entry = 0;
+    int has_field_exit = 0;
     dc_location_t loc = {0};
     if (dc_parser_get_field(parser, DC_FIELD_LOCATION, 0, &loc) == DC_STATUS_SUCCESS) {
         dive->entry_latitude = loc.latitude;
         dive->entry_longitude = loc.longitude;
-        has_field_location = 1;
+        has_field_entry = 1;
     }
     if (dc_parser_get_field(parser, DC_FIELD_LOCATION, 1, &loc) == DC_STATUS_SUCCESS) {
         dive->exit_latitude = loc.latitude;
         dive->exit_longitude = loc.longitude;
-        has_field_location = 1;
+        has_field_exit = 1;
     }
 
     // Extract gas mixes.
@@ -405,9 +458,11 @@ static int extract_dive_fields(dc_parser_t *parser, libdc_parsed_dive_t *dive) {
     sample_state_t sample_state = {0};
     sample_state.dive = dive;
     sample_state.current_gasmix = UINT32_MAX;  // 0 is a valid gas index
-    sample_state.has_field_location = has_field_location;
+    sample_state.has_field_entry = has_field_entry;
+    sample_state.has_field_exit = has_field_exit;
     dc_parser_samples_foreach(parser, sample_callback, &sample_state);
     push_sample(&sample_state);
+    resolve_sample_locations(&sample_state);
 
     return 0;
 }
