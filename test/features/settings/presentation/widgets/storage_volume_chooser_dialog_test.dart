@@ -15,6 +15,10 @@ void main() {
     ExternalVolumeOption? picked;
     await tester.pumpWidget(
       MaterialApp(
+        // Pinned so the English literals below stay valid regardless of the
+        // host's default locale. Asserting via AppLocalizations instead would
+        // compare the copy against itself and pass even if it were wrong.
+        locale: const Locale('en'),
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         home: Scaffold(
@@ -84,6 +88,10 @@ void main() {
     ExternalVolumeOption? picked;
     await tester.pumpWidget(
       MaterialApp(
+        // Pinned so the English literals below stay valid regardless of the
+        // host's default locale. Asserting via AppLocalizations instead would
+        // compare the copy against itself and pass even if it were wrong.
+        locale: const Locale('en'),
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         home: Scaffold(

@@ -40,6 +40,7 @@ class _FixedStorageConfig extends StateNotifier<StorageConfigState>
 void main() {
   late SharedPreferences prefs;
   late Directory tempDir;
+  late PathProviderPlatform originalPathProvider;
 
   const cloudSubtitle = 'Choose a synced folder (Dropbox, Google Drive, etc.)';
   const deviceSubtitle = 'Move the database to internal storage or SD card';
@@ -56,6 +57,7 @@ void main() {
     SharedPreferences.setMockInitialValues({});
     prefs = await SharedPreferences.getInstance();
     tempDir = Directory.systemTemp.createTempSync('storage_subtitle_test');
+    originalPathProvider = PathProviderPlatform.instance;
     PathProviderPlatform.instance = _FakePathProvider(tempDir.path);
   });
 
@@ -64,6 +66,9 @@ void main() {
       await DatabaseService.instance.database.close();
     } catch (_) {}
     DatabaseService.instance.resetForTesting();
+    // Leave the global platform instance as we found it: the fake points at
+    // a temp dir this tearDown is about to delete.
+    PathProviderPlatform.instance = originalPathProvider;
     try {
       tempDir.deleteSync(recursive: true);
     } catch (_) {}

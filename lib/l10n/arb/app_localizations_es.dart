@@ -952,7 +952,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get backup_location_default => 'Ubicacion predeterminada';
 
   @override
-  String get backup_location_title => 'Ubicacion de Copia de Seguridad';
+  String get backup_location_title => 'Ubicación de Copia de Seguridad';
 
   @override
   String get backup_replaceConfirm_confirm => 'Reemplazar en todas partes';
@@ -21187,7 +21187,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get db_location_backup_note =>
-      'Android no puede ejecutar la base de datos desde una carpeta sincronizada en la nube. Para guardar una copia en Dropbox, Nextcloud o Google Drive, configura la Ubicacion de Copia de Seguridad en Copia de Seguridad y Restaurar.';
+      'Android no puede ejecutar la base de datos desde una carpeta sincronizada en la nube. Para guardar una copia en Dropbox, Nextcloud o Google Drive, configura la Ubicación de Copia de Seguridad en Copia de Seguridad y Restaurar.';
 
   @override
   String diveLog_bulkEdit_membership_onAll(int count) {
