@@ -168,4 +168,63 @@ void main() {
     resolver.data = FileData(file: junk);
     expect(await generator.generateFor(item()), isNull);
   });
+
+  group('documents', () {
+    MediaItem doc(String filename) => MediaItem(
+      id: 'doc1',
+      mediaType: MediaType.document,
+      sourceType: MediaSourceType.localFile,
+      originalFilename: filename,
+      takenAt: DateTime(2026),
+      createdAt: DateTime(2026),
+      updatedAt: DateTime(2026),
+    );
+
+    test('a PDF stages the injected renderer output as its thumb', () async {
+      // Hermetic: the real renderer needs a pdfium binary the test harness
+      // cannot load (see pdf_page_renderer_test), so the seam is injected.
+      final thumb = img.Image(width: 512, height: 300);
+      img.fill(thumb, color: img.ColorRgb8(90, 90, 90));
+      final jpeg = img.encodeJpg(thumb, quality: 80);
+      generator = ThumbnailGenerator(
+        registry: MediaSourceResolverRegistry({
+          MediaSourceType.localFile: resolver,
+        }),
+        cache: cache,
+        pdfRenderer: ({file, bytes, maxDimension = 512, quality = 80}) async =>
+            jpeg,
+      );
+      final src = File('${root.path}/map.pdf');
+      await src.writeAsBytes([0x25, 0x50, 0x44, 0x46], flush: true);
+      resolver.data = FileData(file: src);
+
+      final staged = await generator.generateFor(doc('map.pdf'));
+      expect(staged, isNotNull);
+      expect(await staged!.readAsBytes(), jpeg);
+    });
+
+    test('a PDF whose render fails yields null', () async {
+      generator = ThumbnailGenerator(
+        registry: MediaSourceResolverRegistry({
+          MediaSourceType.localFile: resolver,
+        }),
+        cache: cache,
+        pdfRenderer: ({file, bytes, maxDimension = 512, quality = 80}) async =>
+            null,
+      );
+      final src = File('${root.path}/bad.pdf');
+      await src.writeAsBytes([1, 2, 3], flush: true);
+      resolver.data = FileData(file: src);
+
+      expect(await generator.generateFor(doc('bad.pdf')), isNull);
+    });
+
+    test('non-PDF documents have no thumbnail', () async {
+      final src = File('${root.path}/notes.txt');
+      await src.writeAsBytes('hello'.codeUnits, flush: true);
+      resolver.data = FileData(file: src);
+
+      expect(await generator.generateFor(doc('notes.txt')), isNull);
+    });
+  });
 }
