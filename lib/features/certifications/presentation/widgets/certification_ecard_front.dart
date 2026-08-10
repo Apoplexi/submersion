@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 
 import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:submersion/features/certifications/domain/entities/certification.dart';
+import 'package:submersion/features/certifications/domain/certification_title.dart';
 import 'package:submersion/features/certifications/presentation/widgets/certification_card_photo.dart';
 
 /// The front face of the certification card.
@@ -43,9 +44,11 @@ class CertificationEcardFront extends StatelessWidget {
   List<String> _buildInfoLines() {
     final cardNumber = certification.cardNumber;
 
+    // certificationTitle, not the raw name: a stored name that merely repeats
+    // agency and level would otherwise render as "PADI - PADI : Open Water".
     final headline = [
       certification.agency.displayName,
-      certification.name,
+      certificationTitle(certification),
     ].where((value) => value.isNotEmpty).join('  -  ');
 
     final detail = [
@@ -132,13 +135,15 @@ class CertificationEcardFront extends StatelessWidget {
   }
 
   Widget _buildHero() {
+    final subtitle = certificationSubtitle(certification);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
         Flexible(
           child: Text(
-            certification.name,
+            certificationTitle(certification),
             style: const TextStyle(
               color: Colors.white,
               fontSize: 20,
@@ -149,10 +154,12 @@ class CertificationEcardFront extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
           ),
         ),
-        if (certification.level != null) ...[
+        // Only when the title above is a custom name -- otherwise it already
+        // contains the certification.
+        if (subtitle != null) ...[
           const SizedBox(height: 2),
           Text(
-            certification.level!.displayName,
+            subtitle,
             style: TextStyle(
               color: Colors.white.withValues(alpha: 0.85),
               fontSize: 13,

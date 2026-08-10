@@ -285,7 +285,9 @@ class _SubmersionAppState extends ConsumerState<SubmersionApp>
     );
 
     if (shouldNavigate) {
-      router.go('/transfer/import-wizard');
+      // PUSH (not go): the wizard is a sub-page, so system back returns to
+      // wherever the drop happened instead of closing the app (#647).
+      router.push('/transfer/import-wizard');
     }
   }
 

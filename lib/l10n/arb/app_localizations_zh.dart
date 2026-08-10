@@ -1445,34 +1445,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get buddies_edit_merge_notEnoughBody => '潜伴数量不足，无法合并。';
 
   @override
-  String get buddies_section_professionalRoles => '专业角色';
-
-  @override
-  String get buddies_roles_addRole => '添加角色';
-
-  @override
-  String get buddies_roles_role => '角色';
-
-  @override
-  String get buddies_roles_agency => '机构';
-
-  @override
-  String get buddies_roles_credentialNumber => '资质编号';
-
-  @override
-  String get buddies_roles_removeTooltip => '移除角色';
-
-  @override
-  String get buddies_roles_emptyHint => '添加教练或潜水长资质，以便在记录认证和课程时重复使用。';
-
-  @override
   String get buddies_instructorPicker_label => '来自潜伴的教练';
 
   @override
   String get buddies_instructorPicker_none => '无（手动输入）';
-
-  @override
-  String get buddies_detail_section_professionalRoles => '专业角色';
 
   @override
   String get certifications_appBar_addCertification => '添加证书';
@@ -1519,6 +1495,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get certifications_detail_label_cardNumber => '卡号';
 
   @override
+  String get certifications_detail_label_certification => '证书';
+
+  @override
   String get certifications_detail_label_expiryDate => '到期日期';
 
   @override
@@ -1529,9 +1508,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get certifications_detail_label_issueDate => '签发日期';
-
-  @override
-  String get certifications_detail_label_level => '等级';
 
   @override
   String get certifications_detail_label_type => '类型';
@@ -1669,6 +1645,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get certifications_edit_button_update => '更新证书';
 
   @override
+  String get certifications_edit_certification_notSpecified => '未指定';
+
+  @override
   String certifications_edit_datePicker_clearTooltip(Object label) {
     return '清除$label';
   }
@@ -1689,13 +1668,19 @@ class AppLocalizationsZh extends AppLocalizations {
   String get certifications_edit_dialog_keepEditing => '继续编辑';
 
   @override
+  String get certifications_edit_group_progression => '进阶等级';
+
+  @override
+  String get certifications_edit_group_specialties => '专长课程';
+
+  @override
   String get certifications_edit_help_expiryDate => '不会过期的证书请留空';
 
   @override
-  String get certifications_edit_hint_cardNumber => '输入证书卡号';
+  String get certifications_edit_helper_nameOnCard => '可选';
 
   @override
-  String get certifications_edit_hint_certificationName => '例如，开放水域潜水员';
+  String get certifications_edit_hint_cardNumber => '输入证书卡号';
 
   @override
   String get certifications_edit_hint_instructorName => '认证教练姓名';
@@ -1713,7 +1698,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get certifications_edit_label_cardNumber => '卡号';
 
   @override
-  String get certifications_edit_label_certificationName => '证书名称 *';
+  String get certifications_edit_label_certification => '证书';
 
   @override
   String get certifications_edit_label_expiryDate => '到期日期';
@@ -1728,13 +1713,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get certifications_edit_label_issueDate => '签发日期';
 
   @override
-  String get certifications_edit_label_level => '等级';
+  String get certifications_edit_label_nameOnCard => '卡片上的名称';
 
   @override
   String get certifications_edit_label_notes => '备注';
-
-  @override
-  String get certifications_edit_level_notSpecified => '未指定';
 
   @override
   String certifications_edit_photo_addSemanticLabel(Object label) {
@@ -1791,7 +1773,8 @@ class AppLocalizationsZh extends AppLocalizations {
   String get certifications_edit_snackBar_updated => '证书更新成功';
 
   @override
-  String get certifications_edit_validation_nameRequired => '请输入证书名称';
+  String get certifications_edit_validation_certificationOrNameRequired =>
+      '请选择证书或输入名称';
 
   @override
   String get certifications_list_button_retry => '重试';
@@ -8839,24 +8822,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get enum_ascentRate_warning => '警告';
 
   @override
-  String get enum_buddyRole_buddy => '潜伴';
-
-  @override
-  String get enum_buddyRole_diveGuide => '潜水指南';
-
-  @override
-  String get enum_buddyRole_diveMaster => '潜水长';
-
-  @override
-  String get enum_buddyRole_instructor => '教练';
-
-  @override
-  String get enum_buddyRole_solo => '单人';
-
-  @override
-  String get enum_buddyRole_student => '学生';
-
-  @override
   String get enum_certificationAgency_bsac => 'BSAC';
 
   @override
@@ -8909,6 +8874,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get enum_certificationLevel_decompression => '减压';
+
+  @override
+  String get enum_certificationLevel_diveGuide => '潜水向导';
 
   @override
   String get enum_certificationLevel_diveMaster => '潜水长';
@@ -12382,6 +12350,23 @@ class AppLocalizationsZh extends AppLocalizations {
   String get safetyReview_restore => '恢复';
 
   @override
+  String get safetyReview_details => '详情';
+
+  @override
+  String get safetyReview_clearHighlight => '清除高亮';
+
+  @override
+  String safetyReview_findingGroupSemantics(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 条安全提示',
+      one: '1 条安全提示',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get safetySettings_title => '安全回顾';
 
   @override
@@ -12478,10 +12463,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get diveDetailSection_tide_description => '潮汐周期图和时间';
 
   @override
-  String get diveDetailSection_reefHealth_name => '珊瑚礁健康';
+  String get diveDetailSection_reefHealth_name => '水况';
 
   @override
-  String get diveDetailSection_reefHealth_description => '潜水当天的珊瑚白化热压力';
+  String get diveDetailSection_reefHealth_description => '潜水日期的卫星水况';
 
   @override
   String get diveDetailSection_surfaceGps_name => '水面 GPS';
@@ -15670,6 +15655,16 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String surfaceInterval_result_beyondHorizon(Object hours) {
+    return '所需等待时间超出此计划器搜索的 $hours 小时。脱饱和仍在继续，因此更长的水面间隔即可满足。';
+  }
+
+  @override
+  String surfaceInterval_result_beyondHorizonShort(Object hours) {
+    return '超过 $hours 小时';
+  }
+
+  @override
   String get surfaceInterval_result_currentInterval => '当前间隔';
 
   @override
@@ -15691,6 +15686,14 @@ class AppLocalizationsZh extends AppLocalizations {
   String surfaceInterval_result_ndlMinutes(Object minutes) {
     return '$minutes 分钟 NDL';
   }
+
+  @override
+  String surfaceInterval_result_noIntervalHelps(Object minutes) {
+    return '任何水面间隔都不够。在此深度使用此混合气体，最长的免减压潜水时间为 $minutes 分钟。请缩短第二次潜水或降低其深度。';
+  }
+
+  @override
+  String get surfaceInterval_result_notAchievable => '任何水面间隔都无法达成';
 
   @override
   String get surfaceInterval_result_notYetSafe => '尚不安全，请增加水面间隔';
@@ -16115,6 +16118,26 @@ class AppLocalizationsZh extends AppLocalizations {
   String tides_semantic_tideState(Object state) {
     return '潮汐状态：$state';
   }
+
+  @override
+  String tides_source_noaaStation(String name, String distance) {
+    return 'NOAA 站点：$name（$distance）';
+  }
+
+  @override
+  String get tides_source_modelEstimate => '海洋模型估算';
+
+  @override
+  String get tides_source_modelCaveat => '基于卫星数据建模，复杂海岸线附近的时间和高度可能有偏差。';
+
+  @override
+  String get tides_source_sheetTitle => '潮汐数据来源';
+
+  @override
+  String get tides_source_datumMllw => '高度基于 MLLW（站点基准面）';
+
+  @override
+  String get tides_source_datumMsl => '高度基于平均海平面';
 
   @override
   String get tides_title => '潮汐';
@@ -21920,13 +21943,13 @@ class AppLocalizationsZh extends AppLocalizations {
       '此设备无法压缩视频。将从此设备上传原始文件。';
 
   @override
-  String get reef_section_title => '珊瑚礁';
+  String get reef_section_title => '生态系统';
 
   @override
   String get reef_section_sourcesTooltip => '数据来源';
 
   @override
-  String get reef_section_loadError => '目前无法加载珊瑚礁数据';
+  String get reef_section_loadError => '目前无法加载生态系统数据';
 
   @override
   String get reef_habitat_title => '珊瑚礁生境';
@@ -21946,13 +21969,21 @@ class AppLocalizationsZh extends AppLocalizations {
   String get reef_habitat_unavailable => '目前无法查询珊瑚礁生境';
 
   @override
-  String get reef_health_title => '珊瑚礁健康';
+  String get water_conditions_title => '水况';
 
   @override
-  String get reef_health_unavailable => '目前无法查询珊瑚礁健康状况';
+  String get water_conditions_unavailable => '目前无法检查水况';
 
   @override
-  String get reef_health_noData => '此位置没有珊瑚礁健康数据';
+  String get water_conditions_noData => '此位置没有卫星水文数据';
+
+  @override
+  String get water_conditions_freshwater => '卫星水温仅覆盖海洋';
+
+  @override
+  String water_conditions_anomaly(String value) {
+    return '距平 $value';
+  }
 
   @override
   String reef_health_degreeHeatingWeeks(String value) {

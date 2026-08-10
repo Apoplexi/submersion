@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:go_router/go_router.dart';
 
@@ -9,8 +10,9 @@ import 'package:submersion/features/dive_roles/domain/entities/dive_role.dart';
 import 'package:submersion/features/dive_roles/presentation/dive_role_display.dart';
 import 'package:submersion/features/dive_roles/presentation/providers/dive_role_providers.dart';
 import 'package:submersion/features/buddies/domain/entities/buddy.dart';
-import 'package:submersion/features/buddies/domain/entities/buddy_role_credential.dart';
 import 'package:submersion/features/buddies/presentation/providers/buddy_providers.dart';
+import 'package:submersion/features/certifications/domain/entities/certification.dart';
+import 'package:submersion/features/certifications/presentation/providers/certification_providers.dart';
 import 'package:submersion/features/dive_roles/presentation/widgets/dive_role_selector_sheet.dart';
 import 'package:submersion/features/divers/presentation/providers/diver_providers.dart';
 
@@ -311,11 +313,26 @@ class _BuddySelectionSheetState extends ConsumerState<_BuddySelectionSheet> {
   Timer? _debounceTimer;
   List<Buddy>? _lastSearchResults;
   late List<BuddyWithRole> _localSelectedBuddies;
+  Map<String, List<Certification>> _certsByBuddy =
+      const <String, List<Certification>>{};
 
   @override
   void initState() {
     super.initState();
     _localSelectedBuddies = List.from(widget.selectedBuddies);
+    // A manual listener rather than `ref.watch(allBuddyCertificationsProvider)`
+    // in build(): this widget also watches allBuddiesProvider directly for
+    // the buddy list, and allBuddyCertificationsProvider transitively
+    // watches allBuddiesProvider too. Riverpod's TickerMode-driven
+    // auto-pause (which pauses `ref.watch` subscriptions while this sheet
+    // is covered by another route, e.g. pushing the new-buddy page) trips a
+    // pausedActiveSubscriptionCount assertion on resume for that diamond
+    // dependency. Manual listeners are exempt from auto-pause, sidestepping
+    // the bug while staying reactive via setState.
+    ref.listenManual(allBuddyCertificationsProvider, (previous, next) {
+      final value = next.value ?? const <String, List<Certification>>{};
+      if (mounted) setState(() => _certsByBuddy = value);
+    }, fireImmediately: true);
   }
 
   @override
@@ -330,9 +347,6 @@ class _BuddySelectionSheetState extends ConsumerState<_BuddySelectionSheet> {
     final buddiesAsync = _debouncedQuery.isEmpty
         ? ref.watch(allBuddiesProvider)
         : ref.watch(buddySearchProvider(_debouncedQuery));
-    final rolesByBuddy =
-        ref.watch(allBuddyRolesProvider).value ??
-        const <String, List<BuddyRoleCredential>>{};
 
     return DraggableScrollableSheet(
       initialChildSize: 0.7,
@@ -469,7 +483,7 @@ class _BuddySelectionSheetState extends ConsumerState<_BuddySelectionSheet> {
                   return _buildBuddyListView(
                     scrollController,
                     buddies,
-                    rolesByBuddy,
+                    _certsByBuddy,
                   );
                 },
                 loading: () {
@@ -482,7 +496,7 @@ class _BuddySelectionSheetState extends ConsumerState<_BuddySelectionSheet> {
                           child: _buildBuddyListView(
                             scrollController,
                             _lastSearchResults!,
-                            rolesByBuddy,
+                            _certsByBuddy,
                           ),
                         ),
                       ],
@@ -502,7 +516,7 @@ class _BuddySelectionSheetState extends ConsumerState<_BuddySelectionSheet> {
   Widget _buildBuddyListView(
     ScrollController scrollController,
     List<Buddy> buddies,
-    Map<String, List<BuddyRoleCredential>> rolesByBuddy,
+    Map<String, List<Certification>> certsByBuddy,
   ) {
     return ListView.builder(
       controller: scrollController,
@@ -536,15 +550,9 @@ class _BuddySelectionSheetState extends ConsumerState<_BuddySelectionSheet> {
                   ),
           ),
           title: Text(buddy.name),
-          subtitle: () {
-            final credentials = rolesByBuddy[buddy.id] ?? const [];
-            final parts = <String>[
-              if (buddy.certificationLevel != null)
-                buddy.certificationLevel!.displayName,
-              ...credentials.map((c) => c.displayLabel),
-            ];
-            return parts.isEmpty ? null : Text(parts.join(' | '));
-          }(),
+          subtitle: buddy.certificationLevel == null
+              ? null
+              : Text(buddy.certificationLevel!.displayName),
           trailing: isSelected
               ? Chip(
                   label: Text(
@@ -561,7 +569,7 @@ class _BuddySelectionSheetState extends ConsumerState<_BuddySelectionSheet> {
               _showRoleSelectorForBuddy(
                 context,
                 buddy,
-                rolesByBuddy[buddy.id] ?? const [],
+                certsByBuddy[buddy.id] ?? const [],
               );
             }
           },
@@ -602,19 +610,38 @@ class _BuddySelectionSheetState extends ConsumerState<_BuddySelectionSheet> {
   void _showRoleSelectorForBuddy(
     BuildContext context,
     Buddy buddy,
-    List<BuddyRoleCredential> credentials,
+    List<Certification> certs,
   ) async {
     final roles = ref.read(allDiveRolesProvider).value ?? const <DiveRole>[];
     final selection = await showDiveRoleSelector(
       context,
       title: context.l10n.buddies_picker_selectRole(buddy.name),
       roles: roles,
-      credentialRoleIds: credentials.map((c) => c.role.name).toSet(),
+      credentialRoleIds: _professionalRoleIds(certs),
       onCreateCustomRole: _createCustomRole,
     );
     if (selection?.role != null) {
       _addBuddy(buddy, selection!.role!);
     }
+  }
+
+  /// Dive-role ids this buddy plausibly acts as professionally, derived from
+  /// their certification levels; floats those roles to the top of the sheet
+  /// and badges them (replaces the buddy_roles credential lookup).
+  Set<String> _professionalRoleIds(List<Certification> certs) {
+    final ids = <String>{};
+    for (final cert in certs) {
+      final level = cert.level;
+      if (level == null) continue;
+      if (level.isInstructorLevel) ids.add(DiveRole.instructorId);
+      if (level == CertificationLevel.diveMaster) {
+        ids.add(DiveRole.diveMasterId);
+      }
+      if (level == CertificationLevel.diveGuide) {
+        ids.add(DiveRole.diveGuideId);
+      }
+    }
+    return ids;
   }
 
   Future<DiveRole?> _createCustomRole(String name) async {

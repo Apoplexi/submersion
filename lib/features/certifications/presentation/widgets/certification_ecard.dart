@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import 'package:submersion/features/certifications/domain/entities/certification.dart';
+import 'package:submersion/features/certifications/domain/certification_title.dart';
 import 'package:submersion/features/certifications/presentation/widgets/certification_ecard_back.dart';
 import 'package:submersion/features/certifications/presentation/widgets/certification_ecard_front.dart';
 
@@ -51,7 +52,7 @@ class CertificationEcard extends StatelessWidget {
 
     return Semantics(
       label:
-          '${certification.agency.displayName} ${certification.name} certification for $diverName$issueDateStr$statusStr. ${showBack ? 'Showing back' : 'Showing front'}. Tap to flip',
+          '${certification.agency.displayName} ${certificationTitle(certification)} certification for $diverName$issueDateStr$statusStr. ${showBack ? 'Showing back' : 'Showing front'}. Tap to flip',
       child: AspectRatio(
         aspectRatio: aspectRatio,
         child: GestureDetector(

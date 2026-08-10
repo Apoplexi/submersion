@@ -108,6 +108,30 @@ class ReefDataCache extends Table {
   Set<Column> get primaryKey => {provider, coordKey, variant};
 }
 
+/// Cached NOAA CO-OPS harmonic station constituents. Re-derivable
+/// third-party data: never synced, never backed up. status semantics:
+/// 'ok' = usable constituents in constituentsJson; 'unavailable' = the
+/// station deterministically has no harmonic data. Transient fetch
+/// failures write NO row.
+class NoaaTideStations extends Table {
+  TextColumn get stationId => text()();
+  TextColumn get name => text()();
+  RealColumn get latitude => real()();
+  RealColumn get longitude => real()();
+
+  /// JSON object: {"M2": {"amplitude": 0.576, "phase": 208.2}, ...}
+  TextColumn get constituentsJson => text().withDefault(const Constant('{}'))();
+
+  /// MSL minus MLLW in meters (station datum offset); null when the
+  /// station's datums were unavailable (heights then reference MSL).
+  RealColumn get datumOffsetMllw => real().nullable()();
+  TextColumn get status => text()();
+  IntColumn get fetchedAt => integer()();
+
+  @override
+  Set<Column> get primaryKey => {stationId};
+}
+
 @DriftDatabase(
   tables: [
     LocalAssetCache,
@@ -115,13 +139,14 @@ class ReefDataCache extends Table {
     MediaCacheEntries,
     BathymetryCache,
     ReefDataCache,
+    NoaaTideStations,
   ],
 )
 class LocalCacheDatabase extends _$LocalCacheDatabase {
   LocalCacheDatabase(super.e);
 
   @override
-  int get schemaVersion => 8;
+  int get schemaVersion => 9;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -163,6 +188,10 @@ class LocalCacheDatabase extends _$LocalCacheDatabase {
       if (from < 8) {
         await m.createTable(reefDataCache);
       }
+      // v9: NOAA tide station constituent cache.
+      if (from < 9) {
+        await m.createTable(noaaTideStations);
+      }
     },
     beforeOpen: (details) async {
       // Ladder-collision self-heal: a parallel branch that also claimed v7
@@ -192,6 +221,19 @@ class LocalCacheDatabase extends _$LocalCacheDatabase {
           status TEXT NOT NULL,
           fetched_at INTEGER NOT NULL,
           PRIMARY KEY (provider, coord_key, variant)
+        )
+      ''');
+      await customStatement('''
+        CREATE TABLE IF NOT EXISTS noaa_tide_stations (
+          station_id TEXT NOT NULL,
+          name TEXT NOT NULL,
+          latitude REAL NOT NULL,
+          longitude REAL NOT NULL,
+          constituents_json TEXT NOT NULL DEFAULT '{}',
+          datum_offset_mllw REAL NULL,
+          status TEXT NOT NULL,
+          fetched_at INTEGER NOT NULL,
+          PRIMARY KEY (station_id)
         )
       ''');
     },

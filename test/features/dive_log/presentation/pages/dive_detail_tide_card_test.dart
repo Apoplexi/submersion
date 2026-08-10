@@ -55,7 +55,11 @@ Future<void> _pumpDetailPage(WidgetTester tester, TideRecord record) async {
         diveDataSourcesProvider(
           dive.id,
         ).overrideWith((ref) async => <DiveDataSource>[]),
-        tideRecordForDiveProvider(dive.id).overrideWith((ref) async => record),
+        healedTideRecordProvider((
+          diveId: dive.id,
+          location: dive.site?.location,
+          entryTime: dive.effectiveEntryTime,
+        )).overrideWith((ref) async => record),
       ],
       child: MaterialApp(
         localizationsDelegates: AppLocalizations.localizationsDelegates,

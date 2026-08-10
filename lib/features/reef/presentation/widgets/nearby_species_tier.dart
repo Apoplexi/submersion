@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
 import 'package:submersion/features/marine_life/domain/entities/species.dart';
@@ -20,16 +21,28 @@ class NearbySpeciesTier extends ConsumerWidget {
   final String siteId;
   final GeoPoint location;
 
+  /// Must match the water type the enclosing page passes to [ReefSection]:
+  /// both widgets then share one snapshot family entry and one fetch.
+  final WaterType? waterType;
+
   const NearbySpeciesTier({
     super.key,
     required this.siteId,
     required this.location,
+    this.waterType,
   });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final part = ref
-        .watch(reefSnapshotProvider(location))
+        .watch(
+          reefSnapshotProvider(
+            ReefSnapshotRequest(
+              location: location,
+              fetchHealth: waterType != WaterType.fresh,
+            ),
+          ),
+        )
         .maybeWhen(
           data: (snapshot) => snapshot.species,
           orElse: () => const ReefPart<NearbySpecies>.unavailable(),

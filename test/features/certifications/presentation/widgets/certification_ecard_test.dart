@@ -226,6 +226,39 @@ void main() {
       expect(find.byType(Spacer), findsNothing);
     });
 
+    testWidgets('shows a legacy derived name once, not duplicated', (
+      tester,
+    ) async {
+      // Rows created before 2026-08 auto-filled name from agency + level, so
+      // the stored name repeats what the structured fields already say.
+      // certificationTitle collapses that to the level alone.
+      await _pumpCard(
+        tester,
+        certification: _makeCert(
+          name: 'PADI : Open Water',
+          level: CertificationLevel.openWater,
+        ),
+      );
+
+      expect(find.text('Open Water'), findsOneWidget);
+      expect(find.text('PADI : Open Water'), findsNothing);
+    });
+
+    testWidgets('shows the level as a subtitle only under a custom name', (
+      tester,
+    ) async {
+      await _pumpCard(
+        tester,
+        certification: _makeCert(
+          name: 'Cenote Guide Course',
+          level: CertificationLevel.openWater,
+        ),
+      );
+
+      expect(find.text('Cenote Guide Course'), findsOneWidget);
+      expect(find.text('Open Water'), findsOneWidget);
+    });
+
     testWidgets('does not overflow on a narrow card with every field filled', (
       tester,
     ) async {

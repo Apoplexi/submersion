@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 
+import 'package:submersion/features/certifications/domain/certification_title.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:submersion/features/certifications/domain/entities/certification.dart';
 import 'package:submersion/features/certifications/presentation/services/certification_card_renderer.dart';
@@ -57,7 +58,7 @@ class _CertificationShareSheetState extends State<CertificationShareSheet> {
 
             // Subtitle with certification name
             Text(
-              widget.certification.name,
+              certificationTitle(widget.certification),
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
               ),
@@ -106,7 +107,9 @@ class _CertificationShareSheetState extends State<CertificationShareSheet> {
 
       // Save to temp file
       final tempDir = await getTemporaryDirectory();
-      final sanitizedName = _sanitizeFilename(widget.certification.name);
+      final sanitizedName = _sanitizeFilename(
+        certificationTitle(widget.certification),
+      );
       final filename = 'certification_${sanitizedName}_card.png';
       final file = File('${tempDir.path}/$filename');
       await file.writeAsBytes(bytes);
@@ -142,7 +145,9 @@ class _CertificationShareSheetState extends State<CertificationShareSheet> {
 
       // Save to temp file
       final tempDir = await getTemporaryDirectory();
-      final sanitizedName = _sanitizeFilename(widget.certification.name);
+      final sanitizedName = _sanitizeFilename(
+        certificationTitle(widget.certification),
+      );
       final filename = 'certification_${sanitizedName}_certificate.png';
       final file = File('${tempDir.path}/$filename');
       await file.writeAsBytes(bytes);

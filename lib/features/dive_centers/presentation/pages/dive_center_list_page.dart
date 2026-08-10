@@ -121,18 +121,11 @@ class _DiveCenterListPageState extends ConsumerState<DiveCenterListPage> {
         columnSettingsAction: IconButton(
           icon: const Icon(Icons.view_column_outlined),
           tooltip: 'Column settings',
-          onPressed: () {
-            final config = ref.read(diveCenterTableConfigProvider);
-            final notifier = ref.read(diveCenterTableConfigProvider.notifier);
-            showEntityTableColumnPicker<DiveCenterField>(
-              context,
-              config: config,
-              adapter: DiveCenterFieldAdapter.instance,
-              onToggleColumn: notifier.toggleColumn,
-              onReorderColumn: notifier.reorderColumn,
-              onTogglePin: notifier.togglePin,
-            );
-          },
+          onPressed: () => showEntityTableColumnPicker<DiveCenterField>(
+            context,
+            configProvider: diveCenterTableConfigProvider,
+            adapter: DiveCenterFieldAdapter.instance,
+          ),
         ),
         appBarActions: [
           IconButton(

@@ -12,6 +12,7 @@ import 'package:submersion/features/tags/domain/entities/tag.dart';
 import 'package:submersion/features/trips/domain/entities/trip.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive_custom_field.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive_weight.dart';
+import 'package:submersion/features/dive_log/domain/services/bottom_time_calculator.dart';
 
 /// Core dive log entry entity
 class Dive extends Equatable {
@@ -429,62 +430,19 @@ class Dive extends Equatable {
 
   /// Calculate bottom time from dive profile data.
   ///
-  /// Bottom time is defined as the time spent at depth, excluding descent and ascent.
-  /// This method analyzes the profile to find:
-  /// - Descent end: when the diver first reaches the bottom (within threshold of max depth)
-  /// - Ascent start: when the diver starts ascending from the bottom
+  /// Bottom time runs from surface departure to the start of the final
+  /// ascent (US Navy convention): the descent counts; stops shallower
+  /// than the depth threshold (safety stops, shallow deco) do not, while
+  /// deeper stops still count. See [BottomTimeCalculator] for the
+  /// threshold rule.
   ///
   /// Returns null if profile data is insufficient for calculation.
-  Duration? calculateBottomTimeFromProfile({
-    double depthThresholdPercent = 0.85,
-  }) {
-    if (profile.isEmpty || profile.length < 3) return null;
-
-    // Sort profile by timestamp to ensure correct order
-    final sortedProfile = List<DiveProfilePoint>.from(profile)
-      ..sort((a, b) => a.timestamp.compareTo(b.timestamp));
-
-    // Find maximum depth
-    double maxProfileDepth = 0;
-    for (final point in sortedProfile) {
-      if (point.depth > maxProfileDepth) {
-        maxProfileDepth = point.depth;
-      }
-    }
-
-    if (maxProfileDepth <= 0) return null;
-
-    // Threshold depth for considering the diver "at the bottom"
-    final bottomThreshold = maxProfileDepth * depthThresholdPercent;
-
-    // Find descent end: first point where depth >= threshold
-    int? descentEndTimestamp;
-    for (final point in sortedProfile) {
-      if (point.depth >= bottomThreshold) {
-        descentEndTimestamp = point.timestamp;
-        break;
-      }
-    }
-
-    // Find ascent start: last point where depth >= threshold
-    int? ascentStartTimestamp;
-    for (int i = sortedProfile.length - 1; i >= 0; i--) {
-      if (sortedProfile[i].depth >= bottomThreshold) {
-        ascentStartTimestamp = sortedProfile[i].timestamp;
-        break;
-      }
-    }
-
-    // Validate we found both points
-    if (descentEndTimestamp == null || ascentStartTimestamp == null) {
-      return null;
-    }
-
-    // Ensure ascent start is after descent end
-    if (ascentStartTimestamp <= descentEndTimestamp) return null;
-
-    final bottomTimeSeconds = ascentStartTimestamp - descentEndTimestamp;
-    return Duration(seconds: bottomTimeSeconds);
+  Duration? calculateBottomTimeFromProfile() {
+    final seconds = BottomTimeCalculator.secondsFromSamples([
+      for (final point in profile)
+        (timestamp: point.timestamp, depth: point.depth),
+    ]);
+    return seconds == null ? null : Duration(seconds: seconds);
   }
 
   /// Calculate max depth from dive profile data.

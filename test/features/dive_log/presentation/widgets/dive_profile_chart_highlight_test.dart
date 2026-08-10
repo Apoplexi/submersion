@@ -84,7 +84,7 @@ void main() {
     expect(lines.map((l) => l.x), containsAll([60.0, 120.0]));
   });
 
-  testWidgets('an instant highlight renders a single dashed cursor, no band', (
+  testWidgets('an instant highlight renders a minimum-width band, no dash', (
     tester,
   ) async {
     await pumpChart(
@@ -97,11 +97,35 @@ void main() {
     );
     final data = chartData(tester);
 
-    expect(data.rangeAnnotations.verticalRangeAnnotations, isEmpty);
+    final annotations = data.rangeAnnotations.verticalRangeAnnotations;
+    expect(annotations, hasLength(1));
+    expect(annotations.single.x1, lessThan(90));
+    expect(annotations.single.x2, greaterThan(90));
+
     final lines = data.extraLinesData.verticalLines;
-    expect(lines, hasLength(1));
-    expect(lines.single.x, 90);
-    expect(lines.single.dashArray, isNotNull);
+    expect(lines, hasLength(2));
+    for (final line in lines) {
+      expect(line.dashArray, isNull);
+    }
+  });
+
+  testWidgets('a very short range inflates to a visible band', (tester) async {
+    await pumpChart(
+      tester,
+      highlightRange: const ProfileHighlightRange(
+        startTimestamp: 100,
+        endTimestamp: 102,
+        color: Colors.teal,
+      ),
+    );
+    final data = chartData(tester);
+
+    final annotations = data.rangeAnnotations.verticalRangeAnnotations;
+    expect(annotations, hasLength(1));
+    // 2 s of a 270 s axis is ~2-3 px at this width; the band must be wider
+    // than the raw range because the 12 px minimum kicked in.
+    expect(annotations.single.x2 - annotations.single.x1, greaterThan(2.0));
+    expect(data.extraLinesData.verticalLines, hasLength(2));
   });
 
   // A finding can outlive the displayed axis: on a multi-source dive the

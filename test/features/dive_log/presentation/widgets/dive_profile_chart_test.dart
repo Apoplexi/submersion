@@ -3509,10 +3509,8 @@ void main() {
     });
   });
 
-  group('double-tap-hold pan', () {
-    testWidgets('double-tap then hold-drag pans a zoomed-in chart', (
-      tester,
-    ) async {
+  group('touch pan while zoomed', () {
+    testWidgets('tap then drag pans a zoomed-in chart', (tester) async {
       await tester.pumpWidget(_buildChart(profile: _makeProfile(points: 20)));
       await tester.pumpAndSettle();
       final chart = find.byType(LineChart).first;
@@ -3534,15 +3532,20 @@ void main() {
       await tester.pump();
       final zoomed = tester.widget<LineChart>(chart).data;
 
-      // First tap (quick) then a second touch that is held and dragged.
+      // A quick tap followed by a one-finger drag: the drag is claimed after
+      // touch slop and pans. Incremental moves mirror a real pointer stream
+      // (the claim consumes the slop distance of the first move).
       await tester.tapAt(center, kind: PointerDeviceKind.touch);
       await tester.pump(const Duration(milliseconds: 50));
-      final hold = await tester.startGesture(
+      final drag = await tester.startGesture(
         center,
         kind: PointerDeviceKind.touch,
       );
-      await hold.moveBy(const Offset(-60, 0));
-      await hold.up();
+      for (var i = 0; i < 4; i++) {
+        await drag.moveBy(const Offset(-15, 0));
+        await tester.pump();
+      }
+      await drag.up();
       await tester.pumpAndSettle();
 
       final panned = tester.widget<LineChart>(chart).data;

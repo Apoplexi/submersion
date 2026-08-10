@@ -1528,35 +1528,10 @@ class AppLocalizationsHu extends AppLocalizations {
       'Nincs elég búvártárs az összevonáshoz.';
 
   @override
-  String get buddies_section_professionalRoles => 'Szakmai szerepek';
-
-  @override
-  String get buddies_roles_addRole => 'Szerep hozzáadása';
-
-  @override
-  String get buddies_roles_role => 'Szerep';
-
-  @override
-  String get buddies_roles_agency => 'Szervezet';
-
-  @override
-  String get buddies_roles_credentialNumber => 'Igazolványszám';
-
-  @override
-  String get buddies_roles_removeTooltip => 'Szerep eltávolítása';
-
-  @override
-  String get buddies_roles_emptyHint =>
-      'Adja hozzá az oktatói vagy divemaster képesítéseket, hogy újra felhasználhassa őket képesítések és tanfolyamok rögzítésekor.';
-
-  @override
   String get buddies_instructorPicker_label => 'Oktató a búvártársak közül';
 
   @override
   String get buddies_instructorPicker_none => 'Nincs (kézi bevitel)';
-
-  @override
-  String get buddies_detail_section_professionalRoles => 'Szakmai szerepek';
 
   @override
   String get certifications_appBar_addCertification => 'Kepesites hozzaadasa';
@@ -1604,6 +1579,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String get certifications_detail_label_cardNumber => 'Kartyaszam';
 
   @override
+  String get certifications_detail_label_certification => 'Képesítés';
+
+  @override
   String get certifications_detail_label_expiryDate => 'Lejarat datuma';
 
   @override
@@ -1614,9 +1592,6 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get certifications_detail_label_issueDate => 'Kiadas datuma';
-
-  @override
-  String get certifications_detail_label_level => 'Szint';
 
   @override
   String get certifications_detail_label_type => 'Tipus';
@@ -1759,6 +1734,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String get certifications_edit_button_update => 'Kepesites frissitese';
 
   @override
+  String get certifications_edit_certification_notSpecified => 'Nincs megadva';
+
+  @override
   String certifications_edit_datePicker_clearTooltip(Object label) {
     return '$label torlese';
   }
@@ -1781,16 +1759,21 @@ class AppLocalizationsHu extends AppLocalizations {
   String get certifications_edit_dialog_keepEditing => 'Szerkesztes folytatasa';
 
   @override
+  String get certifications_edit_group_progression => 'Fokozatok';
+
+  @override
+  String get certifications_edit_group_specialties => 'Specialitások';
+
+  @override
   String get certifications_edit_help_expiryDate =>
       'Hagyja uresen a le nem jaro kepesiteseknel';
 
   @override
-  String get certifications_edit_hint_cardNumber =>
-      'Adja meg a kepesitesi kartyaszamot';
+  String get certifications_edit_helper_nameOnCard => 'Nem kötelező';
 
   @override
-  String get certifications_edit_hint_certificationName =>
-      'pl. Open Water Diver';
+  String get certifications_edit_hint_cardNumber =>
+      'Adja meg a kepesitesi kartyaszamot';
 
   @override
   String get certifications_edit_hint_instructorName =>
@@ -1810,7 +1793,7 @@ class AppLocalizationsHu extends AppLocalizations {
   String get certifications_edit_label_cardNumber => 'Kartyaszam';
 
   @override
-  String get certifications_edit_label_certificationName => 'Kepesites neve *';
+  String get certifications_edit_label_certification => 'Képesítés';
 
   @override
   String get certifications_edit_label_expiryDate => 'Lejarat datuma';
@@ -1825,13 +1808,10 @@ class AppLocalizationsHu extends AppLocalizations {
   String get certifications_edit_label_issueDate => 'Kiadas datuma';
 
   @override
-  String get certifications_edit_label_level => 'Szint';
+  String get certifications_edit_label_nameOnCard => 'Név a kártyán';
 
   @override
   String get certifications_edit_label_notes => 'Megjegyzesek';
-
-  @override
-  String get certifications_edit_level_notSpecified => 'Nincs megadva';
 
   @override
   String certifications_edit_photo_addSemanticLabel(Object label) {
@@ -1892,8 +1872,8 @@ class AppLocalizationsHu extends AppLocalizations {
       'Tanusitvany sikeresen frissitve';
 
   @override
-  String get certifications_edit_validation_nameRequired =>
-      'Kerem, adja meg a tanusitvany nevet';
+  String get certifications_edit_validation_certificationOrNameRequired =>
+      'Válasszon képesítést, vagy adjon meg egy nevet';
 
   @override
   String get certifications_list_button_retry => 'Ujraproba';
@@ -9250,24 +9230,6 @@ class AppLocalizationsHu extends AppLocalizations {
   String get enum_ascentRate_warning => 'Figyelmeztetés';
 
   @override
-  String get enum_buddyRole_buddy => 'Buddy';
-
-  @override
-  String get enum_buddyRole_diveGuide => 'Merulesvezeto';
-
-  @override
-  String get enum_buddyRole_diveMaster => 'Divemaster';
-
-  @override
-  String get enum_buddyRole_instructor => 'Oktato';
-
-  @override
-  String get enum_buddyRole_solo => 'Solo';
-
-  @override
-  String get enum_buddyRole_student => 'Tanulo';
-
-  @override
   String get enum_certificationAgency_bsac => 'BSAC';
 
   @override
@@ -9320,6 +9282,9 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get enum_certificationLevel_decompression => 'Dekompresszio';
+
+  @override
+  String get enum_certificationLevel_diveGuide => 'Búvárvezető';
 
   @override
   String get enum_certificationLevel_diveMaster => 'Divemaster';
@@ -12941,6 +12906,23 @@ class AppLocalizationsHu extends AppLocalizations {
   String get safetyReview_restore => 'Visszaállítás';
 
   @override
+  String get safetyReview_details => 'Részletek';
+
+  @override
+  String get safetyReview_clearHighlight => 'Kiemelés törlése';
+
+  @override
+  String safetyReview_findingGroupSemantics(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count biztonsági megállapítás',
+      one: '1 biztonsági megállapítás',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get safetySettings_title => 'Biztonsági áttekintés';
 
   @override
@@ -13049,11 +13031,11 @@ class AppLocalizationsHu extends AppLocalizations {
       'Árapály-ciklus grafikon és időzítés';
 
   @override
-  String get diveDetailSection_reefHealth_name => 'Zátony állapota';
+  String get diveDetailSection_reefHealth_name => 'Vízviszonyok';
 
   @override
   String get diveDetailSection_reefHealth_description =>
-      'Korallfehéredési hőstressz a merülés napján';
+      'Műholdas vízviszonyok a merülés napján';
 
   @override
   String get diveDetailSection_surfaceGps_name => 'Felszíni GPS';
@@ -16478,6 +16460,16 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String surfaceInterval_result_beyondHorizon(Object hours) {
+    return 'A várakozás túllépi azt a $hours órát, ameddig ez a tervező keres. A kitelítődés folytatódik, így egy hosszabb felszíni intervallum elegendő lesz.';
+  }
+
+  @override
+  String surfaceInterval_result_beyondHorizonShort(Object hours) {
+    return 'Több mint $hours óra';
+  }
+
+  @override
   String get surfaceInterval_result_currentInterval => 'Jelenlegi intervallum';
 
   @override
@@ -16502,6 +16494,15 @@ class AppLocalizationsHu extends AppLocalizations {
   String surfaceInterval_result_ndlMinutes(Object minutes) {
     return '$minutes perc NDL';
   }
+
+  @override
+  String surfaceInterval_result_noIntervalHelps(Object minutes) {
+    return 'Semmilyen felszíni intervallum nem elegendő. A leghosszabb dekompresszió nélküli merülés ezen a mélységen ezzel a keverékkel $minutes perc. Rövidítsd le a második merülést vagy csökkentsd a mélységét.';
+  }
+
+  @override
+  String get surfaceInterval_result_notAchievable =>
+      'Semmilyen felszíni intervallummal nem érhető el';
 
   @override
   String get surfaceInterval_result_notYetSafe =>
@@ -16934,6 +16935,29 @@ class AppLocalizationsHu extends AppLocalizations {
   String tides_semantic_tideState(Object state) {
     return 'Árapály állapot: $state';
   }
+
+  @override
+  String tides_source_noaaStation(String name, String distance) {
+    return 'NOAA állomás: $name ($distance)';
+  }
+
+  @override
+  String get tides_source_modelEstimate => 'Óceánmodell-becslés';
+
+  @override
+  String get tides_source_modelCaveat =>
+      'Műholdadatok alapján modellezve. Az időpontok és magasságok eltérhetnek összetett partvonalak közelében.';
+
+  @override
+  String get tides_source_sheetTitle => 'Árapályadatok forrása';
+
+  @override
+  String get tides_source_datumMllw =>
+      'Magasságok az MLLW-hez képest (állomási alapszint)';
+
+  @override
+  String get tides_source_datumMsl =>
+      'Magasságok a közepes tengerszinthez képest';
 
   @override
   String get tides_title => 'Árapály';
@@ -23011,13 +23035,14 @@ class AppLocalizationsHu extends AppLocalizations {
       'Ez az eszköz nem tud videót tömöríteni. Róla az eredetik töltődnek fel.';
 
   @override
-  String get reef_section_title => 'Zátony';
+  String get reef_section_title => 'Ökoszisztéma';
 
   @override
   String get reef_section_sourcesTooltip => 'Adatforrások';
 
   @override
-  String get reef_section_loadError => 'A zátonyadatok most nem tölthetők be';
+  String get reef_section_loadError =>
+      'Az ökoszisztéma-adatok jelenleg nem tölthetők be';
 
   @override
   String get reef_habitat_title => 'Zátony élőhely';
@@ -23039,14 +23064,24 @@ class AppLocalizationsHu extends AppLocalizations {
       'A zátony élőhelye most nem ellenőrizhető';
 
   @override
-  String get reef_health_title => 'Zátony állapota';
+  String get water_conditions_title => 'Vízviszonyok';
 
   @override
-  String get reef_health_unavailable =>
-      'A zátony állapota most nem ellenőrizhető';
+  String get water_conditions_unavailable =>
+      'A vízviszonyok jelenleg nem ellenőrizhetők';
 
   @override
-  String get reef_health_noData => 'Nincs zátonyállapot-adat ehhez a helyhez';
+  String get water_conditions_noData =>
+      'Nincsenek műholdas vízadatok ehhez a helyhez';
+
+  @override
+  String get water_conditions_freshwater =>
+      'A műholdas vízhőmérséklet csak az óceánokat fedi le';
+
+  @override
+  String water_conditions_anomaly(String value) {
+    return 'Anomália $value';
+  }
 
   @override
   String reef_health_degreeHeatingWeeks(String value) {

@@ -16,6 +16,7 @@ import 'package:submersion/core/deco/entities/profile_gas_segment.dart';
 import 'package:submersion/core/deco/entities/tissue_compartment.dart';
 import 'package:submersion/core/deco/gas_density.dart';
 import 'package:submersion/core/deco/o2_toxicity_calculator.dart';
+import 'package:submersion/core/deco/profile_depth_sanitizer.dart';
 import 'package:submersion/core/deco/scr_calculator.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart'
     show GasMix;
@@ -562,6 +563,14 @@ class ProfileAnalysisService {
     if (depths.isEmpty || depths.length != timestamps.length) {
       return ProfileAnalysis.empty();
     }
+
+    // Repair implausible single-sample depth readings once, here, so every
+    // curve derived below (ascent rates, ceilings, NDL, tissue state, events)
+    // sees the same series. Sanitizing further downstream would let the
+    // Buhlmann replay and the ascent-rate overlay disagree about the depth at
+    // a given sample. The repair preserves length, which consumers rely on to
+    // index analysis curves against the raw profile.
+    depths = repairDepthOutliers(depths, timestamps);
 
     if (startOtu < 0) {
       throw ArgumentError('startOtu must be non-negative, got $startOtu');

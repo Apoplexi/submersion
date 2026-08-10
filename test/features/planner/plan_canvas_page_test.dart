@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
 import 'package:submersion/core/constants/map_style.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/core/services/database_service.dart';
@@ -345,5 +346,47 @@ void main() {
         .addSimplePlan(maxDepth: 50, bottomTimeMinutes: 25);
     await tester.pumpAndSettle();
     expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('fullscreen chart action pushes over the canvas', (tester) async {
+    await setSize(tester, const Size(400, 800));
+
+    final router = GoRouter(
+      initialLocation: '/planning/dive-planner',
+      routes: [
+        GoRoute(
+          path: '/planning/dive-planner',
+          builder: (_, _) => const PlanCanvasPage(),
+          routes: [
+            GoRoute(
+              path: 'chart',
+              builder: (_, _) => const Text('fullscreen chart'),
+            ),
+          ],
+        ),
+      ],
+    );
+    addTearDown(router.dispose);
+
+    await tester.pumpWidget(
+      testAppRouter(
+        router: router,
+        overrides: [
+          settingsProvider.overrideWith((ref) => _TestSettingsNotifier()),
+        ],
+        locale: const Locale('en'),
+      ),
+    );
+    await tester.pumpAndSettle();
+    seed(tester);
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byIcon(Icons.open_in_full));
+    await tester.pumpAndSettle();
+
+    // PUSH, not go: the canvas stays on the stack with its state, so back
+    // returns to it instead of closing the app (#647).
+    expect(find.text('fullscreen chart'), findsOneWidget);
+    expect(router.routerDelegate.canPop(), isTrue);
   });
 }
