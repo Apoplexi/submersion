@@ -64,6 +64,22 @@ class BleScanDiagnostics {
         // Not a valid "address|name" key, so it cannot collide with a device.
         private const val ADDRESSLESS_KEY = "<addressless>"
 
+        /**
+         * The usable advertised name for a scan result, or null if the device
+         * supplied none.
+         *
+         * A zero-length Complete Local Name AD field surfaces as `""` rather
+         * than being omitted, and the cached [android.bluetooth.BluetoothDevice]
+         * name can be empty too. Both must count as absent: an empty string
+         * would be matched against the descriptor table as an empty prefix,
+         * logged as a nameless `(...)`, and -- because the dedupe key is
+         * `address|name` -- would collide with the key used for devices that
+         * advertised no name at all.
+         */
+        fun resolveName(scanRecordName: String?, deviceName: String?): String? =
+            scanRecordName?.takeIf { it.isNotEmpty() }
+                ?: deviceName?.takeIf { it.isNotEmpty() }
+
         // Mirrors android.bluetooth.le.ScanCallback. Duplicated rather than
         // referenced so this class stays free of Android imports.
         const val SCAN_FAILED_ALREADY_STARTED = 1

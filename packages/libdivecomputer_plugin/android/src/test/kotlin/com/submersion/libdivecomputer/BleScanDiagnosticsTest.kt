@@ -108,6 +108,46 @@ class BleScanDiagnosticsTest {
     }
 
     @Test
+    fun scanRecordNameIsPreferredOverTheCachedDeviceName() {
+        assertEquals(
+            "Suunto Ocean",
+            BleScanDiagnostics.resolveName("Suunto Ocean", "stale cached name")
+        )
+    }
+
+    @Test
+    fun cachedDeviceNameIsUsedWhenTheAdvertisementCarriesNone() {
+        assertEquals("Suunto D5", BleScanDiagnostics.resolveName(null, "Suunto D5"))
+    }
+
+    @Test
+    fun emptyNamesCountAsAbsent() {
+        // A zero-length Complete Local Name AD field is reported as "" rather
+        // than omitted. Treating it as a real name would match an empty prefix
+        // against the descriptor table and log a nameless "(...)" line.
+        assertNull(BleScanDiagnostics.resolveName("", ""))
+        assertNull(BleScanDiagnostics.resolveName(null, ""))
+        assertNull(BleScanDiagnostics.resolveName("", null))
+    }
+
+    @Test
+    fun anEmptyScanRecordNameFallsBackToTheDeviceName() {
+        assertEquals("Suunto D5", BleScanDiagnostics.resolveName("", "Suunto D5"))
+    }
+
+    @Test
+    fun anAbsentNameDoesNotCollideWithAnEmptyOne() {
+        // Both used to produce the dedupe key "<address>|", so whichever
+        // arrived first silently suppressed the other.
+        val diagnostics = BleScanDiagnostics()
+
+        assertNotNull(diagnostics.describeUnnamed("AA:BB:CC:DD:EE:FF", -62))
+        assertNotNull(
+            diagnostics.describeUnmatched("AA:BB:CC:DD:EE:FF", "Suunto Ocean", -62)
+        )
+    }
+
+    @Test
     fun knownScanFailureCodesAreDescribedInWords() {
         assertTrue(
             BleScanDiagnostics.describeScanFailure(BleScanDiagnostics.SCAN_FAILED_ALREADY_STARTED)

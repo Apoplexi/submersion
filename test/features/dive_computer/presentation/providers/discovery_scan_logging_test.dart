@@ -57,7 +57,7 @@ void main() {
 
     // LoggerService publishes through a broadcast controller, so listeners
     // are notified on a later microtask than the call that logged.
-    Future<void> settle() => Future<void>.delayed(Duration.zero);
+    Future<void> settle() => pumpEventQueue();
 
     test('logs a Bluetooth entry when a scan starts', () async {
       await notifier.startScan();

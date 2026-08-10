@@ -78,9 +78,12 @@ class BleScanner(private val context: Context) {
                 val rssi = result.rssi
 
                 // Peripherals may advertise without a local name and only
-                // supply one in the scan response, so a null here is not
-                // necessarily permanent -- later packets are re-evaluated.
-                val name = result.scanRecord?.deviceName ?: result.device.name
+                // supply one in the scan response, so an absent name here is
+                // not necessarily permanent -- later packets are re-evaluated.
+                val name = BleScanDiagnostics.resolveName(
+                    result.scanRecord?.deviceName,
+                    result.device.name
+                )
                 if (name == null) {
                     diagnostics.describeUnnamed(address, rssi)?.let {
                         NativeLogger.d(TAG, "BLE", it)
@@ -138,7 +141,23 @@ class BleScanner(private val context: Context) {
             .build()
 
         NativeLogger.i(TAG, "BLE", "Starting BLE scan (mode=low latency)")
-        scanner.startScan(null, settings, callback)
+        try {
+            scanner.startScan(null, settings, callback)
+        } catch (e: Exception) {
+            // The adapter can be switched off between the null check above and
+            // this call, and revoked permissions surface here too. Nothing is
+            // registered when this throws, so drop the callback rather than
+            // leave it for the next start() to overwrite. The exception still
+            // propagates: DiveComputerHostApiImpl turns it into the error the
+            // user sees.
+            scanCallback = null
+            NativeLogger.e(
+                TAG, "BLE",
+                "Scan could not be started: ${e.javaClass.simpleName}: ${e.message}"
+            )
+            onComplete?.invoke()
+            throw e
+        }
     }
 
     // Always releases the callback and signals completion, including when the
@@ -156,11 +175,24 @@ class BleScanner(private val context: Context) {
 
         if (callback != null) {
             if (scanner != null) {
-                scanner.stopScan(callback)
-                NativeLogger.i(
-                    TAG, "BLE",
-                    "Stopped BLE scan; ${seenAddresses.size} supported device(s) found"
-                )
+                // stopScan throws in some adapter state transitions. Letting it
+                // escape would skip onComplete below and, because the Dart
+                // stopScan() clears isScanning only after awaiting this call,
+                // strand the wizard on "scanning" -- the failure this change
+                // exists to remove. Report it and finish the teardown.
+                try {
+                    scanner.stopScan(callback)
+                    NativeLogger.i(
+                        TAG, "BLE",
+                        "Stopped BLE scan; ${seenAddresses.size} supported device(s) found"
+                    )
+                } catch (e: Exception) {
+                    NativeLogger.w(
+                        TAG, "BLE",
+                        "Stopping the BLE scan failed: " +
+                            "${e.javaClass.simpleName}: ${e.message}"
+                    )
+                }
             } else {
                 NativeLogger.w(
                     TAG, "BLE",
