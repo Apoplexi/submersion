@@ -1,4 +1,5 @@
 {
+  "universalImport_action_importFromGarmin": "从 Garmin 设备导入",
   "diveLog_tank_saveAsPreset": "另存为预设",
   "diveLog_tank_saveAsPreset_needSpecs": "请先输入容积和工作压力",
   "diveLog_tank_saveAsPreset_nameTitle": "保存气瓶预设",

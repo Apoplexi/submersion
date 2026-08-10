@@ -116,6 +116,12 @@ abstract class AppLocalizations {
     Locale('zh'),
   ];
 
+  /// No description provided for @universalImport_action_importFromGarmin.
+  ///
+  /// In en, this message translates to:
+  /// **'Import from Garmin Device'**
+  String get universalImport_action_importFromGarmin;
+
   /// No description provided for @diveLog_edit_flightWindowWarning.
   ///
   /// In en, this message translates to:

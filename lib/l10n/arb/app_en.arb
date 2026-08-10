@@ -1,4 +1,5 @@
 {
+  "universalImport_action_importFromGarmin": "Import from Garmin Device",
   "diveLog_edit_flightWindowWarning": "This dive ends after the latest safe surfacing time for your flight ({time})",
   "@diveLog_edit_flightWindowWarning": {
     "placeholders": {

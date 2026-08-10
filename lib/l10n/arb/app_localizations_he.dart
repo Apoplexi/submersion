@@ -9,6 +9,9 @@ class AppLocalizationsHe extends AppLocalizations {
   AppLocalizationsHe([String locale = 'he']) : super(locale);
 
   @override
+  String get universalImport_action_importFromGarmin => 'ייבוא מהתקן Garmin';
+
+  @override
   String diveLog_edit_flightWindowWarning(String time) {
     return 'הצלילה הזו מסתיימת אחרי הזמן הבטוח האחרון לעלייה לפני הטיסה שלך ($time)';
   }
