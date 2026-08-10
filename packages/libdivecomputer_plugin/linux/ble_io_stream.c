@@ -217,6 +217,7 @@ static void abandon_credit_flow_control(BleIoStream* stream,
     // reading that pointer on the thread dispatching PropertiesChanged, so
     // freeing it would be a use-after-free. It costs one short string to keep
     // it until ble_io_stream_free, which runs after everything has stopped.
+    stream->credits_abandoned = TRUE;
     credit_balance_set(stream->credits, 0, FALSE);
 
     // Unsubscribe rather than merely ignoring the credit indications, so the
@@ -232,9 +233,10 @@ static void abandon_credit_flow_control(BleIoStream* stream,
 }
 
 // Write the opening credit grant to Credits RX. A no-op (success) on devices
-// with no credit characteristics.
+// with no credit characteristics, or where the fallback has already been
+// taken.
 static gboolean grant_initial_credits(BleIoStream* stream) {
-    if (!stream->credits_write_path) return TRUE;
+    if (!stream->credits_write_path || stream->credits_abandoned) return TRUE;
 
     g_autoptr(GError) error = NULL;
     GVariant* result = g_dbus_connection_call_sync(
@@ -937,6 +939,7 @@ void ble_io_stream_close(BleIoStream* stream) {
     }
     credit_balance_set(stream->credits, 0, FALSE);
     stream->credits_required = FALSE;
+    stream->credits_abandoned = FALSE;
 
     if (stream->connection && stream->properties_sub > 0) {
         g_dbus_connection_signal_unsubscribe(

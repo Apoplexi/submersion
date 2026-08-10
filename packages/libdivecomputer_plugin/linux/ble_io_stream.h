@@ -28,6 +28,11 @@ typedef struct {
     // Whether a failed opening grant is fatal (Telit) or falls back to running
     // without flow control (u-blox, where it is optional).
     gboolean credits_required;
+    // Set once the fallback has been taken, so no further credit work is
+    // attempted. Distinct from the balance's `open` flag, which is also FALSE
+    // before the opening grant and so cannot say whether one is still wanted.
+    // Only touched on the download thread, during connect.
+    gboolean credits_abandoned;
 
     GMutex read_mutex;
     GCond read_cond;
