@@ -1,5 +1,6 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
@@ -545,6 +546,49 @@ void main() {
 
     chart.onSafetyFindingTap!(finding);
     expect(container.read(selectedSafetyFindingProvider('d1')), isNull);
+  });
+
+  testWidgets('enters immersive mode on open and restores it on close', (
+    tester,
+  ) async {
+    final calls = <MethodCall>[];
+    tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+      SystemChannels.platform,
+      (call) async {
+        calls.add(call);
+        return null;
+      },
+    );
+    addTearDown(
+      () => tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+        SystemChannels.platform,
+        null,
+      ),
+    );
+
+    await tester.pumpWidget(_wrap(_defaultOverrides()));
+    await tester.pumpAndSettle();
+
+    final uiModeCalls = calls.where(
+      (c) => c.method == 'SystemChrome.setEnabledSystemUIMode',
+    );
+    expect(
+      uiModeCalls,
+      isNotEmpty,
+      reason: 'the page must request immersive mode on entry',
+    );
+    expect(uiModeCalls.last.arguments, 'SystemUiMode.immersiveSticky');
+
+    await tester.tap(find.byIcon(Icons.close));
+    await tester.pumpAndSettle();
+
+    expect(
+      calls
+          .lastWhere((c) => c.method == 'SystemChrome.setEnabledSystemUIMode')
+          .arguments,
+      'SystemUiMode.edgeToEdge',
+      reason: 'leaving the page must hand the system bars back',
+    );
   });
 
   group('phone layout', () {

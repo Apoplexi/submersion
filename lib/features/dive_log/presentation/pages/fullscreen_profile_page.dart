@@ -115,6 +115,13 @@ class _FullscreenProfilePageState extends ConsumerState<FullscreenProfilePage> {
       DeviceOrientation.landscapeLeft,
       DeviceOrientation.landscapeRight,
     ]);
+    // Fullscreen means fullscreen: hide the status and navigation bars so
+    // the chart owns the display (#811). Mirrors photo_viewer_page. The
+    // call is a no-op on desktop platforms.
+    SystemChrome.setEnabledSystemUIMode(
+      SystemUiMode.immersiveSticky,
+      overlays: [],
+    );
     _lifecycleListener = AppLifecycleListener(
       onInactive: () => _playbackNotifier.pause(),
     );
@@ -125,6 +132,10 @@ class _FullscreenProfilePageState extends ConsumerState<FullscreenProfilePage> {
     _removePlaybackListener();
     _lifecycleListener.dispose();
     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+    SystemChrome.setEnabledSystemUIMode(
+      SystemUiMode.edgeToEdge,
+      overlays: SystemUiOverlay.values,
+    );
     // Riverpod forbids mutating provider state synchronously from a widget
     // lifecycle callback (dispose included), so the cleanup itself is
     // deferred to a microtask, which runs just after the current unmount
