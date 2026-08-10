@@ -1152,6 +1152,58 @@ class MediaRepository {
     SyncEventBus.notifyLocalChange();
   }
 
+  /// Splits a dying site's media: `doomed` rows die with the site
+  /// (site-only, non-library; full items because the blob-delete intent
+  /// needs contentHash/filename/type), `unlinkIds` survive as dive-linked
+  /// or library-level rows with siteId nulled. Site counterpart of
+  /// [partitionMediaForDiveDeletion].
+  Future<({List<domain.MediaItem> doomed, List<String> unlinkIds})>
+  partitionMediaForSiteDeletion(List<String> siteIds) async {
+    // Empty-guard mirrors [partitionMediaForDiveDeletion]: bulk callers
+    // legitimately hand over empty collections.
+    if (siteIds.isEmpty) {
+      return (doomed: const <domain.MediaItem>[], unlinkIds: const <String>[]);
+    }
+    final rows = await (_db.select(
+      _db.media,
+    )..where((t) => t.siteId.isIn(siteIds))).get();
+    final doomed = <domain.MediaItem>[];
+    final unlinkIds = <String>[];
+    for (final row in rows) {
+      final keep =
+          row.diveId != null ||
+          libraryLevelSourceTypes.contains(row.sourceType);
+      if (keep) {
+        unlinkIds.add(row.id);
+      } else {
+        doomed.add(_mapRowToMediaItem(row));
+      }
+    }
+    return (doomed: doomed, unlinkIds: unlinkIds);
+  }
+
+  /// Explicitly unlinks surviving media from deleted sites, with the HLC
+  /// stamp the silent FK SET NULL never produced - so the unlink propagates
+  /// to other devices instead of diverging. Site counterpart of
+  /// [unlinkMediaFromDeletedDives].
+  Future<void> unlinkMediaFromDeletedSites(List<String> mediaIds) async {
+    if (mediaIds.isEmpty) return;
+    final now = DateTime.now().millisecondsSinceEpoch;
+    await _db.transaction(() async {
+      await (_db.update(_db.media)..where((t) => t.id.isIn(mediaIds))).write(
+        MediaCompanion(siteId: const Value(null), updatedAt: Value(now)),
+      );
+      for (final id in mediaIds) {
+        await _syncRepository.markRecordPending(
+          entityType: 'media',
+          recordId: id,
+          localUpdatedAt: now,
+        );
+      }
+    });
+    SyncEventBus.notifyLocalChange();
+  }
+
   /// Backlog-sweep candidates (orphan-prevention spec 4.3): unlinked,
   /// non-library, and created before [olderThan] (the 24h age guard
   /// protects any future add-then-link creator the gate audit could not
