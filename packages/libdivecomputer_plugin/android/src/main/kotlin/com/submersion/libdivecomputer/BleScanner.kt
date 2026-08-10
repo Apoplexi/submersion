@@ -141,19 +141,34 @@ class BleScanner(private val context: Context) {
         scanner.startScan(null, settings, callback)
     }
 
+    // Always releases the callback and signals completion, including when the
+    // system scanner has become unreachable -- Bluetooth switched off during a
+    // scan makes bluetoothLeScanner null. Returning early there would strand
+    // scanCallback, and the next start() would overwrite it while the old
+    // registration was still outstanding.
     fun stop() {
-        val bluetoothManager =
-            context.getSystemService(Context.BLUETOOTH_SERVICE) as? BluetoothManager ?: return
-        val scanner = bluetoothManager.adapter?.bluetoothLeScanner ?: return
-
-        scanCallback?.let {
-            scanner.stopScan(it)
-            NativeLogger.i(
-                TAG, "BLE",
-                "Stopped BLE scan; ${seenAddresses.size} supported device(s) found"
-            )
-        }
+        val callback = scanCallback
         scanCallback = null
+
+        val scanner = (context.getSystemService(Context.BLUETOOTH_SERVICE) as? BluetoothManager)
+            ?.adapter
+            ?.bluetoothLeScanner
+
+        if (callback != null) {
+            if (scanner != null) {
+                scanner.stopScan(callback)
+                NativeLogger.i(
+                    TAG, "BLE",
+                    "Stopped BLE scan; ${seenAddresses.size} supported device(s) found"
+                )
+            } else {
+                NativeLogger.w(
+                    TAG, "BLE",
+                    "Stopped BLE scan without unregistering: Bluetooth became unavailable"
+                )
+            }
+        }
+
         onComplete?.invoke()
     }
 }
