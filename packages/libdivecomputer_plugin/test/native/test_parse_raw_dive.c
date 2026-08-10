@@ -232,7 +232,8 @@ static void test_parse_ratio_ix3m_single_fix(void) {
                                   blob, size, &result, err, sizeof(err));
     assert(rc == 0);
 
-    assert(!isnan(result.entry_latitude));
+    assert(fabs(result.entry_latitude - 36.04) < 1e-7);
+    assert(fabs(result.entry_longitude - 14.32) < 1e-7);
     assert(isnan(result.exit_latitude));
     assert(isnan(result.exit_longitude));
 
@@ -277,6 +278,86 @@ static void test_parse_ratio_ix3m_null_island_ignored(void) {
     free(blob);
 }
 
+/* A receiver that reacquires its original position after an intermediate fix
+   (A, B, A) must not leave the mid-dive position B as the exit point: the dive
+   started and ended at A, so A is the one known position and there is no
+   distinct exit. */
+static void test_parse_ratio_ix3m_returns_to_entry(void) {
+    const int a_lat_e7 = 360400000, a_lon_e7 = 143200000;
+    const int b_lat_e7 = 360900000, b_lon_e7 = 143900000;
+
+    const unsigned int nrecords = 6;
+    const unsigned int size = IX3M_HEADER_SIZE + nrecords * IX3M_APOS4_SAMPLE_SIZE;
+    unsigned char *blob = (unsigned char *)calloc(1, size);
+    assert(blob != NULL);
+
+    put_u16le(blob + 1, nrecords);
+    put_u32le(blob + 0x2A, 40000000);
+
+    ix3m_put_info(blob, 0, a_lat_e7, a_lon_e7);
+    ix3m_put_sample(blob, 1, 0, 50);
+    ix3m_put_info(blob, 2, b_lat_e7, b_lon_e7);
+    ix3m_put_sample(blob, 3, 10, 120);
+    ix3m_put_info(blob, 4, a_lat_e7, a_lon_e7);
+    ix3m_put_sample(blob, 5, 20, 30);
+
+    libdc_parsed_dive_t result;
+    char err[256] = {0};
+
+    int rc = libdc_parse_raw_dive("Ratio", "iX3M 2 GPS Pro", IX3M2_GPS_PRO_MODEL,
+                                  blob, size, &result, err, sizeof(err));
+    assert(rc == 0);
+
+    assert(fabs(result.entry_latitude - 36.04) < 1e-7);
+    assert(fabs(result.entry_longitude - 14.32) < 1e-7);
+    assert(isnan(result.exit_latitude));
+    assert(isnan(result.exit_longitude));
+
+    printf("PASS: test_parse_ratio_ix3m_returns_to_entry\n");
+
+    free(result.samples);
+    free(result.events);
+    free(blob);
+}
+
+/* A receiver that only gets a lock after surfacing yields one fix, late in the
+   profile. That is the exit position, not the entry -- storing it as the entry
+   would pin the dive at the wrong end. Site matching reads the exit when the
+   entry is absent, so the dive still resolves to a site. */
+static void test_parse_ratio_ix3m_late_fix_is_exit(void) {
+    const unsigned int nrecords = 5;
+    const unsigned int size = IX3M_HEADER_SIZE + nrecords * IX3M_APOS4_SAMPLE_SIZE;
+    unsigned char *blob = (unsigned char *)calloc(1, size);
+    assert(blob != NULL);
+
+    put_u16le(blob + 1, nrecords);
+    put_u32le(blob + 0x2A, 40000000);
+
+    ix3m_put_sample(blob, 0, 0, 50);
+    ix3m_put_sample(blob, 1, 600, 180);
+    ix3m_put_sample(blob, 2, 1200, 120);
+    ix3m_put_info(blob, 3, 360400000, 143200000);
+    ix3m_put_sample(blob, 4, 1800, 10);
+
+    libdc_parsed_dive_t result;
+    char err[256] = {0};
+
+    int rc = libdc_parse_raw_dive("Ratio", "iX3M 2 GPS Pro", IX3M2_GPS_PRO_MODEL,
+                                  blob, size, &result, err, sizeof(err));
+    assert(rc == 0);
+
+    assert(isnan(result.entry_latitude));
+    assert(isnan(result.entry_longitude));
+    assert(fabs(result.exit_latitude - 36.04) < 1e-7);
+    assert(fabs(result.exit_longitude - 14.32) < 1e-7);
+
+    printf("PASS: test_parse_ratio_ix3m_late_fix_is_exit\n");
+
+    free(result.samples);
+    free(result.events);
+    free(blob);
+}
+
 int main(void) {
     test_null_args();
     test_load_fixture_missing();
@@ -285,6 +366,8 @@ int main(void) {
     test_parse_ratio_ix3m_sample_gps();
     test_parse_ratio_ix3m_single_fix();
     test_parse_ratio_ix3m_null_island_ignored();
+    test_parse_ratio_ix3m_returns_to_entry();
+    test_parse_ratio_ix3m_late_fix_is_exit();
     printf("\nAll parse_raw_dive tests passed.\n");
     return 0;
 }
