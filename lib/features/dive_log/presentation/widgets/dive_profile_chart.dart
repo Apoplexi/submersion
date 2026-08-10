@@ -4739,8 +4739,17 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
 
     final spots = <FlSpot>[];
     for (final i in _decimatedCurveIndices(ndlData)) {
-      // Clamp NDL to display range to avoid gaps that cause Bezier artifacts.
-      // Negative values (in deco) clamp to 0; values > 60 min clamp to 60 min.
+      // Draw NDL only while there is actually no-deco time left. Once it is
+      // spent (zero, or negative in deco) the line simply ends -- a flat line
+      // pinned at zero through the deco phase carries no information. A null
+      // spot breaks the series so it does not bridge straight across the gap.
+      if (ndlData[i] <= 0) {
+        if (spots.isNotEmpty && spots.last != FlSpot.nullSpot) {
+          spots.add(FlSpot.nullSpot);
+        }
+        continue;
+      }
+      // Clamp values > 60 min to the top of the display range.
       final ndl = ndlData[i].clamp(0, maxNdlSeconds.toInt()).toDouble();
       final normalized = ndl / maxNdlSeconds;
       final yValue = band.mapNormalized(normalized);
@@ -4752,9 +4761,9 @@ class _DiveProfileChartState extends ConsumerState<DiveProfileChart> {
       // surface is already cut short by residual loading, which the first
       // sample reflects and a synthetic maximum would not.
       spots: _withFlatSurfaceLeadIn(spots),
-      isCurved: true,
-      curveSmoothness: 0.2,
-      preventCurveOverShooting: true,
+      // Straight segments: a spline across the null-spot breaks would reach
+      // for the gap and overshoot.
+      isCurved: false,
       color: ndlColor,
       barWidth: 2,
       isStrokeCapRound: true,
