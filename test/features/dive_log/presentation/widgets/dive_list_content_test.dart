@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
 import 'package:submersion/core/constants/dive_field.dart';
 import 'package:submersion/core/constants/list_view_mode.dart';
 import 'package:submersion/core/constants/map_style.dart';
@@ -1243,5 +1244,98 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.byIcon(Icons.view_in_ar), findsOneWidget);
     });
+  });
+
+  group('navigation pushes sub-pages', () {
+    // Sub-pages must push, not go: go() replaces the shell's stack and leaves
+    // the Android system back button with nothing to pop (#647).
+    Future<GoRouter> pumpList(
+      WidgetTester tester, {
+      required List<Override> overrides,
+      required bool showAppBar,
+    }) async {
+      final router = GoRouter(
+        initialLocation: '/dives',
+        routes: [
+          GoRoute(
+            path: '/dives',
+            builder: (_, _) =>
+                Scaffold(body: DiveListContent(showAppBar: showAppBar)),
+            routes: [
+              // Declared before ':diveId' so the static segment wins.
+              GoRoute(
+                path: 'search',
+                builder: (_, _) => const Text('search page'),
+              ),
+              GoRoute(
+                path: ':diveId',
+                builder: (context, state) =>
+                    Text('detail:${state.pathParameters['diveId']}'),
+              ),
+            ],
+          ),
+        ],
+      );
+      addTearDown(router.dispose);
+
+      await tester.pumpWidget(
+        testAppRouter(
+          router: router,
+          overrides: overrides,
+          locale: const Locale('en'),
+        ),
+      );
+      await tester.pumpAndSettle();
+      return router;
+    }
+
+    Future<List<Override>> detailedOverrides() => _buildPhoneOverrides(
+      dives: [
+        _makeDive(
+          id: 'd1',
+          diveNumber: 1,
+          site: const DiveSite(id: 's1', name: 'Site One'),
+        ),
+      ],
+      viewMode: ListViewMode.detailed,
+      highlightedDiveId: null,
+    );
+
+    testWidgets('standalone tile tap pushes the dive detail', (tester) async {
+      final router = await pumpList(
+        tester,
+        overrides: await detailedOverrides(),
+        showAppBar: false,
+      );
+
+      // No onItemSelected callback, so this is standalone mode: the tile
+      // navigates rather than driving a master-detail pane.
+      await tester.tap(find.byType(DiveListTile).first);
+      await tester.pumpAndSettle();
+
+      expect(find.text('detail:d1'), findsOneWidget);
+      expect(router.routerDelegate.canPop(), isTrue);
+    });
+
+    for (final showAppBar in const [true, false]) {
+      final bar = showAppBar ? 'app bar' : 'compact bar';
+      testWidgets('$bar advanced search pushes the search page', (
+        tester,
+      ) async {
+        final router = await pumpList(
+          tester,
+          overrides: await detailedOverrides(),
+          showAppBar: showAppBar,
+        );
+
+        await tester.tap(find.byIcon(Icons.more_vert).first);
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('Advanced Search').last);
+        await tester.pumpAndSettle();
+
+        expect(find.text('search page'), findsOneWidget);
+        expect(router.routerDelegate.canPop(), isTrue);
+      });
+    }
   });
 }

@@ -362,8 +362,9 @@ void main() {
   });
 
   group('QuickActionsCard', () {
-    // Each action calls context.go(), which replaces the stack, so every
-    // case gets its own pump rather than popping back.
+    // Tab-level actions still use go(); sub-page actions use push() so the
+    // Android system back button can pop them (#647). Either way each case
+    // gets its own pump rather than popping back.
     for (final (label, destination) in const [
       ('Plan Dive', '/planning/dive-planner'),
       ('Statistics', '/statistics'),
@@ -384,6 +385,17 @@ void main() {
       await tester.pumpAndSettle();
       // The sheet replaces nothing; it presents options over the card.
       expect(find.byType(QuickActionsCard), findsOneWidget);
+    });
+
+    testWidgets('log dive manually pushes the new-dive page', (tester) async {
+      final spy = await pumpCard(tester, const QuickActionsCard());
+      await tester.tap(find.text('Log Dive'));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Log Dive Manually'));
+      await tester.pumpAndSettle();
+
+      expect(spy.location, '/dives/new');
     });
   });
 }
