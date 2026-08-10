@@ -32,6 +32,11 @@ class MockSettingsNotifier extends StateNotifier<AppSettings>
   MockSettingsNotifier([AppSettings? initial])
     : super(initial ?? const AppSettings());
 
+  /// Already "loaded": the mock's state is supplied up front, so nothing
+  /// awaits a database read.
+  @override
+  Future<void> get initialLoad async {}
+
   @override
   Future<void> setDepthUnit(DepthUnit unit) async =>
       state = state.copyWith(depthUnit: unit);

@@ -3471,7 +3471,9 @@ class DiveRepository {
           computerId: t.computerId,
         );
       }).toList(),
-      profile: profileRows.map(_profilePointFromRow).toList(),
+      profile: _dropDuplicateSamples(
+        profileRows,
+      ).map(_profilePointFromRow).toList(),
       equipment: hydratedEquipmentItems,
       weights: weights,
       isFavorite: row.isFavorite,
@@ -4384,7 +4386,34 @@ class DiveRepository {
               ..where((t) => t.diveId.equals(diveId))
               ..orderBy([(t) => OrderingTerm.asc(t.timestamp)]))
             .get();
-    return rows.map(_profilePointFromRow).toList();
+    return _dropDuplicateSamples(rows).map(_profilePointFromRow).toList();
+  }
+
+  /// Drops rows that repeat a sample already seen, comparing every column
+  /// except the primary key.
+  ///
+  /// A repeated download or import can store two identical copies of every
+  /// sample. The duplicates carry no information but do change the analysis:
+  /// half the sample pairs then share a timestamp and contribute a zero rate,
+  /// which halves every smoothed ascent rate and hides real violations.
+  ///
+  /// The comparison is deliberately over the whole row. Two computers on one
+  /// dive can agree on depth at the same second while each carrying data the
+  /// other lacks, so a (timestamp, depth) key would silently discard one
+  /// computer's temperature or heart rate. `dive_profiles` stores only sample
+  /// data alongside its id -- no per-row sync or audit columns -- so full-row
+  /// equality means exactly "the same sample, stored twice".
+  ///
+  /// Applied to every read that builds `Dive.profile`. Analysis curves are
+  /// index-aligned against that list by their consumers, so [getDiveById] and
+  /// [getMergedProfile] must always agree on its length.
+  static List<DiveProfile> _dropDuplicateSamples(List<DiveProfile> rows) {
+    const idPlaceholder = '';
+    final seen = <DiveProfile>{};
+    return [
+      for (final row in rows)
+        if (seen.add(row.copyWith(id: idPlaceholder))) row,
+    ];
   }
 
   /// Lean hydration for decompression/exposure analysis: the dive row's

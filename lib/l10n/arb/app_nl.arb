@@ -408,6 +408,19 @@
   "backup_restore_dialog_safetyNote": "Er wordt automatisch een veiligheidsback-up van uw huidige gegevens gemaakt voor het herstellen.",
   "backup_restore_dialog_title": "Back-up Herstellen",
   "backup_restore_dialog_warning": "Dit vervangt ALLE huidige gegevens door de back-upgegevens. Deze actie kan niet ongedaan worden gemaakt.",
+  "backup_restore_safetyReview_progress": "{done} van {total} duiken geanalyseerd",
+  "@backup_restore_safetyReview_progress": {
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "backup_restore_safetyReview_skip": "Overslaan",
+  "backup_restore_safetyReview_title": "Veiligheidscontrole wordt uitgevoerd",
   "backup_schedule_enabled": "Automatische back-ups",
   "backup_schedule_enabled_subtitle": "Maak back-ups van uw gegevens volgens schema",
   "backup_schedule_frequency": "Frequentie",
@@ -1354,8 +1367,8 @@
   "diveDetailSection_tanks_description": "Flessenlijst, gasmixen, drukken, SAC per fles",
   "diveDetailSection_tanks_name": "Flessen",
   "diveDetailSection_tide_description": "Getijdecyclusgrafiek en timing",
-  "diveDetailSection_reefHealth_name": "Rifgezondheid",
-  "diveDetailSection_reefHealth_description": "Hittestress door koraalverbleking op de duikdatum",
+  "diveDetailSection_reefHealth_name": "Wateromstandigheden",
+  "diveDetailSection_reefHealth_description": "Satellietwateromstandigheden op de duikdatum",
   "diveDetailSection_tide_name": "Getij",
   "diveDetailSection_weights_description": "Gewichtsoverzicht, totaalgewicht",
   "diveDetailSection_buoyancy_name": "Drijfvermogen",
@@ -4927,6 +4940,8 @@
   "surfaceInterval_gasWarning_modExceeded": "ppO₂ {ppO2} op {depth} overschrijdt {limit}. De MOD voor dit mengsel is {mod}.",
   "surfaceInterval_heSemantics": "Helium: {percent}%",
   "surfaceInterval_o2Semantics": "O2: {percent}%",
+  "surfaceInterval_result_beyondHorizon": "De wachttijd valt buiten de {hours} uur die deze planner doorzoekt. De ontgassing gaat door, dus een langer oppervlakte-interval volstaat.",
+  "surfaceInterval_result_beyondHorizonShort": "Meer dan {hours} uur",
   "surfaceInterval_result_currentInterval": "Huidig interval",
   "surfaceInterval_result_gasUnsafe": "Gas onveilig op deze diepte",
   "surfaceInterval_result_inDeco": "In deco",
@@ -4934,6 +4949,8 @@
   "surfaceInterval_result_minimumInterval": "Minimaal oppervlakte-interval",
   "surfaceInterval_result_ndlForSecondDive": "NDL voor 2e duik",
   "surfaceInterval_result_ndlMinutes": "{minutes} min NDL",
+  "surfaceInterval_result_noIntervalHelps": "Geen enkel oppervlakte-interval is voldoende. De langste duik zonder decompressie op deze diepte met dit mengsel duurt {minutes} min. Verkort de tweede duik of verminder de diepte.",
+  "surfaceInterval_result_notAchievable": "Niet haalbaar met welk oppervlakte-interval dan ook",
   "surfaceInterval_result_notYetSafe": "Nog niet veilig, verhoog oppervlakte-interval",
   "surfaceInterval_result_safeToDive": "Veilig om te duiken",
   "surfaceInterval_result_semantics": "Minimaal oppervlakte-interval: {interval}. Huidig interval: {current}. NDL voor tweede duik: {ndl}. {status}",
@@ -5100,6 +5117,12 @@
   "tides_semantic_tideChart": "Getijdengrafiek. {extremesSummary}",
   "tides_semantic_tideCycle": "Getijdencyclus, status: {state}, hoogte: {height}",
   "tides_semantic_tideState": "Getijdenstatus: {state}",
+  "tides_source_noaaStation": "NOAA-station: {name} ({distance})",
+  "tides_source_modelEstimate": "Oceaanmodel-schatting",
+  "tides_source_modelCaveat": "Gemodelleerd op basis van satellietdata. Tijden en hoogten kunnen afwijken bij complexe kustlijnen.",
+  "tides_source_sheetTitle": "Bron getijdendata",
+  "tides_source_datumMllw": "Hoogten ten opzichte van MLLW (stationsdatum)",
+  "tides_source_datumMsl": "Hoogten ten opzichte van gemiddeld zeeniveau",
   "tides_title": "Getijden",
   "tools_gpsLogger_description": "Registreer je positie tijdens een duikdag en koppel geïmporteerde duiken automatisch aan GPS-locaties.",
   "tools_gpsLogger_subtitle": "Neem een oppervlaktetrack op",
@@ -6543,6 +6566,16 @@
   },
   "safetyReview_dismiss": "Negeren",
   "safetyReview_restore": "Herstellen",
+  "safetyReview_details": "Details",
+  "safetyReview_clearHighlight": "Markering wissen",
+  "safetyReview_findingGroupSemantics": "{count, plural, =1{1 veiligheidsbevinding} other{{count} veiligheidsbevindingen}}",
+  "@safetyReview_findingGroupSemantics": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "safetyReview_showDismissed": "{count, plural, =1{Toon 1 genegeerde} other{Toon {count} genegeerde}}",
   "@safetyReview_showDismissed": {
     "placeholders": {
@@ -6900,17 +6933,20 @@
   "settings_mediaStorage_quality_linuxFfmpegHint": "Installeer ffmpeg om videocompressie in te schakelen. Tot die tijd worden originelen geüpload.",
   "settings_mediaStorage_quality_saveFailed": "Kan de uploadkwaliteit niet opslaan. Probeer het opnieuw.",
   "settings_mediaStorage_quality_noTranscoderHint": "Dit apparaat kan geen video comprimeren. Vanaf dit apparaat worden originelen geüpload.",
-  "reef_section_title": "Rif",
+  "reef_section_title": "Ecosysteem",
   "reef_section_sourcesTooltip": "Gegevensbronnen",
-  "reef_section_loadError": "Rifgegevens konden nu niet worden geladen",
+  "reef_section_loadError": "Ecosysteemgegevens konden nu niet worden geladen",
   "reef_habitat_title": "Rifhabitat",
   "reef_habitat_onReef": "Op een koraalrif",
   "reef_habitat_onReefWithThreat": "Op een koraalrif, dreigingsniveau {threat}",
   "reef_habitat_noReef": "Geen gekarteerd koraalrif op deze locatie",
   "reef_habitat_unavailable": "Rifhabitat kon nu niet worden gecontroleerd",
-  "reef_health_title": "Rifgezondheid",
-  "reef_health_unavailable": "Rifgezondheid kon nu niet worden gecontroleerd",
-  "reef_health_noData": "Geen rifgezondheidsgegevens voor deze locatie",
+  "water_conditions_title": "Wateromstandigheden",
+  "water_conditions_unavailable": "Wateromstandigheden konden nu niet worden gecontroleerd",
+  "water_conditions_noData": "Geen satellietwatergegevens voor deze locatie",
+  "water_conditions_freshwater": "Satellietwatertemperatuur dekt alleen oceanen",
+  "water_conditions_anomaly": "Anomalie {value}",
+  "@water_conditions_anomaly": {"placeholders": {"value": {"type": "String"}}},
   "reef_health_degreeHeatingWeeks": "Degree Heating Weeks {value} C-weken",
   "reef_health_seaSurface": "Zeeoppervlak {value}",
   "reef_health_asOf": "Per {date}",

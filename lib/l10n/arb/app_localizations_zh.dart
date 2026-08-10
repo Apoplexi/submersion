@@ -932,6 +932,17 @@ class AppLocalizationsZh extends AppLocalizations {
   String get backup_restore_dialog_warning => '这将用备份数据替换所有当前数据。此操作无法撤消。';
 
   @override
+  String backup_restore_safetyReview_progress(int done, int total) {
+    return '已分析 $done / $total 次潜水';
+  }
+
+  @override
+  String get backup_restore_safetyReview_skip => '跳过';
+
+  @override
+  String get backup_restore_safetyReview_title => '正在运行安全审查';
+
+  @override
   String get backup_restoreComplete_continue => '继续';
 
   @override
@@ -12394,6 +12405,23 @@ class AppLocalizationsZh extends AppLocalizations {
   String get safetyReview_restore => '恢复';
 
   @override
+  String get safetyReview_details => '详情';
+
+  @override
+  String get safetyReview_clearHighlight => '清除高亮';
+
+  @override
+  String safetyReview_findingGroupSemantics(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 条安全提示',
+      one: '1 条安全提示',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get safetySettings_title => '安全回顾';
 
   @override
@@ -12490,10 +12518,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get diveDetailSection_tide_description => '潮汐周期图和时间';
 
   @override
-  String get diveDetailSection_reefHealth_name => '珊瑚礁健康';
+  String get diveDetailSection_reefHealth_name => '水况';
 
   @override
-  String get diveDetailSection_reefHealth_description => '潜水当天的珊瑚白化热压力';
+  String get diveDetailSection_reefHealth_description => '潜水日期的卫星水况';
 
   @override
   String get diveDetailSection_surfaceGps_name => '水面 GPS';
@@ -15682,6 +15710,16 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String surfaceInterval_result_beyondHorizon(Object hours) {
+    return '所需等待时间超出此计划器搜索的 $hours 小时。脱饱和仍在继续，因此更长的水面间隔即可满足。';
+  }
+
+  @override
+  String surfaceInterval_result_beyondHorizonShort(Object hours) {
+    return '超过 $hours 小时';
+  }
+
+  @override
   String get surfaceInterval_result_currentInterval => '当前间隔';
 
   @override
@@ -15703,6 +15741,14 @@ class AppLocalizationsZh extends AppLocalizations {
   String surfaceInterval_result_ndlMinutes(Object minutes) {
     return '$minutes 分钟 NDL';
   }
+
+  @override
+  String surfaceInterval_result_noIntervalHelps(Object minutes) {
+    return '任何水面间隔都不够。在此深度使用此混合气体，最长的免减压潜水时间为 $minutes 分钟。请缩短第二次潜水或降低其深度。';
+  }
+
+  @override
+  String get surfaceInterval_result_notAchievable => '任何水面间隔都无法达成';
 
   @override
   String get surfaceInterval_result_notYetSafe => '尚不安全，请增加水面间隔';
@@ -16127,6 +16173,26 @@ class AppLocalizationsZh extends AppLocalizations {
   String tides_semantic_tideState(Object state) {
     return '潮汐状态：$state';
   }
+
+  @override
+  String tides_source_noaaStation(String name, String distance) {
+    return 'NOAA 站点：$name（$distance）';
+  }
+
+  @override
+  String get tides_source_modelEstimate => '海洋模型估算';
+
+  @override
+  String get tides_source_modelCaveat => '基于卫星数据建模，复杂海岸线附近的时间和高度可能有偏差。';
+
+  @override
+  String get tides_source_sheetTitle => '潮汐数据来源';
+
+  @override
+  String get tides_source_datumMllw => '高度基于 MLLW（站点基准面）';
+
+  @override
+  String get tides_source_datumMsl => '高度基于平均海平面';
 
   @override
   String get tides_title => '潮汐';
@@ -21932,13 +21998,13 @@ class AppLocalizationsZh extends AppLocalizations {
       '此设备无法压缩视频。将从此设备上传原始文件。';
 
   @override
-  String get reef_section_title => '珊瑚礁';
+  String get reef_section_title => '生态系统';
 
   @override
   String get reef_section_sourcesTooltip => '数据来源';
 
   @override
-  String get reef_section_loadError => '目前无法加载珊瑚礁数据';
+  String get reef_section_loadError => '目前无法加载生态系统数据';
 
   @override
   String get reef_habitat_title => '珊瑚礁生境';
@@ -21958,13 +22024,21 @@ class AppLocalizationsZh extends AppLocalizations {
   String get reef_habitat_unavailable => '目前无法查询珊瑚礁生境';
 
   @override
-  String get reef_health_title => '珊瑚礁健康';
+  String get water_conditions_title => '水况';
 
   @override
-  String get reef_health_unavailable => '目前无法查询珊瑚礁健康状况';
+  String get water_conditions_unavailable => '目前无法检查水况';
 
   @override
-  String get reef_health_noData => '此位置没有珊瑚礁健康数据';
+  String get water_conditions_noData => '此位置没有卫星水文数据';
+
+  @override
+  String get water_conditions_freshwater => '卫星水温仅覆盖海洋';
+
+  @override
+  String water_conditions_anomaly(String value) {
+    return '距平 $value';
+  }
 
   @override
   String reef_health_degreeHeatingWeeks(String value) {

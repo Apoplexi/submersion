@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:submersion/features/dive_log/domain/entities/safety_finding.dart';
-import 'package:submersion/features/dive_log/presentation/providers/dive_repository_provider.dart';
-import 'package:submersion/features/dive_log/presentation/providers/safety_review_providers.dart';
+import 'package:submersion/features/dive_log/presentation/providers/safety_review_sweep.dart';
 import 'package:submersion/features/divers/presentation/providers/diver_providers.dart';
 import 'package:submersion/features/safety/domain/services/no_fly_service.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
@@ -23,7 +22,6 @@ class _SafetySettingsPageState extends ConsumerState<SafetySettingsPage> {
   bool _analyzing = false;
   int _analyzeDone = 0;
   int _analyzeTotal = 0;
-  int _analyzeFailed = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -150,53 +148,42 @@ class _SafetySettingsPageState extends ConsumerState<SafetySettingsPage> {
     // Scope the sweep to the active diver's logbook so "Analyze all dives"
     // only touches the current diver's dives, not every diver on the device.
     final diverId = ref.read(currentDiverIdProvider);
-    final diveIds = await ref
-        .read(diveRepositoryProvider)
-        .getOrderedDiveIds(diverId: diverId);
-    if (!mounted) return;
     setState(() {
       _analyzing = true;
       _analyzeDone = 0;
-      _analyzeTotal = diveIds.length;
-      _analyzeFailed = 0;
+      _analyzeTotal = 0;
     });
 
-    for (final diveId in diveIds) {
-      if (!mounted) return;
-      try {
-        // Force a rebuild before reading: safetyReviewProvider is not
-        // autoDispose, so any dive whose detail page was already opened this
-        // session holds a cached AsyncValue. A bare `ref.read(...future)` would
-        // return that cached value -- including a null cached when the dive was
-        // opened mid-sync before its profile arrived -- and never run the
-        // compute-through-cache, so the review would stay missing until an app
-        // restart. Invalidating first guarantees the engine runs (and persists)
-        // for every dive in the sweep.
-        ref.invalidate(safetyReviewProvider(diveId));
-        // Compute-through-cache: already-analyzed dives return after a cheap
-        // marker-row read; only unanalyzed dives run the profile replay.
-        await ref.read(safetyReviewProvider(diveId).future);
-      } catch (_) {
-        // A dive that fails analysis (corrupt profile) must not abort the
-        // sweep; it simply stays unanalyzed. Count it so completion can report
-        // failures honestly rather than implying every dive was analyzed.
-        _analyzeFailed++;
-      }
-      if (!mounted) return;
-      // _analyzeDone tracks dives swept (the progress bar's position), so it
-      // advances on failure too; the failure count is surfaced separately.
-      setState(() => _analyzeDone++);
-    }
+    final result = await ref
+        .read(safetyReviewSweepProvider)
+        .run(
+          diverId: diverId,
+          // _analyzeDone tracks dives swept (the progress bar's position), so
+          // it advances on failure too; the failure count is surfaced
+          // separately when the sweep completes.
+          onProgress: (done, total) {
+            if (!mounted) return;
+            setState(() {
+              _analyzeDone = done;
+              _analyzeTotal = total;
+            });
+          },
+          // Leaving the page ends the sweep, matching the previous
+          // `if (!mounted) return;` guard inside the loop.
+          isCancelled: () => !mounted,
+        );
 
     if (!mounted) return;
-    final failed = _analyzeFailed;
     setState(() => _analyzing = false);
+    if (result.cancelled) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
-          failed == 0
+          result.failed == 0
               ? context.l10n.safetySettings_analyzeAll_done
-              : context.l10n.safetySettings_analyzeAll_doneWithErrors(failed),
+              : context.l10n.safetySettings_analyzeAll_doneWithErrors(
+                  result.failed,
+                ),
         ),
       ),
     );

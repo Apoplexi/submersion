@@ -921,8 +921,46 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
   String? _validatedDiverId;
   bool _isLoading = false;
 
+  /// Completes when the constructor's first load has finished.
+  ///
+  /// State starts at `const AppSettings()` -- the DEFAULTS -- and is replaced
+  /// asynchronously once the diver's row is read. Anything that must act on the
+  /// stored settings rather than the defaults (notably the post-restore safety
+  /// sweep, which builds a throwaway container against a freshly restored
+  /// database) has to await this first.
+  ///
+  /// May complete with an error -- `_loadSettings` has a `finally` but no
+  /// `catch` -- so awaiting callers must guard and fall back to the defaults
+  /// still held in [state]. Merely storing the future adds no listener, so
+  /// failures surface to the zone handler exactly as they did when the
+  /// constructor called `_initializeAndLoad()` fire-and-forget.
+  late final Future<void> _initialLoad;
+
+  Future<void> get initialLoad => _initialLoad;
+
+  /// A notifier pinned to already-loaded [settings] for [diverId], performing
+  /// no database read and installing no diver-change listener.
+  ///
+  /// For batch work that must grade ONE diver's data with THAT diver's
+  /// settings. The post-restore safety sweep builds one container per diver and
+  /// overrides [settingsProvider] with this, so every settings-derived provider
+  /// — gradient factors, ppO2 ceilings, deco stop increment, and
+  /// [ProfileLegend]'s metric-source defaults — resolves to the dive's owning
+  /// diver instead of whoever happens to be active. Overriding the one root
+  /// provider covers them all; overriding each derived provider would rot as
+  /// the analysis pipeline grows.
+  SettingsNotifier.preloaded(
+    this._repository,
+    this._ref, {
+    required AppSettings settings,
+    required String? diverId,
+  }) : super(settings) {
+    _validatedDiverId = diverId;
+    _initialLoad = Future<void>.value();
+  }
+
   SettingsNotifier(this._repository, this._ref) : super(const AppSettings()) {
-    _initializeAndLoad();
+    _initialLoad = _initializeAndLoad();
 
     // Listen for diver changes and reload settings
     _ref.listen<String?>(currentDiverIdProvider, (previous, next) {
@@ -1036,6 +1074,12 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
 
       // Load settings from database
       final settings = await _repository.getOrCreateSettingsForDiver(diverId);
+      // The notifier can be disposed while this read is in flight -- a
+      // ProviderScope teardown (restartApp's soft restart, or the throwaway
+      // container the post-restore safety sweep builds) tears down mid-load,
+      // and the diver-id listener can start a second load whose completion
+      // nobody awaits. Assigning state after dispose throws.
+      if (!mounted) return;
       state = settings.copyWith(
         fullscreenTileOrder: fullscreenTileOrder,
         fullscreenHiddenTiles: fullscreenHiddenTiles,

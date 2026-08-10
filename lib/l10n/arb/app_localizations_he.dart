@@ -976,6 +976,17 @@ class AppLocalizationsHe extends AppLocalizations {
       'פעולה זו תחליף את כל הנתונים הנוכחיים בנתוני הגיבוי. לא ניתן לבטל פעולה זו.';
 
   @override
+  String backup_restore_safetyReview_progress(int done, int total) {
+    return 'נותחו $done מתוך $total צלילות';
+  }
+
+  @override
+  String get backup_restore_safetyReview_skip => 'דלג';
+
+  @override
+  String get backup_restore_safetyReview_title => 'מריץ את סקירת הבטיחות';
+
+  @override
   String get backup_restoreComplete_continue => 'המשך';
 
   @override
@@ -12678,6 +12689,23 @@ class AppLocalizationsHe extends AppLocalizations {
   String get safetyReview_restore => 'שחזר';
 
   @override
+  String get safetyReview_details => 'פרטים';
+
+  @override
+  String get safetyReview_clearHighlight => 'ניקוי הדגשה';
+
+  @override
+  String safetyReview_findingGroupSemantics(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count ממצאי בטיחות',
+      one: 'ממצא בטיחות אחד',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get safetySettings_title => 'סקירת בטיחות';
 
   @override
@@ -12782,11 +12810,11 @@ class AppLocalizationsHe extends AppLocalizations {
   String get diveDetailSection_tide_description => 'גרף מחזור גאות ושפל וזמן';
 
   @override
-  String get diveDetailSection_reefHealth_name => 'בריאות השונית';
+  String get diveDetailSection_reefHealth_name => 'תנאי המים';
 
   @override
   String get diveDetailSection_reefHealth_description =>
-      'עקת חום מהלבנת אלמוגים בתאריך הצלילה';
+      'תנאי מים לווייניים בתאריך הצלילה';
 
   @override
   String get diveDetailSection_surfaceGps_name => 'GPS פני המים';
@@ -16110,6 +16138,16 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
+  String surfaceInterval_result_beyondHorizon(Object hours) {
+    return 'ההמתנה חורגת מ-$hours השעות שמתכנן זה מחפש. הסילוק ממשיך, ולכן מרווח שטח ארוך יותר יספיק.';
+  }
+
+  @override
+  String surfaceInterval_result_beyondHorizonShort(Object hours) {
+    return 'יותר מ-$hours שעות';
+  }
+
+  @override
   String get surfaceInterval_result_currentInterval => 'מרווח נוכחי';
 
   @override
@@ -16132,6 +16170,15 @@ class AppLocalizationsHe extends AppLocalizations {
   String surfaceInterval_result_ndlMinutes(Object minutes) {
     return '$minutes דקות NDL';
   }
+
+  @override
+  String surfaceInterval_result_noIntervalHelps(Object minutes) {
+    return 'שום מרווח שטח אינו מספיק. הצלילה הארוכה ביותר ללא דקומפרסיה בעומק זה עם תערובת זו היא $minutes דקות. קצר את הצלילה השנייה או הקטן את עומקה.';
+  }
+
+  @override
+  String get surfaceInterval_result_notAchievable =>
+      'לא ניתן להשגה בשום מרווח שטח';
 
   @override
   String get surfaceInterval_result_notYetSafe =>
@@ -16559,6 +16606,27 @@ class AppLocalizationsHe extends AppLocalizations {
   String tides_semantic_tideState(Object state) {
     return 'מצב גאות: $state';
   }
+
+  @override
+  String tides_source_noaaStation(String name, String distance) {
+    return 'תחנת NOAA: $name ($distance)';
+  }
+
+  @override
+  String get tides_source_modelEstimate => 'אומדן מודל אוקיינוס';
+
+  @override
+  String get tides_source_modelCaveat =>
+      'מבוסס על נתוני לוויין. זמנים וגבהים עשויים להיות שונים ליד קווי חוף מורכבים.';
+
+  @override
+  String get tides_source_sheetTitle => 'מקור נתוני הגאות';
+
+  @override
+  String get tides_source_datumMllw => 'גבהים ביחס ל-MLLW (ייחוס התחנה)';
+
+  @override
+  String get tides_source_datumMsl => 'גבהים ביחס לגובה פני הים הממוצע';
 
   @override
   String get tides_title => 'גאות';
@@ -22524,13 +22592,14 @@ class AppLocalizationsHe extends AppLocalizations {
       'מכשיר זה אינו יכול לדחוס וידאו. ממנו מועלים הקבצים המקוריים.';
 
   @override
-  String get reef_section_title => 'שונית';
+  String get reef_section_title => 'מערכת אקולוגית';
 
   @override
   String get reef_section_sourcesTooltip => 'מקורות נתונים';
 
   @override
-  String get reef_section_loadError => 'לא ניתן לטעון כעת את נתוני השונית';
+  String get reef_section_loadError =>
+      'לא ניתן לטעון נתוני מערכת אקולוגית כרגע';
 
   @override
   String get reef_habitat_title => 'בית גידול השונית';
@@ -22550,13 +22619,22 @@ class AppLocalizationsHe extends AppLocalizations {
   String get reef_habitat_unavailable => 'לא ניתן לבדוק כעת את בית הגידול';
 
   @override
-  String get reef_health_title => 'בריאות השונית';
+  String get water_conditions_title => 'תנאי המים';
 
   @override
-  String get reef_health_unavailable => 'לא ניתן לבדוק כעת את בריאות השונית';
+  String get water_conditions_unavailable => 'לא ניתן לבדוק את תנאי המים כרגע';
 
   @override
-  String get reef_health_noData => 'אין נתוני בריאות שונית למיקום זה';
+  String get water_conditions_noData => 'אין נתוני לוויין על המים למיקום זה';
+
+  @override
+  String get water_conditions_freshwater =>
+      'טמפרטורת מים לוויינית מכסה אוקיינוסים בלבד';
+
+  @override
+  String water_conditions_anomaly(String value) {
+    return 'סטייה $value';
+  }
 
   @override
   String reef_health_degreeHeatingWeeks(String value) {

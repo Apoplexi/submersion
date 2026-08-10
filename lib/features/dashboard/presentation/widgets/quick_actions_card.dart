@@ -34,7 +34,9 @@ class QuickActionsCard extends StatelessWidget {
               child: FilledButton.icon(
                 onPressed: () => showAddDiveBottomSheet(
                   context: context,
-                  onLogManually: () => context.go('/dives/new'),
+                  // PUSH (not go): sub-pages must stay poppable so system
+                  // back returns to the dashboard (#647).
+                  onLogManually: () => context.push('/dives/new'),
                 ),
                 icon: const Icon(Icons.add),
                 label: Text(context.l10n.dashboard_quickActions_logDive),
@@ -44,7 +46,7 @@ class QuickActionsCard extends StatelessWidget {
             SizedBox(
               width: double.infinity,
               child: FilledButton.tonalIcon(
-                onPressed: () => context.go('/planning/dive-planner'),
+                onPressed: () => context.push('/planning/dive-planner'),
                 icon: const Icon(Icons.edit_calendar),
                 label: Text(context.l10n.dashboard_quickActions_planDive),
               ),

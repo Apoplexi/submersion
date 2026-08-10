@@ -441,7 +441,9 @@ class _PlanCanvasPageState extends ConsumerState<PlanCanvasPage> {
                 bottom: 10,
                 child: IconButton.filledTonal(
                   icon: const Icon(Icons.open_in_full, size: 18),
-                  onPressed: () => context.go('/planning/dive-planner/chart'),
+                  // PUSH (not go): back returns to this canvas with its
+                  // state on the stack, instead of closing the app (#647).
+                  onPressed: () => context.push('/planning/dive-planner/chart'),
                 ),
               ),
             ],
@@ -687,7 +689,7 @@ class _PlanCanvasPageState extends ConsumerState<PlanCanvasPage> {
         content: Text(context.l10n.plannerCanvas_convert_success),
         action: SnackBarAction(
           label: context.l10n.plannerCanvas_convert_view,
-          onPressed: () => context.go('/dives/${created.id}'),
+          onPressed: () => context.push('/dives/${created.id}'),
         ),
       ),
     );

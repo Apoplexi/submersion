@@ -44,3 +44,37 @@ class ProfileHighlightRange {
   if (x1 >= x2) return null;
   return (x1: x1, x2: x2);
 }
+
+/// The drawable band for [range], inflated to at least [minWidthX] (x-axis
+/// units) so short and instant findings stay visible. Centered on the
+/// clamped span's midpoint, shifted (not shrunk) to stay inside the window;
+/// a window narrower than [minWidthX] yields the whole window. Returns null
+/// when nothing of the range is visible.
+({double x1, double x2})? highlightBandSpan(
+  ProfileHighlightRange range, {
+  required double visibleMinX,
+  required double visibleMaxX,
+  required double minWidthX,
+}) {
+  final span = visibleHighlightSpan(
+    range,
+    visibleMinX: visibleMinX,
+    visibleMaxX: visibleMaxX,
+  );
+  if (span == null) return null;
+  if (span.x2 - span.x1 >= minWidthX) return span;
+  if (visibleMaxX - visibleMinX <= minWidthX) {
+    return (x1: visibleMinX, x2: visibleMaxX);
+  }
+  final mid = (span.x1 + span.x2) / 2;
+  var x1 = mid - minWidthX / 2;
+  var x2 = mid + minWidthX / 2;
+  if (x1 < visibleMinX) {
+    x2 += visibleMinX - x1;
+    x1 = visibleMinX;
+  } else if (x2 > visibleMaxX) {
+    x1 -= x2 - visibleMaxX;
+    x2 = visibleMaxX;
+  }
+  return (x1: x1, x2: x2);
+}

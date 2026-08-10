@@ -190,7 +190,7 @@ class _DiveCenterListContentState extends ConsumerState<DiveCenterListContent> {
           IconButton(
             icon: const Icon(Icons.map),
             tooltip: context.l10n.diveCenters_tooltip_mapView,
-            onPressed: () => context.go('/dive-centers/map'),
+            onPressed: () => context.push('/dive-centers/map'),
           ),
           IconButton(
             icon: const Icon(Icons.search),
@@ -351,7 +351,7 @@ class _DiveCenterListContentState extends ConsumerState<DiveCenterListContent> {
             IconButton(
               icon: const Icon(Icons.map, size: 20),
               tooltip: context.l10n.diveCenters_tooltip_mapView,
-              onPressed: () => context.go('/dive-centers/map'),
+              onPressed: () => context.push('/dive-centers/map'),
             ),
           IconButton(
             icon: const Icon(Icons.search, size: 20),

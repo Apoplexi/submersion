@@ -23,7 +23,7 @@ class CertificationWalletCard extends ConsumerWidget {
       child: Card(
         clipBehavior: Clip.antiAlias,
         child: InkWell(
-          onTap: () => context.go('/certifications/wallet'),
+          onTap: () => context.push('/certifications/wallet'),
           child: Padding(
             padding: const EdgeInsets.all(16),
             child: certificationsAsync.when(

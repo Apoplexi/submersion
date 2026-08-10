@@ -713,6 +713,19 @@
   "backup_restore_dialog_safetyNote": "A safety backup of your current data will be created automatically before restoring.",
   "backup_restore_dialog_title": "Restore Backup",
   "backup_restore_dialog_warning": "This will replace ALL current data with the backup data. This action cannot be undone.",
+  "backup_restore_safetyReview_progress": "Analyzed {done} of {total} dives",
+  "@backup_restore_safetyReview_progress": {
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "backup_restore_safetyReview_skip": "Skip",
+  "backup_restore_safetyReview_title": "Running the safety review",
   "backup_restoreComplete_continue": "Continue",
   "backup_restoreComplete_description": "Your data has been restored successfully. Tap continue to reload the app with your restored data.",
   "backup_restoreComplete_title": "Restore Complete",
@@ -7550,6 +7563,23 @@
   },
   "safetyReview_dismiss": "Dismiss",
   "safetyReview_restore": "Restore",
+  "safetyReview_details": "Details",
+  "@safetyReview_details": {
+    "description": "Link in the chart finding callout that scrolls to the full safety review section"
+  },
+  "safetyReview_clearHighlight": "Clear highlight",
+  "@safetyReview_clearHighlight": {
+    "description": "Tooltip/semantics for the button that clears the chart safety highlight"
+  },
+  "safetyReview_findingGroupSemantics": "{count, plural, =1{1 safety observation} other{{count} safety observations}}",
+  "@safetyReview_findingGroupSemantics": {
+    "description": "Semantics label for a clustered chip in the chart safety lane",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "safetySettings_title": "Safety review",
   "safetySettings_entry_subtitle": "Post-dive observations and rules",
   "safetySettings_masterToggle": "Post-dive safety review",
@@ -7600,8 +7630,8 @@
   "diveDetailSection_altitude_description": "Altitude value, category, deco requirement",
   "diveDetailSection_tide_name": "Tide",
   "diveDetailSection_tide_description": "Tide cycle graph and timing",
-  "diveDetailSection_reefHealth_name": "Reef Health",
-  "diveDetailSection_reefHealth_description": "Coral bleaching heat stress on the dive date",
+  "diveDetailSection_reefHealth_name": "Water Conditions",
+  "diveDetailSection_reefHealth_description": "Satellite water conditions on the dive date",
   "diveDetailSection_surfaceGps_name": "Surface GPS",
   "diveDetailSection_surfaceGps_description": "GPS entry/exit points and surface drift",
   "diveLog_detail_section_surfaceGps": "Surface GPS",
@@ -9517,6 +9547,8 @@
   "surfaceInterval_gasWarning_modExceeded": "ppO₂ {ppO2} at {depth} exceeds {limit}. MOD for this mix is {mod}.",
   "surfaceInterval_heSemantics": "Helium: {percent}%",
   "surfaceInterval_o2Semantics": "O2: {percent}%",
+  "surfaceInterval_result_beyondHorizon": "The wait runs past the {hours} hours this planner searches. Off-gassing continues, so a longer surface interval will get there.",
+  "surfaceInterval_result_beyondHorizonShort": "More than {hours} hours",
   "surfaceInterval_result_currentInterval": "Current Interval",
   "surfaceInterval_result_gasUnsafe": "Gas unsafe at this depth",
   "surfaceInterval_result_inDeco": "In deco",
@@ -9524,6 +9556,8 @@
   "surfaceInterval_result_minimumInterval": "Minimum Surface Interval",
   "surfaceInterval_result_ndlForSecondDive": "NDL for 2nd Dive",
   "surfaceInterval_result_ndlMinutes": "{minutes} min NDL",
+  "surfaceInterval_result_noIntervalHelps": "No surface interval is enough. The longest no-stop dive at this depth on this mix is {minutes} min. Shorten the second dive or reduce its depth.",
+  "surfaceInterval_result_notAchievable": "Not achievable at any surface interval",
   "surfaceInterval_result_notYetSafe": "Not yet safe, increase surface interval",
   "surfaceInterval_result_safeToDive": "Safe to dive",
   "surfaceInterval_result_semantics": "Minimum surface interval: {interval}. Current interval: {current}. NDL for second dive: {ndl}. {status}",
@@ -9678,6 +9712,24 @@
       }
     }
   },
+  "@surfaceInterval_result_beyondHorizon": {
+    "description": "Explains that the second dive does fit on clean tissues but needs a longer surface interval than the planner searches",
+    "placeholders": {
+      "hours": {
+        "type": "Object",
+        "example": "6"
+      }
+    }
+  },
+  "@surfaceInterval_result_beyondHorizonShort": {
+    "description": "Shown in place of a minimum surface interval when the required wait is longer than the planner searches",
+    "placeholders": {
+      "hours": {
+        "type": "Object",
+        "example": "6"
+      }
+    }
+  },
   "@surfaceInterval_result_currentInterval": {
     "description": "Label for the current surface interval column"
   },
@@ -9704,6 +9756,18 @@
         "example": "15"
       }
     }
+  },
+  "@surfaceInterval_result_noIntervalHelps": {
+    "description": "Explains that the planned second dive busts the no-stop limit no matter how long the diver waits, and names the longest no-stop dive that is reachable",
+    "placeholders": {
+      "minutes": {
+        "type": "Object",
+        "example": "43"
+      }
+    }
+  },
+  "@surfaceInterval_result_notAchievable": {
+    "description": "Shown in place of a minimum surface interval when no interval makes the second dive a no-stop dive"
   },
   "@surfaceInterval_result_notYetSafe": {
     "description": "Status message when more surface interval time is needed"
@@ -9970,6 +10034,18 @@
   "tides_semantic_extremeItem": "{typeLabel} tide at {time}, {height}{depthSymbol}",
   "tides_semantic_tideChart": "Tide chart. {extremesSummary}",
   "tides_semantic_tideState": "Tide state: {state}",
+  "tides_source_noaaStation": "NOAA station: {name} ({distance})",
+  "@tides_source_noaaStation": {
+    "placeholders": {
+      "name": {"type": "String"},
+      "distance": {"type": "String"}
+    }
+  },
+  "tides_source_modelEstimate": "Ocean-model estimate",
+  "tides_source_modelCaveat": "Modeled from satellite data. Times and heights may differ near complex coastlines.",
+  "tides_source_sheetTitle": "Tide data source",
+  "tides_source_datumMllw": "Heights relative to MLLW (station datum)",
+  "tides_source_datumMsl": "Heights relative to mean sea level",
   "tides_title": "Tides",
   "transfer_appBar_title": "Transfer",
   "transfer_computers_aboutContent": "Connect your dive computer via Bluetooth to download dive logs directly to the app. Supported computers include Suunto, Shearwater, Garmin, Mares, and many other popular brands.  Apple Watch Ultra users can import dive data directly from the Health app, including depth, duration, and heart rate.",
@@ -14623,18 +14699,21 @@
   "settings_mediaStorage_quality_linuxFfmpegHint": "Install ffmpeg to enable video compression. Originals are uploaded until then.",
   "settings_mediaStorage_quality_saveFailed": "Could not save the upload quality. Try again.",
   "settings_mediaStorage_quality_noTranscoderHint": "This device cannot compress video. Originals are uploaded from it.",
-  "reef_section_title": "Reef",
+  "reef_section_title": "Ecosystem",
   "reef_section_sourcesTooltip": "Data sources",
-  "reef_section_loadError": "Could not load reef data right now",
+  "reef_section_loadError": "Could not load ecosystem data right now",
   "reef_habitat_title": "Reef habitat",
   "reef_habitat_onReef": "On a coral reef",
   "reef_habitat_onReefWithThreat": "On a coral reef, threat level {threat}",
   "@reef_habitat_onReefWithThreat": {"placeholders": {"threat": {"type": "String"}}},
   "reef_habitat_noReef": "No mapped coral reef at this location",
   "reef_habitat_unavailable": "Could not check reef habitat right now",
-  "reef_health_title": "Reef health",
-  "reef_health_unavailable": "Could not check reef health right now",
-  "reef_health_noData": "No reef health data for this location",
+  "water_conditions_title": "Water conditions",
+  "water_conditions_unavailable": "Could not check water conditions right now",
+  "water_conditions_noData": "No satellite water data for this location",
+  "water_conditions_freshwater": "Satellite water temperature covers oceans only",
+  "water_conditions_anomaly": "Anomaly {value}",
+  "@water_conditions_anomaly": {"placeholders": {"value": {"type": "String"}}},
   "reef_health_degreeHeatingWeeks": "Degree Heating Weeks {value} C-weeks",
   "@reef_health_degreeHeatingWeeks": {"placeholders": {"value": {"type": "String"}}},
   "reef_health_seaSurface": "Sea surface {value}",

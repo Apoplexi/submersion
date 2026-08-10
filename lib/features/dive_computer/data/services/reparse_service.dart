@@ -4,6 +4,7 @@ import 'package:uuid/uuid.dart';
 
 import 'package:submersion/core/database/database.dart';
 import 'package:submersion/features/dive_computer/data/services/libdc_dive_mode.dart';
+import 'package:submersion/features/dive_log/domain/services/bottom_time_calculator.dart';
 import 'package:submersion/features/dive_computer/data/services/parsed_tank_resolver.dart';
 
 /// Service responsible for applying re-parsed dive computer data back to the
@@ -697,55 +698,19 @@ class ReparseService {
   // Static helpers
   // ==========================================================================
 
-  /// Calculate bottom time from profile samples using the 85% depth threshold.
+  /// Calculate bottom time from profile samples.
   ///
-  /// Mirrors the logic in DiveComputerRepositoryImpl._calculateBottomTimeFromPoints:
-  /// bottom time = time between first sample at 85% of max depth and the last
-  /// sample at that depth. Returns null if insufficient data.
+  /// Delegates to [BottomTimeCalculator], mirroring
+  /// DiveComputerRepositoryImpl._calculateBottomTimeFromPoints: bottom time
+  /// runs from surface departure to the start of the final ascent, so
+  /// multilevel dives count their shallower segments. Returns null if
+  /// insufficient data.
   static int? _calculateBottomTimeFromSamples(
-    List<pigeon.ProfileSample> samples, {
-    double depthThresholdPercent = 0.85,
-  }) {
-    if (samples.length < 3) return null;
-
-    final sorted = List<pigeon.ProfileSample>.from(samples)
-      ..sort((a, b) => a.timeSeconds.compareTo(b.timeSeconds));
-
-    double maxDepth = 0;
-    for (final s in sorted) {
-      if (s.depthMeters > maxDepth) {
-        maxDepth = s.depthMeters;
-      }
-    }
-
-    if (maxDepth <= 0) return null;
-
-    final bottomThreshold = maxDepth * depthThresholdPercent;
-
-    // First sample at or above threshold = descent end
-    int? descentEndTimestamp;
-    for (final s in sorted) {
-      if (s.depthMeters >= bottomThreshold) {
-        descentEndTimestamp = s.timeSeconds;
-        break;
-      }
-    }
-
-    // Last sample at or above threshold = ascent start
-    int? ascentStartTimestamp;
-    for (int i = sorted.length - 1; i >= 0; i--) {
-      if (sorted[i].depthMeters >= bottomThreshold) {
-        ascentStartTimestamp = sorted[i].timeSeconds;
-        break;
-      }
-    }
-
-    if (descentEndTimestamp == null || ascentStartTimestamp == null) {
-      return null;
-    }
-    if (ascentStartTimestamp <= descentEndTimestamp) return null;
-
-    return ascentStartTimestamp - descentEndTimestamp;
+    List<pigeon.ProfileSample> samples,
+  ) {
+    return BottomTimeCalculator.secondsFromSamples([
+      for (final s in samples) (timestamp: s.timeSeconds, depth: s.depthMeters),
+    ]);
   }
 
   /// Extract maximum CNS percentage from profile samples.

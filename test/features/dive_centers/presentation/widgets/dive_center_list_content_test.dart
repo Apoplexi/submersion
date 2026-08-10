@@ -485,4 +485,92 @@ void main() {
       },
     );
   });
+
+  group('map view navigation', () {
+    // Both map buttons must push, not go: go() replaces the stack and leaves
+    // the Android system back button with nothing to pop (#647).
+    Future<bool> tapMapAction(
+      WidgetTester tester, {
+      required List<Override> overrides,
+      required Widget child,
+      required Finder mapButton,
+    }) async {
+      var reachedMap = false;
+      final router = GoRouter(
+        initialLocation: '/dive-centers',
+        routes: [
+          GoRoute(
+            path: '/dive-centers',
+            builder: (context, state) => child,
+            routes: [
+              GoRoute(
+                path: 'map',
+                builder: (context, state) {
+                  reachedMap = true;
+                  return const Scaffold(body: Text('Map view'));
+                },
+              ),
+            ],
+          ),
+        ],
+      );
+      addTearDown(router.dispose);
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: overrides.cast(),
+          child: MaterialApp.router(
+            routerConfig: router,
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+          ),
+        ),
+      );
+      await tester.pump();
+
+      await tester.tap(mapButton);
+      await tester.pumpAndSettle();
+
+      // The list stays underneath, so back returns to it.
+      expect(router.routerDelegate.canPop(), isTrue);
+      return reachedMap;
+    }
+
+    testWidgets('app bar map action pushes the map view', (tester) async {
+      // Table mode short-circuits to its own scaffold, so the app bar action
+      // only exists in detailed/compact mode.
+      final overrides = await _buildPhoneOverrides(
+        centers: [_makeCenter(id: 'dc1', name: 'Reef Explorers')],
+      );
+
+      final reached = await tapMapAction(
+        tester,
+        overrides: overrides,
+        child: const Scaffold(body: DiveCenterListContent(showAppBar: true)),
+        mapButton: find
+            .descendant(
+              of: find.byType(AppBar),
+              matching: find.byIcon(Icons.map),
+            )
+            .first,
+      );
+
+      expect(reached, isTrue);
+    });
+
+    testWidgets('compact bar map action pushes the map view', (tester) async {
+      final overrides = await _buildPhoneOverrides(
+        centers: [_makeCenter(id: 'dc1', name: 'Reef Explorers')],
+      );
+
+      final reached = await tapMapAction(
+        tester,
+        overrides: overrides,
+        child: const Scaffold(body: DiveCenterListContent(showAppBar: false)),
+        mapButton: find.byIcon(Icons.map).first,
+      );
+
+      expect(reached, isTrue);
+    });
+  });
 }

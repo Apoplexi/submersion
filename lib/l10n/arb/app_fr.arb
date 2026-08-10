@@ -408,6 +408,19 @@
   "backup_restore_dialog_safetyNote": "Une sauvegarde de sécurité de vos données actuelles sera créée automatiquement avant la restauration.",
   "backup_restore_dialog_title": "Restaurer la Sauvegarde",
   "backup_restore_dialog_warning": "Cela remplacera TOUTES les données actuelles par les données de la sauvegarde. Cette action est irréversible.",
+  "backup_restore_safetyReview_progress": "{done} plongées sur {total} analysées",
+  "@backup_restore_safetyReview_progress": {
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "backup_restore_safetyReview_skip": "Ignorer",
+  "backup_restore_safetyReview_title": "Analyse de sécurité en cours",
   "backup_schedule_enabled": "Sauvegardes automatiques",
   "backup_schedule_enabled_subtitle": "Sauvegarder vos données selon un calendrier",
   "backup_schedule_frequency": "Fréquence",
@@ -4855,6 +4868,8 @@
   "surfaceInterval_gasWarning_modExceeded": "ppO₂ {ppO2} à {depth} dépasse {limit}. La MOD de ce mélange est {mod}.",
   "surfaceInterval_heSemantics": "Hélium : {percent}%",
   "surfaceInterval_o2Semantics": "O2 : {percent}%",
+  "surfaceInterval_result_beyondHorizon": "L'attente dépasse les {hours} heures explorées par ce planificateur. La désaturation se poursuit, un intervalle de surface plus long suffira donc.",
+  "surfaceInterval_result_beyondHorizonShort": "Plus de {hours} heures",
   "surfaceInterval_result_currentInterval": "Intervalle actuel",
   "surfaceInterval_result_gasUnsafe": "Gaz dangereux à cette profondeur",
   "surfaceInterval_result_inDeco": "En déco",
@@ -4862,6 +4877,8 @@
   "surfaceInterval_result_minimumInterval": "Intervalle de surface minimum",
   "surfaceInterval_result_ndlForSecondDive": "DTR pour la 2e plongée",
   "surfaceInterval_result_ndlMinutes": "{minutes} min DTR",
+  "surfaceInterval_result_noIntervalHelps": "Aucun intervalle de surface ne suffit. La plongée sans palier la plus longue à cette profondeur avec ce mélange est de {minutes} min. Raccourcissez la deuxième plongée ou réduisez sa profondeur.",
+  "surfaceInterval_result_notAchievable": "Impossible quel que soit l'intervalle de surface",
   "surfaceInterval_result_notYetSafe": "Pas encore sûr, augmentez l'intervalle de surface",
   "surfaceInterval_result_safeToDive": "Sûr pour plonger",
   "surfaceInterval_result_semantics": "Intervalle de surface minimum : {interval}. Intervalle actuel : {current}. DTR pour la deuxième plongée : {ndl}. {status}",
@@ -5028,6 +5045,12 @@
   "tides_semantic_tideChart": "Graphique de marée. {extremesSummary}",
   "tides_semantic_tideCycle": "Cycle de marée, état : {state}, hauteur : {height}",
   "tides_semantic_tideState": "État de la marée : {state}",
+  "tides_source_noaaStation": "Station NOAA : {name} ({distance})",
+  "tides_source_modelEstimate": "Estimation par modèle océanique",
+  "tides_source_modelCaveat": "Modélisé à partir de données satellitaires. Les heures et hauteurs peuvent différer près des côtes complexes.",
+  "tides_source_sheetTitle": "Source des données de marée",
+  "tides_source_datumMllw": "Hauteurs par rapport au MLLW (datum de la station)",
+  "tides_source_datumMsl": "Hauteurs par rapport au niveau moyen de la mer",
   "tides_title": "Marées",
   "tools_gpsLogger_description": "Enregistrez votre position pendant une journée de plongée et associez automatiquement les plongées importées à des positions GPS.",
   "tools_gpsLogger_subtitle": "Enregistrer une trace de surface",
@@ -5651,8 +5674,8 @@
   "diveDetailSection_tanks_description": "Liste des bouteilles, melanges gazeux, pressions, SAC par bouteille",
   "diveDetailSection_tanks_name": "Bouteilles",
   "diveDetailSection_tide_description": "Graphique du cycle de maree et horaires",
-  "diveDetailSection_reefHealth_name": "Santé du récif",
-  "diveDetailSection_reefHealth_description": "Stress thermique de blanchissement corallien à la date de la plongée",
+  "diveDetailSection_reefHealth_name": "Conditions de l'eau",
+  "diveDetailSection_reefHealth_description": "Conditions de l'eau par satellite à la date de la plongée",
   "diveDetailSection_tide_name": "Maree",
   "diveDetailSection_weights_description": "Repartition des lests, poids total",
   "diveDetailSection_buoyancy_name": "Flottabilité",
@@ -6543,6 +6566,16 @@
   },
   "safetyReview_dismiss": "Ignorer",
   "safetyReview_restore": "Restaurer",
+  "safetyReview_details": "Détails",
+  "safetyReview_clearHighlight": "Effacer la surbrillance",
+  "safetyReview_findingGroupSemantics": "{count, plural, =1{1 observation de sécurité} other{{count} observations de sécurité}}",
+  "@safetyReview_findingGroupSemantics": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "safetyReview_showDismissed": "{count, plural, =1{Afficher 1 ignorée} other{Afficher {count} ignorées}}",
   "@safetyReview_showDismissed": {
     "placeholders": {
@@ -6900,17 +6933,20 @@
   "settings_mediaStorage_quality_linuxFfmpegHint": "Installez ffmpeg pour activer la compression vidéo. Les originaux sont téléversés d'ici là.",
   "settings_mediaStorage_quality_saveFailed": "Impossible d'enregistrer la qualité de téléversement. Réessayez.",
   "settings_mediaStorage_quality_noTranscoderHint": "Cet appareil ne peut pas compresser la vidéo. Les originaux sont téléversés depuis celui-ci.",
-  "reef_section_title": "Récif",
+  "reef_section_title": "Écosystème",
   "reef_section_sourcesTooltip": "Sources de données",
-  "reef_section_loadError": "Impossible de charger les données du récif pour le moment",
+  "reef_section_loadError": "Impossible de charger les données de l'écosystème pour le moment",
   "reef_habitat_title": "Habitat du récif",
   "reef_habitat_onReef": "Sur un récif corallien",
   "reef_habitat_onReefWithThreat": "Sur un récif corallien, niveau de menace {threat}",
   "reef_habitat_noReef": "Aucun récif corallien cartographié à cet endroit",
   "reef_habitat_unavailable": "Impossible de vérifier l'habitat du récif pour le moment",
-  "reef_health_title": "Santé du récif",
-  "reef_health_unavailable": "Impossible de vérifier la santé du récif pour le moment",
-  "reef_health_noData": "Aucune donnée de santé du récif pour cet endroit",
+  "water_conditions_title": "Conditions de l'eau",
+  "water_conditions_unavailable": "Impossible de vérifier les conditions de l'eau pour le moment",
+  "water_conditions_noData": "Aucune donnée satellite sur l'eau pour cet emplacement",
+  "water_conditions_freshwater": "La température de l'eau par satellite ne couvre que les océans",
+  "water_conditions_anomaly": "Anomalie {value}",
+  "@water_conditions_anomaly": {"placeholders": {"value": {"type": "String"}}},
   "reef_health_degreeHeatingWeeks": "Degrés-semaines de chaleur {value} C-semaines",
   "reef_health_seaSurface": "Surface de la mer {value}",
   "reef_health_asOf": "Au {date}",

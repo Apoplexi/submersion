@@ -993,6 +993,18 @@ class AppLocalizationsNl extends AppLocalizations {
       'Dit vervangt ALLE huidige gegevens door de back-upgegevens. Deze actie kan niet ongedaan worden gemaakt.';
 
   @override
+  String backup_restore_safetyReview_progress(int done, int total) {
+    return '$done van $total duiken geanalyseerd';
+  }
+
+  @override
+  String get backup_restore_safetyReview_skip => 'Overslaan';
+
+  @override
+  String get backup_restore_safetyReview_title =>
+      'Veiligheidscontrole wordt uitgevoerd';
+
+  @override
   String get backup_restoreComplete_continue => 'Doorgaan';
 
   @override
@@ -12896,6 +12908,23 @@ class AppLocalizationsNl extends AppLocalizations {
   String get safetyReview_restore => 'Herstellen';
 
   @override
+  String get safetyReview_details => 'Details';
+
+  @override
+  String get safetyReview_clearHighlight => 'Markering wissen';
+
+  @override
+  String safetyReview_findingGroupSemantics(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count veiligheidsbevindingen',
+      one: '1 veiligheidsbevinding',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get safetySettings_title => 'Veiligheidscontrole';
 
   @override
@@ -13003,11 +13032,11 @@ class AppLocalizationsNl extends AppLocalizations {
       'Getijdecyclusgrafiek en timing';
 
   @override
-  String get diveDetailSection_reefHealth_name => 'Rifgezondheid';
+  String get diveDetailSection_reefHealth_name => 'Wateromstandigheden';
 
   @override
   String get diveDetailSection_reefHealth_description =>
-      'Hittestress door koraalverbleking op de duikdatum';
+      'Satellietwateromstandigheden op de duikdatum';
 
   @override
   String get diveDetailSection_surfaceGps_name => 'Oppervlakte-GPS';
@@ -16398,6 +16427,16 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String surfaceInterval_result_beyondHorizon(Object hours) {
+    return 'De wachttijd valt buiten de $hours uur die deze planner doorzoekt. De ontgassing gaat door, dus een langer oppervlakte-interval volstaat.';
+  }
+
+  @override
+  String surfaceInterval_result_beyondHorizonShort(Object hours) {
+    return 'Meer dan $hours uur';
+  }
+
+  @override
   String get surfaceInterval_result_currentInterval => 'Huidig interval';
 
   @override
@@ -16421,6 +16460,15 @@ class AppLocalizationsNl extends AppLocalizations {
   String surfaceInterval_result_ndlMinutes(Object minutes) {
     return '$minutes min NDL';
   }
+
+  @override
+  String surfaceInterval_result_noIntervalHelps(Object minutes) {
+    return 'Geen enkel oppervlakte-interval is voldoende. De langste duik zonder decompressie op deze diepte met dit mengsel duurt $minutes min. Verkort de tweede duik of verminder de diepte.';
+  }
+
+  @override
+  String get surfaceInterval_result_notAchievable =>
+      'Niet haalbaar met welk oppervlakte-interval dan ook';
 
   @override
   String get surfaceInterval_result_notYetSafe =>
@@ -16851,6 +16899,29 @@ class AppLocalizationsNl extends AppLocalizations {
   String tides_semantic_tideState(Object state) {
     return 'Getijdenstatus: $state';
   }
+
+  @override
+  String tides_source_noaaStation(String name, String distance) {
+    return 'NOAA-station: $name ($distance)';
+  }
+
+  @override
+  String get tides_source_modelEstimate => 'Oceaanmodel-schatting';
+
+  @override
+  String get tides_source_modelCaveat =>
+      'Gemodelleerd op basis van satellietdata. Tijden en hoogten kunnen afwijken bij complexe kustlijnen.';
+
+  @override
+  String get tides_source_sheetTitle => 'Bron getijdendata';
+
+  @override
+  String get tides_source_datumMllw =>
+      'Hoogten ten opzichte van MLLW (stationsdatum)';
+
+  @override
+  String get tides_source_datumMsl =>
+      'Hoogten ten opzichte van gemiddeld zeeniveau';
 
   @override
   String get tides_title => 'Getijden';
@@ -22924,14 +22995,14 @@ class AppLocalizationsNl extends AppLocalizations {
       'Dit apparaat kan geen video comprimeren. Vanaf dit apparaat worden originelen geüpload.';
 
   @override
-  String get reef_section_title => 'Rif';
+  String get reef_section_title => 'Ecosysteem';
 
   @override
   String get reef_section_sourcesTooltip => 'Gegevensbronnen';
 
   @override
   String get reef_section_loadError =>
-      'Rifgegevens konden nu niet worden geladen';
+      'Ecosysteemgegevens konden nu niet worden geladen';
 
   @override
   String get reef_habitat_title => 'Rifhabitat';
@@ -22952,15 +23023,24 @@ class AppLocalizationsNl extends AppLocalizations {
       'Rifhabitat kon nu niet worden gecontroleerd';
 
   @override
-  String get reef_health_title => 'Rifgezondheid';
+  String get water_conditions_title => 'Wateromstandigheden';
 
   @override
-  String get reef_health_unavailable =>
-      'Rifgezondheid kon nu niet worden gecontroleerd';
+  String get water_conditions_unavailable =>
+      'Wateromstandigheden konden nu niet worden gecontroleerd';
 
   @override
-  String get reef_health_noData =>
-      'Geen rifgezondheidsgegevens voor deze locatie';
+  String get water_conditions_noData =>
+      'Geen satellietwatergegevens voor deze locatie';
+
+  @override
+  String get water_conditions_freshwater =>
+      'Satellietwatertemperatuur dekt alleen oceanen';
+
+  @override
+  String water_conditions_anomaly(String value) {
+    return 'Anomalie $value';
+  }
 
   @override
   String reef_health_degreeHeatingWeeks(String value) {

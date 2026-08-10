@@ -4877,19 +4877,20 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
         ref.invalidate(courseForDiveProvider(savedDiveId));
       }
 
-      // Record tide conditions if site has coordinates
+      // Record tide conditions if site has coordinates (skip freshwater
+      // sites: tides are meaningless there and a nearby ocean station
+      // must not leak in).
       if (savedDiveId != null &&
           _selectedSite != null &&
-          _selectedSite!.hasCoordinates) {
+          _selectedSite!.hasCoordinates &&
+          _selectedSite!.waterType != WaterType.fresh) {
         try {
-          final tideDataService = ref.read(tideDataServiceProvider);
-          final calculator = await tideDataService.getCalculatorForLocation(
-            _selectedSite!.location!.latitude,
-            _selectedSite!.location!.longitude,
+          final resolved = await ref.read(
+            resolvedTideDataProvider(_selectedSite!.location!).future,
           );
-          if (calculator != null) {
+          if (resolved != null) {
             // Record tide status at dive entry time
-            final status = calculator.getStatus(entryDateTime);
+            final status = resolved.calculator.getStatus(entryDateTime);
             final tideRepository = ref.read(tideRecordRepositoryProvider);
             await tideRepository.createFromStatus(
               diveId: savedDiveId,
