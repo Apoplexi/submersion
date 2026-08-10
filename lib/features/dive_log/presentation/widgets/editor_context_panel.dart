@@ -256,7 +256,7 @@ class _EditorContextPanelState extends State<EditorContextPanel> {
     );
   }
 
-Widget _buildTrimPanel(BuildContext context) {
+  Widget _buildTrimPanel(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,

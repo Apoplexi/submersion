@@ -275,10 +275,13 @@ class ProfileEditorNotifier extends StateNotifier<ProfileEditorState> {
 
   /// Trim trailing zero-depth points from the profile, keeping the last one.
   void trimEndZeros() {
-    if (state.editedProfile.isEmpty) return;
+    final profile = state.editedProfile;
+    if (profile.length < 2) return;
 
+    final trimmed = _service.trimEndZeros(profile);
+    if (trimmed.length == profile.length) return;
+
     _pushUndo();
-    final trimmed = _service.trimEndZeros(state.editedProfile);
     state = state.copyWith(editedProfile: trimmed, hasChanges: true);
-  }  
+  }
 }
