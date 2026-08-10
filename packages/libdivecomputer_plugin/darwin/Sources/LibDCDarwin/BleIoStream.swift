@@ -773,6 +773,18 @@ class BleIoStream: NSObject, CBPeripheralDelegate {
             return
         }
 
+        // Only the selected command characteristic drives writeSemaphore.
+        // Matching positively rather than "anything that is not credits"
+        // matters once the u-blox fallback has cleared the credit
+        // characteristics: a late completion for a timed-out credit grant
+        // would otherwise fall through here and wake a command write that is
+        // still in flight, desynchronising the protocol.
+        guard let dataCharacteristic = writeCharacteristic,
+            characteristic.uuid == dataCharacteristic.uuid
+        else {
+            return
+        }
+
         lastWriteError = error
         writeSemaphore.signal()
     }

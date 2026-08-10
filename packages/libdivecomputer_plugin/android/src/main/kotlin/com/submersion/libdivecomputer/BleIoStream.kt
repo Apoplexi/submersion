@@ -448,6 +448,13 @@ class BleIoStream(
                 }
                 return
             }
+            // Only the selected command characteristic drives writeSemaphore.
+            // Matching positively rather than "anything that is not credits"
+            // matters once the u-blox fallback has cleared the credit
+            // characteristics: a late completion for an abandoned credit
+            // grant would otherwise fall through and wake a command write
+            // that is still in flight.
+            if (characteristic.uuid != writeCharacteristic?.uuid) return
             writeSemaphore.release()
         }
     }
