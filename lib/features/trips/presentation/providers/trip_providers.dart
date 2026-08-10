@@ -2,7 +2,6 @@ import 'package:submersion/core/constants/sort_options.dart';
 import 'package:submersion/core/models/sort_state.dart';
 import 'package:submersion/core/providers/provider.dart';
 
-import 'package:submersion/features/dive_log/data/repositories/dive_repository_impl.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart'
     as domain;
 import 'package:submersion/features/dive_log/presentation/providers/view_config_providers.dart';
@@ -195,27 +194,39 @@ final tripWithStatsProvider = FutureProvider.family<TripWithStats, String>((
 /// Dives for a trip provider (IDs only).
 ///
 /// Scoped to the currently-active diver so that shared trips only show that
-/// diver's dives on the detail page.
+/// diver's dives on the detail page. Self-invalidates on any `dives` table
+/// write (a merge/consolidate, a direct edit, a sync apply, ...) the same way
+/// [tripListNotifierProvider] already does for the trip list's dive counts --
+/// without this, the trip detail page keeps showing a dive that a merge just
+/// folded away until something else happens to invalidate it.
 final diveIdsForTripProvider = FutureProvider.family<List<String>, String>((
   ref,
   tripId,
 ) async {
   final repository = ref.watch(tripRepositoryProvider);
+  final diveRepository = ref.watch(diveRepositoryProvider);
   final diverId = await ref.watch(validatedCurrentDiverIdProvider.future);
+
+  ref.invalidateSelfWhen(diveRepository.watchDivesChanges());
+
   return repository.getDiveIdsForTrip(tripId, diverId: diverId);
 });
 
 /// Full dive entities for a trip provider.
 ///
 /// Scoped to the currently-active diver so that shared trips only show that
-/// diver's dives.
+/// diver's dives. See [diveIdsForTripProvider] for why this self-invalidates
+/// on dives-table writes.
 final divesForTripProvider = FutureProvider.family<List<domain.Dive>, String>((
   ref,
   tripId,
 ) async {
   final tripRepository = ref.watch(tripRepositoryProvider);
-  final diveRepository = DiveRepository();
+  final diveRepository = ref.watch(diveRepositoryProvider);
   final diverId = await ref.watch(validatedCurrentDiverIdProvider.future);
+
+  ref.invalidateSelfWhen(diveRepository.watchDivesChanges());
+
   final diveIds = await tripRepository.getDiveIdsForTrip(
     tripId,
     diverId: diverId,

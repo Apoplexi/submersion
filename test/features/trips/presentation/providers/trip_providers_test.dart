@@ -206,6 +206,76 @@ void main() {
       );
       expect(await container.read(divesForTripProvider(t.id).future), isEmpty);
     });
+
+    test('divesForTripProvider auto-refreshes after a dive is deleted directly '
+        'from the DB (dive-merge/consolidate scenario)', () async {
+      final diver = await diverRepo.createDiver(
+        Diver(
+          id: '',
+          name: 'D',
+          isDefault: true,
+          createdAt: DateTime(2024),
+          updatedAt: DateTime(2024),
+        ),
+      );
+      await prefs.setString(currentDiverIdKey, diver.id);
+
+      final trip = await tripRepo.createTrip(
+        _makeTrip(name: 'Merge').copyWith(diverId: diver.id),
+      );
+      final survivor = await diveRepo.createDive(
+        Dive(
+          id: '',
+          diverId: diver.id,
+          dateTime: DateTime(2024, 6, 1),
+          tripId: trip.id,
+        ),
+      );
+      final loser = await diveRepo.createDive(
+        Dive(
+          id: '',
+          diverId: diver.id,
+          dateTime: DateTime(2024, 6, 2),
+          tripId: trip.id,
+        ),
+      );
+
+      final container = makeContainer();
+      addTearDown(container.dispose);
+      // Active listener keeps the FutureProvider (and its dives-table
+      // subscription) alive, mirroring a widget watching the trip page.
+      final sub = container.listen(divesForTripProvider(trip.id), (_, _) {});
+      addTearDown(sub.close);
+
+      final initial = await container.read(
+        divesForTripProvider(trip.id).future,
+      );
+      expect(initial.map((d) => d.id), containsAll([survivor.id, loser.id]));
+
+      // A dive merge/consolidation deletes the loser dive through the
+      // tombstone-logging bulkDeleteDives path (dive_consolidation_service.dart,
+      // dive_merge_service.dart) -- the same primitive a sync pull uses when
+      // applying a remote deletion. divesForTripProvider must notice and drop
+      // the deleted dive without any caller having to invalidate it manually.
+      await diveRepo.bulkDeleteDives([loser.id]);
+
+      var ids = <String>[];
+      for (var i = 0; i < 50; i++) {
+        await Future<void>.delayed(const Duration(milliseconds: 10));
+        ids = (await container.read(
+          divesForTripProvider(trip.id).future,
+        )).map((d) => d.id).toList();
+        if (!ids.contains(loser.id)) break;
+      }
+
+      expect(
+        ids,
+        equals([survivor.id]),
+        reason:
+            'divesForTripProvider should auto-refresh after a dive delete, '
+            'the same way tripListNotifierProvider already does',
+      );
+    });
   });
 
   group('tripSearchProvider', () {
