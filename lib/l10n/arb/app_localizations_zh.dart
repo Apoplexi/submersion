@@ -14213,6 +14213,14 @@ class AppLocalizationsZh extends AppLocalizations {
       '选择同步文件夹（Dropbox、Google Drive 等）';
 
   @override
+  String get settings_storage_customFolder_subtitleDeviceOnly =>
+      '将数据库移至内部存储或 SD 卡';
+
+  @override
+  String get settings_storage_customFolder_deviceOnly_noCloudSync =>
+      '当数据库位于设备存储卷上时，应用管理的云同步将停用。在 Android 上没有任何同步服务能访问该文件夹，请使用“备份与恢复”在其他位置保留副本。';
+
+  @override
   String settings_storage_dbStats(
     Object fileSize,
     Object diveCount,
@@ -20083,6 +20091,10 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get db_location_external_note => '卸载应用后，此处的文件将被删除。';
+
+  @override
+  String get db_location_backup_note =>
+      'Android 无法从云同步文件夹运行数据库。若要在 Dropbox、Nextcloud 或 Google Drive 中保留副本，请在“备份与恢复”中设置“备份位置”。';
 
   @override
   String diveLog_bulkEdit_membership_onAll(int count) {

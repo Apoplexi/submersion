@@ -50,6 +50,24 @@ void main() {
     );
   });
 
+  testWidgets('points cloud-folder seekers at the backup location instead', (
+    tester,
+  ) async {
+    await pumpAndOpen(tester);
+
+    // Neither option is a cloud-synced folder, and Android cannot offer one
+    // for the live database (#311). Say where a synced copy DOES belong
+    // rather than leaving the user to conclude the app is broken.
+    expect(
+      find.text(
+        'Android cannot run the database from a cloud-synced folder. '
+        'To keep a copy in Dropbox, Nextcloud, or Google Drive, set a '
+        'Backup Location under Backup & Restore.',
+      ),
+      findsOneWidget,
+    );
+  });
+
   testWidgets('tapping SD card pops with the removable option', (tester) async {
     await pumpAndOpen(tester);
     await tester.tap(find.text('SD card'));

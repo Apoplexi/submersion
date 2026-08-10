@@ -102,11 +102,10 @@ class _StorageSettingsPageState extends ConsumerState<StorageSettingsPage> {
                     context,
                     theme,
                     title: context.l10n.settings_storage_customFolder,
-                    subtitle:
-                        storageState.config.mode ==
-                            StorageLocationMode.customFolder
-                        ? _truncatePath(storageState.config.customFolderPath)
-                        : context.l10n.settings_storage_customFolder_subtitle,
+                    subtitle: _customFolderSubtitle(
+                      storageState.config,
+                      platformCaps,
+                    ),
                     icon: Icons.folder,
                     isSelected:
                         storageState.config.mode ==
@@ -128,7 +127,7 @@ class _StorageSettingsPageState extends ConsumerState<StorageSettingsPage> {
                 const SizedBox(height: 16),
 
                 // Info banner about cloud sync
-                _buildInfoBanner(context, theme, storageState),
+                _buildInfoBanner(context, theme, storageState, platformCaps),
 
                 // Error display
                 if (storageState.error != null) ...[
@@ -269,9 +268,18 @@ class _StorageSettingsPageState extends ConsumerState<StorageSettingsPage> {
     BuildContext context,
     ThemeData theme,
     StorageConfigState storageState,
+    StoragePlatformCapabilities platformCaps,
   ) {
     final isCustomFolder =
         storageState.config.mode == StorageLocationMode.customFolder;
+    // A custom folder turns app-managed sync off on every platform. Where
+    // the folder is an app-specific device volume, no sync service can read
+    // it either, so the usual "your folder's sync service handles it" line
+    // would leave the user believing a library that syncs nowhere is
+    // covered (#311).
+    final activeMessage = platformCaps.customFolderIsDeviceVolumeOnly
+        ? context.l10n.settings_storage_customFolder_deviceOnly_noCloudSync
+        : context.l10n.settings_storage_info_customActive;
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
@@ -291,7 +299,7 @@ class _StorageSettingsPageState extends ConsumerState<StorageSettingsPage> {
           Expanded(
             child: Text(
               isCustomFolder
-                  ? context.l10n.settings_storage_info_customActive
+                  ? activeMessage
                   : context.l10n.settings_storage_info_customAvailable,
               style: theme.textTheme.bodySmall?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
@@ -470,6 +478,25 @@ class _StorageSettingsPageState extends ConsumerState<StorageSettingsPage> {
         ),
       );
     }
+  }
+
+  /// Subtitle for the Custom Folder option: the chosen path once one is set,
+  /// otherwise a description of what picking it will actually offer.
+  ///
+  /// Android only offers app-specific volumes (a live SQLite file cannot sit
+  /// behind a SAF stream), so the cloud-synced-folder wording promises a
+  /// location the app can never use and sends the user after a folder the
+  /// migration then rejects (#311).
+  String _customFolderSubtitle(
+    StorageConfig config,
+    StoragePlatformCapabilities platformCaps,
+  ) {
+    if (config.mode == StorageLocationMode.customFolder) {
+      return _truncatePath(config.customFolderPath);
+    }
+    return platformCaps.customFolderIsDeviceVolumeOnly
+        ? context.l10n.settings_storage_customFolder_subtitleDeviceOnly
+        : context.l10n.settings_storage_customFolder_subtitle;
   }
 
   String _truncatePath(String? path) {
