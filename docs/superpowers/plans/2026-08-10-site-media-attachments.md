@@ -479,16 +479,28 @@ git commit -m "Add v148 migration: media site index and site dedupe index"
 Create `test/features/media/data/media_repository_site_cascade_test.dart`, scaffolding copied from `test/features/media/data/media_repository_cascade_test.dart` (same DB harness and parent-row helpers). Test bodies:
 
 ```dart
+  MediaItem _media({String? siteId, String? diveId, MediaSourceType sourceType =
+      MediaSourceType.platformGallery}) => MediaItem(
+    id: '',
+    siteId: siteId,
+    diveId: diveId,
+    sourceType: sourceType,
+    mediaType: MediaType.photo,
+    takenAt: DateTime(2026),
+    createdAt: DateTime(2026),
+    updatedAt: DateTime(2026),
+  );
+
   group('partitionMediaForSiteDeletion', () {
     test('site-only media is doomed; dive-linked and library rows unlink',
         () async {
-      // parent rows: site-1, dive-1
-      final siteOnly = await repository.createMedia(/* siteId: 'site-1' */);
+      // parent rows: site-1, dive-1 (insert with the harness helpers)
+      final siteOnly = await repository.createMedia(_media(siteId: 'site-1'));
       final diveLinked = await repository.createMedia(
-        /* siteId: 'site-1', diveId: 'dive-1' */
+        _media(siteId: 'site-1', diveId: 'dive-1'),
       );
       final libraryRow = await repository.createMedia(
-        /* siteId: 'site-1', sourceType: MediaSourceType.networkUrl */
+        _media(siteId: 'site-1', sourceType: MediaSourceType.networkUrl),
       );
 
       final split = await repository.partitionMediaForSiteDeletion(['site-1']);
@@ -507,18 +519,18 @@ Create `test/features/media/data/media_repository_site_cascade_test.dart`, scaff
   });
 
   group('unlinkMediaFromDeletedSites', () {
-    test('nulls siteId, bumps updatedAt, marks sync-pending', () async {
-      final m = await repository.createMedia(/* siteId: 'site-1' */);
+    test('nulls siteId and marks sync-pending', () async {
+      final m = await repository.createMedia(_media(siteId: 'site-1'));
       await repository.unlinkMediaFromDeletedSites([m.id]);
       final after = await repository.getMediaById(m.id);
       expect(after!.siteId, isNull);
       // sync pending: assert via the same sync_pending query the dive
-      // cascade test uses.
+      // cascade test uses (copy its helper verbatim).
     });
   });
 ```
 
-Fill the `/* ... */` companions exactly as the dive cascade test builds its media items (full MediaItem constructors with takenAt/createdAt/updatedAt). Also add a `SiteRepository.deleteSite` integration case: create site + site-only media + dive-linked media, call `SiteRepository(...).deleteSite('site-1')` with an injected recording `MediaDeletionCoordinator` fake (copy the fake from the dive cascade test), and assert: the site row is gone, the site-only item was passed to `deleteMediaItems`, the dive-linked row survives with `siteId == null`.
+Also add a `SiteRepository.deleteSite` integration case: create site + site-only media + dive-linked media, call `SiteRepository(...).deleteSite('site-1')` with an injected recording `MediaDeletionCoordinator` fake (copy the fake from the dive cascade test), and assert: the site row is gone, the site-only item was passed to `deleteMediaItems`, the dive-linked row survives with `siteId == null`.
 
 - [ ] **Step 2: Run test to verify it fails**
 
@@ -687,7 +699,14 @@ Create `test/features/media/presentation/providers/site_media_providers_test.dar
   });
 
   test('notifier deleteMultipleMedia removes rows and refreshes', () async {
-    // seed two rows; read notifier, delete one, expect state has one left
+    // seed site-1 with two media rows m1, m2 via MediaRepository.createMedia
+    final notifier = container.read(
+      siteMediaListNotifierProvider('site-1').notifier,
+    );
+    await notifier.refresh();
+    await notifier.deleteMultipleMedia([m1.id]);
+    final state = container.read(siteMediaListNotifierProvider('site-1'));
+    expect(state.value!.map((m) => m.id), [m2.id]);
   });
 
   test('mediaFromDivesAtSiteProvider groups by dive and drops empty dives',
@@ -1096,15 +1115,31 @@ class SiteMediaViewerPage extends ConsumerStatefulWidget {
 
 ```dart
   testWidgets('shows empty message when site has no photos', (tester) async {
-    // ProviderScope overriding mediaForSiteProvider('site-1') with
-    // AsyncValue.data(const <MediaItem>[]) via a FutureProvider override;
-    // pump SiteMediaViewerPage(siteId: 'site-1', initialMediaId: 'x',
-    // scope: SiteViewerScope.attachments) inside MaterialApp with l10n
-    // delegates; expect the media_photoViewer_noPhotosAvailable text.
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          mediaForSiteProvider('site-1').overrideWith(
+            (ref) async => const <MediaItem>[],
+          ),
+        ],
+        child: const MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: SiteMediaViewerPage(
+            siteId: 'site-1',
+            initialMediaId: 'x',
+            scope: SiteViewerScope.attachments,
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    // media_photoViewer_noPhotosAvailable, English value:
+    expect(find.textContaining('No photos'), findsOneWidget);
   });
 ```
 
-Copy the l10n-capable MaterialApp harness from an existing page test (e.g. `test/features/media/presentation/widgets/dive_media_section_test.dart`).
+If the family override syntax differs in this Riverpod version, copy the override style from an existing provider-family widget test (e.g. how `dive_media_section_test.dart` overrides `mediaForDiveProvider`); match the found text to the actual English value of `media_photoViewer_noPhotosAvailable` in `app_en.arb`.
 
 - [ ] **Step 3: Run tests**
 
@@ -1126,7 +1161,7 @@ git commit -m "Add site-scoped media viewer page"
 - Test: `test/features/media/presentation/widgets/site_media_section_test.dart` (create)
 
 **Interfaces:**
-- Consumes: Task 5 providers, Task 6 grid pieces, Task 7 viewer, `DocumentViewerPage` (Task 12 — until then, tapping a PDF routes through a callback, see below).
+- Consumes: Task 5 providers, Task 6 grid pieces, Task 7 viewer. Document opening is injected via callback (wired to `DocumentOpenHelper` in Task 13), so this task has no dependency on the viewer pages.
 - Produces: `SiteMediaSection({required String siteId, VoidCallback? onAddPhotosPressed, VoidCallback? onAddDocumentPressed, void Function(MediaItem)? onOpenDocument})` — the section renders the attachments grid + dive-photos group; add actions and document-opening are injected by the page (keeps this widget free of picker/viewer wiring, mirroring how `DiveMediaSection` takes `onAddPressed`).
 
 - [ ] **Step 1: Write the failing test**
@@ -1134,21 +1169,61 @@ git commit -m "Add site-scoped media viewer page"
 Create `test/features/media/presentation/widgets/site_media_section_test.dart` (harness from `dive_media_section_test.dart`, overriding `mediaForSiteProvider` / `mediaFromDivesAtSiteProvider` / `siteMediaListNotifierProvider` dependencies via a real container over the in-memory DB, or provider overrides — follow whichever style the dive test uses):
 
 ```dart
-  testWidgets('empty state renders map icon and site empty message',
-      (tester) async {
-    // site with no media: expect l10n.media_siteMediaSection_emptyState text
+  Widget _host({VoidCallback? onPhotos, VoidCallback? onDoc}) => ProviderScope(
+    overrides: [
+      mediaForSiteProvider('site-1').overrideWith(
+        (ref) async => const <MediaItem>[],
+      ),
+      mediaFromDivesAtSiteProvider('site-1').overrideWith(
+        (ref) async => const <Dive, List<MediaItem>>{},
+      ),
+    ],
+    child: MaterialApp(
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      home: Scaffold(
+        body: SiteMediaSection(
+          siteId: 'site-1',
+          onAddPhotosPressed: onPhotos,
+          onAddDocumentPressed: onDoc,
+        ),
+      ),
+    ),
+  );
+
+  testWidgets('empty state renders site empty message', (tester) async {
+    await tester.pumpWidget(_host());
+    await tester.pumpAndSettle();
+    expect(
+      find.text('No maps, photos, or documents attached to this site'),
+      findsOneWidget,
+    );
   });
 
   testWidgets('add menu exposes photos and document actions', (tester) async {
-    // pump with onAddPhotosPressed/onAddDocumentPressed spies; tap the add
-    // icon; expect two menu entries; tap each; expect the spies fired.
+    var photos = 0;
+    var docs = 0;
+    await tester.pumpWidget(
+      _host(onPhotos: () => photos++, onDoc: () => docs++),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.byIcon(Icons.add_photo_alternate));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Add document'));
+    await tester.pumpAndSettle();
+    expect(docs, 1);
+    expect(photos, 0);
   });
 
   testWidgets('dive photos group hidden when no dives have media',
       (tester) async {
-    // mediaFromDivesAtSiteProvider -> {}: the ExpansionTile is absent.
+    await tester.pumpWidget(_host());
+    await tester.pumpAndSettle();
+    expect(find.byType(ExpansionTile), findsNothing);
   });
 ```
+
+(The settings provider may need overriding too — copy whatever overrides `dive_media_section_test.dart` pumps with. If family `.overrideWith` on a `FutureProvider.family` needs different syntax in this Riverpod version, mirror the dive test's override style.)
 
 - [ ] **Step 2: Run test to verify it fails**
 
@@ -1811,13 +1886,13 @@ class PdfPageRenderer {
       _log.warning('PDF page render failed: $e');
       return null;
     } finally {
-      document?.dispose();
+      document?.close();
     }
   }
 }
 ```
 
-API check against the installed pdfrx version: `pdfrxInitialize()`, `PdfDocument.openFile/openData`, `page.render(width:, height:)`, `pageImage.createImageNF()`, `pageImage.dispose()`, and whether document cleanup is `dispose()` or `close()` — open the package source under `~/.pub-cache` (or dart docs) and match the real names; the shapes above are from pdfrx's current README.
+API check against the installed pdfrx version: `pdfrxInitialize()`, `PdfDocument.openFile/openData`, `page.render(width:, height:)`, `pageImage.createImageNF()`, `pageImage.dispose()`, `document.close()` — open the package source under `~/.pub-cache` (or its dartdoc) and match the real names/nullability before writing; the shapes above are from pdfrx's current README (which uses `close()` for documents and `dispose()` for page images).
 
 - [ ] **Step 5: Run tests, format, commit**
 
@@ -2153,3 +2228,270 @@ dart format .
 git add -A
 git commit -m "Add PDF viewer, document open flows, and document tiles"
 ```
+
+---
+
+## Phase 6: Dive-side documents
+
+### Task 14: Documents on dives
+
+**Files:**
+- Modify: `lib/features/media/presentation/widgets/dive_media_section.dart`
+- Modify: `lib/features/dive_log/presentation/pages/dive_detail_page.dart`
+- Modify: `lib/features/media/presentation/pages/photo_viewer_page.dart`
+- Test: extend `test/features/media/presentation/widgets/dive_media_section_test.dart`
+
+**Interfaces:**
+- Consumes: `DocumentOpenHelper` (Task 13).
+- Produces: `DiveMediaSection` gains `onAddDocumentPressed` (VoidCallback?) and `onOpenDocument` (void Function(MediaItem)?) parameters; dive photo viewer never receives documents.
+
+- [ ] **Step 1: Write the failing test**
+
+In `dive_media_section_test.dart` add:
+
+```dart
+  testWidgets('add menu shows document action when callback provided',
+      (tester) async {
+    var photos = 0;
+    var docs = 0;
+    // pumpSection = this file's existing harness function for DiveMediaSection
+    await pumpSection(
+      tester,
+      onAddPressed: () => photos++,
+      onAddDocumentPressed: () => docs++,
+    );
+    await tester.tap(find.byIcon(Icons.add_photo_alternate));
+    await tester.pumpAndSettle();
+    expect(find.text('Add document'), findsOneWidget);
+    await tester.tap(find.text('Add document'));
+    await tester.pumpAndSettle();
+    expect(docs, 1);
+    expect(photos, 0);
+  });
+
+  testWidgets('plain add button preserved when no document callback',
+      (tester) async {
+    var photos = 0;
+    await pumpSection(tester, onAddPressed: () => photos++);
+    await tester.tap(find.byIcon(Icons.add_photo_alternate));
+    await tester.pumpAndSettle();
+    expect(photos, 1); // fired directly, no menu
+  });
+```
+
+(`pumpSection` stands for however the existing file pumps `DiveMediaSection` — extend that helper with the new optional callbacks rather than building a fresh harness.)
+
+- [ ] **Step 2: Run test to verify it fails**
+
+Run: `flutter test test/features/media/presentation/widgets/dive_media_section_test.dart`
+Expected: new cases FAIL — parameter undefined.
+
+- [ ] **Step 3: Implement the section changes**
+
+1. Add the two parameters to `DiveMediaSection` (fields + constructor).
+2. In the header (line ~368), replace the plain add `IconButton`:
+
+```dart
+                  if (widget.onAddPressed != null &&
+                      widget.onAddDocumentPressed == null)
+                    IconButton(
+                      icon: Icon(
+                        Icons.add_photo_alternate,
+                        color: colorScheme.primary,
+                      ),
+                      visualDensity: VisualDensity.compact,
+                      tooltip: context.l10n.media_diveMediaSection_addTooltip,
+                      onPressed: widget.onAddPressed,
+                    )
+                  else if (widget.onAddPressed != null)
+                    PopupMenuButton<String>(
+                      icon: Icon(
+                        Icons.add_photo_alternate,
+                        color: colorScheme.primary,
+                      ),
+                      tooltip: context.l10n.media_diveMediaSection_addTooltip,
+                      onSelected: (value) {
+                        if (value == 'photos') widget.onAddPressed!();
+                        if (value == 'document') {
+                          widget.onAddDocumentPressed!();
+                        }
+                      },
+                      itemBuilder: (context) => [
+                        PopupMenuItem(
+                          value: 'photos',
+                          child: Text(
+                            context.l10n.media_siteMediaSection_addPhotos,
+                          ),
+                        ),
+                        PopupMenuItem(
+                          value: 'document',
+                          child: Text(
+                            context.l10n.media_siteMediaSection_addDocument,
+                          ),
+                        ),
+                      ],
+                    ),
+```
+
+3. In `onItemTap` (line ~403), route documents:
+
+```dart
+                  onItemTap: (index) {
+                    final item = media[index];
+                    if (item.isDocument) {
+                      widget.onOpenDocument?.call(item);
+                      return;
+                    }
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        fullscreenDialog: true,
+                        builder: (_) => PhotoViewerPage(
+                          diveId: widget.diveId,
+                          initialMediaId: item.id,
+                        ),
+                      ),
+                    );
+                  },
+```
+
+4. Enrichment backfill guard in `_scheduleEnrichmentBackfill` (line ~88): documents never enrich —
+
+```dart
+    final missing = items
+        .where((m) => m.enrichment == null && !m.isDocument)
+        .map((m) => m.id)
+        .toSet();
+```
+
+- [ ] **Step 4: Wire the dive detail page**
+
+In `dive_detail_page.dart` `_buildMediaSection` (line ~4526):
+
+```dart
+    return DiveMediaSection(
+      diveId: dive.id,
+      onScanPressed: () => _scanGalleryForDive(context, ref, dive),
+      onAddPressed: () async {
+        await PhotoImportHelper.importPhotosForDive(
+          context: context,
+          ref: ref,
+          dive: dive,
+        );
+      },
+      onAddDocumentPressed: () => DocumentOpenHelper.pickAndAttach(
+        context: context,
+        ref: ref,
+        diveId: dive.id,
+      ),
+      onOpenDocument: (item) => DocumentOpenHelper.open(context, ref, item),
+    );
+```
+
+- [ ] **Step 5: Exclude documents from the dive photo viewer**
+
+Open `photo_viewer_page.dart` and find where it materializes the media list from `mediaForDiveProvider(diveId)` (mirror of the trip viewer's `flatMediaAsync.when(data: (mediaList) {...})`). Filter documents at that point:
+
+```dart
+          final mediaList =
+              rawList.where((m) => !m.isDocument).toList();
+```
+
+(adapt the variable names to the file — the invariant is: every list the pager, page indicator, and initial-index lookup use must be the filtered one). Do the same in the gallery-scan suggestion path only if it iterates `mediaForDiveProvider` output (check; scan flows create photo suggestions and should be unaffected).
+
+- [ ] **Step 6: Run tests, format, commit**
+
+Run: `flutter test test/features/media/presentation/widgets/dive_media_section_test.dart test/features/media/presentation/widgets/dive_media_section_lightroom_test.dart test/features/media/presentation/pages/`
+Expected: PASS.
+
+```bash
+dart format .
+git add -A
+git commit -m "Enable document attachments on dives"
+```
+
+---
+
+## Phase 7: Localization and verification
+
+### Task 15: Translate all new l10n keys
+
+**Files:**
+- Modify: all 11 of `lib/l10n/arb/app_{ar,de,en,es,fr,he,hu,it,nl,pt,zh}.arb`
+
+The keys added in Tasks 8, 13 (and any stragglers — diff `app_en.arb` against `origin/main` to enumerate):
+`media_siteMediaSection_title`, `media_siteMediaSection_addPhotos`, `media_siteMediaSection_addDocument`, `media_siteMediaSection_emptyState`, `media_siteMediaSection_divePhotosGroup`, `media_siteMediaSection_divePhotoLabel`, `media_siteMediaSection_unlinkSelectedTitle`, `media_siteMediaSection_unlinkSelectedContent`, `media_siteMediaSection_unlinkSelectedSuccess`, `media_documentViewer_title`, `media_documentViewer_unavailable`, `media_documentViewer_availableOnOriginDevice`, `media_documentViewer_attached`, `media_documentViewer_openExternally`.
+
+- [ ] **Step 1: Translate**
+
+For each non-English ARB, replace the temporary English copies with real translations of the English source strings. Match each locale's existing tone and terminology — open the neighboring `media_diveMediaSection_*` translations in the same file and reuse their vocabulary (e.g. how "unlink"/"attach" is already rendered in that language). Preserve placeholder syntax exactly (`{count}`).
+
+- [ ] **Step 2: Regenerate and verify**
+
+```bash
+flutter gen-l10n
+flutter analyze
+```
+
+Expected: analyze clean (missing-translation infos are fatal).
+
+- [ ] **Step 3: Commit**
+
+```bash
+dart format .
+git add -A
+git commit -m "Translate site media and document viewer strings for all locales"
+```
+
+### Task 16: Roadmap note and full verification
+
+**Files:**
+- Modify: `docs/FEATURE_ROADMAP.md` (line ~1230: mark "User-submitted site photos" as shipped/in-PR with a pointer to issues #211/#627)
+- Modify: `docs/contributing/roadmap.md` (line ~239 "Site photo galleries" — same)
+
+- [ ] **Step 1: Update the two roadmap lines**
+
+Follow the exact status vocabulary neighboring rows use (e.g. change `📋 Planned` to the symbol used for completed items in that table — copy from an adjacent shipped row; do not invent emoji, reuse the table's own).
+
+- [ ] **Step 2: Full verification (evidence before assertions)**
+
+```bash
+dart format .          # must be a no-op
+flutter analyze        # zero issues
+flutter test           # full suite
+```
+
+Known-flaky context: backup tests, media upload pipeline drain, OCR scan-page-under-load, media store fallback walltime, and recovery-code yoyo tests are documented flaky under full-suite load in this project — a failure in one of those, passing in isolation, is pre-existing; anything touching media/site/document code paths is NOT excusable and must be fixed.
+
+- [ ] **Step 3: Final commit**
+
+```bash
+git add -A
+git commit -m "Update roadmap for site media attachments"
+```
+
+Do NOT push or open a PR — the branch owner decides integration (superpowers:finishing-a-development-branch).
+
+---
+
+## Spec coverage map
+
+| Spec requirement | Task(s) |
+| --- | --- |
+| `MediaType.document`, extension-based behavior | 1 |
+| Site read path + providers | 2, 5 |
+| Migration v148 (site index, dedupe index) | 3 |
+| HLC-stamped site-deletion cascade | 4 |
+| Shared grid extraction (Approach B) | 6 |
+| Site viewer (trip-viewer model, no dive overlay) | 7 |
+| SiteMediaSection: attachments + separated dive photos | 8 |
+| Site photo add flow (no time window) | 9 |
+| Reference-everything document linking (bookmark/SAF/path) | 10 |
+| PDF page-1 thumbnails (pdfrx), 512px JPEG | 11, 12 |
+| Store content types for documents | 12 |
+| In-app PDF viewer + unavailable/origin-device state | 13 |
+| Non-PDF opaque tiles + open externally | 6 (badge), 13 |
+| Documents on dives, enrichment skipped | 14 |
+| l10n all locales | 8, 13, 15 |
+| Media-store sync contract (no inline blobs) | inherent — no new sync code anywhere |
+
+Deliberate deviation from the spec: content hashes are NOT computed at attach time — the upload pipeline computes and records them exactly as it does for photos today (`recordContentHash`). The spec's "hash at attach" wording predates checking how photos actually behave; consistency wins and nothing downstream needs the hash earlier.
