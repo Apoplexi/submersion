@@ -128,9 +128,23 @@ class ChartAxis {
         magnitude;
   }
 
+  /// The largest power of ten not exceeding [value], so that
+  /// `value / _magnitudeOf(value)` always lands inside `[1, 10)`.
+  ///
+  /// The floor of `log(value) / ln10` is not enough on its own: for some exact
+  /// powers of ten the division comes back a few ULPs short of the whole
+  /// number (`log(1000) / ln10` is 2.9999999999999996, likewise at 1e6 and
+  /// 1e9), which floors one exponent too low and pushes the normalized value
+  /// to exactly 10. The correction restores the range the callers rely on.
   static double _magnitudeOf(double value) {
     if (!value.isFinite || value <= 0) return 1;
-    return math.pow(10, (math.log(value) / math.ln10).floor()).toDouble();
+
+    final magnitude = math
+        .pow(10, (math.log(value) / math.ln10).floor())
+        .toDouble();
+    if (value / magnitude >= 10) return magnitude * 10;
+    if (value / magnitude < 1) return magnitude / 10;
+    return magnitude;
   }
 
   /// Relative slack so a value already sitting on a tick is not pushed a whole
