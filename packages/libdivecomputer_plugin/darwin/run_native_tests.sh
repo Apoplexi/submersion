@@ -41,3 +41,12 @@ swiftc -o "$BUILD_DIR/serial_read_loop_tests" \
     Tests/SerialReadLoopTests/main.swift
 
 "$BUILD_DIR/serial_read_loop_tests"
+
+# SerialPortOpener errno-reporting tests (issue #291): open(2) failures must
+# carry the real errno and an actionable reason, so a sandbox denial (EPERM) is
+# distinguishable from a busy port or an unplugged cable. Pure POSIX logic.
+swiftc -o "$BUILD_DIR/serial_port_opener_tests" \
+    Sources/LibDCDarwin/SerialPortOpener.swift \
+    Tests/SerialPortOpenerTests/main.swift
+
+"$BUILD_DIR/serial_port_opener_tests"
