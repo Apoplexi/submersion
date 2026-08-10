@@ -7,7 +7,8 @@ import 'package:submersion/features/media/domain/entities/media_source_type.dart
 enum MediaType {
   photo,
   video,
-  instructorSignature;
+  instructorSignature,
+  document;
 
   String get displayName {
     switch (this) {
@@ -17,6 +18,8 @@ enum MediaType {
         return 'Video';
       case MediaType.instructorSignature:
         return 'Instructor Signature';
+      case MediaType.document:
+        return 'Document';
     }
   }
 
@@ -152,6 +155,22 @@ class MediaItem extends Equatable {
   /// Returns true if this is a video
   bool get isVideo => mediaType == MediaType.video;
 
+  /// True for attachment documents (PDFs and opaque files).
+  bool get isDocument => mediaType == MediaType.document;
+
+  /// Lowercased extension of [originalFilename] without the dot; '' when
+  /// absent. Presentation-only: storage addressing uses StoreKeys.
+  String get documentExtension {
+    final name = originalFilename;
+    if (name == null) return '';
+    final dot = name.lastIndexOf('.');
+    if (dot < 0 || dot == name.length - 1) return '';
+    return name.substring(dot + 1).toLowerCase();
+  }
+
+  /// True for documents that render in the in-app PDF viewer.
+  bool get isPdf => isDocument && documentExtension == 'pdf';
+
   /// Filename to use when writing this item's bytes to a temp file for
   /// sharing. Falls back to a media-type-appropriate default when
   /// [originalFilename] is missing or blank -- some import sources (e.g.
@@ -194,7 +213,18 @@ class MediaItem extends Equatable {
         return 'video/quicktime';
       case 'm4v':
         return 'video/x-m4v';
+      case 'pdf':
+        return 'application/pdf';
+      case 'doc':
+        return 'application/msword';
+      case 'docx':
+        return 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+      case 'txt':
+        return 'text/plain';
+      case 'gpx':
+        return 'application/gpx+xml';
       default:
+        if (isDocument) return 'application/octet-stream';
         return isVideo ? 'video/mp4' : 'image/jpeg';
     }
   }
