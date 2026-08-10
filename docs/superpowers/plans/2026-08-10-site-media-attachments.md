@@ -1298,3 +1298,858 @@ dart format .
 git add -A
 git commit -m "Add SiteMediaSection with attachments grid and dive photos group"
 ```
+
+### Task 9: Site photo import and detail-page mount
+
+**Files:**
+- Modify: `lib/features/media/data/services/media_import_service.dart`
+- Create: `lib/features/media/presentation/helpers/site_media_import_helper.dart`
+- Modify: `lib/features/dive_sites/presentation/pages/site_detail_page.dart`
+- Test: `test/features/media/data/services/media_import_service_site_test.dart` (create)
+
+**Interfaces:**
+- Consumes: `showPhotoPicker` (`photo_picker_page.dart:~695` — takes `diveStartTime`/`diveEndTime`/`buffer`/`alreadyLinkedIds`/optional `diveId`), `mediaImportServiceProvider` (`photo_picker_providers.dart:239`), Task 5 providers.
+- Produces:
+  - `MediaImportService.importPhotosForSite({required List<AssetInfo> selectedAssets, required String siteId})` -> `ImportResult` — same dedupe semantics as the dive version, no enrichment.
+  - `SiteMediaImportHelper.importPhotosForSite({required BuildContext context, required WidgetRef ref, required String siteId})` -> `Future<bool>`.
+
+- [ ] **Step 1: Write the failing service test**
+
+Create `test/features/media/data/services/media_import_service_site_test.dart`, harness copied from the existing `media_import_service` test in `test/features/media/data/services/` (find it with `ls`; it constructs the service with an in-memory repository and a fake documents directory):
+
+```dart
+  test('importPhotosForSite links assets to the site without enrichment',
+      () async {
+    final result = await service.importPhotosForSite(
+      selectedAssets: [assetInfo('a1'), assetInfo('a2')],
+      siteId: 'site-1',
+    );
+    expect(result.imported, hasLength(2));
+    expect(result.imported.every((m) => m.siteId == 'site-1'), isTrue);
+    expect(result.imported.every((m) => m.diveId == null), isTrue);
+  });
+
+  test('importPhotosForSite skips assets already linked to the site',
+      () async {
+    await service.importPhotosForSite(
+      selectedAssets: [assetInfo('a1')],
+      siteId: 'site-1',
+    );
+    final second = await service.importPhotosForSite(
+      selectedAssets: [assetInfo('a1')],
+      siteId: 'site-1',
+    );
+    expect(second.imported, isEmpty);
+    expect(second.skippedDuplicates, 1);
+  });
+```
+
+(`assetInfo(...)` = whatever AssetInfo factory the existing service test uses; reuse it.)
+
+- [ ] **Step 2: Run test to verify it fails**
+
+Run: `flutter test test/features/media/data/services/media_import_service_site_test.dart`
+Expected: FAIL — method undefined.
+
+- [ ] **Step 3: Implement `importPhotosForSite`**
+
+In `media_import_service.dart`, below `importPhotosForDive` (line ~189). It is `importPhotosForDive` minus enrichment, with site dedupe lookups and a site-flavored row builder. Extract the shared per-asset row construction rather than duplicating: rename `_createMediaItemFromAsset(AssetInfo asset, String diveId)` to `_createMediaItemFromAsset(AssetInfo asset, {String? diveId, String? siteId})` and set both fields in the returned `MediaItem` (`diveId: diveId, siteId: siteId`); the dive call site passes `diveId:`, the new site loop passes `siteId:`. The new method:
+
+```dart
+  /// Import selected assets as direct site attachments. Same dedupe
+  /// contract as [importPhotosForDive]; no enrichment (sites have no
+  /// profile to position photos on).
+  Future<ImportResult> importPhotosForSite({
+    required List<AssetInfo> selectedAssets,
+    required String siteId,
+  }) async {
+    final List<MediaItem> imported = [];
+    final Map<String, String> failures = {};
+
+    bool hasPath(AssetInfo a) => a.filePath != null && a.filePath!.isNotEmpty;
+    final anyPaths = selectedAssets.any(hasPath);
+    final anyGallery = selectedAssets.any((a) => !hasPath(a));
+
+    final existingAssetIds = anyGallery
+        ? await _mediaRepository.getLinkedAssetIdsForSite(siteId)
+        : const <String>{};
+    final existingPaths = anyPaths
+        ? await _mediaRepository.getLinkedLocalPathsForSite(siteId)
+        : const <String>{};
+
+    final newAssets = selectedAssets.where((a) {
+      if (hasPath(a)) return !existingPaths.contains(a.filePath);
+      return !existingAssetIds.contains(a.id);
+    }).toList();
+    final skippedCount = selectedAssets.length - newAssets.length;
+
+    for (final asset in newAssets) {
+      try {
+        final mediaItem = _createMediaItemFromAsset(asset, siteId: siteId);
+        final saved = await _mediaRepository.createMedia(mediaItem);
+        imported.add(saved);
+        onMediaCreated?.call(saved.id);
+      } catch (e, stackTrace) {
+        _log.error(
+          'Failed to import asset ${asset.id} for site',
+          error: e,
+          stackTrace: stackTrace,
+        );
+        failures[asset.id] = e.toString();
+      }
+    }
+
+    return ImportResult(
+      imported: imported,
+      failures: failures,
+      skippedDuplicates: skippedCount,
+    );
+  }
+```
+
+- [ ] **Step 4: Implement the helper**
+
+Create `site_media_import_helper.dart`, modeled on `photo_import_helper.dart` with the dive-window logic removed — a site has no time window, so the picker opens wide:
+
+```dart
+class SiteMediaImportHelper {
+  /// Opens the photo picker (no date filtering) and imports the selection
+  /// as direct site attachments. Returns true if anything was imported.
+  static Future<bool> importPhotosForSite({
+    required BuildContext context,
+    required WidgetRef ref,
+    required String siteId,
+  }) async {
+    final mediaRepo = ref.read(mediaRepositoryProvider);
+    final alreadyLinkedIds = await mediaRepo.getLinkedAssetIdsForSite(siteId);
+    if (!context.mounted) return false;
+
+    // Sites have no dive window: open the picker over all time. buffer is
+    // zeroed so showPhotoPicker does not widen the range further.
+    final selectedAssets = await showPhotoPicker(
+      context: context,
+      diveStartTime: DateTime.fromMillisecondsSinceEpoch(0),
+      diveEndTime: DateTime.now().add(const Duration(days: 1)),
+      buffer: Duration.zero,
+      alreadyLinkedIds: alreadyLinkedIds,
+    );
+    if (selectedAssets == null ||
+        selectedAssets.isEmpty ||
+        !context.mounted) {
+      return false;
+    }
+
+    try {
+      final importService = ref.read(mediaImportServiceProvider);
+      final result = await importService.importPhotosForSite(
+        selectedAssets: selectedAssets,
+        siteId: siteId,
+      );
+      ref.invalidate(mediaForSiteProvider(siteId));
+      ref.invalidate(mediaCountForSiteProvider(siteId));
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              context.l10n.media_import_importedPhotos(
+                result.imported.length,
+              ),
+            ),
+          ),
+        );
+      }
+      return result.imported.isNotEmpty;
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              context.l10n.media_import_failedToImportError(e.toString()),
+            ),
+            backgroundColor: Theme.of(context).colorScheme.error,
+          ),
+        );
+      }
+      return false;
+    }
+  }
+}
+```
+
+Imports mirror `photo_import_helper.dart` plus `site_media_providers.dart`. Note the picker's Files tab: `showPhotoPicker` without `diveId` shows the Files tab in its no-dive mode (files land unmatched, Link button hidden) — acceptable for now; the Files tab is desktop-only surface and the gallery tab is the site flow's path. Do NOT try to thread siteId through the Files tab in this task.
+
+- [ ] **Step 5: Mount on the site detail page**
+
+In `site_detail_page.dart` after the `SiteMarineLifeSection` block (line ~216) insert:
+
+```dart
+          // Site Media Section (attachments + dive photos)
+          SiteMediaSection(
+            siteId: site.id,
+            onAddPhotosPressed: () => SiteMediaImportHelper.importPhotosForSite(
+              context: context,
+              ref: ref,
+              siteId: site.id,
+            ),
+            onAddDocumentPressed: null, // wired in Task 13
+            onOpenDocument: null, // wired in Task 13
+          ),
+          const SizedBox(height: 16),
+```
+
+Add the imports. The page is a `ConsumerStatefulWidget` (`_SiteDetailContentState` has `ref` available); if the build method in scope only has `context`, use the state's `ref` field directly.
+
+- [ ] **Step 6: Run tests**
+
+Run: `flutter test test/features/media/data/services/media_import_service_site_test.dart test/features/dive_sites/`
+Expected: PASS.
+
+- [ ] **Step 7: Format and commit**
+
+```bash
+dart format .
+git add -A
+git commit -m "Add site photo import flow and mount SiteMediaSection"
+```
+
+---
+
+## Phase 5: Documents and PDF
+
+### Task 10: Document import service (reference-linking)
+
+**Files:**
+- Create: `lib/features/media/data/services/document_import_service.dart`
+- Create: provider registration in `lib/features/media/presentation/providers/site_media_providers.dart` (append)
+- Test: `test/features/media/data/services/document_import_service_test.dart` (create)
+
+**Interfaces:**
+- Consumes: `LocalMediaPlatform` (`createBookmark`, `takePersistableUri`) and `LocalBookmarkStorage` — copy the exact types/imports from `files_tab_providers.dart` (`localMediaPlatformProvider`, `localBookmarkStorageProvider`); `MediaRepository.createMedia`; `onMediaCreated` hook.
+- Produces: `DocumentImportService.importDocuments({required List<({String path, String filename})> picked, String? diveId, String? siteId})` -> `Future<List<MediaItem>>`; `documentImportServiceProvider`.
+- Allowed extensions constant: `DocumentImportService.allowedExtensions = ['pdf', 'doc', 'docx', 'txt', 'gpx']`.
+
+- [ ] **Step 1: Write the failing test**
+
+Create `test/features/media/data/services/document_import_service_test.dart` with fake platform/bookmark storage (copy the fakes from `test/features/media/presentation/providers/files_tab_providers_test.dart` — it tests `_persistOne`'s branches with the same seams):
+
+```dart
+  test('imports a pdf as a document media row linked to the site', () async {
+    final created = await service.importDocuments(
+      picked: [(path: '/tmp/reef-map.pdf', filename: 'reef-map.pdf')],
+      siteId: 'site-1',
+    );
+    expect(created, hasLength(1));
+    final item = created.single;
+    expect(item.mediaType, MediaType.document);
+    expect(item.siteId, 'site-1');
+    expect(item.sourceType, MediaSourceType.localFile);
+    expect(item.originalFilename, 'reef-map.pdf');
+  });
+
+  test('links to a dive when diveId is given', () async {
+    final created = await service.importDocuments(
+      picked: [(path: '/tmp/waiver.pdf', filename: 'waiver.pdf')],
+      diveId: 'dive-1',
+    );
+    expect(created.single.diveId, 'dive-1');
+    expect(created.single.siteId, isNull);
+  });
+
+  test('fires onMediaCreated per row for media-store enqueue', () async {
+    // service constructed with a recording onMediaCreated callback;
+    // expect one call per imported row.
+  });
+```
+
+- [ ] **Step 2: Run test to verify it fails**
+
+Run: `flutter test test/features/media/data/services/document_import_service_test.dart`
+Expected: FAIL — file does not exist.
+
+- [ ] **Step 3: Implement**
+
+Create `document_import_service.dart`. The persist logic is `FilesTabNotifier._persistOne` (`files_tab_providers.dart:260-...`) retargeted at documents — reference-everything, per-platform (spec decisions 5 and the per-platform semantics block):
+
+```dart
+/// Links picked document files (PDFs and common formats) to a dive or a
+/// site by reference — bookmark on iOS/macOS, persisted SAF URI on
+/// Android, plain path on Windows/Linux. Never copies bytes; the media
+/// store upload (enqueued via [onMediaCreated]) is the durability path.
+class DocumentImportService {
+  DocumentImportService({
+    required this.mediaRepository,
+    required this.platform,
+    required this.bookmarkStorage,
+    this.onMediaCreated,
+  });
+
+  final MediaRepository mediaRepository;
+  final LocalMediaPlatform platform;
+  final LocalBookmarkStorage bookmarkStorage;
+  final void Function(String mediaId)? onMediaCreated;
+  final _uuid = const Uuid();
+
+  static const List<String> allowedExtensions = [
+    'pdf',
+    'doc',
+    'docx',
+    'txt',
+    'gpx',
+  ];
+
+  Future<List<MediaItem>> importDocuments({
+    required List<({String path, String filename})> picked,
+    String? diveId,
+    String? siteId,
+  }) async {
+    assert(
+      (diveId == null) != (siteId == null),
+      'exactly one of diveId/siteId must be set',
+    );
+    final created = <MediaItem>[];
+    for (final file in picked) {
+      String? localPath;
+      String? bookmarkRef;
+
+      if (Platform.isIOS || Platform.isMacOS) {
+        final blob = await platform.createBookmark(file.path);
+        bookmarkRef = _uuid.v4();
+        await bookmarkStorage.write(bookmarkRef, blob);
+        if (Platform.isMacOS) {
+          localPath = file.path;
+        }
+      } else if (Platform.isAndroid) {
+        bookmarkRef = await platform.takePersistableUri(file.path);
+      } else {
+        localPath = file.path;
+      }
+
+      final now = DateTime.now();
+      final item = MediaItem(
+        id: '',
+        diveId: diveId,
+        siteId: siteId,
+        mediaType: MediaType.document,
+        sourceType: MediaSourceType.localFile,
+        originalFilename: file.filename,
+        localPath: localPath,
+        bookmarkRef: bookmarkRef,
+        takenAt: now,
+        createdAt: now,
+        updatedAt: now,
+      );
+      final saved = await mediaRepository.createMedia(item);
+      onMediaCreated?.call(saved.id);
+      created.add(saved);
+    }
+    return created;
+  }
+}
+```
+
+Imports: `dart:io`, uuid, media_item/media_source_type, media_repository, plus the `LocalMediaPlatform`/`LocalBookmarkStorage` types (find their files via the imports of `files_tab_providers.dart`). Platform branches make macOS-host tests exercise the bookmark path; keep the fakes' platform override seam identical to the files-tab tests (if those tests inject a platform wrapper rather than branching on `Platform`, mirror THAT design instead — read them first).
+
+Append the provider to `site_media_providers.dart`:
+
+```dart
+final documentImportServiceProvider = Provider<DocumentImportService>((ref) {
+  return DocumentImportService(
+    mediaRepository: ref.watch(mediaRepositoryProvider),
+    platform: ref.watch(localMediaPlatformProvider),
+    bookmarkStorage: ref.watch(localBookmarkStorageProvider),
+    onMediaCreated: ref.watch(mediaStoreEnqueueProvider),
+  );
+});
+```
+
+Check how `mediaImportServiceProvider` (`photo_picker_providers.dart:239`) obtains its `onMediaCreated` — use the identical source (it may be `mediaStoreEnqueueProvider` or a function read from `media_store_enqueue_provider.dart:8`); copy that wiring exactly.
+
+- [ ] **Step 4: Run test to verify it passes**
+
+Run: `flutter test test/features/media/data/services/document_import_service_test.dart`
+Expected: PASS.
+
+- [ ] **Step 5: Format and commit**
+
+```bash
+dart format .
+git add -A
+git commit -m "Add reference-linking document import service"
+```
+
+### Task 11: pdfrx dependency and PDF page renderer
+
+**Files:**
+- Modify: `pubspec.yaml`
+- Create: `lib/features/media/data/services/pdf_page_renderer.dart`
+- Create: `test/fixtures/sample.pdf` (tiny fixture)
+- Test: `test/features/media/data/services/pdf_page_renderer_test.dart` (create)
+
+**Interfaces:**
+- Produces: `PdfPageRenderer.renderFirstPageJpeg({File? file, Uint8List? bytes, int maxDimension = 512, int quality = 80})` -> `Future<Uint8List?>` (null on any failure — corrupt file, zero pages, engine error). Static-method utility class; safe to call from any isolate that has run `pdfrxInitialize()` (the renderer calls it lazily itself).
+
+- [ ] **Step 1: Add the dependency**
+
+```bash
+flutter pub add pdfrx
+```
+
+Then open `pubspec.yaml` and record the resolved version constraint. Confirm `flutter pub get` succeeds. pdfrx supports iOS/Android/macOS/Windows/Linux (pdfium-based) — if `pub add` surfaces a platform-support error for any of the five targets, STOP and flag it (fallback candidate: `pdfx`), do not proceed silently.
+
+- [ ] **Step 2: Create the fixture**
+
+`test/fixtures/sample.pdf` — a minimal one-page PDF. Write these exact bytes as text:
+
+```
+%PDF-1.4
+1 0 obj << /Type /Catalog /Pages 2 0 R >> endobj
+2 0 obj << /Type /Pages /Kids [3 0 R] /Count 1 >> endobj
+3 0 obj << /Type /Page /Parent 2 0 R /MediaBox [0 0 200 100] >> endobj
+xref
+0 4
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000115 00000 n 
+trailer << /Size 4 /Root 1 0 R >>
+startxref
+187
+%%EOF
+```
+
+If pdfium rejects the hand-built xref offsets, generate the fixture instead: `python3 -c "import subprocess"` is not available — use macOS's built-in: `cupsfilter -o media=A4 /etc/hosts > test/fixtures/sample.pdf 2>/dev/null` or export any one-page PDF; the test only needs a valid single-page document, its content is irrelevant.
+
+- [ ] **Step 3: Write the failing test**
+
+```dart
+import 'dart:io';
+
+import 'package:flutter_test/flutter_test.dart';
+import 'package:image/image.dart' as img;
+import 'package:submersion/features/media/data/services/pdf_page_renderer.dart';
+
+void main() {
+  test('renders first page of a pdf to a jpeg within maxDimension', () async {
+    final bytes = await PdfPageRenderer.renderFirstPageJpeg(
+      file: File('test/fixtures/sample.pdf'),
+      maxDimension: 256,
+    );
+    expect(bytes, isNotNull);
+    final decoded = img.decodeJpg(bytes!);
+    expect(decoded, isNotNull);
+    expect(
+      decoded!.width <= 256 && decoded.height <= 256,
+      isTrue,
+      reason: 'longest edge must be capped',
+    );
+  });
+
+  test('returns null for garbage bytes', () async {
+    final bytes = await PdfPageRenderer.renderFirstPageJpeg(
+      bytes: Uint8List.fromList([1, 2, 3]),
+    );
+    expect(bytes, isNull);
+  });
+}
+```
+
+NOTE: pdfrx needs its native pdfium binary; if `flutter test` cannot load it on the host (`Invalid argument(s): Failed to load dynamic library`), mark these two tests with `@TestOn('mac-os')` or skip with a comment referencing the CI platform, and rely on the garbage-bytes test plus manual smoke. Determine this empirically in Step 4 — do not preemptively skip.
+
+- [ ] **Step 4: Implement**
+
+```dart
+import 'dart:io';
+import 'dart:typed_data';
+
+import 'package:image/image.dart' as img;
+import 'package:pdfrx/pdfrx.dart';
+
+import 'package:submersion/core/services/logger_service.dart';
+
+/// Renders the first page of a PDF to JPEG bytes for thumbnails.
+/// Every failure path returns null: thumbnail absence must never block
+/// an upload or a grid render (same contract as ThumbnailGenerator).
+class PdfPageRenderer {
+  PdfPageRenderer._();
+
+  static final _log = LoggerService.forClass(PdfPageRenderer);
+  static bool _initialized = false;
+
+  static Future<Uint8List?> renderFirstPageJpeg({
+    File? file,
+    Uint8List? bytes,
+    int maxDimension = 512,
+    int quality = 80,
+  }) async {
+    assert((file == null) != (bytes == null), 'pass exactly one source');
+    PdfDocument? document;
+    try {
+      if (!_initialized) {
+        await pdfrxInitialize();
+        _initialized = true;
+      }
+      document = file != null
+          ? await PdfDocument.openFile(file.path)
+          : await PdfDocument.openData(bytes!);
+      if (document.pages.isEmpty) return null;
+      final page = document.pages[0];
+      final scale = maxDimension / (page.width > page.height
+          ? page.width
+          : page.height);
+      final pageImage = await page.render(
+        width: page.width * scale,
+        height: page.height * scale,
+      );
+      if (pageImage == null) return null;
+      try {
+        final image = pageImage.createImageNF();
+        return Uint8List.fromList(img.encodeJpg(image, quality: quality));
+      } finally {
+        pageImage.dispose();
+      }
+    } on Exception catch (e) {
+      _log.warning('PDF page render failed: $e');
+      return null;
+    } finally {
+      document?.dispose();
+    }
+  }
+}
+```
+
+API check against the installed pdfrx version: `pdfrxInitialize()`, `PdfDocument.openFile/openData`, `page.render(width:, height:)`, `pageImage.createImageNF()`, `pageImage.dispose()`, and whether document cleanup is `dispose()` or `close()` — open the package source under `~/.pub-cache` (or dart docs) and match the real names; the shapes above are from pdfrx's current README.
+
+- [ ] **Step 5: Run tests, format, commit**
+
+Run: `flutter test test/features/media/data/services/pdf_page_renderer_test.dart`
+Expected: PASS (or documented host-skip per Step 3 note).
+
+```bash
+dart format .
+git add -A
+git commit -m "Add pdfrx and first-page PDF thumbnail renderer"
+```
+
+### Task 12: Thumbnail pipeline and store content types for documents
+
+**Files:**
+- Modify: `lib/features/media_store/data/thumbnail_generator.dart`
+- Modify: `lib/core/services/media_store/store_keys.dart`
+- Test: extend `test/core/services/media_store/store_keys_test.dart` (find exact path with `ls`; create if absent) and the existing thumbnail generator test
+
+**Interfaces:**
+- Consumes: `PdfPageRenderer` (Task 11), `MediaItem.isPdf`/`isDocument` (Task 1).
+- Produces: `ThumbnailGenerator.generateFor` returns a real page-1 thumb for PDFs and null for other documents; `StoreKeys.contentTypeFor('pdf') == 'application/pdf'` etc.
+
+- [ ] **Step 1: Write the failing tests**
+
+StoreKeys additions:
+
+```dart
+  test('document content types', () {
+    expect(StoreKeys.contentTypeFor('pdf'), 'application/pdf');
+    expect(StoreKeys.contentTypeFor('txt'), 'text/plain');
+    expect(StoreKeys.contentTypeFor('gpx'), 'application/gpx+xml');
+    expect(StoreKeys.contentTypeFor('doc'), 'application/msword');
+    expect(
+      StoreKeys.contentTypeFor('docx'),
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    );
+    expect(StoreKeys.contentTypeFor('exe'), 'application/octet-stream');
+  });
+```
+
+ThumbnailGenerator: in its existing test file, add a case that resolves a `MediaType.document` item with `originalFilename: 'sample.pdf'` whose resolver returns `FileData(File('test/fixtures/sample.pdf'))` (use the test's existing fake registry seam) and asserts a non-null staged JPEG; and a `notes.txt` document case asserting null.
+
+- [ ] **Step 2: Run tests to verify they fail**
+
+Run: `flutter test test/core/services/media_store/ test/features/media_store/data/thumbnail_generator_test.dart` (adjust paths to what `ls` shows)
+Expected: FAIL.
+
+- [ ] **Step 3: Implement**
+
+`store_keys.dart` — add cases to `contentTypeFor` before `default`:
+
+```dart
+      case 'pdf':
+        return 'application/pdf';
+      case 'doc':
+        return 'application/msword';
+      case 'docx':
+        return 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+      case 'txt':
+        return 'text/plain';
+      case 'gpx':
+        return 'application/gpx+xml';
+```
+
+`thumbnail_generator.dart` — inside `generateFor`, add a document gate before the existing `switch` on resolved data (after the resolver call, line ~40):
+
+```dart
+      if (item.isDocument) {
+        if (!item.isPdf) return null; // opaque documents have no thumbnail
+        return switch (data) {
+          FileData(file: final f) => _stagePdfThumb(file: f),
+          BytesData(bytes: final b) => _stagePdfThumb(bytes: b),
+          NetworkData() || UnavailableData() => null,
+        };
+      }
+```
+
+and the helper beside `_resizeToJpeg`:
+
+```dart
+  Future<File?> _stagePdfThumb({File? file, Uint8List? bytes}) async {
+    final jpeg = await PdfPageRenderer.renderFirstPageJpeg(
+      file: file,
+      bytes: bytes,
+      maxDimension: maxDimension,
+      quality: jpegQuality,
+    );
+    if (jpeg == null) return null;
+    final staged = await _cache.stagingFile();
+    await staged.writeAsBytes(jpeg, flush: true);
+    return staged;
+  }
+```
+
+(`resolveThumbnail` for a localFile document returns the original bytes/file — exactly what the PDF renderer needs; no resolver changes required.)
+
+- [ ] **Step 4: Run tests, format, commit**
+
+Run the two test files from Step 2. Expected: PASS.
+
+```bash
+dart format .
+git add -A
+git commit -m "Generate PDF thumbnails and document content types in media store"
+```
+
+### Task 13: Document viewer, open-externally, and tile rendering
+
+**Files:**
+- Create: `lib/features/media/presentation/pages/document_viewer_page.dart`
+- Create: `lib/features/media/presentation/helpers/document_open_helper.dart`
+- Modify: `lib/features/media/presentation/widgets/media_item_view.dart`
+- Modify: `lib/features/dive_sites/presentation/pages/site_detail_page.dart` (wire the two null callbacks from Task 9)
+- Test: `test/features/media/presentation/pages/document_viewer_page_test.dart` (create)
+
+**Interfaces:**
+- Consumes: pdfrx `PdfViewer.file` / `PdfViewer.data`, resolver registry, `writeShareTempFile`, `SharePlus`, `DocumentImportService` + `FilePicker` (attach flow), Task 8's callbacks.
+- Produces:
+  - `DocumentViewerPage({required MediaItem item})` — full-screen PDF viewer with share and open-externally actions; unavailable state when bytes cannot be resolved.
+  - `DocumentOpenHelper.open(BuildContext context, WidgetRef ref, MediaItem item)` — PDFs push `DocumentViewerPage`; other documents resolve to a temp file and open externally (desktop `open`/`xdg-open`/`start`, mobile share sheet).
+  - `DocumentOpenHelper.pickAndAttach({required BuildContext context, required WidgetRef ref, String? diveId, String? siteId})` — `FilePicker.pickFiles(type: FileType.custom, allowedExtensions: DocumentImportService.allowedExtensions, allowMultiple: true)` -> `documentImportServiceProvider.importDocuments(...)` -> invalidate the relevant providers -> snackbar.
+
+- [ ] **Step 1: Implement `DocumentViewerPage`**
+
+```dart
+class DocumentViewerPage extends ConsumerStatefulWidget {
+  final MediaItem item;
+  const DocumentViewerPage({super.key, required this.item});
+  ...
+}
+```
+
+State resolves the item once in `initState` via the resolver registry (same memoized-future pattern as `MediaItemView._resolve`, including the media-store `tryResolveRemote` fallback — copy that block, minus the thumbnail branches). Build:
+
+- `Scaffold` with an `AppBar` titled `widget.item.originalFilename ?? context.l10n.media_documentViewer_title`, actions: share (resolve -> `writeShareTempFile` -> `SharePlus`, copied from `trip_photo_viewer_page.dart:199-234`) and an overflow "open externally" invoking `DocumentOpenHelper.openExternally`.
+- Body `FutureBuilder`: `FileData(file: f)` -> `PdfViewer.file(f.path)`; `BytesData(bytes: b)` -> `PdfViewer.data(b, sourceName: widget.item.id)`; `UnavailableData` / error -> centered column with `Icons.picture_as_pdf_outlined`, `context.l10n.media_documentViewer_unavailable`, and — when `widget.item.originDeviceId != null` — `context.l10n.media_documentViewer_availableOnOriginDevice`.
+- A `PdfViewer` load error (corrupt file) must show the unavailable column with an open-externally button, not crash: wrap with the viewer's error callback if the installed pdfrx exposes one (check `PdfViewerParams` for an error builder), else guard with `FutureBuilder` on a pre-flight `PdfPageRenderer.renderFirstPageJpeg` null-check.
+
+- [ ] **Step 2: Implement `DocumentOpenHelper`**
+
+```dart
+class DocumentOpenHelper {
+  /// Route a tapped document: PDFs to the in-app viewer, everything else
+  /// to the platform (desktop-save vs mobile-share duality).
+  static Future<void> open(
+    BuildContext context,
+    WidgetRef ref,
+    MediaItem item,
+  ) async {
+    if (item.isPdf) {
+      await Navigator.of(context).push(
+        MaterialPageRoute(
+          fullscreenDialog: true,
+          builder: (_) => DocumentViewerPage(item: item),
+        ),
+      );
+      return;
+    }
+    await openExternally(context, ref, item);
+  }
+
+  static Future<void> openExternally(
+    BuildContext context,
+    WidgetRef ref,
+    MediaItem item,
+  ) async {
+    final resolved = await ref.read(
+      resolvedFullResolutionProvider(item).future,
+    );
+    if (resolved.isUnavailable || resolved.bytes == null) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(context.l10n.media_documentViewer_unavailable),
+          ),
+        );
+      }
+      return;
+    }
+    final file = await writeShareTempFile(item, resolved.bytes!);
+    if (Platform.isMacOS) {
+      await Process.run('open', [file.path]);
+    } else if (Platform.isWindows) {
+      await Process.run('cmd', ['/c', 'start', '', file.path]);
+    } else if (Platform.isLinux) {
+      await Process.run('xdg-open', [file.path]);
+    } else {
+      await SharePlus.instance.share(
+        ShareParams(files: [XFile(file.path, mimeType: item.shareMimeType)]),
+      );
+    }
+  }
+
+  static Future<void> pickAndAttach({
+    required BuildContext context,
+    required WidgetRef ref,
+    String? diveId,
+    String? siteId,
+  }) async {
+    final result = await FilePicker.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: DocumentImportService.allowedExtensions,
+      allowMultiple: true,
+    );
+    if (result == null || !context.mounted) return;
+    final picked = [
+      for (final f in result.files)
+        if (f.path != null) (path: f.path!, filename: f.name),
+    ];
+    if (picked.isEmpty) return;
+    final service = ref.read(documentImportServiceProvider);
+    final created = await service.importDocuments(
+      picked: picked,
+      diveId: diveId,
+      siteId: siteId,
+    );
+    if (siteId != null) {
+      ref.invalidate(mediaForSiteProvider(siteId));
+      ref.invalidate(mediaCountForSiteProvider(siteId));
+    }
+    if (diveId != null) {
+      ref.invalidate(mediaForDiveProvider(diveId));
+      ref.invalidate(mediaCountForDiveProvider(diveId));
+    }
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            context.l10n.media_documentViewer_attached(created.length),
+          ),
+        ),
+      );
+    }
+  }
+}
+```
+
+- [ ] **Step 3: Document rendering in `MediaItemView`**
+
+In `media_item_view.dart`'s result `switch` (line ~172), documents must not be fed to `Image.file`/`Image.memory`. Add BEFORE the video-poster case:
+
+```dart
+          FileData() when widget.item.isDocument =>
+            _DocumentThumbnailPlaceholder(item: widget.item),
+          BytesData() when widget.item.isDocument && !_isStoreThumb =>
+            _DocumentThumbnailPlaceholder(item: widget.item),
+```
+
+Nuance: a PDF's media-store THUMB resolves to JPEG bytes/file that SHOULD render as an image. The store fallback path (`tryResolveRemote(thumbnail: true)`) is the only source of such bytes; track it with a boolean set where the remote resolution happens (`_isStoreThumb = true` alongside `remote != null` when `widget.thumbnail`), defaulting false. If threading the flag proves invasive, an acceptable simplification: always show `_DocumentThumbnailPlaceholder` for documents in this widget (local tiles), since store-thumb rendering only affects other-device tiles and the placeholder still communicates the document. Choose the simplification only if the flag genuinely tangles the resolve path — note which you chose in the commit message.
+
+The placeholder (add at file bottom, matching `_VideoThumbnailPlaceholder`'s style):
+
+```dart
+class _DocumentThumbnailPlaceholder extends StatelessWidget {
+  final MediaItem item;
+  const _DocumentThumbnailPlaceholder({required this.item});
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return ColoredBox(
+      color: scheme.surfaceContainerHighest,
+      child: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              item.isPdf
+                  ? Icons.picture_as_pdf_outlined
+                  : Icons.description_outlined,
+              color: scheme.onSurfaceVariant,
+            ),
+            if (item.originalFilename != null)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 4),
+                child: Text(
+                  item.originalFilename!,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                    color: scheme.onSurfaceVariant,
+                  ),
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+```
+
+- [ ] **Step 4: Wire the site detail page**
+
+Replace Task 9's two `null` callbacks in `site_detail_page.dart`:
+
+```dart
+            onAddDocumentPressed: () => DocumentOpenHelper.pickAndAttach(
+              context: context,
+              ref: ref,
+              siteId: site.id,
+            ),
+            onOpenDocument: (item) =>
+                DocumentOpenHelper.open(context, ref, item),
+```
+
+- [ ] **Step 5: l10n keys (English)**
+
+Add to `app_en.arb` (and mirror to other locales as in Task 8 Step 4):
+
+```json
+  "media_documentViewer_title": "Document",
+  "media_documentViewer_unavailable": "This document is not available on this device",
+  "media_documentViewer_availableOnOriginDevice": "It is available on the device it was added from, or via a configured media store.",
+  "media_documentViewer_attached": "Attached {count} documents",
+  "@media_documentViewer_attached": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "media_documentViewer_openExternally": "Open in another app"
+```
+
+- [ ] **Step 6: Test and verify**
+
+`test/features/media/presentation/pages/document_viewer_page_test.dart`: pump `DocumentViewerPage` with an item whose resolver override returns `UnavailableData` and assert the unavailable message renders (no pdfium needed for that path). Run:
+
+`flutter test test/features/media/presentation/pages/document_viewer_page_test.dart test/features/media/presentation/widgets/media_item_view_test.dart`
+Expected: PASS.
+
+- [ ] **Step 7: Format and commit**
+
+```bash
+dart format .
+git add -A
+git commit -m "Add PDF viewer, document open flows, and document tiles"
+```
