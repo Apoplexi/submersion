@@ -5,6 +5,7 @@ import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/dive_log/data/services/profile_analysis_service.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
 import 'package:submersion/features/dive_log/presentation/providers/profile_review_provider.dart';
+import 'package:submersion/features/dive_log/presentation/widgets/instrument_sample.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/instrument_tiles.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/profile_transport_controls.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/readout_tile.dart';
