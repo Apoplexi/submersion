@@ -2705,6 +2705,12 @@ abstract class AppLocalizations {
   /// **'Card Number'**
   String get certifications_detail_label_cardNumber;
 
+  /// No description provided for @certifications_detail_label_certification.
+  ///
+  /// In en, this message translates to:
+  /// **'Certification'**
+  String get certifications_detail_label_certification;
+
   /// No description provided for @certifications_detail_label_expiryDate.
   ///
   /// In en, this message translates to:
@@ -2728,12 +2734,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Issue Date'**
   String get certifications_detail_label_issueDate;
-
-  /// No description provided for @certifications_detail_label_level.
-  ///
-  /// In en, this message translates to:
-  /// **'Level'**
-  String get certifications_detail_label_level;
 
   /// No description provided for @certifications_detail_label_type.
   ///
@@ -2954,6 +2954,12 @@ abstract class AppLocalizations {
   /// **'Update Certification'**
   String get certifications_edit_button_update;
 
+  /// No description provided for @certifications_edit_certification_notSpecified.
+  ///
+  /// In en, this message translates to:
+  /// **'Not specified'**
+  String get certifications_edit_certification_notSpecified;
+
   /// No description provided for @certifications_edit_datePicker_clearTooltip.
   ///
   /// In en, this message translates to:
@@ -2990,23 +2996,35 @@ abstract class AppLocalizations {
   /// **'Keep Editing'**
   String get certifications_edit_dialog_keepEditing;
 
+  /// No description provided for @certifications_edit_group_progression.
+  ///
+  /// In en, this message translates to:
+  /// **'Progression'**
+  String get certifications_edit_group_progression;
+
+  /// No description provided for @certifications_edit_group_specialties.
+  ///
+  /// In en, this message translates to:
+  /// **'Specialties'**
+  String get certifications_edit_group_specialties;
+
   /// No description provided for @certifications_edit_help_expiryDate.
   ///
   /// In en, this message translates to:
   /// **'Leave empty for certifications that don\'t expire'**
   String get certifications_edit_help_expiryDate;
 
+  /// No description provided for @certifications_edit_helper_nameOnCard.
+  ///
+  /// In en, this message translates to:
+  /// **'Optional'**
+  String get certifications_edit_helper_nameOnCard;
+
   /// No description provided for @certifications_edit_hint_cardNumber.
   ///
   /// In en, this message translates to:
   /// **'Enter certification card number'**
   String get certifications_edit_hint_cardNumber;
-
-  /// No description provided for @certifications_edit_hint_certificationName.
-  ///
-  /// In en, this message translates to:
-  /// **'e.g., Open Water Diver'**
-  String get certifications_edit_hint_certificationName;
 
   /// No description provided for @certifications_edit_hint_instructorName.
   ///
@@ -3038,11 +3056,11 @@ abstract class AppLocalizations {
   /// **'Card Number'**
   String get certifications_edit_label_cardNumber;
 
-  /// No description provided for @certifications_edit_label_certificationName.
+  /// No description provided for @certifications_edit_label_certification.
   ///
   /// In en, this message translates to:
-  /// **'Certification Name *'**
-  String get certifications_edit_label_certificationName;
+  /// **'Certification'**
+  String get certifications_edit_label_certification;
 
   /// No description provided for @certifications_edit_label_expiryDate.
   ///
@@ -3068,23 +3086,17 @@ abstract class AppLocalizations {
   /// **'Issue Date'**
   String get certifications_edit_label_issueDate;
 
-  /// No description provided for @certifications_edit_label_level.
+  /// No description provided for @certifications_edit_label_nameOnCard.
   ///
   /// In en, this message translates to:
-  /// **'Level'**
-  String get certifications_edit_label_level;
+  /// **'Name on card'**
+  String get certifications_edit_label_nameOnCard;
 
   /// No description provided for @certifications_edit_label_notes.
   ///
   /// In en, this message translates to:
   /// **'Notes'**
   String get certifications_edit_label_notes;
-
-  /// No description provided for @certifications_edit_level_notSpecified.
-  ///
-  /// In en, this message translates to:
-  /// **'Not specified'**
-  String get certifications_edit_level_notSpecified;
 
   /// No description provided for @certifications_edit_photo_addSemanticLabel.
   ///
@@ -3170,11 +3182,11 @@ abstract class AppLocalizations {
   /// **'Certification updated successfully'**
   String get certifications_edit_snackBar_updated;
 
-  /// No description provided for @certifications_edit_validation_nameRequired.
+  /// No description provided for @certifications_edit_validation_certificationOrNameRequired.
   ///
   /// In en, this message translates to:
-  /// **'Please enter a certification name'**
-  String get certifications_edit_validation_nameRequired;
+  /// **'Choose a certification or enter a name'**
+  String get certifications_edit_validation_certificationOrNameRequired;
 
   /// No description provided for @certifications_list_button_retry.
   ///

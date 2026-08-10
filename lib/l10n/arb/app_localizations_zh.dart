@@ -1495,6 +1495,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get certifications_detail_label_cardNumber => '卡号';
 
   @override
+  String get certifications_detail_label_certification => '证书';
+
+  @override
   String get certifications_detail_label_expiryDate => '到期日期';
 
   @override
@@ -1505,9 +1508,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get certifications_detail_label_issueDate => '签发日期';
-
-  @override
-  String get certifications_detail_label_level => '等级';
 
   @override
   String get certifications_detail_label_type => '类型';
@@ -1636,6 +1636,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get certifications_edit_button_update => '更新证书';
 
   @override
+  String get certifications_edit_certification_notSpecified => '未指定';
+
+  @override
   String certifications_edit_datePicker_clearTooltip(Object label) {
     return '清除$label';
   }
@@ -1656,13 +1659,19 @@ class AppLocalizationsZh extends AppLocalizations {
   String get certifications_edit_dialog_keepEditing => '继续编辑';
 
   @override
+  String get certifications_edit_group_progression => '进阶等级';
+
+  @override
+  String get certifications_edit_group_specialties => '专长课程';
+
+  @override
   String get certifications_edit_help_expiryDate => '不会过期的证书请留空';
 
   @override
-  String get certifications_edit_hint_cardNumber => '输入证书卡号';
+  String get certifications_edit_helper_nameOnCard => '可选';
 
   @override
-  String get certifications_edit_hint_certificationName => '例如，开放水域潜水员';
+  String get certifications_edit_hint_cardNumber => '输入证书卡号';
 
   @override
   String get certifications_edit_hint_instructorName => '认证教练姓名';
@@ -1680,7 +1689,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get certifications_edit_label_cardNumber => '卡号';
 
   @override
-  String get certifications_edit_label_certificationName => '证书名称 *';
+  String get certifications_edit_label_certification => '证书';
 
   @override
   String get certifications_edit_label_expiryDate => '到期日期';
@@ -1695,13 +1704,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get certifications_edit_label_issueDate => '签发日期';
 
   @override
-  String get certifications_edit_label_level => '等级';
+  String get certifications_edit_label_nameOnCard => '卡片上的名称';
 
   @override
   String get certifications_edit_label_notes => '备注';
-
-  @override
-  String get certifications_edit_level_notSpecified => '未指定';
 
   @override
   String certifications_edit_photo_addSemanticLabel(Object label) {
@@ -1758,7 +1764,8 @@ class AppLocalizationsZh extends AppLocalizations {
   String get certifications_edit_snackBar_updated => '证书更新成功';
 
   @override
-  String get certifications_edit_validation_nameRequired => '请输入证书名称';
+  String get certifications_edit_validation_certificationOrNameRequired =>
+      '请选择证书或输入名称';
 
   @override
   String get certifications_list_button_retry => '重试';

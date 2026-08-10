@@ -151,6 +151,14 @@ enum CertificationAgency {
 }
 
 /// Common certification levels
+/// A certification a diver holds. Presented in the UI as "Certification" --
+/// the values are course and rating names (Open Water, Nitrox, Tech 1), not
+/// a level scale, and the UI groups them into progression vs specialties via
+/// CertificationLevelCatalog.
+///
+/// The type keeps the historical `Level` name deliberately: values are
+/// persisted as enum-name text and round-trip through UDDF import/export and
+/// the sync field maps, so renaming buys nothing a user can see.
 enum CertificationLevel {
   openWater('Open Water'),
   advancedOpenWater('Advanced Open Water'),

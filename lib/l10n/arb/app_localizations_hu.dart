@@ -1579,6 +1579,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String get certifications_detail_label_cardNumber => 'Kartyaszam';
 
   @override
+  String get certifications_detail_label_certification => 'Képesítés';
+
+  @override
   String get certifications_detail_label_expiryDate => 'Lejarat datuma';
 
   @override
@@ -1589,9 +1592,6 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get certifications_detail_label_issueDate => 'Kiadas datuma';
-
-  @override
-  String get certifications_detail_label_level => 'Szint';
 
   @override
   String get certifications_detail_label_type => 'Tipus';
@@ -1725,6 +1725,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String get certifications_edit_button_update => 'Kepesites frissitese';
 
   @override
+  String get certifications_edit_certification_notSpecified => 'Nincs megadva';
+
+  @override
   String certifications_edit_datePicker_clearTooltip(Object label) {
     return '$label torlese';
   }
@@ -1747,16 +1750,21 @@ class AppLocalizationsHu extends AppLocalizations {
   String get certifications_edit_dialog_keepEditing => 'Szerkesztes folytatasa';
 
   @override
+  String get certifications_edit_group_progression => 'Fokozatok';
+
+  @override
+  String get certifications_edit_group_specialties => 'Specialitások';
+
+  @override
   String get certifications_edit_help_expiryDate =>
       'Hagyja uresen a le nem jaro kepesiteseknel';
 
   @override
-  String get certifications_edit_hint_cardNumber =>
-      'Adja meg a kepesitesi kartyaszamot';
+  String get certifications_edit_helper_nameOnCard => 'Nem kötelező';
 
   @override
-  String get certifications_edit_hint_certificationName =>
-      'pl. Open Water Diver';
+  String get certifications_edit_hint_cardNumber =>
+      'Adja meg a kepesitesi kartyaszamot';
 
   @override
   String get certifications_edit_hint_instructorName =>
@@ -1776,7 +1784,7 @@ class AppLocalizationsHu extends AppLocalizations {
   String get certifications_edit_label_cardNumber => 'Kartyaszam';
 
   @override
-  String get certifications_edit_label_certificationName => 'Kepesites neve *';
+  String get certifications_edit_label_certification => 'Képesítés';
 
   @override
   String get certifications_edit_label_expiryDate => 'Lejarat datuma';
@@ -1791,13 +1799,10 @@ class AppLocalizationsHu extends AppLocalizations {
   String get certifications_edit_label_issueDate => 'Kiadas datuma';
 
   @override
-  String get certifications_edit_label_level => 'Szint';
+  String get certifications_edit_label_nameOnCard => 'Név a kártyán';
 
   @override
   String get certifications_edit_label_notes => 'Megjegyzesek';
-
-  @override
-  String get certifications_edit_level_notSpecified => 'Nincs megadva';
 
   @override
   String certifications_edit_photo_addSemanticLabel(Object label) {
@@ -1858,8 +1863,8 @@ class AppLocalizationsHu extends AppLocalizations {
       'Tanusitvany sikeresen frissitve';
 
   @override
-  String get certifications_edit_validation_nameRequired =>
-      'Kerem, adja meg a tanusitvany nevet';
+  String get certifications_edit_validation_certificationOrNameRequired =>
+      'Válasszon képesítést, vagy adjon meg egy nevet';
 
   @override
   String get certifications_list_button_retry => 'Ujraproba';

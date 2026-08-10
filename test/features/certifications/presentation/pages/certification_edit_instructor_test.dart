@@ -228,7 +228,7 @@ void main() {
       'Alice Instructor ($instructorLabel)',
     );
     await tester.enterText(
-      find.widgetWithText(TextFormField, 'Certification Name *'),
+      find.widgetWithText(TextFormField, 'Name on card'),
       'Open Water Diver',
     );
     await tester.pumpAndSettle();

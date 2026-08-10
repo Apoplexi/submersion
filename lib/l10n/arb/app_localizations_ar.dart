@@ -1565,6 +1565,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get certifications_detail_label_cardNumber => 'رقم البطاقة';
 
   @override
+  String get certifications_detail_label_certification => 'الشهادة';
+
+  @override
   String get certifications_detail_label_expiryDate => 'تاريخ الانتهاء';
 
   @override
@@ -1575,9 +1578,6 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get certifications_detail_label_issueDate => 'تاريخ الإصدار';
-
-  @override
-  String get certifications_detail_label_level => 'المستوى';
 
   @override
   String get certifications_detail_label_type => 'النوع';
@@ -1708,6 +1708,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get certifications_edit_button_update => 'تحديث الشهادة';
 
   @override
+  String get certifications_edit_certification_notSpecified => 'غير محدد';
+
+  @override
   String certifications_edit_datePicker_clearTooltip(Object label) {
     return 'مسح $label';
   }
@@ -1729,15 +1732,20 @@ class AppLocalizationsAr extends AppLocalizations {
   String get certifications_edit_dialog_keepEditing => 'متابعة التعديل';
 
   @override
+  String get certifications_edit_group_progression => 'التدرج';
+
+  @override
+  String get certifications_edit_group_specialties => 'التخصصات';
+
+  @override
   String get certifications_edit_help_expiryDate =>
       'اتركه فارغاً للشهادات التي لا تنتهي صلاحيتها';
 
   @override
-  String get certifications_edit_hint_cardNumber => 'أدخل رقم بطاقة الشهادة';
+  String get certifications_edit_helper_nameOnCard => 'اختياري';
 
   @override
-  String get certifications_edit_hint_certificationName =>
-      'مثال: غواص مياه مفتوحة';
+  String get certifications_edit_hint_cardNumber => 'أدخل رقم بطاقة الشهادة';
 
   @override
   String get certifications_edit_hint_instructorName => 'اسم المدرب المعتمد';
@@ -1755,7 +1763,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get certifications_edit_label_cardNumber => 'رقم البطاقة';
 
   @override
-  String get certifications_edit_label_certificationName => 'اسم الشهادة *';
+  String get certifications_edit_label_certification => 'الشهادة';
 
   @override
   String get certifications_edit_label_expiryDate => 'تاريخ الانتهاء';
@@ -1770,13 +1778,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get certifications_edit_label_issueDate => 'تاريخ الإصدار';
 
   @override
-  String get certifications_edit_label_level => 'المستوى';
+  String get certifications_edit_label_nameOnCard => 'الاسم على البطاقة';
 
   @override
   String get certifications_edit_label_notes => 'ملاحظات';
-
-  @override
-  String get certifications_edit_level_notSpecified => 'غير محدد';
 
   @override
   String certifications_edit_photo_addSemanticLabel(Object label) {
@@ -1834,8 +1839,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get certifications_edit_snackBar_updated => 'تم تحديث الشهادة بنجاح';
 
   @override
-  String get certifications_edit_validation_nameRequired =>
-      'يرجى إدخال اسم الشهادة';
+  String get certifications_edit_validation_certificationOrNameRequired =>
+      'اختر شهادة أو أدخل اسمًا';
 
   @override
   String get certifications_list_button_retry => 'إعادة المحاولة';

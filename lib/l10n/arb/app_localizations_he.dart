@@ -1549,6 +1549,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get certifications_detail_label_cardNumber => 'מספר כרטיס';
 
   @override
+  String get certifications_detail_label_certification => 'הסמכה';
+
+  @override
   String get certifications_detail_label_expiryDate => 'תאריך תפוגה';
 
   @override
@@ -1559,9 +1562,6 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get certifications_detail_label_issueDate => 'תאריך הנפקה';
-
-  @override
-  String get certifications_detail_label_level => 'רמה';
 
   @override
   String get certifications_detail_label_type => 'סוג';
@@ -1691,6 +1691,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get certifications_edit_button_update => 'עדכן הסמכה';
 
   @override
+  String get certifications_edit_certification_notSpecified => 'לא צוין';
+
+  @override
   String certifications_edit_datePicker_clearTooltip(Object label) {
     return 'נקה $label';
   }
@@ -1712,15 +1715,20 @@ class AppLocalizationsHe extends AppLocalizations {
   String get certifications_edit_dialog_keepEditing => 'המשך עריכה';
 
   @override
+  String get certifications_edit_group_progression => 'התקדמות';
+
+  @override
+  String get certifications_edit_group_specialties => 'התמחויות';
+
+  @override
   String get certifications_edit_help_expiryDate =>
       'השאר ריק להסמכות ללא תפוגה';
 
   @override
-  String get certifications_edit_hint_cardNumber => 'הזן מספר כרטיס הסמכה';
+  String get certifications_edit_helper_nameOnCard => 'אופציונלי';
 
   @override
-  String get certifications_edit_hint_certificationName =>
-      'לדוגמה, Open Water Diver';
+  String get certifications_edit_hint_cardNumber => 'הזן מספר כרטיס הסמכה';
 
   @override
   String get certifications_edit_hint_instructorName => 'שם המדריך המסמיך';
@@ -1738,7 +1746,7 @@ class AppLocalizationsHe extends AppLocalizations {
   String get certifications_edit_label_cardNumber => 'מספר כרטיס';
 
   @override
-  String get certifications_edit_label_certificationName => 'שם הסמכה *';
+  String get certifications_edit_label_certification => 'הסמכה';
 
   @override
   String get certifications_edit_label_expiryDate => 'תאריך תפוגה';
@@ -1753,13 +1761,10 @@ class AppLocalizationsHe extends AppLocalizations {
   String get certifications_edit_label_issueDate => 'תאריך הנפקה';
 
   @override
-  String get certifications_edit_label_level => 'רמה';
+  String get certifications_edit_label_nameOnCard => 'השם על הכרטיס';
 
   @override
   String get certifications_edit_label_notes => 'הערות';
-
-  @override
-  String get certifications_edit_level_notSpecified => 'לא צוין';
 
   @override
   String certifications_edit_photo_addSemanticLabel(Object label) {
@@ -1816,7 +1821,8 @@ class AppLocalizationsHe extends AppLocalizations {
   String get certifications_edit_snackBar_updated => 'ההסמכה עודכנה בהצלחה';
 
   @override
-  String get certifications_edit_validation_nameRequired => 'נא להזין שם הסמכה';
+  String get certifications_edit_validation_certificationOrNameRequired =>
+      'יש לבחור הסמכה או להזין שם';
 
   @override
   String get certifications_list_button_retry => 'נסה שוב';

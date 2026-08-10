@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import 'package:submersion/features/certifications/domain/certification_title.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:submersion/core/constants/list_view_mode.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
@@ -503,7 +504,7 @@ class _BuddyDetailContent extends ConsumerWidget {
                           ListTile(
                             contentPadding: EdgeInsets.zero,
                             leading: const Icon(Icons.card_membership),
-                            title: Text(cert.level?.displayName ?? cert.name),
+                            title: Text(certificationTitle(cert)),
                             subtitle: Text(cert.agency.displayName),
                           ),
                       ],

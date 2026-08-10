@@ -6,6 +6,7 @@ import 'package:submersion/features/certifications/domain/entities/certification
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
 import 'package:submersion/features/divers/domain/entities/diver.dart';
 import 'package:submersion/features/signatures/domain/entities/signature.dart';
+import 'package:submersion/features/certifications/domain/certification_title.dart';
 
 /// Minutes string for a logbook Duration field (#644).
 ///
@@ -327,7 +328,7 @@ class PdfSharedComponents {
                   crossAxisAlignment: pw.CrossAxisAlignment.start,
                   children: [
                     pw.Text(
-                      cert.name,
+                      certificationTitle(cert),
                       style: pw.TextStyle(
                         fontSize: 14,
                         fontWeight: pw.FontWeight.bold,
@@ -345,7 +346,9 @@ class PdfSharedComponents {
                   ],
                 ),
               ),
-              if (cert.level != null)
+              // Only when the title above is a custom name -- otherwise the
+              // title already is the certification.
+              if (certificationSubtitle(cert) != null)
                 pw.Container(
                   padding: const pw.EdgeInsets.symmetric(
                     horizontal: 8,
@@ -356,7 +359,7 @@ class PdfSharedComponents {
                     borderRadius: pw.BorderRadius.circular(4),
                   ),
                   child: pw.Text(
-                    cert.level!.displayName,
+                    certificationSubtitle(cert)!,
                     style: pw.TextStyle(
                       fontSize: 10,
                       fontWeight: pw.FontWeight.bold,

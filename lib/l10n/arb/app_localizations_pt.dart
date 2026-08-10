@@ -1583,6 +1583,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String get certifications_detail_label_cardNumber => 'Numero do Cartao';
 
   @override
+  String get certifications_detail_label_certification => 'Certificação';
+
+  @override
   String get certifications_detail_label_expiryDate => 'Data de Validade';
 
   @override
@@ -1593,9 +1596,6 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get certifications_detail_label_issueDate => 'Data de Emissao';
-
-  @override
-  String get certifications_detail_label_level => 'Nivel';
 
   @override
   String get certifications_detail_label_type => 'Tipo';
@@ -1730,6 +1730,10 @@ class AppLocalizationsPt extends AppLocalizations {
   String get certifications_edit_button_update => 'Atualizar Certificacao';
 
   @override
+  String get certifications_edit_certification_notSpecified =>
+      'Não especificado';
+
+  @override
   String certifications_edit_datePicker_clearTooltip(Object label) {
     return 'Limpar $label';
   }
@@ -1752,16 +1756,21 @@ class AppLocalizationsPt extends AppLocalizations {
   String get certifications_edit_dialog_keepEditing => 'Continuar Editando';
 
   @override
+  String get certifications_edit_group_progression => 'Progressão';
+
+  @override
+  String get certifications_edit_group_specialties => 'Especialidades';
+
+  @override
   String get certifications_edit_help_expiryDate =>
       'Deixe vazio para certificacoes que nao expiram';
 
   @override
-  String get certifications_edit_hint_cardNumber =>
-      'Insira o numero do cartao de certificacao';
+  String get certifications_edit_helper_nameOnCard => 'Opcional';
 
   @override
-  String get certifications_edit_hint_certificationName =>
-      'ex., Open Water Diver';
+  String get certifications_edit_hint_cardNumber =>
+      'Insira o numero do cartao de certificacao';
 
   @override
   String get certifications_edit_hint_instructorName =>
@@ -1782,8 +1791,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get certifications_edit_label_cardNumber => 'Numero do Cartao';
 
   @override
-  String get certifications_edit_label_certificationName =>
-      'Nome da Certificacao *';
+  String get certifications_edit_label_certification => 'Certificação';
 
   @override
   String get certifications_edit_label_expiryDate => 'Data de Validade';
@@ -1799,13 +1807,10 @@ class AppLocalizationsPt extends AppLocalizations {
   String get certifications_edit_label_issueDate => 'Data de Emissao';
 
   @override
-  String get certifications_edit_label_level => 'Nivel';
+  String get certifications_edit_label_nameOnCard => 'Nome no cartão';
 
   @override
   String get certifications_edit_label_notes => 'Observacoes';
-
-  @override
-  String get certifications_edit_level_notSpecified => 'Nao especificado';
 
   @override
   String certifications_edit_photo_addSemanticLabel(Object label) {
@@ -1866,8 +1871,8 @@ class AppLocalizationsPt extends AppLocalizations {
       'Certificacao atualizada com sucesso';
 
   @override
-  String get certifications_edit_validation_nameRequired =>
-      'Por favor, insira um nome de certificacao';
+  String get certifications_edit_validation_certificationOrNameRequired =>
+      'Escolha uma certificação ou insira um nome';
 
   @override
   String get certifications_list_button_retry => 'Tentar novamente';
