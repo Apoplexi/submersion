@@ -6,6 +6,7 @@ import 'package:submersion/core/database/database.dart';
 import 'package:submersion/core/services/database_service.dart';
 import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/core/services/sync/sync_event_bus.dart';
+import 'package:submersion/core/utils/stream_debounce.dart';
 import 'package:submersion/features/media/domain/entities/media_item.dart'
     as domain;
 import 'package:submersion/features/media/domain/entities/media_source_type.dart';
@@ -15,6 +16,27 @@ class MediaRepository {
   final SyncRepository _syncRepository = SyncRepository();
   final _uuid = const Uuid();
   final _log = LoggerService.forClass(MediaRepository);
+
+  /// Trailing-debounce window applied to [watchMediaChanges].
+  ///
+  /// A sync applies remote changes as many per-changeset transactions, and a
+  /// bulk photo import inserts one row per file; un-coalesced, every commit
+  /// would re-invalidate every listening provider. Debouncing collapses a
+  /// write burst into a single tick that fires once writes go quiet.
+  static const changeTickDebounce = Duration(milliseconds: 300);
+
+  /// Emits whenever the `media` table changes so cross-feature providers can
+  /// refresh after a delete, an import, or a sync -- including writes that go
+  /// straight to the database and so bypass the notifier paths that invalidate
+  /// per-dive media providers.
+  ///
+  /// Scoped to `media` alone: consumers render the media rows themselves, not
+  /// the joined `media_enrichment` values, and enrichment is backfilled on
+  /// every dive-detail open (see `DiveMediaEnricher`), which would otherwise
+  /// churn listeners for data they do not display.
+  Stream<void> watchMediaChanges() => _db
+      .tableUpdates(TableUpdateQuery.onTable(_db.media))
+      .debounce(changeTickDebounce);
 
   /// Get all media for a dive, ordered by takenAt
   /// Includes enrichment data (depth, temperature) if available
