@@ -2,9 +2,26 @@ import 'dart:async';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:libdivecomputer_plugin/libdivecomputer_plugin.dart' as pigeon;
+import 'package:permission_handler_platform_interface/permission_handler_platform_interface.dart';
+import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 import 'package:submersion/core/models/log_entry.dart';
 import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/features/dive_computer/presentation/providers/discovery_providers.dart';
+
+/// Permission backend that answers without a platform channel. Only
+/// [requestPermissions] is overridden; the rest of the interface throws by
+/// default and is not reached by the discovery flow.
+class _FakePermissionHandler extends PermissionHandlerPlatform
+    with MockPlatformInterfaceMixin {
+  _FakePermissionHandler(this.response);
+
+  final Map<Permission, PermissionStatus> response;
+
+  @override
+  Future<Map<Permission, PermissionStatus>> requestPermissions(
+    List<Permission> permissions,
+  ) async => response;
+}
 
 /// Host API stub that records discovery calls without touching a platform
 /// channel. Extends the generated class so only the two methods the
@@ -107,6 +124,58 @@ void main() {
         expect(notifier.state.discoveredDevices, isEmpty);
       },
     );
+
+    group('runtime permission gate', () {
+      late PermissionHandlerPlatform original;
+
+      setUp(() => original = PermissionHandlerPlatform.instance);
+      tearDown(() => PermissionHandlerPlatform.instance = original);
+
+      DiscoveryNotifier gatedNotifier() {
+        final gated = DiscoveryNotifier(
+          service: service,
+          requiresRuntimePermissions: true,
+        );
+        addTearDown(gated.dispose);
+        return gated;
+      }
+
+      test('logs and blocks the scan when a permission is refused', () async {
+        PermissionHandlerPlatform.instance = _FakePermissionHandler({
+          Permission.bluetoothScan: PermissionStatus.denied,
+          Permission.bluetoothConnect: PermissionStatus.granted,
+        });
+        final gated = gatedNotifier();
+
+        await gated.startScan();
+        await settle();
+
+        expect(hostApi.startDiscoveryCalled, isFalse);
+        expect(gated.state.isScanning, isFalse);
+        expect(gated.state.errorMessage, isNotNull);
+
+        final warnings = bluetoothEntries()
+            .where((e) => e.level == LogLevel.warning)
+            .toList();
+        expect(warnings, isNotEmpty);
+        expect(warnings.first.message, contains('denied'));
+      });
+
+      test('proceeds to scan once every permission is granted', () async {
+        PermissionHandlerPlatform.instance = _FakePermissionHandler({
+          Permission.bluetoothScan: PermissionStatus.granted,
+          Permission.bluetoothConnect: PermissionStatus.granted,
+        });
+        final gated = gatedNotifier();
+
+        await gated.startScan();
+        await settle();
+
+        expect(hostApi.startDiscoveryCalled, isTrue);
+        expect(gated.state.isScanning, isTrue);
+        expect(gated.state.errorMessage, isNull);
+      });
+    });
 
     test('logs a Bluetooth entry when a scan stops', () async {
       await notifier.startScan();

@@ -135,12 +135,25 @@ const _discoveryLog = LoggerService('Discovery');
 /// native platform backends. Accumulates discovered devices in state.
 class DiscoveryNotifier extends StateNotifier<DiscoveryState> {
   final pigeon.DiveComputerService _service;
+
+  /// Whether this platform gates BLE scanning behind runtime permissions.
+  ///
+  /// Only Android does. Injectable because a refused permission is one of the
+  /// likelier reasons a scan finds nothing, and the branch that reports it is
+  /// otherwise unreachable in tests, which run where `Platform.isAndroid` is
+  /// false (issue #123).
+  final bool _requiresRuntimePermissions;
+
   StreamSubscription<pigeon.DiscoveredDevice>? _discoverySubscription;
   StreamSubscription<void>? _discoveryCompleteSubscription;
 
-  DiscoveryNotifier({required pigeon.DiveComputerService service})
-    : _service = service,
-      super(const DiscoveryState()) {
+  DiscoveryNotifier({
+    required pigeon.DiveComputerService service,
+    bool? requiresRuntimePermissions,
+  }) : _service = service,
+       _requiresRuntimePermissions =
+           requiresRuntimePermissions ?? Platform.isAndroid,
+       super(const DiscoveryState()) {
     _discoveryCompleteSubscription = _service.discoveryComplete.listen((_) {
       state = state.copyWith(isScanning: false);
     });
@@ -150,7 +163,7 @@ class DiscoveryNotifier extends StateNotifier<DiscoveryState> {
   Future<void> startScan() async {
     try {
       // Request Bluetooth permissions on Android before scanning.
-      if (Platform.isAndroid) {
+      if (_requiresRuntimePermissions) {
         final statuses = await [
           Permission.bluetoothScan,
           Permission.bluetoothConnect,
