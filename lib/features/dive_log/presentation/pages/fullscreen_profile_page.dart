@@ -151,6 +151,10 @@ class _FullscreenProfilePageState extends ConsumerState<FullscreenProfilePage> {
 
   @override
   Widget build(BuildContext context) {
+    // Phone layouts give the chart the entire screen: no transport strip
+    // below it (#811). shortestSide rather than width so a phone held in
+    // landscape -- where vertical room is scarcest -- still counts as one.
+    final isPhone = MediaQuery.sizeOf(context).shortestSide < 600;
     // Render from AsyncValue.value so background reloads never flash the UI.
     final diveAsync = ref.watch(diveProvider(widget.diveId));
     final dive = diveAsync.value;
@@ -360,7 +364,9 @@ class _FullscreenProfilePageState extends ConsumerState<FullscreenProfilePage> {
                   child: Stack(
                     children: [
                       Padding(
-                        padding: const EdgeInsets.fromLTRB(12, 8, 12, 0),
+                        padding: isPhone
+                            ? const EdgeInsets.all(4)
+                            : const EdgeInsets.fromLTRB(12, 8, 12, 0),
                         child: DiveProfileChart(
                           profile: chartProfile,
                           overlays: overlays.isEmpty ? null : overlays,
@@ -592,12 +598,13 @@ class _FullscreenProfilePageState extends ConsumerState<FullscreenProfilePage> {
                       },
                     ),
                   ),
-                ProfileTransportBar(
-                  diveId: widget.diveId,
-                  // The same profile the chart renders: the scrub minimap
-                  // and seek range must match what is on screen.
-                  profile: chartProfile,
-                ),
+                if (!isPhone)
+                  ProfileTransportBar(
+                    diveId: widget.diveId,
+                    // The same profile the chart renders: the scrub minimap
+                    // and seek range must match what is on screen.
+                    profile: chartProfile,
+                  ),
               ],
             ),
           ),
