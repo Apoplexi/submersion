@@ -22,7 +22,9 @@ typedef struct {
     // characteristic serves both roles.
     gchar* credits_write_path;   // Credits RX (client -> module)
     gchar* credits_notify_path;  // Credits TX (module -> client)
-    gint terminal_io_credits;
+    // Credit balance, refcounted so the asynchronous grant completion can
+    // settle it even if this stream is freed first.
+    struct BleCreditBalance* credits;
     // Whether a failed opening grant is fatal (Telit) or falls back to running
     // without flow control (u-blox, where it is optional).
     gboolean credits_required;

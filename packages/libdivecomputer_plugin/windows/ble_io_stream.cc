@@ -274,11 +274,21 @@ bool BleIoStream::DiscoverCharacteristics() {
                 : GattClientCharacteristicConfigurationDescriptorValue::
                       Indicate;
 
-        auto credits_cccd_result =
-            credits_notify_characteristic_
-                .WriteClientCharacteristicConfigurationDescriptorAsync(
-                    credits_cccd_value)
-                .get();
+        // .get() throws if the link drops mid-setup. The outer try in
+        // ConnectAndDiscover would catch it, but that fails the whole
+        // connection -- which is wrong for u-blox, whose fallback exists
+        // precisely so an optional handshake cannot break a working device.
+        // Treat a throw exactly like a non-Success status instead.
+        auto credits_cccd_result = GattCommunicationStatus::Unreachable;
+        try {
+            credits_cccd_result =
+                credits_notify_characteristic_
+                    .WriteClientCharacteristicConfigurationDescriptorAsync(
+                        credits_cccd_value)
+                    .get();
+        } catch (...) {
+            credits_cccd_result = GattCommunicationStatus::Unreachable;
+        }
         if (credits_cccd_result != GattCommunicationStatus::Success) {
             if (credits_required_) return false;
             // u-blox flow control is optional; fall back to running without it
@@ -342,8 +352,8 @@ bool BleIoStream::GrantInitialCredits() {
     }
 
     {
-        std::lock_guard<std::mutex> lock(credits_mutex_);
-        terminal_io_credits_ = kTerminalIoInitialGrant;
+        std::lock_guard<std::mutex> lock(credits_->mutex);
+        credits_->credits = kTerminalIoInitialGrant;
     }
     return true;
 }
@@ -363,36 +373,65 @@ void BleIoStream::ReleaseCreditCharacteristics() {
         }
         credits_notify_characteristic_ = nullptr;
     }
-    std::lock_guard<std::mutex> lock(credits_mutex_);
+    std::lock_guard<std::mutex> lock(credits_->mutex);
     credits_write_characteristic_ = nullptr;
-    terminal_io_credits_ = 0;
+    credits_->credits = 0;
+    credits_->grant_in_flight = false;
 }
 
 void BleIoStream::ReplenishCredits() {
-    std::lock_guard<std::mutex> lock(credits_mutex_);
-    if (!credits_write_characteristic_) return;
-
-    if (terminal_io_credits_ > 0) terminal_io_credits_--;
-    if (terminal_io_credits_ > kTerminalIoRefillThreshold) return;
-
+    auto credits = credits_;
     const uint8_t grant = static_cast<uint8_t>(kTerminalIoInitialGrant -
                                                kTerminalIoRefillThreshold);
+    GattCharacteristic characteristic{nullptr};
+
+    {
+        std::lock_guard<std::mutex> lock(credits->mutex);
+        if (!credits_write_characteristic_) return;
+        if (credits->credits > 0) credits->credits--;
+        if (credits->grant_in_flight) return;
+        if (credits->credits > kTerminalIoRefillThreshold) return;
+        credits->grant_in_flight = true;
+        characteristic = credits_write_characteristic_;
+    }
+    // The lock is released before the write is issued: Completed() runs the
+    // handler inline when the operation has already finished, and the handler
+    // takes this same non-recursive mutex.
+
     try {
         auto writer = DataWriter();
         writer.WriteByte(grant);
         // Fire-and-forget: this runs on the notification thread, and blocking
         // it on the write result would stall notification delivery during a
-        // bulk logbook dump. The async operation owns its own lifetime and the
-        // completion handler captures nothing, so it stays valid even if this
-        // stream is torn down first.
-        auto operation =
-            credits_write_characteristic_.WriteValueWithResultAsync(
-                writer.DetachBuffer(), GattWriteOption::WriteWithResponse);
-        operation.Completed([](auto const&, auto const&) {});
-        terminal_io_credits_ += grant;
+        // bulk logbook dump.
+        auto operation = characteristic.WriteValueWithResultAsync(
+            writer.DetachBuffer(), GattWriteOption::WriteWithResponse);
+        // The balance is credited only once the module acknowledges the
+        // grant. Counting it now would overstate the balance whenever a write
+        // failed, and an overstated balance stalls the transfer for good: the
+        // module falls silent, no notifications arrive to decrement it, and no
+        // refill is ever issued again.
+        //
+        // The handler captures the shared balance rather than `this`, so it
+        // stays safe if the async operation outlives this stream.
+        operation.Completed([credits, grant](auto const& op, auto const&) {
+            bool acknowledged = false;
+            try {
+                acknowledged =
+                    op.GetResults().Status() == GattCommunicationStatus::Success;
+            } catch (...) {
+                acknowledged = false;
+            }
+            std::lock_guard<std::mutex> lock(credits->mutex);
+            credits->grant_in_flight = false;
+            if (acknowledged) credits->credits += grant;
+        });
     } catch (...) {
-        // Leave the balance untouched; the next notification retries. There
-        // are kTerminalIoRefillThreshold packets of slack to recover within.
+        // Nothing was queued, so no completion is coming; leave the balance
+        // alone and let the next notification retry. There are
+        // kTerminalIoRefillThreshold packets of slack to recover within.
+        std::lock_guard<std::mutex> lock(credits->mutex);
+        credits->grant_in_flight = false;
     }
 }
 

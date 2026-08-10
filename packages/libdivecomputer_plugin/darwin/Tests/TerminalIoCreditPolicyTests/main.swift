@@ -83,30 +83,73 @@ do {
     expect(minimumSeen > 0, "balance never reaches zero (low-water \(minimumSeen))")
 }
 
-// 6. A refill the platform rejected is not committed, and the next packet asks
-// again. Android allows one GATT operation in flight, so a top-up issued while
-// a command write is pending can be refused; the balance must not drift as if
-// the credits had been granted.
+// 6. A refill that never reached the module must not be counted, and once the
+// caller reports the failure the next packet asks again. Android reports
+// success from writeCharacteristic() and can still fail the write at the ATT
+// layer afterwards, so "accepted" is not "received".
 do {
     var policy = TerminalIoCreditPolicy()
     policy.grantAccepted(TerminalIoCreditPolicy.initialGrant)
     _ = drain(&policy, packets: 221)
-    let first = policy.packetReceived()  // reaches the threshold, not committed
+    let first = policy.packetReceived()  // reaches the threshold
     expect(first == 222, "refill requested at the threshold")
-    expect(policy.credits == 32, "a rejected refill leaves the balance untouched")
+    expect(policy.credits == 32, "an unconfirmed refill is not counted")
+    policy.grantFailed()
     let second = policy.packetReceived()
-    expect(second == 222, "the next packet asks for the refill again")
+    expect(second == 222, "after a reported failure the next packet asks again")
     policy.grantAccepted(second ?? 0)
-    expect(policy.credits == 253, "the accepted retry credits the balance")
+    expect(policy.credits == 253, "the confirmed retry credits the balance")
 }
 
-// 7. The counter cannot go negative even if more packets arrive than were paid
+// 7. Regression for the stall this whole policy exists to avoid. If a failed
+// grant were counted as delivered, the balance would sit far above the
+// threshold while the module's real balance ran out; the module would fall
+// silent, no further packets would arrive to decrement the balance, and no
+// refill would ever be issued again. The balance must stay at or below the
+// module's real one so a refill is always eventually triggered.
+do {
+    var policy = TerminalIoCreditPolicy()
+    policy.grantAccepted(TerminalIoCreditPolicy.initialGrant)
+    _ = drain(&policy, packets: 222)  // one confirmed refill, balance back to 254
+    var moduleBalance = 254
+
+    // Every subsequent refill fails to reach the module.
+    for _ in 0..<254 {
+        moduleBalance -= 1
+        if let grant = policy.packetReceived() {
+            _ = grant  // the write is issued but never reaches the module
+            policy.grantFailed()
+        }
+        expect(policy.credits <= moduleBalance,
+               "balance never exceeds the module's real credits")
+        if moduleBalance <= 0 { break }
+    }
+    expect(policy.packetReceived() != nil,
+           "a refill is still being requested rather than silently stalling")
+}
+
+// 8. Only one grant is outstanding at a time: a second packet arriving before
+// the first grant is confirmed must not request another, or the module would
+// be handed credits twice and the balance would overshoot.
+do {
+    var policy = TerminalIoCreditPolicy()
+    policy.grantAccepted(TerminalIoCreditPolicy.initialGrant)
+    _ = drain(&policy, packets: 221)
+    expect(policy.packetReceived() == 222, "first refill requested")
+    expect(policy.packetReceived() == nil, "no second refill while one is outstanding")
+    expect(policy.packetReceived() == nil, "still suppressed on the next packet")
+    policy.grantAccepted(TerminalIoCreditPolicy.refillAmount)
+    expect(policy.credits == 252, "only the one confirmed grant is counted")
+}
+
+// 9. The counter cannot go negative even if more packets arrive than were paid
 // for (a stale notification delivered before the opening grant, say), so the
 // refill amount always stays a valid UInt8.
 do {
     var policy = TerminalIoCreditPolicy()
-    let grants = (0..<10).map { _ in policy.packetReceived() }
-    expect(grants.allSatisfy { $0 == 222 }, "un-granted packets still request a refill")
+    let first = policy.packetReceived()
+    expect(first == 222, "an un-granted packet requests a refill")
+    for _ in 0..<9 { _ = policy.packetReceived() }
     expect(policy.credits == 0, "balance floors at zero rather than going negative")
 }
 

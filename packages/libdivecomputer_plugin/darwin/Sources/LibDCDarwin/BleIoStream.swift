@@ -43,6 +43,8 @@ class BleIoStream: NSObject, CBPeripheralDelegate {
     private var creditsWriteCharacteristic: CBCharacteristic?
     private var creditsNotifyCharacteristic: CBCharacteristic?
     private var creditsRequired = false
+    /// Grant awaiting its write confirmation, for mid-transfer top-ups only.
+    private var pendingTopUpGrant: UInt8?
     private var creditPolicy = TerminalIoCreditPolicy()
     private var discoveredServices: [(service: CBService, characteristics: [CBCharacteristic])] = []
     private var remainingServiceDiscoveries = 0
@@ -140,6 +142,7 @@ class BleIoStream: NSObject, CBPeripheralDelegate {
         creditsWriteCharacteristic = nil
         creditsNotifyCharacteristic = nil
         creditsRequired = false
+        pendingTopUpGrant = nil
         creditPolicy = TerminalIoCreditPolicy()
         lastCreditWriteError = nil
         hasSeenNotify = false
@@ -285,19 +288,21 @@ class BleIoStream: NSObject, CBPeripheralDelegate {
     ///
     /// Called on the CoreBluetooth delegate queue, so the write is issued
     /// without waiting for its confirmation: blocking this queue starves
-    /// notification delivery and loses bytes (issue #394). CoreBluetooth
-    /// queues the write reliably, so the balance is credited here rather than
-    /// on confirmation -- a failure is reported by didWriteValueFor.
+    /// notification delivery and loses bytes (issue #394). The balance is
+    /// therefore credited later, in didWriteValueFor, once the module has
+    /// actually acknowledged the grant -- counting it here would overstate the
+    /// balance whenever a write failed, and an overstated balance stalls the
+    /// transfer permanently (see TerminalIoCreditPolicy).
     private func replenishCredits() {
         guard let creditsChar = creditsWriteCharacteristic,
             let grant = creditPolicy.packetReceived()
         else { return }
 
+        pendingTopUpGrant = grant
         peripheral.writeValue(Data([grant]), for: creditsChar, type: .withResponse)
-        creditPolicy.grantAccepted(grant)
-        let balance = creditPolicy.credits
         NativeLogger.d("BleIoStream", category: "BLE",
-            "Terminal I/O: granted \(grant) more credits (balance=\(balance))")
+            "Terminal I/O: requesting \(grant) more credits"
+                + " (balance=\(self.creditPolicy.credits))")
     }
 
     // MARK: - C Callback Implementations
@@ -746,6 +751,23 @@ class BleIoStream: NSObject, CBPeripheralDelegate {
         // write that is still in flight and desynchronise the protocol.
         if let credits = creditsWriteCharacteristic,
             characteristic.uuid == credits.uuid {
+            // A mid-transfer top-up has no waiter; settle it against the
+            // policy here. Only now is the module known to hold the grant.
+            if let grant = pendingTopUpGrant {
+                pendingTopUpGrant = nil
+                if error == nil {
+                    creditPolicy.grantAccepted(grant)
+                    NativeLogger.d("BleIoStream", category: "BLE",
+                        "Terminal I/O: \(grant) credits acknowledged"
+                            + " (balance=\(self.creditPolicy.credits))")
+                } else {
+                    // Leave the balance uncredited so the next packet retries.
+                    creditPolicy.grantFailed()
+                    NativeLogger.w("BleIoStream", category: "BLE",
+                        "Terminal I/O: credit grant not acknowledged; will retry")
+                }
+                return
+            }
             lastCreditWriteError = error
             creditSemaphore.signal()
             return

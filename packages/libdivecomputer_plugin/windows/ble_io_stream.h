@@ -6,6 +6,7 @@
 #include <cstdint>
 #include <deque>
 #include <functional>
+#include <memory>
 #include <mutex>
 #include <string>
 #include <vector>
@@ -133,12 +134,21 @@ class BleIoStream {
   // Whether a failed opening grant is fatal (Telit) or falls back to running
   // without flow control (u-blox, where it is optional).
   bool credits_required_ = false;
-  // Credit balance. WinRT can dispatch ValueChanged on several thread-pool
-  // threads at once, so the decrement/check/grant sequence is guarded as a
-  // unit: two concurrent refills would credit the balance twice and later
-  // suppress a top-up the module actually needed.
-  std::mutex credits_mutex_;
-  int terminal_io_credits_ = 0;
+  // Credit balance, held behind a shared_ptr so the fire-and-forget grant
+  // completion can settle it without capturing `this`: the async operation may
+  // outlive this stream, and the balance must survive that long to be updated
+  // safely.
+  //
+  // WinRT can dispatch ValueChanged on several thread-pool threads at once, so
+  // the decrement/check/grant sequence is guarded as a unit: two concurrent
+  // refills would hand the module credits twice.
+  struct CreditBalance {
+    std::mutex mutex;
+    int credits = 0;
+    bool grant_in_flight = false;
+  };
+  std::shared_ptr<CreditBalance> credits_ =
+      std::make_shared<CreditBalance>();
 
   std::mutex read_mutex_;
   std::condition_variable read_cv_;

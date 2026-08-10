@@ -415,6 +415,19 @@ class BleIoStream(
                 // released for a write that did not take one.
                 if (creditTopUpInFlight) {
                     creditTopUpInFlight = false
+                    if (status == BluetoothGatt.GATT_SUCCESS) {
+                        // Only now is the module known to hold the grant.
+                        credits += TIO_INITIAL_GRANT - TIO_REFILL_THRESHOLD
+                        NativeLogger.d(TAG, "BLE",
+                            "Terminal I/O: credits acknowledged (balance=$credits)")
+                    } else {
+                        // Leave the balance uncredited so the next packet
+                        // retries rather than stalling on credits the module
+                        // never received.
+                        NativeLogger.w(TAG, "BLE",
+                            "Terminal I/O: credit grant not acknowledged" +
+                                " status=$status; will retry")
+                    }
                     gattOperation.release()
                     return
                 }
@@ -544,10 +557,17 @@ class BleIoStream(
         // Commit the grant only when the request was accepted; otherwise the
         // balance must stay as it is so the next packet asks again.
         if (g.writeCharacteristic(creditsChar)) {
+            // Do NOT count the grant yet. writeCharacteristic() reporting true
+            // only means Android accepted the request; the write can still
+            // fail at the ATT layer, and counting credits the module never
+            // received leaves the balance permanently above the refill
+            // threshold -- the module falls silent, no packets arrive to
+            // decrement it, and the transfer stalls for good. The balance may
+            // run understated in the meantime, which only costs an early
+            // refill.
             creditTopUpInFlight = true
-            credits += grant
             NativeLogger.d(TAG, "BLE",
-                "Terminal I/O: granted $grant more credits (balance=$credits)")
+                "Terminal I/O: requesting $grant more credits (balance=$credits)")
         } else {
             // No completion callback is coming, so release the gate here.
             gattOperation.release()

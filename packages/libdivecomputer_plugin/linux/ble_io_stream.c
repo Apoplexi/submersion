@@ -63,6 +63,9 @@ static const guint32 BLE_IOCTL_GET_PINCODE_NR = 1;
 static const guint32 BLE_IOCTL_ACCESSCODE_NR = 2;
 static const guint32 DIRECTION_INPUT = 1;
 
+static struct BleCreditBalance* credit_balance_new(void);
+static void credit_balance_unref(struct BleCreditBalance* balance);
+
 BleIoStream* ble_io_stream_new(void) {
     BleIoStream* stream = g_new0(BleIoStream, 1);
     g_mutex_init(&stream->read_mutex);
@@ -76,6 +79,7 @@ BleIoStream* ble_io_stream_new(void) {
     stream->device_address = NULL;
     stream->on_pin_code_required = NULL;
     stream->pin_callback_data = NULL;
+    stream->credits = credit_balance_new();
     return stream;
 }
 
@@ -133,6 +137,32 @@ static gboolean has_flag(GDBusConnection* conn, const gchar* char_path,
     return found;
 }
 
+// Credit balance shared between the stream and any in-flight grant
+// completion. Refcounted because a grant issued moments before teardown
+// completes after the stream is gone, and the callback must still be able to
+// settle the balance without touching freed memory.
+struct BleCreditBalance {
+    gint ref_count;
+    gint credits;
+    gboolean grant_in_flight;
+};
+
+static struct BleCreditBalance* credit_balance_new(void) {
+    struct BleCreditBalance* balance = g_new0(struct BleCreditBalance, 1);
+    balance->ref_count = 1;
+    return balance;
+}
+
+static struct BleCreditBalance* credit_balance_ref(
+    struct BleCreditBalance* balance) {
+    g_atomic_int_inc(&balance->ref_count);
+    return balance;
+}
+
+static void credit_balance_unref(struct BleCreditBalance* balance) {
+    if (g_atomic_int_dec_and_test(&balance->ref_count)) g_free(balance);
+}
+
 // Build the (ay, a{sv}) argument tuple for GattCharacteristic1.WriteValue
 // carrying a single byte and no options.
 static GVariant* make_single_byte_write_args(guint8 byte) {
@@ -156,7 +186,7 @@ static void abandon_credit_flow_control(BleIoStream* stream,
     g_warning("BleIoStream: Terminal I/O: %s; "
               "continuing without credit flow control", reason);
     g_clear_pointer(&stream->credits_write_path, g_free);
-    stream->terminal_io_credits = 0;
+    stream->credits->credits = 0;
 
     // Unsubscribe rather than merely ignoring the credit indications, so the
     // module stops transmitting on a channel we have given up on and its
@@ -192,29 +222,55 @@ static gboolean grant_initial_credits(BleIoStream* stream) {
     }
     if (result) g_variant_unref(result);
 
-    stream->terminal_io_credits = TIO_INITIAL_GRANT;
+    stream->credits->credits = TIO_INITIAL_GRANT;
     return TRUE;
 }
 
 // Account for one received packet and top the module back up when its balance
 // runs low, so a multi-thousand-notification logbook dump does not stall once
 // the opening grant is spent.
+// Settle a grant once BlueZ reports whether the module received it.
+static void on_credit_grant_complete(GObject* source, GAsyncResult* result,
+                                     gpointer user_data) {
+    struct BleCreditBalance* balance = (struct BleCreditBalance*)user_data;
+    g_autoptr(GError) error = NULL;
+    GVariant* reply = g_dbus_connection_call_finish(
+        G_DBUS_CONNECTION(source), result, &error);
+
+    balance->grant_in_flight = FALSE;
+    if (error) {
+        // Leave the balance uncredited so the next packet retries.
+        g_warning("BleIoStream: Terminal I/O credit grant not acknowledged: %s",
+                  error->message);
+    } else {
+        balance->credits += TIO_INITIAL_GRANT - TIO_REFILL_THRESHOLD;
+    }
+    if (reply) g_variant_unref(reply);
+    credit_balance_unref(balance);
+}
+
 static void replenish_credits(BleIoStream* stream) {
     if (!stream->credits_write_path) return;
 
-    if (stream->terminal_io_credits > 0) stream->terminal_io_credits--;
-    if (stream->terminal_io_credits > TIO_REFILL_THRESHOLD) return;
+    struct BleCreditBalance* balance = stream->credits;
+    if (balance->credits > 0) balance->credits--;
+    if (balance->grant_in_flight) return;
+    if (balance->credits > TIO_REFILL_THRESHOLD) return;
 
     const guint8 grant = TIO_INITIAL_GRANT - TIO_REFILL_THRESHOLD;
-    // Fire-and-forget: this runs on the thread dispatching PropertiesChanged,
-    // and a synchronous call here would stall notification delivery during a
-    // bulk logbook dump.
+    balance->grant_in_flight = TRUE;
+    // Asynchronous: this runs on the thread dispatching PropertiesChanged, and
+    // a synchronous call here would stall notification delivery during a bulk
+    // logbook dump. The balance is credited in the completion rather than
+    // here, because counting credits the module never received leaves the
+    // balance permanently above the refill threshold -- the module falls
+    // silent, no packets arrive to decrement it, and the transfer stalls.
     g_dbus_connection_call(
         stream->connection, "org.bluez", stream->credits_write_path,
         "org.bluez.GattCharacteristic1", "WriteValue",
         make_single_byte_write_args(grant),
-        NULL, G_DBUS_CALL_FLAGS_NONE, stream->timeout_ms, NULL, NULL, NULL);
-    stream->terminal_io_credits += grant;
+        NULL, G_DBUS_CALL_FLAGS_NONE, stream->timeout_ms, NULL,
+        on_credit_grant_complete, credit_balance_ref(balance));
 }
 
 // PropertiesChanged signal handler for GATT notifications.
@@ -832,7 +888,7 @@ void ble_io_stream_close(BleIoStream* stream) {
             "org.bluez.GattCharacteristic1", "StopNotify",
             NULL, NULL, G_DBUS_CALL_FLAGS_NONE, -1, NULL, NULL);
     }
-    stream->terminal_io_credits = 0;
+    stream->credits->credits = 0;
     stream->credits_required = FALSE;
 
     if (stream->connection && stream->properties_sub > 0) {
@@ -869,6 +925,7 @@ void ble_io_stream_free(BleIoStream* stream) {
     g_free(stream->notify_path);
     g_free(stream->credits_write_path);
     g_free(stream->credits_notify_path);
+    if (stream->credits) credit_balance_unref(stream->credits);
     g_free(stream->device_name);
     g_mutex_clear(&stream->pin_mutex);
     g_cond_clear(&stream->pin_cond);
