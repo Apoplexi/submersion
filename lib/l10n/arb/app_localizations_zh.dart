@@ -1601,15 +1601,24 @@ class AppLocalizationsZh extends AppLocalizations {
   String get certifications_ecardStack_empty_title => '暂无证书';
 
   @override
+  String get certifications_ecard_label_cardNumber => '卡号';
+
+  @override
   String certifications_ecard_label_certifiedBy(Object agency) {
     return '由 $agency 认证';
   }
+
+  @override
+  String get certifications_ecard_label_diver => '潜水员';
 
   @override
   String get certifications_ecard_label_instructor => '教练';
 
   @override
   String get certifications_ecard_label_issued => '签发日期';
+
+  @override
+  String get certifications_ecard_label_validUntil => '有效期至';
 
   @override
   String get certifications_ecard_statusBadge_expired => '已过期';
@@ -1951,31 +1960,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get certifications_summary_stat_valid => '有效';
-
-  @override
-  String certifications_walletCard_countPlural(Object count) {
-    return '$count 个证书';
-  }
-
-  @override
-  String certifications_walletCard_countSingular(Object count) {
-    return '$count 个证书';
-  }
-
-  @override
-  String get certifications_walletCard_emptyFooter => '添加您的第一个证书';
-
-  @override
-  String get certifications_walletCard_error => '加载证书失败';
-
-  @override
-  String get certifications_walletCard_semanticLabel => '证书卡包。点击查看所有证书';
-
-  @override
-  String get certifications_walletCard_tapToAdd => '点击添加';
-
-  @override
-  String get certifications_walletCard_title => '证书卡包';
 
   @override
   String get certifications_wallet_appBar_title => '证书卡包';

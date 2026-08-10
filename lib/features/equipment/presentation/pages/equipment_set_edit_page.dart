@@ -57,9 +57,35 @@ class _EquipmentSetEditPageState extends ConsumerState<EquipmentSetEditPage> {
     _geofences = List.of(set.geofences);
   }
 
+  /// Drops selections whose equipment has been deleted since the form opened.
+  ///
+  /// [_initializeFromSet] seeds the selection once. If a gear item is deleted
+  /// while this page is on screen -- by a sync, or from the equipment tab --
+  /// its checkbox disappears but the id stays selected, so it can be neither
+  /// seen nor un-checked, and the save would re-insert a dangling foreign key
+  /// (issue #819). The repository prunes such ids as well, but only at write
+  /// time; doing it here keeps the rendered membership honest.
+  ///
+  /// An id is kept when the freshly loaded [set] still lists it. Retired gear
+  /// renders no checkbox yet is legitimately a member, and a set may reference
+  /// gear that [allEquipmentProvider] (diver-scoped) does not return -- neither
+  /// may be silently dropped.
+  void _pruneDeletedSelections(
+    EquipmentSet set,
+    List<EquipmentItem>? everyEquipment,
+  ) {
+    if (everyEquipment == null) return;
+    final known = {...everyEquipment.map((e) => e.id), ...set.equipmentIds};
+    _selectedEquipmentIds.retainWhere(known.contains);
+  }
+
   @override
   Widget build(BuildContext context) {
     final allEquipmentAsync = ref.watch(activeEquipmentProvider);
+    // Existence check for _pruneDeletedSelections. Deliberately not
+    // activeEquipmentProvider: retired gear still belongs to a set, it just
+    // gets no checkbox.
+    final everyEquipment = ref.watch(allEquipmentProvider).valueOrNull;
 
     if (widget.isEditing) {
       final setAsync = ref.watch(equipmentSetProvider(widget.setId!));
@@ -76,6 +102,7 @@ class _EquipmentSetEditPageState extends ConsumerState<EquipmentSetEditPage> {
             );
           }
           _initializeFromSet(set);
+          _pruneDeletedSelections(set, everyEquipment);
           return _buildForm(context, allEquipmentAsync, set);
         },
         loading: () => Scaffold(

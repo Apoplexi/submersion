@@ -55,6 +55,9 @@ typedef struct {
     int has_pending_sample;
     unsigned int current_gasmix;  // active gas index, carried across samples
     libdc_sample_t current_sample;
+    // GPS reported as profile samples (see DC_SAMPLE_LOCATION below).
+    int has_field_location;   // DC_FIELD_LOCATION already supplied a fix
+    int sample_location_count;
 } sample_state_t;
 
 // ============================================================
@@ -115,6 +118,20 @@ static void push_sample(sample_state_t *state) {
 
     dive->samples[dive->sample_count++] = state->current_sample;
     state->has_pending_sample = 0;
+}
+
+// A dive computer with no satellite lock reports 0/0 rather than omitting the
+// record, and a corrupt record can yield values far outside the WGS84 range.
+// Either would place the dive somewhere it never happened, so both are dropped.
+static int is_usable_location(double latitude, double longitude) {
+    if (isnan(latitude) || isnan(longitude)) {
+        return 0;
+    }
+    if (latitude == 0.0 && longitude == 0.0) {
+        return 0;
+    }
+    return latitude >= -90.0 && latitude <= 90.0 &&
+           longitude >= -180.0 && longitude <= 180.0;
 }
 
 static void push_event(libdc_parsed_dive_t *dive,
@@ -250,6 +267,31 @@ static void sample_callback(dc_sample_type_t type,
         state->current_sample.deco_depth = value->deco.depth;
         state->current_sample.deco_tts = value->deco.tts;
         break;
+    case DC_SAMPLE_LOCATION:
+        // Issue #926. The Ratio / DiveSystem iX3M and iDive families do not
+        // implement DC_FIELD_LOCATION at all; they emit each GPS fix as a
+        // profile sample instead. Promote those to the dive-level entry/exit
+        // positions the rest of the app already understands: first fix is the
+        // entry point, the most recent one the exit point. A dive with a
+        // single fix keeps its exit unset rather than mirroring the entry --
+        // a duplicated point renders as a bogus second marker on the map.
+        if (state->has_field_location) {
+            break;  // a real DC_FIELD_LOCATION is authoritative
+        }
+        if (!is_usable_location(value->location.latitude,
+                                value->location.longitude)) {
+            break;
+        }
+        if (state->sample_location_count == 0) {
+            state->dive->entry_latitude = value->location.latitude;
+            state->dive->entry_longitude = value->location.longitude;
+        } else if (value->location.latitude != state->dive->entry_latitude ||
+                   value->location.longitude != state->dive->entry_longitude) {
+            state->dive->exit_latitude = value->location.latitude;
+            state->dive->exit_longitude = value->location.longitude;
+        }
+        state->sample_location_count++;
+        break;
     case DC_SAMPLE_EVENT:
         push_event(state->dive,
                    state->current_sample.time_ms,
@@ -312,14 +354,19 @@ static int extract_dive_fields(dc_parser_t *parser, libdc_parsed_dive_t *dive) {
 
     // Extract GPS entry/exit fixes (Shearwater Swift). flags: 0=entry, 1=exit.
     // Patched libdivecomputer maps these to opening[9]/closing[9] record 9.
+    // Families that report GPS per-sample instead are handled in
+    // sample_callback's DC_SAMPLE_LOCATION branch.
+    int has_field_location = 0;
     dc_location_t loc = {0};
     if (dc_parser_get_field(parser, DC_FIELD_LOCATION, 0, &loc) == DC_STATUS_SUCCESS) {
         dive->entry_latitude = loc.latitude;
         dive->entry_longitude = loc.longitude;
+        has_field_location = 1;
     }
     if (dc_parser_get_field(parser, DC_FIELD_LOCATION, 1, &loc) == DC_STATUS_SUCCESS) {
         dive->exit_latitude = loc.latitude;
         dive->exit_longitude = loc.longitude;
+        has_field_location = 1;
     }
 
     // Extract gas mixes.
@@ -358,6 +405,7 @@ static int extract_dive_fields(dc_parser_t *parser, libdc_parsed_dive_t *dive) {
     sample_state_t sample_state = {0};
     sample_state.dive = dive;
     sample_state.current_gasmix = UINT32_MAX;  // 0 is a valid gas index
+    sample_state.has_field_location = has_field_location;
     dc_parser_samples_foreach(parser, sample_callback, &sample_state);
     push_sample(&sample_state);
 

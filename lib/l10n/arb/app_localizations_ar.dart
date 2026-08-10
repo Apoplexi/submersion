@@ -1673,15 +1673,24 @@ class AppLocalizationsAr extends AppLocalizations {
   String get certifications_ecardStack_empty_title => 'لا توجد شهادات بعد';
 
   @override
+  String get certifications_ecard_label_cardNumber => 'رقم البطاقة';
+
+  @override
   String certifications_ecard_label_certifiedBy(Object agency) {
     return 'معتمد من $agency';
   }
+
+  @override
+  String get certifications_ecard_label_diver => 'الغواص';
 
   @override
   String get certifications_ecard_label_instructor => 'المدرب';
 
   @override
   String get certifications_ecard_label_issued => 'تاريخ الإصدار';
+
+  @override
+  String get certifications_ecard_label_validUntil => 'صالحة حتى';
 
   @override
   String get certifications_ecard_statusBadge_expired => 'منتهية';
@@ -2033,32 +2042,6 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get certifications_summary_stat_valid => 'سارية';
-
-  @override
-  String certifications_walletCard_countPlural(Object count) {
-    return '$count شهادات';
-  }
-
-  @override
-  String certifications_walletCard_countSingular(Object count) {
-    return '$count شهادة';
-  }
-
-  @override
-  String get certifications_walletCard_emptyFooter => 'أضف شهادتك الأولى';
-
-  @override
-  String get certifications_walletCard_error => 'فشل في تحميل الشهادات';
-
-  @override
-  String get certifications_walletCard_semanticLabel =>
-      'محفظة الشهادات. انقر لعرض جميع الشهادات';
-
-  @override
-  String get certifications_walletCard_tapToAdd => 'انقر للإضافة';
-
-  @override
-  String get certifications_walletCard_title => 'محفظة الشهادات';
 
   @override
   String get certifications_wallet_appBar_title => 'محفظة الشهادات';
