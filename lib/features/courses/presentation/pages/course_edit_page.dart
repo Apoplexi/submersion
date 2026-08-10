@@ -214,17 +214,17 @@ class _CourseEditPageState extends ConsumerState<CourseEditPage> {
           // Instructor from buddies (optional)
           InstructorPickerField(
             instructorId: _instructorId,
-            onSelected: (buddy, credential) {
+            onSelected: (buddy, instructorCert) {
               setState(() {
                 _instructorId = buddy?.id;
                 if (buddy != null) {
                   // Snapshot the picked buddy fully: overwrite both name and
-                  // number so switching to a buddy without a credential number
+                  // number so switching to a buddy without a card number
                   // clears a stale one rather than leaving the previous
-                  // selection's value behind.
+                  // value behind.
                   _instructorNameController.text = buddy.name;
                   _instructorNumberController.text =
-                      credential?.credentialNumber ?? '';
+                      instructorCert?.cardNumber ?? '';
                 }
               });
             },

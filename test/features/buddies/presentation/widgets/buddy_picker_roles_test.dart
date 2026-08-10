@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/features/buddies/domain/entities/buddy.dart';
-import 'package:submersion/features/buddies/domain/entities/buddy_role_credential.dart';
 import 'package:submersion/features/buddies/presentation/providers/buddy_providers.dart';
 import 'package:submersion/features/buddies/presentation/widgets/buddy_picker.dart';
+import 'package:submersion/features/certifications/domain/entities/certification.dart';
+import 'package:submersion/features/certifications/presentation/providers/certification_providers.dart';
 import 'package:submersion/features/dive_roles/domain/entities/dive_role.dart';
 import 'package:submersion/features/dive_roles/presentation/providers/dive_role_providers.dart';
 
@@ -24,9 +25,14 @@ final _testRoles = [
     ),
 ];
 
-final _credentialedBuddy = Buddy(
+/// Buddy with a pre-hydrated instructor cert level -- in production this
+/// comes from `_withPrimaryCerts`, but this widget test overrides
+/// `allBuddiesProvider` directly, bypassing the repository, so the fixture
+/// must carry the derived field itself.
+final _instructorBuddy = Buddy(
   id: 'buddy-1',
   name: 'Alice Instructor',
+  certificationLevel: CertificationLevel.instructor,
   createdAt: _now,
   updatedAt: _now,
 );
@@ -37,12 +43,23 @@ final _plainBuddy = Buddy(
   updatedAt: _now,
 );
 
-final _instructorCredential = BuddyRoleCredential(
-  id: 'cred-1',
+/// Buddy without a pre-hydrated cert level, used for the role-sheet ordering
+/// tests so the background buddy-list subtitle doesn't also read
+/// "Instructor" and collide with the role text inside the sheet.
+final _credentialedBuddy = Buddy(
+  id: 'buddy-1',
+  name: 'Alice Instructor',
+  createdAt: _now,
+  updatedAt: _now,
+);
+
+final _instructorCert = Certification(
+  id: 'cert-1',
   buddyId: 'buddy-1',
-  role: BuddyRole.instructor,
-  credentialNumber: '12345',
+  name: 'Instructor Certification',
   agency: CertificationAgency.padi,
+  level: CertificationLevel.instructor,
+  cardNumber: '12345',
   createdAt: _now,
   updatedAt: _now,
 );
@@ -64,20 +81,18 @@ Future<void> _openSheet(WidgetTester tester) async {
 }
 
 void main() {
-  group('BuddyPicker - credential surfacing', () {
-    testWidgets('shows credential label as part of the tile subtitle', (
-      tester,
-    ) async {
+  group('BuddyPicker - certification-driven role hints', () {
+    testWidgets('subtitle shows the primary cert level only', (tester) async {
       await tester.pumpWidget(
         testApp(
           overrides: [
             allDiveRolesProvider.overrideWith((ref) async => _testRoles),
             allBuddiesProvider.overrideWith(
-              (ref) async => [_credentialedBuddy, _plainBuddy],
+              (ref) async => [_instructorBuddy, _plainBuddy],
             ),
-            allBuddyRolesProvider.overrideWith(
+            allBuddyCertificationsProvider.overrideWith(
               (ref) async => {
-                'buddy-1': [_instructorCredential],
+                'buddy-1': [_instructorCert],
               },
             ),
           ],
@@ -87,15 +102,15 @@ void main() {
       await tester.pumpAndSettle();
       await _openSheet(tester);
 
-      expect(
-        find.textContaining(_instructorCredential.displayLabel),
-        findsOneWidget,
-      );
+      // The subtitle comes from buddy.certificationLevel (already
+      // cert-derived), shown exactly once with no " | " doubled label.
+      expect(find.text('Instructor'), findsOneWidget);
+      expect(find.textContaining(' | '), findsNothing);
     });
 
     testWidgets(
       'role sheet lists Instructor first with a credential icon for a '
-      'credentialed buddy',
+      'buddy holding an instructor cert',
       (tester) async {
         _useTallScreen(tester);
         await tester.pumpWidget(
@@ -105,9 +120,9 @@ void main() {
               allBuddiesProvider.overrideWith(
                 (ref) async => [_credentialedBuddy, _plainBuddy],
               ),
-              allBuddyRolesProvider.overrideWith(
+              allBuddyCertificationsProvider.overrideWith(
                 (ref) async => {
-                  'buddy-1': [_instructorCredential],
+                  'buddy-1': [_instructorCert],
                 },
               ),
             ],
@@ -120,8 +135,8 @@ void main() {
         await tester.tap(find.text('Alice Instructor'));
         await tester.pumpAndSettle();
 
-        // Instructor appears above Buddy in the role sheet for a
-        // credentialed buddy.
+        // Instructor appears above Buddy in the role sheet for a buddy
+        // holding an instructor cert.
         final instructorCenter = tester.getCenter(find.text('Instructor')).dy;
         final buddyCenter = tester.getCenter(find.text('Buddy')).dy;
         expect(instructorCenter, lessThan(buddyCenter));
@@ -143,7 +158,7 @@ void main() {
     );
 
     testWidgets('role sheet keeps default order for a buddy with no '
-        'credentials', (tester) async {
+        'professional certs', (tester) async {
       _useTallScreen(tester);
       await tester.pumpWidget(
         testApp(
@@ -152,9 +167,9 @@ void main() {
             allBuddiesProvider.overrideWith(
               (ref) async => [_credentialedBuddy, _plainBuddy],
             ),
-            allBuddyRolesProvider.overrideWith(
+            allBuddyCertificationsProvider.overrideWith(
               (ref) async => {
-                'buddy-1': [_instructorCredential],
+                'buddy-1': [_instructorCert],
               },
             ),
           ],
@@ -172,7 +187,7 @@ void main() {
       final instructorCenter = tester.getCenter(find.text('Instructor')).dy;
       expect(buddyCenter, lessThan(instructorCenter));
 
-      // Buddy row (no credential) uses the default person icon.
+      // Buddy row (no professional cert) uses the default person icon.
       final buddyTile = find.ancestor(
         of: find.text('Buddy'),
         matching: find.byType(ListTile),

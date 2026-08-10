@@ -1515,35 +1515,10 @@ class AppLocalizationsAr extends AppLocalizations {
       'لا يوجد عدد كافٍ من الرفاق للدمج.';
 
   @override
-  String get buddies_section_professionalRoles => 'الأدوار المهنية';
-
-  @override
-  String get buddies_roles_addRole => 'إضافة دور';
-
-  @override
-  String get buddies_roles_role => 'الدور';
-
-  @override
-  String get buddies_roles_agency => 'الجهة';
-
-  @override
-  String get buddies_roles_credentialNumber => 'رقم الاعتماد';
-
-  @override
-  String get buddies_roles_removeTooltip => 'إزالة الدور';
-
-  @override
-  String get buddies_roles_emptyHint =>
-      'أضف بيانات اعتماد المدرب أو مدرب الغوص الرئيسي لإعادة استخدامها عند تسجيل الشهادات والدورات.';
-
-  @override
   String get buddies_instructorPicker_label => 'المدرب من قائمة الرفاق';
 
   @override
   String get buddies_instructorPicker_none => 'لا يوجد (إدخال يدوي)';
-
-  @override
-  String get buddies_detail_section_professionalRoles => 'الأدوار المهنية';
 
   @override
   String get certifications_appBar_addCertification => 'إضافة شهادة';
@@ -9121,24 +9096,6 @@ class AppLocalizationsAr extends AppLocalizations {
   String get enum_ascentRate_warning => 'تحذير';
 
   @override
-  String get enum_buddyRole_buddy => 'زميل غوص';
-
-  @override
-  String get enum_buddyRole_diveGuide => 'مرشد غوص';
-
-  @override
-  String get enum_buddyRole_diveMaster => 'مدرب غوص رئيسي';
-
-  @override
-  String get enum_buddyRole_instructor => 'مدرب';
-
-  @override
-  String get enum_buddyRole_solo => 'منفرد';
-
-  @override
-  String get enum_buddyRole_student => 'طالب';
-
-  @override
   String get enum_certificationAgency_bsac => 'BSAC';
 
   @override
@@ -9191,6 +9148,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get enum_certificationLevel_decompression => 'تخفيف الضغط';
+
+  @override
+  String get enum_certificationLevel_diveGuide => 'مرشد غوص';
 
   @override
   String get enum_certificationLevel_diveMaster => 'مدرب غوص رئيسي';

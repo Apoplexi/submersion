@@ -1530,37 +1530,11 @@ class AppLocalizationsPt extends AppLocalizations {
       'Companheiros insuficientes para mesclar.';
 
   @override
-  String get buddies_section_professionalRoles => 'Funções Profissionais';
-
-  @override
-  String get buddies_roles_addRole => 'Adicionar função';
-
-  @override
-  String get buddies_roles_role => 'Função';
-
-  @override
-  String get buddies_roles_agency => 'Agência';
-
-  @override
-  String get buddies_roles_credentialNumber => 'Número de credencial';
-
-  @override
-  String get buddies_roles_removeTooltip => 'Remover função';
-
-  @override
-  String get buddies_roles_emptyHint =>
-      'Adicione as credenciais de instrutor ou divemaster para reutilizá-las ao registrar certificações e cursos.';
-
-  @override
   String get buddies_instructorPicker_label =>
       'Instrutor da lista de companheiros';
 
   @override
   String get buddies_instructorPicker_none => 'Nenhum (entrada manual)';
-
-  @override
-  String get buddies_detail_section_professionalRoles =>
-      'Funções Profissionais';
 
   @override
   String get certifications_appBar_addCertification => 'Adicionar Certificacao';
@@ -9291,24 +9265,6 @@ class AppLocalizationsPt extends AppLocalizations {
   String get enum_ascentRate_warning => 'Alerta';
 
   @override
-  String get enum_buddyRole_buddy => 'Dupla';
-
-  @override
-  String get enum_buddyRole_diveGuide => 'Guia de Mergulho';
-
-  @override
-  String get enum_buddyRole_diveMaster => 'Divemaster';
-
-  @override
-  String get enum_buddyRole_instructor => 'Instrutor';
-
-  @override
-  String get enum_buddyRole_solo => 'Solo';
-
-  @override
-  String get enum_buddyRole_student => 'Aluno';
-
-  @override
   String get enum_certificationAgency_bsac => 'BSAC';
 
   @override
@@ -9361,6 +9317,9 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get enum_certificationLevel_decompression => 'Descompressao';
+
+  @override
+  String get enum_certificationLevel_diveGuide => 'Guia de Mergulho';
 
   @override
   String get enum_certificationLevel_diveMaster => 'Divemaster';

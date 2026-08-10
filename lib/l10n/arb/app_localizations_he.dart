@@ -1499,35 +1499,10 @@ class AppLocalizationsHe extends AppLocalizations {
       'אין מספיק חברי צוללים למיזוג.';
 
   @override
-  String get buddies_section_professionalRoles => 'תפקידים מקצועיים';
-
-  @override
-  String get buddies_roles_addRole => 'הוסף תפקיד';
-
-  @override
-  String get buddies_roles_role => 'תפקיד';
-
-  @override
-  String get buddies_roles_agency => 'גוף הסמכה';
-
-  @override
-  String get buddies_roles_credentialNumber => 'מספר הסמכה';
-
-  @override
-  String get buddies_roles_removeTooltip => 'הסר תפקיד';
-
-  @override
-  String get buddies_roles_emptyHint =>
-      'הוסף הסמכות מדריך או דייבמאסטר לשימוש חוזר בעת רישום הסמכות וקורסים.';
-
-  @override
   String get buddies_instructorPicker_label => 'מדריך מתוך חברי הצוללים';
 
   @override
   String get buddies_instructorPicker_none => 'ללא (הזנה ידנית)';
-
-  @override
-  String get buddies_detail_section_professionalRoles => 'תפקידים מקצועיים';
 
   @override
   String get certifications_appBar_addCertification => 'הוסף הסמכה';
@@ -9065,24 +9040,6 @@ class AppLocalizationsHe extends AppLocalizations {
   String get enum_ascentRate_warning => 'אזהרה';
 
   @override
-  String get enum_buddyRole_buddy => 'שותף';
-
-  @override
-  String get enum_buddyRole_diveGuide => 'מדריך צלילה';
-
-  @override
-  String get enum_buddyRole_diveMaster => 'דייבמאסטר';
-
-  @override
-  String get enum_buddyRole_instructor => 'מדריך';
-
-  @override
-  String get enum_buddyRole_solo => 'יחיד';
-
-  @override
-  String get enum_buddyRole_student => 'תלמיד';
-
-  @override
   String get enum_certificationAgency_bsac => 'BSAC';
 
   @override
@@ -9135,6 +9092,9 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get enum_certificationLevel_decompression => 'דקומפרסיה';
+
+  @override
+  String get enum_certificationLevel_diveGuide => 'מדריך צלילה';
 
   @override
   String get enum_certificationLevel_diveMaster => 'דייבמאסטר';

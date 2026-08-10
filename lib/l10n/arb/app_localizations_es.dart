@@ -1535,36 +1535,11 @@ class AppLocalizationsEs extends AppLocalizations {
       'No hay suficientes compañeros para combinar.';
 
   @override
-  String get buddies_section_professionalRoles => 'Roles Profesionales';
-
-  @override
-  String get buddies_roles_addRole => 'Agregar rol';
-
-  @override
-  String get buddies_roles_role => 'Rol';
-
-  @override
-  String get buddies_roles_agency => 'Agencia';
-
-  @override
-  String get buddies_roles_credentialNumber => 'Número de credencial';
-
-  @override
-  String get buddies_roles_removeTooltip => 'Quitar rol';
-
-  @override
-  String get buddies_roles_emptyHint =>
-      'Agrega las credenciales de instructor o divemaster para reutilizarlas al registrar certificaciones y cursos.';
-
-  @override
   String get buddies_instructorPicker_label =>
       'Instructor de la lista de compañeros';
 
   @override
   String get buddies_instructorPicker_none => 'Ninguno (entrada manual)';
-
-  @override
-  String get buddies_detail_section_professionalRoles => 'Roles Profesionales';
 
   @override
   String get certifications_appBar_addCertification => 'Agregar certificacion';
@@ -9293,24 +9268,6 @@ class AppLocalizationsEs extends AppLocalizations {
   String get enum_ascentRate_warning => 'Advertencia';
 
   @override
-  String get enum_buddyRole_buddy => 'Compañero';
-
-  @override
-  String get enum_buddyRole_diveGuide => 'Guía de buceo';
-
-  @override
-  String get enum_buddyRole_diveMaster => 'Divemaster';
-
-  @override
-  String get enum_buddyRole_instructor => 'Instructor';
-
-  @override
-  String get enum_buddyRole_solo => 'Solo';
-
-  @override
-  String get enum_buddyRole_student => 'Estudiante';
-
-  @override
   String get enum_certificationAgency_bsac => 'BSAC';
 
   @override
@@ -9364,6 +9321,9 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get enum_certificationLevel_decompression => 'Descompresión';
+
+  @override
+  String get enum_certificationLevel_diveGuide => 'Guía de Buceo';
 
   @override
   String get enum_certificationLevel_diveMaster => 'Divemaster';

@@ -5,7 +5,6 @@ import 'package:go_router/go_router.dart';
 import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/features/buddies/presentation/providers/buddy_providers.dart';
 import 'package:submersion/features/buddies/domain/entities/buddy.dart';
-import 'package:submersion/features/buddies/domain/entities/buddy_role_credential.dart';
 import 'package:submersion/features/certifications/domain/entities/certification.dart';
 import 'package:submersion/features/certifications/presentation/pages/certification_edit_page.dart';
 import 'package:submersion/features/certifications/presentation/providers/certification_providers.dart';
@@ -334,12 +333,13 @@ void main() {
         createdAt: DateTime.now(),
         updatedAt: DateTime.now(),
       );
-      final credential = BuddyRoleCredential(
-        id: 'cred-1',
+      final instructorCert = Certification(
+        id: 'cert-1',
         buddyId: 'buddy-1',
-        role: BuddyRole.instructor,
-        credentialNumber: '999-PADI',
+        name: 'Instructor',
         agency: CertificationAgency.padi,
+        level: CertificationLevel.instructor,
+        cardNumber: '999-PADI',
         createdAt: DateTime.now(),
         updatedAt: DateTime.now(),
       );
@@ -351,9 +351,9 @@ void main() {
             ...overrides,
             certificationRepositoryProvider.overrideWithValue(repository),
             allBuddiesProvider.overrideWith((ref) async => [buddy]),
-            allBuddyRolesProvider.overrideWith(
+            allBuddyCertificationsProvider.overrideWith(
               (ref) async => {
-                'buddy-1': [credential],
+                'buddy-1': [instructorCert],
               },
             ),
           ],
