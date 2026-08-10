@@ -28,8 +28,22 @@ class BleIoStream: NSObject, CBPeripheralDelegate {
     let peripheral: CBPeripheral
     private let centralManager: CBCentralManager
 
+    /// Which subscription the discovery state machine is waiting on. Telit
+    /// Terminal I/O devices subscribe to UART Credits TX before UART Data TX;
+    /// everything else goes straight to `.dataNotify`.
+    private enum NotifySetupStep {
+        case idle
+        case creditsNotify
+        case dataNotify
+    }
+
     private var writeCharacteristic: CBCharacteristic?
     private var notifyCharacteristic: CBCharacteristic?
+    /// UART Credits RX/TX, non-nil only for Telit Terminal I/O devices.
+    private var creditsWriteCharacteristic: CBCharacteristic?
+    private var creditsNotifyCharacteristic: CBCharacteristic?
+    private var creditsRequired = false
+    private var creditPolicy = TerminalIoCreditPolicy()
     private var discoveredServices: [(service: CBService, characteristics: [CBCharacteristic])] = []
     private var remainingServiceDiscoveries = 0
     private var discoverySignaled = false
@@ -37,14 +51,16 @@ class BleIoStream: NSObject, CBPeripheralDelegate {
     private let packetBuffer = PacketReadBuffer()
     private let writeSemaphore = DispatchSemaphore(value: 0)
     private let writeReadySemaphore = DispatchSemaphore(value: 0)
+    private let creditSemaphore = DispatchSemaphore(value: 0)
     private let connectSemaphore = DispatchSemaphore(value: 0)
     private let discoverSemaphore = DispatchSemaphore(value: 0)
 
     private var timeoutMs: Int = 10000
     private var connectError: Error?
     private var isReady = false
-    private var waitingForNotifyEnable = false
+    private var notifySetupStep: NotifySetupStep = .idle
     private var lastWriteError: Error?
+    private var lastCreditWriteError: Error?
     private var hasSeenNotify = false
     private var writeWithoutResponsePreferred = false
     private var consecutiveReadTimeouts = 0
@@ -115,12 +131,17 @@ class BleIoStream: NSObject, CBPeripheralDelegate {
 
         connectError = nil
         isReady = false
-        waitingForNotifyEnable = false
+        notifySetupStep = .idle
         discoverySignaled = false
         remainingServiceDiscoveries = 0
         discoveredServices.removeAll()
         writeCharacteristic = nil
         notifyCharacteristic = nil
+        creditsWriteCharacteristic = nil
+        creditsNotifyCharacteristic = nil
+        creditsRequired = false
+        creditPolicy = TerminalIoCreditPolicy()
+        lastCreditWriteError = nil
         hasSeenNotify = false
         writeWithoutResponsePreferred = false
         consecutiveReadTimeouts = 0
@@ -183,6 +204,13 @@ class BleIoStream: NSObject, CBPeripheralDelegate {
             centralManager.cancelPeripheralConnection(peripheral)
             return false
         }
+        // A Telit Terminal I/O module keeps its UART bridge closed until the
+        // client grants initial credits, so the first command write would fail
+        // outright without this (issue #923).
+        if !grantInitialCredits() {
+            centralManager.cancelPeripheralConnection(peripheral)
+            return false
+        }
         Thread.sleep(forTimeInterval: Self.notifySettleDelaySeconds)
         NativeLogger.d("BleIoStream", category: "BLE",
             "Post-notify settle delay complete (\(Int(Self.notifySettleDelaySeconds * 1000)) ms)")
@@ -190,6 +218,73 @@ class BleIoStream: NSObject, CBPeripheralDelegate {
             "Discovery ready (write=\(self.writeCharacteristic?.uuid.uuidString ?? "nil")"
                 + " notify=\(self.notifyCharacteristic?.uuid.uuidString ?? "nil"))")
         return true
+    }
+
+    // MARK: - Terminal I/O credits
+
+    /// Write the opening credit grant to Credits RX and wait for the
+    /// confirmation. A no-op (success) on devices with no credit
+    /// characteristics.
+    private func grantInitialCredits() -> Bool {
+        guard let creditsChar = creditsWriteCharacteristic else { return true }
+
+        let amount = TerminalIoCreditPolicy.initialGrant
+        drainSemaphore(creditSemaphore)
+        lastCreditWriteError = nil
+        NativeLogger.d("BleIoStream", category: "BLE",
+            "Terminal I/O: granting \(amount) initial credits on"
+                + " \(creditsChar.uuid.uuidString)")
+        peripheral.writeValue(Data([amount]), for: creditsChar, type: .withResponse)
+
+        if creditSemaphore.wait(timeout: .now() + .seconds(10)) == .timedOut {
+            return creditGrantFailed("timed out granting initial credits")
+        }
+        if let error = lastCreditWriteError {
+            return creditGrantFailed(
+                "initial credit grant failed: \(error.localizedDescription)")
+        }
+        creditPolicy.grantAccepted(amount)
+        NativeLogger.d("BleIoStream", category: "BLE",
+            "Terminal I/O: bridge open (credits=\(self.creditPolicy.credits))")
+        return true
+    }
+
+    /// Decide what a failed opening grant means for this module family.
+    ///
+    /// A Telit bridge carries nothing without credits, so the connection is
+    /// dead. The u-blox serial service treats flow control as optional and
+    /// already works with no handshake at all, so drop back to that rather
+    /// than fail a device that would otherwise download fine.
+    private func creditGrantFailed(_ reason: String) -> Bool {
+        if creditsRequired {
+            NativeLogger.e("BleIoStream", category: "BLE", "Terminal I/O: \(reason)")
+            return false
+        }
+        NativeLogger.w("BleIoStream", category: "BLE",
+            "Terminal I/O: \(reason); continuing without credit flow control")
+        creditsWriteCharacteristic = nil
+        return true
+    }
+
+    /// Account for one received packet and top the module back up when its
+    /// balance runs low, so a multi-thousand-notification logbook dump does
+    /// not stall once the opening grant is spent.
+    ///
+    /// Called on the CoreBluetooth delegate queue, so the write is issued
+    /// without waiting for its confirmation: blocking this queue starves
+    /// notification delivery and loses bytes (issue #394). CoreBluetooth
+    /// queues the write reliably, so the balance is credited here rather than
+    /// on confirmation -- a failure is reported by didWriteValueFor.
+    private func replenishCredits() {
+        guard let creditsChar = creditsWriteCharacteristic,
+            let grant = creditPolicy.packetReceived()
+        else { return }
+
+        peripheral.writeValue(Data([grant]), for: creditsChar, type: .withResponse)
+        creditPolicy.grantAccepted(grant)
+        let balance = creditPolicy.credits
+        NativeLogger.d("BleIoStream", category: "BLE",
+            "Terminal I/O: granted \(grant) more credits (balance=\(balance))")
     }
 
     // MARK: - C Callback Implementations
@@ -614,6 +709,7 @@ class BleIoStream: NSObject, CBPeripheralDelegate {
         // the download loses bytes (issue #394). append() is O(1) and the log
         // is dispatched off this queue by NativeLogger.
         packetBuffer.append(value)
+        replenishCredits()
         NativeLogger.d("BleIoStream", category: "BLE",
             "notify \(characteristic.uuid.uuidString)"
                 + " bytes=\(value.count)"
@@ -623,7 +719,6 @@ class BleIoStream: NSObject, CBPeripheralDelegate {
     func peripheral(_ peripheral: CBPeripheral,
                      didWriteValueFor characteristic: CBCharacteristic,
                      error: Error?) {
-        lastWriteError = error
         if let error {
             NativeLogger.e("BleIoStream", category: "BLE",
                 "didWriteValue error for \(characteristic.uuid.uuidString):"
@@ -632,33 +727,67 @@ class BleIoStream: NSObject, CBPeripheralDelegate {
             NativeLogger.d("BleIoStream", category: "BLE",
                 "didWriteValue ok for \(characteristic.uuid.uuidString)")
         }
+
+        // Credit grants share this callback with command writes but not their
+        // semaphore: signalling writeSemaphore here would release a command
+        // write that is still in flight and desynchronise the protocol.
+        if let credits = creditsWriteCharacteristic,
+            characteristic.uuid == credits.uuid {
+            lastCreditWriteError = error
+            creditSemaphore.signal()
+            return
+        }
+
+        lastWriteError = error
         writeSemaphore.signal()
     }
 
     func peripheral(_ peripheral: CBPeripheral,
                     didUpdateNotificationStateFor characteristic: CBCharacteristic,
                     error: Error?) {
-        guard let notify = notifyCharacteristic, characteristic.uuid == notify.uuid else {
-            return
+        let expected: CBCharacteristic?
+        switch notifySetupStep {
+        case .idle: return
+        case .creditsNotify: expected = creditsNotifyCharacteristic
+        case .dataNotify: expected = notifyCharacteristic
         }
-        guard waitingForNotifyEnable else { return }
-        waitingForNotifyEnable = false
+        guard let expected, characteristic.uuid == expected.uuid else { return }
 
+        let step = notifySetupStep
+        notifySetupStep = .idle
+
+        let failure: String?
         if let error {
+            failure = "failed enabling notify: \(error.localizedDescription)"
+        } else if !characteristic.isNotifying {
+            failure = "notify not active"
+        } else {
+            failure = nil
+        }
+
+        if let failure {
+            // A failed credits subscription is survivable on u-blox, whose
+            // flow control is optional; on Telit it is the end of the road.
+            if step == .creditsNotify, !creditsRequired {
+                _ = creditGrantFailed(failure)
+                creditsNotifyCharacteristic = nil
+                subscribeToDataNotifications()
+                return
+            }
             NativeLogger.e("BleIoStream", category: "BLE",
-                "Failed enabling notify for \(characteristic.uuid.uuidString):"
-                    + " \(error.localizedDescription)")
+                "\(failure) for \(characteristic.uuid.uuidString)")
             signalDiscoveryReady()
             return
         }
-        if !characteristic.isNotifying {
-            NativeLogger.w("BleIoStream", category: "BLE",
-                "Notify not active for \(characteristic.uuid.uuidString)")
-            signalDiscoveryReady()
-            return
-        }
+
         NativeLogger.d("BleIoStream", category: "BLE",
             "Notify enabled for \(characteristic.uuid.uuidString)")
+
+        if step == .creditsNotify {
+            // Credits TX is live; Data TX comes next.
+            subscribeToDataNotifications()
+            return
+        }
         isReady = true
         signalDiscoveryReady()
     }
@@ -696,6 +825,16 @@ class BleIoStream: NSObject, CBPeripheralDelegate {
 
         writeCharacteristic = writeChar
         notifyCharacteristic = notifyChar
+        if let credits = selection.terminalIoCredits {
+            creditsWriteCharacteristic = entry.characteristics[credits.writeIndex]
+            creditsNotifyCharacteristic = entry.characteristics[credits.notifyIndex]
+            creditsRequired = credits.required
+            NativeLogger.d("BleIoStream", category: "BLE",
+                "Credit flow control detected"
+                    + " (\(credits.required ? "Telit, required" : "u-blox, optional")):"
+                    + " creditsRx=\(entry.characteristics[credits.writeIndex].uuid.uuidString)"
+                    + " creditsTx=\(entry.characteristics[credits.notifyIndex].uuid.uuidString)")
+        }
         writeWithoutResponsePreferred = initialWriteWithoutResponsePreference(for: writeChar)
         NativeLogger.d("BleIoStream", category: "BLE",
             "Selected write=\(writeChar.uuid.uuidString)"
@@ -707,12 +846,28 @@ class BleIoStream: NSObject, CBPeripheralDelegate {
         NativeLogger.d("BleIoStream", category: "BLE",
             "Initial write mode preference:"
                 + " \(preferWithoutResponse ? "withoutResponse" : "withResponse")")
+        // Terminal I/O requires UART Credits TX to be subscribed before UART
+        // Data TX (Telit TIO Implementation Guide r04 sections 6.4 and 6.2,
+        // and the same order in Subsurface's qt-ble.cpp).
+        if let creditsNotify = creditsNotifyCharacteristic, !creditsNotify.isNotifying {
+            notifySetupStep = .creditsNotify
+            peripheral.setNotifyValue(true, for: creditsNotify)
+            return
+        }
+        subscribeToDataNotifications()
+    }
+
+    private func subscribeToDataNotifications() {
+        guard let notifyChar = notifyCharacteristic else {
+            signalDiscoveryReady()
+            return
+        }
         if notifyChar.isNotifying {
             isReady = true
             signalDiscoveryReady()
             return
         }
-        waitingForNotifyEnable = true
+        notifySetupStep = .dataNotify
         peripheral.setNotifyValue(true, for: notifyChar)
     }
 }

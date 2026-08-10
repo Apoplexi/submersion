@@ -17,6 +17,16 @@ typedef struct {
     gchar* notify_path;    // GATT characteristic object path for notify
     guint properties_sub;  // PropertiesChanged signal subscription
 
+    // Terminal I/O credit flow control. Both paths are NULL unless the device
+    // exposes a complete Telit or u-blox layout. On u-blox the same
+    // characteristic serves both roles.
+    gchar* credits_write_path;   // Credits RX (client -> module)
+    gchar* credits_notify_path;  // Credits TX (module -> client)
+    gint terminal_io_credits;
+    // Whether a failed opening grant is fatal (Telit) or falls back to running
+    // without flow control (u-blox, where it is optional).
+    gboolean credits_required;
+
     GMutex read_mutex;
     GCond read_cond;
     // Queue of GByteArray*, one entry per GATT notification.

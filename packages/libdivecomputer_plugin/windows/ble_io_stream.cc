@@ -33,6 +33,53 @@ const winrt::guid BleIoStream::kHalcyonSymbiosRxUuid{
     0x00000101, 0x8C3B, 0x4F2C,
     {0xA5, 0x9E, 0x8C, 0x08, 0x22, 0x4F, 0x32, 0x53}};
 
+// Telit/Stollmann Terminal I/O (TIO), service 0xFEFB.
+//
+// Heinrichs Weikamp computers built on the Telit (formerly Stollmann)
+// BlueMod+SR module -- the OSTC 2/3/4/Sport/cR/Plus family -- expose their
+// serial bridge behind this service with credit-based flow control (Telit
+// "TIO Implementation Guide" r04). The module carries no UART data until the
+// client subscribes to UART Credits TX and grants initial credits on UART
+// Credits RX, and it spends one credit per notification, so the balance must
+// also be topped up while a transfer runs. Without the handshake the very
+// first command write fails and libdivecomputer reports "Failed to send the
+// command" (issue #923, OSTC4).
+//
+// Subsurface implements the same handshake in core/qt-ble.cpp across the two
+// Heinrichs Weikamp module families, and both are handled here: Telit (0xFEFB,
+// four characteristics, credits mandatory) and the u-blox serial service
+// (...d701, two characteristics, credits optional -- the OSTC nano downloads
+// today with no handshake at all, #280/#394, so a rejected grant there falls
+// back to running without flow control instead of failing a working device).
+// Mirrors darwin's BleCharacteristicSelector + TerminalIoCreditPolicy.
+const winrt::guid BleIoStream::kTerminalIoServiceUuid{
+    0x0000FEFB, 0x0000, 0x1000,
+    {0x80, 0x00, 0x00, 0x80, 0x5F, 0x9B, 0x34, 0xFB}};
+const winrt::guid BleIoStream::kTerminalIoDataRxUuid{
+    0x00000001, 0x0000, 0x1000,
+    {0x80, 0x00, 0x00, 0x80, 0x25, 0x00, 0x00, 0x00}};
+const winrt::guid BleIoStream::kTerminalIoDataTxUuid{
+    0x00000002, 0x0000, 0x1000,
+    {0x80, 0x00, 0x00, 0x80, 0x25, 0x00, 0x00, 0x00}};
+const winrt::guid BleIoStream::kTerminalIoCreditsRxUuid{
+    0x00000003, 0x0000, 0x1000,
+    {0x80, 0x00, 0x00, 0x80, 0x25, 0x00, 0x00, 0x00}};
+const winrt::guid BleIoStream::kTerminalIoCreditsTxUuid{
+    0x00000004, 0x0000, 0x1000,
+    {0x80, 0x00, 0x00, 0x80, 0x25, 0x00, 0x00, 0x00}};
+
+// u-blox serial service: one characteristic carries data in both directions
+// and one carries credits in both directions.
+const winrt::guid BleIoStream::kUbloxServiceUuid{
+    0x2456E1B9, 0x26E2, 0x8F83,
+    {0xE7, 0x44, 0xF3, 0x4F, 0x01, 0xE9, 0xD7, 0x01}};
+const winrt::guid BleIoStream::kUbloxDataUuid{
+    0x2456E1B9, 0x26E2, 0x8F83,
+    {0xE7, 0x44, 0xF3, 0x4F, 0x01, 0xE9, 0xD7, 0x03}};
+const winrt::guid BleIoStream::kUbloxCreditsUuid{
+    0x2456E1B9, 0x26E2, 0x8F83,
+    {0xE7, 0x44, 0xF3, 0x4F, 0x01, 0xE9, 0xD7, 0x04}};
+
 static constexpr uint32_t kBleIoctlType = 'b';
 static constexpr uint32_t kBleIoctlGetName = 0;
 static constexpr uint32_t kBleIoctlGetPinCode = 1;
@@ -83,6 +130,9 @@ bool BleIoStream::DiscoverCharacteristics() {
         int score = -1;
         GattCharacteristic write{nullptr};
         GattCharacteristic notify{nullptr};
+        GattCharacteristic credits_write{nullptr};
+        GattCharacteristic credits_notify{nullptr};
+        bool credits_required = false;
     };
     Candidate best;
 
@@ -98,9 +148,23 @@ bool BleIoStream::DiscoverCharacteristics() {
         int best_write_score = -1;
         GattCharacteristic best_notify{nullptr};
         int best_notify_score = -1;
+        // Terminal I/O members of this service, if it is a TIO service.
+        GattCharacteristic tio_data_rx{nullptr};
+        GattCharacteristic tio_data_tx{nullptr};
+        GattCharacteristic tio_credits_rx{nullptr};
+        GattCharacteristic tio_credits_tx{nullptr};
+        GattCharacteristic ublox_data{nullptr};
+        GattCharacteristic ublox_credits{nullptr};
 
         for (auto const& ch : chars_result.Characteristics()) {
             auto props = ch.CharacteristicProperties();
+
+            if (ch.Uuid() == kTerminalIoDataRxUuid) tio_data_rx = ch;
+            if (ch.Uuid() == kTerminalIoDataTxUuid) tio_data_tx = ch;
+            if (ch.Uuid() == kTerminalIoCreditsRxUuid) tio_credits_rx = ch;
+            if (ch.Uuid() == kTerminalIoCreditsTxUuid) tio_credits_tx = ch;
+            if (ch.Uuid() == kUbloxDataUuid) ublox_data = ch;
+            if (ch.Uuid() == kUbloxCreditsUuid) ublox_credits = ch;
 
             // Evaluate as write candidate.
             if ((props & GattCharacteristicProperties::Write) !=
@@ -119,7 +183,9 @@ bool BleIoStream::DiscoverCharacteristics() {
                     ws += 2;
                 }
                 if (ch.Uuid() == kPreferredWriteUuid ||
-                    ch.Uuid() == kHalcyonSymbiosRxUuid) {
+                    ch.Uuid() == kHalcyonSymbiosRxUuid ||
+                    ch.Uuid() == kTerminalIoDataRxUuid ||
+                    ch.Uuid() == kUbloxDataUuid) {
                     ws += 1000;
                 }
                 if (ws > best_write_score) {
@@ -143,7 +209,9 @@ bool BleIoStream::DiscoverCharacteristics() {
                     ns += 2;
                 }
                 if (ch.Uuid() == kPreferredNotifyUuid ||
-                    ch.Uuid() == kHalcyonSymbiosTxUuid) {
+                    ch.Uuid() == kHalcyonSymbiosTxUuid ||
+                    ch.Uuid() == kTerminalIoDataTxUuid ||
+                    ch.Uuid() == kUbloxDataUuid) {
                     ns += 1000;
                 }
                 if (ns > best_notify_score) {
@@ -156,12 +224,30 @@ bool BleIoStream::DiscoverCharacteristics() {
         if (!best_write || !best_notify) continue;
 
         int service_score = best_write_score + best_notify_score;
-        if (service.Uuid() == kPreferredServiceUuid) {
+        if (service.Uuid() == kPreferredServiceUuid ||
+            service.Uuid() == kTerminalIoServiceUuid ||
+            service.Uuid() == kUbloxServiceUuid) {
             service_score += 1000;
         }
 
+        // Only run the handshake on a complete known layout, so every other
+        // device keeps today's plain write/notify behaviour. Telit needs all
+        // four UART characteristics; u-blox needs its data and credits pair.
+        GattCharacteristic credits_write{nullptr};
+        GattCharacteristic credits_notify{nullptr};
+        bool credits_required = false;
+        if (tio_data_rx && tio_data_tx && tio_credits_rx && tio_credits_tx) {
+            credits_write = tio_credits_rx;
+            credits_notify = tio_credits_tx;
+            credits_required = true;
+        } else if (ublox_data && ublox_credits) {
+            credits_write = ublox_credits;
+            credits_notify = ublox_credits;
+        }
+
         if (service_score > best.score) {
-            best = {service_score, best_write, best_notify};
+            best = {service_score, best_write, best_notify, credits_write,
+                    credits_notify, credits_required};
         }
     }
 
@@ -169,6 +255,41 @@ bool BleIoStream::DiscoverCharacteristics() {
 
     write_characteristic_ = best.write;
     notify_characteristic_ = best.notify;
+    credits_write_characteristic_ = best.credits_write;
+    credits_notify_characteristic_ = best.credits_notify;
+    credits_required_ = best.credits_required;
+
+    // Terminal I/O subscribes to UART Credits TX before UART Data TX (Telit
+    // TIO Implementation Guide r04 sections 6.4 and 6.2, and the same order in
+    // Subsurface's qt-ble.cpp). The payload is not consumed, but the module
+    // keeps the UART bridge closed until the subscription exists.
+    if (credits_notify_characteristic_) {
+        // Telit's UART Credits TX indicates; the u-blox credits characteristic
+        // notifies. Pick from the advertised properties rather than assuming.
+        auto credits_cccd_value =
+            ((credits_notify_characteristic_.CharacteristicProperties() &
+              GattCharacteristicProperties::Notify) !=
+             GattCharacteristicProperties::None)
+                ? GattClientCharacteristicConfigurationDescriptorValue::Notify
+                : GattClientCharacteristicConfigurationDescriptorValue::
+                      Indicate;
+
+        auto credits_cccd_result =
+            credits_notify_characteristic_
+                .WriteClientCharacteristicConfigurationDescriptorAsync(
+                    credits_cccd_value)
+                .get();
+        if (credits_cccd_result != GattCommunicationStatus::Success) {
+            if (credits_required_) return false;
+            // u-blox flow control is optional; fall back to running without it
+            // rather than failing a device that works today.
+            credits_notify_characteristic_ = nullptr;
+            credits_write_characteristic_ = nullptr;
+        } else {
+            credits_notify_token_ = credits_notify_characteristic_.ValueChanged(
+                {this, &BleIoStream::OnCharacteristicValueChanged});
+        }
+    }
 
     // Enable notifications.
     auto cccd_value =
@@ -191,12 +312,82 @@ bool BleIoStream::DiscoverCharacteristics() {
     notify_token_ = notify_characteristic_.ValueChanged(
         {this, &BleIoStream::OnCharacteristicValueChanged});
 
+    return GrantInitialCredits();
+}
+
+bool BleIoStream::GrantInitialCredits() {
+    if (!credits_write_characteristic_) return true;
+
+    bool granted = false;
+    try {
+        auto writer = DataWriter();
+        writer.WriteByte(kTerminalIoInitialGrant);
+        auto result =
+            credits_write_characteristic_
+                .WriteValueWithResultAsync(writer.DetachBuffer(),
+                                           GattWriteOption::WriteWithResponse)
+                .get();
+        granted = result.Status() == GattCommunicationStatus::Success;
+    } catch (...) {
+        granted = false;
+    }
+
+    if (!granted) {
+        // A Telit bridge carries nothing without credits, so the connection is
+        // dead. u-blox flow control is optional and the service already works
+        // with no handshake at all, so fall back to that instead.
+        if (credits_required_) return false;
+        std::lock_guard<std::mutex> lock(credits_mutex_);
+        credits_write_characteristic_ = nullptr;
+        return true;
+    }
+
+    {
+        std::lock_guard<std::mutex> lock(credits_mutex_);
+        terminal_io_credits_ = kTerminalIoInitialGrant;
+    }
     return true;
 }
 
+void BleIoStream::ReplenishCredits() {
+    std::lock_guard<std::mutex> lock(credits_mutex_);
+    if (!credits_write_characteristic_) return;
+
+    if (terminal_io_credits_ > 0) terminal_io_credits_--;
+    if (terminal_io_credits_ > kTerminalIoRefillThreshold) return;
+
+    const uint8_t grant = static_cast<uint8_t>(kTerminalIoInitialGrant -
+                                               kTerminalIoRefillThreshold);
+    try {
+        auto writer = DataWriter();
+        writer.WriteByte(grant);
+        // Fire-and-forget: this runs on the notification thread, and blocking
+        // it on the write result would stall notification delivery during a
+        // bulk logbook dump. The async operation owns its own lifetime and the
+        // completion handler captures nothing, so it stays valid even if this
+        // stream is torn down first.
+        auto operation =
+            credits_write_characteristic_.WriteValueWithResultAsync(
+                writer.DetachBuffer(), GattWriteOption::WriteWithResponse);
+        operation.Completed([](auto const&, auto const&) {});
+        terminal_io_credits_ += grant;
+    } catch (...) {
+        // Leave the balance untouched; the next notification retries. There
+        // are kTerminalIoRefillThreshold packets of slack to recover within.
+    }
+}
+
 void BleIoStream::OnCharacteristicValueChanged(
-    GattCharacteristic const&,
+    GattCharacteristic const& sender,
     GattValueChangedEventArgs const& args) {
+    // UART Credits TX shares this handler with UART Data TX but carries no
+    // application data: injecting its indications into the read queue would
+    // corrupt the protocol stream.
+    if (notify_characteristic_ &&
+        sender.AttributeHandle() != notify_characteristic_.AttributeHandle()) {
+        return;
+    }
+
     auto reader = DataReader::FromBuffer(args.CharacteristicValue());
     uint32_t length = reader.UnconsumedBufferLength();
     if (length == 0) return;
@@ -209,6 +400,10 @@ void BleIoStream::OnCharacteristicValueChanged(
         read_chunks_.push_back(std::move(data));
     }
     read_cv_.notify_one();
+
+    // Each packet the module sends costs it one credit; top it back up before
+    // the balance runs out or the transfer stalls part-way through.
+    ReplenishCredits();
 }
 
 libdc_io_callbacks_t BleIoStream::MakeCallbacks() {
@@ -226,6 +421,24 @@ libdc_io_callbacks_t BleIoStream::MakeCallbacks() {
 }
 
 void BleIoStream::Close() {
+    if (credits_notify_characteristic_) {
+        credits_notify_characteristic_.ValueChanged(credits_notify_token_);
+        try {
+            credits_notify_characteristic_
+                .WriteClientCharacteristicConfigurationDescriptorAsync(
+                    GattClientCharacteristicConfigurationDescriptorValue::
+                        None)
+                .get();
+        } catch (...) {
+        }
+        credits_notify_characteristic_ = nullptr;
+    }
+    {
+        std::lock_guard<std::mutex> lock(credits_mutex_);
+        credits_write_characteristic_ = nullptr;
+        terminal_io_credits_ = 0;
+    }
+    credits_required_ = false;
     if (notify_characteristic_) {
         notify_characteristic_.ValueChanged(notify_token_);
         try {

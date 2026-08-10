@@ -20,14 +20,61 @@ import java.util.concurrent.TimeUnit
 // Client Characteristic Configuration Descriptor UUID for enabling notifications.
 private val CCCD_UUID = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb")
 
+// Telit/Stollmann Terminal I/O (TIO), service 0xFEFB.
+//
+// Heinrichs Weikamp computers built on the Telit (formerly Stollmann)
+// BlueMod+SR module -- the OSTC 2/3/4/Sport/cR/Plus family -- expose their
+// serial bridge behind this service with credit-based flow control (Telit
+// "TIO Implementation Guide" r04). The module carries no UART data until the
+// client subscribes to UART Credits TX and grants initial credits on UART
+// Credits RX, and it spends one credit per notification, so the balance must
+// also be topped up while a transfer runs. Without the handshake the first
+// command write fails and libdivecomputer reports "Failed to send the
+// command" (issue #923, OSTC4).
+//
+// Subsurface implements the same handshake in core/qt-ble.cpp across the two
+// Heinrichs Weikamp module families, and both are handled here: Telit (0xFEFB,
+// four characteristics, credits mandatory) and the u-blox serial service
+// (...d701, two characteristics, credits optional -- the OSTC nano downloads
+// today with no handshake at all, #280/#394, so a rejected grant there falls
+// back to running without flow control instead of failing a working device).
+// Mirrors darwin's BleCharacteristicSelector + TerminalIoCreditPolicy.
+private val TIO_SERVICE_UUID = UUID.fromString("0000fefb-0000-1000-8000-00805f9b34fb")
+private val TIO_DATA_RX_UUID = UUID.fromString("00000001-0000-1000-8000-008025000000")
+private val TIO_DATA_TX_UUID = UUID.fromString("00000002-0000-1000-8000-008025000000")
+private val TIO_CREDITS_RX_UUID = UUID.fromString("00000003-0000-1000-8000-008025000000")
+private val TIO_CREDITS_TX_UUID = UUID.fromString("00000004-0000-1000-8000-008025000000")
+
+// u-blox serial service: one characteristic carries data in both directions
+// and one carries credits in both directions.
+private val UBLOX_SERVICE_UUID = UUID.fromString("2456e1b9-26e2-8f83-e744-f34f01e9d701")
+private val UBLOX_DATA_UUID = UUID.fromString("2456e1b9-26e2-8f83-e744-f34f01e9d703")
+private val UBLOX_CREDITS_UUID = UUID.fromString("2456e1b9-26e2-8f83-e744-f34f01e9d704")
+
+// Opening credit grant. 0xFF is reserved by the TIO protocol, so 254 is the
+// largest value that means "credits" rather than a control code.
+private const val TIO_INITIAL_GRANT = 254
+// Balance at or below which the client tops the module back up.
+private const val TIO_REFILL_THRESHOLD = 32
+
 // Preferred UUIDs for characteristic selection scoring (matching Darwin BleIoStream).
 // These ensure devices like Aqualung/Oceanic select the correct write and notify
 // characteristics when the service has multiple write-capable chars.
 private val PREFERRED_SERVICE_UUIDS = setOf(
-    UUID.fromString("cb3c4555-d670-4670-bc20-b61dbc851e9a")
+    UUID.fromString("cb3c4555-d670-4670-bc20-b61dbc851e9a"),
+    // Biased so the serial bridge always beats the Stollmann vendor service
+    // the same devices also advertise, which can tie on raw score.
+    TIO_SERVICE_UUID,
+    UBLOX_SERVICE_UUID
 )
 private val PREFERRED_WRITE_UUIDS = setOf(
     UUID.fromString("6606ab42-89d5-4a00-a8ce-4eb5e1414ee0"),
+    // Telit UART Data RX. Raw scoring already prefers it over UART Credits RX,
+    // but commands written to the credits characteristic would be silently
+    // swallowed, so the pair is pinned rather than left to the heuristic.
+    TIO_DATA_RX_UUID,
+    // u-blox FIFO, pinned over the credits characteristic for the same reason.
+    UBLOX_DATA_UUID,
     // Halcyon Symbios: the app writes commands to the device's Rx endpoint
     // (00000101). Both Symbios characteristics advertise read+write+indicate and
     // tie on raw score, so a preferred UUID is required to tell them apart. The
@@ -38,6 +85,11 @@ private val PREFERRED_WRITE_UUIDS = setOf(
 )
 private val PREFERRED_NOTIFY_UUIDS = setOf(
     UUID.fromString("a60b8e5c-b267-44d7-9764-837caf96489e"),
+    // Telit UART Data TX (see PREFERRED_WRITE_UUIDS).
+    TIO_DATA_TX_UUID,
+    // u-blox FIFO carries data in both directions, so it is the notify
+    // candidate as well as the write one.
+    UBLOX_DATA_UUID,
     // Halcyon Symbios: the device transmits replies on its Tx endpoint
     // (00000201) via indications; the app writes commands on 00000101 (see
     // PREFERRED_WRITE_UUIDS and issue #288).
@@ -61,8 +113,24 @@ class BleIoStream(
         private const val TAG = "BleIoStream"
     }
 
+    // Which step of the connection handshake is in flight. Telit Terminal I/O
+    // devices subscribe to UART Credits TX, then UART Data TX, then grant
+    // initial credits; everything else only does the DATA_NOTIFY step. Android
+    // permits one GATT operation at a time, so these must be chained through
+    // their completion callbacks rather than issued together.
+    private enum class SetupStep { NONE, CREDITS_NOTIFY, DATA_NOTIFY, INITIAL_CREDITS }
+
     private var gatt: BluetoothGatt? = null
     private var writeCharacteristic: BluetoothGattCharacteristic? = null
+    private var notifyCharacteristic: BluetoothGattCharacteristic? = null
+    // UART Credits RX/TX, non-null only on Telit Terminal I/O devices.
+    private var creditsWriteCharacteristic: BluetoothGattCharacteristic? = null
+    private var creditsNotifyCharacteristic: BluetoothGattCharacteristic? = null
+    private var credits = 0
+    // Whether a failed opening grant is fatal (Telit) or falls back to running
+    // without flow control (u-blox, where it is optional).
+    private var creditsRequired = false
+    private var setupStep = SetupStep.NONE
 
     private val readQueue = LinkedBlockingQueue<ByteArray>()
     private val writeSemaphore = Semaphore(0)
@@ -130,6 +198,9 @@ class BleIoStream(
             var bestServiceScore = -1
             var bestWrite: BluetoothGattCharacteristic? = null
             var bestNotify: BluetoothGattCharacteristic? = null
+            var bestCreditsWrite: BluetoothGattCharacteristic? = null
+            var bestCreditsNotify: BluetoothGattCharacteristic? = null
+            var bestCreditsRequired = false
 
             for (service in gatt.services) {
                 NativeLogger.d(TAG, "BLE", "Service: ${service.uuid}")
@@ -178,39 +249,67 @@ class BleIoStream(
                         bestServiceScore = score
                         bestWrite = serviceWrite
                         bestNotify = serviceNotify
+                        // Only run the handshake on a complete known layout, so
+                        // every other device keeps today's plain write/notify
+                        // path. Telit needs all four UART characteristics;
+                        // u-blox needs its data and credits pair.
+                        val tioCreditsRx = service.getCharacteristic(TIO_CREDITS_RX_UUID)
+                        val tioCreditsTx = service.getCharacteristic(TIO_CREDITS_TX_UUID)
+                        val ubloxCredits = service.getCharacteristic(UBLOX_CREDITS_UUID)
+                        if (tioCreditsRx != null && tioCreditsTx != null &&
+                            service.getCharacteristic(TIO_DATA_RX_UUID) != null &&
+                            service.getCharacteristic(TIO_DATA_TX_UUID) != null
+                        ) {
+                            bestCreditsWrite = tioCreditsRx
+                            bestCreditsNotify = tioCreditsTx
+                            bestCreditsRequired = true
+                        } else if (ubloxCredits != null &&
+                            service.getCharacteristic(UBLOX_DATA_UUID) != null
+                        ) {
+                            bestCreditsWrite = ubloxCredits
+                            bestCreditsNotify = ubloxCredits
+                            bestCreditsRequired = false
+                        } else {
+                            bestCreditsWrite = null
+                            bestCreditsNotify = null
+                            bestCreditsRequired = false
+                        }
                     }
                 }
             }
 
-            var startedDescriptorWrite = false
+            var startedSetup = false
             if (bestWrite != null && bestNotify != null) {
                 NativeLogger.d(TAG, "BLE", "Data service selected (score=$bestServiceScore)")
                 NativeLogger.d(TAG, "BLE", "  write=${bestWrite.uuid} notify=${bestNotify.uuid}")
                 writeCharacteristic = bestWrite
-                gatt.setCharacteristicNotification(bestNotify, true)
-                val descriptor = bestNotify.getDescriptor(CCCD_UUID)
-                NativeLogger.d(TAG, "BLE", "  CCCD descriptor: ${descriptor?.uuid ?: "NULL"}")
-                if (descriptor != null) {
-                    // Use ENABLE_INDICATION_VALUE for INDICATE-only chars,
-                    // ENABLE_NOTIFICATION_VALUE otherwise.
-                    descriptor.value = if (
-                        bestNotify.properties and BluetoothGattCharacteristic.PROPERTY_NOTIFY == 0 &&
-                        bestNotify.properties and BluetoothGattCharacteristic.PROPERTY_INDICATE != 0
-                    ) {
-                        BluetoothGattDescriptor.ENABLE_INDICATION_VALUE
-                    } else {
-                        BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
-                    }
-                    startedDescriptorWrite = gatt.writeDescriptor(descriptor)
-                    NativeLogger.d(TAG, "BLE", "  writeDescriptor returned: $startedDescriptorWrite")
+                notifyCharacteristic = bestNotify
+                creditsWriteCharacteristic = bestCreditsWrite
+                creditsNotifyCharacteristic = bestCreditsNotify
+                creditsRequired = bestCreditsRequired
+
+                // Terminal I/O subscribes to Credits TX before Data TX (Telit
+                // TIO Implementation Guide r04 sections 6.4 and 6.2, and the
+                // same order in Subsurface's qt-ble.cpp). The payload is never
+                // consumed, but the module keeps the UART bridge closed until
+                // the subscription exists.
+                val creditsNotify = bestCreditsNotify
+                startedSetup = if (creditsNotify != null) {
+                    NativeLogger.d(TAG, "BLE",
+                        "  Credit flow control detected" +
+                            " (${if (bestCreditsRequired) "Telit, required" else "u-blox, optional"}):" +
+                            " creditsRx=${bestCreditsWrite?.uuid} creditsTx=${creditsNotify.uuid}")
+                    subscribeToNotifications(gatt, creditsNotify, SetupStep.CREDITS_NOTIFY)
+                } else {
+                    subscribeToNotifications(gatt, bestNotify, SetupStep.DATA_NOTIFY)
                 }
             }
 
-            // If a CCCD descriptor write was started, wait for
-            // onDescriptorWrite before signalling ready. Otherwise
-            // the download may call writeCharacteristic while the
-            // descriptor write is still in flight, which silently fails.
-            if (!startedDescriptorWrite) {
+            // If a setup operation was started, wait for its completion
+            // callback before signalling ready. Otherwise the download may
+            // call writeCharacteristic while the descriptor write is still in
+            // flight, which silently fails.
+            if (!startedSetup) {
                 connectSemaphore.release()
             }
         }
@@ -221,8 +320,32 @@ class BleIoStream(
             status: Int
         ) {
             NativeLogger.d(TAG, "BLE", "onDescriptorWrite: ${descriptor.uuid} status=$status")
-            // CCCD write completed; notification subscription is active
-            // on the remote device and GATT is free for I/O.
+            val completed = setupStep
+            setupStep = SetupStep.NONE
+            val ok = status == BluetoothGatt.GATT_SUCCESS
+
+            // Credits TX is live; Data TX comes next, and the initial credit
+            // grant after that.
+            if (completed == SetupStep.CREDITS_NOTIFY && (ok || !creditsRequired)) {
+                if (!ok) abandonCreditFlowControl("credits subscription failed status=$status")
+                val notify = notifyCharacteristic
+                if (notify != null &&
+                    subscribeToNotifications(gatt, notify, SetupStep.DATA_NOTIFY)
+                ) {
+                    return
+                }
+            } else if (completed == SetupStep.DATA_NOTIFY && ok) {
+                if (creditsWriteCharacteristic == null) {
+                    // No credit flow control on this device, or already
+                    // abandoned: GATT is free for I/O.
+                } else if (grantInitialCredits(gatt)) {
+                    return
+                } else if (!creditsRequired) {
+                    abandonCreditFlowControl("initial credit write rejected")
+                }
+            }
+
+            // Nothing further in flight; GATT is free for I/O.
             connectSemaphore.release()
         }
 
@@ -234,7 +357,7 @@ class BleIoStream(
             value: ByteArray
         ) {
             NativeLogger.d(TAG, "BLE", "onCharacteristicChanged(API33+): ${value.size} bytes")
-            readQueue.offer(value)
+            onNotification(characteristic, value)
         }
 
         // Pre-API 33 fallback: notification data is on characteristic.value.
@@ -245,7 +368,7 @@ class BleIoStream(
         ) {
             val value = characteristic.value ?: return
             NativeLogger.d(TAG, "BLE", "onCharacteristicChanged(legacy): ${value.size} bytes")
-            readQueue.offer(value)
+            onNotification(characteristic, value)
         }
 
         override fun onCharacteristicWrite(
@@ -253,7 +376,125 @@ class BleIoStream(
             characteristic: BluetoothGattCharacteristic,
             status: Int
         ) {
+            // Credit grants share this callback with command writes but not
+            // their semaphore: releasing writeSemaphore here would free a
+            // command write that is still in flight and desynchronise the
+            // protocol.
+            if (characteristic.uuid == creditsWriteCharacteristic?.uuid) {
+                if (setupStep == SetupStep.INITIAL_CREDITS) {
+                    setupStep = SetupStep.NONE
+                    if (status == BluetoothGatt.GATT_SUCCESS) {
+                        credits = TIO_INITIAL_GRANT
+                        NativeLogger.d(TAG, "BLE",
+                            "Terminal I/O: bridge open (credits=$credits)")
+                    } else if (creditsRequired) {
+                        NativeLogger.e(TAG, "BLE",
+                            "Terminal I/O: initial credit grant failed status=$status")
+                    } else {
+                        abandonCreditFlowControl(
+                            "initial credit grant failed status=$status")
+                    }
+                    connectSemaphore.release()
+                }
+                return
+            }
             writeSemaphore.release()
+        }
+    }
+
+    // Route one notification, ignoring anything that is not the selected data
+    // characteristic. UART Credits TX carries no application data; injecting
+    // its indications into the read queue would corrupt the protocol stream.
+    private fun onNotification(
+        characteristic: BluetoothGattCharacteristic,
+        value: ByteArray
+    ) {
+        val notify = notifyCharacteristic
+        if (notify != null && characteristic.uuid != notify.uuid) return
+        readQueue.offer(value)
+        replenishCredits()
+    }
+
+    // Give up on credit flow control and run the connection without it.
+    //
+    // Only reachable for u-blox, whose serial service treats flow control as
+    // optional and already works with no handshake at all (#280, #394). A
+    // Telit bridge carries nothing without credits, so its failures are fatal
+    // and never come here.
+    private fun abandonCreditFlowControl(reason: String) {
+        NativeLogger.w(TAG, "BLE",
+            "Terminal I/O: $reason; continuing without credit flow control")
+        creditsWriteCharacteristic = null
+        creditsNotifyCharacteristic = null
+    }
+
+    // Subscribe to a characteristic and record which setup step is now in
+    // flight. Returns true if the descriptor write was accepted.
+    private fun subscribeToNotifications(
+        gatt: BluetoothGatt,
+        characteristic: BluetoothGattCharacteristic,
+        step: SetupStep
+    ): Boolean {
+        gatt.setCharacteristicNotification(characteristic, true)
+        val descriptor = characteristic.getDescriptor(CCCD_UUID)
+        NativeLogger.d(TAG, "BLE", "  CCCD descriptor: ${descriptor?.uuid ?: "NULL"}")
+        if (descriptor == null) return false
+
+        // Use ENABLE_INDICATION_VALUE for INDICATE-only chars (which is what
+        // UART Credits TX is), ENABLE_NOTIFICATION_VALUE otherwise.
+        descriptor.value = if (
+            characteristic.properties and BluetoothGattCharacteristic.PROPERTY_NOTIFY == 0 &&
+            characteristic.properties and BluetoothGattCharacteristic.PROPERTY_INDICATE != 0
+        ) {
+            BluetoothGattDescriptor.ENABLE_INDICATION_VALUE
+        } else {
+            BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
+        }
+        setupStep = step
+        val started = gatt.writeDescriptor(descriptor)
+        NativeLogger.d(TAG, "BLE", "  writeDescriptor returned: $started")
+        if (!started) setupStep = SetupStep.NONE
+        return started
+    }
+
+    // Write the opening credit grant to UART Credits RX. Returns true if the
+    // write was accepted, in which case onCharacteristicWrite finishes setup.
+    private fun grantInitialCredits(gatt: BluetoothGatt): Boolean {
+        val creditsChar = creditsWriteCharacteristic ?: return false
+        NativeLogger.d(TAG, "BLE",
+            "Terminal I/O: granting $TIO_INITIAL_GRANT initial credits")
+        creditsChar.value = byteArrayOf(TIO_INITIAL_GRANT.toByte())
+        creditsChar.writeType = BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT
+        setupStep = SetupStep.INITIAL_CREDITS
+        val started = gatt.writeCharacteristic(creditsChar)
+        if (!started) {
+            setupStep = SetupStep.NONE
+            NativeLogger.e(TAG, "BLE", "Terminal I/O: initial credit write rejected")
+        }
+        return started
+    }
+
+    // Account for one received packet and top the module back up when its
+    // balance runs low, so a multi-thousand-notification logbook dump does not
+    // stall once the opening grant is spent.
+    private fun replenishCredits() {
+        val creditsChar = creditsWriteCharacteristic ?: return
+        val g = gatt ?: return
+
+        if (credits > 0) credits--
+        if (credits > TIO_REFILL_THRESHOLD) return
+
+        val grant = TIO_INITIAL_GRANT - TIO_REFILL_THRESHOLD
+        creditsChar.value = byteArrayOf(grant.toByte())
+        creditsChar.writeType = BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT
+        // Android permits one GATT operation in flight, so a top-up issued
+        // while a command write is pending is refused. Commit the grant only
+        // when the request was accepted; otherwise the next packet retries,
+        // with TIO_REFILL_THRESHOLD packets of slack to recover within.
+        if (g.writeCharacteristic(creditsChar)) {
+            credits += grant
+            NativeLogger.d(TAG, "BLE",
+                "Terminal I/O: granted $grant more credits (balance=$credits)")
         }
     }
 
@@ -272,8 +513,12 @@ class BleIoStream(
             NativeLogger.e(TAG, "BLE", "connectAndDiscover: semaphore timeout")
             return false
         }
-        val ok = connected && writeCharacteristic != null
-        NativeLogger.d(TAG, "BLE", "connectAndDiscover: connected=$connected writeChar=${writeCharacteristic?.uuid} result=$ok")
+        // A Terminal I/O module keeps its UART bridge closed until credits are
+        // granted, so a failed handshake means the first command write would
+        // fail rather than the download merely being slow (issue #923).
+        val terminalIoReady = creditsWriteCharacteristic == null || credits > 0
+        val ok = connected && writeCharacteristic != null && terminalIoReady
+        NativeLogger.d(TAG, "BLE", "connectAndDiscover: connected=$connected writeChar=${writeCharacteristic?.uuid} credits=$credits result=$ok")
         return ok
     }
 
@@ -491,6 +736,11 @@ class BleIoStream(
         gatt?.disconnect()
         gatt?.close()
         gatt = null
+        creditsWriteCharacteristic = null
+        creditsNotifyCharacteristic = null
+        credits = 0
+        creditsRequired = false
+        setupStep = SetupStep.NONE
     }
 
     override fun onPinCodeRequired(address: String): String {

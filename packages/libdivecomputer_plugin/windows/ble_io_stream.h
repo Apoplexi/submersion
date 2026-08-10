@@ -83,12 +83,31 @@ class BleIoStream {
       winrt::Windows::Devices::Bluetooth::GenericAttributeProfile::
           GattValueChangedEventArgs const& args);
 
+  // Telit/Stollmann Terminal I/O credit handshake. See the block comment in
+  // ble_io_stream.cc and darwin's BleCharacteristicSelector.
+  bool GrantInitialCredits();
+  void ReplenishCredits();
+
   // Known service/characteristic UUIDs for dive computers.
   static const winrt::guid kPreferredServiceUuid;
   static const winrt::guid kPreferredWriteUuid;
   static const winrt::guid kPreferredNotifyUuid;
   static const winrt::guid kHalcyonSymbiosTxUuid;
   static const winrt::guid kHalcyonSymbiosRxUuid;
+  static const winrt::guid kTerminalIoServiceUuid;
+  static const winrt::guid kTerminalIoDataRxUuid;
+  static const winrt::guid kTerminalIoDataTxUuid;
+  static const winrt::guid kTerminalIoCreditsRxUuid;
+  static const winrt::guid kTerminalIoCreditsTxUuid;
+  static const winrt::guid kUbloxServiceUuid;
+  static const winrt::guid kUbloxDataUuid;
+  static const winrt::guid kUbloxCreditsUuid;
+
+  // Opening credit grant. 0xFF is reserved by the TIO protocol, so 254 is the
+  // largest value that means "credits" rather than a control code.
+  static constexpr uint8_t kTerminalIoInitialGrant = 254;
+  // Balance at or below which the client tops the module back up.
+  static constexpr int kTerminalIoRefillThreshold = 32;
 
   winrt::Windows::Devices::Bluetooth::BluetoothLEDevice device_{nullptr};
   // Held for the connection's lifetime to keep a throughput-optimized
@@ -103,6 +122,21 @@ class BleIoStream {
   winrt::Windows::Devices::Bluetooth::GenericAttributeProfile::
       GattCharacteristic notify_characteristic_{nullptr};
   winrt::event_token notify_token_;
+  // UART Credits RX/TX, non-null only on Telit Terminal I/O devices.
+  winrt::Windows::Devices::Bluetooth::GenericAttributeProfile::
+      GattCharacteristic credits_write_characteristic_{nullptr};
+  winrt::Windows::Devices::Bluetooth::GenericAttributeProfile::
+      GattCharacteristic credits_notify_characteristic_{nullptr};
+  winrt::event_token credits_notify_token_;
+  // Whether a failed opening grant is fatal (Telit) or falls back to running
+  // without flow control (u-blox, where it is optional).
+  bool credits_required_ = false;
+  // Credit balance. WinRT can dispatch ValueChanged on several thread-pool
+  // threads at once, so the decrement/check/grant sequence is guarded as a
+  // unit: two concurrent refills would credit the balance twice and later
+  // suppress a top-up the module actually needed.
+  std::mutex credits_mutex_;
+  int terminal_io_credits_ = 0;
 
   std::mutex read_mutex_;
   std::condition_variable read_cv_;
