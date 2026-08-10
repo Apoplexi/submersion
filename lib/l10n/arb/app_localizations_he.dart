@@ -11476,54 +11476,53 @@ class AppLocalizationsHe extends AppLocalizations {
   String get media_diveMediaSection_unlinkSuccess => 'קישור התמונה בוטל';
 
   @override
-  String get media_siteMediaSection_title => 'Site Media';
+  String get media_siteMediaSection_title => 'מדיה של האתר';
 
   @override
-  String get media_siteMediaSection_addPhotos => 'Add photos or videos';
+  String get media_siteMediaSection_addPhotos => 'הוספת תמונות או סרטונים';
 
   @override
-  String get media_siteMediaSection_addDocument => 'Add document';
+  String get media_siteMediaSection_addDocument => 'הוספת מסמך';
 
   @override
   String get media_siteMediaSection_emptyState =>
-      'No maps, photos, or documents attached to this site';
+      'אין מפות, תמונות או מסמכים המצורפים לאתר זה';
 
   @override
   String media_siteMediaSection_divePhotosGroup(int count) {
-    return 'Photos from dives here ($count)';
+    return 'תמונות מצלילות כאן ($count)';
   }
 
   @override
-  String get media_siteMediaSection_divePhotoLabel => 'Dive photo';
+  String get media_siteMediaSection_divePhotoLabel => 'תמונת צלילה';
 
   @override
   String media_siteMediaSection_unlinkSelectedTitle(int count) {
-    return 'Remove $count attachments?';
+    return 'להסיר $count קבצים מצורפים?';
   }
 
   @override
   String get media_siteMediaSection_unlinkSelectedContent =>
-      'The selected items will be removed from this site. Files in your photo library or on disk are not deleted.';
+      'הפריטים שנבחרו יוסרו מאתר זה. קבצים בספריית התמונות או בדיסק לא יימחקו.';
 
   @override
   String media_siteMediaSection_unlinkSelectedSuccess(int count) {
-    return 'Removed $count attachments';
+    return 'הוסרו $count קבצים מצורפים';
   }
 
   @override
-  String get media_documentViewer_title => 'Document';
+  String get media_documentViewer_title => 'מסמך';
 
   @override
-  String get media_documentViewer_unavailable =>
-      'This document is not available on this device';
+  String get media_documentViewer_unavailable => 'מסמך זה אינו זמין במכשיר זה';
 
   @override
   String get media_documentViewer_availableOnOriginDevice =>
-      'It is available on the device it was added from, or via a configured media store.';
+      'הוא זמין במכשיר שממנו נוסף, או דרך אחסון מדיה מוגדר.';
 
   @override
   String media_documentViewer_attached(int count) {
-    return 'Attached $count documents';
+    return 'צורפו $count מסמכים';
   }
 
   @override

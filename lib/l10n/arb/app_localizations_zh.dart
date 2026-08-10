@@ -11229,54 +11229,52 @@ class AppLocalizationsZh extends AppLocalizations {
   String get media_diveMediaSection_unlinkSuccess => '照片已取消关联';
 
   @override
-  String get media_siteMediaSection_title => 'Site Media';
+  String get media_siteMediaSection_title => '潜水点媒体';
 
   @override
-  String get media_siteMediaSection_addPhotos => 'Add photos or videos';
+  String get media_siteMediaSection_addPhotos => '添加照片或视频';
 
   @override
-  String get media_siteMediaSection_addDocument => 'Add document';
+  String get media_siteMediaSection_addDocument => '添加文档';
 
   @override
-  String get media_siteMediaSection_emptyState =>
-      'No maps, photos, or documents attached to this site';
+  String get media_siteMediaSection_emptyState => '此潜水点尚未附加地图、照片或文档';
 
   @override
   String media_siteMediaSection_divePhotosGroup(int count) {
-    return 'Photos from dives here ($count)';
+    return '此处潜水的照片（$count）';
   }
 
   @override
-  String get media_siteMediaSection_divePhotoLabel => 'Dive photo';
+  String get media_siteMediaSection_divePhotoLabel => '潜水照片';
 
   @override
   String media_siteMediaSection_unlinkSelectedTitle(int count) {
-    return 'Remove $count attachments?';
+    return '移除 $count 个附件？';
   }
 
   @override
   String get media_siteMediaSection_unlinkSelectedContent =>
-      'The selected items will be removed from this site. Files in your photo library or on disk are not deleted.';
+      '所选项目将从此潜水点移除。照片库或磁盘中的文件不会被删除。';
 
   @override
   String media_siteMediaSection_unlinkSelectedSuccess(int count) {
-    return 'Removed $count attachments';
+    return '已移除 $count 个附件';
   }
 
   @override
-  String get media_documentViewer_title => 'Document';
+  String get media_documentViewer_title => '文档';
 
   @override
-  String get media_documentViewer_unavailable =>
-      'This document is not available on this device';
+  String get media_documentViewer_unavailable => '此文档在本设备上不可用';
 
   @override
   String get media_documentViewer_availableOnOriginDevice =>
-      'It is available on the device it was added from, or via a configured media store.';
+      '它可在添加它的设备上使用，或通过已配置的媒体存储获取。';
 
   @override
   String media_documentViewer_attached(int count) {
-    return 'Attached $count documents';
+    return '已附加 $count 个文档';
   }
 
   @override

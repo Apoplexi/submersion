@@ -11768,54 +11768,54 @@ class AppLocalizationsPt extends AppLocalizations {
   String get media_diveMediaSection_unlinkSuccess => 'Foto desvinculada';
 
   @override
-  String get media_siteMediaSection_title => 'Site Media';
+  String get media_siteMediaSection_title => 'Mídia do ponto de mergulho';
 
   @override
-  String get media_siteMediaSection_addPhotos => 'Add photos or videos';
+  String get media_siteMediaSection_addPhotos => 'Adicionar fotos ou vídeos';
 
   @override
-  String get media_siteMediaSection_addDocument => 'Add document';
+  String get media_siteMediaSection_addDocument => 'Adicionar documento';
 
   @override
   String get media_siteMediaSection_emptyState =>
-      'No maps, photos, or documents attached to this site';
+      'Nenhum mapa, foto ou documento anexado a este ponto de mergulho';
 
   @override
   String media_siteMediaSection_divePhotosGroup(int count) {
-    return 'Photos from dives here ($count)';
+    return 'Fotos de mergulhos aqui ($count)';
   }
 
   @override
-  String get media_siteMediaSection_divePhotoLabel => 'Dive photo';
+  String get media_siteMediaSection_divePhotoLabel => 'Foto de mergulho';
 
   @override
   String media_siteMediaSection_unlinkSelectedTitle(int count) {
-    return 'Remove $count attachments?';
+    return 'Remover $count anexos?';
   }
 
   @override
   String get media_siteMediaSection_unlinkSelectedContent =>
-      'The selected items will be removed from this site. Files in your photo library or on disk are not deleted.';
+      'Os itens selecionados serão removidos deste ponto de mergulho. Os arquivos na sua galeria ou no disco não são excluídos.';
 
   @override
   String media_siteMediaSection_unlinkSelectedSuccess(int count) {
-    return 'Removed $count attachments';
+    return '$count anexos removidos';
   }
 
   @override
-  String get media_documentViewer_title => 'Document';
+  String get media_documentViewer_title => 'Documento';
 
   @override
   String get media_documentViewer_unavailable =>
-      'This document is not available on this device';
+      'Este documento não está disponível neste dispositivo';
 
   @override
   String get media_documentViewer_availableOnOriginDevice =>
-      'It is available on the device it was added from, or via a configured media store.';
+      'Ele está disponível no dispositivo em que foi adicionado, ou por meio de um armazenamento de mídia configurado.';
 
   @override
   String media_documentViewer_attached(int count) {
-    return 'Attached $count documents';
+    return '$count documentos anexados';
   }
 
   @override

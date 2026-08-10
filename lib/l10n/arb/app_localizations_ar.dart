@@ -11555,54 +11555,54 @@ class AppLocalizationsAr extends AppLocalizations {
   String get media_diveMediaSection_unlinkSuccess => 'تم إلغاء ربط الصورة';
 
   @override
-  String get media_siteMediaSection_title => 'Site Media';
+  String get media_siteMediaSection_title => 'وسائط الموقع';
 
   @override
-  String get media_siteMediaSection_addPhotos => 'Add photos or videos';
+  String get media_siteMediaSection_addPhotos => 'إضافة صور أو مقاطع فيديو';
 
   @override
-  String get media_siteMediaSection_addDocument => 'Add document';
+  String get media_siteMediaSection_addDocument => 'إضافة مستند';
 
   @override
   String get media_siteMediaSection_emptyState =>
-      'No maps, photos, or documents attached to this site';
+      'لا توجد خرائط أو صور أو مستندات مرفقة بهذا الموقع';
 
   @override
   String media_siteMediaSection_divePhotosGroup(int count) {
-    return 'Photos from dives here ($count)';
+    return 'صور من الغوصات هنا ($count)';
   }
 
   @override
-  String get media_siteMediaSection_divePhotoLabel => 'Dive photo';
+  String get media_siteMediaSection_divePhotoLabel => 'صورة غوص';
 
   @override
   String media_siteMediaSection_unlinkSelectedTitle(int count) {
-    return 'Remove $count attachments?';
+    return 'إزالة $count من المرفقات؟';
   }
 
   @override
   String get media_siteMediaSection_unlinkSelectedContent =>
-      'The selected items will be removed from this site. Files in your photo library or on disk are not deleted.';
+      'ستتم إزالة العناصر المحددة من هذا الموقع. لن يتم حذف الملفات في مكتبة الصور أو على القرص.';
 
   @override
   String media_siteMediaSection_unlinkSelectedSuccess(int count) {
-    return 'Removed $count attachments';
+    return 'تمت إزالة $count من المرفقات';
   }
 
   @override
-  String get media_documentViewer_title => 'Document';
+  String get media_documentViewer_title => 'مستند';
 
   @override
   String get media_documentViewer_unavailable =>
-      'This document is not available on this device';
+      'هذا المستند غير متاح على هذا الجهاز';
 
   @override
   String get media_documentViewer_availableOnOriginDevice =>
-      'It is available on the device it was added from, or via a configured media store.';
+      'وهو متاح على الجهاز الذي أُضيف منه، أو عبر مخزن وسائط مُهيأ.';
 
   @override
   String media_documentViewer_attached(int count) {
-    return 'Attached $count documents';
+    return 'تم إرفاق $count من المستندات';
   }
 
   @override

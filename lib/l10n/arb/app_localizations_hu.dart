@@ -11730,54 +11730,54 @@ class AppLocalizationsHu extends AppLocalizations {
   String get media_diveMediaSection_unlinkSuccess => 'Foto levalasztva';
 
   @override
-  String get media_siteMediaSection_title => 'Site Media';
+  String get media_siteMediaSection_title => 'Merülőhely médiafájljai';
 
   @override
-  String get media_siteMediaSection_addPhotos => 'Add photos or videos';
+  String get media_siteMediaSection_addPhotos => 'Fotók vagy videók hozzáadása';
 
   @override
-  String get media_siteMediaSection_addDocument => 'Add document';
+  String get media_siteMediaSection_addDocument => 'Dokumentum hozzáadása';
 
   @override
   String get media_siteMediaSection_emptyState =>
-      'No maps, photos, or documents attached to this site';
+      'Ehhez a merülőhelyhez nincs csatolva térkép, fotó vagy dokumentum';
 
   @override
   String media_siteMediaSection_divePhotosGroup(int count) {
-    return 'Photos from dives here ($count)';
+    return 'Fotók az itteni merülésekről ($count)';
   }
 
   @override
-  String get media_siteMediaSection_divePhotoLabel => 'Dive photo';
+  String get media_siteMediaSection_divePhotoLabel => 'Merülésfotó';
 
   @override
   String media_siteMediaSection_unlinkSelectedTitle(int count) {
-    return 'Remove $count attachments?';
+    return 'Eltávolítasz $count mellékletet?';
   }
 
   @override
   String get media_siteMediaSection_unlinkSelectedContent =>
-      'The selected items will be removed from this site. Files in your photo library or on disk are not deleted.';
+      'A kijelölt elemek eltávolításra kerülnek erről a merülőhelyről. A fotókönyvtárban vagy a lemezen lévő fájlok nem törlődnek.';
 
   @override
   String media_siteMediaSection_unlinkSelectedSuccess(int count) {
-    return 'Removed $count attachments';
+    return '$count melléklet eltávolítva';
   }
 
   @override
-  String get media_documentViewer_title => 'Document';
+  String get media_documentViewer_title => 'Dokumentum';
 
   @override
   String get media_documentViewer_unavailable =>
-      'This document is not available on this device';
+      'Ez a dokumentum nem érhető el ezen az eszközön';
 
   @override
   String get media_documentViewer_availableOnOriginDevice =>
-      'It is available on the device it was added from, or via a configured media store.';
+      'Azon az eszközön érhető el, amelyről hozzáadták, vagy egy beállított médiatárolón keresztül.';
 
   @override
   String media_documentViewer_attached(int count) {
-    return 'Attached $count documents';
+    return '$count dokumentum csatolva';
   }
 
   @override
