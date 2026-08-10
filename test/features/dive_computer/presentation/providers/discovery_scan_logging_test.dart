@@ -82,6 +82,32 @@ void main() {
       expect(notifier.state.errorMessage, isNotNull);
     });
 
+    test(
+      'drops the device subscription when starting discovery throws',
+      () async {
+        // The subscription is opened before startDiscovery is awaited, so a
+        // synchronous failure would otherwise leave it live and let a stray
+        // native event populate the list under an error message.
+        hostApi.startDiscoveryError = StateError('adapter unavailable');
+        await notifier.startScan();
+        await settle();
+
+        service.onDeviceDiscovered(
+          pigeon.DiscoveredDevice(
+            vendor: 'Suunto',
+            product: 'D5',
+            model: 2,
+            address: 'AA:BB:CC:DD:EE:FF',
+            name: 'Suunto D5',
+            transport: pigeon.TransportType.ble,
+          ),
+        );
+        await settle();
+
+        expect(notifier.state.discoveredDevices, isEmpty);
+      },
+    );
+
     test('logs a Bluetooth entry when a scan stops', () async {
       await notifier.startScan();
       await settle();

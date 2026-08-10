@@ -192,12 +192,17 @@ class DiscoveryNotifier extends StateNotifier<DiscoveryState> {
         category: LogCategory.bluetooth,
       );
       await _service.startDiscovery(pigeon.TransportType.ble);
-    } catch (e) {
+    } catch (e, stackTrace) {
       _discoveryLog.error(
         'Failed to start BLE scan',
         category: LogCategory.bluetooth,
         error: e,
+        stackTrace: stackTrace,
       );
+      // Cancel the event subscription so stray events from the native side
+      // cannot mutate state after a synchronous start failure.
+      _discoverySubscription?.cancel();
+      _discoverySubscription = null;
       state = state.copyWith(
         isScanning: false,
         errorMessage: 'Failed to start scanning: $e',
