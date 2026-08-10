@@ -69,6 +69,46 @@ class MediaRepository {
     }
   }
 
+  /// Get all media directly attached to a site, ordered by takenAt.
+  /// Enrichment rides along for rows that are also dive-linked.
+  Future<List<domain.MediaItem>> getMediaForSite(String siteId) async {
+    try {
+      final query =
+          _db.select(_db.media).join([
+              leftOuterJoin(
+                _db.mediaEnrichment,
+                _db.mediaEnrichment.mediaId.equalsExp(_db.media.id),
+              ),
+            ])
+            ..where(_db.media.siteId.equals(siteId))
+            ..orderBy([OrderingTerm.asc(_db.media.takenAt)]);
+
+      final rows = await query.get();
+      return rows.map((row) {
+        final mediaRow = row.readTable(_db.media);
+        final enrichmentRow = row.readTableOrNull(_db.mediaEnrichment);
+        return _mapRowToMediaItem(mediaRow, enrichmentRow);
+      }).toList();
+    } catch (e, stackTrace) {
+      _log.error(
+        'Failed to get media for site: $siteId',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      rethrow;
+    }
+  }
+
+  /// Count of media directly attached to a site (badges/headers).
+  Future<int> getMediaCountForSite(String siteId) async {
+    final count = _db.media.id.count();
+    final query = _db.selectOnly(_db.media)
+      ..addColumns([count])
+      ..where(_db.media.siteId.equals(siteId));
+    final row = await query.getSingle();
+    return row.read(count) ?? 0;
+  }
+
   /// Get single media item by ID
   /// Includes enrichment data (depth, temperature) if available
   Future<domain.MediaItem?> getMediaById(String id) async {
@@ -748,6 +788,52 @@ class MediaRepository {
     } catch (e, stackTrace) {
       _log.error(
         'Failed to get linked local paths for dive: $diveId',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      rethrow;
+    }
+  }
+
+  /// Site counterpart of [getLinkedAssetIdsForDive]: gallery-import dedupe
+  /// for direct site attachments.
+  Future<Set<String>> getLinkedAssetIdsForSite(String siteId) async {
+    try {
+      final result = await _db
+          .customSelect(
+            'SELECT platform_asset_id FROM media '
+            'WHERE site_id = ? AND platform_asset_id IS NOT NULL',
+            variables: [Variable.withString(siteId)],
+          )
+          .get();
+      return result
+          .map((row) => row.data['platform_asset_id'] as String)
+          .toSet();
+    } catch (e, stackTrace) {
+      _log.error(
+        'Failed to get linked asset IDs for site: $siteId',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      rethrow;
+    }
+  }
+
+  /// Site counterpart of [getLinkedLocalPathsForDive]: file-import dedupe
+  /// for direct site attachments.
+  Future<Set<String>> getLinkedLocalPathsForSite(String siteId) async {
+    try {
+      final result = await _db
+          .customSelect(
+            'SELECT local_path FROM media '
+            'WHERE site_id = ? AND local_path IS NOT NULL',
+            variables: [Variable.withString(siteId)],
+          )
+          .get();
+      return result.map((row) => row.data['local_path'] as String).toSet();
+    } catch (e, stackTrace) {
+      _log.error(
+        'Failed to get linked local paths for site: $siteId',
         error: e,
         stackTrace: stackTrace,
       );
