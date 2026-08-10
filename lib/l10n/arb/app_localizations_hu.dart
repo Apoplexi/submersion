@@ -1528,35 +1528,10 @@ class AppLocalizationsHu extends AppLocalizations {
       'Nincs elég búvártárs az összevonáshoz.';
 
   @override
-  String get buddies_section_professionalRoles => 'Szakmai szerepek';
-
-  @override
-  String get buddies_roles_addRole => 'Szerep hozzáadása';
-
-  @override
-  String get buddies_roles_role => 'Szerep';
-
-  @override
-  String get buddies_roles_agency => 'Szervezet';
-
-  @override
-  String get buddies_roles_credentialNumber => 'Igazolványszám';
-
-  @override
-  String get buddies_roles_removeTooltip => 'Szerep eltávolítása';
-
-  @override
-  String get buddies_roles_emptyHint =>
-      'Adja hozzá az oktatói vagy divemaster képesítéseket, hogy újra felhasználhassa őket képesítések és tanfolyamok rögzítésekor.';
-
-  @override
   String get buddies_instructorPicker_label => 'Oktató a búvártársak közül';
 
   @override
   String get buddies_instructorPicker_none => 'Nincs (kézi bevitel)';
-
-  @override
-  String get buddies_detail_section_professionalRoles => 'Szakmai szerepek';
 
   @override
   String get certifications_appBar_addCertification => 'Kepesites hozzaadasa';
@@ -9269,24 +9244,6 @@ class AppLocalizationsHu extends AppLocalizations {
   String get enum_ascentRate_warning => 'Figyelmeztetés';
 
   @override
-  String get enum_buddyRole_buddy => 'Buddy';
-
-  @override
-  String get enum_buddyRole_diveGuide => 'Merulesvezeto';
-
-  @override
-  String get enum_buddyRole_diveMaster => 'Divemaster';
-
-  @override
-  String get enum_buddyRole_instructor => 'Oktato';
-
-  @override
-  String get enum_buddyRole_solo => 'Solo';
-
-  @override
-  String get enum_buddyRole_student => 'Tanulo';
-
-  @override
   String get enum_certificationAgency_bsac => 'BSAC';
 
   @override
@@ -9339,6 +9296,9 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get enum_certificationLevel_decompression => 'Dekompresszio';
+
+  @override
+  String get enum_certificationLevel_diveGuide => 'Búvárvezető';
 
   @override
   String get enum_certificationLevel_diveMaster => 'Divemaster';

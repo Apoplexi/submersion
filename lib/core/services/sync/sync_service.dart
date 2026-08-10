@@ -1065,7 +1065,6 @@ class SyncService {
             hasUpdatedAt: true,
           ),
           (type: 'buddies', records: data.buddies, hasUpdatedAt: true),
-          (type: 'buddyRoles', records: data.buddyRoles, hasUpdatedAt: true),
           (type: 'diveCenters', records: data.diveCenters, hasUpdatedAt: true),
           (type: 'trips', records: data.trips, hasUpdatedAt: true),
           (
@@ -1808,7 +1807,6 @@ class SyncService {
     'divers': true,
     'diverSettings': true,
     'buddies': true,
-    'buddyRoles': true,
     'diveCenters': true,
     'trips': true,
     'liveaboardDetails': true,
@@ -1924,7 +1922,6 @@ class SyncService {
       (field: 'diveId', parent: 'dives', nullable: false),
       (field: 'buddyId', parent: 'buddies', nullable: false),
     ],
-    'buddyRoles': [(field: 'buddyId', parent: 'buddies', nullable: false)],
     'mediaEnrichment': [
       (field: 'mediaId', parent: 'media', nullable: false),
       (field: 'diveId', parent: 'dives', nullable: false),

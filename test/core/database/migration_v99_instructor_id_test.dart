@@ -2,31 +2,16 @@ import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/database/database.dart';
 
+/// v99 added the structured instructor link on certifications (issue #395):
+/// `certifications.instructor_id`, a nullable FK to buddies. (v99 also
+/// created the buddy_roles table historically; v145 folded those rows into
+/// certifications and dropped the table -- see
+/// migration_v145_fold_buddy_roles_test.dart -- so this file now covers only
+/// the instructor_id column.)
 void main() {
-  test('fresh v99 schema has buddy_roles table and '
-      'certifications.instructor_id', () async {
+  test('fresh v99+ schema has certifications.instructor_id', () async {
     final db = AppDatabase(NativeDatabase.memory());
     addTearDown(db.close);
-
-    // buddy_roles exists with the expected columns.
-    final roleCols = await db
-        .customSelect("PRAGMA table_info('buddy_roles')")
-        .get();
-    final roleColNames = roleCols.map((c) => c.read<String>('name')).toSet();
-    expect(
-      roleColNames,
-      containsAll([
-        'id',
-        'buddy_id',
-        'role',
-        'credential_number',
-        'agency',
-        'notes',
-        'created_at',
-        'updated_at',
-        'hlc',
-      ]),
-    );
 
     // certifications gained instructor_id.
     final certCols = await db
@@ -67,13 +52,12 @@ void main() {
     expect(await hasColumn(), isTrue);
   });
 
-  test('real onUpgrade from v98 adds instructor_id and creates buddy_roles, '
-      'preserving rows', () async {
+  test('real onUpgrade from v98 adds instructor_id, preserving rows', () async {
     final nativeDb = NativeDatabase.memory(
       setup: (rawDb) {
         rawDb.execute('PRAGMA user_version = 98');
-        // Minimal pre-v99 shapes: certifications without instructor_id, a
-        // buddies table for the new FKs to reference, and NO buddy_roles.
+        // Minimal pre-v99 shapes: certifications without instructor_id, and
+        // a buddies table for the new FK to reference.
         rawDb.execute('''
           CREATE TABLE buddies (
             id TEXT NOT NULL PRIMARY KEY,
@@ -111,25 +95,6 @@ void main() {
     final certColNames = certCols.map((c) => c.read<String>('name')).toSet();
     expect(certColNames, contains('instructor_id'));
 
-    final roleCols = await db
-        .customSelect("PRAGMA table_info('buddy_roles')")
-        .get();
-    final roleColNames = roleCols.map((c) => c.read<String>('name')).toSet();
-    expect(
-      roleColNames,
-      containsAll([
-        'id',
-        'buddy_id',
-        'role',
-        'credential_number',
-        'agency',
-        'notes',
-        'created_at',
-        'updated_at',
-        'hlc',
-      ]),
-    );
-
     // Existing rows survive and read the new column as NULL.
     final row = await db
         .customSelect(
@@ -141,7 +106,7 @@ void main() {
     expect(row.data['instructor_id'], isNull);
   });
 
-  test('schema version is at least 97 and the migration list includes it', () {
+  test('schema version is at least 99 and the migration list includes it', () {
     expect(AppDatabase.currentSchemaVersion, greaterThanOrEqualTo(99));
     expect(AppDatabase.migrationVersions, contains(99));
   });
@@ -150,8 +115,8 @@ void main() {
       'version collision', () async {
     // Reproduces the field failure: another branch build that also claims
     // schema version 99 advanced user_version past this branch's v99 block,
-    // so onUpgrade never runs here and buddy_roles/instructor_id are
-    // missing. The beforeOpen backstop must re-assert them anyway.
+    // so onUpgrade never runs here and instructor_id is missing. The
+    // beforeOpen backstop must re-assert it anyway.
     final nativeDb = NativeDatabase.memory(
       setup: (rawDb) {
         rawDb.execute(
@@ -187,12 +152,7 @@ void main() {
     addTearDown(() => db.close());
 
     // No migration runs (user_version == currentSchemaVersion); only the
-    // beforeOpen backstop can create the missing objects.
-    final roleCols = await db
-        .customSelect("PRAGMA table_info('buddy_roles')")
-        .get();
-    expect(roleCols, isNotEmpty, reason: 'buddy_roles must be re-asserted');
-
+    // beforeOpen backstop can create the missing column.
     final certCols = await db
         .customSelect("PRAGMA table_info('certifications')")
         .get();

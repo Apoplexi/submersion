@@ -2609,48 +2609,6 @@ abstract class AppLocalizations {
   /// **'Not enough buddies to merge.'**
   String get buddies_edit_merge_notEnoughBody;
 
-  /// No description provided for @buddies_section_professionalRoles.
-  ///
-  /// In en, this message translates to:
-  /// **'Professional Roles'**
-  String get buddies_section_professionalRoles;
-
-  /// No description provided for @buddies_roles_addRole.
-  ///
-  /// In en, this message translates to:
-  /// **'Add role'**
-  String get buddies_roles_addRole;
-
-  /// No description provided for @buddies_roles_role.
-  ///
-  /// In en, this message translates to:
-  /// **'Role'**
-  String get buddies_roles_role;
-
-  /// No description provided for @buddies_roles_agency.
-  ///
-  /// In en, this message translates to:
-  /// **'Agency'**
-  String get buddies_roles_agency;
-
-  /// No description provided for @buddies_roles_credentialNumber.
-  ///
-  /// In en, this message translates to:
-  /// **'Credential number'**
-  String get buddies_roles_credentialNumber;
-
-  /// No description provided for @buddies_roles_removeTooltip.
-  ///
-  /// In en, this message translates to:
-  /// **'Remove role'**
-  String get buddies_roles_removeTooltip;
-
-  /// No description provided for @buddies_roles_emptyHint.
-  ///
-  /// In en, this message translates to:
-  /// **'Add instructor or divemaster credentials to reuse them when logging certifications and courses.'**
-  String get buddies_roles_emptyHint;
-
   /// No description provided for @buddies_instructorPicker_label.
   ///
   /// In en, this message translates to:
@@ -2662,12 +2620,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'None (manual entry)'**
   String get buddies_instructorPicker_none;
-
-  /// No description provided for @buddies_detail_section_professionalRoles.
-  ///
-  /// In en, this message translates to:
-  /// **'Professional Roles'**
-  String get buddies_detail_section_professionalRoles;
 
   /// No description provided for @certifications_appBar_addCertification.
   ///
@@ -15705,42 +15657,6 @@ abstract class AppLocalizations {
   /// **'Warning'**
   String get enum_ascentRate_warning;
 
-  /// No description provided for @enum_buddyRole_buddy.
-  ///
-  /// In en, this message translates to:
-  /// **'Buddy'**
-  String get enum_buddyRole_buddy;
-
-  /// No description provided for @enum_buddyRole_diveGuide.
-  ///
-  /// In en, this message translates to:
-  /// **'Dive Guide'**
-  String get enum_buddyRole_diveGuide;
-
-  /// No description provided for @enum_buddyRole_diveMaster.
-  ///
-  /// In en, this message translates to:
-  /// **'Divemaster'**
-  String get enum_buddyRole_diveMaster;
-
-  /// No description provided for @enum_buddyRole_instructor.
-  ///
-  /// In en, this message translates to:
-  /// **'Instructor'**
-  String get enum_buddyRole_instructor;
-
-  /// No description provided for @enum_buddyRole_solo.
-  ///
-  /// In en, this message translates to:
-  /// **'Solo'**
-  String get enum_buddyRole_solo;
-
-  /// No description provided for @enum_buddyRole_student.
-  ///
-  /// In en, this message translates to:
-  /// **'Student'**
-  String get enum_buddyRole_student;
-
   /// No description provided for @enum_certificationAgency_bsac.
   ///
   /// In en, this message translates to:
@@ -15848,6 +15764,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Decompression'**
   String get enum_certificationLevel_decompression;
+
+  /// No description provided for @enum_certificationLevel_diveGuide.
+  ///
+  /// In en, this message translates to:
+  /// **'Dive Guide'**
+  String get enum_certificationLevel_diveGuide;
 
   /// No description provided for @enum_certificationLevel_diveMaster.
   ///

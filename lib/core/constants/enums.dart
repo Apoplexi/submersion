@@ -99,19 +99,6 @@ enum SpeciesCategory {
   const SpeciesCategory(this.displayName);
 }
 
-/// Buddy role on a dive
-enum BuddyRole {
-  buddy('Buddy'),
-  diveGuide('Dive Guide'),
-  instructor('Instructor'),
-  student('Student'),
-  diveMaster('Divemaster'),
-  solo('Solo');
-
-  final String displayName;
-  const BuddyRole(this.displayName);
-}
-
 /// Certification agencies
 enum CertificationAgency {
   padi('PADI'),
@@ -168,6 +155,7 @@ enum CertificationLevel {
   openWater('Open Water'),
   advancedOpenWater('Advanced Open Water'),
   rescue('Rescue Diver'),
+  diveGuide('Dive Guide'),
   diveMaster('Divemaster'),
   instructor('Instructor'),
   masterInstructor('Master Instructor'),
@@ -221,6 +209,22 @@ enum CertificationLevel {
 
   final String displayName;
   const CertificationLevel(this.displayName);
+
+  /// Grades that can independently certify students — drives the
+  /// instructor picker (spec 2026-08-08 buddy-professional-roles-fold).
+  /// Assistant-instructor grades are deliberately excluded.
+  bool get isInstructorLevel => switch (this) {
+    CertificationLevel.instructor ||
+    CertificationLevel.masterInstructor ||
+    CertificationLevel.courseDirector ||
+    CertificationLevel.cmas1StarInstructor ||
+    CertificationLevel.cmas2StarInstructor ||
+    CertificationLevel.cmas3StarInstructor ||
+    CertificationLevel.bsacOpenWaterInstructor ||
+    CertificationLevel.bsacAdvancedInstructor ||
+    CertificationLevel.bsacNationalInstructor => true,
+    _ => false,
+  };
 }
 
 /// Service type for equipment maintenance

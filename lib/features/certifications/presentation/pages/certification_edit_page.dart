@@ -553,18 +553,18 @@ class _CertificationEditPageState extends ConsumerState<CertificationEditPage> {
 
                   InstructorPickerField(
                     instructorId: _instructorId,
-                    onSelected: (buddy, credential) {
+                    onSelected: (buddy, instructorCert) {
                       setState(() {
                         _instructorId = buddy?.id;
                         _hasChanges = true;
                         if (buddy != null) {
                           // Snapshot the picked buddy fully: overwrite both
                           // name and number so switching to a buddy without a
-                          // credential number clears a stale one rather than
+                          // card number clears a stale one rather than
                           // leaving the previous selection's value behind.
                           _instructorNameController.text = buddy.name;
                           _instructorNumberController.text =
-                              credential?.credentialNumber ?? '';
+                              instructorCert?.cardNumber ?? '';
                         }
                         // Clearing to None keeps the text fields untouched.
                       });

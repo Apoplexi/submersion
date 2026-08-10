@@ -1750,29 +1750,6 @@ class DiveBuddies extends Table {
   Set<Column> get primaryKey => {id};
 }
 
-/// Professional credentials held by a buddy (instructor, divemaster,
-/// dive guide). One row per (buddy, role); the repository enforces that
-/// logical uniqueness. Issue #395.
-@DataClassName('BuddyRoleRow')
-class BuddyRoles extends Table {
-  TextColumn get id => text()();
-  TextColumn get buddyId =>
-      text().references(Buddies, #id, onDelete: KeyAction.cascade)();
-  TextColumn get role => text()(); // BuddyRole enum name
-  TextColumn get credentialNumber => text().nullable()();
-  TextColumn get agency => text().nullable()(); // CertificationAgency enum name
-  TextColumn get notes => text().withDefault(const Constant(''))();
-  IntColumn get createdAt => integer()();
-  IntColumn get updatedAt => integer()();
-
-  /// Hybrid Logical Clock for cross-device conflict resolution
-  /// (nullable: rows written before HLC rollout fall back to updatedAt).
-  TextColumn get hlc => text().nullable()();
-
-  @override
-  Set<Column> get primaryKey => {id};
-}
-
 /// Diver certifications
 class Certifications extends Table {
   TextColumn get id => text()();
@@ -1992,9 +1969,10 @@ const String kSeedBuiltInDiveTypesSql = '''
 ''';
 
 /// Per-dive role vocabulary: built-in + custom (v103, issues #551/#547).
-/// Built-in ids are the legacy BuddyRole enum names so existing
-/// dive_buddies.role strings resolve without data migration; custom ids
-/// are UUIDs so renames never break references.
+/// Built-in ids are the historical per-dive role names (buddy, diveGuide,
+/// instructor, student, diveMaster, solo) so existing dive_buddies.role
+/// strings resolve without data migration; custom ids are UUIDs so
+/// renames never break references.
 @DataClassName('DiveRoleRow')
 class DiveRoles extends Table {
   TextColumn get id => text()();
@@ -2878,7 +2856,6 @@ String legacyDataSourceId(String diveId) => '$kLegacyDataSourceIdPrefix$diveId';
     Settings,
     Buddies,
     DiveBuddies,
-    BuddyRoles,
     Certifications,
     ServiceRecords,
     DiveCenters,
@@ -2959,7 +2936,7 @@ class AppDatabase extends _$AppDatabase {
 
   /// The current schema version as a static constant so that pre-open checks
   /// (e.g. version-mismatch guard) can reference it without an instance.
-  static const int currentSchemaVersion = 146;
+  static const int currentSchemaVersion = 147;
 
   /// Every schema version that has a migration block in onUpgrade.
   /// Used to calculate progress step counts. When adding a new migration,
@@ -3148,6 +3125,11 @@ class AppDatabase extends _$AppDatabase {
     // v146: recompute machine-derived bottom times that the retired
     // square-profile heuristic collapsed on multilevel dives.
     146,
+    // v147: fold buddy_roles (professional credentials, issue #395) into
+    // buddy-owned certifications rows and drop the table (spec
+    // 2026-08-08-buddy-professional-roles-fold). Originally authored as v145;
+    // renumbered when PR #908 reserved 145 and v146 landed first.
+    147,
   ];
 
   /// Idempotent DDL for the v106 connector-suggestion columns (Lightroom
@@ -4132,6 +4114,106 @@ class AppDatabase extends _$AppDatabase {
     }
   }
 
+  /// Fold buddy professional credentials (buddy_roles, issue #395) into
+  /// buddy-owned certifications rows, then drop the table (v147; spec
+  /// 2026-08-08-buddy-professional-roles-fold). Invoked from onUpgrade AND
+  /// as a guarded beforeOpen backstop -- unlike the #553 inline-cert copy
+  /// (whose source columns survive until v110, so it must never run in
+  /// beforeOpen), this helper's own DROP TABLE makes the sqlite_master guard
+  /// below a strict no-op once buddy_roles is gone, so re-running it on
+  /// every open cannot resurrect a user-deleted cert. The beforeOpen call
+  /// exists purely to protect a DB whose user_version advanced past 145
+  /// (parallel-branch schema-version collision) without ever running the
+  /// v147 block, which would otherwise strand it with an orphaned
+  /// buddy_roles table nothing else reads. Ids are deterministic
+  /// (`buddyrolecert-<rowId>`): synced replicas share buddy_roles row ids,
+  /// so independent per-device migrations converge on identical cert rows
+  /// instead of duplicating.
+  Future<void> _migrateBuddyRolesToCertifications() async {
+    final tables = await customSelect(
+      "SELECT name FROM sqlite_master WHERE type='table' "
+      "AND name='buddy_roles'",
+    ).get();
+    if (tables.isEmpty) return;
+
+    const levelForRole = {
+      'instructor': 'instructor',
+      'diveMaster': 'diveMaster',
+      'diveGuide': 'diveGuide',
+    };
+    const nameForRole = {
+      'instructor': 'Instructor',
+      'diveMaster': 'Divemaster',
+      'diveGuide': 'Dive Guide',
+    };
+
+    // JOIN buddies so an orphaned credential row (FK-off test databases)
+    // can never fail the certifications FK on insert.
+    final rows = await customSelect(
+      'SELECT br.id, br.buddy_id, br.role, br.credential_number, br.agency, '
+      'br.notes, br.created_at, br.updated_at '
+      'FROM buddy_roles br JOIN buddies b ON b.id = br.buddy_id',
+    ).get();
+    for (final r in rows) {
+      final role = r.read<String>('role');
+      final level = levelForRole[role];
+      if (level == null) continue; // unknown role: feature is gone, drop it
+      final buddyId = r.read<String>('buddy_id');
+      final agency = r.read<String?>('agency') ?? 'other';
+      final cardNumber = r.read<String?>('credential_number');
+
+      // ORDER BY id keeps the backfill target deterministic across replicas
+      // when a buddy has multiple pre-existing certs at the same
+      // (agency, level) -- this migration runs independently per device.
+      final existing = await customSelect(
+        'SELECT id, card_number FROM certifications '
+        'WHERE buddy_id = ? AND agency = ? AND level = ? '
+        'ORDER BY id',
+        variables: [
+          Variable<String>(buddyId),
+          Variable<String>(agency),
+          Variable<String>(level),
+        ],
+      ).get();
+      if (existing.isNotEmpty) {
+        // Same fact already recorded as a certification. Backfill the card
+        // number when the cert lacks one -- the common "entered both halves"
+        // case -- otherwise leave the richer cert row alone.
+        final target = existing.first;
+        final existingNumber = target.read<String?>('card_number');
+        if ((existingNumber == null || existingNumber.isEmpty) &&
+            cardNumber != null &&
+            cardNumber.isNotEmpty) {
+          await customStatement(
+            'UPDATE certifications SET card_number = ? WHERE id = ?',
+            [cardNumber, target.read<String>('id')],
+          );
+        }
+        continue;
+      }
+
+      await customStatement(
+        'INSERT INTO certifications '
+        '(id, buddy_id, diver_id, name, agency, level, card_number, notes, '
+        'created_at, updated_at) '
+        'VALUES (?, ?, NULL, ?, ?, ?, ?, ?, ?, ?) '
+        'ON CONFLICT(id) DO NOTHING',
+        [
+          'buddyrolecert-${r.read<String>('id')}',
+          buddyId,
+          nameForRole[role]!,
+          agency,
+          level,
+          cardNumber,
+          r.read<String>('notes'),
+          r.read<int>('created_at'),
+          r.read<int>('updated_at'),
+        ],
+      );
+    }
+    await customStatement('DROP TABLE IF EXISTS buddy_roles');
+  }
+
   /// Human-readable name for a migrated buddy cert: the level's display name
   /// when present, else the agency's.
   String _displayNameForMigratedCert(String? level, String agency) {
@@ -4371,7 +4453,6 @@ class AppDatabase extends _$AppDatabase {
     'divers',
     'diver_settings',
     'buddies',
-    'buddy_roles',
     'dive_centers',
     'trips',
     'liveaboard_detail_records',
@@ -7136,13 +7217,17 @@ class AppDatabase extends _$AppDatabase {
         }
         if (from < 98) await reportProgress();
         if (from < 99) {
-          // Buddy professional credentials + structured instructor link on
-          // certifications (issue #395). PRAGMA-guarded so a healthy database
-          // no-ops and an interrupted upgrade does not fail on a duplicate
-          // ALTER. createTable is IF NOT EXISTS. (v99: renumbered from v94
-          // repeatedly as main claimed 94-96, then 97, then 98 while the
-          // branch was in review; a beforeOpen backstop re-asserts these
-          // objects too, so a version collision can't strand them.)
+          // Structured instructor link on certifications (issue #395).
+          // PRAGMA-guarded so a healthy database no-ops and an interrupted
+          // upgrade does not fail on a duplicate ALTER. (v99: renumbered
+          // from v94 repeatedly as main claimed 94-96, then 97, then 98
+          // while the branch was in review; a beforeOpen backstop
+          // re-asserts this object too, so a version collision can't
+          // strand it.)
+          //
+          // This block also created the buddy_roles table historically
+          // (buddy professional credentials); v147 folds those rows into
+          // certifications and drops the table.
           final certCols = await customSelect(
             "PRAGMA table_info('certifications')",
           ).get();
@@ -7157,7 +7242,6 @@ class AppDatabase extends _$AppDatabase {
               );
             }
           }
-          await m.createTable(buddyRoles);
         }
         if (from < 99) await reportProgress();
         if (from < 100) {
@@ -7573,6 +7657,13 @@ class AppDatabase extends _$AppDatabase {
           await _recomputeMultilevelBottomTimes();
         }
         if (from < 146) await reportProgress();
+        if (from < 147) {
+          // Fold buddy professional credentials into certifications and drop
+          // buddy_roles (spec 2026-08-08). Conversion + drop in one step; the
+          // sqlite_master guard makes a fresh v147 db a no-op.
+          await _migrateBuddyRolesToCertifications();
+        }
+        if (from < 147) await reportProgress();
       },
       beforeOpen: (details) async {
         // Enable foreign keys
@@ -7697,6 +7788,22 @@ class AppDatabase extends _$AppDatabase {
         await _assertVisibilityMetersColumn();
         await _assertVisibilityScaleColumns();
 
+        // v147 backstop: re-run the buddy_roles fold (parallel-branch
+        // schema-version collision self-heal). This is safe to re-run on
+        // every open, unlike the #553 inline-cert copy above, which must
+        // NEVER run here -- that helper's source columns (buddies.
+        // certification_level/_agency) survive until v110, so re-running it
+        // in beforeOpen would resurrect a user-deleted buddy cert from
+        // still-present source data. _migrateBuddyRolesToCertifications has
+        // no such hazard: its own DROP TABLE makes the sqlite_master guard a
+        // strict no-op the moment buddy_roles is gone, so there is no source
+        // data left to resurrect from. Its purpose here is purely to protect
+        // a DB whose user_version advanced past 145 without ever running the
+        // v147 block -- without this backstop, that DB would carry an
+        // orphaned buddy_roles table whose credentials silently vanish from
+        // the UI forever (nothing else reads that table).
+        await _migrateBuddyRolesToCertifications();
+
         // Built-in dive types are reference data: identical on every device and
         // undeletable through DiveTypeRepository. Nothing else restores them --
         // the seed runs only in onCreate and the one-shot v93 step -- yet a
@@ -7717,9 +7824,10 @@ class AppDatabase extends _$AppDatabase {
         // as the v77/v82/v83 sync-branch incidents): a parallel branch build
         // that claims the same schema version can advance user_version past
         // the v99 block without creating its objects, and no later migration
-        // would ever repair that. All DDL here is idempotent (createTable is
-        // IF NOT EXISTS; the ALTER is PRAGMA-guarded), so re-assert the v99
-        // objects on every open.
+        // would ever repair that. The ALTER is PRAGMA-guarded, so re-assert
+        // the v99 object on every open. (buddy_roles was also created here
+        // historically; v147 dropped it, so it must NOT be re-created below
+        // -- doing so would resurrect the dropped table on every open.)
         final certCols = await customSelect(
           "PRAGMA table_info('certifications')",
         ).get();
@@ -7732,7 +7840,6 @@ class AppDatabase extends _$AppDatabase {
             'REFERENCES buddies (id) ON DELETE SET NULL',
           );
         }
-        await createMigrator().createTable(buddyRoles);
 
         // v100 backstop: re-assert the dive plan tables (same collision
         // disease; createTable is idempotent). Their indexes
