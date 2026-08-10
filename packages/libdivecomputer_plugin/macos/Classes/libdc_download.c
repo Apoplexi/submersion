@@ -320,6 +320,15 @@ static void resolve_sample_locations(sample_state_t *state) {
 
     // Two different positions: the dive genuinely moved between the first and
     // last lock, so they are the entry and exit points.
+    //
+    // Exact equality is deliberate here, not an oversight. Every source
+    // quantizes to an integer before we see it -- int32 / 1e7 for Ratio, / 1e6
+    // for Halcyon and Divesoft, and an exactly-widened float32 for OSTC 4 --
+    // and this file only copies the value, so identical device bytes always
+    // produce bit-identical doubles. Equality therefore means "the device
+    // replayed the same record", which is the only case worth collapsing. A
+    // distance tolerance would instead discard real data: a shore dive exits a
+    // few metres from where it entered, and those are two genuine fixes.
     if (state->first_latitude != state->last_latitude ||
         state->first_longitude != state->last_longitude) {
         if (!state->has_field_entry) {
