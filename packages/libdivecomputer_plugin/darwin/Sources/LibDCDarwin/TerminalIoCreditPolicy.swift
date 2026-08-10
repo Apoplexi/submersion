@@ -46,8 +46,25 @@ struct TerminalIoCreditPolicy {
 
     private(set) var credits = 0
     private(set) var grantInFlight = false
+    /// Whether the opening grant has been confirmed.
+    private(set) var isOpen = false
 
-    /// Record a grant the module has confirmed receiving.
+    /// Record the confirmed opening grant, which starts credit accounting.
+    ///
+    /// Nothing is requested before this, because notifications are already
+    /// live by the time the opening grant is written -- the u-blox service in
+    /// particular streams with no credits at all. A refill requested in that
+    /// window would race the opening grant: two credit writes would be
+    /// outstanding on the same characteristic, their completions are
+    /// indistinguishable to the transport, and the balance would end up
+    /// counting both.
+    mutating func opened(with amount: UInt8) {
+        isOpen = true
+        grantInFlight = false
+        credits += Int(amount)
+    }
+
+    /// Record a mid-transfer grant the module has confirmed receiving.
     mutating func grantAccepted(_ amount: UInt8) {
         grantInFlight = false
         credits += Int(amount)
@@ -70,7 +87,9 @@ struct TerminalIoCreditPolicy {
         if credits > 0 {
             credits -= 1
         }
-        guard !grantInFlight, credits <= Self.refillThreshold else { return nil }
+        guard isOpen, !grantInFlight, credits <= Self.refillThreshold else {
+            return nil
+        }
         grantInFlight = true
         return Self.refillAmount
     }

@@ -258,7 +258,7 @@ class BleIoStream: NSObject, CBPeripheralDelegate {
             return creditGrantFailed(
                 "initial credit grant failed: \(error.localizedDescription)")
         }
-        creditPolicy.grantAccepted(amount)
+        creditPolicy.opened(with: amount)
         NativeLogger.d("BleIoStream", category: "BLE",
             "Terminal I/O: bridge open (credits=\(self.creditPolicy.credits))")
         return true

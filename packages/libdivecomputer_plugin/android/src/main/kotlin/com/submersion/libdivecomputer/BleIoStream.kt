@@ -133,6 +133,9 @@ class BleIoStream(
     // Set while a mid-transfer top-up holds the GATT gate. Only touched on the
     // GATT callback thread.
     private var creditTopUpInFlight = false
+    // Set once the opening grant is confirmed; top-ups stay suppressed until
+    // then so they cannot race the setup write.
+    private var creditsOpen = false
     // GATT status of the most recent command write, so writeLocked() can fail
     // a write the peripheral rejected instead of reporting it as sent.
     private var lastWriteStatus = BluetoothGatt.GATT_SUCCESS
@@ -446,6 +449,7 @@ class BleIoStream(
                     setupStep = SetupStep.NONE
                     if (status == BluetoothGatt.GATT_SUCCESS) {
                         credits = TIO_INITIAL_GRANT
+                        creditsOpen = true
                         NativeLogger.d(TAG, "BLE",
                             "Terminal I/O: bridge open (credits=$credits)")
                     } else if (creditsRequired) {
@@ -557,6 +561,14 @@ class BleIoStream(
     private fun replenishCredits() {
         val creditsChar = creditsWriteCharacteristic ?: return
         val g = gatt ?: return
+
+        // Nothing until the opening grant has been confirmed. Notifications go
+        // live before that write is issued -- the u-blox service streams with
+        // no credits at all -- and a refill requested in that window would put
+        // a second credit write on the wire alongside the opening one. Their
+        // completions are indistinguishable here, so the setup step and the
+        // top-up would be mis-attributed to each other.
+        if (!creditsOpen) return
 
         if (credits > 0) credits--
         if (credits > TIO_REFILL_THRESHOLD) return
@@ -880,6 +892,7 @@ class BleIoStream(
         creditsNotifyCharacteristic = null
         credits = 0
         creditsRequired = false
+        creditsOpen = false
         creditTopUpInFlight = false
         setupStep = SetupStep.NONE
     }

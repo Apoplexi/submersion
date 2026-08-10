@@ -354,6 +354,7 @@ bool BleIoStream::GrantInitialCredits() {
     {
         std::lock_guard<std::mutex> lock(credits_->mutex);
         credits_->credits = kTerminalIoInitialGrant;
+        credits_->open = true;
     }
     return true;
 }
@@ -377,6 +378,7 @@ void BleIoStream::ReleaseCreditCharacteristics() {
     credits_write_characteristic_ = nullptr;
     credits_->credits = 0;
     credits_->grant_in_flight = false;
+    credits_->open = false;
 }
 
 void BleIoStream::ReplenishCredits() {
@@ -388,6 +390,7 @@ void BleIoStream::ReplenishCredits() {
     {
         std::lock_guard<std::mutex> lock(credits->mutex);
         if (!credits_write_characteristic_) return;
+        if (!credits->open) return;
         if (credits->credits > 0) credits->credits--;
         if (credits->grant_in_flight) return;
         if (credits->credits > kTerminalIoRefillThreshold) return;

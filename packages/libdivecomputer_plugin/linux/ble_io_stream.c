@@ -151,6 +151,11 @@ struct BleCreditBalance {
     GMutex mutex;
     gint credits;
     gboolean grant_in_flight;
+    // Set once the opening grant is confirmed. Top-ups stay suppressed until
+    // then: notifications go live before that write is issued, and a refill
+    // requested in the window would put a second credit write on the wire
+    // beside it and count both grants.
+    gboolean open;
 };
 
 static struct BleCreditBalance* credit_balance_new(void) {
@@ -174,10 +179,12 @@ static void credit_balance_unref(struct BleCreditBalance* balance) {
 }
 
 // Set the balance to a known value, for setup and teardown.
-static void credit_balance_set(struct BleCreditBalance* balance, gint credits) {
+static void credit_balance_set(struct BleCreditBalance* balance, gint credits,
+                               gboolean open) {
     g_mutex_lock(&balance->mutex);
     balance->credits = credits;
     balance->grant_in_flight = FALSE;
+    balance->open = open;
     g_mutex_unlock(&balance->mutex);
 }
 
@@ -204,7 +211,7 @@ static void abandon_credit_flow_control(BleIoStream* stream,
     g_warning("BleIoStream: Terminal I/O: %s; "
               "continuing without credit flow control", reason);
     g_clear_pointer(&stream->credits_write_path, g_free);
-    credit_balance_set(stream->credits, 0);
+    credit_balance_set(stream->credits, 0, FALSE);
 
     // Unsubscribe rather than merely ignoring the credit indications, so the
     // module stops transmitting on a channel we have given up on and its
@@ -240,7 +247,7 @@ static gboolean grant_initial_credits(BleIoStream* stream) {
     }
     if (result) g_variant_unref(result);
 
-    credit_balance_set(stream->credits, TIO_INITIAL_GRANT);
+    credit_balance_set(stream->credits, TIO_INITIAL_GRANT, TRUE);
     return TRUE;
 }
 
@@ -277,6 +284,10 @@ static void replenish_credits(BleIoStream* stream) {
     // Take the decrement, the check and the claim as one unit, so two packets
     // arriving together cannot both start a grant.
     g_mutex_lock(&balance->mutex);
+    if (!balance->open) {
+        g_mutex_unlock(&balance->mutex);
+        return;
+    }
     if (balance->credits > 0) balance->credits--;
     if (balance->grant_in_flight || balance->credits > TIO_REFILL_THRESHOLD) {
         g_mutex_unlock(&balance->mutex);
@@ -915,7 +926,7 @@ void ble_io_stream_close(BleIoStream* stream) {
             "org.bluez.GattCharacteristic1", "StopNotify",
             NULL, NULL, G_DBUS_CALL_FLAGS_NONE, -1, NULL, NULL);
     }
-    credit_balance_set(stream->credits, 0);
+    credit_balance_set(stream->credits, 0, FALSE);
     stream->credits_required = FALSE;
 
     if (stream->connection && stream->properties_sub > 0) {

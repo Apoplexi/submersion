@@ -146,6 +146,11 @@ class BleIoStream {
     std::mutex mutex;
     int credits = 0;
     bool grant_in_flight = false;
+    // Set once the opening grant is confirmed. Top-ups stay suppressed until
+    // then: notifications go live before that write is issued, and a refill
+    // requested in the window would put a second credit write on the wire
+    // beside it and count both grants.
+    bool open = false;
   };
   std::shared_ptr<CreditBalance> credits_ =
       std::make_shared<CreditBalance>();

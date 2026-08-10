@@ -40,14 +40,14 @@ do {
 do {
     var policy = TerminalIoCreditPolicy()
     expect(policy.credits == 0, "fresh policy starts at zero credits")
-    policy.grantAccepted(TerminalIoCreditPolicy.initialGrant)
+    policy.opened(with: TerminalIoCreditPolicy.initialGrant)
     expect(policy.credits == 254, "opening grant credits the balance")
 }
 
 // 3. Packets below the threshold cost a credit but ask for nothing.
 do {
     var policy = TerminalIoCreditPolicy()
-    policy.grantAccepted(TerminalIoCreditPolicy.initialGrant)
+    policy.opened(with: TerminalIoCreditPolicy.initialGrant)
     let grants = drain(&policy, packets: 100)
     expect(grants.isEmpty, "no refill requested while the balance is healthy")
     expect(policy.credits == 154, "each packet spends exactly one credit")
@@ -58,7 +58,7 @@ do {
 // when 32 remain.
 do {
     var policy = TerminalIoCreditPolicy()
-    policy.grantAccepted(TerminalIoCreditPolicy.initialGrant)
+    policy.opened(with: TerminalIoCreditPolicy.initialGrant)
     let grants = drain(&policy, packets: 222)
     expect(grants == [222], "one refill of 222 requested on reaching the threshold")
     expect(policy.credits == 254, "refill restores the full balance")
@@ -69,7 +69,7 @@ do {
 // keep topping up and never let the balance reach zero.
 do {
     var policy = TerminalIoCreditPolicy()
-    policy.grantAccepted(TerminalIoCreditPolicy.initialGrant)
+    policy.opened(with: TerminalIoCreditPolicy.initialGrant)
     var minimumSeen = Int.max
     var refills = 0
     for _ in 0..<5000 {
@@ -89,7 +89,7 @@ do {
 // layer afterwards, so "accepted" is not "received".
 do {
     var policy = TerminalIoCreditPolicy()
-    policy.grantAccepted(TerminalIoCreditPolicy.initialGrant)
+    policy.opened(with: TerminalIoCreditPolicy.initialGrant)
     _ = drain(&policy, packets: 221)
     let first = policy.packetReceived()  // reaches the threshold
     expect(first == 222, "refill requested at the threshold")
@@ -109,7 +109,7 @@ do {
 // module's real one so a refill is always eventually triggered.
 do {
     var policy = TerminalIoCreditPolicy()
-    policy.grantAccepted(TerminalIoCreditPolicy.initialGrant)
+    policy.opened(with: TerminalIoCreditPolicy.initialGrant)
     _ = drain(&policy, packets: 222)  // one confirmed refill, balance back to 254
     var moduleBalance = 254
 
@@ -133,7 +133,7 @@ do {
 // be handed credits twice and the balance would overshoot.
 do {
     var policy = TerminalIoCreditPolicy()
-    policy.grantAccepted(TerminalIoCreditPolicy.initialGrant)
+    policy.opened(with: TerminalIoCreditPolicy.initialGrant)
     _ = drain(&policy, packets: 221)
     expect(policy.packetReceived() == 222, "first refill requested")
     expect(policy.packetReceived() == nil, "no second refill while one is outstanding")
@@ -142,15 +142,24 @@ do {
     expect(policy.credits == 252, "only the one confirmed grant is counted")
 }
 
-// 9. The counter cannot go negative even if more packets arrive than were paid
-// for (a stale notification delivered before the opening grant, say), so the
-// refill amount always stays a valid UInt8.
+// 9. Nothing is requested before the opening grant is confirmed. Notifications
+// are already live by the time that grant is written -- the u-blox service in
+// particular streams with no credits at all -- so packets can arrive during
+// the window. A refill requested there would put a second credit write on the
+// wire alongside the opening one; their completions are indistinguishable to
+// the transport, so it would mis-attribute them and count both grants.
 do {
     var policy = TerminalIoCreditPolicy()
-    let first = policy.packetReceived()
-    expect(first == 222, "an un-granted packet requests a refill")
-    for _ in 0..<9 { _ = policy.packetReceived() }
+    let grants = (0..<10).map { _ in policy.packetReceived() }
+    expect(grants.allSatisfy { $0 == nil },
+           "no refill is requested before the opening grant is confirmed")
     expect(policy.credits == 0, "balance floors at zero rather than going negative")
+    expect(!policy.grantInFlight, "no grant is left marked outstanding")
+
+    // Once opened, accounting proceeds normally despite those early packets.
+    policy.opened(with: TerminalIoCreditPolicy.initialGrant)
+    expect(policy.credits == 254, "opening grant credits the balance as usual")
+    expect(policy.packetReceived() == nil, "and refills resume their normal schedule")
 }
 
 if failures == 0 {
