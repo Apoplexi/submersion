@@ -1,6 +1,10 @@
-# Minimum iOS version for the app
-# iOS 14.0 required for CNAuthorizationStatusLimited (contacts permission)
-platform :ios, '14.0'
+# Minimum iOS version for the app. Keep in sync with IPHONEOS_DEPLOYMENT_TARGET
+# in Runner.xcodeproj and the ios platform in the local plugin podspecs.
+#
+# 15.0: App Store Connect rejects uploads with a MinimumOSVersion below 15.0
+#   starting Spring 2027 (ITMS-90068).
+# Never below 14.0: CNAuthorizationStatusLimited (contacts permission) needs it.
+platform :ios, '15.0'
 
 # CocoaPods analytics sends network stats synchronously affecting flutter build latency.
 ENV['COCOAPODS_DISABLE_STATS'] = 'true'
