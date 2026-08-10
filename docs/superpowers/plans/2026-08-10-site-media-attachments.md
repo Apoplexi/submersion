@@ -858,3 +858,443 @@ dart format .
 git add -A
 git commit -m "Add site media providers and mutation notifier"
 ```
+
+---
+
+## Phase 3: Shared grid extraction
+
+### Task 6: Extract shared media grid pieces
+
+**Files:**
+- Create: `lib/features/media/presentation/widgets/media_grid.dart`
+- Modify: `lib/features/media/presentation/widgets/dive_media_section.dart`
+- Test: existing `test/features/media/presentation/widgets/dive_media_section_test.dart` must keep passing; new `test/features/media/presentation/widgets/media_grid_test.dart`
+
+**Interfaces:**
+- Produces (all in `media_grid.dart`, all taking display strings as parameters — NO `context.l10n` inside these shared widgets, per the global l10n constraint):
+
+```dart
+class MediaSelectionHeader extends StatelessWidget {
+  final int selectedCount;
+  final int totalCount;
+  final VoidCallback onSelectAll;
+  final VoidCallback onCancel;
+  final VoidCallback onUnlinkSelected;
+  final String selectedCountLabel;   // e.g. l10n.media_diveMediaSection_selectedCount(n)
+  final String selectAllLabel;
+  final String cancelTooltip;
+  final String unlinkTooltip;
+  const MediaSelectionHeader({...});
+}
+
+class MediaEmptyState extends StatelessWidget {
+  final IconData icon;
+  final String message;
+  const MediaEmptyState({required this.icon, required this.message, ...});
+}
+
+class MediaThumbnailTile extends StatelessWidget {
+  final MediaItem item;
+  final AppSettings settings;
+  final bool isSelectionMode;
+  final bool isSelected;
+  final String semanticsLabel;
+  const MediaThumbnailTile({...});
+}
+
+class OrphanedMediaPlaceholder extends StatelessWidget { ... }
+```
+
+- [ ] **Step 1: Move the pieces**
+
+Create `media_grid.dart` by MOVING (not copying) these private classes out of `dive_media_section.dart`, renamed public:
+- `_SelectionHeader` -> `MediaSelectionHeader` (lines 467-514). Replace the four `context.l10n.*` calls with the new string parameters.
+- `_EmptyMediaState` -> `MediaEmptyState` (lines 517-551). Parameterize icon and message (`Icons.photo_camera_outlined` + `l10n.media_diveMediaSection_emptyState` become the dive call-site's arguments).
+- `_MediaThumbnailContent` -> `MediaThumbnailTile` (lines 559-688). Parameterize the semantics label. Keep the store badge, video badge, selection overlays, and depth badge exactly as they are (the depth badge self-hides when `item.enrichment == null`, so site usage needs no flag). Add ONE new branch after the video-icon block — the document tile treatment:
+
+```dart
+            // Document badge (top-right, mirrors the video badge slot)
+            if (item.isDocument && !isSelected)
+              Positioned(
+                top: 4,
+                right: 4,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 4,
+                    vertical: 2,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.black54,
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: Text(
+                    item.documentExtension.toUpperCase(),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 9,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
+```
+
+- `_OrphanedPlaceholder` -> `OrphanedMediaPlaceholder` (lines 691-708).
+
+Imports for the new file: copy from `dive_media_section.dart` (MediaItem, MediaItemView, MediaStoreBadge, UnitFormatter, settings providers, material).
+
+- [ ] **Step 2: Rewire `DiveMediaSection`**
+
+In `dive_media_section.dart`: import `media_grid.dart`; replace the four private-class usages with the public ones, passing the l10n strings at the call sites, e.g.:
+
+```dart
+              mediaAsync.whenOrNull(
+                    data: (media) => MediaSelectionHeader(
+                      selectedCount: _selectedIndices.length,
+                      totalCount: media.length,
+                      onSelectAll: () => _selectAll(media.length),
+                      onCancel: _exitSelectionMode,
+                      onUnlinkSelected: () => _unlinkSelected(context, media),
+                      selectedCountLabel: context.l10n
+                          .media_diveMediaSection_selectedCount(
+                            _selectedIndices.length,
+                          ),
+                      selectAllLabel: context
+                          .l10n.media_diveMediaSection_selectAllButton,
+                      cancelTooltip: context
+                          .l10n.media_diveMediaSection_cancelSelectionButton,
+                      unlinkTooltip: context.l10n
+                          .media_diveMediaSection_unlinkSelectedButton(
+                            _selectedIndices.length,
+                          ),
+                    ),
+                  ) ??
+                  const SizedBox.shrink()
+```
+
+and
+
+```dart
+                if (media.isEmpty) {
+                  return MediaEmptyState(
+                    icon: Icons.photo_camera_outlined,
+                    message: context.l10n.media_diveMediaSection_emptyState,
+                  );
+                }
+```
+
+and in the itemBuilder:
+
+```dart
+                  itemBuilder: (context, item, isSelected) {
+                    final thumbnail = MediaThumbnailTile(
+                      item: item,
+                      settings: settings,
+                      isSelectionMode: _isSelectionMode,
+                      isSelected: isSelected,
+                      semanticsLabel:
+                          context.l10n.media_diveMediaSection_thumbnailLabel,
+                    );
+                    ...
+```
+
+The orphaned branch inside `MediaThumbnailTile` moves WITH the tile (the tile itself decides `item.isOrphaned ? OrphanedMediaPlaceholder() : MediaItemView(...)`) so both sections get it for free — mirror how `_MediaThumbnailContent` currently receives the decision from outside (lines 589-597) by moving that `if` INSIDE the tile's build.
+
+- [ ] **Step 3: Write the grid test**
+
+Create `test/features/media/presentation/widgets/media_grid_test.dart` (harness copied from `dive_media_section_test.dart` — MaterialApp + ProviderScope with overrides):
+
+```dart
+  testWidgets('MediaEmptyState renders icon and message', (tester) async {
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: Scaffold(
+          body: MediaEmptyState(icon: Icons.map_outlined, message: 'No media'),
+        ),
+      ),
+    );
+    expect(find.text('No media'), findsOneWidget);
+    expect(find.byIcon(Icons.map_outlined), findsOneWidget);
+  });
+
+  testWidgets('MediaSelectionHeader disables unlink at zero selection',
+      (tester) async {
+    // pump with selectedCount: 0 and assert the delete IconButton onPressed
+    // is null; with selectedCount: 1 assert it is enabled.
+  });
+```
+
+(Do not attempt to render `MediaThumbnailTile` with a real item — it needs the resolver pipeline; the existing dive tests already cover the composed rendering paths.)
+
+- [ ] **Step 4: Run tests**
+
+Run: `flutter test test/features/media/presentation/widgets/media_grid_test.dart test/features/media/presentation/widgets/dive_media_section_test.dart test/features/media/presentation/widgets/dive_media_section_lightroom_test.dart`
+Expected: PASS — the refactor is behavior-preserving.
+
+- [ ] **Step 5: Format and commit**
+
+```bash
+dart format .
+git add -A
+git commit -m "Extract shared media grid pieces from DiveMediaSection"
+```
+
+---
+
+## Phase 4: Site UI
+
+### Task 7: Site media viewer page
+
+**Files:**
+- Create: `lib/features/media/presentation/pages/site_media_viewer_page.dart`
+- Test: `test/features/media/presentation/pages/site_media_viewer_page_test.dart` (create)
+
+**Interfaces:**
+- Consumes: `mediaForSiteProvider`, `flatMediaFromDivesAtSiteProvider` (Task 5), `MediaItemView`, `resolvedFullResolutionProvider`, `writeShareTempFile`.
+- Produces: `SiteMediaViewerPage({required String siteId, required String initialMediaId, required SiteViewerScope scope})` where `enum SiteViewerScope { attachments, divePhotos }` picks which list backs the pager.
+
+- [ ] **Step 1: Implement the page**
+
+Model on `trip_photo_viewer_page.dart` with these deltas (copy its structure wholesale, then apply):
+
+1. Class/fields:
+
+```dart
+enum SiteViewerScope { attachments, divePhotos }
+
+class SiteMediaViewerPage extends ConsumerStatefulWidget {
+  final String siteId;
+  final String initialMediaId;
+  final SiteViewerScope scope;
+
+  const SiteMediaViewerPage({
+    super.key,
+    required this.siteId,
+    required this.initialMediaId,
+    required this.scope,
+  });
+  ...
+}
+```
+
+2. List source in `build` — filter documents out (they open in `DocumentViewerPage`, not the photo pager):
+
+```dart
+    final sourceAsync = widget.scope == SiteViewerScope.attachments
+        ? ref.watch(mediaForSiteProvider(widget.siteId))
+        : ref.watch(flatMediaFromDivesAtSiteProvider(widget.siteId));
+    final mediaAsync = sourceAsync.whenData(
+      (list) => list.where((m) => !m.isDocument).toList(),
+    );
+```
+
+3. Drop the dive-context pieces: no `mediaForTripProvider` lookup, no `_findDiveForMedia`, no `PositionedMiniProfileOverlay`, and the bottom overlay passes `siteName: null` (delete the site-name row entirely). Everything else — immersive mode, `PhotoViewGallery` via `MediaItemView(fit: BoxFit.contain)`, swipe-down-to-close, share via `resolvedFullResolutionProvider` + `writeShareTempFile` + `SharePlus` — stays identical to the trip page (reuse its l10n keys `media_photoViewer_*`, which are viewer-generic).
+
+4. The private helper classes `_PhotoGallery`, `_TopOverlay`, `_BottomMetadataOverlay`, `_MetadataChip` are small and page-private in the trip file; replicate the ones you need privately in this file rather than exporting them from the trip page (they are 40-120 lines each; page-private duplication is the established pattern — the trip page itself duplicated them from `photo_viewer_page.dart`).
+
+- [ ] **Step 2: Write the smoke test**
+
+```dart
+  testWidgets('shows empty message when site has no photos', (tester) async {
+    // ProviderScope overriding mediaForSiteProvider('site-1') with
+    // AsyncValue.data(const <MediaItem>[]) via a FutureProvider override;
+    // pump SiteMediaViewerPage(siteId: 'site-1', initialMediaId: 'x',
+    // scope: SiteViewerScope.attachments) inside MaterialApp with l10n
+    // delegates; expect the media_photoViewer_noPhotosAvailable text.
+  });
+```
+
+Copy the l10n-capable MaterialApp harness from an existing page test (e.g. `test/features/media/presentation/widgets/dive_media_section_test.dart`).
+
+- [ ] **Step 3: Run tests**
+
+Run: `flutter test test/features/media/presentation/pages/site_media_viewer_page_test.dart`
+Expected: PASS.
+
+- [ ] **Step 4: Format and commit**
+
+```bash
+dart format .
+git add -A
+git commit -m "Add site-scoped media viewer page"
+```
+
+### Task 8: SiteMediaSection widget
+
+**Files:**
+- Create: `lib/features/media/presentation/widgets/site_media_section.dart`
+- Test: `test/features/media/presentation/widgets/site_media_section_test.dart` (create)
+
+**Interfaces:**
+- Consumes: Task 5 providers, Task 6 grid pieces, Task 7 viewer, `DocumentViewerPage` (Task 12 — until then, tapping a PDF routes through a callback, see below).
+- Produces: `SiteMediaSection({required String siteId, VoidCallback? onAddPhotosPressed, VoidCallback? onAddDocumentPressed, void Function(MediaItem)? onOpenDocument})` — the section renders the attachments grid + dive-photos group; add actions and document-opening are injected by the page (keeps this widget free of picker/viewer wiring, mirroring how `DiveMediaSection` takes `onAddPressed`).
+
+- [ ] **Step 1: Write the failing test**
+
+Create `test/features/media/presentation/widgets/site_media_section_test.dart` (harness from `dive_media_section_test.dart`, overriding `mediaForSiteProvider` / `mediaFromDivesAtSiteProvider` / `siteMediaListNotifierProvider` dependencies via a real container over the in-memory DB, or provider overrides — follow whichever style the dive test uses):
+
+```dart
+  testWidgets('empty state renders map icon and site empty message',
+      (tester) async {
+    // site with no media: expect l10n.media_siteMediaSection_emptyState text
+  });
+
+  testWidgets('add menu exposes photos and document actions', (tester) async {
+    // pump with onAddPhotosPressed/onAddDocumentPressed spies; tap the add
+    // icon; expect two menu entries; tap each; expect the spies fired.
+  });
+
+  testWidgets('dive photos group hidden when no dives have media',
+      (tester) async {
+    // mediaFromDivesAtSiteProvider -> {}: the ExpansionTile is absent.
+  });
+```
+
+- [ ] **Step 2: Run test to verify it fails**
+
+Run: `flutter test test/features/media/presentation/widgets/site_media_section_test.dart`
+Expected: FAIL — widget does not exist.
+
+- [ ] **Step 3: Implement**
+
+Create `site_media_section.dart`. Structure (follow `DiveMediaSection`'s state handling for selection mode; ~250 lines):
+
+```dart
+class SiteMediaSection extends ConsumerStatefulWidget {
+  final String siteId;
+  final VoidCallback? onAddPhotosPressed;
+  final VoidCallback? onAddDocumentPressed;
+  final void Function(MediaItem)? onOpenDocument;
+
+  const SiteMediaSection({
+    super.key,
+    required this.siteId,
+    this.onAddPhotosPressed,
+    this.onAddDocumentPressed,
+    this.onOpenDocument,
+  });
+  ...
+}
+```
+
+Build, inside a `Card` (same padding/typography as `DiveMediaSection`):
+
+1. Header row: `Icons.photo_library` icon, `context.l10n.media_siteMediaSection_title`, spacer, and a `PopupMenuButton<String>` with `Icons.add_photo_alternate` as its child exposing two items — `'photos'` (`l10n.media_siteMediaSection_addPhotos`) and `'document'` (`l10n.media_siteMediaSection_addDocument`) — dispatching to the two callbacks. In selection mode swap the header for `MediaSelectionHeader` wired to `siteMediaListNotifierProvider(widget.siteId).notifier.deleteMultipleMedia` with a confirm dialog (copy `_unlinkSelected` from `DiveMediaSection`, swapping the notifier and the l10n keys for the `media_siteMediaSection_*` variants).
+2. Attachments grid: `ref.watch(mediaForSiteProvider(widget.siteId))` -> empty: `MediaEmptyState(icon: Icons.map_outlined, message: l10n.media_siteMediaSection_emptyState)`; non-empty: `DragSelectGridView<MediaItem>` exactly as `DiveMediaSection` builds it (4 columns, shrinkWrap, `MediaThumbnailTile` items), with `onItemTap`:
+
+```dart
+                  onItemTap: (index) {
+                    final item = media[index];
+                    if (item.isDocument) {
+                      widget.onOpenDocument?.call(item);
+                      return;
+                    }
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        fullscreenDialog: true,
+                        builder: (_) => SiteMediaViewerPage(
+                          siteId: widget.siteId,
+                          initialMediaId: item.id,
+                          scope: SiteViewerScope.attachments,
+                        ),
+                      ),
+                    );
+                  },
+```
+
+3. Dive-photos group, collapsed by default so site reference material stays prominent (spec decision 2):
+
+```dart
+            final grouped =
+                ref.watch(mediaFromDivesAtSiteProvider(widget.siteId));
+            ...
+            if (flat.isNotEmpty)
+              ExpansionTile(
+                tilePadding: EdgeInsets.zero,
+                initiallyExpanded: false,
+                title: Text(
+                  context.l10n.media_siteMediaSection_divePhotosGroup(
+                    flat.length,
+                  ),
+                  style: textTheme.titleSmall,
+                ),
+                children: [
+                  GridView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 4,
+                          crossAxisSpacing: 8,
+                          mainAxisSpacing: 8,
+                        ),
+                    itemCount: flat.length,
+                    itemBuilder: (context, index) => GestureDetector(
+                      onTap: () => Navigator.of(context).push(
+                        MaterialPageRoute(
+                          fullscreenDialog: true,
+                          builder: (_) => SiteMediaViewerPage(
+                            siteId: widget.siteId,
+                            initialMediaId: flat[index].id,
+                            scope: SiteViewerScope.divePhotos,
+                          ),
+                        ),
+                      ),
+                      child: MediaThumbnailTile(
+                        item: flat[index],
+                        settings: settings,
+                        isSelectionMode: false,
+                        isSelected: false,
+                        semanticsLabel: context
+                            .l10n.media_siteMediaSection_divePhotoLabel,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+```
+
+where `flat` is the grouped map's values flattened in `takenAt` order (compute inline; the dive-photos group is read-only, no selection mode).
+
+- [ ] **Step 4: Add the l10n keys (English only for now)**
+
+Add to `lib/l10n/arb/app_en.arb` (full-locale sweep happens in Task 14):
+
+```json
+  "media_siteMediaSection_title": "Site Media",
+  "media_siteMediaSection_addPhotos": "Add photos or videos",
+  "media_siteMediaSection_addDocument": "Add document",
+  "media_siteMediaSection_emptyState": "No maps, photos, or documents attached to this site",
+  "media_siteMediaSection_divePhotosGroup": "Photos from dives here ({count})",
+  "@media_siteMediaSection_divePhotosGroup": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "media_siteMediaSection_divePhotoLabel": "Dive photo",
+  "media_siteMediaSection_unlinkSelectedTitle": "Remove {count} attachments?",
+  "@media_siteMediaSection_unlinkSelectedTitle": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "media_siteMediaSection_unlinkSelectedContent": "The selected items will be removed from this site. Files in your photo library or on disk are not deleted.",
+  "@media_siteMediaSection_unlinkSelectedContent": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "media_siteMediaSection_unlinkSelectedSuccess": "Removed {count} attachments",
+  "@media_siteMediaSection_unlinkSelectedSuccess": {
+    "placeholders": { "count": { "type": "int" } }
+  }
+```
+
+Match the exact placeholder/metadata style of the neighboring `media_diveMediaSection_*` keys in `app_en.arb` (open them and copy the format — some use `num` with plurals; mirror whichever form the dive keys use). Run `flutter gen-l10n`. Other locales get a temporary English copy ONLY if `flutter analyze` requires all locales to define every key (it does — untranslated keys fail generation); in that case copy the English strings into the other 10 ARBs now and mark Task 14 as the translation pass.
+
+- [ ] **Step 5: Run tests**
+
+Run: `flutter test test/features/media/presentation/widgets/site_media_section_test.dart`
+Expected: PASS.
+
+- [ ] **Step 6: Format and commit**
+
+```bash
+dart format .
+git add -A
+git commit -m "Add SiteMediaSection with attachments grid and dive photos group"
+```
