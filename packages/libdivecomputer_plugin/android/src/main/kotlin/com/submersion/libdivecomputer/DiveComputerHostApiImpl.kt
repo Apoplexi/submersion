@@ -165,7 +165,12 @@ class DiveComputerHostApiImpl(
         // BleScanner identifies devices via LibdcWrapper.nativeDescriptorMatch on
         // the (async) scan-result thread. Bail with a clear error if the native
         // library never loaded, rather than crashing there (issue #318).
-        if (!nativeLibraryReady()) return
+        // Signal completion on the way out so the scan UI stops spinning
+        // instead of waiting for results that can never arrive (issue #123).
+        if (!nativeLibraryReady()) {
+            mainHandler.post { flutterApi.onDiscoveryComplete { } }
+            return
+        }
 
         val scanner = BleScanner(context)
         scanner.onDeviceDiscovered = { device ->
