@@ -14680,6 +14680,14 @@ class AppLocalizationsAr extends AppLocalizations {
       'اختر مجلدًا متزامنًا (Dropbox، Google Drive، إلخ)';
 
   @override
+  String get settings_storage_customFolder_subtitleDeviceOnly =>
+      'نقل قاعدة البيانات إلى التخزين الداخلي أو بطاقة SD';
+
+  @override
+  String get settings_storage_customFolder_deviceOnly_noCloudSync =>
+      'المزامنة السحابية التي يديرها التطبيق معطَّلة ما دامت قاعدة البيانات موجودة على وحدة تخزين في الجهاز. لا يمكن لأي خدمة مزامنة الوصول إلى هذا المجلد على Android، لذا استخدم النسخ الاحتياطي والاستعادة للاحتفاظ بنسخ في مكان آخر.';
+
+  @override
   String settings_storage_dbStats(
     Object fileSize,
     Object diveCount,
@@ -20776,6 +20784,10 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get db_location_external_note =>
       'تُحذف الملفات هنا عند إلغاء تثبيت التطبيق.';
+
+  @override
+  String get db_location_backup_note =>
+      'لا يمكن لنظام Android تشغيل قاعدة البيانات من مجلد مُزامَن مع السحابة. للاحتفاظ بنسخة في Dropbox أو Nextcloud أو Google Drive، حدِّد موقع النسخة الاحتياطية ضمن النسخ الاحتياطي والاستعادة.';
 
   @override
   String diveLog_bulkEdit_membership_onAll(int count) {

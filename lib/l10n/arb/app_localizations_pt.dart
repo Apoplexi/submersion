@@ -14953,6 +14953,14 @@ class AppLocalizationsPt extends AppLocalizations {
       'Escolha uma pasta sincronizada (Dropbox, Google Drive, etc.)';
 
   @override
+  String get settings_storage_customFolder_subtitleDeviceOnly =>
+      'Mova o banco de dados para o armazenamento interno ou o cartão SD';
+
+  @override
+  String get settings_storage_customFolder_deviceOnly_noCloudSync =>
+      'A sincronização na nuvem gerenciada pelo app fica desativada enquanto o banco de dados está em um volume de armazenamento do dispositivo. Nenhum serviço de sincronização consegue acessar essa pasta no Android, então use Backup e Restauração para manter cópias em outro lugar.';
+
+  @override
   String settings_storage_dbStats(
     Object fileSize,
     Object diveCount,
@@ -21161,6 +21169,10 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get db_location_external_note =>
       'Os arquivos aqui são removidos se você desinstalar o aplicativo.';
+
+  @override
+  String get db_location_backup_note =>
+      'O Android não consegue executar o banco de dados a partir de uma pasta sincronizada na nuvem. Para manter uma cópia no Dropbox, Nextcloud ou Google Drive, defina o Local do Backup em Backup e Restauração.';
 
   @override
   String diveLog_bulkEdit_membership_onAll(int count) {

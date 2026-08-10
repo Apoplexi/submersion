@@ -14572,6 +14572,14 @@ class AppLocalizationsHe extends AppLocalizations {
       'בחר תיקייה מסונכרנת (Dropbox, Google Drive וכו\')';
 
   @override
+  String get settings_storage_customFolder_subtitleDeviceOnly =>
+      'העברת מסד הנתונים לאחסון הפנימי או לכרטיס SD';
+
+  @override
+  String get settings_storage_customFolder_deviceOnly_noCloudSync =>
+      'סנכרון הענן המנוהל על ידי האפליקציה מושבת כל עוד מסד הנתונים נמצא באחסון המכשיר. ב-Android אף שירות סנכרון אינו יכול להגיע לתיקייה הזו, לכן השתמשו בגיבוי ושחזור כדי לשמור עותקים במקום אחר.';
+
+  @override
   String settings_storage_dbStats(
     Object fileSize,
     Object diveCount,
@@ -20628,6 +20636,10 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String get db_location_external_note =>
       'הקבצים כאן נמחקים אם מסירים את האפליקציה.';
+
+  @override
+  String get db_location_backup_note =>
+      'Android אינו יכול להריץ את מסד הנתונים מתיקייה המסונכרנת בענן. כדי לשמור עותק ב-Dropbox, ב-Nextcloud או ב-Google Drive, הגדירו את מיקום הגיבוי תחת גיבוי ושחזור.';
 
   @override
   String diveLog_bulkEdit_membership_onAll(int count) {
