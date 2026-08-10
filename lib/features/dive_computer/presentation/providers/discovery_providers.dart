@@ -121,6 +121,14 @@ class DiscoveryState {
 /// Steps in the device discovery wizard.
 enum DiscoveryStep { scan, select, pair, confirm, download, summary }
 
+/// Logger for the scan lifecycle.
+///
+/// The native scanner reports the devices it sees, but only this layer knows
+/// that a scan was requested at all. Without these entries a submitted debug
+/// log cannot distinguish "the user never scanned" from "the scan started and
+/// found nothing" from "permissions were refused" (issue #123).
+const _discoveryLog = LoggerService('Discovery');
+
 /// Notifier for managing the discovery wizard state.
 ///
 /// Uses DiveComputerService for BLE discovery via libdivecomputer's
@@ -154,6 +162,10 @@ class DiscoveryNotifier extends StateNotifier<DiscoveryState> {
             .toList();
 
         if (denied.isNotEmpty) {
+          _discoveryLog.warning(
+            'Scan blocked: Bluetooth permissions denied (${denied.join(', ')})',
+            category: LogCategory.bluetooth,
+          );
           state = state.copyWith(
             isScanning: false,
             errorMessage:
@@ -175,8 +187,17 @@ class DiscoveryNotifier extends StateNotifier<DiscoveryState> {
         _onDeviceDiscovered,
       );
 
+      _discoveryLog.info(
+        'Starting BLE scan for dive computers',
+        category: LogCategory.bluetooth,
+      );
       await _service.startDiscovery(pigeon.TransportType.ble);
     } catch (e) {
+      _discoveryLog.error(
+        'Failed to start BLE scan',
+        category: LogCategory.bluetooth,
+        error: e,
+      );
       state = state.copyWith(
         isScanning: false,
         errorMessage: 'Failed to start scanning: $e',
@@ -191,6 +212,11 @@ class DiscoveryNotifier extends StateNotifier<DiscoveryState> {
     // Deduplicate by address
     if (existing.any((d) => d.address == device.address)) return;
 
+    _discoveryLog.info(
+      'Discovered ${device.name} (${device.address}) '
+      'as ${pigeonDevice.vendor} ${pigeonDevice.product}',
+      category: LogCategory.bluetooth,
+    );
     state = state.copyWith(discoveredDevices: [...existing, device]);
   }
 
@@ -199,6 +225,11 @@ class DiscoveryNotifier extends StateNotifier<DiscoveryState> {
     _discoverySubscription?.cancel();
     _discoverySubscription = null;
     await _service.stopDiscovery();
+    _discoveryLog.info(
+      'Stopped BLE scan; '
+      '${state.discoveredDevices.length} supported device(s) found',
+      category: LogCategory.bluetooth,
+    );
     state = state.copyWith(isScanning: false);
   }
 

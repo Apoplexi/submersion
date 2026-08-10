@@ -5,60 +5,104 @@ import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothManager
 import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanResult
+import android.bluetooth.le.ScanSettings
 import android.content.Context
 
 // Transport bitmask values matching libdc_wrapper.h.
 private const val LIBDC_TRANSPORT_BLE = 1 shl 5
 
+private const val TAG = "BleScanner"
+
 // Scans for BLE dive computers using Android's BluetoothLeScanner
 // and matches discovered devices against libdivecomputer's descriptor database.
 // Bluetooth permissions are requested at the Dart layer before these methods are called.
+//
+// Every path that declines to surface a device logs why (issue #123). An
+// unsupported model is indistinguishable from a dead scan otherwise, which
+// is what stalled the Suunto Ocean report: the owner was asked for the
+// "Unmatched device" line twice and could not produce it, because the
+// branches ahead of it all returned silently.
 @SuppressLint("MissingPermission")
 class BleScanner(private val context: Context) {
     private var scanCallback: ScanCallback? = null
     private val seenAddresses = mutableSetOf<String>()
-    private val loggedUnmatched = mutableSetOf<String>()
+    private val diagnostics = BleScanDiagnostics()
 
     var onDeviceDiscovered: ((DiscoveredDevice) -> Unit)? = null
     var onComplete: (() -> Unit)? = null
 
     fun start() {
         seenAddresses.clear()
-        loggedUnmatched.clear()
+        diagnostics.reset()
+
         val bluetoothManager =
-            context.getSystemService(Context.BLUETOOTH_SERVICE) as? BluetoothManager ?: return
-        val adapter = bluetoothManager.adapter ?: return
-        val scanner = adapter.bluetoothLeScanner ?: return
+            context.getSystemService(Context.BLUETOOTH_SERVICE) as? BluetoothManager
+        if (bluetoothManager == null) {
+            NativeLogger.e(TAG, "BLE", "Scan aborted: no Bluetooth service on this device")
+            onComplete?.invoke()
+            return
+        }
+
+        val adapter = bluetoothManager.adapter
+        if (adapter == null) {
+            NativeLogger.e(TAG, "BLE", "Scan aborted: device has no Bluetooth adapter")
+            onComplete?.invoke()
+            return
+        }
+
+        // A disabled adapter yields a null scanner, which previously looked
+        // identical to a scan that simply found nothing.
+        val scanner = adapter.bluetoothLeScanner
+        if (scanner == null) {
+            val state = if (adapter.state == BluetoothAdapter.STATE_OFF) {
+                "Bluetooth is turned off"
+            } else {
+                "adapter state=${adapter.state}"
+            }
+            NativeLogger.e(TAG, "BLE", "Scan aborted: no BLE scanner ($state)")
+            onComplete?.invoke()
+            return
+        }
 
         val callback = object : ScanCallback() {
             override fun onScanResult(callbackType: Int, result: ScanResult) {
-                val address = result.device.address ?: return
+                val address = result.device.address
+                if (address == null) {
+                    diagnostics.describeAddressless()?.let {
+                        NativeLogger.d(TAG, "BLE", it)
+                    }
+                    return
+                }
                 if (seenAddresses.contains(address)) return
 
-                val name = result.scanRecord?.deviceName
-                    ?: result.device.name
-                    ?: return
+                val rssi = result.rssi
+
+                // Peripherals may advertise without a local name and only
+                // supply one in the scan response, so a null here is not
+                // necessarily permanent -- later packets are re-evaluated.
+                val name = result.scanRecord?.deviceName ?: result.device.name
+                if (name == null) {
+                    diagnostics.describeUnnamed(address, rssi)?.let {
+                        NativeLogger.d(TAG, "BLE", it)
+                    }
+                    return
+                }
 
                 val info = DescriptorInfo()
                 val matched = LibdcWrapper.nativeDescriptorMatch(
                     name, LIBDC_TRANSPORT_BLE, info
                 )
                 if (!matched) {
-                    // onScanResult redelivers every advertisement packet, so
-                    // log each unmatched device only once per scan session.
-                    if (loggedUnmatched.add(address)) {
-                        NativeLogger.d(
-                            "BleScanner", "BLE",
-                            "Unmatched device $address ($name)"
-                        )
+                    diagnostics.describeUnmatched(address, name, rssi)?.let {
+                        NativeLogger.d(TAG, "BLE", it)
                     }
                     return
                 }
 
                 seenAddresses.add(address)
-                NativeLogger.d(
-                    "BleScanner", "BLE",
-                    "Matched device $address ($name) -> " +
+                NativeLogger.i(
+                    TAG, "BLE",
+                    "Matched device $address ($name) rssi=$rssi -> " +
                         "${info.vendor} ${info.product} (${info.model})"
                 )
 
@@ -74,12 +118,27 @@ class BleScanner(private val context: Context) {
             }
 
             override fun onScanFailed(errorCode: Int) {
+                NativeLogger.e(
+                    TAG, "BLE",
+                    "Scan failed: ${BleScanDiagnostics.describeScanFailure(errorCode)}"
+                )
                 onComplete?.invoke()
             }
         }
 
         scanCallback = callback
-        scanner.startScan(callback)
+
+        // The no-argument startScan overload uses SCAN_MODE_LOW_POWER, whose
+        // low duty cycle can take tens of seconds to notice a peripheral --
+        // or miss it for the length of a scan. This scan is short-lived,
+        // foreground, and user-initiated, which is exactly what LOW_LATENCY
+        // is for; vendor apps scan the same way.
+        val settings = ScanSettings.Builder()
+            .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
+            .build()
+
+        NativeLogger.i(TAG, "BLE", "Starting BLE scan (mode=low latency)")
+        scanner.startScan(null, settings, callback)
     }
 
     fun stop() {
@@ -87,7 +146,13 @@ class BleScanner(private val context: Context) {
             context.getSystemService(Context.BLUETOOTH_SERVICE) as? BluetoothManager ?: return
         val scanner = bluetoothManager.adapter?.bluetoothLeScanner ?: return
 
-        scanCallback?.let { scanner.stopScan(it) }
+        scanCallback?.let {
+            scanner.stopScan(it)
+            NativeLogger.i(
+                TAG, "BLE",
+                "Stopped BLE scan; ${seenAddresses.size} supported device(s) found"
+            )
+        }
         scanCallback = null
         onComplete?.invoke()
     }
