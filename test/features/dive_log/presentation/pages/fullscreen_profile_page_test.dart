@@ -15,7 +15,7 @@ import 'package:submersion/features/dive_log/presentation/providers/profile_play
 import 'package:submersion/features/dive_log/presentation/providers/profile_review_provider.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/dive_profile_chart.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/draggable_readout_card.dart';
-import 'package:submersion/features/dive_log/presentation/widgets/profile_instrument_bar.dart';
+import 'package:submersion/features/dive_log/presentation/widgets/profile_transport_bar.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/source_bar.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
@@ -85,12 +85,12 @@ List<Override> _erroringOverrides() {
 }
 
 void main() {
-  testWidgets('renders chart and instrument bar', (tester) async {
+  testWidgets('renders chart and transport bar', (tester) async {
     await tester.pumpWidget(_wrap(_defaultOverrides()));
     await tester.pumpAndSettle();
 
     expect(find.byType(DiveProfileChart), findsOneWidget);
-    expect(find.byType(ProfileInstrumentBar), findsOneWidget);
+    expect(find.byType(ProfileTransportBar), findsOneWidget);
     expect(find.byIcon(Icons.close), findsOneWidget);
   });
 
@@ -369,13 +369,12 @@ void main() {
         tester.widget<DiveProfileChart>(find.byType(DiveProfileChart)).profile,
         hasLength(61),
       );
-      // The instrument bar must resolve tiles against the SAME profile the
-      // chart renders and the analysis is computed from; indexing analysis
-      // curves with dive.profile positions reads wrong/blank values once the
-      // arrays differ (issue: gauges wrong/blank mid-dive on 2-source dives).
+      // The transport bar must scrub against the SAME profile the chart
+      // renders: its minimap and seek range are drawn from these points, so
+      // passing dive.profile would scrub a different source's timeline.
       expect(
         tester
-            .widget<ProfileInstrumentBar>(find.byType(ProfileInstrumentBar))
+            .widget<ProfileTransportBar>(find.byType(ProfileTransportBar))
             .profile,
         hasLength(61),
       );
@@ -395,7 +394,7 @@ void main() {
       );
       expect(
         tester
-            .widget<ProfileInstrumentBar>(find.byType(ProfileInstrumentBar))
+            .widget<ProfileTransportBar>(find.byType(ProfileTransportBar))
             .profile,
         hasLength(40),
       );

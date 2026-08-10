@@ -21,7 +21,7 @@ import 'package:submersion/features/dive_log/presentation/utils/sac_normalizatio
 import 'package:submersion/features/dive_log/presentation/widgets/dive_profile_chart.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/draggable_readout_card.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/photo_marker_layout.dart';
-import 'package:submersion/features/dive_log/presentation/widgets/profile_instrument_bar.dart';
+import 'package:submersion/features/dive_log/presentation/widgets/profile_transport_bar.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/safety_finding_highlight.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/source_bar.dart';
 import 'package:submersion/features/media/presentation/providers/media_providers.dart';
@@ -592,13 +592,11 @@ class _FullscreenProfilePageState extends ConsumerState<FullscreenProfilePage> {
                       },
                     ),
                   ),
-                ProfileInstrumentBar(
+                ProfileTransportBar(
                   diveId: widget.diveId,
-                  // The same profile the chart renders and the analysis is
-                  // computed from; tile values are index-aligned to it.
+                  // The same profile the chart renders: the scrub minimap
+                  // and seek range must match what is on screen.
                   profile: chartProfile,
-                  analysis: analysis,
-                  tankPressures: tankPressures,
                 ),
               ],
             ),
