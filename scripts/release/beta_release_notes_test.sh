@@ -239,10 +239,30 @@ echo "$OUT" | grep -q "^## Everything since" \
   && fail "cumulative section emitted with no production tag to anchor it"
 echo "$OUT" | grep -q "the very first feature" || fail "first-ever build lost its notes"
 
-# The cumulative section is meaningless for the length-capped store formats.
-if (cd "$TMPREPO2" && "$GEN" --since "$PREV_BETA" --format store --cumulative) >/dev/null 2>&1; then
-  fail "--cumulative was accepted for the store format"
-fi
+# The capped formats carry the cumulative section too, truncated to fit. A
+# tester arriving straight from the public release needs the whole picture,
+# and TestFlight has 4000 characters to spend on it.
+# Capture the exit status explicitly. Under set -e a failing command
+# substitution aborts the whole script before any assertion runs, which turns
+# a real regression into a silent non-zero exit with no message.
+OUT=$(cd "$TMPREPO2" && "$GEN" --since "$PREV_BETA" --format store --cumulative 2>/dev/null) \
+  || fail "--cumulative was rejected for the store format"
+echo "$OUT" | grep -q "a fix only in this beta" \
+  || fail "store cumulative dropped this beta's own change"
+echo "$OUT" | grep -q "an earlier beta feature" \
+  || fail "store cumulative missing an earlier beta's change"
+echo "$OUT" | grep -q "Since v0.0.1" \
+  || fail "store cumulative heading missing or wrongly versioned"
+echo "$OUT" | grep -q "Since v0.0.1.1" \
+  && fail "store cumulative heading used the 4-segment tag, not the marketing version"
+echo "$OUT" | grep -q "the shipped feature" \
+  && fail "already-released work appeared in the store notes"
+
+OUT=$(cd "$TMPREPO2" && "$GEN" --since "$PREV_BETA" --format play --cumulative 2>/dev/null) \
+  || fail "--cumulative was rejected for the play format"
+echo "$OUT" | grep -q "an earlier beta feature" \
+  || fail "play cumulative missing an earlier beta's change"
+[ "${#OUT}" -le 500 ] || fail "play cumulative output exceeded the 500-character cap"
 
 # --- PR titles are the unit of a note ---------------------------------------
 # Only 14% of commits on main carry a conventional prefix; the tester-facing

@@ -98,13 +98,6 @@ if [ "$USE_STDIN" = false ] && [ -z "$RANGE" ]; then
   die "one of --range <gitrange>, --since <sha>, or --stdin is required"
 fi
 
-# The store formats have a few hundred to a few thousand characters to spend on
-# this build alone; a second, longer section would only crowd out the delta the
-# tester is being asked to exercise.
-if [ "$CUMULATIVE" = true ] && [ "$FORMAT" != markdown ]; then
-  die "--cumulative applies to --format markdown only (got: $FORMAT)"
-fi
-
 # --- Sort subjects into tester-facing buckets -------------------------------
 #
 # Only feat/fix/perf describe something a tester can exercise. Everything else
@@ -223,6 +216,27 @@ fi
 
 classify_subjects "$SUBJECTS"
 
+# --- Resolve the cumulative baseline ----------------------------------------
+# Only the app's own 4-segment tags are production releases. The repository
+# also carries Flutter's 3-segment upstream tags, and per-beta tags live in
+# the beta-builds repository, never here.
+STABLE_TAG=""
+if [ "$CUMULATIVE" = true ]; then
+  STABLE_TAG=$(git describe --tags --abbrev=0 --match 'v*.*.*.*' 2>/dev/null || echo "")
+  [ -n "$STABLE_TAG" ] \
+    || echo "No production tag found; omitting the cumulative section." >&2
+fi
+
+# Remove from $1 every line that also appears in $2, order preserved. The
+# cumulative range contains this beta's own commits; on Play, where the whole
+# budget is 500 characters, printing them twice is the difference between
+# showing the release and showing three lines of it.
+subtract() {
+  [ -n "$1" ] || return 0
+  if [ -z "$2" ]; then printf '%s' "$1"; return 0; fi
+  printf '%s\n' "$1" | grep -Fxv -f <(printf '%s\n' "$2") || true
+}
+
 # --- Markdown: the GitHub beta release body ---------------------------------
 
 render_markdown() {
@@ -243,24 +257,18 @@ render_markdown() {
 }
 
 if [ "$FORMAT" = markdown ]; then
-  # Without --cumulative the body is exactly this beta's delta.
-  if [ "$CUMULATIVE" = false ]; then
+  # Without --cumulative, or with no production tag to anchor to, the body is
+  # exactly this beta's delta.
+  if [ "$CUMULATIVE" = false ] || [ -z "$STABLE_TAG" ]; then
     render_markdown "No changes recorded since the previous beta."
     exit 0
   fi
 
   # With it, the per-beta delta is the headline and a second section carries
   # everything since the last production release, for a tester arriving
-  # straight from the public build. Only the app's own 4-segment tags count as
-  # a production release; the repo also carries Flutter's upstream tags.
-  STABLE_TAG=$(git describe --tags --abbrev=0 --match 'v*.*.*.*' 2>/dev/null || echo "")
-
-  if [ -z "$STABLE_TAG" ]; then
-    echo "No production tag found; omitting the cumulative section." >&2
-    render_markdown "No changes recorded since the previous beta."
-    exit 0
-  fi
-
+  # straight from the public build. This body is uncapped and its heading
+  # promises everything, so it repeats this beta's items rather than
+  # deduplicating them the way the capped formats do.
   echo "## New in this beta"
   echo ""
   render_markdown "No changes recorded since the previous beta."
@@ -292,9 +300,29 @@ $2
 EOF
 }
 
+# This beta's delta is emitted first so that truncation only ever eats the
+# cumulative tail: the change a tester is being asked to exercise is never the
+# part that gets cut.
 add_section "New in this build" "$FEATURES"
 add_section "Improved" "$IMPROVEMENTS"
 add_section "Fixed" "$FIXES"
+
+if [ "$CUMULATIVE" = true ] && [ -n "$STABLE_TAG" ]; then
+  BETA_FEATURES="$FEATURES"
+  BETA_IMPROVEMENTS="$IMPROVEMENTS"
+  BETA_FIXES="$FIXES"
+
+  classify_subjects "$(subjects_in_range "${STABLE_TAG}..HEAD")"
+  FEATURES=$(subtract "$FEATURES" "$BETA_FEATURES")
+  IMPROVEMENTS=$(subtract "$IMPROVEMENTS" "$BETA_IMPROVEMENTS")
+  FIXES=$(subtract "$FIXES" "$BETA_FIXES")
+
+  # One flattened section rather than three: at a 500-character budget every
+  # repeated heading costs an item. The marketing version reads better to a
+  # tester than the 4-segment build tag, so v1.7.2.4977 becomes v1.7.2.
+  EARLIER=$(printf '%s\n%s\n%s' "$FEATURES" "$IMPROVEMENTS" "$FIXES" | sed '/^$/d')
+  add_section "Since ${STABLE_TAG%.*}" "$EARLIER"
+fi
 
 if [ -z "$LINES" ]; then
   if [ -n "$INTERNAL" ]; then
