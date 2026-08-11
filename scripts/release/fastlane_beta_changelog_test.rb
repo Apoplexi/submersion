@@ -127,6 +127,61 @@ Dir.mktmpdir do |tmp|
   end
 end
 
+# --- Already-uploaded build detection (iOS/macOS Fastfiles) -----------------
+# The beta lanes upload the binary and distribute it as two steps, because a
+# build number can only ever be uploaded once. When distribution fails, the
+# re-run has to recognise "this build is already up there" and carry on to
+# distribution instead of failing on the duplicate.
+#
+# The message below is copied verbatim from the run where this broke
+# (actions/runs/31522488646): the distribution failed on Apple's beta review
+# submission limit, then every retry re-uploaded the same pkg and reported the
+# duplicate instead, which stranded the build with no recovery path.
+
+altool_duplicate_error = <<~ERROR
+  Error uploading pkg file:#{' '}
+   [Application Loader Error Output]: [altool.60000369C1C0] [ContentDelivery.Uploader.60000369C1C0] The provided entity includes an attribute with a value that has already been used (-19232) The bundle version must be higher than the previously uploaded version: 5829. (ID: 1d3ed621-6c27-4215-b1d0-0b96fbd95ea7)
+  [Application Loader Error Output]: The call to the altool completed with a non-zero exit status: 1. This indicates a failure.
+ERROR
+
+check(duplicate_build_error?(altool_duplicate_error),
+      'the duplicate-build message from App Store Connect was not recognised, so a ' \
+      're-run would fail on the duplicate instead of distributing the uploaded build')
+
+# The other shape of the same rejection, straight from the API error body.
+check(duplicate_build_error?('ENTITY_ERROR.ATTRIBUTE.INVALID.DUPLICATE'),
+      'the App Store Connect duplicate error code was not recognised')
+
+# Anything else has to keep failing. Swallowing a genuine upload failure would
+# send the run on to distribute a build that was never uploaded.
+[
+  'The call to the altool completed with a non-zero exit status: 1.',
+  'Could not find the certificate in the keychain',
+  'Submission limit has been reached. - Submission limit has been reached.',
+  '',
+  nil,
+].each do |unrelated|
+  check(!duplicate_build_error?(unrelated),
+        "#{unrelated.inspect} was treated as an already-uploaded build, which would " \
+        'let a real upload failure through')
+end
+
+# The macOS Fastfile carries its own copy of these helpers, the way it already
+# does for the changelog ones, and only the iOS file is loaded here (loading
+# both would redefine the same top-level methods). Compare the source text
+# instead, so the platform that actually hit this cannot quietly lose the
+# protection while the iOS tests keep passing.
+macos_fastfile = File.read(File.join(ROOT, 'macos', 'fastlane', 'Fastfile'))
+
+check(macos_fastfile.include?('def duplicate_build_error?'),
+      'the macOS Fastfile no longer defines duplicate_build_error?, so a macOS beta ' \
+      're-run would fail on the duplicate instead of distributing the uploaded build')
+
+DUPLICATE_BUILD_MARKERS.each do |marker|
+  check(macos_fastfile.include?(marker),
+        "the macOS Fastfile is missing the #{marker.inspect} marker that the iOS one has")
+end
+
 # --- Play changelog (Android Fastfile) --------------------------------------
 
 load File.join(ROOT, 'android', 'fastlane', 'Fastfile')
