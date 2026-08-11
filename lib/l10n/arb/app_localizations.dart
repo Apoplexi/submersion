@@ -39302,6 +39302,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Deselect all'**
   String get common_selection_deselectAllTooltip;
+
+  /// No description provided for @common_bulkDelete_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete {count} items?'**
+  String common_bulkDelete_title(Object count);
+
+  /// No description provided for @common_bulkDelete_body.
+  ///
+  /// In en, this message translates to:
+  /// **'This cannot be undone.'**
+  String get common_bulkDelete_body;
+
+  /// No description provided for @common_bulkDelete_snackbar.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} deleted'**
+  String common_bulkDelete_snackbar(Object count);
 }
 
 class _AppLocalizationsDelegate

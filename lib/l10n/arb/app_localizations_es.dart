@@ -23612,4 +23612,17 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get common_selection_deselectAllTooltip => 'Deseleccionar todo';
+
+  @override
+  String common_bulkDelete_title(Object count) {
+    return '¿Eliminar $count elementos?';
+  }
+
+  @override
+  String get common_bulkDelete_body => 'Esta acción no se puede deshacer.';
+
+  @override
+  String common_bulkDelete_snackbar(Object count) {
+    return '$count eliminados';
+  }
 }

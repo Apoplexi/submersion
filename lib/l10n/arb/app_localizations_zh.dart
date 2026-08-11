@@ -22401,4 +22401,17 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get common_selection_deselectAllTooltip => '取消全选';
+
+  @override
+  String common_bulkDelete_title(Object count) {
+    return '删除 $count 项？';
+  }
+
+  @override
+  String get common_bulkDelete_body => '此操作无法撤消。';
+
+  @override
+  String common_bulkDelete_snackbar(Object count) {
+    return '已删除 $count 项';
+  }
 }

@@ -7097,5 +7097,8 @@
   "common_selection_enterTooltip": "Elemente auswählen",
   "common_selection_exitTooltip": "Auswahl beenden",
   "common_selection_selectAllTooltip": "Alle auswählen",
-  "common_selection_deselectAllTooltip": "Auswahl aufheben"
+  "common_selection_deselectAllTooltip": "Auswahl aufheben",
+  "common_bulkDelete_title": "{count} Elemente löschen?",
+  "common_bulkDelete_body": "Dies kann nicht rückgängig gemacht werden.",
+  "common_bulkDelete_snackbar": "{count} gelöscht"
 }

@@ -7097,5 +7097,8 @@
   "common_selection_enterTooltip": "Elemek kijelölése",
   "common_selection_exitTooltip": "Kijelölés befejezése",
   "common_selection_selectAllTooltip": "Összes kijelölése",
-  "common_selection_deselectAllTooltip": "Kijelölés megszüntetése"
+  "common_selection_deselectAllTooltip": "Kijelölés megszüntetése",
+  "common_bulkDelete_title": "{count} elem törlése?",
+  "common_bulkDelete_body": "Ez a művelet nem vonható vissza.",
+  "common_bulkDelete_snackbar": "{count} törölve"
 }

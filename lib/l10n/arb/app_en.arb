@@ -14947,5 +14947,18 @@
     "placeholders": {
       "count": { "type": "Object" }
     }
+  },
+  "common_bulkDelete_title": "Delete {count} items?",
+  "common_bulkDelete_body": "This cannot be undone.",
+  "common_bulkDelete_snackbar": "{count} deleted",
+  "@common_bulkDelete_title": {
+    "placeholders": {
+      "count": { "type": "Object" }
+    }
+  },
+  "@common_bulkDelete_snackbar": {
+    "placeholders": {
+      "count": { "type": "Object" }
+    }
   }
 }

@@ -23176,4 +23176,17 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get common_selection_deselectAllTooltip => 'إلغاء تحديد الكل';
+
+  @override
+  String common_bulkDelete_title(Object count) {
+    return 'حذف $count عنصر؟';
+  }
+
+  @override
+  String get common_bulkDelete_body => 'لا يمكن التراجع عن هذا.';
+
+  @override
+  String common_bulkDelete_snackbar(Object count) {
+    return 'تم حذف $count';
+  }
 }

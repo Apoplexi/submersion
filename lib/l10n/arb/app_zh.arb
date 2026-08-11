@@ -7097,5 +7097,8 @@
   "common_selection_enterTooltip": "选择项目",
   "common_selection_exitTooltip": "退出选择",
   "common_selection_selectAllTooltip": "全选",
-  "common_selection_deselectAllTooltip": "取消全选"
+  "common_selection_deselectAllTooltip": "取消全选",
+  "common_bulkDelete_title": "删除 {count} 项？",
+  "common_bulkDelete_body": "此操作无法撤消。",
+  "common_bulkDelete_snackbar": "已删除 {count} 项"
 }

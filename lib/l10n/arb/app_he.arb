@@ -7097,5 +7097,8 @@
   "common_selection_enterTooltip": "בחירת פריטים",
   "common_selection_exitTooltip": "יציאה מבחירה",
   "common_selection_selectAllTooltip": "בחר הכול",
-  "common_selection_deselectAllTooltip": "בטל בחירת הכול"
+  "common_selection_deselectAllTooltip": "בטל בחירת הכול",
+  "common_bulkDelete_title": "למחוק {count} פריטים?",
+  "common_bulkDelete_body": "לא ניתן לבטל פעולה זו.",
+  "common_bulkDelete_snackbar": "{count} נמחקו"
 }

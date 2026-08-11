@@ -23556,4 +23556,18 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get common_selection_deselectAllTooltip => 'Auswahl aufheben';
+
+  @override
+  String common_bulkDelete_title(Object count) {
+    return '$count Elemente löschen?';
+  }
+
+  @override
+  String get common_bulkDelete_body =>
+      'Dies kann nicht rückgängig gemacht werden.';
+
+  @override
+  String common_bulkDelete_snackbar(Object count) {
+    return '$count gelöscht';
+  }
 }

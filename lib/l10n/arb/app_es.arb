@@ -7097,5 +7097,8 @@
   "common_selection_enterTooltip": "Seleccionar elementos",
   "common_selection_exitTooltip": "Salir de la selección",
   "common_selection_selectAllTooltip": "Seleccionar todo",
-  "common_selection_deselectAllTooltip": "Deseleccionar todo"
+  "common_selection_deselectAllTooltip": "Deseleccionar todo",
+  "common_bulkDelete_title": "¿Eliminar {count} elementos?",
+  "common_bulkDelete_body": "Esta acción no se puede deshacer.",
+  "common_bulkDelete_snackbar": "{count} eliminados"
 }

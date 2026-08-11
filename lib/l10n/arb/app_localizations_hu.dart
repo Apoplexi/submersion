@@ -23515,4 +23515,17 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get common_selection_deselectAllTooltip => 'Kijelölés megszüntetése';
+
+  @override
+  String common_bulkDelete_title(Object count) {
+    return '$count elem törlése?';
+  }
+
+  @override
+  String get common_bulkDelete_body => 'Ez a művelet nem vonható vissza.';
+
+  @override
+  String common_bulkDelete_snackbar(Object count) {
+    return '$count törölve';
+  }
 }

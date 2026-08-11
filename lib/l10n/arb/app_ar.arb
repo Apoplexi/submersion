@@ -7097,5 +7097,8 @@
   "common_selection_enterTooltip": "تحديد العناصر",
   "common_selection_exitTooltip": "إنهاء التحديد",
   "common_selection_selectAllTooltip": "تحديد الكل",
-  "common_selection_deselectAllTooltip": "إلغاء تحديد الكل"
+  "common_selection_deselectAllTooltip": "إلغاء تحديد الكل",
+  "common_bulkDelete_title": "حذف {count} عنصر؟",
+  "common_bulkDelete_body": "لا يمكن التراجع عن هذا.",
+  "common_bulkDelete_snackbar": "تم حذف {count}"
 }

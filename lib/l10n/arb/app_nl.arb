@@ -7097,5 +7097,8 @@
   "common_selection_enterTooltip": "Items selecteren",
   "common_selection_exitTooltip": "Selectie beëindigen",
   "common_selection_selectAllTooltip": "Alles selecteren",
-  "common_selection_deselectAllTooltip": "Alles deselecteren"
+  "common_selection_deselectAllTooltip": "Alles deselecteren",
+  "common_bulkDelete_title": "{count} items verwijderen?",
+  "common_bulkDelete_body": "Dit kan niet ongedaan worden gemaakt.",
+  "common_bulkDelete_snackbar": "{count} verwijderd"
 }

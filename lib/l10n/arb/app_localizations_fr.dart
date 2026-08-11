@@ -23671,4 +23671,17 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get common_selection_deselectAllTooltip => 'Tout désélectionner';
+
+  @override
+  String common_bulkDelete_title(Object count) {
+    return 'Supprimer $count éléments ?';
+  }
+
+  @override
+  String get common_bulkDelete_body => 'Cette action est irréversible.';
+
+  @override
+  String common_bulkDelete_snackbar(Object count) {
+    return '$count supprimés';
+  }
 }
