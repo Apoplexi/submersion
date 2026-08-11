@@ -2884,6 +2884,14 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
+  String get dashboard_hero_divesTotalOne => 'צלילה אחת';
+
+  @override
+  String dashboard_hero_divesTotalOther(Object count) {
+    return '$count צלילות';
+  }
+
+  @override
   String get dashboard_hero_error => 'מוכן לחקור את המעמקים?';
 
   @override

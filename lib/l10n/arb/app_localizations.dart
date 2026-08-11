@@ -5045,6 +5045,18 @@ abstract class AppLocalizations {
   /// **'{count} dives logged'**
   String dashboard_hero_divesLoggedOther(Object count);
 
+  /// No description provided for @dashboard_hero_divesTotalOne.
+  ///
+  /// In en, this message translates to:
+  /// **'1 dive'**
+  String get dashboard_hero_divesTotalOne;
+
+  /// No description provided for @dashboard_hero_divesTotalOther.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} dives'**
+  String dashboard_hero_divesTotalOther(Object count);
+
   /// No description provided for @dashboard_hero_error.
   ///
   /// In en, this message translates to:

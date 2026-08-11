@@ -1098,6 +1098,8 @@
   "dashboard_greeting_withoutName": "{greeting}!",
   "dashboard_hero_divesLoggedOne": "已记录 1 次潜水",
   "dashboard_hero_divesLoggedOther": "已记录 {count} 次潜水",
+  "dashboard_hero_divesTotalOne": "1 次潜水",
+  "dashboard_hero_divesTotalOther": "{count} 次潜水",
   "dashboard_hero_error": "准备好探索深海了吗？",
   "dashboard_hero_hoursUnderwater": "水下 {hours} 小时",
   "dashboard_hero_loading": "正在加载您的潜水统计...",

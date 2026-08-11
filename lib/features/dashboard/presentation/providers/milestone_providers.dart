@@ -77,8 +77,10 @@ class DashboardMilestones {
 /// diver carrying a pre-app logbook is not sent back to the "10 dives"
 /// milestone they passed decades ago (issue #808).
 final milestonesProvider = FutureProvider<DashboardMilestones>((ref) async {
-  final career = await ref.watch(careerTotalsProvider.future);
+  // Watched before the await so the dependency is registered synchronously
+  // rather than across an async gap.
   final certsAsync = ref.watch(certificationListNotifierProvider);
+  final career = await ref.watch(careerTotalsProvider.future);
   final certs = certsAsync.valueOrNull ?? const <Certification>[];
 
   final total = career.combinedDives;

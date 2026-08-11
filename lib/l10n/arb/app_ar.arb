@@ -1004,6 +1004,8 @@
   "dashboard_greeting_withoutName": "{greeting}!",
   "dashboard_hero_divesLoggedOne": "غوصة واحدة مسجلة",
   "dashboard_hero_divesLoggedOther": "{count} غوصات مسجلة",
+  "dashboard_hero_divesTotalOne": "غوصة واحدة",
+  "dashboard_hero_divesTotalOther": "{count} غوصات",
   "dashboard_hero_error": "هل أنت مستعد لاستكشاف الأعماق؟",
   "dashboard_hero_hoursUnderwater": "{hours} ساعات تحت الماء",
   "dashboard_hero_loading": "جارٍ تحميل إحصائيات الغوص...",

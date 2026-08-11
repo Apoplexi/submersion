@@ -2953,6 +2953,14 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String get dashboard_hero_divesTotalOne => '1 merules';
+
+  @override
+  String dashboard_hero_divesTotalOther(Object count) {
+    return '$count merules';
+  }
+
+  @override
   String get dashboard_hero_error => 'Kesz felfedezni a melyseget?';
 
   @override

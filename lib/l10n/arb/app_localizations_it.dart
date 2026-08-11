@@ -2966,6 +2966,14 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
+  String get dashboard_hero_divesTotalOne => '1 immersione';
+
+  @override
+  String dashboard_hero_divesTotalOther(Object count) {
+    return '$count immersioni';
+  }
+
+  @override
   String get dashboard_hero_error => 'Pronti a esplorare le profondita?';
 
   @override

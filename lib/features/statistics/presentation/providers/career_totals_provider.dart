@@ -16,8 +16,14 @@ import 'package:submersion/features/statistics/domain/career_totals.dart';
 /// home hero header and the milestones card reported a smaller total than the
 /// Statistics page for any diver with a pre-app logbook (issue #808).
 final careerTotalsProvider = FutureProvider<CareerTotals>((ref) async {
-  final stats = await ref.watch(diveStatisticsProvider.future);
-  final diver = await ref.watch(currentDiverProvider.future);
+  // Both watches happen synchronously, before either await: the two reads are
+  // independent, so this lets them resolve in parallel and registers both
+  // dependencies without crossing an async gap.
+  final statsFuture = ref.watch(diveStatisticsProvider.future);
+  final diverFuture = ref.watch(currentDiverProvider.future);
+
+  final stats = await statsFuture;
+  final diver = await diverFuture;
 
   return CareerTotals.from(
     loggedDives: stats.totalDives,

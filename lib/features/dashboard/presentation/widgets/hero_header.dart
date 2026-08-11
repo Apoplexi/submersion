@@ -161,9 +161,20 @@ class HeroHeader extends ConsumerWidget {
 
     final parts = <String>[];
 
-    final diveText = dives == 1
-        ? context.l10n.dashboard_hero_divesLoggedOne
-        : context.l10n.dashboard_hero_divesLoggedOther(dives);
+    // "N dives logged" would misdescribe a total that includes the diver's
+    // prior offset -- those dives are precisely the ones NOT logged in-app, and
+    // the Statistics breakdown reserves "logged" for the in-app count. Divers
+    // without prior experience keep the original copy.
+    final String diveText;
+    if (career.hasPriorDives) {
+      diveText = dives == 1
+          ? context.l10n.dashboard_hero_divesTotalOne
+          : context.l10n.dashboard_hero_divesTotalOther(dives);
+    } else {
+      diveText = dives == 1
+          ? context.l10n.dashboard_hero_divesLoggedOne
+          : context.l10n.dashboard_hero_divesLoggedOther(dives);
+    }
     parts.add(diveText);
 
     final totalTimeSeconds = career.combinedTimeSeconds;

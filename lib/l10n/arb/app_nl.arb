@@ -1004,6 +1004,8 @@
   "dashboard_greeting_withoutName": "{greeting}!",
   "dashboard_hero_divesLoggedOne": "1 duik gelogd",
   "dashboard_hero_divesLoggedOther": "{count} duiken gelogd",
+  "dashboard_hero_divesTotalOne": "1 duik",
+  "dashboard_hero_divesTotalOther": "{count} duiken",
   "dashboard_hero_error": "Klaar om de diepte te verkennen?",
   "dashboard_hero_hoursUnderwater": "{hours} uur onder water",
   "dashboard_hero_loading": "Uw duikstatistieken laden...",

@@ -1004,6 +1004,8 @@
   "dashboard_greeting_withoutName": "{greeting}!",
   "dashboard_hero_divesLoggedOne": "1 merules rogzitve",
   "dashboard_hero_divesLoggedOther": "{count} merules rogzitve",
+  "dashboard_hero_divesTotalOne": "1 merules",
+  "dashboard_hero_divesTotalOther": "{count} merules",
   "dashboard_hero_error": "Kesz felfedezni a melyseget?",
   "dashboard_hero_hoursUnderwater": "{hours} ora viz alatt",
   "dashboard_hero_loading": "Merulesi statisztikak betoltese...",

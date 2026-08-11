@@ -242,7 +242,10 @@ void main() {
         await tester.pump(const Duration(milliseconds: 100));
       }
 
-      expect(find.textContaining('372 dives logged'), findsOneWidget);
+      // Neutral copy, not "dives logged": 125 of these were never logged
+      // in-app.
+      expect(find.textContaining('372 dives'), findsOneWidget);
+      expect(find.textContaining('logged'), findsNothing);
       expect(find.textContaining('286 hours'), findsOneWidget);
     });
 
@@ -344,7 +347,8 @@ void main() {
         await tester.pump(const Duration(milliseconds: 100));
       }
 
-      expect(find.textContaining('480 dives logged'), findsOneWidget);
+      expect(find.textContaining('480 dives'), findsOneWidget);
+      expect(find.textContaining('logged'), findsNothing);
     });
 
     testWidgets('displays time-of-day greeting', (tester) async {

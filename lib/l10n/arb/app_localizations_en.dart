@@ -2913,6 +2913,14 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get dashboard_hero_divesTotalOne => '1 dive';
+
+  @override
+  String dashboard_hero_divesTotalOther(Object count) {
+    return '$count dives';
+  }
+
+  @override
   String get dashboard_hero_error => 'Ready to explore the depths?';
 
   @override
