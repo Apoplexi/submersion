@@ -20,8 +20,19 @@ class AppSettingsRepository {
 
   /// Emits whenever the `settings` table changes so providers holding a
   /// setting refresh after a sync applies a remote change.
-  Stream<void> watchSettingsChanges() =>
-      _db.tableUpdates(TableUpdateQuery.onTable(_db.settings));
+  ///
+  /// Emits nothing when the database is not up, matching the contract every
+  /// read in this class already keeps: [getShareByDefault] and friends catch
+  /// their own errors and fall back to a default rather than failing the
+  /// caller. A tick that threw here would take that robustness away -- a
+  /// settings-backed provider that used to resolve to its default before the
+  /// database was initialised would start erroring instead, which is exactly
+  /// what happens during the null-database window of a restore.
+  Stream<void> watchSettingsChanges() {
+    final db = DatabaseService.instance.databaseOrNull;
+    if (db == null) return const Stream.empty();
+    return db.tableUpdates(TableUpdateQuery.onTable(db.settings));
+  }
 
   /// Returns the raw stored nav primary ids, or `null` if unset / on read error.
   ///
