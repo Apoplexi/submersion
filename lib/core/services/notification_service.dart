@@ -341,30 +341,24 @@ class NotificationService {
       iOS: iosDetails,
     );
 
-    final title = backupNotificationTitle(
-      success: success,
-      cloudCopyMissing: cloudCopyMissing,
-    );
-    final body = backupNotificationBody(
-      success: success,
-      cloudCopyMissing: cloudCopyMissing,
-      error: error,
-    );
-
     // Use a fixed ID so repeated backup notifications replace each other
     const backupNotificationId = 99000;
 
     await _plugin.show(
       id: backupNotificationId,
-      title: title,
-      body: body,
+      title: backupNotificationTitle(
+        success: success,
+        cloudCopyMissing: cloudCopyMissing,
+      ),
+      body: backupNotificationBody(
+        success: success,
+        cloudCopyMissing: cloudCopyMissing,
+        error: error,
+      ),
       notificationDetails: details,
     );
 
-    _log.info(
-      'Showed backup notification (success: $success, '
-      'cloudCopyMissing: $cloudCopyMissing)',
-    );
+    _log.info('Showed backup notification (success: $success)');
   }
 
   /// Cancel a specific notification

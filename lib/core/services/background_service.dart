@@ -71,7 +71,11 @@ void callbackDispatcher() {
       if (task == kNotificationRefreshTask) {
         await _refreshNotifications(log);
       } else if (task == kBackupTask) {
-        await _performScheduledBackup(log);
+        await runScheduledBackup(
+          prefs: prefs,
+          dbAdapter: DefaultBackupDatabaseAdapter(DatabaseService.instance),
+          log: log,
+        );
       }
 
       log.info('Background task completed: $task');
@@ -150,12 +154,32 @@ Future<BackupService> buildScheduledBackupService({
   );
 }
 
-Future<void> _performScheduledBackup(LoggerService log) async {
+/// How the scheduled backup reports its outcome. A seam over
+/// [NotificationService.showBackupNotification] so the flow's decisions --
+/// above all whether the cloud copy is missing -- are assertable without a
+/// platform channel.
+typedef BackupNotifier =
+    Future<void> Function({
+      required bool success,
+      String? error,
+      bool cloudCopyMissing,
+    });
+
+/// Run the scheduled backup if one is due, then report the outcome.
+///
+/// [notify] and [instanceFor] are seams for tests; production passes neither.
+Future<void> runScheduledBackup({
+  required SharedPreferences prefs,
+  required BackupDatabaseAdapter dbAdapter,
+  required LoggerService log,
+  BackupNotifier? notify,
+  CloudStorageProvider Function(CloudProviderType type)? instanceFor,
+}) async {
   log.info('Checking if scheduled backup is due');
 
-  final prefs = await SharedPreferences.getInstance();
-  final preferences = BackupPreferences(prefs);
-  final settings = preferences.getSettings();
+  final notifier =
+      notify ?? NotificationService.instance.showBackupNotification;
+  final settings = BackupPreferences(prefs).getSettings();
 
   if (!settings.enabled) {
     log.info('Automatic backups disabled, skipping');
@@ -171,7 +195,8 @@ Future<void> _performScheduledBackup(LoggerService log) async {
 
   final service = await buildScheduledBackupService(
     prefs: prefs,
-    dbAdapter: DefaultBackupDatabaseAdapter(DatabaseService.instance),
+    dbAdapter: dbAdapter,
+    instanceFor: instanceFor,
   );
 
   try {
@@ -185,16 +210,10 @@ Future<void> _performScheduledBackup(LoggerService log) async {
       'Automatic backup completed: ${record.filename} '
       '(location: ${record.location.name})',
     );
-    await NotificationService.instance.showBackupNotification(
-      success: true,
-      cloudCopyMissing: cloudCopyMissing,
-    );
+    await notifier(success: true, cloudCopyMissing: cloudCopyMissing);
   } catch (e, stack) {
     log.error('Automatic backup failed', error: e, stackTrace: stack);
-    await NotificationService.instance.showBackupNotification(
-      success: false,
-      error: e.toString(),
-    );
+    await notifier(success: false, error: e.toString());
   }
 }
 
