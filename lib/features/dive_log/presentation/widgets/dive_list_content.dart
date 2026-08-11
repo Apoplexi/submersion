@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -39,16 +38,13 @@ import 'package:submersion/features/dive_log/presentation/widgets/dive_filter_sh
 import 'package:submersion/features/dive_log/presentation/widgets/dive_numbering_dialog.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/dive_table_view.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
+import 'package:submersion/shared/selection/bulk_action.dart';
+import 'package:submersion/shared/selection/selectable_list_scope.dart';
+import 'package:submersion/shared/selection/selection_app_bar.dart';
+import 'package:submersion/shared/selection/selection_controller.dart';
+import 'package:submersion/shared/selection/selection_state.dart';
 import 'package:submersion/shared/widgets/app_date_picker.dart';
 import 'package:submersion/shared/widgets/feature_accent.dart';
-
-/// Inclusive id span between the [anchor] and [target] indices in [dives].
-/// Order-independent: a backward shift-click selects the same range.
-List<String> rangeIds(List<DiveSummary> dives, int anchor, int target) {
-  final lo = anchor < target ? anchor : target;
-  final hi = anchor < target ? target : anchor;
-  return [for (var i = lo; i <= hi; i++) dives[i].id];
-}
 
 /// True if [d]'s date falls within [r], inclusive of the end calendar day.
 bool inDateRange(DiveSummary d, DateTimeRange r) {
@@ -112,15 +108,23 @@ class DiveListContent extends ConsumerStatefulWidget {
 }
 
 class _DiveListContentState extends ConsumerState<DiveListContent> {
-  bool _isSelectionMode = false;
-  final Set<String> _selectedIds = {};
+  /// Owns the bulk-selection state machine for this list.
+  ///
+  /// Replaces the hand-rolled `_isSelectionMode` / `_selectedIds` /
+  /// `_anchorId` trio, so entry, exit, ranges and pruning follow the same
+  /// rules as every other selectable surface.
+  final SelectionController _selection = SelectionController();
+
   List<Dive>? _deletedDives;
   DiveMergeOutcome? _lastMergeOutcome;
   final ScrollController _scrollController = ScrollController();
   String? _lastScrolledToId;
   bool _selectionFromList =
       false; // Track if selection originated from list tap
-  String? _anchorId; // anchor dive for shift-click range selection
+
+  /// Convenience mirrors of the controller, so the widget tree reads clearly.
+  bool get _isSelectionMode => _selection.value.isActive;
+  Set<String> get _selectedIds => _selection.value.checkedIds;
 
   @override
   void initState() {
@@ -145,6 +149,7 @@ class _DiveListContentState extends ConsumerState<DiveListContent> {
   void dispose() {
     _scrollController.removeListener(_onScroll);
     _scrollController.dispose();
+    _selection.dispose();
     super.dispose();
   }
 
@@ -217,60 +222,32 @@ class _DiveListContentState extends ConsumerState<DiveListContent> {
     });
   }
 
+  /// Enter selection mode implicitly, from a long-press or modifier-click.
+  ///
+  /// Clearing the highlight keeps the detail pane from arguing with the bulk
+  /// selection about what the row means.
   void _enterSelectionMode(String? initialId) {
     ref.read(highlightedDiveIdProvider.notifier).state = null;
-    setState(() {
-      _isSelectionMode = true;
-      _selectedIds.clear();
-      _anchorId = initialId;
-      if (initialId != null) {
-        _selectedIds.add(initialId);
-      }
-    });
+    if (initialId == null) {
+      _selection.enterExplicit();
+    } else {
+      _selection.enterImplicit(initialId);
+    }
   }
 
-  void _exitSelectionMode() {
-    setState(() {
-      _isSelectionMode = false;
-      _selectedIds.clear();
-    });
-  }
+  void _exitSelectionMode() => _selection.exit();
 
-  void _toggleSelection(String id) {
-    setState(() {
-      if (_selectedIds.contains(id)) {
-        _selectedIds.remove(id);
-        if (_selectedIds.isEmpty) {
-          _isSelectionMode = false;
-        }
-      } else {
-        _selectedIds.add(id);
-      }
-      _anchorId = id;
-    });
-  }
-
-  bool _isShiftPressed() {
-    final keys = HardwareKeyboard.instance.logicalKeysPressed;
-    return keys.contains(LogicalKeyboardKey.shiftLeft) ||
-        keys.contains(LogicalKeyboardKey.shiftRight);
-  }
+  void _toggleSelection(String id) => _selection.toggle(id);
 
   /// Select the contiguous span from the anchor dive to [targetId].
+  ///
+  /// With no anchor yet, the highlighted row is the origin, matching Finder.
   void _selectRangeTo(String targetId, List<DiveSummary> dives) {
-    final targetIndex = dives.indexWhere((d) => d.id == targetId);
-    if (targetIndex < 0) return;
-    final anchorIndex = _anchorId == null
-        ? targetIndex
-        : dives.indexWhere((d) => d.id == _anchorId);
-    final from = anchorIndex < 0 ? targetIndex : anchorIndex;
-    setState(() {
-      _selectedIds.addAll(rangeIds(dives, from, targetIndex));
-      // Keep the anchor fixed across shift-clicks (only plain taps move it),
-      // so consecutive shift-clicks extend from the original anchor rather
-      // than walking it forward.
-      _anchorId ??= targetId;
-    });
+    _selection.extendTo(
+      targetId,
+      dives.map((d) => d.id).toList(),
+      fallbackAnchorId: ref.read(highlightedDiveIdProvider),
+    );
   }
 
   /// Pick a date range and select every dive whose date falls inside it.
@@ -281,23 +258,11 @@ class _DiveListContentState extends ConsumerState<DiveListContent> {
       lastDate: DateTime(2100),
     );
     if (range == null) return;
-    setState(() {
-      _selectedIds.addAll(
-        dives.where((d) => inDateRange(d, range)).map((d) => d.id),
-      );
-    });
-  }
-
-  void _selectAll(List<DiveSummary> dives) {
-    setState(() {
-      _selectedIds.addAll(dives.map((d) => d.id));
-    });
-  }
-
-  void _deselectAll() {
-    setState(() {
-      _selectedIds.clear();
-    });
+    final matching = dives
+        .where((d) => inDateRange(d, range))
+        .map((d) => d.id)
+        .toList();
+    _selection.selectAll([..._selectedIds, ...matching]);
   }
 
   Future<void> _confirmAndDelete() async {
@@ -685,6 +650,28 @@ class _DiveListContentState extends ConsumerState<DiveListContent> {
     if (mounted) _exitSelectionMode();
   }
 
+  /// One tap policy for every dive row, in every view mode.
+  ///
+  /// Outside selection mode a held modifier turns a tap into an implicit
+  /// entry, so desktop users never have to discover long-press. Shift extends
+  /// from the anchor, falling back to the highlighted row.
+  void _handleRowTap(String id, List<DiveSummary> dives) {
+    if (SelectableListScope.isShiftPressed()) {
+      _selectRangeTo(id, dives);
+      return;
+    }
+    if (SelectableListScope.isModifierPressed()) {
+      _enterSelectionMode(id);
+      return;
+    }
+    // No-op when the id is gone. A stale tap callback firing after the list
+    // reloaded must not open or toggle an arbitrary other dive, and must not
+    // throw on an emptied list the way `orElse: () => dives.first` would.
+    final index = dives.indexWhere((d) => d.id == id);
+    if (index < 0) return;
+    _handleItemTap(dives[index]);
+  }
+
   void _handleItemTap(DiveSummary dive) {
     if (_isSelectionMode) {
       _toggleSelection(dive.id);
@@ -751,38 +738,61 @@ class _DiveListContentState extends ConsumerState<DiveListContent> {
 
     final paginatedAsync = ref.watch(paginatedDiveListProvider);
 
-    final content = paginatedAsync.when(
-      data: (paginatedState) => paginatedState.dives.isEmpty
-          ? _buildEmptyState(context, filter.hasActiveFilters)
-          : _buildDiveList(context, paginatedState, filter.hasActiveFilters),
-      loading: () => const Center(child: CircularProgressIndicator()),
-      error: (error, stack) => _buildErrorState(context, error),
-    );
-
     final loadedDives = paginatedAsync.value?.dives ?? [];
+    final visibleIds = loadedDives.map((d) => d.id).toList();
 
-    if (!widget.showAppBar) {
-      // Used inside MasterDetailScaffold - no Scaffold wrapper
-      return Column(
-        children: [
-          if (_isSelectionMode)
-            _buildSelectionBar(loadedDives)
-          else
-            _buildCompactAppBar(context, filter),
-          Expanded(child: content),
-        ],
-      );
-    }
+    // Drop checked dives that fell out of the filtered, searched or sorted
+    // list, so the count always matches what is on screen and a bulk action
+    // can never reach a dive the user cannot see. pruneTo is a no-op when
+    // nothing changed, which is what keeps this off a rebuild loop.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _selection.pruneTo(visibleIds);
+    });
 
-    // Standalone mode with full Scaffold
-    return Scaffold(
-      appBar: _isSelectionMode
-          ? _buildSelectionAppBar(loadedDives)
-          : _buildAppBar(context, filter),
-      body: content,
-      floatingActionButton: _isSelectionMode
-          ? null
-          : widget.floatingActionButton,
+    return SelectableListScope(
+      controller: _selection,
+      selectableIds: visibleIds,
+      child: ValueListenableBuilder<SelectionState>(
+        valueListenable: _selection,
+        builder: (context, selection, _) {
+          // Built inside the builder so rows re-render as checks change.
+          final content = paginatedAsync.when(
+            data: (paginatedState) => paginatedState.dives.isEmpty
+                ? _buildEmptyState(context, filter.hasActiveFilters)
+                : _buildDiveList(
+                    context,
+                    paginatedState,
+                    filter.hasActiveFilters,
+                  ),
+            loading: () => const Center(child: CircularProgressIndicator()),
+            error: (error, stack) => _buildErrorState(context, error),
+          );
+
+          if (!widget.showAppBar) {
+            // Used inside MasterDetailScaffold - no Scaffold wrapper
+            return Column(
+              children: [
+                if (selection.isActive)
+                  _buildSelectionBar(loadedDives)
+                else
+                  _buildCompactAppBar(context, filter),
+                Expanded(child: content),
+              ],
+            );
+          }
+
+          // Standalone mode with full Scaffold
+          return Scaffold(
+            appBar: selection.isActive
+                ? _buildSelectionAppBar(loadedDives)
+                : _buildAppBar(context, filter),
+            body: content,
+            floatingActionButton: selection.isActive
+                ? null
+                : widget.floatingActionButton,
+          );
+        },
+      ),
     );
   }
 
@@ -841,6 +851,14 @@ class _DiveListContentState extends ConsumerState<DiveListContent> {
           icon: const Icon(Icons.sort),
           tooltip: context.l10n.diveLog_listPage_tooltip_sort,
           onPressed: () => _showSortSheet(context),
+        ),
+        // Discoverability: bulk actions must not be reachable only by a
+        // long-press that nothing on screen advertises.
+        IconButton(
+          key: const ValueKey('enter_selection'),
+          icon: const Icon(Icons.checklist),
+          tooltip: context.l10n.common_selection_enterTooltip,
+          onPressed: _selection.enterExplicit,
         ),
         PopupMenuButton<String>(
           icon: const Icon(Icons.more_vert),
@@ -999,6 +1017,12 @@ class _DiveListContentState extends ConsumerState<DiveListContent> {
             tooltip: context.l10n.diveLog_listPage_tooltip_sort,
             onPressed: () => _showSortSheet(context),
           ),
+          IconButton(
+            key: const ValueKey('enter_selection'),
+            icon: const Icon(Icons.checklist, size: 20),
+            tooltip: context.l10n.common_selection_enterTooltip,
+            onPressed: _selection.enterExplicit,
+          ),
           PopupMenuButton<String>(
             icon: const Icon(Icons.more_vert, size: 20),
             onSelected: (value) {
@@ -1098,210 +1122,75 @@ class _DiveListContentState extends ConsumerState<DiveListContent> {
     );
   }
 
-  AppBar _buildSelectionAppBar(List<DiveSummary> dives) {
-    return AppBar(
-      leading: IconButton(
-        icon: const Icon(Icons.close),
-        tooltip: context.l10n.diveLog_selection_tooltip_exit,
-        onPressed: _exitSelectionMode,
-      ),
-      title: Text(
-        context.l10n.diveLog_selection_countSelected(_selectedIds.length),
-      ),
-      actions: [
-        if (_selectedIds.length < dives.length)
-          IconButton(
-            icon: const Icon(Icons.select_all),
-            tooltip: context.l10n.diveLog_selection_tooltip_selectAll,
-            onPressed: () => _selectAll(dives),
-          ),
-        if (_selectedIds.isNotEmpty)
-          IconButton(
-            icon: const Icon(Icons.deselect),
-            tooltip: context.l10n.diveLog_selection_tooltip_deselectAll,
-            onPressed: _deselectAll,
-          ),
-        IconButton(
-          icon: const Icon(Icons.date_range),
-          tooltip: context.l10n.diveLog_selection_tooltip_selectDateRange,
-          onPressed: () => _selectByDateRange(dives),
-        ),
-        if (_selectedIds.length >= 2)
-          IconButton(
-            icon: const Icon(Icons.call_merge),
-            tooltip: context.l10n.diveLog_selection_tooltip_combine,
-            onPressed: _combineSelected,
-          ),
-        if (_selectedIds.length >= 2)
-          IconButton(
-            icon: const Icon(Icons.view_in_ar),
-            tooltip: context.l10n.diveLog_selection_tooltip_compare3d,
-            onPressed: _compareIn3d,
-          ),
-        if (_selectedIds.isNotEmpty)
-          IconButton(
-            icon: const Icon(Icons.upload),
-            tooltip: context.l10n.diveLog_selection_tooltip_export,
-            onPressed: _showExportDialog,
-          ),
-        if (_selectedIds.isNotEmpty)
-          IconButton(
-            icon: const Icon(Icons.edit),
-            tooltip: context.l10n.diveLog_selection_tooltip_edit,
-            onPressed: _openBulkEdit,
-          ),
-        if (_selectedIds.isNotEmpty)
-          IconButton(
-            icon: Icon(
-              Icons.delete,
-              color: Theme.of(context).colorScheme.error,
-            ),
-            tooltip: context.l10n.diveLog_selection_tooltip_delete,
-            onPressed: _confirmAndDelete,
-          ),
-      ],
-    );
-  }
-
-  /// Selection bar for master pane in split view
-  Widget _buildSelectionBar(List<DiveSummary> dives) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.primaryContainer,
-        border: Border(
-          bottom: BorderSide(
-            color: Theme.of(context).colorScheme.outline,
-            width: 1,
-          ),
-        ),
-      ),
-      child: Row(
-        children: [
-          IconButton(
-            icon: const Icon(Icons.close, size: 20),
-            tooltip: context.l10n.diveLog_selection_tooltip_exit,
-            onPressed: _exitSelectionMode,
-          ),
-          Text(
-            context.l10n.diveLog_selection_countSelected(_selectedIds.length),
-            style: Theme.of(
-              context,
-            ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
-          ),
-          const Spacer(),
-          if (_selectedIds.length < dives.length)
-            IconButton(
-              icon: const Icon(Icons.select_all, size: 20),
-              tooltip: context.l10n.diveLog_selection_tooltip_selectAll,
-              onPressed: () => _selectAll(dives),
-            ),
-          if (_selectedIds.isNotEmpty)
-            IconButton(
-              icon: const Icon(Icons.deselect, size: 20),
-              tooltip: context.l10n.diveLog_selection_tooltip_deselectAll,
-              onPressed: _deselectAll,
-            ),
-          if (_selectedIds.isNotEmpty)
-            IconButton(
-              icon: const Icon(Icons.edit, size: 20),
-              tooltip: context.l10n.diveLog_selection_tooltip_edit,
-              onPressed: _openBulkEdit,
-            ),
-          if (_selectedIds.isNotEmpty)
-            IconButton(
-              icon: Icon(
-                Icons.delete,
-                size: 20,
-                color: Theme.of(context).colorScheme.error,
-              ),
-              tooltip: context.l10n.diveLog_selection_tooltip_delete,
-              onPressed: _confirmAndDelete,
-            ),
-          _buildSelectionOverflowMenu(dives),
-        ],
-      ),
-    );
-  }
-
-  /// Overflow menu for the narrow master-pane selection bar.
+  /// Dive-specific bulk actions.
   ///
-  /// The master pane is too narrow to show every selection action as its own
-  /// icon (unlike the full-width [_buildSelectionAppBar]), so the situational
-  /// actions collapse here to prevent the toolbar Row from overflowing. Mirrors
-  /// the overflow pattern used by [_buildCompactAppBar].
-  Widget _buildSelectionOverflowMenu(List<DiveSummary> dives) {
-    final canCombine = _selectedIds.length >= 2;
-    final hasSelection = _selectedIds.isNotEmpty;
-    return PopupMenuButton<String>(
-      icon: const Icon(Icons.more_vert, size: 20),
-      onSelected: (value) {
-        switch (value) {
-          case 'date_range':
-            _selectByDateRange(dives);
-          case 'combine':
-            _combineSelected();
-          case 'compare3d':
-            _compareIn3d();
-          case 'export':
-            _showExportDialog();
-        }
-      },
-      itemBuilder: (context) => [
-        PopupMenuItem(
-          value: 'date_range',
-          child: Row(
-            children: [
-              const Icon(Icons.date_range, size: 20),
-              const SizedBox(width: 12),
-              Flexible(
-                child: Text(
-                  context.l10n.diveLog_selection_tooltip_selectDateRange,
-                ),
-              ),
-            ],
-          ),
-        ),
-        if (canCombine)
-          PopupMenuItem(
-            value: 'combine',
-            child: Row(
-              children: [
-                const Icon(Icons.call_merge, size: 20),
-                const SizedBox(width: 12),
-                Flexible(
-                  child: Text(context.l10n.diveLog_selection_tooltip_combine),
-                ),
-              ],
-            ),
-          ),
-        if (canCombine)
-          PopupMenuItem(
-            value: 'compare3d',
-            child: Row(
-              children: [
-                const Icon(Icons.view_in_ar, size: 20),
-                const SizedBox(width: 12),
-                Flexible(
-                  child: Text(context.l10n.diveLog_selection_tooltip_compare3d),
-                ),
-              ],
-            ),
-          ),
-        if (hasSelection)
-          PopupMenuItem(
-            value: 'export',
-            child: Row(
-              children: [
-                const Icon(Icons.upload, size: 20),
-                const SizedBox(width: 12),
-                Flexible(
-                  child: Text(context.l10n.diveLog_selection_tooltip_export),
-                ),
-              ],
-            ),
-          ),
-      ],
+  /// The baseline select-all, deselect-all and delete controls come from
+  /// [SelectionAppBar], so they are deliberately absent here. This list is
+  /// computed once and handed to both shells, which is what stops the master
+  /// pane from silently offering fewer actions than the full-width bar.
+  List<BulkAction> _bulkActions(List<DiveSummary> dives) {
+    return [
+      BulkAction(
+        id: 'combine',
+        icon: Icons.merge_type,
+        label: context.l10n.diveLog_selection_tooltip_combine,
+        minCount: 2,
+        onInvoke: _combineSelected,
+      ),
+      BulkAction(
+        id: 'compare3d',
+        icon: Icons.view_in_ar,
+        label: context.l10n.diveLog_selection_tooltip_compare3d,
+        minCount: 2,
+        onInvoke: _compareIn3d,
+      ),
+      BulkAction(
+        id: 'export',
+        icon: Icons.upload,
+        label: context.l10n.diveLog_selection_tooltip_export,
+        onInvoke: _showExportDialog,
+      ),
+      BulkAction(
+        id: 'bulk_edit',
+        icon: Icons.edit,
+        label: context.l10n.diveLog_selection_tooltip_edit,
+        onInvoke: _openBulkEdit,
+      ),
+      BulkAction(
+        id: 'date_range',
+        icon: Icons.date_range,
+        label: context.l10n.diveLog_selection_tooltip_selectDateRange,
+        // Operates on the visible list rather than the selection, so it is
+        // useful with nothing checked.
+        alwaysEnabled: true,
+        onInvoke: () => _selectByDateRange(dives),
+      ),
+    ];
+  }
+
+  /// Contextual bar for the full-width standalone layout.
+  SelectionAppBar _buildSelectionAppBar(List<DiveSummary> dives) {
+    return SelectionAppBar(
+      controller: _selection,
+      selectableIds: dives.map((d) => d.id).toList(),
+      actions: _bulkActions(dives),
+      shell: SelectionBarShell.appBar,
+      onDelete: _confirmAndDelete,
+      maxInlineActions: 5,
+    );
+  }
+
+  /// Contextual bar for the master pane, which is too narrow for every icon.
+  ///
+  /// Same actions, same order; only the inline/overflow split differs.
+  Widget _buildSelectionBar(List<DiveSummary> dives) {
+    return SelectionAppBar(
+      controller: _selection,
+      selectableIds: dives.map((d) => d.id).toList(),
+      actions: _bulkActions(dives),
+      shell: SelectionBarShell.pane,
+      onDelete: _confirmAndDelete,
+      maxInlineActions: 1,
     );
   }
 
@@ -1318,9 +1207,15 @@ class _DiveListContentState extends ConsumerState<DiveListContent> {
     final content = _buildTableView(context, filter);
 
     if (_isSelectionMode) {
+      // Pass the real dive list, not an empty one. Passing const [] made
+      // select-all vanish and select-by-date-range select nothing whenever
+      // the list was in table mode.
+      final tableDives = ref.read(allDivesForTableProvider).value ?? const [];
       return Column(
         children: [
-          _buildSelectionBar(const []),
+          _buildSelectionBar(
+            tableDives.map((d) => DiveSummary.fromDive(d)).toList(),
+          ),
           Expanded(child: content),
         ],
       );
@@ -1351,7 +1246,16 @@ class _DiveListContentState extends ConsumerState<DiveListContent> {
                   }
                 },
                 onDiveTap: (id) {
-                  if (_isSelectionMode) {
+                  // Table mode now honours modifier and shift clicks too, so
+                  // selection works the same way as in the list view modes.
+                  final summaries = dives
+                      .map((d) => DiveSummary.fromDive(d))
+                      .toList();
+                  if (SelectableListScope.isShiftPressed()) {
+                    _selectRangeTo(id, summaries);
+                  } else if (SelectableListScope.isModifierPressed()) {
+                    _enterSelectionMode(id);
+                  } else if (_isSelectionMode) {
                     _toggleSelection(id);
                   }
                 },
@@ -1462,15 +1366,9 @@ class _DiveListContentState extends ConsumerState<DiveListContent> {
                   gradientStartColor: gradientColors.start,
                   gradientEndColor: gradientColors.end,
                   isSelectionMode: _isSelectionMode,
-                  isSelected: isSelected,
+                  isChecked: isSelected,
                   isHighlighted: isMasterSelected || isHighlighted,
-                  onTap: () {
-                    if (_isSelectionMode && _isShiftPressed()) {
-                      _selectRangeTo(dive.id, dives);
-                    } else {
-                      _handleItemTap(dive);
-                    }
-                  },
+                  onTap: () => _handleRowTap(dive.id, dives),
                   onLongPress: _isSelectionMode
                       ? null
                       : () => _enterSelectionMode(dive.id),

@@ -23589,4 +23589,21 @@ class AppLocalizationsHu extends AppLocalizations {
   String statistics_conditions_visibility_legacySuffix(String band) {
     return '$band (mérés előtt rögzítve)';
   }
+
+  @override
+  String common_selection_countSelected(Object count) {
+    return '$count kijelölve';
+  }
+
+  @override
+  String get common_selection_enterTooltip => 'Elemek kijelölése';
+
+  @override
+  String get common_selection_exitTooltip => 'Kijelölés befejezése';
+
+  @override
+  String get common_selection_selectAllTooltip => 'Összes kijelölése';
+
+  @override
+  String get common_selection_deselectAllTooltip => 'Kijelölés megszüntetése';
 }

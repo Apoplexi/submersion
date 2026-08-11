@@ -14965,5 +14965,15 @@
         "type": "String"
       }
     }
+  },
+  "common_selection_countSelected": "{count} selected",
+  "common_selection_enterTooltip": "Select items",
+  "common_selection_exitTooltip": "Exit selection",
+  "common_selection_selectAllTooltip": "Select all",
+  "common_selection_deselectAllTooltip": "Deselect all",
+  "@common_selection_countSelected": {
+    "placeholders": {
+      "count": { "type": "Object" }
+    }
   }
 }
