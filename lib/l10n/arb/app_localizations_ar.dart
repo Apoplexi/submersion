@@ -13436,11 +13436,78 @@ class AppLocalizationsAr extends AppLocalizations {
   String get settings_cloudSync_adopt_notNow => 'ليس الآن';
 
   @override
+  String get settings_cloudSync_dangerZone => 'منطقة الخطر';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_tile => 'استبدال مكتبة السحابة';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_tileSubtitle =>
+      'اجعل مكتبة هذا الجهاز هي المكتبة التي تستخدمها جميع الأجهزة';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_dialogTitle =>
+      'استبدال مكتبة السحابة؟';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_dialogIntro =>
+      'تصبح مكتبة هذا الجهاز هي المكتبة التي تستخدمها جميع الأجهزة.';
+
+  @override
+  String settings_cloudSync_replaceLibrary_dialogBody(num diveCount) {
+    String _temp0 = intl.Intl.pluralLogic(
+      diveCount,
+      locale: localeName,
+      other:
+          'تُمحى مكتبة السحابة ويحل محلها $diveCount غوصات الموجودة على هذا الجهاز.',
+      one:
+          'تُمحى مكتبة السحابة ويحل محلها الغوص الواحد الموجود على هذا الجهاز.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String settings_cloudSync_replaceLibrary_peers(num peerCount) {
+    String _temp0 = intl.Intl.pluralLogic(
+      peerCount,
+      locale: localeName,
+      other:
+          'سيُطلب من $peerCount أجهزة أخرى اعتمادها؛ وحتى ذلك الحين لن تُدمج تغييراتها.',
+      one:
+          'سيُطلب من جهاز واحد آخر اعتمادها؛ وحتى ذلك الحين لن تُدمج تغييراته.',
+      zero: 'لا يوجد جهاز آخر يتزامن بعد، لذا لا يوجد ما يمكن اعتماده.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get settings_cloudSync_replaceLibrary_peersUnknown =>
+      'سيُطلب من كل الأجهزة الأخرى اعتمادها؛ وحتى ذلك الحين لن تُدمج تغييراتها.';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_backupNote =>
+      'تُنشأ نسخة احتياطية من هذا الجهاز أولاً. لا يمكن التراجع عن هذا الإجراء.';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_confirmWord => 'استبدال';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_confirmHint =>
+      'اكتب \"استبدال\" للتأكيد';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_confirm => 'استبدال';
+
+  @override
   String get settings_cloudSync_firstSync_banner =>
       'المزامنة الأولى في انتظار التأكيد. اضغط على \'مزامنة الآن\' لمراجعة ما سيتم دمجه.';
 
   @override
   String get settings_cloudSync_firstSync_dialogConfirm => 'دمج ومزامنة';
+
+  @override
+  String get settings_cloudSync_firstSync_replaceHint =>
+      'إذا كنت تريد بدلاً من ذلك أن تحل مكتبة هذا الجهاز محل ما في السحابة، فألغِ العملية واستخدم الإعدادات > مزامنة السحابة > استبدال مكتبة السحابة.';
 
   @override
   String settings_cloudSync_firstSync_dialogContent(
@@ -13527,6 +13594,27 @@ class AppLocalizationsAr extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String settings_cloudSync_peerNeedsAdopt_banner(Object deviceList) {
+    return '$deviceList لا يزال يستخدم إصدار مكتبة أقدم أو غير معروف، لذلك لم تُدمج تغييراته. افتح Submersion عليه لاعتماد المكتبة الحالية.';
+  }
+
+  @override
+  String settings_cloudSync_peerNeedsAdopt_bannerPlural(Object deviceList) {
+    return '$deviceList لا تزال تستخدم إصدار مكتبة أقدم أو غير معروف، لذلك لم تُدمج تغييراتها. افتح Submersion عليها لاعتماد المكتبة الحالية.';
+  }
+
+  @override
+  String settings_cloudSync_peerNeedsAdopt_unnamedDevice(Object shortId) {
+    return 'الجهاز $shortId';
+  }
+
+  @override
+  String get settings_cloudSync_peerNeedsAdopt_listSeparator => '، ';
+
+  @override
+  String get settings_cloudSync_peerNeedsAdopt_listLastSeparator => ' و';
 
   @override
   String settings_cloudSync_peerRequiresUpdate_banner(num count) {
@@ -14829,7 +14917,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get settings_storage_resetDatabase_subtitle =>
-      'حذف جميع البيانات والبدء من جديد';
+      'حذف جميع البيانات على هذا الجهاز والبدء من جديد';
 
   @override
   String get settings_storage_resetDialog_title =>
@@ -14837,7 +14925,10 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get settings_storage_resetDialog_body =>
-      'سيؤدي هذا إلى حذف جميع بياناتك نهائياً بما في ذلك الغوصات والمواقع والمعدات والإعدادات. سيتم إنشاء نسخة احتياطية تلقائياً قبل إعادة التعيين.';
+      'سيؤدي هذا إلى حذف جميع البيانات الموجودة على هذا الجهاز نهائياً، بما في ذلك الغوصات والمواقع والمعدات والإعدادات. سيتم إنشاء نسخة احتياطية تلقائياً قبل إعادة التعيين.\n\nلن تُحذف مكتبتك السحابية، وتحتفظ الأجهزة الأخرى ببياناتها. سيتم فصل مزامنة السحابة حتى لا يُلغى أثر إعادة التعيين؛ يمكنك إعادة توصيلها من الإعدادات > مزامنة السحابة.';
+
+  @override
+  String get settings_storage_resetDialog_confirmWord => 'حذف';
 
   @override
   String get settings_storage_resetDialog_confirmHint => 'اكتب \"حذف\" للتأكيد';
@@ -14860,7 +14951,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get settings_storage_resetComplete_description =>
-      'تم مسح بياناتك وحفظ نسخة احتياطية. اضغط على متابعة لإعادة تحميل التطبيق.';
+      'تم مسح بيانات هذا الجهاز وحفظ نسخة احتياطية. أصبحت مزامنة السحابة الآن غير متصلة حتى لا يُلغى أثر إعادة التعيين؛ يمكنك إعادة توصيلها من الإعدادات > مزامنة السحابة. اضغط على متابعة لإعادة تحميل التطبيق.';
 
   @override
   String get settings_summary_activeDiver => 'الغواص النشط';

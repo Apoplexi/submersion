@@ -13670,12 +13670,81 @@ class AppLocalizationsIt extends AppLocalizations {
   String get settings_cloudSync_adopt_notNow => 'Non ora';
 
   @override
+  String get settings_cloudSync_dangerZone => 'Zona pericolosa';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_tile =>
+      'Sostituisci la libreria cloud';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_tileSubtitle =>
+      'Rendi la libreria di questo dispositivo quella usata da tutti i dispositivi';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_dialogTitle =>
+      'Sostituire la libreria cloud?';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_dialogIntro =>
+      'La libreria di questo dispositivo diventa quella usata da tutti i dispositivi.';
+
+  @override
+  String settings_cloudSync_replaceLibrary_dialogBody(num diveCount) {
+    String _temp0 = intl.Intl.pluralLogic(
+      diveCount,
+      locale: localeName,
+      other:
+          'La libreria cloud viene cancellata e sostituita con le $diveCount immersioni di questo dispositivo.',
+      one:
+          'La libreria cloud viene cancellata e sostituita con la 1 immersione di questo dispositivo.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String settings_cloudSync_replaceLibrary_peers(num peerCount) {
+    String _temp0 = intl.Intl.pluralLogic(
+      peerCount,
+      locale: localeName,
+      other:
+          'A $peerCount altri dispositivi verrà chiesto di adottarla; fino ad allora le loro modifiche non vengono unite.',
+      one:
+          'A 1 altro dispositivo verrà chiesto di adottarla; fino ad allora le sue modifiche non vengono unite.',
+      zero:
+          'Nessun altro dispositivo si sincronizza ancora, quindi non c\'è nulla da adottare.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get settings_cloudSync_replaceLibrary_peersUnknown =>
+      'A tutti gli altri dispositivi verrà chiesto di adottarla; fino ad allora le loro modifiche non vengono unite.';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_backupNote =>
+      'Prima viene creato un backup di questo dispositivo. L\'operazione non può essere annullata.';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_confirmWord => 'Sostituisci';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_confirmHint =>
+      'Digita \"Sostituisci\" per confermare';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_confirm => 'Sostituisci';
+
+  @override
   String get settings_cloudSync_firstSync_banner =>
       'La prima sincronizzazione è in attesa di conferma. Tocca \'Sincronizza ora\' per controllare cosa verrà combinato.';
 
   @override
   String get settings_cloudSync_firstSync_dialogConfirm =>
       'Unisci e sincronizza';
+
+  @override
+  String get settings_cloudSync_firstSync_replaceHint =>
+      'Se invece la libreria di questo dispositivo deve sostituire quella nel cloud, annulla e usa Impostazioni > Sincronizzazione cloud > Sostituisci la libreria cloud.';
 
   @override
   String settings_cloudSync_firstSync_dialogContent(
@@ -13765,6 +13834,27 @@ class AppLocalizationsIt extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String settings_cloudSync_peerNeedsAdopt_banner(Object deviceList) {
+    return '$deviceList ha ancora una versione della libreria più vecchia o sconosciuta, quindi le sue modifiche non sono state unite. Apri Submersion su di esso per adottare la libreria attuale.';
+  }
+
+  @override
+  String settings_cloudSync_peerNeedsAdopt_bannerPlural(Object deviceList) {
+    return '$deviceList hanno ancora una versione della libreria più vecchia o sconosciuta, quindi le loro modifiche non sono state unite. Apri Submersion su di essi per adottare la libreria attuale.';
+  }
+
+  @override
+  String settings_cloudSync_peerNeedsAdopt_unnamedDevice(Object shortId) {
+    return 'dispositivo $shortId';
+  }
+
+  @override
+  String get settings_cloudSync_peerNeedsAdopt_listSeparator => ', ';
+
+  @override
+  String get settings_cloudSync_peerNeedsAdopt_listLastSeparator => ' e ';
 
   @override
   String settings_cloudSync_peerRequiresUpdate_banner(num count) {
@@ -15096,14 +15186,17 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get settings_storage_resetDatabase_subtitle =>
-      'Elimina tutti i dati e ricomincia da zero';
+      'Elimina tutti i dati su questo dispositivo e ricomincia da zero';
 
   @override
   String get settings_storage_resetDialog_title => 'Reimpostare il database?';
 
   @override
   String get settings_storage_resetDialog_body =>
-      'Questo eliminera permanentemente tutti i tuoi dati, incluse immersioni, siti, attrezzatura e impostazioni. Un backup verra creato automaticamente prima del reset.';
+      'Questo elimina permanentemente tutti i dati su QUESTO dispositivo, incluse immersioni, siti, attrezzatura e impostazioni. Un backup viene creato automaticamente prima del reset.\n\nLa tua libreria cloud non viene eliminata e gli altri dispositivi conservano i loro dati. La sincronizzazione cloud verrà disconnessa affinché il reset non venga annullato; puoi riconnetterla in Impostazioni > Sincronizzazione cloud.';
+
+  @override
+  String get settings_storage_resetDialog_confirmWord => 'Elimina';
 
   @override
   String get settings_storage_resetDialog_confirmHint =>
@@ -15126,7 +15219,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get settings_storage_resetComplete_description =>
-      'I tuoi dati sono stati cancellati e un backup e stato salvato. Tocca continua per ricaricare l\'app.';
+      'I dati di questo dispositivo sono stati cancellati ed è stato salvato un backup. La sincronizzazione cloud ora è disconnessa affinché il ripristino non venga annullato; puoi riconnetterla in Impostazioni > Sincronizzazione cloud. Tocca continua per ricaricare l\'app.';
 
   @override
   String get settings_summary_activeDiver => 'Subacqueo attivo';
