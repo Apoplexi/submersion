@@ -9,6 +9,10 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
+  String get universalImport_action_importFromGarmin =>
+      'Import from Garmin Device';
+
+  @override
   String diveLog_edit_flightWindowWarning(String time) {
     return 'This dive ends after the latest safe surfacing time for your flight ($time)';
   }

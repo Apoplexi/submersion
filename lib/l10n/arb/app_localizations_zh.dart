@@ -9,6 +9,9 @@ class AppLocalizationsZh extends AppLocalizations {
   AppLocalizationsZh([String locale = 'zh']) : super(locale);
 
   @override
+  String get universalImport_action_importFromGarmin => '从 Garmin 设备导入';
+
+  @override
   String diveLog_edit_flightWindowWarning(String time) {
     return '此次潜水的结束时间晚于您航班的最后安全出水时间($time)';
   }

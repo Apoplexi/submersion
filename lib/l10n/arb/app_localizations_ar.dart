@@ -9,6 +9,10 @@ class AppLocalizationsAr extends AppLocalizations {
   AppLocalizationsAr([String locale = 'ar']) : super(locale);
 
   @override
+  String get universalImport_action_importFromGarmin =>
+      'استيراد من جهاز Garmin';
+
+  @override
   String diveLog_edit_flightWindowWarning(String time) {
     return 'ينتهي هذا الغوص بعد آخر وقت آمن للصعود إلى السطح قبل رحلتك ($time)';
   }

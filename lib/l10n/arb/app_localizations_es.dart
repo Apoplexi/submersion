@@ -9,6 +9,10 @@ class AppLocalizationsEs extends AppLocalizations {
   AppLocalizationsEs([String locale = 'es']) : super(locale);
 
   @override
+  String get universalImport_action_importFromGarmin =>
+      'Importar desde dispositivo Garmin';
+
+  @override
   String diveLog_edit_flightWindowWarning(String time) {
     return 'Esta inmersión termina después de la última hora segura para emerger antes de tu vuelo ($time)';
   }
