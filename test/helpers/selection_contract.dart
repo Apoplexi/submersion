@@ -13,6 +13,13 @@ import 'package:flutter_test/flutter_test.dart';
 /// [firstRow] finds the first selectable row.
 /// [applyFilter] narrows the surface so pruning can be observed, leaving
 /// [visibleAfterFilter] rows on screen.
+/// Whether this surface renders its checked state as [Checkbox] widgets.
+///
+/// List surfaces do. Grid surfaces such as the dive media section draw a check
+/// badge over the thumbnail instead, so they opt out of that one assertion
+/// while still being held to the rest of the contract.
+enum CheckedIndicator { checkbox, custom }
+
 Future<void> verifySelectionContract(
   WidgetTester tester, {
   required Widget Function() build,
@@ -20,6 +27,7 @@ Future<void> verifySelectionContract(
   required Finder firstRow,
   required Future<void> Function(WidgetTester tester) applyFilter,
   required int visibleAfterFilter,
+  CheckedIndicator indicator = CheckedIndicator.checkbox,
 }) async {
   // The Select affordance is visible without any hidden gesture.
   await tester.pumpWidget(build());
@@ -38,11 +46,13 @@ Future<void> verifySelectionContract(
     findsOneWidget,
     reason: 'tapping Select must enter selection mode',
   );
-  expect(
-    find.byType(Checkbox),
-    findsWidgets,
-    reason: 'selection mode must render checkboxes in the leading slot',
-  );
+  if (indicator == CheckedIndicator.checkbox) {
+    expect(
+      find.byType(Checkbox),
+      findsWidgets,
+      reason: 'selection mode must render checkboxes in the leading slot',
+    );
+  }
   expect(
     checkedCount(tester),
     0,
@@ -104,10 +114,18 @@ Future<void> verifySelectionContract(
   );
 }
 
-/// Number of checked [Checkbox] widgets currently rendered.
+/// Number of checked items, read from the selection bar's own count.
+///
+/// The bar is the one element every selectable surface renders, so this works
+/// for grids that draw check badges as well as lists that draw checkboxes.
+/// Callers must pin the locale to `en`, which the contract already assumes.
 int checkedCount(WidgetTester tester) {
-  return tester
-      .widgetList<Checkbox>(find.byType(Checkbox))
-      .where((c) => c.value == true)
-      .length;
+  final pattern = RegExp(r'^(\d+) selected$');
+  for (final widget in tester.widgetList<Text>(find.byType(Text))) {
+    final data = widget.data;
+    if (data == null) continue;
+    final match = pattern.firstMatch(data);
+    if (match != null) return int.parse(match.group(1)!);
+  }
+  return 0;
 }

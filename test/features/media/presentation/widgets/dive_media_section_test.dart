@@ -149,7 +149,10 @@ void main() {
       await tester.longPress(find.byType(MediaThumbnailTile).first);
       await tester.pumpAndSettle();
 
-      expect(find.byType(MediaSelectionHeader), findsOneWidget);
+      // The dive media section now renders the shared SelectionAppBar
+      // rather than MediaSelectionHeader, which the site media section
+      // still uses.
+      expect(find.byKey(const ValueKey('selection_exit')), findsOneWidget);
       expect(find.text('1 selected'), findsOneWidget);
       // The normal header and its add affordance yield to selection.
       expect(find.text('Photos & Video'), findsNothing);
@@ -162,15 +165,23 @@ void main() {
       await tester.longPress(find.byType(MediaThumbnailTile).first);
       await tester.pumpAndSettle();
 
-      await tester.tap(find.widgetWithText(TextButton, 'Select All'));
+      await tester.tap(find.byKey(const ValueKey('selection_select_all')));
       await tester.pumpAndSettle();
       expect(find.text('2 selected'), findsOneWidget);
-      // Nothing left to select, so the button retires.
-      expect(find.widgetWithText(TextButton, 'Select All'), findsNothing);
+      // Nothing left to select, so the control disables rather than
+      // disappearing -- the shared bar keeps a stable action set.
+      expect(
+        tester
+            .widget<IconButton>(
+              find.byKey(const ValueKey('selection_select_all')),
+            )
+            .onPressed,
+        isNull,
+      );
 
-      await tester.tap(find.byIcon(Icons.close));
+      await tester.tap(find.byKey(const ValueKey('selection_exit')));
       await tester.pumpAndSettle();
-      expect(find.byType(MediaSelectionHeader), findsNothing);
+      expect(find.byKey(const ValueKey('selection_exit')), findsNothing);
       expect(find.text('Photos & Video'), findsOneWidget);
     });
   });

@@ -268,6 +268,57 @@ void main() {
     });
   });
 
+  group('SelectionController.replaceChecked', () {
+    test('activates implicitly when the mode was not already active', () {
+      final controller = SelectionController();
+      // A gesture layer that owns its own long-press cannot route through
+      // enterImplicit, because it reports a whole set rather than one id.
+      controller.replaceChecked(['b']);
+      expect(controller.value.isActive, isTrue);
+      expect(controller.value.enteredExplicitly, isFalse);
+      expect(controller.value.checkedIds, {'b'});
+      expect(controller.value.anchorId, 'b');
+    });
+
+    test('does not activate the mode on an empty set', () {
+      final controller = SelectionController();
+      controller.replaceChecked(const []);
+      expect(controller.value.isActive, isFalse);
+    });
+
+    test('preserves an explicit entry, which selectAll would overwrite', () {
+      final controller = SelectionController();
+      controller.enterExplicit();
+      controller.replaceChecked(['a', 'b']);
+      expect(controller.value.enteredExplicitly, isTrue);
+      expect(controller.value.checkedIds, {'a', 'b'});
+    });
+
+    test('preserves an implicit entry across further changes', () {
+      final controller = SelectionController();
+      controller.replaceChecked(['a']);
+      controller.replaceChecked(['a', 'b']);
+      expect(controller.value.enteredExplicitly, isFalse);
+      expect(controller.value.checkedIds, {'a', 'b'});
+    });
+
+    test('keeps an explicit mode active when replaced with nothing', () {
+      final controller = SelectionController();
+      controller.enterExplicit();
+      controller.replaceChecked(['a']);
+      controller.replaceChecked(const []);
+      expect(controller.value.isActive, isTrue);
+      expect(controller.value.checkedIds, isEmpty);
+    });
+
+    test('ends an implicit mode when replaced with nothing', () {
+      final controller = SelectionController();
+      controller.replaceChecked(['a']);
+      controller.replaceChecked(const []);
+      expect(controller.value.isActive, isFalse);
+    });
+  });
+
   group('SelectionController.pruneTo', () {
     test('drops checked ids that left the visible set', () {
       final controller = SelectionController();
