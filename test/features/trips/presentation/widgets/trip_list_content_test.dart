@@ -19,6 +19,8 @@ import 'package:submersion/features/trips/presentation/widgets/trip_list_content
 import 'package:submersion/shared/models/entity_table_config.dart';
 import 'package:submersion/shared/providers/entity_table_config_providers.dart';
 
+import '../../../../helpers/selection_contract.dart';
+
 import '../../../../helpers/mock_providers.dart';
 import '../../../../helpers/test_app.dart';
 
@@ -111,6 +113,12 @@ Future<List<Override>> _buildOverrides({
   ];
 }
 
+/// Mutable source for the contract test's filter step, so the visible
+/// list can be narrowed mid-test the way a real filter would.
+final _visibleTripsProvider = StateProvider<List<TripWithStats>>(
+  (ref) => const [],
+);
+
 Future<List<Override>> _buildPhoneOverrides({
   required List<TripWithStats> trips,
   ListViewMode viewMode = ListViewMode.detailed,
@@ -138,6 +146,56 @@ Future<List<Override>> _buildPhoneOverrides({
 }
 
 void main() {
+  group('selection contract', () {
+    testWidgets('satisfies the shared selection contract', (tester) async {
+      final all = <TripWithStats>[
+        _makeTrip(id: 't1', name: 'Aaa Trip'),
+        _makeTrip(id: 't2', name: 'Bbb Trip'),
+        _makeTrip(id: 't3', name: 'Ccc Trip'),
+      ];
+
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+      final overrides = <Override>[
+        sharedPreferencesProvider.overrideWithValue(prefs),
+        settingsProvider.overrideWith((ref) => MockSettingsNotifier()),
+        currentDiverIdProvider.overrideWith(
+          (ref) => MockCurrentDiverIdNotifier(),
+        ),
+        _visibleTripsProvider.overrideWith((ref) => all),
+        tripListNotifierProvider.overrideWith(
+          (ref) => _MockTripListNotifier(all),
+        ),
+        tripListViewModeProvider.overrideWith((ref) => ListViewMode.detailed),
+        tripTableConfigProvider.overrideWith(
+          (ref) => _TestTripTableConfigNotifier(_testConfig),
+        ),
+        sortedFilteredTripsProvider.overrideWith(
+          (ref) => AsyncValue.data(ref.watch(_visibleTripsProvider)),
+        ),
+        highlightedTripIdProvider.overrideWith((ref) => null),
+      ];
+
+      await verifySelectionContract(
+        tester,
+        build: () => testApp(
+          overrides: overrides,
+          locale: const Locale('en'),
+          child: const TripListContent(showAppBar: true),
+        ),
+        selectButton: find.byKey(const ValueKey('enter_selection')),
+        firstRow: find.text('Aaa Trip'),
+        applyFilter: (tester) async {
+          final container = ProviderScope.containerOf(
+            tester.element(find.byType(TripListContent)),
+          );
+          container.read(_visibleTripsProvider.notifier).state = [all.first];
+        },
+        visibleAfterFilter: 1,
+      );
+    });
+  });
+
   group('TripListContent in table mode', () {
     testWidgets('renders table with column headers', (tester) async {
       final trips = [
