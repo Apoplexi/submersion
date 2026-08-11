@@ -306,4 +306,41 @@ echo "$OUT" | grep -qi "Merge origin/main" \
 echo "$OUT" | grep -qi "^- Merge pull request" \
   && fail "a merge subject leaked into the notes instead of its PR title"
 
+# --- Prose titles are bucketed, not discarded -------------------------------
+# 71 of the last 120 PR titles on main are prose with no conventional prefix.
+# Discarding them is what emptied the store notes, so a prose title is
+# tester-facing work and is bucketed by its leading verb.
+
+OUT=$(printf '%s\n' \
+  'Fix unreliable S3 sync on mobile networks' \
+  'Stop the Linux opening grant after the fallback has been taken' \
+  'Show uploaded certification card photos in the wallet' \
+  'Raise the iOS deployment target to 15.0' \
+  | "$GEN" --stdin --format store)
+
+echo "$OUT" | grep -q "unreliable S3 sync" || fail "prose fix title was discarded"
+echo "$OUT" | grep -q "certification card photos" || fail "prose feature title was discarded"
+echo "$OUT" | grep -q "iOS deployment target" || fail "prose title with no fix verb was discarded"
+
+# Split at the Fixed heading to confirm each title landed in the right bucket.
+NEWWORK=$(echo "$OUT" | sed -n '1,/^Fixed$/p')
+FIXWORK=$(echo "$OUT" | sed -n '/^Fixed$/,$p')
+
+echo "$FIXWORK" | grep -q "unreliable S3 sync" || fail "a Fix-led title did not land under Fixed"
+echo "$FIXWORK" | grep -q "Linux opening grant" || fail "a Stop-led title did not land under Fixed"
+echo "$NEWWORK" | grep -q "certification card photos" || fail "a Show-led title did not land under new work"
+
+# A conventional prefix still wins over the prose heuristic, in both
+# directions: an internal type stays internal even though it is not prose,
+# and feat/fix/perf keep their existing mapping.
+OUT=$(printf '%s\n' \
+  'ci: retain the newest 30 beta releases' \
+  'chore: bump deps' \
+  'refactor: extract a helper' \
+  | "$GEN" --stdin --format store)
+echo "$OUT" | grep -q "retain the newest 30" && fail "a ci-prefixed title reached the store notes"
+echo "$OUT" | grep -q "bump deps" && fail "a chore-prefixed title reached the store notes"
+echo "$OUT" | grep -q "extract a helper" && fail "a refactor-prefixed title reached the store notes"
+echo "$OUT" | grep -qi "internal" || fail "an all-internal range should still say so"
+
 echo "PASS: all beta_release_notes tests passed"

@@ -36,6 +36,12 @@ PLAY_LIMIT=500
 # Room for the "...and N more." line appended after truncation.
 TRUNCATION_RESERVE=24
 
+# Held in variables and used unquoted: bash silently fails to match a regex
+# written inline with an escaped trailing space, matching 2 of 120 real PR
+# titles where the same expression in grep -E matched 49.
+CONVENTIONAL_RE='^[a-z]+(\([^)]*\))?!?: '
+FIX_VERB_RE='^(Fix|Fixes|Fixed|Stop|Stops|Resolve|Resolves|Correct|Corrects|Prevent|Prevents|Repair|Repairs|Restore|Restores) '
+
 RANGE=""
 FORMAT=""
 USE_STDIN=false
@@ -142,7 +148,24 @@ classify_subjects() {
       perf\(*\)*:*|perf:*|perf!:*|perf\(*\)!:*)
         IMPROVEMENTS=$(append_line "$IMPROVEMENTS" "$message") ;;
       *)
-        INTERNAL=$(append_line "$INTERNAL" "$message") ;;
+        # Everything that is not feat/fix/perf. A subject with any other
+        # conventional prefix (chore, ci, docs, test, refactor, build, style)
+        # is internal by definition. A subject without one is a prose PR
+        # title, which is real tester-facing work, so it is bucketed by its
+        # leading verb rather than dropped.
+        #
+        # An infrastructure PR titled in prose therefore surfaces as
+        # tester-facing. That is the deliberate direction of the error: the
+        # defect being fixed is under-reporting, and prefixing the PR title
+        # "ci:" keeps it internal when that is wanted.
+        if [[ "$subject" =~ $CONVENTIONAL_RE ]]; then
+          INTERNAL=$(append_line "$INTERNAL" "$message")
+        elif [[ "$subject" =~ $FIX_VERB_RE ]]; then
+          FIXES=$(append_line "$FIXES" "$message")
+        else
+          FEATURES=$(append_line "$FEATURES" "$message")
+        fi
+        ;;
     esac
   done <<EOF
 $1
