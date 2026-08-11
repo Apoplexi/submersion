@@ -363,8 +363,9 @@ platform :ios do
       raise unless duplicate_build_error?(e.message)
 
       UI.important(
-        "This build is already on App Store Connect; skipping the upload and " \
-        "continuing to distribution."
+        "This build is already on App Store Connect; skipping the upload. " \
+        "This lane does not distribute: run distribute_testflight_beta to " \
+        "assign the build to the Public Beta group."
       )
     end
     UI.success("iOS beta binary is on App Store Connect!")
