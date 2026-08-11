@@ -33,6 +33,7 @@ import 'package:submersion/core/services/sync/crypto/sync_encryption_service.dar
 import 'package:submersion/core/services/sync/established_provider_store.dart';
 import 'package:submersion/core/services/sync/library_epoch.dart';
 import 'package:submersion/core/services/sync/library_epoch_store.dart';
+import 'package:submersion/core/services/sync/library_replace_intent.dart';
 import 'package:submersion/core/services/sync/sync_device_metadata.dart';
 import 'package:submersion/core/services/sync/library_moved.dart';
 import 'package:submersion/core/services/sync/library_moved_store.dart';
@@ -577,6 +578,23 @@ class FirstSyncMergeInfo {
   });
 }
 
+/// Blast radius for the Replace confirmation: how much of this device's
+/// library is about to become authoritative, and how many peers will be asked
+/// to adopt it.
+///
+/// [peerFileCount] is null only when the peer listing FAILED or timed out --
+/// never when it succeeded and found none. The dialog then falls back to a
+/// count-less sentence rather than blocking, because a pre-check must not gate
+/// the escape hatch it is describing.
+class ReplacePreflight {
+  const ReplacePreflight({required this.localDiveCount, this.peerFileCount});
+
+  final int localDiveCount;
+  final int? peerFileCount;
+
+  bool get hasPeerCount => peerFileCount != null;
+}
+
 /// Sync state notifier
 class SyncNotifier extends StateNotifier<SyncState> {
   final SyncRepository _syncRepository;
@@ -795,6 +813,62 @@ class SyncNotifier extends StateNotifier<SyncState> {
       _log.warning('Library replace pre-check failed: $e');
       return null;
     }
+  }
+
+  /// Blast radius for the Replace confirmation. Never throws: a failed or slow
+  /// peer listing degrades to a null count, because a pre-check must not gate
+  /// the escape hatch it is describing.
+  Future<ReplacePreflight> replacePreflight() async {
+    final localDives = await _ref.read(diveRepositoryProvider).getDiveCount();
+    final provider = _ref.read(cloudStorageProviderProvider);
+    if (provider == null) {
+      return ReplacePreflight(localDiveCount: localDives);
+    }
+    try {
+      final peers = await _ref
+          .read(syncInitializerProvider)
+          .peerSyncFiles(provider)
+          .timeout(const Duration(seconds: 8));
+      return ReplacePreflight(
+        localDiveCount: localDives,
+        peerFileCount: peers.length,
+      );
+    } catch (e) {
+      _log.warning('Replace preflight peer listing failed: $e');
+      return ReplacePreflight(localDiveCount: localDives);
+    }
+  }
+
+  /// Make this device's library the one every device uses.
+  ///
+  /// Arms the replace intent, then syncs: the epoch gate checks pendingReplace
+  /// BEFORE reading the cloud marker, so this also works on a device currently
+  /// fenced off awaiting someone else's adoption -- it is the universal escape
+  /// hatch. If the sync fails the intent survives, and the next sync (or the
+  /// launch sync) retries rather than merging.
+  ///
+  /// The CALLER is responsible for the safety backup (cloud_sync_page runs it
+  /// via backupServiceProvider to avoid a provider import cycle), matching
+  /// [adoptReplacedLibrary].
+  Future<void> replaceCloudLibraryFromThisDevice() async {
+    final provider = _ref.read(cloudStorageProviderProvider);
+    if (provider == null) {
+      state = state.copyWith(
+        status: SyncStatus.error,
+        message: 'No cloud provider configured',
+      );
+      return;
+    }
+    final store = _ref.read(libraryEpochStoreProvider);
+    // Already armed (a previous attempt failed mid-flight): do not mint a
+    // second epoch, just drive the pending one to completion.
+    if (store.pendingReplace == null) {
+      await LibraryReplaceIntent(
+        SyncDeviceMetadata(_syncRepository).resolve,
+        store,
+      ).mint();
+    }
+    await performSync();
   }
 
   /// After a successful sync, if an old backend is armed for cleanup and we
