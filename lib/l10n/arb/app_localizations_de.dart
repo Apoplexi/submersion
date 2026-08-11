@@ -23649,4 +23649,53 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get common_selection_deselectAllTooltip => 'Auswahl aufheben';
+
+  @override
+  String common_bulkDelete_title(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Elemente löschen?',
+      one: '$count Element löschen?',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get common_bulkDelete_body =>
+      'Dies kann nicht rückgängig gemacht werden.';
+
+  @override
+  String common_bulkDelete_snackbar(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count gelöscht',
+      one: '$count gelöscht',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get marineLife_species_delete_confirmTitle => 'Art löschen?';
+
+  @override
+  String marineLife_species_delete_confirmBody(String name) {
+    return 'Möchten Sie \"$name\" wirklich löschen?';
+  }
+
+  @override
+  String marineLife_species_delete_inUseError(String name) {
+    return '\"$name\" kann nicht gelöscht werden - es gibt Sichtungen';
+  }
+
+  @override
+  String marineLife_species_delete_snackbar(String name) {
+    return '\"$name\" gelöscht';
+  }
+
+  @override
+  String marineLife_species_delete_error(String error) {
+    return 'Fehler beim Löschen der Art: $error';
+  }
 }

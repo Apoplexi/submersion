@@ -29,12 +29,20 @@ final filteredDiveStatisticsProvider = FutureProvider<DiveStatistics>((
   return repository.getStatistics(diverId: currentDiverId, filter: filter);
 });
 
-/// Adds keepAlive with a 5-minute expiry and watches the statistics version
-/// so all stats providers stay cached across navigations but refresh when
-/// dives are mutated.
+/// Adds keepAlive with a 5-minute expiry and subscribes to the statistics
+/// change tick, so all stats providers stay cached across navigations but
+/// refresh whenever any table they read is written.
+///
+/// This used to watch `statisticsVersionProvider`, a counter incremented from
+/// exactly one line in the app, inside `PaginatedDiveListNotifier`. Merge,
+/// consolidate, import, and sync pulls never bumped it, so the cache this doc
+/// comment claimed was reactive stayed stale for up to five minutes: merge two
+/// dives, open Statistics, and every chart still counted the merged-away dive
+/// (issue #974).
 void _keepAliveWithExpiry(Ref ref) {
-  // Watch version so we refetch when dives change
-  ref.watch(statisticsVersionProvider);
+  ref.invalidateSelfWhen(
+    ref.watch(statisticsRepositoryProvider).watchStatisticsChanges(),
+  );
   // Keep alive for 5 minutes after last listener detaches
   final link = ref.keepAlive();
   final timer = Timer(const Duration(minutes: 5), link.close);

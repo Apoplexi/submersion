@@ -16,6 +16,12 @@ class ItineraryDayRepository {
   final _uuid = const Uuid();
   final _log = LoggerService.forClass(ItineraryDayRepository);
 
+  /// Emits whenever the `trip_itinerary_days` table changes so the trip
+  /// itinerary providers refresh after a sync or any other write that bypasses
+  /// the notifiers.
+  Stream<void> watchItineraryChanges() =>
+      _db.tableUpdates(TableUpdateQuery.onTable(_db.tripItineraryDays));
+
   /// Get all itinerary days for a trip, ordered by dayNumber ascending.
   Future<List<domain.ItineraryDay>> getByTripId(String tripId) async {
     try {

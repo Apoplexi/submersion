@@ -14975,5 +14975,43 @@
     "placeholders": {
       "count": { "type": "Object" }
     }
+  },
+  "common_bulkDelete_title": "{count, plural, one{Delete {count} item?} other{Delete {count} items?}}",
+  "common_bulkDelete_body": "This cannot be undone.",
+  "common_bulkDelete_snackbar": "{count, plural, one{{count} deleted} other{{count} deleted}}",
+  "@common_bulkDelete_title": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "@common_bulkDelete_snackbar": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "marineLife_species_delete_confirmTitle": "Delete species?",
+  "marineLife_species_delete_confirmBody": "Are you sure you want to delete \"{name}\"?",
+  "marineLife_species_delete_inUseError": "Cannot delete \"{name}\" - it has sightings",
+  "marineLife_species_delete_snackbar": "Deleted \"{name}\"",
+  "marineLife_species_delete_error": "Error deleting species: {error}",
+  "@marineLife_species_delete_confirmBody": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "@marineLife_species_delete_inUseError": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "@marineLife_species_delete_snackbar": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "@marineLife_species_delete_error": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
   }
 }

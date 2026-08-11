@@ -188,8 +188,8 @@ class YearInReview {
 
 /// This year vs last year. Null when both years are empty.
 final yearInReviewProvider = FutureProvider<YearInReview?>((ref) async {
-  ref.watch(statisticsVersionProvider);
   final repository = ref.watch(statisticsRepositoryProvider);
+  ref.invalidateSelfWhen(repository.watchStatisticsChanges());
   final diverId = ref.watch(currentDiverIdProvider);
   final year = DateTime.now().year;
   final current = await repository.getYearStats(year, diverId: diverId);
@@ -242,14 +242,13 @@ class DashboardQuickStats {
 /// back the Statistics Social/Geographic/Marine-Life pages -- so this reads
 /// the shared repository directly instead of watching those providers, and
 /// re-implements their diver scoping (but not their filter scoping).
-/// [statisticsVersionProvider] is watched explicitly to preserve the
-/// dive-mutation reactivity that used to arrive transitively through those
-/// three providers.
+/// The statistics change tick preserves the dive-mutation reactivity that used
+/// to arrive transitively through those three providers.
 final dashboardQuickStatsProvider = FutureProvider<DashboardQuickStats>((
   ref,
 ) async {
-  ref.watch(statisticsVersionProvider);
   final repository = ref.watch(statisticsRepositoryProvider);
+  ref.invalidateSelfWhen(repository.watchStatisticsChanges());
   final diverId = ref.watch(currentDiverIdProvider);
 
   // Get top buddy

@@ -88,6 +88,9 @@ void main() {
         safetyReviewEnabledProvider.overrideWithValue(true),
         profileAnalysisProvider('d1').overrideWith((ref) async => analysis),
         profileAnalysisProvider('d2').overrideWith((ref) async => analysis),
+        profileAnalysisProvider(
+          'd-newer',
+        ).overrideWith((ref) async => analysis),
       ],
     );
     addTearDown(container.dispose);
@@ -114,6 +117,34 @@ void main() {
 
     expect(repo.saved, <String>['d1']);
     expect(result.swept, 1);
+  });
+
+  test('sweeps oldest first so residual analysis is already cached', () async {
+    final newer = now.add(const Duration(days: 1)).millisecondsSinceEpoch;
+    await db
+        .into(db.dives)
+        .insert(
+          DivesCompanion(
+            id: const Value('d-newer'),
+            diverId: const Value('diver-a'),
+            diveDateTime: Value(newer),
+            createdAt: Value(newer),
+            updatedAt: Value(newer),
+          ),
+        );
+    final repo = _RecordingRepo();
+
+    await makeContainer(
+      repo,
+    ).read(safetyReviewSweepProvider).run(diverId: 'diver-a');
+
+    expect(
+      repo.saved,
+      <String>['d1', 'd-newer'],
+      reason:
+          'newer profile analysis recursively awaits older dives, so the '
+          'sweep must warm that cache in chronological order',
+    );
   });
 
   test('reports progress ending at the total', () async {

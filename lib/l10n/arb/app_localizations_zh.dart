@@ -22486,4 +22486,50 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get common_selection_deselectAllTooltip => '取消全选';
+
+  @override
+  String common_bulkDelete_title(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '删除 $count 项？',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get common_bulkDelete_body => '此操作无法撤消。';
+
+  @override
+  String common_bulkDelete_snackbar(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '已删除 $count 项',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get marineLife_species_delete_confirmTitle => '删除物种？';
+
+  @override
+  String marineLife_species_delete_confirmBody(String name) {
+    return '确定要删除“$name”吗？';
+  }
+
+  @override
+  String marineLife_species_delete_inUseError(String name) {
+    return '无法删除“$name”——它有目击记录';
+  }
+
+  @override
+  String marineLife_species_delete_snackbar(String name) {
+    return '已删除“$name”';
+  }
+
+  @override
+  String marineLife_species_delete_error(String error) {
+    return '删除物种时出错：$error';
+  }
 }

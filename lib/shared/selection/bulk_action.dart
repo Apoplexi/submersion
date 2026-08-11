@@ -30,6 +30,14 @@ class BulkAction {
   /// such as "select by date range", and so stay enabled at zero checked.
   final bool alwaysEnabled;
 
+  /// Extra condition on *which* items are checked, not just how many.
+  ///
+  /// Count gates cannot express "every checked item is still active" or
+  /// "every checked course is in progress", and those actions are incoherent
+  /// on a mixed selection. Surfaces supply a predicate over the checked ids
+  /// instead of contorting [maxCount].
+  final bool Function(Set<String> checkedIds)? isEnabled;
+
   final VoidCallback onInvoke;
 
   const BulkAction({
@@ -41,17 +49,25 @@ class BulkAction {
     this.maxCount,
     this.isDestructive = false,
     this.alwaysEnabled = false,
+    this.isEnabled,
   });
 
   /// Whether this action can run against a selection of [count] items.
   ///
   /// An empty selection never enables an action, whatever [minCount] says,
   /// unless the action declared itself [alwaysEnabled].
-  bool isEnabledFor(int count) {
+  bool isEnabledFor(int count) => isEnabledForSelection(count, const {});
+
+  /// Whether this action can run against [checkedIds].
+  ///
+  /// [count] is passed separately so callers that only know the size (tests,
+  /// simple surfaces) need not build a set.
+  bool isEnabledForSelection(int count, Set<String> checkedIds) {
     if (alwaysEnabled) return true;
     if (count == 0) return false;
     if (count < minCount) return false;
     if (maxCount != null && count > maxCount!) return false;
+    if (isEnabled != null && !isEnabled!(checkedIds)) return false;
     return true;
   }
 }

@@ -38,6 +38,26 @@ class TrackGeometryCacheRepository {
 
   LocalCacheDatabase get _db => LocalCacheDatabaseService.instance.database;
 
+  /// Emits whenever cached geometry changes so map providers redraw after a
+  /// trim or split invalidates a track's rows and the next render rewrites
+  /// them.
+  ///
+  /// Not a write-once cache: [invalidate] deletes every LOD for a track and
+  /// [write] re-inserts on conflict, so a rendered polyline can outlive the
+  /// geometry it was built from.
+  ///
+  /// Emits nothing when the local cache database is not initialised, matching
+  /// the "behave as an empty cache" contract the read/write methods use.
+  Stream<void> watchGeometryChanges() {
+    final LocalCacheDatabase db;
+    try {
+      db = _db;
+    } on StateError {
+      return const Stream.empty();
+    }
+    return db.tableUpdates(TableUpdateQuery.onTable(db.gpsTrackGeometryCache));
+  }
+
   Future<void> _deleteRow(
     LocalCacheDatabase db,
     String trackId,

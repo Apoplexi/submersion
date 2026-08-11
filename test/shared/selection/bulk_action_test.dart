@@ -50,6 +50,34 @@ void main() {
       expect(build(minCount: 5, alwaysEnabled: true).isEnabledFor(1), isTrue);
     });
 
+    test('an isEnabled predicate can veto an otherwise valid selection', () {
+      final action = BulkAction(
+        id: 'retire',
+        icon: Icons.archive,
+        label: 'Retire',
+        onInvoke: () {},
+        isEnabled: (ids) => ids.every((id) => id.startsWith('active-')),
+      );
+      expect(action.isEnabledForSelection(2, {'active-1', 'active-2'}), isTrue);
+      expect(
+        action.isEnabledForSelection(2, {'active-1', 'retired-2'}),
+        isFalse,
+        reason: 'a mixed selection must not enable a uniform-only action',
+      );
+    });
+
+    test('isEnabled cannot rescue a count that is already invalid', () {
+      final action = BulkAction(
+        id: 'merge',
+        icon: Icons.merge_type,
+        label: 'Merge',
+        minCount: 2,
+        onInvoke: () {},
+        isEnabled: (ids) => true,
+      );
+      expect(action.isEnabledForSelection(1, {'a'}), isFalse);
+    });
+
     test('defaults to non-destructive and not always enabled', () {
       final action = build();
       expect(action.isDestructive, isFalse);

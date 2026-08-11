@@ -23,6 +23,7 @@ final cylinderConfigsProvider = FutureProvider<List<CylinderConfig>>((
   final validatedDiverId = await ref.watch(
     validatedCurrentDiverIdProvider.future,
   );
+  ref.invalidateSelfWhen(repository.watchConfigsChanges());
   return repository.getAllConfigs(
     diverId: validatedDiverId,
     includeItems: true,
@@ -36,6 +37,7 @@ final cylinderConfigsForEquipmentProvider =
       equipmentId,
     ) async {
       final repository = ref.watch(cylinderConfigRepositoryProvider);
+      ref.invalidateSelfWhen(repository.watchConfigsChanges());
       return repository.getConfigsForEquipment(equipmentId);
     });
 
@@ -45,6 +47,7 @@ final cylinderConfigProvider = FutureProvider.family<CylinderConfig?, String>((
   id,
 ) async {
   final repository = ref.watch(cylinderConfigRepositoryProvider);
+  ref.invalidateSelfWhen(repository.watchConfigsChanges());
   return repository.getConfigById(id);
 });
 

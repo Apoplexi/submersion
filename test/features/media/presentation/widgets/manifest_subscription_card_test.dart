@@ -42,6 +42,11 @@ class _FakeRepo implements ManifestSubscriptionRepository {
   final List<({String id, String url, String? name})> editCalls =
       <({String id, String url, String? name})>[];
 
+  /// No database, so nothing ever ticks. Without this the class falls through
+  /// to noSuchMethod, which returns null where a Stream is required.
+  @override
+  Stream<void> watchSubscriptionsChanges() => const Stream.empty();
+
   @override
   Future<List<ManifestSubscription>> listAllActive() async => subs;
 

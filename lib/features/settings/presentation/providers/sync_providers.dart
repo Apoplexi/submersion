@@ -313,6 +313,11 @@ const _providersLog = LoggerService('SyncProviders');
 /// covers every connect path — settings pages and the setup wizard alike —
 /// without each having to re-key. iCloud/Google Drive are session-managed
 /// (no keychain blob) and skip the mirror.
+// no-tick: derivation WITH side effects -- it calls setSyncAccount and mirrors
+// credentials. A tick on the accounts table would re-run those writes on every
+// account change, which writes the accounts table again. The selection is
+// re-derived on each launch and on a deliberate provider-type change, which is
+// the intended trigger.
 final selectedSyncAccountProvider = FutureProvider<domain.ConnectedAccount?>((
   ref,
 ) async {

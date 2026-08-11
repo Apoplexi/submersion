@@ -13,6 +13,8 @@ import 'package:submersion/features/equipment/presentation/providers/equipment_p
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
 
+import '../../../../helpers/bulk_delete_contract.dart';
+import '../../../../helpers/selection_contract.dart';
 import '../../../../helpers/test_database.dart';
 
 void main() {
@@ -39,6 +41,80 @@ void main() {
       ),
     );
   }
+
+  ServiceKind custom(String id, String name) => ServiceKind(
+    id: id,
+    name: name,
+    applicableTypes: const [EquipmentType.tank],
+    defaultIntervalDays: 180,
+    isBuiltIn: false,
+    createdAt: t0,
+    updatedAt: t0,
+  );
+
+  group('selection', () {
+    testWidgets('satisfies the shared selection contract', (tester) async {
+      final all = [
+        custom('c1', 'Aaa custom'),
+        custom('c2', 'Bbb custom'),
+        custom('c3', 'Ccc custom'),
+      ];
+      var visible = all;
+
+      await verifySelectionContract(
+        tester,
+        build: () => ProviderScope(
+          overrides: [
+            serviceKindsProvider.overrideWith((ref) async => visible),
+          ],
+          child: const MaterialApp(
+            locale: Locale('en'),
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: ServiceKindListPage(),
+          ),
+        ),
+        selectButton: find.byKey(const ValueKey('enter_selection')),
+        firstRow: find.text('Aaa custom'),
+        applyFilter: (tester) async {
+          visible = [all.first];
+          final container = ProviderScope.containerOf(
+            tester.element(find.byType(ServiceKindListPage)),
+          );
+          container.invalidate(serviceKindsProvider);
+          await tester.pumpAndSettle();
+        },
+        visibleAfterFilter: 1,
+      );
+    });
+
+    testWidgets('built-in kinds render no checkbox and are excluded from '
+        'select-all', (tester) async {
+      await tester.pumpWidget(
+        buildPage([
+          builtIn('hydro', 'Hydrostatic test'),
+          custom('c1', 'Custom kind'),
+        ]),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byKey(const ValueKey('enter_selection')));
+      await tester.pumpAndSettle();
+
+      // Only the custom kind gets a checkbox; the built-in keeps its lock.
+      expect(find.byType(Checkbox), findsOneWidget);
+      expect(find.byIcon(Icons.lock_outline), findsOneWidget);
+
+      await tester.tap(find.byKey(const ValueKey('selection_select_all')));
+      await tester.pumpAndSettle();
+
+      expect(
+        find.text('1 selected'),
+        findsOneWidget,
+        reason: 'select-all must skip rows the repository refuses to delete',
+      );
+    });
+  });
 
   testWidgets('built-ins render locked without delete action', (tester) async {
     await tester.pumpWidget(
@@ -85,6 +161,48 @@ void main() {
 
     expect(find.text('Add service type'), findsOneWidget);
     expect(find.text('Attach automatically to new gear'), findsOneWidget);
+  });
+
+  group('bulk delete against the database', () {
+    setUp(() async {
+      SharedPreferences.setMockInitialValues({});
+      await setUpTestDatabase();
+    });
+
+    tearDown(() async => tearDownTestDatabase());
+
+    testWidgets('removes the checked custom kinds and reports the count', (
+      tester,
+    ) async {
+      final repo = ServiceKindRepository();
+      final a = await repo.createKind(custom('c1', 'Aaa custom'));
+      final b = await repo.createKind(custom('c2', 'Bbb custom'));
+
+      await verifyBulkDelete(
+        tester,
+        build: () => ProviderScope(
+          overrides: [
+            serviceKindsProvider.overrideWith((ref) async => [a, b]),
+          ],
+          child: const MaterialApp(
+            locale: Locale('en'),
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: ServiceKindListPage(),
+          ),
+        ),
+        selectButton: find.byKey(const ValueKey('enter_selection')),
+        expectedDeletedCount: 2,
+      );
+
+      expect(find.text('2 deleted'), findsOneWidget);
+      final remaining = await repo.getAllKinds();
+      expect(
+        remaining.where((k) => !k.isBuiltIn),
+        isEmpty,
+        reason: 'both custom kinds must be gone from the database',
+      );
+    });
   });
 
   group('database-backed CRUD flows', () {

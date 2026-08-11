@@ -92,6 +92,10 @@ class _FakeAppSettingsRepository implements AppSettingsRepository {
   bool setShareByDefaultCalled = false;
   bool? lastSetValue;
 
+  /// No database, so nothing ever ticks.
+  @override
+  Stream<void> watchSettingsChanges() => const Stream.empty();
+
   @override
   Future<bool> getShareByDefault() async => _shareByDefault;
 

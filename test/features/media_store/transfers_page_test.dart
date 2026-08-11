@@ -45,6 +45,137 @@ void main() {
     ),
   );
 
+  // NOTE: this page does not run verifySelectionContract. The contract helper
+  // calls pumpAndSettle, and as the header above explains, this page renders
+  // from streams whose live form deadlocks against db.close() in the
+  // fake-async zone -- a snapshot stream leaves the provider loading and the
+  // spinner animating, so pumpAndSettle never returns. The selection
+  // behaviour is covered by the targeted tests below instead: the Select
+  // affordance, select-all, the retry gate, and bulk delete.
+
+  testWidgets('exposes a visible Select affordance and select-all', (
+    tester,
+  ) async {
+    late List<MediaTransferQueueEntry> snapshot;
+    await tester.runAsync(() async {
+      await repo.enqueueUpload(mediaId: 'm-a');
+      await repo.enqueueUpload(mediaId: 'm-b');
+      snapshot = await repo.watchEntries().first;
+    });
+
+    await tester.pumpWidget(app(snapshot));
+    await tester.pump();
+
+    expect(find.byKey(const ValueKey('enter_selection')), findsOneWidget);
+
+    await tester.tap(find.byKey(const ValueKey('enter_selection')));
+    await tester.pump();
+    expect(find.text('0 selected'), findsOneWidget);
+
+    await tester.tap(find.byKey(const ValueKey('selection_select_all')));
+    await tester.pump();
+    expect(find.text('2 selected'), findsOneWidget);
+
+    await tester.tap(find.byKey(const ValueKey('selection_exit')));
+    await tester.pump();
+    expect(find.byKey(const ValueKey('selection_exit')), findsNothing);
+  });
+
+  testWidgets('bulk retry requeues every checked failed entry', (tester) async {
+    late List<MediaTransferQueueEntry> snapshot;
+    await tester.runAsync(() async {
+      final a = await repo.enqueueUpload(mediaId: 'm-a');
+      final b = await repo.enqueueUpload(mediaId: 'm-b');
+      await repo.markFailed(a, 'boom');
+      await repo.markFailed(b, 'boom');
+      snapshot = await repo.watchEntries().first;
+    });
+
+    await tester.pumpWidget(app(snapshot));
+    await tester.pump();
+
+    await tester.tap(find.byKey(const ValueKey('enter_selection')));
+    await tester.pump();
+    await tester.tap(find.byKey(const ValueKey('selection_select_all')));
+    await tester.pump();
+
+    final retry = find.byKey(const ValueKey('selection_action_retry'));
+    expect(
+      tester.widget<IconButton>(retry).onPressed,
+      isNotNull,
+      reason: 'a uniformly failed selection is retryable',
+    );
+
+    await tester.tap(retry);
+    await tester.pump();
+
+    await tester.runAsync(() async {
+      final rows = await repo.watchEntries().first;
+      expect(
+        rows.every((e) => e.state == 'pending' && e.errorMessage == null),
+        isTrue,
+        reason: 'retry must clear the error and requeue every checked entry',
+      );
+    });
+  });
+
+  testWidgets('a transferring entry cannot be bulk-retried', (tester) async {
+    late List<MediaTransferQueueEntry> snapshot;
+    await tester.runAsync(() async {
+      final a = await repo.enqueueUpload(mediaId: 'm-a');
+      await repo.markTransferring(a);
+      snapshot = await repo.watchEntries().first;
+    });
+
+    await tester.pumpWidget(app(snapshot));
+    // pump, not pumpAndSettle: a transferring row animates a progress bar
+    // that never settles.
+    await tester.pump();
+
+    await tester.tap(find.byKey(const ValueKey('enter_selection')));
+    await tester.pump();
+    await tester.tap(find.byKey(const ValueKey('selection_select_all')));
+    await tester.pump();
+
+    // The worker still holds a transferring row; requeueing it would upload
+    // the same asset twice.
+    expect(
+      tester
+          .widget<IconButton>(
+            find.byKey(const ValueKey('selection_action_retry')),
+          )
+          .onPressed,
+      isNull,
+      reason: 'retry must stay disabled while an entry is transferring',
+    );
+  });
+
+  testWidgets('bulk delete removes the checked queue entries', (tester) async {
+    late List<MediaTransferQueueEntry> snapshot;
+    await tester.runAsync(() async {
+      await repo.enqueueUpload(mediaId: 'm-a');
+      await repo.enqueueUpload(mediaId: 'm-b');
+      snapshot = await repo.watchEntries().first;
+    });
+
+    await tester.pumpWidget(app(snapshot));
+    await tester.pump();
+
+    await tester.tap(find.byKey(const ValueKey('enter_selection')));
+    await tester.pump();
+    await tester.tap(find.byKey(const ValueKey('selection_select_all')));
+    await tester.pump();
+    await tester.tap(find.byKey(const ValueKey('selection_delete')));
+    await tester.pump();
+    await tester.tap(find.text('Delete'));
+    await tester.pump();
+
+    await tester.runAsync(() async {
+      final remaining = await repo.watchEntries().first;
+      expect(remaining, isEmpty);
+    });
+  });
+
   testWidgets('renders the empty state', (tester) async {
     await tester.pumpWidget(app(const []));
     await tester.pump();

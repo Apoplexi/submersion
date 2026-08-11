@@ -4,13 +4,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:submersion/core/constants/enums.dart';
+import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/features/cylinder_configs/domain/entities/cylinder_config.dart';
 import 'package:submersion/features/cylinder_configs/domain/entities/cylinder_config_item.dart';
 import 'package:submersion/features/cylinder_configs/presentation/pages/cylinder_config_list_page.dart';
+import 'package:submersion/features/cylinder_configs/data/repositories/cylinder_config_repository.dart';
 import 'package:submersion/features/cylinder_configs/presentation/providers/cylinder_config_providers.dart';
 import 'package:submersion/features/equipment/domain/entities/equipment_item.dart';
 import 'package:submersion/features/equipment/presentation/providers/equipment_providers.dart';
 
+import '../../../helpers/bulk_delete_contract.dart';
+import '../../../helpers/selection_contract.dart';
 import '../../../helpers/test_app.dart';
 
 /// Renders [CylinderConfigListPage] behind a real [GoRouter] so the FAB and
@@ -57,6 +61,7 @@ void main() {
     // listener at construction time and the test framework claims it before
     // Riverpod can route it to the widget's error arm.
     Future<List<CylinderConfig>> Function()? configsFuture,
+    List<dynamic> extraOverrides = const [],
   }) {
     Widget probe(String label) => Builder(
       builder: (context) {
@@ -91,9 +96,79 @@ void main() {
           (ref) => configsFuture?.call() ?? Future.value(configs),
         ),
         allEquipmentProvider.overrideWith((ref) async => equipment),
+        ...extraOverrides,
       ],
     );
   }
+
+  group('bulk delete', () {
+    testWidgets('confirms before deleting the checked configurations', (
+      tester,
+    ) async {
+      // This surface gained delete in this change: the repository method
+      // existed with no callers. The confirmation is the whole guard.
+      final repo = _CapturingConfigRepository();
+      await verifyBulkDelete(
+        tester,
+        build: () => host(
+          configs: [
+            config(id: 'g1', name: 'Aaa plan'),
+            config(id: 'g2', name: 'Bbb plan'),
+          ],
+          extraOverrides: [
+            cylinderConfigRepositoryProvider.overrideWithValue(repo),
+          ],
+        ),
+        selectButton: find.byKey(const ValueKey('enter_selection')),
+        expectedDeletedCount: 2,
+      );
+
+      expect(repo.deleted, ['g1', 'g2']);
+      expect(find.text('2 deleted'), findsOneWidget);
+    });
+
+    testWidgets('cancelling deletes nothing and keeps the selection', (
+      tester,
+    ) async {
+      await verifyBulkDeleteCancels(
+        tester,
+        build: () => host(
+          configs: [config(id: 'g1', name: 'Aaa plan')],
+        ),
+        selectButton: find.byKey(const ValueKey('enter_selection')),
+      );
+    });
+  });
+
+  group('selection', () {
+    testWidgets('satisfies the shared selection contract', (tester) async {
+      final all = [
+        config(id: 'g1', name: 'Aaa plan'),
+        config(id: 'g2', name: 'Bbb plan'),
+        config(id: 'g3', name: 'Ccc plan'),
+      ];
+      var visible = all;
+
+      await verifySelectionContract(
+        tester,
+        // configsFuture is read on each provider rebuild, so invalidating
+        // after reassigning `visible` actually narrows the list. Passing
+        // `configs:` would capture the original list by value.
+        build: () => host(configs: all, configsFuture: () async => visible),
+        selectButton: find.byKey(const ValueKey('enter_selection')),
+        firstRow: find.text('Aaa plan'),
+        applyFilter: (tester) async {
+          visible = [all.first];
+          final container = ProviderScope.containerOf(
+            tester.element(find.byType(CylinderConfigListPage)),
+          );
+          container.invalidate(cylinderConfigsProvider);
+          await tester.pumpAndSettle();
+        },
+        visibleAfterFilter: 1,
+      );
+    });
+  });
 
   testWidgets('an empty list explains what a configuration is for', (
     tester,
@@ -244,4 +319,16 @@ void main() {
 
     expect(location, '/equipment/cylinder-configs/new');
   });
+}
+
+/// Records the ids bulk delete reached the repository with, so the flow can
+/// be exercised without standing up a database.
+class _CapturingConfigRepository implements CylinderConfigRepository {
+  final deleted = <String>[];
+
+  @override
+  Future<void> deleteConfig(String id) async => deleted.add(id);
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }

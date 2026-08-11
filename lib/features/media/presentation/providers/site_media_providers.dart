@@ -38,9 +38,14 @@ final mediaFromDivesAtSiteProvider =
       ref,
       siteId,
     ) async {
-      final dives = await ref
-          .watch(diveRepositoryProvider)
-          .getDivesForSite(siteId);
+      final diveRepository = ref.watch(diveRepositoryProvider);
+      // Which dives belong to the site is a dives-table read, so a merge, a
+      // bulk delete, or a sync pull changes this grid without the media tables
+      // being written. mediaCountForSiteProvider above already takes the media
+      // tick; this needs the dives one as well (issue #974).
+      ref.invalidateSelfWhen(diveRepository.watchDivesChanges());
+
+      final dives = await diveRepository.getDivesForSite(siteId);
       if (dives.isEmpty) return {};
 
       const chunkSize = 12;

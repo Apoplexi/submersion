@@ -23686,4 +23686,53 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get common_selection_deselectAllTooltip => 'Deseleziona tutto';
+
+  @override
+  String common_bulkDelete_title(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Eliminare $count elementi?',
+      one: 'Eliminare $count elemento?',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get common_bulkDelete_body =>
+      'Questa azione non può essere annullata.';
+
+  @override
+  String common_bulkDelete_snackbar(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count eliminati',
+      one: '$count eliminato',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get marineLife_species_delete_confirmTitle => 'Eliminare la specie?';
+
+  @override
+  String marineLife_species_delete_confirmBody(String name) {
+    return 'Vuoi davvero eliminare \"$name\"?';
+  }
+
+  @override
+  String marineLife_species_delete_inUseError(String name) {
+    return 'Impossibile eliminare \"$name\" - ha avvistamenti';
+  }
+
+  @override
+  String marineLife_species_delete_snackbar(String name) {
+    return '\"$name\" eliminata';
+  }
+
+  @override
+  String marineLife_species_delete_error(String error) {
+    return 'Errore durante l\'eliminazione della specie: $error';
+  }
 }

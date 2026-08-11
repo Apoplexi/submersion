@@ -23092,4 +23092,56 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get common_selection_deselectAllTooltip => 'בטל בחירת הכול';
+
+  @override
+  String common_bulkDelete_title(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'למחוק $count פריטים?',
+      many: 'למחוק $count פריטים?',
+      two: 'למחוק שני פריטים?',
+      one: 'למחוק פריט אחד?',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get common_bulkDelete_body => 'לא ניתן לבטל פעולה זו.';
+
+  @override
+  String common_bulkDelete_snackbar(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count נמחקו',
+      many: '$count נמחקו',
+      two: 'שני פריטים נמחקו',
+      one: 'פריט אחד נמחק',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get marineLife_species_delete_confirmTitle => 'למחוק מין?';
+
+  @override
+  String marineLife_species_delete_confirmBody(String name) {
+    return 'האם למחוק את \"$name\"?';
+  }
+
+  @override
+  String marineLife_species_delete_inUseError(String name) {
+    return 'לא ניתן למחוק את \"$name\" - יש לו תצפיות';
+  }
+
+  @override
+  String marineLife_species_delete_snackbar(String name) {
+    return '\"$name\" נמחק';
+  }
+
+  @override
+  String marineLife_species_delete_error(String error) {
+    return 'שגיאה במחיקת המין: $error';
+  }
 }
