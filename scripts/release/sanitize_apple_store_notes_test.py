@@ -74,5 +74,75 @@ class TestDetection(unittest.TestCase):
                 self.assertEqual(matched(line), [])
 
 
+class TestListRepair(unittest.TestCase):
+    def repair(self, text):
+        return san.repair_lists(text, TERMS)
+
+    def test_four_members_one_survivor(self):
+        self.assertEqual(
+            self.repair("Downloads (macOS, Windows, Linux, and Android)"),
+            "Downloads (macOS)",
+        )
+
+    def test_three_members_one_survivor(self):
+        self.assertEqual(
+            self.repair("shown on Mac, Windows, and Linux today"),
+            "shown on Mac today",
+        )
+
+    def test_five_members_two_survivors_get_a_conjunction(self):
+        self.assertEqual(
+            self.repair("on iOS, Android, macOS, Windows, and Linux"),
+            "on iOS and macOS",
+        )
+
+    def test_three_survivors_keep_the_oxford_comma(self):
+        self.assertEqual(
+            self.repair("on iOS, iPadOS, macOS, Windows, and Android"),
+            "on iOS, iPadOS, and macOS",
+        )
+
+    def test_no_survivors_collapse_to_the_neutral_phrase(self):
+        self.assertEqual(
+            self.repair("broken on Windows, Linux, and Android"),
+            "broken on other platforms",
+        )
+
+    def test_clean_list_is_untouched(self):
+        text = "covers dives, dive sites, and gear"
+        self.assertEqual(self.repair(text), text)
+
+    def test_conjunction_is_not_parsed_as_a_member(self):
+        # The clause after the list must survive: "and continues with the app"
+        # is not part of the list and must not be rewritten away with it.
+        self.assertEqual(
+            self.repair(
+                "Recording works on iPhone, iPad, and Android and continues "
+                "with the app backgrounded"
+            ),
+            "Recording works on iPhone and iPad and continues "
+            "with the app backgrounded",
+        )
+
+    def test_or_lists_are_handled(self):
+        self.assertEqual(
+            self.repair("use Windows or macOS"),
+            "use macOS",
+        )
+
+    def test_leading_prose_is_not_absorbed_into_the_first_member(self):
+        # The regression that multi-word members caused: the greedy first
+        # member swallowed the words before the list ("broken on Windows"),
+        # which is not entirely a banned term, so the platform name survived.
+        self.assertEqual(
+            self.repair("broken on Windows, Linux, and Android today"),
+            "broken on other platforms today",
+        )
+        self.assertEqual(
+            self.repair("a fix for Windows or Linux"),
+            "a fix for other platforms",
+        )
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -62,3 +62,67 @@ def find_matches(text, terms):
         for match in pattern.finditer(text):
             hits.append((match.start(), match.end(), term_class))
     return sorted(hits)
+
+
+# A list member is exactly one word. Allowing multi-word members looks more
+# general but is actively wrong: the leading member is greedy, so
+# "broken on Windows, Linux, and Android" would parse its first member as
+# "broken on Windows", which is not *entirely* a banned term, and the platform
+# name would survive. Real platform lists are single tokens (macOS, Windows,
+# iOS, Android). The one multi-word banned term that shows up in a list,
+# "Google Play", is left to the replacement pass instead.
+#
+# The negative lookahead stops "and"/"or" being parsed as a member.
+_WORD = r"(?!(?:and|or)\b)[A-Za-z0-9][A-Za-z0-9.+/-]*"
+_MEMBER = _WORD
+
+_LIST_RE = re.compile(
+    r"\b" + _MEMBER +
+    r"(?:\s*,\s*" + _MEMBER + r")*"
+    r"\s*,?\s+(?:and|or)\s+" + _MEMBER + r"\b"
+)
+
+# The conjunction alternative must come first. Python tries alternatives left
+# to right, so a leading plain-comma branch would consume the ", " of ", and "
+# and leave "and Linux" behind as a member, rebuilding the list as
+# "Mac and and Linux".
+_SPLIT_RE = re.compile(r"\s*,?\s+(?:and|or)\s+|\s*,\s*")
+
+
+def _is_banned_member(member, terms):
+    """True when the member is *entirely* one banned term.
+
+    A member that merely contains a banned term is left for the replacement
+    pass; dropping it would delete real content alongside the platform name.
+    """
+    stripped = member.strip()
+    return any(pattern.fullmatch(stripped) for pattern, _cls in terms)
+
+
+def _join(members):
+    """Rebuild a list with the Oxford comma the surrounding prose uses."""
+    if len(members) >= 3:
+        return ", ".join(members[:-1]) + ", and " + members[-1]
+    if len(members) == 2:
+        return members[0] + " and " + members[1]
+    return members[0]
+
+
+def repair_lists(text, terms):
+    """Drop banned members from comma/conjunction lists, repairing punctuation.
+
+    "(macOS, Windows, Linux, and Android)" becomes "(macOS)". A list whose
+    members are all banned collapses to the neutral phrase, and the tidy pass
+    removes the parentheses that are left empty around it.
+    """
+    def substitute(match):
+        raw = match.group(0)
+        members = [m for m in _SPLIT_RE.split(raw) if m]
+        if not any(_is_banned_member(m, terms) for m in members):
+            return raw
+        kept = [m for m in members if not _is_banned_member(m, terms)]
+        if not kept:
+            return REPLACEMENT["platform"]
+        return _join(kept)
+
+    return _LIST_RE.sub(substitute, text)
