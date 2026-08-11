@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:io' show Platform;
 
 import 'package:cryptography/cryptography.dart' show SecretKey;
-import 'package:package_info_plus/package_info_plus.dart';
 
 import 'package:submersion/core/data/repositories/connected_accounts_repository.dart';
 import 'package:submersion/core/providers/account_providers.dart';
@@ -34,6 +33,7 @@ import 'package:submersion/core/services/sync/crypto/sync_encryption_service.dar
 import 'package:submersion/core/services/sync/established_provider_store.dart';
 import 'package:submersion/core/services/sync/library_epoch.dart';
 import 'package:submersion/core/services/sync/library_epoch_store.dart';
+import 'package:submersion/core/services/sync/sync_device_metadata.dart';
 import 'package:submersion/core/services/sync/library_moved.dart';
 import 'package:submersion/core/services/sync/library_moved_store.dart';
 import 'package:submersion/core/services/sync/post_restore_sync_store.dart';
@@ -918,25 +918,8 @@ class SyncNotifier extends StateNotifier<SyncState> {
   /// piece degrades to a safe default; markers are shown in banners so the
   /// origin must always be displayable.
   Future<(String, String?, String?)> _deviceMetadata() async {
-    String deviceId;
-    try {
-      deviceId = await _syncRepository.getDeviceId();
-    } catch (_) {
-      deviceId = 'unknown';
-    }
-    String? deviceName;
-    try {
-      deviceName = Platform.localHostname;
-    } catch (_) {
-      deviceName = null;
-    }
-    String? appVersion;
-    try {
-      appVersion = (await PackageInfo.fromPlatform()).version;
-    } catch (_) {
-      appVersion = null;
-    }
-    return (deviceId, deviceName, appVersion);
+    final identity = await SyncDeviceMetadata(_syncRepository).resolve();
+    return (identity.id, identity.name, identity.appVersion);
   }
 
   /// Adopt the replaced cloud library. The CALLER is responsible for the
