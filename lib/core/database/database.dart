@@ -7672,7 +7672,11 @@ class AppDatabase extends _$AppDatabase {
           // Site media (issues #211/#627). Query index for the site gallery;
           // dedupe cleanup + partial unique index mirroring the dive-side
           // v38 pair so the same gallery asset cannot be linked to the same
-          // site twice. Keep the oldest duplicate (lowest created_at).
+          // site twice. The survivor is the oldest row, tie-broken by rowid:
+          // created_at is epoch MILLISECONDS and a bulk import writes many
+          // rows inside one, so a `created_at > MIN(created_at)` cleanup
+          // would leave every tied row behind and the unique index below
+          // would then abort the whole migration.
           // Guarded on media.site_id existing so partial migration-test
           // fixture databases (which build only the tables and columns their
           // migration touches) pass through unharmed.
@@ -7686,18 +7690,18 @@ class AppDatabase extends _$AppDatabase {
             ON media(site_id)
           ''');
             await customStatement('''
-            DELETE FROM media WHERE id IN (
-              SELECT m.id FROM media m
-              INNER JOIN (
-                SELECT platform_asset_id, site_id, MIN(created_at) as min_created
-                FROM media
-                WHERE platform_asset_id IS NOT NULL AND site_id IS NOT NULL
-                GROUP BY platform_asset_id, site_id
-                HAVING COUNT(*) > 1
-              ) dupes ON m.platform_asset_id = dupes.platform_asset_id
-                AND m.site_id = dupes.site_id
-                AND m.created_at > dupes.min_created
-            )
+            DELETE FROM media
+            WHERE platform_asset_id IS NOT NULL
+              AND site_id IS NOT NULL
+              AND rowid NOT IN (
+                SELECT rowid FROM (
+                  SELECT rowid, ROW_NUMBER() OVER (
+                    PARTITION BY platform_asset_id, site_id
+                    ORDER BY created_at ASC, rowid ASC
+                  ) AS rn FROM media
+                  WHERE platform_asset_id IS NOT NULL AND site_id IS NOT NULL
+                ) WHERE rn = 1
+              )
           ''');
             await customStatement('''
             CREATE UNIQUE INDEX IF NOT EXISTS idx_media_asset_site_unique

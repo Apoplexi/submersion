@@ -102,6 +102,30 @@ void main() {
     },
   );
 
+  test('collapses duplicates that share the oldest created_at', () async {
+    // created_at is epoch MILLISECONDS, and a bulk import loop writes many
+    // rows inside one millisecond, so ties at the minimum are reachable --
+    // notably after a site merge repoints two rows onto the survivor site.
+    // A tie-blind cleanup leaves both rows behind and the unique index
+    // below then fails, which aborts the whole migration and leaves the
+    // database unopenable.
+    final db = AppDatabase(
+      setupDb((rawDb) {
+        insertMedia(rawDb, 'tie-a', assetId: 'a1', siteId: 's1', createdAt: 10);
+        insertMedia(rawDb, 'tie-b', assetId: 'a1', siteId: 's1', createdAt: 10);
+        insertMedia(rawDb, 'later', assetId: 'a1', siteId: 's1', createdAt: 30);
+      }),
+    );
+    addTearDown(db.close);
+
+    // Exactly one survivor, and it is one of the oldest pair.
+    final survivors = await mediaIds(db);
+    expect(survivors, hasLength(1));
+    expect(survivors.single, anyOf('tie-a', 'tie-b'));
+    // The unique index must exist, i.e. its creation was not aborted.
+    expect(await indexNames(db), contains('idx_media_asset_site_unique'));
+  });
+
   test('leaves rows alone when either half of the pair is null', () async {
     final db = AppDatabase(
       setupDb((rawDb) {
