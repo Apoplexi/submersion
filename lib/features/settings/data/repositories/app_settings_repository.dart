@@ -18,6 +18,11 @@ class AppSettingsRepository {
   static const _shareByDefaultKey = 'share_new_records_by_default';
   static const _navPrimaryIdsKey = 'nav_primary_ids';
 
+  /// Emits whenever the `settings` table changes so providers holding a
+  /// setting refresh after a sync applies a remote change.
+  Stream<void> watchSettingsChanges() =>
+      _db.tableUpdates(TableUpdateQuery.onTable(_db.settings));
+
   /// Returns the raw stored nav primary ids, or `null` if unset / on read error.
   ///
   /// Caller should normalize via `normalizeNavPrimaryIds` before using the result.

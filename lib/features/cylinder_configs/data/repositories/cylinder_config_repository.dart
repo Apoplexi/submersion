@@ -22,6 +22,17 @@ class CylinderConfigRepository {
   final SyncRepository _syncRepository = SyncRepository();
   final _uuid = const Uuid();
 
+  /// Emits whenever a cylinder configuration or one of its items changes, so
+  /// the config providers refresh after a sync or any other write that
+  /// bypasses the notifiers. Watches the item table too, because a config is
+  /// only meaningful with its items and a sync can apply either independently.
+  Stream<void> watchConfigsChanges() => _db.tableUpdates(
+    TableUpdateQuery.allOf([
+      TableUpdateQuery.onTable(_db.cylinderConfigs),
+      TableUpdateQuery.onTable(_db.cylinderConfigItems),
+    ]),
+  );
+
   static const String _configEntity = 'cylinderConfigs';
   static const String _itemEntity = 'cylinderConfigItems';
 
