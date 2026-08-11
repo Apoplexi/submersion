@@ -242,51 +242,6 @@ class _PhotoViewerPageState extends ConsumerState<PhotoViewerPage> {
                     ),
                   ),
 
-                // Perdix dive computer overlay. Deliberately independent of
-                // the _showOverlay chrome (which auto-hides during video
-                // playback, exactly when this must stay up) and mounted
-                // BELOW it so the toolbar keeps hit-test priority when the
-                // chrome is visible (the default corner overlaps the top
-                // bar). The face absorbs pointer events over its own bounds
-                // (drags move it, taps do nothing); chrome-toggle and video
-                // play/pause taps work anywhere outside it.
-                if (perdixAvailable && settings.perdixOverlayEnabled)
-                  DraggablePerdixOverlay(
-                    // Re-key when the persisted seed first arrives so a late
-                    // settings load re-seeds the position (same trick as the
-                    // fullscreen readout card).
-                    key: ValueKey(
-                      'perdix-${currentItem.id}-'
-                      '${settings.perdixOverlayX}-${settings.perdixOverlayY}',
-                    ),
-                    resolver: perdixResolver,
-                    baseElapsedSeconds: enrichment.elapsedSeconds!,
-                    settings: settings,
-                    playback: currentItem.isVideo
-                        ? _videoControllers[currentItem.id]
-                        : null,
-                    positionGetter:
-                        currentItem.isVideo &&
-                            _videoControllers[currentItem.id] != null
-                        ? () =>
-                              _videoControllers[currentItem.id]
-                                  ?.value
-                                  .position ??
-                              Duration.zero
-                        : null,
-                    initialFraction:
-                        (settings.perdixOverlayX != null &&
-                            settings.perdixOverlayY != null)
-                        ? Offset(
-                            settings.perdixOverlayX!,
-                            settings.perdixOverlayY!,
-                          )
-                        : null,
-                    onDragEnd: (fraction) => ref
-                        .read(settingsProvider.notifier)
-                        .setPerdixOverlayPosition(fraction.dx, fraction.dy),
-                  ),
-
                 // Overlay controls (app bar and metadata)
                 if (_showOverlay) ...[
                   // Top app bar
@@ -336,6 +291,62 @@ class _PhotoViewerPageState extends ConsumerState<PhotoViewerPage> {
                     ),
                   ),
                 ],
+
+                // Perdix dive computer overlay. Deliberately independent of
+                // the _showOverlay chrome, which auto-hides during video
+                // playback exactly when this must stay up.
+                //
+                // Mounted ABOVE the chrome so it always wins the pointers
+                // that drag it: the bottom metadata's gradient Container and
+                // the mini profile chart both absorb hit tests across their
+                // full bounds, and either would strand the face where it
+                // could no longer be picked up. Neither is interactive, so
+                // nothing is lost by the face shadowing them. The top
+                // toolbar is the exception -- it does have buttons -- so
+                // rather than order, the face is kept out of its band
+                // entirely via topReserve.
+                //
+                // The face absorbs pointer events over its own bounds (drags
+                // move it, taps do nothing); chrome-toggle and video
+                // play/pause taps work anywhere outside it.
+                if (perdixAvailable && settings.perdixOverlayEnabled)
+                  DraggablePerdixOverlay(
+                    // Re-key when the persisted seed first arrives so a late
+                    // settings load re-seeds the position (same trick as the
+                    // fullscreen readout card).
+                    key: ValueKey(
+                      'perdix-${currentItem.id}-'
+                      '${settings.perdixOverlayX}-${settings.perdixOverlayY}',
+                    ),
+                    resolver: perdixResolver,
+                    baseElapsedSeconds: enrichment.elapsedSeconds!,
+                    settings: settings,
+                    topReserve:
+                        MediaQuery.paddingOf(context).top + _topChromeHeight,
+                    playback: currentItem.isVideo
+                        ? _videoControllers[currentItem.id]
+                        : null,
+                    positionGetter:
+                        currentItem.isVideo &&
+                            _videoControllers[currentItem.id] != null
+                        ? () =>
+                              _videoControllers[currentItem.id]
+                                  ?.value
+                                  .position ??
+                              Duration.zero
+                        : null,
+                    initialFraction:
+                        (settings.perdixOverlayX != null &&
+                            settings.perdixOverlayY != null)
+                        ? Offset(
+                            settings.perdixOverlayX!,
+                            settings.perdixOverlayY!,
+                          )
+                        : null,
+                    onDragEnd: (fraction) => ref
+                        .read(settingsProvider.notifier)
+                        .setPerdixOverlayPosition(fraction.dx, fraction.dy),
+                  ),
               ],
             ),
           );
@@ -1049,6 +1060,12 @@ class _VideoControlsOverlayState extends State<_VideoControlsOverlay> {
     );
   }
 }
+
+/// Height of [_TopOverlay]'s content below the status bar: its 8 px vertical
+/// padding either side of a default 48 px [IconButton]. The Perdix overlay
+/// reserves this band so the face can never sit on top of the toolbar's
+/// buttons -- keep the two in step if the toolbar's padding changes.
+const double _topChromeHeight = 64;
 
 /// Top overlay with close button, page indicator, share, and write metadata.
 class _TopOverlay extends StatelessWidget {
