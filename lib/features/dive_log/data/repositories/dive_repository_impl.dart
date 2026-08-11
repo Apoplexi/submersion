@@ -5618,13 +5618,8 @@ class DiveRepository {
   /// Return true if a dive has readings from 2 or more computers.
   Future<bool> hasMultipleDataSources(String diveId) async {
     try {
-      final result = await _db
-          .customSelect(
-            'SELECT COUNT(*) as cnt FROM dive_data_sources WHERE dive_id = ?',
-            variables: [Variable(diveId)],
-          )
-          .getSingle();
-      return (result.data['cnt'] as int) >= 2;
+      final sources = await getDataSources(diveId);
+      return sources.length >= 2;
     } catch (e, stackTrace) {
       _log.error(
         'Failed to check multiple computers for dive: $diveId',
