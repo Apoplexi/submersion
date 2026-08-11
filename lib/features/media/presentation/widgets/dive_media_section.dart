@@ -20,6 +20,10 @@ import 'package:submersion/features/media/presentation/widgets/media_item_view.d
 import 'package:submersion/features/media_store/presentation/widgets/media_store_badge.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
+import 'package:submersion/shared/selection/bulk_action.dart';
+import 'package:submersion/shared/selection/selection_app_bar.dart';
+import 'package:submersion/shared/selection/selection_controller.dart';
+import 'package:submersion/shared/selection/selection_state.dart';
 import 'package:submersion/shared/widgets/drag_select_grid_view.dart';
 
 /// Returns the OS-appropriate label for the "show file in OS file manager"
@@ -62,12 +66,24 @@ class DiveMediaSection extends ConsumerStatefulWidget {
 }
 
 class _DiveMediaSectionState extends ConsumerState<DiveMediaSection> {
-  bool _isSelectionMode = false;
-  Set<int> _selectedIndices = {};
+  /// Owns the bulk-selection state machine for this section.
+  ///
+  /// Id-based, unlike the positional [DragSelectGridView] it drives. Indices
+  /// are derived from ids on every build, so reordering the media list can no
+  /// longer repoint the selection at different files.
+  final SelectionController _selection = SelectionController();
+
+  bool get _isSelectionMode => _selection.value.isActive;
 
   /// Media ids whose enrichment backfill we've already kicked off, so the
   /// post-frame trigger fires once per item rather than on every rebuild.
   final Set<String> _enrichAttempted = {};
+
+  @override
+  void dispose() {
+    _selection.dispose();
+    super.dispose();
+  }
 
   Future<void> _scanLightroom(BuildContext context) async {
     final dive = await ref
@@ -118,27 +134,28 @@ class _DiveMediaSectionState extends ConsumerState<DiveMediaSection> {
   }
   // coverage:ignore-end
 
-  void _exitSelectionMode() {
-    setState(() {
-      _isSelectionMode = false;
-      _selectedIndices = {};
-    });
-  }
+  void _exitSelectionMode() => _selection.exit();
 
-  void _selectAll(int totalCount) {
-    setState(() {
-      _selectedIndices = Set<int>.from(List.generate(totalCount, (i) => i));
-    });
-  }
+  /// Grid indices for the checked ids, against the current ordering.
+  ///
+  /// Derived every build rather than stored: the ids are the truth and the
+  /// positions are recomputed, which is what makes a reorder safe.
+  Set<int> _indicesFor(List<MediaItem> media) => {
+    for (var i = 0; i < media.length; i++)
+      if (_selection.value.isChecked(media[i].id)) i,
+  };
+
+  /// Ids for the controller, from the grid's positional selection.
+  List<String> _idsFor(List<MediaItem> media, Set<int> indices) => indices
+      .where((i) => i >= 0 && i < media.length)
+      .map((i) => media[i].id)
+      .toList();
 
   Future<void> _unlinkSelected(
     BuildContext context,
     List<MediaItem> media,
   ) async {
-    final selectedIds = _selectedIndices
-        .where((i) => i < media.length)
-        .map((i) => media[i].id)
-        .toList();
+    final selectedIds = _selection.value.checkedIds.toList();
 
     if (selectedIds.isEmpty) return;
 
@@ -309,6 +326,28 @@ class _DiveMediaSectionState extends ConsumerState<DiveMediaSection> {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
+    // Drop checked media that is no longer attached to this dive, so an
+    // unlink can never reach an item that is not on screen.
+    final visibleIds =
+        mediaAsync.valueOrNull?.map((m) => m.id).toList() ?? const <String>[];
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _selection.pruneTo(visibleIds);
+    });
+
+    return ValueListenableBuilder<SelectionState>(
+      valueListenable: _selection,
+      builder: (context, selection, _) =>
+          _buildCard(context, mediaAsync, settings, colorScheme, textTheme),
+    );
+  }
+
+  Widget _buildCard(
+    BuildContext context,
+    AsyncValue<List<MediaItem>> mediaAsync,
+    AppSettings settings,
+    ColorScheme colorScheme,
+    TextTheme textTheme,
+  ) {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -318,12 +357,25 @@ class _DiveMediaSectionState extends ConsumerState<DiveMediaSection> {
             // Header: selection mode or normal
             if (_isSelectionMode)
               mediaAsync.whenOrNull(
-                    data: (media) => _SelectionHeader(
-                      selectedCount: _selectedIndices.length,
-                      totalCount: media.length,
-                      onSelectAll: () => _selectAll(media.length),
-                      onCancel: _exitSelectionMode,
-                      onUnlinkSelected: () => _unlinkSelected(context, media),
+                    data: (media) => SelectionAppBar(
+                      controller: _selection,
+                      selectableIds: media.map((m) => m.id).toList(),
+                      shell: SelectionBarShell.pane,
+                      // Unlinking removes media from this dive without
+                      // destroying files, so this surface has no true delete
+                      // and the baseline delete control is omitted.
+                      onDelete: null,
+                      actions: [
+                        BulkAction(
+                          id: 'unlink',
+                          icon: Icons.link_off,
+                          label: context.l10n
+                              .media_diveMediaSection_unlinkSelectedButton(
+                                _selection.value.count,
+                              ),
+                          onInvoke: () => _unlinkSelected(context, media),
+                        ),
+                      ],
                     ),
                   ) ??
                   const SizedBox.shrink()
@@ -342,6 +394,24 @@ class _DiveMediaSectionState extends ConsumerState<DiveMediaSection> {
                       style: textTheme.titleMedium,
                     ),
                   ),
+                  // Discoverability: selecting media required a long-press
+                  // on a thumbnail, which nothing on screen advertised.
+                  mediaAsync.whenOrNull(
+                        data: (media) => media.isEmpty
+                            ? const SizedBox.shrink()
+                            : IconButton(
+                                key: const ValueKey('enter_selection'),
+                                icon: Icon(
+                                  Icons.checklist,
+                                  color: colorScheme.primary,
+                                ),
+                                visualDensity: VisualDensity.compact,
+                                tooltip:
+                                    context.l10n.common_selection_enterTooltip,
+                                onPressed: _selection.enterExplicit,
+                              ),
+                      ) ??
+                      const SizedBox.shrink(),
                   if (widget.onScanPressed != null)
                     IconButton(
                       icon: Icon(
@@ -389,16 +459,14 @@ class _DiveMediaSectionState extends ConsumerState<DiveMediaSection> {
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
                   startInSelectionMode: _isSelectionMode,
-                  initialSelection: _selectedIndices,
+                  initialSelection: _indicesFor(media),
                   onSelectionChanged: (indices) {
-                    setState(() {
-                      _selectedIndices = indices;
-                    });
+                    // The grid reports its complete selection, not a delta,
+                    // so selectAll is the right call rather than toggle.
+                    _selection.selectAll(_idsFor(media, indices));
                   },
                   onSelectionModeChanged: (isSelecting) {
-                    setState(() {
-                      _isSelectionMode = isSelecting;
-                    });
+                    if (!isSelecting) _selection.exit();
                   },
                   onItemTap: (index) {
                     Navigator.of(context).push(
@@ -464,55 +532,6 @@ class _DiveMediaSectionState extends ConsumerState<DiveMediaSection> {
 }
 
 /// Header shown during multi-select mode with count, select all, and unlink.
-class _SelectionHeader extends StatelessWidget {
-  final int selectedCount;
-  final int totalCount;
-  final VoidCallback onSelectAll;
-  final VoidCallback onCancel;
-  final VoidCallback onUnlinkSelected;
-
-  const _SelectionHeader({
-    required this.selectedCount,
-    required this.totalCount,
-    required this.onSelectAll,
-    required this.onCancel,
-    required this.onUnlinkSelected,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
-
-    return Row(
-      children: [
-        IconButton(
-          icon: const Icon(Icons.close),
-          tooltip: context.l10n.media_diveMediaSection_cancelSelectionButton,
-          onPressed: onCancel,
-        ),
-        Text(
-          context.l10n.media_diveMediaSection_selectedCount(selectedCount),
-          style: textTheme.titleMedium,
-        ),
-        const Spacer(),
-        if (selectedCount < totalCount)
-          TextButton(
-            onPressed: onSelectAll,
-            child: Text(context.l10n.media_diveMediaSection_selectAllButton),
-          ),
-        IconButton(
-          icon: Icon(Icons.delete_outline, color: colorScheme.error),
-          tooltip: context.l10n.media_diveMediaSection_unlinkSelectedButton(
-            selectedCount,
-          ),
-          onPressed: selectedCount > 0 ? onUnlinkSelected : null,
-        ),
-      ],
-    );
-  }
-}
-
 /// Empty state when no media is associated with the dive
 class _EmptyMediaState extends StatelessWidget {
   const _EmptyMediaState();
