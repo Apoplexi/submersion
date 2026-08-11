@@ -98,7 +98,9 @@ class GaugeStrip extends ConsumerWidget {
               icon: Icons.build_outlined,
               label: label,
               tone: tone,
-              onTap: () => context.push('/equipment'),
+              // The chip names one item, so open that item rather than the
+              // list the diver would then have to search.
+              onTap: () => context.push('/equipment/${gauge.itemId}'),
             ),
           );
         }
