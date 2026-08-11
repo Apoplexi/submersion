@@ -38,6 +38,7 @@ import 'package:submersion/features/dive_log/presentation/widgets/dive_filter_sh
 import 'package:submersion/features/dive_log/presentation/widgets/dive_numbering_dialog.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/dive_table_view.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
+import 'package:submersion/shared/widgets/app_date_picker.dart';
 import 'package:submersion/shared/widgets/feature_accent.dart';
 
 /// Inclusive id span between the [anchor] and [target] indices in [dives].
@@ -273,7 +274,7 @@ class _DiveListContentState extends ConsumerState<DiveListContent> {
 
   /// Pick a date range and select every dive whose date falls inside it.
   Future<void> _selectByDateRange(List<DiveSummary> dives) async {
-    final range = await showDateRangePicker(
+    final range = await showAppDateRangePicker(
       context: context,
       firstDate: DateTime(1970),
       lastDate: DateTime(2100),

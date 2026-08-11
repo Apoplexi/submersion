@@ -425,6 +425,29 @@ class UnitFormatter {
     return DateFormat(pattern).format(dateTime);
   }
 
+  /// Format month and day, adding the year when [dateTime] falls outside the
+  /// year of [relativeTo] (defaults to now). Honors the day-first preference.
+  ///
+  /// Set [shortYear] for the two-digit form the densest list rows use.
+  /// Example: "Jan 15", "15 Jan 2024", "15 Jan '24".
+  String formatMonthDayWithYear(
+    DateTime? dateTime, {
+    bool shortYear = false,
+    DateTime? relativeTo,
+  }) {
+    if (dateTime == null) return '--';
+    final reference = relativeTo ?? DateTime.now();
+    if (dateTime.year == reference.year) return formatMonthDay(dateTime);
+
+    final dayFirst = settings.dateFormat.isDayFirst;
+    final pattern = shortYear
+        ? (dayFirst ? "d MMM ''yy" : "MMM d ''yy")
+        // Month-first spelling takes a comma before the year; day-first does
+        // not ("Mar 15, 2024" vs "15 Mar 2024").
+        : (dayFirst ? 'd MMM yyyy' : 'MMM d, yyyy');
+    return DateFormat(pattern).format(dateTime);
+  }
+
   /// Format date range for display
   /// Example: "Jan 15 - Jan 20, 2024"
   /// Pass [l10n] to localize the "Until"/"From" connector words.
