@@ -3,6 +3,9 @@ import 'package:submersion/core/models/sort_state.dart';
 import 'package:submersion/core/providers/provider.dart';
 
 import 'package:submersion/core/constants/enums.dart';
+// The dependency-only module, not dive_providers.dart: that file imports
+// trip_providers.dart, which imports this feature's repository impl.
+import 'package:submersion/features/dive_log/presentation/providers/dive_repository_provider.dart';
 import 'package:submersion/features/dive_log/presentation/providers/view_config_providers.dart';
 import 'package:submersion/features/divers/presentation/providers/diver_providers.dart';
 import 'package:submersion/features/equipment/data/repositories/equipment_repository_impl.dart';
@@ -34,6 +37,7 @@ final activeEquipmentProvider = FutureProvider<List<EquipmentItem>>((
   final validatedDiverId = await ref.watch(
     validatedCurrentDiverIdProvider.future,
   );
+  ref.invalidateSelfWhen(repository.watchEquipmentChanges());
   return repository.getActiveEquipment(diverId: validatedDiverId);
 });
 
@@ -45,6 +49,7 @@ final retiredEquipmentProvider = FutureProvider<List<EquipmentItem>>((
   final validatedDiverId = await ref.watch(
     validatedCurrentDiverIdProvider.future,
   );
+  ref.invalidateSelfWhen(repository.watchEquipmentChanges());
   return repository.getRetiredEquipment(diverId: validatedDiverId);
 });
 
@@ -163,33 +168,49 @@ final equipmentItemProvider = FutureProvider.family<EquipmentItem?, String>((
   id,
 ) async {
   final repository = ref.watch(equipmentRepositoryProvider);
+  ref.invalidateSelfWhen(repository.watchEquipmentChanges());
   return repository.getEquipmentById(id);
 });
 
-/// Dive count for equipment provider
+/// Dive count for equipment provider.
+///
+/// Backs the "Used on N dives" figure. A junction read over `dive_equipment`,
+/// whose rows vanish by cascade when a dive is deleted, so it over-counted
+/// after a merge until it took the dives tick as well (issue #974).
 final equipmentDiveCountProvider = FutureProvider.family<int, String>((
   ref,
   equipmentId,
 ) async {
   final repository = ref.watch(equipmentRepositoryProvider);
+  ref.invalidateSelfWhen(repository.watchEquipmentChanges());
+  ref.invalidateSelfWhen(ref.read(diveRepositoryProvider).watchDivesChanges());
   return repository.getDiveCountForEquipment(equipmentId);
 });
 
-/// Trip count for equipment provider
+/// Trip count for equipment provider.
+///
+/// Reaches trips through the equipment's dives, so it takes the trips tick as
+/// well: deleting a trip changes the count without writing `equipment`.
 final equipmentTripCountProvider = FutureProvider.family<int, String>((
   ref,
   equipmentId,
 ) async {
   final repository = ref.watch(equipmentRepositoryProvider);
+  ref.invalidateSelfWhen(repository.watchEquipmentChanges());
+  ref.invalidateSelfWhen(ref.read(tripRepositoryProvider).watchTripsChanges());
   return repository.getTripCountForEquipment(equipmentId);
 });
 
-/// Trip IDs for equipment provider
+/// Trip IDs for equipment provider.
+///
+/// Same junction read as [equipmentTripCountProvider].
 final equipmentTripIdsProvider = FutureProvider.family<List<String>, String>((
   ref,
   equipmentId,
 ) async {
   final repository = ref.watch(equipmentRepositoryProvider);
+  ref.invalidateSelfWhen(repository.watchEquipmentChanges());
+  ref.invalidateSelfWhen(ref.read(tripRepositoryProvider).watchTripsChanges());
   return repository.getTripIdsForEquipment(equipmentId);
 });
 
@@ -215,6 +236,7 @@ final equipmentSearchProvider =
         return ref.watch(allEquipmentProvider).value ?? [];
       }
       final repository = ref.watch(equipmentRepositoryProvider);
+      ref.invalidateSelfWhen(repository.watchEquipmentChanges());
       return repository.searchEquipment(query, diverId: validatedDiverId);
     });
 
@@ -341,6 +363,7 @@ final serviceRecordsForEquipmentProvider =
       equipmentId,
     ) async {
       final repository = ref.watch(serviceRecordRepositoryProvider);
+      ref.invalidateSelfWhen(repository.watchServiceRecordsChanges());
       return repository.getRecordsForEquipment(equipmentId);
     });
 
@@ -348,6 +371,7 @@ final serviceRecordsForEquipmentProvider =
 final serviceRecordByIdProvider = FutureProvider.family<ServiceRecord?, String>(
   (ref, id) async {
     final repository = ref.watch(serviceRecordRepositoryProvider);
+    ref.invalidateSelfWhen(repository.watchServiceRecordsChanges());
     return repository.getRecordById(id);
   },
 );
@@ -356,6 +380,7 @@ final serviceRecordByIdProvider = FutureProvider.family<ServiceRecord?, String>(
 final mostRecentServiceRecordProvider =
     FutureProvider.family<ServiceRecord?, String>((ref, equipmentId) async {
       final repository = ref.watch(serviceRecordRepositoryProvider);
+      ref.invalidateSelfWhen(repository.watchServiceRecordsChanges());
       return repository.getMostRecentRecord(equipmentId);
     });
 
@@ -367,6 +392,7 @@ final serviceRecordTotalCostProvider =
       equipmentId,
     ) async {
       final repository = ref.watch(serviceRecordRepositoryProvider);
+      ref.invalidateSelfWhen(repository.watchServiceRecordsChanges());
       return repository.getTotalServiceCostByCurrency(equipmentId);
     });
 
@@ -376,6 +402,7 @@ final serviceRecordCountProvider = FutureProvider.family<int, String>((
   equipmentId,
 ) async {
   final repository = ref.watch(serviceRecordRepositoryProvider);
+  ref.invalidateSelfWhen(repository.watchServiceRecordsChanges());
   return repository.getRecordCount(equipmentId);
 });
 
