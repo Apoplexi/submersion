@@ -32,6 +32,47 @@ void main() {
       expect(payload.entitiesOf(ImportEntityType.dives).length, 1);
     });
 
+    // #912: the reader has always parsed <types>, but the parser dropped it,
+    // so every MacDive XML dive imported as "recreational".
+    test('maps <types> onto dive type ids', () async {
+      final payload = await const MacDiveXmlParser().parse(bytes);
+
+      final types = payload.entitiesOf(ImportEntityType.diveTypes);
+      expect(types.map((t) => t['id']), containsAll(['shore', 'aquarium']));
+      // "Shore" slugs onto the built-in id; "Aquarium" becomes a custom type
+      // carrying MacDive's own label.
+      expect(
+        types.firstWhere((t) => t['id'] == 'aquarium')['name'],
+        'Aquarium',
+      );
+
+      final dive = payload.entitiesOf(ImportEntityType.dives).single;
+      expect(dive['diveTypeIds'], containsAll(['shore', 'aquarium']));
+    });
+
+    // #912: the operator was written to a free-text column and never became
+    // a dive center.
+    test('maps <diveOperator> onto a dive center and a per-dive ref', () async {
+      final payload = await const MacDiveXmlParser().parse(bytes);
+
+      final centers = payload.entitiesOf(ImportEntityType.diveCenters);
+      expect(centers, hasLength(1));
+      expect(centers.single['name'], 'Test Operator');
+      expect(centers.single['uddfId'], 'Test Operator');
+
+      final dive = payload.entitiesOf(ImportEntityType.dives).single;
+      expect(dive['diveCenterRef'], 'Test Operator');
+      // The free-text column is still populated for round-tripping.
+      expect(dive['diveOperator'], 'Test Operator');
+    });
+
+    test('emits decoAlgorithm, the key the importer reads', () async {
+      final payload = await const MacDiveXmlParser().parse(bytes);
+      final dive = payload.entitiesOf(ImportEntityType.dives).single;
+      // Emitting only `decoModel` dropped it silently on every import.
+      expect(dive.containsKey('decoModel'), isFalse);
+    });
+
     test('produces one site, one buddy, one equipment, two tags', () async {
       final payload = await const MacDiveXmlParser().parse(bytes);
       expect(payload.entitiesOf(ImportEntityType.sites).length, 1);

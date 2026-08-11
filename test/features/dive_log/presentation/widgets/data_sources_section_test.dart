@@ -1057,7 +1057,7 @@ void main() {
           findsOneWidget,
         );
         expect(
-          find.descendant(of: dataTableFinder, matching: find.text('24.0°C')),
+          find.descendant(of: dataTableFinder, matching: find.text('24°C')),
           findsOneWidget,
         );
         expect(

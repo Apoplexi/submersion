@@ -612,13 +612,9 @@ class UddfTestImporter {
       // Parse dive type
       final diveTypeId = diveData['diveType'] as String? ?? 'recreational';
 
-      // Include weight used in notes if available
-      var notes = diveData['notes'] as String? ?? '';
-      final weightUsed = diveData['weightUsed'] as double?;
-      if (weightUsed != null && weightUsed > 0) {
-        if (notes.isNotEmpty) notes += '\n';
-        notes += 'Weight used: ${weightUsed.toStringAsFixed(1)} kg';
-      }
+      // Mirrors UddfEntityImporter: a weight total becomes a DiveWeight row,
+      // it is not appended to the notes (#912).
+      final notes = diveData['notes'] as String? ?? '';
 
       final diveId = _uuid.v4();
       final dateTime = diveData['dateTime'] as DateTime? ?? now;

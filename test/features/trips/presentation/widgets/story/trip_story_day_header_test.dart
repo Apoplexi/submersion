@@ -273,7 +273,9 @@ void main() {
         settingsNotifier: settings,
       );
 
-      expect(find.text('72°F'), findsOneWidget);
+      // 22 C is 71.6 F: one decimal is kept, and only a zero decimal is
+      // trimmed, so this no longer rounds to a whole degree (#912).
+      expect(find.text('71.6°F'), findsOneWidget);
     });
 
     testWidgets('precipitation outranks cloud cover for the icon', (
