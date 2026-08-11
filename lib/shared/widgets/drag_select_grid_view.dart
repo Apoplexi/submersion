@@ -60,6 +60,15 @@ class DragSelectGridView<T> extends StatefulWidget {
   /// Indices of items that cannot be selected (e.g., already-linked items).
   final Set<int> disabledIndices;
 
+  /// Whether unchecking the last item leaves selection mode on its own.
+  ///
+  /// Set false when an outer selection controller owns the mode: it alone
+  /// knows whether the mode was entered deliberately (Select button, which
+  /// must survive at zero checked) or by long-press (which must evaporate),
+  /// and the grid cannot tell those apart. The owner then drives the grid back
+  /// out through [startInSelectionMode].
+  final bool exitOnEmptySelection;
+
   const DragSelectGridView({
     super.key,
     required this.items,
@@ -74,6 +83,7 @@ class DragSelectGridView<T> extends StatefulWidget {
     this.physics,
     this.startInSelectionMode = false,
     this.disabledIndices = const {},
+    this.exitOnEmptySelection = true,
   });
 
   @override
@@ -146,7 +156,7 @@ class _DragSelectGridViewState<T> extends State<DragSelectGridView<T>> {
 
     setState(() {
       _selectedIndices = newSelection;
-      if (_selectedIndices.isEmpty) {
+      if (_selectedIndices.isEmpty && widget.exitOnEmptySelection) {
         _isSelectionMode = false;
         widget.onSelectionModeChanged(false);
       }
