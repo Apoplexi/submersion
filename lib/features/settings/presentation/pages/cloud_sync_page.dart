@@ -1403,10 +1403,23 @@ class CloudSyncPage extends ConsumerWidget {
       context: context,
       builder: (context) => AlertDialog(
         title: Text(l10n.settings_cloudSync_firstSync_dialogTitle),
-        content: Text(
-          l10n.settings_cloudSync_firstSync_dialogContent(
-            info.peerFileCount,
-            info.localDiveCount,
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                l10n.settings_cloudSync_firstSync_dialogContent(
+                  info.peerFileCount,
+                  info.localDiveCount,
+                ),
+              ),
+              const SizedBox(height: 12),
+              // Merge is the only action here on purpose; the alternative is
+              // a fleet-wide wipe and does not belong one tap away in a
+              // dialog that appears routinely. Name where it lives instead.
+              Text(l10n.settings_cloudSync_firstSync_replaceHint),
+            ],
           ),
         ),
         actions: [

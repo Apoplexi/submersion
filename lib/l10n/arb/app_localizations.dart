@@ -23063,6 +23063,12 @@ abstract class AppLocalizations {
   /// **'Merge and Sync'**
   String get settings_cloudSync_firstSync_dialogConfirm;
 
+  /// No description provided for @settings_cloudSync_firstSync_replaceHint.
+  ///
+  /// In en, this message translates to:
+  /// **'If instead this device\'s library should replace what is in the cloud, cancel and use Settings > Cloud Sync > Replace cloud library.'**
+  String get settings_cloudSync_firstSync_replaceHint;
+
   /// No description provided for @settings_cloudSync_firstSync_dialogContent.
   ///
   /// In en, this message translates to:

@@ -13688,6 +13688,10 @@ class AppLocalizationsPt extends AppLocalizations {
       'Mesclar e Sincronizar';
 
   @override
+  String get settings_cloudSync_firstSync_replaceHint =>
+      'Se, em vez disso, a biblioteca deste dispositivo deve substituir a que está na nuvem, cancele e use Definições > Sincronização na nuvem > Substituir biblioteca na nuvem.';
+
+  @override
   String settings_cloudSync_firstSync_dialogContent(
     int deviceCount,
     int diveCount,

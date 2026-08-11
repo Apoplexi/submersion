@@ -13640,6 +13640,10 @@ class AppLocalizationsHu extends AppLocalizations {
       'Összevonás és szinkronizálás';
 
   @override
+  String get settings_cloudSync_firstSync_replaceHint =>
+      'Ha ehelyett ennek az eszköznek a könyvtára írja felül a felhőben lévőt, szakítsa meg, és használja a Beállítások > Felhőszinkronizálás > Felhőkönyvtár cseréje lehetőséget.';
+
+  @override
   String settings_cloudSync_firstSync_dialogContent(
     int deviceCount,
     int diveCount,

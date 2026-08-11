@@ -4101,6 +4101,7 @@
   "settings_cloudSync_replaceLibrary_confirm": "Remplacer",
   "settings_cloudSync_firstSync_banner": "La première synchronisation attend votre confirmation. Appuyez sur « Synchroniser maintenant » pour vérifier ce qui sera combiné.",
   "settings_cloudSync_firstSync_dialogConfirm": "Fusionner et synchroniser",
+  "settings_cloudSync_firstSync_replaceHint": "Si au contraire la bibliothèque de cet appareil doit remplacer celle du cloud, annulez et utilisez Réglages > Synchronisation cloud > Remplacer la bibliothèque cloud.",
   "settings_cloudSync_firstSync_dialogContent": "Des données de synchronisation existantes ont été trouvées dans le cloud ({deviceCount} fichier(s) de synchronisation). Votre première synchronisation combinera ces données avec les {diveCount} plongée(s) de cet appareil, sur tous les appareils synchronisés.\n\nSi les mêmes plongées ont été ajoutées séparément sur chaque appareil, elles apparaîtront en double.",
   "settings_cloudSync_firstSync_dialogTitle": "Combiner les bibliothèques ?",
   "settings_cloudSync_replace_banner": "Synchronisation en pause : la bibliothèque a été remplacée à partir d'une sauvegarde sur « {deviceName} ». Touchez Synchroniser maintenant pour vérifier.",

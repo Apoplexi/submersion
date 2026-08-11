@@ -13029,6 +13029,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settings_cloudSync_firstSync_dialogConfirm => '合并并同步';
 
   @override
+  String get settings_cloudSync_firstSync_replaceHint =>
+      '如果您希望本设备的库替换云端的内容，请取消并使用「设置 > 云同步 > 替换云端库」。';
+
+  @override
   String settings_cloudSync_firstSync_dialogContent(
     int deviceCount,
     int diveCount,

@@ -13347,6 +13347,10 @@ class AppLocalizationsHe extends AppLocalizations {
   String get settings_cloudSync_firstSync_dialogConfirm => 'מזג וסנכרן';
 
   @override
+  String get settings_cloudSync_firstSync_replaceHint =>
+      'אם במקום זאת הספרייה של מכשיר זה אמורה להחליף את מה שנמצא בענן, בטל והשתמש בהגדרות > סנכרון ענן > החלפת ספריית הענן.';
+
+  @override
   String settings_cloudSync_firstSync_dialogContent(
     int deviceCount,
     int diveCount,

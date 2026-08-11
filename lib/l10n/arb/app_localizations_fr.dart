@@ -13729,6 +13729,10 @@ class AppLocalizationsFr extends AppLocalizations {
       'Fusionner et synchroniser';
 
   @override
+  String get settings_cloudSync_firstSync_replaceHint =>
+      'Si au contraire la bibliothèque de cet appareil doit remplacer celle du cloud, annulez et utilisez Réglages > Synchronisation cloud > Remplacer la bibliothèque cloud.';
+
+  @override
   String settings_cloudSync_firstSync_dialogContent(
     int deviceCount,
     int diveCount,

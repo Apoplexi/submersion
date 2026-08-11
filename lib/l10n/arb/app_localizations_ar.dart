@@ -13447,6 +13447,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get settings_cloudSync_firstSync_dialogConfirm => 'دمج ومزامنة';
 
   @override
+  String get settings_cloudSync_firstSync_replaceHint =>
+      'إذا كنت تريد بدلاً من ذلك أن تحل مكتبة هذا الجهاز محل ما في السحابة، فألغِ العملية واستخدم الإعدادات > مزامنة السحابة > استبدال مكتبة السحابة.';
+
+  @override
   String settings_cloudSync_firstSync_dialogContent(
     int deviceCount,
     int diveCount,

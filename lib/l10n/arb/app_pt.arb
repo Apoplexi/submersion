@@ -4173,6 +4173,7 @@
   "settings_cloudSync_replaceLibrary_confirm": "Substituir",
   "settings_cloudSync_firstSync_banner": "A primeira sincronização está aguardando confirmação. Toque em 'Sincronizar Agora' para revisar o que será combinado.",
   "settings_cloudSync_firstSync_dialogConfirm": "Mesclar e Sincronizar",
+  "settings_cloudSync_firstSync_replaceHint": "Se, em vez disso, a biblioteca deste dispositivo deve substituir a que está na nuvem, cancele e use Definições > Sincronização na nuvem > Substituir biblioteca na nuvem.",
   "settings_cloudSync_firstSync_dialogContent": "Foram encontrados dados de sincronização existentes na nuvem ({deviceCount} arquivo(s) de sincronização). Sua primeira sincronização combinará esses dados com os {diveCount} mergulho(s) neste dispositivo, em todos os dispositivos sincronizados.\n\nSe os mesmos mergulhos foram adicionados separadamente em cada dispositivo, eles aparecerão duas vezes.",
   "settings_cloudSync_firstSync_dialogTitle": "Combinar Bibliotecas?",
   "settings_cloudSync_replace_banner": "Sincronização pausada: a biblioteca foi substituída a partir de um backup em \"{deviceName}\". Toque em Sincronizar agora para revisar.",

@@ -13684,6 +13684,10 @@ class AppLocalizationsIt extends AppLocalizations {
       'Unisci e sincronizza';
 
   @override
+  String get settings_cloudSync_firstSync_replaceHint =>
+      'Se invece la libreria di questo dispositivo deve sostituire quella nel cloud, annulla e usa Impostazioni > Sincronizzazione cloud > Sostituisci la libreria cloud.';
+
+  @override
   String settings_cloudSync_firstSync_dialogContent(
     int deviceCount,
     int diveCount,

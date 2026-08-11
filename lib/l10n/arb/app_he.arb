@@ -4177,6 +4177,7 @@
   "settings_cloudSync_replaceLibrary_confirm": "החלפה",
   "settings_cloudSync_firstSync_banner": "הסנכרון הראשון ממתין לאישור. הקש על 'סנכרן עכשיו' כדי לבדוק מה ישולב.",
   "settings_cloudSync_firstSync_dialogConfirm": "מזג וסנכרן",
+  "settings_cloudSync_firstSync_replaceHint": "אם במקום זאת הספרייה של מכשיר זה אמורה להחליף את מה שנמצא בענן, בטל והשתמש בהגדרות > סנכרון ענן > החלפת ספריית הענן.",
   "settings_cloudSync_firstSync_dialogContent": "נמצאו נתוני סנכרון קיימים בענן ({deviceCount} קובצי סנכרון). הסנכרון הראשון ישלב נתונים אלה עם {diveCount} הצלילות שבמכשיר זה, בכל המכשירים המסונכרנים.\n\nאם אותן צלילות נוספו בנפרד בכל מכשיר, הן יופיעו פעמיים.",
   "settings_cloudSync_firstSync_dialogTitle": "לשלב ספריות?",
   "settings_cloudSync_replace_banner": "הסנכרון מושהה: הספרייה הוחלפה מגיבוי במכשיר \"{deviceName}\". יש להקיש על \"סנכרן עכשיו\" לבדיקה.",

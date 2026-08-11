@@ -4173,6 +4173,7 @@
   "settings_cloudSync_replaceLibrary_confirm": "Ersetzen",
   "settings_cloudSync_firstSync_banner": "Die erste Synchronisierung wartet auf Bestätigung. Tippen Sie auf 'Jetzt synchronisieren', um zu prüfen, was zusammengeführt wird.",
   "settings_cloudSync_firstSync_dialogConfirm": "Zusammenführen und synchronisieren",
+  "settings_cloudSync_firstSync_replaceHint": "Wenn stattdessen die Bibliothek dieses Geräts das ersetzen soll, was in der Cloud liegt, brechen Sie ab und verwenden Sie Einstellungen > Cloud-Synchronisierung > Cloud-Bibliothek ersetzen.",
   "settings_cloudSync_firstSync_dialogContent": "In der Cloud wurden vorhandene Synchronisierungsdaten gefunden ({deviceCount} Synchronisierungsdatei(en)). Bei der ersten Synchronisierung werden diese Daten mit den {diveCount} Tauchgängen auf diesem Gerät zusammengeführt, und zwar auf allen synchronisierten Geräten.\n\nWenn dieselben Tauchgänge auf jedem Gerät separat hinzugefügt wurden, erscheinen sie doppelt.",
   "settings_cloudSync_firstSync_dialogTitle": "Bibliotheken zusammenführen?",
   "settings_cloudSync_replace_banner": "Synchronisierung pausiert: Die Bibliothek wurde aus einem Backup auf \"{deviceName}\" ersetzt. Tippen Sie auf \"Jetzt synchronisieren\", um sie zu überprüfen.",

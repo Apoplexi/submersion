@@ -13460,6 +13460,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settings_cloudSync_firstSync_dialogConfirm => 'Merge and Sync';
 
   @override
+  String get settings_cloudSync_firstSync_replaceHint =>
+      'If instead this device\'s library should replace what is in the cloud, cancel and use Settings > Cloud Sync > Replace cloud library.';
+
+  @override
   String settings_cloudSync_firstSync_dialogContent(
     int deviceCount,
     int diveCount,

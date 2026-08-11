@@ -4330,6 +4330,7 @@
   "settings_cloudSync_replaceLibrary_confirm": "替换",
   "settings_cloudSync_firstSync_banner": "首次同步正在等待确认。点击「立即同步」以查看将要合并的内容。",
   "settings_cloudSync_firstSync_dialogConfirm": "合并并同步",
+  "settings_cloudSync_firstSync_replaceHint": "如果您希望本设备的库替换云端的内容，请取消并使用「设置 > 云同步 > 替换云端库」。",
   "settings_cloudSync_firstSync_dialogContent": "在云端发现了已有的同步数据（{deviceCount} 个同步文件）。首次同步会将这些数据与此设备上的 {diveCount} 次潜水合并，并应用到所有已同步的设备。\n\n如果相同的潜水是在每台设备上分别添加的，它们将出现两次。",
   "settings_cloudSync_firstSync_dialogTitle": "合并资料库？",
   "settings_cloudSync_replace_banner": "同步已暂停：资料库已被 \"{deviceName}\" 上的备份替换。点按\"立即同步\"以查看。",

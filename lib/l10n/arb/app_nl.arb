@@ -4173,6 +4173,7 @@
   "settings_cloudSync_replaceLibrary_confirm": "Vervangen",
   "settings_cloudSync_firstSync_banner": "De eerste synchronisatie wacht op bevestiging. Tik op 'Nu synchroniseren' om te bekijken wat er wordt samengevoegd.",
   "settings_cloudSync_firstSync_dialogConfirm": "Samenvoegen en synchroniseren",
+  "settings_cloudSync_firstSync_replaceHint": "Als de bibliotheek van dit apparaat juist moet vervangen wat in de cloud staat, annuleer dan en gebruik Instellingen > Cloudsynchronisatie > Cloudbibliotheek vervangen.",
   "settings_cloudSync_firstSync_dialogContent": "Er zijn bestaande synchronisatiegegevens gevonden in de cloud ({deviceCount} synchronisatiebestand(en)). Je eerste synchronisatie voegt die gegevens samen met de {diveCount} duik(en) op dit apparaat, op alle gesynchroniseerde apparaten.\n\nAls dezelfde duiken op elk apparaat afzonderlijk zijn toegevoegd, verschijnen ze dubbel.",
   "settings_cloudSync_firstSync_dialogTitle": "Bibliotheken samenvoegen?",
   "settings_cloudSync_replace_banner": "Synchronisatie gepauzeerd: de bibliotheek is vervangen vanuit een back-up op \"{deviceName}\". Tik op Nu synchroniseren om te controleren.",

@@ -7893,6 +7893,7 @@
   "settings_cloudSync_replaceLibrary_confirm": "Replace",
   "settings_cloudSync_firstSync_banner": "First sync is waiting for confirmation. Tap Sync Now to review what will be combined.",
   "settings_cloudSync_firstSync_dialogConfirm": "Merge and Sync",
+  "settings_cloudSync_firstSync_replaceHint": "If instead this device's library should replace what is in the cloud, cancel and use Settings > Cloud Sync > Replace cloud library.",
   "settings_cloudSync_firstSync_dialogContent": "Existing sync data was found in the cloud ({deviceCount} sync file(s)). Your first sync will combine that data with the {diveCount} dive(s) on this device, across every synced device.\n\nIf the same dives were added separately on each device, they will appear twice.",
   "@settings_cloudSync_firstSync_dialogContent": {
     "placeholders": {

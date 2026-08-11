@@ -4173,6 +4173,7 @@
   "settings_cloudSync_replaceLibrary_confirm": "استبدال",
   "settings_cloudSync_firstSync_banner": "المزامنة الأولى في انتظار التأكيد. اضغط على 'مزامنة الآن' لمراجعة ما سيتم دمجه.",
   "settings_cloudSync_firstSync_dialogConfirm": "دمج ومزامنة",
+  "settings_cloudSync_firstSync_replaceHint": "إذا كنت تريد بدلاً من ذلك أن تحل مكتبة هذا الجهاز محل ما في السحابة، فألغِ العملية واستخدم الإعدادات > مزامنة السحابة > استبدال مكتبة السحابة.",
   "settings_cloudSync_firstSync_dialogContent": "تم العثور على بيانات مزامنة موجودة في السحابة ({deviceCount} من ملفات المزامنة). ستدمج المزامنة الأولى تلك البيانات مع {diveCount} من الغطسات على هذا الجهاز، وذلك عبر جميع الأجهزة المتزامنة.\n\nإذا تمت إضافة الغطسات نفسها بشكل منفصل على كل جهاز، فستظهر مرتين.",
   "settings_cloudSync_firstSync_dialogTitle": "دمج المكتبات؟",
   "settings_cloudSync_replace_banner": "المزامنة متوقفة مؤقتًا: تم استبدال المكتبة من نسخة احتياطية على \"{deviceName}\". اضغط على \"مزامنة الآن\" للمراجعة.",
