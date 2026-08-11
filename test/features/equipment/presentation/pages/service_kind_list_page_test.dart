@@ -13,6 +13,7 @@ import 'package:submersion/features/equipment/presentation/providers/equipment_p
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
 
+import '../../../../helpers/bulk_delete_contract.dart';
 import '../../../../helpers/selection_contract.dart';
 import '../../../../helpers/test_database.dart';
 
@@ -160,6 +161,48 @@ void main() {
 
     expect(find.text('Add service type'), findsOneWidget);
     expect(find.text('Attach automatically to new gear'), findsOneWidget);
+  });
+
+  group('bulk delete against the database', () {
+    setUp(() async {
+      SharedPreferences.setMockInitialValues({});
+      await setUpTestDatabase();
+    });
+
+    tearDown(() async => tearDownTestDatabase());
+
+    testWidgets('removes the checked custom kinds and reports the count', (
+      tester,
+    ) async {
+      final repo = ServiceKindRepository();
+      final a = await repo.createKind(custom('c1', 'Aaa custom'));
+      final b = await repo.createKind(custom('c2', 'Bbb custom'));
+
+      await verifyBulkDelete(
+        tester,
+        build: () => ProviderScope(
+          overrides: [
+            serviceKindsProvider.overrideWith((ref) async => [a, b]),
+          ],
+          child: const MaterialApp(
+            locale: Locale('en'),
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: ServiceKindListPage(),
+          ),
+        ),
+        selectButton: find.byKey(const ValueKey('enter_selection')),
+        expectedDeletedCount: 2,
+      );
+
+      expect(find.text('2 deleted'), findsOneWidget);
+      final remaining = await repo.getAllKinds();
+      expect(
+        remaining.where((k) => !k.isBuiltIn),
+        isEmpty,
+        reason: 'both custom kinds must be gone from the database',
+      );
+    });
   });
 
   group('database-backed CRUD flows', () {

@@ -6,6 +6,7 @@ import 'package:submersion/features/dive_log/domain/entities/dive_computer.dart'
 import 'package:submersion/features/dive_log/presentation/providers/dive_computer_providers.dart';
 import 'package:submersion/shared/selection/selectable_row.dart';
 
+import '../../../../helpers/bulk_delete_contract.dart';
 import '../../../../helpers/selection_contract.dart';
 import '../../../../helpers/test_app.dart';
 
@@ -63,6 +64,35 @@ void main() {
       );
     });
 
+    testWidgets('deletes every checked computer and reports the count', (
+      tester,
+    ) async {
+      final notifier = _CapturingComputerNotifier();
+      final widget = testApp(
+        locale: const Locale('en'),
+        overrides: [
+          allDiveComputersProvider.overrideWith(
+            (ref) async => [
+              _makeComputer(id: 'c1', name: 'Aaa Perdix'),
+              _makeComputer(id: 'c2', name: 'Bbb Teric'),
+            ],
+          ),
+          diveComputerNotifierProvider.overrideWith((ref) => notifier),
+        ],
+        child: const DeviceListPage(),
+      );
+
+      await verifyBulkDelete(
+        tester,
+        build: () => widget,
+        selectButton: find.byKey(const ValueKey('enter_selection')),
+        expectedDeletedCount: 2,
+      );
+
+      expect(notifier.deleted, ['c1', 'c2']);
+      expect(find.text('2 deleted'), findsOneWidget);
+    });
+
     testWidgets('the Select button is visible without any hidden gesture', (
       tester,
     ) async {
@@ -82,4 +112,19 @@ void main() {
       expect(find.byKey(const ValueKey('enter_selection')), findsOneWidget);
     });
   });
+}
+
+/// Records the ids bulk delete reached the notifier with.
+class _CapturingComputerNotifier
+    extends StateNotifier<AsyncValue<List<DiveComputer>>>
+    implements DiveComputerNotifier {
+  _CapturingComputerNotifier() : super(const AsyncValue.data([]));
+
+  final deleted = <String>[];
+
+  @override
+  Future<void> delete(String id) async => deleted.add(id);
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => null;
 }

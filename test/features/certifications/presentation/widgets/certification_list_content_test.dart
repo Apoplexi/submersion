@@ -17,6 +17,7 @@ import 'package:submersion/shared/providers/entity_table_config_providers.dart';
 
 import '../../../../helpers/mock_providers.dart';
 import '../../../../helpers/test_app.dart';
+import '../../../../helpers/bulk_delete_contract.dart';
 import '../../../../helpers/selection_contract.dart';
 
 // ---------------------------------------------------------------------------
@@ -42,6 +43,12 @@ class _MockCertListNotifier
   void showOnly(List<Certification> certs) {
     state = AsyncValue.data(certs);
   }
+
+  /// Ids bulk delete actually asked to remove.
+  final deleted = <String>[];
+
+  @override
+  Future<void> deleteCertification(String id) async => deleted.add(id);
 
   @override
   dynamic noSuchMethod(Invocation invocation) => null;
@@ -128,6 +135,67 @@ Future<List<Override>> _buildPhoneOverrides({
 }
 
 void main() {
+  group('bulk delete', () {
+    late _MockCertListNotifier notifier;
+
+    Future<Widget> host(List<dynamic> rows) async {
+      notifier = _MockCertListNotifier(rows.cast());
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+      return testApp(
+        locale: const Locale('en'),
+        overrides: [
+          sharedPreferencesProvider.overrideWithValue(prefs),
+          settingsProvider.overrideWith((ref) => MockSettingsNotifier()),
+          currentDiverIdProvider.overrideWith(
+            (ref) => MockCurrentDiverIdNotifier(),
+          ),
+          certificationListNotifierProvider.overrideWith((ref) => notifier),
+          certificationListViewModeProvider.overrideWith(
+            (ref) => ListViewMode.detailed,
+          ),
+          certificationTableConfigProvider.overrideWith(
+            (ref) => _TestCertTableConfigNotifier(_testConfig),
+          ),
+        ],
+        child: const CertificationListContent(showAppBar: true),
+      );
+    }
+
+    testWidgets('deletes every checked row and reports the count', (
+      tester,
+    ) async {
+      final widget = await host([
+        _makeCert(id: 'x1', name: 'Aaa Cert'),
+        _makeCert(id: 'x2', name: 'Bbb Cert'),
+      ]);
+
+      await verifyBulkDelete(
+        tester,
+        build: () => widget,
+        selectButton: find.byKey(const ValueKey('enter_selection')),
+        expectedDeletedCount: 2,
+      );
+
+      expect(notifier.deleted, ['x1', 'x2']);
+      expect(find.text('2 deleted'), findsOneWidget);
+    });
+
+    testWidgets('cancelling deletes nothing and keeps the selection', (
+      tester,
+    ) async {
+      final widget = await host([_makeCert(id: 'x1', name: 'Aaa Cert')]);
+
+      await verifyBulkDeleteCancels(
+        tester,
+        build: () => widget,
+        selectButton: find.byKey(const ValueKey('enter_selection')),
+      );
+
+      expect(notifier.deleted, isEmpty);
+    });
+  });
+
   group('selection contract', () {
     testWidgets('satisfies the shared selection contract', (tester) async {
       final all = <Certification>[

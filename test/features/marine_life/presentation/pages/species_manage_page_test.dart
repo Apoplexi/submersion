@@ -6,6 +6,7 @@ import 'package:submersion/features/marine_life/domain/entities/species.dart';
 import 'package:submersion/features/marine_life/presentation/pages/species_manage_page.dart';
 import 'package:submersion/features/marine_life/presentation/providers/species_providers.dart';
 
+import '../../../../helpers/bulk_delete_contract.dart';
 import '../../../../helpers/selection_contract.dart';
 import '../../../../helpers/test_app.dart';
 
@@ -66,6 +67,72 @@ void main() {
       );
     });
 
+    testWidgets('deletes every checked species and reports the count', (
+      tester,
+    ) async {
+      final all = [
+        _species(id: 's1', name: 'Aaa fish'),
+        _species(id: 's2', name: 'Bbb fish'),
+      ];
+      final notifier = _MockSpeciesNotifier(all);
+      final widget = testApp(
+        locale: const Locale('en'),
+        overrides: [
+          _visibleSpeciesProvider.overrideWith((ref) => all),
+          speciesListNotifierProvider.overrideWith((ref) => notifier),
+          speciesSightingCountsProvider.overrideWith((ref) async => const {}),
+        ],
+        child: const SpeciesManagePage(),
+      );
+
+      await verifyBulkDelete(
+        tester,
+        build: () => widget,
+        selectButton: find.byKey(const ValueKey('enter_selection')),
+        expectedDeletedCount: 2,
+      );
+
+      expect(notifier.deleted, ['s1', 's2']);
+      expect(find.text('2 deleted'), findsOneWidget);
+    });
+
+    testWidgets('one species throwing does not abandon the rest', (
+      tester,
+    ) async {
+      final all = [
+        _species(id: 's1', name: 'Aaa fish'),
+        _species(id: 's2', name: 'Bbb fish'),
+      ];
+      // The counts are a prefetched snapshot, so a species can gain a
+      // sighting after the list loads and throw at delete time.
+      final notifier = _MockSpeciesNotifier(all, throwingIds: const {'s1'});
+      final widget = testApp(
+        locale: const Locale('en'),
+        overrides: [
+          _visibleSpeciesProvider.overrideWith((ref) => all),
+          speciesListNotifierProvider.overrideWith((ref) => notifier),
+          speciesSightingCountsProvider.overrideWith((ref) async => const {}),
+        ],
+        child: const SpeciesManagePage(),
+      );
+
+      await verifyBulkDelete(
+        tester,
+        build: () => widget,
+        selectButton: find.byKey(const ValueKey('enter_selection')),
+        expectedDeletedCount: 2,
+      );
+
+      expect(notifier.deleted, [
+        's2',
+      ], reason: 'the surviving species must still be deleted');
+      expect(
+        find.textContaining('Error deleting species'),
+        findsOneWidget,
+        reason: 'the failure must be surfaced, not swallowed',
+      );
+    });
+
     testWidgets('built-in species render no checkbox', (tester) async {
       await tester.pumpWidget(
         host(
@@ -120,7 +187,22 @@ void main() {
 
 class _MockSpeciesNotifier extends StateNotifier<AsyncValue<List<Species>>>
     implements SpeciesListNotifier {
-  _MockSpeciesNotifier(List<Species> species) : super(AsyncValue.data(species));
+  _MockSpeciesNotifier(List<Species> species, {this.throwingIds = const {}})
+    : super(AsyncValue.data(species));
+
+  /// Ids whose delete should throw, standing in for a species that gained a
+  /// sighting since the counts were prefetched.
+  final Set<String> throwingIds;
+
+  final deleted = <String>[];
+
+  @override
+  Future<void> deleteSpecies(String id) async {
+    if (throwingIds.contains(id)) {
+      throw Exception('Cannot delete species that is referenced by sightings');
+    }
+    deleted.add(id);
+  }
 
   @override
   dynamic noSuchMethod(Invocation invocation) => null;

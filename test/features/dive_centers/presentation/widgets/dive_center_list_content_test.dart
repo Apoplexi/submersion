@@ -17,6 +17,7 @@ import 'package:submersion/shared/providers/entity_table_config_providers.dart';
 
 import '../../../../helpers/mock_providers.dart';
 import '../../../../helpers/test_app.dart';
+import '../../../../helpers/bulk_delete_contract.dart';
 import '../../../../helpers/selection_contract.dart';
 
 // ---------------------------------------------------------------------------
@@ -41,6 +42,12 @@ class _MockDCListNotifier extends StateNotifier<AsyncValue<List<DiveCenter>>>
   void showOnly(List<DiveCenter> centers) {
     state = AsyncValue.data(centers);
   }
+
+  /// Ids bulk delete actually asked to remove.
+  final deleted = <String>[];
+
+  @override
+  Future<void> deleteDiveCenter(String id) async => deleted.add(id);
 
   @override
   dynamic noSuchMethod(Invocation invocation) => null;
@@ -128,6 +135,69 @@ Future<List<Override>> _buildPhoneOverrides({
 }
 
 void main() {
+  group('bulk delete', () {
+    late _MockDCListNotifier notifier;
+
+    Future<Widget> host(List<dynamic> rows) async {
+      notifier = _MockDCListNotifier(rows.cast());
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+      return testApp(
+        locale: const Locale('en'),
+        overrides: [
+          sharedPreferencesProvider.overrideWithValue(prefs),
+          settingsProvider.overrideWith((ref) => MockSettingsNotifier()),
+          currentDiverIdProvider.overrideWith(
+            (ref) => MockCurrentDiverIdNotifier(),
+          ),
+          diveCenterListNotifierProvider.overrideWith((ref) => notifier),
+          diveCenterListViewModeProvider.overrideWith(
+            (ref) => ListViewMode.detailed,
+          ),
+          diveCenterTableConfigProvider.overrideWith(
+            (ref) => _TestDCTableConfigNotifier(_testConfig),
+          ),
+          diveCenterDiveCountProvider.overrideWith((ref, centerId) => 0),
+          highlightedDiveCenterIdProvider.overrideWith((ref) => null),
+        ],
+        child: const DiveCenterListContent(showAppBar: true),
+      );
+    }
+
+    testWidgets('deletes every checked row and reports the count', (
+      tester,
+    ) async {
+      final widget = await host([
+        _makeCenter(id: 'd1', name: 'Aaa Center'),
+        _makeCenter(id: 'd2', name: 'Bbb Center'),
+      ]);
+
+      await verifyBulkDelete(
+        tester,
+        build: () => widget,
+        selectButton: find.byKey(const ValueKey('enter_selection')),
+        expectedDeletedCount: 2,
+      );
+
+      expect(notifier.deleted, ['d1', 'd2']);
+      expect(find.text('2 deleted'), findsOneWidget);
+    });
+
+    testWidgets('cancelling deletes nothing and keeps the selection', (
+      tester,
+    ) async {
+      final widget = await host([_makeCenter(id: 'd1', name: 'Aaa Center')]);
+
+      await verifyBulkDeleteCancels(
+        tester,
+        build: () => widget,
+        selectButton: find.byKey(const ValueKey('enter_selection')),
+      );
+
+      expect(notifier.deleted, isEmpty);
+    });
+  });
+
   group('selection contract', () {
     testWidgets('satisfies the shared selection contract', (tester) async {
       final all = <DiveCenter>[

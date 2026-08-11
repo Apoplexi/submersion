@@ -81,6 +81,44 @@ void main() {
     expect(find.byKey(const ValueKey('selection_exit')), findsNothing);
   });
 
+  testWidgets('bulk retry requeues every checked failed entry', (tester) async {
+    late List<MediaTransferQueueEntry> snapshot;
+    await tester.runAsync(() async {
+      final a = await repo.enqueueUpload(mediaId: 'm-a');
+      final b = await repo.enqueueUpload(mediaId: 'm-b');
+      await repo.markFailed(a, 'boom');
+      await repo.markFailed(b, 'boom');
+      snapshot = await repo.watchEntries().first;
+    });
+
+    await tester.pumpWidget(app(snapshot));
+    await tester.pump();
+
+    await tester.tap(find.byKey(const ValueKey('enter_selection')));
+    await tester.pump();
+    await tester.tap(find.byKey(const ValueKey('selection_select_all')));
+    await tester.pump();
+
+    final retry = find.byKey(const ValueKey('selection_action_retry'));
+    expect(
+      tester.widget<IconButton>(retry).onPressed,
+      isNotNull,
+      reason: 'a uniformly failed selection is retryable',
+    );
+
+    await tester.tap(retry);
+    await tester.pump();
+
+    await tester.runAsync(() async {
+      final rows = await repo.watchEntries().first;
+      expect(
+        rows.every((e) => e.state == 'pending' && e.errorMessage == null),
+        isTrue,
+        reason: 'retry must clear the error and requeue every checked entry',
+      );
+    });
+  });
+
   testWidgets('a transferring entry cannot be bulk-retried', (tester) async {
     late List<MediaTransferQueueEntry> snapshot;
     await tester.runAsync(() async {
