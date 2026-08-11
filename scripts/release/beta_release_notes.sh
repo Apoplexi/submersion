@@ -24,9 +24,11 @@
 #   play      Play release notes (plain text, 500 chars)
 #   markdown  GitHub beta release body (uncapped, keeps internal work)
 #
-# --cumulative (markdown only) appends a second section covering everything
-# since the last production tag, for a tester coming straight from the public
-# release rather than from the previous beta.
+# --cumulative appends a second section covering everything since the last
+# production tag, for a tester coming straight from the public release rather
+# than from the previous beta. It applies to every format: the capped formats
+# emit this build's own delta first and truncate the cumulative tail to fit,
+# so the change a tester is asked to exercise is never the part that is cut.
 #
 # All progress and diagnostics go to stderr; stdout is only ever the notes.
 set -euo pipefail
@@ -35,6 +37,17 @@ STORE_LIMIT=4000
 PLAY_LIMIT=500
 # Room for the "...and N more." line appended after truncation.
 TRUNCATION_RESERVE=24
+
+# Held in variables and used unquoted: bash silently fails to match a regex
+# written inline with an escaped trailing space, matching 2 of 120 real PR
+# titles where the same expression in grep -E matched 49.
+# The space after the colon is optional, matching the "): *" the message strip
+# below accepts. Requiring it let "ci:foo" strip to "foo", miss this pattern,
+# and be classified as prose - leaking internal work into the store formats.
+# The leading [a-z]+ must run straight into the colon, so a prose title with a
+# colon later in the line ("import dives from Garmin: USB") does not match.
+CONVENTIONAL_RE='^[a-z]+(\([^)]*\))?!?:'
+FIX_VERB_RE='^(Fix|Fixes|Fixed|Stop|Stops|Resolve|Resolves|Correct|Corrects|Prevent|Prevents|Repair|Repairs|Restore|Restores) '
 
 RANGE=""
 FORMAT=""
@@ -92,12 +105,17 @@ if [ "$USE_STDIN" = false ] && [ -z "$RANGE" ]; then
   die "one of --range <gitrange>, --since <sha>, or --stdin is required"
 fi
 
-# The store formats have a few hundred to a few thousand characters to spend on
-# this build alone; a second, longer section would only crowd out the delta the
-# tester is being asked to exercise.
-if [ "$CUMULATIVE" = true ] && [ "$FORMAT" != markdown ]; then
-  die "--cumulative applies to --format markdown only (got: $FORMAT)"
-fi
+# The commit the notes are being written for. The cumulative section walks from
+# the last production tag up to this, not to HEAD: replaying an older build's
+# notes while the working tree has advanced would otherwise fold in everything
+# merged since. --since always ends at HEAD, so only --range can differ.
+RANGE_END="HEAD"
+case "$RANGE" in
+  "")      ;;                          # --stdin: no walk happens at all
+  *..*)    RANGE_END="${RANGE##*..}" ;; # "A..B" ends at B; "A.." ends at HEAD
+  *)       RANGE_END="$RANGE" ;;        # a bare revision, e.g. "HEAD"
+esac
+[ -n "$RANGE_END" ] || RANGE_END="HEAD"
 
 # --- Sort subjects into tester-facing buckets -------------------------------
 #
@@ -142,7 +160,24 @@ classify_subjects() {
       perf\(*\)*:*|perf:*|perf!:*|perf\(*\)!:*)
         IMPROVEMENTS=$(append_line "$IMPROVEMENTS" "$message") ;;
       *)
-        INTERNAL=$(append_line "$INTERNAL" "$message") ;;
+        # Everything that is not feat/fix/perf. A subject with any other
+        # conventional prefix (chore, ci, docs, test, refactor, build, style)
+        # is internal by definition. A subject without one is a prose PR
+        # title, which is real tester-facing work, so it is bucketed by its
+        # leading verb rather than dropped.
+        #
+        # An infrastructure PR titled in prose therefore surfaces as
+        # tester-facing. That is the deliberate direction of the error: the
+        # defect being fixed is under-reporting, and prefixing the PR title
+        # "ci:" keeps it internal when that is wanted.
+        if [[ "$subject" =~ $CONVENTIONAL_RE ]]; then
+          INTERNAL=$(append_line "$INTERNAL" "$message")
+        elif [[ "$subject" =~ $FIX_VERB_RE ]]; then
+          FIXES=$(append_line "$FIXES" "$message")
+        else
+          FEATURES=$(append_line "$FEATURES" "$message")
+        fi
+        ;;
     esac
   done <<EOF
 $1
@@ -156,7 +191,41 @@ EOF
 
 subjects_in_range() {
   echo "Reading commits in ${1}..." >&2
-  git log --format='%s' --no-merges "$1"
+  # Walk the first-parent line of main. Each entry is either a PR merge, whose
+  # body's first line is the PR title, or a commit made straight to main.
+  #
+  # A --no-merges walk read the PR branch's own commits instead, which are
+  # working notes ("address review feedback") and mostly carry no conventional
+  # prefix, so they were bucketed as internal and never reached the stores.
+  #
+  # --first-parent also excludes merges made *inside* a PR branch, so a
+  # branch-sync merge ("Merge origin/main into <branch>") needs no special
+  # case: it is not on this line.
+  #
+  # Records are separated by \001 and fields by \002 because a commit body is
+  # multi-line and may contain anything else.
+  git log --first-parent --format='%x01%P%x02%s%x02%b' "$1" | awk '
+    BEGIN { RS = "\001"; FS = "\002" }
+    NF < 3 { next }
+    {
+      parents = $1
+      subject = $2
+      body = $3
+      if (parents ~ / /) {
+        # More than one parent: a merge. Only GitHub PR merges describe user
+        # work; anything else on this line is a manual merge and is skipped.
+        if (subject !~ /^Merge pull request #/) next
+        n = split(body, line, "\n")
+        for (i = 1; i <= n; i++)
+          # A CRLF commit message leaves a trailing carriage return on every
+          # line. The emptiness test above already ignores it, so the title
+          # must be stripped of it too or it rides into the store text.
+          if (line[i] ~ /[^ \t\r]/) { sub(/\r$/, "", line[i]); print line[i]; break }
+      } else {
+        print subject
+      }
+    }
+  '
 }
 
 # --- Collect commit subjects ------------------------------------------------
@@ -168,6 +237,29 @@ else
 fi
 
 classify_subjects "$SUBJECTS"
+
+# --- Resolve the cumulative baseline ----------------------------------------
+# Only the app's own 4-segment tags are production releases. The repository
+# also carries Flutter's 3-segment upstream tags, and per-beta tags live in
+# the beta-builds repository, never here.
+STABLE_TAG=""
+if [ "$CUMULATIVE" = true ]; then
+  # Described from the range end, not HEAD, so replaying an older build finds
+  # the production tag that was current for that build.
+  STABLE_TAG=$(git describe --tags --abbrev=0 --match 'v*.*.*.*' "$RANGE_END" 2>/dev/null || echo "")
+  [ -n "$STABLE_TAG" ] \
+    || echo "No production tag found; omitting the cumulative section." >&2
+fi
+
+# Remove from $1 every line that also appears in $2, order preserved. The
+# cumulative range contains this beta's own commits; on Play, where the whole
+# budget is 500 characters, printing them twice is the difference between
+# showing the release and showing three lines of it.
+subtract() {
+  [ -n "$1" ] || return 0
+  if [ -z "$2" ]; then printf '%s' "$1"; return 0; fi
+  printf '%s\n' "$1" | grep -Fxv -f <(printf '%s\n' "$2") || true
+}
 
 # --- Markdown: the GitHub beta release body ---------------------------------
 
@@ -189,31 +281,25 @@ render_markdown() {
 }
 
 if [ "$FORMAT" = markdown ]; then
-  # Without --cumulative the body is exactly this beta's delta.
-  if [ "$CUMULATIVE" = false ]; then
+  # Without --cumulative, or with no production tag to anchor to, the body is
+  # exactly this beta's delta.
+  if [ "$CUMULATIVE" = false ] || [ -z "$STABLE_TAG" ]; then
     render_markdown "No changes recorded since the previous beta."
     exit 0
   fi
 
   # With it, the per-beta delta is the headline and a second section carries
   # everything since the last production release, for a tester arriving
-  # straight from the public build. Only the app's own 4-segment tags count as
-  # a production release; the repo also carries Flutter's upstream tags.
-  STABLE_TAG=$(git describe --tags --abbrev=0 --match 'v*.*.*.*' 2>/dev/null || echo "")
-
-  if [ -z "$STABLE_TAG" ]; then
-    echo "No production tag found; omitting the cumulative section." >&2
-    render_markdown "No changes recorded since the previous beta."
-    exit 0
-  fi
-
+  # straight from the public build. This body is uncapped and its heading
+  # promises everything, so it repeats this beta's items rather than
+  # deduplicating them the way the capped formats do.
   echo "## New in this beta"
   echo ""
   render_markdown "No changes recorded since the previous beta."
   echo ""
   echo "## Everything since $STABLE_TAG"
   echo ""
-  classify_subjects "$(subjects_in_range "${STABLE_TAG}..HEAD")"
+  classify_subjects "$(subjects_in_range "${STABLE_TAG}..${RANGE_END}")"
   render_markdown "No changes recorded since $STABLE_TAG."
   exit 0
 fi
@@ -238,9 +324,29 @@ $2
 EOF
 }
 
+# This beta's delta is emitted first so that truncation only ever eats the
+# cumulative tail: the change a tester is being asked to exercise is never the
+# part that gets cut.
 add_section "New in this build" "$FEATURES"
 add_section "Improved" "$IMPROVEMENTS"
 add_section "Fixed" "$FIXES"
+
+if [ "$CUMULATIVE" = true ] && [ -n "$STABLE_TAG" ]; then
+  BETA_FEATURES="$FEATURES"
+  BETA_IMPROVEMENTS="$IMPROVEMENTS"
+  BETA_FIXES="$FIXES"
+
+  classify_subjects "$(subjects_in_range "${STABLE_TAG}..${RANGE_END}")"
+  FEATURES=$(subtract "$FEATURES" "$BETA_FEATURES")
+  IMPROVEMENTS=$(subtract "$IMPROVEMENTS" "$BETA_IMPROVEMENTS")
+  FIXES=$(subtract "$FIXES" "$BETA_FIXES")
+
+  # One flattened section rather than three: at a 500-character budget every
+  # repeated heading costs an item. The marketing version reads better to a
+  # tester than the 4-segment build tag, so v1.7.2.4977 becomes v1.7.2.
+  EARLIER=$(printf '%s\n%s\n%s' "$FEATURES" "$IMPROVEMENTS" "$FIXES" | sed '/^$/d')
+  add_section "Since ${STABLE_TAG%.*}" "$EARLIER"
+fi
 
 if [ -z "$LINES" ]; then
   if [ -n "$INTERNAL" ]; then
