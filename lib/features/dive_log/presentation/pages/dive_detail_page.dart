@@ -2901,7 +2901,10 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
   }
 
   void _showFullscreenProfile(BuildContext context, WidgetRef ref, Dive dive) {
-    Navigator.of(context).push(
+    // Root navigator, not the ShellRoute's: pushing on the shell navigator
+    // renders the page inside MainScaffold, leaving the bottom navigation
+    // bar painted under a supposedly fullscreen chart (#811).
+    Navigator.of(context, rootNavigator: true).push(
       MaterialPageRoute(
         builder: (context) => FullscreenProfilePage(diveId: dive.id),
       ),

@@ -1858,8 +1858,6 @@
   "diveLog_fullscreenProfile_close": "Teljes kepernyo bezarasa",
   "diveLog_fullscreenProfile_readoutHint": "Vigye az egermutatot a profil fole, vagy huzza rajta az ujjat",
   "diveLog_fullscreenProfile_title": "Merules #{number} profil",
-  "diveLog_instruments_customize": "Műszerek testreszabása",
-  "diveLog_instruments_customizeHint": "Kapcsolja be vagy ki a műszereket. Húzza az átrendezéshez.",
   "diveLog_legend_label_ascentRate": "Felszallasi sebesseg",
   "diveLog_legend_label_ascentRateLine": "Felszallasi sebesseg vonal",
   "diveLog_legend_label_ceiling": "Plafon",

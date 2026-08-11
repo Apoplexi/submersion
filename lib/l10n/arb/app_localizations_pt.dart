@@ -5696,13 +5696,6 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get diveLog_instruments_customize => 'Personalizar instrumentos';
-
-  @override
-  String get diveLog_instruments_customizeHint =>
-      'Ative ou desative instrumentos. Arraste para reordenar.';
-
-  @override
   String get diveLog_legend_label_ascentRate => 'Taxa de Subida';
 
   @override

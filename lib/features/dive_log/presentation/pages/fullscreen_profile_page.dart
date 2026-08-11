@@ -21,7 +21,7 @@ import 'package:submersion/features/dive_log/presentation/utils/sac_normalizatio
 import 'package:submersion/features/dive_log/presentation/widgets/dive_profile_chart.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/draggable_readout_card.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/photo_marker_layout.dart';
-import 'package:submersion/features/dive_log/presentation/widgets/profile_instrument_bar.dart';
+import 'package:submersion/features/dive_log/presentation/widgets/profile_transport_bar.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/safety_finding_highlight.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/source_bar.dart';
 import 'package:submersion/features/media/presentation/providers/media_providers.dart';
@@ -115,6 +115,13 @@ class _FullscreenProfilePageState extends ConsumerState<FullscreenProfilePage> {
       DeviceOrientation.landscapeLeft,
       DeviceOrientation.landscapeRight,
     ]);
+    // Fullscreen means fullscreen: hide the status and navigation bars so
+    // the chart owns the display (#811). Mirrors photo_viewer_page. The
+    // call is a no-op on desktop platforms.
+    SystemChrome.setEnabledSystemUIMode(
+      SystemUiMode.immersiveSticky,
+      overlays: [],
+    );
     _lifecycleListener = AppLifecycleListener(
       onInactive: () => _playbackNotifier.pause(),
     );
@@ -125,6 +132,10 @@ class _FullscreenProfilePageState extends ConsumerState<FullscreenProfilePage> {
     _removePlaybackListener();
     _lifecycleListener.dispose();
     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+    SystemChrome.setEnabledSystemUIMode(
+      SystemUiMode.edgeToEdge,
+      overlays: SystemUiOverlay.values,
+    );
     // Riverpod forbids mutating provider state synchronously from a widget
     // lifecycle callback (dispose included), so the cleanup itself is
     // deferred to a microtask, which runs just after the current unmount
@@ -151,6 +162,10 @@ class _FullscreenProfilePageState extends ConsumerState<FullscreenProfilePage> {
 
   @override
   Widget build(BuildContext context) {
+    // Phone layouts give the chart the entire screen: no transport strip
+    // below it (#811). shortestSide rather than width so a phone held in
+    // landscape -- where vertical room is scarcest -- still counts as one.
+    final isPhone = MediaQuery.sizeOf(context).shortestSide < 600;
     // Render from AsyncValue.value so background reloads never flash the UI.
     final diveAsync = ref.watch(diveProvider(widget.diveId));
     final dive = diveAsync.value;
@@ -360,7 +375,9 @@ class _FullscreenProfilePageState extends ConsumerState<FullscreenProfilePage> {
                   child: Stack(
                     children: [
                       Padding(
-                        padding: const EdgeInsets.fromLTRB(12, 8, 12, 0),
+                        padding: isPhone
+                            ? const EdgeInsets.all(4)
+                            : const EdgeInsets.fromLTRB(12, 8, 12, 0),
                         child: DiveProfileChart(
                           profile: chartProfile,
                           overlays: overlays.isEmpty ? null : overlays,
@@ -592,14 +609,13 @@ class _FullscreenProfilePageState extends ConsumerState<FullscreenProfilePage> {
                       },
                     ),
                   ),
-                ProfileInstrumentBar(
-                  diveId: widget.diveId,
-                  // The same profile the chart renders and the analysis is
-                  // computed from; tile values are index-aligned to it.
-                  profile: chartProfile,
-                  analysis: analysis,
-                  tankPressures: tankPressures,
-                ),
+                if (!isPhone)
+                  ProfileTransportBar(
+                    diveId: widget.diveId,
+                    // The same profile the chart renders: the scrub minimap
+                    // and seek range must match what is on screen.
+                    profile: chartProfile,
+                  ),
               ],
             ),
           ),

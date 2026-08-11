@@ -79,10 +79,6 @@ class SettingsKeys {
   static const String decoStopIncrement = 'deco_stop_increment';
   static const String pscrRatio = 'pscr_ratio';
 
-  // Fullscreen profile view instrument tile preferences (device-local,
-  // stored directly in SharedPreferences rather than per-diver in the DB).
-  static const String fullscreenTileOrder = 'fullscreen_tile_order';
-  static const String fullscreenHiddenTiles = 'fullscreen_hidden_tiles';
   static const String hiddenHomeChips = 'hidden_home_chips';
 
   // Home card layout is device-local like the chip toggles above (stored
@@ -402,13 +398,6 @@ class AppSettings {
   /// Ordered list of dive detail section visibility preferences
   final List<DiveDetailSectionConfig> diveDetailSections;
 
-  /// Instrument tile order for the fullscreen profile view.
-  /// Empty means the built-in priority order.
-  final List<String> fullscreenTileOrder;
-
-  /// Instrument tiles the user has hidden in the fullscreen profile view.
-  final List<String> fullscreenHiddenTiles;
-
   /// Home dashboard gauge-strip chip types the user has hidden.
   /// Ids are [HomeChipType.name] values; empty means all chips shown.
   /// Device-local, not per-diver.
@@ -554,8 +543,6 @@ class AppSettings {
     this.showDetailsPaneCertifications = false,
     this.showDetailsPaneCourses = false,
     this.diveDetailSections = DiveDetailSectionConfig.defaultSections,
-    this.fullscreenTileOrder = const [],
-    this.fullscreenHiddenTiles = const [],
     this.hiddenHomeChips = const <String>{},
     this.homeCardOrder = const <String>[],
     this.hiddenHomeCards = const <String>{},
@@ -712,8 +699,6 @@ class AppSettings {
     bool? showDetailsPaneCourses,
     List<DiveDetailSectionConfig>? diveDetailSections,
     bool clearDiveDetailSections = false,
-    List<String>? fullscreenTileOrder,
-    List<String>? fullscreenHiddenTiles,
     Set<String>? hiddenHomeChips,
     List<String>? homeCardOrder,
     Set<String>? hiddenHomeCards,
@@ -867,9 +852,6 @@ class AppSettings {
       diveDetailSections: clearDiveDetailSections
           ? DiveDetailSectionConfig.defaultSections
           : (diveDetailSections ?? this.diveDetailSections),
-      fullscreenTileOrder: fullscreenTileOrder ?? this.fullscreenTileOrder,
-      fullscreenHiddenTiles:
-          fullscreenHiddenTiles ?? this.fullscreenHiddenTiles,
       hiddenHomeChips: hiddenHomeChips ?? this.hiddenHomeChips,
       homeCardOrder: homeCardOrder ?? this.homeCardOrder,
       hiddenHomeCards: hiddenHomeCards ?? this.hiddenHomeCards,
@@ -1007,14 +989,10 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
     _isLoading = true;
 
     try {
-      // Fullscreen profile tile preferences are device-local (not per-diver),
-      // so they're read straight from SharedPreferences rather than the
-      // per-diver settings repository.
+      // Some preferences are device-local (not per-diver), so they're read
+      // straight from SharedPreferences rather than the per-diver settings
+      // repository.
       final prefs = _ref.read(sharedPreferencesProvider);
-      final fullscreenTileOrder =
-          prefs.getStringList(SettingsKeys.fullscreenTileOrder) ?? const [];
-      final fullscreenHiddenTiles =
-          prefs.getStringList(SettingsKeys.fullscreenHiddenTiles) ?? const [];
       final hiddenHomeChips =
           prefs.getStringList(SettingsKeys.hiddenHomeChips)?.toSet() ??
           const <String>{};
@@ -1055,8 +1033,6 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
       if (diverId == null) {
         // No diver selected, use defaults
         state = AppSettings(
-          fullscreenTileOrder: fullscreenTileOrder,
-          fullscreenHiddenTiles: fullscreenHiddenTiles,
           hiddenHomeChips: hiddenHomeChips,
           homeCardOrder: homeCardOrder,
           hiddenHomeCards: hiddenHomeCards,
@@ -1081,8 +1057,6 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
       // nobody awaits. Assigning state after dispose throws.
       if (!mounted) return;
       state = settings.copyWith(
-        fullscreenTileOrder: fullscreenTileOrder,
-        fullscreenHiddenTiles: fullscreenHiddenTiles,
         hiddenHomeChips: hiddenHomeChips,
         homeCardOrder: homeCardOrder,
         hiddenHomeCards: hiddenHomeCards,
@@ -1126,18 +1100,9 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
   }
 
   Future<void> _saveSettings() async {
-    // Fullscreen profile tile preferences are device-local (not per-diver),
-    // so they're always persisted to SharedPreferences, independent of
-    // whether a diver is currently selected.
+    // Device-local preferences are always persisted to SharedPreferences,
+    // independent of whether a diver is currently selected.
     final prefs = _ref.read(sharedPreferencesProvider);
-    await prefs.setStringList(
-      SettingsKeys.fullscreenTileOrder,
-      state.fullscreenTileOrder,
-    );
-    await prefs.setStringList(
-      SettingsKeys.fullscreenHiddenTiles,
-      state.fullscreenHiddenTiles,
-    );
     await prefs.setStringList(
       SettingsKeys.hiddenHomeChips,
       state.hiddenHomeChips.toList()..sort(),
@@ -1772,17 +1737,6 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
 
   Future<void> resetDiveDetailSections() async {
     state = state.copyWith(clearDiveDetailSections: true);
-    await _saveSettings();
-  }
-
-  Future<void> setFullscreenTilePreferences({
-    required List<String> order,
-    required List<String> hidden,
-  }) async {
-    state = state.copyWith(
-      fullscreenTileOrder: order,
-      fullscreenHiddenTiles: hidden,
-    );
     await _saveSettings();
   }
 
