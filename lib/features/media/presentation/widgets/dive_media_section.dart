@@ -21,6 +21,7 @@ import 'package:submersion/features/media_store/presentation/widgets/media_store
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:submersion/shared/selection/bulk_action.dart';
+import 'package:submersion/shared/selection/selectable_list_scope.dart';
 import 'package:submersion/shared/selection/selection_app_bar.dart';
 import 'package:submersion/shared/selection/selection_controller.dart';
 import 'package:submersion/shared/selection/selection_state.dart';
@@ -334,10 +335,14 @@ class _DiveMediaSectionState extends ConsumerState<DiveMediaSection> {
       if (mounted) _selection.pruneTo(visibleIds);
     });
 
-    return ValueListenableBuilder<SelectionState>(
-      valueListenable: _selection,
-      builder: (context, selection, _) =>
-          _buildCard(context, mediaAsync, settings, colorScheme, textTheme),
+    return SelectableListScope(
+      controller: _selection,
+      selectableIds: visibleIds,
+      child: ValueListenableBuilder<SelectionState>(
+        valueListenable: _selection,
+        builder: (context, selection, _) =>
+            _buildCard(context, mediaAsync, settings, colorScheme, textTheme),
+      ),
     );
   }
 

@@ -8,6 +8,7 @@ import 'package:submersion/features/settings/presentation/providers/settings_pro
 import 'package:submersion/shared/widgets/drag_select_grid_view.dart';
 
 import '../../../../helpers/mock_providers.dart';
+import '../../../../helpers/selection_contract.dart';
 import '../../../../helpers/test_app.dart';
 
 MediaItem _item(String id) => MediaItem(
@@ -66,6 +67,37 @@ void main() {
       ),
     );
   }
+
+  group('DiveMediaSection selection contract', () {
+    testWidgets('satisfies the shared selection contract', (tester) async {
+      final a = _item('a');
+      final b = _item('b');
+      final c = _item('c');
+
+      await verifySelectionContract(
+        tester,
+        build: () => host([a, b, c]),
+        selectButton: find.byKey(const ValueKey('enter_selection')),
+        // The grid's own keyed detector for the first thumbnail.
+        firstRow: find
+            .descendant(
+              of: find.byType(DragSelectGridView<MediaItem>),
+              matching: find.byType(GestureDetector),
+            )
+            .first,
+        // The grid draws a check badge over the thumbnail rather than a
+        // Checkbox, so it opts out of that one assertion only.
+        indicator: CheckedIndicator.custom,
+        applyFilter: (tester) async {
+          final container = ProviderScope.containerOf(
+            tester.element(find.byType(DiveMediaSection)),
+          );
+          container.read(_mediaProvider.notifier).state = [a];
+        },
+        visibleAfterFilter: 1,
+      );
+    });
+  });
 
   group('DiveMediaSection selection', () {
     testWidgets('exposes a visible Select affordance', (tester) async {
