@@ -29,6 +29,10 @@ Future<void> _pump(WidgetTester tester, {DiveTank tank = _testTank}) async {
         customTankPresetsProvider.overrideWith((ref) async => []),
       ],
       child: MaterialApp(
+        // Pinned: flutter_test forwards the host machine's locale list, so an
+        // unpinned MaterialApp translates "Tank 1" and "Done" out from under
+        // the finders on a non-English dev machine.
+        locale: const Locale('en'),
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         home: Scaffold(
