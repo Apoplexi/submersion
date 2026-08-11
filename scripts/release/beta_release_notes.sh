@@ -24,9 +24,11 @@
 #   play      Play release notes (plain text, 500 chars)
 #   markdown  GitHub beta release body (uncapped, keeps internal work)
 #
-# --cumulative (markdown only) appends a second section covering everything
-# since the last production tag, for a tester coming straight from the public
-# release rather than from the previous beta.
+# --cumulative appends a second section covering everything since the last
+# production tag, for a tester coming straight from the public release rather
+# than from the previous beta. It applies to every format: the capped formats
+# emit this build's own delta first and truncate the cumulative tail to fit,
+# so the change a tester is asked to exercise is never the part that is cut.
 #
 # All progress and diagnostics go to stderr; stdout is only ever the notes.
 set -euo pipefail
@@ -39,7 +41,12 @@ TRUNCATION_RESERVE=24
 # Held in variables and used unquoted: bash silently fails to match a regex
 # written inline with an escaped trailing space, matching 2 of 120 real PR
 # titles where the same expression in grep -E matched 49.
-CONVENTIONAL_RE='^[a-z]+(\([^)]*\))?!?: '
+# The space after the colon is optional, matching the "): *" the message strip
+# below accepts. Requiring it let "ci:foo" strip to "foo", miss this pattern,
+# and be classified as prose - leaking internal work into the store formats.
+# The leading [a-z]+ must run straight into the colon, so a prose title with a
+# colon later in the line ("import dives from Garmin: USB") does not match.
+CONVENTIONAL_RE='^[a-z]+(\([^)]*\))?!?:'
 FIX_VERB_RE='^(Fix|Fixes|Fixed|Stop|Stops|Resolve|Resolves|Correct|Corrects|Prevent|Prevents|Repair|Repairs|Restore|Restores) '
 
 RANGE=""
@@ -97,6 +104,18 @@ fi
 if [ "$USE_STDIN" = false ] && [ -z "$RANGE" ]; then
   die "one of --range <gitrange>, --since <sha>, or --stdin is required"
 fi
+
+# The commit the notes are being written for. The cumulative section walks from
+# the last production tag up to this, not to HEAD: replaying an older build's
+# notes while the working tree has advanced would otherwise fold in everything
+# merged since. --since always ends at HEAD, so only --range can differ.
+RANGE_END="HEAD"
+case "$RANGE" in
+  "")      ;;                          # --stdin: no walk happens at all
+  *..*)    RANGE_END="${RANGE##*..}" ;; # "A..B" ends at B; "A.." ends at HEAD
+  *)       RANGE_END="$RANGE" ;;        # a bare revision, e.g. "HEAD"
+esac
+[ -n "$RANGE_END" ] || RANGE_END="HEAD"
 
 # --- Sort subjects into tester-facing buckets -------------------------------
 #
@@ -198,7 +217,10 @@ subjects_in_range() {
         if (subject !~ /^Merge pull request #/) next
         n = split(body, line, "\n")
         for (i = 1; i <= n; i++)
-          if (line[i] ~ /[^ \t\r]/) { print line[i]; break }
+          # A CRLF commit message leaves a trailing carriage return on every
+          # line. The emptiness test above already ignores it, so the title
+          # must be stripped of it too or it rides into the store text.
+          if (line[i] ~ /[^ \t\r]/) { sub(/\r$/, "", line[i]); print line[i]; break }
       } else {
         print subject
       }
@@ -222,7 +244,9 @@ classify_subjects "$SUBJECTS"
 # the beta-builds repository, never here.
 STABLE_TAG=""
 if [ "$CUMULATIVE" = true ]; then
-  STABLE_TAG=$(git describe --tags --abbrev=0 --match 'v*.*.*.*' 2>/dev/null || echo "")
+  # Described from the range end, not HEAD, so replaying an older build finds
+  # the production tag that was current for that build.
+  STABLE_TAG=$(git describe --tags --abbrev=0 --match 'v*.*.*.*' "$RANGE_END" 2>/dev/null || echo "")
   [ -n "$STABLE_TAG" ] \
     || echo "No production tag found; omitting the cumulative section." >&2
 fi
@@ -275,7 +299,7 @@ if [ "$FORMAT" = markdown ]; then
   echo ""
   echo "## Everything since $STABLE_TAG"
   echo ""
-  classify_subjects "$(subjects_in_range "${STABLE_TAG}..HEAD")"
+  classify_subjects "$(subjects_in_range "${STABLE_TAG}..${RANGE_END}")"
   render_markdown "No changes recorded since $STABLE_TAG."
   exit 0
 fi
@@ -312,7 +336,7 @@ if [ "$CUMULATIVE" = true ] && [ -n "$STABLE_TAG" ]; then
   BETA_IMPROVEMENTS="$IMPROVEMENTS"
   BETA_FIXES="$FIXES"
 
-  classify_subjects "$(subjects_in_range "${STABLE_TAG}..HEAD")"
+  classify_subjects "$(subjects_in_range "${STABLE_TAG}..${RANGE_END}")"
   FEATURES=$(subtract "$FEATURES" "$BETA_FEATURES")
   IMPROVEMENTS=$(subtract "$IMPROVEMENTS" "$BETA_IMPROVEMENTS")
   FIXES=$(subtract "$FIXES" "$BETA_FIXES")

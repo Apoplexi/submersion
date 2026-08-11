@@ -301,6 +301,18 @@ trap 'rm -rf "$TMPREPO" "$TMPREPO2" "$TMPREPO3" "$TMPREPO4"' EXIT
     -m 'Merge pull request #2 from org/pr-two' \
     -m 'Fix unreliable S3 sync on mobile networks'
 
+  # A PR whose merge message uses CRLF line endings. The repository carries
+  # CRLF content, and a stray carriage return would ride into the store text.
+  git checkout -q -b pr-crlf
+  git commit -q --allow-empty -m 'yet more branch work'
+  git checkout -q main
+  git merge -q --no-ff --no-commit pr-crlf >/dev/null
+  # --cleanup=verbatim is required: git's default cleanup strips the carriage
+  # returns, so without it this fixture is vacuous and the assertion below
+  # passes whether or not the extractor handles CR at all.
+  printf 'Merge pull request #3 from org/pr-crlf\r\n\r\nAdd a CRLF titled change\r\n' \
+    | git commit -q --cleanup=verbatim -F -
+
   # A commit pushed straight to main, belonging to no PR.
   git commit -q --allow-empty -m 'Raise the iOS deployment target to 15.0'
 )
@@ -325,6 +337,14 @@ echo "$OUT" | grep -qi "Merge origin/main" \
   && fail "a branch-sync merge leaked into the notes"
 echo "$OUT" | grep -qi "^- Merge pull request" \
   && fail "a merge subject leaked into the notes instead of its PR title"
+
+# A CRLF merge message must yield a clean title. The emptiness test in the
+# extractor already ignores a carriage return, so the printed line has to be
+# stripped of it too.
+echo "$OUT" | grep -q "Add a CRLF titled change" \
+  || fail "a CRLF-bodied PR title was dropped"
+printf '%s' "$OUT" | grep -q $'\r' \
+  && fail "a carriage return survived into the notes"
 
 # --- Prose titles are bucketed, not discarded -------------------------------
 # 71 of the last 120 PR titles on main are prose with no conventional prefix.
@@ -362,6 +382,56 @@ echo "$OUT" | grep -q "retain the newest 30" && fail "a ci-prefixed title reache
 echo "$OUT" | grep -q "bump deps" && fail "a chore-prefixed title reached the store notes"
 echo "$OUT" | grep -q "extract a helper" && fail "a refactor-prefixed title reached the store notes"
 echo "$OUT" | grep -qi "internal" || fail "an all-internal range should still say so"
+
+# The message strip accepts ": *", so a colon with no space is still a
+# conventional prefix. Requiring the space let "ci:foo" strip to "foo" and then
+# fail the prefix test, classifying internal work as prose and shipping it.
+OUT=$(printf '%s\n' 'ci:foo' 'chore:bar' 'docs:baz' | "$GEN" --stdin --format store)
+echo "$OUT" | grep -q "foo" && fail "a spaceless ci: prefix leaked into the store notes"
+echo "$OUT" | grep -q "bar" && fail "a spaceless chore: prefix leaked into the store notes"
+echo "$OUT" | grep -q "baz" && fail "a spaceless docs: prefix leaked into the store notes"
+
+# A prose title with a colon later in the line is not a conventional prefix and
+# must stay tester-facing.
+OUT=$(printf '%s\n' 'Add site media: photos, videos, and documents' \
+  | "$GEN" --stdin --format store)
+echo "$OUT" | grep -q "Add site media" \
+  || fail "a prose title containing a colon was misread as a conventional prefix"
+
+# --- The cumulative walk must stop at the range end, not HEAD ----------------
+# Replaying an older build's notes while the working tree has advanced would
+# otherwise fold every commit merged since into the cumulative section.
+
+TMPREPO5=$(mktemp -d)
+trap 'rm -rf "$TMPREPO" "$TMPREPO2" "$TMPREPO3" "$TMPREPO4" "$TMPREPO5"' EXIT
+(
+  cd "$TMPREPO5"
+  git init -q -b main .
+  git config user.email t@example.com
+  git config user.name Test
+  git commit -q --allow-empty -m 'feat: the shipped feature'
+  git tag v0.0.1.1
+  git rev-parse HEAD > .base
+  git commit -q --allow-empty -m 'feat: inside the replayed range'
+  git rev-parse HEAD > .end
+  git commit -q --allow-empty -m 'feat: merged after the replayed build'
+)
+BASE5=$(cat "$TMPREPO5/.base")
+END5=$(cat "$TMPREPO5/.end")
+
+for fmt in store markdown; do
+  OUT=$(cd "$TMPREPO5" && "$GEN" --range "${BASE5}..${END5}" --format "$fmt" --cumulative 2>/dev/null) \
+    || fail "--range with --cumulative failed for $fmt"
+  echo "$OUT" | grep -q "inside the replayed range" \
+    || fail "$fmt cumulative dropped a change inside the replayed range"
+  echo "$OUT" | grep -q "merged after the replayed build" \
+    && fail "$fmt cumulative walked past the range end to HEAD"
+done
+
+# --since always ends at HEAD, so it must be unaffected by the change.
+OUT=$(cd "$TMPREPO5" && "$GEN" --since "$BASE5" --format markdown --cumulative 2>/dev/null)
+echo "$OUT" | grep -q "merged after the replayed build" \
+  || fail "--since stopped short of HEAD"
 
 # --- The pipeline must actually ask for the cumulative section ---------------
 # Supporting --cumulative is not the same as using it. The capped formats
