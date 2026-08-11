@@ -304,7 +304,7 @@ SPEC CHECKSUMS:
   health: 4decf5d74e8f54c58a8c07a385fc72f629a831d9
   image_picker_ios: e0ece4aa2a75771a7de3fa735d26d90817041326
   integration_test: 4a889634ef21a45d28d50d622cf412dc6d9f586e
-  libdivecomputer_plugin: 5876d08dd98fc04a06421cbaa7ad70e4c01d3f94
+  libdivecomputer_plugin: d7dd76c5ddfeb51f879e840f21f9e0eb13176d76
   local_auth_darwin: c3ee6cce0a8d56be34c8ccb66ba31f7f180aaebb
   native_exif: fe0a79e4115f2d7cd084ba206e4933d8a5ed7bde
   ObjectBox: 7da4aceb5013d041bfafdbc6d744a26918b09757
@@ -328,6 +328,6 @@ SPEC CHECKSUMS:
   video_player_avfoundation: 3453f792138786248960ca029747fcd9f318ef52
   workmanager_apple: 904529ae31e97fc5be632cf628507652294a0778
 
-PODFILE CHECKSUM: 210fbde7dda0478454a38b169f5a92e0b7c05197
+PODFILE CHECKSUM: bf695f1d88cb8e6048580a51c30afd927d095aa6
 
 COCOAPODS: 1.17.0

@@ -1694,7 +1694,7 @@
 
 | Platform | Status | Requirements |
 |----------|--------|--------------|
-| iOS | ✅ | iOS 13+ |
+| iOS | ✅ | iOS 15+ |
 | Android | ✅ | Android 7+ |
 | macOS | ✅ | macOS 11+ |
 | Windows | ✅ | Windows 10+ |
