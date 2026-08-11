@@ -13,12 +13,24 @@
 #   bundle exec fastlane upload_only           # Upload pre-built IPA to App Store
 #   bundle exec fastlane upload_testflight_only # Upload pre-built IPA to TestFlight
 #
+#   Beta pipeline (upload and distribution are separate so each can be rerun):
+#   bundle exec fastlane upload_testflight_beta_binary ipa:PATH
+#   bundle exec fastlane distribute_testflight_beta app_version:1.7.3 build_number:5829
+#
 #   Signing is handled automatically via Xcode + App Store Connect API key.
 
 default_platform(:ios)
 
 # Apple rejects an upload whose whatsNew exceeds 4000 characters.
 TESTFLIGHT_CHANGELOG_LIMIT = 4000
+
+# Markers App Store Connect returns when the build number has already been
+# accepted for this app. Re-running the beta pipeline after a distribution
+# failure hits this, because the binary landed on the first pass.
+DUPLICATE_BUILD_MARKERS = [
+  "ENTITY_ERROR.ATTRIBUTE.INVALID.DUPLICATE",
+  "bundle version must be higher than the previously uploaded version",
+].freeze
 
 platform :ios do
   # ============================================================================
@@ -110,6 +122,18 @@ platform :ios do
     end
 
     notes[0, TESTFLIGHT_CHANGELOG_LIMIT]
+  end
+
+  # True when an upload failed only because this exact build is already on App
+  # Store Connect.
+  #
+  # A build number can be uploaded once, so any retry or workflow re-run after
+  # the binary was accepted reports the duplicate rather than the failure that
+  # actually stopped the pipeline. Treating it as "already uploaded" lets the
+  # run continue to distribution, which is the step that still needs to happen.
+  def duplicate_build_error?(message)
+    text = message.to_s
+    DUPLICATE_BUILD_MARKERS.any? { |marker| text.include?(marker) }
   end
 
   # Loads API key from environment variables or falls back to api_key.json
@@ -312,17 +336,59 @@ platform :ios do
     UI.success("iOS build uploaded to TestFlight!")
   end
 
-  desc "Upload pre-built IPA to TestFlight and distribute to the Public Beta group"
-  lane :upload_testflight_beta do |options|
+  # Uploading and distributing are separate lanes on purpose.
+  #
+  # They used to be one upload_to_testflight call, which uploads the binary,
+  # waits for processing, then submits it for beta review. Only the upload is
+  # one-shot: a build number can never be uploaded twice. So when the beta
+  # review submission failed (Apple's submission limit), every retry and
+  # re-run re-uploaded the same IPA and died on a duplicate-version error that
+  # masked the real cause, leaving the build stranded in TestFlight with no way
+  # to distribute it short of the App Store Connect UI.
+  desc "Upload pre-built IPA to TestFlight without distributing it"
+  lane :upload_testflight_beta_binary do |options|
     api_key = load_api_key
     ipa_path = options[:ipa] || "./build/Submersion.ipa"
 
-    UI.message("Uploading IPA to TestFlight (Public Beta): #{ipa_path}")
-    # distribute_external requires waiting for processing so the build can be
-    # assigned to the group; expect several minutes per upload.
+    UI.message("Uploading IPA to TestFlight: #{ipa_path}")
+    begin
+      # No changelog and no distribution here, so pilot returns as soon as the
+      # binary is accepted instead of waiting out processing.
+      upload_to_testflight(
+        api_key: api_key,
+        ipa: ipa_path,
+        skip_waiting_for_build_processing: true,
+      )
+    rescue StandardError => e
+      raise unless duplicate_build_error?(e.message)
+
+      UI.important(
+        "This build is already on App Store Connect; skipping the upload and " \
+        "continuing to distribution."
+      )
+    end
+    UI.success("iOS beta binary is on App Store Connect!")
+  end
+
+  desc "Distribute an already-uploaded TestFlight build to the Public Beta group"
+  lane :distribute_testflight_beta do |options|
+    api_key = load_api_key
+    app_version = options[:app_version] || UI.user_error!("app_version is required")
+    build_number = options[:build_number] || UI.user_error!("build_number is required")
+
+    UI.message("Distributing #{app_version} (#{build_number}) to the Public Beta group...")
+    # distribute_only touches no binary, so this lane is safe to retry and safe
+    # to run by hand against a build whose distribution failed earlier.
+    #
+    # app_platform is required rather than optional here: pilot normally infers
+    # the platform from the IPA, and with distribute_only there is no IPA to
+    # infer from, so it would fall back to an interactive prompt in CI.
     upload_to_testflight(
       api_key: api_key,
-      ipa: ipa_path,
+      distribute_only: true,
+      app_platform: "ios",
+      app_version: app_version,
+      build_number: build_number.to_s,
       distribute_external: true,
       groups: ["Public Beta"],
       changelog: beta_changelog,
