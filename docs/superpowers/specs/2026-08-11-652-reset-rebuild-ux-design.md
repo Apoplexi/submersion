@@ -186,8 +186,18 @@ strictly larger than reset's. Approved text:
 
 #### UI placement
 
-Cloud Sync page gains a danger-zone header above the existing Sign Out tile,
-matching the storage settings pattern, with the replace tile above Sign Out.
+Cloud Sync page gains a danger-zone header and the replace tile at the end of
+the Advanced section, BELOW the existing Sign Out tile.
+
+Sign Out deliberately stays outside the danger zone: it is reversible and
+routine, so putting it under a "Danger Zone" header would both overstate it and
+dilute the header for the action that actually earns it. The header therefore
+introduces only the replace tile, matching how storage settings scopes its own
+danger zone to Reset Database.
+
+The tile renders only when a cloud provider is configured, and is disabled
+while a sync is running -- publishing under an epoch the replace is about to
+wipe would race the writer.
 
 ### Item 3 — first-contact hint
 

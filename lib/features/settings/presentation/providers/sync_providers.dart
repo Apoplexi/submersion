@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io' show Platform;
 
 import 'package:cryptography/cryptography.dart' show SecretKey;
+import 'package:flutter/foundation.dart' show visibleForTesting;
 
 import 'package:submersion/core/data/repositories/connected_accounts_repository.dart';
 import 'package:submersion/core/providers/account_providers.dart';
@@ -829,7 +830,14 @@ class SyncNotifier extends StateNotifier<SyncState> {
   /// pieces rather than finished strings: a notifier has no BuildContext, so
   /// the unnamed-device fallback has to be localized by the page. Sorted so
   /// the banner text is stable across syncs instead of reordering each pull.
-  List<({String? name, String shortId})> _skippedPeerLabels(SyncResult result) {
+  ///
+  /// Static and visible for testing for the same reason as
+  /// [SyncService.pullResultMessages]: it is pure, and the naming/fallback/
+  /// ordering rules deserve tests that do not need a container.
+  @visibleForTesting
+  static List<({String? name, String shortId})> skippedPeerLabels(
+    SyncResult result,
+  ) {
     final entries =
         result.skippedPeerDeviceIds.map((id) {
           final name = result.skippedPeerNames[id];
@@ -1169,7 +1177,7 @@ class SyncNotifier extends StateNotifier<SyncState> {
             lastSync: result.lastSyncTime,
             conflicts: result.conflictsFound,
             newerSchemaPeerCount: result.newerSchemaPeerDeviceIds.length,
-            skippedPeerLabels: _skippedPeerLabels(result),
+            skippedPeerLabels: skippedPeerLabels(result),
             progress: 1.0,
           );
           // Mark this provider established and consume any post-restore intent:
