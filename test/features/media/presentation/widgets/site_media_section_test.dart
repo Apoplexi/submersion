@@ -262,7 +262,7 @@ void main() {
 
       await enterSelection(tester);
 
-      expect(find.byType(MediaSelectionHeader), findsOneWidget);
+      expect(find.byKey(const ValueKey('selection_exit')), findsOneWidget);
       expect(find.text('1 selected'), findsOneWidget);
       // The normal header (and its add menu) yields to the selection header.
       expect(find.text('Site Media'), findsNothing);
@@ -278,13 +278,22 @@ void main() {
       await tester.pumpAndSettle();
       await enterSelection(tester);
 
-      await tester.tap(find.widgetWithText(TextButton, 'Select All'));
+      await tester.tap(find.byKey(const ValueKey('selection_select_all')));
       await tester.pumpAndSettle();
 
       expect(find.text('2 selected'), findsOneWidget);
       expect(find.byIcon(Icons.check), findsNWidgets(2));
       // Select-all hides once nothing is left to select.
-      expect(find.widgetWithText(TextButton, 'Select All'), findsNothing);
+      // The shared bar keeps a stable action set: select-all disables rather
+      // than disappearing once everything is checked.
+      expect(
+        tester
+            .widget<IconButton>(
+              find.byKey(const ValueKey('selection_select_all')),
+            )
+            .onPressed,
+        isNull,
+      );
     });
 
     testWidgets('cancelling returns to the normal header', (tester) async {
@@ -292,10 +301,10 @@ void main() {
       await tester.pumpAndSettle();
       await enterSelection(tester);
 
-      await tester.tap(find.widgetWithIcon(IconButton, Icons.close));
+      await tester.tap(find.byKey(const ValueKey('selection_exit')));
       await tester.pumpAndSettle();
 
-      expect(find.byType(MediaSelectionHeader), findsNothing);
+      expect(find.byKey(const ValueKey('selection_exit')), findsNothing);
       expect(find.text('Site Media'), findsOneWidget);
       expect(find.byIcon(Icons.check), findsNothing);
     });
@@ -328,9 +337,9 @@ void main() {
       await tester.pumpAndSettle();
       await tester.longPress(find.byType(MediaThumbnailTile).first);
       await tester.pumpAndSettle();
-      await tester.tap(find.widgetWithText(TextButton, 'Select All'));
+      await tester.tap(find.byKey(const ValueKey('selection_select_all')));
       await tester.pumpAndSettle();
-      await tester.tap(find.widgetWithIcon(IconButton, Icons.delete_outline));
+      await tester.tap(find.byKey(const ValueKey('selection_action_unlink')));
       await tester.pumpAndSettle();
     }
 
@@ -377,7 +386,7 @@ void main() {
       ]);
       expect(find.text('Removed 2 attachments'), findsOneWidget);
       // Selection mode exits once the unlink lands.
-      expect(find.byType(MediaSelectionHeader), findsNothing);
+      expect(find.byKey(const ValueKey('selection_exit')), findsNothing);
       expect(find.text('Site Media'), findsOneWidget);
     });
 
