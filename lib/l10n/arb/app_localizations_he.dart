@@ -14720,14 +14720,17 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get settings_storage_resetDatabase_subtitle =>
-      'מחק את כל הנתונים והתחל מחדש';
+      'מחק את כל הנתונים במכשיר זה והתחל מחדש';
 
   @override
   String get settings_storage_resetDialog_title => 'לאפס את מסד הנתונים?';
 
   @override
   String get settings_storage_resetDialog_body =>
-      'פעולה זו תמחק לצמיתות את כל הנתונים שלך כולל צלילות, אתרים, ציוד והגדרות. גיבוי ייווצר אוטומטית לפני האיפוס.';
+      'פעולה זו מוחקת לצמיתות את כל הנתונים במכשיר הזה, כולל צלילות, אתרים, ציוד והגדרות. גיבוי נוצר אוטומטית לפני האיפוס.\n\nספריית הענן שלך לא נמחקת, ומכשירים אחרים שומרים על הנתונים שלהם. סנכרון הענן ינותק כדי שהאיפוס לא יבוטל; ניתן לחבר אותו מחדש בהגדרות > סנכרון ענן.';
+
+  @override
+  String get settings_storage_resetDialog_confirmWord => 'מחיקה';
 
   @override
   String get settings_storage_resetDialog_confirmHint =>
@@ -14750,7 +14753,7 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get settings_storage_resetComplete_description =>
-      'הנתונים שלך נמחקו וגיבוי נשמר. הקש על המשך כדי לטעון מחדש את האפליקציה.';
+      'הנתונים במכשיר זה נמחקו וגיבוי נשמר. סנכרון הענן מנותק כעת כדי שהאיפוס לא יבוטל; ניתן לחבר אותו מחדש בהגדרות > סנכרון ענן. הקש על המשך כדי לטעון מחדש את האפליקציה.';
 
   @override
   String get settings_summary_activeDiver => 'צולל פעיל';

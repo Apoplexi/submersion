@@ -14833,7 +14833,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get settings_storage_resetDatabase_subtitle =>
-      'حذف جميع البيانات والبدء من جديد';
+      'حذف جميع البيانات على هذا الجهاز والبدء من جديد';
 
   @override
   String get settings_storage_resetDialog_title =>
@@ -14841,7 +14841,10 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get settings_storage_resetDialog_body =>
-      'سيؤدي هذا إلى حذف جميع بياناتك نهائياً بما في ذلك الغوصات والمواقع والمعدات والإعدادات. سيتم إنشاء نسخة احتياطية تلقائياً قبل إعادة التعيين.';
+      'سيؤدي هذا إلى حذف جميع البيانات الموجودة على هذا الجهاز نهائياً، بما في ذلك الغوصات والمواقع والمعدات والإعدادات. سيتم إنشاء نسخة احتياطية تلقائياً قبل إعادة التعيين.\n\nلن تُحذف مكتبتك السحابية، وتحتفظ الأجهزة الأخرى ببياناتها. سيتم فصل مزامنة السحابة حتى لا يُلغى أثر إعادة التعيين؛ يمكنك إعادة توصيلها من الإعدادات > مزامنة السحابة.';
+
+  @override
+  String get settings_storage_resetDialog_confirmWord => 'حذف';
 
   @override
   String get settings_storage_resetDialog_confirmHint => 'اكتب \"حذف\" للتأكيد';
@@ -14864,7 +14867,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get settings_storage_resetComplete_description =>
-      'تم مسح بياناتك وحفظ نسخة احتياطية. اضغط على متابعة لإعادة تحميل التطبيق.';
+      'تم مسح بيانات هذا الجهاز وحفظ نسخة احتياطية. أصبحت مزامنة السحابة الآن غير متصلة حتى لا يُلغى أثر إعادة التعيين؛ يمكنك إعادة توصيلها من الإعدادات > مزامنة السحابة. اضغط على متابعة لإعادة تحميل التطبيق.';
 
   @override
   String get settings_summary_activeDiver => 'الغواص النشط';

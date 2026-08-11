@@ -25343,7 +25343,7 @@ abstract class AppLocalizations {
   /// No description provided for @settings_storage_resetDatabase_subtitle.
   ///
   /// In en, this message translates to:
-  /// **'Delete all data and start fresh'**
+  /// **'Delete all data on this device and start fresh'**
   String get settings_storage_resetDatabase_subtitle;
 
   /// No description provided for @settings_storage_resetDialog_title.
@@ -25355,8 +25355,14 @@ abstract class AppLocalizations {
   /// No description provided for @settings_storage_resetDialog_body.
   ///
   /// In en, this message translates to:
-  /// **'This will permanently delete all your data including dives, sites, gear, and settings. A backup will be created automatically before resetting.'**
+  /// **'This permanently deletes all data on THIS device, including dives, sites, gear, and settings. A backup is created automatically before resetting.\n\nYour cloud library is not deleted, and other devices keep their data. Cloud sync will be disconnected so the reset is not undone; you can reconnect it in Settings > Cloud Sync.'**
   String get settings_storage_resetDialog_body;
+
+  /// The word the user must type to arm the reset. Compared literally against their input, so it MUST match the word quoted in settings_storage_resetDialog_confirmHint in the same locale.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get settings_storage_resetDialog_confirmWord;
 
   /// No description provided for @settings_storage_resetDialog_confirmHint.
   ///
@@ -25391,7 +25397,7 @@ abstract class AppLocalizations {
   /// No description provided for @settings_storage_resetComplete_description.
   ///
   /// In en, this message translates to:
-  /// **'Your data has been cleared and a backup was saved. Tap continue to reload the app.'**
+  /// **'This device\'s data has been cleared and a backup was saved. Cloud sync is now disconnected so the reset is not undone; you can reconnect it in Settings > Cloud Sync. Tap continue to reload the app.'**
   String get settings_storage_resetComplete_description;
 
   /// No description provided for @settings_summary_activeDiver.

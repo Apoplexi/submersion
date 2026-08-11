@@ -15102,14 +15102,17 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get settings_storage_resetDatabase_subtitle =>
-      'Elimina tutti i dati e ricomincia da zero';
+      'Elimina tutti i dati su questo dispositivo e ricomincia da zero';
 
   @override
   String get settings_storage_resetDialog_title => 'Reimpostare il database?';
 
   @override
   String get settings_storage_resetDialog_body =>
-      'Questo eliminera permanentemente tutti i tuoi dati, incluse immersioni, siti, attrezzatura e impostazioni. Un backup verra creato automaticamente prima del reset.';
+      'Questo elimina permanentemente tutti i dati su QUESTO dispositivo, incluse immersioni, siti, attrezzatura e impostazioni. Un backup viene creato automaticamente prima del reset.\n\nLa tua libreria cloud non viene eliminata e gli altri dispositivi conservano i loro dati. La sincronizzazione cloud verrà disconnessa affinché il reset non venga annullato; puoi riconnetterla in Impostazioni > Sincronizzazione cloud.';
+
+  @override
+  String get settings_storage_resetDialog_confirmWord => 'Elimina';
 
   @override
   String get settings_storage_resetDialog_confirmHint =>
@@ -15132,7 +15135,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get settings_storage_resetComplete_description =>
-      'I tuoi dati sono stati cancellati e un backup e stato salvato. Tocca continua per ricaricare l\'app.';
+      'I dati di questo dispositivo sono stati cancellati ed è stato salvato un backup. La sincronizzazione cloud ora è disconnessa affinché il ripristino non venga annullato; puoi riconnetterla in Impostazioni > Sincronizzazione cloud. Tocca continua per ricaricare l\'app.';
 
   @override
   String get settings_summary_activeDiver => 'Subacqueo attivo';

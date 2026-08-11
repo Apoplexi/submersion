@@ -14980,14 +14980,17 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get settings_storage_resetDatabase_subtitle =>
-      'Alle gegevens verwijderen en opnieuw beginnen';
+      'Alle gegevens op dit apparaat verwijderen en opnieuw beginnen';
 
   @override
   String get settings_storage_resetDialog_title => 'Database resetten?';
 
   @override
   String get settings_storage_resetDialog_body =>
-      'Dit verwijdert permanent al je gegevens inclusief duiken, stekken, uitrusting en instellingen. Er wordt automatisch een back-up gemaakt voor het resetten.';
+      'Dit verwijdert permanent alle gegevens op DIT apparaat, inclusief duiken, stekken, uitrusting en instellingen. Er wordt automatisch een back-up gemaakt voor het resetten.\n\nJe cloudbibliotheek wordt niet verwijderd en andere apparaten behouden hun gegevens. Cloudsynchronisatie wordt losgekoppeld zodat de reset niet ongedaan wordt gemaakt; je kunt deze opnieuw verbinden via Instellingen > Cloudsynchronisatie.';
+
+  @override
+  String get settings_storage_resetDialog_confirmWord => 'Delete';
 
   @override
   String get settings_storage_resetDialog_confirmHint =>
@@ -15010,7 +15013,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get settings_storage_resetComplete_description =>
-      'Je gegevens zijn gewist en er is een back-up opgeslagen. Tik op doorgaan om de app opnieuw te laden.';
+      'De gegevens van dit apparaat zijn gewist en er is een back-up opgeslagen. Cloudsynchronisatie is nu losgekoppeld zodat de reset niet ongedaan wordt gemaakt; je kunt deze opnieuw verbinden via Instellingen > Cloudsynchronisatie. Tik op doorgaan om de app opnieuw te laden.';
 
   @override
   String get settings_summary_activeDiver => 'Actieve duiker';

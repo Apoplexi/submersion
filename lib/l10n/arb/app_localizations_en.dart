@@ -14848,14 +14848,17 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settings_storage_resetDatabase_subtitle =>
-      'Delete all data and start fresh';
+      'Delete all data on this device and start fresh';
 
   @override
   String get settings_storage_resetDialog_title => 'Reset Database?';
 
   @override
   String get settings_storage_resetDialog_body =>
-      'This will permanently delete all your data including dives, sites, gear, and settings. A backup will be created automatically before resetting.';
+      'This permanently deletes all data on THIS device, including dives, sites, gear, and settings. A backup is created automatically before resetting.\n\nYour cloud library is not deleted, and other devices keep their data. Cloud sync will be disconnected so the reset is not undone; you can reconnect it in Settings > Cloud Sync.';
+
+  @override
+  String get settings_storage_resetDialog_confirmWord => 'Delete';
 
   @override
   String get settings_storage_resetDialog_confirmHint =>
@@ -14878,7 +14881,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settings_storage_resetComplete_description =>
-      'Your data has been cleared and a backup was saved. Tap continue to reload the app.';
+      'This device\'s data has been cleared and a backup was saved. Cloud sync is now disconnected so the reset is not undone; you can reconnect it in Settings > Cloud Sync. Tap continue to reload the app.';
 
   @override
   String get settings_summary_activeDiver => 'Active Diver';

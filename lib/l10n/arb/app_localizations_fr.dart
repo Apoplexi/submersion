@@ -15159,7 +15159,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get settings_storage_resetDatabase_subtitle =>
-      'Supprimer toutes les donnees et repartir a zero';
+      'Supprimer toutes les données de cet appareil et repartir à zéro';
 
   @override
   String get settings_storage_resetDialog_title =>
@@ -15167,7 +15167,10 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get settings_storage_resetDialog_body =>
-      'Cela supprimera definitivement toutes vos donnees, y compris les plongees, les sites, l\'equipement et les reglages. Une sauvegarde sera creee automatiquement avant la reinitialisation.';
+      'Cela supprime définitivement toutes les données de CET appareil, y compris les plongées, les sites, l\'équipement et les réglages. Une sauvegarde est créée automatiquement avant la réinitialisation.\n\nVotre bibliothèque cloud n\'est pas supprimée et les autres appareils conservent leurs données. La synchronisation cloud sera déconnectée afin que la réinitialisation ne soit pas annulée ; vous pouvez la reconnecter dans Réglages > Synchronisation cloud.';
+
+  @override
+  String get settings_storage_resetDialog_confirmWord => 'Supprimer';
 
   @override
   String get settings_storage_resetDialog_confirmHint =>
@@ -15191,7 +15194,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get settings_storage_resetComplete_description =>
-      'Vos donnees ont ete effacees et une sauvegarde a ete enregistree. Appuyez sur continuer pour recharger l\'application.';
+      'Les données de cet appareil ont été effacées et une sauvegarde a été enregistrée. La synchronisation cloud est maintenant déconnectée afin que la réinitialisation ne soit pas annulée ; vous pouvez la reconnecter dans Réglages > Synchronisation cloud. Appuyez sur continuer pour recharger l\'application.';
 
   @override
   String get settings_summary_activeDiver => 'Plongeur actif';

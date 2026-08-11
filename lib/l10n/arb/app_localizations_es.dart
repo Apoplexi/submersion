@@ -15107,14 +15107,17 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get settings_storage_resetDatabase_subtitle =>
-      'Eliminar todos los datos y comenzar de nuevo';
+      'Eliminar todos los datos de este dispositivo y comenzar de nuevo';
 
   @override
   String get settings_storage_resetDialog_title => 'Restablecer Base de Datos?';
 
   @override
   String get settings_storage_resetDialog_body =>
-      'Esto eliminara permanentemente todos tus datos incluyendo inmersiones, puntos, equipo y configuraciones. Se creara una copia de seguridad automaticamente antes de restablecer.';
+      'Esto elimina permanentemente todos los datos de ESTE dispositivo, incluidas inmersiones, puntos, equipo y configuraciones. Se crea una copia de seguridad automáticamente antes de restablecer.\n\nTu biblioteca en la nube no se elimina y los demás dispositivos conservan sus datos. La sincronización en la nube se desconectará para que el restablecimiento no se deshaga; puedes volver a conectarla en Ajustes > Sincronización en la nube.';
+
+  @override
+  String get settings_storage_resetDialog_confirmWord => 'Eliminar';
 
   @override
   String get settings_storage_resetDialog_confirmHint =>
@@ -15138,7 +15141,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get settings_storage_resetComplete_description =>
-      'Tus datos han sido eliminados y se guardo una copia de seguridad. Toca continuar para recargar la app.';
+      'Los datos de este dispositivo se han eliminado y se guardó una copia de seguridad. La sincronización en la nube está ahora desconectada para que el restablecimiento no se deshaga; puedes volver a conectarla en Ajustes > Sincronización en la nube. Toca continuar para recargar la app.';
 
   @override
   String get settings_summary_activeDiver => 'Buceador activo';

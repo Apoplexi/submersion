@@ -14353,14 +14353,17 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settings_storage_resetDatabase => '重置数据库';
 
   @override
-  String get settings_storage_resetDatabase_subtitle => '删除所有数据并重新开始';
+  String get settings_storage_resetDatabase_subtitle => '删除本设备上的所有数据并重新开始';
 
   @override
   String get settings_storage_resetDialog_title => '重置数据库？';
 
   @override
   String get settings_storage_resetDialog_body =>
-      '这将永久删除您的所有数据，包括潜水、潜水点、装备和设置。重置前将自动创建备份。';
+      '这将永久删除本设备上的所有数据，包括潜水、潜水点、装备和设置。重置前将自动创建备份。\n\n您的云端库不会被删除，其他设备也会保留各自的数据。云同步将被断开，以免重置被撤销；您可以在「设置 > 云同步」中重新连接。';
+
+  @override
+  String get settings_storage_resetDialog_confirmWord => 'Delete';
 
   @override
   String get settings_storage_resetDialog_confirmHint => '输入「Delete」以确认';
@@ -14381,7 +14384,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get settings_storage_resetComplete_description =>
-      '您的数据已清除并已保存备份。点击继续以重新加载应用。';
+      '本设备的数据已清除并已保存备份。云同步现已断开，以免重置被撤销；您可以在「设置 > 云同步」中重新连接。点击继续以重新加载应用。';
 
   @override
   String get settings_summary_activeDiver => '当前潜水员';

@@ -15110,14 +15110,17 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_storage_resetDatabase_subtitle =>
-      'Excluir todos os dados e comecar do zero';
+      'Excluir todos os dados deste dispositivo e começar do zero';
 
   @override
   String get settings_storage_resetDialog_title => 'Redefinir Banco de Dados?';
 
   @override
   String get settings_storage_resetDialog_body =>
-      'Isso excluira permanentemente todos os seus dados, incluindo mergulhos, pontos, equipamentos e configuracoes. Um backup sera criado automaticamente antes da redefinicao.';
+      'Isso exclui permanentemente todos os dados DESTE dispositivo, incluindo mergulhos, pontos, equipamentos e configurações. Um backup é criado automaticamente antes da redefinição.\n\nA sua biblioteca na nuvem não é excluída e os outros dispositivos mantêm os seus dados. A sincronização na nuvem será desconectada para que a redefinição não seja desfeita; pode reconectá-la em Definições > Sincronização na nuvem.';
+
+  @override
+  String get settings_storage_resetDialog_confirmWord => 'Excluir';
 
   @override
   String get settings_storage_resetDialog_confirmHint =>
@@ -15141,7 +15144,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_storage_resetComplete_description =>
-      'Seus dados foram apagados e um backup foi salvo. Toque em continuar para recarregar o app.';
+      'Os dados deste dispositivo foram apagados e um backup foi salvo. A sincronização na nuvem está agora desconectada para que a redefinição não seja desfeita; pode reconectá-la em Definições > Sincronização na nuvem. Toque em continuar para recarregar o app.';
 
   @override
   String get settings_summary_activeDiver => 'Mergulhador Ativo';

@@ -15085,14 +15085,17 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get settings_storage_resetDatabase_subtitle =>
-      'Alle Daten löschen und neu beginnen';
+      'Alle Daten auf diesem Gerät löschen und neu beginnen';
 
   @override
   String get settings_storage_resetDialog_title => 'Datenbank zurücksetzen?';
 
   @override
   String get settings_storage_resetDialog_body =>
-      'Dies löscht dauerhaft alle Ihre Daten einschließlich Tauchgänge, Tauchplätze, Ausrüstung und Einstellungen. Vor dem Zurücksetzen wird automatisch eine Sicherung erstellt.';
+      'Dies löscht dauerhaft alle Daten auf DIESEM Gerät, einschließlich Tauchgänge, Tauchplätze, Ausrüstung und Einstellungen. Vor dem Zurücksetzen wird automatisch eine Sicherung erstellt.\n\nIhre Cloud-Bibliothek wird nicht gelöscht, und andere Geräte behalten ihre Daten. Die Cloud-Synchronisierung wird getrennt, damit das Zurücksetzen nicht rückgängig gemacht wird; Sie können sie unter Einstellungen > Cloud-Synchronisierung wieder verbinden.';
+
+  @override
+  String get settings_storage_resetDialog_confirmWord => 'Delete';
 
   @override
   String get settings_storage_resetDialog_confirmHint =>
@@ -15115,7 +15118,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get settings_storage_resetComplete_description =>
-      'Ihre Daten wurden gelöscht und eine Sicherung wurde gespeichert. Tippen Sie auf Weiter, um die App neu zu laden.';
+      'Die Daten dieses Geräts wurden gelöscht und eine Sicherung wurde gespeichert. Die Cloud-Synchronisierung ist jetzt getrennt, damit das Zurücksetzen nicht rückgängig gemacht wird; Sie können sie unter Einstellungen > Cloud-Synchronisierung wieder verbinden. Tippen Sie auf Weiter, um die App neu zu laden.';
 
   @override
   String get settings_summary_activeDiver => 'Aktiver Taucher';
