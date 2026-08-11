@@ -7,6 +7,8 @@ import 'package:submersion/features/tags/presentation/pages/tag_manage_page.dart
 import 'package:submersion/features/tags/presentation/providers/tag_providers.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
 
+import '../../../../helpers/selection_contract.dart';
+
 // ---------------------------------------------------------------------------
 // Test data
 // ---------------------------------------------------------------------------
@@ -113,6 +115,24 @@ Widget _buildTestWidget({List<TagStatistic> stats = const []}) {
 // ---------------------------------------------------------------------------
 
 void main() {
+  group('selection contract', () {
+    testWidgets('satisfies the shared selection contract', (tester) async {
+      await verifySelectionContract(
+        tester,
+        build: () => _buildTestWidget(stats: _testStats),
+        selectButton: find.byKey(const ValueKey('enter_selection')),
+        firstRow: find.text('Night Dive'),
+        applyFilter: (tester) async {
+          // Type into the real search field. Tags previously hid this field
+          // during selection and never pruned, so a hidden tag stayed checked.
+          await tester.enterText(find.byType(TextField).first, 'Night');
+          await tester.pump();
+        },
+        visibleAfterFilter: 1,
+      );
+    });
+  });
+
   group('TagManagePage', () {
     testWidgets('renders tag list with names and usage counts', (tester) async {
       await tester.pumpWidget(_buildTestWidget(stats: _testStats));
@@ -205,7 +225,7 @@ void main() {
       await tester.pumpAndSettle();
 
       // Tap the delete icon in the app bar
-      await tester.tap(find.byIcon(Icons.delete));
+      await tester.tap(find.byKey(const ValueKey('selection_delete')));
       await tester.pumpAndSettle();
 
       // Confirmation dialog should show the tag name and dive count
@@ -224,17 +244,11 @@ void main() {
       await tester.longPress(find.text('Night Dive'));
       await tester.pumpAndSettle();
 
-      // Find the merge IconButton and verify it is disabled
-      final mergeButton = find.byIcon(Icons.merge);
+      // Keyed by SelectionAppBar, so this no longer depends on which glyph
+      // merge happens to use.
+      final mergeButton = find.byKey(const ValueKey('selection_action_merge'));
       expect(mergeButton, findsOneWidget);
-
-      final iconButtonWidget = tester.widget<IconButton>(
-        find.ancestor(
-          of: find.byIcon(Icons.merge),
-          matching: find.byType(IconButton),
-        ),
-      );
-      expect(iconButtonWidget.onPressed, isNull);
+      expect(tester.widget<IconButton>(mergeButton).onPressed, isNull);
     });
 
     testWidgets('merge button enabled when 2 tags selected', (tester) async {
@@ -252,13 +266,14 @@ void main() {
       expect(find.text('2 selected'), findsOneWidget);
 
       // Now merge button should be enabled
-      final iconButtonWidget = tester.widget<IconButton>(
-        find.ancestor(
-          of: find.byIcon(Icons.merge),
-          matching: find.byType(IconButton),
-        ),
+      expect(
+        tester
+            .widget<IconButton>(
+              find.byKey(const ValueKey('selection_action_merge')),
+            )
+            .onPressed,
+        isNotNull,
       );
-      expect(iconButtonWidget.onPressed, isNotNull);
     });
   });
 }
