@@ -71,6 +71,14 @@ class _CylinderConfigItemEditorState
     }
   }
 
+  /// A preset's cylinder size in the diver's units - gas capacity in imperial,
+  /// physical volume in metric.
+  String _presetSize(TankPresetEntity preset) => widget.units.formatTankVolume(
+    preset.volumeLiters,
+    preset.workingPressureBar,
+    ratedCapacityCuft: preset.ratedCapacityCuft,
+  );
+
   Future<void> _pickPreset() async {
     final presets = await ref.read(tankPresetsProvider.future);
     if (!mounted || presets.isEmpty) return;
@@ -85,7 +93,7 @@ class _CylinderConfigItemEditorState
               ListTile(
                 title: Text(preset.displayName),
                 subtitle: Text(
-                  '${widget.units.formatVolume(preset.volumeLiters)} - '
+                  '${_presetSize(preset)} - '
                   '${widget.units.formatPressure(preset.workingPressureBar)}',
                 ),
                 onTap: () => Navigator.of(sheetContext).pop(preset),
@@ -212,7 +220,10 @@ class _CylinderConfigItemEditorState
               child: Text(
                 [
                   if (item.volumeL != null)
-                    widget.units.formatVolume(item.volumeL!),
+                    widget.units.formatTankVolume(
+                      item.volumeL,
+                      item.workingPressureBar,
+                    ),
                   if (item.workingPressureBar != null)
                     widget.units.formatPressure(item.workingPressureBar!),
                 ].join(' - '),

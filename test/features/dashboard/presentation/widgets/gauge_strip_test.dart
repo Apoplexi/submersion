@@ -63,6 +63,11 @@ Future<NavSpy> pumpStrip(
         builder: (_, _) => stub('/equipment'),
         routes: [
           GoRoute(path: 'new', builder: (_, _) => stub('/equipment/new')),
+          GoRoute(
+            path: ':equipmentId',
+            builder: (_, state) =>
+                stub('/equipment/${state.pathParameters['equipmentId']}'),
+          ),
         ],
       ),
       GoRoute(
@@ -140,8 +145,10 @@ GearGauge _gearGauge(
   EquipmentType type,
   ServiceClockSeverity severity, {
   DateTime? dueDate,
+  String? id,
 }) => GearGauge(
   type: type,
+  itemId: id ?? name,
   itemName: name,
   status: ServiceClockStatus(
     schedule: ServiceSchedule(
@@ -238,6 +245,7 @@ void main() {
               EquipmentType.regulator,
               ServiceClockSeverity.overdue,
               dueDate: DateTime(2026, 6, 1),
+              id: 'reg-1',
             ),
             _gearGauge(
               'BCD',
@@ -263,8 +271,10 @@ void main() {
       expect(find.text('Teric OK'), findsOneWidget);
       expect(find.text('Add gear'), findsNothing);
 
+      // The chip names one item, so it must open that item rather than the
+      // list the diver would then have to search (issue #816).
       await tapChip(tester, 'Regulator overdue');
-      expect(spy.location, '/equipment');
+      expect(spy.location, '/equipment/reg-1');
     });
 
     testWidgets('due-soon clock without a due date falls back to 0 days', (

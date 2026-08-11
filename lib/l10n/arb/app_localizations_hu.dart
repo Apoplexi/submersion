@@ -2957,6 +2957,14 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String get dashboard_hero_divesTotalOne => '1 merules';
+
+  @override
+  String dashboard_hero_divesTotalOther(Object count) {
+    return '$count merules';
+  }
+
+  @override
   String get dashboard_hero_error => 'Kesz felfedezni a melyseget?';
 
   @override
@@ -11725,6 +11733,57 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get media_diveMediaSection_unlinkSuccess => 'Foto levalasztva';
+
+  @override
+  String get media_siteMediaSection_title => 'Merülőhely médiafájljai';
+
+  @override
+  String get media_siteMediaSection_addPhotos => 'Fotók vagy videók hozzáadása';
+
+  @override
+  String get media_siteMediaSection_addDocument => 'Dokumentum hozzáadása';
+
+  @override
+  String get media_siteMediaSection_emptyState =>
+      'Ehhez a merülőhelyhez nincs csatolva térkép, fotó vagy dokumentum';
+
+  @override
+  String media_siteMediaSection_divePhotosGroup(int count) {
+    return 'Fotók az itteni merülésekről ($count)';
+  }
+
+  @override
+  String get media_siteMediaSection_divePhotoLabel => 'Merülésfotó';
+
+  @override
+  String media_siteMediaSection_unlinkSelectedTitle(int count) {
+    return 'Eltávolítasz $count mellékletet?';
+  }
+
+  @override
+  String get media_siteMediaSection_unlinkSelectedContent =>
+      'A kijelölt elemek eltávolításra kerülnek erről a merülőhelyről. A fotókönyvtárban vagy a lemezen lévő fájlok nem törlődnek.';
+
+  @override
+  String media_siteMediaSection_unlinkSelectedSuccess(int count) {
+    return '$count melléklet eltávolítva';
+  }
+
+  @override
+  String get media_documentViewer_title => 'Dokumentum';
+
+  @override
+  String get media_documentViewer_unavailable =>
+      'Ez a dokumentum nem érhető el ezen az eszközön';
+
+  @override
+  String get media_documentViewer_availableOnOriginDevice =>
+      'Azon az eszközön érhető el, amelyről hozzáadták, vagy egy beállított médiatárolón keresztül.';
+
+  @override
+  String media_documentViewer_attached(int count) {
+    return '$count dokumentum csatolva';
+  }
 
   @override
   String get media_diveScan_scanTooltip => 'Galeria keresese fotokert';

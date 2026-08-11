@@ -8,6 +8,7 @@ import 'package:submersion/features/settings/presentation/providers/settings_pro
 import 'package:submersion/core/constants/pdf_templates.dart';
 import 'package:submersion/core/services/database_service.dart';
 import 'package:submersion/core/services/export/export_service.dart';
+import 'package:submersion/core/services/pdf_templates/pdf_date_formatter.dart';
 import 'package:submersion/core/services/pdf_templates/pdf_fonts.dart';
 import 'package:submersion/core/services/pdf_templates/pdf_template_factory.dart';
 import 'package:submersion/features/signatures/data/services/signature_storage_service.dart';
@@ -314,9 +315,17 @@ class ExportNotifier extends StateNotifier<ExportState> {
     final factory = PdfTemplateFactory();
     final builder = factory.getBuilder(exportOptions.template);
 
+    // The logbook is a document the diver prints or shares, so its dates and
+    // times follow the diver's preferences (#964); the file name stays ISO.
+    final settings = _ref.read(settingsProvider);
+
     return builder.buildPdf(
       dives: dives,
       pageSize: exportOptions.pageSize,
+      dates: PdfDateFormatter(
+        dateFormat: settings.dateFormat,
+        timeFormat: settings.timeFormat,
+      ),
       title: 'Dive Logbook',
       diveSignatures: diveSignatures.isNotEmpty ? diveSignatures : null,
       certifications: certifications,

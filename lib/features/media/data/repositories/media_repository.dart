@@ -69,6 +69,46 @@ class MediaRepository {
     }
   }
 
+  /// Get all media directly attached to a site, ordered by takenAt.
+  /// Enrichment rides along for rows that are also dive-linked.
+  Future<List<domain.MediaItem>> getMediaForSite(String siteId) async {
+    try {
+      final query =
+          _db.select(_db.media).join([
+              leftOuterJoin(
+                _db.mediaEnrichment,
+                _db.mediaEnrichment.mediaId.equalsExp(_db.media.id),
+              ),
+            ])
+            ..where(_db.media.siteId.equals(siteId))
+            ..orderBy([OrderingTerm.asc(_db.media.takenAt)]);
+
+      final rows = await query.get();
+      return rows.map((row) {
+        final mediaRow = row.readTable(_db.media);
+        final enrichmentRow = row.readTableOrNull(_db.mediaEnrichment);
+        return _mapRowToMediaItem(mediaRow, enrichmentRow);
+      }).toList();
+    } catch (e, stackTrace) {
+      _log.error(
+        'Failed to get media for site: $siteId',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      rethrow;
+    }
+  }
+
+  /// Count of media directly attached to a site (badges/headers).
+  Future<int> getMediaCountForSite(String siteId) async {
+    final count = _db.media.id.count();
+    final query = _db.selectOnly(_db.media)
+      ..addColumns([count])
+      ..where(_db.media.siteId.equals(siteId));
+    final row = await query.getSingle();
+    return row.read(count) ?? 0;
+  }
+
   /// Get single media item by ID
   /// Includes enrichment data (depth, temperature) if available
   Future<domain.MediaItem?> getMediaById(String id) async {
@@ -755,6 +795,52 @@ class MediaRepository {
     }
   }
 
+  /// Site counterpart of [getLinkedAssetIdsForDive]: gallery-import dedupe
+  /// for direct site attachments.
+  Future<Set<String>> getLinkedAssetIdsForSite(String siteId) async {
+    try {
+      final result = await _db
+          .customSelect(
+            'SELECT platform_asset_id FROM media '
+            'WHERE site_id = ? AND platform_asset_id IS NOT NULL',
+            variables: [Variable.withString(siteId)],
+          )
+          .get();
+      return result
+          .map((row) => row.data['platform_asset_id'] as String)
+          .toSet();
+    } catch (e, stackTrace) {
+      _log.error(
+        'Failed to get linked asset IDs for site: $siteId',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      rethrow;
+    }
+  }
+
+  /// Site counterpart of [getLinkedLocalPathsForDive]: file-import dedupe
+  /// for direct site attachments.
+  Future<Set<String>> getLinkedLocalPathsForSite(String siteId) async {
+    try {
+      final result = await _db
+          .customSelect(
+            'SELECT local_path FROM media '
+            'WHERE site_id = ? AND local_path IS NOT NULL',
+            variables: [Variable.withString(siteId)],
+          )
+          .get();
+      return result.map((row) => row.data['local_path'] as String).toSet();
+    } catch (e, stackTrace) {
+      _log.error(
+        'Failed to get linked local paths for site: $siteId',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      rethrow;
+    }
+  }
+
   /// Get GPS coordinates from media attached to a dive.
   ///
   /// Returns a list of (latitude, longitude, takenAt) tuples from photos
@@ -1054,6 +1140,58 @@ class MediaRepository {
     await _db.transaction(() async {
       await (_db.update(_db.media)..where((t) => t.id.isIn(mediaIds))).write(
         MediaCompanion(diveId: const Value(null), updatedAt: Value(now)),
+      );
+      for (final id in mediaIds) {
+        await _syncRepository.markRecordPending(
+          entityType: 'media',
+          recordId: id,
+          localUpdatedAt: now,
+        );
+      }
+    });
+    SyncEventBus.notifyLocalChange();
+  }
+
+  /// Splits a dying site's media: `doomed` rows die with the site
+  /// (site-only, non-library; full items because the blob-delete intent
+  /// needs contentHash/filename/type), `unlinkIds` survive as dive-linked
+  /// or library-level rows with siteId nulled. Site counterpart of
+  /// [partitionMediaForDiveDeletion].
+  Future<({List<domain.MediaItem> doomed, List<String> unlinkIds})>
+  partitionMediaForSiteDeletion(List<String> siteIds) async {
+    // Empty-guard mirrors [partitionMediaForDiveDeletion]: bulk callers
+    // legitimately hand over empty collections.
+    if (siteIds.isEmpty) {
+      return (doomed: const <domain.MediaItem>[], unlinkIds: const <String>[]);
+    }
+    final rows = await (_db.select(
+      _db.media,
+    )..where((t) => t.siteId.isIn(siteIds))).get();
+    final doomed = <domain.MediaItem>[];
+    final unlinkIds = <String>[];
+    for (final row in rows) {
+      final keep =
+          row.diveId != null ||
+          libraryLevelSourceTypes.contains(row.sourceType);
+      if (keep) {
+        unlinkIds.add(row.id);
+      } else {
+        doomed.add(_mapRowToMediaItem(row));
+      }
+    }
+    return (doomed: doomed, unlinkIds: unlinkIds);
+  }
+
+  /// Explicitly unlinks surviving media from deleted sites, with the HLC
+  /// stamp the silent FK SET NULL never produced - so the unlink propagates
+  /// to other devices instead of diverging. Site counterpart of
+  /// [unlinkMediaFromDeletedDives].
+  Future<void> unlinkMediaFromDeletedSites(List<String> mediaIds) async {
+    if (mediaIds.isEmpty) return;
+    final now = DateTime.now().millisecondsSinceEpoch;
+    await _db.transaction(() async {
+      await (_db.update(_db.media)..where((t) => t.id.isIn(mediaIds))).write(
+        MediaCompanion(siteId: const Value(null), updatedAt: Value(now)),
       );
       for (final id in mediaIds) {
         await _syncRepository.markRecordPending(
@@ -1420,6 +1558,8 @@ class MediaRepository {
       case 'instructor_signature':
       case 'instructorSignature':
         return domain.MediaType.instructorSignature;
+      case 'document':
+        return domain.MediaType.document;
       default:
         return domain.MediaType.photo;
     }
@@ -1433,6 +1573,8 @@ class MediaRepository {
         return 'instructor_signature';
       case domain.MediaType.photo:
         return 'photo';
+      case domain.MediaType.document:
+        return 'document';
     }
   }
 

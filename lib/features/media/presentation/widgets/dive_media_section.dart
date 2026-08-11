@@ -6,7 +6,6 @@ import 'package:uuid/uuid.dart';
 
 import 'package:submersion/core/constants/feature_flags.dart';
 import 'package:submersion/core/providers/provider.dart';
-import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_repository_provider.dart';
 import 'package:submersion/features/media/presentation/helpers/lightroom_scan_helper.dart';
 import 'package:submersion/features/media/presentation/providers/lightroom_providers.dart';
@@ -16,8 +15,7 @@ import 'package:submersion/features/media/presentation/pages/photo_viewer_page.d
 import 'package:submersion/features/media/presentation/providers/media_providers.dart';
 import 'package:submersion/features/media/presentation/providers/media_resolver_providers.dart';
 import 'package:submersion/features/media/presentation/widgets/lightroom_suggestions_row.dart';
-import 'package:submersion/features/media/presentation/widgets/media_item_view.dart';
-import 'package:submersion/features/media_store/presentation/widgets/media_store_badge.dart';
+import 'package:submersion/features/media/presentation/widgets/media_grid.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:submersion/shared/selection/bulk_action.dart';
@@ -55,11 +53,22 @@ class DiveMediaSection extends ConsumerStatefulWidget {
   final VoidCallback? onAddPressed;
   final VoidCallback? onScanPressed;
 
+  /// When provided, the add button becomes a menu offering photos and
+  /// documents; without it the button keeps its historical direct-tap
+  /// behavior for callers not yet migrated.
+  final VoidCallback? onAddDocumentPressed;
+
+  /// Invoked when a document tile is tapped (documents never enter the
+  /// photo viewer).
+  final void Function(MediaItem)? onOpenDocument;
+
   const DiveMediaSection({
     super.key,
     required this.diveId,
     this.onAddPressed,
     this.onScanPressed,
+    this.onAddDocumentPressed,
+    this.onOpenDocument,
   });
 
   @override
@@ -105,7 +114,7 @@ class _DiveMediaSectionState extends ConsumerState<DiveMediaSection> {
   void _scheduleEnrichmentBackfill(List<MediaItem>? items) {
     if (items == null) return;
     final missing = items
-        .where((m) => m.enrichment == null)
+        .where((m) => m.enrichment == null && !m.isDocument)
         .map((m) => m.id)
         .toSet();
     if (missing.difference(_enrichAttempted).isEmpty) return;
@@ -440,7 +449,8 @@ class _DiveMediaSectionState extends ConsumerState<DiveMediaSection> {
                       tooltip: context.l10n.settings_lightroom_scanNow,
                       onPressed: () => _scanLightroom(context),
                     ),
-                  if (widget.onAddPressed != null)
+                  if (widget.onAddPressed != null &&
+                      widget.onAddDocumentPressed == null)
                     IconButton(
                       icon: Icon(
                         Icons.add_photo_alternate,
@@ -449,6 +459,34 @@ class _DiveMediaSectionState extends ConsumerState<DiveMediaSection> {
                       visualDensity: VisualDensity.compact,
                       tooltip: context.l10n.media_diveMediaSection_addTooltip,
                       onPressed: widget.onAddPressed,
+                    )
+                  else if (widget.onAddPressed != null)
+                    PopupMenuButton<String>(
+                      icon: Icon(
+                        Icons.add_photo_alternate,
+                        color: colorScheme.primary,
+                      ),
+                      tooltip: context.l10n.media_diveMediaSection_addTooltip,
+                      onSelected: (value) {
+                        if (value == 'photos') widget.onAddPressed!();
+                        if (value == 'document') {
+                          widget.onAddDocumentPressed!();
+                        }
+                      },
+                      itemBuilder: (context) => [
+                        PopupMenuItem(
+                          value: 'photos',
+                          child: Text(
+                            context.l10n.media_siteMediaSection_addPhotos,
+                          ),
+                        ),
+                        PopupMenuItem(
+                          value: 'document',
+                          child: Text(
+                            context.l10n.media_siteMediaSection_addDocument,
+                          ),
+                        ),
+                      ],
                     ),
                 ],
               ),
@@ -457,7 +495,10 @@ class _DiveMediaSectionState extends ConsumerState<DiveMediaSection> {
             mediaAsync.when(
               data: (media) {
                 if (media.isEmpty) {
-                  return const _EmptyMediaState();
+                  return MediaEmptyState(
+                    icon: Icons.photo_camera_outlined,
+                    message: context.l10n.media_diveMediaSection_emptyState,
+                  );
                 }
                 return DragSelectGridView<MediaItem>(
                   items: media,
@@ -474,12 +515,17 @@ class _DiveMediaSectionState extends ConsumerState<DiveMediaSection> {
                     if (!isSelecting) _selection.exit();
                   },
                   onItemTap: (index) {
+                    final item = media[index];
+                    if (item.isDocument) {
+                      widget.onOpenDocument?.call(item);
+                      return;
+                    }
                     Navigator.of(context).push(
                       MaterialPageRoute(
                         fullscreenDialog: true,
                         builder: (_) => PhotoViewerPage(
                           diveId: widget.diveId,
-                          initialMediaId: media[index].id,
+                          initialMediaId: item.id,
                         ),
                       ),
                     );
@@ -500,11 +546,13 @@ class _DiveMediaSectionState extends ConsumerState<DiveMediaSection> {
                   // driver. Both are exercised by manual desktop smoke
                   // tests.
                   itemBuilder: (context, item, isSelected) {
-                    final thumbnail = _MediaThumbnailContent(
+                    final thumbnail = MediaThumbnailTile(
                       item: item,
                       settings: settings,
                       isSelectionMode: _isSelectionMode,
                       isSelected: isSelected,
+                      semanticsLabel:
+                          context.l10n.media_diveMediaSection_thumbnailLabel,
                     );
                     return GestureDetector(
                       behavior: HitTestBehavior.opaque,
@@ -530,201 +578,6 @@ class _DiveMediaSectionState extends ConsumerState<DiveMediaSection> {
             if (lightroomUiEnabled)
               LightroomSuggestionsRow(diveId: widget.diveId),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-/// Header shown during multi-select mode with count, select all, and unlink.
-/// Empty state when no media is associated with the dive
-class _EmptyMediaState extends StatelessWidget {
-  const _EmptyMediaState();
-
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
-
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(vertical: 32),
-      decoration: BoxDecoration(
-        color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            Icons.photo_camera_outlined,
-            size: 48,
-            color: colorScheme.onSurfaceVariant,
-          ),
-          const SizedBox(height: 8),
-          Text(
-            context.l10n.media_diveMediaSection_emptyState,
-            style: textTheme.bodyMedium?.copyWith(
-              color: colorScheme.onSurfaceVariant,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-/// Purely visual thumbnail content for media items.
-///
-/// Tap, long-press, and drag gestures are handled by [DragSelectGridView].
-/// Right-click (`onSecondaryTapDown`) is handled by an outer [GestureDetector]
-/// in the grid's `itemBuilder`, which opens a desktop-only context menu for
-/// local-file items.
-class _MediaThumbnailContent extends StatelessWidget {
-  final MediaItem item;
-  final AppSettings settings;
-  final bool isSelectionMode;
-  final bool isSelected;
-
-  const _MediaThumbnailContent({
-    required this.item,
-    required this.settings,
-    required this.isSelectionMode,
-    required this.isSelected,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final formatter = UnitFormatter(settings);
-
-    return Semantics(
-      label: context.l10n.media_diveMediaSection_thumbnailLabel,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(8),
-        child: Stack(
-          fit: StackFit.expand,
-          children: [
-            // Thumbnail or placeholder.
-            // Orphaned items show a distinct error tile; all other items
-            // route through MediaItemView which dispatches to the correct
-            // resolver for the item's sourceType (gallery, signature, etc.)
-            // and renders UnavailableMediaPlaceholder for missing assets.
-            if (item.isOrphaned)
-              const _OrphanedPlaceholder()
-            else
-              MediaItemView(
-                item: item,
-                thumbnail: true,
-                targetSize: const Size(200, 200),
-                fit: BoxFit.cover,
-              ),
-
-            // Dimming overlay for unselected items in selection mode
-            if (isSelectionMode && !isSelected)
-              Container(color: Colors.black.withValues(alpha: 0.3)),
-
-            // Selection overlay with primary border and tint
-            if (isSelected)
-              Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: colorScheme.primary, width: 3),
-                  color: colorScheme.primary.withValues(alpha: 0.2),
-                ),
-              ),
-
-            // Checkmark circle on selected items
-            if (isSelected)
-              Positioned(
-                top: 4,
-                right: 4,
-                child: Container(
-                  width: 24,
-                  height: 24,
-                  decoration: BoxDecoration(
-                    color: colorScheme.primary,
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(
-                    Icons.check,
-                    size: 16,
-                    color: colorScheme.onPrimary,
-                  ),
-                ),
-              ),
-
-            // Media store transfer badge (queued/uploading/failed only;
-            // top-left so it never collides with the selection checkmark).
-            Positioned(top: 4, left: 4, child: MediaStoreBadge(item: item)),
-
-            // Video icon (top-right when no checkmark, hidden when checkmark)
-            if (item.isVideo && !isSelected)
-              Positioned(
-                top: 4,
-                right: 4,
-                child: Container(
-                  padding: const EdgeInsets.all(4),
-                  decoration: BoxDecoration(
-                    color: Colors.black54,
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  child: const Icon(
-                    Icons.videocam,
-                    size: 16,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-
-            // Depth badge (bottom-left)
-            if (item.enrichment?.depthMeters != null)
-              Positioned(
-                bottom: 4,
-                left: 4,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 6,
-                    vertical: 2,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.black54,
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  child: Text(
-                    formatter.formatDepth(
-                      item.enrichment!.depthMeters,
-                      decimals: 0,
-                    ),
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 10,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ),
-              ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-/// Placeholder shown for orphaned media (file no longer exists)
-class _OrphanedPlaceholder extends StatelessWidget {
-  const _OrphanedPlaceholder();
-
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-
-    return Container(
-      color: colorScheme.errorContainer,
-      child: Center(
-        child: Icon(
-          Icons.broken_image_outlined,
-          color: colorScheme.onErrorContainer,
         ),
       ),
     );
