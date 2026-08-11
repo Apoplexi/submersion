@@ -5470,7 +5470,7 @@ class DiveRepository {
           (t) => OrderingTerm.desc(t.isPrimary),
           (t) => OrderingTerm.asc(t.createdAt),
         ]);
-      final rows = await query.get();
+      final rows = _canonicalDataSourceRows(await query.get());
       final computerNames = await _friendlyNamesFor(rows);
       return rows
           .map((row) => _mapRowToDataSource(row, computerNames))
