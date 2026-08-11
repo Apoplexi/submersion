@@ -76,17 +76,26 @@ def find_matches(text, terms):
 _WORD = r"(?!(?:and|or)\b)[A-Za-z0-9][A-Za-z0-9.+/-]*"
 _MEMBER = _WORD
 
+# Horizontal whitespace only. \s matches a newline, and release notes are
+# wrapped Markdown prose, so a list can straddle a line break. A pattern that
+# consumed that newline would join the two lines, breaking the line-count
+# invariant --report's line-by-line diff depends on and, in the beta notes,
+# potentially merging two items into one.
+_H = r"[ \t]"
+
 _LIST_RE = re.compile(
     r"\b" + _MEMBER +
-    r"(?:\s*,\s*" + _MEMBER + r")*"
-    r"\s*,?\s+(?:and|or)\s+" + _MEMBER + r"\b"
+    r"(?:" + _H + r"*," + _H + r"*" + _MEMBER + r")*"
+    + _H + r"*,?" + _H + r"+(?:and|or)" + _H + r"+" + _MEMBER + r"\b"
 )
 
 # The conjunction alternative must come first. Python tries alternatives left
 # to right, so a leading plain-comma branch would consume the ", " of ", and "
 # and leave "and Linux" behind as a member, rebuilding the list as
 # "Mac and and Linux".
-_SPLIT_RE = re.compile(r"\s*,?\s+(?:and|or)\s+|\s*,\s*")
+_SPLIT_RE = re.compile(
+    _H + r"*,?" + _H + r"+(?:and|or)" + _H + r"+|" + _H + r"*," + _H + r"*"
+)
 
 
 def _is_banned_member(member, terms):
@@ -167,20 +176,25 @@ def replace_terms(text, terms):
     return text
 
 
+# Every pattern here uses _H rather than \s, for the reason given above it:
+# these all consume what they match, so a \s would eat a newline and join two
+# lines.
 _TIDY = [
     # Two adjacent platform names both replaced in place read as a stutter.
-    (re.compile(r"\bother platforms(?:,?\s+(?:and|or)\s+other platforms)+\b"),
+    (re.compile(r"\bother platforms(?:,?" + _H + r"+(?:and|or)" + _H +
+                r"+other platforms)+\b"),
      "other platforms"),
-    (re.compile(r"\banother store(?:,?\s+(?:and|or)\s+another store)+\b"),
+    (re.compile(r"\banother store(?:,?" + _H + r"+(?:and|or)" + _H +
+                r"+another store)+\b"),
      "another store"),
     # A parenthetical emptied by list repair, and the space that preceded it.
-    (re.compile(r"\s*\(\s*\)"), ""),
-    (re.compile(r"\s*\[\s*\]"), ""),
-    (re.compile(r",\s*\)"), ")"),
-    (re.compile(r"\(\s*,\s*"), "("),
-    (re.compile(r"[ \t]+,"), ","),
-    (re.compile(r"[ \t]{2,}"), " "),
-    (re.compile(r"[ \t]+$", re.MULTILINE), ""),
+    (re.compile(_H + r"*\(" + _H + r"*\)"), ""),
+    (re.compile(_H + r"*\[" + _H + r"*\]"), ""),
+    (re.compile(r"," + _H + r"*\)"), ")"),
+    (re.compile(r"\(" + _H + r"*," + _H + r"*"), "("),
+    (re.compile(_H + r"+,"), ","),
+    (re.compile(_H + r"{2,}"), " "),
+    (re.compile(_H + r"+$", re.MULTILINE), ""),
 ]
 
 
@@ -202,6 +216,31 @@ def sanitize(text, terms=None):
     text = repair_lists(text, terms)
     text = replace_terms(text, terms)
     return tidy(text)
+
+
+_WRAPPED_WS_RE = re.compile(r"[ \t]*\n[ \t]*")
+
+
+def find_wrapped_only(text, terms):
+    """Multi-word terms that appear only once line breaks count as spaces.
+
+    Every consuming pattern uses [ \\t] rather than \\s so it can never join
+    two lines. The blind spot that leaves is a multi-word term such as
+    "Google Play" hard-wrapped across a break; a single-word term cannot
+    straddle a line, so Windows, Android and Linux are unaffected.
+
+    Callers warn on this rather than failing. No release body or release note
+    is hard-wrapped today (their paragraphs run to 900+ characters on one
+    line), and the guard must never block a release on wording.
+    """
+    flattened = _WRAPPED_WS_RE.sub(" ", text)
+    if len(find_matches(flattened, terms)) <= len(find_matches(text, terms)):
+        return []
+    return sorted({
+        flattened[start:end]
+        for start, end, _cls in find_matches(flattened, terms)
+        if " " in flattened[start:end]
+    })
 
 
 def _report(original, result, terms):
@@ -250,6 +289,17 @@ def main(argv=None):
 
     if args.report:
         _report(original, result, terms)
+
+    # Unconditional: this is a gap in coverage, not a routine redaction, so it
+    # must surface in the job log whether or not --report was asked for.
+    wrapped = find_wrapped_only(original, terms)
+    if wrapped:
+        print(
+            "sanitize_apple_store_notes: WARNING: %s is split across a line "
+            "break and was left in place; rewrap that source line."
+            % ", ".join(wrapped),
+            file=sys.stderr,
+        )
 
     leftovers = find_matches(result, terms)
     if leftovers:

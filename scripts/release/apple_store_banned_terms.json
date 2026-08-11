@@ -13,12 +13,16 @@
     "lowercase window/windows is a UI window or a time window.",
     "Patterns use only the regex subset common to Python re and Ruby Regexp:",
     "\\b boundaries and (?: ) non-capturing groups. No named groups, no",
-    "lookbehind. JSON \\b is a backspace, so every boundary is written \\\\b."
+    "lookbehind. JSON \\b is a backspace, so every boundary is written \\\\b.",
+    "Use [ \\t] for whitespace inside a multi-word term, never \\s. Release",
+    "notes are wrapped Markdown, so 'Google Play' can straddle a line break;",
+    "\\s would match that newline and the replacement would join the two",
+    "lines, breaking the line-count invariant the --report diff depends on."
   ],
   "terms": [
     { "pattern": "\\bWindows\\b", "ignorecase": false, "class": "platform" },
     { "pattern": "\\bPCs?\\b", "ignorecase": false, "class": "platform" },
-    { "pattern": "\\bMicrosoft(?:\\s+Store)?\\b", "ignorecase": false, "class": "platform" },
+    { "pattern": "\\bMicrosoft(?:[ \\t]+Store)?\\b", "ignorecase": false, "class": "platform" },
     { "pattern": "\\bMSI\\b", "ignorecase": false, "class": "platform" },
     { "pattern": "\\.exe\\b", "ignorecase": true, "class": "platform" },
     { "pattern": "\\.msi\\b", "ignorecase": true, "class": "platform" },
@@ -28,8 +32,8 @@
     { "pattern": "\\bDebian\\b", "ignorecase": true, "class": "platform" },
     { "pattern": "\\bFlatpak\\b", "ignorecase": true, "class": "platform" },
     { "pattern": "\\bAppImage\\b", "ignorecase": true, "class": "platform" },
-    { "pattern": "\\b(?:sudo\\s+)?apt(?:-get)?\\s+(?:install|update|upgrade)\\b", "ignorecase": true, "class": "platform" },
-    { "pattern": "\\bGoogle\\s+Play(?:\\s+Store)?\\b", "ignorecase": true, "class": "store" },
-    { "pattern": "\\bPlay\\s+Store\\b", "ignorecase": true, "class": "store" }
+    { "pattern": "\\b(?:sudo[ \\t]+)?apt(?:-get)?[ \\t]+(?:install|update|upgrade)\\b", "ignorecase": true, "class": "platform" },
+    { "pattern": "\\bGoogle[ \\t]+Play(?:[ \\t]+Store)?\\b", "ignorecase": true, "class": "store" },
+    { "pattern": "\\bPlay[ \\t]+Store\\b", "ignorecase": true, "class": "store" }
   ]
 }

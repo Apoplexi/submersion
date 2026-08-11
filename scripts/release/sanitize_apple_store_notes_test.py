@@ -237,6 +237,32 @@ class TestSanitize(unittest.TestCase):
         text = "a\nBroken on Windows, Linux, and Android\nb\n"
         self.assertEqual(san.sanitize(text).count("\n"), text.count("\n"))
 
+    def test_line_count_survives_constructs_wrapped_across_lines(self):
+        # Every consuming pattern must use [ \t] rather than \s. Markdown prose
+        # wraps, so a list, a two-word term, or an emptied parenthetical can
+        # straddle a newline; a pattern matching \s swallows that newline and
+        # joins the lines, which misaligns the --report diff and can merge two
+        # beta note items into one.
+        for name, text in [
+            ("list wrapped mid-way",
+             "Downloads work on macOS, Windows,\nLinux, and Android today.\n"),
+            ("conjunction on the next line",
+             "Runs on macOS, Windows\nand Linux.\n"),
+            ("two-word term wrapped",
+             "Also available on Google\nPlay now.\n"),
+            ("Microsoft Store wrapped",
+             "See the Microsoft\nStore listing.\n"),
+            ("apt command wrapped",
+             "Run sudo apt\ninstall tesseract-ocr first.\n"),
+            ("parenthetical emptied after a newline",
+             "Downloads\n(Windows, Linux, and Android)\nare available.\n"),
+        ]:
+            with self.subTest(name=name):
+                self.assertEqual(
+                    san.sanitize(text).count("\n"), text.count("\n"),
+                    "a newline was consumed, joining two lines",
+                )
+
 
 class TestMain(unittest.TestCase):
     def run_main(self, stdin_text, argv):
@@ -272,6 +298,21 @@ class TestMain(unittest.TestCase):
         self.assertEqual(code, 0)
         self.assertEqual(out, "")
 
+    def test_warns_about_a_term_split_across_a_line_break(self):
+        # The consuming patterns use [ \t] so they can never join two lines.
+        # The blind spot that leaves is a multi-word term hard-wrapped across a
+        # break. It warns rather than failing: the guard must not block a
+        # release on wording, and no release body is hard-wrapped today.
+        code, out, err = self.run_main("Also on Google\nPlay now.\n", [])
+        self.assertEqual(code, 0)
+        self.assertIn("Google", err)
+        self.assertIn("line break", err)
+        self.assertEqual(out, "Also on Google\nPlay now.\n")
+
+    def test_no_wrap_warning_when_the_term_is_on_one_line(self):
+        _code, _out, err = self.run_main("Also on Google Play now.\n", [])
+        self.assertNotIn("line break", err)
+
     def test_survivor_exits_two(self):
         # Stub the rewriting passes so a term reaches the assert. This can only
         # happen through a bug in this script, which is what exit 2 reports.
@@ -302,6 +343,10 @@ class TestReleaseNotesCorpus(unittest.TestCase):
                 leftovers = [result[s:e]
                              for s, e, _c in san.find_matches(result, TERMS)]
                 self.assertEqual(leftovers, [])
+                self.assertEqual(
+                    result.count("\n"), text.count("\n"),
+                    "sanitizing consumed a newline and joined two lines",
+                )
 
 
 if __name__ == "__main__":
