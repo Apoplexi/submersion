@@ -256,7 +256,16 @@ void main() {
       ),
     );
 
-    final inkWells = tester.widgetList<InkWell>(find.byType(InkWell)).toList();
+    // Scoped to the banner so the count asserts the banner's own contract
+    // rather than the surrounding harness's widget structure.
+    final inkWells = tester
+        .widgetList<InkWell>(
+          find.descendant(
+            of: find.byType(UrgentBanner),
+            matching: find.byType(InkWell),
+          ),
+        )
+        .toList();
     // Three capped gear lines, the "+2 more" overflow, and insurance.
     expect(inkWells, hasLength(5));
     for (final ink in inkWells) {
