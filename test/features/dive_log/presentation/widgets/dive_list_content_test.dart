@@ -19,6 +19,7 @@ import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
 import 'package:submersion/features/divers/presentation/providers/diver_providers.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 
+import '../../../../helpers/selection_contract.dart';
 import '../../../../helpers/mock_providers.dart';
 import '../../../../helpers/test_app.dart';
 
@@ -139,6 +140,13 @@ class _MockPaginatedNotifier
     : super(
         AsyncValue.data(PaginatedDiveListState(dives: dives, hasMore: false)),
       );
+
+  /// Narrow the visible list, standing in for a filter or search change.
+  void showOnly(List<DiveSummary> dives) {
+    state = AsyncValue.data(
+      PaginatedDiveListState(dives: dives, hasMore: false),
+    );
+  }
 
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
@@ -1252,6 +1260,36 @@ void main() {
       await tester.tap(tileFinder('d2'));
       await tester.pumpAndSettle();
       expect(tester.widget<IconButton>(compare).onPressed, isNotNull);
+    });
+
+    testWidgets('satisfies the shared selection contract', (tester) async {
+      final all = fourDives().map(DiveSummary.fromDive).toList();
+      final notifier = _MockPaginatedNotifier(all);
+      final base = await getBaseOverrides();
+      final overrides = [
+        ...base,
+        diveListViewModeProvider.overrideWith((ref) => ListViewMode.detailed),
+        highlightedDiveIdProvider.overrideWith((ref) => null),
+        paginatedDiveListProvider.overrideWith((ref) => notifier),
+      ];
+
+      await verifySelectionContract(
+        tester,
+        build: () => testApp(
+          overrides: overrides,
+          child: const DiveListContent(showAppBar: true),
+        ),
+        selectButton: find.byKey(const ValueKey('enter_selection')),
+        firstRow: find.byWidgetPredicate(
+          (w) => w is DiveListTile && w.diveId == 'd1',
+        ),
+        applyFilter: (tester) async {
+          // Narrowing to a single dive stands in for a filter or search
+          // change; the selection must prune to what remains visible.
+          notifier.showOnly([all.first]);
+        },
+        visibleAfterFilter: 1,
+      );
     });
   });
 
