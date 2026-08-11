@@ -52,7 +52,7 @@ void main() {
   });
 
   test(
-    'enableSecurity writes sidecar, caches key, flips app lock on',
+    'enableSecurity creates credentials without enabling app lock',
     () async {
       final recovery = await svc.enableSecurity(
         password: 'hunter2',
@@ -60,11 +60,23 @@ void main() {
         kdf: testKdf,
       );
       expect(recovery.split('-'), hasLength(8));
-      expect(svc.appLockEnabled, true);
+      expect(svc.appLockEnabled, false);
       expect(svc.isUnlocked, true);
       expect(File('${tmp.path}/submersion.keys').existsSync(), true);
     },
   );
+
+  test('setAppLockEnabled changes only the UI gate', () async {
+    await svc.enableSecurity(password: 'pw', dbPath: dbPath, kdf: testKdf);
+
+    await svc.setAppLockEnabled(true);
+    expect(svc.appLockEnabled, true);
+
+    await svc.setAppLockEnabled(false);
+    expect(svc.appLockEnabled, false);
+    expect(svc.isUnlocked, true);
+    expect(File('${tmp.path}/submersion.keys').existsSync(), true);
+  });
 
   test('enableSecurity throws when a sidecar already exists', () async {
     await svc.enableSecurity(password: 'pw', dbPath: dbPath, kdf: testKdf);
@@ -206,6 +218,7 @@ void main() {
 
     test('disableEncryption reverses and clears the derived key', () async {
       await svc.enableSecurity(password: 'pw', dbPath: dbPath, kdf: testKdf);
+      await svc.setAppLockEnabled(true);
       File(dbPath).writeAsStringSync('PLAIN');
       final calls = <String>[];
       await svc.enableEncryption(
@@ -222,6 +235,30 @@ void main() {
       expect(calls, ['export:false']);
       expect(svc.encryptionEnabled, false);
       expect(svc.databaseKeyHex, isNull);
+      expect(svc.isUnlocked, true);
+      expect(File('${tmp.path}/submersion.keys').existsSync(), true);
+    });
+
+    test('disableEncryption clears credentials when no tier remains', () async {
+      await svc.enableSecurity(password: 'pw', dbPath: dbPath, kdf: testKdf);
+      File(dbPath).writeAsStringSync('PLAIN');
+      final calls = <String>[];
+      await svc.enableEncryption(
+        migrator: fakeMigrator(calls),
+        dbPathOverride: dbPath,
+        skipReopenForTesting: true,
+      );
+
+      await svc.disableEncryption(
+        migrator: fakeMigrator(calls),
+        dbPathOverride: dbPath,
+        skipReopenForTesting: true,
+      );
+
+      expect(svc.encryptionEnabled, false);
+      expect(svc.appLockEnabled, false);
+      expect(svc.isUnlocked, false);
+      expect(File('${tmp.path}/submersion.keys').existsSync(), false);
     });
 
     test('enableEncryption throws when locked', () async {

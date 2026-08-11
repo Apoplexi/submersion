@@ -51,6 +51,7 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
     final theme = Theme.of(context);
     final appLockOn = _security.appLockEnabled;
     final encryptionOn = _security.encryptionEnabled;
+    final hasCredential = appLockOn || encryptionOn;
 
     return ListView(
       children: [
@@ -83,6 +84,8 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
             ),
             onTap: _pickTimeout,
           ),
+        ],
+        if (hasCredential) ...[
           ListTile(
             leading: const Icon(Icons.password),
             title: Text(l10n.settings_security_changePassword),
@@ -94,31 +97,36 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
             onTap: _regenerateRecovery,
           ),
           const Divider(),
-          SwitchListTile(
-            secondary: Icon(
-              encryptionOn ? Icons.enhanced_encryption : Icons.no_encryption,
-              color: encryptionOn ? theme.colorScheme.primary : null,
-            ),
-            title: Text(l10n.settings_security_encryption),
-            subtitle: Text(l10n.settings_security_encryption_subtitle),
-            value: encryptionOn,
-            onChanged: (v) => v ? _enableEncryption() : _disableEncryption(),
-          ),
-        ] else ...[
-          // Encryption without App Lock first runs the password setup (spec:
-          // "prompts you to set the app password first").
-          SwitchListTile(
-            secondary: const Icon(Icons.no_encryption),
-            title: Text(l10n.settings_security_encryption),
-            subtitle: Text(l10n.settings_security_encryption_subtitle),
-            value: false,
-            onChanged: (v) async {
-              if (!v) return;
-              final ok = await _enableAppLock();
-              if (ok && mounted) await _enableEncryption();
-            },
-          ),
         ],
+        SwitchListTile(
+          secondary: Icon(
+            encryptionOn ? Icons.enhanced_encryption : Icons.no_encryption,
+            color: encryptionOn ? theme.colorScheme.primary : null,
+          ),
+          title: Text(l10n.settings_security_encryption),
+          subtitle: Text(l10n.settings_security_encryption_subtitle),
+          value: encryptionOn,
+          onChanged: (v) async {
+            if (!v) {
+              await _disableEncryption();
+              return;
+            }
+            final dbPath = await _dbPath();
+            if (!mounted) return;
+            final credentialExists =
+                hasCredential || _security.hasCredential(dbPath: dbPath);
+            if (!credentialExists) {
+              final ok = await _setupCredential(enableAppLock: false);
+              if (!ok || !mounted) return;
+            } else if (!_security.isUnlocked) {
+              final secret = await _promptPassword(
+                l10n.settings_security_unlock_title,
+              );
+              if (secret == null || !mounted) return;
+            }
+            await _enableEncryption(clearCredentialOnCancel: !hasCredential);
+          },
+        ),
       ],
     );
   }
@@ -131,17 +139,38 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
   }
 
   Future<bool> _enableAppLock() async {
+    if (_security.encryptionEnabled) {
+      if (!_security.isUnlocked) {
+        final secret = await _promptPassword(
+          context.l10n.settings_security_unlock_title,
+        );
+        if (secret == null || !mounted) return false;
+      }
+      await _security.setAppLockEnabled(true);
+      if (mounted) setState(() {});
+      return true;
+    }
+    return _setupCredential(enableAppLock: true);
+  }
+
+  Future<bool> _setupCredential({required bool enableAppLock}) async {
     final dbPath = await _dbPath();
     if (!mounted) return false;
     final ok = await showDialog<bool>(
       context: context,
       barrierDismissible: false,
       builder: (_) => SecuritySetupDialog(
-        onSetPassword: (password) => _security.enableSecurity(
-          password: password,
-          dbPath: dbPath,
-          kdf: widget.kdf,
-        ),
+        onSetPassword: (password) async {
+          final recoveryCode = await _security.enableSecurity(
+            password: password,
+            dbPath: dbPath,
+            kdf: widget.kdf,
+          );
+          if (enableAppLock) {
+            await _security.setAppLockEnabled(true);
+          }
+          return recoveryCode;
+        },
       ),
     );
     if (mounted) setState(() {});
@@ -150,22 +179,6 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
 
   Future<void> _disableAppLock() async {
     final l10n = context.l10n;
-    if (_security.encryptionEnabled) {
-      await showDialog<void>(
-        context: context,
-        builder: (dialogContext) => AlertDialog(
-          title: Text(l10n.settings_security_disableBlockedByEncryption_title),
-          content: Text(l10n.settings_security_disableBlockedByEncryption_body),
-          actions: [
-            FilledButton(
-              onPressed: () => Navigator.of(dialogContext).pop(),
-              child: Text(l10n.settings_security_done),
-            ),
-          ],
-        ),
-      );
-      return;
-    }
     final secret = await _promptPassword(l10n.settings_security_unlock_title);
     if (secret == null || !mounted) return;
     final confirmed = await showDialog<bool>(
@@ -186,11 +199,15 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
       ),
     );
     if (confirmed != true || !mounted) return;
-    await _security.disableSecurity(dbPath: await _dbPath());
+    if (_security.encryptionEnabled) {
+      await _security.setAppLockEnabled(false);
+    } else {
+      await _security.disableSecurity(dbPath: await _dbPath());
+    }
     if (mounted) setState(() {});
   }
 
-  Future<void> _enableEncryption() async {
+  Future<void> _enableEncryption({bool clearCredentialOnCancel = false}) async {
     final l10n = context.l10n;
     final confirmed = await showDialog<bool>(
       context: context,
@@ -209,7 +226,16 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
         ],
       ),
     );
-    if (confirmed != true || !mounted) return;
+    if (confirmed != true) {
+      if (clearCredentialOnCancel &&
+          !_security.appLockEnabled &&
+          !_security.encryptionEnabled) {
+        await _security.disableSecurity(dbPath: await _dbPath());
+        if (mounted) setState(() {});
+      }
+      return;
+    }
+    if (!mounted) return;
     await _runWithProgress(
       (onPhase) => _security.enableEncryption(onPhase: onPhase),
     );
