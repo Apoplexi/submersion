@@ -136,7 +136,7 @@ class _PlannerSection extends ConsumerWidget {
                   summary.mode.name.toUpperCase(),
                 ].join(' · '),
               ),
-              onTap: () => context.go('/planning/dive-planner/${summary.id}'),
+              onTap: () => context.push('/planning/dive-planner/${summary.id}'),
             ),
       ],
     );
@@ -244,7 +244,9 @@ class _PlanningTile extends StatelessWidget {
           Icons.chevron_right,
           color: colorScheme.onSurfaceVariant,
         ).excludeFromSemantics(),
-        onTap: () => context.go(tool.route),
+        // PUSH (not go): tools are sub-pages of the planning hub and must
+        // stay poppable (#647).
+        onTap: () => context.push(tool.route),
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       ),
     );

@@ -990,6 +990,17 @@ class AppLocalizationsAr extends AppLocalizations {
       'سيؤدي هذا إلى استبدال جميع البيانات الحالية ببيانات النسخة الاحتياطية. لا يمكن التراجع عن هذا الإجراء.';
 
   @override
+  String backup_restore_safetyReview_progress(int done, int total) {
+    return 'تم تحليل $done من $total غطسة';
+  }
+
+  @override
+  String get backup_restore_safetyReview_skip => 'تخطي';
+
+  @override
+  String get backup_restore_safetyReview_title => 'جارٍ تشغيل مراجعة السلامة';
+
+  @override
   String get backup_restoreComplete_continue => 'متابعة';
 
   @override
@@ -1504,35 +1515,10 @@ class AppLocalizationsAr extends AppLocalizations {
       'لا يوجد عدد كافٍ من الرفاق للدمج.';
 
   @override
-  String get buddies_section_professionalRoles => 'الأدوار المهنية';
-
-  @override
-  String get buddies_roles_addRole => 'إضافة دور';
-
-  @override
-  String get buddies_roles_role => 'الدور';
-
-  @override
-  String get buddies_roles_agency => 'الجهة';
-
-  @override
-  String get buddies_roles_credentialNumber => 'رقم الاعتماد';
-
-  @override
-  String get buddies_roles_removeTooltip => 'إزالة الدور';
-
-  @override
-  String get buddies_roles_emptyHint =>
-      'أضف بيانات اعتماد المدرب أو مدرب الغوص الرئيسي لإعادة استخدامها عند تسجيل الشهادات والدورات.';
-
-  @override
   String get buddies_instructorPicker_label => 'المدرب من قائمة الرفاق';
 
   @override
   String get buddies_instructorPicker_none => 'لا يوجد (إدخال يدوي)';
-
-  @override
-  String get buddies_detail_section_professionalRoles => 'الأدوار المهنية';
 
   @override
   String get certifications_appBar_addCertification => 'إضافة شهادة';
@@ -1579,6 +1565,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get certifications_detail_label_cardNumber => 'رقم البطاقة';
 
   @override
+  String get certifications_detail_label_certification => 'الشهادة';
+
+  @override
   String get certifications_detail_label_expiryDate => 'تاريخ الانتهاء';
 
   @override
@@ -1589,9 +1578,6 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get certifications_detail_label_issueDate => 'تاريخ الإصدار';
-
-  @override
-  String get certifications_detail_label_level => 'المستوى';
 
   @override
   String get certifications_detail_label_type => 'النوع';
@@ -1687,15 +1673,24 @@ class AppLocalizationsAr extends AppLocalizations {
   String get certifications_ecardStack_empty_title => 'لا توجد شهادات بعد';
 
   @override
+  String get certifications_ecard_label_cardNumber => 'رقم البطاقة';
+
+  @override
   String certifications_ecard_label_certifiedBy(Object agency) {
     return 'معتمد من $agency';
   }
+
+  @override
+  String get certifications_ecard_label_diver => 'الغواص';
 
   @override
   String get certifications_ecard_label_instructor => 'المدرب';
 
   @override
   String get certifications_ecard_label_issued => 'تاريخ الإصدار';
+
+  @override
+  String get certifications_ecard_label_validUntil => 'صالحة حتى';
 
   @override
   String get certifications_ecard_statusBadge_expired => 'منتهية';
@@ -1722,6 +1717,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get certifications_edit_button_update => 'تحديث الشهادة';
 
   @override
+  String get certifications_edit_certification_notSpecified => 'غير محدد';
+
+  @override
   String certifications_edit_datePicker_clearTooltip(Object label) {
     return 'مسح $label';
   }
@@ -1743,15 +1741,20 @@ class AppLocalizationsAr extends AppLocalizations {
   String get certifications_edit_dialog_keepEditing => 'متابعة التعديل';
 
   @override
+  String get certifications_edit_group_progression => 'التدرج';
+
+  @override
+  String get certifications_edit_group_specialties => 'التخصصات';
+
+  @override
   String get certifications_edit_help_expiryDate =>
       'اتركه فارغاً للشهادات التي لا تنتهي صلاحيتها';
 
   @override
-  String get certifications_edit_hint_cardNumber => 'أدخل رقم بطاقة الشهادة';
+  String get certifications_edit_helper_nameOnCard => 'اختياري';
 
   @override
-  String get certifications_edit_hint_certificationName =>
-      'مثال: غواص مياه مفتوحة';
+  String get certifications_edit_hint_cardNumber => 'أدخل رقم بطاقة الشهادة';
 
   @override
   String get certifications_edit_hint_instructorName => 'اسم المدرب المعتمد';
@@ -1769,7 +1772,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get certifications_edit_label_cardNumber => 'رقم البطاقة';
 
   @override
-  String get certifications_edit_label_certificationName => 'اسم الشهادة *';
+  String get certifications_edit_label_certification => 'الشهادة';
 
   @override
   String get certifications_edit_label_expiryDate => 'تاريخ الانتهاء';
@@ -1784,13 +1787,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get certifications_edit_label_issueDate => 'تاريخ الإصدار';
 
   @override
-  String get certifications_edit_label_level => 'المستوى';
+  String get certifications_edit_label_nameOnCard => 'الاسم على البطاقة';
 
   @override
   String get certifications_edit_label_notes => 'ملاحظات';
-
-  @override
-  String get certifications_edit_level_notSpecified => 'غير محدد';
 
   @override
   String certifications_edit_photo_addSemanticLabel(Object label) {
@@ -1848,8 +1848,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get certifications_edit_snackBar_updated => 'تم تحديث الشهادة بنجاح';
 
   @override
-  String get certifications_edit_validation_nameRequired =>
-      'يرجى إدخال اسم الشهادة';
+  String get certifications_edit_validation_certificationOrNameRequired =>
+      'اختر شهادة أو أدخل اسمًا';
 
   @override
   String get certifications_list_button_retry => 'إعادة المحاولة';
@@ -2042,32 +2042,6 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get certifications_summary_stat_valid => 'سارية';
-
-  @override
-  String certifications_walletCard_countPlural(Object count) {
-    return '$count شهادات';
-  }
-
-  @override
-  String certifications_walletCard_countSingular(Object count) {
-    return '$count شهادة';
-  }
-
-  @override
-  String get certifications_walletCard_emptyFooter => 'أضف شهادتك الأولى';
-
-  @override
-  String get certifications_walletCard_error => 'فشل في تحميل الشهادات';
-
-  @override
-  String get certifications_walletCard_semanticLabel =>
-      'محفظة الشهادات. انقر لعرض جميع الشهادات';
-
-  @override
-  String get certifications_walletCard_tapToAdd => 'انقر للإضافة';
-
-  @override
-  String get certifications_walletCard_title => 'محفظة الشهادات';
 
   @override
   String get certifications_wallet_appBar_title => 'محفظة الشهادات';
@@ -2416,29 +2390,6 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get preDive_start_begin => 'بدء';
-
-  @override
-  String get preDive_section_title => 'فحص ما قبل الغوص';
-
-  @override
-  String get preDive_section_link => 'ربط جلسة قائمة تحقق';
-
-  @override
-  String get preDive_section_unlink => 'إلغاء الربط';
-
-  @override
-  String get preDive_section_run => 'تشغيل قائمة تحقق ما قبل الغوص';
-
-  @override
-  String get preDive_section_noUnlinked =>
-      'لا توجد جلسات قوائم تحقق غير مرتبطة';
-
-  @override
-  String get diveDetailSection_preDiveChecklist_name => 'فحص ما قبل الغوص';
-
-  @override
-  String get diveDetailSection_preDiveChecklist_description =>
-      'جلسة قائمة تحقق ما قبل الغوص المرتبطة';
 
   @override
   String get diveLog_listPage_bottomSheet_preDiveChecklist =>
@@ -9128,24 +9079,6 @@ class AppLocalizationsAr extends AppLocalizations {
   String get enum_ascentRate_warning => 'تحذير';
 
   @override
-  String get enum_buddyRole_buddy => 'زميل غوص';
-
-  @override
-  String get enum_buddyRole_diveGuide => 'مرشد غوص';
-
-  @override
-  String get enum_buddyRole_diveMaster => 'مدرب غوص رئيسي';
-
-  @override
-  String get enum_buddyRole_instructor => 'مدرب';
-
-  @override
-  String get enum_buddyRole_solo => 'منفرد';
-
-  @override
-  String get enum_buddyRole_student => 'طالب';
-
-  @override
   String get enum_certificationAgency_bsac => 'BSAC';
 
   @override
@@ -9198,6 +9131,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get enum_certificationLevel_decompression => 'تخفيف الضغط';
+
+  @override
+  String get enum_certificationLevel_diveGuide => 'مرشد غوص';
 
   @override
   String get enum_certificationLevel_diveMaster => 'مدرب غوص رئيسي';
@@ -12784,6 +12720,23 @@ class AppLocalizationsAr extends AppLocalizations {
   String get safetyReview_restore => 'استعادة';
 
   @override
+  String get safetyReview_details => 'التفاصيل';
+
+  @override
+  String get safetyReview_clearHighlight => 'مسح التمييز';
+
+  @override
+  String safetyReview_findingGroupSemantics(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count ملاحظات سلامة',
+      one: 'ملاحظة سلامة واحدة',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get safetySettings_title => 'مراجعة السلامة';
 
   @override
@@ -12888,11 +12841,11 @@ class AppLocalizationsAr extends AppLocalizations {
       'رسم بياني لدورة المد والجزر والتوقيت';
 
   @override
-  String get diveDetailSection_reefHealth_name => 'صحة الشعاب المرجانية';
+  String get diveDetailSection_reefHealth_name => 'أحوال المياه';
 
   @override
   String get diveDetailSection_reefHealth_description =>
-      'الإجهاد الحراري لابيضاض المرجان في تاريخ الغوص';
+      'أحوال المياه عبر الأقمار الصناعية في تاريخ الغطسة';
 
   @override
   String get diveDetailSection_surfaceGps_name => 'GPS السطح';
@@ -14746,6 +14699,14 @@ class AppLocalizationsAr extends AppLocalizations {
       'اختر مجلدًا متزامنًا (Dropbox، Google Drive، إلخ)';
 
   @override
+  String get settings_storage_customFolder_subtitleDeviceOnly =>
+      'نقل قاعدة البيانات إلى التخزين الداخلي أو بطاقة SD';
+
+  @override
+  String get settings_storage_customFolder_deviceOnly_noCloudSync =>
+      'المزامنة السحابية التي يديرها التطبيق معطَّلة ما دامت قاعدة البيانات موجودة على وحدة تخزين في الجهاز. لا يمكن لأي خدمة مزامنة الوصول إلى هذا المجلد على Android، لذا استخدم النسخ الاحتياطي والاستعادة للاحتفاظ بنسخ في مكان آخر.';
+
+  @override
   String settings_storage_dbStats(
     Object fileSize,
     Object diveCount,
@@ -16267,6 +16228,16 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String surfaceInterval_result_beyondHorizon(Object hours) {
+    return 'زمن الانتظار يتجاوز $hours ساعات التي يبحث فيها هذا المخطط. يستمر التخلص من النيتروجين، لذا ستكفي فترة سطح أطول.';
+  }
+
+  @override
+  String surfaceInterval_result_beyondHorizonShort(Object hours) {
+    return 'أكثر من $hours ساعات';
+  }
+
+  @override
   String get surfaceInterval_result_currentInterval => 'الفترة الحالية';
 
   @override
@@ -16290,6 +16261,15 @@ class AppLocalizationsAr extends AppLocalizations {
   String surfaceInterval_result_ndlMinutes(Object minutes) {
     return '$minutes دقيقة NDL';
   }
+
+  @override
+  String surfaceInterval_result_noIntervalHelps(Object minutes) {
+    return 'لا تكفي أي فترة سطح. أطول غطسة بدون توقف إلزامي على هذا العمق بهذا الخليط هي $minutes دقيقة. قلّل زمن الغطسة الثانية أو قلّل عمقها.';
+  }
+
+  @override
+  String get surfaceInterval_result_notAchievable =>
+      'غير قابل للتحقيق بأي فترة سطح';
 
   @override
   String get surfaceInterval_result_notYetSafe =>
@@ -16721,6 +16701,28 @@ class AppLocalizationsAr extends AppLocalizations {
   String tides_semantic_tideState(Object state) {
     return 'حالة المد والجزر: $state';
   }
+
+  @override
+  String tides_source_noaaStation(String name, String distance) {
+    return 'محطة NOAA: $name ($distance)';
+  }
+
+  @override
+  String get tides_source_modelEstimate => 'تقدير نموذج المحيط';
+
+  @override
+  String get tides_source_modelCaveat =>
+      'نموذج مبني على بيانات الأقمار الصناعية. قد تختلف الأوقات والارتفاعات قرب السواحل المعقدة.';
+
+  @override
+  String get tides_source_sheetTitle => 'مصدر بيانات المد والجزر';
+
+  @override
+  String get tides_source_datumMllw => 'الارتفاعات نسبة إلى MLLW (مرجع المحطة)';
+
+  @override
+  String get tides_source_datumMsl =>
+      'الارتفاعات نسبة إلى متوسط مستوى سطح البحر';
 
   @override
   String get tides_title => 'المد والجزر';
@@ -20989,6 +20991,10 @@ class AppLocalizationsAr extends AppLocalizations {
       'تُحذف الملفات هنا عند إلغاء تثبيت التطبيق.';
 
   @override
+  String get db_location_backup_note =>
+      'لا يمكن لنظام Android تشغيل قاعدة البيانات من مجلد مُزامَن مع السحابة. للاحتفاظ بنسخة في Dropbox أو Nextcloud أو Google Drive، حدِّد موقع النسخة الاحتياطية ضمن النسخ الاحتياطي والاستعادة.';
+
+  @override
   String diveLog_bulkEdit_membership_onAll(int count) {
     return 'في كل الـ $count';
   }
@@ -22909,13 +22915,13 @@ class AppLocalizationsAr extends AppLocalizations {
       'لا يمكن لهذا الجهاز ضغط الفيديو. يتم رفع الملفات الأصلية منه.';
 
   @override
-  String get reef_section_title => 'الشعاب المرجانية';
+  String get reef_section_title => 'النظام البيئي';
 
   @override
   String get reef_section_sourcesTooltip => 'مصادر البيانات';
 
   @override
-  String get reef_section_loadError => 'تعذر تحميل بيانات الشعاب الآن';
+  String get reef_section_loadError => 'تعذّر تحميل بيانات النظام البيئي الآن';
 
   @override
   String get reef_habitat_title => 'موئل الشعاب';
@@ -22935,13 +22941,24 @@ class AppLocalizationsAr extends AppLocalizations {
   String get reef_habitat_unavailable => 'تعذر التحقق من موئل الشعاب الآن';
 
   @override
-  String get reef_health_title => 'صحة الشعاب المرجانية';
+  String get water_conditions_title => 'أحوال المياه';
 
   @override
-  String get reef_health_unavailable => 'تعذر التحقق من صحة الشعاب الآن';
+  String get water_conditions_unavailable =>
+      'تعذّر التحقق من أحوال المياه الآن';
 
   @override
-  String get reef_health_noData => 'لا توجد بيانات عن صحة الشعاب لهذا الموقع';
+  String get water_conditions_noData =>
+      'لا توجد بيانات مياه من الأقمار الصناعية لهذا الموقع';
+
+  @override
+  String get water_conditions_freshwater =>
+      'درجة حرارة المياه عبر الأقمار الصناعية تغطي المحيطات فقط';
+
+  @override
+  String water_conditions_anomaly(String value) {
+    return 'شذوذ $value';
+  }
 
   @override
   String reef_health_degreeHeatingWeeks(String value) {

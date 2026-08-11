@@ -113,8 +113,9 @@ class DecoCalculatorPage extends ConsumerWidget {
     // Add the simple plan with calculator values
     planNotifier.addSimplePlan(maxDepth: depth, bottomTimeMinutes: time);
 
-    // Navigate to planner
-    context.go('/planning/dive-planner');
+    // Navigate to planner. PUSH (not go) so system back returns to the
+    // calculator instead of closing the app (#647).
+    context.push('/planning/dive-planner');
 
     // Show confirmation with user's preferred units
     final displayDepth = units.convertDepth(depth);

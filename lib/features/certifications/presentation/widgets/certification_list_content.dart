@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
+import 'package:submersion/features/certifications/domain/certification_title.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:submersion/core/constants/list_view_mode.dart';
 import 'package:submersion/core/constants/sort_options.dart';
@@ -536,8 +537,12 @@ class CertificationListTile extends StatelessWidget {
         : '';
 
     return Semantics(
+      // Keep the agency: this label stands in for the whole tile, so dropping
+      // it would leave "Open Water" with no issuing agency. The title is
+      // derived rather than raw so the agency is not said twice.
       label:
-          '${certification.agency.displayName} ${certification.name}$issueDateLabel$statusLabel',
+          '${certification.agency.displayName} '
+          '${certificationTitle(certification)}$issueDateLabel$statusLabel',
       child: Card(
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
         color: isSelected
@@ -546,7 +551,7 @@ class CertificationListTile extends StatelessWidget {
         child: ListTile(
           onTap: onTap,
           leading: _buildLeadingIcon(context),
-          title: Text(certification.name),
+          title: Text(certificationTitle(certification)),
           subtitle: _buildSubtitle(context),
           trailing: _buildTrailing(context),
         ),

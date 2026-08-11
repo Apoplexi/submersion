@@ -18,6 +18,10 @@ const int kCurrencyAlertDays = 365;
 const int kBackupWarnDays = 7;
 const int kBackupAlertDays = 30;
 
+/// Shared by the no-fly and flight-window chips: both explain themselves on
+/// the same flight-safety page.
+const String _noFlyRoute = '/planning/no-fly';
+
 /// Always-on status chips: gear service clocks, insurance, no-fly, dive
 /// currency, plus attention chips (certifications, trip, checklist,
 /// course, uploads, backup, sync, data quality). Each chip type can be
@@ -94,7 +98,7 @@ class GaugeStrip extends ConsumerWidget {
               icon: Icons.build_outlined,
               label: label,
               tone: tone,
-              onTap: () => context.go('/equipment'),
+              onTap: () => context.push('/equipment'),
             ),
           );
         }
@@ -103,14 +107,20 @@ class GaugeStrip extends ConsumerWidget {
 
     if (_shown(hidden, HomeChipType.insurance)) {
       final insurance = g.insurance;
-      if (insurance == null || insurance.expiryDate == null) {
+      // Emptiness keys off the provider, not the expiry date: expiry is
+      // optional on InsuranceEditPage, so a DAN policy recorded without a
+      // renewal date is a complete record. This matches
+      // DiverInsurance.isValid and the diver profile hub. Both isExpired and
+      // isExpiringSoon return false when expiryDate is null, so such a policy
+      // falls through to the OK branch.
+      if (insurance == null || (insurance.provider?.isEmpty ?? true)) {
         chips.add(
           _chip(
             context,
             icon: Icons.health_and_safety_outlined,
             label: l10n.dashboard_gauges_noInsurance,
             tone: _Tone.neutral,
-            onTap: () => context.go('/settings/diver-profile/insurance'),
+            onTap: () => context.push('/settings/diver-profile/insurance'),
           ),
         );
       } else if (insurance.isExpired) {
@@ -120,7 +130,7 @@ class GaugeStrip extends ConsumerWidget {
             icon: Icons.health_and_safety_outlined,
             label: l10n.dashboard_gauges_insuranceExpired,
             tone: _Tone.alert,
-            onTap: () => context.go('/settings/diver-profile/insurance'),
+            onTap: () => context.push('/settings/diver-profile/insurance'),
           ),
         );
       } else if (insurance.isExpiringSoon) {
@@ -134,7 +144,7 @@ class GaugeStrip extends ConsumerWidget {
               ).format(insurance.expiryDate!),
             ),
             tone: _Tone.warn,
-            onTap: () => context.go('/settings/diver-profile/insurance'),
+            onTap: () => context.push('/settings/diver-profile/insurance'),
           ),
         );
       } else {
@@ -144,7 +154,7 @@ class GaugeStrip extends ConsumerWidget {
             icon: Icons.health_and_safety_outlined,
             label: l10n.dashboard_gauges_insuranceOk,
             tone: _Tone.ok,
-            onTap: () => context.go('/settings/diver-profile/insurance'),
+            onTap: () => context.push('/settings/diver-profile/insurance'),
           ),
         );
       }
@@ -164,6 +174,7 @@ class GaugeStrip extends ConsumerWidget {
               (remaining.inMinutes % 60).toString().padLeft(2, '0'),
             ),
             tone: _Tone.warn,
+            onTap: () => context.push(_noFlyRoute),
           ),
         );
       } else {
@@ -173,6 +184,7 @@ class GaugeStrip extends ConsumerWidget {
             icon: Icons.flight_outlined,
             label: l10n.dashboard_gauges_noFlyClear,
             tone: _Tone.ok,
+            onTap: () => context.push(_noFlyRoute),
           ),
         );
       }
@@ -193,7 +205,7 @@ class GaugeStrip extends ConsumerWidget {
                   (remaining.inMinutes % 60).toString().padLeft(2, '0'),
                 ),
                 tone: _Tone.warn,
-                onTap: () => context.goNamed('noFly'),
+                onTap: () => context.push(_noFlyRoute),
               ),
             );
           case FlightWindowState.closed:
@@ -204,7 +216,7 @@ class GaugeStrip extends ConsumerWidget {
                 icon: Icons.flight_takeoff_outlined,
                 label: l10n.dashboard_gauges_flightWindowClosed,
                 tone: _Tone.alert,
-                onTap: () => context.goNamed('noFly'),
+                onTap: () => context.push(_noFlyRoute),
               ),
             );
         }
@@ -230,6 +242,7 @@ class GaugeStrip extends ConsumerWidget {
               ? l10n.dashboard_gauges_lastDiveToday
               : l10n.dashboard_gauges_lastDiveDays(days),
           tone: tone,
+          onTap: () => context.push('/dives'),
         ),
       );
     }
@@ -242,7 +255,7 @@ class GaugeStrip extends ConsumerWidget {
           icon: Icons.card_membership_outlined,
           label: l10n.dashboard_gauges_certsExpiring(g.expiringCertCount),
           tone: _Tone.warn,
-          onTap: () => context.go('/certifications'),
+          onTap: () => context.push('/certifications'),
         ),
       );
     }
@@ -258,7 +271,7 @@ class GaugeStrip extends ConsumerWidget {
             trip.daysUntilStart,
           ),
           tone: _Tone.ok,
-          onTap: () => context.go('/trips'),
+          onTap: () => context.push('/trips'),
         ),
       );
     }
@@ -288,7 +301,9 @@ class GaugeStrip extends ConsumerWidget {
             course.progress.totalCount,
           ),
           tone: _Tone.neutral,
-          onTap: () => context.go('/courses'),
+          // The chip names one course, so open that course rather than the
+          // list the user would then have to search.
+          onTap: () => context.push('/courses/${course.course.id}'),
         ),
       );
     }
@@ -300,6 +315,7 @@ class GaugeStrip extends ConsumerWidget {
           icon: Icons.cloud_upload_outlined,
           label: l10n.dashboard_gauges_uploadsPending(g.uploadsPending),
           tone: _Tone.warn,
+          onTap: () => context.push('/settings/media-storage/transfers'),
         ),
       );
     }
@@ -346,6 +362,7 @@ class GaugeStrip extends ConsumerWidget {
               ? l10n.dashboard_gauges_syncPending(g.syncPending)
               : l10n.dashboard_gauges_synced,
           tone: g.syncPending > 0 ? _Tone.warn : _Tone.ok,
+          onTap: () => context.push('/settings/cloud-sync'),
         ),
       );
     }
@@ -369,12 +386,15 @@ class GaugeStrip extends ConsumerWidget {
     return Wrap(spacing: 8, runSpacing: 8, children: chips);
   }
 
+  /// [onTap] is required: an InkWell with a null callback looks identical to
+  /// a live chip, so an un-wired chip is invisible to the user and to the
+  /// compiler alike. Every chip must name a destination that explains it.
   Widget _chip(
     BuildContext context, {
     required IconData icon,
     required String label,
     required _Tone tone,
-    VoidCallback? onTap,
+    required VoidCallback onTap,
   }) {
     final scheme = Theme.of(context).colorScheme;
     final (bg, fg) = switch (tone) {

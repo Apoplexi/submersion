@@ -2,7 +2,6 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 
 import 'package:submersion/core/providers/async_value_extensions.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
@@ -37,14 +36,11 @@ class TripStoryDayCard extends ConsumerWidget {
     // Built once for the day's dives rather than per row.
     final diveTypeLabelResolver = watchDiveTypeLabelResolver(ref, context.l10n);
 
-    if (day.isSurface) {
-      return _SurfaceDayRow(day: day);
-    }
-
     // The day title, subtitle, and Planned chip live in the sticky
     // TripStoryDayHeader above this card; the card is body-only. A planned
     // day whose itinerary has nothing to show would produce an empty card,
-    // so skip it entirely.
+    // so skip it entirely. A surface day has nothing by definition and takes
+    // the same exit: its header is the whole chapter.
     // Blank is not content: a whitespace-only port or note would otherwise
     // defeat this guard and render a card with nothing in it. The edit sheet
     // normalizes empties away, but sync and import payloads do not.
@@ -106,42 +102,6 @@ class TripStoryDayCard extends ConsumerWidget {
             ],
           ),
         ),
-      ),
-    );
-  }
-}
-
-/// Slim row for a day with no dives, media, or itinerary entry.
-class _SurfaceDayRow extends StatelessWidget {
-  final TripStoryDay day;
-
-  const _SurfaceDayRow({required this.day});
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final dateFormat = DateFormat.MMMEd();
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
-      child: Row(
-        children: [
-          Icon(
-            Icons.waves,
-            size: 16,
-            color: theme.colorScheme.onSurfaceVariant,
-          ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              '${context.l10n.trips_story_dayLabel(day.dayNumber)}'
-              ' - ${dateFormat.format(day.date)}'
-              ' - ${context.l10n.trips_story_surfaceDay}',
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
-            ),
-          ),
-        ],
       ),
     );
   }

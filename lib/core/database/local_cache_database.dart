@@ -133,6 +133,30 @@ class GpsTrackGeometryCache extends Table {
   Set<Column> get primaryKey => {trackId, lodLevel};
 }
 
+/// Cached NOAA CO-OPS harmonic station constituents. Re-derivable
+/// third-party data: never synced, never backed up. status semantics:
+/// 'ok' = usable constituents in constituentsJson; 'unavailable' = the
+/// station deterministically has no harmonic data. Transient fetch
+/// failures write NO row.
+class NoaaTideStations extends Table {
+  TextColumn get stationId => text()();
+  TextColumn get name => text()();
+  RealColumn get latitude => real()();
+  RealColumn get longitude => real()();
+
+  /// JSON object: {"M2": {"amplitude": 0.576, "phase": 208.2}, ...}
+  TextColumn get constituentsJson => text().withDefault(const Constant('{}'))();
+
+  /// MSL minus MLLW in meters (station datum offset); null when the
+  /// station's datums were unavailable (heights then reference MSL).
+  RealColumn get datumOffsetMllw => real().nullable()();
+  TextColumn get status => text()();
+  IntColumn get fetchedAt => integer()();
+
+  @override
+  Set<Column> get primaryKey => {stationId};
+}
+
 @DriftDatabase(
   tables: [
     LocalAssetCache,
@@ -140,6 +164,7 @@ class GpsTrackGeometryCache extends Table {
     MediaCacheEntries,
     BathymetryCache,
     ReefDataCache,
+    NoaaTideStations,
     GpsTrackGeometryCache,
   ],
 )
@@ -147,7 +172,7 @@ class LocalCacheDatabase extends _$LocalCacheDatabase {
   LocalCacheDatabase(super.e);
 
   @override
-  int get schemaVersion => 9;
+  int get schemaVersion => 10;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -189,10 +214,16 @@ class LocalCacheDatabase extends _$LocalCacheDatabase {
       if (from < 8) {
         await m.createTable(reefDataCache);
       }
-      // v9: simplified GPS track geometry, keyed by (track, LOD). Every
-      // stored schema below 9 lacks it, including v1, for the same reason
-      // reef_data_cache did.
+      // v9: NOAA tide station constituent cache.
       if (from < 9) {
+        await m.createTable(noaaTideStations);
+      }
+      // v10: simplified GPS track geometry, keyed by (track, LOD).
+      // Renumbered from v9 at merge time because the tide branch claimed 9
+      // first. Every stored schema below 10 lacks it, including v1, for the
+      // same reason reef_data_cache did. A dev DB that already ran this
+      // branch at v9 is healed by the beforeOpen backstop below.
+      if (from < 10) {
         await m.createTable(gpsTrackGeometryCache);
       }
     },
@@ -234,6 +265,19 @@ class LocalCacheDatabase extends _$LocalCacheDatabase {
           status TEXT NOT NULL,
           created_at INTEGER NOT NULL,
           PRIMARY KEY (track_id, lod_level)
+        )
+      ''');
+      await customStatement('''
+        CREATE TABLE IF NOT EXISTS noaa_tide_stations (
+          station_id TEXT NOT NULL,
+          name TEXT NOT NULL,
+          latitude REAL NOT NULL,
+          longitude REAL NOT NULL,
+          constituents_json TEXT NOT NULL DEFAULT '{}',
+          datum_offset_mllw REAL NULL,
+          status TEXT NOT NULL,
+          fetched_at INTEGER NOT NULL,
+          PRIMARY KEY (station_id)
         )
       ''');
     },

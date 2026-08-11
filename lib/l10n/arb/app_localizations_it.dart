@@ -998,6 +998,18 @@ class AppLocalizationsIt extends AppLocalizations {
       'Questo sostituirà TUTTI i dati correnti con i dati del backup. Questa azione non può essere annullata.';
 
   @override
+  String backup_restore_safetyReview_progress(int done, int total) {
+    return 'Analizzate $done di $total immersioni';
+  }
+
+  @override
+  String get backup_restore_safetyReview_skip => 'Salta';
+
+  @override
+  String get backup_restore_safetyReview_title =>
+      'Revisione di sicurezza in corso';
+
+  @override
   String get backup_restoreComplete_continue => 'Continua';
 
   @override
@@ -1519,35 +1531,10 @@ class AppLocalizationsIt extends AppLocalizations {
       'Compagni insufficienti per l\'unione.';
 
   @override
-  String get buddies_section_professionalRoles => 'Ruoli Professionali';
-
-  @override
-  String get buddies_roles_addRole => 'Aggiungi ruolo';
-
-  @override
-  String get buddies_roles_role => 'Ruolo';
-
-  @override
-  String get buddies_roles_agency => 'Agenzia';
-
-  @override
-  String get buddies_roles_credentialNumber => 'Numero di credenziale';
-
-  @override
-  String get buddies_roles_removeTooltip => 'Rimuovi ruolo';
-
-  @override
-  String get buddies_roles_emptyHint =>
-      'Aggiungi le credenziali di istruttore o divemaster per riutilizzarle durante la registrazione di certificazioni e corsi.';
-
-  @override
   String get buddies_instructorPicker_label => 'Istruttore dai compagni';
 
   @override
   String get buddies_instructorPicker_none => 'Nessuno (inserimento manuale)';
-
-  @override
-  String get buddies_detail_section_professionalRoles => 'Ruoli Professionali';
 
   @override
   String get certifications_appBar_addCertification =>
@@ -1598,6 +1585,9 @@ class AppLocalizationsIt extends AppLocalizations {
   String get certifications_detail_label_cardNumber => 'Numero tessera';
 
   @override
+  String get certifications_detail_label_certification => 'Certificazione';
+
+  @override
   String get certifications_detail_label_expiryDate => 'Data di scadenza';
 
   @override
@@ -1608,9 +1598,6 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get certifications_detail_label_issueDate => 'Data di rilascio';
-
-  @override
-  String get certifications_detail_label_level => 'Livello';
 
   @override
   String get certifications_detail_label_type => 'Tipo';
@@ -1711,15 +1698,24 @@ class AppLocalizationsIt extends AppLocalizations {
       'Nessuna certificazione ancora';
 
   @override
+  String get certifications_ecard_label_cardNumber => 'N. TESSERA';
+
+  @override
   String certifications_ecard_label_certifiedBy(Object agency) {
     return 'Certificato da $agency';
   }
+
+  @override
+  String get certifications_ecard_label_diver => 'SUBACQUEO';
 
   @override
   String get certifications_ecard_label_instructor => 'ISTRUTTORE';
 
   @override
   String get certifications_ecard_label_issued => 'RILASCIATO';
+
+  @override
+  String get certifications_ecard_label_validUntil => 'VALIDA FINO AL';
 
   @override
   String get certifications_ecard_statusBadge_expired => 'SCADUTO';
@@ -1746,6 +1742,10 @@ class AppLocalizationsIt extends AppLocalizations {
   String get certifications_edit_button_update => 'Aggiorna certificazione';
 
   @override
+  String get certifications_edit_certification_notSpecified =>
+      'Non specificato';
+
+  @override
   String certifications_edit_datePicker_clearTooltip(Object label) {
     return 'Cancella $label';
   }
@@ -1769,16 +1769,21 @@ class AppLocalizationsIt extends AppLocalizations {
   String get certifications_edit_dialog_keepEditing => 'Continua a modificare';
 
   @override
+  String get certifications_edit_group_progression => 'Progressione';
+
+  @override
+  String get certifications_edit_group_specialties => 'Specialità';
+
+  @override
   String get certifications_edit_help_expiryDate =>
       'Lascia vuoto per certificazioni senza scadenza';
 
   @override
-  String get certifications_edit_hint_cardNumber =>
-      'Inserisci il numero della tessera di certificazione';
+  String get certifications_edit_helper_nameOnCard => 'Facoltativo';
 
   @override
-  String get certifications_edit_hint_certificationName =>
-      'es. Open Water Diver';
+  String get certifications_edit_hint_cardNumber =>
+      'Inserisci il numero della tessera di certificazione';
 
   @override
   String get certifications_edit_hint_instructorName =>
@@ -1798,8 +1803,7 @@ class AppLocalizationsIt extends AppLocalizations {
   String get certifications_edit_label_cardNumber => 'Numero tessera';
 
   @override
-  String get certifications_edit_label_certificationName =>
-      'Nome certificazione *';
+  String get certifications_edit_label_certification => 'Certificazione';
 
   @override
   String get certifications_edit_label_expiryDate => 'Data di scadenza';
@@ -1814,13 +1818,10 @@ class AppLocalizationsIt extends AppLocalizations {
   String get certifications_edit_label_issueDate => 'Data di rilascio';
 
   @override
-  String get certifications_edit_label_level => 'Livello';
+  String get certifications_edit_label_nameOnCard => 'Nome sulla tessera';
 
   @override
   String get certifications_edit_label_notes => 'Note';
-
-  @override
-  String get certifications_edit_level_notSpecified => 'Non specificato';
 
   @override
   String certifications_edit_photo_addSemanticLabel(Object label) {
@@ -1881,8 +1882,8 @@ class AppLocalizationsIt extends AppLocalizations {
       'Certificazione aggiornata con successo';
 
   @override
-  String get certifications_edit_validation_nameRequired =>
-      'Inserisci un nome per la certificazione';
+  String get certifications_edit_validation_certificationOrNameRequired =>
+      'Scegli una certificazione o inserisci un nome';
 
   @override
   String get certifications_list_button_retry => 'Riprova';
@@ -2084,34 +2085,6 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get certifications_summary_stat_valid => 'Valide';
-
-  @override
-  String certifications_walletCard_countPlural(Object count) {
-    return '$count certificazioni';
-  }
-
-  @override
-  String certifications_walletCard_countSingular(Object count) {
-    return '$count certificazione';
-  }
-
-  @override
-  String get certifications_walletCard_emptyFooter =>
-      'Aggiungi la tua prima certificazione';
-
-  @override
-  String get certifications_walletCard_error =>
-      'Impossibile caricare le certificazioni';
-
-  @override
-  String get certifications_walletCard_semanticLabel =>
-      'Portafoglio certificazioni. Tocca per visualizzare tutte le certificazioni';
-
-  @override
-  String get certifications_walletCard_tapToAdd => 'Tocca per aggiungere';
-
-  @override
-  String get certifications_walletCard_title => 'Portafoglio certificazioni';
 
   @override
   String get certifications_wallet_appBar_title => 'Portafoglio certificazioni';
@@ -2465,30 +2438,6 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get preDive_start_begin => 'Inizia';
-
-  @override
-  String get preDive_section_title => 'Controllo pre-immersione';
-
-  @override
-  String get preDive_section_link => 'Collega una sessione di checklist';
-
-  @override
-  String get preDive_section_unlink => 'Scollega';
-
-  @override
-  String get preDive_section_run => 'Esegui checklist pre-immersione';
-
-  @override
-  String get preDive_section_noUnlinked =>
-      'Nessuna sessione di checklist non collegata';
-
-  @override
-  String get diveDetailSection_preDiveChecklist_name =>
-      'Controllo pre-immersione';
-
-  @override
-  String get diveDetailSection_preDiveChecklist_description =>
-      'Sessione di checklist pre-immersione collegata';
 
   @override
   String get diveLog_listPage_bottomSheet_preDiveChecklist =>
@@ -9294,24 +9243,6 @@ class AppLocalizationsIt extends AppLocalizations {
   String get enum_ascentRate_warning => 'Attenzione';
 
   @override
-  String get enum_buddyRole_buddy => 'Compagno';
-
-  @override
-  String get enum_buddyRole_diveGuide => 'Guida subacquea';
-
-  @override
-  String get enum_buddyRole_diveMaster => 'Divemaster';
-
-  @override
-  String get enum_buddyRole_instructor => 'Istruttore';
-
-  @override
-  String get enum_buddyRole_solo => 'Solitario';
-
-  @override
-  String get enum_buddyRole_student => 'Allievo';
-
-  @override
   String get enum_certificationAgency_bsac => 'BSAC';
 
   @override
@@ -9365,6 +9296,9 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get enum_certificationLevel_decompression => 'Decompressione';
+
+  @override
+  String get enum_certificationLevel_diveGuide => 'Guida subacquea';
 
   @override
   String get enum_certificationLevel_diveMaster => 'Divemaster';
@@ -13013,6 +12947,23 @@ class AppLocalizationsIt extends AppLocalizations {
   String get safetyReview_restore => 'Ripristina';
 
   @override
+  String get safetyReview_details => 'Dettagli';
+
+  @override
+  String get safetyReview_clearHighlight => 'Rimuovi evidenziazione';
+
+  @override
+  String safetyReview_findingGroupSemantics(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count rilievi di sicurezza',
+      one: '1 rilievo di sicurezza',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get safetySettings_title => 'Revisione di sicurezza';
 
   @override
@@ -13121,11 +13072,11 @@ class AppLocalizationsIt extends AppLocalizations {
       'Grafico ciclo marea e tempi';
 
   @override
-  String get diveDetailSection_reefHealth_name => 'Salute della barriera';
+  String get diveDetailSection_reefHealth_name => 'Condizioni dell\'acqua';
 
   @override
   String get diveDetailSection_reefHealth_description =>
-      'Stress termico da sbiancamento dei coralli alla data dell\'immersione';
+      'Condizioni dell\'acqua da satellite alla data dell\'immersione';
 
   @override
   String get diveDetailSection_surfaceGps_name => 'GPS di superficie';
@@ -15013,6 +14964,14 @@ class AppLocalizationsIt extends AppLocalizations {
       'Scegli una cartella sincronizzata (Dropbox, Google Drive, ecc.)';
 
   @override
+  String get settings_storage_customFolder_subtitleDeviceOnly =>
+      'Sposta il database nella memoria interna o sulla scheda SD';
+
+  @override
+  String get settings_storage_customFolder_deviceOnly_noCloudSync =>
+      'La sincronizzazione cloud gestita dall\'app è disattivata finché il database si trova su un volume di archiviazione del dispositivo. Su Android nessun servizio di sincronizzazione può raggiungere quella cartella: usa Backup e Ripristino per conservare copie altrove.';
+
+  @override
   String settings_storage_dbStats(
     Object fileSize,
     Object diveCount,
@@ -16575,6 +16534,16 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
+  String surfaceInterval_result_beyondHorizon(Object hours) {
+    return 'L\'attesa supera le $hours ore esplorate da questo pianificatore. La desaturazione continua, quindi un intervallo di superficie più lungo sarà sufficiente.';
+  }
+
+  @override
+  String surfaceInterval_result_beyondHorizonShort(Object hours) {
+    return 'Più di $hours ore';
+  }
+
+  @override
   String get surfaceInterval_result_currentInterval => 'Intervallo Corrente';
 
   @override
@@ -16599,6 +16568,15 @@ class AppLocalizationsIt extends AppLocalizations {
   String surfaceInterval_result_ndlMinutes(Object minutes) {
     return '$minutes min NDL';
   }
+
+  @override
+  String surfaceInterval_result_noIntervalHelps(Object minutes) {
+    return 'Nessun intervallo di superficie è sufficiente. L\'immersione senza decompressione più lunga a questa profondità con questa miscela è di $minutes min. Accorcia la seconda immersione o riducine la profondità.';
+  }
+
+  @override
+  String get surfaceInterval_result_notAchievable =>
+      'Non raggiungibile con alcun intervallo di superficie';
 
   @override
   String get surfaceInterval_result_notYetSafe =>
@@ -17032,6 +17010,29 @@ class AppLocalizationsIt extends AppLocalizations {
   String tides_semantic_tideState(Object state) {
     return 'Stato marea: $state';
   }
+
+  @override
+  String tides_source_noaaStation(String name, String distance) {
+    return 'Stazione NOAA: $name ($distance)';
+  }
+
+  @override
+  String get tides_source_modelEstimate => 'Stima da modello oceanico';
+
+  @override
+  String get tides_source_modelCaveat =>
+      'Modellato da dati satellitari. Orari e altezze possono differire vicino a coste complesse.';
+
+  @override
+  String get tides_source_sheetTitle => 'Fonte dei dati di marea';
+
+  @override
+  String get tides_source_datumMllw =>
+      'Altezze rispetto al MLLW (datum della stazione)';
+
+  @override
+  String get tides_source_datumMsl =>
+      'Altezze rispetto al livello medio del mare';
 
   @override
   String get tides_title => 'Maree';
@@ -21369,6 +21370,10 @@ class AppLocalizationsIt extends AppLocalizations {
       'I file qui vengono rimossi se disinstalli l\'app.';
 
   @override
+  String get db_location_backup_note =>
+      'Android non può eseguire il database da una cartella sincronizzata nel cloud. Per conservarne una copia in Dropbox, Nextcloud o Google Drive, imposta la Posizione di backup in Backup e Ripristino.';
+
+  @override
   String diveLog_bulkEdit_membership_onAll(int count) {
     return 'su tutte le $count';
   }
@@ -23321,14 +23326,14 @@ class AppLocalizationsIt extends AppLocalizations {
       'Questo dispositivo non può comprimere i video. Da esso vengono caricati gli originali.';
 
   @override
-  String get reef_section_title => 'Barriera';
+  String get reef_section_title => 'Ecosistema';
 
   @override
   String get reef_section_sourcesTooltip => 'Fonti dei dati';
 
   @override
   String get reef_section_loadError =>
-      'Impossibile caricare i dati della barriera in questo momento';
+      'Impossibile caricare i dati dell\'ecosistema al momento';
 
   @override
   String get reef_habitat_title => 'Habitat della barriera';
@@ -23350,15 +23355,24 @@ class AppLocalizationsIt extends AppLocalizations {
       'Impossibile verificare l\'habitat della barriera in questo momento';
 
   @override
-  String get reef_health_title => 'Salute della barriera';
+  String get water_conditions_title => 'Condizioni dell\'acqua';
 
   @override
-  String get reef_health_unavailable =>
-      'Impossibile verificare la salute della barriera in questo momento';
+  String get water_conditions_unavailable =>
+      'Impossibile verificare le condizioni dell\'acqua al momento';
 
   @override
-  String get reef_health_noData =>
-      'Nessun dato sulla salute della barriera per questa posizione';
+  String get water_conditions_noData =>
+      'Nessun dato satellitare sull\'acqua per questa posizione';
+
+  @override
+  String get water_conditions_freshwater =>
+      'La temperatura dell\'acqua da satellite copre solo gli oceani';
+
+  @override
+  String water_conditions_anomaly(String value) {
+    return 'Anomalia $value';
+  }
 
   @override
   String reef_health_degreeHeatingWeeks(String value) {

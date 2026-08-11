@@ -167,7 +167,9 @@ class _DiveFilterSheetState extends ConsumerState<DiveFilterSheet> {
                 child: TextButton.icon(
                   onPressed: () {
                     Navigator.of(context).pop();
-                    context.go('/dives/search');
+                    // PUSH (not go): go() would leave system back with
+                    // nothing to pop and close the app (#647).
+                    context.push('/dives/search');
                   },
                   icon: const Icon(Icons.manage_search, size: 18),
                   label: const Text('Advanced Search'),

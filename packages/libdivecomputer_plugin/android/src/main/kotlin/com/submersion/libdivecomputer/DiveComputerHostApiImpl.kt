@@ -165,7 +165,12 @@ class DiveComputerHostApiImpl(
         // BleScanner identifies devices via LibdcWrapper.nativeDescriptorMatch on
         // the (async) scan-result thread. Bail with a clear error if the native
         // library never loaded, rather than crashing there (issue #318).
-        if (!nativeLibraryReady()) return
+        // Signal completion on the way out so the scan UI stops spinning
+        // instead of waiting for results that can never arrive (issue #123).
+        if (!nativeLibraryReady()) {
+            mainHandler.post { flutterApi.onDiscoveryComplete { } }
+            return
+        }
 
         val scanner = BleScanner(context)
         scanner.onDeviceDiscovered = { device ->
@@ -386,13 +391,23 @@ class DiveComputerHostApiImpl(
         // Devices using encrypted BLE services (e.g. Aqualung i300C on
         // the Pelagic service) need an established bond. createBond()
         // works here because we have an active GATT connection.
-        if (!bleStream.ensureBonded()) {
-            reportError("bond_failed", "Failed to pair with device")
-            bleStream.close()
-            LibdcWrapper.nativeDownloadSessionFree(sessionPtr)
-            downloadSessionPtr = 0
-            activeBleStream = null
-            return
+        // Shearwater devices are exempt: their protocol needs no bond,
+        // and holding one blocks Shearwater Cloud until the user unpairs
+        // (issue #910) -- see BondPolicy.
+        if (BondPolicy.requiresProactiveBond(device.vendor)) {
+            if (!bleStream.ensureBonded()) {
+                reportError("bond_failed", "Failed to pair with device")
+                bleStream.close()
+                LibdcWrapper.nativeDownloadSessionFree(sessionPtr)
+                downloadSessionPtr = 0
+                activeBleStream = null
+                return
+            }
+        } else {
+            NativeLogger.d(
+                TAG, "BLE",
+                "Skipping proactive bond for ${device.vendor} (BondPolicy)"
+            )
         }
 
         val downloadCallback = makeDownloadCallback()

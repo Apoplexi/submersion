@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import 'package:submersion/l10n/l10n_extension.dart';
+import 'package:submersion/features/certifications/domain/certification_title.dart';
 import 'package:submersion/features/certifications/domain/entities/certification.dart';
 import 'package:submersion/features/certifications/presentation/providers/certification_providers.dart';
 
@@ -36,7 +37,9 @@ class CertificationPicker extends ConsumerWidget {
         ),
       ),
       title: Text(
-        selectedCertification?.name ??
+        (selectedCertification == null
+                ? null
+                : certificationTitle(selectedCertification!)) ??
             context.l10n.certifications_picker_noSelection,
       ),
       subtitle: selectedCertification != null
@@ -185,9 +188,14 @@ class CertificationPickerSheet extends ConsumerWidget {
                   final isSelected = selectedCertification?.id == cert.id;
                   final dateFormat = DateFormat.yMMMd();
 
+                  // Keep the agency: this label replaces the tile's own
+                  // semantics, including the subtitle that shows the agency
+                  // visually. The title is derived so it is not said twice.
+                  final certName =
+                      '${cert.agency.displayName} ${certificationTitle(cert)}';
                   final certLabel = cert.issueDate != null
-                      ? '${cert.agency.displayName} ${cert.name}, issued ${dateFormat.format(cert.issueDate!)}${isSelected ? ', selected' : ''}${cert.isExpired ? ', expired' : ''}'
-                      : '${cert.agency.displayName} ${cert.name}${isSelected ? ', selected' : ''}${cert.isExpired ? ', expired' : ''}';
+                      ? '$certName, issued ${dateFormat.format(cert.issueDate!)}${isSelected ? ', selected' : ''}${cert.isExpired ? ', expired' : ''}'
+                      : '$certName${isSelected ? ', selected' : ''}${cert.isExpired ? ', expired' : ''}';
 
                   return Semantics(
                     label: certLabel,
@@ -203,7 +211,7 @@ class CertificationPickerSheet extends ConsumerWidget {
                               : Colors.green,
                         ),
                       ),
-                      title: Text(cert.name),
+                      title: Text(certificationTitle(cert)),
                       subtitle: Text(
                         cert.issueDate != null
                             ? '${cert.agency.displayName} - ${dateFormat.format(cert.issueDate!)}'

@@ -286,7 +286,7 @@ When planning features, we consider:
 
 | Platform | Status | Version |
 |----------|--------|---------|
-| iOS | :white_check_mark: | iOS 13+ |
+| iOS | :white_check_mark: | iOS 15+ |
 | Android | :white_check_mark: | Android 7+ |
 | macOS | :white_check_mark: | macOS 11+ |
 | Windows | :white_check_mark: | Windows 10+ |

@@ -14,9 +14,20 @@ class SerialIoStream {
         close()
     }
 
-    func open(path: String, baudRate: speed_t = 9600) -> Bool {
-        fileDescriptor = Darwin.open(path, O_RDWR | O_NOCTTY | O_NONBLOCK)
-        guard fileDescriptor >= 0 else { return false }
+    /// Opens and configures the port. Returns `nil` on success, or the reason
+    /// the open was refused.
+    ///
+    /// The failure is returned rather than collapsed to a Bool so callers can
+    /// log why. A sandboxed macOS build missing
+    /// `com.apple.security.device.serial` is denied here with EPERM even though
+    /// the port enumerated fine moments earlier (issue #291).
+    func open(path: String, baudRate: speed_t = 9600) -> SerialOpenFailure? {
+        switch openSerialPort(path: path) {
+        case .failure(let failure):
+            return failure
+        case .success(let fd):
+            fileDescriptor = fd
+        }
 
         // Configure serial port.
         var options = termios()
@@ -33,7 +44,7 @@ class SerialIoStream {
         let flags = fcntl(fileDescriptor, F_GETFL)
         _ = fcntl(fileDescriptor, F_SETFL, flags & ~O_NONBLOCK)
 
-        return true
+        return nil
     }
 
     func close() {

@@ -6,7 +6,7 @@ Submersion runs on iOS, Android, macOS, Windows, and Linux. Choose your platform
 
 | Platform | Minimum Version |
 |----------|-----------------|
-| iOS | iOS 13+ |
+| iOS | iOS 15+ |
 | Android | Android 7+ (API 24) |
 | macOS | macOS 11+ (Big Sur) |
 | Windows | Windows 10+ |

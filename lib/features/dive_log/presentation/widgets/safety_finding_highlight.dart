@@ -15,18 +15,41 @@ Color safetySeverityColor(SafetySeverity severity, ColorScheme colorScheme) {
 }
 
 /// Maps the selected finding to the chart's highlight parameter. Returns null
-/// when nothing is selected or the finding has no profile time range.
+/// when nothing is selected or the finding has no start timestamp; a missing
+/// end timestamp is treated as an instant at the start (the chart inflates
+/// instants to a minimum-width band).
 ProfileHighlightRange? profileHighlightRangeFor(
   SafetyFinding? finding,
   ColorScheme colorScheme,
 ) {
   if (finding == null) return null;
   final start = finding.startTimestamp;
-  final end = finding.endTimestamp;
-  if (start == null || end == null) return null;
+  if (start == null) return null;
+  final end = finding.endTimestamp ?? start;
   return ProfileHighlightRange(
     startTimestamp: start,
     endTimestamp: end,
     color: safetySeverityColor(finding.severity, colorScheme),
   );
+}
+
+/// The findings the profile chart's safety lane shows for [review]:
+/// non-dismissed, rule-enabled, and placeable on the time axis (start
+/// timestamp present), sorted by start time. [disabledRules] holds
+/// [SafetyRuleId.dbValue] strings (settings.safetyReviewDisabledRules).
+List<SafetyFinding> chartSafetyFindings(
+  SafetyReview? review,
+  Set<String> disabledRules,
+) {
+  if (review == null) return const [];
+  final findings = review.findings
+      .where(
+        (f) =>
+            !f.isDismissed &&
+            !disabledRules.contains(f.ruleId.dbValue) &&
+            f.startTimestamp != null,
+      )
+      .toList();
+  findings.sort((a, b) => a.startTimestamp!.compareTo(b.startTimestamp!));
+  return findings;
 }

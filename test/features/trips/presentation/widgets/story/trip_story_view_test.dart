@@ -322,7 +322,9 @@ void main() {
     expect(find.textContaining('Day 1 -'), findsNothing);
   });
 
-  testWidgets('surface days get no sticky header', (tester) async {
+  testWidgets('surface days get the same sticky header as dive days', (
+    tester,
+  ) async {
     final trip = _trip(
       start: DateTime(2026, 3, 25),
       end: DateTime(2026, 3, 27),
@@ -338,9 +340,10 @@ void main() {
     );
     await pumpView(tester, story);
 
-    // Tall harness viewport: all three days are mounted, but only the two
-    // dive days contribute sticky headers.
-    expect(find.byType(TripStoryDayHeader), findsNWidgets(2));
-    expect(find.textContaining('Surface day'), findsOneWidget);
+    // Tall harness viewport: all three days are mounted, and every one of them
+    // contributes a sticky header, surface day included.
+    expect(find.byType(TripStoryDayHeader), findsNWidgets(3));
+    expect(find.textContaining('Day 2 -'), findsOneWidget);
+    expect(find.text('Surface day'), findsOneWidget);
   });
 }

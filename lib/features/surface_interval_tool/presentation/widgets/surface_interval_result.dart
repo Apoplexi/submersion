@@ -24,10 +24,40 @@ class SurfaceIntervalResult extends ConsumerWidget {
     // and picked a mix they can actually breathe at the planned depth.
     final isSafe = ndlIsSafe && gasIsSafe;
 
-    // Format interval as hours:minutes
-    final hours = minInterval ~/ 60;
-    final minutes = minInterval % 60;
-    final intervalText = hours > 0 ? '${hours}h ${minutes}m' : '$minutes min';
+    const horizonHours = siMaxSearchIntervalMinutes ~/ 60;
+
+    // Format interval as hours:minutes. Neither state without an interval gets
+    // a number here: one would be read as "wait this long and you are fine",
+    // and in one of those states waiting is not the remedy at all.
+    final String intervalText;
+    final String intervalSemanticsText;
+    // What the diver should do about it, set exactly when there is no interval
+    // to show. It drives both the visible notice and the spoken summary, so a
+    // screen reader hears the remedy and the ceiling instead of hearing the
+    // headline restated.
+    final String? outcomeAdvice;
+    switch (minInterval.outcome) {
+      case SiIntervalOutcome.withinHorizon:
+        final hours = minInterval.minutes! ~/ 60;
+        final minutes = minInterval.minutes! % 60;
+        intervalText = hours > 0 ? '${hours}h ${minutes}m' : '$minutes min';
+        intervalSemanticsText = intervalText;
+        outcomeAdvice = null;
+      case SiIntervalOutcome.beyondHorizon:
+        intervalText = '> ${horizonHours}h';
+        intervalSemanticsText = context.l10n
+            .surfaceInterval_result_beyondHorizonShort(horizonHours);
+        outcomeAdvice = context.l10n.surfaceInterval_result_beyondHorizon(
+          horizonHours,
+        );
+      case SiIntervalOutcome.impossible:
+        intervalText = '—';
+        intervalSemanticsText =
+            context.l10n.surfaceInterval_result_notAchievable;
+        outcomeAdvice = context.l10n.surfaceInterval_result_noIntervalHelps(
+          minInterval.cleanTissueNoStopSeconds ~/ 60,
+        );
+    }
 
     // Format NDL for display
     String ndlText;
@@ -47,15 +77,17 @@ class SurfaceIntervalResult extends ConsumerWidget {
 
     return Semantics(
       label: context.l10n.surfaceInterval_result_semantics(
-        intervalText,
+        intervalSemanticsText,
         currentText,
         ndlText,
-        // Oxygen is the acute risk, so it leads when both are wrong.
+        // Oxygen is the acute risk, so it leads when both are wrong, then any
+        // outcome that carries its own headline.
         !gasIsSafe
             ? context.l10n.surfaceInterval_result_gasUnsafe
-            : ndlIsSafe
-            ? context.l10n.surfaceInterval_result_safeToDive
-            : context.l10n.surfaceInterval_result_notYetSafe,
+            : outcomeAdvice ??
+                  (ndlIsSafe
+                      ? context.l10n.surfaceInterval_result_safeToDive
+                      : context.l10n.surfaceInterval_result_notYetSafe),
       ),
       child: Card(
         color: isSafe
@@ -140,11 +172,17 @@ class SurfaceIntervalResult extends ConsumerWidget {
                 ),
               ],
 
+              // Every state without an interval is also short on no-deco time,
+              // so this branch covers all three -- but each wants different
+              // advice, and telling an impossible plan to wait longer would be
+              // dead wrong.
               if (!ndlIsSafe) ...[
                 const SizedBox(height: 16),
                 _ResultNotice(
                   icon: Icons.info_outline,
-                  message: context.l10n.surfaceInterval_result_increaseInterval,
+                  message:
+                      outcomeAdvice ??
+                      context.l10n.surfaceInterval_result_increaseInterval,
                 ),
               ],
             ],

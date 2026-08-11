@@ -10,7 +10,8 @@ import 'package:submersion/core/constants/enums.dart';
 // names collide with the domain entities this test imports (DiveSite, Dive,
 // Buddy, Tag, Trip, ...).
 import 'package:submersion/core/database/database.dart' show DiveSitesCompanion;
-import 'package:submersion/core/services/export/export_service.dart';
+import 'package:submersion/core/services/export/export_service.dart'
+    hide ServiceRecord;
 import 'package:submersion/features/universal_import/data/models/import_enums.dart';
 import 'package:submersion/features/universal_import/data/parsers/subsurface_xml_parser.dart';
 import 'package:submersion/features/buddies/data/repositories/buddy_repository.dart';
@@ -35,6 +36,9 @@ import 'package:submersion/features/dive_types/data/repositories/dive_type_repos
 import 'package:submersion/features/dive_types/domain/entities/dive_type_entity.dart';
 import 'package:submersion/features/equipment/data/repositories/equipment_repository_impl.dart';
 import 'package:submersion/features/equipment/data/repositories/equipment_set_repository_impl.dart';
+import 'package:submersion/features/equipment/data/repositories/service_record_repository.dart';
+import 'package:submersion/features/equipment/domain/entities/service_record.dart'
+    show ServiceRecord;
 import 'package:submersion/features/equipment/domain/entities/equipment_item.dart';
 import 'package:submersion/features/equipment/domain/entities/equipment_set.dart';
 import 'package:submersion/features/tags/data/repositories/tag_repository.dart';
@@ -56,6 +60,7 @@ import 'package:submersion/features/trips/domain/entities/trip.dart';
   DiveRepository,
   TankPressureRepository,
   CourseRepository,
+  ServiceRecordRepository,
 ])
 import 'uddf_entity_importer_test.mocks.dart';
 
@@ -77,6 +82,7 @@ void main() {
   late MockDiveRepository mockDiveRepo;
   late MockTankPressureRepository mockTankPressureRepo;
   late MockCourseRepository mockCourseRepo;
+  late MockServiceRecordRepository mockServiceRecordRepo;
   late ImportRepositories repos;
 
   setUp(() {
@@ -93,6 +99,11 @@ void main() {
     mockDiveRepo = MockDiveRepository();
     mockTankPressureRepo = MockTankPressureRepository();
     mockCourseRepo = MockCourseRepository();
+    mockServiceRecordRepo = MockServiceRecordRepository();
+
+    // No dive type exists yet, so every imported type is created. The
+    // importer consults this to avoid duplicating a built-in slug.
+    when(mockDiveTypeRepo.getDiveTypeById(any)).thenAnswer((_) async => null);
 
     // Stub getNextDiveNumber for auto-numbering during import.
     when(
@@ -118,6 +129,7 @@ void main() {
       diveRepository: mockDiveRepo,
       tankPressureRepository: mockTankPressureRepo,
       courseRepository: mockCourseRepo,
+      serviceRecordRepository: mockServiceRecordRepo,
     );
   });
 
@@ -1043,10 +1055,11 @@ void main() {
 
         final dive =
             verify(mockDiveRepo.createDive(captureAny)).captured.single as Dive;
-        // Bottom threshold is 85% of 30 m = 25.5 m; the diver is at/above it from
-        // t=60 to t=1200, so bottom time is 1140 s, not the 1320 s runtime.
+        // Ascent threshold is min(max(6 m, 33% of 30 m), 85% of 30 m) =
+        // 9.9 m; the last sample at/deeper is t=1200 and bottom time runs
+        // from surface departure (t=0), so 1200 s, not the 1320 s runtime.
         expect(dive.runtime, const Duration(seconds: 1320));
-        expect(dive.bottomTime, const Duration(seconds: 1140));
+        expect(dive.bottomTime, const Duration(seconds: 1200));
         expect(dive.bottomTime!, lessThan(dive.runtime!));
       },
     );
@@ -1371,7 +1384,7 @@ void main() {
       verify(mockTagRepo.addTagToDive(any, any)).called(1);
     });
 
-    test('appends weight to notes', () async {
+    test('imports a weight total as a DiveWeight, not as notes text', () async {
       when(mockDiveRepo.createDive(any)).thenAnswer(
         (invocation) async => invocation.positionalArguments[0] as Dive,
       );
@@ -1396,8 +1409,67 @@ void main() {
 
       final captured = verify(mockDiveRepo.createDive(captureAny)).captured;
       final dive = captured[0] as Dive;
-      expect(dive.notes, contains('Great dive'));
-      expect(dive.notes, contains('Weight used: 4.5 kg'));
+      expect(dive.weights, hasLength(1));
+      expect(dive.weights.single.amountKg, 4.5);
+      expect(dive.weights.single.diveId, dive.id);
+      // #912: the value belongs in the Weights section, and the user's own
+      // notes must come through untouched.
+      expect(dive.notes, 'Great dive');
+    });
+
+    test('weightAmount is imported as a DiveWeight too', () async {
+      when(mockDiveRepo.createDive(any)).thenAnswer(
+        (invocation) async => invocation.positionalArguments[0] as Dive,
+      );
+
+      final data = UddfImportResult(
+        dives: [
+          {'dateTime': now, 'maxDepth': 25.0, 'weightAmount': 6.0},
+        ],
+      );
+
+      await importer.import(
+        data: data,
+        selections: const UddfImportSelections(dives: {0}),
+        repositories: repos,
+        diverId: diverId,
+      );
+
+      final captured = verify(mockDiveRepo.createDive(captureAny)).captured;
+      final dive = captured[0] as Dive;
+      expect(dive.weights, hasLength(1));
+      expect(dive.weights.single.amountKg, 6.0);
+    });
+
+    test('an explicit weights breakdown wins over the total', () async {
+      when(mockDiveRepo.createDive(any)).thenAnswer(
+        (invocation) async => invocation.positionalArguments[0] as Dive,
+      );
+
+      final data = UddfImportResult(
+        dives: [
+          {
+            'dateTime': now,
+            'weightUsed': 9.0,
+            'weights': <Map<String, dynamic>>[
+              {'type': WeightType.belt, 'amount': 4.0},
+              {'type': WeightType.trimWeights, 'amount': 2.0},
+            ],
+          },
+        ],
+      );
+
+      await importer.import(
+        data: data,
+        selections: const UddfImportSelections(dives: {0}),
+        repositories: repos,
+        diverId: diverId,
+      );
+
+      final captured = verify(mockDiveRepo.createDive(captureAny)).captured;
+      final dive = captured[0] as Dive;
+      expect(dive.weights, hasLength(2));
+      expect(dive.weights.map((w) => w.amountKg), [4.0, 2.0]);
     });
 
     test('persists profile heart rate from imported UDDF samples', () async {
@@ -2928,5 +3000,120 @@ void main() {
         expect(reading.gradientFactorHigh.value, 85);
       },
     );
+  });
+
+  group('Import service records', () {
+    setUp(() {
+      when(mockEquipmentRepo.createEquipment(any)).thenAnswer(
+        (invocation) async =>
+            invocation.positionalArguments[0] as EquipmentItem,
+      );
+      when(mockServiceRecordRepo.createRecord(any)).thenAnswer(
+        (invocation) async =>
+            invocation.positionalArguments[0] as ServiceRecord,
+      );
+    });
+
+    UddfImportResult dataWith(List<Map<String, dynamic>> records) {
+      return UddfImportResult(
+        equipment: const [
+          {'name': 'Travel Set', 'uddfId': 'gear-1', 'type': 'regulator'},
+        ],
+        serviceRecords: records,
+      );
+    }
+
+    test('attaches a record to the equipment it references', () async {
+      await importer.import(
+        data: dataWith([
+          {
+            'equipmentRef': 'gear-1',
+            'serviceDate': DateTime(2025, 5, 12),
+            'provider': 'Seals Watersports',
+            'notes': 'Swapped yoke to DIN',
+            'serviceType': 'annual',
+          },
+        ]),
+        selections: const UddfImportSelections(equipment: {0}),
+        repositories: repos,
+        diverId: diverId,
+      );
+
+      final captured = verify(
+        mockServiceRecordRepo.createRecord(captureAny),
+      ).captured;
+      expect(captured, hasLength(1));
+      final record = captured.single as ServiceRecord;
+      expect(record.provider, 'Seals Watersports');
+      expect(record.serviceDate, DateTime(2025, 5, 12));
+      expect(record.serviceType, ServiceType.annual);
+      expect(record.notes, 'Swapped yoke to DIN');
+
+      // The record must point at the newly created equipment row, not at the
+      // source's own id.
+      final equipment =
+          verify(mockEquipmentRepo.createEquipment(captureAny)).captured.single
+              as EquipmentItem;
+      expect(record.equipmentId, equipment.id);
+    });
+
+    test('skips a record whose equipment was not imported', () async {
+      await importer.import(
+        data: dataWith([
+          {
+            'equipmentRef': 'gear-missing',
+            'serviceDate': DateTime(2025, 5, 12),
+          },
+        ]),
+        selections: const UddfImportSelections(equipment: {0}),
+        repositories: repos,
+        diverId: diverId,
+      );
+
+      verifyNever(mockServiceRecordRepo.createRecord(any));
+    });
+
+    test('skips a record with no service date', () async {
+      await importer.import(
+        data: dataWith([
+          {'equipmentRef': 'gear-1', 'provider': 'Someone'},
+        ]),
+        selections: const UddfImportSelections(equipment: {0}),
+        repositories: repos,
+        diverId: diverId,
+      );
+
+      verifyNever(mockServiceRecordRepo.createRecord(any));
+    });
+
+    test('one failing record does not abort the import', () async {
+      when(mockServiceRecordRepo.createRecord(any)).thenAnswer((
+        invocation,
+      ) async {
+        final record = invocation.positionalArguments[0] as ServiceRecord;
+        if (record.provider == 'boom') throw Exception('write failed');
+        return record;
+      });
+
+      await importer.import(
+        data: dataWith([
+          {
+            'equipmentRef': 'gear-1',
+            'serviceDate': DateTime(2025, 1, 1),
+            'provider': 'boom',
+          },
+          {
+            'equipmentRef': 'gear-1',
+            'serviceDate': DateTime(2025, 2, 1),
+            'provider': 'fine',
+          },
+        ]),
+        selections: const UddfImportSelections(equipment: {0}),
+        repositories: repos,
+        diverId: diverId,
+      );
+
+      verify(mockServiceRecordRepo.createRecord(any)).called(2);
+    });
   });
 }

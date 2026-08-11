@@ -511,6 +511,7 @@ class UniversalAdapter implements ImportSourceAdapter {
       diveRepository: _ref.read(diveRepositoryProvider),
       tankPressureRepository: _ref.read(tankPressureRepositoryProvider),
       courseRepository: _ref.read(courseRepositoryProvider),
+      serviceRecordRepository: _ref.read(serviceRecordRepositoryProvider),
     );
 
     final settings = _ref.read(settingsProvider);
@@ -1082,6 +1083,7 @@ class UniversalAdapter implements ImportSourceAdapter {
       customDiveTypes: payload.entitiesOf(ui.ImportEntityType.diveTypes),
       equipmentSets: payload.entitiesOf(ui.ImportEntityType.equipmentSets),
       courses: payload.entitiesOf(ui.ImportEntityType.courses),
+      serviceRecords: payload.entitiesOf(ui.ImportEntityType.serviceRecords),
     );
   }
 }

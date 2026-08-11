@@ -13,6 +13,7 @@ import 'package:submersion/features/safety/presentation/pages/incident_edit_page
 import 'package:submersion/features/safety/presentation/pages/incidents_list_page.dart';
 import 'package:submersion/features/safety/presentation/pages/no_fly_page.dart';
 import 'package:submersion/features/settings/presentation/pages/section_appearance_page.dart';
+import 'package:submersion/features/settings/presentation/pages/settings_page.dart';
 import 'package:submersion/features/settings/presentation/pages/column_config_page.dart';
 
 /// Finds a [GoRoute] by name in a route tree recursively.
@@ -732,6 +733,38 @@ void main() {
     );
   });
 
+  // The GaugeStrip widget test navigates through a stub router, so a chip
+  // pointing at a path that does not exist in the real app would still pass
+  // there. These assert the destinations resolve against the real config.
+  group('home gauge-strip chip destinations resolve', () {
+    const destinations = <String>[
+      '/equipment',
+      '/equipment/new',
+      '/settings/diver-profile/insurance',
+      '/planning/no-fly',
+      '/dives',
+      '/certifications',
+      '/trips',
+      '/pre-dive-sessions/session-7',
+      '/courses/c1',
+      '/settings/media-storage/transfers',
+      '/settings/backup',
+      '/settings/cloud-sync',
+      '/dives/quality',
+    ];
+
+    for (final destination in destinations) {
+      test('$destination matches a route', () {
+        final match = router.configuration.findMatch(Uri.parse(destination));
+        expect(
+          match.isError,
+          isFalse,
+          reason: '$destination does not resolve to any route',
+        );
+      });
+    }
+  });
+
   group('app_router initialLocation', () {
     test('initial location is /dashboard', () {
       expect(
@@ -823,6 +856,188 @@ void main() {
 
       lightroomUiEnabled = true;
       expect(await route.redirect!(capturedContext, state), isNull);
+    });
+  });
+
+  group('settings sections are pushed as animated child routes', () {
+    // Settings sub-sections used to navigate two different ways. Sections
+    // with a dedicated route (Appearance -> /settings/appearance) push a
+    // child GoRoute, which go_router wraps in a platform-adaptive
+    // MaterialPage, so they slide in. Sections without one (About, Units,
+    // Data, ...) pushed '/settings?selected=<id>', which re-matches the
+    // '/settings' route itself -- a bottom-nav tab root whose pageBuilder
+    // returns a NoTransitionPage. Correct for switching tabs, but it made
+    // those sections snap into place with no animation.
+    //
+    // The fix gives them a real child route. It deliberately does not make
+    // '/settings' itself animate when '?selected=' is present: the desktop
+    // master-detail pane navigates with go() (a stable pageKey), so swapping
+    // the page type under the same key would fail Page.canUpdate's
+    // runtimeType check and slide the whole split view on every click.
+    test('a section child route exists under /settings', () {
+      final route = _findRouteByName(
+        router.configuration.routes,
+        'settingsSection',
+      );
+      expect(route, isNotNull);
+      expect(route!.path, 'section/:sectionId');
+    });
+
+    test('the section route uses builder, so go_router animates it', () {
+      final route = _findRouteByName(
+        router.configuration.routes,
+        'settingsSection',
+      );
+      expect(route, isNotNull);
+      expect(
+        route!.builder,
+        isNotNull,
+        reason:
+            'builder lets go_router pick the platform-adaptive MaterialPage, '
+            'which is what makes /settings/appearance slide in.',
+      );
+      expect(
+        route.pageBuilder,
+        isNull,
+        reason:
+            'a custom pageBuilder here would risk reintroducing the '
+            'NoTransitionPage that suppressed the animation.',
+      );
+    });
+
+    testWidgets('the section route redirects ids that have a page of their '
+        'own', (tester) async {
+      // SettingsSectionDetailPage supplies a Scaffold and an AppBar, so a
+      // deep link to /settings/section/safety would stack a second app bar
+      // on top of SafetySettingsPage's. Fixing only the list tile leaves the
+      // URL reachable; the route itself has to normalize it.
+      late BuildContext capturedContext;
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Builder(
+            builder: (context) {
+              capturedContext = context;
+              return const SizedBox.shrink();
+            },
+          ),
+        ),
+      );
+
+      final route = _findRouteByName(
+        router.configuration.routes,
+        'settingsSection',
+      );
+      expect(route, isNotNull);
+      expect(route!.redirect, isNotNull);
+
+      Future<String?> redirectFor(String sectionId) async {
+        return route.redirect!(
+          capturedContext,
+          GoRouterState(
+            router.configuration,
+            uri: Uri.parse('/settings/section/$sectionId'),
+            matchedLocation: '/settings/section/$sectionId',
+            fullPath: '/settings/section/:sectionId',
+            pathParameters: {'sectionId': sectionId},
+            pageKey: ValueKey('/settings/section/$sectionId'),
+          ),
+        );
+      }
+
+      // Sections whose content is its own Scaffold with its own AppBar.
+      expect(await redirectFor('safety'), '/settings/safety');
+      expect(await redirectFor('debug'), '/settings/debug-logs');
+      expect(await redirectFor('profile'), '/settings/diver-profile');
+      // Has a dedicated page too, so the route stays canonical.
+      expect(await redirectFor('appearance'), '/settings/appearance');
+
+      // Genuine section content belongs in the wrapper and must not redirect.
+      expect(await redirectFor('about'), isNull);
+      expect(await redirectFor('units'), isNull);
+      expect(
+        await redirectFor('security'),
+        isNull,
+        reason:
+            'SecuritySettingsPage returns plain content and relies on the '
+            "wrapper's Scaffold for its snackbars",
+      );
+    });
+
+    testWidgets('the section route passes its path parameter through', (
+      tester,
+    ) async {
+      late BuildContext capturedContext;
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Builder(
+            builder: (context) {
+              capturedContext = context;
+              return const SizedBox.shrink();
+            },
+          ),
+        ),
+      );
+
+      final route = _findRouteByName(
+        router.configuration.routes,
+        'settingsSection',
+      );
+      expect(route, isNotNull);
+
+      final widget = route!.builder!(
+        capturedContext,
+        GoRouterState(
+          router.configuration,
+          uri: Uri.parse('/settings/section/about'),
+          matchedLocation: '/settings/section/about',
+          fullPath: '/settings/section/:sectionId',
+          pathParameters: const {'sectionId': 'about'},
+          pageKey: const ValueKey('/settings/section/about'),
+        ),
+      );
+
+      expect(widget, isA<SettingsSectionDetailPage>());
+      expect((widget as SettingsSectionDetailPage).sectionId, 'about');
+    });
+
+    testWidgets('the settings tab root itself still has no transition', (
+      tester,
+    ) async {
+      late BuildContext capturedContext;
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Builder(
+            builder: (context) {
+              capturedContext = context;
+              return const SizedBox.shrink();
+            },
+          ),
+        ),
+      );
+
+      final route = _findRouteByName(router.configuration.routes, 'settings');
+      expect(route, isNotNull);
+      expect(route!.pageBuilder, isNotNull);
+
+      final page = route.pageBuilder!(
+        capturedContext,
+        GoRouterState(
+          router.configuration,
+          uri: Uri.parse('/settings'),
+          matchedLocation: '/settings',
+          fullPath: '/settings',
+          pathParameters: const {},
+          pageKey: const ValueKey('/settings'),
+        ),
+      );
+
+      expect(
+        page,
+        isA<NoTransitionPage<dynamic>>(),
+        reason:
+            '/settings is a bottom-nav destination; switching tabs must not '
+            'animate, matching every other tab root.',
+      );
     });
   });
 }

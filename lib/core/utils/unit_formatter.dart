@@ -72,14 +72,30 @@ class UnitFormatter {
   // Temperature
   // ============================================================================
 
-  /// Format temperature value with unit symbol
-  String formatTemperature(double? value, {int decimals = 0}) {
+  /// Format temperature value with unit symbol.
+  ///
+  /// Keeps one decimal, then drops it when it is zero: 25.6°C, but 26°C.
+  /// Whole degrees alone lost real precision for divers logging in Celsius
+  /// from an imperial source - 78°F is 25.6°C, which used to render as 26°C
+  /// (#912) - while a trailing ".0" on every reading is just noise.
+  String formatTemperature(double? value, {int decimals = 1}) {
     if (value == null) return '--';
     final converted = TemperatureUnit.celsius.convert(
       value,
       settings.temperatureUnit,
     );
-    return '${converted.toStringAsFixed(decimals)}°${settings.temperatureUnit.symbol}';
+    final text = _trimTrailingZeros(converted.toStringAsFixed(decimals));
+    return '$text°${settings.temperatureUnit.symbol}';
+  }
+
+  /// Strips a fractional part that is all zeros, along with the separator.
+  /// "26.0" -> "26", "25.60" -> "25.6", "26" -> "26".
+  static String _trimTrailingZeros(String text) {
+    if (!text.contains('.')) return text;
+    final trimmed = text.replaceFirst(RegExp(r'0+$'), '');
+    return trimmed.endsWith('.')
+        ? trimmed.substring(0, trimmed.length - 1)
+        : trimmed;
   }
 
   /// Get temperature unit symbol

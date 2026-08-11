@@ -698,8 +698,10 @@ class _DiveListContentState extends ConsumerState<DiveListContent> {
       _selectionFromList = true;
       widget.onItemSelected!(dive.id);
     } else {
-      // Standalone mode: navigate to detail page
-      context.go('/dives/${dive.id}');
+      // Standalone mode: navigate to detail page. PUSH (not go): go()
+      // replaces the stack, leaving system back with nothing to pop -- it
+      // would close the app (#647).
+      context.push('/dives/${dive.id}');
     }
   }
 
@@ -833,7 +835,7 @@ class _DiveListContentState extends ConsumerState<DiveListContent> {
             if (value == 'numbering') {
               showDiveNumberingDialog(context);
             } else if (value == 'advanced_search') {
-              context.go('/dives/search');
+              context.push('/dives/search');
             } else if (value == 'match_sites') {
               context.push('/dives/match-sites');
             } else if (value == 'data_quality') {
@@ -990,7 +992,7 @@ class _DiveListContentState extends ConsumerState<DiveListContent> {
               if (value == 'numbering') {
                 showDiveNumberingDialog(context);
               } else if (value == 'advanced_search') {
-                context.go('/dives/search');
+                context.push('/dives/search');
               } else if (value == 'match_sites') {
                 context.push('/dives/match-sites');
               } else if (value == 'data_quality') {

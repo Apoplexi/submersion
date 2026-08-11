@@ -78,18 +78,11 @@ class TripListPage extends ConsumerWidget {
           columnSettingsAction: IconButton(
             icon: const Icon(Icons.view_column_outlined),
             tooltip: 'Column settings',
-            onPressed: () {
-              final config = ref.read(tripTableConfigProvider);
-              final notifier = ref.read(tripTableConfigProvider.notifier);
-              showEntityTableColumnPicker<TripField>(
-                context,
-                config: config,
-                adapter: TripFieldAdapter.instance,
-                onToggleColumn: notifier.toggleColumn,
-                onReorderColumn: notifier.reorderColumn,
-                onTogglePin: notifier.togglePin,
-              );
-            },
+            onPressed: () => showEntityTableColumnPicker<TripField>(
+              context,
+              configProvider: tripTableConfigProvider,
+              adapter: TripFieldAdapter.instance,
+            ),
           ),
           appBarActions: [
             IconButton(

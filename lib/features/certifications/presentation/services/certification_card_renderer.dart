@@ -7,6 +7,7 @@ import 'package:submersion/l10n/arb/app_localizations.dart';
 import 'package:intl/intl.dart';
 
 import 'package:submersion/features/certifications/domain/entities/certification.dart';
+import 'package:submersion/features/certifications/domain/certification_title.dart';
 
 /// Service for rendering certification cards to PNG images for sharing.
 ///
@@ -78,7 +79,7 @@ class CertificationCardRenderer {
       // Draw certification name (large, centered vertically)
       _drawText(
         canvas: canvas,
-        text: certification.name,
+        text: certificationTitle(certification),
         x: 32,
         y: height * 0.35,
         fontSize: 32,
@@ -87,11 +88,13 @@ class CertificationCardRenderer {
         maxWidth: width - 64,
       );
 
-      // Draw level if available
-      if (certification.level != null) {
+      // Only when the title above is a custom name -- otherwise it already
+      // contains the certification.
+      final subtitle = certificationSubtitle(certification);
+      if (subtitle != null) {
         _drawText(
           canvas: canvas,
-          text: certification.level!.displayName,
+          text: subtitle,
           x: 32,
           y: height * 0.35 + 44,
           fontSize: 20,
@@ -373,7 +376,7 @@ class CertificationCardRenderer {
       // Draw certification name
       _drawCenteredText(
         canvas: canvas,
-        text: certification.name,
+        text: certificationTitle(certification),
         y: 390,
         width: width,
         fontSize: 40,
@@ -381,11 +384,13 @@ class CertificationCardRenderer {
         color: agencyColor,
       );
 
-      // Draw level if available
-      if (certification.level != null) {
+      // Only when the title above is a custom name -- otherwise it already
+      // contains the certification.
+      final subtitle = certificationSubtitle(certification);
+      if (subtitle != null) {
         _drawCenteredText(
           canvas: canvas,
-          text: certification.level!.displayName,
+          text: subtitle,
           y: 450,
           width: width,
           fontSize: 28,

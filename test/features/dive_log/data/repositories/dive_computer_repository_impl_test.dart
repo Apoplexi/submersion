@@ -3,6 +3,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/core/database/database.dart';
 import 'package:submersion/features/dive_log/data/repositories/dive_computer_repository_impl.dart';
+import 'package:submersion/features/dive_log/domain/entities/dive_computer.dart'
+    as domain;
 
 import '../../../../helpers/test_database.dart';
 
@@ -110,6 +112,9 @@ void main() {
     required String diveId,
     String? computerId,
     bool isPrimary = false,
+    String? computerModel,
+    String? computerSerial,
+    String? sourceFormat,
   }) async {
     final id = 'ds-${DateTime.now().microsecondsSinceEpoch}';
     final now = DateTime.now();
@@ -121,6 +126,9 @@ void main() {
             diveId: Value(diveId),
             computerId: Value(computerId),
             isPrimary: Value(isPrimary),
+            computerModel: Value(computerModel),
+            computerSerial: Value(computerSerial),
+            sourceFormat: Value(sourceFormat),
             importedAt: Value(now),
             createdAt: Value(now),
           ),
@@ -440,6 +448,257 @@ void main() {
       )..where((t) => t.id.equals(computerId))).get();
       expect(computers, isEmpty);
     });
+
+    test('deletes a computer linked as a dive\'s primary computer with foreign '
+        'keys enforced (issue #823)', () async {
+      // The app's real connection runs with PRAGMA foreign_keys = ON, but
+      // the in-memory test database defaults to OFF, which masked the
+      // missing dives.computer_id clearing: deleting a computer that any
+      // dive referenced failed with SqliteException(787) on devices.
+      await db.customStatement('PRAGMA foreign_keys = ON');
+      final computerId = await insertComputer();
+      final diveId = await insertDive(computerId: computerId);
+
+      await repository.deleteComputer(computerId);
+
+      // Computer gone; the dive survives with the link cleared.
+      final computers = await (db.select(
+        db.diveComputers,
+      )..where((t) => t.id.equals(computerId))).get();
+      expect(computers, isEmpty);
+      final dives = await (db.select(
+        db.dives,
+      )..where((t) => t.id.equals(diveId))).get();
+      expect(dives, hasLength(1));
+      expect(dives.first.computerId, isNull);
+    });
+
+    test(
+      'backfills a provenance snapshot for dives lacking a data source row',
+      () async {
+        // Legacy dives predate dive_data_sources: without a snapshot, deleting
+        // the computer would permanently lose which device produced the dive.
+        final computerId = await insertComputer(
+          manufacturer: 'Shearwater',
+          model: 'Perdix',
+          serialNumber: 'SN-12345',
+        );
+        final diveId = await insertDive(computerId: computerId);
+
+        await repository.deleteComputer(computerId);
+
+        final sources = await (db.select(
+          db.diveDataSources,
+        )..where((t) => t.diveId.equals(diveId))).get();
+        expect(sources, hasLength(1));
+        expect(sources.first.computerModel, equals('Shearwater Perdix'));
+        expect(sources.first.computerSerial, equals('SN-12345'));
+        expect(sources.first.sourceFormat, equals('dive_computer'));
+        expect(sources.first.computerId, isNull);
+        expect(sources.first.isPrimary, isTrue);
+      },
+    );
+
+    test('does not duplicate an existing provenance snapshot', () async {
+      final computerId = await insertComputer(
+        manufacturer: 'Shearwater',
+        model: 'Perdix',
+        serialNumber: 'SN-12345',
+      );
+      final diveId = await insertDive(computerId: computerId);
+      await insertDataSource(
+        diveId: diveId,
+        computerId: computerId,
+        isPrimary: true,
+        computerModel: 'Shearwater Perdix',
+        computerSerial: 'SN-12345',
+        sourceFormat: 'dive_computer',
+      );
+
+      await repository.deleteComputer(computerId);
+
+      final sources = await (db.select(
+        db.diveDataSources,
+      )..where((t) => t.diveId.equals(diveId))).get();
+      expect(sources, hasLength(1));
+      expect(sources.first.computerId, isNull);
+      expect(sources.first.computerModel, equals('Shearwater Perdix'));
+      expect(sources.first.computerSerial, equals('SN-12345'));
+    });
+  });
+
+  // ---------------------------------------------------------------------------
+  // createComputer - relinking orphaned dives when the same hardware returns
+  // ---------------------------------------------------------------------------
+
+  group('createComputer relinking', () {
+    domain.DiveComputer newComputer({
+      String? serialNumber = 'SN-12345',
+      String manufacturer = 'Shearwater',
+      String model = 'Perdix',
+    }) {
+      final now = DateTime.now();
+      return domain.DiveComputer(
+        id: '',
+        name: 'My Perdix',
+        manufacturer: manufacturer,
+        model: model,
+        serialNumber: serialNumber,
+        createdAt: now,
+        updatedAt: now,
+      );
+    }
+
+    test(
+      'relinks orphaned dive, source, and profile rows from the same hardware',
+      () async {
+        final oldId = await insertComputer(
+          manufacturer: 'Shearwater',
+          model: 'Perdix',
+          serialNumber: 'SN-12345',
+        );
+        final diveId = await insertDive(computerId: oldId);
+        await insertDataSource(
+          diveId: diveId,
+          computerId: oldId,
+          isPrimary: true,
+          computerModel: 'Shearwater Perdix',
+          computerSerial: 'SN-12345',
+          sourceFormat: 'dive_computer',
+        );
+        await insertProfile(diveId: diveId, computerId: oldId);
+        await repository.deleteComputer(oldId);
+
+        final created = await repository.createComputer(newComputer());
+
+        final sources = await (db.select(
+          db.diveDataSources,
+        )..where((t) => t.diveId.equals(diveId))).get();
+        expect(sources.single.computerId, equals(created.id));
+        final dive = await (db.select(
+          db.dives,
+        )..where((t) => t.id.equals(diveId))).getSingle();
+        expect(dive.computerId, equals(created.id));
+        final profiles = await (db.select(
+          db.diveProfiles,
+        )..where((t) => t.diveId.equals(diveId))).get();
+        expect(profiles.single.computerId, equals(created.id));
+      },
+    );
+
+    test('does not relink without a serial number', () async {
+      final oldId = await insertComputer(
+        manufacturer: 'Shearwater',
+        model: 'Perdix',
+        serialNumber: null,
+      );
+      final diveId = await insertDive(computerId: oldId);
+      await insertDataSource(
+        diveId: diveId,
+        computerId: oldId,
+        isPrimary: true,
+        computerModel: 'Shearwater Perdix',
+        sourceFormat: 'dive_computer',
+      );
+      await repository.deleteComputer(oldId);
+
+      await repository.createComputer(newComputer(serialNumber: null));
+
+      final sources = await (db.select(
+        db.diveDataSources,
+      )..where((t) => t.diveId.equals(diveId))).get();
+      expect(sources.single.computerId, isNull);
+      final dive = await (db.select(
+        db.dives,
+      )..where((t) => t.id.equals(diveId))).getSingle();
+      expect(dive.computerId, isNull);
+    });
+
+    test('leaves rows linked to another computer untouched', () async {
+      final otherId = await insertComputer(
+        id: 'other-computer',
+        manufacturer: 'Shearwater',
+        model: 'Perdix',
+        serialNumber: 'SN-12345',
+      );
+      final diveId = await insertDive(computerId: otherId);
+      await insertDataSource(
+        diveId: diveId,
+        computerId: otherId,
+        isPrimary: true,
+        computerModel: 'Shearwater Perdix',
+        computerSerial: 'SN-12345',
+        sourceFormat: 'dive_computer',
+      );
+
+      final created = await repository.createComputer(newComputer());
+
+      final sources = await (db.select(
+        db.diveDataSources,
+      )..where((t) => t.diveId.equals(diveId))).get();
+      expect(sources.single.computerId, equals(otherId));
+      final dive = await (db.select(
+        db.dives,
+      )..where((t) => t.id.equals(diveId))).getSingle();
+      expect(dive.computerId, equals(otherId));
+      expect(created.id, isNot(equals(otherId)));
+    });
+
+    test(
+      'relinks profiles only when the dive has a single computer source',
+      () async {
+        // A dive built from two computers keeps profile attribution ambiguous
+        // once one of them is deleted, so only the source row is relinked.
+        final oldId = await insertComputer(
+          manufacturer: 'Shearwater',
+          model: 'Perdix',
+          serialNumber: 'SN-12345',
+        );
+        final liveId = await insertComputer(
+          id: 'live-computer',
+          manufacturer: 'Shearwater',
+          model: 'Teric',
+          serialNumber: 'SN-99999',
+        );
+        final diveId = await insertDive(computerId: oldId);
+        await insertDataSource(
+          diveId: diveId,
+          computerId: oldId,
+          isPrimary: true,
+          computerModel: 'Shearwater Perdix',
+          computerSerial: 'SN-12345',
+          sourceFormat: 'dive_computer',
+        );
+        await insertDataSource(
+          diveId: diveId,
+          computerId: liveId,
+          computerModel: 'Shearwater Teric',
+          computerSerial: 'SN-99999',
+          sourceFormat: 'dive_computer',
+        );
+        await insertProfile(diveId: diveId, computerId: oldId);
+        await repository.deleteComputer(oldId);
+
+        final created = await repository.createComputer(newComputer());
+
+        final sources =
+            await (db.select(db.diveDataSources)
+                  ..where((t) => t.diveId.equals(diveId))
+                  ..orderBy([(t) => OrderingTerm.asc(t.computerSerial)]))
+                .get();
+        expect(sources, hasLength(2));
+        expect(sources.first.computerId, equals(created.id));
+        expect(sources.last.computerId, equals(liveId));
+        final dive = await (db.select(
+          db.dives,
+        )..where((t) => t.id.equals(diveId))).getSingle();
+        expect(dive.computerId, equals(created.id));
+        final profiles = await (db.select(
+          db.diveProfiles,
+        )..where((t) => t.diveId.equals(diveId))).get();
+        expect(profiles.single.computerId, isNull);
+      },
+    );
   });
 
   // ---------------------------------------------------------------------------

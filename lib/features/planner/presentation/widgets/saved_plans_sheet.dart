@@ -158,7 +158,7 @@ class _SavedPlansSheetState extends ConsumerState<SavedPlansSheet> {
                           Navigator.of(context).pop();
                           GoRouter.of(
                             context,
-                          ).go('/planning/dive-planner/compare?ids=$ids');
+                          ).push('/planning/dive-planner/compare?ids=$ids');
                         }
                       : null,
                   child: Text(
@@ -188,7 +188,9 @@ class _SavedPlansSheetState extends ConsumerState<SavedPlansSheet> {
       final plan = subplanFromJson(source);
       await ref.read(divePlanRepositoryProvider).savePlan(plan);
       navigator.pop();
-      router.go('/planning/dive-planner/${plan.id}');
+      // PUSH (not go): keep the canvas poppable so system back does not
+      // close the app (#647).
+      router.push('/planning/dive-planner/${plan.id}');
     } on FormatException catch (e) {
       messenger.showSnackBar(
         SnackBar(
@@ -237,7 +239,7 @@ class _PlanTile extends ConsumerWidget {
       subtitle: Text(subtitleParts.join(' · ')),
       onTap: () {
         context.pop();
-        context.go('/planning/dive-planner/${summary.id}');
+        context.push('/planning/dive-planner/${summary.id}');
       },
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
