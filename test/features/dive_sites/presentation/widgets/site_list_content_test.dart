@@ -17,6 +17,7 @@ import 'package:submersion/features/settings/presentation/providers/settings_pro
 import 'package:submersion/l10n/arb/app_localizations.dart';
 
 import '../../../../helpers/mock_providers.dart';
+import '../../../../helpers/selection_contract.dart';
 import '../../../../helpers/test_app.dart';
 import '../../../../helpers/test_database.dart';
 
@@ -47,6 +48,12 @@ SiteWithDiveCount _makeSite({
 Diver _makeDiver(String id) {
   return Diver(id: id, name: 'Diver $id', createdAt: _now, updatedAt: _now);
 }
+
+/// Mutable source for the contract test's filter step, so the visible list
+/// can be narrowed mid-test the way a real filter or search would.
+final _visibleSitesProvider = StateProvider<List<SiteWithDiveCount>>(
+  (ref) => const [],
+);
 
 Future<List<Override>> _buildPhoneOverrides({
   required List<SiteWithDiveCount> sites,
@@ -620,6 +627,53 @@ void main() {
   // Selection mode flows (exercises _toggleSelection, select-all,
   // deselect-all, close selection mode).
   // ---------------------------------------------------------------------------
+  group('selection contract', () {
+    testWidgets('satisfies the shared selection contract', (tester) async {
+      _setMobileTestSurfaceSize(tester);
+      final all = <SiteWithDiveCount>[
+        _makeSite(id: 's1', name: 'Aaa Site'),
+        _makeSite(id: 's2', name: 'Bbb Site'),
+        _makeSite(id: 's3', name: 'Ccc Site'),
+      ];
+
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+      final overrides = <Override>[
+        sharedPreferencesProvider.overrideWithValue(prefs),
+        settingsProvider.overrideWith((ref) => MockSettingsNotifier()),
+        currentDiverIdProvider.overrideWith(
+          (ref) => MockCurrentDiverIdNotifier(),
+        ),
+        _visibleSitesProvider.overrideWith((ref) => all),
+        // Reads the mutable provider so narrowing it narrows the list.
+        sortedSitesWithCountsProvider.overrideWith(
+          (ref) => AsyncValue.data(ref.watch(_visibleSitesProvider)),
+        ),
+        siteListNotifierProvider.overrideWith((ref) => _MockSiteListNotifier()),
+        siteListViewModeProvider.overrideWith((ref) => ListViewMode.detailed),
+        highlightedSiteIdProvider.overrideWith((ref) => null),
+      ];
+
+      await verifySelectionContract(
+        tester,
+        build: () => testApp(
+          overrides: overrides,
+          locale: const Locale('en'),
+          child: const SiteListContent(showAppBar: true),
+        ),
+        selectButton: find.byKey(const ValueKey('enter_selection')),
+        firstRow: find.text('Aaa Site'),
+        applyFilter: (tester) async {
+          final container = ProviderScope.containerOf(
+            tester.element(find.byType(SiteListContent)),
+          );
+          container.read(_visibleSitesProvider.notifier).state = [all.first];
+        },
+        visibleAfterFilter: 1,
+      );
+    });
+  });
+
   group('selection mode', () {
     testWidgets(
       'long press enters selection mode and shows selection app bar',
