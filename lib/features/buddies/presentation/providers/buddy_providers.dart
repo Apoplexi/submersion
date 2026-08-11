@@ -129,6 +129,7 @@ final buddyByIdProvider = FutureProvider.family<Buddy?, String>((
   id,
 ) async {
   final repository = ref.watch(buddyRepositoryProvider);
+  ref.invalidateSelfWhen(repository.watchBuddiesChanges());
   return repository.getBuddyById(id);
 });
 
@@ -154,24 +155,38 @@ final buddySearchProvider = FutureProvider.family<List<Buddy>, String>((
     return ref.watch(allBuddiesProvider).value ?? [];
   }
   final repository = ref.watch(buddyRepositoryProvider);
+  ref.invalidateSelfWhen(repository.watchBuddiesChanges());
   return repository.searchBuddies(query, diverId: validatedDiverId);
 });
 
-/// Buddy stats provider
+/// Buddy stats provider.
+///
+/// Aggregates the buddy's dives, so it takes the dives tick as well as the
+/// buddies tick. Without it the buddy detail header's dive count and the dive
+/// list beneath it disagreed after a merge: the list was reactive, the count
+/// was not (issue #974, same shape as #958 and #970).
 final buddyStatsProvider = FutureProvider.family<BuddyStats, String>((
   ref,
   buddyId,
 ) async {
   final repository = ref.watch(buddyRepositoryProvider);
+  ref.invalidateSelfWhen(repository.watchBuddiesChanges());
+  ref.invalidateSelfWhen(ref.read(diveRepositoryProvider).watchDivesChanges());
   return repository.getBuddyStats(buddyId);
 });
 
-/// Dive IDs for a buddy provider
+/// Dive IDs for a buddy provider.
+///
+/// A junction read: the ids come from `dive_buddies`, whose rows vanish by
+/// cascade when a dive is deleted, so the `buddies` table is never written and
+/// its tick alone would miss the change.
 final diveIdsForBuddyProvider = FutureProvider.family<List<String>, String>((
   ref,
   buddyId,
 ) async {
   final repository = ref.watch(buddyRepositoryProvider);
+  ref.invalidateSelfWhen(repository.watchBuddiesChanges());
+  ref.invalidateSelfWhen(ref.read(diveRepositoryProvider).watchDivesChanges());
   return repository.getDiveIdsForBuddy(buddyId);
 });
 

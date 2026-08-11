@@ -47,6 +47,9 @@ class ReefSnapshotRequest extends Equatable {
 }
 
 /// All reef-data parts for a location. Fetched when a site is viewed.
+// no-tick: reef data comes from REMOTE services (habitat, health, protection,
+// nearby species) cached aside by quantized coordinate. Nothing the app writes
+// can change it, so there is no table to subscribe to.
 final reefSnapshotProvider =
     FutureProvider.family<ReefSnapshot, ReefSnapshotRequest>((ref, request) {
       return ref
@@ -55,6 +58,7 @@ final reefSnapshotProvider =
     });
 
 /// Habitat alone, for the dive detail page's water-conditions card.
+// no-tick: remote reef data keyed by quantized coordinate, as above.
 final reefHabitatProvider =
     FutureProvider.family<ReefPart<ReefHabitat>, GeoPoint>((ref, location) {
       return ref.watch(reefRepositoryProvider).habitatFor(location);
@@ -80,6 +84,7 @@ class ReefHealthRequest extends Equatable {
 }
 
 /// Reef health as it was on a dive's date.
+// no-tick: remote reef data keyed by quantized coordinate and date, as above.
 final reefHealthForDiveProvider =
     FutureProvider.family<ReefPart<ReefHealth>, ReefHealthRequest>((
       ref,

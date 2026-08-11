@@ -39,6 +39,9 @@ class ResolvedAssetResult {
 /// Resolves the media item's asset ID on the current device via
 /// AssetResolutionService, then loads the thumbnail.
 /// Use this instead of assetThumbnailProvider for display contexts.
+// no-tick: the only repository call is clearEntry, a cache EVICTION performed
+// when resolution fails. There is no read whose result could go stale, and a
+// tick would re-run resolution every time the eviction itself wrote a row.
 final resolvedThumbnailProvider =
     FutureProvider.family<ResolvedAssetResult, MediaItem>((ref, item) async {
       final service = ref.watch(assetResolutionServiceProvider);
@@ -67,6 +70,8 @@ final resolvedThumbnailProvider =
 /// Resolved full-resolution provider for photo viewer.
 ///
 /// Same pattern as resolvedThumbnailProvider but loads full-res bytes.
+// no-tick: as resolvedThumbnailProvider -- the only repository call is a
+// clearEntry cache eviction, not a read.
 final resolvedFullResolutionProvider =
     FutureProvider.family<ResolvedAssetResult, MediaItem>((ref, item) async {
       final service = ref.watch(assetResolutionServiceProvider);

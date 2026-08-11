@@ -24,6 +24,7 @@ final speciesByCategoryProvider =
       category,
     ) async {
       final repository = ref.watch(speciesRepositoryProvider);
+      ref.invalidateSelfWhen(repository.watchSpeciesChanges());
       return repository.getSpeciesByCategory(category);
     });
 
@@ -36,6 +37,7 @@ final speciesSearchProvider = FutureProvider.family<List<Species>, String>((
     return ref.watch(allSpeciesProvider).value ?? [];
   }
   final repository = ref.watch(speciesRepositoryProvider);
+  ref.invalidateSelfWhen(repository.watchSpeciesChanges());
   return repository.searchSpecies(query);
 });
 
@@ -45,6 +47,7 @@ final speciesProvider = FutureProvider.family<Species?, String>((
   id,
 ) async {
   final repository = ref.watch(speciesRepositoryProvider);
+  ref.invalidateSelfWhen(repository.watchSpeciesChanges());
   return repository.getSpeciesById(id);
 });
 
@@ -151,6 +154,9 @@ final sightingsNotifierProvider =
     });
 
 /// Initialize species database with built-in species from bundled JSON asset
+// no-tick: a one-shot seeding ACTION, not a cached read. It returns void, so
+// there is no stale value to render, and ticking it on the species table would
+// make the seed re-run every time it wrote a row.
 final seedSpeciesProvider = FutureProvider<void>((ref) async {
   final repository = ref.watch(speciesRepositoryProvider);
   await repository.seedBuiltInSpecies();
@@ -256,6 +262,13 @@ final siteSpottedSpeciesProvider =
       siteId,
     ) async {
       final repository = ref.watch(speciesRepositoryProvider);
+      ref.invalidateSelfWhen(repository.watchSpeciesChanges());
+      // Derived from dive sightings, so it also goes stale when a dive is
+      // merged away or a sync applies remote sightings -- neither of which
+      // writes the species table.
+      ref.invalidateSelfWhen(
+        ref.read(diveRepositoryProvider).watchDiveDetailChanges(),
+      );
       return repository.getSpeciesSpottedAtSite(siteId);
     });
 
@@ -263,6 +276,7 @@ final siteSpottedSpeciesProvider =
 final siteExpectedSpeciesProvider =
     FutureProvider.family<List<SiteSpeciesEntry>, String>((ref, siteId) async {
       final repository = ref.watch(speciesRepositoryProvider);
+      ref.invalidateSelfWhen(repository.watchSpeciesChanges());
       return repository.getExpectedSpeciesForSite(siteId);
     });
 

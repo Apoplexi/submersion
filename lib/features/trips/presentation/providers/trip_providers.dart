@@ -70,6 +70,10 @@ final allTripsWithStatsProvider = FutureProvider<List<TripWithStats>>((
   final validatedDiverId = await ref.watch(
     validatedCurrentDiverIdProvider.future,
   );
+  ref.invalidateSelfWhen(repository.watchTripsChanges());
+  // The per-trip stats aggregate the trip's dives, so a merge or a bulk delete
+  // changes them without the trips table being written (issue #958).
+  ref.invalidateSelfWhen(ref.read(diveRepositoryProvider).watchDivesChanges());
   return repository.getAllTripsWithStats(diverId: validatedDiverId);
 });
 
@@ -83,7 +87,11 @@ final _equipmentFilteredTripsProvider =
       if (!tripsAsync.hasValue) return [];
 
       final trips = tripsAsync.value!;
+      // Constructed directly rather than read from equipmentRepositoryProvider:
+      // equipment_providers.dart imports this file, so reaching for its
+      // provider here would close an import cycle.
       final equipmentRepository = EquipmentRepository();
+      ref.invalidateSelfWhen(equipmentRepository.watchEquipmentChanges());
       final tripIds = await equipmentRepository.getTripIdsForEquipment(
         equipmentId,
       );
@@ -175,6 +183,7 @@ List<TripWithStats> _applyTripSorting(
 /// Single trip provider
 final tripByIdProvider = FutureProvider.family<Trip?, String>((ref, id) async {
   final repository = ref.watch(tripRepositoryProvider);
+  ref.invalidateSelfWhen(repository.watchTripsChanges());
   return repository.getTripById(id);
 });
 
@@ -265,6 +274,7 @@ final tripSearchProvider = FutureProvider.family<List<Trip>, String>((
     return ref.watch(allTripsProvider).value ?? [];
   }
   final repository = ref.watch(tripRepositoryProvider);
+  ref.invalidateSelfWhen(repository.watchTripsChanges());
   return repository.searchTrips(query, diverId: validatedDiverId);
 });
 
@@ -277,6 +287,7 @@ final tripForDateProvider = FutureProvider.family<Trip?, DateTime>((
   final validatedDiverId = await ref.watch(
     validatedCurrentDiverIdProvider.future,
   );
+  ref.invalidateSelfWhen(repository.watchTripsChanges());
   return repository.findTripForDate(date, diverId: validatedDiverId);
 });
 

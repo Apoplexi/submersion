@@ -6,6 +6,8 @@ import 'package:submersion/core/domain/visibility/visibility_scale.dart';
 import 'package:submersion/core/services/database_service.dart';
 import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/core/utils/gas_compressibility.dart';
+import 'package:submersion/core/utils/stream_debounce.dart';
+import 'package:submersion/features/dive_log/data/repositories/dive_repository_impl.dart';
 import 'package:submersion/features/dive_log/domain/models/dive_filter_state.dart';
 import 'package:submersion/features/statistics/data/dive_filter_sql.dart';
 import 'package:submersion/features/statistics/domain/entities/species_statistics.dart';
@@ -59,6 +61,50 @@ class DistributionSegment {
 class StatisticsRepository {
   AppDatabase get _db => DatabaseService.instance.database;
   final _log = LoggerService.forClass(StatisticsRepository);
+
+  /// Emits whenever any table the statistics queries read is written, so every
+  /// statistics provider refreshes after a merge, a bulk delete, an import, or
+  /// a sync pull -- none of which go through a notifier.
+  ///
+  /// Broader than [DiveRepository.watchDivesChanges] because the aggregate SQL
+  /// joins well beyond the `dives` table: `dive_tanks` and
+  /// `tank_pressure_profiles` carry all of the SAC math, `sightings`/`species`
+  /// the marine-life stats, `dive_sites`/`dive_centers`/`trips` the geographic
+  /// stats. Subscribing only to the dives tick would leave every SAC chart
+  /// stale after a sync applied a tank-pressure-only changeset, which never
+  /// touches the `dives` row.
+  ///
+  /// Narrower than [DiveRepository.watchDiveDetailChanges], which also fires on
+  /// media, tide records, and safety findings that no statistic reads.
+  ///
+  /// Replaces `statisticsVersionProvider`, a counter incremented from exactly
+  /// one line in the app (inside `PaginatedDiveListNotifier`), which merge,
+  /// consolidate, import, and sync never reached (issue #974).
+  ///
+  /// [DiveRepository.changeTickDebounce]-debounced so a multi-changeset sync
+  /// recomputes the charts once on the settled state rather than once per
+  /// intermediate commit.
+  Stream<void> watchStatisticsChanges() => _db
+      .tableUpdates(
+        TableUpdateQuery.allOf([
+          TableUpdateQuery.onTable(_db.dives),
+          TableUpdateQuery.onTable(_db.diveProfiles),
+          TableUpdateQuery.onTable(_db.diveTanks),
+          TableUpdateQuery.onTable(_db.tankPressureProfiles),
+          TableUpdateQuery.onTable(_db.diveEquipment),
+          TableUpdateQuery.onTable(_db.equipment),
+          TableUpdateQuery.onTable(_db.diveWeights),
+          TableUpdateQuery.onTable(_db.diveDiveTypes),
+          TableUpdateQuery.onTable(_db.diveBuddies),
+          TableUpdateQuery.onTable(_db.buddies),
+          TableUpdateQuery.onTable(_db.sightings),
+          TableUpdateQuery.onTable(_db.species),
+          TableUpdateQuery.onTable(_db.diveSites),
+          TableUpdateQuery.onTable(_db.diveCenters),
+          TableUpdateQuery.onTable(_db.trips),
+        ]),
+      )
+      .debounce(DiveRepository.changeTickDebounce);
 
   /// Smoothing interval used by [getAscentDescentRates], in seconds.
   ///

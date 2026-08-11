@@ -40,6 +40,7 @@ final inProgressCoursesProvider = FutureProvider<List<Course>>((ref) async {
   final validatedDiverId = await ref.watch(
     validatedCurrentDiverIdProvider.future,
   );
+  ref.invalidateSelfWhen(repository.watchCoursesChanges());
   return repository.getInProgressCourses(diverId: validatedDiverId);
 });
 
@@ -49,6 +50,7 @@ final completedCoursesProvider = FutureProvider<List<Course>>((ref) async {
   final validatedDiverId = await ref.watch(
     validatedCurrentDiverIdProvider.future,
   );
+  ref.invalidateSelfWhen(repository.watchCoursesChanges());
   return repository.getCompletedCourses(diverId: validatedDiverId);
 });
 
@@ -111,6 +113,7 @@ final courseByIdProvider = FutureProvider.family<Course?, String>((
   id,
 ) async {
   final repository = ref.watch(courseRepositoryProvider);
+  ref.invalidateSelfWhen(repository.watchCoursesChanges());
   return repository.getCourseById(id);
 });
 
@@ -132,6 +135,7 @@ final courseForCertificationProvider = FutureProvider.family<Course?, String>((
   certificationId,
 ) async {
   final repository = ref.watch(courseRepositoryProvider);
+  ref.invalidateSelfWhen(repository.watchCoursesChanges());
   return repository.getCourseForCertification(certificationId);
 });
 
@@ -160,6 +164,10 @@ final courseDivesProvider = FutureProvider.family<List<Dive>, String>((
 ///
 /// See [courseDivesProvider] for why this self-invalidates on dives-table
 /// writes; `getDiveCountForCourse` counts the same rows.
+///
+/// Deliberately does NOT take the courses tick: the count is over
+/// `dives.course_id`, so it changes only on dives-table writes and a course
+/// rename would rebuild it for nothing.
 final courseDiveCountProvider = FutureProvider.family<int, String>((
   ref,
   courseId,
@@ -182,6 +190,7 @@ final coursesByAgencyProvider =
       final validatedDiverId = await ref.watch(
         validatedCurrentDiverIdProvider.future,
       );
+      ref.invalidateSelfWhen(repository.watchCoursesChanges());
       return repository.getCoursesByAgency(agency, diverId: validatedDiverId);
     });
 
@@ -197,6 +206,7 @@ final courseSearchProvider = FutureProvider.family<List<Course>, String>((
     return ref.watch(allCoursesProvider).value ?? [];
   }
   final repository = ref.watch(courseRepositoryProvider);
+  ref.invalidateSelfWhen(repository.watchCoursesChanges());
   return repository.searchCourses(query, diverId: validatedDiverId);
 });
 

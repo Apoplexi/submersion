@@ -71,6 +71,7 @@ final equipmentSetGeofencesProvider =
       setId,
     ) async {
       final repo = ref.watch(equipmentSetRepositoryProvider);
+      ref.invalidateSelfWhen(repo.watchSetChanges());
       return repo.getGeofencesForSet(setId);
     });
 
@@ -89,6 +90,7 @@ class EquipmentSetSelectionInputs {
 final equipmentSetSelectionInputsProvider =
     FutureProvider<EquipmentSetSelectionInputs>((ref) async {
       final repo = ref.watch(equipmentSetRepositoryProvider);
+      ref.invalidateSelfWhen(repo.watchSetChanges());
       final diverId = await ref.watch(validatedCurrentDiverIdProvider.future);
       // Depend on equipmentSetsProvider so every set/item mutation (which
       // invalidates it via the notifier's refresh) rebuilds this bundle too;
