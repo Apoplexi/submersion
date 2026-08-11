@@ -1238,15 +1238,20 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      // One dive selected -> no Compare action (needs 2+).
+      final compare = find.byKey(const ValueKey('selection_action_compare3d'));
+
+      // One dive checked -> Compare is visible but disabled. Actions below
+      // their minCount render disabled rather than hidden, so the action set
+      // stays stable and users can see what an action needs.
       await tester.longPress(tileFinder('d1'));
       await tester.pumpAndSettle();
-      expect(find.byIcon(Icons.view_in_ar), findsNothing);
+      expect(compare, findsOneWidget);
+      expect(tester.widget<IconButton>(compare).onPressed, isNull);
 
-      // Select a second dive -> the Compare in 3D action appears.
+      // Check a second dive -> Compare in 3D enables.
       await tester.tap(tileFinder('d2'));
       await tester.pumpAndSettle();
-      expect(find.byIcon(Icons.view_in_ar), findsOneWidget);
+      expect(tester.widget<IconButton>(compare).onPressed, isNotNull);
     });
   });
 
