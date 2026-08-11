@@ -321,25 +321,24 @@ class _EquipmentListContentState extends ConsumerState<EquipmentListContent> {
   /// checked item active, or none of them -- so the action never has to guess
   /// what a mixed selection means.
   List<BulkAction> _bulkActions(List<EquipmentItem> equipment) {
-    final checked = equipment
-        .where((e) => _selectedIds.contains(e.id))
-        .toList();
-    final allActive = checked.isNotEmpty && checked.every((e) => e.isActive);
-    final noneActive = checked.isNotEmpty && checked.every((e) => !e.isActive);
+    bool everyChecked(Set<String> ids, bool Function(EquipmentItem) test) {
+      final checked = equipment.where((e) => ids.contains(e.id));
+      return checked.isNotEmpty && checked.every(test);
+    }
 
     return [
       BulkAction(
         id: 'retire',
         icon: Icons.archive,
         label: context.l10n.equipment_menu_retireEquipment,
-        maxCount: allActive ? null : 0,
+        isEnabled: (ids) => everyChecked(ids, (e) => e.isActive),
         onInvoke: () => _applyRetirement(retire: true),
       ),
       BulkAction(
         id: 'reactivate',
         icon: Icons.unarchive,
         label: context.l10n.equipment_menu_reactivate,
-        maxCount: noneActive ? null : 0,
+        isEnabled: (ids) => everyChecked(ids, (e) => !e.isActive),
         onInvoke: () => _applyRetirement(retire: false),
       ),
     ];
