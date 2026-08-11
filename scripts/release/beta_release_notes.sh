@@ -35,6 +35,9 @@
 # All progress and diagnostics go to stderr; stdout is only ever the notes.
 set -euo pipefail
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SANITIZE="$SCRIPT_DIR/sanitize_apple_store_notes.py"
+
 APPLE_LIMIT=4000
 PLAY_LIMIT=500
 # Room for the "...and N more." line appended after truncation.
@@ -316,13 +319,35 @@ LINES=""
 add() { LINES=$(append_line "$LINES" "$1"); }
 
 add_section() {
-  [ -n "$2" ] || return 0
+  items="$2"
+
+  # Apple bans references to other platforms in App Store metadata (App Review
+  # guideline 2.3.10), and PR titles name them constantly. `apple` is the only
+  # format that reaches Apple; `play` must NOT be sanitized, because Android is
+  # not a banned word on Google Play, and `markdown` keeps everything for the
+  # GitHub release body.
+  #
+  # This runs per item rather than over the finished body because the body is
+  # assembled item by item and then truncated against a hard character budget:
+  # sanitizing afterwards would invalidate that arithmetic and could re-orphan
+  # a heading. An item left empty, or reduced to the replacement phrase alone,
+  # is dropped so the heading above it is not left bare.
+  if [ "$FORMAT" = apple ] && [ -n "$items" ]; then
+    # The leading letter may be either case: an item is the start of its own
+    # line, so the sanitizer capitalises a replacement that lands there.
+    items=$(printf '%s\n' "$items" | "$SANITIZE" \
+      | sed -e '/^[[:space:]]*$/d' \
+            -e '/^[[:space:]]*[Oo]ther platforms[[:space:]]*$/d' \
+            -e '/^[[:space:]]*[Aa]nother store[[:space:]]*$/d')
+  fi
+
+  [ -n "$items" ] || return 0
   [ -n "$LINES" ] && add "H:"
   add "H:$1"
   while IFS= read -r item; do
     [ -n "$item" ] && add "I:- $item"
   done <<EOF
-$2
+$items
 EOF
 }
 

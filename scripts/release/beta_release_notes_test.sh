@@ -367,7 +367,10 @@ NEWWORK=$(echo "$OUT" | sed -n '1,/^Fixed$/p')
 FIXWORK=$(echo "$OUT" | sed -n '/^Fixed$/,$p')
 
 echo "$FIXWORK" | grep -q "unreliable S3 sync" || fail "a Fix-led title did not land under Fixed"
-echo "$FIXWORK" | grep -q "Linux opening grant" || fail "a Stop-led title did not land under Fixed"
+# Asserted on the part that survives sanitizing: this fixture's title names a
+# platform, and the apple format redacts it. Bucketing happens before that, so
+# the verb heuristic is still what this checks.
+echo "$FIXWORK" | grep -q "opening grant" || fail "a Stop-led title did not land under Fixed"
 echo "$NEWWORK" | grep -q "certification card photos" || fail "a Show-led title did not land under new work"
 
 # A conventional prefix still wins over the prose heuristic, in both
@@ -462,5 +465,38 @@ fi
 
 OUT=$(printf '%s\n' 'feat: something real' | "$GEN" --stdin --format apple)
 echo "$OUT" | grep -q "something real" || fail "--format apple produced no items"
+
+# --- Only the Apple format is sanitized --------------------------------------
+# Apple bans references to other platforms in App Store metadata (guideline
+# 2.3.10) and PR titles name them constantly. Google Play must NOT be
+# sanitized: Android is not a banned word there.
+
+PLATFORM_SUBJECTS=$(printf '%s\n' \
+  'fix(android): stop the USB download crashing' \
+  'feat: read the Windows certificate store' \
+  'fix: parse raw data on Linux')
+
+OUT=$(printf '%s\n' "$PLATFORM_SUBJECTS" | "$GEN" --stdin --format apple)
+echo "$OUT" | grep -qi "android" && fail "Android reached the Apple notes"
+echo "$OUT" | grep -q "Windows" && fail "Windows reached the Apple notes"
+echo "$OUT" | grep -qi "linux" && fail "Linux reached the Apple notes"
+echo "$OUT" | grep -q "stop the USB download crashing" \
+  || fail "sanitizing dropped the rest of the item"
+
+OUT=$(printf '%s\n' "$PLATFORM_SUBJECTS" | "$GEN" --stdin --format play)
+echo "$OUT" | grep -q "Windows" || fail "play notes were sanitized; they must not be"
+
+OUT=$(printf '%s\n' "$PLATFORM_SUBJECTS" | "$GEN" --stdin --format markdown)
+echo "$OUT" | grep -q "Windows" || fail "markdown notes were sanitized; they must not be"
+
+# An item that is nothing but a platform name leaves no bare heading behind,
+# and the script's existing empty-body fallback takes over.
+OUT=$(printf '%s\n' 'feat: Android' | "$GEN" --stdin --format apple)
+echo "$OUT" | grep -q "New in this build" \
+  && fail "a heading survived after its only item sanitized away"
+echo "$OUT" | grep -q "no new changes were recorded" \
+  || fail "the empty-body fallback did not fire after every item sanitized away"
+[ -n "$OUT" ] \
+  || fail "Apple notes came out empty; a tester reads that as 'the previous build's notes still apply'"
 
 echo "PASS: all beta_release_notes tests passed"
