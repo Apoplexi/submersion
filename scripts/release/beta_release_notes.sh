@@ -156,7 +156,38 @@ EOF
 
 subjects_in_range() {
   echo "Reading commits in ${1}..." >&2
-  git log --format='%s' --no-merges "$1"
+  # Walk the first-parent line of main. Each entry is either a PR merge, whose
+  # body's first line is the PR title, or a commit made straight to main.
+  #
+  # A --no-merges walk read the PR branch's own commits instead, which are
+  # working notes ("address review feedback") and mostly carry no conventional
+  # prefix, so they were bucketed as internal and never reached the stores.
+  #
+  # --first-parent also excludes merges made *inside* a PR branch, so a
+  # branch-sync merge ("Merge origin/main into <branch>") needs no special
+  # case: it is not on this line.
+  #
+  # Records are separated by \001 and fields by \002 because a commit body is
+  # multi-line and may contain anything else.
+  git log --first-parent --format='%x01%P%x02%s%x02%b' "$1" | awk '
+    BEGIN { RS = "\001"; FS = "\002" }
+    NF < 3 { next }
+    {
+      parents = $1
+      subject = $2
+      body = $3
+      if (parents ~ / /) {
+        # More than one parent: a merge. Only GitHub PR merges describe user
+        # work; anything else on this line is a manual merge and is skipped.
+        if (subject !~ /^Merge pull request #/) next
+        n = split(body, line, "\n")
+        for (i = 1; i <= n; i++)
+          if (line[i] ~ /[^ \t\r]/) { print line[i]; break }
+      } else {
+        print subject
+      }
+    }
+  '
 }
 
 # --- Collect commit subjects ------------------------------------------------

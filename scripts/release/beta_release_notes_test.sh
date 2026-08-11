@@ -244,4 +244,66 @@ if (cd "$TMPREPO2" && "$GEN" --since "$PREV_BETA" --format store --cumulative) >
   fail "--cumulative was accepted for the store format"
 fi
 
+# --- PR titles are the unit of a note ---------------------------------------
+# Only 14% of commits on main carry a conventional prefix; the tester-facing
+# summary of a change is its PR title, which this repository stores as the
+# first body line of the merge commit. A --no-merges walk discarded exactly
+# that, so build 1.7.3.5623 shipped "internal changes only" while its range
+# contained four user-visible fixes.
+
+TMPREPO4=$(mktemp -d)
+trap 'rm -rf "$TMPREPO" "$TMPREPO2" "$TMPREPO3" "$TMPREPO4"' EXIT
+(
+  cd "$TMPREPO4"
+  git init -q -b main .
+  git config user.email t@example.com
+  git config user.name Test
+  git commit -q --allow-empty -m 'feat: the shipped feature'
+  git tag v0.0.1.1
+  git rev-parse HEAD > .base
+
+  # A PR branch whose own commits are noisy but whose title is clean.
+  git checkout -q -b pr-one
+  git commit -q --allow-empty -m 'wip: rename a variable'
+  git commit -q --allow-empty -m 'address review feedback'
+  git checkout -q main
+  git merge -q --no-ff pr-one \
+    -m 'Merge pull request #1 from org/pr-one' \
+    -m 'Show uploaded certification card photos in the wallet'
+
+  # A second PR that first syncs main into its own branch. That inner merge is
+  # not on main's first-parent line and must contribute nothing.
+  git checkout -q -b pr-two
+  git commit -q --allow-empty -m 'more branch work'
+  git merge -q --no-ff main -m 'Merge origin/main into pr-two'
+  git checkout -q main
+  git merge -q --no-ff pr-two \
+    -m 'Merge pull request #2 from org/pr-two' \
+    -m 'Fix unreliable S3 sync on mobile networks'
+
+  # A commit pushed straight to main, belonging to no PR.
+  git commit -q --allow-empty -m 'Raise the iOS deployment target to 15.0'
+)
+BASE4=$(cat "$TMPREPO4/.base")
+
+OUT=$(cd "$TMPREPO4" && "$GEN" --since "$BASE4" --format markdown 2>/dev/null)
+
+echo "$OUT" | grep -q "Show uploaded certification card photos in the wallet" \
+  || fail "PR title missing from the notes"
+echo "$OUT" | grep -q "Fix unreliable S3 sync on mobile networks" \
+  || fail "second PR title missing from the notes"
+echo "$OUT" | grep -q "Raise the iOS deployment target to 15.0" \
+  || fail "a commit pushed directly to main was dropped"
+
+echo "$OUT" | grep -q "rename a variable" \
+  && fail "a PR branch commit leaked into the notes instead of the PR title"
+echo "$OUT" | grep -q "address review feedback" \
+  && fail "a PR branch commit leaked into the notes instead of the PR title"
+echo "$OUT" | grep -q "more branch work" \
+  && fail "a PR branch commit leaked into the notes instead of the PR title"
+echo "$OUT" | grep -qi "Merge origin/main" \
+  && fail "a branch-sync merge leaked into the notes"
+echo "$OUT" | grep -qi "^- Merge pull request" \
+  && fail "a merge subject leaked into the notes instead of its PR title"
+
 echo "PASS: all beta_release_notes tests passed"
