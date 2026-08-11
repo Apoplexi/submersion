@@ -7100,5 +7100,10 @@
   "common_selection_deselectAllTooltip": "إلغاء تحديد الكل",
   "common_bulkDelete_title": "حذف {count} عنصر؟",
   "common_bulkDelete_body": "لا يمكن التراجع عن هذا.",
-  "common_bulkDelete_snackbar": "تم حذف {count}"
+  "common_bulkDelete_snackbar": "تم حذف {count}",
+  "marineLife_species_delete_confirmTitle": "حذف النوع؟",
+  "marineLife_species_delete_confirmBody": "هل تريد بالتأكيد حذف \"{name}\"؟",
+  "marineLife_species_delete_inUseError": "لا يمكن حذف \"{name}\" - لديه مشاهدات",
+  "marineLife_species_delete_snackbar": "تم حذف \"{name}\"",
+  "marineLife_species_delete_error": "خطأ في حذف النوع: {error}"
 }

@@ -22414,4 +22414,27 @@ class AppLocalizationsZh extends AppLocalizations {
   String common_bulkDelete_snackbar(Object count) {
     return '已删除 $count 项';
   }
+
+  @override
+  String get marineLife_species_delete_confirmTitle => '删除物种？';
+
+  @override
+  String marineLife_species_delete_confirmBody(String name) {
+    return '确定要删除“$name”吗？';
+  }
+
+  @override
+  String marineLife_species_delete_inUseError(String name) {
+    return '无法删除“$name”——它有目击记录';
+  }
+
+  @override
+  String marineLife_species_delete_snackbar(String name) {
+    return '已删除“$name”';
+  }
+
+  @override
+  String marineLife_species_delete_error(String error) {
+    return '删除物种时出错：$error';
+  }
 }

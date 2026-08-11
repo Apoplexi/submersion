@@ -23570,4 +23570,27 @@ class AppLocalizationsDe extends AppLocalizations {
   String common_bulkDelete_snackbar(Object count) {
     return '$count gelöscht';
   }
+
+  @override
+  String get marineLife_species_delete_confirmTitle => 'Art löschen?';
+
+  @override
+  String marineLife_species_delete_confirmBody(String name) {
+    return 'Möchten Sie \"$name\" wirklich löschen?';
+  }
+
+  @override
+  String marineLife_species_delete_inUseError(String name) {
+    return '\"$name\" kann nicht gelöscht werden - es gibt Sichtungen';
+  }
+
+  @override
+  String marineLife_species_delete_snackbar(String name) {
+    return '\"$name\" gelöscht';
+  }
+
+  @override
+  String marineLife_species_delete_error(String error) {
+    return 'Fehler beim Löschen der Art: $error';
+  }
 }

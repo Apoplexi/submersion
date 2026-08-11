@@ -224,7 +224,9 @@ class _SpeciesManagePageState extends ConsumerState<SpeciesManagePage> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            'Cannot delete "${species.commonName}" - it has sightings',
+            context.l10n.marineLife_species_delete_inUseError(
+              species.commonName,
+            ),
           ),
           backgroundColor: Theme.of(context).colorScheme.error,
         ),
@@ -235,9 +237,11 @@ class _SpeciesManagePageState extends ConsumerState<SpeciesManagePage> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Delete Species?'),
+        title: Text(context.l10n.marineLife_species_delete_confirmTitle),
         content: Text(
-          'Are you sure you want to delete "${species.commonName}"?',
+          context.l10n.marineLife_species_delete_confirmBody(
+            species.commonName,
+          ),
         ),
         actions: [
           TextButton(
@@ -260,14 +264,22 @@ class _SpeciesManagePageState extends ConsumerState<SpeciesManagePage> {
         await notifier.deleteSpecies(species.id);
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Deleted "${species.commonName}"')),
+            SnackBar(
+              content: Text(
+                context.l10n.marineLife_species_delete_snackbar(
+                  species.commonName,
+                ),
+              ),
+            ),
           );
         }
       } catch (e) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Error deleting species: $e'),
+              content: Text(
+                context.l10n.marineLife_species_delete_error(e.toString()),
+              ),
               backgroundColor: Theme.of(context).colorScheme.error,
             ),
           );

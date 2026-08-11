@@ -7100,5 +7100,10 @@
   "common_selection_deselectAllTooltip": "Deseleziona tutto",
   "common_bulkDelete_title": "Eliminare {count} elementi?",
   "common_bulkDelete_body": "Questa azione non puo essere annullata.",
-  "common_bulkDelete_snackbar": "{count} eliminati"
+  "common_bulkDelete_snackbar": "{count} eliminati",
+  "marineLife_species_delete_confirmTitle": "Eliminare la specie?",
+  "marineLife_species_delete_confirmBody": "Vuoi davvero eliminare \"{name}\"?",
+  "marineLife_species_delete_inUseError": "Impossibile eliminare \"{name}\" - ha avvistamenti",
+  "marineLife_species_delete_snackbar": "\"{name}\" eliminata",
+  "marineLife_species_delete_error": "Errore durante l'eliminazione della specie: {error}"
 }

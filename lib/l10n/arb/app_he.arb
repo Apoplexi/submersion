@@ -7100,5 +7100,10 @@
   "common_selection_deselectAllTooltip": "בטל בחירת הכול",
   "common_bulkDelete_title": "למחוק {count} פריטים?",
   "common_bulkDelete_body": "לא ניתן לבטל פעולה זו.",
-  "common_bulkDelete_snackbar": "{count} נמחקו"
+  "common_bulkDelete_snackbar": "{count} נמחקו",
+  "marineLife_species_delete_confirmTitle": "למחוק מין?",
+  "marineLife_species_delete_confirmBody": "האם למחוק את \"{name}\"?",
+  "marineLife_species_delete_inUseError": "לא ניתן למחוק את \"{name}\" - יש לו תצפיות",
+  "marineLife_species_delete_snackbar": "\"{name}\" נמחק",
+  "marineLife_species_delete_error": "שגיאה במחיקת המין: {error}"
 }

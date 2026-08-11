@@ -7100,5 +7100,10 @@
   "common_selection_deselectAllTooltip": "Alles deselecteren",
   "common_bulkDelete_title": "{count} items verwijderen?",
   "common_bulkDelete_body": "Dit kan niet ongedaan worden gemaakt.",
-  "common_bulkDelete_snackbar": "{count} verwijderd"
+  "common_bulkDelete_snackbar": "{count} verwijderd",
+  "marineLife_species_delete_confirmTitle": "Soort verwijderen?",
+  "marineLife_species_delete_confirmBody": "Weet je zeker dat je \"{name}\" wilt verwijderen?",
+  "marineLife_species_delete_inUseError": "\"{name}\" kan niet worden verwijderd - er zijn waarnemingen",
+  "marineLife_species_delete_snackbar": "\"{name}\" verwijderd",
+  "marineLife_species_delete_error": "Fout bij verwijderen van soort: {error}"
 }

@@ -23430,4 +23430,27 @@ class AppLocalizationsNl extends AppLocalizations {
   String common_bulkDelete_snackbar(Object count) {
     return '$count verwijderd';
   }
+
+  @override
+  String get marineLife_species_delete_confirmTitle => 'Soort verwijderen?';
+
+  @override
+  String marineLife_species_delete_confirmBody(String name) {
+    return 'Weet je zeker dat je \"$name\" wilt verwijderen?';
+  }
+
+  @override
+  String marineLife_species_delete_inUseError(String name) {
+    return '\"$name\" kan niet worden verwijderd - er zijn waarnemingen';
+  }
+
+  @override
+  String marineLife_species_delete_snackbar(String name) {
+    return '\"$name\" verwijderd';
+  }
+
+  @override
+  String marineLife_species_delete_error(String error) {
+    return 'Fout bij verwijderen van soort: $error';
+  }
 }

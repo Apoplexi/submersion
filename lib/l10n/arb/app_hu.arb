@@ -7100,5 +7100,10 @@
   "common_selection_deselectAllTooltip": "Kijelölés megszüntetése",
   "common_bulkDelete_title": "{count} elem törlése?",
   "common_bulkDelete_body": "Ez a művelet nem vonható vissza.",
-  "common_bulkDelete_snackbar": "{count} törölve"
+  "common_bulkDelete_snackbar": "{count} törölve",
+  "marineLife_species_delete_confirmTitle": "Törli a fajt?",
+  "marineLife_species_delete_confirmBody": "Biztosan törli a következőt: \"{name}\"?",
+  "marineLife_species_delete_inUseError": "A(z) \"{name}\" nem törölhető - vannak észlelései",
+  "marineLife_species_delete_snackbar": "\"{name}\" törölve",
+  "marineLife_species_delete_error": "Hiba a faj törlésekor: {error}"
 }

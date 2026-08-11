@@ -23528,4 +23528,27 @@ class AppLocalizationsHu extends AppLocalizations {
   String common_bulkDelete_snackbar(Object count) {
     return '$count törölve';
   }
+
+  @override
+  String get marineLife_species_delete_confirmTitle => 'Törli a fajt?';
+
+  @override
+  String marineLife_species_delete_confirmBody(String name) {
+    return 'Biztosan törli a következőt: \"$name\"?';
+  }
+
+  @override
+  String marineLife_species_delete_inUseError(String name) {
+    return 'A(z) \"$name\" nem törölhető - vannak észlelései';
+  }
+
+  @override
+  String marineLife_species_delete_snackbar(String name) {
+    return '\"$name\" törölve';
+  }
+
+  @override
+  String marineLife_species_delete_error(String error) {
+    return 'Hiba a faj törlésekor: $error';
+  }
 }

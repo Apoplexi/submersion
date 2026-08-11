@@ -14960,5 +14960,30 @@
     "placeholders": {
       "count": { "type": "Object" }
     }
+  },
+  "marineLife_species_delete_confirmTitle": "Delete species?",
+  "marineLife_species_delete_confirmBody": "Are you sure you want to delete \"{name}\"?",
+  "marineLife_species_delete_inUseError": "Cannot delete \"{name}\" - it has sightings",
+  "marineLife_species_delete_snackbar": "Deleted \"{name}\"",
+  "marineLife_species_delete_error": "Error deleting species: {error}",
+  "@marineLife_species_delete_confirmBody": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "@marineLife_species_delete_inUseError": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "@marineLife_species_delete_snackbar": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "@marineLife_species_delete_error": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
   }
 }

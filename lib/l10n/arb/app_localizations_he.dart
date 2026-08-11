@@ -23017,4 +23017,27 @@ class AppLocalizationsHe extends AppLocalizations {
   String common_bulkDelete_snackbar(Object count) {
     return '$count נמחקו';
   }
+
+  @override
+  String get marineLife_species_delete_confirmTitle => 'למחוק מין?';
+
+  @override
+  String marineLife_species_delete_confirmBody(String name) {
+    return 'האם למחוק את \"$name\"?';
+  }
+
+  @override
+  String marineLife_species_delete_inUseError(String name) {
+    return 'לא ניתן למחוק את \"$name\" - יש לו תצפיות';
+  }
+
+  @override
+  String marineLife_species_delete_snackbar(String name) {
+    return '\"$name\" נמחק';
+  }
+
+  @override
+  String marineLife_species_delete_error(String error) {
+    return 'שגיאה במחיקת המין: $error';
+  }
 }
