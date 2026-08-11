@@ -149,4 +149,102 @@ void main() {
       expect(controller.value.checkedIds, {'a'});
     });
   });
+
+  group('SelectionController bulk operations', () {
+    test('selectAll activates explicitly and checks every selectable id', () {
+      final controller = SelectionController();
+      controller.selectAll(['a', 'b', 'c']);
+      expect(controller.value.isActive, isTrue);
+      expect(controller.value.enteredExplicitly, isTrue);
+      expect(controller.value.checkedIds, {'a', 'b', 'c'});
+    });
+
+    test(
+      'selectAll only checks the ids it is given, excluding disabled rows',
+      () {
+        final controller = SelectionController();
+        controller.enterImplicit('a');
+        // 'c' is non-selectable, so the surface omits it from the argument.
+        controller.selectAll(['a', 'b']);
+        expect(controller.value.checkedIds, {'a', 'b'});
+      },
+    );
+
+    test('deselectAll clears but keeps an explicit mode active', () {
+      final controller = SelectionController();
+      controller.enterExplicit();
+      controller.toggle('a');
+      controller.deselectAll();
+      expect(controller.value.isActive, isTrue);
+      expect(controller.value.checkedIds, isEmpty);
+    });
+
+    test('deselectAll ends an implicit mode', () {
+      final controller = SelectionController();
+      controller.enterImplicit('a');
+      controller.deselectAll();
+      expect(controller.value.isActive, isFalse);
+    });
+  });
+
+  group('SelectionController.pruneTo', () {
+    test('drops checked ids that left the visible set', () {
+      final controller = SelectionController();
+      controller.enterExplicit();
+      controller.toggle('a');
+      controller.toggle('b');
+      controller.toggle('c');
+      controller.pruneTo(['a', 'c']);
+      expect(controller.value.checkedIds, {'a', 'c'});
+    });
+
+    test('clears the anchor when the anchor is no longer visible', () {
+      final controller = SelectionController();
+      // extendTo keeps the anchor on 'b' while also checking 'c', so pruning
+      // 'b' away leaves a surviving selection with a stale anchor.
+      controller.enterImplicit('b');
+      controller.extendTo('c', ['a', 'b', 'c']);
+      expect(controller.value.anchorId, 'b');
+
+      controller.pruneTo(['a', 'c']);
+      expect(controller.value.checkedIds, {'c'});
+      expect(controller.value.anchorId, isNull);
+    });
+
+    test('ends an implicit mode when pruning empties the selection', () {
+      final controller = SelectionController();
+      controller.enterImplicit('b');
+      controller.pruneTo(['a', 'c']);
+      expect(controller.value.isActive, isFalse);
+    });
+
+    test(
+      'keeps an explicit mode active when pruning empties the selection',
+      () {
+        final controller = SelectionController();
+        controller.enterExplicit();
+        controller.toggle('b');
+        controller.pruneTo(['a', 'c']);
+        expect(controller.value.isActive, isTrue);
+        expect(controller.value.checkedIds, isEmpty);
+      },
+    );
+
+    test('does nothing and does not notify when the mode is inactive', () {
+      final controller = SelectionController();
+      var notifications = 0;
+      controller.addListener(() => notifications++);
+      controller.pruneTo(['a']);
+      expect(notifications, 0);
+    });
+
+    test('does not notify when nothing was pruned', () {
+      final controller = SelectionController();
+      controller.enterImplicit('a');
+      var notifications = 0;
+      controller.addListener(() => notifications++);
+      controller.pruneTo(['a', 'b']);
+      expect(notifications, 0);
+    });
+  });
 }

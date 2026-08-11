@@ -97,6 +97,62 @@ class SelectionController extends ValueNotifier<SelectionState> {
     );
   }
 
+  /// Check every id in [selectableIds].
+  ///
+  /// The surface passes only rows that can actually be acted on, so
+  /// non-selectable rows are excluded by omission rather than by a filter
+  /// here. Counts as explicit entry: the user asked for all of them.
+  void selectAll(List<String> selectableIds) {
+    value = SelectionState(
+      checkedIds: Set<String>.from(selectableIds),
+      isActive: true,
+      enteredExplicitly: true,
+      anchorId: value.anchorId,
+    );
+  }
+
+  /// Uncheck everything, ending an implicitly entered mode.
+  ///
+  /// Ending the implicit mode here is the same rule as unchecking the last
+  /// item by hand, so the two paths cannot disagree.
+  void deselectAll() {
+    if (!value.enteredExplicitly) {
+      exit();
+      return;
+    }
+    value = value.copyWith(checkedIds: const <String>{}, clearAnchor: true);
+  }
+
+  /// Drop checked ids that are no longer in [visibleIds].
+  ///
+  /// Called whenever the filtered, searched or sorted list changes, so the
+  /// count always matches what is on screen and a bulk action can never reach
+  /// a record the user cannot see.
+  void pruneTo(List<String> visibleIds) {
+    if (!value.isActive) return;
+
+    final visible = visibleIds.toSet();
+    final next = value.checkedIds.where(visible.contains).toSet();
+    final anchorStillVisible =
+        value.anchorId != null && visible.contains(value.anchorId);
+
+    if (next.length == value.checkedIds.length &&
+        (value.anchorId == null || anchorStillVisible)) {
+      return;
+    }
+
+    if (next.isEmpty && !value.enteredExplicitly) {
+      exit();
+      return;
+    }
+
+    value = value.copyWith(
+      checkedIds: next,
+      anchorId: anchorStillVisible ? value.anchorId : null,
+      clearAnchor: !anchorStillVisible,
+    );
+  }
+
   /// Leave selection mode and discard the selection.
   void exit() {
     value = SelectionState.inactive;
