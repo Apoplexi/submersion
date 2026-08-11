@@ -17,6 +17,7 @@ import 'package:submersion/shared/providers/entity_table_config_providers.dart';
 
 import '../../../../helpers/mock_providers.dart';
 import '../../../../helpers/test_app.dart';
+import '../../../../helpers/selection_contract.dart';
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -36,6 +37,11 @@ class _MockCertListNotifier
     implements CertificationListNotifier {
   _MockCertListNotifier(List<Certification> certs)
     : super(AsyncValue.data(certs));
+
+  /// Narrow the visible list, standing in for a filter change.
+  void showOnly(List<Certification> certs) {
+    state = AsyncValue.data(certs);
+  }
 
   @override
   dynamic noSuchMethod(Invocation invocation) => null;
@@ -122,6 +128,49 @@ Future<List<Override>> _buildPhoneOverrides({
 }
 
 void main() {
+  group('selection contract', () {
+    testWidgets('satisfies the shared selection contract', (tester) async {
+      final all = <Certification>[
+        _makeCert(id: 'x1', name: 'Aaa Cert'),
+        _makeCert(id: 'x2', name: 'Bbb Cert'),
+        _makeCert(id: 'x3', name: 'Ccc Cert'),
+      ];
+      final notifier = _MockCertListNotifier(all);
+
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+      final overrides = <Override>[
+        sharedPreferencesProvider.overrideWithValue(prefs),
+        settingsProvider.overrideWith((ref) => MockSettingsNotifier()),
+        currentDiverIdProvider.overrideWith(
+          (ref) => MockCurrentDiverIdNotifier(),
+        ),
+        certificationListNotifierProvider.overrideWith((ref) => notifier),
+        certificationListViewModeProvider.overrideWith(
+          (ref) => ListViewMode.detailed,
+        ),
+        certificationTableConfigProvider.overrideWith(
+          (ref) => _TestCertTableConfigNotifier(_testConfig),
+        ),
+      ];
+
+      await verifySelectionContract(
+        tester,
+        build: () => testApp(
+          overrides: overrides,
+          locale: const Locale('en'),
+          child: const CertificationListContent(showAppBar: true),
+        ),
+        selectButton: find.byKey(const ValueKey('enter_selection')),
+        firstRow: find.text('Aaa Cert'),
+        applyFilter: (tester) async {
+          notifier.showOnly([all.first]);
+        },
+        visibleAfterFilter: 1,
+      );
+    });
+  });
+
   group('CertificationListContent in table mode', () {
     testWidgets('renders table with column headers', (tester) async {
       final certs = [
