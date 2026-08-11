@@ -2,6 +2,25 @@ import 'package:flutter/foundation.dart';
 
 import 'package:submersion/shared/selection/selection_state.dart';
 
+/// Inclusive id span between [anchorId] and [targetId] within [orderedIds].
+///
+/// Order-independent: extending backwards selects the same range. Returns an
+/// empty list when either id is absent, so a stale anchor cannot select a
+/// wrong span.
+List<String> idsInRange(
+  List<String> orderedIds,
+  String anchorId,
+  String targetId,
+) {
+  final anchorIndex = orderedIds.indexOf(anchorId);
+  final targetIndex = orderedIds.indexOf(targetId);
+  if (anchorIndex < 0 || targetIndex < 0) return const [];
+
+  final lo = anchorIndex < targetIndex ? anchorIndex : targetIndex;
+  final hi = anchorIndex < targetIndex ? targetIndex : anchorIndex;
+  return [for (var i = lo; i <= hi; i++) orderedIds[i]];
+}
+
 /// Owns the multi-selection state machine for one list or grid surface.
 ///
 /// Deliberately not a Riverpod provider: selection prunes to the visible set
@@ -51,6 +70,31 @@ class SelectionController extends ValueNotifier<SelectionState> {
       return;
     }
     value = value.copyWith(checkedIds: next, anchorId: id);
+  }
+
+  /// Check every item between the anchor and [targetId] in [orderedIds].
+  ///
+  /// The anchor is the controller's current anchor, else [fallbackAnchorId]
+  /// (the row highlighted in the detail pane), else [targetId] itself. The
+  /// anchor never moves during extension, so consecutive shift-clicks extend
+  /// from the original origin rather than walking it forward.
+  void extendTo(
+    String targetId,
+    List<String> orderedIds, {
+    String? fallbackAnchorId,
+  }) {
+    if (!orderedIds.contains(targetId)) return;
+
+    final anchor = value.anchorId ?? fallbackAnchorId ?? targetId;
+    final next = Set<String>.from(value.checkedIds)
+      ..addAll(idsInRange(orderedIds, anchor, targetId));
+
+    value = SelectionState(
+      checkedIds: next,
+      isActive: true,
+      enteredExplicitly: value.isActive ? value.enteredExplicitly : false,
+      anchorId: anchor,
+    );
   }
 
   /// Leave selection mode and discard the selection.
