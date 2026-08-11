@@ -60,7 +60,7 @@ List<DiveDataSourcesData> _canonicalDataSourceRows(
   List<DiveDataSourcesData> rows,
 ) {
   final seenComputers = <String>{};
-  final result = <DiveDataSourceData>[];
+  final result = <DiveDataSourcesData>[];
   for (final row in rows) {
     final computerId = row.computerId;
     if (computerId == null) {
