@@ -2813,6 +2813,14 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get dashboard_hero_divesTotalOne => '1 次潜水';
+
+  @override
+  String dashboard_hero_divesTotalOther(Object count) {
+    return '$count 次潜水';
+  }
+
+  @override
   String get dashboard_hero_error => '准备好探索深海了吗？';
 
   @override

@@ -1838,6 +1838,8 @@
   "dashboard_greeting_withoutName": "{greeting}!",
   "dashboard_hero_divesLoggedOne": "1 dive logged",
   "dashboard_hero_divesLoggedOther": "{count} dives logged",
+  "dashboard_hero_divesTotalOne": "1 dive",
+  "dashboard_hero_divesTotalOther": "{count} dives",
   "dashboard_hero_error": "Ready to explore the depths?",
   "dashboard_hero_hoursUnderwater": "{hours} hours underwater",
   "dashboard_hero_loading": "Loading your dive stats...",
@@ -2223,6 +2225,13 @@
     }
   },
   "@dashboard_hero_divesLoggedOther": {
+    "placeholders": {
+      "count": {
+        "type": "Object"
+      }
+    }
+  },
+  "@dashboard_hero_divesTotalOther": {
     "placeholders": {
       "count": {
         "type": "Object"

@@ -1005,6 +1005,8 @@
   "dashboard_greeting_withoutName": "{greeting} !",
   "dashboard_hero_divesLoggedOne": "1 plongee enregistree",
   "dashboard_hero_divesLoggedOther": "{count} plongees enregistrees",
+  "dashboard_hero_divesTotalOne": "1 plongee",
+  "dashboard_hero_divesTotalOther": "{count} plongees",
   "dashboard_hero_error": "Pret a explorer les profondeurs ?",
   "dashboard_hero_hoursUnderwater": "{hours} heures sous l'eau",
   "dashboard_hero_loading": "Chargement de tes statistiques de plongee...",
