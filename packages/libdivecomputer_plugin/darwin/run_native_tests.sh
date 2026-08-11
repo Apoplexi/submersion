@@ -22,6 +22,15 @@ swiftc -o "$BUILD_DIR/ble_characteristic_selector_tests" \
 
 "$BUILD_DIR/ble_characteristic_selector_tests"
 
+# Telit Terminal I/O credit accounting (issue #923). The OSTC4's BlueMod+SR
+# module keeps its UART bridge closed until the client grants credits, and
+# spends one per notification, so the balance has to be topped up mid-transfer.
+swiftc -o "$BUILD_DIR/terminal_io_credit_policy_tests" \
+    Sources/LibDCDarwin/TerminalIoCreditPolicy.swift \
+    Tests/TerminalIoCreditPolicyTests/main.swift
+
+"$BUILD_DIR/terminal_io_credit_policy_tests"
+
 # SerialPortEnumerator pure-logic tests (USB-serial port classification and
 # candidate selection for the Mares Puck Pro / serial-over-USB download path).
 # -framework IOKit satisfies the IOKit references in enumerateUsbSerialPaths();
