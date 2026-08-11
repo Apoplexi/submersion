@@ -111,12 +111,20 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
               await _disableEncryption();
               return;
             }
-            final createdCredential = !hasCredential;
-            if (createdCredential) {
+            final dbPath = await _dbPath();
+            if (!mounted) return;
+            final credentialExists =
+                hasCredential || _security.hasCredential(dbPath: dbPath);
+            if (!credentialExists) {
               final ok = await _setupCredential(enableAppLock: false);
               if (!ok || !mounted) return;
+            } else if (!_security.isUnlocked) {
+              final secret = await _promptPassword(
+                l10n.settings_security_unlock_title,
+              );
+              if (secret == null || !mounted) return;
             }
-            await _enableEncryption(clearCredentialOnCancel: createdCredential);
+            await _enableEncryption(clearCredentialOnCancel: !hasCredential);
           },
         ),
       ],
@@ -132,6 +140,12 @@ class _SecuritySettingsPageState extends State<SecuritySettingsPage> {
 
   Future<bool> _enableAppLock() async {
     if (_security.encryptionEnabled) {
+      if (!_security.isUnlocked) {
+        final secret = await _promptPassword(
+          context.l10n.settings_security_unlock_title,
+        );
+        if (secret == null || !mounted) return false;
+      }
       await _security.setAppLockEnabled(true);
       if (mounted) setState(() {});
       return true;

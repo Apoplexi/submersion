@@ -60,6 +60,10 @@ class DatabaseSecurityService {
   bool get encryptionEnabled => _p.dbEncryptionEnabled;
   bool get isUnlocked => _mlk != null;
 
+  /// Whether durable security credentials already exist for [dbPath].
+  bool hasCredential({required String dbPath}) =>
+      DatabaseSecuritySidecar.existsFor(dbPath);
+
   /// The key id minted at enableSecurity, once unlocked. Stable across
   /// password changes (rewrap only); used to label rebuilt sidecars.
   String? get libraryKeyId => _libraryKeyId;

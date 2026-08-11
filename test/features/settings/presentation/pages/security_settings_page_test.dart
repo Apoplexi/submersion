@@ -20,6 +20,8 @@ void main() {
 
   late Directory tmp;
   late String dbPath;
+  late SharedPreferences prefs;
+  late InMemoryKeychain keychain;
 
   setUp(() async {
     tmp = await Directory.systemTemp.createTemp('security_page_test');
@@ -37,10 +39,19 @@ void main() {
 
   Future<void> configure(Map<String, Object> prefsValues) async {
     SharedPreferences.setMockInitialValues(prefsValues);
-    final prefs = await SharedPreferences.getInstance();
+    prefs = await SharedPreferences.getInstance();
+    keychain = InMemoryKeychain();
     await DatabaseSecurityService.instance.configure(
       prefs: prefs,
-      keyStore: DatabaseSecurityKeyStore(storage: InMemoryKeychain()),
+      keyStore: DatabaseSecurityKeyStore(storage: keychain),
+    );
+  }
+
+  Future<void> resetInMemorySecurity() async {
+    DatabaseSecurityService.instance.resetForTesting();
+    await DatabaseSecurityService.instance.configure(
+      prefs: prefs,
+      keyStore: DatabaseSecurityKeyStore(storage: keychain),
     );
   }
 
@@ -165,6 +176,33 @@ void main() {
     },
   );
 
+  testWidgets(
+    'orphaned sidecar unlocks existing credential before encryption confirmation',
+    (tester) async {
+      await configureWithPassword(
+        tester,
+        'existing-encryption-pw',
+        appLockEnabled: false,
+      );
+      await resetInMemorySecurity();
+      await pumpPage(tester);
+
+      await tester.tap(find.text('Encrypt database'));
+      await settle(tester);
+
+      expect(find.byType(SecuritySetupDialog), findsNothing);
+      expect(find.byType(TextField), findsOneWidget);
+
+      await tester.enterText(find.byType(TextField), 'existing-encryption-pw');
+      await tester.tap(find.widgetWithText(FilledButton, 'Continue'));
+      await settle(tester);
+
+      expect(find.text('Encrypt database?'), findsOneWidget);
+      expect(DatabaseSecurityService.instance.appLockEnabled, false);
+      expect(DatabaseSecurityService.instance.encryptionEnabled, false);
+    },
+  );
+
   testWidgets('encryption-only state renders encryption on and management', (
     tester,
   ) async {
@@ -195,6 +233,31 @@ void main() {
     expect(find.byType(SecuritySetupDialog), findsNothing);
     expect(DatabaseSecurityService.instance.appLockEnabled, true);
   });
+
+  testWidgets(
+    'locked encryption credential is required before enabling app lock',
+    (tester) async {
+      await configureWithPassword(tester, 'existing-pw', appLockEnabled: false);
+      await DatabaseSecurityService.instance.preferences.setDbEncryptionEnabled(
+        true,
+      );
+      await resetInMemorySecurity();
+      await pumpPage(tester);
+
+      await tester.tap(find.text('App Lock'));
+      await settle(tester);
+
+      expect(find.byType(SecuritySetupDialog), findsNothing);
+      expect(find.byType(TextField), findsOneWidget);
+      expect(DatabaseSecurityService.instance.appLockEnabled, false);
+
+      await tester.enterText(find.byType(TextField), 'existing-pw');
+      await tester.tap(find.widgetWithText(FilledButton, 'Continue'));
+      await settle(tester);
+
+      expect(DatabaseSecurityService.instance.appLockEnabled, true);
+    },
+  );
 
   group('auto-lock timeout', () {
     testWidgets('shows the current value and persists a new selection', (
