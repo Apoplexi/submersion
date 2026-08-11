@@ -695,6 +695,38 @@ class DiveRepository {
     );
   }
 
+  /// Collapses [rows] so at most one dive_data_sources row survives per
+  /// non-null computerId, keeping the first row encountered -- since every
+  /// caller queries in `desc(isPrimary), asc(createdAt)` order, that's the
+  /// primary if one exists, else the earliest-created. Rows with a null
+  /// computerId (manual entries, edited profiles) are never deduped; there
+  /// is nothing to collide on.
+  ///
+  /// A same-computer sequential merge (DiveMergeService.apply, step 10)
+  /// carries over every original dive's data source row as provenance; when
+  /// both originals were logged by the same physical computer, that
+  /// produces two rows sharing one computerId on the merged dive. Without
+  /// this, getProfilesByDataSource's computerId -> sourceId lookup collides
+  /// and silently misroutes every profile point to whichever row is
+  /// iterated last, and getDataSources shows a second, empty, selectable
+  /// chip for the row that lost the collision.
+  List<DiveDataSourcesData> _canonicalDataSourceRows(
+    List<DiveDataSourcesData> rows,
+  ) {
+    final seenComputers = <String>{};
+    final result = <DiveDataSourcesData>[];
+    for (final row in rows) {
+      final computerId = row.computerId;
+      if (computerId == null) {
+        result.add(row);
+        continue;
+      }
+      if (!seenComputers.add(computerId)) continue;
+      result.add(row);
+    }
+    return result;
+  }
+
   /// Get profile samples grouped by owning data source.
   ///
   /// Keys are dive_data_sources ids, primary source first. Rows with a null
@@ -707,14 +739,15 @@ class DiveRepository {
     String diveId,
   ) async {
     try {
-      final sourceRows =
-          await (_db.select(_db.diveDataSources)
-                ..where((t) => t.diveId.equals(diveId))
-                ..orderBy([
-                  (t) => OrderingTerm.desc(t.isPrimary),
-                  (t) => OrderingTerm.asc(t.createdAt),
-                ]))
-              .get();
+      final sourceRows = _canonicalDataSourceRows(
+        await (_db.select(_db.diveDataSources)
+              ..where((t) => t.diveId.equals(diveId))
+              ..orderBy([
+                (t) => OrderingTerm.desc(t.isPrimary),
+                (t) => OrderingTerm.asc(t.createdAt),
+              ]))
+            .get(),
+      );
       if (sourceRows.isEmpty) {
         // Legacy/imported dives can carry dive_profiles rows without a
         // dive_data_sources metadata row (older import paths predate that
