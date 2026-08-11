@@ -74,8 +74,8 @@ void main() {
       () async {
         final payload = await const MacDiveSqliteParser().parse(validBytes);
         final equipment = payload.entitiesOf(ImportEntityType.equipment);
-        expect(equipment, hasLength(1));
-        final gear = equipment.single;
+        expect(equipment, hasLength(2));
+        final gear = equipment.firstWhere((g) => g['name'] == 'Hydros Pro');
         expect(gear['name'], 'Hydros Pro');
         expect(gear['uddfId'], 'gear-uuid-1');
         expect(gear['sourceUuid'], 'gear-uuid-1');

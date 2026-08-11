@@ -9481,18 +9481,6 @@ abstract class AppLocalizations {
   /// **'Dive #{number} Profile'**
   String diveLog_fullscreenProfile_title(Object number);
 
-  /// No description provided for @diveLog_instruments_customize.
-  ///
-  /// In en, this message translates to:
-  /// **'Customize instruments'**
-  String get diveLog_instruments_customize;
-
-  /// No description provided for @diveLog_instruments_customizeHint.
-  ///
-  /// In en, this message translates to:
-  /// **'Toggle instruments on or off. Drag to reorder.'**
-  String get diveLog_instruments_customizeHint;
-
   /// No description provided for @diveLog_legend_label_ascentRate.
   ///
   /// In en, this message translates to:
@@ -25216,6 +25204,18 @@ abstract class AppLocalizations {
   /// **'Choose a synced folder (Dropbox, Google Drive, etc.)'**
   String get settings_storage_customFolder_subtitle;
 
+  /// No description provided for @settings_storage_customFolder_subtitleDeviceOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Move the database to internal storage or SD card'**
+  String get settings_storage_customFolder_subtitleDeviceOnly;
+
+  /// No description provided for @settings_storage_customFolder_deviceOnly_noCloudSync.
+  ///
+  /// In en, this message translates to:
+  /// **'App-managed cloud sync is disabled while the database sits on a device storage volume. No sync service can reach that folder on Android, so use Backup & Restore to keep copies elsewhere.'**
+  String get settings_storage_customFolder_deviceOnly_noCloudSync;
+
   /// No description provided for @settings_storage_dbStats.
   ///
   /// In en, this message translates to:
@@ -35277,6 +35277,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Files here are removed if you uninstall the app.'**
   String get db_location_external_note;
+
+  /// No description provided for @db_location_backup_note.
+  ///
+  /// In en, this message translates to:
+  /// **'Android cannot run the database from a cloud-synced folder. To keep a copy in Dropbox, Nextcloud, or Google Drive, set a Backup Location under Backup & Restore.'**
+  String get db_location_backup_note;
 
   /// No description provided for @diveLog_bulkEdit_membership_onAll.
   ///

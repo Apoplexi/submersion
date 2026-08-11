@@ -952,7 +952,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get backup_location_default => 'Ubicacion predeterminada';
 
   @override
-  String get backup_location_title => 'Ubicacion de Copia de Seguridad';
+  String get backup_location_title => 'Ubicación de Copia de Seguridad';
 
   @override
   String get backup_replaceConfirm_confirm => 'Reemplazar en todas partes';
@@ -5695,13 +5695,6 @@ class AppLocalizationsEs extends AppLocalizations {
   String diveLog_fullscreenProfile_title(Object number) {
     return 'Perfil de inmersión #$number';
   }
-
-  @override
-  String get diveLog_instruments_customize => 'Personalizar instrumentos';
-
-  @override
-  String get diveLog_instruments_customizeHint =>
-      'Activa o desactiva instrumentos. Arrastra para reordenar.';
 
   @override
   String get diveLog_legend_label_ascentRate => 'Velocidad de ascenso';
@@ -15001,6 +14994,14 @@ class AppLocalizationsEs extends AppLocalizations {
       'Elige una carpeta sincronizada (Dropbox, Google Drive, etc.)';
 
   @override
+  String get settings_storage_customFolder_subtitleDeviceOnly =>
+      'Mueve la base de datos al almacenamiento interno o a la tarjeta SD';
+
+  @override
+  String get settings_storage_customFolder_deviceOnly_noCloudSync =>
+      'La sincronización en la nube gestionada por la app está desactivada mientras la base de datos esté en un volumen de almacenamiento del dispositivo. Ningún servicio de sincronización puede acceder a esa carpeta en Android, así que usa Copia de Seguridad y Restaurar para guardar copias en otro lugar.';
+
+  @override
   String settings_storage_dbStats(
     Object fileSize,
     Object diveCount,
@@ -21227,6 +21228,10 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get db_location_external_note =>
       'Los archivos aquí se eliminan si desinstalas la aplicación.';
+
+  @override
+  String get db_location_backup_note =>
+      'Android no puede ejecutar la base de datos desde una carpeta sincronizada en la nube. Para guardar una copia en Dropbox, Nextcloud o Google Drive, configura la Ubicación de Copia de Seguridad en Copia de Seguridad y Restaurar.';
 
   @override
   String diveLog_bulkEdit_membership_onAll(int count) {

@@ -5672,13 +5672,6 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
-  String get diveLog_instruments_customize => 'Műszerek testreszabása';
-
-  @override
-  String get diveLog_instruments_customizeHint =>
-      'Kapcsolja be vagy ki a műszereket. Húzza az átrendezéshez.';
-
-  @override
   String get diveLog_legend_label_ascentRate => 'Felszallasi sebesseg';
 
   @override
@@ -14958,6 +14951,14 @@ class AppLocalizationsHu extends AppLocalizations {
       'Valasszon szinkronizalt mappat (Dropbox, Google Drive stb.)';
 
   @override
+  String get settings_storage_customFolder_subtitleDeviceOnly =>
+      'Az adatbázis áthelyezése a belső tárhelyre vagy az SD-kártyára';
+
+  @override
+  String get settings_storage_customFolder_deviceOnly_noCloudSync =>
+      'Az alkalmazás által kezelt felhőszinkronizálás ki van kapcsolva, amíg az adatbázis az eszköz tárhelyén van. Android rendszeren egyetlen szinkronizálási szolgáltatás sem éri el ezt a mappát, ezért a Biztonsági Mentés és Visszaállítás segítségével tartson máshol másolatokat.';
+
+  @override
   String settings_storage_dbStats(
     Object fileSize,
     Object diveCount,
@@ -21141,6 +21142,10 @@ class AppLocalizationsHu extends AppLocalizations {
   @override
   String get db_location_external_note =>
       'Az itt tárolt fájlok törlődnek, ha eltávolítja az alkalmazást.';
+
+  @override
+  String get db_location_backup_note =>
+      'Az Android nem tudja az adatbázist felhőben szinkronizált mappából futtatni. Ha másolatot szeretne tartani a Dropboxban, a Nextcloudban vagy a Google Drive-on, állítsa be a Mentés helyét a Biztonsági Mentés és Visszaállítás alatt.';
 
   @override
   String diveLog_bulkEdit_membership_onAll(int count) {

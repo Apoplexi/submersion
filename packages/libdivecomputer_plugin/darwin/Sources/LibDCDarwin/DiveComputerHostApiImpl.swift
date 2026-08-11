@@ -407,8 +407,12 @@ class DiveComputerHostApiImpl: DiveComputerHostApi {
         if candidates.count == 1 {
             let port = candidates[0]
             let stream = SerialIoStream()
-            guard stream.open(path: port) else {
-                reportError(code: "connect_failed", message: "Failed to open serial port: \(port)")
+            if let failure = stream.open(path: port) {
+                NativeLogger.e("DiveComputerHost", category: "SER",
+                    "Failed to open \(port) (errno=\(failure.errnoValue)): \(failure.reason)")
+                reportError(
+                    code: "connect_failed",
+                    message: "Failed to open serial port \(port): \(failure.reason)")
                 return
             }
             NativeLogger.i("DiveComputerHost", category: "SER", "Opened serial port: \(port)")
@@ -440,8 +444,10 @@ class DiveComputerHostApiImpl: DiveComputerHostApi {
             diveBufferLock.unlock()
 
             let stream = SerialIoStream()
-            guard stream.open(path: port) else {
-                probeLog += "  \(port): failed to open\n"
+            if let failure = stream.open(path: port) {
+                NativeLogger.e("DiveComputerHost", category: "SER",
+                    "Failed to open \(port) (errno=\(failure.errnoValue)): \(failure.reason)")
+                probeLog += "  \(port): \(failure.reason)\n"
                 continue
             }
             anyOpened = true

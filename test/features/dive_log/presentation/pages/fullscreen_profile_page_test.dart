@@ -1,5 +1,6 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
@@ -15,7 +16,7 @@ import 'package:submersion/features/dive_log/presentation/providers/profile_play
 import 'package:submersion/features/dive_log/presentation/providers/profile_review_provider.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/dive_profile_chart.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/draggable_readout_card.dart';
-import 'package:submersion/features/dive_log/presentation/widgets/profile_instrument_bar.dart';
+import 'package:submersion/features/dive_log/presentation/widgets/profile_transport_bar.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/source_bar.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
@@ -53,14 +54,42 @@ Dive _dive() => Dive(
   ),
 );
 
-Widget _wrap(List<Override> overrides) => ProviderScope(
+/// Phone and desktop sizes for the layout gate. The page reads
+/// `MediaQuery.sizeOf`, and `setSurfaceSize` does not reliably drive that,
+/// so [_wrap] injects an explicit MediaQuery instead.
+const _phoneSize = Size(400, 800);
+const _desktopSize = Size(1200, 900);
+
+Widget _wrap(List<Override> overrides, {Size? size}) => ProviderScope(
   overrides: overrides,
-  child: const MaterialApp(
+  child: MaterialApp(
     localizationsDelegates: AppLocalizations.localizationsDelegates,
     supportedLocales: AppLocalizations.supportedLocales,
-    home: FullscreenProfilePage(diveId: 'd1'),
+    home: size == null
+        ? const FullscreenProfilePage(diveId: 'd1')
+        : MediaQuery(
+            data: MediaQueryData(size: size),
+            child: const FullscreenProfilePage(diveId: 'd1'),
+          ),
   ),
 );
+
+/// [_wrap] with an externally owned container, for cases that assert on
+/// provider state after the page has run.
+Widget _wrapContainer(ProviderContainer container, {Size? size}) =>
+    UncontrolledProviderScope(
+      container: container,
+      child: MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        home: size == null
+            ? const FullscreenProfilePage(diveId: 'd1')
+            : MediaQuery(
+                data: MediaQueryData(size: size),
+                child: const FullscreenProfilePage(diveId: 'd1'),
+              ),
+      ),
+    );
 
 List<Override> _defaultOverrides() {
   final dive = _dive();
@@ -85,12 +114,12 @@ List<Override> _erroringOverrides() {
 }
 
 void main() {
-  testWidgets('renders chart and instrument bar', (tester) async {
+  testWidgets('renders chart and transport bar', (tester) async {
     await tester.pumpWidget(_wrap(_defaultOverrides()));
     await tester.pumpAndSettle();
 
     expect(find.byType(DiveProfileChart), findsOneWidget);
-    expect(find.byType(ProfileInstrumentBar), findsOneWidget);
+    expect(find.byType(ProfileTransportBar), findsOneWidget);
     expect(find.byIcon(Icons.close), findsOneWidget);
   });
 
@@ -369,13 +398,12 @@ void main() {
         tester.widget<DiveProfileChart>(find.byType(DiveProfileChart)).profile,
         hasLength(61),
       );
-      // The instrument bar must resolve tiles against the SAME profile the
-      // chart renders and the analysis is computed from; indexing analysis
-      // curves with dive.profile positions reads wrong/blank values once the
-      // arrays differ (issue: gauges wrong/blank mid-dive on 2-source dives).
+      // The transport bar must scrub against the SAME profile the chart
+      // renders: its minimap and seek range are drawn from these points, so
+      // passing dive.profile would scrub a different source's timeline.
       expect(
         tester
-            .widget<ProfileInstrumentBar>(find.byType(ProfileInstrumentBar))
+            .widget<ProfileTransportBar>(find.byType(ProfileTransportBar))
             .profile,
         hasLength(61),
       );
@@ -395,7 +423,7 @@ void main() {
       );
       expect(
         tester
-            .widget<ProfileInstrumentBar>(find.byType(ProfileInstrumentBar))
+            .widget<ProfileTransportBar>(find.byType(ProfileTransportBar))
             .profile,
         hasLength(40),
       );
@@ -518,5 +546,159 @@ void main() {
 
     chart.onSafetyFindingTap!(finding);
     expect(container.read(selectedSafetyFindingProvider('d1')), isNull);
+  });
+
+  testWidgets('enters immersive mode on open and restores it on close', (
+    tester,
+  ) async {
+    final calls = <MethodCall>[];
+    tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+      SystemChannels.platform,
+      (call) async {
+        calls.add(call);
+        return null;
+      },
+    );
+    addTearDown(
+      () => tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+        SystemChannels.platform,
+        null,
+      ),
+    );
+
+    await tester.pumpWidget(_wrap(_defaultOverrides()));
+    await tester.pumpAndSettle();
+
+    final uiModeCalls = calls.where(
+      (c) => c.method == 'SystemChrome.setEnabledSystemUIMode',
+    );
+    expect(
+      uiModeCalls,
+      isNotEmpty,
+      reason: 'the page must request immersive mode on entry',
+    );
+    expect(uiModeCalls.last.arguments, 'SystemUiMode.immersiveSticky');
+
+    await tester.tap(find.byIcon(Icons.close));
+    await tester.pumpAndSettle();
+
+    expect(
+      calls
+          .lastWhere((c) => c.method == 'SystemChrome.setEnabledSystemUIMode')
+          .arguments,
+      'SystemUiMode.edgeToEdge',
+      reason: 'leaving the page must hand the system bars back',
+    );
+  });
+
+  group('phone layout', () {
+    testWidgets('no transport bar below the chart', (tester) async {
+      await tester.pumpWidget(_wrap(_defaultOverrides(), size: _phoneSize));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(DiveProfileChart), findsOneWidget);
+      expect(find.byType(ProfileTransportBar), findsNothing);
+      expect(find.byIcon(Icons.play_arrow), findsNothing);
+    });
+
+    testWidgets('landscape still counts as a phone', (tester) async {
+      // shortestSide, not width: a phone on its side has the least vertical
+      // room of all, so it needs the full-bleed chart most.
+      await tester.pumpWidget(
+        _wrap(_defaultOverrides(), size: const Size(800, 400)),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.byType(ProfileTransportBar), findsNothing);
+    });
+
+    testWidgets('desktop keeps the transport bar', (tester) async {
+      await tester.pumpWidget(_wrap(_defaultOverrides(), size: _desktopSize));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(ProfileTransportBar), findsOneWidget);
+      expect(find.byIcon(Icons.play_arrow), findsOneWidget);
+    });
+
+    testWidgets('playback mode is never activated', (tester) async {
+      // ProfileTransportControls.initState is what flips playback mode on.
+      // With no transport on phone it never mounts, so the page must leave
+      // the shared playback provider untouched.
+      final container = ProviderContainer(overrides: _defaultOverrides());
+      addTearDown(container.dispose);
+
+      await tester.pumpWidget(_wrapContainer(container, size: _phoneSize));
+      await tester.pumpAndSettle();
+
+      expect(container.read(playbackProvider('d1')).isActive, isFalse);
+    });
+
+    testWidgets('tapping the chart still drives the readout', (tester) async {
+      final container = ProviderContainer(overrides: _defaultOverrides());
+      addTearDown(container.dispose);
+
+      await tester.pumpWidget(_wrapContainer(container, size: _phoneSize));
+      await tester.pumpAndSettle();
+
+      final chart = tester.widget<DiveProfileChart>(
+        find.byType(DiveProfileChart),
+      );
+      chart.onPointSelected!(3);
+      await tester.pump();
+
+      expect(container.read(profileReviewProvider('d1')), 30);
+    });
+
+    testWidgets('multi-source dive keeps the source bar', (tester) async {
+      final now = DateTime(2026, 5, 7);
+      DiveDataSource source(String id, String computerId, bool isPrimary) =>
+          DiveDataSource(
+            id: id,
+            diveId: 'd1',
+            computerId: computerId,
+            isPrimary: isPrimary,
+            computerName: isPrimary ? 'Black' : 'Bronze',
+            importedAt: now,
+            createdAt: now,
+          );
+      List<DiveProfilePoint> points(int count) => List.generate(
+        count,
+        (i) => DiveProfilePoint(timestamp: i * 10, depth: 10),
+      );
+
+      await tester.pumpWidget(
+        _wrap([
+          ..._defaultOverrides(),
+          diveDataSourcesProvider('d1').overrideWith(
+            (ref) async => [
+              source('src-a', 'dc-a', true),
+              source('src-b', 'dc-b', false),
+            ],
+          ),
+          sourceProfilesProvider('d1').overrideWith(
+            (ref) async => {
+              'src-a': SourceProfile(
+                sourceId: 'src-a',
+                computerId: 'dc-a',
+                isEdited: false,
+                points: points(61),
+              ),
+              'src-b': SourceProfile(
+                sourceId: 'src-b',
+                computerId: 'dc-b',
+                isEdited: false,
+                points: points(40),
+              ),
+            },
+          ),
+        ], size: _phoneSize),
+      );
+      await tester.pump();
+      await tester.pump(const Duration(seconds: 1));
+
+      // Source switching stays reachable on phone; only the transport goes.
+      expect(find.byType(SourceBar), findsOneWidget);
+      expect(find.byType(ProfileTransportBar), findsNothing);
+    });
   });
 }

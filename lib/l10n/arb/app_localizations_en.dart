@@ -5587,13 +5587,6 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get diveLog_instruments_customize => 'Customize instruments';
-
-  @override
-  String get diveLog_instruments_customizeHint =>
-      'Toggle instruments on or off. Drag to reorder.';
-
-  @override
   String get diveLog_legend_label_ascentRate => 'Ascent Rate';
 
   @override
@@ -14747,6 +14740,14 @@ class AppLocalizationsEn extends AppLocalizations {
       'Choose a synced folder (Dropbox, Google Drive, etc.)';
 
   @override
+  String get settings_storage_customFolder_subtitleDeviceOnly =>
+      'Move the database to internal storage or SD card';
+
+  @override
+  String get settings_storage_customFolder_deviceOnly_noCloudSync =>
+      'App-managed cloud sync is disabled while the database sits on a device storage volume. No sync service can reach that folder on Android, so use Backup & Restore to keep copies elsewhere.';
+
+  @override
   String settings_storage_dbStats(
     Object fileSize,
     Object diveCount,
@@ -20847,6 +20848,10 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get db_location_external_note =>
       'Files here are removed if you uninstall the app.';
+
+  @override
+  String get db_location_backup_note =>
+      'Android cannot run the database from a cloud-synced folder. To keep a copy in Dropbox, Nextcloud, or Google Drive, set a Backup Location under Backup & Restore.';
 
   @override
   String diveLog_bulkEdit_membership_onAll(int count) {

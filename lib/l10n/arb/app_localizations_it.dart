@@ -5691,13 +5691,6 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
-  String get diveLog_instruments_customize => 'Personalizza strumenti';
-
-  @override
-  String get diveLog_instruments_customizeHint =>
-      'Attiva o disattiva gli strumenti. Trascina per riordinare.';
-
-  @override
   String get diveLog_legend_label_ascentRate => 'Velocita di risalita';
 
   @override
@@ -14998,6 +14991,14 @@ class AppLocalizationsIt extends AppLocalizations {
       'Scegli una cartella sincronizzata (Dropbox, Google Drive, ecc.)';
 
   @override
+  String get settings_storage_customFolder_subtitleDeviceOnly =>
+      'Sposta il database nella memoria interna o sulla scheda SD';
+
+  @override
+  String get settings_storage_customFolder_deviceOnly_noCloudSync =>
+      'La sincronizzazione cloud gestita dall\'app è disattivata finché il database si trova su un volume di archiviazione del dispositivo. Su Android nessun servizio di sincronizzazione può raggiungere quella cartella: usa Backup e Ripristino per conservare copie altrove.';
+
+  @override
   String settings_storage_dbStats(
     Object fileSize,
     Object diveCount,
@@ -21208,6 +21209,10 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String get db_location_external_note =>
       'I file qui vengono rimossi se disinstalli l\'app.';
+
+  @override
+  String get db_location_backup_note =>
+      'Android non può eseguire il database da una cartella sincronizzata nel cloud. Per conservarne una copia in Dropbox, Nextcloud o Google Drive, imposta la Posizione di backup in Backup e Ripristino.';
 
   @override
   String diveLog_bulkEdit_membership_onAll(int count) {
