@@ -50,13 +50,14 @@ rewritten in the database.
 
 Add one private helper to `DiveRepository`
 (`lib/features/dive_log/data/repositories/dive_repository_impl.dart`),
-operating on the raw Drift table row (`DiveDataSourceData`, the type
-`_db.select(_db.diveDataSources).get()` returns in both call sites below --
-so one helper serves both without a mapping-order change):
+operating on the raw Drift table row (`DiveDataSourcesData`, the type
+`_db.select(_db.diveDataSources).get()` returns in both call sites below,
+and the same type `_mapRowToDataSource` already takes -- so one helper
+serves both without a mapping-order change):
 
 ```dart
-List<DiveDataSourceData> _canonicalDataSourceRows(
-  List<DiveDataSourceData> rows,
+List<DiveDataSourcesData> _canonicalDataSourceRows(
+  List<DiveDataSourcesData> rows,
 ) {
   final seenComputers = <String>{};
   final result = <DiveDataSourceData>[];
