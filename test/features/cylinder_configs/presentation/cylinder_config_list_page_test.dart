@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:submersion/core/constants/enums.dart';
+import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/features/cylinder_configs/domain/entities/cylinder_config.dart';
 import 'package:submersion/features/cylinder_configs/domain/entities/cylinder_config_item.dart';
 import 'package:submersion/features/cylinder_configs/presentation/pages/cylinder_config_list_page.dart';
@@ -11,6 +12,7 @@ import 'package:submersion/features/cylinder_configs/presentation/providers/cyli
 import 'package:submersion/features/equipment/domain/entities/equipment_item.dart';
 import 'package:submersion/features/equipment/presentation/providers/equipment_providers.dart';
 
+import '../../../helpers/selection_contract.dart';
 import '../../../helpers/test_app.dart';
 
 /// Renders [CylinderConfigListPage] behind a real [GoRouter] so the FAB and
@@ -94,6 +96,36 @@ void main() {
       ],
     );
   }
+
+  group('selection', () {
+    testWidgets('satisfies the shared selection contract', (tester) async {
+      final all = [
+        config(id: 'g1', name: 'Aaa plan'),
+        config(id: 'g2', name: 'Bbb plan'),
+        config(id: 'g3', name: 'Ccc plan'),
+      ];
+      var visible = all;
+
+      await verifySelectionContract(
+        tester,
+        // configsFuture is read on each provider rebuild, so invalidating
+        // after reassigning `visible` actually narrows the list. Passing
+        // `configs:` would capture the original list by value.
+        build: () => host(configs: all, configsFuture: () async => visible),
+        selectButton: find.byKey(const ValueKey('enter_selection')),
+        firstRow: find.text('Aaa plan'),
+        applyFilter: (tester) async {
+          visible = [all.first];
+          final container = ProviderScope.containerOf(
+            tester.element(find.byType(CylinderConfigListPage)),
+          );
+          container.invalidate(cylinderConfigsProvider);
+          await tester.pumpAndSettle();
+        },
+        visibleAfterFilter: 1,
+      );
+    });
+  });
 
   testWidgets('an empty list explains what a configuration is for', (
     tester,
