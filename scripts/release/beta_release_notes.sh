@@ -12,7 +12,7 @@
 # caps itself and says how many items it dropped.
 #
 # Usage:
-#   beta_release_notes.sh --since <sha> --format store    # <sha>..HEAD
+#   beta_release_notes.sh --since <sha> --format apple    # <sha>..HEAD
 #   beta_release_notes.sh --range <gitrange> --format play
 #   beta_release_notes.sh --stdin --format markdown       # subjects on stdin
 #
@@ -20,7 +20,9 @@
 # still produces real notes.
 #
 # Formats:
-#   store     TestFlight whatsNew (plain text, 4000 chars)
+#   apple     TestFlight whatsNew (plain text, 4000 chars). The only format
+#             that reaches Apple, and so the only one with non-Apple platform
+#             names stripped out of it.
 #   play      Play release notes (plain text, 500 chars)
 #   markdown  GitHub beta release body (uncapped, keeps internal work)
 #
@@ -33,7 +35,7 @@
 # All progress and diagnostics go to stderr; stdout is only ever the notes.
 set -euo pipefail
 
-STORE_LIMIT=4000
+APPLE_LIMIT=4000
 PLAY_LIMIT=500
 # Room for the "...and N more." line appended after truncation.
 TRUNCATION_RESERVE=24
@@ -74,9 +76,9 @@ while [ $# -gt 0 ]; do
 done
 
 case "$FORMAT" in
-  store|play|markdown) ;;
-  "") die "--format is required (store, play, or markdown)" ;;
-  *)  die "unknown --format: $FORMAT (expected store, play, or markdown)" ;;
+  apple|play|markdown) ;;
+  "") die "--format is required (apple, play, or markdown)" ;;
+  *)  die "unknown --format: $FORMAT (expected apple, play, or markdown)" ;;
 esac
 
 # --since takes the previous beta's commit and turns it into a range. The
@@ -304,9 +306,9 @@ if [ "$FORMAT" = markdown ]; then
   exit 0
 fi
 
-# --- Store formats: plain text within a hard character budget ---------------
+# --- Capped formats: plain text within a hard character budget --------------
 
-if [ "$FORMAT" = play ]; then LIMIT=$PLAY_LIMIT; else LIMIT=$STORE_LIMIT; fi
+if [ "$FORMAT" = play ]; then LIMIT=$PLAY_LIMIT; else LIMIT=$APPLE_LIMIT; fi
 
 # Build the full untruncated line list, tagging item lines so truncation can
 # report how many were dropped and so a heading is never left dangling.

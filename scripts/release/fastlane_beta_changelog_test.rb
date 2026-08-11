@@ -93,7 +93,7 @@ end
 # variable built from user-controlled sources).
 
 Dir.mktmpdir do |tmp|
-  notes_file = File.join(tmp, 'beta-notes-store.txt')
+  notes_file = File.join(tmp, 'beta-notes-apple.txt')
   File.write(notes_file, "New in this build\n- a change from a file\n")
 
   with_env('BETA_CHANGELOG_FILE' => notes_file, 'BETA_CHANGELOG' => nil) do
