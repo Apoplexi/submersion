@@ -9,6 +9,12 @@ import 'package:submersion/core/constants/sort_options.dart';
 import 'package:submersion/core/models/sort_state.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
+import 'package:submersion/shared/selection/bulk_action.dart';
+import 'package:submersion/shared/selection/selectable_list_scope.dart';
+import 'package:submersion/shared/selection/selectable_row.dart';
+import 'package:submersion/shared/selection/selection_app_bar.dart';
+import 'package:submersion/shared/selection/selection_controller.dart';
+import 'package:submersion/shared/selection/selection_state.dart';
 import 'package:submersion/shared/widgets/entity_table/entity_table_view.dart';
 import 'package:submersion/shared/widgets/list_view_mode_toggle.dart';
 import 'package:submersion/shared/widgets/master_detail/responsive_breakpoints.dart';
@@ -48,6 +54,13 @@ class EquipmentListContent extends ConsumerStatefulWidget {
 }
 
 class _EquipmentListContentState extends ConsumerState<EquipmentListContent> {
+  /// Owns the bulk-selection state machine for this list.
+  final SelectionController _selection = SelectionController();
+
+  /// Convenience mirrors of the controller, so the widget tree reads clearly.
+  bool get _isSelectionMode => _selection.value.isActive;
+  Set<String> get _selectedIds => _selection.value.checkedIds;
+
   final ScrollController _scrollController = ScrollController();
   String? _lastScrolledToId;
   bool _selectionFromList = false;
@@ -56,6 +69,7 @@ class _EquipmentListContentState extends ConsumerState<EquipmentListContent> {
   @override
   void dispose() {
     _scrollController.dispose();
+    _selection.dispose();
     super.dispose();
   }
 
@@ -160,85 +174,138 @@ class _EquipmentListContentState extends ConsumerState<EquipmentListContent> {
       return _buildTableModeScaffold(context, sortedAsync);
     }
 
-    final content = equipmentAsync.when(
-      data: (equipment) {
-        final sorted = applyEquipmentSorting(
-          equipment,
-          sort,
-          serviceUrgency: serviceUrgency,
-        );
-        return sorted.isEmpty
-            ? _buildEmptyState(context, ref)
-            : _buildEquipmentList(context, ref, sorted);
-      },
-      loading: () => const Center(child: CircularProgressIndicator()),
-      error: (error, stack) => _buildErrorState(context, error),
+    // The visible list depends on which status filter is active, so derive
+    // selectable ids from the same branch the list renders.
+    final sortedVisible = applyEquipmentSorting(
+      equipmentAsync.value ?? const <EquipmentItem>[],
+      sort,
+      serviceUrgency: serviceUrgency,
     );
+    final visibleIds = sortedVisible.map((e) => e.id).toList();
 
-    if (!widget.showAppBar) {
-      return Column(
-        children: [
-          _buildCompactAppBar(context),
-          if (widget.headerExtension != null) widget.headerExtension!,
-          _buildFilterChips(context),
-          Expanded(child: content),
-        ],
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _selection.pruneTo(visibleIds);
+    });
+
+    // Built inside the selection listener below so rows re-render as checks
+    // change; computing it here would leave the list frozen mid-selection.
+    Widget buildContent() {
+      return equipmentAsync.when(
+        data: (equipment) {
+          final sorted = applyEquipmentSorting(
+            equipment,
+            sort,
+            serviceUrgency: serviceUrgency,
+          );
+          return sorted.isEmpty
+              ? _buildEmptyState(context, ref)
+              : _buildEquipmentList(context, ref, sorted);
+        },
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (error, stack) => _buildErrorState(context, error),
       );
     }
 
-    return Scaffold(
-      appBar: AppBar(
-        title: FeatureAppBarTitle(
-          featureId: 'equipment',
-          title: context.l10n.equipment_appBar_title,
+    if (!widget.showAppBar) {
+      return SelectableListScope(
+        controller: _selection,
+        selectableIds: visibleIds,
+        child: ValueListenableBuilder<SelectionState>(
+          valueListenable: _selection,
+          builder: (context, selection, _) => Column(
+            children: [
+              selection.isActive
+                  ? _buildSelectionBar(sortedVisible, SelectionBarShell.pane)
+                  : _buildCompactAppBar(context),
+              if (widget.headerExtension != null) widget.headerExtension!,
+              _buildFilterChips(context),
+              Expanded(child: buildContent()),
+            ],
+          ),
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.sort),
-            tooltip: context.l10n.equipment_list_sortTooltip,
-            onPressed: () => _showSortSheet(context),
-          ),
-          IconButton(
-            icon: const Icon(Icons.search),
-            tooltip: context.l10n.equipment_list_searchTooltip,
-            onPressed: () {
-              showSearch(context: context, delegate: EquipmentSearchDelegate());
-            },
-          ),
-          PopupMenuButton<String>(
-            icon: const Icon(Icons.more_vert),
-            onSelected: (value) {
-              if (value.startsWith('view_')) {
-                final mode = ListViewMode.fromName(
-                  value.replaceFirst('view_', ''),
-                );
-                ref.read(equipmentListViewModeProvider.notifier).state = mode;
-              }
-            },
-            itemBuilder: (context) {
-              final currentMode = ref.read(equipmentListViewModeProvider);
-              return [
-                ...ListViewModeToggle.menuItems(
-                  context,
-                  currentMode: currentMode,
-                  modes: const [
-                    ListViewMode.detailed,
-                    ListViewMode.compact,
-                    ListViewMode.table,
+      );
+    }
+
+    return SelectableListScope(
+      controller: _selection,
+      selectableIds: visibleIds,
+      child: ValueListenableBuilder<SelectionState>(
+        valueListenable: _selection,
+        builder: (context, selection, _) => Scaffold(
+          appBar: selection.isActive
+              ? _buildSelectionBar(sortedVisible, SelectionBarShell.appBar)
+              : AppBar(
+                  title: FeatureAppBarTitle(
+                    featureId: 'equipment',
+                    title: context.l10n.equipment_appBar_title,
+                  ),
+                  actions: [
+                    IconButton(
+                      icon: const Icon(Icons.sort),
+                      tooltip: context.l10n.equipment_list_sortTooltip,
+                      onPressed: () => _showSortSheet(context),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.search),
+                      tooltip: context.l10n.equipment_list_searchTooltip,
+                      onPressed: () {
+                        showSearch(
+                          context: context,
+                          delegate: EquipmentSearchDelegate(),
+                        );
+                      },
+                    ),
+                    // Discoverability: bulk actions must not be reachable only by a
+                    // long-press that nothing on screen advertises.
+                    IconButton(
+                      key: const ValueKey('enter_selection'),
+                      icon: const Icon(Icons.checklist),
+                      tooltip: context.l10n.common_selection_enterTooltip,
+                      onPressed: _selection.enterExplicit,
+                    ),
+                    PopupMenuButton<String>(
+                      icon: const Icon(Icons.more_vert),
+                      onSelected: (value) {
+                        if (value.startsWith('view_')) {
+                          final mode = ListViewMode.fromName(
+                            value.replaceFirst('view_', ''),
+                          );
+                          ref
+                                  .read(equipmentListViewModeProvider.notifier)
+                                  .state =
+                              mode;
+                        }
+                      },
+                      itemBuilder: (context) {
+                        final currentMode = ref.read(
+                          equipmentListViewModeProvider,
+                        );
+                        return [
+                          ...ListViewModeToggle.menuItems(
+                            context,
+                            currentMode: currentMode,
+                            modes: const [
+                              ListViewMode.detailed,
+                              ListViewMode.compact,
+                              ListViewMode.table,
+                            ],
+                          ),
+                        ];
+                      },
+                    ),
                   ],
                 ),
-              ];
-            },
+          body: Column(
+            children: [
+              _buildFilterChips(context),
+              Expanded(child: buildContent()),
+            ],
           ),
-        ],
+          floatingActionButton: selection.isActive
+              ? null
+              : widget.floatingActionButton,
+        ),
       ),
-      body: Column(
-        children: [
-          _buildFilterChips(context),
-          Expanded(child: content),
-        ],
-      ),
-      floatingActionButton: widget.floatingActionButton,
     );
   }
 
@@ -247,6 +314,136 @@ class _EquipmentListContentState extends ConsumerState<EquipmentListContent> {
   /// When embedded inside [TableModeLayout], provides the filter chips and
   /// table content. The app bar, map, and column settings are managed by
   /// [TableModeLayout].
+  /// Equipment-specific extras. Select-all, deselect-all and delete come from
+  /// SelectionAppBar.
+  ///
+  /// Retire and reactivate are enabled only on a uniform selection -- every
+  /// checked item active, or none of them -- so the action never has to guess
+  /// what a mixed selection means.
+  List<BulkAction> _bulkActions(List<EquipmentItem> equipment) {
+    final checked = equipment
+        .where((e) => _selectedIds.contains(e.id))
+        .toList();
+    final allActive = checked.isNotEmpty && checked.every((e) => e.isActive);
+    final noneActive = checked.isNotEmpty && checked.every((e) => !e.isActive);
+
+    return [
+      BulkAction(
+        id: 'retire',
+        icon: Icons.archive,
+        label: context.l10n.equipment_menu_retireEquipment,
+        maxCount: allActive ? null : 0,
+        onInvoke: () => _applyRetirement(retire: true),
+      ),
+      BulkAction(
+        id: 'reactivate',
+        icon: Icons.unarchive,
+        label: context.l10n.equipment_menu_reactivate,
+        maxCount: noneActive ? null : 0,
+        onInvoke: () => _applyRetirement(retire: false),
+      ),
+    ];
+  }
+
+  SelectionAppBar _buildSelectionBar(
+    List<EquipmentItem> equipment,
+    SelectionBarShell shell,
+  ) {
+    return SelectionAppBar(
+      controller: _selection,
+      selectableIds: equipment.map((e) => e.id).toList(),
+      actions: _bulkActions(equipment),
+      shell: shell,
+      maxInlineActions: shell == SelectionBarShell.pane ? 1 : 3,
+      onDelete: _confirmAndDelete,
+    );
+  }
+
+  /// Retire or reactivate every checked item, mirroring the per-item actions
+  /// on the detail page.
+  Future<void> _applyRetirement({required bool retire}) async {
+    final ids = _selectedIds.toList();
+    if (ids.isEmpty) return;
+
+    final messenger = ScaffoldMessenger.of(context);
+    final notifier = ref.read(equipmentListNotifierProvider.notifier);
+    _selection.exit();
+
+    for (final id in ids) {
+      if (retire) {
+        await notifier.retireEquipment(id);
+      } else {
+        await notifier.reactivateEquipment(id);
+      }
+    }
+
+    if (!mounted) return;
+    messenger.showSnackBar(
+      SnackBar(
+        content: Text(
+          retire
+              ? context.l10n.equipment_snackbar_retired
+              : context.l10n.equipment_snackbar_reactivated,
+        ),
+      ),
+    );
+  }
+
+  Future<void> _confirmAndDelete() async {
+    final ids = _selectedIds.toList();
+    if (ids.isEmpty) return;
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(ctx.l10n.common_bulkDelete_title(ids.length)),
+        content: Text(ctx.l10n.common_bulkDelete_body),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: Text(ctx.l10n.common_action_cancel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            style: FilledButton.styleFrom(
+              backgroundColor: Theme.of(ctx).colorScheme.error,
+            ),
+            child: Text(ctx.l10n.common_action_delete),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+
+    final messenger = ScaffoldMessenger.of(context);
+    final notifier = ref.read(equipmentListNotifierProvider.notifier);
+    _selection.exit();
+
+    for (final id in ids) {
+      await notifier.deleteEquipment(id);
+    }
+
+    if (!mounted) return;
+    messenger.showSnackBar(
+      SnackBar(
+        content: Text(context.l10n.common_bulkDelete_snackbar(ids.length)),
+      ),
+    );
+  }
+
+  /// One tap policy for every equipment row.
+  void _handleRowTap(EquipmentItem item) {
+    if (SelectableListScope.isModifierPressed()) {
+      _selection.enterImplicit(item.id);
+      return;
+    }
+    if (_isSelectionMode) {
+      _selection.toggle(item.id);
+      return;
+    }
+    _handleItemTap(item);
+  }
+
   Widget _buildTableModeScaffold(
     BuildContext context,
     AsyncValue<List<EquipmentItem>> equipmentAsync,
@@ -292,7 +489,14 @@ class _EquipmentListContentState extends ConsumerState<EquipmentListContent> {
           onEntityTapDown: (id) {
             ref.read(highlightedEquipmentIdProvider.notifier).state = id;
           },
-          onEntityTap: (id) {},
+          onEntityTap: (id) {
+            if (_isSelectionMode) _selection.toggle(id);
+          },
+          onEntityLongPress: _isSelectionMode
+              ? null
+              : (id) => _selection.enterImplicit(id),
+          selectedIds: _selectedIds,
+          isSelectionMode: _isSelectionMode,
           onEntityDoubleTap: (id) {
             context.push('/equipment/$id');
           },
@@ -317,12 +521,15 @@ class _EquipmentListContentState extends ConsumerState<EquipmentListContent> {
       child: Row(
         children: [
           const SizedBox(width: 8),
-          FeatureAppBarTitle(
-            featureId: 'equipment',
-            title: context.l10n.equipment_appBar_title,
-            style: Theme.of(
-              context,
-            ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
+          // Flexible so the title yields before the action row overflows.
+          Flexible(
+            child: FeatureAppBarTitle(
+              featureId: 'equipment',
+              title: context.l10n.equipment_appBar_title,
+              style: Theme.of(
+                context,
+              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
+            ),
           ),
           const Spacer(),
           IconButton(
@@ -336,6 +543,14 @@ class _EquipmentListContentState extends ConsumerState<EquipmentListContent> {
             onPressed: () {
               showSearch(context: context, delegate: EquipmentSearchDelegate());
             },
+          ),
+          // Discoverability: bulk actions must not be reachable only by a
+          // long-press that nothing on screen advertises.
+          IconButton(
+            key: const ValueKey('enter_selection'),
+            icon: const Icon(Icons.checklist, size: 20),
+            tooltip: context.l10n.common_selection_enterTooltip,
+            onPressed: _selection.enterExplicit,
           ),
           PopupMenuButton<String>(
             icon: const Icon(Icons.more_vert, size: 20),
@@ -482,18 +697,24 @@ class _EquipmentListContentState extends ConsumerState<EquipmentListContent> {
               widget.selectedId == item.id ||
               ref.watch(highlightedEquipmentIdProvider) == item.id;
           final viewMode = ref.watch(equipmentListViewModeProvider);
-          return switch (viewMode) {
+          final tile = switch (viewMode) {
             ListViewMode.detailed || ListViewMode.compact => EquipmentListTile(
               item: item,
               isSelected: isSelected,
-              onTap: () => _handleItemTap(item),
+              onTap: () => _handleRowTap(item),
             ),
             ListViewMode.dense || ListViewMode.table => DenseEquipmentListTile(
               item: item,
               isSelected: isSelected,
-              onTap: () => _handleItemTap(item),
+              onTap: () => _handleRowTap(item),
             ),
           };
+          return SelectableRow(
+            isSelectionMode: _isSelectionMode,
+            isChecked: _selectedIds.contains(item.id),
+            onChanged: (_) => _selection.toggle(item.id),
+            child: tile,
+          );
         },
       ),
     );

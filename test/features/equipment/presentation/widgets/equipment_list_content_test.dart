@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:submersion/core/constants/enums.dart';
+import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/core/constants/list_view_mode.dart';
 import 'package:submersion/features/divers/presentation/providers/diver_providers.dart';
 import 'package:submersion/features/equipment/domain/constants/equipment_field.dart';
@@ -17,6 +17,7 @@ import 'package:submersion/shared/providers/entity_table_config_providers.dart';
 
 import '../../../../helpers/mock_providers.dart';
 import '../../../../helpers/test_app.dart';
+import '../../../../helpers/selection_contract.dart';
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -81,6 +82,11 @@ Future<List<Override>> _buildOverrides({
   ];
 }
 
+/// Mutable source for the contract test's filter step.
+final _visibleEquipmentProvider = StateProvider<List<EquipmentItem>>(
+  (ref) => const [],
+);
+
 Future<List<Override>> _buildPhoneOverrides({
   required List<EquipmentItem> items,
   ListViewMode viewMode = ListViewMode.detailed,
@@ -106,6 +112,58 @@ Future<List<Override>> _buildPhoneOverrides({
 }
 
 void main() {
+  group('selection contract', () {
+    testWidgets('satisfies the shared selection contract', (tester) async {
+      final all = <EquipmentItem>[
+        _makeEquipment(id: 'e1', name: 'Aaa Reg'),
+        _makeEquipment(id: 'e2', name: 'Bbb BCD'),
+        _makeEquipment(id: 'e3', name: 'Ccc Fins'),
+      ];
+
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+      final overrides = <Override>[
+        sharedPreferencesProvider.overrideWithValue(prefs),
+        settingsProvider.overrideWith((ref) => MockSettingsNotifier()),
+        currentDiverIdProvider.overrideWith(
+          (ref) => MockCurrentDiverIdNotifier(),
+        ),
+        _visibleEquipmentProvider.overrideWith((ref) => all),
+        equipmentByStatusProvider.overrideWith((ref, status) => all),
+        activeEquipmentProvider.overrideWith(
+          (ref) async => ref.watch(_visibleEquipmentProvider),
+        ),
+        equipmentListViewModeProvider.overrideWith(
+          (ref) => ListViewMode.detailed,
+        ),
+        equipmentTableConfigProvider.overrideWith(
+          (ref) => _TestEquipTableConfigNotifier(_testConfig),
+        ),
+        highlightedEquipmentIdProvider.overrideWith((ref) => null),
+      ];
+
+      await verifySelectionContract(
+        tester,
+        build: () => testApp(
+          overrides: overrides,
+          locale: const Locale('en'),
+          child: const EquipmentListContent(showAppBar: true),
+        ),
+        selectButton: find.byKey(const ValueKey('enter_selection')),
+        firstRow: find.text('Aaa Reg'),
+        applyFilter: (tester) async {
+          final container = ProviderScope.containerOf(
+            tester.element(find.byType(EquipmentListContent)),
+          );
+          container.read(_visibleEquipmentProvider.notifier).state = [
+            all.first,
+          ];
+        },
+        visibleAfterFilter: 1,
+      );
+    });
+  });
+
   group('EquipmentListContent in table mode', () {
     testWidgets('renders table with column headers', (tester) async {
       final equipment = [
