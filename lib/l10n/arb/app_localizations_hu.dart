@@ -13063,6 +13063,23 @@ class AppLocalizationsHu extends AppLocalizations {
   String get diveLog_detail_surfaceGps_site => 'Merülőhely';
 
   @override
+  String get diveLog_detail_surfaceGps_track => 'Felszíni nyomvonal';
+
+  @override
+  String get diveLog_detail_surfaceGps_showFullTrack => 'Teljes nyomvonal';
+
+  @override
+  String diveLog_detail_surfaceGps_trackFixes(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count pont',
+      one: '1 pont',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get diveLog_detail_locationsMap_title => 'Merülési helyszínek';
 
   @override
@@ -19966,7 +19983,192 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String gpsLogger_trackSubtitleTrimmed(String duration) {
+    return 'Levágva, $duration';
+  }
+
+  @override
   String get gpsLogger_tracksHeader => 'Rögzített útvonalak';
+
+  @override
+  String get gpsTrack_action_trim => 'Vágás...';
+
+  @override
+  String get gpsTrack_action_split => 'Felosztás...';
+
+  @override
+  String get gpsTrack_action_resetTrim => 'Vágás visszaállítása';
+
+  @override
+  String get gpsTrack_edit_applyTrim => 'Vágás alkalmazása';
+
+  @override
+  String get gpsTrack_edit_confirmSplit => 'Felosztás itt';
+
+  @override
+  String get gpsTrack_edit_splitWarning =>
+      'A felosztás két nyomvonalat hoz létre és törli az eredetit. Ezt nem lehet visszavonni.';
+
+  @override
+  String get gpsTrack_edit_cancel => 'Mégse';
+
+  @override
+  String get gpsTrack_import_action => 'Nyomvonal importálása...';
+
+  @override
+  String get gpsTrack_import_reviewTitle => 'Importálás ellenőrzése';
+
+  @override
+  String get gpsTrack_import_timezone => 'Rögzítés helye';
+
+  @override
+  String get gpsTrack_import_timezoneHint =>
+      'A fájlban szereplő idők UTC szerintiek. Add meg a rögzítés időzónáját, hogy illeszkedjen a merüléseidhez.';
+
+  @override
+  String get gpsTrack_import_duplicate =>
+      'Ez egy meglévő nyomvonal másolatának tűnik.';
+
+  @override
+  String get gpsTrack_import_confirm => 'Importálás';
+
+  @override
+  String get gpsTrack_import_csvMapping => 'Oszlopok megfeleltetése';
+
+  @override
+  String get gpsTrack_import_firstFix => 'Első pont';
+
+  @override
+  String gpsTrack_import_fixCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count pont',
+      one: '1 pont',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String gpsTrack_import_failed(String reason) {
+    return 'A fájl nem olvasható: $reason';
+  }
+
+  @override
+  String get gpsTrack_importError_unsupportedFormat =>
+      'Ez a fájltípus nem támogatott. Importálj GPX-, KML-, CSV- vagy FIT-fájlt.';
+
+  @override
+  String get gpsTrack_importError_unreadable =>
+      'A fájl nem olvasható. Sérült vagy hiányos lehet.';
+
+  @override
+  String get gpsTrack_importError_noPositions =>
+      'A fájl nem tartalmaz időbélyeggel ellátott GPS-pozíciókat.';
+
+  @override
+  String get gpsTrack_importError_badData =>
+      'A fájl olyan pozíciót vagy időbélyeget tartalmaz, amelyet az alkalmazás nem tud beolvasni.';
+
+  @override
+  String get gpsTrack_export_saved => 'Nyomvonal mentve';
+
+  @override
+  String get gpsTrack_action_export => 'Exportálás';
+
+  @override
+  String get gpsTrack_action_shareGpx => 'Megosztás GPX-ként';
+
+  @override
+  String get gpsTrack_action_saveGpx => 'Mentés GPX-ként...';
+
+  @override
+  String get gpsTrack_action_shareKml => 'Megosztás KML-ként';
+
+  @override
+  String get gpsTrack_action_saveKml => 'Mentés KML-ként...';
+
+  @override
+  String get gpsTrack_export_failed => 'Az exportálás sikertelen.';
+
+  @override
+  String get gpsTrack_map_title => 'Nyomvonaltérkép';
+
+  @override
+  String gpsTrack_map_truncated(int count) {
+    return 'A(z) $count legutóbbi nyomvonal látható. Szűkítsd a dátumszűrőt a többi megtekintéséhez.';
+  }
+
+  @override
+  String get gpsTrack_map_noTracks =>
+      'Nincs megjeleníthető rögzített nyomvonal.';
+
+  @override
+  String get gpsTrack_map_showMap => 'Térkép megjelenítése';
+
+  @override
+  String get gpsTrack_filter_all => 'Minden dátum';
+
+  @override
+  String get gpsTrack_filter_clear => 'Dátumszűrő törlése';
+
+  @override
+  String get gpsTrack_inspect_speed => 'Sebesség';
+
+  @override
+  String get gpsTrack_inspect_accuracy => 'Pontosság';
+
+  @override
+  String get gpsTrack_stats_distance => 'Távolság';
+
+  @override
+  String get gpsTrack_stats_duration => 'Időtartam';
+
+  @override
+  String get gpsTrack_stats_avgSpeed => 'Átl. sebesség';
+
+  @override
+  String get gpsTrack_stats_maxSpeed => 'Max. sebesség';
+
+  @override
+  String get gpsTrack_stats_fixes => 'Pontok';
+
+  @override
+  String get gpsTrack_stats_dives => 'Merülések';
+
+  @override
+  String get gpsTrack_colorMode_uniform => 'Egyszínű';
+
+  @override
+  String get gpsTrack_colorMode_speed => 'Sebesség';
+
+  @override
+  String get gpsTrack_colorMode_elapsed => 'Idő';
+
+  @override
+  String get gpsTrack_legend_slower => 'Lassabb';
+
+  @override
+  String get gpsTrack_legend_faster => 'Gyorsabb';
+
+  @override
+  String get gpsTrack_legend_start => 'Kezdet';
+
+  @override
+  String get gpsTrack_legend_end => 'Vég';
+
+  @override
+  String get gpsTrack_detail_title => 'GPS-nyomvonal';
+
+  @override
+  String get gpsTrack_detail_notFound => 'Ez a nyomvonal már nem érhető el.';
+
+  @override
+  String get gpsTrack_detail_unreadable => 'A nyomvonal adatai nem olvashatók.';
+
+  @override
+  String get gpsTrack_detail_noPoints =>
+      'Ez a nyomvonal nem tartalmaz rögzített pozíciókat.';
 
   @override
   String get maps_compass_resetLabel =>

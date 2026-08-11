@@ -12493,6 +12493,23 @@ class AppLocalizationsZh extends AppLocalizations {
   String get diveLog_detail_surfaceGps_site => '潜点';
 
   @override
+  String get diveLog_detail_surfaceGps_track => '水面轨迹';
+
+  @override
+  String get diveLog_detail_surfaceGps_showFullTrack => '完整轨迹';
+
+  @override
+  String diveLog_detail_surfaceGps_trackFixes(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 个定位点',
+      one: '1 个定位点',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get diveLog_detail_locationsMap_title => '潜水位置';
 
   @override
@@ -19005,7 +19022,185 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String gpsLogger_trackSubtitleTrimmed(String duration) {
+    return '已裁剪，$duration';
+  }
+
+  @override
   String get gpsLogger_tracksHeader => '已记录的轨迹';
+
+  @override
+  String get gpsTrack_action_trim => '裁剪...';
+
+  @override
+  String get gpsTrack_action_split => '拆分...';
+
+  @override
+  String get gpsTrack_action_resetTrim => '重置裁剪';
+
+  @override
+  String get gpsTrack_edit_applyTrim => '应用裁剪';
+
+  @override
+  String get gpsTrack_edit_confirmSplit => '在此拆分';
+
+  @override
+  String get gpsTrack_edit_splitWarning => '拆分会创建两条轨迹并删除原轨迹，此操作无法撤销。';
+
+  @override
+  String get gpsTrack_edit_cancel => '取消';
+
+  @override
+  String get gpsTrack_import_action => '导入轨迹...';
+
+  @override
+  String get gpsTrack_import_reviewTitle => '检查导入';
+
+  @override
+  String get gpsTrack_import_timezone => '记录时区';
+
+  @override
+  String get gpsTrack_import_timezoneHint =>
+      '文件中的时间为 UTC。请设置记录轨迹时所在的时区，以便与您的潜水记录对应。';
+
+  @override
+  String get gpsTrack_import_duplicate => '这看起来与已有轨迹重复。';
+
+  @override
+  String get gpsTrack_import_confirm => '导入';
+
+  @override
+  String get gpsTrack_import_csvMapping => '匹配列';
+
+  @override
+  String get gpsTrack_import_firstFix => '首个定位点';
+
+  @override
+  String gpsTrack_import_fixCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 个定位点',
+      one: '1 个定位点',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String gpsTrack_import_failed(String reason) {
+    return '无法读取该文件：$reason';
+  }
+
+  @override
+  String get gpsTrack_importError_unsupportedFormat =>
+      '不支持该文件类型。请导入 GPX、KML、CSV 或 FIT 文件。';
+
+  @override
+  String get gpsTrack_importError_unreadable => '无法读取该文件。它可能已损坏或不完整。';
+
+  @override
+  String get gpsTrack_importError_noPositions => '该文件没有带时间戳的 GPS 位置。';
+
+  @override
+  String get gpsTrack_importError_badData => '该文件包含本应用无法读取的位置或时间戳。';
+
+  @override
+  String get gpsTrack_export_saved => '轨迹已保存';
+
+  @override
+  String get gpsTrack_action_export => '导出';
+
+  @override
+  String get gpsTrack_action_shareGpx => '分享为 GPX';
+
+  @override
+  String get gpsTrack_action_saveGpx => '保存为 GPX...';
+
+  @override
+  String get gpsTrack_action_shareKml => '分享为 KML';
+
+  @override
+  String get gpsTrack_action_saveKml => '保存为 KML...';
+
+  @override
+  String get gpsTrack_export_failed => '导出失败。';
+
+  @override
+  String get gpsTrack_map_title => '轨迹地图';
+
+  @override
+  String gpsTrack_map_truncated(int count) {
+    return '正在显示最近的 $count 条轨迹。请缩小日期筛选范围以查看其他轨迹。';
+  }
+
+  @override
+  String get gpsTrack_map_noTracks => '没有可显示的已记录轨迹。';
+
+  @override
+  String get gpsTrack_map_showMap => '显示地图';
+
+  @override
+  String get gpsTrack_filter_all => '所有日期';
+
+  @override
+  String get gpsTrack_filter_clear => '清除日期筛选';
+
+  @override
+  String get gpsTrack_inspect_speed => '速度';
+
+  @override
+  String get gpsTrack_inspect_accuracy => '精度';
+
+  @override
+  String get gpsTrack_stats_distance => '距离';
+
+  @override
+  String get gpsTrack_stats_duration => '时长';
+
+  @override
+  String get gpsTrack_stats_avgSpeed => '平均速度';
+
+  @override
+  String get gpsTrack_stats_maxSpeed => '最高速度';
+
+  @override
+  String get gpsTrack_stats_fixes => '定位点';
+
+  @override
+  String get gpsTrack_stats_dives => '潜水';
+
+  @override
+  String get gpsTrack_colorMode_uniform => '单色';
+
+  @override
+  String get gpsTrack_colorMode_speed => '速度';
+
+  @override
+  String get gpsTrack_colorMode_elapsed => '时间';
+
+  @override
+  String get gpsTrack_legend_slower => '较慢';
+
+  @override
+  String get gpsTrack_legend_faster => '较快';
+
+  @override
+  String get gpsTrack_legend_start => '起点';
+
+  @override
+  String get gpsTrack_legend_end => '终点';
+
+  @override
+  String get gpsTrack_detail_title => 'GPS 轨迹';
+
+  @override
+  String get gpsTrack_detail_notFound => '此轨迹已不可用。';
+
+  @override
+  String get gpsTrack_detail_unreadable => '无法读取轨迹数据。';
+
+  @override
+  String get gpsTrack_detail_noPoints => '此轨迹没有记录的位置。';
 
   @override
   String get maps_compass_resetLabel => '将地图方向重置为正北';

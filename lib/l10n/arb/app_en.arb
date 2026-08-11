@@ -7618,6 +7618,17 @@
   "diveLog_detail_surfaceGps_entryOnly": "Entry point recorded",
   "diveLog_detail_surfaceGps_exitOnly": "Exit point recorded",
   "diveLog_detail_surfaceGps_site": "Site",
+  "diveLog_detail_surfaceGps_track": "Surface track",
+  "diveLog_detail_surfaceGps_showFullTrack": "Full track",
+  "diveLog_detail_surfaceGps_trackFixes": "{count, plural, =1{1 fix} other{{count} fixes}}",
+  "@diveLog_detail_surfaceGps_trackFixes": {
+    "description": "Count of GPS positions in the surface track covering this dive",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "diveLog_detail_locationsMap_title": "Dive Locations",
   "diveLog_detail_coordinatesCopied": "Coordinates copied to clipboard",
   "diveLog_detail_openInMaps": "Open in Maps",
@@ -12607,7 +12618,105 @@
       }
     }
   },
+  "gpsLogger_trackSubtitleTrimmed": "Trimmed, {duration}",
+  "@gpsLogger_trackSubtitleTrimmed": {
+    "description": "Track row subtitle when a trim makes the stored point count unusable.",
+    "placeholders": {
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
   "gpsLogger_tracksHeader": "Recorded tracks",
+  "gpsTrack_action_trim": "Trim...",
+  "gpsTrack_action_split": "Split...",
+  "gpsTrack_action_resetTrim": "Reset trim",
+  "gpsTrack_edit_applyTrim": "Apply trim",
+  "gpsTrack_edit_confirmSplit": "Split here",
+  "gpsTrack_edit_splitWarning": "Splitting creates two tracks and removes the original. This cannot be undone.",
+  "gpsTrack_edit_cancel": "Cancel",
+  "gpsTrack_import_action": "Import track...",
+  "gpsTrack_import_reviewTitle": "Review Import",
+  "gpsTrack_import_timezone": "Recorded in",
+  "gpsTrack_import_timezoneHint": "Times in the file are UTC. Set the zone the track was recorded in so it lines up with your dives.",
+  "gpsTrack_import_duplicate": "This looks like a duplicate of an existing track.",
+  "gpsTrack_import_confirm": "Import",
+  "gpsTrack_import_csvMapping": "Match the columns",
+  "gpsTrack_import_firstFix": "First fix",
+  "gpsTrack_import_fixCount": "{count, plural, =1{1 fix} other{{count} fixes}}",
+  "@gpsTrack_import_fixCount": {
+    "description": "Number of positions in the track being imported",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "gpsTrack_import_failed": "Could not read that file: {reason}",
+  "@gpsTrack_import_failed": {
+    "description": "Shown when parsing an imported track file fails",
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "gpsTrack_importError_unsupportedFormat": "That file type is not supported. Import a GPX, KML, CSV, or FIT file.",
+  "@gpsTrack_importError_unsupportedFormat": {
+    "description": "Track import failed: the file extension is not one the app reads."
+  },
+  "gpsTrack_importError_unreadable": "That file could not be read. It may be damaged or incomplete.",
+  "@gpsTrack_importError_unreadable": {
+    "description": "Track import failed: the file is structurally unreadable."
+  },
+  "gpsTrack_importError_noPositions": "That file has no timestamped GPS positions.",
+  "@gpsTrack_importError_noPositions": {
+    "description": "Track import failed: the file parsed but holds no GPS positions."
+  },
+  "gpsTrack_importError_badData": "That file has a position or timestamp this app cannot read.",
+  "@gpsTrack_importError_badData": {
+    "description": "Track import failed: a coordinate or timestamp in the file is unusable."
+  },
+  "gpsTrack_export_saved": "Track saved",
+  "gpsTrack_action_export": "Export",
+  "gpsTrack_action_shareGpx": "Share as GPX",
+  "gpsTrack_action_saveGpx": "Save as GPX...",
+  "gpsTrack_action_shareKml": "Share as KML",
+  "gpsTrack_action_saveKml": "Save as KML...",
+  "gpsTrack_export_failed": "Export failed.",
+  "gpsTrack_map_title": "Track Map",
+  "gpsTrack_map_truncated": "Showing the {count} most recent tracks. Narrow the date filter to see others.",
+  "@gpsTrack_map_truncated": {
+    "description": "Banner shown when the overview map caps how many tracks it draws.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "gpsTrack_map_noTracks": "No recorded tracks to show.",
+  "gpsTrack_map_showMap": "Show map",
+  "gpsTrack_filter_all": "All dates",
+  "gpsTrack_filter_clear": "Clear date filter",
+  "gpsTrack_inspect_speed": "Speed",
+  "gpsTrack_inspect_accuracy": "Accuracy",
+  "gpsTrack_stats_distance": "Distance",
+  "gpsTrack_stats_duration": "Duration",
+  "gpsTrack_stats_avgSpeed": "Avg speed",
+  "gpsTrack_stats_maxSpeed": "Max speed",
+  "gpsTrack_stats_fixes": "Fixes",
+  "gpsTrack_stats_dives": "Dives",
+  "gpsTrack_colorMode_uniform": "Plain",
+  "gpsTrack_colorMode_speed": "Speed",
+  "gpsTrack_colorMode_elapsed": "Time",
+  "gpsTrack_legend_slower": "Slower",
+  "gpsTrack_legend_faster": "Faster",
+  "gpsTrack_legend_start": "Start",
+  "gpsTrack_legend_end": "End",
+  "gpsTrack_detail_title": "GPS Track",
+  "gpsTrack_detail_notFound": "This track is no longer available.",
+  "gpsTrack_detail_unreadable": "Track data could not be read.",
+  "gpsTrack_detail_noPoints": "This track has no recorded positions.",
   "maps_compass_resetLabel": "Reset map orientation to north",
   "maps_compass_resetTooltip": "North up",
   "maps_heatMap_hide": "Hide Heat Map",

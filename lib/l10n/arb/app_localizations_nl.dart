@@ -13005,6 +13005,23 @@ class AppLocalizationsNl extends AppLocalizations {
   String get diveLog_detail_surfaceGps_site => 'Duikstek';
 
   @override
+  String get diveLog_detail_surfaceGps_track => 'Oppervlaktetrack';
+
+  @override
+  String get diveLog_detail_surfaceGps_showFullTrack => 'Volledige track';
+
+  @override
+  String diveLog_detail_surfaceGps_trackFixes(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count punten',
+      one: '1 punt',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get diveLog_detail_locationsMap_title => 'Duiklocaties';
 
   @override
@@ -19864,7 +19881,192 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String gpsLogger_trackSubtitleTrimmed(String duration) {
+    return 'Bijgesneden, $duration';
+  }
+
+  @override
   String get gpsLogger_tracksHeader => 'Opgenomen tracks';
+
+  @override
+  String get gpsTrack_action_trim => 'Bijsnijden...';
+
+  @override
+  String get gpsTrack_action_split => 'Splitsen...';
+
+  @override
+  String get gpsTrack_action_resetTrim => 'Bijsnijden ongedaan maken';
+
+  @override
+  String get gpsTrack_edit_applyTrim => 'Bijsnijden toepassen';
+
+  @override
+  String get gpsTrack_edit_confirmSplit => 'Hier splitsen';
+
+  @override
+  String get gpsTrack_edit_splitWarning =>
+      'Splitsen maakt twee tracks en verwijdert het origineel. Dit kan niet ongedaan worden gemaakt.';
+
+  @override
+  String get gpsTrack_edit_cancel => 'Annuleren';
+
+  @override
+  String get gpsTrack_import_action => 'Track importeren...';
+
+  @override
+  String get gpsTrack_import_reviewTitle => 'Import controleren';
+
+  @override
+  String get gpsTrack_import_timezone => 'Opgenomen in';
+
+  @override
+  String get gpsTrack_import_timezoneHint =>
+      'De tijden in het bestand zijn UTC. Stel de zone in waarin de track is opgenomen zodat die aansluit op je duiken.';
+
+  @override
+  String get gpsTrack_import_duplicate =>
+      'Dit lijkt een duplicaat van een bestaande track.';
+
+  @override
+  String get gpsTrack_import_confirm => 'Importeren';
+
+  @override
+  String get gpsTrack_import_csvMapping => 'Kolommen koppelen';
+
+  @override
+  String get gpsTrack_import_firstFix => 'Eerste punt';
+
+  @override
+  String gpsTrack_import_fixCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count punten',
+      one: '1 punt',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String gpsTrack_import_failed(String reason) {
+    return 'Kan dat bestand niet lezen: $reason';
+  }
+
+  @override
+  String get gpsTrack_importError_unsupportedFormat =>
+      'Dit bestandstype wordt niet ondersteund. Importeer een GPX-, KML-, CSV- of FIT-bestand.';
+
+  @override
+  String get gpsTrack_importError_unreadable =>
+      'Dit bestand kon niet worden gelezen. Het is mogelijk beschadigd of onvolledig.';
+
+  @override
+  String get gpsTrack_importError_noPositions =>
+      'Dit bestand bevat geen GPS-posities met tijdstempel.';
+
+  @override
+  String get gpsTrack_importError_badData =>
+      'Dit bestand bevat een positie of tijdstempel die deze app niet kan lezen.';
+
+  @override
+  String get gpsTrack_export_saved => 'Track opgeslagen';
+
+  @override
+  String get gpsTrack_action_export => 'Exporteren';
+
+  @override
+  String get gpsTrack_action_shareGpx => 'Delen als GPX';
+
+  @override
+  String get gpsTrack_action_saveGpx => 'Opslaan als GPX...';
+
+  @override
+  String get gpsTrack_action_shareKml => 'Delen als KML';
+
+  @override
+  String get gpsTrack_action_saveKml => 'Opslaan als KML...';
+
+  @override
+  String get gpsTrack_export_failed => 'Exporteren mislukt.';
+
+  @override
+  String get gpsTrack_map_title => 'Trackkaart';
+
+  @override
+  String gpsTrack_map_truncated(int count) {
+    return 'De $count meest recente tracks worden getoond. Verfijn het datumfilter om andere te zien.';
+  }
+
+  @override
+  String get gpsTrack_map_noTracks => 'Geen opgenomen tracks om te tonen.';
+
+  @override
+  String get gpsTrack_map_showMap => 'Kaart tonen';
+
+  @override
+  String get gpsTrack_filter_all => 'Alle datums';
+
+  @override
+  String get gpsTrack_filter_clear => 'Datumfilter wissen';
+
+  @override
+  String get gpsTrack_inspect_speed => 'Snelheid';
+
+  @override
+  String get gpsTrack_inspect_accuracy => 'Nauwkeurigheid';
+
+  @override
+  String get gpsTrack_stats_distance => 'Afstand';
+
+  @override
+  String get gpsTrack_stats_duration => 'Duur';
+
+  @override
+  String get gpsTrack_stats_avgSpeed => 'Gem. snelheid';
+
+  @override
+  String get gpsTrack_stats_maxSpeed => 'Max. snelheid';
+
+  @override
+  String get gpsTrack_stats_fixes => 'Punten';
+
+  @override
+  String get gpsTrack_stats_dives => 'Duiken';
+
+  @override
+  String get gpsTrack_colorMode_uniform => 'Effen';
+
+  @override
+  String get gpsTrack_colorMode_speed => 'Snelheid';
+
+  @override
+  String get gpsTrack_colorMode_elapsed => 'Tijd';
+
+  @override
+  String get gpsTrack_legend_slower => 'Langzamer';
+
+  @override
+  String get gpsTrack_legend_faster => 'Sneller';
+
+  @override
+  String get gpsTrack_legend_start => 'Start';
+
+  @override
+  String get gpsTrack_legend_end => 'Einde';
+
+  @override
+  String get gpsTrack_detail_title => 'GPS-track';
+
+  @override
+  String get gpsTrack_detail_notFound => 'Deze track is niet meer beschikbaar.';
+
+  @override
+  String get gpsTrack_detail_unreadable =>
+      'Trackgegevens konden niet worden gelezen.';
+
+  @override
+  String get gpsTrack_detail_noPoints =>
+      'Deze track bevat geen opgenomen posities.';
 
   @override
   String get maps_compass_resetLabel =>

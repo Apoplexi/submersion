@@ -12783,6 +12783,24 @@ class AppLocalizationsHe extends AppLocalizations {
   String get diveLog_detail_surfaceGps_site => 'אתר';
 
   @override
+  String get diveLog_detail_surfaceGps_track => 'מסלול פני השטח';
+
+  @override
+  String get diveLog_detail_surfaceGps_showFullTrack => 'מסלול מלא';
+
+  @override
+  String diveLog_detail_surfaceGps_trackFixes(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count נקודות',
+      two: 'שתי נקודות',
+      one: 'נקודה אחת',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get diveLog_detail_locationsMap_title => 'מיקומי צלילה';
 
   @override
@@ -19523,7 +19541,190 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
+  String gpsLogger_trackSubtitleTrimmed(String duration) {
+    return 'נחתך, $duration';
+  }
+
+  @override
   String get gpsLogger_tracksHeader => 'מסלולים שהוקלטו';
+
+  @override
+  String get gpsTrack_action_trim => 'חיתוך...';
+
+  @override
+  String get gpsTrack_action_split => 'פיצול...';
+
+  @override
+  String get gpsTrack_action_resetTrim => 'איפוס החיתוך';
+
+  @override
+  String get gpsTrack_edit_applyTrim => 'החל חיתוך';
+
+  @override
+  String get gpsTrack_edit_confirmSplit => 'פצל כאן';
+
+  @override
+  String get gpsTrack_edit_splitWarning =>
+      'פיצול יוצר שני מסלולים ומוחק את המקורי. לא ניתן לבטל פעולה זו.';
+
+  @override
+  String get gpsTrack_edit_cancel => 'ביטול';
+
+  @override
+  String get gpsTrack_import_action => 'ייבוא מסלול...';
+
+  @override
+  String get gpsTrack_import_reviewTitle => 'בדיקת ייבוא';
+
+  @override
+  String get gpsTrack_import_timezone => 'הוקלט באזור';
+
+  @override
+  String get gpsTrack_import_timezoneHint =>
+      'הזמנים בקובץ הם UTC. בחר את אזור הזמן שבו הוקלט המסלול כדי שיתאים לצלילות שלך.';
+
+  @override
+  String get gpsTrack_import_duplicate => 'נראה שזהו כפיל של מסלול קיים.';
+
+  @override
+  String get gpsTrack_import_confirm => 'ייבוא';
+
+  @override
+  String get gpsTrack_import_csvMapping => 'התאמת עמודות';
+
+  @override
+  String get gpsTrack_import_firstFix => 'נקודה ראשונה';
+
+  @override
+  String gpsTrack_import_fixCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count נקודות',
+      two: 'שתי נקודות',
+      one: 'נקודה אחת',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String gpsTrack_import_failed(String reason) {
+    return 'לא ניתן לקרוא את הקובץ: $reason';
+  }
+
+  @override
+  String get gpsTrack_importError_unsupportedFormat =>
+      'סוג הקובץ אינו נתמך. ייבא קובץ GPX, KML, CSV או FIT.';
+
+  @override
+  String get gpsTrack_importError_unreadable =>
+      'לא ניתן לקרוא את הקובץ. ייתכן שהוא פגום או חלקי.';
+
+  @override
+  String get gpsTrack_importError_noPositions =>
+      'בקובץ אין מיקומי GPS עם חותמת זמן.';
+
+  @override
+  String get gpsTrack_importError_badData =>
+      'בקובץ יש מיקום או חותמת זמן שהאפליקציה אינה יכולה לקרוא.';
+
+  @override
+  String get gpsTrack_export_saved => 'המסלול נשמר';
+
+  @override
+  String get gpsTrack_action_export => 'ייצוא';
+
+  @override
+  String get gpsTrack_action_shareGpx => 'שיתוף כ-GPX';
+
+  @override
+  String get gpsTrack_action_saveGpx => 'שמירה כ-GPX...';
+
+  @override
+  String get gpsTrack_action_shareKml => 'שיתוף כ-KML';
+
+  @override
+  String get gpsTrack_action_saveKml => 'שמירה כ-KML...';
+
+  @override
+  String get gpsTrack_export_failed => 'הייצוא נכשל.';
+
+  @override
+  String get gpsTrack_map_title => 'מפת מסלולים';
+
+  @override
+  String gpsTrack_map_truncated(int count) {
+    return 'מוצגים $count המסלולים האחרונים. צמצם את מסנן התאריכים כדי לראות אחרים.';
+  }
+
+  @override
+  String get gpsTrack_map_noTracks => 'אין מסלולים מוקלטים להצגה.';
+
+  @override
+  String get gpsTrack_map_showMap => 'הצג מפה';
+
+  @override
+  String get gpsTrack_filter_all => 'כל התאריכים';
+
+  @override
+  String get gpsTrack_filter_clear => 'נקה סינון תאריכים';
+
+  @override
+  String get gpsTrack_inspect_speed => 'מהירות';
+
+  @override
+  String get gpsTrack_inspect_accuracy => 'דיוק';
+
+  @override
+  String get gpsTrack_stats_distance => 'מרחק';
+
+  @override
+  String get gpsTrack_stats_duration => 'משך';
+
+  @override
+  String get gpsTrack_stats_avgSpeed => 'מהירות ממוצעת';
+
+  @override
+  String get gpsTrack_stats_maxSpeed => 'מהירות מרבית';
+
+  @override
+  String get gpsTrack_stats_fixes => 'נקודות';
+
+  @override
+  String get gpsTrack_stats_dives => 'צלילות';
+
+  @override
+  String get gpsTrack_colorMode_uniform => 'אחיד';
+
+  @override
+  String get gpsTrack_colorMode_speed => 'מהירות';
+
+  @override
+  String get gpsTrack_colorMode_elapsed => 'זמן';
+
+  @override
+  String get gpsTrack_legend_slower => 'אטי יותר';
+
+  @override
+  String get gpsTrack_legend_faster => 'מהיר יותר';
+
+  @override
+  String get gpsTrack_legend_start => 'התחלה';
+
+  @override
+  String get gpsTrack_legend_end => 'סוף';
+
+  @override
+  String get gpsTrack_detail_title => 'מסלול GPS';
+
+  @override
+  String get gpsTrack_detail_notFound => 'מסלול זה אינו זמין עוד.';
+
+  @override
+  String get gpsTrack_detail_unreadable => 'לא ניתן היה לקרוא את נתוני המסלול.';
+
+  @override
+  String get gpsTrack_detail_noPoints => 'למסלול זה אין מיקומים מוקלטים.';
 
   @override
   String get maps_compass_resetLabel => 'איפוס כיוון המפה לצפון';

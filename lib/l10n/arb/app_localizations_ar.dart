@@ -12873,6 +12873,25 @@ class AppLocalizationsAr extends AppLocalizations {
   String get diveLog_detail_surfaceGps_site => 'الموقع';
 
   @override
+  String get diveLog_detail_surfaceGps_track => 'مسار السطح';
+
+  @override
+  String get diveLog_detail_surfaceGps_showFullTrack => 'المسار الكامل';
+
+  @override
+  String diveLog_detail_surfaceGps_trackFixes(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count نقطة',
+      few: '$count نقاط',
+      two: 'نقطتان',
+      one: 'نقطة واحدة',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get diveLog_detail_locationsMap_title => 'مواقع الغوص';
 
   @override
@@ -19668,7 +19687,193 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String gpsLogger_trackSubtitleTrimmed(String duration) {
+    return 'مقتطع، $duration';
+  }
+
+  @override
   String get gpsLogger_tracksHeader => 'المسارات المسجّلة';
+
+  @override
+  String get gpsTrack_action_trim => 'اقتصاص...';
+
+  @override
+  String get gpsTrack_action_split => 'تقسيم...';
+
+  @override
+  String get gpsTrack_action_resetTrim => 'إلغاء الاقتصاص';
+
+  @override
+  String get gpsTrack_edit_applyTrim => 'تطبيق الاقتصاص';
+
+  @override
+  String get gpsTrack_edit_confirmSplit => 'قسّم هنا';
+
+  @override
+  String get gpsTrack_edit_splitWarning =>
+      'ينشئ التقسيم مسارين ويحذف الأصل. لا يمكن التراجع عن ذلك.';
+
+  @override
+  String get gpsTrack_edit_cancel => 'إلغاء';
+
+  @override
+  String get gpsTrack_import_action => 'استيراد مسار...';
+
+  @override
+  String get gpsTrack_import_reviewTitle => 'مراجعة الاستيراد';
+
+  @override
+  String get gpsTrack_import_timezone => 'سُجّل في';
+
+  @override
+  String get gpsTrack_import_timezoneHint =>
+      'الأوقات في الملف بتوقيت UTC. حدّد المنطقة الزمنية التي سُجّل فيها المسار ليتوافق مع غطساتك.';
+
+  @override
+  String get gpsTrack_import_duplicate =>
+      'يبدو أن هذا نسخة مكررة من مسار موجود.';
+
+  @override
+  String get gpsTrack_import_confirm => 'استيراد';
+
+  @override
+  String get gpsTrack_import_csvMapping => 'طابق الأعمدة';
+
+  @override
+  String get gpsTrack_import_firstFix => 'أول نقطة';
+
+  @override
+  String gpsTrack_import_fixCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count نقطة',
+      few: '$count نقاط',
+      two: 'نقطتان',
+      one: 'نقطة واحدة',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String gpsTrack_import_failed(String reason) {
+    return 'تعذّرت قراءة الملف: $reason';
+  }
+
+  @override
+  String get gpsTrack_importError_unsupportedFormat =>
+      'نوع الملف هذا غير مدعوم. قم باستيراد ملف GPX أو KML أو CSV أو FIT.';
+
+  @override
+  String get gpsTrack_importError_unreadable =>
+      'تعذرت قراءة هذا الملف. قد يكون تالفًا أو غير مكتمل.';
+
+  @override
+  String get gpsTrack_importError_noPositions =>
+      'لا يحتوي هذا الملف على مواقع GPS مؤرخة زمنيًا.';
+
+  @override
+  String get gpsTrack_importError_badData =>
+      'يحتوي هذا الملف على موقع أو طابع زمني يتعذر على التطبيق قراءته.';
+
+  @override
+  String get gpsTrack_export_saved => 'تم حفظ المسار';
+
+  @override
+  String get gpsTrack_action_export => 'تصدير';
+
+  @override
+  String get gpsTrack_action_shareGpx => 'مشاركة كملف GPX';
+
+  @override
+  String get gpsTrack_action_saveGpx => 'حفظ كملف GPX...';
+
+  @override
+  String get gpsTrack_action_shareKml => 'مشاركة كملف KML';
+
+  @override
+  String get gpsTrack_action_saveKml => 'حفظ كملف KML...';
+
+  @override
+  String get gpsTrack_export_failed => 'فشل التصدير.';
+
+  @override
+  String get gpsTrack_map_title => 'خريطة المسارات';
+
+  @override
+  String gpsTrack_map_truncated(int count) {
+    return 'يتم عرض أحدث $count مسار. قم بتضييق عامل تصفية التاريخ لعرض المسارات الأخرى.';
+  }
+
+  @override
+  String get gpsTrack_map_noTracks => 'لا توجد مسارات مسجّلة لعرضها.';
+
+  @override
+  String get gpsTrack_map_showMap => 'عرض الخريطة';
+
+  @override
+  String get gpsTrack_filter_all => 'كل التواريخ';
+
+  @override
+  String get gpsTrack_filter_clear => 'مسح عامل تصفية التاريخ';
+
+  @override
+  String get gpsTrack_inspect_speed => 'السرعة';
+
+  @override
+  String get gpsTrack_inspect_accuracy => 'الدقة';
+
+  @override
+  String get gpsTrack_stats_distance => 'المسافة';
+
+  @override
+  String get gpsTrack_stats_duration => 'المدة';
+
+  @override
+  String get gpsTrack_stats_avgSpeed => 'متوسط السرعة';
+
+  @override
+  String get gpsTrack_stats_maxSpeed => 'أقصى سرعة';
+
+  @override
+  String get gpsTrack_stats_fixes => 'النقاط';
+
+  @override
+  String get gpsTrack_stats_dives => 'الغطسات';
+
+  @override
+  String get gpsTrack_colorMode_uniform => 'عادي';
+
+  @override
+  String get gpsTrack_colorMode_speed => 'السرعة';
+
+  @override
+  String get gpsTrack_colorMode_elapsed => 'الوقت';
+
+  @override
+  String get gpsTrack_legend_slower => 'أبطأ';
+
+  @override
+  String get gpsTrack_legend_faster => 'أسرع';
+
+  @override
+  String get gpsTrack_legend_start => 'البداية';
+
+  @override
+  String get gpsTrack_legend_end => 'النهاية';
+
+  @override
+  String get gpsTrack_detail_title => 'مسار GPS';
+
+  @override
+  String get gpsTrack_detail_notFound => 'هذا المسار لم يعد متاحًا.';
+
+  @override
+  String get gpsTrack_detail_unreadable => 'تعذّرت قراءة بيانات المسار.';
+
+  @override
+  String get gpsTrack_detail_noPoints =>
+      'لا يحتوي هذا المسار على مواقع مسجّلة.';
 
   @override
   String get maps_compass_resetLabel => 'إعادة ضبط اتجاه الخريطة نحو الشمال';
