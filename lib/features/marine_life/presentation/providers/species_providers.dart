@@ -18,6 +18,14 @@ final allSpeciesProvider = FutureProvider<List<Species>>((ref) async {
 });
 
 /// Species by category provider
+/// Sighting counts per species, so a list can tell which species the
+/// repository will refuse to delete without running one query per row.
+final speciesSightingCountsProvider = FutureProvider<Map<String, int>>((
+  ref,
+) async {
+  return ref.watch(speciesRepositoryProvider).sightingCountsBySpecies();
+});
+
 final speciesByCategoryProvider =
     FutureProvider.family<List<Species>, SpeciesCategory>((
       ref,

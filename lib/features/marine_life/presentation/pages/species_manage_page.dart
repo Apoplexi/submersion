@@ -7,6 +7,11 @@ import 'package:submersion/features/marine_life/presentation/utils/species_categ
 import 'package:submersion/features/marine_life/domain/entities/species.dart';
 import 'package:submersion/features/marine_life/presentation/providers/species_providers.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
+import 'package:submersion/shared/selection/selectable_list_scope.dart';
+import 'package:submersion/shared/selection/selection_app_bar.dart';
+import 'package:submersion/shared/selection/selection_controller.dart';
+import 'package:submersion/shared/selection/selection_leading.dart';
+import 'package:submersion/shared/selection/selection_state.dart';
 
 class SpeciesManagePage extends ConsumerStatefulWidget {
   const SpeciesManagePage({super.key});
@@ -19,54 +24,117 @@ class _SpeciesManagePageState extends ConsumerState<SpeciesManagePage> {
   String _searchQuery = '';
   SpeciesCategory? _selectedCategory;
 
+  /// Owns the bulk-selection state machine for this page.
+  final SelectionController _selection = SelectionController();
+
+  /// Convenience mirrors of the controller, so the widget tree reads clearly.
+  bool get _isSelectionMode => _selection.value.isActive;
+  Set<String> get _selectedIds => _selection.value.checkedIds;
+
+  /// Sighting counts, prefetched once for the whole list.
+  ///
+  /// "Has sightings" is a database count, so it cannot be a synchronous
+  /// predicate the way isBuiltIn can. Prefetching lets an in-use species
+  /// render without a checkbox instead of failing at delete time.
+  Map<String, int> _sightingCounts = const {};
+
+  /// A species is selectable only if it is custom and unreferenced -- exactly
+  /// the two conditions SpeciesRepository.deleteSpecies enforces.
+  bool _isSelectable(Species s) =>
+      !s.isBuiltIn && (_sightingCounts[s.id] ?? 0) == 0;
+
+  @override
+  void dispose() {
+    _selection.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     final speciesAsync = ref.watch(speciesListNotifierProvider);
+    _sightingCounts =
+        ref.watch(speciesSightingCountsProvider).value ?? const {};
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(context.l10n.marineLife_speciesManage_appBarTitle),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          tooltip: context.l10n.marineLife_speciesManage_backTooltip,
-          onPressed: () => context.pop(),
-        ),
-        actions: [
-          PopupMenuButton<String>(
-            onSelected: (value) {
-              if (value == 'reset') {
-                _confirmResetDefaults(context, ref);
-              }
-            },
-            itemBuilder: (context) => [
-              PopupMenuItem(
-                value: 'reset',
-                child: Text(
-                  context.l10n.marineLife_speciesManage_resetToDefaults,
+    final selectableIds = _visibleSpecies(
+      speciesAsync.value ?? const [],
+    ).where(_isSelectable).map((s) => s.id).toList();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _selection.pruneTo(selectableIds);
+    });
+
+    return SelectableListScope(
+      controller: _selection,
+      selectableIds: selectableIds,
+      child: ValueListenableBuilder<SelectionState>(
+        valueListenable: _selection,
+        builder: (context, selection, _) => Scaffold(
+          appBar: selection.isActive
+              ? SelectionAppBar(
+                  controller: _selection,
+                  selectableIds: selectableIds,
+                  actions: const [],
+                  shell: SelectionBarShell.appBar,
+                  onDelete: _confirmAndDeleteSelected,
+                )
+              : AppBar(
+                  title: Text(
+                    context.l10n.marineLife_speciesManage_appBarTitle,
+                  ),
+                  leading: IconButton(
+                    icon: const Icon(Icons.arrow_back),
+                    tooltip: context.l10n.marineLife_speciesManage_backTooltip,
+                    onPressed: () => context.pop(),
+                  ),
+                  actions: [
+                    IconButton(
+                      key: const ValueKey('enter_selection'),
+                      icon: const Icon(Icons.checklist),
+                      tooltip: context.l10n.common_selection_enterTooltip,
+                      onPressed: _selection.enterExplicit,
+                    ),
+                    PopupMenuButton<String>(
+                      onSelected: (value) {
+                        if (value == 'reset') {
+                          _confirmResetDefaults(context, ref);
+                        }
+                      },
+                      itemBuilder: (context) => [
+                        PopupMenuItem(
+                          value: 'reset',
+                          child: Text(
+                            context
+                                .l10n
+                                .marineLife_speciesManage_resetToDefaults,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+          floatingActionButton: selection.isActive
+              ? null
+              : FloatingActionButton.extended(
+                  onPressed: () => context.push('/species/new'),
+                  tooltip: context.l10n.marineLife_speciesEdit_addTitle,
+                  icon: const Icon(Icons.add),
+                  label: Text(context.l10n.marineLife_speciesEdit_addTitle),
+                ),
+          body: Column(
+            children: [
+              _buildSearchBar(),
+              _buildCategoryFilter(),
+              Expanded(
+                child: speciesAsync.when(
+                  loading: () =>
+                      const Center(child: CircularProgressIndicator()),
+                  error: (e, st) => Center(child: Text('Error: $e')),
+                  data: (allSpecies) => _buildSpeciesList(allSpecies),
                 ),
               ),
             ],
           ),
-        ],
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => context.push('/species/new'),
-        tooltip: context.l10n.marineLife_speciesEdit_addTitle,
-        icon: const Icon(Icons.add),
-        label: Text(context.l10n.marineLife_speciesEdit_addTitle),
-      ),
-      body: Column(
-        children: [
-          _buildSearchBar(),
-          _buildCategoryFilter(),
-          Expanded(
-            child: speciesAsync.when(
-              loading: () => const Center(child: CircularProgressIndicator()),
-              error: (e, st) => Center(child: Text('Error: $e')),
-              data: (allSpecies) => _buildSpeciesList(allSpecies),
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -125,7 +193,11 @@ class _SpeciesManagePageState extends ConsumerState<SpeciesManagePage> {
     );
   }
 
-  Widget _buildSpeciesList(List<Species> allSpecies) {
+  /// Species matching the active search query and category filter.
+  ///
+  /// Shared by the list and by the pruning in [build] so the selection can
+  /// never hold a species the filter has hidden.
+  List<Species> _visibleSpecies(List<Species> allSpecies) {
     var filtered = allSpecies;
 
     if (_searchQuery.isNotEmpty) {
@@ -142,6 +214,11 @@ class _SpeciesManagePageState extends ConsumerState<SpeciesManagePage> {
           .where((s) => s.category == _selectedCategory)
           .toList();
     }
+    return filtered;
+  }
+
+  Widget _buildSpeciesList(List<Species> allSpecies) {
+    final filtered = _visibleSpecies(allSpecies);
 
     if (filtered.isEmpty) {
       return const Center(child: Text('No species found'));
@@ -183,9 +260,17 @@ class _SpeciesManagePageState extends ConsumerState<SpeciesManagePage> {
 
   Widget _buildSpeciesTile(Species species, {required bool isCustom}) {
     return ListTile(
-      leading: Icon(
-        iconForSpeciesCategory(species.category),
-        color: _getCategoryColor(species.category),
+      leading: SelectionLeading(
+        isSelectionMode: _isSelectionMode,
+        isChecked: _selectedIds.contains(species.id),
+        // Built-in species and species with sightings are exactly what
+        // deleteSpecies refuses, so neither gets a checkbox.
+        isSelectable: _isSelectable(species),
+        onChanged: (_) => _selection.toggle(species.id),
+        child: Icon(
+          iconForSpeciesCategory(species.category),
+          color: _getCategoryColor(species.category),
+        ),
       ),
       title: Text(species.commonName),
       subtitle: species.scientificName != null
@@ -210,7 +295,54 @@ class _SpeciesManagePageState extends ConsumerState<SpeciesManagePage> {
             ),
         ],
       ),
-      onTap: () => context.push('/species/${species.id}'),
+      onTap: () {
+        if (_isSelectionMode) {
+          if (_isSelectable(species)) _selection.toggle(species.id);
+          return;
+        }
+        context.push('/species/${species.id}');
+      },
+    );
+  }
+
+  Future<void> _confirmAndDeleteSelected() async {
+    final ids = _selectedIds.toList();
+    if (ids.isEmpty) return;
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(ctx.l10n.common_bulkDelete_title(ids.length)),
+        content: Text(ctx.l10n.common_bulkDelete_body),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: Text(ctx.l10n.common_action_cancel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            style: FilledButton.styleFrom(
+              backgroundColor: Theme.of(ctx).colorScheme.error,
+            ),
+            child: Text(ctx.l10n.common_action_delete),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+
+    final messenger = ScaffoldMessenger.of(context);
+    final notifier = ref.read(speciesListNotifierProvider.notifier);
+    _selection.exit();
+    for (final id in ids) {
+      await notifier.deleteSpecies(id);
+    }
+    if (!mounted) return;
+    ref.invalidate(speciesSightingCountsProvider);
+    messenger.showSnackBar(
+      SnackBar(
+        content: Text(context.l10n.common_bulkDelete_snackbar(ids.length)),
+      ),
     );
   }
 
