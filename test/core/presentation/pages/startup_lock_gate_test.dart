@@ -111,6 +111,7 @@ void main() {
           dbPath: dbPath,
           kdf: testKdf,
         );
+        await DatabaseSecurityService.instance.setAppLockEnabled(true);
         DatabaseSecurityService.instance.resetForTesting();
         await DatabaseSecurityService.instance.configure(
           prefs: prefs,

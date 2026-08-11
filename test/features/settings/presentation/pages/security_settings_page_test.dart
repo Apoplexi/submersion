@@ -52,16 +52,20 @@ void main() {
   /// so calling it directly in a test body hangs until the 10-minute timeout.
   Future<void> configureWithPassword(
     WidgetTester tester,
-    String password,
-  ) async {
+    String password, {
+    bool appLockEnabled = true,
+  }) async {
     await configure({});
-    await tester.runAsync(
-      () => DatabaseSecurityService.instance.enableSecurity(
+    await tester.runAsync(() async {
+      await DatabaseSecurityService.instance.enableSecurity(
         password: password,
         dbPath: dbPath,
         kdf: testKdf,
-      ),
-    );
+      );
+      if (appLockEnabled) {
+        await DatabaseSecurityService.instance.setAppLockEnabled(true);
+      }
+    });
   }
 
   /// Alternates real-async windows with pumps. Argon2id yields internally,
@@ -131,14 +135,65 @@ void main() {
     expect(find.byType(SecuritySetupDialog), findsOneWidget);
   });
 
-  testWidgets('disable app lock is blocked while encryption is on', (
+  testWidgets(
+    'cancelling encryption after setup leaves app lock off and clears credentials',
+    (tester) async {
+      await configure({});
+      await pumpPage(tester);
+      await tester.tap(find.text('Encrypt database'));
+      await tester.pump();
+
+      final fields = find.byType(TextField);
+      await tester.enterText(fields.at(0), 'encrypt-only');
+      await tester.enterText(fields.at(1), 'encrypt-only');
+      await tester.tap(find.widgetWithText(FilledButton, 'Continue'));
+      await settle(tester);
+      await tester.tap(find.text('I saved my recovery code'));
+      await tester.pump();
+      await tester.tap(find.widgetWithText(FilledButton, 'Done'));
+      await settle(tester);
+
+      expect(DatabaseSecurityService.instance.appLockEnabled, false);
+      expect(find.text('Encrypt database?'), findsOneWidget);
+      await tester.tap(find.widgetWithText(TextButton, 'Cancel'));
+      await settle(tester);
+
+      expect(DatabaseSecurityService.instance.appLockEnabled, false);
+      expect(DatabaseSecurityService.instance.encryptionEnabled, false);
+      expect(DatabaseSecurityService.instance.isUnlocked, false);
+      expect(File(p.join(tmp.path, 'submersion.keys')).existsSync(), false);
+    },
+  );
+
+  testWidgets('encryption-only state renders encryption on and management', (
     tester,
   ) async {
-    await configure({'app_lock_enabled': true, 'db_encryption_enabled': true});
+    await configure({'db_encryption_enabled': true});
     await pumpPage(tester);
+
+    final encryptionSwitch = tester.widget<SwitchListTile>(
+      find.widgetWithText(SwitchListTile, 'Encrypt database'),
+    );
+    expect(encryptionSwitch.value, true);
+    expect(find.text('Change password'), findsOneWidget);
+    expect(find.text('New recovery code'), findsOneWidget);
+    expect(find.text('Auto-lock'), findsNothing);
+  });
+
+  testWidgets('encryption-only state can enable app lock without setup', (
+    tester,
+  ) async {
+    await configureWithPassword(tester, 'pw', appLockEnabled: false);
+    await DatabaseSecurityService.instance.preferences.setDbEncryptionEnabled(
+      true,
+    );
+    await pumpPage(tester);
+
     await tester.tap(find.text('App Lock'));
     await tester.pump();
-    expect(find.text('Encryption is on'), findsOneWidget);
+
+    expect(find.byType(SecuritySetupDialog), findsNothing);
+    expect(DatabaseSecurityService.instance.appLockEnabled, true);
   });
 
   group('auto-lock timeout', () {
@@ -295,6 +350,30 @@ void main() {
   });
 
   group('disable app lock', () {
+    testWidgets('while encrypted preserves encryption and credentials', (
+      tester,
+    ) async {
+      await configureWithPassword(tester, 'keep-encryption');
+      await DatabaseSecurityService.instance.preferences.setDbEncryptionEnabled(
+        true,
+      );
+      await pumpPage(tester);
+
+      await tester.tap(find.text('App Lock'));
+      await settle(tester);
+      await tester.enterText(find.byType(TextField), 'keep-encryption');
+      await tester.tap(find.widgetWithText(FilledButton, 'Continue'));
+      await settle(tester);
+
+      expect(find.text('Turn off App Lock?'), findsOneWidget);
+      await tester.tap(find.widgetWithText(FilledButton, 'Turn off'));
+      await settle(tester);
+
+      expect(DatabaseSecurityService.instance.appLockEnabled, false);
+      expect(DatabaseSecurityService.instance.encryptionEnabled, true);
+      expect(File(p.join(tmp.path, 'submersion.keys')).existsSync(), true);
+    });
+
     testWidgets('requires the password and a confirmation, then clears '
         'security', (tester) async {
       await configureWithPassword(tester, 'to-be-removed');
