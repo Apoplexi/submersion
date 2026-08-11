@@ -372,6 +372,14 @@ class MediaTransferQueueRepository {
     _db.mediaTransferQueue,
   )..where((t) => t.state.equals('done'))).go();
 
+  /// Removes a single queue entry.
+  ///
+  /// The queue is local bookkeeping, not synced data, so a plain delete is
+  /// enough -- no tombstone. Callers must not delete a row that is currently
+  /// `transferring`; see the guard in the transfers page.
+  Future<int> delete(int id) =>
+      (_db.delete(_db.mediaTransferQueue)..where((t) => t.id.equals(id))).go();
+
   /// Live split of the outstanding queue for the settings page.
   ///
   /// Replaces a plain pending+transferring count, which reported a row
