@@ -523,6 +523,7 @@ class _ChangePasswordDialogState extends State<_ChangePasswordDialog> {
                 errorText: _currentError,
               ),
             ),
+            const SizedBox(height: 16),
             TextField(
               controller: _next,
               obscureText: true,
@@ -532,6 +533,7 @@ class _ChangePasswordDialogState extends State<_ChangePasswordDialog> {
                 errorText: _nextError,
               ),
             ),
+            const SizedBox(height: 16),
             TextField(
               controller: _confirm,
               obscureText: true,
