@@ -236,12 +236,6 @@ final sourceProfilesProvider =
 final batchProfileCacheProvider =
     StateProvider<Map<String, List<domain.DiveProfilePoint>>>((ref) => {});
 
-/// Version counter for statistics cache invalidation.
-///
-/// All statistics providers watch this. Bumping the version causes all of them
-/// to re-fetch, while keepAlive prevents disposal between navigations.
-final statisticsVersionProvider = StateProvider<int>((ref) => 0);
-
 /// Statistics provider (filtered by current diver).
 ///
 /// Feeds the dashboard HeroHeader headline totals (total dives, etc.).
@@ -740,11 +734,13 @@ class PaginatedDiveListNotifier
     _ref.invalidate(diveListNotifierProvider);
   }
 
-  /// Bump the statistics version to invalidate all cached stats providers,
-  /// and also invalidate the dive-level stats provider.
+  /// Invalidate the dive-level stats provider.
+  ///
+  /// Every other statistics provider now self-invalidates on
+  /// [StatisticsRepository.watchStatisticsChanges], so there is no version
+  /// counter to bump (issue #974).
   void _invalidateStatistics() {
     _ref.invalidate(diveStatisticsProvider);
-    _ref.read(statisticsVersionProvider.notifier).state++;
   }
 
   Future<domain.Dive> addDive(domain.Dive dive) async {
