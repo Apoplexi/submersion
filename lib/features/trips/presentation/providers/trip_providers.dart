@@ -189,6 +189,12 @@ final tripByIdProvider = FutureProvider.family<Trip?, String>((ref, id) async {
 /// without touching the trip row. The trip detail page renders this through
 /// `TripStatStrip` directly above the itinerary that [divesForTripProvider]
 /// feeds, so leaving it stale would show "5 dives" over a list of 4.
+///
+/// Watches BOTH tables because `getTripWithStats` reads both: it calls
+/// `getTripById` before running the dives aggregate, and the page renders the
+/// returned `trip` (name, dates, location) alongside the stats. A synced
+/// rename would otherwise leave the header showing the old name indefinitely,
+/// since no dives-table write need accompany it.
 final tripWithStatsProvider = FutureProvider.family<TripWithStats, String>((
   ref,
   tripId,
@@ -198,6 +204,7 @@ final tripWithStatsProvider = FutureProvider.family<TripWithStats, String>((
   final diverId = await ref.watch(validatedCurrentDiverIdProvider.future);
 
   ref.invalidateSelfWhen(diveRepository.watchDivesChanges());
+  ref.invalidateSelfWhen(repository.watchTripsChanges());
 
   return repository.getTripWithStats(tripId, diverId: diverId);
 });

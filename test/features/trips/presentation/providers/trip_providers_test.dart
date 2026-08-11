@@ -40,17 +40,16 @@ Trip _makeTrip({
   );
 }
 
-/// Polls [read] until [settled] holds, so the dives-table tick ->
-/// invalidateSelfWhen -> rebuild round trip has a chance to run.
+/// Polls [read] until [settled] holds, so the table tick -> invalidateSelfWhen
+/// -> rebuild round trip has a chance to run.
 ///
 /// The budget is derived from [DiveRepository.changeTickDebounce] rather than
-/// hard-coded, so it stays proportionate if that window is ever widened. This
-/// matters more here than for the sibling trips-table tests: `watchDivesChanges`
-/// is debounced, `watchTripsChanges` is not, so a fixed budget sized for the
-/// undebounced stream spends most of itself waiting for the tick to fire at
-/// all. Never settling fails here, naming the round trip that stalled, instead
-/// of surfacing downstream as a bare value mismatch that reads like a wrong
-/// query.
+/// hard-coded, so it stays proportionate if that window is ever widened. A
+/// fixed budget is the trap here: `watchDivesChanges` is debounced and
+/// `watchTripsChanges` is not, so a number sized against the undebounced stream
+/// spends most of itself waiting for the debounced tick to fire at all. Never
+/// settling fails here, naming the round trip that stalled, instead of
+/// surfacing downstream as a bare value mismatch that reads like a wrong query.
 Future<T> _pollUntilSettled<T>(
   Future<T> Function() read,
   bool Function(T value) settled, {
@@ -70,7 +69,7 @@ Future<T> _pollUntilSettled<T>(
   if (!settled(value)) {
     fail(
       'Timed out after ${budget.inMilliseconds}ms waiting for $awaiting. '
-      'The dives-table tick -> invalidateSelfWhen -> rebuild round trip never '
+      'The table tick -> invalidateSelfWhen -> rebuild round trip never '
       'settled; the provider still holds ${describe(value)}.',
     );
   }
@@ -396,6 +395,49 @@ void main() {
       );
 
       expect(stats.maxDepth, equals(18));
+    });
+
+    test('auto-refreshes the trip row after a trips-table write (synced '
+        'rename)', () async {
+      final diver = await diverRepo.createDiver(
+        Diver(
+          id: '',
+          name: 'D',
+          isDefault: true,
+          createdAt: DateTime(2024),
+          updatedAt: DateTime(2024),
+        ),
+      );
+      await prefs.setString(currentDiverIdKey, diver.id);
+
+      final trip = await tripRepo.createTrip(
+        _makeTrip(name: 'Old Name').copyWith(diverId: diver.id),
+      );
+
+      final container = makeContainer();
+      addTearDown(container.dispose);
+      final sub = container.listen(tripWithStatsProvider(trip.id), (_, _) {});
+      addTearDown(sub.close);
+
+      final initial = await container.read(
+        tripWithStatsProvider(trip.id).future,
+      );
+      expect(initial.trip.name, equals('Old Name'));
+
+      // getTripWithStats calls getTripById before the dives aggregate, and the
+      // detail page renders the returned trip's name/dates next to the stats.
+      // A sync can rename a trip with no accompanying dives write, so the
+      // dives-table subscription alone would leave the header stale forever.
+      await tripRepo.updateTrip(trip.copyWith(name: 'Renamed By Sync'));
+
+      final stats = await _pollUntilSettled(
+        () => container.read(tripWithStatsProvider(trip.id).future),
+        (stats) => stats.trip.name == 'Renamed By Sync',
+        awaiting: 'tripWithStatsProvider to pick up the renamed trip row',
+        describe: (stats) => 'trip name "${stats.trip.name}"',
+      );
+
+      expect(stats.trip.name, equals('Renamed By Sync'));
     });
   });
 
