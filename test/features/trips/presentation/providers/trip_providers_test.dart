@@ -37,6 +37,43 @@ Trip _makeTrip({
   );
 }
 
+/// Polls [read] until [settled] holds, so the dives-table tick ->
+/// invalidateSelfWhen -> rebuild round trip has a chance to run.
+///
+/// The budget is derived from [DiveRepository.changeTickDebounce] rather than
+/// hard-coded, so it stays proportionate if that window is ever widened. This
+/// matters more here than for the sibling trips-table tests: `watchDivesChanges`
+/// is debounced, `watchTripsChanges` is not, so a fixed budget sized for the
+/// undebounced stream spends most of itself waiting for the tick to fire at
+/// all. Never settling fails here, naming the round trip that stalled, instead
+/// of surfacing downstream as a bare value mismatch that reads like a wrong
+/// query.
+Future<T> _pollUntilSettled<T>(
+  Future<T> Function() read,
+  bool Function(T value) settled, {
+  required String awaiting,
+  required String Function(T value) describe,
+}) async {
+  const interval = Duration(milliseconds: 10);
+  final budget = DiveRepository.changeTickDebounce * 20;
+  final deadline = DateTime.now().add(budget);
+
+  var value = await read();
+  while (!settled(value) && DateTime.now().isBefore(deadline)) {
+    await Future<void>.delayed(interval);
+    value = await read();
+  }
+
+  if (!settled(value)) {
+    fail(
+      'Timed out after ${budget.inMilliseconds}ms waiting for $awaiting. '
+      'The dives-table tick -> invalidateSelfWhen -> rebuild round trip never '
+      'settled; the provider still holds ${describe(value)}.',
+    );
+  }
+  return value;
+}
+
 void main() {
   late SharedPreferences prefs;
   late TripRepository tripRepo;
@@ -259,22 +296,86 @@ void main() {
       // the deleted dive without any caller having to invalidate it manually.
       await diveRepo.bulkDeleteDives([loser.id]);
 
-      var ids = <String>[];
-      for (var i = 0; i < 50; i++) {
-        await Future<void>.delayed(const Duration(milliseconds: 10));
-        ids = (await container.read(
-          divesForTripProvider(trip.id).future,
-        )).map((d) => d.id).toList();
-        if (!ids.contains(loser.id)) break;
-      }
+      final dives = await _pollUntilSettled(
+        () => container.read(divesForTripProvider(trip.id).future),
+        (dives) => dives.every((d) => d.id != loser.id),
+        awaiting: 'divesForTripProvider to drop the merged-away dive',
+        describe: (dives) => '${dives.length} dives',
+      );
 
       expect(
-        ids,
+        dives.map((d) => d.id),
         equals([survivor.id]),
         reason:
             'divesForTripProvider should auto-refresh after a dive delete, '
             'the same way tripListNotifierProvider already does',
       );
+    });
+  });
+
+  group('tripWithStatsProvider reactivity', () {
+    test('auto-refreshes its aggregate stats after a dive is deleted directly '
+        'from the DB (dive-merge/consolidate scenario)', () async {
+      final diver = await diverRepo.createDiver(
+        Diver(
+          id: '',
+          name: 'D',
+          isDefault: true,
+          createdAt: DateTime(2024),
+          updatedAt: DateTime(2024),
+        ),
+      );
+      await prefs.setString(currentDiverIdKey, diver.id);
+
+      final trip = await tripRepo.createTrip(
+        _makeTrip(name: 'Merge Stats').copyWith(diverId: diver.id),
+      );
+      await diveRepo.createDive(
+        Dive(
+          id: '',
+          diverId: diver.id,
+          dateTime: DateTime(2024, 6, 1),
+          tripId: trip.id,
+          maxDepth: 18,
+        ),
+      );
+      final loser = await diveRepo.createDive(
+        Dive(
+          id: '',
+          diverId: diver.id,
+          dateTime: DateTime(2024, 6, 2),
+          tripId: trip.id,
+          maxDepth: 42,
+        ),
+      );
+
+      final container = makeContainer();
+      addTearDown(container.dispose);
+      final sub = container.listen(tripWithStatsProvider(trip.id), (_, _) {});
+      addTearDown(sub.close);
+
+      final initial = await container.read(
+        tripWithStatsProvider(trip.id).future,
+      );
+      expect(initial.diveCount, equals(2));
+      expect(initial.maxDepth, equals(42));
+
+      // getTripWithStats aggregates straight over the dives table, so a merge
+      // changes the counts without touching the trip row -- and the trip detail
+      // page renders these in TripStatStrip directly above the itinerary that
+      // divesForTripProvider feeds. Without the dives-table subscription the
+      // header would still read "2 dives / 42m" over a list of one 18m dive.
+      await diveRepo.bulkDeleteDives([loser.id]);
+
+      final stats = await _pollUntilSettled(
+        () => container.read(tripWithStatsProvider(trip.id).future),
+        (stats) => stats.diveCount == 1,
+        awaiting: 'tripWithStatsProvider to drop the merged-away dive',
+        describe: (stats) =>
+            '${stats.diveCount} dives / maxDepth ${stats.maxDepth}',
+      );
+
+      expect(stats.maxDepth, equals(18));
     });
   });
 

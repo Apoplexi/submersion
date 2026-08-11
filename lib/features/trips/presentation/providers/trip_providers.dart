@@ -182,12 +182,23 @@ final tripByIdProvider = FutureProvider.family<Trip?, String>((ref, id) async {
 ///
 /// Scopes aggregate stats to the currently-active diver so that shared trips
 /// only show that diver's dive count, bottom time, and depth figures.
+///
+/// Self-invalidates on `dives` table writes for the same reason
+/// [TripListNotifier] subscribes to them: `getTripWithStats` LEFT JOINs the
+/// dives table, so a merge/consolidate or a sync apply changes the counts
+/// without touching the trip row. The trip detail page renders this through
+/// `TripStatStrip` directly above the itinerary that [divesForTripProvider]
+/// feeds, so leaving it stale would show "5 dives" over a list of 4.
 final tripWithStatsProvider = FutureProvider.family<TripWithStats, String>((
   ref,
   tripId,
 ) async {
   final repository = ref.watch(tripRepositoryProvider);
+  final diveRepository = ref.watch(diveRepositoryProvider);
   final diverId = await ref.watch(validatedCurrentDiverIdProvider.future);
+
+  ref.invalidateSelfWhen(diveRepository.watchDivesChanges());
+
   return repository.getTripWithStats(tripId, diverId: diverId);
 });
 
