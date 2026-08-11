@@ -6,10 +6,21 @@ import 'package:image/image.dart' as img;
 
 import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/features/media/data/services/media_source_resolver_registry.dart';
+import 'package:submersion/features/media/data/services/pdf_page_renderer.dart';
 import 'package:submersion/features/media/domain/entities/media_item.dart';
 import 'package:submersion/features/media/domain/entities/media_source_type.dart';
 import 'package:submersion/features/media/domain/value_objects/media_source_data.dart';
 import 'package:submersion/features/media_store/data/media_cache_store.dart';
+
+/// Signature of the PDF page-1 render seam, injectable so tests do not need
+/// a pdfium binary. Matches [PdfPageRenderer.renderFirstPageJpeg].
+typedef PdfThumbRenderer =
+    Future<Uint8List?> Function({
+      File? file,
+      Uint8List? bytes,
+      int maxDimension,
+      int quality,
+    });
 
 /// Best-effort thumbnail production for the upload pipeline (design spec
 /// section 9 step 4). Only the gallery source hands back genuinely
@@ -21,11 +32,14 @@ class ThumbnailGenerator {
   ThumbnailGenerator({
     required MediaSourceResolverRegistry registry,
     required MediaCacheStore cache,
+    PdfThumbRenderer? pdfRenderer,
   }) : _registry = registry,
-       _cache = cache;
+       _cache = cache,
+       _pdfRenderer = pdfRenderer ?? PdfPageRenderer.renderFirstPageJpeg;
 
   final MediaSourceResolverRegistry _registry;
   final MediaCacheStore _cache;
+  final PdfThumbRenderer _pdfRenderer;
   final _log = LoggerService.forClass(ThumbnailGenerator);
 
   static const int maxDimension = 512;
@@ -38,6 +52,15 @@ class ThumbnailGenerator {
         item,
         target: Size(maxDimension.toDouble(), maxDimension.toDouble()),
       );
+      if (item.isDocument) {
+        // Opaque documents have no thumbnail; PDFs get a page-1 render.
+        if (!item.isPdf) return null;
+        return switch (data) {
+          FileData(file: final f) => _stagePdfThumb(file: f),
+          BytesData(bytes: final b) => _stagePdfThumb(bytes: b),
+          NetworkData() || UnavailableData() => null,
+        };
+      }
       switch (data) {
         case BytesData(bytes: final b)
             when item.sourceType == MediaSourceType.platformGallery:
@@ -67,6 +90,19 @@ class ThumbnailGenerator {
       _log.warning('Thumbnail generation failed for ${item.id}: $e');
       return null;
     }
+  }
+
+  Future<File?> _stagePdfThumb({File? file, Uint8List? bytes}) async {
+    final jpeg = await _pdfRenderer(
+      file: file,
+      bytes: bytes,
+      maxDimension: maxDimension,
+      quality: jpegQuality,
+    );
+    if (jpeg == null) return null;
+    final staged = await _cache.stagingFile();
+    await staged.writeAsBytes(jpeg, flush: true);
+    return staged;
   }
 
   Future<File?> _resizeToJpeg(Uint8List bytes, String? name) async {

@@ -8,6 +8,7 @@ import 'package:submersion/features/dive_computer/presentation/providers/downloa
 import 'package:submersion/features/dive_log/domain/entities/dive_computer.dart';
 import 'package:submersion/features/dive_computer/presentation/widgets/pin_code_dialog.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
+import 'package:submersion/shared/widgets/app_date_picker.dart';
 
 /// Widget for the download step of the discovery wizard.
 class DownloadStepWidget extends ConsumerStatefulWidget {
@@ -130,7 +131,7 @@ class _DownloadStepWidgetState extends ConsumerState<DownloadStepWidget> {
     // from the diver's actual cutoff.
     final cutoff = _cutoff;
     final lastDate = (cutoff != null && cutoff.isAfter(now)) ? cutoff : now;
-    final picked = await showDatePicker(
+    final picked = await showAppDatePicker(
       context: context,
       initialDate: _cutoff,
       firstDate: DateTime(2000),

@@ -2971,6 +2971,14 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
+  String get dashboard_hero_divesTotalOne => '1 mergulho';
+
+  @override
+  String dashboard_hero_divesTotalOther(Object count) {
+    return '$count mergulhos';
+  }
+
+  @override
   String get dashboard_hero_error => 'Pronto para explorar as profundezas?';
 
   @override
@@ -11763,6 +11771,57 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get media_diveMediaSection_unlinkSuccess => 'Foto desvinculada';
+
+  @override
+  String get media_siteMediaSection_title => 'Mídia do ponto de mergulho';
+
+  @override
+  String get media_siteMediaSection_addPhotos => 'Adicionar fotos ou vídeos';
+
+  @override
+  String get media_siteMediaSection_addDocument => 'Adicionar documento';
+
+  @override
+  String get media_siteMediaSection_emptyState =>
+      'Nenhum mapa, foto ou documento anexado a este ponto de mergulho';
+
+  @override
+  String media_siteMediaSection_divePhotosGroup(int count) {
+    return 'Fotos de mergulhos aqui ($count)';
+  }
+
+  @override
+  String get media_siteMediaSection_divePhotoLabel => 'Foto de mergulho';
+
+  @override
+  String media_siteMediaSection_unlinkSelectedTitle(int count) {
+    return 'Remover $count anexos?';
+  }
+
+  @override
+  String get media_siteMediaSection_unlinkSelectedContent =>
+      'Os itens selecionados serão removidos deste ponto de mergulho. Os arquivos na sua galeria ou no disco não são excluídos.';
+
+  @override
+  String media_siteMediaSection_unlinkSelectedSuccess(int count) {
+    return '$count anexos removidos';
+  }
+
+  @override
+  String get media_documentViewer_title => 'Documento';
+
+  @override
+  String get media_documentViewer_unavailable =>
+      'Este documento não está disponível neste dispositivo';
+
+  @override
+  String get media_documentViewer_availableOnOriginDevice =>
+      'Ele está disponível no dispositivo em que foi adicionado, ou por meio de um armazenamento de mídia configurado.';
+
+  @override
+  String media_documentViewer_attached(int count) {
+    return '$count documentos anexados';
+  }
 
   @override
   String get media_diveScan_scanTooltip => 'Pesquisar fotos na galeria';

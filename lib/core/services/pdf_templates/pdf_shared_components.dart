@@ -1,7 +1,7 @@
-import 'package:intl/intl.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 
+import 'package:submersion/core/services/pdf_templates/pdf_date_formatter.dart';
 import 'package:submersion/features/certifications/domain/entities/certification.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
 import 'package:submersion/features/divers/domain/entities/diver.dart';
@@ -27,20 +27,6 @@ Duration pdfTotalRuntime(List<Dive> dives) => dives
 /// common elements like headers, info chips, signatures, and
 /// certification cards.
 class PdfSharedComponents {
-  static final _dateFormat = DateFormat('yyyy-MM-dd');
-  static final _timeFormat = DateFormat('HH:mm');
-  static final _dateTimeFormat = DateFormat('yyyy-MM-dd HH:mm');
-
-  /// Format a date for display.
-  static String formatDate(DateTime date) => _dateFormat.format(date);
-
-  /// Format a time for display.
-  static String formatTime(DateTime time) => _timeFormat.format(time);
-
-  /// Format a date and time for display.
-  static String formatDateTime(DateTime dateTime) =>
-      _dateTimeFormat.format(dateTime);
-
   /// Build a small info chip with label and value.
   static pw.Widget buildInfoChip(String label, String value) {
     return pw.Column(
@@ -76,7 +62,10 @@ class PdfSharedComponents {
   }
 
   /// Build a signature block for display in PDF.
-  static pw.Widget buildSignatureBlock(Signature signature) {
+  static pw.Widget buildSignatureBlock(
+    Signature signature, {
+    required PdfDateFormatter dates,
+  }) {
     pw.ImageProvider? signatureImage;
     if (signature.hasImage) {
       try {
@@ -126,7 +115,7 @@ class PdfSharedComponents {
             textAlign: pw.TextAlign.center,
           ),
           pw.Text(
-            formatDate(signature.signedAt),
+            dates.date(signature.signedAt),
             style: const pw.TextStyle(fontSize: 6, color: PdfColors.grey600),
             textAlign: pw.TextAlign.center,
           ),
@@ -242,6 +231,7 @@ class PdfSharedComponents {
   /// highlighted.
   static pw.Widget buildCertificationCardsPage({
     required List<Certification> certifications,
+    required PdfDateFormatter dates,
     Diver? diver,
     String? highlightAgency,
     PdfColor accentColor = PdfColors.blue800,
@@ -270,6 +260,7 @@ class PdfSharedComponents {
         ...certifications.map(
           (cert) => _buildCertificationCard(
             cert,
+            dates: dates,
             isHighlighted:
                 highlightAgency != null &&
                 cert.agency.name.toLowerCase().contains(
@@ -284,6 +275,7 @@ class PdfSharedComponents {
 
   static pw.Widget _buildCertificationCard(
     Certification cert, {
+    required PdfDateFormatter dates,
     bool isHighlighted = false,
     PdfColor accentColor = PdfColors.blue800,
   }) {
@@ -387,7 +379,7 @@ class PdfSharedComponents {
               ],
               if (cert.issueDate != null)
                 pw.Text(
-                  'Issued: ${formatDate(cert.issueDate!)}',
+                  'Issued: ${dates.date(cert.issueDate!)}',
                   style: const pw.TextStyle(
                     fontSize: 10,
                     color: PdfColors.grey600,
@@ -469,6 +461,7 @@ class PdfSharedComponents {
     required String title,
     required int diveCount,
     required PdfPageFormat pageFormat,
+    required PdfDateFormatter dates,
     DateTime? firstDiveDate,
     DateTime? lastDiveDate,
     Diver? diver,
@@ -498,12 +491,12 @@ class PdfSharedComponents {
           pw.SizedBox(height: 10),
           if (firstDiveDate != null && lastDiveDate != null)
             pw.Text(
-              '${formatDate(firstDiveDate)} - ${formatDate(lastDiveDate)}',
+              '${dates.date(firstDiveDate)} - ${dates.date(lastDiveDate)}',
               style: const pw.TextStyle(fontSize: 16),
             ),
           pw.SizedBox(height: 40),
           pw.Text(
-            'Generated on ${formatDateTime(DateTime.now())}',
+            'Generated on ${dates.dateTime(DateTime.now())}',
             style: const pw.TextStyle(fontSize: 12, color: PdfColors.grey600),
           ),
         ],

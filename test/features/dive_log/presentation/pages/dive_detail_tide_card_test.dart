@@ -35,10 +35,15 @@ TideRecord _tideRecord({
   );
 }
 
-Future<void> _pumpDetailPage(WidgetTester tester, TideRecord record) async {
+Future<void> _pumpDetailPage(
+  WidgetTester tester,
+  TideRecord record, {
+  DateFormatPreference dateFormat = DateFormatPreference.mmmDYYYY,
+}) async {
   final dive = createTestDiveWithBottomTime();
   final settings = MockSettingsNotifier();
   await settings.setTimeFormat(TimeFormat.twentyFourHour);
+  await settings.setDateFormat(dateFormat);
   final overrides = await getBaseOverrides(settingsNotifier: settings);
 
   final originalOnError = FlutterError.onError;
@@ -131,6 +136,23 @@ void main() {
 
       expect(find.textContaining('at 14:20'), findsOneWidget);
       expect(find.textContaining('at 08:20'), findsOneWidget);
+    });
+  });
+
+  group('DiveDetailPage tide card date order (#964)', () {
+    testWidgets('header follows a day-first preference', (tester) async {
+      // Both dates in the header flip: the cycle date and the appended
+      // next-day end date.
+      await _pumpDetailPage(
+        tester,
+        _tideRecord(
+          highTideTime: DateTime.utc(2026, 3, 29, 2),
+          lowTideTime: DateTime.utc(2026, 3, 28, 20),
+        ),
+        dateFormat: DateFormatPreference.ddmmyyyy,
+      );
+
+      expect(find.text('Sat, 28 Mar | 20:00 - 08:00 (29 Mar)'), findsOneWidget);
     });
   });
 }

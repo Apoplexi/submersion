@@ -340,6 +340,7 @@ class _ValueEntryDialogState extends State<_ValueEntryDialog> {
               suffixText: widget.item.valueUnit,
             ),
           ),
+          const SizedBox(height: 16),
           TextField(
             controller: _noteController,
             decoration: InputDecoration(labelText: l10n.preDive_runner_addNote),

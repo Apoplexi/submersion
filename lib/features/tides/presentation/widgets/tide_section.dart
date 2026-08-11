@@ -4,6 +4,7 @@ import 'package:intl/intl.dart' show DateFormat;
 
 import 'package:submersion/core/constants/units.dart';
 import 'package:submersion/core/tide/entities/tide_extremes.dart';
+import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
@@ -241,6 +242,7 @@ class _TideSectionContent extends ConsumerWidget {
                       context,
                       extremes,
                       settings.timeFormat,
+                      settings.dateFormat,
                     ),
                     loading: () => const SizedBox.shrink(),
                     error: (_, _) => const SizedBox.shrink(),
@@ -260,18 +262,21 @@ class _TideSectionContent extends ConsumerWidget {
                       height: 180,
                       timeFormat: settings.timeFormat,
                       depthUnit: settings.depthUnit,
+                      dateFormat: settings.dateFormat,
                     ),
                     loading: () => TideChart(
                       predictions: predictions,
                       height: 180,
                       timeFormat: settings.timeFormat,
                       depthUnit: settings.depthUnit,
+                      dateFormat: settings.dateFormat,
                     ),
                     error: (_, _) => TideChart(
                       predictions: predictions,
                       height: 180,
                       timeFormat: settings.timeFormat,
                       depthUnit: settings.depthUnit,
+                      dateFormat: settings.dateFormat,
                     ),
                   );
                 },
@@ -321,6 +326,7 @@ class _TideSectionContent extends ConsumerWidget {
                     compact: true,
                     depthUnit: settings.depthUnit,
                     timeFormat: settings.timeFormat,
+                    dateFormat: settings.dateFormat,
                   );
                 },
                 loading: () => const SizedBox(
@@ -341,6 +347,7 @@ class _TideSectionContent extends ConsumerWidget {
     BuildContext context,
     List<TideExtreme> extremes,
     TimeFormat timeFormat,
+    DateFormatPreference dateFormat,
   ) {
     if (extremes.isEmpty) return const SizedBox.shrink();
 
@@ -372,15 +379,20 @@ class _TideSectionContent extends ConsumerWidget {
 
     // Window bounds are stored wall-clock instants, not device-local times:
     // format them verbatim without any timezone conversion.
-    final dateStr = DateFormat('EEE, MMM d').format(windowStart);
+    final dateStr = DateFormat(
+      UnitFormatter.weekdayMonthDayPattern(dateFormat),
+    ).format(windowStart);
     final startTimeStr = DateFormat(timeFormat.pattern).format(windowStart);
     final endTimeStr = DateFormat(timeFormat.pattern).format(windowEnd);
     final spansNewDay =
         windowStart.year != windowEnd.year ||
         windowStart.month != windowEnd.month ||
         windowStart.day != windowEnd.day;
+    final endDateStr = DateFormat(
+      UnitFormatter.monthDayPattern(dateFormat),
+    ).format(windowEnd);
     final timeRange = spansNewDay
-        ? '$startTimeStr - $endTimeStr (${DateFormat('MMM d').format(windowEnd)})'
+        ? '$startTimeStr - $endTimeStr ($endDateStr)'
         : '$startTimeStr - $endTimeStr';
 
     return Text(
