@@ -90,6 +90,7 @@ import 'package:submersion/features/marine_life/domain/entities/species.dart';
 import 'package:submersion/features/marine_life/presentation/providers/species_providers.dart';
 import 'package:submersion/features/marine_life/presentation/utils/species_category_icon.dart';
 import 'package:submersion/features/media/data/services/trip_media_scanner.dart';
+import 'package:submersion/features/media/presentation/helpers/document_open_helper.dart';
 import 'package:submersion/features/media/presentation/helpers/photo_import_helper.dart';
 import 'package:submersion/features/media/presentation/providers/media_providers.dart';
 import 'package:submersion/features/media/presentation/providers/photo_picker_providers.dart';
@@ -2909,7 +2910,10 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
   }
 
   void _showFullscreenProfile(BuildContext context, WidgetRef ref, Dive dive) {
-    Navigator.of(context).push(
+    // Root navigator, not the ShellRoute's: pushing on the shell navigator
+    // renders the page inside MainScaffold, leaving the bottom navigation
+    // bar painted under a supposedly fullscreen chart (#811).
+    Navigator.of(context, rootNavigator: true).push(
       MaterialPageRoute(
         builder: (context) => FullscreenProfilePage(diveId: dive.id),
       ),
@@ -4546,6 +4550,12 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
           dive: dive,
         );
       },
+      onAddDocumentPressed: () => DocumentOpenHelper.pickAndAttach(
+        context: context,
+        ref: ref,
+        diveId: dive.id,
+      ),
+      onOpenDocument: (item) => DocumentOpenHelper.open(context, ref, item),
     );
   }
 

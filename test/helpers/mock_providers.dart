@@ -439,15 +439,6 @@ class MockSettingsNotifier extends StateNotifier<AppSettings>
   }
 
   @override
-  Future<void> setFullscreenTilePreferences({
-    required List<String> order,
-    required List<String> hidden,
-  }) async => state = state.copyWith(
-    fullscreenTileOrder: order,
-    fullscreenHiddenTiles: hidden,
-  );
-
-  @override
   Future<void> setFullscreenReadoutCardPosition(double x, double y) async =>
       state = state.copyWith(
         fullscreenReadoutCardX: x,

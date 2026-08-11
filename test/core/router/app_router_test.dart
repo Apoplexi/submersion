@@ -64,6 +64,14 @@ Set<String> _collectRoutePaths(List<RouteBase> routes) {
   return paths;
 }
 
+/// Route paths in declaration order, which [_collectRoutePaths] discards.
+List<String> _orderedRoutePaths(List<RouteBase> routes) => [
+  for (final route in routes) ...[
+    if (route is GoRoute) route.path,
+    ..._orderedRoutePaths(route.routes),
+  ],
+];
+
 void main() {
   late GoRouter router;
   late ProviderContainer container;
@@ -106,6 +114,46 @@ void main() {
       expect(route, isNotNull);
       expect(route!.redirect, isNotNull);
       expect(route.builder, isNull);
+    });
+
+    test('gpsTrackDetail is a SIBLING of gps-log, not a child', () {
+      // go_router builds one page per matched segment and /gps-log has its
+      // own pageBuilder, so nesting stacked a GpsLoggerPage underneath the
+      // detail page - two Back presses to leave, the first landing on a
+      // logger page the diver never opened.
+      final gpsLog = _findRouteByName(router.configuration.routes, 'gpsLog');
+      expect(
+        gpsLog!.routes.whereType<GoRoute>().map((r) => r.name),
+        isNot(contains('gpsTrackDetail')),
+      );
+
+      final detail = _findRouteByName(
+        router.configuration.routes,
+        'gpsTrackDetail',
+      );
+      expect(detail!.path, '/gps-log/:id');
+    });
+
+    test('gpsTrackMap is a sibling too', () {
+      final gpsLog = _findRouteByName(router.configuration.routes, 'gpsLog');
+      expect(
+        gpsLog!.routes.whereType<GoRoute>().map((r) => r.name),
+        isNot(contains('gpsTrackMap')),
+      );
+      final map = _findRouteByName(router.configuration.routes, 'gpsTrackMap');
+      expect(map!.path, '/gps-log/map');
+    });
+
+    test('the static gps-log route is declared before the :id route', () {
+      // ':id' matches any single segment, so a static sibling declared after
+      // it would never match.
+      // _collectRoutePaths returns a Set, which cannot express order.
+      final paths = _orderedRoutePaths(router.configuration.routes);
+      final mapIndex = paths.indexOf('/gps-log/map');
+      final idIndex = paths.indexOf('/gps-log/:id');
+      expect(mapIndex, isNot(-1));
+      expect(idIndex, isNot(-1));
+      expect(mapIndex, lessThan(idIndex));
     });
   });
 
@@ -692,6 +740,8 @@ void main() {
     const destinations = <String>[
       '/equipment',
       '/equipment/new',
+      // Gear chips and urgent-banner lines deep-link to one item (issue #816).
+      '/equipment/e1',
       '/settings/diver-profile/insurance',
       '/planning/no-fly',
       '/dives',

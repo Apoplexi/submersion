@@ -379,6 +379,22 @@ class GpsTracks extends Table {
   TextColumn get deviceName => text().nullable()();
   IntColumn get pointCount => integer().withDefault(const Constant(0))();
 
+  /// Provenance: 'phone' | 'gpx' | 'fit' | 'kml' | 'csv'. Rendering code
+  /// treats this as opaque -- no view logic branches on it.
+  TextColumn get source => text().withDefault(const Constant('phone'))();
+
+  /// Originating filename or device, for imported tracks.
+  TextColumn get sourceRef => text().nullable()();
+
+  /// User-editable label.
+  TextColumn get name => text().nullable()();
+
+  /// Non-destructive trim bounds, wall-clock-as-UTC epoch MILLISECONDS.
+  /// The points blob is never rewritten by a trim, so trimming is fully
+  /// reversible and cannot lose a fix.
+  IntColumn get trimStartTime => integer().nullable()();
+  IntColumn get trimEndTime => integer().nullable()();
+
   /// Gzipped JSON array of [wallClockEpochSeconds, lat, lon, accuracyMeters]
   BlobColumn get points => blob().nullable()();
   IntColumn get createdAt => integer()();
@@ -2936,7 +2952,7 @@ class AppDatabase extends _$AppDatabase {
 
   /// The current schema version as a static constant so that pre-open checks
   /// (e.g. version-mismatch guard) can reference it without an instance.
-  static const int currentSchemaVersion = 147;
+  static const int currentSchemaVersion = 148;
 
   /// Every schema version that has a migration block in onUpgrade.
   /// Used to calculate progress step counts. When adding a new migration,
@@ -3121,7 +3137,10 @@ class AppDatabase extends _$AppDatabase {
     // calibration columns (measured visibility replaces the tropical-biased
     // bucket enum).
     144,
-    // v145 is reserved by the GPS track mapping branch (PR #908).
+    // v145: gps_tracks provenance, label, and non-destructive trim bounds.
+    // Renumbered from v144 as main took that step for the visibility scale
+    // work at merge time.
+    145,
     // v146: recompute machine-derived bottom times that the retired
     // square-profile heuristic collapsed on multilevel dives.
     146,
@@ -3130,6 +3149,10 @@ class AppDatabase extends _$AppDatabase {
     // 2026-08-08-buddy-professional-roles-fold). Originally authored as v145;
     // renumbered when PR #908 reserved 145 and v146 landed first.
     147,
+    // v148: site media attachments (issues #211/#627): media(site_id) query
+    // index plus the site-side dedupe cleanup and partial unique index
+    // mirroring the dive-side v38 pair.
+    148,
   ];
 
   /// Idempotent DDL for the v106 connector-suggestion columns (Lightroom
@@ -4324,6 +4347,41 @@ class AppDatabase extends _$AppDatabase {
     if (!names.contains('default_currency')) {
       await customStatement(
         "ALTER TABLE diver_settings ADD COLUMN default_currency TEXT NOT NULL DEFAULT 'USD'",
+      );
+    }
+  }
+
+  /// Idempotent DDL for the v145 gps_tracks provenance, label, and
+  /// non-destructive trim-bound columns.
+  ///
+  /// Self-guarding like its siblings: a DB that upgraded past 145 on a
+  /// parallel branch never enters the migration block, so the beforeOpen
+  /// backstop is its only path to these columns.
+  Future<void> _assertGpsTrackColumns() async {
+    final cols = await customSelect("PRAGMA table_info('gps_tracks')").get();
+    if (cols.isEmpty) return;
+    final names = cols.map((c) => c.read<String>('name')).toSet();
+    if (!names.contains('source')) {
+      await customStatement(
+        "ALTER TABLE gps_tracks ADD COLUMN source TEXT NOT NULL DEFAULT 'phone'",
+      );
+    }
+    if (!names.contains('source_ref')) {
+      await customStatement(
+        'ALTER TABLE gps_tracks ADD COLUMN source_ref TEXT',
+      );
+    }
+    if (!names.contains('name')) {
+      await customStatement('ALTER TABLE gps_tracks ADD COLUMN name TEXT');
+    }
+    if (!names.contains('trim_start_time')) {
+      await customStatement(
+        'ALTER TABLE gps_tracks ADD COLUMN trim_start_time INTEGER',
+      );
+    }
+    if (!names.contains('trim_end_time')) {
+      await customStatement(
+        'ALTER TABLE gps_tracks ADD COLUMN trim_end_time INTEGER',
       );
     }
   }
@@ -7646,7 +7704,13 @@ class AppDatabase extends _$AppDatabase {
           await _assertVisibilityScaleColumns();
         }
         if (from < 144) await reportProgress();
-        // v145 is reserved by the GPS track mapping branch (PR #908).
+        // v145: gps_tracks source/source_ref/name + non-destructive trim
+        // bounds. Renumbered from v144 as main took that step for the
+        // visibility scale work at merge time.
+        if (from < 145) {
+          await _assertGpsTrackColumns();
+        }
+        if (from < 145) await reportProgress();
         // v146: recompute bottom times the retired square-profile heuristic
         // derived too short on multilevel dives. Fingerprinted -- stored
         // values that exactly reproduce the old heuristic get replaced
@@ -7664,6 +7728,49 @@ class AppDatabase extends _$AppDatabase {
           await _migrateBuddyRolesToCertifications();
         }
         if (from < 147) await reportProgress();
+        if (from < 148) {
+          // Site media (issues #211/#627). Query index for the site gallery;
+          // dedupe cleanup + partial unique index mirroring the dive-side
+          // v38 pair so the same gallery asset cannot be linked to the same
+          // site twice. The survivor is the oldest row, tie-broken by rowid:
+          // created_at is epoch MILLISECONDS and a bulk import writes many
+          // rows inside one, so a `created_at > MIN(created_at)` cleanup
+          // would leave every tied row behind and the unique index below
+          // would then abort the whole migration.
+          // Guarded on media.site_id existing so partial migration-test
+          // fixture databases (which build only the tables and columns their
+          // migration touches) pass through unharmed.
+          final mediaSiteCol = await customSelect(
+            "SELECT name FROM pragma_table_info('media') "
+            "WHERE name = 'site_id'",
+          ).get();
+          if (mediaSiteCol.isNotEmpty) {
+            await customStatement('''
+            CREATE INDEX IF NOT EXISTS idx_media_site_id
+            ON media(site_id)
+          ''');
+            await customStatement('''
+            DELETE FROM media
+            WHERE platform_asset_id IS NOT NULL
+              AND site_id IS NOT NULL
+              AND rowid NOT IN (
+                SELECT rowid FROM (
+                  SELECT rowid, ROW_NUMBER() OVER (
+                    PARTITION BY platform_asset_id, site_id
+                    ORDER BY created_at ASC, rowid ASC
+                  ) AS rn FROM media
+                  WHERE platform_asset_id IS NOT NULL AND site_id IS NOT NULL
+                ) WHERE rn = 1
+              )
+          ''');
+            await customStatement('''
+            CREATE UNIQUE INDEX IF NOT EXISTS idx_media_asset_site_unique
+            ON media(platform_asset_id, site_id)
+            WHERE platform_asset_id IS NOT NULL AND site_id IS NOT NULL
+          ''');
+          }
+        }
+        if (from < 148) await reportProgress();
       },
       beforeOpen: (details) async {
         // Enable foreign keys
@@ -7787,6 +7894,9 @@ class AppDatabase extends _$AppDatabase {
         // diver_settings calibration columns.
         await _assertVisibilityMetersColumn();
         await _assertVisibilityScaleColumns();
+
+        // v145 backstop: re-assert the gps_tracks provenance and trim columns.
+        await _assertGpsTrackColumns();
 
         // v147 backstop: re-run the buddy_roles fold (parallel-branch
         // schema-version collision self-heal). This is safe to re-run on

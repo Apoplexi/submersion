@@ -1,18 +1,25 @@
 import 'dart:async';
 
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 
 import 'package:submersion/core/services/location_service.dart';
 import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/gps_log/data/services/gps_track_recorder.dart';
 import 'package:submersion/features/gps_log/domain/entities/gps_track.dart';
+import 'package:submersion/features/gps_log/data/services/track_import/parsed_track.dart';
+import 'package:submersion/features/gps_log/data/services/track_import/track_import_service.dart';
+import 'package:submersion/features/gps_log/presentation/pages/track_import_review_page.dart';
+import 'package:submersion/features/gps_log/presentation/track_parse_error_text.dart';
 import 'package:submersion/features/gps_log/presentation/providers/gps_log_providers.dart';
+import 'package:submersion/features/gps_log/presentation/providers/gps_track_map_providers.dart';
+import 'package:submersion/features/gps_log/presentation/widgets/gps_track_thumbnail.dart';
+import 'package:submersion/features/gps_log/presentation/widgets/track_row_labels.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:submersion/shared/widgets/feature_accent.dart';
@@ -138,6 +145,54 @@ class _GpsLoggerPageState extends ConsumerState<GpsLoggerPage> {
     );
   }
 
+  Future<void> _importTrack() async {
+    final l10n = context.l10n;
+    final messenger = ScaffoldMessenger.of(context);
+    final navigator = Navigator.of(context);
+
+    final picked = await FilePicker.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: const ['gpx', 'kml', 'csv', 'fit'],
+      // Needed so FIT, which is binary, arrives intact rather than as a path
+      // we would then have to read separately on every platform.
+      withData: true,
+    );
+    final file = picked?.files.singleOrNull;
+    final bytes = file?.bytes;
+    if (file == null || bytes == null) return;
+
+    final TrackImportCandidate candidate;
+    try {
+      candidate = await ref
+          .read(trackImportServiceProvider)
+          .prepare(fileName: file.name, bytes: bytes);
+    } on TrackParseException catch (e) {
+      // e.message names the offending element or row, in English. It belongs
+      // in the log; the SnackBar gets the localized reason.
+      _log.warning('Track import rejected: ${e.message}');
+      if (!mounted) return;
+      messenger.showSnackBar(
+        SnackBar(content: Text(trackParseErrorText(l10n, e))),
+      );
+      return;
+    } catch (e, stackTrace) {
+      _log.error('Track import failed', error: e, stackTrace: stackTrace);
+      if (!mounted) return;
+      messenger.showSnackBar(
+        SnackBar(content: Text(l10n.gpsTrack_import_failed('$e'))),
+      );
+      return;
+    }
+
+    if (!mounted) return;
+    await navigator.push<bool>(
+      MaterialPageRoute(
+        builder: (_) =>
+            TrackImportReviewPage(candidate: candidate, bytes: bytes),
+      ),
+    );
+  }
+
   Future<void> _deleteTrack(GpsTrack track) async {
     final l10n = context.l10n;
     final confirmed = await showDialog<bool>(
@@ -158,7 +213,7 @@ class _GpsLoggerPageState extends ConsumerState<GpsLoggerPage> {
       ),
     );
     if (confirmed == true) {
-      await ref.read(gpsTrackRepositoryProvider).deleteTrack(track.id);
+      await ref.read(deleteTrackProvider)(track.id);
     }
   }
 
@@ -175,18 +230,11 @@ class _GpsLoggerPageState extends ConsumerState<GpsLoggerPage> {
     return _formatCompactDuration(age);
   }
 
-  String _formatTrackDuration(GpsTrack track) {
-    final end = track.endTime;
-    if (end == null) return '--';
-    return _formatCompactDuration(
-      Duration(milliseconds: end - track.startTime),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final theme = Theme.of(context);
+    final units = UnitFormatter(ref.watch(settingsProvider));
     final recorder = ref.watch(gpsTrackRecorderProvider);
     final state = ref.watch(gpsRecorderStateProvider).value ?? recorder.state;
     final tracks = ref.watch(gpsTracksProvider).value ?? const <GpsTrack>[];
@@ -197,65 +245,98 @@ class _GpsLoggerPageState extends ConsumerState<GpsLoggerPage> {
           featureId: 'gps-log',
           title: l10n.tools_gpsLogger_title,
         ),
-      ),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
-          if (_canRecord) ...[
-            _RecordCard(
-              state: state,
-              formatAge: _formatAge,
-              onStart: _startLogging,
-              onStop: () => ref.read(gpsTrackRecorderProvider).stop(),
-            ),
-            const SizedBox(height: 16),
-          ],
-          OutlinedButton.icon(
-            icon: const Icon(Icons.add_location_alt_outlined),
-            label: Text(l10n.gpsLogger_matchButton),
-            onPressed: _matchNow,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.map_outlined),
+            tooltip: l10n.gpsTrack_map_showMap,
+            onPressed: () => context.push('/gps-log/map'),
           ),
-          const SizedBox(height: 24),
-          Text(l10n.gpsLogger_tracksHeader, style: theme.textTheme.titleMedium),
-          const SizedBox(height: 8),
-          if (tracks.isEmpty)
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 24),
-              child: Center(
-                child: Text(
-                  l10n.gpsLogger_noTracks,
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant,
+          IconButton(
+            key: const ValueKey('gps-track-import'),
+            icon: const Icon(Icons.file_open_outlined),
+            tooltip: l10n.gpsTrack_import_action,
+            onPressed: _importTrack,
+          ),
+        ],
+      ),
+      // CustomScrollView rather than ListView: each row now carries a live
+      // FlutterMap thumbnail, and a non-builder list would instantiate one
+      // per track in the database on first paint.
+      body: CustomScrollView(
+        slivers: [
+          SliverPadding(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+            sliver: SliverList.list(
+              children: [
+                if (_canRecord) ...[
+                  _RecordCard(
+                    state: state,
+                    formatAge: _formatAge,
+                    onStart: _startLogging,
+                    onStop: () => ref.read(gpsTrackRecorderProvider).stop(),
                   ),
+                  const SizedBox(height: 16),
+                ],
+                OutlinedButton.icon(
+                  icon: const Icon(Icons.add_location_alt_outlined),
+                  label: Text(l10n.gpsLogger_matchButton),
+                  onPressed: _matchNow,
                 ),
-              ),
-            )
-          else
-            for (final track in tracks)
-              ListTile(
-                leading: const Icon(Icons.route_outlined),
-                // Track times are wall-clock-as-UTC: format the UTC
-                // components directly, never convert to device-local.
-                title: Text(
-                  DateFormat.yMMMd().add_jm().format(
-                    DateTime.fromMillisecondsSinceEpoch(
-                      track.startTime,
-                      isUtc: true,
+                const SizedBox(height: 24),
+                Text(
+                  l10n.gpsLogger_tracksHeader,
+                  style: theme.textTheme.titleMedium,
+                ),
+                const SizedBox(height: 8),
+                if (tracks.isEmpty)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 24),
+                    child: Center(
+                      child: Text(
+                        l10n.gpsLogger_noTracks,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
+                      ),
                     ),
                   ),
-                ),
-                subtitle: Text(
-                  l10n.gpsLogger_trackSubtitle(
-                    track.pointCount,
-                    _formatTrackDuration(track),
+              ],
+            ),
+          ),
+          SliverPadding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+            sliver: SliverList.builder(
+              itemCount: tracks.length,
+              itemBuilder: (context, index) {
+                final track = tracks[index];
+                return ListTile(
+                  // Keyed by track: without this a recycled row keeps the
+                  // previous track's FlutterMap State, and its camera stays
+                  // on the previous region.
+                  key: ValueKey(track.id),
+                  onTap: () => context.push('/gps-log/${track.id}'),
+                  contentPadding: EdgeInsets.zero,
+                  minLeadingWidth: kTrackThumbnailWidth,
+                  leading: GpsTrackThumbnail(trackId: track.id),
+                  // Track times are wall-clock-as-UTC: format the UTC
+                  // components directly, never convert to device-local.
+                  title: Text(formatTrackStart(units, track)),
+                  subtitle: Text(
+                    formatTrackSubtitle(
+                      l10n,
+                      track,
+                      formatTrackDuration(track),
+                    ),
                   ),
-                ),
-                trailing: IconButton(
-                  icon: const Icon(Icons.delete_outline),
-                  tooltip: l10n.common_action_delete,
-                  onPressed: () => _deleteTrack(track),
-                ),
-              ),
+                  trailing: IconButton(
+                    icon: const Icon(Icons.delete_outline),
+                    tooltip: l10n.common_action_delete,
+                    onPressed: () => _deleteTrack(track),
+                  ),
+                );
+              },
+            ),
+          ),
         ],
       ),
     );

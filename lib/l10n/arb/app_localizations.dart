@@ -116,6 +116,12 @@ abstract class AppLocalizations {
     Locale('zh'),
   ];
 
+  /// No description provided for @universalImport_action_importFromGarmin.
+  ///
+  /// In en, this message translates to:
+  /// **'Import from Garmin Device'**
+  String get universalImport_action_importFromGarmin;
+
   /// No description provided for @diveLog_edit_flightWindowWarning.
   ///
   /// In en, this message translates to:
@@ -5045,6 +5051,18 @@ abstract class AppLocalizations {
   /// **'{count} dives logged'**
   String dashboard_hero_divesLoggedOther(Object count);
 
+  /// No description provided for @dashboard_hero_divesTotalOne.
+  ///
+  /// In en, this message translates to:
+  /// **'1 dive'**
+  String get dashboard_hero_divesTotalOne;
+
+  /// No description provided for @dashboard_hero_divesTotalOther.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} dives'**
+  String dashboard_hero_divesTotalOther(Object count);
+
   /// No description provided for @dashboard_hero_error.
   ///
   /// In en, this message translates to:
@@ -9480,18 +9498,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Dive #{number} Profile'**
   String diveLog_fullscreenProfile_title(Object number);
-
-  /// No description provided for @diveLog_instruments_customize.
-  ///
-  /// In en, this message translates to:
-  /// **'Customize instruments'**
-  String get diveLog_instruments_customize;
-
-  /// No description provided for @diveLog_instruments_customizeHint.
-  ///
-  /// In en, this message translates to:
-  /// **'Toggle instruments on or off. Drag to reorder.'**
-  String get diveLog_instruments_customizeHint;
 
   /// No description provided for @diveLog_legend_label_ascentRate.
   ///
@@ -20036,6 +20042,84 @@ abstract class AppLocalizations {
   /// **'Photo unlinked'**
   String get media_diveMediaSection_unlinkSuccess;
 
+  /// No description provided for @media_siteMediaSection_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Site Media'**
+  String get media_siteMediaSection_title;
+
+  /// No description provided for @media_siteMediaSection_addPhotos.
+  ///
+  /// In en, this message translates to:
+  /// **'Add photos or videos'**
+  String get media_siteMediaSection_addPhotos;
+
+  /// No description provided for @media_siteMediaSection_addDocument.
+  ///
+  /// In en, this message translates to:
+  /// **'Add document'**
+  String get media_siteMediaSection_addDocument;
+
+  /// No description provided for @media_siteMediaSection_emptyState.
+  ///
+  /// In en, this message translates to:
+  /// **'No maps, photos, or documents attached to this site'**
+  String get media_siteMediaSection_emptyState;
+
+  /// No description provided for @media_siteMediaSection_divePhotosGroup.
+  ///
+  /// In en, this message translates to:
+  /// **'Photos from dives here ({count})'**
+  String media_siteMediaSection_divePhotosGroup(int count);
+
+  /// No description provided for @media_siteMediaSection_divePhotoLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Dive photo'**
+  String get media_siteMediaSection_divePhotoLabel;
+
+  /// No description provided for @media_siteMediaSection_unlinkSelectedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove {count} attachments?'**
+  String media_siteMediaSection_unlinkSelectedTitle(int count);
+
+  /// No description provided for @media_siteMediaSection_unlinkSelectedContent.
+  ///
+  /// In en, this message translates to:
+  /// **'The selected items will be removed from this site. Files in your photo library or on disk are not deleted.'**
+  String get media_siteMediaSection_unlinkSelectedContent;
+
+  /// No description provided for @media_siteMediaSection_unlinkSelectedSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Removed {count} attachments'**
+  String media_siteMediaSection_unlinkSelectedSuccess(int count);
+
+  /// No description provided for @media_documentViewer_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Document'**
+  String get media_documentViewer_title;
+
+  /// No description provided for @media_documentViewer_unavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'This document is not available on this device'**
+  String get media_documentViewer_unavailable;
+
+  /// No description provided for @media_documentViewer_availableOnOriginDevice.
+  ///
+  /// In en, this message translates to:
+  /// **'It is available on the device it was added from, or via a configured media store.'**
+  String get media_documentViewer_availableOnOriginDevice;
+
+  /// No description provided for @media_documentViewer_attached.
+  ///
+  /// In en, this message translates to:
+  /// **'Attached {count} documents'**
+  String media_documentViewer_attached(int count);
+
   /// No description provided for @media_diveScan_scanTooltip.
   ///
   /// In en, this message translates to:
@@ -22146,6 +22230,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Site'**
   String get diveLog_detail_surfaceGps_site;
+
+  /// No description provided for @diveLog_detail_surfaceGps_track.
+  ///
+  /// In en, this message translates to:
+  /// **'Surface track'**
+  String get diveLog_detail_surfaceGps_track;
+
+  /// No description provided for @diveLog_detail_surfaceGps_showFullTrack.
+  ///
+  /// In en, this message translates to:
+  /// **'Full track'**
+  String get diveLog_detail_surfaceGps_showFullTrack;
+
+  /// Count of GPS positions in the surface track covering this dive
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 fix} other{{count} fixes}}'**
+  String diveLog_detail_surfaceGps_trackFixes(int count);
 
   /// No description provided for @diveLog_detail_locationsMap_title.
   ///
@@ -33353,11 +33455,335 @@ abstract class AppLocalizations {
   /// **'{count, plural, one{{count} point} other{{count} points}}, {duration}'**
   String gpsLogger_trackSubtitle(num count, String duration);
 
+  /// Track row subtitle when a trim makes the stored point count unusable.
+  ///
+  /// In en, this message translates to:
+  /// **'Trimmed, {duration}'**
+  String gpsLogger_trackSubtitleTrimmed(String duration);
+
   /// No description provided for @gpsLogger_tracksHeader.
   ///
   /// In en, this message translates to:
   /// **'Recorded tracks'**
   String get gpsLogger_tracksHeader;
+
+  /// No description provided for @gpsTrack_action_trim.
+  ///
+  /// In en, this message translates to:
+  /// **'Trim...'**
+  String get gpsTrack_action_trim;
+
+  /// No description provided for @gpsTrack_action_split.
+  ///
+  /// In en, this message translates to:
+  /// **'Split...'**
+  String get gpsTrack_action_split;
+
+  /// No description provided for @gpsTrack_action_resetTrim.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset trim'**
+  String get gpsTrack_action_resetTrim;
+
+  /// No description provided for @gpsTrack_edit_applyTrim.
+  ///
+  /// In en, this message translates to:
+  /// **'Apply trim'**
+  String get gpsTrack_edit_applyTrim;
+
+  /// No description provided for @gpsTrack_edit_confirmSplit.
+  ///
+  /// In en, this message translates to:
+  /// **'Split here'**
+  String get gpsTrack_edit_confirmSplit;
+
+  /// No description provided for @gpsTrack_edit_splitWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'Splitting creates two tracks and removes the original. This cannot be undone.'**
+  String get gpsTrack_edit_splitWarning;
+
+  /// No description provided for @gpsTrack_edit_cancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get gpsTrack_edit_cancel;
+
+  /// No description provided for @gpsTrack_import_action.
+  ///
+  /// In en, this message translates to:
+  /// **'Import track...'**
+  String get gpsTrack_import_action;
+
+  /// No description provided for @gpsTrack_import_reviewTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Review Import'**
+  String get gpsTrack_import_reviewTitle;
+
+  /// No description provided for @gpsTrack_import_timezone.
+  ///
+  /// In en, this message translates to:
+  /// **'Recorded in'**
+  String get gpsTrack_import_timezone;
+
+  /// No description provided for @gpsTrack_import_timezoneHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Times in the file are UTC. Set the zone the track was recorded in so it lines up with your dives.'**
+  String get gpsTrack_import_timezoneHint;
+
+  /// No description provided for @gpsTrack_import_duplicate.
+  ///
+  /// In en, this message translates to:
+  /// **'This looks like a duplicate of an existing track.'**
+  String get gpsTrack_import_duplicate;
+
+  /// No description provided for @gpsTrack_import_confirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Import'**
+  String get gpsTrack_import_confirm;
+
+  /// No description provided for @gpsTrack_import_csvMapping.
+  ///
+  /// In en, this message translates to:
+  /// **'Match the columns'**
+  String get gpsTrack_import_csvMapping;
+
+  /// No description provided for @gpsTrack_import_firstFix.
+  ///
+  /// In en, this message translates to:
+  /// **'First fix'**
+  String get gpsTrack_import_firstFix;
+
+  /// Number of positions in the track being imported
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 fix} other{{count} fixes}}'**
+  String gpsTrack_import_fixCount(int count);
+
+  /// Shown when parsing an imported track file fails
+  ///
+  /// In en, this message translates to:
+  /// **'Could not read that file: {reason}'**
+  String gpsTrack_import_failed(String reason);
+
+  /// Track import failed: the file extension is not one the app reads.
+  ///
+  /// In en, this message translates to:
+  /// **'That file type is not supported. Import a GPX, KML, CSV, or FIT file.'**
+  String get gpsTrack_importError_unsupportedFormat;
+
+  /// Track import failed: the file is structurally unreadable.
+  ///
+  /// In en, this message translates to:
+  /// **'That file could not be read. It may be damaged or incomplete.'**
+  String get gpsTrack_importError_unreadable;
+
+  /// Track import failed: the file parsed but holds no GPS positions.
+  ///
+  /// In en, this message translates to:
+  /// **'That file has no timestamped GPS positions.'**
+  String get gpsTrack_importError_noPositions;
+
+  /// Track import failed: a coordinate or timestamp in the file is unusable.
+  ///
+  /// In en, this message translates to:
+  /// **'That file has a position or timestamp this app cannot read.'**
+  String get gpsTrack_importError_badData;
+
+  /// No description provided for @gpsTrack_export_saved.
+  ///
+  /// In en, this message translates to:
+  /// **'Track saved'**
+  String get gpsTrack_export_saved;
+
+  /// No description provided for @gpsTrack_action_export.
+  ///
+  /// In en, this message translates to:
+  /// **'Export'**
+  String get gpsTrack_action_export;
+
+  /// No description provided for @gpsTrack_action_shareGpx.
+  ///
+  /// In en, this message translates to:
+  /// **'Share as GPX'**
+  String get gpsTrack_action_shareGpx;
+
+  /// No description provided for @gpsTrack_action_saveGpx.
+  ///
+  /// In en, this message translates to:
+  /// **'Save as GPX...'**
+  String get gpsTrack_action_saveGpx;
+
+  /// No description provided for @gpsTrack_action_shareKml.
+  ///
+  /// In en, this message translates to:
+  /// **'Share as KML'**
+  String get gpsTrack_action_shareKml;
+
+  /// No description provided for @gpsTrack_action_saveKml.
+  ///
+  /// In en, this message translates to:
+  /// **'Save as KML...'**
+  String get gpsTrack_action_saveKml;
+
+  /// No description provided for @gpsTrack_export_failed.
+  ///
+  /// In en, this message translates to:
+  /// **'Export failed.'**
+  String get gpsTrack_export_failed;
+
+  /// No description provided for @gpsTrack_map_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Track Map'**
+  String get gpsTrack_map_title;
+
+  /// Banner shown when the overview map caps how many tracks it draws.
+  ///
+  /// In en, this message translates to:
+  /// **'Showing the {count} most recent tracks. Narrow the date filter to see others.'**
+  String gpsTrack_map_truncated(int count);
+
+  /// No description provided for @gpsTrack_map_noTracks.
+  ///
+  /// In en, this message translates to:
+  /// **'No recorded tracks to show.'**
+  String get gpsTrack_map_noTracks;
+
+  /// No description provided for @gpsTrack_map_showMap.
+  ///
+  /// In en, this message translates to:
+  /// **'Show map'**
+  String get gpsTrack_map_showMap;
+
+  /// No description provided for @gpsTrack_filter_all.
+  ///
+  /// In en, this message translates to:
+  /// **'All dates'**
+  String get gpsTrack_filter_all;
+
+  /// No description provided for @gpsTrack_filter_clear.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear date filter'**
+  String get gpsTrack_filter_clear;
+
+  /// No description provided for @gpsTrack_inspect_speed.
+  ///
+  /// In en, this message translates to:
+  /// **'Speed'**
+  String get gpsTrack_inspect_speed;
+
+  /// No description provided for @gpsTrack_inspect_accuracy.
+  ///
+  /// In en, this message translates to:
+  /// **'Accuracy'**
+  String get gpsTrack_inspect_accuracy;
+
+  /// No description provided for @gpsTrack_stats_distance.
+  ///
+  /// In en, this message translates to:
+  /// **'Distance'**
+  String get gpsTrack_stats_distance;
+
+  /// No description provided for @gpsTrack_stats_duration.
+  ///
+  /// In en, this message translates to:
+  /// **'Duration'**
+  String get gpsTrack_stats_duration;
+
+  /// No description provided for @gpsTrack_stats_avgSpeed.
+  ///
+  /// In en, this message translates to:
+  /// **'Avg speed'**
+  String get gpsTrack_stats_avgSpeed;
+
+  /// No description provided for @gpsTrack_stats_maxSpeed.
+  ///
+  /// In en, this message translates to:
+  /// **'Max speed'**
+  String get gpsTrack_stats_maxSpeed;
+
+  /// No description provided for @gpsTrack_stats_fixes.
+  ///
+  /// In en, this message translates to:
+  /// **'Fixes'**
+  String get gpsTrack_stats_fixes;
+
+  /// No description provided for @gpsTrack_stats_dives.
+  ///
+  /// In en, this message translates to:
+  /// **'Dives'**
+  String get gpsTrack_stats_dives;
+
+  /// No description provided for @gpsTrack_colorMode_uniform.
+  ///
+  /// In en, this message translates to:
+  /// **'Plain'**
+  String get gpsTrack_colorMode_uniform;
+
+  /// No description provided for @gpsTrack_colorMode_speed.
+  ///
+  /// In en, this message translates to:
+  /// **'Speed'**
+  String get gpsTrack_colorMode_speed;
+
+  /// No description provided for @gpsTrack_colorMode_elapsed.
+  ///
+  /// In en, this message translates to:
+  /// **'Time'**
+  String get gpsTrack_colorMode_elapsed;
+
+  /// No description provided for @gpsTrack_legend_slower.
+  ///
+  /// In en, this message translates to:
+  /// **'Slower'**
+  String get gpsTrack_legend_slower;
+
+  /// No description provided for @gpsTrack_legend_faster.
+  ///
+  /// In en, this message translates to:
+  /// **'Faster'**
+  String get gpsTrack_legend_faster;
+
+  /// No description provided for @gpsTrack_legend_start.
+  ///
+  /// In en, this message translates to:
+  /// **'Start'**
+  String get gpsTrack_legend_start;
+
+  /// No description provided for @gpsTrack_legend_end.
+  ///
+  /// In en, this message translates to:
+  /// **'End'**
+  String get gpsTrack_legend_end;
+
+  /// No description provided for @gpsTrack_detail_title.
+  ///
+  /// In en, this message translates to:
+  /// **'GPS Track'**
+  String get gpsTrack_detail_title;
+
+  /// No description provided for @gpsTrack_detail_notFound.
+  ///
+  /// In en, this message translates to:
+  /// **'This track is no longer available.'**
+  String get gpsTrack_detail_notFound;
+
+  /// No description provided for @gpsTrack_detail_unreadable.
+  ///
+  /// In en, this message translates to:
+  /// **'Track data could not be read.'**
+  String get gpsTrack_detail_unreadable;
+
+  /// No description provided for @gpsTrack_detail_noPoints.
+  ///
+  /// In en, this message translates to:
+  /// **'This track has no recorded positions.'**
+  String get gpsTrack_detail_noPoints;
 
   /// No description provided for @maps_compass_resetLabel.
   ///

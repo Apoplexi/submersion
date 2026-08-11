@@ -22,7 +22,7 @@ Every task's requirements implicitly include this section.
 - **`flutter analyze`** must be clean. Never pipe it to `tail` — that masks the exit code.
 - **Commit message style:** imperative sentence case, no `feat:`/`fix:` prefix, no `Co-Authored-By` trailer, no Claude Code attribution. Match the existing log ("Add customizable home screen design spec").
 - **l10n:** every user-visible string goes in `lib/l10n/arb/app_en.arb` and is translated to **all** supported locales (ar, de, es, fr, he, hu, it, nl, pt, zh).
-- **Schema versions:** main DB target is **v144** — re-grep `origin/main` for `currentSchemaVersion` immediately before pushing, because this ladder has had parallel-branch collisions. Local cache DB target is **v9**.
+- **Schema versions:** main DB step is **v145** (main reached v147 by merge time) — re-grep `origin/main` for `currentSchemaVersion` immediately before pushing, because this ladder has had parallel-branch collisions. Local cache DB step is **v10**, renumbered from v9 when the NOAA tide cache claimed 9 first.
 - **Worktree:** this work runs in its own git worktree. After creating it, run `git submodule update --init --recursive` then `flutter pub get` before anything else.
 
 ## File Structure
@@ -49,8 +49,8 @@ Every task's requirements implicitly include this section.
 
 | Path | Change |
 |---|---|
-| `lib/core/database/database.dart` | `gps_tracks` +5 columns, `currentSchemaVersion` 142 to 144, migration step |
-| `lib/core/database/local_cache_database.dart` | `gps_track_geometry_cache` table, v8 to v9, self-heal |
+| `lib/core/database/database.dart` | `gps_tracks` +5 columns, `currentSchemaVersion` 142 to 145, migration step |
+| `lib/core/database/local_cache_database.dart` | `gps_track_geometry_cache` table, v9 to v10, self-heal |
 | `lib/core/utils/unit_formatter.dart` | `formatSpeed` |
 | `lib/core/services/export/shared/file_export_utils.dart` | `saveTextToFile` |
 | `lib/core/services/export/kml/kml_export_service.dart` | `<gx:Track>` output |
@@ -935,7 +935,7 @@ git fetch origin
 git show origin/main:lib/core/database/database.dart | grep -n "currentSchemaVersion ="
 ```
 
-Expected: `142`. If it is not 142, stop and pick the next free version, updating every reference in this task.
+Expected: `144`. If it is not 144, stop and pick the next free version, updating every reference in this task. This check has already fired once: main was at 142 when the plan was written and reached 144 (visibility scale calibration) before this branch merged, so the step was renumbered from 144 to 145.
 
 - [ ] **Step 2: Read an existing migration step to copy its shape**
 
@@ -992,8 +992,8 @@ void main() {
     expect(row.trimEndTime, isNull);
   });
 
-  test('schema version is 144', () {
-    expect(db.schemaVersion, 144);
+  test('schema version is 145', () {
+    expect(db.schemaVersion, 145);
   });
 }
 ```
@@ -1027,10 +1027,10 @@ In `lib/core/database/database.dart`, inside `class GpsTracks extends Table`, af
 
 - [ ] **Step 6: Bump the version and add the migration step**
 
-Change `currentSchemaVersion` from `142` to `144`, then add to the migration chain, matching the surrounding style:
+Change `currentSchemaVersion` from `142` to `145`, then add to the migration chain, matching the surrounding style:
 
 ```dart
-      if (from < 144) {
+      if (from < 145) {
         await m.addColumn(gpsTracks, gpsTracks.source);
         await m.addColumn(gpsTracks, gpsTracks.sourceRef);
         await m.addColumn(gpsTracks, gpsTracks.name);
@@ -1257,7 +1257,7 @@ git commit -m "Add effectivePoints accessor honouring track trim bounds"
 - Test: `test/core/database/local_cache_gps_geometry_test.dart`
 
 **Interfaces:**
-- Produces: `gps_track_geometry_cache` table `(trackId TEXT, lodLevel TEXT, points BLOB?, status TEXT, createdAt INT)`, primary key `(trackId, lodLevel)`; local cache `schemaVersion` 8 to 9
+- Produces: `gps_track_geometry_cache` table `(trackId TEXT, lodLevel TEXT, points BLOB?, status TEXT, createdAt INT)`, primary key `(trackId, lodLevel)`; local cache `schemaVersion` 9 to 10
 
 This goes in the local cache DB, not the synced one: simplified geometry is fully re-derivable from the stored blob, so the main DB would charge a schema bump, HLC timestamps, tombstones, merge rules, and backup weight for nothing.
 
@@ -1381,7 +1381,7 @@ class GpsTrackGeometryCache extends Table {
 }
 ```
 
-Register it in the `@DriftDatabase(tables: [...])` list, bump `schemaVersion` from 8 to 9, add the migration step, and add the `beforeOpen` self-heal alongside the bathymetry and reef ones:
+Register it in the `@DriftDatabase(tables: [...])` list, bump `schemaVersion` from 9 to 10, add the migration step, and add the `beforeOpen` self-heal alongside the bathymetry and reef ones:
 
 ```dart
         CREATE TABLE IF NOT EXISTS gps_track_geometry_cache (
@@ -8137,7 +8137,7 @@ Manual passes that automated tests cannot cover:
 | Surface 3: overview map | 18, 19 |
 | Surface 4: dive detail | 20, 21 |
 | Schema v144 | 5 |
-| Local cache schema v9 | 7 |
+| Local cache schema v10 | 7 |
 | Import (GPX, KML, CSV, FIT) | 26, 27, 28, 29, 30, 31, 32 |
 | Export (GPX, KML) | 22, 23, 24, 25 |
 | Trim and split | 33, 34, 35 |

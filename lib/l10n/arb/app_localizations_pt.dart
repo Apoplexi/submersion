@@ -9,6 +9,10 @@ class AppLocalizationsPt extends AppLocalizations {
   AppLocalizationsPt([String locale = 'pt']) : super(locale);
 
   @override
+  String get universalImport_action_importFromGarmin =>
+      'Importar do dispositivo Garmin';
+
+  @override
   String diveLog_edit_flightWindowWarning(String time) {
     return 'Este mergulho termina depois do último horário seguro para emergir antes do seu voo ($time)';
   }
@@ -2967,6 +2971,14 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
+  String get dashboard_hero_divesTotalOne => '1 mergulho';
+
+  @override
+  String dashboard_hero_divesTotalOther(Object count) {
+    return '$count mergulhos';
+  }
+
+  @override
   String get dashboard_hero_error => 'Pronto para explorar as profundezas?';
 
   @override
@@ -5694,13 +5706,6 @@ class AppLocalizationsPt extends AppLocalizations {
   String diveLog_fullscreenProfile_title(Object number) {
     return 'Perfil do Mergulho #$number';
   }
-
-  @override
-  String get diveLog_instruments_customize => 'Personalizar instrumentos';
-
-  @override
-  String get diveLog_instruments_customizeHint =>
-      'Ative ou desative instrumentos. Arraste para reordenar.';
 
   @override
   String get diveLog_legend_label_ascentRate => 'Taxa de Subida';
@@ -11768,6 +11773,57 @@ class AppLocalizationsPt extends AppLocalizations {
   String get media_diveMediaSection_unlinkSuccess => 'Foto desvinculada';
 
   @override
+  String get media_siteMediaSection_title => 'Mídia do ponto de mergulho';
+
+  @override
+  String get media_siteMediaSection_addPhotos => 'Adicionar fotos ou vídeos';
+
+  @override
+  String get media_siteMediaSection_addDocument => 'Adicionar documento';
+
+  @override
+  String get media_siteMediaSection_emptyState =>
+      'Nenhum mapa, foto ou documento anexado a este ponto de mergulho';
+
+  @override
+  String media_siteMediaSection_divePhotosGroup(int count) {
+    return 'Fotos de mergulhos aqui ($count)';
+  }
+
+  @override
+  String get media_siteMediaSection_divePhotoLabel => 'Foto de mergulho';
+
+  @override
+  String media_siteMediaSection_unlinkSelectedTitle(int count) {
+    return 'Remover $count anexos?';
+  }
+
+  @override
+  String get media_siteMediaSection_unlinkSelectedContent =>
+      'Os itens selecionados serão removidos deste ponto de mergulho. Os arquivos na sua galeria ou no disco não são excluídos.';
+
+  @override
+  String media_siteMediaSection_unlinkSelectedSuccess(int count) {
+    return '$count anexos removidos';
+  }
+
+  @override
+  String get media_documentViewer_title => 'Documento';
+
+  @override
+  String get media_documentViewer_unavailable =>
+      'Este documento não está disponível neste dispositivo';
+
+  @override
+  String get media_documentViewer_availableOnOriginDevice =>
+      'Ele está disponível no dispositivo em que foi adicionado, ou por meio de um armazenamento de mídia configurado.';
+
+  @override
+  String media_documentViewer_attached(int count) {
+    return '$count documentos anexados';
+  }
+
+  @override
   String get media_diveScan_scanTooltip => 'Pesquisar fotos na galeria';
 
   @override
@@ -13107,6 +13163,23 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get diveLog_detail_surfaceGps_site => 'Ponto de mergulho';
+
+  @override
+  String get diveLog_detail_surfaceGps_track => 'Trilha de superfície';
+
+  @override
+  String get diveLog_detail_surfaceGps_showFullTrack => 'Trilha completa';
+
+  @override
+  String diveLog_detail_surfaceGps_trackFixes(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count pontos',
+      one: '1 ponto',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get diveLog_detail_locationsMap_title => 'Locais de mergulho';
@@ -20031,7 +20104,192 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
+  String gpsLogger_trackSubtitleTrimmed(String duration) {
+    return 'Recortada, $duration';
+  }
+
+  @override
   String get gpsLogger_tracksHeader => 'Trilhas gravadas';
+
+  @override
+  String get gpsTrack_action_trim => 'Recortar...';
+
+  @override
+  String get gpsTrack_action_split => 'Dividir...';
+
+  @override
+  String get gpsTrack_action_resetTrim => 'Remover recorte';
+
+  @override
+  String get gpsTrack_edit_applyTrim => 'Aplicar recorte';
+
+  @override
+  String get gpsTrack_edit_confirmSplit => 'Dividir aqui';
+
+  @override
+  String get gpsTrack_edit_splitWarning =>
+      'Dividir cria duas trilhas e remove a original. Não é possível desfazer.';
+
+  @override
+  String get gpsTrack_edit_cancel => 'Cancelar';
+
+  @override
+  String get gpsTrack_import_action => 'Importar trilha...';
+
+  @override
+  String get gpsTrack_import_reviewTitle => 'Rever importação';
+
+  @override
+  String get gpsTrack_import_timezone => 'Gravada em';
+
+  @override
+  String get gpsTrack_import_timezoneHint =>
+      'As horas no ficheiro estão em UTC. Defina o fuso em que a trilha foi gravada para coincidir com os seus mergulhos.';
+
+  @override
+  String get gpsTrack_import_duplicate =>
+      'Isto parece um duplicado de uma trilha existente.';
+
+  @override
+  String get gpsTrack_import_confirm => 'Importar';
+
+  @override
+  String get gpsTrack_import_csvMapping => 'Associar colunas';
+
+  @override
+  String get gpsTrack_import_firstFix => 'Primeiro ponto';
+
+  @override
+  String gpsTrack_import_fixCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count pontos',
+      one: '1 ponto',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String gpsTrack_import_failed(String reason) {
+    return 'Não foi possível ler o ficheiro: $reason';
+  }
+
+  @override
+  String get gpsTrack_importError_unsupportedFormat =>
+      'Esse tipo de arquivo não é compatível. Importe um arquivo GPX, KML, CSV ou FIT.';
+
+  @override
+  String get gpsTrack_importError_unreadable =>
+      'Não foi possível ler esse arquivo. Ele pode estar danificado ou incompleto.';
+
+  @override
+  String get gpsTrack_importError_noPositions =>
+      'Esse arquivo não tem posições GPS com data e hora.';
+
+  @override
+  String get gpsTrack_importError_badData =>
+      'Esse arquivo tem uma posição ou data e hora que o app não consegue ler.';
+
+  @override
+  String get gpsTrack_export_saved => 'Trilha guardada';
+
+  @override
+  String get gpsTrack_action_export => 'Exportar';
+
+  @override
+  String get gpsTrack_action_shareGpx => 'Partilhar como GPX';
+
+  @override
+  String get gpsTrack_action_saveGpx => 'Guardar como GPX...';
+
+  @override
+  String get gpsTrack_action_shareKml => 'Partilhar como KML';
+
+  @override
+  String get gpsTrack_action_saveKml => 'Guardar como KML...';
+
+  @override
+  String get gpsTrack_export_failed => 'Falha na exportação.';
+
+  @override
+  String get gpsTrack_map_title => 'Mapa de trilhas';
+
+  @override
+  String gpsTrack_map_truncated(int count) {
+    return 'Mostrando as $count trilhas mais recentes. Ajuste o filtro de datas para ver as outras.';
+  }
+
+  @override
+  String get gpsTrack_map_noTracks => 'Não há trilhas gravadas para mostrar.';
+
+  @override
+  String get gpsTrack_map_showMap => 'Mostrar mapa';
+
+  @override
+  String get gpsTrack_filter_all => 'Todas as datas';
+
+  @override
+  String get gpsTrack_filter_clear => 'Limpar filtro de datas';
+
+  @override
+  String get gpsTrack_inspect_speed => 'Velocidade';
+
+  @override
+  String get gpsTrack_inspect_accuracy => 'Precisão';
+
+  @override
+  String get gpsTrack_stats_distance => 'Distância';
+
+  @override
+  String get gpsTrack_stats_duration => 'Duração';
+
+  @override
+  String get gpsTrack_stats_avgSpeed => 'Vel. média';
+
+  @override
+  String get gpsTrack_stats_maxSpeed => 'Vel. máx.';
+
+  @override
+  String get gpsTrack_stats_fixes => 'Pontos';
+
+  @override
+  String get gpsTrack_stats_dives => 'Mergulhos';
+
+  @override
+  String get gpsTrack_colorMode_uniform => 'Simples';
+
+  @override
+  String get gpsTrack_colorMode_speed => 'Velocidade';
+
+  @override
+  String get gpsTrack_colorMode_elapsed => 'Tempo';
+
+  @override
+  String get gpsTrack_legend_slower => 'Mais lento';
+
+  @override
+  String get gpsTrack_legend_faster => 'Mais rápido';
+
+  @override
+  String get gpsTrack_legend_start => 'Início';
+
+  @override
+  String get gpsTrack_legend_end => 'Fim';
+
+  @override
+  String get gpsTrack_detail_title => 'Trilha GPS';
+
+  @override
+  String get gpsTrack_detail_notFound => 'Esta trilha já não está disponível.';
+
+  @override
+  String get gpsTrack_detail_unreadable =>
+      'Não foi possível ler os dados da trilha.';
+
+  @override
+  String get gpsTrack_detail_noPoints =>
+      'Esta trilha não tem posições registadas.';
 
   @override
   String get maps_compass_resetLabel =>

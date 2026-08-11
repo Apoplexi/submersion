@@ -9,6 +9,10 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
+  String get universalImport_action_importFromGarmin =>
+      'Import from Garmin Device';
+
+  @override
   String diveLog_edit_flightWindowWarning(String time) {
     return 'This dive ends after the latest safe surfacing time for your flight ($time)';
   }
@@ -2913,6 +2917,14 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get dashboard_hero_divesTotalOne => '1 dive';
+
+  @override
+  String dashboard_hero_divesTotalOther(Object count) {
+    return '$count dives';
+  }
+
+  @override
   String get dashboard_hero_error => 'Ready to explore the depths?';
 
   @override
@@ -5585,13 +5597,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String diveLog_fullscreenProfile_title(Object number) {
     return 'Dive #$number Profile';
   }
-
-  @override
-  String get diveLog_instruments_customize => 'Customize instruments';
-
-  @override
-  String get diveLog_instruments_customizeHint =>
-      'Toggle instruments on or off. Drag to reorder.';
 
   @override
   String get diveLog_legend_label_ascentRate => 'Ascent Rate';
@@ -11571,6 +11576,57 @@ class AppLocalizationsEn extends AppLocalizations {
   String get media_diveMediaSection_unlinkSuccess => 'Photo unlinked';
 
   @override
+  String get media_siteMediaSection_title => 'Site Media';
+
+  @override
+  String get media_siteMediaSection_addPhotos => 'Add photos or videos';
+
+  @override
+  String get media_siteMediaSection_addDocument => 'Add document';
+
+  @override
+  String get media_siteMediaSection_emptyState =>
+      'No maps, photos, or documents attached to this site';
+
+  @override
+  String media_siteMediaSection_divePhotosGroup(int count) {
+    return 'Photos from dives here ($count)';
+  }
+
+  @override
+  String get media_siteMediaSection_divePhotoLabel => 'Dive photo';
+
+  @override
+  String media_siteMediaSection_unlinkSelectedTitle(int count) {
+    return 'Remove $count attachments?';
+  }
+
+  @override
+  String get media_siteMediaSection_unlinkSelectedContent =>
+      'The selected items will be removed from this site. Files in your photo library or on disk are not deleted.';
+
+  @override
+  String media_siteMediaSection_unlinkSelectedSuccess(int count) {
+    return 'Removed $count attachments';
+  }
+
+  @override
+  String get media_documentViewer_title => 'Document';
+
+  @override
+  String get media_documentViewer_unavailable =>
+      'This document is not available on this device';
+
+  @override
+  String get media_documentViewer_availableOnOriginDevice =>
+      'It is available on the device it was added from, or via a configured media store.';
+
+  @override
+  String media_documentViewer_attached(int count) {
+    return 'Attached $count documents';
+  }
+
+  @override
   String get media_diveScan_scanTooltip => 'Scan gallery for photos';
 
   @override
@@ -12893,6 +12949,23 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get diveLog_detail_surfaceGps_site => 'Site';
+
+  @override
+  String get diveLog_detail_surfaceGps_track => 'Surface track';
+
+  @override
+  String get diveLog_detail_surfaceGps_showFullTrack => 'Full track';
+
+  @override
+  String diveLog_detail_surfaceGps_trackFixes(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count fixes',
+      one: '1 fix',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get diveLog_detail_locationsMap_title => 'Dive Locations';
@@ -19688,7 +19761,191 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String gpsLogger_trackSubtitleTrimmed(String duration) {
+    return 'Trimmed, $duration';
+  }
+
+  @override
   String get gpsLogger_tracksHeader => 'Recorded tracks';
+
+  @override
+  String get gpsTrack_action_trim => 'Trim...';
+
+  @override
+  String get gpsTrack_action_split => 'Split...';
+
+  @override
+  String get gpsTrack_action_resetTrim => 'Reset trim';
+
+  @override
+  String get gpsTrack_edit_applyTrim => 'Apply trim';
+
+  @override
+  String get gpsTrack_edit_confirmSplit => 'Split here';
+
+  @override
+  String get gpsTrack_edit_splitWarning =>
+      'Splitting creates two tracks and removes the original. This cannot be undone.';
+
+  @override
+  String get gpsTrack_edit_cancel => 'Cancel';
+
+  @override
+  String get gpsTrack_import_action => 'Import track...';
+
+  @override
+  String get gpsTrack_import_reviewTitle => 'Review Import';
+
+  @override
+  String get gpsTrack_import_timezone => 'Recorded in';
+
+  @override
+  String get gpsTrack_import_timezoneHint =>
+      'Times in the file are UTC. Set the zone the track was recorded in so it lines up with your dives.';
+
+  @override
+  String get gpsTrack_import_duplicate =>
+      'This looks like a duplicate of an existing track.';
+
+  @override
+  String get gpsTrack_import_confirm => 'Import';
+
+  @override
+  String get gpsTrack_import_csvMapping => 'Match the columns';
+
+  @override
+  String get gpsTrack_import_firstFix => 'First fix';
+
+  @override
+  String gpsTrack_import_fixCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count fixes',
+      one: '1 fix',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String gpsTrack_import_failed(String reason) {
+    return 'Could not read that file: $reason';
+  }
+
+  @override
+  String get gpsTrack_importError_unsupportedFormat =>
+      'That file type is not supported. Import a GPX, KML, CSV, or FIT file.';
+
+  @override
+  String get gpsTrack_importError_unreadable =>
+      'That file could not be read. It may be damaged or incomplete.';
+
+  @override
+  String get gpsTrack_importError_noPositions =>
+      'That file has no timestamped GPS positions.';
+
+  @override
+  String get gpsTrack_importError_badData =>
+      'That file has a position or timestamp this app cannot read.';
+
+  @override
+  String get gpsTrack_export_saved => 'Track saved';
+
+  @override
+  String get gpsTrack_action_export => 'Export';
+
+  @override
+  String get gpsTrack_action_shareGpx => 'Share as GPX';
+
+  @override
+  String get gpsTrack_action_saveGpx => 'Save as GPX...';
+
+  @override
+  String get gpsTrack_action_shareKml => 'Share as KML';
+
+  @override
+  String get gpsTrack_action_saveKml => 'Save as KML...';
+
+  @override
+  String get gpsTrack_export_failed => 'Export failed.';
+
+  @override
+  String get gpsTrack_map_title => 'Track Map';
+
+  @override
+  String gpsTrack_map_truncated(int count) {
+    return 'Showing the $count most recent tracks. Narrow the date filter to see others.';
+  }
+
+  @override
+  String get gpsTrack_map_noTracks => 'No recorded tracks to show.';
+
+  @override
+  String get gpsTrack_map_showMap => 'Show map';
+
+  @override
+  String get gpsTrack_filter_all => 'All dates';
+
+  @override
+  String get gpsTrack_filter_clear => 'Clear date filter';
+
+  @override
+  String get gpsTrack_inspect_speed => 'Speed';
+
+  @override
+  String get gpsTrack_inspect_accuracy => 'Accuracy';
+
+  @override
+  String get gpsTrack_stats_distance => 'Distance';
+
+  @override
+  String get gpsTrack_stats_duration => 'Duration';
+
+  @override
+  String get gpsTrack_stats_avgSpeed => 'Avg speed';
+
+  @override
+  String get gpsTrack_stats_maxSpeed => 'Max speed';
+
+  @override
+  String get gpsTrack_stats_fixes => 'Fixes';
+
+  @override
+  String get gpsTrack_stats_dives => 'Dives';
+
+  @override
+  String get gpsTrack_colorMode_uniform => 'Plain';
+
+  @override
+  String get gpsTrack_colorMode_speed => 'Speed';
+
+  @override
+  String get gpsTrack_colorMode_elapsed => 'Time';
+
+  @override
+  String get gpsTrack_legend_slower => 'Slower';
+
+  @override
+  String get gpsTrack_legend_faster => 'Faster';
+
+  @override
+  String get gpsTrack_legend_start => 'Start';
+
+  @override
+  String get gpsTrack_legend_end => 'End';
+
+  @override
+  String get gpsTrack_detail_title => 'GPS Track';
+
+  @override
+  String get gpsTrack_detail_notFound => 'This track is no longer available.';
+
+  @override
+  String get gpsTrack_detail_unreadable => 'Track data could not be read.';
+
+  @override
+  String get gpsTrack_detail_noPoints =>
+      'This track has no recorded positions.';
 
   @override
   String get maps_compass_resetLabel => 'Reset map orientation to north';

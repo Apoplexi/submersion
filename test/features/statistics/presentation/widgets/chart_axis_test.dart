@@ -72,6 +72,15 @@ void main() {
       expect(axis.interval, greaterThan(0));
     });
 
+    test('stays drawable when handed no values at all', () {
+      final axis = ChartAxis.forTrend(const []);
+
+      expect(axis.max, greaterThan(axis.min));
+      expect(axis.interval, greaterThan(0));
+      expect(_isOnTick(axis.min, axis.interval), isTrue);
+      expect(_isOnTick(axis.max, axis.interval), isTrue);
+    });
+
     test('handles sub-unit SAC pressure values without collapsing', () {
       // bar/min SAC lives well under 1; the interval must scale down with it.
       final axis = ChartAxis.forTrend(const [0.52, 0.61, 0.58, 0.74]);
@@ -79,6 +88,50 @@ void main() {
       expect(axis.interval, lessThan(0.5));
       expect(axis.max, greaterThanOrEqualTo(0.74));
       expect(_isOnTick(axis.max, axis.interval), isTrue);
+    });
+  });
+
+  group('ChartAxis step ladder', () {
+    // math.log(1000) / math.ln10 is 2.9999999999999996, so flooring it alone
+    // put the normalized step at exactly 10 for intervals of 1e3, 1e6 and 1e9.
+    // The ladder ends at 10, so the search for a wider rung found nothing and
+    // threw "Bad state: No element" while snapping the axis.
+    test('survives a step that lands on an exact power of ten', () {
+      expect(
+        () => ChartAxis.forTrend(const [1407.7040137891763, 5630.816055156705]),
+        returnsNormally,
+      );
+      expect(
+        () => ChartAxis.forTrend(const [789.8540953036263, 5528.978667125384]),
+        returnsNormally,
+      );
+    });
+
+    test('produces a valid axis across a wide span of ranges', () {
+      for (var span = 1.0; span <= 200000; span *= 1.01) {
+        for (final lowest in [0.0, 1.0, span / 3]) {
+          final axis = ChartAxis.forTrend([lowest, lowest + span]);
+
+          expect(
+            axis.max,
+            greaterThan(axis.min),
+            reason: 'empty axis for [$lowest, ${lowest + span}]',
+          );
+          expect(
+            _isOnTick(axis.min, axis.interval),
+            isTrue,
+            reason: 'min ${axis.min} off tick for span $span',
+          );
+          expect(
+            _isOnTick(axis.max, axis.interval),
+            isTrue,
+            reason: 'max ${axis.max} off tick for span $span',
+          );
+          expect(axis.max, greaterThanOrEqualTo(lowest + span));
+        }
+
+        expect(() => ChartAxis.forCounts(span), returnsNormally);
+      }
     });
   });
 
