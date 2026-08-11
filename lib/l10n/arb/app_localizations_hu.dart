@@ -23608,16 +23608,28 @@ class AppLocalizationsHu extends AppLocalizations {
   String get common_selection_deselectAllTooltip => 'Kijelölés megszüntetése';
 
   @override
-  String common_bulkDelete_title(Object count) {
-    return '$count elem törlése?';
+  String common_bulkDelete_title(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count elem törlése?',
+      one: '$count elem törlése?',
+    );
+    return '$_temp0';
   }
 
   @override
   String get common_bulkDelete_body => 'Ez a művelet nem vonható vissza.';
 
   @override
-  String common_bulkDelete_snackbar(Object count) {
-    return '$count törölve';
+  String common_bulkDelete_snackbar(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count törölve',
+      one: '$count törölve',
+    );
+    return '$_temp0';
   }
 
   @override

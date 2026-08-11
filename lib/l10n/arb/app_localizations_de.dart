@@ -23651,8 +23651,14 @@ class AppLocalizationsDe extends AppLocalizations {
   String get common_selection_deselectAllTooltip => 'Auswahl aufheben';
 
   @override
-  String common_bulkDelete_title(Object count) {
-    return '$count Elemente löschen?';
+  String common_bulkDelete_title(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Elemente löschen?',
+      one: '$count Element löschen?',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -23660,8 +23666,14 @@ class AppLocalizationsDe extends AppLocalizations {
       'Dies kann nicht rückgängig gemacht werden.';
 
   @override
-  String common_bulkDelete_snackbar(Object count) {
-    return '$count gelöscht';
+  String common_bulkDelete_snackbar(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count gelöscht',
+      one: '$count gelöscht',
+    );
+    return '$_temp0';
   }
 
   @override

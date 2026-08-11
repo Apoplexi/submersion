@@ -39420,8 +39420,8 @@ abstract class AppLocalizations {
   /// No description provided for @common_bulkDelete_title.
   ///
   /// In en, this message translates to:
-  /// **'Delete {count} items?'**
-  String common_bulkDelete_title(Object count);
+  /// **'{count, plural, one{Delete {count} item?} other{Delete {count} items?}}'**
+  String common_bulkDelete_title(int count);
 
   /// No description provided for @common_bulkDelete_body.
   ///
@@ -39432,8 +39432,8 @@ abstract class AppLocalizations {
   /// No description provided for @common_bulkDelete_snackbar.
   ///
   /// In en, this message translates to:
-  /// **'{count} deleted'**
-  String common_bulkDelete_snackbar(Object count);
+  /// **'{count, plural, one{{count} deleted} other{{count} deleted}}'**
+  String common_bulkDelete_snackbar(int count);
 
   /// No description provided for @marineLife_species_delete_confirmTitle.
   ///

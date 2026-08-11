@@ -14976,17 +14976,17 @@
       "count": { "type": "Object" }
     }
   },
-  "common_bulkDelete_title": "Delete {count} items?",
+  "common_bulkDelete_title": "{count, plural, one{Delete {count} item?} other{Delete {count} items?}}",
   "common_bulkDelete_body": "This cannot be undone.",
-  "common_bulkDelete_snackbar": "{count} deleted",
+  "common_bulkDelete_snackbar": "{count, plural, one{{count} deleted} other{{count} deleted}}",
   "@common_bulkDelete_title": {
     "placeholders": {
-      "count": { "type": "Object" }
+      "count": { "type": "int" }
     }
   },
   "@common_bulkDelete_snackbar": {
     "placeholders": {
-      "count": { "type": "Object" }
+      "count": { "type": "int" }
     }
   },
   "marineLife_species_delete_confirmTitle": "Delete species?",

@@ -294,13 +294,23 @@ class _SiteMediaSectionState extends ConsumerState<SiteMediaSection> {
                   physics: const NeverScrollableScrollPhysics(),
                   startInSelectionMode: _isSelectionMode,
                   initialSelection: _indicesFor(media),
+                  // The controller owns the mode. Letting the grid also
+                  // decide had the two fight -- its exit callback cleared the
+                  // controller and the selection callback immediately
+                  // reactivated it, so a long-press selection emptied by hand
+                  // left the bar stranded at "0 selected".
+                  exitOnEmptySelection: false,
                   onSelectionChanged: (indices) {
-                    // The grid reports its complete selection, not a delta.
-                    _selection.selectAll(_idsFor(media, indices));
+                    // The grid reports its complete selection, not a delta, so
+                    // this replaces rather than toggles. Not selectAll: that
+                    // declares the mode explicit, which would launder the
+                    // grid's own long-press into a deliberate entry.
+                    _selection.replaceChecked(_idsFor(media, indices));
                   },
-                  onSelectionModeChanged: (isSelecting) {
-                    if (!isSelecting) _selection.exit();
-                  },
+                  // Entry and exit both travel through onSelectionChanged
+                  // above; the grid follows the controller back out via
+                  // startInSelectionMode.
+                  onSelectionModeChanged: (_) {},
                   onItemTap: (index) => _openItem(
                     context,
                     media[index],

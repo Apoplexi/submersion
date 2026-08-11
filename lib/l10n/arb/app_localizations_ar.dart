@@ -23269,16 +23269,36 @@ class AppLocalizationsAr extends AppLocalizations {
   String get common_selection_deselectAllTooltip => 'إلغاء تحديد الكل';
 
   @override
-  String common_bulkDelete_title(Object count) {
-    return 'حذف $count عنصر؟';
+  String common_bulkDelete_title(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'حذف $count عنصر؟',
+      many: 'حذف $count عنصرا؟',
+      few: 'حذف $count عناصر؟',
+      two: 'حذف عنصرين؟',
+      one: 'حذف عنصر واحد؟',
+      zero: 'حذف $count عنصر؟',
+    );
+    return '$_temp0';
   }
 
   @override
   String get common_bulkDelete_body => 'لا يمكن التراجع عن هذا.';
 
   @override
-  String common_bulkDelete_snackbar(Object count) {
-    return 'تم حذف $count';
+  String common_bulkDelete_snackbar(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'تم حذف $count',
+      many: 'تم حذف $count',
+      few: 'تم حذف $count',
+      two: 'تم حذف عنصرين',
+      one: 'تم حذف عنصر واحد',
+      zero: 'تم حذف $count',
+    );
+    return '$_temp0';
   }
 
   @override

@@ -272,6 +272,31 @@ void main() {
       expect(find.text('0 selected'), findsOneWidget);
     });
 
+    testWidgets('a long-press selection emptied by hand exits the mode', (
+      tester,
+    ) async {
+      await tester.pumpWidget(await host(attachments: [photoA]));
+      await tester.pumpAndSettle();
+
+      // Long-press is an implicit entry, so unchecking the last item must
+      // evaporate the mode. Bridging the grid with selectAll would have
+      // declared the entry explicit and stranded the bar at "0 selected";
+      // letting the grid own exitOnEmptySelection would have had the two
+      // fight instead.
+      await tester.longPress(find.byType(MediaThumbnailTile).first);
+      await tester.pumpAndSettle();
+      expect(find.text('1 selected'), findsOneWidget);
+
+      await tester.tap(find.byType(MediaThumbnailTile).first);
+      await tester.pumpAndSettle();
+
+      expect(
+        find.byKey(const ValueKey('selection_exit')),
+        findsNothing,
+        reason: 'an implicit entry must not survive at zero checked',
+      );
+    });
+
     testWidgets('Escape leaves selection mode', (tester) async {
       await tester.pumpWidget(await host(attachments: [photoA]));
       await tester.pumpAndSettle();

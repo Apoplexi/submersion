@@ -23094,16 +23094,32 @@ class AppLocalizationsHe extends AppLocalizations {
   String get common_selection_deselectAllTooltip => 'בטל בחירת הכול';
 
   @override
-  String common_bulkDelete_title(Object count) {
-    return 'למחוק $count פריטים?';
+  String common_bulkDelete_title(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'למחוק $count פריטים?',
+      many: 'למחוק $count פריטים?',
+      two: 'למחוק שני פריטים?',
+      one: 'למחוק פריט אחד?',
+    );
+    return '$_temp0';
   }
 
   @override
   String get common_bulkDelete_body => 'לא ניתן לבטל פעולה זו.';
 
   @override
-  String common_bulkDelete_snackbar(Object count) {
-    return '$count נמחקו';
+  String common_bulkDelete_snackbar(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count נמחקו',
+      many: '$count נמחקו',
+      two: 'שני פריטים נמחקו',
+      one: 'פריט אחד נמחק',
+    );
+    return '$_temp0';
   }
 
   @override

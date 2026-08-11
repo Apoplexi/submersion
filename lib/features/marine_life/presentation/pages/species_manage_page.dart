@@ -334,14 +334,33 @@ class _SpeciesManagePageState extends ConsumerState<SpeciesManagePage> {
     final messenger = ScaffoldMessenger.of(context);
     final notifier = ref.read(speciesListNotifierProvider.notifier);
     _selection.exit();
+
+    // Selection excludes in-use species, but the counts are a prefetched
+    // snapshot: a sighting added since the list loaded makes deleteSpecies
+    // throw. Without this guard one such species would abort the whole loop
+    // and leave the rest silently undeleted.
+    var deleted = 0;
+    Object? failure;
     for (final id in ids) {
-      await notifier.deleteSpecies(id);
+      try {
+        await notifier.deleteSpecies(id);
+        deleted++;
+      } catch (e) {
+        failure ??= e;
+      }
     }
+
     if (!mounted) return;
     ref.invalidate(speciesSightingCountsProvider);
     messenger.showSnackBar(
       SnackBar(
-        content: Text(context.l10n.common_bulkDelete_snackbar(ids.length)),
+        content: Text(
+          failure == null
+              ? context.l10n.common_bulkDelete_snackbar(deleted)
+              : context.l10n.marineLife_species_delete_error(
+                  failure.toString(),
+                ),
+        ),
       ),
     );
   }

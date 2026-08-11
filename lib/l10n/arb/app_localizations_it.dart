@@ -23688,17 +23688,29 @@ class AppLocalizationsIt extends AppLocalizations {
   String get common_selection_deselectAllTooltip => 'Deseleziona tutto';
 
   @override
-  String common_bulkDelete_title(Object count) {
-    return 'Eliminare $count elementi?';
+  String common_bulkDelete_title(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Eliminare $count elementi?',
+      one: 'Eliminare $count elemento?',
+    );
+    return '$_temp0';
   }
 
   @override
   String get common_bulkDelete_body =>
-      'Questa azione non puo essere annullata.';
+      'Questa azione non può essere annullata.';
 
   @override
-  String common_bulkDelete_snackbar(Object count) {
-    return '$count eliminati';
+  String common_bulkDelete_snackbar(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count eliminati',
+      one: '$count eliminato',
+    );
+    return '$_temp0';
   }
 
   @override

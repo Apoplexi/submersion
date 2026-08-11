@@ -22488,16 +22488,26 @@ class AppLocalizationsZh extends AppLocalizations {
   String get common_selection_deselectAllTooltip => '取消全选';
 
   @override
-  String common_bulkDelete_title(Object count) {
-    return '删除 $count 项？';
+  String common_bulkDelete_title(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '删除 $count 项？',
+    );
+    return '$_temp0';
   }
 
   @override
   String get common_bulkDelete_body => '此操作无法撤消。';
 
   @override
-  String common_bulkDelete_snackbar(Object count) {
-    return '已删除 $count 项';
+  String common_bulkDelete_snackbar(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '已删除 $count 项',
+    );
+    return '$_temp0';
   }
 
   @override
