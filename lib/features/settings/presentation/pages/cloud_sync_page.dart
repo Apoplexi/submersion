@@ -12,6 +12,8 @@ import 'package:submersion/core/services/sync/library_moved.dart';
 import 'package:submersion/features/backup/presentation/providers/backup_providers.dart';
 import 'package:submersion/features/divers/data/repositories/diver_merge_repository.dart';
 import 'package:submersion/features/divers/presentation/providers/diver_providers.dart';
+import 'package:submersion/features/settings/presentation/providers/storage_providers.dart'
+    show StoragePlatformCapabilities, storagePlatformCapabilitiesProvider;
 import 'package:submersion/features/settings/presentation/providers/sync_providers.dart';
 import 'package:submersion/features/settings/presentation/pages/troubleshoot_sync_page.dart';
 import 'package:submersion/features/settings/presentation/widgets/adopt_replaced_library_dialog.dart';
@@ -75,7 +77,11 @@ class CloudSyncPage extends ConsumerWidget {
       body: ListView(
         children: [
           // Show banner when custom folder mode is active
-          if (isCustomFolderMode) _buildCustomFolderBanner(context),
+          if (isCustomFolderMode)
+            _buildCustomFolderBanner(
+              context,
+              ref.watch(storagePlatformCapabilitiesProvider),
+            ),
           // Surface apparent duplicate diver profiles created across devices.
           _buildDuplicateDiversBanner(context, ref),
           _buildSyncStatusCard(context, ref, syncState),
@@ -103,8 +109,17 @@ class CloudSyncPage extends ConsumerWidget {
     );
   }
 
-  Widget _buildCustomFolderBanner(BuildContext context) {
+  Widget _buildCustomFolderBanner(
+    BuildContext context,
+    StoragePlatformCapabilities platformCaps,
+  ) {
     final theme = Theme.of(context);
+    // Where the custom folder can only be an app-specific device volume, no
+    // sync service can read it, so handing credit to the folder's own sync
+    // hides that the library is now syncing nowhere at all (#311).
+    final content = platformCaps.customFolderIsDeviceVolumeOnly
+        ? context.l10n.settings_storage_customFolder_deviceOnly_noCloudSync
+        : context.l10n.settings_cloudSync_disabledBanner_content;
 
     return Container(
       margin: const EdgeInsets.all(16),
@@ -134,7 +149,7 @@ class CloudSyncPage extends ConsumerWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            context.l10n.settings_cloudSync_disabledBanner_content,
+            content,
             style: theme.textTheme.bodyMedium?.copyWith(
               color: theme.colorScheme.onSurface,
             ),

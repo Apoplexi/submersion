@@ -31,6 +31,9 @@ import 'package:submersion/features/dive_roles/data/repositories/dive_role_repos
 import 'package:submersion/features/dive_types/domain/entities/dive_type_entity.dart';
 import 'package:submersion/features/equipment/data/repositories/equipment_repository_impl.dart';
 import 'package:submersion/features/equipment/data/repositories/equipment_set_repository_impl.dart';
+import 'package:submersion/features/equipment/data/repositories/service_record_repository.dart';
+import 'package:submersion/features/equipment/domain/entities/service_record.dart'
+    as equipment_domain;
 import 'package:submersion/features/equipment/domain/constants/equipment_attribute_catalog.dart';
 import 'package:submersion/features/equipment/domain/entities/equipment_attribute.dart';
 import 'package:submersion/features/equipment/domain/entities/equipment_item.dart';
@@ -59,6 +62,10 @@ class ImportRepositories {
   /// Optional so existing constructors and mock bundles keep working;
   /// when null, custom dive role restore is skipped.
   final DiveRoleRepository? diveRoleRepository;
+
+  /// Optional for the same reason; when null, equipment service history in
+  /// the source is skipped rather than failing the import.
+  final ServiceRecordRepository? serviceRecordRepository;
   final SiteRepository siteRepository;
   final DiveRepository diveRepository;
   final TankPressureRepository tankPressureRepository;
@@ -74,6 +81,7 @@ class ImportRepositories {
     required this.tagRepository,
     required this.diveTypeRepository,
     this.diveRoleRepository,
+    this.serviceRecordRepository,
     required this.siteRepository,
     required this.diveRepository,
     required this.tankPressureRepository,
@@ -297,6 +305,16 @@ class UddfEntityImporter {
       onProgress,
     );
 
+    // Service history belongs to the equipment it describes, so it rides
+    // along with whatever equipment was selected rather than being its own
+    // choice in the wizard.
+    await _importServiceRecords(
+      data.serviceRecords,
+      repositories.serviceRecordRepository,
+      equipmentIdMapping,
+      now,
+    );
+
     final buddiesCount = await _importBuddies(
       data.buddies,
       selections.buddies,
@@ -467,6 +485,59 @@ class UddfEntityImporter {
       if (uddfId != null) idMapping[uddfId] = newId;
       count++;
       onProgress?.call(ImportPhase.trips, count, selected.length);
+    }
+
+    return count;
+  }
+
+  // -- Equipment service history --
+
+  /// Persists service records for equipment that was actually imported.
+  ///
+  /// Each record names its owner through `equipmentRef`, the same key
+  /// `_importEquipment` registered in [equipmentIdMapping]. Records whose
+  /// equipment was not imported (deselected, or a dangling reference) are
+  /// skipped - a service record with no item to attach to is unreachable.
+  Future<int> _importServiceRecords(
+    List<Map<String, dynamic>> items,
+    ServiceRecordRepository? repository,
+    Map<String, String> equipmentIdMapping,
+    DateTime now,
+  ) async {
+    if (repository == null || items.isEmpty) return 0;
+    var count = 0;
+
+    for (final recordData in items) {
+      final ref = recordData['equipmentRef'] as String?;
+      if (ref == null) continue;
+      final equipmentId = equipmentIdMapping[ref];
+      if (equipmentId == null) continue;
+
+      final serviceDate = recordData['serviceDate'] as DateTime?;
+      if (serviceDate == null) continue;
+
+      final record = equipment_domain.ServiceRecord(
+        id: _uuid.v4(),
+        equipmentId: equipmentId,
+        serviceType:
+            _parseEnum(recordData['serviceType'], ServiceType.values) ??
+            ServiceType.other,
+        serviceDate: serviceDate,
+        provider: recordData['provider'] as String?,
+        cost: asDoubleOrNull(recordData['cost']),
+        currency: recordData['currency'] as String? ?? 'USD',
+        nextServiceDue: recordData['nextServiceDue'] as DateTime?,
+        notes: recordData['notes'] as String? ?? '',
+        createdAt: now,
+        updatedAt: now,
+      );
+
+      try {
+        await repository.createRecord(record);
+        count++;
+      } catch (_) {
+        // One bad record must not abort the import.
+      }
     }
 
     return count;
@@ -773,6 +844,12 @@ class UddfEntityImporter {
 
       final typeId =
           typeData['id'] as String? ?? DiveTypeEntity.generateSlug(name);
+
+      // createDiveType does not reject a colliding id - it suffixes it and
+      // inserts anyway. Without this check a source whose vocabulary overlaps
+      // the built-ins ("Shore", "Boat", "Night") would add a near-duplicate
+      // custom type beside every one of them.
+      if (await repository.getDiveTypeById(typeId) != null) continue;
 
       final diveType = DiveTypeEntity(
         id: typeId,
@@ -1279,13 +1356,7 @@ class UddfEntityImporter {
         repos.equipmentRepository,
       );
 
-      // Parse notes with weight
-      var notes = diveData['notes'] as String? ?? '';
-      final weightUsed = diveData['weightUsed'] as double?;
-      if (weightUsed != null && weightUsed > 0) {
-        if (notes.isNotEmpty) notes += '\n';
-        notes += 'Weight used: ${weightUsed.toStringAsFixed(1)} kg';
-      }
+      final notes = diveData['notes'] as String? ?? '';
 
       // Parse sightings
       final sightings = _buildSightings(diveData);
@@ -1306,6 +1377,29 @@ class UddfEntityImporter {
               )
               .toList() ??
           [];
+
+      // Formats that report a single ballast total rather than a breakdown
+      // (MacDive's ZWEIGHT, UDDF <leadquantity>, Shearwater Cloud) land here.
+      // These used to be appended to the dive notes as "Weight used: N kg",
+      // which left the Weights section empty and the value unusable for
+      // weighting statistics (#912).
+      if (weights.isEmpty) {
+        final totalKg =
+            asDoubleOrNull(diveData['weightUsed']) ??
+            asDoubleOrNull(diveData['weightAmount']);
+        if (totalKg != null && totalKg > 0) {
+          weights.add(
+            DiveWeight(
+              id: _uuid.v4(),
+              diveId: diveId,
+              weightType:
+                  _parseEnum(diveData['weightType'], WeightType.values) ??
+                  WeightType.integrated,
+              amountKg: totalKg,
+            ),
+          );
+        }
+      }
 
       final dateTime = diveData['dateTime'] as DateTime? ?? now;
       // CSV imports provide only 'duration' (used as bottomTime); fall back
@@ -2050,8 +2144,12 @@ class UddfEntityImporter {
   CertificationAgency _parseCertificationAgency(dynamic value) {
     if (value is CertificationAgency) return value;
     if (value is String) {
+      // A named-but-unrecognised agency is "other", not PADI. Defaulting to
+      // PADI relabels real cards from agencies outside the enum (#912).
       return _parseEnumValue(value, CertificationAgency.values) ??
-          CertificationAgency.padi;
+          (value.trim().isEmpty
+              ? CertificationAgency.padi
+              : CertificationAgency.other);
     }
     return CertificationAgency.padi;
   }

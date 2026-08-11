@@ -439,27 +439,6 @@ void main() {
       );
     });
 
-    test('fullscreen tile preferences persist and reload', () async {
-      final notifier = container.read(settingsProvider.notifier);
-      await waitForInit();
-
-      await notifier.setFullscreenTilePreferences(
-        order: ['depth', 'runtime', 'ppO2'],
-        hidden: ['heartRate'],
-      );
-
-      expect(notifier.state.fullscreenTileOrder, ['depth', 'runtime', 'ppO2']);
-      expect(notifier.state.fullscreenHiddenTiles, ['heartRate']);
-
-      final prefs = await SharedPreferences.getInstance();
-      expect(prefs.getStringList('fullscreen_tile_order'), [
-        'depth',
-        'runtime',
-        'ppO2',
-      ]);
-      expect(prefs.getStringList('fullscreen_hidden_tiles'), ['heartRate']);
-    });
-
     test('readout card position defaults to null and persists', () async {
       final notifier = container.read(settingsProvider.notifier);
       await waitForInit();

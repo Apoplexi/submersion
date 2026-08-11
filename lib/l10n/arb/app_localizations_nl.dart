@@ -5649,13 +5649,6 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
-  String get diveLog_instruments_customize => 'Instrumenten aanpassen';
-
-  @override
-  String get diveLog_instruments_customizeHint =>
-      'Schakel instrumenten in of uit. Sleep om te herschikken.';
-
-  @override
   String get diveLog_legend_label_ascentRate => 'Opstijgsnelheid';
 
   @override
@@ -14879,6 +14872,14 @@ class AppLocalizationsNl extends AppLocalizations {
       'Kies een gesynchroniseerde map (Dropbox, Google Drive, enz.)';
 
   @override
+  String get settings_storage_customFolder_subtitleDeviceOnly =>
+      'Verplaats de database naar interne opslag of een SD-kaart';
+
+  @override
+  String get settings_storage_customFolder_deviceOnly_noCloudSync =>
+      'Door de app beheerde cloudsynchronisatie is uitgeschakeld zolang de database op een opslagvolume van het apparaat staat. Geen enkele synchronisatiedienst kan die map op Android bereiken; gebruik Back-up en Herstel om elders kopieën te bewaren.';
+
+  @override
   String settings_storage_dbStats(
     Object fileSize,
     Object diveCount,
@@ -21042,6 +21043,10 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get db_location_external_note =>
       'Bestanden hier worden verwijderd als je de app verwijdert.';
+
+  @override
+  String get db_location_backup_note =>
+      'Android kan de database niet vanuit een cloudgesynchroniseerde map draaien. Stel een Back-uplocatie in onder Back-up en Herstel om een kopie in Dropbox, Nextcloud of Google Drive te bewaren.';
 
   @override
   String diveLog_bulkEdit_membership_onAll(int count) {

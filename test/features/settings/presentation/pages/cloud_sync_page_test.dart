@@ -35,6 +35,8 @@ import 'package:submersion/features/divers/presentation/providers/diver_provider
 import 'package:submersion/features/settings/presentation/pages/cloud_sync_page.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart'
     show sharedPreferencesProvider;
+import 'package:submersion/features/settings/presentation/providers/storage_providers.dart'
+    show StoragePlatformCapabilities, storagePlatformCapabilitiesProvider;
 import 'package:submersion/features/settings/presentation/providers/sync_providers.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
 import 'package:submersion/l10n/arb/app_localizations_en.dart';
@@ -368,6 +370,9 @@ void main() {
     ),
     ICloudAvailability iCloudAvailability = ICloudAvailability.available,
     bool applePlatform = true,
+    // Android, where a "custom folder" is an app-specific device volume that
+    // no sync service can read (#311).
+    bool customFolderIsDeviceVolumeOnly = false,
   }) async {
     final base = await getBaseOverrides();
     final fakeSync = _FakeSyncNotifier(syncState);
@@ -397,6 +402,15 @@ void main() {
           isCloudSyncDisabledByCustomFolderProvider.overrideWithValue(
             customFolderMode,
           ),
+          storagePlatformCapabilitiesProvider.overrideWithValue(
+            StoragePlatformCapabilities(
+              supportsCustomFolder: true,
+              supportsICloud: applePlatform,
+              supportsGoogleDrive: true,
+              isDesktop: !customFolderIsDeviceVolumeOnly,
+              customFolderIsDeviceVolumeOnly: customFolderIsDeviceVolumeOnly,
+            ),
+          ),
           duplicateDiverGroupsProvider.overrideWith(
             (ref) async => duplicateGroups,
           ),
@@ -423,6 +437,9 @@ void main() {
             ),
         ],
         child: const MaterialApp(
+          // Pinned so the English literals these tests assert on cannot
+          // depend on the host's default locale.
+          locale: Locale('en'),
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
           home: CloudSyncPage(),
@@ -653,6 +670,48 @@ void main() {
       }
     });
 
+    testWidgets('credits the folder\'s sync service where folders really sync', (
+      tester,
+    ) async {
+      await pumpPage(tester, customFolderMode: true);
+
+      expect(
+        find.text(
+          "App-managed cloud sync is disabled because you're using a custom "
+          "storage folder. Your folder's sync service (Dropbox, Google Drive, "
+          'OneDrive, etc.) handles synchronization.',
+        ),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('does not credit a sync service on device-volume-only '
+        'platforms', (tester) async {
+      await pumpPage(
+        tester,
+        customFolderMode: true,
+        customFolderIsDeviceVolumeOnly: true,
+      );
+
+      // On Android the custom folder is an app-specific volume under
+      // Android/data, which no sync client can read. Naming Dropbox/Drive
+      // here tells the user something covers a library that is in fact
+      // syncing nowhere (#311).
+      expect(
+        find.textContaining('handles synchronization'),
+        findsNothing,
+        reason: 'no sync service can reach an app-specific Android volume',
+      );
+      expect(
+        find.text(
+          'App-managed cloud sync is disabled while the database sits on a '
+          'device storage volume. No sync service can reach that folder on '
+          'Android, so use Backup & Restore to keep copies elsewhere.',
+        ),
+        findsOneWidget,
+      );
+    });
+
     testWidgets('tapping Storage Settings pushes the storage route', (
       tester,
     ) async {
@@ -699,6 +758,7 @@ void main() {
           ],
           child: MaterialApp.router(
             routerConfig: router,
+            locale: const Locale('en'),
             localizationsDelegates: AppLocalizations.localizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
           ),
@@ -1641,6 +1701,7 @@ void main() {
           ],
           child: MaterialApp.router(
             routerConfig: router,
+            locale: const Locale('en'),
             localizationsDelegates: AppLocalizations.localizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
           ),
@@ -1724,6 +1785,7 @@ void main() {
             ],
             child: MaterialApp.router(
               routerConfig: router,
+              locale: const Locale('en'),
               localizationsDelegates: AppLocalizations.localizationsDelegates,
               supportedLocales: AppLocalizations.supportedLocales,
             ),

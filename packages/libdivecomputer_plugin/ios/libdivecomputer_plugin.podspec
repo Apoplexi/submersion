@@ -10,7 +10,7 @@ Pod::Spec.new do |s|
   s.source_files     = 'Classes/**/*.{swift,c,h}'
   s.public_header_files = 'Classes/libdc_wrapper.h'
   s.dependency 'Flutter'
-  s.platform         = :ios, '14.0'
+  s.platform         = :ios, '15.0'
   s.swift_version    = '5.9'
 
   # Preserve libdivecomputer source and config for build script
