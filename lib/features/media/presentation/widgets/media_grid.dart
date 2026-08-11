@@ -207,8 +207,12 @@ class MediaThumbnailTile extends StatelessWidget {
                 ),
               ),
 
-            // Document extension badge (top-right, mirrors the video slot)
-            if (item.isDocument && !isSelected)
+            // Document extension badge (top-right, mirrors the video slot).
+            // Extensionless filenames yield '', which would draw an empty
+            // black chip, so the badge is gated on having something to say.
+            if (item.isDocument &&
+                !isSelected &&
+                item.documentExtension.isNotEmpty)
               Positioned(
                 top: 4,
                 right: 4,

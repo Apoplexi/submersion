@@ -26,6 +26,62 @@ void main() {
     PdfPageRenderer.initializer = pdfrxInitialize;
   });
 
+  // These run everywhere: a throwing initializer means the renderer bails
+  // out before it can touch pdfium, so no native binary is involved. They
+  // are declared first so they observe the renderer's un-initialized
+  // state even on a host where PDFIUM_PATH is set.
+  group('engine bootstrap failure', () {
+    late Future<void> Function() previousInitializer;
+    var initializerCalls = 0;
+
+    setUp(() {
+      previousInitializer = PdfPageRenderer.initializer;
+      initializerCalls = 0;
+      PdfPageRenderer.initializer = () async {
+        initializerCalls++;
+        throw Exception('pdfium unavailable');
+      };
+    });
+
+    tearDown(() => PdfPageRenderer.initializer = previousInitializer);
+
+    test('returns null instead of throwing for a file source', () async {
+      final result = await PdfPageRenderer.renderFirstPageJpeg(
+        file: File('test/fixtures/sample.pdf'),
+      );
+      expect(result, isNull);
+      expect(
+        initializerCalls,
+        1,
+        reason: 'bootstrap must be attempted before opening the document',
+      );
+    });
+
+    test('returns null instead of throwing for a bytes source', () async {
+      final result = await PdfPageRenderer.renderFirstPageJpeg(
+        bytes: Uint8List.fromList(const [1, 2, 3]),
+      );
+      expect(result, isNull);
+      expect(initializerCalls, 1);
+    });
+
+    test('retries the bootstrap on the next call after a failure', () async {
+      expect(
+        await PdfPageRenderer.renderFirstPageJpeg(bytes: Uint8List(4)),
+        isNull,
+      );
+      expect(
+        await PdfPageRenderer.renderFirstPageJpeg(bytes: Uint8List(4)),
+        isNull,
+      );
+      expect(
+        initializerCalls,
+        2,
+        reason: 'a failed bootstrap must not be latched as initialized',
+      );
+    });
+  });
+
   test(
     'renders first page of a pdf to a jpeg within maxDimension',
     () async {

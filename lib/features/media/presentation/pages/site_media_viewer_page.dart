@@ -101,6 +101,10 @@ class _SiteMediaViewerPageState extends ConsumerState<SiteMediaViewerPage> {
           );
           if (initialIndex != -1 && _pageController.hasClients == false) {
             _currentIndex = initialIndex;
+            // hasClients == false means no PageView is attached, so the
+            // outgoing controller is safe to dispose; without this the one
+            // built in initState leaks.
+            _pageController.dispose();
             _pageController = PageController(initialPage: initialIndex);
           }
 

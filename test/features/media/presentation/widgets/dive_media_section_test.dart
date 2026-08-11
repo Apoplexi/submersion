@@ -2,13 +2,13 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:submersion/features/media/domain/entities/media_item.dart';
+import 'package:submersion/features/media/presentation/pages/photo_viewer_page.dart';
 import 'package:submersion/features/media/presentation/providers/media_providers.dart';
 import 'package:submersion/features/media/presentation/widgets/dive_media_section.dart';
-import 'package:submersion/l10n/arb/app_localizations.dart';
+import 'package:submersion/features/media/presentation/widgets/media_grid.dart';
 
-import '../../../../helpers/mock_providers.dart';
+import '../support/media_widget_harness.dart';
 
 void main() {
   test('showInOsFileManagerLabel returns OS-appropriate label', () {
@@ -23,33 +23,29 @@ void main() {
     }
   });
 
+  // The shared harness supplies the base overrides, a resolver registry that
+  // serves decodable bytes without touching the filesystem, and the pinned
+  // 'en' locale the English assertions below depend on.
   Future<Widget> host({
     VoidCallback? onAdd,
     VoidCallback? onAddDocument,
-  }) async {
-    final base = await getBaseOverrides();
-    return ProviderScope(
-      overrides: [
-        ...base,
-        mediaForDiveProvider(
-          'dive-1',
-        ).overrideWith((ref) async => const <MediaItem>[]),
-      ],
-      child: MaterialApp(
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
-        supportedLocales: AppLocalizations.supportedLocales,
-        home: Scaffold(
-          body: SingleChildScrollView(
-            child: DiveMediaSection(
-              diveId: 'dive-1',
-              onAddPressed: onAdd,
-              onAddDocumentPressed: onAddDocument,
-            ),
-          ),
+    List<MediaItem> media = const [],
+    void Function(MediaItem)? onOpenDocument,
+  }) => mediaTestApp(
+    overrides: [
+      mediaForDiveProvider('dive-1').overrideWith((ref) async => media),
+    ],
+    home: Scaffold(
+      body: SingleChildScrollView(
+        child: DiveMediaSection(
+          diveId: 'dive-1',
+          onAddPressed: onAdd,
+          onAddDocumentPressed: onAddDocument,
+          onOpenDocument: onOpenDocument,
         ),
       ),
-    );
-  }
+    ),
+  );
 
   testWidgets('add menu shows document action when callback provided', (
     tester,
@@ -79,5 +75,121 @@ void main() {
     await tester.pumpAndSettle();
     expect(photos, 1); // fired directly, no menu
     expect(find.text('Add document'), findsNothing);
+  });
+
+  testWidgets('empty state message replaces the grid when the dive has no '
+      'media', (tester) async {
+    await tester.pumpWidget(await host());
+    await tester.pumpAndSettle();
+    expect(find.text('No photos yet'), findsOneWidget);
+    expect(find.byIcon(Icons.photo_camera_outlined), findsOneWidget);
+    expect(find.byType(MediaThumbnailTile), findsNothing);
+  });
+
+  testWidgets('renders one tile per media item once the dive has media', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      await host(
+        media: [
+          testMediaItem(id: 'm1', originalFilename: 'reef.png'),
+          testMediaItem(id: 'm2', originalFilename: 'wreck.png'),
+        ],
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(find.byType(MediaThumbnailTile), findsNWidgets(2));
+    expect(find.text('No photos yet'), findsNothing);
+  });
+
+  testWidgets('tapping a document tile opens the document and never the '
+      'photo viewer', (tester) async {
+    final opened = <MediaItem>[];
+    await tester.pumpWidget(
+      await host(
+        media: [
+          testMediaItem(
+            id: 'doc-1',
+            mediaType: MediaType.document,
+            originalFilename: 'dive-plan.pdf',
+          ),
+        ],
+        onOpenDocument: opened.add,
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byType(MediaThumbnailTile));
+    await tester.pumpAndSettle();
+
+    expect(opened.map((m) => m.id), ['doc-1']);
+    expect(find.byType(PhotoViewerPage), findsNothing);
+  });
+
+  group('selection mode', () {
+    Future<void> pumpWithTwo(WidgetTester tester) async {
+      await tester.pumpWidget(
+        await host(
+          onAdd: () {},
+          media: [
+            testMediaItem(id: 'm1', originalFilename: 'reef.png'),
+            testMediaItem(id: 'm2', originalFilename: 'wreck.png'),
+          ],
+        ),
+      );
+      await tester.pumpAndSettle();
+    }
+
+    testWidgets('long-pressing a tile swaps in the selection header', (
+      tester,
+    ) async {
+      await pumpWithTwo(tester);
+      expect(find.text('Photos & Video'), findsOneWidget);
+
+      await tester.longPress(find.byType(MediaThumbnailTile).first);
+      await tester.pumpAndSettle();
+
+      expect(find.byType(MediaSelectionHeader), findsOneWidget);
+      expect(find.text('1 selected'), findsOneWidget);
+      // The normal header and its add affordance yield to selection.
+      expect(find.text('Photos & Video'), findsNothing);
+      expect(find.byIcon(Icons.add_photo_alternate), findsNothing);
+    });
+
+    testWidgets('select all covers every tile, then cancel restores the '
+        'normal header', (tester) async {
+      await pumpWithTwo(tester);
+      await tester.longPress(find.byType(MediaThumbnailTile).first);
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.widgetWithText(TextButton, 'Select All'));
+      await tester.pumpAndSettle();
+      expect(find.text('2 selected'), findsOneWidget);
+      // Nothing left to select, so the button retires.
+      expect(find.widgetWithText(TextButton, 'Select All'), findsNothing);
+
+      await tester.tap(find.byIcon(Icons.close));
+      await tester.pumpAndSettle();
+      expect(find.byType(MediaSelectionHeader), findsNothing);
+      expect(find.text('Photos & Video'), findsOneWidget);
+    });
+  });
+
+  testWidgets('tapping a photo tile pushes the photo viewer and leaves '
+      'onOpenDocument untouched', (tester) async {
+    final opened = <MediaItem>[];
+    await tester.pumpWidget(
+      await host(
+        media: [testMediaItem(id: 'm1', originalFilename: 'reef.png')],
+        onOpenDocument: opened.add,
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byType(MediaThumbnailTile));
+    await tester.pumpAndSettle();
+
+    expect(opened, isEmpty);
+    expect(find.byType(PhotoViewerPage), findsOneWidget);
   });
 }

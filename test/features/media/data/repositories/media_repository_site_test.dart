@@ -116,5 +116,26 @@ void main() {
       expect(await repository.getLinkedAssetIdsForSite('site-2'), isEmpty);
       expect(await repository.getLinkedLocalPathsForSite('site-2'), isEmpty);
     });
+
+    test(
+      'a broken schema surfaces the failure instead of an empty set',
+      () async {
+        // An empty set would read as "nothing linked here yet" and let the
+        // importer re-link every asset, so these lookups rethrow rather than
+        // swallow. Dropping the table is the cheapest genuine query failure.
+        // (Closing the database is NOT one: Drift answers a closed handle's
+        // customSelect with an empty result rather than an error.)
+        await db.customStatement('DROP TABLE media');
+
+        await expectLater(
+          repository.getLinkedAssetIdsForSite('site-1'),
+          throwsA(anything),
+        );
+        await expectLater(
+          repository.getLinkedLocalPathsForSite('site-1'),
+          throwsA(anything),
+        );
+      },
+    );
   });
 }

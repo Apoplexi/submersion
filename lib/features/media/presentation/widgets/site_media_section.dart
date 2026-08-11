@@ -258,11 +258,6 @@ class _SiteMediaSectionState extends ConsumerState<SiteMediaSection> {
                     crossAxisSpacing: 8,
                     mainAxisSpacing: 8,
                   ),
-                  // coverage:ignore-start
-                  // The itemBuilder closure only fires when the site has
-                  // media; rendering media tiles needs the populated-DB +
-                  // resolver pipeline (see DiveMediaSection's identical
-                  // exclusion).
                   itemBuilder: (context, item, isSelected) =>
                       MediaThumbnailTile(
                         item: item,
@@ -272,7 +267,6 @@ class _SiteMediaSectionState extends ConsumerState<SiteMediaSection> {
                         semanticsLabel:
                             context.l10n.media_diveMediaSection_thumbnailLabel,
                       ),
-                  // coverage:ignore-end
                 );
               },
               loading: () => const SizedBox(
@@ -322,9 +316,6 @@ class _DivePhotosGroup extends ConsumerWidget {
         style: textTheme.titleSmall,
       ),
       children: [
-        // coverage:ignore-start
-        // Rendering tiles needs the resolver pipeline; the collapsed tile
-        // header above is what widget tests assert on.
         GridView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
@@ -355,7 +346,6 @@ class _DivePhotosGroup extends ConsumerWidget {
             ),
           ),
         ),
-        // coverage:ignore-end
       ],
     );
   }

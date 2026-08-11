@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:submersion/core/providers/provider.dart';
+import 'package:submersion/features/media/data/services/photo_picker_service.dart';
 import 'package:submersion/features/media/presentation/pages/photo_picker_page.dart';
 import 'package:submersion/features/media/presentation/providers/media_providers.dart';
 import 'package:submersion/features/media/presentation/providers/photo_picker_providers.dart';
@@ -37,9 +38,28 @@ class SiteMediaImportHelper {
       alreadyLinkedIds: alreadyLinkedIds,
     );
     // coverage:ignore-end
-    if (selectedAssets == null || selectedAssets.isEmpty || !context.mounted) {
-      return false;
-    }
+    if (!context.mounted) return false;
+    return linkSelectedAssets(
+      context: context,
+      ref: ref,
+      siteId: siteId,
+      selectedAssets: selectedAssets,
+    );
+  }
+
+  /// Persists [selectedAssets] against [siteId], refreshes the site
+  /// providers, and reports the outcome in a SnackBar.
+  ///
+  /// Split out from [importPhotosForSite] because everything above it is
+  /// the photo picker, which cannot run under flutter_test; this half is
+  /// the part with branches worth testing.
+  static Future<bool> linkSelectedAssets({
+    required BuildContext context,
+    required WidgetRef ref,
+    required String siteId,
+    required List<AssetInfo>? selectedAssets,
+  }) async {
+    if (selectedAssets == null || selectedAssets.isEmpty) return false;
 
     try {
       final importService = ref.read(mediaImportServiceProvider);

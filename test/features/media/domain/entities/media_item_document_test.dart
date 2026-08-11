@@ -16,6 +16,14 @@ void main() {
     expect(MediaType.document.name, 'document');
   });
 
+  test('every MediaType has a display name, including document', () {
+    expect(MediaType.document.displayName, 'Document');
+    // Guards the switch against a future member being added without a case.
+    for (final type in MediaType.values) {
+      expect(type.displayName, isNotEmpty, reason: '$type');
+    }
+  });
+
   test('isDocument true only for document type', () {
     expect(_doc('map.pdf').isDocument, isTrue);
     expect(

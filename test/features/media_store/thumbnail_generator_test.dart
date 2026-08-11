@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -217,6 +218,46 @@ void main() {
       resolver.data = FileData(file: src);
 
       expect(await generator.generateFor(doc('bad.pdf')), isNull);
+    });
+
+    test('a PDF resolved as bytes is rendered the same way', () async {
+      // Bookmark-backed reads (iOS/macOS) hand back bytes rather than a
+      // file, so both arms of the PDF switch have to reach the renderer.
+      final thumb = img.Image(width: 400, height: 260);
+      img.fill(thumb, color: img.ColorRgb8(20, 110, 90));
+      final jpeg = img.encodeJpg(thumb, quality: 80);
+      Uint8List? sawBytes;
+      generator = ThumbnailGenerator(
+        registry: MediaSourceResolverRegistry({
+          MediaSourceType.localFile: resolver,
+        }),
+        cache: cache,
+        pdfRenderer: ({file, bytes, maxDimension = 512, quality = 80}) async {
+          sawBytes = bytes;
+          return jpeg;
+        },
+      );
+      resolver.data = BytesData(bytes: Uint8List.fromList([0x25, 0x50]));
+
+      final staged = await generator.generateFor(doc('map.pdf'));
+
+      expect(staged, isNotNull);
+      expect(await staged!.readAsBytes(), jpeg);
+      expect(sawBytes, isNotNull, reason: 'bytes arm must reach the renderer');
+    });
+
+    test('a PDF whose source is unavailable has no thumbnail', () async {
+      generator = ThumbnailGenerator(
+        registry: MediaSourceResolverRegistry({
+          MediaSourceType.localFile: resolver,
+        }),
+        cache: cache,
+        pdfRenderer: ({file, bytes, maxDimension = 512, quality = 80}) async =>
+            fail('the renderer must not run without bytes'),
+      );
+      resolver.data = const UnavailableData(kind: UnavailableKind.notFound);
+
+      expect(await generator.generateFor(doc('map.pdf')), isNull);
     });
 
     test('non-PDF documents have no thumbnail', () async {
