@@ -1,3 +1,5 @@
+import 'package:submersion/core/constants/sort_options.dart';
+import 'package:submersion/core/models/sort_state.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_repository_provider.dart';
 import 'package:submersion/features/dive_log/presentation/providers/safety_review_providers.dart';
@@ -37,6 +39,15 @@ class SafetyReviewSweep {
 
   const SafetyReviewSweep(this._ref);
 
+  /// Profile analysis carries residual tissue, CNS, and OTU state forward
+  /// from earlier dives. Sweeping in that same order primes the provider cache
+  /// one dive at a time instead of making the first newest dive recursively
+  /// analyze much of the logbook before progress can advance.
+  static const oldestFirstSort = SortState<DiveSortField>(
+    field: DiveSortField.date,
+    direction: SortDirection.ascending,
+  );
+
   /// Analyzes every dive matching [diverId] (null means every diver), or
   /// exactly [diveIds] when supplied.
   ///
@@ -65,7 +76,7 @@ class SafetyReviewSweep {
         diveIds ??
         await _ref
             .read(diveRepositoryProvider)
-            .getOrderedDiveIds(diverId: diverId);
+            .getOrderedDiveIds(diverId: diverId, sort: oldestFirstSort);
 
     final total = ids.length;
     onProgress?.call(0, total);
