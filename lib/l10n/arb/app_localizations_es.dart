@@ -13611,6 +13611,71 @@ class AppLocalizationsEs extends AppLocalizations {
   String get settings_cloudSync_adopt_notNow => 'Ahora no';
 
   @override
+  String get settings_cloudSync_dangerZone => 'Zona de peligro';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_tile =>
+      'Reemplazar biblioteca en la nube';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_tileSubtitle =>
+      'Hacer que la biblioteca de este dispositivo sea la que usan todos los dispositivos';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_dialogTitle =>
+      '¿Reemplazar la biblioteca en la nube?';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_dialogIntro =>
+      'La biblioteca de este dispositivo pasa a ser la que usan todos los dispositivos.';
+
+  @override
+  String settings_cloudSync_replaceLibrary_dialogBody(num diveCount) {
+    String _temp0 = intl.Intl.pluralLogic(
+      diveCount,
+      locale: localeName,
+      other:
+          'La biblioteca en la nube se borra y se reemplaza por las $diveCount inmersiones de este dispositivo.',
+      one:
+          'La biblioteca en la nube se borra y se reemplaza por la 1 inmersión de este dispositivo.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String settings_cloudSync_replaceLibrary_peers(num peerCount) {
+    String _temp0 = intl.Intl.pluralLogic(
+      peerCount,
+      locale: localeName,
+      other:
+          'Se pedirá a $peerCount dispositivos más que la adopten; hasta entonces, sus cambios no se combinan.',
+      one:
+          'Se pedirá a 1 dispositivo más que la adopte; hasta entonces, sus cambios no se combinan.',
+      zero:
+          'Todavía no se sincroniza ningún otro dispositivo, así que no hay nada que adoptar.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get settings_cloudSync_replaceLibrary_peersUnknown =>
+      'Se pedirá a todos los demás dispositivos que la adopten; hasta entonces, sus cambios no se combinan.';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_backupNote =>
+      'Primero se crea una copia de seguridad de este dispositivo. Esta acción no se puede deshacer.';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_confirmWord => 'Reemplazar';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_confirmHint =>
+      'Escribe \"Reemplazar\" para confirmar';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_confirm => 'Reemplazar';
+
+  @override
   String get settings_cloudSync_firstSync_banner =>
       'La primera sincronización está esperando confirmación. Toca \'Sincronizar ahora\' para revisar lo que se combinará.';
 

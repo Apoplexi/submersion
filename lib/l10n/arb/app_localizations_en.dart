@@ -13390,6 +13390,69 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settings_cloudSync_adopt_notNow => 'Not Now';
 
   @override
+  String get settings_cloudSync_dangerZone => 'Danger Zone';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_tile => 'Replace cloud library';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_tileSubtitle =>
+      'Make this device\'s library the one every device uses';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_dialogTitle =>
+      'Replace Cloud Library?';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_dialogIntro =>
+      'This device\'s library becomes the one every device uses.';
+
+  @override
+  String settings_cloudSync_replaceLibrary_dialogBody(num diveCount) {
+    String _temp0 = intl.Intl.pluralLogic(
+      diveCount,
+      locale: localeName,
+      other:
+          'The cloud library is erased and replaced with this device\'s $diveCount dives.',
+      one:
+          'The cloud library is erased and replaced with this device\'s 1 dive.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String settings_cloudSync_replaceLibrary_peers(num peerCount) {
+    String _temp0 = intl.Intl.pluralLogic(
+      peerCount,
+      locale: localeName,
+      other:
+          '$peerCount other devices will be asked to adopt it; until they do, their changes are not merged.',
+      one:
+          '1 other device will be asked to adopt it; until it does, its changes are not merged.',
+      zero: 'No other device is syncing yet, so there is nothing to adopt it.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get settings_cloudSync_replaceLibrary_peersUnknown =>
+      'Every other device will be asked to adopt it; until they do, their changes are not merged.';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_backupNote =>
+      'A backup of this device is created first. This cannot be undone.';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_confirmWord => 'Replace';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_confirmHint =>
+      'Type \"Replace\" to confirm';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_confirm => 'Replace';
+
+  @override
   String get settings_cloudSync_firstSync_banner =>
       'First sync is waiting for confirmation. Tap Sync Now to review what will be combined.';
 

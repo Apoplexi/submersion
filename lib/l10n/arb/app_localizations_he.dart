@@ -13280,6 +13280,66 @@ class AppLocalizationsHe extends AppLocalizations {
   String get settings_cloudSync_adopt_notNow => 'לא עכשיו';
 
   @override
+  String get settings_cloudSync_dangerZone => 'אזור מסוכן';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_tile => 'החלפת ספריית הענן';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_tileSubtitle =>
+      'להפוך את הספרייה של מכשיר זה לספרייה שכל המכשירים משתמשים בה';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_dialogTitle =>
+      'להחליף את ספריית הענן?';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_dialogIntro =>
+      'הספרייה של מכשיר זה הופכת לספרייה שכל המכשירים משתמשים בה.';
+
+  @override
+  String settings_cloudSync_replaceLibrary_dialogBody(num diveCount) {
+    String _temp0 = intl.Intl.pluralLogic(
+      diveCount,
+      locale: localeName,
+      other: 'ספריית הענן נמחקת ומוחלפת ב-$diveCount הצלילות שבמכשיר זה.',
+      one: 'ספריית הענן נמחקת ומוחלפת בצלילה 1 שבמכשיר זה.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String settings_cloudSync_replaceLibrary_peers(num peerCount) {
+    String _temp0 = intl.Intl.pluralLogic(
+      peerCount,
+      locale: localeName,
+      other:
+          '$peerCount מכשירים נוספים יתבקשו לאמץ אותה; עד אז השינויים שלהם לא ימוזגו.',
+      one: 'מכשיר אחד נוסף יתבקש לאמץ אותה; עד אז השינויים שלו לא ימוזגו.',
+      zero: 'אף מכשיר אחר עדיין לא מסתנכרן, ולכן אין מה לאמץ.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get settings_cloudSync_replaceLibrary_peersUnknown =>
+      'כל שאר המכשירים יתבקשו לאמץ אותה; עד אז השינויים שלהם לא ימוזגו.';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_backupNote =>
+      'תחילה נוצר גיבוי של מכשיר זה. לא ניתן לבטל פעולה זו.';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_confirmWord => 'החלפה';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_confirmHint =>
+      'הקלד \"החלפה\" לאישור';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_confirm => 'החלפה';
+
+  @override
   String get settings_cloudSync_firstSync_banner =>
       'הסנכרון הראשון ממתין לאישור. הקש על \'סנכרן עכשיו\' כדי לבדוק מה ישולב.';
 

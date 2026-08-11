@@ -12965,6 +12965,63 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settings_cloudSync_adopt_notNow => '暂不';
 
   @override
+  String get settings_cloudSync_dangerZone => '危险操作';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_tile => '替换云端库';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_tileSubtitle =>
+      '让本设备的库成为所有设备共用的库';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_dialogTitle => '替换云端库？';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_dialogIntro =>
+      '本设备的库将成为所有设备共用的库。';
+
+  @override
+  String settings_cloudSync_replaceLibrary_dialogBody(num diveCount) {
+    String _temp0 = intl.Intl.pluralLogic(
+      diveCount,
+      locale: localeName,
+      other: '云端库将被清除，并替换为本设备的 $diveCount 次潜水。',
+      one: '云端库将被清除，并替换为本设备的 1 次潜水。',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String settings_cloudSync_replaceLibrary_peers(num peerCount) {
+    String _temp0 = intl.Intl.pluralLogic(
+      peerCount,
+      locale: localeName,
+      other: '系统将请求另外 $peerCount 台设备采用；在此之前，它们的更改不会合并。',
+      one: '系统将请求另外 1 台设备采用；在此之前，其更改不会合并。',
+      zero: '目前没有其他设备在同步，因此无需采用。',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get settings_cloudSync_replaceLibrary_peersUnknown =>
+      '系统将请求所有其他设备采用；在此之前，它们的更改不会合并。';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_backupNote =>
+      '系统会先创建本设备的备份。此操作无法撤销。';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_confirmWord => '替换';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_confirmHint => '输入「替换」以确认';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_confirm => '替换';
+
+  @override
   String get settings_cloudSync_firstSync_banner =>
       '首次同步正在等待确认。点击「立即同步」以查看将要合并的内容。';
 

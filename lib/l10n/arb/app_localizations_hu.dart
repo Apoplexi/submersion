@@ -13569,6 +13569,69 @@ class AppLocalizationsHu extends AppLocalizations {
   String get settings_cloudSync_adopt_notNow => 'Most nem';
 
   @override
+  String get settings_cloudSync_dangerZone => 'Veszélyes műveletek';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_tile => 'Felhőkönyvtár cseréje';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_tileSubtitle =>
+      'Ennek az eszköznek a könyvtára legyen az, amelyet minden eszköz használ';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_dialogTitle =>
+      'Lecseréli a felhőkönyvtárat?';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_dialogIntro =>
+      'Ennek az eszköznek a könyvtára lesz az, amelyet minden eszköz használ.';
+
+  @override
+  String settings_cloudSync_replaceLibrary_dialogBody(num diveCount) {
+    String _temp0 = intl.Intl.pluralLogic(
+      diveCount,
+      locale: localeName,
+      other:
+          'A felhőkönyvtár törlődik, és az eszköz $diveCount merülése lép a helyébe.',
+      one: 'A felhőkönyvtár törlődik, és az eszköz 1 merülése lép a helyébe.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String settings_cloudSync_replaceLibrary_peers(num peerCount) {
+    String _temp0 = intl.Intl.pluralLogic(
+      peerCount,
+      locale: localeName,
+      other:
+          '$peerCount másik eszköz kap felkérést az átvételre; addig a változásaik nem egyesülnek.',
+      one:
+          '1 másik eszköz kap felkérést az átvételre; addig a változásai nem egyesülnek.',
+      zero:
+          'Még egyetlen másik eszköz sem szinkronizál, így nincs mit átvenni.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get settings_cloudSync_replaceLibrary_peersUnknown =>
+      'Minden másik eszköz felkérést kap az átvételre; addig a változásaik nem egyesülnek.';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_backupNote =>
+      'Előbb biztonsági mentés készül erről az eszközről. A művelet nem vonható vissza.';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_confirmWord => 'Csere';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_confirmHint =>
+      'Írja be: \"Csere\" a megerősítéshez';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_confirm => 'Csere';
+
+  @override
   String get settings_cloudSync_firstSync_banner =>
       'Az első szinkronizálás megerősítésre vár. Koppintson a \'Szinkronizálás most\' gombra, hogy átnézze, mi kerül összevonásra.';
 

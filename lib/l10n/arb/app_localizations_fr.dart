@@ -13656,6 +13656,71 @@ class AppLocalizationsFr extends AppLocalizations {
   String get settings_cloudSync_adopt_notNow => 'Pas maintenant';
 
   @override
+  String get settings_cloudSync_dangerZone => 'Zone sensible';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_tile =>
+      'Remplacer la bibliothèque cloud';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_tileSubtitle =>
+      'Faire de la bibliothèque de cet appareil celle que tous les appareils utilisent';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_dialogTitle =>
+      'Remplacer la bibliothèque cloud ?';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_dialogIntro =>
+      'La bibliothèque de cet appareil devient celle que tous les appareils utilisent.';
+
+  @override
+  String settings_cloudSync_replaceLibrary_dialogBody(num diveCount) {
+    String _temp0 = intl.Intl.pluralLogic(
+      diveCount,
+      locale: localeName,
+      other:
+          'La bibliothèque cloud est effacée et remplacée par les $diveCount plongées de cet appareil.',
+      one:
+          'La bibliothèque cloud est effacée et remplacée par la 1 plongée de cet appareil.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String settings_cloudSync_replaceLibrary_peers(num peerCount) {
+    String _temp0 = intl.Intl.pluralLogic(
+      peerCount,
+      locale: localeName,
+      other:
+          '$peerCount autres appareils devront l\'adopter ; d\'ici là, leurs modifications ne sont pas fusionnées.',
+      one:
+          '1 autre appareil devra l\'adopter ; d\'ici là, ses modifications ne sont pas fusionnées.',
+      zero:
+          'Aucun autre appareil ne se synchronise encore, il n\'y a donc rien à adopter.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get settings_cloudSync_replaceLibrary_peersUnknown =>
+      'Tous les autres appareils devront l\'adopter ; d\'ici là, leurs modifications ne sont pas fusionnées.';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_backupNote =>
+      'Une sauvegarde de cet appareil est créée au préalable. Cette action est irréversible.';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_confirmWord => 'Remplacer';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_confirmHint =>
+      'Tapez \"Remplacer\" pour confirmer';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_confirm => 'Remplacer';
+
+  @override
   String get settings_cloudSync_firstSync_banner =>
       'La première synchronisation attend votre confirmation. Appuyez sur « Synchroniser maintenant » pour vérifier ce qui sera combiné.';
 

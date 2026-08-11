@@ -13377,6 +13377,69 @@ class AppLocalizationsAr extends AppLocalizations {
   String get settings_cloudSync_adopt_notNow => 'ليس الآن';
 
   @override
+  String get settings_cloudSync_dangerZone => 'منطقة الخطر';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_tile => 'استبدال مكتبة السحابة';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_tileSubtitle =>
+      'اجعل مكتبة هذا الجهاز هي المكتبة التي تستخدمها جميع الأجهزة';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_dialogTitle =>
+      'استبدال مكتبة السحابة؟';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_dialogIntro =>
+      'تصبح مكتبة هذا الجهاز هي المكتبة التي تستخدمها جميع الأجهزة.';
+
+  @override
+  String settings_cloudSync_replaceLibrary_dialogBody(num diveCount) {
+    String _temp0 = intl.Intl.pluralLogic(
+      diveCount,
+      locale: localeName,
+      other:
+          'تُمحى مكتبة السحابة ويحل محلها $diveCount غوصات الموجودة على هذا الجهاز.',
+      one:
+          'تُمحى مكتبة السحابة ويحل محلها الغوص الواحد الموجود على هذا الجهاز.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String settings_cloudSync_replaceLibrary_peers(num peerCount) {
+    String _temp0 = intl.Intl.pluralLogic(
+      peerCount,
+      locale: localeName,
+      other:
+          'سيُطلب من $peerCount أجهزة أخرى اعتمادها؛ وحتى ذلك الحين لن تُدمج تغييراتها.',
+      one:
+          'سيُطلب من جهاز واحد آخر اعتمادها؛ وحتى ذلك الحين لن تُدمج تغييراته.',
+      zero: 'لا يوجد جهاز آخر يتزامن بعد، لذا لا يوجد ما يمكن اعتماده.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get settings_cloudSync_replaceLibrary_peersUnknown =>
+      'سيُطلب من كل الأجهزة الأخرى اعتمادها؛ وحتى ذلك الحين لن تُدمج تغييراتها.';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_backupNote =>
+      'تُنشأ نسخة احتياطية من هذا الجهاز أولاً. لا يمكن التراجع عن هذا الإجراء.';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_confirmWord => 'استبدال';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_confirmHint =>
+      'اكتب \"استبدال\" للتأكيد';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_confirm => 'استبدال';
+
+  @override
   String get settings_cloudSync_firstSync_banner =>
       'المزامنة الأولى في انتظار التأكيد. اضغط على \'مزامنة الآن\' لمراجعة ما سيتم دمجه.';
 

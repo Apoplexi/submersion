@@ -13596,6 +13596,71 @@ class AppLocalizationsDe extends AppLocalizations {
   String get settings_cloudSync_adopt_notNow => 'Nicht jetzt';
 
   @override
+  String get settings_cloudSync_dangerZone => 'Gefahrenbereich';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_tile =>
+      'Cloud-Bibliothek ersetzen';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_tileSubtitle =>
+      'Die Bibliothek dieses Geräts für alle Geräte verbindlich machen';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_dialogTitle =>
+      'Cloud-Bibliothek ersetzen?';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_dialogIntro =>
+      'Die Bibliothek dieses Geräts wird zu der, die alle Geräte verwenden.';
+
+  @override
+  String settings_cloudSync_replaceLibrary_dialogBody(num diveCount) {
+    String _temp0 = intl.Intl.pluralLogic(
+      diveCount,
+      locale: localeName,
+      other:
+          'Die Cloud-Bibliothek wird gelöscht und durch die $diveCount Tauchgänge dieses Geräts ersetzt.',
+      one:
+          'Die Cloud-Bibliothek wird gelöscht und durch den 1 Tauchgang dieses Geräts ersetzt.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String settings_cloudSync_replaceLibrary_peers(num peerCount) {
+    String _temp0 = intl.Intl.pluralLogic(
+      peerCount,
+      locale: localeName,
+      other:
+          '$peerCount andere Geräte werden zur Übernahme aufgefordert; bis dahin werden ihre Änderungen nicht zusammengeführt.',
+      one:
+          '1 anderes Gerät wird zur Übernahme aufgefordert; bis dahin werden seine Änderungen nicht zusammengeführt.',
+      zero:
+          'Es synchronisiert noch kein anderes Gerät, es gibt also nichts zu übernehmen.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get settings_cloudSync_replaceLibrary_peersUnknown =>
+      'Alle anderen Geräte werden zur Übernahme aufgefordert; bis dahin werden ihre Änderungen nicht zusammengeführt.';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_backupNote =>
+      'Zuvor wird ein Backup dieses Geräts erstellt. Dies kann nicht rückgängig gemacht werden.';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_confirmWord => 'Ersetzen';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_confirmHint =>
+      'Zum Bestätigen \"Ersetzen\" eingeben';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_confirm => 'Ersetzen';
+
+  @override
   String get settings_cloudSync_firstSync_banner =>
       'Die erste Synchronisierung wartet auf Bestätigung. Tippen Sie auf \'Jetzt synchronisieren\', um zu prüfen, was zusammengeführt wird.';
 

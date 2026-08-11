@@ -13508,6 +13508,71 @@ class AppLocalizationsNl extends AppLocalizations {
   String get settings_cloudSync_adopt_notNow => 'Niet nu';
 
   @override
+  String get settings_cloudSync_dangerZone => 'Gevarenzone';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_tile =>
+      'Cloudbibliotheek vervangen';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_tileSubtitle =>
+      'De bibliotheek van dit apparaat de bibliotheek maken die alle apparaten gebruiken';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_dialogTitle =>
+      'Cloudbibliotheek vervangen?';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_dialogIntro =>
+      'De bibliotheek van dit apparaat wordt de bibliotheek die alle apparaten gebruiken.';
+
+  @override
+  String settings_cloudSync_replaceLibrary_dialogBody(num diveCount) {
+    String _temp0 = intl.Intl.pluralLogic(
+      diveCount,
+      locale: localeName,
+      other:
+          'De cloudbibliotheek wordt gewist en vervangen door de $diveCount duiken van dit apparaat.',
+      one:
+          'De cloudbibliotheek wordt gewist en vervangen door de 1 duik van dit apparaat.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String settings_cloudSync_replaceLibrary_peers(num peerCount) {
+    String _temp0 = intl.Intl.pluralLogic(
+      peerCount,
+      locale: localeName,
+      other:
+          '$peerCount andere apparaten worden gevraagd deze over te nemen; tot die tijd worden hun wijzigingen niet samengevoegd.',
+      one:
+          '1 ander apparaat wordt gevraagd deze over te nemen; tot die tijd worden de wijzigingen niet samengevoegd.',
+      zero:
+          'Er synchroniseert nog geen ander apparaat, dus er is niets over te nemen.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get settings_cloudSync_replaceLibrary_peersUnknown =>
+      'Alle andere apparaten wordt gevraagd deze over te nemen; tot die tijd worden hun wijzigingen niet samengevoegd.';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_backupNote =>
+      'Er wordt eerst een back-up van dit apparaat gemaakt. Dit kan niet ongedaan worden gemaakt.';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_confirmWord => 'Vervangen';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_confirmHint =>
+      'Typ \"Vervangen\" om te bevestigen';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_confirm => 'Vervangen';
+
+  @override
   String get settings_cloudSync_firstSync_banner =>
       'De eerste synchronisatie wacht op bevestiging. Tik op \'Nu synchroniseren\' om te bekijken wat er wordt samengevoegd.';
 

@@ -17,6 +17,7 @@ import 'package:submersion/features/settings/presentation/providers/storage_prov
 import 'package:submersion/features/settings/presentation/providers/sync_providers.dart';
 import 'package:submersion/features/settings/presentation/pages/troubleshoot_sync_page.dart';
 import 'package:submersion/features/settings/presentation/widgets/adopt_replaced_library_dialog.dart';
+import 'package:submersion/features/settings/presentation/widgets/replace_cloud_library_dialog.dart';
 import 'package:submersion/features/settings/presentation/widgets/conflict_resolution_dialog.dart';
 import 'package:submersion/features/settings/presentation/widgets/dropbox_connect_dialog.dart';
 import 'package:submersion/features/settings/presentation/widgets/encryption_settings_section.dart';
@@ -103,7 +104,7 @@ class CloudSyncPage extends ConsumerWidget {
           const Divider(),
           const EncryptionSettingsSection(),
           const Divider(),
-          _buildAdvancedSection(context, ref),
+          _buildAdvancedSection(context, ref, hasProvider),
         ],
       ),
     );
@@ -1294,7 +1295,11 @@ class CloudSyncPage extends ConsumerWidget {
     ref.read(syncStateProvider.notifier).refreshState();
   }
 
-  Widget _buildAdvancedSection(BuildContext context, WidgetRef ref) {
+  Widget _buildAdvancedSection(
+    BuildContext context,
+    WidgetRef ref,
+    bool hasProvider,
+  ) {
     // Recovery resets sync identity/cursors and cloud files; doing that while a
     // sync is writing races it. Disable the entry during an active sync, as the
     // former "Reset Sync State" tile did. A sync ERROR (the banner route) is not
@@ -1331,8 +1336,49 @@ class CloudSyncPage extends ConsumerWidget {
           subtitle: const Text('Disconnect from cloud provider'),
           onTap: () => _confirmSignOut(context, ref),
         ),
+        // Replacing the cloud library is only meaningful once a backend is
+        // configured, and racing it against a running sync would have the
+        // writer publishing under the epoch the replace is about to wipe.
+        if (hasProvider) ...[
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+            child: Text(
+              context.l10n.settings_cloudSync_dangerZone,
+              style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                color: Theme.of(context).colorScheme.error,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          ListTile(
+            leading: Icon(
+              Icons.published_with_changes,
+              color: Theme.of(context).colorScheme.error,
+            ),
+            title: Text(context.l10n.settings_cloudSync_replaceLibrary_tile),
+            subtitle: Text(
+              context.l10n.settings_cloudSync_replaceLibrary_tileSubtitle,
+            ),
+            enabled: !isSyncing,
+            onTap: isSyncing
+                ? null
+                : () => _onReplaceCloudLibraryPressed(context, ref),
+          ),
+        ],
       ],
     );
+  }
+
+  /// Gather the blast radius, then confirm. The preflight runs before the
+  /// dialog so the confirmation can name what is about to be overwritten.
+  Future<void> _onReplaceCloudLibraryPressed(
+    BuildContext context,
+    WidgetRef ref,
+  ) async {
+    final notifier = ref.read(syncStateProvider.notifier);
+    final preflight = await notifier.replacePreflight();
+    if (!context.mounted) return;
+    await showReplaceCloudLibraryDialog(context, ref, preflight);
   }
 
   /// Run a sync, first handling the two gated cases: a replaced cloud

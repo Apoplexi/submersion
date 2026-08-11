@@ -22979,6 +22979,78 @@ abstract class AppLocalizations {
   /// **'Not Now'**
   String get settings_cloudSync_adopt_notNow;
 
+  /// No description provided for @settings_cloudSync_dangerZone.
+  ///
+  /// In en, this message translates to:
+  /// **'Danger Zone'**
+  String get settings_cloudSync_dangerZone;
+
+  /// No description provided for @settings_cloudSync_replaceLibrary_tile.
+  ///
+  /// In en, this message translates to:
+  /// **'Replace cloud library'**
+  String get settings_cloudSync_replaceLibrary_tile;
+
+  /// No description provided for @settings_cloudSync_replaceLibrary_tileSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Make this device\'s library the one every device uses'**
+  String get settings_cloudSync_replaceLibrary_tileSubtitle;
+
+  /// No description provided for @settings_cloudSync_replaceLibrary_dialogTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Replace Cloud Library?'**
+  String get settings_cloudSync_replaceLibrary_dialogTitle;
+
+  /// No description provided for @settings_cloudSync_replaceLibrary_dialogIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'This device\'s library becomes the one every device uses.'**
+  String get settings_cloudSync_replaceLibrary_dialogIntro;
+
+  /// No description provided for @settings_cloudSync_replaceLibrary_dialogBody.
+  ///
+  /// In en, this message translates to:
+  /// **'{diveCount, plural, =1{The cloud library is erased and replaced with this device\'s 1 dive.} other{The cloud library is erased and replaced with this device\'s {diveCount} dives.}}'**
+  String settings_cloudSync_replaceLibrary_dialogBody(num diveCount);
+
+  /// No description provided for @settings_cloudSync_replaceLibrary_peers.
+  ///
+  /// In en, this message translates to:
+  /// **'{peerCount, plural, =0{No other device is syncing yet, so there is nothing to adopt it.} =1{1 other device will be asked to adopt it; until it does, its changes are not merged.} other{{peerCount} other devices will be asked to adopt it; until they do, their changes are not merged.}}'**
+  String settings_cloudSync_replaceLibrary_peers(num peerCount);
+
+  /// No description provided for @settings_cloudSync_replaceLibrary_peersUnknown.
+  ///
+  /// In en, this message translates to:
+  /// **'Every other device will be asked to adopt it; until they do, their changes are not merged.'**
+  String get settings_cloudSync_replaceLibrary_peersUnknown;
+
+  /// No description provided for @settings_cloudSync_replaceLibrary_backupNote.
+  ///
+  /// In en, this message translates to:
+  /// **'A backup of this device is created first. This cannot be undone.'**
+  String get settings_cloudSync_replaceLibrary_backupNote;
+
+  /// The word the user must type to arm the replace. Compared literally against their input, so it MUST match the word quoted in settings_cloudSync_replaceLibrary_confirmHint in the same locale.
+  ///
+  /// In en, this message translates to:
+  /// **'Replace'**
+  String get settings_cloudSync_replaceLibrary_confirmWord;
+
+  /// No description provided for @settings_cloudSync_replaceLibrary_confirmHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Type \"Replace\" to confirm'**
+  String get settings_cloudSync_replaceLibrary_confirmHint;
+
+  /// No description provided for @settings_cloudSync_replaceLibrary_confirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Replace'**
+  String get settings_cloudSync_replaceLibrary_confirm;
+
   /// No description provided for @settings_cloudSync_firstSync_banner.
   ///
   /// In en, this message translates to:
