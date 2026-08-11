@@ -153,14 +153,22 @@ class UnitFormatter {
     return '${converted.toStringAsFixed(decimals)} ${settings.volumeUnit.symbol}';
   }
 
-  /// Format tank volume - handles gas capacity conversion for imperial units.
+  /// Format a cylinder's size - handles gas capacity conversion for imperial.
   /// Pass [ratedCapacityCuft] (from a preset) for accurate display;
   /// otherwise falls back to ideal-gas calculation from volume and pressure.
+  ///
+  /// Metric shows the cylinder's physical volume in liters with up to one
+  /// decimal and no trailing zero, so a 1.5 L stage stays distinct from the
+  /// 2 L bottle beside it while a 12 L twin still reads as "12 L".
+  ///
+  /// Imperial shows rated gas capacity, rounded to [cuftDecimals]. A tenth of
+  /// a cubic foot is below the accuracy of the ideal-gas fallback, so whole
+  /// numbers are the default there. [cuftDecimals] does not affect metric.
   String formatTankVolume(
     double? volumeLiters,
     double? workingPressureBar, {
     double? ratedCapacityCuft,
-    int decimals = 0,
+    int cuftDecimals = 0,
   }) {
     if (volumeLiters == null) return '--';
 
@@ -178,21 +186,22 @@ class UnitFormatter {
         cuft = match?.ratedCapacityCuft;
       }
       if (cuft != null) {
-        return '${cuft.toStringAsFixed(decimals)} ${settings.volumeUnit.symbol}';
+        return '${cuft.toStringAsFixed(cuftDecimals)} ${settings.volumeUnit.symbol}';
       }
       if (workingPressureBar != null && workingPressureBar > 0) {
         // Ideal gas approximation for non-standard tanks
         final calcCuft = (volumeLiters * workingPressureBar) / 28.3168;
-        return '${calcCuft.toStringAsFixed(decimals)} ${settings.volumeUnit.symbol}';
+        return '${calcCuft.toStringAsFixed(cuftDecimals)} ${settings.volumeUnit.symbol}';
       } else {
         // No working pressure - approximate assuming 200 bar
         final calcCuft = (volumeLiters * 200) / 28.3168;
-        return '~${calcCuft.toStringAsFixed(decimals)} ${settings.volumeUnit.symbol}';
+        return '~${calcCuft.toStringAsFixed(cuftDecimals)} ${settings.volumeUnit.symbol}';
       }
     }
 
-    // For liters, just show physical volume
-    return '${volumeLiters.toStringAsFixed(decimals)} ${settings.volumeUnit.symbol}';
+    // For liters, show the physical volume the cylinder is named by
+    final liters = _trimTrailingZeros(volumeLiters.toStringAsFixed(1));
+    return '$liters ${settings.volumeUnit.symbol}';
   }
 
   /// Get volume unit symbol
