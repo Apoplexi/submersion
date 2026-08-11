@@ -452,11 +452,55 @@ class UnitFormatter {
     return '${formatDate(dateTime)} • ${formatTime(dateTime)}';
   }
 
+  /// `DateFormat` pattern for a bare month and day in [dateFormat]'s order.
+  ///
+  /// Static so widgets that thread the bare [DateFormatPreference] down (the
+  /// tide widgets carry it alongside [TimeFormat], with no [AppSettings] to
+  /// hand) share this one definition of the order.
+  static String monthDayPattern(DateFormatPreference dateFormat) =>
+      dateFormat.isDayFirst ? 'd MMM' : 'MMM d';
+
+  /// `DateFormat` pattern for a weekday followed by month and day.
+  /// The weekday leads in both orders: "Mon, Jan 15" or "Mon, 15 Jan".
+  static String weekdayMonthDayPattern(DateFormatPreference dateFormat) =>
+      'EEE, ${monthDayPattern(dateFormat)}';
+
   /// Format month and day only (respects day-first vs month-first preference)
   /// Example: "Jan 15" or "15 Jan"
   String formatMonthDay(DateTime? dateTime) {
     if (dateTime == null) return '--';
-    final pattern = settings.dateFormat.isDayFirst ? 'd MMM' : 'MMM d';
+    return DateFormat(monthDayPattern(settings.dateFormat)).format(dateTime);
+  }
+
+  /// Format weekday with month and day (respects day-first vs month-first)
+  /// Example: "Mon, Jan 15" or "Mon, 15 Jan"
+  String formatWeekdayMonthDay(DateTime? dateTime) {
+    if (dateTime == null) return '--';
+    return DateFormat(
+      weekdayMonthDayPattern(settings.dateFormat),
+    ).format(dateTime);
+  }
+
+  /// Format month and day, adding the year when [dateTime] falls outside the
+  /// year of [relativeTo] (defaults to now). Honors the day-first preference.
+  ///
+  /// Set [shortYear] for the two-digit form the densest list rows use.
+  /// Example: "Jan 15", "15 Jan 2024", "15 Jan '24".
+  String formatMonthDayWithYear(
+    DateTime? dateTime, {
+    bool shortYear = false,
+    DateTime? relativeTo,
+  }) {
+    if (dateTime == null) return '--';
+    final reference = relativeTo ?? DateTime.now();
+    if (dateTime.year == reference.year) return formatMonthDay(dateTime);
+
+    final dayFirst = settings.dateFormat.isDayFirst;
+    final pattern = shortYear
+        ? (dayFirst ? "d MMM ''yy" : "MMM d ''yy")
+        // Month-first spelling takes a comma before the year; day-first does
+        // not ("Mar 15, 2024" vs "15 Mar 2024").
+        : (dayFirst ? 'd MMM yyyy' : 'MMM d, yyyy');
     return DateFormat(pattern).format(dateTime);
   }
 

@@ -8,6 +8,7 @@ import 'package:submersion/core/constants/dive_field.dart';
 import 'package:submersion/core/constants/list_view_mode.dart';
 import 'package:submersion/core/constants/sort_options.dart';
 import 'package:submersion/core/models/sort_state.dart';
+import 'package:submersion/core/services/pdf_templates/pdf_date_formatter.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/dive_log/presentation/providers/highlight_providers.dart';
 import 'package:submersion/features/dive_log/presentation/providers/view_config_providers.dart';
@@ -38,6 +39,7 @@ import 'package:submersion/features/dive_log/presentation/widgets/dive_filter_sh
 import 'package:submersion/features/dive_log/presentation/widgets/dive_numbering_dialog.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/dive_table_view.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
+import 'package:submersion/shared/widgets/app_date_picker.dart';
 import 'package:submersion/shared/widgets/feature_accent.dart';
 
 /// Inclusive id span between the [anchor] and [target] indices in [dives].
@@ -273,7 +275,7 @@ class _DiveListContentState extends ConsumerState<DiveListContent> {
 
   /// Pick a date range and select every dive whose date falls inside it.
   Future<void> _selectByDateRange(List<DiveSummary> dives) async {
-    final range = await showDateRangePicker(
+    final range = await showAppDateRangePicker(
       context: context,
       firstDate: DateTime(1970),
       lastDate: DateTime(2100),
@@ -593,6 +595,11 @@ class _DiveListContentState extends ConsumerState<DiveListContent> {
         _selectedIds.toList(),
       );
       final exportService = ref.read(exportServiceProvider);
+      final settings = ref.read(settingsProvider);
+      final pdfDates = PdfDateFormatter(
+        dateFormat: settings.dateFormat,
+        timeFormat: settings.timeFormat,
+      );
       final sites = selectedDives
           .where((d) => d.site != null)
           .map((d) => d.site!)
@@ -609,8 +616,14 @@ class _DiveListContentState extends ConsumerState<DiveListContent> {
       final path = switch (format) {
         _BulkExportFormat.pdf =>
           sharing
-              ? await exportService.exportDivesToPdf(selectedDives)
-              : await exportService.saveDivesToPdfFile(selectedDives),
+              ? await exportService.exportDivesToPdf(
+                  selectedDives,
+                  dates: pdfDates,
+                )
+              : await exportService.saveDivesToPdfFile(
+                  selectedDives,
+                  dates: pdfDates,
+                ),
         _BulkExportFormat.csv =>
           sharing
               ? await exportService.exportDivesToCsv(selectedDives)

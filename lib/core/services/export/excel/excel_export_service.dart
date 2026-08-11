@@ -89,6 +89,7 @@ class ExcelExportService {
       equipment,
       depthUnit,
       temperatureUnit,
+      dateFormat,
     );
 
     final bytes = excel.encode();
@@ -397,6 +398,7 @@ class ExcelExportService {
     List<EquipmentItem> equipment,
     DepthUnit depthUnit,
     TemperatureUnit temperatureUnit,
+    DateFormatPreference dateFormat,
   ) {
     final sheet = excel['Statistics'];
     var currentRow = 0;
@@ -449,8 +451,15 @@ class ExcelExportService {
 
       final sortedDives = [...dives]
         ..sort((a, b) => a.dateTime.compareTo(b.dateTime));
-      addStat('First Dive', _dateFormat.format(sortedDives.first.dateTime));
-      addStat('Last Dive', _dateFormat.format(sortedDives.last.dateTime));
+      // Human-read summary cells, unlike the ISO stamps used for filenames.
+      addStat(
+        'First Dive',
+        formatDateForExport(sortedDives.first.dateTime, dateFormat),
+      );
+      addStat(
+        'Last Dive',
+        formatDateForExport(sortedDives.last.dateTime, dateFormat),
+      );
 
       final deepestDive = dives.reduce(
         (a, b) => (a.maxDepth ?? 0) > (b.maxDepth ?? 0) ? a : b,

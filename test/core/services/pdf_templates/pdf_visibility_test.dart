@@ -1,10 +1,19 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/constants/pdf_templates.dart';
+import 'package:submersion/core/constants/units.dart';
+import 'package:submersion/core/services/pdf_templates/pdf_date_formatter.dart';
 import 'package:submersion/core/constants/enums.dart' as enums;
 import 'package:submersion/core/services/pdf_templates/pdf_template_naui.dart';
 import 'package:submersion/core/services/pdf_templates/pdf_template_padi.dart';
 import 'package:submersion/core/services/pdf_templates/pdf_template_professional.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
+
+/// Existing coverage pins the historical ISO rendering; #964 preference
+/// coverage lives in pdf_date_preference_test.dart.
+final isoDates = PdfDateFormatter(
+  dateFormat: DateFormatPreference.yyyymmdd,
+  timeFormat: TimeFormat.twentyFourHour,
+);
 
 void main() {
   Dive buildDive({double? visibilityMeters, enums.Visibility? visibility}) =>
@@ -32,13 +41,20 @@ void main() {
   // The three logbook templates that print a visibility field. Each renders a
   // measured distance from v144 and falls back to a pre-v144 bucket label.
   final templates = <String, Future<List<int>> Function(List<Dive>)>{
-    'PADI': (dives) =>
-        PdfTemplatePadi().buildPdf(dives: dives, pageSize: PdfPageSize.a4),
-    'NAUI': (dives) =>
-        PdfTemplateNaui().buildPdf(dives: dives, pageSize: PdfPageSize.a4),
+    'PADI': (dives) => PdfTemplatePadi().buildPdf(
+      dives: dives,
+      pageSize: PdfPageSize.a4,
+      dates: isoDates,
+    ),
+    'NAUI': (dives) => PdfTemplateNaui().buildPdf(
+      dives: dives,
+      pageSize: PdfPageSize.a4,
+      dates: isoDates,
+    ),
     'Professional': (dives) => PdfTemplateProfessional().buildPdf(
       dives: dives,
       pageSize: PdfPageSize.a4,
+      dates: isoDates,
     ),
   };
 
