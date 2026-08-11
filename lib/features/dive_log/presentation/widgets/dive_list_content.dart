@@ -651,8 +651,12 @@ class _DiveListContentState extends ConsumerState<DiveListContent> {
       _enterSelectionMode(id);
       return;
     }
-    final dive = dives.firstWhere((d) => d.id == id, orElse: () => dives.first);
-    _handleItemTap(dive);
+    // No-op when the id is gone. A stale tap callback firing after the list
+    // reloaded must not open or toggle an arbitrary other dive, and must not
+    // throw on an emptied list the way `orElse: () => dives.first` would.
+    final index = dives.indexWhere((d) => d.id == id);
+    if (index < 0) return;
+    _handleItemTap(dives[index]);
   }
 
   void _handleItemTap(DiveSummary dive) {

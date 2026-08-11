@@ -3,6 +3,57 @@ import 'package:submersion/shared/selection/selection_controller.dart';
 import 'package:submersion/shared/selection/selection_state.dart';
 
 void main() {
+  group('SelectionState', () {
+    const base = SelectionState(
+      checkedIds: {'a', 'b'},
+      isActive: true,
+      enteredExplicitly: true,
+      anchorId: 'a',
+    );
+
+    // Equality gates every rebuild: ValueNotifier only notifies when the new
+    // value differs, so a wrong == either spams rebuilds or swallows changes.
+    test('compares checked ids by content, not identity', () {
+      const other = SelectionState(
+        checkedIds: {'b', 'a'},
+        isActive: true,
+        enteredExplicitly: true,
+        anchorId: 'a',
+      );
+      expect(other, base);
+      expect(other.hashCode, base.hashCode);
+    });
+
+    test('differs when any field differs', () {
+      expect(base.copyWith(isActive: false), isNot(base));
+      expect(base.copyWith(enteredExplicitly: false), isNot(base));
+      expect(base.copyWith(anchorId: 'b'), isNot(base));
+      expect(base.copyWith(checkedIds: {'a'}), isNot(base));
+    });
+
+    test('copyWith preserves untouched fields', () {
+      final next = base.copyWith(checkedIds: {'c'});
+      expect(next.checkedIds, {'c'});
+      expect(next.isActive, isTrue);
+      expect(next.enteredExplicitly, isTrue);
+      expect(next.anchorId, 'a');
+    });
+
+    test('clearAnchor wins over an anchorId argument', () {
+      expect(base.copyWith(anchorId: 'b', clearAnchor: true).anchorId, isNull);
+    });
+
+    test('exposes count and isChecked', () {
+      expect(base.count, 2);
+      expect(base.isChecked('a'), isTrue);
+      expect(base.isChecked('z'), isFalse);
+    });
+
+    test('is not equal to an unrelated object', () {
+      expect(base, isNot(equals('not a state')));
+    });
+  });
+
   group('SelectionController entry and exit', () {
     test('starts inactive with nothing checked', () {
       final controller = SelectionController();
@@ -147,6 +198,36 @@ void main() {
       controller.enterImplicit('a');
       controller.extendTo('zz', ordered);
       expect(controller.value.checkedIds, {'a'});
+    });
+
+    test('checks the target when the fallback anchor is stale', () {
+      // The highlighted row can sit outside the visible list, for instance
+      // after a filter change. The range is then empty, but shift-click must
+      // still check the row the user actually clicked.
+      final controller = SelectionController();
+      controller.extendTo('c', ordered, fallbackAnchorId: 'gone');
+      expect(controller.value.isActive, isTrue);
+      expect(controller.value.checkedIds, {'c'});
+      expect(controller.value.anchorId, 'c');
+    });
+
+    test('checks the target when the controller anchor is stale', () {
+      final controller = SelectionController();
+      controller.enterImplicit('a');
+      // Simulate the visible list changing under a live selection.
+      controller.extendTo('c', const ['c', 'd'], fallbackAnchorId: null);
+      expect(controller.value.checkedIds, containsAll({'c'}));
+      expect(controller.value.anchorId, 'c');
+    });
+
+    test('never activates with nothing checked', () {
+      final controller = SelectionController();
+      controller.extendTo('c', ordered, fallbackAnchorId: 'gone');
+      expect(
+        controller.value.count,
+        greaterThan(0),
+        reason: 'shift-click must never leave an empty active selection',
+      );
     });
   });
 

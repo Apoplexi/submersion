@@ -85,7 +85,13 @@ class SelectionController extends ValueNotifier<SelectionState> {
   }) {
     if (!orderedIds.contains(targetId)) return;
 
-    final anchor = value.anchorId ?? fallbackAnchorId ?? targetId;
+    // A stale anchor -- a highlighted row that a filter change pushed out of
+    // the visible list, say -- yields an empty range. Fall back to anchoring
+    // on the target so shift-click always checks at least the clicked row,
+    // rather than activating the mode with nothing checked.
+    var anchor = value.anchorId ?? fallbackAnchorId ?? targetId;
+    if (!orderedIds.contains(anchor)) anchor = targetId;
+
     final next = Set<String>.from(value.checkedIds)
       ..addAll(idsInRange(orderedIds, anchor, targetId));
 

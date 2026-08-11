@@ -37,7 +37,11 @@ class SelectionAppBar extends StatelessWidget implements PreferredSizeWidget {
   final SelectionBarShell shell;
 
   /// Invoked by the baseline delete control.
-  final VoidCallback? onDelete;
+  ///
+  /// Required, not optional: delete is part of the guaranteed baseline, and a
+  /// nullable callback would let a surface ship a permanently disabled delete
+  /// button instead of failing to compile.
+  final VoidCallback onDelete;
 
   /// How many extras render as inline icons before the rest overflow.
   final int maxInlineActions;
@@ -48,7 +52,7 @@ class SelectionAppBar extends StatelessWidget implements PreferredSizeWidget {
     required this.selectableIds,
     required this.actions,
     required this.shell,
-    this.onDelete,
+    required this.onDelete,
     this.maxInlineActions = 3,
   });
 
