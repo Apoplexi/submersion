@@ -92,6 +92,10 @@ Future<void> _pump(
       child: MaterialApp(
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
+        // Every assertion below is an English literal. flutter_test forwards
+        // the host machine's locale list, so without this the UI resolves to
+        // the developer's own language and 6 of these tests miss.
+        locale: const Locale('en'),
         home: Scaffold(
           body: SitePickerSheet(
             scrollController: ScrollController(),
