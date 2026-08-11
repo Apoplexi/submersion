@@ -1449,7 +1449,7 @@ class _DiveListContentState extends ConsumerState<DiveListContent> {
                   gradientStartColor: gradientColors.start,
                   gradientEndColor: gradientColors.end,
                   isSelectionMode: _isSelectionMode,
-                  isSelected: isSelected,
+                  isChecked: isSelected,
                   isHighlighted: isMasterSelected || isHighlighted,
                   onTap: () {
                     if (_isSelectionMode && _isShiftPressed()) {

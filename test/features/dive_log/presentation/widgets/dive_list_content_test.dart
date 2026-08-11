@@ -965,8 +965,11 @@ void main() {
         final tileOne = tiles.firstWhere((t) => t.diveId == 'd1');
         final tileTwo = tiles.firstWhere((t) => t.diveId == 'd2');
 
-        expect(tileOne.isSelected, isFalse);
-        expect(tileTwo.isSelected, isTrue);
+        // Highlight and checked are independent channels: a highlighted row
+        // is not in the bulk selection.
+        expect(tileOne.isHighlighted, isFalse);
+        expect(tileTwo.isHighlighted, isTrue);
+        expect(tileTwo.isChecked, isFalse);
       },
     );
 
@@ -1006,8 +1009,9 @@ void main() {
         final one = tiles.firstWhere((t) => t.diveId == 'd1');
         final two = tiles.firstWhere((t) => t.diveId == 'd2');
 
-        expect(one.isSelected, isFalse);
-        expect(two.isSelected, isTrue);
+        expect(one.isHighlighted, isFalse);
+        expect(two.isHighlighted, isTrue);
+        expect(two.isChecked, isFalse);
       },
     );
   });
@@ -1062,22 +1066,22 @@ void main() {
         await tester.longPress(tileFinder('d1'));
         await tester.pumpAndSettle();
         expect(tile('d1').isSelectionMode, isTrue);
-        expect(tile('d1').isSelected, isTrue);
+        expect(tile('d1').isChecked, isTrue);
 
         // Shift-tap d3 -> the d1..d3 span becomes selected.
         await tester.sendKeyDownEvent(LogicalKeyboardKey.shiftLeft);
         await tester.tap(tileFinder('d3'));
         await tester.sendKeyUpEvent(LogicalKeyboardKey.shiftLeft);
         await tester.pumpAndSettle();
-        expect(tile('d1').isSelected, isTrue);
-        expect(tile('d2').isSelected, isTrue);
-        expect(tile('d3').isSelected, isTrue);
-        expect(tile('d4').isSelected, isFalse);
+        expect(tile('d1').isChecked, isTrue);
+        expect(tile('d2').isChecked, isTrue);
+        expect(tile('d3').isChecked, isTrue);
+        expect(tile('d4').isChecked, isFalse);
 
         // Plain tap d2 -> toggles it back off.
         await tester.tap(tileFinder('d2'));
         await tester.pumpAndSettle();
-        expect(tile('d2').isSelected, isFalse);
+        expect(tile('d2').isChecked, isFalse);
       },
     );
 
@@ -1110,7 +1114,7 @@ void main() {
 
       await tester.tap(tileFinder('d2'));
       await tester.pumpAndSettle();
-      expect(tile('d2').isSelected, isTrue);
+      expect(tile('d2').isChecked, isTrue);
     });
   });
 

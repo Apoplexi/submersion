@@ -8,6 +8,7 @@ import 'package:submersion/features/dive_log/domain/entities/dive_summary.dart';
 import 'package:submersion/features/dive_log/presentation/formatters/dive_type_label_resolver.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
+import 'package:submersion/shared/selection/selection_leading.dart';
 
 /// Two-line compact card tile for the dive list.
 ///
@@ -23,7 +24,12 @@ class CompactDiveListTile extends ConsumerWidget {
   final VoidCallback? onTap;
   final VoidCallback? onLongPress;
   final bool isSelectionMode;
-  final bool isSelected;
+
+  /// In the current bulk selection. Renders as a fill tint plus the leading
+  /// checkbox. Independent of [isHighlighted]: a row can be both.
+  final bool isChecked;
+
+  /// Currently open in the detail pane. Renders as a leading edge stripe.
   final bool isHighlighted;
   final VoidCallback? onDoubleTap;
 
@@ -62,7 +68,7 @@ class CompactDiveListTile extends ConsumerWidget {
     this.onTap,
     this.onLongPress,
     this.isSelectionMode = false,
-    this.isSelected = false,
+    this.isChecked = false,
     this.isHighlighted = false,
     this.onDoubleTap,
     this.colorValue,
@@ -191,7 +197,7 @@ class CompactDiveListTile extends ConsumerWidget {
     final attributeColor = showCardColors
         ? _getAttributeBackgroundColor()
         : null;
-    final cardColor = isSelected
+    final cardColor = isChecked
         ? colorScheme.primaryContainer.withValues(alpha: 0.5)
         : isHighlighted
         ? colorScheme.primaryContainer.withValues(alpha: 0.15)
@@ -236,6 +242,7 @@ class CompactDiveListTile extends ConsumerWidget {
               : maxDepth != null);
 
     return Container(
+      key: isHighlighted ? const ValueKey('dive_row_highlight') : null,
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
       decoration: isHighlighted
           ? BoxDecoration(
@@ -266,37 +273,26 @@ class CompactDiveListTile extends ConsumerWidget {
                     children: [
                       SizedBox(
                         width: 36,
-                        child: Stack(
+                        child: Align(
                           alignment: Alignment.centerLeft,
-                          children: [
-                            Visibility(
-                              visible: isSelectionMode,
-                              maintainSize: true,
-                              maintainAnimation: true,
-                              maintainState: true,
-                              child: Checkbox(
-                                value: isSelected,
-                                onChanged: (_) => onTap?.call(),
-                                materialTapTargetSize:
-                                    MaterialTapTargetSize.shrinkWrap,
-                                visualDensity: VisualDensity.compact,
-                              ),
-                            ),
-                            if (!isSelectionMode)
-                              FittedBox(
-                                fit: BoxFit.scaleDown,
-                                alignment: Alignment.centerLeft,
-                                child: Text(
-                                  '#$diveNumber',
-                                  maxLines: 1,
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 12,
-                                    color: accentColor,
-                                  ),
+                          child: SelectionLeading(
+                            isSelectionMode: isSelectionMode,
+                            isChecked: isChecked,
+                            onChanged: (_) => onTap?.call(),
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              alignment: Alignment.centerLeft,
+                              child: Text(
+                                '#$diveNumber',
+                                maxLines: 1,
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 12,
+                                  color: accentColor,
                                 ),
                               ),
-                          ],
+                            ),
+                          ),
                         ),
                       ),
                       const SizedBox(width: 8),
