@@ -363,4 +363,18 @@ echo "$OUT" | grep -q "bump deps" && fail "a chore-prefixed title reached the st
 echo "$OUT" | grep -q "extract a helper" && fail "a refactor-prefixed title reached the store notes"
 echo "$OUT" | grep -qi "internal" || fail "an all-internal range should still say so"
 
+# --- The pipeline must actually ask for the cumulative section ---------------
+# Supporting --cumulative is not the same as using it. The capped formats
+# accepted the flag for a while before beta.yml passed it to them, so
+# TestFlight and Play shipped the per-beta delta alone while the capability
+# sat unused. Assert the wiring, not just the capability.
+
+WORKFLOW="$SCRIPT_DIR/../../.github/workflows/beta.yml"
+if [ -f "$WORKFLOW" ]; then
+  for fmt in store play markdown; do
+    grep -A1 -- "--format $fmt" "$WORKFLOW" | grep -q -- "--cumulative" \
+      || fail "beta.yml does not pass --cumulative for --format $fmt"
+  done
+fi
+
 echo "PASS: all beta_release_notes tests passed"
