@@ -2,6 +2,7 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 
 import 'package:submersion/core/constants/pdf_templates.dart';
+import 'package:submersion/core/services/pdf_templates/pdf_date_formatter.dart';
 import 'package:submersion/core/services/pdf_templates/pdf_fonts.dart';
 import 'package:submersion/core/services/pdf_templates/pdf_shared_components.dart';
 import 'package:submersion/core/services/pdf_templates/pdf_template_builder.dart';
@@ -26,6 +27,7 @@ class PdfTemplateNaui extends PdfTemplateBuilder {
   Future<List<int>> buildPdf({
     required List<Dive> dives,
     required PdfPageSize pageSize,
+    required PdfDateFormatter dates,
     String title = 'Dive Logbook',
     Map<String, List<Signature>>? diveSignatures,
     List<Certification>? certifications,
@@ -41,6 +43,7 @@ class PdfTemplateNaui extends PdfTemplateBuilder {
         build: (context) => _buildCoverPage(
           title: title,
           diveCount: dives.length,
+          dates: dates,
           diver: diver,
           dives: dives,
         ),
@@ -55,6 +58,7 @@ class PdfTemplateNaui extends PdfTemplateBuilder {
           margin: const pw.EdgeInsets.all(32),
           build: (context) => PdfSharedComponents.buildCertificationCardsPage(
             certifications: certifications,
+            dates: dates,
             diver: diver,
             highlightAgency: 'naui',
             accentColor: _nauiGreen,
@@ -83,6 +87,7 @@ class PdfTemplateNaui extends PdfTemplateBuilder {
                 (dive) => [
                   _buildNauiDiveEntry(
                     dive,
+                    dates: dates,
                     signatures: diveSignatures?[dive.id],
                   ),
                   pw.SizedBox(height: 8),
@@ -100,6 +105,7 @@ class PdfTemplateNaui extends PdfTemplateBuilder {
   pw.Widget _buildCoverPage({
     required String title,
     required int diveCount,
+    required PdfDateFormatter dates,
     Diver? diver,
     required List<Dive> dives,
   }) {
@@ -169,7 +175,7 @@ class PdfTemplateNaui extends PdfTemplateBuilder {
           ),
           pw.Spacer(),
           pw.Text(
-            'Generated ${PdfSharedComponents.formatDateTime(DateTime.now())}',
+            'Generated ${dates.dateTime(DateTime.now())}',
             style: const pw.TextStyle(fontSize: 10, color: PdfColors.grey500),
           ),
           pw.SizedBox(height: 20),
@@ -231,7 +237,11 @@ class PdfTemplateNaui extends PdfTemplateBuilder {
     );
   }
 
-  pw.Widget _buildNauiDiveEntry(Dive dive, {List<Signature>? signatures}) {
+  pw.Widget _buildNauiDiveEntry(
+    Dive dive, {
+    required PdfDateFormatter dates,
+    List<Signature>? signatures,
+  }) {
     final tank = dive.tanks.isNotEmpty ? dive.tanks.first : null;
 
     return pw.Container(
@@ -259,7 +269,7 @@ class PdfTemplateNaui extends PdfTemplateBuilder {
                   ),
                 ),
                 pw.Text(
-                  PdfSharedComponents.formatDateTime(dive.dateTime),
+                  dates.dateTime(dive.dateTime),
                   style: const pw.TextStyle(fontSize: 9),
                 ),
               ],

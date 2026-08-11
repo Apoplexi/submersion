@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 
 import 'package:submersion/core/constants/card_color.dart';
 import 'package:submersion/core/constants/dive_field.dart';
@@ -92,14 +91,10 @@ class DenseDiveListTile extends ConsumerWidget {
     return backgroundColor.computeLuminance() < 0.5;
   }
 
-  /// Abbreviated date: "Mar 15" for current year, "Mar 15 '24" for other years.
-  String _formatShortDate(DateTime dt) {
-    final now = DateTime.now();
-    if (dt.year == now.year) {
-      return DateFormat('MMM d').format(dt);
-    }
-    return DateFormat("MMM d ''yy").format(dt);
-  }
+  /// Abbreviated date: "Mar 15" for current year, "Mar 15 '24" for other
+  /// years, day-first for divers who chose a day-first date format (#964).
+  String _formatShortDate(DateTime dt, UnitFormatter units) =>
+      units.formatMonthDayWithYear(dt, shortYear: true);
 
   /// Returns the display string for an expanded text slot (slot1 / slot2).
   String _buildTextSlotValue(
@@ -119,7 +114,7 @@ class DenseDiveListTile extends ConsumerWidget {
       return siteName ?? context.l10n.diveLog_listPage_unknownSite;
     }
     if (field == DiveField.dateTime) {
-      return _formatShortDate(dateTime);
+      return _formatShortDate(dateTime, units);
     }
     final value = summary != null
         ? field.extractFromSummary(

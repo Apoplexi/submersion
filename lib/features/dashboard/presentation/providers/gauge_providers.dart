@@ -41,11 +41,16 @@ enum HomeChipType {
 /// The worst service clock for one equipment type, shown as one chip.
 class GearGauge {
   final EquipmentType type;
+
+  /// Id of the item the chip names, so the tap can open that item rather
+  /// than the equipment list (issue #816).
+  final String itemId;
   final String itemName;
   final ServiceClockStatus status;
 
   const GearGauge({
     required this.type,
+    required this.itemId,
     required this.itemName,
     required this.status,
   });
@@ -123,6 +128,7 @@ List<GearGauge> worstGaugePerType(List<EquipmentClocks> clocks) {
     for (final status in entry.statuses) {
       final candidate = GearGauge(
         type: entry.item.type,
+        itemId: entry.item.id,
         itemName: entry.item.name,
         status: status,
       );

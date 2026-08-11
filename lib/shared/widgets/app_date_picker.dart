@@ -14,10 +14,11 @@ import 'package:submersion/features/settings/presentation/providers/settings_pro
 /// which matches the audience that uses it.
 ///
 /// [dateFormat] is read from the settings provider when omitted; pass it
-/// explicitly in tests.
+/// explicitly in tests. [initialDate] stays required but nullable so callers
+/// with no date yet must say so deliberately rather than by omission.
 Future<DateTime?> showAppDatePicker({
   required BuildContext context,
-  required DateTime initialDate,
+  required DateTime? initialDate,
   required DateTime firstDate,
   required DateTime lastDate,
   DatePickerMode initialDatePickerMode = DatePickerMode.day,
@@ -37,6 +38,33 @@ Future<DateTime?> showAppDatePicker({
     initialDatePickerMode: initialDatePickerMode,
     locale: _pickerLocaleFor(format),
     fieldHintText: _fieldHintFor(format),
+  );
+}
+
+/// Shows the Material date *range* picker with manual-entry parsing and hints
+/// that honor the diver's [DateFormatPreference] (#964).
+///
+/// The range dialog reads its compact date format from the same ambient
+/// [MaterialLocalizations] as the single-date dialog, so it needs the same
+/// locale override; see [showAppDatePicker] for why the locale is the only
+/// lever Flutter exposes.
+Future<DateTimeRange?> showAppDateRangePicker({
+  required BuildContext context,
+  required DateTime firstDate,
+  required DateTime lastDate,
+  DateTimeRange? initialDateRange,
+  DateFormatPreference? dateFormat,
+}) {
+  final format = dateFormat ?? _resolveFormat(context);
+  final hint = _fieldHintFor(format);
+  return showDateRangePicker(
+    context: context,
+    initialDateRange: initialDateRange,
+    firstDate: firstDate,
+    lastDate: lastDate,
+    locale: _pickerLocaleFor(format),
+    fieldStartHintText: hint,
+    fieldEndHintText: hint,
   );
 }
 

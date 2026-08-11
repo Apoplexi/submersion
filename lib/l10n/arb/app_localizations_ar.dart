@@ -2910,6 +2910,14 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String get dashboard_hero_divesTotalOne => 'غوصة واحدة';
+
+  @override
+  String dashboard_hero_divesTotalOther(Object count) {
+    return '$count غوصات';
+  }
+
+  @override
   String get dashboard_hero_error => 'هل أنت مستعد لاستكشاف الأعماق؟';
 
   @override
@@ -11550,6 +11558,57 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get media_diveMediaSection_unlinkSuccess => 'تم إلغاء ربط الصورة';
+
+  @override
+  String get media_siteMediaSection_title => 'وسائط الموقع';
+
+  @override
+  String get media_siteMediaSection_addPhotos => 'إضافة صور أو مقاطع فيديو';
+
+  @override
+  String get media_siteMediaSection_addDocument => 'إضافة مستند';
+
+  @override
+  String get media_siteMediaSection_emptyState =>
+      'لا توجد خرائط أو صور أو مستندات مرفقة بهذا الموقع';
+
+  @override
+  String media_siteMediaSection_divePhotosGroup(int count) {
+    return 'صور من الغوصات هنا ($count)';
+  }
+
+  @override
+  String get media_siteMediaSection_divePhotoLabel => 'صورة غوص';
+
+  @override
+  String media_siteMediaSection_unlinkSelectedTitle(int count) {
+    return 'إزالة $count من المرفقات؟';
+  }
+
+  @override
+  String get media_siteMediaSection_unlinkSelectedContent =>
+      'ستتم إزالة العناصر المحددة من هذا الموقع. لن يتم حذف الملفات في مكتبة الصور أو على القرص.';
+
+  @override
+  String media_siteMediaSection_unlinkSelectedSuccess(int count) {
+    return 'تمت إزالة $count من المرفقات';
+  }
+
+  @override
+  String get media_documentViewer_title => 'مستند';
+
+  @override
+  String get media_documentViewer_unavailable =>
+      'هذا المستند غير متاح على هذا الجهاز';
+
+  @override
+  String get media_documentViewer_availableOnOriginDevice =>
+      'وهو متاح على الجهاز الذي أُضيف منه، أو عبر مخزن وسائط مُهيأ.';
+
+  @override
+  String media_documentViewer_attached(int count) {
+    return 'تم إرفاق $count من المستندات';
+  }
 
   @override
   String get media_diveScan_scanTooltip => 'مسح المعرض بحثا عن الصور';

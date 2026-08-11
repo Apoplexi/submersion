@@ -2887,6 +2887,14 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
+  String get dashboard_hero_divesTotalOne => 'צלילה אחת';
+
+  @override
+  String dashboard_hero_divesTotalOther(Object count) {
+    return '$count צלילות';
+  }
+
+  @override
   String get dashboard_hero_error => 'מוכן לחקור את המעמקים?';
 
   @override
@@ -11470,6 +11478,56 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get media_diveMediaSection_unlinkSuccess => 'קישור התמונה בוטל';
+
+  @override
+  String get media_siteMediaSection_title => 'מדיה של האתר';
+
+  @override
+  String get media_siteMediaSection_addPhotos => 'הוספת תמונות או סרטונים';
+
+  @override
+  String get media_siteMediaSection_addDocument => 'הוספת מסמך';
+
+  @override
+  String get media_siteMediaSection_emptyState =>
+      'אין מפות, תמונות או מסמכים המצורפים לאתר זה';
+
+  @override
+  String media_siteMediaSection_divePhotosGroup(int count) {
+    return 'תמונות מצלילות כאן ($count)';
+  }
+
+  @override
+  String get media_siteMediaSection_divePhotoLabel => 'תמונת צלילה';
+
+  @override
+  String media_siteMediaSection_unlinkSelectedTitle(int count) {
+    return 'להסיר $count קבצים מצורפים?';
+  }
+
+  @override
+  String get media_siteMediaSection_unlinkSelectedContent =>
+      'הפריטים שנבחרו יוסרו מאתר זה. קבצים בספריית התמונות או בדיסק לא יימחקו.';
+
+  @override
+  String media_siteMediaSection_unlinkSelectedSuccess(int count) {
+    return 'הוסרו $count קבצים מצורפים';
+  }
+
+  @override
+  String get media_documentViewer_title => 'מסמך';
+
+  @override
+  String get media_documentViewer_unavailable => 'מסמך זה אינו זמין במכשיר זה';
+
+  @override
+  String get media_documentViewer_availableOnOriginDevice =>
+      'הוא זמין במכשיר שממנו נוסף, או דרך אחסון מדיה מוגדר.';
+
+  @override
+  String media_documentViewer_attached(int count) {
+    return 'צורפו $count מסמכים';
+  }
 
   @override
   String get media_diveScan_scanTooltip => 'סרוק גלריה לחיפוש תמונות';

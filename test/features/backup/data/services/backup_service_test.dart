@@ -114,6 +114,11 @@ class FakeCloudStorageProvider implements CloudStorageProvider {
   bool shouldFailUpload = false;
   bool shouldFailDelete = false;
   bool shouldFailDownload = false;
+
+  /// Models a provider that is reachable for auth but cannot serve the backup
+  /// folder (offline, revoked scope, quota) -- the path where the upload is
+  /// abandoned before any bytes are sent.
+  bool shouldFailCreateFolder = false;
   String? createdFolder;
   int uploadCallCount = 0;
 
@@ -202,6 +207,9 @@ class FakeCloudStorageProvider implements CloudStorageProvider {
     String folderName, {
     String? parentFolderId,
   }) async {
+    if (shouldFailCreateFolder) {
+      throw const CloudStorageException('Folder unavailable');
+    }
     createdFolder = folderName;
     return 'folder-$folderName';
   }
@@ -995,6 +1003,45 @@ void main() {
         expect(fakeDb.lastBackupPath, contains('Submersion'));
         expect(fakeDb.lastBackupPath, contains('Backups'));
       });
+    });
+
+    group('performBackup cloud upload', () {
+      test('records both locations when the upload lands', () async {
+        await preferences.setCloudBackupEnabled(true);
+
+        final service = BackupService(
+          dbAdapter: fakeDb,
+          preferences: preferences,
+          cloudProvider: fakeCloud,
+        );
+
+        final record = await service.performBackup(isAutomatic: true);
+
+        expect(fakeCloud.uploadedFiles, hasLength(1));
+        expect(record.location, BackupLocation.both);
+        expect(record.cloudFileId, isNotNull);
+      });
+
+      test(
+        'records local-only when the cloud folder cannot be reached: '
+        'history must never claim a cloud copy that does not exist',
+        () async {
+          await preferences.setCloudBackupEnabled(true);
+          fakeCloud.shouldFailCreateFolder = true;
+
+          final service = BackupService(
+            dbAdapter: fakeDb,
+            preferences: preferences,
+            cloudProvider: fakeCloud,
+          );
+
+          final record = await service.performBackup();
+
+          expect(fakeCloud.uploadedFiles, isEmpty);
+          expect(record.cloudFileId, isNull);
+          expect(record.location, BackupLocation.local);
+        },
+      );
     });
 
     group('resolveBackupsDirectory', () {

@@ -232,8 +232,16 @@ class BackupService {
     if (settings.cloudBackupEnabled && _cloudProvider != null) {
       try {
         cloudFileId = await _uploadToCloud(ref, storedName);
-        location = BackupLocation.both;
-        _log.info('Backup uploaded to cloud: $cloudFileId');
+        // Only a real file id means a cloud copy exists: the upload also
+        // gives up (returning null) when the backup folder is unreachable,
+        // and history that claims `both` with no id sends restore looking
+        // for a file that was never written.
+        if (cloudFileId != null) {
+          location = BackupLocation.both;
+          _log.info('Backup uploaded to cloud: $cloudFileId');
+        } else {
+          _log.warning('Cloud upload skipped, backup is local-only');
+        }
       } catch (e, stack) {
         _log.error(
           'Cloud upload failed, backup is local-only',

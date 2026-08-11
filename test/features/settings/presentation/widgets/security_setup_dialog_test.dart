@@ -1,16 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:submersion/core/theme/full_themes/submersion_theme.dart';
 import 'package:submersion/features/settings/presentation/widgets/security_setup_dialog.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
 
 Future<List<Object?>> _pumpSetup(
   WidgetTester tester, {
   required Future<String> Function(String password) onSetPassword,
+  ThemeData? theme,
 }) async {
   final results = <Object?>[];
   await tester.pumpWidget(
     MaterialApp(
+      theme: theme,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       locale: const Locale('en'),
@@ -37,6 +40,37 @@ Future<List<Object?>> _pumpSetup(
 }
 
 void main() {
+  testWidgets('keeps the confirm field clear of the password field above it', (
+    tester,
+  ) async {
+    // The app theme uses filled fields with an OutlineInputBorder. Flutter
+    // floats such a label so it straddles the top border and reserves no
+    // space above the box for it, so two fields stacked flush let the confirm
+    // label paint over the password field. Pump the real theme, not a bare
+    // MaterialApp, or the overlap cannot reproduce.
+    await _pumpSetup(
+      tester,
+      theme: submersionLight,
+      onSetPassword: (_) async => 'a-b-c-d',
+    );
+
+    // Both labels must be floating: that is the state the overlap appears in.
+    await tester.enterText(find.byType(TextField).at(0), 'hunter2!');
+    await tester.enterText(find.byType(TextField).at(1), 'hunter2!');
+    await tester.pumpAndSettle();
+
+    final passwordField = tester.getRect(find.byType(TextField).at(0));
+    final confirmLabel = tester.getRect(find.text('Confirm password'));
+
+    expect(
+      confirmLabel.top,
+      greaterThanOrEqualTo(passwordField.bottom),
+      reason:
+          'the floating "Confirm password" label paints ${passwordField.bottom - confirmLabel.top}px '
+          'inside the password field above it',
+    );
+  });
+
   testWidgets('rejects a short password and a mismatch before minting a key', (
     tester,
   ) async {
