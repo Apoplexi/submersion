@@ -40,6 +40,7 @@ final inProgressCoursesProvider = FutureProvider<List<Course>>((ref) async {
   final validatedDiverId = await ref.watch(
     validatedCurrentDiverIdProvider.future,
   );
+  ref.invalidateSelfWhen(repository.watchCoursesChanges());
   return repository.getInProgressCourses(diverId: validatedDiverId);
 });
 
@@ -49,6 +50,7 @@ final completedCoursesProvider = FutureProvider<List<Course>>((ref) async {
   final validatedDiverId = await ref.watch(
     validatedCurrentDiverIdProvider.future,
   );
+  ref.invalidateSelfWhen(repository.watchCoursesChanges());
   return repository.getCompletedCourses(diverId: validatedDiverId);
 });
 
@@ -111,6 +113,7 @@ final courseByIdProvider = FutureProvider.family<Course?, String>((
   id,
 ) async {
   final repository = ref.watch(courseRepositoryProvider);
+  ref.invalidateSelfWhen(repository.watchCoursesChanges());
   return repository.getCourseById(id);
 });
 
@@ -132,6 +135,7 @@ final courseForCertificationProvider = FutureProvider.family<Course?, String>((
   certificationId,
 ) async {
   final repository = ref.watch(courseRepositoryProvider);
+  ref.invalidateSelfWhen(repository.watchCoursesChanges());
   return repository.getCourseForCertification(certificationId);
 });
 
@@ -141,15 +145,23 @@ final courseDivesProvider = FutureProvider.family<List<Dive>, String>((
   courseId,
 ) async {
   final diveRepository = ref.watch(diveRepositoryProvider);
+  ref.invalidateSelfWhen(diveRepository.watchDivesChanges());
   return diveRepository.getDivesForCourse(courseId);
 });
 
-/// Dive count for a course
+/// Dive count for a course.
+///
+/// Takes the dives tick as well as the courses tick. Without it the course
+/// detail header's dive count and the dive list beneath it disagreed after a
+/// merge, because the count is a junction read over `dives.course_id` and a
+/// cascade delete never writes the `courses` table (issue #970).
 final courseDiveCountProvider = FutureProvider.family<int, String>((
   ref,
   courseId,
 ) async {
   final repository = ref.watch(courseRepositoryProvider);
+  ref.invalidateSelfWhen(repository.watchCoursesChanges());
+  ref.invalidateSelfWhen(ref.read(diveRepositoryProvider).watchDivesChanges());
   return repository.getDiveCountForCourse(courseId);
 });
 
@@ -163,6 +175,7 @@ final coursesByAgencyProvider =
       final validatedDiverId = await ref.watch(
         validatedCurrentDiverIdProvider.future,
       );
+      ref.invalidateSelfWhen(repository.watchCoursesChanges());
       return repository.getCoursesByAgency(agency, diverId: validatedDiverId);
     });
 
@@ -178,6 +191,7 @@ final courseSearchProvider = FutureProvider.family<List<Course>, String>((
     return ref.watch(allCoursesProvider).value ?? [];
   }
   final repository = ref.watch(courseRepositoryProvider);
+  ref.invalidateSelfWhen(repository.watchCoursesChanges());
   return repository.searchCourses(query, diverId: validatedDiverId);
 });
 
