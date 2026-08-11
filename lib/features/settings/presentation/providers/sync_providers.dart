@@ -466,6 +466,13 @@ class SyncState {
   /// a newer database schema than this build. Drives the "update this
   /// device" banner; cleared when a fresh sync starts.
   final int newerSchemaPeerCount;
+
+  /// Peers held back by the library-epoch fence during the last pull, as
+  /// (name, shortId) pairs. Drives the "needs to adopt" banner; cleared when a
+  /// fresh sync starts. A null name means the peer published none, and the
+  /// page renders the localized `device <shortId>` label instead -- resolving
+  /// it here is impossible because a notifier has no BuildContext.
+  final List<({String? name, String shortId})> skippedPeerLabels;
   final bool isAuthenticated;
   final bool firstSyncAwaitingConfirmation;
 
@@ -508,6 +515,7 @@ class SyncState {
     this.pendingChanges = 0,
     this.conflicts = 0,
     this.newerSchemaPeerCount = 0,
+    this.skippedPeerLabels = const [],
     this.isAuthenticated = false,
     this.firstSyncAwaitingConfirmation = false,
     this.postRestoreSyncing = false,
@@ -526,6 +534,7 @@ class SyncState {
     int? pendingChanges,
     int? conflicts,
     int? newerSchemaPeerCount,
+    List<({String? name, String shortId})>? skippedPeerLabels,
     bool? isAuthenticated,
     bool? firstSyncAwaitingConfirmation,
     bool? postRestoreSyncing,
@@ -545,6 +554,7 @@ class SyncState {
       pendingChanges: pendingChanges ?? this.pendingChanges,
       conflicts: conflicts ?? this.conflicts,
       newerSchemaPeerCount: newerSchemaPeerCount ?? this.newerSchemaPeerCount,
+      skippedPeerLabels: skippedPeerLabels ?? this.skippedPeerLabels,
       isAuthenticated: isAuthenticated ?? this.isAuthenticated,
       firstSyncAwaitingConfirmation:
           firstSyncAwaitingConfirmation ?? this.firstSyncAwaitingConfirmation,
@@ -815,6 +825,25 @@ class SyncNotifier extends StateNotifier<SyncState> {
     }
   }
 
+  /// (name, shortId) per peer the epoch fence held back. Returns the raw
+  /// pieces rather than finished strings: a notifier has no BuildContext, so
+  /// the unnamed-device fallback has to be localized by the page. Sorted so
+  /// the banner text is stable across syncs instead of reordering each pull.
+  List<({String? name, String shortId})> _skippedPeerLabels(SyncResult result) {
+    final entries =
+        result.skippedPeerDeviceIds.map((id) {
+          final name = result.skippedPeerNames[id];
+          final shortId = id.length > 8 ? id.substring(0, 8) : id;
+          return (
+            name: (name != null && name.isNotEmpty) ? name : null,
+            shortId: shortId,
+          );
+        }).toList()..sort(
+          (a, b) => (a.name ?? a.shortId).compareTo(b.name ?? b.shortId),
+        );
+    return entries;
+  }
+
   /// Blast radius for the Replace confirmation. Never throws: a failed or slow
   /// peer listing degrades to a null count, because a pre-check must not gate
   /// the escape hatch it is describing.
@@ -1065,6 +1094,7 @@ class SyncNotifier extends StateNotifier<SyncState> {
         message: 'Starting sync...',
         progress: 0.0,
         newerSchemaPeerCount: 0,
+        skippedPeerLabels: const [],
         firstSyncAwaitingConfirmation: false,
         replaceAwaitingAdoption: false,
         needsPassphrase: false,
@@ -1139,6 +1169,7 @@ class SyncNotifier extends StateNotifier<SyncState> {
             lastSync: result.lastSyncTime,
             conflicts: result.conflictsFound,
             newerSchemaPeerCount: result.newerSchemaPeerDeviceIds.length,
+            skippedPeerLabels: _skippedPeerLabels(result),
             progress: 1.0,
           );
           // Mark this provider established and consume any post-restore intent:

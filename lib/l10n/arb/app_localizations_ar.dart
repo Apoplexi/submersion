@@ -13537,6 +13537,27 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String settings_cloudSync_peerNeedsAdopt_banner(Object deviceList) {
+    return '$deviceList لا يزال يستخدم إصدار مكتبة أقدم أو غير معروف، لذلك لم تُدمج تغييراته. افتح Submersion عليه لاعتماد المكتبة الحالية.';
+  }
+
+  @override
+  String settings_cloudSync_peerNeedsAdopt_bannerPlural(Object deviceList) {
+    return '$deviceList لا تزال تستخدم إصدار مكتبة أقدم أو غير معروف، لذلك لم تُدمج تغييراتها. افتح Submersion عليها لاعتماد المكتبة الحالية.';
+  }
+
+  @override
+  String settings_cloudSync_peerNeedsAdopt_unnamedDevice(Object shortId) {
+    return 'الجهاز $shortId';
+  }
+
+  @override
+  String get settings_cloudSync_peerNeedsAdopt_listSeparator => '، ';
+
+  @override
+  String get settings_cloudSync_peerNeedsAdopt_listLastSeparator => ' و';
+
+  @override
   String settings_cloudSync_peerRequiresUpdate_banner(num count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

@@ -7956,6 +7956,14 @@
   "settings_cloudSync_header_syncBehavior": "Sync Behavior",
   "settings_cloudSync_lastSynced": "Last synced: {time}",
   "settings_cloudSync_pendingChanges": "{count, plural, =1{1 pending change} other{{count} pending changes}}",
+  "settings_cloudSync_peerNeedsAdopt_banner": "{deviceList} still has an older or unknown library version, so its changes were not merged. Open Submersion on it to adopt the current library.",
+  "settings_cloudSync_peerNeedsAdopt_bannerPlural": "{deviceList} still have an older or unknown library version, so their changes were not merged. Open Submersion on them to adopt the current library.",
+  "settings_cloudSync_peerNeedsAdopt_unnamedDevice": "device {shortId}",
+  "settings_cloudSync_peerNeedsAdopt_listSeparator": ", ",
+  "settings_cloudSync_peerNeedsAdopt_listLastSeparator": " and ",
+  "@settings_cloudSync_peerNeedsAdopt_listLastSeparator": {
+    "description": "Joins the final two device names, e.g. \"Erics-iPhone and Erics-iPad\". Include the surrounding spaces the locale needs."
+  },
   "settings_cloudSync_peerRequiresUpdate_banner": "{count, plural, =1{1 device syncs from a newer version of Submersion. Update this device to receive its latest changes.} other{{count} devices sync from a newer version of Submersion. Update this device to receive their latest changes.}}",
   "settings_cloudSync_provider_connected": "Connected",
   "settings_cloudSync_provider_connectedTo": "Connected to {providerName}",

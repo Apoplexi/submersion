@@ -18,6 +18,7 @@ import 'package:submersion/features/settings/presentation/providers/sync_provide
 import 'package:submersion/features/settings/presentation/pages/troubleshoot_sync_page.dart';
 import 'package:submersion/features/settings/presentation/widgets/adopt_replaced_library_dialog.dart';
 import 'package:submersion/features/settings/presentation/widgets/replace_cloud_library_dialog.dart';
+import 'package:submersion/features/settings/presentation/widgets/skipped_peer_banner.dart';
 import 'package:submersion/features/settings/presentation/widgets/conflict_resolution_dialog.dart';
 import 'package:submersion/features/settings/presentation/widgets/dropbox_connect_dialog.dart';
 import 'package:submersion/features/settings/presentation/widgets/encryption_settings_section.dart';
@@ -1009,6 +1010,7 @@ class CloudSyncPage extends ConsumerWidget {
                 ),
               ),
             ),
+          SkippedPeerBanner(peers: syncState.skippedPeerLabels),
           if (syncState.newerSchemaPeerCount > 0)
             Padding(
               padding: const EdgeInsets.only(bottom: 12),

@@ -383,8 +383,15 @@ class SyncService {
   /// advance state. Re-pulls are idempotent (upsert + HLC), so a partial apply
   /// leaves state unadvanced and retries next sync rather than losing records.
   /// Builds the user-facing result messages for a completed pull. Extracted
-  /// so the phrasing and precedence (failures suppress peer notices) are
+  /// so the phrasing and precedence (failures suppress everything else) are
   /// unit-testable without a full sync.
+  ///
+  /// Peer notices are deliberately NOT here. Stale-epoch and newer-schema
+  /// peers are carried as structured fields on [SyncResult] and rendered as
+  /// localized banners by the Cloud Sync page; building them here produced
+  /// untranslated English, and in the newer-schema case the notice appeared
+  /// twice. The peer parameters are kept so callers need not change and the
+  /// precedence rule stays expressible.
   @visibleForTesting
   static List<String> pullResultMessages({
     required int recordsFailed,
@@ -397,24 +404,6 @@ class SyncService {
       final recordWord = recordsFailed == 1 ? 'record' : 'records';
       resultMessages.add('$recordsFailed $recordWord failed to apply');
       return resultMessages;
-    }
-    final skippedCount = skippedPeerDeviceIds.length;
-    if (skippedCount > 0) {
-      final deviceWord = skippedCount == 1 ? 'device' : 'devices';
-      final verb = skippedCount == 1 ? 'has' : 'have';
-      resultMessages.add(
-        '$skippedCount $deviceWord still $verb an older or unknown '
-        'library version and were not merged. Those devices must adopt '
-        'the current library.',
-      );
-    }
-    final newerCount = newerSchemaPeerDeviceIds.length;
-    if (newerCount > 0) {
-      final phrase = newerCount == 1 ? 'device runs' : 'devices run';
-      resultMessages.add(
-        '$newerCount $phrase a newer version of Submersion; their latest '
-        'changes were not merged. Update this device to receive them.',
-      );
     }
     if (adoptedFreshIdentity) {
       resultMessages.add(

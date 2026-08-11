@@ -23183,6 +23183,36 @@ abstract class AppLocalizations {
   /// **'{count, plural, =1{1 pending change} other{{count} pending changes}}'**
   String settings_cloudSync_pendingChanges(int count);
 
+  /// No description provided for @settings_cloudSync_peerNeedsAdopt_banner.
+  ///
+  /// In en, this message translates to:
+  /// **'{deviceList} still has an older or unknown library version, so its changes were not merged. Open Submersion on it to adopt the current library.'**
+  String settings_cloudSync_peerNeedsAdopt_banner(Object deviceList);
+
+  /// No description provided for @settings_cloudSync_peerNeedsAdopt_bannerPlural.
+  ///
+  /// In en, this message translates to:
+  /// **'{deviceList} still have an older or unknown library version, so their changes were not merged. Open Submersion on them to adopt the current library.'**
+  String settings_cloudSync_peerNeedsAdopt_bannerPlural(Object deviceList);
+
+  /// No description provided for @settings_cloudSync_peerNeedsAdopt_unnamedDevice.
+  ///
+  /// In en, this message translates to:
+  /// **'device {shortId}'**
+  String settings_cloudSync_peerNeedsAdopt_unnamedDevice(Object shortId);
+
+  /// No description provided for @settings_cloudSync_peerNeedsAdopt_listSeparator.
+  ///
+  /// In en, this message translates to:
+  /// **', '**
+  String get settings_cloudSync_peerNeedsAdopt_listSeparator;
+
+  /// Joins the final two device names, e.g. "Erics-iPhone and Erics-iPad". Include the surrounding spaces the locale needs.
+  ///
+  /// In en, this message translates to:
+  /// **' and '**
+  String get settings_cloudSync_peerNeedsAdopt_listLastSeparator;
+
   /// No description provided for @settings_cloudSync_peerRequiresUpdate_banner.
   ///
   /// In en, this message translates to:
