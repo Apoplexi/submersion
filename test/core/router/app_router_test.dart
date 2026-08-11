@@ -692,6 +692,8 @@ void main() {
     const destinations = <String>[
       '/equipment',
       '/equipment/new',
+      // Gear chips and urgent-banner lines deep-link to one item (issue #816).
+      '/equipment/e1',
       '/settings/diver-profile/insurance',
       '/planning/no-fly',
       '/dives',
