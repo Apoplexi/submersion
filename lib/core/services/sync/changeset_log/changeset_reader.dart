@@ -24,6 +24,7 @@ class ChangesetReadResult {
     required this.payloadsApplied,
     this.peerManifests = const [],
     this.skippedPeerDeviceIds = const {},
+    this.skippedPeerNames = const {},
     this.newerSchemaPeerDeviceIds = const {},
     this.retiredPeerIds = const {},
     this.retiredPeerHasFiles = false,
@@ -39,6 +40,12 @@ class ChangesetReadResult {
   /// belong to the current library epoch. The caller should surface these to
   /// the user rather than reporting a misleadingly clean sync.
   final Set<String> skippedPeerDeviceIds;
+
+  /// Display names for the entries in [skippedPeerDeviceIds] that published
+  /// one, keyed by device id. Peers on manifests written before the name field
+  /// existed, and peers whose hostname identifies nothing, are simply absent;
+  /// the UI falls back to a short id label for those.
+  final Map<String, String> skippedPeerNames;
 
   /// Peers held because their manifests were published from a newer database
   /// schema than this build understands. Merging them would silently drop the
@@ -107,6 +114,7 @@ class ChangesetReader {
     );
     final peerManifests = <SyncManifest>[];
     final skippedPeerDeviceIds = <String>{};
+    final skippedPeerNames = <String, String>{};
     final newerSchemaPeerDeviceIds = <String>{};
 
     var peersProcessed = 0;
@@ -131,6 +139,10 @@ class ChangesetReader {
         // heartbeats rewrite updatedAt without changing the library epoch.
         if (currentEpochId != null && manifest.epochId != currentEpochId) {
           skippedPeerDeviceIds.add(peerId);
+          final name = manifest.deviceName;
+          if (name != null && name.isNotEmpty) {
+            skippedPeerNames[peerId] = name;
+          }
           continue;
         }
 
@@ -220,6 +232,7 @@ class ChangesetReader {
       payloadsApplied: payloadsApplied,
       peerManifests: peerManifests,
       skippedPeerDeviceIds: skippedPeerDeviceIds,
+      skippedPeerNames: skippedPeerNames,
       newerSchemaPeerDeviceIds: newerSchemaPeerDeviceIds,
       retiredPeerIds: retiredPeerIds,
       retiredPeerHasFiles: retiredPeerHasFiles,

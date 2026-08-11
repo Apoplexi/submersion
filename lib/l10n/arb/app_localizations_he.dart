@@ -2887,6 +2887,14 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
+  String get dashboard_hero_divesTotalOne => 'צלילה אחת';
+
+  @override
+  String dashboard_hero_divesTotalOther(Object count) {
+    return '$count צלילות';
+  }
+
+  @override
   String get dashboard_hero_error => 'מוכן לחקור את המעמקים?';
 
   @override
@@ -11472,6 +11480,56 @@ class AppLocalizationsHe extends AppLocalizations {
   String get media_diveMediaSection_unlinkSuccess => 'קישור התמונה בוטל';
 
   @override
+  String get media_siteMediaSection_title => 'מדיה של האתר';
+
+  @override
+  String get media_siteMediaSection_addPhotos => 'הוספת תמונות או סרטונים';
+
+  @override
+  String get media_siteMediaSection_addDocument => 'הוספת מסמך';
+
+  @override
+  String get media_siteMediaSection_emptyState =>
+      'אין מפות, תמונות או מסמכים המצורפים לאתר זה';
+
+  @override
+  String media_siteMediaSection_divePhotosGroup(int count) {
+    return 'תמונות מצלילות כאן ($count)';
+  }
+
+  @override
+  String get media_siteMediaSection_divePhotoLabel => 'תמונת צלילה';
+
+  @override
+  String media_siteMediaSection_unlinkSelectedTitle(int count) {
+    return 'להסיר $count קבצים מצורפים?';
+  }
+
+  @override
+  String get media_siteMediaSection_unlinkSelectedContent =>
+      'הפריטים שנבחרו יוסרו מאתר זה. קבצים בספריית התמונות או בדיסק לא יימחקו.';
+
+  @override
+  String media_siteMediaSection_unlinkSelectedSuccess(int count) {
+    return 'הוסרו $count קבצים מצורפים';
+  }
+
+  @override
+  String get media_documentViewer_title => 'מסמך';
+
+  @override
+  String get media_documentViewer_unavailable => 'מסמך זה אינו זמין במכשיר זה';
+
+  @override
+  String get media_documentViewer_availableOnOriginDevice =>
+      'הוא זמין במכשיר שממנו נוסף, או דרך אחסון מדיה מוגדר.';
+
+  @override
+  String media_documentViewer_attached(int count) {
+    return 'צורפו $count מסמכים';
+  }
+
+  @override
   String get media_diveScan_scanTooltip => 'סרוק גלריה לחיפוש תמונות';
 
   @override
@@ -13280,11 +13338,75 @@ class AppLocalizationsHe extends AppLocalizations {
   String get settings_cloudSync_adopt_notNow => 'לא עכשיו';
 
   @override
+  String get settings_cloudSync_dangerZone => 'אזור מסוכן';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_tile => 'החלפת ספריית הענן';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_tileSubtitle =>
+      'להפוך את הספרייה של מכשיר זה לספרייה שכל המכשירים משתמשים בה';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_dialogTitle =>
+      'להחליף את ספריית הענן?';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_dialogIntro =>
+      'הספרייה של מכשיר זה הופכת לספרייה שכל המכשירים משתמשים בה.';
+
+  @override
+  String settings_cloudSync_replaceLibrary_dialogBody(num diveCount) {
+    String _temp0 = intl.Intl.pluralLogic(
+      diveCount,
+      locale: localeName,
+      other: 'ספריית הענן נמחקת ומוחלפת ב-$diveCount הצלילות שבמכשיר זה.',
+      one: 'ספריית הענן נמחקת ומוחלפת בצלילה 1 שבמכשיר זה.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String settings_cloudSync_replaceLibrary_peers(num peerCount) {
+    String _temp0 = intl.Intl.pluralLogic(
+      peerCount,
+      locale: localeName,
+      other:
+          '$peerCount מכשירים נוספים יתבקשו לאמץ אותה; עד אז השינויים שלהם לא ימוזגו.',
+      one: 'מכשיר אחד נוסף יתבקש לאמץ אותה; עד אז השינויים שלו לא ימוזגו.',
+      zero: 'אף מכשיר אחר עדיין לא מסתנכרן, ולכן אין מה לאמץ.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get settings_cloudSync_replaceLibrary_peersUnknown =>
+      'כל שאר המכשירים יתבקשו לאמץ אותה; עד אז השינויים שלהם לא ימוזגו.';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_backupNote =>
+      'תחילה נוצר גיבוי של מכשיר זה. לא ניתן לבטל פעולה זו.';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_confirmWord => 'החלפה';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_confirmHint =>
+      'הקלד \"החלפה\" לאישור';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_confirm => 'החלפה';
+
+  @override
   String get settings_cloudSync_firstSync_banner =>
       'הסנכרון הראשון ממתין לאישור. הקש על \'סנכרן עכשיו\' כדי לבדוק מה ישולב.';
 
   @override
   String get settings_cloudSync_firstSync_dialogConfirm => 'מזג וסנכרן';
+
+  @override
+  String get settings_cloudSync_firstSync_replaceHint =>
+      'אם במקום זאת הספרייה של מכשיר זה אמורה להחליף את מה שנמצא בענן, בטל והשתמש בהגדרות > סנכרון ענן > החלפת ספריית הענן.';
 
   @override
   String settings_cloudSync_firstSync_dialogContent(
@@ -13371,6 +13493,27 @@ class AppLocalizationsHe extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String settings_cloudSync_peerNeedsAdopt_banner(Object deviceList) {
+    return 'ל$deviceList עדיין יש גרסת ספרייה ישנה או לא מוכרת, ולכן השינויים שלו לא מוזגו. פתח את Submersion במכשיר כדי לאמץ את הספרייה הנוכחית.';
+  }
+
+  @override
+  String settings_cloudSync_peerNeedsAdopt_bannerPlural(Object deviceList) {
+    return 'ל$deviceList עדיין יש גרסת ספרייה ישנה או לא מוכרת, ולכן השינויים שלהם לא מוזגו. פתח את Submersion במכשירים כדי לאמץ את הספרייה הנוכחית.';
+  }
+
+  @override
+  String settings_cloudSync_peerNeedsAdopt_unnamedDevice(Object shortId) {
+    return 'מכשיר $shortId';
+  }
+
+  @override
+  String get settings_cloudSync_peerNeedsAdopt_listSeparator => ', ';
+
+  @override
+  String get settings_cloudSync_peerNeedsAdopt_listLastSeparator => ' ו-';
 
   @override
   String settings_cloudSync_peerRequiresUpdate_banner(num count) {
@@ -14660,14 +14803,17 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get settings_storage_resetDatabase_subtitle =>
-      'מחק את כל הנתונים והתחל מחדש';
+      'מחק את כל הנתונים במכשיר זה והתחל מחדש';
 
   @override
   String get settings_storage_resetDialog_title => 'לאפס את מסד הנתונים?';
 
   @override
   String get settings_storage_resetDialog_body =>
-      'פעולה זו תמחק לצמיתות את כל הנתונים שלך כולל צלילות, אתרים, ציוד והגדרות. גיבוי ייווצר אוטומטית לפני האיפוס.';
+      'פעולה זו מוחקת לצמיתות את כל הנתונים במכשיר הזה, כולל צלילות, אתרים, ציוד והגדרות. גיבוי נוצר אוטומטית לפני האיפוס.\n\nספריית הענן שלך לא נמחקת, ומכשירים אחרים שומרים על הנתונים שלהם. סנכרון הענן ינותק כדי שהאיפוס לא יבוטל; ניתן לחבר אותו מחדש בהגדרות > סנכרון ענן.';
+
+  @override
+  String get settings_storage_resetDialog_confirmWord => 'מחיקה';
 
   @override
   String get settings_storage_resetDialog_confirmHint =>
@@ -14690,7 +14836,7 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get settings_storage_resetComplete_description =>
-      'הנתונים שלך נמחקו וגיבוי נשמר. הקש על המשך כדי לטעון מחדש את האפליקציה.';
+      'הנתונים במכשיר זה נמחקו וגיבוי נשמר. סנכרון הענן מנותק כעת כדי שהאיפוס לא יבוטל; ניתן לחבר אותו מחדש בהגדרות > סנכרון ענן. הקש על המשך כדי לטעון מחדש את האפליקציה.';
 
   @override
   String get settings_summary_activeDiver => 'צולל פעיל';
@@ -22929,4 +23075,21 @@ class AppLocalizationsHe extends AppLocalizations {
   String statistics_conditions_visibility_legacySuffix(String band) {
     return '$band (נרשם לפני מדידה)';
   }
+
+  @override
+  String common_selection_countSelected(Object count) {
+    return '$count נבחרו';
+  }
+
+  @override
+  String get common_selection_enterTooltip => 'בחירת פריטים';
+
+  @override
+  String get common_selection_exitTooltip => 'יציאה מבחירה';
+
+  @override
+  String get common_selection_selectAllTooltip => 'בחר הכול';
+
+  @override
+  String get common_selection_deselectAllTooltip => 'בטל בחירת הכול';
 }

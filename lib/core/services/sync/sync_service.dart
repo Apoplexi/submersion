@@ -29,6 +29,7 @@ import 'package:submersion/core/services/sync/changeset_log/sync_manifest.dart';
 import 'package:submersion/core/services/sync/changeset_log/tombstone_horizon.dart';
 import 'package:submersion/core/services/sync/hlc.dart';
 import 'package:submersion/core/services/sync/library_epoch.dart';
+import 'package:submersion/core/services/sync/sync_device_metadata.dart';
 import 'package:submersion/core/services/sync/library_epoch_store.dart';
 import 'package:submersion/core/services/sync/crypto/crypto_errors.dart';
 import 'package:submersion/core/services/sync/crypto/sync_encryption_service.dart';
@@ -65,6 +66,11 @@ class SyncResult {
   /// can be safely merged.
   final Set<String> skippedPeerDeviceIds;
 
+  /// Display names for the entries in [skippedPeerDeviceIds] that published
+  /// one. An absent entry means the peer is on an older manifest, or its
+  /// hostname identifies nothing; render a short id instead.
+  final Map<String, String> skippedPeerNames;
+
   /// Peers held because they publish from a newer database schema than this
   /// build understands. Their data applies after this device updates.
   final Set<String> newerSchemaPeerDeviceIds;
@@ -82,6 +88,7 @@ class SyncResult {
     this.lastSyncTime,
     this.adoptedFreshIdentity = false,
     this.skippedPeerDeviceIds = const {},
+    this.skippedPeerNames = const {},
     this.newerSchemaPeerDeviceIds = const {},
     this.replaceMarker,
   });
@@ -376,8 +383,15 @@ class SyncService {
   /// advance state. Re-pulls are idempotent (upsert + HLC), so a partial apply
   /// leaves state unadvanced and retries next sync rather than losing records.
   /// Builds the user-facing result messages for a completed pull. Extracted
-  /// so the phrasing and precedence (failures suppress peer notices) are
+  /// so the phrasing and precedence (failures suppress everything else) are
   /// unit-testable without a full sync.
+  ///
+  /// Peer notices are deliberately NOT here. Stale-epoch and newer-schema
+  /// peers are carried as structured fields on [SyncResult] and rendered as
+  /// localized banners by the Cloud Sync page; building them here produced
+  /// untranslated English, and in the newer-schema case the notice appeared
+  /// twice. The peer parameters are kept so callers need not change and the
+  /// precedence rule stays expressible.
   @visibleForTesting
   static List<String> pullResultMessages({
     required int recordsFailed,
@@ -390,24 +404,6 @@ class SyncService {
       final recordWord = recordsFailed == 1 ? 'record' : 'records';
       resultMessages.add('$recordsFailed $recordWord failed to apply');
       return resultMessages;
-    }
-    final skippedCount = skippedPeerDeviceIds.length;
-    if (skippedCount > 0) {
-      final deviceWord = skippedCount == 1 ? 'device' : 'devices';
-      final verb = skippedCount == 1 ? 'has' : 'have';
-      resultMessages.add(
-        '$skippedCount $deviceWord still $verb an older or unknown '
-        'library version and were not merged. Those devices must adopt '
-        'the current library.',
-      );
-    }
-    final newerCount = newerSchemaPeerDeviceIds.length;
-    if (newerCount > 0) {
-      final phrase = newerCount == 1 ? 'device runs' : 'devices run';
-      resultMessages.add(
-        '$newerCount $phrase a newer version of Submersion; their latest '
-        'changes were not merged. Update this device to receive them.',
-      );
     }
     if (adoptedFreshIdentity) {
       resultMessages.add(
@@ -586,6 +582,7 @@ class SyncService {
             deletions: deletions,
             epochId: currentEpochId,
             uploadNonce: uploadNonce,
+            deviceName: await _deviceNameForManifest(),
             appliedPeerHlc: appliedPeerHlc,
           );
           // A publish that did not stamp this nonce into the manifest -- a
@@ -687,6 +684,7 @@ class SyncService {
         lastSyncTime: recordsFailed == 0 ? now : null,
         adoptedFreshIdentity: adoptedFreshIdentity,
         skippedPeerDeviceIds: pullResult.skippedPeerDeviceIds,
+        skippedPeerNames: pullResult.skippedPeerNames,
         newerSchemaPeerDeviceIds: pullResult.newerSchemaPeerDeviceIds,
       );
     } on TimeoutException {
@@ -718,6 +716,22 @@ class SyncService {
   /// Run the library-epoch gate. Returns a terminal result the caller must
   /// return immediately, or the resolved currentEpochId to proceed with.
   /// Mirrors the inline gate the legacy full-file performSync used.
+  String? _cachedDeviceName;
+  bool _deviceNameResolved = false;
+
+  /// The name published on this device's manifest so peers can name it in the
+  /// "still needs to adopt" banner. Resolved once per service lifetime: the
+  /// hostname does not change while the app runs, and publish is on the sync
+  /// hot path. Null when the hostname identifies nothing.
+  Future<String?> _deviceNameForManifest() async {
+    if (_deviceNameResolved) return _cachedDeviceName;
+    _cachedDeviceName = (await SyncDeviceMetadata(
+      _syncRepository,
+    ).resolve()).name;
+    _deviceNameResolved = true;
+    return _cachedDeviceName;
+  }
+
   Future<_EpochGate> _runEpochGate(CloudStorageProvider provider) async {
     final epochStore = _epochStore;
     if (epochStore == null) return const _EpochGate.proceed(null);
@@ -2662,6 +2676,7 @@ class SyncService {
         deletions: deletions,
         epochId: marker.epochId,
         uploadNonce: uploadNonce,
+        deviceName: await _deviceNameForManifest(),
       );
 
       final now = DateTime.now();

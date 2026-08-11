@@ -3,14 +3,21 @@ import 'dart:io';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:workmanager/workmanager.dart';
 
+import 'package:submersion/core/data/repositories/sync_repository.dart'
+    show CloudProviderType;
 import 'package:submersion/core/database/sqlcipher_setup.dart';
+import 'package:submersion/core/services/cloud_storage/cloud_storage_provider.dart';
+import 'package:submersion/core/services/cloud_storage/headless_cloud_provider.dart';
 import 'package:submersion/core/services/database_service.dart';
 import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/core/services/security/database_security_service.dart';
 import 'package:submersion/core/services/notification_service.dart';
+import 'package:submersion/core/services/sync/crypto/encryption_key_store.dart';
+import 'package:submersion/core/services/sync/sync_preferences.dart';
 import 'package:submersion/features/backup/data/repositories/backup_preferences.dart';
 import 'package:submersion/features/backup/data/services/backup_encryption_key_store.dart';
 import 'package:submersion/features/backup/data/services/backup_service.dart';
+import 'package:submersion/features/backup/domain/entities/backup_record.dart';
 import 'package:submersion/features/equipment/data/repositories/equipment_repository_impl.dart';
 import 'package:submersion/features/notifications/data/repositories/scheduled_notification_repository.dart';
 import 'package:submersion/features/notifications/data/services/notification_scheduler.dart';
@@ -64,7 +71,11 @@ void callbackDispatcher() {
       if (task == kNotificationRefreshTask) {
         await _refreshNotifications(log);
       } else if (task == kBackupTask) {
-        await _performScheduledBackup(log);
+        await runScheduledBackup(
+          prefs: prefs,
+          dbAdapter: DefaultBackupDatabaseAdapter(DatabaseService.instance),
+          log: log,
+        );
       }
 
       log.info('Background task completed: $task');
@@ -104,12 +115,71 @@ Future<void> _refreshNotifications(LoggerService log) async {
   await scheduler.scheduleAll(settings: settings);
 }
 
-Future<void> _performScheduledBackup(LoggerService log) async {
+/// The [BackupService] the scheduled backup runs on.
+///
+/// Every store this reaches for is isolate-safe: SharedPreferences and secure
+/// storage (credentials, both encryption keys). That is what lets a scheduled
+/// backup honour the user's "Cloud Backup" switch -- for a long time this
+/// isolate built a cloud-less service, so automatic backups silently stayed on
+/// the device while the UI advertised cloud uploads (issue #969).
+///
+/// The two key stores are separately load-bearing:
+///   * backup encryption -- when the flag is on, the artifact MUST be written
+///     as an encrypted `.sbe`, otherwise `_activeBackupKey` fails closed and
+///     the whole scheduled backup throws.
+///   * sync encryption -- the cloud copy of an otherwise-plaintext backup is
+///     framed before upload, exactly as the foreground path frames it, so
+///     restore sees one artifact format regardless of who wrote it.
+///
+/// [instanceFor] is a test seam for the cloud-provider singletons.
+Future<BackupService> buildScheduledBackupService({
+  required SharedPreferences prefs,
+  required BackupDatabaseAdapter dbAdapter,
+  CloudStorageProvider Function(CloudProviderType type)? instanceFor,
+}) async {
+  // One store for both the provider wrap and the upload's framing, mirroring
+  // the foreground's single encryptionKeyStoreProvider.
+  final encryptionKeyStore = EncryptionKeyStore();
+  return BackupService(
+    dbAdapter: dbAdapter,
+    preferences: BackupPreferences(prefs),
+    cloudProvider: await resolveHeadlessCloudProvider(
+      prefs: prefs,
+      encryptionKeyStore: encryptionKeyStore,
+      instanceFor: instanceFor,
+    ),
+    encryptionKeyStore: encryptionKeyStore,
+    syncPreferences: SyncPreferences(prefs),
+    backupEncryptionKeyStore: BackupEncryptionKeyStore(),
+  );
+}
+
+/// How the scheduled backup reports its outcome. A seam over
+/// [NotificationService.showBackupNotification] so the flow's decisions --
+/// above all whether the cloud copy is missing -- are assertable without a
+/// platform channel.
+typedef BackupNotifier =
+    Future<void> Function({
+      required bool success,
+      String? error,
+      bool cloudCopyMissing,
+    });
+
+/// Run the scheduled backup if one is due, then report the outcome.
+///
+/// [notify] and [instanceFor] are seams for tests; production passes neither.
+Future<void> runScheduledBackup({
+  required SharedPreferences prefs,
+  required BackupDatabaseAdapter dbAdapter,
+  required LoggerService log,
+  BackupNotifier? notify,
+  CloudStorageProvider Function(CloudProviderType type)? instanceFor,
+}) async {
   log.info('Checking if scheduled backup is due');
 
-  final prefs = await SharedPreferences.getInstance();
-  final preferences = BackupPreferences(prefs);
-  final settings = preferences.getSettings();
+  final notifier =
+      notify ?? NotificationService.instance.showBackupNotification;
+  final settings = BackupPreferences(prefs).getSettings();
 
   if (!settings.enabled) {
     log.info('Automatic backups disabled, skipping');
@@ -123,28 +193,27 @@ Future<void> _performScheduledBackup(LoggerService log) async {
 
   log.info('Backup is due, starting automatic backup');
 
-  // Background isolate cannot access cloud auth, so backup is local-only.
-  // The backup-encryption key store IS injected: when the user has enabled
-  // backup encryption, the scheduled backup must still be written as an
-  // encrypted .sbe (otherwise _activeBackupKey fails closed and the whole
-  // scheduled backup fails). Secure storage is reachable from this isolate.
-  final dbAdapter = DefaultBackupDatabaseAdapter(DatabaseService.instance);
-  final service = BackupService(
+  final service = await buildScheduledBackupService(
+    prefs: prefs,
     dbAdapter: dbAdapter,
-    preferences: preferences,
-    backupEncryptionKeyStore: BackupEncryptionKeyStore(),
+    instanceFor: instanceFor,
   );
 
   try {
     final record = await service.performBackup(isAutomatic: true);
-    log.info('Automatic backup completed: ${record.filename}');
-    await NotificationService.instance.showBackupNotification(success: true);
+    // The record's location is the only honest signal: the upload swallows
+    // its own failures to protect the local artifact, so a cloud copy the
+    // user asked for can be missing from an otherwise successful backup.
+    final cloudCopyMissing =
+        settings.cloudBackupEnabled && record.location == BackupLocation.local;
+    log.info(
+      'Automatic backup completed: ${record.filename} '
+      '(location: ${record.location.name})',
+    );
+    await notifier(success: true, cloudCopyMissing: cloudCopyMissing);
   } catch (e, stack) {
     log.error('Automatic backup failed', error: e, stackTrace: stack);
-    await NotificationService.instance.showBackupNotification(
-      success: false,
-      error: e.toString(),
-    );
+    await notifier(success: false, error: e.toString());
   }
 }
 

@@ -11,6 +11,7 @@ import 'package:submersion/features/divers/presentation/providers/diver_provider
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/features/statistics/data/repositories/statistics_repository.dart';
 import 'package:submersion/features/statistics/domain/career_totals.dart';
+import 'package:submersion/features/statistics/presentation/providers/statistics_filter_provider.dart';
 import 'package:submersion/features/statistics/presentation/providers/statistics_providers.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 
@@ -47,13 +48,21 @@ class _OverviewBody extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final diverAsync = ref.watch(currentDiverProvider);
+    // The prior-dive offset is a single lifetime scalar -- no date, site or
+    // buddy behind it -- so it cannot be narrowed to a filtered subset. While a
+    // filter is active the totals stay logged-only, rather than adding an
+    // entire pre-app career on top of (say) one year's dives.
+    final filtered = ref.watch(
+      statisticsFilterProvider.select((f) => f.hasActiveFilters),
+    );
     // With no logged dives, whether to show the empty state depends on prior
     // experience -- so wait for the diver to resolve rather than briefly
     // flashing the empty state (currentDiverProvider is a FutureProvider).
-    if (stats.totalDives == 0 && diverAsync.isLoading) {
+    // Irrelevant under a filter, where prior experience is excluded anyway.
+    if (stats.totalDives == 0 && !filtered && diverAsync.isLoading) {
       return const Center(child: CircularProgressIndicator());
     }
-    final diver = diverAsync.valueOrNull;
+    final diver = filtered ? null : diverAsync.valueOrNull;
     final career = CareerTotals.from(
       loggedDives: stats.totalDives,
       loggedTimeSeconds: stats.totalTimeSeconds,

@@ -4,7 +4,9 @@ import 'dart:typed_data';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/services/export/export_service.dart';
+import 'package:submersion/core/constants/units.dart';
 import 'package:submersion/core/services/export/pdf/pdf_export_service.dart';
+import 'package:submersion/core/services/pdf_templates/pdf_date_formatter.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
 
 import '../../../../helpers/mock_file_picker_platform.dart';
@@ -36,6 +38,13 @@ class _RecordingPicker extends MockFilePickerPlatform {
 
 /// [PdfExportService.savePdfBytesToFile] is the seam the template-aware save
 /// flow uses so the selected detail level survives to disk (#644).
+/// The historical ISO rendering these tests were written against; the diver's
+/// own date and time preferences are covered in pdf_date_preference_test.dart.
+final isoDates = PdfDateFormatter(
+  dateFormat: DateFormatPreference.yyyymmdd,
+  timeFormat: TimeFormat.twentyFourHour,
+);
+
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
@@ -110,7 +119,7 @@ void main() {
         runtime: const Duration(minutes: 62),
         maxDepth: 25.0,
       ),
-    ]);
+    ], dates: isoDates);
 
     expect(path, target);
     expect(picker.requestedFileName, startsWith('dive_logbook_'));

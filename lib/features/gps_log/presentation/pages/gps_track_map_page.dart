@@ -19,6 +19,7 @@ import 'package:submersion/features/maps/presentation/widgets/trackpad_zoom_map.
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:submersion/shared/providers/map_list_selection_provider.dart';
+import 'package:submersion/shared/widgets/app_date_picker.dart';
 import 'package:submersion/shared/widgets/map_list_layout/map_list_scaffold.dart';
 
 const String _kSectionKey = 'gps-tracks';
@@ -36,7 +37,7 @@ class _GpsTrackMapPageState extends ConsumerState<GpsTrackMapPage> {
 
   Future<void> _pickRange() async {
     final existing = ref.read(trackDateFilterProvider);
-    final picked = await showDateRangePicker(
+    final picked = await showAppDateRangePicker(
       context: context,
       firstDate: DateTime(2000),
       lastDate: DateTime(2100),

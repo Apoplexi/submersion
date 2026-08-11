@@ -123,12 +123,16 @@ jobs:
           PREV_SHA: ${{ steps.gate.outputs.prev-sha }}
         run: |
           set -euo pipefail
+          # Every format carries this beta's delta plus a cumulative section
+          # since the last production release, so a tester arriving straight
+          # from the public build sees the whole picture wherever they read.
+          # The delta is emitted first and the capped formats truncate the
+          # cumulative tail to fit, so the change a tester is being asked to
+          # exercise is never the part that gets cut.
           ./scripts/release/beta_release_notes.sh --since "$PREV_SHA" --format store \
-            > beta-notes-store.txt
+            --cumulative > beta-notes-store.txt
           ./scripts/release/beta_release_notes.sh --since "$PREV_SHA" --format play \
-            > beta-notes-play.txt
-          # The GitHub body is uncapped, so it carries this beta's delta plus a
-          # cumulative section for testers arriving from the public release.
+            --cumulative > beta-notes-play.txt
           ./scripts/release/beta_release_notes.sh --since "$PREV_SHA" --format markdown \
             --cumulative > beta-notes.md
           echo "--- TestFlight whatsNew ---"

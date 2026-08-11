@@ -191,51 +191,69 @@ final tripByIdProvider = FutureProvider.family<Trip?, String>((ref, id) async {
 ///
 /// Scopes aggregate stats to the currently-active diver so that shared trips
 /// only show that diver's dive count, bottom time, and depth figures.
+///
+/// Self-invalidates on `dives` table writes for the same reason
+/// [TripListNotifier] subscribes to them: `getTripWithStats` LEFT JOINs the
+/// dives table, so a merge/consolidate or a sync apply changes the counts
+/// without touching the trip row. The trip detail page renders this through
+/// `TripStatStrip` directly above the itinerary that [divesForTripProvider]
+/// feeds, so leaving it stale would show "5 dives" over a list of 4.
+///
+/// Watches BOTH tables because `getTripWithStats` reads both: it calls
+/// `getTripById` before running the dives aggregate, and the page renders the
+/// returned `trip` (name, dates, location) alongside the stats. A synced
+/// rename would otherwise leave the header showing the old name indefinitely,
+/// since no dives-table write need accompany it.
 final tripWithStatsProvider = FutureProvider.family<TripWithStats, String>((
   ref,
   tripId,
 ) async {
   final repository = ref.watch(tripRepositoryProvider);
+  final diveRepository = ref.watch(diveRepositoryProvider);
   final diverId = await ref.watch(validatedCurrentDiverIdProvider.future);
+
+  ref.invalidateSelfWhen(diveRepository.watchDivesChanges());
   ref.invalidateSelfWhen(repository.watchTripsChanges());
-  // Stats aggregate the trip's dives, so a merge or bulk delete changes them
-  // without the trips table being written (issue #958).
-  ref.invalidateSelfWhen(ref.read(diveRepositoryProvider).watchDivesChanges());
+
   return repository.getTripWithStats(tripId, diverId: diverId);
 });
 
 /// Dives for a trip provider (IDs only).
 ///
 /// Scoped to the currently-active diver so that shared trips only show that
-/// diver's dives on the detail page.
+/// diver's dives on the detail page. Self-invalidates on any `dives` table
+/// write (a merge/consolidate, a direct edit, a sync apply, ...) the same way
+/// [tripListNotifierProvider] already does for the trip list's dive counts --
+/// without this, the trip detail page keeps showing a dive that a merge just
+/// folded away until something else happens to invalidate it.
 final diveIdsForTripProvider = FutureProvider.family<List<String>, String>((
   ref,
   tripId,
 ) async {
   final repository = ref.watch(tripRepositoryProvider);
+  final diveRepository = ref.watch(diveRepositoryProvider);
   final diverId = await ref.watch(validatedCurrentDiverIdProvider.future);
-  ref.invalidateSelfWhen(repository.watchTripsChanges());
-  // A junction read: the ids come from the dives table's trip_id, so a merge
-  // or a bulk delete drops one without writing trips (issue #958).
-  ref.invalidateSelfWhen(ref.read(diveRepositoryProvider).watchDivesChanges());
+
+  ref.invalidateSelfWhen(diveRepository.watchDivesChanges());
+
   return repository.getDiveIdsForTrip(tripId, diverId: diverId);
 });
 
 /// Full dive entities for a trip provider.
 ///
 /// Scoped to the currently-active diver so that shared trips only show that
-/// diver's dives.
+/// diver's dives. See [diveIdsForTripProvider] for why this self-invalidates
+/// on dives-table writes.
 final divesForTripProvider = FutureProvider.family<List<domain.Dive>, String>((
   ref,
   tripId,
 ) async {
   final tripRepository = ref.watch(tripRepositoryProvider);
-  // Read from the provider rather than constructed inline, so a test override
-  // reaches it and the tick below is wired to the same instance.
   final diveRepository = ref.watch(diveRepositoryProvider);
-  ref.invalidateSelfWhen(tripRepository.watchTripsChanges());
-  ref.invalidateSelfWhen(diveRepository.watchDivesChanges());
   final diverId = await ref.watch(validatedCurrentDiverIdProvider.future);
+
+  ref.invalidateSelfWhen(diveRepository.watchDivesChanges());
+
   final diveIds = await tripRepository.getDiveIdsForTrip(
     tripId,
     diverId: diverId,

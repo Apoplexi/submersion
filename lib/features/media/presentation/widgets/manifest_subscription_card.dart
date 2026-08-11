@@ -283,6 +283,7 @@ class _SubscriptionTile extends ConsumerWidget {
                 labelText: 'Manifest URL',
               ),
             ),
+            const SizedBox(height: 16),
             TextField(
               controller: nameController,
               decoration: const InputDecoration(

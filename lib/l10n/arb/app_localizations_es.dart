@@ -2974,6 +2974,14 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
+  String get dashboard_hero_divesTotalOne => '1 inmersión';
+
+  @override
+  String dashboard_hero_divesTotalOther(Object count) {
+    return '$count inmersiones';
+  }
+
+  @override
   String get dashboard_hero_error => '¿Listo para explorar las profundidades?';
 
   @override
@@ -11753,6 +11761,57 @@ class AppLocalizationsEs extends AppLocalizations {
   String get media_diveMediaSection_unlinkSuccess => 'Foto desvinculada';
 
   @override
+  String get media_siteMediaSection_title => 'Medios del punto de buceo';
+
+  @override
+  String get media_siteMediaSection_addPhotos => 'Añadir fotos o vídeos';
+
+  @override
+  String get media_siteMediaSection_addDocument => 'Añadir documento';
+
+  @override
+  String get media_siteMediaSection_emptyState =>
+      'No hay mapas, fotos ni documentos adjuntos a este punto de buceo';
+
+  @override
+  String media_siteMediaSection_divePhotosGroup(int count) {
+    return 'Fotos de inmersiones aquí ($count)';
+  }
+
+  @override
+  String get media_siteMediaSection_divePhotoLabel => 'Foto de inmersión';
+
+  @override
+  String media_siteMediaSection_unlinkSelectedTitle(int count) {
+    return '¿Quitar $count adjuntos?';
+  }
+
+  @override
+  String get media_siteMediaSection_unlinkSelectedContent =>
+      'Los elementos seleccionados se quitarán de este punto de buceo. Los archivos de tu fototeca o del disco no se eliminan.';
+
+  @override
+  String media_siteMediaSection_unlinkSelectedSuccess(int count) {
+    return 'Se quitaron $count adjuntos';
+  }
+
+  @override
+  String get media_documentViewer_title => 'Documento';
+
+  @override
+  String get media_documentViewer_unavailable =>
+      'Este documento no está disponible en este dispositivo';
+
+  @override
+  String get media_documentViewer_availableOnOriginDevice =>
+      'Está disponible en el dispositivo desde el que se añadió, o mediante un almacén de medios configurado.';
+
+  @override
+  String media_documentViewer_attached(int count) {
+    return 'Se adjuntaron $count documentos';
+  }
+
+  @override
   String get media_diveScan_scanTooltip => 'Buscar fotos en la galeria';
 
   @override
@@ -13611,12 +13670,81 @@ class AppLocalizationsEs extends AppLocalizations {
   String get settings_cloudSync_adopt_notNow => 'Ahora no';
 
   @override
+  String get settings_cloudSync_dangerZone => 'Zona de peligro';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_tile =>
+      'Reemplazar biblioteca en la nube';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_tileSubtitle =>
+      'Hacer que la biblioteca de este dispositivo sea la que usan todos los dispositivos';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_dialogTitle =>
+      '¿Reemplazar la biblioteca en la nube?';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_dialogIntro =>
+      'La biblioteca de este dispositivo pasa a ser la que usan todos los dispositivos.';
+
+  @override
+  String settings_cloudSync_replaceLibrary_dialogBody(num diveCount) {
+    String _temp0 = intl.Intl.pluralLogic(
+      diveCount,
+      locale: localeName,
+      other:
+          'La biblioteca en la nube se borra y se reemplaza por las $diveCount inmersiones de este dispositivo.',
+      one:
+          'La biblioteca en la nube se borra y se reemplaza por la 1 inmersión de este dispositivo.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String settings_cloudSync_replaceLibrary_peers(num peerCount) {
+    String _temp0 = intl.Intl.pluralLogic(
+      peerCount,
+      locale: localeName,
+      other:
+          'Se pedirá a $peerCount dispositivos más que la adopten; hasta entonces, sus cambios no se combinan.',
+      one:
+          'Se pedirá a 1 dispositivo más que la adopte; hasta entonces, sus cambios no se combinan.',
+      zero:
+          'Todavía no se sincroniza ningún otro dispositivo, así que no hay nada que adoptar.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get settings_cloudSync_replaceLibrary_peersUnknown =>
+      'Se pedirá a todos los demás dispositivos que la adopten; hasta entonces, sus cambios no se combinan.';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_backupNote =>
+      'Primero se crea una copia de seguridad de este dispositivo. Esta acción no se puede deshacer.';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_confirmWord => 'Reemplazar';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_confirmHint =>
+      'Escribe \"Reemplazar\" para confirmar';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_confirm => 'Reemplazar';
+
+  @override
   String get settings_cloudSync_firstSync_banner =>
       'La primera sincronización está esperando confirmación. Toca \'Sincronizar ahora\' para revisar lo que se combinará.';
 
   @override
   String get settings_cloudSync_firstSync_dialogConfirm =>
       'Combinar y sincronizar';
+
+  @override
+  String get settings_cloudSync_firstSync_replaceHint =>
+      'Si en cambio la biblioteca de este dispositivo debe reemplazar la de la nube, cancela y usa Ajustes > Sincronización en la nube > Reemplazar biblioteca en la nube.';
 
   @override
   String settings_cloudSync_firstSync_dialogContent(
@@ -13706,6 +13834,27 @@ class AppLocalizationsEs extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String settings_cloudSync_peerNeedsAdopt_banner(Object deviceList) {
+    return '$deviceList todavía tiene una versión de biblioteca antigua o desconocida, por lo que sus cambios no se combinaron. Abre Submersion en él para adoptar la biblioteca actual.';
+  }
+
+  @override
+  String settings_cloudSync_peerNeedsAdopt_bannerPlural(Object deviceList) {
+    return '$deviceList todavía tienen una versión de biblioteca antigua o desconocida, por lo que sus cambios no se combinaron. Abre Submersion en ellos para adoptar la biblioteca actual.';
+  }
+
+  @override
+  String settings_cloudSync_peerNeedsAdopt_unnamedDevice(Object shortId) {
+    return 'dispositivo $shortId';
+  }
+
+  @override
+  String get settings_cloudSync_peerNeedsAdopt_listSeparator => ', ';
+
+  @override
+  String get settings_cloudSync_peerNeedsAdopt_listLastSeparator => ' y ';
 
   @override
   String settings_cloudSync_peerRequiresUpdate_banner(num count) {
@@ -15042,14 +15191,17 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get settings_storage_resetDatabase_subtitle =>
-      'Eliminar todos los datos y comenzar de nuevo';
+      'Eliminar todos los datos de este dispositivo y comenzar de nuevo';
 
   @override
   String get settings_storage_resetDialog_title => 'Restablecer Base de Datos?';
 
   @override
   String get settings_storage_resetDialog_body =>
-      'Esto eliminara permanentemente todos tus datos incluyendo inmersiones, puntos, equipo y configuraciones. Se creara una copia de seguridad automaticamente antes de restablecer.';
+      'Esto elimina permanentemente todos los datos de ESTE dispositivo, incluidas inmersiones, puntos, equipo y configuraciones. Se crea una copia de seguridad automáticamente antes de restablecer.\n\nTu biblioteca en la nube no se elimina y los demás dispositivos conservan sus datos. La sincronización en la nube se desconectará para que el restablecimiento no se deshaga; puedes volver a conectarla en Ajustes > Sincronización en la nube.';
+
+  @override
+  String get settings_storage_resetDialog_confirmWord => 'Eliminar';
 
   @override
   String get settings_storage_resetDialog_confirmHint =>
@@ -15073,7 +15225,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get settings_storage_resetComplete_description =>
-      'Tus datos han sido eliminados y se guardo una copia de seguridad. Toca continuar para recargar la app.';
+      'Los datos de este dispositivo se han eliminado y se guardó una copia de seguridad. La sincronización en la nube está ahora desconectada para que el restablecimiento no se deshaga; puedes volver a conectarla en Ajustes > Sincronización en la nube. Toca continuar para recargar la app.';
 
   @override
   String get settings_summary_activeDiver => 'Buceador activo';
@@ -23536,4 +23688,21 @@ class AppLocalizationsEs extends AppLocalizations {
   String statistics_conditions_visibility_legacySuffix(String band) {
     return '$band (registrado antes de la medición)';
   }
+
+  @override
+  String common_selection_countSelected(Object count) {
+    return '$count seleccionados';
+  }
+
+  @override
+  String get common_selection_enterTooltip => 'Seleccionar elementos';
+
+  @override
+  String get common_selection_exitTooltip => 'Salir de la selección';
+
+  @override
+  String get common_selection_selectAllTooltip => 'Seleccionar todo';
+
+  @override
+  String get common_selection_deselectAllTooltip => 'Deseleccionar todo';
 }

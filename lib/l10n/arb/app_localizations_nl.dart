@@ -2951,6 +2951,14 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String get dashboard_hero_divesTotalOne => '1 duik';
+
+  @override
+  String dashboard_hero_divesTotalOther(Object count) {
+    return '$count duiken';
+  }
+
+  @override
   String get dashboard_hero_error => 'Klaar om de diepte te verkennen?';
 
   @override
@@ -11675,6 +11683,58 @@ class AppLocalizationsNl extends AppLocalizations {
   String get media_diveMediaSection_unlinkSuccess => 'Foto ontkoppeld';
 
   @override
+  String get media_siteMediaSection_title => 'Media van de duikstek';
+
+  @override
+  String get media_siteMediaSection_addPhotos =>
+      'Foto\'s of video\'s toevoegen';
+
+  @override
+  String get media_siteMediaSection_addDocument => 'Document toevoegen';
+
+  @override
+  String get media_siteMediaSection_emptyState =>
+      'Geen kaarten, foto\'s of documenten aan deze duikstek gekoppeld';
+
+  @override
+  String media_siteMediaSection_divePhotosGroup(int count) {
+    return 'Foto\'s van duiken hier ($count)';
+  }
+
+  @override
+  String get media_siteMediaSection_divePhotoLabel => 'Duikfoto';
+
+  @override
+  String media_siteMediaSection_unlinkSelectedTitle(int count) {
+    return '$count bijlagen verwijderen?';
+  }
+
+  @override
+  String get media_siteMediaSection_unlinkSelectedContent =>
+      'De geselecteerde items worden van deze duikstek verwijderd. Bestanden in je fotobibliotheek of op schijf worden niet gewist.';
+
+  @override
+  String media_siteMediaSection_unlinkSelectedSuccess(int count) {
+    return '$count bijlagen verwijderd';
+  }
+
+  @override
+  String get media_documentViewer_title => 'Document';
+
+  @override
+  String get media_documentViewer_unavailable =>
+      'Dit document is niet beschikbaar op dit apparaat';
+
+  @override
+  String get media_documentViewer_availableOnOriginDevice =>
+      'Het is beschikbaar op het apparaat waarmee het is toegevoegd, of via een geconfigureerde mediaopslag.';
+
+  @override
+  String media_documentViewer_attached(int count) {
+    return '$count documenten toegevoegd';
+  }
+
+  @override
   String get media_diveScan_scanTooltip => 'Galerij doorzoeken naar foto\'s';
 
   @override
@@ -13508,12 +13568,81 @@ class AppLocalizationsNl extends AppLocalizations {
   String get settings_cloudSync_adopt_notNow => 'Niet nu';
 
   @override
+  String get settings_cloudSync_dangerZone => 'Gevarenzone';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_tile =>
+      'Cloudbibliotheek vervangen';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_tileSubtitle =>
+      'De bibliotheek van dit apparaat de bibliotheek maken die alle apparaten gebruiken';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_dialogTitle =>
+      'Cloudbibliotheek vervangen?';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_dialogIntro =>
+      'De bibliotheek van dit apparaat wordt de bibliotheek die alle apparaten gebruiken.';
+
+  @override
+  String settings_cloudSync_replaceLibrary_dialogBody(num diveCount) {
+    String _temp0 = intl.Intl.pluralLogic(
+      diveCount,
+      locale: localeName,
+      other:
+          'De cloudbibliotheek wordt gewist en vervangen door de $diveCount duiken van dit apparaat.',
+      one:
+          'De cloudbibliotheek wordt gewist en vervangen door de 1 duik van dit apparaat.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String settings_cloudSync_replaceLibrary_peers(num peerCount) {
+    String _temp0 = intl.Intl.pluralLogic(
+      peerCount,
+      locale: localeName,
+      other:
+          '$peerCount andere apparaten worden gevraagd deze over te nemen; tot die tijd worden hun wijzigingen niet samengevoegd.',
+      one:
+          '1 ander apparaat wordt gevraagd deze over te nemen; tot die tijd worden de wijzigingen niet samengevoegd.',
+      zero:
+          'Er synchroniseert nog geen ander apparaat, dus er is niets over te nemen.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get settings_cloudSync_replaceLibrary_peersUnknown =>
+      'Alle andere apparaten wordt gevraagd deze over te nemen; tot die tijd worden hun wijzigingen niet samengevoegd.';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_backupNote =>
+      'Er wordt eerst een back-up van dit apparaat gemaakt. Dit kan niet ongedaan worden gemaakt.';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_confirmWord => 'Vervangen';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_confirmHint =>
+      'Typ \"Vervangen\" om te bevestigen';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_confirm => 'Vervangen';
+
+  @override
   String get settings_cloudSync_firstSync_banner =>
       'De eerste synchronisatie wacht op bevestiging. Tik op \'Nu synchroniseren\' om te bekijken wat er wordt samengevoegd.';
 
   @override
   String get settings_cloudSync_firstSync_dialogConfirm =>
       'Samenvoegen en synchroniseren';
+
+  @override
+  String get settings_cloudSync_firstSync_replaceHint =>
+      'Als de bibliotheek van dit apparaat juist moet vervangen wat in de cloud staat, annuleer dan en gebruik Instellingen > Cloudsynchronisatie > Cloudbibliotheek vervangen.';
 
   @override
   String settings_cloudSync_firstSync_dialogContent(
@@ -13602,6 +13731,27 @@ class AppLocalizationsNl extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String settings_cloudSync_peerNeedsAdopt_banner(Object deviceList) {
+    return '$deviceList heeft nog een oudere of onbekende bibliotheekversie, dus de wijzigingen zijn niet samengevoegd. Open Submersion daar om de huidige bibliotheek over te nemen.';
+  }
+
+  @override
+  String settings_cloudSync_peerNeedsAdopt_bannerPlural(Object deviceList) {
+    return '$deviceList hebben nog een oudere of onbekende bibliotheekversie, dus hun wijzigingen zijn niet samengevoegd. Open Submersion daar om de huidige bibliotheek over te nemen.';
+  }
+
+  @override
+  String settings_cloudSync_peerNeedsAdopt_unnamedDevice(Object shortId) {
+    return 'apparaat $shortId';
+  }
+
+  @override
+  String get settings_cloudSync_peerNeedsAdopt_listSeparator => ', ';
+
+  @override
+  String get settings_cloudSync_peerNeedsAdopt_listLastSeparator => ' en ';
 
   @override
   String settings_cloudSync_peerRequiresUpdate_banner(num count) {
@@ -14915,14 +15065,17 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get settings_storage_resetDatabase_subtitle =>
-      'Alle gegevens verwijderen en opnieuw beginnen';
+      'Alle gegevens op dit apparaat verwijderen en opnieuw beginnen';
 
   @override
   String get settings_storage_resetDialog_title => 'Database resetten?';
 
   @override
   String get settings_storage_resetDialog_body =>
-      'Dit verwijdert permanent al je gegevens inclusief duiken, stekken, uitrusting en instellingen. Er wordt automatisch een back-up gemaakt voor het resetten.';
+      'Dit verwijdert permanent alle gegevens op DIT apparaat, inclusief duiken, stekken, uitrusting en instellingen. Er wordt automatisch een back-up gemaakt voor het resetten.\n\nJe cloudbibliotheek wordt niet verwijderd en andere apparaten behouden hun gegevens. Cloudsynchronisatie wordt losgekoppeld zodat de reset niet ongedaan wordt gemaakt; je kunt deze opnieuw verbinden via Instellingen > Cloudsynchronisatie.';
+
+  @override
+  String get settings_storage_resetDialog_confirmWord => 'Delete';
 
   @override
   String get settings_storage_resetDialog_confirmHint =>
@@ -14945,7 +15098,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get settings_storage_resetComplete_description =>
-      'Je gegevens zijn gewist en er is een back-up opgeslagen. Tik op doorgaan om de app opnieuw te laden.';
+      'De gegevens van dit apparaat zijn gewist en er is een back-up opgeslagen. Cloudsynchronisatie is nu losgekoppeld zodat de reset niet ongedaan wordt gemaakt; je kunt deze opnieuw verbinden via Instellingen > Cloudsynchronisatie. Tik op doorgaan om de app opnieuw te laden.';
 
   @override
   String get settings_summary_activeDiver => 'Actieve duiker';
@@ -23340,4 +23493,21 @@ class AppLocalizationsNl extends AppLocalizations {
   String statistics_conditions_visibility_legacySuffix(String band) {
     return '$band (vastgelegd vóór meting)';
   }
+
+  @override
+  String common_selection_countSelected(Object count) {
+    return '$count geselecteerd';
+  }
+
+  @override
+  String get common_selection_enterTooltip => 'Items selecteren';
+
+  @override
+  String get common_selection_exitTooltip => 'Selectie beëindigen';
+
+  @override
+  String get common_selection_selectAllTooltip => 'Alles selecteren';
+
+  @override
+  String get common_selection_deselectAllTooltip => 'Alles deselecteren';
 }

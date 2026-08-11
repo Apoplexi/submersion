@@ -35,6 +35,7 @@ import 'package:submersion/features/settings/presentation/providers/settings_pro
 import 'package:submersion/features/tags/domain/entities/tag.dart';
 import 'package:submersion/features/tags/presentation/widgets/tag_input_widget.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
+import 'package:submersion/shared/selection/selection_leading.dart';
 import 'package:submersion/shared/widgets/debounced_search_results.dart';
 import 'package:submersion/shared/widgets/list_view_mode_toggle.dart';
 import 'package:submersion/shared/widgets/master_detail/master_detail_scaffold.dart';
@@ -660,9 +661,14 @@ class DiveListTile extends ConsumerWidget {
   final VoidCallback? onTap;
   final VoidCallback? onLongPress;
   final VoidCallback? onDoubleTap;
+
+  /// Currently open in the detail pane. Renders as a leading edge stripe.
   final bool isHighlighted;
   final bool isSelectionMode;
-  final bool isSelected;
+
+  /// In the current bulk selection. Renders as a fill tint plus the leading
+  /// checkbox. Independent of [isHighlighted]: a row can be both.
+  final bool isChecked;
 
   /// The dive's value for the active color attribute
   final double? colorValue;
@@ -723,7 +729,7 @@ class DiveListTile extends ConsumerWidget {
     this.onDoubleTap,
     this.isHighlighted = false,
     this.isSelectionMode = false,
-    this.isSelected = false,
+    this.isChecked = false,
     this.colorValue,
     this.minValueInList,
     this.maxValueInList,
@@ -773,14 +779,14 @@ class DiveListTile extends ConsumerWidget {
     final showMapBackground = ref.watch(showMapBackgroundOnDiveCardsProvider);
 
     // Determine if we should show the map (setting enabled + location available)
-    final shouldShowMap = showMapBackground && _hasLocation && !isSelected;
+    final shouldShowMap = showMapBackground && _hasLocation && !isChecked;
 
     // Determine card background: selection takes priority, then attribute coloring
     // When map is shown, we don't use attribute coloring on the card itself
     final attributeColor = (showCardColors && !shouldShowMap)
         ? _getAttributeBackgroundColor()
         : null;
-    final cardColor = isSelected
+    final cardColor = isChecked
         ? colorScheme.primaryContainer.withValues(alpha: 0.5)
         : isHighlighted
         ? colorScheme.primaryContainer.withValues(alpha: 0.15)
@@ -865,36 +871,33 @@ class DiveListTile extends ConsumerWidget {
                     SizedBox(
                       width: 40,
                       height: 40,
-                      child: isSelectionMode
-                          ? Center(
-                              child: Checkbox(
-                                value: isSelected,
-                                onChanged: (_) => onTap?.call(),
-                                materialTapTargetSize:
-                                    MaterialTapTargetSize.shrinkWrap,
-                                visualDensity: VisualDensity.compact,
+                      child: Center(
+                        child: SelectionLeading(
+                          isSelectionMode: isSelectionMode,
+                          isChecked: isChecked,
+                          onChanged: (_) => onTap?.call(),
+                          child: CircleAvatar(
+                            backgroundColor: colorScheme.primaryContainer,
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 4,
                               ),
-                            )
-                          : CircleAvatar(
-                              backgroundColor: colorScheme.primaryContainer,
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 4,
-                                ),
-                                child: FittedBox(
-                                  fit: BoxFit.scaleDown,
-                                  child: Text(
-                                    '#$diveNumber',
-                                    maxLines: 1,
-                                    style: TextStyle(
-                                      color: colorScheme.onPrimaryContainer,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 12,
-                                    ),
+                              child: FittedBox(
+                                fit: BoxFit.scaleDown,
+                                child: Text(
+                                  '#$diveNumber',
+                                  maxLines: 1,
+                                  style: TextStyle(
+                                    color: colorScheme.onPrimaryContainer,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 12,
                                   ),
                                 ),
                               ),
                             ),
+                          ),
+                        ),
+                      ),
                     ),
                     const SizedBox(width: 12),
                     // Main text content (site, location, date)
@@ -1177,6 +1180,7 @@ class DiveListTile extends ConsumerWidget {
 
     // Standard card without map
     return Container(
+      key: isHighlighted ? const ValueKey('dive_row_highlight') : null,
       margin: margin ?? const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       decoration: isHighlighted
           ? BoxDecoration(
