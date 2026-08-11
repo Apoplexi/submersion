@@ -119,7 +119,17 @@ class _TransfersPageState extends ConsumerState<TransfersPage> {
                         isChecked: _selectedIds.contains(entry.id.toString()),
                         onChanged: (_) =>
                             _selection.toggle(entry.id.toString()),
-                        child: _TransferTile(entry: entry),
+                        // The tile has no tap handler of its own, so while
+                        // selecting the whole row has to toggle -- otherwise
+                        // the checkbox is the only target.
+                        child: _isSelectionMode
+                            ? GestureDetector(
+                                behavior: HitTestBehavior.opaque,
+                                onTap: () =>
+                                    _selection.toggle(entry.id.toString()),
+                                child: _TransferTile(entry: entry),
+                              )
+                            : _TransferTile(entry: entry),
                       );
                     },
                   ),

@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
@@ -242,6 +243,45 @@ void main() {
 
       expect(opened.map((m) => m.id), ['doc-1']);
       expect(find.byType(SiteMediaViewerPage), findsNothing);
+    });
+  });
+
+  // NOTE: this file does not call verifySelectionContract. Its host() builder
+  // is async (Future<Widget>) while the helper takes a synchronous build
+  // callback, and the attachments override captures its list by value so the
+  // helper's filter step cannot narrow it. The contract's substance is
+  // covered here directly: the Select affordance below, and select-all, exit
+  // and unlink in the groups that follow.
+  group('select affordance', () {
+    testWidgets('a visible Select button enters selection mode', (
+      tester,
+    ) async {
+      await tester.pumpWidget(await host(attachments: [photoA]));
+      await tester.pumpAndSettle();
+
+      expect(
+        find.byKey(const ValueKey('enter_selection')),
+        findsOneWidget,
+        reason: 'selecting attachments must not require a hidden long-press',
+      );
+
+      await tester.tap(find.byKey(const ValueKey('enter_selection')));
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(const ValueKey('selection_exit')), findsOneWidget);
+      expect(find.text('0 selected'), findsOneWidget);
+    });
+
+    testWidgets('Escape leaves selection mode', (tester) async {
+      await tester.pumpWidget(await host(attachments: [photoA]));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byKey(const ValueKey('enter_selection')));
+      await tester.pumpAndSettle();
+      await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(const ValueKey('selection_exit')), findsNothing);
     });
   });
 
