@@ -1,0 +1,35 @@
+{
+  "_comment": [
+    "Terms that must never reach an Apple App Store Connect note field",
+    "(App Review guideline 2.3.10). Consumed by",
+    "sanitize_apple_store_notes.py and by the beta_changelog backstop in",
+    "ios/fastlane/Fastfile and macos/fastlane/Fastfile, so the two can never",
+    "drift apart.",
+    "Order is significant: the longest spelling of an overlapping pair is",
+    "declared first, so 'Google Play Store' is consumed whole rather than",
+    "leaving a stray 'Store' behind.",
+    "Windows, PC and Microsoft are case-sensitive on purpose. Across every",
+    "file in docs/releases/, capitalised Windows is the operating system and",
+    "lowercase window/windows is a UI window or a time window.",
+    "Patterns use only the regex subset common to Python re and Ruby Regexp:",
+    "\\b boundaries and (?: ) non-capturing groups. No named groups, no",
+    "lookbehind. JSON \\b is a backspace, so every boundary is written \\\\b."
+  ],
+  "terms": [
+    { "pattern": "\\bWindows\\b", "ignorecase": false, "class": "platform" },
+    { "pattern": "\\bPCs?\\b", "ignorecase": false, "class": "platform" },
+    { "pattern": "\\bMicrosoft(?:\\s+Store)?\\b", "ignorecase": false, "class": "platform" },
+    { "pattern": "\\bMSI\\b", "ignorecase": false, "class": "platform" },
+    { "pattern": "\\.exe\\b", "ignorecase": true, "class": "platform" },
+    { "pattern": "\\.msi\\b", "ignorecase": true, "class": "platform" },
+    { "pattern": "\\bAndroid\\b", "ignorecase": true, "class": "platform" },
+    { "pattern": "\\bLinux\\b", "ignorecase": true, "class": "platform" },
+    { "pattern": "\\bUbuntu\\b", "ignorecase": true, "class": "platform" },
+    { "pattern": "\\bDebian\\b", "ignorecase": true, "class": "platform" },
+    { "pattern": "\\bFlatpak\\b", "ignorecase": true, "class": "platform" },
+    { "pattern": "\\bAppImage\\b", "ignorecase": true, "class": "platform" },
+    { "pattern": "\\b(?:sudo\\s+)?apt(?:-get)?\\s+(?:install|update|upgrade)\\b", "ignorecase": true, "class": "platform" },
+    { "pattern": "\\bGoogle\\s+Play(?:\\s+Store)?\\b", "ignorecase": true, "class": "store" },
+    { "pattern": "\\bPlay\\s+Store\\b", "ignorecase": true, "class": "store" }
+  ]
+}
