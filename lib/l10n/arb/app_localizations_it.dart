@@ -11762,6 +11762,57 @@ class AppLocalizationsIt extends AppLocalizations {
   String get media_diveMediaSection_unlinkSuccess => 'Foto scollegata';
 
   @override
+  String get media_siteMediaSection_title => 'Media del sito';
+
+  @override
+  String get media_siteMediaSection_addPhotos => 'Aggiungi foto o video';
+
+  @override
+  String get media_siteMediaSection_addDocument => 'Aggiungi documento';
+
+  @override
+  String get media_siteMediaSection_emptyState =>
+      'Nessuna mappa, foto o documento allegato a questo sito';
+
+  @override
+  String media_siteMediaSection_divePhotosGroup(int count) {
+    return 'Foto dalle immersioni qui ($count)';
+  }
+
+  @override
+  String get media_siteMediaSection_divePhotoLabel => 'Foto dell\'immersione';
+
+  @override
+  String media_siteMediaSection_unlinkSelectedTitle(int count) {
+    return 'Rimuovere $count allegati?';
+  }
+
+  @override
+  String get media_siteMediaSection_unlinkSelectedContent =>
+      'Gli elementi selezionati verranno rimossi da questo sito. I file nella libreria foto o su disco non vengono eliminati.';
+
+  @override
+  String media_siteMediaSection_unlinkSelectedSuccess(int count) {
+    return '$count allegati rimossi';
+  }
+
+  @override
+  String get media_documentViewer_title => 'Documento';
+
+  @override
+  String get media_documentViewer_unavailable =>
+      'Questo documento non è disponibile su questo dispositivo';
+
+  @override
+  String get media_documentViewer_availableOnOriginDevice =>
+      'È disponibile sul dispositivo da cui è stato aggiunto, oppure tramite un archivio media configurato.';
+
+  @override
+  String media_documentViewer_attached(int count) {
+    return '$count documenti allegati';
+  }
+
+  @override
   String get media_diveScan_scanTooltip => 'Cerca foto nella galleria';
 
   @override

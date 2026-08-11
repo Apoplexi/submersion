@@ -20030,6 +20030,84 @@ abstract class AppLocalizations {
   /// **'Photo unlinked'**
   String get media_diveMediaSection_unlinkSuccess;
 
+  /// No description provided for @media_siteMediaSection_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Site Media'**
+  String get media_siteMediaSection_title;
+
+  /// No description provided for @media_siteMediaSection_addPhotos.
+  ///
+  /// In en, this message translates to:
+  /// **'Add photos or videos'**
+  String get media_siteMediaSection_addPhotos;
+
+  /// No description provided for @media_siteMediaSection_addDocument.
+  ///
+  /// In en, this message translates to:
+  /// **'Add document'**
+  String get media_siteMediaSection_addDocument;
+
+  /// No description provided for @media_siteMediaSection_emptyState.
+  ///
+  /// In en, this message translates to:
+  /// **'No maps, photos, or documents attached to this site'**
+  String get media_siteMediaSection_emptyState;
+
+  /// No description provided for @media_siteMediaSection_divePhotosGroup.
+  ///
+  /// In en, this message translates to:
+  /// **'Photos from dives here ({count})'**
+  String media_siteMediaSection_divePhotosGroup(int count);
+
+  /// No description provided for @media_siteMediaSection_divePhotoLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Dive photo'**
+  String get media_siteMediaSection_divePhotoLabel;
+
+  /// No description provided for @media_siteMediaSection_unlinkSelectedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove {count} attachments?'**
+  String media_siteMediaSection_unlinkSelectedTitle(int count);
+
+  /// No description provided for @media_siteMediaSection_unlinkSelectedContent.
+  ///
+  /// In en, this message translates to:
+  /// **'The selected items will be removed from this site. Files in your photo library or on disk are not deleted.'**
+  String get media_siteMediaSection_unlinkSelectedContent;
+
+  /// No description provided for @media_siteMediaSection_unlinkSelectedSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Removed {count} attachments'**
+  String media_siteMediaSection_unlinkSelectedSuccess(int count);
+
+  /// No description provided for @media_documentViewer_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Document'**
+  String get media_documentViewer_title;
+
+  /// No description provided for @media_documentViewer_unavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'This document is not available on this device'**
+  String get media_documentViewer_unavailable;
+
+  /// No description provided for @media_documentViewer_availableOnOriginDevice.
+  ///
+  /// In en, this message translates to:
+  /// **'It is available on the device it was added from, or via a configured media store.'**
+  String get media_documentViewer_availableOnOriginDevice;
+
+  /// No description provided for @media_documentViewer_attached.
+  ///
+  /// In en, this message translates to:
+  /// **'Attached {count} documents'**
+  String media_documentViewer_attached(int count);
+
   /// No description provided for @media_diveScan_scanTooltip.
   ///
   /// In en, this message translates to:

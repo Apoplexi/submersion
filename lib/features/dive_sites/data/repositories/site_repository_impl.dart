@@ -11,8 +11,33 @@ import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/core/services/sync/sync_event_bus.dart';
 import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart'
     as domain;
+import 'package:submersion/features/media/data/repositories/media_repository.dart';
+import 'package:submersion/features/media_store/data/media_deletion_coordinator.dart';
+import 'package:submersion/features/media_store/data/media_transfer_queue_repository.dart';
 
 class SiteRepository {
+  /// Injectable seams mirror [DiveRepository]: tests hand in a coordinator
+  /// over an in-memory queue, production builds the default. A redirecting
+  /// GENERATIVE constructor (not a factory) so existing test fakes that
+  /// `extends SiteRepository` keep their implicit super() call.
+  SiteRepository({
+    MediaRepository? mediaRepository,
+    MediaDeletionCoordinator? mediaDeletionCoordinator,
+  }) : this._(mediaRepository ?? MediaRepository(), mediaDeletionCoordinator);
+
+  SiteRepository._(this._mediaRepository, MediaDeletionCoordinator? coordinator)
+    : _mediaDeletionCoordinator =
+          coordinator ??
+          MediaDeletionCoordinator(
+            mediaRepository: _mediaRepository,
+            queue: () => MediaTransferQueueRepository(),
+            // No worker kick from the data layer (provider cycles): queued
+            // intents drain on the next connectivity event, app start, or
+            // any other kick; the Verify Library sweep is the backstop.
+          );
+
+  final MediaRepository _mediaRepository;
+  final MediaDeletionCoordinator _mediaDeletionCoordinator;
   AppDatabase get _db => DatabaseService.instance.database;
   final SyncRepository _syncRepository = SyncRepository();
   final _uuid = const Uuid();
@@ -297,10 +322,38 @@ class SiteRepository {
     }
   }
 
-  /// Delete a site
-  Future<void> deleteSite(String id) async {
+  /// Cascade a dying site's media: site-only rows die with the site
+  /// (rows + tombstones + blob-delete intents via the coordinator's
+  /// enqueue-before-delete path); dive-linked and library-level rows
+  /// survive with siteId nulled and HLC-stamped. Mirrors
+  /// DiveRepository._cascadeMediaForDiveDeletion; without it the silent
+  /// FK SET NULL on media.site_id writes no HLC stamp and peers diverge.
+  ///
+  /// Deliberately NOT wrapped in a transaction with the site delete: the
+  /// coordinator's queue writes live in another database, and every step
+  /// is individually idempotent/tombstoned. Site merge relinks media to
+  /// the survivor inside its own transaction BEFORE deleting duplicates,
+  /// so this sees no doomed media for merged-away sites.
+  Future<void> _cascadeMediaForSiteDeletion(List<String> ids) async {
+    final split = await _mediaRepository.partitionMediaForSiteDeletion(ids);
+    if (split.doomed.isNotEmpty) {
+      await _mediaDeletionCoordinator.deleteMediaItems(split.doomed);
+    }
+    if (split.unlinkIds.isNotEmpty) {
+      await _mediaRepository.unlinkMediaFromDeletedSites(split.unlinkIds);
+    }
+  }
+
+  /// Delete a site.
+  ///
+  /// [cascadeMedia] is true for user-intent deletions (the site's direct
+  /// attachments go with the site). Restore/undo flows that re-point media
+  /// afterwards pass false so the cascade cannot eat rows they are about
+  /// to restore.
+  Future<void> deleteSite(String id, {bool cascadeMedia = true}) async {
     try {
       _log.info('Deleting site: $id');
+      if (cascadeMedia) await _cascadeMediaForSiteDeletion([id]);
       await (_db.delete(_db.diveSites)..where((t) => t.id.equals(id))).go();
       await _syncRepository.logDeletion(entityType: 'diveSites', recordId: id);
       SyncEventBus.notifyLocalChange();
@@ -333,10 +386,14 @@ class SiteRepository {
   }
 
   /// Bulk delete multiple sites
-  Future<void> bulkDeleteSites(List<String> ids) async {
+  Future<void> bulkDeleteSites(
+    List<String> ids, {
+    bool cascadeMedia = true,
+  }) async {
     if (ids.isEmpty) return;
     try {
       _log.info('Bulk deleting ${ids.length} sites');
+      if (cascadeMedia) await _cascadeMediaForSiteDeletion(ids);
       await (_db.delete(_db.diveSites)..where((t) => t.id.isIn(ids))).go();
       for (final id in ids) {
         await _syncRepository.logDeletion(

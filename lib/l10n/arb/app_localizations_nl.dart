@@ -11675,6 +11675,58 @@ class AppLocalizationsNl extends AppLocalizations {
   String get media_diveMediaSection_unlinkSuccess => 'Foto ontkoppeld';
 
   @override
+  String get media_siteMediaSection_title => 'Media van de duikstek';
+
+  @override
+  String get media_siteMediaSection_addPhotos =>
+      'Foto\'s of video\'s toevoegen';
+
+  @override
+  String get media_siteMediaSection_addDocument => 'Document toevoegen';
+
+  @override
+  String get media_siteMediaSection_emptyState =>
+      'Geen kaarten, foto\'s of documenten aan deze duikstek gekoppeld';
+
+  @override
+  String media_siteMediaSection_divePhotosGroup(int count) {
+    return 'Foto\'s van duiken hier ($count)';
+  }
+
+  @override
+  String get media_siteMediaSection_divePhotoLabel => 'Duikfoto';
+
+  @override
+  String media_siteMediaSection_unlinkSelectedTitle(int count) {
+    return '$count bijlagen verwijderen?';
+  }
+
+  @override
+  String get media_siteMediaSection_unlinkSelectedContent =>
+      'De geselecteerde items worden van deze duikstek verwijderd. Bestanden in je fotobibliotheek of op schijf worden niet gewist.';
+
+  @override
+  String media_siteMediaSection_unlinkSelectedSuccess(int count) {
+    return '$count bijlagen verwijderd';
+  }
+
+  @override
+  String get media_documentViewer_title => 'Document';
+
+  @override
+  String get media_documentViewer_unavailable =>
+      'Dit document is niet beschikbaar op dit apparaat';
+
+  @override
+  String get media_documentViewer_availableOnOriginDevice =>
+      'Het is beschikbaar op het apparaat waarmee het is toegevoegd, of via een geconfigureerde mediaopslag.';
+
+  @override
+  String media_documentViewer_attached(int count) {
+    return '$count documenten toegevoegd';
+  }
+
+  @override
   String get media_diveScan_scanTooltip => 'Galerij doorzoeken naar foto\'s';
 
   @override

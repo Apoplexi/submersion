@@ -11753,6 +11753,57 @@ class AppLocalizationsEs extends AppLocalizations {
   String get media_diveMediaSection_unlinkSuccess => 'Foto desvinculada';
 
   @override
+  String get media_siteMediaSection_title => 'Medios del punto de buceo';
+
+  @override
+  String get media_siteMediaSection_addPhotos => 'Añadir fotos o vídeos';
+
+  @override
+  String get media_siteMediaSection_addDocument => 'Añadir documento';
+
+  @override
+  String get media_siteMediaSection_emptyState =>
+      'No hay mapas, fotos ni documentos adjuntos a este punto de buceo';
+
+  @override
+  String media_siteMediaSection_divePhotosGroup(int count) {
+    return 'Fotos de inmersiones aquí ($count)';
+  }
+
+  @override
+  String get media_siteMediaSection_divePhotoLabel => 'Foto de inmersión';
+
+  @override
+  String media_siteMediaSection_unlinkSelectedTitle(int count) {
+    return '¿Quitar $count adjuntos?';
+  }
+
+  @override
+  String get media_siteMediaSection_unlinkSelectedContent =>
+      'Los elementos seleccionados se quitarán de este punto de buceo. Los archivos de tu fototeca o del disco no se eliminan.';
+
+  @override
+  String media_siteMediaSection_unlinkSelectedSuccess(int count) {
+    return 'Se quitaron $count adjuntos';
+  }
+
+  @override
+  String get media_documentViewer_title => 'Documento';
+
+  @override
+  String get media_documentViewer_unavailable =>
+      'Este documento no está disponible en este dispositivo';
+
+  @override
+  String get media_documentViewer_availableOnOriginDevice =>
+      'Está disponible en el dispositivo desde el que se añadió, o mediante un almacén de medios configurado.';
+
+  @override
+  String media_documentViewer_attached(int count) {
+    return 'Se adjuntaron $count documentos';
+  }
+
+  @override
   String get media_diveScan_scanTooltip => 'Buscar fotos en la galeria';
 
   @override
