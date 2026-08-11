@@ -32,9 +32,11 @@ void main() {
       .toList();
 
   final result = scanForTickViolations(
-    repositoryFiles: dartFiles
-        .where((f) => f.path.contains('/data/repositories/'))
-        .toList(),
+    // Every file, not just `data/repositories/`: MediaStoresRepository lives at
+    // `media_store/data/media_stores_repository.dart`, so a path-shaped filter
+    // silently dropped its tick from the vocabulary and reported its consumer
+    // as a violation even though it was correctly subscribed.
+    repositoryFiles: dartFiles,
     providerFiles: dartFiles,
     relativize: (path) => path.replaceFirst('${Directory.current.path}/', ''),
   );
@@ -46,16 +48,11 @@ void main() {
   });
 
   test('no provider reads a repository without subscribing to a tick', () {
-    final actual = result.violations.map((v) => v.key).toSet();
-
-    final unexpected = result.violations
-        .where((v) => !_knownViolations.contains(v.key))
-        .toList();
     expect(
-      unexpected,
+      result.violations,
       isEmpty,
       reason:
-          'New change-tick violations. Each provider below calls a repository '
+          'Change-tick violations. Each provider below calls a repository '
           'method but never subscribes to a change tick, so it will serve a '
           'stale cache after a merge, a bulk delete, or a sync pull.\n\n'
           'Fix by adding, inside the provider body:\n'
@@ -65,58 +62,12 @@ void main() {
           'junction read such as BuddyRepository.getDiveIdsForBuddy needs the '
           'DIVES tick, because it goes stale on a cascade delete that never '
           'writes the buddies table.\n\n'
-          'If the provider genuinely cannot go stale (a short-lived autoDispose '
-          'read fresh at action time), mark it:\n'
+          'If the provider genuinely cannot go stale -- a short-lived '
+          'autoDispose read fresh at action time, a value that is a function '
+          'or service rather than data, or one where recomputing would re-run '
+          'a side effect -- mark it:\n'
           '  // no-tick: <why a stale cache can never render>\n\n'
-          '${unexpected.join('\n')}',
-    );
-
-    final fixed = _knownViolations.difference(actual);
-    expect(
-      fixed,
-      isEmpty,
-      reason:
-          'These providers were fixed but are still listed in '
-          '_knownViolations. Delete them from that set:\n'
-          '${(fixed.toList()..sort()).join('\n')}',
+          '${result.violations.join('\n')}',
     );
   });
 }
-
-/// Violations present when this test was introduced, being burned down under
-/// issue #974. The set is asserted for EXACT equality against the scan, so it
-/// only ever gets smaller: a new violation fails the build, and a fix that
-/// leaves a stale entry here fails too. When it reaches zero, delete it along
-/// with the two references above.
-const _knownViolations = <String>{
-  'lib/features/bathymetry/application/bathymetry_providers.dart::bathymetryGridProvider',
-  'lib/features/dive_sites/presentation/providers/site_match_review_notifier.dart::eligibleImportedDivesProvider',
-  'lib/features/equipment/presentation/providers/equipment_providers.dart::serviceDueSoonWindowDaysProvider',
-  'lib/features/equipment/presentation/providers/equipment_providers.dart::serviceKindsProvider',
-  'lib/features/equipment/presentation/providers/equipment_providers.dart::serviceSchedulesForEquipmentProvider',
-  'lib/features/gps_log/presentation/providers/gps_track_map_providers.dart::deleteTrackProvider',
-  'lib/features/gps_log/presentation/providers/gps_track_map_providers.dart::gpsTrackDetailProvider',
-  'lib/features/gps_log/presentation/providers/gps_track_map_providers.dart::gpsTrackGeometryProvider',
-  'lib/features/gps_log/presentation/providers/gps_track_map_providers.dart::splitTrackProvider',
-  'lib/features/gps_log/presentation/providers/gps_track_map_providers.dart::trackForDiveProvider',
-  'lib/features/gps_log/presentation/providers/gps_track_map_providers.dart::trimTrackProvider',
-  'lib/features/maps/presentation/providers/offline_map_providers.dart::cachedRegionByIdProvider',
-  'lib/features/maps/presentation/providers/offline_map_providers.dart::cachedRegionsProvider',
-  'lib/features/media/presentation/providers/lightroom_providers.dart::lightroomAccountProvider',
-  'lib/features/media/presentation/providers/lightroom_providers.dart::pendingSuggestionsForDiveProvider',
-  'lib/features/media/presentation/providers/network_sources_providers.dart::manifestSubscriptionsProvider',
-  'lib/features/media/presentation/providers/resolved_asset_providers.dart::resolvedFullResolutionProvider',
-  'lib/features/media/presentation/providers/resolved_asset_providers.dart::resolvedThumbnailProvider',
-  'lib/features/media/presentation/providers/url_tab_providers.dart::networkFetchPipelineProvider',
-  'lib/features/media_store/presentation/providers/media_store_providers.dart::mediaStoreStatusHintProvider',
-  'lib/features/media_store/presentation/providers/media_store_providers.dart::mediaTransferQueueReclaimProvider',
-  'lib/features/planner/presentation/pages/plan_compare_page.dart::planComparisonProvider',
-  'lib/features/reef/presentation/providers/reef_providers.dart::reefHabitatProvider',
-  'lib/features/reef/presentation/providers/reef_providers.dart::reefHealthForDiveProvider',
-  'lib/features/reef/presentation/providers/reef_providers.dart::reefSnapshotProvider',
-  'lib/features/settings/presentation/pages/connected_accounts_page.dart::connectedAccountsWithStatusProvider',
-  'lib/features/settings/presentation/pages/photos_media_setup_page.dart::setupGuideStatusProvider',
-  'lib/features/settings/presentation/providers/settings_providers.dart::shareByDefaultProvider',
-  'lib/features/settings/presentation/providers/sync_providers.dart::selectedSyncAccountProvider',
-  'lib/features/universal_import/presentation/providers/csv_preset_providers.dart::userCsvPresetsProvider',
-};

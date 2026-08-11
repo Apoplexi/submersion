@@ -893,6 +893,7 @@ final appSettingsRepositoryProvider = Provider<AppSettingsRepository>((ref) {
 /// Whether newly created sites/trips should be shared with all profiles by default
 final shareByDefaultProvider = FutureProvider<bool>((ref) async {
   final repo = ref.watch(appSettingsRepositoryProvider);
+  ref.invalidateSelfWhen(repo.watchSettingsChanges());
   return repo.getShareByDefault();
 });
 

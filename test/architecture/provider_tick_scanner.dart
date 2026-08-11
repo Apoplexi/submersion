@@ -147,6 +147,33 @@ bool _isRepositoryTarget(String? target, Set<String> boundIds) {
   return _inlineRepositoryTarget.hasMatch(target.replaceAll('\n', ''));
 }
 
+/// Whether the provider's VALUE is a function rather than data.
+///
+/// Action providers take the shape `Provider((ref) => (args) async { ... })`
+/// or return a closure from a block body. Their repository calls run when a
+/// caller invokes the callback, not when the provider builds, so there is no
+/// cached row that could go stale and no tick to subscribe to. Recognising the
+/// shape here keeps roughly ten `// no-tick:` comments out of the codebase,
+/// all of which would assert the same fact.
+bool _buildsAFunction(MethodInvocation providerInitializer) {
+  for (final argument in providerInitializer.argumentList.arguments) {
+    if (argument is! FunctionExpression) continue;
+    final body = argument.body;
+    if (body is ExpressionFunctionBody) {
+      if (body.expression is FunctionExpression) return true;
+    } else if (body is BlockFunctionBody) {
+      final statements = body.block.statements;
+      if (statements.length == 1) {
+        final only = statements.first;
+        if (only is ReturnStatement && only.expression is FunctionExpression) {
+          return true;
+        }
+      }
+    }
+  }
+  return false;
+}
+
 class _ParsedFile {
   const _ParsedFile(this.unit, this.lineInfo, this.lines);
 
@@ -196,6 +223,7 @@ ScanResult scanForTickViolations({
         if (!variable.name.lexeme.endsWith('Provider')) continue;
         final initializer = variable.initializer;
         if (initializer is! MethodInvocation) continue;
+        if (_buildsAFunction(initializer)) continue;
 
         final bindings = _RepositoryBindings();
         initializer.accept(bindings);

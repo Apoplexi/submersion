@@ -569,9 +569,9 @@ final serviceKindsProvider = FutureProvider<List<ServiceKind>>((ref) async {
   final validatedDiverId = await ref.watch(
     validatedCurrentDiverIdProvider.future,
   );
-  return ref
-      .watch(serviceKindRepositoryProvider)
-      .getAllKinds(diverId: validatedDiverId);
+  final repository = ref.watch(serviceKindRepositoryProvider);
+  ref.invalidateSelfWhen(repository.watchServiceKindsChanges());
+  return repository.getAllKinds(diverId: validatedDiverId);
 });
 
 /// The dueSoon window: the widest configured reminder-days value for the
@@ -581,9 +581,9 @@ final serviceDueSoonWindowDaysProvider = FutureProvider<int>((ref) async {
   final validatedDiverId = await ref.watch(
     validatedCurrentDiverIdProvider.future,
   );
-  return ref
-      .watch(serviceScheduleRepositoryProvider)
-      .getDueSoonWindowDays(diverId: validatedDiverId);
+  final repository = ref.watch(serviceScheduleRepositoryProvider);
+  ref.invalidateSelfWhen(repository.watchSchedulesChanges());
+  return repository.getDueSoonWindowDays(diverId: validatedDiverId);
 });
 
 /// Evaluates every enabled clock on [item] at this moment.
@@ -753,7 +753,7 @@ final serviceSchedulesForEquipmentProvider =
       ref,
       equipmentId,
     ) async {
-      return ref
-          .watch(serviceScheduleRepositoryProvider)
-          .getSchedulesForEquipment(equipmentId);
+      final repository = ref.watch(serviceScheduleRepositoryProvider);
+      ref.invalidateSelfWhen(repository.watchSchedulesChanges());
+      return repository.getSchedulesForEquipment(equipmentId);
     });

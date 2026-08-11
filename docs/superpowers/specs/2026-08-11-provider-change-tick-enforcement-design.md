@@ -5,6 +5,80 @@ symptom side of [#958](https://github.com/submersion-app/submersion/issues/958)
 (trips) and [#970](https://github.com/submersion-app/submersion/issues/970)
 (courses) as a side effect.
 
+## Outcome
+
+Measured at the end of implementation, superseding the pre-implementation
+survey below.
+
+| | Planned | Actual |
+| --- | --- | --- |
+| Violations fixed | 137 | **161** |
+| New repository tick streams | 14 | **16** |
+| Tick declarations in `lib/` | 27 | **44** |
+| `invalidateSelfWhen` call sites | 92 | **218** |
+| `// no-tick:` exemptions | "few" | **15** |
+
+The count grew twice, both times because the checker itself was wrong rather
+than because the codebase was worse than surveyed:
+
+1. **Direct construction.** Unresolved parsing reports `DiveRepository()` as a
+   `MethodInvocation`, not an `InstanceCreationExpression` -- the parser cannot
+   tell a constructor from a function call without type resolution. Caught by a
+   fixture test before the checker ever ran against `lib/`.
+2. **Chained calls.** `ref.watch(repoProvider).getTrack()` never binds the
+   repository to a local, so the call target was not an identifier the scanner
+   tracked. This hid 23 providers.
+3. **Path-shaped tick discovery.** The vocabulary scan looked only in
+   `data/repositories/`, so `MediaStoresRepository` (at
+   `media_store/data/media_stores_repository.dart`) contributed no tick and its
+   correctly-subscribed consumer was reported as a violation. The scan now
+   covers all of `lib/`.
+
+Two rules were generalised during implementation, each replacing a category of
+`// no-tick:` comment with a checkable fact:
+
+- **A `watch`-prefixed repository method is a subscription, not a read.** This
+  covers live Drift queries (`watchFindings`, `watchEntries`, `watchSummary`)
+  as well as change ticks. Both re-emit on every write.
+- **A provider whose value is a function is not a cache.** Action providers
+  shaped `Provider((ref) => (args) async { ... })` run their repository call
+  when a caller invokes the callback, so no row is held.
+
+### The 15 exemptions
+
+Every one carries a written reason at the declaration. They fall into four
+kinds, and the kinds are worth knowing because they are what a syntactic rule
+cannot decide:
+
+| Kind | Examples |
+| --- | --- |
+| Value is a closure or service, read happens in a callback | `mediaVerifyRunnerProvider`, `mediaStoreRuntimeProvider`, `networkFetchPipelineProvider` |
+| Recomputing would re-run a side effect | `mediaTransferQueueReclaimProvider` (a second reclaim pass), `selectedSyncAccountProvider` (rewrites the account), `seedSpeciesProvider` (re-seeds) |
+| Remote or write-once cache with no local write path | `bathymetryGridProvider`, the three `reef*` providers |
+| Short-lived `autoDispose`, read fresh at action time | `firstSyncCutoffDefaultProvider`, `eligibleImportedDivesProvider` |
+
+### Corrections to this spec, made during implementation
+
+- **Debouncing is not the house convention.** Only 3 of the 28 pre-existing
+  ticks debounce. New ticks follow the plain un-debounced form; only
+  `DiveComputerRepository` debounces, because registering a computer happens
+  inside a download that also writes dives, profiles, tanks, and data sources.
+- **`TrackGeometryCacheRepository` is not a write-once cache.** `invalidate()`
+  drops every LOD on a trim or split and the next render rewrites them, so it
+  received a tick rather than the exemption planned here.
+- **`nextDiveNumberProvider` is not exempt.** #974 filed it under short-lived
+  `autoDispose` reads, but it is a plain `FutureProvider` watched by the import
+  wizard's review step, so a stale number rendered for the process lifetime.
+
+### Verification
+
+`flutter analyze` clean project-wide, full suite green, and the invariant test
+was confirmed to fail (naming the provider) when a single `invalidateSelfWhen`
+line was deleted. Performance tests show no regression:
+`getDiveSummaries` <100ms, `getDiveById` <50ms, `getDiveProfile` <50ms.
+
+---
+
 ## Problem
 
 A Riverpod provider whose body queries a database table must self-invalidate on

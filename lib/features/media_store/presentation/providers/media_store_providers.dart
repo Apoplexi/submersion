@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:submersion/core/providers/provider.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
@@ -102,6 +102,10 @@ final mediaTransferQueueRepositoryProvider =
 /// idempotent for the process lifetime. Uses ref.read, not ref.watch, so an
 /// invalidation/override of the repository provider (e.g. in a nested test
 /// scope) cannot recompute this future and trigger a second reclaim pass.
+// no-tick: recomputing is the bug, not the fix. The cached result is what
+// makes the reclaim idempotent for the process lifetime; a tick would run a
+// second reclaim pass over the queue on every write. The doc comment above
+// spells out why it deliberately uses ref.read rather than ref.watch.
 final FutureProvider<void> mediaTransferQueueReclaimProvider =
     FutureProvider<void>((ref) async {
       await ref.read(mediaTransferQueueRepositoryProvider).requeueStale();
@@ -492,7 +496,9 @@ final mediaStoreResolverProvider = Provider<MediaStoreResolver?>((ref) {
 final mediaStoreStatusHintProvider = FutureProvider<String?>((ref) async {
   final runtime = await ref.watch(mediaStoreRuntimeProvider.future);
   if (runtime == null) return null;
-  final active = await ref.watch(mediaStoresRepositoryProvider).getActive();
+  final storesRepository = ref.watch(mediaStoresRepositoryProvider);
+  ref.invalidateSelfWhen(storesRepository.watchStoresChanges());
+  final active = await storesRepository.getActive();
   return active?.displayHint ?? runtime.storeId;
 });
 

@@ -132,6 +132,44 @@ final fooProvider = FutureProvider<int>((ref) async {
     expect(result.violations, isEmpty);
   });
 
+  test('ignores a provider whose value is a function (arrow body)', () {
+    // The provider's value is a callback; the repository call runs when the
+    // caller invokes it, so there is no cached row that could go stale.
+    final result = scan('''
+final deleteFooProvider = Provider(
+  (ref) => (String id) async {
+    await ref.read(fooRepositoryProvider).deleteFoo(id);
+  },
+);
+''');
+    expect(result.repositoryReadingProviders, 0);
+    expect(result.violations, isEmpty);
+  });
+
+  test('ignores a provider whose value is a function (block body)', () {
+    final result = scan('''
+final deleteFooProvider = Provider((ref) {
+  return (String id) async {
+    final repository = ref.read(fooRepositoryProvider);
+    await repository.deleteFoo(id);
+  };
+});
+''');
+    expect(result.repositoryReadingProviders, 0);
+    expect(result.violations, isEmpty);
+  });
+
+  test('still flags a provider that awaits a repository and returns data', () {
+    // Guard against the function-valued rule swallowing ordinary providers.
+    final result = scan('''
+final fooProvider = FutureProvider<int>((ref) async {
+  final repository = ref.watch(fooRepositoryProvider);
+  return repository.getFoo();
+});
+''');
+    expect(result.violations, hasLength(1));
+  });
+
   test('does not count a live watch* query as a repository read', () {
     // watchFindings is not a change tick, but it is still a live Drift query:
     // the provider re-emits on every write, so it cannot serve a stale value.

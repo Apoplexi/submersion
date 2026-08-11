@@ -37,9 +37,9 @@ final gpsTrackDetailProvider = FutureProvider.family<GpsTrack?, String>((
   ref,
   trackId,
 ) async {
-  return ref
-      .watch(gpsTrackRepositoryProvider)
-      .getTrack(trackId, includePoints: true);
+  final repository = ref.watch(gpsTrackRepositoryProvider);
+  ref.invalidateSelfWhen(repository.watchTracksChanges());
+  return repository.getTrack(trackId, includePoints: true);
 });
 
 /// Simplified geometry at a given level of detail, cached across launches.
@@ -50,6 +50,9 @@ final gpsTrackGeometryProvider =
     ) async {
       final (trackId, lod) = key;
       final cache = ref.watch(trackGeometryCacheRepositoryProvider);
+      // A trim or split calls cache.invalidate, dropping every LOD for the
+      // track; without this the map kept drawing the pre-trim polyline.
+      ref.invalidateSelfWhen(cache.watchGeometryChanges());
 
       final cached = await cache.read(trackId, lod);
       if (cached != null) return cached;
@@ -103,10 +106,11 @@ final trackForDiveProvider = FutureProvider.family<GpsTrack?, String>((
   final dive = await ref.watch(diveProvider(diveId).future);
   if (dive == null) return null;
 
+  final repository = ref.watch(gpsTrackRepositoryProvider);
+  ref.invalidateSelfWhen(repository.watchTracksChanges());
+
   // Lean read first - never decode every blob just to find the match.
-  final tracks = await ref
-      .watch(gpsTrackRepositoryProvider)
-      .getCompletedTracks(includePoints: false);
+  final tracks = await repository.getCompletedTracks(includePoints: false);
   final match = GpsTrackMatcher.trackCovering(tracks, _entryMillis(dive));
   if (match == null) return null;
   return ref.watch(gpsTrackDetailProvider(match.id).future);
