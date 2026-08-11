@@ -66,6 +66,11 @@ class SyncResult {
   /// can be safely merged.
   final Set<String> skippedPeerDeviceIds;
 
+  /// Display names for the entries in [skippedPeerDeviceIds] that published
+  /// one. An absent entry means the peer is on an older manifest, or its
+  /// hostname identifies nothing; render a short id instead.
+  final Map<String, String> skippedPeerNames;
+
   /// Peers held because they publish from a newer database schema than this
   /// build understands. Their data applies after this device updates.
   final Set<String> newerSchemaPeerDeviceIds;
@@ -83,6 +88,7 @@ class SyncResult {
     this.lastSyncTime,
     this.adoptedFreshIdentity = false,
     this.skippedPeerDeviceIds = const {},
+    this.skippedPeerNames = const {},
     this.newerSchemaPeerDeviceIds = const {},
     this.replaceMarker,
   });
@@ -689,6 +695,7 @@ class SyncService {
         lastSyncTime: recordsFailed == 0 ? now : null,
         adoptedFreshIdentity: adoptedFreshIdentity,
         skippedPeerDeviceIds: pullResult.skippedPeerDeviceIds,
+        skippedPeerNames: pullResult.skippedPeerNames,
         newerSchemaPeerDeviceIds: pullResult.newerSchemaPeerDeviceIds,
       );
     } on TimeoutException {
