@@ -1,5 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+// Only AppDatabase: the generated Drift classes collide with the domain
+// entities this file imports (Dive, Diver, Trip).
+import 'package:submersion/core/database/database.dart' show AppDatabase;
 import 'package:submersion/core/models/sort_state.dart';
 import 'package:submersion/core/constants/sort_options.dart';
 import 'package:submersion/core/providers/provider.dart';
@@ -79,11 +82,12 @@ void main() {
   late TripRepository tripRepo;
   late DiverRepository diverRepo;
   late DiveRepository diveRepo;
+  late AppDatabase db;
 
   setUp(() async {
     SharedPreferences.setMockInitialValues({});
     prefs = await SharedPreferences.getInstance();
-    await setUpTestDatabase();
+    db = await setUpTestDatabase();
     tripRepo = TripRepository();
     diverRepo = DiverRepository();
     diveRepo = DiveRepository();
@@ -294,7 +298,18 @@ void main() {
       // dive_merge_service.dart) -- the same primitive a sync pull uses when
       // applying a remote deletion. divesForTripProvider must notice and drop
       // the deleted dive without any caller having to invalidate it manually.
-      await diveRepo.bulkDeleteDives([loser.id]);
+      //
+      // Wrapped in a transaction because both production callers are:
+      // dive_merge_service.dart:142 and dive_consolidation_service.dart:78 open
+      // one and run bulkDeleteDives inside it alongside a dozen other writes.
+      // bulkDeleteDives opens no transaction of its own, so calling it bare
+      // would autocommit and fire an immediate standalone tick -- a shape
+      // neither real path produces. Drift defers table-update notifications to
+      // commit, so this asserts against the single coalesced post-commit tick
+      // the app actually emits.
+      await db.transaction(() async {
+        await diveRepo.bulkDeleteDives([loser.id]);
+      });
 
       final dives = await _pollUntilSettled(
         () => container.read(divesForTripProvider(trip.id).future),
@@ -365,7 +380,12 @@ void main() {
       // page renders these in TripStatStrip directly above the itinerary that
       // divesForTripProvider feeds. Without the dives-table subscription the
       // header would still read "2 dives / 42m" over a list of one 18m dive.
-      await diveRepo.bulkDeleteDives([loser.id]);
+      //
+      // Transaction-wrapped for the same reason as the divesForTripProvider
+      // test above: it is the tick shape the merge/consolidate services emit.
+      await db.transaction(() async {
+        await diveRepo.bulkDeleteDives([loser.id]);
+      });
 
       final stats = await _pollUntilSettled(
         () => container.read(tripWithStatsProvider(trip.id).future),
