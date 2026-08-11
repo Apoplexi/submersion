@@ -130,9 +130,12 @@ Two supporting rules:
 
 - **The per-beta section is emitted first.** Truncation consumes only the
   cumulative tail, so the "what to test" ask is never the part that gets cut.
-- **Cumulative items are deduplicated against the per-beta list**, in all three
-  formats including markdown, which currently repeats them. On Play that
-  reclaims roughly 200 of 500 characters.
+- **Cumulative items are deduplicated against the per-beta list in the capped
+  formats only.** On Play that reclaims roughly 200 of 500 characters. Markdown
+  is uncapped and its heading promises "Everything since <tag>", so it keeps
+  the complete list and repeats this beta's items, as it does today. This also
+  leaves the existing markdown assertions in
+  `beta_release_notes_test.sh:191-223` valid unchanged.
 
 The last production tag is resolved with the existing
 `git describe --tags --abbrev=0 --match 'v*.*.*.*'`, which is restricted to the
