@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:flutter/foundation.dart' show visibleForTesting;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:workmanager/workmanager.dart';
 
@@ -129,20 +128,23 @@ Future<void> _refreshNotifications(LoggerService log) async {
 ///     restore sees one artifact format regardless of who wrote it.
 ///
 /// [instanceFor] is a test seam for the cloud-provider singletons.
-@visibleForTesting
 Future<BackupService> buildScheduledBackupService({
   required SharedPreferences prefs,
   required BackupDatabaseAdapter dbAdapter,
   CloudStorageProvider Function(CloudProviderType type)? instanceFor,
 }) async {
+  // One store for both the provider wrap and the upload's framing, mirroring
+  // the foreground's single encryptionKeyStoreProvider.
+  final encryptionKeyStore = EncryptionKeyStore();
   return BackupService(
     dbAdapter: dbAdapter,
     preferences: BackupPreferences(prefs),
     cloudProvider: await resolveHeadlessCloudProvider(
       prefs: prefs,
+      encryptionKeyStore: encryptionKeyStore,
       instanceFor: instanceFor,
     ),
-    encryptionKeyStore: EncryptionKeyStore(),
+    encryptionKeyStore: encryptionKeyStore,
     syncPreferences: SyncPreferences(prefs),
     backupEncryptionKeyStore: BackupEncryptionKeyStore(),
   );
