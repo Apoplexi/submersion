@@ -50,6 +50,10 @@ class ChangesetWriter {
     required List<DeletionLogData> deletions,
     String? epochId,
     String? uploadNonce,
+
+    /// Display name published on the manifest so peers can name this device.
+    /// Null when the hostname identifies nothing; readers fall back to the id.
+    String? deviceName,
     Map<String, String> appliedPeerHlc = const {},
   }) async {
     final providerId = provider.providerId;
@@ -111,6 +115,7 @@ class ChangesetWriter {
         );
         final manifest = SyncManifest(
           deviceId: deviceId,
+          deviceName: deviceName,
           provider: providerId,
           baseSeq: newSeq,
           basePartCount: upload.partCount,
@@ -170,6 +175,10 @@ class ChangesetWriter {
           now - ownManifest.updatedAt > heartbeatMaxAgeMillis) {
         final beat = SyncManifest(
           deviceId: ownManifest.deviceId,
+          // A heartbeat is also the cheapest way a renamed device republishes
+          // its name; keep the previously published one when this build
+          // cannot resolve a usable hostname.
+          deviceName: deviceName ?? ownManifest.deviceName,
           provider: ownManifest.provider,
           baseSeq: ownManifest.baseSeq,
           basePartCount: ownManifest.basePartCount,
@@ -201,6 +210,7 @@ class ChangesetWriter {
     final publishedHigh = payload.toHlc ?? watermark;
     final manifest = SyncManifest(
       deviceId: deviceId,
+      deviceName: deviceName,
       provider: providerId,
       baseSeq: ownManifest?.baseSeq,
       basePartCount: ownManifest?.basePartCount,
@@ -249,6 +259,7 @@ class ChangesetWriter {
         deletions: deletions,
         epochId: epochId,
         uploadNonce: uploadNonce,
+        deviceName: deviceName,
         appliedPeerHlc: appliedPeerHlc,
       );
       return ChangesetWriteResult(ChangesetWriteKind.compacted, compSeq);
@@ -317,6 +328,7 @@ class ChangesetWriter {
     required Map<String, String> appliedPeerHlc,
     String? epochId,
     String? uploadNonce,
+    String? deviceName,
   }) async {
     // The fresh base must carry the full deletion log: a peer that still holds
     // a since-deleted record and cold-starts from this base (its prior
@@ -350,6 +362,7 @@ class ChangesetWriter {
     final now = DateTime.now().millisecondsSinceEpoch;
     final manifest = SyncManifest(
       deviceId: deviceId,
+      deviceName: deviceName,
       provider: providerId,
       baseSeq: compSeq,
       basePartCount: upload.partCount,

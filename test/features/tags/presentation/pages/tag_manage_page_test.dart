@@ -103,6 +103,11 @@ Widget _buildTestWidget({List<TagStatistic> stats = const []}) {
       tagRepositoryProvider.overrideWithValue(_MockTagRepository()),
     ],
     child: const MaterialApp(
+      // flutter_test resolves against the HOST machine's locale list, so an
+      // unpinned MaterialApp renders translated on a non-English machine and
+      // every English literal here -- including the contract's "n selected" --
+      // stops matching.
+      locale: Locale('en'),
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       home: TagManagePage(),

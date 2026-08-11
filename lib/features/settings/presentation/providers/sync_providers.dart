@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:io' show Platform;
 
 import 'package:cryptography/cryptography.dart' show SecretKey;
-import 'package:package_info_plus/package_info_plus.dart';
+import 'package:flutter/foundation.dart' show visibleForTesting;
 
 import 'package:submersion/core/data/repositories/connected_accounts_repository.dart';
 import 'package:submersion/core/providers/account_providers.dart';
@@ -34,6 +34,8 @@ import 'package:submersion/core/services/sync/crypto/sync_encryption_service.dar
 import 'package:submersion/core/services/sync/established_provider_store.dart';
 import 'package:submersion/core/services/sync/library_epoch.dart';
 import 'package:submersion/core/services/sync/library_epoch_store.dart';
+import 'package:submersion/core/services/sync/library_replace_intent.dart';
+import 'package:submersion/core/services/sync/sync_device_metadata.dart';
 import 'package:submersion/core/services/sync/library_moved.dart';
 import 'package:submersion/core/services/sync/library_moved_store.dart';
 import 'package:submersion/core/services/sync/post_restore_sync_store.dart';
@@ -465,6 +467,13 @@ class SyncState {
   /// a newer database schema than this build. Drives the "update this
   /// device" banner; cleared when a fresh sync starts.
   final int newerSchemaPeerCount;
+
+  /// Peers held back by the library-epoch fence during the last pull, as
+  /// (name, shortId) pairs. Drives the "needs to adopt" banner; cleared when a
+  /// fresh sync starts. A null name means the peer published none, and the
+  /// page renders the localized `device <shortId>` label instead -- resolving
+  /// it here is impossible because a notifier has no BuildContext.
+  final List<({String? name, String shortId})> skippedPeerLabels;
   final bool isAuthenticated;
   final bool firstSyncAwaitingConfirmation;
 
@@ -507,6 +516,7 @@ class SyncState {
     this.pendingChanges = 0,
     this.conflicts = 0,
     this.newerSchemaPeerCount = 0,
+    this.skippedPeerLabels = const [],
     this.isAuthenticated = false,
     this.firstSyncAwaitingConfirmation = false,
     this.postRestoreSyncing = false,
@@ -525,6 +535,7 @@ class SyncState {
     int? pendingChanges,
     int? conflicts,
     int? newerSchemaPeerCount,
+    List<({String? name, String shortId})>? skippedPeerLabels,
     bool? isAuthenticated,
     bool? firstSyncAwaitingConfirmation,
     bool? postRestoreSyncing,
@@ -544,6 +555,7 @@ class SyncState {
       pendingChanges: pendingChanges ?? this.pendingChanges,
       conflicts: conflicts ?? this.conflicts,
       newerSchemaPeerCount: newerSchemaPeerCount ?? this.newerSchemaPeerCount,
+      skippedPeerLabels: skippedPeerLabels ?? this.skippedPeerLabels,
       isAuthenticated: isAuthenticated ?? this.isAuthenticated,
       firstSyncAwaitingConfirmation:
           firstSyncAwaitingConfirmation ?? this.firstSyncAwaitingConfirmation,
@@ -575,6 +587,23 @@ class FirstSyncMergeInfo {
     required this.peerFileCount,
     required this.localDiveCount,
   });
+}
+
+/// Blast radius for the Replace confirmation: how much of this device's
+/// library is about to become authoritative, and how many peers will be asked
+/// to adopt it.
+///
+/// [peerFileCount] is null only when the peer listing FAILED or timed out --
+/// never when it succeeded and found none. The dialog then falls back to a
+/// count-less sentence rather than blocking, because a pre-check must not gate
+/// the escape hatch it is describing.
+class ReplacePreflight {
+  const ReplacePreflight({required this.localDiveCount, this.peerFileCount});
+
+  final int localDiveCount;
+  final int? peerFileCount;
+
+  bool get hasPeerCount => peerFileCount != null;
 }
 
 /// Sync state notifier
@@ -797,6 +826,88 @@ class SyncNotifier extends StateNotifier<SyncState> {
     }
   }
 
+  /// (name, shortId) per peer the epoch fence held back. Returns the raw
+  /// pieces rather than finished strings: a notifier has no BuildContext, so
+  /// the unnamed-device fallback has to be localized by the page. Sorted so
+  /// the banner text is stable across syncs instead of reordering each pull.
+  ///
+  /// Static and visible for testing for the same reason as
+  /// [SyncService.pullResultMessages]: it is pure, and the naming/fallback/
+  /// ordering rules deserve tests that do not need a container.
+  @visibleForTesting
+  static List<({String? name, String shortId})> skippedPeerLabels(
+    SyncResult result,
+  ) {
+    final entries =
+        result.skippedPeerDeviceIds.map((id) {
+          final name = result.skippedPeerNames[id];
+          final shortId = id.length > 8 ? id.substring(0, 8) : id;
+          return (
+            name: (name != null && name.isNotEmpty) ? name : null,
+            shortId: shortId,
+          );
+        }).toList()..sort(
+          (a, b) => (a.name ?? a.shortId).compareTo(b.name ?? b.shortId),
+        );
+    return entries;
+  }
+
+  /// Blast radius for the Replace confirmation. Never throws: a failed or slow
+  /// peer listing degrades to a null count, because a pre-check must not gate
+  /// the escape hatch it is describing.
+  Future<ReplacePreflight> replacePreflight() async {
+    final localDives = await _ref.read(diveRepositoryProvider).getDiveCount();
+    final provider = _ref.read(cloudStorageProviderProvider);
+    if (provider == null) {
+      return ReplacePreflight(localDiveCount: localDives);
+    }
+    try {
+      final peers = await _ref
+          .read(syncInitializerProvider)
+          .peerSyncFiles(provider)
+          .timeout(const Duration(seconds: 8));
+      return ReplacePreflight(
+        localDiveCount: localDives,
+        peerFileCount: peers.length,
+      );
+    } catch (e) {
+      _log.warning('Replace preflight peer listing failed: $e');
+      return ReplacePreflight(localDiveCount: localDives);
+    }
+  }
+
+  /// Make this device's library the one every device uses.
+  ///
+  /// Arms the replace intent, then syncs: the epoch gate checks pendingReplace
+  /// BEFORE reading the cloud marker, so this also works on a device currently
+  /// fenced off awaiting someone else's adoption -- it is the universal escape
+  /// hatch. If the sync fails the intent survives, and the next sync (or the
+  /// launch sync) retries rather than merging.
+  ///
+  /// The CALLER is responsible for the safety backup (cloud_sync_page runs it
+  /// via backupServiceProvider to avoid a provider import cycle), matching
+  /// [adoptReplacedLibrary].
+  Future<void> replaceCloudLibraryFromThisDevice() async {
+    final provider = _ref.read(cloudStorageProviderProvider);
+    if (provider == null) {
+      state = state.copyWith(
+        status: SyncStatus.error,
+        message: 'No cloud provider configured',
+      );
+      return;
+    }
+    final store = _ref.read(libraryEpochStoreProvider);
+    // Already armed (a previous attempt failed mid-flight): do not mint a
+    // second epoch, just drive the pending one to completion.
+    if (store.pendingReplace == null) {
+      await LibraryReplaceIntent(
+        SyncDeviceMetadata(_syncRepository).resolve,
+        store,
+      ).mint();
+    }
+    await performSync();
+  }
+
   /// After a successful sync, if an old backend is armed for cleanup and we
   /// just synced against a DIFFERENT backend, surface the cleanup offer. The
   /// different-backend guard means the first real sync on the new backend has
@@ -918,25 +1029,8 @@ class SyncNotifier extends StateNotifier<SyncState> {
   /// piece degrades to a safe default; markers are shown in banners so the
   /// origin must always be displayable.
   Future<(String, String?, String?)> _deviceMetadata() async {
-    String deviceId;
-    try {
-      deviceId = await _syncRepository.getDeviceId();
-    } catch (_) {
-      deviceId = 'unknown';
-    }
-    String? deviceName;
-    try {
-      deviceName = Platform.localHostname;
-    } catch (_) {
-      deviceName = null;
-    }
-    String? appVersion;
-    try {
-      appVersion = (await PackageInfo.fromPlatform()).version;
-    } catch (_) {
-      appVersion = null;
-    }
-    return (deviceId, deviceName, appVersion);
+    final identity = await SyncDeviceMetadata(_syncRepository).resolve();
+    return (identity.id, identity.name, identity.appVersion);
   }
 
   /// Adopt the replaced cloud library. The CALLER is responsible for the
@@ -1008,6 +1102,7 @@ class SyncNotifier extends StateNotifier<SyncState> {
         message: 'Starting sync...',
         progress: 0.0,
         newerSchemaPeerCount: 0,
+        skippedPeerLabels: const [],
         firstSyncAwaitingConfirmation: false,
         replaceAwaitingAdoption: false,
         needsPassphrase: false,
@@ -1082,6 +1177,7 @@ class SyncNotifier extends StateNotifier<SyncState> {
             lastSync: result.lastSyncTime,
             conflicts: result.conflictsFound,
             newerSchemaPeerCount: result.newerSchemaPeerDeviceIds.length,
+            skippedPeerLabels: skippedPeerLabels(result),
             progress: 1.0,
           );
           // Mark this provider established and consume any post-restore intent:

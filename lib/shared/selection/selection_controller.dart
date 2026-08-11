@@ -117,6 +117,39 @@ class SelectionController extends ValueNotifier<SelectionState> {
     );
   }
 
+  /// Replace the checked set with [ids], leaving the entry mode alone.
+  ///
+  /// For surfaces whose child widget owns the gesture layer and reports its
+  /// complete selection rather than a delta -- the media grid. [selectAll] is
+  /// the wrong call there despite also taking a whole set, because it declares
+  /// the mode explicit, which would launder a long-press into a deliberate
+  /// entry and stop it evaporating at zero checked.
+  ///
+  /// Only a gesture can activate the mode through this path, so an activating
+  /// call counts as implicit entry; the Select button routes through
+  /// [enterExplicit] instead. An empty [ids] on an inactive controller is a
+  /// no-op rather than an activation.
+  void replaceChecked(List<String> ids) {
+    final next = ids.toSet();
+
+    if (!value.isActive) {
+      if (next.isEmpty) return;
+      value = SelectionState(
+        checkedIds: next,
+        isActive: true,
+        enteredExplicitly: false,
+        anchorId: ids.first,
+      );
+      return;
+    }
+
+    if (next.isEmpty && !value.enteredExplicitly) {
+      exit();
+      return;
+    }
+    value = value.copyWith(checkedIds: next);
+  }
+
   /// Uncheck everything, ending an implicitly entered mode.
   ///
   /// Ending the implicit mode here is the same rule as unchecking the last

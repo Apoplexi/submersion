@@ -200,6 +200,100 @@ void main() {
       );
     });
 
+    testWidgets('an explicit entry survives unchecking the last thumbnail', (
+      tester,
+    ) async {
+      await tester.pumpWidget(host([_item('a'), _item('b')]));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byKey(const ValueKey('enter_selection')));
+      await tester.pumpAndSettle();
+
+      final thumb = find
+          .descendant(
+            of: find.byType(DragSelectGridView<MediaItem>),
+            matching: find.byType(GestureDetector),
+          )
+          .first;
+
+      await tester.tap(thumb, warnIfMissed: false);
+      await tester.pumpAndSettle();
+      expect(find.text('1 selected'), findsOneWidget);
+
+      await tester.tap(thumb, warnIfMissed: false);
+      await tester.pumpAndSettle();
+
+      expect(
+        find.byKey(const ValueKey('selection_exit')),
+        findsOneWidget,
+        reason: 'a mode the user asked for must survive at zero checked',
+      );
+      expect(find.text('0 selected'), findsOneWidget);
+    });
+
+    testWidgets('a long-press entry evaporates when unchecked by hand', (
+      tester,
+    ) async {
+      await tester.pumpWidget(host([_item('a'), _item('b')]));
+      await tester.pumpAndSettle();
+
+      final thumb = find
+          .descendant(
+            of: find.byType(DragSelectGridView<MediaItem>),
+            matching: find.byType(GestureDetector),
+          )
+          .first;
+
+      await tester.longPress(thumb, warnIfMissed: false);
+      await tester.pumpAndSettle();
+      expect(find.text('1 selected'), findsOneWidget);
+
+      await tester.tap(thumb, warnIfMissed: false);
+      await tester.pumpAndSettle();
+
+      expect(
+        find.byKey(const ValueKey('selection_exit')),
+        findsNothing,
+        reason: 'unchecking the last item must end a long-press selection',
+      );
+    });
+
+    testWidgets('a long-press entry stays implicit and evaporates on prune', (
+      tester,
+    ) async {
+      final a = _item('a');
+      final b = _item('b');
+      await tester.pumpWidget(host([a, b]));
+      await tester.pumpAndSettle();
+
+      // Long-press is the grid's own gesture, so it must register as implicit
+      // entry rather than being laundered into an explicit one.
+      await tester.longPress(
+        find
+            .descendant(
+              of: find.byType(DragSelectGridView<MediaItem>),
+              matching: find.byType(GestureDetector),
+            )
+            .first,
+        warnIfMissed: false,
+      );
+      await tester.pumpAndSettle();
+      expect(find.text('1 selected'), findsOneWidget);
+
+      // Detaching the only checked item empties the selection by pruning.
+      final container = ProviderScope.containerOf(
+        tester.element(find.byType(DiveMediaSection)),
+      );
+      container.read(_mediaProvider.notifier).state = [b];
+      await tester.pumpAndSettle();
+
+      expect(
+        find.byKey(const ValueKey('selection_exit')),
+        findsNothing,
+        reason: 'an implicitly entered mode must evaporate at zero checked',
+      );
+    });
+
     testWidgets('removing an item prunes it from the selection', (
       tester,
     ) async {

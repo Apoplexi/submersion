@@ -13449,11 +13449,78 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settings_cloudSync_adopt_notNow => 'Not Now';
 
   @override
+  String get settings_cloudSync_dangerZone => 'Danger Zone';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_tile => 'Replace cloud library';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_tileSubtitle =>
+      'Make this device\'s library the one every device uses';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_dialogTitle =>
+      'Replace Cloud Library?';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_dialogIntro =>
+      'This device\'s library becomes the one every device uses.';
+
+  @override
+  String settings_cloudSync_replaceLibrary_dialogBody(num diveCount) {
+    String _temp0 = intl.Intl.pluralLogic(
+      diveCount,
+      locale: localeName,
+      other:
+          'The cloud library is erased and replaced with this device\'s $diveCount dives.',
+      one:
+          'The cloud library is erased and replaced with this device\'s 1 dive.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String settings_cloudSync_replaceLibrary_peers(num peerCount) {
+    String _temp0 = intl.Intl.pluralLogic(
+      peerCount,
+      locale: localeName,
+      other:
+          '$peerCount other devices will be asked to adopt it; until they do, their changes are not merged.',
+      one:
+          '1 other device will be asked to adopt it; until it does, its changes are not merged.',
+      zero: 'No other device is syncing yet, so there is nothing to adopt it.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get settings_cloudSync_replaceLibrary_peersUnknown =>
+      'Every other device will be asked to adopt it; until they do, their changes are not merged.';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_backupNote =>
+      'A backup of this device is created first. This cannot be undone.';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_confirmWord => 'Replace';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_confirmHint =>
+      'Type \"Replace\" to confirm';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_confirm => 'Replace';
+
+  @override
   String get settings_cloudSync_firstSync_banner =>
       'First sync is waiting for confirmation. Tap Sync Now to review what will be combined.';
 
   @override
   String get settings_cloudSync_firstSync_dialogConfirm => 'Merge and Sync';
+
+  @override
+  String get settings_cloudSync_firstSync_replaceHint =>
+      'If instead this device\'s library should replace what is in the cloud, cancel and use Settings > Cloud Sync > Replace cloud library.';
 
   @override
   String settings_cloudSync_firstSync_dialogContent(
@@ -13540,6 +13607,27 @@ class AppLocalizationsEn extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String settings_cloudSync_peerNeedsAdopt_banner(Object deviceList) {
+    return '$deviceList still has an older or unknown library version, so its changes were not merged. Open Submersion on it to adopt the current library.';
+  }
+
+  @override
+  String settings_cloudSync_peerNeedsAdopt_bannerPlural(Object deviceList) {
+    return '$deviceList still have an older or unknown library version, so their changes were not merged. Open Submersion on them to adopt the current library.';
+  }
+
+  @override
+  String settings_cloudSync_peerNeedsAdopt_unnamedDevice(Object shortId) {
+    return 'device $shortId';
+  }
+
+  @override
+  String get settings_cloudSync_peerNeedsAdopt_listSeparator => ', ';
+
+  @override
+  String get settings_cloudSync_peerNeedsAdopt_listLastSeparator => ' and ';
 
   @override
   String settings_cloudSync_peerRequiresUpdate_banner(num count) {
@@ -14844,14 +14932,17 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settings_storage_resetDatabase_subtitle =>
-      'Delete all data and start fresh';
+      'Delete all data on this device and start fresh';
 
   @override
   String get settings_storage_resetDialog_title => 'Reset Database?';
 
   @override
   String get settings_storage_resetDialog_body =>
-      'This will permanently delete all your data including dives, sites, gear, and settings. A backup will be created automatically before resetting.';
+      'This permanently deletes all data on THIS device, including dives, sites, gear, and settings. A backup is created automatically before resetting.\n\nYour cloud library is not deleted, and other devices keep their data. Cloud sync will be disconnected so the reset is not undone; you can reconnect it in Settings > Cloud Sync.';
+
+  @override
+  String get settings_storage_resetDialog_confirmWord => 'Delete';
 
   @override
   String get settings_storage_resetDialog_confirmHint =>
@@ -14874,7 +14965,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settings_storage_resetComplete_description =>
-      'Your data has been cleared and a backup was saved. Tap continue to reload the app.';
+      'This device\'s data has been cleared and a backup was saved. Cloud sync is now disconnected so the reset is not undone; you can reconnect it in Settings > Cloud Sync. Tap continue to reload the app.';
 
   @override
   String get settings_summary_activeDiver => 'Active Diver';

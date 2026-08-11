@@ -23069,6 +23069,78 @@ abstract class AppLocalizations {
   /// **'Not Now'**
   String get settings_cloudSync_adopt_notNow;
 
+  /// No description provided for @settings_cloudSync_dangerZone.
+  ///
+  /// In en, this message translates to:
+  /// **'Danger Zone'**
+  String get settings_cloudSync_dangerZone;
+
+  /// No description provided for @settings_cloudSync_replaceLibrary_tile.
+  ///
+  /// In en, this message translates to:
+  /// **'Replace cloud library'**
+  String get settings_cloudSync_replaceLibrary_tile;
+
+  /// No description provided for @settings_cloudSync_replaceLibrary_tileSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Make this device\'s library the one every device uses'**
+  String get settings_cloudSync_replaceLibrary_tileSubtitle;
+
+  /// No description provided for @settings_cloudSync_replaceLibrary_dialogTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Replace Cloud Library?'**
+  String get settings_cloudSync_replaceLibrary_dialogTitle;
+
+  /// No description provided for @settings_cloudSync_replaceLibrary_dialogIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'This device\'s library becomes the one every device uses.'**
+  String get settings_cloudSync_replaceLibrary_dialogIntro;
+
+  /// No description provided for @settings_cloudSync_replaceLibrary_dialogBody.
+  ///
+  /// In en, this message translates to:
+  /// **'{diveCount, plural, =1{The cloud library is erased and replaced with this device\'s 1 dive.} other{The cloud library is erased and replaced with this device\'s {diveCount} dives.}}'**
+  String settings_cloudSync_replaceLibrary_dialogBody(num diveCount);
+
+  /// No description provided for @settings_cloudSync_replaceLibrary_peers.
+  ///
+  /// In en, this message translates to:
+  /// **'{peerCount, plural, =0{No other device is syncing yet, so there is nothing to adopt it.} =1{1 other device will be asked to adopt it; until it does, its changes are not merged.} other{{peerCount} other devices will be asked to adopt it; until they do, their changes are not merged.}}'**
+  String settings_cloudSync_replaceLibrary_peers(num peerCount);
+
+  /// No description provided for @settings_cloudSync_replaceLibrary_peersUnknown.
+  ///
+  /// In en, this message translates to:
+  /// **'Every other device will be asked to adopt it; until they do, their changes are not merged.'**
+  String get settings_cloudSync_replaceLibrary_peersUnknown;
+
+  /// No description provided for @settings_cloudSync_replaceLibrary_backupNote.
+  ///
+  /// In en, this message translates to:
+  /// **'A backup of this device is created first. This cannot be undone.'**
+  String get settings_cloudSync_replaceLibrary_backupNote;
+
+  /// The word the user must type to arm the replace. Compared literally against their input, so it MUST match the word quoted in settings_cloudSync_replaceLibrary_confirmHint in the same locale.
+  ///
+  /// In en, this message translates to:
+  /// **'Replace'**
+  String get settings_cloudSync_replaceLibrary_confirmWord;
+
+  /// No description provided for @settings_cloudSync_replaceLibrary_confirmHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Type \"Replace\" to confirm'**
+  String get settings_cloudSync_replaceLibrary_confirmHint;
+
+  /// No description provided for @settings_cloudSync_replaceLibrary_confirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Replace'**
+  String get settings_cloudSync_replaceLibrary_confirm;
+
   /// No description provided for @settings_cloudSync_firstSync_banner.
   ///
   /// In en, this message translates to:
@@ -23080,6 +23152,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Merge and Sync'**
   String get settings_cloudSync_firstSync_dialogConfirm;
+
+  /// No description provided for @settings_cloudSync_firstSync_replaceHint.
+  ///
+  /// In en, this message translates to:
+  /// **'If instead this device\'s library should replace what is in the cloud, cancel and use Settings > Cloud Sync > Replace cloud library.'**
+  String get settings_cloudSync_firstSync_replaceHint;
 
   /// No description provided for @settings_cloudSync_firstSync_dialogContent.
   ///
@@ -23194,6 +23272,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{count, plural, =1{1 pending change} other{{count} pending changes}}'**
   String settings_cloudSync_pendingChanges(int count);
+
+  /// No description provided for @settings_cloudSync_peerNeedsAdopt_banner.
+  ///
+  /// In en, this message translates to:
+  /// **'{deviceList} still has an older or unknown library version, so its changes were not merged. Open Submersion on it to adopt the current library.'**
+  String settings_cloudSync_peerNeedsAdopt_banner(Object deviceList);
+
+  /// No description provided for @settings_cloudSync_peerNeedsAdopt_bannerPlural.
+  ///
+  /// In en, this message translates to:
+  /// **'{deviceList} still have an older or unknown library version, so their changes were not merged. Open Submersion on them to adopt the current library.'**
+  String settings_cloudSync_peerNeedsAdopt_bannerPlural(Object deviceList);
+
+  /// No description provided for @settings_cloudSync_peerNeedsAdopt_unnamedDevice.
+  ///
+  /// In en, this message translates to:
+  /// **'device {shortId}'**
+  String settings_cloudSync_peerNeedsAdopt_unnamedDevice(Object shortId);
+
+  /// No description provided for @settings_cloudSync_peerNeedsAdopt_listSeparator.
+  ///
+  /// In en, this message translates to:
+  /// **', '**
+  String get settings_cloudSync_peerNeedsAdopt_listSeparator;
+
+  /// Joins the final two device names, e.g. "Erics-iPhone and Erics-iPad". Include the surrounding spaces the locale needs.
+  ///
+  /// In en, this message translates to:
+  /// **' and '**
+  String get settings_cloudSync_peerNeedsAdopt_listLastSeparator;
 
   /// No description provided for @settings_cloudSync_peerRequiresUpdate_banner.
   ///
@@ -25361,7 +25469,7 @@ abstract class AppLocalizations {
   /// No description provided for @settings_storage_resetDatabase_subtitle.
   ///
   /// In en, this message translates to:
-  /// **'Delete all data and start fresh'**
+  /// **'Delete all data on this device and start fresh'**
   String get settings_storage_resetDatabase_subtitle;
 
   /// No description provided for @settings_storage_resetDialog_title.
@@ -25373,8 +25481,14 @@ abstract class AppLocalizations {
   /// No description provided for @settings_storage_resetDialog_body.
   ///
   /// In en, this message translates to:
-  /// **'This will permanently delete all your data including dives, sites, gear, and settings. A backup will be created automatically before resetting.'**
+  /// **'This permanently deletes all data on THIS device, including dives, sites, gear, and settings. A backup is created automatically before resetting.\n\nYour cloud library is not deleted, and other devices keep their data. Cloud sync will be disconnected so the reset is not undone; you can reconnect it in Settings > Cloud Sync.'**
   String get settings_storage_resetDialog_body;
+
+  /// The word the user must type to arm the reset. Compared literally against their input, so it MUST match the word quoted in settings_storage_resetDialog_confirmHint in the same locale.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get settings_storage_resetDialog_confirmWord;
 
   /// No description provided for @settings_storage_resetDialog_confirmHint.
   ///
@@ -25409,7 +25523,7 @@ abstract class AppLocalizations {
   /// No description provided for @settings_storage_resetComplete_description.
   ///
   /// In en, this message translates to:
-  /// **'Your data has been cleared and a backup was saved. Tap continue to reload the app.'**
+  /// **'This device\'s data has been cleared and a backup was saved. Cloud sync is now disconnected so the reset is not undone; you can reconnect it in Settings > Cloud Sync. Tap continue to reload the app.'**
   String get settings_storage_resetComplete_description;
 
   /// No description provided for @settings_summary_activeDiver.

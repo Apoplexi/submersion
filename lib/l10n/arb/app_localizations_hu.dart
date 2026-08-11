@@ -13628,12 +13628,79 @@ class AppLocalizationsHu extends AppLocalizations {
   String get settings_cloudSync_adopt_notNow => 'Most nem';
 
   @override
+  String get settings_cloudSync_dangerZone => 'Veszélyes műveletek';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_tile => 'Felhőkönyvtár cseréje';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_tileSubtitle =>
+      'Ennek az eszköznek a könyvtára legyen az, amelyet minden eszköz használ';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_dialogTitle =>
+      'Lecseréli a felhőkönyvtárat?';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_dialogIntro =>
+      'Ennek az eszköznek a könyvtára lesz az, amelyet minden eszköz használ.';
+
+  @override
+  String settings_cloudSync_replaceLibrary_dialogBody(num diveCount) {
+    String _temp0 = intl.Intl.pluralLogic(
+      diveCount,
+      locale: localeName,
+      other:
+          'A felhőkönyvtár törlődik, és az eszköz $diveCount merülése lép a helyébe.',
+      one: 'A felhőkönyvtár törlődik, és az eszköz 1 merülése lép a helyébe.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String settings_cloudSync_replaceLibrary_peers(num peerCount) {
+    String _temp0 = intl.Intl.pluralLogic(
+      peerCount,
+      locale: localeName,
+      other:
+          '$peerCount másik eszköz kap felkérést az átvételre; addig a változásaik nem egyesülnek.',
+      one:
+          '1 másik eszköz kap felkérést az átvételre; addig a változásai nem egyesülnek.',
+      zero:
+          'Még egyetlen másik eszköz sem szinkronizál, így nincs mit átvenni.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get settings_cloudSync_replaceLibrary_peersUnknown =>
+      'Minden másik eszköz felkérést kap az átvételre; addig a változásaik nem egyesülnek.';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_backupNote =>
+      'Előbb biztonsági mentés készül erről az eszközről. A művelet nem vonható vissza.';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_confirmWord => 'Csere';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_confirmHint =>
+      'Írja be: \"Csere\" a megerősítéshez';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_confirm => 'Csere';
+
+  @override
   String get settings_cloudSync_firstSync_banner =>
       'Az első szinkronizálás megerősítésre vár. Koppintson a \'Szinkronizálás most\' gombra, hogy átnézze, mi kerül összevonásra.';
 
   @override
   String get settings_cloudSync_firstSync_dialogConfirm =>
       'Összevonás és szinkronizálás';
+
+  @override
+  String get settings_cloudSync_firstSync_replaceHint =>
+      'Ha ehelyett ennek az eszköznek a könyvtára írja felül a felhőben lévőt, szakítsa meg, és használja a Beállítások > Felhőszinkronizálás > Felhőkönyvtár cseréje lehetőséget.';
 
   @override
   String settings_cloudSync_firstSync_dialogContent(
@@ -13723,6 +13790,27 @@ class AppLocalizationsHu extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String settings_cloudSync_peerNeedsAdopt_banner(Object deviceList) {
+    return '$deviceList még régebbi vagy ismeretlen könyvtárverziót használ, ezért a változásai nem lettek egyesítve. Nyissa meg rajta a Submersiont az aktuális könyvtár átvételéhez.';
+  }
+
+  @override
+  String settings_cloudSync_peerNeedsAdopt_bannerPlural(Object deviceList) {
+    return '$deviceList még régebbi vagy ismeretlen könyvtárverziót használnak, ezért a változásaik nem lettek egyesítve. Nyissa meg rajtuk a Submersiont az aktuális könyvtár átvételéhez.';
+  }
+
+  @override
+  String settings_cloudSync_peerNeedsAdopt_unnamedDevice(Object shortId) {
+    return '$shortId eszköz';
+  }
+
+  @override
+  String get settings_cloudSync_peerNeedsAdopt_listSeparator => ', ';
+
+  @override
+  String get settings_cloudSync_peerNeedsAdopt_listLastSeparator => ' és ';
 
   @override
   String settings_cloudSync_peerRequiresUpdate_banner(num count) {
@@ -15055,14 +15143,17 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get settings_storage_resetDatabase_subtitle =>
-      'Minden adat törlése és újrakezdés';
+      'Az eszközön lévő összes adat törlése és újrakezdés';
 
   @override
   String get settings_storage_resetDialog_title => 'Adatbázis visszaállítása?';
 
   @override
   String get settings_storage_resetDialog_body =>
-      'Ez véglegesen törli az összes adatot, beleértve a merüléseket, helyszíneket, felszereléseket és beállításokat. A visszaállítás előtt automatikusan biztonsági mentés készül.';
+      'Ez véglegesen törli az EZEN az eszközön lévő összes adatot, beleértve a merüléseket, helyszíneket, felszereléseket és beállításokat. A visszaállítás előtt automatikusan biztonsági mentés készül.\n\nA felhőkönyvtár nem törlődik, és a többi eszköz megtartja az adatait. A felhőszinkronizálás leválasztásra kerül, hogy a visszaállítás ne vonódjon vissza; a Beállítások > Felhőszinkronizálás menüben csatlakoztathatja újra.';
+
+  @override
+  String get settings_storage_resetDialog_confirmWord => 'Törlés';
 
   @override
   String get settings_storage_resetDialog_confirmHint =>
@@ -15085,7 +15176,7 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get settings_storage_resetComplete_description =>
-      'Az adatok törölve lettek és biztonsági mentés készült. Koppintson a Tovább gombra az alkalmazás újratöltéséhez.';
+      'Ennek az eszköznek az adatai törölve lettek és biztonsági mentés készült. A felhőszinkronizálás most le van választva, hogy a visszaállítás ne vonódjon vissza; a Beállítások > Felhőszinkronizálás menüben csatlakoztathatja újra. Koppintson a Tovább gombra az alkalmazás újratöltéséhez.';
 
   @override
   String get settings_summary_activeDiver => 'Aktiv merülo';
