@@ -18,6 +18,7 @@ import 'package:submersion/shared/providers/entity_table_config_providers.dart';
 
 import '../../../../helpers/mock_providers.dart';
 import '../../../../helpers/test_app.dart';
+import '../../../../helpers/selection_contract.dart';
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -36,6 +37,11 @@ class _MockCourseListNotifier extends StateNotifier<AsyncValue<List<Course>>>
     implements CourseListNotifier {
   _MockCourseListNotifier(List<Course> courses)
     : super(AsyncValue.data(courses));
+
+  /// Narrow the visible list, standing in for a filter change.
+  void showOnly(List<Course> courses) {
+    state = AsyncValue.data(courses);
+  }
 
   @override
   dynamic noSuchMethod(Invocation invocation) => null;
@@ -116,6 +122,48 @@ Future<List<Override>> _buildPhoneOverrides({
 }
 
 void main() {
+  group('selection contract', () {
+    testWidgets('satisfies the shared selection contract', (tester) async {
+      final all = <Course>[
+        _makeCourse(id: 'c1', name: 'Aaa Course'),
+        _makeCourse(id: 'c2', name: 'Bbb Course'),
+        _makeCourse(id: 'c3', name: 'Ccc Course'),
+      ];
+      final notifier = _MockCourseListNotifier(all);
+
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+      final overrides = <Override>[
+        sharedPreferencesProvider.overrideWithValue(prefs),
+        settingsProvider.overrideWith((ref) => MockSettingsNotifier()),
+        currentDiverIdProvider.overrideWith(
+          (ref) => MockCurrentDiverIdNotifier(),
+        ),
+        courseListNotifierProvider.overrideWith((ref) => notifier),
+        courseListViewModeProvider.overrideWith((ref) => ListViewMode.detailed),
+        courseTableConfigProvider.overrideWith(
+          (ref) => _TestCourseTableConfigNotifier(_testConfig),
+        ),
+        highlightedCourseIdProvider.overrideWith((ref) => null),
+      ];
+
+      await verifySelectionContract(
+        tester,
+        build: () => testApp(
+          overrides: overrides,
+          locale: const Locale('en'),
+          child: const CourseListContent(showAppBar: true),
+        ),
+        selectButton: find.byKey(const ValueKey('enter_selection')),
+        firstRow: find.text('Aaa Course'),
+        applyFilter: (tester) async {
+          notifier.showOnly([all.first]);
+        },
+        visibleAfterFilter: 1,
+      );
+    });
+  });
+
   group('CourseListContent in table mode', () {
     testWidgets('renders table with column headers', (tester) async {
       final courses = [
