@@ -10,6 +10,20 @@ import 'package:submersion/core/services/sync/sync_clock.dart';
 import 'package:submersion/core/services/sync/sync_preferences.dart'
     show syncLastProviderPrefsKey;
 
+/// The cloud provider the foreground app last selected, as recorded in
+/// [prefs]. Free-standing (not a [SyncInitializer] method) so the headless
+/// background isolate -- which has no `SyncRepository` to build an
+/// initializer with -- reads the selection through the same parser.
+CloudProviderType? lastCloudProviderFromPrefs(SharedPreferences prefs) {
+  final providerString = prefs.getString(syncLastProviderPrefsKey);
+  if (providerString == null) return null;
+
+  for (final type in CloudProviderType.values) {
+    if (type.name == providerString) return type;
+  }
+  return null;
+}
+
 /// Handles sync initialization and checks on app launch
 class SyncInitializer {
   static final _log = LoggerService.forClass(SyncInitializer);
@@ -54,18 +68,7 @@ class SyncInitializer {
        _prefs = prefs;
 
   /// Get the last used cloud provider type
-  CloudProviderType? getLastProvider() {
-    final providerString = _prefs.getString(_lastProviderKey);
-    if (providerString == null) return null;
-
-    try {
-      return CloudProviderType.values.firstWhere(
-        (p) => p.name == providerString,
-      );
-    } catch (e) {
-      return null;
-    }
-  }
+  CloudProviderType? getLastProvider() => lastCloudProviderFromPrefs(_prefs);
 
   /// Save the selected cloud provider
   Future<void> saveProvider(CloudProviderType? provider) async {
