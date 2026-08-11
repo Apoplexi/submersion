@@ -106,6 +106,57 @@ final exportServiceProvider = Provider<ExportService>((ref) {
     expect(result.violations, isEmpty);
   });
 
+  test('flags a chained ref.watch(repo).method() call', () {
+    // The repository is never bound to a local, so the call target is the
+    // ref.watch expression itself rather than an identifier.
+    final result = scan('''
+final fooProvider = FutureProvider<int>((ref) async {
+  return ref.watch(fooRepositoryProvider).getFoo();
+});
+''');
+    expect(result.repositoryReadingProviders, 1);
+    expect(result.violations, hasLength(1));
+    expect(
+      result.violations.single.repositoryCall,
+      'ref.watch(fooRepositoryProvider).getFoo()',
+    );
+  });
+
+  test('accepts a chained call when a tick is also subscribed', () {
+    final result = scan('''
+final fooProvider = FutureProvider<int>((ref) async {
+  ref.invalidateSelfWhen(ref.watch(fooRepositoryProvider).watchFooChanges());
+  return ref.watch(fooRepositoryProvider).getFoo();
+});
+''');
+    expect(result.violations, isEmpty);
+  });
+
+  test('does not count a live watch* query as a repository read', () {
+    // watchFindings is not a change tick, but it is still a live Drift query:
+    // the provider re-emits on every write, so it cannot serve a stale value.
+    final result = scan('''
+final fooProvider = StreamProvider<int>((ref) {
+  return ref.watch(fooRepositoryProvider).watchFindings();
+});
+''');
+    expect(result.repositoryReadingProviders, 0);
+    expect(result.violations, isEmpty);
+  });
+
+  test('does not count a chained tick call as a repository read', () {
+    // A provider whose ONLY repository contact is subscribing to the tick is
+    // not reading anything, so it must not be counted as a reader.
+    final result = scan('''
+final fooProvider = FutureProvider<int>((ref) async {
+  ref.invalidateSelfWhen(ref.watch(fooRepositoryProvider).watchFooChanges());
+  return 1;
+});
+''');
+    expect(result.repositoryReadingProviders, 0);
+    expect(result.violations, isEmpty);
+  });
+
   test('treats a directly constructed repository as a repository', () {
     final result = scan('''
 final fooProvider = FutureProvider<int>((ref) async {

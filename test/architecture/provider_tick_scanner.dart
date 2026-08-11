@@ -132,6 +132,21 @@ class _TopLevelFunctions extends RecursiveAstVisitor<void> {
 
 final _noTickMarker = RegExp(r'//\s*no-tick:\s*(\S.*)$');
 
+/// Matches an inline `ref.watch(fooRepositoryProvider)` /
+/// `ref.read(fooRepositoryProvider)` used directly as a call target, without
+/// being bound to a local first.
+final _inlineRepositoryTarget = RegExp(
+  r'^ref\s*\.\s*(watch|read)\s*\(\s*\w+RepositoryProvider\s*\)$',
+);
+
+/// Whether [target] denotes a repository: either a local bound to one, or an
+/// inline `ref.watch(fooRepositoryProvider)` expression.
+bool _isRepositoryTarget(String? target, Set<String> boundIds) {
+  if (target == null) return false;
+  if (boundIds.contains(target)) return true;
+  return _inlineRepositoryTarget.hasMatch(target.replaceAll('\n', ''));
+}
+
 class _ParsedFile {
   const _ParsedFile(this.unit, this.lineInfo, this.lines);
 
@@ -184,7 +199,6 @@ ScanResult scanForTickViolations({
 
         final bindings = _RepositoryBindings();
         initializer.accept(bindings);
-        if (bindings.ids.isEmpty) continue;
 
         final invocations = _Invocations();
         initializer.accept(invocations);
@@ -194,8 +208,17 @@ ScanResult scanForTickViolations({
         // service-constructor provider (exportServiceProvider, syncService
         // Provider, the import-wizard adapters) -- is not a read, so those
         // need no allowlist entry.
+        //
+        // A `watch`-prefixed repository method is a SUBSCRIPTION, not a read:
+        // either a change tick or a live Drift query (watchFindings,
+        // watchEntries, watchSummary). Both re-emit on every write, so neither
+        // can serve a stale value and neither makes the provider a reader.
         final repositoryCall = invocations.calls
-            .where((c) => c.target != null && bindings.ids.contains(c.target))
+            .where(
+              (c) =>
+                  _isRepositoryTarget(c.target, bindings.ids) &&
+                  !c.method.startsWith('watch'),
+            )
             .firstOrNull;
         if (repositoryCall == null) continue;
         readers++;

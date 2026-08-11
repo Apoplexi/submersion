@@ -128,6 +128,9 @@ final mediaDeletionCoordinatorProvider = Provider<MediaDeletionCoordinator>((
 /// fleet-wide timestamp on success, and kicks a drain for any queued
 /// repairs (orphan-prevention spec 6.3). Throws StateError when no store
 /// is attached; the settings action only renders in the connected state.
+// no-tick: the value is a CLOSURE, not a query result. Every repository read
+// happens inside it at call time via ref.read, so there is no cached row that
+// could go stale.
 final mediaVerifyRunnerProvider =
     Provider<Future<VerifyLibraryReport> Function()>((ref) {
       return () async {
@@ -228,6 +231,10 @@ void invalidateMediaStoreAttachment(WidgetRef ref) {
 ///
 /// Defensive against an uninitialized local cache database or an absent
 /// media repository (widget tests): any error reads as none.
+// no-tick: already reactive on a real change stream (watchLatestForMedia), and
+// the getMediaById below runs inside the async* generator, re-evaluated per
+// settled emission. Re-creating the stream on every media write would thrash
+// the badge rather than fix staleness.
 final mediaBadgeStateProvider =
     StreamProvider.family<MediaBadgeState, MediaItem>((ref, item) {
       // Synchronous build phase. Every ref.watch must happen here, not in
@@ -305,6 +312,10 @@ final mediaStoreServiceProvider = Provider<MediaStoreService>(
 // registry -> lightroom providers -> this file -> registry), and Dart's
 // top-level inference cannot resolve initializer-inferred declarations
 // that participate in a cycle.
+// no-tick: builds a runtime SERVICE, not a cached query result. Its
+// getMediaById call sits inside the queue-drain callback and runs per entry at
+// drain time. Lifecycle is imperative by design -- invalidated on store connect
+// and disconnect -- and a tick would rebuild the store mid-drain.
 final FutureProvider<MediaStoreRuntime?> mediaStoreRuntimeProvider =
     FutureProvider<MediaStoreRuntime?>((ref) async {
       final attachState = ref.watch(mediaStoreAttachStateProvider);

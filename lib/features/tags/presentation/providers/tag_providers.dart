@@ -28,6 +28,7 @@ final tagsProvider = FutureProvider<List<Tag>>((ref) async {
 /// Single tag provider
 final tagProvider = FutureProvider.family<Tag?, String>((ref, id) async {
   final repository = ref.watch(tagRepositoryProvider);
+  ref.invalidateSelfWhen(repository.watchTagsChanges());
   return repository.getTagById(id);
 });
 
@@ -48,6 +49,13 @@ final tagsForDiveProvider = FutureProvider.family<List<Tag>, String>((
   diveId,
 ) async {
   final repository = ref.watch(tagRepositoryProvider);
+  ref.invalidateSelfWhen(repository.watchTagsChanges());
+  // A junction read over dive_tags, whose rows vanish by cascade on a dive
+  // delete without the tags table being written. Same pairing as
+  // tagStatisticsProvider above.
+  ref.invalidateSelfWhen(
+    ref.read(diveRepositoryProvider).watchDiveDetailChanges(),
+  );
   return repository.getTagsForDive(diveId);
 });
 
@@ -60,6 +68,7 @@ final tagSearchProvider = FutureProvider.family<List<Tag>, String>((
   final validatedDiverId = await ref.watch(
     validatedCurrentDiverIdProvider.future,
   );
+  ref.invalidateSelfWhen(repository.watchTagsChanges());
   return repository.searchTags(query, diverId: validatedDiverId);
 });
 
