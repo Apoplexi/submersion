@@ -22929,4 +22929,21 @@ class AppLocalizationsHe extends AppLocalizations {
   String statistics_conditions_visibility_legacySuffix(String band) {
     return '$band (נרשם לפני מדידה)';
   }
+
+  @override
+  String common_selection_countSelected(Object count) {
+    return '$count נבחרו';
+  }
+
+  @override
+  String get common_selection_enterTooltip => 'בחירת פריטים';
+
+  @override
+  String get common_selection_exitTooltip => 'יציאה מבחירה';
+
+  @override
+  String get common_selection_selectAllTooltip => 'בחר הכול';
+
+  @override
+  String get common_selection_deselectAllTooltip => 'בטל בחירת הכול';
 }

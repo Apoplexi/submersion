@@ -22327,4 +22327,21 @@ class AppLocalizationsZh extends AppLocalizations {
   String statistics_conditions_visibility_legacySuffix(String band) {
     return '$band（测量功能之前记录）';
   }
+
+  @override
+  String common_selection_countSelected(Object count) {
+    return '已选择 $count 项';
+  }
+
+  @override
+  String get common_selection_enterTooltip => '选择项目';
+
+  @override
+  String get common_selection_exitTooltip => '退出选择';
+
+  @override
+  String get common_selection_selectAllTooltip => '全选';
+
+  @override
+  String get common_selection_deselectAllTooltip => '取消全选';
 }

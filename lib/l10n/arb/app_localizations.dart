@@ -39182,6 +39182,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{band} (logged before measurement)'**
   String statistics_conditions_visibility_legacySuffix(String band);
+
+  /// No description provided for @common_selection_countSelected.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} selected'**
+  String common_selection_countSelected(Object count);
+
+  /// No description provided for @common_selection_enterTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Select items'**
+  String get common_selection_enterTooltip;
+
+  /// No description provided for @common_selection_exitTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Exit selection'**
+  String get common_selection_exitTooltip;
+
+  /// No description provided for @common_selection_selectAllTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Select all'**
+  String get common_selection_selectAllTooltip;
+
+  /// No description provided for @common_selection_deselectAllTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Deselect all'**
+  String get common_selection_deselectAllTooltip;
 }
 
 class _AppLocalizationsDelegate

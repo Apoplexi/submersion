@@ -7077,5 +7077,10 @@
   "settings_visibilityScale_customGood": "Buena a partir de",
   "settings_visibilityScale_customModerate": "Moderada a partir de",
   "settings_visibilityScale_invalidOrder": "Cada valor debe ser menor que el anterior y mayor que cero",
-  "statistics_conditions_visibility_legacySuffix": "{band} (registrado antes de la medición)"
+  "statistics_conditions_visibility_legacySuffix": "{band} (registrado antes de la medición)",
+  "common_selection_countSelected": "{count} seleccionados",
+  "common_selection_enterTooltip": "Seleccionar elementos",
+  "common_selection_exitTooltip": "Salir de la selección",
+  "common_selection_selectAllTooltip": "Seleccionar todo",
+  "common_selection_deselectAllTooltip": "Deseleccionar todo"
 }

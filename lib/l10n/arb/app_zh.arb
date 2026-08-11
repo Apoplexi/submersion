@@ -7077,5 +7077,10 @@
   "settings_visibilityScale_customGood": "良好（不低于）",
   "settings_visibilityScale_customModerate": "一般（不低于）",
   "settings_visibilityScale_invalidOrder": "每个数值必须小于上一个，且大于零",
-  "statistics_conditions_visibility_legacySuffix": "{band}（测量功能之前记录）"
+  "statistics_conditions_visibility_legacySuffix": "{band}（测量功能之前记录）",
+  "common_selection_countSelected": "已选择 {count} 项",
+  "common_selection_enterTooltip": "选择项目",
+  "common_selection_exitTooltip": "退出选择",
+  "common_selection_selectAllTooltip": "全选",
+  "common_selection_deselectAllTooltip": "取消全选"
 }

@@ -23100,4 +23100,21 @@ class AppLocalizationsAr extends AppLocalizations {
   String statistics_conditions_visibility_legacySuffix(String band) {
     return '$band (مسجلة قبل القياس)';
   }
+
+  @override
+  String common_selection_countSelected(Object count) {
+    return '$count محدد';
+  }
+
+  @override
+  String get common_selection_enterTooltip => 'تحديد العناصر';
+
+  @override
+  String get common_selection_exitTooltip => 'إنهاء التحديد';
+
+  @override
+  String get common_selection_selectAllTooltip => 'تحديد الكل';
+
+  @override
+  String get common_selection_deselectAllTooltip => 'إلغاء تحديد الكل';
 }

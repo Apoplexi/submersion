@@ -23125,4 +23125,21 @@ class AppLocalizationsEn extends AppLocalizations {
   String statistics_conditions_visibility_legacySuffix(String band) {
     return '$band (logged before measurement)';
   }
+
+  @override
+  String common_selection_countSelected(Object count) {
+    return '$count selected';
+  }
+
+  @override
+  String get common_selection_enterTooltip => 'Select items';
+
+  @override
+  String get common_selection_exitTooltip => 'Exit selection';
+
+  @override
+  String get common_selection_selectAllTooltip => 'Select all';
+
+  @override
+  String get common_selection_deselectAllTooltip => 'Deselect all';
 }
