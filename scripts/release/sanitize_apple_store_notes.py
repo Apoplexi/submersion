@@ -126,3 +126,66 @@ def repair_lists(text, terms):
         return _join(kept)
 
     return _LIST_RE.sub(substitute, text)
+
+
+# A sentence or line boundary immediately before the match position.
+_SENTENCE_START_RE = re.compile(r"(?:\A|[.!?:]\s+|\n)\s*\Z")
+
+
+def replace_terms(text, terms):
+    """Replace every surviving banned term with its neutral phrase.
+
+    The possessive form is handled first so the general pass never leaves an
+    orphaned "'s" behind: "Android's" must become "other platforms'", not
+    "other platforms''s".
+
+    No preposition special case is needed. The preposition is not part of the
+    match, so "on Android" becomes "on other platforms" through the default
+    path.
+    """
+    for pattern, term_class in terms:
+        phrase = REPLACEMENT[term_class]
+
+        # Possessive first. The apostrophe style of the source is preserved.
+        text = re.sub(
+            pattern.pattern + r"(['’])s\b",
+            lambda m, phrase=phrase: phrase + m.group(1),
+            text,
+            flags=pattern.flags,
+        )
+
+        current = text
+
+        def substitute(match, phrase=phrase, current=current):
+            head = current[:match.start()]
+            if _SENTENCE_START_RE.search(head):
+                return phrase[0].upper() + phrase[1:]
+            return phrase
+
+        text = pattern.sub(substitute, text)
+
+    return text
+
+
+_TIDY = [
+    # Two adjacent platform names both replaced in place read as a stutter.
+    (re.compile(r"\bother platforms(?:,?\s+(?:and|or)\s+other platforms)+\b"),
+     "other platforms"),
+    (re.compile(r"\banother store(?:,?\s+(?:and|or)\s+another store)+\b"),
+     "another store"),
+    # A parenthetical emptied by list repair, and the space that preceded it.
+    (re.compile(r"\s*\(\s*\)"), ""),
+    (re.compile(r"\s*\[\s*\]"), ""),
+    (re.compile(r",\s*\)"), ")"),
+    (re.compile(r"\(\s*,\s*"), "("),
+    (re.compile(r"[ \t]+,"), ","),
+    (re.compile(r"[ \t]{2,}"), " "),
+    (re.compile(r"[ \t]+$", re.MULTILINE), ""),
+]
+
+
+def tidy(text):
+    """Repair the punctuation and spacing the earlier passes disturb."""
+    for pattern, replacement in _TIDY:
+        text = pattern.sub(replacement, text)
+    return text

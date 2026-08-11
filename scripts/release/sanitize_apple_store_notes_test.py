@@ -144,5 +144,70 @@ class TestListRepair(unittest.TestCase):
         )
 
 
+class TestReplacement(unittest.TestCase):
+    def replace(self, text):
+        return san.replace_terms(text, TERMS)
+
+    def test_default_replacement(self):
+        self.assertEqual(
+            self.replace("a crash specific to Android devices"),
+            "a crash specific to other platforms devices",
+        )
+
+    def test_preposition_form_falls_out_of_the_default(self):
+        self.assertEqual(
+            self.replace("On Android this works through the USB Host API."),
+            "On other platforms this works through the USB Host API.",
+        )
+
+    def test_possessive_does_not_leave_an_orphan_s(self):
+        self.assertEqual(
+            self.replace("reads Windows's certificate store"),
+            "reads other platforms' certificate store",
+        )
+        self.assertEqual(
+            self.replace("uses Android’s folder picker"),
+            "uses other platforms’ folder picker",
+        )
+
+    def test_sentence_initial_is_capitalised(self):
+        self.assertEqual(
+            self.replace("Fixed a bug. Android backups now work."),
+            "Fixed a bug. Other platforms backups now work.",
+        )
+
+    def test_line_initial_is_capitalised(self):
+        self.assertEqual(
+            self.replace("- Fixed a thing\nLinux users are unblocked"),
+            "- Fixed a thing\nOther platforms users are unblocked",
+        )
+
+    def test_store_class_uses_its_own_phrase(self):
+        self.assertEqual(
+            self.replace("also on Google Play"),
+            "also on another store",
+        )
+
+
+class TestTidy(unittest.TestCase):
+    def test_collapses_adjacent_duplicate_phrases(self):
+        self.assertEqual(
+            san.tidy("broken on other platforms and other platforms today"),
+            "broken on other platforms today",
+        )
+
+    def test_removes_emptied_parentheses(self):
+        self.assertEqual(san.tidy("Downloads ( )"), "Downloads")
+
+    def test_repairs_dangling_commas(self):
+        self.assertEqual(san.tidy("Downloads (macOS, )"), "Downloads (macOS)")
+
+    def test_collapses_runs_of_spaces(self):
+        self.assertEqual(san.tidy("a  b"), "a b")
+
+    def test_strips_trailing_whitespace_per_line(self):
+        self.assertEqual(san.tidy("a  \nb"), "a\nb")
+
+
 if __name__ == "__main__":
     unittest.main()
