@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
 """Unit tests for sanitize_apple_store_notes.py."""
 
+import glob
 import importlib.util
+import io
 import os
+import sys
 import unittest
 
 _HERE = os.path.dirname(os.path.abspath(__file__))
@@ -207,6 +210,98 @@ class TestTidy(unittest.TestCase):
 
     def test_strips_trailing_whitespace_per_line(self):
         self.assertEqual(san.tidy("a  \nb"), "a\nb")
+
+
+class TestSanitize(unittest.TestCase):
+    def test_end_to_end(self):
+        self.assertEqual(
+            san.sanitize("### Downloads (macOS, Windows, Linux, and Android)"),
+            "### Downloads (macOS)",
+        )
+
+    def test_normalises_crlf(self):
+        self.assertEqual(san.sanitize("a\r\nb"), "a\nb")
+
+    def test_is_idempotent(self):
+        text = (
+            "### USB-serial downloads (macOS, Windows, Linux, and Android)\n"
+            "On Android this works through the USB Host API.\n"
+            "- Videos showed a movie icon on Mac, Windows, and Linux.\n"
+        )
+        once = san.sanitize(text)
+        self.assertEqual(san.sanitize(once), once)
+
+    def test_line_count_is_preserved(self):
+        # --report diffs the two texts line by line, which is only valid if no
+        # pass ever inserts or removes a newline.
+        text = "a\nBroken on Windows, Linux, and Android\nb\n"
+        self.assertEqual(san.sanitize(text).count("\n"), text.count("\n"))
+
+
+class TestMain(unittest.TestCase):
+    def run_main(self, stdin_text, argv):
+        stdin, stdout, stderr = sys.stdin, sys.stdout, sys.stderr
+        sys.stdin = io.StringIO(stdin_text)
+        out, err = io.StringIO(), io.StringIO()
+        sys.stdout, sys.stderr = out, err
+        try:
+            code = san.main(argv)
+        finally:
+            sys.stdin, sys.stdout, sys.stderr = stdin, stdout, stderr
+        return code, out.getvalue(), err.getvalue()
+
+    def test_clean_run(self):
+        code, out, err = self.run_main("Broken on Android.\n", [])
+        self.assertEqual(code, 0)
+        self.assertEqual(out, "Broken on other platforms.\n")
+        self.assertEqual(err, "")
+
+    def test_report_goes_to_stderr_only(self):
+        code, out, err = self.run_main("Broken on Android.\n", ["--report"])
+        self.assertEqual(code, 0)
+        self.assertEqual(out, "Broken on other platforms.\n")
+        self.assertIn("Android", err)
+
+    def test_empty_input_uses_the_fallback(self):
+        code, out, _err = self.run_main("", ["--fallback", "Bug fixes."])
+        self.assertEqual(code, 0)
+        self.assertEqual(out, "Bug fixes.")
+
+    def test_no_fallback_leaves_empty_empty(self):
+        code, out, _err = self.run_main("   \n", [])
+        self.assertEqual(code, 0)
+        self.assertEqual(out, "")
+
+    def test_survivor_exits_two(self):
+        # Stub the rewriting passes so a term reaches the assert. This can only
+        # happen through a bug in this script, which is what exit 2 reports.
+        original = san.replace_terms
+        san.replace_terms = lambda text, terms: text
+        try:
+            code, out, err = self.run_main("Broken on Android.\n", [])
+        finally:
+            san.replace_terms = original
+        self.assertEqual(code, 2)
+        self.assertEqual(out, "")
+        self.assertIn("survived", err)
+
+
+class TestReleaseNotesCorpus(unittest.TestCase):
+    """The real input distribution: every historical release announcement."""
+
+    def test_every_release_note_sanitizes_clean(self):
+        paths = sorted(glob.glob(
+            os.path.join(_HERE, "..", "..", "docs", "releases", "*.md")
+        ))
+        self.assertTrue(paths, "no release notes found to check")
+        for path in paths:
+            with self.subTest(path=os.path.basename(path)):
+                with open(path, encoding="utf-8") as fh:
+                    text = fh.read()
+                result = san.sanitize(text)
+                leftovers = [result[s:e]
+                             for s, e, _c in san.find_matches(result, TERMS)]
+                self.assertEqual(leftovers, [])
 
 
 if __name__ == "__main__":

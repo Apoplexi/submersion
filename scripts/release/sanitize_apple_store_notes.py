@@ -189,3 +189,84 @@ def tidy(text):
     for pattern, replacement in _TIDY:
         text = pattern.sub(replacement, text)
     return text
+
+
+def sanitize(text, terms=None):
+    """Run every pass. The result may be empty; the caller supplies a fallback.
+
+    No pass inserts or removes a newline, so the output has the same number of
+    lines as the input. --report relies on that to diff them line by line.
+    """
+    terms = load_terms() if terms is None else terms
+    text = text.replace("\r\n", "\n")
+    text = repair_lists(text, terms)
+    text = replace_terms(text, terms)
+    return tidy(text)
+
+
+def _report(original, result, terms):
+    """Describe what was redacted, on stderr.
+
+    The guard never blocks on content, so a CI log is the only place a human
+    can see what was silently changed.
+    """
+    hits = find_matches(original, terms)
+    if not hits:
+        print("sanitize_apple_store_notes: no banned terms found",
+              file=sys.stderr)
+        return
+    found = sorted({original[start:end] for start, end, _cls in hits})
+    print(
+        "sanitize_apple_store_notes: redacted %d occurrence(s) of: %s"
+        % (len(hits), ", ".join(found)),
+        file=sys.stderr,
+    )
+    for number, (before, after) in enumerate(
+        zip(original.split("\n"), result.split("\n")), start=1
+    ):
+        if before != after:
+            print("  line %d:" % number, file=sys.stderr)
+            print("    - %s" % before, file=sys.stderr)
+            print("    + %s" % after, file=sys.stderr)
+
+
+def main(argv=None):
+    parser = argparse.ArgumentParser(
+        description="Strip non-Apple platform references from store notes.",
+    )
+    parser.add_argument(
+        "--fallback", default="",
+        help="text to emit when the input sanitizes away to nothing",
+    )
+    parser.add_argument(
+        "--report", action="store_true",
+        help="describe every redaction on stderr",
+    )
+    args = parser.parse_args(argv)
+
+    terms = load_terms()
+    original = sys.stdin.read()
+    result = sanitize(original, terms)
+
+    if args.report:
+        _report(original, result, terms)
+
+    leftovers = find_matches(result, terms)
+    if leftovers:
+        for start, end, _cls in leftovers:
+            print(
+                "sanitize_apple_store_notes: BUG: %r survived every pass"
+                % result[start:end],
+                file=sys.stderr,
+            )
+        return 2
+
+    if not result.strip():
+        result = args.fallback
+
+    sys.stdout.write(result)
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
