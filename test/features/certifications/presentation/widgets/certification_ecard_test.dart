@@ -4,11 +4,27 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/constants/enums.dart';
+import 'package:submersion/core/constants/map_style.dart';
+import 'package:submersion/core/constants/units.dart';
+import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/features/certifications/domain/entities/certification.dart';
 import 'package:submersion/features/certifications/presentation/widgets/certification_card_photo.dart';
 import 'package:submersion/features/certifications/presentation/widgets/certification_ecard.dart';
+import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 
-import '../../../../helpers/l10n_test_helpers.dart';
+import '../../../../helpers/test_app.dart';
+
+class _TestSettingsNotifier extends StateNotifier<AppSettings>
+    implements SettingsNotifier {
+  _TestSettingsNotifier([super.initial = const AppSettings()]);
+
+  @override
+  Future<void> setMapStyle(MapStyle style) async =>
+      state = state.copyWith(mapStyle: style);
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
 
 /// A valid 1x1 transparent PNG, so the image decoder has real bytes.
 final _onePixelPng = base64Decode(
@@ -51,19 +67,23 @@ Future<void> _pumpCard(
   String diverName = 'Eric Griffin',
   bool showBack = false,
   double width = 320,
+  DateFormatPreference dateFormat = DateFormatPreference.mmmDYYYY,
 }) async {
   await tester.pumpWidget(
-    localizedMaterialApp(
+    testApp(
       locale: const Locale('en'),
-      home: Scaffold(
-        body: Center(
-          child: SizedBox(
-            width: width,
-            child: CertificationEcard(
-              certification: certification,
-              diverName: diverName,
-              showBack: showBack,
-            ),
+      overrides: [
+        settingsProvider.overrideWith(
+          (ref) => _TestSettingsNotifier(AppSettings(dateFormat: dateFormat)),
+        ),
+      ],
+      child: Center(
+        child: SizedBox(
+          width: width,
+          child: CertificationEcard(
+            certification: certification,
+            diverName: diverName,
+            showBack: showBack,
           ),
         ),
       ),
@@ -188,6 +208,27 @@ void main() {
       expect(find.text('VALID UNTIL'), findsOneWidget);
     });
 
+    // The printed card face keeps the compact month/year of the physical card
+    // it imitates. There is no day to reorder, so the date preference has
+    // nothing to change here -- only the spoken Semantics label below, which
+    // has no width budget, carries the diver's full date.
+    testWidgets('keeps the card face month/year under a day-first preference', (
+      tester,
+    ) async {
+      await _pumpCard(
+        tester,
+        dateFormat: DateFormatPreference.ddmmyyyy,
+        certification: _makeCert(
+          issueDate: DateTime(2018, 3, 14),
+          expiryDate: DateTime(2030, 3, 14),
+        ),
+      );
+
+      expect(find.text('Mar 2018'), findsOneWidget);
+      expect(find.text('Mar 2030'), findsOneWidget);
+      expect(find.text('14/03/2018'), findsNothing);
+    });
+
     testWidgets('omits the expiry cell when the certification never expires', (
       tester,
     ) async {
@@ -282,4 +323,49 @@ void main() {
       expect(find.text('VALID UNTIL'), findsOneWidget);
     });
   });
+
+  group('CertificationEcard semantics label', () {
+    testWidgets('speaks the issue date month-first for a month-first diver', (
+      tester,
+    ) async {
+      await _pumpCard(
+        tester,
+        dateFormat: DateFormatPreference.mmddyyyy,
+        certification: _makeCert(issueDate: DateTime(2018, 3, 14)),
+      );
+
+      expect(_cardSemanticsLabel(tester), contains('issued 03/14/2018'));
+    });
+
+    testWidgets('speaks the issue date day-first for a day-first diver', (
+      tester,
+    ) async {
+      await _pumpCard(
+        tester,
+        dateFormat: DateFormatPreference.ddmmyyyy,
+        certification: _makeCert(issueDate: DateTime(2018, 3, 14)),
+      );
+
+      expect(_cardSemanticsLabel(tester), contains('issued 14/03/2018'));
+    });
+
+    testWidgets('omits the issue date when the certification has none', (
+      tester,
+    ) async {
+      await _pumpCard(tester, certification: _makeCert());
+
+      expect(_cardSemanticsLabel(tester), isNot(contains('issued')));
+    });
+  });
+}
+
+/// The label on the [Semantics] wrapper [CertificationEcard] builds itself.
+String _cardSemanticsLabel(WidgetTester tester) {
+  final semantics = find
+      .descendant(
+        of: find.byType(CertificationEcard),
+        matching: find.byType(Semantics),
+      )
+      .first;
+  return tester.widget<Semantics>(semantics).properties.label ?? '';
 }

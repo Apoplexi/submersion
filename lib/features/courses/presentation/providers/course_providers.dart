@@ -135,21 +135,40 @@ final courseForCertificationProvider = FutureProvider.family<Course?, String>((
   return repository.getCourseForCertification(certificationId);
 });
 
-/// Dives for a specific course
+/// Dives for a specific course.
+///
+/// Self-invalidates on any `dives` table write (a merge/consolidate, a direct
+/// edit, a sync apply, ...). The only manual invalidation paths are
+/// [CourseListNotifier.linkDiveToCourse]/[CourseListNotifier.unlinkDiveFromCourse]
+/// and the dive edit form's course reassignment; a merge or consolidate deletes
+/// the losing dive straight through `DiveRepository.bulkDeleteDives`, bypassing
+/// all of them. Without this the course detail page keeps listing a dive that
+/// was merged away -- while `courseProgressProvider`, which already watches this
+/// tick, drops it from the requirements section on the same page.
 final courseDivesProvider = FutureProvider.family<List<Dive>, String>((
   ref,
   courseId,
 ) async {
   final diveRepository = ref.watch(diveRepositoryProvider);
+
+  ref.invalidateSelfWhen(diveRepository.watchDivesChanges());
+
   return diveRepository.getDivesForCourse(courseId);
 });
 
-/// Dive count for a course
+/// Dive count for a course.
+///
+/// See [courseDivesProvider] for why this self-invalidates on dives-table
+/// writes; `getDiveCountForCourse` counts the same rows.
 final courseDiveCountProvider = FutureProvider.family<int, String>((
   ref,
   courseId,
 ) async {
   final repository = ref.watch(courseRepositoryProvider);
+  final diveRepository = ref.watch(diveRepositoryProvider);
+
+  ref.invalidateSelfWhen(diveRepository.watchDivesChanges());
+
   return repository.getDiveCountForCourse(courseId);
 });
 

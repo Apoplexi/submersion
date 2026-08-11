@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/legacy.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/constants/list_view_mode.dart';
 import 'package:submersion/core/services/export/export_service.dart';
+import 'package:submersion/core/services/pdf_templates/pdf_date_formatter.dart';
 import 'package:submersion/features/dive_log/data/repositories/dive_repository_impl.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive_summary.dart';
@@ -61,6 +62,7 @@ class _RecordingExportService implements ExportService {
   @override
   Future<String> exportDivesToPdf(
     List<Dive> dives, {
+    required PdfDateFormatter dates,
     String title = 'Dive Logbook',
     List<Sighting>? allSightings,
   }) => _share('pdf');
@@ -68,6 +70,7 @@ class _RecordingExportService implements ExportService {
   @override
   Future<String?> saveDivesToPdfFile(
     List<Dive> dives, {
+    required PdfDateFormatter dates,
     String title = 'Dive Logbook',
     List<Sighting>? allSightings,
   }) => _save('pdf');

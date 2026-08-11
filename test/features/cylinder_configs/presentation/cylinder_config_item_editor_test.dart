@@ -187,7 +187,7 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('11 L - 207 bar'), findsOneWidget);
+    expect(find.text('11.1 L - 207 bar'), findsOneWidget);
   });
 
   testWidgets('the spec summary respects the diver imperial units', (
@@ -198,8 +198,10 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    // 11.1 L -> 0.39 cuft (0 decimals), 207 bar -> 3002 psi.
-    expect(find.text('0 cuft - 3002 psi'), findsOneWidget);
+    // Imperial divers name a cylinder by its gas capacity, not its physical
+    // volume: 11.1 L @ 207 bar is the AL80's 77 cuft, not 0.39 cuft of
+    // aluminum. 207 bar -> 3002 psi.
+    expect(find.text('77 cuft - 3002 psi'), findsOneWidget);
   });
 
   testWidgets('a cylinder with only a volume shows just that', (tester) async {
@@ -249,7 +251,7 @@ void main() {
     await tester.pumpAndSettle();
 
     // The sheet describes each preset in the diver's units.
-    expect(find.text('11 L - 207 bar'), findsWidgets);
+    expect(find.text('11.1 L - 207 bar'), findsWidgets);
 
     await tester.tap(find.text('AL80').first);
     await tester.pumpAndSettle();

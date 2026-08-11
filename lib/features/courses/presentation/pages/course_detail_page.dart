@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:submersion/core/services/export/export_service.dart';
+import 'package:submersion/core/services/pdf_templates/pdf_date_formatter.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/shared/widgets/master_detail/detail_scroll_retainer.dart';
 import 'package:submersion/shared/widgets/master_detail/responsive_breakpoints.dart';
@@ -726,7 +727,15 @@ class CourseDetailPage extends ConsumerWidget {
 
       // Export to PDF
       final exportService = ExportService();
-      await exportService.exportCourseTrainingLogToPdf(course, dives);
+      final settings = ref.read(settingsProvider);
+      await exportService.exportCourseTrainingLogToPdf(
+        course,
+        dives,
+        dates: PdfDateFormatter(
+          dateFormat: settings.dateFormat,
+          timeFormat: settings.timeFormat,
+        ),
+      );
 
       // Dismiss loading
       if (context.mounted) {

@@ -12,6 +12,7 @@ import 'package:submersion/core/services/export/uddf/uddf_export_service.dart';
 import 'package:submersion/core/services/export/uddf/uddf_full_export_service.dart';
 import 'package:submersion/core/services/export/uddf/uddf_full_import_service.dart';
 import 'package:submersion/core/services/export/uddf/uddf_import_service.dart';
+import 'package:submersion/core/services/pdf_templates/pdf_date_formatter.dart';
 import 'package:submersion/features/buddies/domain/entities/buddy.dart';
 import 'package:submersion/features/certifications/domain/entities/certification.dart';
 import 'package:submersion/features/courses/domain/entities/course.dart';
@@ -90,31 +91,45 @@ class ExportService {
   Future<String> exportTripToPdf(
     Trip trip,
     List<Dive> dives, {
+    required PdfDateFormatter dates,
     TripWithStats? stats,
-  }) => _pdf.exportTripToPdf(trip, dives, stats: stats);
+  }) => _pdf.exportTripToPdf(trip, dives, dates: dates, stats: stats);
 
   Future<({List<int> bytes, String fileName})> generateDivePdfBytes(
     List<Dive> dives, {
+    required PdfDateFormatter dates,
     String title = 'Dive Logbook',
     List<Sighting>? allSightings,
   }) => _pdf.generateDivePdfBytes(
     dives,
+    dates: dates,
     title: title,
     allSightings: allSightings,
   );
 
   Future<String> exportDivesToPdf(
     List<Dive> dives, {
+    required PdfDateFormatter dates,
     String title = 'Dive Logbook',
     List<Sighting>? allSightings,
-  }) => _pdf.exportDivesToPdf(dives, title: title, allSightings: allSightings);
+  }) => _pdf.exportDivesToPdf(
+    dives,
+    dates: dates,
+    title: title,
+    allSightings: allSightings,
+  );
 
   Future<String?> saveDivesToPdfFile(
     List<Dive> dives, {
+    required PdfDateFormatter dates,
     String title = 'Dive Logbook',
     List<Sighting>? allSightings,
-  }) =>
-      _pdf.saveDivesToPdfFile(dives, title: title, allSightings: allSightings);
+  }) => _pdf.saveDivesToPdfFile(
+    dives,
+    dates: dates,
+    title: title,
+    allSightings: allSightings,
+  );
 
   Future<String?> savePdfBytesToFile(List<int> bytes, String fileName) =>
       _pdf.savePdfBytesToFile(bytes, fileName);
@@ -123,8 +138,13 @@ class ExportService {
 
   Future<String> exportCourseTrainingLogToPdf(
     Course course,
-    List<Dive> trainingDives,
-  ) => _pdfCourse.exportCourseTrainingLogToPdf(course, trainingDives);
+    List<Dive> trainingDives, {
+    required PdfDateFormatter dates,
+  }) => _pdfCourse.exportCourseTrainingLogToPdf(
+    course,
+    trainingDives,
+    dates: dates,
+  );
 
   // ==================== Excel Export ====================
 

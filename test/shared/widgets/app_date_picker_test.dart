@@ -96,6 +96,82 @@ void main() {
     expect(picked(), DateTime(2026, 1, 31));
   });
 
+  Future<DateTimeRange? Function()> pumpRangePickerButton(
+    WidgetTester tester,
+    DateFormatPreference format,
+  ) async {
+    DateTimeRange? picked;
+
+    await tester.pumpWidget(
+      MaterialApp(
+        localizationsDelegates: const [
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        home: Scaffold(
+          body: Builder(
+            builder: (context) => ElevatedButton(
+              onPressed: () async {
+                picked = await showAppDateRangePicker(
+                  context: context,
+                  dateFormat: format,
+                  firstDate: DateTime(2020),
+                  lastDate: DateTime(2030),
+                );
+              },
+              child: const Text('pick'),
+            ),
+          ),
+        ),
+      ),
+    );
+    return () => picked;
+  }
+
+  testWidgets('range manual entry accepts the configured day-first format', (
+    tester,
+  ) async {
+    final picked = await pumpRangePickerButton(
+      tester,
+      DateFormatPreference.ddmmyyyy,
+    );
+
+    await tester.tap(find.text('pick'));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byIcon(Icons.edit_outlined));
+    await tester.pumpAndSettle();
+
+    // Day-first notation: 31 is not a valid month, so these only parse when
+    // the picker honors DD/MM/YYYY.
+    final fields = find.byType(TextField);
+    await tester.enterText(fields.at(0), '31/01/2026');
+    await tester.enterText(fields.at(1), '02/02/2026');
+    await tester.pumpAndSettle();
+
+    // Input mode confirms with the OK label; the calendar mode uses Save.
+    await tester.tap(find.text('OK'));
+    await tester.pumpAndSettle();
+
+    expect(picked()?.start, DateTime(2026, 1, 31));
+    expect(picked()?.end, DateTime(2026, 2, 2));
+  });
+
+  testWidgets('range manual entry hints show the configured format', (
+    tester,
+  ) async {
+    await pumpRangePickerButton(tester, DateFormatPreference.ddmmyyyyDots);
+
+    await tester.tap(find.text('pick'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byIcon(Icons.edit_outlined));
+    await tester.pumpAndSettle();
+
+    // One hint per field (start and end).
+    expect(find.text('dd.mm.yyyy'), findsNWidgets(2));
+  });
+
   // Every preference must map to a picker locale and a hint; a missing switch
   // arm would throw when the dialog builds.
   for (final format in DateFormatPreference.values) {

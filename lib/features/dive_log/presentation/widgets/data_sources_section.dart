@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive_data_source.dart';
@@ -93,7 +92,12 @@ class _DataSourcesSectionState extends State<DataSourcesSection> {
 
   List<Widget> _buildCards(bool isMultiSource) {
     if (widget.dataSources.isEmpty) {
-      return [_ManualEntryCard(diveCreatedAt: widget.diveCreatedAt)];
+      return [
+        _ManualEntryCard(
+          diveCreatedAt: widget.diveCreatedAt,
+          units: widget.units,
+        ),
+      ];
     }
 
     final children = <Widget>[];
@@ -236,8 +240,9 @@ class _SourceComparisonGrid extends StatelessWidget {
 /// Card shown when a dive has no imported data sources (manual entry).
 class _ManualEntryCard extends StatelessWidget {
   final DateTime diveCreatedAt;
+  final UnitFormatter units;
 
-  const _ManualEntryCard({required this.diveCreatedAt});
+  const _ManualEntryCard({required this.diveCreatedAt, required this.units});
 
   @override
   Widget build(BuildContext context) {
@@ -276,7 +281,7 @@ class _ManualEntryCard extends StatelessWidget {
           const SizedBox(height: 8),
           // Creation date
           Text(
-            'Created ${_formatDate(diveCreatedAt)}',
+            'Created ${units.formatDate(diveCreatedAt)}',
             style: textTheme.bodySmall?.copyWith(
               color: colorScheme.onSurfaceVariant,
             ),
@@ -284,10 +289,6 @@ class _ManualEntryCard extends StatelessWidget {
         ],
       ),
     );
-  }
-
-  String _formatDate(DateTime date) {
-    return DateFormat('MMM d, yyyy').format(date);
   }
 }
 
@@ -321,14 +322,11 @@ class _DataSourceCard extends StatelessWidget {
     return '$minutes min';
   }
 
-  String _formatTime(DateTime? dateTime) {
-    if (dateTime == null) return '--';
-    return DateFormat('h:mm a').format(dateTime);
-  }
+  // Passed to _DetailsGrid as tear-offs, so they stay methods rather than
+  // inlined calls.
+  String _formatTime(DateTime? dateTime) => units.formatTime(dateTime);
 
-  String _formatDate(DateTime date) {
-    return DateFormat('MMM d, yyyy').format(date);
-  }
+  String _formatDate(DateTime date) => units.formatDate(date);
 
   @override
   Widget build(BuildContext context) {

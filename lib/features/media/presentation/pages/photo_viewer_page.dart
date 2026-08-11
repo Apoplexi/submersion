@@ -109,7 +109,11 @@ class _PhotoViewerPageState extends ConsumerState<PhotoViewerPage> {
 
   @override
   Widget build(BuildContext context) {
-    final mediaAsync = ref.watch(mediaForDiveProvider(widget.diveId));
+    // Documents never enter the photo pager: they open in
+    // DocumentViewerPage, and the raw bytes would not render here anyway.
+    final mediaAsync = ref
+        .watch(mediaForDiveProvider(widget.diveId))
+        .whenData((list) => list.where((m) => !m.isDocument).toList());
     final diveAsync = ref.watch(diveProvider(widget.diveId));
     final settings = ref.watch(settingsProvider);
 

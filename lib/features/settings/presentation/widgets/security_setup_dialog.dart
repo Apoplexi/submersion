@@ -95,6 +95,10 @@ class _SecuritySetupDialogState extends State<SecuritySetupDialog> {
                     errorText: _passwordError,
                   ),
                 ),
+                // Outlined fields float their label over the top border and
+                // reserve no room above the box for it, so stacking them flush
+                // paints this label onto the field above.
+                const SizedBox(height: 16),
                 TextField(
                   controller: _confirm,
                   obscureText: true,
