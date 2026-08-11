@@ -24,6 +24,7 @@ class SyncManifest {
     this.appliedPeerHlc = const {},
     this.formatVersion = 1,
     this.schemaVersion,
+    this.deviceName,
   });
 
   final int formatVersion;
@@ -32,6 +33,13 @@ class SyncManifest {
   /// hold data from newer-schema peers rather than lossily merging it.
   /// Null on manifests written before this field existed.
   final int? schemaVersion;
+
+  /// Display name of the publishing device, used to name peers in the "still
+  /// needs to adopt" banner. Null on manifests written before this field
+  /// existed, and on devices whose hostname identifies nothing (see
+  /// SyncDeviceMetadata.sanitizeDeviceName), so readers must fall back to the
+  /// device id.
+  final String? deviceName;
   final String deviceId;
   final String provider;
   final int? baseSeq;
@@ -53,6 +61,7 @@ class SyncManifest {
   Map<String, dynamic> toJson() => {
     'formatVersion': formatVersion,
     'schemaVersion': schemaVersion,
+    'deviceName': deviceName,
     'deviceId': deviceId,
     'provider': provider,
     'baseSeq': baseSeq,
@@ -71,6 +80,7 @@ class SyncManifest {
   factory SyncManifest.fromJson(Map<String, dynamic> json) => SyncManifest(
     formatVersion: (json['formatVersion'] as int?) ?? 1,
     schemaVersion: json['schemaVersion'] as int?,
+    deviceName: json['deviceName'] as String?,
     deviceId: json['deviceId'] as String,
     provider: json['provider'] as String,
     baseSeq: json['baseSeq'] as int?,

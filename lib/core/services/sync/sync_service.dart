@@ -29,6 +29,7 @@ import 'package:submersion/core/services/sync/changeset_log/sync_manifest.dart';
 import 'package:submersion/core/services/sync/changeset_log/tombstone_horizon.dart';
 import 'package:submersion/core/services/sync/hlc.dart';
 import 'package:submersion/core/services/sync/library_epoch.dart';
+import 'package:submersion/core/services/sync/sync_device_metadata.dart';
 import 'package:submersion/core/services/sync/library_epoch_store.dart';
 import 'package:submersion/core/services/sync/crypto/crypto_errors.dart';
 import 'package:submersion/core/services/sync/crypto/sync_encryption_service.dart';
@@ -586,6 +587,7 @@ class SyncService {
             deletions: deletions,
             epochId: currentEpochId,
             uploadNonce: uploadNonce,
+            deviceName: await _deviceNameForManifest(),
             appliedPeerHlc: appliedPeerHlc,
           );
           // A publish that did not stamp this nonce into the manifest -- a
@@ -718,6 +720,22 @@ class SyncService {
   /// Run the library-epoch gate. Returns a terminal result the caller must
   /// return immediately, or the resolved currentEpochId to proceed with.
   /// Mirrors the inline gate the legacy full-file performSync used.
+  String? _cachedDeviceName;
+  bool _deviceNameResolved = false;
+
+  /// The name published on this device's manifest so peers can name it in the
+  /// "still needs to adopt" banner. Resolved once per service lifetime: the
+  /// hostname does not change while the app runs, and publish is on the sync
+  /// hot path. Null when the hostname identifies nothing.
+  Future<String?> _deviceNameForManifest() async {
+    if (_deviceNameResolved) return _cachedDeviceName;
+    _cachedDeviceName = (await SyncDeviceMetadata(
+      _syncRepository,
+    ).resolve()).name;
+    _deviceNameResolved = true;
+    return _cachedDeviceName;
+  }
+
   Future<_EpochGate> _runEpochGate(CloudStorageProvider provider) async {
     final epochStore = _epochStore;
     if (epochStore == null) return const _EpochGate.proceed(null);
@@ -2662,6 +2680,7 @@ class SyncService {
         deletions: deletions,
         epochId: marker.epochId,
         uploadNonce: uploadNonce,
+        deviceName: await _deviceNameForManifest(),
       );
 
       final now = DateTime.now();
