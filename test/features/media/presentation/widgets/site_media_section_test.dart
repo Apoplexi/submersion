@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
@@ -245,6 +246,70 @@ void main() {
     });
   });
 
+  // NOTE: this file does not call verifySelectionContract. Its host() builder
+  // is async (Future<Widget>) while the helper takes a synchronous build
+  // callback, and the attachments override captures its list by value so the
+  // helper's filter step cannot narrow it. The contract's substance is
+  // covered here directly: the Select affordance below, and select-all, exit
+  // and unlink in the groups that follow.
+  group('select affordance', () {
+    testWidgets('a visible Select button enters selection mode', (
+      tester,
+    ) async {
+      await tester.pumpWidget(await host(attachments: [photoA]));
+      await tester.pumpAndSettle();
+
+      expect(
+        find.byKey(const ValueKey('enter_selection')),
+        findsOneWidget,
+        reason: 'selecting attachments must not require a hidden long-press',
+      );
+
+      await tester.tap(find.byKey(const ValueKey('enter_selection')));
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(const ValueKey('selection_exit')), findsOneWidget);
+      expect(find.text('0 selected'), findsOneWidget);
+    });
+
+    testWidgets('a long-press selection emptied by hand exits the mode', (
+      tester,
+    ) async {
+      await tester.pumpWidget(await host(attachments: [photoA]));
+      await tester.pumpAndSettle();
+
+      // Long-press is an implicit entry, so unchecking the last item must
+      // evaporate the mode. Bridging the grid with selectAll would have
+      // declared the entry explicit and stranded the bar at "0 selected";
+      // letting the grid own exitOnEmptySelection would have had the two
+      // fight instead.
+      await tester.longPress(find.byType(MediaThumbnailTile).first);
+      await tester.pumpAndSettle();
+      expect(find.text('1 selected'), findsOneWidget);
+
+      await tester.tap(find.byType(MediaThumbnailTile).first);
+      await tester.pumpAndSettle();
+
+      expect(
+        find.byKey(const ValueKey('selection_exit')),
+        findsNothing,
+        reason: 'an implicit entry must not survive at zero checked',
+      );
+    });
+
+    testWidgets('Escape leaves selection mode', (tester) async {
+      await tester.pumpWidget(await host(attachments: [photoA]));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byKey(const ValueKey('enter_selection')));
+      await tester.pumpAndSettle();
+      await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(const ValueKey('selection_exit')), findsNothing);
+    });
+  });
+
   group('selection mode', () {
     /// Long-presses the first attachment tile to enter selection mode.
     Future<void> enterSelection(WidgetTester tester) async {
@@ -262,7 +327,7 @@ void main() {
 
       await enterSelection(tester);
 
-      expect(find.byType(MediaSelectionHeader), findsOneWidget);
+      expect(find.byKey(const ValueKey('selection_exit')), findsOneWidget);
       expect(find.text('1 selected'), findsOneWidget);
       // The normal header (and its add menu) yields to the selection header.
       expect(find.text('Site Media'), findsNothing);
@@ -278,13 +343,22 @@ void main() {
       await tester.pumpAndSettle();
       await enterSelection(tester);
 
-      await tester.tap(find.widgetWithText(TextButton, 'Select All'));
+      await tester.tap(find.byKey(const ValueKey('selection_select_all')));
       await tester.pumpAndSettle();
 
       expect(find.text('2 selected'), findsOneWidget);
       expect(find.byIcon(Icons.check), findsNWidgets(2));
       // Select-all hides once nothing is left to select.
-      expect(find.widgetWithText(TextButton, 'Select All'), findsNothing);
+      // The shared bar keeps a stable action set: select-all disables rather
+      // than disappearing once everything is checked.
+      expect(
+        tester
+            .widget<IconButton>(
+              find.byKey(const ValueKey('selection_select_all')),
+            )
+            .onPressed,
+        isNull,
+      );
     });
 
     testWidgets('cancelling returns to the normal header', (tester) async {
@@ -292,10 +366,10 @@ void main() {
       await tester.pumpAndSettle();
       await enterSelection(tester);
 
-      await tester.tap(find.widgetWithIcon(IconButton, Icons.close));
+      await tester.tap(find.byKey(const ValueKey('selection_exit')));
       await tester.pumpAndSettle();
 
-      expect(find.byType(MediaSelectionHeader), findsNothing);
+      expect(find.byKey(const ValueKey('selection_exit')), findsNothing);
       expect(find.text('Site Media'), findsOneWidget);
       expect(find.byIcon(Icons.check), findsNothing);
     });
@@ -328,9 +402,9 @@ void main() {
       await tester.pumpAndSettle();
       await tester.longPress(find.byType(MediaThumbnailTile).first);
       await tester.pumpAndSettle();
-      await tester.tap(find.widgetWithText(TextButton, 'Select All'));
+      await tester.tap(find.byKey(const ValueKey('selection_select_all')));
       await tester.pumpAndSettle();
-      await tester.tap(find.widgetWithIcon(IconButton, Icons.delete_outline));
+      await tester.tap(find.byKey(const ValueKey('selection_action_unlink')));
       await tester.pumpAndSettle();
     }
 
@@ -377,7 +451,7 @@ void main() {
       ]);
       expect(find.text('Removed 2 attachments'), findsOneWidget);
       // Selection mode exits once the unlink lands.
-      expect(find.byType(MediaSelectionHeader), findsNothing);
+      expect(find.byKey(const ValueKey('selection_exit')), findsNothing);
       expect(find.text('Site Media'), findsOneWidget);
     });
 

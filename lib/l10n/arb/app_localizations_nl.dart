@@ -23510,4 +23510,52 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get common_selection_deselectAllTooltip => 'Alles deselecteren';
+
+  @override
+  String common_bulkDelete_title(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count items verwijderen?',
+      one: '$count item verwijderen?',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get common_bulkDelete_body => 'Dit kan niet ongedaan worden gemaakt.';
+
+  @override
+  String common_bulkDelete_snackbar(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count verwijderd',
+      one: '$count verwijderd',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get marineLife_species_delete_confirmTitle => 'Soort verwijderen?';
+
+  @override
+  String marineLife_species_delete_confirmBody(String name) {
+    return 'Weet je zeker dat je \"$name\" wilt verwijderen?';
+  }
+
+  @override
+  String marineLife_species_delete_inUseError(String name) {
+    return '\"$name\" kan niet worden verwijderd - er zijn waarnemingen';
+  }
+
+  @override
+  String marineLife_species_delete_snackbar(String name) {
+    return '\"$name\" verwijderd';
+  }
+
+  @override
+  String marineLife_species_delete_error(String error) {
+    return 'Fout bij verwijderen van soort: $error';
+  }
 }

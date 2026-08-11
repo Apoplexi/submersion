@@ -39416,6 +39416,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Deselect all'**
   String get common_selection_deselectAllTooltip;
+
+  /// No description provided for @common_bulkDelete_title.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{Delete {count} item?} other{Delete {count} items?}}'**
+  String common_bulkDelete_title(int count);
+
+  /// No description provided for @common_bulkDelete_body.
+  ///
+  /// In en, this message translates to:
+  /// **'This cannot be undone.'**
+  String get common_bulkDelete_body;
+
+  /// No description provided for @common_bulkDelete_snackbar.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{{count} deleted} other{{count} deleted}}'**
+  String common_bulkDelete_snackbar(int count);
+
+  /// No description provided for @marineLife_species_delete_confirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete species?'**
+  String get marineLife_species_delete_confirmTitle;
+
+  /// No description provided for @marineLife_species_delete_confirmBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete \"{name}\"?'**
+  String marineLife_species_delete_confirmBody(String name);
+
+  /// No description provided for @marineLife_species_delete_inUseError.
+  ///
+  /// In en, this message translates to:
+  /// **'Cannot delete \"{name}\" - it has sightings'**
+  String marineLife_species_delete_inUseError(String name);
+
+  /// No description provided for @marineLife_species_delete_snackbar.
+  ///
+  /// In en, this message translates to:
+  /// **'Deleted \"{name}\"'**
+  String marineLife_species_delete_snackbar(String name);
+
+  /// No description provided for @marineLife_species_delete_error.
+  ///
+  /// In en, this message translates to:
+  /// **'Error deleting species: {error}'**
+  String marineLife_species_delete_error(String error);
 }
 
 class _AppLocalizationsDelegate

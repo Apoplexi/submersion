@@ -77,7 +77,7 @@ class SelectionAppBar extends StatelessWidget implements PreferredSizeWidget {
           tooltip: context.l10n.common_selection_exitTooltip,
           onPressed: controller.exit,
         );
-        final trailing = _buildControls(context, count);
+        final trailing = _buildControls(context, count, state.checkedIds);
 
         switch (shell) {
           case SelectionBarShell.appBar:
@@ -104,7 +104,11 @@ class SelectionAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   /// Baseline controls plus extras, in a fixed order, identical in both
   /// shells.
-  List<Widget> _buildControls(BuildContext context, int count) {
+  List<Widget> _buildControls(
+    BuildContext context,
+    int count,
+    Set<String> checkedIds,
+  ) {
     final allChecked =
         count >= selectableIds.length && selectableIds.isNotEmpty;
     final inline = actions.take(maxInlineActions).toList();
@@ -133,7 +137,9 @@ class SelectionAppBar extends StatelessWidget implements PreferredSizeWidget {
           color: action.isDestructive
               ? Theme.of(context).colorScheme.error
               : null,
-          onPressed: action.isEnabledFor(count) ? action.onInvoke : null,
+          onPressed: action.isEnabledForSelection(count, checkedIds)
+              ? action.onInvoke
+              : null,
         ),
       if (_hasDelete)
         IconButton(
@@ -150,7 +156,7 @@ class SelectionAppBar extends StatelessWidget implements PreferredSizeWidget {
             for (final action in overflow)
               PopupMenuItem<String>(
                 value: action.id,
-                enabled: action.isEnabledFor(count),
+                enabled: action.isEnabledForSelection(count, checkedIds),
                 child: ListTile(
                   leading: Icon(action.icon),
                   title: Text(action.label),

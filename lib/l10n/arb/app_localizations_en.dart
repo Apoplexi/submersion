@@ -23292,4 +23292,52 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get common_selection_deselectAllTooltip => 'Deselect all';
+
+  @override
+  String common_bulkDelete_title(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Delete $count items?',
+      one: 'Delete $count item?',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get common_bulkDelete_body => 'This cannot be undone.';
+
+  @override
+  String common_bulkDelete_snackbar(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count deleted',
+      one: '$count deleted',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get marineLife_species_delete_confirmTitle => 'Delete species?';
+
+  @override
+  String marineLife_species_delete_confirmBody(String name) {
+    return 'Are you sure you want to delete \"$name\"?';
+  }
+
+  @override
+  String marineLife_species_delete_inUseError(String name) {
+    return 'Cannot delete \"$name\" - it has sightings';
+  }
+
+  @override
+  String marineLife_species_delete_snackbar(String name) {
+    return 'Deleted \"$name\"';
+  }
+
+  @override
+  String marineLife_species_delete_error(String error) {
+    return 'Error deleting species: $error';
+  }
 }
