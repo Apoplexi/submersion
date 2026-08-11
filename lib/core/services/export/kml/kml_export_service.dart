@@ -138,7 +138,9 @@ class KmlExportService {
             builder.element(
               'description',
               nest:
-                  'Exported from Submersion on ${_dateFormat.format(DateTime.now())}',
+                  // Shown to the reader in Google Earth, so it follows the
+                  // diver's preference; _dateFormat stays ISO for filenames.
+                  'Exported from Submersion on ${formatDateForExport(DateTime.now(), dateFormat)}',
             );
 
             for (final site in sitesWithCoords) {

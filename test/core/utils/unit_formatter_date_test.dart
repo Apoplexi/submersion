@@ -64,4 +64,41 @@ void main() {
       expect(monthFirst.formatMonthDayWithYear(null), '--');
     });
   });
+
+  group('formatWeekdayMonthDay', () {
+    final date = DateTime(2026, 3, 15);
+
+    test('keeps the weekday first and orders the rest by preference', () {
+      expect(monthFirst.formatWeekdayMonthDay(date), 'Sun, Mar 15');
+      expect(dayFirst.formatWeekdayMonthDay(date), 'Sun, 15 Mar');
+    });
+
+    test('renders the placeholder for a null date', () {
+      expect(monthFirst.formatWeekdayMonthDay(null), '--');
+    });
+  });
+
+  group('static patterns', () {
+    test('monthDayPattern follows the day-first preference', () {
+      expect(
+        UnitFormatter.monthDayPattern(DateFormatPreference.mmddyyyy),
+        'MMM d',
+      );
+      expect(
+        UnitFormatter.monthDayPattern(DateFormatPreference.ddmmyyyy),
+        'd MMM',
+      );
+    });
+
+    test('weekdayMonthDayPattern prefixes the weekday in both orders', () {
+      expect(
+        UnitFormatter.weekdayMonthDayPattern(DateFormatPreference.mmddyyyy),
+        'EEE, MMM d',
+      );
+      expect(
+        UnitFormatter.weekdayMonthDayPattern(DateFormatPreference.ddmmyyyy),
+        'EEE, d MMM',
+      );
+    });
+  });
 }

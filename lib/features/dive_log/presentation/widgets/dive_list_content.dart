@@ -8,6 +8,7 @@ import 'package:submersion/core/constants/dive_field.dart';
 import 'package:submersion/core/constants/list_view_mode.dart';
 import 'package:submersion/core/constants/sort_options.dart';
 import 'package:submersion/core/models/sort_state.dart';
+import 'package:submersion/core/services/pdf_templates/pdf_date_formatter.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/dive_log/presentation/providers/highlight_providers.dart';
 import 'package:submersion/features/dive_log/presentation/providers/view_config_providers.dart';
@@ -594,6 +595,11 @@ class _DiveListContentState extends ConsumerState<DiveListContent> {
         _selectedIds.toList(),
       );
       final exportService = ref.read(exportServiceProvider);
+      final settings = ref.read(settingsProvider);
+      final pdfDates = PdfDateFormatter(
+        dateFormat: settings.dateFormat,
+        timeFormat: settings.timeFormat,
+      );
       final sites = selectedDives
           .where((d) => d.site != null)
           .map((d) => d.site!)
@@ -610,8 +616,14 @@ class _DiveListContentState extends ConsumerState<DiveListContent> {
       final path = switch (format) {
         _BulkExportFormat.pdf =>
           sharing
-              ? await exportService.exportDivesToPdf(selectedDives)
-              : await exportService.saveDivesToPdfFile(selectedDives),
+              ? await exportService.exportDivesToPdf(
+                  selectedDives,
+                  dates: pdfDates,
+                )
+              : await exportService.saveDivesToPdfFile(
+                  selectedDives,
+                  dates: pdfDates,
+                ),
         _BulkExportFormat.csv =>
           sharing
               ? await exportService.exportDivesToCsv(selectedDives)

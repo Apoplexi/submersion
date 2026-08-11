@@ -417,12 +417,33 @@ class UnitFormatter {
     return '${formatDate(dateTime)} • ${formatTime(dateTime)}';
   }
 
+  /// `DateFormat` pattern for a bare month and day in [dateFormat]'s order.
+  ///
+  /// Static so widgets that thread the bare [DateFormatPreference] down (the
+  /// tide widgets carry it alongside [TimeFormat], with no [AppSettings] to
+  /// hand) share this one definition of the order.
+  static String monthDayPattern(DateFormatPreference dateFormat) =>
+      dateFormat.isDayFirst ? 'd MMM' : 'MMM d';
+
+  /// `DateFormat` pattern for a weekday followed by month and day.
+  /// The weekday leads in both orders: "Mon, Jan 15" or "Mon, 15 Jan".
+  static String weekdayMonthDayPattern(DateFormatPreference dateFormat) =>
+      'EEE, ${monthDayPattern(dateFormat)}';
+
   /// Format month and day only (respects day-first vs month-first preference)
   /// Example: "Jan 15" or "15 Jan"
   String formatMonthDay(DateTime? dateTime) {
     if (dateTime == null) return '--';
-    final pattern = settings.dateFormat.isDayFirst ? 'd MMM' : 'MMM d';
-    return DateFormat(pattern).format(dateTime);
+    return DateFormat(monthDayPattern(settings.dateFormat)).format(dateTime);
+  }
+
+  /// Format weekday with month and day (respects day-first vs month-first)
+  /// Example: "Mon, Jan 15" or "Mon, 15 Jan"
+  String formatWeekdayMonthDay(DateTime? dateTime) {
+    if (dateTime == null) return '--';
+    return DateFormat(
+      weekdayMonthDayPattern(settings.dateFormat),
+    ).format(dateTime);
   }
 
   /// Format month and day, adding the year when [dateTime] falls outside the
