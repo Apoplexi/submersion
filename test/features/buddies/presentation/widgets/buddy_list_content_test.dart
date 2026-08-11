@@ -18,6 +18,7 @@ import 'package:submersion/shared/models/entity_table_config.dart';
 import 'package:submersion/shared/providers/entity_table_config_providers.dart';
 
 import '../../../../helpers/mock_providers.dart';
+import '../../../../helpers/selection_contract.dart';
 import '../../../../helpers/test_app.dart';
 
 // ---------------------------------------------------------------------------
@@ -94,6 +95,12 @@ Future<List<Override>> _buildOverrides({
   ];
 }
 
+/// Mutable source for the contract test's filter step, so the visible
+/// list can be narrowed mid-test the way a real filter would.
+final _visibleBuddiesProvider = StateProvider<List<BuddyWithDiveCount>>(
+  (ref) => const [],
+);
+
 Future<List<Override>> _buildPhoneOverrides({
   required List<BuddyWithDiveCount> buddies,
   ListViewMode viewMode = ListViewMode.detailed,
@@ -117,6 +124,56 @@ Future<List<Override>> _buildPhoneOverrides({
 }
 
 void main() {
+  group('selection contract', () {
+    testWidgets('satisfies the shared selection contract', (tester) async {
+      final all = <BuddyWithDiveCount>[
+        _makeBuddy(id: 'b1', name: 'Aaa Buddy'),
+        _makeBuddy(id: 'b2', name: 'Bbb Buddy'),
+        _makeBuddy(id: 'b3', name: 'Ccc Buddy'),
+      ];
+
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+      final overrides = <Override>[
+        sharedPreferencesProvider.overrideWithValue(prefs),
+        settingsProvider.overrideWith((ref) => MockSettingsNotifier()),
+        currentDiverIdProvider.overrideWith(
+          (ref) => MockCurrentDiverIdNotifier(),
+        ),
+        _visibleBuddiesProvider.overrideWith((ref) => all),
+        allBuddiesWithDiveCountProvider.overrideWith(
+          (ref) => ref.watch(_visibleBuddiesProvider),
+        ),
+        buddyListNotifierProvider.overrideWith(
+          (ref) => _MockBuddyListNotifier(),
+        ),
+        buddyListViewModeProvider.overrideWith((ref) => ListViewMode.detailed),
+        buddyTableConfigProvider.overrideWith(
+          (ref) => _TestBuddyTableConfigNotifier(_testConfig),
+        ),
+        highlightedBuddyIdProvider.overrideWith((ref) => null),
+      ];
+
+      await verifySelectionContract(
+        tester,
+        build: () => testApp(
+          overrides: overrides,
+          locale: const Locale('en'),
+          child: const BuddyListContent(showAppBar: true),
+        ),
+        selectButton: find.byKey(const ValueKey('enter_selection')),
+        firstRow: find.text('Aaa Buddy'),
+        applyFilter: (tester) async {
+          final container = ProviderScope.containerOf(
+            tester.element(find.byType(BuddyListContent)),
+          );
+          container.read(_visibleBuddiesProvider.notifier).state = [all.first];
+        },
+        visibleAfterFilter: 1,
+      );
+    });
+  });
+
   group('BuddyListContent in table mode', () {
     testWidgets('renders table with column headers', (tester) async {
       final buddies = [
