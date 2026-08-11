@@ -107,28 +107,33 @@ class _DraggablePerdixOverlayState extends State<DraggablePerdixOverlay> {
         : DraggablePerdixOverlay.defaultFraction.dy,
   );
 
-  /// Whether the current gesture actually moved the face. The recognizer
-  /// claims the pointer on contact, so a plain tap on the face also produces a
-  /// start/end pair; without this a tap would persist an unchanged position and
-  /// bounce the settings provider (and the page) for nothing.
-  bool _movedDuringDrag = false;
+  /// Position when the current gesture started, or null outside a gesture.
+  /// The recognizer claims the pointer on contact, so a plain tap produces a
+  /// start/end pair too, and dragging further into an edge the fraction is
+  /// already clamped against produces updates that change nothing. Comparing
+  /// against this covers both: only a net move reaches [onDragEnd], instead of
+  /// persisting an unchanged position and bouncing the settings provider (and
+  /// the page) for nothing.
+  Offset? _dragStartFraction;
 
   void _onPanUpdate(DragUpdateDetails details, BoxConstraints constraints) {
     final faceSize = _faceKey.currentContext?.size;
     if (faceSize == null) return;
-    _movedDuringDrag = true;
     final movableW = constraints.maxWidth - faceSize.width;
     final movableH = constraints.maxHeight - faceSize.height;
-    setState(() {
-      _fraction = Offset(
-        movableW <= 0
-            ? 0
-            : (_fraction.dx + details.delta.dx / movableW).clamp(0.0, 1.0),
-        movableH <= 0
-            ? 0
-            : (_fraction.dy + details.delta.dy / movableH).clamp(0.0, 1.0),
-      );
-    });
+    final next = Offset(
+      movableW <= 0
+          ? 0
+          : (_fraction.dx + details.delta.dx / movableW).clamp(0.0, 1.0),
+      movableH <= 0
+          ? 0
+          : (_fraction.dy + details.delta.dy / movableH).clamp(0.0, 1.0),
+    );
+    // A drag pushing past an edge repeats the clamped value every frame; not
+    // rebuilding for those keeps the face's per-frame video rebuild the only
+    // work happening during playback.
+    if (next == _fraction) return;
+    setState(() => _fraction = next);
   }
 
   @override
@@ -160,15 +165,16 @@ class _DraggablePerdixOverlayState extends State<DraggablePerdixOverlay> {
                         _EagerPanGestureRecognizer
                       >(_EagerPanGestureRecognizer.new, (recognizer) {
                         recognizer.onStart = (_) {
-                          _movedDuringDrag = false;
+                          _dragStartFraction = _fraction;
                         };
                         recognizer.onUpdate = (details) {
                           _onPanUpdate(details, constraints);
                         };
                         recognizer.onEnd = (_) {
-                          if (_movedDuringDrag) {
+                          if (_fraction != _dragStartFraction) {
                             widget.onDragEnd?.call(_fraction);
                           }
+                          _dragStartFraction = null;
                         };
                       }),
                 },
@@ -198,6 +204,7 @@ class _DraggablePerdixOverlayState extends State<DraggablePerdixOverlay> {
         return PerdixFace(
           data: widget.resolver.resolve(t),
           settings: widget.settings,
+          showDragHandle: true,
         );
       },
     );

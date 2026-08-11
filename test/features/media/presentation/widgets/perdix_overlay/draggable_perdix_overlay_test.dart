@@ -147,6 +147,32 @@ void main() {
     expect(writes, 1);
   });
 
+  testWidgets('a drag that only pushes past an edge persists nothing', (
+    tester,
+  ) async {
+    var writes = 0;
+    await tester.pumpWidget(
+      host(
+        DraggablePerdixOverlay(
+          resolver: resolver,
+          baseElapsedSeconds: 0,
+          settings: settings,
+          initialFraction: const Offset(1, 0),
+          onDragEnd: (_) => writes++,
+        ),
+      ),
+    );
+    final before = tester.getRect(find.byType(PerdixFace));
+
+    // Already pinned to the top-right, so up-and-right is clamped away
+    // entirely: the gesture moves the pointer but not the face.
+    await tester.drag(find.byType(PerdixFace), const Offset(200, -200));
+    await tester.pumpAndSettle();
+
+    expect(tester.getRect(find.byType(PerdixFace)), before);
+    expect(writes, 0);
+  });
+
   testWidgets('dragging up cannot push the face into the reserved band', (
     tester,
   ) async {
@@ -194,6 +220,30 @@ void main() {
           .first,
     );
     expect(region.cursor, SystemMouseCursors.grab);
+  });
+
+  testWidgets('video mode carries the drag handle too', (tester) async {
+    final position = ValueNotifier<Duration>(Duration.zero);
+    addTearDown(position.dispose);
+    await tester.pumpWidget(
+      host(
+        DraggablePerdixOverlay(
+          resolver: resolver,
+          baseElapsedSeconds: 180,
+          settings: settings,
+          playback: position,
+          positionGetter: () => position.value,
+        ),
+      ),
+    );
+    // The face is equally draggable in video mode, and video is where this
+    // overlay is mostly used, so the affordance has to survive the separate
+    // AnimatedBuilder build path.
+    expect(find.byKey(PerdixFace.dragHandleKey), findsOneWidget);
+
+    position.value = const Duration(seconds: 60);
+    await tester.pump();
+    expect(find.byKey(PerdixFace.dragHandleKey), findsOneWidget);
   });
 
   testWidgets('topReserve keeps the default corner below the top chrome', (
