@@ -118,6 +118,42 @@ void main() {
       expect(deleted, isTrue);
     });
 
+    testWidgets('omits the delete control entirely when onDelete is null', (
+      tester,
+    ) async {
+      controller.enterImplicit('a');
+      await tester.pumpWidget(
+        testApp(
+          locale: const Locale('en'),
+          child: Scaffold(
+            appBar: SelectionAppBar(
+              controller: controller,
+              selectableIds: const ['a', 'b', 'c'],
+              actions: const [],
+              shell: SelectionBarShell.appBar,
+              onDelete: null,
+            ),
+            body: const SizedBox(),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // Omitted, not disabled: a surface with no true delete must not show a
+      // dead trash button.
+      expect(find.byKey(const ValueKey('selection_delete')), findsNothing);
+      // The rest of the baseline still renders.
+      expect(
+        find.byKey(const ValueKey('selection_select_all')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const ValueKey('selection_deselect_all')),
+        findsOneWidget,
+      );
+      expect(find.byKey(const ValueKey('selection_exit')), findsOneWidget);
+    });
+
     testWidgets('an extra below its minCount renders disabled', (tester) async {
       controller.enterImplicit('a');
       await tester.pumpWidget(

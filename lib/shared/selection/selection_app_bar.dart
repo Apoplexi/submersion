@@ -38,10 +38,12 @@ class SelectionAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   /// Invoked by the baseline delete control.
   ///
-  /// Required, not optional: delete is part of the guaranteed baseline, and a
-  /// nullable callback would let a surface ship a permanently disabled delete
-  /// button instead of failing to compile.
-  final VoidCallback onDelete;
+  /// Null only for surfaces that have no true delete -- the dive media section
+  /// unlinks media from a dive without destroying files, so a trash control
+  /// there would misdescribe what it does. When null the delete control is
+  /// omitted entirely rather than rendered disabled, so the bar never shows a
+  /// dead button. Every surface that can delete must pass this.
+  final VoidCallback? onDelete;
 
   /// How many extras render as inline icons before the rest overflow.
   final int maxInlineActions;
@@ -55,6 +57,9 @@ class SelectionAppBar extends StatelessWidget implements PreferredSizeWidget {
     required this.onDelete,
     this.maxInlineActions = 3,
   });
+
+  /// Whether this surface offers a delete at all.
+  bool get _hasDelete => onDelete != null;
 
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
@@ -130,13 +135,14 @@ class SelectionAppBar extends StatelessWidget implements PreferredSizeWidget {
               : null,
           onPressed: action.isEnabledFor(count) ? action.onInvoke : null,
         ),
-      IconButton(
-        key: const ValueKey('selection_delete'),
-        icon: const Icon(Icons.delete_outline),
-        tooltip: MaterialLocalizations.of(context).deleteButtonTooltip,
-        color: Theme.of(context).colorScheme.error,
-        onPressed: count == 0 ? null : onDelete,
-      ),
+      if (_hasDelete)
+        IconButton(
+          key: const ValueKey('selection_delete'),
+          icon: const Icon(Icons.delete_outline),
+          tooltip: MaterialLocalizations.of(context).deleteButtonTooltip,
+          color: Theme.of(context).colorScheme.error,
+          onPressed: count == 0 ? null : onDelete,
+        ),
       if (overflow.isNotEmpty)
         PopupMenuButton<String>(
           key: const ValueKey('selection_overflow'),

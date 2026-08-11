@@ -44,6 +44,19 @@ Phases 4-5 (ten surfaces with no selection today) and Phase 6 (cleanup) follow.
   line, or a session URL.
 - Work in `.claude/worktrees/selection-phase3` on `worktree-selection-phase3`.
 
+## Prerequisite change to the shared bar
+
+`SelectionAppBar.onDelete` becomes nullable again, having been made required
+during PR #981 review. The dive media section is the counterexample that review
+did not have: it unlinks media from a dive without destroying files, so a trash
+control there would misdescribe what it does.
+
+This is not a straight revert. Before review the callback was nullable *and* the
+button still rendered, so an omitting surface shipped a trash icon that looked
+available and did nothing. Now a null callback omits the control entirely, which
+keeps the property the reviewer was protecting -- no dead controls -- while
+letting a surface with no true delete opt out honestly.
+
 ## Icon canon
 
 One glyph per concept, applied to every surface in this phase:
@@ -465,12 +478,11 @@ BulkAction(
 ),
 ```
 
-Unlink is not delete -- the files are not destroyed -- so it is an extra, and
-`onDelete` should invoke the same unlink confirmation. Pass
-`onDelete: () => _unlinkSelected(context, media)` and drop the separate extra if
-having both reads as duplication; decide once the bar renders and keep whichever
-is not redundant. Prefer: unlink as the extra, and `onDelete` also wired to
-`_unlinkSelected`, because the baseline delete slot must do something coherent.
+Unlink is not delete -- the files are not destroyed -- so media passes
+`onDelete: null` and declares unlink as its only extra. `SelectionAppBar.onDelete`
+is nullable for exactly this case, and **omits the delete control entirely** when
+null rather than rendering it disabled, so the bar never shows a dead button.
+Every surface that can genuinely delete must still pass the callback.
 
 - [ ] **Step 5: Add the Select affordance**
 
