@@ -22976,6 +22976,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get dataQuality_repair_applied => 'Herstel toegepast';
 
   @override
+  String get dataQuality_repair_noChange => 'Hier valt niets te herstellen';
+
+  @override
   String get dataQuality_repair_failed => 'Herstel mislukt';
 
   @override
@@ -23190,6 +23193,14 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get dataQuality_repairLabel_despike => 'Piek verwijderen';
+
+  @override
+  String get dataQuality_repairLabel_clampNegative =>
+      'Diepten boven het oppervlak begrenzen';
+
+  @override
+  String get dataQuality_repairLabel_smoothRates =>
+      'Onmogelijke snelheden vlak maken';
 
   @override
   String get dataQuality_repairLabel_fillGaps => 'Hiaten opvullen';

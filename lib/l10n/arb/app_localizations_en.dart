@@ -22763,6 +22763,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get dataQuality_repair_applied => 'Repair applied';
 
   @override
+  String get dataQuality_repair_noChange => 'Nothing to repair here';
+
+  @override
   String get dataQuality_repair_failed => 'Repair failed';
 
   @override
@@ -22977,6 +22980,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get dataQuality_repairLabel_despike => 'Remove spike';
+
+  @override
+  String get dataQuality_repairLabel_clampNegative =>
+      'Clamp above-surface depths';
+
+  @override
+  String get dataQuality_repairLabel_smoothRates => 'Smooth impossible rates';
 
   @override
   String get dataQuality_repairLabel_fillGaps => 'Fill gaps';

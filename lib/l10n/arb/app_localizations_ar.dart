@@ -22743,6 +22743,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get dataQuality_repair_applied => 'تم تطبيق الإصلاح';
 
   @override
+  String get dataQuality_repair_noChange => 'لا يوجد ما يمكن إصلاحه هنا';
+
+  @override
   String get dataQuality_repair_failed => 'فشل الإصلاح';
 
   @override
@@ -22955,6 +22958,12 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get dataQuality_repairLabel_despike => 'إزالة القفزة';
+
+  @override
+  String get dataQuality_repairLabel_clampNegative => 'تثبيت الأعماق فوق السطح';
+
+  @override
+  String get dataQuality_repairLabel_smoothRates => 'تنعيم المعدلات المستحيلة';
 
   @override
   String get dataQuality_repairLabel_fillGaps => 'ملء الفجوات';

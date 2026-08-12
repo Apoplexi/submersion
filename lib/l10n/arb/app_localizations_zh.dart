@@ -21979,6 +21979,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get dataQuality_repair_applied => '已应用修复';
 
   @override
+  String get dataQuality_repair_noChange => '这里没有需要修正的内容';
+
+  @override
   String get dataQuality_repair_failed => '修复失败';
 
   @override
@@ -22187,6 +22190,12 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get dataQuality_repairLabel_despike => '移除尖峰';
+
+  @override
+  String get dataQuality_repairLabel_clampNegative => '将水面以上深度归零';
+
+  @override
+  String get dataQuality_repairLabel_smoothRates => '平滑异常速率';
 
   @override
   String get dataQuality_repairLabel_fillGaps => '填补缺口';

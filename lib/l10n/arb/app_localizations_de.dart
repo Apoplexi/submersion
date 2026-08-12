@@ -23113,6 +23113,10 @@ class AppLocalizationsDe extends AppLocalizations {
   String get dataQuality_repair_applied => 'Korrektur angewendet';
 
   @override
+  String get dataQuality_repair_noChange =>
+      'Hier gibt es nichts zu korrigieren';
+
+  @override
   String get dataQuality_repair_failed => 'Korrektur fehlgeschlagen';
 
   @override
@@ -23328,6 +23332,13 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get dataQuality_repairLabel_despike => 'Ausreißer entfernen';
+
+  @override
+  String get dataQuality_repairLabel_clampNegative =>
+      'Tiefen über der Oberfläche begrenzen';
+
+  @override
+  String get dataQuality_repairLabel_smoothRates => 'Unmögliche Raten glätten';
 
   @override
   String get dataQuality_repairLabel_fillGaps => 'Lücken füllen';
