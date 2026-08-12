@@ -20,7 +20,9 @@ enum DocumentRefStrategy {
   /// "Show in Finder". The bookmark stays the source of truth.
   bookmarkWithPath,
 
-  /// Android: persisted SAF content URI.
+  /// Android: persisted SAF content URI, falling back to the picked path
+  /// when the pick carried no content URI or the provider refused a
+  /// persistable grant.
   persistableUri,
 
   /// Windows / Linux: the picked path is itself durable.
@@ -36,7 +38,11 @@ enum DocumentRefStrategy {
 /// Unlike FilesTabNotifier, this is the one importer that can take an
 /// Android persistable URI: its picker asks for [allowedExtensions], which
 /// routes file_picker to `ACTION_OPEN_DOCUMENT` and therefore to a grant
-/// worth persisting. See [DocumentRefStrategy.persistableUri].
+/// worth persisting. That grant is not guaranteed, though — a provider may
+/// refuse it — so an Android row carries EITHER a `bookmarkRef` or a
+/// `localPath`, never reliably the former. Read them the way
+/// `LocalFileResolver` does: path first, bookmark second. See
+/// [DocumentRefStrategy.persistableUri].
 class DocumentImportService {
   DocumentImportService({
     required this.mediaRepository,
