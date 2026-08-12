@@ -532,6 +532,9 @@ class _FullscreenProfilePageState extends ConsumerState<FullscreenProfilePage> {
                           '${settings.fullscreenReadoutCardY}',
                         ),
                         rows: _readoutRows,
+                        placementInsets: isPhone
+                            ? const EdgeInsets.fromLTRB(12, 56, 12, 12)
+                            : const EdgeInsets.all(12),
                         initialFraction:
                             settings.fullscreenReadoutCardX != null &&
                                 settings.fullscreenReadoutCardY != null
