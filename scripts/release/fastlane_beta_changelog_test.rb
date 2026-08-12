@@ -93,7 +93,7 @@ end
 # variable built from user-controlled sources).
 
 Dir.mktmpdir do |tmp|
-  notes_file = File.join(tmp, 'beta-notes-store.txt')
+  notes_file = File.join(tmp, 'beta-notes-apple.txt')
   File.write(notes_file, "New in this build\n- a change from a file\n")
 
   with_env('BETA_CHANGELOG_FILE' => notes_file, 'BETA_CHANGELOG' => nil) do
@@ -125,6 +125,30 @@ Dir.mktmpdir do |tmp|
   with_env('BETA_CHANGELOG_FILE' => over_limit, 'BETA_CHANGELOG' => nil) do
     check(beta_changelog.length <= 4000, 'file notes were not truncated to Apple\'s limit')
   end
+end
+
+# --- The Apple lanes must not publish another platform's name ----------------
+# Notes handed straight to fastlane via BETA_CHANGELOG never pass through
+# sanitize_apple_store_notes.py, so the Fastfile carries a last-resort sweep
+# over the same shared term list.
+#
+# This has to stay ABOVE the android Fastfile load below: that file defines its
+# own read_beta_notes, which overrides the iOS one at top level, and these
+# checks would then silently exercise the Play helper instead.
+
+with_env('BETA_CHANGELOG_FILE' => nil,
+         'BETA_CHANGELOG' => 'Fixed the Android USB download and the Windows updater.') do
+  notes = beta_changelog
+  check(!notes.match?(/Android/i), 'Android reached the TestFlight changelog')
+  check(!notes.include?('Windows'), 'Windows reached the TestFlight changelog')
+  check(notes.include?('USB download'), 'the backstop ate the rest of the note')
+end
+
+# Already-sanitized text from the pipeline must survive unchanged.
+with_env('BETA_CHANGELOG_FILE' => nil,
+         'BETA_CHANGELOG' => 'Fixed the other platforms USB download.') do
+  check(beta_changelog == 'Fixed the other platforms USB download.',
+        'the backstop is not idempotent over already-sanitized notes')
 end
 
 # --- Already-uploaded build detection (iOS/macOS Fastfiles) -----------------

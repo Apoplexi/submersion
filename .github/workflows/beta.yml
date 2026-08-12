@@ -133,14 +133,14 @@ jobs:
           # The delta is emitted first and the capped formats truncate the
           # cumulative tail to fit, so the change a tester is being asked to
           # exercise is never the part that gets cut.
-          ./scripts/release/beta_release_notes.sh --since "$PREV_SHA" --format store \
-            --cumulative > beta-notes-store.txt
+          ./scripts/release/beta_release_notes.sh --since "$PREV_SHA" --format apple \
+            --cumulative > beta-notes-apple.txt
           ./scripts/release/beta_release_notes.sh --since "$PREV_SHA" --format play \
             --cumulative > beta-notes-play.txt
           ./scripts/release/beta_release_notes.sh --since "$PREV_SHA" --format markdown \
             --cumulative > beta-notes.md
           echo "--- TestFlight whatsNew ---"
-          cat beta-notes-store.txt
+          cat beta-notes-apple.txt
 
       - name: Upload beta release notes
         if: steps.gate.outputs.proceed == 'true'
@@ -148,7 +148,7 @@ jobs:
         with:
           name: beta-notes
           path: |
-            beta-notes-store.txt
+            beta-notes-apple.txt
             beta-notes-play.txt
             beta-notes.md
           retention-days: 5
@@ -341,7 +341,7 @@ jobs:
           APP_STORE_CONNECT_API_KEY_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_KEY_ID }}
           APP_STORE_CONNECT_API_KEY_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ISSUER_ID }}
           APP_STORE_CONNECT_API_KEY_KEY_FILEPATH: fastlane/AuthKey.p8
-          BETA_CHANGELOG_FILE: ${{ github.workspace }}/beta-notes-store.txt
+          BETA_CHANGELOG_FILE: ${{ github.workspace }}/beta-notes-apple.txt
           APP_VERSION: ${{ needs.precheck.outputs.semver }}
           BUILD_NUMBER: ${{ needs.precheck.outputs.build-number }}
         run: |
@@ -436,7 +436,7 @@ jobs:
           APP_STORE_CONNECT_API_KEY_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_KEY_ID }}
           APP_STORE_CONNECT_API_KEY_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ISSUER_ID }}
           APP_STORE_CONNECT_API_KEY_KEY_FILEPATH: fastlane/AuthKey.p8
-          BETA_CHANGELOG_FILE: ${{ github.workspace }}/beta-notes-store.txt
+          BETA_CHANGELOG_FILE: ${{ github.workspace }}/beta-notes-apple.txt
           APP_VERSION: ${{ needs.precheck.outputs.semver }}
           BUILD_NUMBER: ${{ needs.precheck.outputs.build-number }}
         run: |

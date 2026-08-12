@@ -19,6 +19,8 @@
 #
 #   Signing is handled automatically via Xcode + App Store Connect API key.
 
+require 'json'
+
 default_platform(:mac)
 
 # Apple rejects an upload whose whatsNew exceeds 4000 characters.
@@ -56,13 +58,49 @@ platform :mac do
     File.read(path)
   end
 
+  # Last resort for a local run. Notes handed straight to fastlane through
+  # BETA_CHANGELOG never pass through sanitize_apple_store_notes.py, and App
+  # Review guideline 2.3.10 forbids naming other platforms in App Store
+  # metadata. The term list is shared with that script so the two cannot
+  # drift.
+  #
+  # This only redacts. The Python path additionally repairs platform lists,
+  # which is what keeps the prose readable, so this is a safety net rather
+  # than an equivalent implementation.
+  APPLE_BANNED_TERMS_PATH = File.expand_path(
+    "../../scripts/release/apple_store_banned_terms.json", __dir__
+  )
+  APPLE_TERM_REPLACEMENT = {
+    "platform" => "other platforms",
+    "store" => "another store",
+  }.freeze
+
+  def strip_non_apple_platforms(text)
+    unless File.exist?(APPLE_BANNED_TERMS_PATH)
+      UI.important(
+        "Banned-term list missing at #{APPLE_BANNED_TERMS_PATH}; " \
+        "publishing notes unsanitized."
+      )
+      return text
+    end
+
+    terms = JSON.parse(File.read(APPLE_BANNED_TERMS_PATH))["terms"]
+    terms.reduce(text) do |acc, term|
+      options = term["ignorecase"] ? Regexp::IGNORECASE : 0
+      acc.gsub(
+        Regexp.new(term["pattern"], options),
+        APPLE_TERM_REPLACEMENT[term["class"]],
+      )
+    end
+  end
+
   # The TestFlight "What to Test" text, supplied by the beta pipeline.
   #
   # Blank is treated as unset: Ruby's `||` only falls back on nil, so an empty
   # BETA_CHANGELOG would publish empty notes, which a tester reads as "the
   # previous build's notes still apply" - the exact confusion this replaced.
   def beta_changelog
-    notes = read_beta_notes.strip
+    notes = strip_non_apple_platforms(read_beta_notes).strip
 
     if notes.empty?
       UI.important("No beta release notes supplied; falling back to a generic note.")
