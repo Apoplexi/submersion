@@ -22564,7 +22564,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get settings_security_encryption_subtitle =>
-      'احمِ ملف سجل الغوص الخاص بك بالتشفير أثناء التخزين';
+      'احمِ ملف سجل الغوص الخاص بك بالتشفير أثناء التخزين. قد يؤثر التشفير على الأداء.';
 
   @override
   String get settings_security_encryption_progress_backup =>
@@ -22639,7 +22639,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get settings_security_enableEncryption_body =>
-      'يتم أولاً إنشاء نسخة احتياطية، ثم يُعاد تشفير ملف قاعدة البيانات في مكانه. قد يستغرق ذلك وقتًا مع السجلات الكبيرة.';
+      'يتم أولاً إنشاء نسخة احتياطية، ثم يُعاد تشفير ملف قاعدة البيانات في مكانه. قد يستغرق ذلك وقتًا مع السجلات الكبيرة. قد يؤثر التشفير على الأداء.';
 
   @override
   String get settings_security_disableEncryption_title =>

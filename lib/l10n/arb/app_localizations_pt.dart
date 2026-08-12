@@ -22967,7 +22967,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_security_encryption_subtitle =>
-      'Proteja o arquivo do seu registro de mergulhos com criptografia em repouso';
+      'Proteja o arquivo do seu registro de mergulhos com criptografia em repouso. A criptografia pode afetar o desempenho.';
 
   @override
   String get settings_security_encryption_progress_backup =>
@@ -23043,7 +23043,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settings_security_enableEncryption_body =>
-      'Primeiro é criado um backup de segurança e depois o arquivo do banco é recriptografado no local. Pode demorar com registros grandes.';
+      'Primeiro é criado um backup de segurança e depois o arquivo do banco é recriptografado no local. Pode demorar com registros grandes. A criptografia pode afetar o desempenho.';
 
   @override
   String get settings_security_disableEncryption_title =>

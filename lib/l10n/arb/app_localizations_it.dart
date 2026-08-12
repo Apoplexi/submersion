@@ -22968,7 +22968,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get settings_security_encryption_subtitle =>
-      'Proteggi il file del tuo diario di immersioni con la crittografia a riposo';
+      'Proteggi il file del tuo diario di immersioni con la crittografia a riposo. La crittografia può influire sulle prestazioni.';
 
   @override
   String get settings_security_encryption_progress_backup =>
@@ -23044,7 +23044,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get settings_security_enableEncryption_body =>
-      'Prima viene creato un backup di sicurezza, poi il file del database viene ricrittografato sul posto. Con diari grandi può richiedere tempo.';
+      'Prima viene creato un backup di sicurezza, poi il file del database viene ricrittografato sul posto. Con diari grandi può richiedere tempo. La crittografia può influire sulle prestazioni.';
 
   @override
   String get settings_security_disableEncryption_title =>

@@ -22890,7 +22890,7 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get settings_security_encryption_subtitle =>
-      'Védje merülési naplófájlját nyugalmi titkosítással';
+      'Védje merülési naplófájlját nyugalmi titkosítással. A titkosítás hatással lehet a teljesítményre.';
 
   @override
   String get settings_security_encryption_progress_backup =>
@@ -22965,7 +22965,7 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get settings_security_enableEncryption_body =>
-      'Először biztonsági mentés készül, majd az adatbázisfájl helyben újratitkosítódik. Nagy naplóknál ez eltarthat egy ideig.';
+      'Először biztonsági mentés készül, majd az adatbázisfájl helyben újratitkosítódik. Nagy naplóknál ez eltarthat egy ideig. A titkosítás hatással lehet a teljesítményre.';
 
   @override
   String get settings_security_disableEncryption_title =>

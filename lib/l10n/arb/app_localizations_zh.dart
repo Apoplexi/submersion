@@ -21813,7 +21813,8 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settings_security_encryption => '加密数据库';
 
   @override
-  String get settings_security_encryption_subtitle => '使用静态加密保护您的潜水日志文件';
+  String get settings_security_encryption_subtitle =>
+      '使用静态加密保护您的潜水日志文件。加密可能会影响性能。';
 
   @override
   String get settings_security_encryption_progress_backup => '正在创建安全备份...';
@@ -21879,7 +21880,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get settings_security_enableEncryption_body =>
-      '首先会创建安全备份，然后就地重新加密数据库文件。日志较大时可能需要一些时间。';
+      '首先会创建安全备份，然后就地重新加密数据库文件。日志较大时可能需要一些时间。加密可能会影响性能。';
 
   @override
   String get settings_security_disableEncryption_title => '要关闭加密吗？';

@@ -38286,7 +38286,7 @@ abstract class AppLocalizations {
   /// No description provided for @settings_security_encryption_subtitle.
   ///
   /// In en, this message translates to:
-  /// **'Protect your dive log file with at-rest encryption'**
+  /// **'Protect your dive log file with at-rest encryption. Encryption may affect performance.'**
   String get settings_security_encryption_subtitle;
 
   /// No description provided for @settings_security_encryption_progress_backup.
@@ -38412,7 +38412,7 @@ abstract class AppLocalizations {
   /// No description provided for @settings_security_enableEncryption_body.
   ///
   /// In en, this message translates to:
-  /// **'A safety backup is created first, then the database file is re-encrypted in place. This can take a while for large dive logs.'**
+  /// **'A safety backup is created first, then the database file is re-encrypted in place. This can take a while for large dive logs. Encryption may affect performance.'**
   String get settings_security_enableEncryption_body;
 
   /// No description provided for @settings_security_disableEncryption_title.

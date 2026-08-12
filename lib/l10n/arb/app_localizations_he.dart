@@ -22399,7 +22399,7 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get settings_security_encryption_subtitle =>
-      'הגנו על קובץ יומן הצלילות שלכם באמצעות הצפנה במנוחה';
+      'הגנו על קובץ יומן הצלילות שלכם באמצעות הצפנה במנוחה. הצפנה עשויה להשפיע על הביצועים.';
 
   @override
   String get settings_security_encryption_progress_backup =>
@@ -22473,7 +22473,7 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get settings_security_enableEncryption_body =>
-      'תחילה נוצר גיבוי בטיחות ואז קובץ מסד הנתונים מוצפן מחדש במקומו. זה עשוי להימשך זמן מה ביומנים גדולים.';
+      'תחילה נוצר גיבוי בטיחות ואז קובץ מסד הנתונים מוצפן מחדש במקומו. זה עשוי להימשך זמן מה ביומנים גדולים. הצפנה עשויה להשפיע על הביצועים.';
 
   @override
   String get settings_security_disableEncryption_title => 'לכבות את ההצפנה?';

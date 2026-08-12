@@ -23041,7 +23041,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get settings_security_encryption_subtitle =>
-      'Protégez votre carnet de plongée avec un chiffrement au repos';
+      'Protégez votre carnet de plongée avec un chiffrement au repos. Le chiffrement peut affecter les performances.';
 
   @override
   String get settings_security_encryption_progress_backup =>
@@ -23119,7 +23119,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get settings_security_enableEncryption_body =>
-      'Une sauvegarde de sécurité est d\'abord créée, puis le fichier de la base est rechiffré sur place. Cela peut prendre du temps pour les gros carnets.';
+      'Une sauvegarde de sécurité est d\'abord créée, puis le fichier de la base est rechiffré sur place. Cela peut prendre du temps pour les gros carnets. Le chiffrement peut affecter les performances.';
 
   @override
   String get settings_security_disableEncryption_title =>

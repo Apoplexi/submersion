@@ -22986,7 +22986,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get settings_security_encryption_subtitle =>
-      'Protege tu archivo de registro de buceo con cifrado en reposo';
+      'Protege tu archivo de registro de buceo con cifrado en reposo. El cifrado puede afectar al rendimiento.';
 
   @override
   String get settings_security_encryption_progress_backup =>
@@ -23063,7 +23063,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get settings_security_enableEncryption_body =>
-      'Primero se crea una copia de seguridad y después el archivo de la base de datos se vuelve a cifrar en el mismo lugar. Puede tardar un poco con registros grandes.';
+      'Primero se crea una copia de seguridad y después el archivo de la base de datos se vuelve a cifrar en el mismo lugar. Puede tardar un poco con registros grandes. El cifrado puede afectar al rendimiento.';
 
   @override
   String get settings_security_disableEncryption_title =>
