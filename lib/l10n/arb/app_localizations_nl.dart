@@ -22796,7 +22796,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get settings_security_encryption_subtitle =>
-      'Bescherm je duiklogbestand met versleuteling in rust';
+      'Bescherm je duiklogbestand met versleuteling in rust. Versleuteling kan de prestaties beïnvloeden.';
 
   @override
   String get settings_security_encryption_progress_backup =>
@@ -22871,7 +22871,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get settings_security_enableEncryption_body =>
-      'Er wordt eerst een veiligheidsback-up gemaakt, daarna wordt het databasebestand ter plekke opnieuw versleuteld. Dit kan even duren bij grote logboeken.';
+      'Er wordt eerst een veiligheidsback-up gemaakt, daarna wordt het databasebestand ter plekke opnieuw versleuteld. Dit kan even duren bij grote logboeken. Versleuteling kan de prestaties beïnvloeden.';
 
   @override
   String get settings_security_disableEncryption_title =>

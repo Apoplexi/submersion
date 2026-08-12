@@ -13,57 +13,6 @@ import 'package:submersion/features/settings/presentation/providers/settings_pro
 /// break consumer widget tests that pump without localization delegates,
 /// and the dive/site sections want differently-worded labels anyway.
 
-/// Header shown during multi-select mode with count, select all, and unlink.
-class MediaSelectionHeader extends StatelessWidget {
-  final int selectedCount;
-  final int totalCount;
-  final VoidCallback onSelectAll;
-  final VoidCallback onCancel;
-  final VoidCallback onUnlinkSelected;
-  final String selectedCountLabel;
-  final String selectAllLabel;
-  final String cancelTooltip;
-  final String unlinkTooltip;
-
-  const MediaSelectionHeader({
-    super.key,
-    required this.selectedCount,
-    required this.totalCount,
-    required this.onSelectAll,
-    required this.onCancel,
-    required this.onUnlinkSelected,
-    required this.selectedCountLabel,
-    required this.selectAllLabel,
-    required this.cancelTooltip,
-    required this.unlinkTooltip,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
-
-    return Row(
-      children: [
-        IconButton(
-          icon: const Icon(Icons.close),
-          tooltip: cancelTooltip,
-          onPressed: onCancel,
-        ),
-        Text(selectedCountLabel, style: textTheme.titleMedium),
-        const Spacer(),
-        if (selectedCount < totalCount)
-          TextButton(onPressed: onSelectAll, child: Text(selectAllLabel)),
-        IconButton(
-          icon: Icon(Icons.delete_outline, color: colorScheme.error),
-          tooltip: unlinkTooltip,
-          onPressed: selectedCount > 0 ? onUnlinkSelected : null,
-        ),
-      ],
-    );
-  }
-}
-
 /// Empty state shown when a section has no media.
 class MediaEmptyState extends StatelessWidget {
   final IconData icon;
