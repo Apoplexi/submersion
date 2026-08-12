@@ -23,7 +23,9 @@ final allSpeciesProvider = FutureProvider<List<Species>>((ref) async {
 final speciesSightingCountsProvider = FutureProvider<Map<String, int>>((
   ref,
 ) async {
-  return ref.watch(speciesRepositoryProvider).sightingCountsBySpecies();
+  final repository = ref.watch(speciesRepositoryProvider);
+  ref.invalidateSelfWhen(repository.watchSightingChanges());
+  return repository.sightingCountsBySpecies();
 });
 
 final speciesByCategoryProvider =
