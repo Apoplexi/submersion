@@ -554,8 +554,30 @@ class SyncRepository {
   }
 
   /// Public accessor for [_maxRowHlc] -- the highest hlc across conflict-capable
-  /// tables. Used by stale-restore detection.
+  /// tables.
   Future<String?> maxRowHlc() => _maxRowHlc();
+
+  /// The highest hlc this device still ACCOUNTS FOR: live rows or tombstones.
+  ///
+  /// [maxRowHlc] alone answers "what do I still have", which is the wrong
+  /// question for stale-restore detection. Deleting the newest record drops the
+  /// live-row maximum below the published watermark even though nothing was
+  /// rewound -- the tombstone stamped at deletion time (always ABOVE anything
+  /// previously published, since it comes from `SyncClock.issue()`) is the
+  /// device's record of that decision. Counting it distinguishes "the user
+  /// removed data" from "a restore rewound this device", which loses the
+  /// tombstones along with the rows.
+  Future<String?> maxAccountedHlc() async {
+    final rowHigh = await _maxRowHlc();
+    final maxDeletionHlc = _db.deletionLog.hlc.max();
+    final row = await (_db.selectOnly(
+      _db.deletionLog,
+    )..addColumns([maxDeletionHlc])).getSingleOrNull();
+    final tombstoneHigh = row?.read(maxDeletionHlc);
+    if (rowHigh == null) return tombstoneHigh;
+    if (tombstoneHigh == null) return rowHigh;
+    return rowHigh.compareTo(tombstoneHigh) >= 0 ? rowHigh : tombstoneHigh;
+  }
 
   /// Pick the greater of [a]/[b] by (physicalTime, counter) and rebuild it with
   /// [nodeId] so the clock always issues under THIS device's identity.

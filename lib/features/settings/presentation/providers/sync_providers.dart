@@ -28,6 +28,7 @@ import 'package:submersion/core/services/cloud_storage/icloud_native_service.dar
 import 'package:submersion/core/services/cloud_storage/s3/s3_config.dart';
 import 'package:submersion/core/services/cloud_storage/s3/s3_credentials_store.dart';
 import 'package:submersion/core/services/cloud_storage/s3_storage_provider.dart';
+import 'package:submersion/core/services/sync/crypto/crypto_errors.dart';
 import 'package:submersion/core/services/sync/crypto/encryption_key_store.dart';
 import 'package:submersion/core/services/sync/crypto/keyslots.dart';
 import 'package:submersion/core/services/sync/crypto/sync_encryption_service.dart';
@@ -811,6 +812,15 @@ class SyncNotifier extends StateNotifier<SyncState> {
   /// [firstSyncMergeInfo] pre-check pattern for the Sync Now button.
   Future<LibraryEpochMarker?> libraryReplaceInfo() async {
     try {
+      // Load any stored encryption key BEFORE resolving the provider, for the
+      // same reason performSync does: the provider wrap watches the SESSION, so
+      // reading it first hands back the raw provider and every byte of an
+      // encrypted library reads as an opaque SBE1 envelope. This runs from an
+      // unawaited launch hook (_detectReplacedLibraryForSurfacing), which is
+      // precisely when the session has not been loaded yet -- so without this
+      // an encrypted library could never surface a replace at all.
+      await _ref.read(encryptionKeyNotifierProvider.notifier).ensureLoaded();
+      if (!mounted) return null;
       final provider = _ref.read(cloudStorageProviderProvider);
       if (provider == null) return null;
       final store = _ref.read(libraryEpochStoreProvider);
@@ -824,6 +834,13 @@ class SyncNotifier extends StateNotifier<SyncState> {
           store.lastAcceptedEpochId;
       if (marker.epochId == accepted) return null;
       return marker;
+    } on SyncEncryptionRequired {
+      // Encrypted with no key on this device yet: an expected state, not a
+      // fault. performSync halts with awaitingPassphrase and the UI prompts,
+      // so this pre-check simply has nothing to report -- logging it as a
+      // warning on every launch would be noise.
+      _log.debug('Library replace pre-check skipped: library is locked');
+      return null;
     } catch (e) {
       // Never block the button on this pre-check; performSync gates anyway.
       _log.warning('Library replace pre-check failed: $e');
