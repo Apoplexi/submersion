@@ -9,6 +9,12 @@ import 'package:submersion/features/media/presentation/providers/media_resolver_
 import 'package:submersion/features/media/presentation/widgets/unavailable_media_placeholder.dart';
 import 'package:submersion/features/media_store/presentation/providers/media_store_providers.dart';
 
+/// Decode target used when a caller asks for a [MediaItemView.thumbnail]
+/// without naming a size. Matches the largest tile in the app (the media
+/// grid), so it is safe for any of them and still two orders of magnitude
+/// cheaper than the original.
+const Size kDefaultThumbnailTarget = Size(200, 200);
+
 /// Universal display widget for any [MediaItem] regardless of its source
 /// type.
 ///
@@ -31,7 +37,13 @@ import 'package:submersion/features/media_store/presentation/providers/media_sto
 class MediaItemView extends ConsumerStatefulWidget {
   final MediaItem item;
   final BoxFit fit;
+
+  /// Decode target for [thumbnail] requests. Defaults to
+  /// [kDefaultThumbnailTarget]; ignored when [thumbnail] is false.
   final Size? targetSize;
+
+  /// Whether this view only ever draws a tile. Thumbnail requests never touch
+  /// the full-resolution original, with or without a [targetSize].
   final bool thumbnail;
 
   const MediaItemView({
@@ -100,10 +112,16 @@ class _MediaItemViewState extends ConsumerState<MediaItemView> {
   Future<_Resolution> _resolve() async {
     final registry = ref.read(mediaSourceResolverRegistryProvider);
     final resolver = registry.resolverFor(widget.item.sourceType);
-    final native = widget.thumbnail && widget.targetSize != null
+    // [thumbnail] alone decides the path. Requiring a [targetSize] too made
+    // the flag a silent no-op wherever one was omitted, and the fallback is
+    // the full-resolution original: for a gallery item, AssetEntity
+    // .originBytes, decoded at native resolution because the Image widgets
+    // below carry no cacheWidth. A screenful of 12 MP originals behind
+    // 128 px tiles is enough for iOS to kill the app.
+    final native = widget.thumbnail
         ? await resolver.resolveThumbnail(
             widget.item,
-            target: widget.targetSize!,
+            target: widget.targetSize ?? kDefaultThumbnailTarget,
           )
         : await resolver.resolve(widget.item);
     if (native is! UnavailableData) {

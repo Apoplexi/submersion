@@ -61,7 +61,15 @@ class PhotoRibbonCard extends ConsumerWidget {
                       borderRadius: BorderRadius.circular(8),
                       child: SizedBox(
                         width: 128,
-                        child: MediaItemView(item: item, thumbnail: true),
+                        child: MediaItemView(
+                          item: item,
+                          thumbnail: true,
+                          // Sized to the tile, not the photo: the ribbon
+                          // draws a screenful of these at once, and the
+                          // originals behind them are full-resolution
+                          // camera files.
+                          targetSize: const Size(200, 200),
+                        ),
                       ),
                     ),
                   );
