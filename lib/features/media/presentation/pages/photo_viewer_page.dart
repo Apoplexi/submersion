@@ -56,7 +56,12 @@ class PhotoViewerPage extends ConsumerStatefulWidget {
 }
 
 class _PhotoViewerPageState extends ConsumerState<PhotoViewerPage> {
-  late PageController _pageController;
+  /// Built once, on the first frame that has a gallery to show, because
+  /// [PageController.initialPage] is the only way to open on a page other
+  /// than the first and the initial page is not known until the dive's media
+  /// resolves. Null until then; the loading branch renders no gallery.
+  PageController? _pageController;
+
   int _currentIndex = 0;
   bool _showOverlay = true;
 
@@ -87,7 +92,6 @@ class _PhotoViewerPageState extends ConsumerState<PhotoViewerPage> {
   @override
   void initState() {
     super.initState();
-    _pageController = PageController();
 
     // Set immersive mode for full-screen experience
     SystemChrome.setEnabledSystemUIMode(
@@ -98,7 +102,7 @@ class _PhotoViewerPageState extends ConsumerState<PhotoViewerPage> {
 
   @override
   void dispose() {
-    _pageController.dispose();
+    _pageController?.dispose();
     // Restore system UI
     SystemChrome.setEnabledSystemUIMode(
       SystemUiMode.edgeToEdge,
@@ -130,16 +134,27 @@ class _PhotoViewerPageState extends ConsumerState<PhotoViewerPage> {
             );
           }
 
-          // Find initial index
-          final initialIndex = mediaList.indexWhere(
-            (m) => m.id == widget.initialMediaId,
-          );
-          if (initialIndex != -1 && _pageController.hasClients == false) {
-            _currentIndex = initialIndex;
-            _pageController = PageController(initialPage: initialIndex);
+          // Seed the pager on the photo that was tapped, once. Keyed on the
+          // controller being absent rather than on hasClients: the gallery
+          // detaches whenever it is unmounted (an emptied list, a rebuild
+          // between frames), which reads identically to "not attached yet"
+          // and had every such rebuild mint a replacement and leak the live
+          // controller.
+          if (_pageController == null) {
+            final initialIndex = mediaList.indexWhere(
+              (m) => m.id == widget.initialMediaId,
+            );
+            _currentIndex = initialIndex == -1 ? 0 : initialIndex;
+            _pageController = PageController(initialPage: _currentIndex);
           }
+          final pageController = _pageController!;
 
-          final currentItem = mediaList[_currentIndex];
+          // The gallery is live: a delete elsewhere, a dive-deletion cascade
+          // or a sync pull can drop it below the open page. The pager
+          // corrects itself on the next settle, so clamp for this frame
+          // rather than writing the state back during build.
+          final currentIndex = _currentIndex.clamp(0, mediaList.length - 1);
+          final currentItem = mediaList[currentIndex];
           final enrichment = currentItem.enrichment;
 
           // Get dive profile for the mini chart overlay
@@ -215,7 +230,7 @@ class _PhotoViewerPageState extends ConsumerState<PhotoViewerPage> {
                 // Photo/video gallery
                 _PhotoGallery(
                   mediaList: mediaList,
-                  pageController: _pageController,
+                  pageController: pageController,
                   onPageChanged: (index) {
                     setState(() => _currentIndex = index);
                   },
@@ -224,7 +239,7 @@ class _PhotoViewerPageState extends ConsumerState<PhotoViewerPage> {
                       setState(() => _showOverlay = !_showOverlay),
                   onSetOverlay: (value) => setState(() => _showOverlay = value),
                   onVideoControllerChanged: _onVideoControllerChanged,
-                  currentIndex: _currentIndex,
+                  currentIndex: currentIndex,
                 ),
 
                 // Transparent tap target to toggle overlays (photos only)
@@ -247,7 +262,7 @@ class _PhotoViewerPageState extends ConsumerState<PhotoViewerPage> {
                   // Top app bar
                   _TopOverlay(
                     item: currentItem,
-                    currentIndex: _currentIndex,
+                    currentIndex: currentIndex,
                     totalCount: mediaList.length,
                     onClose: () => Navigator.of(context).pop(),
                     onShare: () => _shareCurrentPhoto(currentItem),
