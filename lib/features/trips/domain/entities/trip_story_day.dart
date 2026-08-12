@@ -162,6 +162,21 @@ class TripStoryMapGeometry extends Equatable {
   List<TripStoryMapPoint> pointsForDay(int dayIndex) =>
       points.where((p) => p.dayIndex == dayIndex).toList();
 
+  /// The map point closest to [dayIndex], preserving route order when two
+  /// points are equally distant.
+  TripStoryMapPoint? nearestPointForDay(int dayIndex) {
+    TripStoryMapPoint? nearest;
+    int? nearestDistance;
+    for (final point in points) {
+      final distance = (point.dayIndex - dayIndex).abs();
+      if (nearestDistance == null || distance < nearestDistance) {
+        nearest = point;
+        nearestDistance = distance;
+      }
+    }
+    return nearest;
+  }
+
   @override
   List<Object?> get props => [points];
 }
