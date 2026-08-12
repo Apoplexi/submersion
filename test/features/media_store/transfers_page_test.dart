@@ -165,9 +165,15 @@ void main() {
     await tester.pump();
     await tester.tap(find.byKey(const ValueKey('selection_select_all')));
     await tester.pump();
+    await tester.tap(find.byKey(const ValueKey('selection_overflow')));
+    await tester.pump();
+    // The page animates its in-flight progress, so pumpAndSettle would never
+    // return; run the menu route out by its own duration instead.
+    await tester.pump(const Duration(milliseconds: 300));
     await tester.tap(find.byKey(const ValueKey('selection_delete')));
     await tester.pump();
-    await tester.tap(find.text('Delete'));
+    await tester.pump(const Duration(milliseconds: 300));
+    await tester.tap(find.text('Delete').hitTestable().last);
     await tester.pump();
 
     await tester.runAsync(() async {
