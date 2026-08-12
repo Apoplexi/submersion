@@ -23150,6 +23150,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String get dataQuality_repair_applied => 'Correção aplicada';
 
   @override
+  String get dataQuality_repair_noChange => 'Não há nada a corrigir aqui';
+
+  @override
   String get dataQuality_repair_failed => 'Falha na correção';
 
   @override
@@ -23364,6 +23367,14 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get dataQuality_repairLabel_despike => 'Remover pico';
+
+  @override
+  String get dataQuality_repairLabel_clampNegative =>
+      'Limitar profundidades acima da superfície';
+
+  @override
+  String get dataQuality_repairLabel_smoothRates =>
+      'Suavizar taxas impossíveis';
 
   @override
   String get dataQuality_repairLabel_fillGaps => 'Preencher lacunas';

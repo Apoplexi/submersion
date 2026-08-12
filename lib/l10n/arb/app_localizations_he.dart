@@ -22576,6 +22576,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get dataQuality_repair_applied => 'התיקון הוחל';
 
   @override
+  String get dataQuality_repair_noChange => 'אין כאן מה לתקן';
+
+  @override
   String get dataQuality_repair_failed => 'התיקון נכשל';
 
   @override
@@ -22786,6 +22789,13 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get dataQuality_repairLabel_despike => 'הסרת הקפיצה';
+
+  @override
+  String get dataQuality_repairLabel_clampNegative =>
+      'הגבלת עומקים מעל פני המים';
+
+  @override
+  String get dataQuality_repairLabel_smoothRates => 'החלקת קצבים בלתי אפשריים';
 
   @override
   String get dataQuality_repairLabel_fillGaps => 'מילוי הפערים';

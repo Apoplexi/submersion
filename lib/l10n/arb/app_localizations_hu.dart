@@ -23072,6 +23072,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String get dataQuality_repair_applied => 'Javítás alkalmazva';
 
   @override
+  String get dataQuality_repair_noChange => 'Itt nincs mit javítani';
+
+  @override
   String get dataQuality_repair_failed => 'A javítás sikertelen';
 
   @override
@@ -23286,6 +23289,14 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get dataQuality_repairLabel_despike => 'Kiugrás eltávolítása';
+
+  @override
+  String get dataQuality_repairLabel_clampNegative =>
+      'Felszín feletti mélységek korlátozása';
+
+  @override
+  String get dataQuality_repairLabel_smoothRates =>
+      'Lehetetlen sebességek simítása';
 
   @override
   String get dataQuality_repairLabel_fillGaps => 'Hézagok kitöltése';

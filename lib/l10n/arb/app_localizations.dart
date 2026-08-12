@@ -38577,6 +38577,12 @@ abstract class AppLocalizations {
   /// **'Repair applied'**
   String get dataQuality_repair_applied;
 
+  /// No description provided for @dataQuality_repair_noChange.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing to repair here'**
+  String get dataQuality_repair_noChange;
+
   /// No description provided for @dataQuality_repair_failed.
   ///
   /// In en, this message translates to:
@@ -38888,6 +38894,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Remove spike'**
   String get dataQuality_repairLabel_despike;
+
+  /// No description provided for @dataQuality_repairLabel_clampNegative.
+  ///
+  /// In en, this message translates to:
+  /// **'Clamp above-surface depths'**
+  String get dataQuality_repairLabel_clampNegative;
+
+  /// No description provided for @dataQuality_repairLabel_smoothRates.
+  ///
+  /// In en, this message translates to:
+  /// **'Smooth impossible rates'**
+  String get dataQuality_repairLabel_smoothRates;
 
   /// No description provided for @dataQuality_repairLabel_fillGaps.
   ///
