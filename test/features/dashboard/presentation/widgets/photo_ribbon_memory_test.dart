@@ -38,6 +38,12 @@ void main() {
     final base = await getBaseOverrides();
     final resolver = FakeLocalFileResolver(BytesData(bytes: onePixelPng()));
 
+    // Pinned so the expected target is exact rather than whatever the host
+    // view happens to report. ThumbnailSize is in device pixels, so a 128 pt
+    // tile on a 3x screen wants 384 of them.
+    tester.view.devicePixelRatio = 3.0;
+    addTearDown(tester.view.resetDevicePixelRatio);
+
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
@@ -70,8 +76,11 @@ void main() {
     );
     expect(resolver.resolvedThumbnailTargets, isNotEmpty);
     for (final target in resolver.resolvedThumbnailTargets) {
-      expect(target.width, lessThanOrEqualTo(400));
-      expect(target.height, lessThanOrEqualTo(400));
+      expect(
+        target,
+        const Size.square(128 * 3.0),
+        reason: 'the target is the tile in device pixels, not a magic number',
+      );
     }
   });
 }
