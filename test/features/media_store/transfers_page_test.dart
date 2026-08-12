@@ -12,6 +12,26 @@ import 'package:submersion/features/media_store/presentation/pages/transfers_pag
 import 'package:submersion/features/media_store/presentation/providers/media_store_providers.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
 
+/// Runs out a route transition without pumpAndSettle.
+///
+/// This page animates the progress of in-flight transfers, so pumpAndSettle
+/// never returns here. Widget tests run on a fake clock, so this advances
+/// simulated time deterministically -- machine speed cannot affect it. The
+/// duration deliberately overshoots any plausible menu or dialog transition
+/// rather than matching Flutter's internal constants, which this test has no
+/// business encoding.
+///
+/// Three frames, not one: the first starts the transition, the second runs it
+/// out, and the third renders whatever the completed route caused. Selecting a
+/// popup menu entry needs all three -- PopupMenuButton.onSelected fires only
+/// once the pop animation finishes, so the dialog it opens appears a frame
+/// after the menu is gone.
+Future<void> pumpRoute(WidgetTester tester) async {
+  await tester.pump();
+  await tester.pump(const Duration(seconds: 1));
+  await tester.pump();
+}
+
 /// The page renders from SNAPSHOT streams here: live drift watch() streams
 /// held open by the widget tree deadlock against db.close() in the
 /// fake-async test zone. Stream behavior is covered by the repository
@@ -166,13 +186,10 @@ void main() {
     await tester.tap(find.byKey(const ValueKey('selection_select_all')));
     await tester.pump();
     await tester.tap(find.byKey(const ValueKey('selection_overflow')));
-    await tester.pump();
-    // The page animates its in-flight progress, so pumpAndSettle would never
-    // return; run the menu route out by its own duration instead.
-    await tester.pump(const Duration(milliseconds: 300));
+    await pumpRoute(tester);
     await tester.tap(find.byKey(const ValueKey('selection_delete')));
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 300));
+    await pumpRoute(tester);
+    expect(find.byType(AlertDialog), findsOneWidget);
     await tester.tap(find.text('Delete').hitTestable().last);
     await tester.pump();
 

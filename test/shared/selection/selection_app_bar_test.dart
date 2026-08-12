@@ -143,6 +143,28 @@ void main() {
       expect(deleted, isTrue);
     });
 
+    testWidgets('an action id colliding with the delete sentinel asserts', (
+      tester,
+    ) async {
+      controller.enterImplicit('a');
+      await tester.pumpWidget(
+        host(
+          actions: [
+            BulkAction(
+              id: '__selection_delete__',
+              icon: Icons.merge_type,
+              label: 'Collides',
+              onInvoke: () {},
+            ),
+          ],
+        ),
+      );
+
+      // Silently routing this action's menu entry to onDelete would fire the
+      // wrong handler, and a destructive one. It must fail loudly instead.
+      expect(tester.takeException(), isAssertionError);
+    });
+
     testWidgets('delete sorts last, below the surface extras', (tester) async {
       controller.enterImplicit('a');
       await tester.pumpWidget(

@@ -125,6 +125,16 @@ class SelectionAppBar extends StatelessWidget implements PreferredSizeWidget {
     int count,
     Set<String> checkedIds,
   ) {
+    // A surface that picked the sentinel as an action id would have its menu
+    // entry silently invoke onDelete instead of its own handler -- the wrong
+    // handler, and a destructive one. BulkAction.id is free-form, so make the
+    // collision fail loudly in debug rather than shipping that.
+    assert(
+      actions.every((action) => action.id != _deleteMenuValue),
+      'BulkAction.id "$_deleteMenuValue" is reserved for the baseline delete '
+      'entry; rename the action.',
+    );
+
     final allChecked =
         count >= selectableIds.length && selectableIds.isNotEmpty;
     final inline = actions.take(maxInlineActions).toList();
