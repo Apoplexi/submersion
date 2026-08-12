@@ -98,10 +98,21 @@ void main() {
       )
       .color;
 
-  /// The highlight marker container must carry no leading edge stripe.
-  void expectNoStripe(WidgetTester tester) {
+  /// A highlighted row must be marked, and its marker must carry no leading
+  /// edge stripe.
+  ///
+  /// The marker is asserted rather than tolerated: every caller passes
+  /// `isHighlighted: true` with no coordinates, so the tile always takes the
+  /// standard-card path that emits the key. Returning early on a missing
+  /// marker would turn the stripe check into a vacuous pass if a regression
+  /// ever stopped marking highlighted rows.
+  void expectMarkedWithoutStripe(WidgetTester tester) {
     final marker = find.byKey(const ValueKey('dive_row_highlight'));
-    if (marker.evaluate().isEmpty) return;
+    expect(
+      marker,
+      findsOneWidget,
+      reason: 'the highlighted row carries its marker',
+    );
     final decoration = tester.widget<Container>(marker).decoration;
     expect(
       (decoration as BoxDecoration?)?.border,
@@ -130,7 +141,7 @@ void main() {
         await tester.pumpAndSettle();
 
         expect(cardColor(tester, type), selectionFill(tester, type));
-        expectNoStripe(tester);
+        expectMarkedWithoutStripe(tester);
       });
 
       testWidgets('checked row uses the same fill', (tester) async {
@@ -157,7 +168,7 @@ void main() {
               'in selection mode the fill means checked; a highlighted but '
               'unchecked row must not read as selected',
         );
-        expectNoStripe(tester);
+        expectMarkedWithoutStripe(tester);
       });
     });
   }
