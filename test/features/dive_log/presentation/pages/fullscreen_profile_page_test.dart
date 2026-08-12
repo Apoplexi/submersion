@@ -237,7 +237,7 @@ void main() {
     final overrides = _defaultOverrides()
       ..removeAt(1)
       ..insert(1, diveProvider(dive.id).overrideWith((ref) async => dive));
-    await tester.pumpWidget(_wrap(overrides));
+    await tester.pumpWidget(_wrap(overrides, size: _phoneSize));
     await tester.pumpAndSettle();
 
     expect(
@@ -247,14 +247,51 @@ void main() {
       const Offset(0, 0),
       reason: 'the card must seed at the least occupied corner',
     );
-    final chartRect = tester.getRect(find.byType(DiveProfileChart));
+    final closeButton = find.widgetWithIcon(IconButton, Icons.close);
+    final closeRect = tester.getRect(closeButton);
     final cardRect = tester.getRect(find.byKey(const ValueKey('readout-card')));
     expect(
-      cardRect.left,
-      lessThan(chartRect.center.dx),
-      reason: 'the card must avoid the occupied top-right corner',
+      cardRect.top,
+      greaterThanOrEqualTo(closeRect.bottom + 8),
+      reason: 'the phone readout must clear the close/title row',
     );
-    expect(cardRect.top, lessThan(chartRect.center.dy));
+
+    await tester.tap(closeButton);
+    await tester.pumpAndSettle();
+    expect(find.byType(FullscreenProfilePage), findsNothing);
+  });
+
+  testWidgets('phone saved upper-left position clears the close button', (
+    tester,
+  ) async {
+    final overrides = _defaultOverrides()
+      ..removeAt(0)
+      ..insert(
+        0,
+        settingsProvider.overrideWith(
+          (ref) => _FakeSettingsNotifier(
+            const AppSettings(
+              fullscreenReadoutCardX: 0,
+              fullscreenReadoutCardY: 0,
+            ),
+          ),
+        ),
+      );
+    await tester.pumpWidget(_wrap(overrides, size: _phoneSize));
+    await tester.pumpAndSettle();
+
+    final closeRect = tester.getRect(
+      find.widgetWithIcon(IconButton, Icons.close),
+    );
+    final cardRect = tester.getRect(find.byKey(const ValueKey('readout-card')));
+    expect(cardRect.top, greaterThanOrEqualTo(closeRect.bottom + 8));
+    expect(
+      tester
+          .widget<DraggableReadoutCard>(find.byType(DraggableReadoutCard))
+          .initialFraction,
+      Offset.zero,
+      reason: 'the saved fraction stays unchanged inside the safer arena',
+    );
   });
 
   testWidgets('chart fills most of the screen height', (tester) async {
