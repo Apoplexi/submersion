@@ -118,6 +118,18 @@ void main() {
     expect(switches.every((s) => s.value == false), true);
   });
 
+  testWidgets('warns that encryption may affect performance in settings', (
+    tester,
+  ) async {
+    await configure({});
+    await pumpPage(tester);
+
+    expect(
+      find.textContaining('Encryption may affect performance.'),
+      findsOneWidget,
+    );
+  });
+
   testWidgets('enabling app lock opens the setup dialog', (tester) async {
     await configure({});
     await pumpPage(tester);
@@ -481,6 +493,24 @@ void main() {
       expect(find.text('Encrypt database?'), findsOneWidget);
       expect(find.textContaining('safety backup'), findsOneWidget);
     });
+
+    testWidgets(
+      'warns that encryption may affect performance before enabling',
+      (tester) async {
+        await configureWithPassword(tester, 'pw');
+        await pumpPage(tester);
+        await tester.tap(find.text('Encrypt database'));
+        await settle(tester);
+
+        expect(
+          find.descendant(
+            of: find.byType(AlertDialog),
+            matching: find.textContaining('Encryption may affect performance.'),
+          ),
+          findsOneWidget,
+        );
+      },
+    );
 
     testWidgets('cancelling leaves encryption off', (tester) async {
       await configureWithPassword(tester, 'pw');

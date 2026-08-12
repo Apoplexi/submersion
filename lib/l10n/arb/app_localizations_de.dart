@@ -22930,7 +22930,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get settings_security_encryption_subtitle =>
-      'Schützen Sie Ihre Tauchlog-Datei mit Verschlüsselung im Ruhezustand';
+      'Schützen Sie Ihre Tauchlog-Datei mit Verschlüsselung im Ruhezustand. Die Verschlüsselung kann die Leistung beeinträchtigen.';
 
   @override
   String get settings_security_encryption_progress_backup =>
@@ -23007,7 +23007,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get settings_security_enableEncryption_body =>
-      'Zuerst wird eine Sicherheitskopie erstellt, dann wird die Datenbankdatei direkt neu verschlüsselt. Bei großen Tauchlogs kann das eine Weile dauern.';
+      'Zuerst wird eine Sicherheitskopie erstellt, dann wird die Datenbankdatei direkt neu verschlüsselt. Bei großen Tauchlogs kann das eine Weile dauern. Die Verschlüsselung kann die Leistung beeinträchtigen.';
 
   @override
   String get settings_security_disableEncryption_title =>
