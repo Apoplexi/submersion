@@ -87,9 +87,14 @@ class DocumentOpenHelper {
       allowMultiple: true,
     );
     if (result == null || !context.mounted) return;
+    // identifier travels with path: on Android it is the SAF content URI of
+    // the original, and path is only a cached copy file_picker made. The
+    // import service needs the URI to take a persistable permission
+    // (issue #1002); it is null on every other platform.
     final picked = [
       for (final f in result.files)
-        if (f.path != null) (path: f.path!, filename: f.name),
+        if (f.path != null)
+          (path: f.path!, filename: f.name, identifier: f.identifier),
     ];
     if (picked.isEmpty) return;
 
