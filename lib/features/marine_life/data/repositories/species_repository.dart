@@ -32,6 +32,11 @@ class SpeciesRepository {
   Stream<void> watchSpeciesChanges() =>
       _db.tableUpdates(TableUpdateQuery.onTable(_db.species));
 
+  /// Emits whenever the `sightings` table changes so aggregate providers can
+  /// refresh after a sync or any other write.
+  Stream<void> watchSightingChanges() =>
+      _db.tableUpdates(TableUpdateQuery.onTable(_db.sightings));
+
   /// Get species by category
   Future<List<domain.Species>> getSpeciesByCategory(
     SpeciesCategory category,
