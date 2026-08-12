@@ -114,17 +114,16 @@ class QualityRepairExecutor {
     });
   }
 
+  /// Whole-sample equality: DiveProfilePoint is Equatable over all of its
+  /// fields, so a repair that touches any channel -- not just depth and
+  /// temperature -- still counts as a change.
   static bool _sameSeries(
     List<domain.DiveProfilePoint> a,
     List<domain.DiveProfilePoint> b,
   ) {
     if (a.length != b.length) return false;
     for (var i = 0; i < a.length; i++) {
-      if (a[i].timestamp != b[i].timestamp ||
-          a[i].depth != b[i].depth ||
-          a[i].temperature != b[i].temperature) {
-        return false;
-      }
+      if (a[i] != b[i]) return false;
     }
     return true;
   }

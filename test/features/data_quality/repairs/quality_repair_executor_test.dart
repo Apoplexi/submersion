@@ -159,6 +159,33 @@ void main() {
       );
     });
 
+    test('a repair touching a channel other than depth/temperature still '
+        'counts as a change', () async {
+      // The no-change check compares WHOLE samples, so a repair that
+      // rewrites ppO2, an o2 sensor or a deco field is not mistaken for a
+      // no-op just because depth and temperature are untouched.
+      await diveRepo.createDive(
+        domain.Dive(
+          id: 'd1',
+          dateTime: DateTime.utc(2026, 7, 1),
+          profile: const [
+            domain.DiveProfilePoint(timestamp: 0, depth: 5),
+            domain.DiveProfilePoint(timestamp: 60, depth: 10),
+          ],
+        ),
+      );
+      final finding = await seedFindingForDive('d1');
+
+      final result = await executor.applyProfileRepair(
+        diveId: 'd1',
+        findingId: finding.id,
+        compute: (pts) => [for (final p in pts) p.copyWith(ppO2: 1.2)],
+      );
+
+      expect(result.changed, isTrue);
+      expect(await statusOf('d1'), QualityStatus.resolved);
+    });
+
     test('applies the computed profile, resolves, and undo restores', () async {
       final profile = [
         const domain.DiveProfilePoint(timestamp: 0, depth: 5),
