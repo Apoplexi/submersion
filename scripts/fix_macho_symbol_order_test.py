@@ -40,12 +40,16 @@ SORTED_ORDER = sorted(GEN_SNAPSHOT_ORDER)
 
 
 def _string_table(names):
-    """Return ``(blob, {name: n_strx})``. Offset 0 is the customary empty name."""
+    """Return ``(blob, {name: n_strx})``. Offset 0 is the customary empty name.
+
+    Accepts ``str`` or raw ``bytes`` names, so tests can build string tables
+    that are not valid UTF-8.
+    """
     blob = bytearray(b"\x00")
     offsets = {}
     for name in names:
         offsets[name] = len(blob)
-        blob += name.encode() + b"\x00"
+        blob += (name.encode() if isinstance(name, str) else name) + b"\x00"
     return bytes(blob), offsets
 
 
@@ -149,7 +153,15 @@ def _fat(slices):
 
 
 def _names_in_order(data, base=0):
-    """Read back the symbol-table names of ``data`` in file order."""
+    """Read back the symbol-table names of ``data`` in file order, as text."""
+    return [
+        name.decode("utf-8", "surrogateescape")
+        for name, _ in tool.read_external_symbols(bytearray(data), base)
+    ]
+
+
+def _raw_names_in_order(data, base=0):
+    """Read back the symbol-table names of ``data`` in file order, as bytes."""
     return [name for name, _ in tool.read_external_symbols(bytearray(data), base)]
 
 
@@ -176,6 +188,18 @@ class SortTests(unittest.TestCase):
         tool.sort_slice(data, 0)
         after = dict(tool.read_external_symbols(data, 0))
         self.assertEqual(before, after)
+
+    def test_sorts_names_that_are_not_valid_utf8(self):
+        """Names are compared as bytes, the way dyld's strcmp compares them.
+
+        A Mach-O string table carries no encoding guarantee. Decoding to text
+        would raise on these names, and surrogate escapes would sort them above
+        every real character -- producing an order the loader disagrees with.
+        """
+        names = [b"_\xff_last", b"_\x80_first", b"_ascii"]
+        data = bytearray(_thin(names=names))
+        self.assertTrue(tool.sort_slice(data, 0))
+        self.assertEqual(_raw_names_in_order(data), sorted(names))
 
     def test_is_idempotent(self):
         data = bytearray(_thin())

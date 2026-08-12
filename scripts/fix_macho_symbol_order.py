@@ -191,18 +191,28 @@ def _has_exports_trie(data, base, end):
     )
 
 
-def _symbol_name(data, stroff, strsize, n_strx):
+def _symbol_name_bytes(data, stroff, strsize, n_strx):
+    """Return the raw NUL-terminated name of a symbol table entry.
+
+    Names stay bytes end to end. dyld compares them with ``strcmp``, a byte-wise
+    comparison, and a Mach-O string table carries no encoding guarantee -- so
+    decoding to text would both risk raising on non-UTF-8 names and (via
+    surrogate escapes) sort them into an order the loader disagrees with.
+    """
     if n_strx >= strsize:
         raise MachOError("symbol name offset past end of string table")
     start = stroff + n_strx
     terminator = data.find(b"\x00", start, stroff + strsize)
     if terminator < 0:
         raise MachOError("unterminated symbol name")
-    return bytes(data[start:terminator]).decode("utf-8", "surrogateescape")
+    return bytes(data[start:terminator])
 
 
 def read_external_symbols(data, base, end=None):
-    """Return ``[(name, (n_type, n_sect, n_desc, n_value)), ...]`` in file order."""
+    """Return ``[(name, (n_type, n_sect, n_desc, n_value)), ...]`` in file order.
+
+    ``name`` is raw bytes; decode only for display.
+    """
     end = len(data) if end is None else end
     symoff, nsyms, stroff, strsize = symtab_fields(data, base, end)
     dysymtab = _dysymtab_fields(data, base, end)
@@ -221,7 +231,10 @@ def read_external_symbols(data, base, end=None):
         entry = symoff + i * NLIST_SIZE
         n_strx, n_type, n_sect, n_desc, n_value = struct.unpack_from("<IBBHQ", data, entry)
         symbols.append(
-            (_symbol_name(data, stroff, strsize, n_strx), (n_type, n_sect, n_desc, n_value))
+            (
+                _symbol_name_bytes(data, stroff, strsize, n_strx),
+                (n_type, n_sect, n_desc, n_value),
+            )
         )
     return symbols
 
@@ -268,7 +281,7 @@ def sort_slice(data, base, end=None):
         n_type = raw[4]
         if n_type & N_STAB:
             raise MachOError("debug symbol inside the external defined range")
-        entries.append((_symbol_name(data, stroff, strsize, n_strx).encode(), raw))
+        entries.append((_symbol_name_bytes(data, stroff, strsize, n_strx), raw))
 
     ordered = sorted(entries, key=lambda item: item[0])
     if ordered == entries:
@@ -293,7 +306,10 @@ def _describe(path, data):
     """Return report lines naming each slice's external symbols, in file order."""
     lines = []
     for base, size in slice_ranges(data):
-        names = [name for name, _ in read_external_symbols(data, base, base + size)]
+        names = [
+            name.decode("utf-8", "surrogateescape")
+            for name, _ in read_external_symbols(data, base, base + size)
+        ]
         lines.append(f"    slice @{base}: {', '.join(names)}")
     return lines
 
