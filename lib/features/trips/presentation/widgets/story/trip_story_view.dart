@@ -7,6 +7,7 @@ import 'package:latlong2/latlong.dart';
 import 'package:submersion/features/checklists/presentation/widgets/trip_checklist_section.dart';
 import 'package:submersion/features/trips/domain/entities/trip.dart';
 import 'package:submersion/features/trips/domain/entities/trip_story.dart';
+import 'package:submersion/features/trips/presentation/providers/surface_day_weather_provider.dart';
 import 'package:submersion/features/trips/presentation/widgets/story/trip_flight_countdown_card.dart';
 import 'package:submersion/features/trips/presentation/widgets/story/trip_story_day_card.dart';
 import 'package:submersion/features/trips/presentation/widgets/story/trip_story_day_header.dart';
@@ -230,6 +231,16 @@ class _TripStoryViewState extends ConsumerState<TripStoryView>
   /// header, surface days included - theirs simply has no body under it.
   Widget _daySliver(TripStory story, int index, int? todayIndex) {
     final day = story.days[index];
+    final weatherPoint = day.isSurface
+        ? story.mapGeometry.nearestPointForDay(index)
+        : null;
+    final surfaceWeatherRequest = weatherPoint == null
+        ? null
+        : SurfaceDayWeatherRequest(
+            date: day.date,
+            latitude: weatherPoint.latitude,
+            longitude: weatherPoint.longitude,
+          );
     final showTodayDivider = todayIndex != null && index == todayIndex;
     const divider = SliverPadding(
       padding: EdgeInsets.symmetric(horizontal: 16),
@@ -260,7 +271,12 @@ class _TripStoryViewState extends ConsumerState<TripStoryView>
         // PinnedHeaderSliver (not SliverPersistentHeader) so the header sizes
         // itself: scaled accessibility text grows the band instead of being
         // clipped by a fixed extent we would have to predict.
-        PinnedHeaderSliver(child: TripStoryDayHeader(day: day)),
+        PinnedHeaderSliver(
+          child: TripStoryDayHeader(
+            day: day,
+            surfaceWeatherRequest: surfaceWeatherRequest,
+          ),
+        ),
         body,
       ],
     );
