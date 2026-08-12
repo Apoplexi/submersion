@@ -96,63 +96,142 @@ void main() {
       expect(button.onPressed, isNull);
     });
 
+    testWidgets('delete is never an inline control', (tester) async {
+      controller.enterImplicit('a');
+      await tester.pumpWidget(host());
+      await tester.pumpAndSettle();
+
+      // Delete sits behind the overflow so it cannot be hit by accident while
+      // reaching for a neighbouring control.
+      expect(find.byKey(const ValueKey('selection_delete')), findsNothing);
+      expect(find.byIcon(Icons.delete_outline), findsNothing);
+    });
+
+    testWidgets('a delete-only surface still gets an overflow menu', (
+      tester,
+    ) async {
+      controller.enterImplicit('a');
+      await tester.pumpWidget(host());
+      await tester.pumpAndSettle();
+      expect(find.byKey(const ValueKey('selection_overflow')), findsOneWidget);
+    });
+
     testWidgets('delete is disabled at zero checked', (tester) async {
       controller.enterExplicit();
       await tester.pumpWidget(host());
       await tester.pumpAndSettle();
-      final button = tester.widget<IconButton>(
+      await tester.tap(find.byKey(const ValueKey('selection_overflow')));
+      await tester.pumpAndSettle();
+
+      final item = tester.widget<PopupMenuItem<String>>(
         find.byKey(const ValueKey('selection_delete')),
       );
-      expect(button.onPressed, isNull);
+      expect(item.enabled, isFalse);
     });
 
-    testWidgets('delete invokes onDelete when something is checked', (
+    testWidgets('delete invokes onDelete when chosen from the overflow', (
       tester,
     ) async {
       var deleted = false;
       controller.enterImplicit('a');
       await tester.pumpWidget(host(onDelete: () => deleted = true));
       await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const ValueKey('selection_overflow')));
+      await tester.pumpAndSettle();
       await tester.tap(find.byKey(const ValueKey('selection_delete')));
       await tester.pumpAndSettle();
       expect(deleted, isTrue);
     });
 
-    testWidgets('omits the delete control entirely when onDelete is null', (
+    testWidgets('an action id colliding with the delete sentinel asserts', (
       tester,
     ) async {
       controller.enterImplicit('a');
       await tester.pumpWidget(
-        testApp(
-          locale: const Locale('en'),
-          child: Scaffold(
-            appBar: SelectionAppBar(
-              controller: controller,
-              selectableIds: const ['a', 'b', 'c'],
-              actions: const [],
-              shell: SelectionBarShell.appBar,
-              onDelete: null,
+        host(
+          actions: [
+            BulkAction(
+              id: '__selection_delete__',
+              icon: Icons.merge_type,
+              label: 'Collides',
+              onInvoke: () {},
             ),
-            body: const SizedBox(),
-          ),
+          ],
+        ),
+      );
+
+      // Silently routing this action's menu entry to onDelete would fire the
+      // wrong handler, and a destructive one. It must fail loudly instead.
+      expect(tester.takeException(), isAssertionError);
+    });
+
+    testWidgets('delete sorts last, below the surface extras', (tester) async {
+      controller.enterImplicit('a');
+      await tester.pumpWidget(
+        host(
+          maxInlineActions: 0,
+          actions: [
+            BulkAction(
+              id: 'merge',
+              icon: Icons.merge_type,
+              label: 'Merge',
+              onInvoke: () {},
+            ),
+          ],
         ),
       );
       await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const ValueKey('selection_overflow')));
+      await tester.pumpAndSettle();
 
-      // Omitted, not disabled: a surface with no true delete must not show a
-      // dead trash button.
-      expect(find.byKey(const ValueKey('selection_delete')), findsNothing);
-      // The rest of the baseline still renders.
-      expect(
-        find.byKey(const ValueKey('selection_select_all')),
-        findsOneWidget,
-      );
-      expect(
-        find.byKey(const ValueKey('selection_deselect_all')),
-        findsOneWidget,
-      );
-      expect(find.byKey(const ValueKey('selection_exit')), findsOneWidget);
+      // A divider keeps the destructive entry visually apart from the extras.
+      expect(find.byType(PopupMenuDivider), findsOneWidget);
+      final mergeY = tester
+          .getCenter(find.byKey(const ValueKey('selection_menu_merge')))
+          .dy;
+      final deleteY = tester
+          .getCenter(find.byKey(const ValueKey('selection_delete')))
+          .dy;
+      expect(deleteY, greaterThan(mergeY));
     });
+
+    testWidgets(
+      'omits the overflow entirely when there is nothing to put in it',
+      (tester) async {
+        controller.enterImplicit('a');
+        await tester.pumpWidget(
+          testApp(
+            locale: const Locale('en'),
+            child: Scaffold(
+              appBar: SelectionAppBar(
+                controller: controller,
+                selectableIds: const ['a', 'b', 'c'],
+                actions: const [],
+                shell: SelectionBarShell.appBar,
+                onDelete: null,
+              ),
+              body: const SizedBox(),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        // Omitted, not disabled: a surface with no true delete and no extras has
+        // nothing to overflow, so the menu button itself must not render.
+        expect(find.byKey(const ValueKey('selection_delete')), findsNothing);
+        expect(find.byKey(const ValueKey('selection_overflow')), findsNothing);
+        // The rest of the baseline still renders.
+        expect(
+          find.byKey(const ValueKey('selection_select_all')),
+          findsOneWidget,
+        );
+        expect(
+          find.byKey(const ValueKey('selection_deselect_all')),
+          findsOneWidget,
+        );
+        expect(find.byKey(const ValueKey('selection_exit')), findsOneWidget);
+      },
+    );
 
     testWidgets('an extra below its minCount renders disabled', (tester) async {
       controller.enterImplicit('a');
@@ -305,6 +384,12 @@ void main() {
         findsOneWidget,
       );
       expect(find.byKey(const ValueKey('selection_exit')), findsOneWidget);
+
+      // The pane shell hides delete behind the overflow too, so neither shell
+      // offers a one-tap destructive control.
+      expect(find.byKey(const ValueKey('selection_delete')), findsNothing);
+      await tester.tap(find.byKey(const ValueKey('selection_overflow')));
+      await tester.pumpAndSettle();
       expect(find.byKey(const ValueKey('selection_delete')), findsOneWidget);
     });
   });

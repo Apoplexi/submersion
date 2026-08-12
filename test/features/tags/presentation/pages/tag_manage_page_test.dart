@@ -229,7 +229,9 @@ void main() {
       await tester.longPress(find.text('Night Dive'));
       await tester.pumpAndSettle();
 
-      // Tap the delete icon in the app bar
+      // Delete lives behind the selection bar's overflow menu.
+      await tester.tap(find.byKey(const ValueKey('selection_overflow')));
+      await tester.pumpAndSettle();
       await tester.tap(find.byKey(const ValueKey('selection_delete')));
       await tester.pumpAndSettle();
 

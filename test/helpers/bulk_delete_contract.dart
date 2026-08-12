@@ -4,10 +4,14 @@ import 'package:flutter_test/flutter_test.dart';
 /// Drives a surface's bulk-delete flow end to end and reports what it deleted.
 ///
 /// Every selectable surface got the same baseline delete: enter selection,
-/// check rows, tap the keyed delete control, confirm, and see a snackbar. The
-/// handlers are near-identical per surface and were the least-covered part of
-/// the selection work, so this exercises the real path rather than asserting
-/// the button exists.
+/// check rows, open the overflow, choose the keyed delete entry, confirm, and
+/// see a snackbar. The handlers are near-identical per surface and were the
+/// least-covered part of the selection work, so this exercises the real path
+/// rather than asserting the entry exists.
+///
+/// Delete lives behind the overflow menu on every surface, so the two extra
+/// taps here are load-bearing: if a surface ever regressed to a one-tap inline
+/// delete, opening the overflow would fail rather than silently pass.
 ///
 /// [build] returns a fully wired widget for the surface.
 /// [selectButton] finds the surface's Select affordance.
@@ -40,19 +44,28 @@ Future<void> verifyBulkDelete(
   await tester.tap(find.byKey(const ValueKey('selection_select_all')));
   await advance();
 
-  final deleteButton = find.byKey(const ValueKey('selection_delete'));
   expect(
-    deleteButton,
+    find.byKey(const ValueKey('selection_delete')),
+    findsNothing,
+    reason: 'delete must stay behind the overflow, never inline',
+  );
+
+  await tester.tap(find.byKey(const ValueKey('selection_overflow')));
+  await advance();
+
+  final deleteEntry = find.byKey(const ValueKey('selection_delete'));
+  expect(
+    deleteEntry,
     findsOneWidget,
     reason: 'delete is a guaranteed baseline control',
   );
   expect(
-    tester.widget<IconButton>(deleteButton).onPressed,
-    isNotNull,
+    tester.widget<PopupMenuItem<String>>(deleteEntry).enabled,
+    isTrue,
     reason: 'delete must be enabled with rows checked',
   );
 
-  await tester.tap(deleteButton);
+  await tester.tap(deleteEntry);
   await advance();
 
   // The confirmation is not optional: bulk delete must never act on a single
@@ -92,6 +105,8 @@ Future<void> verifyBulkDeleteCancels(
   await tester.tap(selectButton);
   await advance();
   await tester.tap(find.byKey(const ValueKey('selection_select_all')));
+  await advance();
+  await tester.tap(find.byKey(const ValueKey('selection_overflow')));
   await advance();
   await tester.tap(find.byKey(const ValueKey('selection_delete')));
   await advance();
