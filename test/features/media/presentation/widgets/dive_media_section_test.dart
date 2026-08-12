@@ -149,9 +149,8 @@ void main() {
       await tester.longPress(find.byType(MediaThumbnailTile).first);
       await tester.pumpAndSettle();
 
-      // Both media sections now render the shared SelectionAppBar.
-      // MediaSelectionHeader in media_grid.dart has no remaining consumers;
-      // removing it belongs to the phase 6 cleanup.
+      // Both media sections render the shared SelectionAppBar; the old
+      // MediaSelectionHeader has been removed.
       expect(find.byKey(const ValueKey('selection_exit')), findsOneWidget);
       expect(find.text('1 selected'), findsOneWidget);
       // The normal header and its add affordance yield to selection.
