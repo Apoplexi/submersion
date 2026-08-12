@@ -55,6 +55,14 @@ class ChangesetWriter {
     /// Null when the hostname identifies nothing; readers fall back to the id.
     String? deviceName,
     Map<String, String> appliedPeerHlc = const {},
+
+    /// Rewrite this device's log as a fresh base even when the cloud manifest
+    /// already has one. Set after a stale-restore cold-start: the published log
+    /// describes rows this device no longer holds, and `publishedHlcHigh` only
+    /// ever moves UP, so a changeset can never bring it back down to the truth.
+    /// Leaving it over-claiming makes the stale-restore detector fire again on
+    /// every subsequent sync, wiping all peer cursors each time (#997).
+    bool forceBase = false,
   }) async {
     final providerId = provider.providerId;
     final ownManifest = await _readOwnManifest(provider, folderId, deviceId);
@@ -68,7 +76,7 @@ class ChangesetWriter {
     // there is nothing to append to, so cold-start a fresh base. `state` still
     // recovers the seq counter (knownHeadSeq) so the new base never reuses a
     // number.
-    final hasBase = ownManifest?.baseSeq != null;
+    final hasBase = !forceBase && ownManifest?.baseSeq != null;
     final watermark = ownManifest?.publishedHlcHigh ?? state?.publishedHlcHigh;
     // The post-adopt marker (a publish-state row with a null baseSeq): this
     // device's library IS the adopted epoch the peers already published, so
@@ -86,7 +94,11 @@ class ChangesetWriter {
     // adopt for an empty library (the base below no-ops) or one whose rows
     // all predate HLC stamping (one streamed base publish, safely bounded).
     final adoptedNoBase =
-        !hasBase && state != null && state.baseSeq == null && watermark != null;
+        !forceBase &&
+        !hasBase &&
+        state != null &&
+        state.baseSeq == null &&
+        watermark != null;
 
     final newSeq = knownHeadSeq + 1;
     final now = DateTime.now().millisecondsSinceEpoch;
@@ -103,7 +115,12 @@ class ChangesetWriter {
         seq: newSeq,
       );
       try {
-        if (base.rowCount == 0 && deletions.isEmpty) {
+        // Nothing to say -- except under [forceBase], where the point of the
+        // publish is the manifest, not its contents: an empty base still
+        // replaces an over-claiming `publishedHlcHigh` with the truth (null),
+        // which is what stops the stale-restore loop for a device rewound to an
+        // empty library. Peers apply an empty base as a no-op (upsert + LWW).
+        if (base.rowCount == 0 && deletions.isEmpty && !forceBase) {
           return const ChangesetWriteResult(ChangesetWriteKind.noop);
         }
         final upload = await BasePartFileSource(base.path).uploadAll(
@@ -143,6 +160,14 @@ class ChangesetWriter {
             updatedAt: Value(now),
           ),
         );
+        // A forced base SUPERSEDES an existing log rather than starting one, so
+        // the old base parts and changesets are now dead weight -- potentially
+        // a whole library's worth. Prune them exactly as compaction does (see
+        // _pruneSupersededBelow: best-effort, readers self-heal from the new
+        // base). An ordinary cold-start has nothing below it to prune.
+        if (forceBase) {
+          await _pruneSupersededBelow(provider, folderId, deviceId, newSeq);
+        }
         return ChangesetWriteResult(ChangesetWriteKind.base, newSeq);
       } finally {
         try {

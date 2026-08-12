@@ -476,11 +476,13 @@ class SyncService {
       if (fence.terminal != null) return fence.terminal!;
 
       // ---- Stale-restore: cold-start to re-pull the authoritative library ----
+      var staleRestoreDetected = false;
       if (await _staleRestoreDetector.isStaleRestore(
         provider: provider,
         deviceId: deviceId,
         folderId: folderId,
       )) {
+        staleRestoreDetected = true;
         _log.warning('Stale restore detected; resetting changeset cursors');
         final db = DatabaseService.instance.database;
         await PeerCursorStore(db).resetForProvider(provider.providerId);
@@ -584,6 +586,12 @@ class SyncService {
             uploadNonce: uploadNonce,
             deviceName: await _deviceNameForManifest(),
             appliedPeerHlc: appliedPeerHlc,
+            // Republish our log from what we actually hold now. Without this
+            // the cold-start above never converges: our manifest keeps
+            // claiming an HLC we no longer have, so the next sync detects the
+            // same "stale restore" and wipes every peer cursor again -- a full
+            // re-download of the whole fleet's data, every sync (#997).
+            forceBase: staleRestoreDetected,
           );
           // A publish that did not stamp this nonce into the manifest -- a
           // noop (nothing to say) or a heartbeat (which deliberately keeps

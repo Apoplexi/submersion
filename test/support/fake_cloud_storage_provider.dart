@@ -22,6 +22,7 @@ class FakeCloudStorageProvider implements CloudStorageProvider {
   final Map<String, Uint8List> _files = {};
   final Map<String, int> _modified = {};
   final Map<String, int> _visibleAfterCall = {};
+  final List<String> _downloaded = [];
   int _clock = 0;
   int _listCalls = 0;
 
@@ -77,8 +78,16 @@ class FakeCloudStorageProvider implements CloudStorageProvider {
     if (data == null) {
       throw CloudStorageException('Fake: not found: $fileId');
     }
+    _downloaded.add(fileId.substring(fileId.lastIndexOf('/') + 1));
     return Uint8List.fromList(data);
   }
+
+  /// Names (final path segment) downloaded since the last [resetDownloadLog],
+  /// so a test can assert what a sync actually pulled over the wire -- the
+  /// difference between an incremental sync and a full re-download.
+  List<String> get downloadedNames => List.unmodifiable(_downloaded);
+
+  void resetDownloadLog() => _downloaded.clear();
 
   @override
   Future<UploadResult> uploadFileFromPath(
