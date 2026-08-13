@@ -176,15 +176,6 @@ class _SiteListContentState extends ConsumerState<SiteListContent> {
     }
   }
 
-  /// Enter selection mode implicitly, from a modifier-click.
-  void _enterSelectionMode(String? initialId) {
-    if (initialId == null) {
-      _selection.enterExplicit();
-    } else {
-      _selection.enterImplicit(initialId);
-    }
-  }
-
   void _exitSelectionMode() => _selection.exit();
 
   void _toggleSelection(String id) => _selection.toggle(id);
@@ -480,7 +471,7 @@ class _SiteListContentState extends ConsumerState<SiteListContent> {
                       icon: const Icon(Icons.more_vert),
                       onSelected: (value) {
                         if (value == 'select') {
-                          _enterSelectionMode(null);
+                          _selection.enterExplicit();
                         } else if (value == 'import') {
                           context.push('/sites/import');
                         } else if (value.startsWith('view_')) {
@@ -702,7 +693,7 @@ class _SiteListContentState extends ConsumerState<SiteListContent> {
             icon: const Icon(Icons.more_vert, size: 20),
             onSelected: (value) {
               if (value == 'select') {
-                _enterSelectionMode(null);
+                _selection.enterExplicit();
               } else if (value == 'import') {
                 context.push('/sites/import');
               } else if (value.startsWith('view_')) {

@@ -222,17 +222,17 @@ class _DiveListContentState extends ConsumerState<DiveListContent> {
     });
   }
 
-  /// Enter selection mode implicitly, from a modifier-click.
+  /// Enter selection mode implicitly, from a modifier-click, checking [id].
   ///
   /// Clearing the highlight keeps the detail pane from arguing with the bulk
   /// selection about what the row means.
-  void _enterSelectionMode(String? initialId) {
+  ///
+  /// The Select control routes to [SelectionController.enterExplicit] directly
+  /// -- it has no row to check and must not clear the highlight -- so this
+  /// helper only ever serves the implicit path.
+  void _enterImplicitSelection(String id) {
     ref.read(highlightedDiveIdProvider.notifier).state = null;
-    if (initialId == null) {
-      _selection.enterExplicit();
-    } else {
-      _selection.enterImplicit(initialId);
-    }
+    _selection.enterImplicit(id);
   }
 
   void _exitSelectionMode() => _selection.exit();
@@ -661,7 +661,7 @@ class _DiveListContentState extends ConsumerState<DiveListContent> {
       return;
     }
     if (SelectableListScope.isModifierPressed()) {
-      _enterSelectionMode(id);
+      _enterImplicitSelection(id);
       return;
     }
     // No-op when the id is gone. A stale tap callback firing after the list
@@ -1254,7 +1254,7 @@ class _DiveListContentState extends ConsumerState<DiveListContent> {
                   if (SelectableListScope.isShiftPressed()) {
                     _selectRangeTo(id, summaries);
                   } else if (SelectableListScope.isModifierPressed()) {
-                    _enterSelectionMode(id);
+                    _enterImplicitSelection(id);
                   } else if (_isSelectionMode) {
                     _toggleSelection(id);
                   }
