@@ -2438,6 +2438,52 @@ class AppLocalizationsFr extends AppLocalizations {
       'Supprimer cet enregistrement de checklist ?';
 
   @override
+  String get preDive_sessions_filter => 'Filtrer';
+
+  @override
+  String get preDive_sessions_filterTitle =>
+      'Filtrer les checklists effectuées';
+
+  @override
+  String get preDive_sessions_filterChecklist => 'Checklist';
+
+  @override
+  String get preDive_sessions_filterStatus => 'Statut';
+
+  @override
+  String get preDive_sessions_filterFlaggedOnly => 'Uniquement les anomalies';
+
+  @override
+  String get preDive_sessions_filterDateRange => 'Période';
+
+  @override
+  String get preDive_sessions_filterAnyDate => 'Toutes les dates';
+
+  @override
+  String get preDive_sessions_filterClearAll => 'Tout effacer';
+
+  @override
+  String get preDive_sessions_filterApply => 'Appliquer';
+
+  @override
+  String get preDive_sessions_filterFlaggedChip => 'Anomalies uniquement';
+
+  @override
+  String get preDive_sessions_emptyFiltered =>
+      'Aucune checklist ne correspond à ces filtres';
+
+  @override
+  String get preDive_sessions_export => 'Exporter vers Excel';
+
+  @override
+  String get preDive_sessions_exportEmpty => 'Aucune checklist à exporter';
+
+  @override
+  String preDive_sessions_exportFailed(String error) {
+    return 'Échec de l\'export : $error';
+  }
+
+  @override
   String get preDive_start_title => 'Démarrer la checklist pré-plongée';
 
   @override
@@ -6244,6 +6290,24 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get setup_syncPull_continue => 'Continuer';
+
+  @override
+  String get setup_syncPull_incomplete_message =>
+      'Ce compte contient une bibliothèque Submersion dont l\'envoi n\'a jamais été terminé. Laissez votre autre appareil finir la synchronisation, puis réessayez.';
+
+  @override
+  String get setup_syncPull_incomplete_retry => 'Vérifier à nouveau';
+
+  @override
+  String get setup_syncPull_incomplete_title =>
+      'Envoi de la bibliothèque inachevé';
+
+  @override
+  String get setup_syncPull_locked_message =>
+      'Saisissez la phrase secrète de chiffrement pour déverrouiller cette bibliothèque et la télécharger sur cet appareil.';
+
+  @override
+  String get setup_syncPull_locked_title => 'Cette bibliothèque est chiffrée';
 
   @override
   String get setup_syncPull_noLibrary_message =>
@@ -19315,6 +19379,14 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get diveComputer_download_noSerialPortsFound =>
       'Aucun port série USB trouvé. L\'ordinateur de plongée est-il connecté et allumé ?';
+
+  @override
+  String get diveComputer_download_stalePairing =>
+      'L\'appairage Bluetooth de cet ordinateur de plongée n\'est plus valide. Oubliez l\'ordinateur de plongée dans les réglages Bluetooth de votre appareil, puis appairez-le à nouveau depuis le menu Bluetooth de l\'ordinateur de plongée.';
+
+  @override
+  String get diveComputer_download_discoveryStalled =>
+      'Connexion établie avec l\'ordinateur de plongée, mais il a cessé de répondre avant le début du téléchargement. Cela signifie généralement que l\'appairage Bluetooth n\'est plus valide : oubliez l\'ordinateur de plongée dans les réglages Bluetooth de votre appareil, puis réessayez.';
 
   @override
   String diveComputer_download_serialConnectFailedWithDetails(Object details) {

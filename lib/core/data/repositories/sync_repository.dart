@@ -4,6 +4,7 @@ import 'package:uuid/uuid.dart';
 import 'package:submersion/core/database/database.dart';
 import 'package:submersion/core/services/database_service.dart';
 import 'package:submersion/core/services/logger_service.dart';
+import 'package:submersion/core/services/sync/changeset_log/publish_state_store.dart';
 import 'package:submersion/core/services/sync/hlc.dart';
 import 'package:submersion/core/services/sync/sync_event_bus.dart';
 import 'package:submersion/core/services/sync/sync_clock.dart';
@@ -723,11 +724,19 @@ class SyncRepository {
     }
   }
 
-  /// Get count of pending changes
+  /// Get count of pending changes.
+  ///
+  /// Counts in SQL rather than materializing every pending row: this runs on
+  /// every local write now that the sync chip reflects it live.
   Future<int> getPendingCount() async {
     try {
-      final records = await getPendingRecords();
-      return records.length;
+      final count = _db.syncRecords.id.count();
+      final row =
+          await (_db.selectOnly(_db.syncRecords)
+                ..addColumns([count])
+                ..where(_db.syncRecords.syncStatus.equals('pending')))
+              .getSingle();
+      return row.read(count) ?? 0;
     } catch (e, stackTrace) {
       _log.error(
         'Failed to get pending count',
@@ -736,6 +745,74 @@ class SyncRepository {
       );
       return 0;
     }
+  }
+
+  /// Deletions this device has made that have NOT yet been published.
+  ///
+  /// Deletions never touch `sync_records`, so [getPendingCount] alone reports
+  /// a delete-only change set as zero -- the UI then claims "Synced" while
+  /// tombstones sit unsent. The whole deletion log is the wrong number too:
+  /// tombstones survive publication (only [clearAcknowledgedDeletions] removes
+  /// them, once the fleet has acked), so counting all of them would pin the UI
+  /// to "unsynced" forever.
+  ///
+  /// [upToHlc] is the active provider's `publishedHlcHigh`; this mirrors the
+  /// filter the changeset writer applies, so the count matches what a sync
+  /// would actually send. A null [upToHlc] means nothing has been published
+  /// yet, so every tombstone counts. A null row hlc is always counted: it
+  /// cannot be compared, so it rides every base and is unpublished until one
+  /// goes out.
+  Future<int> getUnpublishedDeletionCount({required String? upToHlc}) async {
+    try {
+      final count = _db.deletionLog.id.count();
+      final query = _db.selectOnly(_db.deletionLog)..addColumns([count]);
+      if (upToHlc != null) {
+        query.where(
+          _db.deletionLog.hlc.isNull() |
+              _db.deletionLog.hlc.isBiggerThanValue(upToHlc),
+        );
+      }
+      final row = await query.getSingle();
+      return row.read(count) ?? 0;
+    } catch (e, stackTrace) {
+      _log.error(
+        'Failed to get unpublished deletion count',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      return 0;
+    }
+  }
+
+  /// Every local change a sync would send: pending record edits plus the
+  /// tombstones above [providerId]'s publish watermark. This is the number the
+  /// UI means by "unsynced"; [getPendingCount] alone misses deletions.
+  ///
+  /// A null [providerId] means no cloud provider is configured, so nothing has
+  /// ever been published and every tombstone counts.
+  Future<int> getUnsyncedChangeCount({required String? providerId}) async {
+    final pending = await getPendingCount();
+    if (providerId == null) {
+      return pending + await getUnpublishedDeletionCount(upToHlc: null);
+    }
+    final String? watermark;
+    try {
+      watermark = (await PublishStateStore(
+        _db,
+      ).get(providerId))?.publishedHlcHigh;
+    } catch (e, stackTrace) {
+      // This count is advisory and its callers treat it as non-failing (the
+      // notifier would otherwise turn a status query into a page-wide error).
+      // Without a watermark, report the pending records alone rather than
+      // counting the entire deletion log as unsent.
+      _log.error(
+        'Failed to read publish watermark for $providerId',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      return pending;
+    }
+    return pending + await getUnpublishedDeletionCount(upToHlc: watermark);
   }
 
   /// Clear all pending sync records

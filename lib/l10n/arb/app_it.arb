@@ -267,6 +267,11 @@
   "setup_step_profile": "Profilo",
   "setup_step_units": "Unità",
   "setup_syncPull_continue": "Continua",
+  "setup_syncPull_incomplete_message": "Questo account contiene una libreria Submersion il cui caricamento non è mai stato completato. Lascia che l'altro dispositivo finisca la sincronizzazione, poi riprova.",
+  "setup_syncPull_incomplete_retry": "Controlla di nuovo",
+  "setup_syncPull_incomplete_title": "Caricamento della libreria incompleto",
+  "setup_syncPull_locked_message": "Inserisci la passphrase di crittografia per sbloccare questa libreria e scaricarla su questo dispositivo.",
+  "setup_syncPull_locked_title": "Questa libreria è crittografata",
   "setup_syncPull_noLibrary_message": "Nessuna libreria Submersion trovata su questo account. Iniziare da zero? La connessione verrà mantenuta.",
   "setup_syncPull_noLibrary_title": "Nessuna libreria trovata",
   "setup_syncPull_success": "Libreria adottata",
@@ -841,6 +846,27 @@
   "preDive_sessions_linkedDive": "Immersione collegata",
   "preDive_sessions_delete": "Elimina",
   "preDive_sessions_deleteConfirm": "Eliminare questo record di checklist?",
+  "preDive_sessions_filter": "Filtra",
+  "preDive_sessions_filterTitle": "Filtra le checklist eseguite",
+  "preDive_sessions_filterChecklist": "Checklist",
+  "preDive_sessions_filterStatus": "Stato",
+  "preDive_sessions_filterFlaggedOnly": "Solo con segnalazioni",
+  "preDive_sessions_filterDateRange": "Intervallo di date",
+  "preDive_sessions_filterAnyDate": "Qualsiasi data",
+  "preDive_sessions_filterClearAll": "Cancella tutto",
+  "preDive_sessions_filterApply": "Applica",
+  "preDive_sessions_filterFlaggedChip": "Solo segnalazioni",
+  "preDive_sessions_emptyFiltered": "Nessuna checklist corrisponde a questi filtri",
+  "preDive_sessions_export": "Esporta in Excel",
+  "preDive_sessions_exportEmpty": "Nessuna checklist da esportare",
+  "preDive_sessions_exportFailed": "Esportazione non riuscita: {error}",
+  "@preDive_sessions_exportFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
   "preDive_start_title": "Avvia checklist pre-immersione",
   "preDive_start_template": "Checklist",
   "preDive_start_equipmentSet": "Set di attrezzatura",
@@ -1269,6 +1295,8 @@
   "diveComputer_download_durationMin": "{duration} min",
   "diveComputer_download_errorOccurred": "Si è verificato un errore",
   "diveComputer_download_noSerialPortsFound": "Nessuna porta seriale USB trovata. Il computer subacqueo è collegato e acceso?",
+  "diveComputer_download_stalePairing": "L'associazione Bluetooth di questo computer subacqueo non è più valida. Dimentica il computer subacqueo nelle impostazioni Bluetooth del tuo dispositivo, quindi associalo di nuovo dal menu Bluetooth del computer subacqueo.",
+  "diveComputer_download_discoveryStalled": "Connessione al computer subacqueo riuscita, ma ha smesso di rispondere prima dell'avvio del download. Di solito significa che l'associazione Bluetooth non è più valida: dimentica il computer subacqueo nelle impostazioni Bluetooth del tuo dispositivo e riprova.",
   "diveComputer_download_serialConnectFailedWithDetails": "Impossibile connettersi al computer subacqueo.\n\nDettagli diagnostici (da condividere con gli sviluppatori):\n{details}",
   "@diveComputer_download_serialConnectFailedWithDetails": {
     "placeholders": {

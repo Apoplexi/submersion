@@ -2385,6 +2385,51 @@ class AppLocalizationsEn extends AppLocalizations {
   String get preDive_sessions_deleteConfirm => 'Delete this checklist record?';
 
   @override
+  String get preDive_sessions_filter => 'Filter';
+
+  @override
+  String get preDive_sessions_filterTitle => 'Filter checklist runs';
+
+  @override
+  String get preDive_sessions_filterChecklist => 'Checklist';
+
+  @override
+  String get preDive_sessions_filterStatus => 'Status';
+
+  @override
+  String get preDive_sessions_filterFlaggedOnly => 'Flagged runs only';
+
+  @override
+  String get preDive_sessions_filterDateRange => 'Date range';
+
+  @override
+  String get preDive_sessions_filterAnyDate => 'Any date';
+
+  @override
+  String get preDive_sessions_filterClearAll => 'Clear all';
+
+  @override
+  String get preDive_sessions_filterApply => 'Apply';
+
+  @override
+  String get preDive_sessions_filterFlaggedChip => 'Flagged only';
+
+  @override
+  String get preDive_sessions_emptyFiltered =>
+      'No checklist runs match these filters';
+
+  @override
+  String get preDive_sessions_export => 'Export to Excel';
+
+  @override
+  String get preDive_sessions_exportEmpty => 'No checklist runs to export';
+
+  @override
+  String preDive_sessions_exportFailed(String error) {
+    return 'Export failed: $error';
+  }
+
+  @override
   String get preDive_start_title => 'Start pre-dive checklist';
 
   @override
@@ -6105,6 +6150,23 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get setup_syncPull_continue => 'Continue';
+
+  @override
+  String get setup_syncPull_incomplete_message =>
+      'This account holds a Submersion library that was never finished uploading. Let your other device finish syncing, then try again.';
+
+  @override
+  String get setup_syncPull_incomplete_retry => 'Check again';
+
+  @override
+  String get setup_syncPull_incomplete_title => 'Library upload unfinished';
+
+  @override
+  String get setup_syncPull_locked_message =>
+      'Enter the encryption passphrase to unlock this library and download it to this device.';
+
+  @override
+  String get setup_syncPull_locked_title => 'This library is encrypted';
 
   @override
   String get setup_syncPull_noLibrary_message =>
@@ -18913,6 +18975,14 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get diveComputer_download_noSerialPortsFound =>
       'No USB serial ports found. Is the dive computer connected and powered on?';
+
+  @override
+  String get diveComputer_download_stalePairing =>
+      'This dive computer\'s Bluetooth pairing is out of date. Forget the dive computer in your device\'s Bluetooth settings, then pair it again from the dive computer\'s Bluetooth menu.';
+
+  @override
+  String get diveComputer_download_discoveryStalled =>
+      'Connected to the dive computer, but it stopped responding before the download could start. This usually means the Bluetooth pairing is out of date: forget the dive computer in your device\'s Bluetooth settings, then try again.';
 
   @override
   String diveComputer_download_serialConnectFailedWithDetails(Object details) {

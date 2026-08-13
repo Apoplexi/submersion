@@ -12,16 +12,6 @@ import 'package:submersion/features/media/domain/entities/media_source_type.dart
 import 'package:submersion/features/media/domain/value_objects/media_source_data.dart';
 import 'package:submersion/features/media_store/data/media_cache_store.dart';
 
-/// Signature of the PDF page-1 render seam, injectable so tests do not need
-/// a pdfium binary. Matches [PdfPageRenderer.renderFirstPageJpeg].
-typedef PdfThumbRenderer =
-    Future<Uint8List?> Function({
-      File? file,
-      Uint8List? bytes,
-      int maxDimension,
-      int quality,
-    });
-
 /// Best-effort thumbnail production for the upload pipeline (design spec
 /// section 9 step 4). Only the gallery source hands back genuinely
 /// pre-compressed thumbnail bytes; everything else (including bookmark

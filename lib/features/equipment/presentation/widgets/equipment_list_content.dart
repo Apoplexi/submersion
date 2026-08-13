@@ -13,6 +13,7 @@ import 'package:submersion/shared/selection/bulk_action.dart';
 import 'package:submersion/shared/selection/selectable_list_scope.dart';
 import 'package:submersion/shared/selection/selectable_row.dart';
 import 'package:submersion/shared/selection/selection_app_bar.dart';
+import 'package:submersion/shared/selection/selection_entry_bar.dart';
 import 'package:submersion/shared/selection/selection_controller.dart';
 import 'package:submersion/shared/selection/selection_state.dart';
 import 'package:submersion/shared/widgets/entity_table/entity_table_view.dart';
@@ -447,14 +448,43 @@ class _EquipmentListContentState extends ConsumerState<EquipmentListContent> {
     BuildContext context,
     AsyncValue<List<EquipmentItem>> equipmentAsync,
   ) {
-    final tableContent = _buildTableView(context, equipmentAsync);
+    final visibleIds = (equipmentAsync.value ?? const <EquipmentItem>[])
+        .map((e) => e.id)
+        .toList();
 
-    return Column(
-      children: [
-        if (widget.headerExtension != null) widget.headerExtension!,
-        _buildFilterChips(context),
-        Expanded(child: tableContent),
-      ],
+    // Same pruning the list path does: drop checked items that fell out of
+    // the visible list, so the count always matches what is on screen.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _selection.pruneTo(visibleIds);
+    });
+
+    // The scope carries Escape, Ctrl/Cmd-A and the Android back handling, and
+    // the builder is what repaints the table as checks change -- the table is
+    // built inside it for that reason.
+    return SelectableListScope(
+      controller: _selection,
+      selectableIds: visibleIds,
+      child: ValueListenableBuilder<SelectionState>(
+        valueListenable: _selection,
+        builder: (context, selection, _) => Column(
+          children: [
+            if (widget.headerExtension != null) widget.headerExtension!,
+            // Table mode has no app bar of its own, so both bars live here:
+            // the contextual one while selecting, and the Select affordance
+            // while not. They share a slot and a height, so the table does
+            // not shift as the mode opens.
+            if (selection.isActive)
+              _buildSelectionBar(
+                equipmentAsync.value ?? const <EquipmentItem>[],
+                SelectionBarShell.pane,
+              )
+            else
+              SelectionEntryBar(controller: _selection),
+            _buildFilterChips(context),
+            Expanded(child: _buildTableView(context, equipmentAsync)),
+          ],
+        ),
+      ),
     );
   }
 

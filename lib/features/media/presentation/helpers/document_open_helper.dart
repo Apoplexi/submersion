@@ -9,8 +9,8 @@ import 'package:submersion/features/media/data/services/document_import_service.
 import 'package:submersion/features/media/data/services/media_share_temp_file.dart';
 import 'package:submersion/features/media/domain/entities/media_item.dart';
 import 'package:submersion/features/media/presentation/pages/document_viewer_page.dart';
+import 'package:submersion/features/media/presentation/providers/media_bytes_providers.dart';
 import 'package:submersion/features/media/presentation/providers/media_providers.dart';
-import 'package:submersion/features/media/presentation/providers/resolved_asset_providers.dart';
 import 'package:submersion/features/media/presentation/providers/site_media_providers.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 
@@ -48,9 +48,7 @@ class DocumentOpenHelper {
     MediaItem item,
   ) async {
     final l10n = context.l10n;
-    final resolved = await ref.read(
-      resolvedFullResolutionProvider(item).future,
-    );
+    final resolved = await ref.read(mediaBytesProvider(item).future);
     if (resolved.isUnavailable || resolved.bytes == null) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(

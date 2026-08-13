@@ -2292,6 +2292,50 @@ class AppLocalizationsZh extends AppLocalizations {
   String get preDive_sessions_deleteConfirm => '要删除此检查清单记录吗？';
 
   @override
+  String get preDive_sessions_filter => '筛选';
+
+  @override
+  String get preDive_sessions_filterTitle => '筛选检查清单记录';
+
+  @override
+  String get preDive_sessions_filterChecklist => '检查清单';
+
+  @override
+  String get preDive_sessions_filterStatus => '状态';
+
+  @override
+  String get preDive_sessions_filterFlaggedOnly => '仅显示有标记的记录';
+
+  @override
+  String get preDive_sessions_filterDateRange => '日期范围';
+
+  @override
+  String get preDive_sessions_filterAnyDate => '任意日期';
+
+  @override
+  String get preDive_sessions_filterClearAll => '全部清除';
+
+  @override
+  String get preDive_sessions_filterApply => '应用';
+
+  @override
+  String get preDive_sessions_filterFlaggedChip => '仅有标记';
+
+  @override
+  String get preDive_sessions_emptyFiltered => '没有符合这些筛选条件的检查清单记录';
+
+  @override
+  String get preDive_sessions_export => '导出到 Excel';
+
+  @override
+  String get preDive_sessions_exportEmpty => '没有可导出的检查清单记录';
+
+  @override
+  String preDive_sessions_exportFailed(String error) {
+    return '导出失败：$error';
+  }
+
+  @override
   String get preDive_start_title => '开始潜前检查清单';
 
   @override
@@ -5905,6 +5949,22 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get setup_syncPull_continue => '继续';
+
+  @override
+  String get setup_syncPull_incomplete_message =>
+      '此账户中的 Submersion 资料库尚未上传完成。请让另一台设备完成同步后重试。';
+
+  @override
+  String get setup_syncPull_incomplete_retry => '重新检查';
+
+  @override
+  String get setup_syncPull_incomplete_title => '资料库上传未完成';
+
+  @override
+  String get setup_syncPull_locked_message => '输入加密口令以解锁此资料库并下载到此设备。';
+
+  @override
+  String get setup_syncPull_locked_title => '此资料库已加密';
 
   @override
   String get setup_syncPull_noLibrary_message =>
@@ -18259,6 +18319,14 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String get diveComputer_download_noSerialPortsFound =>
       '未找到 USB 串行端口。潜水电脑是否已连接并开机？';
+
+  @override
+  String get diveComputer_download_stalePairing =>
+      '此潜水电脑的蓝牙配对已失效。请在设备的蓝牙设置中忽略该潜水电脑，然后从潜水电脑的蓝牙菜单重新配对。';
+
+  @override
+  String get diveComputer_download_discoveryStalled =>
+      '已连接到潜水电脑，但在下载开始前它停止响应。这通常表示蓝牙配对已失效：请在设备的蓝牙设置中忽略该潜水电脑，然后重试。';
 
   @override
   String diveComputer_download_serialConnectFailedWithDetails(Object details) {

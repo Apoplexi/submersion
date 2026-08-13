@@ -267,6 +267,11 @@
   "setup_step_profile": "Perfil",
   "setup_step_units": "Unidades",
   "setup_syncPull_continue": "Continuar",
+  "setup_syncPull_incomplete_message": "Esta conta contém uma biblioteca do Submersion cujo envio nunca foi concluído. Deixe o seu outro dispositivo terminar a sincronização e tente novamente.",
+  "setup_syncPull_incomplete_retry": "Verificar novamente",
+  "setup_syncPull_incomplete_title": "Envio da biblioteca incompleto",
+  "setup_syncPull_locked_message": "Digite a frase-senha de criptografia para desbloquear esta biblioteca e baixá-la neste dispositivo.",
+  "setup_syncPull_locked_title": "Esta biblioteca está criptografada",
   "setup_syncPull_noLibrary_message": "Nenhuma biblioteca do Submersion foi encontrada nesta conta. Começar do zero? Sua conexão será mantida.",
   "setup_syncPull_noLibrary_title": "Nenhuma biblioteca encontrada",
   "setup_syncPull_success": "Biblioteca adotada",
@@ -841,6 +846,27 @@
   "preDive_sessions_linkedDive": "Mergulho vinculado",
   "preDive_sessions_delete": "Excluir",
   "preDive_sessions_deleteConfirm": "Excluir este registro de lista de verificação?",
+  "preDive_sessions_filter": "Filtrar",
+  "preDive_sessions_filterTitle": "Filtrar listas realizadas",
+  "preDive_sessions_filterChecklist": "Lista de verificação",
+  "preDive_sessions_filterStatus": "Estado",
+  "preDive_sessions_filterFlaggedOnly": "Apenas com ocorrências",
+  "preDive_sessions_filterDateRange": "Intervalo de datas",
+  "preDive_sessions_filterAnyDate": "Qualquer data",
+  "preDive_sessions_filterClearAll": "Limpar tudo",
+  "preDive_sessions_filterApply": "Aplicar",
+  "preDive_sessions_filterFlaggedChip": "Apenas ocorrências",
+  "preDive_sessions_emptyFiltered": "Nenhuma lista corresponde a estes filtros",
+  "preDive_sessions_export": "Exportar para Excel",
+  "preDive_sessions_exportEmpty": "Nenhuma lista para exportar",
+  "preDive_sessions_exportFailed": "Falha na exportação: {error}",
+  "@preDive_sessions_exportFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
   "preDive_start_title": "Iniciar lista de verificação pré-mergulho",
   "preDive_start_template": "Lista de verificação",
   "preDive_start_equipmentSet": "Conjunto de equipamentos",
@@ -1269,6 +1295,8 @@
   "diveComputer_download_durationMin": "{duration} min",
   "diveComputer_download_errorOccurred": "Ocorreu um erro",
   "diveComputer_download_noSerialPortsFound": "Nenhuma porta serial USB encontrada. O computador de mergulho está conectado e ligado?",
+  "diveComputer_download_stalePairing": "O emparelhamento Bluetooth deste computador de mergulho está desatualizado. Esqueça o computador de mergulho nas definições de Bluetooth do seu dispositivo e emparelhe-o novamente a partir do menu Bluetooth do computador de mergulho.",
+  "diveComputer_download_discoveryStalled": "Ligou-se ao computador de mergulho, mas ele deixou de responder antes de a transferência começar. Normalmente isto significa que o emparelhamento Bluetooth está desatualizado: esqueça o computador de mergulho nas definições de Bluetooth do seu dispositivo e tente novamente.",
   "diveComputer_download_serialConnectFailedWithDetails": "Não foi possível conectar ao computador de mergulho.\n\nDetalhes de diagnóstico (compartilhe com os desenvolvedores):\n{details}",
   "@diveComputer_download_serialConnectFailedWithDetails": {
     "placeholders": {

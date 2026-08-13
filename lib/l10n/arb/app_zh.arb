@@ -305,6 +305,11 @@
   "setup_step_profile": "个人资料",
   "setup_step_units": "单位",
   "setup_syncPull_continue": "继续",
+  "setup_syncPull_incomplete_message": "此账户中的 Submersion 资料库尚未上传完成。请让另一台设备完成同步后重试。",
+  "setup_syncPull_incomplete_retry": "重新检查",
+  "setup_syncPull_incomplete_title": "资料库上传未完成",
+  "setup_syncPull_locked_message": "输入加密口令以解锁此资料库并下载到此设备。",
+  "setup_syncPull_locked_title": "此资料库已加密",
   "setup_syncPull_noLibrary_message": "此账户中未找到 Submersion 资料库。要重新开始吗？你的连接将被保留。",
   "setup_syncPull_noLibrary_title": "未找到资料库",
   "setup_syncPull_success": "已采用资料库",
@@ -935,6 +940,27 @@
   "preDive_sessions_linkedDive": "关联潜水",
   "preDive_sessions_delete": "删除",
   "preDive_sessions_deleteConfirm": "要删除此检查清单记录吗？",
+  "preDive_sessions_filter": "筛选",
+  "preDive_sessions_filterTitle": "筛选检查清单记录",
+  "preDive_sessions_filterChecklist": "检查清单",
+  "preDive_sessions_filterStatus": "状态",
+  "preDive_sessions_filterFlaggedOnly": "仅显示有标记的记录",
+  "preDive_sessions_filterDateRange": "日期范围",
+  "preDive_sessions_filterAnyDate": "任意日期",
+  "preDive_sessions_filterClearAll": "全部清除",
+  "preDive_sessions_filterApply": "应用",
+  "preDive_sessions_filterFlaggedChip": "仅有标记",
+  "preDive_sessions_emptyFiltered": "没有符合这些筛选条件的检查清单记录",
+  "preDive_sessions_export": "导出到 Excel",
+  "preDive_sessions_exportEmpty": "没有可导出的检查清单记录",
+  "preDive_sessions_exportFailed": "导出失败：{error}",
+  "@preDive_sessions_exportFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
   "preDive_start_title": "开始潜前检查清单",
   "preDive_start_template": "检查清单",
   "preDive_start_equipmentSet": "装备套装",
@@ -1373,6 +1399,8 @@
   "diveComputer_download_newDivesOnlySubtitle": "仅下载自上次同步以来新增的潜水",
   "diveComputer_download_newDivesOnlyTitle": "仅下载新潜水",
   "diveComputer_download_noSerialPortsFound": "未找到 USB 串行端口。潜水电脑是否已连接并开机？",
+  "diveComputer_download_stalePairing": "此潜水电脑的蓝牙配对已失效。请在设备的蓝牙设置中忽略该潜水电脑，然后从潜水电脑的蓝牙菜单重新配对。",
+  "diveComputer_download_discoveryStalled": "已连接到潜水电脑，但在下载开始前它停止响应。这通常表示蓝牙配对已失效：请在设备的蓝牙设置中忽略该潜水电脑，然后重试。",
   "diveComputer_download_preparing": "准备中...",
   "diveComputer_download_progressPercent": "{percent}%",
   "diveComputer_download_retry": "重试",

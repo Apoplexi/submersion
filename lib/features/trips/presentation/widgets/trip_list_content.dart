@@ -18,6 +18,7 @@ import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:submersion/shared/selection/selectable_list_scope.dart';
 import 'package:submersion/shared/selection/selectable_row.dart';
 import 'package:submersion/shared/selection/selection_app_bar.dart';
+import 'package:submersion/shared/selection/selection_entry_bar.dart';
 import 'package:submersion/shared/selection/selection_controller.dart';
 import 'package:submersion/shared/selection/selection_state.dart';
 import 'package:submersion/features/trips/domain/constants/trip_field.dart';
@@ -359,7 +360,6 @@ class _TripListContentState extends ConsumerState<TripListContent> {
     AsyncValue<List<TripWithStats>> tripsAsync,
     TripFilterState filter,
   ) {
-    final tableContent = _buildTableView(context, tripsAsync, filter);
     final loadedTrips = tripsAsync.value ?? const <TripWithStats>[];
     final visibleIds = loadedTrips.map((t) => t.trip.id).toList();
 
@@ -372,14 +372,26 @@ class _TripListContentState extends ConsumerState<TripListContent> {
       selectableIds: visibleIds,
       child: ValueListenableBuilder<SelectionState>(
         valueListenable: _selection,
-        builder: (context, selection, _) => selection.isActive
-            ? Column(
-                children: [
-                  _buildSelectionBar(loadedTrips, SelectionBarShell.pane),
-                  Expanded(child: tableContent),
-                ],
-              )
-            : tableContent,
+        builder: (context, selection, _) {
+          // Built inside the builder so the table's own rows re-render as
+          // checks change; building it outside left them on a stale
+          // selectedIds while only the bar updated.
+          final tableContent = _buildTableView(context, tripsAsync, filter);
+
+          // Table mode has no app bar of its own, so both bars live here: the
+          // contextual one while selecting, and the Select affordance while
+          // not. They share a slot and a height, so the table does not shift
+          // as the mode opens.
+          return Column(
+            children: [
+              if (selection.isActive)
+                _buildSelectionBar(loadedTrips, SelectionBarShell.pane)
+              else
+                SelectionEntryBar(controller: _selection),
+              Expanded(child: tableContent),
+            ],
+          );
+        },
       ),
     );
   }

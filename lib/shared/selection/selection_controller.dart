@@ -47,14 +47,22 @@ class SelectionController extends ValueNotifier<SelectionState> {
   /// [id]. Behaves as [toggle] when the mode is already active.
   ///
   /// Touch has no equivalent: long-press no longer enters selection mode on
-  /// any surface, so on a phone every entry is explicit.
-  void enterImplicit(String id) {
+  /// any surface, so on a phone every entry is explicit and this is the only
+  /// path that still evaporates at zero checked.
+  ///
+  /// [seedId] is checked alongside [id] on entry: the row the surface was
+  /// already showing as current -- the highlighted row backing the detail
+  /// pane -- so a modifier-click adds to what the user sees selected instead
+  /// of discarding it, matching Finder. The anchor is still [id], so a
+  /// following shift-click extends from the row just clicked. Ignored once
+  /// the mode is active, where the checked set already holds the intent.
+  void enterImplicit(String id, {String? seedId}) {
     if (value.isActive) {
       toggle(id);
       return;
     }
     value = SelectionState(
-      checkedIds: {id},
+      checkedIds: {?seedId, id},
       isActive: true,
       enteredExplicitly: false,
       anchorId: id,

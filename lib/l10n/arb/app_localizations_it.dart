@@ -2429,6 +2429,51 @@ class AppLocalizationsIt extends AppLocalizations {
       'Eliminare questo record di checklist?';
 
   @override
+  String get preDive_sessions_filter => 'Filtra';
+
+  @override
+  String get preDive_sessions_filterTitle => 'Filtra le checklist eseguite';
+
+  @override
+  String get preDive_sessions_filterChecklist => 'Checklist';
+
+  @override
+  String get preDive_sessions_filterStatus => 'Stato';
+
+  @override
+  String get preDive_sessions_filterFlaggedOnly => 'Solo con segnalazioni';
+
+  @override
+  String get preDive_sessions_filterDateRange => 'Intervallo di date';
+
+  @override
+  String get preDive_sessions_filterAnyDate => 'Qualsiasi data';
+
+  @override
+  String get preDive_sessions_filterClearAll => 'Cancella tutto';
+
+  @override
+  String get preDive_sessions_filterApply => 'Applica';
+
+  @override
+  String get preDive_sessions_filterFlaggedChip => 'Solo segnalazioni';
+
+  @override
+  String get preDive_sessions_emptyFiltered =>
+      'Nessuna checklist corrisponde a questi filtri';
+
+  @override
+  String get preDive_sessions_export => 'Esporta in Excel';
+
+  @override
+  String get preDive_sessions_exportEmpty => 'Nessuna checklist da esportare';
+
+  @override
+  String preDive_sessions_exportFailed(String error) {
+    return 'Esportazione non riuscita: $error';
+  }
+
+  @override
   String get preDive_start_title => 'Avvia checklist pre-immersione';
 
   @override
@@ -6219,6 +6264,24 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get setup_syncPull_continue => 'Continua';
+
+  @override
+  String get setup_syncPull_incomplete_message =>
+      'Questo account contiene una libreria Submersion il cui caricamento non è mai stato completato. Lascia che l\'altro dispositivo finisca la sincronizzazione, poi riprova.';
+
+  @override
+  String get setup_syncPull_incomplete_retry => 'Controlla di nuovo';
+
+  @override
+  String get setup_syncPull_incomplete_title =>
+      'Caricamento della libreria incompleto';
+
+  @override
+  String get setup_syncPull_locked_message =>
+      'Inserisci la passphrase di crittografia per sbloccare questa libreria e scaricarla su questo dispositivo.';
+
+  @override
+  String get setup_syncPull_locked_title => 'Questa libreria è crittografata';
 
   @override
   String get setup_syncPull_noLibrary_message =>
@@ -19242,6 +19305,14 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String get diveComputer_download_noSerialPortsFound =>
       'Nessuna porta seriale USB trovata. Il computer subacqueo è collegato e acceso?';
+
+  @override
+  String get diveComputer_download_stalePairing =>
+      'L\'associazione Bluetooth di questo computer subacqueo non è più valida. Dimentica il computer subacqueo nelle impostazioni Bluetooth del tuo dispositivo, quindi associalo di nuovo dal menu Bluetooth del computer subacqueo.';
+
+  @override
+  String get diveComputer_download_discoveryStalled =>
+      'Connessione al computer subacqueo riuscita, ma ha smesso di rispondere prima dell\'avvio del download. Di solito significa che l\'associazione Bluetooth non è più valida: dimentica il computer subacqueo nelle impostazioni Bluetooth del tuo dispositivo e riprova.';
 
   @override
   String diveComputer_download_serialConnectFailedWithDetails(Object details) {

@@ -2436,6 +2436,51 @@ class AppLocalizationsEs extends AppLocalizations {
       '¿Eliminar este registro de lista de verificación?';
 
   @override
+  String get preDive_sessions_filter => 'Filtrar';
+
+  @override
+  String get preDive_sessions_filterTitle => 'Filtrar listas realizadas';
+
+  @override
+  String get preDive_sessions_filterChecklist => 'Lista de verificación';
+
+  @override
+  String get preDive_sessions_filterStatus => 'Estado';
+
+  @override
+  String get preDive_sessions_filterFlaggedOnly => 'Solo con incidencias';
+
+  @override
+  String get preDive_sessions_filterDateRange => 'Intervalo de fechas';
+
+  @override
+  String get preDive_sessions_filterAnyDate => 'Cualquier fecha';
+
+  @override
+  String get preDive_sessions_filterClearAll => 'Borrar todo';
+
+  @override
+  String get preDive_sessions_filterApply => 'Aplicar';
+
+  @override
+  String get preDive_sessions_filterFlaggedChip => 'Solo incidencias';
+
+  @override
+  String get preDive_sessions_emptyFiltered =>
+      'Ninguna lista coincide con estos filtros';
+
+  @override
+  String get preDive_sessions_export => 'Exportar a Excel';
+
+  @override
+  String get preDive_sessions_exportEmpty => 'No hay listas para exportar';
+
+  @override
+  String preDive_sessions_exportFailed(String error) {
+    return 'Error al exportar: $error';
+  }
+
+  @override
   String get preDive_start_title => 'Iniciar lista previa a la inmersión';
 
   @override
@@ -6225,6 +6270,24 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get setup_syncPull_continue => 'Continuar';
+
+  @override
+  String get setup_syncPull_incomplete_message =>
+      'Esta cuenta contiene una biblioteca de Submersion cuya carga nunca se completó. Deja que tu otro dispositivo termine de sincronizar y vuelve a intentarlo.';
+
+  @override
+  String get setup_syncPull_incomplete_retry => 'Comprobar de nuevo';
+
+  @override
+  String get setup_syncPull_incomplete_title =>
+      'Carga de la biblioteca sin terminar';
+
+  @override
+  String get setup_syncPull_locked_message =>
+      'Introduce la frase de acceso de cifrado para desbloquear esta biblioteca y descargarla en este dispositivo.';
+
+  @override
+  String get setup_syncPull_locked_title => 'Esta biblioteca está cifrada';
 
   @override
   String get setup_syncPull_noLibrary_message =>
@@ -19259,6 +19322,14 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get diveComputer_download_noSerialPortsFound =>
       'No se encontraron puertos serie USB. ¿Está el ordenador de buceo conectado y encendido?';
+
+  @override
+  String get diveComputer_download_stalePairing =>
+      'El emparejamiento Bluetooth de este ordenador de buceo está obsoleto. Olvida el ordenador de buceo en los ajustes de Bluetooth de tu dispositivo y vuelve a emparejarlo desde el menú Bluetooth del ordenador de buceo.';
+
+  @override
+  String get diveComputer_download_discoveryStalled =>
+      'Se conectó al ordenador de buceo, pero dejó de responder antes de que comenzara la descarga. Normalmente esto significa que el emparejamiento Bluetooth está obsoleto: olvida el ordenador de buceo en los ajustes de Bluetooth de tu dispositivo y vuelve a intentarlo.';
 
   @override
   String diveComputer_download_serialConnectFailedWithDetails(Object details) {

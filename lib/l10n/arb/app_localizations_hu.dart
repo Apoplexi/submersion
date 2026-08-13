@@ -2419,6 +2419,52 @@ class AppLocalizationsHu extends AppLocalizations {
       'Törli ezt az ellenőrzőlista-bejegyzést?';
 
   @override
+  String get preDive_sessions_filter => 'Szűrés';
+
+  @override
+  String get preDive_sessions_filterTitle =>
+      'Ellenőrzőlista-futtatások szűrése';
+
+  @override
+  String get preDive_sessions_filterChecklist => 'Ellenőrzőlista';
+
+  @override
+  String get preDive_sessions_filterStatus => 'Állapot';
+
+  @override
+  String get preDive_sessions_filterFlaggedOnly => 'Csak megjelölt futtatások';
+
+  @override
+  String get preDive_sessions_filterDateRange => 'Dátumtartomány';
+
+  @override
+  String get preDive_sessions_filterAnyDate => 'Bármely dátum';
+
+  @override
+  String get preDive_sessions_filterClearAll => 'Összes törlése';
+
+  @override
+  String get preDive_sessions_filterApply => 'Alkalmaz';
+
+  @override
+  String get preDive_sessions_filterFlaggedChip => 'Csak megjelölt';
+
+  @override
+  String get preDive_sessions_emptyFiltered =>
+      'Nincs a szűrőknek megfelelő ellenőrzőlista-futtatás';
+
+  @override
+  String get preDive_sessions_export => 'Exportálás Excelbe';
+
+  @override
+  String get preDive_sessions_exportEmpty => 'Nincs exportálható futtatás';
+
+  @override
+  String preDive_sessions_exportFailed(String error) {
+    return 'Az exportálás sikertelen: $error';
+  }
+
+  @override
   String get preDive_start_title => 'Merülés előtti ellenőrzőlista indítása';
 
   @override
@@ -6199,6 +6245,24 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get setup_syncPull_continue => 'Folytatás';
+
+  @override
+  String get setup_syncPull_incomplete_message =>
+      'Ezen a fiókon egy Submersion-könyvtár található, amelynek feltöltése soha nem fejeződött be. Hagyja, hogy a másik eszköz befejezze a szinkronizálást, majd próbálja újra.';
+
+  @override
+  String get setup_syncPull_incomplete_retry => 'Ellenőrzés újra';
+
+  @override
+  String get setup_syncPull_incomplete_title =>
+      'A könyvtár feltöltése befejezetlen';
+
+  @override
+  String get setup_syncPull_locked_message =>
+      'Adja meg a titkosítási jelmondatot a könyvtár feloldásához és az eszközre töltéséhez.';
+
+  @override
+  String get setup_syncPull_locked_title => 'Ez a könyvtár titkosítva van';
 
   @override
   String get setup_syncPull_noLibrary_message =>
@@ -19184,6 +19248,14 @@ class AppLocalizationsHu extends AppLocalizations {
   @override
   String get diveComputer_download_noSerialPortsFound =>
       'Nem található USB soros port. A búvárszámítógép csatlakoztatva van és be van kapcsolva?';
+
+  @override
+  String get diveComputer_download_stalePairing =>
+      'Ennek a merülőkomputernek a Bluetooth-párosítása elavult. Felejtesd el a merülőkomputert az eszközöd Bluetooth-beállításaiban, majd párosítsd újra a merülőkomputer Bluetooth menüjéből.';
+
+  @override
+  String get diveComputer_download_discoveryStalled =>
+      'A merülőkomputer csatlakozott, de a letöltés megkezdése előtt nem válaszolt tovább. Ez általában azt jelenti, hogy a Bluetooth-párosítás elavult: felejtesd el a merülőkomputert az eszközöd Bluetooth-beállításaiban, majd próbáld újra.';
 
   @override
   String diveComputer_download_serialConnectFailedWithDetails(Object details) {
