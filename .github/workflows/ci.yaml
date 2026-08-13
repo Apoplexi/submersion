@@ -772,6 +772,16 @@ jobs:
       - name: Build Android APK
         run: flutter build apk --release "${{ env.DART_DEFINES }}" -v
 
+      # The plugin's Kotlin JVM tests (BondPolicy, BondDiagnostics,
+      # BleScanDiagnostics, SerialReadBuffer) cover decision logic that no
+      # Dart test can reach. They run here rather than in their own job
+      # because android/gradlew is gitignored: the Gradle wrapper only
+      # exists once a Flutter Android build has injected it, which the APK
+      # step above has just done.
+      - name: Run libdivecomputer_plugin Kotlin unit tests
+        working-directory: android
+        run: ./gradlew :libdivecomputer_plugin:testDebugUnitTest
+
       # Guards against issue #318: a 4 KB-aligned native lib (liblibdc_jni.so)
       # silently shipped and crashed the app on Android 15+ 16 KB-page devices.
       # Fails the build if any 64-bit native library is not 16 KB-aligned.
