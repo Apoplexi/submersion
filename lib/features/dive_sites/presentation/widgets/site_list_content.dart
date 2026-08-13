@@ -176,7 +176,7 @@ class _SiteListContentState extends ConsumerState<SiteListContent> {
     }
   }
 
-  /// Enter selection mode implicitly, from a long-press or modifier-click.
+  /// Enter selection mode implicitly, from a modifier-click.
   void _enterSelectionMode(String? initialId) {
     if (initialId == null) {
       _selection.enterExplicit();
@@ -191,8 +191,9 @@ class _SiteListContentState extends ConsumerState<SiteListContent> {
 
   /// One tap policy for every site row, in every view mode.
   ///
-  /// A held modifier turns a tap into an implicit entry, so desktop users
-  /// never have to discover long-press.
+  /// A held modifier turns a tap into an implicit entry -- the one path
+  /// that still evaporates at zero checked, since touch has no gesture
+  /// entry left.
   void _handleRowTap(String id, List<SiteWithDiveCount> sites) {
     final orderedIds = sites.map((s) => s.site.id).toList();
     if (SelectableListScope.isShiftPressed()) {
@@ -467,8 +468,8 @@ class _SiteListContentState extends ConsumerState<SiteListContent> {
                       tooltip: context.l10n.diveSites_list_tooltip_sort,
                       onPressed: () => _showSortSheet(context),
                     ),
-                    // Discoverability: bulk actions must not be reachable only
-                    // by a long-press that nothing on screen advertises.
+                    // The only way into bulk actions: entry by long-press was removed,
+                    // so nothing but this control opens selection mode on touch.
                     IconButton(
                       key: const ValueKey('enter_selection'),
                       icon: const Icon(Icons.checklist),
@@ -611,9 +612,6 @@ class _SiteListContentState extends ConsumerState<SiteListContent> {
                   if (_isSelectionMode) return;
                   context.push('/sites/$id');
                 },
-                onEntityLongPress: _isSelectionMode
-                    ? null
-                    : (id) => _enterSelectionMode(id),
                 selectedIds: _selectedIds,
                 isSelectionMode: _isSelectionMode,
                 highlightedId: ref.watch(highlightedSiteIdProvider),
@@ -830,9 +828,6 @@ class _SiteListContentState extends ConsumerState<SiteListContent> {
               longitude: site.location?.longitude,
               showSharedBadge: showSharedBadge,
               onTap: () => _handleRowTap(site.id, sites),
-              onLongPress: _isSelectionMode
-                  ? null
-                  : () => _enterSelectionMode(site.id),
             ),
             ListViewMode.compact => CompactSiteListTile(
               name: site.name,
@@ -843,9 +838,6 @@ class _SiteListContentState extends ConsumerState<SiteListContent> {
               isHighlighted: !_isSelectionMode && isSelected,
               showSharedBadge: showSharedBadge,
               onTap: () => _handleRowTap(site.id, sites),
-              onLongPress: _isSelectionMode
-                  ? null
-                  : () => _enterSelectionMode(site.id),
             ),
             ListViewMode.dense || ListViewMode.table => DenseSiteListTile(
               name: site.name,
@@ -856,9 +848,6 @@ class _SiteListContentState extends ConsumerState<SiteListContent> {
               isHighlighted: !_isSelectionMode && isSelected,
               showSharedBadge: showSharedBadge,
               onTap: () => _handleRowTap(site.id, sites),
-              onLongPress: _isSelectionMode
-                  ? null
-                  : () => _enterSelectionMode(site.id),
             ),
           };
         },
@@ -1213,7 +1202,6 @@ class SiteListTile extends ConsumerStatefulWidget {
   final int diveCount;
   final double? rating;
   final VoidCallback? onTap;
-  final VoidCallback? onLongPress;
   final bool isSelectionMode;
   final bool isSelected;
   final bool isChecked;
@@ -1231,7 +1219,6 @@ class SiteListTile extends ConsumerStatefulWidget {
     this.diveCount = 0,
     this.rating,
     this.onTap,
-    this.onLongPress,
     this.isSelectionMode = false,
     this.isSelected = false,
     this.isChecked = false,
@@ -1267,7 +1254,6 @@ class _SiteListTileState extends ConsumerState<SiteListTile> {
     final diveCount = widget.diveCount;
     final rating = widget.rating;
     final onTap = widget.onTap;
-    final onLongPress = widget.onLongPress;
     final isSelectionMode = widget.isSelectionMode;
     final isSelected = widget.isSelected;
     final isChecked = widget.isChecked;
@@ -1402,7 +1388,6 @@ class _SiteListTileState extends ConsumerState<SiteListTile> {
           label: context.l10n.diveSites_list_tile_semantics(name),
           child: InkWell(
             onTap: onTap,
-            onLongPress: onLongPress,
             child: Stack(
               children: [
                 Positioned.fill(
@@ -1468,7 +1453,6 @@ class _SiteListTileState extends ConsumerState<SiteListTile> {
         label: context.l10n.diveSites_list_tile_semantics(name),
         child: InkWell(
           onTap: onTap,
-          onLongPress: onLongPress,
           borderRadius: BorderRadius.circular(12),
           child: buildContent(),
         ),

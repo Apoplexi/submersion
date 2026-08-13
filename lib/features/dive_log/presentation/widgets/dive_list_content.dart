@@ -222,7 +222,7 @@ class _DiveListContentState extends ConsumerState<DiveListContent> {
     });
   }
 
-  /// Enter selection mode implicitly, from a long-press or modifier-click.
+  /// Enter selection mode implicitly, from a modifier-click.
   ///
   /// Clearing the highlight keeps the detail pane from arguing with the bulk
   /// selection about what the row means.
@@ -653,7 +653,7 @@ class _DiveListContentState extends ConsumerState<DiveListContent> {
   /// One tap policy for every dive row, in every view mode.
   ///
   /// Outside selection mode a held modifier turns a tap into an implicit
-  /// entry, so desktop users never have to discover long-press. Shift extends
+  /// entry -- the one path that still evaporates at zero checked. Shift extends
   /// from the anchor, falling back to the highlighted row.
   void _handleRowTap(String id, List<DiveSummary> dives) {
     if (SelectableListScope.isShiftPressed()) {
@@ -852,8 +852,8 @@ class _DiveListContentState extends ConsumerState<DiveListContent> {
           tooltip: context.l10n.diveLog_listPage_tooltip_sort,
           onPressed: () => _showSortSheet(context),
         ),
-        // Discoverability: bulk actions must not be reachable only by a
-        // long-press that nothing on screen advertises.
+        // The only way into bulk actions: entry by long-press was removed,
+        // so nothing but this control opens selection mode on touch.
         IconButton(
           key: const ValueKey('enter_selection'),
           icon: const Icon(Icons.checklist),
@@ -1263,9 +1263,6 @@ class _DiveListContentState extends ConsumerState<DiveListContent> {
                   if (_isSelectionMode) return;
                   context.push('/dives/$id');
                 },
-                onDiveLongPress: _isSelectionMode
-                    ? null
-                    : (id) => _enterSelectionMode(id),
                 selectedIds: _selectedIds,
                 isSelectionMode: _isSelectionMode,
                 highlightedId: ref.watch(highlightedDiveIdProvider),
@@ -1369,9 +1366,6 @@ class _DiveListContentState extends ConsumerState<DiveListContent> {
                   isChecked: isSelected,
                   isHighlighted: isMasterSelected || isHighlighted,
                   onTap: () => _handleRowTap(dive.id, dives),
-                  onLongPress: _isSelectionMode
-                      ? null
-                      : () => _enterSelectionMode(dive.id),
                 );
               },
             ),

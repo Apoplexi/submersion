@@ -228,8 +228,8 @@ class _TripListContentState extends ConsumerState<TripListContent> {
                       tooltip: context.l10n.trips_list_tooltip_sort,
                       onPressed: () => _showSortSheet(context),
                     ),
-                    // Discoverability: bulk actions must not be reachable only by a
-                    // long-press that nothing on screen advertises.
+                    // The only way into bulk actions: entry by long-press was removed,
+                    // so nothing but this control opens selection mode on touch.
                     IconButton(
                       key: const ValueKey('enter_selection'),
                       icon: const Icon(Icons.checklist),
@@ -339,8 +339,9 @@ class _TripListContentState extends ConsumerState<TripListContent> {
 
   /// One tap policy for every trip row.
   ///
-  /// A held modifier turns a tap into an implicit entry, so desktop users
-  /// never have to discover long-press.
+  /// A held modifier turns a tap into an implicit entry -- the one path
+  /// that still evaporates at zero checked, since touch has no gesture
+  /// entry left.
   void _handleRowTap(Trip trip) {
     if (SelectableListScope.isModifierPressed()) {
       _selection.enterImplicit(trip.id);
@@ -419,9 +420,6 @@ class _TripListContentState extends ConsumerState<TripListContent> {
                 onEntityTap: (id) {
                   if (_isSelectionMode) _selection.toggle(id);
                 },
-                onEntityLongPress: _isSelectionMode
-                    ? null
-                    : (id) => _selection.enterImplicit(id),
                 selectedIds: _selectedIds,
                 isSelectionMode: _isSelectionMode,
                 onEntityDoubleTap: (id) {
@@ -476,8 +474,8 @@ class _TripListContentState extends ConsumerState<TripListContent> {
             tooltip: context.l10n.trips_list_tooltip_sort,
             onPressed: () => _showSortSheet(context),
           ),
-          // Discoverability: bulk actions must not be reachable only by a
-          // long-press that nothing on screen advertises.
+          // The only way into bulk actions: entry by long-press was removed,
+          // so nothing but this control opens selection mode on touch.
           IconButton(
             key: const ValueKey('enter_selection'),
             icon: const Icon(Icons.checklist, size: 20),

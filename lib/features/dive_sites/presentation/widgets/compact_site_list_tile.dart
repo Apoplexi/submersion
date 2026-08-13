@@ -11,7 +11,6 @@ class CompactSiteListTile extends StatelessWidget {
   final String? location;
   final int diveCount;
   final VoidCallback? onTap;
-  final VoidCallback? onLongPress;
   final bool isSelectionMode;
   final bool isSelected;
   final bool isHighlighted;
@@ -23,7 +22,6 @@ class CompactSiteListTile extends StatelessWidget {
     this.location,
     required this.diveCount,
     this.onTap,
-    this.onLongPress,
     this.isSelectionMode = false,
     this.isSelected = false,
     this.isHighlighted = false,
@@ -46,7 +44,6 @@ class CompactSiteListTile extends StatelessWidget {
         label: name,
         child: InkWell(
           onTap: onTap,
-          onLongPress: onLongPress,
           borderRadius: BorderRadius.circular(12),
           child: Padding(
             padding: const EdgeInsets.only(

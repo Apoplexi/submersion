@@ -10,7 +10,6 @@ class DenseSiteListTile extends StatelessWidget {
   final String? location;
   final int diveCount;
   final VoidCallback? onTap;
-  final VoidCallback? onLongPress;
   final bool isSelectionMode;
   final bool isSelected;
   final bool isHighlighted;
@@ -22,7 +21,6 @@ class DenseSiteListTile extends StatelessWidget {
     this.location,
     required this.diveCount,
     this.onTap,
-    this.onLongPress,
     this.isSelectionMode = false,
     this.isSelected = false,
     this.isHighlighted = false,
@@ -52,7 +50,6 @@ class DenseSiteListTile extends StatelessWidget {
         ),
         child: InkWell(
           onTap: onTap,
-          onLongPress: onLongPress,
           child: Padding(
             padding: const EdgeInsets.only(
               left: 8,

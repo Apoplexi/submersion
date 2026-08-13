@@ -154,23 +154,15 @@ class _BuddyListContentState extends ConsumerState<BuddyListContent> {
     }
   }
 
-  /// Enter selection mode implicitly, from a long-press or modifier-click.
-  void _enterSelectionMode(String? initialId) {
-    if (initialId == null) {
-      _selection.enterExplicit();
-    } else {
-      _selection.enterImplicit(initialId);
-    }
-  }
-
   void _exitSelectionMode() => _selection.exit();
 
   void _toggleSelection(String id) => _selection.toggle(id);
 
   /// One tap policy for every buddy row, in every view mode.
   ///
-  /// A held modifier turns a tap into an implicit entry, so desktop users
-  /// never have to discover long-press.
+  /// A held modifier turns a tap into an implicit entry -- the one path
+  /// that still evaporates at zero checked, since touch has no gesture
+  /// entry left.
   void _handleRowTap(String id, List<BuddyWithDiveCount> buddies) {
     final orderedIds = buddies.map((b) => b.buddy.id).toList();
     if (SelectableListScope.isShiftPressed()) {
@@ -454,8 +446,8 @@ class _BuddyListContentState extends ConsumerState<BuddyListContent> {
                         );
                       },
                     ),
-                    // Discoverability: buddies had no Select affordance at all --
-                    // long-press was the only way into bulk actions.
+                    // The only way into bulk actions: entry by long-press was removed,
+                    // so nothing but this control opens selection mode on touch.
                     IconButton(
                       key: const ValueKey('enter_selection'),
                       icon: const Icon(Icons.checklist),
@@ -580,9 +572,6 @@ class _BuddyListContentState extends ConsumerState<BuddyListContent> {
             if (_isSelectionMode) return;
             context.push('/buddies/$id');
           },
-          onEntityLongPress: _isSelectionMode
-              ? null
-              : (id) => _enterSelectionMode(id),
           selectedIds: _selectedIds,
           isSelectionMode: _isSelectionMode,
           highlightedId: ref.watch(highlightedBuddyIdProvider),
@@ -631,8 +620,8 @@ class _BuddyListContentState extends ConsumerState<BuddyListContent> {
               showSearch(context: context, delegate: BuddySearchDelegate(ref));
             },
           ),
-          // Discoverability: buddies had no Select affordance at all --
-          // long-press was the only way into bulk actions.
+          // The only way into bulk actions: entry by long-press was removed,
+          // so nothing but this control opens selection mode on touch.
           IconButton(
             key: const ValueKey('enter_selection'),
             icon: const Icon(Icons.checklist, size: 20),
@@ -763,31 +752,21 @@ class _BuddyListContentState extends ConsumerState<BuddyListContent> {
           final isChecked = _selectedIds.contains(buddy.id);
           final viewMode = ref.watch(buddyListViewModeProvider);
           return switch (viewMode) {
-            ListViewMode.detailed || ListViewMode.compact => GestureDetector(
-              onLongPress: _isSelectionMode
-                  ? null
-                  : () => _enterSelectionMode(buddy.id),
-              child: BuddyListTile(
-                buddy: buddy,
-                diveCount: buddyWithCount.diveCount,
-                isSelected: isSelected,
-                isChecked: isChecked,
-                isSelectionMode: _isSelectionMode,
-                onTap: () => _handleRowTap(buddy.id, buddies),
-              ),
+            ListViewMode.detailed || ListViewMode.compact => BuddyListTile(
+              buddy: buddy,
+              diveCount: buddyWithCount.diveCount,
+              isSelected: isSelected,
+              isChecked: isChecked,
+              isSelectionMode: _isSelectionMode,
+              onTap: () => _handleRowTap(buddy.id, buddies),
             ),
-            ListViewMode.dense || ListViewMode.table => GestureDetector(
-              onLongPress: _isSelectionMode
-                  ? null
-                  : () => _enterSelectionMode(buddy.id),
-              child: DenseBuddyListTile(
-                buddy: buddy,
-                diveCount: buddyWithCount.diveCount,
-                isChecked: isChecked,
-                isHighlighted: !_isSelectionMode && isHighlighted,
-                isSelectionMode: _isSelectionMode,
-                onTap: () => _handleRowTap(buddy.id, buddies),
-              ),
+            ListViewMode.dense || ListViewMode.table => DenseBuddyListTile(
+              buddy: buddy,
+              diveCount: buddyWithCount.diveCount,
+              isChecked: isChecked,
+              isHighlighted: !_isSelectionMode && isHighlighted,
+              isSelectionMode: _isSelectionMode,
+              onTap: () => _handleRowTap(buddy.id, buddies),
             ),
           };
         },

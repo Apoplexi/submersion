@@ -43,8 +43,11 @@ class SelectionController extends ValueNotifier<SelectionState> {
     );
   }
 
-  /// Enter selection mode as a side effect of long-press or modifier-click,
-  /// checking [id]. Behaves as [toggle] when the mode is already active.
+  /// Enter selection mode as a side effect of a modifier-click, checking
+  /// [id]. Behaves as [toggle] when the mode is already active.
+  ///
+  /// Touch has no equivalent: long-press no longer enters selection mode on
+  /// any surface, so on a phone every entry is explicit.
   void enterImplicit(String id) {
     if (value.isActive) {
       toggle(id);
@@ -122,13 +125,17 @@ class SelectionController extends ValueNotifier<SelectionState> {
   /// For surfaces whose child widget owns the gesture layer and reports its
   /// complete selection rather than a delta -- the media grid. [selectAll] is
   /// the wrong call there despite also taking a whole set, because it declares
-  /// the mode explicit, which would launder a long-press into a deliberate
-  /// entry and stop it evaporating at zero checked.
+  /// the mode explicit, which would launder an incidental gesture into a
+  /// deliberate entry and stop it evaporating at zero checked.
   ///
   /// Only a gesture can activate the mode through this path, so an activating
   /// call counts as implicit entry; the Select button routes through
   /// [enterExplicit] instead. An empty [ids] on an inactive controller is a
   /// no-op rather than an activation.
+  ///
+  /// No grid gesture activates the mode today -- the media grids are driven
+  /// into selection by their Select control -- but the branch is kept so a
+  /// future grid gesture cannot silently declare itself deliberate.
   void replaceChecked(List<String> ids) {
     final next = ids.toSet();
 

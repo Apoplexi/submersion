@@ -202,12 +202,13 @@ void main() {
       expect(find.text('Color'), findsOneWidget);
     });
 
-    testWidgets('long-press enters selection mode', (tester) async {
+    testWidgets('Select button enters selection mode', (tester) async {
       await tester.pumpWidget(_buildTestWidget(stats: _testStats));
       await tester.pumpAndSettle();
 
-      // Long press the first tag to enter selection mode
-      await tester.longPress(find.text('Night Dive'));
+      await tester.tap(find.byKey(const ValueKey('enter_selection')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Night Dive'));
       await tester.pumpAndSettle();
 
       // Selection mode indicators: close button, "1 selected" text, checkboxes
@@ -219,14 +220,30 @@ void main() {
       expect(find.byType(FloatingActionButton), findsNothing);
     });
 
+    testWidgets('long-press on a tag does not enter selection mode', (
+      tester,
+    ) async {
+      await tester.pumpWidget(_buildTestWidget(stats: _testStats));
+      await tester.pumpAndSettle();
+
+      await tester.longPress(find.text('Night Dive'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('1 selected'), findsNothing);
+      expect(find.byType(Checkbox), findsNothing);
+      expect(find.byKey(const ValueKey('enter_selection')), findsOneWidget);
+    });
+
     testWidgets('delete button shows confirmation with dive count', (
       tester,
     ) async {
       await tester.pumpWidget(_buildTestWidget(stats: _testStats));
       await tester.pumpAndSettle();
 
-      // Enter selection mode by long-pressing "Night Dive" (12 dives)
-      await tester.longPress(find.text('Night Dive'));
+      // Enter selection mode and check "Night Dive" (12 dives)
+      await tester.tap(find.byKey(const ValueKey('enter_selection')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Night Dive'));
       await tester.pumpAndSettle();
 
       // Delete lives behind the selection bar's overflow menu.
@@ -248,7 +265,9 @@ void main() {
       await tester.pumpAndSettle();
 
       // Enter selection mode with one tag
-      await tester.longPress(find.text('Night Dive'));
+      await tester.tap(find.byKey(const ValueKey('enter_selection')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Night Dive'));
       await tester.pumpAndSettle();
 
       // Keyed by SelectionAppBar, so this no longer depends on which glyph
@@ -263,7 +282,9 @@ void main() {
       await tester.pumpAndSettle();
 
       // Enter selection mode with first tag
-      await tester.longPress(find.text('Night Dive'));
+      await tester.tap(find.byKey(const ValueKey('enter_selection')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Night Dive'));
       await tester.pumpAndSettle();
 
       // Select second tag by tapping

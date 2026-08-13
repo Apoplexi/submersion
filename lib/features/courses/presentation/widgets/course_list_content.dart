@@ -147,8 +147,8 @@ class _CourseListContentState extends ConsumerState<CourseListContent> {
                       tooltip: context.l10n.courses_action_sort,
                       onPressed: () => _showSortSheet(context),
                     ),
-                    // Discoverability: bulk actions must not be reachable only by a
-                    // long-press that nothing on screen advertises.
+                    // The only way into bulk actions: entry by long-press was removed,
+                    // so nothing but this control opens selection mode on touch.
                     IconButton(
                       key: const ValueKey('enter_selection'),
                       icon: const Icon(Icons.checklist),
@@ -360,9 +360,6 @@ class _CourseListContentState extends ConsumerState<CourseListContent> {
           onEntityTap: (id) {
             if (_isSelectionMode) _selection.toggle(id);
           },
-          onEntityLongPress: _isSelectionMode
-              ? null
-              : (id) => _selection.enterImplicit(id),
           onEntityDoubleTap: (id) {
             context.push('/courses/$id');
           },
@@ -408,8 +405,8 @@ class _CourseListContentState extends ConsumerState<CourseListContent> {
               tooltip: context.l10n.courses_action_sort,
               onPressed: () => _showSortSheet(context),
             ),
-          // Discoverability: bulk actions must not be reachable only by a
-          // long-press that nothing on screen advertises.
+          // The only way into bulk actions: entry by long-press was removed,
+          // so nothing but this control opens selection mode on touch.
           IconButton(
             key: const ValueKey('enter_selection'),
             icon: const Icon(Icons.checklist, size: 20),

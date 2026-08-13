@@ -352,30 +352,6 @@ void main() {
       expect(find.text('Deep Wall'), findsOneWidget);
     });
 
-    testWidgets('fires onLongPress callback', (tester) async {
-      bool longPressed = false;
-      await tester.pumpWidget(
-        testApp(
-          overrides: [
-            settingsProvider.overrideWith((ref) => _TestSettingsNotifier()),
-          ],
-          child: CompactDiveListTile(
-            diveId: 'lp-id',
-            diveNumber: 8,
-            dateTime: DateTime(2026, 3, 15),
-            siteName: 'Reef Point',
-            onTap: () {},
-            onLongPress: () => longPressed = true,
-          ),
-        ),
-      );
-
-      await tester.longPress(find.text('Reef Point'));
-      await tester.pumpAndSettle();
-
-      expect(longPressed, isTrue);
-    });
-
     testWidgets('renders stat slot with icon when field has icon', (
       tester,
     ) async {

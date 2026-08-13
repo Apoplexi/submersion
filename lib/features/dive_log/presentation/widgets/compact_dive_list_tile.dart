@@ -22,7 +22,6 @@ class CompactDiveListTile extends ConsumerWidget {
   final double? maxDepth;
   final Duration? duration;
   final VoidCallback? onTap;
-  final VoidCallback? onLongPress;
   final bool isSelectionMode;
 
   /// In the current bulk selection. Renders as a fill tint plus the leading
@@ -66,7 +65,6 @@ class CompactDiveListTile extends ConsumerWidget {
     this.maxDepth,
     this.duration,
     this.onTap,
-    this.onLongPress,
     this.isSelectionMode = false,
     this.isChecked = false,
     this.isHighlighted = false,
@@ -258,7 +256,6 @@ class CompactDiveListTile extends ConsumerWidget {
           child: InkWell(
             onTap: onTap,
             onDoubleTap: onDoubleTap,
-            onLongPress: onLongPress,
             borderRadius: BorderRadius.circular(12),
             child: Padding(
               padding: const EdgeInsets.all(10),

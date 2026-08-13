@@ -96,7 +96,6 @@ final _sacConfig = TableViewConfig(
 Widget _buildTable({
   required List<Dive> dives,
   void Function(String)? onDiveTap,
-  void Function(String)? onDiveLongPress,
   void Function(String)? onDiveDoubleTap,
   Set<String>? selectedIds,
   bool isSelectionMode = false,
@@ -113,7 +112,6 @@ Widget _buildTable({
     child: DiveTableView(
       dives: dives,
       onDiveTap: onDiveTap ?? (_) {},
-      onDiveLongPress: onDiveLongPress,
       onDiveDoubleTap: onDiveDoubleTap,
       selectedIds: selectedIds ?? const {},
       isSelectionMode: isSelectionMode,
@@ -194,21 +192,28 @@ void main() {
       expect(doubleTappedId, 'a');
     });
 
-    testWidgets('fires onDiveLongPress on long press', (tester) async {
-      String? longPressedId;
+    testWidgets('rows register no long-press recognizer', (tester) async {
       await tester.pumpWidget(
         _buildTable(
           dives: [_makeDive(id: 'lp-1', diveNumber: 7)],
           onDiveTap: (_) {},
-          onDiveLongPress: (id) => longPressedId = id,
         ),
       );
       await tester.pumpAndSettle();
 
-      await tester.longPress(find.text('#7'));
-      await tester.pumpAndSettle();
-
-      expect(longPressedId, 'lp-1');
+      // Long-press no longer enters selection mode anywhere, so no row may
+      // carry a handler for it.
+      final detectors = tester.widgetList<GestureDetector>(
+        find.descendant(
+          of: find.byType(DiveTableView),
+          matching: find.byType(GestureDetector),
+        ),
+      );
+      expect(detectors, isNotEmpty);
+      for (final detector in detectors) {
+        expect(detector.onLongPress, isNull);
+        expect(detector.onLongPressStart, isNull);
+      }
     });
 
     testWidgets('selection mode shows checkboxes', (tester) async {
@@ -567,18 +572,14 @@ void main() {
     });
 
     // -----------------------------------------------------------------------
-    // GestureDetector exists for tap/double-tap/long-press
+    // GestureDetector exists for tap/double-tap
     // -----------------------------------------------------------------------
 
     testWidgets('rows have GestureDetector for interaction', (tester) async {
       final dives = [_makeDive(id: 'gd1', diveNumber: 1, maxDepth: 10.0)];
 
       await tester.pumpWidget(
-        _buildTable(
-          dives: dives,
-          onDiveLongPress: (_) {},
-          onDiveDoubleTap: (_) {},
-        ),
+        _buildTable(dives: dives, onDiveDoubleTap: (_) {}),
       );
       await tester.pumpAndSettle();
 
@@ -797,9 +798,7 @@ void main() {
     testWidgets('table renders without optional callbacks', (tester) async {
       final dives = [_makeDive(id: 'nc1', diveNumber: 1, maxDepth: 10.0)];
 
-      await tester.pumpWidget(
-        _buildTable(dives: dives, onDiveLongPress: null, onDiveDoubleTap: null),
-      );
+      await tester.pumpWidget(_buildTable(dives: dives, onDiveDoubleTap: null));
       await tester.pumpAndSettle();
 
       expect(find.text('#1'), findsOneWidget);
