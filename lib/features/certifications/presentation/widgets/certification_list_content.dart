@@ -345,9 +345,28 @@ class _CertificationListContentState
     BuildContext context,
     AsyncValue<List<Certification>> certificationsAsync,
   ) {
-    final tableContent = _buildTableView(context, certificationsAsync);
+    final visibleIds = (certificationsAsync.value ?? const <Certification>[])
+        .map((c) => c.id)
+        .toList();
 
-    return tableContent;
+    // Same pruning the list path does: drop checked certifications that fell
+    // out of the visible list, so the count matches what is on screen.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _selection.pruneTo(visibleIds);
+    });
+
+    // The scope carries Escape, Ctrl/Cmd-A and the Android back handling, and
+    // the builder is what repaints the table as checks change -- the table is
+    // built inside it for that reason.
+    return SelectableListScope(
+      controller: _selection,
+      selectableIds: visibleIds,
+      child: ValueListenableBuilder<SelectionState>(
+        valueListenable: _selection,
+        builder: (context, selection, _) =>
+            _buildTableView(context, certificationsAsync),
+      ),
+    );
   }
 
   /// Build the [EntityTableView] for certification table mode.

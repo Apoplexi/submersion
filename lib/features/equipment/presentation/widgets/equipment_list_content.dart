@@ -447,14 +447,32 @@ class _EquipmentListContentState extends ConsumerState<EquipmentListContent> {
     BuildContext context,
     AsyncValue<List<EquipmentItem>> equipmentAsync,
   ) {
-    final tableContent = _buildTableView(context, equipmentAsync);
+    final visibleIds = (equipmentAsync.value ?? const <EquipmentItem>[])
+        .map((e) => e.id)
+        .toList();
 
-    return Column(
-      children: [
-        if (widget.headerExtension != null) widget.headerExtension!,
-        _buildFilterChips(context),
-        Expanded(child: tableContent),
-      ],
+    // Same pruning the list path does: drop checked items that fell out of
+    // the visible list, so the count always matches what is on screen.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _selection.pruneTo(visibleIds);
+    });
+
+    // The scope carries Escape, Ctrl/Cmd-A and the Android back handling, and
+    // the builder is what repaints the table as checks change -- the table is
+    // built inside it for that reason.
+    return SelectableListScope(
+      controller: _selection,
+      selectableIds: visibleIds,
+      child: ValueListenableBuilder<SelectionState>(
+        valueListenable: _selection,
+        builder: (context, selection, _) => Column(
+          children: [
+            if (widget.headerExtension != null) widget.headerExtension!,
+            _buildFilterChips(context),
+            Expanded(child: _buildTableView(context, equipmentAsync)),
+          ],
+        ),
+      ),
     );
   }
 

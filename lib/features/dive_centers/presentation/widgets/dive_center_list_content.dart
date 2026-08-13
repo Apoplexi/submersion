@@ -398,9 +398,28 @@ class _DiveCenterListContentState extends ConsumerState<DiveCenterListContent> {
     BuildContext context,
     AsyncValue<List<DiveCenter>> centersAsync,
   ) {
-    final tableContent = _buildTableView(context, centersAsync);
+    final visibleIds = (centersAsync.value ?? const <DiveCenter>[])
+        .map((c) => c.id)
+        .toList();
 
-    return tableContent;
+    // Same pruning the list path does: drop checked centers that fell out of
+    // the visible list, so the count matches what is on screen.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _selection.pruneTo(visibleIds);
+    });
+
+    // The scope carries Escape, Ctrl/Cmd-A and the Android back handling, and
+    // the builder is what repaints the table as checks change -- the table is
+    // built inside it for that reason.
+    return SelectableListScope(
+      controller: _selection,
+      selectableIds: visibleIds,
+      child: ValueListenableBuilder<SelectionState>(
+        valueListenable: _selection,
+        builder: (context, selection, _) =>
+            _buildTableView(context, centersAsync),
+      ),
+    );
   }
 
   /// Build the [EntityTableView] for dive center table mode.
