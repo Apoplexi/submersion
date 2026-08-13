@@ -698,10 +698,15 @@ class BleIoStream(
             }
         }
 
+        // NOT_EXPORTED: ACTION_BOND_STATE_CHANGED is only ever delivered by
+        // the platform, so nothing is lost by refusing broadcasts from other
+        // apps -- and it matches how UsbSerialIoStream registers its own
+        // receiver.
         val filter = IntentFilter(BluetoothDevice.ACTION_BOND_STATE_CHANGED)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            context.registerReceiver(receiver, filter, Context.RECEIVER_EXPORTED)
+            context.registerReceiver(receiver, filter, Context.RECEIVER_NOT_EXPORTED)
         } else {
+            @Suppress("UnspecifiedRegisterReceiverFlag")
             context.registerReceiver(receiver, filter)
         }
 
@@ -742,7 +747,8 @@ class BleIoStream(
             NativeLogger.w(TAG, "BLE", "ensureBonded: $lastBondFailure")
             return false
         } catch (e: Exception) {
-            lastBondFailure = "pairing threw ${e.javaClass.simpleName}: ${e.message}"
+            lastBondFailure =
+                BondDiagnostics.describeThrownFailure(e.javaClass.simpleName, e.message)
             NativeLogger.e(TAG, "BLE", "ensureBonded: $lastBondFailure")
             return false
         } finally {
@@ -786,10 +792,12 @@ class BleIoStream(
             }
         }
 
+        // NOT_EXPORTED for the same reason as in ensureBonded above.
         val filter = IntentFilter(BluetoothDevice.ACTION_BOND_STATE_CHANGED)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            context.registerReceiver(receiver, filter, Context.RECEIVER_EXPORTED)
+            context.registerReceiver(receiver, filter, Context.RECEIVER_NOT_EXPORTED)
         } else {
+            @Suppress("UnspecifiedRegisterReceiverFlag")
             context.registerReceiver(receiver, filter)
         }
 

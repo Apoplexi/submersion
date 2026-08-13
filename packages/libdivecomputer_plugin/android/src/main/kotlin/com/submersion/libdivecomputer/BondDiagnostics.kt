@@ -104,4 +104,19 @@ object BondDiagnostics {
     fun describeRefusedRequest(bondState: Int): String =
         "createBond() was refused by the Bluetooth stack " +
             "(device is ${describeBondState(bondState)})"
+
+    /**
+     * Message for a pairing attempt that threw. [message] is
+     * Throwable.message, which is nullable often enough (SecurityException
+     * from a revoked permission, NullPointerException) that interpolating
+     * it directly would leave "null" in the log.
+     */
+    fun describeThrownFailure(exceptionName: String, message: String?): String {
+        val detail = message?.takeIf { it.isNotBlank() }
+        return if (detail == null) {
+            "pairing threw $exceptionName (no message)"
+        } else {
+            "pairing threw $exceptionName: $detail"
+        }
+    }
 }

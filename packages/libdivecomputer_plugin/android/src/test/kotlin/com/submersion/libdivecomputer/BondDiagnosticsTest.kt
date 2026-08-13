@@ -102,6 +102,31 @@ class BondDiagnosticsTest {
     }
 
     @Test
+    fun aThrownPairingFailureNamesTheExceptionAndItsMessage() {
+        val description = BondDiagnostics.describeThrownFailure(
+            "SecurityException",
+            "BLUETOOTH_CONNECT permission denied"
+        )
+
+        assertTrue(description.contains("SecurityException"))
+        assertTrue(description.contains("BLUETOOTH_CONNECT permission denied"))
+    }
+
+    // Throwable.message is nullable, and interpolating it produced log text
+    // ending in ": null" -- the same defect already avoided for the absent
+    // reason extra.
+    @Test
+    fun aThrownPairingFailureWithoutAMessageDoesNotLogTheWordNull() {
+        val description = BondDiagnostics.describeThrownFailure(
+            "NullPointerException",
+            null
+        )
+
+        assertTrue(description.contains("NullPointerException"))
+        assertFalse(description.contains("null"))
+    }
+
+    @Test
     fun aBondRequestTheStackRefusedToStartIsDescribed() {
         val description = BondDiagnostics.describeRefusedRequest(BondDiagnostics.BOND_NONE)
 
