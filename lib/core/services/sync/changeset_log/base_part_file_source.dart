@@ -42,9 +42,20 @@ class BasePartFileSource {
   /// full base republish -- what a wiped backend forces -- can run to hundreds
   /// of megabytes, and without this tick the sync UI shows one motionless step
   /// for the entire transfer and reads as a hang (issue #1032).
+  ///
+  /// [skipPart] suppresses the network call for parts already present in the
+  /// cloud, so an interrupted publish resumes instead of re-uploading hundreds
+  /// of megabytes (issue #1032).
+  ///
+  /// Skipped parts are still read and hashed. That is the point: the checksums
+  /// in the manifest then always describe the bytes actually on disk right now,
+  /// so a file that was truncated between attempts fails verification instead of
+  /// being certified by checksums recorded while it was still intact. Re-reading
+  /// local disk is cheap next to re-uploading.
   Future<BasePartUploadResult> uploadAll(
     Future<void> Function(int index, Uint8List bytes) upload, {
     void Function(int uploaded, int total)? onPartUploaded,
+    bool Function(int index)? skipPart,
   }) async {
     final raf = await File(path).open();
     final digestSink = _DigestSink();
@@ -59,7 +70,7 @@ class BasePartFileSource {
         final empty = Uint8List(0);
         whole.add(empty);
         partChecksums.add(BaseChunker.checksum(empty));
-        await upload(0, empty);
+        if (skipPart?.call(0) != true) await upload(0, empty);
         index = 1;
         onPartUploaded?.call(index, total);
       } else {
@@ -68,7 +79,7 @@ class BasePartFileSource {
           final buf = await raf.read(n);
           whole.add(buf);
           partChecksums.add(BaseChunker.checksum(buf));
-          await upload(index, buf);
+          if (skipPart?.call(index) != true) await upload(index, buf);
           index++;
           onPartUploaded?.call(index, total);
         }
