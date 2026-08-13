@@ -2225,12 +2225,25 @@ class SyncDataSerializer {
   /// Moves [loser]'s dive links onto [survivor], drops the losing tag row and
   /// remembers the alias.
   ///
-  /// Repointed junction rows are marked pending so this device republishes
-  /// them: that is what lets a peer recover a link it had to drop because the
-  /// tag row it referenced arrived in an earlier payload than the junction.
   /// A link the survivor already covers is deleted outright rather than
-  /// tombstoned -- it is a local identity fold, not a user deleting a tag, and
-  /// every peer reaches the same fold from the same rule.
+  /// tombstoned -- it is a local identity fold, not a user deleting a tag.
+  ///
+  /// Convergence does NOT depend on republishing these rows, and deliberately
+  /// so: the survivor rule is deterministic, so every device that sees both
+  /// tags performs the identical fold from its own copy. The repointed rows
+  /// are still marked pending to record that they changed locally, but note
+  /// that alone does not re-export them -- `_exportDiveTags` gathers junctions
+  /// by their parent DIVE's HLC, not from pending junction records, and
+  /// bumping the dive to force it would risk clobbering a peer's newer edit to
+  /// that dive under LWW.
+  ///
+  /// The residual gap is narrow and known: a junction referencing a tag folded
+  /// away in an EARLIER sync run arrives with no alias to rewrite it, so
+  /// `repairDanglingForeignKeys` drops it and that one dive loses the tag
+  /// locally until something touches it. Closing it properly means either a
+  /// durable alias table or teaching the incremental export to honour pending
+  /// junction records -- both new sync surface, deferred rather than smuggled
+  /// into this change (PR #1033 review).
   Future<void> _foldTagInto({
     required String loser,
     required String survivor,

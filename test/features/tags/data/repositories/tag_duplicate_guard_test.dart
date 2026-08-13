@@ -152,6 +152,26 @@ void main() {
     });
   });
 
+  test(
+    'adding a tag twice concurrently still leaves one junction row',
+    () async {
+      // The old read-then-insert was racy: two callers could each observe
+      // "missing" and the loser would throw on the unique index. A single
+      // conflict-aware statement makes the duplicate a true no-op.
+      await insertDive('dive-1');
+      await repository.createTag(tagOf('tag-1', 'Wreck'));
+
+      await Future.wait([
+        repository.addTagToDive('dive-1', 'tag-1'),
+        repository.addTagToDive('dive-1', 'tag-1'),
+        repository.addTagToDive('dive-1', 'tag-1'),
+      ]);
+
+      final rows = await db.select(db.diveTags).get();
+      expect(rows, hasLength(1));
+    },
+  );
+
   group('fresh database', () {
     test('carries both tag uniqueness indexes', () async {
       final rows = await db

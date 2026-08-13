@@ -541,10 +541,13 @@ class ChangesetWriter {
     int seq,
   ) async {
     try {
-      final files = await provider.listFiles(
-        folderId: folderId,
-        namePattern: ChangesetLogLayout.prefix,
-      );
+      // Bounded: the catch below cannot save a caller from a listing that
+      // never RETURNS, and this one runs mid-publish, so a stalled provider
+      // would hang the whole sync instead of falling back to re-uploading.
+      // Same 8s ceiling the cleanup paths use (PR #1033 review).
+      final files = await provider
+          .listFiles(folderId: folderId, namePattern: ChangesetLogLayout.prefix)
+          .timeout(const Duration(seconds: 8));
       return {
         for (final f in files)
           if (ChangesetLogLayout.deviceIdOf(f.name) == deviceId)

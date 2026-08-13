@@ -431,30 +431,30 @@ class TagRepository {
   /// one dive ended up showing the same import tag several times (#1032).
   Future<void> addTagToDive(String diveId, String tagId) async {
     try {
-      final already =
-          await (_db.select(_db.diveTags)
-                ..where((t) => t.diveId.equals(diveId) & t.tagId.equals(tagId))
-                ..limit(1))
-              .get();
-      if (already.isNotEmpty) {
-        _log.info('Dive $diveId already carries tag $tagId');
-        return;
-      }
-
       _log.info('Adding tag $tagId to dive: $diveId');
       final now = DateTime.now().millisecondsSinceEpoch;
       final id = _uuid.v4();
 
-      await _db
+      // One statement rather than read-then-insert. A separate existence check
+      // is both an extra round trip and still racy: two callers can each see
+      // "missing" and the loser then throws on idx_dive_tags_dive_tag_unique.
+      // Letting the database decide makes the duplicate a true no-op, and a
+      // null return says the pair was already there (PR #1033 review).
+      final inserted = await _db
           .into(_db.diveTags)
-          .insert(
+          .insertReturningOrNull(
             DiveTagsCompanion(
               id: Value(id),
               diveId: Value(diveId),
               tagId: Value(tagId),
               createdAt: Value(now),
             ),
+            onConflict: DoNothing<$DiveTagsTable, DiveTag>(target: const []),
           );
+      if (inserted == null) {
+        _log.info('Dive $diveId already carries tag $tagId');
+        return;
+      }
 
       await _syncRepository.markRecordPending(
         entityType: 'diveTags',
