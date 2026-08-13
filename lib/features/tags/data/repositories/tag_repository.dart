@@ -58,6 +58,12 @@ class TagRepository {
   }
 
   /// Get a tag by name (case-insensitive)
+  ///
+  /// Deliberately takes the lowest id rather than asserting a single match:
+  /// an unscoped lookup legitimately spans two divers who both use "Wreck",
+  /// and `getSingleOrNull()` threw "too many elements" there -- which is what
+  /// the import wizard reported as "tagging failed" (#1032). Ordering by id
+  /// makes the winner the same row the uniqueness collapse keeps.
   Future<domain.Tag?> getTagByName(String name, {String? diverId}) async {
     try {
       final query = _db.select(_db.tags)
@@ -66,6 +72,9 @@ class TagRepository {
       if (diverId != null) {
         query.where((t) => t.diverId.equals(diverId));
       }
+      query
+        ..orderBy([(t) => OrderingTerm.asc(t.id)])
+        ..limit(1);
 
       final row = await query.getSingleOrNull();
       return row != null ? _mapRowToTag(row) : null;
@@ -79,9 +88,44 @@ class TagRepository {
     }
   }
 
-  /// Create a new tag
+  /// The tag occupying [name]'s uniqueness slot in [diverId]'s scope, if any.
+  ///
+  /// Mirrors `idx_tags_diver_name_unique` exactly -- (COALESCE(diver_id, ''),
+  /// lower(name)) -- so a caller that checks here can never be surprised by
+  /// the index. A NULL `diverId` is the shared "unassigned" scope, not a scope
+  /// of its own per row.
+  Future<domain.Tag?> _tagOccupying(String name, String? diverId) async {
+    final rows =
+        await (_db.select(_db.tags)
+              ..where(
+                (t) =>
+                    t.name.lower().equals(name.trim().toLowerCase()) &
+                    coalesce([
+                      t.diverId,
+                      const Constant(''),
+                    ]).equals(diverId ?? ''),
+              )
+              ..orderBy([(t) => OrderingTerm.asc(t.id)])
+              ..limit(1))
+            .get();
+    return rows.isEmpty ? null : _mapRowToTag(rows.first);
+  }
+
+  /// Create a new tag, or return the one already holding the name.
+  ///
+  /// `tags` is uniquely indexed on (diver scope, case-folded name) since v149,
+  /// so inserting a second row for a name the scope already has would throw.
+  /// Returning the incumbent keeps every caller's contract ("a tag with this
+  /// name now exists and here it is") while never creating the duplicate that
+  /// made a dive show one tag twice (#1032).
   Future<domain.Tag> createTag(domain.Tag tag) async {
     try {
+      final incumbent = await _tagOccupying(tag.name, tag.diverId);
+      if (incumbent != null) {
+        _log.info('Tag "${tag.name}" already exists as ${incumbent.id}');
+        return incumbent;
+      }
+
       _log.info('Creating tag: ${tag.name}');
       final id = tag.id.isEmpty ? _uuid.v4() : tag.id;
       final now = DateTime.now().millisecondsSinceEpoch;
@@ -149,9 +193,29 @@ class TagRepository {
     }
   }
 
-  /// Update an existing tag
+  /// Update an existing tag.
+  ///
+  /// Renaming onto a name the scope already uses folds the two tags together
+  /// rather than throwing on `idx_tags_diver_name_unique`: the user asked for
+  /// one tag by that name, and every dive on either side keeps it. This is the
+  /// same outcome the tag merge sheet produces, so it reuses [mergeTags].
   Future<void> updateTag(domain.Tag tag) async {
     try {
+      final incumbent = await _tagOccupying(tag.name, tag.diverId);
+      if (incumbent != null && incumbent.id != tag.id) {
+        _log.info(
+          'Renaming ${tag.id} onto "${tag.name}" merges into '
+          '${incumbent.id}',
+        );
+        await mergeTags(
+          sourceTagIds: [tag.id],
+          survivingTagId: incumbent.id,
+          name: tag.name,
+          colorHex: tag.colorHex,
+        );
+        return;
+      }
+
       _log.info('Updating tag: ${tag.id}');
       final now = DateTime.now().millisecondsSinceEpoch;
 
@@ -200,10 +264,12 @@ class TagRepository {
   /// Get tags for a specific dive
   Future<List<domain.Tag>> getTagsForDive(String diveId) async {
     try {
+      // DISTINCT so a legacy database that has not yet been through the v149
+      // collapse still renders each tag once (#1032).
       final result = await _db
           .customSelect(
             '''
-        SELECT t.* FROM tags t
+        SELECT DISTINCT t.* FROM tags t
         INNER JOIN dive_tags dt ON t.id = dt.tag_id
         WHERE dt.dive_id = ?
         ORDER BY t.name
@@ -247,7 +313,7 @@ class TagRepository {
       final placeholders = diveIds.map((_) => '?').join(',');
       final result = await _db.customSelect(
         '''
-        SELECT dt.dive_id, t.* FROM tags t
+        SELECT DISTINCT dt.dive_id, t.* FROM tags t
         INNER JOIN dive_tags dt ON t.id = dt.tag_id
         WHERE dt.dive_id IN ($placeholders)
         ORDER BY t.name
@@ -302,9 +368,13 @@ class TagRepository {
         );
       }
 
-      // Insert new tags
+      // Insert new tags. Deduplicated by id: `dive_tags` is uniquely indexed
+      // on (dive_id, tag_id) since v149, so the same tag listed twice would
+      // throw rather than quietly double up.
       final now = DateTime.now().millisecondsSinceEpoch;
+      final seen = <String>{};
       for (final tag in tags) {
+        if (!seen.add(tag.id)) continue;
         final id = _uuid.v4();
         await _db
             .into(_db.diveTags)
@@ -344,9 +414,23 @@ class TagRepository {
     }
   }
 
-  /// Add a tag to a dive
+  /// Add a tag to a dive.
+  ///
+  /// A no-op when the dive already carries the tag. Re-running an import used
+  /// to blind-insert a second junction row under a fresh uuid, which is how
+  /// one dive ended up showing the same import tag several times (#1032).
   Future<void> addTagToDive(String diveId, String tagId) async {
     try {
+      final already =
+          await (_db.select(_db.diveTags)
+                ..where((t) => t.diveId.equals(diveId) & t.tagId.equals(tagId))
+                ..limit(1))
+              .get();
+      if (already.isNotEmpty) {
+        _log.info('Dive $diveId already carries tag $tagId');
+        return;
+      }
+
       _log.info('Adding tag $tagId to dive: $diveId');
       final now = DateTime.now().millisecondsSinceEpoch;
       final id = _uuid.v4();

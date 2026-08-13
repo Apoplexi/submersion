@@ -4,6 +4,7 @@ import 'dart:developer' as developer;
 import 'package:drift/drift.dart';
 
 import 'package:submersion/core/database/performance_indexes.dart';
+import 'package:submersion/core/database/tag_uniqueness.dart';
 import 'package:submersion/core/constants/enums.dart';
 
 part 'database.g.dart';
@@ -2952,7 +2953,7 @@ class AppDatabase extends _$AppDatabase {
 
   /// The current schema version as a static constant so that pre-open checks
   /// (e.g. version-mismatch guard) can reference it without an instance.
-  static const int currentSchemaVersion = 148;
+  static const int currentSchemaVersion = 149;
 
   /// Every schema version that has a migration block in onUpgrade.
   /// Used to calculate progress step counts. When adding a new migration,
@@ -3153,6 +3154,10 @@ class AppDatabase extends _$AppDatabase {
     // index plus the site-side dedupe cleanup and partial unique index
     // mirroring the dive-side v38 pair.
     148,
+    // v149: duplicate tags (issue #1032): collapse `tags` rows sharing a
+    // (diver scope, case-folded name) and `dive_tags` rows sharing a
+    // (dive, tag), then add the two unique indexes that stop them recurring.
+    149,
   ];
 
   /// Idempotent DDL for the v106 connector-suggestion columns (Lightroom
@@ -4680,6 +4685,11 @@ class AppDatabase extends _$AppDatabase {
         // Seed built-in service kinds (the v122 migration backfills these
         // for upgraded databases; beforeOpen re-asserts).
         await customStatement(kSeedBuiltInServiceKindsSql);
+
+        // Tag uniqueness indexes (v149, issue #1032): createAll() never builds
+        // raw-SQL indexes, so a fresh install would otherwise be the one
+        // device in the library without them.
+        await assertTagUniqueness(this);
       },
       onUpgrade: (Migrator m, int from, int to) async {
         int completedSteps = 0;
@@ -7771,6 +7781,14 @@ class AppDatabase extends _$AppDatabase {
           }
         }
         if (from < 148) await reportProgress();
+        if (from < 149) {
+          // Duplicate tags (issue #1032). The helper dedupes BEFORE creating
+          // the unique indexes and its dedupe is total (rowid/id tie-breaks),
+          // so no tie can survive to abort the index creation -- the failure
+          // mode v148 documents. Self-guarding on the tables existing.
+          await assertTagUniqueness(this);
+        }
+        if (from < 149) await reportProgress();
       },
       beforeOpen: (details) async {
         // Enable foreign keys
@@ -8043,6 +8061,12 @@ class AppDatabase extends _$AppDatabase {
           }
           return true;
         }());
+
+        // v149 backstop (issue #1032): re-assert the tag uniqueness indexes,
+        // deduping first so the creation cannot abort. A database that
+        // arrives by restore or sync-adopt never runs onUpgrade, and that is
+        // exactly the second device the duplicate tags came from.
+        await assertTagUniqueness(this);
 
         // Data self-heal: backfill a primary dive_data_sources row for dives
         // that have profile samples but no source row (legacy file imports).

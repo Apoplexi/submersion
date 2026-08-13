@@ -5,6 +5,7 @@ import 'package:crypto/crypto.dart';
 import 'package:drift/drift.dart';
 import 'package:uuid/uuid.dart';
 
+import 'package:submersion/core/data/repositories/sync_repository.dart';
 import 'package:submersion/core/database/database.dart';
 import 'package:submersion/core/services/sync/changeset_log/sync_temp_dir.dart';
 import 'package:submersion/core/services/database_service.dart';
@@ -519,6 +520,7 @@ class SyncData {
 class SyncDataSerializer {
   AppDatabase get _db => DatabaseService.instance.database;
   final _log = LoggerService.forClass(SyncDataSerializer);
+  final SyncRepository _syncRepository = SyncRepository();
 
   Future<List<Map<String, dynamic>>> _safeExport(
     String label,
@@ -2145,6 +2147,138 @@ class SyncDataSerializer {
     }
   }
 
+  // ==========================================================================
+  // Tag identity (issue #1032)
+  // ==========================================================================
+
+  /// Remote tag ids this device has folded into a local tag of the same name,
+  /// mapped to the id that survived.
+  ///
+  /// A peer's junction rows reference the peer's tag id, which may be the one
+  /// that lost the fold and therefore no longer exists here. Rewriting those
+  /// references keeps the tag on the dive instead of leaving a dangling
+  /// foreign key for the repair pass to delete. Entries never go stale (the
+  /// survivor is chosen deterministically from the ids themselves), so the map
+  /// is not cleared between payloads.
+  final Map<String, String> _tagIdAliases = {};
+
+  Map<String, dynamic> _withTagAlias(Map<String, dynamic> data) {
+    final tagId = data['tagId'];
+    final survivor = tagId is String ? _tagIdAliases[tagId] : null;
+    return survivor == null ? data : {...data, 'tagId': survivor};
+  }
+
+  /// Applies a remote `tags` row, converging on ONE row per (diver scope,
+  /// case-folded name) -- the invariant `idx_tags_diver_name_unique` enforces.
+  ///
+  /// Upserting by primary key alone is what produced #1032: two devices each
+  /// minted a uuid for the same auto-generated import tag name, so the peer's
+  /// row landed beside the local one and the dive showed the tag twice.
+  ///
+  /// The survivor is the lexically lowest id among the rivals. It has to be a
+  /// property of the rows rather than of this device -- "the one we had first"
+  /// differs per device and would make the two flip-flop forever, each
+  /// adopting the other's id on every sync. Lowest-id matches the v149
+  /// migration's rule, so a device that healed by migration and a device that
+  /// healed by merge land on the same tag.
+  Future<void> _applyTagRecord(Tag remote) async {
+    final rivals =
+        await (_db.select(_db.tags)..where(
+              (t) =>
+                  t.name.lower().equals(remote.name.trim().toLowerCase()) &
+                  coalesce([
+                    t.diverId,
+                    const Constant(''),
+                  ]).equals(remote.diverId ?? '') &
+                  t.id.equals(remote.id).not(),
+            ))
+            .get();
+
+    if (rivals.isEmpty) {
+      await _db
+          .into(_db.tags)
+          .insertOnConflictUpdate(remote.toCompanion(false));
+      return;
+    }
+
+    final ids = [remote.id, for (final r in rivals) r.id]..sort();
+    final survivor = ids.first;
+    for (final loser in ids.skip(1)) {
+      await _foldTagInto(loser: loser, survivor: survivor);
+    }
+    if (survivor == remote.id) {
+      await _db
+          .into(_db.tags)
+          .insertOnConflictUpdate(remote.toCompanion(false));
+    }
+  }
+
+  /// Moves [loser]'s dive links onto [survivor], drops the losing tag row and
+  /// remembers the alias.
+  ///
+  /// Repointed junction rows are marked pending so this device republishes
+  /// them: that is what lets a peer recover a link it had to drop because the
+  /// tag row it referenced arrived in an earlier payload than the junction.
+  /// A link the survivor already covers is deleted outright rather than
+  /// tombstoned -- it is a local identity fold, not a user deleting a tag, and
+  /// every peer reaches the same fold from the same rule.
+  Future<void> _foldTagInto({
+    required String loser,
+    required String survivor,
+  }) async {
+    final moving = await (_db.select(
+      _db.diveTags,
+    )..where((t) => t.tagId.equals(loser))).get();
+
+    if (moving.isNotEmpty) {
+      final covered =
+          (await (_db.select(
+                _db.diveTags,
+              )..where((t) => t.tagId.equals(survivor))).get())
+              .map((r) => r.diveId)
+              .toSet();
+      final now = DateTime.now().millisecondsSinceEpoch;
+      for (final row in moving) {
+        if (!covered.add(row.diveId)) {
+          await (_db.delete(
+            _db.diveTags,
+          )..where((t) => t.id.equals(row.id))).go();
+          continue;
+        }
+        await (_db.update(_db.diveTags)..where((t) => t.id.equals(row.id)))
+            .write(DiveTagsCompanion(tagId: Value(survivor)));
+        await _syncRepository.markRecordPending(
+          entityType: 'diveTags',
+          recordId: row.id,
+          localUpdatedAt: now,
+        );
+      }
+    }
+
+    await (_db.delete(_db.tags)..where((t) => t.id.equals(loser))).go();
+    _tagIdAliases[loser] = survivor;
+  }
+
+  /// Applies a remote `dive_tags` row.
+  ///
+  /// `DO NOTHING` on ANY uniqueness conflict, not just the primary key: a peer
+  /// that linked the same tag to the same dive minted its own uuid for the
+  /// junction row, so the pair is already applied even though the id is new.
+  /// Skipping it is the whole point -- with `idx_dive_tags_dive_tag_unique` in
+  /// place an unguarded insert would throw and fail the entire sync, which is
+  /// far worse than the duplicate it replaces.
+  ///
+  /// Junction rows are immutable (they are deleted and re-inserted with fresh
+  /// ids, never edited), so declining to update an existing row loses nothing.
+  Future<void> _applyDiveTagRecord(DiveTag record) async {
+    await _db
+        .into(_db.diveTags)
+        .insert(
+          record,
+          onConflict: DoNothing<$DiveTagsTable, DiveTag>(target: const []),
+        );
+  }
+
   /// Applies one incoming record.
   ///
   /// HLC-bearing entities (`entityHasUpdatedAt == true`) apply via
@@ -2486,14 +2620,10 @@ class SyncDataSerializer {
             );
         return;
       case 'tags':
-        await _db
-            .into(_db.tags)
-            .insertOnConflictUpdate(Tag.fromJson(data).toCompanion(false));
+        await _applyTagRecord(Tag.fromJson(data));
         return;
       case 'diveTags':
-        await _db
-            .into(_db.diveTags)
-            .insertOnConflictUpdate(DiveTag.fromJson(data));
+        await _applyDiveTagRecord(DiveTag.fromJson(_withTagAlias(data)));
         return;
       case 'diveDiveTypes':
         await _db
@@ -3137,19 +3267,21 @@ class SyncDataSerializer {
           ),
         );
         return;
+      // Tags reconcile one at a time: each row may fold a local tag of the
+      // same name into itself (or be folded into one), which a single batched
+      // insert cannot express. Tag vocabularies are tens of rows, not the
+      // per-sample volumes the batch path exists for.
       case 'tags':
-        await _db.batch(
-          (b) => b.insertAllOnConflictUpdate(
-            _db.tags,
-            records.map((r) => Tag.fromJson(r).toCompanion(false)).toList(),
-          ),
-        );
+        for (final record in records) {
+          await _applyTagRecord(Tag.fromJson(record));
+        }
         return;
       case 'diveTags':
         await _db.batch(
-          (b) => b.insertAllOnConflictUpdate(
+          (b) => b.insertAll(
             _db.diveTags,
-            records.map((r) => DiveTag.fromJson(r)).toList(),
+            records.map((r) => DiveTag.fromJson(_withTagAlias(r))).toList(),
+            onConflict: DoNothing<$DiveTagsTable, DiveTag>(target: const []),
           ),
         );
         return;
