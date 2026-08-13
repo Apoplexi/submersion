@@ -4109,6 +4109,90 @@ abstract class AppLocalizations {
   /// **'Delete this checklist record?'**
   String get preDive_sessions_deleteConfirm;
 
+  /// No description provided for @preDive_sessions_filter.
+  ///
+  /// In en, this message translates to:
+  /// **'Filter'**
+  String get preDive_sessions_filter;
+
+  /// No description provided for @preDive_sessions_filterTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Filter checklist runs'**
+  String get preDive_sessions_filterTitle;
+
+  /// No description provided for @preDive_sessions_filterChecklist.
+  ///
+  /// In en, this message translates to:
+  /// **'Checklist'**
+  String get preDive_sessions_filterChecklist;
+
+  /// No description provided for @preDive_sessions_filterStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Status'**
+  String get preDive_sessions_filterStatus;
+
+  /// No description provided for @preDive_sessions_filterFlaggedOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Flagged runs only'**
+  String get preDive_sessions_filterFlaggedOnly;
+
+  /// No description provided for @preDive_sessions_filterDateRange.
+  ///
+  /// In en, this message translates to:
+  /// **'Date range'**
+  String get preDive_sessions_filterDateRange;
+
+  /// No description provided for @preDive_sessions_filterAnyDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Any date'**
+  String get preDive_sessions_filterAnyDate;
+
+  /// No description provided for @preDive_sessions_filterClearAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear all'**
+  String get preDive_sessions_filterClearAll;
+
+  /// No description provided for @preDive_sessions_filterApply.
+  ///
+  /// In en, this message translates to:
+  /// **'Apply'**
+  String get preDive_sessions_filterApply;
+
+  /// No description provided for @preDive_sessions_filterFlaggedChip.
+  ///
+  /// In en, this message translates to:
+  /// **'Flagged only'**
+  String get preDive_sessions_filterFlaggedChip;
+
+  /// No description provided for @preDive_sessions_emptyFiltered.
+  ///
+  /// In en, this message translates to:
+  /// **'No checklist runs match these filters'**
+  String get preDive_sessions_emptyFiltered;
+
+  /// No description provided for @preDive_sessions_export.
+  ///
+  /// In en, this message translates to:
+  /// **'Export to Excel'**
+  String get preDive_sessions_export;
+
+  /// No description provided for @preDive_sessions_exportEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No checklist runs to export'**
+  String get preDive_sessions_exportEmpty;
+
+  /// No description provided for @preDive_sessions_exportFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Export failed: {error}'**
+  String preDive_sessions_exportFailed(String error);
+
   /// No description provided for @preDive_start_title.
   ///
   /// In en, this message translates to:

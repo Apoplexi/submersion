@@ -841,6 +841,27 @@
   "preDive_sessions_linkedDive": "Mergulho vinculado",
   "preDive_sessions_delete": "Excluir",
   "preDive_sessions_deleteConfirm": "Excluir este registro de lista de verificação?",
+  "preDive_sessions_filter": "Filtrar",
+  "preDive_sessions_filterTitle": "Filtrar listas realizadas",
+  "preDive_sessions_filterChecklist": "Lista de verificação",
+  "preDive_sessions_filterStatus": "Estado",
+  "preDive_sessions_filterFlaggedOnly": "Apenas com ocorrências",
+  "preDive_sessions_filterDateRange": "Intervalo de datas",
+  "preDive_sessions_filterAnyDate": "Qualquer data",
+  "preDive_sessions_filterClearAll": "Limpar tudo",
+  "preDive_sessions_filterApply": "Aplicar",
+  "preDive_sessions_filterFlaggedChip": "Apenas ocorrências",
+  "preDive_sessions_emptyFiltered": "Nenhuma lista corresponde a estes filtros",
+  "preDive_sessions_export": "Exportar para Excel",
+  "preDive_sessions_exportEmpty": "Nenhuma lista para exportar",
+  "preDive_sessions_exportFailed": "Falha na exportação: {error}",
+  "@preDive_sessions_exportFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
   "preDive_start_title": "Iniciar lista de verificação pré-mergulho",
   "preDive_start_template": "Lista de verificação",
   "preDive_start_equipmentSet": "Conjunto de equipamentos",

@@ -841,6 +841,27 @@
   "preDive_sessions_linkedDive": "Plongée liée",
   "preDive_sessions_delete": "Supprimer",
   "preDive_sessions_deleteConfirm": "Supprimer cet enregistrement de checklist ?",
+  "preDive_sessions_filter": "Filtrer",
+  "preDive_sessions_filterTitle": "Filtrer les checklists effectuées",
+  "preDive_sessions_filterChecklist": "Checklist",
+  "preDive_sessions_filterStatus": "Statut",
+  "preDive_sessions_filterFlaggedOnly": "Uniquement les anomalies",
+  "preDive_sessions_filterDateRange": "Période",
+  "preDive_sessions_filterAnyDate": "Toutes les dates",
+  "preDive_sessions_filterClearAll": "Tout effacer",
+  "preDive_sessions_filterApply": "Appliquer",
+  "preDive_sessions_filterFlaggedChip": "Anomalies uniquement",
+  "preDive_sessions_emptyFiltered": "Aucune checklist ne correspond à ces filtres",
+  "preDive_sessions_export": "Exporter vers Excel",
+  "preDive_sessions_exportEmpty": "Aucune checklist à exporter",
+  "preDive_sessions_exportFailed": "Échec de l'export : {error}",
+  "@preDive_sessions_exportFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
   "preDive_start_title": "Démarrer la checklist pré-plongée",
   "preDive_start_template": "Checklist",
   "preDive_start_equipmentSet": "Ensemble d'équipement",

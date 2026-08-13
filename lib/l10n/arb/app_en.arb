@@ -1529,6 +1529,27 @@
   "preDive_sessions_linkedDive": "Linked dive",
   "preDive_sessions_delete": "Delete",
   "preDive_sessions_deleteConfirm": "Delete this checklist record?",
+  "preDive_sessions_filter": "Filter",
+  "preDive_sessions_filterTitle": "Filter checklist runs",
+  "preDive_sessions_filterChecklist": "Checklist",
+  "preDive_sessions_filterStatus": "Status",
+  "preDive_sessions_filterFlaggedOnly": "Flagged runs only",
+  "preDive_sessions_filterDateRange": "Date range",
+  "preDive_sessions_filterAnyDate": "Any date",
+  "preDive_sessions_filterClearAll": "Clear all",
+  "preDive_sessions_filterApply": "Apply",
+  "preDive_sessions_filterFlaggedChip": "Flagged only",
+  "preDive_sessions_emptyFiltered": "No checklist runs match these filters",
+  "preDive_sessions_export": "Export to Excel",
+  "preDive_sessions_exportEmpty": "No checklist runs to export",
+  "preDive_sessions_exportFailed": "Export failed: {error}",
+  "@preDive_sessions_exportFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
   "preDive_start_title": "Start pre-dive checklist",
   "preDive_start_template": "Checklist",
   "preDive_start_equipmentSet": "Equipment set",

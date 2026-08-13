@@ -841,6 +841,27 @@
   "preDive_sessions_linkedDive": "Immersione collegata",
   "preDive_sessions_delete": "Elimina",
   "preDive_sessions_deleteConfirm": "Eliminare questo record di checklist?",
+  "preDive_sessions_filter": "Filtra",
+  "preDive_sessions_filterTitle": "Filtra le checklist eseguite",
+  "preDive_sessions_filterChecklist": "Checklist",
+  "preDive_sessions_filterStatus": "Stato",
+  "preDive_sessions_filterFlaggedOnly": "Solo con segnalazioni",
+  "preDive_sessions_filterDateRange": "Intervallo di date",
+  "preDive_sessions_filterAnyDate": "Qualsiasi data",
+  "preDive_sessions_filterClearAll": "Cancella tutto",
+  "preDive_sessions_filterApply": "Applica",
+  "preDive_sessions_filterFlaggedChip": "Solo segnalazioni",
+  "preDive_sessions_emptyFiltered": "Nessuna checklist corrisponde a questi filtri",
+  "preDive_sessions_export": "Esporta in Excel",
+  "preDive_sessions_exportEmpty": "Nessuna checklist da esportare",
+  "preDive_sessions_exportFailed": "Esportazione non riuscita: {error}",
+  "@preDive_sessions_exportFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
   "preDive_start_title": "Avvia checklist pre-immersione",
   "preDive_start_template": "Checklist",
   "preDive_start_equipmentSet": "Set di attrezzatura",

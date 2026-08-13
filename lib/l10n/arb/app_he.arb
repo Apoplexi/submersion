@@ -841,6 +841,27 @@
   "preDive_sessions_linkedDive": "צלילה מקושרת",
   "preDive_sessions_delete": "מחיקה",
   "preDive_sessions_deleteConfirm": "למחוק את רשומת רשימת הבדיקה הזו?",
+  "preDive_sessions_filter": "סינון",
+  "preDive_sessions_filterTitle": "סינון רשימות בדיקה שבוצעו",
+  "preDive_sessions_filterChecklist": "רשימת בדיקה",
+  "preDive_sessions_filterStatus": "סטטוס",
+  "preDive_sessions_filterFlaggedOnly": "רק ריצות מסומנות",
+  "preDive_sessions_filterDateRange": "טווח תאריכים",
+  "preDive_sessions_filterAnyDate": "כל תאריך",
+  "preDive_sessions_filterClearAll": "נקה הכול",
+  "preDive_sessions_filterApply": "החל",
+  "preDive_sessions_filterFlaggedChip": "מסומנות בלבד",
+  "preDive_sessions_emptyFiltered": "אין רשימות בדיקה התואמות למסננים אלה",
+  "preDive_sessions_export": "ייצוא ל-Excel",
+  "preDive_sessions_exportEmpty": "אין רשימות בדיקה לייצוא",
+  "preDive_sessions_exportFailed": "הייצוא נכשל: {error}",
+  "@preDive_sessions_exportFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
   "preDive_start_title": "התחלת רשימת בדיקה לפני צלילה",
   "preDive_start_template": "רשימת בדיקה",
   "preDive_start_equipmentSet": "סט ציוד",

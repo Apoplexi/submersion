@@ -2381,6 +2381,51 @@ class AppLocalizationsAr extends AppLocalizations {
       'هل تريد حذف سجل قائمة التحقق هذا؟';
 
   @override
+  String get preDive_sessions_filter => 'Filter';
+
+  @override
+  String get preDive_sessions_filterTitle => 'Filter checklist runs';
+
+  @override
+  String get preDive_sessions_filterChecklist => 'Checklist';
+
+  @override
+  String get preDive_sessions_filterStatus => 'Status';
+
+  @override
+  String get preDive_sessions_filterFlaggedOnly => 'Flagged runs only';
+
+  @override
+  String get preDive_sessions_filterDateRange => 'Date range';
+
+  @override
+  String get preDive_sessions_filterAnyDate => 'Any date';
+
+  @override
+  String get preDive_sessions_filterClearAll => 'Clear all';
+
+  @override
+  String get preDive_sessions_filterApply => 'Apply';
+
+  @override
+  String get preDive_sessions_filterFlaggedChip => 'Flagged only';
+
+  @override
+  String get preDive_sessions_emptyFiltered =>
+      'No checklist runs match these filters';
+
+  @override
+  String get preDive_sessions_export => 'Export to Excel';
+
+  @override
+  String get preDive_sessions_exportEmpty => 'No checklist runs to export';
+
+  @override
+  String preDive_sessions_exportFailed(String error) {
+    return 'Export failed: $error';
+  }
+
+  @override
   String get preDive_start_title => 'بدء قائمة تحقق ما قبل الغوص';
 
   @override

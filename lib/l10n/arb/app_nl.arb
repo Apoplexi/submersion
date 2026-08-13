@@ -841,6 +841,27 @@
   "preDive_sessions_linkedDive": "Gekoppelde duik",
   "preDive_sessions_delete": "Verwijderen",
   "preDive_sessions_deleteConfirm": "Deze checklistregistratie verwijderen?",
+  "preDive_sessions_filter": "Filteren",
+  "preDive_sessions_filterTitle": "Checklistsessies filteren",
+  "preDive_sessions_filterChecklist": "Checklist",
+  "preDive_sessions_filterStatus": "Status",
+  "preDive_sessions_filterFlaggedOnly": "Alleen gemarkeerde sessies",
+  "preDive_sessions_filterDateRange": "Datumbereik",
+  "preDive_sessions_filterAnyDate": "Elke datum",
+  "preDive_sessions_filterClearAll": "Alles wissen",
+  "preDive_sessions_filterApply": "Toepassen",
+  "preDive_sessions_filterFlaggedChip": "Alleen gemarkeerd",
+  "preDive_sessions_emptyFiltered": "Geen checklistsessies voldoen aan deze filters",
+  "preDive_sessions_export": "Exporteren naar Excel",
+  "preDive_sessions_exportEmpty": "Geen checklistsessies om te exporteren",
+  "preDive_sessions_exportFailed": "Exporteren mislukt: {error}",
+  "@preDive_sessions_exportFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
   "preDive_start_title": "Pre-dive checklist starten",
   "preDive_start_template": "Checklist",
   "preDive_start_equipmentSet": "Uitrustingsset",

@@ -841,6 +841,27 @@
   "preDive_sessions_linkedDive": "Verknüpfter Tauchgang",
   "preDive_sessions_delete": "Löschen",
   "preDive_sessions_deleteConfirm": "Diesen Checklisten-Eintrag löschen?",
+  "preDive_sessions_filter": "Filtern",
+  "preDive_sessions_filterTitle": "Checklisten-Durchläufe filtern",
+  "preDive_sessions_filterChecklist": "Checkliste",
+  "preDive_sessions_filterStatus": "Status",
+  "preDive_sessions_filterFlaggedOnly": "Nur markierte Durchläufe",
+  "preDive_sessions_filterDateRange": "Zeitraum",
+  "preDive_sessions_filterAnyDate": "Beliebiges Datum",
+  "preDive_sessions_filterClearAll": "Alle zurücksetzen",
+  "preDive_sessions_filterApply": "Anwenden",
+  "preDive_sessions_filterFlaggedChip": "Nur markierte",
+  "preDive_sessions_emptyFiltered": "Keine Checklisten-Durchläufe entsprechen diesen Filtern",
+  "preDive_sessions_export": "Nach Excel exportieren",
+  "preDive_sessions_exportEmpty": "Keine Checklisten-Durchläufe zum Exportieren",
+  "preDive_sessions_exportFailed": "Export fehlgeschlagen: {error}",
+  "@preDive_sessions_exportFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
   "preDive_start_title": "Checkliste vor dem Tauchgang starten",
   "preDive_start_template": "Checkliste",
   "preDive_start_equipmentSet": "Ausrüstungsset",
