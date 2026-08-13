@@ -177,11 +177,16 @@ class _SiteListContentState extends ConsumerState<SiteListContent> {
   }
 
   /// Enter selection mode implicitly, from a long-press or modifier-click.
-  void _enterSelectionMode(String? initialId) {
+  ///
+  /// Clearing the highlight keeps the detail pane from arguing with the bulk
+  /// selection about what the row means: a row left highlighted but unchecked
+  /// reads as selected while no bulk action would touch it.
+  void _enterSelectionMode(String? initialId, {String? seedId}) {
+    ref.read(highlightedSiteIdProvider.notifier).state = null;
     if (initialId == null) {
       _selection.enterExplicit();
     } else {
-      _selection.enterImplicit(initialId);
+      _selection.enterImplicit(initialId, seedId: seedId);
     }
   }
 
@@ -189,18 +194,46 @@ class _SiteListContentState extends ConsumerState<SiteListContent> {
 
   void _toggleSelection(String id) => _selection.toggle(id);
 
+  /// Select the contiguous span from the anchor site to [targetId].
+  ///
+  /// With no anchor yet, the highlighted row is the origin, matching Finder.
+  void _selectRangeTo(String targetId, List<String> orderedIds) {
+    _selection.extendTo(
+      targetId,
+      orderedIds,
+      fallbackAnchorId: ref.read(highlightedSiteIdProvider),
+    );
+  }
+
+  /// Cmd/Ctrl-click [id], carrying the highlighted site into the selection.
+  ///
+  /// Outside selection mode the highlighted row is what the user sees as
+  /// selected, so a modifier-click adds to it rather than replacing it. A
+  /// highlight that filtering has pushed out of [orderedIds] is ignored, so
+  /// the count can never include a site that is not on screen.
+  void _modifierTap(String id, List<String> orderedIds) {
+    final highlighted = ref.read(highlightedSiteIdProvider);
+    _enterSelectionMode(
+      id,
+      seedId: highlighted != null && orderedIds.contains(highlighted)
+          ? highlighted
+          : null,
+    );
+  }
+
   /// One tap policy for every site row, in every view mode.
   ///
   /// A held modifier turns a tap into an implicit entry, so desktop users
-  /// never have to discover long-press.
+  /// never have to discover long-press. Shift extends from the anchor,
+  /// falling back to the highlighted row.
   void _handleRowTap(String id, List<SiteWithDiveCount> sites) {
     final orderedIds = sites.map((s) => s.site.id).toList();
     if (SelectableListScope.isShiftPressed()) {
-      _selection.extendTo(id, orderedIds);
+      _selectRangeTo(id, orderedIds);
       return;
     }
     if (SelectableListScope.isModifierPressed()) {
-      _selection.enterImplicit(id);
+      _modifierTap(id, orderedIds);
       return;
     }
     if (_isSelectionMode) {
@@ -547,17 +580,38 @@ class _SiteListContentState extends ConsumerState<SiteListContent> {
     AsyncValue<List<SiteWithDiveCount>> sitesAsync,
     SiteFilterState filter,
   ) {
-    final tableContent = _buildTableView(context, sitesAsync, filter);
+    final loadedSites = sitesAsync.valueOrNull ?? const <SiteWithDiveCount>[];
+    final visibleIds = loadedSites.map((s) => s.site.id).toList();
 
-    if (_isSelectionMode) {
-      return Column(
-        children: [
-          _buildCompactSelectionAppBar(context, sitesAsync.valueOrNull ?? []),
-          Expanded(child: tableContent),
-        ],
-      );
-    }
-    return tableContent;
+    // Same pruning the list path does: drop checked sites that fell out of
+    // the visible list, so the count always matches what is on screen.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _selection.pruneTo(visibleIds);
+    });
+
+    // The scope carries Escape, Ctrl/Cmd-A and the Android back handling, and
+    // the builder is what repaints the table as checks change -- the table is
+    // built inside it for that reason.
+    return SelectableListScope(
+      controller: _selection,
+      selectableIds: visibleIds,
+      child: ValueListenableBuilder<SelectionState>(
+        valueListenable: _selection,
+        builder: (context, selection, _) {
+          final tableContent = _buildTableView(context, sitesAsync, filter);
+
+          if (selection.isActive) {
+            return Column(
+              children: [
+                _buildCompactSelectionAppBar(context, loadedSites),
+                Expanded(child: tableContent),
+              ],
+            );
+          }
+          return tableContent;
+        },
+      ),
+    );
   }
 
   /// Build the [EntityTableView] for site table mode.
@@ -598,12 +652,27 @@ class _SiteListContentState extends ConsumerState<SiteListContent> {
                 onSortFieldChanged: notifier.setSortField,
                 onResizeColumn: notifier.resizeColumn,
                 onEntityTapDown: (id) {
-                  if (!_isSelectionMode) {
-                    ref.read(highlightedSiteIdProvider.notifier).state = id;
+                  // Rows carry a double-tap, so onEntityTap only resolves
+                  // after the double-tap timer -- long after this fires. A
+                  // modified click is a selection gesture, not a navigation
+                  // one: moving the highlight here would overwrite the very
+                  // anchor the shift-click is about to extend from.
+                  if (_isSelectionMode ||
+                      SelectableListScope.isShiftPressed() ||
+                      SelectableListScope.isModifierPressed()) {
+                    return;
                   }
+                  ref.read(highlightedSiteIdProvider.notifier).state = id;
                 },
                 onEntityTap: (id) {
-                  if (_isSelectionMode) {
+                  // Table mode honours modifier and shift clicks too, so
+                  // selection works the same way as in the list view modes.
+                  final orderedIds = siteRecords.map((s) => s.site.id).toList();
+                  if (SelectableListScope.isShiftPressed()) {
+                    _selectRangeTo(id, orderedIds);
+                  } else if (SelectableListScope.isModifierPressed()) {
+                    _modifierTap(id, orderedIds);
+                  } else if (_isSelectionMode) {
                     _toggleSelection(id);
                   }
                 },
