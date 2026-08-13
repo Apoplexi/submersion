@@ -199,7 +199,13 @@ class _MediaItemViewState extends ConsumerState<MediaItemView> {
         return (
           data: remote,
           videoPosterMissing: false,
-          documentRenderable: widget.thumbnail,
+          // Not "the request was a thumbnail": a thumbnail request whose
+          // thumb object is missing or unfetchable degrades to the ORIGINAL
+          // (see MediaStoreResolver.tryResolveRemote), and for a document
+          // that original is the PDF. Only the store knows which of the two
+          // it handed back, and isPoster is how it says so.
+          documentRenderable:
+              widget.thumbnail && remote is FileData && remote.isPoster,
         );
       }
       // The movie tile claims something specific -- this video has no poster

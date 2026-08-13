@@ -113,6 +113,43 @@ void main() {
     expect(result.isUnavailable, isTrue);
   });
 
+  // The resolver checks the file exists before handing it back, so a read
+  // that still fails means it went away in between (an ejected volume, a
+  // cache sweep). That is a placeholder, not an exception thrown out of a
+  // provider the viewer is watching.
+  test('a resolved file that has since vanished reads unavailable', () async {
+    final dir = await Directory.systemTemp.createTemp('media_bytes_gone');
+    addTearDown(() => dir.delete(recursive: true));
+    resolver.data = FileData(file: File('${dir.path}/never-written.pdf'));
+
+    final result = await container().read(mediaBytesProvider(pdf()).future);
+
+    expect(result.isUnavailable, isTrue);
+  });
+
+  // Building the store runtime reads credentials out of the keychain, which
+  // can fail for reasons that have nothing to do with this document.
+  test('a store runtime that fails to build leaves the item '
+      'unavailable', () async {
+    resolver.data = const UnavailableData(kind: UnavailableKind.notFound);
+
+    final c = ProviderContainer(
+      overrides: [
+        mediaSourceResolverRegistryProvider.overrideWithValue(
+          MediaSourceResolverRegistry({MediaSourceType.localFile: resolver}),
+        ),
+        mediaStoreRuntimeProvider.overrideWith(
+          (ref) async => throw StateError('keychain unavailable'),
+        ),
+      ],
+    );
+    addTearDown(c.dispose);
+
+    final result = await c.read(mediaBytesProvider(pdf()).future);
+
+    expect(result.isUnavailable, isTrue);
+  });
+
   test('falls back to the media store when the device holds no local '
       'copy', () async {
     final db = LocalCacheDatabase(NativeDatabase.memory());
