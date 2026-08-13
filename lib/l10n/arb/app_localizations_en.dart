@@ -18915,6 +18915,14 @@ class AppLocalizationsEn extends AppLocalizations {
       'No USB serial ports found. Is the dive computer connected and powered on?';
 
   @override
+  String get diveComputer_download_stalePairing =>
+      'This dive computer\'s Bluetooth pairing is out of date. Forget the dive computer in your device\'s Bluetooth settings, then pair it again from the dive computer\'s Bluetooth menu.';
+
+  @override
+  String get diveComputer_download_discoveryStalled =>
+      'Connected to the dive computer, but it stopped responding before the download could start. This usually means the Bluetooth pairing is out of date: forget the dive computer in your device\'s Bluetooth settings, then try again.';
+
+  @override
   String diveComputer_download_serialConnectFailedWithDetails(Object details) {
     return 'Could not connect to dive computer.\n\nDiagnostic details (share with developers):\n$details';
   }

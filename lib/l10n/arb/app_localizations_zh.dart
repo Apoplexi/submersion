@@ -18261,6 +18261,14 @@ class AppLocalizationsZh extends AppLocalizations {
       '未找到 USB 串行端口。潜水电脑是否已连接并开机？';
 
   @override
+  String get diveComputer_download_stalePairing =>
+      '此潜水电脑的蓝牙配对已失效。请在设备的蓝牙设置中忽略该潜水电脑，然后从潜水电脑的蓝牙菜单重新配对。';
+
+  @override
+  String get diveComputer_download_discoveryStalled =>
+      '已连接到潜水电脑，但在下载开始前它停止响应。这通常表示蓝牙配对已失效：请在设备的蓝牙设置中忽略该潜水电脑，然后重试。';
+
+  @override
   String diveComputer_download_serialConnectFailedWithDetails(Object details) {
     return '无法连接到潜水电脑。\n\n诊断详情（请分享给开发人员）：\n$details';
   }
