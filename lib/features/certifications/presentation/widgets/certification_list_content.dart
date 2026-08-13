@@ -8,6 +8,7 @@ import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:submersion/shared/selection/selectable_list_scope.dart';
 import 'package:submersion/shared/selection/selectable_row.dart';
 import 'package:submersion/shared/selection/selection_app_bar.dart';
+import 'package:submersion/shared/selection/selection_entry_bar.dart';
 import 'package:submersion/shared/selection/selection_controller.dart';
 import 'package:submersion/shared/selection/selection_state.dart';
 import 'package:submersion/core/constants/list_view_mode.dart';
@@ -217,8 +218,8 @@ class _CertificationListContentState
                         );
                       },
                     ),
-                    // Discoverability: bulk actions must not be reachable only by a
-                    // long-press that nothing on screen advertises.
+                    // The only way into bulk actions: entry by long-press was removed,
+                    // so nothing but this control opens selection mode on touch.
                     IconButton(
                       key: const ValueKey('enter_selection'),
                       icon: const Icon(Icons.checklist),
@@ -363,8 +364,23 @@ class _CertificationListContentState
       selectableIds: visibleIds,
       child: ValueListenableBuilder<SelectionState>(
         valueListenable: _selection,
-        builder: (context, selection, _) =>
-            _buildTableView(context, certificationsAsync),
+        builder: (context, selection, _) {
+          final certifications =
+              certificationsAsync.value ?? const <Certification>[];
+          // Table mode has no app bar of its own, so both bars live here: the
+          // contextual one while selecting, and the Select affordance while
+          // not. They share a slot and a height, so the table does not shift
+          // as the mode opens.
+          return Column(
+            children: [
+              if (selection.isActive)
+                _buildSelectionBar(certifications, SelectionBarShell.pane)
+              else
+                SelectionEntryBar(controller: _selection),
+              Expanded(child: _buildTableView(context, certificationsAsync)),
+            ],
+          );
+        },
       ),
     );
   }
@@ -400,9 +416,6 @@ class _CertificationListContentState
           onEntityTap: (id) {
             if (_isSelectionMode) _selection.toggle(id);
           },
-          onEntityLongPress: _isSelectionMode
-              ? null
-              : (id) => _selection.enterImplicit(id),
           onEntityDoubleTap: (id) {
             context.push('/certifications/$id');
           },
@@ -460,8 +473,8 @@ class _CertificationListContentState
               );
             },
           ),
-          // Discoverability: bulk actions must not be reachable only by a
-          // long-press that nothing on screen advertises.
+          // The only way into bulk actions: entry by long-press was removed,
+          // so nothing but this control opens selection mode on touch.
           IconButton(
             key: const ValueKey('enter_selection'),
             icon: const Icon(Icons.checklist, size: 20),

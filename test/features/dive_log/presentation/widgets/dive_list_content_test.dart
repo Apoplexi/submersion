@@ -85,7 +85,6 @@ Widget _buildTableModeLayout({
   Set<String> selectedIds = const {},
   void Function(String)? onDiveTap,
   void Function(String)? onDiveDoubleTap,
-  void Function(String)? onDiveLongPress,
 }) {
   final tableConfig =
       config ??
@@ -119,7 +118,6 @@ Widget _buildTableModeLayout({
             dives: dives,
             onDiveTap: onDiveTap ?? (_) {},
             onDiveDoubleTap: onDiveDoubleTap,
-            onDiveLongPress: onDiveLongPress,
             selectedIds: selectedIds,
             isSelectionMode: isSelectionMode,
             highlightedId: highlightedId,
@@ -336,25 +334,20 @@ void main() {
     });
 
     // -----------------------------------------------------------------------
-    // Long-press fires onDiveLongPress (enters selection mode)
+    // Long-press is not a selection gesture in table mode
     // -----------------------------------------------------------------------
 
-    testWidgets('long-press fires onDiveLongPress callback', (tester) async {
-      String? longPressedId;
+    testWidgets('long-press on a table row does not check it', (tester) async {
       final dives = [_makeDive(id: 'lp-1', diveNumber: 7, maxDepth: 20.0)];
 
-      await tester.pumpWidget(
-        _buildTableModeLayout(
-          dives: dives,
-          onDiveLongPress: (id) => longPressedId = id,
-        ),
-      );
+      await tester.pumpWidget(_buildTableModeLayout(dives: dives));
       await tester.pumpAndSettle();
 
       await tester.longPress(find.text('#7'));
       await tester.pumpAndSettle();
 
-      expect(longPressedId, 'lp-1');
+      // No checkbox column means the table never entered selection mode.
+      expect(find.byType(Checkbox), findsNothing);
     });
 
     // -----------------------------------------------------------------------
@@ -1050,7 +1043,7 @@ void main() {
     ];
 
     testWidgets(
-      'long-press enters selection; shift-tap selects a range; tap toggles',
+      'Select enters selection; shift-tap selects a range; tap toggles',
       (tester) async {
         final overrides = await _buildPhoneOverrides(
           dives: fourDives(),
@@ -1071,8 +1064,10 @@ void main() {
         Finder tileFinder(String id) =>
             find.byWidgetPredicate((w) => w is DiveListTile && w.diveId == id);
 
-        // Long-press d1 -> enter selection mode with d1 as the anchor.
-        await tester.longPress(tileFinder('d1'));
+        // Select, then check d1 -> selection mode with d1 as the anchor.
+        await tester.tap(find.byKey(const ValueKey('enter_selection')));
+        await tester.pumpAndSettle();
+        await tester.tap(tileFinder('d1'));
         await tester.pumpAndSettle();
         expect(tile('d1').isSelectionMode, isTrue);
         expect(tile('d1').isChecked, isTrue);
@@ -1185,7 +1180,7 @@ void main() {
       expect(tile('d3').isChecked, isFalse);
     });
 
-    testWidgets('compact view: long-press enters selection and tap toggles', (
+    testWidgets('compact view: Select enters selection and tap toggles', (
       tester,
     ) async {
       final overrides = await _buildPhoneOverrides(
@@ -1208,7 +1203,7 @@ void main() {
         (w) => w is CompactDiveListTile && w.diveId == id,
       );
 
-      await tester.longPress(tileFinder('d1'));
+      await tester.tap(find.byKey(const ValueKey('enter_selection')));
       await tester.pumpAndSettle();
       expect(tile('d1').isSelectionMode, isTrue);
 
@@ -1280,9 +1275,11 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      // Long-press d1 to enter selection mode with d1 as the only selection.
-      // With 1 of 4 selected, both Select All and Deselect All are visible.
-      await tester.longPress(tileFinder('d1'));
+      // Enter selection mode and check d1 as the only selection. With 1 of 4
+      // selected, both Select All and Deselect All are visible.
+      await tester.tap(find.byKey(const ValueKey('enter_selection')));
+      await tester.pumpAndSettle();
+      await tester.tap(tileFinder('d1'));
       await tester.pumpAndSettle();
 
       expect(find.byIcon(Icons.select_all), findsOneWidget);
@@ -1343,7 +1340,9 @@ void main() {
       // One dive checked -> Compare is visible but disabled. Actions below
       // their minCount render disabled rather than hidden, so the action set
       // stays stable and users can see what an action needs.
-      await tester.longPress(tileFinder('d1'));
+      await tester.tap(find.byKey(const ValueKey('enter_selection')));
+      await tester.pumpAndSettle();
+      await tester.tap(tileFinder('d1'));
       await tester.pumpAndSettle();
       expect(compare, findsOneWidget);
       expect(tester.widget<IconButton>(compare).onPressed, isNull);

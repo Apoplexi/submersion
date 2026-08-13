@@ -11,6 +11,7 @@ import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:submersion/shared/selection/bulk_action.dart';
 import 'package:submersion/shared/selection/selectable_list_scope.dart';
 import 'package:submersion/shared/selection/selection_app_bar.dart';
+import 'package:submersion/shared/selection/selection_entry_bar.dart';
 import 'package:submersion/shared/selection/selection_controller.dart';
 import 'package:submersion/shared/selection/selection_state.dart';
 import 'package:submersion/core/constants/list_view_mode.dart';
@@ -154,18 +155,19 @@ class _BuddyListContentState extends ConsumerState<BuddyListContent> {
     }
   }
 
-  /// Enter selection mode implicitly, from a long-press or modifier-click.
+  /// Enter selection mode implicitly, from a modifier-click, checking [id].
   ///
   /// Clearing the highlight keeps the detail pane from arguing with the bulk
   /// selection about what the row means: a row left highlighted but unchecked
   /// reads as selected while no bulk action would touch it.
-  void _enterSelectionMode(String? initialId, {String? seedId}) {
+  ///
+  /// The Select controls route to [SelectionController.enterExplicit] directly
+  /// -- they have no row to check -- so this helper only ever serves the
+  /// implicit path, which since the removal of long-press entry means
+  /// modifier-click alone.
+  void _enterImplicitSelection(String id, {String? seedId}) {
     ref.read(highlightedBuddyIdProvider.notifier).state = null;
-    if (initialId == null) {
-      _selection.enterExplicit();
-    } else {
-      _selection.enterImplicit(initialId, seedId: seedId);
-    }
+    _selection.enterImplicit(id, seedId: seedId);
   }
 
   void _exitSelectionMode() => _selection.exit();
@@ -191,7 +193,7 @@ class _BuddyListContentState extends ConsumerState<BuddyListContent> {
   /// the count can never include a buddy that is not on screen.
   void _modifierTap(String id, List<String> orderedIds) {
     final highlighted = ref.read(highlightedBuddyIdProvider);
-    _enterSelectionMode(
+    _enterImplicitSelection(
       id,
       seedId: highlighted != null && orderedIds.contains(highlighted)
           ? highlighted
@@ -201,9 +203,9 @@ class _BuddyListContentState extends ConsumerState<BuddyListContent> {
 
   /// One tap policy for every buddy row, in every view mode.
   ///
-  /// A held modifier turns a tap into an implicit entry, so desktop users
-  /// never have to discover long-press. Shift extends from the anchor,
-  /// falling back to the highlighted row.
+  /// A held modifier turns a tap into an implicit entry -- the one path that
+  /// still evaporates at zero checked, since touch has no gesture entry left.
+  /// Shift extends from the anchor, falling back to the highlighted row.
   void _handleRowTap(String id, List<BuddyWithDiveCount> buddies) {
     final orderedIds = buddies.map((b) => b.buddy.id).toList();
     if (SelectableListScope.isShiftPressed()) {
@@ -487,8 +489,8 @@ class _BuddyListContentState extends ConsumerState<BuddyListContent> {
                         );
                       },
                     ),
-                    // Discoverability: buddies had no Select affordance at all --
-                    // long-press was the only way into bulk actions.
+                    // The only way into bulk actions: entry by long-press was removed,
+                    // so nothing but this control opens selection mode on touch.
                     IconButton(
                       key: const ValueKey('enter_selection'),
                       icon: const Icon(Icons.checklist),
@@ -576,15 +578,18 @@ class _BuddyListContentState extends ConsumerState<BuddyListContent> {
         builder: (context, selection, _) {
           final tableContent = _buildTableView(context, buddiesAsync);
 
-          if (selection.isActive) {
-            return Column(
-              children: [
-                _buildCompactSelectionAppBar(context, loadedBuddies),
-                Expanded(child: tableContent),
-              ],
-            );
-          }
-          return tableContent;
+          // Table mode has no app bar of its own, so the Select affordance
+          // lives in the same slot the contextual bar takes, at the same
+          // height -- the table does not shift as the mode opens.
+          return Column(
+            children: [
+              if (selection.isActive)
+                _buildCompactSelectionAppBar(context, loadedBuddies)
+              else
+                SelectionEntryBar(controller: _selection),
+              Expanded(child: tableContent),
+            ],
+          );
         },
       ),
     );
@@ -650,9 +655,6 @@ class _BuddyListContentState extends ConsumerState<BuddyListContent> {
             if (_isSelectionMode) return;
             context.push('/buddies/$id');
           },
-          onEntityLongPress: _isSelectionMode
-              ? null
-              : (id) => _enterSelectionMode(id),
           selectedIds: _selectedIds,
           isSelectionMode: _isSelectionMode,
           highlightedId: ref.watch(highlightedBuddyIdProvider),
@@ -701,8 +703,8 @@ class _BuddyListContentState extends ConsumerState<BuddyListContent> {
               showSearch(context: context, delegate: BuddySearchDelegate(ref));
             },
           ),
-          // Discoverability: buddies had no Select affordance at all --
-          // long-press was the only way into bulk actions.
+          // The only way into bulk actions: entry by long-press was removed,
+          // so nothing but this control opens selection mode on touch.
           IconButton(
             key: const ValueKey('enter_selection'),
             icon: const Icon(Icons.checklist, size: 20),
@@ -833,31 +835,21 @@ class _BuddyListContentState extends ConsumerState<BuddyListContent> {
           final isChecked = _selectedIds.contains(buddy.id);
           final viewMode = ref.watch(buddyListViewModeProvider);
           return switch (viewMode) {
-            ListViewMode.detailed || ListViewMode.compact => GestureDetector(
-              onLongPress: _isSelectionMode
-                  ? null
-                  : () => _enterSelectionMode(buddy.id),
-              child: BuddyListTile(
-                buddy: buddy,
-                diveCount: buddyWithCount.diveCount,
-                isSelected: isSelected,
-                isChecked: isChecked,
-                isSelectionMode: _isSelectionMode,
-                onTap: () => _handleRowTap(buddy.id, buddies),
-              ),
+            ListViewMode.detailed || ListViewMode.compact => BuddyListTile(
+              buddy: buddy,
+              diveCount: buddyWithCount.diveCount,
+              isSelected: isSelected,
+              isChecked: isChecked,
+              isSelectionMode: _isSelectionMode,
+              onTap: () => _handleRowTap(buddy.id, buddies),
             ),
-            ListViewMode.dense || ListViewMode.table => GestureDetector(
-              onLongPress: _isSelectionMode
-                  ? null
-                  : () => _enterSelectionMode(buddy.id),
-              child: DenseBuddyListTile(
-                buddy: buddy,
-                diveCount: buddyWithCount.diveCount,
-                isChecked: isChecked,
-                isHighlighted: !_isSelectionMode && isHighlighted,
-                isSelectionMode: _isSelectionMode,
-                onTap: () => _handleRowTap(buddy.id, buddies),
-              ),
+            ListViewMode.dense || ListViewMode.table => DenseBuddyListTile(
+              buddy: buddy,
+              diveCount: buddyWithCount.diveCount,
+              isChecked: isChecked,
+              isHighlighted: !_isSelectionMode && isHighlighted,
+              isSelectionMode: _isSelectionMode,
+              onTap: () => _handleRowTap(buddy.id, buddies),
             ),
           };
         },

@@ -13,6 +13,7 @@ import 'package:submersion/shared/selection/bulk_action.dart';
 import 'package:submersion/shared/selection/selectable_list_scope.dart';
 import 'package:submersion/shared/selection/selectable_row.dart';
 import 'package:submersion/shared/selection/selection_app_bar.dart';
+import 'package:submersion/shared/selection/selection_entry_bar.dart';
 import 'package:submersion/shared/selection/selection_controller.dart';
 import 'package:submersion/shared/selection/selection_state.dart';
 import 'package:submersion/shared/widgets/entity_table/entity_table_view.dart';
@@ -255,8 +256,8 @@ class _EquipmentListContentState extends ConsumerState<EquipmentListContent> {
                         );
                       },
                     ),
-                    // Discoverability: bulk actions must not be reachable only by a
-                    // long-press that nothing on screen advertises.
+                    // The only way into bulk actions: entry by long-press was removed,
+                    // so nothing but this control opens selection mode on touch.
                     IconButton(
                       key: const ValueKey('enter_selection'),
                       icon: const Icon(Icons.checklist),
@@ -468,6 +469,17 @@ class _EquipmentListContentState extends ConsumerState<EquipmentListContent> {
         builder: (context, selection, _) => Column(
           children: [
             if (widget.headerExtension != null) widget.headerExtension!,
+            // Table mode has no app bar of its own, so both bars live here:
+            // the contextual one while selecting, and the Select affordance
+            // while not. They share a slot and a height, so the table does
+            // not shift as the mode opens.
+            if (selection.isActive)
+              _buildSelectionBar(
+                equipmentAsync.value ?? const <EquipmentItem>[],
+                SelectionBarShell.pane,
+              )
+            else
+              SelectionEntryBar(controller: _selection),
             _buildFilterChips(context),
             Expanded(child: _buildTableView(context, equipmentAsync)),
           ],
@@ -509,9 +521,6 @@ class _EquipmentListContentState extends ConsumerState<EquipmentListContent> {
           onEntityTap: (id) {
             if (_isSelectionMode) _selection.toggle(id);
           },
-          onEntityLongPress: _isSelectionMode
-              ? null
-              : (id) => _selection.enterImplicit(id),
           selectedIds: _selectedIds,
           isSelectionMode: _isSelectionMode,
           onEntityDoubleTap: (id) {
@@ -561,8 +570,8 @@ class _EquipmentListContentState extends ConsumerState<EquipmentListContent> {
               showSearch(context: context, delegate: EquipmentSearchDelegate());
             },
           ),
-          // Discoverability: bulk actions must not be reachable only by a
-          // long-press that nothing on screen advertises.
+          // The only way into bulk actions: entry by long-press was removed,
+          // so nothing but this control opens selection mode on touch.
           IconButton(
             key: const ValueKey('enter_selection'),
             icon: const Icon(Icons.checklist, size: 20),

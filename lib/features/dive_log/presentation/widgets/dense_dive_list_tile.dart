@@ -20,7 +20,6 @@ class DenseDiveListTile extends ConsumerWidget {
   final double? maxDepth;
   final Duration? duration;
   final VoidCallback? onTap;
-  final VoidCallback? onLongPress;
   final bool isSelectionMode;
   final bool isSelected;
   final bool isHighlighted;
@@ -59,7 +58,6 @@ class DenseDiveListTile extends ConsumerWidget {
     this.maxDepth,
     this.duration,
     this.onTap,
-    this.onLongPress,
     this.isSelectionMode = false,
     this.isSelected = false,
     this.isHighlighted = false,
@@ -278,7 +276,6 @@ class DenseDiveListTile extends ConsumerWidget {
         child: InkWell(
           onTap: onTap,
           onDoubleTap: onDoubleTap,
-          onLongPress: onLongPress,
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
             child: Row(

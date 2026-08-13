@@ -18,6 +18,7 @@ import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:submersion/shared/selection/selectable_list_scope.dart';
 import 'package:submersion/shared/selection/selectable_row.dart';
 import 'package:submersion/shared/selection/selection_app_bar.dart';
+import 'package:submersion/shared/selection/selection_entry_bar.dart';
 import 'package:submersion/shared/selection/selection_controller.dart';
 import 'package:submersion/shared/selection/selection_state.dart';
 import 'package:submersion/features/trips/domain/constants/trip_field.dart';
@@ -228,8 +229,8 @@ class _TripListContentState extends ConsumerState<TripListContent> {
                       tooltip: context.l10n.trips_list_tooltip_sort,
                       onPressed: () => _showSortSheet(context),
                     ),
-                    // Discoverability: bulk actions must not be reachable only by a
-                    // long-press that nothing on screen advertises.
+                    // The only way into bulk actions: entry by long-press was removed,
+                    // so nothing but this control opens selection mode on touch.
                     IconButton(
                       key: const ValueKey('enter_selection'),
                       icon: const Icon(Icons.checklist),
@@ -339,8 +340,9 @@ class _TripListContentState extends ConsumerState<TripListContent> {
 
   /// One tap policy for every trip row.
   ///
-  /// A held modifier turns a tap into an implicit entry, so desktop users
-  /// never have to discover long-press.
+  /// A held modifier turns a tap into an implicit entry -- the one path
+  /// that still evaporates at zero checked, since touch has no gesture
+  /// entry left.
   void _handleRowTap(Trip trip) {
     if (SelectableListScope.isModifierPressed()) {
       _selection.enterImplicit(trip.id);
@@ -376,14 +378,19 @@ class _TripListContentState extends ConsumerState<TripListContent> {
           // selectedIds while only the bar updated.
           final tableContent = _buildTableView(context, tripsAsync, filter);
 
-          return selection.isActive
-              ? Column(
-                  children: [
-                    _buildSelectionBar(loadedTrips, SelectionBarShell.pane),
-                    Expanded(child: tableContent),
-                  ],
-                )
-              : tableContent;
+          // Table mode has no app bar of its own, so both bars live here: the
+          // contextual one while selecting, and the Select affordance while
+          // not. They share a slot and a height, so the table does not shift
+          // as the mode opens.
+          return Column(
+            children: [
+              if (selection.isActive)
+                _buildSelectionBar(loadedTrips, SelectionBarShell.pane)
+              else
+                SelectionEntryBar(controller: _selection),
+              Expanded(child: tableContent),
+            ],
+          );
         },
       ),
     );
@@ -425,9 +432,6 @@ class _TripListContentState extends ConsumerState<TripListContent> {
                 onEntityTap: (id) {
                   if (_isSelectionMode) _selection.toggle(id);
                 },
-                onEntityLongPress: _isSelectionMode
-                    ? null
-                    : (id) => _selection.enterImplicit(id),
                 selectedIds: _selectedIds,
                 isSelectionMode: _isSelectionMode,
                 onEntityDoubleTap: (id) {
@@ -482,8 +486,8 @@ class _TripListContentState extends ConsumerState<TripListContent> {
             tooltip: context.l10n.trips_list_tooltip_sort,
             onPressed: () => _showSortSheet(context),
           ),
-          // Discoverability: bulk actions must not be reachable only by a
-          // long-press that nothing on screen advertises.
+          // The only way into bulk actions: entry by long-press was removed,
+          // so nothing but this control opens selection mode on touch.
           IconButton(
             key: const ValueKey('enter_selection'),
             icon: const Icon(Icons.checklist, size: 20),

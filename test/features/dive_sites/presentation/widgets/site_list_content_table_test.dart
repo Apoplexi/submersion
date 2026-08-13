@@ -304,6 +304,40 @@ void main() {
       expect(pushedPath, '/sites/s1');
     });
 
+    // Table mode owns no app bar -- TableModeLayout does, and it cannot reach
+    // this content's SelectionController -- so before the Select bar existed
+    // here, long-press was the only touch route into multi-select. Removing
+    // long-press without this would have left table mode with no way in at
+    // all on a touch device.
+    testWidgets('offers Select while closed and swaps it for the '
+        'contextual bar on entry', (tester) async {
+      final overrides = await _buildOverrides(
+        sites: [_makeSite(id: 's1', name: 'Blue Hole')],
+      );
+      await tester.pumpWidget(
+        testApp(
+          overrides: overrides,
+          child: const SiteListContent(showAppBar: true),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final selectButton = find.byKey(const ValueKey('enter_selection'));
+      final exitButton = find.byKey(const ValueKey('selection_exit'));
+
+      expect(selectButton, findsOneWidget);
+      expect(exitButton, findsNothing);
+
+      await tester.tap(selectButton);
+      await tester.pumpAndSettle();
+
+      // One bar at a time, in the same slot: the Select affordance yields to
+      // the contextual bar rather than stacking above it.
+      expect(exitButton, findsOneWidget);
+      expect(selectButton, findsNothing);
+      expect(find.text('0 selected'), findsOneWidget);
+    });
+
     // Table mode used to ignore both modifiers, so the only way into a
     // multi-row selection was long-press then tap. These drive the real
     // gesture sequence: a plain tap highlights the row, then a modified tap
@@ -404,7 +438,13 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        await tester.longPress(find.text('Blue Hole'));
+        await tester.tap(find.byKey(const ValueKey('enter_selection')));
+        await tester.pumpAndSettle();
+
+        // Table rows carry an onDoubleTap, so the tap only resolves once the
+        // double-tap timer expires.
+        await tester.tap(find.text('Blue Hole'));
+        await tester.pump(const Duration(milliseconds: 500));
         await tester.pumpAndSettle();
         expect(find.text('1 selected'), findsOneWidget);
       }

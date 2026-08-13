@@ -659,7 +659,6 @@ class DiveListTile extends ConsumerWidget {
   final bool isFavorite;
   final List<Tag> tags;
   final VoidCallback? onTap;
-  final VoidCallback? onLongPress;
   final VoidCallback? onDoubleTap;
 
   /// Currently open in the detail pane. Renders as a leading edge stripe.
@@ -725,7 +724,6 @@ class DiveListTile extends ConsumerWidget {
     this.isFavorite = false,
     this.tags = const [],
     this.onTap,
-    this.onLongPress,
     this.onDoubleTap,
     this.isHighlighted = false,
     this.isSelectionMode = false,
@@ -1138,7 +1136,6 @@ class DiveListTile extends ConsumerWidget {
           child: InkWell(
             onTap: onTap,
             onDoubleTap: onDoubleTap,
-            onLongPress: onLongPress,
             child: Stack(
               children: [
                 // Static map tile background (cached)
@@ -1197,7 +1194,6 @@ class DiveListTile extends ConsumerWidget {
           child: InkWell(
             onTap: onTap,
             onDoubleTap: onDoubleTap,
-            onLongPress: onLongPress,
             borderRadius: BorderRadius.circular(12),
             child: buildContent(),
           ),

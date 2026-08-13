@@ -10,6 +10,7 @@ import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:submersion/shared/selection/bulk_action.dart';
 import 'package:submersion/shared/selection/selectable_list_scope.dart';
 import 'package:submersion/shared/selection/selection_app_bar.dart';
+import 'package:submersion/shared/selection/selection_entry_bar.dart';
 import 'package:submersion/shared/selection/selection_controller.dart';
 import 'package:submersion/shared/selection/selection_state.dart';
 import 'package:submersion/features/maps/data/services/tile_cache_service.dart';
@@ -176,18 +177,19 @@ class _SiteListContentState extends ConsumerState<SiteListContent> {
     }
   }
 
-  /// Enter selection mode implicitly, from a long-press or modifier-click.
+  /// Enter selection mode implicitly, from a modifier-click, checking [id].
   ///
   /// Clearing the highlight keeps the detail pane from arguing with the bulk
   /// selection about what the row means: a row left highlighted but unchecked
   /// reads as selected while no bulk action would touch it.
-  void _enterSelectionMode(String? initialId, {String? seedId}) {
+  ///
+  /// The Select controls route to [SelectionController.enterExplicit] directly
+  /// -- they have no row to check -- so this helper only ever serves the
+  /// implicit path, which since the removal of long-press entry means
+  /// modifier-click alone.
+  void _enterImplicitSelection(String id, {String? seedId}) {
     ref.read(highlightedSiteIdProvider.notifier).state = null;
-    if (initialId == null) {
-      _selection.enterExplicit();
-    } else {
-      _selection.enterImplicit(initialId, seedId: seedId);
-    }
+    _selection.enterImplicit(id, seedId: seedId);
   }
 
   void _exitSelectionMode() => _selection.exit();
@@ -213,7 +215,7 @@ class _SiteListContentState extends ConsumerState<SiteListContent> {
   /// the count can never include a site that is not on screen.
   void _modifierTap(String id, List<String> orderedIds) {
     final highlighted = ref.read(highlightedSiteIdProvider);
-    _enterSelectionMode(
+    _enterImplicitSelection(
       id,
       seedId: highlighted != null && orderedIds.contains(highlighted)
           ? highlighted
@@ -223,9 +225,9 @@ class _SiteListContentState extends ConsumerState<SiteListContent> {
 
   /// One tap policy for every site row, in every view mode.
   ///
-  /// A held modifier turns a tap into an implicit entry, so desktop users
-  /// never have to discover long-press. Shift extends from the anchor,
-  /// falling back to the highlighted row.
+  /// A held modifier turns a tap into an implicit entry -- the one path that
+  /// still evaporates at zero checked, since touch has no gesture entry left.
+  /// Shift extends from the anchor, falling back to the highlighted row.
   void _handleRowTap(String id, List<SiteWithDiveCount> sites) {
     final orderedIds = sites.map((s) => s.site.id).toList();
     if (SelectableListScope.isShiftPressed()) {
@@ -500,8 +502,8 @@ class _SiteListContentState extends ConsumerState<SiteListContent> {
                       tooltip: context.l10n.diveSites_list_tooltip_sort,
                       onPressed: () => _showSortSheet(context),
                     ),
-                    // Discoverability: bulk actions must not be reachable only
-                    // by a long-press that nothing on screen advertises.
+                    // The only way into bulk actions: entry by long-press was removed,
+                    // so nothing but this control opens selection mode on touch.
                     IconButton(
                       key: const ValueKey('enter_selection'),
                       icon: const Icon(Icons.checklist),
@@ -512,7 +514,7 @@ class _SiteListContentState extends ConsumerState<SiteListContent> {
                       icon: const Icon(Icons.more_vert),
                       onSelected: (value) {
                         if (value == 'select') {
-                          _enterSelectionMode(null);
+                          _selection.enterExplicit();
                         } else if (value == 'import') {
                           context.push('/sites/import');
                         } else if (value.startsWith('view_')) {
@@ -600,15 +602,18 @@ class _SiteListContentState extends ConsumerState<SiteListContent> {
         builder: (context, selection, _) {
           final tableContent = _buildTableView(context, sitesAsync, filter);
 
-          if (selection.isActive) {
-            return Column(
-              children: [
-                _buildCompactSelectionAppBar(context, loadedSites),
-                Expanded(child: tableContent),
-              ],
-            );
-          }
-          return tableContent;
+          // Table mode has no app bar of its own, so the Select affordance
+          // lives in the same slot the contextual bar takes, at the same
+          // height -- the table does not shift as the mode opens.
+          return Column(
+            children: [
+              if (selection.isActive)
+                _buildCompactSelectionAppBar(context, loadedSites)
+              else
+                SelectionEntryBar(controller: _selection),
+              Expanded(child: tableContent),
+            ],
+          );
         },
       ),
     );
@@ -680,9 +685,6 @@ class _SiteListContentState extends ConsumerState<SiteListContent> {
                   if (_isSelectionMode) return;
                   context.push('/sites/$id');
                 },
-                onEntityLongPress: _isSelectionMode
-                    ? null
-                    : (id) => _enterSelectionMode(id),
                 selectedIds: _selectedIds,
                 isSelectionMode: _isSelectionMode,
                 highlightedId: ref.watch(highlightedSiteIdProvider),
@@ -773,7 +775,7 @@ class _SiteListContentState extends ConsumerState<SiteListContent> {
             icon: const Icon(Icons.more_vert, size: 20),
             onSelected: (value) {
               if (value == 'select') {
-                _enterSelectionMode(null);
+                _selection.enterExplicit();
               } else if (value == 'import') {
                 context.push('/sites/import');
               } else if (value.startsWith('view_')) {
@@ -899,9 +901,6 @@ class _SiteListContentState extends ConsumerState<SiteListContent> {
               longitude: site.location?.longitude,
               showSharedBadge: showSharedBadge,
               onTap: () => _handleRowTap(site.id, sites),
-              onLongPress: _isSelectionMode
-                  ? null
-                  : () => _enterSelectionMode(site.id),
             ),
             ListViewMode.compact => CompactSiteListTile(
               name: site.name,
@@ -912,9 +911,6 @@ class _SiteListContentState extends ConsumerState<SiteListContent> {
               isHighlighted: !_isSelectionMode && isSelected,
               showSharedBadge: showSharedBadge,
               onTap: () => _handleRowTap(site.id, sites),
-              onLongPress: _isSelectionMode
-                  ? null
-                  : () => _enterSelectionMode(site.id),
             ),
             ListViewMode.dense || ListViewMode.table => DenseSiteListTile(
               name: site.name,
@@ -925,9 +921,6 @@ class _SiteListContentState extends ConsumerState<SiteListContent> {
               isHighlighted: !_isSelectionMode && isSelected,
               showSharedBadge: showSharedBadge,
               onTap: () => _handleRowTap(site.id, sites),
-              onLongPress: _isSelectionMode
-                  ? null
-                  : () => _enterSelectionMode(site.id),
             ),
           };
         },
@@ -1282,7 +1275,6 @@ class SiteListTile extends ConsumerStatefulWidget {
   final int diveCount;
   final double? rating;
   final VoidCallback? onTap;
-  final VoidCallback? onLongPress;
   final bool isSelectionMode;
   final bool isSelected;
   final bool isChecked;
@@ -1300,7 +1292,6 @@ class SiteListTile extends ConsumerStatefulWidget {
     this.diveCount = 0,
     this.rating,
     this.onTap,
-    this.onLongPress,
     this.isSelectionMode = false,
     this.isSelected = false,
     this.isChecked = false,
@@ -1336,7 +1327,6 @@ class _SiteListTileState extends ConsumerState<SiteListTile> {
     final diveCount = widget.diveCount;
     final rating = widget.rating;
     final onTap = widget.onTap;
-    final onLongPress = widget.onLongPress;
     final isSelectionMode = widget.isSelectionMode;
     final isSelected = widget.isSelected;
     final isChecked = widget.isChecked;
@@ -1471,7 +1461,6 @@ class _SiteListTileState extends ConsumerState<SiteListTile> {
           label: context.l10n.diveSites_list_tile_semantics(name),
           child: InkWell(
             onTap: onTap,
-            onLongPress: onLongPress,
             child: Stack(
               children: [
                 Positioned.fill(
@@ -1537,7 +1526,6 @@ class _SiteListTileState extends ConsumerState<SiteListTile> {
         label: context.l10n.diveSites_list_tile_semantics(name),
         child: InkWell(
           onTap: onTap,
-          onLongPress: onLongPress,
           borderRadius: BorderRadius.circular(12),
           child: buildContent(),
         ),

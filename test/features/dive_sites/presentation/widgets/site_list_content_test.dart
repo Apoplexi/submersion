@@ -155,7 +155,9 @@ void main() {
 
       await tester.pumpAndSettle();
 
-      await tester.longPress(find.text('Alpha Site'));
+      await tester.tap(find.byKey(const ValueKey('enter_selection')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Alpha Site'));
       await tester.pumpAndSettle();
       expect(find.text('1 selected'), findsOneWidget);
 
@@ -705,7 +707,9 @@ void main() {
           ),
         );
         await tester.pumpAndSettle();
-        await tester.longPress(find.text('First Site'));
+        await tester.tap(find.byKey(const ValueKey('enter_selection')));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('First Site'));
         await tester.pumpAndSettle();
         expect(find.text('1 selected'), findsOneWidget);
 
@@ -726,7 +730,46 @@ void main() {
       },
     );
 
-    testWidgets('tapping last selected site exits selection mode', (
+    testWidgets('long-press on a site does not enter selection mode', (
+      tester,
+    ) async {
+      _setMobileTestSurfaceSize(tester);
+      await siteRepository.createSite(
+        const DiveSite(id: 's1', name: 'Held Site'),
+      );
+      final opened = <String?>[];
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            sharedPreferencesProvider.overrideWithValue(prefs),
+            siteRepositoryProvider.overrideWithValue(siteRepository),
+            validatedCurrentDiverIdProvider.overrideWith((ref) async => null),
+          ],
+          child: MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            // Routed through the callback rather than context.push: with no
+            // long-press handler the hold resolves as an ordinary tap on
+            // release, which would otherwise try to navigate.
+            home: Scaffold(
+              body: SiteListContent(
+                showAppBar: false,
+                onItemSelected: opened.add,
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      await tester.longPress(find.text('Held Site'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('1 selected'), findsNothing);
+      expect(find.byKey(const ValueKey('enter_selection')), findsOneWidget);
+      expect(opened, ['s1']);
+    });
+
+    testWidgets('unchecking the last site keeps the deliberate mode open', (
       tester,
     ) async {
       _setMobileTestSurfaceSize(tester);
@@ -748,13 +791,17 @@ void main() {
         ),
       );
       await tester.pumpAndSettle();
-      await tester.longPress(find.text('Toggle Site'));
+      await tester.tap(find.byKey(const ValueKey('enter_selection')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Toggle Site'));
       await tester.pumpAndSettle();
       expect(find.text('1 selected'), findsOneWidget);
       await tester.tap(find.text('Toggle Site'));
       await tester.pumpAndSettle();
-      // Selection mode exits when last item is deselected.
-      expect(find.text('1 selected'), findsNothing);
+      // The Select button is a deliberate entry, so emptying the selection
+      // leaves the bar standing at zero rather than dropping the user out.
+      // Only an implicit entry (modifier-click) evaporates.
+      expect(find.text('0 selected'), findsOneWidget);
     });
   });
 
