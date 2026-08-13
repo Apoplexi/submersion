@@ -138,9 +138,15 @@ class TagRepository {
       final id = tag.id.isEmpty ? _uuid.v4() : tag.id;
       final now = DateTime.now().millisecondsSinceEpoch;
 
-      await _db
+      // Conflict-aware rather than a bare insert. The incumbent check above is
+      // an `await`, so two callers can both pass it and the loser would then
+      // throw on idx_tags_diver_name_unique -- failing an operation whose whole
+      // contract is "a tag with this name now exists" (PR #1033 review). A null
+      // return means someone won the race; fall back to reading their row,
+      // which is the same answer the incumbent check would have given.
+      final created = await _db
           .into(_db.tags)
-          .insert(
+          .insertReturningOrNull(
             TagsCompanion(
               id: Value(id),
               diverId: Value(tag.diverId),
@@ -149,7 +155,17 @@ class TagRepository {
               createdAt: Value(now),
               updatedAt: Value(now),
             ),
+            onConflict: DoNothing<$TagsTable, Tag>(target: const []),
           );
+      if (created == null) {
+        final winner = await _tagOccupying(name, tag.diverId);
+        _log.info('Tag "$name" was created concurrently as ${winner?.id}');
+        if (winner != null) return winner;
+        // Vanishingly unlikely: the conflicting row was deleted between the
+        // insert and this read. Surfacing it beats returning a tag id that
+        // does not exist.
+        throw StateError('Tag "$name" conflicted but could not be read back');
+      }
 
       await _syncRepository.markRecordPending(
         entityType: 'tags',

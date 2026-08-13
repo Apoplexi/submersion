@@ -153,6 +153,29 @@ void main() {
   });
 
   test(
+    'creating the same tag concurrently returns one tag, never throws',
+    () async {
+      // The incumbent check is an await, so two callers can both pass it; the
+      // loser used to throw on idx_tags_diver_name_unique even though the tag it
+      // asked for now exists (PR #1033 review).
+      final results = await Future.wait([
+        repository.createTag(tagOf('', 'Wreck')),
+        repository.createTag(tagOf('', 'Wreck')),
+        repository.createTag(tagOf('', 'wreck')),
+      ]);
+
+      final all = await repository.getAllTags();
+      expect(all, hasLength(1));
+      expect(
+        results.map((t) => t.id).toSet(),
+        hasLength(1),
+        reason: 'every caller must be handed the same surviving tag',
+      );
+      expect(results.first.id, all.single.id);
+    },
+  );
+
+  test(
     'adding a tag twice concurrently still leaves one junction row',
     () async {
       // The old read-then-insert was racy: two callers could each observe
