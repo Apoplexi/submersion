@@ -2206,7 +2206,7 @@ class SyncDataSerializer {
     if (rivals.isEmpty) {
       await _db
           .into(_db.tags)
-          .insertOnConflictUpdate(remote.toCompanion(false));
+          .insertOnConflictUpdate(_normalizedTag(remote).toCompanion(false));
       return;
     }
 
@@ -2218,8 +2218,21 @@ class SyncDataSerializer {
     if (survivor == remote.id) {
       await _db
           .into(_db.tags)
-          .insertOnConflictUpdate(remote.toCompanion(false));
+          .insertOnConflictUpdate(_normalizedTag(remote).toCompanion(false));
     }
+  }
+
+  /// A remote tag with its name normalized the way everything else keys on it.
+  ///
+  /// The v149 migration trims every stored name so a row reads back as what
+  /// lookups compare against. Writing a peer's value verbatim would undo that
+  /// on the first sync from a device predating the change: uniqueness would
+  /// still hold (the index keys on `lower(trim(name))`), but the stored value
+  /// would drift from the invariant the migration establishes, and the tag
+  /// would render with whitespace the user never typed (PR #1033 review).
+  Tag _normalizedTag(Tag remote) {
+    final trimmed = remote.name.trim();
+    return trimmed == remote.name ? remote : remote.copyWith(name: trimmed);
   }
 
   /// Moves [loser]'s dive links onto [survivor], drops the losing tag row and

@@ -168,6 +168,46 @@ void main() {
       expect(await junctionPairs(), ['dive-1|tag-aaa']);
     });
 
+    test('a padded name from a peer is stored trimmed', () async {
+      // v149 trims every stored name so a row reads back as what lookups
+      // compare against. A device predating that change can still publish a
+      // padded one, and writing it verbatim would undo the migration on the
+      // very first sync (PR #1033 review).
+      //
+      // The peer's tag row is inserted RAW: createTag trims now, so going
+      // through the repository would never put a padded name on the wire and
+      // this test would pass against the unfixed code.
+      await createDive('dive-1');
+      final now = DateTime(2026, 8, 13).millisecondsSinceEpoch;
+      await DatabaseService.instance.database
+          .into(DatabaseService.instance.database.tags)
+          .insert(
+            TagsCompanion(
+              id: const Value('tag-aaa'),
+              name: const Value('  $importTag  '),
+              createdAt: Value(now),
+              updatedAt: Value(now),
+            ),
+          );
+      await TagRepository().addTagToDive('dive-1', 'tag-aaa');
+      // Publishes the above as a peer AND resets this device's database.
+      await seedPeerLog(cloud, 'device-a');
+
+      final result = await buildService().performSync();
+      expect(result.status, isNot(SyncResultStatus.error));
+
+      final db = DatabaseService.instance.database;
+      final rows = await db.select(db.tags).get();
+      expect(rows, hasLength(1));
+      expect(
+        rows.single.name,
+        importTag,
+        reason:
+            'the stored value must match the normalization the index and '
+            'every lookup key on',
+      );
+    });
+
     test('an ordinary peer tag still replicates untouched', () async {
       await createTaggedDive('dive-1', 'tag-aaa', name: 'Wreck');
       await seedPeerLog(cloud, 'device-a');
