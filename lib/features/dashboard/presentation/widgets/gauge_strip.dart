@@ -379,8 +379,16 @@ class GaugeStrip extends ConsumerWidget {
           // Tap syncs; the sync itself is what the user wants when they look
           // at this chip. runSyncNow (not performSync) so the first-contact
           // and replaced-library gates still get their confirmation dialogs.
-          // Inert mid-sync so a second tap cannot queue a redundant run.
-          onTap: syncing ? () {} : () => runSyncNow(context, ref),
+          //
+          // Mid-sync the tap opens the Cloud Sync page instead of queuing a
+          // redundant run. A no-op callback would be the wrong way to say
+          // "inert": it still announces a tap action to assistive tech and
+          // still splashes. Sending the user to the progress bar is both a
+          // real action and the one they want at that moment -- and it keeps
+          // onTap non-null, which is load-bearing here (see [_chip]).
+          onTap: syncing
+              ? () => context.push('/settings/cloud-sync')
+              : () => runSyncNow(context, ref),
           // The settings page stays reachable from the chip that points at it.
           onLongPress: () => context.push('/settings/cloud-sync'),
         ),

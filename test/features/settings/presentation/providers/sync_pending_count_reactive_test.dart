@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -12,6 +14,22 @@ import '../../../../helpers/test_database.dart';
 /// Issue #990: with auto-sync OFF, editing dives left the Home "Synced" chip
 /// and the Cloud Sync page showing a launch-time count of zero for the whole
 /// session -- SyncState.pendingChanges was only ever recomputed by a sync.
+/// Holds each [getUnsyncedChangeCount] call open once [armed], so a test can
+/// choose the order the overlapping refreshes answer in. Before arming, calls
+/// resolve immediately so notifier construction and refreshState are unaffected.
+class _GatedSyncRepository extends SyncRepository {
+  bool armed = false;
+  final List<Completer<int>> gates = [];
+
+  @override
+  Future<int> getUnsyncedChangeCount({required String? providerId}) {
+    if (!armed) return Future.value(0);
+    final gate = Completer<int>();
+    gates.add(gate);
+    return gate.future;
+  }
+}
+
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
@@ -107,6 +125,42 @@ void main() {
     await settleDebounce();
 
     expect(container.read(syncStateProvider).pendingChanges, 0);
+  });
+
+  test('a slow earlier refresh cannot overwrite a newer count', () async {
+    // The debounce cancels pending TIMERS, not an in-flight refresh: a write
+    // arriving while the queries run starts a second refresh alongside the
+    // first. If the slower earlier one published last, the chip would show a
+    // stale count until something else recomputed it.
+    final repo = _GatedSyncRepository();
+    final container = ProviderContainer(
+      overrides: [
+        sharedPreferencesProvider.overrideWithValue(prefs),
+        cloudStorageProviderProvider.overrideWithValue(cloud),
+        syncRepositoryProvider.overrideWithValue(repo),
+      ],
+    );
+    addTearDown(container.dispose);
+    container.read(syncStateProvider);
+    await container.read(syncStateProvider.notifier).refreshState();
+
+    repo.armed = true;
+    // Refresh A starts and blocks on its gate.
+    SyncEventBus.notifyLocalChange();
+    await settleDebounce();
+    // Refresh B starts alongside it.
+    SyncEventBus.notifyLocalChange();
+    await settleDebounce();
+    expect(repo.gates, hasLength(2));
+
+    // B (the newer caller) answers first, then A answers late with a lower,
+    // now-stale count.
+    repo.gates[1].complete(5);
+    await Future<void>.delayed(Duration.zero);
+    repo.gates[0].complete(1);
+    await Future<void>.delayed(Duration.zero);
+
+    expect(container.read(syncStateProvider).pendingChanges, 5);
   });
 
   test('a disposed notifier does not refresh after its debounce', () async {

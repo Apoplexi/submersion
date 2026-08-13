@@ -620,6 +620,7 @@ class SyncNotifier extends StateNotifier<SyncState> {
   StreamSubscription<void>? _changeSubscription;
   Timer? _autoSyncTimer;
   Timer? _pendingCountTimer;
+  int _pendingCountGeneration = 0;
   bool _syncInFlight = false;
 
   SyncNotifier(this._syncRepository, this._ref) : super(const SyncState()) {
@@ -728,17 +729,25 @@ class SyncNotifier extends StateNotifier<SyncState> {
   /// Deliberately narrower than [refreshState]: this runs on every local write,
   /// so it must not probe the network via isSyncAvailable() nor rewrite
   /// status/message (which would stomp a sync or an error the user is reading).
+  ///
+  /// The debounce cancels pending TIMERS, not an in-flight refresh: once the
+  /// queries are running, a later write can start a second refresh alongside
+  /// the first. [_pendingCountGeneration] makes the newest caller the only one
+  /// allowed to publish, so a slow earlier query cannot land a stale count on
+  /// top of a fresher one.
   Future<void> _refreshPendingCount() async {
     if (!mounted) return;
     // A sync clears pending records as it publishes; its own post-sync
     // refreshState lands the settled number.
     if (state.status == SyncStatus.syncing) return;
+    final generation = ++_pendingCountGeneration;
     try {
       final providerId = _ref.read(cloudStorageProviderProvider)?.providerId;
       final count = await _syncRepository.getUnsyncedChangeCount(
         providerId: providerId,
       );
-      if (!mounted || state.pendingChanges == count) return;
+      if (!mounted || generation != _pendingCountGeneration) return;
+      if (state.pendingChanges == count) return;
       state = state.copyWith(pendingChanges: count);
     } catch (e) {
       // A count is advisory: leave the last known value rather than pushing

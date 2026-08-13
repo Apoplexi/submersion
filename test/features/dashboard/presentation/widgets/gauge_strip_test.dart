@@ -914,11 +914,16 @@ void main() {
       expect(spy.location, isNull);
     });
 
-    testWidgets('a tap mid-sync does not queue a second run', (tester) async {
+    // Mid-sync the chip must not queue a second run, but it also must not go
+    // inert via a no-op callback: that still announces a tap action to
+    // assistive tech. It opens the page showing sync progress instead.
+    testWidgets('a tap mid-sync opens progress, not a second run', (
+      tester,
+    ) async {
       final notifier = _RecordingSyncNotifier(
         const SyncState(status: SyncStatus.syncing),
       );
-      await pumpStrip(
+      final spy = await pumpStrip(
         tester,
         _syncGauges,
         extraOverrides: [syncStateProvider.overrideWith((ref) => notifier)],
@@ -927,6 +932,7 @@ void main() {
       await tapChip(tester, 'Syncing...');
 
       expect(notifier.syncCount, 0);
+      expect(spy.location, '/settings/cloud-sync');
     });
 
     testWidgets('long-press still opens cloud sync settings', (tester) async {
