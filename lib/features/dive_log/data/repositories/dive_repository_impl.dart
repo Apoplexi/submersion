@@ -5616,10 +5616,22 @@ class DiveRepository {
   }
 
   /// Return true if a dive has readings from 2 or more computers.
+  ///
+  /// Counts distinct canonical sources rather than raw rows -- two rows
+  /// sharing a computer_id (the shape a same-computer sequential merge
+  /// produces) collapse to one, matching [_canonicalDataSourceRows]. A row
+  /// with no computer_id is always its own canonical source, since [id] is
+  /// unique per row.
   Future<bool> hasMultipleDataSources(String diveId) async {
     try {
-      final sources = await getDataSources(diveId);
-      return sources.length >= 2;
+      final result = await _db
+          .customSelect(
+            'SELECT COUNT(DISTINCT COALESCE(computer_id, id)) as cnt '
+            'FROM dive_data_sources WHERE dive_id = ?',
+            variables: [Variable(diveId)],
+          )
+          .getSingle();
+      return (result.data['cnt'] as int) >= 2;
     } catch (e, stackTrace) {
       _log.error(
         'Failed to check multiple computers for dive: $diveId',
