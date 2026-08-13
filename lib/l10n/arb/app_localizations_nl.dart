@@ -6174,6 +6174,24 @@ class AppLocalizationsNl extends AppLocalizations {
   String get setup_syncPull_continue => 'Doorgaan';
 
   @override
+  String get setup_syncPull_incomplete_message =>
+      'Dit account bevat een Submersion-bibliotheek die nooit volledig is geüpload. Laat je andere apparaat de synchronisatie voltooien en probeer het opnieuw.';
+
+  @override
+  String get setup_syncPull_incomplete_retry => 'Opnieuw controleren';
+
+  @override
+  String get setup_syncPull_incomplete_title =>
+      'Bibliotheek niet volledig geüpload';
+
+  @override
+  String get setup_syncPull_locked_message =>
+      'Voer de versleutelingswachtwoordzin in om deze bibliotheek te ontgrendelen en naar dit apparaat te downloaden.';
+
+  @override
+  String get setup_syncPull_locked_title => 'Deze bibliotheek is versleuteld';
+
+  @override
   String get setup_syncPull_noLibrary_message =>
       'Er is geen Submersion-bibliotheek gevonden op dit account. Opnieuw beginnen? Je verbinding blijft behouden.';
 

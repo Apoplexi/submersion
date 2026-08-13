@@ -6221,6 +6221,24 @@ class AppLocalizationsIt extends AppLocalizations {
   String get setup_syncPull_continue => 'Continua';
 
   @override
+  String get setup_syncPull_incomplete_message =>
+      'Questo account contiene una libreria Submersion il cui caricamento non è mai stato completato. Lascia che l\'altro dispositivo finisca la sincronizzazione, poi riprova.';
+
+  @override
+  String get setup_syncPull_incomplete_retry => 'Controlla di nuovo';
+
+  @override
+  String get setup_syncPull_incomplete_title =>
+      'Caricamento della libreria incompleto';
+
+  @override
+  String get setup_syncPull_locked_message =>
+      'Inserisci la passphrase di crittografia per sbloccare questa libreria e scaricarla su questo dispositivo.';
+
+  @override
+  String get setup_syncPull_locked_title => 'Questa libreria è crittografata';
+
+  @override
   String get setup_syncPull_noLibrary_message =>
       'Nessuna libreria Submersion trovata su questo account. Iniziare da zero? La connessione verrà mantenuta.';
 

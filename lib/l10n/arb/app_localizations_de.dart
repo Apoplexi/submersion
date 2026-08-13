@@ -6218,6 +6218,25 @@ class AppLocalizationsDe extends AppLocalizations {
   String get setup_syncPull_continue => 'Weiter';
 
   @override
+  String get setup_syncPull_incomplete_message =>
+      'Auf diesem Konto liegt eine Submersion-Bibliothek, deren Upload nie abgeschlossen wurde. Lassen Sie Ihr anderes Gerät die Synchronisierung beenden und versuchen Sie es erneut.';
+
+  @override
+  String get setup_syncPull_incomplete_retry => 'Erneut prüfen';
+
+  @override
+  String get setup_syncPull_incomplete_title =>
+      'Bibliothek-Upload unvollständig';
+
+  @override
+  String get setup_syncPull_locked_message =>
+      'Geben Sie die Verschlüsselungs-Passphrase ein, um diese Bibliothek zu entsperren und auf dieses Gerät zu laden.';
+
+  @override
+  String get setup_syncPull_locked_title =>
+      'Diese Bibliothek ist verschlüsselt';
+
+  @override
   String get setup_syncPull_noLibrary_message =>
       'Auf diesem Konto wurde keine Submersion-Bibliothek gefunden. Stattdessen neu beginnen? Die Verbindung bleibt bestehen.';
 
