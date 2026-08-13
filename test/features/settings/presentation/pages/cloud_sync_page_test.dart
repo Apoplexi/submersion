@@ -655,6 +655,13 @@ void main() {
       await pumpPage(tester);
       expect(find.text('Duplicate diver profiles'), findsNothing);
     });
+
+    // Issue #990: SyncState's counts and cursor are otherwise only recomputed
+    // by a sync, so opening the page could report state from app launch.
+    testWidgets('refreshes sync state when opened', (tester) async {
+      final handles = await pumpPage(tester);
+      expect(handles.sync.refreshStateCalls, greaterThan(0));
+    });
   });
 
   group('CloudSyncPage - custom folder banner', () {
