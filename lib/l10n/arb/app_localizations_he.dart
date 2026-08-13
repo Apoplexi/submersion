@@ -2360,48 +2360,48 @@ class AppLocalizationsHe extends AppLocalizations {
       'למחוק את רשומת רשימת הבדיקה הזו?';
 
   @override
-  String get preDive_sessions_filter => 'Filter';
+  String get preDive_sessions_filter => 'סינון';
 
   @override
-  String get preDive_sessions_filterTitle => 'Filter checklist runs';
+  String get preDive_sessions_filterTitle => 'סינון רשימות בדיקה שבוצעו';
 
   @override
-  String get preDive_sessions_filterChecklist => 'Checklist';
+  String get preDive_sessions_filterChecklist => 'רשימת בדיקה';
 
   @override
-  String get preDive_sessions_filterStatus => 'Status';
+  String get preDive_sessions_filterStatus => 'סטטוס';
 
   @override
-  String get preDive_sessions_filterFlaggedOnly => 'Flagged runs only';
+  String get preDive_sessions_filterFlaggedOnly => 'רק ריצות מסומנות';
 
   @override
-  String get preDive_sessions_filterDateRange => 'Date range';
+  String get preDive_sessions_filterDateRange => 'טווח תאריכים';
 
   @override
-  String get preDive_sessions_filterAnyDate => 'Any date';
+  String get preDive_sessions_filterAnyDate => 'כל תאריך';
 
   @override
-  String get preDive_sessions_filterClearAll => 'Clear all';
+  String get preDive_sessions_filterClearAll => 'נקה הכול';
 
   @override
-  String get preDive_sessions_filterApply => 'Apply';
+  String get preDive_sessions_filterApply => 'החל';
 
   @override
-  String get preDive_sessions_filterFlaggedChip => 'Flagged only';
+  String get preDive_sessions_filterFlaggedChip => 'מסומנות בלבד';
 
   @override
   String get preDive_sessions_emptyFiltered =>
-      'No checklist runs match these filters';
+      'אין רשימות בדיקה התואמות למסננים אלה';
 
   @override
-  String get preDive_sessions_export => 'Export to Excel';
+  String get preDive_sessions_export => 'ייצוא ל-Excel';
 
   @override
-  String get preDive_sessions_exportEmpty => 'No checklist runs to export';
+  String get preDive_sessions_exportEmpty => 'אין רשימות בדיקה לייצוא';
 
   @override
   String preDive_sessions_exportFailed(String error) {
-    return 'Export failed: $error';
+    return 'הייצוא נכשל: $error';
   }
 
   @override

@@ -2436,48 +2436,49 @@ class AppLocalizationsDe extends AppLocalizations {
       'Diesen Checklisten-Eintrag löschen?';
 
   @override
-  String get preDive_sessions_filter => 'Filter';
+  String get preDive_sessions_filter => 'Filtern';
 
   @override
-  String get preDive_sessions_filterTitle => 'Filter checklist runs';
+  String get preDive_sessions_filterTitle => 'Checklisten-Durchläufe filtern';
 
   @override
-  String get preDive_sessions_filterChecklist => 'Checklist';
+  String get preDive_sessions_filterChecklist => 'Checkliste';
 
   @override
   String get preDive_sessions_filterStatus => 'Status';
 
   @override
-  String get preDive_sessions_filterFlaggedOnly => 'Flagged runs only';
+  String get preDive_sessions_filterFlaggedOnly => 'Nur markierte Durchläufe';
 
   @override
-  String get preDive_sessions_filterDateRange => 'Date range';
+  String get preDive_sessions_filterDateRange => 'Zeitraum';
 
   @override
-  String get preDive_sessions_filterAnyDate => 'Any date';
+  String get preDive_sessions_filterAnyDate => 'Beliebiges Datum';
 
   @override
-  String get preDive_sessions_filterClearAll => 'Clear all';
+  String get preDive_sessions_filterClearAll => 'Alle zurücksetzen';
 
   @override
-  String get preDive_sessions_filterApply => 'Apply';
+  String get preDive_sessions_filterApply => 'Anwenden';
 
   @override
-  String get preDive_sessions_filterFlaggedChip => 'Flagged only';
+  String get preDive_sessions_filterFlaggedChip => 'Nur markierte';
 
   @override
   String get preDive_sessions_emptyFiltered =>
-      'No checklist runs match these filters';
+      'Keine Checklisten-Durchläufe entsprechen diesen Filtern';
 
   @override
-  String get preDive_sessions_export => 'Export to Excel';
+  String get preDive_sessions_export => 'Nach Excel exportieren';
 
   @override
-  String get preDive_sessions_exportEmpty => 'No checklist runs to export';
+  String get preDive_sessions_exportEmpty =>
+      'Keine Checklisten-Durchläufe zum Exportieren';
 
   @override
   String preDive_sessions_exportFailed(String error) {
-    return 'Export failed: $error';
+    return 'Export fehlgeschlagen: $error';
   }
 
   @override

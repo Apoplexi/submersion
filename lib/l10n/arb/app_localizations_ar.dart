@@ -2381,48 +2381,49 @@ class AppLocalizationsAr extends AppLocalizations {
       'هل تريد حذف سجل قائمة التحقق هذا؟';
 
   @override
-  String get preDive_sessions_filter => 'Filter';
+  String get preDive_sessions_filter => 'تصفية';
 
   @override
-  String get preDive_sessions_filterTitle => 'Filter checklist runs';
+  String get preDive_sessions_filterTitle => 'تصفية عمليات قوائم التحقق';
 
   @override
-  String get preDive_sessions_filterChecklist => 'Checklist';
+  String get preDive_sessions_filterChecklist => 'قائمة التحقق';
 
   @override
-  String get preDive_sessions_filterStatus => 'Status';
+  String get preDive_sessions_filterStatus => 'الحالة';
 
   @override
-  String get preDive_sessions_filterFlaggedOnly => 'Flagged runs only';
+  String get preDive_sessions_filterFlaggedOnly => 'العمليات المعلَّمة فقط';
 
   @override
-  String get preDive_sessions_filterDateRange => 'Date range';
+  String get preDive_sessions_filterDateRange => 'النطاق الزمني';
 
   @override
-  String get preDive_sessions_filterAnyDate => 'Any date';
+  String get preDive_sessions_filterAnyDate => 'أي تاريخ';
 
   @override
-  String get preDive_sessions_filterClearAll => 'Clear all';
+  String get preDive_sessions_filterClearAll => 'مسح الكل';
 
   @override
-  String get preDive_sessions_filterApply => 'Apply';
+  String get preDive_sessions_filterApply => 'تطبيق';
 
   @override
-  String get preDive_sessions_filterFlaggedChip => 'Flagged only';
+  String get preDive_sessions_filterFlaggedChip => 'المعلَّمة فقط';
 
   @override
   String get preDive_sessions_emptyFiltered =>
-      'No checklist runs match these filters';
+      'لا توجد عمليات قوائم تحقق تطابق هذه المرشحات';
 
   @override
-  String get preDive_sessions_export => 'Export to Excel';
+  String get preDive_sessions_export => 'تصدير إلى Excel';
 
   @override
-  String get preDive_sessions_exportEmpty => 'No checklist runs to export';
+  String get preDive_sessions_exportEmpty =>
+      'لا توجد عمليات قوائم تحقق للتصدير';
 
   @override
   String preDive_sessions_exportFailed(String error) {
-    return 'Export failed: $error';
+    return 'فشل التصدير: $error';
   }
 
   @override

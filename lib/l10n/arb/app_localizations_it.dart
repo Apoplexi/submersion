@@ -2429,48 +2429,48 @@ class AppLocalizationsIt extends AppLocalizations {
       'Eliminare questo record di checklist?';
 
   @override
-  String get preDive_sessions_filter => 'Filter';
+  String get preDive_sessions_filter => 'Filtra';
 
   @override
-  String get preDive_sessions_filterTitle => 'Filter checklist runs';
+  String get preDive_sessions_filterTitle => 'Filtra le checklist eseguite';
 
   @override
   String get preDive_sessions_filterChecklist => 'Checklist';
 
   @override
-  String get preDive_sessions_filterStatus => 'Status';
+  String get preDive_sessions_filterStatus => 'Stato';
 
   @override
-  String get preDive_sessions_filterFlaggedOnly => 'Flagged runs only';
+  String get preDive_sessions_filterFlaggedOnly => 'Solo con segnalazioni';
 
   @override
-  String get preDive_sessions_filterDateRange => 'Date range';
+  String get preDive_sessions_filterDateRange => 'Intervallo di date';
 
   @override
-  String get preDive_sessions_filterAnyDate => 'Any date';
+  String get preDive_sessions_filterAnyDate => 'Qualsiasi data';
 
   @override
-  String get preDive_sessions_filterClearAll => 'Clear all';
+  String get preDive_sessions_filterClearAll => 'Cancella tutto';
 
   @override
-  String get preDive_sessions_filterApply => 'Apply';
+  String get preDive_sessions_filterApply => 'Applica';
 
   @override
-  String get preDive_sessions_filterFlaggedChip => 'Flagged only';
+  String get preDive_sessions_filterFlaggedChip => 'Solo segnalazioni';
 
   @override
   String get preDive_sessions_emptyFiltered =>
-      'No checklist runs match these filters';
+      'Nessuna checklist corrisponde a questi filtri';
 
   @override
-  String get preDive_sessions_export => 'Export to Excel';
+  String get preDive_sessions_export => 'Esporta in Excel';
 
   @override
-  String get preDive_sessions_exportEmpty => 'No checklist runs to export';
+  String get preDive_sessions_exportEmpty => 'Nessuna checklist da esportare';
 
   @override
   String preDive_sessions_exportFailed(String error) {
-    return 'Export failed: $error';
+    return 'Esportazione non riuscita: $error';
   }
 
   @override

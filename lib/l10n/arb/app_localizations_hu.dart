@@ -2419,48 +2419,49 @@ class AppLocalizationsHu extends AppLocalizations {
       'Törli ezt az ellenőrzőlista-bejegyzést?';
 
   @override
-  String get preDive_sessions_filter => 'Filter';
+  String get preDive_sessions_filter => 'Szűrés';
 
   @override
-  String get preDive_sessions_filterTitle => 'Filter checklist runs';
+  String get preDive_sessions_filterTitle =>
+      'Ellenőrzőlista-futtatások szűrése';
 
   @override
-  String get preDive_sessions_filterChecklist => 'Checklist';
+  String get preDive_sessions_filterChecklist => 'Ellenőrzőlista';
 
   @override
-  String get preDive_sessions_filterStatus => 'Status';
+  String get preDive_sessions_filterStatus => 'Állapot';
 
   @override
-  String get preDive_sessions_filterFlaggedOnly => 'Flagged runs only';
+  String get preDive_sessions_filterFlaggedOnly => 'Csak megjelölt futtatások';
 
   @override
-  String get preDive_sessions_filterDateRange => 'Date range';
+  String get preDive_sessions_filterDateRange => 'Dátumtartomány';
 
   @override
-  String get preDive_sessions_filterAnyDate => 'Any date';
+  String get preDive_sessions_filterAnyDate => 'Bármely dátum';
 
   @override
-  String get preDive_sessions_filterClearAll => 'Clear all';
+  String get preDive_sessions_filterClearAll => 'Összes törlése';
 
   @override
-  String get preDive_sessions_filterApply => 'Apply';
+  String get preDive_sessions_filterApply => 'Alkalmaz';
 
   @override
-  String get preDive_sessions_filterFlaggedChip => 'Flagged only';
+  String get preDive_sessions_filterFlaggedChip => 'Csak megjelölt';
 
   @override
   String get preDive_sessions_emptyFiltered =>
-      'No checklist runs match these filters';
+      'Nincs a szűrőknek megfelelő ellenőrzőlista-futtatás';
 
   @override
-  String get preDive_sessions_export => 'Export to Excel';
+  String get preDive_sessions_export => 'Exportálás Excelbe';
 
   @override
-  String get preDive_sessions_exportEmpty => 'No checklist runs to export';
+  String get preDive_sessions_exportEmpty => 'Nincs exportálható futtatás';
 
   @override
   String preDive_sessions_exportFailed(String error) {
-    return 'Export failed: $error';
+    return 'Az exportálás sikertelen: $error';
   }
 
   @override

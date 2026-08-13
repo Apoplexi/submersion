@@ -2431,48 +2431,48 @@ class AppLocalizationsPt extends AppLocalizations {
       'Excluir este registro de lista de verificação?';
 
   @override
-  String get preDive_sessions_filter => 'Filter';
+  String get preDive_sessions_filter => 'Filtrar';
 
   @override
-  String get preDive_sessions_filterTitle => 'Filter checklist runs';
+  String get preDive_sessions_filterTitle => 'Filtrar listas realizadas';
 
   @override
-  String get preDive_sessions_filterChecklist => 'Checklist';
+  String get preDive_sessions_filterChecklist => 'Lista de verificação';
 
   @override
-  String get preDive_sessions_filterStatus => 'Status';
+  String get preDive_sessions_filterStatus => 'Estado';
 
   @override
-  String get preDive_sessions_filterFlaggedOnly => 'Flagged runs only';
+  String get preDive_sessions_filterFlaggedOnly => 'Apenas com ocorrências';
 
   @override
-  String get preDive_sessions_filterDateRange => 'Date range';
+  String get preDive_sessions_filterDateRange => 'Intervalo de datas';
 
   @override
-  String get preDive_sessions_filterAnyDate => 'Any date';
+  String get preDive_sessions_filterAnyDate => 'Qualquer data';
 
   @override
-  String get preDive_sessions_filterClearAll => 'Clear all';
+  String get preDive_sessions_filterClearAll => 'Limpar tudo';
 
   @override
-  String get preDive_sessions_filterApply => 'Apply';
+  String get preDive_sessions_filterApply => 'Aplicar';
 
   @override
-  String get preDive_sessions_filterFlaggedChip => 'Flagged only';
+  String get preDive_sessions_filterFlaggedChip => 'Apenas ocorrências';
 
   @override
   String get preDive_sessions_emptyFiltered =>
-      'No checklist runs match these filters';
+      'Nenhuma lista corresponde a estes filtros';
 
   @override
-  String get preDive_sessions_export => 'Export to Excel';
+  String get preDive_sessions_export => 'Exportar para Excel';
 
   @override
-  String get preDive_sessions_exportEmpty => 'No checklist runs to export';
+  String get preDive_sessions_exportEmpty => 'Nenhuma lista para exportar';
 
   @override
   String preDive_sessions_exportFailed(String error) {
-    return 'Export failed: $error';
+    return 'Falha na exportação: $error';
   }
 
   @override

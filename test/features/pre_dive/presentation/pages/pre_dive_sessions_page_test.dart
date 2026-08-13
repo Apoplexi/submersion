@@ -541,6 +541,35 @@ void main() {
       expect(exporter.sharedSessions, isNull);
     });
 
+    testWidgets('export action is disabled while sessions are still loading', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        testApp(
+          locale: const Locale('en'),
+          overrides: [
+            preDiveActiveSessionProvider.overrideWith((ref) async => null),
+            // Never completes: holds the provider in its loading state.
+            preDiveSessionsProvider.overrideWith(
+              (ref) => Completer<List<PreDiveSession>>().future,
+            ),
+          ],
+          child: const PreDiveSessionsPage(),
+        ),
+      );
+      await tester.pump();
+
+      final button = tester.widget<IconButton>(
+        find.ancestor(
+          of: find.byIcon(Icons.grid_on),
+          matching: find.byType(IconButton),
+        ),
+      );
+
+      // A pending load must not be reported as "nothing to export".
+      expect(button.onPressed, isNull);
+    });
+
     testWidgets('exporting an empty list reports it instead of writing', (
       tester,
     ) async {

@@ -19,11 +19,17 @@ class PreDiveSessionsPage extends ConsumerWidget {
   /// Exports whatever the filter currently shows, so the filter doubles as the
   /// export selector. Share and save are a deliberate pair: a null return from
   /// the save path means the diver cancelled, not that the export succeeded.
-  Future<void> _export(BuildContext context, WidgetRef ref) async {
+  ///
+  /// [sessions] is resolved by the caller, which knows whether the list has
+  /// loaded: a pending or failed load must not reach here and be reported as
+  /// "nothing to export".
+  Future<void> _export(
+    BuildContext context,
+    WidgetRef ref,
+    List<PreDiveSession> sessions,
+  ) async {
     final l10n = context.l10n;
     final messenger = ScaffoldMessenger.of(context);
-    final sessions =
-        ref.read(filteredPreDiveSessionsProvider).value ?? const [];
 
     if (sessions.isEmpty) {
       messenger.showSnackBar(
@@ -110,7 +116,12 @@ class PreDiveSessionsPage extends ConsumerWidget {
           IconButton(
             icon: const Icon(Icons.grid_on),
             tooltip: l10n.preDive_sessions_export,
-            onPressed: () => _export(context, ref),
+            // Disabled until the list resolves. While it is loading or in
+            // error there is nothing meaningful to export, and offering the
+            // action would report a pending load as an empty history.
+            onPressed: filtered == null
+                ? null
+                : () => _export(context, ref, filtered),
           ),
         ],
       ),
