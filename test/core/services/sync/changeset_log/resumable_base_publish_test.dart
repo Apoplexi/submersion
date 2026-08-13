@@ -151,6 +151,48 @@ void main() {
       expect(await File(oldPath).exists(), isFalse);
     });
 
+    test('a corrupt sidecar takes its export with it', () async {
+      // The export can be hundreds of megabytes in a directory nothing else
+      // purges, so an unreadable RECORD must not strand its BYTES there. The
+      // data path is derivable from the sidecar's name (PR #1033 review).
+      final path = await writeExport('corrupt.json', 50);
+      await File(
+        ResumableBasePublish.sidecarPathFor(path),
+      ).writeAsString('{not json');
+
+      final found = await store.find(providerId: 'fake', deviceId: 'dev1');
+
+      expect(found, isNull);
+      expect(await File(path).exists(), isFalse);
+      expect(
+        await File(ResumableBasePublish.sidecarPathFor(path)).exists(),
+        isFalse,
+      );
+      expect(publishDir.listSync(), isEmpty);
+    });
+
+    test('clearForProvider also reclaims a corrupt sidecar’s export', () async {
+      final path = await writeExport('corrupt.json', 50);
+      await File(
+        ResumableBasePublish.sidecarPathFor(path),
+      ).writeAsString('{not json');
+
+      await store.clearForProvider('fake');
+
+      expect(await File(path).exists(), isFalse);
+      expect(publishDir.listSync(), isEmpty);
+    });
+
+    test('dataPathForSidecar is the inverse of sidecarPathFor', () async {
+      const data = '/tmp/ssv1_base_dev_1.abc.json';
+      expect(
+        ResumableBasePublish.dataPathForSidecar(
+          ResumableBasePublish.sidecarPathFor(data),
+        ),
+        data,
+      );
+    });
+
     test('clearForProvider drops only that backend’s records', () async {
       final mine = await writeExport('mine.json', 50);
       final theirs = await writeExport('theirs.json', 50);

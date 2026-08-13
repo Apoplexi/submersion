@@ -63,9 +63,13 @@ class FakeCloudStorageProvider implements CloudStorageProvider {
     String filename, {
     String? folderId,
   }) async {
+    // Counted BEFORE the guard: `&&` short-circuits, so folding the increment
+    // into the condition only counted uploads while a failure was being
+    // simulated, contradicting this counter's contract (PR #1033 review).
+    uploadCount++;
     // Models an upload dying partway through a multi-part base: the parts
     // before the cut land, everything after throws (issue #1032 resume tests).
-    if (failUploadsAfter != null && ++uploadCount > failUploadsAfter!) {
+    if (failUploadsAfter != null && uploadCount > failUploadsAfter!) {
       throw const CloudStorageException('upload interrupted (test)');
     }
     final key = _key(folderId, filename);

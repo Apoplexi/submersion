@@ -70,7 +70,18 @@ class ResumableBasePublish {
 
   String get sidecarPath => sidecarPathFor(dataPath);
 
-  static String sidecarPathFor(String dataPath) => '$dataPath.publish';
+  static const String sidecarSuffix = '.publish';
+
+  static String sidecarPathFor(String dataPath) => '$dataPath$sidecarSuffix';
+
+  /// The export a sidecar at [sidecarPath] describes, derived from the name
+  /// alone. Recovers the data file when the sidecar's CONTENTS cannot be read,
+  /// which is the only way a corrupt record's export gets reclaimed -- and it
+  /// can be hundreds of megabytes sitting in a directory nothing else purges.
+  static String dataPathForSidecar(String sidecarPath) =>
+      sidecarPath.endsWith(sidecarSuffix)
+      ? sidecarPath.substring(0, sidecarPath.length - sidecarSuffix.length)
+      : sidecarPath;
 
   Map<String, dynamic> toJson() => {
     'providerId': providerId,
@@ -136,14 +147,20 @@ class ResumableBasePublishStore {
 
     ResumableBasePublish? best;
     await for (final entity in dir.list(followLinks: false)) {
-      if (entity is! File || !entity.path.endsWith('.publish')) continue;
+      if (entity is! File ||
+          !entity.path.endsWith(ResumableBasePublish.sidecarSuffix)) {
+        continue;
+      }
       ResumableBasePublish record;
       try {
         record = ResumableBasePublish.fromJson(
           jsonDecode(await entity.readAsString()) as Map<String, dynamic>,
         );
       } catch (_) {
-        await _deleteQuietly(entity.path);
+        // Drop the export too, not just the record. The path is derivable from
+        // the sidecar's NAME, so an unreadable record is no reason to strand
+        // its bytes here forever (PR #1033 review).
+        await _discardSidecarAndData(entity.path);
         continue;
       }
 
@@ -182,16 +199,28 @@ class ResumableBasePublishStore {
     final dir = await directory;
     if (!await dir.exists()) return;
     await for (final entity in dir.list(followLinks: false)) {
-      if (entity is! File || !entity.path.endsWith('.publish')) continue;
+      if (entity is! File ||
+          !entity.path.endsWith(ResumableBasePublish.sidecarSuffix)) {
+        continue;
+      }
       try {
         final record = ResumableBasePublish.fromJson(
           jsonDecode(await entity.readAsString()) as Map<String, dynamic>,
         );
         if (record.providerId == providerId) await discard(record);
       } catch (_) {
-        await _deleteQuietly(entity.path);
+        await _discardSidecarAndData(entity.path);
       }
     }
+  }
+
+  /// Delete a sidecar and the export its name points at.
+  ///
+  /// Used when the sidecar cannot be parsed, so [discard] (which needs a
+  /// decoded record) is not available.
+  static Future<void> _discardSidecarAndData(String sidecarPath) async {
+    await _deleteQuietly(sidecarPath);
+    await _deleteQuietly(ResumableBasePublish.dataPathForSidecar(sidecarPath));
   }
 
   static Future<void> _deleteQuietly(String path) async {
