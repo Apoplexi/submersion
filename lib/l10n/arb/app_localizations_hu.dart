@@ -2419,6 +2419,52 @@ class AppLocalizationsHu extends AppLocalizations {
       'Törli ezt az ellenőrzőlista-bejegyzést?';
 
   @override
+  String get preDive_sessions_filter => 'Szűrés';
+
+  @override
+  String get preDive_sessions_filterTitle =>
+      'Ellenőrzőlista-futtatások szűrése';
+
+  @override
+  String get preDive_sessions_filterChecklist => 'Ellenőrzőlista';
+
+  @override
+  String get preDive_sessions_filterStatus => 'Állapot';
+
+  @override
+  String get preDive_sessions_filterFlaggedOnly => 'Csak megjelölt futtatások';
+
+  @override
+  String get preDive_sessions_filterDateRange => 'Dátumtartomány';
+
+  @override
+  String get preDive_sessions_filterAnyDate => 'Bármely dátum';
+
+  @override
+  String get preDive_sessions_filterClearAll => 'Összes törlése';
+
+  @override
+  String get preDive_sessions_filterApply => 'Alkalmaz';
+
+  @override
+  String get preDive_sessions_filterFlaggedChip => 'Csak megjelölt';
+
+  @override
+  String get preDive_sessions_emptyFiltered =>
+      'Nincs a szűrőknek megfelelő ellenőrzőlista-futtatás';
+
+  @override
+  String get preDive_sessions_export => 'Exportálás Excelbe';
+
+  @override
+  String get preDive_sessions_exportEmpty => 'Nincs exportálható futtatás';
+
+  @override
+  String preDive_sessions_exportFailed(String error) {
+    return 'Az exportálás sikertelen: $error';
+  }
+
+  @override
   String get preDive_start_title => 'Merülés előtti ellenőrzőlista indítása';
 
   @override

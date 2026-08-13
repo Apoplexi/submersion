@@ -2292,6 +2292,50 @@ class AppLocalizationsZh extends AppLocalizations {
   String get preDive_sessions_deleteConfirm => '要删除此检查清单记录吗？';
 
   @override
+  String get preDive_sessions_filter => '筛选';
+
+  @override
+  String get preDive_sessions_filterTitle => '筛选检查清单记录';
+
+  @override
+  String get preDive_sessions_filterChecklist => '检查清单';
+
+  @override
+  String get preDive_sessions_filterStatus => '状态';
+
+  @override
+  String get preDive_sessions_filterFlaggedOnly => '仅显示有标记的记录';
+
+  @override
+  String get preDive_sessions_filterDateRange => '日期范围';
+
+  @override
+  String get preDive_sessions_filterAnyDate => '任意日期';
+
+  @override
+  String get preDive_sessions_filterClearAll => '全部清除';
+
+  @override
+  String get preDive_sessions_filterApply => '应用';
+
+  @override
+  String get preDive_sessions_filterFlaggedChip => '仅有标记';
+
+  @override
+  String get preDive_sessions_emptyFiltered => '没有符合这些筛选条件的检查清单记录';
+
+  @override
+  String get preDive_sessions_export => '导出到 Excel';
+
+  @override
+  String get preDive_sessions_exportEmpty => '没有可导出的检查清单记录';
+
+  @override
+  String preDive_sessions_exportFailed(String error) {
+    return '导出失败：$error';
+  }
+
+  @override
   String get preDive_start_title => '开始潜前检查清单';
 
   @override

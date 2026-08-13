@@ -2438,6 +2438,52 @@ class AppLocalizationsFr extends AppLocalizations {
       'Supprimer cet enregistrement de checklist ?';
 
   @override
+  String get preDive_sessions_filter => 'Filtrer';
+
+  @override
+  String get preDive_sessions_filterTitle =>
+      'Filtrer les checklists effectuées';
+
+  @override
+  String get preDive_sessions_filterChecklist => 'Checklist';
+
+  @override
+  String get preDive_sessions_filterStatus => 'Statut';
+
+  @override
+  String get preDive_sessions_filterFlaggedOnly => 'Uniquement les anomalies';
+
+  @override
+  String get preDive_sessions_filterDateRange => 'Période';
+
+  @override
+  String get preDive_sessions_filterAnyDate => 'Toutes les dates';
+
+  @override
+  String get preDive_sessions_filterClearAll => 'Tout effacer';
+
+  @override
+  String get preDive_sessions_filterApply => 'Appliquer';
+
+  @override
+  String get preDive_sessions_filterFlaggedChip => 'Anomalies uniquement';
+
+  @override
+  String get preDive_sessions_emptyFiltered =>
+      'Aucune checklist ne correspond à ces filtres';
+
+  @override
+  String get preDive_sessions_export => 'Exporter vers Excel';
+
+  @override
+  String get preDive_sessions_exportEmpty => 'Aucune checklist à exporter';
+
+  @override
+  String preDive_sessions_exportFailed(String error) {
+    return 'Échec de l\'export : $error';
+  }
+
+  @override
   String get preDive_start_title => 'Démarrer la checklist pré-plongée';
 
   @override

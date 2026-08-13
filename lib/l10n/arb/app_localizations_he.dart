@@ -2360,6 +2360,51 @@ class AppLocalizationsHe extends AppLocalizations {
       'למחוק את רשומת רשימת הבדיקה הזו?';
 
   @override
+  String get preDive_sessions_filter => 'סינון';
+
+  @override
+  String get preDive_sessions_filterTitle => 'סינון רשימות בדיקה שבוצעו';
+
+  @override
+  String get preDive_sessions_filterChecklist => 'רשימת בדיקה';
+
+  @override
+  String get preDive_sessions_filterStatus => 'סטטוס';
+
+  @override
+  String get preDive_sessions_filterFlaggedOnly => 'רק ריצות מסומנות';
+
+  @override
+  String get preDive_sessions_filterDateRange => 'טווח תאריכים';
+
+  @override
+  String get preDive_sessions_filterAnyDate => 'כל תאריך';
+
+  @override
+  String get preDive_sessions_filterClearAll => 'נקה הכול';
+
+  @override
+  String get preDive_sessions_filterApply => 'החל';
+
+  @override
+  String get preDive_sessions_filterFlaggedChip => 'מסומנות בלבד';
+
+  @override
+  String get preDive_sessions_emptyFiltered =>
+      'אין רשימות בדיקה התואמות למסננים אלה';
+
+  @override
+  String get preDive_sessions_export => 'ייצוא ל-Excel';
+
+  @override
+  String get preDive_sessions_exportEmpty => 'אין רשימות בדיקה לייצוא';
+
+  @override
+  String preDive_sessions_exportFailed(String error) {
+    return 'הייצוא נכשל: $error';
+  }
+
+  @override
   String get preDive_start_title => 'התחלת רשימת בדיקה לפני צלילה';
 
   @override

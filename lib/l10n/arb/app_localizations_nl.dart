@@ -2414,6 +2414,52 @@ class AppLocalizationsNl extends AppLocalizations {
       'Deze checklistregistratie verwijderen?';
 
   @override
+  String get preDive_sessions_filter => 'Filteren';
+
+  @override
+  String get preDive_sessions_filterTitle => 'Checklistsessies filteren';
+
+  @override
+  String get preDive_sessions_filterChecklist => 'Checklist';
+
+  @override
+  String get preDive_sessions_filterStatus => 'Status';
+
+  @override
+  String get preDive_sessions_filterFlaggedOnly => 'Alleen gemarkeerde sessies';
+
+  @override
+  String get preDive_sessions_filterDateRange => 'Datumbereik';
+
+  @override
+  String get preDive_sessions_filterAnyDate => 'Elke datum';
+
+  @override
+  String get preDive_sessions_filterClearAll => 'Alles wissen';
+
+  @override
+  String get preDive_sessions_filterApply => 'Toepassen';
+
+  @override
+  String get preDive_sessions_filterFlaggedChip => 'Alleen gemarkeerd';
+
+  @override
+  String get preDive_sessions_emptyFiltered =>
+      'Geen checklistsessies voldoen aan deze filters';
+
+  @override
+  String get preDive_sessions_export => 'Exporteren naar Excel';
+
+  @override
+  String get preDive_sessions_exportEmpty =>
+      'Geen checklistsessies om te exporteren';
+
+  @override
+  String preDive_sessions_exportFailed(String error) {
+    return 'Exporteren mislukt: $error';
+  }
+
+  @override
   String get preDive_start_title => 'Pre-dive checklist starten';
 
   @override

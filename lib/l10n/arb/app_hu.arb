@@ -841,6 +841,27 @@
   "preDive_sessions_linkedDive": "Kapcsolt merülés",
   "preDive_sessions_delete": "Törlés",
   "preDive_sessions_deleteConfirm": "Törli ezt az ellenőrzőlista-bejegyzést?",
+  "preDive_sessions_filter": "Szűrés",
+  "preDive_sessions_filterTitle": "Ellenőrzőlista-futtatások szűrése",
+  "preDive_sessions_filterChecklist": "Ellenőrzőlista",
+  "preDive_sessions_filterStatus": "Állapot",
+  "preDive_sessions_filterFlaggedOnly": "Csak megjelölt futtatások",
+  "preDive_sessions_filterDateRange": "Dátumtartomány",
+  "preDive_sessions_filterAnyDate": "Bármely dátum",
+  "preDive_sessions_filterClearAll": "Összes törlése",
+  "preDive_sessions_filterApply": "Alkalmaz",
+  "preDive_sessions_filterFlaggedChip": "Csak megjelölt",
+  "preDive_sessions_emptyFiltered": "Nincs a szűrőknek megfelelő ellenőrzőlista-futtatás",
+  "preDive_sessions_export": "Exportálás Excelbe",
+  "preDive_sessions_exportEmpty": "Nincs exportálható futtatás",
+  "preDive_sessions_exportFailed": "Az exportálás sikertelen: {error}",
+  "@preDive_sessions_exportFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
   "preDive_start_title": "Merülés előtti ellenőrzőlista indítása",
   "preDive_start_template": "Ellenőrzőlista",
   "preDive_start_equipmentSet": "Felszereléskészlet",

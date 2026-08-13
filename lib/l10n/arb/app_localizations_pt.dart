@@ -2431,6 +2431,51 @@ class AppLocalizationsPt extends AppLocalizations {
       'Excluir este registro de lista de verificação?';
 
   @override
+  String get preDive_sessions_filter => 'Filtrar';
+
+  @override
+  String get preDive_sessions_filterTitle => 'Filtrar listas realizadas';
+
+  @override
+  String get preDive_sessions_filterChecklist => 'Lista de verificação';
+
+  @override
+  String get preDive_sessions_filterStatus => 'Estado';
+
+  @override
+  String get preDive_sessions_filterFlaggedOnly => 'Apenas com ocorrências';
+
+  @override
+  String get preDive_sessions_filterDateRange => 'Intervalo de datas';
+
+  @override
+  String get preDive_sessions_filterAnyDate => 'Qualquer data';
+
+  @override
+  String get preDive_sessions_filterClearAll => 'Limpar tudo';
+
+  @override
+  String get preDive_sessions_filterApply => 'Aplicar';
+
+  @override
+  String get preDive_sessions_filterFlaggedChip => 'Apenas ocorrências';
+
+  @override
+  String get preDive_sessions_emptyFiltered =>
+      'Nenhuma lista corresponde a estes filtros';
+
+  @override
+  String get preDive_sessions_export => 'Exportar para Excel';
+
+  @override
+  String get preDive_sessions_exportEmpty => 'Nenhuma lista para exportar';
+
+  @override
+  String preDive_sessions_exportFailed(String error) {
+    return 'Falha na exportação: $error';
+  }
+
+  @override
   String get preDive_start_title => 'Iniciar lista de verificação pré-mergulho';
 
   @override
