@@ -5951,6 +5951,22 @@ class AppLocalizationsZh extends AppLocalizations {
   String get setup_syncPull_continue => '继续';
 
   @override
+  String get setup_syncPull_incomplete_message =>
+      '此账户中的 Submersion 资料库尚未上传完成。请让另一台设备完成同步后重试。';
+
+  @override
+  String get setup_syncPull_incomplete_retry => '重新检查';
+
+  @override
+  String get setup_syncPull_incomplete_title => '资料库上传未完成';
+
+  @override
+  String get setup_syncPull_locked_message => '输入加密口令以解锁此资料库并下载到此设备。';
+
+  @override
+  String get setup_syncPull_locked_title => '此资料库已加密';
+
+  @override
   String get setup_syncPull_noLibrary_message =>
       '此账户中未找到 Submersion 资料库。要重新开始吗？你的连接将被保留。';
 

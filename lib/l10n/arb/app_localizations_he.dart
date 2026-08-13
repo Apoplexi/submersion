@@ -6105,6 +6105,23 @@ class AppLocalizationsHe extends AppLocalizations {
   String get setup_syncPull_continue => 'המשך';
 
   @override
+  String get setup_syncPull_incomplete_message =>
+      'בחשבון זה קיימת ספריית Submersion שהעלאתה מעולם לא הושלמה. אפשרו למכשיר האחר לסיים את הסנכרון ונסו שוב.';
+
+  @override
+  String get setup_syncPull_incomplete_retry => 'בדיקה חוזרת';
+
+  @override
+  String get setup_syncPull_incomplete_title => 'העלאת הספרייה לא הושלמה';
+
+  @override
+  String get setup_syncPull_locked_message =>
+      'הזינו את משפט הסיסמה של ההצפנה כדי לפתוח את הספרייה ולהוריד אותה למכשיר זה.';
+
+  @override
+  String get setup_syncPull_locked_title => 'הספרייה הזו מוצפנת';
+
+  @override
   String get setup_syncPull_noLibrary_message =>
       'לא נמצאה ספריית Submersion בחשבון זה. להתחיל מחדש? החיבור יישמר.';
 

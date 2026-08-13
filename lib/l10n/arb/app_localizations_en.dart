@@ -6152,6 +6152,23 @@ class AppLocalizationsEn extends AppLocalizations {
   String get setup_syncPull_continue => 'Continue';
 
   @override
+  String get setup_syncPull_incomplete_message =>
+      'This account holds a Submersion library that was never finished uploading. Let your other device finish syncing, then try again.';
+
+  @override
+  String get setup_syncPull_incomplete_retry => 'Check again';
+
+  @override
+  String get setup_syncPull_incomplete_title => 'Library upload unfinished';
+
+  @override
+  String get setup_syncPull_locked_message =>
+      'Enter the encryption passphrase to unlock this library and download it to this device.';
+
+  @override
+  String get setup_syncPull_locked_title => 'This library is encrypted';
+
+  @override
   String get setup_syncPull_noLibrary_message =>
       'No existing Submersion library was found on this account. Start fresh instead? Your connection will be kept.';
 

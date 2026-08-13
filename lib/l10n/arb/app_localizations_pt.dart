@@ -6269,6 +6269,25 @@ class AppLocalizationsPt extends AppLocalizations {
   String get setup_syncPull_continue => 'Continuar';
 
   @override
+  String get setup_syncPull_incomplete_message =>
+      'Esta conta contém uma biblioteca do Submersion cujo envio nunca foi concluído. Deixe o seu outro dispositivo terminar a sincronização e tente novamente.';
+
+  @override
+  String get setup_syncPull_incomplete_retry => 'Verificar novamente';
+
+  @override
+  String get setup_syncPull_incomplete_title =>
+      'Envio da biblioteca incompleto';
+
+  @override
+  String get setup_syncPull_locked_message =>
+      'Digite a frase-senha de criptografia para desbloquear esta biblioteca e baixá-la neste dispositivo.';
+
+  @override
+  String get setup_syncPull_locked_title =>
+      'Esta biblioteca está criptografada';
+
+  @override
   String get setup_syncPull_noLibrary_message =>
       'Nenhuma biblioteca do Submersion foi encontrada nesta conta. Começar do zero? Sua conexão será mantida.';
 

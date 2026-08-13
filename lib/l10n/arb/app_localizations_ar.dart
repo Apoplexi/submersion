@@ -6139,6 +6139,23 @@ class AppLocalizationsAr extends AppLocalizations {
   String get setup_syncPull_continue => 'متابعة';
 
   @override
+  String get setup_syncPull_incomplete_message =>
+      'يحتوي هذا الحساب على مكتبة Submersion لم يكتمل رفعها. دع جهازك الآخر ينهي المزامنة ثم أعد المحاولة.';
+
+  @override
+  String get setup_syncPull_incomplete_retry => 'تحقق مرة أخرى';
+
+  @override
+  String get setup_syncPull_incomplete_title => 'لم يكتمل رفع المكتبة';
+
+  @override
+  String get setup_syncPull_locked_message =>
+      'أدخل عبارة مرور التشفير لفتح هذه المكتبة وتنزيلها على هذا الجهاز.';
+
+  @override
+  String get setup_syncPull_locked_title => 'هذه المكتبة مشفّرة';
+
+  @override
   String get setup_syncPull_noLibrary_message =>
       'لم يتم العثور على مكتبة Submersion في هذا الحساب. هل تبدأ من جديد؟ سيتم الاحتفاظ باتصالك.';
 

@@ -10513,6 +10513,36 @@ abstract class AppLocalizations {
   /// **'Continue'**
   String get setup_syncPull_continue;
 
+  /// No description provided for @setup_syncPull_incomplete_message.
+  ///
+  /// In en, this message translates to:
+  /// **'This account holds a Submersion library that was never finished uploading. Let your other device finish syncing, then try again.'**
+  String get setup_syncPull_incomplete_message;
+
+  /// No description provided for @setup_syncPull_incomplete_retry.
+  ///
+  /// In en, this message translates to:
+  /// **'Check again'**
+  String get setup_syncPull_incomplete_retry;
+
+  /// No description provided for @setup_syncPull_incomplete_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Library upload unfinished'**
+  String get setup_syncPull_incomplete_title;
+
+  /// No description provided for @setup_syncPull_locked_message.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the encryption passphrase to unlock this library and download it to this device.'**
+  String get setup_syncPull_locked_message;
+
+  /// No description provided for @setup_syncPull_locked_title.
+  ///
+  /// In en, this message translates to:
+  /// **'This library is encrypted'**
+  String get setup_syncPull_locked_title;
+
   /// No description provided for @setup_syncPull_noLibrary_message.
   ///
   /// In en, this message translates to:

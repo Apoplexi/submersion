@@ -6272,6 +6272,24 @@ class AppLocalizationsEs extends AppLocalizations {
   String get setup_syncPull_continue => 'Continuar';
 
   @override
+  String get setup_syncPull_incomplete_message =>
+      'Esta cuenta contiene una biblioteca de Submersion cuya carga nunca se completó. Deja que tu otro dispositivo termine de sincronizar y vuelve a intentarlo.';
+
+  @override
+  String get setup_syncPull_incomplete_retry => 'Comprobar de nuevo';
+
+  @override
+  String get setup_syncPull_incomplete_title =>
+      'Carga de la biblioteca sin terminar';
+
+  @override
+  String get setup_syncPull_locked_message =>
+      'Introduce la frase de acceso de cifrado para desbloquear esta biblioteca y descargarla en este dispositivo.';
+
+  @override
+  String get setup_syncPull_locked_title => 'Esta biblioteca está cifrada';
+
+  @override
   String get setup_syncPull_noLibrary_message =>
       'No se encontró ninguna biblioteca de Submersion en esta cuenta. ¿Empezar de cero? Tu conexión se mantendrá.';
 

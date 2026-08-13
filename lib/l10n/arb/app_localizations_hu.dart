@@ -6247,6 +6247,24 @@ class AppLocalizationsHu extends AppLocalizations {
   String get setup_syncPull_continue => 'Folytatás';
 
   @override
+  String get setup_syncPull_incomplete_message =>
+      'Ezen a fiókon egy Submersion-könyvtár található, amelynek feltöltése soha nem fejeződött be. Hagyja, hogy a másik eszköz befejezze a szinkronizálást, majd próbálja újra.';
+
+  @override
+  String get setup_syncPull_incomplete_retry => 'Ellenőrzés újra';
+
+  @override
+  String get setup_syncPull_incomplete_title =>
+      'A könyvtár feltöltése befejezetlen';
+
+  @override
+  String get setup_syncPull_locked_message =>
+      'Adja meg a titkosítási jelmondatot a könyvtár feloldásához és az eszközre töltéséhez.';
+
+  @override
+  String get setup_syncPull_locked_title => 'Ez a könyvtár titkosítva van';
+
+  @override
   String get setup_syncPull_noLibrary_message =>
       'Ezen a fiókon nem található Submersion-könyvtár. Új kezdés? A kapcsolat megmarad.';
 
