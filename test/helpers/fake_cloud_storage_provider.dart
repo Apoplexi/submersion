@@ -40,6 +40,10 @@ class FakeCloudStorageProvider extends CloudStorageProvider
   /// When true, [deleteFile] throws, modelling an offline/denied provider.
   bool failDeletes = false;
 
+  /// When true, [listFiles] throws, modelling the listing timeout that left a
+  /// wipe silently incomplete while the UI still claimed success (issue #1032).
+  bool failLists = false;
+
   /// When true, [downloadFile] throws, modelling a transient read failure.
   bool failDownloads = false;
 
@@ -142,6 +146,9 @@ class FakeCloudStorageProvider extends CloudStorageProvider
     String? namePattern,
   }) async {
     operationLog.add('list');
+    if (failLists) {
+      throw const CloudStorageException('list failed (test)');
+    }
     return _files.entries
         .where((e) => namePattern == null || e.key.contains(namePattern))
         .map(

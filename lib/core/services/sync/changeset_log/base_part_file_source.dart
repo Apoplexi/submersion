@@ -25,18 +25,34 @@ class BasePartFileSource {
   final String path;
   final int partSize;
 
+  /// Number of parts [path] will be sliced into, without reading it.
+  ///
+  /// Known from the length alone, so a caller can publish a denominator before
+  /// the first byte moves. Mirrors the empty-file special case below.
+  static int partCountFor(
+    int byteLength, {
+    int partSize = BaseChunker.defaultPartSize,
+  }) => byteLength == 0 ? 1 : (byteLength + partSize - 1) ~/ partSize;
+
   /// Streams the file in [partSize] slices, invoking [upload] for each in order,
   /// and returns the part count plus the `sha256:` whole-file and per-part
   /// checksums (and the total byte length) for the manifest.
+  ///
+  /// [onPartUploaded] fires after each part lands, as `(uploaded, total)`. A
+  /// full base republish -- what a wiped backend forces -- can run to hundreds
+  /// of megabytes, and without this tick the sync UI shows one motionless step
+  /// for the entire transfer and reads as a hang (issue #1032).
   Future<BasePartUploadResult> uploadAll(
-    Future<void> Function(int index, Uint8List bytes) upload,
-  ) async {
+    Future<void> Function(int index, Uint8List bytes) upload, {
+    void Function(int uploaded, int total)? onPartUploaded,
+  }) async {
     final raf = await File(path).open();
     final digestSink = _DigestSink();
     final whole = sha256.startChunkedConversion(digestSink);
     final partChecksums = <String>[];
     try {
       final length = await raf.length();
+      final total = partCountFor(length, partSize: partSize);
       var index = 0;
       if (length == 0) {
         // Mirror BaseChunker.slice(empty) == [Uint8List(0)]: one empty part.
@@ -45,6 +61,7 @@ class BasePartFileSource {
         partChecksums.add(BaseChunker.checksum(empty));
         await upload(0, empty);
         index = 1;
+        onPartUploaded?.call(index, total);
       } else {
         for (var off = 0; off < length; off += partSize) {
           final n = (off + partSize < length) ? partSize : length - off;
@@ -53,6 +70,7 @@ class BasePartFileSource {
           partChecksums.add(BaseChunker.checksum(buf));
           await upload(index, buf);
           index++;
+          onPartUploaded?.call(index, total);
         }
       }
       whole.close();

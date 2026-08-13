@@ -63,6 +63,12 @@ class ChangesetWriter {
     /// Leaving it over-claiming makes the stale-restore detector fire again on
     /// every subsequent sync, wiping all peer cursors each time (#997).
     bool forceBase = false,
+
+    /// Fires as each base part lands, as `(uploaded, total)`. Only a full base
+    /// publish (or a compaction that rewrites one) reports here -- an ordinary
+    /// changeset is a single small upload with nothing to show. See
+    /// [BasePartFileSource.uploadAll] for why this exists (issue #1032).
+    void Function(int uploaded, int total)? onBasePartUploaded,
   }) async {
     final providerId = provider.providerId;
     final ownManifest = await _readOwnManifest(provider, folderId, deviceId);
@@ -129,6 +135,7 @@ class ChangesetWriter {
             ChangesetLogLayout.basePartName(deviceId, newSeq, i),
             folderId: folderId,
           ),
+          onPartUploaded: onBasePartUploaded,
         );
         final manifest = SyncManifest(
           deviceId: deviceId,
@@ -286,6 +293,7 @@ class ChangesetWriter {
         uploadNonce: uploadNonce,
         deviceName: deviceName,
         appliedPeerHlc: appliedPeerHlc,
+        onBasePartUploaded: onBasePartUploaded,
       );
       return ChangesetWriteResult(ChangesetWriteKind.compacted, compSeq);
     }
@@ -354,6 +362,7 @@ class ChangesetWriter {
     String? epochId,
     String? uploadNonce,
     String? deviceName,
+    void Function(int uploaded, int total)? onBasePartUploaded,
   }) async {
     // The fresh base must carry the full deletion log: a peer that still holds
     // a since-deleted record and cold-starts from this base (its prior
@@ -378,6 +387,7 @@ class ChangesetWriter {
           ChangesetLogLayout.basePartName(deviceId, compSeq, i),
           folderId: folderId,
         ),
+        onPartUploaded: onBasePartUploaded,
       );
     } finally {
       try {
