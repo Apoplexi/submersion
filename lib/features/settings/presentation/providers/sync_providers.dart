@@ -619,6 +619,7 @@ class SyncNotifier extends StateNotifier<SyncState> {
   final _log = LoggerService.forClass(SyncNotifier);
   StreamSubscription<void>? _changeSubscription;
   Timer? _autoSyncTimer;
+  Timer? _pendingCountTimer;
   bool _syncInFlight = false;
 
   SyncNotifier(this._syncRepository, this._ref) : super(const SyncState()) {
@@ -705,8 +706,45 @@ class SyncNotifier extends StateNotifier<SyncState> {
 
   void _listenForChanges() {
     _changeSubscription = SyncEventBus.changes.listen((_) {
+      // Refresh the displayed count REGARDLESS of the auto-sync setting.
+      // _scheduleAutoSync returns immediately when auto-sync is off, which is
+      // how the "Synced" chip used to survive a whole session of edits (#990):
+      // nothing else recomputes pendingChanges between syncs.
+      _schedulePendingCountRefresh();
       _scheduleAutoSync();
     });
+  }
+
+  /// Debounced: one local action (a bulk edit, a multi-entity save) fires many
+  /// bus events, and each refresh is two queries.
+  void _schedulePendingCountRefresh() {
+    _pendingCountTimer?.cancel();
+    _pendingCountTimer = Timer(
+      const Duration(milliseconds: 400),
+      _refreshPendingCount,
+    );
+  }
+
+  /// Deliberately narrower than [refreshState]: this runs on every local write,
+  /// so it must not probe the network via isSyncAvailable() nor rewrite
+  /// status/message (which would stomp a sync or an error the user is reading).
+  Future<void> _refreshPendingCount() async {
+    if (!mounted) return;
+    // A sync clears pending records as it publishes; its own post-sync
+    // refreshState lands the settled number.
+    if (state.status == SyncStatus.syncing) return;
+    try {
+      final providerId = _ref.read(cloudStorageProviderProvider)?.providerId;
+      final count = await _syncRepository.getUnsyncedChangeCount(
+        providerId: providerId,
+      );
+      if (!mounted || state.pendingChanges == count) return;
+      state = state.copyWith(pendingChanges: count);
+    } catch (e) {
+      // A count is advisory: leave the last known value rather than pushing
+      // the whole page into an error state over a failed status query.
+      _log.error('Failed to refresh pending count', error: e);
+    }
   }
 
   void _scheduleAutoSync() {
@@ -742,7 +780,11 @@ class SyncNotifier extends StateNotifier<SyncState> {
       final lastSync = await _syncRepository.getLastSyncTime(
         forProvider: activeProvider?.providerId,
       );
-      final pendingCount = await _syncRepository.getPendingCount();
+      // Same composite count the live refresh uses (record edits + tombstones
+      // above the publish watermark), so the two paths cannot disagree.
+      final pendingCount = await _syncRepository.getUnsyncedChangeCount(
+        providerId: activeProvider?.providerId,
+      );
       final conflictCount = await _syncRepository.getConflictCount();
       final isAvailable = await _syncService.isSyncAvailable();
 
@@ -1436,6 +1478,7 @@ class SyncNotifier extends StateNotifier<SyncState> {
   @override
   void dispose() {
     _autoSyncTimer?.cancel();
+    _pendingCountTimer?.cancel();
     _changeSubscription?.cancel();
     super.dispose();
   }
