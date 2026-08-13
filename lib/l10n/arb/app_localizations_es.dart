@@ -19324,6 +19324,14 @@ class AppLocalizationsEs extends AppLocalizations {
       'No se encontraron puertos serie USB. ¿Está el ordenador de buceo conectado y encendido?';
 
   @override
+  String get diveComputer_download_stalePairing =>
+      'El emparejamiento Bluetooth de este ordenador de buceo está obsoleto. Olvida el ordenador de buceo en los ajustes de Bluetooth de tu dispositivo y vuelve a emparejarlo desde el menú Bluetooth del ordenador de buceo.';
+
+  @override
+  String get diveComputer_download_discoveryStalled =>
+      'Se conectó al ordenador de buceo, pero dejó de responder antes de que comenzara la descarga. Normalmente esto significa que el emparejamiento Bluetooth está obsoleto: olvida el ordenador de buceo en los ajustes de Bluetooth de tu dispositivo y vuelve a intentarlo.';
+
+  @override
   String diveComputer_download_serialConnectFailedWithDetails(Object details) {
     return 'No se pudo conectar al ordenador de buceo.\n\nDetalles de diagnóstico (compartir con los desarrolladores):\n$details';
   }

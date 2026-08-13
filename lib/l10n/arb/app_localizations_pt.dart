@@ -19311,6 +19311,14 @@ class AppLocalizationsPt extends AppLocalizations {
       'Nenhuma porta serial USB encontrada. O computador de mergulho está conectado e ligado?';
 
   @override
+  String get diveComputer_download_stalePairing =>
+      'O emparelhamento Bluetooth deste computador de mergulho está desatualizado. Esqueça o computador de mergulho nas definições de Bluetooth do seu dispositivo e emparelhe-o novamente a partir do menu Bluetooth do computador de mergulho.';
+
+  @override
+  String get diveComputer_download_discoveryStalled =>
+      'Ligou-se ao computador de mergulho, mas ele deixou de responder antes de a transferência começar. Normalmente isto significa que o emparelhamento Bluetooth está desatualizado: esqueça o computador de mergulho nas definições de Bluetooth do seu dispositivo e tente novamente.';
+
+  @override
   String diveComputer_download_serialConnectFailedWithDetails(Object details) {
     return 'Não foi possível conectar ao computador de mergulho.\n\nDetalhes de diagnóstico (compartilhe com os desenvolvedores):\n$details';
   }

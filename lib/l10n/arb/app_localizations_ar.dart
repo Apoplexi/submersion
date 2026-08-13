@@ -18961,6 +18961,14 @@ class AppLocalizationsAr extends AppLocalizations {
       'لم يتم العثور على منافذ USB تسلسلية. هل حاسوب الغوص متصل وقيد التشغيل؟';
 
   @override
+  String get diveComputer_download_stalePairing =>
+      'إقران البلوتوث لكمبيوتر الغوص هذا لم يعد صالحًا. انسَ كمبيوتر الغوص من إعدادات البلوتوث في جهازك، ثم أعد إقرانه من قائمة البلوتوث في كمبيوتر الغوص.';
+
+  @override
+  String get diveComputer_download_discoveryStalled =>
+      'تم الاتصال بكمبيوتر الغوص، لكنه توقف عن الاستجابة قبل بدء التنزيل. يعني هذا عادةً أن إقران البلوتوث لم يعد صالحًا: انسَ كمبيوتر الغوص من إعدادات البلوتوث في جهازك ثم حاول مرة أخرى.';
+
+  @override
   String diveComputer_download_serialConnectFailedWithDetails(Object details) {
     return 'تعذر الاتصال بحاسوب الغوص.\n\nتفاصيل التشخيص (شاركها مع المطورين):\n$details';
   }
