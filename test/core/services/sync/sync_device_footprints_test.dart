@@ -97,7 +97,7 @@ void main() {
       seedManifest('old', epochId: 'e1');
       cloud.seedFile(
         ChangesetLogLayout.retiredMarkerName('old'),
-        RetirementMarker(deviceId: 'old', retiredAt: 5).toBytes(),
+        const RetirementMarker(deviceId: 'old', retiredAt: 5).toBytes(),
       );
 
       final all = await footprints.list(
@@ -109,48 +109,57 @@ void main() {
       expect(all.single.state, SyncDeviceFootprintState.retired);
     });
 
-    test('files with no readable manifest are unreadable, never stale', () async {
-      // An interrupted publish looks exactly like this. Calling it stale would
-      // invite the user to delete an upload that is still in flight.
-      cloud.seedFile(
-        ChangesetLogLayout.basePartName('half', 1, 0),
-        bytes('partial'),
-      );
+    test(
+      'files with no readable manifest are unreadable, never stale',
+      () async {
+        // An interrupted publish looks exactly like this. Calling it stale would
+        // invite the user to delete an upload that is still in flight.
+        cloud.seedFile(
+          ChangesetLogLayout.basePartName('half', 1, 0),
+          bytes('partial'),
+        );
 
-      final all = await footprints.list(
-        provider: cloud,
-        selfDeviceId: 'me',
-        currentEpochId: 'e1',
-      );
+        final all = await footprints.list(
+          provider: cloud,
+          selfDeviceId: 'me',
+          currentEpochId: 'e1',
+        );
 
-      expect(all.single.state, SyncDeviceFootprintState.unreadable);
-      expect(
-        all.single.isSafeToRemove,
-        isFalse,
-        reason: 'no manifest means no basis to judge it disposable',
-      );
-    });
+        expect(all.single.state, SyncDeviceFootprintState.unreadable);
+        expect(
+          all.single.isSafeToRemove,
+          isFalse,
+          reason: 'no manifest means no basis to judge it disposable',
+        );
+      },
+    );
 
-    test('a corrupt manifest downgrades one device, not the whole survey', () async {
-      seedManifest('good', epochId: 'e1');
-      cloud.seedFile(ChangesetLogLayout.manifestName('bad'), bytes('not json'));
+    test(
+      'a corrupt manifest downgrades one device, not the whole survey',
+      () async {
+        seedManifest('good', epochId: 'e1');
+        cloud.seedFile(
+          ChangesetLogLayout.manifestName('bad'),
+          bytes('not json'),
+        );
 
-      final all = await footprints.list(
-        provider: cloud,
-        selfDeviceId: 'me',
-        currentEpochId: 'e1',
-      );
+        final all = await footprints.list(
+          provider: cloud,
+          selfDeviceId: 'me',
+          currentEpochId: 'e1',
+        );
 
-      expect(all, hasLength(2));
-      expect(
-        all.firstWhere((f) => f.deviceId == 'bad').state,
-        SyncDeviceFootprintState.unreadable,
-      );
-      expect(
-        all.firstWhere((f) => f.deviceId == 'good').state,
-        SyncDeviceFootprintState.active,
-      );
-    });
+        expect(all, hasLength(2));
+        expect(
+          all.firstWhere((f) => f.deviceId == 'bad').state,
+          SyncDeviceFootprintState.unreadable,
+        );
+        expect(
+          all.firstWhere((f) => f.deviceId == 'good').state,
+          SyncDeviceFootprintState.active,
+        );
+      },
+    );
 
     test('sorts this device first, then most recently published', () async {
       seedManifest('me', epochId: 'e1', updatedAt: 1);
@@ -222,7 +231,10 @@ void main() {
         selfDeviceId: 'me',
       );
 
-      expect(cloud.bytesOf(ChangesetLogLayout.manifestName('keeper')), isNotNull);
+      expect(
+        cloud.bytesOf(ChangesetLogLayout.manifestName('keeper')),
+        isNotNull,
+      );
     });
 
     test('deletes nothing when the marker cannot be written', () async {

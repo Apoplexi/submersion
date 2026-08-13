@@ -14,6 +14,14 @@ final syncDeviceFootprintsProvider = Provider<SyncDeviceFootprints>(
 /// A network read, so it is a FutureProvider the page can refresh explicitly
 /// rather than anything the app polls -- a user opens this once to work out
 /// where their cloud space went (issue #1032), not continuously.
+// no-tick: what this reads lives in the CLOUD, not in any local table, so no
+// database tick can tell it anything. The repository call it makes is
+// getDeviceId -- this install's own sync identity, which changes only through
+// Repair Sync, and only while this autoDispose provider has no listeners
+// because that action lives on the page you must leave here to reach. The
+// listing itself goes stale the moment another device publishes, which no
+// local tick can observe either; the page carries an explicit Refresh for
+// exactly that reason, and every mutation here invalidates this provider.
 final syncDeviceFootprintListProvider =
     FutureProvider.autoDispose<List<SyncDeviceFootprint>>((ref) async {
       final provider = ref.watch(cloudStorageProviderProvider);

@@ -80,8 +80,23 @@ class _FakeSyncNotifier extends StateNotifier<SyncState>
 
 /// Pumps the page with [fake] backing syncStateProvider. Returns the fake.
 /// SharedPreferences backs the encryption-status row (preference flag read).
+/// The page is a ListView of tall, wordy tiles and keeps gaining rows (the
+/// device browser landed in #1032). Off-screen ListView children are never
+/// built, so on the default 800x600 surface the last action silently stops
+/// existing and every finder for it reports "found 0". Give the tests room for
+/// the whole page rather than teaching each one to scroll.
+void _useTallSurface(WidgetTester tester) {
+  tester.view.physicalSize = const Size(1000, 2400);
+  tester.view.devicePixelRatio = 1.0;
+  addTearDown(() {
+    tester.view.resetPhysicalSize();
+    tester.view.resetDevicePixelRatio();
+  });
+}
+
 Future<_FakeSyncNotifier> _pump(WidgetTester tester) async {
   final fake = _FakeSyncNotifier();
+  _useTallSurface(tester);
   SharedPreferences.setMockInitialValues({});
   final prefs = await SharedPreferences.getInstance();
   await tester.pumpWidget(
@@ -104,6 +119,7 @@ Future<_FakeSyncNotifier> _pump(WidgetTester tester) async {
 /// Pump without a fake notifier, for display-only assertions. Preferences
 /// still need backing (the encryption-status row reads the flag).
 Future<void> _pumpBare(WidgetTester tester) async {
+  _useTallSurface(tester);
   SharedPreferences.setMockInitialValues({});
   final prefs = await SharedPreferences.getInstance();
   await tester.pumpWidget(
