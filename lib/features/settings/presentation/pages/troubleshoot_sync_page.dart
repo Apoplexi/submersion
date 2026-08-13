@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:submersion/core/services/sync/sync_cleanup_outcome.dart';
+import 'package:submersion/features/settings/presentation/pages/sync_devices_page.dart';
 import 'package:submersion/features/settings/presentation/providers/sync_providers.dart';
 import 'package:submersion/features/settings/presentation/widgets/sync_maintenance_progress_dialog.dart';
 import 'package:submersion/features/settings/presentation/widgets/encryption_settings_section.dart';
@@ -41,6 +42,20 @@ class TroubleshootSyncPage extends ConsumerWidget {
             onTap: () => _confirmRebuild(context, ref),
           ),
           const Divider(),
+          ListTile(
+            leading: const Icon(Icons.devices_other),
+            title: const Text('Devices on this backend'),
+            subtitle: const Text(
+              'See every device holding files here, how much space each uses, '
+              'and remove leftovers from libraries no device syncs from any '
+              'more. Your dive data is not affected.',
+            ),
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute<void>(
+                builder: (context) => const SyncDevicesPage(),
+              ),
+            ),
+          ),
           ListTile(
             leading: const Icon(Icons.cleaning_services_outlined),
             title: const Text('Remove this device’s cloud files'),
