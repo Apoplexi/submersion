@@ -226,13 +226,29 @@ class _DiveListContentState extends ConsumerState<DiveListContent> {
   ///
   /// Clearing the highlight keeps the detail pane from arguing with the bulk
   /// selection about what the row means.
-  void _enterSelectionMode(String? initialId) {
+  void _enterSelectionMode(String? initialId, {String? seedId}) {
     ref.read(highlightedDiveIdProvider.notifier).state = null;
     if (initialId == null) {
       _selection.enterExplicit();
     } else {
-      _selection.enterImplicit(initialId);
+      _selection.enterImplicit(initialId, seedId: seedId);
     }
+  }
+
+  /// Cmd/Ctrl-click [id], carrying the highlighted dive into the selection.
+  ///
+  /// Outside selection mode the highlighted row is what the user sees as
+  /// selected, so a modifier-click adds to it rather than replacing it. A
+  /// highlight that filtering has pushed out of [orderedIds] is ignored, so
+  /// the count can never include a dive that is not on screen.
+  void _modifierTap(String id, List<String> orderedIds) {
+    final highlighted = ref.read(highlightedDiveIdProvider);
+    _enterSelectionMode(
+      id,
+      seedId: highlighted != null && orderedIds.contains(highlighted)
+          ? highlighted
+          : null,
+    );
   }
 
   void _exitSelectionMode() => _selection.exit();
@@ -661,7 +677,7 @@ class _DiveListContentState extends ConsumerState<DiveListContent> {
       return;
     }
     if (SelectableListScope.isModifierPressed()) {
-      _enterSelectionMode(id);
+      _modifierTap(id, dives.map((d) => d.id).toList());
       return;
     }
     // No-op when the id is gone. A stale tap callback firing after the list
@@ -1204,23 +1220,43 @@ class _DiveListContentState extends ConsumerState<DiveListContent> {
   /// The outer Scaffold, profile panel, map, and column settings are all
   /// managed by [TableModeLayout].
   Widget _buildTableModeScaffold(BuildContext context, DiveFilterState filter) {
-    final content = _buildTableView(context, filter);
+    // Pass the real dive list, not an empty one. Passing const [] made
+    // select-all vanish and select-by-date-range select nothing whenever the
+    // list was in table mode.
+    final tableDives = ref.watch(allDivesForTableProvider).value ?? const [];
+    final visibleIds = tableDives.map((d) => d.id).toList();
 
-    if (_isSelectionMode) {
-      // Pass the real dive list, not an empty one. Passing const [] made
-      // select-all vanish and select-by-date-range select nothing whenever
-      // the list was in table mode.
-      final tableDives = ref.read(allDivesForTableProvider).value ?? const [];
-      return Column(
-        children: [
-          _buildSelectionBar(
-            tableDives.map((d) => DiveSummary.fromDive(d)).toList(),
-          ),
-          Expanded(child: content),
-        ],
-      );
-    }
-    return content;
+    // Same pruning the list path does: drop checked dives that fell out of
+    // the visible list, so the count always matches what is on screen.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _selection.pruneTo(visibleIds);
+    });
+
+    // The scope carries Escape, Ctrl/Cmd-A and the Android back handling, and
+    // the builder is what repaints the table as checks change -- the table is
+    // built inside it for that reason.
+    return SelectableListScope(
+      controller: _selection,
+      selectableIds: visibleIds,
+      child: ValueListenableBuilder<SelectionState>(
+        valueListenable: _selection,
+        builder: (context, selection, _) {
+          final content = _buildTableView(context, filter);
+
+          if (selection.isActive) {
+            return Column(
+              children: [
+                _buildSelectionBar(
+                  tableDives.map((d) => DiveSummary.fromDive(d)).toList(),
+                ),
+                Expanded(child: content),
+              ],
+            );
+          }
+          return content;
+        },
+      ),
+    );
   }
 
   /// Build the DiveTableView widget from the full-Dive provider.
@@ -1241,9 +1277,17 @@ class _DiveListContentState extends ConsumerState<DiveListContent> {
               child: DiveTableView(
                 dives: dives,
                 onDiveTapDown: (id) {
-                  if (!_isSelectionMode) {
-                    ref.read(highlightedDiveIdProvider.notifier).state = id;
+                  // Rows carry a double-tap, so onDiveTap only resolves after
+                  // the double-tap timer -- long after this fires. A modified
+                  // click is a selection gesture, not a navigation one:
+                  // moving the highlight here would overwrite the very anchor
+                  // the shift-click is about to extend from.
+                  if (_isSelectionMode ||
+                      SelectableListScope.isShiftPressed() ||
+                      SelectableListScope.isModifierPressed()) {
+                    return;
                   }
+                  ref.read(highlightedDiveIdProvider.notifier).state = id;
                 },
                 onDiveTap: (id) {
                   // Table mode now honours modifier and shift clicks too, so
@@ -1254,7 +1298,7 @@ class _DiveListContentState extends ConsumerState<DiveListContent> {
                   if (SelectableListScope.isShiftPressed()) {
                     _selectRangeTo(id, summaries);
                   } else if (SelectableListScope.isModifierPressed()) {
-                    _enterSelectionMode(id);
+                    _modifierTap(id, summaries.map((d) => d.id).toList());
                   } else if (_isSelectionMode) {
                     _toggleSelection(id);
                   }

@@ -358,7 +358,6 @@ class _TripListContentState extends ConsumerState<TripListContent> {
     AsyncValue<List<TripWithStats>> tripsAsync,
     TripFilterState filter,
   ) {
-    final tableContent = _buildTableView(context, tripsAsync, filter);
     final loadedTrips = tripsAsync.value ?? const <TripWithStats>[];
     final visibleIds = loadedTrips.map((t) => t.trip.id).toList();
 
@@ -371,14 +370,21 @@ class _TripListContentState extends ConsumerState<TripListContent> {
       selectableIds: visibleIds,
       child: ValueListenableBuilder<SelectionState>(
         valueListenable: _selection,
-        builder: (context, selection, _) => selection.isActive
-            ? Column(
-                children: [
-                  _buildSelectionBar(loadedTrips, SelectionBarShell.pane),
-                  Expanded(child: tableContent),
-                ],
-              )
-            : tableContent,
+        builder: (context, selection, _) {
+          // Built inside the builder so the table's own rows re-render as
+          // checks change; building it outside left them on a stale
+          // selectedIds while only the bar updated.
+          final tableContent = _buildTableView(context, tripsAsync, filter);
+
+          return selection.isActive
+              ? Column(
+                  children: [
+                    _buildSelectionBar(loadedTrips, SelectionBarShell.pane),
+                    Expanded(child: tableContent),
+                  ],
+                )
+              : tableContent;
+        },
       ),
     );
   }

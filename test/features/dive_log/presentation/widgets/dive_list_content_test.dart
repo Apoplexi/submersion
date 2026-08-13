@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -1092,6 +1093,97 @@ void main() {
         expect(tile('d2').isChecked, isFalse);
       },
     );
+
+    // Table rows carry an onDoubleTap, so onDiveTap only resolves once the
+    // double-tap timer expires, and the modifier has to stay held across that
+    // wait. The tap-down handler must not move the highlight in the meantime:
+    // that highlight is the anchor the shift-click extends from.
+    testWidgets('table mode: shift-tap extends from the tapped row', (
+      tester,
+    ) async {
+      final dives = fourDives();
+      final base = await getBaseOverrides();
+      await tester.pumpWidget(
+        testApp(
+          overrides: [
+            ...base,
+            diveListViewModeProvider.overrideWith((ref) => ListViewMode.table),
+            highlightedDiveIdProvider.overrideWith((ref) => null),
+            allDivesForTableProvider.overrideWithValue(AsyncValue.data(dives)),
+            tableViewConfigProvider.overrideWith(
+              (ref) => _TestTableConfigNotifier(
+                TableViewConfig(
+                  columns: [
+                    TableColumnConfig(
+                      field: DiveField.siteName,
+                      isPinned: true,
+                    ),
+                    TableColumnConfig(field: DiveField.maxDepth),
+                  ],
+                ),
+              ),
+            ),
+          ],
+          child: const DiveListContent(showAppBar: false),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // Plain tap highlights the first row. Settle past the double-tap window
+      // so the next tap is not read as a double-tap.
+      await tester.tap(find.text('Aaa'));
+      await tester.pump(const Duration(milliseconds: 500));
+      await tester.pumpAndSettle();
+
+      await tester.sendKeyDownEvent(LogicalKeyboardKey.shiftLeft);
+      await tester.tap(find.text('Ccc'));
+      await tester.pump(const Duration(milliseconds: 500));
+      await tester.sendKeyUpEvent(LogicalKeyboardKey.shiftLeft);
+      await tester.pumpAndSettle();
+
+      expect(find.text('3 selected'), findsOneWidget);
+    });
+
+    testWidgets('modifier-tap checks the highlighted dive too', (tester) async {
+      // Cmd on macOS, Control elsewhere -- mirrors
+      // SelectableListScope.isModifierPressed so this passes on the macOS dev
+      // machine and the Linux CI runner alike.
+      final modifierKey = defaultTargetPlatform == TargetPlatform.macOS
+          ? LogicalKeyboardKey.metaLeft
+          : LogicalKeyboardKey.controlLeft;
+
+      final overrides = await _buildPhoneOverrides(
+        dives: fourDives(),
+        viewMode: ListViewMode.compact,
+        highlightedDiveId: 'd2',
+      );
+      await tester.pumpWidget(
+        testApp(
+          overrides: overrides,
+          child: const DiveListContent(showAppBar: false),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      CompactDiveListTile tile(String id) => tester
+          .widgetList<CompactDiveListTile>(find.byType(CompactDiveListTile))
+          .firstWhere((t) => t.diveId == id);
+      Finder tileFinder(String id) => find.byWidgetPredicate(
+        (w) => w is CompactDiveListTile && w.diveId == id,
+      );
+
+      await tester.sendKeyDownEvent(modifierKey);
+      await tester.tap(tileFinder('d4'));
+      await tester.sendKeyUpEvent(modifierKey);
+      await tester.pumpAndSettle();
+
+      // The highlighted row was the user's on-screen selection, so it joins
+      // the checked set rather than vanishing.
+      expect(tile('d2').isChecked, isTrue);
+      expect(tile('d4').isChecked, isTrue);
+      expect(tile('d1').isChecked, isFalse);
+      expect(tile('d3').isChecked, isFalse);
+    });
 
     testWidgets('compact view: long-press enters selection and tap toggles', (
       tester,

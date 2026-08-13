@@ -1,5 +1,7 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
@@ -326,6 +328,55 @@ void main() {
       expect(find.text('Maldives Trip'), findsOneWidget);
       expect(find.text('Red Sea Safari'), findsOneWidget);
       expect(find.text('Indonesia Live'), findsOneWidget);
+    });
+
+    // The table must be built inside the selection listener, or it keeps the
+    // isSelectionMode and selectedIds it was first built with.
+    //
+    // Pointer gestures hide this: tap-down writes highlightedTripIdProvider,
+    // which the widget watches, so every press happens to rebuild the whole
+    // subtree. Ctrl/Cmd-A changes the selection without any pointer-down, so
+    // it is the gesture that actually exercises the listener -- the bar would
+    // report "3 selected" over rows still drawn with no checkboxes at all.
+    testWidgets('Ctrl/Cmd-A repaints the table rows, not just the bar', (
+      tester,
+    ) async {
+      final selectAllKey = defaultTargetPlatform == TargetPlatform.macOS
+          ? LogicalKeyboardKey.metaLeft
+          : LogicalKeyboardKey.controlLeft;
+
+      final trips = [
+        _makeTrip(id: 't1', name: 'Maldives Trip'),
+        _makeTrip(id: 't2', name: 'Red Sea Safari'),
+        _makeTrip(id: 't3', name: 'Indonesia Live'),
+      ];
+
+      final overrides = await _buildOverrides(trips: trips);
+
+      await tester.pumpWidget(
+        testApp(
+          overrides: overrides,
+          child: const TripListContent(showAppBar: true),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.sendKeyDownEvent(selectAllKey);
+      await tester.sendKeyEvent(LogicalKeyboardKey.keyA);
+      await tester.sendKeyUpEvent(selectAllKey);
+      await tester.pumpAndSettle();
+
+      expect(find.text('3 selected'), findsOneWidget);
+
+      final checked = tester
+          .widgetList<Checkbox>(find.byType(Checkbox))
+          .where((c) => c.value ?? false)
+          .length;
+      expect(
+        checked,
+        3,
+        reason: 'rows must repaint as checked, not just the count in the bar',
+      );
     });
 
     testWidgets('shows empty state when no trips', (tester) async {

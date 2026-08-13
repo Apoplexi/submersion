@@ -1,4 +1,6 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
@@ -859,6 +861,119 @@ void main() {
         expect(find.byType(FlutterMap), findsWidgets);
       },
     );
+  });
+
+  // ---------------------------------------------------------------------------
+  // Modifier and shift clicks seeded by the highlighted row.
+  //
+  // A plain click highlights a site without checking it, so the highlight is
+  // the user's on-screen selection. Shift and Cmd/Ctrl clicks must both treat
+  // it as the origin, the way the dive list does.
+  // ---------------------------------------------------------------------------
+
+  group('selection seeded by the highlighted site', () {
+    List<SiteWithDiveCount> fourSites() => [
+      _makeSite(id: 's1', name: 'Alpha Site'),
+      _makeSite(id: 's2', name: 'Bravo Site'),
+      _makeSite(id: 's3', name: 'Charlie Site'),
+      _makeSite(id: 's4', name: 'Delta Site'),
+    ];
+
+    // Cmd on macOS, Control elsewhere -- mirrors
+    // SelectableListScope.isModifierPressed so the test passes on both the
+    // macOS dev machine and the Linux CI runner.
+    final modifierKey = defaultTargetPlatform == TargetPlatform.macOS
+        ? LogicalKeyboardKey.metaLeft
+        : LogicalKeyboardKey.controlLeft;
+
+    Future<CompactSiteListTile Function(String)> pumpList(
+      WidgetTester tester,
+    ) async {
+      _setMobileTestSurfaceSize(tester);
+      final overrides = await _buildPhoneOverrides(
+        sites: fourSites(),
+        viewMode: ListViewMode.compact,
+        highlightedSiteId: 's2',
+      );
+      await tester.pumpWidget(
+        testApp(
+          overrides: overrides,
+          child: const SiteListContent(showAppBar: false),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      return (String name) => tester
+          .widgetList<CompactSiteListTile>(find.byType(CompactSiteListTile))
+          .firstWhere((t) => t.name == name);
+    }
+
+    testWidgets('shift-tap extends from the highlighted site', (tester) async {
+      final tile = await pumpList(tester);
+
+      await tester.sendKeyDownEvent(LogicalKeyboardKey.shiftLeft);
+      await tester.tap(find.text('Delta Site'));
+      await tester.sendKeyUpEvent(LogicalKeyboardKey.shiftLeft);
+      await tester.pumpAndSettle();
+
+      expect(tile('Alpha Site').isSelected, isFalse);
+      expect(tile('Bravo Site').isSelected, isTrue);
+      expect(tile('Charlie Site').isSelected, isTrue);
+      expect(tile('Delta Site').isSelected, isTrue);
+    });
+
+    testWidgets('modifier-tap checks the highlighted site too', (tester) async {
+      final tile = await pumpList(tester);
+
+      await tester.sendKeyDownEvent(modifierKey);
+      await tester.tap(find.text('Delta Site'));
+      await tester.sendKeyUpEvent(modifierKey);
+      await tester.pumpAndSettle();
+
+      expect(tile('Bravo Site').isSelected, isTrue);
+      expect(tile('Delta Site').isSelected, isTrue);
+      expect(tile('Alpha Site').isSelected, isFalse);
+      expect(tile('Charlie Site').isSelected, isFalse);
+    });
+
+    // Detailed mode paints the highlight through SiteListTile.isSelected,
+    // which -- unlike the compact and dense tiles -- is not gated on being
+    // outside selection mode. A highlight left set there is what the user
+    // sees as "highlighted, but not selected".
+    testWidgets('detailed view leaves no highlighted-but-unchecked row', (
+      tester,
+    ) async {
+      _setMobileTestSurfaceSize(tester);
+      final overrides = await _buildPhoneOverrides(
+        sites: fourSites(),
+        viewMode: ListViewMode.detailed,
+        highlightedSiteId: 's2',
+      );
+      await tester.pumpWidget(
+        testApp(
+          overrides: overrides,
+          child: const SiteListContent(showAppBar: false),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.sendKeyDownEvent(modifierKey);
+      await tester.tap(find.text('Delta Site'));
+      await tester.sendKeyUpEvent(modifierKey);
+      await tester.pumpAndSettle();
+
+      for (final tile in tester.widgetList<SiteListTile>(
+        find.byType(SiteListTile),
+      )) {
+        expect(
+          tile.isSelected && !tile.isChecked,
+          isFalse,
+          reason:
+              '${tile.name} reads as highlighted while no bulk action '
+              'would touch it',
+        );
+      }
+    });
   });
 }
 

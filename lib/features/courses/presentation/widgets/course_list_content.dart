@@ -324,9 +324,29 @@ class _CourseListContentState extends ConsumerState<CourseListContent> {
     BuildContext context,
     AsyncValue<List<Course>> coursesAsync,
   ) {
-    final tableContent = _buildTableView(context, coursesAsync);
+    // The table renders the raw list, not the status-filtered one the list
+    // modes render, so selectable ids come from the raw list here -- pruning
+    // must follow whichever path is on screen.
+    final visibleIds = (coursesAsync.value ?? const <Course>[])
+        .map((c) => c.id)
+        .toList();
 
-    return tableContent;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _selection.pruneTo(visibleIds);
+    });
+
+    // The scope carries Escape, Ctrl/Cmd-A and the Android back handling, and
+    // the builder is what repaints the table as checks change -- the table is
+    // built inside it for that reason.
+    return SelectableListScope(
+      controller: _selection,
+      selectableIds: visibleIds,
+      child: ValueListenableBuilder<SelectionState>(
+        valueListenable: _selection,
+        builder: (context, selection, _) =>
+            _buildTableView(context, coursesAsync),
+      ),
+    );
   }
 
   /// Build the [EntityTableView] for course table mode.
