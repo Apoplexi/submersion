@@ -16,6 +16,22 @@ import 'package:submersion/core/services/sync/sync_device_footprint.dart';
 /// hundreds of files accumulated from a single device and nothing in the app
 /// could account for them.
 class SyncDeviceFootprints {
+  SyncDeviceFootprints({this.cloudCallTimeout = const Duration(seconds: 8)});
+
+  /// Ceiling on every individual cloud call here.
+  ///
+  /// Both entry points run in front of a user who cannot leave: [list] behind
+  /// a page-filling spinner, and [retirePeer] behind a deliberately
+  /// non-dismissible progress dialog with no back button. An unbounded call
+  /// against a stalled connection strands them there indefinitely -- the exact
+  /// "app is hung, force-quit it" failure this whole change set exists to end,
+  /// and force-quitting mid-retire is what leaves a half-deleted device.
+  ///
+  /// 8s matches the ceiling `SyncService`'s cleanup helpers already use, so
+  /// the two paths fail on the same schedule. Injectable so tests can drive a
+  /// timeout without waiting one out.
+  final Duration cloudCallTimeout;
+
   final _log = LoggerService.forClass(SyncDeviceFootprints);
 
   /// Every device with files in the sync folder, newest first.
@@ -33,10 +49,12 @@ class SyncDeviceFootprints {
     String? currentEpochId,
     String? folderId,
   }) async {
-    final files = await provider.listFiles(
-      folderId: folderId,
-      namePattern: ChangesetLogLayout.listPattern,
-    );
+    final files = await provider
+        .listFiles(
+          folderId: folderId,
+          namePattern: ChangesetLogLayout.listPattern,
+        )
+        .timeout(cloudCallTimeout);
 
     final grouped = <String, List<CloudFileInfo>>{};
     for (final f in files) {
@@ -92,7 +110,9 @@ class SyncDeviceFootprints {
     if (manifestFile != null) {
       try {
         manifest = SyncManifest.fromBytes(
-          await provider.downloadFile(manifestFile.id),
+          await provider
+              .downloadFile(manifestFile.id)
+              .timeout(cloudCallTimeout),
         );
       } catch (e) {
         // Encrypted without a key, corrupt, or a torn write. Reported as
@@ -156,14 +176,16 @@ class SyncDeviceFootprints {
     }
 
     try {
-      await provider.uploadFile(
-        RetirementMarker(
-          deviceId: deviceId,
-          retiredAt: DateTime.now().millisecondsSinceEpoch,
-        ).toBytes(),
-        ChangesetLogLayout.retiredMarkerName(deviceId),
-        folderId: folderId,
-      );
+      await provider
+          .uploadFile(
+            RetirementMarker(
+              deviceId: deviceId,
+              retiredAt: DateTime.now().millisecondsSinceEpoch,
+            ).toBytes(),
+            ChangesetLogLayout.retiredMarkerName(deviceId),
+            folderId: folderId,
+          )
+          .timeout(cloudCallTimeout);
     } catch (e) {
       // Without a durable marker the fence does not exist, so deleting now
       // would be actively unsafe. Report nothing done and let the user retry.
@@ -173,10 +195,12 @@ class SyncDeviceFootprints {
 
     final List<CloudFileInfo> files;
     try {
-      files = await provider.listFiles(
-        folderId: folderId,
-        namePattern: ChangesetLogLayout.listPattern,
-      );
+      files = await provider
+          .listFiles(
+            folderId: folderId,
+            namePattern: ChangesetLogLayout.listPattern,
+          )
+          .timeout(cloudCallTimeout);
     } catch (e) {
       _log.warning('Could not list files to retire $deviceId: $e');
       return const SyncCleanupOutcome(listIncomplete: true);
@@ -192,7 +216,7 @@ class SyncDeviceFootprints {
     onProgress?.call(0, targets.length);
     for (final f in targets) {
       try {
-        await provider.deleteFile(f.id);
+        await provider.deleteFile(f.id).timeout(cloudCallTimeout);
         deleted++;
       } catch (e) {
         failed++;

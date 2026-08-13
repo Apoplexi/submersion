@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:flutter_test/flutter_test.dart';
@@ -23,6 +24,11 @@ void main() {
     cloud = FakeCloudStorageProvider();
     footprints = SyncDeviceFootprints();
   });
+
+  /// Same object under a timeout short enough to observe without waiting one
+  /// out. The production default is 8s.
+  SyncDeviceFootprints impatient() =>
+      SyncDeviceFootprints(cloudCallTimeout: const Duration(milliseconds: 20));
 
   Uint8List bytes(String s) => Uint8List.fromList(s.codeUnits);
 
@@ -173,6 +179,92 @@ void main() {
       );
 
       expect(all.map((f) => f.deviceId), ['me', 'newer', 'older']);
+    });
+  });
+
+  group('a stalled backend cannot strand the user (PR #1033 review)', () {
+    // Both entry points run in front of a user who cannot leave: the listing
+    // behind a page-filling spinner, and the retire behind a deliberately
+    // non-dismissible dialog with no back button. An unbounded cloud call
+    // against a dead connection is the "app is hung, force-quit it" failure
+    // this whole change set exists to end -- and force-quitting mid-retire is
+    // what leaves a device half-deleted.
+
+    test('list gives up rather than hanging on the folder listing', () async {
+      cloud.hangOperations = true;
+
+      await expectLater(
+        impatient().list(provider: cloud, selfDeviceId: 'me'),
+        throwsA(isA<TimeoutException>()),
+      );
+    });
+
+    test('one stalled manifest read does not stall the survey', () async {
+      seedManifest('stalled', epochId: 'e1');
+      seedManifest('fine', epochId: 'e1');
+      // The listing succeeds; the per-device manifest reads never return.
+      cloud.hangDownloads = true;
+
+      final all = await impatient().list(
+        provider: cloud,
+        selfDeviceId: 'me',
+        currentEpochId: 'e1',
+      );
+
+      expect(all, hasLength(2));
+      expect(
+        all.every((f) => f.state == SyncDeviceFootprintState.unreadable),
+        isTrue,
+        reason:
+            'a device whose manifest could not be read is reported as '
+            'unreadable, which is never offered as safe to remove',
+      );
+      expect(all.any((f) => f.isSafeToRemove), isFalse);
+    });
+
+    test('retirePeer gives up when the fence marker will not upload', () async {
+      seedManifest('peer', epochId: 'old');
+      cloud.hangOperations = true;
+
+      final outcome = await impatient().retirePeer(
+        provider: cloud,
+        deviceId: 'peer',
+        selfDeviceId: 'me',
+      );
+
+      expect(outcome.deleted, 0);
+      expect(outcome.isComplete, isFalse);
+      expect(
+        cloud.bytesOf(ChangesetLogLayout.manifestName('peer')),
+        isNotNull,
+        reason: 'a timed-out marker is no fence, so nothing may be deleted',
+      );
+    });
+
+    test('a hung delete is counted, not waited on forever', () async {
+      seedManifest('peer', epochId: 'old');
+      cloud.seedFile(
+        ChangesetLogLayout.basePartName('peer', 1, 0),
+        bytes('data'),
+      );
+      final slow = impatient();
+
+      // Let the marker upload and the listing succeed, then stall deletes.
+      var listed = false;
+      final outcome = await slow.retirePeer(
+        provider: cloud,
+        deviceId: 'peer',
+        selfDeviceId: 'me',
+        onProgress: (done, total) {
+          if (!listed) {
+            listed = true;
+            cloud.hangOperations = true;
+          }
+        },
+      );
+
+      expect(outcome.failed, greaterThan(0));
+      expect(outcome.isComplete, isFalse);
     });
   });
 
