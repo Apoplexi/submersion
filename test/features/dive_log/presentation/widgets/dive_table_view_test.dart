@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/constants/dive_field.dart';
@@ -203,16 +204,24 @@ void main() {
 
       // Long-press no longer enters selection mode anywhere, so no row may
       // carry a handler for it.
-      final detectors = tester.widgetList<GestureDetector>(
+      //
+      // The assertion is on the recognizer, not on individual callbacks:
+      // GestureDetector registers one LongPressGestureRecognizer keyed by its
+      // own Type if ANY of seven long-press callbacks is non-null, so checking
+      // the map key covers onLongPressMoveUpdate, onLongPressEnd, onLongPressUp
+      // and the rest without having to enumerate them.
+      final detectors = tester.widgetList<RawGestureDetector>(
         find.descendant(
           of: find.byType(DiveTableView),
-          matching: find.byType(GestureDetector),
+          matching: find.byType(RawGestureDetector),
         ),
       );
       expect(detectors, isNotEmpty);
       for (final detector in detectors) {
-        expect(detector.onLongPress, isNull);
-        expect(detector.onLongPressStart, isNull);
+        expect(
+          detector.gestures.containsKey(LongPressGestureRecognizer),
+          isFalse,
+        );
       }
     });
 

@@ -235,20 +235,28 @@ void main() {
       await tester.pumpAndSettle();
 
       // Long-press is no longer a selection gesture on any surface, so no row
-      // may carry a handler for it. Asserting on the detectors rather than on
-      // a callback is deliberate: with the parameter gone there is nothing
+      // may carry a handler for it. Asserting on the widget tree rather than
+      // on a callback is deliberate: with the parameter gone there is nothing
       // left to observe from the outside, and a reintroduced handler would
       // otherwise slip in unnoticed.
-      final detectors = tester.widgetList<GestureDetector>(
+      //
+      // The assertion is on the recognizer, not on individual callbacks:
+      // GestureDetector registers one LongPressGestureRecognizer keyed by its
+      // own Type if ANY of seven long-press callbacks is non-null, so checking
+      // the map key covers onLongPressMoveUpdate, onLongPressEnd, onLongPressUp
+      // and the rest without having to enumerate them.
+      final detectors = tester.widgetList<RawGestureDetector>(
         find.descendant(
           of: find.byType(EntityTableView<_TestEntity, _TestField>),
-          matching: find.byType(GestureDetector),
+          matching: find.byType(RawGestureDetector),
         ),
       );
       expect(detectors, isNotEmpty);
       for (final detector in detectors) {
-        expect(detector.onLongPress, isNull);
-        expect(detector.onLongPressStart, isNull);
+        expect(
+          detector.gestures.containsKey(LongPressGestureRecognizer),
+          isFalse,
+        );
       }
     });
 
