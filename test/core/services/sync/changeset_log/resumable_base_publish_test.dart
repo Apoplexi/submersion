@@ -193,6 +193,48 @@ void main() {
       );
     });
 
+    test('reclaims an export whose sidecar was never written', () async {
+      // _recordResumable moves the export into place and only then writes the
+      // sidecar. An app killed inside that window leaves a data file nothing
+      // references, and find() scans sidecars, so it would never be seen again
+      // -- a whole library stranded in a directory nothing purges (#1033).
+      final orphan = await writeExport('orphan.json', 50);
+      await File(
+        orphan,
+      ).setLastModified(DateTime.now().subtract(const Duration(hours: 1)));
+
+      await store.find(providerId: 'fake', deviceId: 'dev1');
+
+      expect(await File(orphan).exists(), isFalse);
+    });
+
+    test('spares an export young enough to still be mid-write', () async {
+      // The only writer here is _recordResumable, and publishes are
+      // serialized, but a file written moments ago is likelier to be one in
+      // flight than an orphan. A true orphan is reclaimed by the next sync.
+      final fresh = await writeExport('fresh.json', 50);
+
+      await store.find(providerId: 'fake', deviceId: 'dev1');
+
+      expect(await File(fresh).exists(), isTrue);
+    });
+
+    test('never sweeps an export a sidecar still points at', () async {
+      final path = await writeExport('kept.json', 50);
+      await File(
+        path,
+      ).setLastModified(DateTime.now().subtract(const Duration(hours: 1)));
+      // A record for a DIFFERENT backend: skipped by this find, but its export
+      // is still referenced and must survive.
+      await store.save(
+        record(dataPath: path, byteLength: 50, providerId: 's3'),
+      );
+
+      await store.find(providerId: 'fake', deviceId: 'dev1');
+
+      expect(await File(path).exists(), isTrue);
+    });
+
     test('clearForProvider drops only that backend’s records', () async {
       final mine = await writeExport('mine.json', 50);
       final theirs = await writeExport('theirs.json', 50);

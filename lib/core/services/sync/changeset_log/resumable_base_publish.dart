@@ -122,6 +122,10 @@ class ResumableBasePublishStore {
 
   final Future<Directory> Function() _directory;
 
+  /// How recently an unreferenced export must have been touched to be spared
+  /// as "probably still being written" rather than swept as an orphan.
+  static const Duration _orphanGrace = Duration(minutes: 5);
+
   Future<Directory> get directory => _directory();
 
   /// Record [publish], overwriting any previous record for its data file.
@@ -136,7 +140,9 @@ class ResumableBasePublishStore {
   ///
   /// Anything unusable is deleted on the way past, so a doomed export cannot
   /// accumulate: a sidecar whose data file is gone or the wrong size (the OS
-  /// purged or truncated it), or one stamped with a different epoch.
+  /// purged or truncated it), one stamped with a different epoch, one whose
+  /// record will not parse, and -- via [_pruneUnreferencedExports] -- an export
+  /// with no sidecar at all.
   Future<ResumableBasePublish?> find({
     required String providerId,
     required String deviceId,
@@ -145,6 +151,9 @@ class ResumableBasePublishStore {
     final dir = await directory;
     if (!await dir.exists()) return null;
 
+    /// Data files a surviving sidecar still points at. Everything else in this
+    /// directory is unreachable and gets swept below.
+    final referenced = <String>{};
     ResumableBasePublish? best;
     await for (final entity in dir.list(followLinks: false)) {
       if (entity is! File ||
@@ -164,6 +173,7 @@ class ResumableBasePublishStore {
         continue;
       }
 
+      referenced.add(record.dataPath);
       if (record.providerId != providerId || record.deviceId != deviceId) {
         continue;
       }
@@ -185,7 +195,45 @@ class ResumableBasePublishStore {
         await discard(record);
       }
     }
+    if (best != null) referenced.add(best.dataPath);
+    await _pruneUnreferencedExports(dir, referenced);
     return best;
+  }
+
+  /// Delete exports in [dir] that no sidecar points at.
+  ///
+  /// `_recordResumable` moves the export into place and only then writes its
+  /// sidecar, so an app killed inside that window leaves a data file nothing
+  /// references. Because [find] scans sidecars, such a file would never be
+  /// discovered again -- a whole library's worth of bytes stranded forever in a
+  /// directory nothing else purges (PR #1033 review).
+  ///
+  /// Skips anything touched within [_orphanGrace]. The only writer here is
+  /// `_recordResumable`, and publishes are serialized, so a file younger than
+  /// that is far more likely to be one being written right now than an orphan.
+  /// A true orphan is simply reclaimed by the next sync instead.
+  static Future<void> _pruneUnreferencedExports(
+    Directory dir,
+    Set<String> referenced,
+  ) async {
+    final cutoff = DateTime.now().subtract(_orphanGrace);
+    await for (final entity in dir.list(followLinks: false)) {
+      if (entity is! File) continue;
+      final path = entity.path;
+      if (path.endsWith(ResumableBasePublish.sidecarSuffix)) continue;
+      if (referenced.contains(path)) continue;
+      // A sidecar may exist but have been skipped above (another provider's
+      // record, say), so check the filesystem rather than only `referenced`.
+      if (await File(ResumableBasePublish.sidecarPathFor(path)).exists()) {
+        continue;
+      }
+      try {
+        if ((await entity.stat()).modified.isAfter(cutoff)) continue;
+      } catch (_) {
+        continue;
+      }
+      await _deleteQuietly(path);
+    }
   }
 
   /// Delete a record and the export it describes.

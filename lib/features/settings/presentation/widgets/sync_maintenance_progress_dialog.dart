@@ -118,7 +118,16 @@ class SyncMaintenanceProgressDialog extends StatelessWidget {
 }
 
 /// Runs [task] behind a [SyncMaintenanceProgressDialog], feeding it the task's
-/// own progress, and returns the task's result once the dialog has closed.
+/// own progress, and returns the task's result once the dialog has been
+/// dismissed.
+///
+/// "Dismissed", precisely: the pop has been issued and the route's future has
+/// resolved. That is NOT the same as fully animated out -- a dialog route
+/// completes at pop time, not at the end of its exit transition -- so a caller
+/// showing a snackbar immediately may briefly overlap the closing dialog. The
+/// earlier wording here claimed the stronger guarantee, which was untrue
+/// (PR #1033 review); awaiting the route is the strongest ordering this can
+/// actually offer without polling the transition.
 ///
 /// The dialog is popped in a `finally`, so a throwing task cannot strand the
 /// user behind an undismissable barrier -- the exception then surfaces to the
@@ -149,5 +158,10 @@ Future<T> runWithSyncMaintenanceProgress<T>({
     );
   } finally {
     if (navigator.canPop()) navigator.pop();
+    // Await the ROUTE, not just the pop. Returning the moment the task
+    // finished let callers show their result snackbar while the dialog was
+    // still animating out, and made the "returns once the dialog has closed"
+    // contract above untrue (PR #1033 review).
+    await dialog;
   }
 }

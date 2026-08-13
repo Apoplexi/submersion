@@ -110,6 +110,47 @@ void main() {
     await tester.pumpAndSettle();
   });
 
+  testWidgets('does not return before the dialog has been popped', (
+    tester,
+  ) async {
+    // Callers show their result snackbar the moment this returns, so the pop
+    // must have been issued first. Note this is the route's completion, not
+    // the end of its exit transition -- a dialog route completes at pop time,
+    // which is why the docstring no longer claims "fully closed".
+    final gate = Completer<void>();
+    var returned = false;
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: Builder(
+            builder: (context) => ElevatedButton(
+              onPressed: () async {
+                await runWithSyncMaintenanceProgress<void>(
+                  context: context,
+                  title: 'Wiping sync data',
+                  task: (r) => gate.future,
+                );
+                returned = true;
+              },
+              child: const Text('go'),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    await tester.tap(find.text('go'));
+    await tester.pump();
+    expect(returned, isFalse, reason: 'the task has not finished');
+    expect(find.byType(AlertDialog), findsOneWidget);
+
+    gate.complete();
+    await tester.pumpAndSettle();
+
+    expect(returned, isTrue);
+    expect(find.byType(AlertDialog), findsNothing);
+  });
+
   testWidgets('closes and rethrows when the task fails', (tester) async {
     Object? seen;
     await pumpRunner(
