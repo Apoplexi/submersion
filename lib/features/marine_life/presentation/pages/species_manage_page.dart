@@ -290,13 +290,14 @@ class _SpeciesManagePageState extends ConsumerState<SpeciesManagePage> {
               children: [
                 IconButton(
                   icon: const Icon(Icons.edit_outlined),
-                  tooltip: 'Edit species',
+                  tooltip: context.l10n.marineLife_speciesManage_editTooltip,
                   onPressed: () => context.push('/species/${species.id}/edit'),
                 ),
                 if (isCustom)
                   IconButton(
                     icon: const Icon(Icons.delete_outline),
-                    tooltip: 'Delete species',
+                    tooltip:
+                        context.l10n.marineLife_speciesManage_deleteTooltip,
                     onPressed: () => _confirmDelete(species),
                   ),
               ],

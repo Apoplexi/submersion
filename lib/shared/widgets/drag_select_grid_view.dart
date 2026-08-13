@@ -14,9 +14,11 @@ typedef DragSelectItemBuilder<T> =
 
 /// A grid view that supports drag-to-range-select inside selection mode.
 ///
-/// In normal mode, taps fire [onItemTap] and long-press does nothing:
-/// selection mode is entered only through the surface's own Select control,
-/// never by a gesture on an item.
+/// In normal mode, selection mode is entered only through the surface's own
+/// Select control, never by a gesture on an item. No long-press recognizer is
+/// registered at all, so a hold falls through to the tap recognizer -- which
+/// has no upper duration bound -- and fires [onItemTap] on release, exactly as
+/// a quick tap would.
 ///
 /// In selection mode, taps toggle individual items, and long-pressing an item
 /// anchors a drag; dragging from the anchor adds every item between anchor and
