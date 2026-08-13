@@ -2181,11 +2181,20 @@ class SyncDataSerializer {
   /// adopting the other's id on every sync. Lowest-id matches the v149
   /// migration's rule, so a device that healed by migration and a device that
   /// healed by merge land on the same tag.
+  ///
+  /// Both sides normalize to `lower(trim(name))`, exactly as
+  /// `idx_tags_diver_name_unique` keys. Trimming only the INCOMING name made
+  /// the comparison asymmetric -- a local " Wreck" would not match a remote
+  /// "Wreck" while the reverse did -- so whether two devices converged
+  /// depended on which of them happened to hold the padded spelling
+  /// (PR #1033 review).
   Future<void> _applyTagRecord(Tag remote) async {
     final rivals =
         await (_db.select(_db.tags)..where(
               (t) =>
-                  t.name.lower().equals(remote.name.trim().toLowerCase()) &
+                  t.name.trim().lower().equals(
+                    remote.name.trim().toLowerCase(),
+                  ) &
                   coalesce([
                     t.diverId,
                     const Constant(''),

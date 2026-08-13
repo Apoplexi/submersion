@@ -126,6 +126,39 @@ void main() {
     expect(await diveTagPairs(db), ['dive-1|tag-a']);
   });
 
+  test('collapse ignores surrounding whitespace', () async {
+    // Legacy rows can carry padding: writers matched on a trimmed name but
+    // stored the raw one, so " Wreck" and "Wreck" were two rows every lookup
+    // treated as one (PR #1033 review).
+    final db = AppDatabase(
+      setupDb((rawDb) {
+        insertTag(rawDb, 'tag-a', ' Wreck ', diverId: 'd1');
+        insertTag(rawDb, 'tag-b', 'wreck', diverId: 'd1');
+        insertDiveTag(rawDb, 'dt-1', 'dive-1', 'tag-b');
+      }),
+    );
+    addTearDown(db.close);
+
+    expect(await tagIds(db), ['tag-a']);
+    expect(await diveTagPairs(db), ['dive-1|tag-a']);
+  });
+
+  test('the surviving name is stored trimmed', () async {
+    final db = AppDatabase(
+      setupDb((rawDb) {
+        insertTag(rawDb, 'tag-a', '  Wreck  ', diverId: 'd1');
+      }),
+    );
+    addTearDown(db.close);
+
+    final rows = await db.customSelect('SELECT name FROM tags').get();
+    expect(
+      rows.single.read<String>('name'),
+      'Wreck',
+      reason: 'what is stored must match what every lookup compares against',
+    );
+  });
+
   test('NULL diver_id is one scope, not one scope per row', () async {
     // A plain UNIQUE(diver_id, name) index would leave these two alone --
     // SQLite treats NULLs as distinct inside a unique index -- so the
@@ -200,6 +233,35 @@ void main() {
     addTearDown(db.close);
 
     expect(await diveTagPairs(db), ['dive-1|tag-missing']);
+  });
+
+  test('rebuilds an index left over from an earlier keying', () async {
+    // CREATE UNIQUE INDEX IF NOT EXISTS is a no-op against an index of the
+    // same NAME whatever its definition, so a database that ran a pre-release
+    // build of v149 would silently keep the older keying forever.
+    final db = AppDatabase(
+      setupDb((rawDb) {
+        rawDb.execute(
+          'CREATE UNIQUE INDEX idx_tags_diver_name_unique '
+          "ON tags(COALESCE(diver_id, ''), lower(name))",
+        );
+        insertTag(rawDb, 'tag-a', ' Wreck ', diverId: 'd1');
+        insertTag(rawDb, 'tag-b', 'wreck', diverId: 'd1');
+      }),
+    );
+    addTearDown(db.close);
+
+    final sql = await db
+        .customSelect(
+          "SELECT sql FROM sqlite_master WHERE name = 'idx_tags_diver_name_unique'",
+        )
+        .getSingle();
+    expect(sql.read<String>('sql'), contains('trim'));
+    expect(
+      await tagIds(db),
+      ['tag-a'],
+      reason: 'the rows the old index allowed must still be collapsed',
+    );
   });
 
   test('is idempotent when the database is already clean', () async {

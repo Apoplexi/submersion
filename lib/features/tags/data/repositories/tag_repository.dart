@@ -57,7 +57,11 @@ class TagRepository {
     }
   }
 
-  /// Get a tag by name (case-insensitive)
+  /// Get a tag by name (case-insensitive, whitespace-insensitive)
+  ///
+  /// Normalizes both sides exactly as `idx_tags_diver_name_unique` does
+  /// (`lower(trim(name))`), so a lookup can never miss a row the index
+  /// considers the same tag.
   ///
   /// Deliberately takes the lowest id rather than asserting a single match:
   /// an unscoped lookup legitimately spans two divers who both use "Wreck",
@@ -67,7 +71,7 @@ class TagRepository {
   Future<domain.Tag?> getTagByName(String name, {String? diverId}) async {
     try {
       final query = _db.select(_db.tags)
-        ..where((t) => t.name.lower().equals(name.toLowerCase()));
+        ..where((t) => t.name.trim().lower().equals(name.trim().toLowerCase()));
 
       if (diverId != null) {
         query.where((t) => t.diverId.equals(diverId));
@@ -91,7 +95,7 @@ class TagRepository {
   /// The tag occupying [name]'s uniqueness slot in [diverId]'s scope, if any.
   ///
   /// Mirrors `idx_tags_diver_name_unique` exactly -- (COALESCE(diver_id, ''),
-  /// lower(name)) -- so a caller that checks here can never be surprised by
+  /// lower(trim(name))) -- so a caller that checks here can never be surprised by
   /// the index. A NULL `diverId` is the shared "unassigned" scope, not a scope
   /// of its own per row.
   Future<domain.Tag?> _tagOccupying(String name, String? diverId) async {
@@ -99,7 +103,7 @@ class TagRepository {
         await (_db.select(_db.tags)
               ..where(
                 (t) =>
-                    t.name.lower().equals(name.trim().toLowerCase()) &
+                    t.name.trim().lower().equals(name.trim().toLowerCase()) &
                     coalesce([
                       t.diverId,
                       const Constant(''),
@@ -126,7 +130,11 @@ class TagRepository {
         return incumbent;
       }
 
-      _log.info('Creating tag: ${tag.name}');
+      // Store the SAME normalization the index and every lookup key on.
+      // Persisting the raw value while matching on a trimmed one is what let
+      // " Wreck" and "Wreck" coexist as two rows (PR #1033 review).
+      final name = tag.name.trim();
+      _log.info('Creating tag: $name');
       final id = tag.id.isEmpty ? _uuid.v4() : tag.id;
       final now = DateTime.now().millisecondsSinceEpoch;
 
@@ -136,7 +144,7 @@ class TagRepository {
             TagsCompanion(
               id: Value(id),
               diverId: Value(tag.diverId),
-              name: Value(tag.name),
+              name: Value(name),
               color: Value(tag.colorHex),
               createdAt: Value(now),
               updatedAt: Value(now),
@@ -151,7 +159,7 @@ class TagRepository {
       SyncEventBus.notifyLocalChange();
 
       _log.info('Created tag with id: $id');
-      return tag.copyWith(id: id);
+      return tag.copyWith(id: id, name: name);
     } catch (e, stackTrace) {
       _log.error('Failed to create tag', error: e, stackTrace: stackTrace);
       rethrow;
@@ -201,16 +209,18 @@ class TagRepository {
   /// same outcome the tag merge sheet produces, so it reuses [mergeTags].
   Future<void> updateTag(domain.Tag tag) async {
     try {
-      final incumbent = await _tagOccupying(tag.name, tag.diverId);
+      // Normalized before both the uniqueness check and the write, so a rename
+      // cannot store a spelling the index would key differently.
+      final name = tag.name.trim();
+      final incumbent = await _tagOccupying(name, tag.diverId);
       if (incumbent != null && incumbent.id != tag.id) {
         _log.info(
-          'Renaming ${tag.id} onto "${tag.name}" merges into '
-          '${incumbent.id}',
+          'Renaming ${tag.id} onto "$name" merges into ${incumbent.id}',
         );
         await mergeTags(
           sourceTagIds: [tag.id],
           survivingTagId: incumbent.id,
-          name: tag.name,
+          name: name,
           colorHex: tag.colorHex,
         );
         return;
@@ -221,7 +231,7 @@ class TagRepository {
 
       await (_db.update(_db.tags)..where((t) => t.id.equals(tag.id))).write(
         TagsCompanion(
-          name: Value(tag.name),
+          name: Value(name),
           color: Value(tag.colorHex),
           updatedAt: Value(now),
         ),

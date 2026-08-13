@@ -68,6 +68,90 @@ void main() {
     updatedAt: DateTime(2026, 1, 1),
   );
 
+  // ---- Whitespace variants (PR #1033 review) ----
+  //
+  // The uniqueness slot is (diver scope, case-folded, TRIMMED name). Matching
+  // on a trimmed name while storing the untrimmed one left the exact duplicate
+  // this feature exists to forbid: " Wreck" and "Wreck" are one tag to every
+  // lookup, but were two rows to the index.
+
+  group('whitespace variants are the same tag', () {
+    test('createTag stores the trimmed name', () async {
+      final created = await repository.createTag(tagOf('', '  Wreck  '));
+
+      expect(created.name, 'Wreck');
+      final row = await (db.select(
+        db.tags,
+      )..where((t) => t.id.equals(created.id))).getSingle();
+      expect(
+        row.name,
+        'Wreck',
+        reason: 'what is stored must match what lookups compare against',
+      );
+    });
+
+    test(
+      'a padded name finds the existing tag rather than adding one',
+      () async {
+        await repository.createTag(tagOf('', 'Wreck'));
+
+        final second = await repository.createTag(tagOf('', ' Wreck '));
+        final all = await repository.getAllTags();
+
+        expect(all.where((t) => t.name.trim() == 'Wreck'), hasLength(1));
+        expect(second.name, 'Wreck');
+      },
+    );
+
+    test(
+      'the padded tag is created first, then the bare one folds into it',
+      () async {
+        // Order matters: this is the direction that used to slip through, because
+        // the stored " Wreck" did not case-fold-equal the incoming "Wreck".
+        await repository.createTag(tagOf('', ' Wreck'));
+
+        await repository.createTag(tagOf('', 'Wreck'));
+
+        expect(await repository.getAllTags(), hasLength(1));
+      },
+    );
+
+    test('getTagByName finds a tag through surrounding whitespace', () async {
+      await repository.createTag(tagOf('', 'Wreck'));
+
+      expect(await repository.getTagByName('  Wreck  '), isNotNull);
+    });
+
+    test('the index itself rejects a padded duplicate', () async {
+      final now = DateTime.now().millisecondsSinceEpoch;
+      await db
+          .into(db.tags)
+          .insert(
+            TagsCompanion(
+              id: const Value('a'),
+              name: const Value('Wreck'),
+              createdAt: Value(now),
+              updatedAt: Value(now),
+            ),
+          );
+
+      await expectLater(
+        db
+            .into(db.tags)
+            .insert(
+              TagsCompanion(
+                id: const Value('b'),
+                name: const Value(' wreck '),
+                createdAt: Value(now),
+                updatedAt: Value(now),
+              ),
+            ),
+        throwsA(anything),
+        reason: 'the database is the backstop when a writer forgets to trim',
+      );
+    });
+  });
+
   group('fresh database', () {
     test('carries both tag uniqueness indexes', () async {
       final rows = await db

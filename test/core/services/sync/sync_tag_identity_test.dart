@@ -1,5 +1,7 @@
+import 'package:drift/drift.dart' show Value;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/data/repositories/sync_repository.dart';
+import 'package:submersion/core/database/database.dart';
 import 'package:submersion/core/services/database_service.dart';
 import 'package:submersion/core/services/sync/sync_data_serializer.dart';
 import 'package:submersion/core/services/sync/sync_service.dart';
@@ -118,6 +120,38 @@ void main() {
       expect(await tagIds(), ['tag-aaa']);
       expect(await junctionPairs(), ['dive-1|tag-aaa', 'dive-2|tag-aaa']);
       expect((await TagRepository().getTagsForDive('dive-2')).length, 1);
+    });
+
+    test('a padded local name still folds with a peer’s bare one', () async {
+      // The comparison used to trim only the INCOMING name, so convergence
+      // depended on which device happened to hold the padded spelling. Rows
+      // predating v149 (and legacy peers) can carry one, so the local side is
+      // inserted raw here rather than through the now-trimming repository.
+      await createTaggedDive('dive-1', 'tag-aaa');
+      await seedPeerLog(cloud, 'device-a');
+
+      final db = DatabaseService.instance.database;
+      await createDive('dive-9');
+      final now = DateTime(2026, 8, 13).millisecondsSinceEpoch;
+      await db
+          .into(db.tags)
+          .insert(
+            TagsCompanion(
+              id: const Value('tag-zzz'),
+              name: const Value('  $importTag  '),
+              createdAt: Value(now),
+              updatedAt: Value(now),
+            ),
+          );
+      await TagRepository().addTagToDive('dive-9', 'tag-zzz');
+
+      final result = await buildService().performSync();
+      expect(result.status, isNot(SyncResultStatus.error));
+
+      expect(await tagIds(), [
+        'tag-aaa',
+      ], reason: 'whitespace is not what makes two tags different');
+      expect((await TagRepository().getTagsForDive('dive-9')).length, 1);
     });
 
     test('a peer junction for a pair we already have is a no-op', () async {
