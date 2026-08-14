@@ -126,6 +126,10 @@ void main() {
         tester,
         build: () => _buildTestWidget(stats: _testStats),
         selectButton: find.byKey(const ValueKey('enter_selection')),
+        rowRoot: find.ancestor(
+          of: find.text('Night Dive'),
+          matching: find.byType(ListTile),
+        ),
         firstRow: find.text('Night Dive'),
         applyFilter: (tester) async {
           // Type into the real search field. Tags previously hid this field

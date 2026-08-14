@@ -56,6 +56,12 @@ void main() {
         tester,
         build: () => host(species: all),
         selectButton: find.byKey(const ValueKey('enter_selection')),
+        // Non-selectable species render no checkbox, so pin to the row the
+        // contract already drives rather than whichever sorts first.
+        rowRoot: find.ancestor(
+          of: find.text('Aaa fish'),
+          matching: find.byType(ListTile),
+        ),
         firstRow: find.text('Aaa fish'),
         applyFilter: (tester) async {
           final container = ProviderScope.containerOf(

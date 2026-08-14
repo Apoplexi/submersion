@@ -164,6 +164,7 @@ void main() {
           child: const BuddyListContent(showAppBar: true),
         ),
         selectButton: find.byKey(const ValueKey('enter_selection')),
+        rowRoot: find.byType(BuddyListTile).first,
         firstRow: find.text('Aaa Buddy'),
         applyFilter: (tester) async {
           final container = ProviderScope.containerOf(

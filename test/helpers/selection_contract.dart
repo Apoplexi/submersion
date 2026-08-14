@@ -13,6 +13,10 @@ import 'package:flutter_test/flutter_test.dart';
 /// [firstRow] finds the first selectable row.
 /// [applyFilter] narrows the surface so pruning can be observed, leaving
 /// [visibleAfterFilter] rows on screen.
+/// [rowRoot] finds exactly one row's root widget. The checkbox must render
+/// inside it, which is what keeps every list drawing the checkbox in the card
+/// rather than beside it. Required for [CheckedIndicator.checkbox] surfaces.
+///
 /// Whether this surface renders its checked state as [Checkbox] widgets.
 ///
 /// List surfaces do. Grid surfaces such as the dive media section draw a check
@@ -28,7 +32,17 @@ Future<void> verifySelectionContract(
   required Future<void> Function(WidgetTester tester) applyFilter,
   required int visibleAfterFilter,
   CheckedIndicator indicator = CheckedIndicator.checkbox,
+  Finder? rowRoot,
 }) async {
+  // A surface that forgets to declare its row root must fail rather than
+  // silently skip the placement check -- an assertion that can be skipped is
+  // indistinguishable from no assertion, which is how the outside-card layouts
+  // passed this contract for so long.
+  assert(
+    indicator != CheckedIndicator.checkbox || rowRoot != null,
+    'checkbox surfaces must declare the row root the checkbox has to live '
+    'inside',
+  );
   // The Select affordance is visible without any hidden gesture.
   await tester.pumpWidget(build());
   await tester.pumpAndSettle();
@@ -51,6 +65,11 @@ Future<void> verifySelectionContract(
       find.byType(Checkbox),
       findsWidgets,
       reason: 'selection mode must render checkboxes in the leading slot',
+    );
+    expect(
+      find.descendant(of: rowRoot!, matching: find.byType(Checkbox)),
+      findsOneWidget,
+      reason: 'the checkbox must render inside the row, not beside it',
     );
   }
   expect(
