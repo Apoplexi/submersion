@@ -28,6 +28,7 @@ import 'package:submersion/features/buddies/domain/entities/buddy.dart';
 import 'package:submersion/features/buddies/presentation/providers/buddy_providers.dart';
 import 'package:submersion/features/buddies/presentation/widgets/dense_buddy_list_tile.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
+import 'package:submersion/shared/selection/selection_leading.dart';
 import 'package:submersion/shared/widgets/debounced_search_results.dart';
 import 'package:submersion/shared/widgets/feature_accent.dart';
 
@@ -949,20 +950,15 @@ class BuddyListTile extends StatelessWidget {
           : null,
       child: ListTile(
         onTap: onTap,
-        leading: isSelectionMode
-            ? SizedBox(
-                width: 40,
-                height: 40,
-                child: Center(
-                  child: Checkbox(
-                    value: isChecked,
-                    onChanged: (_) => onTap?.call(),
-                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    visualDensity: VisualDensity.compact,
-                  ),
-                ),
-              )
-            : CircleAvatar(
+        leading: SizedBox(
+          width: 40,
+          height: 40,
+          child: Center(
+            child: SelectionLeading(
+              isSelectionMode: isSelectionMode,
+              isChecked: isChecked,
+              onChanged: (_) => onTap?.call(),
+              child: CircleAvatar(
                 backgroundColor: theme.colorScheme.primaryContainer,
                 backgroundImage: buddy.photoPath != null
                     ? AssetImage(buddy.photoPath!)
@@ -977,6 +973,9 @@ class BuddyListTile extends StatelessWidget {
                       )
                     : null,
               ),
+            ),
+          ),
+        ),
         title: Text(buddy.name),
         subtitle: _buildSubtitle(context),
         trailing: Row(
