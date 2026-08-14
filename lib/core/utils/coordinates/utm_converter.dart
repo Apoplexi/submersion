@@ -3,16 +3,16 @@ import 'dart:math' as math;
 /// WGS84 ellipsoid and UTM projection constants.
 const double _a = 6378137.0; // semi-major axis, metres
 const double _f = 1 / 298.257223563; // flattening
-final double _e2 = _f * (2 - _f); // first eccentricity squared
-final double _ep2 = _e2 / (1 - _e2); // second eccentricity squared
+const double _e2 = _f * (2 - _f); // first eccentricity squared
+const double _ep2 = _e2 / (1 - _e2); // second eccentricity squared
 const double _k0 = 0.9996; // scale factor on the central meridian
 
 /// Meridional arc series coefficients.
-final double _m1 = 1 - _e2 / 4 - 3 * _e2 * _e2 / 64 - 5 * _e2 * _e2 * _e2 / 256;
-final double _m2 =
+const double _m1 = 1 - _e2 / 4 - 3 * _e2 * _e2 / 64 - 5 * _e2 * _e2 * _e2 / 256;
+const double _m2 =
     3 * _e2 / 8 + 3 * _e2 * _e2 / 32 + 45 * _e2 * _e2 * _e2 / 1024;
-final double _m3 = 15 * _e2 * _e2 / 256 + 45 * _e2 * _e2 * _e2 / 1024;
-final double _m4 = 35 * _e2 * _e2 * _e2 / 3072;
+const double _m3 = 15 * _e2 * _e2 / 256 + 45 * _e2 * _e2 * _e2 / 1024;
+const double _m4 = 35 * _e2 * _e2 * _e2 / 3072;
 
 /// Footpoint-latitude series coefficients, used by the inverse projection.
 final double _sqrtE = math.sqrt(1 - _e2);
