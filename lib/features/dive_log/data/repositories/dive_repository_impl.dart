@@ -4883,8 +4883,13 @@ class DiveRepository {
         recordId: row.id,
       );
     }
+    // Deduplicated: `dive_tags` is uniquely indexed on (dive_id, tag_id)
+    // since v149, so a repeated id in the selection would throw (#1032).
+    // Hoisted out of the loop -- the selection does not change per dive, and a
+    // bulk edit multiplies this by the number of dives (PR #1033 review).
+    final uniqueTagIds = tagIds.toSet();
     for (final diveId in diveIds) {
-      for (final tagId in tagIds) {
+      for (final tagId in uniqueTagIds) {
         final id = _uuid.v4();
         await _db
             .into(_db.diveTags)
@@ -5331,12 +5336,26 @@ class DiveRepository {
 
     try {
       final now = DateTime.now().millisecondsSinceEpoch;
+      // Pairs these dives already carry. `dive_tags` is uniquely indexed on
+      // (dive_id, tag_id) since v149, and the fresh uuid per row means an
+      // upsert would never have matched the existing row anyway -- it just
+      // added a second one (#1032).
+      final existing =
+          (await (_db.select(
+                _db.diveTags,
+              )..where((t) => t.diveId.isIn(diveIds))).get())
+              .map((r) => '${r.diveId}|${r.tagId}')
+              .toSet();
+      // Hoisted: the selection is the same for every dive, and a bulk edit
+      // multiplies this by the number of dives (PR #1033 review).
+      final uniqueTagIds = tagIds.toSet();
       for (final diveId in diveIds) {
-        for (final tagId in tagIds) {
+        for (final tagId in uniqueTagIds) {
+          if (!existing.add('$diveId|$tagId')) continue;
           final diveTagId = _uuid.v4();
           await _db
               .into(_db.diveTags)
-              .insertOnConflictUpdate(
+              .insert(
                 DiveTagsCompanion(
                   id: Value(diveTagId),
                   diveId: Value(diveId),

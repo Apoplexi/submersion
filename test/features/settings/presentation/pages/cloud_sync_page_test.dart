@@ -8,6 +8,7 @@ import 'package:http/testing.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:submersion/core/data/repositories/sync_repository.dart'
     show CloudProviderType, SyncRepository;
+import 'package:submersion/core/services/sync/sync_cleanup_outcome.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/core/services/cloud_storage/cloud_storage_provider.dart';
 import 'package:submersion/core/services/cloud_storage/dropbox/dropbox_api_client.dart';
@@ -220,17 +221,28 @@ class _FakeSyncNotifier extends StateNotifier<SyncState>
 
   int removeThisDeviceCloudFilesCalls = 0;
   @override
-  Future<void> removeThisDeviceCloudFiles() async =>
-      removeThisDeviceCloudFilesCalls++;
+  Future<SyncCleanupOutcome> removeThisDeviceCloudFiles({
+    SyncCleanupProgress? onProgress,
+  }) async {
+    removeThisDeviceCloudFilesCalls++;
+    return const SyncCleanupOutcome();
+  }
 
   int wipeAllCloudSyncDataCalls = 0;
   @override
-  Future<void> wipeAllCloudSyncData() async => wipeAllCloudSyncDataCalls++;
+  Future<SyncCleanupOutcome> wipeAllCloudSyncData({
+    SyncCleanupProgress? onProgress,
+  }) async {
+    wipeAllCloudSyncDataCalls++;
+    return const SyncCleanupOutcome();
+  }
 
   int rebuildBackendFromThisDeviceCalls = 0;
   @override
-  Future<void> rebuildBackendFromThisDevice() async =>
-      rebuildBackendFromThisDeviceCalls++;
+  Future<void> rebuildBackendFromThisDevice({
+    SyncCleanupProgress? onProgress,
+    void Function()? onPublishStarted,
+  }) async => rebuildBackendFromThisDeviceCalls++;
 
   @override
   Future<void> signOut() async => signOutCalls++;

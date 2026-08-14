@@ -44,6 +44,7 @@ import 'package:submersion/core/services/sync/sync_data_serializer.dart';
 import 'package:submersion/core/services/sync/sync_event_bus.dart';
 import 'package:submersion/core/services/sync/sync_initializer.dart';
 import 'package:submersion/core/services/sync/sync_preferences.dart';
+import 'package:submersion/core/services/sync/sync_cleanup_outcome.dart';
 import 'package:submersion/core/services/sync/sync_service.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_repository_provider.dart';
 import 'package:submersion/features/divers/presentation/providers/diver_providers.dart';
@@ -1448,25 +1449,45 @@ class SyncNotifier extends StateNotifier<SyncState> {
   /// Remove THIS device's sync files from the active backend (issue #509,
   /// cloud clear 3a). Safe: other devices keep syncing; frees this device's
   /// changeset log, base parts, and manifest.
-  Future<void> removeThisDeviceCloudFiles() async {
+  Future<SyncCleanupOutcome> removeThisDeviceCloudFiles({
+    SyncCleanupProgress? onProgress,
+  }) async {
     final deviceId = await _syncRepository.getDeviceId();
-    await _syncService.deleteDeviceSyncFile(deviceId);
+    final outcome = await _syncService.deleteDeviceSyncFile(
+      deviceId,
+      onProgress: onProgress,
+    );
     await refreshState();
+    return outcome;
   }
 
   /// Wipe ALL sync data on the active backend, including the epoch/moved
   /// markers (issue #509, cloud clear 3b). Every device re-establishes from
   /// scratch. Dive data is untouched.
-  Future<void> wipeAllCloudSyncData() async {
-    await _syncService.wipeAllSyncDataOnActiveProvider();
+  Future<SyncCleanupOutcome> wipeAllCloudSyncData({
+    SyncCleanupProgress? onProgress,
+  }) async {
+    final outcome = await _syncService.wipeAllSyncDataOnActiveProvider(
+      onProgress: onProgress,
+    );
     await refreshState();
+    return outcome;
   }
 
   /// Escape a stuck library replacement whose uploader went offline (issue
   /// #509): rebuild this backend from THIS device's library, then publish it so
   /// peers adopt from us. Un-pauses the awaiting-adoption state.
-  Future<void> rebuildBackendFromThisDevice() async {
-    final result = await _syncService.rebuildBackendFromThisDevice();
+  Future<void> rebuildBackendFromThisDevice({
+    SyncCleanupProgress? onProgress,
+
+    /// Fires once the clear-out is done and the (much longer) full-library
+    /// republish begins, so a caller showing progress can retitle rather than
+    /// leave a completed file count on screen for minutes (issue #1032).
+    void Function()? onPublishStarted,
+  }) async {
+    final result = await _syncService.rebuildBackendFromThisDevice(
+      onProgress: onProgress,
+    );
     if (result.status != SyncResultStatus.success) {
       // Keep the error visible: refreshState (which recomputes status from the
       // repository) must NOT run here, or it would clear the reason.
@@ -1480,6 +1501,7 @@ class SyncNotifier extends StateNotifier<SyncState> {
       message: null,
     );
     await _ref.read(libraryEpochStoreProvider).clearPendingReplace();
+    onPublishStarted?.call();
     await performSync(); // publish our library as the epoch's base
     await refreshState();
   }
