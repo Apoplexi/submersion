@@ -138,6 +138,48 @@ void main() {
     expect(lng, closeTo(-87.029722, 1e-4));
   });
 
+  testWidgets('a pasted pair fills the visible fields, not just the callback', (
+    tester,
+  ) async {
+    await pumpInput(
+      tester,
+      format: CoordinateFormat.decimalDegrees,
+      latitude: 1.0,
+      longitude: 2.0,
+      onChanged: (_, _) {},
+    );
+
+    await tester.enterText(
+      find.byType(TextFormField).first,
+      '20° 21\' 43.0" N, 87° 01\' 47.0" W',
+    );
+    await tester.pump();
+
+    // The parent holds the coordinate and does not rebuild this widget on
+    // every keystroke, so re-seeding from the parent's values would wipe what
+    // was just pasted.
+    expect(find.text('20.361944'), findsOneWidget);
+    expect(find.text('-87.029722'), findsOneWidget);
+    expect(find.text('1.000000'), findsNothing);
+  });
+
+  testWidgets('a coordinate outside the UTM band falls back to the decimal '
+      'layout instead of showing empty grid fields', (tester) async {
+    await pumpInput(
+      tester,
+      format: CoordinateFormat.mgrs,
+      latitude: 85.5,
+      longitude: 10.0,
+      onChanged: (_, _) {},
+    );
+
+    // MGRS is undefined above 84 N. Rendering its layout here would show the
+    // position as missing, and editing would then report it away.
+    expect(find.byType(TextFormField), findsNWidgets(2));
+    expect(find.text('85.500000'), findsOneWidget);
+    expect(find.text('10.000000'), findsOneWidget);
+  });
+
   testWidgets('an unparseable entry reports null rather than a stale value', (
     tester,
   ) async {

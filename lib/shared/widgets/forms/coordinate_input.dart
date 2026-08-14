@@ -105,17 +105,40 @@ class _CoordinateInputState extends State<CoordinateInput> {
     if (controller.text != text) controller.text = text;
   }
 
+  /// The format actually used for seeding and layout.
+  ///
+  /// UTM and MGRS are undefined beyond 84 N / 80 S. A polar coordinate shown
+  /// in a grid layout would render as empty fields -- the position would look
+  /// missing, and the next edit would report it away -- so grid formats
+  /// degrade to decimal degrees there, matching what the display formatter
+  /// already does. With no coordinate yet there is nothing to degrade, so the
+  /// chosen layout stands.
+  CoordinateFormat _effectiveFormat(double? lat, double? lon) {
+    if (!widget.format.isGridFormat) return widget.format;
+    if (lat == null || lon == null) return widget.format;
+    if (latLngToUtm(lat, lon) != null) return widget.format;
+    return CoordinateFormat.decimalDegrees;
+  }
+
   /// Fills every sub-field from the widget's current decimal-degree values.
   void _seed() {
-    _seeding = true;
     _reportedLatitude = widget.latitude;
     _reportedLongitude = widget.longitude;
+    _seedFrom(widget.latitude, widget.longitude);
+  }
 
-    final lat = widget.latitude;
-    final lon = widget.longitude;
+  /// Fills every sub-field from an explicit pair.
+  ///
+  /// The paste path seeds from the parsed values rather than from
+  /// [widget.latitude]/[widget.longitude]: the parent owns the coordinate but
+  /// deliberately does not rebuild this widget on every keystroke, so those
+  /// still hold the previous value and re-seeding from them would wipe what
+  /// was just pasted.
+  void _seedFrom(double? lat, double? lon) {
+    _seeding = true;
     final hasPair = lat != null && lon != null;
 
-    switch (widget.format) {
+    switch (_effectiveFormat(lat, lon)) {
       case CoordinateFormat.decimalDegrees:
         _set('lat', lat == null ? '' : lat.toStringAsFixed(6));
         _set('lon', lon == null ? '' : lon.toStringAsFixed(6));
@@ -189,11 +212,13 @@ class _CoordinateInputState extends State<CoordinateInput> {
     final pasted = parseCoordinates(_controller(editedKey).text);
     if (pasted != null) {
       _report(pasted.latitude, pasted.longitude);
-      _seed();
+      // Seed from what was parsed, not from the parent's stale values, and
+      // leave the reported pair alone: it is the last thing emitted.
+      _seedFrom(pasted.latitude, pasted.longitude);
       return;
     }
 
-    switch (widget.format) {
+    switch (_effectiveFormat(_reportedLatitude, _reportedLongitude)) {
       case CoordinateFormat.decimalDegrees:
         _report(
           parseSingleAxis(_controller('lat').text, isLatitude: true),
@@ -275,7 +300,7 @@ class _CoordinateInputState extends State<CoordinateInput> {
   }
 
   List<Widget> _fieldsForFormat(BuildContext context) {
-    switch (widget.format) {
+    switch (_effectiveFormat(widget.latitude, widget.longitude)) {
       case CoordinateFormat.decimalDegrees:
         return [
           _field('lat', widget.latitudeLabel ?? 'Latitude', signed: true),
