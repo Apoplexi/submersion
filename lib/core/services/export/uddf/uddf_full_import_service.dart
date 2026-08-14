@@ -1348,6 +1348,25 @@ class UddfFullImportService {
         if (existingRefs.isNotEmpty) {
           diveData['equipmentRefs'] = existingRefs;
         }
+
+        // Lead weight, when the exporter put <equipmentused> here rather
+        // than in <informationbeforedive>. UDDF is ambiguous about which
+        // half of the dive owns the element and exporters disagree
+        // (Oceanic Plus and MacDive both write it after), so it is read
+        // from whichever side supplies it. The before-dive value wins to
+        // keep this a fallback rather than an override.
+        if (diveData['weightUsed'] == null) {
+          final leadText = UddfImportParsers.getElementText(
+            afterEquipmentElement,
+            'leadquantity',
+          );
+          if (leadText != null) {
+            final leadKg = double.tryParse(leadText);
+            if (leadKg != null) {
+              diveData['weightUsed'] = leadKg;
+            }
+          }
+        }
       }
     }
 
