@@ -257,11 +257,9 @@ void main() {
         )
         .getSingle();
     expect(sql.read<String>('sql'), contains('trim'));
-    expect(
-      await tagIds(db),
-      ['tag-a'],
-      reason: 'the rows the old index allowed must still be collapsed',
-    );
+    expect(await tagIds(db), [
+      'tag-a',
+    ], reason: 'the rows the old index allowed must still be collapsed');
   });
 
   test('is idempotent when the database is already clean', () async {

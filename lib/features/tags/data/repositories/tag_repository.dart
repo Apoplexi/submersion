@@ -197,7 +197,7 @@ class TagRepository {
 
       // Create new tag
       final now = DateTime.now();
-      return createTag(
+      return await createTag(
         domain.Tag(
           id: _uuid.v4(),
           diverId: diverId,
@@ -627,7 +627,7 @@ class TagRepository {
   /// Search tags by name (for autocomplete)
   Future<List<domain.Tag>> searchTags(String query, {String? diverId}) async {
     try {
-      if (query.isEmpty) return getAllTags(diverId: diverId);
+      if (query.isEmpty) return await getAllTags(diverId: diverId);
 
       final searchQuery = _db.select(_db.tags)
         ..where((t) => t.name.lower().contains(query.toLowerCase()))

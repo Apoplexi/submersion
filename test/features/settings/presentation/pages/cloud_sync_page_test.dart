@@ -966,21 +966,19 @@ void main() {
       },
     );
 
-    testWidgets(
-      'tapping the iCloud tile authenticates and shows snackbar',
-      (tester) async {
-        final handles = await pumpPage(tester);
+    testWidgets('tapping the iCloud tile authenticates and shows snackbar', (
+      tester,
+    ) async {
+      final handles = await pumpPage(tester);
 
-        await tester.tap(find.text('iCloud'));
-        await tester.pumpAndSettle();
+      await tester.tap(find.text('iCloud'));
+      await tester.pumpAndSettle();
 
-        // Fake provider authenticates successfully -> success snackbar +
-        // refreshState() on the sync notifier.
-        expect(find.text('Connected to Fake'), findsOneWidget);
-        expect(handles.sync.refreshStateCalls, greaterThan(0));
-      },
-      skip: tapUnavailable,
-    );
+      // Fake provider authenticates successfully -> success snackbar +
+      // refreshState() on the sync notifier.
+      expect(find.text('Connected to Fake'), findsOneWidget);
+      expect(handles.sync.refreshStateCalls, greaterThan(0));
+    }, skip: tapUnavailable);
 
     testWidgets('null cloud provider shows initialize-failed snackbar', (
       tester,
@@ -993,18 +991,16 @@ void main() {
       expect(find.text('Failed to initialize icloud provider'), findsOneWidget);
     }, skip: tapUnavailable);
 
-    testWidgets(
-      'authentication failure shows connection-failed snackbar',
-      (tester) async {
-        await pumpPage(tester, cloudProvider: _ThrowingCloudStorageProvider());
+    testWidgets('authentication failure shows connection-failed snackbar', (
+      tester,
+    ) async {
+      await pumpPage(tester, cloudProvider: _ThrowingCloudStorageProvider());
 
-        await tester.tap(find.text('iCloud'));
-        await tester.pumpAndSettle();
+      await tester.tap(find.text('iCloud'));
+      await tester.pumpAndSettle();
 
-        expect(find.textContaining('Fake connection failed:'), findsOneWidget);
-      },
-      skip: tapUnavailable,
-    );
+      expect(find.textContaining('Fake connection failed:'), findsOneWidget);
+    }, skip: tapUnavailable);
   });
 
   group('CloudSyncPage - sync actions', () {

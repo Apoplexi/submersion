@@ -132,6 +132,19 @@ class ZipExpansionService {
       );
     }
 
+    // archive 4.x stopped throwing on a truncated or corrupt ZIP: ZipDirectory
+    // tolerates the damage and returns zero entries. A local-file-header
+    // signature (PK\x03\x04) means the archive claimed to carry members, so an
+    // empty decode is corruption rather than an empty archive. A legitimately
+    // empty ZIP (PK\x05\x06) still falls through to the "no importable files"
+    // path below.
+    if (archive.isEmpty && bytes[2] == 0x03 && bytes[3] == 0x04) {
+      throw FormatException(
+        'Could not read archive "$archiveName" '
+        '(corrupt or password-protected)',
+      );
+    }
+
     var totalSize = 0;
     for (final entry in archive) {
       if (entry.isFile) totalSize += entry.size;
@@ -195,7 +208,7 @@ class ZipExpansionService {
             '${p.basenameWithoutExtension(name)}_${counter++}${p.extension(name)}';
         outPath = p.join(tempDir.path, outName);
       }
-      await File(outPath).writeAsBytes(entry.content as List<int>);
+      await File(outPath).writeAsBytes(entry.readBytes() ?? const <int>[]);
 
       if (isDiveFile) {
         diveFiles[p.basenameWithoutExtension(outName)] = outPath;

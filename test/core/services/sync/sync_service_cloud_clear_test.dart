@@ -111,11 +111,10 @@ void main() {
 
       expect(outcome.deleted, 5);
       expect(outcome.failed, 0);
-      expect(
-        seen.first,
-        (done: 0, total: 5),
-        reason: 'the bar must start at a known total, not grow as it goes',
-      );
+      expect(seen.first, (
+        done: 0,
+        total: 5,
+      ), reason: 'the bar must start at a known total, not grow as it goes');
       expect(seen.last, (done: 5, total: 5));
       expect(
         seen.map((p) => p.done),

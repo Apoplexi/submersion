@@ -510,7 +510,7 @@ class DiveRepository {
 
       final rows = await query.get();
       if (rows.isEmpty) return [];
-      return Future.wait(rows.map(_mapRowToDive));
+      return await Future.wait(rows.map(_mapRowToDive));
     } catch (e, stackTrace) {
       _log.error(
         'Failed to get dives needing site match',
@@ -1642,7 +1642,7 @@ class DiveRepository {
         ]);
 
       final rows = await query.get();
-      return Future.wait(rows.map(_mapRowToDive));
+      return await Future.wait(rows.map(_mapRowToDive));
     } catch (e, stackTrace) {
       _log.error(
         'Failed to get dives by ids',
@@ -2086,7 +2086,7 @@ class DiveRepository {
         ]);
 
       final rows = await query.get();
-      return Future.wait(rows.map(_mapRowToDive));
+      return await Future.wait(rows.map(_mapRowToDive));
     } catch (e, stackTrace) {
       _log.error(
         'Failed to get dives for site: $siteId',
@@ -2108,7 +2108,7 @@ class DiveRepository {
         ]);
 
       final rows = await query.get();
-      return Future.wait(rows.map(_mapRowToDive));
+      return await Future.wait(rows.map(_mapRowToDive));
     } catch (e, stackTrace) {
       _log.error(
         'Failed to get dives for course: $courseId',
@@ -2147,7 +2147,7 @@ class DiveRepository {
       }
 
       final rows = await query.get();
-      return Future.wait(rows.map(_mapRowToDive));
+      return await Future.wait(rows.map(_mapRowToDive));
     } catch (e, stackTrace) {
       _log.error(
         'Failed to get dives in range: $start - $end',
@@ -3641,7 +3641,7 @@ class DiveRepository {
       }
 
       final rows = await query.get();
-      return Future.wait(rows.map(_mapRowToDive));
+      return await Future.wait(rows.map(_mapRowToDive));
     } catch (e, stackTrace) {
       _log.error(
         'Failed to get favorite dives',
@@ -3670,7 +3670,7 @@ class DiveRepository {
       }
 
       final rows = await query.get();
-      return Future.wait(rows.map(_mapRowToDive));
+      return await Future.wait(rows.map(_mapRowToDive));
     } catch (e, stackTrace) {
       _log.error(
         'Failed to get planned dives',
@@ -3686,7 +3686,7 @@ class DiveRepository {
     try {
       // Ensure isPlanned is true
       final plannedDive = plan.copyWith(isPlanned: true);
-      return createDive(plannedDive);
+      return await createDive(plannedDive);
     } catch (e, stackTrace) {
       _log.error(
         'Failed to create planned dive',
@@ -4252,7 +4252,7 @@ class DiveRepository {
       final rows = await query.get();
       if (rows.isEmpty) return null;
 
-      return _mapRowToDive(rows.first);
+      return await _mapRowToDive(rows.first);
     } catch (e, stackTrace) {
       _log.error(
         'Failed to get previous dive for: $diveId',

@@ -193,11 +193,9 @@ void main() {
       await tester.tap(find.text('Unlink'));
       await tester.pumpAndSettle();
 
-      expect(
-        notifier.unlinkedIds,
-        ['c'],
-        reason: 'unlink must act on the checked id, not the checked position',
-      );
+      expect(notifier.unlinkedIds, [
+        'c',
+      ], reason: 'unlink must act on the checked id, not the checked position');
     });
 
     testWidgets('an explicit entry survives unchecking the last thumbnail', (

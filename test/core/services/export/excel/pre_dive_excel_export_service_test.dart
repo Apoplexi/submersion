@@ -1,4 +1,4 @@
-import 'package:excel/excel.dart' as xl;
+import 'package:excel_community/excel_community.dart' as xl;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/constants/units.dart';
 import 'package:submersion/core/services/export/excel/pre_dive_excel_export_service.dart';
