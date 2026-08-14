@@ -21,6 +21,7 @@ class CoordinateFieldGroup extends StatefulWidget {
     this.latitudeLabel,
     this.longitudeLabel,
     this.errorText,
+    this.invalidMessage,
   });
 
   final TextEditingController latitudeController;
@@ -29,6 +30,9 @@ class CoordinateFieldGroup extends StatefulWidget {
   final String? latitudeLabel;
   final String? longitudeLabel;
   final String? errorText;
+
+  /// Shown, and used to fail form validation, while the entry is invalid.
+  final String? invalidMessage;
 
   @override
   State<CoordinateFieldGroup> createState() => _CoordinateFieldGroupState();
@@ -72,19 +76,27 @@ class _CoordinateFieldGroupState extends State<CoordinateFieldGroup> {
     });
   }
 
-  void _onChanged(double? latitude, double? longitude) {
+  void _onChanged(CoordinateInputValue value) {
+    // An entry that is neither blank nor a position is a typo or a half-typed
+    // coordinate. Writing it through as empty would destroy the stored
+    // position -- and because the form's range validators treat empty as "no
+    // coordinate", nothing downstream would object. Leave the controllers
+    // alone; CoordinateInput fails validation so the form cannot be saved in
+    // this state.
+    if (value.isInvalid) return;
+
     _writingBack = true;
-    widget.latitudeController.text = latitude == null
+    widget.latitudeController.text = value.latitude == null
         ? ''
-        : latitude.toStringAsFixed(6);
-    widget.longitudeController.text = longitude == null
+        : value.latitude!.toStringAsFixed(6);
+    widget.longitudeController.text = value.longitude == null
         ? ''
-        : longitude.toStringAsFixed(6);
+        : value.longitude!.toStringAsFixed(6);
     _writingBack = false;
     // Deliberately not setState: the input owns the text the diver is typing,
     // and re-seeding it here would move the caret mid-edit.
-    _latitude = latitude;
-    _longitude = longitude;
+    _latitude = value.latitude;
+    _longitude = value.longitude;
   }
 
   @override
@@ -97,6 +109,7 @@ class _CoordinateFieldGroupState extends State<CoordinateFieldGroup> {
       latitudeLabel: widget.latitudeLabel,
       longitudeLabel: widget.longitudeLabel,
       errorText: widget.errorText,
+      invalidMessage: widget.invalidMessage,
     );
   }
 }

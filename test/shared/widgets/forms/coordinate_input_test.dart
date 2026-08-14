@@ -9,7 +9,7 @@ void main() {
     required CoordinateFormat format,
     double? latitude,
     double? longitude,
-    required void Function(double?, double?) onChanged,
+    required void Function(CoordinateInputValue) onChanged,
   }) async {
     await tester.pumpWidget(
       MaterialApp(
@@ -31,7 +31,7 @@ void main() {
       format: CoordinateFormat.decimalDegrees,
       latitude: 20.361944,
       longitude: -87.029722,
-      onChanged: (_, _) {},
+      onChanged: (_) {},
     );
     expect(find.byType(TextFormField), findsNWidgets(2));
     expect(find.text('20.361944'), findsOneWidget);
@@ -46,7 +46,7 @@ void main() {
       format: CoordinateFormat.mgrs,
       latitude: 20.361944,
       longitude: -87.029722,
-      onChanged: (_, _) {},
+      onChanged: (_) {},
     );
     expect(find.byType(TextFormField), findsOneWidget);
     expect(find.text('16Q DH 96898 51535'), findsOneWidget);
@@ -58,7 +58,7 @@ void main() {
       format: CoordinateFormat.utm,
       latitude: 20.361944,
       longitude: -87.029722,
-      onChanged: (_, _) {},
+      onChanged: (_) {},
     );
     expect(find.text('16Q'), findsOneWidget);
     expect(find.text('496898'), findsOneWidget);
@@ -73,7 +73,7 @@ void main() {
       format: CoordinateFormat.degreesMinutesSeconds,
       latitude: 20.361944,
       longitude: -87.029722,
-      onChanged: (_, _) {},
+      onChanged: (_) {},
     );
     expect(find.byType(TextFormField), findsNWidgets(6));
     expect(find.text('43.0'), findsOneWidget);
@@ -88,7 +88,7 @@ void main() {
       format: CoordinateFormat.decimalDegrees,
       latitude: 0,
       longitude: 0,
-      onChanged: (a, _) => lat = a,
+      onChanged: (v) => lat = v.latitude,
     );
     await tester.enterText(find.byType(TextFormField).first, '20.361944');
     await tester.pump();
@@ -103,9 +103,9 @@ void main() {
     await pumpInput(
       tester,
       format: CoordinateFormat.mgrs,
-      onChanged: (a, b) {
-        lat = a;
-        lng = b;
+      onChanged: (v) {
+        lat = v.latitude;
+        lng = v.longitude;
       },
     );
     await tester.enterText(find.byType(TextFormField), '16Q DH 96898 51535');
@@ -122,9 +122,9 @@ void main() {
     await pumpInput(
       tester,
       format: CoordinateFormat.decimalDegrees,
-      onChanged: (a, b) {
-        lat = a;
-        lng = b;
+      onChanged: (v) {
+        lat = v.latitude;
+        lng = v.longitude;
       },
     );
     // A DMS pair pasted while the app is set to decimal degrees still works:
@@ -146,7 +146,7 @@ void main() {
       format: CoordinateFormat.decimalDegrees,
       latitude: 1.0,
       longitude: 2.0,
-      onChanged: (_, _) {},
+      onChanged: (_) {},
     );
 
     await tester.enterText(
@@ -170,7 +170,7 @@ void main() {
       format: CoordinateFormat.mgrs,
       latitude: 85.5,
       longitude: 10.0,
-      onChanged: (_, _) {},
+      onChanged: (_) {},
     );
 
     // MGRS is undefined above 84 N. Rendering its layout here would show the
@@ -180,6 +180,40 @@ void main() {
     expect(find.text('10.000000'), findsOneWidget);
   });
 
+  testWidgets('seconds that round up to 60 carry into minutes', (tester) async {
+    // 1.04998889 is 1 deg 2 min 59.96 sec. Rendering the seconds at one
+    // decimal gives "60.0", which is not a real seconds value: the parser
+    // rejects it, so the field would show a valid stored coordinate as
+    // invalid and the next recompute would report it away.
+    await pumpInput(
+      tester,
+      format: CoordinateFormat.degreesMinutesSeconds,
+      latitude: 1.04998889,
+      longitude: 0,
+      onChanged: (_) {},
+    );
+
+    expect(find.text('60.0'), findsNothing);
+    expect(find.text('03'), findsOneWidget);
+    // Editable fields are not zero-padded the way the display string is.
+    expect(find.text('0.0'), findsWidgets);
+  });
+
+  testWidgets('minutes that round up to 60 carry into degrees', (tester) async {
+    // 1.99999 is a hair under 2 degrees; at three decimals the minutes round
+    // to 60.000.
+    await pumpInput(
+      tester,
+      format: CoordinateFormat.degreesDecimalMinutes,
+      latitude: 1.99999999,
+      longitude: 0,
+      onChanged: (_) {},
+    );
+
+    expect(find.text('60.000'), findsNothing);
+    expect(find.text('2'), findsOneWidget);
+  });
+
   testWidgets('an unparseable entry reports null rather than a stale value', (
     tester,
   ) async {
@@ -187,7 +221,7 @@ void main() {
     await pumpInput(
       tester,
       format: CoordinateFormat.decimalDegrees,
-      onChanged: (a, _) => lat = a,
+      onChanged: (v) => lat = v.latitude,
     );
     await tester.enterText(find.byType(TextFormField).first, 'not a number');
     await tester.pump();
@@ -200,9 +234,9 @@ void main() {
     await pumpInput(
       tester,
       format: CoordinateFormat.decimalDegrees,
-      onChanged: (a, b) {
-        lat = a;
-        lng = b;
+      onChanged: (v) {
+        lat = v.latitude;
+        lng = v.longitude;
       },
     );
     await tester.enterText(find.byType(TextFormField).first, '20.361944');

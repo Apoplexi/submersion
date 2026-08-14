@@ -87,6 +87,10 @@ class LocationSection extends StatelessWidget {
               errorText:
                   latValidator(latitudeController.text) ??
                   lonValidator(longitudeController.text),
+              // Shown while what is typed is not a position at all. The
+              // controllers keep the last good value in that state, so the
+              // range validators above have nothing to complain about.
+              invalidMessage: l10n.diveSites_edit_gps_latitude_validation,
             ),
             Padding(
               padding: const EdgeInsets.fromLTRB(14, 2, 14, 6),

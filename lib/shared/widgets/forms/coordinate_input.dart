@@ -1,9 +1,36 @@
 import 'package:flutter/material.dart';
 
 import 'package:submersion/core/utils/coordinates/coordinate_format.dart';
+import 'package:submersion/core/utils/coordinates/coordinate_formatter.dart';
 import 'package:submersion/core/utils/coordinates/coordinate_parser.dart';
 import 'package:submersion/core/utils/coordinates/mgrs_converter.dart';
 import 'package:submersion/core/utils/coordinates/utm_converter.dart';
+
+/// What the input currently holds, in decimal degrees.
+///
+/// Blank and invalid are reported separately because they mean opposite
+/// things to the consumer: blank is a diver deliberately removing a
+/// coordinate, invalid is a half-typed or mistaken one. Collapsing both to a
+/// null pair is what let a typo erase a stored position.
+class CoordinateInputValue {
+  const CoordinateInputValue({
+    this.latitude,
+    this.longitude,
+    required this.isBlank,
+  });
+
+  final double? latitude;
+  final double? longitude;
+
+  /// Every sub-field is empty.
+  final bool isBlank;
+
+  /// The sub-fields form a complete position.
+  bool get isComplete => latitude != null && longitude != null;
+
+  /// Something is entered, but it is not a position.
+  bool get isInvalid => !isBlank && !isComplete;
+}
 
 /// Latitude/longitude entry that adapts its sub-fields to the diver's chosen
 /// notation.
@@ -26,19 +53,22 @@ class CoordinateInput extends StatefulWidget {
     this.latitudeLabel,
     this.longitudeLabel,
     this.errorText,
+    this.invalidMessage,
   });
 
   final CoordinateFormat format;
   final double? latitude;
   final double? longitude;
 
-  /// Reports the coordinate in decimal degrees, or (null, null) when the
-  /// current sub-fields do not form a complete valid position.
-  final void Function(double? latitude, double? longitude) onChanged;
+  /// Reports what the sub-fields currently hold.
+  final void Function(CoordinateInputValue value) onChanged;
 
   final String? latitudeLabel;
   final String? longitudeLabel;
   final String? errorText;
+
+  /// Shown, and used to fail form validation, while the entry is invalid.
+  final String? invalidMessage;
 
   @override
   State<CoordinateInput> createState() => _CoordinateInputState();
@@ -58,6 +88,9 @@ class _CoordinateInputState extends State<CoordinateInput> {
   /// Set while re-seeding so the controller listeners do not treat a
   /// programmatic write as a user edit.
   bool _seeding = false;
+
+  /// Whether every sub-field was empty at the last report.
+  bool _isBlank = true;
 
   @override
   void initState() {
@@ -178,27 +211,31 @@ class _CoordinateInputState extends State<CoordinateInput> {
       return;
     }
 
-    final hemisphere = isLatitude
-        ? (value >= 0 ? 'N' : 'S')
-        : (value >= 0 ? 'E' : 'W');
+    final hemisphere = hemisphereFor(value, isLatitude: isLatitude);
     if (isLatitude) {
       _latHemisphere = hemisphere;
     } else {
       _lonHemisphere = hemisphere;
     }
 
-    final magnitude = value.abs();
-    final degrees = magnitude.floor();
-    final minutesFull = (magnitude - degrees) * 60;
-
-    _set('${prefix}Deg', degrees.toString());
+    // Shared with the display formatter so both apply the same carry. Doing
+    // the arithmetic here independently is what let seconds render as "60.0",
+    // which the parser then rejects.
     if (withSeconds) {
-      final minutes = minutesFull.floor();
-      final seconds = (minutesFull - minutes) * 60;
-      _set('${prefix}Min', minutes.toString().padLeft(2, '0'));
-      _set('${prefix}Sec', seconds.toStringAsFixed(1));
+      final parts = axisAsDegreesMinutesSeconds(value, isLatitude: isLatitude);
+      _set('${prefix}Deg', parts.degrees.toString());
+      _set('${prefix}Min', parts.minutes.toString().padLeft(2, '0'));
+      _set(
+        '${prefix}Sec',
+        parts.seconds.toStringAsFixed(degreesMinutesSecondsPrecision),
+      );
     } else {
-      _set('${prefix}Min', minutesFull.toStringAsFixed(3));
+      final parts = axisAsDegreesDecimalMinutes(value, isLatitude: isLatitude);
+      _set('${prefix}Deg', parts.degrees.toString());
+      _set(
+        '${prefix}Min',
+        parts.minutes.toStringAsFixed(degreesDecimalMinutesPrecision),
+      );
     }
   }
 
@@ -273,7 +310,26 @@ class _CoordinateInputState extends State<CoordinateInput> {
     final complete = latitude != null && longitude != null;
     _reportedLatitude = complete ? latitude : null;
     _reportedLongitude = complete ? longitude : null;
-    widget.onChanged(_reportedLatitude, _reportedLongitude);
+    _isBlank = _allFieldsEmpty();
+    widget.onChanged(
+      CoordinateInputValue(
+        latitude: _reportedLatitude,
+        longitude: _reportedLongitude,
+        isBlank: _isBlank,
+      ),
+    );
+  }
+
+  /// True when nothing is typed in any visible sub-field.
+  bool _allFieldsEmpty() =>
+      _controllers.values.every((c) => c.text.trim().isEmpty);
+
+  /// The message shown, and used to fail validation, while the entry is
+  /// neither blank nor a valid position.
+  String? _invalidError() {
+    if (_isBlank) return null;
+    if (_reportedLatitude != null && _reportedLongitude != null) return null;
+    return widget.invalidMessage;
   }
 
   @override
@@ -303,7 +359,12 @@ class _CoordinateInputState extends State<CoordinateInput> {
     switch (_effectiveFormat(widget.latitude, widget.longitude)) {
       case CoordinateFormat.decimalDegrees:
         return [
-          _field('lat', widget.latitudeLabel ?? 'Latitude', signed: true),
+          _field(
+            'lat',
+            widget.latitudeLabel ?? 'Latitude',
+            signed: true,
+            carriesError: true,
+          ),
           const SizedBox(height: 8),
           _field('lon', widget.longitudeLabel ?? 'Longitude', signed: true),
         ];
@@ -343,7 +404,10 @@ class _CoordinateInputState extends State<CoordinateInput> {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SizedBox(width: 72, child: _field('zone', 'Zone')),
+              SizedBox(
+                width: 72,
+                child: _field('zone', 'Zone', carriesError: true),
+              ),
               const SizedBox(width: 8),
               Expanded(child: _field('easting', 'Easting', numeric: true)),
               const SizedBox(width: 8),
@@ -353,7 +417,7 @@ class _CoordinateInputState extends State<CoordinateInput> {
         ];
 
       case CoordinateFormat.mgrs:
-        return [_field('grid', 'Grid reference')];
+        return [_field('grid', 'Grid reference', carriesError: true)];
     }
   }
 
@@ -412,12 +476,20 @@ class _CoordinateInputState extends State<CoordinateInput> {
     bool numeric = false,
     bool signed = false,
     String? suffix,
+    bool carriesError = false,
   }) {
     return TextFormField(
       controller: _controller(key),
       keyboardType: numeric || signed
           ? TextInputType.numberWithOptions(decimal: true, signed: signed)
           : TextInputType.text,
+      // Only one field carries the message: the group is validated as a
+      // whole, and repeating it under six sub-fields would be noise. Having
+      // any validator fail is what stops the form saving.
+      validator: carriesError ? (_) => _invalidError() : null,
+      autovalidateMode: carriesError
+          ? AutovalidateMode.onUserInteraction
+          : AutovalidateMode.disabled,
       decoration: InputDecoration(
         labelText: label.isEmpty ? null : label,
         suffixText: suffix,

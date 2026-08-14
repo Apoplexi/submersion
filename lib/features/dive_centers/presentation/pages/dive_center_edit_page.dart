@@ -789,6 +789,8 @@ class _DiveCenterEditPageState extends ConsumerState<DiveCenterEditPage> {
               latitudeLabel: context.l10n.diveCenters_field_latitude,
               longitudeLabel: context.l10n.diveCenters_field_longitude,
               errorText: _coordinateError(context),
+              invalidMessage:
+                  context.l10n.diveCenters_validation_invalidLatitude,
             ),
           ],
         ),
