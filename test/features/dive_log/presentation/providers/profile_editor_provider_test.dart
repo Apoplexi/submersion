@@ -117,7 +117,10 @@ void main() {
 
       trimNotifier.trimEndZeros();
 
-      expect(trimNotifier.state.editedProfile, profileWithoutExtraTrailingZeros);
+      expect(
+        trimNotifier.state.editedProfile,
+        profileWithoutExtraTrailingZeros,
+      );
       expect(trimNotifier.state.undoStack, isEmpty);
       expect(trimNotifier.state.hasChanges, isFalse);
     });
