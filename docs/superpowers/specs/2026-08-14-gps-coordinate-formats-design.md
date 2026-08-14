@@ -27,13 +27,20 @@ coordinate and to coordinate entry:
 
 | Format | Example | Who uses it |
 | --- | --- | --- |
-| Decimal degrees (DD) | `25.076000° N, 80.451000° W` | Current behavior; web maps, APIs |
-| Degrees decimal minutes (DDM) | `25° 04.560' N, 80° 27.060' W` | Marine GPS, chartplotters, most dive boats |
-| Degrees minutes seconds (DMS) | `25° 04' 33.6" N, 80° 27' 03.6" W` | Charts, cartographic convention |
-| UTM | `17R 654321E 2773456N` | Land survey, topographic maps |
-| MGRS | `17R LL 54321 73456` | Military, search and rescue |
+| Decimal degrees (DD) | `20.361944° N, 87.029722° W` | Current behavior; web maps, APIs |
+| Degrees decimal minutes (DDM) | `20° 21.717' N, 87° 01.783' W` | Marine GPS, chartplotters, most dive boats |
+| Degrees minutes seconds (DMS) | `20° 21' 43.0" N, 87° 01' 47.0" W` | Charts, cartographic convention |
+| UTM | `16Q 496898E 2251535N` | Land survey, topographic maps |
+| MGRS | `16Q DH 96898 51535` | Military, search and rescue |
 
-DD remains the default, so no existing user sees a change until they opt in.
+All five rows describe the same point (Palancar reef, Cozumel) and were
+generated from the NGA GEOTRANS library, not written by hand.
+
+DD remains the default, so no diver has to choose anything to keep working the
+way they do now. Two small changes do reach a diver who never opens the
+setting: DD gains a degree symbol and a hemisphere letter (`20.361944° N`
+rather than the current signed `20.361944`), and the display sites that
+currently round to four or five decimals become consistent at six.
 
 ### Out of scope
 
@@ -88,9 +95,15 @@ persisted by `.name`.
 | MGRS | 10-digit | 1 m |
 
 The worked examples in the format table above are the authoritative rendering,
-spacing included: MGRS is grouped (`17R LL 54321 73456`) rather than run
+spacing included: MGRS is grouped (`16Q DH 96898 51535`) rather than run
 together, because grouped digits are what a person reads a grid reference from
 aloud.
+
+One convention difference between the two grid formats matters and is easy to
+get wrong: **UTM rounds to the nearest metre, MGRS truncates.** A UTM
+coordinate names a point, but an MGRS reference names a square and is
+identified by its south-west corner, so rounding would name the wrong square
+for any position in the upper half of one.
 
 These are display precisions only, chosen so that no format loses meaningful
 precision relative to a consumer GPS fix (roughly 3-5 m). Round-tripping a
