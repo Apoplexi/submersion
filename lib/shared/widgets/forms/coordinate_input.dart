@@ -1,0 +1,403 @@
+import 'package:flutter/material.dart';
+
+import 'package:submersion/core/utils/coordinates/coordinate_format.dart';
+import 'package:submersion/core/utils/coordinates/coordinate_parser.dart';
+import 'package:submersion/core/utils/coordinates/mgrs_converter.dart';
+import 'package:submersion/core/utils/coordinates/utm_converter.dart';
+
+/// Latitude/longitude entry that adapts its sub-fields to the diver's chosen
+/// notation.
+///
+/// The public interface is decimal degrees in both directions, so the
+/// consuming form, its validators, and the database contract never learn
+/// which format is active. Only the layout changes.
+///
+/// UTM and MGRS are why this widget owns the whole pair rather than sitting
+/// behind two independent latitude and longitude fields: a UTM zone is shared
+/// between the axes and an MGRS reference encodes both in a single token, so
+/// neither can be split across two fields.
+class CoordinateInput extends StatefulWidget {
+  const CoordinateInput({
+    super.key,
+    required this.format,
+    required this.latitude,
+    required this.longitude,
+    required this.onChanged,
+    this.latitudeLabel,
+    this.longitudeLabel,
+    this.errorText,
+  });
+
+  final CoordinateFormat format;
+  final double? latitude;
+  final double? longitude;
+
+  /// Reports the coordinate in decimal degrees, or (null, null) when the
+  /// current sub-fields do not form a complete valid position.
+  final void Function(double? latitude, double? longitude) onChanged;
+
+  final String? latitudeLabel;
+  final String? longitudeLabel;
+  final String? errorText;
+
+  @override
+  State<CoordinateInput> createState() => _CoordinateInputState();
+}
+
+class _CoordinateInputState extends State<CoordinateInput> {
+  final Map<String, TextEditingController> _controllers = {};
+  String _latHemisphere = 'N';
+  String _lonHemisphere = 'E';
+
+  /// The last pair this widget reported upward. Incoming values equal to it
+  /// are this widget's own echo and must not re-seed the fields, or the
+  /// caret jumps while the diver is still typing.
+  double? _reportedLatitude;
+  double? _reportedLongitude;
+
+  /// Set while re-seeding so the controller listeners do not treat a
+  /// programmatic write as a user edit.
+  bool _seeding = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _seed();
+  }
+
+  @override
+  void didUpdateWidget(CoordinateInput oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    final formatChanged = oldWidget.format != widget.format;
+    final valueChanged =
+        widget.latitude != _reportedLatitude ||
+        widget.longitude != _reportedLongitude;
+    if (!formatChanged && !valueChanged) return;
+
+    // Writing a controller that a TextFormField is bound to notifies the
+    // ancestor Form, which rebuilds itself. Doing that straight from
+    // didUpdateWidget is a setState during build, so re-seed after the frame.
+    // initState is safe because no field has bound to the controllers yet.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _seed();
+    });
+  }
+
+  @override
+  void dispose() {
+    for (final controller in _controllers.values) {
+      controller.dispose();
+    }
+    super.dispose();
+  }
+
+  TextEditingController _controller(String key) =>
+      _controllers.putIfAbsent(key, () {
+        final controller = TextEditingController();
+        controller.addListener(() {
+          if (!_seeding) _recompute(key);
+        });
+        return controller;
+      });
+
+  void _set(String key, String text) {
+    final controller = _controller(key);
+    if (controller.text != text) controller.text = text;
+  }
+
+  /// Fills every sub-field from the widget's current decimal-degree values.
+  void _seed() {
+    _seeding = true;
+    _reportedLatitude = widget.latitude;
+    _reportedLongitude = widget.longitude;
+
+    final lat = widget.latitude;
+    final lon = widget.longitude;
+    final hasPair = lat != null && lon != null;
+
+    switch (widget.format) {
+      case CoordinateFormat.decimalDegrees:
+        _set('lat', lat == null ? '' : lat.toStringAsFixed(6));
+        _set('lon', lon == null ? '' : lon.toStringAsFixed(6));
+
+      case CoordinateFormat.degreesDecimalMinutes:
+        _seedDegreeParts(lat, isLatitude: true, withSeconds: false);
+        _seedDegreeParts(lon, isLatitude: false, withSeconds: false);
+
+      case CoordinateFormat.degreesMinutesSeconds:
+        _seedDegreeParts(lat, isLatitude: true, withSeconds: true);
+        _seedDegreeParts(lon, isLatitude: false, withSeconds: true);
+
+      case CoordinateFormat.utm:
+        final utm = hasPair ? latLngToUtm(lat, lon) : null;
+        _set('zone', utm == null ? '' : '${utm.zone}${utm.band}');
+        _set('easting', utm == null ? '' : utm.easting.round().toString());
+        _set('northing', utm == null ? '' : utm.northing.round().toString());
+
+      case CoordinateFormat.mgrs:
+        final grid = hasPair ? latLngToMgrs(lat, lon) : null;
+        _set('grid', grid ?? '');
+    }
+
+    _seeding = false;
+  }
+
+  void _seedDegreeParts(
+    double? value, {
+    required bool isLatitude,
+    required bool withSeconds,
+  }) {
+    final prefix = isLatitude ? 'lat' : 'lon';
+    if (value == null) {
+      _set('${prefix}Deg', '');
+      _set('${prefix}Min', '');
+      if (withSeconds) _set('${prefix}Sec', '');
+      return;
+    }
+
+    final hemisphere = isLatitude
+        ? (value >= 0 ? 'N' : 'S')
+        : (value >= 0 ? 'E' : 'W');
+    if (isLatitude) {
+      _latHemisphere = hemisphere;
+    } else {
+      _lonHemisphere = hemisphere;
+    }
+
+    final magnitude = value.abs();
+    final degrees = magnitude.floor();
+    final minutesFull = (magnitude - degrees) * 60;
+
+    _set('${prefix}Deg', degrees.toString());
+    if (withSeconds) {
+      final minutes = minutesFull.floor();
+      final seconds = (minutesFull - minutes) * 60;
+      _set('${prefix}Min', minutes.toString().padLeft(2, '0'));
+      _set('${prefix}Sec', seconds.toStringAsFixed(1));
+    } else {
+      _set('${prefix}Min', minutesFull.toStringAsFixed(3));
+    }
+  }
+
+  /// Recomputes the decimal-degree pair from the current sub-fields and
+  /// reports it upward.
+  void _recompute(String editedKey) {
+    // A full coordinate pasted into any single field wins, whatever the
+    // active format. Text arrives from dive guides, messages and chartplotter
+    // screens in whatever notation its author used, and refusing it because
+    // it is not the selected format would be hostile.
+    final pasted = parseCoordinates(_controller(editedKey).text);
+    if (pasted != null) {
+      _report(pasted.latitude, pasted.longitude);
+      _seed();
+      return;
+    }
+
+    switch (widget.format) {
+      case CoordinateFormat.decimalDegrees:
+        _report(
+          parseSingleAxis(_controller('lat').text, isLatitude: true),
+          parseSingleAxis(_controller('lon').text, isLatitude: false),
+        );
+
+      case CoordinateFormat.degreesDecimalMinutes:
+        _report(
+          _axisFromParts(isLatitude: true, withSeconds: false),
+          _axisFromParts(isLatitude: false, withSeconds: false),
+        );
+
+      case CoordinateFormat.degreesMinutesSeconds:
+        _report(
+          _axisFromParts(isLatitude: true, withSeconds: true),
+          _axisFromParts(isLatitude: false, withSeconds: true),
+        );
+
+      case CoordinateFormat.utm:
+        final zone = _controller('zone').text.trim();
+        final easting = _controller('easting').text.trim();
+        final northing = _controller('northing').text.trim();
+        final parsed = parseCoordinates('$zone $easting $northing');
+        _report(parsed?.latitude, parsed?.longitude);
+
+      case CoordinateFormat.mgrs:
+        final parsed = mgrsToLatLng(_controller('grid').text.trim());
+        _report(parsed?.latitude, parsed?.longitude);
+    }
+  }
+
+  double? _axisFromParts({
+    required bool isLatitude,
+    required bool withSeconds,
+  }) {
+    final prefix = isLatitude ? 'lat' : 'lon';
+    final degrees = _controller('${prefix}Deg').text.trim();
+    if (degrees.isEmpty) return null;
+    final minutes = _controller('${prefix}Min').text.trim();
+    final seconds = withSeconds ? _controller('${prefix}Sec').text.trim() : '';
+    final hemisphere = isLatitude ? _latHemisphere : _lonHemisphere;
+    return parseSingleAxis(
+      '$degrees ${minutes.isEmpty ? '0' : minutes} '
+      '${seconds.isEmpty ? '0' : seconds} $hemisphere',
+      isLatitude: isLatitude,
+    );
+  }
+
+  void _report(double? latitude, double? longitude) {
+    // Half a coordinate is not a position: report nothing rather than let a
+    // partially typed entry look like a saved one.
+    final complete = latitude != null && longitude != null;
+    _reportedLatitude = complete ? latitude : null;
+    _reportedLongitude = complete ? longitude : null;
+    widget.onChanged(_reportedLatitude, _reportedLongitude);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(14, 6, 14, 6),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          ..._fieldsForFormat(context),
+          if (widget.errorText != null)
+            Padding(
+              padding: const EdgeInsets.only(top: 6),
+              child: Text(
+                widget.errorText!,
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: Theme.of(context).colorScheme.error,
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  List<Widget> _fieldsForFormat(BuildContext context) {
+    switch (widget.format) {
+      case CoordinateFormat.decimalDegrees:
+        return [
+          _field('lat', widget.latitudeLabel ?? 'Latitude', signed: true),
+          const SizedBox(height: 8),
+          _field('lon', widget.longitudeLabel ?? 'Longitude', signed: true),
+        ];
+
+      case CoordinateFormat.degreesDecimalMinutes:
+        return [
+          _degreeRow(
+            widget.latitudeLabel ?? 'Latitude',
+            isLatitude: true,
+            withSeconds: false,
+          ),
+          const SizedBox(height: 8),
+          _degreeRow(
+            widget.longitudeLabel ?? 'Longitude',
+            isLatitude: false,
+            withSeconds: false,
+          ),
+        ];
+
+      case CoordinateFormat.degreesMinutesSeconds:
+        return [
+          _degreeRow(
+            widget.latitudeLabel ?? 'Latitude',
+            isLatitude: true,
+            withSeconds: true,
+          ),
+          const SizedBox(height: 8),
+          _degreeRow(
+            widget.longitudeLabel ?? 'Longitude',
+            isLatitude: false,
+            withSeconds: true,
+          ),
+        ];
+
+      case CoordinateFormat.utm:
+        return [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(width: 72, child: _field('zone', 'Zone')),
+              const SizedBox(width: 8),
+              Expanded(child: _field('easting', 'Easting', numeric: true)),
+              const SizedBox(width: 8),
+              Expanded(child: _field('northing', 'Northing', numeric: true)),
+            ],
+          ),
+        ];
+
+      case CoordinateFormat.mgrs:
+        return [_field('grid', 'Grid reference')];
+    }
+  }
+
+  Widget _degreeRow(
+    String label, {
+    required bool isLatitude,
+    required bool withSeconds,
+  }) {
+    final prefix = isLatitude ? 'lat' : 'lon';
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(
+          child: _field('${prefix}Deg', label, numeric: true, suffix: '°'),
+        ),
+        const SizedBox(width: 8),
+        Expanded(child: _field('${prefix}Min', '', numeric: true, suffix: "'")),
+        if (withSeconds) ...[
+          const SizedBox(width: 8),
+          Expanded(
+            child: _field('${prefix}Sec', '', numeric: true, suffix: '"'),
+          ),
+        ],
+        const SizedBox(width: 8),
+        _hemisphereSelector(isLatitude: isLatitude),
+      ],
+    );
+  }
+
+  Widget _hemisphereSelector({required bool isLatitude}) {
+    final options = isLatitude ? ['N', 'S'] : ['E', 'W'];
+    final value = isLatitude ? _latHemisphere : _lonHemisphere;
+    return DropdownButton<String>(
+      value: options.contains(value) ? value : options.first,
+      items: [
+        for (final option in options)
+          DropdownMenuItem(value: option, child: Text(option)),
+      ],
+      onChanged: (selected) {
+        if (selected == null) return;
+        setState(() {
+          if (isLatitude) {
+            _latHemisphere = selected;
+          } else {
+            _lonHemisphere = selected;
+          }
+        });
+        _recompute(isLatitude ? 'latDeg' : 'lonDeg');
+      },
+    );
+  }
+
+  Widget _field(
+    String key,
+    String label, {
+    bool numeric = false,
+    bool signed = false,
+    String? suffix,
+  }) {
+    return TextFormField(
+      controller: _controller(key),
+      keyboardType: numeric || signed
+          ? TextInputType.numberWithOptions(decimal: true, signed: signed)
+          : TextInputType.text,
+      decoration: InputDecoration(
+        labelText: label.isEmpty ? null : label,
+        suffixText: suffix,
+        isDense: true,
+      ),
+    );
+  }
+}

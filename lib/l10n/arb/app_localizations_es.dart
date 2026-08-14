@@ -11922,8 +11922,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get media_gpsBanner_addToSiteButton => 'Agregar al punto';
 
   @override
-  String media_gpsBanner_coordinates(Object latitude, Object longitude) {
-    return 'Coordenadas: $latitude, $longitude';
+  String media_gpsBanner_coordinates(Object coordinates) {
+    return 'Coordenadas: $coordinates';
   }
 
   @override
@@ -23730,6 +23730,30 @@ class AppLocalizationsEs extends AppLocalizations {
   String visibility_range_under(String max, String unit) {
     return 'menos de $max $unit';
   }
+
+  @override
+  String get settings_coordinateFormat_title => 'Formato de coordenadas';
+
+  @override
+  String get settings_coordinateFormat_subtitle =>
+      'Cómo se muestran e introducen las posiciones GPS';
+
+  @override
+  String get settings_coordinateFormat_decimalDegrees => 'Grados decimales';
+
+  @override
+  String get settings_coordinateFormat_degreesDecimalMinutes =>
+      'Grados y minutos decimales';
+
+  @override
+  String get settings_coordinateFormat_degreesMinutesSeconds =>
+      'Grados, minutos, segundos';
+
+  @override
+  String get settings_coordinateFormat_utm => 'UTM';
+
+  @override
+  String get settings_coordinateFormat_mgrs => 'MGRS';
 
   @override
   String get settings_visibilityScale_title => 'Escala de visibilidad';

@@ -11846,8 +11846,8 @@ class AppLocalizationsNl extends AppLocalizations {
   String get media_gpsBanner_addToSiteButton => 'Toevoegen aan duikstek';
 
   @override
-  String media_gpsBanner_coordinates(Object latitude, Object longitude) {
-    return 'Coordinaten: $latitude, $longitude';
+  String media_gpsBanner_coordinates(Object coordinates) {
+    return 'Coordinaten: $coordinates';
   }
 
   @override
@@ -23538,6 +23538,30 @@ class AppLocalizationsNl extends AppLocalizations {
   String visibility_range_under(String max, String unit) {
     return 'minder dan $max $unit';
   }
+
+  @override
+  String get settings_coordinateFormat_title => 'Coördinaatformaat';
+
+  @override
+  String get settings_coordinateFormat_subtitle =>
+      'Hoe GPS-posities worden weergegeven en ingevoerd';
+
+  @override
+  String get settings_coordinateFormat_decimalDegrees => 'Decimale graden';
+
+  @override
+  String get settings_coordinateFormat_degreesDecimalMinutes =>
+      'Graden en decimale minuten';
+
+  @override
+  String get settings_coordinateFormat_degreesMinutesSeconds =>
+      'Graden, minuten, seconden';
+
+  @override
+  String get settings_coordinateFormat_utm => 'UTM';
+
+  @override
+  String get settings_coordinateFormat_mgrs => 'MGRS';
 
   @override
   String get settings_visibilityScale_title => 'Zichtschaal';

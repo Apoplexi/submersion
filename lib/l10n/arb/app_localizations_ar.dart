@@ -11721,8 +11721,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get media_gpsBanner_addToSiteButton => 'إضافة إلى الموقع';
 
   @override
-  String media_gpsBanner_coordinates(Object latitude, Object longitude) {
-    return 'الإحداثيات: $latitude، $longitude';
+  String media_gpsBanner_coordinates(Object coordinates) {
+    return 'الإحداثيات: $coordinates';
   }
 
   @override
@@ -23293,6 +23293,30 @@ class AppLocalizationsAr extends AppLocalizations {
   String visibility_range_under(String max, String unit) {
     return 'أقل من $max $unit';
   }
+
+  @override
+  String get settings_coordinateFormat_title => 'تنسيق الإحداثيات';
+
+  @override
+  String get settings_coordinateFormat_subtitle =>
+      'كيفية عرض مواقع GPS وإدخالها';
+
+  @override
+  String get settings_coordinateFormat_decimalDegrees => 'درجات عشرية';
+
+  @override
+  String get settings_coordinateFormat_degreesDecimalMinutes =>
+      'درجات ودقائق عشرية';
+
+  @override
+  String get settings_coordinateFormat_degreesMinutesSeconds =>
+      'درجات ودقائق وثوانٍ';
+
+  @override
+  String get settings_coordinateFormat_utm => 'UTM';
+
+  @override
+  String get settings_coordinateFormat_mgrs => 'MGRS';
 
   @override
   String get settings_visibilityScale_title => 'مقياس الرؤية';
