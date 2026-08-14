@@ -5,7 +5,7 @@ import 'package:submersion/core/providers/provider.dart';
 
 import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:submersion/shared/selection/selectable_list_scope.dart';
-import 'package:submersion/shared/selection/selectable_row.dart';
+import 'package:submersion/shared/selection/selection_leading.dart';
 import 'package:submersion/shared/selection/selection_app_bar.dart';
 import 'package:submersion/shared/selection/selection_entry_bar.dart';
 import 'package:submersion/shared/selection/selection_controller.dart';
@@ -636,31 +636,36 @@ class _DiveCenterListContentState extends ConsumerState<DiveCenterListContent> {
             diveCenterDiveCountProvider(center.id),
           );
           final diveCount = diveCountAsync.valueOrNull ?? 0;
-          final tile = switch (viewMode) {
+          final isChecked = _selectedIds.contains(center.id);
+          void onCheckChanged(bool _) => _selection.toggle(center.id);
+          return switch (viewMode) {
             ListViewMode.detailed => DiveCenterListTile(
               center: center,
               isSelected: isSelected,
               onTap: () => _handleRowTap(center),
+              isSelectionMode: _isSelectionMode,
+              isChecked: isChecked,
+              onCheckChanged: onCheckChanged,
             ),
             ListViewMode.compact => CompactDiveCenterListTile(
               center: center,
               diveCount: diveCount,
               isSelected: isSelected,
               onTap: () => _handleRowTap(center),
+              isSelectionMode: _isSelectionMode,
+              isChecked: isChecked,
+              onCheckChanged: onCheckChanged,
             ),
             ListViewMode.dense || ListViewMode.table => DenseDiveCenterListTile(
               center: center,
               diveCount: diveCount,
               isSelected: isSelected,
               onTap: () => _handleRowTap(center),
+              isSelectionMode: _isSelectionMode,
+              isChecked: isChecked,
+              onCheckChanged: onCheckChanged,
             ),
           };
-          return SelectableRow(
-            isSelectionMode: _isSelectionMode,
-            isChecked: _selectedIds.contains(center.id),
-            onChanged: (_) => _selection.toggle(center.id),
-            child: tile,
-          );
         },
       ),
     );
@@ -744,12 +749,18 @@ class DiveCenterListTile extends ConsumerWidget {
   final DiveCenter center;
   final bool isSelected;
   final VoidCallback? onTap;
+  final bool isSelectionMode;
+  final bool isChecked;
+  final ValueChanged<bool>? onCheckChanged;
 
   const DiveCenterListTile({
     super.key,
     required this.center,
     this.isSelected = false,
     this.onTap,
+    this.isSelectionMode = false,
+    this.isChecked = false,
+    this.onCheckChanged,
   });
 
   @override
@@ -769,16 +780,22 @@ class DiveCenterListTile extends ConsumerWidget {
           padding: const EdgeInsets.all(16),
           child: Row(
             children: [
-              Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  color: theme.colorScheme.primaryContainer,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Icon(
-                  Icons.store,
-                  color: theme.colorScheme.onPrimaryContainer,
+              // Store icon, which becomes the checkbox in selection mode.
+              SelectionLeading(
+                isSelectionMode: isSelectionMode,
+                isChecked: isChecked,
+                onChanged: onCheckChanged,
+                child: Container(
+                  width: 48,
+                  height: 48,
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.primaryContainer,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Icon(
+                    Icons.store,
+                    color: theme.colorScheme.onPrimaryContainer,
+                  ),
                 ),
               ),
               const SizedBox(width: 16),
