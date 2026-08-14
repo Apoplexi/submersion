@@ -736,7 +736,11 @@ class SyncRepository {
                 ..addColumns([count])
                 ..where(_db.syncRecords.syncStatus.equals('pending')))
               .getSingle();
-      return await row.read(count) ?? 0;
+      // Hoisted to a local on purpose: TypedResult.read is synchronous, but
+      // Dart 3.13's unawaited_return_in_try_block false-positives on returning
+      // it directly from a try. Do not inline this back.
+      final pending = row.read(count) ?? 0;
+      return pending;
     } catch (e, stackTrace) {
       _log.error(
         'Failed to get pending count',
@@ -773,7 +777,11 @@ class SyncRepository {
         );
       }
       final row = await query.getSingle();
-      return await row.read(count) ?? 0;
+      // Hoisted to a local on purpose: TypedResult.read is synchronous, but
+      // Dart 3.13's unawaited_return_in_try_block false-positives on returning
+      // it directly from a try. Do not inline this back.
+      final deletions = row.read(count) ?? 0;
+      return deletions;
     } catch (e, stackTrace) {
       _log.error(
         'Failed to get unpublished deletion count',
