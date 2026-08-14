@@ -1223,7 +1223,7 @@ class UddfFullImportService {
           'leadquantity',
         );
         if (leadText != null) {
-          final leadKg = double.tryParse(leadText);
+          final leadKg = UddfImportParsers.parseUddfDouble(leadText);
           if (leadKg != null) {
             diveData['weightUsed'] = leadKg;
           }
@@ -1361,7 +1361,7 @@ class UddfFullImportService {
             'leadquantity',
           );
           if (leadText != null) {
-            final leadKg = double.tryParse(leadText);
+            final leadKg = UddfImportParsers.parseUddfDouble(leadText);
             if (leadKg != null) {
               diveData['weightUsed'] = leadKg;
             }

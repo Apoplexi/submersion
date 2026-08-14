@@ -104,6 +104,19 @@ Covered fields: `divetime`, `diveduration`, `divenumber`, `passedtime`,
 order, gas-switch and event timestamps, gradient factors, marine-life
 sighting count, dive-type and dive-role sort order, gear service interval.
 
+`UddfImportParsers.parseUddfDouble` is the decimal counterpart, added after
+review pointed out that the lead-weight read accepted non-finite input.
+`double.tryParse` succeeds on `"NaN"`, `"Infinity"` and `"-Infinity"`, so a
+value that is only null-checked reaches the database intact. NaN is the
+dangerous case: it compares false against everything including itself, so it
+corrupts totals, averages and range checks downstream rather than failing
+where it entered. Applied at all three `<leadquantity>` reads (two of which
+predate this change).
+
+Only `<leadquantity>` is converted. Sweeping every `double.tryParse` in the
+import path is a larger mechanical change and is left as a follow-up; the
+helper exists for it when that happens.
+
 ### 2. Lead weight read from either half of the dive
 
 The existing `<informationafterdive><equipmentused>` block — which already

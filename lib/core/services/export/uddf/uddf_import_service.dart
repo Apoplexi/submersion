@@ -276,7 +276,7 @@ class UddfImportService {
       if (equipmentElement != null) {
         final leadText = _getElementText(equipmentElement, 'leadquantity');
         if (leadText != null) {
-          final leadKg = double.tryParse(leadText);
+          final leadKg = UddfImportParsers.parseUddfDouble(leadText);
           if (leadKg != null) {
             diveData['weightUsed'] = leadKg;
           }

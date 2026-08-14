@@ -60,4 +60,33 @@ void main() {
       expect(UddfImportParsers.parseUddfInt('3000000000.0'), 3000000000);
     });
   });
+
+  group('UddfImportParsers.parseUddfDouble', () {
+    test('parses decimals, integers and exponent notation', () {
+      expect(UddfImportParsers.parseUddfDouble('12.5'), closeTo(12.5, 1e-9));
+      expect(UddfImportParsers.parseUddfDouble('12'), closeTo(12.0, 1e-9));
+      expect(UddfImportParsers.parseUddfDouble('-3.25'), closeTo(-3.25, 1e-9));
+      expect(UddfImportParsers.parseUddfDouble('2.2E7'), closeTo(2.2e7, 1e-3));
+    });
+
+    test('tolerates surrounding whitespace', () {
+      expect(UddfImportParsers.parseUddfDouble(' 12.5 '), closeTo(12.5, 1e-9));
+    });
+
+    test('returns null for null, empty and non-numeric input', () {
+      expect(UddfImportParsers.parseUddfDouble(null), isNull);
+      expect(UddfImportParsers.parseUddfDouble(''), isNull);
+      expect(UddfImportParsers.parseUddfDouble('   '), isNull);
+      expect(UddfImportParsers.parseUddfDouble('abc'), isNull);
+    });
+
+    test('returns null for non-finite values', () {
+      // double.tryParse succeeds on all three; NaN in particular compares
+      // false against everything, so it corrupts downstream aggregates
+      // rather than failing where it entered.
+      expect(UddfImportParsers.parseUddfDouble('NaN'), isNull);
+      expect(UddfImportParsers.parseUddfDouble('Infinity'), isNull);
+      expect(UddfImportParsers.parseUddfDouble('-Infinity'), isNull);
+    });
+  });
 }

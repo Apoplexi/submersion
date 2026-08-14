@@ -78,6 +78,22 @@ class UddfImportParsers {
     return asDouble.round();
   }
 
+  /// Parses a UDDF decimal value, rejecting non-finite input.
+  ///
+  /// [double.tryParse] succeeds on "NaN", "Infinity" and "-Infinity", so a
+  /// value that is only null-checked reaches the database intact. NaN is the
+  /// dangerous one: it compares false against everything including itself,
+  /// so it silently poisons totals, averages and range checks downstream
+  /// rather than failing where it was introduced.
+  ///
+  /// Returns null when [text] is null, blank, non-numeric or non-finite.
+  static double? parseUddfDouble(String? text) {
+    if (text == null) return null;
+    final value = double.tryParse(text.trim());
+    if (value == null || !value.isFinite) return null;
+    return value;
+  }
+
   static void assignGasMixToTankIfMissing({
     required List<Map<String, dynamic>> tanks,
     required int tankIndex,
