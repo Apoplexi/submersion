@@ -35,14 +35,19 @@ Future<void> verifySelectionContract(
   Finder? rowRoot,
 }) async {
   // A surface that forgets to declare its row root must fail rather than
-  // silently skip the placement check -- an assertion that can be skipped is
-  // indistinguishable from no assertion, which is how the outside-card layouts
-  // passed this contract for so long.
-  assert(
-    indicator != CheckedIndicator.checkbox || rowRoot != null,
-    'checkbox surfaces must declare the row root the checkbox has to live '
-    'inside',
-  );
+  // silently skip the placement check -- a guard that can be skipped is
+  // indistinguishable from no guard, which is how the outside-card layouts
+  // passed this contract for so long. That reasoning rules out `assert`, which
+  // is stripped wherever asserts are disabled; `expect` always runs.
+  if (indicator == CheckedIndicator.checkbox) {
+    expect(
+      rowRoot,
+      isNotNull,
+      reason:
+          'checkbox surfaces must declare the row root the checkbox has to '
+          'live inside',
+    );
+  }
   // The Select affordance is visible without any hidden gesture.
   await tester.pumpWidget(build());
   await tester.pumpAndSettle();
