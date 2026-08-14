@@ -38,10 +38,17 @@ class BasePartFileSource {
   /// and returns the part count plus the `sha256:` whole-file and per-part
   /// checksums (and the total byte length) for the manifest.
   ///
-  /// [onPartUploaded] fires after each part lands, as `(uploaded, total)`. A
-  /// full base republish -- what a wiped backend forces -- can run to hundreds
+  /// [onPartUploaded] fires once per part, as `(uploaded, total)`, after that
+  /// part has been dealt with -- uploaded, or skipped and re-hashed. A full
+  /// base republish, which is what a wiped backend forces, can run to hundreds
   /// of megabytes, and without this tick the sync UI shows one motionless step
   /// for the entire transfer and reads as a hang (issue #1032).
+  ///
+  /// Counting skipped parts is deliberate rather than incidental: on a resumed
+  /// publish the bar sweeps quickly through what already landed and then slows
+  /// to the real upload rate, which is a truthful picture of the work left. A
+  /// tick that fired only on genuine uploads would restart the bar at zero and
+  /// hide the progress the previous attempt made.
   ///
   /// [skipPart] suppresses the network call for parts already present in the
   /// cloud, so an interrupted publish resumes instead of re-uploading hundreds
