@@ -6,7 +6,7 @@ import 'package:intl/intl.dart';
 import 'package:submersion/features/certifications/domain/certification_title.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:submersion/shared/selection/selectable_list_scope.dart';
-import 'package:submersion/shared/selection/selectable_row.dart';
+import 'package:submersion/shared/selection/selection_leading.dart';
 import 'package:submersion/shared/selection/selection_app_bar.dart';
 import 'package:submersion/shared/selection/selection_entry_bar.dart';
 import 'package:submersion/shared/selection/selection_controller.dart';
@@ -564,16 +564,14 @@ class _CertificationListContentState
               Colors.red,
             ),
             ...expired.map(
-              (cert) => SelectableRow(
+              (cert) => CertificationListTile(
+                certification: cert,
+                isSelected:
+                    widget.selectedId == cert.id || highlightedId == cert.id,
+                onTap: () => _handleRowTap(cert),
                 isSelectionMode: _isSelectionMode,
                 isChecked: _selectedIds.contains(cert.id),
-                onChanged: (_) => _selection.toggle(cert.id),
-                child: CertificationListTile(
-                  certification: cert,
-                  isSelected:
-                      widget.selectedId == cert.id || highlightedId == cert.id,
-                  onTap: () => _handleRowTap(cert),
-                ),
+                onCheckChanged: (_) => _selection.toggle(cert.id),
               ),
             ),
           ],
@@ -584,16 +582,14 @@ class _CertificationListContentState
               Colors.orange,
             ),
             ...expiringSoon.map(
-              (cert) => SelectableRow(
+              (cert) => CertificationListTile(
+                certification: cert,
+                isSelected:
+                    widget.selectedId == cert.id || highlightedId == cert.id,
+                onTap: () => _handleRowTap(cert),
                 isSelectionMode: _isSelectionMode,
                 isChecked: _selectedIds.contains(cert.id),
-                onChanged: (_) => _selection.toggle(cert.id),
-                child: CertificationListTile(
-                  certification: cert,
-                  isSelected:
-                      widget.selectedId == cert.id || highlightedId == cert.id,
-                  onTap: () => _handleRowTap(cert),
-                ),
+                onCheckChanged: (_) => _selection.toggle(cert.id),
               ),
             ),
           ],
@@ -604,16 +600,14 @@ class _CertificationListContentState
               Colors.green,
             ),
             ...valid.map(
-              (cert) => SelectableRow(
+              (cert) => CertificationListTile(
+                certification: cert,
+                isSelected:
+                    widget.selectedId == cert.id || highlightedId == cert.id,
+                onTap: () => _handleRowTap(cert),
                 isSelectionMode: _isSelectionMode,
                 isChecked: _selectedIds.contains(cert.id),
-                onChanged: (_) => _selection.toggle(cert.id),
-                child: CertificationListTile(
-                  certification: cert,
-                  isSelected:
-                      widget.selectedId == cert.id || highlightedId == cert.id,
-                  onTap: () => _handleRowTap(cert),
-                ),
+                onCheckChanged: (_) => _selection.toggle(cert.id),
               ),
             ),
           ],
@@ -713,12 +707,18 @@ class CertificationListTile extends StatelessWidget {
   final Certification certification;
   final bool isSelected;
   final VoidCallback? onTap;
+  final bool isSelectionMode;
+  final bool isChecked;
+  final ValueChanged<bool>? onCheckChanged;
 
   const CertificationListTile({
     super.key,
     required this.certification,
     this.isSelected = false,
     this.onTap,
+    this.isSelectionMode = false,
+    this.isChecked = false,
+    this.onCheckChanged,
   });
 
   @override
@@ -748,7 +748,12 @@ class CertificationListTile extends StatelessWidget {
             : null,
         child: ListTile(
           onTap: onTap,
-          leading: _buildLeadingIcon(context),
+          leading: SelectionLeading(
+            isSelectionMode: isSelectionMode,
+            isChecked: isChecked,
+            onChanged: onCheckChanged,
+            child: _buildLeadingIcon(context),
+          ),
           title: Text(certificationTitle(certification)),
           subtitle: _buildSubtitle(context),
           trailing: _buildTrailing(context),
