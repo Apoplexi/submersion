@@ -11639,8 +11639,8 @@ class AppLocalizationsHe extends AppLocalizations {
   String get media_gpsBanner_addToSiteButton => 'הוסף לאתר';
 
   @override
-  String media_gpsBanner_coordinates(Object latitude, Object longitude) {
-    return 'קואורדינטות: $latitude, $longitude';
+  String media_gpsBanner_coordinates(Object coordinates) {
+    return 'קואורדינטות: $coordinates';
   }
 
   @override
@@ -23118,6 +23118,30 @@ class AppLocalizationsHe extends AppLocalizations {
   String visibility_range_under(String max, String unit) {
     return 'מתחת ל-$max $unit';
   }
+
+  @override
+  String get settings_coordinateFormat_title => 'פורמט קואורדינטות';
+
+  @override
+  String get settings_coordinateFormat_subtitle =>
+      'כיצד מוצגים ומוזנים מיקומי GPS';
+
+  @override
+  String get settings_coordinateFormat_decimalDegrees => 'מעלות עשרוניות';
+
+  @override
+  String get settings_coordinateFormat_degreesDecimalMinutes =>
+      'מעלות ודקות עשרוניות';
+
+  @override
+  String get settings_coordinateFormat_degreesMinutesSeconds =>
+      'מעלות, דקות, שניות';
+
+  @override
+  String get settings_coordinateFormat_utm => 'UTM';
+
+  @override
+  String get settings_coordinateFormat_mgrs => 'MGRS';
 
   @override
   String get settings_visibilityScale_title => 'סולם ראות';

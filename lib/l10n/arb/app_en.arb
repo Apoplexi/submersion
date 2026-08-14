@@ -6768,7 +6768,7 @@
     }
   },
   "media_gpsBanner_addToSiteButton": "Add to Site",
-  "media_gpsBanner_coordinates": "Coordinates: {latitude}, {longitude}",
+  "media_gpsBanner_coordinates": "Coordinates: {coordinates}",
   "media_gpsBanner_createSiteButton": "Create Site",
   "media_gpsBanner_dismissTooltip": "Dismiss GPS suggestion",
   "media_gpsBanner_title": "GPS found in photos",
@@ -6950,10 +6950,7 @@
   },
   "@media_gpsBanner_coordinates": {
     "placeholders": {
-      "latitude": {
-        "type": "Object"
-      },
-      "longitude": {
+      "coordinates": {
         "type": "Object"
       }
     }
@@ -14979,6 +14976,13 @@
       }
     }
   },
+  "settings_coordinateFormat_title": "Coordinate format",
+  "settings_coordinateFormat_subtitle": "How GPS positions are shown and entered",
+  "settings_coordinateFormat_decimalDegrees": "Decimal degrees",
+  "settings_coordinateFormat_degreesDecimalMinutes": "Degrees and decimal minutes",
+  "settings_coordinateFormat_degreesMinutesSeconds": "Degrees, minutes, seconds",
+  "settings_coordinateFormat_utm": "UTM",
+  "settings_coordinateFormat_mgrs": "MGRS",
   "settings_visibilityScale_title": "Visibility scale",
   "settings_visibilityScale_subtitle": "Which distances count as good visibility where you dive",
   "settings_visibilityScale_preset_tropical": "Tropical",

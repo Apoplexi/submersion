@@ -11927,8 +11927,8 @@ class AppLocalizationsDe extends AppLocalizations {
   String get media_gpsBanner_addToSiteButton => 'Zum Tauchplatz hinzufügen';
 
   @override
-  String media_gpsBanner_coordinates(Object latitude, Object longitude) {
-    return 'Koordinaten: $latitude, $longitude';
+  String media_gpsBanner_coordinates(Object coordinates) {
+    return 'Koordinaten: $coordinates';
   }
 
   @override
@@ -23678,6 +23678,30 @@ class AppLocalizationsDe extends AppLocalizations {
   String visibility_range_under(String max, String unit) {
     return 'unter $max $unit';
   }
+
+  @override
+  String get settings_coordinateFormat_title => 'Koordinatenformat';
+
+  @override
+  String get settings_coordinateFormat_subtitle =>
+      'Wie GPS-Positionen angezeigt und eingegeben werden';
+
+  @override
+  String get settings_coordinateFormat_decimalDegrees => 'Dezimalgrad';
+
+  @override
+  String get settings_coordinateFormat_degreesDecimalMinutes =>
+      'Grad und Dezimalminuten';
+
+  @override
+  String get settings_coordinateFormat_degreesMinutesSeconds =>
+      'Grad, Minuten, Sekunden';
+
+  @override
+  String get settings_coordinateFormat_utm => 'UTM';
+
+  @override
+  String get settings_coordinateFormat_mgrs => 'MGRS';
 
   @override
   String get settings_visibilityScale_title => 'Sichtweiten-Skala';
