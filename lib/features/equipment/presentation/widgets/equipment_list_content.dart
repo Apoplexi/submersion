@@ -11,7 +11,7 @@ import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:submersion/shared/selection/bulk_action.dart';
 import 'package:submersion/shared/selection/selectable_list_scope.dart';
-import 'package:submersion/shared/selection/selectable_row.dart';
+import 'package:submersion/shared/selection/selection_leading.dart';
 import 'package:submersion/shared/selection/selection_app_bar.dart';
 import 'package:submersion/shared/selection/selection_entry_bar.dart';
 import 'package:submersion/shared/selection/selection_controller.dart';
@@ -723,24 +723,26 @@ class _EquipmentListContentState extends ConsumerState<EquipmentListContent> {
               widget.selectedId == item.id ||
               ref.watch(highlightedEquipmentIdProvider) == item.id;
           final viewMode = ref.watch(equipmentListViewModeProvider);
-          final tile = switch (viewMode) {
+          final isChecked = _selectedIds.contains(item.id);
+          void onCheckChanged(bool _) => _selection.toggle(item.id);
+          return switch (viewMode) {
             ListViewMode.detailed || ListViewMode.compact => EquipmentListTile(
               item: item,
               isSelected: isSelected,
               onTap: () => _handleRowTap(item),
+              isSelectionMode: _isSelectionMode,
+              isChecked: isChecked,
+              onCheckChanged: onCheckChanged,
             ),
             ListViewMode.dense || ListViewMode.table => DenseEquipmentListTile(
               item: item,
               isSelected: isSelected,
               onTap: () => _handleRowTap(item),
+              isSelectionMode: _isSelectionMode,
+              isChecked: isChecked,
+              onCheckChanged: onCheckChanged,
             ),
           };
-          return SelectableRow(
-            isSelectionMode: _isSelectionMode,
-            isChecked: _selectedIds.contains(item.id),
-            onChanged: (_) => _selection.toggle(item.id),
-            child: tile,
-          );
         },
       ),
     );
@@ -830,12 +832,18 @@ class EquipmentListTile extends ConsumerWidget {
   final EquipmentItem item;
   final bool isSelected;
   final VoidCallback? onTap;
+  final bool isSelectionMode;
+  final bool isChecked;
+  final ValueChanged<bool>? onCheckChanged;
 
   const EquipmentListTile({
     super.key,
     required this.item,
     this.isSelected = false,
     this.onTap,
+    this.isSelectionMode = false,
+    this.isChecked = false,
+    this.onCheckChanged,
   });
 
   @override
@@ -858,19 +866,24 @@ class EquipmentListTile extends ConsumerWidget {
           : null,
       child: ListTile(
         onTap: onTap,
-        leading: CircleAvatar(
-          // An overdue service is a status signal, so it keeps the error
-          // colors even with accents on -- a cosmetic preference must not
-          // hide a service warning.
-          backgroundColor: isOverdue
-              ? theme.colorScheme.errorContainer
-              : accent?.withValues(alpha: 0.15) ??
-                    theme.colorScheme.tertiaryContainer,
-          child: Icon(
-            _getIconForType(item.type),
-            color: isOverdue
-                ? theme.colorScheme.onErrorContainer
-                : accent ?? theme.colorScheme.onTertiaryContainer,
+        leading: SelectionLeading(
+          isSelectionMode: isSelectionMode,
+          isChecked: isChecked,
+          onChanged: onCheckChanged,
+          child: CircleAvatar(
+            // An overdue service is a status signal, so it keeps the error
+            // colors even with accents on -- a cosmetic preference must not
+            // hide a service warning.
+            backgroundColor: isOverdue
+                ? theme.colorScheme.errorContainer
+                : accent?.withValues(alpha: 0.15) ??
+                      theme.colorScheme.tertiaryContainer,
+            child: Icon(
+              _getIconForType(item.type),
+              color: isOverdue
+                  ? theme.colorScheme.onErrorContainer
+                  : accent ?? theme.colorScheme.onTertiaryContainer,
+            ),
           ),
         ),
         title: Text(item.name),

@@ -257,6 +257,10 @@ void main() {
           child: const TripListContent(showAppBar: true),
         ),
         selectButton: find.byKey(const ValueKey('enter_selection')),
+        rowRoot: find.ancestor(
+          of: find.text('Aaa Trip'),
+          matching: find.byType(TripListTile),
+        ),
         firstRow: find.text('Aaa Trip'),
         applyFilter: (tester) async {
           final container = ProviderScope.containerOf(

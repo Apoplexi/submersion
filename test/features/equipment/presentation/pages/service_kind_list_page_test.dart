@@ -75,6 +75,13 @@ void main() {
           ),
         ),
         selectButton: find.byKey(const ValueKey('enter_selection')),
+        // Built-in kinds render isSelectable: false and so have no checkbox at
+        // all, which makes ListTile.first the wrong anchor. Pin to the custom
+        // row that is actually selectable.
+        rowRoot: find.ancestor(
+          of: find.text('Aaa custom'),
+          matching: find.byType(ListTile),
+        ),
         firstRow: find.text('Aaa custom'),
         applyFilter: (tester) async {
           visible = [all.first];

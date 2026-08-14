@@ -666,6 +666,7 @@ void main() {
           child: const SiteListContent(showAppBar: true),
         ),
         selectButton: find.byKey(const ValueKey('enter_selection')),
+        rowRoot: find.byType(SiteListTile).first,
         firstRow: find.text('Aaa Site'),
         applyFilter: (tester) async {
           final container = ProviderScope.containerOf(

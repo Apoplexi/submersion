@@ -33,6 +33,7 @@ import 'package:submersion/features/dive_sites/presentation/providers/site_provi
 import 'package:submersion/features/dive_sites/presentation/widgets/compact_site_list_tile.dart';
 import 'package:submersion/features/dive_sites/presentation/widgets/dense_site_list_tile.dart';
 import 'package:submersion/features/dive_sites/presentation/widgets/site_filter_sheet.dart';
+import 'package:submersion/shared/selection/selection_leading.dart';
 import 'package:submersion/shared/widgets/debounced_search_results.dart';
 import 'package:submersion/shared/widgets/feature_accent.dart';
 
@@ -1352,22 +1353,20 @@ class _SiteListTileState extends ConsumerState<SiteListTile> {
             SizedBox(
               width: 40,
               height: 40,
-              child: isSelectionMode
-                  ? Center(
-                      child: Checkbox(
-                        value: isChecked,
-                        onChanged: (_) => onTap?.call(),
-                        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                        visualDensity: VisualDensity.compact,
-                      ),
-                    )
-                  : CircleAvatar(
-                      backgroundColor: colorScheme.secondaryContainer,
-                      child: Icon(
-                        Icons.location_on,
-                        color: colorScheme.onSecondaryContainer,
-                      ),
+              child: Center(
+                child: SelectionLeading(
+                  isSelectionMode: isSelectionMode,
+                  isChecked: isChecked,
+                  onChanged: (_) => onTap?.call(),
+                  child: CircleAvatar(
+                    backgroundColor: colorScheme.secondaryContainer,
+                    child: Icon(
+                      Icons.location_on,
+                      color: colorScheme.onSecondaryContainer,
                     ),
+                  ),
+                ),
+              ),
             ),
             const SizedBox(width: 12),
             Expanded(

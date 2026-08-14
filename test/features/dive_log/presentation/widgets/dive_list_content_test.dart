@@ -1371,6 +1371,7 @@ void main() {
           child: const DiveListContent(showAppBar: true),
         ),
         selectButton: find.byKey(const ValueKey('enter_selection')),
+        rowRoot: find.byType(DiveListTile).first,
         firstRow: find.byWidgetPredicate(
           (w) => w is DiveListTile && w.diveId == 'd1',
         ),

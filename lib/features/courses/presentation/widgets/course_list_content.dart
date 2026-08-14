@@ -5,7 +5,6 @@ import 'package:go_router/go_router.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:submersion/shared/selection/bulk_action.dart';
 import 'package:submersion/shared/selection/selectable_list_scope.dart';
-import 'package:submersion/shared/selection/selectable_row.dart';
 import 'package:submersion/shared/selection/selection_app_bar.dart';
 import 'package:submersion/shared/selection/selection_entry_bar.dart';
 import 'package:submersion/shared/selection/selection_controller.dart';
@@ -539,17 +538,15 @@ class _CourseListContentState extends ConsumerState<CourseListContent> {
           final course = courses[index];
           return Padding(
             padding: const EdgeInsets.only(bottom: 8),
-            child: SelectableRow(
+            child: CourseCard(
+              course: course,
+              isSelected:
+                  widget.selectedId == course.id ||
+                  ref.watch(highlightedCourseIdProvider) == course.id,
+              onTap: () => _handleRowTap(course),
               isSelectionMode: _isSelectionMode,
               isChecked: _selectedIds.contains(course.id),
-              onChanged: (_) => _selection.toggle(course.id),
-              child: CourseCard(
-                course: course,
-                isSelected:
-                    widget.selectedId == course.id ||
-                    ref.watch(highlightedCourseIdProvider) == course.id,
-                onTap: () => _handleRowTap(course),
-              ),
+              onCheckChanged: (_) => _selection.toggle(course.id),
             ),
           );
         },

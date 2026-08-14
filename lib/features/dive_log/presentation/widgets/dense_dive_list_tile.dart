@@ -8,6 +8,7 @@ import 'package:submersion/features/dive_log/domain/entities/dive_summary.dart';
 import 'package:submersion/features/dive_log/presentation/formatters/dive_type_label_resolver.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
+import 'package:submersion/shared/selection/selection_leading.dart';
 
 /// Single-row flat tile for the dive list (maximum density).
 ///
@@ -282,37 +283,26 @@ class DenseDiveListTile extends ConsumerWidget {
               children: [
                 SizedBox(
                   width: 36,
-                  child: Stack(
+                  child: Align(
                     alignment: Alignment.centerLeft,
-                    children: [
-                      Visibility(
-                        visible: isSelectionMode,
-                        maintainSize: true,
-                        maintainAnimation: true,
-                        maintainState: true,
-                        child: Checkbox(
-                          value: isSelected,
-                          onChanged: (_) => onTap?.call(),
-                          materialTapTargetSize:
-                              MaterialTapTargetSize.shrinkWrap,
-                          visualDensity: VisualDensity.compact,
-                        ),
-                      ),
-                      if (!isSelectionMode)
-                        FittedBox(
-                          fit: BoxFit.scaleDown,
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            '#$diveNumber',
-                            maxLines: 1,
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 12,
-                              color: accentColor,
-                            ),
+                    child: SelectionLeading(
+                      isSelectionMode: isSelectionMode,
+                      isChecked: isSelected,
+                      onChanged: (_) => onTap?.call(),
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          '#$diveNumber',
+                          maxLines: 1,
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12,
+                            color: accentColor,
                           ),
                         ),
-                    ],
+                      ),
+                    ),
                   ),
                 ),
                 const SizedBox(width: 8),
