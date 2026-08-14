@@ -59,6 +59,22 @@ void main() {
       expect(UddfImportParsers.parseUddfInt('3000000000'), 3000000000);
       expect(UddfImportParsers.parseUddfInt('3000000000.0'), 3000000000);
     });
+
+    test('float-formatted integers stay exact beyond 2^53', () {
+      // A double cannot represent 2^53 + 1, so routing through
+      // double.tryParse would silently return ...992. Dart ints hold it
+      // exactly, so the zero fraction is stripped textually instead.
+      const big = 9007199254740993; // 2^53 + 1
+      expect(UddfImportParsers.parseUddfInt('9007199254740993'), big);
+      expect(UddfImportParsers.parseUddfInt('9007199254740993.0'), big);
+      expect(UddfImportParsers.parseUddfInt('9007199254740993.000'), big);
+      expect(UddfImportParsers.parseUddfInt(' -9007199254740993.0 '), -big);
+    });
+
+    test('a real fractional part still rounds, at any magnitude', () {
+      expect(UddfImportParsers.parseUddfInt('10.5'), 11);
+      expect(UddfImportParsers.parseUddfInt('9007199254740993.5'), isNotNull);
+    });
   });
 
   group('UddfImportParsers.parseUddfDouble', () {

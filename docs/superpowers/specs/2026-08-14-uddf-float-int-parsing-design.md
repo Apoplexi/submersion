@@ -91,6 +91,16 @@ succeeds on `"NaN"` and `"Infinity"`, and `double.round()` throws
 `UnsupportedError` on both. Without the guard a single malformed element
 would abort an entire import rather than skipping one field.
 
+A zero-only fractional part (`"15.0"`, `"15.000"`) is stripped textually
+rather than routed through a double, so the value keeps exact integer
+semantics. Raised in review: above 2^53 a double round-trip is lossy —
+`"9007199254740993.0"` comes back as `...992` — for values Dart ints hold
+exactly. No dive field approaches that magnitude, so this is about the
+helper's contract rather than any reachable data; it costs one regex match
+on a path that previously allocated a double anyway. Values that overflow
+int64 still fall through to the double path, where `round()` saturates
+rather than throwing.
+
 Applied at all 28 integer-semantics parse sites across the UDDF import path:
 
 | File | Sites |

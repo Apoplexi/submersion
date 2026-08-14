@@ -43,6 +43,10 @@ double normalizeUddfTankVolumeToLiters(
 class UddfImportParsers {
   UddfImportParsers._();
 
+  // An integer followed by a fractional part of nothing but zeros, e.g.
+  // "15.0" or "15.000". Captures the integer so it can be parsed exactly.
+  static final RegExp _zeroFractionPattern = RegExp(r'^([+-]?\d+)\.0*$');
+
   /// Parses a UDDF integer-semantics value, tolerating the float
   /// serialization several exporters emit.
   ///
@@ -69,6 +73,17 @@ class UddfImportParsers {
 
     final asInt = int.tryParse(trimmed);
     if (asInt != null) return asInt;
+
+    // Strip a fractional part that is nothing but zeros, so the value keeps
+    // exact integer semantics. Going through a double would lose precision
+    // above 2^53 ("9007199254740993.0" comes back as ...992) for values Dart
+    // ints represent exactly. Anything with a real fraction, an exponent or
+    // stray characters falls through to the double path below.
+    final zeroFraction = _zeroFractionPattern.firstMatch(trimmed);
+    if (zeroFraction != null) {
+      final exact = int.tryParse(zeroFraction.group(1)!);
+      if (exact != null) return exact;
+    }
 
     final asDouble = double.tryParse(trimmed);
     // double.tryParse succeeds on "NaN" and "Infinity", and calling round()
