@@ -21960,6 +21960,15 @@ class AppLocalizationsIt extends AppLocalizations {
   String get dive3d_seascape_overlay_paths => 'Percorsi delle immersioni';
 
   @override
+  String get dive3d_seascape_overlay_contours => 'Isobate';
+
+  @override
+  String get dive3d_seascape_overlay_walls => 'Pareti ripide';
+
+  @override
+  String get dive3d_overlay_water => 'Superficie dell\'acqua';
+
+  @override
   String get dive3d_seascape_siteTitle => 'Paesaggio marino del sito';
 
   @override

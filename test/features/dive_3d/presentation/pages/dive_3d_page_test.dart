@@ -116,6 +116,21 @@ void main() {
     await tester.pump(const Duration(seconds: 1));
   });
 
+  testWidgets('overlay menu hides seascape-only overlays', (tester) async {
+    await pumpPage(tester);
+    await tester.tap(find.byIcon(Icons.layers));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+    expect(find.text('Temperature layers'), findsOneWidget);
+    expect(find.text('Contours'), findsNothing);
+    expect(find.text('Steep walls'), findsNothing);
+    expect(find.text('Water surface'), findsNothing);
+    await tester.tapAt(const Offset(5, 400)); // dismiss menu
+    await tester.pump(const Duration(seconds: 1));
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pump(const Duration(seconds: 1));
+  });
+
   testWidgets('switching the coloring metric selects the tapped chip', (
     tester,
   ) async {

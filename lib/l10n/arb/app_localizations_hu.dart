@@ -21888,6 +21888,15 @@ class AppLocalizationsHu extends AppLocalizations {
   String get dive3d_seascape_overlay_paths => 'Merülési útvonalak';
 
   @override
+  String get dive3d_seascape_overlay_contours => 'Mélységvonalak';
+
+  @override
+  String get dive3d_seascape_overlay_walls => 'Meredek falak';
+
+  @override
+  String get dive3d_overlay_water => 'Vízfelszín';
+
+  @override
   String get dive3d_seascape_siteTitle => 'Helyszíni tengertáj';
 
   @override

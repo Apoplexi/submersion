@@ -21792,6 +21792,15 @@ class AppLocalizationsNl extends AppLocalizations {
   String get dive3d_seascape_overlay_paths => 'Duikroutes';
 
   @override
+  String get dive3d_seascape_overlay_contours => 'Dieptelijnen';
+
+  @override
+  String get dive3d_seascape_overlay_walls => 'Steile wanden';
+
+  @override
+  String get dive3d_overlay_water => 'Wateroppervlak';
+
+  @override
   String get dive3d_seascape_siteTitle => 'Zeelandschap van de duikstek';
 
   @override

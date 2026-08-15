@@ -21922,6 +21922,15 @@ class AppLocalizationsDe extends AppLocalizations {
   String get dive3d_seascape_overlay_paths => 'Tauchgangspfade';
 
   @override
+  String get dive3d_seascape_overlay_contours => 'Tiefenlinien';
+
+  @override
+  String get dive3d_seascape_overlay_walls => 'Steilwände';
+
+  @override
+  String get dive3d_overlay_water => 'Wasseroberfläche';
+
+  @override
   String get dive3d_seascape_siteTitle => 'Standort-Seelandschaft';
 
   @override

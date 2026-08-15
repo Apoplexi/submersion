@@ -36495,6 +36495,24 @@ abstract class AppLocalizations {
   /// **'Dive paths'**
   String get dive3d_seascape_overlay_paths;
 
+  /// No description provided for @dive3d_seascape_overlay_contours.
+  ///
+  /// In en, this message translates to:
+  /// **'Contours'**
+  String get dive3d_seascape_overlay_contours;
+
+  /// No description provided for @dive3d_seascape_overlay_walls.
+  ///
+  /// In en, this message translates to:
+  /// **'Steep walls'**
+  String get dive3d_seascape_overlay_walls;
+
+  /// No description provided for @dive3d_overlay_water.
+  ///
+  /// In en, this message translates to:
+  /// **'Water surface'**
+  String get dive3d_overlay_water;
+
   /// No description provided for @dive3d_seascape_siteTitle.
   ///
   /// In en, this message translates to:

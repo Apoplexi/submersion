@@ -21412,6 +21412,15 @@ class AppLocalizationsHe extends AppLocalizations {
   String get dive3d_seascape_overlay_paths => 'מסלולי צלילה';
 
   @override
+  String get dive3d_seascape_overlay_contours => 'קווי עומק';
+
+  @override
+  String get dive3d_seascape_overlay_walls => 'קירות תלולים';
+
+  @override
+  String get dive3d_overlay_water => 'פני המים';
+
+  @override
   String get dive3d_seascape_siteTitle => 'נוף ימי של האתר';
 
   @override

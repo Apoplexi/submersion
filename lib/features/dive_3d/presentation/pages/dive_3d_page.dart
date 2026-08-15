@@ -303,10 +303,16 @@ class _Dive3dPageState extends ConsumerState<Dive3dPage>
           icon: const Icon(Icons.layers),
           tooltip: context.l10n.dive3d_overlays,
           itemBuilder: (context) => [
-            // The paths overlay belongs to the spatial/site seascape scenes;
-            // it has no meaning in this analytical view.
+            // The paths/contours/water/walls overlays belong to the
+            // spatial/site seascape scenes; they have no meaning in this
+            // analytical view.
             for (final overlay in SceneOverlay.values)
-              if (overlay != SceneOverlay.paths)
+              if (!const {
+                SceneOverlay.paths,
+                SceneOverlay.contours,
+                SceneOverlay.water,
+                SceneOverlay.steepWalls,
+              }.contains(overlay))
                 CheckedPopupMenuItem(
                   value: overlay,
                   checked: _overlays.contains(overlay),
@@ -317,6 +323,11 @@ class _Dive3dPageState extends ConsumerState<Dive3dPage>
                     SceneOverlay.markers => context.l10n.dive3d_overlay_markers,
                     SceneOverlay.paths =>
                       context.l10n.dive3d_seascape_overlay_paths,
+                    SceneOverlay.contours =>
+                      context.l10n.dive3d_seascape_overlay_contours,
+                    SceneOverlay.water => context.l10n.dive3d_overlay_water,
+                    SceneOverlay.steepWalls =>
+                      context.l10n.dive3d_seascape_overlay_walls,
                   }),
                 ),
           ],

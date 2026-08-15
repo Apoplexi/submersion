@@ -21976,6 +21976,15 @@ class AppLocalizationsEs extends AppLocalizations {
   String get dive3d_seascape_overlay_paths => 'Trayectos de buceo';
 
   @override
+  String get dive3d_seascape_overlay_contours => 'Isóbatas';
+
+  @override
+  String get dive3d_seascape_overlay_walls => 'Paredes verticales';
+
+  @override
+  String get dive3d_overlay_water => 'Superficie del agua';
+
+  @override
   String get dive3d_seascape_siteTitle => 'Paisaje marino del sitio';
 
   @override
