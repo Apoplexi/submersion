@@ -58,9 +58,12 @@ top-right is the template; icon `Icons.water`), visible only with a site
 selected. `SeascapeAppearance` gains `mapDepthOverlay: bool` (default
 false), so the choice syncs per diver and the appearance sheet stays the
 single settings surface. The overlay reads the selected site's grid via
-the cache-first `bathymetryGridProvider`; no grid means brief "no
-bathymetry" feedback and the toggle stays off. The site detail embedded
-map gains the same layer for its own site in this PR.
+the cache-first `bathymetryGridProvider`; when the grid is known absent,
+enabling still records the (global, synced) preference but shows the
+standard no-bathymetry notice and the layer stays away for that site
+(correction at planning time: a global flag should not be blocked by one
+site's missing data). The site detail embedded map gains the same layer
+for its own site in this PR.
 
 ### PR 2: 3D imagery drape
 
