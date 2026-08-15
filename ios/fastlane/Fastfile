@@ -265,12 +265,25 @@ platform :ios do
       includes: "appStoreVersionForReview",
     )
 
+    # Short-circuit. An in-progress submission is already a block, so the
+    # editable version cannot change the answer. Skipping the second lookup is
+    # partly about latency, but mostly about failure surface: this method
+    # deliberately lets App Store Connect errors propagate, so a call made
+    # after the answer is known could fail the lane at the moment we already
+    # knew the safe outcome. Blocking beats erroring.
+    unless submission.nil?
+      return submission_skip_reason(
+        app_version: app_version,
+        review_in_progress: true,
+        review_version: review_submission_version(submission),
+      )
+    end
+
     version = app.get_edit_app_store_version(platform: mapped)
 
     submission_skip_reason(
       app_version: app_version,
-      review_in_progress: !submission.nil?,
-      review_version: review_submission_version(submission),
+      review_in_progress: false,
       edit_version: version&.version_string,
       # app_store_state is deprecated as of App Store Connect API 3.3 in favor
       # of app_version_state; read the new field first and fall back.

@@ -59,6 +59,70 @@ def platform(_name)
   yield
 end
 
+# --- App Store Connect stubs ------------------------------------------------
+# The decision checks below cannot catch a mistake in the App Store Connect
+# calls themselves. A wrong method name, a dropped `includes:` value or a
+# renamed relationship would leave every decision check green and still break
+# the promote lane, which is precisely where the incident that motivated this
+# file happened. These stand in for the handful of spaceship entry points
+# submission_blocker touches, and record what it asked for.
+
+module CredentialsManager
+  module AppfileConfig
+    def self.try_fetch_value(_key)
+      'app.submersion'
+    end
+  end
+end
+
+module Spaceship
+  module ConnectAPI
+    module Platform
+      def self.map(platform)
+        "MAPPED_#{platform.upcase}"
+      end
+    end
+
+    module App
+      def self.find(_identifier)
+        $stub_app
+      end
+    end
+  end
+end
+
+FakeVersion = Struct.new(:version_string, :app_version_state, :app_store_state)
+FakeSubmission = Struct.new(:app_store_version_for_review)
+
+# Stands in for a submission fetched without the relationship included, which
+# is what makes the version unreadable in the first place.
+class UnreadableSubmission
+  def app_store_version_for_review
+    raise StandardError, 'relationship not included'
+  end
+end
+
+class FakeApp
+  attr_reader :review_calls, :edit_calls
+
+  def initialize(submission: nil, edit_version: nil)
+    @submission = submission
+    @edit_version = edit_version
+    @review_calls = []
+    @edit_calls = []
+  end
+
+  def get_in_progress_review_submission(platform:, includes: nil)
+    @review_calls << { platform: platform, includes: includes }
+    @submission
+  end
+
+  def get_edit_app_store_version(platform:)
+    @edit_calls << { platform: platform }
+    @edit_version
+  end
+end
+
 # --- The cases, run against whichever Fastfile is currently loaded -----------
 
 def assert_guard_behaviour(label)
@@ -148,6 +212,79 @@ def assert_guard_behaviour(label)
   end
 end
 
+# --- The App Store Connect wrapper ------------------------------------------
+# Thin, but not too thin to get wrong: these pin the call shape so a rename in
+# spaceship or a fat-fingered symbol fails here rather than 20 minutes into a
+# promotion.
+
+def assert_wrapper_behaviour(label, platform_arg)
+  mapped = "MAPPED_#{platform_arg.upcase}"
+
+  # A review under way for a different version blocks, and the version it
+  # covers is read through the relationship the request asked for.
+  $stub_app = FakeApp.new(
+    submission: FakeSubmission.new(FakeVersion.new('1.7.3', 'WAITING_FOR_REVIEW', nil)),
+    edit_version: FakeVersion.new('1.7.3', 'WAITING_FOR_REVIEW', nil),
+  )
+  reason = submission_blocker('1.7.4', platform_arg)
+  check(!reason.nil?, "#{label}: an in-progress review did not block")
+  check(reason.to_s.include?('1.7.3'),
+        "#{label}: the reason did not name the in-review version (got #{reason.inspect}); " \
+        'the appStoreVersionForReview relationship is how that is read')
+  check($stub_app.review_calls.length == 1,
+        "#{label}: expected one review-submission lookup, got #{$stub_app.review_calls.length}")
+  check($stub_app.review_calls.first[:platform] == mapped,
+        "#{label}: the lookup was not scoped to #{mapped} " \
+        "(got #{$stub_app.review_calls.first[:platform].inspect})")
+  check($stub_app.review_calls.first[:includes] == 'appStoreVersionForReview',
+        "#{label}: the lookup did not request appStoreVersionForReview " \
+        "(got #{$stub_app.review_calls.first[:includes].inspect}); without it the " \
+        'skip message cannot name the version holding the review')
+
+  # Short-circuit: once a submission is known the editable version cannot
+  # change the answer, and asking for it anyway is a call that could raise and
+  # fail the lane after the safe answer was already in hand.
+  check($stub_app.edit_calls.empty?,
+        "#{label}: the editable version was fetched even though a review was " \
+        'already in progress; that is an avoidable way to fail the lane')
+
+  # An unreadable relationship must not weaken the block.
+  $stub_app = FakeApp.new(submission: UnreadableSubmission.new)
+  reason = submission_blocker('1.7.4', platform_arg)
+  check(!reason.nil?,
+        "#{label}: a submission whose version could not be read stopped blocking")
+
+  # Nothing in review: the editable version decides, and now it IS fetched.
+  $stub_app = FakeApp.new(
+    submission: nil,
+    edit_version: FakeVersion.new('1.7.4', 'WAITING_FOR_REVIEW', nil),
+  )
+  reason = submission_blocker('1.7.4', platform_arg)
+  check(!reason.nil?,
+        "#{label}: a version already WAITING_FOR_REVIEW was not blocked")
+  check($stub_app.edit_calls.length == 1,
+        "#{label}: expected one editable-version lookup, got #{$stub_app.edit_calls.length}")
+
+  # The legacy app_store_state field is still honoured as a fallback.
+  $stub_app = FakeApp.new(
+    submission: nil,
+    edit_version: FakeVersion.new('1.7.4', nil, 'IN_REVIEW'),
+  )
+  check(!submission_blocker('1.7.4', platform_arg).nil?,
+        "#{label}: the app_store_state fallback stopped being read")
+
+  # Clean slate: no submission, no editable version.
+  $stub_app = FakeApp.new(submission: nil, edit_version: nil)
+  check(submission_blocker('1.7.4', platform_arg).nil?,
+        "#{label}: a clean slate was blocked by the wrapper")
+
+  # No app record at all degrades to "proceed" and lets the submission attempt
+  # raise its own error rather than inventing one.
+  $stub_app = nil
+  check(submission_blocker('1.7.4', platform_arg).nil?,
+        "#{label}: a missing app record did not fall through")
+end
+
 # --- Both platform Fastfiles ------------------------------------------------
 # Loaded one at a time: the second load redefines the helper at top level, so
 # testing after each load is what actually exercises both copies. These files
@@ -167,9 +304,13 @@ end
 
 load_fastfile('ios', 'fastlane', 'Fastfile')
 assert_guard_behaviour('ios')
+assert_wrapper_behaviour('ios', 'ios')
 
 load_fastfile('macos', 'fastlane', 'Fastfile')
 assert_guard_behaviour('macos')
+# The macOS lane passes Apple's platform name for the Mac App Store, not the
+# directory name; the lane calls submission_blocker(app_version, "osx").
+assert_wrapper_behaviour('macos', 'osx')
 
 # --- Report -----------------------------------------------------------------
 
