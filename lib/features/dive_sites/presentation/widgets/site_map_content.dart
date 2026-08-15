@@ -11,6 +11,7 @@ import 'package:submersion/features/dive_sites/data/services/dive_site_api_servi
 import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
 import 'package:submersion/features/dive_sites/presentation/providers/built_in_sites_providers.dart';
 import 'package:submersion/features/dive_sites/presentation/providers/site_providers.dart';
+import 'package:submersion/features/dive_3d/presentation/pages/site_seascape_page.dart';
 import 'package:submersion/features/dive_sites/presentation/widgets/built_in_site_info_card.dart';
 import 'package:submersion/features/dive_sites/presentation/widgets/built_in_site_marker_layer.dart';
 import 'package:submersion/features/dive_sites/presentation/widgets/built_in_sites_toggle_button.dart';
@@ -465,6 +466,19 @@ class _SiteMapContentState extends ConsumerState<SiteMapContent>
         backgroundColor: colorScheme.primaryContainer,
         child: Icon(Icons.location_on, color: colorScheme.primary),
       ),
+      // The same seascape entry point as the site detail app bar, so the
+      // 3D terrain is reachable from the map (issue #1065 placement).
+      trailing: site.hasCoordinates
+          ? IconButton(
+              icon: const Icon(Icons.terrain),
+              tooltip: context.l10n.dive3d_seascape_siteTitle,
+              onPressed: () => Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (_) => SiteSeascapePage(siteId: site.id),
+                ),
+              ),
+            )
+          : null,
       onDetailsTap: widget.onDetailsTap != null
           ? () => widget.onDetailsTap!(site.id)
           : () => context.push('/sites/${site.id}'),
