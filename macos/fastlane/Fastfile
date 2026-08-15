@@ -618,11 +618,20 @@ platform :mac do
       # lane above has carried this flag since it was written.
       force: true,
       submit_for_review: true,
-      automatic_release: false,
+      # Goes live the moment Apple approves, with no human gate. The other two
+      # channels already behave this way: Play promotes at rollout 1.0 and the
+      # desktop appcast publishes at promotion time, so the manual App Store
+      # button was the one thing holding the platforms out of sync.
+      #
+      # The trade, accepted deliberately: Apple's approval becomes the only
+      # gate, there is no staged rollout to halt, and undoing a live version
+      # means pulling it and submitting a fix through another review cycle.
+      # The Mac App Store has no phased-release equivalent to fall back on.
+      automatic_release: true,
       precheck_include_in_app_purchases: false,
       submission_information: { add_id_info_uses_idfa: false },
     )
-    UI.success("Submitted for review; release manually in App Store Connect on approval.")
+    UI.success("Submitted for review; releases automatically once Apple approves.")
   end
 
   desc "Full release: capture screenshots, upload everything, and submit build"
