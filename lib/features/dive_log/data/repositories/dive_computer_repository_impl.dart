@@ -18,6 +18,8 @@ import 'package:submersion/core/database/database.dart'
         DiveProfileEvent,
         TankPressureProfilesCompanion;
 import 'package:submersion/core/matching/match_scorer.dart';
+import 'package:submersion/core/utils/stream_debounce.dart';
+import 'package:submersion/features/dive_log/data/repositories/dive_repository_impl.dart';
 import 'package:submersion/features/dive_log/data/repositories/safety_findings_repository.dart';
 import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart'
     show GeoPoint;
@@ -40,6 +42,18 @@ class DiveComputerRepository {
   final SyncRepository _syncRepository = SyncRepository();
   final _uuid = const Uuid();
   final _log = LoggerService.forClass(DiveComputerRepository);
+
+  /// Emits whenever the `dive_computers` registry changes so the computer
+  /// pickers and the favourite/primary selectors refresh after a download
+  /// registers a new computer, or a sync applies a remote rename or removal.
+  ///
+  /// Debounced, unlike most ticks in the app: registering a computer happens
+  /// inside a download that also writes dives, profiles, tanks, and data
+  /// sources, so an un-debounced tick would rebuild the pickers repeatedly
+  /// mid-download instead of once on the settled state.
+  Stream<void> watchComputersChanges() => _db
+      .tableUpdates(TableUpdateQuery.onTable(_db.diveComputers))
+      .debounce(DiveRepository.changeTickDebounce);
 
   /// Held for the repository's lifetime so a multi-dive download shares one
   /// elevation-lookup cache: a trip's worth of dives at the same site costs a

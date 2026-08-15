@@ -4,6 +4,7 @@ import 'dart:developer' as developer;
 import 'package:drift/drift.dart';
 
 import 'package:submersion/core/database/performance_indexes.dart';
+import 'package:submersion/core/database/tag_uniqueness.dart';
 import 'package:submersion/core/constants/enums.dart';
 
 part 'database.g.dart';
@@ -1513,6 +1514,15 @@ class DiverSettings extends Table {
   RealColumn get visibilityScaleExcellentM => real().nullable()();
   RealColumn get visibilityScaleGoodM => real().nullable()();
   RealColumn get visibilityScaleModerateM => real().nullable()();
+
+  /// v150: how GPS coordinates are rendered and entered (issue #1041).
+  ///
+  /// Presentational only -- coordinates are always stored as decimal-degree
+  /// doubles, so changing this re-renders every site without altering a
+  /// single stored value. Defaults to 'decimalDegrees', which is what the app
+  /// showed before v150.
+  TextColumn get coordinateFormat =>
+      text().withDefault(const Constant('decimalDegrees'))();
   // Time/Date format settings
   TextColumn get timeFormat =>
       text().withDefault(const Constant('twelveHour'))();
@@ -2952,7 +2962,7 @@ class AppDatabase extends _$AppDatabase {
 
   /// The current schema version as a static constant so that pre-open checks
   /// (e.g. version-mismatch guard) can reference it without an instance.
-  static const int currentSchemaVersion = 147;
+  static const int currentSchemaVersion = 150;
 
   /// Every schema version that has a migration block in onUpgrade.
   /// Used to calculate progress step counts. When adding a new migration,
@@ -3149,6 +3159,18 @@ class AppDatabase extends _$AppDatabase {
     // 2026-08-08-buddy-professional-roles-fold). Originally authored as v145;
     // renumbered when PR #908 reserved 145 and v146 landed first.
     147,
+    // v148: site media attachments (issues #211/#627): media(site_id) query
+    // index plus the site-side dedupe cleanup and partial unique index
+    // mirroring the dive-side v38 pair.
+    148,
+    // v149: duplicate tags (issue #1032): collapse `tags` rows sharing a
+    // (diver scope, case-folded name) and `dive_tags` rows sharing a
+    // (dive, tag), then add the two unique indexes that stop them recurring.
+    149,
+    // v150: diver_settings.coordinate_format (issue #1041): the diver's GPS
+    // coordinate notation. Presentational only -- coordinates stay decimal
+    // degrees in storage.
+    150,
   ];
 
   /// Idempotent DDL for the v106 connector-suggestion columns (Lightroom
@@ -4451,6 +4473,22 @@ class AppDatabase extends _$AppDatabase {
     }
   }
 
+  /// Idempotent DDL for the v150 diver_settings coordinate format column.
+  /// Same dual-call contract as [_assertVisibilityScaleColumns].
+  Future<void> _assertCoordinateFormatColumn() async {
+    final cols = await customSelect(
+      "PRAGMA table_info('diver_settings')",
+    ).get();
+    if (cols.isEmpty) return;
+    final names = cols.map((c) => c.read<String>('name')).toSet();
+    if (!names.contains('coordinate_format')) {
+      await customStatement(
+        'ALTER TABLE diver_settings ADD COLUMN coordinate_format '
+        "TEXT NOT NULL DEFAULT 'decimalDegrees'",
+      );
+    }
+  }
+
   /// One-time clear of weather descriptions this app generated itself.
   ///
   /// Only rows whose weather_source is 'openMeteo' are touched -- those are
@@ -4676,6 +4714,11 @@ class AppDatabase extends _$AppDatabase {
         // Seed built-in service kinds (the v122 migration backfills these
         // for upgraded databases; beforeOpen re-asserts).
         await customStatement(kSeedBuiltInServiceKindsSql);
+
+        // Tag uniqueness indexes (v149, issue #1032): createAll() never builds
+        // raw-SQL indexes, so a fresh install would otherwise be the one
+        // device in the library without them.
+        await assertTagUniqueness(this);
       },
       onUpgrade: (Migrator m, int from, int to) async {
         int completedSteps = 0;
@@ -7724,6 +7767,62 @@ class AppDatabase extends _$AppDatabase {
           await _migrateBuddyRolesToCertifications();
         }
         if (from < 147) await reportProgress();
+        if (from < 148) {
+          // Site media (issues #211/#627). Query index for the site gallery;
+          // dedupe cleanup + partial unique index mirroring the dive-side
+          // v38 pair so the same gallery asset cannot be linked to the same
+          // site twice. The survivor is the oldest row, tie-broken by rowid:
+          // created_at is epoch MILLISECONDS and a bulk import writes many
+          // rows inside one, so a `created_at > MIN(created_at)` cleanup
+          // would leave every tied row behind and the unique index below
+          // would then abort the whole migration.
+          // Guarded on media.site_id existing so partial migration-test
+          // fixture databases (which build only the tables and columns their
+          // migration touches) pass through unharmed.
+          final mediaSiteCol = await customSelect(
+            "SELECT name FROM pragma_table_info('media') "
+            "WHERE name = 'site_id'",
+          ).get();
+          if (mediaSiteCol.isNotEmpty) {
+            await customStatement('''
+            CREATE INDEX IF NOT EXISTS idx_media_site_id
+            ON media(site_id)
+          ''');
+            await customStatement('''
+            DELETE FROM media
+            WHERE platform_asset_id IS NOT NULL
+              AND site_id IS NOT NULL
+              AND rowid NOT IN (
+                SELECT rowid FROM (
+                  SELECT rowid, ROW_NUMBER() OVER (
+                    PARTITION BY platform_asset_id, site_id
+                    ORDER BY created_at ASC, rowid ASC
+                  ) AS rn FROM media
+                  WHERE platform_asset_id IS NOT NULL AND site_id IS NOT NULL
+                ) WHERE rn = 1
+              )
+          ''');
+            await customStatement('''
+            CREATE UNIQUE INDEX IF NOT EXISTS idx_media_asset_site_unique
+            ON media(platform_asset_id, site_id)
+            WHERE platform_asset_id IS NOT NULL AND site_id IS NOT NULL
+          ''');
+          }
+        }
+        if (from < 148) await reportProgress();
+        if (from < 149) {
+          // Duplicate tags (issue #1032). The helper dedupes BEFORE creating
+          // the unique indexes and its dedupe is total (rowid/id tie-breaks),
+          // so no tie can survive to abort the index creation -- the failure
+          // mode v148 documents. Self-guarding on the tables existing.
+          await assertTagUniqueness(this);
+        }
+        if (from < 149) await reportProgress();
+        // v150: the diver's GPS coordinate notation (issue #1041).
+        if (from < 150) {
+          await _assertCoordinateFormatColumn();
+        }
+        if (from < 150) await reportProgress();
       },
       beforeOpen: (details) async {
         // Enable foreign keys
@@ -7847,6 +7946,9 @@ class AppDatabase extends _$AppDatabase {
         // diver_settings calibration columns.
         await _assertVisibilityMetersColumn();
         await _assertVisibilityScaleColumns();
+
+        // v150 backstop: re-assert the coordinate format column.
+        await _assertCoordinateFormatColumn();
 
         // v145 backstop: re-assert the gps_tracks provenance and trim columns.
         await _assertGpsTrackColumns();
@@ -7996,6 +8098,12 @@ class AppDatabase extends _$AppDatabase {
           }
           return true;
         }());
+
+        // v149 backstop (issue #1032): re-assert the tag uniqueness indexes,
+        // deduping first so the creation cannot abort. A database that
+        // arrives by restore or sync-adopt never runs onUpgrade, and that is
+        // exactly the second device the duplicate tags came from.
+        await assertTagUniqueness(this);
 
         // Data self-heal: backfill a primary dive_data_sources row for dives
         // that have profile samples but no source row (legacy file imports).

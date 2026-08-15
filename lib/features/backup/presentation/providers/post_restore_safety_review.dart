@@ -46,7 +46,9 @@ class PostRestoreSafetyReview {
     bool Function()? isCancelled,
   }) async {
     final diveRepo = _ref.read(diveRepositoryProvider);
-    final allIds = await diveRepo.getOrderedDiveIds();
+    final allIds = await diveRepo.getOrderedDiveIds(
+      sort: SafetyReviewSweep.oldestFirstSort,
+    );
     final total = allIds.length;
     onProgress?.call(0, total);
     if (total == 0) return SafetyReviewSweepResult.empty;
@@ -102,7 +104,10 @@ class PostRestoreSafetyReview {
     final passes = <_SweepPass>[];
     final owned = <String>{};
     for (final diver in divers) {
-      final ids = await diveRepo.getOrderedDiveIds(diverId: diver.id);
+      final ids = await diveRepo.getOrderedDiveIds(
+        diverId: diver.id,
+        sort: SafetyReviewSweep.oldestFirstSort,
+      );
       if (ids.isEmpty) continue;
       owned.addAll(ids);
       passes.add((diverId: diver.id, diveIds: ids));

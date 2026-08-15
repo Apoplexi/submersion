@@ -109,6 +109,7 @@ List<Certification> applyCertificationSorting(
 final certificationByIdProvider = FutureProvider.family<Certification?, String>(
   (ref, id) async {
     final repository = ref.watch(certificationRepositoryProvider);
+    ref.invalidateSelfWhen(repository.watchCertificationsChanges());
     return repository.getCertificationById(id);
   },
 );
@@ -123,6 +124,7 @@ final certificationSearchProvider =
         return ref.watch(allCertificationsProvider).value ?? [];
       }
       final repository = ref.watch(certificationRepositoryProvider);
+      ref.invalidateSelfWhen(repository.watchCertificationsChanges());
       return repository.searchCertifications(query, diverId: validatedDiverId);
     });
 
@@ -133,6 +135,7 @@ final expiringCertificationsProvider =
       final validatedDiverId = await ref.watch(
         validatedCurrentDiverIdProvider.future,
       );
+      ref.invalidateSelfWhen(repository.watchCertificationsChanges());
       return repository.getExpiringCertifications(
         days,
         diverId: validatedDiverId,
@@ -147,6 +150,7 @@ final expiredCertificationsProvider = FutureProvider<List<Certification>>((
   final validatedDiverId = await ref.watch(
     validatedCurrentDiverIdProvider.future,
   );
+  ref.invalidateSelfWhen(repository.watchCertificationsChanges());
   return repository.getExpiredCertifications(diverId: validatedDiverId);
 });
 
@@ -157,6 +161,7 @@ final certificationsByAgencyProvider =
       agency,
     ) async {
       final repository = ref.watch(certificationRepositoryProvider);
+      ref.invalidateSelfWhen(repository.watchCertificationsChanges());
       return repository.getCertificationsByAgency(agency);
     });
 

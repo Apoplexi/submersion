@@ -34,6 +34,7 @@ final customTankPresetsProvider = FutureProvider<List<TankPresetEntity>>((
   final validatedDiverId = await ref.watch(
     validatedCurrentDiverIdProvider.future,
   );
+  ref.invalidateSelfWhen(repository.watchTankPresetsChanges());
   return repository.getCustomPresets(diverId: validatedDiverId);
 });
 
@@ -43,6 +44,7 @@ final tankPresetProvider = FutureProvider.family<TankPresetEntity?, String>((
   id,
 ) async {
   final repository = ref.watch(tankPresetRepositoryProvider);
+  ref.invalidateSelfWhen(repository.watchTankPresetsChanges());
   return repository.getPresetById(id);
 });
 

@@ -56,7 +56,12 @@ class PhotoViewerPage extends ConsumerStatefulWidget {
 }
 
 class _PhotoViewerPageState extends ConsumerState<PhotoViewerPage> {
-  late PageController _pageController;
+  /// Built once, on the first frame that has a gallery to show, because
+  /// [PageController.initialPage] is the only way to open on a page other
+  /// than the first and the initial page is not known until the dive's media
+  /// resolves. Null until then; the loading branch renders no gallery.
+  PageController? _pageController;
+
   int _currentIndex = 0;
   bool _showOverlay = true;
 
@@ -87,7 +92,6 @@ class _PhotoViewerPageState extends ConsumerState<PhotoViewerPage> {
   @override
   void initState() {
     super.initState();
-    _pageController = PageController();
 
     // Set immersive mode for full-screen experience
     SystemChrome.setEnabledSystemUIMode(
@@ -98,7 +102,7 @@ class _PhotoViewerPageState extends ConsumerState<PhotoViewerPage> {
 
   @override
   void dispose() {
-    _pageController.dispose();
+    _pageController?.dispose();
     // Restore system UI
     SystemChrome.setEnabledSystemUIMode(
       SystemUiMode.edgeToEdge,
@@ -109,7 +113,11 @@ class _PhotoViewerPageState extends ConsumerState<PhotoViewerPage> {
 
   @override
   Widget build(BuildContext context) {
-    final mediaAsync = ref.watch(mediaForDiveProvider(widget.diveId));
+    // Documents never enter the photo pager: they open in
+    // DocumentViewerPage, and the raw bytes would not render here anyway.
+    final mediaAsync = ref
+        .watch(mediaForDiveProvider(widget.diveId))
+        .whenData((list) => list.where((m) => !m.isDocument).toList());
     final diveAsync = ref.watch(diveProvider(widget.diveId));
     final settings = ref.watch(settingsProvider);
 
@@ -126,16 +134,27 @@ class _PhotoViewerPageState extends ConsumerState<PhotoViewerPage> {
             );
           }
 
-          // Find initial index
-          final initialIndex = mediaList.indexWhere(
-            (m) => m.id == widget.initialMediaId,
-          );
-          if (initialIndex != -1 && _pageController.hasClients == false) {
-            _currentIndex = initialIndex;
-            _pageController = PageController(initialPage: initialIndex);
+          // Seed the pager on the photo that was tapped, once. Keyed on the
+          // controller being absent rather than on hasClients: the gallery
+          // detaches whenever it is unmounted (an emptied list, a rebuild
+          // between frames), which reads identically to "not attached yet"
+          // and had every such rebuild mint a replacement and leak the live
+          // controller.
+          if (_pageController == null) {
+            final initialIndex = mediaList.indexWhere(
+              (m) => m.id == widget.initialMediaId,
+            );
+            _currentIndex = initialIndex == -1 ? 0 : initialIndex;
+            _pageController = PageController(initialPage: _currentIndex);
           }
+          final pageController = _pageController!;
 
-          final currentItem = mediaList[_currentIndex];
+          // The gallery is live: a delete elsewhere, a dive-deletion cascade
+          // or a sync pull can drop it below the open page. The pager
+          // corrects itself on the next settle, so clamp for this frame
+          // rather than writing the state back during build.
+          final currentIndex = _currentIndex.clamp(0, mediaList.length - 1);
+          final currentItem = mediaList[currentIndex];
           final enrichment = currentItem.enrichment;
 
           // Get dive profile for the mini chart overlay
@@ -211,7 +230,7 @@ class _PhotoViewerPageState extends ConsumerState<PhotoViewerPage> {
                 // Photo/video gallery
                 _PhotoGallery(
                   mediaList: mediaList,
-                  pageController: _pageController,
+                  pageController: pageController,
                   onPageChanged: (index) {
                     setState(() => _currentIndex = index);
                   },
@@ -220,7 +239,7 @@ class _PhotoViewerPageState extends ConsumerState<PhotoViewerPage> {
                       setState(() => _showOverlay = !_showOverlay),
                   onSetOverlay: (value) => setState(() => _showOverlay = value),
                   onVideoControllerChanged: _onVideoControllerChanged,
-                  currentIndex: _currentIndex,
+                  currentIndex: currentIndex,
                 ),
 
                 // Transparent tap target to toggle overlays (photos only)
@@ -238,57 +257,12 @@ class _PhotoViewerPageState extends ConsumerState<PhotoViewerPage> {
                     ),
                   ),
 
-                // Perdix dive computer overlay. Deliberately independent of
-                // the _showOverlay chrome (which auto-hides during video
-                // playback, exactly when this must stay up) and mounted
-                // BELOW it so the toolbar keeps hit-test priority when the
-                // chrome is visible (the default corner overlaps the top
-                // bar). The face absorbs pointer events over its own bounds
-                // (drags move it, taps do nothing); chrome-toggle and video
-                // play/pause taps work anywhere outside it.
-                if (perdixAvailable && settings.perdixOverlayEnabled)
-                  DraggablePerdixOverlay(
-                    // Re-key when the persisted seed first arrives so a late
-                    // settings load re-seeds the position (same trick as the
-                    // fullscreen readout card).
-                    key: ValueKey(
-                      'perdix-${currentItem.id}-'
-                      '${settings.perdixOverlayX}-${settings.perdixOverlayY}',
-                    ),
-                    resolver: perdixResolver,
-                    baseElapsedSeconds: enrichment.elapsedSeconds!,
-                    settings: settings,
-                    playback: currentItem.isVideo
-                        ? _videoControllers[currentItem.id]
-                        : null,
-                    positionGetter:
-                        currentItem.isVideo &&
-                            _videoControllers[currentItem.id] != null
-                        ? () =>
-                              _videoControllers[currentItem.id]
-                                  ?.value
-                                  .position ??
-                              Duration.zero
-                        : null,
-                    initialFraction:
-                        (settings.perdixOverlayX != null &&
-                            settings.perdixOverlayY != null)
-                        ? Offset(
-                            settings.perdixOverlayX!,
-                            settings.perdixOverlayY!,
-                          )
-                        : null,
-                    onDragEnd: (fraction) => ref
-                        .read(settingsProvider.notifier)
-                        .setPerdixOverlayPosition(fraction.dx, fraction.dy),
-                  ),
-
                 // Overlay controls (app bar and metadata)
                 if (_showOverlay) ...[
                   // Top app bar
                   _TopOverlay(
                     item: currentItem,
-                    currentIndex: _currentIndex,
+                    currentIndex: currentIndex,
                     totalCount: mediaList.length,
                     onClose: () => Navigator.of(context).pop(),
                     onShare: () => _shareCurrentPhoto(currentItem),
@@ -332,6 +306,62 @@ class _PhotoViewerPageState extends ConsumerState<PhotoViewerPage> {
                     ),
                   ),
                 ],
+
+                // Perdix dive computer overlay. Deliberately independent of
+                // the _showOverlay chrome, which auto-hides during video
+                // playback exactly when this must stay up.
+                //
+                // Mounted ABOVE the chrome so it always wins the pointers
+                // that drag it: the bottom metadata's gradient Container and
+                // the mini profile chart both absorb hit tests across their
+                // full bounds, and either would strand the face where it
+                // could no longer be picked up. Neither is interactive, so
+                // nothing is lost by the face shadowing them. The top
+                // toolbar is the exception -- it does have buttons -- so
+                // rather than order, the face is kept out of its band
+                // entirely via topReserve.
+                //
+                // The face absorbs pointer events over its own bounds (drags
+                // move it, taps do nothing); chrome-toggle and video
+                // play/pause taps work anywhere outside it.
+                if (perdixAvailable && settings.perdixOverlayEnabled)
+                  DraggablePerdixOverlay(
+                    // Re-key when the persisted seed first arrives so a late
+                    // settings load re-seeds the position (same trick as the
+                    // fullscreen readout card).
+                    key: ValueKey(
+                      'perdix-${currentItem.id}-'
+                      '${settings.perdixOverlayX}-${settings.perdixOverlayY}',
+                    ),
+                    resolver: perdixResolver,
+                    baseElapsedSeconds: enrichment.elapsedSeconds!,
+                    settings: settings,
+                    topReserve:
+                        MediaQuery.paddingOf(context).top + _topChromeHeight,
+                    playback: currentItem.isVideo
+                        ? _videoControllers[currentItem.id]
+                        : null,
+                    positionGetter:
+                        currentItem.isVideo &&
+                            _videoControllers[currentItem.id] != null
+                        ? () =>
+                              _videoControllers[currentItem.id]
+                                  ?.value
+                                  .position ??
+                              Duration.zero
+                        : null,
+                    initialFraction:
+                        (settings.perdixOverlayX != null &&
+                            settings.perdixOverlayY != null)
+                        ? Offset(
+                            settings.perdixOverlayX!,
+                            settings.perdixOverlayY!,
+                          )
+                        : null,
+                    onDragEnd: (fraction) => ref
+                        .read(settingsProvider.notifier)
+                        .setPerdixOverlayPosition(fraction.dx, fraction.dy),
+                  ),
               ],
             ),
           );
@@ -1045,6 +1075,12 @@ class _VideoControlsOverlayState extends State<_VideoControlsOverlay> {
     );
   }
 }
+
+/// Height of [_TopOverlay]'s content below the status bar: its 8 px vertical
+/// padding either side of a default 48 px [IconButton]. The Perdix overlay
+/// reserves this band so the face can never sit on top of the toolbar's
+/// buttons -- keep the two in step if the toolbar's padding changes.
+const double _topChromeHeight = 64;
 
 /// Top overlay with close button, page indicator, share, and write metadata.
 class _TopOverlay extends StatelessWidget {

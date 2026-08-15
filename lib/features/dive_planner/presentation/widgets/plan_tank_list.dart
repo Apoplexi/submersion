@@ -134,10 +134,11 @@ class _TankChip extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
+    final tankSize = units.formatTankVolume(tank.volume, tank.workingPressure);
     final tankLabel =
         '${tank.name ?? tank.gasMix.name}, '
         '${units.formatPressure(tank.startPressure)}, '
-        '${units.formatVolume(tank.volume)}';
+        '$tankSize';
 
     return Semantics(
       label: tankLabel,
@@ -160,7 +161,7 @@ class _TankChip extends StatelessWidget {
           children: [
             Text(tank.name ?? tank.gasMix.name),
             Text(
-              '${units.formatPressure(tank.startPressure)} • ${units.formatVolume(tank.volume)}',
+              '${units.formatPressure(tank.startPressure)} • $tankSize',
               style: theme.textTheme.bodySmall,
             ),
           ],

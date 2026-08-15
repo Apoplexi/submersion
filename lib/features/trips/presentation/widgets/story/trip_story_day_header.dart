@@ -9,6 +9,7 @@ import 'package:submersion/features/settings/presentation/providers/settings_pro
 import 'package:submersion/features/trips/domain/entities/trip_story_day.dart';
 import 'package:submersion/features/trips/presentation/helpers/day_type_l10n.dart';
 import 'package:submersion/features/trips/presentation/helpers/weather_icon.dart';
+import 'package:submersion/features/trips/presentation/providers/surface_day_weather_provider.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 
@@ -32,8 +33,13 @@ class TripStoryDayHeader extends ConsumerWidget {
   static const double minHeight = 52;
 
   final TripStoryDay day;
+  final SurfaceDayWeatherRequest? surfaceWeatherRequest;
 
-  const TripStoryDayHeader({super.key, required this.day});
+  const TripStoryDayHeader({
+    super.key,
+    required this.day,
+    this.surfaceWeatherRequest,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -53,8 +59,13 @@ class TripStoryDayHeader extends ConsumerWidget {
       ...day.siteNames,
     ].map((part) => part.trim()).where((part) => part.isNotEmpty).toList();
 
+    final request = day.isSurface ? surfaceWeatherRequest : null;
+    final fetchedWeather = request == null
+        ? null
+        : ref.watch(surfaceDayWeatherProvider(request)).asData?.value;
+    final weather = day.weather ?? fetchedWeather;
     final units = UnitFormatter(ref.watch(settingsProvider));
-    final weatherBadge = _weatherBadge(context, theme, units);
+    final weatherBadge = _weatherBadge(context, theme, units, weather);
 
     return Material(
       color: theme.colorScheme.surface,
@@ -113,8 +124,8 @@ class TripStoryDayHeader extends ConsumerWidget {
     BuildContext context,
     ThemeData theme,
     UnitFormatter units,
+    TripStoryDayWeather? weather,
   ) {
-    final weather = day.weather;
     if (weather == null) return null;
 
     final icon = weatherIconFor(

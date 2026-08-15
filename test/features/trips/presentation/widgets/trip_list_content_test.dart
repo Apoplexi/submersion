@@ -1,5 +1,7 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
@@ -18,6 +20,9 @@ import 'package:submersion/features/trips/presentation/widgets/dense_trip_list_t
 import 'package:submersion/features/trips/presentation/widgets/trip_list_content.dart';
 import 'package:submersion/shared/models/entity_table_config.dart';
 import 'package:submersion/shared/providers/entity_table_config_providers.dart';
+
+import '../../../../helpers/bulk_delete_contract.dart';
+import '../../../../helpers/selection_contract.dart';
 
 import '../../../../helpers/mock_providers.dart';
 import '../../../../helpers/test_app.dart';
@@ -40,6 +45,12 @@ class _MockTripListNotifier
     implements TripListNotifier {
   _MockTripListNotifier(List<TripWithStats> trips)
     : super(AsyncValue.data(trips));
+
+  /// Ids bulk delete actually asked to remove.
+  final deleted = <String>[];
+
+  @override
+  Future<void> deleteTrip(String id) async => deleted.add(id);
 
   @override
   dynamic noSuchMethod(Invocation invocation) => null;
@@ -111,6 +122,12 @@ Future<List<Override>> _buildOverrides({
   ];
 }
 
+/// Mutable source for the contract test's filter step, so the visible
+/// list can be narrowed mid-test the way a real filter would.
+final _visibleTripsProvider = StateProvider<List<TripWithStats>>(
+  (ref) => const [],
+);
+
 Future<List<Override>> _buildPhoneOverrides({
   required List<TripWithStats> trips,
   ListViewMode viewMode = ListViewMode.detailed,
@@ -138,6 +155,124 @@ Future<List<Override>> _buildPhoneOverrides({
 }
 
 void main() {
+  group('bulk delete', () {
+    late _MockTripListNotifier notifier;
+
+    Future<Widget> host(List<TripWithStats> trips) async {
+      notifier = _MockTripListNotifier(trips);
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+      return testApp(
+        locale: const Locale('en'),
+        overrides: [
+          sharedPreferencesProvider.overrideWithValue(prefs),
+          settingsProvider.overrideWith((ref) => MockSettingsNotifier()),
+          currentDiverIdProvider.overrideWith(
+            (ref) => MockCurrentDiverIdNotifier(),
+          ),
+          tripListNotifierProvider.overrideWith((ref) => notifier),
+          tripListViewModeProvider.overrideWith((ref) => ListViewMode.detailed),
+          tripTableConfigProvider.overrideWith(
+            (ref) => _TestTripTableConfigNotifier(_testConfig),
+          ),
+          sortedFilteredTripsProvider.overrideWith(
+            (ref) => AsyncValue.data(trips),
+          ),
+          highlightedTripIdProvider.overrideWith((ref) => null),
+        ],
+        child: const TripListContent(showAppBar: true),
+      );
+    }
+
+    testWidgets('deletes every checked trip and reports the count', (
+      tester,
+    ) async {
+      final trips = [
+        _makeTrip(id: 't1', name: 'Aaa Trip'),
+        _makeTrip(id: 't2', name: 'Bbb Trip'),
+      ];
+      final widget = await host(trips);
+
+      await verifyBulkDelete(
+        tester,
+        build: () => widget,
+        selectButton: find.byKey(const ValueKey('enter_selection')),
+        expectedDeletedCount: 2,
+      );
+
+      expect(notifier.deleted, ['t1', 't2']);
+      expect(find.text('2 deleted'), findsOneWidget);
+    });
+
+    testWidgets('cancelling deletes nothing and keeps the selection', (
+      tester,
+    ) async {
+      final widget = await host([_makeTrip(id: 't1', name: 'Aaa Trip')]);
+
+      await verifyBulkDeleteCancels(
+        tester,
+        build: () => widget,
+        selectButton: find.byKey(const ValueKey('enter_selection')),
+      );
+
+      expect(notifier.deleted, isEmpty);
+    });
+  });
+
+  group('selection contract', () {
+    testWidgets('satisfies the shared selection contract', (tester) async {
+      final all = <TripWithStats>[
+        _makeTrip(id: 't1', name: 'Aaa Trip'),
+        _makeTrip(id: 't2', name: 'Bbb Trip'),
+        _makeTrip(id: 't3', name: 'Ccc Trip'),
+      ];
+
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+      final overrides = <Override>[
+        sharedPreferencesProvider.overrideWithValue(prefs),
+        settingsProvider.overrideWith((ref) => MockSettingsNotifier()),
+        currentDiverIdProvider.overrideWith(
+          (ref) => MockCurrentDiverIdNotifier(),
+        ),
+        _visibleTripsProvider.overrideWith((ref) => all),
+        tripListNotifierProvider.overrideWith(
+          (ref) => _MockTripListNotifier(all),
+        ),
+        tripListViewModeProvider.overrideWith((ref) => ListViewMode.detailed),
+        tripTableConfigProvider.overrideWith(
+          (ref) => _TestTripTableConfigNotifier(_testConfig),
+        ),
+        sortedFilteredTripsProvider.overrideWith(
+          (ref) => AsyncValue.data(ref.watch(_visibleTripsProvider)),
+        ),
+        highlightedTripIdProvider.overrideWith((ref) => null),
+      ];
+
+      await verifySelectionContract(
+        tester,
+        build: () => testApp(
+          overrides: overrides,
+          locale: const Locale('en'),
+          child: const TripListContent(showAppBar: true),
+        ),
+        selectButton: find.byKey(const ValueKey('enter_selection')),
+        rowRoot: find.ancestor(
+          of: find.text('Aaa Trip'),
+          matching: find.byType(TripListTile),
+        ),
+        firstRow: find.text('Aaa Trip'),
+        applyFilter: (tester) async {
+          final container = ProviderScope.containerOf(
+            tester.element(find.byType(TripListContent)),
+          );
+          container.read(_visibleTripsProvider.notifier).state = [all.first];
+        },
+        visibleAfterFilter: 1,
+      );
+    });
+  });
+
   group('TripListContent in table mode', () {
     testWidgets('renders table with column headers', (tester) async {
       final trips = [
@@ -197,6 +332,55 @@ void main() {
       expect(find.text('Maldives Trip'), findsOneWidget);
       expect(find.text('Red Sea Safari'), findsOneWidget);
       expect(find.text('Indonesia Live'), findsOneWidget);
+    });
+
+    // The table must be built inside the selection listener, or it keeps the
+    // isSelectionMode and selectedIds it was first built with.
+    //
+    // Pointer gestures hide this: tap-down writes highlightedTripIdProvider,
+    // which the widget watches, so every press happens to rebuild the whole
+    // subtree. Ctrl/Cmd-A changes the selection without any pointer-down, so
+    // it is the gesture that actually exercises the listener -- the bar would
+    // report "3 selected" over rows still drawn with no checkboxes at all.
+    testWidgets('Ctrl/Cmd-A repaints the table rows, not just the bar', (
+      tester,
+    ) async {
+      final selectAllKey = defaultTargetPlatform == TargetPlatform.macOS
+          ? LogicalKeyboardKey.metaLeft
+          : LogicalKeyboardKey.controlLeft;
+
+      final trips = [
+        _makeTrip(id: 't1', name: 'Maldives Trip'),
+        _makeTrip(id: 't2', name: 'Red Sea Safari'),
+        _makeTrip(id: 't3', name: 'Indonesia Live'),
+      ];
+
+      final overrides = await _buildOverrides(trips: trips);
+
+      await tester.pumpWidget(
+        testApp(
+          overrides: overrides,
+          child: const TripListContent(showAppBar: true),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.sendKeyDownEvent(selectAllKey);
+      await tester.sendKeyEvent(LogicalKeyboardKey.keyA);
+      await tester.sendKeyUpEvent(selectAllKey);
+      await tester.pumpAndSettle();
+
+      expect(find.text('3 selected'), findsOneWidget);
+
+      final checked = tester
+          .widgetList<Checkbox>(find.byType(Checkbox))
+          .where((c) => c.value ?? false)
+          .length;
+      expect(
+        checked,
+        3,
+        reason: 'rows must repaint as checked, not just the count in the bar',
+      );
     });
 
     testWidgets('shows empty state when no trips', (tester) async {

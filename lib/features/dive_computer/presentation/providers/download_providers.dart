@@ -339,6 +339,13 @@ final computerDiveIdsProvider = FutureProvider.family<List<String>, String>((
   computerId,
 ) async {
   final repository = ref.watch(diveComputerRepositoryProvider);
+  // The dive DETAIL tick, not the computers tick: this query reads `dives` and
+  // `dive_data_sources`, so the id list goes stale when a dive is deleted or a
+  // download attributes a new source to one -- neither of which writes the
+  // `dive_computers` registry the repository owns.
+  ref.invalidateSelfWhen(
+    ref.watch(diveRepositoryProvider).watchDiveDetailChanges(),
+  );
   return repository.getDiveIdsForComputer(computerId);
 });
 
@@ -358,6 +365,10 @@ final computerDiveIdsProvider = FutureProvider.family<List<String>, String>((
 /// re-fetches. The download step watches it continuously while it's on
 /// screen, so there's no risk of a mid-session refetch under an active
 /// listener.
+// no-tick: autoDispose, and it seeds a DEFAULT the user then edits. It is
+// re-fetched every time the step mounts, so a stale value cannot render; a tick
+// would instead move the default under the user mid-download, since the
+// download itself writes the dives this reads.
 final firstSyncCutoffDefaultProvider = FutureProvider.autoDispose<DateTime?>((
   ref,
 ) async {

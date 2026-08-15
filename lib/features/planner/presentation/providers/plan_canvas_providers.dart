@@ -48,6 +48,9 @@ final planOutcomeProvider = Provider<PlanOutcome>((ref) {
 /// null when no logged dive carries enough tank data to compute one.
 final loggedAverageSacProvider = FutureProvider<double?>((ref) async {
   final repository = ref.watch(statisticsRepositoryProvider);
+  // Not autoDispose, so without this the logged SAC was computed once and
+  // cached for the whole process lifetime (issue #974).
+  ref.invalidateSelfWhen(repository.watchStatisticsChanges());
   final sacByRole = await repository.getSacVolumeByTankRole();
   return sacByRole['backGas'] ??
       (sacByRole.isEmpty ? null : sacByRole.values.first);

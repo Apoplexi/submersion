@@ -69,6 +69,11 @@ typedef DiveNeighbors = ({String? previousId, String? nextId});
 /// All dive ids in the active filter+sort order -- the source for previous/next
 /// navigation from the detail page. IDs only (not full dives), so it stays
 /// cheap even on large libraries. Recomputes when filter/sort/diver change.
+///
+/// Also self-invalidates on the dives tick. Nothing in the app invalidated this
+/// chain, so after merging from the detail page the id list still contained the
+/// merged-away dive and "next" navigated to a dive that no longer existed;
+/// autoDispose only rescued it once the page closed (issue #974).
 final orderedDiveIdsProvider = FutureProvider.autoDispose<List<String>>((
   ref,
 ) async {
@@ -76,6 +81,7 @@ final orderedDiveIdsProvider = FutureProvider.autoDispose<List<String>>((
   final filter = ref.watch(diveFilterProvider);
   final sort = ref.watch(diveSortProvider);
   final repository = ref.watch(diveRepositoryProvider);
+  ref.invalidateSelfWhen(repository.watchDivesChanges());
   return repository.getOrderedDiveIds(
     diverId: diverId,
     filter: filter,
@@ -171,6 +177,7 @@ final diveSplitServiceProvider = Provider<DiveSplitService>((ref) {
 final customFieldKeySuggestionsProvider =
     FutureProvider.family<List<String>, String>((ref, diverId) async {
       final repository = ref.watch(diveCustomFieldRepositoryProvider);
+      ref.invalidateSelfWhen(repository.watchCustomFieldsChanges());
       return repository.getDistinctKeysForDiver(diverId);
     });
 
@@ -236,12 +243,6 @@ final sourceProfilesProvider =
 final batchProfileCacheProvider =
     StateProvider<Map<String, List<domain.DiveProfilePoint>>>((ref) => {});
 
-/// Version counter for statistics cache invalidation.
-///
-/// All statistics providers watch this. Bumping the version causes all of them
-/// to re-fetch, while keepAlive prevents disposal between navigations.
-final statisticsVersionProvider = StateProvider<int>((ref) => 0);
-
 /// Statistics provider (filtered by current diver).
 ///
 /// Feeds the dashboard HeroHeader headline totals (total dives, etc.).
@@ -259,17 +260,28 @@ final diveStatisticsProvider = FutureProvider<DiveStatistics>((ref) async {
   return repository.getStatistics(diverId: currentDiverId);
 });
 
-/// Dive records (superlatives) provider (filtered by current diver)
+/// Dive records (superlatives) provider (filtered by current diver).
+///
+/// Takes the same dives tick as [diveStatisticsProvider] directly above, for
+/// the same reason it cites (issue #217): a merge, a bulk delete, or a sync
+/// pull rewrites the superlatives without going through any notifier. Until
+/// #974 this was rescued only by the refresh buttons on the records page.
 final diveRecordsProvider = FutureProvider<DiveRecords>((ref) async {
   final repository = ref.watch(diveRepositoryProvider);
   final currentDiverId = ref.watch(currentDiverIdProvider);
+  ref.invalidateSelfWhen(repository.watchDivesChanges());
   return repository.getRecords(diverId: currentDiverId);
 });
 
-/// Next dive number provider (filtered by current diver)
+/// Next dive number provider (filtered by current diver).
+///
+/// Not autoDispose, and the import wizard's review step watches it, so without
+/// the tick a stale number rendered for the rest of the app's life -- long
+/// enough to number two dives the same after an import or sync added dives.
 final nextDiveNumberProvider = FutureProvider<int>((ref) async {
   final repository = ref.watch(diveRepositoryProvider);
   final currentDiverId = ref.watch(currentDiverIdProvider);
+  ref.invalidateSelfWhen(repository.watchDivesChanges());
   return repository.getNextDiveNumber(diverId: currentDiverId);
 });
 
@@ -290,6 +302,7 @@ final diveSearchProvider = FutureProvider.family<List<DiveSummary>, String>((
     validatedCurrentDiverIdProvider.future,
   );
   final repository = ref.watch(diveRepositoryProvider);
+  ref.invalidateSelfWhen(repository.watchDivesChanges());
   return repository.searchDiveSummaries(
     query,
     diverId: validatedDiverId,
@@ -740,11 +753,13 @@ class PaginatedDiveListNotifier
     _ref.invalidate(diveListNotifierProvider);
   }
 
-  /// Bump the statistics version to invalidate all cached stats providers,
-  /// and also invalidate the dive-level stats provider.
+  /// Invalidate the dive-level stats provider.
+  ///
+  /// Every other statistics provider now self-invalidates on
+  /// [StatisticsRepository.watchStatisticsChanges], so there is no version
+  /// counter to bump (issue #974).
   void _invalidateStatistics() {
     _ref.invalidate(diveStatisticsProvider);
-    _ref.read(statisticsVersionProvider.notifier).state++;
   }
 
   Future<domain.Dive> addDive(domain.Dive dive) async {
@@ -996,6 +1011,7 @@ final diveNumberingInfoProvider = FutureProvider<DiveNumberingInfo>((
   final validatedDiverId = await ref.watch(
     validatedCurrentDiverIdProvider.future,
   );
+  ref.invalidateSelfWhen(repository.watchDivesChanges());
   return repository.getDiveNumberingInfo(diverId: validatedDiverId);
 });
 

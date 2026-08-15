@@ -2438,6 +2438,52 @@ class AppLocalizationsFr extends AppLocalizations {
       'Supprimer cet enregistrement de checklist ?';
 
   @override
+  String get preDive_sessions_filter => 'Filtrer';
+
+  @override
+  String get preDive_sessions_filterTitle =>
+      'Filtrer les checklists effectuées';
+
+  @override
+  String get preDive_sessions_filterChecklist => 'Checklist';
+
+  @override
+  String get preDive_sessions_filterStatus => 'Statut';
+
+  @override
+  String get preDive_sessions_filterFlaggedOnly => 'Uniquement les anomalies';
+
+  @override
+  String get preDive_sessions_filterDateRange => 'Période';
+
+  @override
+  String get preDive_sessions_filterAnyDate => 'Toutes les dates';
+
+  @override
+  String get preDive_sessions_filterClearAll => 'Tout effacer';
+
+  @override
+  String get preDive_sessions_filterApply => 'Appliquer';
+
+  @override
+  String get preDive_sessions_filterFlaggedChip => 'Anomalies uniquement';
+
+  @override
+  String get preDive_sessions_emptyFiltered =>
+      'Aucune checklist ne correspond à ces filtres';
+
+  @override
+  String get preDive_sessions_export => 'Exporter vers Excel';
+
+  @override
+  String get preDive_sessions_exportEmpty => 'Aucune checklist à exporter';
+
+  @override
+  String preDive_sessions_exportFailed(String error) {
+    return 'Échec de l\'export : $error';
+  }
+
+  @override
   String get preDive_start_title => 'Démarrer la checklist pré-plongée';
 
   @override
@@ -2977,6 +3023,14 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String dashboard_hero_divesLoggedOther(Object count) {
     return '$count plongees enregistrees';
+  }
+
+  @override
+  String get dashboard_hero_divesTotalOne => '1 plongee';
+
+  @override
+  String dashboard_hero_divesTotalOther(Object count) {
+    return '$count plongees';
   }
 
   @override
@@ -6236,6 +6290,24 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get setup_syncPull_continue => 'Continuer';
+
+  @override
+  String get setup_syncPull_incomplete_message =>
+      'Ce compte contient une bibliothèque Submersion dont l\'envoi n\'a jamais été terminé. Laissez votre autre appareil finir la synchronisation, puis réessayez.';
+
+  @override
+  String get setup_syncPull_incomplete_retry => 'Vérifier à nouveau';
+
+  @override
+  String get setup_syncPull_incomplete_title =>
+      'Envoi de la bibliothèque inachevé';
+
+  @override
+  String get setup_syncPull_locked_message =>
+      'Saisissez la phrase secrète de chiffrement pour déverrouiller cette bibliothèque et la télécharger sur cet appareil.';
+
+  @override
+  String get setup_syncPull_locked_title => 'Cette bibliothèque est chiffrée';
 
   @override
   String get setup_syncPull_noLibrary_message =>
@@ -11871,6 +11943,57 @@ class AppLocalizationsFr extends AppLocalizations {
   String get media_diveMediaSection_unlinkSuccess => 'Photo dissociee';
 
   @override
+  String get media_siteMediaSection_title => 'Médias du site';
+
+  @override
+  String get media_siteMediaSection_addPhotos => 'Ajouter des photos ou vidéos';
+
+  @override
+  String get media_siteMediaSection_addDocument => 'Ajouter un document';
+
+  @override
+  String get media_siteMediaSection_emptyState =>
+      'Aucune carte, photo ou document attaché à ce site';
+
+  @override
+  String media_siteMediaSection_divePhotosGroup(int count) {
+    return 'Photos des plongées ici ($count)';
+  }
+
+  @override
+  String get media_siteMediaSection_divePhotoLabel => 'Photo de plongée';
+
+  @override
+  String media_siteMediaSection_unlinkSelectedTitle(int count) {
+    return 'Retirer $count pièces jointes ?';
+  }
+
+  @override
+  String get media_siteMediaSection_unlinkSelectedContent =>
+      'Les éléments sélectionnés seront retirés de ce site. Les fichiers de votre photothèque ou sur disque ne sont pas supprimés.';
+
+  @override
+  String media_siteMediaSection_unlinkSelectedSuccess(int count) {
+    return '$count pièces jointes retirées';
+  }
+
+  @override
+  String get media_documentViewer_title => 'Document';
+
+  @override
+  String get media_documentViewer_unavailable =>
+      'Ce document n\'est pas disponible sur cet appareil';
+
+  @override
+  String get media_documentViewer_availableOnOriginDevice =>
+      'Il est disponible sur l\'appareil depuis lequel il a été ajouté, ou via un stockage multimédia configuré.';
+
+  @override
+  String media_documentViewer_attached(int count) {
+    return '$count documents attachés';
+  }
+
+  @override
   String get media_diveScan_scanTooltip =>
       'Rechercher des photos dans la galerie';
 
@@ -11919,8 +12042,8 @@ class AppLocalizationsFr extends AppLocalizations {
   String get media_gpsBanner_addToSiteButton => 'Ajouter au site';
 
   @override
-  String media_gpsBanner_coordinates(Object latitude, Object longitude) {
-    return 'Coordonnees : $latitude, $longitude';
+  String media_gpsBanner_coordinates(Object coordinates) {
+    return 'Coordonnees : $coordinates';
   }
 
   @override
@@ -13728,12 +13851,81 @@ class AppLocalizationsFr extends AppLocalizations {
   String get settings_cloudSync_adopt_notNow => 'Pas maintenant';
 
   @override
+  String get settings_cloudSync_dangerZone => 'Zone sensible';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_tile =>
+      'Remplacer la bibliothèque cloud';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_tileSubtitle =>
+      'Faire de la bibliothèque de cet appareil celle que tous les appareils utilisent';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_dialogTitle =>
+      'Remplacer la bibliothèque cloud ?';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_dialogIntro =>
+      'La bibliothèque de cet appareil devient celle que tous les appareils utilisent.';
+
+  @override
+  String settings_cloudSync_replaceLibrary_dialogBody(num diveCount) {
+    String _temp0 = intl.Intl.pluralLogic(
+      diveCount,
+      locale: localeName,
+      other:
+          'La bibliothèque cloud est effacée et remplacée par les $diveCount plongées de cet appareil.',
+      one:
+          'La bibliothèque cloud est effacée et remplacée par la 1 plongée de cet appareil.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String settings_cloudSync_replaceLibrary_peers(num peerCount) {
+    String _temp0 = intl.Intl.pluralLogic(
+      peerCount,
+      locale: localeName,
+      other:
+          '$peerCount autres appareils devront l\'adopter ; d\'ici là, leurs modifications ne sont pas fusionnées.',
+      one:
+          '1 autre appareil devra l\'adopter ; d\'ici là, ses modifications ne sont pas fusionnées.',
+      zero:
+          'Aucun autre appareil ne se synchronise encore, il n\'y a donc rien à adopter.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get settings_cloudSync_replaceLibrary_peersUnknown =>
+      'Tous les autres appareils devront l\'adopter ; d\'ici là, leurs modifications ne sont pas fusionnées.';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_backupNote =>
+      'Une sauvegarde de cet appareil est créée au préalable. Cette action est irréversible.';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_confirmWord => 'Remplacer';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_confirmHint =>
+      'Tapez \"Remplacer\" pour confirmer';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_confirm => 'Remplacer';
+
+  @override
   String get settings_cloudSync_firstSync_banner =>
       'La première synchronisation attend votre confirmation. Appuyez sur « Synchroniser maintenant » pour vérifier ce qui sera combiné.';
 
   @override
   String get settings_cloudSync_firstSync_dialogConfirm =>
       'Fusionner et synchroniser';
+
+  @override
+  String get settings_cloudSync_firstSync_replaceHint =>
+      'Si au contraire la bibliothèque de cet appareil doit remplacer celle du cloud, annulez et utilisez Réglages > Synchronisation cloud > Remplacer la bibliothèque cloud.';
 
   @override
   String settings_cloudSync_firstSync_dialogContent(
@@ -13824,6 +14016,27 @@ class AppLocalizationsFr extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String settings_cloudSync_peerNeedsAdopt_banner(Object deviceList) {
+    return '$deviceList a encore une version de bibliothèque plus ancienne ou inconnue, ses modifications n\'ont donc pas été fusionnées. Ouvrez Submersion dessus pour adopter la bibliothèque actuelle.';
+  }
+
+  @override
+  String settings_cloudSync_peerNeedsAdopt_bannerPlural(Object deviceList) {
+    return '$deviceList ont encore une version de bibliothèque plus ancienne ou inconnue, leurs modifications n\'ont donc pas été fusionnées. Ouvrez Submersion dessus pour adopter la bibliothèque actuelle.';
+  }
+
+  @override
+  String settings_cloudSync_peerNeedsAdopt_unnamedDevice(Object shortId) {
+    return 'appareil $shortId';
+  }
+
+  @override
+  String get settings_cloudSync_peerNeedsAdopt_listSeparator => ', ';
+
+  @override
+  String get settings_cloudSync_peerNeedsAdopt_listLastSeparator => ' et ';
 
   @override
   String settings_cloudSync_peerRequiresUpdate_banner(num count) {
@@ -15166,7 +15379,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get settings_storage_resetDatabase_subtitle =>
-      'Supprimer toutes les donnees et repartir a zero';
+      'Supprimer toutes les données de cet appareil et repartir à zéro';
 
   @override
   String get settings_storage_resetDialog_title =>
@@ -15174,7 +15387,10 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get settings_storage_resetDialog_body =>
-      'Cela supprimera definitivement toutes vos donnees, y compris les plongees, les sites, l\'equipement et les reglages. Une sauvegarde sera creee automatiquement avant la reinitialisation.';
+      'Cela supprime définitivement toutes les données de CET appareil, y compris les plongées, les sites, l\'équipement et les réglages. Une sauvegarde est créée automatiquement avant la réinitialisation.\n\nVotre bibliothèque cloud n\'est pas supprimée et les autres appareils conservent leurs données. La synchronisation cloud sera déconnectée afin que la réinitialisation ne soit pas annulée ; vous pouvez la reconnecter dans Réglages > Synchronisation cloud.';
+
+  @override
+  String get settings_storage_resetDialog_confirmWord => 'Supprimer';
 
   @override
   String get settings_storage_resetDialog_confirmHint =>
@@ -15198,7 +15414,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get settings_storage_resetComplete_description =>
-      'Vos donnees ont ete effacees et une sauvegarde a ete enregistree. Appuyez sur continuer pour recharger l\'application.';
+      'Les données de cet appareil ont été effacées et une sauvegarde a été enregistrée. La synchronisation cloud est maintenant déconnectée afin que la réinitialisation ne soit pas annulée ; vous pouvez la reconnecter dans Réglages > Synchronisation cloud. Appuyez sur continuer pour recharger l\'application.';
 
   @override
   String get settings_summary_activeDiver => 'Plongeur actif';
@@ -19237,6 +19453,14 @@ class AppLocalizationsFr extends AppLocalizations {
       'Aucun port série USB trouvé. L\'ordinateur de plongée est-il connecté et allumé ?';
 
   @override
+  String get diveComputer_download_stalePairing =>
+      'L\'appairage Bluetooth de cet ordinateur de plongée n\'est plus valide. Oubliez l\'ordinateur de plongée dans les réglages Bluetooth de votre appareil, puis appairez-le à nouveau depuis le menu Bluetooth de l\'ordinateur de plongée.';
+
+  @override
+  String get diveComputer_download_discoveryStalled =>
+      'Connexion établie avec l\'ordinateur de plongée, mais il a cessé de répondre avant le début du téléchargement. Cela signifie généralement que l\'appairage Bluetooth n\'est plus valide : oubliez l\'ordinateur de plongée dans les réglages Bluetooth de votre appareil, puis réessayez.';
+
+  @override
   String diveComputer_download_serialConnectFailedWithDetails(Object details) {
     return 'Impossible de se connecter à l\'ordinateur de plongée.\n\nDétails de diagnostic (à partager avec les développeurs) :\n$details';
   }
@@ -22961,7 +23185,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get settings_security_encryption_subtitle =>
-      'Protégez votre carnet de plongée avec un chiffrement au repos';
+      'Protégez votre carnet de plongée avec un chiffrement au repos. Le chiffrement peut affecter les performances.';
 
   @override
   String get settings_security_encryption_progress_backup =>
@@ -23039,7 +23263,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get settings_security_enableEncryption_body =>
-      'Une sauvegarde de sécurité est d\'abord créée, puis le fichier de la base est rechiffré sur place. Cela peut prendre du temps pour les gros carnets.';
+      'Une sauvegarde de sécurité est d\'abord créée, puis le fichier de la base est rechiffré sur place. Cela peut prendre du temps pour les gros carnets. Le chiffrement peut affecter les performances.';
 
   @override
   String get settings_security_disableEncryption_title =>
@@ -23144,6 +23368,9 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get dataQuality_repair_applied => 'Correction appliquée';
+
+  @override
+  String get dataQuality_repair_noChange => 'Rien à corriger ici';
 
   @override
   String get dataQuality_repair_failed => 'Échec de la correction';
@@ -23360,6 +23587,14 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get dataQuality_repairLabel_despike => 'Supprimer le pic';
+
+  @override
+  String get dataQuality_repairLabel_clampNegative =>
+      'Ramener les profondeurs négatives à zéro';
+
+  @override
+  String get dataQuality_repairLabel_smoothRates =>
+      'Lisser les vitesses impossibles';
 
   @override
   String get dataQuality_repairLabel_fillGaps => 'Combler les trous';
@@ -23630,6 +23865,30 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String get settings_coordinateFormat_title => 'Format des coordonnées';
+
+  @override
+  String get settings_coordinateFormat_subtitle =>
+      'Comment les positions GPS sont affichées et saisies';
+
+  @override
+  String get settings_coordinateFormat_decimalDegrees => 'Degrés décimaux';
+
+  @override
+  String get settings_coordinateFormat_degreesDecimalMinutes =>
+      'Degrés et minutes décimales';
+
+  @override
+  String get settings_coordinateFormat_degreesMinutesSeconds =>
+      'Degrés, minutes, secondes';
+
+  @override
+  String get settings_coordinateFormat_utm => 'UTM';
+
+  @override
+  String get settings_coordinateFormat_mgrs => 'MGRS';
+
+  @override
   String get settings_visibilityScale_title => 'Échelle de visibilité';
 
   @override
@@ -23666,5 +23925,70 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String statistics_conditions_visibility_legacySuffix(String band) {
     return '$band (enregistré avant la mesure)';
+  }
+
+  @override
+  String common_selection_countSelected(Object count) {
+    return '$count sélectionnés';
+  }
+
+  @override
+  String get common_selection_enterTooltip => 'Sélectionner des éléments';
+
+  @override
+  String get common_selection_exitTooltip => 'Quitter la sélection';
+
+  @override
+  String get common_selection_selectAllTooltip => 'Tout sélectionner';
+
+  @override
+  String get common_selection_deselectAllTooltip => 'Tout désélectionner';
+
+  @override
+  String common_bulkDelete_title(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Supprimer $count éléments ?',
+      one: 'Supprimer $count élément ?',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get common_bulkDelete_body => 'Cette action est irréversible.';
+
+  @override
+  String common_bulkDelete_snackbar(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count supprimés',
+      one: '$count supprimé',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get marineLife_species_delete_confirmTitle => 'Supprimer l\'espèce ?';
+
+  @override
+  String marineLife_species_delete_confirmBody(String name) {
+    return 'Voulez-vous vraiment supprimer \"$name\" ?';
+  }
+
+  @override
+  String marineLife_species_delete_inUseError(String name) {
+    return 'Impossible de supprimer \"$name\" - elle a des observations';
+  }
+
+  @override
+  String marineLife_species_delete_snackbar(String name) {
+    return '\"$name\" supprimée';
+  }
+
+  @override
+  String marineLife_species_delete_error(String error) {
+    return 'Erreur lors de la suppression de l\'espèce : $error';
   }
 }

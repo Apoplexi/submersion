@@ -2292,6 +2292,50 @@ class AppLocalizationsZh extends AppLocalizations {
   String get preDive_sessions_deleteConfirm => '要删除此检查清单记录吗？';
 
   @override
+  String get preDive_sessions_filter => '筛选';
+
+  @override
+  String get preDive_sessions_filterTitle => '筛选检查清单记录';
+
+  @override
+  String get preDive_sessions_filterChecklist => '检查清单';
+
+  @override
+  String get preDive_sessions_filterStatus => '状态';
+
+  @override
+  String get preDive_sessions_filterFlaggedOnly => '仅显示有标记的记录';
+
+  @override
+  String get preDive_sessions_filterDateRange => '日期范围';
+
+  @override
+  String get preDive_sessions_filterAnyDate => '任意日期';
+
+  @override
+  String get preDive_sessions_filterClearAll => '全部清除';
+
+  @override
+  String get preDive_sessions_filterApply => '应用';
+
+  @override
+  String get preDive_sessions_filterFlaggedChip => '仅有标记';
+
+  @override
+  String get preDive_sessions_emptyFiltered => '没有符合这些筛选条件的检查清单记录';
+
+  @override
+  String get preDive_sessions_export => '导出到 Excel';
+
+  @override
+  String get preDive_sessions_exportEmpty => '没有可导出的检查清单记录';
+
+  @override
+  String preDive_sessions_exportFailed(String error) {
+    return '导出失败：$error';
+  }
+
+  @override
   String get preDive_start_title => '开始潜前检查清单';
 
   @override
@@ -2810,6 +2854,14 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String dashboard_hero_divesLoggedOther(Object count) {
     return '已记录 $count 次潜水';
+  }
+
+  @override
+  String get dashboard_hero_divesTotalOne => '1 次潜水';
+
+  @override
+  String dashboard_hero_divesTotalOther(Object count) {
+    return '$count 次潜水';
   }
 
   @override
@@ -5897,6 +5949,22 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get setup_syncPull_continue => '继续';
+
+  @override
+  String get setup_syncPull_incomplete_message =>
+      '此账户中的 Submersion 资料库尚未上传完成。请让另一台设备完成同步后重试。';
+
+  @override
+  String get setup_syncPull_incomplete_retry => '重新检查';
+
+  @override
+  String get setup_syncPull_incomplete_title => '资料库上传未完成';
+
+  @override
+  String get setup_syncPull_locked_message => '输入加密口令以解锁此资料库并下载到此设备。';
+
+  @override
+  String get setup_syncPull_locked_title => '此资料库已加密';
 
   @override
   String get setup_syncPull_noLibrary_message =>
@@ -11295,6 +11363,55 @@ class AppLocalizationsZh extends AppLocalizations {
   String get media_diveMediaSection_unlinkSuccess => '照片已取消关联';
 
   @override
+  String get media_siteMediaSection_title => '潜水点媒体';
+
+  @override
+  String get media_siteMediaSection_addPhotos => '添加照片或视频';
+
+  @override
+  String get media_siteMediaSection_addDocument => '添加文档';
+
+  @override
+  String get media_siteMediaSection_emptyState => '此潜水点尚未附加地图、照片或文档';
+
+  @override
+  String media_siteMediaSection_divePhotosGroup(int count) {
+    return '此处潜水的照片（$count）';
+  }
+
+  @override
+  String get media_siteMediaSection_divePhotoLabel => '潜水照片';
+
+  @override
+  String media_siteMediaSection_unlinkSelectedTitle(int count) {
+    return '移除 $count 个附件？';
+  }
+
+  @override
+  String get media_siteMediaSection_unlinkSelectedContent =>
+      '所选项目将从此潜水点移除。照片库或磁盘中的文件不会被删除。';
+
+  @override
+  String media_siteMediaSection_unlinkSelectedSuccess(int count) {
+    return '已移除 $count 个附件';
+  }
+
+  @override
+  String get media_documentViewer_title => '文档';
+
+  @override
+  String get media_documentViewer_unavailable => '此文档在本设备上不可用';
+
+  @override
+  String get media_documentViewer_availableOnOriginDevice =>
+      '它可在添加它的设备上使用，或通过已配置的媒体存储获取。';
+
+  @override
+  String media_documentViewer_attached(int count) {
+    return '已附加 $count 个文档';
+  }
+
+  @override
   String get media_diveScan_scanTooltip => '扫描图库为照片';
 
   @override
@@ -11346,8 +11463,8 @@ class AppLocalizationsZh extends AppLocalizations {
   String get media_gpsBanner_addToSiteButton => '添加到潜水点';
 
   @override
-  String media_gpsBanner_coordinates(Object latitude, Object longitude) {
-    return '坐标: $latitude, $longitude';
+  String media_gpsBanner_coordinates(Object coordinates) {
+    return '坐标: $coordinates';
   }
 
   @override
@@ -13034,11 +13151,72 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settings_cloudSync_adopt_notNow => '暂不';
 
   @override
+  String get settings_cloudSync_dangerZone => '危险操作';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_tile => '替换云端库';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_tileSubtitle =>
+      '让本设备的库成为所有设备共用的库';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_dialogTitle => '替换云端库？';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_dialogIntro =>
+      '本设备的库将成为所有设备共用的库。';
+
+  @override
+  String settings_cloudSync_replaceLibrary_dialogBody(num diveCount) {
+    String _temp0 = intl.Intl.pluralLogic(
+      diveCount,
+      locale: localeName,
+      other: '云端库将被清除，并替换为本设备的 $diveCount 次潜水。',
+      one: '云端库将被清除，并替换为本设备的 1 次潜水。',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String settings_cloudSync_replaceLibrary_peers(num peerCount) {
+    String _temp0 = intl.Intl.pluralLogic(
+      peerCount,
+      locale: localeName,
+      other: '系统将请求另外 $peerCount 台设备采用；在此之前，它们的更改不会合并。',
+      one: '系统将请求另外 1 台设备采用；在此之前，其更改不会合并。',
+      zero: '目前没有其他设备在同步，因此无需采用。',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get settings_cloudSync_replaceLibrary_peersUnknown =>
+      '系统将请求所有其他设备采用；在此之前，它们的更改不会合并。';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_backupNote =>
+      '系统会先创建本设备的备份。此操作无法撤销。';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_confirmWord => '替换';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_confirmHint => '输入「替换」以确认';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_confirm => '替换';
+
+  @override
   String get settings_cloudSync_firstSync_banner =>
       '首次同步正在等待确认。点击「立即同步」以查看将要合并的内容。';
 
   @override
   String get settings_cloudSync_firstSync_dialogConfirm => '合并并同步';
+
+  @override
+  String get settings_cloudSync_firstSync_replaceHint =>
+      '如果您希望本设备的库替换云端的内容，请取消并使用「设置 > 云同步 > 替换云端库」。';
 
   @override
   String settings_cloudSync_firstSync_dialogContent(
@@ -13124,6 +13302,27 @@ class AppLocalizationsZh extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String settings_cloudSync_peerNeedsAdopt_banner(Object deviceList) {
+    return '$deviceList 仍使用较旧或未知的库版本，因此其更改未被合并。请在该设备上打开 Submersion 以采用当前的库。';
+  }
+
+  @override
+  String settings_cloudSync_peerNeedsAdopt_bannerPlural(Object deviceList) {
+    return '$deviceList 仍使用较旧或未知的库版本，因此它们的更改未被合并。请在这些设备上打开 Submersion 以采用当前的库。';
+  }
+
+  @override
+  String settings_cloudSync_peerNeedsAdopt_unnamedDevice(Object shortId) {
+    return '设备 $shortId';
+  }
+
+  @override
+  String get settings_cloudSync_peerNeedsAdopt_listSeparator => '、';
+
+  @override
+  String get settings_cloudSync_peerNeedsAdopt_listLastSeparator => '和';
 
   @override
   String settings_cloudSync_peerRequiresUpdate_banner(num count) {
@@ -14365,14 +14564,17 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settings_storage_resetDatabase => '重置数据库';
 
   @override
-  String get settings_storage_resetDatabase_subtitle => '删除所有数据并重新开始';
+  String get settings_storage_resetDatabase_subtitle => '删除本设备上的所有数据并重新开始';
 
   @override
   String get settings_storage_resetDialog_title => '重置数据库？';
 
   @override
   String get settings_storage_resetDialog_body =>
-      '这将永久删除您的所有数据，包括潜水、潜水点、装备和设置。重置前将自动创建备份。';
+      '这将永久删除本设备上的所有数据，包括潜水、潜水点、装备和设置。重置前将自动创建备份。\n\n您的云端库不会被删除，其他设备也会保留各自的数据。云同步将被断开，以免重置被撤销；您可以在「设置 > 云同步」中重新连接。';
+
+  @override
+  String get settings_storage_resetDialog_confirmWord => 'Delete';
 
   @override
   String get settings_storage_resetDialog_confirmHint => '输入「Delete」以确认';
@@ -14393,7 +14595,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get settings_storage_resetComplete_description =>
-      '您的数据已清除并已保存备份。点击继续以重新加载应用。';
+      '本设备的数据已清除并已保存备份。云同步现已断开，以免重置被撤销；您可以在「设置 > 云同步」中重新连接。点击继续以重新加载应用。';
 
   @override
   String get settings_summary_activeDiver => '当前潜水员';
@@ -18188,6 +18390,14 @@ class AppLocalizationsZh extends AppLocalizations {
       '未找到 USB 串行端口。潜水电脑是否已连接并开机？';
 
   @override
+  String get diveComputer_download_stalePairing =>
+      '此潜水电脑的蓝牙配对已失效。请在设备的蓝牙设置中忽略该潜水电脑，然后从潜水电脑的蓝牙菜单重新配对。';
+
+  @override
+  String get diveComputer_download_discoveryStalled =>
+      '已连接到潜水电脑，但在下载开始前它停止响应。这通常表示蓝牙配对已失效：请在设备的蓝牙设置中忽略该潜水电脑，然后重试。';
+
+  @override
   String diveComputer_download_serialConnectFailedWithDetails(Object details) {
     return '无法连接到潜水电脑。\n\n诊断详情（请分享给开发人员）：\n$details';
   }
@@ -21740,7 +21950,8 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settings_security_encryption => '加密数据库';
 
   @override
-  String get settings_security_encryption_subtitle => '使用静态加密保护您的潜水日志文件';
+  String get settings_security_encryption_subtitle =>
+      '使用静态加密保护您的潜水日志文件。加密可能会影响性能。';
 
   @override
   String get settings_security_encryption_progress_backup => '正在创建安全备份...';
@@ -21806,7 +22017,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get settings_security_enableEncryption_body =>
-      '首先会创建安全备份，然后就地重新加密数据库文件。日志较大时可能需要一些时间。';
+      '首先会创建安全备份，然后就地重新加密数据库文件。日志较大时可能需要一些时间。加密可能会影响性能。';
 
   @override
   String get settings_security_disableEncryption_title => '要关闭加密吗？';
@@ -21904,6 +22115,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get dataQuality_repair_applied => '已应用修复';
+
+  @override
+  String get dataQuality_repair_noChange => '这里没有需要修正的内容';
 
   @override
   String get dataQuality_repair_failed => '修复失败';
@@ -22114,6 +22328,12 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get dataQuality_repairLabel_despike => '移除尖峰';
+
+  @override
+  String get dataQuality_repairLabel_clampNegative => '将水面以上深度归零';
+
+  @override
+  String get dataQuality_repairLabel_smoothRates => '平滑异常速率';
 
   @override
   String get dataQuality_repairLabel_fillGaps => '填补缺口';
@@ -22363,6 +22583,27 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get settings_coordinateFormat_title => '坐标格式';
+
+  @override
+  String get settings_coordinateFormat_subtitle => 'GPS 位置的显示和输入方式';
+
+  @override
+  String get settings_coordinateFormat_decimalDegrees => '十进制度';
+
+  @override
+  String get settings_coordinateFormat_degreesDecimalMinutes => '度和十进制分';
+
+  @override
+  String get settings_coordinateFormat_degreesMinutesSeconds => '度分秒';
+
+  @override
+  String get settings_coordinateFormat_utm => 'UTM';
+
+  @override
+  String get settings_coordinateFormat_mgrs => 'MGRS';
+
+  @override
   String get settings_visibilityScale_title => '能见度标准';
 
   @override
@@ -22395,5 +22636,68 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String statistics_conditions_visibility_legacySuffix(String band) {
     return '$band（测量功能之前记录）';
+  }
+
+  @override
+  String common_selection_countSelected(Object count) {
+    return '已选择 $count 项';
+  }
+
+  @override
+  String get common_selection_enterTooltip => '选择项目';
+
+  @override
+  String get common_selection_exitTooltip => '退出选择';
+
+  @override
+  String get common_selection_selectAllTooltip => '全选';
+
+  @override
+  String get common_selection_deselectAllTooltip => '取消全选';
+
+  @override
+  String common_bulkDelete_title(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '删除 $count 项？',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get common_bulkDelete_body => '此操作无法撤消。';
+
+  @override
+  String common_bulkDelete_snackbar(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '已删除 $count 项',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get marineLife_species_delete_confirmTitle => '删除物种？';
+
+  @override
+  String marineLife_species_delete_confirmBody(String name) {
+    return '确定要删除“$name”吗？';
+  }
+
+  @override
+  String marineLife_species_delete_inUseError(String name) {
+    return '无法删除“$name”——它有目击记录';
+  }
+
+  @override
+  String marineLife_species_delete_snackbar(String name) {
+    return '已删除“$name”';
+  }
+
+  @override
+  String marineLife_species_delete_error(String error) {
+    return '删除物种时出错：$error';
   }
 }

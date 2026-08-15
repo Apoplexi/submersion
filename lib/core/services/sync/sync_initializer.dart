@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show visibleForTesting;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 
@@ -9,6 +10,20 @@ import 'package:submersion/core/services/sync/library_epoch_store.dart';
 import 'package:submersion/core/services/sync/sync_clock.dart';
 import 'package:submersion/core/services/sync/sync_preferences.dart'
     show syncLastProviderPrefsKey;
+
+/// The cloud provider the foreground app last selected, as recorded in
+/// [prefs]. Free-standing (not a [SyncInitializer] method) so the headless
+/// background isolate -- which has no `SyncRepository` to build an
+/// initializer with -- reads the selection through the same parser.
+CloudProviderType? lastCloudProviderFromPrefs(SharedPreferences prefs) {
+  final providerString = prefs.getString(syncLastProviderPrefsKey);
+  if (providerString == null) return null;
+
+  for (final type in CloudProviderType.values) {
+    if (type.name == providerString) return type;
+  }
+  return null;
+}
 
 /// Handles sync initialization and checks on app launch
 class SyncInitializer {
@@ -54,18 +69,7 @@ class SyncInitializer {
        _prefs = prefs;
 
   /// Get the last used cloud provider type
-  CloudProviderType? getLastProvider() {
-    final providerString = _prefs.getString(_lastProviderKey);
-    if (providerString == null) return null;
-
-    try {
-      return CloudProviderType.values.firstWhere(
-        (p) => p.name == providerString,
-      );
-    } catch (e) {
-      return null;
-    }
-  }
+  CloudProviderType? getLastProvider() => lastCloudProviderFromPrefs(_prefs);
 
   /// Save the selected cloud provider
   Future<void> saveProvider(CloudProviderType? provider) async {
@@ -352,14 +356,48 @@ class SyncInitializer {
   Future<List<CloudFileInfo>> peerSyncFiles(
     CloudStorageProvider provider,
   ) async {
+    final files = await peerLogFiles(provider);
+    return files.where((f) => ChangesetLogLayout.isManifest(f.name)).toList();
+  }
+
+  /// Every changeset-log artifact belonging to a peer device -- manifests,
+  /// changesets and base parts alike -- our own excluded. [peerSyncFiles]
+  /// narrows this to manifests; callers that must tell "this account is empty"
+  /// apart from "a publish was interrupted here" need the wider view, because
+  /// the manifest is written LAST and a base publish is not resumable.
+  Future<List<CloudFileInfo>> peerLogFiles(
+    CloudStorageProvider provider,
+  ) async {
     final deviceId = await _syncRepository.getDeviceId();
     final files = await provider.listFiles(
       namePattern: ChangesetLogLayout.prefix,
     );
     return files
-        .where((f) => ChangesetLogLayout.isManifest(f.name))
+        .where((f) => ChangesetLogLayout.isOurs(f.name))
         .where((f) => ChangesetLogLayout.deviceIdOf(f.name) != deviceId)
         .toList();
+  }
+
+  /// What a peer listing says about this account, in one round trip.
+  Future<PeerLibraryState> peerLibraryState(
+    CloudStorageProvider provider,
+  ) async => classifyPeerFiles(await peerLogFiles(provider));
+
+  /// Classifies a peer listing. Static and visible for testing for the same
+  /// reason as SyncNotifier.skippedPeerLabels: it is pure, and the rule
+  /// deserves tests that do not need a provider or a database.
+  @visibleForTesting
+  static PeerLibraryState classifyPeerFiles(List<CloudFileInfo> files) {
+    if (files.isEmpty) return PeerLibraryState.none;
+    // A retirement marker is a tombstone, not a library: a retired peer's
+    // leftovers must not read as a library waiting to be pulled.
+    final live = files.where(
+      (f) => !ChangesetLogLayout.isRetiredMarker(f.name),
+    );
+    if (live.isEmpty) return PeerLibraryState.none;
+    return live.any((f) => ChangesetLogLayout.isManifest(f.name))
+        ? PeerLibraryState.pullable
+        : PeerLibraryState.incomplete;
   }
 
   /// The most recent modifiedTime across [files], which must be non-empty.
@@ -370,6 +408,21 @@ class SyncInitializer {
     }
     return newest;
   }
+}
+
+/// What a peer changeset-log listing says about a cloud account.
+enum PeerLibraryState {
+  /// No peer has written anything here. A genuinely fresh account.
+  none,
+
+  /// Peer artifacts exist but none of them is a manifest. The manifest commits
+  /// a publish and is written last, so this is a publish that never finished
+  /// -- interrupted, or still in flight on the other device. There is nothing
+  /// to pull yet, but the account is NOT empty and saying so would be wrong.
+  incomplete,
+
+  /// At least one peer manifest: a library that can be pulled.
+  pullable,
 }
 
 /// Outcome of [SyncInitializer.reconcileDeviceIdentity].
