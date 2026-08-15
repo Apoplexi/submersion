@@ -24,6 +24,7 @@ class Dive3dScenePainter extends CustomPainter {
   final double pitchDegrees;
   final double zoom;
   final Set<SceneOverlay>? visibleOverlays;
+  final bool mirrorX;
 
   const Dive3dScenePainter({
     required this.scene,
@@ -31,6 +32,7 @@ class Dive3dScenePainter extends CustomPainter {
     this.pitchDegrees = 22,
     this.zoom = 1.0,
     this.visibleOverlays,
+    this.mirrorX = false,
   });
 
   // Studio lighting for flat shading. Ambient is the floor every surface
@@ -60,6 +62,7 @@ class Dive3dScenePainter extends CustomPainter {
       yawDegrees: yawDegrees,
       pitchDegrees: pitchDegrees,
       zoom: zoom,
+      mirrorX: mirrorX,
     );
     for (final layer in scene.layers) {
       if (_visible(layer.overlay)) _paintMesh(canvas, projector, layer.mesh);
@@ -188,5 +191,6 @@ class Dive3dScenePainter extends CustomPainter {
       oldDelegate.yawDegrees != yawDegrees ||
       oldDelegate.pitchDegrees != pitchDegrees ||
       oldDelegate.zoom != zoom ||
-      oldDelegate.visibleOverlays != visibleOverlays;
+      oldDelegate.visibleOverlays != visibleOverlays ||
+      oldDelegate.mirrorX != mirrorX;
 }
