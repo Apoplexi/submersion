@@ -1,7 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/features/bathymetry/domain/bathymetry_grid.dart';
 import 'package:submersion/features/dive_3d/domain/geometry/marker_layout.dart';
+import 'package:submersion/features/dive_3d/domain/scene_3d.dart';
 import 'package:submersion/features/dive_3d/domain/spatial/reckoned_path.dart';
+import 'package:submersion/features/dive_3d/domain/spatial/seascape_appearance.dart';
 import 'package:submersion/features/dive_3d/domain/spatial/site_seascape_geometry_service.dart';
 import 'package:submersion/features/dive_3d/presentation/scene_overlay.dart';
 import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
@@ -45,6 +47,15 @@ SiteSeascapeInput input({
   nearbySites: nearby,
 );
 
+/// Layers minus the contour/wall overlays this feature added, so the
+/// original structural-count assertions keep measuring what they meant.
+List<SceneLayer> structuralLayers(Scene3d scene) => [
+  for (final l in scene.layers)
+    if (l.overlay != SceneOverlay.contours &&
+        l.overlay != SceneOverlay.steepWalls)
+      l,
+];
+
 void main() {
   const service = SiteSeascapeGeometryService();
 
@@ -61,7 +72,7 @@ void main() {
 
   test('bare scene: terrain, site pin, water; a site marker; no scrub', () {
     final scene = service.build(input());
-    expect(scene.layers.length, 3);
+    expect(structuralLayers(scene).length, 3);
     expect(scene.scrubPath, isNull);
     final site = scene.markers.single;
     expect(site.kind, SceneMarkerKind.site);
@@ -84,7 +95,7 @@ void main() {
         ),
       );
       // terrain + (ribbon + 2 pins) + site pin + water = 6.
-      expect(scene.layers.length, 6);
+      expect(structuralLayers(scene).length, 6);
       final gated = scene.layers
           .where((l) => l.overlay == SceneOverlay.paths)
           .length;
@@ -116,5 +127,67 @@ void main() {
     final scene = service.build(input());
     expect(scene.bounds.maxDepthMeters, 40); // grid max beats siteMaxDepth
     expect(scene.bounds.sceneMaxY, greaterThan(0));
+  });
+
+  test('real terrain gains contour and water-gated layers plus labels', () {
+    // Grid sloping 5 -> 45 m: auto levels 5..45, 8 rendered lines (see
+    // contour_builder_test for the hand-derived count), major 25 labeled.
+    final slopeGrid = BathymetryGrid(
+      originLat: 0,
+      originLon: 0,
+      cellSizeLatDeg: 100.0 / 110540.0,
+      cellSizeLonDeg: 100.0 / 111320.0,
+      rows: 3,
+      cols: 3,
+      depthsMeters: const [5, 5, 5, 25, 25, 25, 45, 45, 45],
+      sourceId: 'test',
+      resolutionMeters: 100,
+      fetchedAt: DateTime.utc(2026, 8, 15),
+    );
+    final result = service.buildWithLabels(
+      SiteSeascapeInput(
+        grid: slopeGrid,
+        center: const GeoPoint(0, 0),
+        siteName: 'Test',
+        divePaths: const [],
+        nearbySites: const [],
+      ),
+    );
+    final overlays = result.scene.layers.map((l) => l.overlay).toList();
+    expect(overlays.where((o) => o == SceneOverlay.contours), hasLength(8));
+    expect(overlays.last, SceneOverlay.water);
+    expect(result.contourLabels.single.text, '25 m');
+    // 5 -> 45 over two 100 m cells is 20 m per cell: atan(0.2) = 11.3
+    // degrees, below the default 22, so no wall layer.
+    expect(overlays.contains(SceneOverlay.steepWalls), isFalse);
+  });
+
+  test('steep terrain gains a wall layer once the threshold allows', () {
+    final wallGrid = BathymetryGrid(
+      originLat: 0,
+      originLon: 0,
+      cellSizeLatDeg: 100.0 / 110540.0,
+      cellSizeLonDeg: 100.0 / 111320.0,
+      rows: 2,
+      cols: 2,
+      depthsMeters: const [10, 10, 60, 60],
+      sourceId: 'test',
+      resolutionMeters: 100,
+      fetchedAt: DateTime.utc(2026, 8, 15),
+    );
+    final result = service.buildWithLabels(
+      SiteSeascapeInput(
+        grid: wallGrid,
+        center: const GeoPoint(0, 0),
+        siteName: 'Wall',
+        divePaths: const [],
+        nearbySites: const [],
+        appearance: const SeascapeAppearance(wallAngleDeg: 20),
+      ),
+    );
+    expect(
+      result.scene.layers.where((l) => l.overlay == SceneOverlay.steepWalls),
+      hasLength(1),
+    );
   });
 }
