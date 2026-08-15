@@ -5,6 +5,10 @@
 **Depends on:** the site bathymetry seascape
 (`2026-07-28-site-bathymetry-seascape-design.md`, shipped in PR #763) and its
 axes/extent addendum (`2026-07-28-seascape-axes-and-extent-design.md`).
+**Incorporates:** issue #1065 (nautical chart analysis request): steep-wall
+shading, configurable ramp range, banded/continuous gradient, custom contour
+levels, and a sites-map entry point. The issue's measure-points idea stays in
+slice 4 of the program.
 **Part of:** the seascape usefulness program (slice 1 of 5, see Program
 Context below).
 
@@ -33,7 +37,8 @@ slices, each its own spec/plan/PR cycle:
    into site features.
 4. Briefing tools: two-point measure (distance, bearing, depth profile
    along the line) and depth-limit shading (cert depth or MOD of a chosen
-   mix).
+   mix). Demand evidence: issue #1065 independently requests map measure
+   points.
 5. Dive coverage layer: aggregate path ribbons into a "where I've been"
    density trace.
 
@@ -50,6 +55,18 @@ slices, each its own spec/plan/PR cycle:
 - The per-dive seascape page gets a "Contours" FilterChip (a chip row above
   the time scrub bar) instead of hardcoding contours on.
 - No export/share button in this slice; no chart mode on the per-dive page.
+
+Second pass (Eric, 2026-08-15, incorporating issue #1065, all four accepted):
+
+- Steep-wall highlighting as its own overlay with a user-set angle
+  threshold.
+- A terrain-appearance sheet on both seascape pages: ramp depth range,
+  banded vs continuous gradient, contour mode, line thickness, wall
+  threshold. Persisted in `AppSettings`.
+- Custom contour levels with optional per-level colors and ONE global line
+  thickness slider (no per-level thickness).
+- The seascape becomes reachable from the dive-sites map marker callout,
+  not only the site detail app bar.
 
 ## Design
 
@@ -74,9 +91,15 @@ New pure-domain builder `lib/features/dive_3d/domain/spatial/contour_builder.dar
   5/10/15 m lines. Levels convert to meters for marching; label text stays
   in display units.
 - **Flat-site guard:** if fewer than 2 levels fit in the depth range, no
-  contours are emitted.
+  contours are emitted (Auto mode only; Custom lists are explicit).
+- **Custom levels (issue #1065):** the terrain-appearance sheet can switch
+  contour mode from Auto to Custom: a user-edited list of depths in the
+  display unit, each with an optional color defaulting to the standard ink.
+  In Custom mode every level is labeled (custom lists are short by nature).
+  An empty Custom list falls back to Auto. Levels deeper than the terrain
+  simply produce no line (marching squares finds no crossings).
 - Output type `ContourSet`: per level, `levelMeters`, `isMajor`, `labelText`,
-  and scene-space polylines.
+  optional color override, and scene-space polylines.
 
 The builder is a pure function (no IO, no throws by design) and runs inside
 the existing geometry services, so it rides the current `compute()` isolate
@@ -94,15 +117,17 @@ Ribbons participate in the painter's back-to-front triangle sort, so
 occlusion is correct for free.
 
 Styling: minor contours are fine, semi-transparent dark ink; major contours
-are wider and more opaque. Colors are fixed constants beside the terrain
-ramp constants in the builder.
+are wider and more opaque. Default colors are fixed constants beside the
+terrain ramp constants in the builder; Custom-mode per-level colors override
+them. A single global line-thickness factor from the appearance sheet scales
+minor and major ribbon widths proportionally in both modes.
 
 ### Contour labels
 
-Major contours only, and only while the contours overlay is visible (no
-separate toggle).
+Labeled levels are the Auto majors, or every level in Custom mode. Labels
+show only while the contours overlay is visible (no separate toggle).
 
-- **3D orbit view:** each major contour carries a small set of candidate
+- **3D orbit view:** each labeled contour carries a small set of candidate
   anchor points sampled along its polyline. Per paint, `AxisChromePainter`
   projects the candidates and draws the label at the candidate nearest the
   camera (highest view-space z), which naturally sits on the visible front
@@ -141,36 +166,96 @@ bathymetry grid, so it can never show synthesized terrain.
 ### Depth legend
 
 New widget `seascape_depth_legend.dart`: a compact vertical ramp bar
-(teal at 0 to navy at max depth) with tick marks at the major contour
-levels, values in display units, plus the sand swatch labeled as land.
-Shown top-right on BOTH seascape pages in BOTH modes, clear of the
-provenance chip (top-left), compass (bottom-left), and overlay chips
-(bottom center). Hidden on synthesized terrain.
+(teal at 0 to navy) with tick marks at the active contour levels (Auto
+majors, or the Custom list), values in display units, plus the sand swatch
+labeled as land. The legend follows the appearance settings: a smooth bar
+when the gradient is continuous, discrete swatches when banded, and when a
+custom ramp range is active the bar ends at the range max with a "+" cap
+indicating deeper terrain clamps to the deepest color. Shown top-right on
+BOTH seascape pages in BOTH modes, clear of the provenance chip (top-left),
+compass (bottom-left), and overlay chips (bottom center). Hidden on
+synthesized terrain.
+
+### Terrain appearance sheet (issue #1065)
+
+Both seascape pages gain a tune icon opening a settings sheet, persisted in
+`AppSettings` (the `tissueColorScheme` precedent) so choices stick across
+sessions and apply to both pages:
+
+- **Color depth range:** a toggle plus a max-depth slider with manual input
+  (shallow end pinned at 0). When on, the ramp spans 0 to the custom max
+  instead of the grid's deepest cell; deeper terrain clamps to the deepest
+  color. This resolves the drop-off compression trade-off flagged in the
+  axes spec (deepest-cell normalization crushing reef color range).
+- **Gradient style:** continuous (default, current behavior) or banded into
+  10 equal segments across the active ramp range.
+- **Contour mode:** Auto (default) or Custom, with the Custom level/color
+  editor.
+- **Line thickness:** one global slider with manual input.
+- **Steep-wall threshold:** angle slider (5 to 90 degrees) with manual
+  input, default 22 degrees, with a one-line caption explaining that grid
+  resolution smooths
+  real walls flatter than they are (a sheer wall inside one ~67 m cell reads
+  as a modest slope), which is why the default is well under 45.
+
+New `AppSettings` fields: `seascapeRampMaxDepthMeters` (null = off, ramp to
+deepest cell), `seascapeRampBanded` (default false),
+`seascapeContourMode` (auto/custom), `seascapeCustomContourLevels`
+(JSON-encoded list of depth + optional color), `seascapeContourThickness`
+(factor, default 1.0), `seascapeWallAngleDeg` (default 22).
+
+### Steep-wall highlighting (issue #1065)
+
+Slope per cell is computed by central differences over real-meter spacing
+(degree cell sizes converted via the grid's latitude). Cells steeper than
+the threshold become a translucent red highlight mesh, duplicated cell
+quads lifted a small epsilon above the terrain, packaged as `SceneLayer`s
+gated by a new `SceneOverlay.steepWalls` value with its own "Walls"
+FilterChip beside "Contours" on both pages, default OFF.
+
+Walls are a separate overlay layer rather than tint baked into terrain
+vertex colors for the same reason contours are: toggling a pre-built layer
+is free, while baking would force a geometry rebuild per flip. Changing the
+threshold rebuilds geometry through the settings watch, same as a unit
+change. Never shown on synthesized terrain.
+
+### Sites-map entry point (issue #1065)
+
+The dive-sites map's marker callout gains the same terrain/seascape action
+as the site detail app bar (icon + tooltip reused), gated on the site
+having coordinates. Exact callout widget located at planning time.
 
 ### Integration
 
-- `SceneOverlay` gains `contours` and `water`. The analytical dive scene's
-  overlay menu (`dive_3d_page.dart`) does an exhaustive switch over this
-  enum: both new values get labels there but are filtered out of that menu,
-  the same way `paths` was handled when the seascape shipped.
-- **Site seascape page:** adds a third FilterChip, "Contours", default on.
+- `SceneOverlay` gains `contours`, `water`, and `steepWalls`. The
+  analytical dive scene's overlay menu (`dive_3d_page.dart`) does an
+  exhaustive switch over this enum: all new values get labels there but are
+  filtered out of that menu, the same way `paths` was handled when the
+  seascape shipped.
+- **Site seascape page:** adds FilterChips "Contours" (default on) and
+  "Walls" (default off), plus the appearance-sheet tune icon and the chart
+  mode toggle in the app bar.
 - **Per-dive seascape page:** gains a compact chip row above the
-  `TimeScrubBar` with a single "Contours" chip (markers stay hardcoded; that
-  scene has no markers today, and water stays internal).
+  `TimeScrubBar` with "Contours" and "Walls" chips, plus the tune icon
+  (markers stay hardcoded; that scene has no markers today, and water stays
+  internal).
 - Both geometry services (`site_seascape_geometry_service.dart`,
   `spatial_geometry_service.dart`) invoke the contour builder only when the
   terrain is real bathymetry. The synthesized fallback gets no contours, no
   legend, and no chart mode: contours assert "this is the real isobath,"
   matching the precedent that hover inspection is disabled on invented
   terrain.
-- Levels depend on the display unit, so the geometry providers gain a
-  depth-unit dependency and rebuild when units change (a 20 ft contour is
-  not a 6 m contour). Known trap: a new provider dependency breaks consumer
-  widget tests that lack a settings override; all touched page tests get the
+- Levels depend on the display unit, and geometry now also depends on the
+  appearance settings (ramp range, banded, contour mode/levels, thickness,
+  wall threshold), so the geometry providers gain a settings dependency and
+  rebuild when any of those change (a 20 ft contour is not a 6 m contour).
+  Known trap: a new provider dependency breaks consumer widget tests that
+  lack a settings override; all touched page tests get the
   `_TestSettingsNotifier` pattern.
-- New l10n keys (contours chip label, chart mode toggle tooltip, legend land
-  label, overlay menu labels) are translated in ALL supported locales, and
-  `flutter gen-l10n` runs from the project root.
+- New l10n keys (chip labels, chart mode toggle tooltip, legend land label,
+  overlay menu labels, appearance sheet labels and captions) are translated
+  in ALL supported locales, and `flutter gen-l10n` runs from the project
+  root.
 
 ### Edge cases
 
@@ -178,9 +263,14 @@ provenance chip (top-left), compass (bottom-left), and overlay chips
 - Near-flat sites: fewer than 2 fitting levels means no contour lines; the
   legend still shows the ramp.
 - Unit switch: levels, labels, and legend all recompute via the settings
-  watch.
+  watch. Custom contour levels are stored in meters internally and
+  re-rendered in the active display unit.
 - Degenerate label placement: if every candidate anchor of a contour
   projects off-screen, its label is skipped that frame.
+- Ramp range max set shallower than the terrain: deeper cells clamp to the
+  deepest color; the legend's "+" cap signals the clamp.
+- Wall threshold at the extremes: 0 degrees would tint everything, so the
+  slider floor is 5 degrees; 90 degrees tints nothing and is allowed.
 
 ## Testing
 
@@ -188,15 +278,22 @@ TDD throughout:
 
 - `contour_builder` unit tests with hand-computed marching-squares vectors:
   a tiny 3x3 grid with a known saddle, null-corner skipping, polyline
-  joining, level selection in both unit systems, flat-site guard, label
+  joining, level selection in both unit systems, flat-site guard, custom
+  level lists (colors, empty-list fallback, level below terrain), label
   anchor sampling.
+- Steep-wall builder unit tests with hand-computed slope vectors: a known
+  incline grid where the expected angle is derivable by hand, threshold
+  boundary cases, latitude-corrected cell spacing.
+- Ramp tests: banded quantization boundaries (10 segments over the active
+  range), custom range clamping, continuous default unchanged.
 - Chart-mode camera preset unit test asserting north-up via
   `compassNeedleAngle`.
-- Widget tests: contours chip toggles the layers on both pages, chart mode
-  toggle swaps camera and chrome (legend present, water hidden, labels on),
-  legend renders ticks in the active unit. Established patterns apply:
-  settings-notifier override, bounded pumps on pages hosting maps or
-  never-settling animations.
+- Widget tests: contours and walls chips toggle their layers on both pages,
+  chart mode toggle swaps camera and chrome (legend present, water hidden,
+  labels on), legend renders ticks in the active unit and swatches when
+  banded, appearance sheet round-trips its settings, sites-map callout
+  action navigates. Established patterns apply: settings-notifier override,
+  bounded pumps on pages hosting maps or never-settling animations.
 - `dart format .` and `flutter analyze` clean before push.
 
 ## Out of scope (this slice)
@@ -204,21 +301,26 @@ TDD throughout:
 - Export/share chart as image (respect the existing share-vs-save duality
   when it comes).
 - Chart mode on the per-dive seascape page.
-- Depth-band (stepped/quantized) terrain coloring; the smooth ramp stays.
-- Depth-ramp renormalization for drop-off sites (still a known trade-off
-  from the axes spec).
+- Per-level line thickness (one global slider only) and per-site appearance
+  overrides (appearance settings are global).
 - Slices 2 to 5 of the program (site features, wreck suggestions, measure +
-  depth-limit shading, coverage layer).
+  depth-limit shading, coverage layer). Issue #1065's measure request lands
+  in slice 4.
 
 ## File plan
 
 New:
 - `lib/features/dive_3d/domain/spatial/contour_builder.dart` (+ tests)
+- `lib/features/dive_3d/domain/spatial/wall_highlight_builder.dart`
+  (+ tests)
 - `lib/features/dive_3d/presentation/widgets/seascape_depth_legend.dart`
+  (+ tests)
+- `lib/features/dive_3d/presentation/widgets/terrain_appearance_sheet.dart`
   (+ tests)
 
 Touched:
-- `lib/features/dive_3d/presentation/scene_overlay.dart` (two new values)
+- `lib/features/dive_3d/presentation/scene_overlay.dart` (three new values:
+  `contours`, `water`, `steepWalls`)
 - `lib/features/dive_3d/domain/spatial/site_seascape_geometry_service.dart`
 - `lib/features/dive_3d/domain/spatial/spatial_geometry_service.dart`
 - `lib/features/dive_3d/application/site_seascape_providers.dart`
@@ -231,4 +333,10 @@ Touched:
 - `lib/features/dive_3d/presentation/pages/spatial_site_page.dart`
 - `lib/features/dive_3d/presentation/pages/dive_3d_page.dart` (exhaustive
   switch entries)
+- `lib/features/dive_3d/domain/spatial/bathymetry_terrain_builder.dart`
+  (ramp range + banded gradient)
+- `lib/features/settings/.../settings_providers.dart` (`AppSettings` gains
+  the seascape appearance fields; note `AppSettings` is defined IN
+  settings_providers.dart, no separate entity file)
+- Dive-sites map marker callout (exact file located at planning time)
 - `lib/l10n/*.arb` (all locales)
