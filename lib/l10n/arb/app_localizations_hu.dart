@@ -11897,8 +11897,8 @@ class AppLocalizationsHu extends AppLocalizations {
   String get media_gpsBanner_addToSiteButton => 'Hozzaadas a merülohelyhez';
 
   @override
-  String media_gpsBanner_coordinates(Object latitude, Object longitude) {
-    return 'Koordinatak: $latitude, $longitude';
+  String media_gpsBanner_coordinates(Object coordinates) {
+    return 'Koordinatak: $coordinates';
   }
 
   @override
@@ -23635,6 +23635,30 @@ class AppLocalizationsHu extends AppLocalizations {
   String visibility_range_under(String max, String unit) {
     return 'kevesebb mint $max $unit';
   }
+
+  @override
+  String get settings_coordinateFormat_title => 'Koordináta-formátum';
+
+  @override
+  String get settings_coordinateFormat_subtitle =>
+      'Hogyan jelennek meg és hogyan adhatók meg a GPS-pozíciók';
+
+  @override
+  String get settings_coordinateFormat_decimalDegrees => 'Tizedes fok';
+
+  @override
+  String get settings_coordinateFormat_degreesDecimalMinutes =>
+      'Fok és tizedes perc';
+
+  @override
+  String get settings_coordinateFormat_degreesMinutesSeconds =>
+      'Fok, perc, másodperc';
+
+  @override
+  String get settings_coordinateFormat_utm => 'UTM';
+
+  @override
+  String get settings_coordinateFormat_mgrs => 'MGRS';
 
   @override
   String get settings_visibilityScale_title => 'Látótávolság-skála';

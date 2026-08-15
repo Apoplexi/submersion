@@ -11394,8 +11394,8 @@ class AppLocalizationsZh extends AppLocalizations {
   String get media_gpsBanner_addToSiteButton => '添加到潜水点';
 
   @override
-  String media_gpsBanner_coordinates(Object latitude, Object longitude) {
-    return '坐标: $latitude, $longitude';
+  String media_gpsBanner_coordinates(Object coordinates) {
+    return '坐标: $coordinates';
   }
 
   @override
@@ -22512,6 +22512,27 @@ class AppLocalizationsZh extends AppLocalizations {
   String visibility_range_under(String max, String unit) {
     return '不足 $max $unit';
   }
+
+  @override
+  String get settings_coordinateFormat_title => '坐标格式';
+
+  @override
+  String get settings_coordinateFormat_subtitle => 'GPS 位置的显示和输入方式';
+
+  @override
+  String get settings_coordinateFormat_decimalDegrees => '十进制度';
+
+  @override
+  String get settings_coordinateFormat_degreesDecimalMinutes => '度和十进制分';
+
+  @override
+  String get settings_coordinateFormat_degreesMinutesSeconds => '度分秒';
+
+  @override
+  String get settings_coordinateFormat_utm => 'UTM';
+
+  @override
+  String get settings_coordinateFormat_mgrs => 'MGRS';
 
   @override
   String get settings_visibilityScale_title => '能见度标准';

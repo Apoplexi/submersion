@@ -5445,6 +5445,10 @@ class SyncDataSerializer {
       'weightUnit': 'kilograms',
       'altitudeUnit': 'meters',
       'sacUnit': 'litersPerMin',
+      // Issue #1041. v144's visibility columns were never given defaults
+      // here; this one is, so a payload from a pre-v150 peer hydrates to the
+      // documented default instead of null.
+      'coordinateFormat': 'decimalDegrees',
       // Time/Date format settings
       'timeFormat': 'twelveHour',
       'dateFormat': 'mmmDYYYY',

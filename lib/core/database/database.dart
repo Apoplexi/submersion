@@ -1514,6 +1514,15 @@ class DiverSettings extends Table {
   RealColumn get visibilityScaleExcellentM => real().nullable()();
   RealColumn get visibilityScaleGoodM => real().nullable()();
   RealColumn get visibilityScaleModerateM => real().nullable()();
+
+  /// v150: how GPS coordinates are rendered and entered (issue #1041).
+  ///
+  /// Presentational only -- coordinates are always stored as decimal-degree
+  /// doubles, so changing this re-renders every site without altering a
+  /// single stored value. Defaults to 'decimalDegrees', which is what the app
+  /// showed before v150.
+  TextColumn get coordinateFormat =>
+      text().withDefault(const Constant('decimalDegrees'))();
   // Time/Date format settings
   TextColumn get timeFormat =>
       text().withDefault(const Constant('twelveHour'))();
@@ -2953,7 +2962,7 @@ class AppDatabase extends _$AppDatabase {
 
   /// The current schema version as a static constant so that pre-open checks
   /// (e.g. version-mismatch guard) can reference it without an instance.
-  static const int currentSchemaVersion = 149;
+  static const int currentSchemaVersion = 150;
 
   /// Every schema version that has a migration block in onUpgrade.
   /// Used to calculate progress step counts. When adding a new migration,
@@ -3158,6 +3167,10 @@ class AppDatabase extends _$AppDatabase {
     // (diver scope, case-folded name) and `dive_tags` rows sharing a
     // (dive, tag), then add the two unique indexes that stop them recurring.
     149,
+    // v150: diver_settings.coordinate_format (issue #1041): the diver's GPS
+    // coordinate notation. Presentational only -- coordinates stay decimal
+    // degrees in storage.
+    150,
   ];
 
   /// Idempotent DDL for the v106 connector-suggestion columns (Lightroom
@@ -4456,6 +4469,22 @@ class AppDatabase extends _$AppDatabase {
       await customStatement(
         'ALTER TABLE diver_settings ADD COLUMN visibility_scale_moderate_m '
         'REAL',
+      );
+    }
+  }
+
+  /// Idempotent DDL for the v150 diver_settings coordinate format column.
+  /// Same dual-call contract as [_assertVisibilityScaleColumns].
+  Future<void> _assertCoordinateFormatColumn() async {
+    final cols = await customSelect(
+      "PRAGMA table_info('diver_settings')",
+    ).get();
+    if (cols.isEmpty) return;
+    final names = cols.map((c) => c.read<String>('name')).toSet();
+    if (!names.contains('coordinate_format')) {
+      await customStatement(
+        'ALTER TABLE diver_settings ADD COLUMN coordinate_format '
+        "TEXT NOT NULL DEFAULT 'decimalDegrees'",
       );
     }
   }
@@ -7789,6 +7818,11 @@ class AppDatabase extends _$AppDatabase {
           await assertTagUniqueness(this);
         }
         if (from < 149) await reportProgress();
+        // v150: the diver's GPS coordinate notation (issue #1041).
+        if (from < 150) {
+          await _assertCoordinateFormatColumn();
+        }
+        if (from < 150) await reportProgress();
       },
       beforeOpen: (details) async {
         // Enable foreign keys
@@ -7912,6 +7946,9 @@ class AppDatabase extends _$AppDatabase {
         // diver_settings calibration columns.
         await _assertVisibilityMetersColumn();
         await _assertVisibilityScaleColumns();
+
+        // v150 backstop: re-assert the coordinate format column.
+        await _assertCoordinateFormatColumn();
 
         // v145 backstop: re-assert the gps_tracks provenance and trim columns.
         await _assertGpsTrackColumns();

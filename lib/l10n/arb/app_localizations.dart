@@ -20291,8 +20291,8 @@ abstract class AppLocalizations {
   /// No description provided for @media_gpsBanner_coordinates.
   ///
   /// In en, this message translates to:
-  /// **'Coordinates: {latitude}, {longitude}'**
-  String media_gpsBanner_coordinates(Object latitude, Object longitude);
+  /// **'Coordinates: {coordinates}'**
+  String media_gpsBanner_coordinates(Object coordinates);
 
   /// No description provided for @media_gpsBanner_createSiteButton.
   ///
@@ -39464,6 +39464,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'under {max} {unit}'**
   String visibility_range_under(String max, String unit);
+
+  /// No description provided for @settings_coordinateFormat_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Coordinate format'**
+  String get settings_coordinateFormat_title;
+
+  /// No description provided for @settings_coordinateFormat_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'How GPS positions are shown and entered'**
+  String get settings_coordinateFormat_subtitle;
+
+  /// No description provided for @settings_coordinateFormat_decimalDegrees.
+  ///
+  /// In en, this message translates to:
+  /// **'Decimal degrees'**
+  String get settings_coordinateFormat_decimalDegrees;
+
+  /// No description provided for @settings_coordinateFormat_degreesDecimalMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'Degrees and decimal minutes'**
+  String get settings_coordinateFormat_degreesDecimalMinutes;
+
+  /// No description provided for @settings_coordinateFormat_degreesMinutesSeconds.
+  ///
+  /// In en, this message translates to:
+  /// **'Degrees, minutes, seconds'**
+  String get settings_coordinateFormat_degreesMinutesSeconds;
+
+  /// No description provided for @settings_coordinateFormat_utm.
+  ///
+  /// In en, this message translates to:
+  /// **'UTM'**
+  String get settings_coordinateFormat_utm;
+
+  /// No description provided for @settings_coordinateFormat_mgrs.
+  ///
+  /// In en, this message translates to:
+  /// **'MGRS'**
+  String get settings_coordinateFormat_mgrs;
 
   /// No description provided for @settings_visibilityScale_title.
   ///
