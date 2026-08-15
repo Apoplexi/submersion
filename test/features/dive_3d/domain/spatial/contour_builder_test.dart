@@ -131,4 +131,112 @@ void main() {
       expect(levels.single.depthMeters, 40.0);
     });
   });
+
+  group('marchGrid', () {
+    double eastOf(int c) => c * 100.0;
+    double northOf(int r) => r * 100.0;
+
+    test('single cell, vertical isobath at the midpoint', () {
+      // Corners: sw=5 se=15 nw=5 ne=15, level 10. Inside (>=10) = se+ne,
+      // marching-squares case S-N: crossings at S edge t=(10-5)/(15-5)=0.5
+      // -> (50, 0), and N edge t=0.5 -> (50, 100).
+      final grid = [
+        [5.0, 15.0], // r=0 (south)
+        [5.0, 15.0], // r=1 (north)
+      ];
+      final lines = marchGrid(
+        rows: 2,
+        cols: 2,
+        depthAt: (r, c) => grid[r][c],
+        eastOf: eastOf,
+        northOf: northOf,
+        levelMeters: 10,
+      );
+      expect(lines, hasLength(1));
+      final pts = lines.single.pointsEastNorth;
+      expect(pts, hasLength(4));
+      // Accept either direction along the line.
+      final ends = {(pts[0], pts[1]), (pts[2], pts[3])};
+      expect(ends, {(50.0, 0.0), (50.0, 100.0)});
+    });
+
+    test('segments across neighboring cells join into one polyline', () {
+      // 2 rows x 3 cols: south row all 5, north row all 15, level 10.
+      // Each cell crosses W (t=0.5) and E (t=0.5): a horizontal line at
+      // north=50 spanning east 0..200, joined into a single 3-point line.
+      final grid = [
+        [5.0, 5.0, 5.0],
+        [15.0, 15.0, 15.0],
+      ];
+      final lines = marchGrid(
+        rows: 2,
+        cols: 3,
+        depthAt: (r, c) => grid[r][c],
+        eastOf: eastOf,
+        northOf: northOf,
+        levelMeters: 10,
+      );
+      expect(lines, hasLength(1));
+      final pts = lines.single.pointsEastNorth;
+      expect(pts, hasLength(6));
+      expect(pts[1], 50.0);
+      expect(pts[3], 50.0);
+      expect(pts[5], 50.0);
+      final easts = {pts[0], pts[2], pts[4]};
+      expect(easts, {0.0, 100.0, 200.0});
+    });
+
+    test('cells touching a null or land corner are skipped', () {
+      // Same as the joining test, but the NE corner is null: the right cell
+      // must be skipped, leaving only the left cell's segment.
+      final grid = <List<double?>>[
+        [5.0, 5.0, 5.0],
+        [15.0, 15.0, null],
+      ];
+      final lines = marchGrid(
+        rows: 2,
+        cols: 3,
+        depthAt: (r, c) => grid[r][c],
+        eastOf: eastOf,
+        northOf: northOf,
+        levelMeters: 10,
+      );
+      expect(lines, hasLength(1));
+      expect(lines.single.pointsEastNorth, hasLength(4));
+      // Land corners (depth <= 0) are skipped the same way.
+      final landGrid = [
+        [5.0, -2.0],
+        [15.0, 15.0],
+      ];
+      expect(
+        marchGrid(
+          rows: 2,
+          cols: 2,
+          depthAt: (r, c) => landGrid[r][c],
+          eastOf: eastOf,
+          northOf: northOf,
+          levelMeters: 10,
+        ),
+        isEmpty,
+      );
+    });
+
+    test('level outside the cell range yields nothing', () {
+      final grid = [
+        [5.0, 6.0],
+        [7.0, 8.0],
+      ];
+      expect(
+        marchGrid(
+          rows: 2,
+          cols: 2,
+          depthAt: (r, c) => grid[r][c],
+          eastOf: eastOf,
+          northOf: northOf,
+          levelMeters: 40,
+        ),
+        isEmpty,
+      );
+    });
+  });
 }

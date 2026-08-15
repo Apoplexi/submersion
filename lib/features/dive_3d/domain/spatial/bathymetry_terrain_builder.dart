@@ -22,7 +22,7 @@ class BathymetryTerrainBuilder {
   static const double _waterOpacity = 0.22;
   static const double _landHeightCapFraction = 0.15;
 
-  static const double _metersPerDegLat = 110540.0;
+  static const double metersPerDegLat = 110540.0;
 
   /// The grid's extent in local east-north meters relative to [center].
   static ({double minEast, double maxEast, double minNorth, double maxNorth})
@@ -34,12 +34,12 @@ class BathymetryTerrainBuilder {
             grid.cellSizeLonDeg * (grid.cols - 1) -
             center.longitude) *
         mLon;
-    final minNorth = (grid.originLat - center.latitude) * _metersPerDegLat;
+    final minNorth = (grid.originLat - center.latitude) * metersPerDegLat;
     final maxNorth =
         (grid.originLat +
             grid.cellSizeLatDeg * (grid.rows - 1) -
             center.latitude) *
-        _metersPerDegLat;
+        metersPerDegLat;
     return (
       minEast: minEast,
       maxEast: maxEast,
@@ -63,7 +63,7 @@ class BathymetryTerrainBuilder {
     for (var r = 0; r < rows; r++) {
       final north =
           (grid.originLat + grid.cellSizeLatDeg * r - center.latitude) *
-          _metersPerDegLat;
+          metersPerDegLat;
       for (var c = 0; c < cols; c++) {
         final east =
             (grid.originLon + grid.cellSizeLonDeg * c - center.longitude) *
