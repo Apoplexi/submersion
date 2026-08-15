@@ -21934,6 +21934,50 @@ class AppLocalizationsDe extends AppLocalizations {
   String get dive3d_seascape_legend_land => 'Land';
 
   @override
+  String get dive3d_seascape_appearance => 'Geländedarstellung';
+
+  @override
+  String get dive3d_seascape_chartView => 'Kartenansicht';
+
+  @override
+  String get dive3d_seascape_orbitView => '3D-Ansicht';
+
+  @override
+  String get dive3d_seascape_appearance_rampRange =>
+      'Farbtiefenbereich begrenzen';
+
+  @override
+  String get dive3d_seascape_appearance_rampMax => 'Dunkelste Farbe bei';
+
+  @override
+  String get dive3d_seascape_appearance_banded => 'Gestufter Verlauf';
+
+  @override
+  String get dive3d_seascape_appearance_contours => 'Tiefenlinien';
+
+  @override
+  String get dive3d_seascape_appearance_contourAuto => 'Automatisch';
+
+  @override
+  String get dive3d_seascape_appearance_contourCustom => 'Benutzerdefiniert';
+
+  @override
+  String get dive3d_seascape_appearance_addLevel => 'Linie hinzufügen';
+
+  @override
+  String get dive3d_seascape_appearance_defaultColor => 'Standard';
+
+  @override
+  String get dive3d_seascape_appearance_thickness => 'Liniendicke';
+
+  @override
+  String get dive3d_seascape_appearance_wallAngle => 'Steilwand-Winkel';
+
+  @override
+  String get dive3d_seascape_appearance_wallAngleNote =>
+      'Bathymetriezellen mitteln das Gefälle in ihrem Inneren, echte Wände wirken daher flacher. Deutlich unter 45 Grad bleiben.';
+
+  @override
   String get dive3d_seascape_siteTitle => 'Standort-Seelandschaft';
 
   @override

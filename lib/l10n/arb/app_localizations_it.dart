@@ -21972,6 +21972,50 @@ class AppLocalizationsIt extends AppLocalizations {
   String get dive3d_seascape_legend_land => 'Terra';
 
   @override
+  String get dive3d_seascape_appearance => 'Aspetto del terreno';
+
+  @override
+  String get dive3d_seascape_chartView => 'Vista carta';
+
+  @override
+  String get dive3d_seascape_orbitView => 'Vista 3D';
+
+  @override
+  String get dive3d_seascape_appearance_rampRange =>
+      'Limita l\'intervallo di profondità dei colori';
+
+  @override
+  String get dive3d_seascape_appearance_rampMax => 'Colore più scuro a';
+
+  @override
+  String get dive3d_seascape_appearance_banded => 'Gradiente a bande';
+
+  @override
+  String get dive3d_seascape_appearance_contours => 'Livelli delle isobate';
+
+  @override
+  String get dive3d_seascape_appearance_contourAuto => 'Automatico';
+
+  @override
+  String get dive3d_seascape_appearance_contourCustom => 'Personalizzato';
+
+  @override
+  String get dive3d_seascape_appearance_addLevel => 'Aggiungi livello';
+
+  @override
+  String get dive3d_seascape_appearance_defaultColor => 'Predefinito';
+
+  @override
+  String get dive3d_seascape_appearance_thickness => 'Spessore delle linee';
+
+  @override
+  String get dive3d_seascape_appearance_wallAngle => 'Angolo di parete ripida';
+
+  @override
+  String get dive3d_seascape_appearance_wallAngleNote =>
+      'Le celle batimetriche mediano la pendenza interna, quindi le pareti reali sembrano meno ripide. Restare ben sotto i 45 gradi.';
+
+  @override
   String get dive3d_seascape_siteTitle => 'Paesaggio marino del sito';
 
   @override

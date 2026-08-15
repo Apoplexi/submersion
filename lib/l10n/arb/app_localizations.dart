@@ -36519,6 +36519,90 @@ abstract class AppLocalizations {
   /// **'Land'**
   String get dive3d_seascape_legend_land;
 
+  /// No description provided for @dive3d_seascape_appearance.
+  ///
+  /// In en, this message translates to:
+  /// **'Terrain appearance'**
+  String get dive3d_seascape_appearance;
+
+  /// No description provided for @dive3d_seascape_chartView.
+  ///
+  /// In en, this message translates to:
+  /// **'Chart view'**
+  String get dive3d_seascape_chartView;
+
+  /// No description provided for @dive3d_seascape_orbitView.
+  ///
+  /// In en, this message translates to:
+  /// **'3D view'**
+  String get dive3d_seascape_orbitView;
+
+  /// No description provided for @dive3d_seascape_appearance_rampRange.
+  ///
+  /// In en, this message translates to:
+  /// **'Limit color depth range'**
+  String get dive3d_seascape_appearance_rampRange;
+
+  /// No description provided for @dive3d_seascape_appearance_rampMax.
+  ///
+  /// In en, this message translates to:
+  /// **'Deepest color at'**
+  String get dive3d_seascape_appearance_rampMax;
+
+  /// No description provided for @dive3d_seascape_appearance_banded.
+  ///
+  /// In en, this message translates to:
+  /// **'Banded gradient'**
+  String get dive3d_seascape_appearance_banded;
+
+  /// No description provided for @dive3d_seascape_appearance_contours.
+  ///
+  /// In en, this message translates to:
+  /// **'Contour levels'**
+  String get dive3d_seascape_appearance_contours;
+
+  /// No description provided for @dive3d_seascape_appearance_contourAuto.
+  ///
+  /// In en, this message translates to:
+  /// **'Auto'**
+  String get dive3d_seascape_appearance_contourAuto;
+
+  /// No description provided for @dive3d_seascape_appearance_contourCustom.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom'**
+  String get dive3d_seascape_appearance_contourCustom;
+
+  /// No description provided for @dive3d_seascape_appearance_addLevel.
+  ///
+  /// In en, this message translates to:
+  /// **'Add level'**
+  String get dive3d_seascape_appearance_addLevel;
+
+  /// No description provided for @dive3d_seascape_appearance_defaultColor.
+  ///
+  /// In en, this message translates to:
+  /// **'Default'**
+  String get dive3d_seascape_appearance_defaultColor;
+
+  /// No description provided for @dive3d_seascape_appearance_thickness.
+  ///
+  /// In en, this message translates to:
+  /// **'Contour line thickness'**
+  String get dive3d_seascape_appearance_thickness;
+
+  /// No description provided for @dive3d_seascape_appearance_wallAngle.
+  ///
+  /// In en, this message translates to:
+  /// **'Steep wall angle'**
+  String get dive3d_seascape_appearance_wallAngle;
+
+  /// No description provided for @dive3d_seascape_appearance_wallAngleNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Bathymetry cells average the slope inside them, so real walls read flatter than they are. Keep this well under 45 degrees.'**
+  String get dive3d_seascape_appearance_wallAngleNote;
+
   /// No description provided for @dive3d_seascape_siteTitle.
   ///
   /// In en, this message translates to:

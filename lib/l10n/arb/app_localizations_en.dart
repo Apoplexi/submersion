@@ -21601,6 +21601,49 @@ class AppLocalizationsEn extends AppLocalizations {
   String get dive3d_seascape_legend_land => 'Land';
 
   @override
+  String get dive3d_seascape_appearance => 'Terrain appearance';
+
+  @override
+  String get dive3d_seascape_chartView => 'Chart view';
+
+  @override
+  String get dive3d_seascape_orbitView => '3D view';
+
+  @override
+  String get dive3d_seascape_appearance_rampRange => 'Limit color depth range';
+
+  @override
+  String get dive3d_seascape_appearance_rampMax => 'Deepest color at';
+
+  @override
+  String get dive3d_seascape_appearance_banded => 'Banded gradient';
+
+  @override
+  String get dive3d_seascape_appearance_contours => 'Contour levels';
+
+  @override
+  String get dive3d_seascape_appearance_contourAuto => 'Auto';
+
+  @override
+  String get dive3d_seascape_appearance_contourCustom => 'Custom';
+
+  @override
+  String get dive3d_seascape_appearance_addLevel => 'Add level';
+
+  @override
+  String get dive3d_seascape_appearance_defaultColor => 'Default';
+
+  @override
+  String get dive3d_seascape_appearance_thickness => 'Contour line thickness';
+
+  @override
+  String get dive3d_seascape_appearance_wallAngle => 'Steep wall angle';
+
+  @override
+  String get dive3d_seascape_appearance_wallAngleNote =>
+      'Bathymetry cells average the slope inside them, so real walls read flatter than they are. Keep this well under 45 degrees.';
+
+  @override
   String get dive3d_seascape_siteTitle => 'Site Seascape';
 
   @override
