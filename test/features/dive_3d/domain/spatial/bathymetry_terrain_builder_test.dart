@@ -98,4 +98,80 @@ void main() {
       expect(t.water.positions[i * 3 + 1], 0);
     }
   });
+
+  group('depth ramp options', () {
+    test('depthColor banded quantizes into 10 segment centers', () {
+      // t = 0.0 and t = 0.09 both land in segment 0 (center 0.05);
+      // t = 0.95 lands in segment 9 (center 0.95).
+      expect(
+        BathymetryTerrainBuilder.depthColor(0.0, banded: true),
+        BathymetryTerrainBuilder.depthColor(0.09, banded: true),
+      );
+      expect(
+        BathymetryTerrainBuilder.depthColor(0.0, banded: true),
+        isNot(BathymetryTerrainBuilder.depthColor(0.11, banded: true)),
+      );
+      expect(
+        BathymetryTerrainBuilder.depthColor(1.0, banded: true),
+        BathymetryTerrainBuilder.depthColor(0.95, banded: true),
+      );
+      // Continuous stays continuous.
+      expect(
+        BathymetryTerrainBuilder.depthColor(0.0),
+        isNot(BathymetryTerrainBuilder.depthColor(0.09)),
+      );
+    });
+
+    test('rampMaxDepthMeters clamps deeper terrain to the deepest color', () {
+      // One shallow (10 m) and one deep (80 m) vertex; ramp max 20 m: the
+      // 80 m vertex must carry exactly the deep color, and the 10 m vertex
+      // the t = 0.5 color.
+      final rampGrid = BathymetryGrid(
+        originLat: 0,
+        originLon: 0,
+        cellSizeLatDeg: 100.0 / 110540.0,
+        cellSizeLonDeg: 100.0 / 111320.0,
+        rows: 2,
+        cols: 2,
+        depthsMeters: const [10, 80, 10, 80],
+        sourceId: 'test',
+        resolutionMeters: 100,
+        fetchedAt: DateTime.utc(2026, 8, 15),
+      );
+      final rampProj = SpatialProjection(
+        minEast: 0,
+        maxEast: 100,
+        minNorth: 0,
+        maxNorth: 100,
+        maxDepth: 80,
+      );
+      final terrain = BathymetryTerrainBuilder.build(
+        grid: rampGrid,
+        center: const GeoPoint(0, 0),
+        projection: rampProj,
+        rampMaxDepthMeters: 20,
+      );
+      final deep = BathymetryTerrainBuilder.deepColor;
+      // Vertex 1 (row 0, col 1) is the 80 m cell.
+      expect(terrain.terrain.colors[3], closeTo(deep.r, 1e-4));
+      expect(terrain.terrain.colors[4], closeTo(deep.g, 1e-4));
+      final half = BathymetryTerrainBuilder.depthColor(0.5);
+      expect(terrain.terrain.colors[0], closeTo(half.r, 1e-4));
+    });
+
+    test('default build output is unchanged (regression guard)', () {
+      final a = BathymetryTerrainBuilder.build(
+        grid: grid,
+        center: center,
+        projection: proj(),
+      );
+      final b = BathymetryTerrainBuilder.build(
+        grid: grid,
+        center: center,
+        projection: proj(),
+        rampBanded: false,
+      );
+      expect(a.terrain.colors, b.terrain.colors);
+    });
+  });
 }
