@@ -459,8 +459,11 @@ platform :ios do
       # promotion run 31850203979 died there with "Could not retrieve response
       # as fastlane runs in non-interactive mode". force skips that preview
       # confirmation only; run_precheck_before_submit still defaults to true,
-      # so Apple's content rules are checked as before. The legacy release
+      # so Apple's content rules are checked as before. The upload_screenshots
       # lane above has carried this flag since it was written.
+      #
+      # platform is left at deliver's default of "ios", which is correct here.
+      # The mac lane must set it explicitly; see the comment there.
       force: true,
       submit_for_review: true,
       automatic_release: false,

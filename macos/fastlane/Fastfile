@@ -526,6 +526,16 @@ platform :mac do
     UI.message("Submitting #{app_version} (#{build_number}) for App Review...")
     upload_to_app_store(
       api_key: api_key,
+      # deliver defaults platform to "ios" and otherwise infers it from the
+      # binary it is uploading. skip_binary_upload leaves nothing to infer
+      # from, so without this the mac lane drove the iOS app record instead:
+      # promotion run 31859359618 selected iOS build 6027 and App Store
+      # Connect refused to attach it to the iOS 1.7.3 version that the iOS
+      # job had submitted for review a minute earlier, with "A relationship
+      # value is not acceptable for the current resource state". This is the
+      # same inference gap the app_platform comment on
+      # distribute_testflight_beta above describes, for the same reason.
+      platform: "osx",
       app_version: app_version,
       build_number: build_number.to_s,
       skip_binary_upload: true,
@@ -541,7 +551,7 @@ platform :mac do
       # promotion run 31850203979 died there with "Could not retrieve response
       # as fastlane runs in non-interactive mode". force skips that preview
       # confirmation only; run_precheck_before_submit still defaults to true,
-      # so Apple's content rules are checked as before. The legacy release
+      # so Apple's content rules are checked as before. The upload_screenshots
       # lane above has carried this flag since it was written.
       force: true,
       submit_for_review: true,
