@@ -13,6 +13,10 @@ enum AttributeKind { text, number, thickness, choice, flag, date }
 
 /// Unit dimension for number attributes; drives UnitFormatter conversion.
 /// thicknessMm always displays in mm (industry convention in every market).
+///
+/// Every dimension stores its canonical metric value, which for all of them
+/// except [speedMps] is also what a metric diver reads. Speed is stored in m/s
+/// to match wind speed and GPS track speed, and displays as km/h or knots.
 enum AttributeDimension {
   none,
   thicknessMm,
@@ -21,6 +25,7 @@ enum AttributeDimension {
   massKg,
   lengthM,
   depthM,
+  speedMps,
 }
 
 /// Stable attribute keys referenced from more than one file.
@@ -252,6 +257,43 @@ abstract final class EquipmentAttributeCatalog {
       ),
     ],
     EquipmentType.camera: [
+      EquipmentAttributeDef(
+        key: 'depth_rating_m',
+        kind: AttributeKind.number,
+        dimension: AttributeDimension.depthM,
+      ),
+    ],
+    EquipmentType.dpv: [
+      EquipmentAttributeDef(
+        key: 'dpv_style',
+        kind: AttributeKind.choice,
+        choiceKeys: ['tow_behind', 'ride_on', 'handheld'],
+      ),
+      // Rated run time in hours, dimensionless for the same reason as the
+      // rebreather's scrubber duration.
+      EquipmentAttributeDef(key: 'burn_time_h', kind: AttributeKind.number),
+      EquipmentAttributeDef(
+        key: 'battery_type',
+        kind: AttributeKind.choice,
+        choiceKeys: ['lithium_ion', 'nimh', 'lead_acid'],
+      ),
+      // Watt-hours: the figure printed on the pack and the one airlines ask
+      // about, universal in every market.
+      EquipmentAttributeDef(
+        key: 'battery_capacity_wh',
+        kind: AttributeKind.number,
+      ),
+      EquipmentAttributeDef(
+        key: 'motor_type',
+        kind: AttributeKind.choice,
+        choiceKeys: ['brushless', 'brushed'],
+      ),
+      EquipmentAttributeDef(
+        key: 'speed_mps',
+        kind: AttributeKind.number,
+        dimension: AttributeDimension.speedMps,
+      ),
+      // Shared verbatim with the camera and rebreather entries.
       EquipmentAttributeDef(
         key: 'depth_rating_m',
         kind: AttributeKind.number,

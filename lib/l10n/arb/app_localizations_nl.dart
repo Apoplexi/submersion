@@ -22018,6 +22018,24 @@ class AppLocalizationsNl extends AppLocalizations {
   String get attrLabel_o2_cylinder_l => 'O2-fles';
 
   @override
+  String get attrLabel_dpv_style => 'Stijl';
+
+  @override
+  String get attrLabel_burn_time_h => 'Looptijd (u)';
+
+  @override
+  String get attrLabel_battery_type => 'Accu';
+
+  @override
+  String get attrLabel_battery_capacity_wh => 'Accucapaciteit (Wh)';
+
+  @override
+  String get attrLabel_motor_type => 'Motor';
+
+  @override
+  String get attrLabel_speed_mps => 'Topsnelheid';
+
+  @override
   String get attrChoice_unit_type_eccr => 'Elektronische CCR (eCCR)';
 
   @override
@@ -22227,6 +22245,30 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get attrChoice_sole_type_soft => 'Zachte zool';
+
+  @override
+  String get attrChoice_dpv_style_tow_behind => 'Sleepmodel';
+
+  @override
+  String get attrChoice_dpv_style_ride_on => 'Zitmodel';
+
+  @override
+  String get attrChoice_dpv_style_handheld => 'Handheld';
+
+  @override
+  String get attrChoice_battery_type_lithium_ion => 'Lithium-ion';
+
+  @override
+  String get attrChoice_battery_type_nimh => 'NiMH';
+
+  @override
+  String get attrChoice_battery_type_lead_acid => 'Loodzuur';
+
+  @override
+  String get attrChoice_motor_type_brushless => 'Borstelloos';
+
+  @override
+  String get attrChoice_motor_type_brushed => 'Met borstels';
 
   @override
   String get equipment_edit_customFieldsTitle => 'Aangepaste velden';

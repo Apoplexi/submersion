@@ -21634,6 +21634,24 @@ class AppLocalizationsHe extends AppLocalizations {
   String get attrLabel_o2_cylinder_l => 'בלון O2';
 
   @override
+  String get attrLabel_dpv_style => 'סגנון';
+
+  @override
+  String get attrLabel_burn_time_h => 'זמן פעולה (שעות)';
+
+  @override
+  String get attrLabel_battery_type => 'סוללה';
+
+  @override
+  String get attrLabel_battery_capacity_wh => 'קיבולת סוללה (Wh)';
+
+  @override
+  String get attrLabel_motor_type => 'מנוע';
+
+  @override
+  String get attrLabel_speed_mps => 'מהירות מרבית';
+
+  @override
   String get attrChoice_unit_type_eccr => 'CCR אלקטרוני (eCCR)';
 
   @override
@@ -21842,6 +21860,30 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get attrChoice_sole_type_soft => 'סוליה רכה';
+
+  @override
+  String get attrChoice_dpv_style_tow_behind => 'נגרר';
+
+  @override
+  String get attrChoice_dpv_style_ride_on => 'רכיבה';
+
+  @override
+  String get attrChoice_dpv_style_handheld => 'מוחזק ביד';
+
+  @override
+  String get attrChoice_battery_type_lithium_ion => 'ליתיום-יון';
+
+  @override
+  String get attrChoice_battery_type_nimh => 'NiMH';
+
+  @override
+  String get attrChoice_battery_type_lead_acid => 'עופרת-חומצה';
+
+  @override
+  String get attrChoice_motor_type_brushless => 'ללא מברשות';
+
+  @override
+  String get attrChoice_motor_type_brushed => 'עם מברשות';
 
   @override
   String get equipment_edit_customFieldsTitle => 'שדות מותאמים אישית';

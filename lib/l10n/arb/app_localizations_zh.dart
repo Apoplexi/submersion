@@ -21067,6 +21067,24 @@ class AppLocalizationsZh extends AppLocalizations {
   String get attrLabel_o2_cylinder_l => 'O2 气瓶';
 
   @override
+  String get attrLabel_dpv_style => '款式';
+
+  @override
+  String get attrLabel_burn_time_h => '续航时间（小时）';
+
+  @override
+  String get attrLabel_battery_type => '电池';
+
+  @override
+  String get attrLabel_battery_capacity_wh => '电池容量（瓦时）';
+
+  @override
+  String get attrLabel_motor_type => '电机';
+
+  @override
+  String get attrLabel_speed_mps => '最高速度';
+
+  @override
   String get attrChoice_unit_type_eccr => '电子式 CCR (eCCR)';
 
   @override
@@ -21275,6 +21293,30 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get attrChoice_sole_type_soft => '软底';
+
+  @override
+  String get attrChoice_dpv_style_tow_behind => '拖曳式';
+
+  @override
+  String get attrChoice_dpv_style_ride_on => '骑乘式';
+
+  @override
+  String get attrChoice_dpv_style_handheld => '手持式';
+
+  @override
+  String get attrChoice_battery_type_lithium_ion => '锂离子';
+
+  @override
+  String get attrChoice_battery_type_nimh => '镍氢';
+
+  @override
+  String get attrChoice_battery_type_lead_acid => '铅酸';
+
+  @override
+  String get attrChoice_motor_type_brushless => '无刷';
+
+  @override
+  String get attrChoice_motor_type_brushed => '有刷';
 
   @override
   String get equipment_edit_customFieldsTitle => '自定义字段';

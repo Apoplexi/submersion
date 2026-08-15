@@ -22115,6 +22115,24 @@ class AppLocalizationsHu extends AppLocalizations {
   String get attrLabel_o2_cylinder_l => 'O2 palack';
 
   @override
+  String get attrLabel_dpv_style => 'Fazon';
+
+  @override
+  String get attrLabel_burn_time_h => 'Üzemidő (ó)';
+
+  @override
+  String get attrLabel_battery_type => 'Akkumulátor';
+
+  @override
+  String get attrLabel_battery_capacity_wh => 'Akkukapacitás (Wh)';
+
+  @override
+  String get attrLabel_motor_type => 'Motor';
+
+  @override
+  String get attrLabel_speed_mps => 'Végsebesség';
+
+  @override
   String get attrChoice_unit_type_eccr => 'Elektronikus CCR (eCCR)';
 
   @override
@@ -22323,6 +22341,30 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get attrChoice_sole_type_soft => 'Puha talp';
+
+  @override
+  String get attrChoice_dpv_style_tow_behind => 'Vontatott';
+
+  @override
+  String get attrChoice_dpv_style_ride_on => 'Ráülős';
+
+  @override
+  String get attrChoice_dpv_style_handheld => 'Kézi';
+
+  @override
+  String get attrChoice_battery_type_lithium_ion => 'Lítium-ion';
+
+  @override
+  String get attrChoice_battery_type_nimh => 'NiMH';
+
+  @override
+  String get attrChoice_battery_type_lead_acid => 'Ólom-savas';
+
+  @override
+  String get attrChoice_motor_type_brushless => 'Szénkefe nélküli';
+
+  @override
+  String get attrChoice_motor_type_brushed => 'Szénkefés';
 
   @override
   String get equipment_edit_customFieldsTitle => 'Egyéni mezők';

@@ -22188,6 +22188,24 @@ class AppLocalizationsPt extends AppLocalizations {
   String get attrLabel_o2_cylinder_l => 'Cilindro de O2';
 
   @override
+  String get attrLabel_dpv_style => 'Estilo';
+
+  @override
+  String get attrLabel_burn_time_h => 'Autonomia (h)';
+
+  @override
+  String get attrLabel_battery_type => 'Bateria';
+
+  @override
+  String get attrLabel_battery_capacity_wh => 'Capacidade da bateria (Wh)';
+
+  @override
+  String get attrLabel_motor_type => 'Motor';
+
+  @override
+  String get attrLabel_speed_mps => 'Velocidade máxima';
+
+  @override
   String get attrChoice_unit_type_eccr => 'CCR eletrónico (eCCR)';
 
   @override
@@ -22399,6 +22417,30 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get attrChoice_sole_type_soft => 'Sola macia';
+
+  @override
+  String get attrChoice_dpv_style_tow_behind => 'De reboque';
+
+  @override
+  String get attrChoice_dpv_style_ride_on => 'De montar';
+
+  @override
+  String get attrChoice_dpv_style_handheld => 'De mão';
+
+  @override
+  String get attrChoice_battery_type_lithium_ion => 'Iões de lítio';
+
+  @override
+  String get attrChoice_battery_type_nimh => 'NiMH';
+
+  @override
+  String get attrChoice_battery_type_lead_acid => 'Chumbo-ácido';
+
+  @override
+  String get attrChoice_motor_type_brushless => 'Sem escovas';
+
+  @override
+  String get attrChoice_motor_type_brushed => 'Com escovas';
 
   @override
   String get equipment_edit_customFieldsTitle => 'Campos personalizados';

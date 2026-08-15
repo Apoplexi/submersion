@@ -16,6 +16,9 @@ double attributeDisplayFromMetric(
   AttributeDimension.pressureBar => units.convertPressure(metric),
   AttributeDimension.lengthM ||
   AttributeDimension.depthM => units.convertDepth(metric),
+  // Stored in m/s (see AttributeDimension.speedMps); shares the wind-speed
+  // conversion so two speeds never disagree on units.
+  AttributeDimension.speedMps => units.convertWindSpeed(metric),
   AttributeDimension.thicknessMm || AttributeDimension.none => metric,
 };
 
@@ -30,6 +33,7 @@ double attributeMetricFromDisplay(
   AttributeDimension.pressureBar => units.pressureToBar(display),
   AttributeDimension.lengthM ||
   AttributeDimension.depthM => units.depthToMeters(display),
+  AttributeDimension.speedMps => units.windSpeedToMs(display),
   AttributeDimension.thicknessMm || AttributeDimension.none => display,
 };
 
@@ -40,6 +44,7 @@ String attributeUnitSymbol(AttributeDimension d, UnitFormatter units) =>
       AttributeDimension.pressureBar => units.pressureSymbol,
       AttributeDimension.lengthM ||
       AttributeDimension.depthM => units.depthSymbol,
+      AttributeDimension.speedMps => units.speedSymbol,
       AttributeDimension.thicknessMm => 'mm',
       AttributeDimension.none => '',
     };

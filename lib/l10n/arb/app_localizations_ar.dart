@@ -21793,6 +21793,24 @@ class AppLocalizationsAr extends AppLocalizations {
   String get attrLabel_o2_cylinder_l => 'أسطوانة O2';
 
   @override
+  String get attrLabel_dpv_style => 'النمط';
+
+  @override
+  String get attrLabel_burn_time_h => 'زمن التشغيل (ساعة)';
+
+  @override
+  String get attrLabel_battery_type => 'البطارية';
+
+  @override
+  String get attrLabel_battery_capacity_wh => 'سعة البطارية (واط·ساعة)';
+
+  @override
+  String get attrLabel_motor_type => 'المحرك';
+
+  @override
+  String get attrLabel_speed_mps => 'السرعة القصوى';
+
+  @override
   String get attrChoice_unit_type_eccr => 'CCR إلكتروني (eCCR)';
 
   @override
@@ -22001,6 +22019,30 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get attrChoice_sole_type_soft => 'نعل لين';
+
+  @override
+  String get attrChoice_dpv_style_tow_behind => 'سحب خلفي';
+
+  @override
+  String get attrChoice_dpv_style_ride_on => 'ركوب';
+
+  @override
+  String get attrChoice_dpv_style_handheld => 'محمول باليد';
+
+  @override
+  String get attrChoice_battery_type_lithium_ion => 'ليثيوم أيون';
+
+  @override
+  String get attrChoice_battery_type_nimh => 'نيكل هيدريد فلزي';
+
+  @override
+  String get attrChoice_battery_type_lead_acid => 'حمض الرصاص';
+
+  @override
+  String get attrChoice_motor_type_brushless => 'بدون فرشات';
+
+  @override
+  String get attrChoice_motor_type_brushed => 'بفرشات';
 
   @override
   String get equipment_edit_customFieldsTitle => 'حقول مخصصة';
