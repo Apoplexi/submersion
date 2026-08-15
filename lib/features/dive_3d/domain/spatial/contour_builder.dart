@@ -259,6 +259,7 @@ ContourBuildResult buildContourLayers({
             thicknessFactor: appearance.contourThickness,
           ),
           overlay: SceneOverlay.contours,
+          drapedOnTerrain: true,
         ),
       );
     }

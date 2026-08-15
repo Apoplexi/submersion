@@ -122,7 +122,13 @@ class SiteSeascapeGeometryService {
     final layers = <SceneLayer>[SceneLayer(terrain.terrain)];
     layers.addAll(contours.layers);
     if (wallMesh != null) {
-      layers.add(SceneLayer(wallMesh, overlay: SceneOverlay.steepWalls));
+      layers.add(
+        SceneLayer(
+          wallMesh,
+          overlay: SceneOverlay.steepWalls,
+          drapedOnTerrain: true,
+        ),
+      );
     }
     for (final d in input.divePaths) {
       final placed = offsetReckonedPath(d.path, d.anchor);

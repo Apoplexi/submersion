@@ -190,7 +190,11 @@ class SpatialGeometryService {
         SceneLayer(terrain.terrain),
         ...contours.layers,
         if (wallMesh != null)
-          SceneLayer(wallMesh, overlay: SceneOverlay.steepWalls),
+          SceneLayer(
+            wallMesh,
+            overlay: SceneOverlay.steepWalls,
+            drapedOnTerrain: true,
+          ),
         SceneLayer(ribbon),
         SceneLayer(entryPin),
         SceneLayer(exitPin),

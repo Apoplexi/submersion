@@ -157,6 +157,14 @@ void main() {
     expect(overlays.where((o) => o == SceneOverlay.contours), hasLength(8));
     expect(overlays.last, SceneOverlay.water);
     expect(result.contourLabels.single.text, '25 m');
+    // Contours ride the terrain surface, so they depth-sort WITH it.
+    expect(
+      result.scene.layers
+          .where((l) => l.overlay == SceneOverlay.contours)
+          .every((l) => l.drapedOnTerrain),
+      isTrue,
+    );
+    expect(result.scene.layers.last.drapedOnTerrain, isFalse); // water
     // 5 -> 45 over two 100 m cells is 20 m per cell: atan(0.2) = 11.3
     // degrees, below the default 22, so no wall layer.
     expect(overlays.contains(SceneOverlay.steepWalls), isFalse);
@@ -188,6 +196,12 @@ void main() {
     expect(
       result.scene.layers.where((l) => l.overlay == SceneOverlay.steepWalls),
       hasLength(1),
+    );
+    expect(
+      result.scene.layers
+          .firstWhere((l) => l.overlay == SceneOverlay.steepWalls)
+          .drapedOnTerrain,
+      isTrue,
     );
   });
 }
