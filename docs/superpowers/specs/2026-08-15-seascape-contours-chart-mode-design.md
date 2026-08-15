@@ -85,8 +85,12 @@ New pure-domain builder `lib/features/dive_3d/domain/spatial/contour_builder.dar
 - **Levels:** computed at nice values in the diver's display depth unit
   using the existing 1/2/5 x 10^n `niceStep` logic from
   `seascape_axes.dart`. Selection rule: the minor interval is the smallest
-  nice step that yields at most 15 levels across the wet depth range
-  (0 to `grid.maxDepthMeters` in display units). Every 5th level is a major
+  nice step, floored at 1 display unit, that yields at most 15 levels across
+  the wet depth range (0 to `grid.maxDepthMeters` in display units).
+  (Correction at planning time: without the floor, the at-most-15 rule alone
+  can never produce fewer than 2 levels, so the flat-site guard would be
+  dead code and near-flat sites would get centimeter contours.) Every 5th
+  level is a major
   contour. A feet diver gets 20/40/60 ft lines; a meters diver gets
   5/10/15 m lines. Levels convert to meters for marching; label text stays
   in display units.
@@ -198,11 +202,14 @@ sessions and apply to both pages:
   real walls flatter than they are (a sheer wall inside one ~67 m cell reads
   as a modest slope), which is why the default is well under 45.
 
-New `AppSettings` fields: `seascapeRampMaxDepthMeters` (null = off, ramp to
-deepest cell), `seascapeRampBanded` (default false),
-`seascapeContourMode` (auto/custom), `seascapeCustomContourLevels`
-(JSON-encoded list of depth + optional color), `seascapeContourThickness`
-(factor, default 1.0), `seascapeWallAngleDeg` (default 22).
+Persistence (corrected at planning time): the knobs live on `AppSettings`
+as ONE `SeascapeAppearance` value object (fields: `rampMaxDepthMeters`
+nullable, `rampBanded`, `contourMode`, `customLevels`, `contourThickness`,
+`wallAngleDeg`), persisted DEVICE-LOCALLY as a single JSON string in
+SharedPreferences (`SettingsKeys.seascapeAppearance`, the
+`profileMetricsFollowViewport` lane). The per-diver `diver_settings` table
+is deliberately NOT touched: its discrete columns would require a main-DB
+schema migration plus sync surface, which this slice scopes out.
 
 ### Steep-wall highlighting (issue #1065)
 
@@ -310,6 +317,7 @@ TDD throughout:
 ## File plan
 
 New:
+- `lib/features/dive_3d/domain/spatial/seascape_appearance.dart` (+ tests)
 - `lib/features/dive_3d/domain/spatial/contour_builder.dart` (+ tests)
 - `lib/features/dive_3d/domain/spatial/wall_highlight_builder.dart`
   (+ tests)
@@ -335,8 +343,10 @@ Touched:
   switch entries)
 - `lib/features/dive_3d/domain/spatial/bathymetry_terrain_builder.dart`
   (ramp range + banded gradient)
-- `lib/features/settings/.../settings_providers.dart` (`AppSettings` gains
-  the seascape appearance fields; note `AppSettings` is defined IN
-  settings_providers.dart, no separate entity file)
-- Dive-sites map marker callout (exact file located at planning time)
-- `lib/l10n/*.arb` (all locales)
+- `lib/features/settings/presentation/providers/settings_providers.dart`
+  (`AppSettings` gains the `seascapeAppearance` field; note `AppSettings`
+  is defined IN settings_providers.dart, no separate entity file)
+- `lib/shared/widgets/map_list_layout/map_info_card.dart` (trailing slot)
+- `lib/features/dive_sites/presentation/widgets/site_map_content.dart`
+  (seascape action on the marker callout)
+- `lib/l10n/arb/*.arb` (all locales)

@@ -77,7 +77,7 @@ class MapInfoCard extends StatelessWidget {
                     ],
                   ),
                 ),
-                if (trailing != null) trailing!,
+                ?trailing,
                 if (onDetailsTap != null)
                   IconButton(
                     icon: Icon(

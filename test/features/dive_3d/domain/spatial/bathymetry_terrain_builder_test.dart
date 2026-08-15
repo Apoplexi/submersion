@@ -151,7 +151,7 @@ void main() {
         projection: rampProj,
         rampMaxDepthMeters: 20,
       );
-      final deep = BathymetryTerrainBuilder.deepColor;
+      const deep = BathymetryTerrainBuilder.deepColor;
       // Vertex 1 (row 0, col 1) is the 80 m cell.
       expect(terrain.terrain.colors[3], closeTo(deep.r, 1e-4));
       expect(terrain.terrain.colors[4], closeTo(deep.g, 1e-4));

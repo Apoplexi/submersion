@@ -187,7 +187,7 @@ class TerrainAppearanceSheet extends ConsumerWidget {
     final level = appearance.customLevels[index];
     List<SeascapeContourLevel> withLevel(SeascapeContourLevel? next) => [
       for (var i = 0; i < appearance.customLevels.length; i++)
-        if (i != index) appearance.customLevels[i] else if (next != null) next,
+        if (i != index) appearance.customLevels[i] else ?next,
     ];
     final display = level.depthMeters / unitInMeters;
     return Row(
