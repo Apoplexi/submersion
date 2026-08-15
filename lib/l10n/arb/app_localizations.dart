@@ -16251,6 +16251,12 @@ abstract class AppLocalizations {
   /// **'Camera'**
   String get enum_equipmentType_camera;
 
+  /// No description provided for @enum_equipmentType_dpv.
+  ///
+  /// In en, this message translates to:
+  /// **'DPV'**
+  String get enum_equipmentType_dpv;
+
   /// No description provided for @enum_equipmentType_computer.
   ///
   /// In en, this message translates to:
@@ -37305,6 +37311,42 @@ abstract class AppLocalizations {
   /// **'O2 cylinder'**
   String get attrLabel_o2_cylinder_l;
 
+  /// No description provided for @attrLabel_dpv_style.
+  ///
+  /// In en, this message translates to:
+  /// **'Style'**
+  String get attrLabel_dpv_style;
+
+  /// No description provided for @attrLabel_burn_time_h.
+  ///
+  /// In en, this message translates to:
+  /// **'Burn time (h)'**
+  String get attrLabel_burn_time_h;
+
+  /// No description provided for @attrLabel_battery_type.
+  ///
+  /// In en, this message translates to:
+  /// **'Battery'**
+  String get attrLabel_battery_type;
+
+  /// No description provided for @attrLabel_battery_capacity_wh.
+  ///
+  /// In en, this message translates to:
+  /// **'Battery capacity (Wh)'**
+  String get attrLabel_battery_capacity_wh;
+
+  /// No description provided for @attrLabel_motor_type.
+  ///
+  /// In en, this message translates to:
+  /// **'Motor'**
+  String get attrLabel_motor_type;
+
+  /// No description provided for @attrLabel_speed_mps.
+  ///
+  /// In en, this message translates to:
+  /// **'Top speed'**
+  String get attrLabel_speed_mps;
+
   /// No description provided for @attrChoice_unit_type_eccr.
   ///
   /// In en, this message translates to:
@@ -37724,6 +37766,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Soft sole'**
   String get attrChoice_sole_type_soft;
+
+  /// No description provided for @attrChoice_dpv_style_tow_behind.
+  ///
+  /// In en, this message translates to:
+  /// **'Tow-behind'**
+  String get attrChoice_dpv_style_tow_behind;
+
+  /// No description provided for @attrChoice_dpv_style_ride_on.
+  ///
+  /// In en, this message translates to:
+  /// **'Ride-on'**
+  String get attrChoice_dpv_style_ride_on;
+
+  /// No description provided for @attrChoice_dpv_style_handheld.
+  ///
+  /// In en, this message translates to:
+  /// **'Handheld'**
+  String get attrChoice_dpv_style_handheld;
+
+  /// No description provided for @attrChoice_battery_type_lithium_ion.
+  ///
+  /// In en, this message translates to:
+  /// **'Lithium-ion'**
+  String get attrChoice_battery_type_lithium_ion;
+
+  /// No description provided for @attrChoice_battery_type_nimh.
+  ///
+  /// In en, this message translates to:
+  /// **'NiMH'**
+  String get attrChoice_battery_type_nimh;
+
+  /// No description provided for @attrChoice_battery_type_lead_acid.
+  ///
+  /// In en, this message translates to:
+  /// **'Lead-acid'**
+  String get attrChoice_battery_type_lead_acid;
+
+  /// No description provided for @attrChoice_motor_type_brushless.
+  ///
+  /// In en, this message translates to:
+  /// **'Brushless'**
+  String get attrChoice_motor_type_brushless;
+
+  /// No description provided for @attrChoice_motor_type_brushed.
+  ///
+  /// In en, this message translates to:
+  /// **'Brushed'**
+  String get attrChoice_motor_type_brushed;
 
   /// No description provided for @equipment_edit_customFieldsTitle.
   ///

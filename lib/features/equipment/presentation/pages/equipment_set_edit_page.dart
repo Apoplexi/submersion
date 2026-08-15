@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:submersion/core/icons/mdi_icons.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:submersion/core/constants/enums.dart';
+import 'package:submersion/features/equipment/presentation/utils/equipment_type_icon.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:submersion/features/divers/presentation/providers/diver_providers.dart';
 import 'package:submersion/features/equipment/domain/entities/equipment_set.dart';
@@ -382,7 +382,7 @@ class _EquipmentSetEditPageState extends ConsumerState<EquipmentSetEditPage> {
       title: Text(item.name),
       subtitle: item.fullName != item.name ? Text(item.fullName) : null,
       secondary: Icon(
-        _getIconForType(item.type),
+        equipmentTypeIcon(item.type),
         color: Theme.of(context).colorScheme.onSurfaceVariant,
       ),
       controlAffinity: ListTileControlAffinity.trailing,
@@ -529,36 +529,6 @@ class _EquipmentSetEditPageState extends ConsumerState<EquipmentSetEditPage> {
       if (mounted) {
         setState(() => _isLoading = false);
       }
-    }
-  }
-
-  IconData _getIconForType(EquipmentType type) {
-    switch (type) {
-      case EquipmentType.regulator:
-        return Icons.air;
-      case EquipmentType.bcd:
-        return Icons.accessibility_new;
-      case EquipmentType.wetsuit:
-      case EquipmentType.drysuit:
-        return Icons.checkroom;
-      case EquipmentType.fins:
-        return Icons.directions_walk;
-      case EquipmentType.mask:
-        return Icons.visibility;
-      case EquipmentType.computer:
-        return Icons.watch;
-      case EquipmentType.tank:
-        return MdiIcons.divingScubaTank;
-      case EquipmentType.weights:
-        return Icons.fitness_center;
-      case EquipmentType.light:
-        return Icons.flashlight_on;
-      case EquipmentType.camera:
-        return Icons.camera_alt;
-      case EquipmentType.transmitter:
-        return Icons.sensors;
-      default:
-        return Icons.backpack;
     }
   }
 }

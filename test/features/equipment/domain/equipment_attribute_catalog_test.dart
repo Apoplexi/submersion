@@ -126,6 +126,96 @@ void main() {
     expect(isValidThicknessDesignation('abc'), isFalse);
   });
 
+  group('dpv attributes', () {
+    test('exposes the curated dpv keys plus the universal ones', () {
+      final keys = EquipmentAttributeCatalog.attributesFor(
+        EquipmentType.dpv,
+      ).map((d) => d.key).toList();
+
+      expect(keys, [
+        'dpv_style',
+        'burn_time_h',
+        'battery_type',
+        'battery_capacity_wh',
+        'motor_type',
+        'speed_mps',
+        'depth_rating_m',
+        'buoyancy_kg',
+        'dry_weight_kg',
+      ]);
+    });
+
+    test('speed carries the speed dimension so it converts for the diver', () {
+      final def = EquipmentAttributeCatalog.defFor('speed_mps');
+      expect(def, isNotNull);
+      expect(def!.kind, AttributeKind.number);
+      expect(def.dimension, AttributeDimension.speedMps);
+    });
+
+    test('burn time and battery capacity are dimensionless numbers', () {
+      // Hours are hours and watt-hours are watt-hours in every market, the
+      // same call scrubber_duration_h makes.
+      for (final key in ['burn_time_h', 'battery_capacity_wh']) {
+        final def = EquipmentAttributeCatalog.defFor(key);
+        expect(def, isNotNull, reason: key);
+        expect(def!.kind, AttributeKind.number, reason: key);
+        expect(def.dimension, AttributeDimension.none, reason: key);
+      }
+    });
+
+    test('reuses the shared depth_rating_m definition', () {
+      // Same concept as the camera and rebreather entries, so it must reuse
+      // the one key rather than minting a DPV-specific twin.
+      final def = EquipmentAttributeCatalog.defFor('depth_rating_m');
+      expect(def, isNotNull);
+      expect(def!.dimension, AttributeDimension.depthM);
+      expect(
+        EquipmentAttributeCatalog.attributesFor(
+          EquipmentType.camera,
+        ).map((d) => d.key),
+        contains('depth_rating_m'),
+      );
+    });
+
+    test('choice options are the ones divers actually pick between', () {
+      expect(EquipmentAttributeCatalog.defFor('dpv_style')!.choiceKeys, [
+        'tow_behind',
+        'ride_on',
+        'handheld',
+      ]);
+      expect(EquipmentAttributeCatalog.defFor('battery_type')!.choiceKeys, [
+        'lithium_ion',
+        'nimh',
+        'lead_acid',
+      ]);
+      expect(EquipmentAttributeCatalog.defFor('motor_type')!.choiceKeys, [
+        'brushless',
+        'brushed',
+      ]);
+    });
+
+    test('every dpv attribute and option resolves to a localized label', () {
+      final l10n = lookupAppLocalizations(const Locale('en'));
+
+      for (final def in EquipmentAttributeCatalog.attributesFor(
+        EquipmentType.dpv,
+      )) {
+        expect(
+          attributeLabel(l10n, def.key),
+          isNot(def.key),
+          reason: 'missing attrLabel_${def.key}',
+        );
+        for (final option in def.choiceKeys) {
+          expect(
+            attributeChoiceLabel(l10n, def.key, option),
+            isNot(option),
+            reason: 'missing attrChoice_${def.key}_$option',
+          );
+        }
+      }
+    });
+  });
+
   test('rebreather is a distinct equipment type with a stable name', () {
     expect(EquipmentType.values, contains(EquipmentType.rebreather));
     expect(EquipmentType.rebreather.name, 'rebreather');

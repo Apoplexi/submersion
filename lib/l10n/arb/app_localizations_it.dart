@@ -9555,6 +9555,9 @@ class AppLocalizationsIt extends AppLocalizations {
   String get enum_equipmentType_camera => 'Fotocamera';
 
   @override
+  String get enum_equipmentType_dpv => 'DPV';
+
+  @override
   String get enum_equipmentType_computer => 'Computer subacqueo';
 
   @override
@@ -22408,6 +22411,24 @@ class AppLocalizationsIt extends AppLocalizations {
   String get attrLabel_o2_cylinder_l => 'Bombola O2';
 
   @override
+  String get attrLabel_dpv_style => 'Stile';
+
+  @override
+  String get attrLabel_burn_time_h => 'Autonomia (h)';
+
+  @override
+  String get attrLabel_battery_type => 'Batteria';
+
+  @override
+  String get attrLabel_battery_capacity_wh => 'Capacità batteria (Wh)';
+
+  @override
+  String get attrLabel_motor_type => 'Motore';
+
+  @override
+  String get attrLabel_speed_mps => 'Velocità massima';
+
+  @override
   String get attrChoice_unit_type_eccr => 'CCR elettronico (eCCR)';
 
   @override
@@ -22618,6 +22639,30 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get attrChoice_sole_type_soft => 'Suola morbida';
+
+  @override
+  String get attrChoice_dpv_style_tow_behind => 'A traino';
+
+  @override
+  String get attrChoice_dpv_style_ride_on => 'Cavalcabile';
+
+  @override
+  String get attrChoice_dpv_style_handheld => 'A mano';
+
+  @override
+  String get attrChoice_battery_type_lithium_ion => 'Ioni di litio';
+
+  @override
+  String get attrChoice_battery_type_nimh => 'NiMH';
+
+  @override
+  String get attrChoice_battery_type_lead_acid => 'Piombo-acido';
+
+  @override
+  String get attrChoice_motor_type_brushless => 'Brushless';
+
+  @override
+  String get attrChoice_motor_type_brushed => 'Con spazzole';
 
   @override
   String get equipment_edit_customFieldsTitle => 'Campi personalizzati';

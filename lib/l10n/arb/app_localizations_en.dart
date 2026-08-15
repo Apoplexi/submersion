@@ -9407,6 +9407,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get enum_equipmentType_camera => 'Camera';
 
   @override
+  String get enum_equipmentType_dpv => 'DPV';
+
+  @override
   String get enum_equipmentType_computer => 'Dive Computer';
 
   @override
@@ -22031,6 +22034,24 @@ class AppLocalizationsEn extends AppLocalizations {
   String get attrLabel_o2_cylinder_l => 'O2 cylinder';
 
   @override
+  String get attrLabel_dpv_style => 'Style';
+
+  @override
+  String get attrLabel_burn_time_h => 'Burn time (h)';
+
+  @override
+  String get attrLabel_battery_type => 'Battery';
+
+  @override
+  String get attrLabel_battery_capacity_wh => 'Battery capacity (Wh)';
+
+  @override
+  String get attrLabel_motor_type => 'Motor';
+
+  @override
+  String get attrLabel_speed_mps => 'Top speed';
+
+  @override
   String get attrChoice_unit_type_eccr => 'Electronic CCR (eCCR)';
 
   @override
@@ -22239,6 +22260,30 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get attrChoice_sole_type_soft => 'Soft sole';
+
+  @override
+  String get attrChoice_dpv_style_tow_behind => 'Tow-behind';
+
+  @override
+  String get attrChoice_dpv_style_ride_on => 'Ride-on';
+
+  @override
+  String get attrChoice_dpv_style_handheld => 'Handheld';
+
+  @override
+  String get attrChoice_battery_type_lithium_ion => 'Lithium-ion';
+
+  @override
+  String get attrChoice_battery_type_nimh => 'NiMH';
+
+  @override
+  String get attrChoice_battery_type_lead_acid => 'Lead-acid';
+
+  @override
+  String get attrChoice_motor_type_brushless => 'Brushless';
+
+  @override
+  String get attrChoice_motor_type_brushed => 'Brushed';
 
   @override
   String get equipment_edit_customFieldsTitle => 'Custom fields';
