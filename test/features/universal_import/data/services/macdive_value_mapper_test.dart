@@ -148,6 +148,10 @@ void main() {
       'Spool': EquipmentType.reel,
       'Knife': EquipmentType.knife,
       'Shears': EquipmentType.knife,
+      'DPV': EquipmentType.dpv,
+      'Scooter': EquipmentType.dpv,
+      'Suex XJoy Scooter': EquipmentType.dpv,
+      'Diver Propulsion Vehicle': EquipmentType.dpv,
     };
 
     cases.forEach((input, expected) {
