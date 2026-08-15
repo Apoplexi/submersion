@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/features/equipment/presentation/utils/equipment_type_icon.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/features/equipment/domain/entities/equipment_item.dart';

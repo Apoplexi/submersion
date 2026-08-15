@@ -9,12 +9,12 @@ import 'package:latlong2/latlong.dart';
 import 'package:libdivecomputer_plugin/libdivecomputer_plugin.dart' as pigeon;
 import 'package:submersion/core/constants/dive_detail_sections.dart';
 import 'package:submersion/core/constants/enums.dart';
+import 'package:submersion/features/equipment/presentation/utils/equipment_type_icon.dart';
 import 'package:submersion/features/data_quality/data/services/quality_scan_service.dart';
 import 'package:submersion/features/data_quality/presentation/providers/quality_inbox_providers.dart';
 import 'package:submersion/core/constants/list_view_mode.dart';
 import 'package:submersion/core/constants/units.dart';
 import 'package:submersion/core/deco/altitude_calculator.dart';
-import 'package:submersion/core/icons/mdi_icons.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/core/services/export/export_service.dart';
 import 'package:submersion/core/services/pdf_templates/pdf_date_formatter.dart';
@@ -4320,7 +4320,7 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
                     context,
                   ).colorScheme.tertiaryContainer,
                   child: Icon(
-                    _getEquipmentIcon(item.type),
+                    equipmentTypeIcon(item.type),
                     color: Theme.of(context).colorScheme.onTertiaryContainer,
                     size: 20,
                   ),
@@ -4357,36 +4357,6 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
         ),
       ),
     );
-  }
-
-  IconData _getEquipmentIcon(EquipmentType type) {
-    switch (type) {
-      case EquipmentType.regulator:
-        return Icons.air;
-      case EquipmentType.bcd:
-        return Icons.accessibility_new;
-      case EquipmentType.wetsuit:
-      case EquipmentType.drysuit:
-        return Icons.checkroom;
-      case EquipmentType.fins:
-        return Icons.directions_walk;
-      case EquipmentType.mask:
-        return Icons.visibility;
-      case EquipmentType.computer:
-        return Icons.watch;
-      case EquipmentType.tank:
-        return MdiIcons.divingScubaTank;
-      case EquipmentType.weights:
-        return Icons.fitness_center;
-      case EquipmentType.light:
-        return Icons.flashlight_on;
-      case EquipmentType.camera:
-        return Icons.camera_alt;
-      case EquipmentType.transmitter:
-        return Icons.sensors;
-      default:
-        return Icons.backpack;
-    }
   }
 
   Widget _buildSightingsSection(BuildContext context, WidgetRef ref) {
