@@ -21,6 +21,7 @@ import 'package:submersion/core/presentation/startup_brightness.dart';
 import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/features/divers/presentation/providers/diver_providers.dart';
 import 'package:submersion/features/notifications/data/services/notification_scheduler.dart';
+import 'package:submersion/features/dive_3d/domain/spatial/seascape_appearance.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/tissue_color_schemes.dart';
 import 'package:submersion/features/settings/data/repositories/app_settings_repository.dart';
 import 'package:submersion/features/settings/data/repositories/diver_settings_repository.dart';
@@ -101,6 +102,10 @@ class SettingsKeys {
   static const String perdixOverlayEnabled = 'perdix_overlay_enabled';
   static const String perdixOverlayX = 'perdix_overlay_x';
   static const String perdixOverlayY = 'perdix_overlay_y';
+
+  // Seascape terrain appearance (device-local, stored directly in
+  // SharedPreferences rather than per-diver in the DB). One JSON blob.
+  static const String seascapeAppearance = 'seascape_appearance';
 }
 
 /// App settings state
@@ -438,6 +443,10 @@ class AppSettings {
   final double? perdixOverlayX;
   final double? perdixOverlayY;
 
+  /// Seascape terrain appearance (issue #1065 knobs). Device-local, not
+  /// per-diver.
+  final SeascapeAppearance seascapeAppearance;
+
   const AppSettings({
     this.depthUnit = DepthUnit.meters,
     this.temperatureUnit = TemperatureUnit.celsius,
@@ -560,6 +569,7 @@ class AppSettings {
     this.perdixOverlayEnabled = false,
     this.perdixOverlayX,
     this.perdixOverlayY,
+    this.seascapeAppearance = const SeascapeAppearance(),
   });
 
   /// Compute the current unit preset based on actual unit values
@@ -717,6 +727,7 @@ class AppSettings {
     bool? perdixOverlayEnabled,
     double? perdixOverlayX,
     double? perdixOverlayY,
+    SeascapeAppearance? seascapeAppearance,
   }) {
     return AppSettings(
       depthUnit: depthUnit ?? this.depthUnit,
@@ -874,6 +885,7 @@ class AppSettings {
       perdixOverlayEnabled: perdixOverlayEnabled ?? this.perdixOverlayEnabled,
       perdixOverlayX: perdixOverlayX ?? this.perdixOverlayX,
       perdixOverlayY: perdixOverlayY ?? this.perdixOverlayY,
+      seascapeAppearance: seascapeAppearance ?? this.seascapeAppearance,
     );
   }
 }
@@ -1039,6 +1051,11 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
           prefs.getBool(SettingsKeys.perdixOverlayEnabled) ?? false;
       final perdixOverlayX = prefs.getDouble(SettingsKeys.perdixOverlayX);
       final perdixOverlayY = prefs.getDouble(SettingsKeys.perdixOverlayY);
+      // Seascape terrain appearance is a device-local viewing preference,
+      // kept out of the per-diver settings table like the prefs above.
+      final seascapeAppearance = SeascapeAppearance.decode(
+        prefs.getString(SettingsKeys.seascapeAppearance),
+      );
 
       final diverId = _validatedDiverId;
       if (diverId == null) {
@@ -1054,6 +1071,7 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
           perdixOverlayEnabled: perdixOverlayEnabled,
           perdixOverlayX: perdixOverlayX,
           perdixOverlayY: perdixOverlayY,
+          seascapeAppearance: seascapeAppearance,
         );
         await _writeCachedThemeMode(prefs);
         return;
@@ -1078,6 +1096,7 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
         perdixOverlayEnabled: perdixOverlayEnabled,
         perdixOverlayX: perdixOverlayX,
         perdixOverlayY: perdixOverlayY,
+        seascapeAppearance: seascapeAppearance,
       );
 
       await _writeCachedThemeMode(prefs);
@@ -1148,6 +1167,10 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
     if (perdixY != null) {
       await prefs.setDouble(SettingsKeys.perdixOverlayY, perdixY);
     }
+    await prefs.setString(
+      SettingsKeys.seascapeAppearance,
+      state.seascapeAppearance.encode(),
+    );
 
     await _writeCachedThemeMode(prefs);
 
@@ -1580,6 +1603,11 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
 
   Future<void> setTissueColorScheme(TissueColorScheme scheme) async {
     state = state.copyWith(tissueColorScheme: scheme);
+    await _saveSettings();
+  }
+
+  Future<void> setSeascapeAppearance(SeascapeAppearance appearance) async {
+    state = state.copyWith(seascapeAppearance: appearance);
     await _saveSettings();
   }
 
