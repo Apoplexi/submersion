@@ -32,6 +32,11 @@ class SpeciesRepository {
   Stream<void> watchSpeciesChanges() =>
       _db.tableUpdates(TableUpdateQuery.onTable(_db.species));
 
+  /// Emits whenever the `sightings` table changes so aggregate providers can
+  /// refresh after a sync or any other write.
+  Stream<void> watchSightingChanges() =>
+      _db.tableUpdates(TableUpdateQuery.onTable(_db.sightings));
+
   /// Get species by category
   Future<List<domain.Species>> getSpeciesByCategory(
     SpeciesCategory category,
@@ -578,6 +583,24 @@ class SpeciesRepository {
   }
 
   /// Check if a species is referenced by any sightings
+  /// Sighting counts for every species that has at least one sighting.
+  ///
+  /// One GROUP BY rather than a per-row [isSpeciesInUse] call, so a list can
+  /// decide which species are deletable without N queries. Species absent
+  /// from the map have no sightings.
+  Future<Map<String, int>> sightingCountsBySpecies() async {
+    final rows = await _db
+        .customSelect(
+          'SELECT species_id, COUNT(*) as count FROM sightings '
+          'GROUP BY species_id',
+        )
+        .get();
+    return {
+      for (final row in rows)
+        row.data['species_id'] as String: row.data['count'] as int,
+    };
+  }
+
   Future<bool> isSpeciesInUse(String id) async {
     final result = await _db
         .customSelect(

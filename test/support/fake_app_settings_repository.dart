@@ -33,6 +33,11 @@ class FakeAppSettingsRepository implements AppSettingsRepository {
     values[key] = value;
   }
 
+  /// No database, so nothing ever ticks. Providers under test still subscribe,
+  /// they just never self-invalidate.
+  @override
+  Stream<void> watchSettingsChanges() => const Stream.empty();
+
   // Members these tests do not use -- stub to satisfy the interface.
   @override
   Future<bool> getShareByDefault() async =>

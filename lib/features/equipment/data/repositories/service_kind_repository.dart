@@ -19,6 +19,12 @@ class ServiceKindRepository {
   final SyncRepository _syncRepository = SyncRepository();
   final _uuid = const Uuid();
 
+  /// Emits whenever the `service_kinds` table changes so the kind-catalog
+  /// providers refresh after a sync, a built-in re-seed, or any other write
+  /// that bypasses the notifiers.
+  Stream<void> watchServiceKindsChanges() =>
+      _db.tableUpdates(TableUpdateQuery.onTable(_db.serviceKinds));
+
   /// Built-ins plus the diver's custom kinds (all custom kinds when
   /// [diverId] is null).
   Future<List<domain.ServiceKind>> getAllKinds({String? diverId}) async {

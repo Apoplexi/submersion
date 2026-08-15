@@ -3,13 +3,12 @@ import 'dart:typed_data';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/data/repositories/sync_repository.dart';
-import 'package:submersion/core/services/database_service.dart';
 import 'package:submersion/core/services/sync/sync_data_serializer.dart';
 import 'package:submersion/core/services/sync/sync_service.dart';
 import 'package:submersion/features/dive_log/data/repositories/dive_repository_impl.dart';
 
+import '../../../helpers/changeset_test_helpers.dart';
 import '../../../helpers/fake_cloud_storage_provider.dart';
-import '../../../helpers/sync_test_helpers.dart';
 import '../../../helpers/mock_providers.dart';
 import '../../../helpers/test_database.dart';
 
@@ -33,8 +32,8 @@ void main() {
       cloud = FakeCloudStorageProvider();
     });
 
-    tearDown(() {
-      DatabaseService.instance.resetForTesting();
+    tearDown(() async {
+      await tearDownTestDatabase();
     });
 
     SyncService buildService() => SyncService(
@@ -92,9 +91,7 @@ void main() {
         'createdAt': 1000,
       });
 
-      await buildService().performSync();
-      await serializer.deleteRecord('diveCustomFields', 'cf-1');
-      await impersonateFreshDevice();
+      await seedPeerLog(cloud, 'device-a');
       expect(await serializer.fetchRecord('diveCustomFields', 'cf-1'), isNull);
 
       final pull = await buildService().performSync();
@@ -119,9 +116,7 @@ void main() {
         'createdAt': 1000,
       });
 
-      await buildService().performSync();
-      await serializer.deleteRecord('siteSpecies', 'ss-1');
-      await impersonateFreshDevice();
+      await seedPeerLog(cloud, 'device-a');
       expect(await serializer.fetchRecord('siteSpecies', 'ss-1'), isNull);
 
       final pull = await buildService().performSync();
@@ -143,9 +138,7 @@ void main() {
         'updatedAt': 1000,
       });
 
-      await buildService().performSync();
-      await serializer.deleteRecord('csvPresets', 'csv-1');
-      await impersonateFreshDevice();
+      await seedPeerLog(cloud, 'device-a');
       expect(await serializer.fetchRecord('csvPresets', 'csv-1'), isNull);
 
       final pull = await buildService().performSync();
@@ -169,9 +162,7 @@ void main() {
         'updatedAt': 1000,
       });
 
-      await buildService().performSync();
-      await serializer.deleteRecord('viewConfigs', 'vc-1');
-      await impersonateFreshDevice();
+      await seedPeerLog(cloud, 'device-a');
       expect(await serializer.fetchRecord('viewConfigs', 'vc-1'), isNull);
 
       final pull = await buildService().performSync();
@@ -196,9 +187,7 @@ void main() {
         'createdAt': 1000,
       });
 
-      await buildService().performSync();
-      await serializer.deleteRecord('fieldPresets', 'fp-1');
-      await impersonateFreshDevice();
+      await seedPeerLog(cloud, 'device-a');
       expect(await serializer.fetchRecord('fieldPresets', 'fp-1'), isNull);
 
       final pull = await buildService().performSync();
@@ -229,9 +218,7 @@ void main() {
           'rawFingerprint': fingerprint,
         });
 
-        await buildService().performSync();
-        await serializer.deleteRecord('diveDataSources', 'ds-1');
-        await impersonateFreshDevice();
+        await seedPeerLog(cloud, 'device-a');
         expect(await serializer.fetchRecord('diveDataSources', 'ds-1'), isNull);
 
         final pull = await buildService().performSync();

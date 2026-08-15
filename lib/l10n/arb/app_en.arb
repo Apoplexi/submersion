@@ -1529,6 +1529,27 @@
   "preDive_sessions_linkedDive": "Linked dive",
   "preDive_sessions_delete": "Delete",
   "preDive_sessions_deleteConfirm": "Delete this checklist record?",
+  "preDive_sessions_filter": "Filter",
+  "preDive_sessions_filterTitle": "Filter checklist runs",
+  "preDive_sessions_filterChecklist": "Checklist",
+  "preDive_sessions_filterStatus": "Status",
+  "preDive_sessions_filterFlaggedOnly": "Flagged runs only",
+  "preDive_sessions_filterDateRange": "Date range",
+  "preDive_sessions_filterAnyDate": "Any date",
+  "preDive_sessions_filterClearAll": "Clear all",
+  "preDive_sessions_filterApply": "Apply",
+  "preDive_sessions_filterFlaggedChip": "Flagged only",
+  "preDive_sessions_emptyFiltered": "No checklist runs match these filters",
+  "preDive_sessions_export": "Export to Excel",
+  "preDive_sessions_exportEmpty": "No checklist runs to export",
+  "preDive_sessions_exportFailed": "Export failed: {error}",
+  "@preDive_sessions_exportFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
   "preDive_start_title": "Start pre-dive checklist",
   "preDive_start_template": "Checklist",
   "preDive_start_equipmentSet": "Equipment set",
@@ -1838,6 +1859,8 @@
   "dashboard_greeting_withoutName": "{greeting}!",
   "dashboard_hero_divesLoggedOne": "1 dive logged",
   "dashboard_hero_divesLoggedOther": "{count} dives logged",
+  "dashboard_hero_divesTotalOne": "1 dive",
+  "dashboard_hero_divesTotalOther": "{count} dives",
   "dashboard_hero_error": "Ready to explore the depths?",
   "dashboard_hero_hoursUnderwater": "{hours} hours underwater",
   "dashboard_hero_loading": "Loading your dive stats...",
@@ -2223,6 +2246,13 @@
     }
   },
   "@dashboard_hero_divesLoggedOther": {
+    "placeholders": {
+      "count": {
+        "type": "Object"
+      }
+    }
+  },
+  "@dashboard_hero_divesTotalOther": {
     "placeholders": {
       "count": {
         "type": "Object"
@@ -3433,6 +3463,11 @@
   "setup_step_profile": "Profile",
   "setup_step_units": "Units",
   "setup_syncPull_continue": "Continue",
+  "setup_syncPull_incomplete_message": "This account holds a Submersion library that was never finished uploading. Let your other device finish syncing, then try again.",
+  "setup_syncPull_incomplete_retry": "Check again",
+  "setup_syncPull_incomplete_title": "Library upload unfinished",
+  "setup_syncPull_locked_message": "Enter the encryption passphrase to unlock this library and download it to this device.",
+  "setup_syncPull_locked_title": "This library is encrypted",
   "setup_syncPull_noLibrary_message": "No existing Submersion library was found on this account. Start fresh instead? Your connection will be kept.",
   "setup_syncPull_noLibrary_title": "No library found",
   "setup_syncPull_success": "Library adopted",
@@ -6691,6 +6726,19 @@
   "media_diveMediaSection_unlinkSelectedSuccess": "Unlinked {count} items",
   "media_diveMediaSection_unlinkSelectedTitle": "Unlink {count} items?",
   "media_diveMediaSection_unlinkSuccess": "Photo unlinked",
+  "media_siteMediaSection_title": "Site Media",
+  "media_siteMediaSection_addPhotos": "Add photos or videos",
+  "media_siteMediaSection_addDocument": "Add document",
+  "media_siteMediaSection_emptyState": "No maps, photos, or documents attached to this site",
+  "media_siteMediaSection_divePhotosGroup": "Photos from dives here ({count})",
+  "media_siteMediaSection_divePhotoLabel": "Dive photo",
+  "media_siteMediaSection_unlinkSelectedTitle": "Remove {count} attachments?",
+  "media_siteMediaSection_unlinkSelectedContent": "The selected items will be removed from this site. Files in your photo library or on disk are not deleted.",
+  "media_siteMediaSection_unlinkSelectedSuccess": "Removed {count} attachments",
+  "media_documentViewer_title": "Document",
+  "media_documentViewer_unavailable": "This document is not available on this device",
+  "media_documentViewer_availableOnOriginDevice": "It is available on the device it was added from, or via a configured media store.",
+  "media_documentViewer_attached": "Attached {count} documents",
   "media_diveScan_scanTooltip": "Scan gallery for photos",
   "media_diveScan_noPhotosFound": "No new photos found near this dive",
   "media_diveScan_accessDenied": "Photo library access is required to scan for photos",
@@ -6721,7 +6769,7 @@
     }
   },
   "media_gpsBanner_addToSiteButton": "Add to Site",
-  "media_gpsBanner_coordinates": "Coordinates: {latitude}, {longitude}",
+  "media_gpsBanner_coordinates": "Coordinates: {coordinates}",
   "media_gpsBanner_createSiteButton": "Create Site",
   "media_gpsBanner_dismissTooltip": "Dismiss GPS suggestion",
   "media_gpsBanner_title": "GPS found in photos",
@@ -6873,12 +6921,37 @@
       }
     }
   },
+  "@media_siteMediaSection_divePhotosGroup": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@media_siteMediaSection_unlinkSelectedTitle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@media_siteMediaSection_unlinkSelectedSuccess": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@media_documentViewer_attached": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "@media_gpsBanner_coordinates": {
     "placeholders": {
-      "latitude": {
-        "type": "Object"
-      },
-      "longitude": {
+      "coordinates": {
         "type": "Object"
       }
     }
@@ -7877,8 +7950,24 @@
   },
   "settings_cloudSync_adopt_dialogTitle": "Adopt Restored Library?",
   "settings_cloudSync_adopt_notNow": "Not Now",
+  "settings_cloudSync_dangerZone": "Danger Zone",
+  "settings_cloudSync_replaceLibrary_tile": "Replace cloud library",
+  "settings_cloudSync_replaceLibrary_tileSubtitle": "Make this device's library the one every device uses",
+  "settings_cloudSync_replaceLibrary_dialogTitle": "Replace Cloud Library?",
+  "settings_cloudSync_replaceLibrary_dialogIntro": "This device's library becomes the one every device uses.",
+  "settings_cloudSync_replaceLibrary_dialogBody": "{diveCount, plural, =1{The cloud library is erased and replaced with this device's 1 dive.} other{The cloud library is erased and replaced with this device's {diveCount} dives.}}",
+  "settings_cloudSync_replaceLibrary_peers": "{peerCount, plural, =0{No other device is syncing yet, so there is nothing to adopt it.} =1{1 other device will be asked to adopt it; until it does, its changes are not merged.} other{{peerCount} other devices will be asked to adopt it; until they do, their changes are not merged.}}",
+  "settings_cloudSync_replaceLibrary_peersUnknown": "Every other device will be asked to adopt it; until they do, their changes are not merged.",
+  "settings_cloudSync_replaceLibrary_backupNote": "A backup of this device is created first. This cannot be undone.",
+  "settings_cloudSync_replaceLibrary_confirmWord": "Replace",
+  "@settings_cloudSync_replaceLibrary_confirmWord": {
+    "description": "The word the user must type to arm the replace. Compared literally against their input, so it MUST match the word quoted in settings_cloudSync_replaceLibrary_confirmHint in the same locale."
+  },
+  "settings_cloudSync_replaceLibrary_confirmHint": "Type \"Replace\" to confirm",
+  "settings_cloudSync_replaceLibrary_confirm": "Replace",
   "settings_cloudSync_firstSync_banner": "First sync is waiting for confirmation. Tap Sync Now to review what will be combined.",
   "settings_cloudSync_firstSync_dialogConfirm": "Merge and Sync",
+  "settings_cloudSync_firstSync_replaceHint": "If instead this device's library should replace what is in the cloud, cancel and use Settings > Cloud Sync > Replace cloud library.",
   "settings_cloudSync_firstSync_dialogContent": "Existing sync data was found in the cloud ({deviceCount} sync file(s)). Your first sync will combine that data with the {diveCount} dive(s) on this device, across every synced device.\n\nIf the same dives were added separately on each device, they will appear twice.",
   "@settings_cloudSync_firstSync_dialogContent": {
     "placeholders": {
@@ -7941,6 +8030,14 @@
   "settings_cloudSync_header_syncBehavior": "Sync Behavior",
   "settings_cloudSync_lastSynced": "Last synced: {time}",
   "settings_cloudSync_pendingChanges": "{count, plural, =1{1 pending change} other{{count} pending changes}}",
+  "settings_cloudSync_peerNeedsAdopt_banner": "{deviceList} still has an older or unknown library version, so its changes were not merged. Open Submersion on it to adopt the current library.",
+  "settings_cloudSync_peerNeedsAdopt_bannerPlural": "{deviceList} still have an older or unknown library version, so their changes were not merged. Open Submersion on them to adopt the current library.",
+  "settings_cloudSync_peerNeedsAdopt_unnamedDevice": "device {shortId}",
+  "settings_cloudSync_peerNeedsAdopt_listSeparator": ", ",
+  "settings_cloudSync_peerNeedsAdopt_listLastSeparator": " and ",
+  "@settings_cloudSync_peerNeedsAdopt_listLastSeparator": {
+    "description": "Joins the final two device names, e.g. \"Erics-iPhone and Erics-iPad\". Include the surrounding spaces the locale needs."
+  },
   "settings_cloudSync_peerRequiresUpdate_banner": "{count, plural, =1{1 device syncs from a newer version of Submersion. Update this device to receive its latest changes.} other{{count} devices sync from a newer version of Submersion. Update this device to receive their latest changes.}}",
   "settings_cloudSync_provider_connected": "Connected",
   "settings_cloudSync_provider_connectedTo": "Connected to {providerName}",
@@ -8360,15 +8457,19 @@
   "settings_storage_success_moved": "Database moved successfully",
   "settings_storage_dangerZone": "Danger Zone",
   "settings_storage_resetDatabase": "Reset Database",
-  "settings_storage_resetDatabase_subtitle": "Delete all data and start fresh",
+  "settings_storage_resetDatabase_subtitle": "Delete all data on this device and start fresh",
   "settings_storage_resetDialog_title": "Reset Database?",
-  "settings_storage_resetDialog_body": "This will permanently delete all your data including dives, sites, gear, and settings. A backup will be created automatically before resetting.",
+  "settings_storage_resetDialog_body": "This permanently deletes all data on THIS device, including dives, sites, gear, and settings. A backup is created automatically before resetting.\n\nYour cloud library is not deleted, and other devices keep their data. Cloud sync will be disconnected so the reset is not undone; you can reconnect it in Settings > Cloud Sync.",
+  "settings_storage_resetDialog_confirmWord": "Delete",
+  "@settings_storage_resetDialog_confirmWord": {
+    "description": "The word the user must type to arm the reset. Compared literally against their input, so it MUST match the word quoted in settings_storage_resetDialog_confirmHint in the same locale."
+  },
   "settings_storage_resetDialog_confirmHint": "Type \"Delete\" to confirm",
   "settings_storage_resetDialog_confirmButton": "Reset",
   "settings_storage_resetDialog_backupFailed": "Backup failed. Reset aborted to protect your data.",
   "settings_storage_resetDialog_resetFailed": "Reset failed: {error}",
   "settings_storage_resetComplete_title": "Database Reset",
-  "settings_storage_resetComplete_description": "Your data has been cleared and a backup was saved. Tap continue to reload the app.",
+  "settings_storage_resetComplete_description": "This device's data has been cleared and a backup was saved. Cloud sync is now disconnected so the reset is not undone; you can reconnect it in Settings > Cloud Sync. Tap continue to reload the app.",
   "settings_summary_activeDiver": "Active Diver",
   "settings_summary_currentConfiguration": "Current Configuration",
   "settings_summary_depth": "Depth",
@@ -12011,6 +12112,8 @@
   },
   "diveComputer_download_errorOccurred": "An error occurred",
   "diveComputer_download_noSerialPortsFound": "No USB serial ports found. Is the dive computer connected and powered on?",
+  "diveComputer_download_stalePairing": "This dive computer's Bluetooth pairing is out of date. Forget the dive computer in your device's Bluetooth settings, then pair it again from the dive computer's Bluetooth menu.",
+  "diveComputer_download_discoveryStalled": "Connected to the dive computer, but it stopped responding before the download could start. This usually means the Bluetooth pairing is out of date: forget the dive computer in your device's Bluetooth settings, then try again.",
   "diveComputer_download_serialConnectFailedWithDetails": "Could not connect to dive computer.\n\nDiagnostic details (share with developers):\n{details}",
   "@diveComputer_download_serialConnectFailedWithDetails": {
     "placeholders": {
@@ -14424,7 +14527,7 @@
   },
   "settings_security_autoLock_never": "Never",
   "settings_security_encryption": "Encrypt database",
-  "settings_security_encryption_subtitle": "Protect your dive log file with at-rest encryption",
+  "settings_security_encryption_subtitle": "Protect your dive log file with at-rest encryption. Encryption may affect performance.",
   "settings_security_encryption_progress_backup": "Creating safety backup...",
   "settings_security_encryption_progress_encrypt": "Encrypting database...",
   "settings_security_encryption_progress_decrypt": "Decrypting database...",
@@ -14445,7 +14548,7 @@
   "settings_security_disableBlockedByEncryption_title": "Encryption is on",
   "settings_security_disableBlockedByEncryption_body": "Turn off database encryption before turning off App Lock. The encrypted database needs a credential.",
   "settings_security_enableEncryption_title": "Encrypt database?",
-  "settings_security_enableEncryption_body": "A safety backup is created first, then the database file is re-encrypted in place. This can take a while for large dive logs.",
+  "settings_security_enableEncryption_body": "A safety backup is created first, then the database file is re-encrypted in place. This can take a while for large dive logs. Encryption may affect performance.",
   "settings_security_disableEncryption_title": "Turn off encryption?",
   "settings_security_disableEncryption_body": "The database file will be stored unencrypted on disk again.",
   "settings_security_turnOffAppLock_title": "Turn off App Lock?",
@@ -14504,6 +14607,7 @@
   "dataQuality_action_goToDive": "Go to dive",
   "dataQuality_action_undo": "Undo",
   "dataQuality_repair_applied": "Repair applied",
+  "dataQuality_repair_noChange": "Nothing to repair here",
   "dataQuality_repair_failed": "Repair failed",
   "dataQuality_chip_all": "All",
   "dataQuality_chip_time": "Time",
@@ -14760,6 +14864,8 @@
   "dataQuality_repairLabel_consolidate": "Consolidate",
   "dataQuality_repairLabel_combine": "Combine into one dive",
   "dataQuality_repairLabel_despike": "Remove spike",
+  "dataQuality_repairLabel_clampNegative": "Clamp above-surface depths",
+  "dataQuality_repairLabel_smoothRates": "Smooth impossible rates",
   "dataQuality_repairLabel_fillGaps": "Fill gaps",
   "dataQuality_repairLabel_smoothTemp": "Smooth temperature",
   "dataQuality_repairLabel_convertTemp": "Convert temperature",
@@ -14885,6 +14991,13 @@
       }
     }
   },
+  "settings_coordinateFormat_title": "Coordinate format",
+  "settings_coordinateFormat_subtitle": "How GPS positions are shown and entered",
+  "settings_coordinateFormat_decimalDegrees": "Decimal degrees",
+  "settings_coordinateFormat_degreesDecimalMinutes": "Degrees and decimal minutes",
+  "settings_coordinateFormat_degreesMinutesSeconds": "Degrees, minutes, seconds",
+  "settings_coordinateFormat_utm": "UTM",
+  "settings_coordinateFormat_mgrs": "MGRS",
   "settings_visibilityScale_title": "Visibility scale",
   "settings_visibilityScale_subtitle": "Which distances count as good visibility where you dive",
   "settings_visibilityScale_preset_tropical": "Tropical",
@@ -14901,6 +15014,54 @@
       "band": {
         "type": "String"
       }
+    }
+  },
+  "common_selection_countSelected": "{count} selected",
+  "common_selection_enterTooltip": "Select items",
+  "common_selection_exitTooltip": "Exit selection",
+  "common_selection_selectAllTooltip": "Select all",
+  "common_selection_deselectAllTooltip": "Deselect all",
+  "@common_selection_countSelected": {
+    "placeholders": {
+      "count": { "type": "Object" }
+    }
+  },
+  "common_bulkDelete_title": "{count, plural, one{Delete {count} item?} other{Delete {count} items?}}",
+  "common_bulkDelete_body": "This cannot be undone.",
+  "common_bulkDelete_snackbar": "{count, plural, one{{count} deleted} other{{count} deleted}}",
+  "@common_bulkDelete_title": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "@common_bulkDelete_snackbar": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "marineLife_species_delete_confirmTitle": "Delete species?",
+  "marineLife_species_delete_confirmBody": "Are you sure you want to delete \"{name}\"?",
+  "marineLife_species_delete_inUseError": "Cannot delete \"{name}\" - it has sightings",
+  "marineLife_species_delete_snackbar": "Deleted \"{name}\"",
+  "marineLife_species_delete_error": "Error deleting species: {error}",
+  "@marineLife_species_delete_confirmBody": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "@marineLife_species_delete_inUseError": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "@marineLife_species_delete_snackbar": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "@marineLife_species_delete_error": {
+    "placeholders": {
+      "error": { "type": "String" }
     }
   }
 }

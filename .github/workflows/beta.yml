@@ -33,6 +33,9 @@ jobs:
       proceed: ${{ steps.gate.outputs.proceed }}
       tag: ${{ steps.version.outputs.tag }}
       build-number: ${{ steps.version.outputs.build-number }}
+      # Marketing version alone (no build suffix). The TestFlight lanes address
+      # an already-uploaded build by version + build number.
+      semver: ${{ steps.version.outputs.semver }}
       sha: ${{ steps.version.outputs.sha }}
       # The previous beta's source commit. Every downstream job derives its
       # release notes from prev-sha..sha, so testers see what changed in this
@@ -70,6 +73,7 @@ jobs:
           fi
           echo "tag=v${SEMVER}.${BUILD}" >> "$GITHUB_OUTPUT"
           echo "build-number=${BUILD}" >> "$GITHUB_OUTPUT"
+          echo "semver=${SEMVER}" >> "$GITHUB_OUTPUT"
           echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
 
       - name: Skip if nothing shippable changed since the last beta
@@ -123,16 +127,20 @@ jobs:
           PREV_SHA: ${{ steps.gate.outputs.prev-sha }}
         run: |
           set -euo pipefail
-          ./scripts/release/beta_release_notes.sh --since "$PREV_SHA" --format store \
-            > beta-notes-store.txt
+          # Every format carries this beta's delta plus a cumulative section
+          # since the last production release, so a tester arriving straight
+          # from the public build sees the whole picture wherever they read.
+          # The delta is emitted first and the capped formats truncate the
+          # cumulative tail to fit, so the change a tester is being asked to
+          # exercise is never the part that gets cut.
+          ./scripts/release/beta_release_notes.sh --since "$PREV_SHA" --format apple \
+            --cumulative > beta-notes-apple.txt
           ./scripts/release/beta_release_notes.sh --since "$PREV_SHA" --format play \
-            > beta-notes-play.txt
-          # The GitHub body is uncapped, so it carries this beta's delta plus a
-          # cumulative section for testers arriving from the public release.
+            --cumulative > beta-notes-play.txt
           ./scripts/release/beta_release_notes.sh --since "$PREV_SHA" --format markdown \
             --cumulative > beta-notes.md
           echo "--- TestFlight whatsNew ---"
-          cat beta-notes-store.txt
+          cat beta-notes-apple.txt
 
       - name: Upload beta release notes
         if: steps.gate.outputs.proceed == 'true'
@@ -140,7 +148,7 @@ jobs:
         with:
           name: beta-notes
           path: |
-            beta-notes-store.txt
+            beta-notes-apple.txt
             beta-notes-play.txt
             beta-notes.md
           retention-days: 5
@@ -309,29 +317,57 @@ jobs:
       # commit-derived content into GITHUB_ENV makes a commit subject that
       # matches the heredoc delimiter an environment-variable injection vector,
       # and this job holds the App Store Connect signing key.
-      - name: Upload to TestFlight (Public Beta)
+      # Uploading the binary and distributing it are separate steps because a
+      # build number can only ever be uploaded once. The upload runs exactly
+      # once and treats an already-uploaded build as success; only the
+      # distribution, which is idempotent, is retried.
+      - name: Upload binary to TestFlight
         working-directory: ios
         env:
           APP_STORE_CONNECT_API_KEY_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_KEY_ID }}
           APP_STORE_CONNECT_API_KEY_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ISSUER_ID }}
           APP_STORE_CONNECT_API_KEY_KEY_FILEPATH: fastlane/AuthKey.p8
-          BETA_CHANGELOG_FILE: ${{ github.workspace }}/beta-notes-store.txt
         run: |
           IPA_PATH=$(ls $GITHUB_WORKSPACE/Submersion-*-iOS.ipa 2>/dev/null | head -1)
           if [ -z "$IPA_PATH" ]; then
             echo "Error: No IPA artifact found"
             exit 1
           fi
-          for attempt in 1 2; do
-            if bundle exec fastlane upload_testflight_beta ipa:"$IPA_PATH"; then
-              break
+          bundle exec fastlane upload_testflight_beta_binary ipa:"$IPA_PATH"
+
+      - name: Distribute to Public Beta group
+        working-directory: ios
+        env:
+          APP_STORE_CONNECT_API_KEY_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_KEY_ID }}
+          APP_STORE_CONNECT_API_KEY_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ISSUER_ID }}
+          APP_STORE_CONNECT_API_KEY_KEY_FILEPATH: fastlane/AuthKey.p8
+          BETA_CHANGELOG_FILE: ${{ github.workspace }}/beta-notes-apple.txt
+          APP_VERSION: ${{ needs.precheck.outputs.semver }}
+          BUILD_NUMBER: ${{ needs.precheck.outputs.build-number }}
+        run: |
+          set -o pipefail
+          LOG="$RUNNER_TEMP/distribute.log"
+          RECOVER="cd ios && bundle exec fastlane distribute_testflight_beta app_version:$APP_VERSION build_number:$BUILD_NUMBER"
+          for attempt in 1 2 3; do
+            if bundle exec fastlane distribute_testflight_beta \
+                 app_version:"$APP_VERSION" build_number:"$BUILD_NUMBER" 2>&1 | tee "$LOG"; then
+              exit 0
             fi
-            if [ "$attempt" -eq 2 ]; then
-              echo "Fastlane upload failed after 2 attempts"
+            # Apple meters beta review submissions per day, so this one does not
+            # clear in a minute; retrying only delays the same failure.
+            if grep -q "Submission limit has been reached" "$LOG"; then
+              echo "::error::Apple refused the beta review submission (submission limit reached)." \
+                "Build $APP_VERSION ($BUILD_NUMBER) is uploaded and processed but was not" \
+                "distributed to Public Beta. Re-run this job once the limit clears, or run: $RECOVER"
               exit 1
             fi
-            echo "Fastlane attempt $attempt failed, retrying in 30s..."
-            sleep 30
+            if [ "$attempt" -eq 3 ]; then
+              echo "::error::Distribution failed after 3 attempts. The binary is uploaded;" \
+                "re-run this job, or run: $RECOVER"
+              exit 1
+            fi
+            echo "Distribution attempt $attempt failed, retrying in 60s..."
+            sleep 60
           done
 
       - name: Cleanup sensitive files
@@ -375,13 +411,16 @@ jobs:
           name: beta-notes
 
       # Handed as a path, not as text - see the iOS job for why.
-      - name: Upload to TestFlight (Public Beta)
+      # Uploading the binary and distributing it are separate steps because a
+      # build number can only ever be uploaded once. The upload runs exactly
+      # once and treats an already-uploaded build as success; only the
+      # distribution, which is idempotent, is retried.
+      - name: Upload binary to TestFlight
         working-directory: macos
         env:
           APP_STORE_CONNECT_API_KEY_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_KEY_ID }}
           APP_STORE_CONNECT_API_KEY_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ISSUER_ID }}
           APP_STORE_CONNECT_API_KEY_KEY_FILEPATH: fastlane/AuthKey.p8
-          BETA_CHANGELOG_FILE: ${{ github.workspace }}/beta-notes-store.txt
         run: |
           # The Mac App Store package keeps its fixed name (no tag prefix).
           PKG_PATH="$GITHUB_WORKSPACE/Submersion.pkg"
@@ -389,16 +428,41 @@ jobs:
             echo "Error: No pkg artifact found at $PKG_PATH"
             exit 1
           fi
-          for attempt in 1 2; do
-            if bundle exec fastlane upload_testflight_beta pkg:"$PKG_PATH"; then
-              break
+          bundle exec fastlane upload_testflight_beta_binary pkg:"$PKG_PATH"
+
+      - name: Distribute to Public Beta group
+        working-directory: macos
+        env:
+          APP_STORE_CONNECT_API_KEY_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_KEY_ID }}
+          APP_STORE_CONNECT_API_KEY_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ISSUER_ID }}
+          APP_STORE_CONNECT_API_KEY_KEY_FILEPATH: fastlane/AuthKey.p8
+          BETA_CHANGELOG_FILE: ${{ github.workspace }}/beta-notes-apple.txt
+          APP_VERSION: ${{ needs.precheck.outputs.semver }}
+          BUILD_NUMBER: ${{ needs.precheck.outputs.build-number }}
+        run: |
+          set -o pipefail
+          LOG="$RUNNER_TEMP/distribute.log"
+          RECOVER="cd macos && bundle exec fastlane distribute_testflight_beta app_version:$APP_VERSION build_number:$BUILD_NUMBER"
+          for attempt in 1 2 3; do
+            if bundle exec fastlane distribute_testflight_beta \
+                 app_version:"$APP_VERSION" build_number:"$BUILD_NUMBER" 2>&1 | tee "$LOG"; then
+              exit 0
             fi
-            if [ "$attempt" -eq 2 ]; then
-              echo "Fastlane upload failed after 2 attempts"
+            # Apple meters beta review submissions per day, so this one does not
+            # clear in a minute; retrying only delays the same failure.
+            if grep -q "Submission limit has been reached" "$LOG"; then
+              echo "::error::Apple refused the beta review submission (submission limit reached)." \
+                "Build $APP_VERSION ($BUILD_NUMBER) is uploaded and processed but was not" \
+                "distributed to Public Beta. Re-run this job once the limit clears, or run: $RECOVER"
               exit 1
             fi
-            echo "Fastlane attempt $attempt failed, retrying in 30s..."
-            sleep 30
+            if [ "$attempt" -eq 3 ]; then
+              echo "::error::Distribution failed after 3 attempts. The binary is uploaded;" \
+                "re-run this job, or run: $RECOVER"
+              exit 1
+            fi
+            echo "Distribution attempt $attempt failed, retrying in 60s..."
+            sleep 60
           done
 
       - name: Cleanup sensitive files

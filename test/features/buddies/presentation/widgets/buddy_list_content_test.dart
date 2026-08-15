@@ -1,4 +1,6 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -18,6 +20,7 @@ import 'package:submersion/shared/models/entity_table_config.dart';
 import 'package:submersion/shared/providers/entity_table_config_providers.dart';
 
 import '../../../../helpers/mock_providers.dart';
+import '../../../../helpers/selection_contract.dart';
 import '../../../../helpers/test_app.dart';
 
 // ---------------------------------------------------------------------------
@@ -94,6 +97,12 @@ Future<List<Override>> _buildOverrides({
   ];
 }
 
+/// Mutable source for the contract test's filter step, so the visible
+/// list can be narrowed mid-test the way a real filter would.
+final _visibleBuddiesProvider = StateProvider<List<BuddyWithDiveCount>>(
+  (ref) => const [],
+);
+
 Future<List<Override>> _buildPhoneOverrides({
   required List<BuddyWithDiveCount> buddies,
   ListViewMode viewMode = ListViewMode.detailed,
@@ -117,6 +126,57 @@ Future<List<Override>> _buildPhoneOverrides({
 }
 
 void main() {
+  group('selection contract', () {
+    testWidgets('satisfies the shared selection contract', (tester) async {
+      final all = <BuddyWithDiveCount>[
+        _makeBuddy(id: 'b1', name: 'Aaa Buddy'),
+        _makeBuddy(id: 'b2', name: 'Bbb Buddy'),
+        _makeBuddy(id: 'b3', name: 'Ccc Buddy'),
+      ];
+
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+      final overrides = <Override>[
+        sharedPreferencesProvider.overrideWithValue(prefs),
+        settingsProvider.overrideWith((ref) => MockSettingsNotifier()),
+        currentDiverIdProvider.overrideWith(
+          (ref) => MockCurrentDiverIdNotifier(),
+        ),
+        _visibleBuddiesProvider.overrideWith((ref) => all),
+        allBuddiesWithDiveCountProvider.overrideWith(
+          (ref) => ref.watch(_visibleBuddiesProvider),
+        ),
+        buddyListNotifierProvider.overrideWith(
+          (ref) => _MockBuddyListNotifier(),
+        ),
+        buddyListViewModeProvider.overrideWith((ref) => ListViewMode.detailed),
+        buddyTableConfigProvider.overrideWith(
+          (ref) => _TestBuddyTableConfigNotifier(_testConfig),
+        ),
+        highlightedBuddyIdProvider.overrideWith((ref) => null),
+      ];
+
+      await verifySelectionContract(
+        tester,
+        build: () => testApp(
+          overrides: overrides,
+          locale: const Locale('en'),
+          child: const BuddyListContent(showAppBar: true),
+        ),
+        selectButton: find.byKey(const ValueKey('enter_selection')),
+        rowRoot: find.byType(BuddyListTile).first,
+        firstRow: find.text('Aaa Buddy'),
+        applyFilter: (tester) async {
+          final container = ProviderScope.containerOf(
+            tester.element(find.byType(BuddyListContent)),
+          );
+          container.read(_visibleBuddiesProvider.notifier).state = [all.first];
+        },
+        visibleAfterFilter: 1,
+      );
+    });
+  });
+
   group('BuddyListContent in table mode', () {
     testWidgets('renders table with column headers', (tester) async {
       final buddies = [
@@ -476,6 +536,109 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(pushedPath, '/buddies/b1');
+    });
+  });
+
+  // ---------------------------------------------------------------------------
+  // Modifier and shift clicks seeded by the highlighted row.
+  //
+  // A plain click highlights a buddy without checking it, so the highlight is
+  // the user's on-screen selection. Shift and Cmd/Ctrl clicks must both treat
+  // it as the origin, the way the dive and site lists do.
+  // ---------------------------------------------------------------------------
+
+  group('selection seeded by the highlighted buddy', () {
+    List<BuddyWithDiveCount> fourBuddies() => [
+      _makeBuddy(id: 'b1', name: 'Aaa Buddy'),
+      _makeBuddy(id: 'b2', name: 'Bbb Buddy'),
+      _makeBuddy(id: 'b3', name: 'Ccc Buddy'),
+      _makeBuddy(id: 'b4', name: 'Ddd Buddy'),
+    ];
+
+    // Cmd on macOS, Control elsewhere -- mirrors
+    // SelectableListScope.isModifierPressed so this passes on the macOS dev
+    // machine and the Linux CI runner alike.
+    final modifierKey = defaultTargetPlatform == TargetPlatform.macOS
+        ? LogicalKeyboardKey.metaLeft
+        : LogicalKeyboardKey.controlLeft;
+
+    Future<DenseBuddyListTile Function(String)> pumpList(
+      WidgetTester tester,
+    ) async {
+      final overrides = await _buildPhoneOverrides(
+        buddies: fourBuddies(),
+        viewMode: ListViewMode.dense,
+        highlightedBuddyId: 'b2',
+      );
+      await tester.pumpWidget(
+        testApp(
+          overrides: overrides,
+          child: const BuddyListContent(showAppBar: false),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      return (String name) => tester
+          .widgetList<DenseBuddyListTile>(find.byType(DenseBuddyListTile))
+          .firstWhere((t) => t.buddy.name == name);
+    }
+
+    testWidgets('shift-tap extends from the highlighted buddy', (tester) async {
+      final tile = await pumpList(tester);
+
+      await tester.sendKeyDownEvent(LogicalKeyboardKey.shiftLeft);
+      await tester.tap(find.text('Ddd Buddy'));
+      await tester.sendKeyUpEvent(LogicalKeyboardKey.shiftLeft);
+      await tester.pumpAndSettle();
+
+      expect(tile('Aaa Buddy').isChecked, isFalse);
+      expect(tile('Bbb Buddy').isChecked, isTrue);
+      expect(tile('Ccc Buddy').isChecked, isTrue);
+      expect(tile('Ddd Buddy').isChecked, isTrue);
+    });
+
+    testWidgets('modifier-tap checks the highlighted buddy too', (
+      tester,
+    ) async {
+      final tile = await pumpList(tester);
+
+      await tester.sendKeyDownEvent(modifierKey);
+      await tester.tap(find.text('Ddd Buddy'));
+      await tester.sendKeyUpEvent(modifierKey);
+      await tester.pumpAndSettle();
+
+      expect(tile('Bbb Buddy').isChecked, isTrue);
+      expect(tile('Ddd Buddy').isChecked, isTrue);
+      expect(tile('Aaa Buddy').isChecked, isFalse);
+      expect(tile('Ccc Buddy').isChecked, isFalse);
+    });
+
+    // Table rows carry an onDoubleTap, so onTap only resolves once the
+    // double-tap timer expires. The modifier has to stay held across that
+    // wait, because the handler reads the keyboard when the tap fires.
+    testWidgets('table mode: shift-tap extends from the tapped row', (
+      tester,
+    ) async {
+      final overrides = await _buildOverrides(buddies: fourBuddies());
+      await tester.pumpWidget(
+        testApp(
+          overrides: overrides,
+          child: const BuddyListContent(showAppBar: true),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Aaa Buddy'));
+      await tester.pump(const Duration(milliseconds: 500));
+      await tester.pumpAndSettle();
+
+      await tester.sendKeyDownEvent(LogicalKeyboardKey.shiftLeft);
+      await tester.tap(find.text('Ccc Buddy'));
+      await tester.pump(const Duration(milliseconds: 500));
+      await tester.sendKeyUpEvent(LogicalKeyboardKey.shiftLeft);
+      await tester.pumpAndSettle();
+
+      expect(find.text('3 selected'), findsOneWidget);
     });
   });
 }

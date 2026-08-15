@@ -22,6 +22,9 @@ import 'package:submersion/features/maps/presentation/widgets/map_attribution.da
 import 'package:submersion/features/maps/presentation/widgets/trackpad_zoom_map.dart';
 import 'package:submersion/features/marine_life/presentation/widgets/site_marine_life_section.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
+import 'package:submersion/features/media/presentation/helpers/document_open_helper.dart';
+import 'package:submersion/features/media/presentation/helpers/site_media_import_helper.dart';
+import 'package:submersion/features/media/presentation/widgets/site_media_section.dart';
 import 'package:submersion/features/reef/presentation/widgets/reef_section.dart';
 import 'package:submersion/features/tides/presentation/widgets/tide_section.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
@@ -180,7 +183,7 @@ class _SiteDetailContentState extends ConsumerState<_SiteDetailContent> {
           const SizedBox(height: 16),
 
           // Location Details Section
-          _buildLocationSection(context, site),
+          _buildLocationSection(context, ref, site),
           const SizedBox(height: 16),
 
           // Depth Information Section
@@ -212,6 +215,24 @@ class _SiteDetailContentState extends ConsumerState<_SiteDetailContent> {
             siteId: site.id,
             location: site.location,
             waterType: site.waterType,
+          ),
+          const SizedBox(height: 16),
+
+          // Site Media Section (attachments + dive photos)
+          SiteMediaSection(
+            siteId: site.id,
+            onAddPhotosPressed: () => SiteMediaImportHelper.importPhotosForSite(
+              context: context,
+              ref: ref,
+              siteId: site.id,
+            ),
+            onAddDocumentPressed: () => DocumentOpenHelper.pickAndAttach(
+              context: context,
+              ref: ref,
+              siteId: site.id,
+            ),
+            onOpenDocument: (item) =>
+                DocumentOpenHelper.open(context, ref, item),
           ),
           const SizedBox(height: 16),
 
@@ -850,8 +871,17 @@ class _SiteDetailContentState extends ConsumerState<_SiteDetailContent> {
     );
   }
 
-  Widget _buildLocationSection(BuildContext context, DiveSite site) {
+  Widget _buildLocationSection(
+    BuildContext context,
+    WidgetRef ref,
+    DiveSite site,
+  ) {
+    final units = UnitFormatter(ref.watch(settingsProvider));
     final colorScheme = Theme.of(context).colorScheme;
+    final coordinates = units.formatCoordinates(
+      site.location?.latitude,
+      site.location?.longitude,
+    );
 
     return Card(
       child: Padding(
@@ -920,14 +950,12 @@ class _SiteDetailContentState extends ConsumerState<_SiteDetailContent> {
               Icons.gps_fixed,
               context.l10n.diveSites_detail_location_gpsCoordinates,
               site.hasCoordinates
-                  ? site.location.toString()
+                  ? coordinates
                   : context.l10n.diveSites_detail_location_notSet,
               isEmpty: !site.hasCoordinates,
               onTap: site.hasCoordinates
                   ? () {
-                      Clipboard.setData(
-                        ClipboardData(text: site.location.toString()),
-                      );
+                      Clipboard.setData(ClipboardData(text: coordinates));
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text(

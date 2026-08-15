@@ -60,6 +60,10 @@ class DatabaseSecurityService {
   bool get encryptionEnabled => _p.dbEncryptionEnabled;
   bool get isUnlocked => _mlk != null;
 
+  /// Whether durable security credentials already exist for [dbPath].
+  bool hasCredential({required String dbPath}) =>
+      DatabaseSecuritySidecar.existsFor(dbPath);
+
   /// The key id minted at enableSecurity, once unlocked. Stable across
   /// password changes (rewrap only); used to label rebuilt sidecars.
   String? get libraryKeyId => _libraryKeyId;
@@ -100,8 +104,9 @@ class DatabaseSecurityService {
   }
 
   /// Mints the Master Key and sidecar (password + recovery slots), caches
-  /// the key, flips App Lock on, and returns the recovery code — shown to
-  /// the user exactly once.
+  /// the key, and returns the recovery code — shown to the user exactly once.
+  /// App Lock is an independent tier and must be enabled explicitly with
+  /// [setAppLockEnabled].
   Future<String> enableSecurity({
     required String password,
     required String dbPath,
@@ -134,8 +139,16 @@ class DatabaseSecurityService {
     );
     await DatabaseSecuritySidecar.write(dbPath, file);
     await _adoptMlk(mlk, libraryKeyId, persist: true);
-    await _p.setAppLockEnabled(true);
     return recoveryCode;
+  }
+
+  /// Enables or disables the App Lock UI gate without changing database
+  /// encryption, keyslots, or the cached Master Key.
+  Future<void> setAppLockEnabled(bool enabled) async {
+    if (enabled && _mlk == null) {
+      throw StateError('Cannot enable App Lock without an unlocked credential');
+    }
+    await _p.setAppLockEnabled(enabled);
   }
 
   /// Rewraps the passphrase slot only — the master key and recovery slot
@@ -243,8 +256,10 @@ class DatabaseSecurityService {
     }
   }
 
-  /// Decrypts in place; mirror image of [enableEncryption]. App Lock stays
-  /// on — only the at-rest tier is removed.
+  /// Decrypts in place; mirror image of [enableEncryption]. When App Lock is
+  /// still enabled, the shared credential remains for that tier. Otherwise
+  /// this was the last enabled tier, so the unused sidecar and cached key are
+  /// removed as well.
   Future<void> disableEncryption({
     DatabaseEncryptionMigrator? migrator,
     void Function(String phase)? onPhase,
@@ -270,6 +285,9 @@ class DatabaseSecurityService {
 
     await _p.setDbEncryptionEnabled(false);
     await refreshDerivedKey();
+    if (!appLockEnabled) {
+      await disableSecurity(dbPath: dbPath);
+    }
 
     if (!skipReopenForTesting) {
       onPhase?.call('reopen');

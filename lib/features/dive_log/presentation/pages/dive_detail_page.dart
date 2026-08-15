@@ -17,6 +17,7 @@ import 'package:submersion/core/deco/altitude_calculator.dart';
 import 'package:submersion/core/icons/mdi_icons.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/core/services/export/export_service.dart';
+import 'package:submersion/core/services/pdf_templates/pdf_date_formatter.dart';
 import 'package:submersion/core/tide/entities/tide_extremes.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/buddies/domain/entities/buddy.dart';
@@ -89,6 +90,7 @@ import 'package:submersion/features/marine_life/domain/entities/species.dart';
 import 'package:submersion/features/marine_life/presentation/providers/species_providers.dart';
 import 'package:submersion/features/marine_life/presentation/utils/species_category_icon.dart';
 import 'package:submersion/features/media/data/services/trip_media_scanner.dart';
+import 'package:submersion/features/media/presentation/helpers/document_open_helper.dart';
 import 'package:submersion/features/media/presentation/helpers/photo_import_helper.dart';
 import 'package:submersion/features/media/presentation/providers/media_providers.dart';
 import 'package:submersion/features/media/presentation/providers/photo_picker_providers.dart';
@@ -2858,7 +2860,14 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
 
     try {
       final exportService = ref.read(exportServiceProvider);
-      final result = await exportService.generateDivePdfBytes([dive]);
+      final settings = ref.read(settingsProvider);
+      final result = await exportService.generateDivePdfBytes(
+        [dive],
+        dates: PdfDateFormatter(
+          dateFormat: settings.dateFormat,
+          timeFormat: settings.timeFormat,
+        ),
+      );
 
       // Close loading dialog BEFORE opening file picker to avoid navigator lock issues
       if (mounted) {
@@ -3651,7 +3660,9 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
     );
     final dateRef = entryTime ?? record.highTideTime ?? record.lowTideTime;
     final dateStr = dateRef != null
-        ? DateFormat('EEE, MMM d').format(dateRef)
+        ? DateFormat(
+            UnitFormatter.weekdayMonthDayPattern(settings.dateFormat),
+          ).format(dateRef)
         : '';
     // Cycle bounds are stored wall-clock instants, not device-local times:
     // format them verbatim without any timezone conversion.
@@ -3665,7 +3676,9 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
                 cycleStart.month != cycleEnd.month ||
                 cycleStart.day != cycleEnd.day;
             if (spansNewDay) {
-              final endDateStr = DateFormat('MMM d').format(cycleEnd);
+              final endDateStr = DateFormat(
+                UnitFormatter.monthDayPattern(settings.dateFormat),
+              ).format(cycleEnd);
               return '$startStr - $endStr ($endDateStr)';
             }
             return '$startStr - $endStr';
@@ -4537,6 +4550,12 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
           dive: dive,
         );
       },
+      onAddDocumentPressed: () => DocumentOpenHelper.pickAndAttach(
+        context: context,
+        ref: ref,
+        diveId: dive.id,
+      ),
+      onOpenDocument: (item) => DocumentOpenHelper.open(context, ref, item),
     );
   }
 

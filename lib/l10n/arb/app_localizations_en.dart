@@ -2385,6 +2385,51 @@ class AppLocalizationsEn extends AppLocalizations {
   String get preDive_sessions_deleteConfirm => 'Delete this checklist record?';
 
   @override
+  String get preDive_sessions_filter => 'Filter';
+
+  @override
+  String get preDive_sessions_filterTitle => 'Filter checklist runs';
+
+  @override
+  String get preDive_sessions_filterChecklist => 'Checklist';
+
+  @override
+  String get preDive_sessions_filterStatus => 'Status';
+
+  @override
+  String get preDive_sessions_filterFlaggedOnly => 'Flagged runs only';
+
+  @override
+  String get preDive_sessions_filterDateRange => 'Date range';
+
+  @override
+  String get preDive_sessions_filterAnyDate => 'Any date';
+
+  @override
+  String get preDive_sessions_filterClearAll => 'Clear all';
+
+  @override
+  String get preDive_sessions_filterApply => 'Apply';
+
+  @override
+  String get preDive_sessions_filterFlaggedChip => 'Flagged only';
+
+  @override
+  String get preDive_sessions_emptyFiltered =>
+      'No checklist runs match these filters';
+
+  @override
+  String get preDive_sessions_export => 'Export to Excel';
+
+  @override
+  String get preDive_sessions_exportEmpty => 'No checklist runs to export';
+
+  @override
+  String preDive_sessions_exportFailed(String error) {
+    return 'Export failed: $error';
+  }
+
+  @override
   String get preDive_start_title => 'Start pre-dive checklist';
 
   @override
@@ -2914,6 +2959,14 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String dashboard_hero_divesLoggedOther(Object count) {
     return '$count dives logged';
+  }
+
+  @override
+  String get dashboard_hero_divesTotalOne => '1 dive';
+
+  @override
+  String dashboard_hero_divesTotalOther(Object count) {
+    return '$count dives';
   }
 
   @override
@@ -6097,6 +6150,23 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get setup_syncPull_continue => 'Continue';
+
+  @override
+  String get setup_syncPull_incomplete_message =>
+      'This account holds a Submersion library that was never finished uploading. Let your other device finish syncing, then try again.';
+
+  @override
+  String get setup_syncPull_incomplete_retry => 'Check again';
+
+  @override
+  String get setup_syncPull_incomplete_title => 'Library upload unfinished';
+
+  @override
+  String get setup_syncPull_locked_message =>
+      'Enter the encryption passphrase to unlock this library and download it to this device.';
+
+  @override
+  String get setup_syncPull_locked_title => 'This library is encrypted';
 
   @override
   String get setup_syncPull_noLibrary_message =>
@@ -11571,6 +11641,57 @@ class AppLocalizationsEn extends AppLocalizations {
   String get media_diveMediaSection_unlinkSuccess => 'Photo unlinked';
 
   @override
+  String get media_siteMediaSection_title => 'Site Media';
+
+  @override
+  String get media_siteMediaSection_addPhotos => 'Add photos or videos';
+
+  @override
+  String get media_siteMediaSection_addDocument => 'Add document';
+
+  @override
+  String get media_siteMediaSection_emptyState =>
+      'No maps, photos, or documents attached to this site';
+
+  @override
+  String media_siteMediaSection_divePhotosGroup(int count) {
+    return 'Photos from dives here ($count)';
+  }
+
+  @override
+  String get media_siteMediaSection_divePhotoLabel => 'Dive photo';
+
+  @override
+  String media_siteMediaSection_unlinkSelectedTitle(int count) {
+    return 'Remove $count attachments?';
+  }
+
+  @override
+  String get media_siteMediaSection_unlinkSelectedContent =>
+      'The selected items will be removed from this site. Files in your photo library or on disk are not deleted.';
+
+  @override
+  String media_siteMediaSection_unlinkSelectedSuccess(int count) {
+    return 'Removed $count attachments';
+  }
+
+  @override
+  String get media_documentViewer_title => 'Document';
+
+  @override
+  String get media_documentViewer_unavailable =>
+      'This document is not available on this device';
+
+  @override
+  String get media_documentViewer_availableOnOriginDevice =>
+      'It is available on the device it was added from, or via a configured media store.';
+
+  @override
+  String media_documentViewer_attached(int count) {
+    return 'Attached $count documents';
+  }
+
+  @override
   String get media_diveScan_scanTooltip => 'Scan gallery for photos';
 
   @override
@@ -11624,8 +11745,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get media_gpsBanner_addToSiteButton => 'Add to Site';
 
   @override
-  String media_gpsBanner_coordinates(Object latitude, Object longitude) {
-    return 'Coordinates: $latitude, $longitude';
+  String media_gpsBanner_coordinates(Object coordinates) {
+    return 'Coordinates: $coordinates';
   }
 
   @override
@@ -13393,11 +13514,78 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settings_cloudSync_adopt_notNow => 'Not Now';
 
   @override
+  String get settings_cloudSync_dangerZone => 'Danger Zone';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_tile => 'Replace cloud library';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_tileSubtitle =>
+      'Make this device\'s library the one every device uses';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_dialogTitle =>
+      'Replace Cloud Library?';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_dialogIntro =>
+      'This device\'s library becomes the one every device uses.';
+
+  @override
+  String settings_cloudSync_replaceLibrary_dialogBody(num diveCount) {
+    String _temp0 = intl.Intl.pluralLogic(
+      diveCount,
+      locale: localeName,
+      other:
+          'The cloud library is erased and replaced with this device\'s $diveCount dives.',
+      one:
+          'The cloud library is erased and replaced with this device\'s 1 dive.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String settings_cloudSync_replaceLibrary_peers(num peerCount) {
+    String _temp0 = intl.Intl.pluralLogic(
+      peerCount,
+      locale: localeName,
+      other:
+          '$peerCount other devices will be asked to adopt it; until they do, their changes are not merged.',
+      one:
+          '1 other device will be asked to adopt it; until it does, its changes are not merged.',
+      zero: 'No other device is syncing yet, so there is nothing to adopt it.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get settings_cloudSync_replaceLibrary_peersUnknown =>
+      'Every other device will be asked to adopt it; until they do, their changes are not merged.';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_backupNote =>
+      'A backup of this device is created first. This cannot be undone.';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_confirmWord => 'Replace';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_confirmHint =>
+      'Type \"Replace\" to confirm';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_confirm => 'Replace';
+
+  @override
   String get settings_cloudSync_firstSync_banner =>
       'First sync is waiting for confirmation. Tap Sync Now to review what will be combined.';
 
   @override
   String get settings_cloudSync_firstSync_dialogConfirm => 'Merge and Sync';
+
+  @override
+  String get settings_cloudSync_firstSync_replaceHint =>
+      'If instead this device\'s library should replace what is in the cloud, cancel and use Settings > Cloud Sync > Replace cloud library.';
 
   @override
   String settings_cloudSync_firstSync_dialogContent(
@@ -13484,6 +13672,27 @@ class AppLocalizationsEn extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String settings_cloudSync_peerNeedsAdopt_banner(Object deviceList) {
+    return '$deviceList still has an older or unknown library version, so its changes were not merged. Open Submersion on it to adopt the current library.';
+  }
+
+  @override
+  String settings_cloudSync_peerNeedsAdopt_bannerPlural(Object deviceList) {
+    return '$deviceList still have an older or unknown library version, so their changes were not merged. Open Submersion on them to adopt the current library.';
+  }
+
+  @override
+  String settings_cloudSync_peerNeedsAdopt_unnamedDevice(Object shortId) {
+    return 'device $shortId';
+  }
+
+  @override
+  String get settings_cloudSync_peerNeedsAdopt_listSeparator => ', ';
+
+  @override
+  String get settings_cloudSync_peerNeedsAdopt_listLastSeparator => ' and ';
 
   @override
   String settings_cloudSync_peerRequiresUpdate_banner(num count) {
@@ -14788,14 +14997,17 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settings_storage_resetDatabase_subtitle =>
-      'Delete all data and start fresh';
+      'Delete all data on this device and start fresh';
 
   @override
   String get settings_storage_resetDialog_title => 'Reset Database?';
 
   @override
   String get settings_storage_resetDialog_body =>
-      'This will permanently delete all your data including dives, sites, gear, and settings. A backup will be created automatically before resetting.';
+      'This permanently deletes all data on THIS device, including dives, sites, gear, and settings. A backup is created automatically before resetting.\n\nYour cloud library is not deleted, and other devices keep their data. Cloud sync will be disconnected so the reset is not undone; you can reconnect it in Settings > Cloud Sync.';
+
+  @override
+  String get settings_storage_resetDialog_confirmWord => 'Delete';
 
   @override
   String get settings_storage_resetDialog_confirmHint =>
@@ -14818,7 +15030,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settings_storage_resetComplete_description =>
-      'Your data has been cleared and a backup was saved. Tap continue to reload the app.';
+      'This device\'s data has been cleared and a backup was saved. Cloud sync is now disconnected so the reset is not undone; you can reconnect it in Settings > Cloud Sync. Tap continue to reload the app.';
 
   @override
   String get settings_summary_activeDiver => 'Active Diver';
@@ -18768,6 +18980,14 @@ class AppLocalizationsEn extends AppLocalizations {
       'No USB serial ports found. Is the dive computer connected and powered on?';
 
   @override
+  String get diveComputer_download_stalePairing =>
+      'This dive computer\'s Bluetooth pairing is out of date. Forget the dive computer in your device\'s Bluetooth settings, then pair it again from the dive computer\'s Bluetooth menu.';
+
+  @override
+  String get diveComputer_download_discoveryStalled =>
+      'Connected to the dive computer, but it stopped responding before the download could start. This usually means the Bluetooth pairing is out of date: forget the dive computer in your device\'s Bluetooth settings, then try again.';
+
+  @override
   String diveComputer_download_serialConnectFailedWithDetails(Object details) {
     return 'Could not connect to dive computer.\n\nDiagnostic details (share with developers):\n$details';
   }
@@ -22481,7 +22701,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settings_security_encryption_subtitle =>
-      'Protect your dive log file with at-rest encryption';
+      'Protect your dive log file with at-rest encryption. Encryption may affect performance.';
 
   @override
   String get settings_security_encryption_progress_backup =>
@@ -22554,7 +22774,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settings_security_enableEncryption_body =>
-      'A safety backup is created first, then the database file is re-encrypted in place. This can take a while for large dive logs.';
+      'A safety backup is created first, then the database file is re-encrypted in place. This can take a while for large dive logs. Encryption may affect performance.';
 
   @override
   String get settings_security_disableEncryption_title =>
@@ -22656,6 +22876,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get dataQuality_repair_applied => 'Repair applied';
+
+  @override
+  String get dataQuality_repair_noChange => 'Nothing to repair here';
 
   @override
   String get dataQuality_repair_failed => 'Repair failed';
@@ -22872,6 +23095,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get dataQuality_repairLabel_despike => 'Remove spike';
+
+  @override
+  String get dataQuality_repairLabel_clampNegative =>
+      'Clamp above-surface depths';
+
+  @override
+  String get dataQuality_repairLabel_smoothRates => 'Smooth impossible rates';
 
   @override
   String get dataQuality_repairLabel_fillGaps => 'Fill gaps';
@@ -23134,6 +23364,30 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get settings_coordinateFormat_title => 'Coordinate format';
+
+  @override
+  String get settings_coordinateFormat_subtitle =>
+      'How GPS positions are shown and entered';
+
+  @override
+  String get settings_coordinateFormat_decimalDegrees => 'Decimal degrees';
+
+  @override
+  String get settings_coordinateFormat_degreesDecimalMinutes =>
+      'Degrees and decimal minutes';
+
+  @override
+  String get settings_coordinateFormat_degreesMinutesSeconds =>
+      'Degrees, minutes, seconds';
+
+  @override
+  String get settings_coordinateFormat_utm => 'UTM';
+
+  @override
+  String get settings_coordinateFormat_mgrs => 'MGRS';
+
+  @override
   String get settings_visibilityScale_title => 'Visibility scale';
 
   @override
@@ -23169,5 +23423,70 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String statistics_conditions_visibility_legacySuffix(String band) {
     return '$band (logged before measurement)';
+  }
+
+  @override
+  String common_selection_countSelected(Object count) {
+    return '$count selected';
+  }
+
+  @override
+  String get common_selection_enterTooltip => 'Select items';
+
+  @override
+  String get common_selection_exitTooltip => 'Exit selection';
+
+  @override
+  String get common_selection_selectAllTooltip => 'Select all';
+
+  @override
+  String get common_selection_deselectAllTooltip => 'Deselect all';
+
+  @override
+  String common_bulkDelete_title(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Delete $count items?',
+      one: 'Delete $count item?',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get common_bulkDelete_body => 'This cannot be undone.';
+
+  @override
+  String common_bulkDelete_snackbar(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count deleted',
+      one: '$count deleted',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get marineLife_species_delete_confirmTitle => 'Delete species?';
+
+  @override
+  String marineLife_species_delete_confirmBody(String name) {
+    return 'Are you sure you want to delete \"$name\"?';
+  }
+
+  @override
+  String marineLife_species_delete_inUseError(String name) {
+    return 'Cannot delete \"$name\" - it has sightings';
+  }
+
+  @override
+  String marineLife_species_delete_snackbar(String name) {
+    return 'Deleted \"$name\"';
+  }
+
+  @override
+  String marineLife_species_delete_error(String error) {
+    return 'Error deleting species: $error';
   }
 }

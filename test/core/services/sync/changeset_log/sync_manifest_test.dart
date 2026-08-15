@@ -42,6 +42,33 @@ void main() {
     expect(back.schemaVersion, isNull);
   });
 
+  test('round-trips deviceName', () {
+    const manifest = SyncManifest(
+      deviceId: 'dev-1',
+      provider: 'icloud',
+      headSeq: 3,
+      updatedAt: 1234,
+      deviceName: 'Erics-MacBook-Pro',
+    );
+
+    final back = SyncManifest.fromJson(manifest.toJson());
+
+    expect(back.deviceName, 'Erics-MacBook-Pro');
+  });
+
+  test('legacy manifest without deviceName parses as null', () {
+    // Peers on older builds publish no name; readers must fall back to the
+    // device id rather than treating this as malformed.
+    final back = SyncManifest.fromJson({
+      'deviceId': 'dev-1',
+      'provider': 'icloud',
+      'headSeq': 3,
+      'updatedAt': 1234,
+    });
+
+    expect(back.deviceName, isNull);
+  });
+
   test('toBytes -> fromBytes round-trips every field', () {
     final m = sample();
     final back = SyncManifest.fromBytes(m.toBytes());

@@ -1,11 +1,11 @@
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 
-import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
 import 'package:intl/intl.dart';
 
+import 'package:submersion/core/constants/units.dart';
 import 'package:submersion/features/certifications/domain/entities/certification.dart';
 import 'package:submersion/features/certifications/domain/certification_title.dart';
 
@@ -18,6 +18,14 @@ class CertificationCardRenderer {
 
   /// Standard credit card aspect ratio (CR80: 85.6mm × 53.98mm).
   static const double _cardAspectRatio = 1.586;
+
+  /// Renders [date] in the diver's date order.
+  ///
+  /// Exposed for tests: both share images burn the date into pixels, so the
+  /// ordering can only be asserted on the string, not on the PNG.
+  @visibleForTesting
+  static String formatDate(DateTime date, DateFormatPreference dateFormat) =>
+      DateFormat(dateFormat.pattern).format(date);
 
   /// Generates a certification card image programmatically using Canvas.
   ///
@@ -130,10 +138,11 @@ class CertificationCardRenderer {
         );
       }
 
-      // Draw issue date at bottom right
+      // Draw issue date at bottom right. Month/year only, mirroring the
+      // physical card this image imitates: there is no day to order, so the
+      // diver's date preference has nothing to change here.
       if (certification.issueDate != null) {
-        final dateFormat = DateFormat('MM/yy');
-        final dateStr = dateFormat.format(certification.issueDate!);
+        final dateStr = DateFormat('MM/yy').format(certification.issueDate!);
         _drawTextRightAligned(
           canvas: canvas,
           text: dateStr,
@@ -270,10 +279,14 @@ class CertificationCardRenderer {
   /// - Issue date and card number at bottom
   ///
   /// Returns the PNG bytes, or null if generation fails.
+  ///
+  /// [dateFormat] is the diver's date order preference; the shared image is a
+  /// static PNG, so the ordering is burned in and cannot be re-read later.
   static Future<Uint8List?> generateCertificateImage({
     required Certification certification,
     required String diverName,
     required AppLocalizations l10n,
+    required DateFormatPreference dateFormat,
   }) async {
     try {
       const width = 1200.0;
@@ -401,9 +414,8 @@ class CertificationCardRenderer {
 
       // Draw issue date and card number at bottom
       if (certification.issueDate != null) {
-        final dateFormat = DateFormat('MMMM d, yyyy');
         final issueDateStr = l10n.certifications_certificate_issued(
-          dateFormat.format(certification.issueDate!),
+          formatDate(certification.issueDate!, dateFormat),
         );
         _drawCenteredText(
           canvas: canvas,

@@ -2360,6 +2360,51 @@ class AppLocalizationsHe extends AppLocalizations {
       'למחוק את רשומת רשימת הבדיקה הזו?';
 
   @override
+  String get preDive_sessions_filter => 'סינון';
+
+  @override
+  String get preDive_sessions_filterTitle => 'סינון רשימות בדיקה שבוצעו';
+
+  @override
+  String get preDive_sessions_filterChecklist => 'רשימת בדיקה';
+
+  @override
+  String get preDive_sessions_filterStatus => 'סטטוס';
+
+  @override
+  String get preDive_sessions_filterFlaggedOnly => 'רק ריצות מסומנות';
+
+  @override
+  String get preDive_sessions_filterDateRange => 'טווח תאריכים';
+
+  @override
+  String get preDive_sessions_filterAnyDate => 'כל תאריך';
+
+  @override
+  String get preDive_sessions_filterClearAll => 'נקה הכול';
+
+  @override
+  String get preDive_sessions_filterApply => 'החל';
+
+  @override
+  String get preDive_sessions_filterFlaggedChip => 'מסומנות בלבד';
+
+  @override
+  String get preDive_sessions_emptyFiltered =>
+      'אין רשימות בדיקה התואמות למסננים אלה';
+
+  @override
+  String get preDive_sessions_export => 'ייצוא ל-Excel';
+
+  @override
+  String get preDive_sessions_exportEmpty => 'אין רשימות בדיקה לייצוא';
+
+  @override
+  String preDive_sessions_exportFailed(String error) {
+    return 'הייצוא נכשל: $error';
+  }
+
+  @override
   String get preDive_start_title => 'התחלת רשימת בדיקה לפני צלילה';
 
   @override
@@ -2884,6 +2929,14 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String dashboard_hero_divesLoggedOther(Object count) {
     return '$count צלילות רשומות';
+  }
+
+  @override
+  String get dashboard_hero_divesTotalOne => 'צלילה אחת';
+
+  @override
+  String dashboard_hero_divesTotalOther(Object count) {
+    return '$count צלילות';
   }
 
   @override
@@ -6050,6 +6103,23 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get setup_syncPull_continue => 'המשך';
+
+  @override
+  String get setup_syncPull_incomplete_message =>
+      'בחשבון זה קיימת ספריית Submersion שהעלאתה מעולם לא הושלמה. אפשרו למכשיר האחר לסיים את הסנכרון ונסו שוב.';
+
+  @override
+  String get setup_syncPull_incomplete_retry => 'בדיקה חוזרת';
+
+  @override
+  String get setup_syncPull_incomplete_title => 'העלאת הספרייה לא הושלמה';
+
+  @override
+  String get setup_syncPull_locked_message =>
+      'הזינו את משפט הסיסמה של ההצפנה כדי לפתוח את הספרייה ולהוריד אותה למכשיר זה.';
+
+  @override
+  String get setup_syncPull_locked_title => 'הספרייה הזו מוצפנת';
 
   @override
   String get setup_syncPull_noLibrary_message =>
@@ -11475,6 +11545,56 @@ class AppLocalizationsHe extends AppLocalizations {
   String get media_diveMediaSection_unlinkSuccess => 'קישור התמונה בוטל';
 
   @override
+  String get media_siteMediaSection_title => 'מדיה של האתר';
+
+  @override
+  String get media_siteMediaSection_addPhotos => 'הוספת תמונות או סרטונים';
+
+  @override
+  String get media_siteMediaSection_addDocument => 'הוספת מסמך';
+
+  @override
+  String get media_siteMediaSection_emptyState =>
+      'אין מפות, תמונות או מסמכים המצורפים לאתר זה';
+
+  @override
+  String media_siteMediaSection_divePhotosGroup(int count) {
+    return 'תמונות מצלילות כאן ($count)';
+  }
+
+  @override
+  String get media_siteMediaSection_divePhotoLabel => 'תמונת צלילה';
+
+  @override
+  String media_siteMediaSection_unlinkSelectedTitle(int count) {
+    return 'להסיר $count קבצים מצורפים?';
+  }
+
+  @override
+  String get media_siteMediaSection_unlinkSelectedContent =>
+      'הפריטים שנבחרו יוסרו מאתר זה. קבצים בספריית התמונות או בדיסק לא יימחקו.';
+
+  @override
+  String media_siteMediaSection_unlinkSelectedSuccess(int count) {
+    return 'הוסרו $count קבצים מצורפים';
+  }
+
+  @override
+  String get media_documentViewer_title => 'מסמך';
+
+  @override
+  String get media_documentViewer_unavailable => 'מסמך זה אינו זמין במכשיר זה';
+
+  @override
+  String get media_documentViewer_availableOnOriginDevice =>
+      'הוא זמין במכשיר שממנו נוסף, או דרך אחסון מדיה מוגדר.';
+
+  @override
+  String media_documentViewer_attached(int count) {
+    return 'צורפו $count מסמכים';
+  }
+
+  @override
   String get media_diveScan_scanTooltip => 'סרוק גלריה לחיפוש תמונות';
 
   @override
@@ -11522,8 +11642,8 @@ class AppLocalizationsHe extends AppLocalizations {
   String get media_gpsBanner_addToSiteButton => 'הוסף לאתר';
 
   @override
-  String media_gpsBanner_coordinates(Object latitude, Object longitude) {
-    return 'קואורדינטות: $latitude, $longitude';
+  String media_gpsBanner_coordinates(Object coordinates) {
+    return 'קואורדינטות: $coordinates';
   }
 
   @override
@@ -13283,11 +13403,75 @@ class AppLocalizationsHe extends AppLocalizations {
   String get settings_cloudSync_adopt_notNow => 'לא עכשיו';
 
   @override
+  String get settings_cloudSync_dangerZone => 'אזור מסוכן';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_tile => 'החלפת ספריית הענן';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_tileSubtitle =>
+      'להפוך את הספרייה של מכשיר זה לספרייה שכל המכשירים משתמשים בה';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_dialogTitle =>
+      'להחליף את ספריית הענן?';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_dialogIntro =>
+      'הספרייה של מכשיר זה הופכת לספרייה שכל המכשירים משתמשים בה.';
+
+  @override
+  String settings_cloudSync_replaceLibrary_dialogBody(num diveCount) {
+    String _temp0 = intl.Intl.pluralLogic(
+      diveCount,
+      locale: localeName,
+      other: 'ספריית הענן נמחקת ומוחלפת ב-$diveCount הצלילות שבמכשיר זה.',
+      one: 'ספריית הענן נמחקת ומוחלפת בצלילה 1 שבמכשיר זה.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String settings_cloudSync_replaceLibrary_peers(num peerCount) {
+    String _temp0 = intl.Intl.pluralLogic(
+      peerCount,
+      locale: localeName,
+      other:
+          '$peerCount מכשירים נוספים יתבקשו לאמץ אותה; עד אז השינויים שלהם לא ימוזגו.',
+      one: 'מכשיר אחד נוסף יתבקש לאמץ אותה; עד אז השינויים שלו לא ימוזגו.',
+      zero: 'אף מכשיר אחר עדיין לא מסתנכרן, ולכן אין מה לאמץ.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get settings_cloudSync_replaceLibrary_peersUnknown =>
+      'כל שאר המכשירים יתבקשו לאמץ אותה; עד אז השינויים שלהם לא ימוזגו.';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_backupNote =>
+      'תחילה נוצר גיבוי של מכשיר זה. לא ניתן לבטל פעולה זו.';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_confirmWord => 'החלפה';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_confirmHint =>
+      'הקלד \"החלפה\" לאישור';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_confirm => 'החלפה';
+
+  @override
   String get settings_cloudSync_firstSync_banner =>
       'הסנכרון הראשון ממתין לאישור. הקש על \'סנכרן עכשיו\' כדי לבדוק מה ישולב.';
 
   @override
   String get settings_cloudSync_firstSync_dialogConfirm => 'מזג וסנכרן';
+
+  @override
+  String get settings_cloudSync_firstSync_replaceHint =>
+      'אם במקום זאת הספרייה של מכשיר זה אמורה להחליף את מה שנמצא בענן, בטל והשתמש בהגדרות > סנכרון ענן > החלפת ספריית הענן.';
 
   @override
   String settings_cloudSync_firstSync_dialogContent(
@@ -13374,6 +13558,27 @@ class AppLocalizationsHe extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String settings_cloudSync_peerNeedsAdopt_banner(Object deviceList) {
+    return 'ל$deviceList עדיין יש גרסת ספרייה ישנה או לא מוכרת, ולכן השינויים שלו לא מוזגו. פתח את Submersion במכשיר כדי לאמץ את הספרייה הנוכחית.';
+  }
+
+  @override
+  String settings_cloudSync_peerNeedsAdopt_bannerPlural(Object deviceList) {
+    return 'ל$deviceList עדיין יש גרסת ספרייה ישנה או לא מוכרת, ולכן השינויים שלהם לא מוזגו. פתח את Submersion במכשירים כדי לאמץ את הספרייה הנוכחית.';
+  }
+
+  @override
+  String settings_cloudSync_peerNeedsAdopt_unnamedDevice(Object shortId) {
+    return 'מכשיר $shortId';
+  }
+
+  @override
+  String get settings_cloudSync_peerNeedsAdopt_listSeparator => ', ';
+
+  @override
+  String get settings_cloudSync_peerNeedsAdopt_listLastSeparator => ' ו-';
 
   @override
   String settings_cloudSync_peerRequiresUpdate_banner(num count) {
@@ -14663,14 +14868,17 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get settings_storage_resetDatabase_subtitle =>
-      'מחק את כל הנתונים והתחל מחדש';
+      'מחק את כל הנתונים במכשיר זה והתחל מחדש';
 
   @override
   String get settings_storage_resetDialog_title => 'לאפס את מסד הנתונים?';
 
   @override
   String get settings_storage_resetDialog_body =>
-      'פעולה זו תמחק לצמיתות את כל הנתונים שלך כולל צלילות, אתרים, ציוד והגדרות. גיבוי ייווצר אוטומטית לפני האיפוס.';
+      'פעולה זו מוחקת לצמיתות את כל הנתונים במכשיר הזה, כולל צלילות, אתרים, ציוד והגדרות. גיבוי נוצר אוטומטית לפני האיפוס.\n\nספריית הענן שלך לא נמחקת, ומכשירים אחרים שומרים על הנתונים שלהם. סנכרון הענן ינותק כדי שהאיפוס לא יבוטל; ניתן לחבר אותו מחדש בהגדרות > סנכרון ענן.';
+
+  @override
+  String get settings_storage_resetDialog_confirmWord => 'מחיקה';
 
   @override
   String get settings_storage_resetDialog_confirmHint =>
@@ -14693,7 +14901,7 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get settings_storage_resetComplete_description =>
-      'הנתונים שלך נמחקו וגיבוי נשמר. הקש על המשך כדי לטעון מחדש את האפליקציה.';
+      'הנתונים במכשיר זה נמחקו וגיבוי נשמר. סנכרון הענן מנותק כעת כדי שהאיפוס לא יבוטל; ניתן לחבר אותו מחדש בהגדרות > סנכרון ענן. הקש על המשך כדי לטעון מחדש את האפליקציה.';
 
   @override
   String get settings_summary_activeDiver => 'צולל פעיל';
@@ -18614,6 +18822,14 @@ class AppLocalizationsHe extends AppLocalizations {
       'לא נמצאו חיבורי USB טוריים. האם מחשב הצלילה מחובר ופועל?';
 
   @override
+  String get diveComputer_download_stalePairing =>
+      'התאמת ה-Bluetooth של מחשב הצלילה הזה אינה עדכנית. שכח את מחשב הצלילה בהגדרות ה-Bluetooth של המכשיר שלך, ולאחר מכן התאם אותו מחדש מתפריט ה-Bluetooth של מחשב הצלילה.';
+
+  @override
+  String get diveComputer_download_discoveryStalled =>
+      'ההתחברות למחשב הצלילה הצליחה, אך הוא הפסיק להגיב לפני תחילת ההורדה. בדרך כלל המשמעות היא שהתאמת ה-Bluetooth אינה עדכנית: שכח את מחשב הצלילה בהגדרות ה-Bluetooth של המכשיר שלך ונסה שוב.';
+
+  @override
   String diveComputer_download_serialConnectFailedWithDetails(Object details) {
     return 'לא ניתן להתחבר למחשב הצלילה.\n\nפרטי אבחון (שתפו עם המפתחים):\n$details';
   }
@@ -22298,7 +22514,7 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get settings_security_encryption_subtitle =>
-      'הגנו על קובץ יומן הצלילות שלכם באמצעות הצפנה במנוחה';
+      'הגנו על קובץ יומן הצלילות שלכם באמצעות הצפנה במנוחה. הצפנה עשויה להשפיע על הביצועים.';
 
   @override
   String get settings_security_encryption_progress_backup =>
@@ -22372,7 +22588,7 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get settings_security_enableEncryption_body =>
-      'תחילה נוצר גיבוי בטיחות ואז קובץ מסד הנתונים מוצפן מחדש במקומו. זה עשוי להימשך זמן מה ביומנים גדולים.';
+      'תחילה נוצר גיבוי בטיחות ואז קובץ מסד הנתונים מוצפן מחדש במקומו. זה עשוי להימשך זמן מה ביומנים גדולים. הצפנה עשויה להשפיע על הביצועים.';
 
   @override
   String get settings_security_disableEncryption_title => 'לכבות את ההצפנה?';
@@ -22473,6 +22689,9 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get dataQuality_repair_applied => 'התיקון הוחל';
+
+  @override
+  String get dataQuality_repair_noChange => 'אין כאן מה לתקן';
 
   @override
   String get dataQuality_repair_failed => 'התיקון נכשל';
@@ -22685,6 +22904,13 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get dataQuality_repairLabel_despike => 'הסרת הקפיצה';
+
+  @override
+  String get dataQuality_repairLabel_clampNegative =>
+      'הגבלת עומקים מעל פני המים';
+
+  @override
+  String get dataQuality_repairLabel_smoothRates => 'החלקת קצבים בלתי אפשריים';
 
   @override
   String get dataQuality_repairLabel_fillGaps => 'מילוי הפערים';
@@ -22939,6 +23165,30 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
+  String get settings_coordinateFormat_title => 'פורמט קואורדינטות';
+
+  @override
+  String get settings_coordinateFormat_subtitle =>
+      'כיצד מוצגים ומוזנים מיקומי GPS';
+
+  @override
+  String get settings_coordinateFormat_decimalDegrees => 'מעלות עשרוניות';
+
+  @override
+  String get settings_coordinateFormat_degreesDecimalMinutes =>
+      'מעלות ודקות עשרוניות';
+
+  @override
+  String get settings_coordinateFormat_degreesMinutesSeconds =>
+      'מעלות, דקות, שניות';
+
+  @override
+  String get settings_coordinateFormat_utm => 'UTM';
+
+  @override
+  String get settings_coordinateFormat_mgrs => 'MGRS';
+
+  @override
   String get settings_visibilityScale_title => 'סולם ראות';
 
   @override
@@ -22973,5 +23223,74 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String statistics_conditions_visibility_legacySuffix(String band) {
     return '$band (נרשם לפני מדידה)';
+  }
+
+  @override
+  String common_selection_countSelected(Object count) {
+    return '$count נבחרו';
+  }
+
+  @override
+  String get common_selection_enterTooltip => 'בחירת פריטים';
+
+  @override
+  String get common_selection_exitTooltip => 'יציאה מבחירה';
+
+  @override
+  String get common_selection_selectAllTooltip => 'בחר הכול';
+
+  @override
+  String get common_selection_deselectAllTooltip => 'בטל בחירת הכול';
+
+  @override
+  String common_bulkDelete_title(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'למחוק $count פריטים?',
+      many: 'למחוק $count פריטים?',
+      two: 'למחוק שני פריטים?',
+      one: 'למחוק פריט אחד?',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get common_bulkDelete_body => 'לא ניתן לבטל פעולה זו.';
+
+  @override
+  String common_bulkDelete_snackbar(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count נמחקו',
+      many: '$count נמחקו',
+      two: 'שני פריטים נמחקו',
+      one: 'פריט אחד נמחק',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get marineLife_species_delete_confirmTitle => 'למחוק מין?';
+
+  @override
+  String marineLife_species_delete_confirmBody(String name) {
+    return 'האם למחוק את \"$name\"?';
+  }
+
+  @override
+  String marineLife_species_delete_inUseError(String name) {
+    return 'לא ניתן למחוק את \"$name\" - יש לו תצפיות';
+  }
+
+  @override
+  String marineLife_species_delete_snackbar(String name) {
+    return '\"$name\" נמחק';
+  }
+
+  @override
+  String marineLife_species_delete_error(String error) {
+    return 'שגיאה במחיקת המין: $error';
   }
 }

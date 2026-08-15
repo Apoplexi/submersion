@@ -80,6 +80,7 @@ final diveCenterByIdProvider = FutureProvider.family<DiveCenter?, String>((
   id,
 ) async {
   final repository = ref.watch(diveCenterRepositoryProvider);
+  ref.invalidateSelfWhen(repository.watchDiveCentersChanges());
   return repository.getDiveCenterById(id);
 });
 
@@ -91,6 +92,7 @@ final diveCentersWithCoordinatesProvider = FutureProvider<List<DiveCenter>>((
   final validatedDiverId = await ref.watch(
     validatedCurrentDiverIdProvider.future,
   );
+  ref.invalidateSelfWhen(repository.watchDiveCentersChanges());
   return repository.getDiveCentersWithCoordinates(diverId: validatedDiverId);
 });
 
@@ -104,6 +106,7 @@ final diveCenterSearchProvider =
         return ref.watch(allDiveCentersProvider).value ?? [];
       }
       final repository = ref.watch(diveCenterRepositoryProvider);
+      ref.invalidateSelfWhen(repository.watchDiveCentersChanges());
       return repository.searchDiveCenters(query, diverId: validatedDiverId);
     });
 
@@ -114,6 +117,7 @@ final diveCentersByCountryProvider =
       final validatedDiverId = await ref.watch(
         validatedCurrentDiverIdProvider.future,
       );
+      ref.invalidateSelfWhen(repository.watchDiveCentersChanges());
       return repository.getDiveCentersByCountry(
         country,
         diverId: validatedDiverId,
@@ -126,6 +130,7 @@ final diveCenterCountriesProvider = FutureProvider<List<String>>((ref) async {
   final validatedDiverId = await ref.watch(
     validatedCurrentDiverIdProvider.future,
   );
+  ref.invalidateSelfWhen(repository.watchDiveCentersChanges());
   return repository.getCountries(diverId: validatedDiverId);
 });
 

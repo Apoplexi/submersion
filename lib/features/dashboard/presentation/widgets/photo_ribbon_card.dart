@@ -6,6 +6,10 @@ import 'package:submersion/features/media/presentation/pages/photo_viewer_page.d
 import 'package:submersion/features/media/presentation/widgets/media_item_view.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 
+/// Ribbon tile size in logical pixels.
+const double _tileWidth = 128;
+const double _tileHeight = 96;
+
 /// Horizontal ribbon of the newest dive photos.
 class PhotoRibbonCard extends ConsumerWidget {
   const PhotoRibbonCard({super.key});
@@ -30,6 +34,16 @@ class PhotoRibbonCard extends ConsumerWidget {
     final photos = photosAsync.valueOrNull ?? const [];
     if (photos.isEmpty) return const SizedBox.shrink();
 
+    // ThumbnailSize reaches PHImageManager (and its Android counterpart) in
+    // DEVICE pixels, so a tile-sized request has to be scaled or it lands
+    // soft on a 2x/3x screen. Square, like every other tile request in the
+    // app, so BoxFit.cover does the cropping here rather than in
+    // photo_manager. Even at 3x this is ~0.15 MP against the ~12 MP original
+    // the unsized request used to decode.
+    final thumbnailTarget = Size.square(
+      _tileWidth * MediaQuery.devicePixelRatioOf(context),
+    );
+
     return Card(
       margin: EdgeInsets.zero,
       child: Padding(
@@ -45,7 +59,7 @@ class PhotoRibbonCard extends ConsumerWidget {
             ),
             const SizedBox(height: 8),
             SizedBox(
-              height: 96,
+              height: _tileHeight,
               child: ListView.separated(
                 scrollDirection: Axis.horizontal,
                 itemCount: photos.length,
@@ -60,8 +74,12 @@ class PhotoRibbonCard extends ConsumerWidget {
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(8),
                       child: SizedBox(
-                        width: 128,
-                        child: MediaItemView(item: item, thumbnail: true),
+                        width: _tileWidth,
+                        child: MediaItemView(
+                          item: item,
+                          thumbnail: true,
+                          targetSize: thumbnailTarget,
+                        ),
                       ),
                     ),
                   );
