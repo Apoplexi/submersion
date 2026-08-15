@@ -6307,6 +6307,8 @@
   "@dive3d_seascape_overlay_walls": {},
   "dive3d_overlay_water": "פני המים",
   "@dive3d_overlay_water": {},
+  "dive3d_seascape_legend_land": "יבשה",
+  "@dive3d_seascape_legend_land": {},
   "dive3d_seascape_siteTitle": "נוף ימי של האתר",
   "@dive3d_seascape_siteTitle": {},
   "dive3d_seascape_seafloorSource": "קרקעית הים: {source} (~{resolution} מ')",

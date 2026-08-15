@@ -6307,6 +6307,8 @@
   "@dive3d_seascape_overlay_walls": {},
   "dive3d_overlay_water": "Wateroppervlak",
   "@dive3d_overlay_water": {},
+  "dive3d_seascape_legend_land": "Land",
+  "@dive3d_seascape_legend_land": {},
   "dive3d_seascape_siteTitle": "Zeelandschap van de duikstek",
   "@dive3d_seascape_siteTitle": {},
   "dive3d_seascape_seafloorSource": "Zeebodem: {source} (~{resolution} m)",

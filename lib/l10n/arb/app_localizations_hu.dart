@@ -21897,6 +21897,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String get dive3d_overlay_water => 'Vízfelszín';
 
   @override
+  String get dive3d_seascape_legend_land => 'Szárazföld';
+
+  @override
   String get dive3d_seascape_siteTitle => 'Helyszíni tengertáj';
 
   @override

@@ -21421,6 +21421,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get dive3d_overlay_water => 'פני המים';
 
   @override
+  String get dive3d_seascape_legend_land => 'יבשה';
+
+  @override
   String get dive3d_seascape_siteTitle => 'נוף ימי של האתר';
 
   @override

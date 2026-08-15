@@ -21971,6 +21971,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String get dive3d_overlay_water => 'Superfície da água';
 
   @override
+  String get dive3d_seascape_legend_land => 'Terra';
+
+  @override
   String get dive3d_seascape_siteTitle => 'Paisagem marinha do local';
 
   @override

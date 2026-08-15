@@ -21985,6 +21985,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get dive3d_overlay_water => 'Superficie del agua';
 
   @override
+  String get dive3d_seascape_legend_land => 'Tierra';
+
+  @override
   String get dive3d_seascape_siteTitle => 'Paisaje marino del sitio';
 
   @override

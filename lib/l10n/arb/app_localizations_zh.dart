@@ -20856,6 +20856,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get dive3d_overlay_water => '水面';
 
   @override
+  String get dive3d_seascape_legend_land => '陆地';
+
+  @override
   String get dive3d_seascape_siteTitle => '潜点海景';
 
   @override

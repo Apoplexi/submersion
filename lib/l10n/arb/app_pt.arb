@@ -6307,6 +6307,8 @@
   "@dive3d_seascape_overlay_walls": {},
   "dive3d_overlay_water": "Superfície da água",
   "@dive3d_overlay_water": {},
+  "dive3d_seascape_legend_land": "Terra",
+  "@dive3d_seascape_legend_land": {},
   "dive3d_seascape_siteTitle": "Paisagem marinha do local",
   "@dive3d_seascape_siteTitle": {},
   "dive3d_seascape_seafloorSource": "Fundo do mar: {source} (~{resolution} m)",

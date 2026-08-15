@@ -6307,6 +6307,8 @@
   "@dive3d_seascape_overlay_walls": {},
   "dive3d_overlay_water": "Wasseroberfläche",
   "@dive3d_overlay_water": {},
+  "dive3d_seascape_legend_land": "Land",
+  "@dive3d_seascape_legend_land": {},
   "dive3d_seascape_siteTitle": "Standort-Seelandschaft",
   "@dive3d_seascape_siteTitle": {},
   "dive3d_seascape_seafloorSource": "Meeresboden: {source} (~{resolution} m)",

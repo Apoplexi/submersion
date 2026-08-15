@@ -6307,6 +6307,8 @@
   "@dive3d_seascape_overlay_walls": {},
   "dive3d_overlay_water": "水面",
   "@dive3d_overlay_water": {},
+  "dive3d_seascape_legend_land": "陆地",
+  "@dive3d_seascape_legend_land": {},
   "dive3d_seascape_siteTitle": "潜点海景",
   "@dive3d_seascape_siteTitle": {},
   "dive3d_seascape_seafloorSource": "海底：{source}（约{resolution}米）",

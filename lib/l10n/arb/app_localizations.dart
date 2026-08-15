@@ -36513,6 +36513,12 @@ abstract class AppLocalizations {
   /// **'Water surface'**
   String get dive3d_overlay_water;
 
+  /// No description provided for @dive3d_seascape_legend_land.
+  ///
+  /// In en, this message translates to:
+  /// **'Land'**
+  String get dive3d_seascape_legend_land;
+
   /// No description provided for @dive3d_seascape_siteTitle.
   ///
   /// In en, this message translates to:

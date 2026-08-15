@@ -6307,6 +6307,8 @@
   "@dive3d_seascape_overlay_walls": {},
   "dive3d_overlay_water": "Vízfelszín",
   "@dive3d_overlay_water": {},
+  "dive3d_seascape_legend_land": "Szárazföld",
+  "@dive3d_seascape_legend_land": {},
   "dive3d_seascape_siteTitle": "Helyszíni tengertáj",
   "@dive3d_seascape_siteTitle": {},
   "dive3d_seascape_seafloorSource": "Tengerfenék: {source} (~{resolution} m)",
