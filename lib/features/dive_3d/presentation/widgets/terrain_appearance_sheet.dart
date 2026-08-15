@@ -35,7 +35,11 @@ class TerrainAppearanceSheet extends ConsumerWidget {
     0xFFA855F7,
   ];
   static const double _defaultRampMaxMeters = 40.0;
-  static const double _defaultNewLevelMeters = 10.0;
+
+  /// Seed for a newly added custom level, in DISPLAY units: the editor rows
+  /// read in the diver's unit, so a fixed metric seed would greet a feet
+  /// diver with 32.8 rather than a round number.
+  static const double _defaultNewLevelDisplay = 10.0;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -133,8 +137,8 @@ class TerrainAppearanceSheet extends ConsumerWidget {
                 appearance.copyWith(
                   customLevels: [
                     ...appearance.customLevels,
-                    const SeascapeContourLevel(
-                      depthMeters: _defaultNewLevelMeters,
+                    SeascapeContourLevel(
+                      depthMeters: _defaultNewLevelDisplay * unitInMeters,
                     ),
                   ],
                 ),

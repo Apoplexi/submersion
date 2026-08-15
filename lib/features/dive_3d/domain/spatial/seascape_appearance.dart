@@ -113,11 +113,7 @@ class SeascapeAppearance extends Equatable {
           ? SeascapeContourMode.custom
           : SeascapeContourMode.auto,
       customLevels: levels is List
-          ? [
-              for (final e in levels)
-                if (SeascapeContourLevel.fromJson(e) != null)
-                  SeascapeContourLevel.fromJson(e)!,
-            ]
+          ? [for (final e in levels) ?SeascapeContourLevel.fromJson(e)]
           : defaults.customLevels,
       contourThickness: (thickness is num && thickness.isFinite)
           ? thickness.toDouble().clamp(0.5, 3.0)

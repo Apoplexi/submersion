@@ -39,6 +39,23 @@ void main() {
     );
   });
 
+  test('decode keeps valid custom levels and drops malformed ones', () {
+    const raw =
+        '{"contourMode":"custom","customLevels":['
+        '{"depthMeters":10},'
+        '"not an object",'
+        '{"depthMeters":-5},'
+        '{"depthMeters":"x"},'
+        '{"depthMeters":20,"colorArgb":16711680}]}';
+    final decoded = SeascapeAppearance.decode(raw);
+    expect(decoded.contourMode, SeascapeContourMode.custom);
+    expect(decoded.customLevels.map((l) => l.depthMeters).toList(), [
+      10.0,
+      20.0,
+    ]);
+    expect(decoded.customLevels.last.colorArgb, 16711680);
+  });
+
   test('copyWith clearRampMax clears the nullable field', () {
     const a = SeascapeAppearance(rampMaxDepthMeters: 40.0);
     expect(a.copyWith(clearRampMax: true).rampMaxDepthMeters, isNull);
