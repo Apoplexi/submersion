@@ -99,10 +99,19 @@ done
 # range_resolved distinguishes "nothing changed" from "could not work out what
 # changed". The former means there is nothing to format; the latter must fall
 # back to formatting the whole project rather than silently checking nothing.
+#
+# It is therefore set ONLY from a diff that actually succeeded. Setting it
+# up-front, or after a diff whose failure `|| true` had swallowed, would let a
+# force-pushed-away remote sha or a partial clone produce an empty file list
+# that the hook then reported as a clean format check having inspected nothing.
+# range_failed makes one bad ref poison the whole push rather than silently
+# scoping the checks to the refs that did resolve.
+#
 # push_sha seeds the generated-l10n sample.
 changed_files=""
 push_sha=""
-range_resolved=0
+range_ok=0
+range_failed=0
 if [ -t 0 ]; then
     # Run manually from a terminal (no ref list piped): fall back to the diff
     # of the current branch against its merge-base with main.
@@ -110,8 +119,12 @@ if [ -t 0 ]; then
     if [ -n "$MAIN_REF" ]; then
         base=$(git merge-base HEAD "$MAIN_REF" 2>/dev/null || true)
         if [ -n "$base" ]; then
-            changed_files=$(git diff --name-only --diff-filter=d "$base" HEAD 2>/dev/null || true)
-            range_resolved=1
+            if changed_files=$(git diff --name-only --diff-filter=d "$base" HEAD 2>/dev/null); then
+                range_ok=1
+            else
+                changed_files=""
+                range_failed=1
+            fi
         fi
     fi
 else
@@ -122,7 +135,6 @@ else
             *) continue ;;
         esac
         [ -n "$push_sha" ] || push_sha="$local_sha"
-        range_resolved=1
         # New branch on remote (remote sha all zeros) has no remote base;
         # bound it by the merge-base with main. Otherwise diff from the
         # remote sha to the local sha (exactly the commits being pushed).
@@ -131,13 +143,25 @@ else
             *) base=$(git merge-base "$local_sha" "${MAIN_REF:-$local_sha}" 2>/dev/null || true) ;;
         esac
         if [ -n "$base" ]; then
-            files=$(git diff --name-only --diff-filter=d "$base" "$local_sha" 2>/dev/null || true)
+            diff_from="$base"
         else
-            files=$(git diff --name-only --diff-filter=d "${local_sha}~1" "$local_sha" 2>/dev/null || true)
+            diff_from="${local_sha}~1"
+        fi
+        if files=$(git diff --name-only --diff-filter=d "$diff_from" "$local_sha" 2>/dev/null); then
+            range_ok=1
+        else
+            files=""
+            range_failed=1
         fi
         changed_files="${changed_files}
 ${files}"
     done
+fi
+
+if [ "$range_ok" = "1" ] && [ "$range_failed" = "0" ]; then
+    range_resolved=1
+else
+    range_resolved=0
 fi
 
 # --- Static checks ----------------------------------------------------------
@@ -243,7 +267,31 @@ default_concurrency() {
     if [ "$n" -lt 2 ]; then n=2; fi
     printf '%s' "$n"
 }
-CONCURRENCY="${TEST_CONCURRENCY:-$(default_concurrency)}"
+
+# Both overrides are interpolated straight into a command (`--concurrency=` and
+# `head -n`), so a typo used to fail that command and, under set -e, abort the
+# push with an error that named neither the variable nor the value. Warn and
+# fall back instead: a mistyped tuning knob must never block a push.
+sanitized_override() {
+    local name="$1" value="$2" fallback="$3"
+    case "$value" in
+        ''|*[!0-9]*|0)
+            echo "⚠️  Ignoring invalid ${name}='${value}'; using ${fallback}." >&2
+            printf '%s' "$fallback"
+            ;;
+        *) printf '%s' "$value" ;;
+    esac
+}
+
+CONCURRENCY="$(default_concurrency)"
+if [ -n "${TEST_CONCURRENCY:-}" ]; then
+    CONCURRENCY="$(sanitized_override TEST_CONCURRENCY "$TEST_CONCURRENCY" "$CONCURRENCY")"
+fi
+
+L10N_SAMPLE_SIZE=40
+if [ -n "${L10N_SAMPLE:-}" ]; then
+    L10N_SAMPLE_SIZE="$(sanitized_override L10N_SAMPLE "$L10N_SAMPLE" 40)"
+fi
 
 # Shared test runner: "$@" is an explicit file list; empty means whole suite.
 run_tests() {
@@ -374,7 +422,7 @@ if [ -s "$l10n_pattern" ]; then
             # djb2 over "seed + path" gives a stable pseudo-random order without
             # a per-file subprocess (the real importer set is ~378 files).
             l10n_pick=$(printf '%s\n' "$l10n_hits" | sort | awk \
-                -v seed="${push_sha:-none}" -v want="${L10N_SAMPLE:-40}" '
+                -v seed="${push_sha:-none}" '
                 BEGIN { for (i = 32; i < 127; i++) ord[sprintf("%c", i)] = i }
                 {
                     s = seed $0; h = 5381
@@ -382,7 +430,7 @@ if [ -s "$l10n_pattern" ]; then
                         h = (h * 33 + ord[substr(s, i, 1)]) % 4294967291
                     }
                     printf "%012d\t%s\n", h, $0
-                }' | sort -n | cut -f2 | head -n "${L10N_SAMPLE:-40}")
+                }' | sort -n | cut -f2 | head -n "$L10N_SAMPLE_SIZE")
         fi
         while IFS= read -r t; do
             [ -n "$t" ] || continue

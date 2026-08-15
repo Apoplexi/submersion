@@ -123,6 +123,27 @@ run_hook() {
     dart_args="$(cat "$tmp/dart.log" 2>/dev/null || true)"
 }
 
+# As run_hook, but the caller supplies the whole ref line. Used to simulate a
+# push range git cannot resolve.
+run_hook_refline() {
+    tmp="$1"
+    refline="$2"
+    shift 2
+
+    cd "$tmp/wt" || exit 1
+    : > "$tmp/cwd.log"
+    : > "$tmp/dart.log"
+
+    printf '%s\n' "$refline" > "$tmp/refline"
+
+    hook_output="$(env "$@" PATH="$tmp/bin:$PATH" CWD_LOG="$tmp/cwd.log" \
+        DART_LOG="$tmp/dart.log" DRY_RUN=1 \
+        /bin/bash "$tmp/main/hooks/pre-push" < "$tmp/refline" 2>&1)"
+    hook_status=$?
+
+    dart_args="$(cat "$tmp/dart.log" 2>/dev/null || true)"
+}
+
 # Assert that the DRY_RUN test list does (or does not) contain a path.
 # $1 = 'has' | 'lacks', $2 = path, $3 = test name
 assert_selected() {
@@ -376,6 +397,77 @@ run_hook "$tmp"
 
 assert_selected has 'test/features/delta/main_importer_test.dart' \
     'keeps importers of a changed top-level lib file'
+
+rm -rf "$tmp"
+
+# --- Test 8: an unresolvable push range formats the whole project -----------
+#
+# Scoping the format check to the changed files is only safe when we actually
+# KNOW what changed. A remote sha git cannot resolve (force-pushed away, partial
+# clone, corrupt object) makes the diff fail; if the hook still treated the range
+# as resolved it would format an empty list and report a pass having checked
+# nothing. Reported by review on PR #1058.
+
+tmp="$(make_proximity_fixture 'lib/features/alpha/presentation/pages/alpha_page.dart')"
+cd "$tmp/wt" || exit 1
+missing='deadbeefdeadbeefdeadbeefdeadbeefdeadbeef'
+run_hook_refline "$tmp" \
+    "refs/heads/feature $(git rev-parse HEAD) refs/heads/feature $missing"
+
+case "$dart_args" in
+    *'--set-exit-if-changed .')
+        pass 'formats the whole project when the push range cannot be resolved'
+        ;;
+    *)
+        fail 'formats the whole project when the push range cannot be resolved' \
+            "dart was invoked as: $dart_args"
+        ;;
+esac
+
+rm -rf "$tmp"
+
+# --- Test 9: bad env overrides warn instead of aborting the push ------------
+#
+# TEST_CONCURRENCY and L10N_SAMPLE are interpolated into `flutter test
+# --concurrency=` and `head -n`. Under set -e a non-numeric value made those
+# commands fail and killed the push with a cryptic error. Reported by review on
+# PR #1058.
+
+tmp="$(make_proximity_fixture 'lib/l10n/arb/app_localizations.dart')"
+run_hook "$tmp" TEST_CONCURRENCY=abc L10N_SAMPLE=notanumber
+
+if [ "$hook_status" -eq 0 ]; then
+    pass 'survives non-numeric TEST_CONCURRENCY and L10N_SAMPLE'
+else
+    fail 'survives non-numeric TEST_CONCURRENCY and L10N_SAMPLE' \
+        "hook exited $hook_status: $hook_output"
+fi
+
+case "$hook_output" in
+    *'invalid TEST_CONCURRENCY'*)
+        pass 'warns about an invalid TEST_CONCURRENCY'
+        ;;
+    *)
+        fail 'warns about an invalid TEST_CONCURRENCY' "output: $hook_output"
+        ;;
+esac
+
+case "$hook_output" in
+    *'invalid L10N_SAMPLE'*)
+        pass 'warns about an invalid L10N_SAMPLE'
+        ;;
+    *)
+        fail 'warns about an invalid L10N_SAMPLE' "output: $hook_output"
+        ;;
+esac
+
+# The bad sample size must fall back to the default, not to "everything".
+selected_l10n="$(printf '%s\n' "$hook_output" | grep -c 'test/features/gamma/l10n_' || true)"
+if [ "$selected_l10n" -eq 40 ]; then
+    pass 'falls back to the default sample size of 40'
+else
+    fail 'falls back to the default sample size of 40' "selected $selected_l10n of 60"
+fi
 
 rm -rf "$tmp"
 
