@@ -318,9 +318,12 @@ jobs:
           echo "$APP_STORE_CONNECT_API_KEY_KEY" | base64 --decode \
             > ${{ matrix.platform }}/fastlane/AuthKey.p8
 
-      # The lane is a no-op when Apple already has this version, so a
-      # re-dispatched promotion skips the platform that already succeeded
-      # instead of failing on it. See already_submitted_state in the Fastfile.
+      # The lane is a no-op when Apple already has a submission under way for
+      # this platform, whatever version it covers, so a re-dispatched promotion
+      # skips the leg that already succeeded instead of failing on it, and a
+      # promotion launched while the previous one is still in review skips
+      # rather than renaming that in-review version. See submission_blocker in
+      # the Fastfile.
       - name: Submit build
         working-directory: ${{ matrix.platform }}
         env:
