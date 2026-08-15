@@ -389,6 +389,7 @@ class _Dive3dInteractiveViewportState extends State<Dive3dInteractiveViewport> {
                   hoverPick: hasHover ? widget.hoverPick : null,
                   contourLabels: widget.contourLabels,
                   mirrorX: widget.chartMode,
+                  panOffset: _pan,
                 ),
                 child: scenePaint,
               )

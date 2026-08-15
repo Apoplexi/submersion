@@ -73,6 +73,9 @@ void main() {
     void Function(SceneMarker)? onMarkerTap,
     ScrubCursorStyle scrubCursor = ScrubCursorStyle.dot,
     bool chartMode = false,
+    AxisFrame? axisFrame,
+    TissueChromeStyle? chromeStyle,
+    bool axisChromeOnly = false,
   }) async {
     await tester.pumpWidget(
       MaterialApp(
@@ -86,12 +89,64 @@ void main() {
             onMarkerTap: onMarkerTap,
             scrubCursor: scrubCursor,
             chartMode: chartMode,
+            axisFrame: axisFrame,
+            chromeStyle: chromeStyle,
+            axisChromeOnly: axisChromeOnly,
           ),
         ),
       ),
     );
     await tester.pump();
   }
+
+  testWidgets('panning threads the offset into the chrome painter', (
+    tester,
+  ) async {
+    const style = TissueChromeStyle(
+      axisX: Color(0xFF000000),
+      axisY: Color(0xFF000000),
+      axisZ: Color(0xFF000000),
+      grid: Color(0xFF000000),
+      wireframe: Color(0x00000000),
+      marker: Color(0xFF000000),
+      markerOutline: Color(0xFFFFFFFF),
+      label: Color(0xFF000000),
+    );
+    await pumpViewport(
+      tester,
+      scene: buildScene(),
+      chartMode: true,
+      axisChromeOnly: true,
+      axisFrame: const AxisFrame([]),
+      chromeStyle: style,
+    );
+    AxisChromePainter chrome() => tester
+        .widgetList<CustomPaint>(
+          find.descendant(
+            of: find.byType(Dive3dInteractiveViewport),
+            matching: find.byType(CustomPaint),
+          ),
+        )
+        .map((p) => p.foregroundPainter)
+        .whereType<AxisChromePainter>()
+        .single;
+    expect(chrome().panOffset, Offset.zero);
+    // Chart mode: a one-finger drag pans, and the chrome painter must know
+    // the pan so fixed chrome (the compass) can cancel it.
+    await tester.drag(
+      find.byType(Dive3dInteractiveViewport),
+      const Offset(60, 40),
+    );
+    await tester.pump();
+    // Touch slop consumes the first stretch of the gesture, so assert the
+    // pan moved substantially rather than by the raw drag distance.
+    expect(chrome().panOffset.dx, greaterThan(20));
+    expect(chrome().panOffset.dy, greaterThan(10));
+
+    await tester.pump(const Duration(seconds: 1));
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pump(const Duration(seconds: 1));
+  });
 
   testWidgets('chart mode pins the chart pose and pans instead of rotating', (
     tester,

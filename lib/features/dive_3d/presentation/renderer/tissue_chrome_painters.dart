@@ -217,6 +217,11 @@ class AxisChromePainter extends CustomPainter {
   final List<ContourLabelSpec>? contourLabels;
   final bool mirrorX;
 
+  /// The viewport's screen-space pan translation. World-anchored chrome
+  /// (axes, labels, hover ring) should ride the pan, but fixed chrome (the
+  /// compass) must cancel it to stay pinned in its corner.
+  final Offset panOffset;
+
   AxisChromePainter({
     required this.bounds,
     required this.frame,
@@ -230,7 +235,14 @@ class AxisChromePainter extends CustomPainter {
     this.hoverPick,
     this.contourLabels,
     this.mirrorX = false,
+    this.panOffset = Offset.zero,
   }) : super(repaint: hoverPick);
+
+  /// Where the compass rose draws: its fixed corner position pre-shifted
+  /// by -[panOffset], so the viewport's pan Transform lands it back in the
+  /// corner.
+  static Offset compassCenter(Size size, Offset panOffset) =>
+      Offset(_compassInset.dx, size.height - _compassInset.dy) - panOffset;
 
   static const double _compassRadius = 18;
   static const Offset _compassInset = Offset(36, 36);
@@ -303,7 +315,7 @@ class AxisChromePainter extends CustomPainter {
   void _paintCompass(Canvas canvas, Size size, SceneProjector p) {
     final angle = compassNeedleAngle(p);
     if (angle == null) return;
-    final center = Offset(_compassInset.dx, size.height - _compassInset.dy);
+    final center = compassCenter(size, panOffset);
     canvas.drawCircle(
       center,
       _compassRadius,
@@ -381,6 +393,7 @@ class AxisChromePainter extends CustomPainter {
       !identical(old.surfaceGrid, surfaceGrid) ||
       !identical(old.contourLabels, contourLabels) ||
       old.mirrorX != mirrorX ||
+      old.panOffset != panOffset ||
       old.style != style ||
       old.textDirection != textDirection;
 }
