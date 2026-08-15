@@ -72,6 +72,7 @@ void main() {
     ValueListenable<double>? scrub,
     void Function(SceneMarker)? onMarkerTap,
     ScrubCursorStyle scrubCursor = ScrubCursorStyle.dot,
+    bool chartMode = false,
   }) async {
     await tester.pumpWidget(
       MaterialApp(
@@ -84,12 +85,38 @@ void main() {
             visibleOverlays: SceneOverlay.values.toSet(),
             onMarkerTap: onMarkerTap,
             scrubCursor: scrubCursor,
+            chartMode: chartMode,
           ),
         ),
       ),
     );
     await tester.pump();
   }
+
+  testWidgets('chart mode pins the chart pose and pans instead of rotating', (
+    tester,
+  ) async {
+    await pumpViewport(tester, scene: buildScene(), chartMode: true);
+    var painter = scenePainterOf(tester);
+    expect(painter.yawDegrees, chartYawDegrees);
+    expect(painter.pitchDegrees, chartPitchDegrees);
+    expect(painter.mirrorX, isTrue);
+    // A drag must NOT change yaw/pitch (it pans the plan view).
+    await tester.drag(
+      find.byType(Dive3dInteractiveViewport),
+      const Offset(60, 40),
+    );
+    await tester.pump();
+    painter = scenePainterOf(tester);
+    expect(painter.yawDegrees, chartYawDegrees);
+    expect(painter.pitchDegrees, chartPitchDegrees);
+
+    // Let gesture-recognizer timers finish, then unmount so nothing is
+    // pending at teardown.
+    await tester.pump(const Duration(seconds: 1));
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pump(const Duration(seconds: 1));
+  });
 
   testWidgets('renders the scene painter with the default camera', (
     tester,
