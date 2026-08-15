@@ -697,7 +697,7 @@ class SyncRepository {
     try {
       final query = _db.select(_db.syncRecords)
         ..where((t) => t.syncStatus.equals('pending'));
-      return query.get();
+      return await query.get();
     } catch (e, stackTrace) {
       _log.error(
         'Failed to get pending records',
@@ -713,7 +713,7 @@ class SyncRepository {
     try {
       final query = _db.select(_db.syncRecords)
         ..where((t) => t.syncStatus.equals('conflict'));
-      return query.get();
+      return await query.get();
     } catch (e, stackTrace) {
       _log.error(
         'Failed to get conflict records',
@@ -736,7 +736,11 @@ class SyncRepository {
                 ..addColumns([count])
                 ..where(_db.syncRecords.syncStatus.equals('pending')))
               .getSingle();
-      return row.read(count) ?? 0;
+      // Hoisted to a local on purpose: TypedResult.read is synchronous, but
+      // Dart 3.13's unawaited_return_in_try_block false-positives on returning
+      // it directly from a try. Do not inline this back.
+      final pending = row.read(count) ?? 0;
+      return pending;
     } catch (e, stackTrace) {
       _log.error(
         'Failed to get pending count',
@@ -773,7 +777,11 @@ class SyncRepository {
         );
       }
       final row = await query.getSingle();
-      return row.read(count) ?? 0;
+      // Hoisted to a local on purpose: TypedResult.read is synchronous, but
+      // Dart 3.13's unawaited_return_in_try_block false-positives on returning
+      // it directly from a try. Do not inline this back.
+      final deletions = row.read(count) ?? 0;
+      return deletions;
     } catch (e, stackTrace) {
       _log.error(
         'Failed to get unpublished deletion count',
@@ -945,7 +953,7 @@ class SyncRepository {
         ..where(
           (t) => t.deletedAt.isBiggerOrEqualValue(since.millisecondsSinceEpoch),
         );
-      return query.get();
+      return await query.get();
     } catch (e, stackTrace) {
       _log.error(
         'Failed to get deletions since: $since',
@@ -959,7 +967,7 @@ class SyncRepository {
   /// Get all deletions
   Future<List<DeletionLogData>> getAllDeletions() async {
     try {
-      return _db.select(_db.deletionLog).get();
+      return await _db.select(_db.deletionLog).get();
     } catch (e, stackTrace) {
       _log.error(
         'Failed to get all deletions',

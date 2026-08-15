@@ -45,7 +45,7 @@ class ThumbnailGenerator {
       if (item.isDocument) {
         // Opaque documents have no thumbnail; PDFs get a page-1 render.
         if (!item.isPdf) return null;
-        return switch (data) {
+        return await switch (data) {
           FileData(file: final f) => _stagePdfThumb(file: f),
           BytesData(bytes: final b) => _stagePdfThumb(bytes: b),
           NetworkData() || UnavailableData() => null,
@@ -64,14 +64,17 @@ class ThumbnailGenerator {
           // original's filename: a video row carries a .mp4 name but its
           // rendition is a JPEG poster frame, and decoding by that name
           // would always fail.
-          return _resizeToJpeg(b, 'rendition.jpg');
+          return await _resizeToJpeg(b, 'rendition.jpg');
         case BytesData(bytes: final b):
           // Non-gallery BytesData is the original (e.g. a bookmark read on
           // iOS/macOS): resize and re-encode so full-size bytes and their
           // EXIF/GPS never masquerade as a thumb.
-          return _resizeToJpeg(b, item.originalFilename);
+          return await _resizeToJpeg(b, item.originalFilename);
         case FileData(file: final f):
-          return _resizeToJpeg(await f.readAsBytes(), item.originalFilename);
+          return await _resizeToJpeg(
+            await f.readAsBytes(),
+            item.originalFilename,
+          );
         case NetworkData():
         case UnavailableData():
           return null;
