@@ -21968,9 +21968,6 @@ class AppLocalizationsDe extends AppLocalizations {
   String get dive3d_seascape_appearance_defaultColor => 'Standard';
 
   @override
-  String get dive3d_seascape_appearance_thickness => 'Liniendicke';
-
-  @override
   String get dive3d_seascape_appearance_wallAngle => 'Steilwand-Winkel';
 
   @override

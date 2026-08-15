@@ -6331,8 +6331,6 @@
   "@dive3d_seascape_appearance_addLevel": {},
   "dive3d_seascape_appearance_defaultColor": "Predefinito",
   "@dive3d_seascape_appearance_defaultColor": {},
-  "dive3d_seascape_appearance_thickness": "Spessore delle linee",
-  "@dive3d_seascape_appearance_thickness": {},
   "dive3d_seascape_appearance_wallAngle": "Angolo di parete ripida",
   "@dive3d_seascape_appearance_wallAngle": {},
   "dive3d_seascape_appearance_wallAngleNote": "Le celle batimetriche mediano la pendenza interna, quindi le pareti reali sembrano meno ripide. Restare ben sotto i 45 gradi.",

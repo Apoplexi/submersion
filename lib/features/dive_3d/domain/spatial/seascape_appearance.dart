@@ -43,9 +43,6 @@ class SeascapeAppearance extends Equatable {
   final SeascapeContourMode contourMode;
   final List<SeascapeContourLevel> customLevels;
 
-  /// Multiplier on contour ribbon width, slider range 0.5 to 3.0.
-  final double contourThickness;
-
   /// Cells steeper than this highlight as walls, slider range 5 to 90.
   final double wallAngleDeg;
 
@@ -54,7 +51,6 @@ class SeascapeAppearance extends Equatable {
     this.rampBanded = false,
     this.contourMode = SeascapeContourMode.auto,
     this.customLevels = const [],
-    this.contourThickness = 1.0,
     this.wallAngleDeg = 22.0,
   });
 
@@ -64,7 +60,6 @@ class SeascapeAppearance extends Equatable {
     bool? rampBanded,
     SeascapeContourMode? contourMode,
     List<SeascapeContourLevel>? customLevels,
-    double? contourThickness,
     double? wallAngleDeg,
   }) => SeascapeAppearance(
     rampMaxDepthMeters: clearRampMax
@@ -73,7 +68,6 @@ class SeascapeAppearance extends Equatable {
     rampBanded: rampBanded ?? this.rampBanded,
     contourMode: contourMode ?? this.contourMode,
     customLevels: customLevels ?? this.customLevels,
-    contourThickness: contourThickness ?? this.contourThickness,
     wallAngleDeg: wallAngleDeg ?? this.wallAngleDeg,
   );
 
@@ -82,7 +76,6 @@ class SeascapeAppearance extends Equatable {
     'rampBanded': rampBanded,
     'contourMode': contourMode.name,
     'customLevels': [for (final l in customLevels) l.toJson()],
-    'contourThickness': contourThickness,
     'wallAngleDeg': wallAngleDeg,
   });
 
@@ -102,7 +95,6 @@ class SeascapeAppearance extends Equatable {
     final banded = parsed['rampBanded'];
     final mode = parsed['contourMode'];
     final levels = parsed['customLevels'];
-    final thickness = parsed['contourThickness'];
     final wall = parsed['wallAngleDeg'];
     return SeascapeAppearance(
       rampMaxDepthMeters: (ramp is num && ramp.isFinite && ramp > 0)
@@ -115,9 +107,6 @@ class SeascapeAppearance extends Equatable {
       customLevels: levels is List
           ? [for (final e in levels) ?SeascapeContourLevel.fromJson(e)]
           : defaults.customLevels,
-      contourThickness: (thickness is num && thickness.isFinite)
-          ? thickness.toDouble().clamp(0.5, 3.0)
-          : defaults.contourThickness,
       wallAngleDeg: (wall is num && wall.isFinite)
           ? wall.toDouble().clamp(5.0, 90.0)
           : defaults.wallAngleDeg,
@@ -130,7 +119,6 @@ class SeascapeAppearance extends Equatable {
     rampBanded,
     contourMode,
     customLevels,
-    contourThickness,
     wallAngleDeg,
   ];
 }

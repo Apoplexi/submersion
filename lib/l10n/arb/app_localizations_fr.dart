@@ -22080,9 +22080,6 @@ class AppLocalizationsFr extends AppLocalizations {
   String get dive3d_seascape_appearance_defaultColor => 'Par défaut';
 
   @override
-  String get dive3d_seascape_appearance_thickness => 'Épaisseur des lignes';
-
-  @override
   String get dive3d_seascape_appearance_wallAngle => 'Angle de tombant';
 
   @override

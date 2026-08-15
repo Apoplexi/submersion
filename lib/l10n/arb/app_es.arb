@@ -6331,8 +6331,6 @@
   "@dive3d_seascape_appearance_addLevel": {},
   "dive3d_seascape_appearance_defaultColor": "Predeterminado",
   "@dive3d_seascape_appearance_defaultColor": {},
-  "dive3d_seascape_appearance_thickness": "Grosor de las líneas",
-  "@dive3d_seascape_appearance_thickness": {},
   "dive3d_seascape_appearance_wallAngle": "Ángulo de pared vertical",
   "@dive3d_seascape_appearance_wallAngle": {},
   "dive3d_seascape_appearance_wallAngleNote": "Las celdas batimétricas promedian la pendiente interior, así que las paredes reales parecen menos inclinadas. Manténgalo muy por debajo de 45 grados.",

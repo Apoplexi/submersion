@@ -20892,9 +20892,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get dive3d_seascape_appearance_defaultColor => '默认';
 
   @override
-  String get dive3d_seascape_appearance_thickness => '等深线粗细';
-
-  @override
   String get dive3d_seascape_appearance_wallAngle => '陡壁角度';
 
   @override

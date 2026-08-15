@@ -13985,8 +13985,6 @@
   "@dive3d_seascape_appearance_addLevel": {},
   "dive3d_seascape_appearance_defaultColor": "Default",
   "@dive3d_seascape_appearance_defaultColor": {},
-  "dive3d_seascape_appearance_thickness": "Contour line thickness",
-  "@dive3d_seascape_appearance_thickness": {},
   "dive3d_seascape_appearance_wallAngle": "Steep wall angle",
   "@dive3d_seascape_appearance_wallAngle": {},
   "dive3d_seascape_appearance_wallAngleNote": "Bathymetry cells average the slope inside them, so real walls read flatter than they are. Keep this well under 45 degrees.",

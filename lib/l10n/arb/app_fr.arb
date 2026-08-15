@@ -6331,8 +6331,6 @@
   "@dive3d_seascape_appearance_addLevel": {},
   "dive3d_seascape_appearance_defaultColor": "Par défaut",
   "@dive3d_seascape_appearance_defaultColor": {},
-  "dive3d_seascape_appearance_thickness": "Épaisseur des lignes",
-  "@dive3d_seascape_appearance_thickness": {},
   "dive3d_seascape_appearance_wallAngle": "Angle de tombant",
   "@dive3d_seascape_appearance_wallAngle": {},
   "dive3d_seascape_appearance_wallAngleNote": "Les cellules bathymétriques moyennent la pente interne : les vrais tombants paraissent moins raides. Rester bien en dessous de 45 degrés.",

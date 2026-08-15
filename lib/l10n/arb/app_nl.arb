@@ -6331,8 +6331,6 @@
   "@dive3d_seascape_appearance_addLevel": {},
   "dive3d_seascape_appearance_defaultColor": "Standaard",
   "@dive3d_seascape_appearance_defaultColor": {},
-  "dive3d_seascape_appearance_thickness": "Lijndikte",
-  "@dive3d_seascape_appearance_thickness": {},
   "dive3d_seascape_appearance_wallAngle": "Steile-wandhoek",
   "@dive3d_seascape_appearance_wallAngle": {},
   "dive3d_seascape_appearance_wallAngleNote": "Bathymetriecellen middelen de helling binnenin, echte wanden ogen dus vlakker. Blijf ruim onder 45 graden.",

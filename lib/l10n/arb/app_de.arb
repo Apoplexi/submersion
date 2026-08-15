@@ -6331,8 +6331,6 @@
   "@dive3d_seascape_appearance_addLevel": {},
   "dive3d_seascape_appearance_defaultColor": "Standard",
   "@dive3d_seascape_appearance_defaultColor": {},
-  "dive3d_seascape_appearance_thickness": "Liniendicke",
-  "@dive3d_seascape_appearance_thickness": {},
   "dive3d_seascape_appearance_wallAngle": "Steilwand-Winkel",
   "@dive3d_seascape_appearance_wallAngle": {},
   "dive3d_seascape_appearance_wallAngleNote": "Bathymetriezellen mitteln das Gefälle in ihrem Inneren, echte Wände wirken daher flacher. Deutlich unter 45 Grad bleiben.",

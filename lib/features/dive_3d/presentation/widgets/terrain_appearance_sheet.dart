@@ -147,19 +147,6 @@ class TerrainAppearanceSheet extends ConsumerWidget {
           ],
           ListTile(
             contentPadding: EdgeInsets.zero,
-            title: Text(l10n.dive3d_seascape_appearance_thickness),
-            subtitle: Slider(
-              key: const ValueKey('seascapeThicknessSlider'),
-              min: 0.5,
-              max: 3.0,
-              divisions: 10,
-              value: appearance.contourThickness,
-              onChanged: (v) =>
-                  update(appearance.copyWith(contourThickness: v)),
-            ),
-          ),
-          ListTile(
-            contentPadding: EdgeInsets.zero,
             title: Text(l10n.dive3d_seascape_appearance_wallAngle),
             subtitle: Slider(
               key: const ValueKey('seascapeWallAngleSlider'),

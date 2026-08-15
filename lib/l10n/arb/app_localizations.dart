@@ -36585,12 +36585,6 @@ abstract class AppLocalizations {
   /// **'Default'**
   String get dive3d_seascape_appearance_defaultColor;
 
-  /// No description provided for @dive3d_seascape_appearance_thickness.
-  ///
-  /// In en, this message translates to:
-  /// **'Contour line thickness'**
-  String get dive3d_seascape_appearance_thickness;
-
   /// No description provided for @dive3d_seascape_appearance_wallAngle.
   ///
   /// In en, this message translates to:

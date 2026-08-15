@@ -21457,9 +21457,6 @@ class AppLocalizationsHe extends AppLocalizations {
   String get dive3d_seascape_appearance_defaultColor => 'ברירת מחדל';
 
   @override
-  String get dive3d_seascape_appearance_thickness => 'עובי הקווים';
-
-  @override
   String get dive3d_seascape_appearance_wallAngle => 'זווית קיר תלול';
 
   @override

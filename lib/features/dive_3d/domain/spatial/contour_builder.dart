@@ -252,12 +252,7 @@ ContourBuildResult buildContourLayers({
       sceneLines.add(xyz);
       layers.add(
         SceneLayer(
-          _ribbonMesh(
-            xyz,
-            isMajor: level.isMajor,
-            colorArgb: level.colorArgb,
-            thicknessFactor: appearance.contourThickness,
-          ),
+          _ribbonMesh(xyz, isMajor: level.isMajor, colorArgb: level.colorArgb),
           overlay: SceneOverlay.contours,
           drapedOnTerrain: true,
         ),
@@ -291,7 +286,6 @@ MeshData _ribbonMesh(
   List<double> xyz, {
   required bool isMajor,
   required int? colorArgb,
-  required double thicknessFactor,
 }) {
   final n = xyz.length ~/ 3;
   if (n < 2) {
@@ -301,8 +295,7 @@ MeshData _ribbonMesh(
       colors: Float32List(0),
     );
   }
-  final halfWidth =
-      (isMajor ? _majorHalfWidth : _minorHalfWidth) * thicknessFactor;
+  final halfWidth = isMajor ? _majorHalfWidth : _minorHalfWidth;
   final color = colorArgb != null ? Color(colorArgb) : _contourInk;
   final opacity = colorArgb != null
       ? _majorOpacity

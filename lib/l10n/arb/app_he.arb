@@ -6331,8 +6331,6 @@
   "@dive3d_seascape_appearance_addLevel": {},
   "dive3d_seascape_appearance_defaultColor": "ברירת מחדל",
   "@dive3d_seascape_appearance_defaultColor": {},
-  "dive3d_seascape_appearance_thickness": "עובי הקווים",
-  "@dive3d_seascape_appearance_thickness": {},
   "dive3d_seascape_appearance_wallAngle": "זווית קיר תלול",
   "@dive3d_seascape_appearance_wallAngle": {},
   "dive3d_seascape_appearance_wallAngleNote": "תאי מדידת עומק ממצעים את השיפוע שבתוכם, ולכן קירות אמיתיים נראים מתונים יותר. יש להישאר הרבה מתחת ל-45 מעלות.",

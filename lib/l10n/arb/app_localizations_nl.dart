@@ -21838,9 +21838,6 @@ class AppLocalizationsNl extends AppLocalizations {
   String get dive3d_seascape_appearance_defaultColor => 'Standaard';
 
   @override
-  String get dive3d_seascape_appearance_thickness => 'Lijndikte';
-
-  @override
   String get dive3d_seascape_appearance_wallAngle => 'Steile-wandhoek';
 
   @override

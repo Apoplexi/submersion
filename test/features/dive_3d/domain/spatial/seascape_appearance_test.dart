@@ -8,7 +8,6 @@ void main() {
     expect(a.rampBanded, isFalse);
     expect(a.contourMode, SeascapeContourMode.auto);
     expect(a.customLevels, isEmpty);
-    expect(a.contourThickness, 1.0);
     expect(a.wallAngleDeg, 22.0);
   });
 
@@ -21,12 +20,20 @@ void main() {
         SeascapeContourLevel(depthMeters: 10.0),
         SeascapeContourLevel(depthMeters: 20.0, colorArgb: 0xFFEF4444),
       ],
-      contourThickness: 1.5,
       wallAngleDeg: 30.0,
     );
     final decoded = SeascapeAppearance.decode(a.encode());
     expect(decoded, a);
     expect(decoded.customLevels[1].colorArgb, 0xFFEF4444);
+  });
+
+  test('stored JSON from builds with the thickness field still decodes', () {
+    // contourThickness shipped briefly and was removed; the defensive
+    // decoder must ignore the legacy key without disturbing its neighbors.
+    const raw = '{"rampBanded":true,"contourThickness":2.5,"wallAngleDeg":30}';
+    final decoded = SeascapeAppearance.decode(raw);
+    expect(decoded.rampBanded, isTrue);
+    expect(decoded.wallAngleDeg, 30.0);
   });
 
   test('decode of null, garbage, or wrong shapes yields defaults', () {

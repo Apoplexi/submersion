@@ -68,6 +68,18 @@ Second pass (Eric, 2026-08-15, incorporating issue #1065, all four accepted):
 - The seascape becomes reachable from the dive-sites map marker callout,
   not only the site detail app bar.
 
+Post-review amendments (Eric, 2026-08-15, after using the build):
+
+- The contour line thickness option is REMOVED (no slider, no
+  `contourThickness` field; ribbon widths are the fixed minor/major
+  constants). Legacy stored JSON containing the field still decodes.
+- The compass rose stays pinned in its corner under pan: the chrome
+  painter receives the viewport's pan offset and pre-subtracts it for
+  fixed chrome, while world-anchored chrome keeps riding the pan.
+- The occlusion mechanism below is CORRECTED: layer order alone cannot
+  occlude draped geometry, so the renderer depth-sorts draped layers
+  together with the terrain.
+
 ## Design
 
 ### Contour generation
@@ -117,14 +129,22 @@ Instead each polyline becomes a thin triangle-strip ribbon (the dive-path
 ribbon pattern), lifted a small epsilon above the terrain surface to avoid
 z-fighting the mesh, and packaged as `SceneLayer`s gated by a new
 `SceneOverlay.contours` value (default visible on both seascape scenes).
-Ribbons participate in the painter's back-to-front triangle sort, so
-occlusion is correct for free.
 
-Styling: minor contours are fine, semi-transparent dark ink; major contours
-are wider and more opaque. Default colors are fixed constants beside the
-terrain ramp constants in the builder; Custom-mode per-level colors override
-them. A single global line-thickness factor from the appearance sheet scales
-minor and major ribbon widths proportionally in both modes.
+Occlusion (corrected post-review): the painter draws each mesh whole in
+layer order, and its back-to-front triangle sort is per-mesh, so layer
+order alone would paint every ribbon over the terrain, far side included.
+Draped layers (contours, walls) therefore carry
+`SceneLayer.drapedOnTerrain`; the renderer merges the terrain plus all
+visible draped layers into one triangle soup and depth-sorts them together
+(each triangle keeping its source mesh's opacity), while paths, pins, and
+water keep plain layer order on top. Chip toggling stays free: hidden
+draped layers are simply excluded from the merge.
+
+Styling: minor contours are fine, semi-transparent light ink; major
+contours are wider and more opaque, at fixed widths (the thickness option
+was removed post-review). Default colors are fixed constants beside the
+terrain ramp constants in the builder; Custom-mode per-level colors
+override them.
 
 ### Contour labels
 
@@ -195,7 +215,6 @@ sessions and apply to both pages:
   10 equal segments across the active ramp range.
 - **Contour mode:** Auto (default) or Custom, with the Custom level/color
   editor.
-- **Line thickness:** one global slider with manual input.
 - **Steep-wall threshold:** angle slider (5 to 90 degrees) with manual
   input, default 22 degrees, with a one-line caption explaining that grid
   resolution smooths
@@ -204,8 +223,8 @@ sessions and apply to both pages:
 
 Persistence (corrected at planning time): the knobs live on `AppSettings`
 as ONE `SeascapeAppearance` value object (fields: `rampMaxDepthMeters`
-nullable, `rampBanded`, `contourMode`, `customLevels`, `contourThickness`,
-`wallAngleDeg`), persisted DEVICE-LOCALLY as a single JSON string in
+nullable, `rampBanded`, `contourMode`, `customLevels`, `wallAngleDeg`),
+persisted DEVICE-LOCALLY as a single JSON string in
 SharedPreferences (`SettingsKeys.seascapeAppearance`, the
 `profileMetricsFollowViewport` lane). The per-diver `diver_settings` table
 is deliberately NOT touched: its discrete columns would require a main-DB
@@ -308,8 +327,8 @@ TDD throughout:
 - Export/share chart as image (respect the existing share-vs-save duality
   when it comes).
 - Chart mode on the per-dive seascape page.
-- Per-level line thickness (one global slider only) and per-site appearance
-  overrides (appearance settings are global).
+- Any contour line thickness control (removed post-review) and per-site
+  appearance overrides (appearance settings are global).
 - Slices 2 to 5 of the program (site features, wreck suggestions, measure +
   depth-limit shading, coverage layer). Issue #1065's measure request lands
   in slice 4.

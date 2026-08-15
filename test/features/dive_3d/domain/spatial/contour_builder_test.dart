@@ -313,17 +313,17 @@ void main() {
       expect(result.labels.single.anchorsXyz[1], closeTo(y + 0.08, 1e-6));
     });
 
-    test('ribbon width scales with thickness and majors are wider', () {
+    test('major contour ribbons are wider than minors', () {
       final grid = gridOf([
         [5.0, 5.0, 5.0],
         [25.0, 25.0, 25.0],
         [45.0, 45.0, 45.0],
       ]);
-      ContourBuildResult at(double thickness) => buildContourLayers(
+      final result = buildContourLayers(
         grid: grid,
         center: center,
         projection: projFor(grid),
-        appearance: SeascapeAppearance(contourThickness: thickness),
+        appearance: const SeascapeAppearance(),
         displayUnitInMeters: 1.0,
         depthSymbol: 'm',
       );
@@ -335,14 +335,8 @@ void main() {
         return math.sqrt(dx * dx + dz * dz);
       }
 
-      final thin = at(1.0);
-      final thick = at(2.0);
-      expect(
-        widthOf(thick.layers.first),
-        closeTo(widthOf(thin.layers.first) * 2, 1e-6),
-      );
       // Rendered levels are 10,15,20,25,...: the 25 m major is index 3.
-      expect(widthOf(thin.layers[3]), greaterThan(widthOf(thin.layers[0])));
+      expect(widthOf(result.layers[3]), greaterThan(widthOf(result.layers[0])));
     });
 
     test('custom level color overrides the ink', () {

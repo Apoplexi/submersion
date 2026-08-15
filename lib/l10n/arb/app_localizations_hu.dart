@@ -21934,9 +21934,6 @@ class AppLocalizationsHu extends AppLocalizations {
   String get dive3d_seascape_appearance_defaultColor => 'Alapértelmezett';
 
   @override
-  String get dive3d_seascape_appearance_thickness => 'Vonalvastagság';
-
-  @override
   String get dive3d_seascape_appearance_wallAngle => 'Meredek fal szöge';
 
   @override

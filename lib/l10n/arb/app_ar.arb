@@ -6331,8 +6331,6 @@
   "@dive3d_seascape_appearance_addLevel": {},
   "dive3d_seascape_appearance_defaultColor": "افتراضي",
   "@dive3d_seascape_appearance_defaultColor": {},
-  "dive3d_seascape_appearance_thickness": "سماكة الخطوط",
-  "@dive3d_seascape_appearance_thickness": {},
   "dive3d_seascape_appearance_wallAngle": "زاوية الجدار الشديد",
   "@dive3d_seascape_appearance_wallAngle": {},
   "dive3d_seascape_appearance_wallAngleNote": "تحسب خلايا قياس الأعماق متوسط الميل داخلها، لذا تبدو الجدران الحقيقية أقل انحدارا. ابق أقل بكثير من 45 درجة.",
