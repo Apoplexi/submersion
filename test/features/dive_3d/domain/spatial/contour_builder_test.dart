@@ -1,6 +1,13 @@
+import 'dart:math' as math;
+
 import 'package:flutter_test/flutter_test.dart';
+import 'package:submersion/features/bathymetry/domain/bathymetry_grid.dart';
+import 'package:submersion/features/dive_3d/domain/scene_3d.dart';
 import 'package:submersion/features/dive_3d/domain/spatial/contour_builder.dart';
 import 'package:submersion/features/dive_3d/domain/spatial/seascape_appearance.dart';
+import 'package:submersion/features/dive_3d/domain/spatial/spatial_projection.dart';
+import 'package:submersion/features/dive_3d/presentation/scene_overlay.dart';
+import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
 
 void main() {
   group('resolvedContourLevels auto mode', () {
@@ -237,6 +244,147 @@ void main() {
         ),
         isEmpty,
       );
+    });
+  });
+
+  group('buildContourLayers', () {
+    BathymetryGrid gridOf(List<List<double?>> rowsSouthToNorth) {
+      final rows = rowsSouthToNorth.length;
+      final cols = rowsSouthToNorth.first.length;
+      return BathymetryGrid(
+        originLat: 0,
+        originLon: 0,
+        // ~0.0009 deg lat is ~100 m; longitude at lat 0 is ~111320 m/deg.
+        cellSizeLatDeg: 100.0 / 110540.0,
+        cellSizeLonDeg: 100.0 / 111320.0,
+        rows: rows,
+        cols: cols,
+        depthsMeters: [for (final r in rowsSouthToNorth) ...r],
+        sourceId: 'test',
+        resolutionMeters: 100,
+        fetchedAt: DateTime.utc(2026, 8, 15),
+      );
+    }
+
+    const center = GeoPoint(0, 0);
+
+    SpatialProjection projFor(BathymetryGrid grid) {
+      // Mirror the geometry services: the grid box frames the scene.
+      return SpatialProjection(
+        minEast: 0,
+        maxEast: 100.0 * (grid.cols - 1),
+        minNorth: 0,
+        maxNorth: 100.0 * (grid.rows - 1),
+        maxDepth: grid.maxDepthMeters,
+      );
+    }
+
+    test('produces overlay-gated layers and major labels', () {
+      // Auto levels 5..45 (step 5, major at 25). Level 5 yields NO line:
+      // every corner is >= 5, so both cells are case 15 (all inside). The
+      // other 8 levels each cross exactly one cell row: with inside = ">=",
+      // level 25 crosses only the south cell (t = 1 at the shared edge) and
+      // level 45 crosses the north cell at its top edge. 8 layers total:
+      // 10,15,20,25,30,35,40,45.
+      final grid = gridOf([
+        [5.0, 5.0, 5.0],
+        [25.0, 25.0, 25.0],
+        [45.0, 45.0, 45.0],
+      ]);
+      final result = buildContourLayers(
+        grid: grid,
+        center: center,
+        projection: projFor(grid),
+        appearance: const SeascapeAppearance(),
+        displayUnitInMeters: 1.0,
+        depthSymbol: 'm',
+      );
+      expect(result.layers, hasLength(8));
+      expect(
+        result.layers.every((l) => l.overlay == SceneOverlay.contours),
+        isTrue,
+      );
+      // One labeled level (25 m major) with 5 anchor triplets.
+      expect(result.labels, hasLength(1));
+      expect(result.labels.single.text, '25 m');
+      expect(result.labels.single.anchorsXyz.length, 15);
+      // Anchors ride the contour's scene height: yOf(25) plus lifts.
+      final y = projFor(grid).yOf(25);
+      expect(result.labels.single.anchorsXyz[1], closeTo(y + 0.08, 1e-6));
+    });
+
+    test('ribbon width scales with thickness and majors are wider', () {
+      final grid = gridOf([
+        [5.0, 5.0, 5.0],
+        [25.0, 25.0, 25.0],
+        [45.0, 45.0, 45.0],
+      ]);
+      ContourBuildResult at(double thickness) => buildContourLayers(
+        grid: grid,
+        center: center,
+        projection: projFor(grid),
+        appearance: SeascapeAppearance(contourThickness: thickness),
+        displayUnitInMeters: 1.0,
+        depthSymbol: 'm',
+      );
+      double widthOf(SceneLayer layer) {
+        // Ribbon vertices come in left/right pairs; the first pair's
+        // separation is the full ribbon width in scene units.
+        final p = layer.mesh.positions;
+        final dx = p[3] - p[0], dz = p[5] - p[2];
+        return math.sqrt(dx * dx + dz * dz);
+      }
+
+      final thin = at(1.0);
+      final thick = at(2.0);
+      expect(
+        widthOf(thick.layers.first),
+        closeTo(widthOf(thin.layers.first) * 2, 1e-6),
+      );
+      // Rendered levels are 10,15,20,25,...: the 25 m major is index 3.
+      expect(widthOf(thin.layers[3]), greaterThan(widthOf(thin.layers[0])));
+    });
+
+    test('custom level color overrides the ink', () {
+      final grid = gridOf([
+        [5.0, 5.0],
+        [45.0, 45.0],
+      ]);
+      final result = buildContourLayers(
+        grid: grid,
+        center: center,
+        projection: projFor(grid),
+        appearance: const SeascapeAppearance(
+          contourMode: SeascapeContourMode.custom,
+          customLevels: [
+            SeascapeContourLevel(depthMeters: 20.0, colorArgb: 0xFF10B981),
+          ],
+        ),
+        displayUnitInMeters: 1.0,
+        depthSymbol: 'm',
+      );
+      expect(result.layers, hasLength(1));
+      // 0xFF10B981: r = 0x10/255, per-vertex float colors.
+      expect(result.layers.single.mesh.colors[0], closeTo(0x10 / 255, 1e-4));
+      // Custom levels are all labeled.
+      expect(result.labels.single.text, '20 m');
+    });
+
+    test('empty result for a flat or too-shallow grid', () {
+      final grid = gridOf([
+        [1.0, 1.0],
+        [1.2, 1.2],
+      ]);
+      final result = buildContourLayers(
+        grid: grid,
+        center: center,
+        projection: projFor(grid),
+        appearance: const SeascapeAppearance(),
+        displayUnitInMeters: 1.0,
+        depthSymbol: 'm',
+      );
+      expect(result.layers, isEmpty);
+      expect(result.labels, isEmpty);
     });
   });
 }
