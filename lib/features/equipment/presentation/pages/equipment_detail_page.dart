@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:submersion/core/icons/mdi_icons.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:go_router/go_router.dart';
 
@@ -12,6 +11,7 @@ import 'package:submersion/shared/widgets/master_detail/detail_scroll_retainer.d
 import 'package:submersion/shared/widgets/master_detail/responsive_breakpoints.dart';
 
 import 'package:submersion/core/constants/enums.dart';
+import 'package:submersion/features/equipment/presentation/utils/equipment_type_icon.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_providers.dart';
 import 'package:submersion/features/trips/presentation/providers/trip_providers.dart';
@@ -232,7 +232,7 @@ class _EquipmentDetailContent extends ConsumerWidget {
                 ? colorScheme.errorContainer
                 : colorScheme.tertiaryContainer,
             child: Icon(
-              _getIconForType(equipment.type),
+              equipmentTypeIcon(equipment.type),
               size: 20,
               color: isServiceOverdue
                   ? colorScheme.onErrorContainer
@@ -329,7 +329,7 @@ class _EquipmentDetailContent extends ConsumerWidget {
                       ? Theme.of(context).colorScheme.errorContainer
                       : Theme.of(context).colorScheme.tertiaryContainer,
                   child: Icon(
-                    _getIconForType(equipment.type),
+                    equipmentTypeIcon(equipment.type),
                     size: 32,
                     color: isServiceOverdue
                         ? Theme.of(context).colorScheme.onErrorContainer
@@ -815,36 +815,6 @@ class _EquipmentDetailContent extends ConsumerWidget {
           }
         }
         break;
-    }
-  }
-
-  IconData _getIconForType(EquipmentType type) {
-    switch (type) {
-      case EquipmentType.regulator:
-        return Icons.air;
-      case EquipmentType.bcd:
-        return Icons.accessibility_new;
-      case EquipmentType.wetsuit:
-      case EquipmentType.drysuit:
-        return Icons.checkroom;
-      case EquipmentType.fins:
-        return Icons.directions_walk;
-      case EquipmentType.mask:
-        return Icons.visibility;
-      case EquipmentType.computer:
-        return Icons.watch;
-      case EquipmentType.tank:
-        return MdiIcons.divingScubaTank;
-      case EquipmentType.weights:
-        return Icons.fitness_center;
-      case EquipmentType.light:
-        return Icons.flashlight_on;
-      case EquipmentType.camera:
-        return Icons.camera_alt;
-      case EquipmentType.transmitter:
-        return Icons.sensors;
-      default:
-        return Icons.backpack;
     }
   }
 }

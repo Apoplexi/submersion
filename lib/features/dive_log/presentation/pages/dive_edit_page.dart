@@ -3,12 +3,12 @@ import 'dart:io';
 
 import 'package:flutter/material.dart' hide Visibility;
 import 'package:go_router/go_router.dart';
-import 'package:submersion/core/icons/mdi_icons.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/shared/widgets/app_date_picker.dart';
 import 'package:uuid/uuid.dart';
 
 import 'package:submersion/core/constants/enums.dart';
+import 'package:submersion/features/equipment/presentation/utils/equipment_type_icon.dart';
 import 'package:submersion/features/data_quality/data/services/quality_scan_service.dart';
 import 'package:submersion/features/marine_life/presentation/utils/species_category_color.dart';
 import 'package:submersion/features/marine_life/presentation/utils/species_category_icon.dart';
@@ -3037,7 +3037,7 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
                         context,
                       ).colorScheme.primaryContainer,
                       child: Icon(
-                        _getEquipmentIcon(item.type),
+                        equipmentTypeIcon(item.type),
                         color: Theme.of(context).colorScheme.onPrimaryContainer,
                         size: 20,
                       ),
@@ -3087,56 +3087,6 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
           ),
       ],
     );
-  }
-
-  IconData _getEquipmentIcon(EquipmentType type) {
-    switch (type) {
-      case EquipmentType.regulator:
-        return Icons.air;
-      case EquipmentType.bcd:
-        return Icons.checkroom;
-      case EquipmentType.wetsuit:
-        return Icons.dry_cleaning;
-      case EquipmentType.drysuit:
-        return Icons.dry_cleaning;
-      case EquipmentType.mask:
-        return Icons.visibility;
-      case EquipmentType.fins:
-        return Icons.water;
-      case EquipmentType.boots:
-        return Icons.hiking;
-      case EquipmentType.gloves:
-        return Icons.pan_tool;
-      case EquipmentType.hood:
-        return Icons.face;
-      case EquipmentType.tank:
-        return MdiIcons.divingScubaTank;
-      // A closed circuit recycles the breathing loop; the vendored MdiIcons
-      // subset has no rebreather glyph, and the tank glyph already means
-      // "tank".
-      case EquipmentType.rebreather:
-        return Icons.recycling;
-      case EquipmentType.transmitter:
-        return Icons.sensors;
-      case EquipmentType.weights:
-        return Icons.fitness_center;
-      case EquipmentType.computer:
-        return Icons.watch;
-      case EquipmentType.light:
-        return Icons.flashlight_on;
-      case EquipmentType.camera:
-        return Icons.camera_alt;
-      case EquipmentType.knife:
-        return Icons.content_cut;
-      case EquipmentType.smb:
-        return Icons.flag;
-      case EquipmentType.reel:
-        return Icons.all_inclusive;
-      case EquipmentType.dpv:
-        return Icons.electric_scooter;
-      case EquipmentType.other:
-        return Icons.build;
-    }
   }
 
   void _showEquipmentPicker() {
@@ -3229,7 +3179,7 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
           BulkMembershipItem(
             id: e.id,
             label: e.name,
-            icon: _getEquipmentIcon(e.type),
+            icon: equipmentTypeIcon(e.type),
           ),
       ]..sort(byLabel);
       _tagCounts = tagCounts;
@@ -3291,7 +3241,7 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
                   BulkMembershipItem(
                     id: equipment.id,
                     label: equipment.name,
-                    icon: _getEquipmentIcon(equipment.type),
+                    icon: equipmentTypeIcon(equipment.type),
                   ),
                 ];
               }
@@ -3324,7 +3274,7 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
                     BulkMembershipItem(
                       id: item.id,
                       label: item.name,
-                      icon: _getEquipmentIcon(item.type),
+                      icon: equipmentTypeIcon(item.type),
                     ),
               ];
             });
