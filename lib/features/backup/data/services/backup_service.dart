@@ -1065,7 +1065,30 @@ class BackupService {
       // filesystem path -- SAF content:// locations were already handled
       // above). Security-scoped bookmarks are an Apple-only concept, so a bare
       // custom filesystem path here persists and works without scoping.
-      return BackupDirLease(await _ensureDir(custom), _noRelease);
+      try {
+        return BackupDirLease(await _ensureDir(custom), _noRelease);
+      } on FileSystemException {
+        // The stored path is not a directory this process can create or reach:
+        // an ejected SD card or unmounted network share, or a path fabricated
+        // by file_picker from a SAF tree whose document id has no
+        // "volume:path" shape. A Google Drive pick yields
+        // "/storage/emulated/0/acc=2;doc=encoded=...", which is not a
+        // content:// ref (so the guard above misses it) and which scoped
+        // storage refuses to mkdir with errno 13.
+        //
+        // Resolution runs before the pre-migration safety copy, outside
+        // PreMigrationBackupService's fallback, so throwing here strands the
+        // user on the terminal "Database upgrade failed" screen with no way
+        // back into settings to correct the location. Self-heal to the sandbox
+        // default instead, matching the Apple dead-bookmark and revoked
+        // SAF-grant branches: clearing the location stops it being retried and
+        // makes the settings subtitle revert, signaling a re-pick is needed.
+        await preferences.setBackupLocation(null);
+        return BackupDirLease(
+          await resolveDefaultBackupsDirectory(),
+          _noRelease,
+        );
+      }
     }
     final port = bookmarks ?? const _DefaultBackupBookmarkPort();
     final bytes = preferences.getBackupLocationBookmark();
