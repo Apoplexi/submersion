@@ -34,6 +34,24 @@ DUPLICATE_BUILD_MARKERS = [
   "bundle version must be higher than the previously uploaded version",
 ].freeze
 
+# App Store version states meaning the version is already out of our hands.
+# App Store Connect refuses build and metadata changes from any of these, so
+# submitting again cannot succeed; the only useful behavior is to skip.
+#
+# Rejected states are deliberately absent. REJECTED, DEVELOPER_REJECTED,
+# METADATA_REJECTED and INVALID_BINARY all need a fresh submission, which is
+# exactly what this lane is for.
+ALREADY_SUBMITTED_STATES = [
+  "WAITING_FOR_REVIEW",
+  "IN_REVIEW",
+  "PENDING_APPLE_RELEASE",
+  "PENDING_DEVELOPER_RELEASE",
+  "PROCESSING_FOR_DISTRIBUTION",
+  "READY_FOR_DISTRIBUTION",
+  "READY_FOR_SALE",
+  "ACCEPTED",
+].freeze
+
 platform :mac do
   # ============================================================================
   # Helper Methods
@@ -127,6 +145,41 @@ platform :mac do
   def duplicate_build_error?(message)
     text = message.to_s
     DUPLICATE_BUILD_MARKERS.any? { |marker| text.include?(marker) }
+  end
+
+  # The already-submitted state of <app_version> on <platform>, or nil when the
+  # version is still ours to submit OR the state cannot be determined.
+  #
+  # Every uncertain path returns nil on purpose, so the caller falls through to
+  # attempting the submission, which is the behavior that existed before this
+  # check. The guard can therefore only ever skip work that would have failed;
+  # it can never turn a working submission into a skipped one.
+  #
+  # Limitation worth knowing: get_edit_app_store_version returns versions in
+  # editable states, which includes WAITING_FOR_REVIEW (the state that broke
+  # promotion run 31859359618). Should Apple stop returning an IN_REVIEW
+  # version there, this quietly degrades to the old attempt-and-fail behavior
+  # rather than misreporting.
+  #
+  # No explicit spaceship auth: both branches of load_api_key go through the
+  # app_store_connect_api_key action, whose set_spaceship_token defaults to
+  # true, so Spaceship::ConnectAPI.token is already set by the time a lane
+  # calls this.
+  def already_submitted_state(app_version, platform)
+    app = Spaceship::ConnectAPI::App.find(
+      CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier),
+    )
+    return nil if app.nil?
+
+    version = app.get_edit_app_store_version(
+      platform: Spaceship::ConnectAPI::Platform.map(platform),
+    )
+    return nil if version.nil? || version.version_string != app_version
+
+    # app_store_state is deprecated as of App Store Connect API 3.3 in favor of
+    # app_version_state; read the new field first and fall back.
+    state = version.app_version_state || version.app_store_state
+    ALREADY_SUBMITTED_STATES.include?(state) ? state : nil
   end
 
   def load_api_key
@@ -522,6 +575,16 @@ platform :mac do
     api_key = load_api_key
     app_version = options[:app_version] || UI.user_error!("app_version is required")
     build_number = options[:build_number] || UI.user_error!("build_number is required")
+
+    # Makes the lane a no-op once Apple has the version, so a re-dispatched
+    # promotion does not fail on the leg that already succeeded.
+    if (state = already_submitted_state(app_version, "osx"))
+      UI.important(
+        "#{app_version} is already #{state} for osx; skipping submission. " \
+        "Remove it from review in App Store Connect if you need to resubmit."
+      )
+      next
+    end
 
     UI.message("Submitting #{app_version} (#{build_number}) for App Review...")
     upload_to_app_store(
