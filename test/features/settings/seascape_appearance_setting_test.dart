@@ -10,32 +10,41 @@ import 'package:submersion/features/settings/presentation/providers/settings_pro
 
 import '../../helpers/test_database.dart';
 
-/// Drives the real [SettingsNotifier] so the device-local seascape
-/// appearance load/save path is exercised end to end (same harness as the
-/// deco stop settings test: the notifier resolves a default diver from the
-/// database even before any setter runs).
+/// Drives the real [SettingsNotifier] end to end. Since v151 the seascape
+/// appearance is PER-DIVER (diver_settings column, synced); the legacy
+/// device-local pref is adopted once into a row that never held a value,
+/// then retired.
 void main() {
   late AppDatabase db;
 
-  Future<ProviderContainer> containerWith(Map<String, Object> prefsSeed) async {
+  Future<ProviderContainer> containerWith(
+    Map<String, Object> prefsSeed, {
+    bool withDiver = true,
+    Future<void> Function(AppDatabase db)? prepareDb,
+  }) async {
     SharedPreferences.setMockInitialValues({
-      currentDiverIdKey: 'd1',
+      if (withDiver) currentDiverIdKey: 'd1',
       ...prefsSeed,
     });
     final prefs = await SharedPreferences.getInstance();
     db = await setUpTestDatabase();
-    final now = DateTime.now().millisecondsSinceEpoch;
-    await db
-        .into(db.divers)
-        .insert(
-          DiversCompanion.insert(
-            id: 'd1',
-            name: 'Test Diver',
-            createdAt: now,
-            updatedAt: now,
-          ),
-        );
-    await DiverSettingsRepository().createSettingsForDiver('d1');
+    if (withDiver) {
+      final now = DateTime.now().millisecondsSinceEpoch;
+      await db
+          .into(db.divers)
+          .insert(
+            DiversCompanion.insert(
+              id: 'd1',
+              name: 'Test Diver',
+              createdAt: now,
+              updatedAt: now,
+            ),
+          );
+      await DiverSettingsRepository().createSettingsForDiver('d1');
+    }
+    // Runs BEFORE the notifier's initial load, so tests can shape the row
+    // (e.g. simulate a pre-v151 column) that the load will encounter.
+    await prepareDb?.call(db);
     final container = ProviderContainer(
       overrides: [sharedPreferencesProvider.overrideWithValue(prefs)],
     );
@@ -49,21 +58,43 @@ void main() {
     DatabaseService.instance.resetForTesting();
   });
 
-  test('loads seascape appearance from SharedPreferences', () async {
-    const stored = SeascapeAppearance(rampBanded: true, wallAngleDeg: 30.0);
-    final container = await containerWith({
-      SettingsKeys.seascapeAppearance: stored.encode(),
-    });
-    expect(container.read(settingsProvider).seascapeAppearance, stored);
-  });
-
-  test('setSeascapeAppearance updates state and persists to prefs', () async {
-    final container = await containerWith({});
-    expect(
-      container.read(settingsProvider).seascapeAppearance,
-      const SeascapeAppearance(),
+  test('a pre-v151 row adopts the legacy pref once, then retires it', () async {
+    const legacy = SeascapeAppearance(rampBanded: true, wallAngleDeg: 30.0);
+    final container = await containerWith(
+      {SettingsKeys.seascapeAppearance: legacy.encode()},
+      // Simulate a row created before v151: the column never held a value.
+      prepareDb: (db) => db.customStatement(
+        'UPDATE diver_settings SET seascape_appearance = NULL',
+      ),
     );
 
+    expect(container.read(settingsProvider).seascapeAppearance, legacy);
+    // Adoption wrote through to the diver row so it syncs.
+    final stored = await DiverSettingsRepository().getSettingsForDiver('d1');
+    expect(stored!.seascapeAppearance, legacy);
+    // The pref is retired so a later reset elsewhere cannot be resurrected.
+    final prefs = await SharedPreferences.getInstance();
+    expect(prefs.getString(SettingsKeys.seascapeAppearance), isNull);
+  });
+
+  test('a row that has held a value wins over a stale pref', () async {
+    const dbValue = SeascapeAppearance(wallAngleDeg: 45.0);
+    const stalePref = SeascapeAppearance(rampBanded: true);
+    final container = await containerWith(
+      {SettingsKeys.seascapeAppearance: stalePref.encode()},
+      prepareDb: (db) => DiverSettingsRepository().updateSettingsForDiver(
+        'd1',
+        const AppSettings(seascapeAppearance: dbValue),
+      ),
+    );
+
+    expect(container.read(settingsProvider).seascapeAppearance, dbValue);
+    final prefs = await SharedPreferences.getInstance();
+    expect(prefs.getString(SettingsKeys.seascapeAppearance), isNull);
+  });
+
+  test('setSeascapeAppearance persists to the diver row, not prefs', () async {
+    final container = await containerWith({});
     const next = SeascapeAppearance(
       rampMaxDepthMeters: 40.0,
       contourMode: SeascapeContourMode.custom,
@@ -72,6 +103,21 @@ void main() {
     await container.read(settingsProvider.notifier).setSeascapeAppearance(next);
 
     expect(container.read(settingsProvider).seascapeAppearance, next);
+    final stored = await DiverSettingsRepository().getSettingsForDiver('d1');
+    expect(stored!.seascapeAppearance, next);
+    final prefs = await SharedPreferences.getInstance();
+    expect(prefs.getString(SettingsKeys.seascapeAppearance), isNull);
+  });
+
+  test('with no diver the pref remains the fallback store', () async {
+    const stored = SeascapeAppearance(rampBanded: true);
+    final container = await containerWith({
+      SettingsKeys.seascapeAppearance: stored.encode(),
+    }, withDiver: false);
+    expect(container.read(settingsProvider).seascapeAppearance, stored);
+
+    const next = SeascapeAppearance(wallAngleDeg: 60.0);
+    await container.read(settingsProvider.notifier).setSeascapeAppearance(next);
     final prefs = await SharedPreferences.getInstance();
     expect(
       SeascapeAppearance.decode(

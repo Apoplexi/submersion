@@ -221,14 +221,18 @@ sessions and apply to both pages:
   real walls flatter than they are (a sheer wall inside one ~67 m cell reads
   as a modest slope), which is why the default is well under 45.
 
-Persistence (corrected at planning time): the knobs live on `AppSettings`
-as ONE `SeascapeAppearance` value object (fields: `rampMaxDepthMeters`
-nullable, `rampBanded`, `contourMode`, `customLevels`, `wallAngleDeg`),
-persisted DEVICE-LOCALLY as a single JSON string in
-SharedPreferences (`SettingsKeys.seascapeAppearance`, the
-`profileMetricsFollowViewport` lane). The per-diver `diver_settings` table
-is deliberately NOT touched: its discrete columns would require a main-DB
-schema migration plus sync surface, which this slice scopes out.
+Persistence (amended post-review: Eric wants the knobs to sync): the knobs
+live on `AppSettings` as ONE `SeascapeAppearance` value object (fields:
+`rampMaxDepthMeters` nullable, `rampBanded`, `contourMode`, `customLevels`,
+`wallAngleDeg`), stored PER-DIVER as a single JSON string in a new nullable
+`diver_settings.seascape_appearance` TEXT column (main-DB migration v151,
+with the idempotent-DDL beforeOpen backstop). Sync rides the existing
+whole-row diver_settings serialization for free; the column's nullability
+tolerates rows from older builds. The SharedPreferences key remains only as
+the fallback store while no diver exists: on the first load with a diver,
+a row that has never held a value adopts the pref exactly once (written
+through immediately so it syncs), and the pref is then removed so a stale
+copy can never resurrect a value reset on another device.
 
 ### Steep-wall highlighting (issue #1065)
 
