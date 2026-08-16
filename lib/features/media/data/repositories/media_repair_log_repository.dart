@@ -55,6 +55,15 @@ class MediaRepairLogRepository {
 
   static const int _maxRows = 500;
 
+  /// Emits whenever the repair log changes.
+  ///
+  /// The log is append-only from the caller's side but not from the reader's:
+  /// the watcher's automatic pass records entries with no user action, and the
+  /// prune in [record] drops the oldest rows. A history view open across
+  /// either would otherwise keep rendering the snapshot it built with.
+  Stream<void> watchRepairLogChanges() =>
+      _db.tableUpdates(TableUpdateQuery.onTable(_db.mediaRepairLog));
+
   /// Appends [entries] and prunes the history back to the newest
   /// [_maxRows].
   Future<void> record(List<RepairLogEntry> entries) async {

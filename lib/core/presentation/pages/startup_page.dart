@@ -639,14 +639,24 @@ class _StartupWrapperState extends State<StartupWrapper>
     } else {
       final info = await PackageInfo.fromPlatform();
       appVersion = '${info.version}.${info.buildNumber}';
-      // Arm any security-scoped bookmark for the custom location (and
-      // self-heal a stale one to the sandbox default) before the safety copy.
-      // Layer 1's fallback below still applies if writing to the armed path
-      // fails, so a pre-migration backup can never brick startup.
-      lease = await BackupService.resolveBackupsDirectoryLeased(prefs);
       service = PreMigrationBackupService(
         livePathProvider: () async => dbPath,
-        backupsDirProvider: () async => lease!.path,
+        // Resolve LAZILY, inside the provider. Resolution arms any
+        // security-scoped bookmark for the custom location and self-heals a
+        // dead one to the sandbox default, but it also touches the filesystem
+        // and can throw (an ejected volume, or a location that is no longer
+        // creatable). PreMigrationBackupService calls this provider inside the
+        // region guarded by fallbackBackupsDirProvider, so resolving here keeps
+        // any failure recoverable. Resolving eagerly instead would move the
+        // throw outside that guard, where it escapes as a bare
+        // FileSystemException rather than a BackupFailedException and strands
+        // startup on the terminal "Database upgrade failed" screen. Keeping it
+        // lazy is what makes "a pre-migration backup can never brick startup"
+        // actually hold.
+        backupsDirProvider: () async {
+          lease = await BackupService.resolveBackupsDirectoryLeased(prefs);
+          return lease!.path;
+        },
         fallbackBackupsDirProvider:
             BackupService.resolveDefaultBackupsDirectory,
         preferences: prefs,

@@ -1733,8 +1733,8 @@ void main() {
       },
     );
 
-    test('bottomTime falls back to durationSeconds when ascentStart <= '
-        'descentEnd', () async {
+    test('bottomTime falls back to durationSeconds when the bottom span '
+        'is zero', () async {
       await insertDive('dive-1');
       await insertComputer('comp-1');
       await insertSource(
@@ -1744,13 +1744,15 @@ void main() {
         isPrimary: true,
       );
 
-      // Single deep sample at one timestamp -- descent end == ascent start
+      // Only the first sample reaches the ascent threshold (min(max(6,
+      // 9.9), 25.5) = 9.9 m), so ascent start == surface departure and the
+      // computed span is zero.
       final parsed = makeParsedDive(
         maxDepthMeters: 30.0,
         durationSeconds: 1200,
         samples: [
-          pigeon.ProfileSample(timeSeconds: 0, depthMeters: 0.0),
-          pigeon.ProfileSample(timeSeconds: 60, depthMeters: 30.0),
+          pigeon.ProfileSample(timeSeconds: 0, depthMeters: 30.0),
+          pigeon.ProfileSample(timeSeconds: 60, depthMeters: 1.0),
           pigeon.ProfileSample(timeSeconds: 120, depthMeters: 0.0),
         ],
       );
@@ -1766,9 +1768,8 @@ void main() {
       );
 
       final dive = await getDive('dive-1');
-      // The only sample at >= 85% of 30m (25.5m) is the single 30m sample
-      // at t=60. descentEnd = ascentStart = 60, so bottom time returns null
-      // and falls back to durationSeconds.
+      // Ascent start (t=0) minus surface departure (t=0) is zero, so bottom
+      // time returns null and falls back to durationSeconds.
       expect(dive.bottomTime, 1200);
     });
   });
@@ -2690,8 +2691,9 @@ void main() {
       );
 
       // Profile with a clear bottom phase: descent to 30m, plateau, ascent.
-      // 85% of 30m = 25.5m. Samples at/above 25.5m: t=120 (26m), t=180 (30m),
-      // t=240 (28m). descentEnd=120, ascentStart=240, bottom time = 120s.
+      // Ascent threshold = min(max(6, 0.33*30=9.9), 0.85*30=25.5) = 9.9 m.
+      // The last sample at/deeper than 9.9 m is t=300 (10 m); bottom time
+      // runs from surface departure (t=0), so 300 s.
       final parsed = makeParsedDive(
         maxDepthMeters: 30.0,
         durationSeconds: 360,
@@ -2717,8 +2719,8 @@ void main() {
       );
 
       final dive = await getDive('dive-1');
-      // Bottom time should be 240 - 120 = 120 seconds
-      expect(dive.bottomTime, 120);
+      // Bottom time: surface departure t=0 to ascent start t=300
+      expect(dive.bottomTime, 300);
     });
   });
 

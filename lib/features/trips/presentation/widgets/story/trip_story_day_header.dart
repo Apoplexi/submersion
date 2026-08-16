@@ -9,6 +9,7 @@ import 'package:submersion/features/settings/presentation/providers/settings_pro
 import 'package:submersion/features/trips/domain/entities/trip_story_day.dart';
 import 'package:submersion/features/trips/presentation/helpers/day_type_l10n.dart';
 import 'package:submersion/features/trips/presentation/helpers/weather_icon.dart';
+import 'package:submersion/features/trips/presentation/providers/surface_day_weather_provider.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 
@@ -16,6 +17,11 @@ import 'package:submersion/l10n/l10n_extension.dart';
 /// subtitle - on an opaque surface so day cards scroll underneath cleanly.
 /// Days with logged weather get a trailing badge: conditions icon plus air
 /// temperature in the diver's temperature unit.
+///
+/// Every day of the trip gets one of these, including surface days (which
+/// carry no card body at all and are nothing but this header). Presenting a
+/// dive-free day in some slimmer, quieter form makes it read as a lesser entry
+/// and easy to miss when scanning the story.
 ///
 /// Mounted in a [PinnedHeaderSliver] inside a SliverMainAxisGroup, so it sticks
 /// at the top of its day chapter until the next day's header pushes it out.
@@ -27,8 +33,13 @@ class TripStoryDayHeader extends ConsumerWidget {
   static const double minHeight = 52;
 
   final TripStoryDay day;
+  final SurfaceDayWeatherRequest? surfaceWeatherRequest;
 
-  const TripStoryDayHeader({super.key, required this.day});
+  const TripStoryDayHeader({
+    super.key,
+    required this.day,
+    this.surfaceWeatherRequest,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -38,14 +49,23 @@ class TripStoryDayHeader extends ConsumerWidget {
     // an empty port to null, but sync and import payloads write the nullable
     // column directly, and a site name is equally free to be blank. Joining
     // either verbatim would render a doubled separator ("Dive Day -  - Site").
+    // A surface day has no itinerary and no dives by definition, so it owns the
+    // subtitle outright - it reads in the same slot where an itinerary day
+    // leads with its day type ("Dive Day", "Travel Day").
     final subtitleParts = <String>[
+      if (day.isSurface) context.l10n.trips_story_surfaceDay,
       if (itinerary != null) itinerary.dayType.localizedName(context),
       if (itinerary?.portName != null) itinerary!.portName!,
       ...day.siteNames,
     ].map((part) => part.trim()).where((part) => part.isNotEmpty).toList();
 
+    final request = day.isSurface ? surfaceWeatherRequest : null;
+    final fetchedWeather = request == null
+        ? null
+        : ref.watch(surfaceDayWeatherProvider(request)).asData?.value;
+    final weather = day.weather ?? fetchedWeather;
     final units = UnitFormatter(ref.watch(settingsProvider));
-    final weatherBadge = _weatherBadge(context, theme, units);
+    final weatherBadge = _weatherBadge(context, theme, units, weather);
 
     return Material(
       color: theme.colorScheme.surface,
@@ -104,8 +124,8 @@ class TripStoryDayHeader extends ConsumerWidget {
     BuildContext context,
     ThemeData theme,
     UnitFormatter units,
+    TripStoryDayWeather? weather,
   ) {
-    final weather = day.weather;
     if (weather == null) return null;
 
     final icon = weatherIconFor(

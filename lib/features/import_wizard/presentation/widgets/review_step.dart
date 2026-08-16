@@ -37,7 +37,6 @@ class ReviewStep extends ConsumerWidget {
     }
 
     final types = bundle.availableTypes;
-    final availableActions = notifier.supportedDuplicateActions;
     final counts = _AggregateCounts.compute(state);
 
     // Compute projected dive numbers for the review list.
@@ -60,7 +59,6 @@ class ReviewStep extends ConsumerWidget {
       bundle: bundle,
       state: state,
       notifier: notifier,
-      availableActions: availableActions,
       counts: counts,
       projectedDiveNumbers: projectedDiveNumbers,
       existingTags: existingTags,
@@ -128,7 +126,6 @@ class _MultiTypeLayout extends StatefulWidget {
   final ImportBundle bundle;
   final ImportWizardState state;
   final ImportWizardNotifier notifier;
-  final Set<DuplicateAction> availableActions;
   final _AggregateCounts counts;
   final Map<int, int>? projectedDiveNumbers;
   final List<Tag> existingTags;
@@ -140,7 +137,6 @@ class _MultiTypeLayout extends StatefulWidget {
     required this.bundle,
     required this.state,
     required this.notifier,
-    required this.availableActions,
     required this.counts,
     this.projectedDiveNumbers,
     required this.existingTags,
@@ -237,7 +233,6 @@ class _MultiTypeLayoutState extends State<_MultiTypeLayout> {
                     bundle: widget.bundle,
                     state: widget.state,
                     notifier: widget.notifier,
-                    availableActions: widget.availableActions,
                     projectedDiveNumbers: type == ImportEntityType.dives
                         ? widget.projectedDiveNumbers
                         : null,
@@ -307,7 +302,6 @@ class _EntityTab extends StatelessWidget {
   final ImportBundle bundle;
   final ImportWizardState state;
   final ImportWizardNotifier notifier;
-  final Set<DuplicateAction> availableActions;
   final Map<int, int>? projectedDiveNumbers;
 
   const _EntityTab({
@@ -315,7 +309,6 @@ class _EntityTab extends StatelessWidget {
     required this.bundle,
     required this.state,
     required this.notifier,
-    required this.availableActions,
     this.projectedDiveNumbers,
   });
 
@@ -324,6 +317,9 @@ class _EntityTab extends StatelessWidget {
     final group = bundle.groups[type]!;
     final selectedIndices = state.selections[type] ?? const <int>{};
     final duplicateActions = state.duplicateActions[type] ?? const {};
+    // Per-tab, not per-adapter: an adapter may implement an action for only
+    // some entity types (e.g. Universal supports replaceSource on sites only).
+    final availableActions = notifier.duplicateActionsFor(type);
 
     return SingleChildScrollView(
       child: EntityReviewList(

@@ -35,6 +35,7 @@ import 'package:submersion/features/settings/presentation/providers/settings_pro
 import 'package:submersion/features/tags/domain/entities/tag.dart';
 import 'package:submersion/features/tags/presentation/widgets/tag_input_widget.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
+import 'package:submersion/shared/selection/selection_leading.dart';
 import 'package:submersion/shared/widgets/debounced_search_results.dart';
 import 'package:submersion/shared/widgets/list_view_mode_toggle.dart';
 import 'package:submersion/shared/widgets/master_detail/master_detail_scaffold.dart';
@@ -627,7 +628,9 @@ class DiveSearchDelegate extends SearchDelegate<String?> {
               siteLongitude: dive.siteLongitude,
               onTap: () {
                 close(context, dive.id);
-                context.go('/dives/${dive.id}');
+                // PUSH (not go): go() replaces the stack, leaving system back
+                // with nothing to pop -- it would close the app (#647).
+                context.push('/dives/${dive.id}');
               },
             );
           },
@@ -656,11 +659,15 @@ class DiveListTile extends ConsumerWidget {
   final bool isFavorite;
   final List<Tag> tags;
   final VoidCallback? onTap;
-  final VoidCallback? onLongPress;
   final VoidCallback? onDoubleTap;
+
+  /// Currently open in the detail pane. Renders as a leading edge stripe.
   final bool isHighlighted;
   final bool isSelectionMode;
-  final bool isSelected;
+
+  /// In the current bulk selection. Renders as a fill tint plus the leading
+  /// checkbox. Independent of [isHighlighted]: a row can be both.
+  final bool isChecked;
 
   /// The dive's value for the active color attribute
   final double? colorValue;
@@ -717,11 +724,10 @@ class DiveListTile extends ConsumerWidget {
     this.isFavorite = false,
     this.tags = const [],
     this.onTap,
-    this.onLongPress,
     this.onDoubleTap,
     this.isHighlighted = false,
     this.isSelectionMode = false,
-    this.isSelected = false,
+    this.isChecked = false,
     this.colorValue,
     this.minValueInList,
     this.maxValueInList,
@@ -770,18 +776,23 @@ class DiveListTile extends ConsumerWidget {
     // Check if map background is enabled
     final showMapBackground = ref.watch(showMapBackgroundOnDiveCardsProvider);
 
+    // The active row carries a fill tint: checked in the bulk selection, or --
+    // outside selection mode -- open in the detail pane. Inside selection mode
+    // the fill belongs to the checked channel alone, so a highlighted but
+    // unchecked row stays plain instead of reading as selected.
+    final showsSelectionFill = isChecked || (isHighlighted && !isSelectionMode);
+
     // Determine if we should show the map (setting enabled + location available)
-    final shouldShowMap = showMapBackground && _hasLocation && !isSelected;
+    final shouldShowMap =
+        showMapBackground && _hasLocation && !showsSelectionFill;
 
     // Determine card background: selection takes priority, then attribute coloring
     // When map is shown, we don't use attribute coloring on the card itself
     final attributeColor = (showCardColors && !shouldShowMap)
         ? _getAttributeBackgroundColor()
         : null;
-    final cardColor = isSelected
+    final cardColor = showsSelectionFill
         ? colorScheme.primaryContainer.withValues(alpha: 0.5)
-        : isHighlighted
-        ? colorScheme.primaryContainer.withValues(alpha: 0.15)
         : attributeColor;
 
     // Determine text colors based on background luminance
@@ -863,36 +874,33 @@ class DiveListTile extends ConsumerWidget {
                     SizedBox(
                       width: 40,
                       height: 40,
-                      child: isSelectionMode
-                          ? Center(
-                              child: Checkbox(
-                                value: isSelected,
-                                onChanged: (_) => onTap?.call(),
-                                materialTapTargetSize:
-                                    MaterialTapTargetSize.shrinkWrap,
-                                visualDensity: VisualDensity.compact,
+                      child: Center(
+                        child: SelectionLeading(
+                          isSelectionMode: isSelectionMode,
+                          isChecked: isChecked,
+                          onChanged: (_) => onTap?.call(),
+                          child: CircleAvatar(
+                            backgroundColor: colorScheme.primaryContainer,
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 4,
                               ),
-                            )
-                          : CircleAvatar(
-                              backgroundColor: colorScheme.primaryContainer,
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 4,
-                                ),
-                                child: FittedBox(
-                                  fit: BoxFit.scaleDown,
-                                  child: Text(
-                                    '#$diveNumber',
-                                    maxLines: 1,
-                                    style: TextStyle(
-                                      color: colorScheme.onPrimaryContainer,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 12,
-                                    ),
+                              child: FittedBox(
+                                fit: BoxFit.scaleDown,
+                                child: Text(
+                                  '#$diveNumber',
+                                  maxLines: 1,
+                                  style: TextStyle(
+                                    color: colorScheme.onPrimaryContainer,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 12,
                                   ),
                                 ),
                               ),
                             ),
+                          ),
+                        ),
+                      ),
                     ),
                     const SizedBox(width: 12),
                     // Main text content (site, location, date)
@@ -1128,7 +1136,6 @@ class DiveListTile extends ConsumerWidget {
           child: InkWell(
             onTap: onTap,
             onDoubleTap: onDoubleTap,
-            onLongPress: onLongPress,
             child: Stack(
               children: [
                 // Static map tile background (cached)
@@ -1173,17 +1180,11 @@ class DiveListTile extends ConsumerWidget {
       );
     }
 
-    // Standard card without map
+    // Standard card without map. The highlight is the fill above, not an edge
+    // stripe -- the key marks the row for tests without decorating it.
     return Container(
+      key: isHighlighted ? const ValueKey('dive_row_highlight') : null,
       margin: margin ?? const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-      decoration: isHighlighted
-          ? BoxDecoration(
-              border: Border(
-                left: BorderSide(color: colorScheme.primary, width: 3),
-              ),
-              borderRadius: BorderRadius.circular(12),
-            )
-          : null,
       child: Card(
         margin: EdgeInsets.zero,
         color: cardColor,
@@ -1193,7 +1194,6 @@ class DiveListTile extends ConsumerWidget {
           child: InkWell(
             onTap: onTap,
             onDoubleTap: onDoubleTap,
-            onLongPress: onLongPress,
             borderRadius: BorderRadius.circular(12),
             child: buildContent(),
           ),

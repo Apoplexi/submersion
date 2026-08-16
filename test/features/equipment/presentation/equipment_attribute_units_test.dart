@@ -67,14 +67,31 @@ void main() {
   });
 
   group('attributeDisplayFromMetric', () {
-    test('metric formatter is identity for every dimension', () {
+    test('metric formatter is identity for every same-unit dimension', () {
+      // Every dimension whose canonical storage unit is also its metric
+      // display unit: kg, L, bar, m, mm. speedMps is the deliberate exception
+      // (stored m/s, shown km/h) and is asserted on its own below.
       for (final d in AttributeDimension.values) {
+        if (d == AttributeDimension.speedMps) continue;
         expect(
           attributeDisplayFromMetric(d, units, 10),
           closeTo(10, 1e-9),
           reason: 'metric $d should not scale',
         );
       }
+    });
+
+    test('speed converts out of canonical m/s in both unit systems', () {
+      // Stored in m/s like wind speed and GPS track speed; a metric diver
+      // reads km/h, an imperial diver reads knots.
+      expect(
+        attributeDisplayFromMetric(AttributeDimension.speedMps, units, 1),
+        closeTo(3.6, 1e-6),
+      );
+      expect(
+        attributeDisplayFromMetric(AttributeDimension.speedMps, imperial, 1),
+        closeTo(1.94384, 1e-4),
+      );
     });
 
     test('imperial formatter converts each scaled dimension', () {
@@ -131,6 +148,8 @@ void main() {
     expect(attributeUnitSymbol(AttributeDimension.lengthM, imperial), 'ft');
     expect(attributeUnitSymbol(AttributeDimension.depthM, imperial), 'ft');
     expect(attributeUnitSymbol(AttributeDimension.thicknessMm, imperial), 'mm');
+    expect(attributeUnitSymbol(AttributeDimension.speedMps, imperial), 'kts');
+    expect(attributeUnitSymbol(AttributeDimension.speedMps, units), 'km/h');
     expect(attributeUnitSymbol(AttributeDimension.none, imperial), '');
   });
 

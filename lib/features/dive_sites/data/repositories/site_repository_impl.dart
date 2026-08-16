@@ -11,8 +11,33 @@ import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/core/services/sync/sync_event_bus.dart';
 import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart'
     as domain;
+import 'package:submersion/features/media/data/repositories/media_repository.dart';
+import 'package:submersion/features/media_store/data/media_deletion_coordinator.dart';
+import 'package:submersion/features/media_store/data/media_transfer_queue_repository.dart';
 
 class SiteRepository {
+  /// Injectable seams mirror [DiveRepository]: tests hand in a coordinator
+  /// over an in-memory queue, production builds the default. A redirecting
+  /// GENERATIVE constructor (not a factory) so existing test fakes that
+  /// `extends SiteRepository` keep their implicit super() call.
+  SiteRepository({
+    MediaRepository? mediaRepository,
+    MediaDeletionCoordinator? mediaDeletionCoordinator,
+  }) : this._(mediaRepository ?? MediaRepository(), mediaDeletionCoordinator);
+
+  SiteRepository._(this._mediaRepository, MediaDeletionCoordinator? coordinator)
+    : _mediaDeletionCoordinator =
+          coordinator ??
+          MediaDeletionCoordinator(
+            mediaRepository: _mediaRepository,
+            queue: () => MediaTransferQueueRepository(),
+            // No worker kick from the data layer (provider cycles): queued
+            // intents drain on the next connectivity event, app start, or
+            // any other kick; the Verify Library sweep is the backstop.
+          );
+
+  final MediaRepository _mediaRepository;
+  final MediaDeletionCoordinator _mediaDeletionCoordinator;
   AppDatabase get _db => DatabaseService.instance.database;
   final SyncRepository _syncRepository = SyncRepository();
   final _uuid = const Uuid();
@@ -117,39 +142,72 @@ class SiteRepository {
   }
 
   /// Update an existing site
-  Future<void> updateSite(domain.DiveSite site) async {
+  Future<void> updateSite(domain.DiveSite site) => _writeSiteUpdate(site);
+
+  /// Update an existing site and, in the same statement, apply importer-only
+  /// columns that do not flow through the [domain.DiveSite] entity.
+  ///
+  /// The UDDF importer's overwrite path needs both halves to land together:
+  /// writing the core fields and then patching `waterType`/`bodyOfWater` in a
+  /// second statement would leave the row with new core data and stale
+  /// metadata if the second write threw. Merging them into one UPDATE makes
+  /// the pair atomic without a transaction, and marks the row pending for
+  /// sync exactly once.
+  ///
+  /// Columns set on [metadataPatch] win over the values derived from [site].
+  Future<void> updateSiteWithImportedMetadata(
+    domain.DiveSite site,
+    DiveSitesCompanion metadataPatch,
+  ) => _writeSiteUpdate(site, metadataPatch: metadataPatch);
+
+  Future<void> _writeSiteUpdate(
+    domain.DiveSite site, {
+    DiveSitesCompanion? metadataPatch,
+  }) async {
     try {
       _log.info('Updating site: ${site.id}');
       final now = DateTime.now().millisecondsSinceEpoch;
 
+      var companion = DiveSitesCompanion(
+        name: Value(site.name),
+        description: Value(site.description),
+        latitude: Value(site.location?.latitude),
+        longitude: Value(site.location?.longitude),
+        minDepth: Value(site.minDepth),
+        maxDepth: Value(site.maxDepth),
+        difficulty: Value(site.difficulty?.name),
+        waterType: Value(site.waterType?.name),
+        country: Value(site.country),
+        region: Value(site.region),
+        city: Value(site.city),
+        island: Value(site.island),
+        bodyOfWater: Value(site.bodyOfWater),
+        rating: Value(site.rating),
+        notes: Value(site.notes),
+        hazards: Value(site.hazards),
+        accessNotes: Value(site.accessNotes),
+        mooringNumber: Value(site.mooringNumber),
+        parkingInfo: Value(site.parkingInfo),
+        altitude: Value(site.altitude),
+        isShared: Value(site.isShared),
+        updatedAt: Value(now),
+      );
+      if (metadataPatch != null) {
+        // Only the columns actually present on the patch override the
+        // entity-derived values; `Value.absent()` leaves them alone.
+        if (metadataPatch.waterType.present) {
+          companion = companion.copyWith(waterType: metadataPatch.waterType);
+        }
+        if (metadataPatch.bodyOfWater.present) {
+          companion = companion.copyWith(
+            bodyOfWater: metadataPatch.bodyOfWater,
+          );
+        }
+      }
+
       await (_db.update(
         _db.diveSites,
-      )..where((t) => t.id.equals(site.id))).write(
-        DiveSitesCompanion(
-          name: Value(site.name),
-          description: Value(site.description),
-          latitude: Value(site.location?.latitude),
-          longitude: Value(site.location?.longitude),
-          minDepth: Value(site.minDepth),
-          maxDepth: Value(site.maxDepth),
-          difficulty: Value(site.difficulty?.name),
-          waterType: Value(site.waterType?.name),
-          country: Value(site.country),
-          region: Value(site.region),
-          city: Value(site.city),
-          island: Value(site.island),
-          bodyOfWater: Value(site.bodyOfWater),
-          rating: Value(site.rating),
-          notes: Value(site.notes),
-          hazards: Value(site.hazards),
-          accessNotes: Value(site.accessNotes),
-          mooringNumber: Value(site.mooringNumber),
-          parkingInfo: Value(site.parkingInfo),
-          altitude: Value(site.altitude),
-          isShared: Value(site.isShared),
-          updatedAt: Value(now),
-        ),
-      );
+      )..where((t) => t.id.equals(site.id))).write(companion);
       await _syncRepository.markRecordPending(
         entityType: 'diveSites',
         recordId: site.id,
@@ -264,10 +322,38 @@ class SiteRepository {
     }
   }
 
-  /// Delete a site
-  Future<void> deleteSite(String id) async {
+  /// Cascade a dying site's media: site-only rows die with the site
+  /// (rows + tombstones + blob-delete intents via the coordinator's
+  /// enqueue-before-delete path); dive-linked and library-level rows
+  /// survive with siteId nulled and HLC-stamped. Mirrors
+  /// DiveRepository._cascadeMediaForDiveDeletion; without it the silent
+  /// FK SET NULL on media.site_id writes no HLC stamp and peers diverge.
+  ///
+  /// Deliberately NOT wrapped in a transaction with the site delete: the
+  /// coordinator's queue writes live in another database, and every step
+  /// is individually idempotent/tombstoned. Site merge relinks media to
+  /// the survivor inside its own transaction BEFORE deleting duplicates,
+  /// so this sees no doomed media for merged-away sites.
+  Future<void> _cascadeMediaForSiteDeletion(List<String> ids) async {
+    final split = await _mediaRepository.partitionMediaForSiteDeletion(ids);
+    if (split.doomed.isNotEmpty) {
+      await _mediaDeletionCoordinator.deleteMediaItems(split.doomed);
+    }
+    if (split.unlinkIds.isNotEmpty) {
+      await _mediaRepository.unlinkMediaFromDeletedSites(split.unlinkIds);
+    }
+  }
+
+  /// Delete a site.
+  ///
+  /// [cascadeMedia] is true for user-intent deletions (the site's direct
+  /// attachments go with the site). Restore/undo flows that re-point media
+  /// afterwards pass false so the cascade cannot eat rows they are about
+  /// to restore.
+  Future<void> deleteSite(String id, {bool cascadeMedia = true}) async {
     try {
       _log.info('Deleting site: $id');
+      if (cascadeMedia) await _cascadeMediaForSiteDeletion([id]);
       await (_db.delete(_db.diveSites)..where((t) => t.id.equals(id))).go();
       await _syncRepository.logDeletion(entityType: 'diveSites', recordId: id);
       SyncEventBus.notifyLocalChange();
@@ -300,10 +386,14 @@ class SiteRepository {
   }
 
   /// Bulk delete multiple sites
-  Future<void> bulkDeleteSites(List<String> ids) async {
+  Future<void> bulkDeleteSites(
+    List<String> ids, {
+    bool cascadeMedia = true,
+  }) async {
     if (ids.isEmpty) return;
     try {
       _log.info('Bulk deleting ${ids.length} sites');
+      if (cascadeMedia) await _cascadeMediaForSiteDeletion(ids);
       await (_db.delete(_db.diveSites)..where((t) => t.id.isIn(ids))).go();
       for (final id in ids) {
         await _syncRepository.logDeletion(

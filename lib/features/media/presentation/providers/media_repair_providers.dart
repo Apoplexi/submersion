@@ -200,10 +200,17 @@ final mediaRepairLogRepositoryProvider = Provider<MediaRepairLogRepository>(
 );
 
 /// Newest repair history entries for the history view.
-final repairHistoryProvider = FutureProvider<List<RepairLogEntry>>(
-  (ref) => ref.watch(mediaRepairLogRepositoryProvider).recent(),
-);
+final repairHistoryProvider = FutureProvider<List<RepairLogEntry>>((ref) {
+  final repo = ref.watch(mediaRepairLogRepositoryProvider);
+  ref.invalidateSelfWhen(repo.watchRepairLogChanges());
+  return repo.recent();
+});
 
+// no-tick: autoDispose, and the repository reads live inside callbacks the
+// notifier invokes at action time rather than in this body -- there is no
+// cached row here that could go stale. The wizard is opened, run, and
+// disposed; re-running its scan on an unrelated media write is the bug, not
+// the fix, since the scan is what writes media in the first place.
 final repairWizardProvider =
     StateNotifierProvider.autoDispose<RepairWizardNotifier, RepairWizardState>((
       ref,

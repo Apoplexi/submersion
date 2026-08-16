@@ -11,7 +11,7 @@ void main() {
     // compiler only partly checks, so this failing is the prompt to also
     // update defaultSections and the ARB keys for the localized switches.
     test('section count changes are intentional', () {
-      expect(DiveDetailSectionId.values.length, 22);
+      expect(DiveDetailSectionId.values.length, 21);
     });
 
     test('values match expected IDs', () {
@@ -666,7 +666,7 @@ void main() {
         DiveDetailSectionId.values,
         contains(DiveDetailSectionId.reefHealth),
       );
-      expect(DiveDetailSectionId.reefHealth.displayName, 'Reef Health');
+      expect(DiveDetailSectionId.reefHealth.displayName, 'Water Conditions');
       expect(DiveDetailSectionId.reefHealth.description.isNotEmpty, isTrue);
     });
 

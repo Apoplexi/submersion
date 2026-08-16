@@ -14,6 +14,8 @@ import 'package:submersion/features/settings/presentation/pages/column_config_pa
 import 'package:submersion/features/settings/presentation/pages/safety_settings_page.dart';
 import 'package:submersion/features/settings/presentation/pages/security_settings_page.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
+import 'package:submersion/features/settings/presentation/widgets/coordinate_format_picker.dart';
+import 'package:submersion/features/settings/presentation/widgets/visibility_scale_picker.dart';
 import 'package:submersion/core/constants/profile_metrics.dart';
 import 'package:submersion/features/settings/presentation/pages/home_appearance_page.dart';
 import 'package:submersion/features/settings/presentation/pages/section_appearance_page.dart';
@@ -126,7 +128,7 @@ class SettingsPage extends ConsumerWidget {
 
     if (selectedSection != null) {
       // Show section detail page
-      return _SettingsSectionDetailPage(sectionId: selectedSection, ref: ref);
+      return SettingsSectionDetailPage(sectionId: selectedSection);
     }
 
     // Mobile: Show section list
@@ -221,15 +223,33 @@ class SettingsMobileContent extends ConsumerWidget {
   }
 }
 
-/// Mobile detail page for settings sections accessed via query params.
-class _SettingsSectionDetailPage extends ConsumerWidget {
-  final String sectionId;
-  final WidgetRef ref;
+/// Settings sections that render a page of their own, mapped to that page's
+/// route.
+///
+/// [SettingsSectionDetailPage] supplies a Scaffold and an AppBar, so sections
+/// whose content is itself a Scaffold with an AppBar (Diver Profile, Safety,
+/// Debug) would show two stacked app bars inside it. Appearance is listed too
+/// because it has a dedicated page, keeping that route canonical.
+///
+/// Used both by the settings list tile and by the '/settings/section/:id'
+/// route's redirect, so a deep link to that path cannot bypass it.
+const settingsSectionDedicatedRoutes = <String, String>{
+  'profile': '/settings/diver-profile',
+  'appearance': '/settings/appearance',
+  'safety': '/settings/safety',
+  'debug': '/settings/debug-logs',
+};
 
-  const _SettingsSectionDetailPage({
-    required this.sectionId,
-    required this.ref,
-  });
+/// Mobile detail page for a single settings section.
+///
+/// Reached by pushing the '/settings/section/:sectionId' child route, which
+/// go_router wraps in a platform-adaptive page so the section slides in like
+/// every other sub-page. Also rendered directly by [SettingsPage] for legacy
+/// `/settings?selected=<id>` deep links.
+class SettingsSectionDetailPage extends ConsumerWidget {
+  final String sectionId;
+
+  const SettingsSectionDetailPage({super.key, required this.sectionId});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -382,23 +402,19 @@ class _MobileSettingsTile extends StatelessWidget {
   }
 
   void _navigateToSection(BuildContext context, String sectionId) {
-    // Navigate to the appropriate page based on section
-    switch (sectionId) {
-      case 'profile':
-        context.push('/settings/diver-profile');
-        break;
-      case 'appearance':
-        context.push('/settings/appearance');
-        break;
-      default:
-        // For sections that don't have dedicated pages, show them in a
-        // detail page using query params. PUSH (not go): go() replaces the
-        // location in place, leaving nothing on the stack for the system
-        // back gesture to pop, so Android closed the whole app (#647).
-        final state = GoRouterState.of(context);
-        final currentPath = state.uri.path;
-        context.push('$currentPath?selected=$sectionId');
-    }
+    // Sections without a page of their own get the shared section route.
+    // PUSH (not go): go() replaces the location in place, leaving nothing on
+    // the stack for the system back gesture to pop, so Android closed the
+    // whole app (#647).
+    //
+    // This pushes a child route rather than '/settings?selected=<id>'. The
+    // latter re-matched the '/settings' tab root, whose pageBuilder returns a
+    // NoTransitionPage so bottom-nav tab switches do not animate -- which
+    // also robbed every pushed section of its slide-in.
+    context.push(
+      settingsSectionDedicatedRoutes[sectionId] ??
+          '/settings/section/$sectionId',
+    );
   }
 }
 
@@ -501,6 +517,28 @@ class _UnitsSectionContent extends ConsumerWidget {
                     ref,
                     settings.defaultCurrency,
                   ),
+                ),
+                const Divider(height: 1),
+                _buildUnitTile(
+                  context,
+                  title: context.l10n.settings_visibilityScale_title,
+                  value: visibilityPresetLabel(
+                    context.l10n,
+                    settings.visibilityScalePreset,
+                  ),
+                  onTap: () =>
+                      showVisibilityScalePicker(context, ref, settings),
+                ),
+                const Divider(height: 1),
+                _buildUnitTile(
+                  context,
+                  title: context.l10n.settings_coordinateFormat_title,
+                  value: coordinateFormatLabel(
+                    context.l10n,
+                    settings.coordinateFormat,
+                  ),
+                  onTap: () =>
+                      showCoordinateFormatPicker(context, ref, settings),
                 ),
               ],
             ),

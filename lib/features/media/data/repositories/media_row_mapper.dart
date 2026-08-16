@@ -117,6 +117,8 @@ domain.MediaType parseMediaType(String value) {
     case 'instructor_signature':
     case 'instructorSignature':
       return domain.MediaType.instructorSignature;
+    case 'document':
+      return domain.MediaType.document;
     default:
       return domain.MediaType.photo;
   }
@@ -130,6 +132,8 @@ String mediaTypeToDbString(domain.MediaType type) {
       return 'instructor_signature';
     case domain.MediaType.photo:
       return 'photo';
+    case domain.MediaType.document:
+      return 'document';
   }
 }
 

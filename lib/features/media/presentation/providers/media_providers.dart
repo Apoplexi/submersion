@@ -41,6 +41,7 @@ final mediaByIdProvider = FutureProvider.family<MediaItem?, String>((
   id,
 ) async {
   final repository = ref.watch(mediaRepositoryProvider);
+  ref.invalidateSelfWhen(repository.watchMediaChanges());
   return repository.getMediaById(id);
 });
 
@@ -50,6 +51,7 @@ final mediaCountForDiveProvider = FutureProvider.family<int, String>((
   diveId,
 ) async {
   final repository = ref.watch(mediaRepositoryProvider);
+  ref.invalidateSelfWhen(repository.watchMediaChanges());
   return repository.getMediaCountForDive(diveId);
 });
 
@@ -59,12 +61,14 @@ final pendingSuggestionCountProvider = FutureProvider.family<int, String>((
   diveId,
 ) async {
   final repository = ref.watch(mediaRepositoryProvider);
+  ref.invalidateSelfWhen(repository.watchMediaChanges());
   return repository.getPendingSuggestionCount(diveId);
 });
 
 /// Get all orphaned media
 final orphanedMediaProvider = FutureProvider<List<MediaItem>>((ref) async {
   final repository = ref.watch(mediaRepositoryProvider);
+  ref.invalidateSelfWhen(repository.watchMediaChanges());
   return repository.getOrphanedMedia();
 });
 
@@ -78,6 +82,7 @@ final divePhotoGpsProvider =
       diveId,
     ) async {
       final repository = ref.watch(mediaRepositoryProvider);
+      ref.invalidateSelfWhen(repository.watchMediaChanges());
       return repository.getBestGpsFromDiveMedia(diveId);
     });
 
@@ -88,6 +93,7 @@ final allDivePhotoGpsProvider =
       String
     >((ref, diveId) async {
       final repository = ref.watch(mediaRepositoryProvider);
+      ref.invalidateSelfWhen(repository.watchMediaChanges());
       return repository.getGpsFromDiveMedia(diveId);
     });
 

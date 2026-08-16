@@ -19,6 +19,10 @@ final sourceCountsProvider = FutureProvider<Map<MediaSourceType, int>>((
   return repo.countBySourceType();
 });
 
+// no-tick: reads watched_roots in the device-local cache database, which no
+// sync pull, merge, or repository bulk delete can touch, and which exposes no
+// change stream. Its only writer is this device's scanner, and [_refreshRoots]
+// below is the invalidation that owes for it.
 /// When a watched root was last scanned, memoized per root.
 ///
 /// A `FutureBuilder` built inline would re-issue this query on every

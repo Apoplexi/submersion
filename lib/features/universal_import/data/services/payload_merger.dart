@@ -195,6 +195,9 @@ class PayloadMerger {
             : agency?.toString().toLowerCase() ?? '';
         return '$name|$agencyStr';
       case ImportEntityType.dives:
+      // Service records are events, not named entities: two services on the
+      // same item are both real and must never fold together.
+      case ImportEntityType.serviceRecords:
         return null;
       case ImportEntityType.sites:
       case ImportEntityType.trips:

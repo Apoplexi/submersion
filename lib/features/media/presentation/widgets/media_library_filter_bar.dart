@@ -9,6 +9,7 @@ import 'package:submersion/features/media/presentation/providers/media_smart_alb
 import 'package:submersion/features/media/presentation/widgets/media_smart_album_name_dialog.dart';
 import 'package:submersion/features/trips/presentation/providers/trip_providers.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
+import 'package:submersion/shared/widgets/app_date_picker.dart';
 
 /// The library filter chip row: media type, site, trip, and date range, all
 /// writing [mediaLibraryFilterProvider]. Stateless — active state renders
@@ -51,7 +52,7 @@ class MediaLibraryFilterBar extends ConsumerWidget {
 
   Future<void> _pickDates(BuildContext context, WidgetRef ref) async {
     final now = DateTime.now();
-    final range = await showDateRangePicker(
+    final range = await showAppDateRangePicker(
       context: context,
       firstDate: DateTime(1970),
       lastDate: DateTime(now.year + 1),

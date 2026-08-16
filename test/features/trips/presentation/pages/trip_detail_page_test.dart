@@ -183,6 +183,9 @@ void main() {
                 (ref) => _MockTripListNotifier([]),
               ),
               settingsProvider.overrideWith((ref) => _MockSettingsNotifier()),
+              currentDiverIdProvider.overrideWith(
+                (ref) => MockCurrentDiverIdNotifier(),
+              ),
             ],
             child: MaterialApp(
               locale: const Locale('en'),
@@ -231,7 +234,7 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text('Add dives first to link photos'), findsWidgets);
 
-      // scan-dives with no diverId short-circuits without error.
+      // scan-dives with no active diver short-circuits without error.
       await openMenu();
       await tester.tap(
         find.widgetWithText(PopupMenuItem<String>, 'Find matching dives'),

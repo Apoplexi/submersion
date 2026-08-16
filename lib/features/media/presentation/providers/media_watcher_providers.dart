@@ -16,6 +16,12 @@ final watchedFolderRepositoryProvider = Provider<WatchedFolderRepository>(
   (ref) => WatchedFolderRepository(),
 );
 
+// no-tick: watched_roots lives in the device-local cache database and has
+// exactly two writers, addRoot and removeRoot, both reached from this
+// section's own UI, which invalidates this provider directly. Nothing that
+// the tick rule exists to catch -- a sync pull, a dive merge, a repository
+// bulk delete -- can reach that table, and the local cache DB has no change
+// stream to subscribe to.
 /// The registered watched roots, re-read after every mutation.
 final watchedRootsProvider = FutureProvider<List<String>>(
   (ref) => ref.watch(watchedFolderRepositoryProvider).getRoots(),
@@ -101,6 +107,10 @@ final watcherScannerProvider = Provider<WatchedFolderScanner>((ref) {
   );
 });
 
+// no-tick: this is a side effect, not a cached query -- recomputing it
+// re-runs a filesystem scan that can rewrite media.local_path. Subscribing to
+// a tick would make every media write trigger another scan, and the scan
+// itself writes media, so the tick would drive it in a loop.
 /// Opportunistic automatic pass, read once when the Media console builds.
 ///
 /// The app has no startup-maintenance host, so the console is the hook;

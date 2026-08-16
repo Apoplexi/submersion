@@ -464,6 +464,26 @@ class ChartOptionsDialog extends StatelessWidget {
       );
     }
 
+    // Display section: rendering behaviour rather than series visibility, so
+    // it is always present and its items carry no series colour.
+    sections.add(
+      _buildSection(
+        context,
+        key: 'display',
+        title: context.l10n.diveLog_chartSection_display,
+        legendState: legendState,
+        legendNotifier: legendNotifier,
+        children: [
+          _buildBehaviorItem(
+            context,
+            label: context.l10n.diveLog_chartOption_metricsFollowViewport,
+            isEnabled: legendState.metricsFollowViewport,
+            onTap: legendNotifier.toggleMetricsFollowViewport,
+          ),
+        ],
+      ),
+    );
+
     return sections;
   }
 
@@ -647,6 +667,16 @@ class ChartOptionsDialog extends StatelessWidget {
     );
   }
 
+  /// Wraps a hand-rolled check-box row so assistive technology announces it as
+  /// a checkbox with its state, not as an unlabelled button. The rows draw
+  /// their own [Icons.check_box] rather than using [Checkbox], which carries no
+  /// semantics of its own; [MergeSemantics] folds the state onto the same node
+  /// as the [InkWell]'s tap action so the two are announced together.
+  Widget _checkboxSemantics({required bool isEnabled, required Widget child}) =>
+      MergeSemantics(
+        child: Semantics(checked: isEnabled, child: child),
+      );
+
   Widget _buildToggleItem(
     BuildContext context, {
     required String label,
@@ -654,31 +684,68 @@ class ChartOptionsDialog extends StatelessWidget {
     required bool isEnabled,
     required VoidCallback onTap,
   }) {
-    return InkWell(
-      onTap: onTap,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-        child: Row(
-          children: [
-            Icon(
-              isEnabled ? Icons.check_box : Icons.check_box_outline_blank,
-              size: 20,
-              color: isEnabled
-                  ? color
-                  : Theme.of(context).colorScheme.onSurfaceVariant,
-            ),
-            const SizedBox(width: 8),
-            Container(
-              width: 16,
-              height: 4,
-              decoration: BoxDecoration(
-                color: isEnabled ? color : color.withValues(alpha: 0.3),
-                borderRadius: BorderRadius.circular(2),
+    return _checkboxSemantics(
+      isEnabled: isEnabled,
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          child: Row(
+            children: [
+              Icon(
+                isEnabled ? Icons.check_box : Icons.check_box_outline_blank,
+                size: 20,
+                color: isEnabled
+                    ? color
+                    : Theme.of(context).colorScheme.onSurfaceVariant,
               ),
-            ),
-            const SizedBox(width: 8),
-            Expanded(child: Text(label)),
-          ],
+              const SizedBox(width: 8),
+              Container(
+                width: 16,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: isEnabled ? color : color.withValues(alpha: 0.3),
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(child: Text(label)),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// A checkbox row for a rendering-behaviour option. Unlike
+  /// [_buildToggleItem] it carries no series colour swatch, because it does not
+  /// correspond to a line on the chart.
+  Widget _buildBehaviorItem(
+    BuildContext context, {
+    required String label,
+    required bool isEnabled,
+    required VoidCallback onTap,
+  }) {
+    final colorScheme = Theme.of(context).colorScheme;
+    return _checkboxSemantics(
+      isEnabled: isEnabled,
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          child: Row(
+            children: [
+              Icon(
+                isEnabled ? Icons.check_box : Icons.check_box_outline_blank,
+                size: 20,
+                color: isEnabled
+                    ? colorScheme.primary
+                    : colorScheme.onSurfaceVariant,
+              ),
+              const SizedBox(width: 8),
+              Expanded(child: Text(label)),
+            ],
+          ),
         ),
       ),
     );

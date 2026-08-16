@@ -57,10 +57,19 @@ Future<InboxSuggestion> computeInboxSuggestion({
 
 /// Matcher verdict for one unlinked media id: candidate dives come from a
 /// one-day window around the item's takenAt.
+///
+/// Subscribes to the DIVES tick, not a media one: the verdict is a join of
+/// this item against the dives in its window, so it goes stale when the
+/// candidate set moves underneath it -- a consolidation merging two dives, a
+/// bulk delete, or a sync pull -- none of which write the media table. Without
+/// this the inbox keeps offering a match against a dive that no longer exists.
 final inboxSuggestionProvider = FutureProvider.family<InboxSuggestion, String>((
   ref,
   mediaId,
 ) async {
+  final diveRepository = ref.watch(diveRepositoryProvider);
+  ref.invalidateSelfWhen(diveRepository.watchDivesChanges());
+
   final item = await ref.watch(mediaByIdProvider(mediaId).future);
   if (item == null) {
     return const InboxSuggestion(
@@ -68,13 +77,11 @@ final inboxSuggestionProvider = FutureProvider.family<InboxSuggestion, String>((
     );
   }
   final takenAt = item.takenAt;
-  final dives = await ref
-      .read(diveRepositoryProvider)
-      .getDivesInRange(
-        takenAt.subtract(const Duration(days: 1)),
-        takenAt.add(const Duration(days: 1)),
-        diverId: ref.read(currentDiverIdProvider),
-      );
+  final dives = await diveRepository.getDivesInRange(
+    takenAt.subtract(const Duration(days: 1)),
+    takenAt.add(const Duration(days: 1)),
+    diverId: ref.read(currentDiverIdProvider),
+  );
   return computeInboxSuggestion(takenAt: takenAt, candidateDives: dives);
 });
 

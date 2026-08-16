@@ -27,7 +27,6 @@ enum DiveDetailSectionId {
   tags,
   notes,
   customFields,
-  preDiveChecklist,
   dataSources;
 
   /// Human-readable name shown in the settings UI (English fallback).
@@ -40,7 +39,7 @@ enum DiveDetailSectionId {
       environment => 'Environment',
       altitude => 'Altitude',
       tide => 'Tide',
-      reefHealth => 'Reef Health',
+      reefHealth => 'Water Conditions',
       surfaceGps => 'Surface GPS',
       weights => 'Weights',
       buoyancy => 'Buoyancy',
@@ -53,7 +52,6 @@ enum DiveDetailSectionId {
       tags => 'Tags',
       notes => 'Notes',
       customFields => 'Custom Fields',
-      preDiveChecklist => 'Pre-Dive Check',
       dataSources => 'Data Sources',
     };
   }
@@ -69,7 +67,7 @@ enum DiveDetailSectionId {
       environment => 'Air/water temp, visibility, current',
       altitude => 'Altitude value, category, deco requirement',
       tide => 'Tide cycle graph and timing',
-      reefHealth => 'Coral bleaching heat stress on the dive date',
+      reefHealth => 'Satellite water conditions on the dive date',
       surfaceGps => 'GPS entry/exit points and surface drift',
       weights => 'Weight breakdown, total weight',
       buoyancy => 'Buoyancy through the dive, swing, ditchable weight',
@@ -82,7 +80,6 @@ enum DiveDetailSectionId {
       tags => 'Dive tags',
       notes => 'Dive notes/description',
       customFields => 'User-defined custom fields',
-      preDiveChecklist => 'Linked pre-dive checklist session',
       dataSources => 'Connected dive computers, source management',
     };
   }
@@ -110,7 +107,6 @@ enum DiveDetailSectionId {
       tags => l10n.diveDetailSection_tags_name,
       notes => l10n.diveDetailSection_notes_name,
       customFields => l10n.diveDetailSection_customFields_name,
-      preDiveChecklist => l10n.diveDetailSection_preDiveChecklist_name,
       dataSources => l10n.diveDetailSection_dataSources_name,
     };
   }
@@ -138,7 +134,6 @@ enum DiveDetailSectionId {
       tags => l10n.diveDetailSection_tags_description,
       notes => l10n.diveDetailSection_notes_description,
       customFields => l10n.diveDetailSection_customFields_description,
-      preDiveChecklist => l10n.diveDetailSection_preDiveChecklist_description,
       dataSources => l10n.diveDetailSection_dataSources_description,
     };
   }
@@ -206,10 +201,6 @@ class DiveDetailSectionConfig {
     DiveDetailSectionConfig(id: DiveDetailSectionId.notes, visible: true),
     DiveDetailSectionConfig(
       id: DiveDetailSectionId.customFields,
-      visible: true,
-    ),
-    DiveDetailSectionConfig(
-      id: DiveDetailSectionId.preDiveChecklist,
       visible: true,
     ),
     DiveDetailSectionConfig(id: DiveDetailSectionId.dataSources, visible: true),

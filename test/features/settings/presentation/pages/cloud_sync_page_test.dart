@@ -8,6 +8,7 @@ import 'package:http/testing.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:submersion/core/data/repositories/sync_repository.dart'
     show CloudProviderType, SyncRepository;
+import 'package:submersion/core/services/sync/sync_cleanup_outcome.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/core/services/cloud_storage/cloud_storage_provider.dart';
 import 'package:submersion/core/services/cloud_storage/dropbox/dropbox_api_client.dart';
@@ -35,6 +36,8 @@ import 'package:submersion/features/divers/presentation/providers/diver_provider
 import 'package:submersion/features/settings/presentation/pages/cloud_sync_page.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart'
     show sharedPreferencesProvider;
+import 'package:submersion/features/settings/presentation/providers/storage_providers.dart'
+    show StoragePlatformCapabilities, storagePlatformCapabilitiesProvider;
 import 'package:submersion/features/settings/presentation/providers/sync_providers.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
 import 'package:submersion/l10n/arb/app_localizations_en.dart';
@@ -166,6 +169,13 @@ class _FakeSyncNotifier extends StateNotifier<SyncState>
   Future<void> performSync({bool auto = false}) async => performSyncCalls++;
 
   @override
+  Future<ReplacePreflight> replacePreflight() async =>
+      const ReplacePreflight(localDiveCount: 0, peerFileCount: 0);
+
+  @override
+  Future<void> replaceCloudLibraryFromThisDevice() async {}
+
+  @override
   Future<void> disableForDatabaseReset() async {}
 
   @override
@@ -211,17 +221,28 @@ class _FakeSyncNotifier extends StateNotifier<SyncState>
 
   int removeThisDeviceCloudFilesCalls = 0;
   @override
-  Future<void> removeThisDeviceCloudFiles() async =>
-      removeThisDeviceCloudFilesCalls++;
+  Future<SyncCleanupOutcome> removeThisDeviceCloudFiles({
+    SyncCleanupProgress? onProgress,
+  }) async {
+    removeThisDeviceCloudFilesCalls++;
+    return const SyncCleanupOutcome();
+  }
 
   int wipeAllCloudSyncDataCalls = 0;
   @override
-  Future<void> wipeAllCloudSyncData() async => wipeAllCloudSyncDataCalls++;
+  Future<SyncCleanupOutcome> wipeAllCloudSyncData({
+    SyncCleanupProgress? onProgress,
+  }) async {
+    wipeAllCloudSyncDataCalls++;
+    return const SyncCleanupOutcome();
+  }
 
   int rebuildBackendFromThisDeviceCalls = 0;
   @override
-  Future<void> rebuildBackendFromThisDevice() async =>
-      rebuildBackendFromThisDeviceCalls++;
+  Future<void> rebuildBackendFromThisDevice({
+    SyncCleanupProgress? onProgress,
+    void Function()? onPublishStarted,
+  }) async => rebuildBackendFromThisDeviceCalls++;
 
   @override
   Future<void> signOut() async => signOutCalls++;
@@ -368,6 +389,9 @@ void main() {
     ),
     ICloudAvailability iCloudAvailability = ICloudAvailability.available,
     bool applePlatform = true,
+    // Android, where a "custom folder" is an app-specific device volume that
+    // no sync service can read (#311).
+    bool customFolderIsDeviceVolumeOnly = false,
   }) async {
     final base = await getBaseOverrides();
     final fakeSync = _FakeSyncNotifier(syncState);
@@ -397,6 +421,15 @@ void main() {
           isCloudSyncDisabledByCustomFolderProvider.overrideWithValue(
             customFolderMode,
           ),
+          storagePlatformCapabilitiesProvider.overrideWithValue(
+            StoragePlatformCapabilities(
+              supportsCustomFolder: true,
+              supportsICloud: applePlatform,
+              supportsGoogleDrive: true,
+              isDesktop: !customFolderIsDeviceVolumeOnly,
+              customFolderIsDeviceVolumeOnly: customFolderIsDeviceVolumeOnly,
+            ),
+          ),
           duplicateDiverGroupsProvider.overrideWith(
             (ref) async => duplicateGroups,
           ),
@@ -423,6 +456,9 @@ void main() {
             ),
         ],
         child: const MaterialApp(
+          // Pinned so the English literals these tests assert on cannot
+          // depend on the host's default locale.
+          locale: Locale('en'),
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
           home: CloudSyncPage(),
@@ -631,6 +667,13 @@ void main() {
       await pumpPage(tester);
       expect(find.text('Duplicate diver profiles'), findsNothing);
     });
+
+    // Issue #990: SyncState's counts and cursor are otherwise only recomputed
+    // by a sync, so opening the page could report state from app launch.
+    testWidgets('refreshes sync state when opened', (tester) async {
+      final handles = await pumpPage(tester);
+      expect(handles.sync.refreshStateCalls, greaterThan(0));
+    });
   });
 
   group('CloudSyncPage - custom folder banner', () {
@@ -651,6 +694,48 @@ void main() {
       for (final s in switches) {
         expect(s.onChanged, isNull);
       }
+    });
+
+    testWidgets('credits the folder\'s sync service where folders really sync', (
+      tester,
+    ) async {
+      await pumpPage(tester, customFolderMode: true);
+
+      expect(
+        find.text(
+          "App-managed cloud sync is disabled because you're using a custom "
+          "storage folder. Your folder's sync service (Dropbox, Google Drive, "
+          'OneDrive, etc.) handles synchronization.',
+        ),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('does not credit a sync service on device-volume-only '
+        'platforms', (tester) async {
+      await pumpPage(
+        tester,
+        customFolderMode: true,
+        customFolderIsDeviceVolumeOnly: true,
+      );
+
+      // On Android the custom folder is an app-specific volume under
+      // Android/data, which no sync client can read. Naming Dropbox/Drive
+      // here tells the user something covers a library that is in fact
+      // syncing nowhere (#311).
+      expect(
+        find.textContaining('handles synchronization'),
+        findsNothing,
+        reason: 'no sync service can reach an app-specific Android volume',
+      );
+      expect(
+        find.text(
+          'App-managed cloud sync is disabled while the database sits on a '
+          'device storage volume. No sync service can reach that folder on '
+          'Android, so use Backup & Restore to keep copies elsewhere.',
+        ),
+        findsOneWidget,
+      );
     });
 
     testWidgets('tapping Storage Settings pushes the storage route', (
@@ -699,6 +784,7 @@ void main() {
           ],
           child: MaterialApp.router(
             routerConfig: router,
+            locale: const Locale('en'),
             localizationsDelegates: AppLocalizations.localizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
           ),
@@ -880,21 +966,19 @@ void main() {
       },
     );
 
-    testWidgets(
-      'tapping the iCloud tile authenticates and shows snackbar',
-      (tester) async {
-        final handles = await pumpPage(tester);
+    testWidgets('tapping the iCloud tile authenticates and shows snackbar', (
+      tester,
+    ) async {
+      final handles = await pumpPage(tester);
 
-        await tester.tap(find.text('iCloud'));
-        await tester.pumpAndSettle();
+      await tester.tap(find.text('iCloud'));
+      await tester.pumpAndSettle();
 
-        // Fake provider authenticates successfully -> success snackbar +
-        // refreshState() on the sync notifier.
-        expect(find.text('Connected to Fake'), findsOneWidget);
-        expect(handles.sync.refreshStateCalls, greaterThan(0));
-      },
-      skip: tapUnavailable,
-    );
+      // Fake provider authenticates successfully -> success snackbar +
+      // refreshState() on the sync notifier.
+      expect(find.text('Connected to Fake'), findsOneWidget);
+      expect(handles.sync.refreshStateCalls, greaterThan(0));
+    }, skip: tapUnavailable);
 
     testWidgets('null cloud provider shows initialize-failed snackbar', (
       tester,
@@ -907,18 +991,16 @@ void main() {
       expect(find.text('Failed to initialize icloud provider'), findsOneWidget);
     }, skip: tapUnavailable);
 
-    testWidgets(
-      'authentication failure shows connection-failed snackbar',
-      (tester) async {
-        await pumpPage(tester, cloudProvider: _ThrowingCloudStorageProvider());
+    testWidgets('authentication failure shows connection-failed snackbar', (
+      tester,
+    ) async {
+      await pumpPage(tester, cloudProvider: _ThrowingCloudStorageProvider());
 
-        await tester.tap(find.text('iCloud'));
-        await tester.pumpAndSettle();
+      await tester.tap(find.text('iCloud'));
+      await tester.pumpAndSettle();
 
-        expect(find.textContaining('Fake connection failed:'), findsOneWidget);
-      },
-      skip: tapUnavailable,
-    );
+      expect(find.textContaining('Fake connection failed:'), findsOneWidget);
+    }, skip: tapUnavailable);
   });
 
   group('CloudSyncPage - sync actions', () {
@@ -1641,6 +1723,7 @@ void main() {
           ],
           child: MaterialApp.router(
             routerConfig: router,
+            locale: const Locale('en'),
             localizationsDelegates: AppLocalizations.localizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
           ),
@@ -1724,6 +1807,7 @@ void main() {
             ],
             child: MaterialApp.router(
               routerConfig: router,
+              locale: const Locale('en'),
               localizationsDelegates: AppLocalizations.localizationsDelegates,
               supportedLocales: AppLocalizations.supportedLocales,
             ),

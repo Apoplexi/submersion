@@ -14,6 +14,7 @@ import 'package:submersion/features/gps_log/data/services/gps_track_recorder.dar
 import 'package:submersion/features/gps_log/domain/entities/gps_track.dart';
 import 'package:submersion/features/gps_log/presentation/pages/gps_logger_page.dart';
 import 'package:submersion/features/gps_log/presentation/providers/gps_log_providers.dart';
+import 'package:submersion/features/gps_log/presentation/widgets/gps_track_thumbnail.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
 
@@ -123,6 +124,15 @@ void main() {
         GoRoute(
           path: '/gps-log',
           builder: (context, state) => const GpsLoggerPage(),
+          routes: [
+            // Stub stand-in for the real detail page: this harness only needs
+            // to prove the row pushes the right location.
+            GoRoute(
+              path: ':id',
+              builder: (context, state) =>
+                  const Scaffold(body: Text('TRACK-DETAIL-PAGE')),
+            ),
+          ],
         ),
         GoRoute(
           path: '/dives/match-sites',
@@ -143,6 +153,7 @@ void main() {
       ],
       child: MaterialApp.router(
         routerConfig: router,
+        locale: const Locale('en'),
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
       ),
@@ -162,27 +173,21 @@ void main() {
     return id;
   }
 
-  testWidgets(
-    'desktop hides record controls, shows empty state',
-    (tester) async {
-      await tester.pumpWidget(await app());
-      await tester.pumpAndSettle();
-      expect(find.text('Start logging'), findsNothing);
-      expect(find.text('No GPS tracks recorded yet'), findsOneWidget);
-      expect(find.text('Match dives to GPS logs'), findsOneWidget);
-    },
-    variant: TargetPlatformVariant.only(TargetPlatform.macOS),
-  );
+  testWidgets('desktop hides record controls, shows empty state', (
+    tester,
+  ) async {
+    await tester.pumpWidget(await app());
+    await tester.pumpAndSettle();
+    expect(find.text('Start logging'), findsNothing);
+    expect(find.text('No GPS tracks recorded yet'), findsOneWidget);
+    expect(find.text('Match dives to GPS logs'), findsOneWidget);
+  }, variant: TargetPlatformVariant.only(TargetPlatform.macOS));
 
-  testWidgets(
-    'mobile idle state shows the start button',
-    (tester) async {
-      await tester.pumpWidget(await app());
-      await tester.pumpAndSettle();
-      expect(find.text('Start logging'), findsOneWidget);
-    },
-    variant: TargetPlatformVariant.only(TargetPlatform.android),
-  );
+  testWidgets('mobile idle state shows the start button', (tester) async {
+    await tester.pumpWidget(await app());
+    await tester.pumpAndSettle();
+    expect(find.text('Start logging'), findsOneWidget);
+  }, variant: TargetPlatformVariant.only(TargetPlatform.android));
 
   testWidgets(
     'recording state shows point count and stop button',
@@ -224,24 +229,20 @@ void main() {
     timeout: const Timeout(Duration(seconds: 30)),
   );
 
-  testWidgets(
-    'recording card shows last-fix age and accuracy',
-    (tester) async {
-      final state = GpsRecorderState(
-        status: GpsRecorderStatus.recording,
-        trackId: 't1',
-        pointCount: 4,
-        startedAt: DateTime.now().toUtc(),
-        lastFixAt: DateTime.now().toUtc().subtract(const Duration(minutes: 2)),
-        lastFixAccuracy: 8,
-      );
-      await tester.pumpWidget(await app(recorderState: Stream.value(state)));
-      await tester.pumpAndSettle();
-      expect(find.text('Recording - 4 points'), findsOneWidget);
-      expect(find.textContaining('Last fix'), findsOneWidget);
-    },
-    variant: TargetPlatformVariant.only(TargetPlatform.android),
-  );
+  testWidgets('recording card shows last-fix age and accuracy', (tester) async {
+    final state = GpsRecorderState(
+      status: GpsRecorderStatus.recording,
+      trackId: 't1',
+      pointCount: 4,
+      startedAt: DateTime.now().toUtc(),
+      lastFixAt: DateTime.now().toUtc().subtract(const Duration(minutes: 2)),
+      lastFixAccuracy: 8,
+    );
+    await tester.pumpWidget(await app(recorderState: Stream.value(state)));
+    await tester.pumpAndSettle();
+    expect(find.text('Recording - 4 points'), findsOneWidget);
+    expect(find.textContaining('Last fix'), findsOneWidget);
+  }, variant: TargetPlatformVariant.only(TargetPlatform.android));
 
   testWidgets('completed tracks render as tiles with delete affordance', (
     tester,
@@ -251,10 +252,24 @@ void main() {
     await tester.pumpWidget(await app());
     await tester.pumpAndSettle();
     expect(find.text('No GPS tracks recorded yet'), findsNothing);
-    expect(find.byIcon(Icons.route_outlined), findsOneWidget);
+    // The leading affordance is now a map preview, not a route glyph.
+    expect(find.byType(GpsTrackThumbnail), findsOneWidget);
     // 1 point, 90 minutes, compact app-wide duration style.
     expect(find.text('1 point, 1h 30m'), findsOneWidget);
     expect(find.byIcon(Icons.delete_outline), findsOneWidget);
+  });
+
+  testWidgets('tapping a track row navigates to its detail route', (
+    tester,
+  ) async {
+    await seedCompletedTrack();
+
+    await tester.pumpWidget(await app());
+    await tester.pumpAndSettle();
+    await tester.tap(find.byType(ListTile));
+    await tester.pumpAndSettle();
+
+    expect(find.text('TRACK-DETAIL-PAGE'), findsOneWidget);
   });
 
   testWidgets('match action reports positioned dives and links to review', (
@@ -330,57 +345,45 @@ void main() {
     final defaultGeolocator = GeolocatorPlatform.instance;
     tearDown(() => GeolocatorPlatform.instance = defaultGeolocator);
 
-    testWidgets(
-      'warns when location services are disabled',
-      (tester) async {
-        GeolocatorPlatform.instance = _FakeGeolocator(serviceEnabled: false);
-        await tester.pumpWidget(await app());
-        await tester.pumpAndSettle();
-        await tester.tap(find.text('Start logging'));
-        await tester.pumpAndSettle();
-        expect(find.text('Location services are turned off.'), findsOneWidget);
-      },
-      variant: TargetPlatformVariant.only(TargetPlatform.android),
-    );
+    testWidgets('warns when location services are disabled', (tester) async {
+      GeolocatorPlatform.instance = _FakeGeolocator(serviceEnabled: false);
+      await tester.pumpWidget(await app());
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Start logging'));
+      await tester.pumpAndSettle();
+      expect(find.text('Location services are turned off.'), findsOneWidget);
+    }, variant: TargetPlatformVariant.only(TargetPlatform.android));
 
-    testWidgets(
-      'warns when permission is denied',
-      (tester) async {
-        GeolocatorPlatform.instance = _FakeGeolocator(
-          permission: LocationPermission.denied,
-          requestResult: LocationPermission.denied,
-        );
-        await tester.pumpWidget(await app());
-        await tester.pumpAndSettle();
-        await tester.tap(find.text('Start logging'));
-        await tester.pumpAndSettle();
-        expect(
-          find.text(
-            'Location permission is required to record a GPS track. '
-            'Enable it in system settings.',
-          ),
-          findsOneWidget,
-        );
-      },
-      variant: TargetPlatformVariant.only(TargetPlatform.android),
-    );
+    testWidgets('warns when permission is denied', (tester) async {
+      GeolocatorPlatform.instance = _FakeGeolocator(
+        permission: LocationPermission.denied,
+        requestResult: LocationPermission.denied,
+      );
+      await tester.pumpWidget(await app());
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Start logging'));
+      await tester.pumpAndSettle();
+      expect(
+        find.text(
+          'Location permission is required to record a GPS track. '
+          'Enable it in system settings.',
+        ),
+        findsOneWidget,
+      );
+    }, variant: TargetPlatformVariant.only(TargetPlatform.android));
 
-    testWidgets(
-      'starts recording once permission is granted',
-      (tester) async {
-        GeolocatorPlatform.instance = _FakeGeolocator(
-          permission: LocationPermission.denied,
-          requestResult: LocationPermission.whileInUse,
-        );
-        final recorder = _SpyRecorder(repo);
-        await tester.pumpWidget(await app(recorder: recorder));
-        await tester.pumpAndSettle();
-        await tester.tap(find.text('Start logging'));
-        await tester.pumpAndSettle();
-        expect(recorder.started, isTrue);
-      },
-      variant: TargetPlatformVariant.only(TargetPlatform.android),
-    );
+    testWidgets('starts recording once permission is granted', (tester) async {
+      GeolocatorPlatform.instance = _FakeGeolocator(
+        permission: LocationPermission.denied,
+        requestResult: LocationPermission.whileInUse,
+      );
+      final recorder = _SpyRecorder(repo);
+      await tester.pumpWidget(await app(recorder: recorder));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Start logging'));
+      await tester.pumpAndSettle();
+      expect(recorder.started, isTrue);
+    }, variant: TargetPlatformVariant.only(TargetPlatform.android));
   });
 
   testWidgets('an interrupted recording surfaces a recovery notice', (
@@ -403,6 +406,6 @@ void main() {
       findsOneWidget,
     );
     // The recovered track now renders as a completed tile.
-    expect(find.byIcon(Icons.route_outlined), findsOneWidget);
+    expect(find.byType(GpsTrackThumbnail), findsOneWidget);
   });
 }

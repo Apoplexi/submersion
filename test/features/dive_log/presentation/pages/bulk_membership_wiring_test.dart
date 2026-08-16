@@ -6,6 +6,7 @@ import 'package:submersion/core/database/database.dart' hide Buddy, Dive;
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/features/buddies/data/repositories/buddy_repository.dart';
 import 'package:submersion/features/buddies/domain/entities/buddy.dart';
+import 'package:submersion/features/buddies/presentation/widgets/buddy_picker.dart';
 import 'package:submersion/features/dive_roles/domain/entities/dive_role.dart';
 import 'package:submersion/features/dive_log/data/repositories/dive_repository_impl.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
@@ -42,15 +43,24 @@ void main() {
       await tearDownTestDatabase();
     });
 
-    BuddyWithRole bwr(String id, String name) => BuddyWithRole(
-      buddy: Buddy(
-        id: id,
-        name: name,
-        createdAt: DateTime(2026, 1, 1),
-        updatedAt: DateTime(2026, 1, 1),
-      ),
-      role: DiveRole.builtInBuddy(),
+    final instructorRole = DiveRole(
+      id: DiveRole.instructorId,
+      name: 'Instructor',
+      isBuiltIn: true,
+      createdAt: DateTime(2026, 1, 1),
+      updatedAt: DateTime(2026, 1, 1),
     );
+
+    BuddyWithRole bwr(String id, String name, [DiveRole? role]) =>
+        BuddyWithRole(
+          buddy: Buddy(
+            id: id,
+            name: name,
+            createdAt: DateTime(2026, 1, 1),
+            updatedAt: DateTime(2026, 1, 1),
+          ),
+          role: role ?? DiveRole.builtInBuddy(),
+        );
 
     Future<void> seedTag(String id, String name) => db
         .into(db.tags)
@@ -91,6 +101,9 @@ void main() {
             customTankPresetsProvider.overrideWith((ref) async => []),
           ].cast(),
           child: MaterialApp(
+            // Every assertion below matches an English label, so pin the
+            // locale instead of inheriting the ambient platform one.
+            locale: const Locale('en'),
             localizationsDelegates: AppLocalizations.localizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
             home: Scaffold(
@@ -293,6 +306,135 @@ void main() {
         await tester.pumpAndSettle();
         expect(find.byType(AlertDialog), findsNothing);
       }
+    });
+
+    testWidgets('bulk-adding a buddy keeps the role picked in the picker', (
+      tester,
+    ) async {
+      await seedBuddy('b1', 'Alice');
+      await seedDive('d1');
+      await seedDive('d2');
+      await pump(tester, ['d1', 'd2']);
+
+      // Buddies "+ Add" -> dialog hosting the BuddyPicker.
+      await tapAdd(tester, 'Buddies');
+      // The picker's own "+ Add" -> buddy selection sheet.
+      await tester.tap(
+        find.descendant(
+          of: find.byType(BuddyPicker),
+          matching: find.widgetWithText(TextButton, 'Add'),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // Pick Alice -> role selector -> Instructor.
+      await tester.tap(find.text('Alice'));
+      await tester.pumpAndSettle();
+      expect(find.text('Select Role for Alice'), findsOneWidget);
+      await tester.tap(find.text('Instructor'));
+      await tester.pumpAndSettle();
+
+      // Done (close the sheet) then Add (merge into the membership editor).
+      await tester.tap(find.text('Done'));
+      await tester.pumpAndSettle();
+      await tester.tap(
+        find.descendant(
+          of: find.byType(AlertDialog),
+          matching: find.widgetWithText(FilledButton, 'Add'),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.ensureVisible(find.text('Save'));
+      await tester.tap(find.text('Save'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Apply'));
+      await tester.pumpAndSettle();
+
+      final rows = await db.select(db.diveBuddies).get();
+      expect(rows.map((r) => r.diveId), containsAll(['d1', 'd2']));
+      expect(rows.map((r) => r.role), everyElement(DiveRole.instructorId));
+    });
+
+    testWidgets('adding an existing buddy to the rest keeps their role', (
+      tester,
+    ) async {
+      await seedBuddy('b1', 'Alice');
+      await seedDive('d1');
+      await seedDive('d2');
+      // Alice is an Instructor on d1 only -> the row reads "on 1 of 2".
+      await buddyRepo.bulkAddBuddies(
+        ['d1'],
+        [bwr('b1', 'Alice', instructorRole)],
+      );
+
+      await pump(tester, ['d1', 'd2']);
+
+      final toggle = find.byKey(const ValueKey('membership-toggle-b1'));
+      await tester.ensureVisible(toggle);
+      await tester.tap(toggle);
+      await tester.pumpAndSettle();
+
+      await tester.ensureVisible(find.text('Save'));
+      await tester.tap(find.text('Save'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Apply'));
+      await tester.pumpAndSettle();
+
+      final rows = await db.select(db.diveBuddies).get();
+      expect(rows.map((r) => r.diveId), containsAll(['d1', 'd2']));
+      // Neither the pre-existing link nor the new one may fall back to "buddy".
+      expect(rows.map((r) => r.role), everyElement(DiveRole.instructorId));
+    });
+
+    testWidgets('re-picking a role for an already-listed buddy applies it', (
+      tester,
+    ) async {
+      await seedBuddy('b1', 'Alice');
+      await seedDive('d1');
+      await seedDive('d2');
+      // Alice is already on both dives as a plain Buddy.
+      await buddyRepo.bulkAddBuddies(['d1', 'd2'], [bwr('b1', 'Alice')]);
+
+      await pump(tester, ['d1', 'd2']);
+
+      await tapAdd(tester, 'Buddies');
+      await tester.tap(
+        find.descendant(
+          of: find.byType(BuddyPicker),
+          matching: find.widgetWithText(TextButton, 'Add'),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(
+        find.descendant(
+          of: find.byType(DraggableScrollableSheet),
+          matching: find.text('Alice'),
+        ),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Instructor'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Done'));
+      await tester.pumpAndSettle();
+      await tester.tap(
+        find.descendant(
+          of: find.byType(AlertDialog),
+          matching: find.widgetWithText(FilledButton, 'Add'),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.ensureVisible(find.text('Save'));
+      await tester.tap(find.text('Save'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Apply'));
+      await tester.pumpAndSettle();
+
+      final rows = await db.select(db.diveBuddies).get();
+      expect(rows, hasLength(2));
+      expect(rows.map((r) => r.role), everyElement(DiveRole.instructorId));
     });
 
     testWidgets('equipment add and use-set open their pickers', (tester) async {

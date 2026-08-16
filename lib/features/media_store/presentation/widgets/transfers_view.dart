@@ -5,13 +5,29 @@ import 'package:submersion/features/media/presentation/providers/resolved_asset_
 import 'package:submersion/features/media_store/data/media_transfer_queue_repository.dart';
 import 'package:submersion/features/media_store/presentation/providers/media_store_providers.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
+import 'package:submersion/shared/selection/selection_leading.dart';
 
 /// The transfer queue list: active, waiting, and failed transfers with
 /// per-entry retry. Embedded by both the Settings TransfersPage (which adds
-/// the app bar and clear-completed action) and the Media console's
-/// Transfers section.
+/// the app bar, clear-completed action, and bulk selection) and the Media
+/// console's Transfers section.
+///
+/// Selection is owned by the host, not by this widget: the Settings page runs
+/// the [SelectionController] behind its [SelectionAppBar] and passes the state
+/// down, while the Media console embeds the plain list by omitting these. The
+/// tile renders its checkbox in place of the state icon so the row root stays
+/// the [ListTile] either way.
 class TransfersView extends ConsumerWidget {
-  const TransfersView({super.key});
+  const TransfersView({
+    super.key,
+    this.isSelectionMode = false,
+    this.selectedIds = const {},
+    this.onToggle,
+  });
+
+  final bool isSelectionMode;
+  final Set<String> selectedIds;
+  final ValueChanged<String>? onToggle;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -25,17 +41,45 @@ class TransfersView extends ConsumerWidget {
           : ListView.separated(
               itemCount: rows.length,
               separatorBuilder: (_, _) => const Divider(height: 1),
-              itemBuilder: (context, index) =>
-                  _TransferTile(entry: rows[index]),
+              itemBuilder: (context, index) {
+                final entry = rows[index];
+                final id = entry.id.toString();
+                final tile = _TransferTile(
+                  entry: entry,
+                  isSelectionMode: isSelectionMode,
+                  isChecked: selectedIds.contains(id),
+                  onCheckChanged: onToggle == null
+                      ? null
+                      : (_) => onToggle!(id),
+                );
+                // The tile has no tap handler of its own, so while selecting
+                // the whole row has to toggle -- otherwise the checkbox is
+                // the only target.
+                return isSelectionMode && onToggle != null
+                    ? GestureDetector(
+                        behavior: HitTestBehavior.opaque,
+                        onTap: () => onToggle!(id),
+                        child: tile,
+                      )
+                    : tile;
+              },
             ),
     );
   }
 }
 
 class _TransferTile extends ConsumerWidget {
-  const _TransferTile({required this.entry});
+  const _TransferTile({
+    required this.entry,
+    this.isSelectionMode = false,
+    this.isChecked = false,
+    this.onCheckChanged,
+  });
 
   final MediaTransferQueueEntry entry;
+  final bool isSelectionMode;
+  final bool isChecked;
+  final ValueChanged<bool>? onCheckChanged;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -68,11 +112,17 @@ class _TransferTile extends ConsumerWidget {
       ),
     };
     return ListTile(
-      leading: Icon(
-        icon,
-        color: entry.state == 'failed'
-            ? Theme.of(context).colorScheme.error
-            : null,
+      // The state icon becomes the checkbox in selection mode.
+      leading: SelectionLeading(
+        isSelectionMode: isSelectionMode,
+        isChecked: isChecked,
+        onChanged: onCheckChanged,
+        child: Icon(
+          icon,
+          color: entry.state == 'failed'
+              ? Theme.of(context).colorScheme.error
+              : null,
+        ),
       ),
       title: Text(label),
       subtitle: Column(

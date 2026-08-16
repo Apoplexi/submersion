@@ -180,6 +180,12 @@ const List<PerformanceIndex> kPerformanceIndexes = [
         'ON media(platform_asset_id)',
   ),
   (
+    name: 'idx_media_site_id',
+    ddl:
+        'CREATE INDEX IF NOT EXISTS idx_media_site_id '
+        'ON media(site_id)',
+  ),
+  (
     name: 'idx_media_enrichment_media',
     ddl:
         'CREATE INDEX IF NOT EXISTS idx_media_enrichment_media '

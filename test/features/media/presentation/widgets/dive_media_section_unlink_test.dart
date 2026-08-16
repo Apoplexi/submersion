@@ -1,25 +1,39 @@
 import 'package:drift/drift.dart' show Value;
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+// The project barrel, not flutter_riverpod directly: Riverpod 3.1 moved
+// StateNotifier into flutter_riverpod/legacy.dart and the barrel re-exports
+// both halves.
+import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/core/database/database.dart';
 import 'package:submersion/features/media/data/repositories/media_repository.dart';
 import 'package:submersion/features/media/domain/entities/media_item.dart';
 import 'package:submersion/features/media/domain/entities/media_source_type.dart';
 import 'package:submersion/features/media/presentation/providers/media_providers.dart';
 import 'package:submersion/features/media/presentation/widgets/dive_media_section.dart';
-import 'package:submersion/features/media_store/data/media_deletion_coordinator.dart';
-import 'package:submersion/features/media_store/presentation/providers/media_store_providers.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
 
 import '../../../../helpers/test_database.dart';
 
-class _ThrowingDeletionCoordinator implements MediaDeletionCoordinator {
+/// Fails the unlink so the surface's error branch can be asserted. Delete is
+/// captured rather than thrown: this surface must never reach it, and a
+/// regression to the old hard-delete wiring would surface as a delete error
+/// instead of the expected unlink one.
+class _ThrowingMediaListNotifier
+    extends StateNotifier<AsyncValue<List<MediaItem>>>
+    implements MediaListNotifier {
+  _ThrowingMediaListNotifier() : super(const AsyncValue.data(<MediaItem>[]));
+
+  @override
+  Future<void> unlinkMultipleMedia(List<String> ids) async {
+    throw StateError('unlink failed');
+  }
+
   @override
   Future<void> deleteMultipleMedia(List<String> ids) async {
-    throw StateError('store offline');
+    throw StateError('delete must not be reached from this surface');
   }
 
   @override
@@ -84,8 +98,8 @@ void main() {
     expect(await repo.getMediaById('kill-me'), isNull);
   });
 
-  testWidgets('selection header offers Unlink and Delete; Unlink keeps the '
-      'row', (tester) async {
+  testWidgets('the selection bar offers Unlink and no Delete; Unlink keeps '
+      'the row', (tester) async {
     await insertDive('d1');
     await repo.createMedia(item('m1', diveId: 'd1'));
 
@@ -111,14 +125,24 @@ void main() {
       await tester.pump();
     });
 
-    // Enter selection mode by long-pressing the tile.
-    await tester.longPress(find.byType(GestureDetector).first);
+    // Entry is the keyed Select affordance: long-press was removed as a
+    // selection entry across every surface (PR #1021).
+    await tester.tap(find.byKey(const ValueKey('enter_selection')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('selection_select_all')));
     await tester.pumpAndSettle();
 
-    expect(find.byIcon(Icons.link_off), findsOneWidget);
-    expect(find.byIcon(Icons.delete_outline), findsOneWidget);
+    // Unlink is the only bulk action here. This surface deliberately has no
+    // delete: clearing a dive link is not destroying the file, and the row
+    // stays reachable from the Media library.
+    expect(
+      find.byKey(const ValueKey('selection_action_unlink')),
+      findsOneWidget,
+    );
+    expect(find.byKey(const ValueKey('selection_delete')), findsNothing);
+    expect(find.byIcon(Icons.delete_outline), findsNothing);
 
-    await tester.tap(find.byIcon(Icons.link_off));
+    await tester.tap(find.byKey(const ValueKey('selection_action_unlink')));
     await tester.pumpAndSettle();
     expect(find.text('Unlink 1 items?'), findsOneWidget);
     await tester.tap(find.text('Unlink'));
@@ -132,7 +156,7 @@ void main() {
     expect(m!.diveId, isNull);
   });
 
-  testWidgets('a failed delete reports a delete error, not an unlink one', (
+  testWidgets('a failed unlink reports an unlink error and keeps the row', (
     tester,
   ) async {
     await insertDive('d1');
@@ -143,9 +167,9 @@ void main() {
         ProviderScope(
           overrides: [
             sharedPreferencesProvider.overrideWithValue(prefs),
-            mediaDeletionCoordinatorProvider.overrideWithValue(
-              _ThrowingDeletionCoordinator(),
-            ),
+            mediaListNotifierProvider(
+              'd1',
+            ).overrideWith((ref) => _ThrowingMediaListNotifier()),
           ],
           child: const MaterialApp(
             locale: Locale('en'),
@@ -165,22 +189,24 @@ void main() {
       await tester.pump();
     });
 
-    await tester.longPress(find.byType(GestureDetector).first);
+    await tester.tap(find.byKey(const ValueKey('enter_selection')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('selection_select_all')));
     await tester.pumpAndSettle();
 
-    await tester.tap(find.byIcon(Icons.delete_outline));
+    await tester.tap(find.byKey(const ValueKey('selection_action_unlink')));
     await tester.pumpAndSettle();
-    expect(find.text('Delete 1 items?'), findsOneWidget);
-    await tester.tap(find.text('Delete').last);
+    expect(find.text('Unlink 1 items?'), findsOneWidget);
+    await tester.tap(find.text('Unlink'));
     await tester.runAsync(() async {
       await Future<void>.delayed(const Duration(milliseconds: 100));
       await tester.pump();
     });
     await tester.pump();
 
-    expect(find.textContaining('Failed to delete:'), findsOneWidget);
-    expect(find.textContaining('Failed to unlink:'), findsNothing);
-    // The row survives a failed delete.
+    expect(find.textContaining('Failed to unlink:'), findsOneWidget);
+    expect(find.textContaining('Failed to delete:'), findsNothing);
+    // The row survives a failed unlink.
     expect(await repo.getMediaById('m1'), isNotNull);
   });
 }

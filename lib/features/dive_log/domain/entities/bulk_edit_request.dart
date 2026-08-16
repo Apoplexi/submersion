@@ -39,7 +39,17 @@ class BuddiesOp extends BulkCollectionOp {
   final BulkCollectionMode mode;
   // For remove, the buddy ids are read from each entry's .buddy.id.
   final List<BuddyWithRole> buddies;
-  const BuddiesOp({required this.mode, required this.buddies});
+
+  /// Add mode only: whether each entry's role replaces the role on links that
+  /// already exist. False for a membership-only add, where the user asked for
+  /// the buddy on every dive but never touched their role (#893).
+  final bool overwriteRole;
+
+  const BuddiesOp({
+    required this.mode,
+    required this.buddies,
+    this.overwriteRole = true,
+  });
 }
 
 class TanksOp extends BulkCollectionOp {

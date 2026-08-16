@@ -138,6 +138,8 @@ class AppShortcuts {
       // `go` into a `/dives` child would rebuild the stack as [dive list, X],
       // stranding a user who pressed the key from Media or Statistics.
       platformShortcut(LogicalKeyboardKey.keyN): () {
+        // PUSH (not go): the digit shortcuts below switch tabs, but this
+        // opens a sub-page and must stay poppable (#647).
         context.push('/dives/new');
       },
       platformShortcut(LogicalKeyboardKey.digit1): () {

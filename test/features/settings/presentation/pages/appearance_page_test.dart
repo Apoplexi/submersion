@@ -178,6 +178,46 @@ void main() {
       expect(pushed, '/settings/appearance/home');
     });
 
+    testWidgets('App Language tile pushes the language page', (tester) async {
+      await tester.binding.setSurfaceSize(const Size(400, 2000));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+
+      final router = GoRouter(
+        routes: [
+          GoRoute(path: '/', builder: (_, _) => const AppearancePage()),
+          GoRoute(
+            path: '/settings/language',
+            builder: (_, _) => const Scaffold(body: Text('language page')),
+          ),
+        ],
+      );
+      addTearDown(router.dispose);
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            settingsProvider.overrideWith((ref) => _MockSettingsNotifier()),
+            sharedPreferencesProvider.overrideWithValue(_prefs),
+          ],
+          child: MaterialApp.router(
+            locale: const Locale('en'),
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            routerConfig: router,
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('App Language'));
+      await tester.pumpAndSettle();
+
+      // PUSH (not go): the settings page stays underneath, so the Android
+      // system back button returns to it instead of closing the app (#647).
+      expect(find.text('language page'), findsOneWidget);
+      expect(router.routerDelegate.canPop(), isTrue);
+    });
+
     testWidgets('does NOT show old inline settings', (tester) async {
       await tester.binding.setSurfaceSize(const Size(400, 2000));
       addTearDown(() => tester.binding.setSurfaceSize(null));

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/intl.dart';
@@ -8,6 +10,7 @@ import 'package:submersion/features/dive_log/domain/entities/dive.dart';
 import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
 import 'package:submersion/features/trips/domain/entities/itinerary_day.dart';
 import 'package:submersion/features/trips/domain/entities/trip_story_day.dart';
+import 'package:submersion/features/trips/presentation/providers/surface_day_weather_provider.dart';
 import 'package:submersion/features/trips/presentation/widgets/story/trip_story_day_header.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
 
@@ -30,6 +33,8 @@ Future<void> pumpHeader(
   TripStoryDay day, {
   double textScale = 1.0,
   MockSettingsNotifier? settingsNotifier,
+  SurfaceDayWeatherRequest? surfaceWeatherRequest,
+  List<Override> extra = const [],
 }) async {
   // The header dates itself with DateFormat.MMMEd(), which resolves against
   // Intl.defaultLocale - a process global that app.dart sets from the app
@@ -43,7 +48,7 @@ Future<void> pumpHeader(
   final overrides = await getBaseOverrides(settingsNotifier: settingsNotifier);
   await tester.pumpWidget(
     ProviderScope(
-      overrides: overrides,
+      overrides: [...overrides, ...extra],
       child: MaterialApp(
         locale: const Locale('en'),
         localizationsDelegates: AppLocalizations.localizationsDelegates,
@@ -58,7 +63,10 @@ Future<void> pumpHeader(
                 data: MediaQuery.of(
                   context,
                 ).copyWith(textScaler: TextScaler.linear(textScale)),
-                child: TripStoryDayHeader(day: day),
+                child: TripStoryDayHeader(
+                  day: day,
+                  surfaceWeatherRequest: surfaceWeatherRequest,
+                ),
               ),
             ),
           ),
@@ -129,15 +137,150 @@ void main() {
   });
 
   testWidgets('no subtitle line when there is nothing to say', (tester) async {
+    // A dive with no site on a day with no itinerary: nothing to subtitle with,
+    // but the dive keeps it off the surface-day path (which has its own label).
     final day = TripStoryDay(
       date: DateTime(2026, 3, 8),
       dayNumber: 2,
       kind: TripStoryDayKind.past,
+      dives: [Dive(id: 'd1', dateTime: DateTime(2026, 3, 8, 9))],
     );
     await pumpHeader(tester, day);
 
     // Only the title line renders.
     expect(find.byType(Text), findsOneWidget);
+  });
+
+  group('surface day', () {
+    TripStoryDay surfaceDay() => TripStoryDay(
+      date: DateTime(2026, 3, 8),
+      dayNumber: 2,
+      kind: TripStoryDayKind.past,
+    );
+    final request = SurfaceDayWeatherRequest(
+      date: DateTime(2026, 3, 8),
+      latitude: 12.1,
+      longitude: -68.2,
+    );
+
+    testWidgets('gets the same title line as any other day', (tester) async {
+      await pumpHeader(tester, surfaceDay());
+
+      expect(find.textContaining('Day 2'), findsOneWidget);
+      expect(find.textContaining('Mar 8'), findsOneWidget);
+    });
+
+    testWidgets('labels itself in the subtitle slot', (tester) async {
+      await pumpHeader(tester, surfaceDay());
+
+      expect(find.text('Surface day'), findsOneWidget);
+    });
+
+    testWidgets('title style matches a dive day title exactly', (tester) async {
+      // The point of the shared header: a surface day must not read as a
+      // lesser, smaller entry than the dive day above or below it.
+      await pumpHeader(tester, surfaceDay());
+      final surfaceStyle = tester
+          .widget<Text>(find.textContaining('Day 2'))
+          .style;
+
+      await pumpHeader(
+        tester,
+        TripStoryDay(
+          date: DateTime(2026, 3, 8),
+          dayNumber: 2,
+          kind: TripStoryDayKind.past,
+          dives: [
+            Dive(
+              id: 'd1',
+              dateTime: DateTime(2026, 3, 8, 9),
+              site: const DiveSite(id: 'site-a', name: 'Blue Corner'),
+            ),
+          ],
+        ),
+      );
+      final diveStyle = tester.widget<Text>(find.textContaining('Day 2')).style;
+
+      expect(surfaceStyle, diveStyle);
+      expect(surfaceStyle?.fontWeight, FontWeight.bold);
+    });
+
+    testWidgets('carries no leading icon', (tester) async {
+      // The old slim row led with a waves icon; no other day header does, so
+      // keeping it would reintroduce the asymmetry the shared header removes.
+      await pumpHeader(tester, surfaceDay());
+
+      expect(find.byType(Icon), findsNothing);
+    });
+
+    testWidgets('shows fetched weather in the existing badge', (tester) async {
+      await pumpHeader(
+        tester,
+        surfaceDay(),
+        surfaceWeatherRequest: request,
+        extra: [
+          surfaceDayWeatherProvider(request).overrideWith(
+            (ref) async => const TripStoryDayWeather(
+              airTemp: 22,
+              cloudCover: CloudCover.clear,
+            ),
+          ),
+        ],
+      );
+      await tester.pump();
+
+      expect(find.byIcon(Icons.wb_sunny_outlined), findsOneWidget);
+      expect(find.text('22°C'), findsOneWidget);
+    });
+
+    testWidgets('fetched temperature respects Fahrenheit', (tester) async {
+      final settings = MockSettingsNotifier();
+      await settings.setTemperatureUnit(TemperatureUnit.fahrenheit);
+      await pumpHeader(
+        tester,
+        surfaceDay(),
+        settingsNotifier: settings,
+        surfaceWeatherRequest: request,
+        extra: [
+          surfaceDayWeatherProvider(
+            request,
+          ).overrideWith((ref) async => const TripStoryDayWeather(airTemp: 22)),
+        ],
+      );
+      await tester.pump();
+
+      expect(find.text('71.6°F'), findsOneWidget);
+    });
+
+    testWidgets('loading and failed weather stay badge-free', (tester) async {
+      final pending = Completer<TripStoryDayWeather?>();
+      await pumpHeader(
+        tester,
+        surfaceDay(),
+        surfaceWeatherRequest: request,
+        extra: [
+          surfaceDayWeatherProvider(
+            request,
+          ).overrideWith((ref) => pending.future),
+        ],
+      );
+
+      expect(find.textContaining('°'), findsNothing);
+      expect(find.byType(CircularProgressIndicator), findsNothing);
+
+      pending.completeError(Exception('weather unavailable'));
+      await tester.pump();
+
+      expect(find.textContaining('°'), findsNothing);
+      expect(find.byType(CircularProgressIndicator), findsNothing);
+    });
+
+    testWidgets('without a request stays badge-free', (tester) async {
+      await pumpHeader(tester, surfaceDay());
+
+      expect(find.textContaining('°'), findsNothing);
+      expect(find.byType(CircularProgressIndicator), findsNothing);
+    });
   });
 
   testWidgets('future day shows the planned chip', (tester) async {
@@ -153,11 +296,13 @@ void main() {
 
   testWidgets('short day still fills the minimum band height', (tester) async {
     // Title line only: shorter than the band, so the floor applies and every
-    // day header reads as the same height at default text scale.
+    // day header reads as the same height at default text scale. A siteless
+    // dive keeps the subtitle empty without taking the surface-day path.
     final day = TripStoryDay(
       date: DateTime(2026, 3, 8),
       dayNumber: 2,
       kind: TripStoryDayKind.past,
+      dives: [Dive(id: 'd1', dateTime: DateTime(2026, 3, 8, 9))],
     );
     await pumpHeader(tester, day);
 
@@ -210,7 +355,9 @@ void main() {
         settingsNotifier: settings,
       );
 
-      expect(find.text('72°F'), findsOneWidget);
+      // 22 C is 71.6 F: one decimal is kept, and only a zero decimal is
+      // trimmed, so this no longer rounds to a whole degree (#912).
+      expect(find.text('71.6°F'), findsOneWidget);
     });
 
     testWidgets('precipitation outranks cloud cover for the icon', (

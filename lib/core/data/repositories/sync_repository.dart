@@ -4,6 +4,7 @@ import 'package:uuid/uuid.dart';
 import 'package:submersion/core/database/database.dart';
 import 'package:submersion/core/services/database_service.dart';
 import 'package:submersion/core/services/logger_service.dart';
+import 'package:submersion/core/services/sync/changeset_log/publish_state_store.dart';
 import 'package:submersion/core/services/sync/hlc.dart';
 import 'package:submersion/core/services/sync/sync_event_bus.dart';
 import 'package:submersion/core/services/sync/sync_clock.dart';
@@ -31,7 +32,6 @@ class SyncRepository {
     'divers': (table: 'divers', pk: 'id'),
     'diverSettings': (table: 'diver_settings', pk: 'id'),
     'buddies': (table: 'buddies', pk: 'id'),
-    'buddyRoles': (table: 'buddy_roles', pk: 'id'),
     'mediaStores': (table: 'media_stores', pk: 'id'),
     'connectedAccounts': (table: 'connected_accounts', pk: 'id'),
     'mediaSubscriptions': (table: 'media_subscriptions', pk: 'id'),
@@ -556,8 +556,30 @@ class SyncRepository {
   }
 
   /// Public accessor for [_maxRowHlc] -- the highest hlc across conflict-capable
-  /// tables. Used by stale-restore detection.
+  /// tables.
   Future<String?> maxRowHlc() => _maxRowHlc();
+
+  /// The highest hlc this device still ACCOUNTS FOR: live rows or tombstones.
+  ///
+  /// [maxRowHlc] alone answers "what do I still have", which is the wrong
+  /// question for stale-restore detection. Deleting the newest record drops the
+  /// live-row maximum below the published watermark even though nothing was
+  /// rewound -- the tombstone stamped at deletion time (always ABOVE anything
+  /// previously published, since it comes from `SyncClock.issue()`) is the
+  /// device's record of that decision. Counting it distinguishes "the user
+  /// removed data" from "a restore rewound this device", which loses the
+  /// tombstones along with the rows.
+  Future<String?> maxAccountedHlc() async {
+    final rowHigh = await _maxRowHlc();
+    final maxDeletionHlc = _db.deletionLog.hlc.max();
+    final row = await (_db.selectOnly(
+      _db.deletionLog,
+    )..addColumns([maxDeletionHlc])).getSingleOrNull();
+    final tombstoneHigh = row?.read(maxDeletionHlc);
+    if (rowHigh == null) return tombstoneHigh;
+    if (tombstoneHigh == null) return rowHigh;
+    return rowHigh.compareTo(tombstoneHigh) >= 0 ? rowHigh : tombstoneHigh;
+  }
 
   /// Pick the greater of [a]/[b] by (physicalTime, counter) and rebuild it with
   /// [nodeId] so the clock always issues under THIS device's identity.
@@ -676,7 +698,7 @@ class SyncRepository {
     try {
       final query = _db.select(_db.syncRecords)
         ..where((t) => t.syncStatus.equals('pending'));
-      return query.get();
+      return await query.get();
     } catch (e, stackTrace) {
       _log.error(
         'Failed to get pending records',
@@ -692,7 +714,7 @@ class SyncRepository {
     try {
       final query = _db.select(_db.syncRecords)
         ..where((t) => t.syncStatus.equals('conflict'));
-      return query.get();
+      return await query.get();
     } catch (e, stackTrace) {
       _log.error(
         'Failed to get conflict records',
@@ -703,11 +725,23 @@ class SyncRepository {
     }
   }
 
-  /// Get count of pending changes
+  /// Get count of pending changes.
+  ///
+  /// Counts in SQL rather than materializing every pending row: this runs on
+  /// every local write now that the sync chip reflects it live.
   Future<int> getPendingCount() async {
     try {
-      final records = await getPendingRecords();
-      return records.length;
+      final count = _db.syncRecords.id.count();
+      final row =
+          await (_db.selectOnly(_db.syncRecords)
+                ..addColumns([count])
+                ..where(_db.syncRecords.syncStatus.equals('pending')))
+              .getSingle();
+      // Hoisted to a local on purpose: TypedResult.read is synchronous, but
+      // Dart 3.13's unawaited_return_in_try_block false-positives on returning
+      // it directly from a try. Do not inline this back.
+      final pending = row.read(count) ?? 0;
+      return pending;
     } catch (e, stackTrace) {
       _log.error(
         'Failed to get pending count',
@@ -716,6 +750,78 @@ class SyncRepository {
       );
       return 0;
     }
+  }
+
+  /// Deletions this device has made that have NOT yet been published.
+  ///
+  /// Deletions never touch `sync_records`, so [getPendingCount] alone reports
+  /// a delete-only change set as zero -- the UI then claims "Synced" while
+  /// tombstones sit unsent. The whole deletion log is the wrong number too:
+  /// tombstones survive publication (only [clearAcknowledgedDeletions] removes
+  /// them, once the fleet has acked), so counting all of them would pin the UI
+  /// to "unsynced" forever.
+  ///
+  /// [upToHlc] is the active provider's `publishedHlcHigh`; this mirrors the
+  /// filter the changeset writer applies, so the count matches what a sync
+  /// would actually send. A null [upToHlc] means nothing has been published
+  /// yet, so every tombstone counts. A null row hlc is always counted: it
+  /// cannot be compared, so it rides every base and is unpublished until one
+  /// goes out.
+  Future<int> getUnpublishedDeletionCount({required String? upToHlc}) async {
+    try {
+      final count = _db.deletionLog.id.count();
+      final query = _db.selectOnly(_db.deletionLog)..addColumns([count]);
+      if (upToHlc != null) {
+        query.where(
+          _db.deletionLog.hlc.isNull() |
+              _db.deletionLog.hlc.isBiggerThanValue(upToHlc),
+        );
+      }
+      final row = await query.getSingle();
+      // Hoisted to a local on purpose: TypedResult.read is synchronous, but
+      // Dart 3.13's unawaited_return_in_try_block false-positives on returning
+      // it directly from a try. Do not inline this back.
+      final deletions = row.read(count) ?? 0;
+      return deletions;
+    } catch (e, stackTrace) {
+      _log.error(
+        'Failed to get unpublished deletion count',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      return 0;
+    }
+  }
+
+  /// Every local change a sync would send: pending record edits plus the
+  /// tombstones above [providerId]'s publish watermark. This is the number the
+  /// UI means by "unsynced"; [getPendingCount] alone misses deletions.
+  ///
+  /// A null [providerId] means no cloud provider is configured, so nothing has
+  /// ever been published and every tombstone counts.
+  Future<int> getUnsyncedChangeCount({required String? providerId}) async {
+    final pending = await getPendingCount();
+    if (providerId == null) {
+      return pending + await getUnpublishedDeletionCount(upToHlc: null);
+    }
+    final String? watermark;
+    try {
+      watermark = (await PublishStateStore(
+        _db,
+      ).get(providerId))?.publishedHlcHigh;
+    } catch (e, stackTrace) {
+      // This count is advisory and its callers treat it as non-failing (the
+      // notifier would otherwise turn a status query into a page-wide error).
+      // Without a watermark, report the pending records alone rather than
+      // counting the entire deletion log as unsent.
+      _log.error(
+        'Failed to read publish watermark for $providerId',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      return pending;
+    }
+    return pending + await getUnpublishedDeletionCount(upToHlc: watermark);
   }
 
   /// Clear all pending sync records
@@ -848,7 +954,7 @@ class SyncRepository {
         ..where(
           (t) => t.deletedAt.isBiggerOrEqualValue(since.millisecondsSinceEpoch),
         );
-      return query.get();
+      return await query.get();
     } catch (e, stackTrace) {
       _log.error(
         'Failed to get deletions since: $since',
@@ -862,7 +968,7 @@ class SyncRepository {
   /// Get all deletions
   Future<List<DeletionLogData>> getAllDeletions() async {
     try {
-      return _db.select(_db.deletionLog).get();
+      return await _db.select(_db.deletionLog).get();
     } catch (e, stackTrace) {
       _log.error(
         'Failed to get all deletions',

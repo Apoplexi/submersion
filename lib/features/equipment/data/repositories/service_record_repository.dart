@@ -14,6 +14,12 @@ class ServiceRecordRepository {
   final SyncRepository _syncRepository = SyncRepository();
   final _uuid = const Uuid();
 
+  /// Emits whenever the `service_records` table changes so the service-history
+  /// providers can refresh after a sync or any other write that bypasses the
+  /// notifiers.
+  Stream<void> watchServiceRecordsChanges() =>
+      _db.tableUpdates(TableUpdateQuery.onTable(_db.serviceRecords));
+
   /// Get all service records for an equipment item
   Future<List<domain.ServiceRecord>> getRecordsForEquipment(
     String equipmentId,

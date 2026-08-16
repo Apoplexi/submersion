@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
@@ -7,6 +8,11 @@ import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 
 /// Save string content to a file and open the system share sheet.
+///
+/// This is the "share" half of the export idiom. Callers that want the user to
+/// pick a destination on disk should use the matching `save*ToFile` helper
+/// instead -- those return `null` when the save dialog is cancelled, which this
+/// function has no way to express.
 Future<String> saveAndShareFile(
   String content,
   String fileName,
@@ -27,6 +33,8 @@ Future<String> saveAndShareFile(
 }
 
 /// Save raw bytes to a file and open the system share sheet.
+///
+/// See [saveAndShareFile] for why this never opens a save dialog.
 Future<String> saveAndShareFileBytes(
   List<int> bytes,
   String fileName,
@@ -104,6 +112,40 @@ Future<String?> saveImageToFile(List<int> pngBytes, String fileName) async {
 /// Share PDF bytes via the system share sheet.
 Future<String> sharePdfBytes(List<int> pdfBytes, String fileName) async {
   return saveAndShareFileBytes(pdfBytes, fileName, 'application/pdf');
+}
+
+/// Save string content to a user-selected file location.
+///
+/// Opens a file picker dialog allowing the user to choose where to save.
+/// Returns the saved file path, or null if the user cancelled.
+///
+/// The string counterpart to [savePdfToFile]. Deliberately distinct from
+/// [saveAndShareFile], which always opens the share sheet and cannot be
+/// cancelled - a "Save to..." menu item needs this one.
+Future<String?> saveTextToFile(
+  String content,
+  String fileName, {
+  required String dialogTitle,
+  required List<String> allowedExtensions,
+}) async {
+  final bytes = Uint8List.fromList(utf8.encode(content));
+  final result = await FilePicker.saveFile(
+    dialogTitle: dialogTitle,
+    fileName: fileName,
+    type: FileType.custom,
+    allowedExtensions: allowedExtensions,
+    bytes: bytes,
+  );
+
+  if (result == null) return null;
+
+  // Matching savePdfToFile: on some platforms saveFile returns a path but
+  // does not write the bytes itself.
+  if (!Platform.isAndroid) {
+    await File(result).writeAsBytes(bytes);
+  }
+
+  return result;
 }
 
 /// Save PDF bytes to a user-selected file location.

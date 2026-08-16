@@ -39,6 +39,10 @@ class _TestAdapter implements ImportSourceAdapter {
   };
 
   @override
+  Set<DuplicateAction> duplicateActionsFor(ImportEntityType type) =>
+      supportedDuplicateActions;
+
+  @override
   dynamic noSuchMethod(Invocation invocation) =>
       throw UnimplementedError(invocation.memberName.toString());
 }
@@ -205,6 +209,12 @@ void main() {
       when(mockAdapter.acquisitionSteps).thenReturn([]);
       when(
         mockAdapter.supportedDuplicateActions,
+      ).thenReturn({DuplicateAction.skip, DuplicateAction.importAsNew});
+      // The notifier gates writes on the per-type set, so the mock has to
+      // answer duplicateActionsFor too -- unstubbed it returns an empty set
+      // and every setDuplicateAction/applyBulkAction call becomes a no-op.
+      when(
+        mockAdapter.duplicateActionsFor(any),
       ).thenReturn({DuplicateAction.skip, DuplicateAction.importAsNew});
       notifier = ImportWizardNotifier(
         mockAdapter,
@@ -1708,11 +1718,9 @@ void main() {
         notifier.toggleSelection(ImportEntityType.dives, 0);
 
         final state = container.read(importWizardNotifierProvider);
-        expect(
-          state.pendingFor(ImportEntityType.dives),
-          {1},
-          reason: 'Pending for duplicate should be unchanged',
-        );
+        expect(state.pendingFor(ImportEntityType.dives), {
+          1,
+        }, reason: 'Pending for duplicate should be unchanged');
         expect(state.selections[ImportEntityType.dives], isNot(contains(0)));
       },
     );
@@ -1869,11 +1877,9 @@ void main() {
         );
 
         final state = container.read(importWizardNotifierProvider);
-        expect(
-          state.pendingFor(ImportEntityType.dives),
-          {1},
-          reason: 'Weak match (score 0.55) should remain pending',
-        );
+        expect(state.pendingFor(ImportEntityType.dives), {
+          1,
+        }, reason: 'Weak match (score 0.55) should remain pending');
         expect(
           state.duplicateActions[ImportEntityType.dives]?[0],
           DuplicateAction.consolidate,

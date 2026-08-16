@@ -18,9 +18,12 @@ import 'package:submersion/core/database/database.dart'
         DiveProfileEvent,
         TankPressureProfilesCompanion;
 import 'package:submersion/core/matching/match_scorer.dart';
+import 'package:submersion/core/utils/stream_debounce.dart';
+import 'package:submersion/features/dive_log/data/repositories/dive_repository_impl.dart';
 import 'package:submersion/features/dive_log/data/repositories/safety_findings_repository.dart';
 import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart'
     show GeoPoint;
+import 'package:submersion/features/dive_log/domain/services/bottom_time_calculator.dart';
 import 'package:submersion/features/dive_log/domain/services/dive_altitude_enricher.dart';
 import 'package:submersion/features/equipment/data/services/dive_equipment_defaulter.dart';
 import 'package:submersion/features/pre_dive/data/services/checklist_dive_linker.dart';
@@ -39,6 +42,18 @@ class DiveComputerRepository {
   final SyncRepository _syncRepository = SyncRepository();
   final _uuid = const Uuid();
   final _log = LoggerService.forClass(DiveComputerRepository);
+
+  /// Emits whenever the `dive_computers` registry changes so the computer
+  /// pickers and the favourite/primary selectors refresh after a download
+  /// registers a new computer, or a sync applies a remote rename or removal.
+  ///
+  /// Debounced, unlike most ticks in the app: registering a computer happens
+  /// inside a download that also writes dives, profiles, tanks, and data
+  /// sources, so an un-debounced tick would rebuild the pickers repeatedly
+  /// mid-download instead of once on the settled state.
+  Stream<void> watchComputersChanges() => _db
+      .tableUpdates(TableUpdateQuery.onTable(_db.diveComputers))
+      .debounce(DiveRepository.changeTickDebounce);
 
   /// Held for the repository's lifetime so a multi-dive download shares one
   /// elevation-lookup cache: a trip's worth of dives at the same site costs a
@@ -235,6 +250,10 @@ class DiveComputerRepository {
         recordId: id,
         localUpdatedAt: now,
       );
+
+      // If a computer with this hardware identity was deleted earlier, its
+      // dives kept provenance snapshots; give them their link back.
+      await _relinkOrphanedRows(id, computer);
       SyncEventBus.notifyLocalChange();
 
       _log.info('Created dive computer with id: $id');
@@ -300,15 +319,32 @@ class DiveComputerRepository {
 
   /// Delete a dive computer
   ///
-  /// Nulls out FK references in `dive_profiles` and `dive_data_sources` first
-  /// so the delete is not blocked by foreign key constraints.
-  /// The profile/data-source rows are preserved — only the computer link is
-  /// removed.
+  /// Every dive referencing the computer keeps a `dive_data_sources` text
+  /// snapshot (model + serial) of the device that produced it, backfilled
+  /// here when missing, so the provenance record survives the delete and
+  /// [_relinkOrphanedRows] can restore the links if the same hardware is
+  /// added again. FK references in `dives`, `dive_profiles`, and
+  /// `dive_data_sources` are then nulled out so the delete is not blocked by
+  /// foreign key constraints; the dive/profile/data-source rows themselves
+  /// are preserved.
   Future<void> deleteComputer(String id) async {
     try {
       _log.info('Deleting dive computer: $id');
 
-      // Clear FK references that would block the delete.
+      final row = await (_db.select(
+        _db.diveComputers,
+      )..where((t) => t.id.equals(id))).getSingleOrNull();
+      if (row != null) {
+        await _backfillProvenanceSnapshots(_mapRowToComputer(row));
+      }
+
+      // Clear FK references that would block the delete. dives.computer_id
+      // has no ON DELETE action, so leaving it set fails the delete with
+      // SqliteException(787) on any computer that a dive references (#823).
+      await _db.customStatement(
+        'UPDATE dives SET computer_id = NULL WHERE computer_id = ?',
+        [id],
+      );
       await _db.customStatement(
         'UPDATE dive_profiles SET computer_id = NULL WHERE computer_id = ?',
         [id],
@@ -332,6 +368,153 @@ class DiveComputerRepository {
         stackTrace: stackTrace,
       );
       rethrow;
+    }
+  }
+
+  /// Insert a `dive_data_sources` snapshot for every dive that references
+  /// [computer] but has no data source row for it (dives imported before
+  /// provenance rows existed). The snapshot's text columns are what the UI
+  /// shows and what relinking matches on once the computer row is gone.
+  Future<void> _backfillProvenanceSnapshots(
+    domain.DiveComputer computer,
+  ) async {
+    final orphanDives = await _db
+        .customSelect(
+          'SELECT d.id AS dive_id, '
+          'NOT EXISTS(SELECT 1 FROM dive_data_sources p '
+          'WHERE p.dive_id = d.id AND p.is_primary = 1) AS needs_primary '
+          'FROM dives d WHERE d.computer_id = ? AND NOT EXISTS('
+          'SELECT 1 FROM dive_data_sources s WHERE s.dive_id = d.id '
+          'AND s.computer_id = ?)',
+          variables: [Variable(computer.id), Variable(computer.id)],
+          readsFrom: {_db.dives, _db.diveDataSources},
+        )
+        .get();
+    if (orphanDives.isEmpty) return;
+
+    final now = DateTime.now();
+    for (final row in orphanDives) {
+      await _db
+          .into(_db.diveDataSources)
+          .insert(
+            DiveDataSourcesCompanion.insert(
+              id: _uuid.v4(),
+              diveId: row.read<String>('dive_id'),
+              isPrimary: Value(row.read<int>('needs_primary') == 1),
+              computerModel: Value(computer.fullName),
+              computerSerial: Value(computer.serialNumber),
+              sourceFormat: const Value('dive_computer'),
+              importedAt: now,
+              createdAt: now,
+            ),
+          );
+    }
+    _log.info(
+      'Backfilled ${orphanDives.length} provenance snapshot(s) '
+      'for computer ${computer.id}',
+    );
+  }
+
+  /// Restore the links a deleted computer with this hardware identity left
+  /// behind. Orphaned `dive_data_sources` rows are matched on the model +
+  /// serial snapshot; their dives (when the matched source is the dive's
+  /// primary and no live computer claims the dive) and, for dives whose
+  /// computer attribution is unambiguous, their profiles get [computerId]
+  /// back. Relinked dives are marked pending so the restored link syncs.
+  /// Best-effort: a relink failure must never fail the computer creation.
+  Future<void> _relinkOrphanedRows(
+    String computerId,
+    domain.DiveComputer computer,
+  ) async {
+    final serial = computer.serialNumber;
+    if (serial == null || serial.isEmpty) return;
+    try {
+      final matched = await _db
+          .customSelect(
+            'SELECT id, dive_id, is_primary FROM dive_data_sources '
+            'WHERE computer_id IS NULL AND source_format = ? '
+            'AND computer_model = ? AND computer_serial = ?',
+            variables: [
+              const Variable('dive_computer'),
+              Variable(computer.fullName),
+              Variable(serial),
+            ],
+            readsFrom: {_db.diveDataSources},
+          )
+          .get();
+      if (matched.isEmpty) return;
+
+      final sourceIds = matched.map((r) => r.read<String>('id')).toList();
+      final sourcePh = List.filled(sourceIds.length, '?').join(', ');
+      await _db.customStatement(
+        'UPDATE dive_data_sources SET computer_id = ? WHERE id IN ($sourcePh)',
+        [computerId, ...sourceIds],
+      );
+
+      // Restore the dive's primary-computer link where the matched source is
+      // the dive's primary and no live computer claims the dive.
+      final primaryDiveIds = matched
+          .where((r) => r.read<int>('is_primary') != 0)
+          .map((r) => r.read<String>('dive_id'))
+          .toSet()
+          .toList();
+      if (primaryDiveIds.isNotEmpty) {
+        final divePh = List.filled(primaryDiveIds.length, '?').join(', ');
+        final claimable = await _db
+            .customSelect(
+              'SELECT id FROM dives '
+              'WHERE computer_id IS NULL AND id IN ($divePh)',
+              variables: [for (final d in primaryDiveIds) Variable(d)],
+              readsFrom: {_db.dives},
+            )
+            .get();
+        final diveIds = claimable.map((r) => r.read<String>('id')).toList();
+        if (diveIds.isNotEmpty) {
+          final now = DateTime.now().millisecondsSinceEpoch;
+          final ph = List.filled(diveIds.length, '?').join(', ');
+          await _db.customStatement(
+            'UPDATE dives SET computer_id = ?, updated_at = ? '
+            'WHERE id IN ($ph)',
+            [computerId, now, ...diveIds],
+          );
+          for (final diveId in diveIds) {
+            await _syncRepository.markRecordPending(
+              entityType: 'dives',
+              recordId: diveId,
+              localUpdatedAt: now,
+            );
+          }
+        }
+      }
+
+      // Profiles carry no serial snapshot of their own, so restore them only
+      // when the dive's computer attribution is unambiguous: exactly one
+      // dive_computer source row.
+      final matchedDiveIds = matched
+          .map((r) => r.read<String>('dive_id'))
+          .toSet()
+          .toList();
+      final matchedPh = List.filled(matchedDiveIds.length, '?').join(', ');
+      await _db.customStatement(
+        'UPDATE dive_profiles SET computer_id = ? '
+        'WHERE computer_id IS NULL AND dive_id IN ($matchedPh) '
+        'AND (SELECT COUNT(*) FROM dive_data_sources s '
+        'WHERE s.dive_id = dive_profiles.dive_id '
+        "AND s.source_format = 'dive_computer') = 1",
+        [computerId, ...matchedDiveIds],
+      );
+
+      _log.info(
+        'Relinked ${sourceIds.length} data source(s) from previous '
+        '${computer.fullName} (${computer.serialNumber}) '
+        'to computer $computerId',
+      );
+    } catch (e, stackTrace) {
+      _log.error(
+        'Failed to relink orphaned rows to computer $computerId',
+        error: e,
+        stackTrace: stackTrace,
+      );
     }
   }
 
@@ -1563,55 +1746,16 @@ class DiveComputerRepository {
 
   /// Calculate bottom time (seconds) from profile points.
   ///
-  /// Bottom time excludes descent and ascent phases. Uses the same algorithm
-  /// as [Dive.calculateBottomTimeFromProfile]: finds the first and last points
-  /// at or above 85% of max depth.
+  /// Delegates to [BottomTimeCalculator]: bottom time runs from surface
+  /// departure to the start of the final ascent, so multilevel dives
+  /// count their shallower segments.
   ///
   /// Returns null if profile data is insufficient for calculation.
-  int? _calculateBottomTimeFromPoints(
-    List<ProfilePointData> points, {
-    double depthThresholdPercent = 0.85,
-  }) {
-    if (points.length < 3) return null;
-
-    final sorted = List<ProfilePointData>.from(points)
-      ..sort((a, b) => a.timestamp.compareTo(b.timestamp));
-
-    double maxDepth = 0;
-    for (final point in sorted) {
-      if (point.depth > maxDepth) {
-        maxDepth = point.depth;
-      }
-    }
-
-    if (maxDepth <= 0) return null;
-
-    final bottomThreshold = maxDepth * depthThresholdPercent;
-
-    // First point at or above threshold = descent end
-    int? descentEndTimestamp;
-    for (final point in sorted) {
-      if (point.depth >= bottomThreshold) {
-        descentEndTimestamp = point.timestamp;
-        break;
-      }
-    }
-
-    // Last point at or above threshold = ascent start
-    int? ascentStartTimestamp;
-    for (int i = sorted.length - 1; i >= 0; i--) {
-      if (sorted[i].depth >= bottomThreshold) {
-        ascentStartTimestamp = sorted[i].timestamp;
-        break;
-      }
-    }
-
-    if (descentEndTimestamp == null || ascentStartTimestamp == null) {
-      return null;
-    }
-    if (ascentStartTimestamp <= descentEndTimestamp) return null;
-
-    return ascentStartTimestamp - descentEndTimestamp;
+  int? _calculateBottomTimeFromPoints(List<ProfilePointData> points) {
+    return BottomTimeCalculator.secondsFromSamples([
+      for (final point in points)
+        (timestamp: point.timestamp, depth: point.depth),
+    ]);
   }
 
   /// Map libdivecomputer event type strings to ProfileEventType enum names.

@@ -137,6 +137,55 @@ class WatchedFolderIndex extends Table {
   Set<Column> get primaryKey => {rootPath, relativePath};
 }
 
+/// Simplified GPS track geometry, cached per level of detail.
+///
+/// NOT synced and never backed up: every device can re-derive this from the
+/// gps_tracks points blob in milliseconds, so paying the main database's
+/// schema-bump, HLC, tombstone, and backup costs would buy nothing.
+class GpsTrackGeometryCache extends Table {
+  TextColumn get trackId => text()();
+
+  /// 'thumbnail' (50 m tolerance) | 'overview' (10 m) | 'detail' (2 m)
+  TextColumn get lodLevel => text()();
+
+  /// Gzipped JSON in the same format as gps_tracks.points. Null when
+  /// [status] is not 'ok'.
+  BlobColumn get points => blob().nullable()();
+
+  /// 'ok' | 'empty' | 'unavailable'. An explicit negative is cached so a
+  /// genuinely empty track is not re-derived on every scroll.
+  TextColumn get status => text()();
+
+  IntColumn get createdAt => integer()();
+
+  @override
+  Set<Column> get primaryKey => {trackId, lodLevel};
+}
+
+/// Cached NOAA CO-OPS harmonic station constituents. Re-derivable
+/// third-party data: never synced, never backed up. status semantics:
+/// 'ok' = usable constituents in constituentsJson; 'unavailable' = the
+/// station deterministically has no harmonic data. Transient fetch
+/// failures write NO row.
+class NoaaTideStations extends Table {
+  TextColumn get stationId => text()();
+  TextColumn get name => text()();
+  RealColumn get latitude => real()();
+  RealColumn get longitude => real()();
+
+  /// JSON object: {"M2": {"amplitude": 0.576, "phase": 208.2}, ...}
+  TextColumn get constituentsJson => text().withDefault(const Constant('{}'))();
+
+  /// MSL minus MLLW in meters (station datum offset); null when the
+  /// station's datums were unavailable (heights then reference MSL).
+  RealColumn get datumOffsetMllw => real().nullable()();
+  TextColumn get status => text()();
+  IntColumn get fetchedAt => integer()();
+
+  @override
+  Set<Column> get primaryKey => {stationId};
+}
+
 @DriftDatabase(
   tables: [
     LocalAssetCache,
@@ -144,6 +193,8 @@ class WatchedFolderIndex extends Table {
     MediaCacheEntries,
     BathymetryCache,
     ReefDataCache,
+    NoaaTideStations,
+    GpsTrackGeometryCache,
     WatchedRoots,
     WatchedFolderIndex,
   ],
@@ -152,7 +203,7 @@ class LocalCacheDatabase extends _$LocalCacheDatabase {
   LocalCacheDatabase(super.e);
 
   @override
-  int get schemaVersion => 10;
+  int get schemaVersion => 12;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -194,12 +245,28 @@ class LocalCacheDatabase extends _$LocalCacheDatabase {
       if (from < 8) {
         await m.createTable(reefDataCache);
       }
-      // v9: repair watcher state (Media section Phase 5).
+      // v9: NOAA tide station constituent cache.
       if (from < 9) {
+        await m.createTable(noaaTideStations);
+      }
+      // v10: simplified GPS track geometry, keyed by (track, LOD).
+      // Renumbered from v9 at merge time because the tide branch claimed 9
+      // first. Every stored schema below 10 lacks it, including v1, for the
+      // same reason reef_data_cache did. A dev DB that already ran this
+      // branch at v9 is healed by the beforeOpen backstop below.
+      if (from < 10) {
+        await m.createTable(gpsTrackGeometryCache);
+      }
+      // v11: repair watcher state (Media section Phase 5). Renumbered from v9
+      // at merge time: main had meanwhile taken 9 for the tide cache and 10
+      // for the GPS geometry cache. A dev DB that already ran this branch at
+      // v9 is healed by the beforeOpen backstop below.
+      if (from < 11) {
         await m.createTable(watchedRoots);
         await m.createTable(watchedFolderIndex);
       }
-      // v10: drop poisoned negative resolutions. The gallery search window was
+      // v12: drop poisoned negative resolutions. Renumbered from v10 at merge
+      // time for the same reason as v11 above. The gallery search window was
       // computed by copying a UTC DateTime's calendar fields into a LOCAL
       // DateTime, which shifted it by the whole UTC offset and meant the
       // raw-instant reading of taken_at was never actually queried. Rows that
@@ -214,7 +281,7 @@ class LocalCacheDatabase extends _$LocalCacheDatabase {
       // No beforeOpen backstop, unlike the createTable steps above: if a
       // ladder collision skips this, the only consequence is that the stale
       // negatives expire on their own within 7 days.
-      if (from < 10) {
+      if (from < 12) {
         await customStatement(
           "DELETE FROM local_asset_cache WHERE resolution_method = 'unresolved'",
         );
@@ -248,6 +315,29 @@ class LocalCacheDatabase extends _$LocalCacheDatabase {
           status TEXT NOT NULL,
           fetched_at INTEGER NOT NULL,
           PRIMARY KEY (provider, coord_key, variant)
+        )
+      ''');
+      await customStatement('''
+        CREATE TABLE IF NOT EXISTS gps_track_geometry_cache (
+          track_id TEXT NOT NULL,
+          lod_level TEXT NOT NULL,
+          points BLOB NULL,
+          status TEXT NOT NULL,
+          created_at INTEGER NOT NULL,
+          PRIMARY KEY (track_id, lod_level)
+        )
+      ''');
+      await customStatement('''
+        CREATE TABLE IF NOT EXISTS noaa_tide_stations (
+          station_id TEXT NOT NULL,
+          name TEXT NOT NULL,
+          latitude REAL NOT NULL,
+          longitude REAL NOT NULL,
+          constituents_json TEXT NOT NULL DEFAULT '{}',
+          datum_offset_mllw REAL NULL,
+          status TEXT NOT NULL,
+          fetched_at INTEGER NOT NULL,
+          PRIMARY KEY (station_id)
         )
       ''');
       await customStatement('''

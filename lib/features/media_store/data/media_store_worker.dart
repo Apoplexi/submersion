@@ -70,10 +70,7 @@ class MediaStoreWorker {
       while (true) {
         // Re-checked per entry, not once per drain: a store wipe or user
         // disconnect mid-drain must suspend the rest of the queue.
-        if (_preflight != null && !await _preflight()) {
-          _log.warning('Media store preflight failed; drain suspended');
-          return;
-        }
+        if (!await _preflightPasses()) return;
         final entry = await _queue.nextPending(DateTime.now());
         if (entry == null) break;
         if (_gate != null) {
@@ -104,6 +101,38 @@ class MediaStoreWorker {
       _running = false;
       await _armWakeup();
     }
+  }
+
+  /// Whether the drain may proceed. Null preflight admits everything.
+  ///
+  /// A preflight that throws suspends the drain exactly like one that returns
+  /// false. It reads the store marker out of the bucket, so an offline moment
+  /// or a transient S3 failure makes it throw rather than answer - and since
+  /// every drain() call site is fire-and-forget (app start, connectivity
+  /// change, the retry wakeup, enqueueAndKick), an escaping throw had no
+  /// handler and surfaced as an uncaught zone error instead of a suspended
+  /// drain (#942). Suspending is also the safe reading: the check exists to
+  /// stop transfers against a store this device may no longer be attached to,
+  /// so "could not verify" must never be treated as "verified".
+  ///
+  /// The throw is logged with its error and stack trace, not interpolated into
+  /// the message: catching it is what stops the crash, so the log is now the
+  /// only record of a preflight that keeps failing, and a bare string would
+  /// make that state less diagnosable than the uncaught zone error it replaced.
+  Future<bool> _preflightPasses() async {
+    final preflight = _preflight;
+    if (preflight == null) return true;
+    try {
+      if (await preflight()) return true;
+      _log.warning('Media store preflight failed; drain suspended');
+    } on Object catch (e, stackTrace) {
+      _log.warning(
+        'Media store preflight could not run; drain suspended',
+        error: e,
+        stackTrace: stackTrace,
+      );
+    }
+    return false;
   }
 
   /// Arms a single timer for the soonest deferred row, so a retry that comes

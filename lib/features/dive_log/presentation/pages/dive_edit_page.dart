@@ -3,18 +3,19 @@ import 'dart:io';
 
 import 'package:flutter/material.dart' hide Visibility;
 import 'package:go_router/go_router.dart';
-import 'package:submersion/core/icons/mdi_icons.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/shared/widgets/app_date_picker.dart';
 import 'package:uuid/uuid.dart';
 
 import 'package:submersion/core/constants/enums.dart';
+import 'package:submersion/features/equipment/presentation/utils/equipment_type_icon.dart';
 import 'package:submersion/features/data_quality/data/services/quality_scan_service.dart';
 import 'package:submersion/features/marine_life/presentation/utils/species_category_color.dart';
 import 'package:submersion/features/marine_life/presentation/utils/species_category_icon.dart';
 import 'package:submersion/core/deco/altitude_calculator.dart';
 import 'package:submersion/core/services/location_service.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
+import 'package:submersion/features/dive_log/presentation/formatters/visibility_display.dart';
 import 'package:submersion/features/buddies/domain/entities/buddy.dart';
 import 'package:submersion/features/dive_roles/domain/entities/dive_role.dart';
 import 'package:submersion/features/buddies/presentation/providers/buddy_providers.dart';
@@ -198,6 +199,11 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
   bool _exitMethodLinked = true;
   WaterType? _waterType;
   final _swellHeightController = TextEditingController();
+
+  /// Measured visibility, entered in the diver's depth unit and converted to
+  /// meters on save. Replaces the pre-v144 bucket picker; [_selectedVisibility]
+  /// survives only to carry a legacy dive's band until it gains a number.
+  final _visibilityController = TextEditingController();
   final _altitudeController = TextEditingController();
   final _surfacePressureController = TextEditingController();
 
@@ -401,6 +407,7 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
       _notesController,
       _nameController,
       _swellHeightController,
+      _visibilityController,
       _altitudeController,
       _surfacePressureController,
       _windSpeedController,
@@ -624,6 +631,9 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
           _nameController.text = dive.name ?? '';
           _selectedDiveTypeIds = List.from(dive.diveTypeIds);
           _selectedVisibility = dive.visibility ?? Visibility.unknown;
+          _visibilityController.text = dive.visibilityMeters != null
+              ? units.convertDepth(dive.visibilityMeters!).toStringAsFixed(0)
+              : '';
           _rating = dive.rating ?? 0;
           _selectedSite = dive.site;
           _selectedTrip = dive.trip;
@@ -795,6 +805,7 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
     _notesController.dispose();
     _nameController.dispose();
     _swellHeightController.dispose();
+    _visibilityController.dispose();
     _altitudeController.dispose();
     _surfacePressureController.dispose();
     _windSpeedController.dispose();
@@ -935,7 +946,15 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
 
   Map<String, int> _buddyCounts = {};
   final Map<String, Buddy> _buddyById = {};
+
+  /// Roles the user picked in the buddy picker during this edit. Membership
+  /// alone never lands here, so an entry means "apply this role" (#893).
   final Map<String, DiveRole> _buddyRoleById = {};
+
+  /// Role id each buddy already carries on every selected dive that has them,
+  /// so filling in the missing links reuses it instead of the default Buddy.
+  /// Buddies with a mix of roles across the selection are absent.
+  final Map<String, String> _existingBuddyRoleIds = {};
   List<BulkMembershipItem> _buddyMembers = [];
   MembershipDelta _buddyDelta = MembershipDelta.empty;
 
@@ -1058,9 +1077,7 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
       rating: _rating > 0 ? _rating : null,
       isFavorite: _bulkFavorite,
       waterType: _waterType?.name,
-      visibility: _selectedVisibility != Visibility.unknown
-          ? _selectedVisibility.name
-          : null,
+      visibilityMeters: _visibilityMetersInput(units),
       currentDirection: _currentDirection?.name,
       currentStrength: _currentStrength?.name,
       swellHeight: _swellHeightController.text.isNotEmpty
@@ -1281,11 +1298,35 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
         ),
       );
     }
-    if (_buddyDelta.addIds.isNotEmpty) {
+    // Membership and role are separate instructions. A row the user only
+    // ticked on must not rewrite the role of links that already exist, while a
+    // role picked in the picker applies even when membership does not change
+    // because the buddy is already on every selected dive (#893).
+    final membershipOnlyAdds = _buddyDelta.addIds
+        .where((id) => !_buddyRoleById.containsKey(id))
+        .toList();
+    final pickedRoleAdds = _buddyRoleById.keys
+        .where(
+          (id) =>
+              !_buddyDelta.removeIds.contains(id) &&
+              (_buddyDelta.addIds.contains(id) ||
+                  _buddyOnEverySelectedDive(id)),
+        )
+        .toList();
+    if (membershipOnlyAdds.isNotEmpty) {
       ops.add(
         BuddiesOp(
           mode: BulkCollectionMode.add,
-          buddies: _buddyDelta.addIds.map(_buddyWithRole).toList(),
+          buddies: membershipOnlyAdds.map(_buddyWithRole).toList(),
+          overwriteRole: false,
+        ),
+      );
+    }
+    if (pickedRoleAdds.isNotEmpty) {
+      ops.add(
+        BuddiesOp(
+          mode: BulkCollectionMode.add,
+          buddies: pickedRoleAdds.map(_buddyWithRole).toList(),
         ),
       );
     }
@@ -1358,15 +1399,11 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
         ),
         _gatedRow(
           BulkField.visibility,
-          FormRow.custom(
+          FormRow.text(
             label: context.l10n.diveLog_edit_label_visibility,
-            child: _enumDropdown<Visibility>(
-              value: _selectedVisibility,
-              options: Visibility.values,
-              label: (v) => v.displayName,
-              onChanged: (v) =>
-                  setState(() => _selectedVisibility = v ?? Visibility.unknown),
-            ),
+            controller: _visibilityController,
+            suffixText: UnitFormatter(ref.read(settingsProvider)).depthSymbol,
+            keyboardType: const TextInputType.numberWithOptions(decimal: true),
           ),
         ),
         _gatedRow(
@@ -3000,7 +3037,7 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
                         context,
                       ).colorScheme.primaryContainer,
                       child: Icon(
-                        _getEquipmentIcon(item.type),
+                        equipmentTypeIcon(item.type),
                         color: Theme.of(context).colorScheme.onPrimaryContainer,
                         size: 20,
                       ),
@@ -3050,54 +3087,6 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
           ),
       ],
     );
-  }
-
-  IconData _getEquipmentIcon(EquipmentType type) {
-    switch (type) {
-      case EquipmentType.regulator:
-        return Icons.air;
-      case EquipmentType.bcd:
-        return Icons.checkroom;
-      case EquipmentType.wetsuit:
-        return Icons.dry_cleaning;
-      case EquipmentType.drysuit:
-        return Icons.dry_cleaning;
-      case EquipmentType.mask:
-        return Icons.visibility;
-      case EquipmentType.fins:
-        return Icons.water;
-      case EquipmentType.boots:
-        return Icons.hiking;
-      case EquipmentType.gloves:
-        return Icons.pan_tool;
-      case EquipmentType.hood:
-        return Icons.face;
-      case EquipmentType.tank:
-        return MdiIcons.divingScubaTank;
-      // A closed circuit recycles the breathing loop; the vendored MdiIcons
-      // subset has no rebreather glyph, and the tank glyph already means
-      // "tank".
-      case EquipmentType.rebreather:
-        return Icons.recycling;
-      case EquipmentType.transmitter:
-        return Icons.sensors;
-      case EquipmentType.weights:
-        return Icons.fitness_center;
-      case EquipmentType.computer:
-        return Icons.watch;
-      case EquipmentType.light:
-        return Icons.flashlight_on;
-      case EquipmentType.camera:
-        return Icons.camera_alt;
-      case EquipmentType.knife:
-        return Icons.content_cut;
-      case EquipmentType.smb:
-        return Icons.flag;
-      case EquipmentType.reel:
-        return Icons.all_inclusive;
-      case EquipmentType.other:
-        return Icons.build;
-    }
   }
 
   void _showEquipmentPicker() {
@@ -3164,6 +3153,7 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
     final typeCounts = await repo.diveTypeCountsForDives(ids);
     final buddyRepo = ref.read(buddyRepositoryProvider);
     final buddyCounts = await buddyRepo.buddyCountsForDives(ids);
+    final buddyRoles = await buddyRepo.unanimousBuddyRolesForDives(ids);
 
     final equip = await EquipmentRepository().getEquipmentByIds(
       equipCounts.keys.toList(),
@@ -3189,7 +3179,7 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
           BulkMembershipItem(
             id: e.id,
             label: e.name,
-            icon: _getEquipmentIcon(e.type),
+            icon: equipmentTypeIcon(e.type),
           ),
       ]..sort(byLabel);
       _tagCounts = tagCounts;
@@ -3217,6 +3207,9 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
       _buddyById
         ..clear()
         ..addAll(buddyMap);
+      _existingBuddyRoleIds
+        ..clear()
+        ..addAll(buddyRoles);
       _buddyMembers = [
         for (final id in buddyCounts.keys)
           BulkMembershipItem(
@@ -3248,7 +3241,7 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
                   BulkMembershipItem(
                     id: equipment.id,
                     label: equipment.name,
-                    icon: _getEquipmentIcon(equipment.type),
+                    icon: equipmentTypeIcon(equipment.type),
                   ),
                 ];
               }
@@ -3281,7 +3274,7 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
                     BulkMembershipItem(
                       id: item.id,
                       label: item.name,
-                      icon: _getEquipmentIcon(item.type),
+                      icon: equipmentTypeIcon(item.type),
                     ),
               ];
             });
@@ -3447,8 +3440,27 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
           createdAt: DateTime.now(),
           updatedAt: DateTime.now(),
         ),
-    role: _buddyRoleById[id] ?? DiveRole.builtInBuddy(),
+    role: _roleForBuddy(id),
   );
+
+  /// Mirrors BulkMembershipEditor's "on all" presence, which is what makes a
+  /// picked role a no-op for the membership delta.
+  bool _buddyOnEverySelectedDive(String id) {
+    final total = widget.bulkDiveIds!.length;
+    return total > 0 && (_buddyCounts[id] ?? 0) >= total;
+  }
+
+  /// A picked role wins; otherwise reuse the role the buddy already has across
+  /// the selection so a membership-only add cannot demote them to Buddy. Only
+  /// the id reaches the database, so an unresolved id stays synthetic (#893).
+  DiveRole _roleForBuddy(String id) {
+    final picked = _buddyRoleById[id];
+    if (picked != null) return picked;
+    final existing = _existingBuddyRoleIds[id];
+    return existing == null
+        ? DiveRole.builtInBuddy()
+        : DiveRole.synthetic(existing);
+  }
 
   void _saveEquipmentAsSet() {
     if (_selectedEquipment.isEmpty) return;
@@ -3579,19 +3591,46 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
     );
   }
 
+  /// The visibility field's value converted to meters, or null when the field
+  /// is empty or does not parse. See [parseVisibilityInput].
+  double? _visibilityMetersInput(UnitFormatter units) =>
+      parseVisibilityInput(_visibilityController.text, units);
+
+  /// Caption under the visibility field: the adjective the diver's calibration
+  /// assigns to what they just typed, or, for a legacy dive not yet given a
+  /// number, the range its stored bucket covers.
+  String? _visibilityCaption(UnitFormatter units) {
+    final l10n = context.l10n;
+    final meters = _visibilityMetersInput(units);
+    if (meters != null) {
+      final scale = ref.read(settingsProvider).visibilityScale;
+      return visibilityBandName(scale.bandFor(meters), l10n);
+    }
+    if (_selectedVisibility != Visibility.unknown) {
+      return formatLegacyVisibilityBand(_selectedVisibility, l10n, units);
+    }
+    return null;
+  }
+
   String _conditionsSummary(UnitFormatter units) {
     return [
       if (_waterType != null) _waterType!.displayName,
       if (_waterTempController.text.isNotEmpty)
         '${_waterTempController.text} ${units.temperatureSymbol}',
-      if (_selectedVisibility != Visibility.unknown)
-        _selectedVisibility.displayName,
+      // Through the formatter rather than hand-concatenated, so the summary
+      // matches how every other distance in the app renders.
+      if (_visibilityMetersInput(units) case final meters?)
+        units.formatDistance(meters)
+      else if (_selectedVisibility != Visibility.unknown)
+        formatLegacyVisibilityBand(_selectedVisibility, context.l10n, units) ??
+            '',
     ].join(' · ');
   }
 
   bool _conditionsIsEmpty() =>
       _waterTempController.text.isEmpty &&
       _airTempController.text.isEmpty &&
+      _visibilityController.text.isEmpty &&
       _selectedVisibility == Visibility.unknown &&
       _waterType == null &&
       _currentDirection == null &&
@@ -3617,17 +3656,25 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
           onChanged: (ids) => setState(() => _selectedDiveTypeIds = ids),
         ),
       ),
-      EnumPickerRow<Visibility>(
-        label: l10n.diveLog_edit_label_visibility,
-        value: _selectedVisibility == Visibility.unknown
-            ? null
-            : _selectedVisibility,
-        values: Visibility.values
-            .where((v) => v != Visibility.unknown)
-            .toList(),
-        displayName: (v) => v.displayName,
-        onChanged: (v) =>
-            setState(() => _selectedVisibility = v ?? Visibility.unknown),
+      Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          FormRow.text(
+            label: l10n.diveLog_edit_label_visibility,
+            controller: _visibilityController,
+            suffixText: units.depthSymbol,
+            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+            onChanged: (_) => setState(() {}),
+          ),
+          if (_visibilityCaption(units) case final caption?)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(14, 0, 14, 8),
+              child: Text(
+                caption,
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
+            ),
+        ],
       ),
       EnumPickerRow<WaterType>(
         label: l10n.diveLog_edit_label_waterType,
@@ -4556,8 +4603,16 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
         avgDepth: avgDepth,
         waterTemp: waterTemp,
         airTemp: airTemp,
+        // The legacy bucket is carried through untouched so a pre-v144 dive
+        // keeps its band until the diver actually measures one. The repository
+        // clears it as soon as visibilityMeters is present.
         visibility: _selectedVisibility != Visibility.unknown
             ? _selectedVisibility
+            : null,
+        visibilityMeters: _visibilityController.text.isNotEmpty
+            ? units.depthToMeters(
+                double.tryParse(_visibilityController.text) ?? 0,
+              )
             : null,
         diveTypeIds: _selectedDiveTypeIds,
         notes: _notesController.text,
@@ -4774,19 +4829,20 @@ class _DiveEditPageState extends ConsumerState<DiveEditPage> {
         ref.invalidate(courseForDiveProvider(savedDiveId));
       }
 
-      // Record tide conditions if site has coordinates
+      // Record tide conditions if site has coordinates (skip freshwater
+      // sites: tides are meaningless there and a nearby ocean station
+      // must not leak in).
       if (savedDiveId != null &&
           _selectedSite != null &&
-          _selectedSite!.hasCoordinates) {
+          _selectedSite!.hasCoordinates &&
+          _selectedSite!.waterType != WaterType.fresh) {
         try {
-          final tideDataService = ref.read(tideDataServiceProvider);
-          final calculator = await tideDataService.getCalculatorForLocation(
-            _selectedSite!.location!.latitude,
-            _selectedSite!.location!.longitude,
+          final resolved = await ref.read(
+            resolvedTideDataProvider(_selectedSite!.location!).future,
           );
-          if (calculator != null) {
+          if (resolved != null) {
             // Record tide status at dive entry time
-            final status = calculator.getStatus(entryDateTime);
+            final status = resolved.calculator.getStatus(entryDateTime);
             final tideRepository = ref.read(tideRecordRepositoryProvider);
             await tideRepository.createFromStatus(
               diveId: savedDiveId,

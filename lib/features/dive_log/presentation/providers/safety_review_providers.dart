@@ -58,3 +58,37 @@ final safetyReviewProvider = FutureProvider.family<SafetyReview?, String>((
   await repo.saveReview(review);
   return review;
 });
+
+/// The safety finding currently selected for profile-chart highlighting, or
+/// null when none. Session state keyed by dive ID: the safety review section
+/// writes it on tile tap; the detail and fullscreen profile charts read it.
+/// Stores the whole finding (timestamps, severity) so chart consumers never
+/// depend on the async [safetyReviewProvider]. Not persisted.
+final selectedSafetyFindingProvider =
+    StateProvider.family<SafetyFinding?, String>((ref, diveId) => null);
+
+/// Dismisses or restores a finding and keeps UI state consistent: a dismissed
+/// finding can no longer be the chart selection. Persists through
+/// [SafetyFindingsRepository.setDismissed], which also bumps the parent
+/// dive's HLC so the change syncs (findings tables have no HLC of their own).
+Future<void> setSafetyFindingDismissed(
+  WidgetRef ref, {
+  required SafetyFinding finding,
+  required bool dismissed,
+}) async {
+  final diveId = finding.diveId;
+  if (dismissed) {
+    final selected = ref.read(selectedSafetyFindingProvider(diveId).notifier);
+    if (selected.state?.id == finding.id) {
+      selected.state = null;
+    }
+  }
+  await ref
+      .read(safetyFindingsRepositoryProvider)
+      .setDismissed(
+        findingId: finding.id,
+        dismissed: dismissed,
+        now: DateTime.now(),
+      );
+  ref.invalidate(safetyReviewProvider(diveId));
+}

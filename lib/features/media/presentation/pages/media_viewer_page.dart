@@ -65,6 +65,18 @@ class MediaViewerPage extends ConsumerStatefulWidget {
 }
 
 class _MediaViewerPageState extends ConsumerState<MediaViewerPage> {
+  /// The pageable subset of [MediaViewerPage.mediaList].
+  ///
+  /// Documents (PDF, docx, ...) resolve to raw bytes the Image widgets cannot
+  /// decode, so they never enter the pager: they would render as a grey
+  /// placeholder tile, count toward the "n / m" indicator, and be swipeable
+  /// onto for no purpose. Filtering here rather than in each caller covers
+  /// every wrapper at once (PhotoViewerPage, TripPhotoViewerPage,
+  /// SiteMediaViewerPage, and the library view), which is what the per-caller
+  /// guards kept missing.
+  List<MediaItem> get _pageableMedia =>
+      widget.mediaList.where((m) => !m.isDocument).toList();
+
   late PageController _pageController;
   int _currentIndex = 0;
   bool _showOverlay = true;
@@ -96,7 +108,7 @@ class _MediaViewerPageState extends ConsumerState<MediaViewerPage> {
   @override
   void initState() {
     super.initState();
-    final initialIndex = widget.mediaList.indexWhere(
+    final initialIndex = _pageableMedia.indexWhere(
       (m) => m.id == widget.initialMediaId,
     );
     _currentIndex = initialIndex == -1 ? 0 : initialIndex;
@@ -122,10 +134,18 @@ class _MediaViewerPageState extends ConsumerState<MediaViewerPage> {
 
   @override
   Widget build(BuildContext context) {
-    final mediaList = widget.mediaList;
+    final mediaList = _pageableMedia;
+    // The gallery is live: a delete elsewhere, a dive-deletion cascade, or a
+    // sync pull can shrink it under the open viewer. Clamp once here and use
+    // this everywhere rather than writing it back during build -- PageView
+    // corrects _currentIndex itself on the next settle via onPageChanged, so
+    // the clamp only has to survive one frame.
+    final currentIndex = mediaList.isEmpty
+        ? 0
+        : _currentIndex.clamp(0, mediaList.length - 1);
     final currentDiveId = mediaList.isEmpty
         ? null
-        : mediaList[_currentIndex.clamp(0, mediaList.length - 1)].diveId;
+        : mediaList[currentIndex].diveId;
     final diveAsync = currentDiveId == null
         ? const AsyncValue<Dive?>.data(null)
         : ref.watch(diveProvider(currentDiveId));
@@ -144,8 +164,7 @@ class _MediaViewerPageState extends ConsumerState<MediaViewerPage> {
             );
           }
 
-          final currentItem =
-              mediaList[_currentIndex.clamp(0, mediaList.length - 1)];
+          final currentItem = mediaList[currentIndex];
           final enrichment = currentItem.enrichment;
 
           // Get dive profile for the mini chart overlay
@@ -245,7 +264,7 @@ class _MediaViewerPageState extends ConsumerState<MediaViewerPage> {
                       setState(() => _showOverlay = !_showOverlay),
                   onSetOverlay: (value) => setState(() => _showOverlay = value),
                   onVideoControllerChanged: _onVideoControllerChanged,
-                  currentIndex: _currentIndex,
+                  currentIndex: currentIndex,
                 ),
 
                 // Transparent tap target to toggle overlays (photos only)
@@ -263,57 +282,12 @@ class _MediaViewerPageState extends ConsumerState<MediaViewerPage> {
                     ),
                   ),
 
-                // Perdix dive computer overlay. Deliberately independent of
-                // the _showOverlay chrome (which auto-hides during video
-                // playback, exactly when this must stay up) and mounted
-                // BELOW it so the toolbar keeps hit-test priority when the
-                // chrome is visible (the default corner overlaps the top
-                // bar). The face absorbs pointer events over its own bounds
-                // (drags move it, taps do nothing); chrome-toggle and video
-                // play/pause taps work anywhere outside it.
-                if (perdixAvailable && settings.perdixOverlayEnabled)
-                  DraggablePerdixOverlay(
-                    // Re-key when the persisted seed first arrives so a late
-                    // settings load re-seeds the position (same trick as the
-                    // fullscreen readout card).
-                    key: ValueKey(
-                      'perdix-${currentItem.id}-'
-                      '${settings.perdixOverlayX}-${settings.perdixOverlayY}',
-                    ),
-                    resolver: perdixResolver,
-                    baseElapsedSeconds: enrichment.elapsedSeconds!,
-                    settings: settings,
-                    playback: currentItem.isVideo
-                        ? _videoControllers[currentItem.id]
-                        : null,
-                    positionGetter:
-                        currentItem.isVideo &&
-                            _videoControllers[currentItem.id] != null
-                        ? () =>
-                              _videoControllers[currentItem.id]
-                                  ?.value
-                                  .position ??
-                              Duration.zero
-                        : null,
-                    initialFraction:
-                        (settings.perdixOverlayX != null &&
-                            settings.perdixOverlayY != null)
-                        ? Offset(
-                            settings.perdixOverlayX!,
-                            settings.perdixOverlayY!,
-                          )
-                        : null,
-                    onDragEnd: (fraction) => ref
-                        .read(settingsProvider.notifier)
-                        .setPerdixOverlayPosition(fraction.dx, fraction.dy),
-                  ),
-
                 // Overlay controls (app bar and metadata)
                 if (_showOverlay) ...[
                   // Top app bar
                   _TopOverlay(
                     item: currentItem,
-                    currentIndex: _currentIndex,
+                    currentIndex: currentIndex,
                     totalCount: mediaList.length,
                     onClose: () => Navigator.of(context).pop(),
                     onShare: () => _shareCurrentPhoto(currentItem),
@@ -364,6 +338,62 @@ class _MediaViewerPageState extends ConsumerState<MediaViewerPage> {
                     ),
                   ),
                 ],
+
+                // Perdix dive computer overlay. Deliberately independent of
+                // the _showOverlay chrome, which auto-hides during video
+                // playback exactly when this must stay up.
+                //
+                // Mounted ABOVE the chrome so it always wins the pointers
+                // that drag it: the bottom metadata's gradient Container and
+                // the mini profile chart both absorb hit tests across their
+                // full bounds, and either would strand the face where it
+                // could no longer be picked up. Neither is interactive, so
+                // nothing is lost by the face shadowing them. The top
+                // toolbar is the exception -- it does have buttons -- so
+                // rather than order, the face is kept out of its band
+                // entirely via topReserve.
+                //
+                // The face absorbs pointer events over its own bounds (drags
+                // move it, taps do nothing); chrome-toggle and video
+                // play/pause taps work anywhere outside it.
+                if (perdixAvailable && settings.perdixOverlayEnabled)
+                  DraggablePerdixOverlay(
+                    // Re-key when the persisted seed first arrives so a late
+                    // settings load re-seeds the position (same trick as the
+                    // fullscreen readout card).
+                    key: ValueKey(
+                      'perdix-${currentItem.id}-'
+                      '${settings.perdixOverlayX}-${settings.perdixOverlayY}',
+                    ),
+                    resolver: perdixResolver,
+                    baseElapsedSeconds: enrichment.elapsedSeconds!,
+                    settings: settings,
+                    topReserve:
+                        MediaQuery.paddingOf(context).top + _topChromeHeight,
+                    playback: currentItem.isVideo
+                        ? _videoControllers[currentItem.id]
+                        : null,
+                    positionGetter:
+                        currentItem.isVideo &&
+                            _videoControllers[currentItem.id] != null
+                        ? () =>
+                              _videoControllers[currentItem.id]
+                                  ?.value
+                                  .position ??
+                              Duration.zero
+                        : null,
+                    initialFraction:
+                        (settings.perdixOverlayX != null &&
+                            settings.perdixOverlayY != null)
+                        ? Offset(
+                            settings.perdixOverlayX!,
+                            settings.perdixOverlayY!,
+                          )
+                        : null,
+                    onDragEnd: (fraction) => ref
+                        .read(settingsProvider.notifier)
+                        .setPerdixOverlayPosition(fraction.dx, fraction.dy),
+                  ),
               ],
             ),
           );
@@ -1061,6 +1091,12 @@ class _VideoControlsOverlayState extends State<_VideoControlsOverlay> {
   }
 }
 
+/// Height of [_TopOverlay]'s content below the status bar: its 8 px vertical
+/// padding either side of a default 48 px [IconButton]. The Perdix overlay
+/// reserves this band so the face can never sit on top of the toolbar's
+/// buttons -- keep the two in step if the toolbar's padding changes.
+const double _topChromeHeight = 64;
+
 /// Top overlay with close button, page indicator, share, and write metadata.
 class _TopOverlay extends StatelessWidget {
   final MediaItem item;
@@ -1254,7 +1290,6 @@ class _BottomMetadataOverlay extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                 ],
-
                 // Metadata row
                 Row(
                   children: [

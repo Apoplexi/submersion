@@ -188,11 +188,77 @@ class MediaImportService {
     );
   }
 
+  /// Import selected assets as direct site attachments. Same dedupe
+  /// contract as [importPhotosForDive]; no enrichment (sites have no
+  /// profile to position photos on).
+  Future<ImportResult> importPhotosForSite({
+    required List<AssetInfo> selectedAssets,
+    required String siteId,
+  }) async {
+    final List<MediaItem> imported = [];
+    final Map<String, String> failures = {};
+
+    _log.info(
+      'Starting import of ${selectedAssets.length} assets for site $siteId',
+    );
+
+    // Same two-key dedupe as the dive import: gallery picks match on the
+    // platform asset id, desktop picks on the path.
+    bool hasPath(AssetInfo a) => a.filePath != null && a.filePath!.isNotEmpty;
+    final anyPaths = selectedAssets.any(hasPath);
+    final anyGallery = selectedAssets.any((a) => !hasPath(a));
+
+    final existingAssetIds = anyGallery
+        ? await _mediaRepository.getLinkedAssetIdsForSite(siteId)
+        : const <String>{};
+    final existingPaths = anyPaths
+        ? await _mediaRepository.getLinkedLocalPathsForSite(siteId)
+        : const <String>{};
+
+    final newAssets = selectedAssets.where((a) {
+      if (hasPath(a)) return !existingPaths.contains(a.filePath);
+      return !existingAssetIds.contains(a.id);
+    }).toList();
+    final skippedCount = selectedAssets.length - newAssets.length;
+
+    for (final asset in newAssets) {
+      try {
+        final mediaItem = _createMediaItemFromAsset(asset, siteId: siteId);
+        final saved = await _mediaRepository.createMedia(mediaItem);
+        imported.add(saved);
+        onMediaCreated?.call(saved.id);
+      } catch (e, stackTrace) {
+        _log.error(
+          'Failed to import asset ${asset.id} for site',
+          error: e,
+          stackTrace: stackTrace,
+        );
+        failures[asset.id] = e.toString();
+      }
+    }
+
+    _log.info(
+      'Site import complete: ${imported.length} succeeded, '
+      '${failures.length} failed, $skippedCount skipped',
+    );
+
+    return ImportResult(
+      imported: imported,
+      failures: failures,
+      skippedDuplicates: skippedCount,
+    );
+  }
+
   /// Library import (Media section Phase 4): no dive context, rows are
   /// retained so the orphan sweep never GCs deliberately imported media,
   /// and enrichment is skipped (it is a join product of media x a dive
   /// profile; there is no dive yet). Linking happens on the batch confirm
   /// screen or later in the Unlinked inbox.
+  ///
+  /// Dedupe is LIBRARY-WIDE, unlike [importPhotosForSite] and
+  /// [importPhotosForDive], which scope it to the thing being attached to:
+  /// there is no link to scope by here, and a second copy of an asset
+  /// already in the library is a duplicate no matter what it is linked to.
   Future<ImportResult> importPhotosToLibrary({
     required List<AssetInfo> selectedAssets,
   }) async {
@@ -236,6 +302,7 @@ class MediaImportService {
   MediaItem _createMediaItemFromAsset(
     AssetInfo asset, {
     String? diveId,
+    String? siteId,
     bool retainInLibrary = false,
   }) {
     final now = DateTime.now();
@@ -255,6 +322,7 @@ class MediaImportService {
     return MediaItem(
       id: '',
       diveId: diveId,
+      siteId: siteId,
       // Deliberately null for a localFile row. The desktop picker's asset id
       // is a synthetic in-memory key, and several features gate purely on
       // `platformAssetId != null` -- MediaItem.isGalleryPhoto,

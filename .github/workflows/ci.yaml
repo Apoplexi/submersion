@@ -369,7 +369,7 @@ jobs:
       - name: Run Python guard tests with coverage
         run: |
           mkdir -p coverage
-          guards='scripts/check_proguard_serial_keep.py,scripts/check_native_libs_present.py,scripts/check_jni_local_refs.py,scripts/check_dc_process_isolation.py'
+          guards='scripts/check_proguard_serial_keep.py,scripts/check_native_libs_present.py,scripts/check_jni_local_refs.py,scripts/check_dc_process_isolation.py,scripts/fix_macho_symbol_order.py,scripts/release/sanitize_apple_store_notes.py'
           python3 -m coverage run --include="$guards" \
             scripts/check_proguard_serial_keep_test.py
           python3 -m coverage run --append --include="$guards" \
@@ -378,6 +378,10 @@ jobs:
             scripts/check_jni_local_refs_test.py
           python3 -m coverage run --append --include="$guards" \
             scripts/check_dc_process_isolation_test.py
+          python3 -m coverage run --append --include="$guards" \
+            scripts/fix_macho_symbol_order_test.py
+          python3 -m coverage run --append --include="$guards" \
+            scripts/release/sanitize_apple_store_notes_test.py
           python3 -m coverage report -m --include="$guards"
           python3 -m coverage xml --include="$guards" \
             -o coverage/scripts.xml
@@ -387,6 +391,29 @@ jobs:
 
       - name: Run release notes HTML test
         run: ./scripts/generate_release_notes_html_test.sh
+
+      - name: Run beta release notes test
+        run: ./scripts/release/beta_release_notes_test.sh
+
+      - name: Run changelog generator test
+        run: ./scripts/release/generate_changelog_test.sh
+
+      - name: Run fastlane beta changelog test
+        run: ruby scripts/release/fastlane_beta_changelog_test.rb
+
+      - name: Run fastlane submit guard test
+        # Guards the App Review submission guard against the defect behind
+        # promotion run 31903095751: submitting while a DIFFERENT version was
+        # still in review, which renamed the in-review version instead of
+        # creating a new one and left it carrying the wrong build.
+        run: ruby scripts/release/fastlane_submit_guard_test.rb
+
+      - name: Run pre-push hook test
+        # Guards two hook bugs that both rejected pushes for reasons unrelated
+        # to the change being pushed: running the checks against the main
+        # checkout rather than the worktree, and a set -e abort that produced
+        # no error message. Stubs dart/flutter, so no toolchain is needed here.
+        run: ./scripts/pre_push_hook_test.sh
 
       - name: Upload coverage
         uses: codecov/codecov-action@v7
@@ -663,6 +690,15 @@ jobs:
             --entitlements macos/Runner/ReleaseNoSandbox.entitlements \
             build/macos/Build/Products/Release/submersion.app
 
+      # gen_snapshot emits App.framework's exported symbols in address order, which
+      # macOS 11's dyld cannot resolve by binary search -- the app then segfaults on
+      # launch before its window appears (issue #996). A build phase sorts them; this
+      # asserts the phase actually ran, since the failure is invisible on macOS 12+.
+      - name: Verify App.framework symbol order
+        run: |
+          python3 scripts/fix_macho_symbol_order.py --check \
+            build/macos/Build/Products/Release/submersion.app/Contents/Frameworks/App.framework/Versions/A/App
+
       # Zip with ditto before upload: upload-artifact would otherwise root the
       # archive inside the .app bundle (losing the submersion.app wrapper) and
       # strip the symlinks, permission bits, and codesign seal the bundle
@@ -753,6 +789,16 @@ jobs:
 
       - name: Build Android APK
         run: flutter build apk --release "${{ env.DART_DEFINES }}" -v
+
+      # The plugin's Kotlin JVM tests (BondPolicy, BondDiagnostics,
+      # BleScanDiagnostics, SerialReadBuffer) cover decision logic that no
+      # Dart test can reach. They run here rather than in their own job
+      # because android/gradlew is gitignored: the Gradle wrapper only
+      # exists once a Flutter Android build has injected it, which the APK
+      # step above has just done.
+      - name: Run libdivecomputer_plugin Kotlin unit tests
+        working-directory: android
+        run: ./gradlew :libdivecomputer_plugin:testDebugUnitTest
 
       # Guards against issue #318: a 4 KB-aligned native lib (liblibdc_jni.so)
       # silently shipped and crashed the app on Android 15+ 16 KB-page devices.

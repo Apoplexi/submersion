@@ -4,6 +4,7 @@ import 'dart:developer' as developer;
 import 'package:drift/drift.dart';
 
 import 'package:submersion/core/database/performance_indexes.dart';
+import 'package:submersion/core/database/tag_uniqueness.dart';
 import 'package:submersion/core/constants/enums.dart';
 
 part 'database.g.dart';
@@ -379,6 +380,22 @@ class GpsTracks extends Table {
   TextColumn get deviceName => text().nullable()();
   IntColumn get pointCount => integer().withDefault(const Constant(0))();
 
+  /// Provenance: 'phone' | 'gpx' | 'fit' | 'kml' | 'csv'. Rendering code
+  /// treats this as opaque -- no view logic branches on it.
+  TextColumn get source => text().withDefault(const Constant('phone'))();
+
+  /// Originating filename or device, for imported tracks.
+  TextColumn get sourceRef => text().nullable()();
+
+  /// User-editable label.
+  TextColumn get name => text().nullable()();
+
+  /// Non-destructive trim bounds, wall-clock-as-UTC epoch MILLISECONDS.
+  /// The points blob is never rewritten by a trim, so trimming is fully
+  /// reversible and cannot lose a fix.
+  IntColumn get trimStartTime => integer().nullable()();
+  IntColumn get trimEndTime => integer().nullable()();
+
   /// Gzipped JSON array of [wallClockEpochSeconds, lat, lon, accuracyMeters]
   BlobColumn get points => blob().nullable()();
   IntColumn get createdAt => integer()();
@@ -581,7 +598,18 @@ class Dives extends Table {
   RealColumn get avgDepth => real().nullable()();
   RealColumn get waterTemp => real().nullable()();
   RealColumn get airTemp => real().nullable()();
+
+  /// Legacy visibility bucket (pre-v144). Retained read-only so dives logged
+  /// before measured visibility keep the band they were filed under; cleared
+  /// when [visibilityMeters] is written. New code must not write this.
   TextColumn get visibility => text().nullable()();
+
+  /// v144: measured horizontal visibility in meters, canonical from v144 on.
+  ///
+  /// Storing the measurement rather than a judgment is what lets the
+  /// good/poor adjective be calibrated per diver: six meters is six meters in
+  /// Cozumel and in Puget Sound, only the adjective differs.
+  RealColumn get visibilityMeters => real().nullable()();
   TextColumn get diveType =>
       text().withDefault(const Constant('recreational'))();
   TextColumn get buddy => text().nullable()();
@@ -1525,6 +1553,31 @@ class DiverSettings extends Table {
   TextColumn get sacUnit =>
       text().withDefault(const Constant('litersPerMin'))();
   TextColumn get defaultCurrency => text().withDefault(const Constant('USD'))();
+
+  /// v144: per-diver calibration deciding which measured distances count as
+  /// excellent/good/moderate/poor visibility.
+  ///
+  /// Presentational only -- dives always store the measured distance, so
+  /// changing this re-labels a logbook without altering any dive. Defaults to
+  /// 'tropical', which reproduces the thresholds hardcoded before v144 so
+  /// upgrading re-labels nobody's existing dives.
+  TextColumn get visibilityScalePreset =>
+      text().withDefault(const Constant('tropical'))();
+
+  /// Custom calibration thresholds in meters, used only when
+  /// [visibilityScalePreset] is 'custom'.
+  RealColumn get visibilityScaleExcellentM => real().nullable()();
+  RealColumn get visibilityScaleGoodM => real().nullable()();
+  RealColumn get visibilityScaleModerateM => real().nullable()();
+
+  /// v150: how GPS coordinates are rendered and entered (issue #1041).
+  ///
+  /// Presentational only -- coordinates are always stored as decimal-degree
+  /// doubles, so changing this re-renders every site without altering a
+  /// single stored value. Defaults to 'decimalDegrees', which is what the app
+  /// showed before v150.
+  TextColumn get coordinateFormat =>
+      text().withDefault(const Constant('decimalDegrees'))();
   // Time/Date format settings
   TextColumn get timeFormat =>
       text().withDefault(const Constant('twelveHour'))();
@@ -1778,29 +1831,6 @@ class DiveBuddies extends Table {
   Set<Column> get primaryKey => {id};
 }
 
-/// Professional credentials held by a buddy (instructor, divemaster,
-/// dive guide). One row per (buddy, role); the repository enforces that
-/// logical uniqueness. Issue #395.
-@DataClassName('BuddyRoleRow')
-class BuddyRoles extends Table {
-  TextColumn get id => text()();
-  TextColumn get buddyId =>
-      text().references(Buddies, #id, onDelete: KeyAction.cascade)();
-  TextColumn get role => text()(); // BuddyRole enum name
-  TextColumn get credentialNumber => text().nullable()();
-  TextColumn get agency => text().nullable()(); // CertificationAgency enum name
-  TextColumn get notes => text().withDefault(const Constant(''))();
-  IntColumn get createdAt => integer()();
-  IntColumn get updatedAt => integer()();
-
-  /// Hybrid Logical Clock for cross-device conflict resolution
-  /// (nullable: rows written before HLC rollout fall back to updatedAt).
-  TextColumn get hlc => text().nullable()();
-
-  @override
-  Set<Column> get primaryKey => {id};
-}
-
 /// Diver certifications
 class Certifications extends Table {
   TextColumn get id => text()();
@@ -2020,9 +2050,10 @@ const String kSeedBuiltInDiveTypesSql = '''
 ''';
 
 /// Per-dive role vocabulary: built-in + custom (v103, issues #551/#547).
-/// Built-in ids are the legacy BuddyRole enum names so existing
-/// dive_buddies.role strings resolve without data migration; custom ids
-/// are UUIDs so renames never break references.
+/// Built-in ids are the historical per-dive role names (buddy, diveGuide,
+/// instructor, student, diveMaster, solo) so existing dive_buddies.role
+/// strings resolve without data migration; custom ids are UUIDs so
+/// renames never break references.
 @DataClassName('DiveRoleRow')
 class DiveRoles extends Table {
   TextColumn get id => text()();
@@ -2908,7 +2939,6 @@ String legacyDataSourceId(String diveId) => '$kLegacyDataSourceIdPrefix$diveId';
     Settings,
     Buddies,
     DiveBuddies,
-    BuddyRoles,
     Certifications,
     ServiceRecords,
     DiveCenters,
@@ -2989,7 +3019,7 @@ class AppDatabase extends _$AppDatabase {
 
   /// The current schema version as a static constant so that pre-open checks
   /// (e.g. version-mismatch guard) can reference it without an instance.
-  static const int currentSchemaVersion = 143;
+  static const int currentSchemaVersion = 150;
 
   /// Every schema version that has a migration block in onUpgrade.
   /// Used to calculate progress step counts. When adding a new migration,
@@ -3171,8 +3201,37 @@ class AppDatabase extends _$AppDatabase {
     // v142: trips.return_flight_at (return-flight dive-window countdown).
     142,
     // v143: media_repair_log (per-device) + media_smart_albums (synced),
-    // Media section Phase 5.
+    // Media section Phase 5. Main reserved this number for PR #894 and
+    // continued at v144, so it lands here without renumbering.
     143,
+    // v144: dives.visibility_meters plus the diver_settings visibility scale
+    // calibration columns (measured visibility replaces the tropical-biased
+    // bucket enum).
+    144,
+    // v145: gps_tracks provenance, label, and non-destructive trim bounds.
+    // Renumbered from v144 as main took that step for the visibility scale
+    // work at merge time.
+    145,
+    // v146: recompute machine-derived bottom times that the retired
+    // square-profile heuristic collapsed on multilevel dives.
+    146,
+    // v147: fold buddy_roles (professional credentials, issue #395) into
+    // buddy-owned certifications rows and drop the table (spec
+    // 2026-08-08-buddy-professional-roles-fold). Originally authored as v145;
+    // renumbered when PR #908 reserved 145 and v146 landed first.
+    147,
+    // v148: site media attachments (issues #211/#627): media(site_id) query
+    // index plus the site-side dedupe cleanup and partial unique index
+    // mirroring the dive-side v38 pair.
+    148,
+    // v149: duplicate tags (issue #1032): collapse `tags` rows sharing a
+    // (diver scope, case-folded name) and `dive_tags` rows sharing a
+    // (dive, tag), then add the two unique indexes that stop them recurring.
+    149,
+    // v150: diver_settings.coordinate_format (issue #1041): the diver's GPS
+    // coordinate notation. Presentational only -- coordinates stay decimal
+    // degrees in storage.
+    150,
   ];
 
   /// Idempotent DDL for the v106 connector-suggestion columns (Lightroom
@@ -3458,6 +3517,113 @@ class AppDatabase extends _$AppDatabase {
     if (descentEnd == null || ascentStart == null) return null;
     if (ascentStart <= descentEnd) return null;
     return ascentStart - descentEnd;
+  }
+
+  /// v146 data fix: the retired bottom-time heuristic (time at/above 85% of
+  /// max depth -- kept frozen above in [_bottomTimeSecondsFromProfileRows])
+  /// collapsed multilevel dives to their deepest segment: 10 min at 29 m
+  /// followed by 40 min at 15 m reported ~9 min of bottom time. For any dive
+  /// whose stored bottom_time exactly reproduces the old heuristic's output
+  /// for its primary profile (in practice machine-derived by an import,
+  /// download, or the v132 backfill; a user-typed value that coincidentally
+  /// reproduces it is recomputed too, which still yields a
+  /// profile-consistent result), recompute it with the multilevel-correct
+  /// rule in [_multilevelBottomTimeSecondsFromProfileRows].
+  ///
+  /// Both algorithms are frozen private copies so every device computes
+  /// identical values no matter which app version it migrates with; `hlc`
+  /// is left untouched (deterministic local recompute, no sync traffic
+  /// needed to converge, exactly like v132). onUpgrade only.
+  Future<void> _recomputeMultilevelBottomTimes() async {
+    final diveCols = await customSelect("PRAGMA table_info('dives')").get();
+    final diveColNames = diveCols.map((c) => c.read<String>('name')).toSet();
+    if (!diveColNames.contains('bottom_time')) {
+      return;
+    }
+    final profileCols = await customSelect(
+      "PRAGMA table_info('dive_profiles')",
+    ).get();
+    final profileColNames = profileCols
+        .map((c) => c.read<String>('name'))
+        .toSet();
+    if (!profileColNames.contains('dive_id') ||
+        !profileColNames.contains('is_primary') ||
+        !profileColNames.contains('timestamp') ||
+        !profileColNames.contains('depth')) {
+      return;
+    }
+
+    final candidates = await customSelect(
+      'SELECT id, bottom_time FROM dives WHERE bottom_time IS NOT NULL',
+    ).get();
+
+    var processed = 0;
+    for (final candidate in candidates) {
+      // Same event-loop yield as the v132 backfill: during a migration the
+      // executor completes drift awaits in microtasks, so an unbroken loop
+      // would freeze the migration progress spinner.
+      if (processed++ % 25 == 24) {
+        await Future<void>.delayed(Duration.zero);
+      }
+      final diveId = candidate.read<String>('id');
+      final storedSeconds = candidate.read<int>('bottom_time');
+
+      final points = await customSelect(
+        'SELECT timestamp, depth FROM dive_profiles '
+        'WHERE dive_id = ? AND is_primary = 1 '
+        'ORDER BY timestamp ASC',
+        variables: [Variable<String>(diveId)],
+      ).get();
+
+      // Fingerprint check: a value reproducing the old heuristic is
+      // treated as machine-written and replaced (a coincidental user match
+      // is recomputed too); anything else is user data and stays.
+      final oldSeconds = _bottomTimeSecondsFromProfileRows(points);
+      if (oldSeconds == null || oldSeconds != storedSeconds) continue;
+
+      final newSeconds = _multilevelBottomTimeSecondsFromProfileRows(points);
+      if (newSeconds != null && newSeconds != storedSeconds) {
+        await customStatement('UPDATE dives SET bottom_time = ? WHERE id = ?', [
+          newSeconds,
+          diveId,
+        ]);
+      }
+    }
+  }
+
+  /// Multilevel-correct bottom time in seconds from timestamp-ordered
+  /// profile rows: surface departure (first sample) to the last sample
+  /// at/deeper than min(max(6 m, 33% of max depth), 85% of max depth).
+  /// Frozen copy of the v146-era BottomTimeCalculator so the migration is
+  /// deterministic across app versions; do not sync with later changes to
+  /// the domain calculator.
+  int? _multilevelBottomTimeSecondsFromProfileRows(List<QueryRow> points) {
+    if (points.length < 3) return null;
+
+    var maxDepth = 0.0;
+    for (final point in points) {
+      final depth = point.read<double>('depth');
+      if (depth > maxDepth) maxDepth = depth;
+    }
+    if (maxDepth <= 0) return null;
+
+    var threshold = maxDepth * 0.33;
+    if (threshold < 6.0) threshold = 6.0;
+    final cap = maxDepth * 0.85;
+    if (threshold > cap) threshold = cap;
+
+    int? ascentStart;
+    for (var i = points.length - 1; i >= 0; i--) {
+      if (points[i].read<double>('depth') >= threshold) {
+        ascentStart = points[i].read<int>('timestamp');
+        break;
+      }
+    }
+    if (ascentStart == null) return null;
+
+    final firstTimestamp = points.first.read<int>('timestamp');
+    final bottomSeconds = ascentStart - firstTimestamp;
+    return bottomSeconds > 0 ? bottomSeconds : null;
   }
 
   /// v114: collapse duplicate tombstones (newest deleted_at per entity_type +
@@ -4072,6 +4238,106 @@ class AppDatabase extends _$AppDatabase {
     }
   }
 
+  /// Fold buddy professional credentials (buddy_roles, issue #395) into
+  /// buddy-owned certifications rows, then drop the table (v147; spec
+  /// 2026-08-08-buddy-professional-roles-fold). Invoked from onUpgrade AND
+  /// as a guarded beforeOpen backstop -- unlike the #553 inline-cert copy
+  /// (whose source columns survive until v110, so it must never run in
+  /// beforeOpen), this helper's own DROP TABLE makes the sqlite_master guard
+  /// below a strict no-op once buddy_roles is gone, so re-running it on
+  /// every open cannot resurrect a user-deleted cert. The beforeOpen call
+  /// exists purely to protect a DB whose user_version advanced past 145
+  /// (parallel-branch schema-version collision) without ever running the
+  /// v147 block, which would otherwise strand it with an orphaned
+  /// buddy_roles table nothing else reads. Ids are deterministic
+  /// (`buddyrolecert-<rowId>`): synced replicas share buddy_roles row ids,
+  /// so independent per-device migrations converge on identical cert rows
+  /// instead of duplicating.
+  Future<void> _migrateBuddyRolesToCertifications() async {
+    final tables = await customSelect(
+      "SELECT name FROM sqlite_master WHERE type='table' "
+      "AND name='buddy_roles'",
+    ).get();
+    if (tables.isEmpty) return;
+
+    const levelForRole = {
+      'instructor': 'instructor',
+      'diveMaster': 'diveMaster',
+      'diveGuide': 'diveGuide',
+    };
+    const nameForRole = {
+      'instructor': 'Instructor',
+      'diveMaster': 'Divemaster',
+      'diveGuide': 'Dive Guide',
+    };
+
+    // JOIN buddies so an orphaned credential row (FK-off test databases)
+    // can never fail the certifications FK on insert.
+    final rows = await customSelect(
+      'SELECT br.id, br.buddy_id, br.role, br.credential_number, br.agency, '
+      'br.notes, br.created_at, br.updated_at '
+      'FROM buddy_roles br JOIN buddies b ON b.id = br.buddy_id',
+    ).get();
+    for (final r in rows) {
+      final role = r.read<String>('role');
+      final level = levelForRole[role];
+      if (level == null) continue; // unknown role: feature is gone, drop it
+      final buddyId = r.read<String>('buddy_id');
+      final agency = r.read<String?>('agency') ?? 'other';
+      final cardNumber = r.read<String?>('credential_number');
+
+      // ORDER BY id keeps the backfill target deterministic across replicas
+      // when a buddy has multiple pre-existing certs at the same
+      // (agency, level) -- this migration runs independently per device.
+      final existing = await customSelect(
+        'SELECT id, card_number FROM certifications '
+        'WHERE buddy_id = ? AND agency = ? AND level = ? '
+        'ORDER BY id',
+        variables: [
+          Variable<String>(buddyId),
+          Variable<String>(agency),
+          Variable<String>(level),
+        ],
+      ).get();
+      if (existing.isNotEmpty) {
+        // Same fact already recorded as a certification. Backfill the card
+        // number when the cert lacks one -- the common "entered both halves"
+        // case -- otherwise leave the richer cert row alone.
+        final target = existing.first;
+        final existingNumber = target.read<String?>('card_number');
+        if ((existingNumber == null || existingNumber.isEmpty) &&
+            cardNumber != null &&
+            cardNumber.isNotEmpty) {
+          await customStatement(
+            'UPDATE certifications SET card_number = ? WHERE id = ?',
+            [cardNumber, target.read<String>('id')],
+          );
+        }
+        continue;
+      }
+
+      await customStatement(
+        'INSERT INTO certifications '
+        '(id, buddy_id, diver_id, name, agency, level, card_number, notes, '
+        'created_at, updated_at) '
+        'VALUES (?, ?, NULL, ?, ?, ?, ?, ?, ?, ?) '
+        'ON CONFLICT(id) DO NOTHING',
+        [
+          'buddyrolecert-${r.read<String>('id')}',
+          buddyId,
+          nameForRole[role]!,
+          agency,
+          level,
+          cardNumber,
+          r.read<String>('notes'),
+          r.read<int>('created_at'),
+          r.read<int>('updated_at'),
+        ],
+      );
+    }
+    await customStatement('DROP TABLE IF EXISTS buddy_roles');
+  }
+
   /// Human-readable name for a migrated buddy cert: the level's display name
   /// when present, else the agency's.
   String _displayNameForMigratedCert(String? level, String agency) {
@@ -4186,6 +4452,41 @@ class AppDatabase extends _$AppDatabase {
     }
   }
 
+  /// Idempotent DDL for the v145 gps_tracks provenance, label, and
+  /// non-destructive trim-bound columns.
+  ///
+  /// Self-guarding like its siblings: a DB that upgraded past 145 on a
+  /// parallel branch never enters the migration block, so the beforeOpen
+  /// backstop is its only path to these columns.
+  Future<void> _assertGpsTrackColumns() async {
+    final cols = await customSelect("PRAGMA table_info('gps_tracks')").get();
+    if (cols.isEmpty) return;
+    final names = cols.map((c) => c.read<String>('name')).toSet();
+    if (!names.contains('source')) {
+      await customStatement(
+        "ALTER TABLE gps_tracks ADD COLUMN source TEXT NOT NULL DEFAULT 'phone'",
+      );
+    }
+    if (!names.contains('source_ref')) {
+      await customStatement(
+        'ALTER TABLE gps_tracks ADD COLUMN source_ref TEXT',
+      );
+    }
+    if (!names.contains('name')) {
+      await customStatement('ALTER TABLE gps_tracks ADD COLUMN name TEXT');
+    }
+    if (!names.contains('trim_start_time')) {
+      await customStatement(
+        'ALTER TABLE gps_tracks ADD COLUMN trim_start_time INTEGER',
+      );
+    }
+    if (!names.contains('trim_end_time')) {
+      await customStatement(
+        'ALTER TABLE gps_tracks ADD COLUMN trim_end_time INTEGER',
+      );
+    }
+  }
+
   /// Idempotent DDL for the v142 return-flight column. Called from the v142
   /// onUpgrade step and the beforeOpen backstop, matching the
   /// _assertWeatherCodeColumn pattern so a schema-version collision cannot
@@ -4198,6 +4499,75 @@ class AppDatabase extends _$AppDatabase {
     if (!names.contains('return_flight_at')) {
       await customStatement(
         'ALTER TABLE trips ADD COLUMN return_flight_at INTEGER',
+      );
+    }
+  }
+
+  /// Idempotent DDL for the v144 dives.visibility_meters column. Called from
+  /// the v144 onUpgrade step and the beforeOpen backstop, matching the
+  /// _assertTripReturnFlightColumn pattern so a schema-version collision
+  /// cannot strand a database without it. Self-guarding when the table is
+  /// absent (minimal migration-test fixtures).
+  ///
+  /// Deliberately does not backfill the legacy `visibility` bucket: a bucket
+  /// only says the dive fell somewhere in a range, so deriving a number would
+  /// fabricate precision the diver never entered.
+  Future<void> _assertVisibilityMetersColumn() async {
+    final cols = await customSelect("PRAGMA table_info('dives')").get();
+    if (cols.isEmpty) return;
+    final names = cols.map((c) => c.read<String>('name')).toSet();
+    if (!names.contains('visibility_meters')) {
+      await customStatement(
+        'ALTER TABLE dives ADD COLUMN visibility_meters REAL',
+      );
+    }
+  }
+
+  /// Idempotent DDL for the v144 diver_settings visibility calibration
+  /// columns. Same dual-call contract as [_assertVisibilityMetersColumn].
+  Future<void> _assertVisibilityScaleColumns() async {
+    final cols = await customSelect(
+      "PRAGMA table_info('diver_settings')",
+    ).get();
+    if (cols.isEmpty) return;
+    final names = cols.map((c) => c.read<String>('name')).toSet();
+    if (!names.contains('visibility_scale_preset')) {
+      await customStatement(
+        'ALTER TABLE diver_settings ADD COLUMN visibility_scale_preset '
+        "TEXT NOT NULL DEFAULT 'tropical'",
+      );
+    }
+    if (!names.contains('visibility_scale_excellent_m')) {
+      await customStatement(
+        'ALTER TABLE diver_settings ADD COLUMN visibility_scale_excellent_m '
+        'REAL',
+      );
+    }
+    if (!names.contains('visibility_scale_good_m')) {
+      await customStatement(
+        'ALTER TABLE diver_settings ADD COLUMN visibility_scale_good_m REAL',
+      );
+    }
+    if (!names.contains('visibility_scale_moderate_m')) {
+      await customStatement(
+        'ALTER TABLE diver_settings ADD COLUMN visibility_scale_moderate_m '
+        'REAL',
+      );
+    }
+  }
+
+  /// Idempotent DDL for the v150 diver_settings coordinate format column.
+  /// Same dual-call contract as [_assertVisibilityScaleColumns].
+  Future<void> _assertCoordinateFormatColumn() async {
+    final cols = await customSelect(
+      "PRAGMA table_info('diver_settings')",
+    ).get();
+    if (cols.isEmpty) return;
+    final names = cols.map((c) => c.read<String>('name')).toSet();
+    if (!names.contains('coordinate_format')) {
+      await customStatement(
+        'ALTER TABLE diver_settings ADD COLUMN coordinate_format '
+        "TEXT NOT NULL DEFAULT 'decimalDegrees'",
       );
     }
   }
@@ -4258,7 +4628,6 @@ class AppDatabase extends _$AppDatabase {
     'divers',
     'diver_settings',
     'buddies',
-    'buddy_roles',
     'dive_centers',
     'trips',
     'liveaboard_detail_records',
@@ -4428,6 +4797,11 @@ class AppDatabase extends _$AppDatabase {
         // Seed built-in service kinds (the v122 migration backfills these
         // for upgraded databases; beforeOpen re-asserts).
         await customStatement(kSeedBuiltInServiceKindsSql);
+
+        // Tag uniqueness indexes (v149, issue #1032): createAll() never builds
+        // raw-SQL indexes, so a fresh install would otherwise be the one
+        // device in the library without them.
+        await assertTagUniqueness(this);
       },
       onUpgrade: (Migrator m, int from, int to) async {
         int completedSteps = 0;
@@ -7023,13 +7397,17 @@ class AppDatabase extends _$AppDatabase {
         }
         if (from < 98) await reportProgress();
         if (from < 99) {
-          // Buddy professional credentials + structured instructor link on
-          // certifications (issue #395). PRAGMA-guarded so a healthy database
-          // no-ops and an interrupted upgrade does not fail on a duplicate
-          // ALTER. createTable is IF NOT EXISTS. (v99: renumbered from v94
-          // repeatedly as main claimed 94-96, then 97, then 98 while the
-          // branch was in review; a beforeOpen backstop re-asserts these
-          // objects too, so a version collision can't strand them.)
+          // Structured instructor link on certifications (issue #395).
+          // PRAGMA-guarded so a healthy database no-ops and an interrupted
+          // upgrade does not fail on a duplicate ALTER. (v99: renumbered
+          // from v94 repeatedly as main claimed 94-96, then 97, then 98
+          // while the branch was in review; a beforeOpen backstop
+          // re-asserts this object too, so a version collision can't
+          // strand it.)
+          //
+          // This block also created the buddy_roles table historically
+          // (buddy professional credentials); v147 folds those rows into
+          // certifications and drops the table.
           final certCols = await customSelect(
             "PRAGMA table_info('certifications')",
           ).get();
@@ -7044,7 +7422,6 @@ class AppDatabase extends _$AppDatabase {
               );
             }
           }
-          await m.createTable(buddyRoles);
         }
         if (from < 99) await reportProgress();
         if (from < 100) {
@@ -7448,11 +7825,100 @@ class AppDatabase extends _$AppDatabase {
           await _assertTripReturnFlightColumn();
         }
         if (from < 142) await reportProgress();
-        // v143: repair history + smart albums (Media section Phase 5).
+        // v143: repair history + smart albums (Media section Phase 5). A DB
+        // already carried to 144-150 by main never enters this block; the
+        // beforeOpen backstop is its only path to those tables.
         if (from < 143) {
           await _assertMediaPhase5Schema();
         }
         if (from < 143) await reportProgress();
+        // v144: dives.visibility_meters + the diver_settings visibility
+        // calibration columns.
+        if (from < 144) {
+          await _assertVisibilityMetersColumn();
+          await _assertVisibilityScaleColumns();
+        }
+        if (from < 144) await reportProgress();
+        // v145: gps_tracks source/source_ref/name + non-destructive trim
+        // bounds. Renumbered from v144 as main took that step for the
+        // visibility scale work at merge time.
+        if (from < 145) {
+          await _assertGpsTrackColumns();
+        }
+        if (from < 145) await reportProgress();
+        // v146: recompute bottom times the retired square-profile heuristic
+        // derived too short on multilevel dives. Fingerprinted -- stored
+        // values that exactly reproduce the old heuristic get replaced
+        // (machine-derived, or a coincidental user match that recomputes to
+        // a profile-consistent value); anything else is treated as user
+        // data and left alone. onUpgrade only, hlc untouched (v132 pattern).
+        if (from < 146) {
+          await _recomputeMultilevelBottomTimes();
+        }
+        if (from < 146) await reportProgress();
+        if (from < 147) {
+          // Fold buddy professional credentials into certifications and drop
+          // buddy_roles (spec 2026-08-08). Conversion + drop in one step; the
+          // sqlite_master guard makes a fresh v147 db a no-op.
+          await _migrateBuddyRolesToCertifications();
+        }
+        if (from < 147) await reportProgress();
+        if (from < 148) {
+          // Site media (issues #211/#627). Query index for the site gallery;
+          // dedupe cleanup + partial unique index mirroring the dive-side
+          // v38 pair so the same gallery asset cannot be linked to the same
+          // site twice. The survivor is the oldest row, tie-broken by rowid:
+          // created_at is epoch MILLISECONDS and a bulk import writes many
+          // rows inside one, so a `created_at > MIN(created_at)` cleanup
+          // would leave every tied row behind and the unique index below
+          // would then abort the whole migration.
+          // Guarded on media.site_id existing so partial migration-test
+          // fixture databases (which build only the tables and columns their
+          // migration touches) pass through unharmed.
+          final mediaSiteCol = await customSelect(
+            "SELECT name FROM pragma_table_info('media') "
+            "WHERE name = 'site_id'",
+          ).get();
+          if (mediaSiteCol.isNotEmpty) {
+            await customStatement('''
+            CREATE INDEX IF NOT EXISTS idx_media_site_id
+            ON media(site_id)
+          ''');
+            await customStatement('''
+            DELETE FROM media
+            WHERE platform_asset_id IS NOT NULL
+              AND site_id IS NOT NULL
+              AND rowid NOT IN (
+                SELECT rowid FROM (
+                  SELECT rowid, ROW_NUMBER() OVER (
+                    PARTITION BY platform_asset_id, site_id
+                    ORDER BY created_at ASC, rowid ASC
+                  ) AS rn FROM media
+                  WHERE platform_asset_id IS NOT NULL AND site_id IS NOT NULL
+                ) WHERE rn = 1
+              )
+          ''');
+            await customStatement('''
+            CREATE UNIQUE INDEX IF NOT EXISTS idx_media_asset_site_unique
+            ON media(platform_asset_id, site_id)
+            WHERE platform_asset_id IS NOT NULL AND site_id IS NOT NULL
+          ''');
+          }
+        }
+        if (from < 148) await reportProgress();
+        if (from < 149) {
+          // Duplicate tags (issue #1032). The helper dedupes BEFORE creating
+          // the unique indexes and its dedupe is total (rowid/id tie-breaks),
+          // so no tie can survive to abort the index creation -- the failure
+          // mode v148 documents. Self-guarding on the tables existing.
+          await assertTagUniqueness(this);
+        }
+        if (from < 149) await reportProgress();
+        // v150: the diver's GPS coordinate notation (issue #1041).
+        if (from < 150) {
+          await _assertCoordinateFormatColumn();
+        }
+        if (from < 150) await reportProgress();
       },
       beforeOpen: (details) async {
         // Enable foreign keys
@@ -7583,6 +8049,33 @@ class AppDatabase extends _$AppDatabase {
         // v142 backstop: re-assert trips.return_flight_at.
         await _assertTripReturnFlightColumn();
 
+        // v144 backstop: re-assert the measured-visibility column and the
+        // diver_settings calibration columns.
+        await _assertVisibilityMetersColumn();
+        await _assertVisibilityScaleColumns();
+
+        // v150 backstop: re-assert the coordinate format column.
+        await _assertCoordinateFormatColumn();
+
+        // v145 backstop: re-assert the gps_tracks provenance and trim columns.
+        await _assertGpsTrackColumns();
+
+        // v147 backstop: re-run the buddy_roles fold (parallel-branch
+        // schema-version collision self-heal). This is safe to re-run on
+        // every open, unlike the #553 inline-cert copy above, which must
+        // NEVER run here -- that helper's source columns (buddies.
+        // certification_level/_agency) survive until v110, so re-running it
+        // in beforeOpen would resurrect a user-deleted buddy cert from
+        // still-present source data. _migrateBuddyRolesToCertifications has
+        // no such hazard: its own DROP TABLE makes the sqlite_master guard a
+        // strict no-op the moment buddy_roles is gone, so there is no source
+        // data left to resurrect from. Its purpose here is purely to protect
+        // a DB whose user_version advanced past 145 without ever running the
+        // v147 block -- without this backstop, that DB would carry an
+        // orphaned buddy_roles table whose credentials silently vanish from
+        // the UI forever (nothing else reads that table).
+        await _migrateBuddyRolesToCertifications();
+
         // Built-in dive types are reference data: identical on every device and
         // undeletable through DiveTypeRepository. Nothing else restores them --
         // the seed runs only in onCreate and the one-shot v93 step -- yet a
@@ -7603,9 +8096,10 @@ class AppDatabase extends _$AppDatabase {
         // as the v77/v82/v83 sync-branch incidents): a parallel branch build
         // that claims the same schema version can advance user_version past
         // the v99 block without creating its objects, and no later migration
-        // would ever repair that. All DDL here is idempotent (createTable is
-        // IF NOT EXISTS; the ALTER is PRAGMA-guarded), so re-assert the v99
-        // objects on every open.
+        // would ever repair that. The ALTER is PRAGMA-guarded, so re-assert
+        // the v99 object on every open. (buddy_roles was also created here
+        // historically; v147 dropped it, so it must NOT be re-created below
+        // -- doing so would resurrect the dropped table on every open.)
         final certCols = await customSelect(
           "PRAGMA table_info('certifications')",
         ).get();
@@ -7618,7 +8112,6 @@ class AppDatabase extends _$AppDatabase {
             'REFERENCES buddies (id) ON DELETE SET NULL',
           );
         }
-        await createMigrator().createTable(buddyRoles);
 
         // v100 backstop: re-assert the dive plan tables (same collision
         // disease; createTable is idempotent). Their indexes
@@ -7712,6 +8205,12 @@ class AppDatabase extends _$AppDatabase {
           }
           return true;
         }());
+
+        // v149 backstop (issue #1032): re-assert the tag uniqueness indexes,
+        // deduping first so the creation cannot abort. A database that
+        // arrives by restore or sync-adopt never runs onUpgrade, and that is
+        // exactly the second device the duplicate tags came from.
+        await assertTagUniqueness(this);
 
         // Data self-heal: backfill a primary dive_data_sources row for dives
         // that have profile samples but no source row (legacy file imports).

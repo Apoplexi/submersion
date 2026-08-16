@@ -11,6 +11,7 @@ import 'package:submersion/features/reef/data/services/reef_habitat_service.dart
 import 'package:submersion/features/reef/data/services/reef_health_service.dart';
 import 'package:submersion/features/reef/data/services/reef_protection_service.dart';
 import 'package:submersion/features/reef/domain/entities/reef_data_status.dart';
+import 'package:submersion/features/reef/domain/entities/reef_habitat.dart';
 import 'package:submersion/features/reef/domain/entities/reef_health.dart';
 import 'package:submersion/features/reef/domain/entities/reef_snapshot.dart';
 
@@ -32,13 +33,36 @@ final reefRepositoryProvider = Provider<ReefRepository>((ref) {
   );
 });
 
-/// All four reef-data parts for a location. Fetched when a site is viewed.
-final reefSnapshotProvider = FutureProvider.family<ReefSnapshot, GeoPoint>((
-  ref,
-  location,
-) {
-  return ref.watch(reefRepositoryProvider).snapshotFor(location);
-});
+/// Identifies one snapshot lookup. [fetchHealth] is false for freshwater
+/// sites, whose water NOAA's ocean grid cannot see; equality covers it so a
+/// water-type edit refetches.
+class ReefSnapshotRequest extends Equatable {
+  final GeoPoint location;
+  final bool fetchHealth;
+
+  const ReefSnapshotRequest({required this.location, this.fetchHealth = true});
+
+  @override
+  List<Object?> get props => [location, fetchHealth];
+}
+
+/// All reef-data parts for a location. Fetched when a site is viewed.
+// no-tick: reef data comes from REMOTE services (habitat, health, protection,
+// nearby species) cached aside by quantized coordinate. Nothing the app writes
+// can change it, so there is no table to subscribe to.
+final reefSnapshotProvider =
+    FutureProvider.family<ReefSnapshot, ReefSnapshotRequest>((ref, request) {
+      return ref
+          .watch(reefRepositoryProvider)
+          .snapshotFor(request.location, includeHealth: request.fetchHealth);
+    });
+
+/// Habitat alone, for the dive detail page's water-conditions card.
+// no-tick: remote reef data keyed by quantized coordinate, as above.
+final reefHabitatProvider =
+    FutureProvider.family<ReefPart<ReefHabitat>, GeoPoint>((ref, location) {
+      return ref.watch(reefRepositoryProvider).habitatFor(location);
+    });
 
 /// Identifies a historical reef-health lookup for one dive.
 ///
@@ -60,6 +84,7 @@ class ReefHealthRequest extends Equatable {
 }
 
 /// Reef health as it was on a dive's date.
+// no-tick: remote reef data keyed by quantized coordinate and date, as above.
 final reefHealthForDiveProvider =
     FutureProvider.family<ReefPart<ReefHealth>, ReefHealthRequest>((
       ref,

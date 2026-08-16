@@ -41,7 +41,7 @@ void main() {
       rating: 4,
       isFavorite: true,
       waterType: 'salt',
-      visibility: 'good',
+      visibilityMeters: 6.0,
       currentDirection: 'none',
       currentStrength: 'mild',
       swellHeight: 1.0,

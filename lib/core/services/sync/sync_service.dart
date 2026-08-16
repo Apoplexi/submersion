@@ -29,6 +29,8 @@ import 'package:submersion/core/services/sync/changeset_log/sync_manifest.dart';
 import 'package:submersion/core/services/sync/changeset_log/tombstone_horizon.dart';
 import 'package:submersion/core/services/sync/hlc.dart';
 import 'package:submersion/core/services/sync/library_epoch.dart';
+import 'package:submersion/core/services/sync/sync_cleanup_outcome.dart';
+import 'package:submersion/core/services/sync/sync_device_metadata.dart';
 import 'package:submersion/core/services/sync/library_epoch_store.dart';
 import 'package:submersion/core/services/sync/crypto/crypto_errors.dart';
 import 'package:submersion/core/services/sync/crypto/sync_encryption_service.dart';
@@ -65,6 +67,11 @@ class SyncResult {
   /// can be safely merged.
   final Set<String> skippedPeerDeviceIds;
 
+  /// Display names for the entries in [skippedPeerDeviceIds] that published
+  /// one. An absent entry means the peer is on an older manifest, or its
+  /// hostname identifies nothing; render a short id instead.
+  final Map<String, String> skippedPeerNames;
+
   /// Peers held because they publish from a newer database schema than this
   /// build understands. Their data applies after this device updates.
   final Set<String> newerSchemaPeerDeviceIds;
@@ -82,6 +89,7 @@ class SyncResult {
     this.lastSyncTime,
     this.adoptedFreshIdentity = false,
     this.skippedPeerDeviceIds = const {},
+    this.skippedPeerNames = const {},
     this.newerSchemaPeerDeviceIds = const {},
     this.replaceMarker,
   });
@@ -376,8 +384,15 @@ class SyncService {
   /// advance state. Re-pulls are idempotent (upsert + HLC), so a partial apply
   /// leaves state unadvanced and retries next sync rather than losing records.
   /// Builds the user-facing result messages for a completed pull. Extracted
-  /// so the phrasing and precedence (failures suppress peer notices) are
+  /// so the phrasing and precedence (failures suppress everything else) are
   /// unit-testable without a full sync.
+  ///
+  /// Peer notices are deliberately NOT here. Stale-epoch and newer-schema
+  /// peers are carried as structured fields on [SyncResult] and rendered as
+  /// localized banners by the Cloud Sync page; building them here produced
+  /// untranslated English, and in the newer-schema case the notice appeared
+  /// twice. The peer parameters are kept so callers need not change and the
+  /// precedence rule stays expressible.
   @visibleForTesting
   static List<String> pullResultMessages({
     required int recordsFailed,
@@ -390,24 +405,6 @@ class SyncService {
       final recordWord = recordsFailed == 1 ? 'record' : 'records';
       resultMessages.add('$recordsFailed $recordWord failed to apply');
       return resultMessages;
-    }
-    final skippedCount = skippedPeerDeviceIds.length;
-    if (skippedCount > 0) {
-      final deviceWord = skippedCount == 1 ? 'device' : 'devices';
-      final verb = skippedCount == 1 ? 'has' : 'have';
-      resultMessages.add(
-        '$skippedCount $deviceWord still $verb an older or unknown '
-        'library version and were not merged. Those devices must adopt '
-        'the current library.',
-      );
-    }
-    final newerCount = newerSchemaPeerDeviceIds.length;
-    if (newerCount > 0) {
-      final phrase = newerCount == 1 ? 'device runs' : 'devices run';
-      resultMessages.add(
-        '$newerCount $phrase a newer version of Submersion; their latest '
-        'changes were not merged. Update this device to receive them.',
-      );
     }
     if (adoptedFreshIdentity) {
       resultMessages.add(
@@ -480,11 +477,13 @@ class SyncService {
       if (fence.terminal != null) return fence.terminal!;
 
       // ---- Stale-restore: cold-start to re-pull the authoritative library ----
+      var staleRestoreDetected = false;
       if (await _staleRestoreDetector.isStaleRestore(
         provider: provider,
         deviceId: deviceId,
         folderId: folderId,
       )) {
+        staleRestoreDetected = true;
         _log.warning('Stale restore detected; resetting changeset cursors');
         final db = DatabaseService.instance.database;
         await PeerCursorStore(db).resetForProvider(provider.providerId);
@@ -586,7 +585,24 @@ class SyncService {
             deletions: deletions,
             epochId: currentEpochId,
             uploadNonce: uploadNonce,
+            deviceName: await _deviceNameForManifest(),
             appliedPeerHlc: appliedPeerHlc,
+            // Republish our log from what we actually hold now. Without this
+            // the cold-start above never converges: our manifest keeps
+            // claiming an HLC we no longer have, so the next sync detects the
+            // same "stale restore" and wipes every peer cursor again -- a full
+            // re-download of the whole fleet's data, every sync (#997).
+            forceBase: staleRestoreDetected,
+            // A full base republish -- what a wiped or replaced backend forces
+            // -- can run to hundreds of megabytes. Spread it across the back
+            // fifth of the bar so the user sees it advancing, instead of
+            // reading a motionless 80% as a hang and killing the app, which
+            // restarts the whole upload from part 0 (issue #1032).
+            onBasePartUploaded: (uploaded, total) => _reportProgress(
+              SyncPhase.uploading,
+              0.8 + 0.2 * (uploaded / total),
+              'Uploading library ($uploaded of $total)',
+            ),
           );
           // A publish that did not stamp this nonce into the manifest -- a
           // noop (nothing to say) or a heartbeat (which deliberately keeps
@@ -687,6 +703,7 @@ class SyncService {
         lastSyncTime: recordsFailed == 0 ? now : null,
         adoptedFreshIdentity: adoptedFreshIdentity,
         skippedPeerDeviceIds: pullResult.skippedPeerDeviceIds,
+        skippedPeerNames: pullResult.skippedPeerNames,
         newerSchemaPeerDeviceIds: pullResult.newerSchemaPeerDeviceIds,
       );
     } on TimeoutException {
@@ -718,6 +735,22 @@ class SyncService {
   /// Run the library-epoch gate. Returns a terminal result the caller must
   /// return immediately, or the resolved currentEpochId to proceed with.
   /// Mirrors the inline gate the legacy full-file performSync used.
+  String? _cachedDeviceName;
+  bool _deviceNameResolved = false;
+
+  /// The name published on this device's manifest so peers can name it in the
+  /// "still needs to adopt" banner. Resolved once per service lifetime: the
+  /// hostname does not change while the app runs, and publish is on the sync
+  /// hot path. Null when the hostname identifies nothing.
+  Future<String?> _deviceNameForManifest() async {
+    if (_deviceNameResolved) return _cachedDeviceName;
+    _cachedDeviceName = (await SyncDeviceMetadata(
+      _syncRepository,
+    ).resolve()).name;
+    _deviceNameResolved = true;
+    return _cachedDeviceName;
+  }
+
   Future<_EpochGate> _runEpochGate(CloudStorageProvider provider) async {
     final epochStore = _epochStore;
     if (epochStore == null) return const _EpochGate.proceed(null);
@@ -840,9 +873,10 @@ class SyncService {
   /// user-driven [rebuildBackendFromThisDevice].
   Future<void> _reestablishEpochFromLocalLibrary(
     CloudStorageProvider provider,
-    LibraryEpochMarker marker,
-  ) async {
-    await deleteAllSyncFiles(provider);
+    LibraryEpochMarker marker, {
+    SyncCleanupProgress? onProgress,
+  }) async {
+    await deleteAllSyncFiles(provider, onProgress: onProgress);
     final db = DatabaseService.instance.database;
     await PublishStateStore(db).resetForProvider(provider.providerId);
     await PeerCursorStore(db).resetForProvider(provider.providerId);
@@ -857,7 +891,9 @@ class SyncService {
   /// grace window: THIS device's library becomes the epoch's authoritative
   /// base, and the caller's follow-up sync publishes it. Peers then adopt from
   /// us instead of the offline device.
-  Future<SyncResult> rebuildBackendFromThisDevice() async {
+  Future<SyncResult> rebuildBackendFromThisDevice({
+    SyncCleanupProgress? onProgress,
+  }) async {
     final provider = _cloudProvider;
     if (provider == null) {
       return const SyncResult(
@@ -873,7 +909,11 @@ class SyncService {
       );
     }
     try {
-      await _reestablishEpochFromLocalLibrary(provider, marker);
+      await _reestablishEpochFromLocalLibrary(
+        provider,
+        marker,
+        onProgress: onProgress,
+      );
       _log.info('Rebuilt backend from this device for epoch ${marker.epochId}');
       return const SyncResult(
         status: SyncResultStatus.success,
@@ -1065,7 +1105,6 @@ class SyncService {
             hasUpdatedAt: true,
           ),
           (type: 'buddies', records: data.buddies, hasUpdatedAt: true),
-          (type: 'buddyRoles', records: data.buddyRoles, hasUpdatedAt: true),
           (type: 'diveCenters', records: data.diveCenters, hasUpdatedAt: true),
           (type: 'trips', records: data.trips, hasUpdatedAt: true),
           (
@@ -1816,7 +1855,6 @@ class SyncService {
     'divers': true,
     'diverSettings': true,
     'buddies': true,
-    'buddyRoles': true,
     'diveCenters': true,
     'trips': true,
     'liveaboardDetails': true,
@@ -1933,7 +1971,6 @@ class SyncService {
       (field: 'diveId', parent: 'dives', nullable: false),
       (field: 'buddyId', parent: 'buddies', nullable: false),
     ],
-    'buddyRoles': [(field: 'buddyId', parent: 'buddies', nullable: false)],
     'mediaEnrichment': [
       (field: 'mediaId', parent: 'media', nullable: false),
       (field: 'diveId', parent: 'dives', nullable: false),
@@ -2541,85 +2578,133 @@ class SyncService {
   /// identity (Reset Sync State): once the device id changes, its old log would
   /// otherwise be merged back as a stale "peer" forever. Never throws; if the
   /// provider is offline the log lingers indefinitely as a stale peer.
-  Future<void> deleteDeviceSyncFile(String deviceId) async {
+  Future<SyncCleanupOutcome> deleteDeviceSyncFile(
+    String deviceId, {
+    SyncCleanupProgress? onProgress,
+  }) async {
     final provider = _cloudProvider;
-    if (provider == null) return;
-    try {
-      final files = await provider
-          .listFiles(namePattern: ChangesetLogLayout.prefix)
-          .timeout(const Duration(seconds: 8));
-      for (final f in files) {
-        if (ChangesetLogLayout.deviceIdOf(f.name) == deviceId) {
-          await provider.deleteFile(f.id).timeout(const Duration(seconds: 8));
-          _log.info('Retired changeset log file ${f.name}');
+    if (provider == null) return const SyncCleanupOutcome();
+    return _deleteListedFiles(
+      provider,
+      const [ChangesetLogLayout.prefix],
+      where: (f) => ChangesetLogLayout.deviceIdOf(f.name) == deviceId,
+      reason: 'retirement of $deviceId',
+      onProgress: onProgress,
+    );
+  }
+
+  /// List every file matching [patterns] (de-duplicated by id, patterns applied
+  /// in order so the caller's deletion order is predictable), then delete each
+  /// one, reporting progress against a total fixed before the first delete.
+  ///
+  /// Deliberately two-pass. Deleting as it lists would leave the UI unable to
+  /// show anything but a spinner, and a wipe of a 400-file backend runs for
+  /// minutes (issue #1032). Taking the whole listing up front costs one extra
+  /// round trip and buys a real denominator.
+  ///
+  /// Best-effort, as every caller here is: individual failures are counted into
+  /// the returned [SyncCleanupOutcome] rather than thrown, so a partial wipe
+  /// finishes what it can. Callers must not claim success without checking
+  /// [SyncCleanupOutcome.isComplete].
+  Future<SyncCleanupOutcome> _deleteListedFiles(
+    CloudStorageProvider provider,
+    List<String> patterns, {
+    required String reason,
+    bool Function(CloudFileInfo file)? where,
+    SyncCleanupProgress? onProgress,
+  }) async {
+    final byId = <String, CloudFileInfo>{};
+    var listIncomplete = false;
+    for (final pattern in patterns) {
+      try {
+        final files = await provider
+            .listFiles(namePattern: pattern)
+            .timeout(const Duration(seconds: 8));
+        for (final f in files) {
+          if (where == null || where(f)) byId[f.id] = f;
         }
+      } catch (e) {
+        // The listing we could not read may name files we will never attempt.
+        // Record that so the caller cannot report a clean sweep (issue #1032).
+        listIncomplete = true;
+        _log.warning('Could not list "$pattern" files for $reason: $e');
       }
-    } catch (e) {
-      _log.warning('Could not retire changeset log for $deviceId: $e');
     }
+
+    final targets = byId.values.toList();
+    var deleted = 0;
+    var failed = 0;
+    onProgress?.call(0, targets.length);
+    for (final f in targets) {
+      try {
+        await provider.deleteFile(f.id).timeout(const Duration(seconds: 8));
+        deleted++;
+        _log.info('Deleted sync file ${f.name} for $reason');
+      } catch (e) {
+        failed++;
+        _log.warning('Could not delete sync file ${f.name}: $e');
+      }
+      onProgress?.call(deleted + failed, targets.length);
+    }
+    return SyncCleanupOutcome(
+      deleted: deleted,
+      failed: failed,
+      listIncomplete: listIncomplete,
+    );
   }
 
   /// Best-effort deletion of EVERY sync file in the cloud folder: all peers'
   /// per-device files, our own, the legacy shared file, and conflict copies.
   /// Failures are logged and skipped -- files that survive carry a stale (or
   /// missing) epoch stamp and are inert to every current-epoch device.
-  Future<void> deleteAllSyncFiles(CloudStorageProvider provider) async {
+  Future<SyncCleanupOutcome> deleteAllSyncFiles(
+    CloudStorageProvider provider, {
+    SyncCleanupProgress? onProgress,
+  }) {
     // Wipe both the changeset logs (ssv1.*) and any legacy full-file uploads.
     // The epoch/moved markers (submersion_library_*) match neither pattern, so
     // they survive -- a peer mid-replace still learns the new epoch.
-    for (final pattern in [
-      ChangesetLogLayout.prefix,
-      CloudStorageProviderMixin.syncFileStem,
-    ]) {
-      try {
-        final files = await provider
-            .listFiles(namePattern: pattern)
-            .timeout(const Duration(seconds: 8));
-        for (final f in files) {
-          try {
-            await provider.deleteFile(f.id).timeout(const Duration(seconds: 8));
-            _log.info('Deleted sync file ${f.name} for library replace');
-          } catch (e) {
-            _log.warning('Could not delete sync file ${f.name}: $e');
-          }
-        }
-      } catch (e) {
-        _log.warning('Could not list sync files for replace wipe: $e');
-      }
-    }
+    return _deleteListedFiles(
+      provider,
+      const [ChangesetLogLayout.prefix, CloudStorageProviderMixin.syncFileStem],
+      reason: 'library replace',
+      onProgress: onProgress,
+    );
   }
 
   /// Delete EVERY sync artifact on [provider], INCLUDING the library epoch and
   /// moved markers that [deleteAllSyncFiles] intentionally preserves. A genuine
   /// fresh start (issue #509, cloud clear 3b): every device re-establishes from
   /// scratch. Best-effort; failures are logged and skipped.
-  Future<void> wipeAllSyncData(CloudStorageProvider provider) async {
-    await deleteAllSyncFiles(provider);
-    for (final pattern in [libraryEpochFileName, libraryMovedFileName]) {
-      try {
-        final markers = await provider
-            .listFiles(namePattern: pattern)
-            .timeout(const Duration(seconds: 8));
-        for (final f in markers) {
-          try {
-            await provider.deleteFile(f.id).timeout(const Duration(seconds: 8));
-            _log.info('Deleted marker ${f.name} for full sync wipe');
-          } catch (e) {
-            _log.warning('Could not delete marker ${f.name}: $e');
-          }
-        }
-      } catch (e) {
-        _log.warning('Could not list markers for full sync wipe: $e');
-      }
-    }
+  Future<SyncCleanupOutcome> wipeAllSyncData(
+    CloudStorageProvider provider, {
+    SyncCleanupProgress? onProgress,
+  }) {
+    // One pass over all four patterns rather than logs-then-markers, so the
+    // user sees a single bar with a single honest total (issue #1032). Pattern
+    // order still puts the logs first: a peer listing mid-wipe must never find
+    // orphaned logs whose epoch marker is already gone.
+    return _deleteListedFiles(
+      provider,
+      const [
+        ChangesetLogLayout.prefix,
+        CloudStorageProviderMixin.syncFileStem,
+        libraryEpochFileName,
+        libraryMovedFileName,
+      ],
+      reason: 'full sync wipe',
+      onProgress: onProgress,
+    );
   }
 
   /// Wipe all sync data on the active provider (issue #509, cloud clear 3b).
   /// No-op when no provider is configured.
-  Future<void> wipeAllSyncDataOnActiveProvider() async {
+  Future<SyncCleanupOutcome> wipeAllSyncDataOnActiveProvider({
+    SyncCleanupProgress? onProgress,
+  }) async {
     final provider = _cloudProvider;
-    if (provider == null) return;
-    await wipeAllSyncData(provider);
+    if (provider == null) return const SyncCleanupOutcome();
+    return wipeAllSyncData(provider, onProgress: onProgress);
   }
 
   /// Execute the cloud side of a Replace restore: write the new epoch marker
@@ -2674,6 +2759,7 @@ class SyncService {
         deletions: deletions,
         epochId: marker.epochId,
         uploadNonce: uploadNonce,
+        deviceName: await _deviceNameForManifest(),
       );
 
       final now = DateTime.now();

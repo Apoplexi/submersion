@@ -8,6 +8,7 @@ import 'package:submersion/features/settings/presentation/providers/settings_pro
 import 'package:submersion/core/constants/pdf_templates.dart';
 import 'package:submersion/core/services/database_service.dart';
 import 'package:submersion/core/services/export/export_service.dart';
+import 'package:submersion/core/services/pdf_templates/pdf_date_formatter.dart';
 import 'package:submersion/core/services/pdf_templates/pdf_fonts.dart';
 import 'package:submersion/core/services/pdf_templates/pdf_template_factory.dart';
 import 'package:submersion/features/signatures/data/services/signature_storage_service.dart';
@@ -37,6 +38,7 @@ import 'package:submersion/features/dive_log/domain/entities/gas_switch.dart';
 import 'package:submersion/features/dive_log/domain/entities/profile_event.dart';
 import 'package:submersion/features/dive_log/domain/services/profile_event_mapper.dart';
 import 'package:submersion/features/dive_log/data/repositories/tank_pressure_repository.dart';
+import 'package:submersion/features/pre_dive/presentation/providers/pre_dive_providers.dart';
 
 /// Load per-tank pressure data for a list of dives.
 ///
@@ -314,9 +316,17 @@ class ExportNotifier extends StateNotifier<ExportState> {
     final factory = PdfTemplateFactory();
     final builder = factory.getBuilder(exportOptions.template);
 
+    // The logbook is a document the diver prints or shares, so its dates and
+    // times follow the diver's preferences (#964); the file name stays ISO.
+    final settings = _ref.read(settingsProvider);
+
     return builder.buildPdf(
       dives: dives,
       pageSize: exportOptions.pageSize,
+      dates: PdfDateFormatter(
+        dateFormat: settings.dateFormat,
+        timeFormat: settings.timeFormat,
+      ),
       title: 'Dive Logbook',
       diveSignatures: diveSignatures.isNotEmpty ? diveSignatures : null,
       certifications: certifications,
@@ -480,6 +490,12 @@ class ExportNotifier extends StateNotifier<ExportState> {
       final dives = await _ref.read(divesProvider.future);
       final sites = await _ref.read(sitesProvider.future);
       final equipment = await _ref.read(allEquipmentProvider.future);
+      // Checklist runs ride along in the workbook. Fetched in bulk: one query
+      // for the runs, one for every item across them.
+      final preDiveSessions = await _ref.read(preDiveSessionsProvider.future);
+      final preDiveItems = await _ref
+          .read(preDiveSessionRepositoryProvider)
+          .getItemsForSessions([for (final s in preDiveSessions) s.id]);
 
       if (dives.isEmpty && sites.isEmpty && equipment.isEmpty) {
         state = state.copyWith(
@@ -502,6 +518,8 @@ class ExportNotifier extends StateNotifier<ExportState> {
         pressureUnit: settings.pressureUnit,
         volumeUnit: settings.volumeUnit,
         dateFormat: settings.dateFormat,
+        preDiveSessions: preDiveSessions,
+        preDiveItemsBySession: preDiveItems,
       );
 
       state = state.copyWith(
@@ -577,6 +595,12 @@ class ExportNotifier extends StateNotifier<ExportState> {
       final dives = await _ref.read(divesProvider.future);
       final sites = await _ref.read(sitesProvider.future);
       final equipment = await _ref.read(allEquipmentProvider.future);
+      // Checklist runs ride along in the workbook. Fetched in bulk: one query
+      // for the runs, one for every item across them.
+      final preDiveSessions = await _ref.read(preDiveSessionsProvider.future);
+      final preDiveItems = await _ref
+          .read(preDiveSessionRepositoryProvider)
+          .getItemsForSessions([for (final s in preDiveSessions) s.id]);
 
       if (dives.isEmpty && sites.isEmpty && equipment.isEmpty) {
         state = state.copyWith(
@@ -599,6 +623,8 @@ class ExportNotifier extends StateNotifier<ExportState> {
         pressureUnit: settings.pressureUnit,
         volumeUnit: settings.volumeUnit,
         dateFormat: settings.dateFormat,
+        preDiveSessions: preDiveSessions,
+        preDiveItemsBySession: preDiveItems,
       );
 
       if (path == null) {

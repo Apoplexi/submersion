@@ -6,6 +6,7 @@ import 'package:image/image.dart' as img;
 
 import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/features/media/data/services/media_source_resolver_registry.dart';
+import 'package:submersion/features/media/data/services/pdf_page_renderer.dart';
 import 'package:submersion/features/media/domain/entities/media_item.dart';
 import 'package:submersion/features/media/domain/entities/media_source_type.dart';
 import 'package:submersion/features/media/domain/value_objects/media_source_data.dart';
@@ -21,11 +22,14 @@ class ThumbnailGenerator {
   ThumbnailGenerator({
     required MediaSourceResolverRegistry registry,
     required MediaCacheStore cache,
+    PdfThumbRenderer? pdfRenderer,
   }) : _registry = registry,
-       _cache = cache;
+       _cache = cache,
+       _pdfRenderer = pdfRenderer ?? PdfPageRenderer.renderFirstPageJpeg;
 
   final MediaSourceResolverRegistry _registry;
   final MediaCacheStore _cache;
+  final PdfThumbRenderer _pdfRenderer;
   final _log = LoggerService.forClass(ThumbnailGenerator);
 
   static const int maxDimension = 512;
@@ -38,6 +42,15 @@ class ThumbnailGenerator {
         item,
         target: Size(maxDimension.toDouble(), maxDimension.toDouble()),
       );
+      if (item.isDocument) {
+        // Opaque documents have no thumbnail; PDFs get a page-1 render.
+        if (!item.isPdf) return null;
+        return await switch (data) {
+          FileData(file: final f) => _stagePdfThumb(file: f),
+          BytesData(bytes: final b) => _stagePdfThumb(bytes: b),
+          NetworkData() || UnavailableData() => null,
+        };
+      }
       switch (data) {
         case BytesData(bytes: final b)
             when item.sourceType == MediaSourceType.platformGallery:
@@ -51,14 +64,17 @@ class ThumbnailGenerator {
           // original's filename: a video row carries a .mp4 name but its
           // rendition is a JPEG poster frame, and decoding by that name
           // would always fail.
-          return _resizeToJpeg(b, 'rendition.jpg');
+          return await _resizeToJpeg(b, 'rendition.jpg');
         case BytesData(bytes: final b):
           // Non-gallery BytesData is the original (e.g. a bookmark read on
           // iOS/macOS): resize and re-encode so full-size bytes and their
           // EXIF/GPS never masquerade as a thumb.
-          return _resizeToJpeg(b, item.originalFilename);
+          return await _resizeToJpeg(b, item.originalFilename);
         case FileData(file: final f):
-          return _resizeToJpeg(await f.readAsBytes(), item.originalFilename);
+          return await _resizeToJpeg(
+            await f.readAsBytes(),
+            item.originalFilename,
+          );
         case NetworkData():
         case UnavailableData():
           return null;
@@ -67,6 +83,19 @@ class ThumbnailGenerator {
       _log.warning('Thumbnail generation failed for ${item.id}: $e');
       return null;
     }
+  }
+
+  Future<File?> _stagePdfThumb({File? file, Uint8List? bytes}) async {
+    final jpeg = await _pdfRenderer(
+      file: file,
+      bytes: bytes,
+      maxDimension: maxDimension,
+      quality: jpegQuality,
+    );
+    if (jpeg == null) return null;
+    final staged = await _cache.stagingFile();
+    await staged.writeAsBytes(jpeg, flush: true);
+    return staged;
   }
 
   Future<File?> _resizeToJpeg(Uint8List bytes, String? name) async {

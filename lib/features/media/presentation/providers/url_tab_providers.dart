@@ -279,6 +279,9 @@ final urlMetadataExtractorProvider = Provider<UrlMetadataExtractor>(
 /// [DatabaseService] (the same lazy-singleton pattern used by
 /// [MediaRepository]); Riverpod is not yet wired up to manage the database
 /// instance.
+// no-tick: builds a pipeline SERVICE. Its getDivesInRange call lives inside
+// the diveBoundsLoader callback the pipeline invokes per photo, so the read is
+// already fresh per fetch and no cached row exists to go stale.
 final networkFetchPipelineProvider = Provider<NetworkFetchPipeline>((ref) {
   return NetworkFetchPipeline(
     db: DatabaseService.instance.database,

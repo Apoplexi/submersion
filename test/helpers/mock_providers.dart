@@ -5,6 +5,7 @@ import 'package:http/testing.dart';
 import 'package:riverpod/src/framework.dart' as riverpod show Override;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:submersion/core/constants/card_color.dart';
+import 'package:submersion/core/domain/visibility/visibility_scale.dart';
 import 'package:submersion/core/constants/list_view_mode.dart';
 import 'package:submersion/core/constants/map_style.dart';
 import 'package:submersion/features/data_quality/presentation/providers/data_quality_providers.dart';
@@ -20,6 +21,7 @@ import 'package:submersion/core/constants/dive_detail_sections.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/tissue_color_schemes.dart';
 import 'package:submersion/features/divers/presentation/providers/diver_providers.dart';
+import 'package:submersion/core/utils/coordinates/coordinate_format.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/features/weather/presentation/providers/weather_providers.dart';
 
@@ -28,7 +30,13 @@ typedef Override = riverpod.Override;
 /// Mock SettingsNotifier that doesn't access the database
 class MockSettingsNotifier extends StateNotifier<AppSettings>
     implements SettingsNotifier {
-  MockSettingsNotifier() : super(const AppSettings());
+  MockSettingsNotifier([AppSettings? initial])
+    : super(initial ?? const AppSettings());
+
+  /// Already "loaded": the mock's state is supplied up front, so nothing
+  /// awaits a database read.
+  @override
+  Future<void> get initialLoad async {}
 
   @override
   Future<void> setDepthUnit(DepthUnit unit) async =>
@@ -53,8 +61,23 @@ class MockSettingsNotifier extends StateNotifier<AppSettings>
   Future<void> setDefaultCurrency(String currencyCode) async =>
       state = state.copyWith(defaultCurrency: currencyCode);
   @override
+  Future<void> setVisibilityScale({
+    required VisibilityScalePreset preset,
+    double? excellentM,
+    double? goodM,
+    double? moderateM,
+  }) async => state = state.copyWith(
+    visibilityScalePreset: preset,
+    visibilityScaleExcellentM: excellentM,
+    visibilityScaleGoodM: goodM,
+    visibilityScaleModerateM: moderateM,
+  );
+  @override
   Future<void> setAltitudeUnit(AltitudeUnit unit) async =>
       state = state.copyWith(altitudeUnit: unit);
+  @override
+  Future<void> setCoordinateFormat(CoordinateFormat format) async =>
+      state = state.copyWith(coordinateFormat: format);
   @override
   Future<void> setTimeFormat(TimeFormat format) async =>
       state = state.copyWith(timeFormat: format);
@@ -159,6 +182,27 @@ class MockSettingsNotifier extends StateNotifier<AppSettings>
     }
     state = state.copyWith(hiddenHomeChips: hidden);
   }
+
+  @override
+  Future<void> setHomeCardEnabled(String cardId, bool enabled) async {
+    final hidden = {...state.hiddenHomeCards};
+    if (enabled) {
+      hidden.remove(cardId);
+    } else {
+      hidden.add(cardId);
+    }
+    state = state.copyWith(hiddenHomeCards: hidden);
+  }
+
+  @override
+  Future<void> setHomeCardOrder(List<String> order) async =>
+      state = state.copyWith(homeCardOrder: order);
+
+  @override
+  Future<void> resetHomeCards() async => state = state.copyWith(
+    homeCardOrder: const <String>[],
+    hiddenHomeCards: const <String>{},
+  );
 
   @override
   Future<void> setSafetyRuleEnabled(SafetyRuleId rule, bool enabled) async {
@@ -399,20 +443,15 @@ class MockSettingsNotifier extends StateNotifier<AppSettings>
   }
 
   @override
-  Future<void> setFullscreenTilePreferences({
-    required List<String> order,
-    required List<String> hidden,
-  }) async => state = state.copyWith(
-    fullscreenTileOrder: order,
-    fullscreenHiddenTiles: hidden,
-  );
-
-  @override
   Future<void> setFullscreenReadoutCardPosition(double x, double y) async =>
       state = state.copyWith(
         fullscreenReadoutCardX: x,
         fullscreenReadoutCardY: y,
       );
+
+  @override
+  Future<void> setProfileMetricsFollowViewport(bool value) async =>
+      state = state.copyWith(profileMetricsFollowViewport: value);
 
   @override
   Future<void> setPerdixOverlayEnabled(bool value) async =>

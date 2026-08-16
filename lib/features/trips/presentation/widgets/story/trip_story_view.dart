@@ -7,6 +7,7 @@ import 'package:latlong2/latlong.dart';
 import 'package:submersion/features/checklists/presentation/widgets/trip_checklist_section.dart';
 import 'package:submersion/features/trips/domain/entities/trip.dart';
 import 'package:submersion/features/trips/domain/entities/trip_story.dart';
+import 'package:submersion/features/trips/presentation/providers/surface_day_weather_provider.dart';
 import 'package:submersion/features/trips/presentation/widgets/story/trip_flight_countdown_card.dart';
 import 'package:submersion/features/trips/presentation/widgets/story/trip_story_day_card.dart';
 import 'package:submersion/features/trips/presentation/widgets/story/trip_story_day_header.dart';
@@ -226,15 +227,33 @@ class _TripStoryViewState extends ConsumerState<TripStoryView>
   }
 
   /// One day chapter: a SliverMainAxisGroup whose pinned header sticks below
-  /// the map until the next day's group pushes it out. Surface days render
-  /// their slim row with no header.
+  /// the map until the next day's group pushes it out. Every day gets the same
+  /// header, surface days included - theirs simply has no body under it.
   Widget _daySliver(TripStory story, int index, int? todayIndex) {
     final day = story.days[index];
+    final weatherPoint = day.isSurface
+        ? story.mapGeometry.nearestPointForDay(index)
+        : null;
+    final surfaceWeatherRequest = weatherPoint == null
+        ? null
+        : SurfaceDayWeatherRequest(
+            date: day.date,
+            latitude: weatherPoint.latitude,
+            longitude: weatherPoint.longitude,
+          );
     final showTodayDivider = todayIndex != null && index == todayIndex;
     const divider = SliverPadding(
       padding: EdgeInsets.symmetric(horizontal: 16),
       sliver: SliverToBoxAdapter(child: _TodayDivider()),
     );
+    // Unconditional, even for the days whose card renders nothing (surface
+    // days, content-less planned days). It looks like dead weight there but is
+    // not: it carries _dayKeys[index], which _onScroll and _scrollToDay read
+    // positions from, and they skip days whose key context is unmounted -- so
+    // dropping it would quietly take those days out of active-day resolution.
+    // Its 8px bottom inset is also the gap between consecutive chapters, and
+    // is painted in the same surface color as the headers, so it separates
+    // them rather than showing as a blank band.
     final body = SliverPadding(
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
       sliver: SliverToBoxAdapter(
@@ -246,18 +265,18 @@ class _TripStoryViewState extends ConsumerState<TripStoryView>
       ),
     );
 
-    if (day.isSurface) {
-      return SliverMainAxisGroup(
-        slivers: [if (showTodayDivider) divider, body],
-      );
-    }
     return SliverMainAxisGroup(
       slivers: [
         if (showTodayDivider) divider,
         // PinnedHeaderSliver (not SliverPersistentHeader) so the header sizes
         // itself: scaled accessibility text grows the band instead of being
         // clipped by a fixed extent we would have to predict.
-        PinnedHeaderSliver(child: TripStoryDayHeader(day: day)),
+        PinnedHeaderSliver(
+          child: TripStoryDayHeader(
+            day: day,
+            surfaceWeatherRequest: surfaceWeatherRequest,
+          ),
+        ),
         body,
       ],
     );

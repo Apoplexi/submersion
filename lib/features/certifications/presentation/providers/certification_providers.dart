@@ -4,6 +4,7 @@ import 'package:submersion/core/models/sort_state.dart';
 import 'package:submersion/core/providers/provider.dart';
 
 import 'package:submersion/core/constants/enums.dart';
+import 'package:submersion/features/buddies/presentation/providers/buddy_providers.dart';
 import 'package:submersion/features/divers/presentation/providers/diver_providers.dart';
 import 'package:submersion/features/certifications/data/repositories/certification_repository.dart';
 import 'package:submersion/features/certifications/domain/constants/certification_field.dart';
@@ -44,6 +45,19 @@ final buddyCertificationsProvider =
       final repository = ref.watch(certificationRepositoryProvider);
       ref.invalidateSelfWhen(repository.watchCertificationsChanges());
       return repository.getCertificationsByBuddy(buddyId);
+    });
+
+/// Certifications for every buddy, keyed by buddy id — the picker-annotation
+/// replacement for the removed allBuddyRolesProvider. Single batched query
+/// (no N+1); self-invalidates on any certifications change (local or sync).
+final allBuddyCertificationsProvider =
+    FutureProvider<Map<String, List<Certification>>>((ref) async {
+      final repository = ref.watch(certificationRepositoryProvider);
+      ref.invalidateSelfWhen(repository.watchCertificationsChanges());
+      final buddies = await ref.watch(allBuddiesProvider.future);
+      return repository.getCertificationsForBuddies(
+        buddies.map((b) => b.id).toList(),
+      );
     });
 
 /// Certification sort state provider
@@ -95,6 +109,7 @@ List<Certification> applyCertificationSorting(
 final certificationByIdProvider = FutureProvider.family<Certification?, String>(
   (ref, id) async {
     final repository = ref.watch(certificationRepositoryProvider);
+    ref.invalidateSelfWhen(repository.watchCertificationsChanges());
     return repository.getCertificationById(id);
   },
 );
@@ -109,6 +124,7 @@ final certificationSearchProvider =
         return ref.watch(allCertificationsProvider).value ?? [];
       }
       final repository = ref.watch(certificationRepositoryProvider);
+      ref.invalidateSelfWhen(repository.watchCertificationsChanges());
       return repository.searchCertifications(query, diverId: validatedDiverId);
     });
 
@@ -119,6 +135,7 @@ final expiringCertificationsProvider =
       final validatedDiverId = await ref.watch(
         validatedCurrentDiverIdProvider.future,
       );
+      ref.invalidateSelfWhen(repository.watchCertificationsChanges());
       return repository.getExpiringCertifications(
         days,
         diverId: validatedDiverId,
@@ -133,6 +150,7 @@ final expiredCertificationsProvider = FutureProvider<List<Certification>>((
   final validatedDiverId = await ref.watch(
     validatedCurrentDiverIdProvider.future,
   );
+  ref.invalidateSelfWhen(repository.watchCertificationsChanges());
   return repository.getExpiredCertifications(diverId: validatedDiverId);
 });
 
@@ -143,6 +161,7 @@ final certificationsByAgencyProvider =
       agency,
     ) async {
       final repository = ref.watch(certificationRepositoryProvider);
+      ref.invalidateSelfWhen(repository.watchCertificationsChanges());
       return repository.getCertificationsByAgency(agency);
     });
 

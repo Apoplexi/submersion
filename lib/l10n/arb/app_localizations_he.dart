@@ -9,6 +9,9 @@ class AppLocalizationsHe extends AppLocalizations {
   AppLocalizationsHe([String locale = 'he']) : super(locale);
 
   @override
+  String get universalImport_action_importFromGarmin => 'ייבוא מהתקן Garmin';
+
+  @override
   String diveLog_edit_flightWindowWarning(String time) {
     return 'הצלילה הזו מסתיימת אחרי הזמן הבטוח האחרון לעלייה לפני הטיסה שלך ($time)';
   }
@@ -976,6 +979,17 @@ class AppLocalizationsHe extends AppLocalizations {
       'פעולה זו תחליף את כל הנתונים הנוכחיים בנתוני הגיבוי. לא ניתן לבטל פעולה זו.';
 
   @override
+  String backup_restore_safetyReview_progress(int done, int total) {
+    return 'נותחו $done מתוך $total צלילות';
+  }
+
+  @override
+  String get backup_restore_safetyReview_skip => 'דלג';
+
+  @override
+  String get backup_restore_safetyReview_title => 'מריץ את סקירת הבטיחות';
+
+  @override
   String get backup_restoreComplete_continue => 'המשך';
 
   @override
@@ -1488,35 +1502,10 @@ class AppLocalizationsHe extends AppLocalizations {
       'אין מספיק חברי צוללים למיזוג.';
 
   @override
-  String get buddies_section_professionalRoles => 'תפקידים מקצועיים';
-
-  @override
-  String get buddies_roles_addRole => 'הוסף תפקיד';
-
-  @override
-  String get buddies_roles_role => 'תפקיד';
-
-  @override
-  String get buddies_roles_agency => 'גוף הסמכה';
-
-  @override
-  String get buddies_roles_credentialNumber => 'מספר הסמכה';
-
-  @override
-  String get buddies_roles_removeTooltip => 'הסר תפקיד';
-
-  @override
-  String get buddies_roles_emptyHint =>
-      'הוסף הסמכות מדריך או דייבמאסטר לשימוש חוזר בעת רישום הסמכות וקורסים.';
-
-  @override
   String get buddies_instructorPicker_label => 'מדריך מתוך חברי הצוללים';
 
   @override
   String get buddies_instructorPicker_none => 'ללא (הזנה ידנית)';
-
-  @override
-  String get buddies_detail_section_professionalRoles => 'תפקידים מקצועיים';
 
   @override
   String get certifications_appBar_addCertification => 'הוסף הסמכה';
@@ -1563,6 +1552,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get certifications_detail_label_cardNumber => 'מספר כרטיס';
 
   @override
+  String get certifications_detail_label_certification => 'הסמכה';
+
+  @override
   String get certifications_detail_label_expiryDate => 'תאריך תפוגה';
 
   @override
@@ -1573,9 +1565,6 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get certifications_detail_label_issueDate => 'תאריך הנפקה';
-
-  @override
-  String get certifications_detail_label_level => 'רמה';
 
   @override
   String get certifications_detail_label_type => 'סוג';
@@ -1670,15 +1659,24 @@ class AppLocalizationsHe extends AppLocalizations {
   String get certifications_ecardStack_empty_title => 'אין עדיין הסמכות';
 
   @override
+  String get certifications_ecard_label_cardNumber => 'מספר כרטיס';
+
+  @override
   String certifications_ecard_label_certifiedBy(Object agency) {
     return 'הוסמך על ידי $agency';
   }
+
+  @override
+  String get certifications_ecard_label_diver => 'צוללן';
 
   @override
   String get certifications_ecard_label_instructor => 'מדריך';
 
   @override
   String get certifications_ecard_label_issued => 'הונפק';
+
+  @override
+  String get certifications_ecard_label_validUntil => 'בתוקף עד';
 
   @override
   String get certifications_ecard_statusBadge_expired => 'פג תוקף';
@@ -1705,6 +1703,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get certifications_edit_button_update => 'עדכן הסמכה';
 
   @override
+  String get certifications_edit_certification_notSpecified => 'לא צוין';
+
+  @override
   String certifications_edit_datePicker_clearTooltip(Object label) {
     return 'נקה $label';
   }
@@ -1726,15 +1727,20 @@ class AppLocalizationsHe extends AppLocalizations {
   String get certifications_edit_dialog_keepEditing => 'המשך עריכה';
 
   @override
+  String get certifications_edit_group_progression => 'התקדמות';
+
+  @override
+  String get certifications_edit_group_specialties => 'התמחויות';
+
+  @override
   String get certifications_edit_help_expiryDate =>
       'השאר ריק להסמכות ללא תפוגה';
 
   @override
-  String get certifications_edit_hint_cardNumber => 'הזן מספר כרטיס הסמכה';
+  String get certifications_edit_helper_nameOnCard => 'אופציונלי';
 
   @override
-  String get certifications_edit_hint_certificationName =>
-      'לדוגמה, Open Water Diver';
+  String get certifications_edit_hint_cardNumber => 'הזן מספר כרטיס הסמכה';
 
   @override
   String get certifications_edit_hint_instructorName => 'שם המדריך המסמיך';
@@ -1752,7 +1758,7 @@ class AppLocalizationsHe extends AppLocalizations {
   String get certifications_edit_label_cardNumber => 'מספר כרטיס';
 
   @override
-  String get certifications_edit_label_certificationName => 'שם הסמכה *';
+  String get certifications_edit_label_certification => 'הסמכה';
 
   @override
   String get certifications_edit_label_expiryDate => 'תאריך תפוגה';
@@ -1767,13 +1773,10 @@ class AppLocalizationsHe extends AppLocalizations {
   String get certifications_edit_label_issueDate => 'תאריך הנפקה';
 
   @override
-  String get certifications_edit_label_level => 'רמה';
+  String get certifications_edit_label_nameOnCard => 'השם על הכרטיס';
 
   @override
   String get certifications_edit_label_notes => 'הערות';
-
-  @override
-  String get certifications_edit_level_notSpecified => 'לא צוין';
 
   @override
   String certifications_edit_photo_addSemanticLabel(Object label) {
@@ -1830,7 +1833,8 @@ class AppLocalizationsHe extends AppLocalizations {
   String get certifications_edit_snackBar_updated => 'ההסמכה עודכנה בהצלחה';
 
   @override
-  String get certifications_edit_validation_nameRequired => 'נא להזין שם הסמכה';
+  String get certifications_edit_validation_certificationOrNameRequired =>
+      'יש לבחור הסמכה או להזין שם';
 
   @override
   String get certifications_list_button_retry => 'נסה שוב';
@@ -2022,33 +2026,6 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get certifications_summary_stat_valid => 'בתוקף';
-
-  @override
-  String certifications_walletCard_countPlural(Object count) {
-    return '$count הסמכות';
-  }
-
-  @override
-  String certifications_walletCard_countSingular(Object count) {
-    return 'הסמכה $count';
-  }
-
-  @override
-  String get certifications_walletCard_emptyFooter =>
-      'הוסף את ההסמכה הראשונה שלך';
-
-  @override
-  String get certifications_walletCard_error => 'טעינת ההסמכות נכשלה';
-
-  @override
-  String get certifications_walletCard_semanticLabel =>
-      'ארנק הסמכות. הקש כדי לצפות בכל ההסמכות';
-
-  @override
-  String get certifications_walletCard_tapToAdd => 'הקש להוספה';
-
-  @override
-  String get certifications_walletCard_title => 'ארנק הסמכות';
 
   @override
   String get certifications_wallet_appBar_title => 'ארנק הסמכות';
@@ -2383,6 +2360,51 @@ class AppLocalizationsHe extends AppLocalizations {
       'למחוק את רשומת רשימת הבדיקה הזו?';
 
   @override
+  String get preDive_sessions_filter => 'סינון';
+
+  @override
+  String get preDive_sessions_filterTitle => 'סינון רשימות בדיקה שבוצעו';
+
+  @override
+  String get preDive_sessions_filterChecklist => 'רשימת בדיקה';
+
+  @override
+  String get preDive_sessions_filterStatus => 'סטטוס';
+
+  @override
+  String get preDive_sessions_filterFlaggedOnly => 'רק ריצות מסומנות';
+
+  @override
+  String get preDive_sessions_filterDateRange => 'טווח תאריכים';
+
+  @override
+  String get preDive_sessions_filterAnyDate => 'כל תאריך';
+
+  @override
+  String get preDive_sessions_filterClearAll => 'נקה הכול';
+
+  @override
+  String get preDive_sessions_filterApply => 'החל';
+
+  @override
+  String get preDive_sessions_filterFlaggedChip => 'מסומנות בלבד';
+
+  @override
+  String get preDive_sessions_emptyFiltered =>
+      'אין רשימות בדיקה התואמות למסננים אלה';
+
+  @override
+  String get preDive_sessions_export => 'ייצוא ל-Excel';
+
+  @override
+  String get preDive_sessions_exportEmpty => 'אין רשימות בדיקה לייצוא';
+
+  @override
+  String preDive_sessions_exportFailed(String error) {
+    return 'הייצוא נכשל: $error';
+  }
+
+  @override
   String get preDive_start_title => 'התחלת רשימת בדיקה לפני צלילה';
 
   @override
@@ -2396,28 +2418,6 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get preDive_start_begin => 'התחל';
-
-  @override
-  String get preDive_section_title => 'בדיקה לפני צלילה';
-
-  @override
-  String get preDive_section_link => 'קשר הרצת רשימת בדיקה';
-
-  @override
-  String get preDive_section_unlink => 'בטל קישור';
-
-  @override
-  String get preDive_section_run => 'הרץ רשימת בדיקה לפני צלילה';
-
-  @override
-  String get preDive_section_noUnlinked => 'אין הרצות רשימת בדיקה לא מקושרות';
-
-  @override
-  String get diveDetailSection_preDiveChecklist_name => 'בדיקה לפני צלילה';
-
-  @override
-  String get diveDetailSection_preDiveChecklist_description =>
-      'הרצת רשימת בדיקה לפני צלילה מקושרת';
 
   @override
   String get diveLog_listPage_bottomSheet_preDiveChecklist =>
@@ -2932,6 +2932,14 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
+  String get dashboard_hero_divesTotalOne => 'צלילה אחת';
+
+  @override
+  String dashboard_hero_divesTotalOther(Object count) {
+    return '$count צלילות';
+  }
+
+  @override
   String get dashboard_hero_error => 'מוכן לחקור את המעמקים?';
 
   @override
@@ -3055,11 +3063,79 @@ class AppLocalizationsHe extends AppLocalizations {
   String get dashboard_gauges_noDivesYet => 'אין צלילות עדיין';
 
   @override
-  String get settings_homeChips_pageTitle => 'שבבי מצב של דף הבית';
+  String get settings_homeChips_pageTitle => 'מסך הבית';
 
   @override
   String get settings_homeChips_description =>
       'בחר אילו שבבי מצב יופיעו בראש לשונית הבית.';
+
+  @override
+  String get settings_homeChips_sectionTitle => 'שבבי מצב';
+
+  @override
+  String get settings_homeCards_sectionTitle => 'כרטיסי דף הבית';
+
+  @override
+  String get settings_homeCards_description =>
+      'בחר אילו כרטיסים יופיעו בלשונית הבית וגרור כדי לסדר מחדש.';
+
+  @override
+  String get settings_homeCards_autoHides => 'מוסתר אוטומטית כשהוא ריק';
+
+  @override
+  String get settings_homeCards_resetToDefault => 'איפוס לברירת המחדל';
+
+  @override
+  String get settings_homeCards_resetDialog_title => 'לאפס את פריסת דף הבית?';
+
+  @override
+  String get settings_homeCards_resetDialog_message =>
+      'משחזר את סדר הכרטיסים המוגדר כברירת מחדל ומציג את כולם מחדש.';
+
+  @override
+  String get settings_homeCards_resetDialog_cancel => 'ביטול';
+
+  @override
+  String get settings_homeCards_resetDialog_confirm => 'איפוס';
+
+  @override
+  String get settings_homeCards_card_hero => 'כותרת פתיחה';
+
+  @override
+  String get settings_homeCards_card_gaugeStrip => 'שבבי מצב';
+
+  @override
+  String get settings_homeCards_card_preDive => 'רשימת בדיקה לפני צלילה';
+
+  @override
+  String get settings_homeCards_card_recentDives => 'צלילות אחרונות';
+
+  @override
+  String get settings_homeCards_card_quickActions => 'פעולות מהירות';
+
+  @override
+  String get settings_homeCards_card_milestones => 'אבני דרך';
+
+  @override
+  String get settings_homeCards_card_photoRibbon => 'תמונות אחרונות';
+
+  @override
+  String get settings_homeCards_card_onThisDay => 'ביום זה';
+
+  @override
+  String get settings_homeCards_card_yearInReview => 'סיכום השנה';
+
+  @override
+  String get settings_homeCards_card_activeCourses => 'התקדמות בקורס';
+
+  @override
+  String get settings_homeCards_card_recentSitesMap => 'מפת אתרים אחרונים';
+
+  @override
+  String get dashboard_allHidden_message => 'כל כרטיסי דף הבית מוסתרים.';
+
+  @override
+  String get dashboard_allHidden_customize => 'התאמה אישית של דף הבית';
 
   @override
   String get settings_homeChips_flightWindow => 'חלון צלילה לפני טיסה';
@@ -5521,13 +5597,6 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
-  String get diveLog_instruments_customize => 'התאמה אישית של מכשירים';
-
-  @override
-  String get diveLog_instruments_customizeHint =>
-      'הפעל או כבה מכשירים. גרור כדי לסדר מחדש.';
-
-  @override
   String get diveLog_legend_label_ascentRate => 'קצב עלייה';
 
   @override
@@ -5627,10 +5696,17 @@ class AppLocalizationsHe extends AppLocalizations {
   String get diveLog_chartSection_gasAnalysis => 'ניתוח גזים';
 
   @override
+  String get diveLog_chartSection_display => 'תצוגה';
+
+  @override
   String get diveLog_chartSection_other => 'אחר';
 
   @override
   String get diveLog_chartSection_tankPressures => 'לחצי מיכלים';
+
+  @override
+  String get diveLog_chartOption_metricsFollowViewport =>
+      'שמירת שכבות העל בתצוגה';
 
   @override
   String get diveLog_pressure_estimatedSuffix => '(משוער)';
@@ -6027,6 +6103,23 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get setup_syncPull_continue => 'המשך';
+
+  @override
+  String get setup_syncPull_incomplete_message =>
+      'בחשבון זה קיימת ספריית Submersion שהעלאתה מעולם לא הושלמה. אפשרו למכשיר האחר לסיים את הסנכרון ונסו שוב.';
+
+  @override
+  String get setup_syncPull_incomplete_retry => 'בדיקה חוזרת';
+
+  @override
+  String get setup_syncPull_incomplete_title => 'העלאת הספרייה לא הושלמה';
+
+  @override
+  String get setup_syncPull_locked_message =>
+      'הזינו את משפט הסיסמה של ההצפנה כדי לפתוח את הספרייה ולהוריד אותה למכשיר זה.';
+
+  @override
+  String get setup_syncPull_locked_title => 'הספרייה הזו מוצפנת';
 
   @override
   String get setup_syncPull_noLibrary_message =>
@@ -6936,6 +7029,23 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get diveLog_tank_selectPreset => 'בחר תבנית...';
+
+  @override
+  String get diveLog_tank_saveAsPreset => 'שמור כתבנית';
+
+  @override
+  String get diveLog_tank_saveAsPreset_needSpecs => 'הזן תחילה נפח ולחץ עבודה';
+
+  @override
+  String get diveLog_tank_saveAsPreset_nameTitle => 'שמור תבנית בלון';
+
+  @override
+  String get diveLog_tank_saveAsPreset_nameHint => 'לדוגמה AL80 שלי';
+
+  @override
+  String diveLog_tank_saveAsPreset_saved(String name) {
+    return 'התבנית \"$name\" נשמרה';
+  }
 
   @override
   String diveLog_tank_title(Object number) {
@@ -8978,24 +9088,6 @@ class AppLocalizationsHe extends AppLocalizations {
   String get enum_ascentRate_warning => 'אזהרה';
 
   @override
-  String get enum_buddyRole_buddy => 'שותף';
-
-  @override
-  String get enum_buddyRole_diveGuide => 'מדריך צלילה';
-
-  @override
-  String get enum_buddyRole_diveMaster => 'דייבמאסטר';
-
-  @override
-  String get enum_buddyRole_instructor => 'מדריך';
-
-  @override
-  String get enum_buddyRole_solo => 'יחיד';
-
-  @override
-  String get enum_buddyRole_student => 'תלמיד';
-
-  @override
   String get enum_certificationAgency_bsac => 'BSAC';
 
   @override
@@ -9048,6 +9140,9 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get enum_certificationLevel_decompression => 'דקומפרסיה';
+
+  @override
+  String get enum_certificationLevel_diveGuide => 'מדריך צלילה';
 
   @override
   String get enum_certificationLevel_diveMaster => 'דייבמאסטר';
@@ -9234,6 +9329,9 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get enum_equipmentType_camera => 'מצלמה';
+
+  @override
+  String get enum_equipmentType_dpv => 'DPV';
 
   @override
   String get enum_equipmentType_computer => 'מחשב צלילה';
@@ -9698,80 +9796,6 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get enum_weightType_trimWeights => 'משקולות טרים';
-
-  @override
-  String get equipment_addSheet_brandHint => 'לדוגמה, Scubapro';
-
-  @override
-  String get equipment_addSheet_brandLabel => 'מותג';
-
-  @override
-  String get equipment_addSheet_closeTooltip => 'סגור';
-
-  @override
-  String get equipment_addSheet_currencyLabel => 'מטבע';
-
-  @override
-  String get equipment_addSheet_dateLabel => 'תאריך';
-
-  @override
-  String equipment_addSheet_errorSnackbar(Object error) {
-    return 'שגיאה בהוספת ציוד: $error';
-  }
-
-  @override
-  String get equipment_addSheet_modelHint => 'לדוגמה, MK25 EVO';
-
-  @override
-  String get equipment_addSheet_modelLabel => 'דגם';
-
-  @override
-  String get equipment_addSheet_nameHint => 'לדוגמה, הרגולטור הראשי שלי';
-
-  @override
-  String get equipment_addSheet_nameLabel => 'שם';
-
-  @override
-  String get equipment_addSheet_nameValidation => 'נא להזין שם';
-
-  @override
-  String get equipment_addSheet_notesHint => 'הערות נוספות...';
-
-  @override
-  String get equipment_addSheet_notesLabel => 'הערות';
-
-  @override
-  String get equipment_addSheet_priceLabel => 'מחיר';
-
-  @override
-  String get equipment_addSheet_purchaseInfoTitle => 'פרטי רכישה';
-
-  @override
-  String get equipment_addSheet_serialNumberLabel => 'מספר סידורי';
-
-  @override
-  String get equipment_addSheet_serviceIntervalHint => 'לדוגמה, 365 לשנתי';
-
-  @override
-  String get equipment_addSheet_serviceIntervalLabel => 'מרווח טיפול (ימים)';
-
-  @override
-  String get equipment_addSheet_sizeHint => 'לדוגמה, M, L, 42';
-
-  @override
-  String get equipment_addSheet_sizeLabel => 'מידה';
-
-  @override
-  String get equipment_addSheet_submitButton => 'הוסף ציוד';
-
-  @override
-  String get equipment_addSheet_successSnackbar => 'הציוד נוסף בהצלחה';
-
-  @override
-  String get equipment_addSheet_title => 'הוסף ציוד';
-
-  @override
-  String get equipment_addSheet_typeLabel => 'סוג';
 
   @override
   String get equipment_appBar_title => 'ציוד';
@@ -11553,6 +11577,56 @@ class AppLocalizationsHe extends AppLocalizations {
   String get media_diveMediaSection_unlinkSuccess => 'קישור התמונה בוטל';
 
   @override
+  String get media_siteMediaSection_title => 'מדיה של האתר';
+
+  @override
+  String get media_siteMediaSection_addPhotos => 'הוספת תמונות או סרטונים';
+
+  @override
+  String get media_siteMediaSection_addDocument => 'הוספת מסמך';
+
+  @override
+  String get media_siteMediaSection_emptyState =>
+      'אין מפות, תמונות או מסמכים המצורפים לאתר זה';
+
+  @override
+  String media_siteMediaSection_divePhotosGroup(int count) {
+    return 'תמונות מצלילות כאן ($count)';
+  }
+
+  @override
+  String get media_siteMediaSection_divePhotoLabel => 'תמונת צלילה';
+
+  @override
+  String media_siteMediaSection_unlinkSelectedTitle(int count) {
+    return 'להסיר $count קבצים מצורפים?';
+  }
+
+  @override
+  String get media_siteMediaSection_unlinkSelectedContent =>
+      'הפריטים שנבחרו יוסרו מאתר זה. קבצים בספריית התמונות או בדיסק לא יימחקו.';
+
+  @override
+  String media_siteMediaSection_unlinkSelectedSuccess(int count) {
+    return 'הוסרו $count קבצים מצורפים';
+  }
+
+  @override
+  String get media_documentViewer_title => 'מסמך';
+
+  @override
+  String get media_documentViewer_unavailable => 'מסמך זה אינו זמין במכשיר זה';
+
+  @override
+  String get media_documentViewer_availableOnOriginDevice =>
+      'הוא זמין במכשיר שממנו נוסף, או דרך אחסון מדיה מוגדר.';
+
+  @override
+  String media_documentViewer_attached(int count) {
+    return 'צורפו $count מסמכים';
+  }
+
+  @override
   String get media_diveScan_scanTooltip => 'סרוק גלריה לחיפוש תמונות';
 
   @override
@@ -11600,8 +11674,8 @@ class AppLocalizationsHe extends AppLocalizations {
   String get media_gpsBanner_addToSiteButton => 'הוסף לאתר';
 
   @override
-  String media_gpsBanner_coordinates(Object latitude, Object longitude) {
-    return 'קואורדינטות: $latitude, $longitude';
+  String media_gpsBanner_coordinates(Object coordinates) {
+    return 'קואורדינטות: $coordinates';
   }
 
   @override
@@ -13013,6 +13087,23 @@ class AppLocalizationsHe extends AppLocalizations {
   String get safetyReview_restore => 'שחזר';
 
   @override
+  String get safetyReview_details => 'פרטים';
+
+  @override
+  String get safetyReview_clearHighlight => 'ניקוי הדגשה';
+
+  @override
+  String safetyReview_findingGroupSemantics(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count ממצאי בטיחות',
+      one: 'ממצא בטיחות אחד',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get safetySettings_title => 'סקירת בטיחות';
 
   @override
@@ -13117,11 +13208,11 @@ class AppLocalizationsHe extends AppLocalizations {
   String get diveDetailSection_tide_description => 'גרף מחזור גאות ושפל וזמן';
 
   @override
-  String get diveDetailSection_reefHealth_name => 'בריאות השונית';
+  String get diveDetailSection_reefHealth_name => 'תנאי המים';
 
   @override
   String get diveDetailSection_reefHealth_description =>
-      'עקת חום מהלבנת אלמוגים בתאריך הצלילה';
+      'תנאי מים לווייניים בתאריך הצלילה';
 
   @override
   String get diveDetailSection_surfaceGps_name => 'GPS פני המים';
@@ -13150,6 +13241,24 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get diveLog_detail_surfaceGps_site => 'אתר';
+
+  @override
+  String get diveLog_detail_surfaceGps_track => 'מסלול פני השטח';
+
+  @override
+  String get diveLog_detail_surfaceGps_showFullTrack => 'מסלול מלא';
+
+  @override
+  String diveLog_detail_surfaceGps_trackFixes(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count נקודות',
+      two: 'שתי נקודות',
+      one: 'נקודה אחת',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get diveLog_detail_locationsMap_title => 'מיקומי צלילה';
@@ -13495,6 +13604,14 @@ class AppLocalizationsHe extends AppLocalizations {
       'הצג סמנים כאשר לחץ הבלון חוצה ספי 2/3, 1/2 ו-1/3';
 
   @override
+  String get settings_appearance_metricsFollowViewport =>
+      'שמירת שכבות העל בתצוגה בעת זום';
+
+  @override
+  String get settings_appearance_metricsFollowViewport_subtitle =>
+      'התאמת שכבות על כגון NDL ו-ppO2 לאזור הנראה במקום להגדיל אותן יחד עם ציר העומק';
+
+  @override
   String get settings_appearance_rightYAxisMetric => 'מדד ציר Y ימני';
 
   @override
@@ -13623,11 +13740,75 @@ class AppLocalizationsHe extends AppLocalizations {
   String get settings_cloudSync_adopt_notNow => 'לא עכשיו';
 
   @override
+  String get settings_cloudSync_dangerZone => 'אזור מסוכן';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_tile => 'החלפת ספריית הענן';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_tileSubtitle =>
+      'להפוך את הספרייה של מכשיר זה לספרייה שכל המכשירים משתמשים בה';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_dialogTitle =>
+      'להחליף את ספריית הענן?';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_dialogIntro =>
+      'הספרייה של מכשיר זה הופכת לספרייה שכל המכשירים משתמשים בה.';
+
+  @override
+  String settings_cloudSync_replaceLibrary_dialogBody(num diveCount) {
+    String _temp0 = intl.Intl.pluralLogic(
+      diveCount,
+      locale: localeName,
+      other: 'ספריית הענן נמחקת ומוחלפת ב-$diveCount הצלילות שבמכשיר זה.',
+      one: 'ספריית הענן נמחקת ומוחלפת בצלילה 1 שבמכשיר זה.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String settings_cloudSync_replaceLibrary_peers(num peerCount) {
+    String _temp0 = intl.Intl.pluralLogic(
+      peerCount,
+      locale: localeName,
+      other:
+          '$peerCount מכשירים נוספים יתבקשו לאמץ אותה; עד אז השינויים שלהם לא ימוזגו.',
+      one: 'מכשיר אחד נוסף יתבקש לאמץ אותה; עד אז השינויים שלו לא ימוזגו.',
+      zero: 'אף מכשיר אחר עדיין לא מסתנכרן, ולכן אין מה לאמץ.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get settings_cloudSync_replaceLibrary_peersUnknown =>
+      'כל שאר המכשירים יתבקשו לאמץ אותה; עד אז השינויים שלהם לא ימוזגו.';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_backupNote =>
+      'תחילה נוצר גיבוי של מכשיר זה. לא ניתן לבטל פעולה זו.';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_confirmWord => 'החלפה';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_confirmHint =>
+      'הקלד \"החלפה\" לאישור';
+
+  @override
+  String get settings_cloudSync_replaceLibrary_confirm => 'החלפה';
+
+  @override
   String get settings_cloudSync_firstSync_banner =>
       'הסנכרון הראשון ממתין לאישור. הקש על \'סנכרן עכשיו\' כדי לבדוק מה ישולב.';
 
   @override
   String get settings_cloudSync_firstSync_dialogConfirm => 'מזג וסנכרן';
+
+  @override
+  String get settings_cloudSync_firstSync_replaceHint =>
+      'אם במקום זאת הספרייה של מכשיר זה אמורה להחליף את מה שנמצא בענן, בטל והשתמש בהגדרות > סנכרון ענן > החלפת ספריית הענן.';
 
   @override
   String settings_cloudSync_firstSync_dialogContent(
@@ -13714,6 +13895,27 @@ class AppLocalizationsHe extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String settings_cloudSync_peerNeedsAdopt_banner(Object deviceList) {
+    return 'ל$deviceList עדיין יש גרסת ספרייה ישנה או לא מוכרת, ולכן השינויים שלו לא מוזגו. פתח את Submersion במכשיר כדי לאמץ את הספרייה הנוכחית.';
+  }
+
+  @override
+  String settings_cloudSync_peerNeedsAdopt_bannerPlural(Object deviceList) {
+    return 'ל$deviceList עדיין יש גרסת ספרייה ישנה או לא מוכרת, ולכן השינויים שלהם לא מוזגו. פתח את Submersion במכשירים כדי לאמץ את הספרייה הנוכחית.';
+  }
+
+  @override
+  String settings_cloudSync_peerNeedsAdopt_unnamedDevice(Object shortId) {
+    return 'מכשיר $shortId';
+  }
+
+  @override
+  String get settings_cloudSync_peerNeedsAdopt_listSeparator => ', ';
+
+  @override
+  String get settings_cloudSync_peerNeedsAdopt_listLastSeparator => ' ו-';
 
   @override
   String settings_cloudSync_peerRequiresUpdate_banner(num count) {
@@ -14929,6 +15131,14 @@ class AppLocalizationsHe extends AppLocalizations {
       'בחר תיקייה מסונכרנת (Dropbox, Google Drive וכו\')';
 
   @override
+  String get settings_storage_customFolder_subtitleDeviceOnly =>
+      'העברת מסד הנתונים לאחסון הפנימי או לכרטיס SD';
+
+  @override
+  String get settings_storage_customFolder_deviceOnly_noCloudSync =>
+      'סנכרון הענן המנוהל על ידי האפליקציה מושבת כל עוד מסד הנתונים נמצא באחסון המכשיר. ב-Android אף שירות סנכרון אינו יכול להגיע לתיקייה הזו, לכן השתמשו בגיבוי ושחזור כדי לשמור עותקים במקום אחר.';
+
+  @override
   String settings_storage_dbStats(
     Object fileSize,
     Object diveCount,
@@ -14995,14 +15205,17 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get settings_storage_resetDatabase_subtitle =>
-      'מחק את כל הנתונים והתחל מחדש';
+      'מחק את כל הנתונים במכשיר זה והתחל מחדש';
 
   @override
   String get settings_storage_resetDialog_title => 'לאפס את מסד הנתונים?';
 
   @override
   String get settings_storage_resetDialog_body =>
-      'פעולה זו תמחק לצמיתות את כל הנתונים שלך כולל צלילות, אתרים, ציוד והגדרות. גיבוי ייווצר אוטומטית לפני האיפוס.';
+      'פעולה זו מוחקת לצמיתות את כל הנתונים במכשיר הזה, כולל צלילות, אתרים, ציוד והגדרות. גיבוי נוצר אוטומטית לפני האיפוס.\n\nספריית הענן שלך לא נמחקת, ומכשירים אחרים שומרים על הנתונים שלהם. סנכרון הענן ינותק כדי שהאיפוס לא יבוטל; ניתן לחבר אותו מחדש בהגדרות > סנכרון ענן.';
+
+  @override
+  String get settings_storage_resetDialog_confirmWord => 'מחיקה';
 
   @override
   String get settings_storage_resetDialog_confirmHint =>
@@ -15025,7 +15238,7 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get settings_storage_resetComplete_description =>
-      'הנתונים שלך נמחקו וגיבוי נשמר. הקש על המשך כדי לטעון מחדש את האפליקציה.';
+      'הנתונים במכשיר זה נמחקו וגיבוי נשמר. סנכרון הענן מנותק כעת כדי שהאיפוס לא יבוטל; ניתן לחבר אותו מחדש בהגדרות > סנכרון ענן. הקש על המשך כדי לטעון מחדש את האפליקציה.';
 
   @override
   String get settings_summary_activeDiver => 'צולל פעיל';
@@ -16417,6 +16630,16 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
+  String surfaceInterval_gasWarning_modExceeded(
+    Object ppO2,
+    Object depth,
+    Object limit,
+    Object mod,
+  ) {
+    return 'ppO₂ $ppO2 בעומק $depth חורג מ-$limit. ה-MOD של תערובת זו הוא $mod.';
+  }
+
+  @override
   String surfaceInterval_heSemantics(Object percent) {
     return 'הליום: $percent%';
   }
@@ -16427,7 +16650,20 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
+  String surfaceInterval_result_beyondHorizon(Object hours) {
+    return 'ההמתנה חורגת מ-$hours השעות שמתכנן זה מחפש. הסילוק ממשיך, ולכן מרווח שטח ארוך יותר יספיק.';
+  }
+
+  @override
+  String surfaceInterval_result_beyondHorizonShort(Object hours) {
+    return 'יותר מ-$hours שעות';
+  }
+
+  @override
   String get surfaceInterval_result_currentInterval => 'מרווח נוכחי';
+
+  @override
+  String get surfaceInterval_result_gasUnsafe => 'הגז אינו בטוח בעומק זה';
 
   @override
   String get surfaceInterval_result_inDeco => 'בדקו';
@@ -16446,6 +16682,15 @@ class AppLocalizationsHe extends AppLocalizations {
   String surfaceInterval_result_ndlMinutes(Object minutes) {
     return '$minutes דקות NDL';
   }
+
+  @override
+  String surfaceInterval_result_noIntervalHelps(Object minutes) {
+    return 'שום מרווח שטח אינו מספיק. הצלילה הארוכה ביותר ללא דקומפרסיה בעומק זה עם תערובת זו היא $minutes דקות. קצר את הצלילה השנייה או הקטן את עומקה.';
+  }
+
+  @override
+  String get surfaceInterval_result_notAchievable =>
+      'לא ניתן להשגה בשום מרווח שטח';
 
   @override
   String get surfaceInterval_result_notYetSafe =>
@@ -16470,7 +16715,14 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
-  String get surfaceInterval_secondDive_gasAir => '(אוויר)';
+  String surfaceInterval_secondDive_heSemantics(Object percent) {
+    return 'הליום צלילה שנייה: $percent%';
+  }
+
+  @override
+  String surfaceInterval_secondDive_o2Semantics(Object percent) {
+    return 'חמצן צלילה שנייה: $percent%';
+  }
 
   @override
   String surfaceInterval_secondDive_timeSemantics(Object time) {
@@ -16866,6 +17118,27 @@ class AppLocalizationsHe extends AppLocalizations {
   String tides_semantic_tideState(Object state) {
     return 'מצב גאות: $state';
   }
+
+  @override
+  String tides_source_noaaStation(String name, String distance) {
+    return 'תחנת NOAA: $name ($distance)';
+  }
+
+  @override
+  String get tides_source_modelEstimate => 'אומדן מודל אוקיינוס';
+
+  @override
+  String get tides_source_modelCaveat =>
+      'מבוסס על נתוני לוויין. זמנים וגבהים עשויים להיות שונים ליד קווי חוף מורכבים.';
+
+  @override
+  String get tides_source_sheetTitle => 'מקור נתוני הגאות';
+
+  @override
+  String get tides_source_datumMllw => 'גבהים ביחס ל-MLLW (ייחוס התחנה)';
+
+  @override
+  String get tides_source_datumMsl => 'גבהים ביחס לגובה פני הים הממוצע';
 
   @override
   String get tides_title => 'גאות';
@@ -17399,8 +17672,7 @@ class AppLocalizationsHe extends AppLocalizations {
   String get trips_diveScan_noMatches => 'לא נמצאו צלילות תואמות';
 
   @override
-  String get trips_diveScan_noDiver =>
-      'שייך צולל לטיול זה כדי לסרוק אחר צלילות';
+  String get trips_diveScan_noDiver => 'בחר צולל פעיל כדי לסרוק אחר צלילות';
 
   @override
   String get trips_diveScan_selectAll => 'בחר הכל';
@@ -18276,6 +18548,29 @@ class AppLocalizationsHe extends AppLocalizations {
       'שימוש ברשומה התואמת';
 
   @override
+  String get universalImport_entityAction_replaceBadge => 'החלפה';
+
+  @override
+  String get universalImport_entityAction_replaceExisting => 'החלף את הקיים';
+
+  @override
+  String get universalImport_entityAction_replaceExistingSubtitle =>
+      'דרוס בנתונים המיובאים';
+
+  @override
+  String get universalImport_entityAction_skip => 'דלג';
+
+  @override
+  String get universalImport_entityAction_skipSubtitle => 'בטל ייבוא זה';
+
+  @override
+  String get universalImport_entityAction_importAsNew => 'ייבוא כחדש';
+
+  @override
+  String get universalImport_entityAction_importAsNewSubtitle =>
+      'צור רשומה נפרדת';
+
+  @override
   String get universalImport_pending_chooseAction => 'בחר פעולה';
 
   @override
@@ -18862,6 +19157,14 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String get diveComputer_download_noSerialPortsFound =>
       'לא נמצאו חיבורי USB טוריים. האם מחשב הצלילה מחובר ופועל?';
+
+  @override
+  String get diveComputer_download_stalePairing =>
+      'התאמת ה-Bluetooth של מחשב הצלילה הזה אינה עדכנית. שכח את מחשב הצלילה בהגדרות ה-Bluetooth של המכשיר שלך, ולאחר מכן התאם אותו מחדש מתפריט ה-Bluetooth של מחשב הצלילה.';
+
+  @override
+  String get diveComputer_download_discoveryStalled =>
+      'ההתחברות למחשב הצלילה הצליחה, אך הוא הפסיק להגיב לפני תחילת ההורדה. בדרך כלל המשמעות היא שהתאמת ה-Bluetooth אינה עדכנית: שכח את מחשב הצלילה בהגדרות ה-Bluetooth של המכשיר שלך ונסה שוב.';
 
   @override
   String diveComputer_download_serialConnectFailedWithDetails(Object details) {
@@ -19794,7 +20097,190 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
+  String gpsLogger_trackSubtitleTrimmed(String duration) {
+    return 'נחתך, $duration';
+  }
+
+  @override
   String get gpsLogger_tracksHeader => 'מסלולים שהוקלטו';
+
+  @override
+  String get gpsTrack_action_trim => 'חיתוך...';
+
+  @override
+  String get gpsTrack_action_split => 'פיצול...';
+
+  @override
+  String get gpsTrack_action_resetTrim => 'איפוס החיתוך';
+
+  @override
+  String get gpsTrack_edit_applyTrim => 'החל חיתוך';
+
+  @override
+  String get gpsTrack_edit_confirmSplit => 'פצל כאן';
+
+  @override
+  String get gpsTrack_edit_splitWarning =>
+      'פיצול יוצר שני מסלולים ומוחק את המקורי. לא ניתן לבטל פעולה זו.';
+
+  @override
+  String get gpsTrack_edit_cancel => 'ביטול';
+
+  @override
+  String get gpsTrack_import_action => 'ייבוא מסלול...';
+
+  @override
+  String get gpsTrack_import_reviewTitle => 'בדיקת ייבוא';
+
+  @override
+  String get gpsTrack_import_timezone => 'הוקלט באזור';
+
+  @override
+  String get gpsTrack_import_timezoneHint =>
+      'הזמנים בקובץ הם UTC. בחר את אזור הזמן שבו הוקלט המסלול כדי שיתאים לצלילות שלך.';
+
+  @override
+  String get gpsTrack_import_duplicate => 'נראה שזהו כפיל של מסלול קיים.';
+
+  @override
+  String get gpsTrack_import_confirm => 'ייבוא';
+
+  @override
+  String get gpsTrack_import_csvMapping => 'התאמת עמודות';
+
+  @override
+  String get gpsTrack_import_firstFix => 'נקודה ראשונה';
+
+  @override
+  String gpsTrack_import_fixCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count נקודות',
+      two: 'שתי נקודות',
+      one: 'נקודה אחת',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String gpsTrack_import_failed(String reason) {
+    return 'לא ניתן לקרוא את הקובץ: $reason';
+  }
+
+  @override
+  String get gpsTrack_importError_unsupportedFormat =>
+      'סוג הקובץ אינו נתמך. ייבא קובץ GPX, KML, CSV או FIT.';
+
+  @override
+  String get gpsTrack_importError_unreadable =>
+      'לא ניתן לקרוא את הקובץ. ייתכן שהוא פגום או חלקי.';
+
+  @override
+  String get gpsTrack_importError_noPositions =>
+      'בקובץ אין מיקומי GPS עם חותמת זמן.';
+
+  @override
+  String get gpsTrack_importError_badData =>
+      'בקובץ יש מיקום או חותמת זמן שהאפליקציה אינה יכולה לקרוא.';
+
+  @override
+  String get gpsTrack_export_saved => 'המסלול נשמר';
+
+  @override
+  String get gpsTrack_action_export => 'ייצוא';
+
+  @override
+  String get gpsTrack_action_shareGpx => 'שיתוף כ-GPX';
+
+  @override
+  String get gpsTrack_action_saveGpx => 'שמירה כ-GPX...';
+
+  @override
+  String get gpsTrack_action_shareKml => 'שיתוף כ-KML';
+
+  @override
+  String get gpsTrack_action_saveKml => 'שמירה כ-KML...';
+
+  @override
+  String get gpsTrack_export_failed => 'הייצוא נכשל.';
+
+  @override
+  String get gpsTrack_map_title => 'מפת מסלולים';
+
+  @override
+  String gpsTrack_map_truncated(int count) {
+    return 'מוצגים $count המסלולים האחרונים. צמצם את מסנן התאריכים כדי לראות אחרים.';
+  }
+
+  @override
+  String get gpsTrack_map_noTracks => 'אין מסלולים מוקלטים להצגה.';
+
+  @override
+  String get gpsTrack_map_showMap => 'הצג מפה';
+
+  @override
+  String get gpsTrack_filter_all => 'כל התאריכים';
+
+  @override
+  String get gpsTrack_filter_clear => 'נקה סינון תאריכים';
+
+  @override
+  String get gpsTrack_inspect_speed => 'מהירות';
+
+  @override
+  String get gpsTrack_inspect_accuracy => 'דיוק';
+
+  @override
+  String get gpsTrack_stats_distance => 'מרחק';
+
+  @override
+  String get gpsTrack_stats_duration => 'משך';
+
+  @override
+  String get gpsTrack_stats_avgSpeed => 'מהירות ממוצעת';
+
+  @override
+  String get gpsTrack_stats_maxSpeed => 'מהירות מרבית';
+
+  @override
+  String get gpsTrack_stats_fixes => 'נקודות';
+
+  @override
+  String get gpsTrack_stats_dives => 'צלילות';
+
+  @override
+  String get gpsTrack_colorMode_uniform => 'אחיד';
+
+  @override
+  String get gpsTrack_colorMode_speed => 'מהירות';
+
+  @override
+  String get gpsTrack_colorMode_elapsed => 'זמן';
+
+  @override
+  String get gpsTrack_legend_slower => 'אטי יותר';
+
+  @override
+  String get gpsTrack_legend_faster => 'מהיר יותר';
+
+  @override
+  String get gpsTrack_legend_start => 'התחלה';
+
+  @override
+  String get gpsTrack_legend_end => 'סוף';
+
+  @override
+  String get gpsTrack_detail_title => 'מסלול GPS';
+
+  @override
+  String get gpsTrack_detail_notFound => 'מסלול זה אינו זמין עוד.';
+
+  @override
+  String get gpsTrack_detail_unreadable => 'לא ניתן היה לקרוא את נתוני המסלול.';
+
+  @override
+  String get gpsTrack_detail_noPoints => 'למסלול זה אין מיקומים מוקלטים.';
 
   @override
   String get maps_compass_resetLabel => 'איפוס כיוון המפה לצפון';
@@ -20905,6 +21391,10 @@ class AppLocalizationsHe extends AppLocalizations {
       'הקבצים כאן נמחקים אם מסירים את האפליקציה.';
 
   @override
+  String get db_location_backup_note =>
+      'Android אינו יכול להריץ את מסד הנתונים מתיקייה המסונכרנת בענן. כדי לשמור עותק ב-Dropbox, ב-Nextcloud או ב-Google Drive, הגדירו את מיקום הגיבוי תחת גיבוי ושחזור.';
+
+  @override
   String diveLog_bulkEdit_membership_onAll(int count) {
     return 'בכל $count';
   }
@@ -21697,6 +22187,24 @@ class AppLocalizationsHe extends AppLocalizations {
   String get attrLabel_o2_cylinder_l => 'בלון O2';
 
   @override
+  String get attrLabel_dpv_style => 'סגנון';
+
+  @override
+  String get attrLabel_burn_time_h => 'זמן פעולה (שעות)';
+
+  @override
+  String get attrLabel_battery_type => 'סוללה';
+
+  @override
+  String get attrLabel_battery_capacity_wh => 'קיבולת סוללה (Wh)';
+
+  @override
+  String get attrLabel_motor_type => 'מנוע';
+
+  @override
+  String get attrLabel_speed_mps => 'מהירות מרבית';
+
+  @override
   String get attrChoice_unit_type_eccr => 'CCR אלקטרוני (eCCR)';
 
   @override
@@ -21905,6 +22413,30 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get attrChoice_sole_type_soft => 'סוליה רכה';
+
+  @override
+  String get attrChoice_dpv_style_tow_behind => 'נגרר';
+
+  @override
+  String get attrChoice_dpv_style_ride_on => 'רכיבה';
+
+  @override
+  String get attrChoice_dpv_style_handheld => 'מוחזק ביד';
+
+  @override
+  String get attrChoice_battery_type_lithium_ion => 'ליתיום-יון';
+
+  @override
+  String get attrChoice_battery_type_nimh => 'NiMH';
+
+  @override
+  String get attrChoice_battery_type_lead_acid => 'עופרת-חומצה';
+
+  @override
+  String get attrChoice_motor_type_brushless => 'ללא מברשות';
+
+  @override
+  String get attrChoice_motor_type_brushed => 'עם מברשות';
 
   @override
   String get equipment_edit_customFieldsTitle => 'שדות מותאמים אישית';
@@ -22319,7 +22851,7 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get settings_security_encryption_subtitle =>
-      'הגנו על קובץ יומן הצלילות שלכם באמצעות הצפנה במנוחה';
+      'הגנו על קובץ יומן הצלילות שלכם באמצעות הצפנה במנוחה. הצפנה עשויה להשפיע על הביצועים.';
 
   @override
   String get settings_security_encryption_progress_backup =>
@@ -22393,7 +22925,7 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get settings_security_enableEncryption_body =>
-      'תחילה נוצר גיבוי בטיחות ואז קובץ מסד הנתונים מוצפן מחדש במקומו. זה עשוי להימשך זמן מה ביומנים גדולים.';
+      'תחילה נוצר גיבוי בטיחות ואז קובץ מסד הנתונים מוצפן מחדש במקומו. זה עשוי להימשך זמן מה ביומנים גדולים. הצפנה עשויה להשפיע על הביצועים.';
 
   @override
   String get settings_security_disableEncryption_title => 'לכבות את ההצפנה?';
@@ -22494,6 +23026,9 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get dataQuality_repair_applied => 'התיקון הוחל';
+
+  @override
+  String get dataQuality_repair_noChange => 'אין כאן מה לתקן';
 
   @override
   String get dataQuality_repair_failed => 'התיקון נכשל';
@@ -22708,6 +23243,13 @@ class AppLocalizationsHe extends AppLocalizations {
   String get dataQuality_repairLabel_despike => 'הסרת הקפיצה';
 
   @override
+  String get dataQuality_repairLabel_clampNegative =>
+      'הגבלת עומקים מעל פני המים';
+
+  @override
+  String get dataQuality_repairLabel_smoothRates => 'החלקת קצבים בלתי אפשריים';
+
+  @override
   String get dataQuality_repairLabel_fillGaps => 'מילוי הפערים';
 
   @override
@@ -22809,13 +23351,14 @@ class AppLocalizationsHe extends AppLocalizations {
       'מכשיר זה אינו יכול לדחוס וידאו. ממנו מועלים הקבצים המקוריים.';
 
   @override
-  String get reef_section_title => 'שונית';
+  String get reef_section_title => 'מערכת אקולוגית';
 
   @override
   String get reef_section_sourcesTooltip => 'מקורות נתונים';
 
   @override
-  String get reef_section_loadError => 'לא ניתן לטעון כעת את נתוני השונית';
+  String get reef_section_loadError =>
+      'לא ניתן לטעון נתוני מערכת אקולוגית כרגע';
 
   @override
   String get reef_habitat_title => 'בית גידול השונית';
@@ -22835,13 +23378,22 @@ class AppLocalizationsHe extends AppLocalizations {
   String get reef_habitat_unavailable => 'לא ניתן לבדוק כעת את בית הגידול';
 
   @override
-  String get reef_health_title => 'בריאות השונית';
+  String get water_conditions_title => 'תנאי המים';
 
   @override
-  String get reef_health_unavailable => 'לא ניתן לבדוק כעת את בריאות השונית';
+  String get water_conditions_unavailable => 'לא ניתן לבדוק את תנאי המים כרגע';
 
   @override
-  String get reef_health_noData => 'אין נתוני בריאות שונית למיקום זה';
+  String get water_conditions_noData => 'אין נתוני לוויין על המים למיקום זה';
+
+  @override
+  String get water_conditions_freshwater =>
+      'טמפרטורת מים לוויינית מכסה אוקיינוסים בלבד';
+
+  @override
+  String water_conditions_anomaly(String value) {
+    return 'סטייה $value';
+  }
 
   @override
   String reef_health_degreeHeatingWeeks(String value) {
@@ -22921,4 +23473,161 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String get reef_attribution_protectedSeas =>
       'גבולות אזורים ימיים מוגנים. CC BY 4.0.';
+
+  @override
+  String get enum_visibilityBand_excellent => 'מצוינת';
+
+  @override
+  String get enum_visibilityBand_good => 'טובה';
+
+  @override
+  String get enum_visibilityBand_moderate => 'בינונית';
+
+  @override
+  String get enum_visibilityBand_poor => 'ירודה';
+
+  @override
+  String visibility_range_between(String min, String max, String unit) {
+    return '$min-$max $unit';
+  }
+
+  @override
+  String visibility_range_over(String min, String unit) {
+    return 'מעל $min $unit';
+  }
+
+  @override
+  String visibility_range_under(String max, String unit) {
+    return 'מתחת ל-$max $unit';
+  }
+
+  @override
+  String get settings_coordinateFormat_title => 'פורמט קואורדינטות';
+
+  @override
+  String get settings_coordinateFormat_subtitle =>
+      'כיצד מוצגים ומוזנים מיקומי GPS';
+
+  @override
+  String get settings_coordinateFormat_decimalDegrees => 'מעלות עשרוניות';
+
+  @override
+  String get settings_coordinateFormat_degreesDecimalMinutes =>
+      'מעלות ודקות עשרוניות';
+
+  @override
+  String get settings_coordinateFormat_degreesMinutesSeconds =>
+      'מעלות, דקות, שניות';
+
+  @override
+  String get settings_coordinateFormat_utm => 'UTM';
+
+  @override
+  String get settings_coordinateFormat_mgrs => 'MGRS';
+
+  @override
+  String get settings_visibilityScale_title => 'סולם ראות';
+
+  @override
+  String get settings_visibilityScale_subtitle =>
+      'אילו מרחקים נחשבים ראות טובה במקום שבו אתה צולל';
+
+  @override
+  String get settings_visibilityScale_preset_tropical => 'טרופי';
+
+  @override
+  String get settings_visibilityScale_preset_temperate => 'ממוזג';
+
+  @override
+  String get settings_visibilityScale_preset_coldWater => 'מים קרים / יבשתיים';
+
+  @override
+  String get settings_visibilityScale_preset_custom => 'מותאם אישית';
+
+  @override
+  String get settings_visibilityScale_customExcellent => 'מצוינת מ-';
+
+  @override
+  String get settings_visibilityScale_customGood => 'טובה מ-';
+
+  @override
+  String get settings_visibilityScale_customModerate => 'בינונית מ-';
+
+  @override
+  String get settings_visibilityScale_invalidOrder =>
+      'כל ערך חייב להיות קטן מזה שמעליו וגדול מאפס';
+
+  @override
+  String statistics_conditions_visibility_legacySuffix(String band) {
+    return '$band (נרשם לפני מדידה)';
+  }
+
+  @override
+  String common_selection_countSelected(Object count) {
+    return '$count נבחרו';
+  }
+
+  @override
+  String get common_selection_enterTooltip => 'בחירת פריטים';
+
+  @override
+  String get common_selection_exitTooltip => 'יציאה מבחירה';
+
+  @override
+  String get common_selection_selectAllTooltip => 'בחר הכול';
+
+  @override
+  String get common_selection_deselectAllTooltip => 'בטל בחירת הכול';
+
+  @override
+  String common_bulkDelete_title(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'למחוק $count פריטים?',
+      many: 'למחוק $count פריטים?',
+      two: 'למחוק שני פריטים?',
+      one: 'למחוק פריט אחד?',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get common_bulkDelete_body => 'לא ניתן לבטל פעולה זו.';
+
+  @override
+  String common_bulkDelete_snackbar(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count נמחקו',
+      many: '$count נמחקו',
+      two: 'שני פריטים נמחקו',
+      one: 'פריט אחד נמחק',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get marineLife_species_delete_confirmTitle => 'למחוק מין?';
+
+  @override
+  String marineLife_species_delete_confirmBody(String name) {
+    return 'האם למחוק את \"$name\"?';
+  }
+
+  @override
+  String marineLife_species_delete_inUseError(String name) {
+    return 'לא ניתן למחוק את \"$name\" - יש לו תצפיות';
+  }
+
+  @override
+  String marineLife_species_delete_snackbar(String name) {
+    return '\"$name\" נמחק';
+  }
+
+  @override
+  String marineLife_species_delete_error(String error) {
+    return 'שגיאה במחיקת המין: $error';
+  }
 }

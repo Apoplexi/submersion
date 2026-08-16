@@ -3,7 +3,6 @@ import 'dart:typed_data';
 
 import 'package:cryptography/cryptography.dart';
 import 'package:intl/intl.dart';
-import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:sqlite3/sqlite3.dart' as sqlite3;
@@ -15,9 +14,10 @@ import 'package:submersion/core/services/cloud_storage/cloud_storage_provider.da
 import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/core/services/sync/changeset_log/sync_temp_dir.dart';
 import 'package:submersion/core/services/sync/crypto/encryption_key_store.dart';
-import 'package:submersion/core/services/sync/library_epoch.dart';
 import 'package:submersion/core/services/sync/library_epoch_store.dart';
+import 'package:submersion/core/services/sync/library_replace_intent.dart';
 import 'package:submersion/core/services/sync/post_restore_sync_store.dart';
+import 'package:submersion/core/services/sync/sync_device_metadata.dart';
 import 'package:submersion/core/services/sync/sync_preferences.dart';
 import 'package:submersion/features/backup/data/services/backup_crypto.dart';
 import 'package:submersion/features/backup/data/services/backup_encryption_key_store.dart';
@@ -232,8 +232,16 @@ class BackupService {
     if (settings.cloudBackupEnabled && _cloudProvider != null) {
       try {
         cloudFileId = await _uploadToCloud(ref, storedName);
-        location = BackupLocation.both;
-        _log.info('Backup uploaded to cloud: $cloudFileId');
+        // Only a real file id means a cloud copy exists: the upload also
+        // gives up (returning null) when the backup folder is unreachable,
+        // and history that claims `both` with no id sends restore looking
+        // for a file that was never written.
+        if (cloudFileId != null) {
+          location = BackupLocation.both;
+          _log.info('Backup uploaded to cloud: $cloudFileId');
+        } else {
+          _log.warning('Cloud upload skipped, backup is local-only');
+        }
       } catch (e, stack) {
         _log.error(
           'Cloud upload failed, backup is local-only',
@@ -828,34 +836,10 @@ class BackupService {
       _log.warning('Replace mode requested but no epoch store is configured');
       return;
     }
-    String deviceId;
-    try {
-      deviceId = await _syncRepository.getDeviceId();
-    } catch (_) {
-      // Non-empty sentinel: the marker's origin is shown in peer banners
-      // and dialogs, so it must always be displayable.
-      deviceId = 'unknown';
-    }
-    String? deviceName;
-    try {
-      deviceName = Platform.localHostname;
-    } catch (_) {
-      deviceName = null;
-    }
-    String? appVersion;
-    try {
-      appVersion = (await PackageInfo.fromPlatform()).version;
-    } catch (_) {
-      appVersion = null;
-    }
-    final marker = LibraryEpochMarker(
-      epochId: _uuid.v4(),
-      replacedAt: DateTime.now().millisecondsSinceEpoch,
-      deviceId: deviceId,
-      deviceName: deviceName,
-      appVersion: appVersion,
-    );
-    await store.setPendingReplace(marker);
+    final marker = await LibraryReplaceIntent(
+      SyncDeviceMetadata(_syncRepository).resolve,
+      store,
+    ).mint();
     _log.info('Minted pending library replace (epoch ${marker.epochId})');
   }
 
@@ -1081,7 +1065,39 @@ class BackupService {
       // filesystem path -- SAF content:// locations were already handled
       // above). Security-scoped bookmarks are an Apple-only concept, so a bare
       // custom filesystem path here persists and works without scoping.
-      return BackupDirLease(await _ensureDir(custom), _noRelease);
+      try {
+        return BackupDirLease(await _ensureDir(custom), _noRelease);
+      } on FileSystemException {
+        // The stored path is not a directory this process can create or reach:
+        // an ejected SD card or unmounted network share, or a path fabricated
+        // by file_picker from a SAF tree whose document id has no
+        // "volume:path" shape. A Google Drive pick yields
+        // "/storage/emulated/0/acc=2;doc=encoded=...", which is not a
+        // content:// ref (so the guard above misses it) and which scoped
+        // storage refuses to mkdir with errno 13.
+        //
+        // Self-heal rather than propagate, matching the Apple dead-bookmark
+        // and revoked SAF-grant branches: clearing the location stops it being
+        // retried and makes the settings subtitle revert, signaling a re-pick
+        // is needed.
+        //
+        // Both callers need this to be total. Normal backups arrive via
+        // resolveBackupTargetLeased, and would otherwise throw on every
+        // scheduled and manual run for as long as the location stays dead. The
+        // pre-migration safety copy arrives through a provider that
+        // PreMigrationBackupService invokes inside its fallback guard, so an
+        // escaping exception is recoverable there today -- but only because
+        // StartupPage resolves lazily. When it resolved eagerly the throw
+        // landed outside that guard, surfaced as a bare FileSystemException
+        // instead of a BackupFailedException, and stranded startup on the
+        // terminal "Database upgrade failed" screen, which offers no route
+        // back into settings to correct the location.
+        await preferences.setBackupLocation(null);
+        return BackupDirLease(
+          await resolveDefaultBackupsDirectory(),
+          _noRelease,
+        );
+      }
     }
     final port = bookmarks ?? const _DefaultBackupBookmarkPort();
     final bytes = preferences.getBackupLocationBookmark();

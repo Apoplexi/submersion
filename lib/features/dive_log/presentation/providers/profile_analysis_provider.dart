@@ -37,6 +37,9 @@ final metricSourceInfoProvider = StateProvider<MetricSourceInfo?>(
 final diveComputerEventsProvider =
     FutureProvider.family<List<ProfileEvent>, String>((ref, diveId) async {
       final repository = ref.watch(diveComputerRepositoryProvider);
+      ref.invalidateSelfWhen(
+        ref.watch(diveRepositoryProvider).watchDiveDetailChanges(),
+      );
       final dbEvents = await repository.getEventsForDive(diveId);
       return dbEvents.map(mapDiveProfileEventToProfileEvent).toList();
     });
@@ -1347,9 +1350,14 @@ final weeklyOtuProvider = FutureProvider.family<double, String>((
   ref,
   diveId,
 ) async {
+  final repository = ref.watch(diveRepositoryProvider);
+  // Sums OTU across every dive in the surrounding week, so it goes stale when
+  // ANY of those dives is added or removed -- not just this one. The rest of
+  // the file subscribes to watchDiveDetailChanges; this needs the wider dives
+  // tick, or the "Prior" figure keeps counting a merged-away same-week dive
+  // after the rest of the page has refreshed (issue #974).
+  ref.invalidateSelfWhen(repository.watchDivesChanges());
   try {
-    final repository = ref.watch(diveRepositoryProvider);
-
     final currentDive = await repository.getDiveTimes(diveId);
     if (currentDive == null) return 0.0;
 

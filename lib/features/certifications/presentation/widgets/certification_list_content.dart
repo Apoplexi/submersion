@@ -3,7 +3,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
+import 'package:submersion/features/certifications/domain/certification_title.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
+import 'package:submersion/shared/selection/selectable_list_scope.dart';
+import 'package:submersion/shared/selection/selection_leading.dart';
+import 'package:submersion/shared/selection/selection_app_bar.dart';
+import 'package:submersion/shared/selection/selection_entry_bar.dart';
+import 'package:submersion/shared/selection/selection_controller.dart';
+import 'package:submersion/shared/selection/selection_state.dart';
 import 'package:submersion/core/constants/list_view_mode.dart';
 import 'package:submersion/core/constants/sort_options.dart';
 import 'package:submersion/core/models/sort_state.dart';
@@ -40,6 +47,13 @@ class CertificationListContent extends ConsumerStatefulWidget {
 
 class _CertificationListContentState
     extends ConsumerState<CertificationListContent> {
+  /// Owns the bulk-selection state machine for this list.
+  final SelectionController _selection = SelectionController();
+
+  /// Convenience mirrors of the controller, so the widget tree reads clearly.
+  bool get _isSelectionMode => _selection.value.isActive;
+  Set<String> get _selectedIds => _selection.value.checkedIds;
+
   final ScrollController _scrollController = ScrollController();
   String? _lastScrolledToId;
   bool _selectionFromList = false;
@@ -57,6 +71,7 @@ class _CertificationListContentState
   @override
   void dispose() {
     _scrollController.dispose();
+    _selection.dispose();
     super.dispose();
   }
 
@@ -125,79 +140,131 @@ class _CertificationListContentState
 
     final sort = ref.watch(certificationSortProvider);
 
-    final content = certificationsAsync.when(
-      data: (certifications) {
-        final sorted = applyCertificationSorting(certifications, sort);
-        return sorted.isEmpty
-            ? _buildEmptyState(context)
-            : _buildCertificationList(context, ref, sorted);
-      },
-      loading: () => const Center(child: CircularProgressIndicator()),
-      error: (error, stack) => _buildErrorState(context, error),
+    final visibleCerts = applyCertificationSorting(
+      certificationsAsync.value ?? const [],
+      sort,
     );
+    final visibleIds = visibleCerts.map((c) => c.id).toList();
 
-    if (!widget.showAppBar) {
-      return Column(
-        children: [
-          _buildCompactAppBar(context),
-          Expanded(child: content),
-        ],
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _selection.pruneTo(visibleIds);
+    });
+
+    // Built inside the selection listener below so rows re-render as checks
+    // change; computing it here would leave the list frozen mid-selection.
+    Widget buildContent() {
+      return certificationsAsync.when(
+        data: (certifications) {
+          final sorted = applyCertificationSorting(certifications, sort);
+          return sorted.isEmpty
+              ? _buildEmptyState(context)
+              : _buildCertificationList(context, ref, sorted);
+        },
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (error, stack) => _buildErrorState(context, error),
       );
     }
 
-    return Scaffold(
-      appBar: AppBar(
-        title: FeatureAppBarTitle(
-          featureId: 'certifications',
-          title: context.l10n.certifications_appBar_title,
+    if (!widget.showAppBar) {
+      return SelectableListScope(
+        controller: _selection,
+        selectableIds: visibleIds,
+        child: ValueListenableBuilder<SelectionState>(
+          valueListenable: _selection,
+          builder: (context, selection, _) => Column(
+            children: [
+              selection.isActive
+                  ? _buildSelectionBar(visibleCerts, SelectionBarShell.pane)
+                  : _buildCompactAppBar(context),
+              Expanded(child: buildContent()),
+            ],
+          ),
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.wallet),
-            tooltip: context.l10n.certifications_list_tooltip_walletView,
-            onPressed: () => context.push('/certifications/wallet'),
-          ),
-          IconButton(
-            icon: const Icon(Icons.sort),
-            tooltip: context.l10n.certifications_list_tooltip_sort,
-            onPressed: () => _showSortSheet(context),
-          ),
-          IconButton(
-            icon: const Icon(Icons.search),
-            tooltip: context.l10n.certifications_list_tooltip_search,
-            onPressed: () {
-              showSearch(
-                context: context,
-                delegate: CertificationSearchDelegate(ref),
-              );
-            },
-          ),
-          PopupMenuButton<String>(
-            icon: const Icon(Icons.more_vert),
-            onSelected: (value) {
-              if (value.startsWith('view_')) {
-                final mode = ListViewMode.fromName(
-                  value.replaceFirst('view_', ''),
-                );
-                ref.read(certificationListViewModeProvider.notifier).state =
-                    mode;
-              }
-            },
-            itemBuilder: (context) {
-              final currentMode = ref.read(certificationListViewModeProvider);
-              return [
-                ...ListViewModeToggle.menuItems(
-                  context,
-                  currentMode: currentMode,
-                  modes: const [ListViewMode.detailed, ListViewMode.table],
+      );
+    }
+
+    return SelectableListScope(
+      controller: _selection,
+      selectableIds: visibleIds,
+      child: ValueListenableBuilder<SelectionState>(
+        valueListenable: _selection,
+        builder: (context, selection, _) => Scaffold(
+          appBar: selection.isActive
+              ? _buildSelectionBar(visibleCerts, SelectionBarShell.appBar)
+              : AppBar(
+                  title: FeatureAppBarTitle(
+                    featureId: 'certifications',
+                    title: context.l10n.certifications_appBar_title,
+                  ),
+                  actions: [
+                    IconButton(
+                      icon: const Icon(Icons.wallet),
+                      tooltip:
+                          context.l10n.certifications_list_tooltip_walletView,
+                      onPressed: () => context.push('/certifications/wallet'),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.sort),
+                      tooltip: context.l10n.certifications_list_tooltip_sort,
+                      onPressed: () => _showSortSheet(context),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.search),
+                      tooltip: context.l10n.certifications_list_tooltip_search,
+                      onPressed: () {
+                        showSearch(
+                          context: context,
+                          delegate: CertificationSearchDelegate(ref),
+                        );
+                      },
+                    ),
+                    // The only way into bulk actions: entry by long-press was removed,
+                    // so nothing but this control opens selection mode on touch.
+                    IconButton(
+                      key: const ValueKey('enter_selection'),
+                      icon: const Icon(Icons.checklist),
+                      tooltip: context.l10n.common_selection_enterTooltip,
+                      onPressed: _selection.enterExplicit,
+                    ),
+                    PopupMenuButton<String>(
+                      icon: const Icon(Icons.more_vert),
+                      onSelected: (value) {
+                        if (value.startsWith('view_')) {
+                          final mode = ListViewMode.fromName(
+                            value.replaceFirst('view_', ''),
+                          );
+                          ref
+                                  .read(
+                                    certificationListViewModeProvider.notifier,
+                                  )
+                                  .state =
+                              mode;
+                        }
+                      },
+                      itemBuilder: (context) {
+                        final currentMode = ref.read(
+                          certificationListViewModeProvider,
+                        );
+                        return [
+                          ...ListViewModeToggle.menuItems(
+                            context,
+                            currentMode: currentMode,
+                            modes: const [
+                              ListViewMode.detailed,
+                              ListViewMode.table,
+                            ],
+                          ),
+                        ];
+                      },
+                    ),
+                  ],
                 ),
-              ];
-            },
-          ),
-        ],
+          body: buildContent(),
+          floatingActionButton: selection.isActive
+              ? null
+              : widget.floatingActionButton,
+        ),
       ),
-      body: content,
-      floatingActionButton: widget.floatingActionButton,
     );
   }
 
@@ -205,13 +272,117 @@ class _CertificationListContentState
   ///
   /// When embedded inside [TableModeLayout] (showAppBar: false), provides
   /// only the compact app bar and the table content.
+  /// Certifications offer no extras beyond the baseline.
+  ///
+  /// The detail page exposes only edit and delete, so there is no other
+  /// single-item action to lift into a bulk one.
+  SelectionAppBar _buildSelectionBar(
+    List<Certification> certs,
+    SelectionBarShell shell,
+  ) {
+    return SelectionAppBar(
+      controller: _selection,
+      selectableIds: certs.map((c) => c.id).toList(),
+      actions: const [],
+      shell: shell,
+      onDelete: _confirmAndDelete,
+    );
+  }
+
+  /// One tap policy for every certification row.
+  void _handleRowTap(Certification cert) {
+    if (SelectableListScope.isModifierPressed()) {
+      _selection.enterImplicit(cert.id);
+      return;
+    }
+    if (_isSelectionMode) {
+      _selection.toggle(cert.id);
+      return;
+    }
+    _handleItemTap(cert);
+  }
+
+  Future<void> _confirmAndDelete() async {
+    final ids = _selectedIds.toList();
+    if (ids.isEmpty) return;
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(ctx.l10n.common_bulkDelete_title(ids.length)),
+        content: Text(ctx.l10n.common_bulkDelete_body),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: Text(ctx.l10n.common_action_cancel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            style: FilledButton.styleFrom(
+              backgroundColor: Theme.of(ctx).colorScheme.error,
+            ),
+            child: Text(ctx.l10n.common_action_delete),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+
+    final messenger = ScaffoldMessenger.of(context);
+    final notifier = ref.read(certificationListNotifierProvider.notifier);
+    _selection.exit();
+    for (final id in ids) {
+      await notifier.deleteCertification(id);
+    }
+    if (!mounted) return;
+    messenger.showSnackBar(
+      SnackBar(
+        content: Text(context.l10n.common_bulkDelete_snackbar(ids.length)),
+      ),
+    );
+  }
+
   Widget _buildTableModeScaffold(
     BuildContext context,
     AsyncValue<List<Certification>> certificationsAsync,
   ) {
-    final tableContent = _buildTableView(context, certificationsAsync);
+    final visibleIds = (certificationsAsync.value ?? const <Certification>[])
+        .map((c) => c.id)
+        .toList();
 
-    return tableContent;
+    // Same pruning the list path does: drop checked certifications that fell
+    // out of the visible list, so the count matches what is on screen.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _selection.pruneTo(visibleIds);
+    });
+
+    // The scope carries Escape, Ctrl/Cmd-A and the Android back handling, and
+    // the builder is what repaints the table as checks change -- the table is
+    // built inside it for that reason.
+    return SelectableListScope(
+      controller: _selection,
+      selectableIds: visibleIds,
+      child: ValueListenableBuilder<SelectionState>(
+        valueListenable: _selection,
+        builder: (context, selection, _) {
+          final certifications =
+              certificationsAsync.value ?? const <Certification>[];
+          // Table mode has no app bar of its own, so both bars live here: the
+          // contextual one while selecting, and the Select affordance while
+          // not. They share a slot and a height, so the table does not shift
+          // as the mode opens.
+          return Column(
+            children: [
+              if (selection.isActive)
+                _buildSelectionBar(certifications, SelectionBarShell.pane)
+              else
+                SelectionEntryBar(controller: _selection),
+              Expanded(child: _buildTableView(context, certificationsAsync)),
+            ],
+          );
+        },
+      ),
+    );
   }
 
   /// Build the [EntityTableView] for certification table mode.
@@ -242,12 +413,14 @@ class _CertificationListContentState
           onEntityTapDown: (id) {
             ref.read(highlightedCertificationIdProvider.notifier).state = id;
           },
-          onEntityTap: (id) {},
+          onEntityTap: (id) {
+            if (_isSelectionMode) _selection.toggle(id);
+          },
           onEntityDoubleTap: (id) {
             context.push('/certifications/$id');
           },
-          selectedIds: const {},
-          isSelectionMode: false,
+          selectedIds: _selectedIds,
+          isSelectionMode: _isSelectionMode,
           highlightedId: ref.watch(highlightedCertificationIdProvider),
         );
       },
@@ -269,12 +442,15 @@ class _CertificationListContentState
       child: Row(
         children: [
           const SizedBox(width: 8),
-          FeatureAppBarTitle(
-            featureId: 'certifications',
-            title: context.l10n.certifications_appBar_title,
-            style: Theme.of(
-              context,
-            ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
+          // Flexible so the title yields before the action row overflows.
+          Flexible(
+            child: FeatureAppBarTitle(
+              featureId: 'certifications',
+              title: context.l10n.certifications_appBar_title,
+              style: Theme.of(
+                context,
+              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
+            ),
           ),
           const Spacer(),
           IconButton(
@@ -296,6 +472,14 @@ class _CertificationListContentState
                 delegate: CertificationSearchDelegate(ref),
               );
             },
+          ),
+          // The only way into bulk actions: entry by long-press was removed,
+          // so nothing but this control opens selection mode on touch.
+          IconButton(
+            key: const ValueKey('enter_selection'),
+            icon: const Icon(Icons.checklist, size: 20),
+            tooltip: context.l10n.common_selection_enterTooltip,
+            onPressed: _selection.enterExplicit,
           ),
           PopupMenuButton<String>(
             icon: const Icon(Icons.more_vert, size: 20),
@@ -384,7 +568,10 @@ class _CertificationListContentState
                 certification: cert,
                 isSelected:
                     widget.selectedId == cert.id || highlightedId == cert.id,
-                onTap: () => _handleItemTap(cert),
+                onTap: () => _handleRowTap(cert),
+                isSelectionMode: _isSelectionMode,
+                isChecked: _selectedIds.contains(cert.id),
+                onCheckChanged: (_) => _selection.toggle(cert.id),
               ),
             ),
           ],
@@ -399,7 +586,10 @@ class _CertificationListContentState
                 certification: cert,
                 isSelected:
                     widget.selectedId == cert.id || highlightedId == cert.id,
-                onTap: () => _handleItemTap(cert),
+                onTap: () => _handleRowTap(cert),
+                isSelectionMode: _isSelectionMode,
+                isChecked: _selectedIds.contains(cert.id),
+                onCheckChanged: (_) => _selection.toggle(cert.id),
               ),
             ),
           ],
@@ -414,7 +604,10 @@ class _CertificationListContentState
                 certification: cert,
                 isSelected:
                     widget.selectedId == cert.id || highlightedId == cert.id,
-                onTap: () => _handleItemTap(cert),
+                onTap: () => _handleRowTap(cert),
+                isSelectionMode: _isSelectionMode,
+                isChecked: _selectedIds.contains(cert.id),
+                onCheckChanged: (_) => _selection.toggle(cert.id),
               ),
             ),
           ],
@@ -514,12 +707,18 @@ class CertificationListTile extends StatelessWidget {
   final Certification certification;
   final bool isSelected;
   final VoidCallback? onTap;
+  final bool isSelectionMode;
+  final bool isChecked;
+  final ValueChanged<bool>? onCheckChanged;
 
   const CertificationListTile({
     super.key,
     required this.certification,
     this.isSelected = false,
     this.onTap,
+    this.isSelectionMode = false,
+    this.isChecked = false,
+    this.onCheckChanged,
   });
 
   @override
@@ -536,8 +735,12 @@ class CertificationListTile extends StatelessWidget {
         : '';
 
     return Semantics(
+      // Keep the agency: this label stands in for the whole tile, so dropping
+      // it would leave "Open Water" with no issuing agency. The title is
+      // derived rather than raw so the agency is not said twice.
       label:
-          '${certification.agency.displayName} ${certification.name}$issueDateLabel$statusLabel',
+          '${certification.agency.displayName} '
+          '${certificationTitle(certification)}$issueDateLabel$statusLabel',
       child: Card(
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
         color: isSelected
@@ -545,8 +748,13 @@ class CertificationListTile extends StatelessWidget {
             : null,
         child: ListTile(
           onTap: onTap,
-          leading: _buildLeadingIcon(context),
-          title: Text(certification.name),
+          leading: SelectionLeading(
+            isSelectionMode: isSelectionMode,
+            isChecked: isChecked,
+            onChanged: onCheckChanged,
+            child: _buildLeadingIcon(context),
+          ),
+          title: Text(certificationTitle(certification)),
           subtitle: _buildSubtitle(context),
           trailing: _buildTrailing(context),
         ),

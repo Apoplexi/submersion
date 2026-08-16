@@ -9,6 +9,12 @@ import 'package:submersion/features/media/presentation/providers/media_resolver_
 import 'package:submersion/features/media/presentation/widgets/unavailable_media_placeholder.dart';
 import 'package:submersion/features/media_store/presentation/providers/media_store_providers.dart';
 
+/// Decode target used when a caller asks for a [MediaItemView.thumbnail]
+/// without naming a size. Matches the largest tile in the app (the media
+/// grid), so it is safe for any of them and still two orders of magnitude
+/// cheaper than the original.
+const Size kDefaultThumbnailTarget = Size(200, 200);
+
 /// Universal display widget for any [MediaItem] regardless of its source
 /// type.
 ///
@@ -31,7 +37,13 @@ import 'package:submersion/features/media_store/presentation/providers/media_sto
 class MediaItemView extends ConsumerStatefulWidget {
   final MediaItem item;
   final BoxFit fit;
+
+  /// Decode target for [thumbnail] requests. Defaults to
+  /// [kDefaultThumbnailTarget]; ignored when [thumbnail] is false.
   final Size? targetSize;
+
+  /// Whether this view only ever draws a tile. Thumbnail requests never touch
+  /// the full-resolution original, with or without a [targetSize].
   final bool thumbnail;
 
   const MediaItemView({
@@ -54,7 +66,18 @@ class MediaItemView extends ConsumerStatefulWidget {
 /// the video down to discover that is exactly what the resolver declines to
 /// do. Carried alongside the data rather than folded into it so the resolver
 /// contract stays a plain "bytes or a reason".
-typedef _Resolution = ({MediaSourceData data, bool videoPosterMissing});
+///
+/// [documentRenderable] marks a document resolution whose bytes are an
+/// IMAGE rather than the document itself — a page-1 render, produced either
+/// locally by [PdfThumbnailService] or by the upload pipeline and served
+/// back as the store's THUMB. Every other document resolution (local
+/// original, store original) is raw document bytes that Image widgets
+/// cannot decode, and draws the placeholder instead.
+typedef _Resolution = ({
+  MediaSourceData data,
+  bool videoPosterMissing,
+  bool documentRenderable,
+});
 
 class _MediaItemViewState extends ConsumerState<MediaItemView> {
   late Future<_Resolution> _future;
@@ -91,14 +114,45 @@ class _MediaItemViewState extends ConsumerState<MediaItemView> {
   Future<_Resolution> _resolve() async {
     final registry = ref.read(mediaSourceResolverRegistryProvider);
     final resolver = registry.resolverFor(widget.item.sourceType);
-    final native = widget.thumbnail && widget.targetSize != null
+    // A PDF tile draws page 1. Rendering is the only way raw document bytes
+    // become an image, and doing it here rather than in the resolver keeps
+    // resolveThumbnail's contract intact -- ThumbnailGenerator calls it
+    // expecting the PDF itself to feed to the same renderer. Cache-first
+    // inside the service, so the source read (on Android, the whole file
+    // back across a platform channel) happens once per document instead of
+    // once per tile that scrolls into view.
+    if (widget.thumbnail && widget.item.isPdf) {
+      final page1 = await ref
+          .read(pdfThumbnailServiceProvider)
+          .thumbFor(widget.item, source: () => resolver.resolve(widget.item));
+      if (page1 != null) {
+        return (
+          data: BytesData(bytes: page1),
+          videoPosterMissing: false,
+          documentRenderable: true,
+        );
+      }
+      // No local render (bytes unavailable here, or an unreadable PDF):
+      // fall through, which reaches the store's own page-1 thumb below.
+    }
+    // [thumbnail] alone decides the path. Requiring a [targetSize] too made
+    // the flag a silent no-op wherever one was omitted, and the fallback is
+    // the full-resolution original: for a gallery item, AssetEntity
+    // .originBytes, decoded at native resolution because the Image widgets
+    // below carry no cacheWidth. A screenful of 12 MP originals behind
+    // 128 px tiles is enough for iOS to kill the app.
+    final native = widget.thumbnail
         ? await resolver.resolveThumbnail(
             widget.item,
-            target: widget.targetSize!,
+            target: widget.targetSize ?? kDefaultThumbnailTarget,
           )
         : await resolver.resolve(widget.item);
     if (native is! UnavailableData) {
-      return (data: native, videoPosterMissing: false);
+      return (
+        data: native,
+        videoPosterMissing: false,
+        documentRenderable: false,
+      );
     }
     // Media store fallback (design spec section 10): only engages when the
     // native source cannot produce bytes on this device and the row is
@@ -119,19 +173,41 @@ class _MediaItemViewState extends ConsumerState<MediaItemView> {
             widget.item.remoteCompressedUploadedAt != null ||
             (widget.thumbnail && widget.item.remoteThumbUploadedAt != null));
     if (!storeConfirmed) {
-      return (data: native, videoPosterMissing: false);
+      return (
+        data: native,
+        videoPosterMissing: false,
+        documentRenderable: false,
+      );
     }
     try {
       final runtime = await ref.read(mediaStoreRuntimeProvider.future);
       // No store on this device: the row's stamps say the bytes exist
       // somewhere, but nothing here can reach them, so the native
       // placeholder is the honest answer.
-      if (runtime == null) return (data: native, videoPosterMissing: false);
+      if (runtime == null) {
+        return (
+          data: native,
+          videoPosterMissing: false,
+          documentRenderable: false,
+        );
+      }
       final remote = await runtime.resolver.tryResolveRemote(
         widget.item,
         thumbnail: widget.thumbnail,
       );
-      if (remote != null) return (data: remote, videoPosterMissing: false);
+      if (remote != null) {
+        return (
+          data: remote,
+          videoPosterMissing: false,
+          // Not "the request was a thumbnail": a thumbnail request whose
+          // thumb object is missing or unfetchable degrades to the ORIGINAL
+          // (see MediaStoreResolver.tryResolveRemote), and for a document
+          // that original is the PDF. Only the store knows which of the two
+          // it handed back, and isPoster is how it says so.
+          documentRenderable:
+              widget.thumbnail && remote is FileData && remote.isPoster,
+        );
+      }
       // The movie tile claims something specific -- this video has no poster
       // frame -- so it is shown only when that is what happened: the store
       // holds the item, no thumb was ever stamped, and the resolver therefore
@@ -145,9 +221,14 @@ class _MediaItemViewState extends ConsumerState<MediaItemView> {
             widget.thumbnail &&
             widget.item.isVideo &&
             widget.item.remoteThumbUploadedAt == null,
+        documentRenderable: false,
       );
     } catch (_) {
-      return (data: native, videoPosterMissing: false);
+      return (
+        data: native,
+        videoPosterMissing: false,
+        documentRenderable: false,
+      );
     }
   }
 
@@ -169,6 +250,11 @@ class _MediaItemViewState extends ConsumerState<MediaItemView> {
           return const _VideoThumbnailPlaceholder();
         }
         final data = resolution.data;
+        // A document resolves to raw document bytes (PDF, docx, ...), which
+        // the Image widgets cannot decode. The renderable exception is a
+        // PDF's page-1 image: rendered here for a tile, or served as the
+        // store's THUMB when this device cannot read the PDF itself.
+        final documentRenderable = resolution.documentRenderable;
         // Bound the DECODE, not just the layout. Photo resolvers hand back the
         // original file, so an unbounded Image.file holds a full-resolution
         // bitmap (a 12 MP JPEG is ~48 MB RGBA) for as long as the tile has a
@@ -184,6 +270,10 @@ class _MediaItemViewState extends ConsumerState<MediaItemView> {
             : (target.longestSide * MediaQuery.devicePixelRatioOf(context))
                   .round();
         return switch (data) {
+          FileData() when widget.item.isDocument && !documentRenderable =>
+            _DocumentThumbnailPlaceholder(item: widget.item),
+          BytesData() when widget.item.isDocument && !documentRenderable =>
+            _DocumentThumbnailPlaceholder(item: widget.item),
           // A video normally resolves to the raw video file, which Image.file
           // cannot decode. Show a placeholder instead of surfacing an
           // "Invalid image data" exception. A poster frame is the exception:
@@ -226,6 +316,45 @@ class _ShimmerThumbnail extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       color: Theme.of(context).colorScheme.surfaceContainerHighest,
+    );
+  }
+}
+
+/// Neutral tile shown for document attachments, whose raw bytes the Image
+/// widgets cannot render. The grid stacks its extension badge over this.
+class _DocumentThumbnailPlaceholder extends StatelessWidget {
+  final MediaItem item;
+  const _DocumentThumbnailPlaceholder({required this.item});
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return ColoredBox(
+      color: scheme.surfaceContainerHighest,
+      child: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              item.isPdf
+                  ? Icons.picture_as_pdf_outlined
+                  : Icons.description_outlined,
+              color: scheme.onSurfaceVariant,
+            ),
+            if (item.originalFilename != null)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 4),
+                child: Text(
+                  item.originalFilename!,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                    color: scheme.onSurfaceVariant,
+                  ),
+                ),
+              ),
+          ],
+        ),
+      ),
     );
   }
 }

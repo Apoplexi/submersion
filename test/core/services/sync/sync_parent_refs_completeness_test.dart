@@ -20,7 +20,6 @@ void main() {
     'dives': 'dives',
     'diver_settings': 'diverSettings',
     'buddies': 'buddies',
-    'buddy_roles': 'buddyRoles',
     'dive_centers': 'diveCenters',
     'trips': 'trips',
     'liveaboard_detail_records': 'liveaboardDetails',

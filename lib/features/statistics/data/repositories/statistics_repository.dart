@@ -1,9 +1,13 @@
 import 'package:drift/drift.dart';
 
 import 'package:submersion/core/database/database.dart';
+import 'package:submersion/core/deco/ascent_rate_calculator.dart';
+import 'package:submersion/core/domain/visibility/visibility_scale.dart';
 import 'package:submersion/core/services/database_service.dart';
 import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/core/utils/gas_compressibility.dart';
+import 'package:submersion/core/utils/stream_debounce.dart';
+import 'package:submersion/features/dive_log/data/repositories/dive_repository_impl.dart';
 import 'package:submersion/features/dive_log/domain/models/dive_filter_state.dart';
 import 'package:submersion/features/statistics/data/dive_filter_sql.dart';
 import 'package:submersion/features/statistics/domain/entities/species_statistics.dart';
@@ -57,6 +61,75 @@ class DistributionSegment {
 class StatisticsRepository {
   AppDatabase get _db => DatabaseService.instance.database;
   final _log = LoggerService.forClass(StatisticsRepository);
+
+  /// Emits whenever any table the statistics queries read is written, so every
+  /// statistics provider refreshes after a merge, a bulk delete, an import, or
+  /// a sync pull -- none of which go through a notifier.
+  ///
+  /// Broader than [DiveRepository.watchDivesChanges] because the aggregate SQL
+  /// joins well beyond the `dives` table: `dive_tanks` and
+  /// `tank_pressure_profiles` carry all of the SAC math, `sightings`/`species`
+  /// the marine-life stats, `dive_sites`/`dive_centers`/`trips` the geographic
+  /// stats. Subscribing only to the dives tick would leave every SAC chart
+  /// stale after a sync applied a tank-pressure-only changeset, which never
+  /// touches the `dives` row.
+  ///
+  /// Narrower than [DiveRepository.watchDiveDetailChanges], which also fires on
+  /// media, tide records, and safety findings that no statistic reads.
+  ///
+  /// Replaces `statisticsVersionProvider`, a counter incremented from exactly
+  /// one line in the app (inside `PaginatedDiveListNotifier`), which merge,
+  /// consolidate, import, and sync never reached (issue #974).
+  ///
+  /// [DiveRepository.changeTickDebounce]-debounced so a multi-changeset sync
+  /// recomputes the charts once on the settled state rather than once per
+  /// intermediate commit.
+  Stream<void> watchStatisticsChanges() => _db
+      .tableUpdates(
+        TableUpdateQuery.allOf([
+          TableUpdateQuery.onTable(_db.dives),
+          TableUpdateQuery.onTable(_db.diveProfiles),
+          TableUpdateQuery.onTable(_db.diveTanks),
+          TableUpdateQuery.onTable(_db.tankPressureProfiles),
+          TableUpdateQuery.onTable(_db.diveEquipment),
+          TableUpdateQuery.onTable(_db.equipment),
+          TableUpdateQuery.onTable(_db.diveWeights),
+          TableUpdateQuery.onTable(_db.diveDiveTypes),
+          TableUpdateQuery.onTable(_db.diveBuddies),
+          TableUpdateQuery.onTable(_db.buddies),
+          TableUpdateQuery.onTable(_db.sightings),
+          TableUpdateQuery.onTable(_db.species),
+          TableUpdateQuery.onTable(_db.diveSites),
+          TableUpdateQuery.onTable(_db.diveCenters),
+          TableUpdateQuery.onTable(_db.trips),
+        ]),
+      )
+      .debounce(DiveRepository.changeTickDebounce);
+
+  /// Smoothing interval used by [getAscentDescentRates], in seconds.
+  ///
+  /// Kept in sync with the per-dive calculator's configured target interval so
+  /// the two cannot drift apart on how much of a profile they smooth over. The
+  /// filters themselves differ: [AscentRateCalculator] takes an overlapping,
+  /// centred moving average over point-to-point rates (window rounded to an odd
+  /// count of samples, minimum three), while this query averages depth into
+  /// fixed non-overlapping buckets and differences consecutive bucket means.
+  /// Both suppress the same short-timescale noise; neither is a reimplementation
+  /// of the other, and their per-profile outputs are close but not identical.
+  static const int _rateWindowSeconds =
+      AscentRateCalculator.defaultSmoothingWindowSeconds;
+
+  /// Slowest vertical rate that counts as ascending or descending rather than
+  /// working a multi-level profile, in m/min.
+  ///
+  /// A recreational profile spends most of its windows drifting slowly around
+  /// the bottom: on a representative library, windows in the 0.5-3 m/min band
+  /// outnumber genuine transit roughly four to one. Averaging those in drags
+  /// both figures down to around 2.4 m/min, which tells a diver nothing and is
+  /// not comparable to the ascent-rate limits they are trained against. Only
+  /// counting sustained movement keeps the card answering "how fast do I
+  /// actually go up and down".
+  static const double _sustainedTransitThreshold = 3.0;
 
   /// Builds the `AND <alias>.id IN (<subquery>)` fragment + raw params for a
   /// stats filter. Empty (no-op) when the filter has no active axes.
@@ -967,36 +1040,83 @@ class StatisticsRepository {
   // Conditions & Environment Statistics
   // ============================================================================
 
-  /// Get visibility distribution
+  /// Get visibility distribution, binned by the diver's calibration.
+  ///
+  /// The calibration thresholds are passed into SQL as variables, so SQLite
+  /// still does the aggregation and only the handful of grouped rows cross
+  /// into Dart. Changing the calibration re-bins the same dives, which is the
+  /// whole point of storing a measurement rather than a judgment.
+  ///
+  /// Labels are stable keys, not display text: a measured dive yields the
+  /// [VisibilityBand] name, and a pre-v144 dive yields `legacy_<bucket>`. The
+  /// two never merge, because a bucket does not say where in its range the
+  /// dive fell, so it cannot be assigned a calibrated adjective. The page
+  /// turns these keys into localized text.
   Future<List<DistributionSegment>> getVisibilityDistribution({
+    required VisibilityScale scale,
     String? diverId,
     DiveFilterState filter = const DiveFilterState(),
   }) async {
     try {
       final diverFilter = diverId != null ? 'AND diver_id = ?' : '';
       final df = _diveFilter(filter, alias: 'dives');
-      final params = diverId != null ? [diverId, ...df.params] : [...df.params];
+      // Threshold variables come first: they appear before the diver and
+      // filter placeholders in the statement below, and Drift binds
+      // positionally.
+      final scaleParams = [
+        scale.excellentAtOrAboveM,
+        scale.goodAtOrAboveM,
+        scale.moderateAtOrAboveM,
+      ];
+      final params = diverId != null
+          ? [...scaleParams, diverId, ...df.params]
+          : [...scaleParams, ...df.params];
 
       final results = await _db.customSelect('''
-        SELECT
-          visibility,
-          COUNT(*) AS count
-        FROM dives
-        WHERE visibility IS NOT NULL AND visibility != '' $diverFilter ${df.clause}
-        GROUP BY visibility
-        ORDER BY count DESC
+        SELECT bucket, COUNT(*) AS count FROM (
+          SELECT CASE
+            WHEN visibility_meters IS NOT NULL THEN
+              CASE
+                WHEN visibility_meters >= ? THEN 'excellent'
+                WHEN visibility_meters >= ? THEN 'good'
+                WHEN visibility_meters >= ? THEN 'moderate'
+                ELSE 'poor'
+              END
+            ELSE 'legacy_' || visibility
+          END AS bucket
+          FROM dives
+          WHERE (
+            visibility_meters IS NOT NULL
+            OR (visibility IS NOT NULL AND visibility != '')
+          ) $diverFilter ${df.clause}
+        )
+        GROUP BY bucket
         ''', variables: params.map((p) => Variable(p)).toList()).get();
 
-      final total = results.fold<int>(
-        0,
-        (sum, row) => sum + row.read<int>('count'),
-      );
+      final counts = <String, int>{
+        for (final row in results)
+          row.read<String>('bucket'): row.read<int>('count'),
+      };
+
+      final total = counts.values.fold<int>(0, (sum, c) => sum + c);
       if (total == 0) return [];
 
-      return results.map((row) {
-        final count = row.read<int>('count');
+      // Calibrated bands first, best to worst, then whatever legacy buckets
+      // remain. The legacy segments shrink naturally as old dives are edited.
+      final ordered = <String>[
+        ...[
+          VisibilityBand.excellent,
+          VisibilityBand.good,
+          VisibilityBand.moderate,
+          VisibilityBand.poor,
+        ].map((b) => b.name).where(counts.containsKey),
+        ...counts.keys.where((k) => k.startsWith('legacy_')).toList()..sort(),
+      ];
+
+      return ordered.map((key) {
+        final count = counts[key]!;
         return DistributionSegment(
-          label: row.read<String>('visibility'),
+          label: key,
           count: count,
           percentage: count / total * 100,
         );
@@ -1920,7 +2040,32 @@ class StatisticsRepository {
   // Profile Analysis Statistics
   // ============================================================================
 
-  /// Get average ascent/descent rates
+  /// Get average ascent/descent rates in m/min, or null when the filtered
+  /// dives hold no vertical movement to average.
+  ///
+  /// Rates are derived from the stored depth samples rather than read from
+  /// `dive_profiles.ascent_rate`: no download or import path ever populates
+  /// that column (libdivecomputer reports no ascent-rate sample type), so it is
+  /// null for every row and averaging it always yielded an empty section.
+  ///
+  /// The derivation follows the same conventions as [AscentRateCalculator],
+  /// which computes rates per-dive for the profile chart, but smooths by a
+  /// different (cheaper, set-based) filter -- see [_rateWindowSeconds]:
+  ///
+  /// - Samples are averaged into fixed [_rateWindowSeconds] buckets, which
+  ///   makes the result independent of the computer's sample interval and keeps
+  ///   depth-resolution noise from dominating (0.1 m between two 1 s samples is
+  ///   already 6 m/min of pure quantisation noise).
+  /// - The rate between two buckets uses their mean sample times, not the
+  ///   bucket width, so uneven occupancy at the edges cannot distort the
+  ///   interval.
+  /// - Positive is ascending, matching [AscentRatePoint.rateMetersPerMin].
+  /// - Buckets slower than [_sustainedTransitThreshold] are excluded, so
+  ///   working a multi-level profile does not read as ascending or descending.
+  ///
+  /// Only primary profile rows are considered, so a dive logged by two
+  /// computers — or one whose original profile was demoted by an edit — is
+  /// counted once rather than interleaving two sample streams.
   Future<({double? avgAscent, double? avgDescent})> getAscentDescentRates({
     String? diverId,
     DiveFilterState filter = const DiveFilterState(),
@@ -1931,12 +2076,38 @@ class StatisticsRepository {
       final params = diverId != null ? [diverId, ...df.params] : [...df.params];
 
       final results = await _db.customSelect('''
+        WITH windows AS (
+          SELECT
+            p.dive_id AS dive_id,
+            p.computer_id AS computer_id,
+            p.timestamp / $_rateWindowSeconds AS window_index,
+            AVG(p.depth) AS depth,
+            AVG(p.timestamp) AS at
+          FROM dive_profiles p
+          JOIN dives d ON d.id = p.dive_id
+          WHERE p.is_primary = 1 $diverFilter ${df.clause}
+          GROUP BY p.dive_id, p.computer_id, p.timestamp / $_rateWindowSeconds
+        ),
+        paired AS (
+          SELECT
+            depth,
+            at,
+            LAG(depth) OVER w AS prev_depth,
+            LAG(at) OVER w AS prev_at
+          FROM windows
+          WINDOW w AS (PARTITION BY dive_id, computer_id ORDER BY window_index)
+        ),
+        rates AS (
+          SELECT (prev_depth - depth) * 60.0 / (at - prev_at) AS rate
+          FROM paired
+          WHERE prev_at IS NOT NULL AND at > prev_at
+        )
         SELECT
-          AVG(CASE WHEN p.ascent_rate < 0 THEN ABS(p.ascent_rate) ELSE NULL END) AS avg_ascent,
-          AVG(CASE WHEN p.ascent_rate > 0 THEN p.ascent_rate ELSE NULL END) AS avg_descent
-        FROM dive_profiles p
-        JOIN dives d ON d.id = p.dive_id
-        WHERE p.ascent_rate IS NOT NULL $diverFilter ${df.clause}
+          AVG(CASE WHEN rate >= $_sustainedTransitThreshold THEN rate END)
+            AS avg_ascent,
+          AVG(CASE WHEN rate <= -$_sustainedTransitThreshold THEN -rate END)
+            AS avg_descent
+        FROM rates
         ''', variables: params.map((p) => Variable(p)).toList()).get();
 
       if (results.isEmpty) return (avgAscent: null, avgDescent: null);

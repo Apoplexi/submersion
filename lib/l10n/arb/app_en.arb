@@ -1,4 +1,5 @@
 {
+  "universalImport_action_importFromGarmin": "Import from Garmin Device",
   "diveLog_edit_flightWindowWarning": "This dive ends after the latest safe surfacing time for your flight ({time})",
   "@diveLog_edit_flightWindowWarning": {
     "placeholders": {
@@ -713,6 +714,19 @@
   "backup_restore_dialog_safetyNote": "A safety backup of your current data will be created automatically before restoring.",
   "backup_restore_dialog_title": "Restore Backup",
   "backup_restore_dialog_warning": "This will replace ALL current data with the backup data. This action cannot be undone.",
+  "backup_restore_safetyReview_progress": "Analyzed {done} of {total} dives",
+  "@backup_restore_safetyReview_progress": {
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "backup_restore_safetyReview_skip": "Skip",
+  "backup_restore_safetyReview_title": "Running the safety review",
   "backup_restoreComplete_continue": "Continue",
   "backup_restoreComplete_description": "Your data has been restored successfully. Tap continue to reload the app with your restored data.",
   "backup_restoreComplete_title": "Restore Complete",
@@ -1016,16 +1030,8 @@
   },
   "buddies_edit_merge_notEnoughTitle": "Merge Buddies",
   "buddies_edit_merge_notEnoughBody": "Not enough buddies to merge.",
-  "buddies_section_professionalRoles": "Professional Roles",
-  "buddies_roles_addRole": "Add role",
-  "buddies_roles_role": "Role",
-  "buddies_roles_agency": "Agency",
-  "buddies_roles_credentialNumber": "Credential number",
-  "buddies_roles_removeTooltip": "Remove role",
-  "buddies_roles_emptyHint": "Add instructor or divemaster credentials to reuse them when logging certifications and courses.",
   "buddies_instructorPicker_label": "Instructor from buddies",
   "buddies_instructorPicker_none": "None (manual entry)",
-  "buddies_detail_section_professionalRoles": "Professional Roles",
   "certifications_appBar_addCertification": "Add Certification",
   "certifications_appBar_certificationWallet": "Certification Wallet",
   "certifications_appBar_editCertification": "Edit Certification",
@@ -1040,11 +1046,11 @@
   "certifications_detail_dialog_deleteTitle": "Delete Certification?",
   "certifications_detail_label_agency": "Agency",
   "certifications_detail_label_cardNumber": "Card Number",
+  "certifications_detail_label_certification": "Certification",
   "certifications_detail_label_expiryDate": "Expiry Date",
   "certifications_detail_label_instructorName": "Name",
   "certifications_detail_label_instructorNumber": "Instructor #",
   "certifications_detail_label_issueDate": "Issue Date",
-  "certifications_detail_label_level": "Level",
   "certifications_detail_label_type": "Type",
   "certifications_detail_label_validity": "Validity",
   "certifications_detail_noExpiration": "No Expiration",
@@ -1070,9 +1076,12 @@
   "certifications_detail_tooltip_moreOptions": "More options",
   "certifications_ecardStack_empty_subtitle": "Add your first certification to see it here",
   "certifications_ecardStack_empty_title": "No certifications yet",
+  "certifications_ecard_label_cardNumber": "CARD NO.",
   "certifications_ecard_label_certifiedBy": "Certified by {agency}",
+  "certifications_ecard_label_diver": "DIVER",
   "certifications_ecard_label_instructor": "INSTRUCTOR",
   "certifications_ecard_label_issued": "ISSUED",
+  "certifications_ecard_label_validUntil": "VALID UNTIL",
   "certifications_ecard_statusBadge_expired": "EXPIRED",
   "certifications_ecard_statusBadge_expiring": "EXPIRING",
   "certifications_edit_appBar_add": "Add Certification",
@@ -1081,28 +1090,30 @@
   "certifications_edit_button_cancel": "Cancel",
   "certifications_edit_button_save": "Save",
   "certifications_edit_button_update": "Update Certification",
+  "certifications_edit_certification_notSpecified": "Not specified",
   "certifications_edit_datePicker_clearTooltip": "Clear {label}",
   "certifications_edit_datePicker_tapToSelect": "Tap to select",
   "certifications_edit_dialog_discard": "Discard",
   "certifications_edit_dialog_discardContent": "You have unsaved changes. Are you sure you want to leave?",
   "certifications_edit_dialog_discardTitle": "Discard Changes?",
   "certifications_edit_dialog_keepEditing": "Keep Editing",
+  "certifications_edit_group_progression": "Progression",
+  "certifications_edit_group_specialties": "Specialties",
   "certifications_edit_help_expiryDate": "Leave empty for certifications that don't expire",
+  "certifications_edit_helper_nameOnCard": "Optional",
   "certifications_edit_hint_cardNumber": "Enter certification card number",
-  "certifications_edit_hint_certificationName": "e.g., Open Water Diver",
   "certifications_edit_hint_instructorName": "Name of certifying instructor",
   "certifications_edit_hint_instructorNumber": "Instructor certification number",
   "certifications_edit_hint_notes": "Any additional notes",
   "certifications_edit_label_agency": "Agency *",
   "certifications_edit_label_cardNumber": "Card Number",
-  "certifications_edit_label_certificationName": "Certification Name *",
+  "certifications_edit_label_certification": "Certification",
   "certifications_edit_label_expiryDate": "Expiry Date",
   "certifications_edit_label_instructorName": "Instructor Name",
   "certifications_edit_label_instructorNumber": "Instructor Number",
   "certifications_edit_label_issueDate": "Issue Date",
-  "certifications_edit_label_level": "Level",
+  "certifications_edit_label_nameOnCard": "Name on card",
   "certifications_edit_label_notes": "Notes",
-  "certifications_edit_level_notSpecified": "Not specified",
   "certifications_edit_photo_addSemanticLabel": "Add {label} photo. Tap to select",
   "certifications_edit_photo_attachedSemanticLabel": "{label} photo attached. Tap to change",
   "certifications_edit_photo_chooseFromGallery": "Choose from Gallery",
@@ -1117,7 +1128,7 @@
   "certifications_edit_snackBar_errorPhoto": "Error picking photo: {error}",
   "certifications_edit_snackBar_errorSaving": "Error saving certification: {error}",
   "certifications_edit_snackBar_updated": "Certification updated successfully",
-  "certifications_edit_validation_nameRequired": "Please enter a certification name",
+  "certifications_edit_validation_certificationOrNameRequired": "Choose a certification or enter a name",
   "certifications_list_button_retry": "Retry",
   "certifications_list_empty_button": "Add Your First Certification",
   "certifications_list_empty_subtitle": "Add your dive certifications to keep track of your training and qualifications",
@@ -1172,13 +1183,6 @@
   "certifications_summary_stat_expiringSoon": "Expiring Soon",
   "certifications_summary_stat_total": "Total",
   "certifications_summary_stat_valid": "Valid",
-  "certifications_walletCard_countPlural": "{count} certifications",
-  "certifications_walletCard_countSingular": "{count} certification",
-  "certifications_walletCard_emptyFooter": "Add your first certification",
-  "certifications_walletCard_error": "Failed to load certifications",
-  "certifications_walletCard_semanticLabel": "Certification Wallet. Tap to view all certifications",
-  "certifications_walletCard_tapToAdd": "Tap to add",
-  "certifications_walletCard_title": "Certification Wallet",
   "certifications_wallet_appBar_title": "Certification Wallet",
   "certifications_wallet_error_retry": "Retry",
   "certifications_wallet_error_title": "Failed to load certifications",
@@ -1235,12 +1239,21 @@
       }
     }
   },
+  "@certifications_ecard_label_cardNumber": {
+    "description": "Uppercase field label above the certification card number on the generated wallet card"
+  },
   "@certifications_ecard_label_certifiedBy": {
     "placeholders": {
       "agency": {
         "type": "Object"
       }
     }
+  },
+  "@certifications_ecard_label_diver": {
+    "description": "Uppercase field label above the diver's name on the generated wallet card"
+  },
+  "@certifications_ecard_label_validUntil": {
+    "description": "Uppercase field label above the certification expiry date on the generated wallet card"
   },
   "@certifications_edit_datePicker_clearTooltip": {
     "placeholders": {
@@ -1360,20 +1373,6 @@
   "@certifications_share_error_certificate": {
     "placeholders": {
       "error": {
-        "type": "Object"
-      }
-    }
-  },
-  "@certifications_walletCard_countPlural": {
-    "placeholders": {
-      "count": {
-        "type": "Object"
-      }
-    }
-  },
-  "@certifications_walletCard_countSingular": {
-    "placeholders": {
-      "count": {
         "type": "Object"
       }
     }
@@ -1530,18 +1529,32 @@
   "preDive_sessions_linkedDive": "Linked dive",
   "preDive_sessions_delete": "Delete",
   "preDive_sessions_deleteConfirm": "Delete this checklist record?",
+  "preDive_sessions_filter": "Filter",
+  "preDive_sessions_filterTitle": "Filter checklist runs",
+  "preDive_sessions_filterChecklist": "Checklist",
+  "preDive_sessions_filterStatus": "Status",
+  "preDive_sessions_filterFlaggedOnly": "Flagged runs only",
+  "preDive_sessions_filterDateRange": "Date range",
+  "preDive_sessions_filterAnyDate": "Any date",
+  "preDive_sessions_filterClearAll": "Clear all",
+  "preDive_sessions_filterApply": "Apply",
+  "preDive_sessions_filterFlaggedChip": "Flagged only",
+  "preDive_sessions_emptyFiltered": "No checklist runs match these filters",
+  "preDive_sessions_export": "Export to Excel",
+  "preDive_sessions_exportEmpty": "No checklist runs to export",
+  "preDive_sessions_exportFailed": "Export failed: {error}",
+  "@preDive_sessions_exportFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
   "preDive_start_title": "Start pre-dive checklist",
   "preDive_start_template": "Checklist",
   "preDive_start_equipmentSet": "Equipment set",
   "preDive_start_noEquipmentSet": "None",
   "preDive_start_begin": "Begin",
-  "preDive_section_title": "Pre-Dive Check",
-  "preDive_section_link": "Link a checklist session",
-  "preDive_section_unlink": "Unlink",
-  "preDive_section_run": "Run pre-dive checklist",
-  "preDive_section_noUnlinked": "No unlinked checklist sessions",
-  "diveDetailSection_preDiveChecklist_name": "Pre-Dive Check",
-  "diveDetailSection_preDiveChecklist_description": "Linked pre-dive checklist session",
   "diveLog_listPage_bottomSheet_preDiveChecklist": "Start pre-dive checklist",
   "preDive_dashboard_title": "Pre-Dive Check",
   "preDive_dashboard_resume": "Resume - {done} of {total}",
@@ -1846,6 +1859,8 @@
   "dashboard_greeting_withoutName": "{greeting}!",
   "dashboard_hero_divesLoggedOne": "1 dive logged",
   "dashboard_hero_divesLoggedOther": "{count} dives logged",
+  "dashboard_hero_divesTotalOne": "1 dive",
+  "dashboard_hero_divesTotalOther": "{count} dives",
   "dashboard_hero_error": "Ready to explore the depths?",
   "dashboard_hero_hoursUnderwater": "{hours} hours underwater",
   "dashboard_hero_loading": "Loading your dive stats...",
@@ -1945,8 +1960,30 @@
   },
   "dashboard_gauges_lastDiveToday": "Dove today",
   "dashboard_gauges_noDivesYet": "No dives yet",
-  "settings_homeChips_pageTitle": "Home status chips",
+  "settings_homeChips_pageTitle": "Home screen",
   "settings_homeChips_description": "Choose which status chips appear at the top of the Home tab.",
+  "settings_homeChips_sectionTitle": "Status chips",
+  "settings_homeCards_sectionTitle": "Home cards",
+  "settings_homeCards_description": "Choose which cards appear on the Home tab and drag to reorder them.",
+  "settings_homeCards_autoHides": "Hides automatically when empty",
+  "settings_homeCards_resetToDefault": "Reset to default",
+  "settings_homeCards_resetDialog_title": "Reset Home layout?",
+  "settings_homeCards_resetDialog_message": "This restores the default card order and shows all cards again.",
+  "settings_homeCards_resetDialog_cancel": "Cancel",
+  "settings_homeCards_resetDialog_confirm": "Reset",
+  "settings_homeCards_card_hero": "Welcome header",
+  "settings_homeCards_card_gaugeStrip": "Status chips",
+  "settings_homeCards_card_preDive": "Pre-dive checklist",
+  "settings_homeCards_card_recentDives": "Recent dives",
+  "settings_homeCards_card_quickActions": "Quick actions",
+  "settings_homeCards_card_milestones": "Milestones",
+  "settings_homeCards_card_photoRibbon": "Recent photos",
+  "settings_homeCards_card_onThisDay": "On this day",
+  "settings_homeCards_card_yearInReview": "Year in review",
+  "settings_homeCards_card_activeCourses": "Course progress",
+  "settings_homeCards_card_recentSitesMap": "Recent sites map",
+  "dashboard_allHidden_message": "All Home cards are hidden.",
+  "dashboard_allHidden_customize": "Customize Home",
   "settings_homeChips_flightWindow": "Flight dive window",
   "settings_homeChips_gear": "Gear service",
   "settings_homeChips_insurance": "Insurance",
@@ -2209,6 +2246,13 @@
     }
   },
   "@dashboard_hero_divesLoggedOther": {
+    "placeholders": {
+      "count": {
+        "type": "Object"
+      }
+    }
+  },
+  "@dashboard_hero_divesTotalOther": {
     "placeholders": {
       "count": {
         "type": "Object"
@@ -3140,8 +3184,6 @@
   "diveLog_fullscreenProfile_close": "Close fullscreen",
   "diveLog_fullscreenProfile_readoutHint": "Hover or scrub the profile",
   "diveLog_fullscreenProfile_title": "Dive #{number} Profile",
-  "diveLog_instruments_customize": "Customize instruments",
-  "diveLog_instruments_customizeHint": "Toggle instruments on or off. Drag to reorder.",
   "diveLog_legend_label_ascentRate": "Ascent Rate",
   "diveLog_legend_label_ascentRateLine": "Ascent Rate Line",
   "diveLog_legend_label_ceiling": "Ceiling",
@@ -3175,8 +3217,10 @@
   "diveLog_chartSection_markers": "Markers",
   "diveLog_chartSection_decompression": "Decompression",
   "diveLog_chartSection_gasAnalysis": "Gas Analysis",
+  "diveLog_chartSection_display": "Display",
   "diveLog_chartSection_other": "Other",
   "diveLog_chartSection_tankPressures": "Tank Pressures",
+  "diveLog_chartOption_metricsFollowViewport": "Keep overlays in view",
   "diveLog_pressure_estimatedSuffix": "(est.)",
   "@diveLog_pressure_estimatedSuffix": {
     "description": "Short suffix appended to a tank label when its pressure line is a linear start-to-end estimate rather than measured air-integrated data. Abbreviation of 'estimated'."
@@ -3419,6 +3463,11 @@
   "setup_step_profile": "Profile",
   "setup_step_units": "Units",
   "setup_syncPull_continue": "Continue",
+  "setup_syncPull_incomplete_message": "This account holds a Submersion library that was never finished uploading. Let your other device finish syncing, then try again.",
+  "setup_syncPull_incomplete_retry": "Check again",
+  "setup_syncPull_incomplete_title": "Library upload unfinished",
+  "setup_syncPull_locked_message": "Enter the encryption passphrase to unlock this library and download it to this device.",
+  "setup_syncPull_locked_title": "This library is encrypted",
   "setup_syncPull_noLibrary_message": "No existing Submersion library was found on this account. Start fresh instead? Your connection will be kept.",
   "setup_syncPull_noLibrary_title": "No library found",
   "setup_syncPull_success": "Library adopted",
@@ -3772,6 +3821,18 @@
   "diveLog_tank_modMndInfo": "MOD: {mod} (ppO₂ 1.4) | MND: {mnd}",
   "diveLog_tank_section_gasMix": "Gas Mix",
   "diveLog_tank_selectPreset": "Select Preset...",
+  "diveLog_tank_saveAsPreset": "Save as preset",
+  "diveLog_tank_saveAsPreset_needSpecs": "Enter a volume and working pressure first",
+  "diveLog_tank_saveAsPreset_nameTitle": "Save tank preset",
+  "diveLog_tank_saveAsPreset_nameHint": "e.g. My AL80",
+  "diveLog_tank_saveAsPreset_saved": "Saved preset \"{name}\"",
+  "@diveLog_tank_saveAsPreset_saved": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "diveLog_tank_title": "Tank {number}",
   "diveLog_tank_tooltip_remove": "Remove tank",
   "diveLog_tissue_label_ceiling": "Ceiling",
@@ -5391,12 +5452,6 @@
   "enum_ascentRate_danger": "Danger",
   "enum_ascentRate_safe": "Safe",
   "enum_ascentRate_warning": "Warning",
-  "enum_buddyRole_buddy": "Buddy",
-  "enum_buddyRole_diveGuide": "Dive Guide",
-  "enum_buddyRole_diveMaster": "Divemaster",
-  "enum_buddyRole_instructor": "Instructor",
-  "enum_buddyRole_solo": "Solo",
-  "enum_buddyRole_student": "Student",
   "enum_certificationAgency_bsac": "BSAC",
   "enum_certificationAgency_cmas": "CMAS",
   "enum_certificationAgency_gue": "GUE",
@@ -5415,6 +5470,7 @@
   "enum_certificationLevel_cavern": "Cavern",
   "enum_certificationLevel_courseDirector": "Course Director",
   "enum_certificationLevel_decompression": "Decompression",
+  "enum_certificationLevel_diveGuide": "Dive Guide",
   "enum_certificationLevel_diveMaster": "Divemaster",
   "enum_certificationLevel_instructor": "Instructor",
   "enum_certificationLevel_masterInstructor": "Master Instructor",
@@ -5477,6 +5533,7 @@
   "enum_equipmentType_bcd": "BCD",
   "enum_equipmentType_boots": "Boots",
   "enum_equipmentType_camera": "Camera",
+  "enum_equipmentType_dpv": "DPV",
   "enum_equipmentType_computer": "Dive Computer",
   "enum_equipmentType_drysuit": "Drysuit",
   "enum_equipmentType_fins": "Fins",
@@ -5630,30 +5687,6 @@
   "enum_weightType_integrated": "Integrated Weights",
   "enum_weightType_mixed": "Mixed/Combined",
   "enum_weightType_trimWeights": "Trim Weights",
-  "equipment_addSheet_brandHint": "e.g., Scubapro",
-  "equipment_addSheet_brandLabel": "Brand",
-  "equipment_addSheet_closeTooltip": "Close",
-  "equipment_addSheet_currencyLabel": "Currency",
-  "equipment_addSheet_dateLabel": "Date",
-  "equipment_addSheet_errorSnackbar": "Error adding equipment: {error}",
-  "equipment_addSheet_modelHint": "e.g., MK25 EVO",
-  "equipment_addSheet_modelLabel": "Model",
-  "equipment_addSheet_nameHint": "e.g., My Primary Regulator",
-  "equipment_addSheet_nameLabel": "Name",
-  "equipment_addSheet_nameValidation": "Please enter a name",
-  "equipment_addSheet_notesHint": "Additional notes...",
-  "equipment_addSheet_notesLabel": "Notes",
-  "equipment_addSheet_priceLabel": "Price",
-  "equipment_addSheet_purchaseInfoTitle": "Purchase Information",
-  "equipment_addSheet_serialNumberLabel": "Serial Number",
-  "equipment_addSheet_serviceIntervalHint": "e.g., 365 for yearly",
-  "equipment_addSheet_serviceIntervalLabel": "Service Interval (days)",
-  "equipment_addSheet_sizeHint": "e.g., M, L, 42",
-  "equipment_addSheet_sizeLabel": "Size",
-  "equipment_addSheet_submitButton": "Add Equipment",
-  "equipment_addSheet_successSnackbar": "Equipment added successfully",
-  "equipment_addSheet_title": "Add Equipment",
-  "equipment_addSheet_typeLabel": "Type",
   "equipment_appBar_title": "Equipment",
   "equipment_deleteDialog_cancel": "Cancel",
   "equipment_deleteDialog_confirm": "Delete",
@@ -6114,13 +6147,6 @@
   "equipment_summary_totalValue": "Total Value",
   "equipment_tab_equipment": "Equipment",
   "equipment_tab_sets": "Sets",
-  "@equipment_addSheet_errorSnackbar": {
-    "placeholders": {
-      "error": {
-        "type": "Object"
-      }
-    }
-  },
   "@equipment_detail_daysOverdue": {
     "placeholders": {
       "days": {
@@ -6745,6 +6771,19 @@
   "media_diveMediaSection_unlinkSelectedSuccess": "Unlinked {count} items",
   "media_diveMediaSection_unlinkSelectedTitle": "Unlink {count} items?",
   "media_diveMediaSection_unlinkSuccess": "Photo unlinked",
+  "media_siteMediaSection_title": "Site Media",
+  "media_siteMediaSection_addPhotos": "Add photos or videos",
+  "media_siteMediaSection_addDocument": "Add document",
+  "media_siteMediaSection_emptyState": "No maps, photos, or documents attached to this site",
+  "media_siteMediaSection_divePhotosGroup": "Photos from dives here ({count})",
+  "media_siteMediaSection_divePhotoLabel": "Dive photo",
+  "media_siteMediaSection_unlinkSelectedTitle": "Remove {count} attachments?",
+  "media_siteMediaSection_unlinkSelectedContent": "The selected items will be removed from this site. Files in your photo library or on disk are not deleted.",
+  "media_siteMediaSection_unlinkSelectedSuccess": "Removed {count} attachments",
+  "media_documentViewer_title": "Document",
+  "media_documentViewer_unavailable": "This document is not available on this device",
+  "media_documentViewer_availableOnOriginDevice": "It is available on the device it was added from, or via a configured media store.",
+  "media_documentViewer_attached": "Attached {count} documents",
   "media_diveScan_scanTooltip": "Scan gallery for photos",
   "media_diveScan_noPhotosFound": "No new photos found near this dive",
   "media_diveScan_accessDenied": "Photo library access is required to scan for photos",
@@ -6775,7 +6814,7 @@
     }
   },
   "media_gpsBanner_addToSiteButton": "Add to Site",
-  "media_gpsBanner_coordinates": "Coordinates: {latitude}, {longitude}",
+  "media_gpsBanner_coordinates": "Coordinates: {coordinates}",
   "media_gpsBanner_createSiteButton": "Create Site",
   "media_gpsBanner_dismissTooltip": "Dismiss GPS suggestion",
   "media_gpsBanner_title": "GPS found in photos",
@@ -6927,12 +6966,37 @@
       }
     }
   },
+  "@media_siteMediaSection_divePhotosGroup": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@media_siteMediaSection_unlinkSelectedTitle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@media_siteMediaSection_unlinkSelectedSuccess": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@media_documentViewer_attached": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "@media_gpsBanner_coordinates": {
     "placeholders": {
-      "latitude": {
-        "type": "Object"
-      },
-      "longitude": {
+      "coordinates": {
         "type": "Object"
       }
     }
@@ -8029,6 +8093,23 @@
   },
   "safetyReview_dismiss": "Dismiss",
   "safetyReview_restore": "Restore",
+  "safetyReview_details": "Details",
+  "@safetyReview_details": {
+    "description": "Link in the chart finding callout that scrolls to the full safety review section"
+  },
+  "safetyReview_clearHighlight": "Clear highlight",
+  "@safetyReview_clearHighlight": {
+    "description": "Tooltip/semantics for the button that clears the chart safety highlight"
+  },
+  "safetyReview_findingGroupSemantics": "{count, plural, =1{1 safety observation} other{{count} safety observations}}",
+  "@safetyReview_findingGroupSemantics": {
+    "description": "Semantics label for a clustered chip in the chart safety lane",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "safetySettings_title": "Safety review",
   "safetySettings_entry_subtitle": "Post-dive observations and rules",
   "safetySettings_masterToggle": "Post-dive safety review",
@@ -8079,8 +8160,8 @@
   "diveDetailSection_altitude_description": "Altitude value, category, deco requirement",
   "diveDetailSection_tide_name": "Tide",
   "diveDetailSection_tide_description": "Tide cycle graph and timing",
-  "diveDetailSection_reefHealth_name": "Reef Health",
-  "diveDetailSection_reefHealth_description": "Coral bleaching heat stress on the dive date",
+  "diveDetailSection_reefHealth_name": "Water Conditions",
+  "diveDetailSection_reefHealth_description": "Satellite water conditions on the dive date",
   "diveDetailSection_surfaceGps_name": "Surface GPS",
   "diveDetailSection_surfaceGps_description": "GPS entry/exit points and surface drift",
   "diveLog_detail_section_surfaceGps": "Surface GPS",
@@ -8090,6 +8171,17 @@
   "diveLog_detail_surfaceGps_entryOnly": "Entry point recorded",
   "diveLog_detail_surfaceGps_exitOnly": "Exit point recorded",
   "diveLog_detail_surfaceGps_site": "Site",
+  "diveLog_detail_surfaceGps_track": "Surface track",
+  "diveLog_detail_surfaceGps_showFullTrack": "Full track",
+  "diveLog_detail_surfaceGps_trackFixes": "{count, plural, =1{1 fix} other{{count} fixes}}",
+  "@diveLog_detail_surfaceGps_trackFixes": {
+    "description": "Count of GPS positions in the surface track covering this dive",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "diveLog_detail_locationsMap_title": "Dive Locations",
   "diveLog_detail_coordinatesCopied": "Coordinates copied to clipboard",
   "diveLog_detail_openInMaps": "Open in Maps",
@@ -8244,6 +8336,8 @@
   "settings_appearance_pressureThresholdMarkers": "Pressure threshold markers",
   "settings_appearance_pressureThresholdMarkers_subtitle": "Show markers when tank pressure crosses thresholds",
   "settings_appearance_pressureThresholdMarkers_subtitleFull": "Show markers when tank pressure crosses 2/3, 1/2, and 1/3 thresholds",
+  "settings_appearance_metricsFollowViewport": "Keep overlays in view when zooming",
+  "settings_appearance_metricsFollowViewport_subtitle": "Fit overlays such as NDL and ppO2 to the visible area instead of magnifying them with the depth axis",
   "settings_appearance_rightYAxisMetric": "Right Y-axis metric",
   "settings_appearance_rightYAxisMetric_subtitle": "Default metric shown on right axis",
   "settings_appearance_subsection_decompressionMetrics": "Decompression Metrics",
@@ -8335,8 +8429,24 @@
   },
   "settings_cloudSync_adopt_dialogTitle": "Adopt Restored Library?",
   "settings_cloudSync_adopt_notNow": "Not Now",
+  "settings_cloudSync_dangerZone": "Danger Zone",
+  "settings_cloudSync_replaceLibrary_tile": "Replace cloud library",
+  "settings_cloudSync_replaceLibrary_tileSubtitle": "Make this device's library the one every device uses",
+  "settings_cloudSync_replaceLibrary_dialogTitle": "Replace Cloud Library?",
+  "settings_cloudSync_replaceLibrary_dialogIntro": "This device's library becomes the one every device uses.",
+  "settings_cloudSync_replaceLibrary_dialogBody": "{diveCount, plural, =1{The cloud library is erased and replaced with this device's 1 dive.} other{The cloud library is erased and replaced with this device's {diveCount} dives.}}",
+  "settings_cloudSync_replaceLibrary_peers": "{peerCount, plural, =0{No other device is syncing yet, so there is nothing to adopt it.} =1{1 other device will be asked to adopt it; until it does, its changes are not merged.} other{{peerCount} other devices will be asked to adopt it; until they do, their changes are not merged.}}",
+  "settings_cloudSync_replaceLibrary_peersUnknown": "Every other device will be asked to adopt it; until they do, their changes are not merged.",
+  "settings_cloudSync_replaceLibrary_backupNote": "A backup of this device is created first. This cannot be undone.",
+  "settings_cloudSync_replaceLibrary_confirmWord": "Replace",
+  "@settings_cloudSync_replaceLibrary_confirmWord": {
+    "description": "The word the user must type to arm the replace. Compared literally against their input, so it MUST match the word quoted in settings_cloudSync_replaceLibrary_confirmHint in the same locale."
+  },
+  "settings_cloudSync_replaceLibrary_confirmHint": "Type \"Replace\" to confirm",
+  "settings_cloudSync_replaceLibrary_confirm": "Replace",
   "settings_cloudSync_firstSync_banner": "First sync is waiting for confirmation. Tap Sync Now to review what will be combined.",
   "settings_cloudSync_firstSync_dialogConfirm": "Merge and Sync",
+  "settings_cloudSync_firstSync_replaceHint": "If instead this device's library should replace what is in the cloud, cancel and use Settings > Cloud Sync > Replace cloud library.",
   "settings_cloudSync_firstSync_dialogContent": "Existing sync data was found in the cloud ({deviceCount} sync file(s)). Your first sync will combine that data with the {diveCount} dive(s) on this device, across every synced device.\n\nIf the same dives were added separately on each device, they will appear twice.",
   "@settings_cloudSync_firstSync_dialogContent": {
     "placeholders": {
@@ -8399,6 +8509,14 @@
   "settings_cloudSync_header_syncBehavior": "Sync Behavior",
   "settings_cloudSync_lastSynced": "Last synced: {time}",
   "settings_cloudSync_pendingChanges": "{count, plural, =1{1 pending change} other{{count} pending changes}}",
+  "settings_cloudSync_peerNeedsAdopt_banner": "{deviceList} still has an older or unknown library version, so its changes were not merged. Open Submersion on it to adopt the current library.",
+  "settings_cloudSync_peerNeedsAdopt_bannerPlural": "{deviceList} still have an older or unknown library version, so their changes were not merged. Open Submersion on them to adopt the current library.",
+  "settings_cloudSync_peerNeedsAdopt_unnamedDevice": "device {shortId}",
+  "settings_cloudSync_peerNeedsAdopt_listSeparator": ", ",
+  "settings_cloudSync_peerNeedsAdopt_listLastSeparator": " and ",
+  "@settings_cloudSync_peerNeedsAdopt_listLastSeparator": {
+    "description": "Joins the final two device names, e.g. \"Erics-iPhone and Erics-iPad\". Include the surrounding spaces the locale needs."
+  },
   "settings_cloudSync_peerRequiresUpdate_banner": "{count, plural, =1{1 device syncs from a newer version of Submersion. Update this device to receive its latest changes.} other{{count} devices sync from a newer version of Submersion. Update this device to receive their latest changes.}}",
   "settings_cloudSync_provider_connected": "Connected",
   "settings_cloudSync_provider_connectedTo": "Connected to {providerName}",
@@ -8799,6 +8917,8 @@
   "settings_storage_customFolder": "Custom Folder",
   "settings_storage_customFolder_change": "Change",
   "settings_storage_customFolder_subtitle": "Choose a synced folder (Dropbox, Google Drive, etc.)",
+  "settings_storage_customFolder_subtitleDeviceOnly": "Move the database to internal storage or SD card",
+  "settings_storage_customFolder_deviceOnly_noCloudSync": "App-managed cloud sync is disabled while the database sits on a device storage volume. No sync service can reach that folder on Android, so use Backup & Restore to keep copies elsewhere.",
   "settings_storage_dbStats": "{fileSize} • {diveCount} dives • {siteCount} sites",
   "settings_storage_dismissError_tooltip": "Dismiss error",
   "settings_storage_dismissSuccess_tooltip": "Dismiss success message",
@@ -8816,15 +8936,19 @@
   "settings_storage_success_moved": "Database moved successfully",
   "settings_storage_dangerZone": "Danger Zone",
   "settings_storage_resetDatabase": "Reset Database",
-  "settings_storage_resetDatabase_subtitle": "Delete all data and start fresh",
+  "settings_storage_resetDatabase_subtitle": "Delete all data on this device and start fresh",
   "settings_storage_resetDialog_title": "Reset Database?",
-  "settings_storage_resetDialog_body": "This will permanently delete all your data including dives, sites, gear, and settings. A backup will be created automatically before resetting.",
+  "settings_storage_resetDialog_body": "This permanently deletes all data on THIS device, including dives, sites, gear, and settings. A backup is created automatically before resetting.\n\nYour cloud library is not deleted, and other devices keep their data. Cloud sync will be disconnected so the reset is not undone; you can reconnect it in Settings > Cloud Sync.",
+  "settings_storage_resetDialog_confirmWord": "Delete",
+  "@settings_storage_resetDialog_confirmWord": {
+    "description": "The word the user must type to arm the reset. Compared literally against their input, so it MUST match the word quoted in settings_storage_resetDialog_confirmHint in the same locale."
+  },
   "settings_storage_resetDialog_confirmHint": "Type \"Delete\" to confirm",
   "settings_storage_resetDialog_confirmButton": "Reset",
   "settings_storage_resetDialog_backupFailed": "Backup failed. Reset aborted to protect your data.",
   "settings_storage_resetDialog_resetFailed": "Reset failed: {error}",
   "settings_storage_resetComplete_title": "Database Reset",
-  "settings_storage_resetComplete_description": "Your data has been cleared and a backup was saved. Tap continue to reload the app.",
+  "settings_storage_resetComplete_description": "This device's data has been cleared and a backup was saved. Cloud sync is now disconnected so the reset is not undone; you can reconnect it in Settings > Cloud Sync. Tap continue to reload the app.",
   "settings_summary_activeDiver": "Active Diver",
   "settings_summary_currentConfiguration": "Current Configuration",
   "settings_summary_depth": "Depth",
@@ -9991,19 +10115,26 @@
   "surfaceInterval_gasMix_air": "Air",
   "surfaceInterval_gasMix_ean": "EAN{percent}",
   "surfaceInterval_gasMix_trimix": "Trimix {o2}/{he}",
+  "surfaceInterval_gasWarning_modExceeded": "ppO₂ {ppO2} at {depth} exceeds {limit}. MOD for this mix is {mod}.",
   "surfaceInterval_heSemantics": "Helium: {percent}%",
   "surfaceInterval_o2Semantics": "O2: {percent}%",
+  "surfaceInterval_result_beyondHorizon": "The wait runs past the {hours} hours this planner searches. Off-gassing continues, so a longer surface interval will get there.",
+  "surfaceInterval_result_beyondHorizonShort": "More than {hours} hours",
   "surfaceInterval_result_currentInterval": "Current Interval",
+  "surfaceInterval_result_gasUnsafe": "Gas unsafe at this depth",
   "surfaceInterval_result_inDeco": "In deco",
   "surfaceInterval_result_increaseInterval": "Increase surface interval or reduce second dive depth/time",
   "surfaceInterval_result_minimumInterval": "Minimum Surface Interval",
   "surfaceInterval_result_ndlForSecondDive": "NDL for 2nd Dive",
   "surfaceInterval_result_ndlMinutes": "{minutes} min NDL",
+  "surfaceInterval_result_noIntervalHelps": "No surface interval is enough. The longest no-stop dive at this depth on this mix is {minutes} min. Shorten the second dive or reduce its depth.",
+  "surfaceInterval_result_notAchievable": "Not achievable at any surface interval",
   "surfaceInterval_result_notYetSafe": "Not yet safe, increase surface interval",
   "surfaceInterval_result_safeToDive": "Safe to dive",
   "surfaceInterval_result_semantics": "Minimum surface interval: {interval}. Current interval: {current}. NDL for second dive: {ndl}. {status}",
   "surfaceInterval_secondDive_depthSemantics": "Second dive depth: {depth} {unit}",
-  "surfaceInterval_secondDive_gasAir": "(Air)",
+  "surfaceInterval_secondDive_heSemantics": "Second dive helium: {percent}%",
+  "surfaceInterval_secondDive_o2Semantics": "Second dive O2: {percent}%",
   "surfaceInterval_secondDive_timeSemantics": "Second dive time: {time} minutes",
   "surfaceInterval_secondDive_title": "Second Dive",
   "surfaceInterval_tissueRecovery_chartSemantics": "Tissue recovery chart showing 16 compartment off-gassing over a {interval} surface interval",
@@ -10113,6 +10244,27 @@
       }
     }
   },
+  "@surfaceInterval_gasWarning_modExceeded": {
+    "description": "Warning shown when the planned depth exceeds the MOD of the selected mix",
+    "placeholders": {
+      "ppO2": {
+        "type": "Object",
+        "example": "1.60"
+      },
+      "depth": {
+        "type": "Object",
+        "example": "30 m"
+      },
+      "limit": {
+        "type": "Object",
+        "example": "1.40"
+      },
+      "mod": {
+        "type": "Object",
+        "example": "25 m"
+      }
+    }
+  },
   "@surfaceInterval_heSemantics": {
     "description": "Accessibility label for helium slider",
     "placeholders": {
@@ -10131,8 +10283,29 @@
       }
     }
   },
+  "@surfaceInterval_result_beyondHorizon": {
+    "description": "Explains that the second dive does fit on clean tissues but needs a longer surface interval than the planner searches",
+    "placeholders": {
+      "hours": {
+        "type": "Object",
+        "example": "6"
+      }
+    }
+  },
+  "@surfaceInterval_result_beyondHorizonShort": {
+    "description": "Shown in place of a minimum surface interval when the required wait is longer than the planner searches",
+    "placeholders": {
+      "hours": {
+        "type": "Object",
+        "example": "6"
+      }
+    }
+  },
   "@surfaceInterval_result_currentInterval": {
     "description": "Label for the current surface interval column"
+  },
+  "@surfaceInterval_result_gasUnsafe": {
+    "description": "Result card status when either dive exceeds its gas MOD"
   },
   "@surfaceInterval_result_inDeco": {
     "description": "Shown when the second dive would require decompression stops"
@@ -10154,6 +10327,18 @@
         "example": "15"
       }
     }
+  },
+  "@surfaceInterval_result_noIntervalHelps": {
+    "description": "Explains that the planned second dive busts the no-stop limit no matter how long the diver waits, and names the longest no-stop dive that is reachable",
+    "placeholders": {
+      "minutes": {
+        "type": "Object",
+        "example": "43"
+      }
+    }
+  },
+  "@surfaceInterval_result_notAchievable": {
+    "description": "Shown in place of a minimum surface interval when no interval makes the second dive a no-stop dive"
   },
   "@surfaceInterval_result_notYetSafe": {
     "description": "Status message when more surface interval time is needed"
@@ -10195,8 +10380,23 @@
       }
     }
   },
-  "@surfaceInterval_secondDive_gasAir": {
-    "description": "Label indicating the second dive uses air"
+  "@surfaceInterval_secondDive_heSemantics": {
+    "description": "Accessibility label for the second dive helium slider",
+    "placeholders": {
+      "percent": {
+        "type": "Object",
+        "example": "10"
+      }
+    }
+  },
+  "@surfaceInterval_secondDive_o2Semantics": {
+    "description": "Accessibility label for the second dive O2 slider",
+    "placeholders": {
+      "percent": {
+        "type": "Object",
+        "example": "32"
+      }
+    }
   },
   "@surfaceInterval_secondDive_timeSemantics": {
     "description": "Accessibility label for second dive time slider",
@@ -10405,6 +10605,18 @@
   "tides_semantic_extremeItem": "{typeLabel} tide at {time}, {height}{depthSymbol}",
   "tides_semantic_tideChart": "Tide chart. {extremesSummary}",
   "tides_semantic_tideState": "Tide state: {state}",
+  "tides_source_noaaStation": "NOAA station: {name} ({distance})",
+  "@tides_source_noaaStation": {
+    "placeholders": {
+      "name": {"type": "String"},
+      "distance": {"type": "String"}
+    }
+  },
+  "tides_source_modelEstimate": "Ocean-model estimate",
+  "tides_source_modelCaveat": "Modeled from satellite data. Times and heights may differ near complex coastlines.",
+  "tides_source_sheetTitle": "Tide data source",
+  "tides_source_datumMllw": "Heights relative to MLLW (station datum)",
+  "tides_source_datumMsl": "Heights relative to mean sea level",
   "tides_title": "Tides",
   "transfer_appBar_title": "Transfer",
   "transfer_computers_aboutContent": "Connect your dive computer via Bluetooth to download dive logs directly to the app. Supported computers include Suunto, Shearwater, Garmin, Mares, and many other popular brands.  Apple Watch Ultra users can import dive data directly from the Health app, including depth, duration, and heart rate.",
@@ -10633,7 +10845,7 @@
     }
   },
   "trips_diveScan_noMatches": "No matching dives found",
-  "trips_diveScan_noDiver": "Assign a diver to this trip to scan for dives",
+  "trips_diveScan_noDiver": "Select an active diver to scan for dives",
   "trips_diveScan_selectAll": "Select all",
   "trips_diveScan_subtitle": "{count} dives found in date range",
   "@trips_diveScan_subtitle": {
@@ -11167,6 +11379,13 @@
   "universalImport_entityAction_linkBadge": "LINK",
   "universalImport_entityAction_linkExisting": "Link to existing",
   "universalImport_entityAction_linkExistingSubtitle": "Use the matched record",
+  "universalImport_entityAction_replaceBadge": "REPLACE",
+  "universalImport_entityAction_replaceExisting": "Replace existing",
+  "universalImport_entityAction_replaceExistingSubtitle": "Overwrite with imported data",
+  "universalImport_entityAction_skip": "Skip",
+  "universalImport_entityAction_skipSubtitle": "Discard this import",
+  "universalImport_entityAction_importAsNew": "Import as New",
+  "universalImport_entityAction_importAsNewSubtitle": "Create separate entry",
   "universalImport_pending_chooseAction": "Choose an action",
   "universalImport_pending_gateHint": "{count} duplicate(s) need a decision",
   "universalImport_pending_needsDecision": "Needs decision",
@@ -11490,6 +11709,27 @@
   },
   "@universalImport_entityAction_linkExistingSubtitle": {
     "description": "Subtitle under the link-to-existing action button"
+  },
+  "@universalImport_entityAction_replaceBadge": {
+    "description": "Collapsed-header badge on a duplicate row whose action is replace-the-existing-record"
+  },
+  "@universalImport_entityAction_replaceExisting": {
+    "description": "Action button on a duplicate site row: overwrite the matched existing record with the imported data"
+  },
+  "@universalImport_entityAction_replaceExistingSubtitle": {
+    "description": "Subtitle under the replace-existing action button"
+  },
+  "@universalImport_entityAction_skip": {
+    "description": "Action button on a duplicate entity row: do not import this item"
+  },
+  "@universalImport_entityAction_skipSubtitle": {
+    "description": "Subtitle under the skip action button"
+  },
+  "@universalImport_entityAction_importAsNew": {
+    "description": "Action button on a duplicate entity row: create a separate new record instead of reusing the match"
+  },
+  "@universalImport_entityAction_importAsNewSubtitle": {
+    "description": "Subtitle under the import-as-new action button"
   },
   "@universalImport_pending_chooseAction": {
     "description": "Prompt shown above the action buttons on an expanded pending duplicate row, telling the user to pick an action"
@@ -12351,6 +12591,8 @@
   },
   "diveComputer_download_errorOccurred": "An error occurred",
   "diveComputer_download_noSerialPortsFound": "No USB serial ports found. Is the dive computer connected and powered on?",
+  "diveComputer_download_stalePairing": "This dive computer's Bluetooth pairing is out of date. Forget the dive computer in your device's Bluetooth settings, then pair it again from the dive computer's Bluetooth menu.",
+  "diveComputer_download_discoveryStalled": "Connected to the dive computer, but it stopped responding before the download could start. This usually means the Bluetooth pairing is out of date: forget the dive computer in your device's Bluetooth settings, then try again.",
   "diveComputer_download_serialConnectFailedWithDetails": "Could not connect to dive computer.\n\nDiagnostic details (share with developers):\n{details}",
   "@diveComputer_download_serialConnectFailedWithDetails": {
     "placeholders": {
@@ -12959,7 +13201,105 @@
       }
     }
   },
+  "gpsLogger_trackSubtitleTrimmed": "Trimmed, {duration}",
+  "@gpsLogger_trackSubtitleTrimmed": {
+    "description": "Track row subtitle when a trim makes the stored point count unusable.",
+    "placeholders": {
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
   "gpsLogger_tracksHeader": "Recorded tracks",
+  "gpsTrack_action_trim": "Trim...",
+  "gpsTrack_action_split": "Split...",
+  "gpsTrack_action_resetTrim": "Reset trim",
+  "gpsTrack_edit_applyTrim": "Apply trim",
+  "gpsTrack_edit_confirmSplit": "Split here",
+  "gpsTrack_edit_splitWarning": "Splitting creates two tracks and removes the original. This cannot be undone.",
+  "gpsTrack_edit_cancel": "Cancel",
+  "gpsTrack_import_action": "Import track...",
+  "gpsTrack_import_reviewTitle": "Review Import",
+  "gpsTrack_import_timezone": "Recorded in",
+  "gpsTrack_import_timezoneHint": "Times in the file are UTC. Set the zone the track was recorded in so it lines up with your dives.",
+  "gpsTrack_import_duplicate": "This looks like a duplicate of an existing track.",
+  "gpsTrack_import_confirm": "Import",
+  "gpsTrack_import_csvMapping": "Match the columns",
+  "gpsTrack_import_firstFix": "First fix",
+  "gpsTrack_import_fixCount": "{count, plural, =1{1 fix} other{{count} fixes}}",
+  "@gpsTrack_import_fixCount": {
+    "description": "Number of positions in the track being imported",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "gpsTrack_import_failed": "Could not read that file: {reason}",
+  "@gpsTrack_import_failed": {
+    "description": "Shown when parsing an imported track file fails",
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "gpsTrack_importError_unsupportedFormat": "That file type is not supported. Import a GPX, KML, CSV, or FIT file.",
+  "@gpsTrack_importError_unsupportedFormat": {
+    "description": "Track import failed: the file extension is not one the app reads."
+  },
+  "gpsTrack_importError_unreadable": "That file could not be read. It may be damaged or incomplete.",
+  "@gpsTrack_importError_unreadable": {
+    "description": "Track import failed: the file is structurally unreadable."
+  },
+  "gpsTrack_importError_noPositions": "That file has no timestamped GPS positions.",
+  "@gpsTrack_importError_noPositions": {
+    "description": "Track import failed: the file parsed but holds no GPS positions."
+  },
+  "gpsTrack_importError_badData": "That file has a position or timestamp this app cannot read.",
+  "@gpsTrack_importError_badData": {
+    "description": "Track import failed: a coordinate or timestamp in the file is unusable."
+  },
+  "gpsTrack_export_saved": "Track saved",
+  "gpsTrack_action_export": "Export",
+  "gpsTrack_action_shareGpx": "Share as GPX",
+  "gpsTrack_action_saveGpx": "Save as GPX...",
+  "gpsTrack_action_shareKml": "Share as KML",
+  "gpsTrack_action_saveKml": "Save as KML...",
+  "gpsTrack_export_failed": "Export failed.",
+  "gpsTrack_map_title": "Track Map",
+  "gpsTrack_map_truncated": "Showing the {count} most recent tracks. Narrow the date filter to see others.",
+  "@gpsTrack_map_truncated": {
+    "description": "Banner shown when the overview map caps how many tracks it draws.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "gpsTrack_map_noTracks": "No recorded tracks to show.",
+  "gpsTrack_map_showMap": "Show map",
+  "gpsTrack_filter_all": "All dates",
+  "gpsTrack_filter_clear": "Clear date filter",
+  "gpsTrack_inspect_speed": "Speed",
+  "gpsTrack_inspect_accuracy": "Accuracy",
+  "gpsTrack_stats_distance": "Distance",
+  "gpsTrack_stats_duration": "Duration",
+  "gpsTrack_stats_avgSpeed": "Avg speed",
+  "gpsTrack_stats_maxSpeed": "Max speed",
+  "gpsTrack_stats_fixes": "Fixes",
+  "gpsTrack_stats_dives": "Dives",
+  "gpsTrack_colorMode_uniform": "Plain",
+  "gpsTrack_colorMode_speed": "Speed",
+  "gpsTrack_colorMode_elapsed": "Time",
+  "gpsTrack_legend_slower": "Slower",
+  "gpsTrack_legend_faster": "Faster",
+  "gpsTrack_legend_start": "Start",
+  "gpsTrack_legend_end": "End",
+  "gpsTrack_detail_title": "GPS Track",
+  "gpsTrack_detail_notFound": "This track is no longer available.",
+  "gpsTrack_detail_unreadable": "Track data could not be read.",
+  "gpsTrack_detail_noPoints": "This track has no recorded positions.",
   "maps_compass_resetLabel": "Reset map orientation to north",
   "maps_compass_resetTooltip": "North up",
   "maps_heatMap_hide": "Hide Heat Map",
@@ -13848,6 +14188,7 @@
   "db_location_internal": "Internal storage",
   "db_location_sd_card": "SD card",
   "db_location_external_note": "Files here are removed if you uninstall the app.",
+  "db_location_backup_note": "Android cannot run the database from a cloud-synced folder. To keep a copy in Dropbox, Nextcloud, or Google Drive, set a Backup Location under Backup & Restore.",
   "diveLog_bulkEdit_membership_onAll": "on all {count}",
   "@diveLog_bulkEdit_membership_onAll": {
     "placeholders": {
@@ -14334,6 +14675,12 @@
   "attrLabel_o2_cell_count": "O2 cells",
   "attrLabel_diluent_cylinder_l": "Diluent cylinder",
   "attrLabel_o2_cylinder_l": "O2 cylinder",
+  "attrLabel_dpv_style": "Style",
+  "attrLabel_burn_time_h": "Burn time (h)",
+  "attrLabel_battery_type": "Battery",
+  "attrLabel_battery_capacity_wh": "Battery capacity (Wh)",
+  "attrLabel_motor_type": "Motor",
+  "attrLabel_speed_mps": "Top speed",
   "attrChoice_unit_type_eccr": "Electronic CCR (eCCR)",
   "attrChoice_unit_type_mccr": "Manual CCR (mCCR)",
   "attrChoice_unit_type_hccr": "Hybrid CCR (hCCR)",
@@ -14404,6 +14751,14 @@
   "attrChoice_glove_type_dry": "Dry",
   "attrChoice_sole_type_hard": "Hard sole",
   "attrChoice_sole_type_soft": "Soft sole",
+  "attrChoice_dpv_style_tow_behind": "Tow-behind",
+  "attrChoice_dpv_style_ride_on": "Ride-on",
+  "attrChoice_dpv_style_handheld": "Handheld",
+  "attrChoice_battery_type_lithium_ion": "Lithium-ion",
+  "attrChoice_battery_type_nimh": "NiMH",
+  "attrChoice_battery_type_lead_acid": "Lead-acid",
+  "attrChoice_motor_type_brushless": "Brushless",
+  "attrChoice_motor_type_brushed": "Brushed",
   "equipment_edit_customFieldsTitle": "Custom fields",
   "equipment_edit_addCustomField": "Add custom field",
   "attr_flagYes": "Yes",
@@ -14651,7 +15006,7 @@
   },
   "settings_security_autoLock_never": "Never",
   "settings_security_encryption": "Encrypt database",
-  "settings_security_encryption_subtitle": "Protect your dive log file with at-rest encryption",
+  "settings_security_encryption_subtitle": "Protect your dive log file with at-rest encryption. Encryption may affect performance.",
   "settings_security_encryption_progress_backup": "Creating safety backup...",
   "settings_security_encryption_progress_encrypt": "Encrypting database...",
   "settings_security_encryption_progress_decrypt": "Decrypting database...",
@@ -14672,7 +15027,7 @@
   "settings_security_disableBlockedByEncryption_title": "Encryption is on",
   "settings_security_disableBlockedByEncryption_body": "Turn off database encryption before turning off App Lock. The encrypted database needs a credential.",
   "settings_security_enableEncryption_title": "Encrypt database?",
-  "settings_security_enableEncryption_body": "A safety backup is created first, then the database file is re-encrypted in place. This can take a while for large dive logs.",
+  "settings_security_enableEncryption_body": "A safety backup is created first, then the database file is re-encrypted in place. This can take a while for large dive logs. Encryption may affect performance.",
   "settings_security_disableEncryption_title": "Turn off encryption?",
   "settings_security_disableEncryption_body": "The database file will be stored unencrypted on disk again.",
   "settings_security_turnOffAppLock_title": "Turn off App Lock?",
@@ -14731,6 +15086,7 @@
   "dataQuality_action_goToDive": "Go to dive",
   "dataQuality_action_undo": "Undo",
   "dataQuality_repair_applied": "Repair applied",
+  "dataQuality_repair_noChange": "Nothing to repair here",
   "dataQuality_repair_failed": "Repair failed",
   "dataQuality_chip_all": "All",
   "dataQuality_chip_time": "Time",
@@ -14987,6 +15343,8 @@
   "dataQuality_repairLabel_consolidate": "Consolidate",
   "dataQuality_repairLabel_combine": "Combine into one dive",
   "dataQuality_repairLabel_despike": "Remove spike",
+  "dataQuality_repairLabel_clampNegative": "Clamp above-surface depths",
+  "dataQuality_repairLabel_smoothRates": "Smooth impossible rates",
   "dataQuality_repairLabel_fillGaps": "Fill gaps",
   "dataQuality_repairLabel_smoothTemp": "Smooth temperature",
   "dataQuality_repairLabel_convertTemp": "Convert temperature",
@@ -15030,18 +15388,21 @@
   "settings_mediaStorage_quality_linuxFfmpegHint": "Install ffmpeg to enable video compression. Originals are uploaded until then.",
   "settings_mediaStorage_quality_saveFailed": "Could not save the upload quality. Try again.",
   "settings_mediaStorage_quality_noTranscoderHint": "This device cannot compress video. Originals are uploaded from it.",
-  "reef_section_title": "Reef",
+  "reef_section_title": "Ecosystem",
   "reef_section_sourcesTooltip": "Data sources",
-  "reef_section_loadError": "Could not load reef data right now",
+  "reef_section_loadError": "Could not load ecosystem data right now",
   "reef_habitat_title": "Reef habitat",
   "reef_habitat_onReef": "On a coral reef",
   "reef_habitat_onReefWithThreat": "On a coral reef, threat level {threat}",
   "@reef_habitat_onReefWithThreat": {"placeholders": {"threat": {"type": "String"}}},
   "reef_habitat_noReef": "No mapped coral reef at this location",
   "reef_habitat_unavailable": "Could not check reef habitat right now",
-  "reef_health_title": "Reef health",
-  "reef_health_unavailable": "Could not check reef health right now",
-  "reef_health_noData": "No reef health data for this location",
+  "water_conditions_title": "Water conditions",
+  "water_conditions_unavailable": "Could not check water conditions right now",
+  "water_conditions_noData": "No satellite water data for this location",
+  "water_conditions_freshwater": "Satellite water temperature covers oceans only",
+  "water_conditions_anomaly": "Anomaly {value}",
+  "@water_conditions_anomaly": {"placeholders": {"value": {"type": "String"}}},
   "reef_health_degreeHeatingWeeks": "Degree Heating Weeks {value} C-weeks",
   "@reef_health_degreeHeatingWeeks": {"placeholders": {"value": {"type": "String"}}},
   "reef_health_seaSurface": "Sea surface {value}",
@@ -15068,5 +15429,118 @@
   "reef_attribution_wri": "Reef presence and threat level. CC BY 3.0.",
   "reef_attribution_noaa": "Sea surface temperature and bleaching heat stress. Public domain.",
   "reef_attribution_gbif": "Species occurrence records, filtered to CC0 and CC BY 4.0.",
-  "reef_attribution_protectedSeas": "Marine protected area boundaries. CC BY 4.0."
+  "reef_attribution_protectedSeas": "Marine protected area boundaries. CC BY 4.0.",
+  "enum_visibilityBand_excellent": "Excellent",
+  "enum_visibilityBand_good": "Good",
+  "enum_visibilityBand_moderate": "Moderate",
+  "enum_visibilityBand_poor": "Poor",
+  "visibility_range_between": "{min}-{max} {unit}",
+  "@visibility_range_between": {
+    "placeholders": {
+      "min": {
+        "type": "String"
+      },
+      "max": {
+        "type": "String"
+      },
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "visibility_range_over": "over {min} {unit}",
+  "@visibility_range_over": {
+    "placeholders": {
+      "min": {
+        "type": "String"
+      },
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "visibility_range_under": "under {max} {unit}",
+  "@visibility_range_under": {
+    "placeholders": {
+      "max": {
+        "type": "String"
+      },
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "settings_coordinateFormat_title": "Coordinate format",
+  "settings_coordinateFormat_subtitle": "How GPS positions are shown and entered",
+  "settings_coordinateFormat_decimalDegrees": "Decimal degrees",
+  "settings_coordinateFormat_degreesDecimalMinutes": "Degrees and decimal minutes",
+  "settings_coordinateFormat_degreesMinutesSeconds": "Degrees, minutes, seconds",
+  "settings_coordinateFormat_utm": "UTM",
+  "settings_coordinateFormat_mgrs": "MGRS",
+  "settings_visibilityScale_title": "Visibility scale",
+  "settings_visibilityScale_subtitle": "Which distances count as good visibility where you dive",
+  "settings_visibilityScale_preset_tropical": "Tropical",
+  "settings_visibilityScale_preset_temperate": "Temperate",
+  "settings_visibilityScale_preset_coldWater": "Cold water / Inland",
+  "settings_visibilityScale_preset_custom": "Custom",
+  "settings_visibilityScale_customExcellent": "Excellent at or above",
+  "settings_visibilityScale_customGood": "Good at or above",
+  "settings_visibilityScale_customModerate": "Moderate at or above",
+  "settings_visibilityScale_invalidOrder": "Each value must be smaller than the one above it, and greater than zero",
+  "statistics_conditions_visibility_legacySuffix": "{band} (logged before measurement)",
+  "@statistics_conditions_visibility_legacySuffix": {
+    "placeholders": {
+      "band": {
+        "type": "String"
+      }
+    }
+  },
+  "common_selection_countSelected": "{count} selected",
+  "common_selection_enterTooltip": "Select items",
+  "common_selection_exitTooltip": "Exit selection",
+  "common_selection_selectAllTooltip": "Select all",
+  "common_selection_deselectAllTooltip": "Deselect all",
+  "@common_selection_countSelected": {
+    "placeholders": {
+      "count": { "type": "Object" }
+    }
+  },
+  "common_bulkDelete_title": "{count, plural, one{Delete {count} item?} other{Delete {count} items?}}",
+  "common_bulkDelete_body": "This cannot be undone.",
+  "common_bulkDelete_snackbar": "{count, plural, one{{count} deleted} other{{count} deleted}}",
+  "@common_bulkDelete_title": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "@common_bulkDelete_snackbar": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "marineLife_species_delete_confirmTitle": "Delete species?",
+  "marineLife_species_delete_confirmBody": "Are you sure you want to delete \"{name}\"?",
+  "marineLife_species_delete_inUseError": "Cannot delete \"{name}\" - it has sightings",
+  "marineLife_species_delete_snackbar": "Deleted \"{name}\"",
+  "marineLife_species_delete_error": "Error deleting species: {error}",
+  "@marineLife_species_delete_confirmBody": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "@marineLife_species_delete_inUseError": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "@marineLife_species_delete_snackbar": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "@marineLife_species_delete_error": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  }
 }

@@ -136,6 +136,8 @@ import 'package:submersion/features/marine_life/presentation/pages/species_detai
 import 'package:submersion/features/planner/presentation/pages/plan_chart_fullscreen_page.dart';
 import 'package:submersion/features/planning/presentation/pages/planning_page.dart';
 import 'package:submersion/features/gps_log/presentation/pages/gps_logger_page.dart';
+import 'package:submersion/features/gps_log/presentation/pages/gps_track_detail_page.dart';
+import 'package:submersion/features/gps_log/presentation/pages/gps_track_map_page.dart';
 import 'package:submersion/features/weight_planner/presentation/pages/weight_planner_page.dart';
 import 'package:submersion/features/deco_calculator/presentation/pages/deco_calculator_page.dart';
 import 'package:submersion/features/gas_calculators/presentation/pages/gas_calculators_page.dart';
@@ -873,6 +875,28 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             ),
           ),
 
+          // The track map and track detail are SIBLINGS of /gps-log, not
+          // children. go_router builds one page per matched segment, and
+          // /gps-log has its own pageBuilder, so nesting them stacked a
+          // GpsLoggerPage underneath: pushing a track from the dive detail's
+          // Surface GPS link needed two Back presses, the first landing on a
+          // logger page the diver never visited. Same failure the editPlan
+          // route above was fixed for.
+          //
+          // Static path declared before the parameterised one so 'map' is
+          // not swallowed by ':id'.
+          GoRoute(
+            path: '/gps-log/map',
+            name: 'gpsTrackMap',
+            builder: (context, state) => const GpsTrackMapPage(),
+          ),
+          GoRoute(
+            path: '/gps-log/:id',
+            name: 'gpsTrackDetail',
+            builder: (context, state) =>
+                GpsTrackDetailPage(trackId: state.pathParameters['id']!),
+          ),
+
           // Near-miss incident log (entry point: Settings > Manage)
           GoRoute(
             path: '/incidents',
@@ -905,6 +929,28 @@ final appRouterProvider = Provider<GoRouter>((ref) {
               child: const SettingsPage(),
             ),
             routes: [
+              // Shared detail route for settings sections that have no
+              // dedicated page of their own (About, Units, Data, ...).
+              // Deliberately a child route with a plain builder: go_router
+              // then wraps it in the platform-adaptive MaterialPage, so these
+              // sections slide in exactly like '/settings/appearance'.
+              // Rendering them by re-matching '/settings?selected=<id>'
+              // instead reused this route's NoTransitionPage and made them
+              // appear instantly.
+              GoRoute(
+                path: 'section/:sectionId',
+                name: 'settingsSection',
+                // Sections that render a full page of their own would get a
+                // second app bar from the wrapper, so send deep links to the
+                // dedicated route. Returns null for genuine section content,
+                // which belongs in the wrapper.
+                redirect: (context, state) =>
+                    settingsSectionDedicatedRoutes[state
+                        .pathParameters['sectionId']],
+                builder: (context, state) => SettingsSectionDetailPage(
+                  sectionId: state.pathParameters['sectionId']!,
+                ),
+              ),
               GoRoute(
                 path: 'storage',
                 name: 'storageSettings',

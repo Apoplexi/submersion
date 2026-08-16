@@ -34,7 +34,9 @@ Widget _harness(
   List<Species> catalog = const [_catalogSpecies],
 }) => ProviderScope(
   overrides: [
-    reefSnapshotProvider(location).overrideWith((ref) async => snapshot),
+    reefSnapshotProvider(
+      ReefSnapshotRequest(location: location),
+    ).overrideWith((ref) async => snapshot),
     allSpeciesProvider.overrideWith((ref) async => catalog),
   ],
   child: localizedMaterialApp(

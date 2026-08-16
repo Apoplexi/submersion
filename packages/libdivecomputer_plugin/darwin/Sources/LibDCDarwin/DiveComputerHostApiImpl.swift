@@ -407,8 +407,12 @@ class DiveComputerHostApiImpl: DiveComputerHostApi {
         if candidates.count == 1 {
             let port = candidates[0]
             let stream = SerialIoStream()
-            guard stream.open(path: port) else {
-                reportError(code: "connect_failed", message: "Failed to open serial port: \(port)")
+            if let failure = stream.open(path: port) {
+                NativeLogger.e("DiveComputerHost", category: "SER",
+                    "Failed to open \(port) (errno=\(failure.errnoValue)): \(failure.reason)")
+                reportError(
+                    code: "connect_failed",
+                    message: "Failed to open serial port \(port): \(failure.reason)")
                 return
             }
             NativeLogger.i("DiveComputerHost", category: "SER", "Opened serial port: \(port)")
@@ -440,8 +444,10 @@ class DiveComputerHostApiImpl: DiveComputerHostApi {
             diveBufferLock.unlock()
 
             let stream = SerialIoStream()
-            guard stream.open(path: port) else {
-                probeLog += "  \(port): failed to open\n"
+            if let failure = stream.open(path: port) {
+                NativeLogger.e("DiveComputerHost", category: "SER",
+                    "Failed to open \(port) (errno=\(failure.errnoValue)): \(failure.reason)")
+                probeLog += "  \(port): \(failure.reason)\n"
                 continue
             }
             anyOpened = true
@@ -518,6 +524,9 @@ class DiveComputerHostApiImpl: DiveComputerHostApi {
             ("scan-only", false, 20),
         ]
         var connectedStream: BleIoStream?
+        // Remembered across attempts so the error the user sees describes the
+        // reason the attempts failed, not just that they did.
+        var lastFailure: BleConnectFailure = .other
 
         for (index, plan) in resolvePlans.enumerated() {
             NativeLogger.d("DiveComputerHost", category: "BLE",
@@ -545,24 +554,57 @@ class DiveComputerHostApiImpl: DiveComputerHostApi {
                 self?.flutterApi.onPinCodeRequired(deviceAddress: address) { _ in }
             }
             self.activeBleStream = stream
-            if stream.connectAndDiscover() {
+            guard let failure = stream.connectAndDiscover() else {
                 connectedStream = stream
                 break
             }
+            lastFailure = failure
 
             NativeLogger.w("DiveComputerHost", category: "BLE",
                 "connectAndDiscover failed on attempt \(index + 1) for \(peripheral.identifier.uuidString)")
             if peripheral.state != .disconnected {
                 centralMgr.cancelPeripheralConnection(peripheral)
             }
+
+            // A pairing record the peer has disowned cannot be repaired from
+            // here -- CoreBluetooth offers no unpair API -- so a second attempt
+            // only delays the instruction that does fix it (issue #865).
+            if failure.isTerminal {
+                NativeLogger.w("DiveComputerHost", category: "BLE",
+                    "Not retrying: \(failure.errorCode) needs the user to clear the pairing")
+                break
+            }
         }
 
         guard let bleStream = connectedStream else {
-            reportError(code: "connect_failed", message: "Failed to connect to device")
+            reportError(
+                code: lastFailure.errorCode,
+                message: Self.connectFailureMessage(for: lastFailure))
             self.activeBleStream = nil
             return nil
         }
         return bleStream.makeCallbacks()
+    }
+
+    /// Fallback text for a failed BLE connect.
+    ///
+    /// The Dart layer localises the known codes and only falls back to this
+    /// string for `connect_failed`, but the native message is what lands in the
+    /// debug logs users attach to bug reports, so it spells the diagnosis out.
+    private static func connectFailureMessage(for failure: BleConnectFailure) -> String {
+        switch failure {
+        case .stalePairing:
+            return "The Bluetooth pairing for this dive computer is out of date."
+                + " Forget the dive computer in your device's Bluetooth settings,"
+                + " then try again."
+        case .discoveryStalled:
+            return "Connected to the dive computer, but it stopped responding"
+                + " before the download could start. This is usually an out-of-date"
+                + " Bluetooth pairing: forget the dive computer in your device's"
+                + " Bluetooth settings, then try again."
+        case .other:
+            return "Failed to connect to device"
+        }
     }
 
     // MARK: - Dive Conversion

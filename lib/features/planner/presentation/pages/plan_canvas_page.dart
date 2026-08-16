@@ -27,6 +27,7 @@ import 'package:submersion/features/planner/presentation/providers/plan_reposito
 import 'package:submersion/features/planner/presentation/providers/planner_layout_providers.dart';
 import 'package:submersion/features/planner/presentation/widgets/contingency_chips.dart';
 import 'package:submersion/features/planner/presentation/widgets/follow_dive_sheet.dart';
+import 'package:submersion/features/planner/presentation/widgets/plan_chart_readouts.dart';
 import 'package:submersion/features/planner/presentation/widgets/plan_name_dialog.dart';
 import 'package:submersion/features/planner/presentation/widgets/plan_status_chips.dart';
 import 'package:submersion/features/planner/presentation/widgets/saved_plans_sheet.dart';
@@ -405,10 +406,15 @@ class _PlanCanvasPageState extends ConsumerState<PlanCanvasPage> {
       context.l10n.plannerCanvas_tab_setup,
       context.l10n.divePlanner_tab_results,
     ];
+    // 30% of the body, clamped so the chart neither vanishes on short
+    // viewports nor dominates tall ones; the deck gets everything else.
+    final chartHeight = (constraints.maxHeight * 0.30)
+        .clamp(160.0, 260.0)
+        .toDouble();
     return Column(
       children: [
         SizedBox(
-          height: constraints.maxHeight * 0.40,
+          height: chartHeight,
           child: Stack(
             children: [
               const Positioned.fill(
@@ -417,27 +423,31 @@ class _PlanCanvasPageState extends ConsumerState<PlanCanvasPage> {
                   child: PlanProfileChart(),
                 ),
               ),
+              PlanChartReadouts(
+                onIssuesTap: () =>
+                    ref.read(plannerPhoneTabProvider.notifier).state = 3,
+              ),
+              const Positioned(
+                left: 8,
+                right: 56,
+                bottom: 8,
+                child: Align(
+                  alignment: Alignment.bottomLeft,
+                  child: ContingencyChips(overlay: true),
+                ),
+              ),
               Positioned(
                 right: 10,
                 bottom: 10,
                 child: IconButton.filledTonal(
                   icon: const Icon(Icons.open_in_full, size: 18),
-                  onPressed: () => context.go('/planning/dive-planner/chart'),
+                  // PUSH (not go): back returns to this canvas with its
+                  // state on the stack, instead of closing the app (#647).
+                  onPressed: () => context.push('/planning/dive-planner/chart'),
                 ),
               ),
             ],
           ),
-        ),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12),
-          child: PlanStatusChips(
-            onIssuesTap: () =>
-                ref.read(plannerPhoneTabProvider.notifier).state = 3,
-          ),
-        ),
-        const Padding(
-          padding: EdgeInsets.fromLTRB(12, 6, 12, 0),
-          child: ContingencyChips(),
         ),
         const SizedBox(height: 8),
         Padding(

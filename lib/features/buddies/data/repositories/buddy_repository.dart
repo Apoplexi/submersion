@@ -10,8 +10,6 @@ import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/features/buddies/domain/entities/buddy.dart'
     as domain;
 import 'package:submersion/features/buddies/data/repositories/buddy_merge_repository.dart';
-import 'package:submersion/features/buddies/data/repositories/buddy_role_repository.dart';
-import 'package:submersion/features/buddies/domain/entities/buddy_role_credential.dart';
 import 'package:submersion/features/dive_roles/data/repositories/dive_role_repository.dart';
 import 'package:submersion/features/dive_roles/domain/entities/dive_role.dart';
 import 'package:submersion/features/certifications/data/repositories/certification_repository.dart';
@@ -23,7 +21,6 @@ export 'package:submersion/features/buddies/data/repositories/buddy_merge_reposi
         BuddyMergeResult,
         BuddyMergeSnapshot,
         DiveBuddySnapshot,
-        BuddyRoleSnapshot,
         CertificationInstructorSnapshot;
 
 class BuddyRepository {
@@ -44,6 +41,27 @@ class BuddyRepository {
     return {for (final r in rows) r.read(j.buddyId)!: r.read(countExpr)!};
   }
 
+  /// {buddyId: the role id every one of [diveIds] agrees on for that buddy}.
+  /// Buddies whose links disagree are omitted, so a caller filling in missing
+  /// links can reuse a unanimous role without flattening a deliberate mix.
+  /// HAVING MIN(role) = MAX(role) keeps the mixed rows in SQLite rather than
+  /// shipping every junction row to Dart on the bulk-edit load path.
+  Future<Map<String, String>> unanimousBuddyRolesForDives(
+    List<String> diveIds,
+  ) async {
+    if (diveIds.isEmpty) return {};
+    final j = _db.diveBuddies;
+    final minRole = j.role.min();
+    final maxRole = j.role.max();
+    final rows =
+        await (_db.selectOnly(j)
+              ..addColumns([j.buddyId, minRole])
+              ..where(j.diveId.isIn(diveIds))
+              ..groupBy([j.buddyId], having: minRole.equalsExp(maxRole)))
+            .get();
+    return {for (final r in rows) r.read(j.buddyId)!: r.read(minRole)!};
+  }
+
   final SyncRepository _syncRepository = SyncRepository();
   final CertificationRepository _certRepo = CertificationRepository();
   final _uuid = const Uuid();
@@ -53,29 +71,6 @@ class BuddyRepository {
   /// refresh after a sync or any other write.
   Stream<void> watchBuddiesChanges() =>
       _db.tableUpdates(TableUpdateQuery.onTable(_db.buddies));
-
-  /// Emits whenever the `buddy_roles` table changes.
-  /// Delegates to [BuddyRoleRepository].
-  Stream<void> watchBuddyRolesChanges() =>
-      BuddyRoleRepository().watchBuddyRolesChanges();
-
-  /// Professional credentials for one buddy.
-  /// Delegates to [BuddyRoleRepository].
-  Future<List<BuddyRoleCredential>> getRolesForBuddy(String buddyId) =>
-      BuddyRoleRepository().getRolesForBuddy(buddyId);
-
-  /// All credentials keyed by buddy id, for pickers annotating many buddies.
-  /// Delegates to [BuddyRoleRepository].
-  Future<Map<String, List<BuddyRoleCredential>>> getAllRoles() =>
-      BuddyRoleRepository().getAllRoles();
-
-  /// Replace the credential set for [buddyId]. Dedupes by role (last entry
-  /// wins) and preserves the existing row id for roles that stay.
-  /// Delegates to [BuddyRoleRepository].
-  Future<void> setRolesForBuddy(
-    String buddyId,
-    List<BuddyRoleCredential> roles,
-  ) => BuddyRoleRepository().setRolesForBuddy(buddyId, roles);
 
   /// Get all buddies ordered by name
   Future<List<domain.Buddy>> getAllBuddies({String? diverId}) async {
@@ -88,7 +83,7 @@ class BuddyRepository {
       }
 
       final rows = await query.get();
-      return _withPrimaryCerts(rows.map(_mapRowToBuddy).toList());
+      return await _withPrimaryCerts(rows.map(_mapRowToBuddy).toList());
     } catch (e, stackTrace) {
       _log.error('Failed to get all buddies', error: e, stackTrace: stackTrace);
       rethrow;
@@ -261,7 +256,7 @@ class BuddyRepository {
         updatedAt: DateTime.now(),
       );
 
-      return createBuddy(newBuddy);
+      return await createBuddy(newBuddy);
     } catch (e, stackTrace) {
       _log.error(
         'Failed to find or create buddy: $name',
@@ -596,12 +591,15 @@ class BuddyRepository {
     );
   }
 
-  /// Add each buddy (with role) to every dive. Upserts role if already linked.
+  /// Add each buddy (with role) to every dive. Upserts role if already linked,
+  /// unless [overwriteRole] is false — a membership-only add must leave the
+  /// role each existing link already carries untouched (#893).
   /// No notify/transaction — BulkDiveEditService owns those.
   Future<void> bulkAddBuddies(
     List<String> diveIds,
-    List<domain.BuddyWithRole> buddies,
-  ) async {
+    List<domain.BuddyWithRole> buddies, {
+    bool overwriteRole = true,
+  }) async {
     if (diveIds.isEmpty || buddies.isEmpty) return;
     final now = DateTime.now().millisecondsSinceEpoch;
     for (final diveId in diveIds) {
@@ -613,6 +611,7 @@ class BuddyRepository {
                 ))
                 .getSingleOrNull();
         if (existing != null) {
+          if (!overwriteRole) continue;
           await (_db.update(_db.diveBuddies)..where(
                 (t) => t.diveId.equals(diveId) & t.buddyId.equals(bwr.buddy.id),
               ))

@@ -1,8 +1,10 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/core/constants/enums.dart';
+import 'package:submersion/features/buddies/domain/entities/buddy.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive_custom_field.dart';
 import 'package:submersion/features/dive_log/domain/models/dive_filter_state.dart';
+import 'package:submersion/features/dive_roles/domain/entities/dive_role.dart';
 import 'package:submersion/features/equipment/domain/entities/equipment_attribute.dart';
 import 'package:submersion/features/equipment/domain/entities/equipment_item.dart';
 
@@ -484,6 +486,119 @@ void main() {
 
         expect(result, hasLength(1));
         expect(result.first.id, 'd1');
+      });
+
+      test('filters by buddyNameFilter (case-insensitive legacy)', () {
+        const filter = DiveFilterState(buddyNameFilter: 'JOHN');
+        final dives = [
+          Dive(
+            id: 'd1',
+            dateTime: DateTime.now(),
+            buddy: 'John Doe',
+            notes: '',
+          ),
+          Dive(
+            id: 'd2',
+            dateTime: DateTime.now(),
+            buddy: 'Jane Smith',
+            notes: '',
+          ),
+        ];
+
+        final result = filter.apply(dives);
+
+        expect(result, hasLength(1));
+        expect(result.first.id, 'd1');
+      });
+
+      test('filters by buddyNameFilter (case-insensitive structured)', () {
+        const filter = DiveFilterState(buddyNameFilter: 'doe');
+        final buddyJohn = Buddy(
+          id: 'b1',
+          name: 'John Doe',
+          createdAt: DateTime.now(),
+          updatedAt: DateTime.now(),
+        );
+        final dives = [
+          Dive(
+            id: 'd1',
+            dateTime: DateTime.now(),
+            notes: '',
+            buddies: [
+              BuddyWithRole(buddy: buddyJohn, role: DiveRole.builtInBuddy()),
+            ],
+          ),
+          Dive(
+            id: 'd2',
+            dateTime: DateTime.now(),
+            buddy: 'Jane Doe',
+            notes: '',
+          ),
+        ];
+
+        final result = filter.apply(dives);
+
+        expect(result, hasLength(2));
+      });
+
+      test('filters by multiple comma-separated buddies (AND-semantics)', () {
+        const filter = DiveFilterState(buddyNameFilter: 'John, Jane');
+        final buddyJohn = Buddy(
+          id: 'b1',
+          name: 'John Smith',
+          createdAt: DateTime.now(),
+          updatedAt: DateTime.now(),
+        );
+        final buddyJane = Buddy(
+          id: 'b2',
+          name: 'Jane Smith',
+          createdAt: DateTime.now(),
+          updatedAt: DateTime.now(),
+        );
+
+        final dives = [
+          // D1: Matches both (John in structured, Jane in legacy)
+          Dive(
+            id: 'd1',
+            dateTime: DateTime.now(),
+            buddy: 'Jane Doe',
+            notes: '',
+            buddies: [
+              BuddyWithRole(buddy: buddyJohn, role: DiveRole.builtInBuddy()),
+            ],
+          ),
+          // D2: Matches both (Both in structured)
+          Dive(
+            id: 'd2',
+            dateTime: DateTime.now(),
+            notes: '',
+            buddies: [
+              BuddyWithRole(buddy: buddyJohn, role: DiveRole.builtInBuddy()),
+              BuddyWithRole(buddy: buddyJane, role: DiveRole.builtInBuddy()),
+            ],
+          ),
+          // D3: Matches only John
+          Dive(
+            id: 'd3',
+            dateTime: DateTime.now(),
+            buddy: 'John Doe',
+            notes: '',
+          ),
+          // D4: Matches only Jane
+          Dive(
+            id: 'd4',
+            dateTime: DateTime.now(),
+            notes: '',
+            buddies: [
+              BuddyWithRole(buddy: buddyJane, role: DiveRole.builtInBuddy()),
+            ],
+          ),
+        ];
+
+        final result = filter.apply(dives);
+
+        expect(result, hasLength(2));
+        expect(result.map((d) => d.id), containsAll(['d1', 'd2']));
       });
 
       group('equipmentAttr axis', () {

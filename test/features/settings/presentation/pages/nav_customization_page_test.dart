@@ -9,6 +9,11 @@ import 'package:submersion/shared/widgets/nav/nav_destinations.dart';
 
 class _FakeRepo implements AppSettingsRepository {
   List<String>? stored;
+
+  /// No database, so nothing ever ticks.
+  @override
+  Stream<void> watchSettingsChanges() => const Stream.empty();
+
   @override
   Future<List<String>?> getNavPrimaryIdsRaw() async => stored;
   @override

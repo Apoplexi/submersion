@@ -17,7 +17,9 @@ import 'package:submersion/core/constants/map_style.dart';
 import 'package:submersion/features/dive_sites/domain/matching/site_match_sensitivity.dart';
 import 'package:submersion/core/constants/dive_detail_sections.dart';
 import 'package:submersion/core/constants/profile_metrics.dart';
+import 'package:submersion/core/domain/visibility/visibility_scale.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/tissue_color_schemes.dart';
+import 'package:submersion/core/utils/coordinates/coordinate_format.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/features/statistics/presentation/pages/records_page.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
@@ -28,6 +30,10 @@ typedef Override = riverpod.Override;
 class _MockSettingsNotifier extends StateNotifier<AppSettings>
     implements SettingsNotifier {
   _MockSettingsNotifier() : super(const AppSettings());
+
+  /// Already "loaded": the mock's state is supplied up front.
+  @override
+  Future<void> get initialLoad async {}
 
   @override
   Future<void> setAccentNavIcons(bool value) async =>
@@ -90,8 +96,23 @@ class _MockSettingsNotifier extends StateNotifier<AppSettings>
   Future<void> setDefaultCurrency(String currencyCode) async =>
       state = state.copyWith(defaultCurrency: currencyCode);
   @override
+  Future<void> setVisibilityScale({
+    required VisibilityScalePreset preset,
+    double? excellentM,
+    double? goodM,
+    double? moderateM,
+  }) async => state = state.copyWith(
+    visibilityScalePreset: preset,
+    visibilityScaleExcellentM: excellentM,
+    visibilityScaleGoodM: goodM,
+    visibilityScaleModerateM: moderateM,
+  );
+  @override
   Future<void> setAltitudeUnit(AltitudeUnit unit) async =>
       state = state.copyWith(altitudeUnit: unit);
+  @override
+  Future<void> setCoordinateFormat(CoordinateFormat format) async =>
+      state = state.copyWith(coordinateFormat: format);
   @override
   Future<void> setTimeFormat(TimeFormat format) async =>
       state = state.copyWith(timeFormat: format);
@@ -171,6 +192,27 @@ class _MockSettingsNotifier extends StateNotifier<AppSettings>
     }
     state = state.copyWith(hiddenHomeChips: hidden);
   }
+
+  @override
+  Future<void> setHomeCardEnabled(String cardId, bool enabled) async {
+    final hidden = {...state.hiddenHomeCards};
+    if (enabled) {
+      hidden.remove(cardId);
+    } else {
+      hidden.add(cardId);
+    }
+    state = state.copyWith(hiddenHomeCards: hidden);
+  }
+
+  @override
+  Future<void> setHomeCardOrder(List<String> order) async =>
+      state = state.copyWith(homeCardOrder: order);
+
+  @override
+  Future<void> resetHomeCards() async => state = state.copyWith(
+    homeCardOrder: const <String>[],
+    hiddenHomeCards: const <String>{},
+  );
 
   @override
   Future<void> setSafetyRuleEnabled(SafetyRuleId rule, bool enabled) async {
@@ -391,14 +433,6 @@ class _MockSettingsNotifier extends StateNotifier<AppSettings>
   @override
   Future<void> resetDiveDetailSections() async =>
       state = state.copyWith(clearDiveDetailSections: true);
-  @override
-  Future<void> setFullscreenTilePreferences({
-    required List<String> order,
-    required List<String> hidden,
-  }) async => state = state.copyWith(
-    fullscreenTileOrder: order,
-    fullscreenHiddenTiles: hidden,
-  );
 
   @override
   Future<void> setFullscreenReadoutCardPosition(double x, double y) async =>
@@ -406,6 +440,10 @@ class _MockSettingsNotifier extends StateNotifier<AppSettings>
         fullscreenReadoutCardX: x,
         fullscreenReadoutCardY: y,
       );
+
+  @override
+  Future<void> setProfileMetricsFollowViewport(bool value) async =>
+      state = state.copyWith(profileMetricsFollowViewport: value);
 
   @override
   Future<void> setPerdixOverlayEnabled(bool value) async =>

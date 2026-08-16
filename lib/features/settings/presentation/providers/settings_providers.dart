@@ -4,6 +4,8 @@ import 'package:submersion/core/constants/card_color.dart';
 import 'package:submersion/core/constants/dive_detail_sections.dart';
 import 'package:submersion/core/constants/list_view_mode.dart';
 import 'package:submersion/core/constants/map_style.dart';
+import 'package:submersion/core/domain/visibility/visibility_scale.dart';
+import 'package:submersion/core/utils/coordinates/coordinate_format.dart';
 import 'package:submersion/features/dive_sites/domain/matching/site_match_sensitivity.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/core/theme/app_theme_preset.dart';
@@ -78,13 +80,21 @@ class SettingsKeys {
   static const String decoStopIncrement = 'deco_stop_increment';
   static const String pscrRatio = 'pscr_ratio';
 
-  // Fullscreen profile view instrument tile preferences (device-local,
-  // stored directly in SharedPreferences rather than per-diver in the DB).
-  static const String fullscreenTileOrder = 'fullscreen_tile_order';
-  static const String fullscreenHiddenTiles = 'fullscreen_hidden_tiles';
   static const String hiddenHomeChips = 'hidden_home_chips';
+
+  // Home card layout is device-local like the chip toggles above (stored
+  // directly in SharedPreferences rather than per-diver in the DB).
+  static const String homeCardOrder = 'home_card_order';
+  static const String hiddenHomeCards = 'hidden_home_cards';
+
   static const String fullscreenReadoutCardX = 'fullscreen_readout_card_x';
   static const String fullscreenReadoutCardY = 'fullscreen_readout_card_y';
+
+  // Whether profile-chart metric overlays follow the visible depth window when
+  // zoomed (device-local, stored directly in SharedPreferences rather than
+  // per-diver in the DB).
+  static const String profileMetricsFollowViewport =
+      'profile_metrics_follow_viewport';
 
   // Perdix-style media overlay preferences (device-local, stored directly in
   // SharedPreferences rather than per-diver in the DB).
@@ -106,6 +116,37 @@ class AppSettings {
   /// ISO 4217 code used as the default currency for new priced items
   /// (e.g. equipment purchase price).
   final String defaultCurrency;
+
+  /// Per-diver calibration deciding which measured visibility distances read
+  /// as excellent/good/moderate/poor.
+  ///
+  /// Presentational only: dives store the measured distance, so changing this
+  /// re-labels the logbook without altering a single dive.
+  final VisibilityScalePreset visibilityScalePreset;
+
+  /// Custom calibration thresholds in meters, used only when
+  /// [visibilityScalePreset] is [VisibilityScalePreset.custom].
+  final double? visibilityScaleExcellentM;
+  final double? visibilityScaleGoodM;
+  final double? visibilityScaleModerateM;
+
+  /// How GPS coordinates are rendered and entered.
+  ///
+  /// Presentational only: coordinates are always stored as decimal degrees,
+  /// so changing this re-renders every site without altering a stored value.
+  final CoordinateFormat coordinateFormat;
+
+  /// The resolved scale for the current preference.
+  ///
+  /// Custom values that are absent or invalid degrade to tropical rather than
+  /// producing an unreachable band, so a corrupt preference falls back to the
+  /// pre-v144 behaviour instead of rendering nonsense.
+  VisibilityScale get visibilityScale => VisibilityScale.forPreset(
+    visibilityScalePreset,
+    excellentM: visibilityScaleExcellentM,
+    goodM: visibilityScaleGoodM,
+    moderateM: visibilityScaleModerateM,
+  );
   final TimeFormat timeFormat;
   final DateFormatPreference dateFormat;
   final ThemeMode themeMode;
@@ -364,22 +405,29 @@ class AppSettings {
   /// Ordered list of dive detail section visibility preferences
   final List<DiveDetailSectionConfig> diveDetailSections;
 
-  /// Instrument tile order for the fullscreen profile view.
-  /// Empty means the built-in priority order.
-  final List<String> fullscreenTileOrder;
-
-  /// Instrument tiles the user has hidden in the fullscreen profile view.
-  final List<String> fullscreenHiddenTiles;
-
   /// Home dashboard gauge-strip chip types the user has hidden.
   /// Ids are [HomeChipType.name] values; empty means all chips shown.
   /// Device-local, not per-diver.
   final Set<String> hiddenHomeChips;
 
+  /// Display order of home screen cards ([HomeCardType.name] values).
+  /// Empty means the default order. Device-local, not per-diver.
+  final List<String> homeCardOrder;
+
+  /// Home screen cards the user has toggled off ([HomeCardType.name]
+  /// values). Device-local, not per-diver.
+  final Set<String> hiddenHomeCards;
+
   /// Fullscreen readout card position as fractions (0..1) of the movable
   /// range; null means the default corner. See DraggableReadoutCard.
   final double? fullscreenReadoutCardX;
   final double? fullscreenReadoutCardY;
+
+  /// Whether the dive profile chart's secondary-axis metric overlays (NDL,
+  /// ppO2, GF, ...) follow the visible depth window when zoomed instead of
+  /// magnifying with the depth axis and scrolling out of view. Device-local,
+  /// not per-diver. See MetricBand.
+  final bool profileMetricsFollowViewport;
 
   /// Perdix-style media overlay: shown over photos/videos when enabled.
   /// Device-local, not per-diver.
@@ -399,6 +447,11 @@ class AppSettings {
     this.altitudeUnit = AltitudeUnit.meters,
     this.sacUnit = SacUnit.pressurePerMin,
     this.defaultCurrency = 'USD',
+    this.visibilityScalePreset = VisibilityScalePreset.tropical,
+    this.visibilityScaleExcellentM,
+    this.visibilityScaleGoodM,
+    this.visibilityScaleModerateM,
+    this.coordinateFormat = CoordinateFormat.decimalDegrees,
     this.timeFormat = TimeFormat.twelveHour,
     this.dateFormat = DateFormatPreference.mmmDYYYY,
     this.themeMode = ThemeMode.system,
@@ -498,11 +551,12 @@ class AppSettings {
     this.showDetailsPaneCertifications = false,
     this.showDetailsPaneCourses = false,
     this.diveDetailSections = DiveDetailSectionConfig.defaultSections,
-    this.fullscreenTileOrder = const [],
-    this.fullscreenHiddenTiles = const [],
     this.hiddenHomeChips = const <String>{},
+    this.homeCardOrder = const <String>[],
+    this.hiddenHomeCards = const <String>{},
     this.fullscreenReadoutCardX,
     this.fullscreenReadoutCardY,
+    this.profileMetricsFollowViewport = false,
     this.perdixOverlayEnabled = false,
     this.perdixOverlayX,
     this.perdixOverlayY,
@@ -550,6 +604,11 @@ class AppSettings {
     AltitudeUnit? altitudeUnit,
     SacUnit? sacUnit,
     String? defaultCurrency,
+    VisibilityScalePreset? visibilityScalePreset,
+    double? visibilityScaleExcellentM,
+    double? visibilityScaleGoodM,
+    double? visibilityScaleModerateM,
+    CoordinateFormat? coordinateFormat,
     TimeFormat? timeFormat,
     DateFormatPreference? dateFormat,
     ThemeMode? themeMode,
@@ -649,11 +708,12 @@ class AppSettings {
     bool? showDetailsPaneCourses,
     List<DiveDetailSectionConfig>? diveDetailSections,
     bool clearDiveDetailSections = false,
-    List<String>? fullscreenTileOrder,
-    List<String>? fullscreenHiddenTiles,
     Set<String>? hiddenHomeChips,
+    List<String>? homeCardOrder,
+    Set<String>? hiddenHomeCards,
     double? fullscreenReadoutCardX,
     double? fullscreenReadoutCardY,
+    bool? profileMetricsFollowViewport,
     bool? perdixOverlayEnabled,
     double? perdixOverlayX,
     double? perdixOverlayY,
@@ -667,6 +727,14 @@ class AppSettings {
       altitudeUnit: altitudeUnit ?? this.altitudeUnit,
       sacUnit: sacUnit ?? this.sacUnit,
       defaultCurrency: defaultCurrency ?? this.defaultCurrency,
+      visibilityScalePreset:
+          visibilityScalePreset ?? this.visibilityScalePreset,
+      visibilityScaleExcellentM:
+          visibilityScaleExcellentM ?? this.visibilityScaleExcellentM,
+      visibilityScaleGoodM: visibilityScaleGoodM ?? this.visibilityScaleGoodM,
+      visibilityScaleModerateM:
+          visibilityScaleModerateM ?? this.visibilityScaleModerateM,
+      coordinateFormat: coordinateFormat ?? this.coordinateFormat,
       timeFormat: timeFormat ?? this.timeFormat,
       dateFormat: dateFormat ?? this.dateFormat,
       themeMode: themeMode ?? this.themeMode,
@@ -794,14 +862,15 @@ class AppSettings {
       diveDetailSections: clearDiveDetailSections
           ? DiveDetailSectionConfig.defaultSections
           : (diveDetailSections ?? this.diveDetailSections),
-      fullscreenTileOrder: fullscreenTileOrder ?? this.fullscreenTileOrder,
-      fullscreenHiddenTiles:
-          fullscreenHiddenTiles ?? this.fullscreenHiddenTiles,
       hiddenHomeChips: hiddenHomeChips ?? this.hiddenHomeChips,
+      homeCardOrder: homeCardOrder ?? this.homeCardOrder,
+      hiddenHomeCards: hiddenHomeCards ?? this.hiddenHomeCards,
       fullscreenReadoutCardX:
           fullscreenReadoutCardX ?? this.fullscreenReadoutCardX,
       fullscreenReadoutCardY:
           fullscreenReadoutCardY ?? this.fullscreenReadoutCardY,
+      profileMetricsFollowViewport:
+          profileMetricsFollowViewport ?? this.profileMetricsFollowViewport,
       perdixOverlayEnabled: perdixOverlayEnabled ?? this.perdixOverlayEnabled,
       perdixOverlayX: perdixOverlayX ?? this.perdixOverlayX,
       perdixOverlayY: perdixOverlayY ?? this.perdixOverlayY,
@@ -834,6 +903,7 @@ final appSettingsRepositoryProvider = Provider<AppSettingsRepository>((ref) {
 /// Whether newly created sites/trips should be shared with all profiles by default
 final shareByDefaultProvider = FutureProvider<bool>((ref) async {
   final repo = ref.watch(appSettingsRepositoryProvider);
+  ref.invalidateSelfWhen(repo.watchSettingsChanges());
   return repo.getShareByDefault();
 });
 
@@ -844,8 +914,46 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
   String? _validatedDiverId;
   bool _isLoading = false;
 
+  /// Completes when the constructor's first load has finished.
+  ///
+  /// State starts at `const AppSettings()` -- the DEFAULTS -- and is replaced
+  /// asynchronously once the diver's row is read. Anything that must act on the
+  /// stored settings rather than the defaults (notably the post-restore safety
+  /// sweep, which builds a throwaway container against a freshly restored
+  /// database) has to await this first.
+  ///
+  /// May complete with an error -- `_loadSettings` has a `finally` but no
+  /// `catch` -- so awaiting callers must guard and fall back to the defaults
+  /// still held in [state]. Merely storing the future adds no listener, so
+  /// failures surface to the zone handler exactly as they did when the
+  /// constructor called `_initializeAndLoad()` fire-and-forget.
+  late final Future<void> _initialLoad;
+
+  Future<void> get initialLoad => _initialLoad;
+
+  /// A notifier pinned to already-loaded [settings] for [diverId], performing
+  /// no database read and installing no diver-change listener.
+  ///
+  /// For batch work that must grade ONE diver's data with THAT diver's
+  /// settings. The post-restore safety sweep builds one container per diver and
+  /// overrides [settingsProvider] with this, so every settings-derived provider
+  /// — gradient factors, ppO2 ceilings, deco stop increment, and
+  /// [ProfileLegend]'s metric-source defaults — resolves to the dive's owning
+  /// diver instead of whoever happens to be active. Overriding the one root
+  /// provider covers them all; overriding each derived provider would rot as
+  /// the analysis pipeline grows.
+  SettingsNotifier.preloaded(
+    this._repository,
+    this._ref, {
+    required AppSettings settings,
+    required String? diverId,
+  }) : super(settings) {
+    _validatedDiverId = diverId;
+    _initialLoad = Future<void>.value();
+  }
+
   SettingsNotifier(this._repository, this._ref) : super(const AppSettings()) {
-    _initializeAndLoad();
+    _initialLoad = _initializeAndLoad();
 
     // Listen for diver changes and reload settings
     _ref.listen<String?>(currentDiverIdProvider, (previous, next) {
@@ -892,17 +1000,27 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
     _isLoading = true;
 
     try {
-      // Fullscreen profile tile preferences are device-local (not per-diver),
-      // so they're read straight from SharedPreferences rather than the
-      // per-diver settings repository.
+      // Some preferences are device-local (not per-diver), so they're read
+      // straight from SharedPreferences rather than the per-diver settings
+      // repository.
       final prefs = _ref.read(sharedPreferencesProvider);
-      final fullscreenTileOrder =
-          prefs.getStringList(SettingsKeys.fullscreenTileOrder) ?? const [];
-      final fullscreenHiddenTiles =
-          prefs.getStringList(SettingsKeys.fullscreenHiddenTiles) ?? const [];
       final hiddenHomeChips =
           prefs.getStringList(SettingsKeys.hiddenHomeChips)?.toSet() ??
           const <String>{};
+      List<String> homeCardOrder;
+      Set<String> hiddenHomeCards;
+      try {
+        homeCardOrder =
+            prefs.getStringList(SettingsKeys.homeCardOrder) ?? const [];
+        hiddenHomeCards =
+            prefs.getStringList(SettingsKeys.hiddenHomeCards)?.toSet() ??
+            const <String>{};
+      } catch (_) {
+        // Corrupt pref types must never block the dashboard; fall back to
+        // the default layout.
+        homeCardOrder = const [];
+        hiddenHomeCards = const <String>{};
+      }
       final fullscreenReadoutCardX = prefs.getDouble(
         SettingsKeys.fullscreenReadoutCardX,
       );
@@ -913,6 +1031,10 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
       // per-diver settings table), so it is read straight from SharedPreferences
       // like the fullscreen tile prefs above.
       final pscrRatio = prefs.getDouble(SettingsKeys.pscrRatio);
+      // Profile-chart overlay scaling is a device-local viewing preference,
+      // kept out of the per-diver settings table like the prefs above.
+      final profileMetricsFollowViewport =
+          prefs.getBool(SettingsKeys.profileMetricsFollowViewport) ?? false;
       final perdixOverlayEnabled =
           prefs.getBool(SettingsKeys.perdixOverlayEnabled) ?? false;
       final perdixOverlayX = prefs.getDouble(SettingsKeys.perdixOverlayX);
@@ -922,12 +1044,13 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
       if (diverId == null) {
         // No diver selected, use defaults
         state = AppSettings(
-          fullscreenTileOrder: fullscreenTileOrder,
-          fullscreenHiddenTiles: fullscreenHiddenTiles,
           hiddenHomeChips: hiddenHomeChips,
+          homeCardOrder: homeCardOrder,
+          hiddenHomeCards: hiddenHomeCards,
           fullscreenReadoutCardX: fullscreenReadoutCardX,
           fullscreenReadoutCardY: fullscreenReadoutCardY,
           pscrRatio: pscrRatio ?? 100.0,
+          profileMetricsFollowViewport: profileMetricsFollowViewport,
           perdixOverlayEnabled: perdixOverlayEnabled,
           perdixOverlayX: perdixOverlayX,
           perdixOverlayY: perdixOverlayY,
@@ -938,13 +1061,20 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
 
       // Load settings from database
       final settings = await _repository.getOrCreateSettingsForDiver(diverId);
+      // The notifier can be disposed while this read is in flight -- a
+      // ProviderScope teardown (restartApp's soft restart, or the throwaway
+      // container the post-restore safety sweep builds) tears down mid-load,
+      // and the diver-id listener can start a second load whose completion
+      // nobody awaits. Assigning state after dispose throws.
+      if (!mounted) return;
       state = settings.copyWith(
-        fullscreenTileOrder: fullscreenTileOrder,
-        fullscreenHiddenTiles: fullscreenHiddenTiles,
         hiddenHomeChips: hiddenHomeChips,
+        homeCardOrder: homeCardOrder,
+        hiddenHomeCards: hiddenHomeCards,
         fullscreenReadoutCardX: fullscreenReadoutCardX,
         fullscreenReadoutCardY: fullscreenReadoutCardY,
         pscrRatio: pscrRatio,
+        profileMetricsFollowViewport: profileMetricsFollowViewport,
         perdixOverlayEnabled: perdixOverlayEnabled,
         perdixOverlayX: perdixOverlayX,
         perdixOverlayY: perdixOverlayY,
@@ -981,21 +1111,17 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
   }
 
   Future<void> _saveSettings() async {
-    // Fullscreen profile tile preferences are device-local (not per-diver),
-    // so they're always persisted to SharedPreferences, independent of
-    // whether a diver is currently selected.
+    // Device-local preferences are always persisted to SharedPreferences,
+    // independent of whether a diver is currently selected.
     final prefs = _ref.read(sharedPreferencesProvider);
-    await prefs.setStringList(
-      SettingsKeys.fullscreenTileOrder,
-      state.fullscreenTileOrder,
-    );
-    await prefs.setStringList(
-      SettingsKeys.fullscreenHiddenTiles,
-      state.fullscreenHiddenTiles,
-    );
     await prefs.setStringList(
       SettingsKeys.hiddenHomeChips,
       state.hiddenHomeChips.toList()..sort(),
+    );
+    await prefs.setStringList(SettingsKeys.homeCardOrder, state.homeCardOrder);
+    await prefs.setStringList(
+      SettingsKeys.hiddenHomeCards,
+      state.hiddenHomeCards.toList()..sort(),
     );
     final readoutCardX = state.fullscreenReadoutCardX;
     if (readoutCardX != null) {
@@ -1006,6 +1132,10 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
       await prefs.setDouble(SettingsKeys.fullscreenReadoutCardY, readoutCardY);
     }
     await prefs.setDouble(SettingsKeys.pscrRatio, state.pscrRatio);
+    await prefs.setBool(
+      SettingsKeys.profileMetricsFollowViewport,
+      state.profileMetricsFollowViewport,
+    );
     await prefs.setBool(
       SettingsKeys.perdixOverlayEnabled,
       state.perdixOverlayEnabled,
@@ -1068,6 +1198,31 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
 
   Future<void> setDefaultCurrency(String currencyCode) async {
     state = state.copyWith(defaultCurrency: currencyCode.trim().toUpperCase());
+    await _saveSettings();
+  }
+
+  /// Sets the visibility calibration.
+  ///
+  /// Custom thresholds are retained even while a named preset is active, so
+  /// switching away and back restores them; [VisibilityScale.forPreset]
+  /// ignores them unless the preset is custom.
+  Future<void> setVisibilityScale({
+    required VisibilityScalePreset preset,
+    double? excellentM,
+    double? goodM,
+    double? moderateM,
+  }) async {
+    state = state.copyWith(
+      visibilityScalePreset: preset,
+      visibilityScaleExcellentM: excellentM,
+      visibilityScaleGoodM: goodM,
+      visibilityScaleModerateM: moderateM,
+    );
+    await _saveSettings();
+  }
+
+  Future<void> setCoordinateFormat(CoordinateFormat format) async {
+    state = state.copyWith(coordinateFormat: format);
     await _saveSettings();
   }
 
@@ -1220,6 +1375,33 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
       hidden.add(chipId);
     }
     state = state.copyWith(hiddenHomeChips: hidden);
+    await _saveSettings();
+  }
+
+  /// Show or hide one home card (id = HomeCardType.name).
+  Future<void> setHomeCardEnabled(String cardId, bool enabled) async {
+    final hidden = {...state.hiddenHomeCards};
+    if (enabled) {
+      hidden.remove(cardId);
+    } else {
+      hidden.add(cardId);
+    }
+    state = state.copyWith(hiddenHomeCards: hidden);
+    await _saveSettings();
+  }
+
+  /// Persist the home card display order (HomeCardType.name values).
+  Future<void> setHomeCardOrder(List<String> order) async {
+    state = state.copyWith(homeCardOrder: List.unmodifiable(order));
+    await _saveSettings();
+  }
+
+  /// Restore the default home card order and visibility.
+  Future<void> resetHomeCards() async {
+    state = state.copyWith(
+      homeCardOrder: const <String>[],
+      hiddenHomeCards: const <String>{},
+    );
     await _saveSettings();
   }
 
@@ -1574,17 +1756,6 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
     await _saveSettings();
   }
 
-  Future<void> setFullscreenTilePreferences({
-    required List<String> order,
-    required List<String> hidden,
-  }) async {
-    state = state.copyWith(
-      fullscreenTileOrder: order,
-      fullscreenHiddenTiles: hidden,
-    );
-    await _saveSettings();
-  }
-
   Future<void> setFullscreenReadoutCardPosition(double x, double y) async {
     // Positions are fractions of the card's movable range; clamp so
     // persisted values always honor the 0..1 contract (an out-of-range
@@ -1597,6 +1768,11 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
       fullscreenReadoutCardX: x.isFinite ? x.clamp(0.0, 1.0) : 1.0,
       fullscreenReadoutCardY: y.isFinite ? y.clamp(0.0, 1.0) : 0.0,
     );
+    await _saveSettings();
+  }
+
+  Future<void> setProfileMetricsFollowViewport(bool value) async {
+    state = state.copyWith(profileMetricsFollowViewport: value);
     await _saveSettings();
   }
 
@@ -1704,6 +1880,10 @@ final defaultCurrencyProvider = Provider<String>((ref) {
 
 final altitudeUnitProvider = Provider<AltitudeUnit>((ref) {
   return ref.watch(settingsProvider.select((s) => s.altitudeUnit));
+});
+
+final coordinateFormatProvider = Provider<CoordinateFormat>((ref) {
+  return ref.watch(settingsProvider.select((s) => s.coordinateFormat));
 });
 
 final themeModeProvider = Provider<ThemeMode>((ref) {

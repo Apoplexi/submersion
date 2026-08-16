@@ -22,11 +22,22 @@ class StoragePlatformCapabilities {
   /// Whether this is a desktop platform
   final bool isDesktop;
 
+  /// Whether "custom folder" can only mean an app-specific device volume
+  /// (internal storage or SD card) rather than any folder the user names.
+  ///
+  /// True on Android: a live SQLite file needs a real lockable path for its
+  /// `-wal`/`-shm` byte-range locks, which a Storage Access Framework stream
+  /// cannot provide, so the picker offers app-specific external volumes
+  /// instead of an arbitrary folder. The UI must not promise cloud-synced
+  /// folders there (#311).
+  final bool customFolderIsDeviceVolumeOnly;
+
   const StoragePlatformCapabilities({
     required this.supportsCustomFolder,
     required this.supportsICloud,
     required this.supportsGoogleDrive,
     required this.isDesktop,
+    required this.customFolderIsDeviceVolumeOnly,
   });
 }
 
@@ -38,11 +49,13 @@ final storagePlatformCapabilitiesProvider =
         // - macOS: Uses security-scoped bookmarks for persistent access
         // - iOS: Uses security-scoped bookmarks for iCloud Drive folders
         // - Windows/Linux: Standard file system access
-        // - Android: Uses Storage Access Framework (SAF)
+        // - Android: app-specific external volumes only (internal/SD card);
+        //   scoped storage rules out an arbitrary folder for the live DB
         supportsCustomFolder: true,
         supportsICloud: Platform.isIOS || Platform.isMacOS,
         supportsGoogleDrive: true, // All platforms
         isDesktop: Platform.isMacOS || Platform.isWindows || Platform.isLinux,
+        customFolderIsDeviceVolumeOnly: Platform.isAndroid,
       );
     });
 

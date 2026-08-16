@@ -29,10 +29,12 @@ import 'package:submersion/features/dive_sites/domain/matching/site_match_sensit
 import 'package:submersion/core/constants/dive_detail_sections.dart';
 import 'package:submersion/core/constants/list_view_mode.dart';
 import 'package:submersion/core/constants/profile_metrics.dart';
+import 'package:submersion/core/domain/visibility/visibility_scale.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/tissue_color_schemes.dart';
 import 'package:submersion/core/services/log_file_service.dart';
 import 'package:submersion/features/settings/presentation/providers/debug_log_providers.dart';
 import 'package:submersion/features/settings/presentation/providers/debug_mode_provider.dart';
+import 'package:submersion/core/utils/coordinates/coordinate_format.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
 
@@ -43,6 +45,10 @@ class _MockSettingsNotifier extends StateNotifier<AppSettings>
     implements SettingsNotifier {
   _MockSettingsNotifier([AppSettings? initial])
     : super(initial ?? const AppSettings());
+
+  /// Already "loaded": the mock's state is supplied up front.
+  @override
+  Future<void> get initialLoad async {}
 
   @override
   Future<void> setAccentNavIcons(bool value) async =>
@@ -105,8 +111,23 @@ class _MockSettingsNotifier extends StateNotifier<AppSettings>
   Future<void> setDefaultCurrency(String currencyCode) async =>
       state = state.copyWith(defaultCurrency: currencyCode);
   @override
+  Future<void> setVisibilityScale({
+    required VisibilityScalePreset preset,
+    double? excellentM,
+    double? goodM,
+    double? moderateM,
+  }) async => state = state.copyWith(
+    visibilityScalePreset: preset,
+    visibilityScaleExcellentM: excellentM,
+    visibilityScaleGoodM: goodM,
+    visibilityScaleModerateM: moderateM,
+  );
+  @override
   Future<void> setAltitudeUnit(AltitudeUnit unit) async =>
       state = state.copyWith(altitudeUnit: unit);
+  @override
+  Future<void> setCoordinateFormat(CoordinateFormat format) async =>
+      state = state.copyWith(coordinateFormat: format);
   @override
   Future<void> setTimeFormat(TimeFormat format) async =>
       state = state.copyWith(timeFormat: format);
@@ -186,6 +207,27 @@ class _MockSettingsNotifier extends StateNotifier<AppSettings>
     }
     state = state.copyWith(hiddenHomeChips: hidden);
   }
+
+  @override
+  Future<void> setHomeCardEnabled(String cardId, bool enabled) async {
+    final hidden = {...state.hiddenHomeCards};
+    if (enabled) {
+      hidden.remove(cardId);
+    } else {
+      hidden.add(cardId);
+    }
+    state = state.copyWith(hiddenHomeCards: hidden);
+  }
+
+  @override
+  Future<void> setHomeCardOrder(List<String> order) async =>
+      state = state.copyWith(homeCardOrder: order);
+
+  @override
+  Future<void> resetHomeCards() async => state = state.copyWith(
+    homeCardOrder: const <String>[],
+    hiddenHomeCards: const <String>{},
+  );
 
   @override
   Future<void> setSafetyRuleEnabled(SafetyRuleId rule, bool enabled) async {
@@ -406,14 +448,6 @@ class _MockSettingsNotifier extends StateNotifier<AppSettings>
   @override
   Future<void> resetDiveDetailSections() async =>
       state = state.copyWith(clearDiveDetailSections: true);
-  @override
-  Future<void> setFullscreenTilePreferences({
-    required List<String> order,
-    required List<String> hidden,
-  }) async => state = state.copyWith(
-    fullscreenTileOrder: order,
-    fullscreenHiddenTiles: hidden,
-  );
 
   @override
   Future<void> setFullscreenReadoutCardPosition(double x, double y) async =>
@@ -421,6 +455,10 @@ class _MockSettingsNotifier extends StateNotifier<AppSettings>
         fullscreenReadoutCardX: x,
         fullscreenReadoutCardY: y,
       );
+
+  @override
+  Future<void> setProfileMetricsFollowViewport(bool value) async =>
+      state = state.copyWith(profileMetricsFollowViewport: value);
 
   @override
   Future<void> setPerdixOverlayEnabled(bool value) async =>
@@ -1402,12 +1440,34 @@ void main() {
       await tester.binding.setSurfaceSize(const Size(400, 800));
       addTearDown(() => tester.binding.setSurfaceSize(null));
 
+      // Mirror the real route config: '/settings' is a bottom-nav tab root
+      // that must not animate when tabs are switched, and sections live on
+      // an animated child route beneath it.
       final router = GoRouter(
         initialLocation: initialLocation,
         routes: [
           GoRoute(
             path: '/settings',
-            builder: (context, state) => const SettingsPage(),
+            pageBuilder: (context, state) => NoTransitionPage(
+              key: state.pageKey,
+              child: const SettingsPage(),
+            ),
+            routes: [
+              GoRoute(
+                path: 'section/:sectionId',
+                builder: (context, state) => SettingsSectionDetailPage(
+                  sectionId: state.pathParameters['sectionId']!,
+                ),
+              ),
+              // Sections whose content is already a full page have their own
+              // routes; stubbed here so the tile's target is observable
+              // without pulling in their provider graphs.
+              GoRoute(
+                path: 'safety',
+                builder: (context, state) =>
+                    const Scaffold(body: Text('safety page')),
+              ),
+            ],
           ),
         ],
       );
@@ -1427,7 +1487,65 @@ void main() {
       return router;
     }
 
-    testWidgets('opening a query-param section pushes a poppable route so the '
+    testWidgets('sections whose content is already a full page go to their '
+        'own route, not the shared section wrapper', (tester) async {
+      // SettingsSectionDetailPage supplies a Scaffold and an AppBar, so a
+      // section whose content is itself a Scaffold-with-AppBar (Safety,
+      // Debug) would render two stacked app bars. Both have dedicated
+      // routes; the tile must use them, the way Profile and Appearance do.
+      final router = await pumpSettingsList(tester);
+
+      await tester.scrollUntilVisible(find.text('Safety'), 100);
+      await tester.tap(find.text('Safety'));
+      await tester.pumpAndSettle();
+
+      expect(
+        router.state.uri.toString(),
+        '/settings/safety',
+        reason:
+            'routing Safety through /settings/section/safety nests '
+            'SafetySettingsPage inside the wrapper Scaffold',
+      );
+    });
+
+    testWidgets('opening a section animates it into place instead of '
+        'snapping', (tester) async {
+      // Appearance slid in because it pushes a child GoRoute; About, Data and
+      // the rest re-matched the '/settings' tab root, whose NoTransitionPage
+      // suppressed the animation. Every section must now animate the same
+      // way.
+      final router = await pumpSettingsList(tester);
+
+      await tester.scrollUntilVisible(find.text('Data'), 100);
+      await tester.tap(find.text('Data'));
+      await tester.pumpAndSettle();
+
+      expect(
+        router.state.uri.toString(),
+        '/settings/section/data',
+        reason:
+            'the section must be its own child route; re-matching /settings '
+            'reuses that tab root page, which never animates',
+      );
+
+      // Assert on the route rather than a frame-by-frame position: the tap
+      // ripple keeps animations running either way, so only the pushed
+      // route's own transition duration distinguishes a slide from a snap.
+      final route = ModalRoute.of(
+        tester.element(find.byType(SettingsSectionDetailPage)),
+      );
+      expect(route, isNotNull);
+      expect(
+        route!.transitionDuration,
+        greaterThan(Duration.zero),
+        reason:
+            'a NoTransitionPage route has a zero-length transition, which is '
+            'exactly the snap this fixes',
+      );
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('opening a section pushes a poppable route so the '
         'system back gesture returns to Settings instead of closing the app', (
       tester,
     ) async {

@@ -275,6 +275,7 @@ final siteProvider = FutureProvider.family<domain.DiveSite?, String>((
   id,
 ) async {
   final repository = ref.watch(siteRepositoryProvider);
+  ref.invalidateSelfWhen(repository.watchSitesChanges());
   return repository.getSiteById(id);
 });
 
@@ -288,6 +289,7 @@ final siteSearchProvider = FutureProvider.family<List<domain.DiveSite>, String>(
       return ref.watch(sitesProvider).value ?? [];
     }
     final repository = ref.watch(siteRepositoryProvider);
+    ref.invalidateSelfWhen(repository.watchSitesChanges());
     return repository.searchSites(query, diverId: validatedDiverId);
   },
 );

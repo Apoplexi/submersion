@@ -56,6 +56,74 @@ void main() {
     );
   });
 
+  group('metricsFollowViewport', () {
+    ProviderContainer containerWith(AppSettings settings) {
+      final container = ProviderContainer(
+        overrides: [
+          settingsProvider.overrideWith(
+            (ref) => _StubSettingsNotifier(settings),
+          ),
+        ],
+      );
+      addTearDown(container.dispose);
+      final sub = container.listen(profileLegendProvider, (_, _) {});
+      addTearDown(sub.close);
+      return container;
+    }
+
+    test('defaults to off, preserving the original zoom behaviour', () {
+      final container = containerWith(const AppSettings());
+
+      expect(
+        container.read(profileLegendProvider).metricsFollowViewport,
+        isFalse,
+      );
+    });
+
+    test('seeds from the global setting', () {
+      final container = containerWith(
+        const AppSettings(profileMetricsFollowViewport: true),
+      );
+
+      expect(
+        container.read(profileLegendProvider).metricsFollowViewport,
+        isTrue,
+      );
+    });
+
+    test('the per-chart toggle overrides the global default per session', () {
+      final container = containerWith(const AppSettings());
+      final notifier = container.read(profileLegendProvider.notifier);
+
+      notifier.toggleMetricsFollowViewport();
+      expect(
+        container.read(profileLegendProvider).metricsFollowViewport,
+        isTrue,
+      );
+
+      notifier.toggleMetricsFollowViewport();
+      expect(
+        container.read(profileLegendProvider).metricsFollowViewport,
+        isFalse,
+      );
+    });
+
+    test('is a render mode, so it never counts as an active overlay', () {
+      // The "More options" badge counts visible series. This toggle draws no
+      // line, so counting it would inflate the badge.
+      final container = containerWith(
+        const AppSettings(profileMetricsFollowViewport: true),
+      );
+
+      final state = container.read(profileLegendProvider);
+      expect(state.metricsFollowViewport, isTrue);
+      expect(
+        state.activeSecondaryCount,
+        const ProfileLegendState().activeSecondaryCount,
+      );
+    });
+  });
+
   group('ProfileLegendState', () {
     group('sectionExpanded', () {
       test('defaults to expected initial values', () {

@@ -510,7 +510,7 @@ class DiveRepository {
 
       final rows = await query.get();
       if (rows.isEmpty) return [];
-      return Future.wait(rows.map(_mapRowToDive));
+      return await Future.wait(rows.map(_mapRowToDive));
     } catch (e, stackTrace) {
       _log.error(
         'Failed to get dives needing site match',
@@ -695,6 +695,38 @@ class DiveRepository {
     );
   }
 
+  /// Collapses [rows] so at most one dive_data_sources row survives per
+  /// non-null computerId, keeping the first row encountered -- since every
+  /// caller queries in `desc(isPrimary), asc(createdAt)` order, that's the
+  /// primary if one exists, else the earliest-created. Rows with a null
+  /// computerId (manual entries, edited profiles) are never deduped; there
+  /// is nothing to collide on.
+  ///
+  /// A same-computer sequential merge (DiveMergeService.apply, step 10)
+  /// carries over every original dive's data source row as provenance; when
+  /// both originals were logged by the same physical computer, that
+  /// produces two rows sharing one computerId on the merged dive. Without
+  /// this, getProfilesByDataSource's computerId -> sourceId lookup collides
+  /// and silently misroutes every profile point to whichever row is
+  /// iterated last, and getDataSources shows a second, empty, selectable
+  /// chip for the row that lost the collision.
+  List<DiveDataSourcesData> _canonicalDataSourceRows(
+    List<DiveDataSourcesData> rows,
+  ) {
+    final seenComputers = <String>{};
+    final result = <DiveDataSourcesData>[];
+    for (final row in rows) {
+      final computerId = row.computerId;
+      if (computerId == null) {
+        result.add(row);
+        continue;
+      }
+      if (!seenComputers.add(computerId)) continue;
+      result.add(row);
+    }
+    return result;
+  }
+
   /// Get profile samples grouped by owning data source.
   ///
   /// Keys are dive_data_sources ids, primary source first. Rows with a null
@@ -707,14 +739,15 @@ class DiveRepository {
     String diveId,
   ) async {
     try {
-      final sourceRows =
-          await (_db.select(_db.diveDataSources)
-                ..where((t) => t.diveId.equals(diveId))
-                ..orderBy([
-                  (t) => OrderingTerm.desc(t.isPrimary),
-                  (t) => OrderingTerm.asc(t.createdAt),
-                ]))
-              .get();
+      final sourceRows = _canonicalDataSourceRows(
+        await (_db.select(_db.diveDataSources)
+              ..where((t) => t.diveId.equals(diveId))
+              ..orderBy([
+                (t) => OrderingTerm.desc(t.isPrimary),
+                (t) => OrderingTerm.asc(t.createdAt),
+              ]))
+            .get(),
+      );
       if (sourceRows.isEmpty) {
         // Legacy/imported dives can carry dive_profiles rows without a
         // dive_data_sources metadata row (older import paths predate that
@@ -973,7 +1006,14 @@ class DiveRepository {
               avgDepth: Value(dive.avgDepth),
               waterTemp: Value(dive.waterTemp),
               airTemp: Value(dive.airTemp),
-              visibility: Value(dive.visibility?.name),
+              visibilityMeters: Value(dive.visibilityMeters),
+              // A measured distance supersedes the legacy bucket. Value(null)
+              // rather than Value.absent(): absent() preserves the existing
+              // column on a companion write, which would leave the dive
+              // carrying both a measurement and a contradicting bucket.
+              visibility: dive.visibilityMeters != null
+                  ? const Value(null)
+                  : Value(dive.visibility?.name),
               diveType: Value(dive.diveTypeId),
               buddy: Value(dive.buddy),
               diveMaster: Value(dive.diveMaster),
@@ -1221,7 +1261,14 @@ class DiveRepository {
           avgDepth: Value(dive.avgDepth),
           waterTemp: Value(dive.waterTemp),
           airTemp: Value(dive.airTemp),
-          visibility: Value(dive.visibility?.name),
+          visibilityMeters: Value(dive.visibilityMeters),
+          // A measured distance supersedes the legacy bucket. Value(null)
+          // rather than Value.absent(): absent() preserves the existing column
+          // on a companion write, which would leave the dive carrying both a
+          // measurement and a contradicting bucket.
+          visibility: dive.visibilityMeters != null
+              ? const Value(null)
+              : Value(dive.visibility?.name),
           diveType: Value(dive.diveTypeId),
           buddy: Value(dive.buddy),
           diveMaster: Value(dive.diveMaster),
@@ -1595,7 +1642,7 @@ class DiveRepository {
         ]);
 
       final rows = await query.get();
-      return Future.wait(rows.map(_mapRowToDive));
+      return await Future.wait(rows.map(_mapRowToDive));
     } catch (e, stackTrace) {
       _log.error(
         'Failed to get dives by ids',
@@ -1942,13 +1989,22 @@ class DiveRepository {
     if (filter.buddyNameFilter != null && filter.buddyNameFilter!.isNotEmpty) {
       // The dive editor writes buddies only to the dive_buddies junction;
       // d.buddy is a legacy text column kept for old data (#757).
-      clauses.add(
-        '(LOWER(d.buddy) LIKE LOWER(?) OR EXISTS (SELECT 1 FROM dive_buddies db '
-        'JOIN buddies b ON b.id = db.buddy_id '
-        'WHERE db.dive_id = d.id AND LOWER(b.name) LIKE LOWER(?)))',
-      );
-      args.add(Variable('%${filter.buddyNameFilter}%'));
-      args.add(Variable('%${filter.buddyNameFilter}%'));
+      final names = filter.buddyNameFilter!
+          .split(',')
+          .map((s) => s.trim())
+          .where((s) => s.isNotEmpty)
+          .toList();
+
+      for (final name in names) {
+        clauses.add(
+          '(LOWER(d.buddy) LIKE LOWER(?) OR '
+          'EXISTS (SELECT 1 FROM dive_buddies db '
+          'JOIN buddies b ON db.buddy_id = b.id '
+          'WHERE db.dive_id = d.id AND LOWER(b.name) LIKE LOWER(?)))',
+        );
+        args.add(Variable('%$name%'));
+        args.add(Variable('%$name%'));
+      }
     }
     if (filter.buddyId != null) {
       clauses.add(
@@ -2030,7 +2086,7 @@ class DiveRepository {
         ]);
 
       final rows = await query.get();
-      return Future.wait(rows.map(_mapRowToDive));
+      return await Future.wait(rows.map(_mapRowToDive));
     } catch (e, stackTrace) {
       _log.error(
         'Failed to get dives for site: $siteId',
@@ -2052,7 +2108,7 @@ class DiveRepository {
         ]);
 
       final rows = await query.get();
-      return Future.wait(rows.map(_mapRowToDive));
+      return await Future.wait(rows.map(_mapRowToDive));
     } catch (e, stackTrace) {
       _log.error(
         'Failed to get dives for course: $courseId',
@@ -2091,7 +2147,7 @@ class DiveRepository {
       }
 
       final rows = await query.get();
-      return Future.wait(rows.map(_mapRowToDive));
+      return await Future.wait(rows.map(_mapRowToDive));
     } catch (e, stackTrace) {
       _log.error(
         'Failed to get dives in range: $start - $end',
@@ -2935,6 +2991,7 @@ class DiveRepository {
               orElse: () => Visibility.unknown,
             )
           : null,
+      visibilityMeters: row.visibilityMeters,
       diveTypeIds: diveTypeIds ?? [row.diveType],
       buddy: row.buddy,
       diveMaster: row.diveMaster,
@@ -3306,6 +3363,7 @@ class DiveRepository {
               orElse: () => Visibility.unknown,
             )
           : null,
+      visibilityMeters: row.visibilityMeters,
       diveTypeIds: diveTypeIds,
       buddy: row.buddy,
       diveMaster: row.diveMaster,
@@ -3446,7 +3504,9 @@ class DiveRepository {
           computerId: t.computerId,
         );
       }).toList(),
-      profile: profileRows.map(_profilePointFromRow).toList(),
+      profile: _dropDuplicateSamples(
+        profileRows,
+      ).map(_profilePointFromRow).toList(),
       equipment: hydratedEquipmentItems,
       weights: weights,
       isFavorite: row.isFavorite,
@@ -3581,7 +3641,7 @@ class DiveRepository {
       }
 
       final rows = await query.get();
-      return Future.wait(rows.map(_mapRowToDive));
+      return await Future.wait(rows.map(_mapRowToDive));
     } catch (e, stackTrace) {
       _log.error(
         'Failed to get favorite dives',
@@ -3610,7 +3670,7 @@ class DiveRepository {
       }
 
       final rows = await query.get();
-      return Future.wait(rows.map(_mapRowToDive));
+      return await Future.wait(rows.map(_mapRowToDive));
     } catch (e, stackTrace) {
       _log.error(
         'Failed to get planned dives',
@@ -3626,7 +3686,7 @@ class DiveRepository {
     try {
       // Ensure isPlanned is true
       final plannedDive = plan.copyWith(isPlanned: true);
-      return createDive(plannedDive);
+      return await createDive(plannedDive);
     } catch (e, stackTrace) {
       _log.error(
         'Failed to create planned dive',
@@ -4192,7 +4252,7 @@ class DiveRepository {
       final rows = await query.get();
       if (rows.isEmpty) return null;
 
-      return _mapRowToDive(rows.first);
+      return await _mapRowToDive(rows.first);
     } catch (e, stackTrace) {
       _log.error(
         'Failed to get previous dive for: $diveId',
@@ -4359,7 +4419,34 @@ class DiveRepository {
               ..where((t) => t.diveId.equals(diveId))
               ..orderBy([(t) => OrderingTerm.asc(t.timestamp)]))
             .get();
-    return rows.map(_profilePointFromRow).toList();
+    return _dropDuplicateSamples(rows).map(_profilePointFromRow).toList();
+  }
+
+  /// Drops rows that repeat a sample already seen, comparing every column
+  /// except the primary key.
+  ///
+  /// A repeated download or import can store two identical copies of every
+  /// sample. The duplicates carry no information but do change the analysis:
+  /// half the sample pairs then share a timestamp and contribute a zero rate,
+  /// which halves every smoothed ascent rate and hides real violations.
+  ///
+  /// The comparison is deliberately over the whole row. Two computers on one
+  /// dive can agree on depth at the same second while each carrying data the
+  /// other lacks, so a (timestamp, depth) key would silently discard one
+  /// computer's temperature or heart rate. `dive_profiles` stores only sample
+  /// data alongside its id -- no per-row sync or audit columns -- so full-row
+  /// equality means exactly "the same sample, stored twice".
+  ///
+  /// Applied to every read that builds `Dive.profile`. Analysis curves are
+  /// index-aligned against that list by their consumers, so [getDiveById] and
+  /// [getMergedProfile] must always agree on its length.
+  static List<DiveProfile> _dropDuplicateSamples(List<DiveProfile> rows) {
+    const idPlaceholder = '';
+    final seen = <DiveProfile>{};
+    return [
+      for (final row in rows)
+        if (seen.add(row.copyWith(id: idPlaceholder))) row,
+    ];
   }
 
   /// Lean hydration for decompression/exposure analysis: the dive row's
@@ -4829,8 +4916,13 @@ class DiveRepository {
         recordId: row.id,
       );
     }
+    // Deduplicated: `dive_tags` is uniquely indexed on (dive_id, tag_id)
+    // since v149, so a repeated id in the selection would throw (#1032).
+    // Hoisted out of the loop -- the selection does not change per dive, and a
+    // bulk edit multiplies this by the number of dives (PR #1033 review).
+    final uniqueTagIds = tagIds.toSet();
     for (final diveId in diveIds) {
-      for (final tagId in tagIds) {
+      for (final tagId in uniqueTagIds) {
         final id = _uuid.v4();
         await _db
             .into(_db.diveTags)
@@ -5277,12 +5369,26 @@ class DiveRepository {
 
     try {
       final now = DateTime.now().millisecondsSinceEpoch;
+      // Pairs these dives already carry. `dive_tags` is uniquely indexed on
+      // (dive_id, tag_id) since v149, and the fresh uuid per row means an
+      // upsert would never have matched the existing row anyway -- it just
+      // added a second one (#1032).
+      final existing =
+          (await (_db.select(
+                _db.diveTags,
+              )..where((t) => t.diveId.isIn(diveIds))).get())
+              .map((r) => '${r.diveId}|${r.tagId}')
+              .toSet();
+      // Hoisted: the selection is the same for every dive, and a bulk edit
+      // multiplies this by the number of dives (PR #1033 review).
+      final uniqueTagIds = tagIds.toSet();
       for (final diveId in diveIds) {
-        for (final tagId in tagIds) {
+        for (final tagId in uniqueTagIds) {
+          if (!existing.add('$diveId|$tagId')) continue;
           final diveTagId = _uuid.v4();
           await _db
               .into(_db.diveTags)
-              .insertOnConflictUpdate(
+              .insert(
                 DiveTagsCompanion(
                   id: Value(diveTagId),
                   diveId: Value(diveId),
@@ -5383,7 +5489,7 @@ class DiveRepository {
           (t) => OrderingTerm.desc(t.isPrimary),
           (t) => OrderingTerm.asc(t.createdAt),
         ]);
-      final rows = await query.get();
+      final rows = _canonicalDataSourceRows(await query.get());
       final computerNames = await _friendlyNamesFor(rows);
       return rows
           .map((row) => _mapRowToDataSource(row, computerNames))
@@ -5529,11 +5635,18 @@ class DiveRepository {
   }
 
   /// Return true if a dive has readings from 2 or more computers.
+  ///
+  /// Counts distinct canonical sources rather than raw rows -- two rows
+  /// sharing a computer_id (the shape a same-computer sequential merge
+  /// produces) collapse to one, matching [_canonicalDataSourceRows]. A row
+  /// with no computer_id is always its own canonical source, since [id] is
+  /// unique per row.
   Future<bool> hasMultipleDataSources(String diveId) async {
     try {
       final result = await _db
           .customSelect(
-            'SELECT COUNT(*) as cnt FROM dive_data_sources WHERE dive_id = ?',
+            'SELECT COUNT(DISTINCT COALESCE(computer_id, id)) as cnt '
+            'FROM dive_data_sources WHERE dive_id = ?',
             variables: [Variable(diveId)],
           )
           .getSingle();

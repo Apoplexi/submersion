@@ -55,6 +55,13 @@ class _TripEditPageState extends ConsumerState<TripEditPage> {
   DateTime _startDate = DateTime.now();
   DateTime? _returnFlightAt;
   DateTime _endDate = DateTime.now().add(const Duration(days: 7));
+  // Controls where the end-date picker opens, not whether _endDate still
+  // holds the placeholder value -- _endDate can also get auto-synced to
+  // _startDate (below) while this stays false. False until the diver
+  // deliberately sets an end date (picked here, or loaded from an existing
+  // trip); while false, the picker opens at _startDate instead of dragging
+  // the diver back through the calendar to it.
+  bool _endDateTouched = false;
   bool _isLoading = false;
   bool _isSaving = false;
   bool _hasChanges = false;
@@ -128,6 +135,7 @@ class _TripEditPageState extends ConsumerState<TripEditPage> {
         setState(() {
           _startDate = trip.startDate;
           _endDate = trip.endDate;
+          _endDateTouched = true;
           _returnFlightAt = trip.returnFlightAt;
           _isShared = trip.isShared;
           _isLoading = false;
@@ -708,7 +716,9 @@ class _TripEditPageState extends ConsumerState<TripEditPage> {
   }
 
   Future<void> _selectDate(BuildContext context, bool isStartDate) async {
-    final initialDate = isStartDate ? _startDate : _endDate;
+    final initialDate = isStartDate
+        ? _startDate
+        : (_endDateTouched ? _endDate : _startDate);
     final firstDate = isStartDate ? DateTime(1950) : _startDate;
     final lastDate = DateTime(2100);
 
@@ -728,6 +738,7 @@ class _TripEditPageState extends ConsumerState<TripEditPage> {
           }
         } else {
           _endDate = pickedDate;
+          _endDateTouched = true;
         }
         _hasChanges = true;
       });
@@ -923,47 +934,56 @@ class _TripEditPageState extends ConsumerState<TripEditPage> {
           _originalTrip?.startDate != _startDate ||
           _originalTrip?.endDate != _endDate;
 
-      if (mounted && datesChanged && trip.diverId != null) {
-        final candidates = await ref
-            .read(tripRepositoryProvider)
-            .findCandidateDivesForTrip(
-              tripId: savedId,
-              startDate: _startDate,
-              endDate: _endDate,
-              diverId: trip.diverId!,
+      if (mounted && datesChanged) {
+        // Resolved only once a scan is actually going to run: this provider
+        // hits the database, and the save above may not have warmed it (the
+        // `??` at the top of this method short-circuits for existing trips).
+        final activeDiverId = await ref.read(
+          validatedCurrentDiverIdProvider.future,
+        );
+
+        if (mounted && activeDiverId != null) {
+          final candidates = await ref
+              .read(tripRepositoryProvider)
+              .findCandidateDivesForTrip(
+                tripId: savedId,
+                startDate: _startDate,
+                endDate: _endDate,
+                diverId: activeDiverId,
+              );
+
+          if (candidates.isNotEmpty && mounted) {
+            final selectedIds = await showDiveAssignmentDialog(
+              context: context,
+              candidates: candidates,
             );
 
-        if (candidates.isNotEmpty && mounted) {
-          final selectedIds = await showDiveAssignmentDialog(
-            context: context,
-            candidates: candidates,
-          );
+            if (selectedIds != null && selectedIds.isNotEmpty && mounted) {
+              // Collect old trip IDs for provider invalidation
+              final oldTripIds = candidates
+                  .where(
+                    (c) => selectedIds.contains(c.dive.id) && !c.isUnassigned,
+                  )
+                  .map((c) => c.currentTripId!)
+                  .toSet();
 
-          if (selectedIds != null && selectedIds.isNotEmpty && mounted) {
-            // Collect old trip IDs for provider invalidation
-            final oldTripIds = candidates
-                .where(
-                  (c) => selectedIds.contains(c.dive.id) && !c.isUnassigned,
-                )
-                .map((c) => c.currentTripId!)
-                .toSet();
+              await ref
+                  .read(tripListNotifierProvider.notifier)
+                  .assignDivesToTrip(
+                    selectedIds,
+                    savedId,
+                    oldTripIds: oldTripIds,
+                  );
 
-            await ref
-                .read(tripListNotifierProvider.notifier)
-                .assignDivesToTrip(
-                  selectedIds,
-                  savedId,
-                  oldTripIds: oldTripIds,
-                );
-
-            if (mounted) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(
-                    context.l10n.trips_diveScan_added(selectedIds.length),
+              if (mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      context.l10n.trips_diveScan_added(selectedIds.length),
+                    ),
                   ),
-                ),
-              );
+                );
+              }
             }
           }
         }

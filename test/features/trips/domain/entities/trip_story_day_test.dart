@@ -200,6 +200,66 @@ void main() {
       expect(geometry.pointsForDay(9), isEmpty);
     });
 
+    test('nearestPointForDay returns a point on the requested day', () {
+      const geometry = TripStoryMapGeometry(
+        points: [
+          TripStoryMapPoint(latitude: 1, longitude: 2, dayIndex: 0, label: 'A'),
+          TripStoryMapPoint(latitude: 3, longitude: 4, dayIndex: 2, label: 'B'),
+        ],
+      );
+
+      expect(geometry.nearestPointForDay(2)?.label, 'B');
+    });
+
+    test('nearestPointForDay uses the closest point at trip boundaries', () {
+      const geometry = TripStoryMapGeometry(
+        points: [
+          TripStoryMapPoint(
+            latitude: 1,
+            longitude: 2,
+            dayIndex: 2,
+            label: 'First',
+          ),
+          TripStoryMapPoint(
+            latitude: 3,
+            longitude: 4,
+            dayIndex: 4,
+            label: 'Last',
+          ),
+        ],
+      );
+
+      expect(geometry.nearestPointForDay(0)?.label, 'First');
+      expect(geometry.nearestPointForDay(7)?.label, 'Last');
+    });
+
+    test('nearestPointForDay preserves route order for an equidistant tie', () {
+      const geometry = TripStoryMapGeometry(
+        points: [
+          TripStoryMapPoint(
+            latitude: 1,
+            longitude: 2,
+            dayIndex: 0,
+            label: 'Prior',
+          ),
+          TripStoryMapPoint(
+            latitude: 3,
+            longitude: 4,
+            dayIndex: 2,
+            label: 'Next',
+          ),
+        ],
+      );
+
+      expect(geometry.nearestPointForDay(1)?.label, 'Prior');
+    });
+
+    test('nearestPointForDay returns null for empty geometry', () {
+      const geometry = TripStoryMapGeometry(points: []);
+
+      expect(geometry.nearestPointForDay(1), isNull);
+    });
+
     test('empty geometry has no points', () {
       const geometry = TripStoryMapGeometry(points: []);
       expect(geometry.hasPoints, isFalse);

@@ -48,7 +48,10 @@ extension DiveFieldExtractor on DiveField {
       case DiveField.airTemp:
         return dive.airTemp;
       case DiveField.visibility:
-        return dive.visibility?.displayName;
+        // Raw metric value, consistent with maxDepth and swellHeight: the
+        // UnitFormatter converts at render time. Pre-v144 dives have no
+        // measurement, so they fall back to the legacy bucket's English label.
+        return dive.visibilityMeters ?? dive.visibility?.displayName;
       case DiveField.currentDirection:
         return dive.currentDirection?.displayName;
       case DiveField.currentStrength:

@@ -6,6 +6,7 @@ import 'package:submersion/core/database/database.dart';
 import 'package:submersion/core/services/database_service.dart';
 import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/core/services/sync/sync_event_bus.dart';
+import 'package:submersion/core/utils/stream_debounce.dart';
 import 'package:submersion/features/media/data/repositories/media_row_mapper.dart';
 import 'package:submersion/features/media/data/services/repair/media_repair_service.dart';
 import 'package:submersion/features/media/domain/entities/media_item.dart'
@@ -17,6 +18,27 @@ class MediaRepository {
   final SyncRepository _syncRepository = SyncRepository();
   final _uuid = const Uuid();
   final _log = LoggerService.forClass(MediaRepository);
+
+  /// Trailing-debounce window applied to [watchMediaChanges].
+  ///
+  /// A sync applies remote changes as many per-changeset transactions, and a
+  /// bulk photo import inserts one row per file; un-coalesced, every commit
+  /// would re-invalidate every listening provider. Debouncing collapses a
+  /// write burst into a single tick that fires once writes go quiet.
+  static const changeTickDebounce = Duration(milliseconds: 300);
+
+  /// Emits whenever the `media` table changes so cross-feature providers can
+  /// refresh after a delete, an import, or a sync -- including writes that go
+  /// straight to the database and so bypass the notifier paths that invalidate
+  /// per-dive media providers.
+  ///
+  /// Scoped to `media` alone: consumers render the media rows themselves, not
+  /// the joined `media_enrichment` values, and enrichment is backfilled on
+  /// every dive-detail open (see `DiveMediaEnricher`), which would otherwise
+  /// churn listeners for data they do not display.
+  Stream<void> watchMediaChanges() => _db
+      .tableUpdates(TableUpdateQuery.onTable(_db.media))
+      .debounce(changeTickDebounce);
 
   /// Get all media for a dive, ordered by takenAt
   /// Includes enrichment data (depth, temperature) if available
@@ -47,6 +69,46 @@ class MediaRepository {
       );
       rethrow;
     }
+  }
+
+  /// Get all media directly attached to a site, ordered by takenAt.
+  /// Enrichment rides along for rows that are also dive-linked.
+  Future<List<domain.MediaItem>> getMediaForSite(String siteId) async {
+    try {
+      final query =
+          _db.select(_db.media).join([
+              leftOuterJoin(
+                _db.mediaEnrichment,
+                _db.mediaEnrichment.mediaId.equalsExp(_db.media.id),
+              ),
+            ])
+            ..where(_db.media.siteId.equals(siteId))
+            ..orderBy([OrderingTerm.asc(_db.media.takenAt)]);
+
+      final rows = await query.get();
+      return rows.map((row) {
+        final mediaRow = row.readTable(_db.media);
+        final enrichmentRow = row.readTableOrNull(_db.mediaEnrichment);
+        return mediaItemFromRow(mediaRow, enrichmentRow);
+      }).toList();
+    } catch (e, stackTrace) {
+      _log.error(
+        'Failed to get media for site: $siteId',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      rethrow;
+    }
+  }
+
+  /// Count of media directly attached to a site (badges/headers).
+  Future<int> getMediaCountForSite(String siteId) async {
+    final count = _db.media.id.count();
+    final query = _db.selectOnly(_db.media)
+      ..addColumns([count])
+      ..where(_db.media.siteId.equals(siteId));
+    final row = await query.getSingle();
+    return row.read(count) ?? 0;
   }
 
   /// Get single media item by ID
@@ -739,6 +801,52 @@ class MediaRepository {
     }
   }
 
+  /// Site counterpart of [getLinkedAssetIdsForDive]: gallery-import dedupe
+  /// for direct site attachments.
+  Future<Set<String>> getLinkedAssetIdsForSite(String siteId) async {
+    try {
+      final result = await _db
+          .customSelect(
+            'SELECT platform_asset_id FROM media '
+            'WHERE site_id = ? AND platform_asset_id IS NOT NULL',
+            variables: [Variable.withString(siteId)],
+          )
+          .get();
+      return result
+          .map((row) => row.data['platform_asset_id'] as String)
+          .toSet();
+    } catch (e, stackTrace) {
+      _log.error(
+        'Failed to get linked asset IDs for site: $siteId',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      rethrow;
+    }
+  }
+
+  /// Site counterpart of [getLinkedLocalPathsForDive]: file-import dedupe
+  /// for direct site attachments.
+  Future<Set<String>> getLinkedLocalPathsForSite(String siteId) async {
+    try {
+      final result = await _db
+          .customSelect(
+            'SELECT local_path FROM media '
+            'WHERE site_id = ? AND local_path IS NOT NULL',
+            variables: [Variable.withString(siteId)],
+          )
+          .get();
+      return result.map((row) => row.data['local_path'] as String).toSet();
+    } catch (e, stackTrace) {
+      _log.error(
+        'Failed to get linked local paths for site: $siteId',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      rethrow;
+    }
+  }
+
   /// Get GPS coordinates from media attached to a dive.
   ///
   /// Returns a list of (latitude, longitude, takenAt) tuples from photos
@@ -1038,6 +1146,63 @@ class MediaRepository {
     await _db.transaction(() async {
       await (_db.update(_db.media)..where((t) => t.id.isIn(mediaIds))).write(
         MediaCompanion(diveId: const Value(null), updatedAt: Value(now)),
+      );
+      for (final id in mediaIds) {
+        await _syncRepository.markRecordPending(
+          entityType: 'media',
+          recordId: id,
+          localUpdatedAt: now,
+        );
+      }
+    });
+    SyncEventBus.notifyLocalChange();
+  }
+
+  /// Splits a dying site's media: `doomed` rows die with the site
+  /// (site-only, non-library; full items because the blob-delete intent
+  /// needs contentHash/filename/type), `unlinkIds` survive as dive-linked
+  /// or library-level rows with siteId nulled. Site counterpart of
+  /// [partitionMediaForDiveDeletion].
+  Future<({List<domain.MediaItem> doomed, List<String> unlinkIds})>
+  partitionMediaForSiteDeletion(List<String> siteIds) async {
+    // Empty-guard mirrors [partitionMediaForDiveDeletion]: bulk callers
+    // legitimately hand over empty collections.
+    if (siteIds.isEmpty) {
+      return (doomed: const <domain.MediaItem>[], unlinkIds: const <String>[]);
+    }
+    final rows = await (_db.select(
+      _db.media,
+    )..where((t) => t.siteId.isIn(siteIds))).get();
+    final doomed = <domain.MediaItem>[];
+    final unlinkIds = <String>[];
+    for (final row in rows) {
+      final keep =
+          row.diveId != null ||
+          libraryLevelSourceTypes.contains(row.sourceType);
+      if (keep) {
+        unlinkIds.add(row.id);
+      } else {
+        doomed.add(mediaItemFromRow(row));
+      }
+    }
+    return (doomed: doomed, unlinkIds: unlinkIds);
+  }
+
+  /// Explicitly unlinks surviving media from deleted sites, with the HLC
+  /// stamp the silent FK SET NULL never produced - so the unlink propagates
+  /// to other devices instead of diverging. Site counterpart of
+  /// [unlinkMediaFromDeletedDives].
+  ///
+  /// Deliberately NOT routed through [_unlinkColumns]: that path also sets
+  /// retain_in_library, which is a one-way latch that permanently excludes a
+  /// row from the orphan sweep. Site-deletion leftovers must stay sweepable,
+  /// the same distinction [unlinkMediaFromDeletedDives] draws.
+  Future<void> unlinkMediaFromDeletedSites(List<String> mediaIds) async {
+    if (mediaIds.isEmpty) return;
+    final now = DateTime.now().millisecondsSinceEpoch;
+    await _db.transaction(() async {
+      await (_db.update(_db.media)..where((t) => t.id.isIn(mediaIds))).write(
+        MediaCompanion(siteId: const Value(null), updatedAt: Value(now)),
       );
       for (final id in mediaIds) {
         await _syncRepository.markRecordPending(

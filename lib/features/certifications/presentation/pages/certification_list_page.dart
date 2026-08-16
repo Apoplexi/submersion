@@ -78,20 +78,11 @@ class CertificationListPage extends ConsumerWidget {
           columnSettingsAction: IconButton(
             icon: const Icon(Icons.view_column_outlined),
             tooltip: 'Column settings',
-            onPressed: () {
-              final config = ref.read(certificationTableConfigProvider);
-              final notifier = ref.read(
-                certificationTableConfigProvider.notifier,
-              );
-              showEntityTableColumnPicker<CertificationField>(
-                context,
-                config: config,
-                adapter: CertificationFieldAdapter.instance,
-                onToggleColumn: notifier.toggleColumn,
-                onReorderColumn: notifier.reorderColumn,
-                onTogglePin: notifier.togglePin,
-              );
-            },
+            onPressed: () => showEntityTableColumnPicker<CertificationField>(
+              context,
+              configProvider: certificationTableConfigProvider,
+              adapter: CertificationFieldAdapter.instance,
+            ),
           ),
           appBarActions: [
             IconButton(
