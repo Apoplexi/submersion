@@ -19577,6 +19577,12 @@ abstract class AppLocalizations {
   /// **'Blender'**
   String get gasCalculators_tab_blender;
 
+  /// No description provided for @gasCalculators_blender_cylinder.
+  ///
+  /// In en, this message translates to:
+  /// **'Cylinder'**
+  String get gasCalculators_blender_cylinder;
+
   /// No description provided for @gasCalculators_blender_startCylinder.
   ///
   /// In en, this message translates to:
@@ -19619,6 +19625,12 @@ abstract class AppLocalizations {
   /// **'Air'**
   String get gasCalculators_blender_air;
 
+  /// No description provided for @gasCalculators_blender_helium.
+  ///
+  /// In en, this message translates to:
+  /// **'Helium'**
+  String get gasCalculators_blender_helium;
+
   /// No description provided for @gasCalculators_blender_procedure.
   ///
   /// In en, this message translates to:
@@ -19628,7 +19640,7 @@ abstract class AppLocalizations {
   /// No description provided for @gasCalculators_blender_amounts.
   ///
   /// In en, this message translates to:
-  /// **'Amounts per litre of cylinder volume'**
+  /// **'Gas to add'**
   String get gasCalculators_blender_amounts;
 
   /// No description provided for @gasCalculators_blender_stepStart.
@@ -19676,6 +19688,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'This blend is not achievable with these gases — it would require removing gas.'**
   String get gasCalculators_blender_error_negativeAmount;
+
+  /// No description provided for @gasCalculators_blender_error_drainTo.
+  ///
+  /// In en, this message translates to:
+  /// **'Too much gas in the cylinder for this blend. Drain to {pressure} first, then blend.'**
+  String gasCalculators_blender_error_drainTo(String pressure);
+
+  /// No description provided for @gasCalculators_blender_error_drainEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'None of the gas in the cylinder can be used for this blend. Empty it first, then blend.'**
+  String get gasCalculators_blender_error_drainEmpty;
+
+  /// No description provided for @gasCalculators_blender_error_cannotRemoveHelium.
+  ///
+  /// In en, this message translates to:
+  /// **'The cylinder holds helium and the target mix has none. Topping up dilutes helium but cannot remove it, so the cylinder must be emptied first.'**
+  String get gasCalculators_blender_error_cannotRemoveHelium;
+
+  /// No description provided for @gasCalculators_blender_error_insufficientGases.
+  ///
+  /// In en, this message translates to:
+  /// **'A helium-free target needs two helium-free fill gases with different O₂ content.'**
+  String get gasCalculators_blender_error_insufficientGases;
+
+  /// No description provided for @gasCalculators_blender_error_targetNotReached.
+  ///
+  /// In en, this message translates to:
+  /// **'These fill gases cannot reach the target mix exactly. Check the fill gases and their order.'**
+  String get gasCalculators_blender_error_targetNotReached;
 
   /// No description provided for @gasCalculators_blender_about.
   ///

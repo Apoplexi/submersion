@@ -11282,6 +11282,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get gasCalculators_tab_blender => 'Blender';
 
   @override
+  String get gasCalculators_blender_cylinder => 'Cylinder';
+
+  @override
   String get gasCalculators_blender_startCylinder => 'In the cylinder';
 
   @override
@@ -11303,11 +11306,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get gasCalculators_blender_air => 'Air';
 
   @override
+  String get gasCalculators_blender_helium => 'Helium';
+
+  @override
   String get gasCalculators_blender_procedure => 'Fill procedure';
 
   @override
-  String get gasCalculators_blender_amounts =>
-      'Amounts per litre of cylinder volume';
+  String get gasCalculators_blender_amounts => 'Gas to add';
 
   @override
   String gasCalculators_blender_stepStart(String pressure, String gas) {
@@ -11342,6 +11347,27 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get gasCalculators_blender_error_negativeAmount =>
       'This blend is not achievable with these gases — it would require removing gas.';
+
+  @override
+  String gasCalculators_blender_error_drainTo(String pressure) {
+    return 'Too much gas in the cylinder for this blend. Drain to $pressure first, then blend.';
+  }
+
+  @override
+  String get gasCalculators_blender_error_drainEmpty =>
+      'None of the gas in the cylinder can be used for this blend. Empty it first, then blend.';
+
+  @override
+  String get gasCalculators_blender_error_cannotRemoveHelium =>
+      'The cylinder holds helium and the target mix has none. Topping up dilutes helium but cannot remove it, so the cylinder must be emptied first.';
+
+  @override
+  String get gasCalculators_blender_error_insufficientGases =>
+      'A helium-free target needs two helium-free fill gases with different O₂ content.';
+
+  @override
+  String get gasCalculators_blender_error_targetNotReached =>
+      'These fill gases cannot reach the target mix exactly. Check the fill gases and their order.';
 
   @override
   String get gasCalculators_blender_about => 'About blending';

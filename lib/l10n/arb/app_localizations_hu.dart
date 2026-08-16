@@ -11440,6 +11440,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String get gasCalculators_tab_blender => 'Keverő';
 
   @override
+  String get gasCalculators_blender_cylinder => 'Palack';
+
+  @override
   String get gasCalculators_blender_startCylinder => 'A palackban';
 
   @override
@@ -11461,11 +11464,13 @@ class AppLocalizationsHu extends AppLocalizations {
   String get gasCalculators_blender_air => 'Levegő';
 
   @override
+  String get gasCalculators_blender_helium => 'Hélium';
+
+  @override
   String get gasCalculators_blender_procedure => 'Töltési sorrend';
 
   @override
-  String get gasCalculators_blender_amounts =>
-      'Mennyiségek palacktérfogat literenként';
+  String get gasCalculators_blender_amounts => 'Hozzáadandó gáz';
 
   @override
   String gasCalculators_blender_stepStart(String pressure, String gas) {
@@ -11500,6 +11505,27 @@ class AppLocalizationsHu extends AppLocalizations {
   @override
   String get gasCalculators_blender_error_negativeAmount =>
       'Ez a keverék ezekkel a gázokkal nem érhető el — gázt kellene eltávolítani.';
+
+  @override
+  String gasCalculators_blender_error_drainTo(String pressure) {
+    return 'Túl sok gáz van a palackban ehhez a keverékhez. Előbb engedd le $pressure nyomásra, majd tölts.';
+  }
+
+  @override
+  String get gasCalculators_blender_error_drainEmpty =>
+      'A palackban lévő gáz nem használható ehhez a keverékhez. Előbb ürítsd ki teljesen, majd tölts.';
+
+  @override
+  String get gasCalculators_blender_error_cannotRemoveHelium =>
+      'A palack héliumot tartalmaz, a célkeverék viszont nem. A rátöltés hígítja a héliumot, de nem távolítja el: a palackot előbb ki kell üríteni.';
+
+  @override
+  String get gasCalculators_blender_error_insufficientGases =>
+      'A hélium nélküli célhoz két hélium nélküli töltőgáz kell, eltérő O₂-tartalommal.';
+
+  @override
+  String get gasCalculators_blender_error_targetNotReached =>
+      'Ezekkel a töltőgázokkal a célkeverék nem érhető el pontosan. Ellenőrizd a töltőgázokat és a sorrendjüket.';
 
   @override
   String get gasCalculators_blender_about => 'A keverésről';

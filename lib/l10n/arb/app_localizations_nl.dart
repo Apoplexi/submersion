@@ -11383,6 +11383,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get gasCalculators_tab_blender => 'Mixer';
 
   @override
+  String get gasCalculators_blender_cylinder => 'Fles';
+
+  @override
   String get gasCalculators_blender_startCylinder => 'In de fles';
 
   @override
@@ -11404,11 +11407,13 @@ class AppLocalizationsNl extends AppLocalizations {
   String get gasCalculators_blender_air => 'Lucht';
 
   @override
+  String get gasCalculators_blender_helium => 'Helium';
+
+  @override
   String get gasCalculators_blender_procedure => 'Vulprocedure';
 
   @override
-  String get gasCalculators_blender_amounts =>
-      'Hoeveelheden per liter flesvolume';
+  String get gasCalculators_blender_amounts => 'Toe te voegen gas';
 
   @override
   String gasCalculators_blender_stepStart(String pressure, String gas) {
@@ -11443,6 +11448,27 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get gasCalculators_blender_error_negativeAmount =>
       'Dit mengsel is met deze gassen niet haalbaar — er zou gas verwijderd moeten worden.';
+
+  @override
+  String gasCalculators_blender_error_drainTo(String pressure) {
+    return 'Te veel gas in de fles voor dit mengsel. Laat eerst af tot $pressure en vul daarna.';
+  }
+
+  @override
+  String get gasCalculators_blender_error_drainEmpty =>
+      'Het gas in de fles is niet bruikbaar voor dit mengsel. Maak de fles eerst leeg en vul daarna.';
+
+  @override
+  String get gasCalculators_blender_error_cannotRemoveHelium =>
+      'De fles bevat helium en het doelmengsel niet. Bijvullen verdunt helium maar verwijdert het niet: de fles moet eerst leeg.';
+
+  @override
+  String get gasCalculators_blender_error_insufficientGases =>
+      'Een heliumvrij doel heeft twee heliumvrije vulgassen met verschillend O₂-gehalte nodig.';
+
+  @override
+  String get gasCalculators_blender_error_targetNotReached =>
+      'Deze vulgassen bereiken het doelmengsel niet exact. Controleer de vulgassen en hun volgorde.';
 
   @override
   String get gasCalculators_blender_about => 'Over het mengen';

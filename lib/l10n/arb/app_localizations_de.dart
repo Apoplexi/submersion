@@ -11459,6 +11459,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get gasCalculators_tab_blender => 'Mischer';
 
   @override
+  String get gasCalculators_blender_cylinder => 'Flasche';
+
+  @override
   String get gasCalculators_blender_startCylinder => 'In der Flasche';
 
   @override
@@ -11480,11 +11483,13 @@ class AppLocalizationsDe extends AppLocalizations {
   String get gasCalculators_blender_air => 'Luft';
 
   @override
+  String get gasCalculators_blender_helium => 'Helium';
+
+  @override
   String get gasCalculators_blender_procedure => 'Füllreihenfolge';
 
   @override
-  String get gasCalculators_blender_amounts =>
-      'Mengen pro Liter Flaschenvolumen';
+  String get gasCalculators_blender_amounts => 'Zuzuführendes Gas';
 
   @override
   String gasCalculators_blender_stepStart(String pressure, String gas) {
@@ -11519,6 +11524,27 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get gasCalculators_blender_error_negativeAmount =>
       'Dieses Gemisch ist mit diesen Gasen nicht erreichbar — es müsste Gas entnommen werden.';
+
+  @override
+  String gasCalculators_blender_error_drainTo(String pressure) {
+    return 'Zu viel Gas in der Flasche für dieses Gemisch. Zuerst auf $pressure ablassen, dann füllen.';
+  }
+
+  @override
+  String get gasCalculators_blender_error_drainEmpty =>
+      'Das Gas in der Flasche kann für dieses Gemisch nicht verwendet werden. Zuerst vollständig entleeren, dann füllen.';
+
+  @override
+  String get gasCalculators_blender_error_cannotRemoveHelium =>
+      'Die Flasche enthält Helium, das Zielgemisch nicht. Nachfüllen verdünnt Helium, entfernt es aber nicht: die Flasche muss zuerst entleert werden.';
+
+  @override
+  String get gasCalculators_blender_error_insufficientGases =>
+      'Ein heliumfreies Ziel braucht zwei heliumfreie Füllgase mit unterschiedlichem O₂-Gehalt.';
+
+  @override
+  String get gasCalculators_blender_error_targetNotReached =>
+      'Mit diesen Füllgasen wird das Zielgemisch nicht exakt erreicht. Füllgase und ihre Reihenfolge prüfen.';
 
   @override
   String get gasCalculators_blender_about => 'Über das Mischen';

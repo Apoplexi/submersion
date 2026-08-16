@@ -11467,6 +11467,9 @@ class AppLocalizationsIt extends AppLocalizations {
   String get gasCalculators_tab_blender => 'Miscelatore';
 
   @override
+  String get gasCalculators_blender_cylinder => 'Bombola';
+
+  @override
   String get gasCalculators_blender_startCylinder => 'Nella bombola';
 
   @override
@@ -11488,11 +11491,13 @@ class AppLocalizationsIt extends AppLocalizations {
   String get gasCalculators_blender_air => 'Aria';
 
   @override
+  String get gasCalculators_blender_helium => 'Elio';
+
+  @override
   String get gasCalculators_blender_procedure => 'Procedura di riempimento';
 
   @override
-  String get gasCalculators_blender_amounts =>
-      'Quantità per litro di volume bombola';
+  String get gasCalculators_blender_amounts => 'Gas da aggiungere';
 
   @override
   String gasCalculators_blender_stepStart(String pressure, String gas) {
@@ -11527,6 +11532,27 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String get gasCalculators_blender_error_negativeAmount =>
       'Questa miscela non è realizzabile con questi gas: richiederebbe di rimuovere gas.';
+
+  @override
+  String gasCalculators_blender_error_drainTo(String pressure) {
+    return 'Troppo gas nella bombola per questa miscela: scarica fino a $pressure, poi riempi.';
+  }
+
+  @override
+  String get gasCalculators_blender_error_drainEmpty =>
+      'Il gas presente nella bombola non è utilizzabile per questa miscela: svuotala completamente, poi riempi.';
+
+  @override
+  String get gasCalculators_blender_error_cannotRemoveHelium =>
+      'La bombola contiene elio mentre la miscela target no. Il rabbocco diluisce l\'elio ma non lo rimuove: la bombola va prima svuotata.';
+
+  @override
+  String get gasCalculators_blender_error_insufficientGases =>
+      'Un target senza elio richiede due gas di riempimento senza elio con contenuto di O₂ diverso.';
+
+  @override
+  String get gasCalculators_blender_error_targetNotReached =>
+      'Questi gas di riempimento non raggiungono esattamente la miscela target. Controlla i gas e il loro ordine.';
 
   @override
   String get gasCalculators_blender_about => 'Informazioni sulla miscelazione';

@@ -10948,6 +10948,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get gasCalculators_tab_blender => '配气';
 
   @override
+  String get gasCalculators_blender_cylinder => '气瓶';
+
+  @override
   String get gasCalculators_blender_startCylinder => '瓶内现有';
 
   @override
@@ -10969,10 +10972,13 @@ class AppLocalizationsZh extends AppLocalizations {
   String get gasCalculators_blender_air => '空气';
 
   @override
+  String get gasCalculators_blender_helium => '氦气';
+
+  @override
   String get gasCalculators_blender_procedure => '充填步骤';
 
   @override
-  String get gasCalculators_blender_amounts => '每升瓶容积用量';
+  String get gasCalculators_blender_amounts => '需充入的气体';
 
   @override
   String gasCalculators_blender_stepStart(String pressure, String gas) {
@@ -11005,6 +11011,27 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String get gasCalculators_blender_error_negativeAmount =>
       '用这些气体无法配成此混合气——需要放出气体。';
+
+  @override
+  String gasCalculators_blender_error_drainTo(String pressure) {
+    return '瓶内气体过多，无法配成此混合气。请先放气至 $pressure，再充填。';
+  }
+
+  @override
+  String get gasCalculators_blender_error_drainEmpty =>
+      '瓶内现有气体无法用于此混合气。请先完全排空，再充填。';
+
+  @override
+  String get gasCalculators_blender_error_cannotRemoveHelium =>
+      '瓶内含氦气，而目标混合气不含。补充充填只会稀释氦气而无法去除，需先排空气瓶。';
+
+  @override
+  String get gasCalculators_blender_error_insufficientGases =>
+      '无氦目标需要两种不含氦、含氧量不同的充填气体。';
+
+  @override
+  String get gasCalculators_blender_error_targetNotReached =>
+      '这些充填气体无法精确达到目标混合气。请检查充填气体及其顺序。';
 
   @override
   String get gasCalculators_blender_about => '关于配气';

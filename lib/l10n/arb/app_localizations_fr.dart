@@ -11504,6 +11504,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get gasCalculators_tab_blender => 'Mélangeur';
 
   @override
+  String get gasCalculators_blender_cylinder => 'Bloc';
+
+  @override
   String get gasCalculators_blender_startCylinder => 'Dans le bloc';
 
   @override
@@ -11525,11 +11528,13 @@ class AppLocalizationsFr extends AppLocalizations {
   String get gasCalculators_blender_air => 'Air';
 
   @override
+  String get gasCalculators_blender_helium => 'Hélium';
+
+  @override
   String get gasCalculators_blender_procedure => 'Procédure de remplissage';
 
   @override
-  String get gasCalculators_blender_amounts =>
-      'Quantités par litre de volume du bloc';
+  String get gasCalculators_blender_amounts => 'Gaz à ajouter';
 
   @override
   String gasCalculators_blender_stepStart(String pressure, String gas) {
@@ -11564,6 +11569,27 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get gasCalculators_blender_error_negativeAmount =>
       'Ce mélange n\'est pas réalisable avec ces gaz — il faudrait retirer du gaz.';
+
+  @override
+  String gasCalculators_blender_error_drainTo(String pressure) {
+    return 'Trop de gaz dans le bloc pour ce mélange. Vidangez d\'abord à $pressure, puis remplissez.';
+  }
+
+  @override
+  String get gasCalculators_blender_error_drainEmpty =>
+      'Le gaz présent dans le bloc ne peut pas servir à ce mélange. Videz-le complètement, puis remplissez.';
+
+  @override
+  String get gasCalculators_blender_error_cannotRemoveHelium =>
+      'Le bloc contient de l\'hélium alors que le mélange cible n\'en contient pas. Le remplissage dilue l\'hélium mais ne l\'élimine pas : le bloc doit d\'abord être vidé.';
+
+  @override
+  String get gasCalculators_blender_error_insufficientGases =>
+      'Une cible sans hélium nécessite deux gaz de remplissage sans hélium de teneurs en O₂ différentes.';
+
+  @override
+  String get gasCalculators_blender_error_targetNotReached =>
+      'Ces gaz de remplissage n\'atteignent pas exactement le mélange cible. Vérifiez les gaz et leur ordre.';
 
   @override
   String get gasCalculators_blender_about => 'À propos du mélange';

@@ -11266,6 +11266,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get gasCalculators_tab_blender => 'الخلاط';
 
   @override
+  String get gasCalculators_blender_cylinder => 'الأسطوانة';
+
+  @override
   String get gasCalculators_blender_startCylinder => 'في الأسطوانة';
 
   @override
@@ -11287,11 +11290,13 @@ class AppLocalizationsAr extends AppLocalizations {
   String get gasCalculators_blender_air => 'هواء';
 
   @override
+  String get gasCalculators_blender_helium => 'هيليوم';
+
+  @override
   String get gasCalculators_blender_procedure => 'خطوات التعبئة';
 
   @override
-  String get gasCalculators_blender_amounts =>
-      'الكميات لكل لتر من حجم الأسطوانة';
+  String get gasCalculators_blender_amounts => 'الغاز المطلوب إضافته';
 
   @override
   String gasCalculators_blender_stepStart(String pressure, String gas) {
@@ -11326,6 +11331,27 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get gasCalculators_blender_error_negativeAmount =>
       'هذا الخليط غير قابل للتحقيق بهذه الغازات — سيتطلب إخراج غاز.';
+
+  @override
+  String gasCalculators_blender_error_drainTo(String pressure) {
+    return 'الغاز في الأسطوانة أكثر من اللازم لهذا الخليط. أفرغها حتى $pressure أولاً ثم عبِّئ.';
+  }
+
+  @override
+  String get gasCalculators_blender_error_drainEmpty =>
+      'الغاز الموجود في الأسطوانة لا يصلح لهذا الخليط. أفرغها بالكامل أولاً ثم عبِّئ.';
+
+  @override
+  String get gasCalculators_blender_error_cannotRemoveHelium =>
+      'الأسطوانة تحتوي على هيليوم بينما الخليط المستهدف لا يحتوي عليه. التعبئة تخفف الهيليوم لكنها لا تزيله، لذا يجب إفراغ الأسطوانة أولاً.';
+
+  @override
+  String get gasCalculators_blender_error_insufficientGases =>
+      'الهدف الخالي من الهيليوم يحتاج غازي تعبئة خاليين من الهيليوم بنسبتي O₂ مختلفتين.';
+
+  @override
+  String get gasCalculators_blender_error_targetNotReached =>
+      'غازات التعبئة هذه لا تصل إلى الخليط المستهدف بدقة. تحقق من الغازات وترتيبها.';
 
   @override
   String get gasCalculators_blender_about => 'حول الخلط';

@@ -11460,6 +11460,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get gasCalculators_tab_blender => 'Mezclador';
 
   @override
+  String get gasCalculators_blender_cylinder => 'Cilindro';
+
+  @override
   String get gasCalculators_blender_startCylinder => 'En el cilindro';
 
   @override
@@ -11481,11 +11484,13 @@ class AppLocalizationsEs extends AppLocalizations {
   String get gasCalculators_blender_air => 'Aire';
 
   @override
+  String get gasCalculators_blender_helium => 'Helio';
+
+  @override
   String get gasCalculators_blender_procedure => 'Procedimiento de llenado';
 
   @override
-  String get gasCalculators_blender_amounts =>
-      'Cantidades por litro de volumen del cilindro';
+  String get gasCalculators_blender_amounts => 'Gas a añadir';
 
   @override
   String gasCalculators_blender_stepStart(String pressure, String gas) {
@@ -11520,6 +11525,27 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get gasCalculators_blender_error_negativeAmount =>
       'Esta mezcla no es posible con estos gases: habría que extraer gas.';
+
+  @override
+  String gasCalculators_blender_error_drainTo(String pressure) {
+    return 'Demasiado gas en el cilindro para esta mezcla: vacía hasta $pressure y luego llena.';
+  }
+
+  @override
+  String get gasCalculators_blender_error_drainEmpty =>
+      'El gas que hay en el cilindro no sirve para esta mezcla: vacíalo por completo y luego llena.';
+
+  @override
+  String get gasCalculators_blender_error_cannotRemoveHelium =>
+      'El cilindro contiene helio y la mezcla objetivo no. Rellenar diluye el helio pero no lo elimina: hay que vaciar el cilindro primero.';
+
+  @override
+  String get gasCalculators_blender_error_insufficientGases =>
+      'Un objetivo sin helio necesita dos gases de llenado sin helio con distinto contenido de O₂.';
+
+  @override
+  String get gasCalculators_blender_error_targetNotReached =>
+      'Estos gases de llenado no alcanzan exactamente la mezcla objetivo. Revisa los gases y su orden.';
 
   @override
   String get gasCalculators_blender_about => 'Sobre la mezcla';

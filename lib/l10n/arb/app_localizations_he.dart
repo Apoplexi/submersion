@@ -11191,6 +11191,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get gasCalculators_tab_blender => 'מערבל';
 
   @override
+  String get gasCalculators_blender_cylinder => 'בלון';
+
+  @override
   String get gasCalculators_blender_startCylinder => 'בבלון';
 
   @override
@@ -11212,10 +11215,13 @@ class AppLocalizationsHe extends AppLocalizations {
   String get gasCalculators_blender_air => 'אוויר';
 
   @override
+  String get gasCalculators_blender_helium => 'הליום';
+
+  @override
   String get gasCalculators_blender_procedure => 'סדר המילוי';
 
   @override
-  String get gasCalculators_blender_amounts => 'כמויות לליטר נפח בלון';
+  String get gasCalculators_blender_amounts => 'גז להוספה';
 
   @override
   String gasCalculators_blender_stepStart(String pressure, String gas) {
@@ -11250,6 +11256,27 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String get gasCalculators_blender_error_negativeAmount =>
       'לא ניתן להשיג את התערובת הזו עם הגזים האלה — יידרש להוציא גז.';
+
+  @override
+  String gasCalculators_blender_error_drainTo(String pressure) {
+    return 'יש יותר מדי גז בבלון לתערובת הזו. רוקנו תחילה עד $pressure ואז מלאו.';
+  }
+
+  @override
+  String get gasCalculators_blender_error_drainEmpty =>
+      'הגז שבבלון אינו מתאים לתערובת הזו. רוקנו אותו לגמרי ואז מלאו.';
+
+  @override
+  String get gasCalculators_blender_error_cannotRemoveHelium =>
+      'הבלון מכיל הליום והתערובת המבוקשת לא. מילוי נוסף מדלל את ההליום אך אינו מסלק אותו, ולכן יש לרוקן את הבלון תחילה.';
+
+  @override
+  String get gasCalculators_blender_error_insufficientGases =>
+      'יעד ללא הליום דורש שני גזי מילוי ללא הליום עם תכולת O₂ שונה.';
+
+  @override
+  String get gasCalculators_blender_error_targetNotReached =>
+      'גזי המילוי האלה לא מגיעים בדיוק לתערובת היעד. בדקו את הגזים ואת סדרם.';
 
   @override
   String get gasCalculators_blender_about => 'על הערבוב';
