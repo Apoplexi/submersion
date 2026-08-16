@@ -18546,10 +18546,6 @@ class AppLocalizationsHe extends AppLocalizations {
   String get diveComputer_connectionType_wifi => 'Wi-Fi';
 
   @override
-  String get diveComputer_detail_cannotFilterNoSerial =>
-      'לא ניתן לסנן: אין מספר סידורי למחשב זה.';
-
-  @override
   String diveComputer_detail_deleteDialogContent(String name) {
     return 'האם אתה בטוח שברצונך להסיר את \"$name\"? פעולה זו לא תמחק צלילות שיובאו ממחשב זה.';
   }

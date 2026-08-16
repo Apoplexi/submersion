@@ -6055,7 +6055,6 @@
   "diveComputer_connectionType_unknown": "לא ידוע",
   "diveComputer_connectionType_usb": "USB",
   "diveComputer_connectionType_wifi": "Wi-Fi",
-  "diveComputer_detail_cannotFilterNoSerial": "לא ניתן לסנן: אין מספר סידורי למחשב זה.",
   "diveComputer_detail_deleteDialogContent": "האם אתה בטוח שברצונך להסיר את \"{name}\"? פעולה זו לא תמחק צלילות שיובאו ממחשב זה.",
   "diveComputer_detail_deleteDialogTitle": "למחוק את המחשב?",
   "diveComputer_detail_divesImported": "צלילות שיובאו",

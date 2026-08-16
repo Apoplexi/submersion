@@ -6055,7 +6055,6 @@
   "diveComputer_connectionType_unknown": "Sconosciuto",
   "diveComputer_connectionType_usb": "USB",
   "diveComputer_connectionType_wifi": "Wi-Fi",
-  "diveComputer_detail_cannotFilterNoSerial": "Impossibile filtrare: nessun numero di serie per questo computer.",
   "diveComputer_detail_deleteDialogContent": "Vuoi davvero rimuovere \"{name}\"? Le immersioni importate da questo computer non verranno eliminate.",
   "diveComputer_detail_deleteDialogTitle": "Eliminare il computer?",
   "diveComputer_detail_divesImported": "Immersioni importate",

@@ -11927,7 +11927,6 @@
   "diveComputer_connectionType_unknown": "Unknown",
   "diveComputer_connectionType_usb": "USB",
   "diveComputer_connectionType_wifi": "Wi-Fi",
-  "diveComputer_detail_cannotFilterNoSerial": "Cannot filter: no serial number for this computer.",
   "diveComputer_detail_deleteDialogContent": "Are you sure you want to remove \"{name}\"? This will not delete any dives that were imported from this computer.",
   "@diveComputer_detail_deleteDialogContent": {
     "placeholders": {

@@ -6055,7 +6055,6 @@
   "diveComputer_connectionType_unknown": "Unbekannt",
   "diveComputer_connectionType_usb": "USB",
   "diveComputer_connectionType_wifi": "WLAN",
-  "diveComputer_detail_cannotFilterNoSerial": "Filtern nicht möglich: keine Seriennummer für diesen Computer.",
   "diveComputer_detail_deleteDialogContent": "Möchten Sie \"{name}\" wirklich entfernen? Dadurch werden keine von diesem Computer importierten Tauchgänge gelöscht.",
   "diveComputer_detail_deleteDialogTitle": "Computer löschen?",
   "diveComputer_detail_divesImported": "Importierte Tauchgänge",

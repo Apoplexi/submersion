@@ -6055,7 +6055,6 @@
   "diveComputer_connectionType_unknown": "غير معروف",
   "diveComputer_connectionType_usb": "USB",
   "diveComputer_connectionType_wifi": "Wi-Fi",
-  "diveComputer_detail_cannotFilterNoSerial": "لا يمكن التصفية: لا يوجد رقم تسلسلي لهذا الكمبيوتر.",
   "diveComputer_detail_deleteDialogContent": "هل تريد حقا إزالة \"{name}\"؟ لن يؤدي هذا إلى حذف أي غطسات تم استيرادها من هذا الكمبيوتر.",
   "diveComputer_detail_deleteDialogTitle": "حذف الكمبيوتر؟",
   "diveComputer_detail_divesImported": "الغطسات المستوردة",

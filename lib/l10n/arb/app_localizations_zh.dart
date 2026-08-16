@@ -18053,9 +18053,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get diveComputer_connectionType_wifi => 'Wi-Fi';
 
   @override
-  String get diveComputer_detail_cannotFilterNoSerial => '无法筛选:此电脑没有序列号。';
-
-  @override
   String diveComputer_detail_deleteDialogContent(String name) {
     return '确定要移除“$name”吗?这不会删除从此电脑导入的任何潜水记录。';
   }

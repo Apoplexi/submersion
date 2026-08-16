@@ -6055,7 +6055,6 @@
   "diveComputer_connectionType_unknown": "Onbekend",
   "diveComputer_connectionType_usb": "USB",
   "diveComputer_connectionType_wifi": "Wi-Fi",
-  "diveComputer_detail_cannotFilterNoSerial": "Filteren niet mogelijk: geen serienummer voor deze computer.",
   "diveComputer_detail_deleteDialogContent": "Weet je zeker dat je \"{name}\" wilt verwijderen? Dit verwijdert geen duiken die van deze computer zijn geimporteerd.",
   "diveComputer_detail_deleteDialogTitle": "Computer verwijderen?",
   "diveComputer_detail_divesImported": "Geimporteerde duiken",

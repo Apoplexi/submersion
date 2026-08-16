@@ -4118,6 +4118,72 @@ class AppDatabase extends _$AppDatabase {
     ''');
   }
 
+  /// Data self-heal: adopt each dive's computer attribution from its data-source
+  /// rows when `dives.computer_id` is null.
+  ///
+  /// The download path only began stamping `dives.computer_id` in v1.6 (commit
+  /// 9ddb281); before that every child row (profiles, tanks, data source)
+  /// carried the computer id but the parent dive did not. Those dives are
+  /// invisible to the "dives from this computer" filter, which keys on the
+  /// parent column (issue #1064), and to the consolidation service's
+  /// same-computer guard.
+  ///
+  /// Runs on every open; a cheap no-op once healed (the `IN` set is empty when
+  /// no dive is missing attribution). Local-only by design: the value is
+  /// derived from already-synced `dive_data_sources` rows, so every device
+  /// heals to the identical id independently. It never touches the dive's HLC,
+  /// so healing does not trigger a fleet re-sync.
+  ///
+  /// The primary source wins, with the source id as a tiebreak so devices
+  /// resolve a multi-source dive to the same computer rather than whichever row
+  /// SQLite happened to visit first.
+  ///
+  /// Runs after `ensurePerformanceIndexes` so the correlated subquery uses
+  /// idx_dive_data_sources_dive_id rather than scanning a million-row table on
+  /// a fresh or restored database. Order relative to
+  /// [_backfillMissingDataSources] is immaterial: the rows that helper
+  /// synthesizes carry no computer_id, so they never satisfy the `IN` set here.
+  Future<void> _backfillDiveComputerIds() async {
+    // PRAGMA-guarded like every other self-heal helper. beforeOpen runs for
+    // every open, including minimal old-schema test fixtures and databases
+    // caught mid-upgrade. Unlike _backfillMissingDataSources, which only names
+    // columns that have existed since those tables were created, this statement
+    // reads computer_id on both sides, so a table-existence check is not
+    // enough: PRAGMA table_info returns empty for a missing table, so probing
+    // the columns covers both cases.
+    final diveCols = await customSelect("PRAGMA table_info('dives')").get();
+    if (!diveCols.map((c) => c.read<String>('name')).contains('computer_id')) {
+      return;
+    }
+    final sourceCols = await customSelect(
+      "PRAGMA table_info('dive_data_sources')",
+    ).get();
+    final sourceColNames = sourceCols
+        .map((c) => c.read<String>('name'))
+        .toSet();
+    if (!sourceColNames.contains('computer_id') ||
+        !sourceColNames.contains('dive_id') ||
+        !sourceColNames.contains('is_primary')) {
+      return;
+    }
+
+    await customStatement('''
+      UPDATE dives SET computer_id = (
+        SELECT s.computer_id FROM dive_data_sources s
+        WHERE s.dive_id = dives.id AND s.computer_id IS NOT NULL
+        ORDER BY s.is_primary DESC, s.id
+        LIMIT 1
+      )
+      WHERE computer_id IS NULL
+        AND id IN (
+          SELECT dive_id FROM dive_data_sources WHERE computer_id IS NOT NULL
+        )
+    ''');
+  }
+
+  /// Test-only hook exercising the #1064 attribution self-heal directly.
+  Future<void> backfillDiveComputerIdsForTest() => _backfillDiveComputerIds();
+
   /// Copy each buddy's inline certification into a certifications row owned by
   /// that buddy (issue #553). Invoked from the onUpgrade blocks only (v109
   /// expand + the v110 contract safety-net), NEVER the beforeOpen backstop --
@@ -8113,6 +8179,13 @@ class AppDatabase extends _$AppDatabase {
         // subqueries hit idx_dive_profiles_dive_id / idx_dive_data_sources_dive_id
         // instead of full-scanning million-row tables on a fresh/restored DB.
         await _backfillMissingDataSources();
+
+        // Data self-heal (issue #1064): adopt dives.computer_id from the
+        // data-source rows for dives downloaded before v1.6 stamped it.
+        // Idempotent and local-only (derived from already-synced rows, no HLC
+        // bump). Also AFTER ensurePerformanceIndexes, for the same reason as
+        // the backfill above.
+        await _backfillDiveComputerIds();
       },
     );
   }
