@@ -21476,6 +21476,18 @@ class AppLocalizationsHe extends AppLocalizations {
   String get dive3d_seascape_orbitView => 'תצוגת תלת-ממד';
 
   @override
+  String get dive3d_seascape_appearance_surface => 'פני הקרקע';
+
+  @override
+  String get dive3d_seascape_appearance_surfaceDepth => 'צבעי עומק';
+
+  @override
+  String get dive3d_seascape_appearance_surfaceImagery => 'תמונות מפה';
+
+  @override
+  String get dive3d_seascape_appearance_surfaceBlend => 'שילוב';
+
+  @override
   String get dive3d_seascape_appearance_rampRange => 'הגבלת טווח עומק הצבעים';
 
   @override

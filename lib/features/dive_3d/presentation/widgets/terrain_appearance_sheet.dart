@@ -70,6 +70,29 @@ class TerrainAppearanceSheet extends ConsumerWidget {
             l10n.dive3d_seascape_appearance,
             style: Theme.of(context).textTheme.titleMedium,
           ),
+          const SizedBox(height: 12),
+          Text(l10n.dive3d_seascape_appearance_surface),
+          const SizedBox(height: 8),
+          SegmentedButton<SeascapeSurfaceMode>(
+            key: const ValueKey('seascapeSurfaceModeSegments'),
+            segments: [
+              ButtonSegment(
+                value: SeascapeSurfaceMode.depth,
+                label: Text(l10n.dive3d_seascape_appearance_surfaceDepth),
+              ),
+              ButtonSegment(
+                value: SeascapeSurfaceMode.imagery,
+                label: Text(l10n.dive3d_seascape_appearance_surfaceImagery),
+              ),
+              ButtonSegment(
+                value: SeascapeSurfaceMode.blend,
+                label: Text(l10n.dive3d_seascape_appearance_surfaceBlend),
+              ),
+            ],
+            selected: {appearance.surfaceMode},
+            onSelectionChanged: (sel) =>
+                update(appearance.copyWith(surfaceMode: sel.single)),
+          ),
           SwitchListTile(
             key: const ValueKey('seascapeRampRangeSwitch'),
             contentPadding: EdgeInsets.zero,

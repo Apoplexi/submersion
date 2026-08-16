@@ -21634,6 +21634,18 @@ class AppLocalizationsAr extends AppLocalizations {
   String get dive3d_seascape_orbitView => 'عرض ثلاثي الأبعاد';
 
   @override
+  String get dive3d_seascape_appearance_surface => 'سطح التضاريس';
+
+  @override
+  String get dive3d_seascape_appearance_surfaceDepth => 'ألوان العمق';
+
+  @override
+  String get dive3d_seascape_appearance_surfaceImagery => 'صور الخريطة';
+
+  @override
+  String get dive3d_seascape_appearance_surfaceBlend => 'مزيج';
+
+  @override
   String get dive3d_seascape_appearance_rampRange => 'تحديد نطاق عمق الألوان';
 
   @override

@@ -115,6 +115,26 @@ void main() {
     );
   });
 
+  testWidgets('surface mode segmented control writes through', (tester) async {
+    final container = await pumpSheet(tester);
+    expect(
+      container.read(settingsProvider).seascapeAppearance.surfaceMode,
+      SeascapeSurfaceMode.depth,
+    );
+    await tester.tap(find.text('Map imagery'));
+    await tester.pump();
+    expect(
+      container.read(settingsProvider).seascapeAppearance.surfaceMode,
+      SeascapeSurfaceMode.imagery,
+    );
+    await tester.tap(find.text('Blend'));
+    await tester.pump();
+    expect(
+      container.read(settingsProvider).seascapeAppearance.surfaceMode,
+      SeascapeSurfaceMode.blend,
+    );
+  });
+
   testWidgets('wall angle slider persists its value', (tester) async {
     final container = await pumpSheet(tester);
     final slider = find.byKey(const ValueKey('seascapeWallAngleSlider'));
