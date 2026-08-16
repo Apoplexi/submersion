@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:submersion/core/constants/map_tile_config.dart';
 import 'package:submersion/core/constants/units.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/bathymetry/domain/bathymetry_grid.dart';
 import 'package:submersion/features/bathymetry/presentation/bathymetry_labels.dart';
 import 'package:submersion/features/dive_3d/application/site_seascape_providers.dart';
+import 'package:submersion/features/dive_3d/domain/spatial/seascape_appearance.dart';
 import 'package:submersion/features/dive_3d/domain/spatial/seascape_axes.dart';
 import 'package:submersion/features/dive_3d/domain/spatial/seascape_surface.dart';
 import 'package:submersion/features/dive_3d/domain/spatial/spatial_projection.dart';
@@ -102,6 +104,7 @@ class _SiteSeascapePageState extends ConsumerState<SiteSeascapePage> {
             :final axisInputs,
             :final grid,
             :final contourLabels,
+            :final imagery,
           ) =>
             Column(
               children: [
@@ -130,6 +133,13 @@ class _SiteSeascapePageState extends ConsumerState<SiteSeascapePage> {
                                 scene.layers.first.mesh,
                               ),
                               hoverPick: _hoverPick,
+                              terrainImagery: imagery?.image,
+                              imageryWhiteTexel: imagery == null
+                                  ? null
+                                  : (
+                                      u: imagery.frame.whiteU,
+                                      v: imagery.frame.whiteV,
+                                    ),
                             );
                           },
                         ),
@@ -140,21 +150,36 @@ class _SiteSeascapePageState extends ConsumerState<SiteSeascapePage> {
                         right: 8,
                         child: _sourceChip(sourceId, resolutionMeters),
                       ),
-                      Positioned(
-                        top: 40,
-                        right: 8,
-                        child: SeascapeDepthLegend(
-                          maxDepthMeters: axisInputs.maxDepth,
-                          hasLand: grid.depthsMeters.any(
-                            (d) => d == null || d <= 0,
+                      // The legend describes the depth ramp; a photographed
+                      // surface has no ramp to explain.
+                      if (appearance.surfaceMode != SeascapeSurfaceMode.imagery)
+                        Positioned(
+                          top: 40,
+                          right: 8,
+                          child: SeascapeDepthLegend(
+                            maxDepthMeters: axisInputs.maxDepth,
+                            hasLand: grid.depthsMeters.any(
+                              (d) => d == null || d <= 0,
+                            ),
+                            appearance: appearance,
+                            displayUnitInMeters: depthUnit == DepthUnit.feet
+                                ? 0.3048
+                                : 1.0,
+                            depthSymbol: depthUnit.symbol,
                           ),
-                          appearance: appearance,
-                          displayUnitInMeters: depthUnit == DepthUnit.feet
-                              ? 0.3048
-                              : 1.0,
-                          depthSymbol: depthUnit.symbol,
                         ),
-                      ),
+                      if (imagery != null)
+                        Positioned(
+                          bottom: 8,
+                          right: 8,
+                          child: _attributionChip(
+                            MapTileConfig.attribution(
+                              ref.watch(
+                                settingsProvider.select((s) => s.mapStyle),
+                              ),
+                            ),
+                          ),
+                        ),
                       _hoverTooltip(grid),
                     ],
                   ),
@@ -233,6 +258,19 @@ class _SiteSeascapePageState extends ConsumerState<SiteSeascapePage> {
           ],
         ),
       ),
+    );
+  }
+
+  /// Tile-provider credit for the draped imagery, styled like the source
+  /// chip. Required by the imagery providers' terms of use.
+  Widget _attributionChip(String text) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.8),
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: Text(text, style: Theme.of(context).textTheme.labelSmall),
     );
   }
 

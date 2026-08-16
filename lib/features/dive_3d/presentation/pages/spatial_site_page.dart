@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:submersion/core/constants/map_tile_config.dart';
 import 'package:submersion/core/constants/units.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/bathymetry/presentation/bathymetry_labels.dart';
 import 'package:submersion/features/dive_3d/application/spatial_providers.dart';
 import 'package:submersion/features/bathymetry/domain/bathymetry_grid.dart';
+import 'package:submersion/features/dive_3d/domain/spatial/seascape_appearance.dart';
 import 'package:submersion/features/dive_3d/domain/spatial/seascape_axes.dart';
 import 'package:submersion/features/dive_3d/domain/spatial/seascape_surface.dart';
 import 'package:submersion/features/dive_3d/domain/spatial/spatial_projection.dart';
@@ -135,6 +137,13 @@ class _SpatialSitePageState extends ConsumerState<SpatialSitePage>
                                     scene.layers.first.mesh,
                                   ),
                             hoverPick: grid == null ? null : _hoverPick,
+                            terrainImagery: result.imagery?.image,
+                            imageryWhiteTexel: result.imagery == null
+                                ? null
+                                : (
+                                    u: result.imagery!.frame.whiteU,
+                                    v: result.imagery!.frame.whiteV,
+                                  ),
                           );
                         },
                       ),
@@ -145,7 +154,11 @@ class _SpatialSitePageState extends ConsumerState<SpatialSitePage>
                       right: 8,
                       child: _captions(result!),
                     ),
-                    if (result.grid != null && result.axisInputs != null)
+                    // The legend describes the depth ramp; a photographed
+                    // surface has no ramp to explain.
+                    if (result.grid != null &&
+                        result.axisInputs != null &&
+                        appearance.surfaceMode != SeascapeSurfaceMode.imagery)
                       Positioned(
                         top: 40,
                         right: 8,
@@ -301,6 +314,14 @@ class _SpatialSitePageState extends ConsumerState<SpatialSitePage>
           )
         else
           chip(context.l10n.dive3d_spatial_synthesizedSeafloor),
+        // Tile-provider credit for the draped imagery, required by the
+        // imagery providers' terms of use.
+        if (result.imagery != null)
+          chip(
+            MapTileConfig.attribution(
+              ref.watch(settingsProvider.select((s) => s.mapStyle)),
+            ),
+          ),
       ],
     );
   }
