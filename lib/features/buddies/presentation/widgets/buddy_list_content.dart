@@ -476,11 +476,6 @@ class _BuddyListContentState extends ConsumerState<BuddyListContent> {
                   ),
                   actions: [
                     IconButton(
-                      icon: const Icon(Icons.sort),
-                      tooltip: context.l10n.buddies_action_sort,
-                      onPressed: () => _showSortSheet(context),
-                    ),
-                    IconButton(
                       icon: const Icon(Icons.search),
                       tooltip: context.l10n.buddies_action_search,
                       onPressed: () {
@@ -489,6 +484,11 @@ class _BuddyListContentState extends ConsumerState<BuddyListContent> {
                           delegate: BuddySearchDelegate(ref),
                         );
                       },
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.sort),
+                      tooltip: context.l10n.buddies_action_sort,
+                      onPressed: () => _showSortSheet(context),
                     ),
                     // The only way into bulk actions: entry by long-press was removed,
                     // so nothing but this control opens selection mode on touch.
@@ -692,16 +692,16 @@ class _BuddyListContentState extends ConsumerState<BuddyListContent> {
             ),
           ),
           IconButton(
-            icon: const Icon(Icons.sort, size: 20),
-            tooltip: context.l10n.buddies_action_sort,
-            onPressed: () => _showSortSheet(context),
-          ),
-          IconButton(
             icon: const Icon(Icons.search, size: 20),
             tooltip: context.l10n.buddies_action_search,
             onPressed: () {
               showSearch(context: context, delegate: BuddySearchDelegate(ref));
             },
+          ),
+          IconButton(
+            icon: const Icon(Icons.sort, size: 20),
+            tooltip: context.l10n.buddies_action_sort,
+            onPressed: () => _showSortSheet(context),
           ),
           // The only way into bulk actions: entry by long-press was removed,
           // so nothing but this control opens selection mode on touch.

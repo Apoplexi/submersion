@@ -204,11 +204,6 @@ class _CertificationListContentState
                       onPressed: () => context.push('/certifications/wallet'),
                     ),
                     IconButton(
-                      icon: const Icon(Icons.sort),
-                      tooltip: context.l10n.certifications_list_tooltip_sort,
-                      onPressed: () => _showSortSheet(context),
-                    ),
-                    IconButton(
                       icon: const Icon(Icons.search),
                       tooltip: context.l10n.certifications_list_tooltip_search,
                       onPressed: () {
@@ -217,6 +212,11 @@ class _CertificationListContentState
                           delegate: CertificationSearchDelegate(ref),
                         );
                       },
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.sort),
+                      tooltip: context.l10n.certifications_list_tooltip_sort,
+                      onPressed: () => _showSortSheet(context),
                     ),
                     // The only way into bulk actions: entry by long-press was removed,
                     // so nothing but this control opens selection mode on touch.
@@ -462,11 +462,6 @@ class _CertificationListContentState
             onPressed: () => context.push('/certifications/wallet'),
           ),
           IconButton(
-            icon: const Icon(Icons.sort, size: 20),
-            tooltip: context.l10n.certifications_list_tooltip_sort,
-            onPressed: () => _showSortSheet(context),
-          ),
-          IconButton(
             icon: const Icon(Icons.search, size: 20),
             tooltip: context.l10n.certifications_list_tooltip_search,
             onPressed: () {
@@ -475,6 +470,11 @@ class _CertificationListContentState
                 delegate: CertificationSearchDelegate(ref),
               );
             },
+          ),
+          IconButton(
+            icon: const Icon(Icons.sort, size: 20),
+            tooltip: context.l10n.certifications_list_tooltip_sort,
+            onPressed: () => _showSortSheet(context),
           ),
           // The only way into bulk actions: entry by long-press was removed,
           // so nothing but this control opens selection mode on touch.

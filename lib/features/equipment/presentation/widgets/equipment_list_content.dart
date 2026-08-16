@@ -242,11 +242,6 @@ class _EquipmentListContentState extends ConsumerState<EquipmentListContent> {
                   ),
                   actions: [
                     IconButton(
-                      icon: const Icon(Icons.sort),
-                      tooltip: context.l10n.equipment_list_sortTooltip,
-                      onPressed: () => _showSortSheet(context),
-                    ),
-                    IconButton(
                       icon: const Icon(Icons.search),
                       tooltip: context.l10n.equipment_list_searchTooltip,
                       onPressed: () {
@@ -255,6 +250,11 @@ class _EquipmentListContentState extends ConsumerState<EquipmentListContent> {
                           delegate: EquipmentSearchDelegate(),
                         );
                       },
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.sort),
+                      tooltip: context.l10n.equipment_list_sortTooltip,
+                      onPressed: () => _showSortSheet(context),
                     ),
                     // The only way into bulk actions: entry by long-press was removed,
                     // so nothing but this control opens selection mode on touch.
@@ -560,16 +560,16 @@ class _EquipmentListContentState extends ConsumerState<EquipmentListContent> {
             ),
           ),
           IconButton(
-            icon: const Icon(Icons.sort, size: 20),
-            tooltip: context.l10n.equipment_list_sortTooltip,
-            onPressed: () => _showSortSheet(context),
-          ),
-          IconButton(
             icon: const Icon(Icons.search, size: 20),
             tooltip: context.l10n.equipment_list_searchTooltip,
             onPressed: () {
               showSearch(context: context, delegate: EquipmentSearchDelegate());
             },
+          ),
+          IconButton(
+            icon: const Icon(Icons.sort, size: 20),
+            tooltip: context.l10n.equipment_list_sortTooltip,
+            onPressed: () => _showSortSheet(context),
           ),
           // The only way into bulk actions: entry by long-press was removed,
           // so nothing but this control opens selection mode on touch.
