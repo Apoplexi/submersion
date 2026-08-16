@@ -3,7 +3,10 @@ import 'dart:typed_data';
 import 'dart:ui';
 
 import 'package:submersion/core/utils/geo_math.dart';
+import 'package:submersion/core/utils/slippy_tiles.dart';
 import 'package:submersion/features/bathymetry/domain/bathymetry_grid.dart';
+import 'package:submersion/features/bathymetry/domain/terrain_imagery_frame.dart';
+import 'package:submersion/features/dive_3d/domain/spatial/seascape_appearance.dart';
 import 'package:submersion/features/dive_3d/domain/entities/mesh_data.dart';
 import 'package:submersion/features/dive_3d/domain/spatial/spatial_projection.dart';
 import 'package:submersion/features/dive_3d/domain/spatial/terrain_builder.dart';
@@ -63,6 +66,8 @@ class BathymetryTerrainBuilder {
     required SpatialProjection projection,
     double? rampMaxDepthMeters,
     bool rampBanded = false,
+    TerrainImageryFrame? imageryFrame,
+    SeascapeSurfaceMode surfaceMode = SeascapeSurfaceMode.depth,
   }) {
     final rows = grid.rows, cols = grid.cols;
     final mLon = metersPerDegreeLongitude(center.latitude);
@@ -71,14 +76,13 @@ class BathymetryTerrainBuilder {
 
     final positions = Float32List(rows * cols * 3);
     final colors = Float32List(rows * cols * 3);
+    final uvs = imageryFrame == null ? null : Float32List(rows * cols * 2);
     for (var r = 0; r < rows; r++) {
-      final north =
-          (grid.originLat + grid.cellSizeLatDeg * r - center.latitude) *
-          metersPerDegLat;
+      final lat = grid.originLat + grid.cellSizeLatDeg * r;
+      final north = (lat - center.latitude) * metersPerDegLat;
       for (var c = 0; c < cols; c++) {
-        final east =
-            (grid.originLon + grid.cellSizeLonDeg * c - center.longitude) *
-            mLon;
+        final lon = grid.originLon + grid.cellSizeLonDeg * c;
+        final east = (lon - center.longitude) * mLon;
         final raw = grid.depthAt(r, c);
         // nodata -> shoreline; land elevation capped so peaks stay modest.
         final depth = raw == null ? 0.0 : math.max(raw, -landCap);
@@ -86,8 +90,18 @@ class BathymetryTerrainBuilder {
         positions[vi] = projection.xOf(east);
         positions[vi + 1] = projection.yOf(depth);
         positions[vi + 2] = projection.zOf(north);
+        if (uvs != null) {
+          final f = imageryFrame!;
+          final uvi = (r * cols + c) * 2;
+          uvs[uvi] = (mercatorX(lon) - f.u0MercX) / (f.u1MercX - f.u0MercX);
+          uvs[uvi + 1] = (mercatorY(lat) - f.v0MercY) / (f.v1MercY - f.v0MercY);
+        }
         final Color color;
-        if (raw == null || raw <= 0) {
+        if (surfaceMode == SeascapeSurfaceMode.imagery) {
+          // The photo carries the surface; vertex colors stay neutral so
+          // only the baked flat shading modulates it.
+          color = const Color(0xFFFFFFFF);
+        } else if (raw == null || raw <= 0) {
           color = landColor;
         } else {
           final ramp = math.max(rampMaxDepthMeters ?? maxDepth, 1.0);
@@ -102,6 +116,7 @@ class BathymetryTerrainBuilder {
       positions: positions,
       indices: _gridIndices(rows, cols),
       colors: colors,
+      textureCoordinates: uvs,
     );
 
     final b = enuBounds(grid, center);

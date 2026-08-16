@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:submersion/features/bathymetry/domain/bathymetry_grid.dart';
+import 'package:submersion/features/bathymetry/domain/terrain_imagery_frame.dart';
 import 'package:submersion/features/dive_3d/domain/geometry/scene_bounds.dart';
 import 'package:submersion/features/dive_3d/domain/scene_3d.dart';
 import 'package:submersion/features/dive_3d/domain/spatial/bathymetry_terrain_builder.dart';
@@ -36,6 +37,7 @@ class SpatialGeometryService {
     SeascapeAppearance appearance = const SeascapeAppearance(),
     double displayUnitInMeters = 1.0,
     String depthSymbol = 'm',
+    TerrainImageryFrame? imageryFrame,
   }) => buildWithFrame(
     path,
     siteMaxDepth: siteMaxDepth,
@@ -45,6 +47,7 @@ class SpatialGeometryService {
     appearance: appearance,
     displayUnitInMeters: displayUnitInMeters,
     depthSymbol: depthSymbol,
+    imageryFrame: imageryFrame,
   ).scene;
 
   /// [build], plus the scene-frame numbers ([SeascapeAxisInputs]) the axes
@@ -64,6 +67,7 @@ class SpatialGeometryService {
     SeascapeAppearance appearance = const SeascapeAppearance(),
     double displayUnitInMeters = 1.0,
     String depthSymbol = 'm',
+    TerrainImageryFrame? imageryFrame,
   }) {
     if (path.points.length < 2) {
       return (
@@ -124,6 +128,8 @@ class SpatialGeometryService {
             projection: proj,
             rampMaxDepthMeters: appearance.rampMaxDepthMeters,
             rampBanded: appearance.rampBanded,
+            imageryFrame: imageryFrame,
+            surfaceMode: appearance.surfaceMode,
           )
         : TerrainBuilder.build(
             path: placed,

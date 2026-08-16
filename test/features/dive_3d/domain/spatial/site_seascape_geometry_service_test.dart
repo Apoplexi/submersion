@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:submersion/features/bathymetry/domain/bathymetry_grid.dart';
+import 'package:submersion/features/bathymetry/domain/terrain_imagery_frame.dart';
 import 'package:submersion/features/dive_3d/domain/geometry/marker_layout.dart';
 import 'package:submersion/features/dive_3d/domain/scene_3d.dart';
 import 'package:submersion/features/dive_3d/domain/spatial/reckoned_path.dart';
@@ -168,6 +169,40 @@ void main() {
     // 5 -> 45 over two 100 m cells is 20 m per cell: atan(0.2) = 11.3
     // degrees, below the default 22, so no wall layer.
     expect(overlays.contains(SceneOverlay.steepWalls), isFalse);
+  });
+
+  test('an imagery frame flows through to terrain UVs', () {
+    final slopeGrid = BathymetryGrid(
+      originLat: 0,
+      originLon: 0,
+      cellSizeLatDeg: 100.0 / 110540.0,
+      cellSizeLonDeg: 100.0 / 111320.0,
+      rows: 3,
+      cols: 3,
+      depthsMeters: const [5, 5, 5, 25, 25, 25, 45, 45, 45],
+      sourceId: 'test',
+      resolutionMeters: 100,
+      fetchedAt: DateTime.utc(2026, 8, 15),
+    );
+    const frame = TerrainImageryFrame(
+      u0MercX: 0.4,
+      u1MercX: 0.6,
+      v0MercY: 0.4,
+      v1MercY: 0.6,
+      whiteU: 0.5,
+      whiteV: 0.99,
+    );
+    final result = service.buildWithLabels(
+      SiteSeascapeInput(
+        grid: slopeGrid,
+        center: const GeoPoint(0, 0),
+        siteName: 'Test',
+        divePaths: const [],
+        nearbySites: const [],
+        imageryFrame: frame,
+      ),
+    );
+    expect(result.scene.layers.first.mesh.textureCoordinates, isNotNull);
   });
 
   test('steep terrain gains a wall layer once the threshold allows', () {
