@@ -3947,9 +3947,6 @@ class AppLocalizationsAr extends AppLocalizations {
       'اختر مركز غوص من القائمة لعرض التفاصيل';
 
   @override
-  String get diveCenters_summary_topRated => 'الأعلى تقييماً';
-
-  @override
   String get diveCenters_summary_totalCenters => 'إجمالي المراكز';
 
   @override

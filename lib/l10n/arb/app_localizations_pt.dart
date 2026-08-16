@@ -4031,9 +4031,6 @@ class AppLocalizationsPt extends AppLocalizations {
       'Selecione um centro de mergulho da lista para ver os detalhes';
 
   @override
-  String get diveCenters_summary_topRated => 'Mais Bem Avaliados';
-
-  @override
   String get diveCenters_summary_totalCenters => 'Total de Centros';
 
   @override

@@ -3818,9 +3818,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get diveCenters_summary_selectPrompt => '从列表中选择潜水中心以查看详情';
 
   @override
-  String get diveCenters_summary_topRated => '评分最高';
-
-  @override
   String get diveCenters_summary_totalCenters => '中心总数';
 
   @override

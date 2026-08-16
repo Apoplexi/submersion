@@ -3951,9 +3951,6 @@ class AppLocalizationsEn extends AppLocalizations {
       'Select a dive center from the list to view details';
 
   @override
-  String get diveCenters_summary_topRated => 'Top Rated';
-
-  @override
   String get diveCenters_summary_totalCenters => 'Total Centers';
 
   @override

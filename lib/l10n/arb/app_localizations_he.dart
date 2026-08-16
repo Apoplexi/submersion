@@ -3919,9 +3919,6 @@ class AppLocalizationsHe extends AppLocalizations {
       'בחר מרכז צלילה מהרשימה כדי להציג פרטים';
 
   @override
-  String get diveCenters_summary_topRated => 'מדורג ביותר';
-
-  @override
   String get diveCenters_summary_totalCenters => 'סה\"כ מרכזים';
 
   @override

@@ -4043,9 +4043,6 @@ class AppLocalizationsFr extends AppLocalizations {
       'Sélectionnez un centre de plongée dans la liste pour afficher les détails';
 
   @override
-  String get diveCenters_summary_topRated => 'Mieux notés';
-
-  @override
   String get diveCenters_summary_totalCenters => 'Total centres';
 
   @override

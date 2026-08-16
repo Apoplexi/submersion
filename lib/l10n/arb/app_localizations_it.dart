@@ -4026,9 +4026,6 @@ class AppLocalizationsIt extends AppLocalizations {
       'Seleziona un centro immersioni dalla lista per vedere i dettagli';
 
   @override
-  String get diveCenters_summary_topRated => 'Più Votati';
-
-  @override
   String get diveCenters_summary_totalCenters => 'Centri Totali';
 
   @override

@@ -3995,9 +3995,6 @@ class AppLocalizationsNl extends AppLocalizations {
       'Selecteer een duikcentrum uit de lijst om details te bekijken';
 
   @override
-  String get diveCenters_summary_topRated => 'Best beoordeeld';
-
-  @override
   String get diveCenters_summary_totalCenters => 'Totaal centra';
 
   @override

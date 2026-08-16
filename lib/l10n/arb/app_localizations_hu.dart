@@ -4012,9 +4012,6 @@ class AppLocalizationsHu extends AppLocalizations {
       'Válassz ki egy búvárközpontot a listából a részletek megtekintéséhez';
 
   @override
-  String get diveCenters_summary_topRated => 'Legjobbra értékelt';
-
-  @override
   String get diveCenters_summary_totalCenters => 'Összes központ';
 
   @override

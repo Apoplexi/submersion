@@ -4035,9 +4035,6 @@ class AppLocalizationsDe extends AppLocalizations {
       'Wählen Sie ein Tauchcenter aus der Liste, um Details anzuzeigen';
 
   @override
-  String get diveCenters_summary_topRated => 'Bestbewertet';
-
-  @override
   String get diveCenters_summary_totalCenters => 'Center gesamt';
 
   @override

@@ -6826,12 +6826,6 @@ abstract class AppLocalizations {
   /// **'Select a dive center from the list to view details'**
   String get diveCenters_summary_selectPrompt;
 
-  /// No description provided for @diveCenters_summary_topRated.
-  ///
-  /// In en, this message translates to:
-  /// **'Top Rated'**
-  String get diveCenters_summary_topRated;
-
   /// No description provided for @diveCenters_summary_totalCenters.
   ///
   /// In en, this message translates to:

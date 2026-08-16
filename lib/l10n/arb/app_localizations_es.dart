@@ -4031,9 +4031,6 @@ class AppLocalizationsEs extends AppLocalizations {
       'Selecciona un centro de buceo de la lista para ver detalles';
 
   @override
-  String get diveCenters_summary_topRated => 'Mejor Calificados';
-
-  @override
   String get diveCenters_summary_totalCenters => 'Total de Centros';
 
   @override
