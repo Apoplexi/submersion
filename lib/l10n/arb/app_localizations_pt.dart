@@ -3241,7 +3241,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get settings_homeCards_card_milestones => 'Marcos';
 
   @override
-  String get settings_homeCards_card_photoRibbon => 'Fotos recentes';
+  String get settings_homeCards_card_photoRibbon => 'Mídia recente';
 
   @override
   String get settings_homeCards_card_onThisDay => 'Neste dia';
@@ -3365,7 +3365,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get dashboard_urgent_title => 'Requer atenção';
 
   @override
-  String get dashboard_photos_title => 'Fotos recentes';
+  String get dashboard_media_title => 'Mídia recente';
 
   @override
   String get dashboard_recentSites_title => 'Locais recentes';
@@ -3484,6 +3484,23 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get dashboard_recentDives_errorLoading =>
       'Falha ao carregar mergulhos';
+
+  @override
+  String get dashboard_recentDives_latestProfileTitle =>
+      'Perfil do último mergulho';
+
+  @override
+  String get dashboard_recentDives_noProfileData =>
+      'Sem dados de perfil para este mergulho';
+
+  @override
+  String get dashboard_recentDives_profileLoadError =>
+      'Não foi possível carregar o perfil do mergulho';
+
+  @override
+  String dashboard_recentDives_profileMinutes(int minutes) {
+    return '$minutes min';
+  }
 
   @override
   String get dashboard_recentDives_logFirst => 'Registre Seu Primeiro Mergulho';
@@ -4029,9 +4046,6 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get diveCenters_summary_selectPrompt =>
       'Selecione um centro de mergulho da lista para ver os detalhes';
-
-  @override
-  String get diveCenters_summary_topRated => 'Mais Bem Avaliados';
 
   @override
   String get diveCenters_summary_totalCenters => 'Total de Centros';
@@ -13258,6 +13272,15 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get planning_section_tools => 'Ferramentas';
+
+  @override
+  String get planning_summary_prompt => 'Selecione uma ferramenta para começar';
+
+  @override
+  String get planning_summary_savedPlans => 'Planos salvos';
+
+  @override
+  String get planning_summary_noPlans => 'Ainda não há planos salvos';
 
   @override
   String get planning_sidebar_appBar_title => 'Planejamento';

@@ -3250,7 +3250,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get settings_homeCards_card_milestones => 'Jalons';
 
   @override
-  String get settings_homeCards_card_photoRibbon => 'Photos récentes';
+  String get settings_homeCards_card_photoRibbon => 'Médias récents';
 
   @override
   String get settings_homeCards_card_onThisDay => 'Ce jour-là';
@@ -3374,7 +3374,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get dashboard_urgent_title => 'Attention requise';
 
   @override
-  String get dashboard_photos_title => 'Photos récentes';
+  String get dashboard_media_title => 'Médias récents';
 
   @override
   String get dashboard_recentSites_title => 'Sites récents';
@@ -3493,6 +3493,23 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get dashboard_recentDives_errorLoading =>
       'Impossible de charger les plongees';
+
+  @override
+  String get dashboard_recentDives_latestProfileTitle =>
+      'Profil de la dernière plongée';
+
+  @override
+  String get dashboard_recentDives_noProfileData =>
+      'Aucune donnée de profil pour cette plongée';
+
+  @override
+  String get dashboard_recentDives_profileLoadError =>
+      'Impossible de charger le profil de plongée';
+
+  @override
+  String dashboard_recentDives_profileMinutes(int minutes) {
+    return '$minutes min';
+  }
 
   @override
   String get dashboard_recentDives_logFirst => 'Enregistre ta premiere plongee';
@@ -4041,9 +4058,6 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get diveCenters_summary_selectPrompt =>
       'Sélectionnez un centre de plongée dans la liste pour afficher les détails';
-
-  @override
-  String get diveCenters_summary_topRated => 'Mieux notés';
 
   @override
   String get diveCenters_summary_totalCenters => 'Total centres';
@@ -13291,6 +13305,15 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get planning_section_tools => 'Outils';
+
+  @override
+  String get planning_summary_prompt => 'Sélectionnez un outil pour commencer';
+
+  @override
+  String get planning_summary_savedPlans => 'Plans enregistrés';
+
+  @override
+  String get planning_summary_noPlans => 'Aucun plan enregistré';
 
   @override
   String get planning_sidebar_appBar_title => 'Planification';

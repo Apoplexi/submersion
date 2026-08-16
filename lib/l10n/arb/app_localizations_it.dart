@@ -3238,7 +3238,7 @@ class AppLocalizationsIt extends AppLocalizations {
   String get settings_homeCards_card_milestones => 'Traguardi';
 
   @override
-  String get settings_homeCards_card_photoRibbon => 'Foto recenti';
+  String get settings_homeCards_card_photoRibbon => 'Media recenti';
 
   @override
   String get settings_homeCards_card_onThisDay => 'In questo giorno';
@@ -3360,7 +3360,7 @@ class AppLocalizationsIt extends AppLocalizations {
   String get dashboard_urgent_title => 'Richiede attenzione';
 
   @override
-  String get dashboard_photos_title => 'Foto recenti';
+  String get dashboard_media_title => 'Media recenti';
 
   @override
   String get dashboard_recentSites_title => 'Siti recenti';
@@ -3479,6 +3479,23 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String get dashboard_recentDives_errorLoading =>
       'Impossibile caricare le immersioni';
+
+  @override
+  String get dashboard_recentDives_latestProfileTitle =>
+      'Profilo dell\'ultima immersione';
+
+  @override
+  String get dashboard_recentDives_noProfileData =>
+      'Nessun dato di profilo per questa immersione';
+
+  @override
+  String get dashboard_recentDives_profileLoadError =>
+      'Impossibile caricare il profilo dell\'immersione';
+
+  @override
+  String dashboard_recentDives_profileMinutes(int minutes) {
+    return '$minutes min';
+  }
 
   @override
   String get dashboard_recentDives_logFirst =>
@@ -4024,9 +4041,6 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String get diveCenters_summary_selectPrompt =>
       'Seleziona un centro immersioni dalla lista per vedere i dettagli';
-
-  @override
-  String get diveCenters_summary_topRated => 'Più Votati';
 
   @override
   String get diveCenters_summary_totalCenters => 'Centri Totali';
@@ -13252,6 +13266,15 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get planning_section_tools => 'Strumenti';
+
+  @override
+  String get planning_summary_prompt => 'Seleziona uno strumento per iniziare';
+
+  @override
+  String get planning_summary_savedPlans => 'Piani salvati';
+
+  @override
+  String get planning_summary_noPlans => 'Nessun piano salvato';
 
   @override
   String get planning_sidebar_appBar_title => 'Pianificazione';

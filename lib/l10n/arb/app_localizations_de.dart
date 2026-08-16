@@ -3249,7 +3249,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get settings_homeCards_card_milestones => 'Meilensteine';
 
   @override
-  String get settings_homeCards_card_photoRibbon => 'Neueste Fotos';
+  String get settings_homeCards_card_photoRibbon => 'Aktuelle Medien';
 
   @override
   String get settings_homeCards_card_onThisDay => 'An diesem Tag';
@@ -3371,7 +3371,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get dashboard_urgent_title => 'Braucht Aufmerksamkeit';
 
   @override
-  String get dashboard_photos_title => 'Aktuelle Fotos';
+  String get dashboard_media_title => 'Aktuelle Medien';
 
   @override
   String get dashboard_recentSites_title => 'Aktuelle Tauchplätze';
@@ -3489,6 +3489,22 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get dashboard_recentDives_errorLoading =>
       'Tauchgänge konnten nicht geladen werden';
+
+  @override
+  String get dashboard_recentDives_latestProfileTitle => 'Letztes Tauchprofil';
+
+  @override
+  String get dashboard_recentDives_noProfileData =>
+      'Keine Profildaten für diesen Tauchgang';
+
+  @override
+  String get dashboard_recentDives_profileLoadError =>
+      'Tauchprofil konnte nicht geladen werden';
+
+  @override
+  String dashboard_recentDives_profileMinutes(int minutes) {
+    return '$minutes Min.';
+  }
 
   @override
   String get dashboard_recentDives_logFirst => 'Ersten Tauchgang erfassen';
@@ -4033,9 +4049,6 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get diveCenters_summary_selectPrompt =>
       'Wählen Sie ein Tauchcenter aus der Liste, um Details anzuzeigen';
-
-  @override
-  String get diveCenters_summary_topRated => 'Bestbewertet';
 
   @override
   String get diveCenters_summary_totalCenters => 'Center gesamt';
@@ -13243,6 +13256,15 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get planning_section_tools => 'Werkzeuge';
+
+  @override
+  String get planning_summary_prompt => 'Wähle ein Werkzeug zum Starten';
+
+  @override
+  String get planning_summary_savedPlans => 'Gespeicherte Pläne';
+
+  @override
+  String get planning_summary_noPlans => 'Noch keine gespeicherten Pläne';
 
   @override
   String get planning_sidebar_appBar_title => 'Planung';

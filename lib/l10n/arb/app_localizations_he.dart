@@ -3151,7 +3151,7 @@ class AppLocalizationsHe extends AppLocalizations {
   String get settings_homeCards_card_milestones => 'אבני דרך';
 
   @override
-  String get settings_homeCards_card_photoRibbon => 'תמונות אחרונות';
+  String get settings_homeCards_card_photoRibbon => 'מדיה אחרונה';
 
   @override
   String get settings_homeCards_card_onThisDay => 'ביום זה';
@@ -3270,7 +3270,7 @@ class AppLocalizationsHe extends AppLocalizations {
   String get dashboard_urgent_title => 'דורש תשומת לב';
 
   @override
-  String get dashboard_photos_title => 'תמונות אחרונות';
+  String get dashboard_media_title => 'מדיה אחרונה';
 
   @override
   String get dashboard_recentSites_title => 'אתרים אחרונים';
@@ -3385,6 +3385,23 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get dashboard_recentDives_errorLoading => 'נכשל טעינת צלילות';
+
+  @override
+  String get dashboard_recentDives_latestProfileTitle =>
+      'פרופיל הצלילה האחרונה';
+
+  @override
+  String get dashboard_recentDives_noProfileData =>
+      'אין נתוני פרופיל לצלילה זו';
+
+  @override
+  String get dashboard_recentDives_profileLoadError =>
+      'לא ניתן לטעון את פרופיל הצלילה';
+
+  @override
+  String dashboard_recentDives_profileMinutes(int minutes) {
+    return '$minutes דק\'';
+  }
 
   @override
   String get dashboard_recentDives_logFirst => 'רשום את הצלילה הראשונה';
@@ -3917,9 +3934,6 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String get diveCenters_summary_selectPrompt =>
       'בחר מרכז צלילה מהרשימה כדי להציג פרטים';
-
-  @override
-  String get diveCenters_summary_topRated => 'מדורג ביותר';
 
   @override
   String get diveCenters_summary_totalCenters => 'סה\"כ מרכזים';
@@ -12937,6 +12951,15 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get planning_section_tools => 'כלים';
+
+  @override
+  String get planning_summary_prompt => 'בחר כלי כדי להתחיל';
+
+  @override
+  String get planning_summary_savedPlans => 'תוכניות שמורות';
+
+  @override
+  String get planning_summary_noPlans => 'אין עדיין תוכניות שמורות';
 
   @override
   String get planning_sidebar_appBar_title => 'תכנון';

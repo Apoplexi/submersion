@@ -3227,7 +3227,7 @@ class AppLocalizationsHu extends AppLocalizations {
   String get settings_homeCards_card_milestones => 'Mérföldkövek';
 
   @override
-  String get settings_homeCards_card_photoRibbon => 'Legutóbbi fotók';
+  String get settings_homeCards_card_photoRibbon => 'Legutóbbi médiaelemek';
 
   @override
   String get settings_homeCards_card_onThisDay => 'Ezen a napon';
@@ -3349,7 +3349,7 @@ class AppLocalizationsHu extends AppLocalizations {
   String get dashboard_urgent_title => 'Figyelmet igényel';
 
   @override
-  String get dashboard_photos_title => 'Legutóbbi fotók';
+  String get dashboard_media_title => 'Legutóbbi médiaelemek';
 
   @override
   String get dashboard_recentSites_title => 'Legutóbbi helyszínek';
@@ -3466,6 +3466,23 @@ class AppLocalizationsHu extends AppLocalizations {
   @override
   String get dashboard_recentDives_errorLoading =>
       'Nem sikerult betolteni a meruleseket';
+
+  @override
+  String get dashboard_recentDives_latestProfileTitle =>
+      'Legutóbbi merülési profil';
+
+  @override
+  String get dashboard_recentDives_noProfileData =>
+      'Nincs profiladat ehhez a merüléshez';
+
+  @override
+  String get dashboard_recentDives_profileLoadError =>
+      'A merülési profil betöltése sikertelen';
+
+  @override
+  String dashboard_recentDives_profileMinutes(int minutes) {
+    return '$minutes perc';
+  }
 
   @override
   String get dashboard_recentDives_logFirst => 'Rogzitse az elso meruleset';
@@ -4010,9 +4027,6 @@ class AppLocalizationsHu extends AppLocalizations {
   @override
   String get diveCenters_summary_selectPrompt =>
       'Válassz ki egy búvárközpontot a listából a részletek megtekintéséhez';
-
-  @override
-  String get diveCenters_summary_topRated => 'Legjobbra értékelt';
 
   @override
   String get diveCenters_summary_totalCenters => 'Összes központ';
@@ -13213,6 +13227,15 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get planning_section_tools => 'Eszközök';
+
+  @override
+  String get planning_summary_prompt => 'Válassz egy eszközt a kezdéshez';
+
+  @override
+  String get planning_summary_savedPlans => 'Mentett tervek';
+
+  @override
+  String get planning_summary_noPlans => 'Még nincsenek mentett tervek';
 
   @override
   String get planning_sidebar_appBar_title => 'Tervezes';

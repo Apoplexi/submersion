@@ -3070,7 +3070,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settings_homeCards_card_milestones => '里程碑';
 
   @override
-  String get settings_homeCards_card_photoRibbon => '最近照片';
+  String get settings_homeCards_card_photoRibbon => '最近媒体';
 
   @override
   String get settings_homeCards_card_onThisDay => '历史上的今天';
@@ -3189,7 +3189,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get dashboard_urgent_title => '需要注意';
 
   @override
-  String get dashboard_photos_title => '最近照片';
+  String get dashboard_media_title => '最近媒体';
 
   @override
   String get dashboard_recentSites_title => '最近潜点';
@@ -3303,6 +3303,20 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get dashboard_recentDives_errorLoading => '加载潜水记录失败';
+
+  @override
+  String get dashboard_recentDives_latestProfileTitle => '最近潜水剖面';
+
+  @override
+  String get dashboard_recentDives_noProfileData => '此次潜水没有剖面数据';
+
+  @override
+  String get dashboard_recentDives_profileLoadError => '无法加载潜水剖面';
+
+  @override
+  String dashboard_recentDives_profileMinutes(int minutes) {
+    return '$minutes 分钟';
+  }
 
   @override
   String get dashboard_recentDives_logFirst => '记录您的第一次潜水';
@@ -3816,9 +3830,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get diveCenters_summary_selectPrompt => '从列表中选择潜水中心以查看详情';
-
-  @override
-  String get diveCenters_summary_topRated => '评分最高';
 
   @override
   String get diveCenters_summary_totalCenters => '中心总数';
@@ -12662,6 +12673,15 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get planning_section_tools => '工具';
+
+  @override
+  String get planning_summary_prompt => '选择一个工具开始';
+
+  @override
+  String get planning_summary_savedPlans => '已保存的计划';
+
+  @override
+  String get planning_summary_noPlans => '尚无已保存的计划';
 
   @override
   String get planning_sidebar_appBar_title => '计划';

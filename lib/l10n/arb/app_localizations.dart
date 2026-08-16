@@ -5516,7 +5516,7 @@ abstract class AppLocalizations {
   /// No description provided for @settings_homeCards_card_photoRibbon.
   ///
   /// In en, this message translates to:
-  /// **'Recent photos'**
+  /// **'Recent media'**
   String get settings_homeCards_card_photoRibbon;
 
   /// No description provided for @settings_homeCards_card_onThisDay.
@@ -5711,11 +5711,11 @@ abstract class AppLocalizations {
   /// **'Needs attention'**
   String get dashboard_urgent_title;
 
-  /// No description provided for @dashboard_photos_title.
+  /// No description provided for @dashboard_media_title.
   ///
   /// In en, this message translates to:
-  /// **'Recent photos'**
-  String get dashboard_photos_title;
+  /// **'Recent media'**
+  String get dashboard_media_title;
 
   /// No description provided for @dashboard_recentSites_title.
   ///
@@ -5914,6 +5914,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Failed to load dives'**
   String get dashboard_recentDives_errorLoading;
+
+  /// No description provided for @dashboard_recentDives_latestProfileTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Latest dive profile'**
+  String get dashboard_recentDives_latestProfileTitle;
+
+  /// No description provided for @dashboard_recentDives_noProfileData.
+  ///
+  /// In en, this message translates to:
+  /// **'No profile data for this dive'**
+  String get dashboard_recentDives_noProfileData;
+
+  /// No description provided for @dashboard_recentDives_profileLoadError.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t load the dive profile'**
+  String get dashboard_recentDives_profileLoadError;
+
+  /// No description provided for @dashboard_recentDives_profileMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes} min'**
+  String dashboard_recentDives_profileMinutes(int minutes);
 
   /// No description provided for @dashboard_recentDives_logFirst.
   ///
@@ -6825,12 +6849,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Select a dive center from the list to view details'**
   String get diveCenters_summary_selectPrompt;
-
-  /// No description provided for @diveCenters_summary_topRated.
-  ///
-  /// In en, this message translates to:
-  /// **'Top Rated'**
-  String get diveCenters_summary_topRated;
 
   /// No description provided for @diveCenters_summary_totalCenters.
   ///
@@ -22456,6 +22474,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Tools'**
   String get planning_section_tools;
+
+  /// No description provided for @planning_summary_prompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Select a tool to get started'**
+  String get planning_summary_prompt;
+
+  /// No description provided for @planning_summary_savedPlans.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved plans'**
+  String get planning_summary_savedPlans;
+
+  /// No description provided for @planning_summary_noPlans.
+  ///
+  /// In en, this message translates to:
+  /// **'No saved plans yet'**
+  String get planning_summary_noPlans;
 
   /// No description provided for @planning_sidebar_appBar_title.
   ///

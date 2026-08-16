@@ -3175,7 +3175,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get settings_homeCards_card_milestones => 'الإنجازات';
 
   @override
-  String get settings_homeCards_card_photoRibbon => 'الصور الأخيرة';
+  String get settings_homeCards_card_photoRibbon => 'أحدث الوسائط';
 
   @override
   String get settings_homeCards_card_onThisDay => 'في مثل هذا اليوم';
@@ -3295,7 +3295,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get dashboard_urgent_title => 'يتطلب الانتباه';
 
   @override
-  String get dashboard_photos_title => 'أحدث الصور';
+  String get dashboard_media_title => 'أحدث الوسائط';
 
   @override
   String get dashboard_recentSites_title => 'المواقع الأخيرة';
@@ -3410,6 +3410,21 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get dashboard_recentDives_errorLoading => 'فشل تحميل الغوصات';
+
+  @override
+  String get dashboard_recentDives_latestProfileTitle => 'مخطط آخر غطسة';
+
+  @override
+  String get dashboard_recentDives_noProfileData =>
+      'لا توجد بيانات مخطط لهذه الغطسة';
+
+  @override
+  String get dashboard_recentDives_profileLoadError => 'تعذر تحميل مخطط الغطسة';
+
+  @override
+  String dashboard_recentDives_profileMinutes(int minutes) {
+    return '$minutes دقيقة';
+  }
 
   @override
   String get dashboard_recentDives_logFirst => 'سجّل أول غوصة لك';
@@ -3945,9 +3960,6 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get diveCenters_summary_selectPrompt =>
       'اختر مركز غوص من القائمة لعرض التفاصيل';
-
-  @override
-  String get diveCenters_summary_topRated => 'الأعلى تقييماً';
 
   @override
   String get diveCenters_summary_totalCenters => 'إجمالي المراكز';
@@ -13022,6 +13034,15 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get planning_section_tools => 'أدوات';
+
+  @override
+  String get planning_summary_prompt => 'اختر أداة للبدء';
+
+  @override
+  String get planning_summary_savedPlans => 'الخطط المحفوظة';
+
+  @override
+  String get planning_summary_noPlans => 'لا توجد خطط محفوظة بعد';
 
   @override
   String get planning_sidebar_appBar_title => 'التخطيط';

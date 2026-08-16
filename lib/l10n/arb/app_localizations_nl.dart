@@ -3216,7 +3216,7 @@ class AppLocalizationsNl extends AppLocalizations {
   String get settings_homeCards_card_milestones => 'Mijlpalen';
 
   @override
-  String get settings_homeCards_card_photoRibbon => 'Recente foto\'s';
+  String get settings_homeCards_card_photoRibbon => 'Recente media';
 
   @override
   String get settings_homeCards_card_onThisDay => 'Op deze dag';
@@ -3337,7 +3337,7 @@ class AppLocalizationsNl extends AppLocalizations {
   String get dashboard_urgent_title => 'Vereist aandacht';
 
   @override
-  String get dashboard_photos_title => 'Recente foto\'s';
+  String get dashboard_media_title => 'Recente media';
 
   @override
   String get dashboard_recentSites_title => 'Recente stekken';
@@ -3454,6 +3454,22 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get dashboard_recentDives_errorLoading => 'Laden van duiken mislukt';
+
+  @override
+  String get dashboard_recentDives_latestProfileTitle => 'Laatste duikprofiel';
+
+  @override
+  String get dashboard_recentDives_noProfileData =>
+      'Geen profielgegevens voor deze duik';
+
+  @override
+  String get dashboard_recentDives_profileLoadError =>
+      'Kan het duikprofiel niet laden';
+
+  @override
+  String dashboard_recentDives_profileMinutes(int minutes) {
+    return '$minutes min';
+  }
 
   @override
   String get dashboard_recentDives_logFirst => 'Log uw eerste duik';
@@ -3993,9 +4009,6 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get diveCenters_summary_selectPrompt =>
       'Selecteer een duikcentrum uit de lijst om details te bekijken';
-
-  @override
-  String get diveCenters_summary_topRated => 'Best beoordeeld';
 
   @override
   String get diveCenters_summary_totalCenters => 'Totaal centra';
@@ -13155,6 +13168,15 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get planning_section_tools => 'Gereedschappen';
+
+  @override
+  String get planning_summary_prompt => 'Kies een hulpmiddel om te beginnen';
+
+  @override
+  String get planning_summary_savedPlans => 'Opgeslagen plannen';
+
+  @override
+  String get planning_summary_noPlans => 'Nog geen opgeslagen plannen';
 
   @override
   String get planning_sidebar_appBar_title => 'Planning';

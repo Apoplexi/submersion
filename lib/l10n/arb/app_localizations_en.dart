@@ -3179,7 +3179,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settings_homeCards_card_milestones => 'Milestones';
 
   @override
-  String get settings_homeCards_card_photoRibbon => 'Recent photos';
+  String get settings_homeCards_card_photoRibbon => 'Recent media';
 
   @override
   String get settings_homeCards_card_onThisDay => 'On this day';
@@ -3298,7 +3298,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get dashboard_urgent_title => 'Needs attention';
 
   @override
-  String get dashboard_photos_title => 'Recent photos';
+  String get dashboard_media_title => 'Recent media';
 
   @override
   String get dashboard_recentSites_title => 'Recent sites';
@@ -3412,6 +3412,22 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get dashboard_recentDives_errorLoading => 'Failed to load dives';
+
+  @override
+  String get dashboard_recentDives_latestProfileTitle => 'Latest dive profile';
+
+  @override
+  String get dashboard_recentDives_noProfileData =>
+      'No profile data for this dive';
+
+  @override
+  String get dashboard_recentDives_profileLoadError =>
+      'Couldn\'t load the dive profile';
+
+  @override
+  String dashboard_recentDives_profileMinutes(int minutes) {
+    return '$minutes min';
+  }
 
   @override
   String get dashboard_recentDives_logFirst => 'Log Your First Dive';
@@ -3949,9 +3965,6 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get diveCenters_summary_selectPrompt =>
       'Select a dive center from the list to view details';
-
-  @override
-  String get diveCenters_summary_topRated => 'Top Rated';
 
   @override
   String get diveCenters_summary_totalCenters => 'Total Centers';
@@ -13042,6 +13055,15 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get planning_section_tools => 'Tools';
+
+  @override
+  String get planning_summary_prompt => 'Select a tool to get started';
+
+  @override
+  String get planning_summary_savedPlans => 'Saved plans';
+
+  @override
+  String get planning_summary_noPlans => 'No saved plans yet';
 
   @override
   String get planning_sidebar_appBar_title => 'Planning';
