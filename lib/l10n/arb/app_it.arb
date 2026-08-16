@@ -845,6 +845,23 @@
   "preDive_sessions_statusAborted": "Interrotta",
   "preDive_sessions_statusInProgress": "In corso",
   "preDive_sessions_linkedDive": "Immersione collegata",
+  "preDive_link_linkToDive": "Collega a immersione",
+  "preDive_link_unlinkDive": "Scollega immersione",
+  "preDive_link_linkChecklist": "Collega checklist pre-immersione",
+  "preDive_link_unlinkChecklist": "Scollega checklist pre-immersione",
+  "preDive_link_searchDives": "Cerca immersioni",
+  "preDive_link_noDives": "Nessuna immersione da collegare",
+  "preDive_link_noDivesMatch": "Nessuna immersione corrisponde a \"{query}\"",
+  "@preDive_link_noDivesMatch": {
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "preDive_link_noUnlinkedSessions": "Nessuna checklist non collegata",
+  "preDive_link_linked": "Checklist collegata a questa immersione",
+  "preDive_link_unlinked": "Checklist scollegata da questa immersione",
   "preDive_sessions_delete": "Elimina",
   "preDive_sessions_deleteConfirm": "Eliminare questo record di checklist?",
   "preDive_sessions_filter": "Filtra",

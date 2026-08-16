@@ -845,6 +845,23 @@
   "preDive_sessions_statusAborted": "Abandonada",
   "preDive_sessions_statusInProgress": "En curso",
   "preDive_sessions_linkedDive": "Inmersión vinculada",
+  "preDive_link_linkToDive": "Vincular a inmersión",
+  "preDive_link_unlinkDive": "Desvincular inmersión",
+  "preDive_link_linkChecklist": "Vincular lista previa",
+  "preDive_link_unlinkChecklist": "Desvincular lista previa",
+  "preDive_link_searchDives": "Buscar inmersiones",
+  "preDive_link_noDives": "No hay inmersiones para vincular",
+  "preDive_link_noDivesMatch": "Ninguna inmersión coincide con «{query}»",
+  "@preDive_link_noDivesMatch": {
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "preDive_link_noUnlinkedSessions": "No hay listas sin vincular",
+  "preDive_link_linked": "Lista vinculada a esta inmersión",
+  "preDive_link_unlinked": "Lista desvinculada de esta inmersión",
   "preDive_sessions_delete": "Eliminar",
   "preDive_sessions_deleteConfirm": "¿Eliminar este registro de lista de verificación?",
   "preDive_sessions_filter": "Filtrar",

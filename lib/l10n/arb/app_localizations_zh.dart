@@ -2286,6 +2286,38 @@ class AppLocalizationsZh extends AppLocalizations {
   String get preDive_sessions_linkedDive => '关联潜水';
 
   @override
+  String get preDive_link_linkToDive => '关联到潜水';
+
+  @override
+  String get preDive_link_unlinkDive => '取消关联潜水';
+
+  @override
+  String get preDive_link_linkChecklist => '关联潜前检查清单';
+
+  @override
+  String get preDive_link_unlinkChecklist => '取消关联潜前检查清单';
+
+  @override
+  String get preDive_link_searchDives => '搜索潜水';
+
+  @override
+  String get preDive_link_noDives => '没有可关联的潜水';
+
+  @override
+  String preDive_link_noDivesMatch(String query) {
+    return '没有与“$query”匹配的潜水';
+  }
+
+  @override
+  String get preDive_link_noUnlinkedSessions => '没有未关联的检查清单记录';
+
+  @override
+  String get preDive_link_linked => '检查清单已关联到此潜水';
+
+  @override
+  String get preDive_link_unlinked => '已取消检查清单与此潜水的关联';
+
+  @override
   String get preDive_sessions_delete => '删除';
 
   @override

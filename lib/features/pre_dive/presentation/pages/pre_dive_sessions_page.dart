@@ -5,6 +5,7 @@ import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/features/pre_dive/domain/entities/pre_dive_session.dart';
 import 'package:submersion/features/pre_dive/domain/models/pre_dive_session_filter.dart';
 import 'package:submersion/features/pre_dive/presentation/providers/pre_dive_providers.dart';
+import 'package:submersion/features/pre_dive/presentation/widgets/link_dive_picker.dart';
 import 'package:submersion/features/pre_dive/presentation/widgets/pre_dive_session_filter_sheet.dart';
 import 'package:submersion/features/pre_dive/presentation/widgets/start_session_sheet.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
@@ -353,6 +354,17 @@ class _SessionTile extends ConsumerWidget {
     };
   }
 
+  /// Attaches this run to a dive the diver picks (#1066). The automatic
+  /// linker only reaches back three hours from the dive, so a build check run
+  /// the evening before is only ever linked by hand.
+  Future<void> _link(BuildContext context, WidgetRef ref) async {
+    final diveId = await showLinkDivePicker(context);
+    if (diveId == null) return;
+    await ref
+        .read(preDiveSessionRepositoryProvider)
+        .linkToDive(session.id, diveId);
+  }
+
   Future<void> _confirmDelete(BuildContext context, WidgetRef ref) async {
     final l10n = context.l10n;
     final confirmed = await showDialog<bool>(
@@ -433,9 +445,28 @@ class _SessionTile extends ConsumerWidget {
       ),
       trailing: PopupMenuButton<String>(
         onSelected: (value) {
-          if (value == 'delete') _confirmDelete(context, ref);
+          switch (value) {
+            case 'link':
+              _link(context, ref);
+            case 'unlink':
+              ref
+                  .read(preDiveSessionRepositoryProvider)
+                  .unlinkFromDive(session.id);
+            case 'delete':
+              _confirmDelete(context, ref);
+          }
         },
         itemBuilder: (context) => [
+          if (hasLinkedDive)
+            PopupMenuItem(
+              value: 'unlink',
+              child: Text(l10n.preDive_link_unlinkDive),
+            )
+          else
+            PopupMenuItem(
+              value: 'link',
+              child: Text(l10n.preDive_link_linkToDive),
+            ),
           PopupMenuItem(
             value: 'delete',
             child: Text(l10n.preDive_sessions_delete),

@@ -2429,6 +2429,38 @@ class AppLocalizationsEs extends AppLocalizations {
   String get preDive_sessions_linkedDive => 'Inmersión vinculada';
 
   @override
+  String get preDive_link_linkToDive => 'Vincular a inmersión';
+
+  @override
+  String get preDive_link_unlinkDive => 'Desvincular inmersión';
+
+  @override
+  String get preDive_link_linkChecklist => 'Vincular lista previa';
+
+  @override
+  String get preDive_link_unlinkChecklist => 'Desvincular lista previa';
+
+  @override
+  String get preDive_link_searchDives => 'Buscar inmersiones';
+
+  @override
+  String get preDive_link_noDives => 'No hay inmersiones para vincular';
+
+  @override
+  String preDive_link_noDivesMatch(String query) {
+    return 'Ninguna inmersión coincide con «$query»';
+  }
+
+  @override
+  String get preDive_link_noUnlinkedSessions => 'No hay listas sin vincular';
+
+  @override
+  String get preDive_link_linked => 'Lista vinculada a esta inmersión';
+
+  @override
+  String get preDive_link_unlinked => 'Lista desvinculada de esta inmersión';
+
+  @override
   String get preDive_sessions_delete => 'Eliminar';
 
   @override

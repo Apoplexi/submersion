@@ -2429,6 +2429,40 @@ class AppLocalizationsDe extends AppLocalizations {
   String get preDive_sessions_linkedDive => 'Verknüpfter Tauchgang';
 
   @override
+  String get preDive_link_linkToDive => 'Mit Tauchgang verknüpfen';
+
+  @override
+  String get preDive_link_unlinkDive => 'Tauchgang trennen';
+
+  @override
+  String get preDive_link_linkChecklist => 'Checkliste verknüpfen';
+
+  @override
+  String get preDive_link_unlinkChecklist => 'Checkliste trennen';
+
+  @override
+  String get preDive_link_searchDives => 'Tauchgänge suchen';
+
+  @override
+  String get preDive_link_noDives => 'Keine Tauchgänge zum Verknüpfen';
+
+  @override
+  String preDive_link_noDivesMatch(String query) {
+    return 'Keine Tauchgänge für „$query“';
+  }
+
+  @override
+  String get preDive_link_noUnlinkedSessions =>
+      'Keine unverknüpften Checklisten-Durchläufe';
+
+  @override
+  String get preDive_link_linked => 'Checkliste mit diesem Tauchgang verknüpft';
+
+  @override
+  String get preDive_link_unlinked =>
+      'Checkliste von diesem Tauchgang getrennt';
+
+  @override
   String get preDive_sessions_delete => 'Löschen';
 
   @override

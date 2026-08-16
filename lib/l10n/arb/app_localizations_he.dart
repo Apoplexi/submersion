@@ -2353,6 +2353,40 @@ class AppLocalizationsHe extends AppLocalizations {
   String get preDive_sessions_linkedDive => 'צלילה מקושרת';
 
   @override
+  String get preDive_link_linkToDive => 'קישור לצלילה';
+
+  @override
+  String get preDive_link_unlinkDive => 'בטל קישור צלילה';
+
+  @override
+  String get preDive_link_linkChecklist => 'קישור רשימת בדיקה לפני צלילה';
+
+  @override
+  String get preDive_link_unlinkChecklist =>
+      'ביטול קישור רשימת בדיקה לפני צלילה';
+
+  @override
+  String get preDive_link_searchDives => 'חיפוש צלילות';
+
+  @override
+  String get preDive_link_noDives => 'אין צלילות לקישור';
+
+  @override
+  String preDive_link_noDivesMatch(String query) {
+    return 'אין צלילות התואמות ל-\"$query\"';
+  }
+
+  @override
+  String get preDive_link_noUnlinkedSessions =>
+      'אין הרצות רשימת בדיקה ללא קישור';
+
+  @override
+  String get preDive_link_linked => 'רשימת הבדיקה קושרה לצלילה זו';
+
+  @override
+  String get preDive_link_unlinked => 'קישור רשימת הבדיקה לצלילה זו בוטל';
+
+  @override
   String get preDive_sessions_delete => 'מחיקה';
 
   @override

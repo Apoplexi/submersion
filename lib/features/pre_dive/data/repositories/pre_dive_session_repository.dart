@@ -316,6 +316,30 @@ class PreDiveSessionRepository {
     }
   }
 
+  /// Dives that already have a checklist run attached, across all divers.
+  ///
+  /// The manual link picker (#1066) subtracts these from its candidates so a
+  /// hand-made link keeps the one-run-per-dive rule [ChecklistDiveLinker]
+  /// enforces; a second run on the same dive would leave the older one
+  /// invisible from the dive side, since [getSessionForDive] returns only the
+  /// latest.
+  Future<Set<String>> getLinkedDiveIds() async {
+    try {
+      final query = _db.selectOnly(_db.preDiveSessions, distinct: true)
+        ..addColumns([_db.preDiveSessions.diveId])
+        ..where(_db.preDiveSessions.diveId.isNotNull());
+      final rows = await query.get();
+      return {for (final row in rows) ?row.read(_db.preDiveSessions.diveId)};
+    } catch (e, stackTrace) {
+      _log.error(
+        'Failed to get linked dive ids',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      rethrow;
+    }
+  }
+
   /// Mutates one item's run state. completedAt is stamped at tap time when
   /// leaving pending and cleared when resetting to pending. Value/note
   /// parameters are only written when provided so partial updates preserve

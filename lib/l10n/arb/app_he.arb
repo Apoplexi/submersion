@@ -845,6 +845,23 @@
   "preDive_sessions_statusAborted": "בוטלה",
   "preDive_sessions_statusInProgress": "בתהליך",
   "preDive_sessions_linkedDive": "צלילה מקושרת",
+  "preDive_link_linkToDive": "קישור לצלילה",
+  "preDive_link_unlinkDive": "בטל קישור צלילה",
+  "preDive_link_linkChecklist": "קישור רשימת בדיקה לפני צלילה",
+  "preDive_link_unlinkChecklist": "ביטול קישור רשימת בדיקה לפני צלילה",
+  "preDive_link_searchDives": "חיפוש צלילות",
+  "preDive_link_noDives": "אין צלילות לקישור",
+  "preDive_link_noDivesMatch": "אין צלילות התואמות ל-\"{query}\"",
+  "@preDive_link_noDivesMatch": {
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "preDive_link_noUnlinkedSessions": "אין הרצות רשימת בדיקה ללא קישור",
+  "preDive_link_linked": "רשימת הבדיקה קושרה לצלילה זו",
+  "preDive_link_unlinked": "קישור רשימת הבדיקה לצלילה זו בוטל",
   "preDive_sessions_delete": "מחיקה",
   "preDive_sessions_deleteConfirm": "למחוק את רשומת רשימת הבדיקה הזו?",
   "preDive_sessions_filter": "סינון",

@@ -2374,6 +2374,39 @@ class AppLocalizationsAr extends AppLocalizations {
   String get preDive_sessions_linkedDive => 'الغطسة المرتبطة';
 
   @override
+  String get preDive_link_linkToDive => 'الربط بغطسة';
+
+  @override
+  String get preDive_link_unlinkDive => 'إلغاء ربط الغطسة';
+
+  @override
+  String get preDive_link_linkChecklist => 'ربط قائمة تحقق ما قبل الغوص';
+
+  @override
+  String get preDive_link_unlinkChecklist =>
+      'إلغاء ربط قائمة تحقق ما قبل الغوص';
+
+  @override
+  String get preDive_link_searchDives => 'البحث في الغطسات';
+
+  @override
+  String get preDive_link_noDives => 'لا توجد غطسات للربط';
+
+  @override
+  String preDive_link_noDivesMatch(String query) {
+    return 'لا توجد غطسات تطابق \"$query\"';
+  }
+
+  @override
+  String get preDive_link_noUnlinkedSessions => 'لا توجد قوائم تحقق غير مرتبطة';
+
+  @override
+  String get preDive_link_linked => 'تم ربط قائمة التحقق بهذه الغطسة';
+
+  @override
+  String get preDive_link_unlinked => 'تم إلغاء ربط قائمة التحقق بهذه الغطسة';
+
+  @override
   String get preDive_sessions_delete => 'حذف';
 
   @override

@@ -845,6 +845,23 @@
   "preDive_sessions_statusAborted": "Interrompida",
   "preDive_sessions_statusInProgress": "Em andamento",
   "preDive_sessions_linkedDive": "Mergulho vinculado",
+  "preDive_link_linkToDive": "Vincular a mergulho",
+  "preDive_link_unlinkDive": "Desvincular mergulho",
+  "preDive_link_linkChecklist": "Vincular lista de verificação",
+  "preDive_link_unlinkChecklist": "Desvincular lista de verificação",
+  "preDive_link_searchDives": "Procurar mergulhos",
+  "preDive_link_noDives": "Não há mergulhos para vincular",
+  "preDive_link_noDivesMatch": "Nenhum mergulho corresponde a \"{query}\"",
+  "@preDive_link_noDivesMatch": {
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "preDive_link_noUnlinkedSessions": "Não há listas de verificação sem vínculo",
+  "preDive_link_linked": "Lista de verificação vinculada a este mergulho",
+  "preDive_link_unlinked": "Lista de verificação desvinculada deste mergulho",
   "preDive_sessions_delete": "Excluir",
   "preDive_sessions_deleteConfirm": "Excluir este registro de lista de verificação?",
   "preDive_sessions_filter": "Filtrar",
