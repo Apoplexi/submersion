@@ -79,4 +79,26 @@ void main() {
       isNot(const SeascapeAppearance(rampBanded: true)),
     );
   });
+
+  test(
+    'mapDepthOverlay defaults off, round-trips, and decodes defensively',
+    () {
+      expect(const SeascapeAppearance().mapDepthOverlay, isFalse);
+      const on = SeascapeAppearance(mapDepthOverlay: true);
+      expect(SeascapeAppearance.decode(on.encode()).mapDepthOverlay, isTrue);
+      expect(
+        const SeascapeAppearance()
+            .copyWith(mapDepthOverlay: true)
+            .mapDepthOverlay,
+        isTrue,
+      );
+      // Defensive decode: wrong type falls back to the default.
+      expect(
+        SeascapeAppearance.decode('{"mapDepthOverlay":"yes"}').mapDepthOverlay,
+        isFalse,
+      );
+      // Equality includes the new field.
+      expect(on, isNot(const SeascapeAppearance()));
+    },
+  );
 }

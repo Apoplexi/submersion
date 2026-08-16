@@ -46,12 +46,17 @@ class SeascapeAppearance extends Equatable {
   /// Cells steeper than this highlight as walls, slider range 5 to 90.
   final double wallAngleDeg;
 
+  /// Whether the 2D maps drape the selected site's bathymetry (ramp +
+  /// contours) as a translucent overlay. Synced per-diver like the rest.
+  final bool mapDepthOverlay;
+
   const SeascapeAppearance({
     this.rampMaxDepthMeters,
     this.rampBanded = false,
     this.contourMode = SeascapeContourMode.auto,
     this.customLevels = const [],
     this.wallAngleDeg = 22.0,
+    this.mapDepthOverlay = false,
   });
 
   SeascapeAppearance copyWith({
@@ -61,6 +66,7 @@ class SeascapeAppearance extends Equatable {
     SeascapeContourMode? contourMode,
     List<SeascapeContourLevel>? customLevels,
     double? wallAngleDeg,
+    bool? mapDepthOverlay,
   }) => SeascapeAppearance(
     rampMaxDepthMeters: clearRampMax
         ? null
@@ -69,6 +75,7 @@ class SeascapeAppearance extends Equatable {
     contourMode: contourMode ?? this.contourMode,
     customLevels: customLevels ?? this.customLevels,
     wallAngleDeg: wallAngleDeg ?? this.wallAngleDeg,
+    mapDepthOverlay: mapDepthOverlay ?? this.mapDepthOverlay,
   );
 
   String encode() => jsonEncode({
@@ -77,6 +84,7 @@ class SeascapeAppearance extends Equatable {
     'contourMode': contourMode.name,
     'customLevels': [for (final l in customLevels) l.toJson()],
     'wallAngleDeg': wallAngleDeg,
+    'mapDepthOverlay': mapDepthOverlay,
   });
 
   /// Defensive decode: any missing or malformed field falls back to its
@@ -96,6 +104,7 @@ class SeascapeAppearance extends Equatable {
     final mode = parsed['contourMode'];
     final levels = parsed['customLevels'];
     final wall = parsed['wallAngleDeg'];
+    final overlayFlag = parsed['mapDepthOverlay'];
     return SeascapeAppearance(
       rampMaxDepthMeters: (ramp is num && ramp.isFinite && ramp > 0)
           ? ramp.toDouble()
@@ -110,6 +119,9 @@ class SeascapeAppearance extends Equatable {
       wallAngleDeg: (wall is num && wall.isFinite)
           ? wall.toDouble().clamp(5.0, 90.0)
           : defaults.wallAngleDeg,
+      mapDepthOverlay: overlayFlag is bool
+          ? overlayFlag
+          : defaults.mapDepthOverlay,
     );
   }
 
@@ -120,5 +132,6 @@ class SeascapeAppearance extends Equatable {
     contourMode,
     customLevels,
     wallAngleDeg,
+    mapDepthOverlay,
   ];
 }
