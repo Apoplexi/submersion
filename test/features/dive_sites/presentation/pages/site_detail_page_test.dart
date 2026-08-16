@@ -4,7 +4,10 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:submersion/core/constants/list_view_mode.dart';
 import 'package:submersion/core/providers/provider.dart';
+import 'package:submersion/features/bathymetry/application/bathymetry_providers.dart';
+import 'package:submersion/features/bathymetry/domain/bathymetry_grid.dart';
 import 'package:submersion/features/dive_3d/application/career_providers.dart';
+import 'package:submersion/features/dive_3d/domain/spatial/seascape_appearance.dart';
 import 'package:submersion/features/dive_3d/domain/career/career_geometry_service.dart';
 import 'package:submersion/features/dive_3d/presentation/pages/career_terrain_page.dart';
 import 'package:submersion/features/divers/domain/entities/diver.dart';
@@ -225,6 +228,89 @@ void main() {
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 300));
       expect(find.byTooltip('Site Seascape'), findsOneWidget);
+    });
+
+    testWidgets('embedded map drapes the depth overlay when toggled on', (
+      tester,
+    ) async {
+      const gpsSite = DiveSite(
+        id: 'gps-site',
+        name: 'Salt Pier',
+        location: GeoPoint(12.151, -68.299),
+      );
+      final grid = BathymetryGrid(
+        originLat: 12.15,
+        originLon: -68.30,
+        cellSizeLatDeg: 0.001,
+        cellSizeLonDeg: 0.001,
+        rows: 3,
+        cols: 3,
+        depthsMeters: const [5, 5, 5, 25, 25, 25, 45, 45, 45],
+        sourceId: 'test',
+        resolutionMeters: 100,
+        fetchedAt: DateTime.utc(2026, 8, 15),
+      );
+      final overrides = await getBaseOverrides(
+        settingsNotifier: MockSettingsNotifier(
+          const AppSettings(
+            seascapeAppearance: SeascapeAppearance(mapDepthOverlay: true),
+          ),
+        ),
+      );
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            ...overrides,
+            siteProvider(gpsSite.id).overrideWith((ref) async => gpsSite),
+            siteDiveCountProvider(gpsSite.id).overrideWith((ref) async => 0),
+            bathymetryGridProvider.overrideWith((ref, cell) async => grid),
+          ],
+          child: MaterialApp(
+            locale: const Locale('en'),
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: SiteDetailPage(siteId: gpsSite.id, embedded: true),
+          ),
+        ),
+      );
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+      // The overlay renders through real engine async (PNG encode).
+      await tester.runAsync(
+        () => Future<void>.delayed(const Duration(milliseconds: 100)),
+      );
+      await tester.pump();
+      expect(find.byType(OverlayImageLayer), findsOneWidget);
+    });
+
+    testWidgets('embedded map skips the depth overlay when the flag is off', (
+      tester,
+    ) async {
+      const gpsSite = DiveSite(
+        id: 'gps-site',
+        name: 'Salt Pier',
+        location: GeoPoint(12.151, -68.299),
+      );
+      final overrides = await getBaseOverrides();
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            ...overrides,
+            siteProvider(gpsSite.id).overrideWith((ref) async => gpsSite),
+            siteDiveCountProvider(gpsSite.id).overrideWith((ref) async => 0),
+            bathymetryGridProvider.overrideWith((ref, cell) async => null),
+          ],
+          child: MaterialApp(
+            locale: const Locale('en'),
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: SiteDetailPage(siteId: gpsSite.id, embedded: true),
+          ),
+        ),
+      );
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+      expect(find.byType(OverlayImageLayer), findsNothing);
     });
 
     testWidgets('embedded header hides the seascape button without '
