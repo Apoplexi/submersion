@@ -442,8 +442,12 @@ class _CertificationListContentState
       child: Row(
         children: [
           const SizedBox(width: 8),
-          // Flexible so the title yields before the action row overflows.
-          Flexible(
+          // Expanded, and no Spacer: the title must be the row's only flexible
+          // child, or Spacer takes half the free space and the leftover half
+          // lands after the last icon (see trip_list_content for the detail).
+          // This bar felt it worst in the other direction too: halving starved
+          // "Certifications" to ~56px and it broke mid-word.
+          Expanded(
             child: FeatureAppBarTitle(
               featureId: 'certifications',
               title: context.l10n.certifications_appBar_title,
@@ -452,7 +456,6 @@ class _CertificationListContentState
               ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
             ),
           ),
-          const Spacer(),
           IconButton(
             icon: const Icon(Icons.wallet, size: 20),
             tooltip: context.l10n.certifications_list_tooltip_walletView,
