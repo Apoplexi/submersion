@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:submersion/core/constants/tank_presets.dart';
+import 'package:submersion/core/constants/units.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart'
     show GasMix;
@@ -15,20 +16,28 @@ class _TestSettingsNotifier extends StateNotifier<AppSettings>
     implements SettingsNotifier {
   _TestSettingsNotifier(super.settings);
 
+  /// Lets a test change units mid-session the way the settings page would.
+  void apply(AppSettings next) => state = next;
+
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
+/// Re-created by every [_pump] so a unit change in one test cannot leak into
+/// the next.
+late _TestSettingsNotifier _settings;
+
 Future<WidgetRef> _pump(WidgetTester tester) async {
+  _settings = _TestSettingsNotifier(const AppSettings());
   late WidgetRef captured;
   await tester.pumpWidget(
     ProviderScope(
-      overrides: [
-        settingsProvider.overrideWith(
-          (ref) => _TestSettingsNotifier(const AppSettings()),
-        ),
-      ],
+      overrides: [settingsProvider.overrideWith((ref) => _settings)],
       child: MaterialApp(
+        // flutter_test forwards the host machine's locale list, so an unpinned
+        // MaterialApp renders translated on a non-English dev machine and every
+        // English finder below misses.
+        locale: const Locale('en'),
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         home: Scaffold(
@@ -122,6 +131,37 @@ void main() {
 
     // 27.164 x 15 L = 407 L of oxygen.
     expect(find.textContaining('407 L'), findsOneWidget);
+  });
+
+  testWidgets('renders English even on a non-English host machine', (
+    tester,
+  ) async {
+    // flutter_test forwards the host's locale list; without a pinned locale
+    // the app resolves to one of its eleven translations and every English
+    // finder in this file silently misses.
+    tester.platformDispatcher.localesTestValue = const [
+      Locale('fr'),
+      Locale('en'),
+    ];
+    addTearDown(tester.platformDispatcher.clearLocalesTestValue);
+
+    await _pump(tester);
+
+    expect(find.text('Fill procedure'), findsOneWidget);
+  });
+
+  testWidgets('switching to psi re-seeds the pressure fields', (tester) async {
+    await _pump(tester);
+
+    expect(find.widgetWithText(TextField, '200'), findsOneWidget);
+
+    _settings.apply(const AppSettings(pressureUnit: PressureUnit.psi));
+    await tester.pumpAndSettle();
+
+    // 200 bar is 2901 psi. Leaving "200" on screen would relabel the target as
+    // 200 psi, a seventh of the fill the diver asked for.
+    expect(find.widgetWithText(TextField, '200'), findsNothing);
+    expect(find.widgetWithText(TextField, '2901'), findsOneWidget);
   });
 
   testWidgets('an over-rich cylinder is told what to drain to', (tester) async {

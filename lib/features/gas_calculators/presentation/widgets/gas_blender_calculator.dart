@@ -22,7 +22,13 @@ class GasBlenderCalculator extends ConsumerWidget {
     // A reset bumps the epoch, forcing the body (and its controllers) to rebuild
     // from the reset provider values.
     final epoch = ref.watch(blenderResetEpochProvider);
-    return _GasBlenderBody(key: ValueKey(epoch));
+    // Changing the pressure unit re-seeds the same way. Provider state is held
+    // in bar, so recreating the controllers reprints every field in the new
+    // unit; leaving them alone would show "200" as psi after a bar fill.
+    final pressureUnit = ref.watch(
+      settingsProvider.select((s) => s.pressureUnit),
+    );
+    return _GasBlenderBody(key: ValueKey('$epoch/${pressureUnit.name}'));
   }
 }
 
@@ -52,7 +58,10 @@ class _GasBlenderBodyState extends ConsumerState<_GasBlenderBody> {
     super.initState();
 
     String p(double bar) => _units.convertPressure(bar).toStringAsFixed(0);
-    String n(double v) => v.toStringAsFixed(0);
+    // Seeding must be lossless: a re-seed now also happens on a unit change,
+    // and rounding would silently rewrite a 32.5% mix as 32%.
+    String n(double v) =>
+        v == v.roundToDouble() ? v.toStringAsFixed(0) : v.toString();
 
     final startMix = ref.read(blenderStartMixProvider);
     final targetMix = ref.read(blenderTargetMixProvider);
