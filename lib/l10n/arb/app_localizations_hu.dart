@@ -22387,6 +22387,18 @@ class AppLocalizationsHu extends AppLocalizations {
   String get dive3d_seascape_orbitView => '3D nézet';
 
   @override
+  String get dive3d_seascape_appearance_surface => 'Terepfelszín';
+
+  @override
+  String get dive3d_seascape_appearance_surfaceDepth => 'Mélységszínek';
+
+  @override
+  String get dive3d_seascape_appearance_surfaceImagery => 'Térképi felvétel';
+
+  @override
+  String get dive3d_seascape_appearance_surfaceBlend => 'Keverék';
+
+  @override
   String get dive3d_seascape_appearance_rampRange =>
       'Színmélység-tartomány korlátozása';
 

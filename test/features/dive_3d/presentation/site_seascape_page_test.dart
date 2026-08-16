@@ -1,8 +1,14 @@
+import 'dart:ui' as ui;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:submersion/core/constants/map_style.dart';
+import 'package:submersion/features/bathymetry/data/terrain_imagery_service.dart';
 import 'package:submersion/features/bathymetry/domain/bathymetry_grid.dart';
+import 'package:submersion/features/bathymetry/domain/terrain_imagery_frame.dart';
 import 'package:submersion/features/dive_3d/domain/spatial/bathymetry_terrain_builder.dart';
 import 'package:submersion/features/dive_3d/application/site_seascape_providers.dart';
+import 'package:submersion/features/dive_3d/domain/spatial/seascape_appearance.dart';
 import 'package:submersion/features/dive_3d/domain/spatial/site_seascape_geometry_service.dart';
 import 'package:submersion/features/dive_3d/presentation/pages/site_seascape_page.dart';
 import 'package:submersion/features/dive_3d/presentation/scene_overlay.dart';
@@ -14,13 +20,33 @@ import 'package:submersion/l10n/arb/app_localizations.dart';
 
 class _TestSettingsNotifier extends StateNotifier<AppSettings>
     implements SettingsNotifier {
-  _TestSettingsNotifier() : super(const AppSettings());
+  _TestSettingsNotifier([super.initial = const AppSettings()]);
 
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
-SiteSeascapeReady readyState() {
+Future<TerrainImagery> testImagery() async {
+  final recorder = ui.PictureRecorder();
+  ui.Canvas(recorder).drawRect(
+    const ui.Rect.fromLTWH(0, 0, 4, 4),
+    ui.Paint()..color = const ui.Color(0xFF00FF00),
+  );
+  final image = await recorder.endRecording().toImage(4, 4);
+  return TerrainImagery(
+    image: image,
+    frame: const TerrainImageryFrame(
+      u0MercX: 0.4,
+      u1MercX: 0.6,
+      v0MercY: 0.4,
+      v1MercY: 0.6,
+      whiteU: 0.5,
+      whiteV: 0.9,
+    ),
+  );
+}
+
+SiteSeascapeReady readyState({TerrainImagery? imagery}) {
   final grid = BathymetryGrid(
     originLat: 12.15,
     originLon: -68.30,
@@ -52,6 +78,7 @@ SiteSeascapeReady readyState() {
     sourceId: 'gmrt',
     resolutionMeters: 61,
     grid: grid,
+    imagery: imagery,
     axisInputs: (
       minEast: box.minEast,
       maxEast: box.maxEast,
@@ -62,9 +89,12 @@ SiteSeascapeReady readyState() {
   );
 }
 
-Widget page(SiteSeascapeState state) => ProviderScope(
+Widget page(
+  SiteSeascapeState state, {
+  AppSettings settings = const AppSettings(),
+}) => ProviderScope(
   overrides: [
-    settingsProvider.overrideWith((ref) => _TestSettingsNotifier()),
+    settingsProvider.overrideWith((ref) => _TestSettingsNotifier(settings)),
     siteSeascapeProvider.overrideWith((ref, id) async => state),
   ],
   child: const MaterialApp(
@@ -145,6 +175,44 @@ void main() {
       find.byKey(const ValueKey('seascapeAppearanceButton')),
       findsOneWidget,
     );
+  });
+
+  testWidgets('imagery reaches the viewport and shows attribution', (
+    tester,
+  ) async {
+    final imagery = await testImagery();
+    addTearDown(imagery.image.dispose);
+    await tester.pumpWidget(
+      page(
+        readyState(imagery: imagery),
+        settings: const AppSettings(
+          mapStyle: MapStyle.esriSatellite,
+          seascapeAppearance: SeascapeAppearance(
+            surfaceMode: SeascapeSurfaceMode.imagery,
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+    await tester.pump();
+    final viewport = tester.widget<Dive3dInteractiveViewport>(
+      find.byType(Dive3dInteractiveViewport),
+    );
+    expect(viewport.terrainImagery, isNotNull);
+    expect(viewport.imageryWhiteTexel, (u: 0.5, v: 0.9));
+    // Esri attribution rides the chrome; the legend hides in imagery mode.
+    expect(find.textContaining('Esri'), findsOneWidget);
+    expect(find.byKey(const ValueKey('seascapeDepthLegend')), findsNothing);
+  });
+
+  testWidgets('depth mode keeps the legend and skips attribution', (
+    tester,
+  ) async {
+    await tester.pumpWidget(page(readyState()));
+    await tester.pump();
+    await tester.pump();
+    expect(find.byKey(const ValueKey('seascapeDepthLegend')), findsOneWidget);
+    expect(find.textContaining('Esri'), findsNothing);
   });
 
   testWidgets('no-coordinates state shows the message, not a spinner', (

@@ -5,6 +5,10 @@ import 'package:equatable/equatable.dart';
 /// How contour levels are chosen: nice unit-aware steps, or a user list.
 enum SeascapeContourMode { auto, custom }
 
+/// What the 3D terrain surface shows: the depth ramp, draped map imagery,
+/// or imagery tinted by the ramp.
+enum SeascapeSurfaceMode { depth, imagery, blend }
+
 /// One user-defined contour level. Depth is stored in METERS regardless of
 /// the display unit; [colorArgb] null means the standard contour ink.
 class SeascapeContourLevel extends Equatable {
@@ -50,6 +54,9 @@ class SeascapeAppearance extends Equatable {
   /// contours) as a translucent overlay. Synced per-diver like the rest.
   final bool mapDepthOverlay;
 
+  /// The 3D terrain surface: depth ramp, map imagery, or a blend.
+  final SeascapeSurfaceMode surfaceMode;
+
   const SeascapeAppearance({
     this.rampMaxDepthMeters,
     this.rampBanded = false,
@@ -57,6 +64,7 @@ class SeascapeAppearance extends Equatable {
     this.customLevels = const [],
     this.wallAngleDeg = 22.0,
     this.mapDepthOverlay = false,
+    this.surfaceMode = SeascapeSurfaceMode.depth,
   });
 
   SeascapeAppearance copyWith({
@@ -67,6 +75,7 @@ class SeascapeAppearance extends Equatable {
     List<SeascapeContourLevel>? customLevels,
     double? wallAngleDeg,
     bool? mapDepthOverlay,
+    SeascapeSurfaceMode? surfaceMode,
   }) => SeascapeAppearance(
     rampMaxDepthMeters: clearRampMax
         ? null
@@ -76,6 +85,7 @@ class SeascapeAppearance extends Equatable {
     customLevels: customLevels ?? this.customLevels,
     wallAngleDeg: wallAngleDeg ?? this.wallAngleDeg,
     mapDepthOverlay: mapDepthOverlay ?? this.mapDepthOverlay,
+    surfaceMode: surfaceMode ?? this.surfaceMode,
   );
 
   String encode() => jsonEncode({
@@ -85,6 +95,7 @@ class SeascapeAppearance extends Equatable {
     'customLevels': [for (final l in customLevels) l.toJson()],
     'wallAngleDeg': wallAngleDeg,
     'mapDepthOverlay': mapDepthOverlay,
+    'surfaceMode': surfaceMode.name,
   });
 
   /// Defensive decode: any missing or malformed field falls back to its
@@ -105,6 +116,7 @@ class SeascapeAppearance extends Equatable {
     final levels = parsed['customLevels'];
     final wall = parsed['wallAngleDeg'];
     final overlayFlag = parsed['mapDepthOverlay'];
+    final surface = parsed['surfaceMode'];
     return SeascapeAppearance(
       rampMaxDepthMeters: (ramp is num && ramp.isFinite && ramp > 0)
           ? ramp.toDouble()
@@ -122,6 +134,9 @@ class SeascapeAppearance extends Equatable {
       mapDepthOverlay: overlayFlag is bool
           ? overlayFlag
           : defaults.mapDepthOverlay,
+      surfaceMode:
+          SeascapeSurfaceMode.values.asNameMap()[surface] ??
+          defaults.surfaceMode,
     );
   }
 
@@ -133,5 +148,6 @@ class SeascapeAppearance extends Equatable {
     customLevels,
     wallAngleDeg,
     mapDepthOverlay,
+    surfaceMode,
   ];
 }

@@ -37369,6 +37369,30 @@ abstract class AppLocalizations {
   /// **'3D view'**
   String get dive3d_seascape_orbitView;
 
+  /// No description provided for @dive3d_seascape_appearance_surface.
+  ///
+  /// In en, this message translates to:
+  /// **'Terrain surface'**
+  String get dive3d_seascape_appearance_surface;
+
+  /// No description provided for @dive3d_seascape_appearance_surfaceDepth.
+  ///
+  /// In en, this message translates to:
+  /// **'Depth colors'**
+  String get dive3d_seascape_appearance_surfaceDepth;
+
+  /// No description provided for @dive3d_seascape_appearance_surfaceImagery.
+  ///
+  /// In en, this message translates to:
+  /// **'Map imagery'**
+  String get dive3d_seascape_appearance_surfaceImagery;
+
+  /// No description provided for @dive3d_seascape_appearance_surfaceBlend.
+  ///
+  /// In en, this message translates to:
+  /// **'Blend'**
+  String get dive3d_seascape_appearance_surfaceBlend;
+
   /// No description provided for @dive3d_seascape_appearance_rampRange.
   ///
   /// In en, this message translates to:

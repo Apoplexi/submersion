@@ -22472,6 +22472,19 @@ class AppLocalizationsEs extends AppLocalizations {
   String get dive3d_seascape_orbitView => 'Vista 3D';
 
   @override
+  String get dive3d_seascape_appearance_surface => 'Superficie del terreno';
+
+  @override
+  String get dive3d_seascape_appearance_surfaceDepth =>
+      'Colores de profundidad';
+
+  @override
+  String get dive3d_seascape_appearance_surfaceImagery => 'Imágenes del mapa';
+
+  @override
+  String get dive3d_seascape_appearance_surfaceBlend => 'Mezcla';
+
+  @override
   String get dive3d_seascape_appearance_rampRange =>
       'Limitar rango de profundidad del color';
 

@@ -64,6 +64,18 @@ void main() {
     expect(identical(before!.pngBytes, after!.pngBytes), isTrue);
   });
 
+  test('surface mode changes do not re-render the 2D overlay', () async {
+    final c = container(g: grid());
+    final before = await c.read(bathymetryOverlayProvider(cell).future);
+    await c
+        .read(settingsProvider.notifier)
+        .setSeascapeAppearance(
+          const SeascapeAppearance(surfaceMode: SeascapeSurfaceMode.imagery),
+        );
+    final after = await c.read(bathymetryOverlayProvider(cell).future);
+    expect(identical(before!.pngBytes, after!.pngBytes), isTrue);
+  });
+
   test('ramp changes DO re-render the overlay', () async {
     final c = container(g: grid());
     final before = await c.read(bathymetryOverlayProvider(cell).future);

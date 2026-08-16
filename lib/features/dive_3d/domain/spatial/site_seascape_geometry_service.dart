@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'dart:ui';
 
 import 'package:submersion/features/bathymetry/domain/bathymetry_grid.dart';
+import 'package:submersion/features/bathymetry/domain/terrain_imagery_frame.dart';
 import 'package:submersion/features/dive_3d/domain/entities/mesh_data.dart';
 import 'package:submersion/features/dive_3d/domain/geometry/marker_layout.dart';
 import 'package:submersion/features/dive_3d/domain/geometry/scene_bounds.dart';
@@ -56,6 +57,11 @@ class SiteSeascapeInput {
   final double displayUnitInMeters;
   final String depthSymbol;
 
+  /// The stitched imagery's mercator mapping when the surface drapes map
+  /// tiles; null renders the depth ramp. Plain data so the whole input
+  /// still crosses compute().
+  final TerrainImageryFrame? imageryFrame;
+
   const SiteSeascapeInput({
     required this.grid,
     required this.center,
@@ -66,6 +72,7 @@ class SiteSeascapeInput {
     this.appearance = const SeascapeAppearance(),
     this.displayUnitInMeters = 1.0,
     this.depthSymbol = 'm',
+    this.imageryFrame,
   });
 }
 
@@ -103,6 +110,8 @@ class SiteSeascapeGeometryService {
       projection: proj,
       rampMaxDepthMeters: input.appearance.rampMaxDepthMeters,
       rampBanded: input.appearance.rampBanded,
+      imageryFrame: input.imageryFrame,
+      surfaceMode: input.appearance.surfaceMode,
     );
     final contours = buildContourLayers(
       grid: input.grid,

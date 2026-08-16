@@ -10,11 +10,16 @@ class MeshData {
   final Float32List colors;
   final double opacity;
 
+  /// Normalized uv pairs per vertex for renderers that texture the mesh;
+  /// null for untextured meshes.
+  final Float32List? textureCoordinates;
+
   const MeshData({
     required this.positions,
     required this.indices,
     required this.colors,
     this.opacity = 1.0,
+    this.textureCoordinates,
   });
 
   int get vertexCount => positions.length ~/ 3;

@@ -22288,6 +22288,18 @@ class AppLocalizationsNl extends AppLocalizations {
   String get dive3d_seascape_orbitView => '3D-weergave';
 
   @override
+  String get dive3d_seascape_appearance_surface => 'Terreinoppervlak';
+
+  @override
+  String get dive3d_seascape_appearance_surfaceDepth => 'Dieptekleuren';
+
+  @override
+  String get dive3d_seascape_appearance_surfaceImagery => 'Kaartbeelden';
+
+  @override
+  String get dive3d_seascape_appearance_surfaceBlend => 'Mengeling';
+
+  @override
   String get dive3d_seascape_appearance_rampRange =>
       'Kleurdieptebereik beperken';
 

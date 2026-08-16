@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:submersion/core/constants/units.dart';
 import 'package:submersion/features/bathymetry/application/bathymetry_providers.dart';
 import 'package:submersion/features/bathymetry/presentation/bathymetry_overlay_image.dart';
+import 'package:submersion/features/dive_3d/domain/spatial/seascape_appearance.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 
 /// The rendered depth overlay for a quantized bathymetry cell, or null
@@ -26,6 +27,7 @@ final bathymetryOverlayProvider =
           (s) => s.seascapeAppearance.copyWith(
             mapDepthOverlay: false,
             wallAngleDeg: 0,
+            surfaceMode: SeascapeSurfaceMode.depth,
           ),
         ),
       );

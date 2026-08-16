@@ -1,17 +1,20 @@
 import 'dart:math' as math;
 
 import 'package:flutter/foundation.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:submersion/core/providers/provider.dart';
 
 import 'package:submersion/core/utils/geo_math.dart';
 import 'package:submersion/features/bathymetry/application/bathymetry_providers.dart';
 import 'package:submersion/features/bathymetry/data/bathymetry_repository.dart';
+import 'package:submersion/features/bathymetry/data/terrain_imagery_service.dart';
 import 'package:submersion/features/bathymetry/domain/bathymetry_grid.dart';
+import 'package:submersion/features/bathymetry/presentation/terrain_imagery_providers.dart';
 import 'package:submersion/core/constants/units.dart';
 import 'package:submersion/features/dive_3d/application/spatial_providers.dart';
 import 'package:submersion/features/dive_3d/domain/scene_3d.dart';
 import 'package:submersion/features/dive_3d/domain/spatial/bathymetry_terrain_builder.dart';
 import 'package:submersion/features/dive_3d/domain/spatial/contour_builder.dart';
+import 'package:submersion/features/dive_3d/domain/spatial/seascape_appearance.dart';
 import 'package:submersion/features/dive_3d/domain/spatial/seascape_axes.dart';
 import 'package:submersion/features/dive_3d/domain/spatial/site_seascape_geometry_service.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_providers.dart';
@@ -38,6 +41,11 @@ class SiteSeascapeReady extends SiteSeascapeState {
   /// chrome painter picks the camera-nearest anchor per frame.
   final List<ContourLabelSpec> contourLabels;
 
+  /// The stitched terrain imagery when the surface mode drapes map tiles
+  /// and the mosaic has resolved; attached UI-side (never crosses the
+  /// compute() isolate). The viewport samples image + white texel from it.
+  final TerrainImagery? imagery;
+
   const SiteSeascapeReady({
     required this.scene,
     required this.sourceId,
@@ -45,6 +53,7 @@ class SiteSeascapeReady extends SiteSeascapeState {
     required this.axisInputs,
     required this.grid,
     this.contourLabels = const [],
+    this.imagery,
   });
 }
 
@@ -131,6 +140,23 @@ final siteSeascapeProvider = FutureProvider.family<SiteSeascapeState, String>((
   );
   final depthUnit = ref.watch(settingsProvider.select((s) => s.depthUnit));
 
+  // Imagery drape: non-blocking. While the mosaic loads (or offline) the
+  // scene renders with depth colors and rebuilds when it lands.
+  TerrainImagery? imagery;
+  if (appearance.surfaceMode != SeascapeSurfaceMode.depth) {
+    final mapStyle = ref.watch(settingsProvider.select((s) => s.mapStyle));
+    final cell = BathymetryRepository.quantize(center);
+    imagery = ref
+        .watch(
+          terrainImageryProvider((
+            lat: cell.lat,
+            lon: cell.lon,
+            style: mapStyle,
+          )),
+        )
+        .valueOrNull;
+  }
+
   final input = SiteSeascapeInput(
     grid: grid,
     center: center,
@@ -141,6 +167,7 @@ final siteSeascapeProvider = FutureProvider.family<SiteSeascapeState, String>((
     appearance: appearance,
     displayUnitInMeters: depthUnit == DepthUnit.feet ? 0.3048 : 1.0,
     depthSymbol: depthUnit.symbol,
+    imageryFrame: imagery?.frame,
   );
   final built = grid.rows * grid.cols > _isolateCellThreshold
       ? await compute(_buildScene, input)
@@ -157,6 +184,7 @@ final siteSeascapeProvider = FutureProvider.family<SiteSeascapeState, String>((
     resolutionMeters: grid.resolutionMeters,
     grid: grid,
     contourLabels: built.contourLabels,
+    imagery: imagery,
     axisInputs: (
       minEast: box.minEast,
       maxEast: box.maxEast,

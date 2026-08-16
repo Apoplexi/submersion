@@ -71,9 +71,10 @@ for its own site in this PR.
 and the active `MapStyle`, pick the zoom where the box spans ~3 to 5 tiles
 (about z13-z14 for 8 km), compute the slippy tile range (extract and share
 the lat/lon-to-tile math already in the dive-list thumbnail code), fetch
-tiles via `MapTileConfig.tileUrl` (keyless), stitch onto one canvas
-cropped to the grid box in Web Mercator, and cache the resulting
-`ui.Image` in memory per (grid, style). A one-pixel WHITE TEXEL is
+tiles via `MapTileConfig.tileUrl` (keyless), stitch tiles onto one
+tile-aligned canvas; the UV frame maps the grid box into it (correction
+at planning time: cropping bought nothing the frame does not). Cache the
+resulting `ui.Image` in memory per (grid, style). A one-pixel WHITE TEXEL is
 reserved in a padded corner. Any failure or offline yields null and the
 terrain silently falls back to depth colors (no spinner, no error state).
 

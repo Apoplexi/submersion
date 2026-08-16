@@ -1,5 +1,3 @@
-import 'dart:math' as math;
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -10,6 +8,7 @@ import 'package:submersion/core/constants/list_view_mode.dart';
 import 'package:submersion/core/constants/map_style.dart';
 import 'package:submersion/core/constants/map_tile_config.dart';
 import 'package:submersion/core/providers/provider.dart';
+import 'package:submersion/core/utils/slippy_tiles.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive_summary.dart';
@@ -42,21 +41,11 @@ import 'package:submersion/shared/widgets/master_detail/master_detail_scaffold.d
 import 'package:submersion/shared/widgets/master_detail/responsive_breakpoints.dart';
 import 'package:submersion/shared/widgets/table_mode_layout/table_mode_layout.dart';
 
-/// Compute a single map tile URL for the given lat/lng at [zoom].
-///
-/// Converts WGS-84 coordinates to slippy map tile x/y using the standard
-/// Web Mercator projection formula, then returns the tile URL for the
-/// requested [style] (Street, Topo, or Satellite).
+/// Compute a single map tile URL for the given lat/lng at [zoom], via the
+/// shared slippy-map conversion.
 String _tileUrl(double lat, double lng, int zoom, MapStyle style) {
-  final n = 1 << zoom; // 2^zoom
-  final x = ((lng + 180.0) / 360.0 * n).floor();
-  final latRad = lat * math.pi / 180.0;
-  final y =
-      ((1.0 - math.log(math.tan(latRad) + 1.0 / math.cos(latRad)) / math.pi) /
-              2.0 *
-              n)
-          .floor();
-  return MapTileConfig.tileUrl(style, zoom, x, y);
+  final tile = slippyTileOf(lat, lng, zoom);
+  return MapTileConfig.tileUrl(style, zoom, tile.x, tile.y);
 }
 
 /// Main dive list page with master-detail layout on desktop.

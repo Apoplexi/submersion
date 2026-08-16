@@ -101,4 +101,18 @@ void main() {
       expect(on, isNot(const SeascapeAppearance()));
     },
   );
+
+  test('surfaceMode defaults to depth, round-trips, decodes defensively', () {
+    expect(const SeascapeAppearance().surfaceMode, SeascapeSurfaceMode.depth);
+    const blend = SeascapeAppearance(surfaceMode: SeascapeSurfaceMode.blend);
+    expect(
+      SeascapeAppearance.decode(blend.encode()).surfaceMode,
+      SeascapeSurfaceMode.blend,
+    );
+    expect(
+      SeascapeAppearance.decode('{"surfaceMode":"hologram"}').surfaceMode,
+      SeascapeSurfaceMode.depth,
+    );
+    expect(blend, isNot(const SeascapeAppearance()));
+  });
 }
