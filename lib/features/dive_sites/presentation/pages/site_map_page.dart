@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:latlong2/latlong.dart';
 
 import 'package:submersion/core/providers/provider.dart';
+import 'package:submersion/features/bathymetry/presentation/depth_overlay_toggle_button.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 import 'package:submersion/features/dive_sites/data/repositories/site_repository_impl.dart';
 import 'package:submersion/features/dive_sites/data/services/dive_site_api_service.dart';
@@ -130,6 +131,8 @@ class _SiteMapPageState extends ConsumerState<SiteMapPage>
       actions: [
         const BuiltInSitesToggleButton(),
         const HeatMapToggleButton(),
+        if (selectedSite != null)
+          DepthOverlayToggleButton(siteLocation: selectedSite.location),
         IconButton(
           icon: const Icon(Icons.list),
           tooltip: context.l10n.diveSites_map_tooltip_listView,

@@ -11,6 +11,9 @@ import 'package:submersion/features/dive_sites/data/services/dive_site_api_servi
 import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
 import 'package:submersion/features/dive_sites/presentation/providers/built_in_sites_providers.dart';
 import 'package:submersion/features/dive_sites/presentation/providers/site_providers.dart';
+import 'package:submersion/features/bathymetry/data/bathymetry_repository.dart';
+import 'package:submersion/features/bathymetry/presentation/bathymetry_overlay_providers.dart';
+import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/features/dive_3d/presentation/pages/site_seascape_page.dart';
 import 'package:submersion/features/dive_sites/presentation/widgets/built_in_site_info_card.dart';
 import 'package:submersion/features/dive_sites/presentation/widgets/built_in_site_marker_layer.dart';
@@ -246,17 +249,20 @@ class _SiteMapContentState extends ConsumerState<SiteMapContent>
     }).toList();
     final colorScheme = Theme.of(context).colorScheme;
 
+    // The selected site also drives the depth overlay layer below.
+    final selectedSite = widget.selectedId == null
+        ? null
+        : sitesWithLocation
+              .where((s) => s.site.id == widget.selectedId)
+              .firstOrNull
+              ?.site;
+
     // Calculate initial center and zoom
     // If there's a selected site with location, start centered on it
     LatLng center = _defaultCenter;
     double zoom = _defaultZoom;
 
     if (widget.selectedId != null) {
-      // Find the selected site's location
-      final selectedSite = sitesWithLocation
-          .where((s) => s.site.id == widget.selectedId)
-          .firstOrNull
-          ?.site;
       if (selectedSite?.hasCoordinates == true) {
         center = LatLng(
           selectedSite!.location!.latitude,
@@ -309,6 +315,34 @@ class _SiteMapContentState extends ConsumerState<SiteMapContent>
                 tileProvider: TileCacheService.instance.isInitialized
                     ? TileCacheService.instance.getTileProvider()
                     : null,
+              ),
+              // Depth overlay: the selected site's bathymetry as a
+              // translucent ramp + contours, above tiles, below markers.
+              Consumer(
+                builder: (context, ref, _) {
+                  final on = ref.watch(
+                    settingsProvider.select(
+                      (s) => s.seascapeAppearance.mapDepthOverlay,
+                    ),
+                  );
+                  final location = selectedSite?.location;
+                  if (!on || location == null) return const SizedBox.shrink();
+                  final overlayAsync = ref.watch(
+                    bathymetryOverlayProvider(
+                      BathymetryRepository.quantize(location),
+                    ),
+                  );
+                  final overlay = overlayAsync.valueOrNull;
+                  if (overlay == null) return const SizedBox.shrink();
+                  return OverlayImageLayer(
+                    overlayImages: [
+                      OverlayImage(
+                        bounds: overlay.bounds,
+                        imageProvider: MemoryImage(overlay.pngBytes),
+                      ),
+                    ],
+                  );
+                },
               ),
               // Built-in (bundled) sites layer - below the user markers so the
               // user's own sites always draw on top. Shown only when toggled.
