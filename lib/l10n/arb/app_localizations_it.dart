@@ -20467,6 +20467,12 @@ class AppLocalizationsIt extends AppLocalizations {
       'Sovrapposizione mappa termica disattivata';
 
   @override
+  String get maps_depthOverlay_show => 'Mostra sovrapposizione di profondità';
+
+  @override
+  String get maps_depthOverlay_hide => 'Nascondi sovrapposizione di profondità';
+
+  @override
   String get maps_heatMap_overlayOn => 'Sovrapposizione mappa termica attivata';
 
   @override

@@ -20307,6 +20307,12 @@ class AppLocalizationsNl extends AppLocalizations {
   String get maps_heatMap_overlayOff => 'Heatmap-overlay is uit';
 
   @override
+  String get maps_depthOverlay_show => 'Diepte-overlay tonen';
+
+  @override
+  String get maps_depthOverlay_hide => 'Diepte-overlay verbergen';
+
+  @override
   String get maps_heatMap_overlayOn => 'Heatmap-overlay is aan';
 
   @override

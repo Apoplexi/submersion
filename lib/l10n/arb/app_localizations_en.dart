@@ -20121,6 +20121,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get maps_heatMap_overlayOff => 'Heat map overlay is off';
 
   @override
+  String get maps_depthOverlay_show => 'Show depth overlay';
+
+  @override
+  String get maps_depthOverlay_hide => 'Hide depth overlay';
+
+  @override
   String get maps_heatMap_overlayOn => 'Heat map overlay is on';
 
   @override

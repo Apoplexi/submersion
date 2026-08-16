@@ -20435,6 +20435,12 @@ class AppLocalizationsDe extends AppLocalizations {
   String get maps_heatMap_overlayOff => 'Heatmap-Overlay ist aus';
 
   @override
+  String get maps_depthOverlay_show => 'Tiefen-Overlay anzeigen';
+
+  @override
+  String get maps_depthOverlay_hide => 'Tiefen-Overlay ausblenden';
+
+  @override
   String get maps_heatMap_overlayOn => 'Heatmap-Overlay ist an';
 
   @override

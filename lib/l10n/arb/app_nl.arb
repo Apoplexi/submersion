@@ -3698,6 +3698,8 @@
   "maps_compass_resetTooltip": "Noorden boven",
   "maps_heatMap_hide": "Heatmap verbergen",
   "maps_heatMap_overlayOff": "Heatmap-overlay is uit",
+  "maps_depthOverlay_show": "Diepte-overlay tonen",
+  "maps_depthOverlay_hide": "Diepte-overlay verbergen",
   "maps_heatMap_overlayOn": "Heatmap-overlay is aan",
   "maps_heatMap_show": "Heatmap tonen",
   "maps_offline_bounds": "Grenzen",

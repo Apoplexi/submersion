@@ -3626,6 +3626,8 @@
   "maps_compass_resetTooltip": "Nord in alto",
   "maps_heatMap_hide": "Nascondi mappa termica",
   "maps_heatMap_overlayOff": "Sovrapposizione mappa termica disattivata",
+  "maps_depthOverlay_show": "Mostra sovrapposizione di profondità",
+  "maps_depthOverlay_hide": "Nascondi sovrapposizione di profondità",
   "maps_heatMap_overlayOn": "Sovrapposizione mappa termica attivata",
   "maps_heatMap_show": "Mostra mappa termica",
   "maps_offline_bounds": "Limiti",

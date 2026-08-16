@@ -3626,6 +3626,8 @@
   "maps_compass_resetTooltip": "Nord en haut",
   "maps_heatMap_hide": "Masquer la carte de chaleur",
   "maps_heatMap_overlayOff": "La carte de chaleur est desactivee",
+  "maps_depthOverlay_show": "Afficher la surcouche de profondeur",
+  "maps_depthOverlay_hide": "Masquer la surcouche de profondeur",
   "maps_heatMap_overlayOn": "La carte de chaleur est activee",
   "maps_heatMap_show": "Afficher la carte de chaleur",
   "maps_offline_bounds": "Limites",

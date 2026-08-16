@@ -3626,6 +3626,8 @@
   "maps_compass_resetTooltip": "Eszak felul",
   "maps_heatMap_hide": "Hoterkep elrejtese",
   "maps_heatMap_overlayOff": "A hoterkep reteg ki van kapcsolva",
+  "maps_depthOverlay_show": "Mélységréteg megjelenítése",
+  "maps_depthOverlay_hide": "Mélységréteg elrejtése",
   "maps_heatMap_overlayOn": "A hoterkep reteg be van kapcsolva",
   "maps_heatMap_show": "Hoterkep megjelenitese",
   "maps_offline_bounds": "Hatarok",

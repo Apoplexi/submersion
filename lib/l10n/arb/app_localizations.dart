@@ -34049,6 +34049,18 @@ abstract class AppLocalizations {
   /// **'Heat map overlay is off'**
   String get maps_heatMap_overlayOff;
 
+  /// No description provided for @maps_depthOverlay_show.
+  ///
+  /// In en, this message translates to:
+  /// **'Show depth overlay'**
+  String get maps_depthOverlay_show;
+
+  /// No description provided for @maps_depthOverlay_hide.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide depth overlay'**
+  String get maps_depthOverlay_hide;
+
   /// No description provided for @maps_heatMap_overlayOn.
   ///
   /// In en, this message translates to:
