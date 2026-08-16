@@ -27,7 +27,8 @@ List<DiveProfilePoint> _profile() => [
 
 Future<void> _pump(
   WidgetTester tester, {
-  required List<DiveProfilePoint>? profile,
+  List<DiveProfilePoint>? profile,
+  Object? error,
   DepthUnit depthUnit = DepthUnit.meters,
 }) async {
   final settings = MockSettingsNotifier(AppSettings(depthUnit: depthUnit));
@@ -40,7 +41,10 @@ Future<void> _pump(
         recentDivesProvider.overrideWith(
           (ref) async => [createTestDiveWithBottomTime(id: 'd1')],
         ),
-        latestDiveProfileProvider.overrideWith((ref) async => profile),
+        latestDiveProfileProvider.overrideWith((ref) async {
+          if (error != null) throw error;
+          return profile;
+        }),
       ].cast(),
       child: MaterialApp.router(
         localizationsDelegates: AppLocalizations.localizationsDelegates,
@@ -86,6 +90,19 @@ void main() {
 
     expect(find.byType(LineChart), findsNothing);
     expect(find.text('No profile data for this dive'), findsOneWidget);
+  });
+
+  // A failed load and a dive that simply has no samples are different facts.
+  // Reporting "no profile data" for a failure hides the error and tells the
+  // diver something untrue about their dive.
+  testWidgets('reports a load failure as an error, not as missing data', (
+    tester,
+  ) async {
+    await _pump(tester, error: Exception('db unavailable'));
+
+    expect(find.byType(LineChart), findsNothing);
+    expect(find.text('No profile data for this dive'), findsNothing);
+    expect(find.text("Couldn't load the dive profile"), findsOneWidget);
   });
 
   testWidgets('plots depth in the diver\'s configured unit', (tester) async {

@@ -3395,6 +3395,10 @@ class AppLocalizationsHe extends AppLocalizations {
       'אין נתוני פרופיל לצלילה זו';
 
   @override
+  String get dashboard_recentDives_profileLoadError =>
+      'לא ניתן לטעון את פרופיל הצלילה';
+
+  @override
   String dashboard_recentDives_profileMinutes(int minutes) {
     return '$minutes דק\'';
   }

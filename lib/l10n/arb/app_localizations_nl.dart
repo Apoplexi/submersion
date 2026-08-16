@@ -3463,6 +3463,10 @@ class AppLocalizationsNl extends AppLocalizations {
       'Geen profielgegevens voor deze duik';
 
   @override
+  String get dashboard_recentDives_profileLoadError =>
+      'Kan het duikprofiel niet laden';
+
+  @override
   String dashboard_recentDives_profileMinutes(int minutes) {
     return '$minutes min';
   }

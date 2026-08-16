@@ -3489,6 +3489,10 @@ class AppLocalizationsIt extends AppLocalizations {
       'Nessun dato di profilo per questa immersione';
 
   @override
+  String get dashboard_recentDives_profileLoadError =>
+      'Impossibile caricare il profilo dell\'immersione';
+
+  @override
   String dashboard_recentDives_profileMinutes(int minutes) {
     return '$minutes min';
   }

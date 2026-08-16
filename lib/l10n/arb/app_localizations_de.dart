@@ -3498,6 +3498,10 @@ class AppLocalizationsDe extends AppLocalizations {
       'Keine Profildaten für diesen Tauchgang';
 
   @override
+  String get dashboard_recentDives_profileLoadError =>
+      'Tauchprofil konnte nicht geladen werden';
+
+  @override
   String dashboard_recentDives_profileMinutes(int minutes) {
     return '$minutes Min.';
   }

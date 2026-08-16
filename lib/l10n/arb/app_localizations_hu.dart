@@ -3476,6 +3476,10 @@ class AppLocalizationsHu extends AppLocalizations {
       'Nincs profiladat ehhez a merüléshez';
 
   @override
+  String get dashboard_recentDives_profileLoadError =>
+      'A merülési profil betöltése sikertelen';
+
+  @override
   String dashboard_recentDives_profileMinutes(int minutes) {
     return '$minutes perc';
   }

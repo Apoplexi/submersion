@@ -1175,6 +1175,7 @@
   "dashboard_recentDives_errorLoading": "加载潜水记录失败",
   "dashboard_recentDives_latestProfileTitle": "最近潜水剖面",
   "dashboard_recentDives_noProfileData": "此次潜水没有剖面数据",
+  "dashboard_recentDives_profileLoadError": "无法加载潜水剖面",
   "dashboard_recentDives_profileMinutes": "{minutes} 分钟",
   "dashboard_recentDives_logFirst": "记录您的第一次潜水",
   "dashboard_recentDives_sectionTitle": "最近的潜水",

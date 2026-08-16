@@ -3419,6 +3419,9 @@ class AppLocalizationsAr extends AppLocalizations {
       'لا توجد بيانات مخطط لهذه الغطسة';
 
   @override
+  String get dashboard_recentDives_profileLoadError => 'تعذر تحميل مخطط الغطسة';
+
+  @override
   String dashboard_recentDives_profileMinutes(int minutes) {
     return '$minutes دقيقة';
   }

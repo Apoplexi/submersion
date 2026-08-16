@@ -3311,6 +3311,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get dashboard_recentDives_noProfileData => '此次潜水没有剖面数据';
 
   @override
+  String get dashboard_recentDives_profileLoadError => '无法加载潜水剖面';
+
+  @override
   String dashboard_recentDives_profileMinutes(int minutes) {
     return '$minutes 分钟';
   }

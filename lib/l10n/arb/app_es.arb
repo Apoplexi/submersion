@@ -1081,6 +1081,7 @@
   "dashboard_recentDives_errorLoading": "Error al cargar inmersiones",
   "dashboard_recentDives_latestProfileTitle": "Perfil de la última inmersión",
   "dashboard_recentDives_noProfileData": "Sin datos de perfil para esta inmersión",
+  "dashboard_recentDives_profileLoadError": "No se pudo cargar el perfil de inmersión",
   "dashboard_recentDives_profileMinutes": "{minutes} min",
   "dashboard_recentDives_logFirst": "Registra tu primera inmersión",
   "dashboard_recentDives_sectionTitle": "Inmersiones recientes",

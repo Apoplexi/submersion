@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
@@ -7,6 +9,7 @@ import 'package:submersion/features/deco_calculator/presentation/providers/deco_
 import 'package:submersion/features/planner/domain/entities/dive_plan.dart';
 import 'package:submersion/features/planner/presentation/providers/plan_repository_providers.dart';
 import 'package:submersion/features/planning/presentation/pages/planning_page.dart';
+import 'package:submersion/features/planning/presentation/widgets/planning_summary_widget.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 
 import '../../helpers/test_app.dart';
@@ -189,6 +192,66 @@ void main() {
 
       expect(find.text('Select a tool to get started'), findsOneWidget);
       expect(find.text('SAVED PLANS'), findsOneWidget);
+      // Genuinely no plans in this fixture, so the empty state is accurate.
+      expect(find.text('No saved plans yet'), findsOneWidget);
+    });
+
+    // "No saved plans yet" is a claim about the data. Asserting it before the
+    // query has answered tells a diver with a full plan library that they
+    // have none, which is worse than showing nothing for a frame.
+    testWidgets('does not claim "no plans" while the query is in flight', (
+      tester,
+    ) async {
+      tester.view.physicalSize = const Size(1600, 1000);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.reset);
+
+      final router = GoRouter(
+        initialLocation: '/planning',
+        routes: [
+          GoRoute(path: '/planning', builder: (_, _) => const PlanningPage()),
+        ],
+      );
+      addTearDown(router.dispose);
+
+      final gate = Completer<List<DivePlanSummary>>();
+      await tester.pumpWidget(
+        testAppRouter(
+          router: router,
+          locale: const Locale('en'),
+          overrides: [
+            settingsProvider.overrideWith((ref) => _TestSettingsNotifier()),
+            divePlanSummariesProvider.overrideWith((ref) => gate.future),
+          ],
+        ),
+      );
+      await tester.pump();
+
+      expect(find.text('No saved plans yet'), findsNothing);
+
+      gate.complete([
+        DivePlanSummary(
+          id: 'p1',
+          name: 'Reef 30m',
+          updatedAt: DateTime(2026, 7, 4),
+          maxDepth: 30.0,
+          runtimeSeconds: 45 * 60,
+          ttsSeconds: 300,
+          mode: PlanMode.oc,
+        ),
+      ]);
+      await tester.pumpAndSettle();
+
+      expect(find.text('No saved plans yet'), findsNothing);
+      // The hub lists the three most recent plans and the summary pane lists
+      // the full set, so an overlapping plan legitimately renders in both.
+      expect(
+        find.descendant(
+          of: find.byType(PlanningSummaryWidget),
+          matching: find.text('Reef 30m'),
+        ),
+        findsOneWidget,
+      );
     });
 
     testWidgets('a tool opens beside the list, not over it', (tester) async {

@@ -1081,6 +1081,7 @@
   "dashboard_recentDives_errorLoading": "Impossible de charger les plongees",
   "dashboard_recentDives_latestProfileTitle": "Profil de la dernière plongée",
   "dashboard_recentDives_noProfileData": "Aucune donnée de profil pour cette plongée",
+  "dashboard_recentDives_profileLoadError": "Impossible de charger le profil de plongée",
   "dashboard_recentDives_profileMinutes": "{minutes} min",
   "dashboard_recentDives_logFirst": "Enregistre ta premiere plongee",
   "dashboard_recentDives_sectionTitle": "Plongees recentes",

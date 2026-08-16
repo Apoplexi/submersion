@@ -3421,6 +3421,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'No profile data for this dive';
 
   @override
+  String get dashboard_recentDives_profileLoadError =>
+      'Couldn\'t load the dive profile';
+
+  @override
   String dashboard_recentDives_profileMinutes(int minutes) {
     return '$minutes min';
   }

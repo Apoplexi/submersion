@@ -5927,6 +5927,12 @@ abstract class AppLocalizations {
   /// **'No profile data for this dive'**
   String get dashboard_recentDives_noProfileData;
 
+  /// No description provided for @dashboard_recentDives_profileLoadError.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t load the dive profile'**
+  String get dashboard_recentDives_profileLoadError;
+
   /// No description provided for @dashboard_recentDives_profileMinutes.
   ///
   /// In en, this message translates to:

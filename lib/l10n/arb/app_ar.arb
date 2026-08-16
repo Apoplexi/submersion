@@ -1081,6 +1081,7 @@
   "dashboard_recentDives_errorLoading": "فشل تحميل الغوصات",
   "dashboard_recentDives_latestProfileTitle": "مخطط آخر غطسة",
   "dashboard_recentDives_noProfileData": "لا توجد بيانات مخطط لهذه الغطسة",
+  "dashboard_recentDives_profileLoadError": "تعذر تحميل مخطط الغطسة",
   "dashboard_recentDives_profileMinutes": "{minutes} دقيقة",
   "dashboard_recentDives_logFirst": "سجّل أول غوصة لك",
   "dashboard_recentDives_sectionTitle": "الغوصات الأخيرة",

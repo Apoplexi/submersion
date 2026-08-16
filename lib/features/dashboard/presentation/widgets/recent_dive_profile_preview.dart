@@ -57,14 +57,20 @@ class RecentDiveProfilePreview extends ConsumerWidget {
                 child: profileAsync.when(
                   data: (profile) => profile == null
                       ? _Placeholder(
+                          icon: Icons.show_chart,
                           message:
                               context.l10n.dashboard_recentDives_noProfileData,
                         )
                       : _ProfileChart(profile: profile),
                   loading: () =>
                       const Center(child: CircularProgressIndicator()),
+                  // A failed load and a dive with no samples are different
+                  // facts. Reporting "no profile data" for a failure hides the
+                  // error and tells the diver something untrue about the dive.
                   error: (_, _) => _Placeholder(
-                    message: context.l10n.dashboard_recentDives_noProfileData,
+                    icon: Icons.error_outline,
+                    message:
+                        context.l10n.dashboard_recentDives_profileLoadError,
                   ),
                 ),
               ),
@@ -151,6 +157,7 @@ class _ProfileChart extends ConsumerWidget {
     ];
     if (spots.length < 2) {
       return _Placeholder(
+        icon: Icons.show_chart,
         message: context.l10n.dashboard_recentDives_noProfileData,
       );
     }
@@ -243,8 +250,9 @@ class _ProfileChart extends ConsumerWidget {
 }
 
 class _Placeholder extends StatelessWidget {
-  const _Placeholder({required this.message});
+  const _Placeholder({required this.icon, required this.message});
 
+  final IconData icon;
   final String message;
 
   @override
@@ -255,7 +263,7 @@ class _Placeholder extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(
-            Icons.show_chart,
+            icon,
             size: 32,
             color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
           ),

@@ -1081,6 +1081,7 @@
   "dashboard_recentDives_errorLoading": "Falha ao carregar mergulhos",
   "dashboard_recentDives_latestProfileTitle": "Perfil do último mergulho",
   "dashboard_recentDives_noProfileData": "Sem dados de perfil para este mergulho",
+  "dashboard_recentDives_profileLoadError": "Não foi possível carregar o perfil do mergulho",
   "dashboard_recentDives_profileMinutes": "{minutes} min",
   "dashboard_recentDives_logFirst": "Registre Seu Primeiro Mergulho",
   "dashboard_recentDives_sectionTitle": "Mergulhos Recentes",

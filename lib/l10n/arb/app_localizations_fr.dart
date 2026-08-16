@@ -3503,6 +3503,10 @@ class AppLocalizationsFr extends AppLocalizations {
       'Aucune donnée de profil pour cette plongée';
 
   @override
+  String get dashboard_recentDives_profileLoadError =>
+      'Impossible de charger le profil de plongée';
+
+  @override
   String dashboard_recentDives_profileMinutes(int minutes) {
     return '$minutes min';
   }

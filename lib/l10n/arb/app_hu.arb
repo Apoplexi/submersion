@@ -1081,6 +1081,7 @@
   "dashboard_recentDives_errorLoading": "Nem sikerult betolteni a meruleseket",
   "dashboard_recentDives_latestProfileTitle": "Legutóbbi merülési profil",
   "dashboard_recentDives_noProfileData": "Nincs profiladat ehhez a merüléshez",
+  "dashboard_recentDives_profileLoadError": "A merülési profil betöltése sikertelen",
   "dashboard_recentDives_profileMinutes": "{minutes} perc",
   "dashboard_recentDives_logFirst": "Rogzitse az elso meruleset",
   "dashboard_recentDives_sectionTitle": "Legutobbi merulesek",

@@ -2178,6 +2178,7 @@
   "dashboard_recentDives_errorLoading": "Failed to load dives",
   "dashboard_recentDives_latestProfileTitle": "Latest dive profile",
   "dashboard_recentDives_noProfileData": "No profile data for this dive",
+  "dashboard_recentDives_profileLoadError": "Couldn't load the dive profile",
   "dashboard_recentDives_profileMinutes": "{minutes} min",
   "@dashboard_recentDives_profileMinutes": {"placeholders": {"minutes": {"type": "int"}}},
   "dashboard_recentDives_logFirst": "Log Your First Dive",

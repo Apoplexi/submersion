@@ -1081,6 +1081,7 @@
   "dashboard_recentDives_errorLoading": "Tauchgänge konnten nicht geladen werden",
   "dashboard_recentDives_latestProfileTitle": "Letztes Tauchprofil",
   "dashboard_recentDives_noProfileData": "Keine Profildaten für diesen Tauchgang",
+  "dashboard_recentDives_profileLoadError": "Tauchprofil konnte nicht geladen werden",
   "dashboard_recentDives_profileMinutes": "{minutes} Min.",
   "dashboard_recentDives_logFirst": "Ersten Tauchgang erfassen",
   "dashboard_recentDives_sectionTitle": "Letzte Tauchgänge",

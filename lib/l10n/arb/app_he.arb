@@ -1081,6 +1081,7 @@
   "dashboard_recentDives_errorLoading": "נכשל טעינת צלילות",
   "dashboard_recentDives_latestProfileTitle": "פרופיל הצלילה האחרונה",
   "dashboard_recentDives_noProfileData": "אין נתוני פרופיל לצלילה זו",
+  "dashboard_recentDives_profileLoadError": "לא ניתן לטעון את פרופיל הצלילה",
   "dashboard_recentDives_profileMinutes": "{minutes} דק'",
   "dashboard_recentDives_logFirst": "רשום את הצלילה הראשונה",
   "dashboard_recentDives_sectionTitle": "צלילות אחרונות",
