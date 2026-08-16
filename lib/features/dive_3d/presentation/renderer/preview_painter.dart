@@ -1,6 +1,6 @@
 import 'dart:math' as math;
 import 'dart:typed_data';
-import 'dart:ui';
+import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 
@@ -26,6 +26,15 @@ class Dive3dScenePainter extends CustomPainter {
   final Set<SceneOverlay>? visibleOverlays;
   final bool mirrorX;
 
+  /// Stitched map-tile mosaic draped over the terrain-merged group; null
+  /// paints vertex colors only.
+  final ui.Image? terrainImagery;
+
+  /// Normalized coordinates of the mosaic's reserved white texel; UV-less
+  /// meshes in the merged group sample it so BlendMode.modulate leaves
+  /// their vertex colors untouched.
+  final ({double u, double v})? imageryWhiteTexel;
+
   const Dive3dScenePainter({
     required this.scene,
     this.yawDegrees = -32,
@@ -33,6 +42,8 @@ class Dive3dScenePainter extends CustomPainter {
     this.zoom = 1.0,
     this.visibleOverlays,
     this.mirrorX = false,
+    this.terrainImagery,
+    this.imageryWhiteTexel,
   });
 
   // Studio lighting for flat shading. Ambient is the floor every surface
@@ -96,21 +107,67 @@ class Dive3dScenePainter extends CustomPainter {
       mirrorX: mirrorX,
     );
     final parts = partitionLayers(scene, visibleOverlays);
-    _paintMeshes(canvas, projector, parts.merged);
+    // Only the terrain-merged group textures; rest layers (paths, pins,
+    // water) always paint their own vertex colors.
+    _paintMeshes(
+      canvas,
+      projector,
+      parts.merged,
+      imagery: terrainImagery,
+      whiteTexel: imageryWhiteTexel,
+    );
     for (final mesh in parts.rest) {
       _paintMeshes(canvas, projector, [mesh]);
     }
     if (_visible(SceneOverlay.markers)) _paintMarkers(canvas, projector);
   }
 
+  /// Per-global-vertex texture coordinates for a merged soup, in IMAGE
+  /// PIXELS (ImageShader space under an identity matrix). Meshes without
+  /// UVs sample the reserved white texel so BlendMode.modulate leaves
+  /// their vertex colors untouched.
+  @visibleForTesting
+  static Float32List soupTextureCoords(
+    List<MeshData> meshes,
+    ({double u, double v}) whiteTexel,
+    int imageWidth,
+    int imageHeight,
+  ) {
+    var vn = 0;
+    for (final mesh in meshes) {
+      vn += mesh.vertexCount;
+    }
+    final coords = Float32List(vn * 2);
+    var vOff = 0;
+    for (final mesh in meshes) {
+      final uv = mesh.textureCoordinates;
+      for (var i = 0; i < mesh.vertexCount; i++) {
+        final gi = (vOff + i) * 2;
+        if (uv != null) {
+          coords[gi] = uv[i * 2] * imageWidth;
+          coords[gi + 1] = uv[i * 2 + 1] * imageHeight;
+        } else {
+          coords[gi] = whiteTexel.u * imageWidth;
+          coords[gi + 1] = whiteTexel.v * imageHeight;
+        }
+      }
+      vOff += mesh.vertexCount;
+    }
+    return coords;
+  }
+
   /// Paints one or more meshes as a single depth-sorted triangle soup.
   /// Multi-mesh calls exist for the terrain-draped group; each triangle
-  /// keeps its source mesh's opacity.
+  /// keeps its source mesh's opacity. When [imagery] and [whiteTexel] are
+  /// present and any mesh carries UVs, the soup draws through an
+  /// ImageShader modulated by the (shaded) vertex colors.
   void _paintMeshes(
     Canvas canvas,
     SceneProjector projector,
-    List<MeshData> meshes,
-  ) {
+    List<MeshData> meshes, {
+    ui.Image? imagery,
+    ({double u, double v})? whiteTexel,
+  }) {
     var vn = 0;
     var triCount = 0;
     for (final mesh in meshes) {
@@ -118,6 +175,18 @@ class Dive3dScenePainter extends CustomPainter {
       triCount += mesh.triangleCount;
     }
     if (vn == 0 || triCount == 0) return;
+
+    Float32List? vertexTex;
+    if (imagery != null &&
+        whiteTexel != null &&
+        meshes.any((m) => m.textureCoordinates != null)) {
+      vertexTex = soupTextureCoords(
+        meshes,
+        whiteTexel,
+        imagery.width,
+        imagery.height,
+      );
+    }
 
     // Rotate every vertex into view space once: (vx,vy,vz) drive both the
     // face normals and the depth sort, (sx,sy) are the canvas points.
@@ -179,10 +248,16 @@ class Dive3dScenePainter extends CustomPainter {
     // interpolates colors, so shading has to be baked into those colors here.
     final screen = Float32List(triCount * 3 * 2);
     final colors = Int32List(triCount * 3);
+    final texOut = vertexTex == null ? null : Float32List(triCount * 3 * 2);
+    final tex = vertexTex;
 
     void emit(int slot, int vi, double shade, int alpha) {
       screen[slot * 2] = sx[vi];
       screen[slot * 2 + 1] = sy[vi];
+      if (texOut != null) {
+        texOut[slot * 2] = tex![vi * 2];
+        texOut[slot * 2 + 1] = tex[vi * 2 + 1];
+      }
       final r = ((vColors[vi * 3] * shade).clamp(0.0, 1.0) * 255).round();
       final g = ((vColors[vi * 3 + 1] * shade).clamp(0.0, 1.0) * 255).round();
       final b = ((vColors[vi * 3 + 2] * shade).clamp(0.0, 1.0) * 255).round();
@@ -224,11 +299,30 @@ class Dive3dScenePainter extends CustomPainter {
       emit(tv + 2, i2, shade, triAlpha[tri]);
     }
 
-    canvas.drawVertices(
-      Vertices.raw(VertexMode.triangles, screen, colors: colors),
-      BlendMode.dst,
-      Paint(),
-    );
+    if (texOut != null) {
+      canvas.drawVertices(
+        ui.Vertices.raw(
+          ui.VertexMode.triangles,
+          screen,
+          colors: colors,
+          textureCoordinates: texOut,
+        ),
+        BlendMode.modulate,
+        Paint()
+          ..shader = ui.ImageShader(
+            imagery!,
+            TileMode.clamp,
+            TileMode.clamp,
+            Matrix4.identity().storage,
+          ),
+      );
+    } else {
+      canvas.drawVertices(
+        ui.Vertices.raw(ui.VertexMode.triangles, screen, colors: colors),
+        BlendMode.dst,
+        Paint(),
+      );
+    }
   }
 
   void _paintMarkers(Canvas canvas, SceneProjector projector) {
@@ -256,5 +350,7 @@ class Dive3dScenePainter extends CustomPainter {
       oldDelegate.pitchDegrees != pitchDegrees ||
       oldDelegate.zoom != zoom ||
       oldDelegate.visibleOverlays != visibleOverlays ||
-      oldDelegate.mirrorX != mirrorX;
+      oldDelegate.mirrorX != mirrorX ||
+      !identical(oldDelegate.terrainImagery, terrainImagery) ||
+      oldDelegate.imageryWhiteTexel != imageryWhiteTexel;
 }

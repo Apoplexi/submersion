@@ -1,3 +1,5 @@
+import 'dart:ui' as ui;
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -56,6 +58,14 @@ class Dive3dInteractiveViewport extends StatefulWidget {
   /// Labeled contour levels for the seascape chrome; null everywhere else.
   final List<ContourLabelSpec>? contourLabels;
 
+  /// Stitched map-tile mosaic draped over the terrain (seascape imagery
+  /// modes only); forwarded to the scene painter untouched.
+  final ui.Image? terrainImagery;
+
+  /// Normalized white-texel coordinates inside [terrainImagery]; UV-less
+  /// draped meshes sample it so modulate blending leaves them unchanged.
+  final ({double u, double v})? imageryWhiteTexel;
+
   const Dive3dInteractiveViewport({
     super.key,
     required this.scene,
@@ -71,6 +81,8 @@ class Dive3dInteractiveViewport extends StatefulWidget {
     this.axisChromeOnly = false,
     this.chartMode = false,
     this.contourLabels,
+    this.terrainImagery,
+    this.imageryWhiteTexel,
   });
 
   @override
@@ -325,6 +337,8 @@ class _Dive3dInteractiveViewportState extends State<Dive3dInteractiveViewport> {
             zoom: _zoom,
             visibleOverlays: widget.visibleOverlays,
             mirrorX: widget.chartMode,
+            terrainImagery: widget.terrainImagery,
+            imageryWhiteTexel: widget.imageryWhiteTexel,
           ),
           foregroundPainter: hasChrome
               ? TissueChromePainter(
