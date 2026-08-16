@@ -3179,7 +3179,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settings_homeCards_card_milestones => 'Milestones';
 
   @override
-  String get settings_homeCards_card_photoRibbon => 'Recent photos';
+  String get settings_homeCards_card_photoRibbon => 'Recent media';
 
   @override
   String get settings_homeCards_card_onThisDay => 'On this day';
@@ -3298,7 +3298,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get dashboard_urgent_title => 'Needs attention';
 
   @override
-  String get dashboard_photos_title => 'Recent photos';
+  String get dashboard_media_title => 'Recent media';
 
   @override
   String get dashboard_recentSites_title => 'Recent sites';

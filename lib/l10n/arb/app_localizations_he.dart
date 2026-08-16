@@ -3151,7 +3151,7 @@ class AppLocalizationsHe extends AppLocalizations {
   String get settings_homeCards_card_milestones => 'אבני דרך';
 
   @override
-  String get settings_homeCards_card_photoRibbon => 'תמונות אחרונות';
+  String get settings_homeCards_card_photoRibbon => 'מדיה אחרונה';
 
   @override
   String get settings_homeCards_card_onThisDay => 'ביום זה';
@@ -3270,7 +3270,7 @@ class AppLocalizationsHe extends AppLocalizations {
   String get dashboard_urgent_title => 'דורש תשומת לב';
 
   @override
-  String get dashboard_photos_title => 'תמונות אחרונות';
+  String get dashboard_media_title => 'מדיה אחרונה';
 
   @override
   String get dashboard_recentSites_title => 'אתרים אחרונים';

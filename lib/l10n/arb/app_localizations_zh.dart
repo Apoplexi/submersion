@@ -3070,7 +3070,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settings_homeCards_card_milestones => '里程碑';
 
   @override
-  String get settings_homeCards_card_photoRibbon => '最近照片';
+  String get settings_homeCards_card_photoRibbon => '最近媒体';
 
   @override
   String get settings_homeCards_card_onThisDay => '历史上的今天';
@@ -3189,7 +3189,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get dashboard_urgent_title => '需要注意';
 
   @override
-  String get dashboard_photos_title => '最近照片';
+  String get dashboard_media_title => '最近媒体';
 
   @override
   String get dashboard_recentSites_title => '最近潜点';

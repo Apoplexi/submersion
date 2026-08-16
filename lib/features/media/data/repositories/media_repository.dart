@@ -136,13 +136,18 @@ class MediaRepository {
     }
   }
 
-  /// Newest photos across all dives, ordered by takenAt descending.
-  /// Videos and signatures are excluded, as are photos not attached to a
-  /// dive (the dashboard ribbon links each tile to its dive, so an
-  /// unattached photo would render as a dead tile). Backs the dashboard
-  /// photo ribbon.
-  Future<List<domain.MediaItem>> getRecentPhotos({int limit = 12}) async {
+  /// Newest photos and videos across all dives, ordered by takenAt
+  /// descending. Signatures and documents are excluded: they are attachments
+  /// rather than things a diver browses by recency. Media not attached to a
+  /// dive is excluded too, because the dashboard ribbon links each tile to
+  /// its dive and an unattached item would render as a dead tile. Backs the
+  /// dashboard media ribbon.
+  Future<List<domain.MediaItem>> getRecentMedia({int limit = 12}) async {
     try {
+      final browsableTypes = [
+        _mediaTypeToString(domain.MediaType.photo),
+        _mediaTypeToString(domain.MediaType.video),
+      ];
       final query =
           _db.select(_db.media).join([
               leftOuterJoin(
@@ -151,9 +156,7 @@ class MediaRepository {
               ),
             ])
             ..where(
-              _db.media.fileType.equals(
-                    _mediaTypeToString(domain.MediaType.photo),
-                  ) &
+              _db.media.fileType.isIn(browsableTypes) &
                   _db.media.diveId.isNotNull(),
             )
             ..orderBy([OrderingTerm.desc(_db.media.takenAt)])

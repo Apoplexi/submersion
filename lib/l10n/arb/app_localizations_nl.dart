@@ -3216,7 +3216,7 @@ class AppLocalizationsNl extends AppLocalizations {
   String get settings_homeCards_card_milestones => 'Mijlpalen';
 
   @override
-  String get settings_homeCards_card_photoRibbon => 'Recente foto\'s';
+  String get settings_homeCards_card_photoRibbon => 'Recente media';
 
   @override
   String get settings_homeCards_card_onThisDay => 'Op deze dag';
@@ -3337,7 +3337,7 @@ class AppLocalizationsNl extends AppLocalizations {
   String get dashboard_urgent_title => 'Vereist aandacht';
 
   @override
-  String get dashboard_photos_title => 'Recente foto\'s';
+  String get dashboard_media_title => 'Recente media';
 
   @override
   String get dashboard_recentSites_title => 'Recente stekken';

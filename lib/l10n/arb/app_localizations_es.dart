@@ -3240,7 +3240,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get settings_homeCards_card_milestones => 'Hitos';
 
   @override
-  String get settings_homeCards_card_photoRibbon => 'Fotos recientes';
+  String get settings_homeCards_card_photoRibbon => 'Medios recientes';
 
   @override
   String get settings_homeCards_card_onThisDay => 'Tal día como hoy';
@@ -3365,7 +3365,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get dashboard_urgent_title => 'Requiere atención';
 
   @override
-  String get dashboard_photos_title => 'Fotos recientes';
+  String get dashboard_media_title => 'Medios recientes';
 
   @override
   String get dashboard_recentSites_title => 'Sitios recientes';

@@ -3249,7 +3249,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get settings_homeCards_card_milestones => 'Meilensteine';
 
   @override
-  String get settings_homeCards_card_photoRibbon => 'Neueste Fotos';
+  String get settings_homeCards_card_photoRibbon => 'Aktuelle Medien';
 
   @override
   String get settings_homeCards_card_onThisDay => 'An diesem Tag';
@@ -3371,7 +3371,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get dashboard_urgent_title => 'Braucht Aufmerksamkeit';
 
   @override
-  String get dashboard_photos_title => 'Aktuelle Fotos';
+  String get dashboard_media_title => 'Aktuelle Medien';
 
   @override
   String get dashboard_recentSites_title => 'Aktuelle Tauchplätze';

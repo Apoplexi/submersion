@@ -3227,7 +3227,7 @@ class AppLocalizationsHu extends AppLocalizations {
   String get settings_homeCards_card_milestones => 'Mérföldkövek';
 
   @override
-  String get settings_homeCards_card_photoRibbon => 'Legutóbbi fotók';
+  String get settings_homeCards_card_photoRibbon => 'Legutóbbi médiaelemek';
 
   @override
   String get settings_homeCards_card_onThisDay => 'Ezen a napon';
@@ -3349,7 +3349,7 @@ class AppLocalizationsHu extends AppLocalizations {
   String get dashboard_urgent_title => 'Figyelmet igényel';
 
   @override
-  String get dashboard_photos_title => 'Legutóbbi fotók';
+  String get dashboard_media_title => 'Legutóbbi médiaelemek';
 
   @override
   String get dashboard_recentSites_title => 'Legutóbbi helyszínek';

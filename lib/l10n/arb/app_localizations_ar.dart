@@ -3175,7 +3175,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get settings_homeCards_card_milestones => 'الإنجازات';
 
   @override
-  String get settings_homeCards_card_photoRibbon => 'الصور الأخيرة';
+  String get settings_homeCards_card_photoRibbon => 'أحدث الوسائط';
 
   @override
   String get settings_homeCards_card_onThisDay => 'في مثل هذا اليوم';
@@ -3295,7 +3295,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get dashboard_urgent_title => 'يتطلب الانتباه';
 
   @override
-  String get dashboard_photos_title => 'أحدث الصور';
+  String get dashboard_media_title => 'أحدث الوسائط';
 
   @override
   String get dashboard_recentSites_title => 'المواقع الأخيرة';

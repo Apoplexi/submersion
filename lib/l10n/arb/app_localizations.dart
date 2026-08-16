@@ -5516,7 +5516,7 @@ abstract class AppLocalizations {
   /// No description provided for @settings_homeCards_card_photoRibbon.
   ///
   /// In en, this message translates to:
-  /// **'Recent photos'**
+  /// **'Recent media'**
   String get settings_homeCards_card_photoRibbon;
 
   /// No description provided for @settings_homeCards_card_onThisDay.
@@ -5711,11 +5711,11 @@ abstract class AppLocalizations {
   /// **'Needs attention'**
   String get dashboard_urgent_title;
 
-  /// No description provided for @dashboard_photos_title.
+  /// No description provided for @dashboard_media_title.
   ///
   /// In en, this message translates to:
-  /// **'Recent photos'**
-  String get dashboard_photos_title;
+  /// **'Recent media'**
+  String get dashboard_media_title;
 
   /// No description provided for @dashboard_recentSites_title.
   ///
