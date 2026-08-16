@@ -845,6 +845,23 @@
   "preDive_sessions_statusAborted": "Megszakítva",
   "preDive_sessions_statusInProgress": "Folyamatban",
   "preDive_sessions_linkedDive": "Kapcsolt merülés",
+  "preDive_link_linkToDive": "Merüléshez kapcsolás",
+  "preDive_link_unlinkDive": "Merülés leválasztása",
+  "preDive_link_linkChecklist": "Ellenőrzőlista kapcsolása",
+  "preDive_link_unlinkChecklist": "Ellenőrzőlista leválasztása",
+  "preDive_link_searchDives": "Merülések keresése",
+  "preDive_link_noDives": "Nincs kapcsolható merülés",
+  "preDive_link_noDivesMatch": "Nincs a következőre illeszkedő merülés: „{query}”",
+  "@preDive_link_noDivesMatch": {
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "preDive_link_noUnlinkedSessions": "Nincs kapcsolatlan ellenőrzőlista-futtatás",
+  "preDive_link_linked": "Ellenőrzőlista ehhez a merüléshez kapcsolva",
+  "preDive_link_unlinked": "Ellenőrzőlista leválasztva erről a merülésről",
   "preDive_sessions_delete": "Törlés",
   "preDive_sessions_deleteConfirm": "Törli ezt az ellenőrzőlista-bejegyzést?",
   "preDive_sessions_filter": "Szűrés",

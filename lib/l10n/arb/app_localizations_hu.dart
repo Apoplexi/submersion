@@ -2412,6 +2412,41 @@ class AppLocalizationsHu extends AppLocalizations {
   String get preDive_sessions_linkedDive => 'Kapcsolt merülés';
 
   @override
+  String get preDive_link_linkToDive => 'Merüléshez kapcsolás';
+
+  @override
+  String get preDive_link_unlinkDive => 'Merülés leválasztása';
+
+  @override
+  String get preDive_link_linkChecklist => 'Ellenőrzőlista kapcsolása';
+
+  @override
+  String get preDive_link_unlinkChecklist => 'Ellenőrzőlista leválasztása';
+
+  @override
+  String get preDive_link_searchDives => 'Merülések keresése';
+
+  @override
+  String get preDive_link_noDives => 'Nincs kapcsolható merülés';
+
+  @override
+  String preDive_link_noDivesMatch(String query) {
+    return 'Nincs a következőre illeszkedő merülés: „$query”';
+  }
+
+  @override
+  String get preDive_link_noUnlinkedSessions =>
+      'Nincs kapcsolatlan ellenőrzőlista-futtatás';
+
+  @override
+  String get preDive_link_linked =>
+      'Ellenőrzőlista ehhez a merüléshez kapcsolva';
+
+  @override
+  String get preDive_link_unlinked =>
+      'Ellenőrzőlista leválasztva erről a merülésről';
+
+  @override
   String get preDive_sessions_delete => 'Törlés';
 
   @override

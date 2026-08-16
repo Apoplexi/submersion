@@ -2424,6 +2424,41 @@ class AppLocalizationsPt extends AppLocalizations {
   String get preDive_sessions_linkedDive => 'Mergulho vinculado';
 
   @override
+  String get preDive_link_linkToDive => 'Vincular a mergulho';
+
+  @override
+  String get preDive_link_unlinkDive => 'Desvincular mergulho';
+
+  @override
+  String get preDive_link_linkChecklist => 'Vincular lista de verificação';
+
+  @override
+  String get preDive_link_unlinkChecklist => 'Desvincular lista de verificação';
+
+  @override
+  String get preDive_link_searchDives => 'Procurar mergulhos';
+
+  @override
+  String get preDive_link_noDives => 'Não há mergulhos para vincular';
+
+  @override
+  String preDive_link_noDivesMatch(String query) {
+    return 'Nenhum mergulho corresponde a \"$query\"';
+  }
+
+  @override
+  String get preDive_link_noUnlinkedSessions =>
+      'Não há listas de verificação sem vínculo';
+
+  @override
+  String get preDive_link_linked =>
+      'Lista de verificação vinculada a este mergulho';
+
+  @override
+  String get preDive_link_unlinked =>
+      'Lista de verificação desvinculada deste mergulho';
+
+  @override
   String get preDive_sessions_delete => 'Excluir';
 
   @override

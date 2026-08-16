@@ -2379,6 +2379,38 @@ class AppLocalizationsEn extends AppLocalizations {
   String get preDive_sessions_linkedDive => 'Linked dive';
 
   @override
+  String get preDive_link_linkToDive => 'Link to dive';
+
+  @override
+  String get preDive_link_unlinkDive => 'Unlink dive';
+
+  @override
+  String get preDive_link_linkChecklist => 'Link pre-dive checklist';
+
+  @override
+  String get preDive_link_unlinkChecklist => 'Unlink pre-dive checklist';
+
+  @override
+  String get preDive_link_searchDives => 'Search dives';
+
+  @override
+  String get preDive_link_noDives => 'No dives to link to';
+
+  @override
+  String preDive_link_noDivesMatch(String query) {
+    return 'No dives match \"$query\"';
+  }
+
+  @override
+  String get preDive_link_noUnlinkedSessions => 'No unlinked checklist runs';
+
+  @override
+  String get preDive_link_linked => 'Checklist linked to this dive';
+
+  @override
+  String get preDive_link_unlinked => 'Checklist unlinked from this dive';
+
+  @override
   String get preDive_sessions_delete => 'Delete';
 
   @override

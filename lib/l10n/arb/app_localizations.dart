@@ -4097,6 +4097,66 @@ abstract class AppLocalizations {
   /// **'Linked dive'**
   String get preDive_sessions_linkedDive;
 
+  /// No description provided for @preDive_link_linkToDive.
+  ///
+  /// In en, this message translates to:
+  /// **'Link to dive'**
+  String get preDive_link_linkToDive;
+
+  /// No description provided for @preDive_link_unlinkDive.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlink dive'**
+  String get preDive_link_unlinkDive;
+
+  /// No description provided for @preDive_link_linkChecklist.
+  ///
+  /// In en, this message translates to:
+  /// **'Link pre-dive checklist'**
+  String get preDive_link_linkChecklist;
+
+  /// No description provided for @preDive_link_unlinkChecklist.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlink pre-dive checklist'**
+  String get preDive_link_unlinkChecklist;
+
+  /// No description provided for @preDive_link_searchDives.
+  ///
+  /// In en, this message translates to:
+  /// **'Search dives'**
+  String get preDive_link_searchDives;
+
+  /// No description provided for @preDive_link_noDives.
+  ///
+  /// In en, this message translates to:
+  /// **'No dives to link to'**
+  String get preDive_link_noDives;
+
+  /// No description provided for @preDive_link_noDivesMatch.
+  ///
+  /// In en, this message translates to:
+  /// **'No dives match \"{query}\"'**
+  String preDive_link_noDivesMatch(String query);
+
+  /// No description provided for @preDive_link_noUnlinkedSessions.
+  ///
+  /// In en, this message translates to:
+  /// **'No unlinked checklist runs'**
+  String get preDive_link_noUnlinkedSessions;
+
+  /// No description provided for @preDive_link_linked.
+  ///
+  /// In en, this message translates to:
+  /// **'Checklist linked to this dive'**
+  String get preDive_link_linked;
+
+  /// No description provided for @preDive_link_unlinked.
+  ///
+  /// In en, this message translates to:
+  /// **'Checklist unlinked from this dive'**
+  String get preDive_link_unlinked;
+
   /// No description provided for @preDive_sessions_delete.
   ///
   /// In en, this message translates to:

@@ -166,6 +166,21 @@ void main() {
     expect(await repository.getUnlinkedSessions(), hasLength(1));
   });
 
+  test('getLinkedDiveIds reports which dives are already spoken for', () async {
+    // The manual link picker (#1066) must not offer a dive that already has a
+    // run, the same one-to-one rule ChecklistDiveLinker enforces.
+    await insertDive('dive-1');
+    await insertDive('dive-2');
+    expect(await repository.getLinkedDiveIds(), isEmpty);
+
+    final session = await start();
+    await repository.linkToDive(session.id, 'dive-1');
+    expect(await repository.getLinkedDiveIds(), {'dive-1'});
+
+    await repository.unlinkFromDive(session.id);
+    expect(await repository.getLinkedDiveIds(), isEmpty);
+  });
+
   test('getActiveSession returns latest inProgress only', () async {
     final s1 = await start();
     await repository.completeSession(s1.id);

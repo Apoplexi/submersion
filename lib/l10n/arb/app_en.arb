@@ -1527,6 +1527,23 @@
   "preDive_sessions_statusAborted": "Aborted",
   "preDive_sessions_statusInProgress": "In progress",
   "preDive_sessions_linkedDive": "Linked dive",
+  "preDive_link_linkToDive": "Link to dive",
+  "preDive_link_unlinkDive": "Unlink dive",
+  "preDive_link_linkChecklist": "Link pre-dive checklist",
+  "preDive_link_unlinkChecklist": "Unlink pre-dive checklist",
+  "preDive_link_searchDives": "Search dives",
+  "preDive_link_noDives": "No dives to link to",
+  "preDive_link_noDivesMatch": "No dives match \"{query}\"",
+  "@preDive_link_noDivesMatch": {
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "preDive_link_noUnlinkedSessions": "No unlinked checklist runs",
+  "preDive_link_linked": "Checklist linked to this dive",
+  "preDive_link_unlinked": "Checklist unlinked from this dive",
   "preDive_sessions_delete": "Delete",
   "preDive_sessions_deleteConfirm": "Delete this checklist record?",
   "preDive_sessions_filter": "Filter",

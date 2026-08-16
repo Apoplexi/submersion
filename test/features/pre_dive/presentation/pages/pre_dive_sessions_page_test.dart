@@ -5,6 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:submersion/core/constants/units.dart';
 import 'package:submersion/core/services/export/excel/pre_dive_excel_export_service.dart';
+import 'package:submersion/features/dive_log/domain/entities/dive_summary.dart';
 import 'package:submersion/features/pre_dive/data/repositories/pre_dive_session_repository.dart';
 import 'package:submersion/features/pre_dive/domain/entities/pre_dive_session.dart';
 import 'package:submersion/features/pre_dive/domain/services/checklist_session_engine.dart';
@@ -43,9 +44,12 @@ class _RecordingExcelExporter extends PreDiveExcelExportService {
 }
 
 /// Serves the bulk item fetch without a database, and records which runs the
-/// page asked for.
+/// page asked for plus any dive-link writes it made.
 class _StubSessionRepository implements PreDiveSessionRepository {
   List<String>? requestedIds;
+
+  /// Every link write in order. A null diveId is an unlink.
+  final List<({String sessionId, String? diveId})> linkWrites = [];
 
   @override
   Future<Map<String, List<PreDiveSessionItem>>> getItemsForSessions(
@@ -54,6 +58,24 @@ class _StubSessionRepository implements PreDiveSessionRepository {
     requestedIds = sessionIds;
     return {for (final id in sessionIds) id: const []};
   }
+
+  /// No writes reach this fake from outside the test, so the tick the link
+  /// providers subscribe to never has anything to report.
+  @override
+  Stream<void> watchSessionsChanges() => const Stream.empty();
+
+  @override
+  Future<Set<String>> getLinkedDiveIds() async => {
+    for (final write in linkWrites) ?write.diveId,
+  };
+
+  @override
+  Future<void> linkToDive(String sessionId, String diveId) async =>
+      linkWrites.add((sessionId: sessionId, diveId: diveId));
+
+  @override
+  Future<void> unlinkFromDive(String sessionId) async =>
+      linkWrites.add((sessionId: sessionId, diveId: null));
 
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
@@ -665,6 +687,115 @@ void main() {
 
     // Dialog dismissed; no repository call made.
     expect(find.text('Delete this checklist record?'), findsNothing);
+  });
+
+  group('manual dive linking (#1066)', () {
+    DiveSummary diveSummary(String id, {int? number, String? site}) {
+      final at = DateTime(2026, 8, 14, 9, 30);
+      return DiveSummary(
+        id: id,
+        diveNumber: number,
+        dateTime: at,
+        siteName: site,
+        sortTimestamp: at.millisecondsSinceEpoch,
+      );
+    }
+
+    /// Pumps one completed run and returns the repository stub so the test can
+    /// assert on the link write the menu actually made.
+    Future<_StubSessionRepository> pumpOneRun(
+      WidgetTester tester, {
+      String? diveId,
+      List<DiveSummary> candidates = const [],
+    }) async {
+      final repo = _StubSessionRepository();
+      await pumpPage(
+        tester,
+        sessions: [
+          session(
+            's1',
+            name: 'CCR Build',
+            status: PreDiveSessionStatus.completed,
+            diveId: diveId,
+          ),
+        ],
+        items: {
+          's1': [item('s1', 0, PreDiveItemState.done)],
+        },
+        extraOverrides: [
+          preDiveSessionRepositoryProvider.overrideWithValue(repo),
+          preDiveLinkCandidateDivesProvider.overrideWith(
+            (ref) async => candidates,
+          ),
+        ],
+      );
+      return repo;
+    }
+
+    testWidgets('an unlinked run offers Link to dive', (tester) async {
+      await pumpOneRun(tester);
+
+      await tester.tap(find.byType(PopupMenuButton<String>));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Link to dive'), findsOneWidget);
+      expect(find.text('Unlink dive'), findsNothing);
+    });
+
+    testWidgets('a run already linked offers Unlink dive instead', (
+      tester,
+    ) async {
+      await pumpOneRun(tester, diveId: 'dive-42');
+
+      await tester.tap(find.byType(PopupMenuButton<String>));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Unlink dive'), findsOneWidget);
+      expect(find.text('Link to dive'), findsNothing);
+    });
+
+    testWidgets('picking a dive writes the link', (tester) async {
+      final repo = await pumpOneRun(
+        tester,
+        candidates: [diveSummary('dive-42', number: 42, site: 'Blue Hole')],
+      );
+
+      await tester.tap(find.byType(PopupMenuButton<String>));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Link to dive'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.textContaining('Blue Hole'));
+      await tester.pumpAndSettle();
+
+      expect(repo.linkWrites, [(sessionId: 's1', diveId: 'dive-42')]);
+    });
+
+    testWidgets('cancelling the picker writes nothing', (tester) async {
+      final repo = await pumpOneRun(
+        tester,
+        candidates: [diveSummary('dive-42', number: 42, site: 'Blue Hole')],
+      );
+
+      await tester.tap(find.byType(PopupMenuButton<String>));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Link to dive'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Cancel'));
+      await tester.pumpAndSettle();
+
+      expect(repo.linkWrites, isEmpty);
+    });
+
+    testWidgets('Unlink dive clears the link', (tester) async {
+      final repo = await pumpOneRun(tester, diveId: 'dive-42');
+
+      await tester.tap(find.byType(PopupMenuButton<String>));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Unlink dive'));
+      await tester.pumpAndSettle();
+
+      expect(repo.linkWrites, [(sessionId: 's1', diveId: null)]);
+    });
   });
 
   testWidgets('tapping Resume navigates to the session runner route', (

@@ -2422,6 +2422,41 @@ class AppLocalizationsIt extends AppLocalizations {
   String get preDive_sessions_linkedDive => 'Immersione collegata';
 
   @override
+  String get preDive_link_linkToDive => 'Collega a immersione';
+
+  @override
+  String get preDive_link_unlinkDive => 'Scollega immersione';
+
+  @override
+  String get preDive_link_linkChecklist => 'Collega checklist pre-immersione';
+
+  @override
+  String get preDive_link_unlinkChecklist =>
+      'Scollega checklist pre-immersione';
+
+  @override
+  String get preDive_link_searchDives => 'Cerca immersioni';
+
+  @override
+  String get preDive_link_noDives => 'Nessuna immersione da collegare';
+
+  @override
+  String preDive_link_noDivesMatch(String query) {
+    return 'Nessuna immersione corrisponde a \"$query\"';
+  }
+
+  @override
+  String get preDive_link_noUnlinkedSessions =>
+      'Nessuna checklist non collegata';
+
+  @override
+  String get preDive_link_linked => 'Checklist collegata a questa immersione';
+
+  @override
+  String get preDive_link_unlinked =>
+      'Checklist scollegata da questa immersione';
+
+  @override
   String get preDive_sessions_delete => 'Elimina';
 
   @override

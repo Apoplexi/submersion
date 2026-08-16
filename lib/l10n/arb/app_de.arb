@@ -845,6 +845,23 @@
   "preDive_sessions_statusAborted": "Abgebrochen",
   "preDive_sessions_statusInProgress": "In Bearbeitung",
   "preDive_sessions_linkedDive": "Verknüpfter Tauchgang",
+  "preDive_link_linkToDive": "Mit Tauchgang verknüpfen",
+  "preDive_link_unlinkDive": "Tauchgang trennen",
+  "preDive_link_linkChecklist": "Checkliste verknüpfen",
+  "preDive_link_unlinkChecklist": "Checkliste trennen",
+  "preDive_link_searchDives": "Tauchgänge suchen",
+  "preDive_link_noDives": "Keine Tauchgänge zum Verknüpfen",
+  "preDive_link_noDivesMatch": "Keine Tauchgänge für „{query}“",
+  "@preDive_link_noDivesMatch": {
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "preDive_link_noUnlinkedSessions": "Keine unverknüpften Checklisten-Durchläufe",
+  "preDive_link_linked": "Checkliste mit diesem Tauchgang verknüpft",
+  "preDive_link_unlinked": "Checkliste von diesem Tauchgang getrennt",
   "preDive_sessions_delete": "Löschen",
   "preDive_sessions_deleteConfirm": "Diesen Checklisten-Eintrag löschen?",
   "preDive_sessions_filter": "Filtern",

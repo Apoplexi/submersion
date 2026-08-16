@@ -845,6 +845,23 @@
   "preDive_sessions_statusAborted": "ملغاة",
   "preDive_sessions_statusInProgress": "قيد التنفيذ",
   "preDive_sessions_linkedDive": "الغطسة المرتبطة",
+  "preDive_link_linkToDive": "الربط بغطسة",
+  "preDive_link_unlinkDive": "إلغاء ربط الغطسة",
+  "preDive_link_linkChecklist": "ربط قائمة تحقق ما قبل الغوص",
+  "preDive_link_unlinkChecklist": "إلغاء ربط قائمة تحقق ما قبل الغوص",
+  "preDive_link_searchDives": "البحث في الغطسات",
+  "preDive_link_noDives": "لا توجد غطسات للربط",
+  "preDive_link_noDivesMatch": "لا توجد غطسات تطابق \"{query}\"",
+  "@preDive_link_noDivesMatch": {
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "preDive_link_noUnlinkedSessions": "لا توجد قوائم تحقق غير مرتبطة",
+  "preDive_link_linked": "تم ربط قائمة التحقق بهذه الغطسة",
+  "preDive_link_unlinked": "تم إلغاء ربط قائمة التحقق بهذه الغطسة",
   "preDive_sessions_delete": "حذف",
   "preDive_sessions_deleteConfirm": "هل تريد حذف سجل قائمة التحقق هذا؟",
   "preDive_sessions_filter": "تصفية",

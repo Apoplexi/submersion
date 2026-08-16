@@ -2407,6 +2407,38 @@ class AppLocalizationsNl extends AppLocalizations {
   String get preDive_sessions_linkedDive => 'Gekoppelde duik';
 
   @override
+  String get preDive_link_linkToDive => 'Koppelen aan duik';
+
+  @override
+  String get preDive_link_unlinkDive => 'Duik ontkoppelen';
+
+  @override
+  String get preDive_link_linkChecklist => 'Pre-dive checklist koppelen';
+
+  @override
+  String get preDive_link_unlinkChecklist => 'Pre-dive checklist ontkoppelen';
+
+  @override
+  String get preDive_link_searchDives => 'Duiken zoeken';
+
+  @override
+  String get preDive_link_noDives => 'Geen duiken om te koppelen';
+
+  @override
+  String preDive_link_noDivesMatch(String query) {
+    return 'Geen duiken komen overeen met \"$query\"';
+  }
+
+  @override
+  String get preDive_link_noUnlinkedSessions => 'Geen ongekoppelde checklists';
+
+  @override
+  String get preDive_link_linked => 'Checklist gekoppeld aan deze duik';
+
+  @override
+  String get preDive_link_unlinked => 'Checklist ontkoppeld van deze duik';
+
+  @override
   String get preDive_sessions_delete => 'Verwijderen';
 
   @override

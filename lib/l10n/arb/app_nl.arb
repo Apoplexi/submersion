@@ -845,6 +845,23 @@
   "preDive_sessions_statusAborted": "Afgebroken",
   "preDive_sessions_statusInProgress": "Bezig",
   "preDive_sessions_linkedDive": "Gekoppelde duik",
+  "preDive_link_linkToDive": "Koppelen aan duik",
+  "preDive_link_unlinkDive": "Duik ontkoppelen",
+  "preDive_link_linkChecklist": "Pre-dive checklist koppelen",
+  "preDive_link_unlinkChecklist": "Pre-dive checklist ontkoppelen",
+  "preDive_link_searchDives": "Duiken zoeken",
+  "preDive_link_noDives": "Geen duiken om te koppelen",
+  "preDive_link_noDivesMatch": "Geen duiken komen overeen met \"{query}\"",
+  "@preDive_link_noDivesMatch": {
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "preDive_link_noUnlinkedSessions": "Geen ongekoppelde checklists",
+  "preDive_link_linked": "Checklist gekoppeld aan deze duik",
+  "preDive_link_unlinked": "Checklist ontkoppeld van deze duik",
   "preDive_sessions_delete": "Verwijderen",
   "preDive_sessions_deleteConfirm": "Deze checklistregistratie verwijderen?",
   "preDive_sessions_filter": "Filteren",
