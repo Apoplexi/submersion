@@ -2429,6 +2429,38 @@ class AppLocalizationsEs extends AppLocalizations {
   String get preDive_sessions_linkedDive => 'Inmersión vinculada';
 
   @override
+  String get preDive_link_linkToDive => 'Vincular a inmersión';
+
+  @override
+  String get preDive_link_unlinkDive => 'Desvincular inmersión';
+
+  @override
+  String get preDive_link_linkChecklist => 'Vincular lista previa';
+
+  @override
+  String get preDive_link_unlinkChecklist => 'Desvincular lista previa';
+
+  @override
+  String get preDive_link_searchDives => 'Buscar inmersiones';
+
+  @override
+  String get preDive_link_noDives => 'No hay inmersiones para vincular';
+
+  @override
+  String preDive_link_noDivesMatch(String query) {
+    return 'Ninguna inmersión coincide con «$query»';
+  }
+
+  @override
+  String get preDive_link_noUnlinkedSessions => 'No hay listas sin vincular';
+
+  @override
+  String get preDive_link_linked => 'Lista vinculada a esta inmersión';
+
+  @override
+  String get preDive_link_unlinked => 'Lista desvinculada de esta inmersión';
+
+  @override
   String get preDive_sessions_delete => 'Eliminar';
 
   @override
@@ -9559,6 +9591,9 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get enum_equipmentType_camera => 'Cámara';
+
+  @override
+  String get enum_equipmentType_dpv => 'DPV';
 
   @override
   String get enum_equipmentType_computer => 'Ordenador de buceo';
@@ -22485,6 +22520,24 @@ class AppLocalizationsEs extends AppLocalizations {
   String get attrLabel_o2_cylinder_l => 'Botella de O2';
 
   @override
+  String get attrLabel_dpv_style => 'Estilo';
+
+  @override
+  String get attrLabel_burn_time_h => 'Autonomía (h)';
+
+  @override
+  String get attrLabel_battery_type => 'Batería';
+
+  @override
+  String get attrLabel_battery_capacity_wh => 'Capacidad de batería (Wh)';
+
+  @override
+  String get attrLabel_motor_type => 'Motor';
+
+  @override
+  String get attrLabel_speed_mps => 'Velocidad máxima';
+
+  @override
   String get attrChoice_unit_type_eccr => 'CCR electrónico (eCCR)';
 
   @override
@@ -22696,6 +22749,30 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get attrChoice_sole_type_soft => 'Suela blanda';
+
+  @override
+  String get attrChoice_dpv_style_tow_behind => 'De remolque';
+
+  @override
+  String get attrChoice_dpv_style_ride_on => 'De montar';
+
+  @override
+  String get attrChoice_dpv_style_handheld => 'De mano';
+
+  @override
+  String get attrChoice_battery_type_lithium_ion => 'Iones de litio';
+
+  @override
+  String get attrChoice_battery_type_nimh => 'NiMH';
+
+  @override
+  String get attrChoice_battery_type_lead_acid => 'Plomo-ácido';
+
+  @override
+  String get attrChoice_motor_type_brushless => 'Sin escobillas';
+
+  @override
+  String get attrChoice_motor_type_brushed => 'Con escobillas';
 
   @override
   String get equipment_edit_customFieldsTitle => 'Campos personalizados';

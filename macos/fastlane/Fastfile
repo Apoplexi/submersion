@@ -147,39 +147,115 @@ platform :mac do
     DUPLICATE_BUILD_MARKERS.any? { |marker| text.include?(marker) }
   end
 
-  # The already-submitted state of <app_version> on <platform>, or nil when the
-  # version is still ours to submit OR the state cannot be determined.
+  # Whether to skip App Review submission, given facts already read from App
+  # Store Connect. Pure, so scripts/release/fastlane_submit_guard_test.rb can
+  # drive every branch without a network call.
   #
-  # Every uncertain path returns nil on purpose, so the caller falls through to
-  # attempting the submission, which is the behavior that existed before this
-  # check. The guard can therefore only ever skip work that would have failed;
-  # it can never turn a working submission into a skipped one.
+  # Returns a reason string to skip, or nil to go ahead.
   #
-  # Limitation worth knowing: get_edit_app_store_version returns versions in
-  # editable states, which includes WAITING_FOR_REVIEW (the state that broke
-  # promotion run 31859359618). Should Apple stop returning an IN_REVIEW
-  # version there, this quietly degrades to the old attempt-and-fail behavior
-  # rather than misreporting.
+  # The first check is version-AGNOSTIC, and that is the whole point. Promotion
+  # run 31903095751 submitted 1.7.4 while 1.7.3 was still with Apple. The old
+  # guard asked only whether THIS version was already submitted, so a different
+  # version in review did not stop it. deliver then called ensure_version!,
+  # which renames the editable version in place when the version string
+  # differs, and WAITING_FOR_REVIEW counts as editable: iOS 1.7.3 was silently
+  # renamed to 1.7.4 with build 6027 still attached, and the follow-up
+  # select_build was refused. The result was a submission labelled 1.7.4
+  # carrying 1.7.3's binary. macOS escaped with a clean error only because
+  # Apple had moved its copy to IN_REVIEW, which is not editable, so deliver
+  # tried to create a version instead. The loud failure was luck.
+  #
+  # Note what is deliberately NOT blocking: an editable version carrying an
+  # older version string. Renaming that forward is legitimate, and is how the
+  # recovery from that incident worked.
+  def submission_skip_reason(app_version:, review_in_progress:,
+                             review_version: nil, edit_version: nil,
+                             edit_state: nil)
+    if review_in_progress
+      held_by = review_version ? "#{review_version} is" : "another version is"
+      return "#{held_by} already in review; skipping submission of " \
+             "#{app_version}. App Store Connect allows one submission at a " \
+             "time, and submitting now would rename the version under review " \
+             "rather than create a new one. Wait for it to clear, or remove it " \
+             "from review in App Store Connect."
+    end
+
+    if edit_version == app_version && ALREADY_SUBMITTED_STATES.include?(edit_state)
+      return "#{app_version} is already #{edit_state}; skipping submission. " \
+             "Remove it from review in App Store Connect if you need to resubmit."
+    end
+
+    nil
+  end
+
+  # The reason to skip submitting <app_version> on <platform>, or nil to go
+  # ahead.
+  #
+  # A missing app record returns nil and lets the submission attempt produce
+  # its own error rather than inventing one. A failure of the App Store Connect
+  # lookups themselves is deliberately NOT swallowed: after promotion run
+  # 31903095751, stopping is better than proceeding without knowing whether a
+  # review is already under way, because proceeding blind is what renamed an
+  # in-review version and left it carrying the wrong build.
   #
   # No explicit spaceship auth: both branches of load_api_key go through the
   # app_store_connect_api_key action, whose set_spaceship_token defaults to
   # true, so Spaceship::ConnectAPI.token is already set by the time a lane
   # calls this.
-  def already_submitted_state(app_version, platform)
+  def submission_blocker(app_version, platform)
     app = Spaceship::ConnectAPI::App.find(
       CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier),
     )
     return nil if app.nil?
 
-    version = app.get_edit_app_store_version(
-      platform: Spaceship::ConnectAPI::Platform.map(platform),
-    )
-    return nil if version.nil? || version.version_string != app_version
+    mapped = Spaceship::ConnectAPI::Platform.map(platform)
 
-    # app_store_state is deprecated as of App Store Connect API 3.3 in favor of
-    # app_version_state; read the new field first and fall back.
-    state = version.app_version_state || version.app_store_state
-    ALREADY_SUBMITTED_STATES.include?(state) ? state : nil
+    # Apple's own record of "a review is under way for this platform", covering
+    # WAITING_FOR_REVIEW, IN_REVIEW and UNRESOLVED_ISSUES. Preferred over
+    # reading version states ourselves because it cannot be fooled by a version
+    # string, and because it never matches the live version, which every
+    # published app always has.
+    submission = app.get_in_progress_review_submission(
+      platform: mapped,
+      includes: "appStoreVersionForReview",
+    )
+
+    # Short-circuit. An in-progress submission is already a block, so the
+    # editable version cannot change the answer. Skipping the second lookup is
+    # partly about latency, but mostly about failure surface: this method
+    # deliberately lets App Store Connect errors propagate, so a call made
+    # after the answer is known could fail the lane at the moment we already
+    # knew the safe outcome. Blocking beats erroring.
+    unless submission.nil?
+      return submission_skip_reason(
+        app_version: app_version,
+        review_in_progress: true,
+        review_version: review_submission_version(submission),
+      )
+    end
+
+    version = app.get_edit_app_store_version(platform: mapped)
+
+    submission_skip_reason(
+      app_version: app_version,
+      review_in_progress: false,
+      edit_version: version&.version_string,
+      # app_store_state is deprecated as of App Store Connect API 3.3 in favor
+      # of app_version_state; read the new field first and fall back.
+      edit_state: version && (version.app_version_state || version.app_store_state),
+    )
+  end
+
+  # Best effort only: the version a review submission covers is used to make
+  # the skip message actionable, never to decide whether to skip. An unknown
+  # version must not weaken the block, so every failure path returns nil and
+  # leaves the caller blocking on the submission's mere existence.
+  def review_submission_version(submission)
+    return nil if submission.nil?
+
+    submission.app_store_version_for_review&.version_string
+  rescue StandardError
+    nil
   end
 
   def load_api_key
@@ -576,13 +652,11 @@ platform :mac do
     app_version = options[:app_version] || UI.user_error!("app_version is required")
     build_number = options[:build_number] || UI.user_error!("build_number is required")
 
-    # Makes the lane a no-op once Apple has the version, so a re-dispatched
-    # promotion does not fail on the leg that already succeeded.
-    if (state = already_submitted_state(app_version, "osx"))
-      UI.important(
-        "#{app_version} is already #{state} for osx; skipping submission. " \
-        "Remove it from review in App Store Connect if you need to resubmit."
-      )
+    # Makes the lane a no-op once Apple has this version, or any other version,
+    # so a re-dispatched promotion does not fail on the leg that already
+    # succeeded and cannot rename a submission that is already under review.
+    if (reason = submission_blocker(app_version, "osx"))
+      UI.important("osx: #{reason}")
       next
     end
 

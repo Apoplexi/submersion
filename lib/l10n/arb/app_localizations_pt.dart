@@ -2424,6 +2424,41 @@ class AppLocalizationsPt extends AppLocalizations {
   String get preDive_sessions_linkedDive => 'Mergulho vinculado';
 
   @override
+  String get preDive_link_linkToDive => 'Vincular a mergulho';
+
+  @override
+  String get preDive_link_unlinkDive => 'Desvincular mergulho';
+
+  @override
+  String get preDive_link_linkChecklist => 'Vincular lista de verificação';
+
+  @override
+  String get preDive_link_unlinkChecklist => 'Desvincular lista de verificação';
+
+  @override
+  String get preDive_link_searchDives => 'Procurar mergulhos';
+
+  @override
+  String get preDive_link_noDives => 'Não há mergulhos para vincular';
+
+  @override
+  String preDive_link_noDivesMatch(String query) {
+    return 'Nenhum mergulho corresponde a \"$query\"';
+  }
+
+  @override
+  String get preDive_link_noUnlinkedSessions =>
+      'Não há listas de verificação sem vínculo';
+
+  @override
+  String get preDive_link_linked =>
+      'Lista de verificação vinculada a este mergulho';
+
+  @override
+  String get preDive_link_unlinked =>
+      'Lista de verificação desvinculada deste mergulho';
+
+  @override
   String get preDive_sessions_delete => 'Excluir';
 
   @override
@@ -9556,6 +9591,9 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get enum_equipmentType_camera => 'Camera';
+
+  @override
+  String get enum_equipmentType_dpv => 'DPV';
 
   @override
   String get enum_equipmentType_computer => 'Computador de Mergulho';
@@ -22468,6 +22506,24 @@ class AppLocalizationsPt extends AppLocalizations {
   String get attrLabel_o2_cylinder_l => 'Cilindro de O2';
 
   @override
+  String get attrLabel_dpv_style => 'Estilo';
+
+  @override
+  String get attrLabel_burn_time_h => 'Autonomia (h)';
+
+  @override
+  String get attrLabel_battery_type => 'Bateria';
+
+  @override
+  String get attrLabel_battery_capacity_wh => 'Capacidade da bateria (Wh)';
+
+  @override
+  String get attrLabel_motor_type => 'Motor';
+
+  @override
+  String get attrLabel_speed_mps => 'Velocidade máxima';
+
+  @override
   String get attrChoice_unit_type_eccr => 'CCR eletrónico (eCCR)';
 
   @override
@@ -22679,6 +22735,30 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get attrChoice_sole_type_soft => 'Sola macia';
+
+  @override
+  String get attrChoice_dpv_style_tow_behind => 'De reboque';
+
+  @override
+  String get attrChoice_dpv_style_ride_on => 'De montar';
+
+  @override
+  String get attrChoice_dpv_style_handheld => 'De mão';
+
+  @override
+  String get attrChoice_battery_type_lithium_ion => 'Iões de lítio';
+
+  @override
+  String get attrChoice_battery_type_nimh => 'NiMH';
+
+  @override
+  String get attrChoice_battery_type_lead_acid => 'Chumbo-ácido';
+
+  @override
+  String get attrChoice_motor_type_brushless => 'Sem escovas';
+
+  @override
+  String get attrChoice_motor_type_brushed => 'Com escovas';
 
   @override
   String get equipment_edit_customFieldsTitle => 'Campos personalizados';

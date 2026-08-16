@@ -22,6 +22,8 @@ import 'package:submersion/features/dive_3d/domain/spatial/seascape_appearance.d
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/tissue_color_schemes.dart';
 import 'package:submersion/features/divers/presentation/providers/diver_providers.dart';
+import 'package:submersion/features/pre_dive/domain/entities/pre_dive_session.dart';
+import 'package:submersion/features/pre_dive/presentation/providers/pre_dive_providers.dart';
 import 'package:submersion/core/utils/coordinates/coordinate_format.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/features/weather/presentation/providers/weather_providers.dart';
@@ -516,9 +518,14 @@ Dive createTestDiveWithBottomTime({
 }
 
 /// Common provider overrides for widget tests
+/// [linkedPreDiveSession] seeds the pre-dive checklist run the dive-detail
+/// overflow menu sees. Parameterized rather than stacked as a second override
+/// because Riverpod refuses to override the same family twice in one
+/// container.
 Future<List<Override>> getBaseOverrides({
   MockSettingsNotifier? settingsNotifier,
   http.Client? weatherHttpClient,
+  PreDiveSession? linkedPreDiveSession,
 }) async {
   SharedPreferences.setMockInitialValues({});
   final prefs = await SharedPreferences.getInstance();
@@ -537,6 +544,12 @@ Future<List<Override>> getBaseOverrides({
     // timer at teardown.
     diveOpenFindingsCountProvider.overrideWith(
       (ref, diveId) => Stream.value(0),
+    ),
+    // The dive-detail overflow menu asks whether a pre-dive checklist run is
+    // attached (#1066); without this the family reaches the real repository
+    // and a database that widget tests do not have.
+    preDiveSessionForDiveProvider.overrideWith(
+      (ref, diveId) async => linkedPreDiveSession,
     ),
     // Weather/elevation lookups must never hit the network in widget tests;
     // the default stub fails fast so altitude auto-fill resolves to null.

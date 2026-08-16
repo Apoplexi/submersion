@@ -2353,6 +2353,40 @@ class AppLocalizationsHe extends AppLocalizations {
   String get preDive_sessions_linkedDive => 'צלילה מקושרת';
 
   @override
+  String get preDive_link_linkToDive => 'קישור לצלילה';
+
+  @override
+  String get preDive_link_unlinkDive => 'בטל קישור צלילה';
+
+  @override
+  String get preDive_link_linkChecklist => 'קישור רשימת בדיקה לפני צלילה';
+
+  @override
+  String get preDive_link_unlinkChecklist =>
+      'ביטול קישור רשימת בדיקה לפני צלילה';
+
+  @override
+  String get preDive_link_searchDives => 'חיפוש צלילות';
+
+  @override
+  String get preDive_link_noDives => 'אין צלילות לקישור';
+
+  @override
+  String preDive_link_noDivesMatch(String query) {
+    return 'אין צלילות התואמות ל-\"$query\"';
+  }
+
+  @override
+  String get preDive_link_noUnlinkedSessions =>
+      'אין הרצות רשימת בדיקה ללא קישור';
+
+  @override
+  String get preDive_link_linked => 'רשימת הבדיקה קושרה לצלילה זו';
+
+  @override
+  String get preDive_link_unlinked => 'קישור רשימת הבדיקה לצלילה זו בוטל';
+
+  @override
   String get preDive_sessions_delete => 'מחיקה';
 
   @override
@@ -9329,6 +9363,9 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get enum_equipmentType_camera => 'מצלמה';
+
+  @override
+  String get enum_equipmentType_dpv => 'DPV';
 
   @override
   String get enum_equipmentType_computer => 'מחשב צלילה';
@@ -21905,6 +21942,24 @@ class AppLocalizationsHe extends AppLocalizations {
   String get attrLabel_o2_cylinder_l => 'בלון O2';
 
   @override
+  String get attrLabel_dpv_style => 'סגנון';
+
+  @override
+  String get attrLabel_burn_time_h => 'זמן פעולה (שעות)';
+
+  @override
+  String get attrLabel_battery_type => 'סוללה';
+
+  @override
+  String get attrLabel_battery_capacity_wh => 'קיבולת סוללה (Wh)';
+
+  @override
+  String get attrLabel_motor_type => 'מנוע';
+
+  @override
+  String get attrLabel_speed_mps => 'מהירות מרבית';
+
+  @override
   String get attrChoice_unit_type_eccr => 'CCR אלקטרוני (eCCR)';
 
   @override
@@ -22113,6 +22168,30 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get attrChoice_sole_type_soft => 'סוליה רכה';
+
+  @override
+  String get attrChoice_dpv_style_tow_behind => 'נגרר';
+
+  @override
+  String get attrChoice_dpv_style_ride_on => 'רכיבה';
+
+  @override
+  String get attrChoice_dpv_style_handheld => 'מוחזק ביד';
+
+  @override
+  String get attrChoice_battery_type_lithium_ion => 'ליתיום-יון';
+
+  @override
+  String get attrChoice_battery_type_nimh => 'NiMH';
+
+  @override
+  String get attrChoice_battery_type_lead_acid => 'עופרת-חומצה';
+
+  @override
+  String get attrChoice_motor_type_brushless => 'ללא מברשות';
+
+  @override
+  String get attrChoice_motor_type_brushed => 'עם מברשות';
 
   @override
   String get equipment_edit_customFieldsTitle => 'שדות מותאמים אישית';

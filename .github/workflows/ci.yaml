@@ -401,6 +401,13 @@ jobs:
       - name: Run fastlane beta changelog test
         run: ruby scripts/release/fastlane_beta_changelog_test.rb
 
+      - name: Run fastlane submit guard test
+        # Guards the App Review submission guard against the defect behind
+        # promotion run 31903095751: submitting while a DIFFERENT version was
+        # still in review, which renamed the in-review version instead of
+        # creating a new one and left it carrying the wrong build.
+        run: ruby scripts/release/fastlane_submit_guard_test.rb
+
       - name: Run pre-push hook test
         # Guards two hook bugs that both rejected pushes for reasons unrelated
         # to the change being pushed: running the checks against the main

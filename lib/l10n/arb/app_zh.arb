@@ -1,5 +1,6 @@
 {
   "universalImport_action_importFromGarmin": "从 Garmin 设备导入",
+  "enum_equipmentType_dpv": "DPV",
   "diveLog_tank_saveAsPreset": "另存为预设",
   "diveLog_tank_saveAsPreset_needSpecs": "请先输入容积和工作压力",
   "diveLog_tank_saveAsPreset_nameTitle": "保存气瓶预设",
@@ -938,6 +939,23 @@
   "preDive_sessions_statusAborted": "已中止",
   "preDive_sessions_statusInProgress": "进行中",
   "preDive_sessions_linkedDive": "关联潜水",
+  "preDive_link_linkToDive": "关联到潜水",
+  "preDive_link_unlinkDive": "取消关联潜水",
+  "preDive_link_linkChecklist": "关联潜前检查清单",
+  "preDive_link_unlinkChecklist": "取消关联潜前检查清单",
+  "preDive_link_searchDives": "搜索潜水",
+  "preDive_link_noDives": "没有可关联的潜水",
+  "preDive_link_noDivesMatch": "没有与“{query}”匹配的潜水",
+  "@preDive_link_noDivesMatch": {
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "preDive_link_noUnlinkedSessions": "没有未关联的检查清单记录",
+  "preDive_link_linked": "检查清单已关联到此潜水",
+  "preDive_link_unlinked": "已取消检查清单与此潜水的关联",
   "preDive_sessions_delete": "删除",
   "preDive_sessions_deleteConfirm": "要删除此检查清单记录吗？",
   "preDive_sessions_filter": "筛选",
@@ -6551,6 +6569,12 @@
   "attrLabel_o2_cell_count": "氧电池",
   "attrLabel_diluent_cylinder_l": "稀释气瓶",
   "attrLabel_o2_cylinder_l": "O2 气瓶",
+  "attrLabel_dpv_style": "款式",
+  "attrLabel_burn_time_h": "续航时间（小时）",
+  "attrLabel_battery_type": "电池",
+  "attrLabel_battery_capacity_wh": "电池容量（瓦时）",
+  "attrLabel_motor_type": "电机",
+  "attrLabel_speed_mps": "最高速度",
   "attrChoice_unit_type_eccr": "电子式 CCR (eCCR)",
   "attrChoice_unit_type_mccr": "手动式 CCR (mCCR)",
   "attrChoice_unit_type_hccr": "混合式 CCR (hCCR)",
@@ -6621,6 +6645,14 @@
   "attrChoice_glove_type_dry": "干式",
   "attrChoice_sole_type_hard": "硬底",
   "attrChoice_sole_type_soft": "软底",
+  "attrChoice_dpv_style_tow_behind": "拖曳式",
+  "attrChoice_dpv_style_ride_on": "骑乘式",
+  "attrChoice_dpv_style_handheld": "手持式",
+  "attrChoice_battery_type_lithium_ion": "锂离子",
+  "attrChoice_battery_type_nimh": "镍氢",
+  "attrChoice_battery_type_lead_acid": "铅酸",
+  "attrChoice_motor_type_brushless": "无刷",
+  "attrChoice_motor_type_brushed": "有刷",
   "equipment_edit_customFieldsTitle": "自定义字段",
   "equipment_edit_addCustomField": "添加自定义字段",
   "attr_flagYes": "是",

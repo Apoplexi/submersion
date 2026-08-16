@@ -94,6 +94,13 @@ class MacDiveValueMapper {
     if (s.contains('rebreather') || s.contains('ccr') || s.contains('scr')) {
       return EquipmentType.rebreather;
     }
+    // Before the light/camera family: a scooter is often logged by brand and
+    // model with "DPV" or "Scooter" as the only generic word in the label.
+    if (s.contains('dpv') ||
+        s.contains('scooter') ||
+        s.contains('propulsion')) {
+      return EquipmentType.dpv;
+    }
     if (s.contains('transmitter') || s.contains('ai ')) {
       return EquipmentType.transmitter;
     }
