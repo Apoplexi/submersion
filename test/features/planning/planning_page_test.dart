@@ -140,6 +140,96 @@ void main() {
     });
   });
 
+  // On desktop the calculators open beside the hub instead of covering it, so
+  // the tool list stays reachable. The dive planner is the exception: it has
+  // its own three-pane layout and still needs the whole window.
+  group('desktop split view', () {
+    Future<GoRouter> pumpWide(WidgetTester tester) async {
+      tester.view.physicalSize = const Size(1600, 1000);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.reset);
+
+      final router = GoRouter(
+        initialLocation: '/planning',
+        routes: [
+          GoRoute(
+            path: '/planning',
+            builder: (_, _) => const PlanningPage(),
+            routes: [
+              GoRoute(
+                path: 'dive-planner',
+                builder: (_, _) => const Text('dive planner page'),
+              ),
+            ],
+          ),
+        ],
+      );
+      addTearDown(router.dispose);
+
+      await tester.pumpWidget(
+        testAppRouter(
+          router: router,
+          locale: const Locale('en'),
+          overrides: [
+            settingsProvider.overrideWith((ref) => _TestSettingsNotifier()),
+            divePlanSummariesProvider.overrideWith(
+              (ref) async => <DivePlanSummary>[],
+            ),
+          ],
+        ),
+      );
+      await tester.pumpAndSettle();
+      return router;
+    }
+
+    testWidgets('shows the summary pane before a tool is chosen', (
+      tester,
+    ) async {
+      await pumpWide(tester);
+
+      expect(find.text('Select a tool to get started'), findsOneWidget);
+      expect(find.text('SAVED PLANS'), findsOneWidget);
+    });
+
+    testWidgets('a tool opens beside the list, not over it', (tester) async {
+      await pumpWide(tester);
+
+      await tester.tap(find.text('Deco Calculator'));
+      await tester.pumpAndSettle();
+
+      // The calculator is in the pane...
+      expect(find.text('Dive Parameters'), findsOneWidget);
+      // ...and the hub list is still there beside it.
+      expect(find.text('Surface Interval'), findsWidgets);
+      expect(find.text('Dive Planner'), findsWidgets);
+    });
+
+    testWidgets('the chosen tool rides in the URL', (tester) async {
+      final router = await pumpWide(tester);
+
+      await tester.tap(find.text('Deco Calculator'));
+      await tester.pumpAndSettle();
+
+      expect(
+        router.routerDelegate.currentConfiguration.uri.queryParameters['tool'],
+        'deco-calculator',
+      );
+    });
+
+    testWidgets('the dive planner still takes the whole window', (
+      tester,
+    ) async {
+      await pumpWide(tester);
+
+      await tester.tap(find.text('Dive Planner'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('dive planner page'), findsOneWidget);
+      // The hub is covered, not split.
+      expect(find.text('Deco Calculator'), findsNothing);
+    });
+  });
+
   test('deco calculator environment defaults to legacy standard water', () {
     final container = ProviderContainer(
       overrides: [

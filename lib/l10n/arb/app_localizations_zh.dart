@@ -12241,6 +12241,15 @@ class AppLocalizationsZh extends AppLocalizations {
   String get planning_section_tools => '工具';
 
   @override
+  String get planning_summary_prompt => '选择一个工具开始';
+
+  @override
+  String get planning_summary_savedPlans => '已保存的计划';
+
+  @override
+  String get planning_summary_noPlans => '尚无已保存的计划';
+
+  @override
   String get planning_sidebar_appBar_title => '计划';
 
   @override

@@ -12728,6 +12728,15 @@ class AppLocalizationsNl extends AppLocalizations {
   String get planning_section_tools => 'Gereedschappen';
 
   @override
+  String get planning_summary_prompt => 'Kies een hulpmiddel om te beginnen';
+
+  @override
+  String get planning_summary_savedPlans => 'Opgeslagen plannen';
+
+  @override
+  String get planning_summary_noPlans => 'Nog geen opgeslagen plannen';
+
+  @override
   String get planning_sidebar_appBar_title => 'Planning';
 
   @override

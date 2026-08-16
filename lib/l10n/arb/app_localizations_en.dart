@@ -12617,6 +12617,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get planning_section_tools => 'Tools';
 
   @override
+  String get planning_summary_prompt => 'Select a tool to get started';
+
+  @override
+  String get planning_summary_savedPlans => 'Saved plans';
+
+  @override
+  String get planning_summary_noPlans => 'No saved plans yet';
+
+  @override
   String get planning_sidebar_appBar_title => 'Planning';
 
   @override

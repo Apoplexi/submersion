@@ -12514,6 +12514,15 @@ class AppLocalizationsHe extends AppLocalizations {
   String get planning_section_tools => 'כלים';
 
   @override
+  String get planning_summary_prompt => 'בחר כלי כדי להתחיל';
+
+  @override
+  String get planning_summary_savedPlans => 'תוכניות שמורות';
+
+  @override
+  String get planning_summary_noPlans => 'אין עדיין תוכניות שמורות';
+
+  @override
   String get planning_sidebar_appBar_title => 'תכנון';
 
   @override

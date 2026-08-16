@@ -111,10 +111,16 @@ final recentDivesProvider = FutureProvider<List<Dive>>((ref) async {
 final latestDiveProfileProvider = FutureProvider<List<DiveProfilePoint>?>((
   ref,
 ) async {
+  final repository = ref.watch(diveRepositoryProvider);
+  // The dive-detail tick, not the dives tick: this reads dive_profiles, and
+  // samples change without the dives row changing (a reparse or a sync pull
+  // rewrites the profile in place). watchDivesChanges would leave the chart
+  // showing the pre-reparse shape.
+  ref.invalidateSelfWhen(repository.watchDiveDetailChanges());
+
   final recent = await ref.watch(recentDivesProvider.future);
   if (recent.isEmpty) return null;
 
-  final repository = ref.watch(diveRepositoryProvider);
   final profile = await repository.getDiveProfile(recent.first.id);
   return profile.isEmpty ? null : profile;
 });

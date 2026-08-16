@@ -12598,6 +12598,15 @@ class AppLocalizationsAr extends AppLocalizations {
   String get planning_section_tools => 'أدوات';
 
   @override
+  String get planning_summary_prompt => 'اختر أداة للبدء';
+
+  @override
+  String get planning_summary_savedPlans => 'الخطط المحفوظة';
+
+  @override
+  String get planning_summary_noPlans => 'لا توجد خطط محفوظة بعد';
+
+  @override
   String get planning_sidebar_appBar_title => 'التخطيط';
 
   @override

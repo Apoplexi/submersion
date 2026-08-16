@@ -21709,6 +21709,24 @@ abstract class AppLocalizations {
   /// **'Tools'**
   String get planning_section_tools;
 
+  /// No description provided for @planning_summary_prompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Select a tool to get started'**
+  String get planning_summary_prompt;
+
+  /// No description provided for @planning_summary_savedPlans.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved plans'**
+  String get planning_summary_savedPlans;
+
+  /// No description provided for @planning_summary_noPlans.
+  ///
+  /// In en, this message translates to:
+  /// **'No saved plans yet'**
+  String get planning_summary_noPlans;
+
   /// No description provided for @planning_sidebar_appBar_title.
   ///
   /// In en, this message translates to:

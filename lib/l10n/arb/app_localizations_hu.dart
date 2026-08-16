@@ -12787,6 +12787,15 @@ class AppLocalizationsHu extends AppLocalizations {
   String get planning_section_tools => 'Eszközök';
 
   @override
+  String get planning_summary_prompt => 'Válassz egy eszközt a kezdéshez';
+
+  @override
+  String get planning_summary_savedPlans => 'Mentett tervek';
+
+  @override
+  String get planning_summary_noPlans => 'Még nincsenek mentett tervek';
+
+  @override
   String get planning_sidebar_appBar_title => 'Tervezes';
 
   @override
