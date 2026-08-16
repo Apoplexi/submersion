@@ -9,6 +9,7 @@ import 'package:submersion/features/gps_log/presentation/widgets/gps_track_polyl
 import 'package:submersion/features/maps/presentation/widgets/map_attribution.dart';
 import 'package:submersion/features/maps/presentation/widgets/submersion_tile_layer.dart';
 import 'package:submersion/features/maps/presentation/widgets/map_compass_button.dart';
+import 'package:submersion/features/maps/presentation/widgets/map_interaction_options.dart';
 import 'package:submersion/features/maps/presentation/widgets/trackpad_zoom_map.dart';
 
 /// Marker colors for the GPS entry/exit fixes, matching the values the dive
@@ -236,9 +237,9 @@ class _DiveLocationsMapState extends ConsumerState<DiveLocationsMap> {
                 _framedOn = trackRuns;
               },
               initialCameraFit: fit,
-              interactionOptions: InteractionOptions(
-                flags: interactive ? InteractiveFlag.all : InteractiveFlag.none,
-              ),
+              interactionOptions: interactive
+                  ? rotatableMapInteraction
+                  : const InteractionOptions(flags: InteractiveFlag.none),
             ),
             children: [
               submersionTileLayer(ref),
