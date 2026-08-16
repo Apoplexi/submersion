@@ -18779,10 +18779,6 @@ class AppLocalizationsAr extends AppLocalizations {
   String get diveComputer_connectionType_wifi => 'Wi-Fi';
 
   @override
-  String get diveComputer_detail_cannotFilterNoSerial =>
-      'لا يمكن التصفية: لا يوجد رقم تسلسلي لهذا الكمبيوتر.';
-
-  @override
   String diveComputer_detail_deleteDialogContent(String name) {
     return 'هل تريد حقا إزالة \"$name\"؟ لن يؤدي هذا إلى حذف أي غطسات تم استيرادها من هذا الكمبيوتر.';
   }

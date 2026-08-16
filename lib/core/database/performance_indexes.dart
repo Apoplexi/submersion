@@ -64,6 +64,16 @@ const List<PerformanceIndex> kPerformanceIndexes = [
     name: 'idx_dives_course_id',
     ddl: 'CREATE INDEX IF NOT EXISTS idx_dives_course_id ON dives(course_id)',
   ),
+  // Attribution to a registered dive computer. Backs the "dives from this
+  // computer" filter axis (issue #1064) and the beforeOpen self-heal that
+  // adopts the column from dive_data_sources, which both drive off the null
+  // side of this column.
+  (
+    name: 'idx_dives_computer_id',
+    ddl:
+        'CREATE INDEX IF NOT EXISTS idx_dives_computer_id '
+        'ON dives(computer_id)',
+  ),
   (
     name: 'idx_dives_favorite',
     ddl:

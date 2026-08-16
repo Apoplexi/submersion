@@ -6081,7 +6081,6 @@
   "diveComputer_connectionType_unknown": "Ismeretlen",
   "diveComputer_connectionType_usb": "USB",
   "diveComputer_connectionType_wifi": "Wi-Fi",
-  "diveComputer_detail_cannotFilterNoSerial": "Nem lehet szurni: nincs sorozatszam ehhez a szamitogephez.",
   "diveComputer_detail_deleteDialogContent": "Biztosan eltavolitod a(z) \"{name}\" eszkozt? Ez nem torli az errol a szamitogeprol importalt merulseket.",
   "diveComputer_detail_deleteDialogTitle": "Szamitogep torlese?",
   "diveComputer_detail_divesImported": "Importalt merulesek",

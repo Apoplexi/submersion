@@ -19064,10 +19064,6 @@ class AppLocalizationsHu extends AppLocalizations {
   String get diveComputer_connectionType_wifi => 'Wi-Fi';
 
   @override
-  String get diveComputer_detail_cannotFilterNoSerial =>
-      'Nem lehet szurni: nincs sorozatszam ehhez a szamitogephez.';
-
-  @override
   String diveComputer_detail_deleteDialogContent(String name) {
     return 'Biztosan eltavolitod a(z) \"$name\" eszkozt? Ez nem torli az errol a szamitogeprol importalt merulseket.';
   }

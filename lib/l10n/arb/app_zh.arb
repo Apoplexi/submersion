@@ -6081,7 +6081,6 @@
   "diveComputer_connectionType_unknown": "未知",
   "diveComputer_connectionType_usb": "USB",
   "diveComputer_connectionType_wifi": "Wi-Fi",
-  "diveComputer_detail_cannotFilterNoSerial": "无法筛选:此电脑没有序列号。",
   "diveComputer_detail_deleteDialogContent": "确定要移除“{name}”吗?这不会删除从此电脑导入的任何潜水记录。",
   "diveComputer_detail_deleteDialogTitle": "删除电脑?",
   "diveComputer_detail_divesImported": "已导入潜水",

@@ -55,7 +55,7 @@ class _DiveFilterSheetState extends ConsumerState<DiveFilterSheet> {
   late int? _minRating;
   late int? _minDurationMinutes;
   late int? _maxDurationMinutes;
-  late String? _computerSerial;
+  late String? _computerId;
   double? _suitThicknessMin;
   double? _suitThicknessMax;
 
@@ -89,7 +89,7 @@ class _DiveFilterSheetState extends ConsumerState<DiveFilterSheet> {
     _minRating = filter.minRating;
     _minDurationMinutes = filter.minBottomTimeMinutes;
     _maxDurationMinutes = filter.maxBottomTimeMinutes;
-    _computerSerial = filter.computerSerial;
+    _computerId = filter.computerId;
     if (filter.equipmentAttrKey == 'thickness_mm') {
       _suitThicknessMin = filter.equipmentAttrMin;
       _suitThicknessMax = filter.equipmentAttrMax;
@@ -363,17 +363,12 @@ class _DiveFilterSheetState extends ConsumerState<DiveFilterSheet> {
                     loading: () => const LinearProgressIndicator(),
                     error: (_, _) => const Text('Error loading computers'),
                     data: (computers) {
-                      // Only include computers with serial numbers,
-                      // deduplicated by serial.
-                      final seen = <String>{};
-                      final filterable = computers
-                          .where(
-                            (c) =>
-                                c.serialNumber != null &&
-                                seen.add(c.serialNumber!),
-                          )
-                          .toList();
-                      if (filterable.isEmpty) {
+                      // Every registered computer is offered. The list used to
+                      // be restricted to computers carrying a serial number,
+                      // which hid every device whose firmware never reports one
+                      // (issue #1064); attribution rides the computer id, which
+                      // is always present.
+                      if (computers.isEmpty) {
                         return Text(
                           'No dive computers registered',
                           style: Theme.of(context).textTheme.bodySmall
@@ -384,18 +379,16 @@ class _DiveFilterSheetState extends ConsumerState<DiveFilterSheet> {
                               ),
                         );
                       }
-                      // Reset to null if the saved serial is not in the list.
-                      final validSerial =
-                          filterable.any(
-                            (c) => c.serialNumber == _computerSerial,
-                          )
-                          ? _computerSerial
+                      // Reset to null if the saved computer is no longer known
+                      // (deleted since the filter was set).
+                      final validId = computers.any((c) => c.id == _computerId)
+                          ? _computerId
                           : null;
-                      if (validSerial != _computerSerial) {
-                        _computerSerial = validSerial;
+                      if (validId != _computerId) {
+                        _computerId = validId;
                       }
                       return DropdownButtonFormField<String?>(
-                        initialValue: validSerial,
+                        initialValue: validId,
                         decoration: const InputDecoration(
                           hintText: 'All computers',
                           prefixIcon: Icon(Icons.watch),
@@ -405,15 +398,15 @@ class _DiveFilterSheetState extends ConsumerState<DiveFilterSheet> {
                             value: null,
                             child: Text('All computers'),
                           ),
-                          ...filterable.map(
+                          ...computers.map(
                             (c) => DropdownMenuItem(
-                              value: c.serialNumber,
+                              value: c.id,
                               child: Text(c.displayName),
                             ),
                           ),
                         ],
                         onChanged: (value) {
-                          setState(() => _computerSerial = value);
+                          setState(() => _computerId = value);
                         },
                       );
                     },
@@ -919,7 +912,7 @@ class _DiveFilterSheetState extends ConsumerState<DiveFilterSheet> {
       minRating: _minRating,
       minBottomTimeMinutes: _minDurationMinutes,
       maxBottomTimeMinutes: _maxDurationMinutes,
-      computerSerial: _computerSerial,
+      computerId: _computerId,
       equipmentAttrKey: (_suitThicknessMin != null || _suitThicknessMax != null)
           ? 'thickness_mm'
           : null,

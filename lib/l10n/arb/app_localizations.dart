@@ -31925,12 +31925,6 @@ abstract class AppLocalizations {
   /// **'Wi-Fi'**
   String get diveComputer_connectionType_wifi;
 
-  /// No description provided for @diveComputer_detail_cannotFilterNoSerial.
-  ///
-  /// In en, this message translates to:
-  /// **'Cannot filter: no serial number for this computer.'**
-  String get diveComputer_detail_cannotFilterNoSerial;
-
   /// No description provided for @diveComputer_detail_deleteDialogContent.
   ///
   /// In en, this message translates to:

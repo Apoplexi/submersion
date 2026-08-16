@@ -19087,10 +19087,6 @@ class AppLocalizationsDe extends AppLocalizations {
   String get diveComputer_connectionType_wifi => 'WLAN';
 
   @override
-  String get diveComputer_detail_cannotFilterNoSerial =>
-      'Filtern nicht möglich: keine Seriennummer für diesen Computer.';
-
-  @override
   String diveComputer_detail_deleteDialogContent(String name) {
     return 'Möchten Sie \"$name\" wirklich entfernen? Dadurch werden keine von diesem Computer importierten Tauchgänge gelöscht.';
   }
