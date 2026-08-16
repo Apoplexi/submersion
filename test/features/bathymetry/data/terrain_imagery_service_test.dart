@@ -77,6 +77,35 @@ void main() {
     },
   );
 
+  test('an oversized tile range yields null without fetching', () async {
+    // ~7 degrees each way clamps to the z10 floor, where the range is far
+    // beyond the 20-tile cap; the guard must refuse before any request.
+    final huge = BathymetryGrid(
+      originLat: 0,
+      originLon: 0,
+      cellSizeLatDeg: 3.6,
+      cellSizeLonDeg: 3.6,
+      rows: 2,
+      cols: 2,
+      depthsMeters: const [10, 20, 30, 40],
+      sourceId: 'test',
+      resolutionMeters: 100,
+      fetchedAt: DateTime.utc(2026, 8, 15),
+    );
+    var requests = 0;
+    final client = MockClient((request) async {
+      requests++;
+      return http.Response('nope', 404);
+    });
+    expect(
+      await TerrainImageryService(
+        client,
+      ).fetch(grid: huge, style: MapStyle.esriSatellite),
+      isNull,
+    );
+    expect(requests, 0);
+  });
+
   test('any tile failure yields null', () async {
     final client = MockClient((request) async => http.Response('nope', 404));
     expect(

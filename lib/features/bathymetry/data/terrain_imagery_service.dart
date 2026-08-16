@@ -18,7 +18,7 @@ class TerrainImagery {
 
 const int _tileSizePx = 256;
 const int _whiteStripPx = 4;
-const int _maxTiles = 16;
+const int _maxTiles = 20;
 
 /// Fetches and stitches keyless map tiles covering a bathymetry grid's
 /// footprint into one mosaic image with a reserved white strip at the
@@ -54,7 +54,7 @@ class TerrainImageryService {
     final yMax = slippyTileOf(south, west, z).y;
     final tilesX = xMax - xMin + 1;
     final tilesY = yMax - yMin + 1;
-    if (tilesX <= 0 || tilesY <= 0 || tilesX * tilesY > _maxTiles + 4) {
+    if (tilesX <= 0 || tilesY <= 0 || tilesX * tilesY > _maxTiles) {
       return null;
     }
 

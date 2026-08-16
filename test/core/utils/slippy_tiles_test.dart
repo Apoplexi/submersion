@@ -20,6 +20,17 @@ void main() {
     expect(slippyTileOf(12.15, -68.3, 14), (x: 5083, y: 7634));
   });
 
+  test('poles and out-of-range coordinates clamp instead of diverging', () {
+    // Web Mercator is undefined at the poles: the raw formula returns a
+    // non-finite y there, and floor() on a non-finite double throws.
+    expect(mercatorY(90), closeTo(0.0, 1e-9));
+    expect(mercatorY(-90), closeTo(1.0, 1e-9));
+    // Tile indices stay inside 0..n-1 even at the world's edges.
+    expect(slippyTileOf(90, 0, 4), (x: 8, y: 0));
+    expect(slippyTileOf(-90, 0, 4), (x: 8, y: 15));
+    expect(slippyTileOf(0, 180, 4), (x: 15, y: 8));
+  });
+
   test('imageryZoomFor targets a handful of tiles and clamps', () {
     // 8 km box near the equator is ~0.0719 degrees of longitude:
     // z = round(log2(4 * 360 / 0.0719)) = round(14.29) = 14.
