@@ -24,6 +24,7 @@ class Dive3dScenePainter extends CustomPainter {
   final double pitchDegrees;
   final double zoom;
   final Set<SceneOverlay>? visibleOverlays;
+  final bool mirrorX;
 
   const Dive3dScenePainter({
     required this.scene,
@@ -31,6 +32,7 @@ class Dive3dScenePainter extends CustomPainter {
     this.pitchDegrees = 22,
     this.zoom = 1.0,
     this.visibleOverlays,
+    this.mirrorX = false,
   });
 
   // Studio lighting for flat shading. Ambient is the floor every surface
@@ -52,6 +54,37 @@ class Dive3dScenePainter extends CustomPainter {
       visibleOverlays == null ||
       visibleOverlays!.contains(overlay);
 
+  static bool _overlayVisible(
+    SceneOverlay? overlay,
+    Set<SceneOverlay>? visibleOverlays,
+  ) =>
+      overlay == null ||
+      visibleOverlays == null ||
+      visibleOverlays.contains(overlay);
+
+  /// Splits the scene's visible layers into the terrain-draped merge group
+  /// and the rest. The group is the first visible layer (the terrain) plus
+  /// every visible [SceneLayer.drapedOnTerrain] layer: their triangles are
+  /// depth-sorted TOGETHER so far-side contours and walls hide behind
+  /// hills. Everything else keeps plain back-to-front layer order.
+  @visibleForTesting
+  static ({List<MeshData> merged, List<MeshData> rest}) partitionLayers(
+    Scene3d scene,
+    Set<SceneOverlay>? visibleOverlays,
+  ) {
+    final merged = <MeshData>[];
+    final rest = <MeshData>[];
+    for (final layer in scene.layers) {
+      if (!_overlayVisible(layer.overlay, visibleOverlays)) continue;
+      if (merged.isEmpty || layer.drapedOnTerrain) {
+        merged.add(layer.mesh);
+      } else {
+        rest.add(layer.mesh);
+      }
+    }
+    return (merged: merged, rest: rest);
+  }
+
   @override
   void paint(Canvas canvas, Size size) {
     final projector = SceneProjector(
@@ -60,46 +93,83 @@ class Dive3dScenePainter extends CustomPainter {
       yawDegrees: yawDegrees,
       pitchDegrees: pitchDegrees,
       zoom: zoom,
+      mirrorX: mirrorX,
     );
-    for (final layer in scene.layers) {
-      if (_visible(layer.overlay)) _paintMesh(canvas, projector, layer.mesh);
+    final parts = partitionLayers(scene, visibleOverlays);
+    _paintMeshes(canvas, projector, parts.merged);
+    for (final mesh in parts.rest) {
+      _paintMeshes(canvas, projector, [mesh]);
     }
     if (_visible(SceneOverlay.markers)) _paintMarkers(canvas, projector);
   }
 
-  void _paintMesh(Canvas canvas, SceneProjector projector, MeshData mesh) {
-    final vn = mesh.vertexCount;
-    final triCount = mesh.triangleCount;
+  /// Paints one or more meshes as a single depth-sorted triangle soup.
+  /// Multi-mesh calls exist for the terrain-draped group; each triangle
+  /// keeps its source mesh's opacity.
+  void _paintMeshes(
+    Canvas canvas,
+    SceneProjector projector,
+    List<MeshData> meshes,
+  ) {
+    var vn = 0;
+    var triCount = 0;
+    for (final mesh in meshes) {
+      vn += mesh.vertexCount;
+      triCount += mesh.triangleCount;
+    }
     if (vn == 0 || triCount == 0) return;
 
     // Rotate every vertex into view space once: (vx,vy,vz) drive both the
     // face normals and the depth sort, (sx,sy) are the canvas points.
+    // Vertices and triangles from all meshes concatenate with an offset;
+    // per-triangle alpha carries each source mesh's opacity.
     final vx = Float32List(vn);
     final vy = Float32List(vn);
     final vz = Float32List(vn);
     final sx = Float32List(vn);
     final sy = Float32List(vn);
-    for (var i = 0; i < vn; i++) {
-      final v = projector.viewOf(
-        mesh.positions[i * 3],
-        mesh.positions[i * 3 + 1],
-        mesh.positions[i * 3 + 2],
-      );
-      vx[i] = v.$1;
-      vy[i] = v.$2;
-      vz[i] = v.$3;
-      final o = projector.projectView(v);
-      sx[i] = o.dx;
-      sy[i] = o.dy;
+    final vColors = Float32List(vn * 3);
+    final triIndices = Uint32List(triCount * 3);
+    final triAlpha = Int32List(triCount);
+    var vOff = 0;
+    var tOff = 0;
+    for (final mesh in meshes) {
+      final alpha = (mesh.opacity * 255).round() << 24;
+      for (var i = 0; i < mesh.vertexCount; i++) {
+        final gi = vOff + i;
+        final v = projector.viewOf(
+          mesh.positions[i * 3],
+          mesh.positions[i * 3 + 1],
+          mesh.positions[i * 3 + 2],
+        );
+        vx[gi] = v.$1;
+        vy[gi] = v.$2;
+        vz[gi] = v.$3;
+        final o = projector.projectView(v);
+        sx[gi] = o.dx;
+        sy[gi] = o.dy;
+        vColors[gi * 3] = mesh.colors[i * 3];
+        vColors[gi * 3 + 1] = mesh.colors[i * 3 + 1];
+        vColors[gi * 3 + 2] = mesh.colors[i * 3 + 2];
+      }
+      for (var t = 0; t < mesh.triangleCount; t++) {
+        final gt = tOff + t;
+        triIndices[gt * 3] = mesh.indices[t * 3] + vOff;
+        triIndices[gt * 3 + 1] = mesh.indices[t * 3 + 1] + vOff;
+        triIndices[gt * 3 + 2] = mesh.indices[t * 3 + 2] + vOff;
+        triAlpha[gt] = alpha;
+      }
+      vOff += mesh.vertexCount;
+      tOff += mesh.triangleCount;
     }
 
     // Depth-sort triangles back-to-front by mean view depth.
     final order = List<int>.generate(triCount, (i) => i);
     final depths = Float32List(triCount);
     for (var t = 0; t < triCount; t++) {
-      final i0 = mesh.indices[t * 3];
-      final i1 = mesh.indices[t * 3 + 1];
-      final i2 = mesh.indices[t * 3 + 2];
+      final i0 = triIndices[t * 3];
+      final i1 = triIndices[t * 3 + 1];
+      final i2 = triIndices[t * 3 + 2];
       depths[t] = (vz[i0] + vz[i1] + vz[i2]) / 3;
     }
     order.sort((a, b) => depths[a].compareTo(depths[b]));
@@ -107,26 +177,23 @@ class Dive3dScenePainter extends CustomPainter {
     // De-index into flat-shaded triangles: each triangle owns its 3 vertices
     // so it can carry its own face-normal brightness. drawVertices only
     // interpolates colors, so shading has to be baked into those colors here.
-    final alpha = (mesh.opacity * 255).round() << 24;
     final screen = Float32List(triCount * 3 * 2);
     final colors = Int32List(triCount * 3);
 
-    void emit(int slot, int vi, double shade) {
+    void emit(int slot, int vi, double shade, int alpha) {
       screen[slot * 2] = sx[vi];
       screen[slot * 2 + 1] = sy[vi];
-      final r = ((mesh.colors[vi * 3] * shade).clamp(0.0, 1.0) * 255).round();
-      final g = ((mesh.colors[vi * 3 + 1] * shade).clamp(0.0, 1.0) * 255)
-          .round();
-      final b = ((mesh.colors[vi * 3 + 2] * shade).clamp(0.0, 1.0) * 255)
-          .round();
+      final r = ((vColors[vi * 3] * shade).clamp(0.0, 1.0) * 255).round();
+      final g = ((vColors[vi * 3 + 1] * shade).clamp(0.0, 1.0) * 255).round();
+      final b = ((vColors[vi * 3 + 2] * shade).clamp(0.0, 1.0) * 255).round();
       colors[slot] = alpha | (r << 16) | (g << 8) | b;
     }
 
     for (var t = 0; t < triCount; t++) {
       final tri = order[t];
-      final i0 = mesh.indices[tri * 3];
-      final i1 = mesh.indices[tri * 3 + 1];
-      final i2 = mesh.indices[tri * 3 + 2];
+      final i0 = triIndices[tri * 3];
+      final i1 = triIndices[tri * 3 + 1];
+      final i2 = triIndices[tri * 3 + 2];
 
       // Face normal from two edges (cross product) in view space.
       final ax = vx[i1] - vx[i0], ay = vy[i1] - vy[i0], az = vz[i1] - vz[i0];
@@ -152,9 +219,9 @@ class Dive3dScenePainter extends CustomPainter {
       }
 
       final tv = t * 3;
-      emit(tv, i0, shade);
-      emit(tv + 1, i1, shade);
-      emit(tv + 2, i2, shade);
+      emit(tv, i0, shade, triAlpha[tri]);
+      emit(tv + 1, i1, shade, triAlpha[tri]);
+      emit(tv + 2, i2, shade, triAlpha[tri]);
     }
 
     canvas.drawVertices(
@@ -188,5 +255,6 @@ class Dive3dScenePainter extends CustomPainter {
       oldDelegate.yawDegrees != yawDegrees ||
       oldDelegate.pitchDegrees != pitchDegrees ||
       oldDelegate.zoom != zoom ||
-      oldDelegate.visibleOverlays != visibleOverlays;
+      oldDelegate.visibleOverlays != visibleOverlays ||
+      oldDelegate.mirrorX != mirrorX;
 }

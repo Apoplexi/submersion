@@ -7,13 +7,16 @@ import 'package:submersion/core/utils/geo_math.dart';
 import 'package:submersion/features/bathymetry/application/bathymetry_providers.dart';
 import 'package:submersion/features/bathymetry/data/bathymetry_repository.dart';
 import 'package:submersion/features/bathymetry/domain/bathymetry_grid.dart';
+import 'package:submersion/core/constants/units.dart';
 import 'package:submersion/features/dive_3d/application/spatial_providers.dart';
 import 'package:submersion/features/dive_3d/domain/scene_3d.dart';
 import 'package:submersion/features/dive_3d/domain/spatial/bathymetry_terrain_builder.dart';
+import 'package:submersion/features/dive_3d/domain/spatial/contour_builder.dart';
 import 'package:submersion/features/dive_3d/domain/spatial/seascape_axes.dart';
 import 'package:submersion/features/dive_3d/domain/spatial/site_seascape_geometry_service.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_providers.dart';
 import 'package:submersion/features/dive_sites/presentation/providers/site_providers.dart';
+import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 
 /// Terminal states for the site seascape. The provider ALWAYS resolves to
 /// one of these — a null/silent-spinner path does not exist (PR #659).
@@ -31,12 +34,17 @@ class SiteSeascapeReady extends SiteSeascapeState {
   /// reads per-cell coordinates and depth from it.
   final BathymetryGrid grid;
 
+  /// Labeled contour levels with their scene-space anchor candidates; the
+  /// chrome painter picks the camera-nearest anchor per frame.
+  final List<ContourLabelSpec> contourLabels;
+
   const SiteSeascapeReady({
     required this.scene,
     required this.sourceId,
     required this.resolutionMeters,
     required this.axisInputs,
     required this.grid,
+    this.contourLabels = const [],
   });
 }
 
@@ -115,6 +123,14 @@ final siteSeascapeProvider = FutureProvider.family<SiteSeascapeState, String>((
     }
   }
 
+  // Terrain appearance and the depth unit shape the geometry (contour
+  // levels, ramp colors, wall threshold), so the scene rebuilds when the
+  // diver changes either.
+  final appearance = ref.watch(
+    settingsProvider.select((s) => s.seascapeAppearance),
+  );
+  final depthUnit = ref.watch(settingsProvider.select((s) => s.depthUnit));
+
   final input = SiteSeascapeInput(
     grid: grid,
     center: center,
@@ -122,10 +138,13 @@ final siteSeascapeProvider = FutureProvider.family<SiteSeascapeState, String>((
     siteMaxDepth: site.maxDepth,
     divePaths: divePaths,
     nearbySites: nearby,
+    appearance: appearance,
+    displayUnitInMeters: depthUnit == DepthUnit.feet ? 0.3048 : 1.0,
+    depthSymbol: depthUnit.symbol,
   );
-  final scene = grid.rows * grid.cols > _isolateCellThreshold
+  final built = grid.rows * grid.cols > _isolateCellThreshold
       ? await compute(_buildScene, input)
-      : const SiteSeascapeGeometryService().build(input);
+      : const SiteSeascapeGeometryService().buildWithLabels(input);
   // Mirrors SiteSeascapeGeometryService's depth budget so the axes and the
   // terrain agree on the scene frame.
   final maxDepth = math.max(
@@ -133,10 +152,11 @@ final siteSeascapeProvider = FutureProvider.family<SiteSeascapeState, String>((
     1.0,
   );
   return SiteSeascapeReady(
-    scene: scene,
+    scene: built.scene,
     sourceId: grid.sourceId,
     resolutionMeters: grid.resolutionMeters,
     grid: grid,
+    contourLabels: built.contourLabels,
     axisInputs: (
       minEast: box.minEast,
       maxEast: box.maxEast,
@@ -147,5 +167,6 @@ final siteSeascapeProvider = FutureProvider.family<SiteSeascapeState, String>((
   );
 });
 
-Scene3d _buildScene(SiteSeascapeInput input) =>
-    const SiteSeascapeGeometryService().build(input);
+({Scene3d scene, List<ContourLabelSpec> contourLabels}) _buildScene(
+  SiteSeascapeInput input,
+) => const SiteSeascapeGeometryService().buildWithLabels(input);

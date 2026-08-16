@@ -3,6 +3,7 @@ import 'package:submersion/l10n/l10n_extension.dart';
 
 import 'package:submersion/features/gas_calculators/presentation/providers/gas_calculators_providers.dart';
 import 'package:submersion/features/gas_calculators/presentation/widgets/best_mix_calculator.dart';
+import 'package:submersion/features/gas_calculators/presentation/widgets/gas_blender_calculator.dart';
 import 'package:submersion/features/gas_calculators/presentation/widgets/gas_consumption_calculator.dart';
 import 'package:submersion/features/gas_calculators/presentation/widgets/mod_calculator.dart';
 import 'package:submersion/features/gas_calculators/presentation/widgets/mnd_calculator.dart';
@@ -12,12 +13,13 @@ import 'package:submersion/core/providers/provider.dart';
 
 /// Gas Calculators page with tabbed interface.
 ///
-/// Provides 5 specialized diving gas calculators:
+/// Provides 6 specialized diving gas calculators:
 /// - MOD: Maximum Operating Depth for a given gas mix
 /// - Best Mix: Ideal O2% for a target depth
 /// - Gas Consumption: How much gas a dive will use
 /// - Rock Bottom: Minimum reserve for emergency ascent
 /// - MND/END: Maximum Narcotic Depth / Equivalent Narcotic Depth
+/// - Blender: Partial-pressure fill procedure for a target mix
 class GasCalculatorsPage extends ConsumerStatefulWidget {
   /// Renders without its own Scaffold and AppBar, for the Planning detail
   /// pane. See [PlanningToolPane].
@@ -36,7 +38,7 @@ class _GasCalculatorsPageState extends ConsumerState<GasCalculatorsPage>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 5, vsync: this);
+    _tabController = TabController(length: 6, vsync: this);
   }
 
   @override
@@ -84,6 +86,10 @@ class _GasCalculatorsPageState extends ConsumerState<GasCalculatorsPage>
           icon: const Icon(Icons.psychology),
           text: context.l10n.gasCalculators_tab_mnd,
         ),
+        Tab(
+          icon: const Icon(Icons.gas_meter),
+          text: context.l10n.gasCalculators_tab_blender,
+        ),
       ],
       indicatorColor: colorScheme.primary,
       labelColor: colorScheme.primary,
@@ -98,6 +104,7 @@ class _GasCalculatorsPageState extends ConsumerState<GasCalculatorsPage>
         GasConsumptionCalculator(),
         RockBottomCalculator(),
         MndCalculator(),
+        GasBlenderCalculator(),
       ],
     );
 

@@ -11516,6 +11516,104 @@ class AppLocalizationsIt extends AppLocalizations {
   String get gasCalculators_tab_mnd => 'MND/END';
 
   @override
+  String get gasCalculators_tab_blender => 'Miscelatore';
+
+  @override
+  String get gasCalculators_blender_cylinder => 'Bombola';
+
+  @override
+  String get gasCalculators_blender_startCylinder => 'Nella bombola';
+
+  @override
+  String get gasCalculators_blender_targetFill => 'Riempimento target';
+
+  @override
+  String get gasCalculators_blender_fillGases => 'Gas di riempimento';
+
+  @override
+  String get gasCalculators_blender_pressure => 'Pressione';
+
+  @override
+  String get gasCalculators_blender_o2 => 'O₂';
+
+  @override
+  String get gasCalculators_blender_he => 'He';
+
+  @override
+  String get gasCalculators_blender_air => 'Aria';
+
+  @override
+  String get gasCalculators_blender_helium => 'Elio';
+
+  @override
+  String get gasCalculators_blender_procedure => 'Procedura di riempimento';
+
+  @override
+  String get gasCalculators_blender_amounts => 'Gas da aggiungere';
+
+  @override
+  String gasCalculators_blender_stepStart(String pressure, String gas) {
+    return 'Inizia con $pressure $gas';
+  }
+
+  @override
+  String gasCalculators_blender_stepFill(
+    String gas,
+    String pressure,
+    String mix,
+  ) {
+    return 'Riempi $gas fino a $pressure → $mix';
+  }
+
+  @override
+  String get gasCalculators_blender_error_targetPressure =>
+      'La pressione target deve essere maggiore di quella iniziale.';
+
+  @override
+  String get gasCalculators_blender_error_invalidMix =>
+      'O₂ + He di una miscela non può superare il 100%.';
+
+  @override
+  String get gasCalculators_blender_error_identicalGases =>
+      'I due gas di riempimento sono identici: niente da miscelare.';
+
+  @override
+  String get gasCalculators_blender_error_linearlyDependent =>
+      'Questi gas non possono produrre la miscela target: un target trimix richiede una fonte di elio.';
+
+  @override
+  String get gasCalculators_blender_error_negativeAmount =>
+      'Questa miscela non è realizzabile con questi gas: richiederebbe di rimuovere gas.';
+
+  @override
+  String gasCalculators_blender_error_drainTo(String pressure) {
+    return 'Troppo gas nella bombola per questa miscela: scarica fino a $pressure, poi riempi.';
+  }
+
+  @override
+  String get gasCalculators_blender_error_drainEmpty =>
+      'Il gas presente nella bombola non è utilizzabile per questa miscela: svuotala completamente, poi riempi.';
+
+  @override
+  String get gasCalculators_blender_error_cannotRemoveHelium =>
+      'La bombola contiene elio mentre la miscela target no. Il rabbocco diluisce l\'elio ma non lo rimuove: la bombola va prima svuotata.';
+
+  @override
+  String get gasCalculators_blender_error_insufficientGases =>
+      'Un target senza elio richiede due gas di riempimento senza elio con contenuto di O₂ diverso.';
+
+  @override
+  String get gasCalculators_blender_error_targetNotReached =>
+      'Questi gas di riempimento non raggiungono esattamente la miscela target. Controlla i gas e il loro ordine.';
+
+  @override
+  String get gasCalculators_blender_about => 'Informazioni sulla miscelazione';
+
+  @override
+  String get gasCalculators_blender_aboutBody =>
+      'Miscelazione per pressioni parziali per la miscela target, con comportamento di gas reale (Van der Waals). Aggiungi ogni gas di riempimento in ordine, fino alla pressione indicata. I gas e il loro ordine sono configurabili; analizza sempre la miscela finale prima di immergerti.';
+
+  @override
   String get gasCalculators_tab_mod => 'MOD';
 
   @override
@@ -22019,6 +22117,59 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get dive3d_seascape_overlay_paths => 'Percorsi delle immersioni';
+
+  @override
+  String get dive3d_seascape_overlay_contours => 'Isobate';
+
+  @override
+  String get dive3d_seascape_overlay_walls => 'Pareti ripide';
+
+  @override
+  String get dive3d_overlay_water => 'Superficie dell\'acqua';
+
+  @override
+  String get dive3d_seascape_legend_land => 'Terra';
+
+  @override
+  String get dive3d_seascape_appearance => 'Aspetto del terreno';
+
+  @override
+  String get dive3d_seascape_chartView => 'Vista carta';
+
+  @override
+  String get dive3d_seascape_orbitView => 'Vista 3D';
+
+  @override
+  String get dive3d_seascape_appearance_rampRange =>
+      'Limita l\'intervallo di profondità dei colori';
+
+  @override
+  String get dive3d_seascape_appearance_rampMax => 'Colore più scuro a';
+
+  @override
+  String get dive3d_seascape_appearance_banded => 'Gradiente a bande';
+
+  @override
+  String get dive3d_seascape_appearance_contours => 'Livelli delle isobate';
+
+  @override
+  String get dive3d_seascape_appearance_contourAuto => 'Automatico';
+
+  @override
+  String get dive3d_seascape_appearance_contourCustom => 'Personalizzato';
+
+  @override
+  String get dive3d_seascape_appearance_addLevel => 'Aggiungi livello';
+
+  @override
+  String get dive3d_seascape_appearance_defaultColor => 'Predefinito';
+
+  @override
+  String get dive3d_seascape_appearance_wallAngle => 'Angolo di parete ripida';
+
+  @override
+  String get dive3d_seascape_appearance_wallAngleNote =>
+      'Le celle batimetriche mediano la pendenza interna, quindi le pareti reali sembrano meno ripide. Restare ben sotto i 45 gradi.';
 
   @override
   String get dive3d_seascape_siteTitle => 'Paesaggio marino del sito';

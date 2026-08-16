@@ -18,6 +18,7 @@ import 'package:submersion/core/constants/units.dart';
 import 'package:submersion/core/deco/entities/cns_calculation_method.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/core/constants/dive_detail_sections.dart';
+import 'package:submersion/features/dive_3d/domain/spatial/seascape_appearance.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/tissue_color_schemes.dart';
 import 'package:submersion/features/divers/presentation/providers/diver_providers.dart';
@@ -77,6 +78,9 @@ class MockSettingsNotifier extends StateNotifier<AppSettings>
   @override
   Future<void> setAltitudeUnit(AltitudeUnit unit) async =>
       state = state.copyWith(altitudeUnit: unit);
+  @override
+  Future<void> setSeascapeAppearance(SeascapeAppearance appearance) async =>
+      state = state.copyWith(seascapeAppearance: appearance);
   @override
   Future<void> setCoordinateFormat(CoordinateFormat format) async =>
       state = state.copyWith(coordinateFormat: format);

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:submersion/core/constants/units.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/bathymetry/domain/bathymetry_grid.dart';
 import 'package:submersion/features/bathymetry/presentation/bathymetry_labels.dart';
@@ -12,7 +13,9 @@ import 'package:submersion/features/dive_3d/domain/tissue/tissue_surface_picker.
 import 'package:submersion/features/dive_3d/presentation/scene_overlay.dart';
 import 'package:submersion/features/dive_3d/presentation/seascape_chrome.dart';
 import 'package:submersion/features/dive_3d/presentation/widgets/dive_3d_interactive_viewport.dart';
+import 'package:submersion/features/dive_3d/presentation/widgets/seascape_depth_legend.dart';
 import 'package:submersion/features/dive_3d/presentation/widgets/seascape_hover_tooltip.dart';
+import 'package:submersion/features/dive_3d/presentation/widgets/terrain_appearance_sheet.dart';
 import 'package:submersion/features/dive_3d/presentation/widgets/tissue_tooltip_layout.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
@@ -33,7 +36,12 @@ class _SiteSeascapePageState extends ConsumerState<SiteSeascapePage> {
   // No timeline at site level: the scrub cursor stays parked.
   final ValueNotifier<double> _scrub = ValueNotifier(0);
   final ValueNotifier<TissuePick?> _hoverPick = ValueNotifier(null);
-  final Set<SceneOverlay> _visible = {SceneOverlay.markers, SceneOverlay.paths};
+  final Set<SceneOverlay> _visible = {
+    SceneOverlay.markers,
+    SceneOverlay.paths,
+    SceneOverlay.contours,
+  };
+  bool _chartMode = false;
 
   @override
   void dispose() {
@@ -45,8 +53,30 @@ class _SiteSeascapePageState extends ConsumerState<SiteSeascapePage> {
   @override
   Widget build(BuildContext context) {
     final stateAsync = ref.watch(siteSeascapeProvider(widget.siteId));
+    final appearance = ref.watch(
+      settingsProvider.select((s) => s.seascapeAppearance),
+    );
+    final depthUnit = ref.watch(settingsProvider.select((s) => s.depthUnit));
     return Scaffold(
-      appBar: AppBar(title: Text(context.l10n.dive3d_seascape_siteTitle)),
+      appBar: AppBar(
+        title: Text(context.l10n.dive3d_seascape_siteTitle),
+        actions: [
+          IconButton(
+            key: const ValueKey('seascapeAppearanceButton'),
+            icon: const Icon(Icons.tune),
+            tooltip: context.l10n.dive3d_seascape_appearance,
+            onPressed: () => showTerrainAppearanceSheet(context),
+          ),
+          IconButton(
+            key: const ValueKey('seascapeChartToggle'),
+            icon: Icon(_chartMode ? Icons.view_in_ar : Icons.map_outlined),
+            tooltip: _chartMode
+                ? context.l10n.dive3d_seascape_orbitView
+                : context.l10n.dive3d_seascape_chartView,
+            onPressed: () => setState(() => _chartMode = !_chartMode),
+          ),
+        ],
+      ),
       body: stateAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) {
@@ -71,6 +101,7 @@ class _SiteSeascapePageState extends ConsumerState<SiteSeascapePage> {
             :final resolutionMeters,
             :final axisInputs,
             :final grid,
+            :final contourLabels,
           ) =>
             Column(
               children: [
@@ -84,7 +115,12 @@ class _SiteSeascapePageState extends ConsumerState<SiteSeascapePage> {
                             return Dive3dInteractiveViewport(
                               scene: scene,
                               scrubPosition: _scrub,
-                              visibleOverlays: _visible,
+                              visibleOverlays: {
+                                ..._visible,
+                                if (!_chartMode) SceneOverlay.water,
+                              },
+                              chartMode: _chartMode,
+                              contourLabels: contourLabels,
                               axisFrame: axes.frame,
                               axisLabels: axes.labels,
                               chromeStyle: seascapeChromeStyle(context),
@@ -103,6 +139,21 @@ class _SiteSeascapePageState extends ConsumerState<SiteSeascapePage> {
                         left: 8,
                         right: 8,
                         child: _sourceChip(sourceId, resolutionMeters),
+                      ),
+                      Positioned(
+                        top: 40,
+                        right: 8,
+                        child: SeascapeDepthLegend(
+                          maxDepthMeters: axisInputs.maxDepth,
+                          hasLand: grid.depthsMeters.any(
+                            (d) => d == null || d <= 0,
+                          ),
+                          appearance: appearance,
+                          displayUnitInMeters: depthUnit == DepthUnit.feet
+                              ? 0.3048
+                              : 1.0,
+                          depthSymbol: depthUnit.symbol,
+                        ),
                       ),
                       _hoverTooltip(grid),
                     ],
@@ -200,6 +251,14 @@ class _SiteSeascapePageState extends ConsumerState<SiteSeascapePage> {
         children: [
           chip(SceneOverlay.paths, context.l10n.dive3d_seascape_overlay_paths),
           chip(SceneOverlay.markers, context.l10n.dive3d_overlay_markers),
+          chip(
+            SceneOverlay.contours,
+            context.l10n.dive3d_seascape_overlay_contours,
+          ),
+          chip(
+            SceneOverlay.steepWalls,
+            context.l10n.dive3d_seascape_overlay_walls,
+          ),
         ],
       ),
     );

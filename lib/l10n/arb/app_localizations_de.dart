@@ -11506,6 +11506,104 @@ class AppLocalizationsDe extends AppLocalizations {
   String get gasCalculators_tab_mnd => 'MND/END';
 
   @override
+  String get gasCalculators_tab_blender => 'Mischer';
+
+  @override
+  String get gasCalculators_blender_cylinder => 'Flasche';
+
+  @override
+  String get gasCalculators_blender_startCylinder => 'In der Flasche';
+
+  @override
+  String get gasCalculators_blender_targetFill => 'Zielfüllung';
+
+  @override
+  String get gasCalculators_blender_fillGases => 'Füllgase';
+
+  @override
+  String get gasCalculators_blender_pressure => 'Druck';
+
+  @override
+  String get gasCalculators_blender_o2 => 'O₂';
+
+  @override
+  String get gasCalculators_blender_he => 'He';
+
+  @override
+  String get gasCalculators_blender_air => 'Luft';
+
+  @override
+  String get gasCalculators_blender_helium => 'Helium';
+
+  @override
+  String get gasCalculators_blender_procedure => 'Füllreihenfolge';
+
+  @override
+  String get gasCalculators_blender_amounts => 'Zuzuführendes Gas';
+
+  @override
+  String gasCalculators_blender_stepStart(String pressure, String gas) {
+    return 'Beginne mit $pressure $gas';
+  }
+
+  @override
+  String gasCalculators_blender_stepFill(
+    String gas,
+    String pressure,
+    String mix,
+  ) {
+    return 'Fülle $gas bis $pressure → $mix';
+  }
+
+  @override
+  String get gasCalculators_blender_error_targetPressure =>
+      'Zieldruck muss höher als der Ausgangsdruck sein.';
+
+  @override
+  String get gasCalculators_blender_error_invalidMix =>
+      'O₂ + He eines Gasgemischs darf 100 % nicht überschreiten.';
+
+  @override
+  String get gasCalculators_blender_error_identicalGases =>
+      'Die beiden Füllgase sind identisch — nichts zu mischen.';
+
+  @override
+  String get gasCalculators_blender_error_linearlyDependent =>
+      'Mit diesen Füllgasen ist das Zielgemisch nicht möglich — ein Trimix-Ziel braucht eine Heliumquelle.';
+
+  @override
+  String get gasCalculators_blender_error_negativeAmount =>
+      'Dieses Gemisch ist mit diesen Gasen nicht erreichbar — es müsste Gas entnommen werden.';
+
+  @override
+  String gasCalculators_blender_error_drainTo(String pressure) {
+    return 'Zu viel Gas in der Flasche für dieses Gemisch. Zuerst auf $pressure ablassen, dann füllen.';
+  }
+
+  @override
+  String get gasCalculators_blender_error_drainEmpty =>
+      'Das Gas in der Flasche kann für dieses Gemisch nicht verwendet werden. Zuerst vollständig entleeren, dann füllen.';
+
+  @override
+  String get gasCalculators_blender_error_cannotRemoveHelium =>
+      'Die Flasche enthält Helium, das Zielgemisch nicht. Nachfüllen verdünnt Helium, entfernt es aber nicht: die Flasche muss zuerst entleert werden.';
+
+  @override
+  String get gasCalculators_blender_error_insufficientGases =>
+      'Ein heliumfreies Ziel braucht zwei heliumfreie Füllgase mit unterschiedlichem O₂-Gehalt.';
+
+  @override
+  String get gasCalculators_blender_error_targetNotReached =>
+      'Mit diesen Füllgasen wird das Zielgemisch nicht exakt erreicht. Füllgase und ihre Reihenfolge prüfen.';
+
+  @override
+  String get gasCalculators_blender_about => 'Über das Mischen';
+
+  @override
+  String get gasCalculators_blender_aboutBody =>
+      'Partialdruck-Mischung für das Zielgemisch mit realem Gasverhalten (Van der Waals). Fülle jedes Füllgas der Reihe nach bis zum angezeigten Druck. Füllgase und ihre Reihenfolge sind einstellbar; analysiere das fertige Gemisch immer, bevor du damit tauchst.';
+
+  @override
   String get gasCalculators_tab_mod => 'MOD';
 
   @override
@@ -21979,6 +22077,59 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get dive3d_seascape_overlay_paths => 'Tauchgangspfade';
+
+  @override
+  String get dive3d_seascape_overlay_contours => 'Tiefenlinien';
+
+  @override
+  String get dive3d_seascape_overlay_walls => 'Steilwände';
+
+  @override
+  String get dive3d_overlay_water => 'Wasseroberfläche';
+
+  @override
+  String get dive3d_seascape_legend_land => 'Land';
+
+  @override
+  String get dive3d_seascape_appearance => 'Geländedarstellung';
+
+  @override
+  String get dive3d_seascape_chartView => 'Kartenansicht';
+
+  @override
+  String get dive3d_seascape_orbitView => '3D-Ansicht';
+
+  @override
+  String get dive3d_seascape_appearance_rampRange =>
+      'Farbtiefenbereich begrenzen';
+
+  @override
+  String get dive3d_seascape_appearance_rampMax => 'Dunkelste Farbe bei';
+
+  @override
+  String get dive3d_seascape_appearance_banded => 'Gestufter Verlauf';
+
+  @override
+  String get dive3d_seascape_appearance_contours => 'Tiefenlinien';
+
+  @override
+  String get dive3d_seascape_appearance_contourAuto => 'Automatisch';
+
+  @override
+  String get dive3d_seascape_appearance_contourCustom => 'Benutzerdefiniert';
+
+  @override
+  String get dive3d_seascape_appearance_addLevel => 'Linie hinzufügen';
+
+  @override
+  String get dive3d_seascape_appearance_defaultColor => 'Standard';
+
+  @override
+  String get dive3d_seascape_appearance_wallAngle => 'Steilwand-Winkel';
+
+  @override
+  String get dive3d_seascape_appearance_wallAngleNote =>
+      'Bathymetriezellen mitteln das Gefälle in ihrem Inneren, echte Wände wirken daher flacher. Deutlich unter 45 Grad bleiben.';
 
   @override
   String get dive3d_seascape_siteTitle => 'Standort-Seelandschaft';

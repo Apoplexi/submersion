@@ -16,6 +16,7 @@ import 'package:submersion/features/dive_sites/data/repositories/site_repository
 import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart'
     as domain;
 import 'package:submersion/features/dive_sites/presentation/providers/site_providers.dart';
+import 'package:submersion/features/dive_3d/domain/spatial/seascape_appearance.dart';
 import 'package:submersion/features/settings/data/repositories/app_settings_repository.dart';
 import 'package:submersion/features/settings/presentation/pages/settings_page.dart';
 import 'package:submersion/core/constants/card_color.dart';
@@ -140,6 +141,10 @@ class _MockSettingsNotifier extends StateNotifier<AppSettings>
   @override
   Future<void> setAccentListIcons(bool value) async =>
       state = state.copyWith(accentListIcons: value);
+
+  @override
+  Future<void> setSeascapeAppearance(SeascapeAppearance appearance) async =>
+      state = state.copyWith(seascapeAppearance: appearance);
 
   @override
   Future<void> setChamberHidden(String chamberId, bool hidden) async {

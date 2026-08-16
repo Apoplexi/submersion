@@ -3,6 +3,13 @@ import 'dart:ui';
 
 import 'package:submersion/features/dive_3d/domain/geometry/scene_bounds.dart';
 
+/// The chart-mode camera pose: from above, north-up, east-right. This trio
+/// is load-bearing: yaw/pitch alone cannot give all three at once (see the
+/// chart-pose test), so chart mode always pairs these angles with
+/// mirrorX: true.
+const double chartYawDegrees = 180.0;
+const double chartPitchDegrees = 90.0;
+
 /// Orthographic projector: yaw about Y then pitch about X, drop view z,
 /// fit to canvas, scale by zoom. The single camera model for every dive_3d
 /// renderer -- preview card, interactive viewport, and deterministic tests.
@@ -13,6 +20,7 @@ class SceneProjector {
   // (e.g. the tissue surface with sceneMinY: 0) orbit around the right pivot
   // instead of the default depth midpoint.
   final double _yCenter;
+  final bool _mirror;
   late final double _scale;
   late final Offset _offset;
 
@@ -22,11 +30,13 @@ class SceneProjector {
     double yawDegrees = -32,
     double pitchDegrees = 22,
     double zoom = 1.0,
+    bool mirrorX = false,
   }) : _cy = math.cos(yawDegrees * math.pi / 180),
        _sy = math.sin(yawDegrees * math.pi / 180),
        _cp = math.cos(pitchDegrees * math.pi / 180),
        _sp = math.sin(pitchDegrees * math.pi / 180),
-       _yCenter = (bounds.sceneMinY + bounds.sceneMaxY) / 2 {
+       _yCenter = (bounds.sceneMinY + bounds.sceneMaxY) / 2,
+       _mirror = mirrorX {
     // Fit: project the scene box corners at unit scale, then scale and
     // center the bounding box into the canvas with a margin.
     var minX = double.infinity, maxX = double.negativeInfinity;
@@ -57,7 +67,7 @@ class SceneProjector {
   (double, double, double) _view(double x, double y, double z) {
     final cx = x - SceneBounds.xSpan / 2;
     final cyy = y - _yCenter;
-    final rx = cx * _cy + z * _sy;
+    final rx = (cx * _cy + z * _sy) * (_mirror ? -1.0 : 1.0);
     final rz = -cx * _sy + z * _cy;
     final ry = cyy * _cp - rz * _sp;
     final rz2 = cyy * _sp + rz * _cp;

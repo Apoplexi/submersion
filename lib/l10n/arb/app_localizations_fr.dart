@@ -11551,6 +11551,104 @@ class AppLocalizationsFr extends AppLocalizations {
   String get gasCalculators_tab_mnd => 'MND/END';
 
   @override
+  String get gasCalculators_tab_blender => 'Mélangeur';
+
+  @override
+  String get gasCalculators_blender_cylinder => 'Bloc';
+
+  @override
+  String get gasCalculators_blender_startCylinder => 'Dans le bloc';
+
+  @override
+  String get gasCalculators_blender_targetFill => 'Remplissage cible';
+
+  @override
+  String get gasCalculators_blender_fillGases => 'Gaz de remplissage';
+
+  @override
+  String get gasCalculators_blender_pressure => 'Pression';
+
+  @override
+  String get gasCalculators_blender_o2 => 'O₂';
+
+  @override
+  String get gasCalculators_blender_he => 'He';
+
+  @override
+  String get gasCalculators_blender_air => 'Air';
+
+  @override
+  String get gasCalculators_blender_helium => 'Hélium';
+
+  @override
+  String get gasCalculators_blender_procedure => 'Procédure de remplissage';
+
+  @override
+  String get gasCalculators_blender_amounts => 'Gaz à ajouter';
+
+  @override
+  String gasCalculators_blender_stepStart(String pressure, String gas) {
+    return 'Commencer avec $pressure $gas';
+  }
+
+  @override
+  String gasCalculators_blender_stepFill(
+    String gas,
+    String pressure,
+    String mix,
+  ) {
+    return 'Remplir $gas jusqu\'à $pressure → $mix';
+  }
+
+  @override
+  String get gasCalculators_blender_error_targetPressure =>
+      'La pression cible doit être supérieure à la pression de départ.';
+
+  @override
+  String get gasCalculators_blender_error_invalidMix =>
+      'L\'O₂ + He d\'un mélange ne peut pas dépasser 100 %.';
+
+  @override
+  String get gasCalculators_blender_error_identicalGases =>
+      'Les deux gaz de remplissage sont identiques — rien à mélanger.';
+
+  @override
+  String get gasCalculators_blender_error_linearlyDependent =>
+      'Ces gaz ne peuvent pas produire le mélange cible — une cible trimix nécessite une source d\'hélium.';
+
+  @override
+  String get gasCalculators_blender_error_negativeAmount =>
+      'Ce mélange n\'est pas réalisable avec ces gaz — il faudrait retirer du gaz.';
+
+  @override
+  String gasCalculators_blender_error_drainTo(String pressure) {
+    return 'Trop de gaz dans le bloc pour ce mélange. Vidangez d\'abord à $pressure, puis remplissez.';
+  }
+
+  @override
+  String get gasCalculators_blender_error_drainEmpty =>
+      'Le gaz présent dans le bloc ne peut pas servir à ce mélange. Videz-le complètement, puis remplissez.';
+
+  @override
+  String get gasCalculators_blender_error_cannotRemoveHelium =>
+      'Le bloc contient de l\'hélium alors que le mélange cible n\'en contient pas. Le remplissage dilue l\'hélium mais ne l\'élimine pas : le bloc doit d\'abord être vidé.';
+
+  @override
+  String get gasCalculators_blender_error_insufficientGases =>
+      'Une cible sans hélium nécessite deux gaz de remplissage sans hélium de teneurs en O₂ différentes.';
+
+  @override
+  String get gasCalculators_blender_error_targetNotReached =>
+      'Ces gaz de remplissage n\'atteignent pas exactement le mélange cible. Vérifiez les gaz et leur ordre.';
+
+  @override
+  String get gasCalculators_blender_about => 'À propos du mélange';
+
+  @override
+  String get gasCalculators_blender_aboutBody =>
+      'Mélange par pressions partielles pour le mélange cible, avec comportement de gaz réel (Van der Waals). Ajoutez chaque gaz de remplissage dans l\'ordre, jusqu\'à la pression indiquée. Les gaz et leur ordre sont configurables ; analysez toujours le mélange final avant de plonger.';
+
+  @override
   String get gasCalculators_tab_mod => 'MOD';
 
   @override
@@ -22091,6 +22189,59 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get dive3d_seascape_overlay_paths => 'Trajets de plongée';
+
+  @override
+  String get dive3d_seascape_overlay_contours => 'Isobathes';
+
+  @override
+  String get dive3d_seascape_overlay_walls => 'Tombants';
+
+  @override
+  String get dive3d_overlay_water => 'Surface de l\'eau';
+
+  @override
+  String get dive3d_seascape_legend_land => 'Terre';
+
+  @override
+  String get dive3d_seascape_appearance => 'Apparence du terrain';
+
+  @override
+  String get dive3d_seascape_chartView => 'Vue carte';
+
+  @override
+  String get dive3d_seascape_orbitView => 'Vue 3D';
+
+  @override
+  String get dive3d_seascape_appearance_rampRange =>
+      'Limiter la plage de profondeur des couleurs';
+
+  @override
+  String get dive3d_seascape_appearance_rampMax => 'Couleur la plus foncée à';
+
+  @override
+  String get dive3d_seascape_appearance_banded => 'Dégradé par paliers';
+
+  @override
+  String get dive3d_seascape_appearance_contours => 'Niveaux d\'isobathes';
+
+  @override
+  String get dive3d_seascape_appearance_contourAuto => 'Automatique';
+
+  @override
+  String get dive3d_seascape_appearance_contourCustom => 'Personnalisé';
+
+  @override
+  String get dive3d_seascape_appearance_addLevel => 'Ajouter un niveau';
+
+  @override
+  String get dive3d_seascape_appearance_defaultColor => 'Par défaut';
+
+  @override
+  String get dive3d_seascape_appearance_wallAngle => 'Angle de tombant';
+
+  @override
+  String get dive3d_seascape_appearance_wallAngleNote =>
+      'Les cellules bathymétriques moyennent la pente interne : les vrais tombants paraissent moins raides. Rester bien en dessous de 45 degrés.';
 
   @override
   String get dive3d_seascape_siteTitle => 'Paysage marin du site';

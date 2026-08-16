@@ -20,6 +20,7 @@ import 'package:submersion/features/divers/data/repositories/diver_repository.da
     show DeleteDiverResult;
 import 'package:submersion/features/divers/domain/entities/diver.dart';
 import 'package:submersion/features/divers/presentation/providers/diver_providers.dart';
+import 'package:submersion/features/dive_3d/domain/spatial/seascape_appearance.dart';
 import 'package:submersion/features/settings/presentation/pages/home_appearance_page.dart';
 import 'package:submersion/features/settings/presentation/pages/section_appearance_page.dart';
 import 'package:submersion/features/settings/presentation/pages/settings_page.dart';
@@ -61,6 +62,10 @@ class _MockSettingsNotifier extends StateNotifier<AppSettings>
   @override
   Future<void> setAccentListIcons(bool value) async =>
       state = state.copyWith(accentListIcons: value);
+
+  @override
+  Future<void> setSeascapeAppearance(SeascapeAppearance appearance) async =>
+      state = state.copyWith(seascapeAppearance: appearance);
 
   @override
   Future<void> setChamberHidden(String chamberId, bool hidden) async {
