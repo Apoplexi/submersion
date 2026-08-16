@@ -153,26 +153,37 @@ final blenderTargetMixProvider = StateProvider<GasMix>(
   (ref) => const GasMix(o2: 32),
 );
 
-/// Fill gases, applied in order. Defaults O2 -> air -> helium suit both a
-/// nitrox target (first two) and a trimix target (all three).
+/// Fill gases, applied in this order. The default O2 -> helium -> air is the
+/// order a fill station works in: helium is decanted while the cylinder is
+/// still low, and the compressor tops off with air last. A helium-free target
+/// skips the helium source and blends O2 with air.
 final blenderFillGas1Provider = StateProvider<GasMix>(
   (ref) => const GasMix(o2: 100),
 );
 final blenderFillGas2Provider = StateProvider<GasMix>(
-  (ref) => const GasMix(o2: 21),
-);
-final blenderFillGas3Provider = StateProvider<GasMix>(
   (ref) => const GasMix(o2: 0, he: 100),
 );
+final blenderFillGas3Provider = StateProvider<GasMix>(
+  (ref) => const GasMix(o2: 21),
+);
+
+/// The cylinder being filled. Only its water capacity matters here: it turns
+/// the solver's per-litre amounts into the gas quantity actually drawn from
+/// each bank.
+final blenderTankProvider = StateProvider<TankSpec>((ref) => defaultTankSpec());
 
 /// Bumped by a reset so the input fields re-seed their controllers.
 final blenderResetEpochProvider = StateProvider<int>((ref) => 0);
 
 /// Either a computed fill procedure or the reason one is not achievable.
 class BlenderOutcome {
-  const BlenderOutcome({this.result, this.error});
+  const BlenderOutcome({this.result, this.error, this.drainToBar});
   final BlendResult? result;
   final BlendError? error;
+
+  /// Set when the blend fails only because the cylinder holds too much gas:
+  /// the pressure to drain down to before starting.
+  final double? drainToBar;
 }
 
 /// The fill procedure for the current inputs; carries a [BlendError] instead of
@@ -193,7 +204,7 @@ final blenderResultProvider = Provider<BlenderOutcome>((ref) {
       ),
     );
   } on BlendException catch (e) {
-    return BlenderOutcome(error: e.error);
+    return BlenderOutcome(error: e.error, drainToBar: e.drainToBar);
   }
 });
 
@@ -204,11 +215,12 @@ void resetGasBlender(WidgetRef ref) {
   ref.read(blenderTargetPressureProvider.notifier).state = 200.0;
   ref.read(blenderTargetMixProvider.notifier).state = const GasMix(o2: 32);
   ref.read(blenderFillGas1Provider.notifier).state = const GasMix(o2: 100);
-  ref.read(blenderFillGas2Provider.notifier).state = const GasMix(o2: 21);
-  ref.read(blenderFillGas3Provider.notifier).state = const GasMix(
+  ref.read(blenderFillGas2Provider.notifier).state = const GasMix(
     o2: 0,
     he: 100,
   );
+  ref.read(blenderFillGas3Provider.notifier).state = const GasMix(o2: 21);
+  ref.read(blenderTankProvider.notifier).state = defaultTankSpec();
   ref.read(blenderResetEpochProvider.notifier).state++;
 }
 

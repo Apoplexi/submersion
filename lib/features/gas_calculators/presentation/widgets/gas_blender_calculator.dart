@@ -3,10 +3,12 @@ import 'package:flutter/services.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/l10n/l10n_extension.dart';
 
+import 'package:submersion/core/constants/units.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/dive_log/domain/entities/dive.dart'
     show GasMix;
 import 'package:submersion/features/gas_calculators/domain/gas_blender.dart';
+import 'package:submersion/features/gas_calculators/domain/tank_spec.dart';
 import 'package:submersion/features/gas_calculators/presentation/providers/gas_calculators_providers.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 
@@ -32,7 +34,10 @@ class _GasBlenderBody extends ConsumerStatefulWidget {
 }
 
 class _GasBlenderBodyState extends ConsumerState<_GasBlenderBody> {
-  late final UnitFormatter _units;
+  /// Rebuilt per use so a unit change mid-session is picked up; [build]
+  /// watches the settings so the widget actually rebuilds when it happens.
+  UnitFormatter get _units => UnitFormatter(ref.read(settingsProvider));
+
   late final TextEditingController _startP;
   late final TextEditingController _startO2;
   late final TextEditingController _startHe;
@@ -45,7 +50,6 @@ class _GasBlenderBodyState extends ConsumerState<_GasBlenderBody> {
   @override
   void initState() {
     super.initState();
-    _units = UnitFormatter(ref.read(settingsProvider));
 
     String p(double bar) => _units.convertPressure(bar).toStringAsFixed(0);
     String n(double v) => v.toStringAsFixed(0);
@@ -111,6 +115,8 @@ class _GasBlenderBodyState extends ConsumerState<_GasBlenderBody> {
   @override
   Widget build(BuildContext context) {
     final outcome = ref.watch(blenderResultProvider);
+    // Subscribes to unit changes; the value is read through [_units].
+    ref.watch(settingsProvider);
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
@@ -144,6 +150,37 @@ class _GasBlenderBodyState extends ConsumerState<_GasBlenderBody> {
     ),
   );
 
+  /// Cylinder choices, offered in whichever unit the diver thinks in.
+  Widget _cylinderChips(BuildContext context) {
+    final selected = ref.watch(blenderTankProvider);
+    final units = _units;
+    final choices = ref.watch(settingsProvider).volumeUnit == VolumeUnit.liters
+        ? metricTankChoices()
+        : imperialTankChoices();
+
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: [
+        for (final choice in choices)
+          FilterChip(
+            label: Text(
+              units.formatTankVolume(
+                choice.waterVolumeLiters,
+                choice.workingPressureBar,
+                ratedCapacityCuft: choice.ratedCapacityCuft,
+              ),
+            ),
+            selected: choice == selected,
+            onSelected: (_) =>
+                ref.read(blenderTankProvider.notifier).state = choice,
+            selectedColor: Theme.of(context).colorScheme.primaryContainer,
+            checkmarkColor: Theme.of(context).colorScheme.onPrimaryContainer,
+          ),
+      ],
+    );
+  }
+
   Widget _cylinderCard(BuildContext context) {
     return Card(
       child: Padding(
@@ -151,6 +188,9 @@ class _GasBlenderBodyState extends ConsumerState<_GasBlenderBody> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            _sectionTitle(context.l10n.gasCalculators_blender_cylinder),
+            _cylinderChips(context),
+            const SizedBox(height: 20),
             _sectionTitle(context.l10n.gasCalculators_blender_startCylinder),
             _mixRow(
               pressureController: _startP,
@@ -280,13 +320,14 @@ class _GasBlenderBodyState extends ConsumerState<_GasBlenderBody> {
     );
   }
 
+  /// Localizes "Air" and prettifies the O2 subscript; everything else defers
+  /// to [GasMix.name] so the blender labels gases the way the rest of the app
+  /// does ("Tx 18/45", not a second convention).
   String _gasName(GasMix m) {
-    if (m.he > 0.5) {
-      return 'TMX ${m.o2.round()}/${m.he.round()}';
-    }
-    if ((m.o2 - 21).abs() < 0.5) return context.l10n.gasCalculators_blender_air;
-    if (m.o2 >= 99.5) return 'O₂';
-    return 'EAN${m.o2.round()}';
+    if (m.isAir) return context.l10n.gasCalculators_blender_air;
+    if (m.he >= 99.5) return context.l10n.gasCalculators_blender_helium;
+    if (m.isOxygen) return 'O₂';
+    return m.name;
   }
 
   Widget _resultCard(BuildContext context, BlenderOutcome outcome) {
@@ -304,7 +345,7 @@ class _GasBlenderBodyState extends ConsumerState<_GasBlenderBody> {
               const SizedBox(width: 12),
               Expanded(
                 child: Text(
-                  _errorText(context, outcome.error!),
+                  _errorText(context, outcome.error!, outcome.drainToBar),
                   style: textTheme.bodyMedium?.copyWith(
                     color: colorScheme.onErrorContainer,
                   ),
@@ -317,6 +358,7 @@ class _GasBlenderBodyState extends ConsumerState<_GasBlenderBody> {
     }
 
     final steps = outcome.result!.steps;
+    final tank = ref.watch(blenderTankProvider);
     return Card(
       color: colorScheme.primaryContainer,
       child: Padding(
@@ -352,8 +394,12 @@ class _GasBlenderBodyState extends ConsumerState<_GasBlenderBody> {
             const SizedBox(height: 4),
             Text(
               [
+                // The solver works per litre of cylinder volume; multiplying by
+                // water capacity turns that into the gas actually drawn from
+                // each bank, in the diver's own volume unit.
                 for (final s in steps.where((s) => s.fillGas != null))
-                  '${_gasName(s.fillGas!)}: ${s.addedVolumePerLiter!.toStringAsFixed(1)} L',
+                  '${_gasName(s.fillGas!)}: '
+                      '${_units.formatVolume(s.addedVolumePerLiter! * tank.waterVolumeLiters)}',
               ].join('   ·   '),
               style: textTheme.bodyMedium?.copyWith(
                 color: colorScheme.onPrimaryContainer,
@@ -373,7 +419,11 @@ class _GasBlenderBodyState extends ConsumerState<_GasBlenderBody> {
     return '${index + 1}. ${context.l10n.gasCalculators_blender_stepFill(_gasName(step.fillGas!), pressure, _gasName(step.resultingMix))}';
   }
 
-  String _errorText(BuildContext context, BlendError error) {
+  String _errorText(
+    BuildContext context,
+    BlendError error,
+    double? drainToBar,
+  ) {
     switch (error) {
       case BlendError.targetPressureNotHigher:
         return context.l10n.gasCalculators_blender_error_targetPressure;
@@ -383,8 +433,24 @@ class _GasBlenderBodyState extends ConsumerState<_GasBlenderBody> {
         return context.l10n.gasCalculators_blender_error_identicalGases;
       case BlendError.linearlyDependentGases:
         return context.l10n.gasCalculators_blender_error_linearlyDependent;
+      case BlendError.cannotRemoveHelium:
+        return context.l10n.gasCalculators_blender_error_cannotRemoveHelium;
+      case BlendError.insufficientFillGases:
+        return context.l10n.gasCalculators_blender_error_insufficientGases;
+      case BlendError.targetNotReached:
+        return context.l10n.gasCalculators_blender_error_targetNotReached;
       case BlendError.negativeAmountRequired:
-        return context.l10n.gasCalculators_blender_error_negativeAmount;
+        // Naming the pressure to bleed down to is the whole answer here; a
+        // bare "not achievable" leaves the blender to guess it.
+        if (drainToBar == null) {
+          return context.l10n.gasCalculators_blender_error_negativeAmount;
+        }
+        if (drainToBar < 1) {
+          return context.l10n.gasCalculators_blender_error_drainEmpty;
+        }
+        return context.l10n.gasCalculators_blender_error_drainTo(
+          _units.formatPressure(drainToBar),
+        );
     }
   }
 
