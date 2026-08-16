@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:submersion/features/dive_3d/domain/geometry/axis_frame.dart';
 import 'package:submersion/features/dive_3d/domain/geometry/scene_bounds.dart';
 import 'package:submersion/features/dive_3d/domain/scene_3d.dart';
+import 'package:submersion/features/dive_3d/domain/spatial/contour_builder.dart';
 import 'package:submersion/features/dive_3d/domain/tissue/tissue_surface_grid.dart';
 import 'package:submersion/features/dive_3d/domain/tissue/tissue_surface_picker.dart';
 import 'package:submersion/features/dive_3d/presentation/renderer/axis_labels.dart';
@@ -178,6 +179,26 @@ double? compassNeedleAngle(SceneProjector p) {
   return math.atan2(delta.dy, delta.dx);
 }
 
+/// Index of the anchor triplet nearest the camera. The nearest candidate
+/// sits on the visible front side of the terrain, so the label is never
+/// stranded behind a ridge.
+int bestContourAnchorIndex(SceneProjector p, List<double> anchorsXyz) {
+  var best = 0;
+  var bestDepth = double.negativeInfinity;
+  for (var i = 0; i < anchorsXyz.length ~/ 3; i++) {
+    final d = p.viewDepth(
+      anchorsXyz[i * 3],
+      anchorsXyz[i * 3 + 1],
+      anchorsXyz[i * 3 + 2],
+    );
+    if (d > bestDepth) {
+      bestDepth = d;
+      best = i;
+    }
+  }
+  return best;
+}
+
 /// Foreground axis + label chrome with no tissue surface — the seascape
 /// views' measurement frame, plus (when hover inputs are provided) the
 /// hover marker ring on the picked terrain vertex. The scrub cursor stays
@@ -193,6 +214,13 @@ class AxisChromePainter extends CustomPainter {
   final TextDirection textDirection;
   final TissueSurfaceGrid? surfaceGrid;
   final ValueListenable<TissuePick?>? hoverPick;
+  final List<ContourLabelSpec>? contourLabels;
+  final bool mirrorX;
+
+  /// The viewport's screen-space pan translation. World-anchored chrome
+  /// (axes, labels, hover ring) should ride the pan, but fixed chrome (the
+  /// compass) must cancel it to stay pinned in its corner.
+  final Offset panOffset;
 
   AxisChromePainter({
     required this.bounds,
@@ -205,7 +233,16 @@ class AxisChromePainter extends CustomPainter {
     this.textDirection = TextDirection.ltr,
     this.surfaceGrid,
     this.hoverPick,
+    this.contourLabels,
+    this.mirrorX = false,
+    this.panOffset = Offset.zero,
   }) : super(repaint: hoverPick);
+
+  /// Where the compass rose draws: its fixed corner position pre-shifted
+  /// by -[panOffset], so the viewport's pan Transform lands it back in the
+  /// corner.
+  static Offset compassCenter(Size size, Offset panOffset) =>
+      Offset(_compassInset.dx, size.height - _compassInset.dy) - panOffset;
 
   static const double _compassRadius = 18;
   static const Offset _compassInset = Offset(36, 36);
@@ -218,11 +255,57 @@ class AxisChromePainter extends CustomPainter {
       yawDegrees: yawDegrees,
       pitchDegrees: pitchDegrees,
       zoom: zoom,
+      mirrorX: mirrorX,
     );
     paintAxisSegments(canvas, p, frame, style);
     paintAxisLabels(canvas, p, labels, style, textDirection);
+    _paintContourLabels(canvas, size, p);
     _paintCompass(canvas, size, p);
     _paintHoverRing(canvas, p);
+  }
+
+  /// One label per labeled contour, at the candidate anchor nearest the
+  /// camera; a label whose best candidate projects off-canvas skips this
+  /// frame.
+  void _paintContourLabels(Canvas canvas, Size size, SceneProjector p) {
+    final specs = contourLabels;
+    if (specs == null || specs.isEmpty) return;
+    for (final spec in specs) {
+      if (spec.anchorsXyz.length < 3) continue;
+      final i = bestContourAnchorIndex(p, spec.anchorsXyz);
+      final at = p.project(
+        spec.anchorsXyz[i * 3],
+        spec.anchorsXyz[i * 3 + 1],
+        spec.anchorsXyz[i * 3 + 2],
+      );
+      if (at.dx < -12 ||
+          at.dy < -12 ||
+          at.dx > size.width + 12 ||
+          at.dy > size.height + 12) {
+        continue;
+      }
+      final tp = TextPainter(
+        text: TextSpan(
+          text: spec.text,
+          style: TextStyle(
+            color: style.label,
+            fontSize: 9.5,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        textDirection: textDirection,
+      )..layout();
+      final rect = Rect.fromCenter(
+        center: at,
+        width: tp.width + 8,
+        height: tp.height + 4,
+      );
+      canvas.drawRRect(
+        RRect.fromRectAndRadius(rect, const Radius.circular(4)),
+        Paint()..color = style.markerOutline.withValues(alpha: 0.6),
+      );
+      tp.paint(canvas, at - Offset(tp.width / 2, tp.height / 2));
+    }
   }
 
   /// A small rose in the bottom-left corner whose needle points along the
@@ -232,7 +315,7 @@ class AxisChromePainter extends CustomPainter {
   void _paintCompass(Canvas canvas, Size size, SceneProjector p) {
     final angle = compassNeedleAngle(p);
     if (angle == null) return;
-    final center = Offset(_compassInset.dx, size.height - _compassInset.dy);
+    final center = compassCenter(size, panOffset);
     canvas.drawCircle(
       center,
       _compassRadius,
@@ -308,6 +391,9 @@ class AxisChromePainter extends CustomPainter {
       !identical(old.labels, labels) ||
       !identical(old.bounds, bounds) ||
       !identical(old.surfaceGrid, surfaceGrid) ||
+      !identical(old.contourLabels, contourLabels) ||
+      old.mirrorX != mirrorX ||
+      old.panOffset != panOffset ||
       old.style != style ||
       old.textDirection != textDirection;
 }

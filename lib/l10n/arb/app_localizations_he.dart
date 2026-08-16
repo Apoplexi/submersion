@@ -21449,6 +21449,58 @@ class AppLocalizationsHe extends AppLocalizations {
   String get dive3d_seascape_overlay_paths => 'מסלולי צלילה';
 
   @override
+  String get dive3d_seascape_overlay_contours => 'קווי עומק';
+
+  @override
+  String get dive3d_seascape_overlay_walls => 'קירות תלולים';
+
+  @override
+  String get dive3d_overlay_water => 'פני המים';
+
+  @override
+  String get dive3d_seascape_legend_land => 'יבשה';
+
+  @override
+  String get dive3d_seascape_appearance => 'מראה פני השטח';
+
+  @override
+  String get dive3d_seascape_chartView => 'תצוגת מפה';
+
+  @override
+  String get dive3d_seascape_orbitView => 'תצוגת תלת-ממד';
+
+  @override
+  String get dive3d_seascape_appearance_rampRange => 'הגבלת טווח עומק הצבעים';
+
+  @override
+  String get dive3d_seascape_appearance_rampMax => 'הצבע הכהה ביותר בעומק';
+
+  @override
+  String get dive3d_seascape_appearance_banded => 'מעבר צבע במדרגות';
+
+  @override
+  String get dive3d_seascape_appearance_contours => 'רמות קווי עומק';
+
+  @override
+  String get dive3d_seascape_appearance_contourAuto => 'אוטומטי';
+
+  @override
+  String get dive3d_seascape_appearance_contourCustom => 'מותאם אישית';
+
+  @override
+  String get dive3d_seascape_appearance_addLevel => 'הוספת רמה';
+
+  @override
+  String get dive3d_seascape_appearance_defaultColor => 'ברירת מחדל';
+
+  @override
+  String get dive3d_seascape_appearance_wallAngle => 'זווית קיר תלול';
+
+  @override
+  String get dive3d_seascape_appearance_wallAngleNote =>
+      'תאי מדידת עומק ממצעים את השיפוע שבתוכם, ולכן קירות אמיתיים נראים מתונים יותר. יש להישאר הרבה מתחת ל-45 מעלות.';
+
+  @override
   String get dive3d_seascape_siteTitle => 'נוף ימי של האתר';
 
   @override

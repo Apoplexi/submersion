@@ -20,6 +20,7 @@ import 'package:submersion/core/deco/entities/cns_calculation_method.dart';
 import 'package:submersion/core/services/database_service.dart';
 import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/core/services/sync/sync_event_bus.dart';
+import 'package:submersion/features/dive_3d/domain/spatial/seascape_appearance.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/tissue_color_schemes.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 
@@ -45,6 +46,17 @@ class DiverSettingsRepository {
       );
       rethrow;
     }
+  }
+
+  /// True when the diver's settings row exists AND has ever stored a
+  /// seascape appearance. Drives the one-time adoption of the legacy
+  /// device-local pref: a null column marks a pre-v151 row (or a diver
+  /// with no row yet), the only cases where the pref may seed the value.
+  Future<bool> hasSeascapeAppearance(String diverId) async {
+    final query = _db.select(_db.diverSettings)
+      ..where((t) => t.diverId.equals(diverId));
+    final row = await query.getSingleOrNull();
+    return row?.seascapeAppearance != null;
   }
 
   /// Create default settings for a diver
@@ -76,6 +88,7 @@ class DiverSettingsRepository {
               visibilityScaleGoodM: Value(s.visibilityScaleGoodM),
               visibilityScaleModerateM: Value(s.visibilityScaleModerateM),
               coordinateFormat: Value(s.coordinateFormat.name),
+              seascapeAppearance: Value(s.seascapeAppearance.encode()),
               timeFormat: Value(s.timeFormat.name),
               dateFormat: Value(s.dateFormat.name),
               themeMode: Value(_themeModeToString(s.themeMode)),
@@ -233,6 +246,7 @@ class DiverSettingsRepository {
           visibilityScaleGoodM: Value(settings.visibilityScaleGoodM),
           visibilityScaleModerateM: Value(settings.visibilityScaleModerateM),
           coordinateFormat: Value(settings.coordinateFormat.name),
+          seascapeAppearance: Value(settings.seascapeAppearance.encode()),
           timeFormat: Value(settings.timeFormat.name),
           dateFormat: Value(settings.dateFormat.name),
           themeMode: Value(_themeModeToString(settings.themeMode)),
@@ -434,6 +448,7 @@ class DiverSettingsRepository {
       visibilityScaleGoodM: row.visibilityScaleGoodM,
       visibilityScaleModerateM: row.visibilityScaleModerateM,
       coordinateFormat: _parseCoordinateFormat(row.coordinateFormat),
+      seascapeAppearance: SeascapeAppearance.decode(row.seascapeAppearance),
       timeFormat: _parseTimeFormat(row.timeFormat),
       dateFormat: _parseDateFormat(row.dateFormat),
       themeMode: _parseThemeMode(row.themeMode),

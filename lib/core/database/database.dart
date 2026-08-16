@@ -1523,6 +1523,13 @@ class DiverSettings extends Table {
   /// showed before v150.
   TextColumn get coordinateFormat =>
       text().withDefault(const Constant('decimalDegrees'))();
+
+  /// v151: seascape terrain appearance (ramp range/banding, contour mode
+  /// and custom levels, steep-wall angle) as one JSON blob, per-diver so
+  /// it syncs. Nullable ON PURPOSE: null marks a row that predates v151
+  /// and has never held a value, which is what lets a device adopt its
+  /// legacy device-local pref exactly once (see SettingsNotifier).
+  TextColumn get seascapeAppearance => text().nullable()();
   // Time/Date format settings
   TextColumn get timeFormat =>
       text().withDefault(const Constant('twelveHour'))();
@@ -2962,7 +2969,7 @@ class AppDatabase extends _$AppDatabase {
 
   /// The current schema version as a static constant so that pre-open checks
   /// (e.g. version-mismatch guard) can reference it without an instance.
-  static const int currentSchemaVersion = 150;
+  static const int currentSchemaVersion = 151;
 
   /// Every schema version that has a migration block in onUpgrade.
   /// Used to calculate progress step counts. When adding a new migration,
@@ -3171,6 +3178,10 @@ class AppDatabase extends _$AppDatabase {
     // coordinate notation. Presentational only -- coordinates stay decimal
     // degrees in storage.
     150,
+    // v151: diver_settings.seascape_appearance (PR #1073): the seascape
+    // terrain appearance knobs as one JSON blob, per-diver so they sync.
+    // Nullable so pre-v151 rows can adopt the legacy device-local pref.
+    151,
   ];
 
   /// Idempotent DDL for the v106 connector-suggestion columns (Lightroom
@@ -4485,6 +4496,22 @@ class AppDatabase extends _$AppDatabase {
       await customStatement(
         'ALTER TABLE diver_settings ADD COLUMN coordinate_format '
         "TEXT NOT NULL DEFAULT 'decimalDegrees'",
+      );
+    }
+  }
+
+  /// Idempotent DDL for the v151 diver_settings seascape appearance blob.
+  /// Same dual-call contract as [_assertVisibilityScaleColumns]. Nullable
+  /// with no default: null marks a pre-v151 row (see the table comment).
+  Future<void> _assertSeascapeAppearanceColumn() async {
+    final cols = await customSelect(
+      "PRAGMA table_info('diver_settings')",
+    ).get();
+    if (cols.isEmpty) return;
+    final names = cols.map((c) => c.read<String>('name')).toSet();
+    if (!names.contains('seascape_appearance')) {
+      await customStatement(
+        'ALTER TABLE diver_settings ADD COLUMN seascape_appearance TEXT',
       );
     }
   }
@@ -7823,6 +7850,11 @@ class AppDatabase extends _$AppDatabase {
           await _assertCoordinateFormatColumn();
         }
         if (from < 150) await reportProgress();
+        // v151: per-diver seascape terrain appearance (synced; PR #1073).
+        if (from < 151) {
+          await _assertSeascapeAppearanceColumn();
+        }
+        if (from < 151) await reportProgress();
       },
       beforeOpen: (details) async {
         // Enable foreign keys
@@ -7949,6 +7981,11 @@ class AppDatabase extends _$AppDatabase {
 
         // v150 backstop: re-assert the coordinate format column.
         await _assertCoordinateFormatColumn();
+
+        // v151 backstop: re-assert the seascape appearance column (the
+        // shared-dev-machine ladder-collision trap: a DB already at this
+        // version number from a parallel branch skips onUpgrade).
+        await _assertSeascapeAppearanceColumn();
 
         // v145 backstop: re-assert the gps_tracks provenance and trim columns.
         await _assertGpsTrackColumns();

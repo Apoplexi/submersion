@@ -15,14 +15,23 @@ import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
 /// waterline (height capped so shorelines read without dominating);
 /// nodata cells fill as shoreline at the waterline.
 class BathymetryTerrainBuilder {
-  static const Color _shallow = Color(0xFF2DD4BF);
-  static const Color _deep = Color(0xFF1E3A8A);
-  static const Color _land = Color(0xFFC2A878);
+  static const Color shallowColor = Color(0xFF2DD4BF);
+  static const Color deepColor = Color(0xFF1E3A8A);
+  static const Color landColor = Color(0xFFC2A878);
   static const Color _water = Color(0xFF3B82F6);
   static const double _waterOpacity = 0.22;
   static const double _landHeightCapFraction = 0.15;
 
-  static const double _metersPerDegLat = 110540.0;
+  static const double metersPerDegLat = 110540.0;
+
+  /// The ramp color at normalized depth [t] (0 = shallow, 1 = ramp max).
+  /// Banded mode quantizes into 10 equal segments sampled at their centers
+  /// so the seascape reads like a stepped nautical chart tint.
+  static Color depthColor(double t, {bool banded = false}) {
+    final tc = t.clamp(0.0, 1.0);
+    final tt = banded ? (((tc * 10).floor().clamp(0, 9)) + 0.5) / 10 : tc;
+    return Color.lerp(shallowColor, deepColor, tt)!;
+  }
 
   /// The grid's extent in local east-north meters relative to [center].
   static ({double minEast, double maxEast, double minNorth, double maxNorth})
@@ -34,12 +43,12 @@ class BathymetryTerrainBuilder {
             grid.cellSizeLonDeg * (grid.cols - 1) -
             center.longitude) *
         mLon;
-    final minNorth = (grid.originLat - center.latitude) * _metersPerDegLat;
+    final minNorth = (grid.originLat - center.latitude) * metersPerDegLat;
     final maxNorth =
         (grid.originLat +
             grid.cellSizeLatDeg * (grid.rows - 1) -
             center.latitude) *
-        _metersPerDegLat;
+        metersPerDegLat;
     return (
       minEast: minEast,
       maxEast: maxEast,
@@ -52,6 +61,8 @@ class BathymetryTerrainBuilder {
     required BathymetryGrid grid,
     required GeoPoint center,
     required SpatialProjection projection,
+    double? rampMaxDepthMeters,
+    bool rampBanded = false,
   }) {
     final rows = grid.rows, cols = grid.cols;
     final mLon = metersPerDegreeLongitude(center.latitude);
@@ -63,7 +74,7 @@ class BathymetryTerrainBuilder {
     for (var r = 0; r < rows; r++) {
       final north =
           (grid.originLat + grid.cellSizeLatDeg * r - center.latitude) *
-          _metersPerDegLat;
+          metersPerDegLat;
       for (var c = 0; c < cols; c++) {
         final east =
             (grid.originLon + grid.cellSizeLonDeg * c - center.longitude) *
@@ -77,10 +88,10 @@ class BathymetryTerrainBuilder {
         positions[vi + 2] = projection.zOf(north);
         final Color color;
         if (raw == null || raw <= 0) {
-          color = _land;
+          color = landColor;
         } else {
-          final t = (depth / maxDepth).clamp(0.0, 1.0);
-          color = Color.lerp(_shallow, _deep, t)!;
+          final ramp = math.max(rampMaxDepthMeters ?? maxDepth, 1.0);
+          color = depthColor(depth / ramp, banded: rampBanded);
         }
         colors[vi] = color.r;
         colors[vi + 1] = color.g;

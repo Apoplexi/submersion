@@ -5,6 +5,7 @@ import 'package:submersion/features/dive_3d/domain/spatial/bathymetry_terrain_bu
 import 'package:submersion/features/dive_3d/application/site_seascape_providers.dart';
 import 'package:submersion/features/dive_3d/domain/spatial/site_seascape_geometry_service.dart';
 import 'package:submersion/features/dive_3d/presentation/pages/site_seascape_page.dart';
+import 'package:submersion/features/dive_3d/presentation/scene_overlay.dart';
 import 'package:submersion/features/dive_3d/presentation/widgets/dive_3d_interactive_viewport.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
@@ -96,6 +97,54 @@ void main() {
     expect(viewport.surfaceGrid!.isEmpty, isFalse);
     expect(viewport.hoverPick, isNotNull);
     expect(viewport.axisChromeOnly, isTrue);
+  });
+
+  testWidgets('contours default on, chip toggles them off', (tester) async {
+    await tester.pumpWidget(page(readyState()));
+    await tester.pump();
+    await tester.pump();
+    Dive3dInteractiveViewport viewport() =>
+        tester.widget<Dive3dInteractiveViewport>(
+          find.byType(Dive3dInteractiveViewport),
+        );
+    expect(viewport().visibleOverlays, contains(SceneOverlay.contours));
+    expect(viewport().visibleOverlays, contains(SceneOverlay.water));
+    expect(viewport().chartMode, isFalse);
+    await tester.tap(find.text('Contours'));
+    await tester.pump();
+    expect(viewport().visibleOverlays, isNot(contains(SceneOverlay.contours)));
+    // Walls chip exists and defaults off.
+    expect(find.text('Steep walls'), findsOneWidget);
+    expect(
+      viewport().visibleOverlays,
+      isNot(contains(SceneOverlay.steepWalls)),
+    );
+  });
+
+  testWidgets('chart toggle enters chart mode and hides the water plane', (
+    tester,
+  ) async {
+    await tester.pumpWidget(page(readyState()));
+    await tester.pump();
+    await tester.pump();
+    await tester.tap(find.byKey(const ValueKey('seascapeChartToggle')));
+    await tester.pump();
+    final viewport = tester.widget<Dive3dInteractiveViewport>(
+      find.byType(Dive3dInteractiveViewport),
+    );
+    expect(viewport.chartMode, isTrue);
+    expect(viewport.visibleOverlays, isNot(contains(SceneOverlay.water)));
+  });
+
+  testWidgets('legend renders on the ready state', (tester) async {
+    await tester.pumpWidget(page(readyState()));
+    await tester.pump();
+    await tester.pump();
+    expect(find.byKey(const ValueKey('seascapeDepthLegend')), findsOneWidget);
+    expect(
+      find.byKey(const ValueKey('seascapeAppearanceButton')),
+      findsOneWidget,
+    );
   });
 
   testWidgets('no-coordinates state shows the message, not a spinner', (

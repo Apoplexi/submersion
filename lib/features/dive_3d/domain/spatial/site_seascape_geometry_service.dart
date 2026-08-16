@@ -8,9 +8,12 @@ import 'package:submersion/features/dive_3d/domain/geometry/marker_layout.dart';
 import 'package:submersion/features/dive_3d/domain/geometry/scene_bounds.dart';
 import 'package:submersion/features/dive_3d/domain/scene_3d.dart';
 import 'package:submersion/features/dive_3d/domain/spatial/bathymetry_terrain_builder.dart';
+import 'package:submersion/features/dive_3d/domain/spatial/contour_builder.dart';
 import 'package:submersion/features/dive_3d/domain/spatial/reckoned_path.dart';
+import 'package:submersion/features/dive_3d/domain/spatial/seascape_appearance.dart';
 import 'package:submersion/features/dive_3d/domain/spatial/spatial_path_builder.dart';
 import 'package:submersion/features/dive_3d/domain/spatial/spatial_projection.dart';
+import 'package:submersion/features/dive_3d/domain/spatial/wall_highlight_builder.dart';
 import 'package:submersion/features/dive_3d/presentation/scene_overlay.dart';
 import 'package:submersion/features/dive_sites/domain/entities/dive_site.dart';
 
@@ -49,6 +52,9 @@ class SiteSeascapeInput {
   final double? siteMaxDepth;
   final List<SiteDivePathInput> divePaths;
   final List<NearbySiteInput> nearbySites;
+  final SeascapeAppearance appearance;
+  final double displayUnitInMeters;
+  final String depthSymbol;
 
   const SiteSeascapeInput({
     required this.grid,
@@ -57,6 +63,9 @@ class SiteSeascapeInput {
     this.siteMaxDepth,
     required this.divePaths,
     required this.nearbySites,
+    this.appearance = const SeascapeAppearance(),
+    this.displayUnitInMeters = 1.0,
+    this.depthSymbol = 'm',
   });
 }
 
@@ -70,7 +79,11 @@ class SiteSeascapeGeometryService {
 
   const SiteSeascapeGeometryService();
 
-  Scene3d build(SiteSeascapeInput input) {
+  Scene3d build(SiteSeascapeInput input) => buildWithLabels(input).scene;
+
+  ({Scene3d scene, List<ContourLabelSpec> contourLabels}) buildWithLabels(
+    SiteSeascapeInput input,
+  ) {
     final box = BathymetryTerrainBuilder.enuBounds(input.grid, input.center);
     final maxDepth = math.max(
       math.max(input.grid.maxDepthMeters, input.siteMaxDepth ?? 0),
@@ -88,9 +101,35 @@ class SiteSeascapeGeometryService {
       grid: input.grid,
       center: input.center,
       projection: proj,
+      rampMaxDepthMeters: input.appearance.rampMaxDepthMeters,
+      rampBanded: input.appearance.rampBanded,
+    );
+    final contours = buildContourLayers(
+      grid: input.grid,
+      center: input.center,
+      projection: proj,
+      appearance: input.appearance,
+      displayUnitInMeters: input.displayUnitInMeters,
+      depthSymbol: input.depthSymbol,
+    );
+    final wallMesh = buildWallHighlightMesh(
+      grid: input.grid,
+      center: input.center,
+      projection: proj,
+      thresholdDeg: input.appearance.wallAngleDeg,
     );
 
     final layers = <SceneLayer>[SceneLayer(terrain.terrain)];
+    layers.addAll(contours.layers);
+    if (wallMesh != null) {
+      layers.add(
+        SceneLayer(
+          wallMesh,
+          overlay: SceneOverlay.steepWalls,
+          drapedOnTerrain: true,
+        ),
+      );
+    }
     for (final d in input.divePaths) {
       final placed = offsetReckonedPath(d.path, d.anchor);
       if (placed.points.length < 2) continue;
@@ -124,7 +163,7 @@ class SiteSeascapeGeometryService {
     }
     layers
       ..add(SceneLayer(_sitePin(proj, input.siteMaxDepth ?? maxDepth)))
-      ..add(SceneLayer(terrain.water));
+      ..add(SceneLayer(terrain.water, overlay: SceneOverlay.water));
 
     final markers = <SceneMarker>[
       SceneMarker(
@@ -149,7 +188,7 @@ class SiteSeascapeGeometryService {
     ];
 
     final zHalf = proj.zHalfExtent + SceneBounds.zHalfWidth;
-    return Scene3d(
+    final scene = Scene3d(
       layers: layers,
       markers: markers,
       bounds: SceneBounds(
@@ -161,6 +200,7 @@ class SiteSeascapeGeometryService {
         sceneMaxZ: zHalf,
       ),
     );
+    return (scene: scene, contourLabels: contours.labels);
   }
 
   /// A thin vertical quad from the surface down to the site's recorded max

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:submersion/features/dive_3d/domain/geometry/axis_frame.dart';
 import 'package:submersion/features/dive_3d/domain/geometry/marker_layout.dart';
 import 'package:submersion/features/dive_3d/domain/scene_3d.dart';
+import 'package:submersion/features/dive_3d/domain/spatial/contour_builder.dart';
 import 'package:submersion/features/dive_3d/domain/tissue/tissue_surface_grid.dart';
 import 'package:submersion/features/dive_3d/domain/tissue/tissue_surface_picker.dart';
 import 'package:submersion/features/dive_3d/presentation/renderer/axis_labels.dart';
@@ -47,6 +48,14 @@ class Dive3dInteractiveViewport extends StatefulWidget {
   /// kept on the scene's own foreground painter.
   final bool axisChromeOnly;
 
+  /// Chart mode: a locked plan-view camera (from above, north-up,
+  /// east-right via the mirrored chart pose). One-finger drag pans instead
+  /// of rotating; double-tap resets to the chart pose.
+  final bool chartMode;
+
+  /// Labeled contour levels for the seascape chrome; null everywhere else.
+  final List<ContourLabelSpec>? contourLabels;
+
   const Dive3dInteractiveViewport({
     super.key,
     required this.scene,
@@ -60,6 +69,8 @@ class Dive3dInteractiveViewport extends StatefulWidget {
     this.chromeStyle,
     this.hoverPick,
     this.axisChromeOnly = false,
+    this.chartMode = false,
+    this.contourLabels,
   });
 
   @override
@@ -81,12 +92,46 @@ class _Dive3dInteractiveViewportState extends State<Dive3dInteractiveViewport> {
   // the LayoutBuilder constraints) can re-project the hover pick.
   Size? _lastLayoutSize;
 
+  /// Snaps the camera to the pose the current mode calls for: the chart
+  /// plan view, or the default orbit view.
+  void _applyPose() {
+    if (widget.chartMode) {
+      _yaw = chartYawDegrees;
+      _pitch = chartPitchDegrees;
+    } else {
+      _yaw = _initialYaw;
+      _pitch = _initialPitch;
+    }
+    _zoom = 1.0;
+    _pan = Offset.zero;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _applyPose();
+  }
+
+  @override
+  void didUpdateWidget(Dive3dInteractiveViewport old) {
+    super.didUpdateWidget(old);
+    if (old.chartMode != widget.chartMode) {
+      setState(_applyPose);
+      _refreshHoverAfterCameraChange();
+    }
+  }
+
   void _onPanUpdate(DragUpdateDetails details) {
     setState(() {
-      // Drag follows the object: dragging right spins it clockwise (yaw up),
-      // dragging down tilts it toward the viewer.
-      _yaw += details.delta.dx * 0.4;
-      _pitch = (_pitch + details.delta.dy * 0.4).clamp(-80.0, 80.0);
+      if (widget.chartMode) {
+        // Chart mode is a locked plan view: one-finger drag pans the map.
+        _pan += details.delta;
+      } else {
+        // Drag follows the object: dragging right spins it clockwise (yaw
+        // up), dragging down tilts it toward the viewer.
+        _yaw += details.delta.dx * 0.4;
+        _pitch = (_pitch + details.delta.dy * 0.4).clamp(-80.0, 80.0);
+      }
     });
     _refreshHoverAfterCameraChange();
   }
@@ -113,12 +158,7 @@ class _Dive3dInteractiveViewportState extends State<Dive3dInteractiveViewport> {
   }
 
   void _resetCamera() {
-    setState(() {
-      _yaw = _initialYaw;
-      _pitch = _initialPitch;
-      _zoom = 1.0;
-      _pan = Offset.zero;
-    });
+    setState(_applyPose);
     _refreshHoverAfterCameraChange();
   }
 
@@ -161,6 +201,7 @@ class _Dive3dInteractiveViewportState extends State<Dive3dInteractiveViewport> {
     yawDegrees: _yaw,
     pitchDegrees: _pitch,
     zoom: _zoom,
+    mirrorX: widget.chartMode,
   );
 
   // Cached screen projections of the surface grid, recomputed when the camera,
@@ -283,6 +324,7 @@ class _Dive3dInteractiveViewportState extends State<Dive3dInteractiveViewport> {
             pitchDegrees: _pitch,
             zoom: _zoom,
             visibleOverlays: widget.visibleOverlays,
+            mirrorX: widget.chartMode,
           ),
           foregroundPainter: hasChrome
               ? TissueChromePainter(
@@ -303,6 +345,7 @@ class _Dive3dInteractiveViewportState extends State<Dive3dInteractiveViewport> {
                   zoom: _zoom,
                   scrubPosition: widget.scrubPosition,
                   style: widget.scrubCursor,
+                  mirrorX: widget.chartMode,
                 ),
           child: const SizedBox.expand(),
         );
@@ -344,6 +387,9 @@ class _Dive3dInteractiveViewportState extends State<Dive3dInteractiveViewport> {
                   textDirection: Directionality.of(context),
                   surfaceGrid: hasHover ? widget.surfaceGrid : null,
                   hoverPick: hasHover ? widget.hoverPick : null,
+                  contourLabels: widget.contourLabels,
+                  mirrorX: widget.chartMode,
+                  panOffset: _pan,
                 ),
                 child: scenePaint,
               )
@@ -486,6 +532,7 @@ class _ScrubCursorPainter extends CustomPainter {
   final double zoom;
   final ValueListenable<double> scrubPosition;
   final ScrubCursorStyle style;
+  final bool mirrorX;
 
   _ScrubCursorPainter({
     required this.scene,
@@ -494,6 +541,7 @@ class _ScrubCursorPainter extends CustomPainter {
     required this.zoom,
     required this.scrubPosition,
     required this.style,
+    this.mirrorX = false,
   }) : super(repaint: scrubPosition);
 
   @override
@@ -508,6 +556,7 @@ class _ScrubCursorPainter extends CustomPainter {
       yawDegrees: yawDegrees,
       pitchDegrees: pitchDegrees,
       zoom: zoom,
+      mirrorX: mirrorX,
     );
     if (style == ScrubCursorStyle.timePlane) {
       final b = scene.bounds;
@@ -540,5 +589,6 @@ class _ScrubCursorPainter extends CustomPainter {
       oldDelegate.yawDegrees != yawDegrees ||
       oldDelegate.pitchDegrees != pitchDegrees ||
       oldDelegate.zoom != zoom ||
-      oldDelegate.style != style;
+      oldDelegate.style != style ||
+      oldDelegate.mirrorX != mirrorX;
 }

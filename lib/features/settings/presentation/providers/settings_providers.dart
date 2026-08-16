@@ -21,6 +21,7 @@ import 'package:submersion/core/presentation/startup_brightness.dart';
 import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/features/divers/presentation/providers/diver_providers.dart';
 import 'package:submersion/features/notifications/data/services/notification_scheduler.dart';
+import 'package:submersion/features/dive_3d/domain/spatial/seascape_appearance.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/tissue_color_schemes.dart';
 import 'package:submersion/features/settings/data/repositories/app_settings_repository.dart';
 import 'package:submersion/features/settings/data/repositories/diver_settings_repository.dart';
@@ -101,6 +102,12 @@ class SettingsKeys {
   static const String perdixOverlayEnabled = 'perdix_overlay_enabled';
   static const String perdixOverlayX = 'perdix_overlay_x';
   static const String perdixOverlayY = 'perdix_overlay_y';
+
+  // Seascape terrain appearance as one JSON blob. Since v151 the diver's
+  // settings row is the source of truth (so it syncs); this pref is only
+  // the fallback store while no diver exists, adopted once into a row
+  // that has never held a value and then removed.
+  static const String seascapeAppearance = 'seascape_appearance';
 }
 
 /// App settings state
@@ -438,6 +445,10 @@ class AppSettings {
   final double? perdixOverlayX;
   final double? perdixOverlayY;
 
+  /// Seascape terrain appearance (issue #1065 knobs). Device-local, not
+  /// per-diver.
+  final SeascapeAppearance seascapeAppearance;
+
   const AppSettings({
     this.depthUnit = DepthUnit.meters,
     this.temperatureUnit = TemperatureUnit.celsius,
@@ -560,6 +571,7 @@ class AppSettings {
     this.perdixOverlayEnabled = false,
     this.perdixOverlayX,
     this.perdixOverlayY,
+    this.seascapeAppearance = const SeascapeAppearance(),
   });
 
   /// Compute the current unit preset based on actual unit values
@@ -717,6 +729,7 @@ class AppSettings {
     bool? perdixOverlayEnabled,
     double? perdixOverlayX,
     double? perdixOverlayY,
+    SeascapeAppearance? seascapeAppearance,
   }) {
     return AppSettings(
       depthUnit: depthUnit ?? this.depthUnit,
@@ -874,6 +887,7 @@ class AppSettings {
       perdixOverlayEnabled: perdixOverlayEnabled ?? this.perdixOverlayEnabled,
       perdixOverlayX: perdixOverlayX ?? this.perdixOverlayX,
       perdixOverlayY: perdixOverlayY ?? this.perdixOverlayY,
+      seascapeAppearance: seascapeAppearance ?? this.seascapeAppearance,
     );
   }
 }
@@ -1039,6 +1053,14 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
           prefs.getBool(SettingsKeys.perdixOverlayEnabled) ?? false;
       final perdixOverlayX = prefs.getDouble(SettingsKeys.perdixOverlayX);
       final perdixOverlayY = prefs.getDouble(SettingsKeys.perdixOverlayY);
+      // Since v151 the seascape appearance is per-diver (synced). The pref
+      // is only the fallback store while no diver exists; with a diver it
+      // is adopted once into a row that has never held a value, then
+      // retired.
+      final legacySeascapeRaw = prefs.getString(
+        SettingsKeys.seascapeAppearance,
+      );
+      final seascapeAppearance = SeascapeAppearance.decode(legacySeascapeRaw);
 
       final diverId = _validatedDiverId;
       if (diverId == null) {
@@ -1054,10 +1076,17 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
           perdixOverlayEnabled: perdixOverlayEnabled,
           perdixOverlayX: perdixOverlayX,
           perdixOverlayY: perdixOverlayY,
+          seascapeAppearance: seascapeAppearance,
         );
         await _writeCachedThemeMode(prefs);
         return;
       }
+
+      // A row whose seascape column has never held a value (pre-v151, or
+      // no row yet) adopts the legacy device-local pref exactly once.
+      final adoptLegacySeascape =
+          legacySeascapeRaw != null &&
+          !(await _repository.hasSeascapeAppearance(diverId));
 
       // Load settings from database
       final settings = await _repository.getOrCreateSettingsForDiver(diverId);
@@ -1078,7 +1107,17 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
         perdixOverlayEnabled: perdixOverlayEnabled,
         perdixOverlayX: perdixOverlayX,
         perdixOverlayY: perdixOverlayY,
+        seascapeAppearance: adoptLegacySeascape ? seascapeAppearance : null,
       );
+      if (adoptLegacySeascape) {
+        // Write through immediately so the adopted value syncs.
+        await _repository.updateSettingsForDiver(diverId, state);
+      }
+      if (legacySeascapeRaw != null) {
+        // Retire the pref: the diver row is the source of truth now, and a
+        // stale pref must never resurrect a value reset on another device.
+        await prefs.remove(SettingsKeys.seascapeAppearance);
+      }
 
       await _writeCachedThemeMode(prefs);
 
@@ -1148,11 +1187,19 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
     if (perdixY != null) {
       await prefs.setDouble(SettingsKeys.perdixOverlayY, perdixY);
     }
-
     await _writeCachedThemeMode(prefs);
 
     final diverId = _validatedDiverId;
-    if (diverId == null) return;
+    if (diverId == null) {
+      // No diver yet: the device-local pref is the seascape knobs' only
+      // store; it is adopted into the diver row and retired on the first
+      // load with a diver (see _loadSettings).
+      await prefs.setString(
+        SettingsKeys.seascapeAppearance,
+        state.seascapeAppearance.encode(),
+      );
+      return;
+    }
     await _repository.updateSettingsForDiver(diverId, state);
   }
 
@@ -1580,6 +1627,11 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
 
   Future<void> setTissueColorScheme(TissueColorScheme scheme) async {
     state = state.copyWith(tissueColorScheme: scheme);
+    await _saveSettings();
+  }
+
+  Future<void> setSeascapeAppearance(SeascapeAppearance appearance) async {
+    state = state.copyWith(seascapeAppearance: appearance);
     await _saveSettings();
   }
 

@@ -21926,6 +21926,59 @@ class AppLocalizationsHu extends AppLocalizations {
   String get dive3d_seascape_overlay_paths => 'Merülési útvonalak';
 
   @override
+  String get dive3d_seascape_overlay_contours => 'Mélységvonalak';
+
+  @override
+  String get dive3d_seascape_overlay_walls => 'Meredek falak';
+
+  @override
+  String get dive3d_overlay_water => 'Vízfelszín';
+
+  @override
+  String get dive3d_seascape_legend_land => 'Szárazföld';
+
+  @override
+  String get dive3d_seascape_appearance => 'Terep megjelenése';
+
+  @override
+  String get dive3d_seascape_chartView => 'Térképnézet';
+
+  @override
+  String get dive3d_seascape_orbitView => '3D nézet';
+
+  @override
+  String get dive3d_seascape_appearance_rampRange =>
+      'Színmélység-tartomány korlátozása';
+
+  @override
+  String get dive3d_seascape_appearance_rampMax => 'Legsötétebb szín ennél';
+
+  @override
+  String get dive3d_seascape_appearance_banded => 'Sávos színátmenet';
+
+  @override
+  String get dive3d_seascape_appearance_contours => 'Mélységvonal-szintek';
+
+  @override
+  String get dive3d_seascape_appearance_contourAuto => 'Automatikus';
+
+  @override
+  String get dive3d_seascape_appearance_contourCustom => 'Egyéni';
+
+  @override
+  String get dive3d_seascape_appearance_addLevel => 'Szint hozzáadása';
+
+  @override
+  String get dive3d_seascape_appearance_defaultColor => 'Alapértelmezett';
+
+  @override
+  String get dive3d_seascape_appearance_wallAngle => 'Meredek fal szöge';
+
+  @override
+  String get dive3d_seascape_appearance_wallAngleNote =>
+      'A batimetriai cellák átlagolják a bennük lévő lejtést, így a valódi falak laposabbnak tűnnek. Maradjon jóval 45 fok alatt.';
+
+  @override
   String get dive3d_seascape_siteTitle => 'Helyszíni tengertáj';
 
   @override

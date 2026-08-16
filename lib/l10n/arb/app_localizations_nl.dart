@@ -21827,6 +21827,59 @@ class AppLocalizationsNl extends AppLocalizations {
   String get dive3d_seascape_overlay_paths => 'Duikroutes';
 
   @override
+  String get dive3d_seascape_overlay_contours => 'Dieptelijnen';
+
+  @override
+  String get dive3d_seascape_overlay_walls => 'Steile wanden';
+
+  @override
+  String get dive3d_overlay_water => 'Wateroppervlak';
+
+  @override
+  String get dive3d_seascape_legend_land => 'Land';
+
+  @override
+  String get dive3d_seascape_appearance => 'Terreinweergave';
+
+  @override
+  String get dive3d_seascape_chartView => 'Kaartweergave';
+
+  @override
+  String get dive3d_seascape_orbitView => '3D-weergave';
+
+  @override
+  String get dive3d_seascape_appearance_rampRange =>
+      'Kleurdieptebereik beperken';
+
+  @override
+  String get dive3d_seascape_appearance_rampMax => 'Donkerste kleur op';
+
+  @override
+  String get dive3d_seascape_appearance_banded => 'Gradiënt in banden';
+
+  @override
+  String get dive3d_seascape_appearance_contours => 'Dieptelijnniveaus';
+
+  @override
+  String get dive3d_seascape_appearance_contourAuto => 'Automatisch';
+
+  @override
+  String get dive3d_seascape_appearance_contourCustom => 'Aangepast';
+
+  @override
+  String get dive3d_seascape_appearance_addLevel => 'Niveau toevoegen';
+
+  @override
+  String get dive3d_seascape_appearance_defaultColor => 'Standaard';
+
+  @override
+  String get dive3d_seascape_appearance_wallAngle => 'Steile-wandhoek';
+
+  @override
+  String get dive3d_seascape_appearance_wallAngleNote =>
+      'Bathymetriecellen middelen de helling binnenin, echte wanden ogen dus vlakker. Blijf ruim onder 45 graden.';
+
+  @override
   String get dive3d_seascape_siteTitle => 'Zeelandschap van de duikstek';
 
   @override

@@ -21607,6 +21607,58 @@ class AppLocalizationsAr extends AppLocalizations {
   String get dive3d_seascape_overlay_paths => 'مسارات الغوص';
 
   @override
+  String get dive3d_seascape_overlay_contours => 'خطوط الأعماق';
+
+  @override
+  String get dive3d_seascape_overlay_walls => 'جدران شديدة الانحدار';
+
+  @override
+  String get dive3d_overlay_water => 'سطح الماء';
+
+  @override
+  String get dive3d_seascape_legend_land => 'يابسة';
+
+  @override
+  String get dive3d_seascape_appearance => 'مظهر التضاريس';
+
+  @override
+  String get dive3d_seascape_chartView => 'عرض الخريطة';
+
+  @override
+  String get dive3d_seascape_orbitView => 'عرض ثلاثي الأبعاد';
+
+  @override
+  String get dive3d_seascape_appearance_rampRange => 'تحديد نطاق عمق الألوان';
+
+  @override
+  String get dive3d_seascape_appearance_rampMax => 'أغمق لون عند';
+
+  @override
+  String get dive3d_seascape_appearance_banded => 'تدرج شرائطي';
+
+  @override
+  String get dive3d_seascape_appearance_contours => 'مستويات خطوط الأعماق';
+
+  @override
+  String get dive3d_seascape_appearance_contourAuto => 'تلقائي';
+
+  @override
+  String get dive3d_seascape_appearance_contourCustom => 'مخصص';
+
+  @override
+  String get dive3d_seascape_appearance_addLevel => 'إضافة مستوى';
+
+  @override
+  String get dive3d_seascape_appearance_defaultColor => 'افتراضي';
+
+  @override
+  String get dive3d_seascape_appearance_wallAngle => 'زاوية الجدار الشديد';
+
+  @override
+  String get dive3d_seascape_appearance_wallAngleNote =>
+      'تحسب خلايا قياس الأعماق متوسط الميل داخلها، لذا تبدو الجدران الحقيقية أقل انحدارا. ابق أقل بكثير من 45 درجة.';
+
+  @override
   String get dive3d_seascape_siteTitle => 'المشهد البحري للموقع';
 
   @override

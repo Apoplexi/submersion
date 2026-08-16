@@ -22070,6 +22070,59 @@ class AppLocalizationsFr extends AppLocalizations {
   String get dive3d_seascape_overlay_paths => 'Trajets de plongée';
 
   @override
+  String get dive3d_seascape_overlay_contours => 'Isobathes';
+
+  @override
+  String get dive3d_seascape_overlay_walls => 'Tombants';
+
+  @override
+  String get dive3d_overlay_water => 'Surface de l\'eau';
+
+  @override
+  String get dive3d_seascape_legend_land => 'Terre';
+
+  @override
+  String get dive3d_seascape_appearance => 'Apparence du terrain';
+
+  @override
+  String get dive3d_seascape_chartView => 'Vue carte';
+
+  @override
+  String get dive3d_seascape_orbitView => 'Vue 3D';
+
+  @override
+  String get dive3d_seascape_appearance_rampRange =>
+      'Limiter la plage de profondeur des couleurs';
+
+  @override
+  String get dive3d_seascape_appearance_rampMax => 'Couleur la plus foncée à';
+
+  @override
+  String get dive3d_seascape_appearance_banded => 'Dégradé par paliers';
+
+  @override
+  String get dive3d_seascape_appearance_contours => 'Niveaux d\'isobathes';
+
+  @override
+  String get dive3d_seascape_appearance_contourAuto => 'Automatique';
+
+  @override
+  String get dive3d_seascape_appearance_contourCustom => 'Personnalisé';
+
+  @override
+  String get dive3d_seascape_appearance_addLevel => 'Ajouter un niveau';
+
+  @override
+  String get dive3d_seascape_appearance_defaultColor => 'Par défaut';
+
+  @override
+  String get dive3d_seascape_appearance_wallAngle => 'Angle de tombant';
+
+  @override
+  String get dive3d_seascape_appearance_wallAngleNote =>
+      'Les cellules bathymétriques moyennent la pente interne : les vrais tombants paraissent moins raides. Rester bien en dessous de 45 degrés.';
+
+  @override
   String get dive3d_seascape_siteTitle => 'Paysage marin du site';
 
   @override

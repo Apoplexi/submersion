@@ -22011,6 +22011,59 @@ class AppLocalizationsEs extends AppLocalizations {
   String get dive3d_seascape_overlay_paths => 'Trayectos de buceo';
 
   @override
+  String get dive3d_seascape_overlay_contours => 'Isóbatas';
+
+  @override
+  String get dive3d_seascape_overlay_walls => 'Paredes verticales';
+
+  @override
+  String get dive3d_overlay_water => 'Superficie del agua';
+
+  @override
+  String get dive3d_seascape_legend_land => 'Tierra';
+
+  @override
+  String get dive3d_seascape_appearance => 'Aspecto del terreno';
+
+  @override
+  String get dive3d_seascape_chartView => 'Vista de carta';
+
+  @override
+  String get dive3d_seascape_orbitView => 'Vista 3D';
+
+  @override
+  String get dive3d_seascape_appearance_rampRange =>
+      'Limitar rango de profundidad del color';
+
+  @override
+  String get dive3d_seascape_appearance_rampMax => 'Color más oscuro a';
+
+  @override
+  String get dive3d_seascape_appearance_banded => 'Degradado en bandas';
+
+  @override
+  String get dive3d_seascape_appearance_contours => 'Niveles de isóbatas';
+
+  @override
+  String get dive3d_seascape_appearance_contourAuto => 'Automático';
+
+  @override
+  String get dive3d_seascape_appearance_contourCustom => 'Personalizado';
+
+  @override
+  String get dive3d_seascape_appearance_addLevel => 'Añadir nivel';
+
+  @override
+  String get dive3d_seascape_appearance_defaultColor => 'Predeterminado';
+
+  @override
+  String get dive3d_seascape_appearance_wallAngle => 'Ángulo de pared vertical';
+
+  @override
+  String get dive3d_seascape_appearance_wallAngleNote =>
+      'Las celdas batimétricas promedian la pendiente interior, así que las paredes reales parecen menos inclinadas. Manténgalo muy por debajo de 45 grados.';
+
+  @override
   String get dive3d_seascape_siteTitle => 'Paisaje marino del sitio';
 
   @override

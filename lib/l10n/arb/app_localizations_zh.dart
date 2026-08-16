@@ -20882,6 +20882,58 @@ class AppLocalizationsZh extends AppLocalizations {
   String get dive3d_seascape_overlay_paths => '潜水路径';
 
   @override
+  String get dive3d_seascape_overlay_contours => '等深线';
+
+  @override
+  String get dive3d_seascape_overlay_walls => '陡壁';
+
+  @override
+  String get dive3d_overlay_water => '水面';
+
+  @override
+  String get dive3d_seascape_legend_land => '陆地';
+
+  @override
+  String get dive3d_seascape_appearance => '地形外观';
+
+  @override
+  String get dive3d_seascape_chartView => '海图视图';
+
+  @override
+  String get dive3d_seascape_orbitView => '3D 视图';
+
+  @override
+  String get dive3d_seascape_appearance_rampRange => '限制颜色深度范围';
+
+  @override
+  String get dive3d_seascape_appearance_rampMax => '最深颜色位于';
+
+  @override
+  String get dive3d_seascape_appearance_banded => '分段渐变';
+
+  @override
+  String get dive3d_seascape_appearance_contours => '等深线层级';
+
+  @override
+  String get dive3d_seascape_appearance_contourAuto => '自动';
+
+  @override
+  String get dive3d_seascape_appearance_contourCustom => '自定义';
+
+  @override
+  String get dive3d_seascape_appearance_addLevel => '添加层级';
+
+  @override
+  String get dive3d_seascape_appearance_defaultColor => '默认';
+
+  @override
+  String get dive3d_seascape_appearance_wallAngle => '陡壁角度';
+
+  @override
+  String get dive3d_seascape_appearance_wallAngleNote =>
+      '水深网格会平均单元内的坡度，实际陡壁看起来更平缓。请保持远低于 45 度。';
+
+  @override
   String get dive3d_seascape_siteTitle => '潜点海景';
 
   @override

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:submersion/core/constants/units.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
 import 'package:submersion/features/bathymetry/presentation/bathymetry_labels.dart';
 import 'package:submersion/features/dive_3d/application/spatial_providers.dart';
@@ -10,7 +11,9 @@ import 'package:submersion/features/dive_3d/domain/spatial/seascape_surface.dart
 import 'package:submersion/features/dive_3d/domain/spatial/spatial_projection.dart';
 import 'package:submersion/features/dive_3d/domain/tissue/tissue_surface_picker.dart';
 import 'package:submersion/features/dive_3d/presentation/seascape_chrome.dart';
+import 'package:submersion/features/dive_3d/presentation/widgets/seascape_depth_legend.dart';
 import 'package:submersion/features/dive_3d/presentation/widgets/seascape_hover_tooltip.dart';
+import 'package:submersion/features/dive_3d/presentation/widgets/terrain_appearance_sheet.dart';
 import 'package:submersion/features/dive_3d/presentation/widgets/tissue_tooltip_layout.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/features/dive_3d/presentation/scene_overlay.dart';
@@ -35,6 +38,10 @@ class _SpatialSitePageState extends ConsumerState<SpatialSitePage>
     with SingleTickerProviderStateMixin {
   final ValueNotifier<double> _position = ValueNotifier(0);
   final ValueNotifier<TissuePick?> _hoverPick = ValueNotifier(null);
+  final Set<SceneOverlay> _visible = {
+    SceneOverlay.markers,
+    SceneOverlay.contours,
+  };
   late final AnimationController _player;
 
   @override
@@ -68,8 +75,22 @@ class _SpatialSitePageState extends ConsumerState<SpatialSitePage>
   @override
   Widget build(BuildContext context) {
     final sceneAsync = ref.watch(spatialGeometryProvider(widget.diveId));
+    final appearance = ref.watch(
+      settingsProvider.select((s) => s.seascapeAppearance),
+    );
+    final depthUnit = ref.watch(settingsProvider.select((s) => s.depthUnit));
     return Scaffold(
-      appBar: AppBar(title: Text(context.l10n.dive3d_spatial_title)),
+      appBar: AppBar(
+        title: Text(context.l10n.dive3d_spatial_title),
+        actions: [
+          IconButton(
+            key: const ValueKey('seascapeAppearanceButton'),
+            icon: const Icon(Icons.tune),
+            tooltip: context.l10n.dive3d_seascape_appearance,
+            onPressed: () => showTerrainAppearanceSheet(context),
+          ),
+        ],
+      ),
       body: sceneAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) {
@@ -99,7 +120,8 @@ class _SpatialSitePageState extends ConsumerState<SpatialSitePage>
                           return Dive3dInteractiveViewport(
                             scene: scene,
                             scrubPosition: _position,
-                            visibleOverlays: const {SceneOverlay.markers},
+                            visibleOverlays: {..._visible, SceneOverlay.water},
+                            contourLabels: result.contourLabels,
                             axisFrame: axes?.frame,
                             axisLabels: axes?.labels,
                             chromeStyle: axes == null
@@ -123,19 +145,75 @@ class _SpatialSitePageState extends ConsumerState<SpatialSitePage>
                       right: 8,
                       child: _captions(result!),
                     ),
+                    if (result.grid != null && result.axisInputs != null)
+                      Positioned(
+                        top: 40,
+                        right: 8,
+                        child: SeascapeDepthLegend(
+                          maxDepthMeters: result.axisInputs!.maxDepth,
+                          hasLand: result.grid!.depthsMeters.any(
+                            (d) => d == null || d <= 0,
+                          ),
+                          appearance: appearance,
+                          displayUnitInMeters: depthUnit == DepthUnit.feet
+                              ? 0.3048
+                              : 1.0,
+                          depthSymbol: depthUnit.symbol,
+                        ),
+                      ),
                     if (result.grid != null) _hoverTooltip(result.grid!),
                   ],
                 ),
               ),
               SafeArea(
                 top: false,
-                child: TimeScrubBar(
-                  position: _position,
-                  playing: _player.isAnimating,
-                  onPlayPause: _togglePlay,
-                  onScrubStart: () {
-                    if (_player.isAnimating) setState(() => _player.stop());
-                  },
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (result.grid != null)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8),
+                        child: Wrap(
+                          spacing: 8,
+                          children: [
+                            FilterChip(
+                              label: Text(
+                                context.l10n.dive3d_seascape_overlay_contours,
+                              ),
+                              selected: _visible.contains(
+                                SceneOverlay.contours,
+                              ),
+                              onSelected: (on) => setState(() {
+                                on
+                                    ? _visible.add(SceneOverlay.contours)
+                                    : _visible.remove(SceneOverlay.contours);
+                              }),
+                            ),
+                            FilterChip(
+                              label: Text(
+                                context.l10n.dive3d_seascape_overlay_walls,
+                              ),
+                              selected: _visible.contains(
+                                SceneOverlay.steepWalls,
+                              ),
+                              onSelected: (on) => setState(() {
+                                on
+                                    ? _visible.add(SceneOverlay.steepWalls)
+                                    : _visible.remove(SceneOverlay.steepWalls);
+                              }),
+                            ),
+                          ],
+                        ),
+                      ),
+                    TimeScrubBar(
+                      position: _position,
+                      playing: _player.isAnimating,
+                      onPlayPause: _togglePlay,
+                      onScrubStart: () {
+                        if (_player.isAnimating) setState(() => _player.stop());
+                      },
+                    ),
+                  ],
                 ),
               ),
             ],
