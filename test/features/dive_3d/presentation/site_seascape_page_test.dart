@@ -20,8 +20,7 @@ import 'package:submersion/l10n/arb/app_localizations.dart';
 
 class _TestSettingsNotifier extends StateNotifier<AppSettings>
     implements SettingsNotifier {
-  _TestSettingsNotifier([AppSettings initial = const AppSettings()])
-    : super(initial);
+  _TestSettingsNotifier([super.initial = const AppSettings()]);
 
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
