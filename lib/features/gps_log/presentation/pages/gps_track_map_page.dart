@@ -14,6 +14,7 @@ import 'package:submersion/features/gps_log/presentation/widgets/track_camera.da
 import 'package:submersion/features/gps_log/presentation/widgets/track_row_labels.dart';
 import 'package:submersion/features/maps/presentation/widgets/map_attribution.dart';
 import 'package:submersion/features/maps/presentation/widgets/map_compass_button.dart';
+import 'package:submersion/features/maps/presentation/widgets/map_interaction_options.dart';
 import 'package:submersion/features/maps/presentation/widgets/submersion_tile_layer.dart';
 import 'package:submersion/features/maps/presentation/widgets/trackpad_zoom_map.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
@@ -260,6 +261,7 @@ class _OverviewMapState extends ConsumerState<_OverviewMap> {
           initialCameraFit: camera.fit,
           initialCenter: camera.center ?? const LatLng(0, 0),
           initialZoom: camera.zoom ?? 13.0,
+          interactionOptions: rotatableMapInteraction,
         ),
         children: [
           submersionTileLayer(ref),

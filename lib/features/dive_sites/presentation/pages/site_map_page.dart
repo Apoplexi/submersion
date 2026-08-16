@@ -21,6 +21,7 @@ import 'package:submersion/features/maps/presentation/widgets/heat_map_controls.
 import 'package:submersion/features/maps/presentation/widgets/heat_map_layer.dart';
 import 'package:submersion/features/maps/presentation/widgets/map_attribution.dart';
 import 'package:submersion/features/maps/presentation/widgets/map_compass_button.dart';
+import 'package:submersion/features/maps/presentation/widgets/map_interaction_options.dart';
 import 'package:submersion/features/maps/presentation/providers/map_tile_providers.dart';
 import 'package:submersion/features/maps/presentation/widgets/trackpad_zoom_map.dart';
 import 'package:submersion/shared/providers/map_list_selection_provider.dart';
@@ -251,6 +252,7 @@ class _SiteMapPageState extends ConsumerState<SiteMapPage>
               initialZoom: zoom,
               minZoom: 2.0,
               maxZoom: 18.0,
+              interactionOptions: rotatableMapInteraction,
               onTap: (_, _) {
                 ref.read(mapListSelectionProvider('sites').notifier).deselect();
                 setState(() => _selectedBuiltInId = null);
