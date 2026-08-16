@@ -3456,6 +3456,18 @@ class AppLocalizationsNl extends AppLocalizations {
   String get dashboard_recentDives_errorLoading => 'Laden van duiken mislukt';
 
   @override
+  String get dashboard_recentDives_latestProfileTitle => 'Laatste duikprofiel';
+
+  @override
+  String get dashboard_recentDives_noProfileData =>
+      'Geen profielgegevens voor deze duik';
+
+  @override
+  String dashboard_recentDives_profileMinutes(int minutes) {
+    return '$minutes min';
+  }
+
+  @override
   String get dashboard_recentDives_logFirst => 'Log uw eerste duik';
 
   @override

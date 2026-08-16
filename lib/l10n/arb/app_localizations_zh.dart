@@ -3305,6 +3305,17 @@ class AppLocalizationsZh extends AppLocalizations {
   String get dashboard_recentDives_errorLoading => '加载潜水记录失败';
 
   @override
+  String get dashboard_recentDives_latestProfileTitle => '最近潜水剖面';
+
+  @override
+  String get dashboard_recentDives_noProfileData => '此次潜水没有剖面数据';
+
+  @override
+  String dashboard_recentDives_profileMinutes(int minutes) {
+    return '$minutes 分钟';
+  }
+
+  @override
   String get dashboard_recentDives_logFirst => '记录您的第一次潜水';
 
   @override

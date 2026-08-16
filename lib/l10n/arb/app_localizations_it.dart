@@ -3481,6 +3481,19 @@ class AppLocalizationsIt extends AppLocalizations {
       'Impossibile caricare le immersioni';
 
   @override
+  String get dashboard_recentDives_latestProfileTitle =>
+      'Profilo dell\'ultima immersione';
+
+  @override
+  String get dashboard_recentDives_noProfileData =>
+      'Nessun dato di profilo per questa immersione';
+
+  @override
+  String dashboard_recentDives_profileMinutes(int minutes) {
+    return '$minutes min';
+  }
+
+  @override
   String get dashboard_recentDives_logFirst =>
       'Registra la tua prima immersione';
 

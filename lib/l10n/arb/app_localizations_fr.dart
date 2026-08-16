@@ -3495,6 +3495,19 @@ class AppLocalizationsFr extends AppLocalizations {
       'Impossible de charger les plongees';
 
   @override
+  String get dashboard_recentDives_latestProfileTitle =>
+      'Profil de la dernière plongée';
+
+  @override
+  String get dashboard_recentDives_noProfileData =>
+      'Aucune donnée de profil pour cette plongée';
+
+  @override
+  String dashboard_recentDives_profileMinutes(int minutes) {
+    return '$minutes min';
+  }
+
+  @override
   String get dashboard_recentDives_logFirst => 'Enregistre ta premiere plongee';
 
   @override

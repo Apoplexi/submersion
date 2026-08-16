@@ -3468,6 +3468,19 @@ class AppLocalizationsHu extends AppLocalizations {
       'Nem sikerult betolteni a meruleseket';
 
   @override
+  String get dashboard_recentDives_latestProfileTitle =>
+      'Legutóbbi merülési profil';
+
+  @override
+  String get dashboard_recentDives_noProfileData =>
+      'Nincs profiladat ehhez a merüléshez';
+
+  @override
+  String dashboard_recentDives_profileMinutes(int minutes) {
+    return '$minutes perc';
+  }
+
+  @override
   String get dashboard_recentDives_logFirst => 'Rogzitse az elso meruleset';
 
   @override

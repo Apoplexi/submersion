@@ -3414,6 +3414,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get dashboard_recentDives_errorLoading => 'Failed to load dives';
 
   @override
+  String get dashboard_recentDives_latestProfileTitle => 'Latest dive profile';
+
+  @override
+  String get dashboard_recentDives_noProfileData =>
+      'No profile data for this dive';
+
+  @override
+  String dashboard_recentDives_profileMinutes(int minutes) {
+    return '$minutes min';
+  }
+
+  @override
   String get dashboard_recentDives_logFirst => 'Log Your First Dive';
 
   @override

@@ -3412,6 +3412,18 @@ class AppLocalizationsAr extends AppLocalizations {
   String get dashboard_recentDives_errorLoading => 'فشل تحميل الغوصات';
 
   @override
+  String get dashboard_recentDives_latestProfileTitle => 'مخطط آخر غطسة';
+
+  @override
+  String get dashboard_recentDives_noProfileData =>
+      'لا توجد بيانات مخطط لهذه الغطسة';
+
+  @override
+  String dashboard_recentDives_profileMinutes(int minutes) {
+    return '$minutes دقيقة';
+  }
+
+  @override
   String get dashboard_recentDives_logFirst => 'سجّل أول غوصة لك';
 
   @override

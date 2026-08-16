@@ -3491,6 +3491,18 @@ class AppLocalizationsDe extends AppLocalizations {
       'Tauchgänge konnten nicht geladen werden';
 
   @override
+  String get dashboard_recentDives_latestProfileTitle => 'Letztes Tauchprofil';
+
+  @override
+  String get dashboard_recentDives_noProfileData =>
+      'Keine Profildaten für diesen Tauchgang';
+
+  @override
+  String dashboard_recentDives_profileMinutes(int minutes) {
+    return '$minutes Min.';
+  }
+
+  @override
   String get dashboard_recentDives_logFirst => 'Ersten Tauchgang erfassen';
 
   @override

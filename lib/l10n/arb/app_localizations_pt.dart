@@ -3486,6 +3486,19 @@ class AppLocalizationsPt extends AppLocalizations {
       'Falha ao carregar mergulhos';
 
   @override
+  String get dashboard_recentDives_latestProfileTitle =>
+      'Perfil do último mergulho';
+
+  @override
+  String get dashboard_recentDives_noProfileData =>
+      'Sem dados de perfil para este mergulho';
+
+  @override
+  String dashboard_recentDives_profileMinutes(int minutes) {
+    return '$minutes min';
+  }
+
+  @override
   String get dashboard_recentDives_logFirst => 'Registre Seu Primeiro Mergulho';
 
   @override

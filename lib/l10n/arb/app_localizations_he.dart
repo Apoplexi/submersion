@@ -3387,6 +3387,19 @@ class AppLocalizationsHe extends AppLocalizations {
   String get dashboard_recentDives_errorLoading => 'נכשל טעינת צלילות';
 
   @override
+  String get dashboard_recentDives_latestProfileTitle =>
+      'פרופיל הצלילה האחרונה';
+
+  @override
+  String get dashboard_recentDives_noProfileData =>
+      'אין נתוני פרופיל לצלילה זו';
+
+  @override
+  String dashboard_recentDives_profileMinutes(int minutes) {
+    return '$minutes דק\'';
+  }
+
+  @override
   String get dashboard_recentDives_logFirst => 'רשום את הצלילה הראשונה';
 
   @override
