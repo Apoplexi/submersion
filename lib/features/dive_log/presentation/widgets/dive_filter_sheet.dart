@@ -166,10 +166,19 @@ class _DiveFilterSheetState extends ConsumerState<DiveFilterSheet> {
                 alignment: AlignmentDirectional.centerStart,
                 child: TextButton.icon(
                   onPressed: () {
+                    // push, not go: this sheet also opens from Statistics, and
+                    // `go` into the `/dives` child route would rebuild the
+                    // stack as [dive list, search] and discard the section --
+                    // and its filters -- the user opened the sheet from. It
+                    // would also leave system back with nothing to pop and
+                    // close the app (#647).
+                    //
+                    // The router is captured BEFORE the pop: after it, this
+                    // sheet's context is deactivated and cannot be looked up
+                    // through.
+                    final router = GoRouter.of(context);
                     Navigator.of(context).pop();
-                    // PUSH (not go): go() would leave system back with
-                    // nothing to pop and close the app (#647).
-                    context.push('/dives/search');
+                    router.push('/dives/search');
                   },
                   icon: const Icon(Icons.manage_search, size: 18),
                   label: const Text('Advanced Search'),
