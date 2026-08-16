@@ -17,8 +17,17 @@ final bathymetryOverlayProvider =
     ) async {
       final grid = await ref.watch(bathymetryGridProvider(cell).future);
       if (grid == null) return null;
+      // Normalize the fields the overlay never reads (the toggle itself,
+      // the wall threshold) so changing them cannot invalidate this
+      // provider and re-render the PNG; Equatable equality on the selected
+      // value does the rest.
       final appearance = ref.watch(
-        settingsProvider.select((s) => s.seascapeAppearance),
+        settingsProvider.select(
+          (s) => s.seascapeAppearance.copyWith(
+            mapDepthOverlay: false,
+            wallAngleDeg: 0,
+          ),
+        ),
       );
       final depthUnit = ref.watch(settingsProvider.select((s) => s.depthUnit));
       return buildBathymetryOverlay(

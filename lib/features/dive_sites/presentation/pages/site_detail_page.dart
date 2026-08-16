@@ -9,8 +9,7 @@ import 'package:submersion/core/constants/units.dart';
 import 'package:submersion/core/deco/altitude_calculator.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
-import 'package:submersion/features/bathymetry/data/bathymetry_repository.dart';
-import 'package:submersion/features/bathymetry/presentation/bathymetry_overlay_providers.dart';
+import 'package:submersion/features/bathymetry/presentation/bathymetry_depth_overlay_layer.dart';
 import 'package:submersion/features/dive_3d/application/career_providers.dart';
 import 'package:submersion/features/dive_3d/presentation/pages/career_terrain_page.dart';
 import 'package:submersion/features/dive_3d/presentation/pages/site_seascape_page.dart';
@@ -506,33 +505,6 @@ class _SiteDetailContentState extends ConsumerState<_SiteDetailContent> {
     }
   }
 
-  /// Depth overlay for [site], shown when the synced appearance flag is on
-  /// and bathymetry resolves. Above tiles, below the site marker.
-  Widget _depthOverlayLayer(DiveSite site) {
-    return Consumer(
-      builder: (context, ref, _) {
-        final on = ref.watch(
-          settingsProvider.select((s) => s.seascapeAppearance.mapDepthOverlay),
-        );
-        final location = site.location;
-        if (!on || location == null) return const SizedBox.shrink();
-        final overlayAsync = ref.watch(
-          bathymetryOverlayProvider(BathymetryRepository.quantize(location)),
-        );
-        final overlay = overlayAsync.valueOrNull;
-        if (overlay == null) return const SizedBox.shrink();
-        return OverlayImageLayer(
-          overlayImages: [
-            OverlayImage(
-              bounds: overlay.bounds,
-              imageProvider: MemoryImage(overlay.pngBytes),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
   Widget _buildMapSection(BuildContext context, WidgetRef ref, DiveSite site) {
     final colorScheme = Theme.of(context).colorScheme;
     final siteLocation = LatLng(
@@ -571,7 +543,7 @@ class _SiteDetailContentState extends ConsumerState<_SiteDetailContent> {
                         ? TileCacheService.instance.getTileProvider()
                         : null,
                   ),
-                  _depthOverlayLayer(site),
+                  BathymetryDepthOverlayLayer(location: site.location),
                   MarkerLayer(
                     markers: [
                       Marker(
@@ -673,7 +645,7 @@ class _SiteDetailContentState extends ConsumerState<_SiteDetailContent> {
                       ? TileCacheService.instance.getTileProvider()
                       : null,
                 ),
-                _depthOverlayLayer(site),
+                BathymetryDepthOverlayLayer(location: site.location),
                 MarkerLayer(
                   markers: [
                     Marker(

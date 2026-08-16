@@ -29,15 +29,30 @@ BathymetryGrid gridOf(List<List<double?>> rowsSouthToNorth) {
 
 /// Decodes PNG bytes and reads the straight-alpha RGBA pixel at (x, y).
 /// (rawRgba is PREMULTIPLIED; rawStraightRgba returns the actual colors.)
+/// Codec and image are engine resources: dispose both so the suite never
+/// accumulates handles.
 Future<ui.Color> pixelAt(Uint8List png, int x, int y) async {
   final codec = await ui.instantiateImageCodec(png);
-  final image = (await codec.getNextFrame()).image;
-  final data = (await image.toByteData(
-    format: ui.ImageByteFormat.rawStraightRgba,
-  ))!;
-  final i = (y * image.width + x) * 4;
-  final bytes = data.buffer.asUint8List();
-  return ui.Color.fromARGB(bytes[i + 3], bytes[i], bytes[i + 1], bytes[i + 2]);
+  try {
+    final image = (await codec.getNextFrame()).image;
+    try {
+      final data = (await image.toByteData(
+        format: ui.ImageByteFormat.rawStraightRgba,
+      ))!;
+      final i = (y * image.width + x) * 4;
+      final bytes = data.buffer.asUint8List();
+      return ui.Color.fromARGB(
+        bytes[i + 3],
+        bytes[i],
+        bytes[i + 1],
+        bytes[i + 2],
+      );
+    } finally {
+      image.dispose();
+    }
+  } finally {
+    codec.dispose();
+  }
 }
 
 void main() {

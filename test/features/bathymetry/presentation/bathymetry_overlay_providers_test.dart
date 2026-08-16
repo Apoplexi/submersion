@@ -3,15 +3,10 @@ import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/features/bathymetry/application/bathymetry_providers.dart';
 import 'package:submersion/features/bathymetry/domain/bathymetry_grid.dart';
 import 'package:submersion/features/bathymetry/presentation/bathymetry_overlay_providers.dart';
+import 'package:submersion/features/dive_3d/domain/spatial/seascape_appearance.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 
-class _TestSettingsNotifier extends StateNotifier<AppSettings>
-    implements SettingsNotifier {
-  _TestSettingsNotifier() : super(const AppSettings());
-
-  @override
-  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
-}
+import '../../../helpers/mock_providers.dart';
 
 BathymetryGrid grid() => BathymetryGrid(
   originLat: 10,
@@ -34,7 +29,7 @@ void main() {
     final c = ProviderContainer(
       overrides: [
         bathymetryGridProvider.overrideWith((ref, cell) async => g),
-        settingsProvider.overrideWith((ref) => _TestSettingsNotifier()),
+        settingsProvider.overrideWith((ref) => MockSettingsNotifier()),
       ],
     );
     addTearDown(c.dispose);
@@ -54,5 +49,28 @@ void main() {
   test('null grid yields null overlay', () async {
     final c = container(g: null);
     expect(await c.read(bathymetryOverlayProvider(cell).future), isNull);
+  });
+
+  test('irrelevant appearance changes do not re-render the overlay', () async {
+    final c = container(g: grid());
+    final before = await c.read(bathymetryOverlayProvider(cell).future);
+    // The toggle itself and the wall threshold do not affect the image.
+    await c
+        .read(settingsProvider.notifier)
+        .setSeascapeAppearance(
+          const SeascapeAppearance(mapDepthOverlay: true, wallAngleDeg: 60),
+        );
+    final after = await c.read(bathymetryOverlayProvider(cell).future);
+    expect(identical(before!.pngBytes, after!.pngBytes), isTrue);
+  });
+
+  test('ramp changes DO re-render the overlay', () async {
+    final c = container(g: grid());
+    final before = await c.read(bathymetryOverlayProvider(cell).future);
+    await c
+        .read(settingsProvider.notifier)
+        .setSeascapeAppearance(const SeascapeAppearance(rampBanded: true));
+    final after = await c.read(bathymetryOverlayProvider(cell).future);
+    expect(identical(before!.pngBytes, after!.pngBytes), isFalse);
   });
 }
