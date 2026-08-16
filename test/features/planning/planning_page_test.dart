@@ -10,6 +10,9 @@ import 'package:submersion/features/planner/domain/entities/dive_plan.dart';
 import 'package:submersion/features/planner/presentation/providers/plan_repository_providers.dart';
 import 'package:submersion/features/planning/presentation/pages/planning_page.dart';
 import 'package:submersion/features/planning/presentation/widgets/planning_summary_widget.dart';
+import 'package:submersion/features/planning/presentation/widgets/planning_tool_pane.dart';
+import 'package:submersion/features/safety/presentation/providers/flight_window_providers.dart';
+import 'package:submersion/features/safety/presentation/providers/no_fly_providers.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 
 import '../../helpers/test_app.dart';
@@ -178,6 +181,10 @@ void main() {
             divePlanSummariesProvider.overrideWith(
               (ref) async => <DivePlanSummary>[],
             ),
+            // The no-fly pane reaches a repository and a trip lookup, neither
+            // of which exists in a widget test.
+            noFlyStatusProvider.overrideWith((ref) async => null),
+            activeTripFlightWindowProvider.overrideWith((ref) async => null),
           ],
         ),
       );
@@ -277,6 +284,47 @@ void main() {
         router.routerDelegate.currentConfiguration.uri.queryParameters['tool'],
         'deco-calculator',
       );
+    });
+
+    // Every tool id in the hub must resolve to its own pane. The ids come
+    // from the URL, so a typo in the switch would silently strand a
+    // deep-linked tool on the summary instead.
+    testWidgets('every tool id resolves to its own pane', (tester) async {
+      const expected = {
+        'deco-calculator': 'Deco Calculator',
+        'gas-calculators': 'Gas Calculators',
+        'weight-calculator': 'Weight Calculator',
+        'surface-interval': 'Surface Interval',
+        'no-fly': 'Flying after diving',
+      };
+
+      for (final entry in expected.entries) {
+        final router = await pumpWide(tester);
+        router.go('/planning?tool=${entry.key}');
+        // Bounded pumps, not pumpAndSettle: the weight planner shows an
+        // indefinite CircularProgressIndicator until its prediction resolves,
+        // and an indefinite animation never lets pumpAndSettle return.
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 50));
+
+        expect(
+          find.descendant(
+            of: find.byType(PlanningToolPane),
+            matching: find.text(entry.value),
+          ),
+          findsOneWidget,
+          reason: 'tool=${entry.key} did not open its pane',
+        );
+      }
+    });
+
+    testWidgets('an unknown tool id falls back to the summary', (tester) async {
+      final router = await pumpWide(tester);
+      router.go('/planning?tool=not-a-tool');
+      await tester.pumpAndSettle();
+
+      expect(find.byType(PlanningToolPane), findsNothing);
+      expect(find.text('Select a tool to get started'), findsOneWidget);
     });
 
     testWidgets('the dive planner still takes the whole window', (
