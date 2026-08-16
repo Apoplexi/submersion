@@ -20423,6 +20423,12 @@ class AppLocalizationsHe extends AppLocalizations {
   String get maps_heatMap_overlayOff => 'שכבת מפת חום כבויה';
 
   @override
+  String get maps_depthOverlay_show => 'הצגת שכבת עומק';
+
+  @override
+  String get maps_depthOverlay_hide => 'הסתרת שכבת עומק';
+
+  @override
   String get maps_heatMap_overlayOn => 'שכבת מפת חום פעילה';
 
   @override

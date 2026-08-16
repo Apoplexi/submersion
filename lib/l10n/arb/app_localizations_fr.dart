@@ -21012,6 +21012,12 @@ class AppLocalizationsFr extends AppLocalizations {
   String get maps_heatMap_overlayOff => 'La carte de chaleur est desactivee';
 
   @override
+  String get maps_depthOverlay_show => 'Afficher la surcouche de profondeur';
+
+  @override
+  String get maps_depthOverlay_hide => 'Masquer la surcouche de profondeur';
+
+  @override
   String get maps_heatMap_overlayOn => 'La carte de chaleur est activee';
 
   @override

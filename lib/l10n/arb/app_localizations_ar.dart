@@ -20576,6 +20576,12 @@ class AppLocalizationsAr extends AppLocalizations {
   String get maps_heatMap_overlayOff => 'طبقة خريطة الحرارة معطلة';
 
   @override
+  String get maps_depthOverlay_show => 'إظهار طبقة العمق';
+
+  @override
+  String get maps_depthOverlay_hide => 'إخفاء طبقة العمق';
+
+  @override
   String get maps_heatMap_overlayOn => 'طبقة خريطة الحرارة مفعلة';
 
   @override

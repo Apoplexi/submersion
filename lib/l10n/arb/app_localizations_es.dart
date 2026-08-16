@@ -20956,6 +20956,12 @@ class AppLocalizationsEs extends AppLocalizations {
       'La capa de mapa de calor esta desactivada';
 
   @override
+  String get maps_depthOverlay_show => 'Mostrar capa de profundidad';
+
+  @override
+  String get maps_depthOverlay_hide => 'Ocultar capa de profundidad';
+
+  @override
   String get maps_heatMap_overlayOn => 'La capa de mapa de calor esta activada';
 
   @override

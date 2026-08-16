@@ -3742,6 +3742,8 @@
   "maps_compass_resetTooltip": "Norden oben",
   "maps_heatMap_hide": "Heatmap ausblenden",
   "maps_heatMap_overlayOff": "Heatmap-Overlay ist aus",
+  "maps_depthOverlay_show": "Tiefen-Overlay anzeigen",
+  "maps_depthOverlay_hide": "Tiefen-Overlay ausblenden",
   "maps_heatMap_overlayOn": "Heatmap-Overlay ist an",
   "maps_heatMap_show": "Heatmap anzeigen",
   "maps_offline_bounds": "Grenzen",

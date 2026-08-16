@@ -3742,6 +3742,8 @@
   "maps_compass_resetTooltip": "الشمال للأعلى",
   "maps_heatMap_hide": "إخفاء خريطة الحرارة",
   "maps_heatMap_overlayOff": "طبقة خريطة الحرارة معطلة",
+  "maps_depthOverlay_show": "إظهار طبقة العمق",
+  "maps_depthOverlay_hide": "إخفاء طبقة العمق",
   "maps_heatMap_overlayOn": "طبقة خريطة الحرارة مفعلة",
   "maps_heatMap_show": "إظهار خريطة الحرارة",
   "maps_offline_bounds": "الحدود",

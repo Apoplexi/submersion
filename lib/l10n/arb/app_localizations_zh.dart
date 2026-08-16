@@ -19888,6 +19888,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get maps_heatMap_overlayOff => '热力图叠加层已关闭';
 
   @override
+  String get maps_depthOverlay_show => '显示深度叠加层';
+
+  @override
+  String get maps_depthOverlay_hide => '隐藏深度叠加层';
+
+  @override
   String get maps_heatMap_overlayOn => '热力图叠加层已开启';
 
   @override

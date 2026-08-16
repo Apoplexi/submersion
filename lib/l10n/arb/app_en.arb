@@ -13364,6 +13364,8 @@
   "maps_compass_resetTooltip": "North up",
   "maps_heatMap_hide": "Hide Heat Map",
   "maps_heatMap_overlayOff": "Heat map overlay is off",
+  "maps_depthOverlay_show": "Show depth overlay",
+  "maps_depthOverlay_hide": "Hide depth overlay",
   "maps_heatMap_overlayOn": "Heat map overlay is on",
   "maps_heatMap_show": "Show Heat Map",
   "maps_offline_bounds": "Bounds",

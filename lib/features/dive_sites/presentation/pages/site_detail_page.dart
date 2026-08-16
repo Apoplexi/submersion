@@ -9,6 +9,7 @@ import 'package:submersion/core/constants/units.dart';
 import 'package:submersion/core/deco/altitude_calculator.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/core/utils/unit_formatter.dart';
+import 'package:submersion/features/bathymetry/presentation/bathymetry_depth_overlay_layer.dart';
 import 'package:submersion/features/dive_3d/application/career_providers.dart';
 import 'package:submersion/features/dive_3d/presentation/pages/career_terrain_page.dart';
 import 'package:submersion/features/dive_3d/presentation/pages/site_seascape_page.dart';
@@ -542,6 +543,7 @@ class _SiteDetailContentState extends ConsumerState<_SiteDetailContent> {
                         ? TileCacheService.instance.getTileProvider()
                         : null,
                   ),
+                  BathymetryDepthOverlayLayer(location: site.location),
                   MarkerLayer(
                     markers: [
                       Marker(
@@ -643,6 +645,7 @@ class _SiteDetailContentState extends ConsumerState<_SiteDetailContent> {
                       ? TileCacheService.instance.getTileProvider()
                       : null,
                 ),
+                BathymetryDepthOverlayLayer(location: site.location),
                 MarkerLayer(
                   markers: [
                     Marker(

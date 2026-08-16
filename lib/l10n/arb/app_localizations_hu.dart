@@ -20878,6 +20878,12 @@ class AppLocalizationsHu extends AppLocalizations {
   String get maps_heatMap_overlayOff => 'A hoterkep reteg ki van kapcsolva';
 
   @override
+  String get maps_depthOverlay_show => 'Mélységréteg megjelenítése';
+
+  @override
+  String get maps_depthOverlay_hide => 'Mélységréteg elrejtése';
+
+  @override
   String get maps_heatMap_overlayOn => 'A hoterkep reteg be van kapcsolva';
 
   @override

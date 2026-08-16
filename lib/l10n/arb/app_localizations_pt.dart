@@ -20945,6 +20945,12 @@ class AppLocalizationsPt extends AppLocalizations {
       'Sobreposicao do mapa de calor desativada';
 
   @override
+  String get maps_depthOverlay_show => 'Mostrar camada de profundidade';
+
+  @override
+  String get maps_depthOverlay_hide => 'Ocultar camada de profundidade';
+
+  @override
   String get maps_heatMap_overlayOn => 'Sobreposicao do mapa de calor ativada';
 
   @override

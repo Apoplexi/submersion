@@ -3742,6 +3742,8 @@
   "maps_compass_resetTooltip": "Norte para cima",
   "maps_heatMap_hide": "Ocultar Mapa de Calor",
   "maps_heatMap_overlayOff": "Sobreposicao do mapa de calor desativada",
+  "maps_depthOverlay_show": "Mostrar camada de profundidade",
+  "maps_depthOverlay_hide": "Ocultar camada de profundidade",
   "maps_heatMap_overlayOn": "Sobreposicao do mapa de calor ativada",
   "maps_heatMap_show": "Mostrar Mapa de Calor",
   "maps_offline_bounds": "Limites",

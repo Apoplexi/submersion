@@ -3670,6 +3670,8 @@
   "maps_compass_resetTooltip": "צפון למעלה",
   "maps_heatMap_hide": "הסתר מפת חום",
   "maps_heatMap_overlayOff": "שכבת מפת חום כבויה",
+  "maps_depthOverlay_show": "הצגת שכבת עומק",
+  "maps_depthOverlay_hide": "הסתרת שכבת עומק",
   "maps_heatMap_overlayOn": "שכבת מפת חום פעילה",
   "maps_heatMap_show": "הצג מפת חום",
   "maps_offline_bounds": "גבולות",
