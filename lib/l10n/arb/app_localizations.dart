@@ -19637,6 +19637,166 @@ abstract class AppLocalizations {
   /// **'MND/END'**
   String get gasCalculators_tab_mnd;
 
+  /// No description provided for @gasCalculators_tab_blender.
+  ///
+  /// In en, this message translates to:
+  /// **'Blender'**
+  String get gasCalculators_tab_blender;
+
+  /// No description provided for @gasCalculators_blender_cylinder.
+  ///
+  /// In en, this message translates to:
+  /// **'Cylinder'**
+  String get gasCalculators_blender_cylinder;
+
+  /// No description provided for @gasCalculators_blender_startCylinder.
+  ///
+  /// In en, this message translates to:
+  /// **'In the cylinder'**
+  String get gasCalculators_blender_startCylinder;
+
+  /// No description provided for @gasCalculators_blender_targetFill.
+  ///
+  /// In en, this message translates to:
+  /// **'Target fill'**
+  String get gasCalculators_blender_targetFill;
+
+  /// No description provided for @gasCalculators_blender_fillGases.
+  ///
+  /// In en, this message translates to:
+  /// **'Fill gases'**
+  String get gasCalculators_blender_fillGases;
+
+  /// No description provided for @gasCalculators_blender_pressure.
+  ///
+  /// In en, this message translates to:
+  /// **'Pressure'**
+  String get gasCalculators_blender_pressure;
+
+  /// No description provided for @gasCalculators_blender_o2.
+  ///
+  /// In en, this message translates to:
+  /// **'O₂'**
+  String get gasCalculators_blender_o2;
+
+  /// No description provided for @gasCalculators_blender_he.
+  ///
+  /// In en, this message translates to:
+  /// **'He'**
+  String get gasCalculators_blender_he;
+
+  /// No description provided for @gasCalculators_blender_air.
+  ///
+  /// In en, this message translates to:
+  /// **'Air'**
+  String get gasCalculators_blender_air;
+
+  /// No description provided for @gasCalculators_blender_helium.
+  ///
+  /// In en, this message translates to:
+  /// **'Helium'**
+  String get gasCalculators_blender_helium;
+
+  /// No description provided for @gasCalculators_blender_procedure.
+  ///
+  /// In en, this message translates to:
+  /// **'Fill procedure'**
+  String get gasCalculators_blender_procedure;
+
+  /// No description provided for @gasCalculators_blender_amounts.
+  ///
+  /// In en, this message translates to:
+  /// **'Gas to add'**
+  String get gasCalculators_blender_amounts;
+
+  /// No description provided for @gasCalculators_blender_stepStart.
+  ///
+  /// In en, this message translates to:
+  /// **'Start with {pressure} {gas}'**
+  String gasCalculators_blender_stepStart(String pressure, String gas);
+
+  /// No description provided for @gasCalculators_blender_stepFill.
+  ///
+  /// In en, this message translates to:
+  /// **'Fill {gas} to {pressure} → {mix}'**
+  String gasCalculators_blender_stepFill(
+    String gas,
+    String pressure,
+    String mix,
+  );
+
+  /// No description provided for @gasCalculators_blender_error_targetPressure.
+  ///
+  /// In en, this message translates to:
+  /// **'Target pressure must be higher than the starting pressure.'**
+  String get gasCalculators_blender_error_targetPressure;
+
+  /// No description provided for @gasCalculators_blender_error_invalidMix.
+  ///
+  /// In en, this message translates to:
+  /// **'A gas mix\'s O₂ + He cannot exceed 100%.'**
+  String get gasCalculators_blender_error_invalidMix;
+
+  /// No description provided for @gasCalculators_blender_error_identicalGases.
+  ///
+  /// In en, this message translates to:
+  /// **'The two fill gases are identical — there is nothing to blend.'**
+  String get gasCalculators_blender_error_identicalGases;
+
+  /// No description provided for @gasCalculators_blender_error_linearlyDependent.
+  ///
+  /// In en, this message translates to:
+  /// **'These fill gases cannot produce the target mix — a trimix target needs a helium source.'**
+  String get gasCalculators_blender_error_linearlyDependent;
+
+  /// No description provided for @gasCalculators_blender_error_negativeAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'This blend is not achievable with these gases — it would require removing gas.'**
+  String get gasCalculators_blender_error_negativeAmount;
+
+  /// No description provided for @gasCalculators_blender_error_drainTo.
+  ///
+  /// In en, this message translates to:
+  /// **'Too much gas in the cylinder for this blend. Drain to {pressure} first, then blend.'**
+  String gasCalculators_blender_error_drainTo(String pressure);
+
+  /// No description provided for @gasCalculators_blender_error_drainEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'None of the gas in the cylinder can be used for this blend. Empty it first, then blend.'**
+  String get gasCalculators_blender_error_drainEmpty;
+
+  /// No description provided for @gasCalculators_blender_error_cannotRemoveHelium.
+  ///
+  /// In en, this message translates to:
+  /// **'The cylinder holds helium and the target mix has none. Topping up dilutes helium but cannot remove it, so the cylinder must be emptied first.'**
+  String get gasCalculators_blender_error_cannotRemoveHelium;
+
+  /// No description provided for @gasCalculators_blender_error_insufficientGases.
+  ///
+  /// In en, this message translates to:
+  /// **'A helium-free target needs two helium-free fill gases with different O₂ content.'**
+  String get gasCalculators_blender_error_insufficientGases;
+
+  /// No description provided for @gasCalculators_blender_error_targetNotReached.
+  ///
+  /// In en, this message translates to:
+  /// **'These fill gases cannot reach the target mix exactly. Check the fill gases and their order.'**
+  String get gasCalculators_blender_error_targetNotReached;
+
+  /// No description provided for @gasCalculators_blender_about.
+  ///
+  /// In en, this message translates to:
+  /// **'About blending'**
+  String get gasCalculators_blender_about;
+
+  /// No description provided for @gasCalculators_blender_aboutBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Partial-pressure blend for the target mix, using real-gas (Van der Waals) behaviour. Add each fill gas in order, up to the pressure shown. Fill gases and their order are configurable; always analyse the finished mix before diving it.'**
+  String get gasCalculators_blender_aboutBody;
+
   /// No description provided for @gasCalculators_tab_mod.
   ///
   /// In en, this message translates to:

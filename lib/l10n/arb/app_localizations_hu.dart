@@ -11475,6 +11475,104 @@ class AppLocalizationsHu extends AppLocalizations {
   String get gasCalculators_tab_mnd => 'MND/END';
 
   @override
+  String get gasCalculators_tab_blender => 'Keverő';
+
+  @override
+  String get gasCalculators_blender_cylinder => 'Palack';
+
+  @override
+  String get gasCalculators_blender_startCylinder => 'A palackban';
+
+  @override
+  String get gasCalculators_blender_targetFill => 'Cél töltés';
+
+  @override
+  String get gasCalculators_blender_fillGases => 'Töltőgázok';
+
+  @override
+  String get gasCalculators_blender_pressure => 'Nyomás';
+
+  @override
+  String get gasCalculators_blender_o2 => 'O₂';
+
+  @override
+  String get gasCalculators_blender_he => 'He';
+
+  @override
+  String get gasCalculators_blender_air => 'Levegő';
+
+  @override
+  String get gasCalculators_blender_helium => 'Hélium';
+
+  @override
+  String get gasCalculators_blender_procedure => 'Töltési sorrend';
+
+  @override
+  String get gasCalculators_blender_amounts => 'Hozzáadandó gáz';
+
+  @override
+  String gasCalculators_blender_stepStart(String pressure, String gas) {
+    return 'Kezdd $pressure $gas gázzal';
+  }
+
+  @override
+  String gasCalculators_blender_stepFill(
+    String gas,
+    String pressure,
+    String mix,
+  ) {
+    return 'Tölts $gas-t $pressure-ig → $mix';
+  }
+
+  @override
+  String get gasCalculators_blender_error_targetPressure =>
+      'A célnyomásnak magasabbnak kell lennie a kiindulási nyomásnál.';
+
+  @override
+  String get gasCalculators_blender_error_invalidMix =>
+      'Egy keverék O₂ + He aránya nem haladhatja meg a 100%-ot.';
+
+  @override
+  String get gasCalculators_blender_error_identicalGases =>
+      'A két töltőgáz azonos — nincs mit keverni.';
+
+  @override
+  String get gasCalculators_blender_error_linearlyDependent =>
+      'Ezekkel a gázokkal a célkeverék nem állítható elő — a trimix célhoz héliumforrás kell.';
+
+  @override
+  String get gasCalculators_blender_error_negativeAmount =>
+      'Ez a keverék ezekkel a gázokkal nem érhető el — gázt kellene eltávolítani.';
+
+  @override
+  String gasCalculators_blender_error_drainTo(String pressure) {
+    return 'Túl sok gáz van a palackban ehhez a keverékhez. Előbb engedd le $pressure nyomásra, majd tölts.';
+  }
+
+  @override
+  String get gasCalculators_blender_error_drainEmpty =>
+      'A palackban lévő gáz nem használható ehhez a keverékhez. Előbb ürítsd ki teljesen, majd tölts.';
+
+  @override
+  String get gasCalculators_blender_error_cannotRemoveHelium =>
+      'A palack héliumot tartalmaz, a célkeverék viszont nem. A rátöltés hígítja a héliumot, de nem távolítja el: a palackot előbb ki kell üríteni.';
+
+  @override
+  String get gasCalculators_blender_error_insufficientGases =>
+      'A hélium nélküli célhoz két hélium nélküli töltőgáz kell, eltérő O₂-tartalommal.';
+
+  @override
+  String get gasCalculators_blender_error_targetNotReached =>
+      'Ezekkel a töltőgázokkal a célkeverék nem érhető el pontosan. Ellenőrizd a töltőgázokat és a sorrendjüket.';
+
+  @override
+  String get gasCalculators_blender_about => 'A keverésről';
+
+  @override
+  String get gasCalculators_blender_aboutBody =>
+      'Parciális nyomású keverés a célkeverékhez, valós gáz (Van der Waals) viselkedéssel. Add hozzá az egyes töltőgázokat sorban, a megjelenített nyomásig. A töltőgázok és sorrendjük állítható; a kész keveréket mindig elemezd, mielőtt lemerülnél vele.';
+
+  @override
   String get gasCalculators_tab_mod => 'MOD';
 
   @override

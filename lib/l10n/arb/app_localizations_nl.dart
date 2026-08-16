@@ -11415,6 +11415,104 @@ class AppLocalizationsNl extends AppLocalizations {
   String get gasCalculators_tab_mnd => 'MND/END';
 
   @override
+  String get gasCalculators_tab_blender => 'Mixer';
+
+  @override
+  String get gasCalculators_blender_cylinder => 'Fles';
+
+  @override
+  String get gasCalculators_blender_startCylinder => 'In de fles';
+
+  @override
+  String get gasCalculators_blender_targetFill => 'Doelvulling';
+
+  @override
+  String get gasCalculators_blender_fillGases => 'Vulgassen';
+
+  @override
+  String get gasCalculators_blender_pressure => 'Druk';
+
+  @override
+  String get gasCalculators_blender_o2 => 'O₂';
+
+  @override
+  String get gasCalculators_blender_he => 'He';
+
+  @override
+  String get gasCalculators_blender_air => 'Lucht';
+
+  @override
+  String get gasCalculators_blender_helium => 'Helium';
+
+  @override
+  String get gasCalculators_blender_procedure => 'Vulprocedure';
+
+  @override
+  String get gasCalculators_blender_amounts => 'Toe te voegen gas';
+
+  @override
+  String gasCalculators_blender_stepStart(String pressure, String gas) {
+    return 'Begin met $pressure $gas';
+  }
+
+  @override
+  String gasCalculators_blender_stepFill(
+    String gas,
+    String pressure,
+    String mix,
+  ) {
+    return 'Vul $gas tot $pressure → $mix';
+  }
+
+  @override
+  String get gasCalculators_blender_error_targetPressure =>
+      'De doeldruk moet hoger zijn dan de begindruk.';
+
+  @override
+  String get gasCalculators_blender_error_invalidMix =>
+      'O₂ + He van een mengsel mag niet meer dan 100% zijn.';
+
+  @override
+  String get gasCalculators_blender_error_identicalGases =>
+      'De twee vulgassen zijn identiek — niets te mengen.';
+
+  @override
+  String get gasCalculators_blender_error_linearlyDependent =>
+      'Deze vulgassen kunnen het doelmengsel niet maken — een trimix-doel heeft een heliumbron nodig.';
+
+  @override
+  String get gasCalculators_blender_error_negativeAmount =>
+      'Dit mengsel is met deze gassen niet haalbaar — er zou gas verwijderd moeten worden.';
+
+  @override
+  String gasCalculators_blender_error_drainTo(String pressure) {
+    return 'Te veel gas in de fles voor dit mengsel. Laat eerst af tot $pressure en vul daarna.';
+  }
+
+  @override
+  String get gasCalculators_blender_error_drainEmpty =>
+      'Het gas in de fles is niet bruikbaar voor dit mengsel. Maak de fles eerst leeg en vul daarna.';
+
+  @override
+  String get gasCalculators_blender_error_cannotRemoveHelium =>
+      'De fles bevat helium en het doelmengsel niet. Bijvullen verdunt helium maar verwijdert het niet: de fles moet eerst leeg.';
+
+  @override
+  String get gasCalculators_blender_error_insufficientGases =>
+      'Een heliumvrij doel heeft twee heliumvrije vulgassen met verschillend O₂-gehalte nodig.';
+
+  @override
+  String get gasCalculators_blender_error_targetNotReached =>
+      'Deze vulgassen bereiken het doelmengsel niet exact. Controleer de vulgassen en hun volgorde.';
+
+  @override
+  String get gasCalculators_blender_about => 'Over het mengen';
+
+  @override
+  String get gasCalculators_blender_aboutBody =>
+      'Partiaaldrukmenging voor het doelmengsel, met reëel gasgedrag (Van der Waals). Voeg elk vulgas op volgorde toe, tot de getoonde druk. Vulgassen en hun volgorde zijn instelbaar; analyseer het eindmengsel altijd voordat je ermee duikt.';
+
+  @override
   String get gasCalculators_tab_mod => 'MOD';
 
   @override

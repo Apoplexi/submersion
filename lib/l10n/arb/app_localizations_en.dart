@@ -11314,6 +11314,104 @@ class AppLocalizationsEn extends AppLocalizations {
   String get gasCalculators_tab_mnd => 'MND/END';
 
   @override
+  String get gasCalculators_tab_blender => 'Blender';
+
+  @override
+  String get gasCalculators_blender_cylinder => 'Cylinder';
+
+  @override
+  String get gasCalculators_blender_startCylinder => 'In the cylinder';
+
+  @override
+  String get gasCalculators_blender_targetFill => 'Target fill';
+
+  @override
+  String get gasCalculators_blender_fillGases => 'Fill gases';
+
+  @override
+  String get gasCalculators_blender_pressure => 'Pressure';
+
+  @override
+  String get gasCalculators_blender_o2 => 'O₂';
+
+  @override
+  String get gasCalculators_blender_he => 'He';
+
+  @override
+  String get gasCalculators_blender_air => 'Air';
+
+  @override
+  String get gasCalculators_blender_helium => 'Helium';
+
+  @override
+  String get gasCalculators_blender_procedure => 'Fill procedure';
+
+  @override
+  String get gasCalculators_blender_amounts => 'Gas to add';
+
+  @override
+  String gasCalculators_blender_stepStart(String pressure, String gas) {
+    return 'Start with $pressure $gas';
+  }
+
+  @override
+  String gasCalculators_blender_stepFill(
+    String gas,
+    String pressure,
+    String mix,
+  ) {
+    return 'Fill $gas to $pressure → $mix';
+  }
+
+  @override
+  String get gasCalculators_blender_error_targetPressure =>
+      'Target pressure must be higher than the starting pressure.';
+
+  @override
+  String get gasCalculators_blender_error_invalidMix =>
+      'A gas mix\'s O₂ + He cannot exceed 100%.';
+
+  @override
+  String get gasCalculators_blender_error_identicalGases =>
+      'The two fill gases are identical — there is nothing to blend.';
+
+  @override
+  String get gasCalculators_blender_error_linearlyDependent =>
+      'These fill gases cannot produce the target mix — a trimix target needs a helium source.';
+
+  @override
+  String get gasCalculators_blender_error_negativeAmount =>
+      'This blend is not achievable with these gases — it would require removing gas.';
+
+  @override
+  String gasCalculators_blender_error_drainTo(String pressure) {
+    return 'Too much gas in the cylinder for this blend. Drain to $pressure first, then blend.';
+  }
+
+  @override
+  String get gasCalculators_blender_error_drainEmpty =>
+      'None of the gas in the cylinder can be used for this blend. Empty it first, then blend.';
+
+  @override
+  String get gasCalculators_blender_error_cannotRemoveHelium =>
+      'The cylinder holds helium and the target mix has none. Topping up dilutes helium but cannot remove it, so the cylinder must be emptied first.';
+
+  @override
+  String get gasCalculators_blender_error_insufficientGases =>
+      'A helium-free target needs two helium-free fill gases with different O₂ content.';
+
+  @override
+  String get gasCalculators_blender_error_targetNotReached =>
+      'These fill gases cannot reach the target mix exactly. Check the fill gases and their order.';
+
+  @override
+  String get gasCalculators_blender_about => 'About blending';
+
+  @override
+  String get gasCalculators_blender_aboutBody =>
+      'Partial-pressure blend for the target mix, using real-gas (Van der Waals) behaviour. Add each fill gas in order, up to the pressure shown. Fill gases and their order are configurable; always analyse the finished mix before diving it.';
+
+  @override
   String get gasCalculators_tab_mod => 'MOD';
 
   @override
