@@ -46,6 +46,17 @@ class _RecordingExcelExporter extends PreDiveExcelExportService {
 /// Serves the bulk item fetch without a database, and records which runs the
 /// page asked for plus any dive-link writes it made.
 class _StubSessionRepository implements PreDiveSessionRepository {
+  /// Current dive link per session, seeded from the same fixtures the page
+  /// renders. The real query reads stored state, so a fake built only from
+  /// this test's own writes would answer differently for a run that arrived
+  /// already linked.
+  final Map<String, String?> _diveIdBySession;
+
+  _StubSessionRepository({List<PreDiveSession> seed = const []})
+    : _diveIdBySession = {
+        for (final session in seed) session.id: session.diveId,
+      };
+
   List<String>? requestedIds;
 
   /// Every link write in order. A null diveId is an unlink.
@@ -64,18 +75,24 @@ class _StubSessionRepository implements PreDiveSessionRepository {
   @override
   Stream<void> watchSessionsChanges() => const Stream.empty();
 
+  /// Current links only, matching the real query. Folding [linkWrites]
+  /// instead would keep reporting a dive as taken after it was unlinked.
   @override
   Future<Set<String>> getLinkedDiveIds() async => {
-    for (final write in linkWrites) ?write.diveId,
+    for (final diveId in _diveIdBySession.values) ?diveId,
   };
 
   @override
-  Future<void> linkToDive(String sessionId, String diveId) async =>
-      linkWrites.add((sessionId: sessionId, diveId: diveId));
+  Future<void> linkToDive(String sessionId, String diveId) async {
+    linkWrites.add((sessionId: sessionId, diveId: diveId));
+    _diveIdBySession[sessionId] = diveId;
+  }
 
   @override
-  Future<void> unlinkFromDive(String sessionId) async =>
-      linkWrites.add((sessionId: sessionId, diveId: null));
+  Future<void> unlinkFromDive(String sessionId) async {
+    linkWrites.add((sessionId: sessionId, diveId: null));
+    _diveIdBySession[sessionId] = null;
+  }
 
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
@@ -708,17 +725,16 @@ void main() {
       String? diveId,
       List<DiveSummary> candidates = const [],
     }) async {
-      final repo = _StubSessionRepository();
+      final run = session(
+        's1',
+        name: 'CCR Build',
+        status: PreDiveSessionStatus.completed,
+        diveId: diveId,
+      );
+      final repo = _StubSessionRepository(seed: [run]);
       await pumpPage(
         tester,
-        sessions: [
-          session(
-            's1',
-            name: 'CCR Build',
-            status: PreDiveSessionStatus.completed,
-            diveId: diveId,
-          ),
-        ],
+        sessions: [run],
         items: {
           's1': [item('s1', 0, PreDiveItemState.done)],
         },
@@ -795,6 +811,75 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(repo.linkWrites, [(sessionId: 's1', diveId: null)]);
+    });
+
+    testWidgets('the excluded set tracks current links, not link history', (
+      tester,
+    ) async {
+      // A dive spoken for by another run must not be offered, and unlinking
+      // that run must hand the dive back. Both directions matter: the picker
+      // is the only thing standing between a hand-made link and the
+      // one-run-per-dive rule ChecklistDiveLinker enforces.
+      final taken = session(
+        'taken',
+        name: 'Reef Check',
+        status: PreDiveSessionStatus.completed,
+        diveId: 'dive-42',
+      );
+      final free = session(
+        'free',
+        name: 'CCR Build',
+        status: PreDiveSessionStatus.completed,
+      );
+      final repo = _StubSessionRepository(seed: [taken, free]);
+
+      await pumpPage(
+        tester,
+        sessions: [taken, free],
+        items: {
+          'taken': [item('taken', 0, PreDiveItemState.done)],
+          'free': [item('free', 0, PreDiveItemState.done)],
+        },
+        extraOverrides: [
+          preDiveSessionRepositoryProvider.overrideWithValue(repo),
+          preDiveLinkCandidateDivesProvider.overrideWith(
+            (ref) async => [
+              diveSummary('dive-42', number: 42, site: 'Blue Hole'),
+              diveSummary('dive-7', number: 7, site: 'Ginnie Springs'),
+            ],
+          ),
+        ],
+      );
+
+      Future<void> openMenuFor(String name) async {
+        await tester.tap(
+          find.descendant(
+            of: find.widgetWithText(ListTile, name),
+            matching: find.byType(PopupMenuButton<String>),
+          ),
+        );
+        await tester.pumpAndSettle();
+      }
+
+      // Blue Hole belongs to the Reef Check run, so it is not on offer.
+      await openMenuFor('CCR Build');
+      await tester.tap(find.text('Link to dive'));
+      await tester.pumpAndSettle();
+      expect(find.textContaining('Blue Hole'), findsNothing);
+      expect(find.textContaining('Ginnie Springs'), findsOneWidget);
+      await tester.tap(find.text('Cancel'));
+      await tester.pumpAndSettle();
+
+      // Release it.
+      await openMenuFor('Reef Check');
+      await tester.tap(find.text('Unlink dive'));
+      await tester.pumpAndSettle();
+
+      // Now it is claimable again.
+      await openMenuFor('CCR Build');
+      await tester.tap(find.text('Link to dive'));
+      await tester.pumpAndSettle();
+      expect(find.textContaining('Blue Hole'), findsOneWidget);
     });
   });
 
