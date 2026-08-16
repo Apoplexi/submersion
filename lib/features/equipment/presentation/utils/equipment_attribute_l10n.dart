@@ -46,6 +46,12 @@ String attributeLabel(AppLocalizations l10n, String key) => switch (key) {
   'o2_cell_count' => l10n.attrLabel_o2_cell_count,
   'diluent_cylinder_l' => l10n.attrLabel_diluent_cylinder_l,
   'o2_cylinder_l' => l10n.attrLabel_o2_cylinder_l,
+  'dpv_style' => l10n.attrLabel_dpv_style,
+  'burn_time_h' => l10n.attrLabel_burn_time_h,
+  'battery_type' => l10n.attrLabel_battery_type,
+  'battery_capacity_wh' => l10n.attrLabel_battery_capacity_wh,
+  'motor_type' => l10n.attrLabel_motor_type,
+  'speed_mps' => l10n.attrLabel_speed_mps,
   _ => key,
 };
 
@@ -128,5 +134,13 @@ String attributeChoiceLabel(AppLocalizations l10n, String key, String option) =>
         l10n.attrChoice_mount_configuration_sidemount,
       'scrubber_type_axial' => l10n.attrChoice_scrubber_type_axial,
       'scrubber_type_radial' => l10n.attrChoice_scrubber_type_radial,
+      'dpv_style_tow_behind' => l10n.attrChoice_dpv_style_tow_behind,
+      'dpv_style_ride_on' => l10n.attrChoice_dpv_style_ride_on,
+      'dpv_style_handheld' => l10n.attrChoice_dpv_style_handheld,
+      'battery_type_lithium_ion' => l10n.attrChoice_battery_type_lithium_ion,
+      'battery_type_nimh' => l10n.attrChoice_battery_type_nimh,
+      'battery_type_lead_acid' => l10n.attrChoice_battery_type_lead_acid,
+      'motor_type_brushless' => l10n.attrChoice_motor_type_brushless,
+      'motor_type_brushed' => l10n.attrChoice_motor_type_brushed,
       _ => option,
     };

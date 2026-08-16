@@ -1,5 +1,7 @@
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/core/services/export/excel/pre_dive_excel_export_service.dart';
+import 'package:submersion/features/dive_log/domain/entities/dive_summary.dart';
+import 'package:submersion/features/dive_log/presentation/providers/dive_repository_provider.dart';
 import 'package:submersion/features/divers/presentation/providers/diver_providers.dart';
 import 'package:submersion/features/pre_dive/data/repositories/pre_dive_session_repository.dart';
 import 'package:submersion/features/pre_dive/data/repositories/pre_dive_template_repository.dart';
@@ -134,4 +136,48 @@ final preDiveSessionForDiveProvider =
       final repository = ref.watch(preDiveSessionRepositoryProvider);
       ref.invalidateSelfWhen(repository.watchSessionsChanges());
       return repository.getSessionForDive(diveId);
+    });
+
+/// How many recent dives the manual link picker offers before the diver
+/// searches. Enough to cover "the dive I just logged" without paging a large
+/// log into a dialog.
+const kPreDiveLinkRecentDiveCount = 50;
+
+/// Recent dives the manual link picker offers as its default list (#1066).
+/// Summaries rather than hydrated dives: the rows show only number, date and
+/// site, so a large log must not pay full hydration to fill one dialog.
+final preDiveLinkCandidateDivesProvider =
+    FutureProvider.autoDispose<List<DiveSummary>>((ref) async {
+      final repository = ref.watch(diveRepositoryProvider);
+      final diverId = ref.watch(currentDiverIdProvider);
+      ref.invalidateSelfWhen(repository.watchDivesChanges());
+      return repository.getDiveSummaries(
+        diverId: diverId,
+        limit: kPreDiveLinkRecentDiveCount,
+      );
+    });
+
+/// Dives the link picker must not offer, because a run is already attached.
+///
+/// Subscribed rather than read once: a sync pull can attach a run to a dive
+/// while the picker is open, and a stale set here is not a cosmetic staleness
+/// but the double-link this set exists to prevent.
+final preDiveLinkedDiveIdsProvider = FutureProvider.autoDispose<Set<String>>((
+  ref,
+) async {
+  final repository = ref.watch(preDiveSessionRepositoryProvider);
+  ref.invalidateSelfWhen(repository.watchSessionsChanges());
+  return repository.getLinkedDiveIds();
+});
+
+/// Checklist runs not yet attached to a dive, newest first (#1066).
+///
+/// The diver filter is exact-match (null selects unscoped runs only), matching
+/// [ChecklistDiveLinker], so a manual link cannot cross a diver boundary the
+/// automatic linker respects.
+final preDiveUnlinkedSessionsProvider = FutureProvider.autoDispose
+    .family<List<domain.PreDiveSession>, String?>((ref, diverId) async {
+      final repository = ref.watch(preDiveSessionRepositoryProvider);
+      ref.invalidateSelfWhen(repository.watchSessionsChanges());
+      return repository.getUnlinkedSessions(diverId: diverId);
     });

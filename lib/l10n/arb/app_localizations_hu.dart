@@ -2412,6 +2412,41 @@ class AppLocalizationsHu extends AppLocalizations {
   String get preDive_sessions_linkedDive => 'Kapcsolt merülés';
 
   @override
+  String get preDive_link_linkToDive => 'Merüléshez kapcsolás';
+
+  @override
+  String get preDive_link_unlinkDive => 'Merülés leválasztása';
+
+  @override
+  String get preDive_link_linkChecklist => 'Ellenőrzőlista kapcsolása';
+
+  @override
+  String get preDive_link_unlinkChecklist => 'Ellenőrzőlista leválasztása';
+
+  @override
+  String get preDive_link_searchDives => 'Merülések keresése';
+
+  @override
+  String get preDive_link_noDives => 'Nincs kapcsolható merülés';
+
+  @override
+  String preDive_link_noDivesMatch(String query) {
+    return 'Nincs a következőre illeszkedő merülés: „$query”';
+  }
+
+  @override
+  String get preDive_link_noUnlinkedSessions =>
+      'Nincs kapcsolatlan ellenőrzőlista-futtatás';
+
+  @override
+  String get preDive_link_linked =>
+      'Ellenőrzőlista ehhez a merüléshez kapcsolva';
+
+  @override
+  String get preDive_link_unlinked =>
+      'Ellenőrzőlista leválasztva erről a merülésről';
+
+  @override
   String get preDive_sessions_delete => 'Törlés';
 
   @override
@@ -9540,6 +9575,9 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get enum_equipmentType_camera => 'Kamera';
+
+  @override
+  String get enum_equipmentType_dpv => 'DPV';
 
   @override
   String get enum_equipmentType_computer => 'Merulesszamitogep';
@@ -22393,6 +22431,24 @@ class AppLocalizationsHu extends AppLocalizations {
   String get attrLabel_o2_cylinder_l => 'O2 palack';
 
   @override
+  String get attrLabel_dpv_style => 'Fazon';
+
+  @override
+  String get attrLabel_burn_time_h => 'Üzemidő (ó)';
+
+  @override
+  String get attrLabel_battery_type => 'Akkumulátor';
+
+  @override
+  String get attrLabel_battery_capacity_wh => 'Akkukapacitás (Wh)';
+
+  @override
+  String get attrLabel_motor_type => 'Motor';
+
+  @override
+  String get attrLabel_speed_mps => 'Végsebesség';
+
+  @override
   String get attrChoice_unit_type_eccr => 'Elektronikus CCR (eCCR)';
 
   @override
@@ -22601,6 +22657,30 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get attrChoice_sole_type_soft => 'Puha talp';
+
+  @override
+  String get attrChoice_dpv_style_tow_behind => 'Vontatott';
+
+  @override
+  String get attrChoice_dpv_style_ride_on => 'Ráülős';
+
+  @override
+  String get attrChoice_dpv_style_handheld => 'Kézi';
+
+  @override
+  String get attrChoice_battery_type_lithium_ion => 'Lítium-ion';
+
+  @override
+  String get attrChoice_battery_type_nimh => 'NiMH';
+
+  @override
+  String get attrChoice_battery_type_lead_acid => 'Ólom-savas';
+
+  @override
+  String get attrChoice_motor_type_brushless => 'Szénkefe nélküli';
+
+  @override
+  String get attrChoice_motor_type_brushed => 'Szénkefés';
 
   @override
   String get equipment_edit_customFieldsTitle => 'Egyéni mezők';

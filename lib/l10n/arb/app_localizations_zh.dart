@@ -2286,6 +2286,38 @@ class AppLocalizationsZh extends AppLocalizations {
   String get preDive_sessions_linkedDive => '关联潜水';
 
   @override
+  String get preDive_link_linkToDive => '关联到潜水';
+
+  @override
+  String get preDive_link_unlinkDive => '取消关联潜水';
+
+  @override
+  String get preDive_link_linkChecklist => '关联潜前检查清单';
+
+  @override
+  String get preDive_link_unlinkChecklist => '取消关联潜前检查清单';
+
+  @override
+  String get preDive_link_searchDives => '搜索潜水';
+
+  @override
+  String get preDive_link_noDives => '没有可关联的潜水';
+
+  @override
+  String preDive_link_noDivesMatch(String query) {
+    return '没有与“$query”匹配的潜水';
+  }
+
+  @override
+  String get preDive_link_noUnlinkedSessions => '没有未关联的检查清单记录';
+
+  @override
+  String get preDive_link_linked => '检查清单已关联到此潜水';
+
+  @override
+  String get preDive_link_unlinked => '已取消检查清单与此潜水的关联';
+
+  @override
   String get preDive_sessions_delete => '删除';
 
   @override
@@ -9128,6 +9160,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get enum_equipmentType_camera => '相机';
+
+  @override
+  String get enum_equipmentType_dpv => 'DPV';
 
   @override
   String get enum_equipmentType_computer => '潜水电脑';
@@ -21332,6 +21367,24 @@ class AppLocalizationsZh extends AppLocalizations {
   String get attrLabel_o2_cylinder_l => 'O2 气瓶';
 
   @override
+  String get attrLabel_dpv_style => '款式';
+
+  @override
+  String get attrLabel_burn_time_h => '续航时间（小时）';
+
+  @override
+  String get attrLabel_battery_type => '电池';
+
+  @override
+  String get attrLabel_battery_capacity_wh => '电池容量（瓦时）';
+
+  @override
+  String get attrLabel_motor_type => '电机';
+
+  @override
+  String get attrLabel_speed_mps => '最高速度';
+
+  @override
   String get attrChoice_unit_type_eccr => '电子式 CCR (eCCR)';
 
   @override
@@ -21540,6 +21593,30 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get attrChoice_sole_type_soft => '软底';
+
+  @override
+  String get attrChoice_dpv_style_tow_behind => '拖曳式';
+
+  @override
+  String get attrChoice_dpv_style_ride_on => '骑乘式';
+
+  @override
+  String get attrChoice_dpv_style_handheld => '手持式';
+
+  @override
+  String get attrChoice_battery_type_lithium_ion => '锂离子';
+
+  @override
+  String get attrChoice_battery_type_nimh => '镍氢';
+
+  @override
+  String get attrChoice_battery_type_lead_acid => '铅酸';
+
+  @override
+  String get attrChoice_motor_type_brushless => '无刷';
+
+  @override
+  String get attrChoice_motor_type_brushed => '有刷';
 
   @override
   String get equipment_edit_customFieldsTitle => '自定义字段';

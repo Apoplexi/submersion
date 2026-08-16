@@ -21,6 +21,7 @@ enum EquipmentType {
   hood('Hood'),
   gloves('Gloves'),
   boots('Boots'),
+  dpv('DPV'),
   other('Other');
 
   final String displayName;

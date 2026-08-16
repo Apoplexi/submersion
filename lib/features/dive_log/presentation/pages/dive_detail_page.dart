@@ -9,12 +9,12 @@ import 'package:latlong2/latlong.dart';
 import 'package:libdivecomputer_plugin/libdivecomputer_plugin.dart' as pigeon;
 import 'package:submersion/core/constants/dive_detail_sections.dart';
 import 'package:submersion/core/constants/enums.dart';
+import 'package:submersion/features/equipment/presentation/utils/equipment_type_icon.dart';
 import 'package:submersion/features/data_quality/data/services/quality_scan_service.dart';
 import 'package:submersion/features/data_quality/presentation/providers/quality_inbox_providers.dart';
 import 'package:submersion/core/constants/list_view_mode.dart';
 import 'package:submersion/core/constants/units.dart';
 import 'package:submersion/core/deco/altitude_calculator.dart';
-import 'package:submersion/core/icons/mdi_icons.dart';
 import 'package:submersion/core/providers/provider.dart';
 import 'package:submersion/core/services/export/export_service.dart';
 import 'package:submersion/core/services/pdf_templates/pdf_date_formatter.dart';
@@ -43,6 +43,9 @@ import 'package:submersion/features/dive_log/presentation/providers/profile_anal
 import 'package:submersion/features/dive_log/presentation/pages/fullscreen_profile_page.dart';
 import 'package:submersion/features/dive_log/presentation/utils/sac_normalization.dart';
 import 'package:submersion/features/planner/presentation/providers/plan_overlay_provider.dart';
+import 'package:submersion/features/pre_dive/domain/entities/pre_dive_session.dart';
+import 'package:submersion/features/pre_dive/presentation/providers/pre_dive_providers.dart';
+import 'package:submersion/features/pre_dive/presentation/widgets/link_session_picker.dart';
 import 'package:submersion/shared/widgets/export_destination_sheet.dart';
 import 'package:submersion/shared/widgets/master_detail/detail_scroll_retainer.dart';
 import 'package:submersion/shared/widgets/master_detail/responsive_breakpoints.dart';
@@ -683,12 +686,66 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
     return children;
   }
 
+  /// Overflow entry for the pre-dive checklist link (#1066). PR #913 removed
+  /// the dive-detail pre-dive card, and with it the only way to attach a run
+  /// completed the evening before -- outside the auto-linker's three-hour
+  /// window -- to the dive it was run for. The label doubles as the indicator:
+  /// "Unlink" only appears when something is attached.
+  PopupMenuItem<String> _preDiveLinkMenuItem(
+    BuildContext context,
+    PreDiveSession? linked,
+  ) {
+    return PopupMenuItem(
+      value: linked == null ? 'linkPreDive' : 'unlinkPreDive',
+      child: ListTile(
+        leading: Icon(
+          linked == null ? Icons.fact_check_outlined : Icons.link_off,
+        ),
+        title: Text(
+          linked == null
+              ? context.l10n.preDive_link_linkChecklist
+              : context.l10n.preDive_link_unlinkChecklist,
+        ),
+        contentPadding: EdgeInsets.zero,
+      ),
+    );
+  }
+
+  Future<void> _linkPreDiveChecklist(BuildContext context, Dive dive) async {
+    final messenger = ScaffoldMessenger.of(context);
+    final confirmation = context.l10n.preDive_link_linked;
+    final sessionId = await showLinkSessionPicker(
+      context,
+      diverId: dive.diverId,
+    );
+    if (sessionId == null) return;
+    await ref
+        .read(preDiveSessionRepositoryProvider)
+        .linkToDive(sessionId, dive.id);
+    // Nothing on this page renders the link, so the snackbar is the only
+    // evidence the write happened.
+    messenger.showSnackBar(SnackBar(content: Text(confirmation)));
+  }
+
+  Future<void> _unlinkPreDiveChecklist(
+    BuildContext context,
+    PreDiveSession linked,
+  ) async {
+    final messenger = ScaffoldMessenger.of(context);
+    final confirmation = context.l10n.preDive_link_unlinked;
+    await ref.read(preDiveSessionRepositoryProvider).unlinkFromDive(linked.id);
+    messenger.showSnackBar(SnackBar(content: Text(confirmation)));
+  }
+
   Widget _buildContent(BuildContext context, WidgetRef ref, Dive dive) {
     final settings = ref.watch(settingsProvider);
     final units = UnitFormatter(settings);
     final computerReadingsAsync = ref.watch(diveDataSourcesProvider(dive.id));
     final hasRawData =
         ref.watch(diveHasRawDataProvider(dive.id)).valueOrNull ?? false;
+    final linkedPreDive = ref
+        .watch(preDiveSessionForDiveProvider(dive.id))
+        .value;
 
     final builders = _sectionBuilders(
       context: context,
@@ -802,6 +859,12 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
                 case 'logNearMiss':
                   context.push('/incidents/new?diveId=$diveId');
                   break;
+                case 'linkPreDive':
+                  _linkPreDiveChecklist(context, dive);
+                  break;
+                case 'unlinkPreDive':
+                  _unlinkPreDiveChecklist(context, linkedPreDive!);
+                  break;
                 case 'delete':
                   _showDeleteConfirmation(context, ref);
                   break;
@@ -824,6 +887,7 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
                   contentPadding: EdgeInsets.zero,
                 ),
               ),
+              _preDiveLinkMenuItem(context, linkedPreDive),
               if (hasRawData)
                 PopupMenuItem(
                   value: 'reparse',
@@ -862,6 +926,9 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
     bool hasRawData = false,
   }) {
     final colorScheme = Theme.of(context).colorScheme;
+    final linkedPreDive = ref
+        .watch(preDiveSessionForDiveProvider(dive.id))
+        .value;
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -972,6 +1039,12 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
                 case 'logNearMiss':
                   context.push('/incidents/new?diveId=$diveId');
                   break;
+                case 'linkPreDive':
+                  _linkPreDiveChecklist(context, dive);
+                  break;
+                case 'unlinkPreDive':
+                  _unlinkPreDiveChecklist(context, linkedPreDive!);
+                  break;
                 case 'delete':
                   _showDeleteConfirmation(context, ref);
                   break;
@@ -1009,6 +1082,7 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
                   contentPadding: EdgeInsets.zero,
                 ),
               ),
+              _preDiveLinkMenuItem(context, linkedPreDive),
               if (hasRawData)
                 PopupMenuItem(
                   value: 'reparse',
@@ -4320,7 +4394,7 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
                     context,
                   ).colorScheme.tertiaryContainer,
                   child: Icon(
-                    _getEquipmentIcon(item.type),
+                    equipmentTypeIcon(item.type),
                     color: Theme.of(context).colorScheme.onTertiaryContainer,
                     size: 20,
                   ),
@@ -4357,36 +4431,6 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
         ),
       ),
     );
-  }
-
-  IconData _getEquipmentIcon(EquipmentType type) {
-    switch (type) {
-      case EquipmentType.regulator:
-        return Icons.air;
-      case EquipmentType.bcd:
-        return Icons.accessibility_new;
-      case EquipmentType.wetsuit:
-      case EquipmentType.drysuit:
-        return Icons.checkroom;
-      case EquipmentType.fins:
-        return Icons.directions_walk;
-      case EquipmentType.mask:
-        return Icons.visibility;
-      case EquipmentType.computer:
-        return Icons.watch;
-      case EquipmentType.tank:
-        return MdiIcons.divingScubaTank;
-      case EquipmentType.weights:
-        return Icons.fitness_center;
-      case EquipmentType.light:
-        return Icons.flashlight_on;
-      case EquipmentType.camera:
-        return Icons.camera_alt;
-      case EquipmentType.transmitter:
-        return Icons.sensors;
-      default:
-        return Icons.backpack;
-    }
   }
 
   Widget _buildSightingsSection(BuildContext context, WidgetRef ref) {
