@@ -379,6 +379,60 @@ void main() {
     });
   });
 
+  // Issues #1828 and #1829, end to end from the file's bytes.
+  group('parse: day-first, two-digit and unreadable dates', () {
+    const options = ImportOptions(
+      sourceApp: SourceApp.generic,
+      format: ImportFormat.csv,
+    );
+
+    List<DateTime> diveDates(ImportPayload payload) => [
+      for (final dive in payload.entitiesOf(ImportEntityType.dives))
+        dive['dateTime'] as DateTime,
+    ];
+
+    test('a UK logbook imports every row in day-first order', () async {
+      const csv =
+          'Date,Time,Max Depth\n'
+          '03/04/1991,09:00,20\n'
+          '15/04/1991,10:00,18\n';
+
+      final payload = await parser.parse(csvBytes(csv), options: options);
+
+      expect(diveDates(payload), [
+        DateTime.utc(1991, 4, 3, 9),
+        DateTime.utc(1991, 4, 15, 10),
+      ]);
+    });
+
+    test('a two-digit year is not stored as the year 91', () async {
+      const csv =
+          'Date,Time,Max Depth\n'
+          '4/15/91,09:00,20\n';
+
+      final payload = await parser.parse(csvBytes(csv), options: options);
+
+      expect(diveDates(payload).single.year, 1991);
+    });
+
+    test('an unreadable row is reported with its spreadsheet row', () async {
+      // The blank line is row 3, so the unreadable row is row 4.
+      const csv =
+          'Date,Time,Max Depth\n'
+          '2024-01-15,10:00,20\n'
+          '\n'
+          '15 Apr 2024,11:00,18\n';
+
+      final payload = await parser.parse(csvBytes(csv), options: options);
+
+      expect(diveDates(payload), hasLength(1));
+      final skipped = payload.warnings.where(
+        (w) => w.code == ImportWarningCode.unreadableDate,
+      );
+      expect(skipped.single.sourceRow, 4);
+    });
+  });
+
   group('parse - new pipeline features', () {
     test('each dive has a generated UUID', () async {
       const csv =
