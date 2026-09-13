@@ -21918,9 +21918,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get universalImport_label_importAsNew => 'Import as New';
 
   @override
-  String get universalImport_label_importComplete => 'Import Complete';
-
-  @override
   String get universalImport_label_importing => 'Importing';
 
   @override

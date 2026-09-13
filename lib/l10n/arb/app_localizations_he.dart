@@ -21737,9 +21737,6 @@ class AppLocalizationsHe extends AppLocalizations {
   String get universalImport_label_importAsNew => 'ייבוא כחדש';
 
   @override
-  String get universalImport_label_importComplete => 'ייבוא הושלם';
-
-  @override
   String get universalImport_label_importing => 'מייבא';
 
   @override
