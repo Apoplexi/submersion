@@ -354,7 +354,7 @@ class DivePlanNotifier extends StateNotifier<DivePlanState> {
     final segments = <PlanSegment>[
       // Descends at the plan's own rate. The old call used PlanSegment
       // .descent without passing one, so the quick plan always dropped at
-      // the factory's hardcoded 18 m/min and ignored the rate slider.
+      // the factory's hardcoded 18 m/min and ignored the rate field.
       PlanSegment.travel(
         id: _uuid.v4(),
         fromDepth: 0,

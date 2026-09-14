@@ -8499,6 +8499,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get divePlanner_label_max => 'الأقصى';
 
   @override
+  String get divePlanner_label_minutesUnit => 'دقيقة';
+
+  @override
   String get divePlanner_label_ndl => 'NDL';
 
   @override
@@ -36974,11 +36977,6 @@ class AppLocalizationsAr extends AppLocalizations {
       zero: 'وقت القاع: $minutes دقيقة',
     );
     return '$_temp0';
-  }
-
-  @override
-  String divePlanner_quickPlan_minutes(int minutes) {
-    return '$minutes دقيقة';
   }
 
   @override

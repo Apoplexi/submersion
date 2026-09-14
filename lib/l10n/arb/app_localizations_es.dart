@@ -8666,6 +8666,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get divePlanner_label_max => 'Máx';
 
   @override
+  String get divePlanner_label_minutesUnit => 'min';
+
+  @override
   String get divePlanner_label_ndl => 'NDL';
 
   @override
@@ -37395,11 +37398,6 @@ class AppLocalizationsEs extends AppLocalizations {
       one: 'Tiempo de fondo: 1 minuto',
     );
     return '$_temp0';
-  }
-
-  @override
-  String divePlanner_quickPlan_minutes(int minutes) {
-    return '$minutes min';
   }
 
   @override

@@ -14283,6 +14283,12 @@ abstract class AppLocalizations {
   /// **'Max'**
   String get divePlanner_label_max;
 
+  /// No description provided for @divePlanner_label_minutesUnit.
+  ///
+  /// In en, this message translates to:
+  /// **'min'**
+  String get divePlanner_label_minutesUnit;
+
   /// No description provided for @divePlanner_label_ndl.
   ///
   /// In en, this message translates to:
@@ -60933,12 +60939,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{minutes, plural, =1{Bottom time: 1 minute} other{Bottom time: {minutes} minutes}}'**
   String divePlanner_quickPlan_bottomTimeSemantics(int minutes);
-
-  /// No description provided for @divePlanner_quickPlan_minutes.
-  ///
-  /// In en, this message translates to:
-  /// **'{minutes} min'**
-  String divePlanner_quickPlan_minutes(int minutes);
 
   /// No description provided for @divePlanner_quickPlan_previewSemantics.
   ///

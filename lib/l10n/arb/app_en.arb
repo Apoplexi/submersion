@@ -5234,6 +5234,7 @@
   "divePlanner_label_gfHigh": "GF High",
   "divePlanner_label_gfLow": "GF Low",
   "divePlanner_label_max": "Max",
+  "divePlanner_label_minutesUnit": "min",
   "divePlanner_label_ndl": "NDL",
   "divePlanner_label_planSettings": "Plan Settings",
   "divePlanner_label_remaining": "Remaining",
@@ -22313,7 +22314,6 @@
   "divePlanner_quickPlan_depthSemantics": "Depth: {depth}",
   "divePlanner_quickPlan_timeLabel": "Time:",
   "divePlanner_quickPlan_bottomTimeSemantics": "{minutes, plural, =1{Bottom time: 1 minute} other{Bottom time: {minutes} minutes}}",
-  "divePlanner_quickPlan_minutes": "{minutes} min",
   "divePlanner_quickPlan_previewSemantics": "Plan preview: Descent to {depth}, bottom time {minutes} minutes, ascent with safety stop",
   "divePlanner_quickPlan_previewTitle": "Plan Preview:",
   "divePlanner_quickPlan_previewDescent": "Descent to {depth}",
@@ -22551,13 +22551,6 @@
     }
   },
   "@divePlanner_quickPlan_bottomTimeSemantics": {
-    "placeholders": {
-      "minutes": {
-        "type": "int"
-      }
-    }
-  },
-  "@divePlanner_quickPlan_minutes": {
     "placeholders": {
       "minutes": {
         "type": "int"

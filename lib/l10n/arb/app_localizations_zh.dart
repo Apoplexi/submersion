@@ -8252,6 +8252,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get divePlanner_label_max => '最大';
 
   @override
+  String get divePlanner_label_minutesUnit => '分钟';
+
+  @override
   String get divePlanner_label_ndl => 'NDL';
 
   @override
@@ -35205,11 +35208,6 @@ class AppLocalizationsZh extends AppLocalizations {
       other: '底部时间：$minutes 分钟',
     );
     return '$_temp0';
-  }
-
-  @override
-  String divePlanner_quickPlan_minutes(int minutes) {
-    return '$minutes 分钟';
   }
 
   @override

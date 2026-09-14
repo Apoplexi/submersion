@@ -8456,6 +8456,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get divePlanner_label_max => 'מקסימום';
 
   @override
+  String get divePlanner_label_minutesUnit => 'דקות';
+
+  @override
   String get divePlanner_label_ndl => 'NDL';
 
   @override
@@ -36628,11 +36631,6 @@ class AppLocalizationsHe extends AppLocalizations {
       one: 'זמן תחתית: דקה אחת',
     );
     return '$_temp0';
-  }
-
-  @override
-  String divePlanner_quickPlan_minutes(int minutes) {
-    return '$minutes דקות';
   }
 
   @override
