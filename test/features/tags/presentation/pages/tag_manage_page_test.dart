@@ -1009,6 +1009,180 @@ void main() {
       expect(saved.appliesToSites, isTrue);
     });
   });
+
+  group('deleting from the edit dialog (#1889)', () {
+    // Delete was reachable only through selection mode, which divers did not
+    // find. The editor now offers it too, behind the same confirmation.
+
+    final confirmation = find.widgetWithText(AlertDialog, 'Delete Tag?');
+
+    Finder confirmationButton(String label) => find.descendant(
+      of: confirmation,
+      matching: find.widgetWithText(TextButton, label),
+    );
+
+    Future<void> openEditor(WidgetTester tester, String tagId) async {
+      await tester.tap(find.byKey(ValueKey('tag_edit_$tagId')));
+      await tester.pumpAndSettle();
+    }
+
+    testWidgets(
+      'the edit dialog offers Delete and the create dialog does not',
+      (tester) async {
+        await tester.pumpWidget(_buildTestWidget(stats: _testStats));
+        await tester.pumpAndSettle();
+
+        await openEditor(tester, 'tag1');
+        expect(find.byKey(const ValueKey('tag_edit_delete')), findsOneWidget);
+        await tester.tap(find.widgetWithText(TextButton, 'Cancel'));
+        await tester.pumpAndSettle();
+
+        // There is nothing to delete before the tag exists.
+        await tester.tap(find.byType(FloatingActionButton));
+        await tester.pumpAndSettle();
+        expect(find.byKey(const ValueKey('tag_edit_delete')), findsNothing);
+      },
+    );
+
+    testWidgets('confirming deletes the tag and closes both dialogs', (
+      tester,
+    ) async {
+      final notifier = _MockTagListNotifier(_tagsFromStats(_testStats));
+      await tester.pumpWidget(
+        _buildTestWidget(stats: _testStats, notifier: notifier),
+      );
+      await tester.pumpAndSettle();
+
+      await openEditor(tester, 'tag1');
+      await tester.tap(find.byKey(const ValueKey('tag_edit_delete')));
+      await tester.pumpAndSettle();
+
+      // The same confirmation as selection mode: the tag and its dive count.
+      expect(confirmation, findsOneWidget);
+      expect(
+        find.descendant(
+          of: confirmation,
+          matching: find.textContaining('Night Dive'),
+        ),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(
+          of: confirmation,
+          matching: find.textContaining('12 dives'),
+        ),
+        findsOneWidget,
+      );
+      expect(notifier.deleted, isEmpty, reason: 'nothing is deleted unasked');
+
+      await tester.tap(confirmationButton('Delete'));
+      await tester.pumpAndSettle();
+
+      expect(notifier.deleted, ['tag1']);
+      expect(notifier.updated, isEmpty, reason: 'Delete must not save first');
+      expect(find.byType(AlertDialog), findsNothing);
+    });
+
+    testWidgets('cancelling returns to the editor with unsaved edits intact', (
+      tester,
+    ) async {
+      final notifier = _MockTagListNotifier(_tagsFromStats(_testStats));
+      await tester.pumpWidget(
+        _buildTestWidget(stats: _testStats, notifier: notifier),
+      );
+      await tester.pumpAndSettle();
+
+      await openEditor(tester, 'tag2');
+      await tester.enterText(
+        find.widgetWithText(TextField, 'Photography'),
+        'Macro Photography',
+      );
+      await tester.tap(find.bySemanticsLabel('Select color #22C55E'));
+      await tester.pump();
+      await tester.tap(find.byKey(const ValueKey('tag_edit_delete')));
+      await tester.pumpAndSettle();
+      expect(
+        find.descendant(
+          of: confirmation,
+          matching: find.textContaining('5 dives'),
+        ),
+        findsOneWidget,
+      );
+
+      await tester.tap(confirmationButton('Cancel'));
+      await tester.pumpAndSettle();
+
+      expect(notifier.deleted, isEmpty);
+      expect(confirmation, findsNothing);
+      expect(find.text('Edit Tag'), findsOneWidget);
+      expect(
+        find.widgetWithText(TextField, 'Macro Photography'),
+        findsOneWidget,
+      );
+
+      // Saving now proves both pieces of editor state survived, the color as
+      // well as the name.
+      await tester.tap(find.widgetWithText(TextButton, 'Save'));
+      await tester.pumpAndSettle();
+      expect(notifier.updated.single.name, 'Macro Photography');
+      expect(notifier.updated.single.colorHex, '#22C55E');
+    });
+
+    testWidgets('a failed delete is logged, not left as an uncaught error', (
+      tester,
+    ) async {
+      final notifier = _FailingDeleteTagListNotifier(
+        _tagsFromStats(_testStats),
+      );
+      await tester.pumpWidget(
+        _buildTestWidget(stats: _testStats, notifier: notifier),
+      );
+      await tester.pumpAndSettle();
+
+      await openEditor(tester, 'tag1');
+      await tester.tap(find.byKey(const ValueKey('tag_edit_delete')));
+      await tester.pumpAndSettle();
+      await tester.tap(confirmationButton('Delete'));
+      await tester.pumpAndSettle();
+
+      // onPressed cannot await, so the delete must carry its own listener,
+      // as the selection bar's dispatch does. Unlistened, the failure would
+      // surface here as an uncaught error.
+      expect(tester.takeException(), isNull);
+      expect(find.byType(AlertDialog), findsNothing);
+    });
+
+    testWidgets('Delete is disabled while a save is in flight', (tester) async {
+      // A delete started mid-save would race the write it interrupts (#1907
+      // disables Cancel for the same reason).
+      final notifier = _GatedSaveTagListNotifier(_tagsFromStats(_testStats));
+      await tester.pumpWidget(
+        _buildTestWidget(stats: _testStats, notifier: notifier),
+      );
+      await tester.pumpAndSettle();
+
+      await openEditor(tester, 'tag1');
+      await tester.tap(find.widgetWithText(TextButton, 'Save'));
+      await tester.pump();
+
+      final delete = find.byKey(const ValueKey('tag_edit_delete'));
+      expect(tester.widget<TextButton>(delete).onPressed, isNull);
+
+      notifier.gate.complete();
+      await tester.pumpAndSettle();
+      expect(notifier.deleted, isEmpty);
+    });
+  });
+}
+
+/// A notifier whose single-tag delete fails, as a repository or sync failure
+/// would.
+class _FailingDeleteTagListNotifier extends _MockTagListNotifier {
+  _FailingDeleteTagListNotifier(super.tags);
+
+  @override
+  Future<void> deleteTag(String id) async =>
+      throw StateError('delete failed for $id');
 }
 
 /// A notifier whose first edit save fails and whose second waits on [gate],
