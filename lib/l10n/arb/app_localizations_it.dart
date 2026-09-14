@@ -22731,6 +22731,69 @@ class AppLocalizationsIt extends AppLocalizations {
   String get universalImport_summary_filesTitle => 'File';
 
   @override
+  String universalImport_divers_intro(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'Questo registro contiene immersioni di $count subacquei. Scegli dove importare le immersioni e i brevetti di ciascun subacqueo.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String universalImport_divers_diveCount(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count immersioni',
+      one: '1 immersione',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String universalImport_divers_certificationCount(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count brevetti',
+      one: '1 brevetto',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get universalImport_divers_unownedRow => 'Immersioni senza subacqueo';
+
+  @override
+  String get universalImport_divers_targetLabel => 'Importa in';
+
+  @override
+  String universalImport_divers_targetNew(String name) {
+    return 'Crea nuovo profilo \"$name\"';
+  }
+
+  @override
+  String get universalImport_divers_targetSkip => 'Non importare';
+
+  @override
+  String universalImport_divers_newLabel(String name) {
+    return 'Nuovo: $name';
+  }
+
+  @override
+  String get universalImport_summary_byProfileTitle => 'Per profilo';
+
+  @override
+  String get universalImport_summary_newProfile => 'Nuovo profilo';
+
+  @override
+  String universalImport_summary_switchToSee(String name) {
+    return 'Passa a $name per vedere queste immersioni';
+  }
+
+  @override
   String get universalImport_summary_noticesTitle => 'Note sull\'importazione';
 
   @override
@@ -22769,15 +22832,6 @@ class AppLocalizationsIt extends AppLocalizations {
       one: '1 immersione saltata',
     );
     return '$_temp0';
-  }
-
-  @override
-  String get universalImport_summary_noticeMultipleDiversTitle =>
-      'Immersioni di più subacquei';
-
-  @override
-  String universalImport_summary_noticeMultipleDiversBody(String names) {
-    return 'Questa libreria MacDive contiene immersioni registrate da $names. Sono state tutte importate nel subacqueo attuale e ogni immersione è etichettata con il nome con cui è stata registrata.';
   }
 
   @override

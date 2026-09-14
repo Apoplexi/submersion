@@ -22672,6 +22672,69 @@ class AppLocalizationsHu extends AppLocalizations {
   String get universalImport_summary_filesTitle => 'Fájlok';
 
   @override
+  String universalImport_divers_intro(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'Ez a napló $count búvár merüléseit tartalmazza. Válaszd ki, hová kerüljenek az egyes búvárok merülései és minősítései.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String universalImport_divers_diveCount(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count merülés',
+      one: '1 merülés',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String universalImport_divers_certificationCount(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count minősítés',
+      one: '1 minősítés',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get universalImport_divers_unownedRow => 'Búvár nélküli merülések';
+
+  @override
+  String get universalImport_divers_targetLabel => 'Importálás ide';
+
+  @override
+  String universalImport_divers_targetNew(String name) {
+    return 'Új profil létrehozása: „$name”';
+  }
+
+  @override
+  String get universalImport_divers_targetSkip => 'Ne importáld';
+
+  @override
+  String universalImport_divers_newLabel(String name) {
+    return 'Új: $name';
+  }
+
+  @override
+  String get universalImport_summary_byProfileTitle => 'Profilonként';
+
+  @override
+  String get universalImport_summary_newProfile => 'Új profil';
+
+  @override
+  String universalImport_summary_switchToSee(String name) {
+    return 'Válts $name profiljára a merülések megtekintéséhez';
+  }
+
+  @override
   String get universalImport_summary_noticesTitle => 'Importálási megjegyzések';
 
   @override
@@ -22710,15 +22773,6 @@ class AppLocalizationsHu extends AppLocalizations {
       one: '1 merülés kihagyva',
     );
     return '$_temp0';
-  }
-
-  @override
-  String get universalImport_summary_noticeMultipleDiversTitle =>
-      'Több búvár merülései';
-
-  @override
-  String universalImport_summary_noticeMultipleDiversBody(String names) {
-    return 'Ez a MacDive-könyvtár a következő búvárok merüléseit tartalmazza: $names. Mindet az aktuális búvárhoz importáltuk, és minden merülést megcímkéztünk azzal a névvel, amelyen rögzítették.';
   }
 
   @override

@@ -37224,6 +37224,72 @@ abstract class AppLocalizations {
   /// **'Files'**
   String get universalImport_summary_filesTitle;
 
+  /// Explains the import wizard Divers step for a logbook holding several divers
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, other{This logbook has dives for {count} divers. Choose where each diver\'s dives and certifications go.}}'**
+  String universalImport_divers_intro(num count);
+
+  /// Dive count of one diver row in the Divers step
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 dive} other{{count} dives}}'**
+  String universalImport_divers_diveCount(num count);
+
+  /// Certification count of one diver row in the Divers step
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 certification} other{{count} certifications}}'**
+  String universalImport_divers_certificationCount(num count);
+
+  /// Divers step row for dives the logbook attributes to no diver
+  ///
+  /// In en, this message translates to:
+  /// **'Dives with no diver'**
+  String get universalImport_divers_unownedRow;
+
+  /// Label of the profile picker on a Divers step row
+  ///
+  /// In en, this message translates to:
+  /// **'Import into'**
+  String get universalImport_divers_targetLabel;
+
+  /// Divers step choice that creates a profile named after the diver
+  ///
+  /// In en, this message translates to:
+  /// **'Create new profile \"{name}\"'**
+  String universalImport_divers_targetNew(String name);
+
+  /// Divers step choice that leaves the diver out of the import
+  ///
+  /// In en, this message translates to:
+  /// **'Don\'t import'**
+  String get universalImport_divers_targetSkip;
+
+  /// Review row label for an item going to a profile the import will create
+  ///
+  /// In en, this message translates to:
+  /// **'New: {name}'**
+  String universalImport_divers_newLabel(String name);
+
+  /// Import summary section listing what each diver profile received
+  ///
+  /// In en, this message translates to:
+  /// **'By profile'**
+  String get universalImport_summary_byProfileTitle;
+
+  /// Import summary label on a profile the import created
+  ///
+  /// In en, this message translates to:
+  /// **'New profile'**
+  String get universalImport_summary_newProfile;
+
+  /// Import summary hint on a profile that is not the active one
+  ///
+  /// In en, this message translates to:
+  /// **'Switch to {name} to see these dives'**
+  String universalImport_summary_switchToSee(String name);
+
   /// No description provided for @universalImport_summary_noticesTitle.
   ///
   /// In en, this message translates to:
@@ -37265,18 +37331,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{count, plural, =1{1 dive skipped} other{{count} dives skipped}}'**
   String universalImport_summary_noticeDivesSkippedCount(int count);
-
-  /// No description provided for @universalImport_summary_noticeMultipleDiversTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Dives from more than one diver'**
-  String get universalImport_summary_noticeMultipleDiversTitle;
-
-  /// No description provided for @universalImport_summary_noticeMultipleDiversBody.
-  ///
-  /// In en, this message translates to:
-  /// **'This MacDive library has dives logged by {names}. All of them were imported into the current diver, and each dive is tagged with the name it was logged under.'**
-  String universalImport_summary_noticeMultipleDiversBody(String names);
 
   /// No description provided for @universalImport_summary_noticeProfileUnreadableTitle.
   ///

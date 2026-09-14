@@ -22681,6 +22681,69 @@ class AppLocalizationsDe extends AppLocalizations {
   String get universalImport_summary_filesTitle => 'Dateien';
 
   @override
+  String universalImport_divers_intro(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'Dieses Logbuch enthält Tauchgänge von $count Tauchern. Wählen Sie, wohin die Tauchgänge und Brevets jedes Tauchers importiert werden.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String universalImport_divers_diveCount(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Tauchgänge',
+      one: '1 Tauchgang',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String universalImport_divers_certificationCount(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Brevets',
+      one: '1 Brevet',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get universalImport_divers_unownedRow => 'Tauchgänge ohne Taucher';
+
+  @override
+  String get universalImport_divers_targetLabel => 'Importieren in';
+
+  @override
+  String universalImport_divers_targetNew(String name) {
+    return 'Neues Profil „$name“ anlegen';
+  }
+
+  @override
+  String get universalImport_divers_targetSkip => 'Nicht importieren';
+
+  @override
+  String universalImport_divers_newLabel(String name) {
+    return 'Neu: $name';
+  }
+
+  @override
+  String get universalImport_summary_byProfileTitle => 'Nach Profil';
+
+  @override
+  String get universalImport_summary_newProfile => 'Neues Profil';
+
+  @override
+  String universalImport_summary_switchToSee(String name) {
+    return 'Wechseln Sie zu $name, um diese Tauchgänge zu sehen';
+  }
+
+  @override
   String get universalImport_summary_noticesTitle => 'Hinweise zum Import';
 
   @override
@@ -22719,15 +22782,6 @@ class AppLocalizationsDe extends AppLocalizations {
       one: '1 Tauchgang übersprungen',
     );
     return '$_temp0';
-  }
-
-  @override
-  String get universalImport_summary_noticeMultipleDiversTitle =>
-      'Tauchgänge mehrerer Taucher';
-
-  @override
-  String universalImport_summary_noticeMultipleDiversBody(String names) {
-    return 'Diese MacDive-Bibliothek enthält Tauchgänge von $names. Alle wurden beim aktuellen Taucher importiert, und jeder Tauchgang ist mit dem Namen markiert, unter dem er aufgezeichnet wurde.';
   }
 
   @override

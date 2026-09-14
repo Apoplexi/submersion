@@ -1,6 +1,8 @@
 import 'package:submersion/features/universal_import/data/models/import_enums.dart';
 import 'package:submersion/features/universal_import/data/models/import_payload.dart';
 import 'package:submersion/features/universal_import/data/models/import_warning.dart';
+import 'package:submersion/features/universal_import/data/models/source_diver.dart';
+import 'package:submersion/features/universal_import/data/services/payload_ref_keys.dart';
 
 /// One parsed file's payload plus its batch identity.
 class FilePayload {
@@ -47,30 +49,28 @@ class PayloadMerger {
   const PayloadMerger();
 
   /// Dive map fields holding a single entity reference.
-  static const _scalarRefFields = [
-    'siteId',
-    'tripRef',
-    'diveCenterRef',
-    'courseRef',
-  ];
+  static final _scalarRefFields = diveScalarRefTypes.keys.toList();
 
   /// Dive map fields holding a list of entity references.
-  static const _listRefFields = [
-    'equipmentRefs',
-    'buddyRefs',
-    'diveGuideRefs',
-    'tagRefs',
-  ];
+  static final _listRefFields = diveListRefTypes.keys.toList();
 
   /// Reference fields inside a dive's `gearLinks` entries and an item's
   /// `components` entries (issue #1487): nested lists of maps, so they
   /// need their own pass.
-  static const _gearLinkRefFields = ['itemRef', 'viaRef', 'setRef'];
-  static const _componentRefFields = ['componentRef'];
+  static final _gearLinkRefFields = gearLinkRefTypes.keys.toList();
+  static final _componentRefFields = componentRefTypes.keys.toList();
 
   /// Reference field inside a dive's `buddyRoleRefs` entries (issue #1737):
   /// the person holding each exact role.
-  static const _buddyRoleRefFields = ['buddyRef'];
+  static final _buddyRoleRefFields = buddyRoleRefTypes.keys.toList();
+
+  /// Site map fields holding a list of entity references (issue #1765).
+  static final _siteListRefFields = siteListRefTypes.keys.toList();
+
+  /// Service record fields naming their equipment item. Equipment ids are
+  /// namespaced and folded, so these have to follow or the importer, which
+  /// attaches a record only through its equipment's id, drops the record.
+  static final _serviceRecordRefFields = serviceRecordRefTypes.keys.toList();
 
   /// Rewrites the string reference [fields] of every map in [item]'s
   /// [key] list through [rewrite], copying rather than mutating the
@@ -118,6 +118,9 @@ class PayloadMerger {
     // UUIDs referenced verbatim by dive links, so they are never namespaced,
     // and the same id in two files is the same role.
     final customDiveRoles = <String, Map<String, dynamic>>{};
+    // The people each file attributes records to (issue #1893). Keyed by the
+    // diver's own id, so the same person in two files stays one diver.
+    final sourceDivers = <String, SourceDiver>{};
     // Custom site type definitions (issue #1765). Their slug ids are shared
     // across files by design, like dive type slugs, so the same id in two
     // files is the same type and is not namespaced.
@@ -125,6 +128,19 @@ class PayloadMerger {
 
     for (final input in inputs) {
       warnings.addAll(input.payload.warnings);
+      for (final original in input.payload.sourceDivers) {
+        final diver = original.copyWith(
+          key: SourceDiver.qualifyForFile(original.key, input.fileId),
+        );
+        final seen = sourceDivers[diver.key];
+        sourceDivers[diver.key] = seen == null
+            ? diver
+            : seen.copyWith(
+                diveCount: seen.diveCount + diver.diveCount,
+                certificationCount:
+                    seen.certificationCount + diver.certificationCount,
+              );
+      }
       final roles = input.payload.metadata[ImportPayload.customDiveRolesKey];
       for (final role in roles is List ? roles : const []) {
         if (role is Map<String, dynamic> && role['id'] is String) {
@@ -191,6 +207,7 @@ class PayloadMerger {
     return ImportPayload(
       entities: entities,
       warnings: warnings,
+      sourceDivers: sourceDivers.values.toList(),
       metadata: {
         'batchFileCount': inputs.length,
         'sourceFiles': [for (final i in inputs) i.fileName],
@@ -260,12 +277,14 @@ class PayloadMerger {
     // A site's tag references point at namespaced tag ids, like a dive's
     // (issue #1765). Its siteTypeRefs are slugs and stay as they are.
     if (type == ImportEntityType.sites) {
-      final refs = item['tagRefs'];
-      if (refs is List) {
-        item['tagRefs'] = [
-          for (final ref in refs)
-            if (ref is String && ref.isNotEmpty) '$fileId:$ref' else ref,
-        ];
+      for (final field in _siteListRefFields) {
+        final refs = item[field];
+        if (refs is List) {
+          item[field] = [
+            for (final ref in refs)
+              if (ref is String && ref.isNotEmpty) '$fileId:$ref' else ref,
+          ];
+        }
       }
     }
 
@@ -276,6 +295,19 @@ class PayloadMerger {
         _componentRefFields,
         (ref) => '$fileId:$ref',
       );
+    }
+
+    // A diver key only this file guarantees is qualified by the file, on the
+    // record as on the diver it names (#1893).
+    if (item[SourceDiver.mapKey] case final String diverKey) {
+      item[SourceDiver.mapKey] = SourceDiver.qualifyForFile(diverKey, fileId);
+    }
+
+    if (type == ImportEntityType.serviceRecords) {
+      for (final field in _serviceRecordRefFields) {
+        final ref = item[field];
+        if (ref is String && ref.isNotEmpty) item[field] = '$fileId:$ref';
+      }
     }
 
     if (type == ImportEntityType.equipmentSets) {
@@ -431,7 +463,10 @@ class PayloadMerger {
         final agencyStr = agency is String
             ? agency.toLowerCase()
             : agency?.toString().toLowerCase() ?? '';
-        return '$name|$agencyStr';
+        // A card belongs to one diver (#1893): two divers holding the same
+        // card keep one each, while one diver's card in two files folds.
+        final diver = item[SourceDiver.mapKey];
+        return diver is String ? '$name|$agencyStr|$diver' : '$name|$agencyStr';
       case ImportEntityType.dives:
       // Service records are events, not named entities: two services on the
       // same item are both real and must never fold together.
@@ -507,14 +542,25 @@ class PayloadMerger {
       }
     }
 
+    // A service record follows its equipment when that folds.
+    for (final record
+        in entities[ImportEntityType.serviceRecords] ?? const []) {
+      for (final field in _serviceRecordRefFields) {
+        final ref = record[field];
+        if (ref is String) record[field] = resolve(ref);
+      }
+    }
+
     // A site's tag references follow a folded tag like a dive's (#1765).
     for (final site in entities[ImportEntityType.sites] ?? const []) {
-      final refs = site['tagRefs'];
-      if (refs is List) {
-        site['tagRefs'] = [
-          for (final ref in refs)
-            if (ref is String) resolve(ref) else ref,
-        ];
+      for (final field in _siteListRefFields) {
+        final refs = site[field];
+        if (refs is List) {
+          site[field] = [
+            for (final ref in refs)
+              if (ref is String) resolve(ref) else ref,
+          ];
+        }
       }
     }
   }

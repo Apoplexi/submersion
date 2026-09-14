@@ -22737,6 +22737,69 @@ class AppLocalizationsPt extends AppLocalizations {
   String get universalImport_summary_filesTitle => 'Arquivos';
 
   @override
+  String universalImport_divers_intro(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'Este registro tem mergulhos de $count mergulhadores. Escolha para onde vão os mergulhos e as certificações de cada mergulhador.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String universalImport_divers_diveCount(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count mergulhos',
+      one: '1 mergulho',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String universalImport_divers_certificationCount(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count certificações',
+      one: '1 certificação',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get universalImport_divers_unownedRow => 'Mergulhos sem mergulhador';
+
+  @override
+  String get universalImport_divers_targetLabel => 'Importar para';
+
+  @override
+  String universalImport_divers_targetNew(String name) {
+    return 'Criar novo perfil \"$name\"';
+  }
+
+  @override
+  String get universalImport_divers_targetSkip => 'Não importar';
+
+  @override
+  String universalImport_divers_newLabel(String name) {
+    return 'Novo: $name';
+  }
+
+  @override
+  String get universalImport_summary_byProfileTitle => 'Por perfil';
+
+  @override
+  String get universalImport_summary_newProfile => 'Novo perfil';
+
+  @override
+  String universalImport_summary_switchToSee(String name) {
+    return 'Mude para $name para ver estes mergulhos';
+  }
+
+  @override
   String get universalImport_summary_noticesTitle => 'Notas da importação';
 
   @override
@@ -22775,15 +22838,6 @@ class AppLocalizationsPt extends AppLocalizations {
       one: '1 mergulho ignorado',
     );
     return '$_temp0';
-  }
-
-  @override
-  String get universalImport_summary_noticeMultipleDiversTitle =>
-      'Mergulhos de mais de um mergulhador';
-
-  @override
-  String universalImport_summary_noticeMultipleDiversBody(String names) {
-    return 'Esta biblioteca do MacDive tem mergulhos registrados por $names. Todos foram importados para o mergulhador atual, e cada mergulho recebeu uma etiqueta com o nome sob o qual foi registrado.';
   }
 
   @override
