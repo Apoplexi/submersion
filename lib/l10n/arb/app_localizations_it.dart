@@ -38653,14 +38653,6 @@ class AppLocalizationsIt extends AppLocalizations {
   String get settings_export_progress_preparingPdf => 'Preparazione del PDF...';
 
   @override
-  String get settings_export_progress_selectingBackup =>
-      'Selezione del file di backup...';
-
-  @override
-  String get settings_export_progress_restoringBackup =>
-      'Ripristino dal backup...';
-
-  @override
   String get settings_export_empty_dives => 'Nessuna immersione da esportare';
 
   @override
@@ -38685,22 +38677,6 @@ class AppLocalizationsIt extends AppLocalizations {
   String settings_export_saveFailed(String error) {
     return 'Salvataggio non riuscito: $error';
   }
-
-  @override
-  String settings_export_backupFailed(String error) {
-    return 'Backup non riuscito: $error';
-  }
-
-  @override
-  String settings_export_restoreFailed(String error) {
-    return 'Ripristino non riuscito: $error';
-  }
-
-  @override
-  String get settings_export_fileUnreadable => 'Impossibile accedere al file';
-
-  @override
-  String get settings_export_notADbFile => 'Seleziona un file di backup .db';
 
   @override
   String get settings_export_success_dives =>
@@ -38778,25 +38754,10 @@ class AppLocalizationsIt extends AppLocalizations {
   String get settings_export_saved_pdf => 'PDF salvato con successo';
 
   @override
-  String get settings_export_saved_backup => 'Backup salvato con successo';
-
-  @override
-  String get settings_export_restoreComplete => 'Ripristino completato';
-
-  @override
   String get settings_export_cancelled_save => 'Salvataggio annullato';
 
   @override
-  String get settings_export_cancelled_backup => 'Backup annullato';
-
-  @override
-  String get settings_export_cancelled_restore => 'Ripristino annullato';
-
-  @override
   String get settings_export_pdfDocumentTitle => 'Diario delle immersioni';
-
-  @override
-  String get settings_export_saveBackupDialogTitle => 'Salva backup';
 
   @override
   String get settings_export_saveDivesCsvDialogTitle => 'Salva CSV immersioni';

@@ -37892,12 +37892,6 @@ class AppLocalizationsHe extends AppLocalizations {
   String get settings_export_progress_preparingPdf => 'מכין PDF...';
 
   @override
-  String get settings_export_progress_selectingBackup => 'בוחר קובץ גיבוי...';
-
-  @override
-  String get settings_export_progress_restoringBackup => 'משחזר מגיבוי...';
-
-  @override
   String get settings_export_empty_dives => 'אין צלילות לייצוא';
 
   @override
@@ -37919,22 +37913,6 @@ class AppLocalizationsHe extends AppLocalizations {
   String settings_export_saveFailed(String error) {
     return 'השמירה נכשלה: $error';
   }
-
-  @override
-  String settings_export_backupFailed(String error) {
-    return 'הגיבוי נכשל: $error';
-  }
-
-  @override
-  String settings_export_restoreFailed(String error) {
-    return 'השחזור נכשל: $error';
-  }
-
-  @override
-  String get settings_export_fileUnreadable => 'לא ניתן לגשת לקובץ';
-
-  @override
-  String get settings_export_notADbFile => 'יש לבחור קובץ גיבוי בסיומת .db';
 
   @override
   String get settings_export_success_dives => 'הצלילות יוצאו בהצלחה';
@@ -38009,25 +37987,10 @@ class AppLocalizationsHe extends AppLocalizations {
   String get settings_export_saved_pdf => 'קובץ PDF נשמר בהצלחה';
 
   @override
-  String get settings_export_saved_backup => 'הגיבוי נשמר בהצלחה';
-
-  @override
-  String get settings_export_restoreComplete => 'השחזור הושלם';
-
-  @override
   String get settings_export_cancelled_save => 'השמירה בוטלה';
 
   @override
-  String get settings_export_cancelled_backup => 'הגיבוי בוטל';
-
-  @override
-  String get settings_export_cancelled_restore => 'השחזור בוטל';
-
-  @override
   String get settings_export_pdfDocumentTitle => 'יומן צלילות';
-
-  @override
-  String get settings_export_saveBackupDialogTitle => 'שמירת גיבוי';
 
   @override
   String get settings_export_saveDivesCsvDialogTitle => 'שמירת CSV של הצלילות';
