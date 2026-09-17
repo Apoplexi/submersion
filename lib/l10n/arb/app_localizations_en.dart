@@ -17121,7 +17121,15 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settings_navCustomization_description =>
-      'Drag items to reorder. The top three appear in your bottom navigation bar.';
+      'Drag items to reorder. The items at the top appear in your bottom navigation bar; how many depends on your screen size, not its orientation.';
+
+  @override
+  String get settings_navCustomization_alwaysHideLabels_title =>
+      'Always hide labels';
+
+  @override
+  String get settings_navCustomization_alwaysHideLabels_subtitle =>
+      'Icons only, even where labels would normally fit';
 
   @override
   String get settings_navCustomization_descriptionDesktop =>
@@ -17135,7 +17143,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settings_navCustomization_dividerLabel =>
-      'Items below appear in the More menu';
+      'Items below go to the More menu when they do not fit in the bar';
 
   @override
   String get settings_navCustomization_resetButton => 'Reset to defaults';

@@ -28485,8 +28485,20 @@ abstract class AppLocalizations {
   /// Help text at the top of the navigation customization page.
   ///
   /// In en, this message translates to:
-  /// **'Drag items to reorder. The top three appear in your bottom navigation bar.'**
+  /// **'Drag items to reorder. The items at the top appear in your bottom navigation bar; how many depends on your screen size, not its orientation.'**
   String get settings_navCustomization_description;
+
+  /// Switch title: forces nav destinations to icon-only, hiding the text label next to the icon even where the phone bottom bar or the expanded desktop sidebar would otherwise show one (#1424).
+  ///
+  /// In en, this message translates to:
+  /// **'Always hide labels'**
+  String get settings_navCustomization_alwaysHideLabels_title;
+
+  /// Subtitle under the always-hide-labels switch.
+  ///
+  /// In en, this message translates to:
+  /// **'Icons only, even where labels would normally fit'**
+  String get settings_navCustomization_alwaysHideLabels_subtitle;
 
   /// Help text shown when arranging the wide-screen navigation rail.
   ///
@@ -28509,7 +28521,7 @@ abstract class AppLocalizations {
   /// Non-interactive divider row between primary and overflow destinations.
   ///
   /// In en, this message translates to:
-  /// **'Items below appear in the More menu'**
+  /// **'Items below go to the More menu when they do not fit in the bar'**
   String get settings_navCustomization_dividerLabel;
 
   /// Button that restores the default nav order.
