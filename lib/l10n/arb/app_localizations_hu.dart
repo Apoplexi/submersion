@@ -5516,10 +5516,6 @@ class AppLocalizationsHu extends AppLocalizations {
   String get diveLog_detail_tooltip_nextDive => 'Next dive';
 
   @override
-  String get diveLog_detail_tooltip_exportProfileImage =>
-      'Profil exportalasa kepkent';
-
-  @override
   String get diveLog_detail_tooltip_removeFromFavorites =>
       'Eltavolitas a kedvencekbol';
 
@@ -6299,6 +6295,13 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get diveLog_export_pdfLogbookEntry => 'PDF naplo bejegyzes';
+
+  @override
+  String get diveLog_export_profileAsImage => 'Profil kepkent';
+
+  @override
+  String get diveLog_export_profileAsImageDescription =>
+      'Kepernyokep a merulesi profil diagramrol';
 
   @override
   String get diveLog_export_success => 'Merules sikeresen exportalva';
