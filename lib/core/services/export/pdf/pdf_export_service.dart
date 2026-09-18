@@ -101,47 +101,44 @@ class PdfExportService {
       ),
     );
 
-    // Dive pages
+    // Dive pages. A MultiPage, not a fixed pw.Page, so long notes continue
+    // onto another sheet instead of being dropped from the export.
     for (final dive in dives) {
       pdf.addPage(
-        pw.Page(
+        pw.MultiPage(
           pageFormat: PdfPageFormat.a4,
-          build: (context) => pw.Column(
-            crossAxisAlignment: pw.CrossAxisAlignment.start,
-            children: [
-              pw.Text(
-                'Dive ${dive.diveNumber ?? ""}',
-                style: const pw.TextStyle(
-                  fontSize: 24,
-                  fontWeight: pw.FontWeight.bold,
-                ),
+          crossAxisAlignment: pw.CrossAxisAlignment.start,
+          build: (context) => [
+            pw.Text(
+              'Dive ${dive.diveNumber ?? ""}',
+              style: const pw.TextStyle(
+                fontSize: 24,
+                fontWeight: pw.FontWeight.bold,
               ),
-              pw.SizedBox(height: 10),
-              pw.Text('Date: ${dates.dateTime(dive.dateTime)}'),
-              if (dive.site != null) pw.Text('Site: ${dive.site!.name}'),
-              pw.SizedBox(height: 10),
-              pw.Row(
-                mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                children: [
-                  if (dive.maxDepth != null)
-                    pw.Text('Max Depth: ${units.formatDepth(dive.maxDepth)}'),
-                  if (dive.effectiveRuntime != null)
-                    pw.Text(
-                      'Duration: ${dive.effectiveRuntime!.inMinutes} min',
-                    ),
-                ],
-              ),
-              if (dive.waterTemp != null)
-                pw.Text(
-                  'Water Temp: ${units.formatTemperature(dive.waterTemp)}',
-                ),
-              if (dive.notes.isNotEmpty) ...[
-                pw.SizedBox(height: 10),
-                pw.Text('Notes:'),
-                pw.Text(dive.notes),
+            ),
+            pw.SizedBox(height: 10),
+            pw.Text('Date: ${dates.dateTime(dive.dateTime)}'),
+            if (dive.site != null) pw.Text('Site: ${dive.site!.name}'),
+            pw.SizedBox(height: 10),
+            pw.Row(
+              mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+              children: [
+                if (dive.maxDepth != null)
+                  pw.Text('Max Depth: ${units.formatDepth(dive.maxDepth)}'),
+                if (dive.effectiveRuntime != null)
+                  pw.Text('Duration: ${dive.effectiveRuntime!.inMinutes} min'),
               ],
+            ),
+            if (dive.waterTemp != null)
+              pw.Text('Water Temp: ${units.formatTemperature(dive.waterTemp)}'),
+            if (dive.notes.isNotEmpty) ...[
+              pw.SizedBox(height: 10),
+              pw.Text('Notes:'),
+              // TextOverflow.span is what lets MultiPage break the notes
+              // across sheets.
+              pw.Text(dive.notes, overflow: pw.TextOverflow.span),
             ],
-          ),
+          ],
         ),
       );
     }
