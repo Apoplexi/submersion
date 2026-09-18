@@ -19833,6 +19833,9 @@ class AppLocalizationsPt extends AppLocalizations {
       'Nenhum dado de tendencia disponivel';
 
   @override
+  String get statistics_chart_notRecorded => 'Não registado';
+
+  @override
   String statistics_chart_trendSemanticLabel(Object count) {
     return 'Grafico de linhas de tendencia mostrando $count pontos de dados';
   }
