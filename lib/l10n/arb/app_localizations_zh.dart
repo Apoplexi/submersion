@@ -11603,6 +11603,15 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String equipment_serviceClocks_divesUsedAndLeft(
+    int used,
+    int remaining,
+    int total,
+  ) {
+    return '已用 $used 次，剩余 $remaining/$total 次潜水';
+  }
+
+  @override
   String get cylinderConfigs_title => '气瓶配置';
 
   @override
@@ -11688,8 +11697,26 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String equipment_serviceClocks_hoursUsedAndLeft(
+    String used,
+    String remaining,
+    String total,
+  ) {
+    return '已用 $used 小时，剩余 $remaining/$total 小时';
+  }
+
+  @override
   String equipment_serviceClocks_saltHoursLeft(String remaining, String total) {
     return '海水小时数剩余 $remaining / $total';
+  }
+
+  @override
+  String equipment_serviceClocks_saltHoursUsedAndLeft(
+    String used,
+    String remaining,
+    String total,
+  ) {
+    return '海水小时数已用 $used，剩余 $remaining / $total';
   }
 
   @override
@@ -11698,8 +11725,26 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String equipment_serviceClocks_coldDivesUsedAndLeft(
+    String used,
+    String remaining,
+    String total,
+  ) {
+    return '冷水潜水已用 $used 次，剩余 $remaining / $total 次';
+  }
+
+  @override
   String equipment_serviceClocks_o2HoursLeft(String remaining, String total) {
     return '高氧小时数剩余 $remaining / $total';
+  }
+
+  @override
+  String equipment_serviceClocks_o2HoursUsedAndLeft(
+    String used,
+    String remaining,
+    String total,
+  ) {
+    return '高氧小时数已用 $used，剩余 $remaining / $total';
   }
 
   @override
@@ -11711,8 +11756,26 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String equipment_serviceClocks_deepCyclesUsedAndLeft(
+    String used,
+    String remaining,
+    String total,
+  ) {
+    return '深潜已用 $used 次，剩余 $remaining / $total 次';
+  }
+
+  @override
   String equipment_serviceClocks_cyclesLeft(String remaining, String total) {
     return '电池循环剩余 $remaining / $total 次';
+  }
+
+  @override
+  String equipment_serviceClocks_cyclesUsedAndLeft(
+    String used,
+    String remaining,
+    String total,
+  ) {
+    return '电池循环已用 $used 次，剩余 $remaining / $total 次';
   }
 
   @override
@@ -12441,6 +12504,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get equipment_serviceDialog_manageServiceTypes => '管理维护类型';
 
   @override
+  String get equipment_serviceDialog_filterToConfiguredTypes => '仅显示已配置的维护类型';
+
+  @override
   String get equipment_serviceDialog_categoryLabel => '类别';
 
   @override
@@ -12543,6 +12609,19 @@ class AppLocalizationsZh extends AppLocalizations {
   String equipment_service_filterMatchCount(int count, int total) {
     return '显示 $count / $total';
   }
+
+  @override
+  String equipment_service_showMore(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '再显示 $count 项',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get equipment_service_showFewer => '收起';
 
   @override
   String get equipment_serviceKinds_defaultCategoryLabel => '默认类别';
