@@ -16835,13 +16835,6 @@ class AppLocalizationsHe extends AppLocalizations {
       'מחשבי צלילה מחוברים, ניהול מקורות';
 
   @override
-  String get siteDetailSection_map_name => 'מפה';
-
-  @override
-  String get siteDetailSection_map_description =>
-      'תצוגה מקדימה של מפת מיקום האתר';
-
-  @override
   String get siteDetailSection_diveStatistics_description =>
       'מספר צלילות, עומקים שהושגו, הצלילות הארוכות והאחרונות';
 
