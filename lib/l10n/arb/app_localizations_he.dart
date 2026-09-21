@@ -26930,6 +26930,15 @@ class AppLocalizationsHe extends AppLocalizations {
   String get dive3d_seascape_orbitView => 'תצוגת תלת-ממד';
 
   @override
+  String get dive3d_seascape_verticalExaggeration => 'הגזמה אנכית';
+
+  @override
+  String get dive3d_seascape_verticalExaggerationReset => 'איפוס לאוטומטי';
+
+  @override
+  String get dive3d_seascape_verticalExaggerationLabel => 'עומק';
+
+  @override
   String get dive3d_seascape_appearance_surface => 'פני הקרקע';
 
   @override
