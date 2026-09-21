@@ -11644,6 +11644,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get enum_logCategory_database => 'Database';
 
   @override
+  String get enum_logCategory_media => 'Media';
+
+  @override
   String get enum_visibility_excellent => 'Uitstekend (>30m / >100ft)';
 
   @override
@@ -27072,6 +27075,20 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String get settings_mediaStorage_report_action => 'Mediarapport exporteren';
+
+  @override
+  String get settings_mediaStorage_report_done => 'Mediarapport geëxporteerd';
+
+  @override
+  String get settings_mediaStorage_report_note =>
+      'Het rapport bevat bestandspaden en apparaatnamen. Er wordt niets verzonden.';
+
+  @override
+  String get settings_mediaStorage_report_running =>
+      'Mediarapport wordt gemaakt...';
+
+  @override
   String get settings_mediaStorage_verify_action => 'Bibliotheek verifiëren';
 
   @override
@@ -39980,7 +39997,13 @@ class AppLocalizationsNl extends AppLocalizations {
   String get media_info_actionReveal => 'Tonen in bestandsbeheer';
 
   @override
+  String get media_info_actionCopyDiagnostics => 'Diagnose kopiëren';
+
+  @override
   String get media_info_actionCopyPath => 'Referentie kopiëren';
+
+  @override
+  String get media_info_diagnosticsCopied => 'Diagnose gekopieerd';
 
   @override
   String get media_info_referenceCopied => 'Referentie gekopieerd';

@@ -11529,6 +11529,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get enum_logCategory_database => 'قاعدة البيانات';
 
   @override
+  String get enum_logCategory_media => 'الوسائط';
+
+  @override
   String get enum_visibility_excellent => 'ممتازة (>30m / >100ft)';
 
   @override
@@ -26908,6 +26911,20 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String get settings_mediaStorage_report_action => 'تصدير تقرير الوسائط';
+
+  @override
+  String get settings_mediaStorage_report_done => 'تم تصدير تقرير الوسائط';
+
+  @override
+  String get settings_mediaStorage_report_note =>
+      'يسرد التقرير مسارات الملفات وأسماء الأجهزة. لا يُرسل أي شيء.';
+
+  @override
+  String get settings_mediaStorage_report_running =>
+      'جارٍ إنشاء تقرير الوسائط...';
+
+  @override
   String get settings_mediaStorage_verify_action => 'التحقق من المكتبة';
 
   @override
@@ -39943,7 +39960,13 @@ class AppLocalizationsAr extends AppLocalizations {
   String get media_info_actionReveal => 'إظهار في مدير الملفات';
 
   @override
+  String get media_info_actionCopyDiagnostics => 'نسخ التشخيص';
+
+  @override
   String get media_info_actionCopyPath => 'نسخ المرجع';
+
+  @override
+  String get media_info_diagnosticsCopied => 'تم نسخ التشخيص';
 
   @override
   String get media_info_referenceCopied => 'تم نسخ المرجع';
