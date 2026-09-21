@@ -17816,6 +17816,13 @@ class AppLocalizationsHe extends AppLocalizations {
   String get settings_data_offlineMaps_subtitle => 'הורד מפות לשימוש לא מקוון';
 
   @override
+  String get settings_data_threeDMaps => '3D Maps';
+
+  @override
+  String get settings_data_threeDMaps_subtitle =>
+      'Manage cached swissBATHY3D and other bathymetry data';
+
+  @override
   String get settings_data_restore => 'שחזור';
 
   @override
@@ -25985,6 +25992,163 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String get settings_appearance_bathymetryRefresh_resultNothingCached =>
       'עדיין לא נשמרו נתוני עומק אגמים';
+
+  @override
+  String get maps3d_appBar_title => 'מפות תלת-ממד';
+
+  @override
+  String get maps3d_section_all => 'כל הספקים';
+
+  @override
+  String get maps3d_section_swissBathy => 'swissBATHY3D';
+
+  @override
+  String get maps3d_swissBathy_delete => 'מחיקת נתונים';
+
+  @override
+  String get maps3d_swissBathy_delete_subtitle =>
+      'מסיר אריחי עומק ורשתות אגמים של swissBATHY3D מהמטמון';
+
+  @override
+  String get maps3d_swissBathy_delete_confirmTitle =>
+      'למחוק את נתוני swissBATHY3D?';
+
+  @override
+  String get maps3d_swissBathy_delete_confirmMessage =>
+      'נתוני העומק השמורים במטמון עבור אגמים בשווייץ יימחקו וייטענו מחדש בפעם הבאה שתיפתח תצוגת התלת-ממד של אתר צלילה.';
+
+  @override
+  String get maps3d_swissBathy_delete_done => 'נתוני swissBATHY3D נמחקו';
+
+  @override
+  String get maps3d_section_other => 'ספקים אחרים';
+
+  @override
+  String get maps3d_other_reset => 'איפוס נתוני הבתימטריה הנותרים';
+
+  @override
+  String get maps3d_other_reset_subtitle =>
+      'מסיר נתונים שמורים במטמון מ-EMODnet, NOAA DEM, GMRT ו-ETOPO';
+
+  @override
+  String get maps3d_other_reset_confirmTitle =>
+      'לאפס את נתוני הבתימטריה הנותרים?';
+
+  @override
+  String get maps3d_other_reset_confirmMessage =>
+      'נתונים שמורים במטמון מכל הספקים מלבד swissBATHY3D יימחקו וייטענו מחדש בפעם הבאה שתיפתח תצוגת התלת-ממד של אתר צלילה.';
+
+  @override
+  String get maps3d_other_reset_done => 'נתוני הבתימטריה הנותרים אופסו';
+
+  @override
+  String get maps3d_reload => 'טעינת נתוני המפות מחדש';
+
+  @override
+  String get maps3d_reload_subtitle =>
+      'מוחק את כל נתוני הבתימטריה השמורים במטמון ומוריד אותם מחדש עבור כל אתר צלילה';
+
+  @override
+  String get maps3d_reload_confirmTitle =>
+      'לטעון מחדש את נתוני המפות עבור כל אתרי הצלילה?';
+
+  @override
+  String maps3d_reload_confirm_siteCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count אתרי צלילה ייטענו מחדש.',
+      one: 'אתר צלילה אחד ייטען מחדש.',
+      zero: 'לאף אתר צלילה אין מיקום.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String maps3d_reload_confirm_estimatedSize(String size) {
+    return 'הורדה משוערת: כ-$size';
+  }
+
+  @override
+  String get maps3d_reload_confirm_duration => 'הפעולה עשויה להימשך כמה דקות.';
+
+  @override
+  String get maps3d_reload_confirm_wifiHint =>
+      'יורדו נתונים רבים, ולכן מומלץ חיבור Wi-Fi מהיר.';
+
+  @override
+  String get maps3d_reload_start => 'טעינה מחדש';
+
+  @override
+  String maps3d_reload_progress(int completed, int total) {
+    return '$completed מתוך $total אתרי צלילה';
+  }
+
+  @override
+  String get maps3d_reload_cancel => 'ביטול';
+
+  @override
+  String get maps3d_reload_done => 'נתוני המפות נטענו מחדש עבור כל אתרי הצלילה';
+
+  @override
+  String get maps3d_reload_cancelled => 'הטעינה מחדש בוטלה';
+
+  @override
+  String get maps3d_reload_failed =>
+      'הטעינה מחדש נכשלה; ייתכן שחלק מאתרי הצלילה לא נטענו מחדש';
+
+  @override
+  String get maps3d_busy_notice =>
+      'פעולה אחרת של מפות תלת-ממד פועלת כעת. יש להמתין עד לסיומה.';
+
+  @override
+  String maps3d_reload_remainingSeconds(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'נותרו כ-$count שניות',
+      one: 'נותרה כשנייה אחת',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String maps3d_reload_remainingMinutes(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'נותרו כ-$count דקות',
+      one: 'נותרה כדקה אחת',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String maps3d_reload_warming(int index, int total, String name) {
+    return 'בהכנה: אגם $index מתוך $total ($name)';
+  }
+
+  @override
+  String maps3d_reload_elapsedSeconds(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'פועל כבר $count שניות',
+      one: 'פועל כבר שנייה אחת',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String maps3d_reload_elapsedMinutes(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'פועל כבר $count דקות',
+      one: 'פועל כבר דקה אחת',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get common_action_reparse => 'נתח מחדש';
