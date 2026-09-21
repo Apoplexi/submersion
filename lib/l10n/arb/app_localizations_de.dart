@@ -27671,6 +27671,27 @@ class AppLocalizationsDe extends AppLocalizations {
       'Dieser Tauchplatz hat keine GPS-Koordinaten';
 
   @override
+  String get dive3d_seascape_detailLimitReached =>
+      'Für diesen Ort ist kein weiteres Detail verfügbar';
+
+  @override
+  String dive3d_seascape_lodStageLabel(String stage, String span) {
+    return 'Detailstufe: $stage ($span)';
+  }
+
+  @override
+  String get dive3d_seascape_lodStageOverview => 'Übersicht';
+
+  @override
+  String get dive3d_seascape_lodStageMedium => 'Mittel';
+
+  @override
+  String get dive3d_seascape_lodStageFine => 'Fein';
+
+  @override
+  String get dive3d_seascape_lodStageSuperFine => 'Superfein';
+
+  @override
   String get dive3d_seascape_noData =>
       'Keine Bathymetrie für diesen Ort verfügbar';
 

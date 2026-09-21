@@ -8043,6 +8043,27 @@
   "@dive3d_seascape_seafloorSource": {},
   "dive3d_seascape_noCoordinates": "Dieser Tauchplatz hat keine GPS-Koordinaten",
   "@dive3d_seascape_noCoordinates": {},
+  "dive3d_seascape_detailLimitReached": "Für diesen Ort ist kein weiteres Detail verfügbar",
+  "@dive3d_seascape_detailLimitReached": {},
+  "dive3d_seascape_lodStageLabel": "Detailstufe: {stage} ({span})",
+  "@dive3d_seascape_lodStageLabel": {
+    "placeholders": {
+      "stage": {
+        "type": "String"
+      },
+      "span": {
+        "type": "String"
+      }
+    }
+  },
+  "dive3d_seascape_lodStageOverview": "Übersicht",
+  "@dive3d_seascape_lodStageOverview": {},
+  "dive3d_seascape_lodStageMedium": "Mittel",
+  "@dive3d_seascape_lodStageMedium": {},
+  "dive3d_seascape_lodStageFine": "Fein",
+  "@dive3d_seascape_lodStageFine": {},
+  "dive3d_seascape_lodStageSuperFine": "Superfein",
+  "@dive3d_seascape_lodStageSuperFine": {},
   "dive3d_seascape_noData": "Keine Bathymetrie für diesen Ort verfügbar",
   "@dive3d_seascape_noData": {},
   "dive3d_seascape_axis_distance": "Entfernung ({unitSymbol})",

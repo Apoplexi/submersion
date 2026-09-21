@@ -27349,6 +27349,27 @@ class AppLocalizationsAr extends AppLocalizations {
       'لا توجد إحداثيات GPS لهذا الموقع';
 
   @override
+  String get dive3d_seascape_detailLimitReached =>
+      'This is the most detail available for this location';
+
+  @override
+  String dive3d_seascape_lodStageLabel(String stage, String span) {
+    return 'Level of detail: $stage ($span)';
+  }
+
+  @override
+  String get dive3d_seascape_lodStageOverview => 'Overview';
+
+  @override
+  String get dive3d_seascape_lodStageMedium => 'Medium';
+
+  @override
+  String get dive3d_seascape_lodStageFine => 'Fine';
+
+  @override
+  String get dive3d_seascape_lodStageSuperFine => 'Super-fine';
+
+  @override
   String get dive3d_seascape_noData =>
       'لا توجد بيانات قياس أعماق متاحة لهذا الموقع';
 
