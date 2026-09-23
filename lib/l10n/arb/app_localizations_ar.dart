@@ -6595,6 +6595,10 @@ class AppLocalizationsAr extends AppLocalizations {
       'إبقاء الطبقات الإضافية ضمن العرض';
 
   @override
+  String get diveLog_chartOption_tooltipFollowsCursor =>
+      'تلميح الأداة يتبع المؤشر';
+
+  @override
   String get diveLog_pressure_estimatedSuffix => '(تقديري)';
 
   @override

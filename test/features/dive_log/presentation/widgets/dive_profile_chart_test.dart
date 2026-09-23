@@ -24,8 +24,11 @@ import 'package:submersion/features/dive_log/presentation/widgets/profile_metric
 import 'package:submersion/features/dive_log/presentation/widgets/dive_profile_chart.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/gas_timeline_strip.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/photo_marker_layout.dart';
+import 'package:submersion/features/dive_log/presentation/widgets/ascent_rate_bar_overlay.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/photo_marker_overlay.dart';
+import 'package:submersion/features/dive_log/presentation/widgets/profile_cursor_tooltip.dart';
 import 'package:submersion/features/media/domain/entities/media_item.dart';
+import 'package:submersion/core/constants/units.dart';
 import 'package:submersion/features/settings/presentation/providers/settings_providers.dart';
 import 'package:submersion/l10n/arb/app_localizations.dart';
 import 'package:submersion/core/constants/o2_cell_unit.dart';
@@ -36,8 +39,8 @@ import 'package:submersion/core/constants/o2_cell_unit.dart';
 
 class _TestSettingsNotifier extends StateNotifier<AppSettings>
     implements SettingsNotifier {
-  _TestSettingsNotifier()
-    : super(const AppSettings(defaultShowGasTimeline: true));
+  _TestSettingsNotifier({DepthUnit depthUnit = DepthUnit.meters})
+    : super(AppSettings(defaultShowGasTimeline: true, depthUnit: depthUnit));
 
   @override
   Future<void> setMapStyle(MapStyle style) async =>
@@ -186,6 +189,7 @@ Widget _buildChart({
   List<GasUsageSegment>? gasSegments,
   int? diveDurationSeconds,
   bool tooltipBelow = false,
+  bool tooltipNativeBubble = false,
   void Function(List<TooltipRow>? rows)? onTooltipData,
   void Function(int? index)? onPointSelected,
   int? playbackTimestamp,
@@ -238,7 +242,11 @@ Widget _buildChart({
             gasSwitches: gasSwitches,
             gasSegments: gasSegments,
             diveDurationSeconds: diveDurationSeconds,
-            tooltipBelow: tooltipBelow,
+            tooltipPresentation: tooltipBelow
+                ? TooltipPresentation.external
+                : tooltipNativeBubble
+                ? TooltipPresentation.nativeBubble
+                : TooltipPresentation.inChart,
             onTooltipData: onTooltipData,
             onPointSelected: onPointSelected,
             playbackTimestamp: playbackTimestamp,
@@ -329,7 +337,9 @@ Widget _buildChartAllMetrics({
             markers: markers,
             showMaxDepthMarker: showMaxDepthMarker,
             showPressureThresholdMarkers: showPressureThresholdMarkers,
-            tooltipBelow: tooltipBelow,
+            tooltipPresentation: tooltipBelow
+                ? TooltipPresentation.external
+                : TooltipPresentation.inChart,
             onTooltipData: onTooltipData,
             onPointSelected: onPointSelected,
           ),
@@ -928,6 +938,15 @@ void main() {
         // First sample at 10s and 20 m depth => 3 bar ambient. A ppO2 of
         // 0.63 bar there is 0.21 at the surface, so the lead-in readout must
         // compute it, not repeat 0.63. Temperature is held and marked.
+        //
+        // fl_chart's own tooltip builder used to be driven directly here
+        // (getTooltipItems), back when it built the readout text itself. It
+        // is now always suppressed (see the "tooltip placement" group
+        // above) and ProfileCursorTooltip renders the `!tooltipBelow` (the
+        // default here) in-chart readout instead, off the same row builder
+        // the tooltipBelow path uses -- so this drives it the same way
+        // those tests do, through touchCallback, and reads the rows off
+        // the rendered ProfileCursorTooltip.
         final profile = [
           for (var i = 1; i <= 8; i++)
             DiveProfilePoint(timestamp: i * 10, depth: 20.0, temperature: 25.0),
@@ -949,21 +968,111 @@ void main() {
         final depthBar = data.lineBarsData.first;
         expect(depthBar.spots.first, const FlSpot(0, 0));
 
-        // Drive fl_chart's own tooltip builder with the lead-in vertex.
-        final items = data.lineTouchData.touchTooltipData.getTooltipItems(
-          <LineBarSpot>[TouchLineBarSpot(depthBar, 0, depthBar.spots.first, 0)],
+        // ProfileCursorTooltip only renders once a cursor position is known
+        // (see [DiveProfileChart._lastPointerLocal]); a real hover gives it
+        // one. The exact position does not matter here -- the touchCallback
+        // call right after supplies the sample the rows are built from.
+        final chart = find.byType(LineChart).first;
+        final topLeft = tester.getTopLeft(chart);
+        final size = tester.getSize(chart);
+        final pointer = TestPointer(1, PointerDeviceKind.mouse);
+        await tester.sendEventToBinding(
+          pointer.hover(topLeft + Offset(size.width * 0.5, size.height * 0.5)),
         );
-        final plain = items
-            .whereType<LineTooltipItem>()
-            .expand(
-              (it) => [it.text, ...?it.children?.map((c) => c.toPlainText())],
-            )
-            .join();
+        await tester.pump();
 
-        expect(plain, contains('0:00')); // t=0, not 0:10
-        expect(plain, contains('0.21 bar')); // computed ppO2, not 0.63
-        expect(plain, isNot(contains('0.63 bar')));
-        expect(plain, contains('(interpolated)')); // temperature held
+        data.lineTouchData.touchCallback!(
+          FlPanDownEvent(DragDownDetails()),
+          LineTouchResponse(
+            touchLocation: Offset.zero,
+            touchChartCoordinate: Offset.zero,
+            lineBarSpots: <TouchLineBarSpot>[
+              TouchLineBarSpot(depthBar, 0, depthBar.spots.first, 0),
+            ],
+          ),
+        );
+        await tester.pump();
+
+        final tooltip = tester.widget<ProfileCursorTooltip>(
+          find.byType(ProfileCursorTooltip),
+        );
+        final byLabel = {for (final r in tooltip.rows) r.label: r.value};
+
+        expect(byLabel['Time'], '0:00'); // t=0, not 0:10
+        expect(byLabel['ppO2'], contains('0.21')); // computed, not 0.63
+        expect(byLabel['ppO2'], isNot(contains('0.63')));
+        expect(byLabel['Temp'], contains('(interpolated)')); // temp held
+      },
+    );
+
+    testWidgets(
+      'the playback-driven tooltip cursor lands at the right height in '
+      'imperial units, not a raw-meters depth plotted against a feet-scaled '
+      'axis (issue #2228 follow-up)',
+      (tester) async {
+        // A profile sitting at its own max depth throughout: with the axis
+        // padded 10% above maxDepth (see _totalMaxDepth), the diver's true
+        // fractional position in the plot is depth / (depth * 1.1) ~= 0.909,
+        // regardless of which unit the depth axis is expressed in. Converting
+        // only one side of that fraction (the bug this guards against: depth
+        // left in raw meters while the axis range is feet-converted) instead
+        // produces a unit-independent ~0.277 -- meters/(meters*3.28*1.1) --
+        // stranding the cursor far short of the bottom of the plot.
+        final profile = [
+          for (var i = 0; i < 5; i++)
+            DiveProfilePoint(timestamp: i * 10, depth: 20.0),
+        ];
+        final container = ProviderContainer(
+          overrides: [
+            settingsProvider.overrideWith(
+              (ref) => _TestSettingsNotifier(depthUnit: DepthUnit.feet),
+            ),
+          ],
+        );
+        addTearDown(container.dispose);
+
+        await tester.pumpWidget(
+          UncontrolledProviderScope(
+            container: container,
+            child: MaterialApp(
+              localizationsDelegates: AppLocalizations.localizationsDelegates,
+              supportedLocales: AppLocalizations.supportedLocales,
+              home: Scaffold(
+                body: SizedBox(
+                  width: 400,
+                  height: 300,
+                  child: DiveProfileChart(
+                    profile: profile,
+                    diveDurationSeconds: profile.last.timestamp,
+                    playbackIsPlaying: true,
+                    highlightedTimestamp: 20,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        final tooltip = tester.widget<ProfileCursorTooltip>(
+          find.byType(ProfileCursorTooltip),
+        );
+        // Measured against the LineChart's own rect, not the inner plot
+        // area alone (axis labels/gutters shrink the usable fraction of it,
+        // so this isn't the ~0.909 the plot-only math predicts) -- it only
+        // needs to clearly separate the fixed behaviour from the bug's, and
+        // the two land far enough apart in either coordinate space for that.
+        final chartRect = tester.getRect(find.byType(LineChart).first);
+        final fraction =
+            (tooltip.cursorLocal.dy - chartRect.top) / chartRect.height;
+        expect(
+          fraction,
+          greaterThan(0.5),
+          reason:
+              'a diver sitting at max depth the whole dive belongs well '
+              'toward the bottom of the chart, not stranded partway down by '
+              'a raw-meters depth plotted against a feet-scaled axis range',
+        );
       },
     );
 
@@ -1093,16 +1202,25 @@ void main() {
     LineChartData primaryChartData(WidgetTester tester) =>
         tester.widget<LineChart>(find.byType(LineChart).first).data;
 
-    List<LineChartBarData> temperatureLines(WidgetTester tester) =>
-        primaryChartData(tester).lineBarsData
-            .where(
-              (bar) =>
-                  bar.dashArray != null &&
-                  bar.dashArray!.length == 2 &&
-                  bar.dashArray![0] == 5 &&
-                  bar.dashArray![1] == 3,
-            )
-            .toList();
+    // The active temperature line is solid now (issue #2228: colour alone
+    // already distinguishes it from every other metric), so it is matched by
+    // its colour. The overlaid source's own temperature line keeps its own,
+    // independent dash and a tinted colour, so it is matched by the dash.
+    List<LineChartBarData> temperatureLines(WidgetTester tester) {
+      final colorScheme = Theme.of(
+        tester.element(find.byType(DiveProfileChart).first),
+      ).colorScheme;
+      return primaryChartData(tester).lineBarsData
+          .where(
+            (bar) =>
+                bar.color == colorScheme.tertiary ||
+                (bar.dashArray != null &&
+                    bar.dashArray!.length == 2 &&
+                    bar.dashArray![0] == 5 &&
+                    bar.dashArray![1] == 3),
+          )
+          .toList();
+    }
 
     List<DiveProfilePoint> profileWithTemp(double temperature) => List.generate(
       8,
@@ -2467,8 +2585,10 @@ void main() {
   });
 
   group('DiveProfileChart - tooltip placement', () {
-    testWidgets('default keeps the bubble pinned above the chart box '
-        '(detail-page behavior)', (tester) async {
+    testWidgets('default suppresses fl_chart\'s own bubble '
+        '(detail-page behavior, ProfileCursorTooltip renders it instead)', (
+      tester,
+    ) async {
       await tester.pumpWidget(_buildChart());
       await tester.pumpAndSettle();
 
@@ -2477,9 +2597,17 @@ void main() {
           .data
           .lineTouchData
           .touchTooltipData;
-      expect(tooltip.showOnTopOfTheChartBoxArea, isTrue);
-      expect(tooltip.fitInsideVertically, isFalse);
-      expect(tooltip.tooltipMargin, 0);
+      // fl_chart's own bubble used to be pinned above the chart box
+      // (showOnTopOfTheChartBoxArea/fitInsideVertically: false), which
+      // could clip rows past the plot's top/bottom edge with many metrics
+      // enabled. It is now suppressed entirely -- transparent, no items --
+      // and ProfileCursorTooltip (a Stack layer, see profile_cursor_tooltip
+      // .dart) renders the in-chart readout instead, sized and clamped
+      // against the real plot rect.
+      final barData = LineChartBarData(spots: const [FlSpot(0, 0)]);
+      final barSpot = LineBarSpot(barData, 0, const FlSpot(0, 0));
+      expect(tooltip.getTooltipColor(barSpot), Colors.transparent);
+      expect(tooltip.getTooltipItems([barSpot]), [null]);
     });
   });
 
@@ -3504,14 +3632,18 @@ void main() {
         await tester.pumpAndSettle();
 
         final chartFinder = find.byType(LineChart);
-        final chartBox = tester.renderObject(chartFinder) as RenderBox;
-        final chartSize = chartBox.size;
 
         // Sweep across the chart so fl_chart resolves a nearby data point and
-        // renders the in-chart tooltip, exercising getTooltipItems.
+        // renders the in-chart tooltip, exercising getTooltipItems. The
+        // RenderBox is re-fetched every iteration rather than cached before
+        // the loop: a hover/hold can rebuild the chart with a fresh
+        // RenderObject (e.g. the legend's async height measurement), and
+        // localToGlobal on a stale, now-detached reference throws
+        // "'attached': is not true".
         for (var xFrac = 0.1; xFrac <= 0.9; xFrac += 0.1) {
+          final chartBox = tester.renderObject(chartFinder) as RenderBox;
           final testPoint = chartBox.localToGlobal(
-            Offset(chartSize.width * xFrac, chartSize.height * 0.5),
+            Offset(chartBox.size.width * xFrac, chartBox.size.height * 0.5),
           );
           final gesture = await tester.startGesture(testPoint);
           await tester.pump(const Duration(milliseconds: 600));
@@ -3754,7 +3886,7 @@ void main() {
       'getTooltipItems never returns a cached list whose length differs from '
       'touchedSpots (fl_chart size-match contract)',
       (tester) async {
-        await tester.pumpWidget(_buildChart());
+        await tester.pumpWidget(_buildChart(tooltipNativeBubble: true));
         await tester.pumpAndSettle();
 
         final getItems = primaryChartData(
@@ -3785,6 +3917,35 @@ void main() {
           getItems(fewerBars).length,
           fewerBars.length,
           reason: 'cache must invalidate when the touched-bar count changes',
+        );
+      },
+    );
+
+    testWidgets(
+      'getTooltipItems returns the same cached list for a second call at '
+      'the same sample, instead of rebuilding it (issue #2228 follow-up: '
+      'this memoization existed before the tooltip-building code was '
+      'consolidated and was silently dropped along the way)',
+      (tester) async {
+        await tester.pumpWidget(_buildChart(tooltipNativeBubble: true));
+        await tester.pumpAndSettle();
+
+        final getItems = primaryChartData(
+          tester,
+        ).lineTouchData.touchTooltipData.getTooltipItems;
+        final depthBar = primaryChartData(tester).lineBarsData.first;
+        const spotIndex = 3;
+        final depthSpot = LineBarSpot(depthBar, 0, depthBar.spots[spotIndex]);
+        final touched = <LineBarSpot>[depthSpot];
+
+        final first = getItems(touched);
+        final second = getItems(touched);
+        expect(
+          identical(first, second),
+          isTrue,
+          reason:
+              'same sample, same touched-bar count, same highlight state -- '
+              'nothing the built items depend on changed',
         );
       },
     );
@@ -4628,6 +4789,12 @@ void main() {
       // Regression: with velocity colouring on, the depth line is drawn as
       // one bar per band. The tooltip builder only recognised barIndex 0, so
       // hovering any later segment produced no tooltip at all.
+      //
+      // fl_chart's own bubble is now always suppressed (see the "tooltip
+      // placement" group above); ProfileCursorTooltip renders the in-chart
+      // readout instead, off the same row builder, driven by touchCallback
+      // -- see [DiveProfileChart._resolveDepthTouch] and
+      // `_buildTooltipRowsForIndex`, both shared with the tooltipBelow path.
       final profile = _makeProfile(points: 12);
       await tester.pumpWidget(
         buildWithLegend(
@@ -4646,16 +4813,38 @@ void main() {
         reason: 'velocity colouring should split the depth line into bands',
       );
 
-      final getItems = data.lineTouchData.touchTooltipData.getTooltipItems;
+      // ProfileCursorTooltip only renders once a cursor position is known
+      // (see [DiveProfileChart._lastPointerLocal]); a real hover gives it
+      // one, same as the lead-in test above.
+      final chart = find.byType(LineChart).first;
+      final topLeft = tester.getTopLeft(chart);
+      final size = tester.getSize(chart);
+      final pointer = TestPointer(1, PointerDeviceKind.mouse);
+      await tester.sendEventToBinding(
+        pointer.hover(topLeft + Offset(size.width * 0.5, size.height * 0.5)),
+      );
+      await tester.pump();
+
       // Hover the second band (barIndex 1) at its first sample.
       final secondBar = bars[1];
-      final spot = LineBarSpot(secondBar, 1, secondBar.spots.first);
-      final items = getItems(<LineBarSpot>[spot]);
+      data.lineTouchData.touchCallback!(
+        FlPanDownEvent(DragDownDetails()),
+        LineTouchResponse(
+          touchLocation: Offset.zero,
+          touchChartCoordinate: Offset.zero,
+          lineBarSpots: <TouchLineBarSpot>[
+            TouchLineBarSpot(secondBar, 1, secondBar.spots.first, 0),
+          ],
+        ),
+      );
+      await tester.pump();
 
-      expect(items.length, 1);
+      final tooltip = tester.widget<ProfileCursorTooltip>(
+        find.byType(ProfileCursorTooltip),
+      );
       expect(
-        items.first,
-        isNotNull,
+        tooltip.rows,
+        isNotEmpty,
         reason: 'a hover on a non-first velocity band must show a tooltip',
       );
     });
@@ -4764,9 +4953,18 @@ void main() {
       );
     });
 
-    bool hasRateLine(WidgetTester t) => primaryChartData(
-      t,
-    ).lineBarsData.any((b) => b.color == Colors.lime && b.dashArray != null);
+    // Ascent rate is drawn by AscentRateBarOverlay, a widget layer (bars from
+    // the plot's vertical centre), not an fl_chart line bar (issue #2228
+    // follow-up), so it is found by widget type rather than a bar colour.
+    bool hasRateLine(WidgetTester t) => find
+        .descendant(
+          of: find.byType(AscentRateBarOverlay),
+          matching: find.byWidgetPredicate(
+            (w) => w is CustomPaint && w.painter != null,
+          ),
+        )
+        .evaluate()
+        .isNotEmpty;
 
     testWidgets('does not render the ascent-rate line by default', (
       tester,
@@ -4991,15 +5189,11 @@ void main() {
           reason: 'the depth trace must stay at full resolution',
         );
 
-        // The ceiling line is the dashed [4, 4] bar; it must be decimated
-        // to the point budget instead of emitting all 5,000 spots.
+        // The ceiling line is identified by its unique colour (issue #2228:
+        // it is solid now, no longer the dashed [4, 4] bar); it must be
+        // decimated to the point budget instead of emitting all 5,000 spots.
         final ceilingBars = bars.where(
-          (b) =>
-              b.dashArray != null &&
-              b.dashArray!.length == 2 &&
-              b.dashArray!.first == 4 &&
-              b.dashArray!.last == 4 &&
-              b.spots.isNotEmpty,
+          (b) => b.color == ProfileMetricColors.ceiling && b.spots.isNotEmpty,
         );
         expect(ceilingBars, isNotEmpty);
         for (final bar in ceilingBars) {
@@ -5098,12 +5292,7 @@ void main() {
 
       // The ceiling curve still decimates within the visible window.
       final ceilingBars = zoomed.lineBarsData.where(
-        (b) =>
-            b.dashArray != null &&
-            b.dashArray!.length == 2 &&
-            b.dashArray!.first == 4 &&
-            b.dashArray!.last == 4 &&
-            b.spots.isNotEmpty,
+        (b) => b.color == ProfileMetricColors.ceiling && b.spots.isNotEmpty,
       );
       expect(ceilingBars, isNotEmpty);
       for (final bar in ceilingBars) {
@@ -5673,19 +5862,12 @@ void main() {
       container.read(profileLegendProvider.notifier).toggleMod();
       await tester.pumpAndSettle();
 
-      // MOD is the deepOrange [8, 4] dashed line.
+      // MOD is the deepOrange line, solid now (issue #2228).
       final modBars = tester
           .widget<LineChart>(find.byType(LineChart).first)
           .data
           .lineBarsData
-          .where(
-            (b) =>
-                b.color == const Color(0xFFFFB300) &&
-                b.dashArray != null &&
-                b.dashArray!.length == 2 &&
-                b.dashArray!.first == 8 &&
-                b.dashArray!.last == 4,
-          );
+          .where((b) => b.color == const Color(0xFFFFB300));
       expect(modBars, isNotEmpty);
       for (final b in modBars) {
         expect(b.spots, isNotEmpty);

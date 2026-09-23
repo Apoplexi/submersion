@@ -104,6 +104,8 @@ import 'package:submersion/features/dive_log/presentation/providers/active_sourc
 import 'package:submersion/features/dive_log/presentation/widgets/compact_deco_status_card.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/compact_tissue_loading_card.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/cylinders_card.dart';
+import 'package:submersion/features/dive_log/presentation/widgets/dive_profile_chart.dart'
+    show TooltipPresentation;
 import 'package:submersion/features/dive_log/presentation/widgets/dive_profile_chart_host.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/environment_enum_display.dart';
 import 'package:submersion/features/dive_log/presentation/widgets/o2_toxicity_card.dart';
@@ -2154,6 +2156,13 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
               dive: dive,
               exportKey: _profileChartExportKey,
               onSafetyFindingDetails: (_) => _scrollToSafetySection(),
+              // fl_chart's own tooltip bubble (issue #2228 follow-up): this
+              // is the exact pre-#2228 presentation for the embedded chart,
+              // positioned above the chart box by fl_chart itself rather
+              // than by the custom ProfileCursorTooltip used elsewhere.
+              // Restored after the custom in-chart tooltip's own upward-
+              // growth approximation still did not land in the same place.
+              tooltipPresentation: TooltipPresentation.nativeBubble,
             ),
             // Profile point count (bottom-right, inline with x-axis)
             Align(

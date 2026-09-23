@@ -6757,6 +6757,10 @@ class AppLocalizationsFr extends AppLocalizations {
       'Garder les superpositions visibles';
 
   @override
+  String get diveLog_chartOption_tooltipFollowsCursor =>
+      'L\'infobulle suit le curseur';
+
+  @override
   String get diveLog_pressure_estimatedSuffix => '(est.)';
 
   @override

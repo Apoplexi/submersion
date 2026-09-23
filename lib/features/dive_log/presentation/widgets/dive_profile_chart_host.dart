@@ -115,7 +115,7 @@ class DiveProfileChartHost extends ConsumerWidget {
     required this.dive,
     this.exportKey,
     this.legendLeading,
-    this.tooltipBelow = false,
+    this.tooltipPresentation = TooltipPresentation.inChart,
     this.onTooltipData,
     this.onSafetyFindingDetails,
   });
@@ -131,10 +131,9 @@ class DiveProfileChartHost extends ConsumerWidget {
   /// button and title).
   final Widget? legendLeading;
 
-  /// Hand tooltip rows to the host instead of painting them over the plot.
-  /// Needed where there is no headroom above the chart for the painted
-  /// tooltip to land in.
-  final bool tooltipBelow;
+  /// Which of the three mutually exclusive ways the hosted chart shows the
+  /// touched/hovered sample's readout. See [TooltipPresentation].
+  final TooltipPresentation tooltipPresentation;
 
   final void Function(List<TooltipRow>? rows)? onTooltipData;
 
@@ -353,7 +352,7 @@ class DiveProfileChartHost extends ConsumerWidget {
         diveDuration: dive.effectiveRuntime,
         maxDepth: dive.maxDepth,
         legendLeading: legendLeading,
-        tooltipBelow: tooltipBelow,
+        tooltipPresentation: tooltipPresentation,
         onTooltipData: onTooltipData,
         ceilingCurve: analysis?.ceilingCurve,
         decoStopCurve: analysis?.decoStopCurve,
@@ -419,6 +418,11 @@ class DiveProfileChartHost extends ConsumerWidget {
         // returns (c4e70ae1814 removed the entry point "until the
         // functionality can be more thought-out"). Whatever revives it needs
         // to scope the subscription to the cursor rather than to the host.
+        //
+        // playbackIsPlaying is likewise not forwarded here for the same
+        // reason: there is no playback ticker subscription on this host to
+        // read it from any more (issue #2228 follow-up forwarded it briefly
+        // before #2231 removed the underlying watch).
         highlightedTimestamp:
             trackingIndex != null && trackingIndex < chartProfile.length
             ? chartProfile[trackingIndex].timestamp

@@ -6560,6 +6560,10 @@ class AppLocalizationsHe extends AppLocalizations {
       'שמירת שכבות העל בתצוגה';
 
   @override
+  String get diveLog_chartOption_tooltipFollowsCursor =>
+      'הרמז הצף עוקב אחר הסמן';
+
+  @override
   String get diveLog_pressure_estimatedSuffix => '(משוער)';
 
   @override
