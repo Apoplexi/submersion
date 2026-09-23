@@ -157,7 +157,7 @@ class ProfileSeriesRepository {
           contentHash: row.read<String>('content_hash'),
           revisionKind: row.read<String>('revision_kind'),
           createdAt: row.read<int>('created_at'),
-          isActive: (row.read<int>('is_active') ?? 0) == 1,
+          isActive: row.read<int>('is_active') == 1,
         ),
     ];
   }

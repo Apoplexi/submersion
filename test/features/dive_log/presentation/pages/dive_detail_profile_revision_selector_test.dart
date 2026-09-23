@@ -13,7 +13,7 @@ import '../../../../helpers/mock_providers.dart';
 import '../../../weather/data/repositories/weather_repository_test.mocks.dart';
 
 void main() {
-  Dive _diveWithProfile() => createTestDiveWithBottomTime().copyWith(
+  Dive diveWithProfile() => createTestDiveWithBottomTime().copyWith(
     profile: const [
       DiveProfilePoint(timestamp: 0, depth: 0.0),
       DiveProfilePoint(timestamp: 60, depth: 12.0),
@@ -24,7 +24,7 @@ void main() {
   testWidgets(
     'shows revision selector label and switches to selected revision',
     (tester) async {
-      final dive = _diveWithProfile();
+      final dive = diveWithProfile();
       final base = await getBaseOverrides();
       final mockRepo = MockDiveRepository();
 
@@ -95,7 +95,7 @@ void main() {
   );
 
   testWidgets('hides selector when history is empty', (tester) async {
-    final dive = _diveWithProfile();
+    final dive = diveWithProfile();
     final base = await getBaseOverrides();
 
     await tester.pumpWidget(
