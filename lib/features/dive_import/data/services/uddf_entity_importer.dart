@@ -71,6 +71,7 @@ import 'package:submersion/features/tank_presets/domain/entities/tank_preset_ent
 import 'package:submersion/features/marine_life/data/repositories/species_repository.dart';
 import 'package:submersion/features/universal_import/data/models/import_enums.dart';
 import 'package:submersion/features/universal_import/data/models/import_tag_scopes.dart';
+import 'package:submersion/features/universal_import/data/services/import_site_location.dart';
 import 'package:submersion/features/universal_import/data/services/import_tank_defaults.dart';
 import 'package:uuid/uuid.dart';
 
@@ -1570,10 +1571,8 @@ class UddfEntityImporter {
     List<DiveSite> existingSites,
     Map<String, dynamic> item,
   ) {
-    final lat = (item['latitude'] as num?)?.toDouble();
-    final lon = (item['longitude'] as num?)?.toDouble();
-    if (lat == null || lon == null) return null;
-    final point = GeoPoint(lat, lon);
+    final point = ImportSiteLocation.coordinatesOf(item);
+    if (point == null) return null;
 
     DiveSite? nearest;
     var nearestMeters = double.infinity;
@@ -1654,12 +1653,17 @@ class UddfEntityImporter {
         );
         continue;
       }
-      final siteData = items[i];
-      final name = siteData['name'] as String?;
-      if (name == null || name.isEmpty) {
-        _log.warning('Site override at index $i has no name; skipping');
+      // Names a nameless site from its coordinates rather than discarding it,
+      // so no importer loses a location for want of a label (#2232).
+      final siteData = ImportSiteLocation.named(items[i]);
+      if (siteData == null) {
+        _log.warning(
+          'Site override at index $i has neither a name nor coordinates; '
+          'skipping',
+        );
         continue;
       }
+      final name = siteData['name'] as String;
 
       final existing = existingById[existingId];
       if (existing == null) {
@@ -1671,8 +1675,9 @@ class UddfEntityImporter {
       }
 
       final uddfId = siteData['uddfId'] as String?;
-      final lat = siteData['latitude'] as double?;
-      final lon = siteData['longitude'] as double?;
+      final point = ImportSiteLocation.coordinatesOf(siteData);
+      final lat = point?.latitude;
+      final lon = point?.longitude;
 
       String? country = siteData['country'] as String?;
       String? region = siteData['region'] as String?;
@@ -1749,13 +1754,17 @@ class UddfEntityImporter {
 
     for (var i = 0; i < items.length; i++) {
       if (!selected.contains(i)) continue;
-      final siteData = items[i];
-      final name = siteData['name'] as String?;
-      if (name == null || name.isEmpty) continue;
+      // Names a nameless site from its coordinates rather than discarding it.
+      // The old skip took the coordinates with it and, because the site never
+      // reached `idMapping`, un-linked every dive pointing at it (#2232).
+      final siteData = ImportSiteLocation.named(items[i]);
+      if (siteData == null) continue;
+      final name = siteData['name'] as String;
 
       final uddfId = siteData['uddfId'] as String?;
-      final lat = siteData['latitude'] as double?;
-      final lon = siteData['longitude'] as double?;
+      final point = ImportSiteLocation.coordinatesOf(siteData);
+      final lat = point?.latitude;
+      final lon = point?.longitude;
 
       String? country = siteData['country'] as String?;
       String? region = siteData['region'] as String?;
