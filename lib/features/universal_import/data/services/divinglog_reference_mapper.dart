@@ -1,6 +1,7 @@
 import 'package:submersion/features/dive_types/domain/entities/dive_type_entity.dart';
 import 'package:submersion/features/universal_import/data/services/divinglog_raw_types.dart';
 import 'package:submersion/features/universal_import/data/services/divinglog_row_values.dart';
+import 'package:submersion/features/universal_import/data/services/import_site_location.dart';
 
 /// Builds the payload entities that come from Diving Log's reference
 /// tables, each keyed by the `uddfId` the dive maps reference.
@@ -14,14 +15,29 @@ class DivingLogReferenceMapper {
   /// re-import must fold onto the same site rather than creating a second.
   /// The parts are the country, city and place names in that order, joined
   /// with a pipe and lowercased, skipping any that are missing.
+  ///
+  /// With no text at all, a Place's coordinates key the site instead,
+  /// through the shared coordinate name the way Shearwater's key does
+  /// (#2210). Keyed on text alone, a dive at a Place the diver never named
+  /// never reached [ImportSiteLocation.named] and lost where it happened
+  /// (#2232). Nothing phase 1 keyed can collide: it read the text only.
   static String? siteKeyFor(DivingLogLogbook book, DivingLogRawDive dive) {
     final parts = [
       countryNameFor(book, dive),
       cityNameFor(book, dive),
       placeNameFor(book, dive),
     ].whereType<String>().where((p) => p.trim().isNotEmpty).toList();
-    if (parts.isEmpty) return null;
-    return 'divinglog_site_${parts.join('|').toLowerCase()}';
+    if (parts.isNotEmpty) {
+      return 'divinglog_site_${parts.join('|').toLowerCase()}';
+    }
+    final place = dive.placeId == null ? null : book.placesById[dive.placeId];
+    final point = ImportSiteLocation.fix(place?.latitude, place?.longitude);
+    if (point == null) return null;
+    final name = ImportSiteLocation.nameFromCoordinates(
+      point.latitude,
+      point.longitude,
+    );
+    return 'divinglog_site_${name.toLowerCase()}';
   }
 
   /// Each component resolves through its id, falling back to the free text
@@ -71,8 +87,8 @@ class DivingLogReferenceMapper {
       final city = cityNameFor(book, dive);
       final country = countryNameFor(book, dive);
       final name = placeName ?? city ?? country;
-      if (name == null) continue;
-      final map = <String, dynamic>{'uddfId': key, 'name': name};
+      final map = <String, dynamic>{'uddfId': key};
+      if (name != null) map['name'] = name;
       if (country != null) map['country'] = country;
       if (city != null) map['region'] = city;
       if (place?.latitude != null) map['latitude'] = place!.latitude;
@@ -85,13 +101,18 @@ class DivingLogReferenceMapper {
         if (place?.comments != null) place!.comments!,
       ].join('\n');
       if (notes.isNotEmpty) map['description'] = notes;
+      // Named from its coordinates when the file gave it none, so a nameless
+      // Place still keeps its position (#2232). A site with neither is
+      // dropped, which is all it was ever worth.
+      final named = ImportSiteLocation.named(map);
+      if (named == null) continue;
       // Several dives share a site, and they need not all carry the same
       // detail: one whose PlaceID dangles reaches this key only through the
       // free-text fallback and has no Place row behind it. Taking the first
       // occurrence would then drop the coordinates a later dive's Place row
       // supplies, so later occurrences fill whatever is still missing while
       // anything already set is kept.
-      out[key] = {...map, ...?out[key]};
+      out[key] = {...named, ...?out[key]};
     }
     return out;
   }
