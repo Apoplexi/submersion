@@ -1528,6 +1528,7 @@ class DiveComputerRepository {
       if (!hadSeries) {
         isPrimary = true;
       }
+      final revisionKind = hadSeries ? 'create' : 'computer_import';
 
       // Attribute the samples to the dive_data_sources row that describes
       // this computer's reading (issue #1149), so a later primary swap
@@ -1542,6 +1543,7 @@ class DiveComputerRepository {
           computerId: computerId,
           sourceId: ownerSourceId,
           isPrimary: isPrimary,
+          revisionKind: revisionKind,
           samples: [for (final point in points) _sampleFromPointData(point)],
         );
       }

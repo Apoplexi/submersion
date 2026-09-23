@@ -4261,7 +4261,7 @@ class AppDatabase extends _$AppDatabase {
 
   /// The current schema version as a static constant so that pre-open checks
   /// (e.g. version-mismatch guard) can reference it without an instance.
-  static const int currentSchemaVersion = 221;
+  static const int currentSchemaVersion = 222;
 
   /// The oldest schema whose reader can apply this build's sync payloads
   /// without loss or misinterpretation (the compatibility floor).
@@ -4881,6 +4881,10 @@ class AppDatabase extends _$AppDatabase {
     // compatibility floor stays. Sits above v220 (#1980), which shipped
     // while this was in review.
     221,
+    // v222: metadata-only profile revision history over existing
+    // dive_profile_series rows. No profile samples are copied: history rows
+    // point at existing series ids and track parent/branch relations.
+    222,
   ];
 
   /// Idempotent DDL for the v106 connector-suggestion columns (Lightroom
@@ -8367,6 +8371,48 @@ class AppDatabase extends _$AppDatabase {
       if (rows.isEmpty) return;
     }
     await createMigrator().createTable(diveCenterGearNotes);
+  }
+
+  /// Idempotent creation of profile revision metadata over
+  /// `dive_profile_series` (v222).
+  ///
+  /// History is pointer-only: samples stay in `dive_profile_series` and this
+  /// table stores parent/branch links plus a content hash for de-dup checks.
+  /// Safe from both onUpgrade and beforeOpen; skipped on fixtures that do not
+  /// carry the parent tables yet.
+  Future<void> _assertProfileSeriesHistorySchema() async {
+    for (final parent in const ['dive_profile_series', 'dives']) {
+      final rows = await customSelect(
+        "SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = ?",
+        variables: [Variable<String>(parent)],
+      ).get();
+      if (rows.isEmpty) return;
+    }
+    await customStatement('''
+      CREATE TABLE IF NOT EXISTS dive_profile_series_history (
+        series_id TEXT NOT NULL PRIMARY KEY
+          REFERENCES dive_profile_series(id) ON DELETE CASCADE,
+        dive_id TEXT NOT NULL REFERENCES dives(id) ON DELETE CASCADE,
+        parent_series_id TEXT REFERENCES dive_profile_series(id)
+          ON DELETE SET NULL,
+        root_series_id TEXT NOT NULL,
+        content_hash TEXT NOT NULL,
+        revision_kind TEXT NOT NULL,
+        created_at INTEGER NOT NULL
+      )
+    ''');
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_profile_series_history_dive_created '
+      'ON dive_profile_series_history (dive_id, created_at DESC)',
+    );
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_profile_series_history_root_created '
+      'ON dive_profile_series_history (root_series_id, created_at DESC)',
+    );
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_profile_series_history_dive_hash '
+      'ON dive_profile_series_history (dive_id, content_hash)',
+    );
   }
 
   /// Idempotent DDL for the v174 dive_types.show_in_detail_header and
@@ -12367,6 +12413,45 @@ class AppDatabase extends _$AppDatabase {
           await _assertDiveCenterGearNotesSchema();
         }
         if (from < 221) await reportProgress();
+        // v222: profile revision history over existing series rows. Metadata
+        // only: one history row per series id, no sample/blob duplication.
+        if (from < 222) {
+          await _assertProfileSeriesHistorySchema();
+          await customStatement('''
+            INSERT OR IGNORE INTO dive_profile_series_history (
+              series_id,
+              dive_id,
+              parent_series_id,
+              root_series_id,
+              content_hash,
+              revision_kind,
+              created_at
+            )
+            SELECT
+              s.id,
+              s.dive_id,
+              NULL,
+              s.id,
+              'legacy:' || s.id,
+              CASE
+                WHEN s.computer_id IS NOT NULL
+                  OR EXISTS (
+                    SELECT 1
+                    FROM dive_data_sources ds
+                    WHERE ds.id = s.source_id
+                      AND (
+                        ds.source_format = 'dive_computer'
+                        OR ds.computer_id IS NOT NULL
+                      )
+                  )
+                THEN 'computer_import'
+                ELSE 'legacy'
+              END,
+              s.created_at
+            FROM dive_profile_series s
+          ''');
+        }
+        if (from < 222) await reportProgress();
       },
       beforeOpen: (details) async {
         // v220 backstop: the computer-set auto-apply opt-in column.
@@ -12494,6 +12579,44 @@ class AppDatabase extends _$AppDatabase {
         // v221 backstop: the rental gear notes table (parallel-branch
         // version-collision self-heal; createTable is idempotent).
         await _assertDiveCenterGearNotesSchema();
+
+        // v222 backstop: metadata-only profile revision history over existing
+        // series rows. Safe to re-run: INSERT OR IGNORE keeps existing
+        // revisions untouched and only fills missing pointer rows.
+        await _assertProfileSeriesHistorySchema();
+        await customStatement('''
+          INSERT OR IGNORE INTO dive_profile_series_history (
+            series_id,
+            dive_id,
+            parent_series_id,
+            root_series_id,
+            content_hash,
+            revision_kind,
+            created_at
+          )
+          SELECT
+            s.id,
+            s.dive_id,
+            NULL,
+            s.id,
+            'legacy:' || s.id,
+            CASE
+              WHEN s.computer_id IS NOT NULL
+                OR EXISTS (
+                  SELECT 1
+                  FROM dive_data_sources ds
+                  WHERE ds.id = s.source_id
+                    AND (
+                      ds.source_format = 'dive_computer'
+                      OR ds.computer_id IS NOT NULL
+                    )
+                )
+              THEN 'computer_import'
+              ELSE 'legacy'
+            END,
+            s.created_at
+          FROM dive_profile_series s
+        ''');
 
         // v122 backstop: re-assert service ledger schema + built-in kinds.
         // The legacy backfill is NOT here (onUpgrade only) -- re-running it
