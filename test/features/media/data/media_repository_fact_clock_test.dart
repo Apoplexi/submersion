@@ -83,7 +83,6 @@ void main() {
   };
   final verifyWriters = <String, Future<void> Function(String)>{
     'markAsOrphaned': repo.markAsOrphaned,
-    'markAsVerified': repo.markAsVerified,
     'markOrphaned': (i) => repo.markOrphaned(i, true),
     'markVerified': (i) =>
         repo.markVerified(i, isOrphaned: true, verifiedAt: DateTime(2026)),
@@ -114,6 +113,22 @@ void main() {
       expect(later(after['verify'], before['verify']), isTrue);
     });
   }
+
+  test('markAsVerified stamps the verification clock only', () async {
+    // Out of the table above because only a FLAG CHANGE stamps now (slice
+    // 4): against a row that is already not orphaned this writes the date
+    // locally and spends no clock, so the case needs a flag to clear.
+    await repo.markOrphaned(id, true);
+    final before = await clocks();
+    await Future<void>.delayed(const Duration(milliseconds: 2));
+
+    await repo.markAsVerified(id);
+
+    final after = await clocks();
+    expect(after['row'], before['row'], reason: 'row clock unchanged');
+    expect(after['upload'], before['upload']);
+    expect(later(after['verify'], before['verify']), isTrue);
+  });
 
   test('markOrphaned stays quiet when the row already agrees', () async {
     // SubscriptionPoller calls this for every entry on every poll, so

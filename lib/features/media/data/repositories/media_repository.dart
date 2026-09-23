@@ -389,8 +389,18 @@ class MediaRepository {
     }
   }
 
-  /// Update existing media
-
+  /// Writes [item]'s user fields over the stored row and takes the row
+  /// clock, which is what a user edit is.
+  ///
+  /// Writes no fact column at all: not the upload stamps, not the
+  /// verification flag or date. Every caller patches a row it read earlier,
+  /// so a stamp or a verdict landing in between would be rolled back by
+  /// this write, and the rollback would then travel under a fresh group
+  /// clock and beat the observation it erased (media sync program spec
+  /// 5.1). Those columns belong to the narrow writers:
+  /// [stampContentIdentity], [stampRemoteUploaded] and friends for the
+  /// upload group, [markOrphaned], [markAsVerified] and [stampVerification]
+  /// for the verification group.
   Future<void> updateMedia(domain.MediaItem item) async {
     try {
       _log.info('Updating media: ${item.id}');
@@ -532,13 +542,27 @@ class MediaRepository {
       _log.info('Marking media as orphaned: $id');
       final now = DateTime.now().millisecondsSinceEpoch;
 
+      // Hoisted: the write below is guarded on the flag actually
+      // moving, and SubscriptionPoller reaches these for every manifest
+      // entry on every poll, so a row that was not written must not
+      // announce a local change and wake the sync check for nothing.
+      var wrote = false;
       // One transaction: the flag and the clock that orders it must
       // not be able to come apart (media sync program spec 5.1).
       await _db.transaction(() async {
-        await (_db.update(_db.media)..where((t) => t.id.equals(id))).write(
-          MediaCompanion(isOrphaned: const Value(true), updatedAt: Value(now)),
-        );
+        final rowsWritten =
+            await (_db.update(_db.media)
+                  ..where((t) => t.id.equals(id) & t.isOrphaned.equals(false)))
+                .write(
+                  MediaCompanion(
+                    isOrphaned: const Value(true),
+                    updatedAt: Value(now),
+                  ),
+                );
+        if (rowsWritten == 0) return;
 
+        if (rowsWritten == 0) return;
+        wrote = true;
         await _syncRepository.markFactsPending(
           entityType: 'media',
           recordId: id,
@@ -546,6 +570,7 @@ class MediaRepository {
           group: SyncFactGroups.mediaVerification,
         );
       });
+      if (!wrote) return;
       SyncEventBus.notifyLocalChange();
       _log.info('Marked media as orphaned: $id');
     } catch (e, stackTrace) {
@@ -564,17 +589,37 @@ class MediaRepository {
       _log.info('Marking media as verified: $id');
       final now = DateTime.now().millisecondsSinceEpoch;
 
+      // Hoisted: an early return below leaves the transaction, not the
+      // method, and a row that was not written must not announce a
+      // local change. SubscriptionPoller calls markOrphaned for every
+      // entry on every poll.
+      var wrote = false;
       // One transaction: the flag and the clock that orders it must
       // not be able to come apart (media sync program spec 5.1).
       await _db.transaction(() async {
-        await (_db.update(_db.media)..where((t) => t.id.equals(id))).write(
-          MediaCompanion(
-            isOrphaned: const Value(false),
-            lastVerifiedAt: Value(now),
-            updatedAt: Value(now),
-          ),
-        );
+        final flagMoved =
+            await (_db.update(
+              _db.media,
+            )..where((t) => t.id.equals(id) & t.isOrphaned.equals(true))).write(
+              MediaCompanion(
+                isOrphaned: const Value(false),
+                lastVerifiedAt: Value(now),
+                updatedAt: Value(now),
+              ),
+            ) >
+            0;
+        if (!flagMoved) {
+          // The check date is a local observation (spec 5.2), so nothing
+          // here becomes publishable and the sync check is left asleep.
+          // The media queries watch the table and see the write itself.
+          await (_db.update(_db.media)..where((t) => t.id.equals(id))).write(
+            MediaCompanion(lastVerifiedAt: Value(now), updatedAt: Value(now)),
+          );
+          return;
+        }
 
+        // Reached only when the flag moved and is being published.
+        wrote = true;
         await _syncRepository.markFactsPending(
           entityType: 'media',
           recordId: id,
@@ -582,6 +627,7 @@ class MediaRepository {
           group: SyncFactGroups.mediaVerification,
         );
       });
+      if (!wrote) return;
       SyncEventBus.notifyLocalChange();
       _log.info('Marked media as verified: $id');
     } catch (e, stackTrace) {
@@ -730,11 +776,10 @@ class MediaRepository {
           ? ifLastVerifiedAt.value?.millisecondsSinceEpoch
           : null;
 
-      // Hoisted: the early return below leaves the transaction, not the
+      // Hoisted: an early return below leaves the transaction, not the
       // method, and a row that was not written must not announce a
       // local change. SubscriptionPoller calls markOrphaned for every
-      // entry on every poll, so a notification per healthy row would
-      // wake the sync check each time for nothing.
+      // entry on every poll.
       var wrote = false;
       // One transaction: the flag and the clock that orders it must
       // not be able to come apart (media sync program spec 5.1).
@@ -816,11 +861,10 @@ class MediaRepository {
     try {
       final now = DateTime.now().millisecondsSinceEpoch;
 
-      // Hoisted: the early return below leaves the transaction, not the
+      // Hoisted: an early return below leaves the transaction, not the
       // method, and a row that was not written must not announce a
       // local change. SubscriptionPoller calls markOrphaned for every
-      // entry on every poll, so a notification per healthy row would
-      // wake the sync check each time for nothing.
+      // entry on every poll.
       var wrote = false;
       // One transaction: the flag and the clock that orders it must
       // not be able to come apart (media sync program spec 5.1).
@@ -871,10 +915,17 @@ class MediaRepository {
   /// write from the snapshot ([updateMedia]) would roll that stamp back to
   /// null, and the pending mark would then sync the rollback fleet-wide.
   ///
-  /// Unlike [markVerified] this always writes: the user asked for a check
-  /// and the date of that check is the answer, whether or not the flag moved.
-  /// Like it, a row that is gone by the time the check lands (deleted during
-  /// a Check all media pass) gets no pending record pointing at nothing.
+  /// Always records the date, but publishes only when the flag moves: the
+  /// date is this device's own observation of when it last looked, and it
+  /// stays local until something stamps the verification group, which only
+  /// a real flag change does (spec 5.2). A peer can therefore show an older
+  /// "last checked" indefinitely for a row whose every check confirms what
+  /// it already said. That is the intended trade: the alternative is a
+  /// library-wide publish every time a user presses Check all. The media
+  /// health report shows this device's own value, which is the one a
+  /// support thread needs. Like [markVerified], a row that is
+  /// gone by the time the check lands (deleted during a Check all media
+  /// pass) gets no pending record pointing at nothing.
   Future<void> stampVerification(
     String id, {
     required DateTime verifiedAt,
@@ -882,26 +933,52 @@ class MediaRepository {
   }) async {
     try {
       final now = DateTime.now().millisecondsSinceEpoch;
-      // Hoisted: the early return below leaves the transaction, not the
+      // Two writes, because they mean different things (media sync program
+      // spec 5.2). The flag is a synced fact and is guarded on actually
+      // moving: a Check all pass over a healthy library would otherwise
+      // publish every row it confirmed. The date is this device's own
+      // observation of when it last looked, so it is recorded without a
+      // clock. It does not travel on the row's next edit either: that edit
+      // moves the row clock, and the merge compares each fact group on its
+      // own clock, so a peer with an equal or newer verification clock keeps
+      // its own date. Local until the flag moves, by design.
+      // Hoisted: an early return below leaves the transaction, not the
       // method, and a row that was not written must not announce a
       // local change. SubscriptionPoller calls markOrphaned for every
-      // entry on every poll, so a notification per healthy row would
-      // wake the sync check each time for nothing.
+      // entry on every poll.
       var wrote = false;
       // One transaction: the flag and the clock that orders it must
       // not be able to come apart (media sync program spec 5.1).
       await _db.transaction(() async {
-        final rowsWritten =
-            await (_db.update(_db.media)..where((t) => t.id.equals(id))).write(
-              MediaCompanion(
-                isOrphaned: isOrphaned == null
-                    ? const Value.absent()
-                    : Value(isOrphaned),
-                lastVerifiedAt: Value(verifiedAt.millisecondsSinceEpoch),
-                updatedAt: Value(now),
-              ),
-            );
-        if (rowsWritten == 0) return;
+        var flagMoved = false;
+        if (isOrphaned != null) {
+          flagMoved =
+              await (_db.update(_db.media)..where(
+                    (t) => t.id.equals(id) & t.isOrphaned.equals(!isOrphaned),
+                  ))
+                  .write(
+                    MediaCompanion(
+                      isOrphaned: Value(isOrphaned),
+                      lastVerifiedAt: Value(verifiedAt.millisecondsSinceEpoch),
+                      updatedAt: Value(now),
+                    ),
+                  ) >
+              0;
+        }
+        if (!flagMoved) {
+          // The check date is a local observation (spec 5.2), so nothing
+          // here becomes publishable and the sync check is left asleep.
+          // A Check all pass reaches this for every healthy row; waking it
+          // each time would schedule a network sync with nothing to send.
+          await (_db.update(_db.media)..where((t) => t.id.equals(id))).write(
+            MediaCompanion(
+              lastVerifiedAt: Value(verifiedAt.millisecondsSinceEpoch),
+              updatedAt: Value(now),
+            ),
+          );
+          return;
+        }
+        // Reached only when the flag moved and is being published.
         wrote = true;
         await _syncRepository.markFactsPending(
           entityType: 'media',
@@ -1740,13 +1817,31 @@ class MediaRepository {
   /// Explicitly unlinks surviving media from deleted dives, with the HLC
   /// stamp the old silent FK SET NULL never produced - so the unlink
   /// propagates to other devices instead of diverging.
-  Future<void> unlinkMediaFromDeletedDives(List<String> mediaIds) async {
-    if (mediaIds.isEmpty) return;
+  /// [diveIds] are the dives being deleted, and every write here is scoped
+  /// to them. [partitionMediaForDiveDeletion] chose [mediaIds] before the
+  /// caller did its other deletion work, so a row can be relinked to a
+  /// surviving dive in between; keyed on the media id alone this would
+  /// clear that new link and delete the enrichment the row gained with it.
+  Future<void> unlinkMediaFromDeletedDives(
+    List<String> mediaIds,
+    List<String> diveIds,
+  ) async {
+    if (mediaIds.isEmpty || diveIds.isEmpty) return;
     final now = DateTime.now().millisecondsSinceEpoch;
     await _db.transaction(() async {
-      await (_db.update(_db.media)..where((t) => t.id.isIn(mediaIds))).write(
-        MediaCompanion(diveId: const Value(null), updatedAt: Value(now)),
-      );
+      // The enrichment is dive-scoped (depth and elapsed time on THAT dive's
+      // profile) and its FK is NOT NULL with a cascade, so the dive rows
+      // about to be deleted would take it with them silently. Drop it here
+      // instead, with tombstones, or a peer re-adds it on its next publish
+      // (media sync program spec 5.3).
+      await _dropEnrichmentForDives(mediaIds, diveIds);
+      final unlinked =
+          await (_db.update(
+            _db.media,
+          )..where((t) => t.id.isIn(mediaIds) & t.diveId.isIn(diveIds))).write(
+            MediaCompanion(diveId: const Value(null), updatedAt: Value(now)),
+          );
+      if (unlinked == 0) return;
       for (final id in mediaIds) {
         await _syncRepository.markRecordPending(
           entityType: 'media',
@@ -1959,6 +2054,29 @@ class MediaRepository {
   /// on foreign keys being enabled at all.
   ///
   /// Caller supplies the transaction; this does no committing of its own.
+  /// As [_dropEnrichmentRows], but only the rows belonging to [diveIds].
+  ///
+  /// The dive-deletion path must not touch enrichment a row gained on
+  /// ANOTHER dive: the partition that chose these ids ran before this call,
+  /// and a row can be relinked in between.
+  Future<void> _dropEnrichmentForDives(
+    List<String> mediaIds,
+    List<String> diveIds,
+  ) async {
+    final stale = await (_db.select(
+      _db.mediaEnrichment,
+    )..where((t) => t.mediaId.isIn(mediaIds) & t.diveId.isIn(diveIds))).get();
+    for (final row in stale) {
+      await (_db.delete(
+        _db.mediaEnrichment,
+      )..where((t) => t.id.equals(row.id))).go();
+      await _syncRepository.logDeletion(
+        entityType: 'mediaEnrichment',
+        recordId: row.id,
+      );
+    }
+  }
+
   Future<void> _dropEnrichmentRows(List<String> mediaIds) async {
     final stale = await (_db.select(
       _db.mediaEnrichment,
