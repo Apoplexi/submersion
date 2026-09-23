@@ -11,9 +11,14 @@ import 'package:submersion/l10n/l10n_extension.dart';
 
 /// Ticks on every SyncEventBus event (repository writes that mark records
 /// pending: store attach, account create/delete, subscription edits).
-final _syncBusTickProvider = StreamProvider.autoDispose<void>(
-  (ref) => SyncEventBus.changes,
-);
+///
+/// Each tick is a new number: a provider whose value does not change
+/// notifies no one, so a stream of identical nulls refreshed the card once
+/// after it opened and never again (issue #2304).
+final _syncBusTickProvider = StreamProvider.autoDispose<int>((ref) {
+  var tick = 0;
+  return SyncEventBus.changes.map((_) => ++tick);
+});
 
 /// Ticks when the media store marker mismatch flag may have changed, which
 /// is device-local and so never reaches the sync event bus. Each tick is a
