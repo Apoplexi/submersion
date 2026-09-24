@@ -28364,6 +28364,16 @@ class AppLocalizationsEs extends AppLocalizations {
       'Sin acceso a la fototeca';
 
   @override
+  String get media_unavailablePlaceholder_limitedAccess =>
+      'No está entre las fotos permitidas';
+
+  @override
+  String get media_limitedAccess_allowFullAccess => 'Permitir acceso completo';
+
+  @override
+  String get media_limitedAccess_choosePhotoAgain => 'Volver a elegir la foto';
+
+  @override
   String get attrLabel_hose_length_m => 'Longitud del latiguillo';
 
   @override

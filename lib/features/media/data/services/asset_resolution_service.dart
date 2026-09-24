@@ -34,7 +34,16 @@ class ResolutionResult {
   final String? localAssetId;
   final ResolutionStatus status;
 
-  const ResolutionResult({this.localAssetId, required this.status});
+  /// With [ResolutionStatus.accessDenied] only: the gallery was searched
+  /// through a limited selection, so a miss may be a photo the user did not
+  /// select rather than one that is gone.
+  final bool limitedAccess;
+
+  const ResolutionResult({
+    this.localAssetId,
+    required this.status,
+    this.limitedAccess = false,
+  });
 }
 
 /// Service for resolving cross-device photo asset IDs.
@@ -115,9 +124,7 @@ class AssetResolutionService {
     final cacheEntry = await _cacheRepository.getCacheEntry(item.id);
     if (cacheEntry != null && cacheEntry.localAssetId == null) {
       final expired = await _cacheRepository.isExpired(item.id);
-      if (!expired) {
-        return const ResolutionResult(status: ResolutionStatus.unavailable);
-      }
+      if (!expired) return _backedOff(item);
     }
 
     // Deduplicate concurrent resolution requests for the same media
@@ -187,6 +194,91 @@ class AssetResolutionService {
       );
     }
 
+    return _searchGallery(item);
+  }
+
+  /// Finds [item] in the photo library by the metadata tiers alone, for a
+  /// row whose stored pointer no longer reads: a file whose Android read
+  /// grant was lost, which is usually still in the library (media sync
+  /// program spec 6.3). Needs no stored asset id. Honors the same cache and
+  /// backoff as [resolveAssetId], and shares its in-flight searches.
+  ///
+  /// Unlike [resolveAssetId], a cached mapping is proven before it is
+  /// trusted. This runs only after a read has already failed, so the check
+  /// costs nothing on the hot path, and a mapping gone stale (a second
+  /// re-index) would otherwise be served as nothing on every render, which
+  /// reads as notFound on the linking device.
+  Future<ResolutionResult> findInLibrary(MediaItem item) async {
+    if (!_photoPickerService.supportsGalleryBrowsing) {
+      return const ResolutionResult(status: ResolutionStatus.unavailable);
+    }
+    final cachedId = await _cacheRepository.getCachedAssetId(item.id);
+    if (cachedId != null) {
+      if (await _verifyAssetLoadable(cachedId)) {
+        return ResolutionResult(
+          localAssetId: cachedId,
+          status: ResolutionStatus.resolved,
+        );
+      }
+      _log.info('Cached library match for media ${item.id} is gone');
+      await _cacheRepository.clearEntry(item.id);
+    }
+    final cacheEntry = await _cacheRepository.getCacheEntry(item.id);
+    if (cacheEntry != null &&
+        cacheEntry.localAssetId == null &&
+        !await _cacheRepository.isExpired(item.id)) {
+      return _backedOff(item);
+    }
+    final pending = _pendingResolutions[item.id];
+    if (pending != null) return pending;
+    final future = _searchGallery(item);
+    _pendingResolutions[item.id] = future;
+    try {
+      return await future;
+    } finally {
+      _pendingResolutions.remove(item.id);
+    }
+  }
+
+  /// Drops the shared gallery queries, so the next search sees the library
+  /// as it is now. Called when the user comes back from changing photo
+  /// access, since a changed limited selection keeps the same permission.
+  void forgetGalleryQueries() => _galleryQueryCache.clear();
+
+  /// The answer for a row whose earlier search gave up and is backing off.
+  /// That miss is evidence the photo is gone only if the search saw the
+  /// whole library, and it may not have: every build before this one cached
+  /// a miss under limited access, and the user may have narrowed access
+  /// since (spec 6.3). So it stands only under full access, read without
+  /// prompting; anything less is inconclusive. Only backed-off rows pay for
+  /// the read.
+  Future<ResolutionResult> _backedOff(MediaItem item) async {
+    final PhotoPermissionStatus permission;
+    try {
+      permission = await _photoPickerService.currentPermission();
+    } on Object catch (e, stackTrace) {
+      _log.error(
+        'Permission check failed for backed-off media ${item.id}',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      return const ResolutionResult(status: ResolutionStatus.accessDenied);
+    }
+    return switch (permission) {
+      PhotoPermissionStatus.authorized => const ResolutionResult(
+        status: ResolutionStatus.unavailable,
+      ),
+      PhotoPermissionStatus.limited => const ResolutionResult(
+        status: ResolutionStatus.accessDenied,
+        limitedAccess: true,
+      ),
+      _ => const ResolutionResult(status: ResolutionStatus.accessDenied),
+    };
+  }
+
+  /// The permission gate and the metadata tiers: everything a search does
+  /// once the stored id has failed or there is none.
+  Future<ResolutionResult> _searchGallery(MediaItem item) async {
     // A gallery query against a library the app cannot access yet returns
     // zero candidates -- indistinguishable from "genuinely no matching
     // photo" unless permission is checked directly. Skip the query (and,
@@ -199,15 +291,24 @@ class AssetResolutionService {
     // what lets a caller tell "the gallery says no" apart from "the gallery
     // would not answer". A caller that orphans rows on unavailable would
     // otherwise mark the whole library missing the moment permission lapses.
+    //
+    // Read, never asked: this runs from thumbnail renders, and on a phone
+    // asking shows the OS prompt, which must come only from the picker or
+    // the "Allow full access" action (media sync program spec 6.3).
     final PhotoPermissionStatus permission;
     try {
-      permission = await _photoPickerService.checkPermission();
-    } catch (e) {
-      // checkPermission() ultimately hits platform code; treat a
-      // platform-channel failure like any other gallery failure rather than
-      // letting it bubble out of resolveAssetId() and break a Riverpod
-      // provider watching it.
-      _log.error('Permission check failed for media ${item.id}', error: e);
+      permission = await _photoPickerService.currentPermission();
+    } on Object catch (e, stackTrace) {
+      // The read ultimately hits platform code; treat a platform-channel
+      // failure like any other gallery failure rather than letting it bubble
+      // out of resolveAssetId() and break a Riverpod provider watching it.
+      // Logged under the media category, with the exception, so a health
+      // report export shows why the row was inconclusive.
+      _log.error(
+        'Permission check failed for media ${item.id}',
+        error: e,
+        stackTrace: stackTrace,
+      );
       return const ResolutionResult(status: ResolutionStatus.accessDenied);
     }
     if (permission != PhotoPermissionStatus.authorized &&
@@ -230,18 +331,36 @@ class AssetResolutionService {
         final found = await _getAssetsCoalesced(
           reading.subtract(timeWindow),
           reading.add(timeWindow),
+          permission,
         );
         for (final asset in found) {
           byId[asset.id] = asset;
         }
-      } catch (e) {
-        _log.error('Gallery query failed for media ${item.id}', error: e);
-        return const ResolutionResult(status: ResolutionStatus.unavailable);
+      } on Object catch (e, stackTrace) {
+        // The gallery could not be consulted, which says nothing about the
+        // photo: unavailable would read as notFound on the device that
+        // linked it and orphan the row everywhere.
+        _log.error(
+          'Gallery query failed for media ${item.id}',
+          error: e,
+          stackTrace: stackTrace,
+        );
+        return const ResolutionResult(status: ResolutionStatus.accessDenied);
       }
     }
     final candidates = byId.values.toList();
 
+    // A limited selection hides photos the device does have (spec 6.3): a
+    // miss under it is not evidence of absence, and caching it would back
+    // off a photo the user can make visible in a moment.
+    final limited = permission == PhotoPermissionStatus.limited;
+    const limitedMiss = ResolutionResult(
+      status: ResolutionStatus.accessDenied,
+      limitedAccess: true,
+    );
+
     if (candidates.isEmpty) {
+      if (limited) return limitedMiss;
       await _cacheUnresolved(item.id);
       return const ResolutionResult(status: ResolutionStatus.unavailable);
     }
@@ -322,6 +441,7 @@ class AssetResolutionService {
     }
 
     // Tier 4: unresolved
+    if (limited) return limitedMiss;
     await _cacheUnresolved(item.id);
     _log.info('Could not resolve media ${item.id} -- marked unresolved');
     return const ResolutionResult(status: ResolutionStatus.unavailable);
@@ -477,13 +597,20 @@ class AssetResolutionService {
   /// When opening a dive with many photos, all providers fire near-simultaneously
   /// with overlapping time windows. This method caches the gallery query results
   /// for 30 seconds so only one actual gallery scan is performed per time window.
+  ///
+  /// Keyed by [permission] too: a query taken under full access shows photos
+  /// a limited selection hides, and answering a limited search with it would
+  /// match a photo this device can no longer read (spec 6.3). A change of
+  /// selection under the same permission goes through [forgetGalleryQueries].
   Future<List<AssetInfo>> _getAssetsCoalesced(
     DateTime start,
     DateTime end,
+    PhotoPermissionStatus permission,
   ) async {
     final (bucketStart, bucketEnd) = galleryQueryBucket(start, end);
     final cacheKey =
-        '${bucketStart.millisecondsSinceEpoch}~${bucketEnd.millisecondsSinceEpoch}';
+        '${permission.name}:${bucketStart.millisecondsSinceEpoch}~'
+        '${bucketEnd.millisecondsSinceEpoch}';
 
     // Check for a valid cached result
     final cached = _galleryQueryCache[cacheKey];
