@@ -18448,14 +18448,7 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get settings_data_offlineMaps_subtitle =>
-      'Térképek letöltése offline használathoz';
-
-  @override
-  String get settings_data_threeDMaps => '3D Maps';
-
-  @override
-  String get settings_data_threeDMaps_subtitle =>
-      'Manage cached swissBATHY3D and other bathymetry data';
+      'Térképcsempék és 3D domborzati adatok';
 
   @override
   String get settings_data_restore => 'Visszaállítás';
@@ -26014,14 +26007,14 @@ class AppLocalizationsHu extends AppLocalizations {
   String get maps_offline_clearAll => 'Összes törlése';
 
   @override
-  String get maps_offline_clearAllCache => 'Teljes gyorstár törlése';
-
-  @override
   String get maps_offline_clearAllCacheMessage =>
       'Törli az összes letöltött térképrégiit és gyorsított csempét?';
 
   @override
   String get maps_offline_clearAllCacheTitle => 'Teljes gyorstár törlése?';
+
+  @override
+  String get maps_offline_clearAllTiles => 'Összes térképcsempe törlése';
 
   @override
   String maps_offline_clearCacheStats(Object count, Object size) {
@@ -26129,6 +26122,12 @@ class AppLocalizationsHu extends AppLocalizations {
   ) {
     return '$size, $count csempe, zoom $minZoom-tól $maxZoom-ig';
   }
+
+  @override
+  String get maps_offline_section_terrain => '3D domborzat';
+
+  @override
+  String get maps_offline_section_tiles => 'Térképcsempék';
 
   @override
   String get maps_offline_size => 'Méret';
@@ -26840,9 +26839,6 @@ class AppLocalizationsHu extends AppLocalizations {
       'Még nincsenek tárolt tómélységadatok';
 
   @override
-  String get maps3d_appBar_title => '3D térképek';
-
-  @override
   String get maps3d_section_all => 'Összes szolgáltató';
 
   @override
@@ -26947,7 +26943,7 @@ class AppLocalizationsHu extends AppLocalizations {
 
   @override
   String get maps3d_busy_notice =>
-      'Egy másik művelet fut a 3D térképek oldalon. Kérjük, várja meg, amíg befejeződik.';
+      'Egy másik 3D domborzati művelet fut. Kérjük, várja meg, amíg befejeződik.';
 
   @override
   String maps3d_reload_remainingSeconds(int count) {

@@ -18474,14 +18474,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get settings_data_offlineMaps_subtitle =>
-      'Karten für die Offline-Nutzung herunterladen';
-
-  @override
-  String get settings_data_threeDMaps => '3D-Karten';
-
-  @override
-  String get settings_data_threeDMaps_subtitle =>
-      'Gecachte swissBATHY3D- und andere Bathymetrie-Daten verwalten';
+      'Kartenkacheln und 3D-Geländedaten';
 
   @override
   String get settings_data_restore => 'Wiederherstellen';
@@ -26043,14 +26036,14 @@ class AppLocalizationsDe extends AppLocalizations {
   String get maps_offline_clearAll => 'Alle löschen';
 
   @override
-  String get maps_offline_clearAllCache => 'Gesamten Cache löschen';
-
-  @override
   String get maps_offline_clearAllCacheMessage =>
       'Alle heruntergeladenen Kartenregionen und zwischengespeicherten Kacheln löschen?';
 
   @override
   String get maps_offline_clearAllCacheTitle => 'Gesamten Cache löschen?';
+
+  @override
+  String get maps_offline_clearAllTiles => 'Alle Kartenkacheln löschen';
 
   @override
   String maps_offline_clearCacheStats(Object count, Object size) {
@@ -26158,6 +26151,12 @@ class AppLocalizationsDe extends AppLocalizations {
   ) {
     return '$size, $count Kacheln, Zoom $minZoom bis $maxZoom';
   }
+
+  @override
+  String get maps_offline_section_terrain => '3D-Gelände';
+
+  @override
+  String get maps_offline_section_tiles => 'Kartenkacheln';
 
   @override
   String get maps_offline_size => 'Größe';
@@ -26872,9 +26871,6 @@ class AppLocalizationsDe extends AppLocalizations {
       'Noch keine Seetiefendaten gespeichert';
 
   @override
-  String get maps3d_appBar_title => '3D-Karten';
-
-  @override
   String get maps3d_section_all => 'Alle Anbieter';
 
   @override
@@ -26980,7 +26976,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get maps3d_busy_notice =>
-      'Eine andere 3D-Karten-Aktion läuft gerade. Bitte warten, bis sie abgeschlossen ist.';
+      'Eine andere 3D-Gelände-Aktion läuft gerade. Bitte warten, bis sie abgeschlossen ist.';
 
   @override
   String maps3d_reload_remainingSeconds(int count) {
