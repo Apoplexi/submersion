@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:path/path.dart' as p;
+import 'package:submersion/features/marine_life/presentation/providers/species_providers.dart';
 import 'package:submersion/core/constants/enums.dart';
 import 'package:submersion/core/domain/models/incoming_dive_data.dart';
 import 'package:submersion/core/providers/provider.dart';
@@ -17,6 +18,7 @@ import 'package:submersion/features/dive_import/domain/services/dive_matcher.dar
 import 'package:submersion/core/services/logger_service.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_computer_providers.dart';
 import 'package:submersion/features/dive_log/presentation/providers/dive_providers.dart';
+import 'package:submersion/features/dive_sites/presentation/providers/site_feature_providers.dart';
 import 'package:submersion/features/dive_sites/presentation/providers/site_providers.dart';
 import 'package:submersion/features/data_quality/data/services/quality_scan_service.dart';
 import 'package:submersion/features/dive_types/presentation/providers/dive_type_providers.dart';
@@ -1857,6 +1859,7 @@ ImportRepositories universalImportRepositories(WidgetRef ref) {
     siteRepository: ref.read(siteRepositoryProvider),
     diveRepository: ref.read(diveRepositoryProvider),
     tankPressureRepository: ref.read(tankPressureRepositoryProvider),
+    speciesRepository: ref.read(speciesRepositoryProvider),
     courseRepository: ref.read(courseRepositoryProvider),
     serviceRecordRepository: ref.read(serviceRecordRepositoryProvider),
     diveComputerRepository: ref.read(diveComputerRepositoryProvider),
@@ -1874,5 +1877,8 @@ ImportRepositories universalImportRepositories(WidgetRef ref) {
     // Equipment tags (issue #1942); without it imported gear arrives with
     // none of its tags.
     equipmentTagRepository: ref.read(equipmentTagRepositoryProvider),
+    // Site features (issue #2200); without it every feature in the file is
+    // dropped and the site arrives with none of its markers.
+    siteFeatureRepository: ref.read(siteFeatureRepositoryProvider),
   );
 }
