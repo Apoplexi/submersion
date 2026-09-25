@@ -30408,6 +30408,11 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
+  String visibility_range_atLeast(String min, String unit) {
+    return '$min $unit ומעלה';
+  }
+
+  @override
   String get settings_coordinateFormat_title => 'פורמט קואורדינטות';
 
   @override
@@ -30443,7 +30448,11 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get settings_visibilityScale_subtitle =>
-      'אילו מרחקים נחשבים ראות טובה במקום שבו אתה צולל';
+      'כיצד פרטי הצלילה והסטטיסטיקה מתארים את הראות שמדדת';
+
+  @override
+  String get settings_visibilityScale_intro =>
+      'בחר אילו מרחקים שנמדדו ייחשבו מצוינת, טובה, בינונית או ירודה בפרטי הצלילה ובסטטיסטיקה. שינוי ההגדרה משנה רק את התוויות של הצלילות; הוא לעולם לא משנה את המרחקים שתיעדת.';
 
   @override
   String get settings_visibilityScale_preset_tropical => 'טרופי';
@@ -30469,6 +30478,18 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String get settings_visibilityScale_invalidOrder =>
       'כל ערך חייב להיות קטן מזה שמעליו וגדול מאפס';
+
+  @override
+  String settings_visibilityScale_bandRange(String band, String range) {
+    return '$band $range';
+  }
+
+  @override
+  String get settings_visibilityScale_customUnset => 'הגדר מרחקים משלך';
+
+  @override
+  String get settings_visibilityScale_customHelp =>
+      'הזן לכל דרגה את המרחק הקצר ביותר שעדיין נחשב לה.';
 
   @override
   String statistics_conditions_visibility_legacySuffix(String band) {
