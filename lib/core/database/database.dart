@@ -8415,6 +8415,88 @@ class AppDatabase extends _$AppDatabase {
     );
   }
 
+  /// Backfill history rows for existing series using the safest classifier
+  /// the current schema supports.
+  ///
+  /// Minimal old-schema fixtures do not all carry `source_id`,
+  /// `dive_data_sources`, or `source_format`, so the classifier degrades in
+  /// layers rather than assuming the richest shape is always present.
+  Future<void> _backfillProfileSeriesHistoryRows() async {
+    final historyCols = await customSelect(
+      "PRAGMA table_info('dive_profile_series_history')",
+    ).get();
+    if (historyCols.isEmpty) return;
+
+    final seriesCols = await customSelect(
+      "PRAGMA table_info('dive_profile_series')",
+    ).get();
+    if (seriesCols.isEmpty) return;
+    final seriesNames = seriesCols.map((c) => c.read<String>('name')).toSet();
+    if (!seriesNames.contains('id') ||
+        !seriesNames.contains('dive_id') ||
+        !seriesNames.contains('created_at')) {
+      return;
+    }
+
+    final hasSeriesComputerId = seriesNames.contains('computer_id');
+    final hasSeriesSourceId = seriesNames.contains('source_id');
+
+    final sourceCols = await customSelect(
+      "PRAGMA table_info('dive_data_sources')",
+    ).get();
+    final sourceNames = sourceCols.map((c) => c.read<String>('name')).toSet();
+    final canReadSourceFormat =
+        sourceNames.contains('id') && sourceNames.contains('source_format');
+    final canReadSourceComputerId =
+        sourceNames.contains('id') && sourceNames.contains('computer_id');
+
+    final sourceChecks = <String>[];
+    if (canReadSourceFormat) {
+      sourceChecks.add("ds.source_format = 'dive_computer'");
+    }
+    if (canReadSourceComputerId) {
+      sourceChecks.add('ds.computer_id IS NOT NULL');
+    }
+
+    final revisionKindCase = switch ((hasSeriesComputerId, hasSeriesSourceId)) {
+      (true, true) when sourceChecks.isNotEmpty =>
+        "CASE WHEN s.computer_id IS NOT NULL OR EXISTS ("
+            "SELECT 1 FROM dive_data_sources ds WHERE ds.id = s.source_id "
+            "AND (${sourceChecks.join(' OR ')})"
+            ") THEN 'computer_import' ELSE 'legacy' END",
+      (true, _) =>
+        "CASE WHEN s.computer_id IS NOT NULL THEN 'computer_import' "
+            "ELSE 'legacy' END",
+      (false, true) when sourceChecks.isNotEmpty =>
+        "CASE WHEN EXISTS ("
+            "SELECT 1 FROM dive_data_sources ds WHERE ds.id = s.source_id "
+            "AND (${sourceChecks.join(' OR ')})"
+            ") THEN 'computer_import' ELSE 'legacy' END",
+      _ => "'legacy'",
+    };
+
+    await customStatement('''
+      INSERT OR IGNORE INTO dive_profile_series_history (
+        series_id,
+        dive_id,
+        parent_series_id,
+        root_series_id,
+        content_hash,
+        revision_kind,
+        created_at
+      )
+      SELECT
+        s.id,
+        s.dive_id,
+        NULL,
+        s.id,
+        'legacy:' || s.id,
+        $revisionKindCase,
+        s.created_at
+      FROM dive_profile_series s
+    ''');
+  }
+
   /// Idempotent DDL for the v174 dive_types.show_in_detail_header and
   /// dive_types.show_in_list_view columns: per-type toggles for which
   /// badge rows a diver's types appear in (issue #1269 follow-up). Both
@@ -12417,39 +12499,7 @@ class AppDatabase extends _$AppDatabase {
         // only: one history row per series id, no sample/blob duplication.
         if (from < 222) {
           await _assertProfileSeriesHistorySchema();
-          await customStatement('''
-            INSERT OR IGNORE INTO dive_profile_series_history (
-              series_id,
-              dive_id,
-              parent_series_id,
-              root_series_id,
-              content_hash,
-              revision_kind,
-              created_at
-            )
-            SELECT
-              s.id,
-              s.dive_id,
-              NULL,
-              s.id,
-              'legacy:' || s.id,
-              CASE
-                WHEN s.computer_id IS NOT NULL
-                  OR EXISTS (
-                    SELECT 1
-                    FROM dive_data_sources ds
-                    WHERE ds.id = s.source_id
-                      AND (
-                        ds.source_format = 'dive_computer'
-                        OR ds.computer_id IS NOT NULL
-                      )
-                  )
-                THEN 'computer_import'
-                ELSE 'legacy'
-              END,
-              s.created_at
-            FROM dive_profile_series s
-          ''');
+          await _backfillProfileSeriesHistoryRows();
         }
         if (from < 222) await reportProgress();
       },
@@ -12584,39 +12634,7 @@ class AppDatabase extends _$AppDatabase {
         // series rows. Safe to re-run: INSERT OR IGNORE keeps existing
         // revisions untouched and only fills missing pointer rows.
         await _assertProfileSeriesHistorySchema();
-        await customStatement('''
-          INSERT OR IGNORE INTO dive_profile_series_history (
-            series_id,
-            dive_id,
-            parent_series_id,
-            root_series_id,
-            content_hash,
-            revision_kind,
-            created_at
-          )
-          SELECT
-            s.id,
-            s.dive_id,
-            NULL,
-            s.id,
-            'legacy:' || s.id,
-            CASE
-              WHEN s.computer_id IS NOT NULL
-                OR EXISTS (
-                  SELECT 1
-                  FROM dive_data_sources ds
-                  WHERE ds.id = s.source_id
-                    AND (
-                      ds.source_format = 'dive_computer'
-                      OR ds.computer_id IS NOT NULL
-                    )
-                )
-              THEN 'computer_import'
-              ELSE 'legacy'
-            END,
-            s.created_at
-          FROM dive_profile_series s
-        ''');
+        await _backfillProfileSeriesHistoryRows();
 
         // v122 backstop: re-assert service ledger schema + built-in kinds.
         // The legacy backfill is NOT here (onUpgrade only) -- re-running it

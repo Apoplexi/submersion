@@ -1961,6 +1961,7 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
                         child: _buildProfileRevisionControl(
                           context,
                           ref,
+                          units,
                           dive.id,
                         ),
                       ),
@@ -2120,6 +2121,7 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
   Widget _buildProfileRevisionControl(
     BuildContext context,
     WidgetRef ref,
+    UnitFormatter units,
     String diveId,
   ) {
     final historyAsync = ref.watch(profileSeriesHistoryProvider(diveId));
@@ -2145,7 +2147,7 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
         );
         final activeLabel =
             '${_revisionKindLabel(context, active.revisionKind)} · '
-            '${_formatRevisionCreatedAt(context, active.createdAt)}';
+            '${_formatRevisionCreatedAt(units, active.createdAt)}';
 
         return PopupMenuButton<String>(
           tooltip: 'Profile revision',
@@ -2175,7 +2177,7 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
                   children: [
                     Text(_revisionKindLabel(context, revision.revisionKind)),
                     Text(
-                      _formatRevisionCreatedAt(context, revision.createdAt),
+                      _formatRevisionCreatedAt(units, revision.createdAt),
                       style: Theme.of(context).textTheme.bodySmall,
                     ),
                   ],
@@ -2289,11 +2291,10 @@ class _DiveDetailPageState extends ConsumerState<DiveDetailPage> {
     _ => editType,
   };
 
-  String _formatRevisionCreatedAt(BuildContext context, int createdAtMs) {
-    final locale = Localizations.localeOf(context).toLanguageTag();
-    return DateFormat.yMd(
-      locale,
-    ).add_Hm().format(DateTime.fromMillisecondsSinceEpoch(createdAtMs));
+  String _formatRevisionCreatedAt(UnitFormatter units, int createdAtMs) {
+    return units.formatDateTimeBullet(
+      DateTime.fromMillisecondsSinceEpoch(createdAtMs),
+    );
   }
 
   /// The three cards the deco/tissue panel is made of, or null when the dive
