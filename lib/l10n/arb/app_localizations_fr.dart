@@ -14438,6 +14438,91 @@ class AppLocalizationsFr extends AppLocalizations {
       'Profondeur narcotique limite d\'un mélange';
 
   @override
+  String get gasCalculators_tab_density => 'Densité du gaz';
+
+  @override
+  String get gasCalculators_desc_density =>
+      'Densité du gaz respiré en profondeur, OC ou CCR';
+
+  @override
+  String get gasCalculators_density_inputParameters => 'Mélange et conditions';
+
+  @override
+  String get gasCalculators_density_o2Percent => 'O2 %';
+
+  @override
+  String get gasCalculators_density_hePercent => 'He %';
+
+  @override
+  String get gasCalculators_density_depth => 'Profondeur';
+
+  @override
+  String get gasCalculators_density_mode => 'Mode';
+
+  @override
+  String get gasCalculators_density_modeOc => 'OC';
+
+  @override
+  String get gasCalculators_density_modeCcr => 'CCR';
+
+  @override
+  String get gasCalculators_density_setpoint => 'Setpoint (bar)';
+
+  @override
+  String get gasCalculators_density_diluentHint =>
+      'En CCR, le mélange ci-dessus est le gaz diluant.';
+
+  @override
+  String get gasCalculators_density_temperature => 'Température du gaz';
+
+  @override
+  String get gasCalculators_density_resultTitle => 'Densité du gaz';
+
+  @override
+  String gasCalculators_density_withinLimit(Object limit) {
+    return 'Sous la limite recommandée de $limit g/L.';
+  }
+
+  @override
+  String get gasCalculators_density_eaddLabel =>
+      'Profondeur équivalente en densité d\'air (EADD)';
+
+  @override
+  String get gasCalculators_density_eaddInfo =>
+      'L\'EADD est la profondeur à laquelle l\'air serait aussi dense que ce gaz. Contrairement à la densité en g/L, elle ne dépend pas de la température.';
+
+  @override
+  String get gasCalculators_density_loopGasTitle =>
+      'Gaz de la boucle en profondeur';
+
+  @override
+  String gasCalculators_density_loopComposition(
+    Object o2,
+    Object he,
+    Object n2,
+  ) {
+    return 'O2 $o2 % · He $he % · N2 $n2 %';
+  }
+
+  @override
+  String get gasCalculators_density_setpointCapped =>
+      'Le setpoint dépasse ici la pression ambiante : la boucle contient de l\'oxygène pur.';
+
+  @override
+  String gasCalculators_density_diluentAboveSetpoint(Object ppO2) {
+    return 'Le diluant seul donne ici une ppO2 de $ppO2, au-dessus du setpoint. La densité utilise la ppO2 du diluant.';
+  }
+
+  @override
+  String get gasCalculators_density_infoTitle =>
+      'À propos de la densité du gaz';
+
+  @override
+  String gasCalculators_density_infoContent(Object warn, Object critical) {
+    return 'Un gaz dense est plus difficile à respirer et augmente le risque de rétention de CO2. Gardez la densité à $warn g/L au maximum ; $critical g/L est la limite absolue.\n\nEn CCR, c\'est la densité du gaz de la boucle qui compte : l\'oxygène au setpoint, le reste réparti entre azote et hélium selon le rapport du diluant.\n\nUn gaz plus froid est plus dense : l\'option de température la plus froide est donc la plus prudente. Le calcul suppose un gaz parfait.';
+  }
+
+  @override
   String get gasCalculators_desc_blender =>
       'Procédure de remplissage d\'un mélange cible';
 

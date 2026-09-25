@@ -14156,6 +14156,89 @@ class AppLocalizationsEn extends AppLocalizations {
   String get gasCalculators_desc_mnd => 'Narcosis depth limit for a mix';
 
   @override
+  String get gasCalculators_tab_density => 'Gas Density';
+
+  @override
+  String get gasCalculators_desc_density =>
+      'Breathing gas density at depth, OC or CCR';
+
+  @override
+  String get gasCalculators_density_inputParameters => 'Gas Mix & Conditions';
+
+  @override
+  String get gasCalculators_density_o2Percent => 'O2 %';
+
+  @override
+  String get gasCalculators_density_hePercent => 'He %';
+
+  @override
+  String get gasCalculators_density_depth => 'Depth';
+
+  @override
+  String get gasCalculators_density_mode => 'Mode';
+
+  @override
+  String get gasCalculators_density_modeOc => 'OC';
+
+  @override
+  String get gasCalculators_density_modeCcr => 'CCR';
+
+  @override
+  String get gasCalculators_density_setpoint => 'Setpoint (bar)';
+
+  @override
+  String get gasCalculators_density_diluentHint =>
+      'On CCR, the mix above is the diluent.';
+
+  @override
+  String get gasCalculators_density_temperature => 'Gas temperature';
+
+  @override
+  String get gasCalculators_density_resultTitle => 'Gas Density';
+
+  @override
+  String gasCalculators_density_withinLimit(Object limit) {
+    return 'Within the recommended $limit g/L limit.';
+  }
+
+  @override
+  String get gasCalculators_density_eaddLabel =>
+      'Equivalent air density depth (EADD)';
+
+  @override
+  String get gasCalculators_density_eaddInfo =>
+      'EADD is the depth at which air would be as dense as this gas. Unlike the density in g/L, it does not depend on the temperature.';
+
+  @override
+  String get gasCalculators_density_loopGasTitle => 'Loop gas at depth';
+
+  @override
+  String gasCalculators_density_loopComposition(
+    Object o2,
+    Object he,
+    Object n2,
+  ) {
+    return 'O2 $o2 % · He $he % · N2 $n2 %';
+  }
+
+  @override
+  String get gasCalculators_density_setpointCapped =>
+      'The setpoint is above ambient pressure here, so the loop is pure oxygen.';
+
+  @override
+  String gasCalculators_density_diluentAboveSetpoint(Object ppO2) {
+    return 'The diluent alone gives ppO2 $ppO2 here, above the setpoint. The density uses the diluent\'s ppO2.';
+  }
+
+  @override
+  String get gasCalculators_density_infoTitle => 'About Gas Density';
+
+  @override
+  String gasCalculators_density_infoContent(Object warn, Object critical) {
+    return 'Dense gas is harder to breathe and raises the risk of CO2 retention. Keep the density at or below $warn g/L; $critical g/L is the hard ceiling.\n\nOn CCR the density is that of the loop gas: oxygen at the setpoint, the rest split between nitrogen and helium in the diluent\'s ratio.\n\nColder gas is denser, so the colder temperature option is the conservative one. The calculation assumes an ideal gas.';
+  }
+
+  @override
   String get gasCalculators_desc_blender => 'Fill procedure for a target mix';
 
   @override
