@@ -25828,6 +25828,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tankPresets_builtInPresets => 'Built-in Presets';
 
   @override
+  String get tankPresets_builtInPresets_description =>
+      'Switch off the presets you don\'t use to hide them from the tank pickers. The default preset is always shown.';
+
+  @override
   String get tankPresets_currentDefault => 'Current default';
 
   @override
@@ -25977,6 +25981,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get tankPresets_setAsDefault => 'Set as default';
+
+  @override
+  String get tankPresets_showInPickers => 'Show in tank pickers';
 
   @override
   String get tankPresets_title => 'Tank Presets';

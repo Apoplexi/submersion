@@ -26259,6 +26259,10 @@ class AppLocalizationsIt extends AppLocalizations {
   String get tankPresets_builtInPresets => 'Preset predefiniti';
 
   @override
+  String get tankPresets_builtInPresets_description =>
+      'Disattiva i preset che non usi per nasconderli nei selettori di bombola. Il preset predefinito viene sempre mostrato.';
+
+  @override
   String get tankPresets_currentDefault => 'Predefinito attuale';
 
   @override
@@ -26409,6 +26413,9 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get tankPresets_setAsDefault => 'Imposta come predefinito';
+
+  @override
+  String get tankPresets_showInPickers => 'Mostra nei selettori di bombola';
 
   @override
   String get tankPresets_title => 'Preset bombole';

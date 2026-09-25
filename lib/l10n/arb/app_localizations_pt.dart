@@ -26257,6 +26257,10 @@ class AppLocalizationsPt extends AppLocalizations {
   String get tankPresets_builtInPresets => 'Presets Integrados';
 
   @override
+  String get tankPresets_builtInPresets_description =>
+      'Desative os presets que você não usa para ocultá-los nos seletores de cilindro. O preset padrão é sempre exibido.';
+
+  @override
   String get tankPresets_currentDefault => 'Padrão atual';
 
   @override
@@ -26408,6 +26412,9 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get tankPresets_setAsDefault => 'Definir como padrão';
+
+  @override
+  String get tankPresets_showInPickers => 'Mostrar nos seletores de cilindro';
 
   @override
   String get tankPresets_title => 'Presets de Cilindro';

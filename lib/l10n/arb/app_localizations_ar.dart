@@ -25906,6 +25906,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get tankPresets_builtInPresets => 'الإعدادات المدمجة';
 
   @override
+  String get tankPresets_builtInPresets_description =>
+      'أوقف الإعدادات التي لا تستخدمها لإخفائها من قوائم اختيار الأسطوانة. يظهر الإعداد الافتراضي دائمًا.';
+
+  @override
   String get tankPresets_currentDefault => 'الافتراضي الحالي';
 
   @override
@@ -26054,6 +26058,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get tankPresets_setAsDefault => 'تعيين كافتراضي';
+
+  @override
+  String get tankPresets_showInPickers => 'إظهار في قوائم اختيار الأسطوانة';
 
   @override
   String get tankPresets_title => 'إعدادات الأسطوانات';
