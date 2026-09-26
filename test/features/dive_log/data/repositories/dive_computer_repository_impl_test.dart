@@ -10,12 +10,12 @@ import 'package:submersion/features/dive_log/domain/entities/dive_computer.dart'
     as domain;
 
 import '../../../../helpers/test_database.dart';
+import '../../../../helpers/unique_ids.dart';
 
 void main() {
   late DiveComputerRepository repository;
   late ProfileSeriesRepository profileSeries;
   late AppDatabase db;
-  var dataSourceIdCounter = 0;
 
   setUp(() async {
     db = await setUpTestDatabase();
@@ -70,7 +70,7 @@ void main() {
     double? avgDepth,
     int? diveNumber,
   }) async {
-    final diveId = id ?? 'dive-${DateTime.now().microsecondsSinceEpoch}';
+    final diveId = id ?? uniqueTestId('dive');
     final now = DateTime.now().millisecondsSinceEpoch;
     await db
         .into(db.dives)
@@ -100,8 +100,7 @@ void main() {
     String? computerSerial,
     String? sourceFormat,
   }) async {
-    final id =
-        'ds-${DateTime.now().microsecondsSinceEpoch}-${dataSourceIdCounter++}';
+    final id = uniqueTestId('ds');
     final now = DateTime.now();
     await db
         .into(db.diveDataSources)
