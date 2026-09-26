@@ -29046,6 +29046,12 @@ class AppLocalizationsPt extends AppLocalizations {
   String get attrLabel_speed_mps => 'Velocidade máxima';
 
   @override
+  String get attrLabel_tow_burn_factor => 'Fator de consumo ao rebocar';
+
+  @override
+  String get attrLabel_tow_speed_factor => 'Fator de velocidade ao rebocar';
+
+  @override
   String get attrLabel_sku => 'SKU';
 
   @override

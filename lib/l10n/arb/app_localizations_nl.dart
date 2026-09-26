@@ -28838,6 +28838,12 @@ class AppLocalizationsNl extends AppLocalizations {
   String get attrLabel_speed_mps => 'Topsnelheid';
 
   @override
+  String get attrLabel_tow_burn_factor => 'Verbruiksfactor bij slepen';
+
+  @override
+  String get attrLabel_tow_speed_factor => 'Snelheidsfactor bij slepen';
+
+  @override
   String get attrLabel_sku => 'SKU';
 
   @override
