@@ -12369,9 +12369,6 @@ class AppLocalizationsPt extends AppLocalizations {
       'O2 e He devem estar entre 0 e 100 e somar no máximo 100';
 
   @override
-  String get passport_logFill_invalidNumber => 'Digite um número';
-
-  @override
   String get passport_logFill_saveFailed =>
       'Não foi possível salvar a carga. Tente novamente.';
 
@@ -13239,9 +13236,6 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get equipment_edit_purchasePriceLabel => 'Preço de Compra';
-
-  @override
-  String get equipment_edit_purchasePriceValidation => 'Insira um valor válido';
 
   @override
   String get equipment_edit_remindMeBeforeServiceDue =>
@@ -14854,11 +14848,6 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String gasCalculators_blender_unitPrice(String unit) {
     return 'Preço por 100 $unit';
-  }
-
-  @override
-  String gasCalculators_blender_invalidNumber(String separator) {
-    return 'Introduza um número válido (separador decimal: \"$separator\")';
   }
 
   @override
@@ -30879,9 +30868,6 @@ class AppLocalizationsPt extends AppLocalizations {
       'Mistura com O2 elevado acima de (% O2)';
 
   @override
-  String get equipmentConditionSettings_invalid => 'Introduza um número';
-
-  @override
   String get equipmentConditionSettings_saveFailed =>
       'Não foi possível guardar. Tente novamente.';
 
@@ -43321,7 +43307,24 @@ class AppLocalizationsPt extends AppLocalizations {
   String get plannerCanvas_compare_showOnChart => 'Show on chart';
 
   @override
-  String get numberInput_invalidValue => 'Insira um número válido';
+  String numberInput_invalidNumber(String separator) {
+    return 'Introduza um número válido (separador decimal: \"$separator\")';
+  }
+
+  @override
+  String get numberInput_invalidWholeNumber => 'Insira um número inteiro';
+
+  @override
+  String get numberInput_required => 'Obrigatório';
+
+  @override
+  String get numberInput_notNegative => 'Insira 0 ou mais';
+
+  @override
+  String get numberInput_atLeastOne => 'Insira 1 ou mais';
+
+  @override
+  String get numberInput_percentRange => 'Insira um valor de 0 a 100';
 
   @override
   String get diveCenters_rental_sectionTitle => 'Equipamento alugado';
