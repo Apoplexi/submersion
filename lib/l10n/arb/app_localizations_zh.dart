@@ -23603,6 +23603,14 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get universalImport_summary_noticeMacdiveDeviceTimeZoneTitle =>
+      '潜水时间按此设备的时区读取';
+
+  @override
+  String get universalImport_summary_noticeMacdiveDeviceTimeZoneBody =>
+      'MacDive 没有为这些潜水保存可读取的时区，而且它们的潜水点没有 GPS 位置，因此它们的时间按此设备的时区读取。如果您是在其他地方进行这些潜水的，请检查它们的开始时间。';
+
+  @override
   String get universalImport_summary_unreadableDatesTitle => '部分行未导入';
 
   @override

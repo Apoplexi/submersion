@@ -24852,6 +24852,14 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get universalImport_summary_noticeMacdiveDeviceTimeZoneTitle =>
+      'Tauchzeiten in der Zeitzone dieses Geräts gelesen';
+
+  @override
+  String get universalImport_summary_noticeMacdiveDeviceTimeZoneBody =>
+      'MacDive hat für diese Tauchgänge keine lesbare Zeitzone gespeichert, und ihre Tauchplätze haben keine GPS-Position. Ihre Zeiten wurden daher in der Zeitzone dieses Geräts gelesen. Wenn Sie diese Tauchgänge anderswo gemacht haben, prüfen Sie ihre Startzeiten.';
+
+  @override
   String get universalImport_summary_unreadableDatesTitle =>
       'Einige Zeilen wurden nicht importiert';
 
