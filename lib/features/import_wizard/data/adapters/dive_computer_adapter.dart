@@ -15,6 +15,8 @@ import 'package:submersion/features/dive_computer/domain/services/planned_dive_m
 import 'package:submersion/features/dive_computer/domain/entities/device_model.dart';
 import 'package:submersion/features/dive_computer/data/services/fingerprint_utils.dart';
 import 'package:submersion/features/dive_computer/domain/entities/downloaded_dive.dart';
+import 'package:submersion/features/dive_computer/domain/entities/clock_sync.dart';
+import 'package:submersion/features/dive_computer/presentation/providers/clock_sync_providers.dart';
 import 'package:submersion/features/dive_computer/presentation/providers/discovery_providers.dart';
 import 'package:submersion/features/dive_computer/presentation/providers/download_providers.dart';
 import 'package:submersion/features/dive_import/domain/services/dive_matcher.dart';
@@ -161,6 +163,25 @@ class DiveComputerAdapter implements ImportSourceAdapter {
   int? _descriptorModel;
   String? _libdivecomputerVersion;
 
+  /// What the last [ensureComputer] call was given, kept so [buildBundle]
+  /// can retry the save when the download step's attempt failed.
+  ({
+    DiscoveredDevice device,
+    String? serialNumber,
+    String? firmwareVersion,
+    String? reportedProduct,
+    int? reportedModel,
+  })?
+  _pendingComputerSave;
+
+  /// Why the last retry of [_pendingComputerSave] failed, reported by
+  /// [performImport] in place of importing without a computer.
+  Object? _computerSaveError;
+
+  /// The download's clock sync answer, recorded once a retried save recovers
+  /// the computer it belongs to. See [rememberClockSyncStatus].
+  ClockSyncStatus? _pendingClockSyncStatus;
+
   /// Set by the wizard so the confirm step can navigate back to scan.
   VoidCallback? goBackFromConfirm;
 
@@ -190,6 +211,16 @@ class DiveComputerAdapter implements ImportSourceAdapter {
   /// it -- also done by [resetState].
   void setSinceCutoff(DateTime? cutoff) {
     _sinceCutoff = cutoff;
+  }
+
+  /// Keep the download's clock sync answer in case the computer save fails.
+  ///
+  /// The download step records the answer against the computer it just
+  /// saved. When that save fails there is no computer id to record it
+  /// against, so the adapter records it after a later retry recovers the
+  /// computer (issue #2439).
+  void rememberClockSyncStatus(ClockSyncStatus? status) {
+    _pendingClockSyncStatus = status;
   }
 
   /// Set the computer after discovery completes.
@@ -234,6 +265,14 @@ class DiveComputerAdapter implements ImportSourceAdapter {
     String? reportedProduct,
     int? reportedModel,
   }) async {
+    _pendingComputerSave = (
+      device: device,
+      serialNumber: serialNumber,
+      firmwareVersion: firmwareVersion,
+      reportedProduct: reportedProduct,
+      reportedModel: reportedModel,
+    );
+
     // Capture descriptor fields regardless of whether a computer record already
     // exists: these are always needed for the import service. A device that
     // named a different model during the download (issue #422) is stamped
@@ -349,6 +388,9 @@ class DiveComputerAdapter implements ImportSourceAdapter {
   @override
   void resetState() {
     _sinceCutoff = null;
+    _pendingComputerSave = null;
+    _computerSaveError = null;
+    _pendingClockSyncStatus = null;
     final ref = _ref;
     if (ref == null) return;
     ref.invalidate(dcAdapterScanCanAdvanceProvider);
@@ -440,8 +482,64 @@ class DiveComputerAdapter implements ImportSourceAdapter {
     ];
   }
 
+  /// Retries a computer save that failed on the download step (issue #2439).
+  ///
+  /// The download step lets the diver past that failure, so the adapter can
+  /// reach [buildBundle] with no computer record. A failure is kept in
+  /// [_computerSaveError] for [performImport] to report.
+  Future<void> _retryPendingComputerSave() async {
+    final pending = _pendingComputerSave;
+    if (computer != null || pending == null) return;
+    try {
+      await ensureComputer(
+        device: pending.device,
+        serialNumber: pending.serialNumber,
+        firmwareVersion: pending.firmwareVersion,
+        reportedProduct: pending.reportedProduct,
+        reportedModel: pending.reportedModel,
+      );
+      _computerSaveError = null;
+    } catch (e, stackTrace) {
+      _log.error(
+        'Could not save ${pending.device.displayName} after its download',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      _computerSaveError = e;
+      return;
+    }
+    await _recordRecoveredClockSync();
+  }
+
+  /// Records the clock sync answer the download step could not, now that a
+  /// retried save has produced a computer to record it against.
+  Future<void> _recordRecoveredClockSync() async {
+    final status = _pendingClockSyncStatus;
+    final comp = computer;
+    final ref = _ref;
+    if (status == null || comp == null || ref == null) return;
+    _pendingClockSyncStatus = null;
+    try {
+      await ref
+          .read(clockSyncSettingsNotifierProvider.notifier)
+          .recordSupport(comp.id, status);
+    } catch (e, stackTrace) {
+      _log.error(
+        'Could not record clock sync support for ${comp.displayName}',
+        error: e,
+        stackTrace: stackTrace,
+      );
+    }
+  }
+
   @override
   Future<ImportBundle> buildBundle() async {
+    // Resolve the computer before the bundle records its id: duplicate
+    // detection runs on this bundle next and keys its same-computer checks
+    // (contained segments, cross-computer consolidation) on that id. A
+    // failure here is left for performImport to report.
+    await _retryPendingComputerSave();
+
     final items = _downloadedDives.map(_diveToEntityItem).toList();
 
     final cutoff = _sinceCutoff;
@@ -560,7 +658,20 @@ class DiveComputerAdapter implements ImportSourceAdapter {
     ImportProgressCallback? onProgress,
     ImportCancellationToken? cancelToken,
   }) async {
+    // No retry here: duplicate detection already ran on this bundle, and if
+    // the computer save failed in buildBundle it ran without the computer id.
+    // Importing now would let the same-computer matches it missed through as
+    // new dives, so report why the save failed instead.
     final comp = computer;
+    final saveError = _computerSaveError;
+    if (comp == null && saveError != null) {
+      return UnifiedImportResult(
+        importedCounts: const {},
+        consolidatedCount: 0,
+        skippedCount: 0,
+        errorMessage: 'Could not save the dive computer: $saveError',
+      );
+    }
     if (comp == null) {
       return const UnifiedImportResult(
         importedCounts: {},
