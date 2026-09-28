@@ -12880,6 +12880,88 @@ class AppLocalizationsIt extends AppLocalizations {
   String get passport_foreign_defaultName => 'Bombola';
 
   @override
+  String get passport_nfc_tap => 'Avvicina un tag NFC';
+
+  @override
+  String get passport_nfc_holdNear =>
+      'Tieni il tag contro il retro del telefono.';
+
+  @override
+  String get passport_nfc_write => 'Scrivi tag NFC';
+
+  @override
+  String get passport_nfc_rewrite => 'Riscrivi tag';
+
+  @override
+  String get passport_nfc_reprint => 'Ristampa etichetta';
+
+  @override
+  String get passport_nfc_unsupported =>
+      'Questo dispositivo non può leggere né scrivere tag NFC.';
+
+  @override
+  String get passport_nfc_disabled =>
+      'L\'NFC è disattivato. Attivalo nelle impostazioni di sistema.';
+
+  @override
+  String get passport_nfc_written => 'Tag scritto e verificato';
+
+  @override
+  String passport_nfc_tagInfo(String type, int capacity) {
+    return '$type, $capacity byte';
+  }
+
+  @override
+  String passport_nfc_capacity(int capacity) {
+    return '$capacity byte';
+  }
+
+  @override
+  String get passport_nfc_allFields => 'Tutto entra in questo tag.';
+
+  @override
+  String passport_nfc_fieldsDropped(String fields) {
+    return 'Omesso per spazio: $fields';
+  }
+
+  @override
+  String get passport_nfc_notNdef =>
+      'Questo tag non può contenere un link. Usa un tag NTAG215 o NTAG216.';
+
+  @override
+  String get passport_nfc_readOnly =>
+      'Questo tag è bloccato e non può essere scritto.';
+
+  @override
+  String passport_nfc_tooSmall(int capacity) {
+    return 'Questo tag è troppo piccolo ($capacity byte), anche per l\'identità della bombola.';
+  }
+
+  @override
+  String get passport_nfc_readBackFailed =>
+      'Il tag non è stato riletto come scritto, quindi non è stato scritto.';
+
+  @override
+  String get passport_nfc_writeFailed =>
+      'Il tag non è stato scritto. Tienilo fermo e riprova.';
+
+  @override
+  String get passport_nfc_readFailed =>
+      'Impossibile leggere il tag. Tienilo fermo e riprova.';
+
+  @override
+  String get passport_nfc_retry => 'Riprova';
+
+  @override
+  String get passport_nfc_fieldName => 'Nome';
+
+  @override
+  String get passport_nfc_fieldSerial => 'Numero di serie';
+
+  @override
+  String get passport_nfc_fieldO2Clean => 'Pulita per O2';
+
+  @override
   String passport_foreign_serial(String serial) {
     return 'N. di serie $serial';
   }
@@ -14428,6 +14510,10 @@ class AppLocalizationsIt extends AppLocalizations {
   String equipment_list_emptyState_noEquipment(Object filterText) {
     return 'Nessuna $filterText';
   }
+
+  @override
+  String get equipment_list_emptyState_noQueryMatch =>
+      'Nessuna attrezzatura corrisponde a questa query';
 
   @override
   String get equipment_list_emptyState_noStatusMatch =>
@@ -41380,6 +41466,18 @@ class AppLocalizationsIt extends AppLocalizations {
       'Qualcos’altro stava ancora usando il file del database, quindi Submersion si è fermato invece di scriverci. Non è stato modificato nulla e nulla è danneggiato. Chiudi completamente Submersion, poi riaprilo.';
 
   @override
+  String get startup_locationUnreachable_title =>
+      'Impossibile raggiungere la cartella del tuo diario di immersione';
+
+  @override
+  String get startup_locationUnreachable_body =>
+      'Il tuo diario di immersione si trova in una cartella che hai scelto, e Submersion al momento non riesce ad aprirla. Non è stato modificato nulla al suo interno. Se la cartella si trova su un\'unità non collegata o in una cartella cloud ancora in sincronizzazione, ricollegala e riapri Submersion.';
+
+  @override
+  String get startup_locationUnreachable_folderLabel =>
+      'Cartella del tuo diario di immersione:';
+
+  @override
   String get startup_failure_technicalDetails => 'Dettagli tecnici';
 
   @override
@@ -41442,6 +41540,22 @@ class AppLocalizationsIt extends AppLocalizations {
       'Metti da parte il file danneggiato e ricomincia. Non viene eliminato nulla.';
 
   @override
+  String get startup_failure_chooseFolderAgain =>
+      'Scegli la cartella del diario immersioni';
+
+  @override
+  String get startup_failure_chooseFolderAgain_subtitle =>
+      'Scegli di nuovo la stessa cartella per ridare l\'accesso a Submersion, oppure scegli la cartella in cui si trova ora il tuo diario.';
+
+  @override
+  String get startup_failure_useDefaultLocation =>
+      'Torna alla posizione predefinita dell\'app';
+
+  @override
+  String get startup_failure_useDefaultLocation_subtitle =>
+      'Smetti di usare questa cartella e apri il diario nella cartella di Submersion. Nella tua cartella non viene modificato nulla.';
+
+  @override
   String get startup_recovery_adopt_title => 'Usare questo diario immersioni?';
 
   @override
@@ -41493,6 +41607,19 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String get startup_recovery_encryptedBackup_body =>
       'Quel backup è cifrato. Submersion può sbloccare un backup cifrato solo ad app aperta, quindi usa prima una delle altre opzioni qui e poi ripristinalo dalle Impostazioni, in Backup e ripristino.';
+
+  @override
+  String get startup_recovery_useDefault_title =>
+      'Tornare alla posizione predefinita dell\'app?';
+
+  @override
+  String startup_recovery_useDefault_body(Object folder) {
+    return 'D\'ora in poi Submersion aprirà il diario nella propria cartella, o ne creerà uno vuoto se non c\'è. Nulla in $folder viene spostato o eliminato. Per usare di nuovo quella cartella, sceglila dalle Impostazioni, in Archiviazione database.';
+  }
+
+  @override
+  String get startup_recovery_useDefault_confirm =>
+      'Usa la posizione predefinita';
 
   @override
   String get startup_failure_downgrade_title =>
@@ -44835,6 +44962,9 @@ class AppLocalizationsIt extends AppLocalizations {
   String get query_entity_sightings => 'Avvistamenti';
 
   @override
+  String get query_entity_siteTypes => 'Tipi di sito';
+
+  @override
   String get query_entity_sites => 'Siti di immersione';
 
   @override
@@ -44874,6 +45004,9 @@ class AppLocalizationsIt extends AppLocalizations {
   String get query_equipment_brand => 'Marca';
 
   @override
+  String get query_equipment_dives => 'Immersioni';
+
+  @override
   String get query_equipment_model => 'Modello';
 
   @override
@@ -44883,7 +45016,22 @@ class AppLocalizationsIt extends AppLocalizations {
   String get query_equipment_serialNumber => 'Numero di serie';
 
   @override
+  String get query_equipment_serviceDue => 'Manutenzione prevista';
+
+  @override
+  String get query_equipment_serviceDue_dueSoon => 'In scadenza';
+
+  @override
+  String get query_equipment_serviceDue_ok => 'Aggiornato';
+
+  @override
+  String get query_equipment_serviceDue_overdue => 'Scaduta';
+
+  @override
   String get query_equipment_status => 'Stato';
+
+  @override
+  String get query_equipment_tags => 'Tag';
 
   @override
   String get query_equipment_type => 'Tipo';
@@ -44898,6 +45046,9 @@ class AppLocalizationsIt extends AppLocalizations {
   String get query_media_type => 'Tipo';
 
   @override
+  String get query_sheet_sectionTitle => 'Query';
+
+  @override
   String get query_sightings_count => 'Conteggio';
 
   @override
@@ -44907,10 +45058,22 @@ class AppLocalizationsIt extends AppLocalizations {
   String get query_sightings_species => 'Specie';
 
   @override
+  String get query_siteTypes_name => 'Nome';
+
+  @override
   String get query_sites_city => 'Città';
 
   @override
+  String get query_sites_coordinates => 'Coordinate';
+
+  @override
   String get query_sites_country => 'Paese';
+
+  @override
+  String get query_sites_difficulty => 'Difficoltà';
+
+  @override
+  String get query_sites_dives => 'Immersioni';
 
   @override
   String get query_sites_island => 'Isola';
@@ -44922,10 +45085,19 @@ class AppLocalizationsIt extends AppLocalizations {
   String get query_sites_name => 'Nome';
 
   @override
+  String get query_sites_notes => 'Note';
+
+  @override
   String get query_sites_rating => 'Valutazione';
 
   @override
   String get query_sites_region => 'Regione';
+
+  @override
+  String get query_sites_tags => 'Tag';
+
+  @override
+  String get query_sites_types => 'Tipi di sito';
 
   @override
   String get query_species_category => 'Categoria';
@@ -44961,7 +45133,13 @@ class AppLocalizationsIt extends AppLocalizations {
   String get query_tanks_volume => 'Volume';
 
   @override
+  String get query_trips_dives => 'Immersioni';
+
+  @override
   String get query_trips_endDate => 'Data di fine';
+
+  @override
+  String get query_trips_liveaboardName => 'Crociera subacquea';
 
   @override
   String get query_trips_location => 'Località';
@@ -44970,7 +45148,19 @@ class AppLocalizationsIt extends AppLocalizations {
   String get query_trips_name => 'Nome';
 
   @override
+  String get query_trips_notes => 'Note';
+
+  @override
+  String get query_trips_resortName => 'Resort';
+
+  @override
+  String get query_trips_shared => 'Condiviso';
+
+  @override
   String get query_trips_startDate => 'Data di inizio';
+
+  @override
+  String get query_trips_tripType => 'Tipo di viaggio';
 
   @override
   String get query_weights_amount => 'Quantità';

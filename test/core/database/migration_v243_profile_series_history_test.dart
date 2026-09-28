@@ -20,7 +20,7 @@ void main() {
     // greaterThanOrEqualTo when the next one lands.
     expect(AppDatabase.currentSchemaVersion, 243);
     expect(AppDatabase.migrationVersions, contains(243));
-    expect(AppDatabase.migrationStepCount(240), 1);
+    expect(AppDatabase.migrationStepCount(242), 1);
   });
 
   test('this rung is additive and did not move the sync floor', () {

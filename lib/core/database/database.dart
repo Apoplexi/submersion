@@ -9,6 +9,7 @@ import 'package:submersion/core/database/tables/dive_profile_tables.dart';
 import 'package:submersion/core/database/tables/dive_tables.dart';
 import 'package:submersion/core/database/tables/diver_tables.dart';
 import 'package:submersion/core/database/tables/equipment_condition_tables.dart';
+import 'package:submersion/core/database/tables/equipment_service_status_tables.dart';
 import 'package:submersion/core/database/tables/equipment_tables.dart';
 import 'package:submersion/core/database/tables/marine_life_tables.dart';
 import 'package:submersion/core/database/tables/media_tables.dart';
@@ -33,6 +34,7 @@ export 'package:submersion/core/database/tables/dive_profile_tables.dart';
 export 'package:submersion/core/database/tables/dive_tables.dart';
 export 'package:submersion/core/database/tables/diver_tables.dart';
 export 'package:submersion/core/database/tables/equipment_condition_tables.dart';
+export 'package:submersion/core/database/tables/equipment_service_status_tables.dart';
 export 'package:submersion/core/database/tables/equipment_tables.dart';
 export 'package:submersion/core/database/tables/marine_life_tables.dart';
 export 'package:submersion/core/database/tables/media_tables.dart';
@@ -138,6 +140,9 @@ String legacyDataSourceId(String diveId) => '$kLegacyDataSourceIdPrefix$diveId';
     // Equipment sharing and its event log (v234, issue #2046)
     EquipmentShares,
     EquipmentOwnershipEvents,
+    // Equipment service cache for the query language (v242, issue
+    // #2365), local only
+    EquipmentServiceStatus,
     // Saved queries (v238, issue #2365)
     SavedQueries,
     // Training courses (v1.5)
@@ -960,11 +965,17 @@ class AppDatabase extends _$AppDatabase {
     // to 240. Renumbered from 233 and then 235: main shipped 233 (#1921),
     // 234 (#2046) and 239 (#2275) while this was open.
     240,
+    // v242: equipment_service_status, the local service-due cache the
+    // query language's serviceDue field reads (issue #2365, PR 3). A table
+    // with no hlc, never synced, so the floor does not move. 241 was held
+    // by #2493 when this was taken.
+    242,
     // v243: metadata-only profile revision history over existing
     // dive_profile_series rows (#1197). No profile samples are copied:
     // history rows point at existing series ids and track parent/branch
     // relations. Local-only table, so the floor stays. Renumbered from 228
-    // and then 229: main shipped both, and open branches claim 241 and 242.
+    // and then 229, which main shipped; #2493 claims 241 and main shipped
+    // 242.
     243,
   ];
 

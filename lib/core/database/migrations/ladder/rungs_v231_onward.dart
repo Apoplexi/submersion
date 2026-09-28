@@ -70,6 +70,12 @@ extension RungsFromV231 on AppDatabase {
       await _assertProfileEventsDiveIdIndex();
     }
     if (from < 240) await reportProgress();
+    // v242: the equipment service cache (issue #2365). Table-only rung;
+    // re-asserted in beforeOpen.
+    if (from < 242) {
+      await _assertEquipmentServiceStatusTable();
+    }
+    if (from < 242) await reportProgress();
     // v243: metadata-only profile revision history over existing series
     // rows (#1197). One history row per series id, no sample/blob
     // duplication. Re-asserted in beforeOpen.

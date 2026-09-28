@@ -12684,6 +12684,88 @@ class AppLocalizationsEn extends AppLocalizations {
   String get passport_foreign_defaultName => 'Cylinder';
 
   @override
+  String get passport_nfc_tap => 'Tap an NFC tag';
+
+  @override
+  String get passport_nfc_holdNear =>
+      'Hold the tag against the back of the phone.';
+
+  @override
+  String get passport_nfc_write => 'Write NFC tag';
+
+  @override
+  String get passport_nfc_rewrite => 'Rewrite tag';
+
+  @override
+  String get passport_nfc_reprint => 'Reprint label';
+
+  @override
+  String get passport_nfc_unsupported =>
+      'This device cannot read or write NFC tags.';
+
+  @override
+  String get passport_nfc_disabled =>
+      'NFC is turned off. Turn it on in the system settings.';
+
+  @override
+  String get passport_nfc_written => 'Tag written and checked';
+
+  @override
+  String passport_nfc_tagInfo(String type, int capacity) {
+    return '$type, $capacity bytes';
+  }
+
+  @override
+  String passport_nfc_capacity(int capacity) {
+    return '$capacity bytes';
+  }
+
+  @override
+  String get passport_nfc_allFields => 'Everything fits on this tag.';
+
+  @override
+  String passport_nfc_fieldsDropped(String fields) {
+    return 'Left off to fit: $fields';
+  }
+
+  @override
+  String get passport_nfc_notNdef =>
+      'This tag cannot hold a link. Use an NTAG215 or NTAG216 tag.';
+
+  @override
+  String get passport_nfc_readOnly =>
+      'This tag is locked and cannot be written.';
+
+  @override
+  String passport_nfc_tooSmall(int capacity) {
+    return 'This tag is too small ($capacity bytes), even for the cylinder\'s identity.';
+  }
+
+  @override
+  String get passport_nfc_readBackFailed =>
+      'The tag did not read back as written, so it was not written.';
+
+  @override
+  String get passport_nfc_writeFailed =>
+      'The tag was not written. Hold it still and try again.';
+
+  @override
+  String get passport_nfc_readFailed =>
+      'Could not read the tag. Hold it still and try again.';
+
+  @override
+  String get passport_nfc_retry => 'Try again';
+
+  @override
+  String get passport_nfc_fieldName => 'Name';
+
+  @override
+  String get passport_nfc_fieldSerial => 'Serial number';
+
+  @override
+  String get passport_nfc_fieldO2Clean => 'O2 clean';
+
+  @override
   String passport_foreign_serial(String serial) {
     return 'Serial $serial';
   }
@@ -14215,6 +14297,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String equipment_list_emptyState_noEquipment(Object filterText) {
     return 'No $filterText';
   }
+
+  @override
+  String get equipment_list_emptyState_noQueryMatch =>
+      'No equipment matches this query';
 
   @override
   String get equipment_list_emptyState_noStatusMatch =>
@@ -40795,6 +40881,18 @@ class AppLocalizationsEn extends AppLocalizations {
       'Something else was still using the database file, so Submersion stopped rather than write to it. Nothing was changed and nothing is damaged. Close Submersion completely, then open it again.';
 
   @override
+  String get startup_locationUnreachable_title =>
+      'Your dive log\'s folder can\'t be reached';
+
+  @override
+  String get startup_locationUnreachable_body =>
+      'Your dive log is kept in a folder you chose, and Submersion can\'t open that folder right now. Nothing in it has been changed. If the folder is on a drive that isn\'t connected, or in a cloud folder that is still syncing, reconnect it and open Submersion again.';
+
+  @override
+  String get startup_locationUnreachable_folderLabel =>
+      'Your dive log\'s folder:';
+
+  @override
   String get startup_failure_technicalDetails => 'Technical details';
 
   @override
@@ -40855,6 +40953,22 @@ class AppLocalizationsEn extends AppLocalizations {
       'Set the damaged file aside and begin again. Nothing is deleted.';
 
   @override
+  String get startup_failure_chooseFolderAgain =>
+      'Choose your dive log\'s folder';
+
+  @override
+  String get startup_failure_chooseFolderAgain_subtitle =>
+      'Pick the same folder again to give Submersion access to it, or pick the folder your dive log is in now.';
+
+  @override
+  String get startup_failure_useDefaultLocation =>
+      'Go back to the app default location';
+
+  @override
+  String get startup_failure_useDefaultLocation_subtitle =>
+      'Stop using this folder and open the dive log in Submersion\'s own folder. Nothing in your folder is changed.';
+
+  @override
   String get startup_recovery_adopt_title => 'Use this dive log?';
 
   @override
@@ -40906,6 +41020,18 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get startup_recovery_encryptedBackup_body =>
       'That backup is encrypted. Submersion can only unlock an encrypted backup once the app is open, so use one of the other routes here first, then restore it from Settings, under Backup and Restore.';
+
+  @override
+  String get startup_recovery_useDefault_title =>
+      'Go back to the app default location?';
+
+  @override
+  String startup_recovery_useDefault_body(Object folder) {
+    return 'From now on Submersion opens the dive log in its own folder, or starts an empty one there if there is none. Nothing in $folder is moved or deleted. To use that folder again, choose it in Settings, under Database Storage.';
+  }
+
+  @override
+  String get startup_recovery_useDefault_confirm => 'Use the default location';
 
   @override
   String get startup_failure_downgrade_title =>
@@ -44185,6 +44311,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get query_entity_sightings => 'Sightings';
 
   @override
+  String get query_entity_siteTypes => 'Site types';
+
+  @override
   String get query_entity_sites => 'Dive sites';
 
   @override
@@ -44224,6 +44353,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get query_equipment_brand => 'Brand';
 
   @override
+  String get query_equipment_dives => 'Dives';
+
+  @override
   String get query_equipment_model => 'Model';
 
   @override
@@ -44233,7 +44365,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get query_equipment_serialNumber => 'Serial number';
 
   @override
+  String get query_equipment_serviceDue => 'Service due';
+
+  @override
+  String get query_equipment_serviceDue_dueSoon => 'Due soon';
+
+  @override
+  String get query_equipment_serviceDue_ok => 'Up to date';
+
+  @override
+  String get query_equipment_serviceDue_overdue => 'Overdue';
+
+  @override
   String get query_equipment_status => 'Status';
+
+  @override
+  String get query_equipment_tags => 'Tags';
 
   @override
   String get query_equipment_type => 'Type';
@@ -44248,6 +44395,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get query_media_type => 'Type';
 
   @override
+  String get query_sheet_sectionTitle => 'Query';
+
+  @override
   String get query_sightings_count => 'Count';
 
   @override
@@ -44257,10 +44407,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get query_sightings_species => 'Species';
 
   @override
+  String get query_siteTypes_name => 'Name';
+
+  @override
   String get query_sites_city => 'City';
 
   @override
+  String get query_sites_coordinates => 'Coordinates';
+
+  @override
   String get query_sites_country => 'Country';
+
+  @override
+  String get query_sites_difficulty => 'Difficulty';
+
+  @override
+  String get query_sites_dives => 'Dives';
 
   @override
   String get query_sites_island => 'Island';
@@ -44272,10 +44434,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get query_sites_name => 'Name';
 
   @override
+  String get query_sites_notes => 'Notes';
+
+  @override
   String get query_sites_rating => 'Rating';
 
   @override
   String get query_sites_region => 'Region';
+
+  @override
+  String get query_sites_tags => 'Tags';
+
+  @override
+  String get query_sites_types => 'Site types';
 
   @override
   String get query_species_category => 'Category';
@@ -44311,7 +44482,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get query_tanks_volume => 'Volume';
 
   @override
+  String get query_trips_dives => 'Dives';
+
+  @override
   String get query_trips_endDate => 'End date';
+
+  @override
+  String get query_trips_liveaboardName => 'Liveaboard';
 
   @override
   String get query_trips_location => 'Location';
@@ -44320,7 +44497,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get query_trips_name => 'Name';
 
   @override
+  String get query_trips_notes => 'Notes';
+
+  @override
+  String get query_trips_resortName => 'Resort';
+
+  @override
+  String get query_trips_shared => 'Shared';
+
+  @override
   String get query_trips_startDate => 'Start date';
+
+  @override
+  String get query_trips_tripType => 'Trip type';
 
   @override
   String get query_weights_amount => 'Amount';
