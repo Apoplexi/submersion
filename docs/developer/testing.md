@@ -36,9 +36,35 @@ tests at once.
 
 ### All Tests
 
+The quickest full run bundles the suite (see
+[Shared Isolates in CI](#shared-isolates-in-ci)):
+
+```bash
+scripts/run_all_tests.sh
+```
+
+It runs from the repository root wherever you start it, excludes performance
+tests, and passes options to `flutter test`, such as
+`scripts/run_all_tests.sh --coverage`. The whole suite goes to one
+`flutter test` call, so a coverage report covers all of it. It takes options
+only: to run particular files, use `flutter test <paths>`. `TEST_CONCURRENCY=N`
+sets the number of parallel test isolates (default: the core count, at most
+16). If anything fails, it names the test files that failed, did not compile or
+could not load, so one can be rerun on its own with `flutter test <path>`, and
+exits non-zero. `RUN_ALL_TESTS=1 git push` runs the same script before pushing.
+
+Measured on an 18-core Mac at `--concurrency=16` (issue #2512), the whole suite
+took 10 min 11 s as separate files and 2 min 52 s as bundles of up to 40 test
+files. Each run keeps its bundles in its own directory under `test/.bundles`,
+so it leaves bundles made by another run alone. Under Git Bash on Windows, where
+a command line is limited to 8,191 characters, the script rebuilds the bundles
+with more files each until their paths fit. Without `python3` it runs the files
+one by one, as plain `flutter test` does:
+
 ```bash
 flutter test
-```text
+```
+
 ### Specific Test Suite
 
 ```bash
@@ -389,9 +415,12 @@ class MockDiveRepository extends Mock implements DiveRepository {
 that made the cost of a run follow the number of test files, so the test job
 runs bundles instead: generated entrypoints that import many test files and
 call each one's `main()` inside a group named after the file
-(`scripts/bundle_tests.py`, issue #2500). Local runs and the pre-push hook still
-run test files one by one. At local concurrency a bundle is no faster, because
-it runs its files one after another in a single isolate.
+(`scripts/bundle_tests.py`, issue #2500). A full local run with
+`scripts/run_all_tests.sh` (or `RUN_ALL_TESTS=1` on a push) uses bundles too, of
+up to 40 files so they spread evenly over the local workers (issue #2512). The
+pre-push hook's usual run of the affected
+test files stays unbundled: a few dozen files finish sooner side by side than
+one after another in a single isolate.
 
 ### The rule: put back what you replace
 
@@ -418,8 +447,9 @@ Two checks enforce the rule:
 - `test/architecture/test_global_state_restored_test.dart` reads the source and
   fails on an assignment that nothing in its scope restores. It names the file
   and line, and it runs locally like any other test.
-- In CI, each generated bundle records the process-wide state before a file's
-  tests (`test/helpers/global_state_snapshot.dart`) and fails that file's group
+- In CI and in a bundled full local run, each generated bundle records the
+  process-wide state before a file's tests
+  (`test/helpers/global_state_snapshot.dart`) and fails that file's group
   if anything is left changed afterwards, whatever shape the code took.
 
 The bundle also checks each file's `main()`, which runs while the bundle is
