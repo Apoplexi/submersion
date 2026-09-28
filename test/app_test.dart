@@ -19,6 +19,8 @@ import 'package:submersion/core/services/sync/sync_service.dart'
 import 'package:submersion/features/backup/presentation/pages/restore_complete_page.dart';
 import 'package:submersion/features/cylinder_passports/presentation/services/passport_link_dispatcher.dart';
 import 'package:submersion/features/divers/presentation/providers/diver_providers.dart';
+import 'package:submersion/features/equipment/presentation/providers/equipment_service_status_providers.dart';
+import 'package:submersion/features/query/presentation/providers/service_status_keeper.dart';
 import 'package:submersion/features/backup/presentation/providers/backup_providers.dart';
 import 'package:submersion/features/settings/presentation/providers/sync_providers.dart';
 
@@ -152,6 +154,10 @@ LibraryEpochMarker _marker() => const LibraryEpochMarker(
 );
 
 void main() {
+  /// Builds of the service-due cache writer; stubbed so the app tests never
+  /// evaluate real service clocks.
+  var serviceCacheBuilds = 0;
+
   /// Pumps [SubmersionApp] with the providers its build/launch path reads
   /// stubbed out, leaving [sync] as the driver for the app-root listener.
   Future<void> pumpApp(
@@ -179,6 +185,9 @@ void main() {
             (ref) async => DeviceIdentityStatus.unchanged,
           ),
           restoreLastProviderProvider.overrideWith((ref) async {}),
+          equipmentServiceStatusCacheProvider.overrideWith((ref) async {
+            serviceCacheBuilds++;
+          }),
           ...extraOverrides,
         ],
         child: const SubmersionApp(),
@@ -186,6 +195,21 @@ void main() {
     );
     await tester.pumpAndSettle();
   }
+
+  testWidgets('runs the service-due cache writer only on demand (#2365)', (
+    tester,
+  ) async {
+    // The app root keeps the keeper alive, and the keeper starts the
+    // writer only while a filter names serviceDue: with none, launching
+    // the app evaluates no service clocks.
+    serviceCacheBuilds = 0;
+    await pumpApp(tester, _DrivableSyncNotifier(const SyncState()));
+    expect(serviceCacheBuilds, 0);
+    final container = ProviderScope.containerOf(
+      tester.element(find.byType(SubmersionApp)),
+    );
+    expect(container.exists(serviceStatusKeeperProvider), isTrue);
+  });
 
   testWidgets('shows the post-restore syncing notice when sync begins', (
     tester,

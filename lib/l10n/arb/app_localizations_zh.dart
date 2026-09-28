@@ -13807,6 +13807,9 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get equipment_list_emptyState_noQueryMatch => '没有与此查询匹配的装备';
+
+  @override
   String get equipment_list_emptyState_noStatusMatch => '没有此状态的装备';
 
   @override
@@ -42325,6 +42328,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get query_entity_sightings => '观察记录';
 
   @override
+  String get query_entity_siteTypes => '潜水点类型';
+
+  @override
   String get query_entity_sites => '潜点';
 
   @override
@@ -42364,6 +42370,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get query_equipment_brand => '品牌';
 
   @override
+  String get query_equipment_dives => '潜水';
+
+  @override
   String get query_equipment_model => '型号';
 
   @override
@@ -42373,7 +42382,22 @@ class AppLocalizationsZh extends AppLocalizations {
   String get query_equipment_serialNumber => '序列号';
 
   @override
+  String get query_equipment_serviceDue => '需要维护';
+
+  @override
+  String get query_equipment_serviceDue_dueSoon => '即将到期';
+
+  @override
+  String get query_equipment_serviceDue_ok => '已是最新版本';
+
+  @override
+  String get query_equipment_serviceDue_overdue => '已逾期';
+
+  @override
   String get query_equipment_status => '状态';
+
+  @override
+  String get query_equipment_tags => '标签';
 
   @override
   String get query_equipment_type => '类型';
@@ -42388,6 +42412,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get query_media_type => '类型';
 
   @override
+  String get query_sheet_sectionTitle => '查询';
+
+  @override
   String get query_sightings_count => '数量';
 
   @override
@@ -42397,10 +42424,22 @@ class AppLocalizationsZh extends AppLocalizations {
   String get query_sightings_species => '物种';
 
   @override
+  String get query_siteTypes_name => '名称';
+
+  @override
   String get query_sites_city => '城市';
 
   @override
+  String get query_sites_coordinates => '坐标';
+
+  @override
   String get query_sites_country => '国家';
+
+  @override
+  String get query_sites_difficulty => '难度';
+
+  @override
+  String get query_sites_dives => '潜水';
 
   @override
   String get query_sites_island => '岛屿';
@@ -42412,10 +42451,19 @@ class AppLocalizationsZh extends AppLocalizations {
   String get query_sites_name => '名称';
 
   @override
+  String get query_sites_notes => '备注';
+
+  @override
   String get query_sites_rating => '评分';
 
   @override
   String get query_sites_region => '地区';
+
+  @override
+  String get query_sites_tags => '标签';
+
+  @override
+  String get query_sites_types => '潜水点类型';
 
   @override
   String get query_species_category => '类别';
@@ -42451,7 +42499,13 @@ class AppLocalizationsZh extends AppLocalizations {
   String get query_tanks_volume => '容量';
 
   @override
+  String get query_trips_dives => '潜水';
+
+  @override
   String get query_trips_endDate => '结束日期';
+
+  @override
+  String get query_trips_liveaboardName => '船宿';
 
   @override
   String get query_trips_location => '地点';
@@ -42460,7 +42514,19 @@ class AppLocalizationsZh extends AppLocalizations {
   String get query_trips_name => '名称';
 
   @override
+  String get query_trips_notes => '备注';
+
+  @override
+  String get query_trips_resortName => '度假村';
+
+  @override
+  String get query_trips_shared => '已共享';
+
+  @override
   String get query_trips_startDate => '开始日期';
+
+  @override
+  String get query_trips_tripType => '旅行类型';
 
   @override
   String get query_weights_amount => '数量';

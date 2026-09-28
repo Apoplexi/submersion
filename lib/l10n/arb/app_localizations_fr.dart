@@ -14494,6 +14494,10 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String get equipment_list_emptyState_noQueryMatch =>
+      'Aucun équipement ne correspond à cette requête';
+
+  @override
   String get equipment_list_emptyState_noStatusMatch =>
       'Aucun équipement avec ce statut';
 
@@ -45017,6 +45021,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get query_entity_sightings => 'Observations';
 
   @override
+  String get query_entity_siteTypes => 'Types de site';
+
+  @override
   String get query_entity_sites => 'Sites de plongée';
 
   @override
@@ -45056,6 +45063,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get query_equipment_brand => 'Marque';
 
   @override
+  String get query_equipment_dives => 'Plongées';
+
+  @override
   String get query_equipment_model => 'Modèle';
 
   @override
@@ -45065,7 +45075,22 @@ class AppLocalizationsFr extends AppLocalizations {
   String get query_equipment_serialNumber => 'Numéro de série';
 
   @override
+  String get query_equipment_serviceDue => 'Révision due';
+
+  @override
+  String get query_equipment_serviceDue_dueSoon => 'Bientôt due';
+
+  @override
+  String get query_equipment_serviceDue_ok => 'À jour';
+
+  @override
+  String get query_equipment_serviceDue_overdue => 'En retard';
+
+  @override
   String get query_equipment_status => 'Statut';
+
+  @override
+  String get query_equipment_tags => 'Étiquettes';
 
   @override
   String get query_equipment_type => 'Type';
@@ -45080,6 +45105,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get query_media_type => 'Type';
 
   @override
+  String get query_sheet_sectionTitle => 'Requête';
+
+  @override
   String get query_sightings_count => 'Nombre';
 
   @override
@@ -45089,10 +45117,22 @@ class AppLocalizationsFr extends AppLocalizations {
   String get query_sightings_species => 'Espèces';
 
   @override
+  String get query_siteTypes_name => 'Nom';
+
+  @override
   String get query_sites_city => 'Ville';
 
   @override
+  String get query_sites_coordinates => 'Coordonnées';
+
+  @override
   String get query_sites_country => 'Pays';
+
+  @override
+  String get query_sites_difficulty => 'Difficulté';
+
+  @override
+  String get query_sites_dives => 'Plongées';
 
   @override
   String get query_sites_island => 'Île';
@@ -45104,10 +45144,19 @@ class AppLocalizationsFr extends AppLocalizations {
   String get query_sites_name => 'Nom';
 
   @override
+  String get query_sites_notes => 'Notes';
+
+  @override
   String get query_sites_rating => 'Note';
 
   @override
   String get query_sites_region => 'Région';
+
+  @override
+  String get query_sites_tags => 'Étiquettes';
+
+  @override
+  String get query_sites_types => 'Types de site';
 
   @override
   String get query_species_category => 'Catégorie';
@@ -45143,7 +45192,13 @@ class AppLocalizationsFr extends AppLocalizations {
   String get query_tanks_volume => 'Volume';
 
   @override
+  String get query_trips_dives => 'Plongées';
+
+  @override
   String get query_trips_endDate => 'Date de fin';
+
+  @override
+  String get query_trips_liveaboardName => 'Croisière';
 
   @override
   String get query_trips_location => 'Lieu';
@@ -45152,7 +45207,19 @@ class AppLocalizationsFr extends AppLocalizations {
   String get query_trips_name => 'Nom';
 
   @override
+  String get query_trips_notes => 'Notes';
+
+  @override
+  String get query_trips_resortName => 'Resort';
+
+  @override
+  String get query_trips_shared => 'Partagé';
+
+  @override
   String get query_trips_startDate => 'Date de début';
+
+  @override
+  String get query_trips_tripType => 'Type de voyage';
 
   @override
   String get query_weights_amount => 'Quantité';

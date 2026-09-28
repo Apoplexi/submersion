@@ -14408,6 +14408,10 @@ class AppLocalizationsHu extends AppLocalizations {
   }
 
   @override
+  String get equipment_list_emptyState_noQueryMatch =>
+      'Nincs a lekérdezésnek megfelelő felszerelés';
+
+  @override
   String get equipment_list_emptyState_noStatusMatch =>
       'Nincs ilyen állapotú felszerelés';
 
@@ -44729,6 +44733,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String get query_entity_sightings => 'Észlelések';
 
   @override
+  String get query_entity_siteTypes => 'Merülőhely-típusok';
+
+  @override
   String get query_entity_sites => 'Merülőhelyek';
 
   @override
@@ -44768,6 +44775,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String get query_equipment_brand => 'Márka';
 
   @override
+  String get query_equipment_dives => 'Merülések';
+
+  @override
   String get query_equipment_model => 'Modell';
 
   @override
@@ -44777,7 +44787,22 @@ class AppLocalizationsHu extends AppLocalizations {
   String get query_equipment_serialNumber => 'Sorozatszám';
 
   @override
+  String get query_equipment_serviceDue => 'Szerviz esedékes';
+
+  @override
+  String get query_equipment_serviceDue_dueSoon => 'Hamarosan';
+
+  @override
+  String get query_equipment_serviceDue_ok => 'Naprakész';
+
+  @override
+  String get query_equipment_serviceDue_overdue => 'Lejárt';
+
+  @override
   String get query_equipment_status => 'Állapot';
+
+  @override
+  String get query_equipment_tags => 'Címkék';
 
   @override
   String get query_equipment_type => 'Típus';
@@ -44792,6 +44817,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String get query_media_type => 'Típus';
 
   @override
+  String get query_sheet_sectionTitle => 'Lekérdezés';
+
+  @override
   String get query_sightings_count => 'Darabszám';
 
   @override
@@ -44801,10 +44829,22 @@ class AppLocalizationsHu extends AppLocalizations {
   String get query_sightings_species => 'Fajok';
 
   @override
+  String get query_siteTypes_name => 'Név';
+
+  @override
   String get query_sites_city => 'Város';
 
   @override
+  String get query_sites_coordinates => 'Koordináták';
+
+  @override
   String get query_sites_country => 'Ország';
+
+  @override
+  String get query_sites_difficulty => 'Nehézség';
+
+  @override
+  String get query_sites_dives => 'Merülések';
 
   @override
   String get query_sites_island => 'Sziget';
@@ -44816,10 +44856,19 @@ class AppLocalizationsHu extends AppLocalizations {
   String get query_sites_name => 'Név';
 
   @override
+  String get query_sites_notes => 'Jegyzetek';
+
+  @override
   String get query_sites_rating => 'Értékelés';
 
   @override
   String get query_sites_region => 'Régió';
+
+  @override
+  String get query_sites_tags => 'Címkék';
+
+  @override
+  String get query_sites_types => 'Merülőhely-típusok';
 
   @override
   String get query_species_category => 'Kategória';
@@ -44855,7 +44904,13 @@ class AppLocalizationsHu extends AppLocalizations {
   String get query_tanks_volume => 'Térfogat';
 
   @override
+  String get query_trips_dives => 'Merülések';
+
+  @override
   String get query_trips_endDate => 'Záró dátum';
+
+  @override
+  String get query_trips_liveaboardName => 'Hajószállás';
 
   @override
   String get query_trips_location => 'Helyszín';
@@ -44864,7 +44919,19 @@ class AppLocalizationsHu extends AppLocalizations {
   String get query_trips_name => 'Név';
 
   @override
+  String get query_trips_notes => 'Jegyzetek';
+
+  @override
+  String get query_trips_resortName => 'Üdülőhely';
+
+  @override
+  String get query_trips_shared => 'Megosztott';
+
+  @override
   String get query_trips_startDate => 'Kezdő dátum';
+
+  @override
+  String get query_trips_tripType => 'Út típusa';
 
   @override
   String get query_weights_amount => 'Mennyiség';

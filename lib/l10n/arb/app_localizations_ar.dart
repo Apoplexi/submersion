@@ -14252,6 +14252,10 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String get equipment_list_emptyState_noQueryMatch =>
+      'لا توجد معدات تطابق هذا الاستعلام';
+
+  @override
   String get equipment_list_emptyState_noStatusMatch =>
       'لا توجد معدات بهذه الحالة';
 
@@ -44569,6 +44573,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get query_entity_sightings => 'المشاهدات';
 
   @override
+  String get query_entity_siteTypes => 'أنواع الموقع';
+
+  @override
   String get query_entity_sites => 'مواقع الغوص';
 
   @override
@@ -44608,6 +44615,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get query_equipment_brand => 'العلامة التجارية';
 
   @override
+  String get query_equipment_dives => 'الغطسات';
+
+  @override
   String get query_equipment_model => 'الطراز';
 
   @override
@@ -44617,7 +44627,22 @@ class AppLocalizationsAr extends AppLocalizations {
   String get query_equipment_serialNumber => 'الرقم التسلسلي';
 
   @override
+  String get query_equipment_serviceDue => 'الصيانة مستحقة';
+
+  @override
+  String get query_equipment_serviceDue_dueSoon => 'قريبًا';
+
+  @override
+  String get query_equipment_serviceDue_ok => 'محدّث';
+
+  @override
+  String get query_equipment_serviceDue_overdue => 'متأخرة';
+
+  @override
   String get query_equipment_status => 'الحالة';
+
+  @override
+  String get query_equipment_tags => 'الوسوم';
 
   @override
   String get query_equipment_type => 'النوع';
@@ -44632,6 +44657,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get query_media_type => 'النوع';
 
   @override
+  String get query_sheet_sectionTitle => 'استعلام';
+
+  @override
   String get query_sightings_count => 'العدد';
 
   @override
@@ -44641,10 +44669,22 @@ class AppLocalizationsAr extends AppLocalizations {
   String get query_sightings_species => 'الأنواع';
 
   @override
+  String get query_siteTypes_name => 'الاسم';
+
+  @override
   String get query_sites_city => 'المدينة';
 
   @override
+  String get query_sites_coordinates => 'الإحداثيات';
+
+  @override
   String get query_sites_country => 'البلد';
+
+  @override
+  String get query_sites_difficulty => 'الصعوبة';
+
+  @override
+  String get query_sites_dives => 'الغطسات';
 
   @override
   String get query_sites_island => 'الجزيرة';
@@ -44656,10 +44696,19 @@ class AppLocalizationsAr extends AppLocalizations {
   String get query_sites_name => 'الاسم';
 
   @override
+  String get query_sites_notes => 'ملاحظات';
+
+  @override
   String get query_sites_rating => 'التقييم';
 
   @override
   String get query_sites_region => 'المنطقة';
+
+  @override
+  String get query_sites_tags => 'الوسوم';
+
+  @override
+  String get query_sites_types => 'أنواع الموقع';
 
   @override
   String get query_species_category => 'الفئة';
@@ -44695,7 +44744,13 @@ class AppLocalizationsAr extends AppLocalizations {
   String get query_tanks_volume => 'الحجم';
 
   @override
+  String get query_trips_dives => 'الغطسات';
+
+  @override
   String get query_trips_endDate => 'تاريخ الانتهاء';
+
+  @override
+  String get query_trips_liveaboardName => 'سفينة غوص';
 
   @override
   String get query_trips_location => 'الموقع';
@@ -44704,7 +44759,19 @@ class AppLocalizationsAr extends AppLocalizations {
   String get query_trips_name => 'الاسم';
 
   @override
+  String get query_trips_notes => 'ملاحظات';
+
+  @override
+  String get query_trips_resortName => 'المنتجع';
+
+  @override
+  String get query_trips_shared => 'مشترك';
+
+  @override
   String get query_trips_startDate => 'تاريخ البدء';
+
+  @override
+  String get query_trips_tripType => 'نوع الرحلة';
 
   @override
   String get query_weights_amount => 'الكمية';

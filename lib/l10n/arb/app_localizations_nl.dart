@@ -14348,6 +14348,10 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String get equipment_list_emptyState_noQueryMatch =>
+      'Geen uitrusting komt overeen met deze query';
+
+  @override
   String get equipment_list_emptyState_noStatusMatch =>
       'Geen uitrusting met deze status';
 
@@ -44614,6 +44618,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get query_entity_sightings => 'Waarnemingen';
 
   @override
+  String get query_entity_siteTypes => 'Duikstektypes';
+
+  @override
   String get query_entity_sites => 'Duikstekken';
 
   @override
@@ -44653,6 +44660,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get query_equipment_brand => 'Merk';
 
   @override
+  String get query_equipment_dives => 'Duiken';
+
+  @override
   String get query_equipment_model => 'Model';
 
   @override
@@ -44662,7 +44672,22 @@ class AppLocalizationsNl extends AppLocalizations {
   String get query_equipment_serialNumber => 'Serienummer';
 
   @override
+  String get query_equipment_serviceDue => 'Service nodig';
+
+  @override
+  String get query_equipment_serviceDue_dueSoon => 'Binnenkort';
+
+  @override
+  String get query_equipment_serviceDue_ok => 'Up-to-date';
+
+  @override
+  String get query_equipment_serviceDue_overdue => 'Achterstallig';
+
+  @override
   String get query_equipment_status => 'Status';
+
+  @override
+  String get query_equipment_tags => 'Tags';
 
   @override
   String get query_equipment_type => 'Type';
@@ -44677,6 +44702,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get query_media_type => 'Type';
 
   @override
+  String get query_sheet_sectionTitle => 'Query';
+
+  @override
   String get query_sightings_count => 'Aantal';
 
   @override
@@ -44686,10 +44714,22 @@ class AppLocalizationsNl extends AppLocalizations {
   String get query_sightings_species => 'Soorten';
 
   @override
+  String get query_siteTypes_name => 'Naam';
+
+  @override
   String get query_sites_city => 'Stad';
 
   @override
+  String get query_sites_coordinates => 'Coördinaten';
+
+  @override
   String get query_sites_country => 'Land';
+
+  @override
+  String get query_sites_difficulty => 'Moeilijkheidsgraad';
+
+  @override
+  String get query_sites_dives => 'Duiken';
 
   @override
   String get query_sites_island => 'Eiland';
@@ -44701,10 +44741,19 @@ class AppLocalizationsNl extends AppLocalizations {
   String get query_sites_name => 'Naam';
 
   @override
+  String get query_sites_notes => 'Notities';
+
+  @override
   String get query_sites_rating => 'Beoordeling';
 
   @override
   String get query_sites_region => 'Regio';
+
+  @override
+  String get query_sites_tags => 'Tags';
+
+  @override
+  String get query_sites_types => 'Duikstektypes';
 
   @override
   String get query_species_category => 'Categorie';
@@ -44740,7 +44789,13 @@ class AppLocalizationsNl extends AppLocalizations {
   String get query_tanks_volume => 'Volume';
 
   @override
+  String get query_trips_dives => 'Duiken';
+
+  @override
   String get query_trips_endDate => 'Einddatum';
+
+  @override
+  String get query_trips_liveaboardName => 'Liveaboard';
 
   @override
   String get query_trips_location => 'Locatie';
@@ -44749,7 +44804,19 @@ class AppLocalizationsNl extends AppLocalizations {
   String get query_trips_name => 'Naam';
 
   @override
+  String get query_trips_notes => 'Notities';
+
+  @override
+  String get query_trips_resortName => 'Resort';
+
+  @override
+  String get query_trips_shared => 'Gedeeld';
+
+  @override
   String get query_trips_startDate => 'Startdatum';
+
+  @override
+  String get query_trips_tripType => 'Reistype';
 
   @override
   String get query_weights_amount => 'Hoeveelheid';
